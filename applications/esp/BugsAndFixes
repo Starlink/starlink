@@ -1,0 +1,84 @@
+!-*-Mode: Text; fill-prefix: "	";-*-
+
+* Tue 17 Feb: Initial list of minor alterations [Completed ages ago]
+
+	My first ESP change!  Altered the esp.csh script to use the
+	ADAM_USER variable, like the comment says it does.
+
+* Feb: Rodney [Completed ages ago]
+
+	Change output format to display FWHM rather than sigma, in
+	units of arcsec, rather than pixels.
+
+* Mar: Agreed with Derek Ward-Thompson and Rodney
+
+	Improve the GAUFIT fitting algorithm, by making NSG (from
+	PORT) an alternative to Grant's one.
+	
+! Thu 4 Jun: Malcolm Currie
+
+	I've just been trying to use ESP/GAUFIT and found that it
+	doesn't do what I want, because it doesn't write the computed
+	values to parameters, only to a text file.
+
+* Thu 4 Jun: Malcolm Currie [Fixed 4 June]
+
+	In interactive mode, it asks you to hit right mouse button
+	_and_ (my emphasis) CTRL-C to quit selection of Gaussians to
+	fit.  This should be "or CTRL-C".
+
+? Thu 4 Jun: Malcolm Currie [Fixed? 4 June]
+
+	Despite putting the value for parameter OUT on the command
+	line, GAUFIT prompts me for it!  That's not appreciated in an
+	automatic script. (-: The file I'm creating does not exist.
+	Indeed its suggested default is the value I gave on the
+	command line, and hitting the return key creates the results
+	file correctly.  Looking at the interface file I notice that
+	the text files are type _CHAR and not FILENAME.  Does this
+	mean that they're using PAR_GET0C and a Fortran open statement
+	instead of FIO?  This might be a clue why parameter OUT
+	behaves peculiarly.
+
+? Thu 4 Jun: Malcolm Currie [Fixed? 10 June 1998]
+
+	The global value of COSYS is ignored.  This parameter should
+	be defaulted to the global value.  See one of the KAPPA tasks,
+	e.g.  CENTROID, for an example.  Likewise parameter IMGDEV
+	doesn't use the current graphics device.  (This may be the
+	case in other ESP graphics tasks too.)  Yet parameters XINC
+	and YINC without global associations have global in their
+	ppath.
+
+	[Added global to ppath of COSYS and IMGDEV, removed it from *INC]
+
+* Thu 4 Jun: Malcolm Currie [Fixed? (I remember doing this, but don't have a date)]
+
+	On a more-general point, there is no online help in response
+	to ? or ??  at prompts.
+
+* August 1998: Quick programming service
+
+	Made a couple of changes to the elp1_stats routine of ellpro,
+	in response to a Quick service request from Paul Lynam at
+	LivJM.  Notes in Notes-lynam
+
+! November 1998: Jonathan Smoker <J.Smoker@Queens-Belfast.AC.uk>
+
+	Requested help on ARDFIL.  Looking at ards.f it appears that
+	ESP_ARD_DRIVER returns a warning whether you type !
+	(=PAR__NULL, cf SUN/114) in response to the ARDFIL prompt, or
+	!! (=PAR__ABORT).  The latter should cause the application to
+	stop, and it doesn't.
+
+! November 1998: me
+
+	As a result of that, I realised that the command line
+	  ...ardfil=! origin=[100,100]
+	will cause csh to barf, because both ! and [ are significant
+	to the shell.  Include a note in the documentation warning
+	about this, and suggesting either explicit escaping, or
+	putting the arguments in single quotes.  Also, ards.f
+	calls par_cancl, which (I think) carefully discards any value
+	of ardfil the user sets on the command line.  Is there some
+	twisted reason why this is a Good Idea?

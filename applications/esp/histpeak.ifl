@@ -1,0 +1,267 @@
+#+
+#  Name:
+#     HISTPEAK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-SEP-1992 (GJP):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface HISTPEAK                       
+  
+  helplib '$ESP_HELP'
+
+  parameter ADEV      # Absolute deviation of the pixel values
+    type '_DOUBLE'
+    access 'write'
+    prompt 'The absolute deviation of the pixel values distribution'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+  
+  parameter ARDFIL    # ARD file for selecting image areas to use
+    type '_CHAR'
+    access 'read'
+    keyword 'ARDFIL'
+    position 5
+    prompt 'Name of the text ARD file'
+    ppath 'current,default'
+    vpath 'prompt'
+    default ardfile.dat
+    helpkey '*'
+  endparameter
+
+  parameter DEVICE    # Display device for graphics
+    type '_DEVICE'
+    access 'read'
+    keyword 'DEVICE'
+    position 4
+    prompt 'Display device code or name'
+    ppath 'current,default'
+    vpath 'prompt'
+    default xwindows
+    helpkey '*'
+  endparameter
+
+  parameter HIGH      # Highest pixel value encountered
+    type '_REAL'
+    access 'write'
+    prompt 'The highest pixel value found in the part of the NDF used'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter IN        # Input NDF
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    access 'read'
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Image NDF filename'
+    ppath 'global,default'
+    vpath 'prompt'
+    default galaxy
+    helpkey '*'
+  endparameter
+
+  parameter KURT      # Kurtosis of the pixel values
+    type '_DOUBLE'
+    access 'write'
+    prompt 'The Kurtosis of the pixel values distribution'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+  
+  parameter LOW       # Lowest pixel value encountered
+    type '_REAL'
+    access 'write'
+    prompt 'The lowest pixel value found in the part of the NDF used'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter MEAN      # Mean value of the image pixel values
+    type '_DOUBLE'
+    access 'write'
+    prompt 'The mean value of the pixel values used'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter MEDIAN    # Median value of the unsmoothed histogram
+    type '_DOUBLE'
+    access 'write'
+    prompt 'The median value of the pixel values used'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter MODE      # Simple modal value from unsmoothed histogram
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Modal value for the unsmoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter MODEI     # Interpolated value of modal count
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Interpolated modal value for smoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter MODEP     # Projected value of modal count
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Projected modal value for the smoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter MODES     # Simple modal value from smoothed histogram
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Modal value for the smoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter NUMBER    # The number of pixels actually used
+    type '_DOUBLE'
+    access 'write'
+    prompt 'The number of pixels actually used'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter PEAKV     # Unsmoothed histogram peak height
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Peak value of the unsmoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+  
+  parameter PEAKVS    # Smoothed histogram peak height
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Peak value of the smoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+  
+  parameter PEAKVI    # Interpolated histogram peak height
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Interpolated peak value for the smoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+  
+  parameter SDEV      # Simple standard deviation
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Simple standard deviation'
+    vpath 'default'
+    default 0
+    helpkey '*'
+  endparameter
+
+  parameter SIGMA     # Interpolated value of background std dev
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Interpolated standard deviation from smoothed histogram'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter SFACT     # Smoothing width requested 
+    type '_INTEGER'
+    access 'update'
+    keyword 'SFACT'
+    position 3
+    prompt 'Smoothing width you wish to use'
+    ppath 'current,default'
+    vpath 'prompt'
+    range -1,10000
+    default 0
+    helpkey '*'
+  endparameter
+
+  parameter SFACTA    # Smoothing filter radius employed 
+    type '_INTEGER'
+    access 'write'
+    prompt 'Smoothing radius used'
+    vpath 'default'
+    default 0
+    helpkey '*'
+  endparameter
+
+  parameter SKEW      # Skewness of the pixel values
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Skewness of the pixel values distribution'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter UNUPIX      # Number of unused pixels found in the areas used
+    type '_INTEGER'
+    access 'write'
+    prompt 'Number of bad pixels in the NDF used'
+    vpath 'default'
+    default 0
+    helpkey '*'
+  endparameter
+
+  parameter USE       # Area selection method
+    type '_CHAR'
+    access 'read'
+    keyword 'USE'
+    position 2
+    prompt 'Use the whole image or an ARD file'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'w','W','r','R','b','B','a','A'
+    default 'w'
+    helpkey '*'
+  endparameter
+
+  parameter VARI      # Variance of the pixel values
+    type '_DOUBLE'
+    access 'write'
+    prompt 'Variance of the pixel values distribution'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+  
+endinterface

@@ -1,0 +1,117 @@
+*+
+*  Name:
+*     ELP_PAR
+
+*  Purpose:
+*     Define ELLPRO system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of any ELLPRO global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     NG: Norman Gray (Starlink, Glasgow)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-MAR-1992 (GJP):
+*        Original version.
+*     16-OCT-1996 (GJP):
+*        Increase number of galaxies to 10000.
+*     18 Aug 1998 (NG):
+*        Include ELP__RESxxx parameters, to select type of residual
+*        calculated in elp1_stats.  Parameterised ELP__NRES
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*  The maximum size of the results arrays. 
+      INTEGER ELP__RESUL
+      PARAMETER ( ELP__RESUL = 10001 )
+
+*  The number of result types (first dim. of the RESULT array)
+      INTEGER ELP__NRES
+      PARAMETER (ELP__NRES = 18)
+*  Elements within that array
+      INTEGER ELP__STAT         ! Statistic returned from elp1_stats
+      PARAMETER (ELP__STAT = 18)
+
+*  The maximum number of points in an ellipse. 
+      INTEGER ELP__MXPOI
+      PARAMETER ( ELP__MXPOI = 500 )
+
+*  Used to indicate if the fast analysis is to be employed.
+*  Should only be set to false if accurate (but slow) estimates
+*  of the profile at small radii are required. 
+      LOGICAL ELP__FAST
+      PARAMETER ( ELP__FAST = .TRUE. )
+
+*  The maximum number of galaxy locations that can be profiled in one go.
+      INTEGER ELP__NGALS
+      PARAMETER ( ELP__NGALS = 10000 )
+
+*  Value used to define the fineness of the ellipse radii separation.
+*  1.0 default, 2.0 coarse and 0.1 fine. The smaller the number, th
+*  the greater the number of ellipses generated.
+      REAL ELP__FINE
+      PARAMETER ( ELP__FINE = 1.0 )
+
+*  The factor used to determine the size of mean count value increase at which
+*  the ellipse fitting will stop. It is assumed that if the fluctuations have
+*  become this big then the galaxy can no longer be properly profiled.   
+      REAL ELP__LIM1
+      PARAMETER ( ELP__LIM1 = 1.2 )
+
+*  The factor used to determine at what mean count level above sky the ellipse
+*  profiling should cease. The value given is used to multiply the standard
+*  deviation.
+      REAL ELP__LIM2
+      PARAMETER ( ELP__LIM2 = 0.8 )
+
+*  Radius value (in pixels) at which the position angle, ellipticity and 
+*  origin are no longer adjusted when a new radius is tried. Default
+*  value is for no cutoff.
+      REAL ELP__LIM3
+      PARAMETER ( ELP__LIM3 = -1.0 )
+
+*  Fraction of the number of points in an ellipse that must be non-bad for the 
+*  ellipse profile parameters to be retained.
+      REAL ELP__FRACT
+      PARAMETER ( ELP__FRACT = 40. )
+
+*  The value of the geometric constant PI.
+      REAL ELP__PIVAL
+      PARAMETER ( ELP__PIVAL = 3.1415926 )
+
+*  The value of the geometric constant needed to convert radians to 
+*  degrees format.
+      REAL ELP__PI2360
+      PARAMETER ( ELP__PI2360 = ELP__PIVAL*2./360. )
+
+*  The maximum number of ellipses that will be generated during 
+*  the fitting. Units 
+      REAL ELP__RLIM
+      PARAMETER ( ELP__RLIM = 150. )
+
+*  A very large value. The actual value is not important.
+      REAL ELP__VBIG
+      PARAMETER ( ELP__VBIG = 1.E+20 )
+
+*  A very small value that is greater than 0.0. The actual
+*  value is not important.
+      REAL ELP__VSMAL
+      PARAMETER ( ELP__VSMAL = 1.E-20 )
+
+*   Which type of residuals may be calculated in elp1_stats?
+      INTEGER ELP__RESMN, ELP__RESMD, ELP__RESLS
+      PARAMETER (ELP__RESMN=0, ELP__RESMD=1, ELP__RESLS=2)

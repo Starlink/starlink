@@ -1,0 +1,35 @@
+*+
+*  Name:
+*     FAS_PAR
+
+*  Purpose:
+*     Define FASTMED system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the values of the FASTMED global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-MAY-1993 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*   The maximum allowed width for the binning histogram.
+      INTEGER FAS__HISZ
+      PARAMETER ( FAS__HISZ = 32767 )

@@ -1,0 +1,352 @@
+#+
+#  Name:
+#     SECTOR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-NOV-1992 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface SECTOR
+
+  helplib '$ESP_HELP'
+
+  parameter IN           # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    prompt 'Image NDF filename'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_ARRAY'
+    default galaxy
+    helpkey '*'
+  endparameter
+
+  parameter CURSOR    # Cursor or keyboard input.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'CURSOR'
+    position 1
+    prompt 'Use the cursor to identify the galaxy centre?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default y
+    helpkey '*'
+  endparameter
+
+  parameter COSYS    # World co-ordinates or data co-ordinates.
+    type '_CHAR'
+    access 'read'
+    keyword 'COSYS'
+    prompt 'Use world or data co-ordinates to define a pixel'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'd','D','w','W'
+    default 'D'
+    helpkey '*'
+  endparameter
+
+   parameter POSANG     # Position angle of the slice.
+    type '_REAL'
+    access 'read'
+    keyword 'POSANG'
+    prompt 'Position angle'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.0
+    range 0.0,360.
+    helpkey '*'
+  endparameter
+
+   parameter COLOUR     # Pen colour used to show galaxy centre marker.
+    type '_INTEGER'
+    access 'read'
+    keyword 'COLOUR'
+    prompt 'Pen colour'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1
+    range 0,3
+    helpkey '*'
+  endparameter
+
+  parameter ANGWID     # Angular width of the slice.
+    type '_REAL'
+    access 'read'
+    keyword 'ANGWID'
+    prompt 'Angular width of the slice'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 10.0
+    range 0.0,360.
+    helpkey '*'
+  endparameter
+
+  parameter RLIM    # Length of the slice to be taken. 0 = automatic.
+    type '_INTEGER'
+    access 'read'
+    keyword 'RLIM'
+    prompt 'Radius of the slice required'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 10
+    helpkey '*'
+  endparameter
+
+  parameter MIRROR    # Are two diametrically opposite slices to be summed.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'MIRROR'
+    position 8
+    prompt 'Use two diametrically opposite slices?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default f
+    helpkey '*'
+  endparameter
+
+  parameter BACK      # Background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'BACK'
+    position 3
+    prompt 'Background count value'
+    ppath 'global,current,default'
+    association '<->GLOBAL.BACK'
+    vpath 'prompt'
+    default 760
+    helpkey '*'
+  endparameter
+
+   parameter SIGMA   # Standard deviation of the background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'SIGMA'
+    position 4
+    prompt 'Standard deviation of the background'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.SIGMA'
+    default 12
+    helpkey '*'
+  endparameter
+
+ parameter PSIZE  # Size of the pixels in arc seconds.
+    type '_REAL'
+    access 'read'
+    keyword 'PSIZE'
+    position 5
+    prompt 'Size of the pixels'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.PSIZE'
+    default 1.0
+    helpkey '*'
+  endparameter
+
+  parameter SURF      # Display counts as surface brightness flag.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'SURF'
+    position 6
+    prompt 'Display counts as surface brightness?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+       
+ parameter RADISP       # The radius display style mode.
+    type '_CHAR'
+    access 'read'
+    keyword 'RADISP'
+    position 7
+    prompt 'Radius display mode'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'r','q','l','s','R','Q','L','S' 
+    default 'r'
+    helpkey '*'
+  endparameter
+
+  parameter AUTOL       # Conduct search for a better origin?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AUTOL'
+    position 9
+    prompt 'Automatically search for better origin?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+ parameter ZEROP   # Zero point for the surface brightness plot.
+    type '_REAL'
+    access 'read'
+    keyword 'ZEROP'
+    position 10
+    prompt 'Surface brightness zerop point'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.ZEROP'
+    default 27.5
+    helpkey '*'
+  endparameter
+
+ parameter ARDFIL       # The name of the ARD file to be used.
+    type '_CHAR'
+    access 'read'
+    position 2
+    keyword 'ARDFIL'
+    prompt 'Masking ARD file'
+    ppath 'current,default'
+    vpath 'prompt'
+    default ardfile.dat
+    helpkey '*'
+  endparameter
+
+  parameter DEVICE     # Which graphics device to use.
+    type '_DEVICE'
+    access 'read'
+    keyword 'DEVICE'
+    prompt 'Which device/type to display the graph'
+    ppath 'current,default'
+    vpath 'prompt'
+    default x2windows
+    helpkey '*'
+  endparameter
+
+   parameter FITLIM     # The highest and lowest radii value to be fitted.
+    type '_REAL'
+    access 'read'
+    keyword 'FITLIM'
+    prompt 'Limits of the radius range to be fitted'
+    ppath 'current,default'
+    range 0.0,1e6
+    vpath 'prompt'
+    default 2,10
+    helpkey '*'
+  endparameter
+
+  parameter IMGDEV     # Which graphics device is displaying the image
+    type '_DEVICE'
+    access 'read'
+    keyword 'IMGDEV'
+    prompt 'Which device is displaying the image'
+    ppath 'current,default'
+    vpath 'prompt'
+    default xwindows
+    helpkey '*'
+  endparameter
+
+  parameter ORIGIN     # The origin point from which the sector extends.
+    type '_REAL'
+    access 'read'
+    keyword 'ORIGIN'
+    prompt 'Indices of the origin'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 92,96
+    helpkey '*'
+  endparameter
+ 
+ parameter OUT       # The name of the text file to contain the profile.
+    type '_CHAR'
+    access 'read'
+    keyword 'OUT'
+    position 11
+    prompt 'Text file for profile output'
+    ppath 'current,default'
+    vpath 'prompt'
+    default sectout.dat
+    helpkey '*'
+  endparameter
+
+  parameter SAME      # Use the same graphics device as the image?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'SAME'
+    prompt 'Use the same graphics device for the results graph?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default f
+    helpkey '*'
+  endparameter
+
+  parameter ABOBEL        # Central brightness of the object relative to sky.
+    type '_REAL'
+    access 'write'
+    prompt 'Central brightness of the object relative to sky'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter OCOUNT        # Count value for the object centre chosen.
+    type '_REAL'
+    access 'write'
+    prompt 'Count value for the object centre chosen'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter SLENE        # Scale length of the object (elliptical model).
+    type '_REAL'
+    access 'write'
+    prompt 'The scale length of the object (elliptical model)'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter SLENS        # Scale length of the object (spiral model).
+    type '_REAL'
+    access 'write'
+    prompt 'The scale length of the object (spiral model)'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter XCO        # X co-ordinate of the object chosen.
+    type '_REAL'
+    access 'write'
+    prompt 'The X co-ordinate of the object the user chose'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter YCO        # Y co-ordinate of the object chosen.
+    type '_REAL'
+    access 'write'
+    prompt 'The Y co-ordinate of the object the user chose'
+    vpath 'default'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+  parameter AGAIN    # Consider another part of the same image.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AGAIN'
+    prompt 'Profile again?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+endinterface

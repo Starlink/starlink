@@ -1,0 +1,62 @@
+#+
+#  Name:
+#     HSUB.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-NOV-1992 (GJP):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface HSUB                       
+  
+  helplib '$ESP_HELP'
+
+  parameter IN        # Input NDF
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Image NDF filename'
+    ppath 'global,default'
+    vpath 'prompt'
+    default galaxy
+    helpkey '*'
+  endparameter
+
+  parameter SFACT     # Smoothing width requested 
+    type '_INTEGER'
+    access 'read'
+    keyword 'SFACT'
+    position 2
+    prompt 'Smoothing width you wish to use'
+    ppath 'current,default'
+    vpath 'prompt'
+    range -1,100
+    default 0
+    helpkey '*'
+  endparameter
+
+  parameter TYPE      # Selection of mode calculation method 
+    type '_INTEGER'
+    access 'read'
+    keyword 'TYPE'
+    position 3
+    prompt 'Mode calculation method'
+    ppath 'current,default'
+    vpath 'prompt'
+    range 0,4
+    default 0
+    helpkey '*'
+  endparameter
+
+endinterface

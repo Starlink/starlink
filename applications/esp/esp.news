@@ -1,0 +1,34 @@
+1 ESP - Extended Surface Photometry - update
+                                                   Expires: **.**.**
+ 
+ The ESP package has been rereleased on Unix.  This is a package for
+ Extended Surface Photometry, aimed at photometry of large galaxies. 
+
+ The only package to change in this release is GAUFIT, which has been
+ modified to give it an alternative fitting algorithm; this should be
+ slightly faster and more robust, and it allows us to give
+ uncertainties on the fit parameters.  Also, the application can
+ now report the parameters for fitted gaussians as FWHM or sigma, and
+ in units of arcsecs or pixels.
+
+ This version of ESP also contains a number of bug fixes and the 
+ document SUN/180 has been upgraded to include information on the new
+ facilities within GAUFIT. 
+
+ ESP is available for Unix shell or ICL. To start ESP in the shell, type:
+ 
+     % esp
+ 
+ or from ICL> type:
+ 
+     ICL> esp
+ 
+ where % and ICL> are the shell and ICL prompts respectively.
+ 
+ SUN/180 gives full details of ESP.  A hypertext version is available 
+ (`showme sun180' or `findme esp').
+ 
+ ESP's maintainer is now Norman Gray at Glasgow (norman@astro.gla.ac.uk). 
+ Please report any ESP problems to him and to the Starlink Software 
+ Librarian (ussc@star.rl.ac.uk).
+ 

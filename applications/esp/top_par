@@ -1,0 +1,41 @@
+*+
+*  Name:
+*     TOP_PAR
+
+*  Purpose:
+*     Define TOPPED system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the values of the TOPPED global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JAN-1992 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*   The maximum number of pixels within an area about a bright pixel 
+*   that can be used. 
+      INTEGER TOP1__PIXN
+      PARAMETER ( TOP1__PIXN = 10000 )
+
+*   A very small value that is greater than 0.0. The actual
+*   value is not important.
+      REAL TOP1__VSMAL
+      PARAMETER ( TOP1__VSMAL = 1.E-20 )

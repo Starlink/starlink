@@ -1,0 +1,86 @@
+#+
+#  Name:
+#     FASTMED.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-MAY-1993 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface FASTMED
+
+  helplib '$ESP_HELP'
+
+  parameter IN          # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Image NDF filename'
+    ppath 'global,default'
+    vpath 'prompt'
+    default galaxies
+    helpkey '*'
+  endparameter
+
+  parameter OUT         # The resultant output NDF file.
+    type '_NDF'
+    access 'update'
+    keyword 'OUT'
+    position 2
+    prompt 'Output NDF filename'
+    ppath 'current,default'
+    vpath 'prompt'
+    default fastout
+    helpkey '*'
+  endparameter
+
+  parameter SIGMA      # Standard deviation of the image pixels.
+    type '_REAL'
+    access 'read'
+    keyword 'SIGMA'
+    position 4
+    prompt 'Standard deviation of background'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOABL.SIGMA'
+    default 46
+    helpkey '*'
+  endparameter
+
+  parameter BACK      # Background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'BACK'
+    position 3
+    prompt 'Background count value'
+    ppath 'global,current,default'
+    vpath 'prompt
+    association '<->GLOBAL.BACK'
+    default 998
+    helpkey '*'
+  endparameter
+
+  parameter WIDTH       # Width of median filter required.
+    type '_INTEGER'
+    access 'read'
+    keyword 'WIDTH'
+    position 5
+    prompt 'Width of the median filter (pixels)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default '32'
+    helpkey '*'
+  endparameter
+
+endinterface

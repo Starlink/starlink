@@ -1,0 +1,58 @@
+#+
+#  Name:
+#     MASK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     06-NOV-1992 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface MASK
+
+  helplib '$ESP_HELP'
+
+  parameter IN           # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    prompt 'Image NDF filename'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_ARRAY'
+    helpkey '*'
+  endparameter
+
+  parameter ARDFIL       # The name of the ARD file to be used.
+    type '_CHAR'
+    access 'read'
+    default ardfile.dat
+    keyword 'ARDFIL'
+    position 2
+    prompt 'Masking ARD file'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey '*'
+  endparameter
+
+  parameter OUT         # The output NDF file.
+    type '_NDF'
+    access 'update'
+    keyword 'OUT'
+    position 3
+    prompt 'Output NDF filename'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey '*'
+  endparameter
+
+endinterface

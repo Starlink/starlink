@@ -1,0 +1,377 @@
+
+#+
+#  Name:
+#     ELLPRO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     NG: Norman Gray (Starlink, Glasgow)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-MAR-1992 (GJP):
+#        Original version.
+#     18 August 1998 (NG)
+#	Added MINMOD parameter
+#     {enter_changes_here}
+
+#-    
+
+interface ELLPRO
+
+  helplib '$ESP_HELP'
+
+  parameter MODE    # Interactive or file mode?.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'MODE'
+    position 1
+    prompt 'Use the application interactively?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+  parameter IN           # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    prompt 'Image NDF filename'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_ARRAY'
+    default galaxy
+    helpkey '*'
+  endparameter
+
+  parameter CURSOR    # Cursor or keyboard input.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'CURSOR'
+    prompt 'Use the cursor to identify the galaxy centre?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+  parameter BACK      # Background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'BACK'
+    position 2
+    prompt 'Background count value'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.BACK'
+    default 760
+    helpkey '*'
+  endparameter
+
+   parameter SIGMA   # Standard deviation of the background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'SIGMA'
+    position 3
+    prompt 'Standard deviation of the background'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_SIGMA'
+    helpkey '*'
+    default 12
+  endparameter
+
+ parameter PSIZE  # Size of the pixels in arc seconds.
+    type '_REAL'
+    access 'read'
+    keyword 'PSIZE'
+    position 4
+    prompt 'Size of the pixels'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.PSIZE'
+    default 1.0
+    helpkey '*'
+  endparameter
+
+ parameter ZEROP   # Zero point for the surface brightness plot.
+    type '_REAL'
+    access 'read'
+    keyword 'ZEROP'
+    position 5
+    prompt 'Surface brightness zerop point'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.ZEROP'
+    default 27.5
+    helpkey '*'
+  endparameter
+
+ parameter ARDFIL       # The name of the ARD file to be used.
+    type '_CHAR'
+    access 'read'
+    keyword 'ARDFIL'
+    position 6
+    prompt 'Masking ARD file'
+    ppath 'current,default'
+    vpath 'prompt'
+    default ardfile.dat
+    helpkey '*'
+  endparameter
+
+  parameter DEVICE     # Which graphics device to use.
+    type '_DEVICE'
+    access 'read'
+    keyword 'DEVICE'
+    position 7
+    prompt 'Which device/type to display the graph'
+    ppath 'current,default'
+    vpath 'prompt'
+    default x2windows
+    helpkey '*'
+  endparameter
+
+ parameter OUT       # The name of the text file to contain the profile.
+    type '_CHAR'
+    access 'read'
+    position 8
+    keyword 'OUT'
+    prompt 'Text file for profile output'
+    ppath 'current,default'
+    vpath 'prompt'
+    default elpout.dat
+    helpkey '*'
+  endparameter
+
+  parameter COSYS    # World co-ordinates or data co-ordinates.
+    type '_CHAR'
+    access 'read'
+    keyword 'COSYS'
+    prompt 'Use world or data co-ordinates to define a pixel'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'd','D','w','W'
+    default 'D'
+    helpkey '*'
+  endparameter
+
+  parameter AUTOL       # Conduct search for a better origin?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AUTOL'
+    position 9
+    prompt 'Automatically search for better origin?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+  parameter AUTOLT       # What type of search
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AUTOLT'
+    position 10
+    prompt 'Use a centroid?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default n
+    helpkey '*'
+  endparameter
+
+   parameter ORIGIN     # The origin point from which the sector extends.
+    type '_REAL'
+    access 'read'
+    keyword 'ORIGIN'
+    prompt 'Indices of the origin'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey '*'
+    default 92,96
+  endparameter
+
+  parameter FAST    # Use the fast (but slightly less accurate) method.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'FAST'
+    prompt 'Fast method'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+  parameter FINE      # How finely separated should the radii values be?
+    type '_REAL'
+    access 'read'
+    keyword 'FINE'
+    prompt 'Radii separation factor.'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1.0
+    range 0.01,20.0
+    helpkey '*'
+  endparameter
+
+  parameter RLIM      # Maximum ellipse radius.
+    type '_REAL'
+    access 'read'
+    keyword 'RLIM'
+    prompt 'Maximum ellipse radius'
+    ppath 'current,default'
+    default 10.
+    vpath 'prompt'
+    helpkey '*'
+  endparameter
+
+  parameter LIM1      # Greatest ratio by which the ellipse count may increase.
+    type '_REAL'
+    access 'read'
+    keyword 'LIM1'
+    prompt 'Count increase factor'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1.25
+    helpkey '*'
+  endparameter
+
+  parameter LIM2      # SIGMA multiplying factor for lowest count allowed.
+    type '_REAL'
+    access 'read'
+    keyword 'LIM2'
+    prompt 'Lowest acceptable count factor'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.5
+    helpkey '*'
+  endparameter
+
+  parameter LIM3      # Radius at which the parameters are frozen.
+    type '_REAL'
+    access 'read'
+    keyword 'LIM3'
+    prompt 'Parameters frozen radius'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 20
+    helpkey '*'
+  endparameter
+
+  parameter FRACT      # Fraction (%) of ellipse points that are needed.
+    type '_REAL'
+    access 'read'
+    keyword 'FRACT'
+    prompt 'Fraction of ellipse points required'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 40.
+    helpkey '*'
+  endparameter
+ 
+  parameter SAME      # Use the same graphics device as the image?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'SAME'
+    prompt 'Use the same graphics device for the results graph?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default f
+    helpkey '*'
+  endparameter
+
+  parameter AGAIN    # Consider another part of the same image.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AGAIN'
+    prompt 'Profile again?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+  parameter FRZORI    # Is the galaxy origin allowed to change?
+    type '_LOGICAL'
+    access 'read'
+    position 11
+    keyword 'FRZORI'
+    prompt 'Is the galaxy origin to be frozen?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+ parameter INFILE       # The name of the text file contain the co-ordinates.
+    type '_CHAR'
+    access 'read'
+    keyword 'INFILE'
+    prompt 'Text file containing co-ordinates'
+    ppath 'current,default'
+    vpath 'prompt'
+    default coords.dat
+    helpkey '*'
+  endparameter
+
+  parameter IMGDEV     # Which graphics device is displaying the image
+    type '_DEVICE'
+    access 'read'
+    keyword 'IMGDEV'
+    prompt 'Which device is displaying the image?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default xwindows
+    helpkey '*'
+  endparameter
+
+  parameter COLOUR  # What colour should the galaxy centre pen be?
+    type '_INTEGER'
+    access 'read'
+    keyword 'COLOUR'
+    prompt 'Pen colour?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1
+    range 0,3
+    helpkey '*'
+  endparameter
+
+  parameter MINMOD  # Which minimisation-mode (which residual to use)
+    type '_INTEGER'
+    access 'read'
+    keyword 'MINMOD'
+    prompt 'Minimisation type?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0
+    range 0,2	# range is defined by ELP__RESxx in elp__par
+    helpkey '*'
+  endparameter
+
+ parameter ANGCON     # Which position angle rotation convention?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'ANGCON'
+    prompt 'Use clockwise positive rotation convention?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+ 
+  parameter ANGOFF    # Position angle offset
+    type '_REAL'
+    access 'read'
+    keyword 'ANGOFF'
+    prompt 'Position angle offset'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+endinterface

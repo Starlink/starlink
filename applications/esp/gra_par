@@ -1,0 +1,40 @@
+*+
+*  Name:
+*     GRA_PAR
+
+*  Purpose:
+*     Define GRAPHS system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of any GRAPHS global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-OCT-1993 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*  The maximum size of the results arrays. 
+      INTEGER GRA__RESUL
+      PARAMETER ( GRA__RESUL = 4096 )
+
+*  A very small value that is greater than 0.0. The actual
+*  value is not important.
+      REAL GRA__VSMAL
+      PARAMETER ( GRA__VSMAL = 1.E-20 )

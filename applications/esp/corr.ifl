@@ -1,0 +1,128 @@
+#+
+#  Name:
+#     CORR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-MAY-1993 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface CORR
+
+  helplib '$ESP_HELP'
+
+  parameter IN          # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Image NDF filename'
+    ppath 'global,default'
+    vpath 'prompt'
+    default fgalaxy
+    helpkey '*'
+  endparameter
+
+  parameter BACK        # The modal pixel count value within the source NDF.
+    type '_REAL'
+    position 5
+    access 'read'
+    prompt 'Background sky count value'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.BACK'
+    default 6200
+    helpkey '*'
+  endparameter
+
+  parameter MULT        # Multiplying factor for output values.
+    type '_REAL'
+    access 'read'
+    position 7
+    prompt 'Output correlation multiplying factor'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1000.
+    helpkey '*'
+  endparameter
+
+  parameter NSIGMA       # Height of high pixel cutoff above sky.
+    type '_REAL'
+    access 'read'
+    prompt 'Level of the cutout in SIGMA'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 10.
+    helpkey '*'
+  endparameter
+
+  parameter OUT         # The correlation results NDF file.
+    type '_NDF'
+    access 'update'
+    keyword 'OUT'
+    position 2
+    prompt 'Output NDF filename'
+    ppath 'current,default'
+    vpath 'prompt'
+    default corrout
+    helpkey '*'
+  endparameter
+
+  parameter PSIZE       # The pixel size in arc seconds. 
+    type '_REAL'
+    access 'read'
+    keyword 'PSIZE'
+    position 4
+    prompt 'Pixel size'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.PSIZE'
+    default 1.0
+    helpkey '*'
+  endparameter
+
+  parameter SIGMA        # Standard deviation of the image pixel values.
+    type '_REAL'
+    access 'read'
+    prompt 'Standard deviation of the background'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.SIGMA'
+    default 390
+    helpkey '*'
+  endparameter
+
+  parameter USEALL      # Use a high pixel cutout algorithm flag. 
+    type '_LOGICAL'
+    position 6
+    access 'read'
+    prompt 'Include very bright pixels (y/n)?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 'F' 
+    helpkey '*'
+  endparameter
+
+  parameter SCALE       # Scale length of the required galaxy in arc secs.
+    type '_REAL'
+    access 'read'
+    keyword 'SCALE'
+    position 3
+    prompt 'Galaxy scale length'
+    ppath 'current,default'
+    vpath 'prompt'
+    default '8'
+    helpkey '*'
+  endparameter
+
+endinterface

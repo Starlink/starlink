@@ -1,0 +1,42 @@
+*+
+*  Name:
+*     SKE_PAR
+
+*  Purpose:
+*     Define SKEW system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of the SKEW global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     05-NOV-1992 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*   The maximum number of pixels within a hemisphere that can be used.
+*   May be necessary to increase as higher res images of large size
+*   become available. 
+      INTEGER SKE1__PIXN
+      PARAMETER ( SKE1__PIXN = 10000 )
+
+*   A very small value that is greater than 0.0. The actual
+*   value is not important.
+      REAL SKE1__VSMAL
+      PARAMETER ( SKE1__VSMAL = 1.E-20 )

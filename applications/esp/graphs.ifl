@@ -1,0 +1,169 @@
+#+
+#  Name:
+#     GRAPHS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-NOV-1993 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface GRAPHS
+
+  helplib '$ESP_HELP'
+
+  parameter MODE    # Interactive mode or batch?.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'MODE'
+    position 1
+    prompt 'Use the application interactively?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default f
+    helpkey '*'
+  endparameter
+
+  parameter CURSOR    # Cursor or keyboard input.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'CURSOR'
+    prompt 'Use the cursor?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default f
+    helpkey '*'
+  endparameter
+
+  parameter RRANGE    # Automatic radius limit selection?
+    type '_LOGICAL'
+    access 'read'
+    position 4
+    keyword 'RRANGE'
+    prompt 'Automatic radius limit selection?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
+  parameter AGAIN      # Display profile again?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AGAIN'
+    prompt 'Display again?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+       
+ parameter RADISP       # The radius display style mode.
+    type '_CHAR'
+    access 'read'
+    keyword 'RADISP'
+    prompt 'Radius display mode'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'r','q','l','s','R','Q','L','S' 
+    default 'r'
+    helpkey '*'
+  endparameter
+
+ parameter WHATD       # The radius display style mode.
+    type '_CHAR'
+    access 'read'
+    keyword 'WHATD'
+    prompt 'Parameter to display'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 's'
+    helpkey '*'
+  endparameter
+
+  parameter DEVICE     # Which graphics device to use.
+    type '_DEVICE'
+    access 'read'
+    keyword 'DEVICE'
+    prompt 'Which device/type to display the graph'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey '*'
+  endparameter
+
+   parameter FITLIM     # The highest and lowest radii value to be fitted.
+    type '_REAL'
+    access 'read'
+    keyword 'FITLIM'
+    prompt 'Limits of the radius range to be fitted'
+    ppath 'current,default'
+    range 0.0,1e6
+    vpath 'prompt'
+    helpkey '*'
+  endparameter
+
+  parameter OUT       # The name of the text file to contain the scale length.
+    type '_CHAR'
+    access 'read'
+    position 3
+    keyword 'OUT'
+    prompt 'Text file for profile output'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey '*'
+    default 'graphs.out'
+  endparameter
+
+  parameter INFILE     # The name of the input results file.
+    type '_CHAR'
+    access 'read'
+    position 2
+    keyword 'INFILE'
+    prompt 'Name of ESP data file'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey '*'
+  endparameter
+
+  parameter LOWLIM     # Lower limit for inclusion in scale length calcs
+    type '_REAL'
+    access 'read'
+    keyword 'LOWLIM'
+    prompt 'Lower radius limit?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.5
+    helpkey '*'
+  endparameter
+ 
+  parameter ANGCON     # Which position angle rotation convention?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'ANGCON'
+    prompt 'Use clockwise positive rotation convention?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+ 
+  parameter ANGOFF    # Position angle offset
+    type '_REAL'
+    access 'read'
+    keyword 'ANGOFF'
+    prompt 'Position angle offset'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.0
+    helpkey '*'
+  endparameter
+
+endinterface

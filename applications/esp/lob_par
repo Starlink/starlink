@@ -1,0 +1,65 @@
+*+
+*  Name:
+*     LOB_PAR
+
+*  Purpose:
+*     Define LOBACK system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of any LOBACK global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     04-JUN-1993 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*  The maximum number of the pixels for which values are 
+*  kept. These values are used to fill the histogram.
+      INTEGER LOB__MXPIX
+      PARAMETER ( LOB__MXPIX = 50000 )
+
+*  The maximum number of the locations for which mode values can be 
+*  calculated
+      INTEGER LOB__NGALS
+      PARAMETER ( LOB__NGALS = 10000 )
+
+*  The maximum size of the histogram arrays and hence the maximum
+*  number of bin available for binning pixel count values.
+      INTEGER LOB__BINLI
+      PARAMETER ( LOB__BINLI = 65536 )
+
+*  The maximum number of chords that may be taken through the histogram
+*  peak to determine the projected mode value.
+      INTEGER LOB__CHORM
+      PARAMETER ( LOB__CHORM = 100 )
+
+*  The maximum permitted width for the smoothing filter.
+      INTEGER LOB__SFLIM
+      PARAMETER ( LOB__SFLIM = 100 )
+
+*  The value of the geometric constant PI (need only be approximate).
+      REAL LOB__PIVAL
+      PARAMETER ( LOB__PIVAL = 3.1415926 )
+
+*  A very small value that is greater than 0.0. The actual
+*  value is not important.
+      REAL LOB__VSMAL
+      PARAMETER ( LOB__VSMAL = 1.E-20 )
+

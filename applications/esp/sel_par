@@ -1,0 +1,42 @@
+*+
+*  Name:
+*     SEL_PAR
+
+*  Purpose:
+*     Define SELFC system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of the SELFC global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     04-OCT-1992 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*   The maximum number of pixels within a hemisphere that can be used.
+*   May be necessary to increase as higher res images of large size
+*   become available. 
+      INTEGER SEL1__PIXN
+      PARAMETER ( SEL1__PIXN = 50000 )
+
+*   A very small value that is greater than 0.0. The actual
+*   value is not important.
+      REAL SEL1__VSMAL
+      PARAMETER ( SEL1__VSMAL = 1.E-20 )

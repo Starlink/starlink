@@ -1,0 +1,362 @@
+#+
+#  Name:
+#     GAUFIT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     NG: Norman Gray (Starlink, GLA)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-MAY-1996 (GJP):
+#        Original version.
+#     25-Feb-1998 (NG):
+#	Add PSIZE and FWHM parameters to allow display of gaussian
+#	parameters as FWHM/arcsecs
+#     {enter_changes_here}
+
+#-    
+
+interface GAUFIT
+
+  # Better to use the environment variable for the help.  But I don't
+  # know if this works, and I don't have time to experiment!
+  #helplib '$ESP_HELP gaufit parameters'
+  helplib '/star/help/esp/esp'
+
+  parameter MODE    # Interactive or file mode?.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'MODE'
+    prompt 'Use the application interactively?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey *
+  endparameter
+
+  parameter IN       # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    prompt 'Image NDF filename'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_ARRAY'
+    helpkey *
+  endparameter
+
+  parameter BACK      # Background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'BACK'
+    prompt 'Background count value'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.BACK'
+    helpkey *
+  endparameter
+
+   parameter SIGMA   # Std deviation of the background count value.
+    type '_REAL'
+    access 'read'
+    keyword 'SIGMA'
+    prompt 'Std. dev. of the background'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_SIGMA'
+    helpkey *
+  endparameter
+
+  parameter ANGINC   # Increment direction in angle.
+    type '_REAL'
+    access 'read'
+    keyword 'ANGINC'
+    prompt 'Source origin variation in angle'
+#	Norman removed global 19980610
+    ppath 'current,default'
+#    ppath 'global,current,default'
+    range .00001,1
+    default 1
+    vpath 'prompt'
+    helpkey *
+  endparameter
+
+  parameter PINC   # Increment direction in peak.
+    type '_REAL'
+    access 'read'
+    keyword 'PINC'
+    prompt 'Source peak variation'
+#	Norman removed global 19980610
+    ppath 'current,default'
+#    ppath 'global,current,default'
+    range .00001,1
+    default 1
+    vpath 'prompt'
+    helpkey *
+  endparameter
+
+  parameter XINC   # Increment direction in X.
+    type '_REAL'
+    access 'read'
+    keyword 'XINC'
+    prompt 'Source origin movement in X'
+#    ppath 'global,current,default'
+#	Norman removed global 19980610
+    ppath 'current,default'
+    range .001,1
+    default .2
+    vpath 'prompt'
+    helpkey *
+  endparameter
+
+  parameter YINC   # Increment direction in Y.
+    type '_REAL'
+    access 'read'
+    keyword 'YINC'
+    prompt 'Source origin movement in Y'
+#    ppath 'global,current,default'
+#	Norman removed global 19980610
+    ppath 'current,default'
+    range .001,1
+    default .2
+    vpath 'prompt'
+    helpkey *
+  endparameter
+
+  parameter SAINC   # Variation in std dev.
+    type '_REAL'
+    access 'read'
+    keyword 'SAINC'
+    prompt 'Source std dev factor in Sa'
+#	Norman removed global 19980610
+    ppath 'current,default'
+#    ppath 'global,current,default'
+    range .00001,1
+    default 1
+    vpath 'prompt'
+    helpkey *
+  endparameter
+
+  parameter SBINC   # Variation in std dev.
+    type '_REAL'
+    access 'read'
+    keyword 'SBINC'
+    prompt 'Source std dev factor in Sb'
+#	Norman removed global 19980610
+    ppath 'current,default'
+#    ppath 'global,current,default'
+    range .00001,1
+    default 1
+    vpath 'prompt'
+    helpkey *
+  endparameter
+
+  parameter NSIGMA   # Number of sigma for pixel to be significant.
+    type '_REAL'
+    access 'read'
+    keyword 'NSIGMA'
+    prompt 'Number of sigma above sky'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    default 8
+    helpkey *
+  endparameter
+
+ parameter MAXITER  # Maximum number of iterations (lsq variant)
+    type '_INTEGER'
+    access 'read'
+    keyword 'MAXITER'
+    prompt 'Maximum number of iterations (-1 for default)'
+    ppath 'global,current,default'
+    vpath 'prompt'
+#	Use range to exclude _silly_ values
+    range -1,1000
+    default -1
+    helpkey *
+  endparameter
+
+ parameter NITER  # Number of iterations (original version)
+    type '_INTEGER'
+    access 'read'
+    keyword 'NITER'
+    prompt 'Number of iterations'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    range 1,10
+    default 5
+    helpkey *
+  endparameter
+
+ parameter OUT       # The name of the text file to contain the profile.
+    type '_CHAR'
+    access 'read'
+    keyword 'OUT'
+    prompt 'Text file for parameter'
+    ppath 'current,default'
+    vpath 'prompt'
+    default gaufit.dat
+    helpkey *
+  endparameter
+
+  parameter COSYS    # World co-ordinates or data co-ordinates.
+    type '_CHAR'
+    access 'read'
+    keyword 'COSYS'
+    prompt 'Use world or data co-ordinates to define a pixel'
+#    ppath 'current,default'
+#	Norman added global, 19980610
+    ppath 'global,current,default'
+    vpath 'prompt'
+    in 'd','D','w','W'
+    default 'D'
+    helpkey *
+  endparameter
+
+  parameter MODTYP   # Type of output image.
+    type '_CHAR'
+    access 'read'
+    keyword 'MODTYP'
+    prompt 'Whole image model (W) or residuals (R)'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'r','R','w','W','g','G'
+    default 'r'
+    helpkey *
+  endparameter
+
+ parameter INFILE       # The name of the text file contain the co-ordinates.
+    type '_CHAR'
+    access 'read'
+    keyword 'INFILE'
+    prompt 'Text file containing co-ordinates'
+    ppath 'current,default'
+    vpath 'prompt'
+    default coords.dat
+    helpkey *
+  endparameter
+
+  parameter IMGDEV     # Which graphics device is displaying the image
+    type '_DEVICE'
+    access 'read'
+    keyword 'IMGDEV'
+    prompt 'Which device is displaying the image?'
+#    ppath 'current,default'
+#	Norman added global 19980610
+    ppath 'global,current,default'
+    vpath 'prompt'
+    default xwindows
+    helpkey *
+  endparameter
+
+  parameter COLOUR  # What colour should the galaxy centre pen be?
+    type '_INTEGER'
+    access 'read'
+    keyword 'COLOUR'
+    prompt 'Pen colour?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1
+    range 0,3
+    helpkey *
+  endparameter
+
+ parameter ANGCON     # Which position angle rotation convention?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'ANGCON'
+    prompt 'Use clockwise positive rotation convention?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default f
+    helpkey *
+  endparameter
+ 
+  parameter ANGOFF    # Position angle offset
+    type '_REAL'
+    access 'read'
+    keyword 'ANGOFF'
+    prompt 'Position angle offset'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.0
+    helpkey *
+  endparameter
+
+# NG: copy definition of PSIZE from skew.ifl
+  parameter PSIZE       # The pixel size in arc seconds. 
+    type '_REAL'
+    access 'read'
+    keyword 'PSIZE'
+#    position 5
+    prompt 'Pixel size'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.PSIZE'
+    default 1.0
+    helpkey '*'
+  endparameter
+
+# NG: add definition of new non-linear least-squares fit algorithm
+# I doubt any more algorithms will be added, so a logical is appropriate,
+# rather than an integer selector
+  parameter LSQFIT      # Fit using non-linear least-squares
+    type '_LOGICAL'
+    access 'read'
+    keyword 'LSQFIT'
+    prompt 'Use the non-linear least-squares method?'
+    help 'If true, use a least-squares method to fit the gaussian parameters, rather than the older parameter search method.  The least-squares method can supply parameter uncertainties'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey *
+  endparameter
+
+# NG: select whether the LSQFIT algorithm should calculate (and display) errors
+  parameter CALCSD	# calculate and display SD uncertainties
+    type '_LOGICAL'
+    access 'read'
+    keyword 'CALCSD'
+    prompt 'Calculate and display uncertainties?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey *
+  endparameter
+
+ parameter FWHM     # Display FWHM, rather than sigma?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'FWHM'
+    prompt 'Work in FWHM, rather than sigmas?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey *
+  endparameter
+ 
+  parameter MODEL         # The output NDF file.
+    type '_NDF'
+    access 'update'
+    keyword 'MODEL'
+    prompt 'Output NDF filename'
+    ppath 'current,default'
+    vpath 'prompt'
+    helpkey *
+  endparameter
+ 
+  parameter AUTOL    # Search for a better origin?.
+    type '_LOGICAL'
+    access 'read'
+    keyword 'AUTOL'
+    prompt 'Search for a better origin?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey *
+  endparameter
+
+ endinterface

@@ -1,0 +1,42 @@
+!-*-Mode: Text; fill-prefix: "  ";-*-
+
+18-20 August 1998
+
+	Request via Quick service from Paul Lynam at LivJM
+	(pdl@astro.livjm.ac.uk), to modify the way that ellpro does
+	its galaxy profiling, `using a median rather than a mean'.
+
+	This looked like a trivial task, just requiring elp1_stats to
+	return a median in the slot where it had previously returned a
+	mean.  This won't work, however, as ellpro seems to use the
+	mean for other purposes as well, so that it looks as if simply
+	replacing this with a median would have knock-on effects.
+
+	What I've done, therefore, is to modify the call to elp1_stats
+	to include a RTYPE and STAT parameters.  RTYPE may be one of
+	ELP1__RESnn defined in elp_par, and this selects which
+	residual is to be calculated; STAT is a statistic which the
+	program can usefully (?)  report.  The choice can be
+	elp__resmn for the original one, with STAT holding the mean;
+	elp__resmd for a residual which is the sum of the absolute
+	differences between the values on the ellipse and the median,
+	with STAT returning the median; and elp__resls which is like
+	res__mn, except that the residual is a simple
+	squared-difference, without the (pointless) statistical
+	corrections and biasing of the original.
+
+	I've incorporated some of the hacks Clive Davenhall made to
+	the source, to modify the output.  It should, therefore, be
+	consistent with the version he released to Paul before, called
+	ELLPRO(M).
+
+
+
+	I'm still confused about how the makefile works.  Martin Bly
+	made some changes to it when he was building ESP for release,
+	particularly to the way that platform-specific files are
+	managed.  I haven't persuaded myself that this is completely
+	correct, as I needed some fiddling (dragging the
+	d1mach.f_littleieee, etc down from Glasgow, because they
+	hadn't been included in the `mk export_source') to build the
+	thing on star.rl.ac.uk.

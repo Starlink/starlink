@@ -1,0 +1,2050 @@
+!
+! ESP HELP LIbrary
+!
+0 ESP
+
+  ESP (standing for Extended Surface Photometry) is a package of
+  routines that deal with various aspects of obtaining galaxy profiles.
+  They may be subdivided thus:
+
+
+  ELLPRO, ELLFOU, GAUFIT, SECTOR      -  Profile generation.
+
+  HISTPEAK, LOBACK and HSUB           -  Background determination.
+
+  FASTMED, MASK, SKEW and TOPPED      -  Image preparation.
+
+  GRAPHS                              -  Presentation of results.
+  
+  CORR, SELFC, SELFCW and MIXUP       -  Object detection/enhancement.
+
+
+1 CORR
+Performs cross-correlations on an image using a galaxy template.
+
+Usage:
+
+   CORR IN OUT SCALE PSIZE BACK USEALL MULT [SIGMA] [NSIGMA]
+
+Description:
+
+   Performs calculations to cross-correlate a circular shaped
+   exponential template with an image.
+   The exponential profile template chosen optimises the chances of
+   identifying faint diffuse galaxies/galaxies of (and near) a
+   scale length defined by the user.
+
+   Performs cross-correlation calculations on an input NDF image
+   file. The resulting image/plot is stored in an output NDF.
+
+   For each image pixel in turn, all the pixels within a defined
+   radius are identified. The values for each of these in turn have
+   their background values subtracted and the result (F1)
+   multiplied by a factor (F2) generated using an exponential function.
+   The values obtained for all the surrounding image pixels are
+   summed. The total generated is divided by using a normalisation
+   value created by taking the sums of square for F1 and F2,
+   multiplying them together and then taking the square root.
+   This normalised sum is placed in the
+   appropriate pixel of the output image and the program moves on
+   to the next input image pixel to be considered.
+
+   The circular elliptical mask used is of a radius 1.8x the
+   scale length requested. Studies undertaken by Phillipps and
+   Davies at Cardiff suggest that this value optimises the
+   detection sensitivity.
+
+   The correlation value obtained is multiplied by 1000 (or a user
+   defined value) to make display easier.
+
+   A border is present in the final output image which is the
+   same width as the radius of the template used. Pixels within the
+   border have been assigned the value bad.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BACK
+BACK = _REAL (Read)
+   The modal pixel count value found in the input NDF.
+   Units counts.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF image that is to be examined.
+3 MULT
+MULT = _REAL (Read)
+   A multiplying factor applied to each of the results.
+   Default value is 1000.
+3 NSIGMA
+NSIGMA = _REAL(Read)
+   The number of half-widths above the sky level
+   count value, where the pixel count cutoff occurs.
+3 OUT
+OUT = _NDF (Write)
+   The name of the NDF data that will be created.
+3 PSIZE
+PSIZE = _REAL (Read)
+   The size of each image pixel. Units arc seconds.
+3 SCALE
+SCALE = _REAL (Read)
+   The scale length of the galaxies to be highlighted in the
+   output image. Units arc seconds.
+3 SIGMA
+SIGMA = _REAL (Read)
+   The half-width of the background pixel count within the
+   input NDF. Should be determined using a routine such as
+   HISTPEAK which ignores outliers.
+3 USEALL
+USEALL = _LOGICAL (Read)
+   Used to indicate whether a pixel count threshold is to
+   be a applied when calculating the correlation.
+2 Examples
+corr in=hh1826 out=correl scale=8. psize=0.3 back=7437.
+      useall=true mult=1000.
+
+   Correlates image HH1826 with a mask/template optimised for
+   galaxies of 8 arc seconds scale length. The pixel size on the
+   image is .3 arc second, the background count value 7437 and
+   all the pixels on the image can be used in the calculation.
+   The output image is to be named CORREL.
+
+corr in=forn out=forn4 scale=4. psize=0.22 mult=1000. back=666
+      useall=false sigma=15 nsigma=3
+
+   Correlates image FORN with a mask/template optimised for
+   galaxies of 4 arc seconds scale length. The pixel size is .22
+   arc seconds and the background count value 666.
+
+   Pixels that are brighter than 666+15x3 counts are not
+   included in the correlation calculations (USEALL=FALSE).
+   The output image is to be named FORN4.
+2 Notes
+It is assumed that the x and y axis pixels are of the same size.
+
+To establish the statistical significance of a detection, this
+application should be used in conjunction with MIXUP to allow noise
+equivalent images to be generated and correlated thereby
+establishing a 3 sigma limit.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 13-MAY-1993 (GJP)
+
+ (Original version)
+1 ELLFOU
+Ellipse fitting galaxy profiles using contour analysis.
+
+Usage:
+
+   ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
+          AUTOL FRZORI [CURSOR] [IN] [COSYS] [ORIGIN] (FINE)
+          [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] [INFILE]
+          [IMGDEV] (COLOUR) (ANGCON) (ANGOFF) (FRACT)
+
+Description:
+
+   Performs the calculations to fit galaxy profiles using ellipses.
+   The method used involves fitting an ellipse to the shape
+   of the isophote contour.
+
+   The output includes both the ellipse parameters and
+   the Fourier descriptors. The position of the centre of the
+   galaxy (and a number of other parameters) must be specified
+   interactively (using cursor or keyboard) by the user.
+
+   If MODE is false, a list containing the location of
+   galaxies within an image, is obtained from an ASCII file.
+   profiles are generated for all these objects.
+
+   If MODE is true, a value for the parameter CURSOR
+   is required. If CURSOR is true, then a cursor/mouse is used in
+   (conjunction with the most recent image displayed) to determine
+   information such as proposed galaxy centre and the largest
+   ellipse radius to be used. If CURSOR is false, a keyboard is
+   used for all input required by the application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AGAIN
+AGAIN=_LOGICAL (Read)
+   Allows the user to elect to repeat the profiling operation
+   on the current input image. Profiling is repeated if
+   AGAIN=TRUE.
+3 ANGCON
+ANGCON=_TRUE (Read)
+   Position angle convention. TRUE=clockwise positive
+3 ANGOFF
+ANGOFF=_REAL (Read)
+   Positive angle offset. Units degrees.
+3 ARDFIL
+ARDFIL=_CHAR (Read)
+   The name of an ARD file to be used to mask out regions of the
+   image that are not to be used.
+3 AUTOL
+AUTOL=_LOGICAL (Read)
+   Is a better estimate of the galaxy centre position to be
+   obtained? If AUTOL=FALSE the user estimate is employed,
+   otherwise the application examines the area of the image near
+   the user defined co-ordinates for a better estimate.
+3 BACK
+BACK=_REAL (Read)
+   The background count value for the image. Units counts.
+3 COLOUR
+COLOUR=_INTEGER (Read)
+   Colour of the pen used to mark the position of the galaxy
+   centre.
+3 COSYS
+COSYS=_CHAR (Read)
+   Use world or data co-ordinates for image pixel positions?
+   (W=world, D=data)
+3 CURSOR
+CURSOR=_LOGICAL (Read)
+   Whether the galaxy locations are to be identified using the
+   graphics cursor or the keyboard. Cursor/mouse is used if
+   CURSOR=TRUE.
+3 DEVICE
+DEVICE=_DEVICE (Read)
+   The name of the graphics device on which the graph of results
+   should be displayed.
+3 FRACT
+FRACT=_REAL (Read)
+   Fraction of pixels that must be present for a fit to be okay.
+3 FINE
+FINE=_REAL (Read)
+   A factor modifying the default separation of isophotal
+   separation of the pixels used to create ellipses.
+   The default value is 1. Decreasing this value increases the
+   number of profiles generated for a given object.
+   Must be issued from the command line.
+3 FRZORI
+FRZORI=_LOGICAL (Read)
+   Allows the origin given (or the values determined via AUTOL)
+   to remain unchanged throughout the current profiling
+   operation. The origin is free to move if FRZORI=FALSE.
+3 IMGDEV
+IMGDEV=_DEVICE (Read)
+   Name of the graphics device displaying the current image.
+3 INFILE
+INFILE=_CHAR (Read)
+   Name of a text file containing the co-ordinates of galaxies
+   to be profiled. (Only used in file mode i.e. MODE=FALSE). The
+   file may also contain a third column containing the
+   background count value. If this is found to be absent the
+   global background count value (BACK) is substituted.
+3 IN
+IN=_NDF (Read)
+   The name of the source NDF data structure/file.
+3 LIM1
+LIM1=_REAL (Read)
+   The maximum ratio that is permitted between the average mean
+   count value of the two preceeding radii profiled and that of
+   the current radius. If this ratio is exceeded, the profiling
+   operation stops.
+   Must be issued from the command line.
+3 LIM2
+LIM2=_REAL (Read)
+   The lower limit for mean profile count value. If the mean count
+   value for the current profile drops below this value the
+   profiling operation stops. Must be issued from the command line.
+3 MODE
+MODE=_LOGICAL (Read)
+   Whether the application is to run in file input mode or
+   interactively. Interactive MODE=TRUE. File mode=FALSE.
+3 ORIGIN
+ORIGIN=_REAL (Read)
+   Image indices for the galaxy origin point to be used. Units
+   pixels.
+3 OUT
+OUT=_CHAR (Read)
+   File name for the output text file containing the profile
+   data.
+3 PSIZE
+PSIZE=_REAL (Read)
+   Size of the image pixels in arc seconds.
+3 RLIM
+RLIM=_REAL (Read)
+   Radius at which the profiling will be stopped. Units pixels.
+3 SAME
+SAME=_LOGICAL (Read)
+   Is the results graph to be displayed on the device currently
+   displaying the input image? Only valid if CURSOR is true.
+   If SAME is set to true then the user is prompted to identify
+   the quadrant of the input device in which graph will be
+   displayed.
+3 SIGMA
+SIGMA=_REAL (Read)
+   The half-width of the background count value. Units counts.
+3 ZEROP
+ZEROP=_REAL (Read)
+   Zero point of the scale for surface brightness plots. Units
+   magnitudes per arc seconds.
+2 Examples
+ellfou mode=true back=6200. sigma=390. psize=1.
+       zerop=27.5 ardfil=^ardfile.dat device=xwindow
+       out=elf autol=true frzori=true cursor=true
+       same=true
+
+   Profiles are obtained for the image co-ordinates determined
+   using the cursor/mouse on the DATA image currently displayed
+   on device XWINDOW. The background count value of that image is
+   6200 with an associated half-width of 390. The
+   magnitude scale assumed has a zero point of 27.5, all profiles
+   will be output to text file ELF, the final results will
+   also be plotted on the XWINDOW device and the galaxy centre
+   co-ordinates are allowed to vary.
+
+ellfou mode=true back=1267. sigma=45. psize=2.
+       zerop=26.2 ardfil=^ardfile.dat device=xwindow
+       out=elf2 autol=true frzori=true cursor=true
+       same=false imgdev=x2windows
+
+   Profiles are obtained for the current data image on device
+   XWINDOW. The results are output onto device X2WINDOWS. An
+   ARD file definition in ARDFILE.DAT is used to identify parts
+   of the image that may be used in the profiling operation.
+   An attempt will be made to improve the co-ordinates indicated
+   via the cursor/mouse but the galaxy centre co-ordinates will
+   not be allowed to vary from one profile to the next.
+
+ellfou mode=true back=6200 sigma=390. psize=1. zerop=27.5
+       ardfil=^ardfile.dat out=elf autol=true frzori=true
+       cursor=false in=p2 cosys=w origin=96,92 rlim=10.
+       imgdev=x2windows
+
+   Profiles for the object at world co-ordinates 96,92 on image
+   P2 are obtained out to a radius of 10 pixels. The results are
+   output to device X2WINDOWS and to a file text file ELF. The
+   background count is 6200 with an associated half-width
+   of 390.
+
+ellfou mode=false infile=coords ardfil=^ardfile.dat in=jet
+       frzori=false cosys=w back=3713 sigma=23 rlim=20 psize=0.5
+       zerop=26.2 autol=false
+
+   The program is operated in file mode where the world
+   co-ordinates of the galaxies to be profiled are read from file
+   COORDS. An ARD file ARDFILE.DAT is used to identify parts of
+   the image that can be used. The global value for the
+   background count value is input in case the COORDS file does not
+   contain a third column with local background values in.
+   The image used as the source is JET. During profiling the
+   galaxy centre is allowed to vary from that originally
+   provided in the file. The profiling operation ceases
+   if the ellipse radius reaches 20 pixels.
+2 Notes
+The parameters surrounded by curved brackets may only be changed
+from the command line.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 1-JUL-1994 (GJP)
+
+ (Original version)
+1 ELLPRO
+Performs an ellipse fitting galaxy profile using simple
+intensity analysis.
+
+Usage:
+
+   ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
+          AUTOL FRZORI [CURSOR] [COSYS] [IN] [ORIGIN] (FAST)
+          (FINE) [RLIM] (LIM1) (LIM2) (LIM3) (FRACT) [SAME]
+          [AGAIN] [INFILE) [IMGDEV] (COLOUR) (ANGCON) (ANGOFF)
+
+Description:
+
+   Performs an ellipse fitting galaxy profile using simple
+   intensity analysis. The position of the centre of the galaxy
+   (and a number of other parameters) may be specified
+   interactively (using cursor or keyboard) or the location
+   within the image of several galaxies may be specified using
+   an ASCII text file.
+
+   A number of options allow the user to determine criteria for;
+   when profiling should end, whether an ARD file is to be used
+   to mask out bad areas of the image, whether the initial galaxy
+   centre value is to be fixed throughout profiling and also
+   whether or not the initial galaxy centre co-ordinates provided
+   by the user may be refined by the application before the first
+   profile is generated.
+
+   The position of the centre of the galaxy in question may be
+   input interactively, MODE=TRUE), or (if there are many galaxies
+   to be considered) may be read in from a text file (MODE=FALSE).
+   In addition, when in MODE=TRUE the galaxy can be identified
+   using a cursor (CURSOR=TRUE) as opposed to a keyboard entry of
+   its co-ordinates.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AGAIN
+AGAIN=_LOGICAL (Read)
+   Allows the user to elect to repeat the profiling operation
+   on the current input image.
+3 ANGCON
+ANGCON=_LOGICAL (Read)
+   Angle rotation convention. Defines if clockwise or
+   anticlockwise is considered positive. TRUE=Clockwise.
+3 ANGOFF
+ANGOFF=_REAL (Read)
+   Angular offset for position angles generated. Units degrees.
+3 ARDFIL
+ARDFIL=_CHAR (Read)
+   The name of an ARD file to be used to mask out regions of the
+   image that are not to be used.
+3 AUTOL
+AUTOL=_LOGICAL (Read)
+   Is a better estimate of the galaxy centre position to be
+   obtained? If AUTOL=True the program attempts to find a better
+   candidate for the galaxy centre.
+3 BACK
+BACK=_REAL (Read)
+   The background count value for the image. Units counts.
+3 COLOUR
+COLOUR = _INTEGER (Given)
+   Colour of the pen used to mark galaxy centres.
+3 COSYS
+COSYS=_CHAR (Read)
+   Use world or data co-ordinate system? (D=data W=world)
+3 CURSOR
+CURSOR=_LOGICAL (Read)
+   Whether the galaxy locations are to be identified using the
+   graphics cursor or the keyboard. True=cursor. False=keyboard.
+3 DEVICE
+DEVICE=_DEVICE (Read)
+   Name of the graphics device on which the results graph should
+   be displayed.
+3 FAST
+FAST=_LOGICAL (Read)
+   Is the faster method of profiling to be used? Default value is
+   true. The slower version should yield better values at low
+   radii values since surface interpolation (rather than
+   bi-linear) is used. The surface generated by the slow method to
+   model the galaxy near its centre is a 6x6 bi-cubic spline, so
+   considerable calculation is involved.
+3 FINE
+FINE=_REAL (Read)
+   A factor modifying the default separation of ellipses
+   profiled. The default value is 1. Decreasing this value
+   increases the number of profiles generated for a given object.
+   Increasing this value above 2.0 is not recommended.
+3 FRACT
+FRACT=_REAL (Read)
+   The minimum fraction of the points round the ellipse for which
+   no value was available due to either image pixels set to the
+   bad value or parts of the ellipse being beyond the bounds of
+   the image. If the fraction of points available for a given
+   ellipse drops below this value the results for that radius
+   are not kept.
+3 FRZORI
+FRZORI=_LOGICAL (Read)
+   Allows the origin given (or the values determined via AUTOL)
+   to remain unchanged throughout if FRZORI=TRUE.
+3 IMGDEV
+IMGDEV=_DEVICE (Read)
+   Name of the graphics graphics device displaying an image.
+3 INFILE
+INFILE=_CHAR (Read)
+   Name of a text file containing the co-ordinates of galaxies
+   to be profiled. (Only used in file mode i.e. MODE=FALSE)
+3 IN
+IN=_NDF (Read)
+   The name of the source NDF data structure/file.
+3 LIM1
+LIM1=_REAL (Read)
+   The maximum ratio that is permitted between the average mean
+   count value of the two preceeding radii profiled and that of
+   the current radius. If this value is exceeded, the profiling
+   operation stops.
+3 LIM2
+LIM2=_REAL (Read)
+   The lower limit for mean profile count value (above sky).
+   If the mean count value for the current profile drops below
+   this value the profiling operation stops. Units
+   are half-widths.
+3 LIM3
+LIM3=_REAL (Read)
+   The distance from the galaxy origin at which the profile is
+   assumed to maintain a constant position angle, origin and
+   ellipticity. At radii beyond these, parameters are no longer
+   modified. The position angle, origin and ellipticity are not
+   frozen if a value of zero or less than zero is suggested.
+   Units are pixels
+3 MODE
+MODE=_LOGICAL (Read)
+   Whether the application is to run in file input mode or
+   interactively. Interactive MODE=TRUE. File mode=FALSE.
+3 ORIGIN
+ORIGIN=_REAL (Read)
+   Image indices for the origin point to be used. Units pixels.
+3 OUT
+OUT=_CHAR (Read)
+   File name for the output text file containing the profile
+   data.
+3 PSIZE
+PSIZE=_REAL (Read)
+   Size of the image pixels in arc seconds.
+3 RLIM
+RLIM=_REAL (Read)
+   Radius at which the profiling will be stopped. Units pixels.
+3 SAME
+SAME=_LOGICAL (Read)
+   Is the results graph to be displayed on the device currently
+   displaying the input image? Only valid if CURSOR is true.
+   If SAME is set to true then the user is prompted to identify
+   the quadrant of the input device in which graph will be
+   displayed.
+3 SIGMA
+SIGMA=_REAL (Read)
+   The half-width of the background value. Units counts.
+3 ZEROP
+ZEROP=_REAL (Read)
+   Zero point of the scale for surface brightness plots. Units
+   magnitudes per arc seconds.
+2 Examples
+ellpro mode=true back=6200 sigma=390 psize=1.
+       zerop=27.5 ardfil=^ardfile.dat device=xwindows
+       out=elp1.dat autol=true frzori=false cursor=false
+       cosys=d in=p2 rlim=10 origin=96,92
+
+   Performs profiling on an object positioned at (pixel
+   co-ordinates) 96,92 on image P2. The profile determined will
+   be output to a graphical display on device XWINDOWS and to
+   text file ELP1.DAT. The galaxy centre provided will be
+   refined by the application and during profiling the galaxy centre
+   will be allowed to change. The profiling will be stopped at
+   a radius of 10 pixels.
+
+ellpro mode=true back=6200 sigma=390 psize=1. zerop=27.5
+        ardfil=^ardfile.dat device=xwindows out=elp1.dat
+        autol=false frzori=true cursor=true
+
+   Performs profiling on a galaxy identified using a cursor/mouse
+   and the most recently displayed image. The ARD area definition
+   contained in the file ARDFILE.DAT is used to mask out bad
+   parts of the image. The galaxy centre identified by the user
+   is not refined by the software and is not allowed to change
+   during profiling. The galaxy location is defined using a
+   cursor/mouse on the most recently displayed image.
+
+ellpro mode=false back=760 sigma=12 psize=0.44 zerop=27.5
+        ardfil=^arddef.dat in=p2 infile=p2log.dat
+        out=output.dat cosys=w autol=true frzori=false
+
+   The appliication reads the object locations in file P2LOG.DAT
+   (taking them as world co-ordinates) and performs profiling on
+   those locations on image P2. The profiling output is displayed
+   on the text screen and is also placed in file OUTPUT.DAT.
+2 Notes
+Parameters surrounded by curved brackets may only be
+modified via the command line.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 19-JUL-1994 (GJP)
+
+ (Original version)
+1 FASTMED
+Applies a square median filter of user defined size to an input
+image.
+
+Usage:
+
+   FASTMED IN OUT BACK SIGMA WIDTH
+
+Description:
+
+   The method used employs a rolling histogram and allows
+   the whole image to be filtered.
+
+   The median pixel value in the region surrounding each input
+   image pixel is  calculated. This value is then subtracted from
+   the value of the pixel being considered. Finally, the original
+   background count is added to the result, which is placed in the
+   corresponding pixel of the output image.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BACK
+BACK = _REAL (Read)
+   Image background count value. Units counts.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF to which the filter will be applied.
+3 OUT
+OUT = _NDF (Write)
+   The name of the output NDF that will be created.
+3 SIGMA
+SIGMA = _REAL (Read)
+   Half-width of the background count value. Units counts.
+3 WIDTH
+WIDTH = _INTEGER (Read)
+   The width of the filter to be employed. Units pixels.
+2 Examples
+fastmed in=field out=flatgal back=760. sigma=27. width=72
+   In this example, a 72x72 pixel filter will be applied to
+   the input image FIELD. The resulting median filtered image
+   will be placed in output image FLATGAL. The input image
+   (FIELD) had a global background count value of 760. with
+   an associated half-width of 27 counts.
+2 Notes
+With small filters it may be found that the resulting output
+images are noisy. This is due to the small
+number of pixels contributing to the histogram. The problem will
+be most obvious at the image edges and corners. For this reason
+some users may find it necessary to clip the output image by
+WIDTH/2 pixels on each edge to generate better results.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 18-MAY-1993 (GJP)
+
+ (Original version)
+1 GRAPHS
+Displays/analyses the results generated using SECTOR,
+ELLFOU or ELLPRO.
+
+Usage:
+
+   GRAPHS MODE INFILE OUT RRANGE [AGAIN] [CURSOR] [DEVICE]
+          [FITLIM] [RADISP] [WHATD] (ANGCON) (ANGOFF)
+
+Description:
+
+   Displays galaxy profiles and performs scale length analysis.
+   The data used comes from an ASCII text input file generated by
+   ESP application ELLPRO, ELLFOU or SECTOR.
+
+   The application can be operated in two modes; interactive and file.
+
+   INTERACTIVE - The user can select whether the radius
+                 range used to calculate the scale length values
+                 are input via a keyboard (CURSOR=FALSE) or via the
+                 mouse/ball (CURSOR=TRUE).
+
+   FILE -        The user inputs the name of the text
+                 file output by ELLPRO, ELLFOU or SECTOR and the
+                 radius range over which isophotes will be employed
+                 to calculate the galaxy scale length.
+
+   In the file mode, graphs are not displayed. Once the input
+   filename has been entered, no further user interaction is
+   required. The input file should contain the contents of a
+   single file output from ELLFOU, ELLPRO, SECTOR, or,
+   alternatively, several such files concatenated together.
+   In both modes, the name of the text file created by GRAPHS to
+   store results in, is supplied by the user.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AGAIN
+AGAIN = _LOGICAL(Read)
+   Should the profile be displayed/anaylsed again?
+3 ANGCON
+ANGCON = _LOGICAL (Read)
+   Position angle rotation convention. TRUE=clockwise positive.
+3 ANGOFF
+ANGOFF = _REAL (Read)
+   Position angle offset. Units degrees.
+3 CURSOR
+CURSOR = _LOGICAL (Read)
+   Whether the radius value range is to be identified using the
+   graphics cursor or the keyboard. Only values within the user
+   defined range will be used to determine the scale length.
+3 DEVICE
+DEVICE = _LOGICAL (Read)
+   Name of the graphics device on which to display the
+   results graph.
+3 FITLIM
+FITLIM = _REAL (Read)
+   The range of radius values over which the scale length 'fits'
+   are to be calculated.
+3 INFILE
+INFILE = _CHAR (Read)
+   Name of the text file containing the galaxy profile.
+3 MODE
+MODE = LOGICAL (Read)
+   Is the application to be used interactively or in file mode?
+   TRUE = interactive. FALSE = file mode.
+3 OUT
+OUT = _CHAR (Read)
+   File name for the output text file containing the
+   scale length data.
+3 RADISP
+RADISP = _CHAR (Read)
+   The display mode used for the radius axis of the graphs.
+
+   - Q = quarter power
+
+   - L = logarithmic
+
+   - S = square root
+
+   - R = linear
+   The radius values displayed are the equivalent radius
+   (R*) when using ELLPRO/ELLFOU input files and distance
+   from the galaxy origin when using SECTOR derived files.
+3 RRANGE
+RRANGE =_CHAR (Read)
+   Should the radius range be selected automatically?
+3 WHATD
+WHATD = _CHAR (Read)
+   What will be displayed against radius on the graphs.
+
+   -   B   = Brightness of the profile in terms of sky i.e. (I-Back)/Sigma
+
+   -   C   = Count value of the profile
+
+   -   E   = Ellipticity of the profile
+
+   -   FC1 = First cosine Fourier descriptor
+
+   -   FC2 = First sine Fourier descriptor
+
+   -   FC3 = Second cosine Fourier descriptor
+
+   -   FC4 = Second sine Fourier descriptor
+
+   -   FS1 = Third cosine Fourier descriptor
+
+   -   FS2 = Third sine Fourier descriptor
+
+   -   FS3 = Fourth cosine Fourier descriptor
+
+   -   FS4 = Fourth sine Fourier descriptor
+
+   -   P   = Position angle of the profile
+
+   -   S   = Surface brightness of the profile
+
+   -   X   = X co-ordinate
+
+   -   Y   = Y co-ordinate
+2 Examples
+graphs mode=true infile=results.dat out=scales.dat rrange=true
+      cursor=true whatd=s radisp=r device=xwindows
+
+   The file RESULTS.DAT is examined and its contents displayed
+   graphically as required. The first display will be of linear
+   radius versus surface brightness and will be shown on
+   device XWINDOWS. The radius range for the isophotes to be
+   employed in the scale length calculation are selected
+   interactively via the mouse/ball.
+
+graphs mode=true infile=profs.dat out=lengths.dat rrange=false
+      fitlim=1,20 cursor=false whatd=p radisp=l
+      device=x2windows
+
+   The results stored in file PROFS.DAT are read one after the.
+   other The profiles and 'fits' may be observed interactively as
+   graphs on device X2WINDOWS. The first display will be of
+   log(radius) versus position angle. The radius range used
+   when calculating the scale length is 1 to 20 arc seconds.
+   results are output to file LENGTHS.DAT.
+
+graphs mode=false infile=elf1.dat out=lengths.dat rrange=true
+   The profile data required is read in from file ELF1.DAT.
+   Data from isophotes chosen by the application
+   are selected for use in the scale length analysis.
+   The results are output to file LENGTHS.DAT.
+
+graphs mode=false infile=profs.dat out=scales.dat rrange=false
+       fitlim=0.5,7
+
+   Profile data read in from file PROFS.DAT is analysed to
+   determine the scale length using isophotes with a radius in
+   the range 0.5 to 7 arc seconds. The results are output into
+   text file SCALES.DAT.
+2 Notes
+Parameters surrounded by curved brackets may only be adjusted
+via the command line.
+
+Within ESP the scale lengths are calculated by assuming an
+exponential brightness profile for spiral galaxies and an
+exponential modified by a quarter power law for elliptical
+galaxies. The scale length
+value given is derived from the decay constant of the
+exponential functions.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 04-DEC-1993 (GJP)
+
+ (Original version)
+1 GAUFIT
+Performs a 2-D Gaussian fit of multiple sources.
+
+Usage:
+
+     GAUFIT MODE BACK IMGDEV SIGMA NSIGMA OUT COSYS IN MODEL  
+            MODTYPE INFILE COLOUR ANGCON ANGOFF AUTOL NITER
+            XINC YINC SAINC SBINC PINC ANGINC
+            LSQFIT PSIZE FWHM
+
+     or
+     
+     GAUFIT MODE BACK IMGDEV SIGMA NSIGMA OUT COSYS IN MODEL  
+            MODTYPE INFILE COLOUR ANGCON ANGOFF MAXITER
+            LSQFIT PSIZE FWHM
+     
+Description:
+
+     Uses a minimisation routine to determine the 2-D Gaussian profiles
+     of multiple sources on an NDF format image.
+
+     As of documentation release 180.4, GAUFIT has an alternative
+     parameter-fitting routine, using a non-linear least-squares
+     algorithm, which can produce parameter uncertainties.  This is
+     selectable by LSQFIT=TRUE. 
+
+     Source locations can be specified using a cursor or by 
+     text file. The user is allowed to restrain the extent to which 
+     each minimisation iteration is allowed to modify the location, 
+     breadth or position angle of the sources. This is 
+     essential when the package is used with overlapping sources.
+
+     Input text files must contain the x and y coordinates of the 
+     source and may in addition contain estimates for the position 
+     angle, Sa, Sb (gaussian `sigma' or FWHM of the Gaussian functions in 2 
+     directions - major axis then minor) and the peak value.
+  
+     Output image options are for the generation of the complete whole 
+     image model or an image containing the residuals in the regions 
+     surrounding the sources.
+2 Parameters
+For information on individual parameters, select from the list below.
+Where a parameter is defined for only one of the two modes LSQ and PS
+(parameter-search, LSQFIT=NO), this is noted in its description.
+
+3 ANGCON
+ANGCON = _LOGICAL (Read)
+   Angle rotation convention. Defines if clockwise or
+   anticlockwise is considered positive. TRUE=Clockwise.
+3 ANGINC
+ANGINC = _REAL (Read) [PS]
+   The amount by which the angle of a source may vary.
+   Arbitrary range 0 to 1. 1 = free to move as required.
+   0 = unable to move.
+3 ANGOFF
+ANGOFF = _REAL (Read) 
+   Angular offset for position angles generated. Units degrees.
+3 AUTOL
+AUTOL = _LOGICAL (Read) [PS]
+   Is the source origin provided to be refined?
+3 BACK
+BACK = _REAL (Read)
+   The background value for the image.
+
+   [LSQ] If this is negative, then the background is obtained as part of
+   the fitting routine.
+3 CALCSD
+CALCSD = _LOGICAL (Read) [LSQ]
+   Indicates whether the LSQ algorithm should calculate and display
+   uncertainties.
+
+   This is expensive to calculate (approaching half the number of
+   function evaluations), so it will save you time to switch this off
+   if you do not require it.
+3 COLOUR
+COLOUR = _INTEGER (Read)
+   Colour of the pen used to mark source centres.
+3 COSYS
+COSYS = _CHAR (Read)
+   Use world or data co-ordinate system? (D=data W=world)
+3 FWHM
+FWHM = _LOGICAL (Read)
+   If true, gaussian widths are read and written in units of FWHM,
+   rather than `standard deviation'.
+3 IMGDEV
+IMGDEV = _DEVICE (Read) 
+   Name of the graphics device on which the results graph should 
+   be displayed.
+3 INFILE
+INFILE = _CHAR (Read)
+   Name of a text file containing the co-ordinates sources 
+   to be profiled.
+3 IN
+IN = _NDF (Read)
+   The name of the source NDF data structure/file.
+3 MAXITER
+MAXITER = _INTEGER (Read) [LSQ]
+   The maximum number of iterations the routine may use.  If given as
+   -1, the routine uses a default value.  This is intended as a brake
+   on runaway problems with pathological data, and need not
+   generally be changed from the default.
+3 MODE
+MODE = _LOGICAL (Read)
+   Whether the application is to run in file input mode or 
+   interactively. Interactive MODE=TRUE. File mode=FALSE.
+3 MODEL
+MODEL = _NDF (Read)
+   The output NDF.
+3 MODTYP
+MODTYP=_CHAR (Read)
+   The type of output NDF file to be created. MODTYP=R gives
+   residuals near the sources. MODTYP=W gives the whole
+   image model.
+
+   [LSQ] MODTYP=G gives a `regression diagnostic', which is an image
+   in which the value at each point is the change in the residual
+   function if the corresponding point in the data were deleted.  The
+   residual function is half the sum of the squares of the differences
+   between the model and the data.  This is expensive to create, so it
+   should not be selected unless it is to be used.
+3 NITER
+NITER = _INTEGER (Read) [PS]
+   The number of iterations the algorithm should use to home in on a
+   best-fit parameter set.
+3 NSIGMA
+NSIGMA = _REAL (Read) [PS]
+   Number of sigma above sky at which pixels are considered 
+   to be significant.
+3 OUT
+OUT = _CHAR (Read)
+   File name for the output text file containing the profile 
+   data.
+3 PINC
+PINC = _REAL (Read) [PS]
+   The amount by which the peak of a source may vary.
+   1 = free to move as required. 0 = unable to move.  
+3 PSIZE
+PSIZE = _REAL (Read)
+   The size of a pixel in arcseconds.  If this parameter is null,
+   sizes are displayed in units of pixels.
+3 SAINC
+SAINC = _REAL (Read) [PS]
+   The amount by which the standard deviation of a source may vary
+   per iteration. Largest axis. 1 = free to move as required. 
+   0 = unable to move.  
+3 SBINC
+SBINC = _REAL (Read) [PS]
+   The amount by which the standard deviation of a source may vary
+   per iteration. Smallest axis.
+3 SIGMA
+SIGMA = _REAL (Read) [PS]
+SIGMA = _REAL (Written) [LSQ]
+   Standard deviation of the sky count.
+
+   [PS] Read as input.
+
+   [LSQ] The calculation of the parameter uncertainties itself
+   calculates a value for the data standard deviation, and writes it
+   to this parameter.  If the value is grossly in error, please inform
+   the ESP maintainer.
+3 XINC
+XINC = _REAL (Read) [PS]
+   The amount by which the x coordinate of a source may vary
+   per iteration. 1 = free to move as required.
+   0 = unable to move.  
+3 YINC
+YINC = _REAL (Read) [PS]
+   The amount by which the x coordinate of a source may vary
+   per iteration. 1 = free to move as required.
+   0 = unable to move.  
+2 Examples
+gaufit mode=false infile=coords.dat in=image out=sources
+       cosys=w modtyp=w model=imodel
+
+  Will read source coordinates from the text file coords.dat. 
+  The image on which these appear is image, the output image 
+  containing the model for each pixel will be imodel.
+  The coordinates provided by the file will be assumed to be
+  in the form of world coordinates.
+
+gaufit mode=true out=test1 modtyp=r angoff=90
+        
+  The sources will be identified by cursor. The output 
+  image test1 will only show the residual (discrepancy 
+  between the models and the source image in the vicinity
+  of the sources. The resultant position angles will be
+  modified by 90 degrees.
+2 Authors
+GJP: Grant Privett (STARLINK)
+NG: Norman Gray (Starlink, Glasgow)
+2 History
+ 01-Aug-1996 (GJP)
+   Original version
+
+ 15 June 1998 (NG)
+   Source release 0.9 (beta), documentation release SUN/180.4. Added
+   the LSQ fitting algorithm, added FWHM and PSIZE parameters.
+1 HISTPEAK
+Establish the mean, mode, median and other statistics
+for NDF image files.
+
+Usage:
+
+   HISTPEAK IN USE SFACT DEVICE [ARDFIL]
+
+Description:
+
+   Allows the user to input the name of an NDF image file and
+   then constructs an image count value versus occurence
+   histogram. This is used to allow count median, mode, kurtosis,
+   standard deviation, background count half-width and skewness
+   values to be estimated.
+
+   The user may also select which parts of the image are to be
+   used. The options implemented are:
+
+   - the whole image.
+
+   - areas defined using an ARD file.
+
+   Both options exclude bad valued points from the calculations.
+
+   Four estimates of the modal value are generated:
+
+   - unsmoothed histogram mode.
+
+   - smoothed histogram mode.
+
+   - projected mode. Calculated by extrapolating the lengths of a
+     series of chords through the peak to zero length and
+     determining the count value at which this occurs.
+
+   - interpolated mode. Calculated by assuming a Normal form
+     for the histogram peak and 'fitting' a function to it.
+     The function is then used to provide both a modal value and
+     the background count half-width.
+
+   An estimate of the standard deviation of pixel count values
+   and the background count halfwidth are generated.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ARDFIL
+ARDFIL = _CHAR (Read)
+   The name of the ARD file containing a description of
+   the parts of the image to be ignored.
+3 DEVICE
+DEVICE = _DEVICE (Read)
+   The name or number of the graphics display type to be
+   used when displaying the histogram. ! may be used if
+   graphics are not required.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF data structure/file that is to be
+   examined.
+3 LOW
+LOW = _REAL (Write)
+   The lowest pixel count value found in the parts of the
+   image that were used. Units counts.
+3 HIGH
+HIGH = _REAL (Write)
+   The highest pixel count value found in the parts of the
+   image that were used. Units counts.
+3 KURT
+KURT = _DOUBLE (Write)
+   The value of pixel count kurtosis calculated for the good
+   pixels found in the parts of the image used.
+3 MEAN
+MEAN = _DOUBLE (Write)
+   The mean pixel count value calculated using the pixels found
+   in the parts of the image used. Units counts.
+3 MEDIAN
+MEDIAN = _DOUBLE (Write)
+   The median pixel count value calculated using the pixels
+   found in the parts of the image used. Units counts.
+3 MODE
+MODE = DOUBLE (Write)
+   The modal value of the unsmoothed histogram generated
+   when using only pixels from the parts of the image requested.
+3 MODEI
+MODEI = _DOUBLE (Write)
+   The modal value of the histogram calculated by
+   assuming that near the histogram peak a Normal distribution
+   is present and then 'fitting' it. The 'fit' obtained
+   supplies the value for the histogram peak and also an
+   accurate estimate of the background count half-width.
+3 MODEP
+MODEP = _DOUBLE (Write)
+   The modal value of the smoothed histogram calculated
+   by taking a number of chords through the histogram and
+   by examining the length of chord versus height relationship
+   extrapolates to a zero chord length. Assumes that the
+   histogram peak is probably a skewed distribution (SIGMA).
+3 MODES
+MODES = _DOUBLE (Write)
+   The modal value of the smoothed histogram calculated
+   when using only pixels from the parts of the image requested.
+3 PEAKV
+PEAKV = _DOUBLE (Write)
+   The peak number of pixels found with a given count value
+   in the unsmoothed count versus occurence histogram.
+3 PEAKVS
+PEAKVS = _DOUBLE (Write)
+   The peak number of pixels found with a given count value
+   in the smoothed count versus occurence histogram.
+3 PEAKVI
+PEAKVI = _DOUBLE (Write)
+   The peak number of pixels found with a given count value
+   as estimated by fitting a Normal distribution to the
+   peak of the count versus occurence histogram.
+3 SDEV
+SDEV = _DOUBLE (Write)
+   The standard deviation of the pixel count value calculated
+   using only the good pixels from the image areas requested.
+3 SIGMA
+SIGMA = _DOUBLE (Write)
+   Estimates for the background count half-width. Units counts.
+3 SFACT
+SFACT = _INTEGER (Read)
+   The Gaussian smoothing filter radius requested. This may be:
+
+   - -1 to indicate that the application should automatically
+     assign a filter radius to apply to the histogram.
+
+   - 0 to indicate that the histogram should not be smoothed.
+
+   - >0 to indicate the radius of the Gaussian filter.
+   Values greater than HIS__SFLIM (see include file) are not
+   allowed. Units counts.
+3 SFACTA
+SFACTA = _INTEGER (Write)
+   The Gaussian filter radius actually employed by the application.
+   See SFACT. Units counts.
+3 SKEW
+SKEW = _DOUBLE (Write)
+   The value of pixel count skewness calculated for the
+   pixels found in the parts of the image used.
+3 UNUPIX
+UNUPIX = _INTEGER (Write)
+   The number of unused pixels in the final image.
+3 USE
+USE = _CHAR (Read)
+   Defines the method by which the areas of the image to be
+   used in building up the pixel count histogram are to be
+   selected.
+      USE='W' All the image pixels are used.
+      USE='A' The image pixels are defined using an ARD file
+2 Examples
+histpeak in=galaxy sfact=3 use=w device=ikon1
+   The statistics are calculated for the image GALAXY, using the
+   all the non-bad pixels on the image and the results displayed
+   on the default device as text and graphically on device IKON1.
+   The histogram used to calculate the interpolated mode and
+   background halfwidth is smoothed using a Gaussian filter of
+   radius 3 counts.
+
+histpeak in=galaxy2 sfact=-1 use=a device=xwindows ardfil=^okay.dat
+   The statistics are calculated for the image GALAXY2, using
+   the image pixels defined by ARD file OKAY.DAT
+   and the results displayed
+   on the default device as text and graphically on device XWINDOWS.
+   A smoothed histogram is used to calculate the interpolated mode and
+   background half-width. The width of the smoothing filter is
+   chosen by the application.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 11-JUL-1992 (GJP)
+
+ (Original version)
+2 Implementation_Status
+   The current version will not accept a pixel value range greater
+   than the largest integer value possible.
+1 HSUB
+A subroutine version of HISTPEAK for developers.
+
+Usage:
+
+   HSUB IN SFACT TYPE
+
+Description:
+
+   A subroutine version of HISTPEAK that has been designed to be
+   easily transplanted into the users ADAM programs. It establishes
+   the mode, median and other statistics for NDF image files. Calls a
+   subroutine based upon a modified version of HISTPEAK to obtain
+   values for the mode, skewness and kurtosis values for an NDF image.
+
+   The method employed to calculate the modal value from the
+   count versus frequency histogram is user selected using
+   parameter TYPE.
+
+   The histogram may also be smoothed using a Normal distribution
+   filter of integer radius SFACT. In general, values less than 3
+   have very little effect. A value of 0 indicates no smoothing is to
+   be employed.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = _NDF (Read)
+   The name of the NDF data structure/file that is to be
+   examined.
+3 SFACT
+SFACT = _INTEGER (Read)
+   The Gaussian smoothing filter radius requested. This may be:
+
+   - -1 to indicate that the application should automatically
+     assign a filter radius to apply to the histogram.
+
+   - 0 to indicate that the histogram should not be smoothed.
+
+   - >0 to indicate the radius of the Gaussian filter to use.
+   Values greater than HSB__SFLIM (see include file HSUB_PAR)
+   are not allowed. The value returned is that actually
+   employed. Units counts.
+3 TYPE
+TYPE = _INTEGER (Read)
+   Allows the user to define which method is to be used to
+   calculate the modal count value.
+   1 = raw histogram
+   2 = smoothed histogram
+   3 = extrapolate the length of chords through histogram peak
+       to zero length
+   4 = interpolation of data points near the histogram peak
+   0 = computer selection i.e. the highest method number that
+       didnt fail
+   A negative value is returned if the application cannot supply a
+   result using the method requested. The value returned for
+   mode is the next best estimate.
+2 Examples
+hsub in=ic3374 sfact=0 type=0
+   A histogram of the values in image IC3374 is constructed.
+   The image is not smoothed (SFACT=0) and the results returned
+   correspond to the highest value (1-4) of TYPE that was
+   obtainable.
+
+hsub in=galaxy sfact=10 type=4
+   A histogram of the values in image GALAXY is used. The image
+   is smoothed (SFACT=10) using a Gaussian filter of radius 10.
+   The results required are those for the smoothed histogram
+   only.
+
+hsub in=forn4 sfact=6 type=3
+   A histogram of the values in image FORN4 is used. The image
+   is smoothed using a gaussian filter of radius 6 and the
+   results returned those for the projected mode value.
+2 Notes
+HSUB should be viewed as a coding example for users wishing
+to incorporate the functions of HISTPEAK into their own
+programs.
+
+This application is intended to form the basis of a user
+program requiring image statistics. The user requiring other
+data from the application will need to modify subroutines HSUB
+and HISTPEA2 so that the desired parameters (say mean or median)
+are passed between them.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 13-Nov-1992 (GJP)
+
+ (Original version)
+
+ 29-Jan-1993 (GJP)
+
+ Bug in the interpolation method corrected.
+2 Implementation_Status
+   The current version will not accept a pixel value range greater
+   than the largest integer value possible.
+1 LOBACK
+Establishes the local mode values for parts of an image.
+
+Usage:
+
+   LOBACK IN INFILE SFACT THIRD COSYS OUT WIDTH
+
+Description:
+
+   Establishes the local mode values for parts of an image
+   immediately surrounding a set of image co-ordinates supplied by
+   the user.
+
+   The user may also supply some indication of the number of pixels
+   that must be used to create the pixel value histogram. This
+   value may be supplied as the width of the square area around the
+   co-ordinates that will be used, or alternatively the number of
+   contiguous data points believed to be present in the object at
+   the image location specified.
+
+   The latter method is intended specifically for use with RGASP's
+   IMAGES or IRAF's FOCAS output files.
+
+   All co-ordinates are read from a two or three columns
+   ASCII text file. If two columns are present then these are
+   taken as representing the image co-ordinates required for the
+   regions of the image to be considered. If three columns are
+   present the third column respresents the width of the area
+   to be sampled or the number of contiguous pixels detected there
+   by FOCAS or IMAGES.
+
+   The selection of the number of pixels to used in the histogram is
+   defined by the user subject to a lower limit of 1024 pixels
+   (32x32).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COSYS
+COSYS = _CHAR (Read)
+   Defines whether the co-ordinates are provided as data
+   (COSYS='D') or world (COSYS='W').
+3 IN
+IN = _NDF (Read)
+   The name of the NDF data structure/file that is to be
+   examined.
+3 INFILE
+INFILE = _CHAR (Read)
+   The name of the ASCII text file containing the image
+   co-ordinates and number of pixels to be used at each location
+   or the number of contiguous pixels found there by FOCAS or
+   IMAGES.
+3 OUT
+OUT = _CHAR (Read)
+   The file name in which the results are stored in text form.
+3 SFACT
+SFACT = _INTEGER (Read)
+   The Gaussian smoothing filter radius requested. This may be:
+
+   - -1 to indicate that the application should automatically
+     assign a filter radius to apply to the histogram.
+
+   - 0 to indicate that the histogram should not be smoothed.
+
+   - >0 to indicate the radius of the Gaussian filter to use.
+   Values greater than LOB__SFLIM (see include file) are not
+   allowed.
+   The value returned is that employed. Units counts.
+3 THIRD
+THIRD = _LOGICAL (Read)
+   Determines whether or not the third column found in
+   the text file specified using INFILE, contains the number
+   of contiguous image pixels believed to be at that image
+   location, (THIRD = TRUE), or the number of screen pixels to be
+   taken from the image around the required location
+   (THIRD=FALSE).
+
+    The value supplied via the third text column is used to
+    determine how big an area of image must be used when
+    calculating the background. This is done by assuming
+    that all the pixels in the object are in a square
+    area and then determining the width of that area.
+    The width used in the end is 3 times that of the
+    object.
+
+   However, the WIDTH parameter
+   overrides this if less than 32x32 pixels (as defined by the
+   WIDTH parameter limits in the LOBACK.IFL file) are to be used.
+   This ensures that the histogram employed is reasonably well
+   filled under most circumstances.
+3 WIDTH
+WIDTH = _INTEGER (Read)
+   The width of the square area of the image from which pixel
+   values will be taken to construct the histogram. The minimum
+   permitted value is 32 (as defined in the LOBACK.IFL file).
+   Units pixels.
+2 Examples
+loback in=p2 infile=coords.dat sfact=0 third=true cosys=w
+       out=backs.dat width=64
+
+   Reads the world co-ordinate data stored in text file COORDS
+   and determines the background count value within a 64x64 pixel
+   area surrounding each of those locations. The histogram
+   generated to do this will not be smoothed. The output will be
+   into text file BACKS.DAT. Since THIRD is true, the third
+   column represents the number of pixels thought to make up
+   the object.
+
+loback in=p2 infile=coords.dat sfact=4 third=false cosys=w
+       out=output.dat width=35
+
+   Determines the background count value within a 35x35 pixel
+   area surrounding each of the locations identified in
+   COORDS.DAT. The histogram generated to do this will be
+   smoothed using a Gaussian 4 counts wide. The output will be
+   into text file OUTPUT.DAT. Since THIRD is false, the third
+   column represent the lower limit of pixels to be taken from
+   the image to make up the histogram. The co-ordinate system
+   used is world.
+2 Notes
+The current version will not accept a pixel value range greater
+than the largest integer value possible.
+
+The user may easily abolish the 32x32 pixel filter lower size
+limit by modifying the WIDTH parameter entry in the LOBACK.IFL
+file. This action is only recommended for use with very flat
+images.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 14-Jun-1993 (GJP)
+
+ (Original version)
+1 MASK
+Uses an ARD file to set some pixels of a given image to bad.
+
+Usage:
+
+   MASK IN ARDFIL OUT
+
+Description:
+
+   Allows the user to input the name of an NDF image file and
+   and ARD file. The ARD file is used to specify which parts of the
+   image will NOT be used. An output NDF is then created which is
+   the same as the input file except that all pixels specified by
+   the ARD file have been assigned the value Bad.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ARDFIL
+ARDFIL = _CHAR (Read)
+   The name of the ARD file containing a description of
+   the parts of the image to be masked out i.e. set to bad.
+3 IN
+IN = _NDF (Read)
+   The name of the source NDF.
+3 OUT
+OUT = _NDF (Write)
+   The name of the output NDF.
+2 Examples
+mask in=ic3374 ardfil=^ardfile.txt out=ic3374a
+   This example uses as the source image IC3374 and sets
+   the pixels specified by the ARD description contained in
+   ARDFILE.TXT to the bad value. The resultant image is output
+   as IC3374A.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 08-Jun-1994 (GJP)
+
+ (Original version)
+1 MIXUP
+To mixup the position of all the pixels in an image.
+
+Usage:
+
+   MIXUP IN OUT
+
+Description:
+
+   Creates an equivalent noise image by swapping the positions of
+   pairs of pixels taken from an image. This ensures that
+   structure due to galaxies/stars etc is spread randomly
+   throughout the image but the count value statistics are retained.
+
+   The routine may be used in conjunction with SKEW, SELFC,
+   SELFCW or CORR when searching for low contrast objects. It
+   provides comparison noise images which may be used to determine
+   the significance of 'objects' identified by the other applications.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = _NDF (Read)
+   The name of the NDF that is to be scrambled.
+3 OUT
+OUT = _NDF (Write)
+   The name of the NDF data that will be created.
+2 Examples
+mixup in=ic3374 out=ic3374m
+   The pixel positions in the input file IC3374 will be
+   scrambled and the resulting image output as IC3374M.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 3-JUL-1993 (GJP)
+
+ (Original version)
+1 SECTOR
+May be used to display the average pixel values within a wedge
+shaped sector/slice of the image.
+
+Usage:
+
+   SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL
+          ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG]
+          [ANGWID] [RLIM] [COSYS] [SAME] [AGAIN] [ORIGIN] (COLOUR)
+
+Description:
+
+   May be used to display the average pixel values within a wedge
+   shaped sector/slice of the image. The sector is in the form of a
+   wedge (of user defined size) drawn outward from the galaxy
+   origin point.
+
+   The results are displayed as mean pixel value (in terms of level
+   relative to sky or surface brightness) versus distance from the
+   galaxy origin. Pixel count values are summed over all the pixels
+   at a given distance from the origin.
+
+   Options include:
+
+     - summing pixels taken  from two equal sized, but
+       diametrically opposite, sectors.
+
+     - displaying data using a number of possible radius
+       transformations.
+
+     - the use of a graphics cursor to select the image object
+       to be examined.
+
+     - refinement of approximate galaxy centre positions
+       if required.
+
+     - automatic selection of the maximum radius out
+       from the origin to be considered.
+
+   The application is not intended to replace ELLPRO or ELLFOU
+   profiling application, but merely to allow the user to obtain
+   quickly a first approximation to the brightness cross-section of
+   an interactively selected galaxy.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AGAIN
+AGAIN = _LOGICAL(Read)
+   Should another profile be attempted?
+3 ANGWID
+ANGWID = _REAL (Read)
+   The angular width of the slice/wedge/sector to be considered.
+   Units degrees.
+3 ARDFIL
+ARDFIL = _CHAR (Read)
+   The name of an ARD file to be used to mask out regions of the
+   image that are not to be used.
+3 AUTOL
+AUTOL = _LOGICAL
+   Is a simple method to be applied to get a better
+   estimate of the galaxy centre position?
+   The accuracy of the method used is no better than 1 pixel.
+3 BACK
+BACK = _REAL (Read)
+   The background value for the image. Units counts.
+3 COLOUR
+COLOUR = _INTEGER (Read)
+   Colour used when showing the galaxy centre and profiling radius.
+3 COSYS
+COSYS = _CHAR (Read)
+   Use a data or world co-ordinate system? (D=data W=world).
+3 CURSOR
+CURSOR = _LOGICAL (Read)
+   Whether the galaxy location is to be identified using the
+   graphics cursor or the keyboard.
+3 DEVICE
+DEVICE = _DEVICE (Read)
+   The name of the display device on which the results graphs
+   should be displayed.
+3 FITLIM
+FITLIM = _REAL (Read)
+   The range of radius values over which the scale length 'fits'
+   are to be calculated.
+3 IMGDEV
+IMGDEV = _DEVICE (Read)
+   Name of the graphics device displaying the image.
+3 IN
+IN = _NDF (Read)
+   The name of the source NDF data structure/file.
+3 MIRROR
+MIRROR = _LOGICAL (Read)
+   Whether the summation is to be taken from two
+   sectors/wedges/slices of the same size, but on
+   diametrically opposite sides of the galaxy origin.
+3 ORIGIN
+ORIGIN = _REAL (Read)
+   Image indices for the origin point to be used. Units pixels.
+3 OUT
+OUT = _CHAR (Read)
+   File name for the output text file containing the
+   profile data.
+3 POSANG
+POSANG = _REAL (Read)
+   The position angle of the sector relative to the top of the
+   image. Convention is clockwise increases angle and the image
+   Y axis represents 0 degrees. Units degrees.
+3 PSIZE
+PSIZE = _REAL (Read)
+   Size of the image pixels in arc seconds. Units arc secs.
+3 RADISP
+RADISP = _CHAR (Read)
+   The display mode used for the radius axis of the graphs.
+
+    - Q=quarter power
+
+    - L=logarithmic
+
+    - S=square root
+
+    - R=linear
+3 RLIM
+RLIM = _INTEGER (Read)
+   Distance out from the origin at which the sector stops. Values
+   are input as arc seconds, but the program works in pixels.
+   A value of 0 causes the application to automatically select
+   the distance at which to stop.
+3 SAME
+SAME = _LOGICAL (Read)
+   Should the graphs be displayed on the same device as the
+   original image?
+3 SIGMA
+SIGMA = _REAL (Read)
+   The half-width of the background value. Units counts.
+3 SURF
+SURF = _LOGICAL (Read)
+   Are the pixel values to be expressed as surface brightness.
+   If true then the output is surface brightness, otherwise the
+   display shows brightness in terms of sigma above sky.
+   i.e. (I-Back)/SIGMA
+3 ZEROP
+ZEROP = _REAL (Read)
+   Zero point of the scale for surface brightness plots. Units
+   magnitudes per square arc second.
+2 Examples
+sector cursor=true ardfil=^ardup.dat back=6200 sigma=390
+       psize=0.96 surf=true radisp=r mirror=true autol=true
+       zerop=27.5 out=x2windows device=x2windows
+       imgdev=xwindows same=false
+
+   Profiles an object identified on the currently displayed
+   image using a cursor/mouse. The resulting profile is displayed
+   as linear radius versus surface brightness. ARD file ARDUP is
+   used to identify parts of the image that may not be used.
+   The source image is currently displayed on device XWINDOW and
+   the graphs will appear on device X2WINDOW. The galaxy centre
+   co-ordinate identified is refined automatically. The radius
+   limits to be employed when calculating scale length are
+   defined using the cursor/mouse.
+
+sector cursor=false ardfil=^ardfile.dat back=760 sigma=23
+       psize=0.3 surf=true radisp=q mirror=false autol=false
+       zerop=26.4 out in=ic3374 device=xwindows fitlim=0,20
+       posang=25 angwid=5
+       rlim=25 cosys=d origin=47,123
+
+   An object located at co-ordinates 47,123 or image IC3374 is
+   profiled in the 25 degree direction out to a distance of 25
+   arc seconds. The wedge/sector used will be 5 degrees wide
+   and the scale length will be calculated using data obtained
+   in the radius range 0-20 arc seconds. The user supplied
+   estimate of the galaxy centre will not be refined. The graphs
+   generated will be quarter power radius versus surface
+   brightness.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 16-JUL-1994 (GJP)
+
+ (Original version)
+1 SELFC
+To perform self-correlations on an NDF image file.
+
+Usage:
+
+   SELFC IN OUT DIAM PSIZE BACK USEALL [SIGMA] [NSIGMA]
+
+Description:
+
+   Performs an self-correlation calculation on an input NDF image
+   file. The resulting correlation image/plot is stored to disk.
+
+   The self-correlated image may be used to find flat-fielding
+   faults and faint diffuse objects of a given size.
+
+   To reduce the influence of bright objects or cosmic rays;
+   the user may elect to employ a cut out pixel count value where
+   any pixel found to be above that value is ignored. The cutout
+   value is determined by the user inputting a global mode value
+   (usually the sky background count - obtained via HISTPEAK),
+   the background count half-width and the number of half
+   widths above sky level at which the cutout should occur.
+
+   The user is required to enter a value for the size of object(s)
+   of interest (roughly the template size) and also the image pixel
+   size.
+
+   The value for each pixel of the output image is determined
+   as follows. An imaginary circle is drawn about the pixel
+   and all pixel pairs within that circle, that lie on opposite
+   sides of the centre from each other, are stored.
+
+   Each pair is then considered in turn and the modal count value
+   subtracted from each. The resultant residual pixel count values
+   are then multiplied together. The values found for all the pairs
+   are then summed, the total divided by the number of pixel pairs
+   found and the square root taken. In the event of a negative sum
+   being found the value given is the square root of the magnitude
+   of the self-correlation multiplied by -1.
+
+   The resultant value is some measure of the extent to
+   which points within that circle (about the current pixel)
+   are correlated.
+
+   The method assumes some sort of symmetry is present in the
+   objects detected but appears to work well on a wide range of
+   image types.
+
+   A border is present in the output image which the same width
+   as the radius of the template. All pixels within this border
+   are assigned the value bad.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BACK
+BACK = _REAL (Read)
+   The modal pixel count value found in the input NDF.
+   Units counts.
+3 DIAM
+DIAM = _REAL (Read)
+   The diameter of the galaxies to be searched for in the
+   image. Units arc seconds.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF data that is to be examined.
+3 NSIGMA
+NSIGMA = _REAL(Read)
+   The number of half-widths above the sky level
+   count value, where the pixel count cutoff occurs.
+3 OUT
+OUT = _NDF (Write)
+   The name of the NDF that will be created.
+3 PSIZE
+PSIZE = _REAL (Read)
+   The size of each pixel. Units arc seconds.
+3 SIGMA
+SIGMA = _REAL (Read)
+   The half-width of the background count within the
+   input NDF. Should be determined using a routine such as
+   HISTPEAK which ignores outliers.
+3 USEALL
+USEALL = _LOGICAL (Read)
+   Used to indicate whether a pixel count threshold is to
+   be a applied when calculating the self-correlation.
+2 Examples
+selfc in=search out=scorr diam=15. psize=0.5 back=727.
+      useall=true
+   A self-correlation is carried out on image GALAXIES. The
+   search is for an object 15 arc seconds across. The image
+   pixel size is .5 arc seconds and the background count level
+   is 727. USEALL=TRUE ensures that no pixels are excluded from
+   the correlation calculation.
+
+selfc in=plate out=plates diam=5. psize=1. back=6600.
+      useall=false sigma=35. nsigma=5.
+   A self-correlation is carried out on image PLATE. The search
+   is for an object 5 arc seconds across. The image pixel size
+   is 1 arc second and the background count level is 6600.
+   Since USEALL=FALSE, all pixels with a count value above
+   6600+35.x5. are excluded from the correlation calculation.
+   The output image is named PLATES
+2 Notes
+It is assumed through out that the x and y axis pixels
+sizes are the same.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 13-OCT-1992 (GJP)
+
+ (Original version)
+2 Implementation_Status
+   At present suitable normalisation factors have not been
+   implemented. These may be added. As the program stands it is
+   useful for looking at an image to detect faint objects and
+   provides a comparison for users employing cross-correlation
+   techniques. In addition, it provides a simple way of detecting
+   areas of an image where flatfielding has not been entirely
+   successful.
+1 SELFCW
+To perform mixed cross-self-correlations on an NDF image file.
+
+Usage:
+
+   SELFCW IN OUT SCALE PSIZE BACK USEALL MULT [SIGMA] [NSIGMA]
+
+Description:
+
+   Performs a mixed cross-self-correlation calculation on an input
+   NDF image file. The resulting correlation image/plot is stored
+   to disk.
+
+   The cross-self-correlated image may be used to find faint
+   diffuse objects for a given scale length.
+
+   The circular exponential profile template used is of a size that
+   optimises the search for galaxies of the scale length
+   requested by the user.
+
+   To reduce the influence of bright objects or cosmic rays;
+   the user may elect to employ a cut out pixel count value where
+   any pixel found to be above that value is ignored. The cutout
+   value is determined by the user inputting a global background
+   count value (available via HISTPEAK), the background count
+   half-width and the number of half-widths above
+   sky level at which the cutout should occur.
+
+   The user is required to enter a value for the scale length of
+   of the object(s) of interest and also the image pixel size.
+
+   The method assumes some sort of symmetry is present in the
+   objects detected but appears to work well on a wide range of
+   image types.
+
+   A border is present in the output image which is of the same
+   width as the radius of the template. All pixels within this
+   border are assigned the value bad.
+
+   The correlation is optimised by making the template size 1.8x
+   that of the galaxy scale length required. This factor was
+   determined from simulations by Phillipps and Davies at Cardiff.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BACK
+BACK = _REAL (Read)
+   The modal pixel count value found in the input NDF.
+   Units counts.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF that is to be examined.
+3 NSIGMA
+NSIGMA = _REAL(Read)
+   The number of half-widths above the sky level
+   count value at which the pixel count cutoff occurs.
+3 MULT
+MULT = _REAL (Read)
+   A multiplying factor used to modify the output range.
+3 OUT
+OUT = _NDF (Write)
+   The name of the NDF that will be created.
+3 PSIZE
+PSIZE = _REAL (Read)
+   The size of each pixel. Units arc seconds.
+3 SCALE
+SCALE = _REAL (Read)
+   The scale length of the galaxies being searched for.
+   Units arc seconds.
+3 SIGMA
+SIGMA = _REAL (Read)
+   The half-width of the pixel background count within the
+   input NDF. Should be determined using a routine such as
+   HISTPEAK which ignores outliers.
+3 USEALL
+USEALL = _LOGICAL (Read)
+   Used to indicate whether a pixel count threshold is to
+   be a applied when calculating the self-correlation.
+2 Examples
+selfcw in=p2 out=scp2 scale=15. psize=0.96 back=1000.2
+       useall=true
+   A self-correlation image, optimised for galaxies of a 15 arc
+   second scale length, is generated using image P2 as the input
+   source image and SCP2 as the output image. The pixel size
+   on the image is .96 arc second and the background count value
+   for the source image is 1000.2
+
+selfcw in=lsbg1 out=lsbg2 scale=8. psize=1.5 back=444.
+       useall=false sigma=12. nsigma=4.
+   A self-correlation image, optimised for galaxies of a 8 arc
+   second scale length, is generated using image P2 as the input
+   source image and SCP2 as the output image. The pixel size
+   on the image is 1.5 arc second and the background count value
+   for the source image is 444.
+
+   All pixels with a count value greater than 444.+12.x4. are
+   excluded from the correlation calculations.
+2 Notes
+It is assumed that the x and y axis pixels sizes are the same
+size.
+
+To establish the statistical significance of a detection, this
+application should be used in conjunction with MIXUP to allow noise
+equivalent images to be generated and correlated thereby
+establishing a 3 sigma limit.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 13-MAY-1993 (GJP)
+
+ (Original version)
+1 SKEW
+Generates a skewness representation of the image.
+
+Usage:
+
+   SKEW IN OUT MODET WIDTH PSIZE MULT [BACK] [SIGMA]
+        [NSIGMA] [USEALL]
+
+Description:
+
+   Performs skewness calculations on an input NDF image
+   file. The resulting skewness image/plot is stored to disk.
+
+   Two actions have been taken to reduce the influence of bright
+   objects or cosmic rays:
+
+   - the user may elect to employ a cut out pixel count value
+     where any pixel found to be above that value is ignored. The
+     cutout value is determined by the user inputting a global mode
+     value, the background count half-width (available via
+     HISTPEAK) and the number of half-widths above sky level
+     at which the cutout should be.
+
+   - a local mean value may be used as the mode.
+
+   The user is required to enter the size of the sampling area
+   and the pixel size (in arc secs). This is used to define the
+   width of pixel template radius employed. It is assumed that
+   pixels are the same size in the x and y directions.
+
+   The skewness value assigned to each pixel of the output image
+   is calculated using the values of pixel count found for all the
+   non-bad pixels within the calculated radius. The value obtained
+   is multiplied by 1000 (or a user defined value) to make display
+   easier.
+
+   The modal count value used during the calculation is either the
+   global value (defined by the user) or a local value calculated
+   as required.
+
+   The resultant value is some measure of the extent to which the
+   pixel count values surrounding a given pixel are not distributed
+   in a Gaussian manner.
+
+   A border is present in the final output image which is the same
+   width as the radius of the template used. Pixels within the
+   border have been assigned the value bad.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BACK
+BACK = _REAL (Read)
+   The background pixel count value found in the input NDF.
+   Units counts. Only used if MODET = TRUE.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF that is to be examined.
+3 MODET
+MODET = _LOGICAL (Read)
+   Used to indicate whether a global modal count value
+   is to be used when calculating the skewness values.
+   The alternative is for the application to calculate and use the
+   local mode value. See BACK. Using a local background
+   calculation can be slow.
+3 MULT
+MULT = _REAL (Read)
+   A multiplying factor applied to each of the results.
+   Default value is 1000.
+3 NSIGMA
+NSIGMA = _REAL(Read)
+   The number of half-widths above the sky level
+   count value, where the pixel count cutoff occurs.
+   Only employed if a global pixel count modal value is
+   in use (MODET = TRUE).
+3 OUT
+OUT = _NDF (Write)
+   The name of the NDF that will be created.
+3 PSIZE
+PSIZE = _REAL (Read)
+   The width of each pixel. Units arc seconds.
+3 SIGMA
+SIGMA = _REAL (Read)
+   The half-width of the back ground count within the
+   input NDF. Should be determined using a routine such as
+   HISTPEAK which ignores outliers. Only employed if a global
+   pixel count modal value is in use (MODET = TRUE).
+   Units counts.
+3 USEALL
+USEALL = _LOGICAL (Read)
+   Used to indicate whether a pixel count threshold is to
+   be a applied when calculating the skewness.
+   Only employed if MODET has been set to ensure that
+   a global modal value is in use.
+3 WIDTH
+WIDTH = _REAL (Read)
+   The width of the sampling area/filter to be passed over the
+   image. Units arc seconds.
+2 Examples
+skew in=ic3374 out=skewed modet=false width=10. psize=0.5
+     mult=1000
+   A skewness image named SKEWED is generated using IC3374 as
+   the source image. The sampling area from which pixels are
+   selected is 10 arc seconds across. The individual pixel size
+   is .5 arc seconds so the area is 20 pixels across. All the
+   skewness values generated for the output image are multiplied
+   by a factor of 1000, and local background values are used
+   throughout.
+
+skew in=jet out=sjet modet=true width=5. psize=1. mult=1000.
+     back=2010. useall=true
+   An output image SJET is generated using JET as the source
+   image. The pixel size is 1 arc second, the background count
+   2010. and all the pixels in the image can be used in the
+   calculation. The sampling area width is 5 arc seconds. All
+   the pixels in the image can be used in the calculation.
+
+skew in=sgp27 out=result modet=true width=8. psize=1. mult=1000.
+     back=4505. sigma=23.7 nsigma=10. useall=false
+   The output image generated is created by assuming a global
+   background count of 4505. with an associated half-width
+   of 23.7 counts. All pixels of a count value greater
+   than 4505+23.7x10. are excluded from the calculations.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 13-OCT-1992 (GJP)
+
+ (Original version)
+2 Implementation_Status
+   As the program stands it is useful for looking at an image to
+   with a view to detecting faint objects and flat-fielding
+   faults. It may be easily extended by the user to provide
+   plots showing other statistical quantities such as kurtosis
+   or S/N.
+1 TOPPED
+Remove all pixel values above a certain limit from
+an NDF image file.
+
+Usage:
+
+   TOPPED IN OUT WIDTH BACK SIGMA NSIGMA NOISE PSIZE
+
+Description:
+
+   Sets to bad, all the pixels with a count above the threshold
+   level. An option allows the close neighbours of the bright pixel
+   to be set to bad as well. Close neighbours are considered to be
+   those pixels within a user defined radius of the bright pixel.
+
+   A further option allows all bad pixels in the output image to be
+   assigned a random value. The values chosen are taken from a
+   Normal distribution defined by the user.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BACK
+BACK = _REAL (Read)
+   The background count value. Units counts.
+3 IN
+IN = _NDF (Read)
+   The name of the NDF that is to be examined.
+3 NOISE
+NOISE = _LOGICAL (Read)
+   Defines whether or not bad pixels should eventually be
+   assigned a random value.
+3 NSIGMA
+NSIGMA = _REAL (Read)
+   The number of half-widths above sky at which the
+   cutoff occurs.
+3 OUT
+OUT = _NDF (Write)
+   The name of the output NDF that will be created.
+3 PSIZE
+PSIZE = _REAL (Read)
+   The size of each pixel. Units arc seconds.
+3 SIGMA
+SIGMA = _REAL (Read)
+   The background pixel count half-width value. Units
+   counts.
+3 WIDTH
+WIDTH = _REAL (Read)
+   The width of the circle around a bright pixel within which
+   pixels will be set to bad. Units arc seconds.
+2 Examples
+topped in=eggs out=scrambled width=2.5 psize=0.44 back=1000.
+       sigma=23. nsigma=8. noise=false
+   Uses EGGS as the input image and finds all pixels within the
+   image that have a count greater than 1000.+8.x23. These are
+   all set to the bad value. In addition, all pixels within a
+   radius of 1.25 arc seconds are also set to bad.
+
+topped in=objects out=cut width=4. psize=1. back=6200. sigma=390.
+       nsigma=10. noise=true
+   Uses OBJECTS as the input image and finds all pixels within
+   the image that have a count value greater than 6200.+10.x390..
+   These are all set to random values, as are all the pixels
+   within a radius of 2. arc seconds.
+2 Notes
+The distribution of pixel values used when NOISE=TRUE comes
+from a Normal (Gaussian) distribution. In some circumstances,
+particularly for low count values, this may not be appropriate.
+2 Authors
+GJP: Grant Privett (STARLINK)
+2 History
+ 28-Jan-1993 (GJP)
+
+ (Original version)

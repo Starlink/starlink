@@ -1,0 +1,117 @@
+#+
+#  Name:
+#     SELFC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     31-MAR-1993 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface SELFC
+
+  helplib '$ESP_HELP'
+
+  parameter IN          # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Image NDF filename'
+    ppath 'global,default'
+    vpath 'prompt'
+    default fgalaxy
+    helpkey '*'
+  endparameter
+
+  parameter BACK        # The modal pixel count value within the source NDF.
+    type '_REAL'
+    access 'read'
+    position 5
+    prompt 'Background sky count value'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.BACK'
+    default 6200
+    helpkey '*'
+  endparameter
+
+  parameter NSIGMA       # Height of high pixel cutoff above sky.
+    type '_REAL'
+    access 'read'
+    prompt 'Level of the cutout in Sigma'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 10.
+    helpkey '*'
+  endparameter
+
+  parameter OUT         # The self-correlation results NDF file.
+    type '_NDF'
+    access 'UPDATE'
+    keyword 'OUT'
+    position 2
+    prompt 'Output NDF filename'
+    ppath 'current,default'
+    vpath 'prompt'
+    default selfcout
+    helpkey '*'
+  endparameter
+
+  parameter PSIZE       # The pixel size in arc seconds. 
+    type '_REAL'
+    access 'read'
+    keyword 'PSIZE'
+    position 4
+    prompt 'Pixel size'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.PSIZE'
+    default 1.0
+    helpkey '*'
+  endparameter
+
+  parameter SIGMA        # Standard deviation of the image pixel values.
+    type '_REAL'
+    access 'read'
+    prompt 'Standard deviation of the image pixels'
+    ppath 'global,current,default'
+    vpath 'prompt'
+    association '<->GLOBAL.DATA_SIGMA'
+    default 6200
+    helpkey '*'
+  endparameter
+
+  parameter USEALL      # Use a high pixel cutout algorithm flag. 
+    type '_LOGICAL'
+    access 'read'
+    position 6
+    prompt 'Include very bright pixels (y/n)?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 'F' 
+    helpkey '*'
+  endparameter
+
+  parameter DIAM       # Diameter of the ideal galaxy in arc secs.
+    type '_REAL'
+    access 'read'
+    keyword 'DIAM'
+    position 3
+    prompt 'Template width'
+    ppath 'current,default'
+    vpath 'prompt'
+    default '8'
+    helpkey '*'
+  endparameter
+
+endinterface

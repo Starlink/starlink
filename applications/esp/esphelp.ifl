@@ -1,0 +1,60 @@
+#+
+#  Name:
+#     ESPHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1994 November 15 (GJP):
+#	 Original version - taken from CCDHELP by 
+#        Malcolm Currie and Peter Draper.
+#     {enter_further_changes_here}
+
+#-
+
+
+interface ESPHELP
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+   endparameter
+
+endinterface
+

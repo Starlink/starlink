@@ -1,0 +1,111 @@
+#+
+#  Name:
+#     LOBACK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUN-1993 (GJP):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface LOBACK                       
+  
+  helplib '$ESP_HELP'
+
+  parameter IN        # Input NDF
+    type '_NDF'
+    keyword 'IN'
+    position 1
+    access 'read'
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Image NDF filename'
+    ppath 'global,default'
+    vpath 'prompt'
+    default galaxies
+    helpkey '*'
+  endparameter
+
+ parameter INFILE       # The name of the text file contain the co-ordinates.
+    type '_CHAR'
+    position 2
+    access 'read'
+    keyword 'INFILE'
+    prompt 'Input text file'
+    ppath 'current,default'
+    vpath 'prompt'
+    default bcoords.dat
+    helpkey '*'
+  endparameter
+
+  parameter SFACT     # Smoothing width requested 
+    type '_INTEGER'
+    access 'read'
+    keyword 'SFACT'
+    position 3
+    prompt 'Smoothing width'
+    ppath 'current,default'
+    vpath 'prompt'
+    range -1,100
+    default 0
+    helpkey '*'
+  endparameter
+
+  parameter THIRD      # Selection of the contents of the third INFILE column
+    type '_LOGICAL'
+    access 'read'
+    keyword 'THIRD'
+    position 4
+    prompt 'Contiguous pixels'
+    ppath 'current,default'
+    vpath 'prompt'
+    default T
+    helpkey '*'
+  endparameter
+
+  parameter COSYS    # World co-ordinates or data co-ordinates used.
+    type '_CHAR'
+    access 'read'
+    keyword 'COSYS'
+    position 5
+    prompt 'World or data co-ordinates'
+    ppath 'current,default'
+    vpath 'prompt'
+    in 'd','D','w','W'
+    default 'D'
+    helpkey '*'
+  endparameter
+
+ parameter OUT       # The name of the text file to contain the profile.
+    type '_CHAR'
+    access 'read'
+    keyword 'OUT'
+    position 6
+    prompt 'Output results file'
+    ppath 'current,default'
+    vpath 'prompt'
+    default lobout.dat
+    helpkey '*'
+  endparameter
+
+  parameter WIDE      # Sampling box width
+    type '_INTEGER'
+    access 'read'
+    keyword 'WIDE'
+    position 7
+    prompt 'Min. box width'
+    ppath 'current,default'
+    vpath 'prompt'
+    range 32,16384
+    default 32
+    helpkey '*'
+  endparameter
+
+endinterface

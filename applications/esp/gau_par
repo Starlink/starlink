@@ -1,0 +1,60 @@
+*	-*-Mode: fortran; -*-
+*
+*   Define parameters for gau2par array, passed around the gau2_... functions
+      integer gau2maxfits       ! maximum number of gaussians fitted
+                                ! (at least 10!)
+      parameter (gau2maxfits=10)
+
+*   Rest are indexes within this array
+      integer gau2status        ! result code
+      integer gau2xstatus       ! status details (see below)
+      integer gau2bg            ! +ve if bg is to be fitted
+      integer gau2calcda        ! no. times da had to be calculated
+      integer gau2debug         ! debug flag
+      parameter (gau2status=1, gau2xstatus=2, gau2bg=3, gau2calcda=4,
+     :     gau2debug=5)
+
+      integer gau2nparams       ! number of parameters listed here
+      parameter (gau2nparams=5)
+      
+      integer gau2len           ! length of gau2par array
+      parameter (gau2len=gau2nparams)
+
+*   Constants for the `model types' returned by the imaging procedure
+      integer gau2whole         ! produce image of model
+      integer gau2residual      ! produce image of residuals (data-model)
+      integer gau2regdiag       ! regression diagnostic
+      parameter (gau2whole=1, gau2residual=2, gau2regdiag=3)
+
+*   There are several result codes which can be returned in
+*   gau2par(gau2status).  Success is 0 (but put iv(1) in gau2xstatus),
+*   others are errors.  These should be translated to sai__error with a
+*   suitable message, by gau2_pro. 
+*   Status 0 corresponds to NSG status iv(1)=3,4,5,6
+      integer gau2noconv        ! convergence tests failed (iv(1)=7,8)
+      integer gau2maxiter       ! too many iterations (iv(1)=9,10)
+                                ! (put max iter in gau2xstatus)
+      integer gau2unkerror      ! unknown error! (iv(1)=other)
+                                ! (put error number in gau2xstatus)
+*   The following flag errors discovered in my code. gau2memory and
+*   gau2code shouldn't happen, and should result in a
+*   status=sai__error.  gau2drifted is a user/data error, and should
+*   warn the user, but result in sai__ok
+      integer gau2drifted       ! X has gone too far from initial value
+      integer gau2memory        ! memory allocation error
+      integer gau2code          ! coding error, or other can't-happen
+                                ! (put a code number in gau2xstatus)
+      parameter (gau2noconv=1, gau2maxiter=2, gau2unkerror=3,
+     :     gau2drifted=4, gau2memory=5, gau2code=6)
+
+**   max-drift calculation: each time round the loop, calcluate how far X
+**   has drifted from its initial value.  
+**   We need gau2maxfits maximum drift values, and 5*gau2maxfits coefficients,
+**   so make space for 6*gau2maxfits integers.
+*      parameter (gau2len=gau2nparams+6*gau2maxfits)
+**   See gau2_pro for documentation
+*      integer gau2maxdrift
+*      integer gau2driftcoef
+*      parameter (gau2maxdrift=gau2nparams,
+*     :     gau2driftcoef=gau2maxdrift+gau2maxfits)
+

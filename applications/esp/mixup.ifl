@@ -1,0 +1,48 @@
+#+
+#  Name:
+#     MIXUP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-JUL-1993 (GJP):
+#        Original version.
+#     {enter_changes_here}
+
+#-    
+
+interface MIXUP
+
+  helplib '$ESP_HELP'
+
+  parameter IN          # The name of the source NDF image to be used.
+    type '_NDF'
+    access 'read'
+    keyword 'IN'
+    position 1
+    association '<->GLOBAL.DATA_ARRAY'
+    prompt 'Input NDF image'
+    ppath 'global,default'
+    vpath 'prompt'
+    default fgalaxy
+    helpkey '*'
+  endparameter
+
+  parameter OUT          # The name of the output NDF image to be created.
+    type '_NDF'
+    access 'update'
+    keyword 'OUT'
+    position 2
+    prompt 'Output NDF image'
+    ppath 'default'
+    vpath 'prompt'
+    default mixout
+    helpkey '*'
+  endparameter
+
+endinterface

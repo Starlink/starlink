@@ -1,0 +1,49 @@
+*+
+*  Name:
+*     SEC_PAR
+
+*  Purpose:
+*     Define SEC system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of any SECTOR global constants.
+
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-NOV-1992 (GJP):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*  The maximum size of the results arrays. 
+      INTEGER SEC__RESUL
+      PARAMETER ( SEC__RESUL = 4096 )
+
+*  The value of the geometric constant PI.
+      REAL SEC__PIVAL
+      PARAMETER ( SEC__PIVAL = 3.1415926 )
+
+*  The value of the geometric constant needed to convert radians to 
+*  degrees format.
+      REAL SEC__RADS
+      PARAMETER ( SEC__RADS = 1./2./SEC__PIVAL*360. )
+
+*  A very small value that is greater than 0.0. The actual
+*  value is not important.
+      REAL SEC__VSMAL
+      PARAMETER ( SEC__VSMAL = 1.E-20 )
