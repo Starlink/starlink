@@ -1,0 +1,165 @@
+#+
+#  Name:
+#     echomop.sh
+#
+#  Purpose:
+#     Start the ECHOMOP package from the Bourne shell.
+#
+#  Type of Module:
+#     Bourne shell command list (not a script, since it's sourced, not execed)
+#
+#  Invocation:
+#     . $ECHOMOP_DIR/echomop.sh
+#
+#  Description:
+#     This procedure starts the ECHOMOP package for use from the
+#     Bourne shell by defining the aliases needed to execute each application.
+#
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     mjc: Martin Clayton (UCL, Starlink)
+#     ng: Norman Gray (Glasgow, Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     18 Aug 1992 (hme):
+#        Original Version
+#     30 Nov 1995 (mjc):
+#        Stole some parts of Horst's FIGARO setup.     
+#     22-Sep-2000 (ng):
+#        Converted to sh script from csh.
+#     {enter_changes_here}
+#
+#   RCS ID
+#     $Id$
+#
+#-
+#.
+#  Announce name now, version etc. below.
+#
+echo " "
+echo " ----------- Initialising for ECHOMOP ------------"
+#
+#Set environment variables for ECHOMOP.
+#
+ECHOMOP_BASE=INSTALL_BIN;			export ECHOMOP_BASE
+ECHOMOP_EXEC=INSTALL_BIN;			export ECHOMOP_EXEC
+ECHOMOP_HELP=${ECHOMOP_BASE}/echomop;		export ECHOMOP_HELP
+ECHOMOP_DEMO=${ECHOMOP_BASE}/demo;		export ECHOMOP_DEMO
+ECHOMOP_DATA=${ECHOMOP_BASE}/data;		export ECHOMOP_DATA
+ECHOMOP_TEST=${ECHOMOP_BASE}/test;		export ECHOMOP_TEST
+ECHOMOP_HYPERDIR=${ECHOMOP_BASE}/hyper;		export ECHOMOP_HYPERDIR
+ECHOMOP_HYPER="Mosaic $ECHOMOP_HYPERDIR/echomop.html"
+						export ECHOMOP_HYPER
+
+ARCDIRS=${ECHOMOP_BASE}/arc;			export ARCDIRS
+AAA_CATEGORIES=${ECHOMOP_BASE}/data/aaa_cat.txt;export AAA_CATEGORIES
+AAA_KEYWORDS=${ECHOMOP_BASE}/data/aaa_key.txt;	export AAA_KEYWORDS
+
+echmenu () { ${ECHOMOP_EXEC}/echmenu; }
+
+#  I don't understand what this command is for -- it can only be used if 
+#  ECHOMOP has already been set up...
+#echomopsetup () { "source ${ECHOMOP_EXEC}/echomop.csh"; }
+echomopsetup () { echo "ECHOMOP version PKG_VERS is already set up"; }
+
+#
+#  Define functions for each application (the posix shell has aliases,
+#  but the Bourne shell doesn't).
+#
+echhelp () { ${ECHOMOP_EXEC}/echhelp; }
+#  We have to be a little cunning to run the csh demo...
+ech_demo () { echo "source ${ECHOMOP_EXEC}/echomop.csh; source ${ECHOMOP_DEMO}/ech_demo.csh" | csh }
+ech_locate () { ${ECHOMOP_EXEC}/ech_ftrdb; }
+ech_locate () { ${ECHOMOP_EXEC}/ech_locate; }
+ech_trace () { ${ECHOMOP_EXEC}/ech_trace; }
+ech_decos1 () { ${ECHOMOP_EXEC}/ech_decos1; }
+ech_fcheck () { ${ECHOMOP_EXEC}/ech_fcheck; }
+ech_fitord () { ${ECHOMOP_EXEC}/ech_fitord; }
+ech_dekker () { ${ECHOMOP_EXEC}/ech_dekker; }
+ech_object () { ${ECHOMOP_EXEC}/ech_object; }
+ech_spatial () { ${ECHOMOP_EXEC}/ech_spatial; }
+ech_ffield () { ${ECHOMOP_EXEC}/ech_ffield; }
+ech_genflat () { ${ECHOMOP_EXEC}/ech_genflat; }
+ech_sky () { ${ECHOMOP_EXEC}/ech_sky; }
+ech_mdlbck () { ${ECHOMOP_EXEC}/ech_mdlbck; }
+ech_profile () { ${ECHOMOP_EXEC}/ech_profile; }
+ech_extrct () { ${ECHOMOP_EXEC}/ech_extrct; }
+ech_qextr () { ${ECHOMOP_EXEC}/ech_qextr; }
+ech_linloc () { ${ECHOMOP_EXEC}/ech_linloc; }
+ech_fwhm () { ${ECHOMOP_EXEC}/ech_fwhm; }
+ech_idwave () { ${ECHOMOP_EXEC}/ech_idwave; }
+ech_blaze () { ${ECHOMOP_EXEC}/ech_blaze; }
+ech_fitblz () { ${ECHOMOP_EXEC}/ech_fitblz; }
+ech_doblz () { ${ECHOMOP_EXEC}/ech_doblz; }
+ech_scrunch () { ${ECHOMOP_EXEC}/ech_scrunch; }
+ech_scrn2d () { ${ECHOMOP_EXEC}/ech_scrn2d; }
+ech_wscale () { ${ECHOMOP_EXEC}/ech_wscale; }
+ech_scrobj () { ${ECHOMOP_EXEC}/ech_scrobj; }
+ech_scrarc () { ${ECHOMOP_EXEC}/ech_scrarc; }
+ech_result () { ${ECHOMOP_EXEC}/ech_result; }
+ech_ext2d () { ${ECHOMOP_EXEC}/ech_ext2d; }
+ech_2dfit () { ${ECHOMOP_EXEC}/ech_2dfit; }
+ech_trcsis () { ${ECHOMOP_EXEC}/ech_trcsis; }
+ech_wvcsis () { ${ECHOMOP_EXEC}/ech_wvcsis; }
+ech_trplt () { ${ECHOMOP_EXEC}/ech_trplt; }
+ech_plot () { ${ECHOMOP_EXEC}/ech_plot; }
+ech_mulmrg () { ${ECHOMOP_EXEC}/ech_mulmrg; }
+ech_decos2 () { ${ECHOMOP_EXEC}/ech_decos2; }
+ech_decimg () { ${ECHOMOP_EXEC}/ech_decimg; }
+echbrowse () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
+echwww () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
+ECHMENU () { ${ECHOMOP_EXEC}/echmenu; }
+ECH_DEMO () { echo "source ${ECHOMOP_EXEC}/echomop.csh; source ${ECHOMOP_DEMO}/ech_demo.csh" | csh }
+ECH_LOCATE () { ${ECHOMOP_EXEC}/ech_locate; }
+ECH_FTRDB () { ${ECHOMOP_EXEC}/ech_ftrdb; }
+ECH_TRACE () { ${ECHOMOP_EXEC}/ech_trace; }
+ECH_DECOS1 () { ${ECHOMOP_EXEC}/ech_decos1; }
+ECH_FCHECK () { ${ECHOMOP_EXEC}/ech_fcheck; }
+ECH_FITORD () { ${ECHOMOP_EXEC}/ech_fitord; }
+ECH_DEKKER () { ${ECHOMOP_EXEC}/ech_dekker; }
+ECH_OBJECT () { ${ECHOMOP_EXEC}/ech_object; }
+ECH_SPATIAL () { ${ECHOMOP_EXEC}/ech_spatial; }
+ECH_FFIELD () { ${ECHOMOP_EXEC}/ech_ffield; }
+ECH_GENFLAT () { ${ECHOMOP_EXEC}/ech_genflat; }
+ECH_SKY () { ${ECHOMOP_EXEC}/ech_sky; }
+ECH_MDLBCK () { ${ECHOMOP_EXEC}/ech_mdlbck; }
+ECH_PROFILE () { ${ECHOMOP_EXEC}/ech_profile; }
+ECH_EXTRCT () { ${ECHOMOP_EXEC}/ech_extrct; }
+ECH_QEXTR () { ${ECHOMOP_EXEC}/ech_qextr; }
+ECH_LINLOC () { ${ECHOMOP_EXEC}/ech_linloc; }
+ECH_FWHM () { ${ECHOMOP_EXEC}/ech_fwhm; }
+ECH_IDWAVE () { ${ECHOMOP_EXEC}/ech_idwave; }
+ECH_BLAZE () { ${ECHOMOP_EXEC}/ech_blaze; }
+ECH_FITBLZ () { ${ECHOMOP_EXEC}/ech_fitblz; }
+ECH_DOBLZ () { ${ECHOMOP_EXEC}/ech_doblz; }
+ECH_SCRUNCH () { ${ECHOMOP_EXEC}/ech_scrunch; }
+ECH_SCRN2D () { ${ECHOMOP_EXEC}/ech_scrn2d; }
+ECH_WSCALE () { ${ECHOMOP_EXEC}/ech_wscale; }
+ECH_SCROBJ () { ${ECHOMOP_EXEC}/ech_scrobj; }
+ECH_SCRARC () { ${ECHOMOP_EXEC}/ech_scrarc; }
+ECH_RESULT () { ${ECHOMOP_EXEC}/ech_result; }
+ECH_EXT2D () { ${ECHOMOP_EXEC}/ech_ext2d; }
+ECH_2DFIT () { ${ECHOMOP_EXEC}/ech_2dfit; }
+ECH_TRCSIS () { ${ECHOMOP_EXEC}/ech_trcsis; }
+ECH_WVCSIS () { ${ECHOMOP_EXEC}/ech_wvcsis; }
+ECH_TRPLT () { ${ECHOMOP_EXEC}/ech_trplt; }
+ECH_PLOT () { ${ECHOMOP_EXEC}/ech_plot; }
+ECH_MULMRG () { ${ECHOMOP_EXEC}/ech_mulmrg; }
+ECH_DECOS2 () { ${ECHOMOP_EXEC}/ech_decos2; }
+ECH_DECIMG () { ${ECHOMOP_EXEC}/ech_decimg; }
+ECHBROWSE () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
+ECHWWW () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
+#
+# Show that the ECHOMOP commands are now available.
+#
+echo "              Echelle data reduction"
+echo "          Version PKG_VERS  13th June 1997"
+echo " "
+echo "          Type" \"echhelp echomop\" for help
+echo "    or" \"echhelp news\" for news on changes
+echo " "
+echo " Type" \"echwww\" to start Mosaic documentation browser.
+echo " "
+echo " Type" \"echmenu\" to start the monolith.
+echo " "
