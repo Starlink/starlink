@@ -1,3 +1,4 @@
+#if !defined( PLOT_INCLUDED ) /* Include this file only once */
 #define PLOT_INCLUDED
 /*
 *+
