@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 //#include <unistd.h>
 #include <vector>
+#include <string>
 
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstring>
@@ -62,7 +63,7 @@ using std::ios;
 #endif
 
 
-typedef STD::vector<string> string_list;
+typedef STD::vector<STD::string> string_list;
 string_list break_path (string);
     
 // define class static variables
