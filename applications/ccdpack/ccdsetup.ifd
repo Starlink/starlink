@@ -32,6 +32,8 @@
 #        Generated IFD file from IFL file.
 #     26-MAR-2001 (MBT):
 #        Added USESET.
+#     14-MAY-2001 (MBT):
+#        Added INDEX and BYSET.
 #     {enter_further_changes_here}
 
 #-
@@ -57,6 +59,28 @@
             ppath CURRENT DEFAULT
             default CCDPACK_SETUP.DAT
             prompt {Setup restoration file}
+            helpkey *
+          }
+
+         parameter byset {
+                          # Are we Set specific?
+            type _LOGICAL
+            access READ
+            vpath PROMPT GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            default FALSE
+            association <-global.ccdpack_useset
+            prompt {Set up values specific to one Set Index?}
+            helpkey *
+          }
+
+         parameter index {
+                          # Set Index specific value
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Set Index values these parameters are specific to}
             helpkey *
           }
 

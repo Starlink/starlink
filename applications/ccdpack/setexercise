@@ -31,6 +31,8 @@
 #  History:
 #     21-FEB-2001 (MBT):
 #        Original version (based on ccdexercise and wcsexercise).
+#     17-MAY-2001 (MBT):
+#        Introduced Set Index specific global variables.
 #-
 #
       onintr EXIT
@@ -90,16 +92,31 @@
 
 #  Do the "device" setup without an ARD file.
       ccdsetup \
+         byset=true \
+         index=1 \
          bounds='[1,2,56,64]' \
          extent='[3,55,1,128]' \
-	 adc=2 \
-	 rnoise=10.0 \
+	 adc=2.1 \
+	 rnoise=10.1 \
          logto=both \
 	 logfile=ccdtest.log \
 	 preserve=true \
 	 direction=x \
          useset=true \
          reset accept
+      ccdsetup \
+         index=2 \
+         adc=2.2 \
+         rnoise=10.2 \
+         accept
+      ccdsetup \
+         index=3 \
+         adc=2.3 \
+         rnoise=10.3 \
+         accept
+
+#  Display the global parameters.
+      ccdshow
 
 #  Try to locate the object specification file. If this does not exist
 #  then exit.
