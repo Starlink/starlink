@@ -10,11 +10,13 @@
 *
 *     Doug Bertram (BHVAD::DB)
 *     David J. Allan (JET-X, University of Birmingham)
+*     Richard Beard (ROSAT, University of Birminggam)
 *
 *    History :
 *
 *     10 Aug 90 : Original (adapted from MATH_POISS) (DB)
 *     10 Jun 94 : Converted internals to double precision (DJA)
+*      6 Jun 97 : Convert to PDA (RB)
 *
 *    Type Definitions :
 *
@@ -27,13 +29,15 @@
 *
 *    External references :
 *
-      DOUBLE PRECISION 		G05DDF			! NAG gaussian random number
-        EXTERNAL		G05DDF
+      REAL			PDA_RNNOR
+        EXTERNAL		  PDA_RNNOR
 *
 *    Local variables :
 *
       LOGICAL			INITIALISE		! True if first call
         SAVE			INITIALISE
+
+      INTEGER			SEED, TICKS, STATUS
 *
 *    Local data :
 *
@@ -42,10 +46,13 @@
 
 *    Initialise random number generator if necessary
       IF ( INITIALISE ) THEN
-	CALL G05CCF
+        STATUS = 0
+        CALL PSX_TIME( TICKS, STATUS )
+        SEED = ( TICKS / 4 ) * 4 + 1
+        CALL PDA_RNSED( SEED )
 	INITIALISE=.FALSE.
       END IF
 
-      MATH_GAUSS = G05DDF ( DBLE(XMEAN), DBLE(SIGMA) )
+      MATH_GAUSS = PDA_RNNOR ( XMEAN, SIGMA )
 
       END
