@@ -171,6 +171,9 @@
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
 *     $Log$
+*     Revision 1.8  1999/07/13 06:27:34  timj
+*     Remove spurious check for Az MAP_X offset.
+*
 *     Revision 1.7  1997/11/19 03:33:19  timj
 *     An AZ offset requires a sign change.
 *
@@ -261,9 +264,6 @@
          SHIFT_X = MAP_X
          SHIFT_Y = MAP_Y
       
-*     Special case for AZ - need to reverse azimuth offset
-         IF (COORD_TYPE .EQ. 'AZ') SHIFT_X = -1.0D0 * SHIFT_X 
-
          CALL SLA_DTP2S(SHIFT_X, SHIFT_Y, LONG, LAT, MYLONG, MYLAT)
       END IF
          
