@@ -47,7 +47,7 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49
 
 // Fudge socklen_t if not defined.
 #ifndef HAVE_SOCKLEN_T
-typedef socklen_t int;
+typedef int socklen_t;
 #endif
 
 // this call changed in tcl8
