@@ -33,12 +33,14 @@
 {-
 
 {  Basic command definitions.
+define polimp            $POLPACK_DIR/polpack_mon
 define calpol            $POLPACK_DIR/polpack_mon
 define polmap            $POLPACK_DIR/polpack_mon
 define polreg            $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
 
 {  Full command definitions.
+define pol_polimp        $POLPACK_DIR/polpack_mon polimp
 define pol_calpol        $POLPACK_DIR/polpack_mon calpol
 define pol_polmap        $POLPACK_DIR/polpack_mon polmap
 define pol_polreg        $POLPACK_DIR/polpack_mon polreg
@@ -50,6 +52,7 @@ defhelp  polhelp         $POLPACK_HELP
 defhelp  polmap          $POLPACK_HELP
 defhelp  polreg          $POLPACK_HELP
 defhelp  calpol          $POLPACK_HELP
+defhelp  polimp          $POLPACK_HELP
 
 {
 {  Announce that the POLPACK commands are available.

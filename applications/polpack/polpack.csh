@@ -59,6 +59,7 @@ setenv POLPACK_HELP INSTALL_HELP/polpack
 #
 alias calpol    INSTALL_BIN/calpol
 alias polhelp   INSTALL_BIN/polhelp 
+alias polimp    INSTALL_BIN/polimp
 alias polmap    INSTALL_BIN/polmap
 alias polreg    INSTALL_BIN/polreg
 #
@@ -66,6 +67,7 @@ alias polreg    INSTALL_BIN/polreg
 #
 alias pol_calpol    INSTALL_BIN/pol_calpol
 alias pol_polhelp   INSTALL_BIN/polhelp 
+alias pol_polimp    INSTALL_BIN/pol_polimp
 alias pol_polmap    INSTALL_BIN/pol_polmap
 alias pol_polreg    INSTALL_BIN/pol_polreg
 #

@@ -443,6 +443,61 @@ endinterface
 
 #+
 #  Name:
+#     POLIMP.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-DEC-1997 (DSB):
+#     	 Original version, based on CCDPACK equivalent.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLIMP
+
+   helplib 'POLPACK_HELP:'
+
+   parameter IN                  # List of Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input images'
+      helpkey  '*'
+   endparameter
+
+   parameter TABLE               # Import control table
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'polimp.tab'
+      prompt   'Import control table'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Input NDF name list'
+   endparameter
+
+endinterface
+
+#+
+#  Name:
 #     POLMAP.IFL
 
 #  Type of Module:

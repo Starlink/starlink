@@ -76,6 +76,9 @@
       ELSE IF ( NAME .EQ. 'CALPOL' ) THEN
          CALL CALPOL( STATUS )
 
+      ELSE IF ( NAME .EQ. 'POLIMP' ) THEN
+         CALL POLIMP( STATUS )
+
       ELSE IF ( NAME .EQ. 'POLCENT' ) THEN
          CALL POLCENT( STATUS )
 

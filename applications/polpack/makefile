@@ -135,6 +135,8 @@
 #           POSIX interface library
 #        sae
 #           Global include files
+#        generic
+#           Generic code expander utility
 #
 #  Notes:
 #     This makefile uses the presence/absence of the hidden files
@@ -296,9 +298,13 @@ AR_IN = ar -r
 
 ALINK = $(STAR_BIN)/alink
 
+#  Generic source code expander
+
+GENERIC = $(STAR_BIN)/generic
+
 #  Pathname to directories holding KAPPA libraries.
  
-KAPPA_SOURCE = $(STARLINK)/kappa
+KAPPA_SOURCE = $(STARLINK)/sources/kappa
 
 #  Tcl/Tk 
 
@@ -384,7 +390,7 @@ PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
 
 I_SUB1 = ndg_com ndg_const ndg_err
 
-I_SUB2 = hlpcmd
+I_SUB2 = hlpcmd ccd1_par ccd1_memcm
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -393,14 +399,15 @@ I_SUB2 = hlpcmd
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR \
-PAR_PAR PRM_PAR FIO_ERR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
-NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R
+PAR_PAR PRM_PAR FIO_ERR FIO_PAR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
+NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).  
 
-F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
+F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE) \
+             $(GENLRDICSRC) $(GENLRDICSRC:.glrdic=.f) 
 
 F_SUB1 = ndg1_ffind.f ndg1_fspec.f \
 ndg1_lasto.f ndg1_ndfch.f ndg1_slice.f \
@@ -413,7 +420,13 @@ kps1_plcpy.f kps1_plmsk.f kps1_retr.f kps1_stor.f kps1_xyd2w.f pda_qsiai.f \
 polcent.f polhelp.f polmap.f polreg.f pthlpo.f rdndf.f segment.f sread.f \
 wrndf.f calpol.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
 ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
-ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f
+ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
+ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
+ccd1_rmcom.f ccd1_hvcon.f pol1_cext.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
+pol1_knext.f polimp.f ccd1_iscom.f 
+
+#  Routines which may be logical,real,double,integer or character (storage)
+GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -448,7 +461,7 @@ ADDLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polmap polreg datapic polcent segment calpol
+TASKS = polhelp polmap polreg datapic polcent segment calpol polimp
 
 #  Monolith routine source name.
 
@@ -465,7 +478,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 #  List of task interface files.
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polreg.ifl \
-segment.ifl calpol.ifl
+segment.ifl calpol.ifl polimp.ifl
 
 #  List of help library sources.
 
@@ -484,7 +497,8 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 LATEX_DOCS = polreg.tex polmap.tex
 HYPERTEXT_DOCS = 
-HYPERTEXT_HELP = polreg.htx polmap.htx
+#HYPERTEXT_HELP = polreg.htx polmap.htx
+HYPERTEXT_HELP = 
 
 #  List of documentation files.
 
@@ -502,7 +516,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  Use only .o, .c, .f, .ifc, .ifl, .shl and .hlp suffix rules.
 
 .SUFFIXES:
-.SUFFIXES: .o .c .f .ifc .ifl .shl .hlp
+.SUFFIXES: .o .c .f .ifc .ifl .shl .hlp .glrdic
 
 #  List of files which must be built from the source files before the
 #  package can be installed for use.  This should comprise all the files
@@ -519,11 +533,14 @@ $(DATA_FILES)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
-HLPCMD NDG_ERR NDG_CONST NDG_COM
+CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST NDG_COM
 
 #  Rules to set up links to locate each of the above include files.
 
 HLPCMD:    hlpcmd;                $(LINK) $? $@
+CCD1_PAR:  ccd1_par;              $(LINK) $? $@
+CCD1_MEMCM:  ccd1_memcm;          $(LINK) $? $@
+
 NDG_ERR:   ndg_err;               $(LINK) $? $@
 NDG_CONST: ndg_const;             $(LINK) $? $@
 NDG_COM:   ndg_com;               $(LINK) $? $@
@@ -535,7 +552,10 @@ DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
+CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
+TRN_ERR:   $(STAR_INC)/trn_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
+FIO_PAR:   $(STAR_INC)/fio_par;   $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
@@ -560,7 +580,7 @@ $(F_SUB1) $(I_SUB1) $(C_SUB1):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB2) $(I_SUB2) $(C_SUB2) :
+$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -584,14 +604,24 @@ OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT)
 
 O_SUB1 = $(F_SUB1:.f=.o) $(C_SUB1:.c=.o)
 
-O_SUB2 = $(F_SUB2:.f=.o) $(C_SUB2:.c=.o) $(PLATFORM_C:.c=.o) $(ADDOBJS)
+O_SUB2 = $(F_SUB2:.f=.o) $(C_SUB2:.c=.o) $(PLATFORM_C:.c=.o) $(ADDOBJS) \
+         $(GENCOBJ)
 
 MONO_OBJECT = $(MONO_SOURCE:.f=.o)
+
+GENCOBJ = $(GENLRDICSRC:.glrdic=.o)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 .f.o:
 	$(FC) $(FFLAGS) -c $<
+
+.glrdic.o:
+	cp $< $(<:.glrdic=.gen)
+	$(GENERIC) -t lrdic $(<:.glrdic=.gen)
+	$(FC) $(FFLAGS) -c $(<:.glrdic=.f)
+	$(RM) $(<:.glrdic=.f)
+	$(RM) $(<:.glrdic=.gen)
 
 $(ADDOBJS): 
 	cp $(STAR_LIB)/$@ ./
@@ -1328,115 +1358,196 @@ strip:
 #  Object file dependencies on include files (or links to those include
 #  files).  These are normally generated automatically from the source
 #  files.
-calpol.o: NDF_PAR
-calpol.o: PRM_PAR
-calpol.o: SAE_PAR
-ccg1_cenr.o: NUM_DEF_CVT
-ccg1_cenr.o: NUM_DEC_CVT
-ccg1_cenr.o: PRM_PAR
-ccg1_cenr.o: SAE_PAR
-ccg1_is4d.o: SAE_PAR
-ccd1_cmprr.o: SAE_PAR    
-ccd1_cmprr.o: PRM_PAR    
-ccd1_qntlr.o: SAE_PAR    
-ccd1_qsrtr.o: SAE_PAR    
-ccd1_skysr.o: SAE_PAR    
-ccd1_skysr.o: PRM_PAR    
-ccg1_cmltr.o: SAE_PAR    
-ccg1_cmltr.o: PRM_PAR    
-ccg1_cmltr.o: NUM_CMN    
-ccg1_cmltr.o: NUM_DEC_CVT
-ccg1_cmltr.o: NUM_DEC_R  
-ccg1_cmltr.o: NUM_DEF_CVT
-ccg1_cmltr.o: NUM_DEF_R
-ccg1_is2r.o: SAE_PAR     
-ccg1_is3r.o: SAE_PAR     
-ccg1_mdr1r.o: SAE_PAR    
-ccg1_mdr1r.o: PRM_PAR    
-ccg1_mdr1r.o: NUM_CMN    
-ccg1_mdr1r.o: NUM_DEC_CVT
-ccg1_mdr1r.o: NUM_DEF_CVT
-ccg1_mdr3r.o: SAE_PAR    
-ccg1_mdr3r.o: PRM_PAR    
-ccg1_mdr3r.o: NUM_CMN    
-ccg1_mdr3r.o: NUM_DEC_CVT
-ccg1_mdr3r.o: NUM_DEF_CVT
-ccg1_wtm2r.o: SAE_PAR    
-ccg1_wtm2r.o: NUM_DEC_CVT
-ccg1_wtm2r.o: NUM_DEF_CVT
-ccg1_wtm3r.o: SAE_PAR    
-ccg1_wtm3r.o: NUM_DEC_CVT
-ccg1_wtm3r.o: NUM_DEF_CVT
-datapic.o: SAE_PAR
-gethlp.o: HLPCMD
-gethlp.o: SAE_PAR
-gthlpi.o: HLPCMD
-gthlpi.o: SAE_PAR
-kpg1_chaxd.o: NDF_PAR SAE_PAR
-kpg1_flcor.o: FIO_ERR MSG_PAR PAR_ERR PRM_PAR SAE_PAR
-kpg1_rfcor.o: DAT_PAR FIO_ERR SAE_PAR
-kpg1_scrsz.o: SAE_PAR
-kps1_cuxyr.o: PRM_PAR SAE_PAR
-kps1_flxyr.o: SAE_PAR
-kps1_inxyr.o: PAR_ERR PRM_PAR SAE_PAR
-kps1_plcpx.o: SAE_PAR
-kps1_plcpy.o: NDF_PAR SAE_PAR
-kps1_plmsk.o: PRM_PAR SAE_PAR
-kps1_retr.o: SAE_PAR
-kps1_stor.o: SAE_PAR
-kps1_xyd2w.o: PRM_PAR SAE_PAR
-ndfac.o: SAE_PAR
-pol_cale.o: PRM_PAR
-pol_cale.o: SAE_PAR
-pol_calf.o: PRM_PAR
-pol_calf.o: SAE_PAR
-pol_calp.o: SAE_PAR
-pol_calti.o: PRM_PAR
-pol_calti.o: SAE_PAR
-polcent.o: PAR_ERR
-polcent.o: SAE_PAR
-polhelp.o: PAR_ERR
-polhelp.o: SAE_PAR
-polmap.o: PAR_ERR
-polmap.o: SAE_PAR
-polreg.o: PRM_PAR
-polreg.o: GRP_PAR
-polreg.o: PAR_ERR
-polreg.o: SAE_PAR
-pthlpo.o: HLPCMD
-pthlpo.o: SAE_PAR
-rdndf.o: GRP_PAR
-rdndf.o: MSG_PAR
-rdndf.o: NDG_ERR
-rdndf.o: PAR_ERR
-rdndf.o: SAE_PAR
-segment.o: NDF_PAR
-segment.o: PAR_ERR
-segment.o: PAR_PAR
-segment.o: PRM_PAR
-segment.o: SAE_PAR
-wrndf.o: GRP_PAR
-wrndf.o: MSG_PAR
-wrndf.o: NDG_ERR
-wrndf.o: PAR_ERR
-wrndf.o: SAE_PAR
+calpol.o:	SAE_PAR     
+calpol.o:	PRM_PAR     
+calpol.o:	NDF_PAR     
+ccd1_asfio.o:	SAE_PAR     
+ccd1_asfio.o:	PAR_ERR     
+ccd1_asfio.o:	FIO_PAR     
+ccd1_cfgrp.o:	SAE_PAR     
+ccd1_cfgrp.o:	CCD1_PAR    
+ccd1_cmprr.o:	SAE_PAR     
+ccd1_cmprr.o:	PRM_PAR     
+ccd1_ftgrp.o:	SAE_PAR     
+ccd1_ftgrp.o:	GRP_PAR     
+ccd1_ftgrp.o:	TRN_ERR     
+ccd1_hvcon.o:	SAE_PAR     
+ccd1_iscom.o:	SAE_PAR     
+ccd1_mall.o:	SAE_PAR     
+ccd1_mall.o:	PRM_PAR     
+ccd1_mall.o:	CCD1_PAR    
+ccd1_mall.o:	CCD1_MEMCM  
+ccd1_mfree.o:	CCD1_PAR    
+ccd1_mfree.o:	CCD1_MEMCM  
+ccd1_nxwrd.o:	SAE_PAR     
+ccd1_nxwrd.o:	CHR_ERR     
+ccd1_qntlr.o:	SAE_PAR     
+ccd1_qsrtr.o:	SAE_PAR     
+ccd1_rdlin.o:	SAE_PAR     
+ccd1_rdlin.o:	FIO_ERR     
+ccd1_rmcom.o:	SAE_PAR     
+ccd1_skysr.o:	SAE_PAR     
+ccd1_skysr.o:	PRM_PAR     
+ccg1_cenr.o:	SAE_PAR     
+ccg1_cenr.o:	PRM_PAR     
+ccg1_cenr.o:	NUM_DEC_CVT 
+ccg1_cenr.o:	NUM_DEF_CVT 
+ccg1_cmltr.o:	SAE_PAR     
+ccg1_cmltr.o:	PRM_PAR     
+ccg1_cmltr.o:	NUM_CMN     
+ccg1_cmltr.o:	NUM_DEC_CVT 
+ccg1_cmltr.o:	NUM_DEC_R   
+ccg1_cmltr.o:	NUM_DEF_CVT 
+ccg1_cmltr.o:	NUM_DEF_R
+ccg1_is2r.o:	SAE_PAR     
+ccg1_is3r.o:	SAE_PAR     
+ccg1_is4d.o:	SAE_PAR     
+ccg1_mdr1r.o:	SAE_PAR     
+ccg1_mdr1r.o:	PRM_PAR     
+ccg1_mdr1r.o:	NUM_CMN     
+ccg1_mdr1r.o:	NUM_DEC_CVT 
+ccg1_mdr1r.o:	NUM_DEF_CVT 
+ccg1_mdr3r.o:	SAE_PAR     
+ccg1_mdr3r.o:	PRM_PAR     
+ccg1_mdr3r.o:	NUM_CMN     
+ccg1_mdr3r.o:	NUM_DEC_CVT 
+ccg1_mdr3r.o:	NUM_DEF_CVT 
+ccg1_wtm2r.o:	SAE_PAR     
+ccg1_wtm2r.o:	NUM_DEC_CVT 
+ccg1_wtm2r.o:	NUM_DEF_CVT 
+ccg1_wtm3r.o:	SAE_PAR     
+ccg1_wtm3r.o:	NUM_DEC_CVT 
+ccg1_wtm3r.o:	NUM_DEF_CVT 
+datapic.o:	SAE_PAR     
+gethlp.o:	SAE_PAR     
+gethlp.o:	HLPCMD      
+gthlpi.o:	SAE_PAR     
+gthlpi.o:	HLPCMD      
+kpg1_chaxd.o:	SAE_PAR     
+kpg1_chaxd.o:	NDF_PAR     
+kpg1_flcor.o:	SAE_PAR     
+kpg1_flcor.o:	PRM_PAR     
+kpg1_flcor.o:	MSG_PAR     
+kpg1_flcor.o:	PAR_ERR     
+kpg1_flcor.o:	FIO_ERR     
+kpg1_rfcor.o:	SAE_PAR     
+kpg1_rfcor.o:	DAT_PAR     
+kpg1_rfcor.o:	FIO_ERR     
+kpg1_scrsz.o:	SAE_PAR     
+kps1_flxyr.o:	SAE_PAR
+kps1_inxyr.o:	SAE_PAR     
+kps1_inxyr.o:	PRM_PAR     
+kps1_inxyr.o:	PAR_ERR     
+kps1_plcpx.o:	SAE_PAR     
+kps1_plcpx.o:	SAE_PAR     
+kps1_plcpx.o:	SAE_PAR     
+kps1_plcpx.o:	SAE_PAR     
+kps1_plcpx.o:	SAE_PAR     
+kps1_plcpy.o:	SAE_PAR     
+kps1_plcpy.o:	NDF_PAR     
+kps1_plmsk.o:	SAE_PAR     
+kps1_plmsk.o:	PRM_PAR     
+kps1_retr.o:	SAE_PAR     
+kps1_stor.o:	SAE_PAR     
+kps1_xyd2w.o:	SAE_PAR     
+kps1_xyd2w.o:	PRM_PAR     
+ndfac.o:	SAE_PAR     
+ndg1_ffind.o:	SAE_PAR     
+ndg1_ffind.o:	GRP_PAR     
+ndg1_ffind.o:	NDG_ERR     
+ndg1_ffind.o:	NDG_CONST   
+ndg1_fspec.o:	SAE_PAR     
+ndg1_fspec.o:	GRP_PAR     
+ndg1_lasto.o:	SAE_PAR     
+ndg1_ndfch.o:	SAE_PAR     
+ndg1_ndfch.o:	DAT_PAR     
+ndg1_ndfch.o:	GRP_PAR     
+ndg1_ndfch.o:	NDG_CONST   
+ndg1_ndfch.o:	NDG_ERR     
+ndg1_ndfch.o:	PSX_ERR     
+ndg1_slice.o:	SAE_PAR     
+ndg1_slice.o:	GRP_PAR     
+ndg_asexp.o:	SAE_PAR     
+ndg_asexp.o:	NDG_CONST   
+ndg_asexp.o:	NDG_ERR     
+ndg_asexp.o:	GRP_PAR     
+ndg_assoc.o:	SAE_PAR     
+ndg_assoc.o:	GRP_PAR     
+ndg_assoc.o:	GRP_ERR     
+ndg_assoc.o:	PAR_ERR     
+ndg_assoc.o:	NDG_ERR     
+ndg_creat.o:	SAE_PAR     
+ndg_creat.o:	GRP_PAR     
+ndg_creat.o:	PAR_ERR     
+ndg_crexp.o:	SAE_PAR     
+ndg_crexp.o:	GRP_PAR     
+ndg_crexp.o:	NDG_ERR     
+ndg_crexp.o:	NDG_CONST   
+ndg_crexp.o:	PSX_ERR     
+ndg_ndfas.o:	SAE_PAR     
+ndg_ndfas.o:	DAT_PAR     
+ndg_ndfas.o:	NDF_PAR     
+ndg_ndfas.o:	GRP_PAR     
+ndg_ndfas.o:	NDG_CONST   
+ndg_ndfcr.o:	SAE_PAR     
+ndg_ndfcr.o:	DAT_PAR     
+ndg_ndfcr.o:	NDF_PAR     
+ndg_ndfcr.o:	GRP_PAR     
+ndg_ndfcr.o:	NDG_CONST   
+ndg_ndfpr.o:	SAE_PAR     
+ndg_ndfpr.o:	DAT_PAR     
+ndg_ndfpr.o:	NDF_PAR     
+ndg_ndfpr.o:	GRP_PAR     
+ndg_ndfpr.o:	NDG_CONST   
+pol1_cext.o:	SAE_PAR     
+pol1_imfit.o:	SAE_PAR     
+pol1_imfit.o:	GRP_PAR     
+pol1_imfit.o:	DAT_PAR     
+pol1_imfit.o:	MSG_PAR     
+pol1_knext.o:	SAE_PAR     
+pol1_lnam.o:	SAE_PAR     
+pol1_lnam.o:	GRP_PAR     
+pol1_lnam.o:	FIO_PAR     
+pol1_sto0.o:	SAE_PAR DAT_PAR PRM_PAR     
+pol1_stoc.o:	SAE_PAR DAT_PAR PRM_PAR     
+pol_cale.o:	SAE_PAR     
+pol_cale.o:	PRM_PAR     
+pol_calf.o:	SAE_PAR     
+pol_calf.o:	PRM_PAR     
+pol_calp.o:	SAE_PAR     
+pol_calti.o:	SAE_PAR     
+pol_calti.o:	PRM_PAR     
+polcent.o:	SAE_PAR     
+polcent.o:	PAR_ERR     
+polhelp.o:	SAE_PAR     
+polhelp.o:	PAR_ERR     
+polimp.o:	SAE_PAR
+polimp.o:	DAT_PAR
+polimp.o:	FIO_PAR
+polmap.o:	SAE_PAR     
+polmap.o:	PAR_ERR     
+polreg.o:	SAE_PAR     
+polreg.o:	GRP_PAR     
+polreg.o:	PAR_ERR     
+polreg.o:	PRM_PAR     
+pthlpo.o:	SAE_PAR     
+pthlpo.o:	HLPCMD      
+rdndf.o:	SAE_PAR     
+rdndf.o:	PAR_ERR     
+rdndf.o:	MSG_PAR     
+rdndf.o:	GRP_PAR     
+rdndf.o:	NDG_ERR     
+segment.o:	SAE_PAR     
+segment.o:	NDF_PAR     
+segment.o:	PRM_PAR     
+segment.o:	PAR_ERR     
+segment.o:	PAR_PAR     
+wrndf.o:	SAE_PAR     
+wrndf.o:	PAR_ERR     
+wrndf.o:	MSG_PAR     
+wrndf.o:	GRP_PAR     
+wrndf.o:	NDG_ERR     
 polpack_mon.o: SAE_PAR PAR_PAR
-
-ndg1_ffind.o: GRP_PAR NDG_CONST NDG_ERR SAE_PAR
-ndg1_fspec.o: GRP_PAR SAE_PAR
-ndg1_lasto.o: SAE_PAR
-ndg1_ndfch.o: DAT_PAR GRP_PAR NDG_CONST NDG_ERR SAE_PAR PSX_ERR
-ndg1_slice.o: GRP_PAR SAE_PAR
-ndg_annul.o: DAT_PAR SAE_PAR
-ndg_asexp.o: GRP_PAR NDG_CONST NDG_ERR SAE_PAR
-ndg_assoc.o: GRP_ERR GRP_PAR NDG_ERR PAR_ERR SAE_PAR
-ndg_creat.o: GRP_PAR PAR_ERR SAE_PAR
-ndg_crexp.o: GRP_PAR NDG_CONST SAE_PAR
-ndg_delet.o: DAT_PAR SAE_PAR
-ndg_ndfas.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
-ndg_ndfcr.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
-ndg_ndfpr.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
-ndg_test.o: GRP_PAR SAE_PAR
 
 #-------------------------------------------------------------------------------
 #

@@ -1,3 +1,42 @@
+proc CanDelete {id} {
+#+
+#  Name:
+#     CanDelete
+#
+#  Purpose:
+#     Delete a canvas item, executing any <Leave> bindings associated with the
+#     item first.
+#
+#  Arguments:
+#     id
+#        The canvas identifier for the item to be deleted.
+#
+#  Globals:
+#     CAN (Read)
+#        The name of the canvas widget holding the GWM image.
+#
+#-
+   global CAN
+   global CURITEM
+
+# If the item being deleted has set the canvas cursor (see proc CursorBind)
+# we need to reset the cursor before deleting the item. 
+   if { [info exists CURITEM] && $CURITEM == $id } {
+
+# Check each tag associated with the item.
+      foreach tag [$CAN gettags $id] {
+
+# If there is a <Leave> binding assocaited with this tag, execute it.
+         if { ![catch {set cmd [$CAN bind $tag <Leave>] } ] } {
+            eval $cmd
+         }
+      }
+   }
+
+# Delete the canvas item.
+   $CAN delete $id
+}
+
 proc Accept {} {
 #+
 #  Name:
@@ -38,21 +77,19 @@ proc Accept {} {
       set lab [GetPosn $i LBL $REFIM_DISP $REFOBJ_DISP]
 
 # See if there is already a current feature with the same label as the
-# reference feature.
+# reference feature. If not, append this position to the list of
+# positions to be accepted.
       if { [FindPosn LBL $lab 0] == "" } {
-
-# If not, search for an image feature at these canvas coordinates. If one is
-# found, give it the same label as the reference feature. If the
-# centroiding fails, increment the number of bad positions.
-         if { ![GetFeature $cx $cy $lab] } { incr nbad }
+         lappend cxs $cx
+         lappend cys $cy
+         lappend labs $lab
       }
    }
 
-# If any positions could ne be found tell the user.
-   if { $nbad == 1 } {
-      Message "1 position could not be located accurately."
-   } elseif { $nbad > 1 } {
-      Message "$nbad positions could not be located accurately."
+# If there are any positions to be accepted, centroid each feature and
+# create an entry in the relevant positions list.
+   if { [info exists cxs] } {
+      GetFeature $cxs $cys $labs
    }
 
 # Cancel the informative text set earlier in this procedure.
@@ -230,6 +267,9 @@ proc B1MotionBind {x y} {
    global VID1
    global VID2
    global POINTER_PXY
+   global ANCX
+   global ANCY
+   global ROOTAG
 
 # Convert the screen coords to canvas coords.
    set cx [$CAN canvasx $x]
@@ -241,8 +281,6 @@ proc B1MotionBind {x y} {
 
 # Store the pixel coordinates of the pointer in POINTER_PXY.
    set pxy [CanToNDF $cx $cy]
-   if { $pxy == "" } { return } 
-
    set px [lindex $pxy 0]
    set py [lindex $pxy 1]
    set POINTER_PXY [format "( %.1f, %.1f )" $px $py ]
@@ -306,12 +344,13 @@ proc B1MotionBind {x y} {
    } {
 
 # Find the offsets from the previous position.
-      set cxy [$CAN coords $VID0]
-      set dx [expr $cx - [lindex $cxy 0]]
-      set dy [expr $cy - [lindex $cxy 1]]
+      set dx [expr $cx - $ANCX]
+      set dy [expr $cy - $ANCY]
+      set ANCX $cx
+      set ANCY $cy
 
 # Move all canvas items which have the same tag as the root vertex.
-      $CAN move [GetPosn $ROOTI TAG] $dx $dy
+      $CAN move $ROOTAG $dx $dy
 
    }
 }
@@ -1128,13 +1167,13 @@ proc ClearPosns {args} {
 
             set id [lindex $PNTID($image,$object) $i]
             if { $id != -1 } {
-               $CAN delete $id
+               CanDelete $id
                set PNTID($image,$object) [lreplace $PNTID($image,$object) $i $i -1]
             }
 
             set vid [lindex $PNTVID($image,$object) $i]
             if { $vid != -1 && $vid != "" } {
-               $CAN delete $vid
+               CanDelete $vid
                set PNTVID($image,$object) [lreplace $PNTVID($image,$object) $i $i -1]
             }
          }
@@ -2145,7 +2184,7 @@ proc DelPosn {i all args} {
 # Delete any canvas item marking the position.
       set id [lindex $PNTID($image,$object) $i]
       if { $id != -1 } {
-         $CAN delete $id
+         CanDelete $id
          set PNTID($image,$object) [lreplace $PNTID($image,$object) $i $i -1 ]
       }
 
@@ -2156,7 +2195,7 @@ proc DelPosn {i all args} {
          set coords [$CAN coords $idedge]
          set xn [lindex $coords 2]
          set yn [lindex $coords 3]
-         $CAN delete $idedge
+         CanDelete $idedge
          set PNTVID($image,$object) [lreplace $PNTVID($image,$object) $i $i -1 ]
       } {
          set xn ""
@@ -2198,7 +2237,7 @@ proc DelPosn {i all args} {
                   set cybeg [lindex $coords 1]
                   $CAN coords $lid2 $cxbeg $cybeg $xn $yn
                } {
-                  $CAN delete $lid2
+                  CanDelete $lid2
                   set PNTVID($image,$object) [lreplace $PNTVID($image,$object) $j $j -1 ]
                }
             }
@@ -2417,7 +2456,7 @@ proc DescMap {map} {
          if { $gotx && $goty } {
             for {set i 1} {$i < 7} {incr i} {
 
-               regsub -nocase D $c($i) E text
+               regsub -nocase -all D $c($i) E text
 
                if { [scan $text "%g" val] == 1 ||
                     [scan $text "(%g)" val] == 1 } {
@@ -2700,8 +2739,8 @@ proc DrawGwm {} {
 
       } {
          if { [Obey kappa stats "ndf=$data"] } {
-            regsub -nocase D [GetParam kappa stats:maximum] E maxm
-            regsub -nocase D [GetParam kappa stats:minimum] E minm
+            regsub -nocase -all D [GetParam kappa stats:maximum] E maxm
+            regsub -nocase -all D [GetParam kappa stats:minimum] E minm
 
             if { abs( $maxm/2.0 - $minm/2.0 ) < 
                  2.0E-4 * ( abs($maxm)/2.0 + abs($minm)/2.0 ) } {
@@ -2724,8 +2763,8 @@ proc DrawGwm {} {
 # Get the used scaling limits (replace D exponents with E). If the data
 # range was too small to display, use the values established earlier.
          if { $pars != "mode=flash" } {
-            regsub -nocase D [GetParam kapview display:scalow] E scalow
-            regsub -nocase D [GetParam kapview display:scahigh] E scahigh
+            regsub -nocase -all D [GetParam kapview display:scalow] E scalow
+            regsub -nocase -all D [GetParam kapview display:scahigh] E scahigh
          }
          set SCALOW [format "%.5g" $scalow]
          set SCAHIGH [format "%.5g" $scahigh]
@@ -2734,7 +2773,7 @@ proc DrawGwm {} {
 # normalised device coordinates and NDF pixels. These NDC values extend
 # from 0 to 1 on both axes (and in general are therefore not square).
          Obey polpack datapic "device=$DEVICE" 1
-         regsub -nocase D [GetParam polpack datapic:result] E result
+         regsub -nocase -all D [GetParam polpack datapic:result] E result
          scan $result "' %f %f %f %f %f %f %f %f '" ncx1 ncx2 ncy1 ncy2 \
                                                     wcx1 wcx2 wcy1 wcy2
       
@@ -4430,7 +4469,7 @@ proc Effects {im effect nodisp} {
          if { [Obey kappa stats "ndf=$image"] } {
 
 # Convert D exponents (as used by HDS) to E (as used by Tcl).
-            regsub -nocase D [GetParam kappa stats:minimum] E dmin
+            regsub -nocase -all D [GetParam kappa stats:minimum] E dmin
 
 # Decide on the output image name.
             set file [UniqueFile]
@@ -5690,23 +5729,22 @@ proc GetFeature {cx cy rlabel} {
 #     GetFeature
 #
 #  Purpose:
-#     Check if the button press position can be used as a feature,
-#     and if so, add the feature to the list of current features.
+#     Check if supplied canvas positions can be used as features,
+#     and if so, adds the features to the list of current features.
 #
 #  Arguments:
 #     cx, cy
-#        The canvas coordinates of the initial guess at the feature
-#        position.
+#        A list of canvas coordinates of the initial guesses at the feature
+#        positions.
 #     rlabel
-#        If this is not null, then it is used as the label for the new
-#        feature (and the user is not prompted for a label). Also, this
-#        suppresses the warning messages which are otherwise displayed if 
-#        a position already exists at the supplied position, or if a
-#        position cannot be centroided.
+#        If this is not null, then it is a list of labels to be used as the 
+#        labels for the new features (and the user is not prompted for new
+#        labels). Also, this suppresses the warning messages which are 
+#        otherwise displayed if a position already exists at the supplied 
+#        position, or if a position cannot be centroided.
 #
 #  Returned Value:
-#      Zero if the position could not be found (i.e. if the centroiding
-#      failed), and one otherwise.
+#      The number of features which could not be centroided.
 #
 #  Globals:
 #     CAN (Read)
@@ -5735,59 +5773,121 @@ proc GetFeature {cx cy rlabel} {
    global TEST_PX
    global TEST_PY
 
-# Assume success.
-   set ok 1
+# Assume no bad values.
+   set nbad 0
 
-# Get the NDF pixel coordinates at the position where the button was 
-# pressed.
-   set pxy [CanToNDF $cx $cy]
-   if { $pxy == "" } { return } 
-   set px [lindex $pxy 0]
-   set py [lindex $pxy 1]
+# See how many positions are to be procesed.
+   set np [llength $cx]
 
-# If the position is to be centroided...
+# Take a copy of the supplied list of labels.
+   set rlabs $rlabel
+
+# Get the NDF pixel coordinates at the supplied canvas positions.
+# Form text strings which can be used as the XIN adn YIN parameters for
+# the POLCENT ATASK.
+   set xin "\["
+   set yin "\["
+   for {set i 0} {$i < $np} {incr i} {
+      set pxy [CanToNDF [lindex $cx $i] [lindex $cy $i] ]
+      set ppx [lindex $pxy 0]
+      set ppy [lindex $pxy 1]
+      lappend px $ppx
+      lappend py $ppy
+      if { $i == 0 } {
+         append xin "$ppx"
+         append yin "$ppy"
+      } {
+         append xin ",$ppx"
+         append yin ",$ppy"
+      }
+   }
+   append xin "\]"
+   append yin "\]"
+
+# If the positions are to be centroided...
    if { $PSF_SIZE > 0 } {
 
 # Calculate the box size and max shift values.
       set isize [expr 2 * $PSF_SIZE]
       set maxsh [expr 4 * $PSF_SIZE]
 
-# Attempt to centroid it. Do not report an error if the centrodibng fails 
-# if we are finding features automatically.
-      if { $rlabel == "" } {
-         set norep ""
-      } {
-         set norep "noreport"
-      }
+# Attempt to centroid them. 
       set imsec "[Top IMAGE_STACK($IMAGE_DISP)]$SECTION_DISP"
-      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize xin=$px yin=$py" $norep] } {
+      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize xin=$xin yin=$yin"] } {
 
 # If succesful, read the accurate feature coordinates from the output
-# parameters.
-         regsub -nocase D [GetParam polpack polcent:xyout] E pxy
-         scan $pxy "' %f %f '" px py
+# parameters. Convert the parameter vector value into a Tcl list
+# by replacing "D" exponents by "E", removing square brackets, and
+# replacing commas by spaces.
+         regsub -nocase -all D [GetParam polpack polcent:xout] E aax
+         regsub -nocase -all D [GetParam polpack polcent:yout] E aay
 
-# If the position could not be centroided, report an error if required.
-      } {
-         if { $rlabel == "" } {
-            Message "Failed to find centroid. Ignoring this position. Centroiding can be switched off by setting the Feature Size to zero in the \"Options\" menu."
+         regsub  -all {\[} $aax "" bbx
+         regsub  -all {\[} $aay "" bby
+
+         regsub  -all {\]} $bbx "" ccx
+         regsub  -all {\]} $bby "" ccy
+
+         regsub  -all "," $ccx " " qx
+         regsub  -all "," $ccy " " qy
+
+# Count and remove any positions which could not be centroided. These
+# are flagged by polcent by returning -100000 for X and Y.
+         unset px
+         unset py
+         unset rlabs
+         for {set i 0} {$i < $np} {incr i} {
+            set ppx [lindex $qx $i]
+            if { $ppx != -100000 } {
+               set ppy [lindex $qy $i]
+               set lab [lindex $rlabel $i]
+               lappend px $ppx
+               lappend py $ppy
+               lappend rlabs $lab
+            } {
+               incr nbad
+            }
          }
+
+#  Adjust the number of positions to exclude any which could be
+#  centroided.
+         set np [expr $np - $nbad]
+
+# Warn the user about the bad positions.
+         if { $nbad > 1 } {
+            Message "Accurate positions could not be found for $nbad features."
+         } elseif { $nbad > 0 } {
+            Message "An accurate position could not be found for the feature."
+         }
+
+# If the position could not be centroided, indicate we have no good
+# positions.
+      } {
          set px ""
          set py ""
-         set ok 0
+         set nbad $np
+         set np 0
       }
    }
 
-# If we have a position...
-   if { $px != "" && $py != "" } {
+# Loop round each good position.
+   for {set i 0} {$i < $np} {incr i} {
+      set ppx [lindex $px $i]
+      set ppy [lindex $py $i]
+
+      if { $rlabel != "" } {
+         set rlb [lindex $rlabs $i]
+      } {
+         set rlb ""
+      }
 
 # See if a feature already exists at these pixel coordinates.
-      if { [ FindPosn "PX PY" [list $px $py] 2] != "" } {
+      if { [ FindPosn "PX PY" [list $ppx $ppy] 2] != "" } {
 
 # If so then warn the user and ignore the position. The warning is not
 # issued if this procedure has been entered as a result of the "Accept"
 # button being pressed (as shown by "rlabel" not being blank).
-         if { $rlabel == "" } {
+         if { $rlb == "" } {
             Message "An image feature already exists at the specified position."
          }
                
@@ -5796,15 +5896,15 @@ proc GetFeature {cx cy rlabel} {
 # indicate that we have a "candidate feature". TestFea returns a list
 # holding the X and Y canvas coordinates at the feature.
       } {
-         set TEST_PX $px
-         set TEST_PY $py
+         set TEST_PX $ppx
+         set TEST_PY $ppy
          TestFea
 
 # Get a label for this position, if required.
-         if { $rlabel == "" } {
+         if { $rlb == "" } {
             set lab [GetLabel]
          } {
-            set lab $rlabel
+            set lab $rlb
          }
 
 # Delete the temporary circle used to mark the candidate feature.
@@ -5813,18 +5913,18 @@ proc GetFeature {cx cy rlabel} {
 
 # If a label was given, create a new position and marker.
          if { $lab != "" } {
-            set cxy [NDFToCan $px $py]
+            set cxy [NDFToCan $ppx $ppy]
             if { $cxy == "" } { return } 
             set cx [lindex $cxy 0]
             set cy [lindex $cxy 1]
-            set newi [SetPosn -1 "PX PY CX CY LBL" [list $px $py $cx $cy $lab] ]
+            set newi [SetPosn -1 "PX PY CX CY LBL" [list $ppx $ppy $cx $cy $lab] ]
             set id [MarkPosn $newi 0 0 ""]
             SetPosn $newi ID $id
          }
       }
    }   
 
-   return $ok
+   return $nbad
 }
 
 proc GetItems {} {
@@ -6125,7 +6225,7 @@ proc GetLabel {} {
       set init 0
       set ilab 0
       foreach lab $LABELS {
-         if { $lab == $LAST_LABEL } { set init $ilab }
+         if { [info exists LAST_LABEL] && $lab == $LAST_LABEL } { set init $ilab }
          incr ilab
          if { $NLAB($lab) > 0 } {
             $LB insert end $lab
@@ -8866,6 +8966,7 @@ proc OpenFile {mode title text lfile lfd} {
    bind $ent <Return> "set OPFILE_EXIT ok"
 
 # Give the focus to the entry.
+   set F_OWNER $ent
    focus $ent
 
 # Create the OK and Cancel buttons, but don't pack them yet.
@@ -9034,8 +9135,8 @@ proc PixIndSection {imsec} {
    Obey ndfpack ndftrace "ndf=\"$imsec\" quiet" 1
 
 # Get the lower and upper bounds.
-   regsub -nocase D [GetParam ndfpack ndftrace:lbound] E lbound
-   regsub -nocase D [GetParam ndfpack ndftrace:ubound] E ubound
+   regsub -nocase -all D [GetParam ndfpack ndftrace:lbound] E lbound
+   regsub -nocase -all D [GetParam ndfpack ndftrace:ubound] E ubound
 
 # Extract the individual bounds.
    set ok 0
@@ -9166,7 +9267,8 @@ proc RealValue {name width value command args} {
 #    OLD_VAL (Write)
 #      The previous (valid) value displayed in the text entry widget.
 #-
-
+   global F_OWNER
+   global OLD_VAL
    global $value
    upvar #0 $value varr
 
@@ -9174,6 +9276,11 @@ proc RealValue {name width value command args} {
 # the supplied global variable.
    eval entry $name -width $width -relief sunken -bd 2 -textvariable $value \
           -justify center $args
+   set F_OWNER $name
+   focus $name
+
+# Save the current value of the variable.
+   set OLD_VAL $varr
 
 # When the pointer enters the text entry area, select the entire current
 # contents of the widget so that typing a single character will delete it.
@@ -9448,6 +9555,9 @@ proc ReleaseBind {x y} {
                   SetPosn $nxt "CX CY" [list $cx $cy]
                   set nxt [GetPosn $nxt NXT]
                }
+
+               set MOVE 0
+
             }
 
 # If we are not dragging a vertex, then we must have initiated a new
@@ -9619,6 +9729,7 @@ proc Restore {file} {
    global PNTID
    global PNTNXT
    global PNTVID
+   global PNTLBL
 
 # Open an existing dump file, either the supplied one, or one specified by
 # the user.
@@ -9734,9 +9845,16 @@ proc Restore {file} {
                }
             }
 
+#  The rest is only done if the Object was restired succesfully.
+            if { !$bad } {
+
+#  Set up the arrays holding the number of times each label is used.
+               foreach lbl $PNTLBL($image,$object) {
+                  Labels $lbl 1
+               }
+
 # Initialise the other required arrays to indicate that nothing is
 # currently drawn.
-            if { !$bad } {
                catch { unset PNTID($image,$object) }
                catch { unset PNTCX($image,$object) }
                catch { unset PNTCY($image,$object) }
@@ -11594,7 +11712,7 @@ proc SetPosn {i names values args} {
                set cy0 [lindex $PNTCY($image,$object) $nx]
                $CAN coords $vid $cx $cy $cx0 $cy0
             } {
-               $CAN delete $vid
+               CanDelete $vid
                set PNTVID($image,$object) [lreplace $PNTVID($image,$object) $ret $ret $nx]
             }
          }
@@ -11789,6 +11907,9 @@ proc SingleBind {x y shift} {
    global VID1
    global VID2
    global POLPACK_DIR
+   global ANCX
+   global ANCY
+   global ROOTAG
 
 # Cancel any existing selected area.
    CancelArea
@@ -11815,10 +11936,14 @@ proc SingleBind {x y shift} {
 # vertex in global for use in B1MotionBind.
       if { $ROOTI != "" } {
          set VID0 [GetPosn $ROOTI ID]
+         set vid0xy [$CAN coords $VID0]
+         set ANCX [lindex $vid0xy 0]
+         set ANCY [lindex $vid0xy 1]
          set VID2 [GetPosn $ROOTI VID]
          set j [FindPosn NXT $ROOTI 0]
          set VID1 [GetPosn $j VID]
          set MOVE $shift
+         set ROOTAG [GetPosn $ROOTI TAG]
 
 # If we are not pointing at a vertex, try to find a vector with the
 # current id.
@@ -12525,7 +12650,7 @@ proc StringValue {name width value command args} {
 #    OLD_VAL (Write)
 #      The previous (valid) value displayed in the text entry widget.
 #-
-
+   global F_OWNER
    global $value
    upvar #0 $value varr
 
@@ -12533,6 +12658,8 @@ proc StringValue {name width value command args} {
 # the supplied global variable.
    eval entry $name -width $width -relief sunken -bd 2 -textvariable $value \
           -justify left $args
+   set F_OWNER $name
+   focus $name
 
 # When the pointer enters the text entry area, select the entire current
 # contents of the widget so that typing a single character will delete it.
@@ -12911,17 +13038,7 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
    global RECALC_OEMAP
 
 # Erase any canvas items currently associated with the output list.
-   for {set i 0} {$i < [llength $PNTPX($im_out,$obj_out)]} {incr i} {
-      set id [lindex $PNTID($im_out,$obj_out) $i]
-      if { $id != -1 } { 
-         $CAN delete $id
-      }
- 
-      set id [lindex $PNTVID($im_out,$obj_out) $i]
-      if { $id != -1 && $id != "" } { 
-         $CAN delete $id
-      }
-   }
+   ClearPosns $im_out $obj_out
 
 # Nullify the output lists.
    set PNTPX($im_out,$obj_out) ""
