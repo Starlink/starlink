@@ -54,4 +54,5 @@ proc bindCred4Widgets {taskname} {
     set Cred4Widgets(POE) 1
     trace variable Cred4Widgets(VERBOSE) w "cgs4drVerbose $taskname"
     set Cred4Widgets(VERBOSE) 0
+    set Cred4Widgets(DTYPE) "NONE"
 }
