@@ -102,9 +102,11 @@
       INTEGER KINDEX             ! Keyword index
       CHARACTER * ( 8 ) KEYWRD   ! IRAF keyword
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to NDF
+      LOGICAL MAKHIS             ! Make HISTORY structure?
       CHARACTER * ( NDF__SZHUM ) MODE ! Update mode
       LOGICAL MORTEX             ! More text lines to process?
       INTEGER NC                 ! Number of characters
+      INTEGER NEXREC             ! Number of existing HISTORY records
       INTEGER NWORD              ! Number of words in HISTORY card
       CHARACTER * ( 2048 ) PARAGR ! Paragraph of HISTORY text
       INTEGER PARCOL             ! Paragraph column where to append text
@@ -126,8 +128,11 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise DO WHILE flag.
+*  Initialise DO WHILE flag, and flag to indicate HISTORY structure
+*  has yet to be written.
       HISPRE = .TRUE.
+      MAKHIS = .TRUE.
+      NEXREC = 0
 
 *  Start the search from the first card.
       KINDEX = 1
@@ -163,7 +168,8 @@
             CALL NDF_LOC( NDF, 'UPDATE', LOC, STATUS )
 
 *  Create the HISTORY structure and obtain a locator to it.
-            CALL DAT_NEW( LOC, 'HISTORY', 'HISTORY', 0, 0, STATUS )
+            IF ( MAKHIS )
+     :        CALL DAT_NEW( LOC, 'HISTORY', 'HISTORY', 0, 0, STATUS )
             CALL DAT_FIND( LOC, 'HISTORY', HLOC, STATUS )
 
 *  Annul the locator to the NDF.
@@ -177,7 +183,8 @@
 
 *  Make the CREATED component and assign it the creation date via a
 *  locator.
-            CALL DAT_NEW0C( HLOC, 'CREATED', NDF__SZHDT, STATUS )
+            IF ( MAKHIS )
+     :        CALL DAT_NEW0C( HLOC, 'CREATED', NDF__SZHDT, STATUS )
             CALL DAT_FIND( HLOC, 'CREATED', CLOC, STATUS )
             CALL DAT_PUT0C( CLOC, CREATD, STATUS )
             CALL DAT_ANNUL( CLOC, STATUS )
@@ -198,7 +205,8 @@
 
 *  Make the UPDATE_MODE component and assign it the update mode via a
 *  locator.
-            CALL DAT_NEW0C( HLOC, 'UPDATE_MODE', NDF__SZHUM, STATUS )
+            IF ( MAKHIS )
+     :        CALL DAT_NEW0C( HLOC, 'UPDATE_MODE', NDF__SZHUM, STATUS )
             CALL DAT_FIND( HLOC, 'UPDATE_MODE', CLOC, STATUS )
             CALL DAT_PUT0C( CLOC, MODE, STATUS )
             CALL DAT_ANNUL( CLOC, STATUS )
@@ -209,7 +217,8 @@
 
 *  Make the CURRENT_RECORD component and assign it the record number
 *  via a locator.
-            CALL DAT_NEW0I( HLOC, 'CURRENT_RECORD', STATUS )
+            IF ( MAKHIS )
+     :        CALL DAT_NEW0I( HLOC, 'CURRENT_RECORD', STATUS )
             CALL DAT_FIND( HLOC, 'CURRENT_RECORD', CLOC, STATUS )
             CALL DAT_PUT0I( CLOC, CURREC, STATUS )
             CALL DAT_ANNUL( CLOC, STATUS )
@@ -222,9 +231,17 @@
 *  and unused records truncated at the end.
 
 *  Create the RECORDS structure and obtain a locator to it.
-            CALL DAT_NEW( HLOC, 'RECORDS', 'HIST_REC', 1, CURREC,
-     :                    STATUS )
-            CALL DAT_FIND( HLOC, 'RECORDS', RLOC, STATUS )
+            IF ( MAKHIS ) THEN
+               CALL DAT_NEW( HLOC, 'RECORDS', 'HIST_REC', 1, CURREC,
+     :                       STATUS )
+               CALL DAT_FIND( HLOC, 'RECORDS', RLOC, STATUS )
+
+*  Find the current size of the HISTORY records.  Enlarge it as required
+*  to store the additional records.
+            ELSE
+               CALL DAT_FIND( HLOC, 'RECORDS', RLOC, STATUS )
+               CALL DAT_ALTER( RLOC, 1, NEXREC, STATUS )
+            END IF
 
 *  Skip over the expected blank line in the header.
             KINDEX = KINDEX + 1
@@ -234,7 +251,7 @@
 
 *  Create a new RECORDS element.
 *  =============================
-            DO IREC = 1, CURREC
+            DO IREC = NEXREC + 1, NEXREC+ CURREC
 
 *  Skip to the next header card.  Here we assume that these headers have
 *  not been tampered.
@@ -436,8 +453,19 @@
 
          END IF
 
+*  HISTORY structure created.
+         MAKHIS = .FALSE.
+
+*  Update the count of the number of records.
+         NEXREC = NEXREC + CURREC
+
+*  For the moment, assume there is only one set of NDF-style HISTORY
+*  headers.  This should only fail if the headers have been tampered,
+*  i.e. divided.  In normal circumstances this loop shouldn't be
+*  required anyway.
+*  
 *  Return to start of DO WHILE loop.
-         GOTO 100
+*         GOTO 100
       END IF
 
       END
