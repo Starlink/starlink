@@ -244,11 +244,8 @@
          WRITE (MSGLU,*) 'SGS_SELZ - status',ISTAT
          GOTO 9999
       END IF
-      CALL SGS_IZONE(X1,X2,Y1,Y2,XM,YM,ISTAT)
-      IF (ISTAT.NE.0) THEN
-         WRITE (MSGLU,*) 'SGS_IZONE - status',ISTAT
-         GOTO 9999
-      END IF
+      CALL SGS_IZONE(X1,X2,Y1,Y2,XM,YM)
+
       CALL SGS_BOX(X1,X2,Y1,Y2)
 
       CALL SGS_TPZ(IZT,0.0,0.0,IZS(4),X,Y,ISTAT)
