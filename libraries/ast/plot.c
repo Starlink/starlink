@@ -2074,6 +2074,7 @@ MAKE_TEST(MajTickLen,( this->majticklen[axis] != AST__BAD ),2)
 MAKE_GET(MajTickLen,double,0.0,( this->majticklen[axis] == AST__BAD ? 0.015 : this->majticklen[axis]),2)
 
 MAKE_SET3(UsedMajTickLen,double,umjtkln,value,2)
+MAKE_GET3(UsedMajTickLen,double,0.0,this->umjtkln[axis],2)
 
 /* TitleGap. */
 /* --------- */
@@ -10004,7 +10005,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "majticklen" ) ) {
-      dval = astGetMajTickLen( this, 0 );
+      dval = GetUsedMajTickLen( this, 0 );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -10015,7 +10016,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      dval = astGetMajTickLen( this, axis - 1 );
+      dval = GetUsedMajTickLen( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
