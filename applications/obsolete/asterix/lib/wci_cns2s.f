@@ -83,10 +83,10 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     WCI Subroutine Guide : http://www.sr.star.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
-*     package:wci, usage:public
+*     package:wci, usage:public, coordinate conversion
 
 *  Copyright:
 *     {routine_copyright}

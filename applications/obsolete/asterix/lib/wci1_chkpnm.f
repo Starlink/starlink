@@ -7,7 +7,7 @@
 *     Check a WCI map projection name
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL WCI1_CHKPNM( NAME, STATUS )
@@ -63,10 +63,10 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:wci, usage:private
 
 *  Copyright:
 *     {routine_copyright}
