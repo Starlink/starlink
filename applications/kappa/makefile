@@ -619,7 +619,7 @@ kpg1_prsar.f kpg1_psfsd.f kpg1_psfsr.f kpg1_px2ax.f kpg1_pxdpb.f \
 kpg1_pxdpd.f kpg1_pxdpi.f kpg1_pxdpr.f kpg1_pxdpub.f kpg1_pxdpuw.f \
 kpg1_pxdpw.f kpg1_qcol.f kpg1_qidat.f kpg1_qncol.f kpg1_qntld.f \
 kpg1_qntlr.f kpg1_qsrtc.f kpg1_qsrti.f kpg1_qsrtr.f kpg1_qvid.f \
-kpg1_rdast.f kpg1_rdlst.f kpg1_retrr.f kpg1_rfcod.f \
+kpg1_rdast.f kpg1_rdlst.f kpg1_retrr.f kpg1_rfcod.f kpg1_nbadd.f \
 kpg1_rfcor.f kpg1_rgndf.f kpg1_rmapb.f kpg1_rmapd.f kpg1_rmapi.f \
 kpg1_rmapr.f kpg1_rmapub.f kpg1_rmapuw.f kpg1_rmapw.f kpg1_satkc.f \
 kpg1_satkd.f kpg1_sclof.f kpg1_scrsz.f kpg1_sdimp.f kpg1_sdtrn.f \
@@ -2943,6 +2943,7 @@ kpg1_mxmnw.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
 kpg1_nacvt.o:	 SAE_PAR DAT_PAR
 kpg1_nagtc.o:	 SAE_PAR
 kpg1_naptc.o:	 SAE_PAR DAT_PAR
+kpg1_nbadd.o:    SAE_PAR PRM_PAR
 kpg1_ndfch.o:	 SAE_PAR DAT_PAR GRP_PAR IRG_ERR MSG_PAR
 kpg1_nmcol.o:	 SAE_PAR CTM_PAR CTM_COM
 kpg1_noisb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
