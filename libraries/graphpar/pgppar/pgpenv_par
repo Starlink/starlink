@@ -1,0 +1,9 @@
+*+
+*    Description :
+*     This file contains the Internal Global Constants for PGP_ENV.
+*    Global constants :
+      INTEGER PGP__MXPAR           ! Maximum number of graphics parameters
+      PARAMETER(PGP__MXPAR=32)
+      INTEGER PGP__SZPAR           ! Maximum size of graphics parameter name
+      PARAMETER(PGP__SZPAR=15)
+*-

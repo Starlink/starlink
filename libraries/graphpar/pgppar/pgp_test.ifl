@@ -1,0 +1,16 @@
+## PGP_TEST - Test of PGPLOT parameter routines
+
+interface PGP_TEST
+
+   parameter	DEVICE
+      ptype		'DEVICE'
+      position		1
+      type		'GRAPHICS'
+      access		'read'
+      vpath		'prompt'
+      ppath             'current,default'
+      help		'name of virtual device to be used'
+      default           xwindows
+   endparameter
+
+endinterface

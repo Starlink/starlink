@@ -1,0 +1,8 @@
+*+ 
+*  PGPLOT Implicit Initialisation Data
+      LOGICAL PGPSLP                   ! Whether package is asleep
+
+      COMMON /PGPGO1/ PGPSLP
+
+      SAVE /PGPGO1/
+*-

@@ -1,0 +1,17 @@
+## SGS_TEST - Test some SGS functions
+
+interface SGS_TEST
+
+   parameter	DEVICE
+      ptype		'DEVICE'
+      keyword		'V_DEVICE'
+      position		1
+      type		'v_device'
+      access		'read'
+      vpath		'prompt'
+      ppath             'current,default'
+      default           xwindows
+      help		'name of virtual device to be used'
+   endparameter
+
+endinterface

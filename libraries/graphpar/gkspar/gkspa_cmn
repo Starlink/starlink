@@ -1,0 +1,19 @@
+*+
+*  Description :
+*     This file contains the GKSPA Common Block.   This Common Block
+*     provides the relationship between Starlink Program Parameters
+*     and GKS workstation identifier.
+*-
+
+*  Global variables :
+      INTEGER PCNT                      ! Parameter count
+      LOGICAL PFREE(GKS__MXPAR)         ! whether slot used
+      INTEGER PDESC(GKS__MXPAR)         ! Workstation id
+
+      CHARACTER*(PAR__SZNAM)            ! Parameter names
+     :  PTNAME(GKS__MXPAR)
+
+      COMMON /GKS_PA_1/ PCNT, PFREE, PDESC
+      COMMON /GKS_PA_2/ PTNAME
+
+      SAVE /GKS_PA_1/, /GKS_PA_2/

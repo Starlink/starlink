@@ -1,0 +1,23 @@
+*  Construct the error numbers according to SUN/104
+*  CODE = 134250498 + 65536 * <fac> + 8 * <mes>
+*  The PGPLOT/GRPCKG facilty number = 1508
+      INTEGER IBASE
+      PARAMETER (IBASE=233078786)
+
+*   Codes up to 164 are used internally by GRPCKG
+
+      INTEGER PGP__TOOUD
+      PARAMETER ( PGP__TOOUD = 172 + IBASE )
+*   No more available unit descriptors
+ 
+      INTEGER PGP__ILLAC
+      PARAMETER ( PGP__ILLAC = 180 + IBASE )
+*   Illegal access mode
+ 
+      INTEGER PGP__UNKPA
+      PARAMETER ( PGP__UNKPA = 188 + IBASE )
+*   Parameter not found
+ 
+      INTEGER PGP__ISACT
+      PARAMETER ( PGP__ISACT = 196 + IBASE )
+*   Parameter currently active

@@ -1,0 +1,8 @@
+*+ 
+*  SGS Implicit Initialisation Data
+      LOGICAL SGSSLP                ! Whether package is asleep
+
+      COMMON /SGSGO1/ SGSSLP
+
+      SAVE /SGSGO1/
+*-

@@ -1,0 +1,19 @@
+*+
+*    Description :
+*     This file contains the PGPPA Common Block.   This Common Block
+*     provides the relationship between Starlink Program Parameters
+*     and PGPLOT unit numbers.
+
+*    Global variables :
+      INTEGER PCNT                      ! Parameter count
+      LOGICAL PFREE(PGP__MXPAR)         ! whether slot used
+      INTEGER PDESC(PGP__MXPAR)         ! Unit descriptor
+
+      CHARACTER*(PAR__SZNAM)            ! Parameter names
+     :  PTNAME(PGP__MXPAR)
+
+      COMMON /PGP_PA_1/ PCNT, PFREE, PDESC
+      COMMON /PGP_PA_2/ PTNAME
+
+      SAVE /PGP_PA_1/, /PGP_PA_2/
+*-

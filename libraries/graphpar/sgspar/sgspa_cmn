@@ -1,0 +1,19 @@
+*+
+*    Description :
+*     This file contains the SGSPA Common Block.   This Common Block
+*     provides the relationship between Starlink Program Parameters
+*     and SGS Zone numbers.
+
+*    Global variables :
+      INTEGER PCNT                      ! Parameter count
+      LOGICAL PFREE(SGS__MXPAR)         ! whether slot used
+      INTEGER PDESC(SGS__MXPAR)         ! Zone descriptor
+
+      CHARACTER*(PAR__SZNAM)            ! Parameter names
+     :  PTNAME(SGS__MXPAR)
+
+      COMMON /SGS_PA_1/ PCNT, PFREE, PDESC
+      COMMON /SGS_PA_2/ PTNAME
+
+      SAVE /SGS_PA_1/, /SGS_PA_2/
+*-

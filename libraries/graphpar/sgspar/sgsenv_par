@@ -1,0 +1,9 @@
+*+
+*    Description :
+*     This file contains the Internal Global Constants for SGS_ENV.
+*    Global constants :
+      INTEGER SGS__MXPAR           ! Maximum number of graphics parameters
+      PARAMETER(SGS__MXPAR=32)
+      INTEGER SGS__SZPAR           ! Maximum size of graphics parameter name
+      PARAMETER(SGS__SZPAR=15)
+*-

@@ -1,0 +1,9 @@
+*+ 
+*  GKS Implicit Initialisation Data
+*-
+      LOGICAL GKSSLP             ! Whether package is asleep
+
+      COMMON /GKSGO1/ GKSSLP
+
+      SAVE /GKSGO1/
+*-

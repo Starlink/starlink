@@ -1,0 +1,10 @@
+*+
+*  Description :
+*     This file contains the Internal Global Constants for GKS_ENV.
+*-
+
+*  Global constants :
+      INTEGER GKS__MXPAR          ! Maximum number of graphics parameters
+      PARAMETER(GKS__MXPAR=32)
+      INTEGER GKS__SZPAR          ! Maximum size of graphics parameter name
+      PARAMETER(GKS__SZPAR=15)
