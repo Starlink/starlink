@@ -5116,6 +5116,10 @@ c      REAL HWID
         CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
 
+*  make sure flag is zero
+        FLAG=0
+        CALL NBS_PUT_VALUE(FID,0,VAL__NBI,FLAG,STATUS)
+
 *  get device size
         CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,NB,STATUS)
         CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,NB,STATUS)
@@ -5128,7 +5132,6 @@ c      REAL HWID
         YSCALE=(YW2-YW1)/(YP2-YP1)
 
 *  wait for GUI to send a position
-        FLAG=0
         DO WHILE (FLAG.EQ.0)
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
         ENDDO
