@@ -111,6 +111,8 @@
       INTEGER			LUN			! Logical unit
       INTEGER			NDIM			! Array dimensionality
       INTEGER			NELM			! Total # elements
+
+      LOGICAL			THERE			! Component exists
 *.
 
 *  Check inherited global status.
@@ -172,17 +174,17 @@
 
 *    Write values
         IF ( FKEY .EQ. 'J' ) THEN
-          CALL FTPPRJ( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+          CALL FTPPRJ( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         ELSE IF ( FKEY .EQ. 'I' ) THEN
-          CALL FTPPRI( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+          CALL FTPPRI( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         ELSE IF ( FKEY .EQ. 'B' ) THEN
-          CALL FTPPRB( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+          CALL FTPPRB( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         ELSE IF ( FKEY .EQ. 'E' ) THEN
-          CALL FTPPRE( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+          CALL FTPPRE( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         ELSE IF ( FKEY .EQ. 'D' ) THEN
-          CALL FTPPRD( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+          CALL FTPPRD( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         ELSE IF ( FKEY .EQ. 'L' ) THEN
-          CALL FTPPRL( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+          CALL FTPPRL( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         END IF
 
 *    Unmap
