@@ -875,7 +875,7 @@ docs_check:
 
 docs:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs
-     [copy] Copying 88 files to /apps/cvsbuild/java/source/topcat/build/docs
+     [copy] Copying 92 files to /apps/cvsbuild/java/source/topcat/build/docs
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/build/docs
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -885,7 +885,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Oct 12, 2004 5:16:55 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Oct 13, 2004 5:16:50 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution

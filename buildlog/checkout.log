@@ -9038,10 +9038,12 @@ U java/source/topcat/src/docs/toHTML.xslt
 U java/source/topcat/src/docs/toHTML1.xslt
 U java/source/topcat/src/docs/toHelp.xslt
 cvs checkout: Updating java/source/topcat/src/docs/figures
+U java/source/topcat/src/docs/figures/ActivationQueryWindow.gif
 U java/source/topcat/src/docs/figures/ColumnInfoWindow.gif
 U java/source/topcat/src/docs/figures/ConcatWindow.gif
 U java/source/topcat/src/docs/figures/ControlWindow.gif
 U java/source/topcat/src/docs/figures/HelpWindow.gif
+U java/source/topcat/src/docs/figures/ImageWindow.gif
 U java/source/topcat/src/docs/figures/JFileChooserLoad.gif
 U java/source/topcat/src/docs/figures/JFileChooserSave.gif
 U java/source/topcat/src/docs/figures/JTable.gif
@@ -9054,6 +9056,8 @@ U java/source/topcat/src/docs/figures/PlotWindow.gif
 U java/source/topcat/src/docs/figures/PlotWindow_blob.gif
 U java/source/topcat/src/docs/figures/SQLReadDialog.gif
 U java/source/topcat/src/docs/figures/SQLWriteDialog.gif
+U java/source/topcat/src/docs/figures/SoG.gif
+U java/source/topcat/src/docs/figures/Splat.gif
 U java/source/topcat/src/docs/figures/StarTableNodeChooser.gif
 U java/source/topcat/src/docs/figures/StarTableSaver.gif
 U java/source/topcat/src/docs/figures/StatsWindow.gif
