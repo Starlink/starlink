@@ -2,7 +2,7 @@
       SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
      :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
      :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
-     :   VARIANCE)
+     :   BADBIT, VARIANCE)
 *    Description :
 *     This routine coadds the current exposure to the input coadd arrays
 *     and puts the result in the output coadd arrays. The input and output
@@ -17,7 +17,7 @@
 *     SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
 *    :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
 *    :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
-*    :   VARIANCE)
+*    :   BADBIT, VARIANCE)
 *    Parameters :
 *     N                       = INTEGER (Given)
 *           Number of elements in arrays.
@@ -25,24 +25,26 @@
 *           data to be added to coadd
 *     IN_VARIANCE (N)         = REAL (Given)
 *           variance on input data
-*     IN_QUALITY (N)          = INTEGER (Given)
+*     IN_QUALITY (N)          = BYTE (Given)
 *           quality on input data
 *     INCOADD_DATA (N)        = REAL (Given)
 *           Input coadd. 
 *     INCOADD_VAR (N)         = REAL (Given)
 *           Input coadd variance.
-*     INCOADD_QUAL (N)        = INTEGER (Given)
-*           Input coadd quality
+*     INCOADD_QUAL (N)       = BYTE (returned)
+*           Input coadd quality.
 *     INCOADD_NUMBER (N)      = INTEGER (Given)
 *           Number of exposures coadded in input coadd.
 *     OUTCOADD_DATA (N)       = REAL (Returned)
 *           Output coadd. 
 *     OUTCOADD_VAR (N)        = REAL (Returned)
 *           Output coadd variance.
-*     OUTCOADD_QUAL (N)       = INTEGER (returned)
+*     OUTCOADD_QUAL (N)       = BYTE (returned)
 *           Output coadd quality.
 *     OUTCOADD_NUMBER (N)     = INTEGER (Returned)
 *           Number of exposures coadded in output coadd.
+*     BADBIT                  = BYTE (Given)
+*           Bad bit mask
 *     VARIANCE                = LOGICAL (Given)
 *           T if input data has variance associated with it
 *    Method :
@@ -57,21 +59,23 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
+      INCLUDE 'PRM_PAR'
 *    Import :
+      BYTE BADBIT
       INTEGER N
       REAL IN_DATA (N)
       REAL IN_VARIANCE (N)
-      INTEGER IN_QUALITY (N)
+      BYTE IN_QUALITY(N)
       REAL INCOADD_DATA (N)
       REAL INCOADD_VAR (N)
-      INTEGER INCOADD_QUAL (N)
+      BYTE INCOADD_QUAL (N)
       INTEGER INCOADD_NUMBER (N)
       LOGICAL VARIANCE
 *    Import-Export :
 *    Export :
       REAL OUTCOADD_DATA (N)
       REAL OUTCOADD_VAR (N)
-      INTEGER OUTCOADD_QUAL (N)
+      BYTE OUTCOADD_QUAL (N)
       INTEGER OUTCOADD_NUMBER (N)
 *    Status :
 *    External references :
@@ -83,11 +87,14 @@
       REAL    SUMSQ               ! sum of data squared coadded
 *    Internal References :
 *    Local data :
+*    External functions:
+      INCLUDE 'NDF_FUNC'
 *-
 
       DO I = 1, N
 
-         IF (IN_QUALITY(I) .EQ. 0) THEN
+         IF (NDF_QMASK(IN_QUALITY(I), BADBIT).AND.
+     :        NDF_QMASK(INCOADD_QUAL(I), BADBIT)) THEN
 
 *  good quality input point, 
 *  ..recover the sum of the data points and the sum of them squared
@@ -128,7 +135,6 @@
                   OUTCOADD_VAR (I) = 0.0
                END IF
             END IF
-
          END IF
       END DO
 
