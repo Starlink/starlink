@@ -10,7 +10,7 @@ bin_MONOLITHS = surf_mon
 surf_mon_SOURCES = surf_mon.f surf_set_app_name.f
 
 starnewsdir = $(datadir)/doc/@PACKAGE_NAME@-@PACKAGE_VERSION@
-starnews_DATA = SURF_CONDITIONS surf.news
+dist_starnews_DATA = SURF_CONDITIONS surf.news
 
 # Data files to be installed into bindir
 bindatadir = $(bindir)
@@ -35,7 +35,7 @@ misc/calsig_850_map.sdf misc/polimp.scuba
 STATICSCRIPTS = scripts/change_nacentre.pl scripts/qdraw	       \
 scripts/scupa.csh scripts/scusetenv.csh scripts/setbolwt.pl	       \
 scripts/remdbm.pl scripts/scuplot.csh scripts/scushift scripts/sigclip \
-scripts/sculog scripts/scupol.pl scripts/scuvax_clkerr.pl	       \
+scripts/sculog \
 scripts/calcflat.pl scripts/polphot.pl scripts/scunoise		       \
 scripts/scuquick scripts/sdip.csh
 
