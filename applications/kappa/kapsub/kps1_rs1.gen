@@ -1,6 +1,8 @@
       SUBROUTINE KPS1_RS1<T>( NDIM, IDIM, DIMI, DIMO, INTERP, PARAMS,
-     :                        HASVAR, DATI, VARI, BAD, DATWKI, VARWKI,
-     :                        DATWKO, VARWKO, DATO, VARO, STATUS )
+     :                        HASVAR, HASQUA, HASAXI, DATI, VARI, QUAI,
+     :                        AXI, BAD, DATWKI, VARWKI, QUAWKI,
+     :                        DATWKO, VARWKO, QUAWKO, DATO, VARO, 
+     :                        QUAO, AXO, STATUS )
 *+
 *  Name:
 *     KPS1_RS1<T>
@@ -12,13 +14,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_RS1<T>( NDIM, IDIM, DIMI, DIMO, INTERP, PARAMS, HASVAR,
-*                       DATI, VARI, BAD, DATWKI, VARWKI, DATWKO,
-*                       VARWKO, DATO, VARO, STATUS )
+*     CALL KPS1_RS1<T>( NDIM, IDIM, DIMI, DIMO, INTERP, PARAMS,
+*                       HASVAR, HASQUA, HASAXI, DATI, VARI, QUAI,
+*                       AXI, BAD, DATWKI, VARWKI, QUAWKI,
+*                       DATWKO, VARWKO, QUAWKO, DATO, VARO, 
+*                       QUAO, AXO, STATUS )
 
 *  Description:
-*     This routine resamples a data and associated variance array by
-*     applying a linear transformation to it along a single dimension.
+*     This routine resamples a data and associated variance, quality and
+*     axis arrays by applying a linear transformation to it along a single 
+*     dimension.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -35,10 +40,18 @@
 *        The auxiliary resampling parameters as passed to AST_RESAMPLE<T>.
 *     HASVAR = LOGICAL (Given)
 *        Whether the variance is to be resampled.
+*     HASQUA = LOGICAL (Given)
+*        Whether the quality is to be resampled.
+*     HASAXI = LOGICAL (Given)
+*        Whether the AXIS Centres are to be resampled.
 *     DATI( * ) = <TYPE> (Given)
 *        The input data array.
 *     VARI( * ) = <TYPE> (Given)
 *        The input variance array (only used if HASVAR is true).
+*     QUAI( * ) = BYTE (Given)
+*        The input quality array (only used if HASQUA is true).
+*     AXI( * ) = DOUBLE PRECISION (Given)
+*        The input AXIS Centre array (only used if HASAXI is true).
 *     BAD = LOGICAL (Given and Returned)
 *        On input, a true value indicates that the input data 
 *        (and variance) arrays may contain bad pixels.  On exit, it will 
@@ -49,24 +62,37 @@
 *     VARWKI( * ) = <TYPE> (Returned)
 *        A workspace array, with DIMI( IDIM ) elements.  Only used if
 *        HASVAR is true.
+*     QUAWKI( * ) = BYTE (Returned)
+*        A workspace array, with DIMI( IDIM ) elements.  Only used if
+*        HASQUA is true.
 *     DATWKO( * ) = <TYPE> (Returned)
 *        A workspace array, with DIMO( IDIM ) elements.
 *     VARWKO( * ) = <TYPE> (Returned)
 *        A workspace array, with DIMO( IDIM ) elements.  Only used if
 *        HASVAR is true.
+*     QUAWKO( * ) = BYTE (Returned)
+*        A workspace array, with DIMO( IDIM ) elements.  Only used if
+*        HASQUA is true.
 *     DATO( * ) = <TYPE> (Returned)
 *        The output data array.
 *     VARO( * ) = <TYPE> (Returned)
 *        The output variance array (only used if HASVAR is true).
+*     QUAO( * ) = BYTE (Returned)
+*        The output quality array (only used if HASQUA is true).
+*     AXO( * ) = DOUBLE PRECISION (Returned)
+*        The output AXIS Centre array (only used if HASAXI is true).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
+*     DSB: David Berry (STARLINK)
 
 *  History:
 *     3-JAN-2002 (MBT):
 *        Original version.
+*     16-JAN-2002 (DSB):
+*        Added propagation of Quality and AXIS Centres.
 
 *-
 
@@ -87,8 +113,12 @@
       INTEGER INTERP
       DOUBLE PRECISION PARAMS( * )
       LOGICAL HASVAR
+      LOGICAL HASQUA
+      LOGICAL HASAX
       <TYPE> DATI( * )
       <TYPE> VARI( * )
+      BYTE QUAI( * )
+      DOUBLE PRECISION AXI( * )
 
 *  Arguments Given and Returned:
       LOGICAL BAD
@@ -96,10 +126,14 @@
 *  Arguments Returned:
       <TYPE> DATWKI( * )
       <TYPE> VARWKI( * )
+      BYTE QUAWKI( * )
       <TYPE> DATWKO( * )
       <TYPE> VARWKO( * )
+      BYTE QUAWKO( * )
       <TYPE> DATO( * )
       <TYPE> VARO( * )
+      BYTE QUAO( * )
+      DOUBLE PRECISION AXO( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -141,6 +175,9 @@
          STRIDI( I ) = STRIDI( I - 1 ) * DIMI( I - 1 )
          STRIDO( I ) = STRIDO( I - 1 ) * DIMO( I - 1 )
       END DO
+
+*  Resample the Data and Variance arrays.
+*  ======================================
 
 *  Initialise the offsets into the input and output arrays.
       OFFI = 1
@@ -228,5 +265,87 @@
 
 *  Update information about whether the output array contains bad pixels.
       BAD = NBAD .GT. 0
+
+*  Resample the Quality array.
+*  ===========================
+      IF( HASQUA ) THEN
+
+*  Initialise the offsets into the input and output arrays.
+         OFFI = 1
+         OFFO = 1
+
+*  Set the initial position in the array.
+         DO I = 1, NDIM
+            POS( I ) = 1
+         END DO
+
+*  Set constant values for the resampling routine.
+         FLAGS = 0
+         TOL = 0.1D0
+         MAXPIX = DIMI( IDIM ) + DIMO( IDIM )
+
+*  Loop over all the lines along the resampling dimension.
+         NBAD = 0
+         DONE = .FALSE.
+         DO WHILE ( .NOT. DONE )
+ 
+*  Copy the line we will resample from the input arrays into work buffers.
+            IO = OFFI
+            DO I = 1, DIMI( IDIM )
+               QUAWKI( I ) = QUAI( IO )
+               IO = IO + STRIDI( IDIM )
+            END DO
+
+*  Perform the one-dimensional resampling.
+            NBAD = NBAD + AST_RESAMPLEUB( MAP, 1, 1, DIMI( IDIM ), 
+     :                                    QUAWKI, QUAWKI, INTERP, 
+     :                                    AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                    MAXPIX, VAL__BADUB, 1, 1, 
+     :                                    DIMO( IDIM ), 1, DIMO( IDIM ), 
+     :                                    QUAWKO, QUAWKO, STATUS )
+
+*  Copy the resampled line from work buffers into the output arrays.
+            IO = OFFO
+            DO I = 1, DIMO( IDIM )
+               QUAO( IO ) = QUAWKO( I )
+               IO = IO + STRIDO( IDIM )
+            END DO
+
+*  Locate the start of the next line in the input arrays.
+            J = 1
+   1        CONTINUE
+            IF ( J .LE. NDIM ) THEN
+               IF ( J .EQ. IDIM ) THEN
+                  J = J + 1
+                  GO TO 1
+               ELSE
+                  IF ( POS( J ) .LT. DIMI( J ) ) THEN
+                     OFFI = OFFI + STRIDI( J )
+                     OFFO = OFFO + STRIDO( J )
+                     POS( J ) = POS( J ) + 1
+                  ELSE
+                     OFFI = OFFI - ( DIMI( J ) - 1 ) * STRIDI( J )
+                     OFFO = OFFO - ( DIMO( J ) - 1 ) * STRIDO( J )
+                     POS( J ) = 1
+                     J = J + 1
+                     GO TO 1
+                  END IF
+               END IF
+            ELSE
+               DONE = .TRUE.
+            END IF
+         END DO
+
+      END IF
+
+*  Resample the Axis array.
+*  ========================
+      IF( HASAXI ) THEN
+         FLAGS = AST__USEBAD
+         NBAD = AST_RESAMPLED( MAP, 1, 1, DIMI( IDIM ), AXI, AXI, 
+     :                         INTERP, AST_NULL, PARAMS, FLAGS, TOL, 
+     :                         MAXPIX, VAL__BADD, 1, 1, DIMO( IDIM ), 
+     :                         1, DIMO( IDIM ), AXO, AXO, STATUS )
+      END IF
 
       END

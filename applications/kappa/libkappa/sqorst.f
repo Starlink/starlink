@@ -147,16 +147,30 @@
 *     above assumption about the input data is correct, because of
 *     the sub-pixel interpolation schemes employed.
 
+*  Implementation Status:
+*     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
+*     propagated. TITLE is controlled by the TITLE parameter. DATA,
+*     VARIANCE, AXIS and WCS are propagated after appropriate modification.
+*     QUALITY component is also propagated if Nearest Neighbour
+*     interpolation is being used. 
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.
+*     -  There can be an arbitrary number of NDF dimensions.
+
 *  Related Applications:
 *     KAPPA: REGRID, SLIDE, WCSADD
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
+*     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     2-JAN-2002 (MBT):
 *        Original version.
+*     16-JAN-2002 (DSB):
+*        Added propagation of QUALITY and AXIS.
 *     {enter_further_changes_here}
 
 *-
@@ -196,16 +210,24 @@
       INTEGER EL2                ! Number of elements in output array
       INTEGER I                  ! Loop variable
       INTEGER INTERP             ! Resampling scheme identifier
+      INTEGER IPAXI              ! Pointer to input AXIS Centre array
+      INTEGER IPAXO              ! Pointer to output AXIS Centre array
       INTEGER IPDAT1             ! Pointer to intermediate input data array
       INTEGER IPDAT2             ! Pointer to intermediate output data array
       INTEGER IPDATI             ! Pointer to data array of input NDF
       INTEGER IPDATO             ! Pointer to data array of output NDF
+      INTEGER IPQUA1             ! Pointer to intermediate input quality array
+      INTEGER IPQUA2             ! Pointer to intermediate output quality array
+      INTEGER IPQUAI             ! Pointer to quality array of input NDF
+      INTEGER IPQUAO             ! Pointer to quality array of output NDF
       INTEGER IPVAR1             ! Pointer to intermediate input variance array
       INTEGER IPVAR2             ! Pointer to intermediate output variance array
       INTEGER IPVARI             ! Pointer to variance array of input NDF
       INTEGER IPVARO             ! Pointer to variance array of output NDF
       INTEGER IPWD1              ! Pointer to workspace
       INTEGER IPWD2              ! Pointer to workspace
+      INTEGER IPWQ1              ! Pointer to workspace
+      INTEGER IPWQ2              ! Pointer to workspace
       INTEGER IPWV1              ! Pointer to workspace
       INTEGER IPWV2              ! Pointer to workspace
       INTEGER J                  ! Loop variable
@@ -220,6 +242,8 @@
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL BAD                ! May there be bad pixels?
+      LOGICAL HASAXI             ! Do we have an AXIS Centre component?
+      LOGICAL HASQUA             ! Do we have a quality component?
       LOGICAL HASVAR             ! Do we have a variance component?
 
 *  Check the inherited global status.
@@ -239,6 +263,9 @@
 
 *  Find out if we have a Variance component.
       CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
+
+*  Find out if we have a Quality component.
+      CALL NDF_STATE( NDFI, 'QUALITY', HASQUA, STATUS )
 
 *  Determine a data type which can be used for operations on its Data
 *  and possibly Variance components.
@@ -299,7 +326,7 @@
       END IF
 
 *  Create a new NDF by propagation from the input one. 
-      CALL LPG_PROP( NDFI, '', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFI, 'AXIS', 'OUT', NDFO, STATUS )
 
 *  Get a title from the parameter system.
       CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
@@ -407,9 +434,18 @@
             CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
          END IF
 
+*  If using Nearest Neighbour interpolation, also map the QUALITY array.
+         IF( HASQUA .AND. INTERP .EQ. AST__NEAREST ) THEN
+            CALL NDF_MAP( NDFI, 'DATA', '_UBYTE', 'READ', IPQUAI, EL, 
+     :                    STATUS )
+         ELSE
+            HASQUA = .FALSE.
+         END IF        
+
 *  Initialise the per-iteration input data to be the input NDF.
          IPDAT1 = IPDATI
          IPVAR1 = IPVARI
+         IPQUA1 = IPQUAI
          DO I = 1, NDIM
             DIM1( I ) = DIMI( I )
             DIM2( I ) = DIMI( I )
@@ -443,6 +479,20 @@
                   END IF
                END IF
 
+*  If this axis has a defined AXIS Centre array, we need to over-write the 
+*  AXIS Centre array propagated from the input NDF, by resampling the input 
+*  AXIS Centre array. See if it is defined. If so, map the input and
+*  output AXIS Centre array as _DOUBLE. Reset other AXIS arrays in the
+*  output.
+               CALL NDF_ASTAT( NDFI, 'Centre', I, HASAXI, STATUS ) 
+               IF( HASAXI ) THEN
+                  CALL NDF_AMAP( NDFI, 'Centre', I, '_DOUBLE', 'READ',
+     :                           IPAXI, EL, STATUS ) 
+                  CALL NDF_AMAP( NDFO, 'Centre', I, '_DOUBLE', 'WRITE',
+     :                           IPAXO, EL, STATUS ) 
+                  CALL NDF_AREST( NDFO, 'Variance,Width', I, STATUS )                
+               END IF            
+
 *  Get a pointer to the array into which the results will be written.
 *  This may be either a temporary workspace array allocated for the
 *  purpose, or if this is the last transformation which needs to be
@@ -454,6 +504,10 @@
                      CALL NDF_MAP( NDFO, 'VARIANCE', ITYPE, 'WRITE',
      :                             IPVAR2, EL2, STATUS )
                   END IF
+                  IF ( HASQUA ) THEN
+                     CALL NDF_MAP( NDFO, 'QUALITY', '_UBYTE', 'WRITE',
+     :                             IPQUA2, EL2, STATUS )
+                  END IF
                ELSE
                   EL2 = 1
                   DO J = 1, NDIM
@@ -462,6 +516,9 @@
                   CALL PSX_CALLOC( EL2, ITYPE, IPDAT2, STATUS )
                   IF ( HASVAR ) THEN
                      CALL PSX_CALLOC( EL2, ITYPE, IPVAR2, STATUS )
+                  END IF
+                  IF ( HASQUA ) THEN
+                     CALL PSX_CALLOC( EL2, '_UBYTE', IPQUA2, STATUS )
                   END IF
                END IF
 
@@ -472,57 +529,95 @@
                   CALL PSX_CALLOC( DIM1( I ), ITYPE, IPWV1, STATUS )
                   CALL PSX_CALLOC( DIM2( I ), ITYPE, IPWV2, STATUS )
                END IF
+               IF ( HASQUA ) THEN
+                  CALL PSX_CALLOC( DIM1( I ), '_UBYTE', IPWQ1, STATUS )
+                  CALL PSX_CALLOC( DIM2( I ), '_UBYTE', IPWQ2, STATUS )
+               END IF
 
 *  Do the resampling along the current dimension.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPS1_RS1B( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, %VAL( IPDAT1 ),
-     :                            %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                            %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                            %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPS1_RS1UB( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                             HASVAR, %VAL( IPDAT1 ),
-     :                             %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                             %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                             %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                             %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPS1_RS1W( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, %VAL( IPDAT1 ),
-     :                            %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                            %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                            %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPS1_RS1UW( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                             HASVAR, %VAL( IPDAT1 ),
-     :                             %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                             %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                             %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                             %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPS1_RS1I( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, %VAL( IPDAT1 ),
-     :                            %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                            %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                            %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPS1_RS1R( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, %VAL( IPDAT1 ),
-     :                            %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                            %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                            %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPS1_RS1D( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, %VAL( IPDAT1 ),
-     :                            %VAL( IPVAR1 ), BAD, %VAL( IPWD1 ),
-     :                            %VAL( IPWV1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPDAT2 ),
-     :                            %VAL( IPVAR2 ), STATUS )
+     :                            HASVAR, HASQUA, HASAXI, 
+     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
+     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
+     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
+     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
+     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
+     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
+     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            STATUS )
                END IF
 
 *  Free the temporary workspace.
@@ -532,6 +627,10 @@
                   CALL PSX_FREE( IPWV1, STATUS )
                   CALL PSX_FREE( IPWV2, STATUS )
                END IF
+               IF ( HASQUA ) THEN
+                  CALL PSX_FREE( IPWQ1, STATUS )
+                  CALL PSX_FREE( IPWQ2, STATUS )
+               END IF
 
 *  Release the input array, which may be the original mapped NDF component
 *  or intermediately allocated workspace.
@@ -540,11 +639,22 @@
                   IF ( HASVAR ) THEN
                      CALL NDF_UNMAP( NDFI, 'VARIANCE', STATUS )
                   END IF
+                  IF ( HASQUA ) THEN
+                     CALL NDF_UNMAP( NDFI, 'QUALITY', STATUS )
+                  END IF
                ELSE
                   CALL PSX_FREE( IPDAT1, STATUS )
                   IF ( HASVAR ) THEN
                      CALL PSX_FREE( IPVAR1, STATUS )
                   END IF
+                  IF ( HASQUA ) THEN
+                     CALL PSX_FREE( IPQUA1, STATUS )
+                  END IF
+               END IF
+
+               IF ( HASAXI ) THEN 
+                  CALL NDF_AUNMP( NDFI, 'Centre', I, STATUS ) 
+                  CALL NDF_AUNMP( NDFO, 'Centre', I, STATUS ) 
                END IF
 
 *  The output values for array shapes and pointers for this iteration 
@@ -552,6 +662,7 @@
                DIM1( I ) = DIM2( I )
                IPDAT1 = IPDAT2
                IPVAR1 = IPVAR2
+               IPQUA1 = IPQUA2
             END IF
          END DO
 
@@ -638,6 +749,23 @@
             CALL NDF_UNMAP( NDFI, 'VARIANCE', STATUS )
             CALL NDF_UNMAP( NDFO, 'VARIANCE', STATUS )
          END IF
+
+*  Map the input and output quality arrays.
+         IF ( HASQUA ) THEN
+            CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, EL,
+     :                    STATUS )
+            CALL NDF_MAP( NDFO, 'QUALITY', '_UBYTE', 'WRITE', IPQUAO, 
+     :                    EL, STATUS )
+
+*  Copy the quality array across.
+            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( IPQUAI ), 1, EL,
+     :                        %VAL( IPQUAO ), EL2, STATUS )
+
+*  Unmap the quality arrays.
+            CALL NDF_UNMAP( NDFI, 'QUALITY', STATUS )
+            CALL NDF_UNMAP( NDFO, 'QUALITY', STATUS )
+         END IF
+
       END IF
 
 *  Come here if something has gone wrong.
