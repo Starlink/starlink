@@ -191,8 +191,7 @@ FOO5
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
-#  Make the ndg, ctg and lpg source tar files.
-      ${NDG_SYS}/dev/bin/make_source.csh
+#  Make the ctg and lpg source tar files.
       ${CTG_SYS}/dev/bin/make_source.csh
       ${LPG_SYS}/dev/bin/make_source.csh
 
