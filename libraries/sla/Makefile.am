@@ -22,9 +22,6 @@ FPP_ROUTINES = \
 	random.fpp \
 	gresid.fpp
 
-random.f: random.fpp
-gresid.f: gresid.fpp
-
 F_ROUTINES = \
         addet.f  \
         afin.f   \
