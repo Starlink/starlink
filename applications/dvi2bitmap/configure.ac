@@ -181,6 +181,24 @@ AC_DEFINE_UNQUOTED(STD,
                    [Define as `std' (no quotes) if standard functions are in 
                     the std namespace; define as empty otherwise])
 
+dnl  The C++ standard specifies that the <cctype> contents are
+dnl  functions in the std namespace, rather than macros.  This means
+dnl  that calling either isalnum() will lose if the compiler is being
+dnl  run in a strict mode, but std::isalnum() will lose if it's being
+dnl  less strict.  So check this case (this behaviour is generally
+dnl  switchable -- for example with option -[no]pure-cname on Tru64,
+dnl  which defines __PURE_CNAME -- but of course that's a poor strategy).
+AC_CACHE_CHECK([whether ctype functions are in std],
+   [my_cv_ctype_in_std],
+   [AC_TRY_COMPILE([#include <cctype>], [bool b=std::isalnum('x');],
+       my_cv_ctype_in_std=yes,
+       my_cv_ctype_in_std=no)])
+if test $my_cv_ctype_in_std = yes; then
+    AC_DEFINE(CCTYPE_IN_STD, 1, 
+       [Define as 1 if, after including <cctype>, the isxxx functions
+        are in the std namespace])
+fi
+
 dnl  Some C++ compilers seem to have snprintf in std::, some in the global
 dnl  namespace, and some just don't care....
 AC_CACHE_CHECK([where snprintf is],
