@@ -10,7 +10,7 @@
 *	Contents:	functions dealing with on-line filtering of the image
 *			(for detection).
 *
-*	Last modify:	15/12/99
+*	Last modify:	23/09/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -303,8 +303,8 @@ void	neurfilter(picstruct *field, PIXTYPE *mscan)
 		x, field->y);
     pix = thefilter->conv;
 /*-- Apply a transform of the intensity scale */
-    for (i=thefilter->nconv; i--;)
-      *(pix++) = *pix>0.0?log(1+*pix/sig):-log(1-*pix/sig);
+    for (i=thefilter->nconv; i--; pix++)
+      *pix = *pix>0.0?log(1+*pix/sig):-log(1-*pix/sig);
     play_bpann(thefilter->bpann, thefilter->conv, &resp);
     if (resp>70.0)
       resp = 70.0;
