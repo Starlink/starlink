@@ -28,23 +28,25 @@
 *     BDF = CHARACTER*(*) (Given)
 *        The input BDF parameter name.
 *     NDF = INTEGER (Given)
-*        NDF identifier.
+*        The NDF identifier.
 *     NDIM = INTEGER (Given)
-*        Dimensions of NDF main data array.
+*        Dimensions of the NDF main data array.
 *     WRDSCR = LOGICAL (Given)
-*        If true the descriptors are reported to the user.
+*        If true, the descriptors are reported to the user.
 *     FLOC = CHARACTER*(DAT__SZLOC) FLOC  (Returned)
-*        Locator to MORE.FITS structure.
+*        Locator to the MORE.FITS structure.
 *     CRVAL( DAT__MXDIM ) = REAL (Returned)
-*        Values of CRVALn descriptors.  These default to 0.5
+*        Values of the CRVALn descriptors.  These default to 0.5
 *     CDELT( DAT__MXDIM ) = REAL (Returned)
-*        Values of CDELTn descriptors.  These default to 1.0
+*        Values of the CDELTn descriptors.  These default to 1.0
 *     CRPIX( DAT__MXDIM ) = REAL (Returned)
-*        Values of CRPIXn descriptors.  These default to 1.0.
+*        Values of the CRPIXn descriptors.  These default to 1.0.
 *     CRTYPE( DAT__MXDIM ) = CHARACTER * ( * )(Returned)
-*        Values of CRTYPEn descriptors.  These default to blank strings.
+*        Values of the CRTYPEn descriptors.  These default to blank
+*        strings.
 *     AXTHER( DAT__MXDIM ) = LOGICAL (Returned)
-*        Indicates whether CRVALn and CDELTn available for an axis.
+*        Indicates whether or not CRVALn and CDELTn are present
+*        to form an axis.  CROTAn must also be absent or equal to zero.
 *     TITLE = CHARACTER*72 (Returned)
 *        Value of TITLE descriptor.
 *     LABEL = CHARACTER*72 (Returned)
@@ -91,6 +93,9 @@
 *        handle fragmented arrays of descriptors such as appear in
 *        La Palma FITS headers.  Handle verbatim FITS card images in
 *        the descriptors.
+*     1992 November 17 (MJC):
+*        Rotated axes are flagged as not being present, as these cannot
+*        be handled by the NDF in a standard way.
 *     {enter_further_changes_here}
 *
 *  Bugs:
@@ -108,6 +113,7 @@
 
 *  Global Constants:
       INCLUDE   'SAE_PAR'           ! Standard SAE constants
+      INCLUDE   'PRM_PAR'           ! PRIMDAT public constants
       INCLUDE   'INTERIM(ERRPAR)'   ! Interim error constants
 
 *  Arguments Given:
@@ -172,6 +178,8 @@
       INTEGER   NPAD                ! Number of blanks to pad character
                                     ! value
       CHARACTER NAMES( MAXELS ) * ( 8 )! Names of descriptor items
+      LOGICAL   NOROT(DAT__MXDIM)   ! True if CROTAn values are absent
+                                    ! or equal to zero
       INTEGER   PADCOL              ! Column where padding starts or
                                     ! ends
       INTEGER   QUOCOL              ! Column containing trailing quote
@@ -180,6 +188,7 @@
       CHARACTER TEST2 * ( 6 )       ! Used to compare with Descriptors
       CHARACTER TEST3 * ( 6 )       ! Used to compare with Descriptors
       CHARACTER TEST4 * ( 7 )       ! Used to compare with Descriptors
+      CHARACTER TEST5 * ( 6 )       ! Used to compare with Descriptors
       CHARACTER VALUE * ( SZDESC )  ! 'Value' of descriptor item
       CHARACTER VALUES( MAXELS ) * ( SZDESC ) ! Values of descriptor
                                     ! items
@@ -198,6 +207,7 @@
       DO I = 1, NDIM
          CRTHER( I ) = .FALSE.
          CDTHER( I ) = .FALSE.
+         NOROT( I ) = .TRUE.
          CRTYPE( I ) = ' '
          CRVAL( I ) = 0.5
          CDELT( I ) = 1.0
@@ -518,6 +528,7 @@
                TEST2 = 'CDELT'//C
                TEST3 = 'CRPIX'//C
                TEST4 = 'CRTYPE'//C
+               TEST5 = 'CROTA'//C
 
 *            Test for the CRVALn keyword.  If present convert it to real
 *            and record that it was found.
@@ -548,6 +559,16 @@
 
 *            Test for the CRTYPEn keyword.
                IF ( INDEX( DESCR, TEST4 ) .GT. 0 ) CRTYPE( IAX ) = VALUE
+
+*            Test for the CROTAn keyword.  If present convert it to real
+*            and record that it was found.
+               IF ( INDEX( DESCR, TEST5 ) .GT. 0 ) THEN
+                  CALL CHR_CTOR( VALUE, RVALUE, STATUS )
+                  IF ( STATUS .EQ. SAI__OK ) THEN
+                     NOROT( IAX ) = ABS( RVALUE ) .LT. VAL__EPSR
+                  END IF
+               END IF
+
             END DO
 
 *      End of the test for special descriptors.
@@ -557,13 +578,19 @@
 
 998   CONTINUE
 
-*   Set AXTHER(n) depending on whether there is sufficient information
-*   to generate AXIS(n).
+*   Set AXTHER(n) depending on whether or not there is sufficient
+*   information to generate AXIS(n), and provided there is no axis
+*   rotation (as this is not supported by the NDF in a standard way).
+*   Also have to reinitialise the axis to pixel co-ordinates when
+*   there is no or partial axis-centre information, or when there is
+*   a rotated axis.
       DO I = 1, NDIM
-         IF ( CDTHER( I ) .AND. CRTHER( I ) ) THEN
+         IF ( CDTHER( I ) .AND. CRTHER( I ) .AND. NOROT( I ) ) THEN
             AXTHER( I ) = .TRUE.
          ELSE
             AXTHER( I ) = .FALSE.
+            CRVAL( I ) = 0.5
+            CDELT( I ) = 1.0
          END IF
       END DO
 
