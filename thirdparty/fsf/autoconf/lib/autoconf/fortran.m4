@@ -741,7 +741,7 @@ while test $[@%:@] != 1; do
              [_AC_LINKER_OPTION([$ac_arg], ac_cv_[]_AC_LANG_ABBREV[]_libs)])
           ;;
           # Ignore these flags.
-        -lang* | -lcrt[[01]].o | -lcrtbegin.o | -lc | -lgcc | -libmil | -LANG:=*)
+        -lang* | -lcrt[[012]].o | -lcrtbegin.o | -lc | -lgcc | -libmil | -LANG:=*)
           ;;
         -lkernel32)
           test x"$CYGWIN" != xyes && ac_cv_[]_AC_LANG_ABBREV[]_libs="$ac_cv_[]_AC_LANG_ABBREV[]_libs $ac_arg"
