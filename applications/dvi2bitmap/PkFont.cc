@@ -138,13 +138,6 @@ PkFont::PkFont(unsigned int dvimag,
 	if (verbosity_ > normal)
 	    cerr << "Opened font " << path_ << " successfully\n";
 
-	//fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
-	//if (verbosity_ > normal)
-	//    cerr << "PkFont: font scaling: "
-	//	 << dvimag << "/1000 * (" << s << '/' << d
-	//	 << ")=" << fontscale_
-	//	 << ": DVI font checksum=" << c << '\n';
-
 	if (preamble_.cs != c)
 	    if (verbosity_ > quiet)
 		cerr << "Warning: Font " << name_
@@ -165,7 +158,8 @@ PkFont::PkFont(unsigned int dvimag,
 	preamble_.cs = 0;
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
-    quad_ = ((double)dvimag/1000.0) * d;
+    //quad_ = ((double)dvimag/1000.0) * d;
+    quad_ = d * magnification();
     word_space_ = 0.2*quad_;
     back_space_ = 0.9*quad_;
     if (verbosity_ > normal)
@@ -199,15 +193,16 @@ void PkFont::verbosity (const verbosities level)
 bool PkFont::find_font (string& path)
 {
     bool got_it = false;
-    double scaled_res = resolution_
-	* ((double)font_header_.s * (double)dvimag_)
-	/ ((double)font_header_.d * 1000.0);
+    double scaled_res = resolution_ * magnification();
+    //	* ((double)font_header_.s * (double)dvimag_)
+    /// ((double)font_header_.d * 1000.0);
 
     if (verbosity_ > normal)
 	cerr << "Font file: " << name_
 	     << ", checksum=" << font_header_.c
-	     << ", scaled " << font_header_.s << '/' << font_header_.d 
-	     << " (mag " << dvimag_ << ") = " << scaled_res
+	     << ", res " << resolution_
+	     << '*' << magnification()
+	     << " = " << scaled_res
 	     << '\n';
 
     string pkpath = "";
@@ -557,6 +552,19 @@ void PkFont::read_font (InputByteStream& pkf)
     }
 }
 
+// Return magnification, including both font scaling and overall DVI
+// file magnification.
+double PkFont::magnification() const
+{
+    double rval = ((double)font_header_.s * (double)dvimag_)
+	/ ((double)font_header_.d * 1000.0);
+    if (verbosity_ > normal)
+	cerr << "PkFont::magnification: "
+	     << font_header_.s << '/' << font_header_.d
+	     << " *" << dvimag_ << "/1000 = " << rval << '\n';
+    return rval;
+}
+
 PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int tfmwidth,
 		 unsigned int dm,
@@ -796,9 +804,9 @@ string PkFont::fontgenCommand (void)
 
     SSTREAM cmd;
     cmd << MKTEXPK
-	<< " --dpi " << dpi()
+	<< " --dpi " << dpiScaled()
 	<< " --bdpi " << dpiBase()
-	<< " --mag " << dvimag_/1000.0
+	<< " --mag " << magnification()
 	<< " --mfmode " << missingFontMode_
 	<< ' ' << name_
 	<< '\0';
@@ -809,9 +817,9 @@ string PkFont::fontgenCommand (void)
     SSTREAM cmd;
     cmd << MAKETEXPK		<< ' '
 	<< name_		<< ' '
-	<< dpi()		<< ' '
+	<< dpiScaled()		<< ' '
 	<< dpiBase()		<< ' '
-	<< dvimag_/1000.0	<< ' '
+	<< magnification()	<< ' '
 	<< missingFontMode_
 	<< '\0';
     rval = C_STR(cmd);
