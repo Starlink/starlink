@@ -22,6 +22,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/junit
+    [mkdir] Created dir: /star/starjava/docs/junit
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 55 files to /star/starjava/docs
      [echo] Executing tamfits target: install
@@ -47,6 +49,8 @@ dist:
      [copy] Copying 6 files to /apps/cvsbuild/java/source/tamfits/docs/tamfits
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/tamfits
+    [mkdir] Created dir: /star/starjava/docs/tamfits
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 77 files to /star/starjava/docs
      [echo] Executing axis target: install
@@ -73,6 +77,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/axis
+    [mkdir] Created dir: /star/starjava/docs/axis
 [loggedcopy] Copying 17 files to /star/starjava/lib
 [loggedcopy] Copying 1551 files to /star/starjava/docs
      [echo] Executing Jetty target: install
@@ -94,6 +100,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/jetty
+    [mkdir] Created dir: /star/starjava/docs/jetty
 [loggedcopy] Copying 6 files to /star/starjava/lib
 [loggedcopy] Copying 397 files to /star/starjava/docs
      [echo] Executing UTIL target: install
@@ -123,6 +131,8 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/util/etc
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/util
+    [mkdir] Created dir: /star/starjava/docs/util
 [loggedcopy] Copying 2 files to /star/starjava/bin
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 1 file to /star/starjava/etc
@@ -148,6 +158,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/task
+    [mkdir] Created dir: /star/starjava/docs/task
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 27 files to /star/starjava/docs
      [echo] Executing JNIAST target: install
@@ -192,6 +204,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/jniast
+    [mkdir] Created dir: /star/starjava/docs/jniast
 [loggedcopy] Copying 10 files to /star/starjava/lib
 [loggedcopy] Copying 73 files to /star/starjava/docs
      [echo] Executing DIVA target: install
@@ -218,6 +232,8 @@ dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/diva
+    [mkdir] Created dir: /star/starjava/docs/diva
 [loggedcopy] Copying 4 files to /star/starjava/lib
 [loggedcopy] Copying 1109 files to /star/starjava/docs
 [loggedcopy] Copying 108 files to /star/starjava/docs
@@ -243,6 +259,8 @@ dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/help/docs/help
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/help
+    [mkdir] Created dir: /star/starjava/docs/help
 [loggedcopy] Copying 4 files to /star/starjava/lib
 [loggedcopy] Copying 29 files to /star/starjava/docs
      [echo] Executing ASTGUI target: install
@@ -266,6 +284,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/astgui
+    [mkdir] Created dir: /star/starjava/docs/astgui
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 62 files to /star/starjava/docs
      [echo] Executing JNIHDS target: install
@@ -310,6 +330,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/jnihds
+    [mkdir] Created dir: /star/starjava/docs/jnihds
 [loggedcopy] Copying 10 files to /star/starjava/lib
 [loggedcopy] Copying 18 files to /star/starjava/docs
      [echo] Executing HDX target: install
@@ -333,6 +355,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/hdx
+    [mkdir] Created dir: /star/starjava/docs/hdx
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 29 files to /star/starjava/docs
      [echo] Executing NDArray target: install
@@ -364,6 +388,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/array
+    [mkdir] Created dir: /star/starjava/docs/array
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 58 files to /star/starjava/docs
      [echo] Executing NDX target: install
@@ -389,6 +415,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/ndx
+    [mkdir] Created dir: /star/starjava/docs/ndx
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 27 files to /star/starjava/docs
      [echo] Executing Table target: install
@@ -414,6 +442,8 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/bin
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/table
+    [mkdir] Created dir: /star/starjava/docs/table
 [loggedcopy] Copying 4 files to /star/starjava/lib
 [loggedcopy] Copying 1 file to /star/starjava/bin
 [loggedcopy] Copying 118 files to /star/starjava/docs
@@ -442,6 +472,9 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/ndtools/bin/ndtools
 
 install:
+    [mkdir] Created dir: /star/starjava/bin/ndtools
+    [mkdir] Created dir: /star/starjava/lib/ndtools
+    [mkdir] Created dir: /star/starjava/docs/ndtools
 [loggedcopy] Copying 1 file to /star/starjava/bin
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 15 files to /star/starjava/docs
@@ -468,6 +501,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/hds
+    [mkdir] Created dir: /star/starjava/docs/hds
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 20 files to /star/starjava/docs
      [echo] Executing FITS target: install
@@ -493,6 +528,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/fits
+    [mkdir] Created dir: /star/starjava/docs/fits
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 23 files to /star/starjava/docs
      [echo] Executing JSky target: install
@@ -524,6 +561,8 @@ dist:
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/jsky
+    [mkdir] Created dir: /star/starjava/docs/jsky
 [loggedcopy] Copying 3 files to /star/starjava/bin
 [loggedcopy] Copying 9 files to /star/starjava/lib
 [loggedcopy] Copying 434 files to /star/starjava/docs
@@ -549,6 +588,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/pal
+    [mkdir] Created dir: /star/starjava/docs/pal
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 30 files to /star/starjava/docs
      [echo] Executing VOTable target: install
@@ -573,6 +614,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/votable
+    [mkdir] Created dir: /star/starjava/docs/votable
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 29 files to /star/starjava/docs
      [echo] Executing JAIUtil target: install
@@ -597,6 +640,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/jaiutil
+    [mkdir] Created dir: /star/starjava/docs/jaiutil
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 31 files to /star/starjava/docs
      [echo] Executing SOAPSERVER target: install
@@ -622,6 +667,9 @@ dist:
      [copy] Copying 2 files to /apps/cvsbuild/java/source/soapserver/bin/soapserver
 
 install:
+    [mkdir] Created dir: /star/starjava/bin/soapserver
+    [mkdir] Created dir: /star/starjava/lib/soapserver
+    [mkdir] Created dir: /star/starjava/docs/soapserver
 [loggedcopy] Copying 2 files to /star/starjava/bin
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 19 files to /star/starjava/docs
@@ -657,6 +705,8 @@ javadocs:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/jpcs
+    [mkdir] Created dir: /star/starjava/docs/jpcs
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 37 files to /star/starjava/docs
      [echo] Executing SOG target: install
@@ -683,6 +733,9 @@ dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/sog/bin/sog
 
 install:
+    [mkdir] Created dir: /star/starjava/bin/sog
+    [mkdir] Created dir: /star/starjava/lib/sog
+    [mkdir] Created dir: /star/starjava/docs/sog
 [loggedcopy] Copying 3 files to /star/starjava/bin
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 48 files to /star/starjava/docs
@@ -729,9 +782,14 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
+    [mkdir] Created dir: /star/starjava/bin/splat
+    [mkdir] Created dir: /star/starjava/lib/splat
+    [mkdir] Created dir: /star/starjava/etc/splat
+    [mkdir] Created dir: /star/starjava/docs/splat
 [loggedcopy] Copying 26 files to /star/starjava/bin
 [loggedcopy] Copying 10 files to /star/starjava/lib
 [loggedcopy] Copying 251 files to /star/starjava/docs
+[loggedcopy] Copied 1 empty directory to /star/starjava/docs
 [loggedcopy] Copying 262 files to /star/starjava/docs
 [loggedcopy] Copying 55 files to /star/starjava/etc
 [loggedcopy] Copied 1 empty directory to /star/starjava/etc
@@ -759,6 +817,8 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/mirage
+    [mkdir] Created dir: /star/starjava/docs/mirage
 [loggedcopy] Copying 1 file to /star/starjava/bin
 [loggedcopy] Copying 2 files to /star/starjava/lib
 [loggedcopy] Copying 17 files to /star/starjava/docs
@@ -901,10 +961,12 @@ dist:
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/docs/topcat
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/topcat
+    [mkdir] Created dir: /star/starjava/docs/topcat
 [loggedcopy] Copying 1 file to /star/starjava/bin
 [loggedcopy] Copying 5 files to /star/starjava/lib
 [loggedcopy] Copying 171 files to /star/starjava/docs
-[loggedcopy] Copied 1 empty directory to /star/starjava/docs
+[loggedcopy] Copied 3 empty directories to /star/starjava/docs
 [loggedcopy] Copying 75 files to /star/starjava/docs
      [echo] Executing Treeview target: install
 
@@ -940,6 +1002,9 @@ dist:
      [copy] Copying 14 files to /apps/cvsbuild/java/source/treeview/etc/treeview
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/treeview
+    [mkdir] Created dir: /star/starjava/etc/treeview
+    [mkdir] Created dir: /star/starjava/docs/treeview
 [loggedcopy] Copying 2 files to /star/starjava/bin
 [loggedcopy] Copying 5 files to /star/starjava/lib
 [loggedcopy] Copying 131 files to /star/starjava/docs
@@ -965,6 +1030,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/coco
+    [mkdir] Created dir: /star/starjava/docs/coco
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 18 files to /star/starjava/docs
      [echo] Executing RV target: install
@@ -988,6 +1055,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /star/starjava/lib/rv
+    [mkdir] Created dir: /star/starjava/docs/rv
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 18 files to /star/starjava/docs
      [echo] Executing FROG target: install
@@ -1038,9 +1107,13 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 install:
+    [mkdir] Created dir: /star/starjava/bin/frog
+    [mkdir] Created dir: /star/starjava/lib/frog
+    [mkdir] Created dir: /star/starjava/docs/frog
 [loggedcopy] Copying 2 files to /star/starjava/bin
 [loggedcopy] Copying 6 files to /star/starjava/lib
 [loggedcopy] Copying 152 files to /star/starjava/docs
+[loggedcopy] Copied 1 empty directory to /star/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 30 seconds
+Total time: 4 minutes 13 seconds
