@@ -1,6 +1,6 @@
 *+  FIT_STATDERIV - Calculates deriv of statistic w.r.t. a parameter
       SUBROUTINE FIT_STATDERIV(NDS,IMOD,NPAR,PARAM,LB,UB,
-     :	PARNO,DELTAP,FSTAT,PREDICTOR,DERIV,STATUS)
+     :	PARNO,DELTAP,FSTAT,PREDICTOR,DERIV,LNDFAC,STATUS)
 *
 *    Description :
 *
@@ -56,6 +56,7 @@ c     RECORD /MODEL_SPEC/ MODEL			! Model specification
       REAL                DELTAP		! Diff. increment (scaled) for param
       INTEGER             FSTAT                 ! Statistic to use
       EXTERNAL            PREDICTOR		! Predicted data routine
+      DOUBLE PRECISION    LNDFAC
 *
 *    Import/export :
 *
@@ -116,13 +117,13 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
         CALL FIT_APPTIE( IMOD, .FALSE., PARCAL, LB, UB, STATUS )
       END IF
       CALL FIT_STAT( NDS, IMOD, PARCAL, FSTAT, PREDICTOR,
-     :                                         STATUP, STATUS )
+     :               STATUP, LNDFAC, STATUS )
       PARCAL(PARNO) = PARAM(PARNO) - DPDOWN
       IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
         CALL FIT_APPTIE( IMOD, .FALSE., PARCAL, LB, UB, STATUS )
       END IF
       CALL FIT_STAT( NDS, IMOD, PARCAL, FSTAT, PREDICTOR,
-     :                                       STATDOWN, STATUS )
+     :               STATDOWN, LNDFAC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
 *  Form difference approximation to derivative

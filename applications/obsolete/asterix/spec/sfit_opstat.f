@@ -50,7 +50,7 @@
       CALL AIO_BLNK( OCI, STATUS )
 
 *    Fit statistic at minimum
-      CALL MSG_FMTD( 'SVAL', '1PG15.8', STAT )
+      CALL MSG_FMTD( 'SVAL', '1PG18.10', STAT )
       CALL FIT_STATTOK( FSTAT, 'STAT', STATUS )
       IF ( FSTAT .EQ. FIT__CHISQ ) THEN
 
