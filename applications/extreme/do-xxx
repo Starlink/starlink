@@ -102,7 +102,7 @@
          then
             :
          else
-            echo >>warnfile "$filter exited with non-zero status"
+            echo >>$warnfile "$filter exited with non-zero status"
          fi
 
 #  See if the processing made any changes.  Remove the output file if not.
