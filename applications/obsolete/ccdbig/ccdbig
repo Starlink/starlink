@@ -218,23 +218,6 @@ set keepard = TRUE
      	       accept
 #           end ccdgenerate
 
-#  Apply masking directly to the frames if we're not using the ARD file
-#  implicitly
-            if ( "$keepard" == "FALSE" ) then
-               echo 
-               log_start ardmask
-               foreach ndf ( data?.sdf bias?.sdf ff?.sdf )
-                  echo "Applying mask ccdtest_ard.dat to NDF ${ndf:r}"
-                  ardmask  \
-                     in=${ndf:r} \
-                     ardfile=ccdtest_ard.dat \
-                     out=masked_${ndf:r}
-#                 end ardmask
-                  mv masked_$ndf $ndf
-               end
-            endif
-
-
 #  If display capability is enabled then display one DATA frame.
             if ( "$device" != "NONE" ) then
                echo " "
@@ -277,6 +260,21 @@ set keepard = TRUE
                preserve=true \
                accept
 #           end makebias
+
+#  Apply masking directly to the frames if we're not using the ARD file
+#  implicitly
+            if ( "$keepard" == "FALSE" ) then
+               echo
+               echo "  Use ARDMASK to apply ARD file directly to bias frame."
+               echo
+               log_start ardmask
+               ardmask  \
+                  in=master_bias \
+                  out=masked_bias \
+                  ardfile=ccdtest_ard.dat 
+#              end ardmask
+               mv masked_bias.sdf master_bias.sdf
+            endif
 
 #  DEBIAS all frames (including flatfields)
             log_start debias
