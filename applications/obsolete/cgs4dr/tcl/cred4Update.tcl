@@ -72,6 +72,7 @@ proc cred4Update {item value} {
           incr sfr
         }
       }
+      set Cred4Widgets(DTYPE) "OBS"
     } elseif {[string toupper [string trim ${value}]] == "NONE"} {
       set Cred4Widgets(DTYPE) "NONE"
     } else {
