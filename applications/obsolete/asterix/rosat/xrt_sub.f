@@ -3504,15 +3504,20 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       CALL HDS_CLOSE(QLOC,STATUS)
 
       OFFAX = OFFAXD * 60.0
+	print *,offax
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
       VIG=1.0 - 1.49E-3*OFFAX -3.07E-4*OFFAX**2
+	print *,vig
 
 *    Get quantum efficiency factor
       IF (OFFAX.LE.ANGLE(1)) THEN
+	print *,'A'
+
         QE=FACTOR(1)
       ELSEIF (OFFAX.LT.ANGLE(NQE)) THEN
+	print *,'B'
         I=1
         DO WHILE (OFFAX.GT.ANGLE(I))
           I=I+1
@@ -3520,6 +3525,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
         QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
      :                                          (FACTOR(I)-FACTOR(I-1))
       ELSE
+	print *,'C'
+
         QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
      :                           (FACTOR(NQE-1)-FACTOR(NQE))/
      :                              (ANGLE(NQE)-ANGLE(NQE-1))
