@@ -162,13 +162,13 @@
 *      Free the HDS object
           CALL DAT_ANNUL( CLOC, STATUS )
 
-        ELSE
-          STATUS = SAI__ERROR
-          CALL MSG_SETC( 'IT', ITEM )
-          CALL ERR_REP( ' ', 'Unable to get item ^IT data from'/
-     :                  /' HDS file', STATUS )
-
         END IF
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'IT', ITEM )
+        CALL ERR_REP( ' ', 'Unable to get item ^IT data from HDS file',
+     :                STATUS )
 
       END IF
 
