@@ -2774,6 +2774,34 @@ sub handle_ltlibraries
 	  $xlink = $linker ? $linker : 'LINK';
 	}
 
+      my $linkmagic = '';
+      if ($xlink ne 'LINK')
+        {
+          # We're about to use a non-C linker.  Do we need any other
+          # linking magic?  In the case of C and Fortran on the Mac,
+          # yes we do.  The following outputs the hooks which allow us to
+          # handle this case, but is quite general in fact.
+          # Make a sorted list of all the
+          # languages uses, and IF there's more than one, make a
+          # variable lang_lang_..._$link_MAGIC (eg C_FC_FCLINK_MAGIC)
+          # and include this in the generated link line.  Only
+          # include those languages which have a linker, thus
+          # excluding languages like `header' which present no link
+          # problems at all.  After this, it is up to the configure.ac
+          # to sort out which, if any, of the ..._MAGIC variables it
+          # needs to define.
+          my @langlist = sort map { my $l = $languages{$extension_map{$_}};
+                                    $l->linker ? $l->name : () }
+                                  keys %extension_seen;
+
+          if ($#langlist > 0)
+            {
+              $linkmagic = '$('
+                . uc(join('_', @langlist) . '_' . $xlink . '_magic')
+                . ')';
+            }
+        }
+
       my $rpath;
       if ($instdirs{$onelib} eq 'EXTRA'
 	  || $instdirs{$onelib} eq 'noinst'
@@ -2805,7 +2833,8 @@ sub handle_ltlibraries
 				       XLTLIBRARY => $xlib,
 				       RPATH      => $rpath,
 				       XLINK      => $xlink,
-				       DIRSTAMP   => $dirstamp);
+				       DIRSTAMP   => $dirstamp,
+                                       LINKMAGIC  => $linkmagic);
       if ($seen_libobjs)
 	{
 	  if (var ($xlib . '_LIBADD'))
@@ -4320,9 +4349,9 @@ sub handle_messgen
             {
               my $srcfile = $1 . '.msg';
               $srcfile =~ tr{[A-Z]}{[a-z]};
-              if (! -f $srcfile)
+              if (! -f $relative_dir . '/' . $srcfile)
                 {
-                  err_am($loc . ": no ${normalmsg}_SOURCES variable, and defaulted $srcfile does not exist");
+                  err_am($loc . ": no ${normalmsg}_SOURCES variable, and defaulted $relative_dir/$srcfile does not exist");
                   next;
                 }
               if (defined $messgen_sourcefiles{$srcfile})
@@ -4346,7 +4375,7 @@ sub handle_messgen
     {
       my $fac = '';
       my $code = '';
-      open (MSG, "<$msg") ||
+      open (MSG, "<$relative_dir/$msg") ||
         do {
           print "Eeek! .msg source $msg doesn't exist -- ignored\n";
           next;
@@ -5157,7 +5186,7 @@ sub scan_autoconf_traces ($)
                 STAR_DEFAULTS => 0,
                 STAR_LATEX_DOCUMENTATION => 1,
                 STAR_XML_DOCUMENTATION => 1,
-                STAR_MESSGEN => 1,
+                STAR_MESSGEN => 0,
                 STAR_MONOLITHS => 0,
                 STAR_PREDIST_SOURCES => 1,
                 STAR_SPECIAL_INSTALL_COMMAND => 1,
