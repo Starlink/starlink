@@ -27,6 +27,8 @@
 *                     statement in DOWDT. This differs the
 *                     OS4 version of gkswdt.
 *     29/05/92  RTP   Add IOSTAT to Direct access WRITE for Indigo
+*     15/07/92  DLT   Divide record length by KRCBYT when opening
+*                     direct access file.
 *
 *  COMMON BLOCK USAGE
 *  ------------------
@@ -285,6 +287,7 @@
 *     ?      /WDTBUF/  ?
 *     ?      /FILES/  ?
 *
+      INCLUDE '../../include/gkmc.par'
       INCLUDE 'wdtbuf.par'
       INCLUDE 'wdtfls.cmn'
 *
@@ -387,7 +390,7 @@
       IF (.NOT. OK) GOTO 3
 *
       OPEN ( UNIT = DWDT, FILE = DFILE, STATUS = 'UNKNOWN',
-     :       ACCESS = 'DIRECT', RECL = KMXQBU)
+     :       ACCESS = 'DIRECT', RECL = KMXQBU/KRCBYT)
 *
 *     Open the Listing file
 *
