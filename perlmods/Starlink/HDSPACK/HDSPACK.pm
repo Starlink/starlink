@@ -8,7 +8,7 @@ Starlink::HDSPACK - routines for high level HDS manipulation
 
   use Starlink::HDSPACK;
 
-  copobj("file.more.fits","file1.more", "fits");
+  copobj("file.more.fits","file1.more", $status);
   delobj("file.more.fits");
 
 =head1 DESCRIPTION
@@ -171,22 +171,22 @@ sub copobj {
     if length($target) > 0;
 
   # If tarlocs contains nothing and status is good, we have
-  # to create a new HDS contained of name OUTNAME
+  # to use HDS_COPY rather than DAT_COPY so that a top level container
+  # can be created with the first HDS structure.
 
-  if ($status == SAI__OK && scalar(@tarlocs) == 0) {
-    print "Creating new HDS container... $outname\n" if $DEBUG;
+  if ($status == SAI__OK && scalar(@tarlocs) == 0 && scalar(@srclocs) != 0) {
+    print "Create new HDS container... $outname\n" if $DEBUG;
 
-    # Get the type of the input
-    my @null = (0);
-    hds_new ($outname,substr($outname,0,9),"COPOBJ_HDS",0,@null,
-	     my $loc,$status);
-    push(@tarlocs, $loc) if $status == SAI__OK;
-      
-  }
+    # Need to read the structure name from the locator so that
+    # we dont change it (should match the end of the requested source string)
+    dat_name($srclocs[-1], my $structname, $status);
+    
+    # Copy to the new root
+    hds_copy($srclocs[-1], $outname, $structname, $status);
 
-  # If either of these do not contain any entries
-  # dont try anything else
-  if ((scalar(@srclocs) != 0) && (scalar(@tarlocs) != 0)) {
+  } elsif ((scalar(@srclocs) != 0) && (scalar(@tarlocs) != 0)) {
+    # Else if both source and target contain something we can
+    # use dat_copy
 
     # Check to see that the last locator actually is a structure
     # component (else we can't put anything into it)

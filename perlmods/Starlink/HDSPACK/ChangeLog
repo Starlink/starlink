@@ -1,0 +1,5 @@
+1999-10-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* HDSPACK.pm (copobj): Properly deal with a new root by using
+	hds_copy rather than dat_copy in that case.
+
