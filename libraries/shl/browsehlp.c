@@ -1,7 +1,10 @@
-void main( argc, argv )
-   int    argc;
-   char **argv;
+
+
+#include <stdlib.h>
+#include "hlps.h"
+
+int main( int argc, char **argv )
 {
-   void helpc();
-   (void) helpc( argc, argv );
+   (void) hlps_standalone( "DEMO", argc, argv );
+   return EXIT_SUCCESS;
 }
