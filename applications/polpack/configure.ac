@@ -35,7 +35,7 @@ dnl The POLPACK link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [sla nbs kaplibs shl tcl], [link])
 
 dnl Using POLPACK requires the following components to be available at run-time.
-STAR_DECLARE_DEPENDENCIES([use], [kappa ccdpack tcl tk])
+STAR_DECLARE_DEPENDENCIES([use], [kappa ccdpack tcl tk startcl])
 
 STAR_LATEX_DOCUMENTATION(sun223)
 STAR_PREDIST_SOURCES(polka.tex)
