@@ -5,12 +5,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.11}
-\newcommand{\stardocnumber}    {95.11}
+\newcommand{\stardocsource}    {sun95.12}
+\newcommand{\stardocnumber}    {95.12}
 \newcommand{\stardocauthors}   {Malcolm J. Currie}
 \newcommand{\stardocdate}      {2 June 1998}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.11}
+\newcommand{\stardocversion}   {0.12}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -35264,6 +35264,22 @@ the NDF\_ library feature much-improved documentation.
 \end{itemize}
 \end{htmlonly}
 
+
+\section{Release Notes---V0.12}
+\subsection{Modified applications}
+\begin{itemize}
+  \item \htmlref{DISPLAY}{DISPLAY} changed to avoid a spurious error
+previously reported if double precision data is displayed which requires
+compression to fit in the display.
+  \item \htmlref{FILLBAD}{FILLBAD} now ignores any input VARIANCE component
+if all the variances are bad or zero. Also added protection against
+division by zero which occurred if the variance array contained any isolated 
+zeros.
+  \item \htmlref{LINPLOT}{LINOPLOT} changed to avoid spurious clearing of
+X displays when using two or more GWM windows under ICL.
+  \item  \htmlref{TRANMAKE}{TRANMAKE} no longer reports a compilation error 
+if a null value is given for parameter CLASS.
+\end{itemize}
 
 \section{Release Notes---V0.10}
 This release includes four new applications, three new synonyms, and
