@@ -102,14 +102,18 @@
       INTEGER STATUS
 *    Function declarations :
 *    Local constants :
+      INTEGER NBSIZ
+      PARAMETER (NBSIZ=65536)
 *    Local variables :
       CHARACTER*8 CNAME
+      INTEGER OLDSIZ
       INTEGER ID,SID,ITEMID
       INTEGER GCBID
       INTEGER I,J
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+        CALL NBS_TUNE('MAX_DEFN_SIZE',NBSIZ,OLDSIZ,STATUS)
         CALL NBS_BEGIN_DEFINITION(ID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'FLAG','_INTEGER',0,VAL__NBI,
      :                                                   SID,STATUS)

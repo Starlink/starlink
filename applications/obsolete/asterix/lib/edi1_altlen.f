@@ -85,6 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
@@ -117,10 +118,10 @@
       OARG = ADI__NULLID
 
 *  Get locator for top level object
-      CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
 
 *  Get existing list length, and number of lists
-      CALL EDI_GETNS( LHS, NEVENT, NLIST, STATUS )
+      CALL EDI_GETNS( ARGS(1), NEVENT, NLIST, STATUS )
 
 *  Get new list length
       CALL ADI_CGET0I( ARGS(3), NEVENT, STATUS )

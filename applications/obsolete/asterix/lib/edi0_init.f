@@ -89,6 +89,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			EDI1_ALTLEN
       EXTERNAL			EDI1_CREAT
       EXTERNAL			EDI1_MAP
       EXTERNAL			EDI1_UNMAP
@@ -113,6 +114,8 @@
      :                               EDI1_UNMAP, DID, STATUS )
         CALL ADI_DEFFUN( 'ListCreate(_EventDS,_HDSfile,_EventList)',
      :                               EDI1_CREAT, DID, STATUS )
+        CALL ADI_DEFFUN( 'ListAlterLength(_EventDS,_HDSfile,_INTEGER)',
+     :                               EDI1_ALTLEN, DID, STATUS )
 
 *    Mark as initialised
         EDI_INIT = .TRUE.
