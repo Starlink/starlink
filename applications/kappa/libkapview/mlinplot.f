@@ -446,6 +446,8 @@
 *        picture.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     19-NOV-2004 (DSB):
+*        Correct use of CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -512,7 +514,6 @@
       INTEGER IGRP             ! Group containing textual curve labels
       INTEGER IMODE            ! Mode identifier
       INTEGER INDF             ! NDF identifier for input NDF
-      INTEGER IPB              ! Pointer to next error bar value
       INTEGER IPBAR            ! Pointer to error bar values
       INTEGER IPDAT            ! Pointer to nominal data values
       INTEGER IPDIN            ! Pointer to input data array
@@ -521,8 +522,6 @@
       INTEGER IPICK            ! AGI id. for the KEY picture
       INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
       INTEGER IPLOTK           ! Pointer to AST Plot for KEY picture
-      INTEGER IPND             ! Pointer to next nominal data value
-      INTEGER IPNG             ! Pointer to next nominal GRID value
       INTEGER IPNOM            ! Pointer to nominal GRID values
       INTEGER IPVIN            ! Pointer to input variance array
       INTEGER IPW1             ! Pointer to work space
@@ -928,32 +927,29 @@ c         IMODE = 4
       DO I = 1, NDISP
          IF( USE( I ) ) THEN
 
-*  Get a pointer to the start of the nominal GRID values for this line.
-            IPNG = IPNOM + ( I - 1 )*ABSDIM*VAL__NBD
-
-*  Get a pointer to the start of the nominal data values for this line.
-            IPND = IPDAT + ( I - 1 )*ABSDIM*VAL__NBD
-
 *  Map all the required axis values from "what we've got" into GRAPHICS.
             CALL AST_TRAN1( AXMAPS( 1 ), ABSDIM, 
-     :                      %VAL( CNF_PVAL( IPNG ) ), .FALSE.,
-     :                      %VAL( CNF_PVAL( IPNG ) ), STATUS )
+     :                      %VAL( CNF_PVAL( IPNOM ) + ( I - 1 )*ABSDIM*
+     :                            VAL__NBD ), .FALSE.,
+     :                      %VAL( CNF_PVAL( IPNOM ) + ( I - 1 )*ABSDIM*
+     :                            VAL__NBD ), STATUS )
 
             CALL AST_TRAN1( AXMAPS( 2 ), ABSDIM, 
-     :                      %VAL( CNF_PVAL( IPND ) ), .FALSE.,
-     :                      %VAL( CNF_PVAL( IPND ) ), STATUS )
+     :                      %VAL( CNF_PVAL( IPDAT ) + ( I - 1 )*ABSDIM*
+     :                            VAL__NBD ), .FALSE.,
+     :                      %VAL( CNF_PVAL( IPDAT ) + ( I - 1 )*ABSDIM*
+     :                            VAL__NBD ), STATUS )
 
 *  If required, map the error bar limits into GRAPHICS.
             IF( ERRBAR ) THEN
 
-*  Get a pointer to the start of the error bar values for this line.
-               IPB = IPBAR + 2*( I - 1 )*ABSDIM*VAL__NBD
-
 *  Do the transformation.
                CALL AST_TRAN1( AXMAPS( 2 ), 2*ABSDIM, 
-     :                         %VAL( CNF_PVAL( IPB ) ),
-     :                         .FALSE., %VAL( CNF_PVAL( IPB ) ), 
-     :                         STATUS )
+     :                         %VAL( CNF_PVAL( IPBAR ) + 2*( I - 1 )*
+     :                               ABSDIM*VAL__NBD ), .FALSE., 
+     :                         %VAL( CNF_PVAL( IPBAR ) + 2*( I - 1 )*
+     :                               ABSDIM*VAL__NBD ), STATUS )
+
             END IF
 
          END IF
