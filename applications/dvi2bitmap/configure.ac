@@ -10,28 +10,11 @@ AC_INIT(dvi2bitmap, 0.13b1, norman@astro.gla.ac.uk)
 AM_INIT_AUTOMAKE
 AC_REVISION($Revision$)
 
-dnl   The syntax in here is for autoconf 2.50 and later
 AC_PREREQ(2.50)
 
 AC_CONFIG_SRCDIR([dvi2bitmap.cc])
 
-dnl   Say where the install-sh, config.guess and config.sub scripts
-dnl   are.
-dnl
-dnl   Hmm, something appears to go wrong with this: autoconf 2.57
-dnl   appears to generate a ./configure which doesn't look in the
-dnl   specified directory.  Also, some automake list messages,
-dnl   including the thread that contains
-dnl   <http://mail.gnu.org/archive/html/automake/2002-09/msg00167.html>
-dnl   suggest that libtool 1.4.3 fails to work with configure.ac
-dnl   scripts that specify AC_CONFIG_AUX_DIR.  Therefore, though it's
-dnl   slightly ugly, just leave all the configure junk in the
-dnl   top-level directory.
-dnl AC_CONFIG_AUX_DIR(config)
-
-dnl   Use a config file (the list of settings is getting too long)
-AC_CONFIG_HEADER(config.h)
-
+STAR_DEFAULTS
 
 dnl   Checks for programs.
 dnl   By giving arguments (CC cxx c++ g++) and (cc gcc egcs), here, we
@@ -49,6 +32,10 @@ dnl  spurious linking errors on, for example, Solaris)
 AC_LANG([C])
 
 AC_PATH_PROG(PERL, perl)
+AC_PATH_PROG(DOXYGEN, doxygen, [])
+if test -z "$DOXYGEN"; then
+    AC_MSG_NOTICE([Couldn't find Doxygen -- I'll just create a stub library document.  Doxygen's good though: you can get it from www.doxygen.org])
+fi
 
 dnl   Checks for header files (note unistd.h and stdlib are
 dnl   automatically checked for, and the corresponding HAVE_ macros
@@ -471,11 +458,14 @@ AC_ARG_WITH(path-seps,
     test -n "$COLON" && AC_DEFINE_UNQUOTED(SRCHPATH_SEP,'$COLON')
   fi)
 
+
+
 dnl   DOXYGEN_OUTPUT_DIRECTORY is the directory into which Doxygen
 dnl   output will be placed
 AC_SUBST(DOXYGEN_OUTPUT_DIRECTORY)
 DOXYGEN_OUTPUT_DIRECTORY="doc_libdvi2bitmap"
 
-AC_CONFIG_FILES([Makefile test/Makefile Doxyfile version.h])
+AC_CONFIG_HEADER(config.h)
+AC_CONFIG_FILES([Makefile test/Makefile component.xml Doxyfile version.h])
 AC_OUTPUT
 
