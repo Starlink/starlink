@@ -250,7 +250,7 @@ class Gwmview {
 
 #  Add control groups to the control panel.
          addgroup zoom Zoom
-         addgroup marknum Index
+         addgroup marknum Markers
          addgroup action Control
 
 #  Construct control widgets.
