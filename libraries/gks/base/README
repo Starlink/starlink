@@ -124,11 +124,17 @@ C routine modifications:
 
   gkgtsp.c      - rewritten for autoconf similarly to gktset.c
 
+  gkiosb.c      -  "     "
+
 Include files
 =============
 
   f77_type.h    - needed although a switch to CNF is obvious.
+  gkerr.h       - no system specific changes
 
+  gkwca.h
+  gkdt.h        - Cray does not require underscore in common block
+                  name
 
 
 
