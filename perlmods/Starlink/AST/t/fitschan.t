@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 15;
 
 require_ok("Starlink::AST");
 
@@ -11,13 +11,24 @@ my $fchan = new Starlink::AST::FitsChan();
 while (<DATA>) {
   $fchan->PutFits($_ ,0);
 }
-
 $fchan->Clear( "Card" );
-is( $fchan->GetC( "Encoding" ), "FITS-WCS", 
+
+# FitsChan
+# --------
+
+# encoding type
+is( $fchan->Get( "Encoding" ), "FITS-WCS", 
     "Encoding type of the FitsChan object" );
 
+# number of cards in the FitsChan
+is ( $fchan->Get( "Ncard" ), 38, "Number of cards in FitsChan" );
+
+# Get FrameSet
 my $wcsinfo = $fchan->Read();
 isa_ok( $wcsinfo, "AstFrameSetPtr" );
+
+# Mappings
+# --------
 
 # define some arrays (and references) to hold out inital coordinates
 my ( @x, @y );
@@ -49,9 +60,19 @@ is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" ); 
 is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
 
+# Set/Get Stuff
+# -------------
+
+# change output detail flag
+$fchan->Set( Full => 1 );
+is( $fchan->Get( "Full" ), 1, "Changing output detail flag to +1" );
+    
+$fchan->Set( Full => -1 );
+is( $fchan->Get( "Full" ), -1, "Changing output detail flag to -1" );
+
 # change encoding type
-$fchan->Set( "Encoding=NATIVE" );
-is( $fchan->GetC( "Encoding" ), "NATIVE", 
+$fchan->Set( Encoding => "NATIVE" );
+is( $fchan->Get( "Encoding" ), "NATIVE", 
     "Changing type of the FitsChan object" );
     
 # Done!

@@ -7,6 +7,7 @@ use vars qw/ $VERSION /;
 
 require DynaLoader;
 use base qw| DynaLoader |;
+use Scalar::Util;
 
 $VERSION = '0.01';
 
@@ -65,17 +66,34 @@ sub ThrowError {
 
 package AstObjectPtr;
 
-
-# Provide the sprintf functionality in the Perl side since it
-# is easier than doing it in C [but causes a problem if the
-# string includes a comma]
-
 sub Set {
   my $self = shift;
-  my $string = shift;
+  
+  # Original code, using the lower lever _Set method. Provide the sprintf 
+  # functionality in the Perl side since it is easier than doing it in C 
+  # [but causes a problem if the string includes a comma]
+  #
+  #my $string = shift;
+  #
   # token substitution if we have more arguments
-  $string = sprintf($string, @_) if @_;
-  return $self->_Set( $string );
+  #
+  #$string = sprintf($string, @_) if @_;
+  #return $self->_Set( $string );
+  
+  my %hash = @_;
+  foreach my $key ( sort keys %hash ) {
+     $self->SetC( $key, $hash{$key} );
+  }   
+  return;
+  
+}
+
+sub Get {
+  my $self = shift;
+  my $string = shift;
+  
+  my $value = $self->GetC( $string );
+  return $value;
 }
 
 # Rebless cloned/copied object into the original class
