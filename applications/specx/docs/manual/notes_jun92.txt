@@ -1,0 +1,255 @@
+SPECX notes (for JCMT/UKIRT newsletter)
+
+Frequency and velocity scales in SPECX
+______________________________________
+
+INTRODUCTION
+
+Traditionally, radio spectral-line analysis programs have displayed velocities
+with respect to the Local Standard of Rest (LSR), using the radio definition of
+velocity. It is now possible to observe at JCMT using Heliocentric, Barycentric
+and Telluric velocity frames, and optical and relativistic velocity
+definitions, and SPECX V6.2 (now released to Starlink) contains the appropriate
+facilities for dealing with such data. 
+
+Before describing what SPECX does, it is necessary to review, briefly, what is
+required (see also ref[1]). We all know that any relative velocity between
+source and observer gives rise to a corresponding Doppler shift in the received
+frequency. For *small* velocities, then, radioastronomers (who think in
+frequencies) write 
+
+            nu/nu_0          =   (c-v)/c   =   -v/c,   ............1
+
+where v is the velocity *away* from the observer. Likewise, optical astronomers
+write a similar formula in wavelengths: 
+
+           lambda_0/lambda   =   c/(c+v)   =   v/c.     ...........2
+
+Finally, it seems that extragalactic observers believe in special relativity,
+which of course tells us that: 
+
+           nu/nu_0           = sqrt[(c-v)/(c+v)].    ..............3
+
+(ignoring the smaller doppler shift due to any transverse component of
+velocity). By a simple application of the binomial theorem, we can see that
+these are all equivalent for v << c. A problem arises because these equations
+are used in reverse to *define* a velocity, and this definition is often used
+where the approximations in (1) or (2) are inadmissable. Even the (special)
+relativistic formula applies only in *local* frames, which are not the same
+thing at all as distant cosmological frames. So none of these formula are
+"right". 
+
+Normally we reduce our velocities to one of a few commonly agreed standards:
+Radio astronomers prefer the Local Standard of Rest (LSR); extragalactic
+astronomers apparently prefer a Heliocentric system, whilst for some purposes,
+such as instrument or atmospheric diagnostics it may be the Telluric frame that
+is of most interest. Or indeed we may have some favourite other frame which is
+defined with respect to one of these "standard" frames. One that is used quite
+often is the source frame --- for example, if we want the frequency scale to be
+that appropriate to a non-moving source we have to transform all telluric
+(observed) frequencies to a frame comoving with the source. In the case of
+Orion for example this is 9 km/s wrt the LSR, and few of us know the 
+heliocentric velocity. 
+
+Thus our velocity scale is specified by four parameters:
+       i.   The velocity transformation law.
+       ii.  The rest frequency or wavelength used in the law.
+       iii. The standard frame, and
+       iv.  The reference velocity expressed in that frame.
+Here I use the general term "frame" to imply this full specification.
+
+OBSERVATION AND DISPLAY OF LINE SPECTRA.
+
+There are two separate issues. First, we need to *observe* such that the line
+of interest actually occurs within the passband of the instrument (normally,
+but not always, at the centre of the passband). For a heterodyne receiver we do
+this by adjusting the local oscillator frequency by an amount equal to the
+*total* doppler frequency shift expected for the line. Second, we then need to
+*display* the spectrum. Unfortunately, the spectrometer is back on Earth, at
+the telescope, so we need to map the I.F. frequencies of individual spectrometer
+channels onto velocity (or frequency) space in some other chosen frame. This
+`display' frame need not necessarily be the same as the `observation' frame.
+For example, whatever the observation frame, we may wish to display the output
+in one of several standard frames:
+
+(i)    In the telluric frame, where the frequencies of spurious responses in
+       the I.F. passband (for example) can be measured, and with any luck,
+       disposed of. Or we may wish to measure absolute frequency in this frame
+       to identify telluric (atmospheric) emission and/or absorption features.
+(ii)   In the frame of the source (e.g., at a velocity of V_lsr offset
+       with respect to the LSR frame itself), when we wish to measure the 
+       absolute frequency of some spectral feature, in case it is a spectral
+       line of some species other than the one we desired.
+(iii)  In the LSR frame, if we want to determine a velocity to use for distance
+       measurements within the galaxy.
+(iv)   In a heliocentric frame for velocity determinations of external galaxies
+       (I am told that this is the normal way of doing this.)
+
+The solution adopted in SPECX is to view all calculations of velocity and/or
+frequency as a two stage process. In the first, the spectral header information
+is used to calculate the telluric centre frequency of the observation. That is,
+we deduce the true frequency as measured at the telescope of a signal appearing
+in the centre channel of the spectrometer. SPECX then produces an `X-array'
+which contains, for each spectrometer channel, the telluric frequency
+corresponding to that channel. Finally, this array is transformed back to the
+display frame. By default the display frame is the same as the observation
+frame, which is encoded in the SPECX and GSD scan headers, but it may be
+changed to any other frame if you like. 
+
+To summarize: SPECX will normally display the data using the velocity frame
+in which it was observed; however you can use SET-VELOCITY-FRAME to select
+another frame, and optionally you can use SET-LINE-REST-FREQ to choose another
+reference frequency for the velocity transformation. Current options for
+frames include LSR, Geocentric, Heliocentric and Telluric, and you have a
+choice of Radio, Optical and Relativistic velocity laws. Because of the
+bewildering number of combinations of these variables, the header on the
+X-axis of the plot has been modified to give a full specification.
+
+COMPLICATIONS. 1: Displaying the other sideband.
+
+The command CHANGE-SIDEBAND does the following: First, it calculates the
+telluric centre frequency. Then it adds or subtracts twice the I.F. (depending
+on whether the observations are in LSB or USB respectively). Finally, it
+transforms this telluric frequency to the nominal frame of the observation,
+files it as F_CEN in the scan header, and changes the sense of the frequency
+step in the spectrometer (F_INC). GSD spectra stored with storage task V6 or
+earlier do not have the local oscillator frequency stored, so SPECX instead
+asks you for the current sideband and I.F.; for V7 data or later SPECX can
+deduce these from the data in the GSD scan header. 
+
+Let us take a specific example. We have a RxB3i spectrum which is centred on CS
+7-6 (rest freq. 342.883 GHz) in the lower sideband.  The nominal I.F. is 1.5
+GHz. In order to look at absolute "rest frame" frequencies, we set the display
+frame to be that of the source itself: 
+
+    >> set-velocity-frame
+    Output in different vel frame? (Y/N) [Y] 
+    Velocity frame? (TELLuric, LSR, HELIocentric, GEOcentric) [TELL] LSR
+    Velocity law definition? (OPTical, RADio, RELativistic) [RAD] RAD
+    Velocity in new frame? (km/s) [  20.0] vlsr
+
+(see Fig 1). (There is a predefined variable "vlsr" equated to the actual value
+for the current spectrum, so we can quote this in response to the last query
+rather than looking up the actual value.) 
+
+For an AOSC spectrum, we would now regrid to a linear scale (see next section
+for more details on this). Then we go ahead and change the sideband:
+
+    >> change-sideband
+    Local oscillator frequency not defined...
+    Current sideband? (U/L) [L] L
+    First i.f.? (GHz) [ 1.500000] 1.5
+
+     --- Header entries changed to other sideband ---
+       Don't forget to SET-LINE-REST-FREQ to set the
+       frequency of the line you wanted to look at -
+       the old line will appear at large velocities!
+
+As suggested, change the reference frequency to CO 3-2:
+
+    >> set-line-rest-freq
+    Receiver # 1  Line rest frequency? (GHz) [  0.000000] 345.795989
+
+If we have done all this correctly we now get the absolute frequency plot
+shown below (Fig 2). A macro has been provided to do all this -- just type
+IMAGE-FREQ (this calls specx_command:image.spx).
+
+COMPLICATIONS. 2: AOSC
+
+It is well known that the frequency scales of Acousto-Optical spectrometers
+tend to be non-linear. To this end, the SPECX frequency calculation stuff
+contains a facility for correcting the frequency using a polynomial fit to the
+frequency error. For AOSC, the cubic term dominates, and the maximum error is
+about 0.6 MHz, but for somewhat complicated reasons, there is an *additional*
+zero-order (d.c.) term of some 11 or 12 channels, or about 3 MHz. The
+implication of this is that a line you might expect to come out in the centre
+channel (1024.5) of the spectrum will actually emerge some 3 MHz away, and to
+compensate for this the GSD header files correct the reference-frame observed
+frequency, F_CEN, appropriately. This makes the display work fine, but has
+implications for when we want to look at image frequencies (as will be shown in
+a moment). 
+
+To correct the frequency scale for AOSC data in particular, I have written a
+small macro, FRQFIX.SPX, which is kept in the "standard" command-files
+directory. It is invoked by the symbol LINEARIZE-AOSC-FREQ:
+
+    >> linearize-aosc-freq
+    FRQFIX> Linearization turned off - reset it? (Y/N) [Y] Y
+    OK, setting freq coefficients
+    FRQFIX> Regrid to uniform sampling? (Y/N) [Y] Y
+     -- AOS frequency scale linearization applied --
+    First and last useful channels in input:           1        2038
+    Linearization has now been turned off!
+    Reset if another spectrum needs correcting
+
+This macro in fact *also* removes the 3-MHz offset from F_CEN, instead adding
+it into the zero-order term of the correction polynomial, which simplifies
+calculation of the I.F.  LINEARIZE also does various checks and tidies up
+the program flags. If you choose to REGRID the data at this point you transform
+the data to a truly linear scale (in current units). Otherwise the data will
+still display correctly, as long as you have the linearization turned on (set
+fcorrect=true or use SET-X). 
+
+If you now want to look at the other sideband of AOSC data, remember that the
+effective I.F. at the centre of the passband is not what you might think it is,
+but is actually 1.503 GHz (or 3.943 GHz for RxA1 or RxB2). If on the other hand
+you apply the LINEARIZE-AOSC macro the data will be regridded onto a linear
+scale *and shifted to the nominal channel*. In this case the I.F. is the
+standard 1.5 or 3.94 GHz. There is one Awful Warning: you cannot apply
+linearization to data *after* you have done a CHANGE-SIDE. That flips the
+spectrometer frequency scale, and so will apply the correction 'the wrong way
+round'. So after you have done a CHANGE-SIDE, make sure that linearization is
+turned off, either through SET-X or by typing "fcorrect=false". 
+
+I thank Per Friberg, Goeran Sandell and Chris Mayer for their help in untangling
+this mess, Louis Noreau for pointing out the need for other velocity frames and
+scaling laws, and Paul Feldman for bringing other infelicities in the velocity
+and frequency scaling to my attention. The system in SPECX V6.2 has been
+written from scratch, and so does not have 10 years of testing behind it;
+please bring any demonstrable faults to my attention. (I do not have Donald
+Knuth's confidence, and do not offer a steadily increasing reward for each bug
+found in my code.) 
+
+Efficient map-making
+____________________
+
+Finally, a brief note about map-making. People are making some really quite
+big maps. SPECX tries to hold the entire cube in virtual memory at one time,
+and in fact with various permutations of INTERPOLATE and ROTATE, may want to
+have up to 3 copies of the cube resident. If excessive paging is to be avoided,
+then it is desirable that all these fit into the available physical memory of
+the machine (the working set). The usual consequence if they do not is that
+the whole machine grinds to a halt, without any apparent error...
+
+You can minimize the amount of virtual memory required by only mapping those
+spectral channels of interest. Use TRUNCATE (or DROP-CHANNELS) to dispense with
+spectral channels lying far away from the line; use BIN-SPECTRUM where you have
+higher resolution than you need. Even if you have plenty of memory to spare,
+you can greatly speed up the map-making process by using as few channels as
+possible. To reinforce this point, when you do an OPEN-MAP you are now asked
+explicitly for the number of spectral channels in the cube. You can also
+eliminate one cube from memory altogether by using 'interpolation-on-demand'
+(an option in INTERPOLATE-MAP), albeit at the cost of slightly increased time
+to make any particular map. 
+
+As noted in the manual, SPECX maps are really channel maps, and no information
+is stored in the header about individual spectra. Thus if you want to map data
+taken in the other sideband from that of the map header, or taken with a
+different spectrometer etc, you first need to INVERT, SHIFT, TRUNCATE etc to
+get your spectrum into the right form. There is a new macro that does this
+automatically: it can be invoked by the command symbol CONVERT-TO-MAP-FORMAT
+(this macro is stored along with all the other standard macros in the directory
+with logical name "specx_command".) Just use this command before you ADD-TO-MAP
+to convert your current spectrum to the same frequency scaling etc as the map
+header. 
+
+Reference:
+
+[1] M.A. Gordon. Chap 6.1 in "Methods of Experimental Physics", vol 12-C,
+    (Astrophyics -- Radio Observations). Academic Press, NY, 1976
+
+Rachael Padman
+
+CAVAD::RP1
+RACHAEL@UK.AC.CAM.PHY-RAVX
+                                                                                                                                                                                                                                                                                                                                                                     

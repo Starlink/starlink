@@ -1,0 +1,202 @@
+SPECX Notes
+
+The good news (for those for whom that sort of news is good) is that, thanks
+largely to the efforts of Horst Meyerdierks at The University of Edinburgh, and
+following an intensive burst of work over Christmas on my part, SPECX should
+shortly be available on Starlink UNIX platforms. Large parts of the port are
+complete but it is not quite clear when there will be enough of a system to be
+worth releasing it to starlink. At the date of writing (4th January) neither
+GSD nor FITS i/o has been implemented, so there is still no way to import data
+other than by direct conversion of VAX files in SPECX internal format. Horst
+has written a standard SPECX command to do this - for the present anyway it
+produces .SDF files, which use Starlink NDF and HDS libraries. Remo Tilanus has
+been working on a GSD reader, and converting the FITS stuff should not be too
+difficult (although tape i/o will probably not be supported under UNIX), so
+with any luck it will not be too difficult to finish off V6.4. 
+
+Unfortunately a number of the nicest features of the VAX version - such as ^C
+handling and proper support for dual-screen alpha graphics terminals - are
+unlikely to be available in the first UNIX version (6.4), and users may notice
+some "debug" type statements which are unfortunately necessary to circumvent
+bugs in the f77 compiler, but for most purposes SPECX V6.4 should satisfy
+the need. With any luck it will be released to Starlink during February,
+and if not, then soon after. Whether the documentation will be
+available by then is another matter. 
+
+Horst is aware of the need to be able to export SPECX to non-Starlink
+sites without them needing to take on the whole of the Starlink environment,
+and I am assured that this will be possible. However in the first instance
+it is probable that UNIX software will be available only through ROE, or
+later through the Starlink Librarian --- in any case, probably
+not from me directly.
+
+Meanwhile, for those who do have access to a VAX still, and while
+you are at the telescope, the improvements in V6.3 should make life
+easier. In fact the release of this version has been prompted mainly
+by the successful commissioning of the DAS, which in turn has required
+major changes in the internals of SPECX to accomodate extra header
+information required to define the frequency scales accurately.
+Several new commands have been added for dealing with DAS data, while
+others have been modified slightly.
+
+Most importantly, the SPECX internal datafile and map format has changed.
+As always, SPECX 6.3 is able to read any existing files and maps you may have,
+but it is no longer able to write to them. Map files (with the .MAP 
+extension) are converted to V3 the first time they are opened by the
+new program --- if you intend also to use earlier versions of SPECX then
+make a copy of the map before you use V6.3 for the first time. This is
+not true of ordinary datafiles; you just can't write spectra to them 
+any more, but it is a simple matter to open a new file and then copy the
+spectra across one by one or in a DO loop.
+
+The reason these file formats have had to change is to accomodate the
+LO and IF frequencies in the header, along with the velocity of the
+source in various frames. These were not previously available in the
+GSD file, but were derived within SPECX from the specified source-frame
+centre frequency of each sub-band. This is not however a natural way to
+do things, and proved prone to error with increasingly complex data
+such as those produced by the DAS. Hence the change. Since things *were*
+changing I have taken the opportunity to tidy up some other relics of
+bygone computer systems --- RA and DEC are now stored internally as R*8
+degrees, and the map offsets are stored as reals. This has meant
+changes to some of the macros supplied with SPECX, and if you use these
+variables in your own macros then you will need to modify them
+accordingly.
+
+1.  New and modified commands:
+
+CLIP-SPECTRUM       --- Sets all values in a spectrum outside of the specified
+                        range to a specified value.
+CONCATENATE-SPECTRA --- Combines all sub-bands of the spectra in X & Y stack
+                        positions into a new spectrum (the individual subbands
+                        are retained).
+WRITE               --- A version of PRINT modified to write into an SCL
+                        character variable which can then be used in response
+                        to a request of character input (a filename say)
+READ-FITS-SPECTRUM  --- Reads a SPECX or CLASS FITS spectrum from a disk-FITS
+                        file into the X stack position.
+OPEN-FITS-FILE      --- Replaces OPEN-FITS-OUTPUT-FILE, and has new questions.
+CLOSE-FITS-FILE     --- Replaces CLOSE-FITS-OUTPUT-FILE
+SET-PLOT-SCALE      --- Now lets you specify auto-scaling for the X and Y
+                        plot axes separately.
+SET-MAP-PARAMETERS  --- Now lets you specify that the map axes are to be
+                        scaled in sexagesimal form - i.e., RA and Dec in HMS.
+SHOW-VARIABLES      --- Accepts VMS-type wildcards, so that, for example, the
+                        command ">> show-var f*" will return all SCL variables
+                        that begin with the letter f.
+PLOT-LINE-PARAMETERS--- As well as the existing set of parameters (Tmax, Vmax,
+                        Integrated intensity and Delta(v)), now also offers you
+                        the 1st and 2nd moments of the line profile. The 1st
+                        moment is the Centroid; the 2nd moment approximates the
+                        line width for lines of good Signal/Noise ratio.
+
+
+2.  Bad channel/Magic value handling
+
+Bad-channel handling has been available for some time in the various
+mapping functions, although it tends to go unseen (except when you
+forget to do an INTERPOLATE for sparsely sampled data). A version of
+this has now been introduced for single-spectrum data. Channels in
+spectra set to this value are not displayed on plots, or used in
+computing quantities such as maximum intensity or line width. Channels
+which end up being unspecified, as the result of a SHIFT operation say,
+are now set to the bad channel value, rather than zero as before. Bad
+channels can be interpolated over with smoothing commands such as HANN,
+SMOOTH, CONVOLVE, BIN etc.
+
+You can determine the current setting of the bad channel value by doing:
+          >> print badpix_value
+and if you don't like it, you can change it by doing:
+          >> badpix_value = -100
+for example. The one place where bad channels in spectra are not handled
+well is in spectra in a map cube  --- fewest problems will result if you
+smooth over such bad channels before ADDing to the map, or choose a value
+of badpix_value close to zero (I tend to use 1.e-5 by default). Although
+we did have some teething problems with this feature, it seems to be working
+pretty well now --- It is particularly useful for dealing with DAS data, where
+the end channels of each subband tend to be set to 10**4 or some such similar
+value, and totally destroy the auto-scaling of plots.
+
+Note that if you change the value of badpix_value as shown above, then 
+previously "hidden" channels in your data will now be displayed, and/or
+used in reduction operations.
+
+
+3.  Map display
+
+A few mostly cosmetic changes have been introduced here. Displays involving
+greyscales will mostly now have a scale-bar displayed wherever there seems
+to be most room. This is not foolproof however, and for some unfortunately
+sized maps the scale-bar may vanish off the edge of the plot area -- just
+do SET-MAP-SIZE if this is the case. Note that the scale bar will *not*
+appear in the case of PLOT-LINE-PARAMETERS when more than one map is made ---
+the various maps in this case have different scales, and it did not seem
+sensible to try to generate scale-bars for each independent panel.
+
+Also, you can now display RA and Dec coordinates (only) in all forms of
+map display (GRID, CHANNEL-MAP, GREY, CONTOUR and PLOT-LINE-PAR) in 
+standard sexagesimal notation. That is, absolute positions are displayed,
+in HMS and DMS respectively. You can however still display things in the
+old way if you want -- the map centre RA and DEC are now indicated in the
+axis labels. Use SET-MAP-PARAMETERS to change the default axis scaling.
+
+
+4.  FITS i/o
+
+There have been ongoing problems with exchanging single spectra in FITS
+format between SPECX and CLASS. We (Remo Tilanus and I) believe that
+this has now been cured, following minor changes to both programs (with
+the cooperation of the CLASS authors at IRAM). Certainly SPECX now
+seems to produce valid CLASS spectra. I have also resurrected John
+Richer's FITS reader, and with a great deal of hacking turned it into a
+standard command that reads disk-FITS spectra (SIMPLE=.TRUE. only) into
+the X position of the stack. This command is READ-FITS-SPECTRUM   ---
+open the FITS file with OPEN-FITS-FILE and close it afterwards with
+CLOSE-FITS-FILE as before (note that the names of these commands have
+been changed from OPEN-FITS-OUTPUT-FILE and CLOSE-FITS-OUTPUT-FILE
+respectively).
+
+FITS maps are more of a problem. Claire Chandler has recently modified 
+WRITE-FITS-MAP to make it compatible with AIPS (it always used to be, so
+I assume that AIPS has changed too...), but this is probably *not* compatible
+with CLASS. We may eventually need separate commands to write FITS maps
+for different targets.
+
+
+5.  Frequency and Velocity scaling of Plots
+
+It is now possible to produce plots which have the image sideband 
+frequency along the top axis. To get this, all you have to do is to
+choose the absolute frequency options in SET-X-SCALE. Note however 
+that it is unlikely to be correct unless the display frame is the one
+in which the source is at rest. Since you *may* have observed with
+(say) the LSR velocity not equal to that of the source itself, I can't
+protect you from this. But in most cases it will be sufficient to do
+     >> SET-VELOCITY-FRAME yes lsr radio vlsr
+That is, choose a velocity reference frame which is defined as having
+velocity offset with respect to the standard of rest the same as that
+of the source itself (modify as appropriate for heliocentric,
+geocentric or telluric frames, and for different velocities or velocity
+definitions).
+
+HOWEVER... You must realize that most plotting packages, PGPLOT
+amongst them, accept REAL*4 numbers only. So if you display things in
+absolute frequency, it is not possible to get velocities accurate to
+better than a couple of MHz in three hundred odd GHz, no matter how
+accurately they are calculated internally in SPECX. For more accurate
+displays, choose a convenient reference frequency in the absolute
+frequency option in SET-X. For  example, if you have a set of lines 
+in the range 338 -- 339 GHz, then choose a reference frequency of
+338 GHz, and remember to add this back on to any frequency you determine
+with FIT-GAUSSIAN, or using the cursor.
+
+My thanks to Remo Tilanus in particular for his help,
+provision of DAS data, and rapid turn around of queries while we
+were solving the problems associated with the DAS. My apologies to
+anyone who may have been inconvenienced by problems in the Beta-test
+version --- I hope you appreciate that it was the only way to make
+DAS data available at all.
+
+Rachael Padman
+04-Jan-1994
+
