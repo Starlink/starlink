@@ -1,4 +1,4 @@
-      SUBROUTINE KPS_$RPRF<T>( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA,
+      SUBROUTINE KPS1_RPRF<T>( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA,
      :                         RANGE, POS, NXY, WT, RSCALE, RSCL2,
      :                         NBIN1, NBIN2, BINPTS, DMODE, R, LSTART,
      :                         NPTS, DATA, IADR, NXTADR, PROFIL,
@@ -6,7 +6,7 @@
      :                         GAMMA, STATUS )
 *+
 *  Name:
-*     KPS_$RPRFx
+*     KPS1_RPRFx
 
 *  Purpose:
 *     Fits a radial profile to a set of star images.
@@ -15,7 +15,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$RPRFx( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA, RANGE,
+*     CALL KPS1_RPRFx( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA, RANGE,
 *                      POS, NXY, WT, RSCALE, RSCL2, NBIN1, NBIN2,
 *                      BINPTS, DMODE, R, LSTART, NPTS, DATA, IADR,
 *                      NXTADR, PROFIL, PROFR, PROFWT, FWHM, AMP, BACK,
@@ -105,7 +105,7 @@
 *     the routine name by D, R, I, W, UW, B, UB as appropriate.  The
 *     arrays ARRAY and DATA supplied to the routine must have the data
 *     type specified.
-*     -  This is a server routine for PSF via KPS_$SPARMx.
+*     -  This is a server routine for PSF via KPS1_SPARMx.
 
 *  Algorithm:
 *     -  For each star, put the data into bins representing isophotal
@@ -425,7 +425,7 @@
                      DMODE( BIN ) = DATA( 1 )
 
                   ELSE
-                     CALL KPG_$MODE<T>( DATA, ICOUNT, PBAD, NITER, 0.1,
+                     CALL KPG1_MODE<T>( DATA, ICOUNT, PBAD, NITER, 0.1,
      :                                  DMODE( BIN ), DSIG, STATUS )
                   END IF
 
@@ -513,7 +513,7 @@
       BACK = 0.0
       GAMMA = 2.0
       SIGMA = SIG0
-      CALL KPS_$PGFTR( PROFIL, PROFWT, PROFR, NBIN2, NITFIT,
+      CALL KPS1_PGFTR( PROFIL, PROFWT, PROFR, NBIN2, NITFIT,
      :                 TOLFIT, AMP, BACK, SIGMA, GAMMA, STATUS )
 
       FWHM = VAL__BADR
