@@ -189,8 +189,7 @@
   error from the DTD.
 -->
 <![ %Feature.Versioning [
-  <!-- If %Feature.Versioning is 'include', then ignore %Feature.Dateonly -->
-  <!entity % Feature.Dateonly	'ignore'>
+  <!entity % Internal.Feature.Dateonly 'ignore'>
 ]]>
 <!entity % Internal.Feature.Dateonly	'include'>
 
@@ -259,6 +258,9 @@
 
 
 <!--======== Shortrefs ==========-->
+<![ ignore [
+<!-- The quote shortref achieves little, and leads to puzzling errors --
+  -- when you use a quote character in <verbatim> for example. -->
 <!entity openQ starttag "quote">
 <!entity closeQ endtag "quote">
 
@@ -269,6 +271,10 @@
 
 <!usemap textabbrevsmap (p | px)>
 <!usemap Qmap           quote>
+]]>
+<!shortref textabbrevsmap	"--"	endash
+				"~"	nbsp>
+<!usemap textabbrevsmap (p | px)>
 
 <!--========== Abbreviations ==========-->
 
@@ -277,6 +283,9 @@
 
 <!--========== Overall document structure ==========-->
 
+<!entity % DTD.Version 'Unknown' -- Include so that this DTD is valid
+				    on its own (for the benefit of
+				    DTD-documenting tools) -->
 <!entity % gversion.attr "generalversion cdata #fixed '%DTD.General.Version;'">
 <!entity % version.attr "version cdata #fixed '%DTD.Version;'">
 
@@ -525,7 +534,7 @@
 			   text. -->
 
 <!--========== Document body ==========-->
-<!entity % body.content '(p | table | figure | verbatim)*'>
+<!entity % body.content '(p | table | figure)*'>
 
 <!--
   I'm don't think we need to have the bibliography, indexcontents
@@ -537,7 +546,6 @@
   <!entity % appendix.content "routinelist?, sect*">
 ]]>
 <!entity % appendix.content "sect+">
-<!entity % backmatter	"bibliography? & indexcontents? & notecontents?">
 
 <!--
   Express a link policy on certain elements.  Those elements which
@@ -588,8 +596,8 @@
 		%req.abstract 
 		%body.content,
 		sect*,
-		appendices?, 
-		(%backmatter)'>
+		appendices?,
+		backmatter?'>
 
 <!element DOCBODY o o (%docbody.model)>
 
@@ -605,6 +613,8 @@
 <!element SUBSUBSUBSECT - o (subhead, %body.content)>
 
 <!element APPENDICES	- o (%appendix.content;)>
+
+<!element BACKMATTER	o o (bibliography? & indexcontents? & notecontents?)>
 
 <!attlist (sect | subsect)
 	%export.id.required;
@@ -658,14 +668,10 @@
 <!entity % simplephrase	"em | strong | quote | code | kbd | cite">
 <!entity % references	"ref | docxref | webref | url">
 <!entity % special	"index | note | draftnote | citation">
-<!entity % structuring	"blockquote | dl | ul | ol">
-<!entity % phrase	"%simplephrase | %references">
-<!--
-  I think this is too general a definition for simpletext:
-  <!entity % simpletext	"(#pcdata | %phrase | %special)*">
--->
-<!entity % simpletext	"(#pcdata | %simplephrase )*">
+<!entity % structuring	"blockquote | dl | ul | ol | verbatim">
 <!entity % maths	"m | mequation | meqnarray">
+<!entity % simpletext	"(#pcdata | %simplephrase | %maths )*">
+<!entity % phrase	"%simpletext | %references">
 
 <!--
   %phrase: different types of phrase display within text.
@@ -690,7 +696,7 @@
   The id attribute is a bit of a pain to implement, but useful.
 -->
 <!entity % p.model 
-    '%update (#pcdata | %phrase | %special | %structuring | %maths)*'>
+    '%update (%phrase | %structuring | %special )*'>
 <!element P o o (%p.model)>
 <!attlist p
 	id	id	#implied	-- id for this paragraph --
@@ -702,7 +708,7 @@
   and so can be used within NOTEs, for example, without clumsy
   exclusions.  It'll also help find `missing end tag' errors.
 -->
-<!entity % px.model '%update (#pcdata | %phrase | %structuring)*'>
+<!entity % px.model '%update (%phrase | %structuring)*'>
 <!element PX o o (%px.model)>
 
 <!element (EM | STRONG | CITE) - - (#pcdata|%simplephrase)*>
@@ -716,7 +722,7 @@
 <!element (CODE|KBD) - - (#pcdata)	-- literal text -->
 
 <!--
-  VERBATIM is part of %block, and is for extended blocks of verbatim
+  VERBATIM is part of %structuring, and is for extended blocks of verbatim
   text.  It should be set in a fixed-width font, and preserve line
   ends.  The contents of VERBATIM will possibly need to be enclosed in
   <![ cdata [...]]>
@@ -724,7 +730,7 @@
 <!element VERBATIM - - (#pcdata)	-- verbatim text -->
 
 <!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
-<!element QUOTE - - (attribution?, (#pcdata|%phrase)+)	
+<!element QUOTE - - (attribution?, (%phrase)+)	
 					-- simple quotation  -->
 <!element ATTRIBUTION - - (#pcdata)	-- source of quotation -->
 
@@ -1059,7 +1065,7 @@
 <!--========== Lists ==========-->
 <!entity % dl.model '%update (dt,dd)+'>
 <!element DL - - (%dl.model)>
-<!element DT - o (#pcdata | %phrase)+>
+<!element DT - o (%phrase)+>
 <!element DD - o (p)+>
 
 <!entity % oul.model '%update (li)+'>
@@ -1076,7 +1082,7 @@
   the TABLE.
 -->
 <!entity % titles 'caption'>
-<!entity % tbl.entry.mdl '(#pcdata | %phrase)*'>
+<!entity % tbl.entry.mdl '(%phrase)*'>
 <!entity % tbl.table.att 
 	'pgwide number	#implied
 	%export.id.optional; '>
