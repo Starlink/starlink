@@ -305,10 +305,10 @@
 
 *      Perform n-D flip
           IF ( TYPE .EQ. 'UBYTE' ) THEN
-            CALL AR7_AXFLIP_R( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
+            CALL AR7_AXFLIP_B( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
      :                         STATUS )
           ELSE
-            CALL AR7_AXFLIP_B( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
+            CALL AR7_AXFLIP_R( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
      :                         STATUS )
           END IF
 

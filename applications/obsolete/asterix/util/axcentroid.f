@@ -1,96 +1,168 @@
-*+  AXCENTROID - Finds <brief title for application>
       SUBROUTINE AXCENTROID( STATUS )
-*    Description :
-*     <description of what the application does - for user info>
-*    Environment parameters :
-*     parameter(dimensions) =type(access,i.e. R,W or U)
-*           <description of parameter>
-*    Method :
-*     <description of how the application works - for programmer info>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     23 Mar 92 : V1.6-0  Original (DJA)
-*     14 Oct 92 : V1.7-0  Major bug fix (DJA)
-*     24 Nov 92 : V1.7-1  Now uses quality in 1-d case (DJA)
-*     26 Sep 93 : V1.7-2  Bug fixed in quality handling (DJA)
-*     28 Feb 94 : V1.7-3  Use BIT_ routines to do bit manipulations (DJA)
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     28 Mar 95 : V1.8-1  Use new data interface (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+*+
+*  Name:
+*     AXCENTROID
+
+*  Purpose:
+*     Finds the data weighted mean axis value for any dataset axis
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL AXCENTROID( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     The program makes a copy of its input, reducing the dimensionality
+*     by one and replacing the data value with the data weighted mean
+*     mean lost axis value. In the simple 1-D case the mean axis value
+*     is printed out.
+
+*  Usage:
+*     axcentroid {parameter_usage}
+
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     axcentroid, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Mar 1992 V1.6-0 (DJA):
+*        Original version
+*     14 Oct 1992 V1.7-0 (DJA):
+*        Major bug fix
+*     24 Nov 1992 V1.7-1 (DJA):
+*        Now uses quality in 1-d case
+*     26 Sep 1993 V1.7-2 (DJA):
+*        Bug fixed in quality handling
+*     28 Feb 1994 V1.7-3 (DJA):
+*        Use BIT_ routines to do bit manipulations
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      6 Dec 1995 V2.0-0 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
+      INCLUDE 'QUAL_PAR'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'AXCENTROID Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*80		TEXT			! History text
       CHARACTER*40     		UNITS                   ! Axis units
 
       REAL             		AXCEN                   ! Channel weighted mean
 
-      INTEGER          AXIS                           ! Axis for weighting
-      INTEGER          DNDIM                          ! Dummy dimensionality
-      INTEGER          DDIMS(ADI__MXDIM)              ! Dummy dimensions
-      INTEGER          DIMS(ADI__MXDIM)               ! Input dimensions
-      INTEGER          IAPTR                          ! Weighting axis data
-      INTEGER          IAX, JAX                       ! Loops over axes
-      INTEGER          IDPTR                          ! Input data values
+      INTEGER                   AXIS                    ! Axis for weighting
+      INTEGER                   DIMS(ADI__MXDIM)        ! Input dimensions
+      INTEGER                   IAPTR                   ! Weighting axis data
+      INTEGER                   IAX, JAX                ! Loops over axes
+      INTEGER                   IDPTR                   ! Input data values
       INTEGER			IFID			! Input dataset id
-      INTEGER          IQPTR                          ! Input quality values
-      INTEGER          NAX                            ! Number of axes
-      INTEGER          NDIM                           ! Input dimensionality
-      INTEGER          ODIMS(ADI__MXDIM)              ! Output dimensions
-      INTEGER          ODPTR                          ! Output data
+      INTEGER                   IQPTR                   ! Input quality values
+      INTEGER                   NAX                     ! Number of axes
+      INTEGER                   NDIM                    ! Input dimensionality
+      INTEGER                   ODIMS(ADI__MXDIM)       ! Output dimensions
+      INTEGER                   ODPTR                   ! Output data
       INTEGER			OFID			! Output dataset id
-      INTEGER          ONDIM                          ! Output dimensionality
-      INTEGER          OQPTR                          ! Output quality
+      INTEGER                   ONDIM                   ! Output dimensionality
+      INTEGER                   OQPTR                   ! Output quality
       INTEGER			TLEN			! Amount of TEXT used
 
-      BYTE             MASK                           ! Input quality mask
-      BYTE             OQUAL                          ! Output quality point
+      BYTE                      OQUAL                   ! Output quality point
 
-      LOGICAL          OK                             ! Validity test
-      LOGICAL          PRIM                           ! Input primitive
-      LOGICAL          QOK                            ! Input quality there?
-C      LOGICAL          VOK                            ! Input variance there?
-*
-*    Version :
-*
+      LOGICAL                   ISDS                    ! Input structured?
+      LOGICAL                   OK                      ! Validity test
+      LOGICAL                   QOK                     ! Input quality there?
+*.
 
-      CHARACTER*30     VERSION
-        PARAMETER      (VERSION = 'AXCENTROID Version 1.8-1' )
-*-
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Get input
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL BDI_PRIM( IFID, PRIM, STATUS )
+*  Get input
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL ADI_DERVD( IFID, 'BinDS', ISDS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check data
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
+*  Check data
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         CALL MSG_PRNT( '! Invalid data' )
@@ -101,18 +173,17 @@ C      LOGICAL          VOK                            ! Input variance there?
         STATUS = SAI__ERROR
         GOTO 99
       END IF
-      CALL BDI_CHKQUAL( IFID, QOK, DNDIM, DDIMS, STATUS )
-C      CALL BDI_CHKVAR( IFID, VOK, DNDIM, DDIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
 
-*    Select axis
+*  Select axis
       IF ( NDIM .EQ. 1 ) THEN
         AXIS = 1
       ELSE
 
-*      List axes
+*    List axes
         CALL AXIS_TLIST( IFID, NDIM, STATUS )
 
-*      Select axis
+*    Select axis
         CALL USI_GET0I( 'AXIS', AXIS, STATUS )
         IF ( (AXIS.LT.1) .OR. (AXIS.GT.NDIM) ) THEN
           CALL MSG_PRNT( '! Invalid axis number' )
@@ -122,33 +193,29 @@ C      CALL BDI_CHKVAR( IFID, VOK, DNDIM, DDIMS, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map input data
-      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
+*  Map input data
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Use axis values or channels
-      CALL BDI_CHKAXES( IFID, NAX, STATUS )
-      IF ( NAX .GT. 0 ) THEN
-        CALL BDI_MAPAXVAL( IFID, 'READ', AXIS, IAPTR, STATUS )
+*  Use axis values or channels
+      CALL BDI_AXCHK( IFID, AXIS, 'Data', OK, STATUS )
+      IF ( OK ) THEN
+        CALL BDI_AXMAPR( IFID, AXIS, 'READ', IAPTR, STATUS )
       ELSE
         CALL DYN_MAPR( 1, DIMS(AXIS), IAPTR, STATUS )
         CALL ARR_REG1R( 1.0, 1.0, DIMS(AXIS), %VAL(IAPTR), STATUS )
       END IF
 
-*    Map input quality
+*  Map input quality
       IF ( QOK ) THEN
-        CALL BDI_GETMASK( IFID, MASK, STATUS )
-        CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR,
+     :                 STATUS )
       END IF
 
-*    Create output file?
+*  Create output file?
       IF ( NDIM .GT. 1 ) THEN
 
-*      Associate object
-        CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*      Construct dimensions
+*    Construct dimensions
         JAX = 1
         DO IAX = 1, NDIM
           IF ( IAX .NE. AXIS ) THEN
@@ -158,80 +225,70 @@ C      CALL BDI_CHKVAR( IFID, VOK, DNDIM, DDIMS, STATUS )
         END DO
         ONDIM = NDIM - 1
 
-*      Create output data
-        CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
-        CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+*    Associate object
+        CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+        CALL BDI_LINK( 'BinDS', ONDIM, ODIMS, 'REAL', OFID,
+     :                 STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Create quality if present in input
+*    Create output data
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
+
+*    Create quality if present in input
         IF ( QOK ) THEN
-          CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
-          CALL BDI_PUTMASK( OFID, MASK, STATUS )
-          CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
-          CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
+          CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0,
+     :                  QUAL__MASK, STATUS )
+          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR,
+     :                  STATUS )
         END IF
 
-*      Create variance if present in input
-C        IF ( VOK ) THEN
-C          CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
-C          CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
-C          CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
-C        END IF
-C        VOK = .FALSE.
+*    Copy stuff from input
+        IF ( ISDS ) THEN
 
-*      Copy stuff from input
-        IF ( .NOT. PRIM ) THEN
-
-*        Copy axes
+*      Copy axes
           IF ( NAX .GT. 0 ) THEN
             JAX = 1
             DO IAX = 1, NAX
               IF ( IAX .NE. AXIS ) THEN
-                CALL BDI_COPAXIS( IFID, OFID, IAX, JAX, STATUS )
+                CALL BDI_AXCOPY( IFID, IAX, ' ', OFID, JAX,
+     :                           STATUS )
                 JAX = JAX + 1
               END IF
             END DO
           END IF
 
-*        Ancillary bits
+*      Ancillary bits
           CALL HSI_COPY( IFID, OFID, STATUS )
-          CALL BDI_COPMORE( IFID, OFID, STATUS )
-          CALL BDI_COPTEXT( IFID, OFID, STATUS )
+          CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+          CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, STATUS )
 
         END IF
 
-*    Reset flags if scalar output
-C      ELSE
-C        VOK = .FALSE.
-
       END IF
 
-*    Pad dimensions to 7D
+*  Pad dimensions to 7D
       CALL AR7_PAD( NDIM, DIMS, STATUS )
       CALL AR7_PAD( ONDIM, ODIMS, STATUS )
 
-*    Act on data
+*  Act on data
       IF ( NDIM .GT. 1 ) THEN
         CALL AXCENTROID_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                     DIMS(5), DIMS(6), DIMS(7), AXIS,
-     :                     %VAL(IAPTR), %VAL(IDPTR), QOK, MASK,
+     :                     %VAL(IAPTR), %VAL(IDPTR), QOK,
      :                     %VAL(IQPTR),
-C     :                     VOK, %VAL(IVPTR),
      :                     ODIMS(1), ODIMS(2), ODIMS(3), ODIMS(4),
      :                     ODIMS(5), ODIMS(6), ODIMS(7),
-     :                     %VAL(ODPTR), %VAL(OQPTR),
-C     :                    %VAL(OVPTR),
-     :                     STATUS )
+     :                     %VAL(ODPTR), %VAL(OQPTR), STATUS )
       ELSE
         CALL AXCENTROID_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                     DIMS(5), DIMS(6), DIMS(7), AXIS,
-     :                     %VAL(IAPTR), %VAL(IDPTR), QOK, MASK,
+     :                     %VAL(IAPTR), %VAL(IDPTR), QOK,
      :                     %VAL(IQPTR),
-C     :                     VOK, %VAL(IVPTR),
      :                     1, 1, 1, 1, 1, 1, 1,
      :                     AXCEN, OQUAL, STATUS )
 
         IF ( NAX .GT. 0 ) THEN
-          CALL BDI_GETAXUNITS( IFID, AXIS, UNITS, STATUS )
+          CALL BDI_AXGET0C( IFID, AXIS, 'Units', UNITS, STATUS )
           CALL MSG_SETC( 'UNIT', UNITS )
         ELSE
           CALL MSG_SETC( 'UNIT', 'pixels' )
@@ -241,7 +298,7 @@ C     :                     VOK, %VAL(IVPTR),
         CALL MSG_PRNT( 'Centroid wrt axis ^AX is ^CEN ^UNIT.' )
       END IF
 
-*    Write history
+*  Write history
       IF ( NDIM .GT. 1 ) THEN
         CALL HSI_ADD( OFID, VERSION, STATUS )
         CALL MSG_SETI( 'AX', AXIS )
@@ -249,7 +306,7 @@ C     :                     VOK, %VAL(IVPTR),
         CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
       END IF
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -259,10 +316,8 @@ C     :                     VOK, %VAL(IVPTR),
 
 *+  AXCENTROID_INT - Peform ratioing on 7D data sets
       SUBROUTINE AXCENTROID_INT( L1,L2,L3,L4,L5,L6,L7,AXIS,
-     :                         I_A, I_D, QFLAG, MASK,I_Q,
-c     :                        VFLAG, I_V,
+     :                         I_A, I_D, QFLAG, I_Q,
      :                         M1,M2,M3,M4,M5,M6,M7, O_D, O_Q,
-c     :                        O_V,
      :                         STATUS )
 *
 *    Description :
@@ -293,28 +348,22 @@ c     :                        O_V,
 *
       INTEGER                AXIS                ! Axis to ratio on
       REAL                   I_A(*)              ! Axis values
-
       LOGICAL                QFLAG               ! Use quality?
-      BYTE                   MASK                ! Quality mask
-
-c      LOGICAL                VFLAG               ! Use variance?
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input qual
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-c      REAL                   I_V(L1,L2,L3,L4,L5,L6,L7) ! Input vari
       INTEGER                M1,M2,M3,M4,M5,M6,M7!
 *
 *    Export :
 *
       BYTE                   O_Q(M1,M2,M3,M4,M5,M6,M7) ! Output quality
       REAL                   O_D(M1,M2,M3,M4,M5,M6,M7) ! Output data
-c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Accumulate the data from I_D into W_D and O_D
+*  Accumulate the data from I_D into W_D and O_D
       IF ( AXIS .EQ. 7 ) THEN
         CALL AXCENTROID_7( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
      :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
@@ -352,7 +401,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_7 - Perform sum over axis 7
       SUBROUTINE AXCENTROID_7( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                 QFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
 *    Description :
 *
@@ -372,22 +421,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M1,M2,M3,M4,M5,M6   !
       REAL                   O_D(M1,M2,M3,M4,M5,M6) ! Output data
       BYTE                   O_Q(M1,M2,M3,M4,M5,M6) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -413,8 +456,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO O = 1, L7
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
@@ -448,7 +490,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_6 - Perform sum over axis 6
       SUBROUTINE AXCENTROID_6( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,M1,M2,M3,M4,M5,M7, O_D, O_Q )
+     :                 QFLAG, M1,M2,M3,M4,M5,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -468,22 +510,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M1,M2,M3,M4,M5,M7   !
       REAL                   O_D(M1,M2,M3,M4,M5,M7) ! Output data
       BYTE                   O_Q(M1,M2,M3,M4,M5,M7) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -509,8 +545,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO N = 1, L6
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
@@ -544,7 +579,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_5 - Perform sum over axis 5
       SUBROUTINE AXCENTROID_5( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,M1,M2,M3,M4,M6,M7, O_D, O_Q )
+     :                 QFLAG, M1,M2,M3,M4,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -564,22 +599,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M1,M2,M3,M4,M6,M7   !
       REAL                   O_D(M1,M2,M3,M4,M6,M7) ! Output data
       BYTE                   O_Q(M1,M2,M3,M4,M6,M7) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -605,8 +634,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO M = 1, L5
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
@@ -640,7 +668,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_4 - Perform sum over axis 4
       SUBROUTINE AXCENTROID_4( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,M1,M2,M3,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, M1,M2,M3,M5,M6,M7, O_D, O_Q )
 *
 *    Description :
 *
@@ -660,22 +688,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M1,M2,M3,M5,M6,M7   !
       REAL                   O_D(M1,M2,M3,M5,M6,M7) ! Output data
       BYTE                   O_Q(M1,M2,M3,M5,M6,M7) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -701,8 +723,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO L = 1, L4
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
@@ -736,7 +757,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_3 - Perform sum over axis 3
       SUBROUTINE AXCENTROID_3( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,M1,M2,M4,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, M1,M2,M4,M5,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -756,22 +777,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M1,M2,M4,M5,M6,M7   !
       REAL                   O_D(M1,M2,M4,M5,M6,M7) ! Output data
       BYTE                   O_Q(M1,M2,M4,M5,M6,M7) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -796,8 +811,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO K = 1, L3
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
@@ -831,7 +845,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_2 - Perform sum over axis 2
       SUBROUTINE AXCENTROID_2( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,M1,M3,M4,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, M1,M3,M4,M5,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -851,22 +865,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M1,M3,M4,M5,M6,M7   !
       REAL                   O_D(M1,M3,M4,M5,M6,M7) ! Output data
       BYTE                   O_Q(M1,M3,M4,M5,M6,M7) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -892,8 +900,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO J = 1, L2
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
@@ -927,7 +934,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_1 - Perform sum over axis 1
       SUBROUTINE AXCENTROID_1( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,M2, M3,M4,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, M2, M3,M4,M5,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -947,22 +954,16 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      BYTE                   I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
-      BYTE                   MASK                ! Quality mask
+      LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input quality
 *
 *    Export :
 *
       INTEGER                M2,M3,M4,M5,M6,M7   !
       REAL                   O_D(M2,M3,M4,M5,M6,M7) ! Output data
       BYTE                   O_Q(M2,M3,M4,M5,M6,M7) ! Output quality
-*
-*    Functions :
-*
-      BYTE		     BIT_ANDUB
 *
 *    Local variables :
 *
@@ -988,8 +989,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *                Sum the numerator and denominator
                   DO I = 1, L1
                     IF ( QFLAG ) THEN
-                      GOOD = BIT_ANDUB(I_Q(I,J,K,L,M,N,O),MASK)
-     :                                .EQ.QUAL__GOOD
+                      GOOD = I_Q(I,J,K,L,M,N,O)
                     ELSE
                       GOOD = .TRUE.
                     END IF
