@@ -2601,6 +2601,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *      Choose spatial bins
         IX = INT(0.5+(X0-RF_BASE(3,SLOT)) / RF_SCALE(3,SLOT)) + 1
         IY = INT(0.5+(Y0-RF_BASE(4,SLOT)) / RF_SCALE(4,SLOT)) + 1
+        IX = MIN( IX, RF_DIMS(3) )
+        IY = MIN( IY, RF_DIMS(4) )
 
 *      Choose energy bin
         IF ( RF_PHA_DEF(SLOT) .AND. (RF_NDIM(SLOT).GT.4) ) THEN
@@ -2612,7 +2614,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *      This selects the psf
         IPSF = (IE-1)*RF_DIMS(3,SLOT)*RF_DIMS(4,SLOT) +
-     :         (IY-1)*RF_DIMS(3,SLOT) + (IX-1)
+     :         (IY-1)*RF_DIMS(3,SLOT) + IX
 
       END IF
 
