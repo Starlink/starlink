@@ -365,14 +365,14 @@
      :                                       STATUS ),
      :                         'UNIT(3)', STATUS )
          ELSE
-            ZAUNIT = ""
+            ZAUNIT = ' '
          END IF
 
          IF( NAXB .GT. 2 ) THEN 
             ZCUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
      :                         'UNIT(3)', STATUS )
          ELSE
-            ZCUNIT = ""
+            ZCUNIT = ' '
          END IF
 
       END IF

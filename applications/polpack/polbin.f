@@ -558,9 +558,9 @@
 
 *  Limit the box dimensions to be no bigger than the span of the data,
 *  plus 5%.
-         BOX( 1 ) = MIN( BOX( 1 ), INT( 1.05*( SXHI - SXLO ) ) )
-         BOX( 2 ) = MIN( BOX( 2 ), INT( 1.05*( SYHI - SYLO ) ) )
-         BOX( 3 ) = MIN( BOX( 3 ), INT( 1.05*( SZHI - SZLO ) ) )
+         BOX( 1 ) = MIN( BOX( 1 ), REAL( INT( 1.05*( SXHI - SXLO ) ) ) )
+         BOX( 2 ) = MIN( BOX( 2 ), REAL( INT( 1.05*( SYHI - SYLO ) ) ) )
+         BOX( 3 ) = MIN( BOX( 3 ), REAL( INT( 1.05*( SZHI - SZLO ) ) ) )
 
 *  Find the indices of the first and last bins on each axis. This
 *  assumes that the origin on each axis is at a bin edge.
