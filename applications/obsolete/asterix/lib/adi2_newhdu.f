@@ -96,12 +96,13 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARAQCTER*20		LHDU
+      CHARACTER*20		LHDU
       CHARACTER*4		STR
 
       INTEGER			HCID			! HDU container
       INTEGER			HID			! New HDU
       INTEGER			HLEN
+      INTEGER			I			! Loop over LHDU
       INTEGER			NDIG			! Digits used in STR
       INTEGER			NHDU			! # HDUs in file
 *.
