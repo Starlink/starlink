@@ -124,12 +124,15 @@
       CHARACTER*132		GNAME			! Full grid name
       CHARACTER*40		UNITS			! Grid spatial units
 
+      REAL			SPAR(2)			! Spaced array info
       REAL			TOR			! Conversion to radian
 
       INTEGER			APTR			! Mapped grid item
+      INTEGER			EAX			! Energy axis number
       INTEGER			ELEN			! Length of ETCDIR
 	SAVE			ELEN
       INTEGER			FID			! Grid file identifier
+      INTEGER			IAX			! Loop over axes
       INTEGER			NELM			! Total # grid elements
 
       LOGICAL			FIRST			! First time through?
