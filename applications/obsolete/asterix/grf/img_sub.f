@@ -3317,6 +3317,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
+      INTEGER I1,I2,J1,J2
       BYTE REG(I_NX,I_NY)
 
 
@@ -3329,6 +3330,68 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       ENDDO
 
       END
+
+
+
+*+ IMG_SETSLICE
+	SUBROUTINE IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+        REAL XC,YC,ANGLE,LENGTH,WIDTH
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER I1,I2,J1,J2
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  get range of pixels containing slice
+        CALL IMG_SLICETOBOX(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
+     :                                                     STATUS)
+
+*  set region mask
+        CALL IMG_SETSLICE_SUB(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
+     :                                              %val(I_REG_PTR))
+        I_REG_TYPE='COMPLEX'
+      ENDIF
+
+      END
+
+
+      SUBROUTINE IMG_SETSLICE_SUB(XC,YC,ANGLE,LENGTH,WIDTH,
+     :                                      I1,I2,J1,J2,REG)
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'IMG_CMN'
+
+      REAL XC,YC,ANGLE,LENGTH,WIDTH
+      INTEGER I1,I2,J1,J2
+      BYTE REG(I_NX,I_NY)
+
+      LOGICAL IMG_INSLICE
+
+      INTEGER I,J
+
+      DO J=J1,J2
+        DO I=I1,I2
+          IF (IMG_INSLICE(I,J,XC,YC,ANGLE,LENGTH,WIDTH) THEN
+            REG(I,J)='01'X
+          ENDIF
+        ENDDO
+      ENDDO
+
+      END
+
 
 
 *+ IMG_BOXTOBOX - convert box spec. to range of pixels
@@ -3372,6 +3435,77 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       ENDIF
 
       END
+
+
+
+*+ IMG_SLICETOBOX - get box enclosing slice
+	SUBROUTINE IMG_SLICETOBOX(XC,YC,ANGLE,LENGTH,WIDTH,
+     :                                    I1,I2,J1,J2,STATUS)
+*    Description :
+*    Type Definitions :
+        IMPLICIT NONE
+*    Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*    Import :
+        REAL XC,YC,ANGLE,LENGTH,WIDTH
+*    Import-Export :
+*    Export :
+        INTEGER I1,I2,J1,J2
+*    Status :
+        INTEGER STATUS
+*    Function declarations :
+*    Local variables :
+        REAL PHI
+        REAL HDIAG
+        REAL DX1,DX2,DY1,DY2
+        REAL X,Y
+        REAL PX1,PX2,PX3,PX4
+        REAL PY1,PY2,PY3,PY4
+*-
+        IF (STATUS.NE.SAI__OK) RETURN
+
+*  get half diagonal
+        HDIAG=SQRT(LENGTH**2 + WIDTH**2)/2.0
+
+*  angle of diagonal from x-axis
+        PHI=ATAN2(WIDTH,LENGTH)
+
+*  offset of corners from centre
+        DX1=HDIAG*COS(PHI+ANGLE)
+        DY1=HDIAG*SIN(PHI+ANGLE)
+        DX2=HDIAG*COS(ANGLE-PHI)
+        DY2=HDIAG*SIN(ANGLE-PHI)
+
+*  get coords of corners
+        X=XC+DX1
+        Y=YC+DY1
+        CALL IMG_WORLDTOPIX(X,Y,PX1,PY1,STATUS)
+        X=XC+DX2
+        Y=YC+DY2
+        CALL IMG_WORLDTOPIX(X,Y,PX2,PY2,STATUS)
+
+
+        X=XC-DX1
+        Y=YC-DY1
+        CALL IMG_WORLDTOPIX(X,Y,PX3,PY3,STATUS)
+        X=XC-DX2
+        Y=YC-DY2
+        CALL IMG_WORLDTOPIX(X,Y,PX4,PY4,STATUS)
+
+        I1=INT(MIN(PX1,MIN(PX2,MIN(PX3,PX4))))
+        I2=INT(MAX(PX1,MAX(PX2,MAX(PX3,PX4))))
+        J1=INT(MIN(PY1,MIN(PY2,MIN(PY3,PY4))))
+        J2=INT(MAX(PY1,MAX(PY2,MAX(PY3,PY4))))
+
+
+	END
+
+
+
+
 
 *+ IMG_POLYTOBOX - get box containing polygon
       SUBROUTINE IMG_POLYTOBOX(NVERTEX,XVERT,YVERT,I1,I2,J1,J2,STATUS)
@@ -3554,6 +3688,53 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
       END
+
+
+
+*+ IMG_INSLICE - determine whether pixel is inside slice
+	LOGICAL FUNCTION IMG_INSLICE(I,J,XC,YC,ANGLE,LENGTH,WIDTH)
+
+*    Description :
+*    Type Definitions :
+        IMPLICIT NONE
+*    Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*    Import :
+        INTEGER I,J
+        REAL XC,YC,ANGLE,LENGTH,WIDTH
+*    Import-Export :
+*    Export :
+*    Status :
+        INTEGER STATUS
+*    Function declarations :
+*    Local variables :
+      REAL X,Y
+      REAL THETA
+      REAL DISP
+*-
+        IF (STATUS.NE.SAI__OK) RETURN
+
+*  get world coord of pixel centre
+          CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
+
+*  transform to frame centred on slice
+          X=X-XC
+          Y=Y-YC
+
+*  rotate to frame parallel with slice axes
+          THETA=ATAN2(Y,X)
+          DISP=SQRT(X**2 + Y**2)
+          X=DISP*COS(ANGLE-THETA)
+          Y=DISP*SIN(ANGLE-THETA)
+
+*  check transformed coord falls within slice
+          IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0)
+
+	END
+
 
 
 
@@ -3799,6 +3980,174 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       ENDIF
 
       END
+
+*+ IMG_GETSLICE - get rectangular slice of image
+      SUBROUTINE IMG_GETSLICE(PAR1,PAR2,PAR3,PAR4,PAR5,XC,YC,
+     :                              ANGLE,LENGTH,WIDTH,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*) PAR1,PAR2,PAR3,PAR4,PAR5
+*    Export :
+      REAL XC,YC,ANGLE,LENGTH,WIDTH
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+      REAL PI,DTOR
+      PARAMETER (PI=3.14159265,DTOR=PI/180.0)
+*    Local variables :
+      CHARACTER*1 CH
+      REAL XCENT,YCENT
+      REAL PXCENT,PYCENT
+      REAL XEND,YEND
+      REAL PXEND,PYEND
+      REAL XOEND,YOEND
+      REAL PXOEND,PYOEND
+      REAL XWID,YWID
+      REAL PXWID,PYWID
+      REAL HLEN
+      REAL HWID
+      REAL PLENGTH,PHLEN,PWIDTH,PHWID
+      REAL ANGLE,ALPHA,BETA
+      REAL D
+      REAL XTR,YTR,XTL,YTL,XBR,YBR,XBL,YBL
+      REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
+      INTEGER LS
+      LOGICAL LEFT,RIGHT
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  get centre of cut
+        IF (I_MODE.EQ.1) THEN
+          CALL MSG_PRNT(' ')
+          XCENT=I_X
+          YCENT=I_Y
+          CALL MSG_SETR('X',XCENT)
+          CALL MSG_SETR('Y',YCENT)
+          CALL MSG_PRNT('Select centre/^X,^Y/...')
+          CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
+            XCENT=I_X
+            YCENT=I_Y
+          ENDIF
+          CALL PGPOINT(1,XCENT,YCENT,2)
+          CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+
+*  get mid-point of end
+          CALL MSG_PRNT('Select end...')
+          XEND=XCENT
+          YEND=YCENT
+          CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
+          CALL PGPOINT(1,XEND,YEND,2)
+          CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
+
+*  calculate other end and draw centre line
+          XOEND=2.0*XCENT-XEND
+          YOEND=2.0*YCENT-YEND
+          CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
+          CALL PGPOINT(1,XOEND,YOEND,2)
+          CALL PGQLS(LS)
+          CALL PGSLS(2)
+          CALL PGDRAW(XEND,YEND)
+
+
+*  get width
+          CALL MSG_PRNT('Select width...')
+          XWID=XCENT
+          YWID=YCENT
+          CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
+          CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
+
+*  calc length
+          LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+          PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
+          PHLEN=MAX(1.0,PHLEN)
+          PLENGTH=PHLEN*2.0
+
+*  calc angle
+          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+
+*  calc width (pixels)
+          D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
+          ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
+          BETA=ALPHA-ANGLE
+          PHWID=ABS(D*SIN(BETA))
+          PHWID=MAX(0.5,PHWID)
+          PWIDTH=PHWID*2.0
+*  calc width (world coords)
+          D=SQRT((XWID-XCENT)**2 + (YWID-YCENT)**2)
+          ALPHA=ATAN2(ABS(YWID-YCENT),ABS(XWID-XCENT))
+          BETA=ALPHA-ANGLE
+          WIDTH=ABS(D*SIN(BETA))
+
+*  keyboard mode
+        ELSE
+          CALL PAR_DEF0R(PAR1,I_X,STATUS)
+          CALL PAR_GET0R(PAR1,XCENT,STATUS)
+          CALL PAR_DEF0R(PAR2,I_Y,STATUS)
+          CALL PAR_GET0R(PAR2,YCENT,STATUS)
+          CALL PAR_GET0R(PAR3,ANGLE,STATUS)
+          CALL PAR_GET0R(PAR4,LENGTH,STATUS)
+          CALL PAR_GET0R(PAR5,WIDTH,STATUS)
+          ANGLE=ANGLE*DTOR
+*  convert to pixel coords
+          CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+          PLENGTH = LENGTH/(ABS(I_XSCALE*COS(ANGLE)) +
+     :                        ABS(I_YSCALE*SIN(ANGLE)))
+          PLENGTH=MAX(2.0,PLENGTH)
+          PWIDTH = WIDTH/(ABS(I_XSCALE*SIN(ANGLE))   +
+     :                        ABS(I_YSCALE*COS(ANGLE)))
+          PWIDTH=MAX(1.0,PWIDTH)
+          PHWID=PWIDTH/2.0
+          PHLEN=PLENGTH/2.0
+          PXEND=PXCENT+PHLEN*COS(ANGLE)
+          PXOEND=PXCENT-PHLEN*COS(ANGLE)
+          PYEND=PYCENT+PHLEN*SIN(ANGLE)
+          PYOEND=PYCENT-PHLEN*SIN(ANGLE)
+        ENDIF
+
+*  plot extent of cut
+        PXTR=PXEND+PHWID*SIN(ANGLE)
+        PYTR=PYEND-PHWID*COS(ANGLE)
+        PXTL=PXEND-PHWID*SIN(ANGLE)
+        PYTL=PYEND+PHWID*COS(ANGLE)
+        PXBR=PXOEND+PHWID*SIN(ANGLE)
+        PYBR=PYOEND-PHWID*COS(ANGLE)
+        PXBL=PXOEND-PHWID*SIN(ANGLE)
+        PYBL=PYOEND+PHWID*COS(ANGLE)
+        CALL IMG_PIXTOWORLD(PXBR,PYBR,XBR,YBR,STATUS)
+        CALL IMG_PIXTOWORLD(PXBL,PYBL,XBL,YBL,STATUS)
+        CALL IMG_PIXTOWORLD(PXTL,PYTL,XTL,YTL,STATUS)
+        CALL IMG_PIXTOWORLD(PXTR,PYTR,XTR,YTR,STATUS)
+        CALL PGSLS(1)
+        CALL PGMOVE(XBR,YBR)
+        CALL PGDRAW(XBL,YBL)
+        CALL PGDRAW(XTL,YTL)
+        CALL PGDRAW(XTR,YTR)
+        CALL PGDRAW(XBR,YBR)
+        CALL PGSLS(LS)
+
+
+      ENDIF
+
+
+      END
+
+
+
 
 
 *+  IMG_GETARD - define region described by ARD
