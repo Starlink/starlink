@@ -1,0 +1,42 @@
+pstopnm dataflow.eps
+ppmtogif -transparent white dataflow.eps001.ppm > dataflow.gif
+
+pstopnm -scale 90 effan.eps
+ppmtogif -transparent white effan.eps001.ppm > effan.gif
+
+pstopnm -scale 50 extract.eps
+ppmtogif -transparent white extract.eps001.ppm > extract.gif
+
+pstopnm -scale 80 gaia1.eps
+ppmtogif -transparent white gaia1.eps001.ppm > gaia1.gif
+
+pstopnm -scale 80 gaia2.eps
+ppmtogif -transparent white gaia2.eps001.ppm > gaia2.gif
+
+pstopnm -scale 80 gaia3.eps
+ppmtogif -transparent white gaia3.eps001.ppm > gaia3.gif
+
+pstopnm grids.eps
+ppmtogif -transparent white grids.eps001.ppm > grids.gif
+
+#pstopnm map2.eps
+#ppmtogif -transparent white map2.eps001.ppm > map2.gif
+
+pstopnm -scale 70 optical.eps
+ppmtogif -transparent white optical.eps001.ppm > optical.gif
+
+pstopnm -scale 130 polext.eps
+ppmtogif -transparent white polext.eps001.ppm > polext.gif
+
+pstopnm -scale 130 polka.eps
+ppmtogif -transparent white polka.eps001.ppm > polka.gif
+
+pstopnm quadfit.eps
+ppmtogif -transparent white quadfit.eps001.ppm > quadfit.gif
+
+pstopnm singopt.eps
+ppmtogif -transparent white singopt.eps001.ppm > singopt.gif
+
+pstopnm -scale 150 varest.eps
+ppmtogif -transparent white varest.eps001.ppm > varest.gif
+
