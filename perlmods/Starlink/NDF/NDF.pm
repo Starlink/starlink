@@ -14,6 +14,7 @@ require AutoLoader;
  
 @ISA = qw(Exporter DynaLoader); 
 
+# Version 1.2
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
 
 # Add the following to the 'ndf'=> associative array if you want to
