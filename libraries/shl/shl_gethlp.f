@@ -156,7 +156,7 @@
          CALL MSG_SETC( 'LIB', HELPLB )
          STATUS = SAI__ERROR
          CALL ERR_REP( 'SHL_GETHLP_ERR',
-     :     'Error accessing help on topic \'^TOPIC\' in library ^LIB. '/
+     :     'Error accessing help on topic ''^TOPIC'' in library ^LIB. '/
      :     /'Reason was "^ERR". ', STATUS )
       END IF
 
