@@ -127,7 +127,7 @@ void HMS::print_normal_precise_( char *buf ) const
 {
     // allan: 22.4.98: make sure seconds are formatted with leading zero
     // (%02.2f doesn't do it)
-    char secs[8];
+    char secs[32];
     if (show_sign_) {  // show 2 digits prec for dec, 3 for ra
 	if (sec_ < 10) {
 	    sprintf(secs, "%02d.%02d", int(sec_), int(((sec_-int(sec_))+0.005)*100));
@@ -157,7 +157,7 @@ void HMS::print_normal_precise_( char *buf ) const
 //  Show 4 digits prec for dec, 5 for ra
 void HMS::print_extra_precise_( char *buf ) const
 {
-    char secs[8];
+    char secs[32];
     if (show_sign_) {
 	if ( sec_ < 1000 ) {
             // ??? When would this not be true?
