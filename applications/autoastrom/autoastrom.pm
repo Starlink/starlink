@@ -29,9 +29,11 @@ sub reuse_files (;$);
 sub get_temp_files ();
 sub get_dates ($$$);
 sub invP ($);
+sub verbosity ($);
 
 my $noregenerate = 0;
 my @tempfiles = ();
+my $verbose = 0;	  
 
 # Useful values
 my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
@@ -49,7 +51,7 @@ sub extract_objects ($$$$) {
     my $catname = "$tempdir/extractor";
     if ($noregenerate && -e $catname) {
 	# Nothing to do
-	print STDERR "Reusing $catname...\n";
+	print STDERR "Reusing $catname...\n" if $verbose;
 	return $catname;
     }
 
@@ -65,16 +67,12 @@ sub extract_objects ($$$$) {
     }
     my $tcat = $ENV{AUTOASTROMTEMPCATALOGUE};
 
-#    my $extractor = new Starlink::AMS::Task
-#      ("extractor_mon_$$", "$ENV{EXTRACTOR_DIR}/extractor");
-#    $extractor->contactw  || die "Error launching extractor -- timeout";
-
     my $parlist = "image=$ndfname config=$ENV{AUTOASTROM_DIR}/extractor.config keywords=false";
-    print STDERR "parlist=$parlist\n";
+    print STDERR "parlist=$parlist\n" if $verbose;
     my $status = $extractor->obeyw ("extractor", $parlist);
 
     $status == &Starlink::ADAM::DTASK__ACTCOMPLETE
-      || die "Error running extractor";
+      || croak "Error running extractor";
 
     # Now convert the output to a form suitable for input to
     # FINDOFF. That means that the first three columns should be
@@ -150,25 +148,23 @@ sub ndf_info ($$$) {
 
     my $status = $NDFPack->obeyw ("ndftrace", "$NDF quiet=true");
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-      || die "Error running ndftrace";
+      || croak "Error running ndftrace";
 
     ($status, @lboundpix) = $NDFPack->get ("ndftrace", "lbound");
     ($status == $okstatus)
-      || die "Error getting ndftrace/lbound";
-    #print STDERR "lbound=@lboundpix\n";
+      || croak "Error getting ndftrace/lbound";
 
     ($status, @uboundpix) = $NDFPack->get ("ndftrace", "ubound");
     ($status == $okstatus)
-      || die "Error getting ndftrace/ubound";
-    #print STDERR "ubound=@uboundpix\n";
+      || croak "Error getting ndftrace/ubound";
 
     my $tfile = "$tempdir/wcsshow";
     if ($noregenerate && -e $tfile) {
-	print STDERR "Reusing $tfile...\n";
+	print STDERR "Reusing $tfile...\n" if $verbose;
     } else {
 	$status = $NDFPack->obeyw ("wcsshow", "ndf=$NDF logfile=$tfile quiet=true full=-1");
 	($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-	  || die "Error running wcsshow";
+	  || croak "Error running wcsshow";
 
 	push (@tempfiles, $tfile);
     }
@@ -185,19 +181,15 @@ sub ndf_info ($$$) {
 	    if (!$isSkyDomain
 		&& ($line =~ /domain *= *"?sky"?/i || $line =~ /begin  *skyframe/i)) {
 		$isSkyDomain = 1;
-		print STDERR "SKY domain exists\n";
-	    #if ($line =~ /Domain *= *([^ ]*)/) {
-		#print STDERR "DOMAIN $1\n";
-		#$isSkyDomain = 1 if ($1 =~ /sky/i);
-		#print STDERR "Weh-hey!\n" if ($isSkyDomain);
-	    #}
+		print STDERR "SKY domain exists\n" if $verbose;
 	    }
 	    push (@wcslines, $line);
 	}
 	close (WCS);
 	$wcsref = \@wcslines;
     } else {
-	print STDERR "ndf_info: NDF $NDF does not appear to have a WCS component\n";
+	print STDERR "ndf_info: NDF $NDF does not appear to have a WCS component\n"
+	  if $verbose;
 	$wcsref = undef;
     }
 
@@ -206,7 +198,7 @@ sub ndf_info ($$$) {
     my $fitshash;
     ($fitshash, $status) = fits_read_header($NDF);
     if ($status != $okstatus) {
-	print STDERR "ndf_info: Can't read FITS component\n";
+	print STDERR "ndf_info: Can't read FITS component\n" if $verbose;
 	$fitshash = undef;
     }
     my $ndfdates = get_dates ($NDF, $helpers, $fitshash);
@@ -220,12 +212,14 @@ sub ndf_info ($$$) {
 					   $sthms[1]+($sthms[2]/60));
 	$returnhash{astromtimecomment} = "FITS ST";
     }
-    if (defined ($returnhash{astromtime})) {
-	printf STDERR ("ndf_info: ASTROM Time=%s from %s\n",
-		      $returnhash{astromtime},
-		      $returnhash{astromtimecomment});
-    } else {
-	print STDERR "ndf_info: Can't work out ASTROM Time record\n";
+    if ($verbose) {
+	if (defined ($returnhash{astromtime})) {
+	    printf STDERR ("ndf_info: ASTROM Time=%s from %s\n",
+			   $returnhash{astromtime},
+			   $returnhash{astromtimecomment});
+	} else {
+	    print STDERR "ndf_info: Can't work out ASTROM Time record\n";
+	}
     }
 
     if (defined($fitshash)) {
@@ -256,12 +250,14 @@ sub ndf_info ($$$) {
 	# keyword. The list of these, though not the mappings to SLA
 	# codes, is in the IRAF obsdb.dat file.  See
 	# http://tdc-www.harvard.edu/iraf/rvsao/bcvcorr/obsdb.html
-	if (defined($returnhash{astromobs})) {
-	    printf STDERR ("ndf_info: ASTROM Obs=%s from %s\n",
-			  $returnhash{astromobs},
-			  $returnhash{astromobscomment});
-	} else {
-	    print STDERR "ndf_info: can't work out ASTROM Obs record\n";
+	if ($verbose) {
+	    if (defined($returnhash{astromobs})) {
+		printf STDERR ("ndf_info: ASTROM Obs=%s from %s\n",
+			       $returnhash{astromobs},
+			       $returnhash{astromobscomment});
+	    } else {
+		print STDERR "ndf_info: can't work out ASTROM Obs record\n";
+	    }
 	}
 
 	# ASTROM Met record
@@ -270,12 +266,14 @@ sub ndf_info ($$$) {
 					      $fitshash->{TEMPTUBE} + 273.15);
 	    $returnhash{astrommetcomment} = "FITS TEMPTUBE";
 	}
-	if (defined($returnhash{astrommet})) {
-	    printf STDERR ("ndf_info: ASTROM Met=%s from %s\n",
-			  $returnhash{astrommet},
-			  $returnhash{astrommetcomment});
-	} else {
-	    print STDERR "ndf_info: can't work out ASTROM Met record\n";
+	if ($verbose) {
+	    if (defined($returnhash{astrommet})) {
+		printf STDERR ("ndf_info: ASTROM Met=%s from %s\n",
+			       $returnhash{astrommet},
+			       $returnhash{astrommetcomment});
+	    } else {
+		print STDERR "ndf_info: can't work out ASTROM Met record\n";
+	    }
 	}
 
 	# ASTROM Colour record
@@ -292,26 +290,31 @@ sub ndf_info ($$$) {
 	    $returnhash{astromcol} = $bandmap{$t} if (defined($bandmap{$t}));
 	    $returnhash{astromcolcomment} = "FITS WFFBAND";
 	}
-	if (defined($returnhash{astromcol})) {
-	    printf STDERR ("ndf_info: ASTROM Col=%s from %s\n",
-			  $returnhash{astromcol},
-			  $returnhash{astromcolcomment});
-	} else {
-	    print STDERR "ndf_info: can't work out ASTROM Col record\n";
+	if ($verbose) {
+	    if (defined($returnhash{astromcol})) {
+		printf STDERR ("ndf_info: ASTROM Col=%s from %s\n",
+			       $returnhash{astromcol},
+			       $returnhash{astromcolcomment});
+	    } else {
+		print STDERR "ndf_info: can't work out ASTROM Col record\n";
+	    }
 	}
     }
 
     my $obsdate;
     if (defined($ndfdates->{ndd})) {
 	$obsdate = $ndfdates->{ndd};
-	print STDERR "ndf_info: obsdate $obsdate from NDF history\n";
+	print STDERR "ndf_info: obsdate $obsdate from NDF history\n"
+	  if $verbose;
     } elsif (defined($ndfdates->{fdd})) {
 	$obsdate = $ndfdates->{fdd};
-	print STDERR "ndf_info: obsdate $obsdate from FITS\n";
+	print STDERR "ndf_info: obsdate $obsdate from FITS\n"
+	  if $verbose;
     } else {
 	my @now = localtime();
 	$obsdate = ymd2dec ($now[5]+1900, $now[4]+1, $now[3]);
-	print STDERR "ndf_info: WARNING obsdate $obsdate taken to be NOW\n";
+	print STDERR "ndf_info: WARNING obsdate $obsdate taken to be NOW\n"
+	  if $verbose;
     }
 
     $returnhash{date} = $obsdate;
@@ -349,7 +352,8 @@ sub get_dates ($$$) {
 	    # Yes, it has.  Now find the last history record
 	    my ($nhist, $hrec);
 	    ndf_hinfo ($indf, 'NRECORDS', 0, $nhist, $status);
-	    print STDERR "NDF $NDFfn has $nhist history records\n";
+	    print STDERR "NDF $NDFfn has $nhist history records\n"
+	      if $verbose;
 	    ndf_hinfo ($indf, 'DATE', $nhist, $hrec, $status);
 	
 	    my @dates = split ('[-: ]+', $hrec);
@@ -371,23 +375,27 @@ sub get_dates ($$$) {
     ndf_end ($status);
 
     if ($status != $okstatus) {
-	print STDERR "get_date: NDF error (discarded)\n";
+	print STDERR "get_date: NDF error (discarded)\n"
+	  if $verbose;
 	# Reset the status
 	$status = $okstatus;
     }
 
     if (defined($fitshash)) {
 	if ($status != &NDF::SAI__OK) {
-	    print STDERR "fits_read_header appeared to fail status=$status\n";
+	    print STDERR "fits_read_header appeared to fail status=$status\n"
+	      if $verbose;
 	} elsif (defined($$fitshash{'JD'})) {
 	    $dates{fjd} = $$fitshash{'JD'};
-	    print STDERR "fits_read_header{JD}=", $dates{fjd}, "\n";
+	    print STDERR "fits_read_header{JD}=", $dates{fjd}, "\n"
+	      if $verbose;
 	    # Convert JD to a decimal year.
 	    # Julian epoch=J2000.0 + (JD - 2 451 545)/365.25
 	    $dates{fdd} = 2000.0 + ($dates{fjd} - 2451545)/365.25;
 	} elsif (defined($$fitshash{'DATE-OBS'})) {
 	    my $fitsdate = $$fitshash{'DATE-OBS'};
-	    printf STDERR "fits_read_header{DATE-OBS}=%s\n", $fitsdate;
+	    printf STDERR "fits_read_header{DATE-OBS}=%s\n", $fitsdate
+	      if $verbose;
 	    
 	    # Parse the yyyy?mm?dd date and convert it to a decimal year.
 	    my ($datey,$datem,$dated,$junk);
@@ -418,13 +426,20 @@ sub get_dates ($$$) {
 # Invoke the moggy server to obtain a catalogue corresponding to the
 # proffered bounds of the NDF.  Return the name of a file which is
 # suitable for input into FINDOFF.
+#
+# We will also want to call this with explicitly specified sky
+# position and search size (for the case where the original NDF has no
+# WCS information, and it has to be supplied on the command line).
+# This should be easy if we supply the NDFinforef with ra, dec and
+# radius fields.
 sub get_catalogue ($\%$$) {
     my ($cat, $NDFinforef, $maxobj, $tempdir) = @_;
 
     my $mytempfile = "$tempdir/catalogue";
 
     if ($noregenerate && -e $mytempfile) {
-	print STDERR "Reusing $mytempfile...\n";
+	print STDERR "Reusing $mytempfile...\n"
+	  if $verbose;
 	return $mytempfile;
     }
 
@@ -462,11 +477,11 @@ sub get_catalogue ($\%$$) {
     $cat->maxrow($maxobj);
 
     $cat->status_ok()
-      || die "Can't set catalogue parameters ("
+      || croak "Can't set catalogue parameters ("
 	. $cat->current_statusmessage() . ")\n";
 
     $cat->query()
-      || die "Can't make catalogue query ("
+      || croak "Can't make catalogue query ("
 	. $cat->current_statusmessage() . ")\n";
 
     # Now write the catalogue out to a file which can be used as input
@@ -484,17 +499,13 @@ sub get_catalogue ($\%$$) {
     my $deccol = $cat->resulthascolumn('dec');
     my $magcol = $cat->resulthascolumn('/mag/');
     ($xcol>=0 && $ycol>=0 && $racol>=0 && $deccol>=0)
-      || die "Can't find expected column ($xcol,$ycol,$racol,$deccol) in catalogue results\n";
+      || croak "Can't find expected column ($xcol,$ycol,$racol,$deccol) in catalogue results\n";
     open (PIXCAT, ">$mytempfile")
-      || die "Can't open PIXCAT $mytempfile to write\n";
+      || croak "Can't open PIXCAT $mytempfile to write\n";
     push (@tempfiles, $mytempfile);
     print PIXCAT "# Catalogue generated from autoastrom.pl\n";
     my $i;
     for ($i=0; $i<$nrows; $i++) {
-#	for ($j=0; $j<=$#collist; $j++) {
-#	    print PIXCAT "\t", $resref->[$i]->[$collist[$j]];
-#	}
-#	print PIXCAT "\n";
 	printf PIXCAT "%5d %12.5f %12.5f %12.5f %12.5f %5d %12.5f\n",
 	    $i,
 	    $resref->[$i]->[$xcol], $resref->[$i]->[$ycol],
@@ -527,18 +538,19 @@ sub match_positions ($$$$$) {
     my $cat1out = "$tempfn-cat1.out";
     my $cat2out = "$tempfn-cat2.out";
     if ($noregenerate && -e $cat1out && -e $cat2out) {
-	print STDERR "Reusing $cat1out and $cat2out...\n";
+	print STDERR "Reusing $cat1out and $cat2out...\n"
+	  if $verbose;
 	return ($cat1out, $cat2out);
     }
 
     # Check that the input files exist
     (-r $cat1 && -r $cat2)
-      || die "Can't find FINDOFF input files $cat1 and $cat2\n";
+      || croak "Can't find FINDOFF input files $cat1 and $cat2\n";
 
     # Write these two file names to an input file for FINDOFF
     my $findoffinfile = "$tempfn-findoffin";
     open (FOFF, ">$findoffinfile")
-      || die "Can't open file $findoffinfile to write\n";
+      || croak "Can't open file $findoffinfile to write\n";
     print FOFF "$cat1\n$cat2\n";
     close (FOFF);
     push (@tempfiles, $findoffinfile);
@@ -546,7 +558,7 @@ sub match_positions ($$$$$) {
     # ... and a file containing the names of the output file
     my $findoffoutfile = "$tempfn-findoffout";
     open (FOFF, ">$findoffoutfile")
-      || die "Can't open file $findoffoutfile to write\n";
+      || croak "Can't open file $findoffoutfile to write\n";
     print FOFF "$cat1out\n$cat2out\n";
     close (FOFF);
     push (@tempfiles, $findoffoutfile);
@@ -587,21 +599,19 @@ sub match_positions ($$$$$) {
     $findoffarg .= ' accept';	# safety net: accept default for any
                                 # unspecified parameters
 
-    print STDERR "Calling findoff\n";
-    my $e;
-    foreach $e (split(' ',$findoffarg)) {
-	print STDERR "\t$e\n";
+    if ($verbose) {
+	print STDERR "Calling findoff\n";
+	foreach my $e (split(' ',$findoffarg)) {
+	    print STDERR "\t$e\n";
+	}
     }
 
-#    my $proc = $ccdpack->pid();
-#    print STDERR "...process PID is ", $proc->pid(), ".  Running? ",
-#        ($proc->poll() ? "yes" : "no"), "\n";
     $ccdpack->contact()
       || croak "Ooops, can't contact the CCDPACK monolith\n";
     my $status = $ccdpack->obeyw ("findoff", $findoffarg);
 
     # XXX distinguish the case where FINDOFF crashes somehow, from the
-    # case where it fails to find matches, and DO NOT die in the
+    # case where it fails to find matches, and DO NOT croak in the
     # latter case, but merely return some error.
 
     # If the status returned here is
@@ -697,7 +707,7 @@ sub generate_astrom ($) {
     # should be identical, being a continuous sequence of integers,
     # starting with 1, so check this on input.
     open (IN, "<$par->{CCDin}")
-      || die "Can't open file $par-{CCDin} to read\n";
+      || croak "Can't open file $par-{CCDin} to read\n";
     my $lineno = 0;
     my $line;
     my @CCDarray = ();
@@ -705,27 +715,27 @@ sub generate_astrom ($) {
 	next if ($line =~ /^ *\#/);
 	$lineno++;
 	my @tmparr = split (' ', $line);
-	$tmparr[0] == $lineno || die "File $par->{CCDin} has wrong format\n";
+	$tmparr[0] == $lineno || croak "File $par->{CCDin} has wrong format\n";
 	push (@CCDarray, \@tmparr);
     }
     close (IN);
 
     my @CATarray = ();
     open (IN, "<$par->{catalogue}")
-      || die "Can't open file $par->{catalogue} to read\n";
+      || croak "Can't open file $par->{catalogue} to read\n";
     $lineno = 0;
     while (defined($line = <IN>)) {
 	next if ($line =~ /^ *\#/);
 	$lineno++;
 	my @tmparr = split (' ', $line);
 	$tmparr[0] == $lineno
-	  || die "File $par->{catalogue} has wrong format\n";
+	  || croak "File $par->{catalogue} has wrong format\n";
 	push (@CATarray, \@tmparr);
     }
     close (IN);
 
     ($#CCDarray == $#CATarray)
-      || die "generate_astrom: input files have different number of matches\n";
+      || croak "generate_astrom: input files have different number of matches\n";
 
 
     # {maxnterms} is the maximum number of fit terms to try, and
@@ -737,7 +747,8 @@ sub generate_astrom ($) {
 			  && defined($par->{NDFinfo}->{astromobs})
 			  && defined($par->{NDFinfo}->{astromcol})
 			  && ($#CCDarray >= 10))) {
-	print STDERR "generate_astrom: Not enough observation data, I'm doing only a 6-parameter fit\n";
+	print STDERR "generate_astrom: Not enough observation data, I'm doing only a 6-parameter fit\n"
+	  if $verbose;
 	$nterms = 6;
     }
 
@@ -771,7 +782,8 @@ sub generate_astrom ($) {
     #-
     my $samplesd = sqrt($statM/($nmatches-1));
     printf STDERR ("CCD-CAT offset=(%.2f,%.2f)pix, M=%f sample s.d.=%f\n",
-		   $xoffset, $yoffset, $statM, $samplesd);
+		   $xoffset, $yoffset, $statM, $samplesd)
+      if $verbose;
 
     #+ How good a match is this?
     #
@@ -871,7 +883,8 @@ sub generate_astrom ($) {
 	    printf STDERR ("Very poor (way too good) match\n\t(%d matches, SSD=%f, Q(chi2)=%.5f).\n\tThe FINDOFF error parameter is probably too high.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels, Q(samplesd)=%.5f)\n",
 			   $nmatches, $samplesd, $Q,
 			   $findofferr, $findoffboxprop*100, $findoffsigma,
-			   qchi($statM/($samplesd*$samplesd),2*($nmatches-1)));
+			   qchi($statM/($samplesd*$samplesd),2*($nmatches-1)))
+	      if $verbose;
 	    $matchquality = +3;
 	    last MATCHQUALITY;
 	}
@@ -879,7 +892,8 @@ sub generate_astrom ($) {
 	    # A dubiously good match
 	    printf STDERR ("Rather dodgy (ie, implausibly good) match\n\t(%d matches, SSD=%f, Q(chi2)=%.3f).\n\tThe FINDOFF error parameter may be too high.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
 			   $nmatches, $samplesd, $Q,
-			   $findofferr, $findoffboxprop*100, $findoffsigma);
+			   $findofferr, $findoffboxprop*100, $findoffsigma)
+	      if $verbose;
 	    $matchquality = +2;
 	    last MATCHQUALITY;
 	}
@@ -887,7 +901,8 @@ sub generate_astrom ($) {
 	    # A good match, at p=0.95
 	    printf STDERR ("Good match\n\t(%d matches, SSD=%f, Q(chi2)=%.3f).\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
 			   $nmatches, $samplesd, $Q,
-			   $findofferr, $findoffboxprop*100, $findoffsigma);
+			   $findofferr, $findoffboxprop*100, $findoffsigma)
+	      if $verbose;
 	    if ($Q > 0.5) {
 		$matchquality = +1;
 	    } else {
@@ -899,14 +914,16 @@ sub generate_astrom ($) {
 	    # A dubiously poor match
 	    printf STDERR ("Rather dodgy (ie, implausibly bad) match\n\t(%d matches, SSD=%f, Q(chi2)=%.5f).\n\tEither these position lists do not match,\n\tor else the FINDOFF error parameter is set too low.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
 			   $nmatches, $samplesd, $Q,
-			   $findofferr, $findoffboxprop*100, $findoffsigma);
+			   $findofferr, $findoffboxprop*100, $findoffsigma)
+	      if $verbose;
 	    $matchquality = -2;
 	    last MATCHQUALITY;
 	}
 	# Q<=0.025.  A very poor match
 	printf STDERR ("Unlikely (ie, implausibly bad) match\n\t(%d matches, SSD=%f, Q(chi2)=%.3f).\n\tEither these position lists simply do not match,\n\tor else the FINDOFF error parameter is far too low.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
 		       $nmatches, $samplesd, $Q,
-		       $findofferr, $findoffboxprop*100, $findoffsigma);
+		       $findofferr, $findoffboxprop*100, $findoffsigma)
+	  if $verbose;
 	$matchquality = -3;
     }
     # e/\sigma=$eoversigma, so given that $samplesd is an estimate of
@@ -917,7 +934,7 @@ sub generate_astrom ($) {
 
     my $astromofile = "$tempfn-astromin";
     open (ASTROMOUT, ">$astromofile")
-      || die "Can't open file $astromofile to write\n";
+      || croak "Can't open file $astromofile to write\n";
     push (@tempfiles, "$astromofile");
     my $timestring = localtime();
     print ASTROMOUT "* ASTROM input file generated by...\n* $0\n* $timestring\n";
@@ -976,7 +993,8 @@ sub generate_astrom ($) {
 	    my $outndfname = "$inndfname-out";
 	    my $asttranarg = "this=$astrom->{wcs}";
 	    $asttranarg .= " in=$inndfname out=$outndfname forward=true";
-	    print STDERR "Calling asttrann $asttranarg...\n";
+	    print STDERR "Calling asttrann $asttranarg...\n"
+	      if $verbose;
 	    my $status = $par->{helpers}->{atools}->obeyw("asttrann",
 							  $asttranarg);
 	    ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
@@ -986,7 +1004,8 @@ sub generate_astrom ($) {
 	    @projpole = @{$skyd->[0]};
 	    $projpole[0] *= $d2r;
 	    $projpole[1] *= $d2r;
-	    print STDERR "Plate centre: ($pcx,$pcy)->($bestastrometry)->($projpole[0],$projpole[1])\n";
+	    print STDERR "Plate centre: ($pcx,$pcy)->($bestastrometry)->($projpole[0],$projpole[1])\n"
+	      if $verbose;
 	} else {
 	    # Apply the offset obtained from the last step.  The offset is
 	    # calculated as (CCD-catalogue), that is, an estimate of
@@ -1003,7 +1022,8 @@ sub generate_astrom ($) {
 	    defined($projpoleref)
 	      || croak "generate_astrom: Can't convert coordinates";
 	    @projpole = @$projpoleref;
-	    print STDERR "Plate centre: offset ($xoffset,$yoffset): ($pcx,$pcy)->($projpole[0],$projpole[1])\n";
+	    print STDERR "Plate centre: offset ($xoffset,$yoffset): ($pcx,$pcy)->($projpole[0],$projpole[1])\n"
+	      if $verbose;
 	}
 	$projpolesex[0] = dmshms ($projpole[0], 1);
         $projpolesex[1] = dmshms ($projpole[1], 0);
@@ -1086,7 +1106,8 @@ sub run_astrom ($$) {
 		   $arep,
 		   $asum,
 		   "$tempfn-astromout-wcs",
-		   $alog);
+		   $alog)
+      if $verbose;
     my $astromexit = system ("$ENV{ASTROM_DIR}/astrom.x",
 			     '.',
 			     $astromin,
@@ -1116,7 +1137,6 @@ sub run_astrom ($$) {
 
 	($l =~ /^RESULT +(\S+)\s+(\S+)/)
 	  && do { $results{$1} = $2;
-		  #print STDERR "run_astrom: RESULT $1=$2\n";
 		  next; };
 
 	($l =~ /^STATUS +(\S+)/)
@@ -1142,40 +1162,6 @@ sub run_astrom ($$) {
 	    next;
 	};
     }
-#    while (defined ($l=<SUM>)) {
-#	chop $l;
-#	($l =~ /^FIT/) && do { $resultline=undef; $statline=undef; next; };
-#
-#	($l =~ /^RESULT *(.*)/) && do { $resultline = $1; next; };
-#
-#	($l =~ /^STAT *(.*)/) && do { $statline = $1; next; };
-#
-#	($l =~ /^ENDFIT/) && do {
-#	    unless (defined($statline) && defined($resultline)) {
-#		print STDERR "ASTROM logfile malformed!\n";
-#		next;
-#	    }
-#	    # STAT line has fields:
-#	    #    nstars, x-rms, y-rms, r-rms, pix-sum-sq
-#	    my @stats = split (' ', $statline);
-#	    # RESULT line has fields:
-#	    #    nterms, q, RA-rad, DEC-rad, RA-sex, DEC-sex, FITS-WCS
-#	    my @result = split (' ', $resultline);
-#	    my %t = ();
-#	    $t{nterms} = $result[0];
-#	    $t{q}      = $result[1];
-#	    $t{rarad}  = $result[2];
-#	    $t{decrad} = $result[3];
-#	    $t{rasex}  = $result[4];
-#	    $t{decsex} = $result[5];
-#	    $t{wcs}    = $result[6];
-#	    push (@tempfiles, $t{wcs}) if (defined($t{wcs}));
-#	    $t{nstars} = $stats[0];
-#	    $t{residual} = $stats[4];
-#	    push (@ret, \%t);
-#	    next;
-#	};
-#    }
     close (SUM);
 
     @ret || print STDERR "run_astrom: no return values! Either astrom failed, or the log file was incomplete\n";
@@ -1210,7 +1196,7 @@ sub dmshms ($$) {
 	    $val = -$val;
 	}
 	if ($val > 90) {
-	    die "DEC of $val out of range\n";
+	    croak "DEC of $val out of range\n";
 	}
 	# val=90.0000001388 will round to 90
 	$val += 0.0000001388;
@@ -1295,8 +1281,9 @@ sub twodarray2ndf (\@$) {
 	}
     }
     if ($subdim <= 0) {
-	print STDERR "twodarray2ndf: inconsistent array dimensions: ",
-	    "row $i has ".$#{$dat[$i]}." entries, not ".$#{$dat[0]}."\n";
+	print STDERR ("twodarray2ndf: inconsistent array dimensions: row %d has %d entries, not %d\n",
+		      $i, $#{$dat[$i]}, $#{$dat[0]})
+	  if $verbose;
 	return 0;
     }
 
@@ -1528,6 +1515,10 @@ sub invP ($) {
     } while ($rhomod > $accuracy && --$itercount>0);
 
     return $rho;
+}
+
+sub verbosity ($) {
+    $verbose = shift;
 }
 
 1;
