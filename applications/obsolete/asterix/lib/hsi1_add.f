@@ -126,6 +126,7 @@
       INTEGER			CURREC			! Current rec number
       INTEGER			ESIZE			! Extend size
       INTEGER			IVERB			! Verbosity
+      INTEGER			NLEN			! Command length
       INTEGER			SIZE			! Number of records
 
       LOGICAL			THERE			! Exists already?
