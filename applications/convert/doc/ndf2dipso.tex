@@ -1,0 +1,72 @@
+\newpage
+\sstroutine{
+   NDF2DIPSO
+}{
+   Writes an NDF to a DIPSO-format file, which can be read by the
+   DIPSO READ command
+}{
+   \sstdescription{
+      The routine reads a 1-dimensional NDF data file and writes a
+      DIPSO format file.  The NDF TITLE object is also written to the
+      DIPSO file.  Bad pixels found in the NDF result in `breaks' in
+      the DIPSO file.
+   }
+   \sstusage{
+      NDF2DIPSO IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.  A file extension must not be given
+         after the name.  The suggested default is the current NDF if
+         one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Output DIPSO file.  File extension {\tt "}.DAT{\tt "} is assumed.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         NDF2DIPSO OLD NEW
+      }{
+         This converts the NDF file NEW.SDF to the DIPSO file OLD.DAT
+         file.
+      }
+      \sstexamplesubsection{
+         NDF2DIPSO SPECTRE SPECTRE
+      }{
+         This converts the NDF called SPECTRE in file SPECTRE.SDF to
+         the DIPSO file SPECTRE.DAT.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Most NDF components are not supported by the DIPSO format,
+         and therefore anything but the data array, axis centres, and
+         data title will not be copied.
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         If the NDF data array exceeds the DIPSO limits of 28000
+         elements or 1000 breaks in the data, the application will abort
+         with an appropriate error message.
+
+         \sstitem
+         If the NDF does not have a title, {\tt "Data from NDF"} is written
+         as the DIPSO file's title.
+
+         \sstitem
+         If the NDF does not have an axis, the application will abort
+         with an appropriate error message.
+      }
+   }
+}
+\end{document}
