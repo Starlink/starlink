@@ -177,9 +177,18 @@
 *  Related Applications:
 *     SURF: REMSKY
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.7  1999/08/03 20:36:42  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.6  1999/07/26 20:38:01  timj
 *     Improve the checking for 0.0. Some indenting.
 *

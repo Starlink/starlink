@@ -65,10 +65,19 @@
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (JACH)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.15  1999/08/03 20:36:42  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.14  1999/05/15 01:48:40  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -111,25 +120,25 @@ c
  
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'DAT_PAR'                ! Data-system constants
       INCLUDE 'SURF_PAR'               ! SURF constants
       INCLUDE 'MSG_PAR'                ! MSG__ constants
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local Constants :
+*  Local Constants:
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       CHARACTER * 9    TSKNAME         ! Name of this task
       PARAMETER (TSKNAME = 'FLATFIELD')
 
-*    Local variables :
+*  Local variables:
       BYTE             BADBIT          ! Bad bit mask
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in

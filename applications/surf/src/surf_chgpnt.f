@@ -72,6 +72,11 @@
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: T.Jenness   (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 March 19 (timj)
 *        Separate from MODIFY
@@ -82,33 +87,36 @@
 
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
       INCLUDE 'PAR_ERR'
 
-*    Import:
-*    Import-Export:
-*    Export:
+*  Arguments Given:
 
-*    Status :
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
 
-*    External references:
+*  External references:
 
-*    Global variables :
+*  Global variables:
 
-*    Local Constants:
+*  Local Constants:
       INTEGER          MAX__DIM                  ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)                   ! array
       CHARACTER * 15   TSKNAME                   ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_POINTING')  
 
-*    Local variables :
+*  Local variables:
       LOGICAL          CHANGE_POINT              ! .TRUE. if the user wants
                                                  ! to change the pointing
                                                  ! correction array
@@ -158,8 +166,11 @@
       INTEGER          RUN_NUMBER                ! run number of input file
       CHARACTER*1      SIGN                      ! + or -
       CHARACTER*80     STEMP                     ! scratch string
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+
+*  Local data:
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN

@@ -96,8 +96,17 @@
 *  Authors:
 *     Tim Jenness (t.jenness@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.8  1999/08/03 20:36:38  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.7  1999/07/14 21:53:55  timj
 *     Add triple beam support
 *

@@ -124,6 +124,11 @@
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: T.Jenness   (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     {enter_further_changes_here}
@@ -133,25 +138,31 @@
 
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                   ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
       INCLUDE 'SURF_PAR'                  ! SURF constants
       INCLUDE 'MSG_PAR'                   ! MSG__ constants
 
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+*  Arguments Given:
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN
 
-*    Global variables :
-*    Local Constants :
+*  Global variables:
+
+*  Local Constants:
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
       CHARACTER * 1    NEGCHAR            ! Character used to negate a section
@@ -159,7 +170,7 @@
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_DATA')
 
-*    Local variables :
+*  Local variables:
       BYTE             BVALUE             ! Value of byte
       CHARACTER*10     CHG_TYPE           ! Type of array to change
       CHARACTER*10     COMP               ! Selected component
@@ -226,13 +237,14 @@
       LOGICAL          USE_SECT           ! Use or not to use
       REAL             VALUE              ! New data value
 
-*     Internal References :
-*     Local data :
+*  Internal References:
+
+*  Local data:
       DATA SUFFIX_STRINGS /'!_cdat','a','_cdat'/
 
-*     External:
+*  External:
       INCLUDE 'NUM_DEC_CVT'               ! Convert UB to integer
-      INCLUDE 'NUM_DEF_CVT'                ! Function definitions
+      INCLUDE 'NUM_DEF_CVT'               ! Function definitions
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN

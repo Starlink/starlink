@@ -115,6 +115,11 @@
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: T.Jenness   (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     {enter_further_changes_here}
@@ -124,27 +129,25 @@
 
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                   ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
       INCLUDE 'SURF_PAR'                  ! SURF constants
       INCLUDE 'MSG_PAR'                   ! MSG__ constants
 
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN                     ! Length of string
       EXTERNAL CHR_LEN
       BYTE SCULIB_BITON                   ! function to set a specified
                                           ! bit in a byte 
-*    Global variables :
-*    Local Constants :
+*  Local Constants:
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
       CHARACTER * 1    NEGCHAR            ! Character used to negate a section
@@ -154,7 +157,7 @@
       INTEGER          BITNUM             ! Bit affected by this task
       PARAMETER (BITNUM = 3)
 
-*    Local variables :
+*  Local variables:
       BYTE             BADBIT             ! NDF badbit mask
       LOGICAL          BAD_QUALITY        ! .TRUE. if quality to be set
                                           ! bad, .FALSE. if to be set good
@@ -211,9 +214,8 @@
       LOGICAL          SWITCH_EXPECTED    ! .TRUE. if switch is to be
                                           ! specified in data-spec
       LOGICAL          USE_SECT           ! Am I using the section or not?
-*     Internal References :
-*     Local data :
-*     .
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

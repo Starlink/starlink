@@ -115,9 +115,18 @@
 *  Authors:
 *     Tim Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.4  1999/08/03 20:36:42  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.3  1998/06/03 23:34:18  timj
 *     Free IJPOS_PTR. Add (commented out) GRID code.
 *

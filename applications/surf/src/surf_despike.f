@@ -112,10 +112,20 @@
 
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
+*     TIMJ: T. Jenness (t.jenness@jach.hawaii.edu)
 *     {enter_new_authors_here}
 
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*    History:
 *     $Log$
+*     Revision 1.8  1999/08/03 20:36:40  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.7  1999/05/15 01:48:39  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -149,28 +159,28 @@
 *-
 
 
-*    Type Definitions:
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants:
+*  Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'SURF_PAR'                ! SURF constants
       INCLUDE 'MSG_PAR'                 ! for MSG__ constants
 
-*    Status:
+*  Status:
       INTEGER STATUS
 
-*    External References:
+*  External References:
       BYTE    SCULIB_BITON              ! Turn on a bit
 
-*    Local Constants:
+*  Local Constants:
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10 TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'DESPIKE2')
 
-*    Local variables:
+*  Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
                                         ! aborted
       BYTE         BADBIT               ! Bad bit mask

@@ -47,6 +47,11 @@
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: T.Jenness   (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     13 March 1997 (timj)
 *         Make separate FLATFIELD task from MODIFY
@@ -57,29 +62,36 @@
 
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
 
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+*  Arguments Given:
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITON                          ! function to set a specified
                                                  ! bit in a byte 
-*    Global variables :
-*    Local Constants :
+*  Global variables:
+
+*  Local Constants:
       INTEGER          MAX__DIM                  ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)                   ! array
       CHARACTER * 11   TSKNAME                   ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_FLAT')
-*    Local variables :
+
+*  Local variables:
       INTEGER          B                         ! DO loop index
       BYTE             BADBIT                    ! NDF badbit mask
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -163,8 +175,11 @@
                                                  ! the input file
       INTEGER          RUN_NUMBER                ! run number of input file
       CHARACTER*80     STEMP                     ! scratch string
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+
+*  Local data:
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
