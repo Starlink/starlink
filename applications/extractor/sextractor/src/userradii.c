@@ -65,6 +65,7 @@
 #include "globals.h"
 #include "plist.h"
 #include "userradii.h"
+#include "prefs.h"
 
 void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
                 pliststruct *pixel )
