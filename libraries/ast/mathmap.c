@@ -1,16 +1,10 @@
-/* To do:
-      o Write user documentation.
-      o Sort out how to implement x ? a : b efficiently (using a mask stack
-        maybe?).
-*/
-
 /*
 *class++
 *  Name:
 *     MathMap
 
 *  Purpose:
-*     Transform coordinates using symbolic transformation functions.
+*     Transform coordinates using mathematical expressions.
 
 *  Constructor Function:
 c     astMathMap
@@ -54,6 +48,8 @@ f     The MathMap class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS MathMap
 
+/* Allocate pointer array. */
+/* ----------------------- */
 /* This macro allocates an array of pointers. If successful, each element
    of the array is initialised to NULL. */
 #define MALLOC_POINTER_ARRAY(array_name,array_type,array_size) \
@@ -69,13 +65,15 @@ f     The MathMap class does not define any new routines beyond those
       } \
    }
 
+/* Free pointer array. */
+/* ------------------- */
 /* This macro frees a dynamically allocated array of pointers, each of
    whose elements may point at a further dynamically allocated array
    (which is also to be freed). It also allows for the possibility of any
    of the pointers being NULL. */
 #define FREE_POINTER_ARRAY(array_name,array_size) \
 \
-/* Check thet the main array pointer is not NULL. */ \
+/* Check that the main array pointer is not NULL. */ \
    if ( (array_name) ) { \
 \
 /* If OK, loop to free each of the sub-arrays. */ \
@@ -124,7 +122,8 @@ f     The MathMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-
+/* This type is made obscure since it is publicly accessible (but not
+   useful). Provide shorthand for use within this module. */
 typedef AstMathMapRandContext_ Rcontext;
 
 /* Define the class virtual function table and its initialisation flag
@@ -178,9 +177,7 @@ typedef enum {
    OP_COSD,                      /* Cosine (degrees) */
    OP_COSH,                      /* Hyperbolic cosine */
    OP_EXP,                       /* Exponential function */
-   OP_EXP2,                      /* Exponent of 2 from C frexp function */
    OP_FLOOR,                     /* C floor function (round down) */
-   OP_FR2,                       /* Normalised fraction from C frexp fn */
    OP_INT,                       /* Integer value (round towards zero) */
    OP_ISBAD,                     /* Test for bad value */
    OP_LOG,                       /* Natural logarithm */
@@ -308,10 +305,8 @@ static const Symbol symbol[] = {
    { "cosd("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COSD     },
    { "cosh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COSH     },
    { "exp("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_EXP      },
-   { "exp2("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_EXP2     },
    { "fabs("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ABS      },
    { "floor("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_FLOOR    },
-   { "fr2("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_FR2      },
    { "int("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_INT      },
    { "isbad("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ISBAD    },
    { "log("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_LOG      },
@@ -434,24 +429,24 @@ static void ClearAttrib( AstObject *, const char * );
 static void ClearSeed( AstMathMap * );
 static void ClearSimpFI( AstMathMap * );
 static void ClearSimpIF( AstMathMap * );
-static void CompileExpression( const char *, const char *, int, const char *[], int **, double **, int * );
-static void CompileMapping( const char *, int, int, int, const char *[], int, const char *[], int ***, int ***, double ***, double ***, int *, int * );
+static void CompileExpression( const char *, const char *, const char *, int, const char *[], int **, double **, int * );
+static void CompileMapping( const char *, const char *, int, int, int, const char *[], int, const char *[], int ***, int ***, double ***, double ***, int *, int * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void EvaluateFunction( Rcontext *, int, int, const double **, const int *, const double *, int, double * );
+static void EvaluateFunction( Rcontext *, int, const double **, const int *, const double *, int, double * );
 static void EvaluationSort( const double [], int, int [], int **, int * );
-static void ExtractExpressions( const char *, int, const char *[], int, char *** );
-static void ExtractVariables( const char *, int, const char *[], int, int, int, int, int, char *** );
+static void ExtractExpressions( const char *, const char *, int, const char *[], int, char *** );
+static void ExtractVariables( const char *, const char *, int, const char *[], int, int, int, int, int, char *** );
 static void InitVtab( AstMathMapVtab * );
-static void ParseConstant( const char *, const char *, int, int *, double * );
+static void ParseConstant( const char *, const char *, const char *, int, int *, double * );
 static void ParseName( const char *, int, int * );
-static void ParseVariable( const char *, const char *, int, int, const char *[], int *, int * );
+static void ParseVariable( const char *, const char *, const char *, int, int, const char *[], int *, int * );
 static void SetAttrib( AstObject *, const char * );
 static void SetSeed( AstMathMap *, int );
 static void SetSimpFI( AstMathMap *, int );
 static void SetSimpIF( AstMathMap *, int );
-static void ValidateSymbol( const char *, const char *, int, int, int *, int **, int **, int *, double ** );
+static void ValidateSymbol( const char *, const char *, const char *, int, int, int *, int **, int **, int *, double ** );
 
 /* Member functions. */
 /* ================= */
@@ -615,8 +610,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
-static void CompileExpression( const char *method, const char *exprs,
-                               int nvar, const char *var[],
+static void CompileExpression( const char *method, const char *class,
+                               const char *exprs, int nvar, const char *var[],
                                int **code, double **con, int *stacksize ) {
 /*
 *  Name:
@@ -630,8 +625,8 @@ static void CompileExpression( const char *method, const char *exprs,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void CompileExpression( const char *method, const char *exprs,
-*                             int nvar, const char *var[],
+*     void CompileExpression( const char *method, const char *class,
+*                             const char *exprs, int nvar, const char *var[],
 *                             int **code, double **con, int *stacksize )
 
 *  Class Membership:
@@ -648,6 +643,10 @@ static void CompileExpression( const char *method, const char *exprs,
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        to be compiled. This is case sensitive and should contain no white
@@ -809,8 +808,8 @@ static void CompileExpression( const char *method, const char *exprs,
    validate it, updating the parenthesis level and argument count
    information at the same time. */
       if ( found ) {
-         ValidateSymbol( method, exprs, iend, sym, &lpar, &argcount, &opensym,
-                         &ncon, con );
+         ValidateSymbol( method, class, exprs, iend, sym, &lpar, &argcount,
+                         &opensym, &ncon, con );
 
 /* If it was not one of the standard symbols, then check if the next
    symbol was expected to be an operator. If so, then there is a missing
@@ -818,14 +817,14 @@ static void CompileExpression( const char *method, const char *exprs,
       } else {
          if ( opernext ) {
             astError( AST__MIOPR,
-                      "%s: Missing or invalid operator in the expression "
+                      "%s(%s): Missing or invalid operator in the expression "
                       "\"%.*s\".",
-                      method, istart + 1, exprs );
+                      method, class, istart + 1, exprs );
 
 /* If the next symbol was expected to be an operand, then it may be a
    constant, so try to parse it as one. */
          } else {
-            ParseConstant( method, exprs, istart, &iend, &c );
+            ParseConstant( method, class, exprs, istart, &iend, &c );
             if ( astOK ) {
 
 /* If successful, set the symbol number to "symbol_ldcon" (load
@@ -843,7 +842,7 @@ static void CompileExpression( const char *method, const char *exprs,
 /* If the symbol did not parse as a constant, then it may be a
    variable name, so try to parse it as one. */
                } else {
-                  ParseVariable( method, exprs, istart, nvar, var,
+                  ParseVariable( method, class, exprs, istart, nvar, var,
                                  &ivar, &iend );
                   if ( astOK ) {
 
@@ -864,9 +863,9 @@ static void CompileExpression( const char *method, const char *exprs,
    missing operand in the expression, so report an error. */
                      } else {
                         astError( AST__MIOPA,
-                                  "%s: Missing or invalid operand in the "
+                                  "%s(%s): Missing or invalid operand in the "
                                   "expression \"%.*s\".",
-                                  method, istart + 1, exprs );
+                                  method, class, istart + 1, exprs );
                      }
                   }
                }
@@ -908,15 +907,17 @@ static void CompileExpression( const char *method, const char *exprs,
    operator on the end of the expression, so report an error. */
       if ( !opernext ) {
          astError( AST__MIOPA,
-                   "%s: Missing or invalid operand in the expression \"%s\".",
-                   method, exprs );
+                   "%s(%s): Missing or invalid operand in the expression "
+                   "\"%s\".",
+                   method, class, exprs );
 
 /* If the final parenthesis level is positive, then there is a missing
    right parenthesis, so report an error. */
       } else if ( lpar > 0 ) {
          astError( AST__MRPAR,
-                   "%s: Missing right parenthesis in the expression \"%s\".",
-                   method, exprs );
+                   "%s(%s): Missing right parenthesis in the expression "
+                   "\"%s\".",
+                   method, class, exprs );
       }
    }
 
@@ -943,7 +944,8 @@ static void CompileExpression( const char *method, const char *exprs,
    }
 }
 
-static void CompileMapping( const char *method, int nin, int nout,
+static void CompileMapping( const char *method, const char *class,
+                            int nin, int nout,
                             int nfwd, const char *fwdfun[],
                             int ninv, const char *invfun[],
                             int ***fwdcode, int ***invcode,
@@ -961,8 +963,10 @@ static void CompileMapping( const char *method, int nin, int nout,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void CompileMapping( const char *method, int nin, int nout,
-*                          const char *fwdfun[], const char *invfun[],
+*     void CompileMapping( const char *method, const char *class,
+*                          int nin, int nout,
+*                          int nfwd, const char *fwdfun[],
+*                          int ninv, const char *invfun[],
 *                          int ***fwdcode, int ***invcode,
 *                          double ***fwdcon, double ***invcon,
 *                          int *fwdstack, int *invstack )
@@ -981,6 +985,10 @@ static void CompileMapping( const char *method, int nin, int nout,
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     nin
 *        Number of input variables for the MathMap.
 *     nout
@@ -1118,7 +1126,7 @@ static void CompileMapping( const char *method, int nin, int nout,
 
 /* Extract the variable names from the left hand sides of these
    functions and check them for validity and absence of duplication. */
-      ExtractVariables( method, nvar, strings, nin, nout, nfwd, ninv, 1,
+      ExtractVariables( method, class, nvar, strings, nin, nout, nfwd, ninv, 1,
                         &var );
    }
 
@@ -1127,7 +1135,7 @@ static void CompileMapping( const char *method, int nin, int nout,
 
 /* Extract the expressions from the right hand sides of the forward
    transformation functions. */
-   ExtractExpressions( method, nfwd, fwdfun, 1, &exprs );
+   ExtractExpressions( method, class, nfwd, fwdfun, 1, &exprs );
 
 /* If OK, and the forward transformation is defined, then allocate and
    initialise space for an array of pointers to the opcodes for each
@@ -1143,7 +1151,7 @@ static void CompileMapping( const char *method, int nin, int nout,
    can only use variables which have been defined earlier. */
       if ( astOK ) {
          for ( ifun = 0; ifun < nfwd; ifun++ ) {
-            CompileExpression( method, exprs[ ifun ],
+            CompileExpression( method, class, exprs[ ifun ],
                                nin + ifun, (const char **) var,
                                &( *fwdcode )[ ifun ], &( *fwdcon )[ ifun ],
                                &stacksize );
@@ -1191,7 +1199,7 @@ static void CompileMapping( const char *method, int nin, int nout,
 
 /* Extract the variable names from the left hand sides of these
    functions and check them for validity and absence of duplication. */
-      ExtractVariables( method, nvar, strings, nin, nout, nfwd, ninv, 0,
+      ExtractVariables( method, class, nvar, strings, nin, nout, nfwd, ninv, 0,
                         &var );
    }
 
@@ -1200,7 +1208,7 @@ static void CompileMapping( const char *method, int nin, int nout,
 
 /* Extract the expressions from the right hand sides of the inverse
    transformation functions. */
-   ExtractExpressions( method, ninv, invfun, 0, &exprs );
+   ExtractExpressions( method, class, ninv, invfun, 0, &exprs );
 
 /* If OK, and the forward transformation is defined, then allocate and
    initialise space for an array of pointers to the opcodes for each
@@ -1216,7 +1224,7 @@ static void CompileMapping( const char *method, int nin, int nout,
    can only use variables which have been defined earlier. */
       if ( astOK ) {
          for ( ifun = 0; ifun < ninv; ifun++ ) {
-            CompileExpression( method, exprs[ ifun ],
+            CompileExpression( method, class, exprs[ ifun ],
                                nout + ifun, (const char **) var,
                                &( *invcode )[ ifun ], &( *invcon )[ ifun ],
                                &stacksize );
@@ -1359,9 +1367,8 @@ static int DefaultSeed( const Rcontext *context ) {
 }
 
 static void EvaluateFunction( Rcontext *rcontext, int npoint,
-                              int ncoord_in, const double **ptr_in,
-                              const int *code, const double *con,
-                              int stacksize, double *out ) {
+                              const double **ptr_in, const int *code,
+                              const double *con, int stacksize, double *out ) {
 /*
 *  Name:
 *     EvaluateFunction
@@ -1374,9 +1381,9 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void EvaluateFunction( int npoint, int ncoord_in, const double **ptr_in,
-*                            const int *code, const double *con, int stacksize,
-*                            double *out )
+*     void EvaluateFunction( Rcontext *rcontext, int npoint,
+*                            const double **ptr_in, const int *code,
+*                            const double *con, int stacksize, double *out )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1397,13 +1404,11 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 *     npoint
 *        The number of points to be transformd (i.e. the size of the vector
 *        of values on which operations are to be performed).
-*     ncoord_in
-*        The number of input coordinames per point.
 *     ptr_in
-*        Pointer to an array (with "ncoord_in" elements) of pointers to arrays
-*        of double (with "npoint" elements). These arrays should contain the
-*        input coordinate values, such that coordinate number "coord" for point
-*        number "point" can be found in "ptr_in[coord][point]".
+*        Pointer to an array of pointers to arrays of double (with "npoint"
+*        elements). These arrays should contain the input coordinate values,
+*        such that coordinate number "coord" for point number "point" can be
+*        found in "ptr_in[coord][point]".
 *     code
 *        Pointer to an array of int containing the set of opcodes (cast to int)
 *        for the operations to be performed. The first element of this array
@@ -1516,6 +1521,8 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
          stack[ istk ] = work + ( istk - 1 ) * npoint;
       }
 
+/* Define stack operations. */
+/* ======================== */
 /* We now define a set of macros for performing vector operations on
    elements of the stack. Each is in the form of a "case" block for
    execution in response to the appropriate operation code (opcode). */
@@ -1677,9 +1684,12 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 /* Break out of the "case" block. */ \
       break;
 
-/* We now define some macros for performing mathematical operations in
-   a "safe" way - i.e. trapping numerical problems such as overflow and
-   invalid arguments and translating them into the AST__BAD value. */
+/* Define arithmetic operations. */
+/* ============================= */
+/* We now define macros for performing some of the arithmetic
+   operations we will require in a "safe" way - i.e. trapping numerical
+   problems such as overflow and invalid arguments and translating them
+   into the AST__BAD value. */
 
 /* Absolute value. */
 /* --------------- */
@@ -1892,15 +1902,32 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    ) \
 )
 
-/* Bit shift operation. */
+/* Bit-shift operation. */
 /* -------------------- */
-#define SHIFT_BITS( x1, x2 ) ( \
+/* This macro shifts the bits in a double value a specified number of
+   places to the left, which simply corresponds to multiplying by the
+   appropriate power of two. */
+#define SHIFT_BITS(x1,x2) ( \
+\
+/* Decompose the value into a normalised fraction and a power of 2. */ \
    frac = frexp( (x1), &expon ), \
+\
+/* Calculate the new power of 2 which should apply after the shift, \
+   rounding towards zero to give an integer value. */ \
    newexp = INT( (x2) ) + (double) expon, \
+\
+/* If the new exponent is too negative to convert to an integer, then \
+   the result must underflow to zero. */ \
    ( newexp < (double) -INT_MAX ) ? ( \
       0.0 \
+\
+/* Otherwise, if it is too positive to convert to an integer, then the \
+   result must overflow, unless the normalised fraction is zero. */ \
    ) : ( ( newexp > (double) INT_MAX ) ? ( \
-      AST__BAD \
+      ( frac == 0.0 ) ? 0.0 : AST__BAD \
+\
+/* Otherwise, convert the new exponent to an integer and apply \
+   it. Trap any overflow which may still occur. */ \
    ) : ( \
       CATCH_MATHS_OVERFLOW( ldexp( frac, (int) newexp ) ) \
    ) ) \
@@ -1918,7 +1945,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    fraction bits of floating point numbers. It also offers greater
    precision (the first 53 or so significant bits of the result being
    preserved for typical IEEE floating point implementations). */
-#define BIT_OPER( oper, x1, x2 ) \
+#define BIT_OPER(oper,x1,x2) \
 \
 /* Convert each argument to a normalised fraction in the range \
    [0.5,1.0) and a power of two exponent, removing any sign \
@@ -2036,7 +2063,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 /* This macro expands to code which assigns a pseudo-random value to
    the "result" variable. The value is drawn from a Gaussian distribution
    with mean "x1" and standard deviation "ABS(x2)". */
-#define GAUSS( x1, x2 ) \
+#define GAUSS(x1,x2) \
 \
 /* Loop until a satisfactory result is obtained. */ \
    do { \
@@ -2055,8 +2082,8 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    overflow. */ \
    } while ( result == AST__BAD );
 
-/* All the required macros are now defined. */
-
+/* Implement the stack-based arithmetic. */
+/* ===================================== */
 /* Initialise the top of stack index and constant counter. */
       tos = -1;
       icon = 0;
@@ -2131,10 +2158,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
             ARG_1( OP_COSD,     *y = cos( x * d2r ) )
             ARG_1( OP_COSH,     *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
             ARG_1( OP_EXP,      *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
-            ARG_1( OP_EXP2,     (void) frexp( x, &expon );
-                                *y = (double) expon )
             ARG_1( OP_FLOOR,    *y = floor( x ) )
-            ARG_1( OP_FR2,      *y = frexp( x, &expon ) )
             ARG_1( OP_INT,      *y = INT( x ) )
             ARG_1B( OP_ISBAD,   *y = ( x == AST__BAD ) )
             ARG_1( OP_LOG,      *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
@@ -2254,8 +2278,8 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 #undef SAFE_SUB
 #undef SAFE_MUL
 #undef SAFE_DIV
-#undef BIT_OPER
 #undef SHIFT_BITS
+#undef BIT_OPER
 #undef GAUSS
 }
 
@@ -2468,8 +2492,8 @@ static void EvaluationSort( const double con[], int nsym, int symlist[],
    }
 }
 
-static void ExtractExpressions( const char *method, int nfun,
-                                const char *fun[], int forward,
+static void ExtractExpressions( const char *method, const char *class,
+                                int nfun, const char *fun[], int forward,
                                 char ***exprs ) {
 /*
 *  Name:
@@ -2483,8 +2507,8 @@ static void ExtractExpressions( const char *method, int nfun,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ExtractExpressions( const char *method, int nfun,
-*                              const char *fun[], int forward,
+*     void ExtractExpressions( const char *method, const char *class,
+*                              int nfun, const char *fun[], int forward,
 *                              char ***exprs )
 
 *  Class Membership:
@@ -2505,6 +2529,10 @@ static void ExtractExpressions( const char *method, int nfun,
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     nfun
 *        The number of functions to be analysed.
 *     fun
@@ -2513,7 +2541,7 @@ static void ExtractExpressions( const char *method, int nfun,
 *        strings should contain no white space.
 *     forward
 *        A non-zero value indicates the the MathMap's forward transformation
-*        functions are being compiled, while a zero value indicates compilation
+*        functions are being processed, while a zero value indicates processing
 *        of the inverse transformation functions. This value is used solely for
 *        constructing error messages.
 *     exprs
@@ -2577,8 +2605,9 @@ static void ExtractExpressions( const char *method, int nfun,
    error and quit. */
             } else {
                astError( AST__NORHS,
-                         "%s: Missing right hand side in expression: \"%s\".",
-                         method, fun[ ifun ] );
+                         "%s(%s): Missing right hand side in expression: "
+                         "\"%s\".",
+                         method, class, fun[ ifun ] );
                astError( astStatus,
                          "Error in %s transformation function %d.",
                          forward ? "forward" : "inverse", ifun + 1 );
@@ -2597,13 +2626,13 @@ static void ExtractExpressions( const char *method, int nfun,
    }
 
 /* Either all functions should have an "=" sign (in which case the
-   transformation is defined), nor none of them should have (in which
-   case it is undefined). If some do and some don't, then report an
-   error, citing the first instance of a missing "=" sign. */
+   transformation is defined), or none of them should have (in which case
+   it is undefined). If some do and some don't, then report an error,
+   citing the first instance of a missing "=" sign. */
    if ( astOK && ( nud != 0 ) && ( nud != nfun ) ) {
       astError( AST__NORHS,
-                "%s: Missing right hand side in function: \"%s\".",
-                method, fun[ iud ] );
+                "%s(%s): Missing right hand side in function: \"%s\".",
+                method, class, fun[ iud ] );
       astError( astStatus,
                 "Error in %s transformation function %d.",
                 forward ? "forward" : "inverse", iud + 1 );
@@ -2616,7 +2645,8 @@ static void ExtractExpressions( const char *method, int nfun,
    }
 }
 
-static void ExtractVariables( const char *method, int nfun, const char *fun[],
+static void ExtractVariables( const char *method, const char *class,
+                              int nfun, const char *fun[],
                               int nin, int nout, int nfwd, int ninv,
                               int forward, char ***var ) {
 /*
@@ -2631,7 +2661,8 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ExtractVariables( const char *method, int nfun, const char *fun[],
+*     void ExtractVariables( const char *method, const char *class,
+*                            int nfun, const char *fun[],
 *                            int nin, int nout, int nfwd, int ninv,
 *                            int forward, char ***var )
 
@@ -2650,6 +2681,10 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     nfun
 *        The number of functions to be analysed.
 *     fun
@@ -2672,7 +2707,7 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
 *        Number of inverse transformation functions for the MathMap.
 *     forward
 *        A non-zero value indicates the the MathMap's forward transformation
-*        functions are being compiled, while a zero value indicates compilation
+*        functions are being processed, while a zero value indicates processing
 *        of the inverse transformation functions. This value, together with
 *        "nin", "nout", "nfwd" and "ninv" are used solely for constructing
 *        error messages.
@@ -2739,8 +2774,8 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
          if ( !nc ) {
             if ( c ) {
                astError( AST__MISVN,
-                         "%s: No left hand side in expression: \"%s\".",
-                         method, fun[ ifun ] );
+                         "%s(%s): No left hand side in expression: \"%s\".",
+                         method, class, fun[ ifun ] );
             } else {
                astError( AST__MISVN,
                          "%s: Transformation function contains no variable "
@@ -2773,8 +2808,8 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
    have an invalid variable name, so report an error and quit. */
          if ( ( iend < 0 ) || ( *var )[ ifun ][ iend + 1 ] ) {
             astError( AST__VARIN,
-                      "%s: Variable name is invalid: \"%s\".",
-                      method, ( *var )[ ifun ] );
+                      "%s(%s): Variable name is invalid: \"%s\".",
+                      method, class, ( *var )[ ifun ] );
             break;
          }
       }
@@ -2807,8 +2842,9 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
 /* If a duplicate variable name is found, report an error. */
             if ( !strcmp( ( *var )[ i1 ], ( *var )[ i2 ] ) ) {
                astError( AST__DUVAR,
-                         "%s: Duplicate definition of variable name: \"%s\".",
-                         method, ( *var )[ i1 ] );
+                         "%s(%s): Duplicate definition of variable name: "
+                         "\"%s\".",
+                         method, class, ( *var )[ i1 ] );
 
 /* For each transformation function involved, determine the function
    number and the direction of the transformation of which it forms part,
@@ -2852,7 +2888,7 @@ static double Gauss( Rcontext *context ) {
 *     Gauss
 
 *  Purpose:
-*     Produce a pseudo-random value from a standard Gaussian distribution.
+*     Produce a pseudo-random sample from a standard Gaussian distribution.
 
 *  Type:
 *     Private function.
@@ -2865,9 +2901,9 @@ static double Gauss( Rcontext *context ) {
 *     MathMap member function.
 
 *  Description:
-*     On each invocation, this function returns a pseudo-random number
-*     selected from a standard Gaussian distribution with mean zero and
-*     standard deviation unity. The Box-Muller method is used.
+*     On each invocation, this function returns a pseudo-random sample drawn
+*     from a standard Gaussian distribution with mean zero and standard
+*     deviation unity. The Box-Muller transformation method is used.
 
 *  Parameters:
 *     context
@@ -3180,14 +3216,14 @@ static double LogGamma( double x ) {
 */
 
 /* Local Constants: */
-   const double c0 = 1.000000000190015;
+   const double c0 = 1.000000000190015; /* Coefficients for series sum... */
    const double c1 = 76.18009172947146;
    const double c2 = -86.50532032941677;
    const double c3 = 24.01409824083091;
    const double c4 = -1.231739572450155;
    const double c5 = 0.1208650973866179e-2;
    const double c6 = -0.5395239384953e-5;
-   const double gamma = 5.0;
+   const double g = 5.0;
 
 /* Local Variables: */
    double result;                /* Result value to return */
@@ -3222,9 +3258,9 @@ static double LogGamma( double x ) {
       sum += c6 / ++xx;
 
 /* Calculate the result. */
-      result = x + gamma + 0.5;
+      result = x + g + 0.5;
       result -= ( x + 0.5 ) * log( result );
-      result = -result + log( root_twopi * sum / x );
+      result = log( root_twopi * sum / x ) - result;
    }
 
 /* Return the result. */
@@ -3453,7 +3489,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       ninv2 = !invert2 ? mathmap2->ninv : mathmap2->nfwd;
 
 /* Check whether these values are equal. The MathMaps cannot be
-   idential if they are not. */
+   identical if they are not. */
       simplify = ( nfwd1 == ninv2 );
    }
 
@@ -3529,8 +3565,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static void ParseConstant( const char *method, const char *exprs,
-                           int istart, int *iend, double *con ) {
+static void ParseConstant( const char *method, const char *class,
+                           const char *exprs, int istart, int *iend,
+                           double *con ) {
 /*
 *  Name:
 *     ParseConstant
@@ -3543,8 +3580,9 @@ static void ParseConstant( const char *method, const char *exprs,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ParseConstant( const char *method, const char *exprs,
-*                         int istart, int *iend, double *con )
+*     void ParseConstant( const char *method, const char *class,
+*                         const char *exprs, int istart, int *iend,
+*                         double *con )
 
 *  Class Membership:
 *     MathMap member function.
@@ -3570,6 +3608,10 @@ static void ParseConstant( const char *method, const char *exprs,
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        to be parsed.
@@ -3697,7 +3739,7 @@ static void ParseConstant( const char *method, const char *exprs,
 
 /* Check that one value was read and all the characters consumed. If
    not, then the constant's syntax is invalid. */
-            if ( ( n != 1 ) || ( nc != ( *iend - istart + 1 ) ) ) valid = 0;
+            if ( ( n != 1 ) || ( nc < ( *iend - istart + 1 ) ) ) valid = 0;
          }
 
 /* Free the temporary string. */
@@ -3708,8 +3750,9 @@ static void ParseConstant( const char *method, const char *exprs,
    then report an error. */
       if ( astOK && !valid ) {
          astError( AST__CONIN,
-                   "%s: Invalid constant syntax in the expression \"%.*s\".",
-                   method, *iend + 1, exprs );
+                   "%s(%s): Invalid constant syntax in the expression "
+                   "\"%.*s\".",
+                   method, class, *iend + 1, exprs );
       }
 
 /* If an error occurred, reset the output values. */
@@ -3783,8 +3826,8 @@ static void ParseName( const char *exprs, int istart, int *iend ) {
    }
 }
 
-static void ParseVariable( const char *method, const char *exprs,
-                           int istart, int nvar,
+static void ParseVariable( const char *method, const char *class,
+                           const char *exprs, int istart, int nvar,
                            const char *var[], int *ivar, int *iend ) {
 /*
 *  Name:
@@ -3798,8 +3841,8 @@ static void ParseVariable( const char *method, const char *exprs,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ParseVariable( const char *method, const char *exprs,
-*                         int istart, int nvar,
+*     void ParseVariable( const char *method, const char *class,
+*                         const char *exprs, int istart, int nvar,
 *                         const char *var[], int *ivar, int *iend )
 
 *  Class Membership:
@@ -3818,7 +3861,7 @@ static void ParseVariable( const char *method, const char *exprs,
 *     If the expression does not contain a name at the specified location,
 *     "*ivar" and "*iend" are set to -1 and no error results. However, if
 *     the expression contains a name but it is not in the list of defined
-*     variable names supplied, then an error is also reported.
+*     variable names supplied, then an error is reported.
 *
 *     This function is case sensitive. The expression should not contain
 *     embedded white space.
@@ -3828,6 +3871,10 @@ static void ParseVariable( const char *method, const char *exprs,
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        to be parsed.
@@ -3874,9 +3921,8 @@ static void ParseVariable( const char *method, const char *exprs,
    supplied. */
       found = 0;
       for ( *ivar = 0; *ivar < nvar; ( *ivar )++ ) {
-         found = ( nc == (int) strlen( var[ *ivar ] ) );
-         found = found && !strncmp( exprs + istart, var[ *ivar ],
-                                    (size_t) nc );
+         found = ( nc == (int) strlen( var[ *ivar ] ) ) &&
+                 !strncmp( exprs + istart, var[ *ivar ], (size_t) nc );
 
 /* Break if the name is recognised. */
          if ( found ) break;
@@ -3886,9 +3932,9 @@ static void ParseVariable( const char *method, const char *exprs,
    values. */
       if ( !found ) {
          astError( AST__UDVOF,
-                   "%s: Undefined variable or function in the expression "
+                   "%s(%s): Undefined variable or function in the expression "
                    "\"%.*s\".",
-                   method, *iend + 1, exprs );
+                   method, class, *iend + 1, exprs );
          *ivar = -1;
          *iend = -1;
       }
@@ -3901,7 +3947,7 @@ static double Poisson( Rcontext *context, double mean ) {
 *     Poisson
 
 *  Purpose:
-*     Produce a pseudo-random value from a Poisson distribution.
+*     Produce a pseudo-random sample from a Poisson distribution.
 
 *  Type:
 *     Private function.
@@ -3914,11 +3960,11 @@ static double Poisson( Rcontext *context, double mean ) {
 *     MathMap member function.
 
 *  Description:
-*     On each invocation, this function returns a pseudo-random number
-*     selected from a Poisson distribution with a specified mean. A
-*     combination of methods is used, depending on the value of the
-*     mean. The algorithm is based on that given by Press et al.
-*     (Numerical Recipes), but re-implemented and extended.
+*     On each invocation, this function returns a pseudo-random sample drawn
+*     from a Poisson distribution with a specified mean. A combination of
+*     methods is used, depending on the value of the mean. The algorithm is
+*     based on that given by Press et al. (Numerical Recipes), but
+*     re-implemented and extended.
 
 *  Parameters:
 *     context
@@ -3976,8 +4022,8 @@ static double Poisson( Rcontext *context, double mean ) {
 
 /* Calculate the value of the distribution mean for which the smallest
    representable deviation from the mean permitted by the machine
-   precision is one million standard deviations. */
-      huge = pow( 1.0e6 / DBL_EPSILON, 2.0 );
+   precision is one thousand standard deviations. */
+      huge = pow( 1.0e3 / DBL_EPSILON, 2.0 );
 
 /* Calculate the largest value such that
    (0.9+(sqrt_point9*ranmax)*(sqrt_point9*ranmax)) doesn't overflow,
@@ -4245,7 +4291,7 @@ static double Rand( Rcontext *context ) {
    result = 0.0;
 
 /* Loop to generate sufficient random integers to combine into a
-   single double value. */
+   double value. */
    scale = norm;
    for ( irand = 0; irand < nrand; irand++ ) {
 
@@ -4538,7 +4584,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    result = (*parent_transform)( map, in, forward, out );
 
 /* We will now extend the parent astTransform method by performing the
-   permutation needed to generate the output coordinate values. */
+   transformation needed to generate the output coordinate values. */
 
 /* Determine the numbers of points and coordinates per point from the input
    and output PointSets and obtain pointers for accessing the input and output
@@ -4561,7 +4607,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 
 /* If intermediate results are to be calculated, then allocate
    workspace to hold them (each intermediate result being a vector of
-   values). */
+   "npoint" double values). */
    if ( nfun > ncoord_out ) {
       work = astMalloc( sizeof( double) *
                         (size_t) ( npoint * ( nfun - ncoord_out ) ) );
@@ -4608,8 +4654,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    "data_ptr" array (skipping the input data elements), while the
    function has access to all previous elements of the "data_ptr" array
    to locate the required input data. */
-         EvaluateFunction( &this->rcontext, npoint, ncoord_in + ifun,
-                           (const double **) data_ptr,
+         EvaluateFunction( &this->rcontext, npoint, (const double **) data_ptr,
                            forward ? this->fwdcode[ ifun ] :
                                      this->invcode[ ifun ],
                            forward ? this->fwdcon[ ifun ] :
@@ -4624,13 +4669,21 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    data_ptr = astFree( data_ptr );
    if ( nfun > ncoord_out ) work = astFree( work );
 
+/* If an error occurred, then return a NULL pointer. If no output
+   PointSet was supplied, also annul any new one that may have been
+   created. */
+   if ( !astOK ) {
+      result = ( result == out ) ? NULL : astAnnul( result );
+   }
+
 /* Return a pointer to the output PointSet. */
    return result;
 }
 
-static void ValidateSymbol( const char *method, const char *exprs,
-                            int iend, int sym, int *lpar, int **argcount,
-                            int **opensym, int *ncon, double **con ) {
+static void ValidateSymbol( const char *method, const char *class,
+                            const char *exprs, int iend, int sym,
+                            int *lpar, int **argcount, int **opensym,
+                            int *ncon, double **con ) {
 /*
 *  Name:
 *     ValidateSymbol
@@ -4643,9 +4696,10 @@ static void ValidateSymbol( const char *method, const char *exprs,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ValidateSymbol( const char *method, const char *exprs,
-*                          int iend, int sym, int *lpar, int **argcount,
-*                          int **opensym, int *ncon, double **con )
+*     void ValidateSymbol( const char *method, const char *class,
+*                          const char *exprs, int iend, int sym, int *lpar,
+*                          int **argcount, int **opensym, int *ncon,
+*                          double **con )
 
 *  Class Membership:
 *     MathMap member function.
@@ -4664,6 +4718,10 @@ static void ValidateSymbol( const char *method, const char *exprs,
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function.
 *        This method name is used solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string containing the
+*        class name of the Object being processed. This name is used solely
+*        for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        being parsed. This is only used for constructing error messages.
@@ -4739,9 +4797,9 @@ static void ValidateSymbol( const char *method, const char *exprs,
    error. */
          if ( ( *lpar <= 0 ) || ( ( *argcount )[ *lpar - 1 ] == 0 ) ) {
             astError( AST__COMIN,
-                      "%s: Spurious comma encountered in the expression "
+                      "%s(%s): Spurious comma encountered in the expression "
                       "\"%.*s\".",
-                      method, iend + 1, exprs );
+                      method, class, iend + 1, exprs );
 
 /* If a comma is valid, then increment the argument count at the
    current level of parenthesis. */
@@ -4780,9 +4838,9 @@ static void ValidateSymbol( const char *method, const char *exprs,
    compiled, so report an error. */
          if ( *lpar == 0 ) {
             astError( AST__MLPAR,
-                      "%s: Missing left parenthesis in the expression "
+                      "%s(%s): Missing left parenthesis in the expression "
                       "\"%.*s\".",
-                      method, iend + 1, exprs );
+                      method, class, iend + 1, exprs );
 
 /* If the parenthesis level is valid and the symbol which opened this
    level of parenthesis was a function call with a fixed number of
@@ -4795,9 +4853,9 @@ static void ValidateSymbol( const char *method, const char *exprs,
             if ( ( *argcount )[ *lpar - 1 ] !=
                  symbol[ ( *opensym )[ *lpar - 1 ] ].nargs ) {
                astError( AST__WRNFA,
-                         "%s: Wrong number of function arguments in the "
+                         "%s(%s): Wrong number of function arguments in the "
                          "expression \"%.*s\".",
-                         method, iend + 1, exprs );
+                         method, class, iend + 1, exprs );
 
 /* If the number of arguments is valid, decrement the parenthesis
    level. */
@@ -4816,9 +4874,9 @@ static void ValidateSymbol( const char *method, const char *exprs,
             if ( ( *argcount )[ *lpar - 1 ] <
                  ( -symbol[ ( *opensym )[ *lpar - 1 ] ].nargs ) ) {
                astError( AST__WRNFA,
-                         "%s: Insufficient function arguments in the "
+                         "%s(%s): Insufficient function arguments in the "
                          "expression \"%.*s\".",
-                         method, iend + 1, exprs );
+                         method, class, iend + 1, exprs );
 
 /* If the number of arguments is valid, increase the size of the
    constants array and check for errors. */
@@ -5719,7 +5777,7 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
 /* Compile the cleaned functions. From the returned pointers (if
    successful), we can now tell which transformations (forward and/or
    inverse) are defined. */
-      CompileMapping( "astInitMathMap", nin, nout,
+      CompileMapping( "astInitMathMap", name, nin, nout,
                       nfwd, (const char **) fwdfun,
                       ninv, (const char **) invfun,
                       &fwdcode, &invcode, &fwdcon, &invcon,
@@ -5752,6 +5810,8 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
 
 /* Initialise the MathMap data. */
 /* ---------------------------- */
+/* Store pointers to the compiled function information, together with
+   other MathMap data. */
       if ( new ) {
          new->fwdfun = fwdfun;
          new->invfun = invfun;
@@ -5767,9 +5827,9 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
          new->simp_if = -INT_MAX;
 
 /* Initialise the random number generator context associated with the
-   MathMap. */
-         new->rcontext.random_int = 0;
+   MathMap, using an unpredictable default seed value. */
          new->rcontext.active = 0;
+         new->rcontext.random_int = 0;
          new->rcontext.seed_set = 0;
          new->rcontext.seed = DefaultSeed( &new->rcontext );
 
@@ -5973,8 +6033,8 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 /* Random number context. */
 /* ---------------------- */
 /* Initialise the random number generator context. */
-            new->rcontext.random_int = 0;
             new->rcontext.active = 0;
+            new->rcontext.random_int = 0;
 
 /* Read the flag that determines if the Seed value is set, and the
    Seed value itself. */
@@ -5983,14 +6043,13 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
                new->rcontext.seed = astReadInt( channel, "seed", 0 );
                SetSeed( new, new->rcontext.seed );
 
-/* Supply a default Seed value if necessary. */
+/* Supply an unpredictable default Seed value if necessary. */
             } else {
                new->rcontext.seed = DefaultSeed( &new->rcontext );
             }
 
 /* Compile the MathMap's transformation functions. */
-            CompileMapping( "astLoadMathMap",
-                            new->ninv, new->nfwd,
+            CompileMapping( "astLoadMathMap", name, nin, nout,
                             new->nfwd, (const char **) new->fwdfun,
                             new->ninv, (const char **) new->invfun,
                             &new->fwdcode, &new->invcode,
