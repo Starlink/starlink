@@ -51,14 +51,14 @@ using std::endl;
 
 /**
  * Opens the requested file.  If preload is true, then open the file
- * and read it entire into memory, since the client will be seeking a
- * lot.  If the file can't be opened, then try adding
- * <code>tryext</code> to the end of it.  Certain methods below can be
- * called only on files which have been preloaded.
+ * and read it entire into memory (possibly helpful if the client will
+ * be seeking a lot).  If the file can't be opened, then try adding
+ * <code>tryext</code> to the end of it.
  *
  * @param filename the file to be opened
  * @param tryext a file extension which should be added to the end of
- * <code>filename</code> if that cannot be opened
+ * <code>filename</code> if that cannot be opened; default
+ * <code>""</code> suppresses this
  * @param preload if true, then the file is read entirely into memory
  */
 FileByteStream::FileByteStream(string& filename,

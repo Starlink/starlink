@@ -1,1 +1,5 @@
-Stub ChangeLog, to keep automake happy
+2003-08-03  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* libdvi2bitmap Transformed into library.
+	* all Reorganised using automake/autoconf/libtool.
+

@@ -42,7 +42,34 @@ class InputByteStreamError : public DviError {
 };
 
 /**
- * Abstracts a file as a stream of bytes.
+ * Abstracts a file as a stream of bytes.  Functions are provided to
+ * read individual bytes from the file and blocks of contiguous
+ * bytes.
+ *
+ * <p>Since this class is intended to help reading TeX DVI and PK
+ * files, we also provide methods to read signed and unsigned
+ * integers from the stream, encoded as described in the DVI driver
+ * standard.
+ *
+ * <p>This class is designed to be extended (and is extended in fact
+ * in classes {@link FileByteStream} and {@link PipeStream}).  The
+ * subclassing interface consists of a no-argument constructor, a
+ * method to associate the class with a given file descriptor ({@link
+ * #bindToFileDescriptor}), and a convenience method to help opening
+ * files, using the same specification syntax supported by this class
+ * ({@link #openSourceSpec}).  Since one of the main purposes of this
+ * subclassing is to support a class which handles a seekable input
+ * stream, we also have {@link #getFD} to get the file descriptor
+ * being handled, and {@link #reloadBuffer} to indicate to the parent
+ * class that the underlying stream has been modified (typically by a
+ * <code>seek</code> operation) so that the input buffer should be
+ * invalidated.  If <code>bindToFileDescriptor</code> was invoked
+ * with the <code>fillBufferAndClose</code> flag true, then the
+ * {@link #bufferSeek} method allows rapid seeking by simply
+ * adjusting the buffer pointer; though this is useless unless the
+ * whole stream is in the buffer, the class makes no check on this,
+ * and it is the extending class's responsibility to make sure that
+ * this is not called inappropriately.
  */
 class InputByteStream {
 

@@ -79,7 +79,7 @@ using std::cerr;
  * on <code>stderr</code>, but any output from the command is still returned.
  *
  * <p>If there's no way of doing this on a particular platform, throw
- * <code>DviError</code> always.
+ * <code>InputByteStreamError</code> always.
  *
  * @param cmd the command to be run
  *
@@ -87,18 +87,7 @@ using std::cerr;
  * if it is an empty string, <code>""</code> (the default), then a
  * default list of variables is inherited
  *
- * @param statusp a pointer to an integer which will receive the
- * status returned from the command; it may be zero (the default) in
- * which case no status will be returned
- *
- * @return the command's output as a single string, or an empty
- * string if the command command could not be executed, or if it
- * exited on a signal, including <code>abort()</code>.  If it is
- * important to distinguish a command which fails from one
- * which returns an empty string, then the status should be obtained
- * using the third parameter.
- *
- * @throws DviError on any errors
+ * @throws InputByteStreamError on any errors
 */
 PipeStream::PipeStream (string cmd, string envs)
     throw (InputByteStreamError)
@@ -221,6 +210,9 @@ PipeStream::~PipeStream()
     close();
 }
 
+/**
+ * Closes the stream, and reaps the process status.
+ */
 void PipeStream::close(void)
 {
     cerr << "PipeStream::close..." << endl;
@@ -232,9 +224,12 @@ void PipeStream::close(void)
 }
 
 /**
- * Returns the status of the command at the end of the pipe.  Since this
- * is only available after the command has run to completion, this
- * also waits until the command has finished, and then closes the stream.
+ * Returns the status of the command at the end of the pipe.  Since
+ * this is only available after the command has run to completion,
+ * this <em>closes</em> the stream, and waits until the command has
+ * finished.  Thus, you should <em>not</em> call this until
+ * <em>after</em> you have extracted all of the command's output that
+ * you want.
  *
  * @return the exit status of the process.
  */
@@ -246,8 +241,9 @@ int PipeStream::getStatus(void)
 
 /**
  * Returns the contents of the stream as a string.  If some of the
- * stream has already been read, it cannot be re-read.  Any trailing
- * whitespace, including end-of-line characters, is stripped.
+ * stream has already been read by other methods of this class or its
+ * parent, it cannot be re-read.  Any trailing whitespace, including
+ * end-of-line characters, is stripped.
  *
  * <p>If the current platform cannot support pipes, then return
  * <code>InputByteStreamError</code> immediately.

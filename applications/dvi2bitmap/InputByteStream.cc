@@ -89,8 +89,8 @@ InputByteStream::InputByteStream(int fd)
  * <li>a file name, which should be readable
  * <li>a specifier of the form <code>&lt;osfile&gt;filename</code>:
  * the specified file is opened
- * <li>a specifier of the form <code>&lt;osfd&gt;integer</code>,
- * specifying an (open) OS file descriptor; thus
+ * <li>a specifier of the form <code>&lt;osfd&gt;integer</code>: the integer
+ * specifyies an (open) OS file descriptor; thus
  * <code>&lt;osfd&gt;0</code> opens the standard input
  * </ul>
  *
@@ -137,11 +137,11 @@ bool InputByteStream::eof()
  * reaches either the end of the newly-allocated buffer, or
  * end-of-file, whichever comes first.  It will then close the file
  * descriptor.  In this case (and in this case alone), the method
- * {@link bufferSeek} becomes useful, and can be used by an extending
+ * {@link #bufferSeek} becomes useful, and can be used by an extending
  * class to implement an efficient <code>seek</code> operation on the file.
  *
  * @param fileno the file descriptor to be handled by this object
- * @param the file name associated with this descriptor; this may be
+ * @param filename the file name associated with this descriptor; this may be
  * the empty string
  * @param bufsize a size suggested for the input buffer, or zero to
  * accept the default
@@ -320,11 +320,12 @@ size_t InputByteStream::certainly_read_(int fd, Byte* b, size_t len)
 }
 
 /**
- * Reads a byte from the stream.  This method does not signal
- * an error at end-of-file; if {@ #eof} is true or <em>becomes</em>
- * true as a result of this attempt to read past the end of the file,
- * then we return zero.  That is, <code>eof()</code> does not return
- * true immediately the last byte in the file has been read.
+ * Reads a byte from the stream.  Increments the reading pointer.
+ * This method does not signal an error at end-of-file; if {@link
+ * #eof} is true or <em>becomes</em> true as a result of this attempt
+ * to read past the end of the file, then we return zero.  That is,
+ * <code>eof()</code> does not return true immediately the last byte
+ * in the file has been read.
  *
  * @return the byte read, or zero if we are at the end of the file
  * @throws InputByteStreamError if there is some problem reading the stream
@@ -353,8 +354,8 @@ Byte InputByteStream::getByte(void)
 }
 
 /**
- * Retrieves a block from the stream.   Leaves the pointer pointing after
- * the block returned.
+ * Retrieves a block from the current position in the stream.   Leaves
+ * the pointer pointing after the block returned.
  *
  * @param length the size of block desired
  *
@@ -458,7 +459,7 @@ void InputByteStream::read_buf_ ()
  * Skips a given number of bytes forward in the stream.
  *
  * @param increment the number of bytes to move forward in the stream
- * throws InputByteStreamError if we skip past the end of file
+ * @throws InputByteStreamError if we skip past the end of file
  */
 void InputByteStream::skip (unsigned int increment)
     throw (InputByteStreamError)
@@ -535,6 +536,9 @@ void InputByteStream::reloadBuffer(void)
     assert(buf_ <= p_ && p_ <= eob_);
 }
 
+/**
+ * Closes the stream, releasing all resources.
+ */
 void InputByteStream::close(void)
 {
     if (verbosity_ > normal)

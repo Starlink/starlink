@@ -32,6 +32,13 @@
 #include <InputByteStream.h>
 #include <sys/types.h>
 
+/**
+ * Runs an external program, and provides access to the result.  This
+ * runs a given command in a forked process, optionally adjusting the
+ * environment as it does so.  The output from the command is
+ * available using the methods of an {@link InputByteStream}, plus an
+ * additional one which retrieves the entire result as a string.
+ */
 class PipeStream : public InputByteStream {
  public:
     PipeStream (string cmd, string envs="")

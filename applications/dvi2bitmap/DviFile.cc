@@ -150,62 +150,6 @@ DviFile::DviFile (string& fn,
     }
 }
 
-/**
- * Constructs a new <code>DviFile</code> object.
- *
- * <p>Once the DVI file has been opened in this way, its contents can
- * be processed in an event-based fashion, by repeatedly calling
- * {@link #getEvent} and handling the returned object.
- *
- * @param fn the name of the DVI file
- * @param res the base DPI to be used for processing the file, in pixels-per-inch
- * @param magmag the factor by which the DVI file's internal
- * magnification factor should itself be magnified -- default 1.0
- *
- * @param read_post if true, then the DVI postamble will be read; if
- * false, it will be skipped.  This is false by default, but if the
- * postamble is read, then the font declarations there will be read
- * and acted on, which <em>may</em> speed things up.
- */
-// DviFile::DviFile (const char* fn, int res, double externalmag, bool read_post)
-//     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
-//       current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
-//       netmag_(1.0), skipPage_(false),
-//       max_drift_(0),
-//       widest_page_(-1), deepest_page_(-1), have_read_postamble_(false)
-// {
-//     PkFont::setResolution(res);
-
-//     try
-//     {
-// 	dvif_ = new InputByteStream (fileName_, false, ".dvi");
-// 	if (read_post) {
-// 	    read_postamble();
-// 	    dvif_->seek(0);	// return to beginning
-// 	}
-
-// #if HOMEMADE_POSSTATESTACK
-// 	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
-// #endif
-//     }
-//     catch (InputByteStreamError& e)
-//     {
-// 	e.print();
-// 	throw DviError ("DviFile: can't open file");
-//     }
-// }
-
-
-// XXX How do I invoke one constructor from another?  If I do
-// DviFile::DviFile (const char* fn, int res, double magmag)
-// {
-//     string s = fn;
-//     DviFile(s, res, magmag);
-//     cerr << "end of char* constructor: fontSet_.size=" << fontSet_.size() << endl;
-//}
-// ...then the DviFile I construct appears to be a temporary, and things
-// like fontSet_ aren't initialised.
-
 DviFile::~DviFile()
 {
     delete dvif_;
