@@ -109,6 +109,22 @@ echo "    STARCONF_DEFAULT_PREFIX    = $STARCONF_DEFAULT_PREFIX"
 echo "    BUILDSUPPORT_PREFIX        = $BUILDSUPPORT_PREFIX"
 echo "    Do we need to build GNU m4?  $need_gnu_m4"
 
+# Test whether important paths have spaces in them
+# (this is a natural thing to do on OSX or Windows boxes).
+# Autoconf has grave problems with this, so we should exit cleanly now,
+# rather than in a heap later, and get the user to change directory.  Pity.
+for d in PWD STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX
+do
+    eval expr "\"\$$d\"" : "'.* '" >/dev/null
+    if test $? = 0; then
+        eval echo "\"Environment variable $d=\\\"\$$d\\\" has a space in it\""
+        echo "This causes unavoidable problems with the autoconf system,"
+        echo "so, unfortunately, we can't proceed."
+        # Exit below
+        dryrun=true
+    fi
+done
+
 
 if $dryrun; then
     exit 0
