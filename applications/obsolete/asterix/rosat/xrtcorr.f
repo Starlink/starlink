@@ -82,7 +82,8 @@
       INTEGER CHR_LEN
          EXTERNAL CHR_LEN
 *    Local constants :
-*     <local constants defined by PARAMETER>
+      INTEGER	MAXRNG
+	PARAMETER (MAXRNG=2000)
 *    Local variables :
       RECORD /CORR/ HEAD                  ! Header information
 *

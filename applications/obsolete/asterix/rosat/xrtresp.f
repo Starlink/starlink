@@ -68,7 +68,7 @@
       INTEGER NPHA                            ! Number of PH chans in response
 *                                             ! array
       INTEGER NENERGY                         ! Number of energy channels
-      INTEGER L
+      INTEGER L,IFID
       LOGICAL HRI                             ! attach HRI response
       LOGICAL PSPC                            ! attach PSPC response
 * Local data :
@@ -84,19 +84,14 @@
       CALL AST_INIT
 *
 * Get input filename
-      CALL USI_ASSOCI('INP','UPDATE',LOC,INPRIM,STATUS)
-*
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL ADI1_GETLOC( IFID, LOC, STATUS )
+
 * HRI or PSPC (default)
       CALL USI_GET0L('HRI',HRI,STATUS)
       PSPC=.NOT.HRI
 
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-      IF (INPRIM) THEN
-          CALL MSG_OUT(' ','Input data cannot be primitive',STATUS)
-          STATUS=SAI__ERROR
-          GOTO 999
-      ENDIF
 *
 * Set the default for the detector response file
       CALL XRT_CALDEF(CALDIR, STATUS)
@@ -274,11 +269,11 @@
       ENDIF		! HRI or PSPC
 
 * Write history component
-      CALL HIST_ADD(LOC,VERSION,STATUS)
+      CALL HSI_ADD( IFID,VERSION,STATUS)
 *
       HTEXT(1)='Set up detector response structure in datafile'
 *
-      CALL HIST_PTXT(LOC,1,HTEXT,STATUS)
+      CALL HSI_PTXT( IFID,1,HTEXT,STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error adding history record')
