@@ -8,9 +8,10 @@
 #  g++ -Wall  (GNU)
 #  CC +w2     (Sun Workshop compilers)
 #  cxx -w0    (Compaq compilers)
-CXX=@CXX@
-CXXFLAGS=@CXXFLAGS@
 DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CXX=@CXX@
+CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
 LIBS=-lm @LIBS@
 KPATHSEA_OBJ=@KPATHSEAOBJ@
 PNG_OBJ=@PNGOBJ@
@@ -24,7 +25,7 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(DEFS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
