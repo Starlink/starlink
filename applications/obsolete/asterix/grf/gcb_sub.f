@@ -1242,6 +1242,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
+      INCLUDE 'PRM_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
 *    Structure definitions :
@@ -1258,15 +1259,20 @@
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+*  for scalar quantities mirror GCB
         DO NSCAL=1,G_NSCAL
           CALL NBS_DEFINE_PRIMITIVE(ID,G_SCNAME(NSCAL),'_CHAR',
      :                                     0,G_SCSIZ(NSCAL),SID,STATUS)
         ENDDO
         DO NSTRUC=1,G_NSTRUC
+*  for structures mirror each component once
           DO NCOMP=1,G_NCOMP(NSTRUC)
             CALL NBS_DEFINE_PRIMITIVE(ID,G_CNAME(NSTRUC,NCOMP),'_CHAR',
      :                               0,G_CSIZ(NSTRUC,NCOMP),SID,STATUS)
           ENDDO
+*  and add one quantity to say which element of the structure is stored
+          CALL NBS_DEFINE_PRIMITIVE(ID,G_STNAME(NSTRUC),'_INTEGER',
+     :                                        0,VAL__NBI,SID,STATUS)
         ENDDO
 
       ENDIF
@@ -1287,6 +1293,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
+      INCLUDE 'PRM_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
 *    Structure definitions :
@@ -1298,6 +1305,8 @@
       INTEGER STATUS
 *    Function declarations :
 *    Local constants :
+      INTEGER ZERO
+      PARAMETER (ZERO=0)
 *    Local variables :
       CHARACTER*132 BUFFER
       INTEGER NSCAL,NSTRUC,NCOMP,ITEMID
@@ -1314,12 +1323,14 @@
         ENDDO
 
 
-C        DO NSTRUC=1,G_NSTRUC
+        DO NSTRUC=1,G_NSTRUC
+          CALL NBS_FIND_ITEM(ID,G_STNAME(NSTRUC),ITEMID,STATUS)
+          CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,ZERO,STATUS)
 C          DO NCOMP=1,G_NCOMP(NSTRUC)
 C            CALL NBS_DEFINE_PRIMITIVE(ID,G_CNAME(NSTRUC,NCOMP),'_CHAR',
 C     :                               0,G_CSIZ(NSTRUC,NCOMP),SID,STATUS)
 C          ENDDO
-C        ENDDO
+        ENDDO
 
       ENDIF
 
