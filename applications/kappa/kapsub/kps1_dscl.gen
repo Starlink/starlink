@@ -192,12 +192,12 @@
  
 *    Convert the smallest value to double precision for later testing.
  
-      DSML = NUM_<T>TOD( VAL__SMLR )
+      DSML = NUM_<T>TOD( VAL__SML<T> )
  
 *    Convert the extreme values to double precision for later testing.
  
-      DTMIN = NUM_<T>TOD( VAL__MINR )
-      DTMAX = NUM_<T>TOD( VAL__MAXR )
+      DTMIN = NUM_<T>TOD( VAL__MIN<T> )
+      DTMAX = NUM_<T>TOD( VAL__MAX<T> )
  
 *    Set defaults depending on required polarity of the scaling.
  
