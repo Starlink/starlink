@@ -1,103 +1,45 @@
-1 New version of GAIA
+1 Update to GAIA
 
-  A new release of GAIA (v2.3) is now available. This release includes
-  two new toolboxes and many other enhancements.
+  This is a minor update to GAIA with the following fixes:
 
-  The new toolboxes are:
-  
-     -  Contouring
+    - A percentiles option has been added to automatic contour
+      generation.
 
-     -  Optimal photometry
+    - The "automatic" and "percent" generation options now correctly
+      use the image to be contoured not the displayed image.
 
-  The contouring toolbox allows the overlay of contours from different
-  images, possibly aligned using sky coordinates (naturally it also
-  allows you to contour the displayed image). It also provides control
-  of the colour and line thickness of each contour. 
+    - The measure band can now display pixels and non-celestial
+      coordinate system offsets.
 
-  The optimal photometry toolbox provides facilities similar to the
-  aperture photometry toolbox, both of which are based on the PHOTOM
-  program AUTOPHOTOM (see SUN/45).
+    - The SExtractor toolbox increment and decrement arrows now work 
+      the obvious way around.
 
-  The version of Skycat that GAIA is based on is now 2.4. This has
-  improved catalogue facilities, an image "history" mechanism, main
-  window geometry history, web proxy server dialog (this removes need to
-  set the http_proxy environment variable, see the "Proxies..."  item
-  under the "Options" menu in a catalogue window), histogram
-  equalization, HTTP password support and many less significant changes.
-  
-  Other changes to GAIA include:  
+    - Automatic NDF history recording should be working again.
 
-    - The image panel now has quick selections for colour tables and 
-      intensity maps, as well as data cuts.
+    - NDFs stored within container files are now supported.
 
-    - The Sextractor toolbox is updated to work with version 2.0.19.
-      This supports the new parameters:
-         o BACK_TYPE, BACK_VALUE and THRESH_TYPE.
+    - Floating point images of size 35000x2048 pixels are now 
+      known to display (if you have sufficient VM). Bigger images
+      may also now work.
 
-    - Sextractor bug fixes:
-        o Photometry aperture now use the given size.
-        o The messages window now only shows one copy of the output
-          from Sextractor, not two. 
-        o The ranges of scales in the photometry section are now
-          allowed to be outside of the initial range. 
+    - Pixel coordinates (which include the NDF origin) can now be
+      selected as the "celestial" coordinate system (see the
+      "Celestial coordinates..." toolbox)
 
-    - A new method for transferring astrometry between images has been
-      added to the "Fit to star positions..." toolbox. This works by
-      selecting positions on the reference image and then selecting the
-      same positions on the target image.
+    - Blank pixels in unsigned word NDFs should be be handled 
+      correctly.
 
-    - The aperture photometry toolbox has been considerably
-      reworked. Fixed apertures are now re-sizable (but keep all the
-      same size) and the general layout is changed. Measurements can
-      be saved and appended to a named file. You can now also change
-      the aperture colours.
-
-    - The measure band now works when image is scrolled and zoomed.
-
-    - The "pick" and "ard" toolboxes can now save/append their
-      results to a file.
-
-    - Many others too numerous to mention.
-   
-  Internally there have been many changes to GAIA, one consequence of
-  which is that most of the keyboard shortcuts are changed. Most
-  notably the interactive slice is now bound to <control-a>.
+    - The on-line help for the photometry toolbox should be
+      available again. 
 
   To try out GAIA for yourself type the following command:
 
       %  gaia [image_file]
 
-  from the C-shell. Or alternatively:
+  from the C-shell.
 
-      cl> gaia
-      cl> gaiadisp [image_file]
+  If you have any comments or problems with GAIA then mail:
 
-  from CL.
+      gaia@star.rl.ac.uk
 
-  If you have any comments about GAIA then mail me at:
-
-      P.W.Draper@durham.ac.uk.
-
-  Peter Draper 23th June 1999.
-
-
---------------------
-
-New changes: 2.3-2
-
-    added percentiles to contour generation
-    "automatic" and "percent" now correctly use the image to be
-    contoured not the displayed image.
-
-    Measure band now works with just pixels and non-celestial
-    coordinate systems
-
-    SExtractor toolbox increment and decrement arrows right way around.
-
-    Automatic NDF history recording should be working again.
-
-    NDFs stored with container files are now allowed (useful for SCUBA 
-    data).
-
-    Floating point images of size 35,000x2048 pixels are now known to
-    display. Bigger images may also now work.
+  Peter Draper 12th November 1999.
