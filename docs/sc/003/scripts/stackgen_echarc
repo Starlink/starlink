@@ -1,0 +1,311 @@
+#!/bin/csh -f
+
+#+
+#  Name:
+#     stackgen_echarc
+
+#  Purpose:
+#     Script to generate a DIPSO stack containing orders from a
+#     collapsed echelle image.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script performs a common task; converting an NDF containing
+#     a collapsed echelle spectrum into a DIPSO stack where each stack
+#     entry holds one order from the echellogram.  In a collapsed
+#     echelle image each row of the 2-D image is a single order from the
+#     echellogram.   Each order has its own wavelength scale, which is
+#     stored in an NDF extension.  This script will pair up each order
+#     with its wavelength scale and output them as individual NDFs with
+#     flux data in the main NDF data array and wavelength data in the
+#     AXIS(1) data array, in other words, an NDF which can be read by
+#     DIPSO, FIGARO and so on.  Once the orders have been output to their
+#     own NDFs, they are read into DIPSO and then saved as a DIPSO stack.
+#     The intermediate NDFs are then deleted.
+#
+#     The input image should be one output from FIGARO ECHARC or one
+#     which consists of a 2-dimensional image where each order occupies
+#     a single line of the image.  There is a sister to this script
+#     "stackgen_echomop" specifically for processing ECHOMOP output.
+#
+#     The script expects the wavelength data in the input file to be 
+#     stored in the NDF extension:
+#
+#        .AXIS(1).MORE.FIGARO.DATA_ARRAY.DATA
+#
+#     if this is not the case you can still use the script by modifying
+#     the value of AXISDATA in the script.
+#
+#     The main 2-D order array is expected to be in the NDF main
+#     DATA_ARRAY (it will be for ECHARC data).  If you want to take the
+#     data from a different location, then set FLUXDATA to reflect
+#     the location.  For example, if the data are in the extension
+#     .MORE.ECHELLE.DATA_ARRAY, then edit the appropriate script line to:
+#
+#        set FLUXDATA = '.MORE.ECHELLE.DATA_ARRAY';
+#
+#     Be sure to include the leading "." or the extension will not be
+#     found.
+
+#  Usage:
+#     You can simply invoke this script with no arguments and you
+#     will be prompted for the required information.  Alternatively,
+#     you can supply the arguments on the command line.  For example,
+#     if you have a collapsed echelle spectrum "extobj.sdf" which
+#     contains 42 orders and you want the stack to be called
+#     "ech_STK.sdf" (which you can then read in DIPSO with the
+#     command "RESTORE ech") invoke the script thus:
+#
+#        % stackgen extobj 1 42 ech
+#
+#     If supplied, arguments must be in this order:
+#
+#      1. Input image.
+#         Name of the image containing the echelle orders.
+#
+#      2. Number of first order.
+#         Number of the first echelle order to be extracted.
+#
+#      3. Number of last order.
+#         Number of the last echelle order to be extracted.
+#
+#      4. Output stack.
+#         Root name for output stack, e.g., a value "ech" will
+#         lead to output DIPSO stack ech_STK.sdf.  This is also used
+#         as the root name for the temporary single-order NDFs.
+#
+#     Missing arguments are prompted for.
+
+#  Notes:
+#     1. FIGARO V5.0-0 or higher is required.
+#
+#     2. KAPPA V0.9-0 or higher is required.
+#
+#     3. By default, wavelength data should be in the FIGARO extension:
+#
+#           .AXIS(1).MORE.FIGARO.DATA_ARRAY.DATA
+#
+#        Use HDSTRACE to check this.  Edit AXISDATA below to alter
+#        this behaviour.
+#
+#     4. By default, the flux array is assumed to be in the main
+#
+#           .DATA_ARRAY
+#
+#        of the input file.  Use HDSTRACE to check this.  Edit
+#        FLUXDATA below to alter this behaviour.
+#
+#     5. This script performs a Starlink login, setup for FIGARO
+#        commands, setup for KAPPA commands and DIPSO setup.  This is
+#        so that the script need not be "source"d to use.  You can
+#        reduce the script set up time (and get rid of the login/setup
+#        messages) if you have already done a Starlink login, setup for
+#        FIGARO, KAPPA, and DIPSO.  Edit out the lines as indicated
+#        in the script then, to use this script, you MUST source it.
+#        For example:
+#
+#           % source stackgen extobj 1 42 ech
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-JAN-1996 (MJC):
+#       Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Source of wavelength information in the collapsed echelle image.
+#  Edit AXISDATA if the wavelength scales live somewhere else in your
+#  input files.
+      set AXISDATA = '.AXIS(1).MORE.FIGARO.DATA_ARRAY.DATA';
+
+#  Source of FLUX information in source file.
+#  Edit this if the input data are not in the main NDF DATA_ARRAY.
+#  Use a leading "." in the variable below if the variable is
+#  "non-null".
+      set FLUXDATA = '';
+
+#  Catch interruptions.
+      onintr quit;
+
+#  Generate a temporary DIPSO script file name.
+      set DIPSOCMDFILE = "stackgen$$.cmd";
+
+#  Generate two temporary filenames for NDFs used in the process.
+#  These files are deleted after processing.
+      set temp_waves = "twaves_$$";
+      set temp_order = "torder_$$";
+
+#  Get the name of the collapsed echelle frame, either from the
+#  command-line arguments or by prompting.
+      if ( "$1" == "" ) then
+         echo -n "? Echelle frame > ";
+         set input = "$<";
+
+      else
+         set input = "$1";
+      endif
+
+#  Check that the name file exists, report an error if not.
+      if ( ! -e ${input}.sdf ) then
+         echo "! File ${input}.sdf not found.";
+
+      else
+         echo "! File ${input}.sdf found OK.";
+
+#     Do Starlink login, FIGARO, KAPPA, and DIPSO setups.
+#     You can delete these lines if you have already performed these
+#     setups AND you intend to use this script by "source"ing it.
+         source /star/etc/cshrc;
+         source /star/etc/login;
+         alias echo 'echo >/dev/null';
+         figaro;
+         kappa;
+         dipsosetup;
+         unalias echo;
+
+#     Get the range of orders to be extracted, either from the
+#     command-line arguments or by prompting.
+         if ( "$2" == "" ) then
+            echo -n "? First order > ";
+            @ first_order = $<;
+
+         else
+            @ first_order = $2;
+         endif
+         if ( "$3" == "" ) then
+            echo -n "? Last order > ";
+            @ last_order = $<;
+
+         else
+            @ last_order = $3;
+         endif
+
+#     Get the name for the DIPSO stack to be produced.
+         if ( "$4" == "" ) then
+            echo -n "? Output stack name > ";
+            set stack = $<;
+
+         else
+            set stack = $4;
+         endif
+
+#     Check for an existing stack with this name.
+         if ( -e ${stack}_STK.sdf ) then
+            echo "! ${stack}_STK.sdf will be overwritten.";
+         endif
+
+#     Remove any existing DIPSO command file.
+         if ( -e ${DIPSOCMDFILE} ) then
+            echo "! Removing old ${DIPSOCMDFILE}.";
+            rm -f ${DIPSOCMDFILE};
+         endif
+
+#     Create a DIPSO command file.
+         touch ${DIPSOCMDFILE};
+
+#     We will be using NDF files in this session.
+         echo "usendf" >> ${DIPSOCMDFILE};
+
+#     Generate a temporary NDF to hold the wavelength scales.
+         creobj type=NDF dims=0 object=${temp_waves};
+
+#     Copy the wavelength scales from the collapsed echelle image
+#     to the temporary NDF.
+         copobj SOURCE=${input}${AXISDATA} OBJECT=${temp_waves}.DATA_ARRAY;
+
+#     Give the wavelength scales NDF a Y axis with order numbers.
+         setaxis NDF=${temp_waves} MODE=EXPR DIM=2 EXPRS="INDEX";
+
+#     Loop through the range of orders, generating a single-order NDF
+#     for each and adding a suitable line to the DIPSO script.
+
+#     Start from the first order.
+         @ order = $first_order;
+
+#     Keep going until we reach the last order.
+         while ( $order <= $last_order )
+
+#        This little test ensures that orders numbered less than 10
+#        get a leading zero in their file name.  So that, for example,
+#        the first file is "echord_01.sdf" instead of  "echord_1.sdf".
+            if ( $order < 10 ) then
+               set ordnum = '0'$order;
+
+            else
+               set ordnum = $order;
+            endif
+
+#        Extract the flux data for the order from the input image and
+#        place it in the appropriate output single-order NDF.
+            extract IMAGE=${input}${FLUXDATA} YSTART=$order YEND=$order \
+                    SPECTRUM=${stack}_$ordnum;
+
+#        Create a new X-axis for the single-order NDF, this has dummy data
+#        in it at this point.
+            lxset IMAGE=${stack}_$ordnum WSTART=MIN WEND=MAX \
+                  OUTPUT=${stack}_$ordnum LOG=FALSE;
+
+#        Take a copy of the wavelength scale for this order from
+#        the temporary NDF holding all the wavelength scales.
+            isubset IMAGE=$temp_waves XSTART=MIN XEND=MAX YSTART=$order \
+                    YEND=$order OUTPUT=$temp_order;
+
+#        Remove the "dummy" axis data.
+            delobj OBJECT=${stack}_$ordnum.'AXIS(1).DATA_ARRAY';
+
+#        "Paste" the wavelength scale onto the single-order NDF.
+            copobj SOURCE=${temp_order}.DATA_ARRAY \
+                   OBJECT=${stack}_$ordnum.'AXIS(1).DATA_ARRAY';
+
+#        Delete temporary NDF holding the single-order wavelength scale.
+            rm -f ${temp_order}.sdf;
+
+#        Add line to DIPSO script to read the NDF and push onto the stack.
+#        You might want to add additional DIPSO processing here.
+#        For example, this line will subtract a constant (200) from all
+#        the flux points in each order prior to pushing onto the DIPSO
+#        stack:
+#
+#            echo sp0rd ${stack}_$ordnum , ysub 200, push >> ${DIPSOCMDFILE};
+
+            echo sp0rd ${stack}_$ordnum , push >> ${DIPSOCMDFILE};
+
+#        Display an informational message.
+            echo "! Extracted ${input} order ${order}.";
+
+#        Increment the order index.
+            @ order = ( $order + 1 );
+         end
+
+#     Add DISPO SAVE command to the end of the script file.
+         echo "save ${stack}" >> ${DIPSOCMDFILE};
+         echo "quit" >> ${DIPSOCMDFILE};
+
+#     Run DIPSO to build the stack.
+         echo "! Running DIPSO.";
+         dipso < ${DIPSOCMDFILE};
+
+#     Delete the temporary NDF holding wavelength scales, the DIPSO script,
+#     and the intermediate NDFs.
+         echo "! Removing temporary files.";
+         rm -f ${temp_waves}.sdf;
+         rm -f ${DIPSOCMDFILE};
+
+#     You can comment out this line if you want to retain the intermediate
+#     individual order NDFs.
+         rm -f ${stack}_??.sdf;
+
+#     Display completion message.
+         echo "! Stack generation complete.";
+      endif
+
+#  Exit point.
+quit:
+
+#End-of-file.

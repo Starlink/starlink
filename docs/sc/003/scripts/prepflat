@@ -1,0 +1,269 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     prepflat
+
+#  Purpose:
+#     Script to prepare a median flat-field for use by ECHOMOP.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script takes a list of "raw" CCD flat-field frames and
+#     produces a single median flat-field image suitable for use as
+#     the FFIELD file in ECHOMOP.
+#
+#     Be advised that flat-fielding in echelle data reduction is not
+#     easy - sometimes it's not even possible.  Refer to the
+#     "Introduction to Echelle Spectroscopy" (SG/9) if in any doubt.
+#
+#     The script performs the basic CCD data processing steps of bias
+#     subtraction and trimming.  Bias subtraction removes the zero-point
+#     bias introduced by the camera electronics.  Trimming removes the
+#     pre-scan and over-scan regions of the CCD image which contain no
+#     science data and can confuse the algorithms in echelle data
+#     reduction software.
+#
+#     If required, the CCD frames can be rotated so that the dispersion
+#     direction of the echelle orders runs horizontally as required by
+#     ECHOMOP.
+#
+#     The median flat-field is calculated using FIGARO MEDSKY.
+
+#  Usage:
+#     This script can simply be invoked from the shell; in this case
+#     the script will prompt for a list of the input flat-field images.
+#     Alternatively, the list of frames can be supplied on the
+#     command line, for example:
+#
+#        % prepflat run0800 run0801 run0802 run0856 run0857 run0858
+#
+#     If wildcarding facilities are available in your shell, you can use
+#     them to simplify the command line, for example, the above would
+#     become:
+#
+#        % prepflat run080[012] run085[678]
+#
+#     in the C shell.  This wildcarding facility is available when the
+#     script prompts for a list of input images.
+#
+#     In practice, invocation from your shell is unlikely to be a good
+#     method of using this script as 8 environment variables defining
+#     the region of the image to be kept and the region of the overscan
+#     to be used for debiasing are required.  Use of these variables is
+#     summarised below.
+
+#  Notes:
+#     1. If needed, the input parameters can be input at the command
+#        line thus:
+#
+#           % nohup prepflat filename [filename...] &
+#
+#        the "nohup" command will ensure that the script continues
+#        to run even when you have logged off the system.  The "&" at
+#        the end of the line will run the script in the background.
+#
+#     2. This script is designed to be used as part of an automated
+#        echelle data reduction package.  If you intend to use it
+#        for this purpose, you should not change the name of the output
+#        median flat-field frame "flatfield".  See the comments in the
+#        script for changes which can be made if it is to be used
+#        stand-alone.
+#
+#     3. This script will work with FIGARO v5.0-0 or later.
+#
+#     4. When this script is invoked, 8 environment variables defining
+#        the overscan region to be used for debiasing, and the region
+#        of the images containing science data must be defined.
+#        These environment variables are used:
+#
+#         $xbimin
+#           X-start of overscan region to use for bias subtract.
+#         $xbimax
+#           X-end of overscan region to use for bias subtract.
+#         $ybimin
+#           Y-start of overscan region to use for bias subtract.
+#         $ybimax
+#           Y-end of overscan region to use for bias subtract.
+#         $xtrmin
+#           X-start of region of image to be retained.
+#         $xtrmax
+#           X-end of region of image to be retained.
+#         $ytrmin
+#           Y-start of region of image to be retained.
+#         $ytrmax
+#           Y-end of region of image to be retained.
+#
+#     5. A file "biasframe" containing a bias frame prepared by the
+#        script "prepbias" should exist in the working directory.
+#        You can alter the name of this file, see comments in the
+#        script.
+#
+#     6. The input frames are NOT rotated by this script.  You may
+#        have images in which the orders run roughly vertically,
+#        in which case you should uncomment the line using FIGARO
+#        IROT90 as indicated in the script.  Approximately horizontal
+#        orders are required by ECHOMOP.  If you do rotate the flat
+#        field, note that the script only rotates the final median
+#        frame, not the individual input frames (saves time).
+#
+#     7. This script is designed to be called by a master reduction
+#        script.  See the example scripts "preprun1" and "preprun2"
+#        for details.
+
+#  Authors:
+#     ACC: Andrew Collier Cameron (St. Andrews)
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     ??-???-???? (ACC):
+#       Original Version.
+#     06-NOV-1995 (MJC):
+#       Minor tidying up for Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Do Starlink login and set up for Starlink applications used.
+#  You can comment out these lines if you already have these set up AND
+#  you invoke the script by "source"ing it, for example:
+#
+#     % source prepflat run080[012] run085[678]
+#
+      source /star/etc/cshrc;
+      source /star/etc/login;
+      alias echo 'echo >/dev/null';
+      figaro;
+      unalias echo;
+
+#  Force standard UNIX commands to "normal" behaviour.
+#  This is to remove any special alias for the remove command.
+      set rm_old = `alias rm`;
+      unalias rm;
+
+#  This line should only be modified if you wish to run several jobs
+#  simultaneously, or you keep your Starlink parameter files in a
+#  non-default directory.  If you don't understand this then leave the
+#  line as it is!
+      set ADAMDIR = $HOME/adam;
+
+#  Get the list of input flat-field frames, either from the command line
+#  or by prompting.
+      if ( "$#argv" == 0 ) then
+         echo '';
+         echo -n '? Flat-field Frame(s) > ';
+         set Files = ( `echo $< ` );
+
+      else
+         set Files = ( $* );
+      endif
+
+#  Display information confirming the selected bias-level calculation
+#  region.
+      echo " Bias statistics will be calculated over X-range "\
+ "$xbimin to $xbimax ";
+      echo "                                and over Y-range "\
+ "$ybimin to $ybimax ";
+
+#  Display information confirming the selected region of the image to be
+#  retained; i.e., the CCD area containing the science data.
+      echo " Frames will be trimmed over X-range $xtrmin to $xtrmax ";
+      echo "                    and over Y-range $ytrmin to $ytrmax ";
+
+#  Set script-internal variables to describe the trimming region.
+      @ Xmin = $xtrmin;
+      @ Xmax = $xtrmax;
+      @ Ymin = $ytrmin;
+      @ Ymax = $ytrmax;
+
+      @ Xsize = $Xmax - $Xmin + 1;
+      @ Ysize = $Ymax - $Ymin + 1;
+
+#  Set the name of the input median bias frame.
+#  You can change this line if you are using the script on its own.
+      set Biasframe = 'biasframe';
+
+#  Set the name of the output median flat-field frame.
+#  You can change this line if you are using the script on it's own.
+      set Flatfield = 'flatfield';
+
+#  Create a new flat-field frame list file.
+#  This file is used to hold the list of frames to be processed
+#  by FIGARO MEDSKY.
+      set Flatlist = 'flatlist.dat';
+      if ( -e $Flatlist ) then
+         echo "! Removing old $Flatlist.";
+         rm $Flatlist;
+      endif
+      touch $Flatlist;
+
+#  Set loop parameters and go through the list of files,
+#  checking whether each file exists, process it,
+#  and add its name to the flat-field frame list file.
+      @ found = 0;
+      foreach File ( $Files )
+         if ( -e $File ) then
+
+#        Subtract the bias frame from the input image.
+            isub $File:r $Biasframe junk1;
+
+#        Use FIGARO ISTAT to determine the median level in the
+#        selected overscan region.
+            istat junk1 $ybimin $ybimax $xbimin $xbimax median;
+
+#        Use FIGARO ICSUB to subtract the overscan level from the image.
+#        This accesses the parameters written by the previous (ISTAT)
+#        command and uses the median value found in the overscan region.
+            icsub junk1 @$ADAMDIR/istat.STAT_MEDIAN junk2;
+
+#        Set the name of the trimmed, debiassed image.
+            set NewFile = f_$File:r;
+
+#        Trim off the unwanted parts of the frame, leaving only the
+#        region containing the science data.
+            isubset junk2 $Ymin $Ymax $Xmin $Xmax $NewFile;
+
+#        Add the name of this file to the list of input frames for
+#        FIGARO MEDSKY.
+            echo $NewFile >> $Flatlist;
+
+#        Increment the count of flat-field frames found.
+            @ found++;
+
+#        Delete intermediate files.
+            rm junk*;
+
+         else
+            echo "! Could not find $File.";
+         endif
+      end
+
+#  Display summary of preprocessing.
+      echo " ! $found fields subtracted by master-bias, trimmed and ";
+      echo " ! written to $Flatlist.";
+
+#  Run FIGARO MEDSKY to generate the final frame and rotate it if needed.
+      if ( $found != 0 ) then
+         medsky $Flatlist scaled $FlatField;
+
+#     If your orders run with the dispersion direction in a roughly
+#     vertical direction then uncomment last line of this comment.
+#
+#     Ideally, orders should run with wavelength increasing from left to 
+#     right across the frame - if an anticlockwise rotation is required
+#     (rather than the default clockwise) then add the work "ANTI" to the
+#     irot90 command.  Don't worry if you don't know which way the
+#     wavelength scale goes.
+#         irot90 IMAGE=$FlatField OUTPUT=$FlatField;
+      endif
+
+#  Display informational message.
+      echo "! Flat-field frame written to $Flatfield.";
+
+#  Reset any user command aliases.
+      alias rm $rm_old;
+
+#  End-of-file.

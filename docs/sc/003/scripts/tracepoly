@@ -1,0 +1,145 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     tracepoly
+
+#  Purpose:
+#     Script to extract trace polynomial coefficients from an ECHOMOP
+#     data reduction structure file.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script uses the Starlink HDSTRACE utility to look for
+#     the object <file>.MORE.ECHELLE.TRC_POLY in the ECHOMOP reduction
+#     structure file "<file>".sdf which holds the coefficients of order
+#     trace polynomials as determined by the ECHOMOP task ech_trace.
+#     This allows easy access to the trace polynomials outside of
+#     ECHOMOP tasks.  The script can be modified to display other
+#     information from ECHOMOP reduction structures.
+
+#  Usage:
+#     You can simply invoke this script with no arguments and you
+#     will be prompted for the required information.  Alternatively,
+#     you can supply the arguments on the command line.  For example,
+#
+#        % tracepoly rdf68 4 7
+#
+#     will display the first seven polynomial coefficients for order 4
+#     of the data in the reduction structure file "rdf68".
+#
+#     If supplied, arguments must be in this order:
+#
+#      1. Reduction structure.
+#         Name of the ECHOMOP reduction structure file.
+#
+#      2. Number of the order.
+#         Number of the order trace to be displayed.
+#
+#      3. Maximum coefficients.  (Default value 8.)
+#         Number of polynomial coefficients to be displayed.
+#
+#     Arguments 1-2 will be prompted for if not given on the command line.
+#     Argument  3   defaults to the value 8 if not given on the command line.
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink, UCL)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-APR-1996 (MJC):
+#       Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Constants:
+#  Object holding the trace polynomial.
+#  This is the normal object used by ECHOMOP.  You might change this to
+#  display some other data from the reduction structure.
+#  Use HDSTRACE to examine a reduction structure file to familiarise
+#  yourself with the contents.
+      set TRCPOLY = '.MORE.ECHELLE.TRC_POLY';
+
+#  Object holding the trace image name.
+#  This is not strictly required to get the polynomials from the reduction
+#  structure file, but it may well be useful to know which image was traced
+#  to produce the polynomials.
+      set TRACIM = '.MORE.ECHELLE.TRACIM';
+
+#  Variables used:
+#     $rdf        The name of the ECHOMOP reduction structure file.
+#     $order      Number of the selected order.
+#     $maxcoeefs  The number of fit coefficients to be displayed.
+#     $traceim    The name of the image which was traced.
+
+#.
+
+#  Catch interruptions.
+      onintr quit;
+
+#  Prompt for ECHOMOP reduction structure file name
+#  Get the name of the ECHOMOP reduction structure file either from the
+#  command-line arguments or by prompting.
+      if ( "$1" == "" ) then
+         echo -n "? Reduction structure > ";
+         set rdf = $<;
+         set rdf = ${rdf:r};
+
+      else
+         set rdf = ${1:r};
+      endif
+
+#  Check that the chosen reduction structure file actually contains
+#  trace polynomials.
+      echo ! Looking for trace polynomial object...;
+      hdstrace ${rdf}${TRCPOLY} nlines=1 newline | grep '(';
+
+#  Get the number of the order to be displayed, either from the
+#  command-line arguments or by prompting.
+      if ( "$2" == "" ) then
+         echo -n "? Order Number > ";
+         @ order = $<;
+
+      else
+         @ order = $2;
+      endif
+
+#  Get the maximum number of coefficients to be displayed, either from the
+#  command-line arguments or by prompting.
+      if ( "$3" != "" ) then
+         @ maxcoeffs = $3;
+
+      else
+         @ maxcoeffs = 8;
+      endif
+
+#  Display heading.
+      set traceim = `hdstrace ${rdf}${TRACIM} newline | grep \'`;
+      echo ! Trace polynomial for order ${order} of image ${traceim} \
+           \(in RDF \'${rdf}\'\).;
+
+#  Loop over requested range of coefficients.
+      @ i = 1;
+      while ( $i <= $maxcoeffs )
+
+#     Run HDSTRACE, remove headers, footers etc. using grep and display
+#     the stripped down coefficient value.
+         echo \!\! | \
+         hdstrace ${rdf}${TRCPOLY}'('${i},${order}')' \
+                  nlines=10 newline | egrep -iv '[A-Z]|^ *$';
+         if ( $status != 0 ) then
+            echo ! tracepoly failed for order ${order} at coeff. ${i}.;
+            exit;
+         endif
+
+#     Go on to the next coefficient.
+         @ i = $i + 1;
+      end
+
+#  Exit point.
+quit:
+
+#End-of-script.

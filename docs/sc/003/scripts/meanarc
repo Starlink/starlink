@@ -1,0 +1,302 @@
+#!/usr/bin/perl
+
+#+
+#  Name:
+#     meanarc
+
+#  Purpose:
+#     Pastes the average of two arc wavelength scales onto a spectrum.
+
+#  Language:
+#     Perl script.
+
+#  Description:
+#     A common data reduction task is to apply the wavelength calibration
+#     based an arc lamp spectrum to an object frame or several object
+#     frames.  It is often the case that we have two arc lamp exposures which
+#     `bracket' the astronomy frames in case there is some time dependence
+#     of the wavelength scale.  FIGARO XCOPI allows a weighted mean of the
+#     wavelength scales of two arc frames to be applied to an object frame.
+#     This script takes this one step further by working out the weighting -
+#     based upon Modified Julian Dates extracted from FITS header
+#     information which should have propagated into the Starlink data
+#     structures holding the object frames.  If FITS headers are not present
+#     the script won't work as is, but could be modified to obtain date
+#     information from a different source.
+#
+#     This is a perl script - don't be alarmed!  If it does what you need
+#     then it's very simple to use.  Perl was chosen as a simple floating
+#     point calculation is needed.  The script could be modified to drive
+#     a different FIGARO application.
+#
+#     This script will take two wavelength-calibrated arcs, typically
+#     bracketing object frames, use FIGARO XCOPI to find the mean
+#     wavelength scale for each of the object frames and apply this
+#     scale to the data.  This script is suitable for processing spectra
+#     wavelength calibrated with FIGARO ECHARC.
+#
+#     HDSTRACE is used to search for the MJD record of a FITS header
+#     from which the Modified Julian Date for the file can be extracted.
+#     The weighting of the "mean" wavelength scale for an object frame
+#     is based on the MJD for each of the two arcs and that of the object
+#     itself.  Schematically the weighting is:
+#
+#        OUTPUT = ARC1 +  TOBJ - TARC1 * ( ARC2 - ARC1 )
+#                        -------------
+#                        TARC2 - TARC1
+#
+#     where:
+#
+#        OUTPUT is the wavelength scale produced.
+#        ARC1   is the wavelength scale of ARC1.
+#        ARC2   is the wavelength scale of ARC2.
+#        TARC1  is the MJD for ARC1.
+#        TARC2  is the MJD for ARC2.
+#        TOBJ   is the MJD for the object.
+
+#  Usage:
+#     You can simply invoke this script with no arguments and you
+#     will be prompted for the required information.  Alternatively,
+#     you can supply the arguments on the command line.  For example,
+#     if you have two object frames "obj1" and "obj2" bracketed by the
+#     arc exposures "arc1" and "arc2" this would be a suitable way to
+#     invoke the script:
+#
+#        % meanarc arc1 arc2 obj1 obj2
+#
+#     If supplied, command-line arguments must be in this order:
+#
+#      1. First Arc.
+#         Name of the first arc frame file.
+#
+#      2. Second Arc.
+#         Name of the second arc frame file.
+#
+#      3. List of object frames.
+#         Names of the files to which the calibration should be applied.
+#         You can supply as many names as you like, separated by spaces.
+#         If you are prompted for a list of objects, then you should
+#         supply a comma-separated list of object frames.
+#
+#     Missing command-line arguments are prompted for.
+
+#  Notes:
+#     1. FIGARO V5.0-0 or higher is required.
+#
+#     2. By default, this script modifies the wavelength scales of the
+#        object files on which it acts.  To create new files with a
+#        postfix (e.g. file_wcal.sdf from file.sdf) modify the value of
+#        $Postfix as indicated in the script.
+#
+#     3. If FITS header information has not been propagated to the
+#        Starlink data structure, or there is no Modified Julian Date
+#        present, this script will not work.  The routine "getmjd"
+#        in the script could be modified to use date information from a 
+#        different source.
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-NOV-1995 (MJC):
+#       Original Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Where FIGARO executables live - edit for your installation.
+      $FIGARO = '/star/bin/figaro';
+
+#  Postfix to be used to generate output filenames from input spectrum.
+#  If this is blank, then the output data will overwrite the input object
+#  wavelength scales.  If you set a Postfix value then the output spectra
+#  will have their own names, e.g.,
+#
+#      $Postfix = '_wcal';
+#
+#  will produce a wavelength-calibrated spectrum "obj_wcal.sdf" from
+#  an input spectrum "obj.sdf".
+      $Postfix = '';
+
+#  Get the name of the first arc frame, either from the
+#  command-line arguments or by prompting.
+      if ( $ARGV[0] eq '' ) {
+         print "ARC1 - First arc frame > ";
+         chop( $ArcFrame1 = <STDIN> );
+
+      } else {
+         $ArcFrame1 = $ARGV[0];
+      }
+
+#  Get the name of the second arc frame, either from the
+#  command-line arguments or by prompting.
+      if ( $ARGV[1] eq '' ) {
+         print "ARC2 - Second arc frame > ";
+         chop( $ArcFrame2 = <STDIN> );
+
+      } else {
+         $ArcFrame2 = $ARGV[1];
+      }
+
+#  Get Modified Julian Date for first arc.
+      ( $mjd1, $mjd_status ) = &getmjd( $ArcFrame1 );
+      if ( $mjd_status != 0 ) {
+         die "Cannot continue without Julian Date from $ArcFrame1";
+      }
+
+#  Get Modified Julian Date for second arc.
+      ( $mjd2, $mjd_status ) = &getmjd( $ArcFrame2 );
+      if ( $mjd_status != 0 ) {
+         die "Cannot continue without Julian Date from $ArcFrame2";
+      }
+
+#  Swap Julian dates if needed.
+      if ( $mjd2 < $mjd1 ) {
+         $mjdtemp = $mjd1;
+         $mjd1 = $mjd2;
+         $mjd2 = $mjdtemp;
+
+#  Check for the case where the two bracketing arcs have the same MJD.
+#  This is probably an error.
+      } elsif ( $mjd2 == $mjd1 ) {
+         print "! Both arcs have the same date-time stamp.\n";
+         print "! Cannot run FIGARO XCOPI.\n";
+         exit;
+      }
+
+#  Get the list of names of the object frames, either from the
+#  command-line arguments or by prompting.
+      if ( $ARGV[2] eq ''  ) {
+         print "Specify object frames separated by commas.\n";
+         print "OBJ - Object frame(s) > ";
+         $Objin = <STDIN>;
+         @Objs = split( ',', $Objin );
+
+      } else {
+         @Objs = @ARGV[2..$#ARGV];
+      }
+
+#  Process each of the object frames from the list in turn.
+      foreach $Obj ( @Objs ) {
+
+#     Remove whitespace from the object name.
+         $Obj =~ s/\s*//g;
+
+#     Get Modified Julian Date for this object frame.
+         ( $mjd_obj, $mjd_status ) = &getmjd( $Obj );
+
+#     Skip this file if no Julian date was found.
+         if ( $mjd_status == 1 ) {
+            print "! Not processing file $Obj.sdf: " .
+                  "no Julian date found in header.\n";
+
+         } else {
+            print "! Processing file $Obj.sdf.\n";
+
+#        Calculate the time-based weighting for this object frame.
+            $fraction = ( $mjd_obj - $mjd1 ) / ( $mjd2 - $mjd1 );
+
+
+#        Generate a string holding the FIGARO XCOPI command.
+            $XCOPI_COMMAND = "$FIGARO/xcopi SPECTRUM=$Obj ARC=$ArcFrame1 " .
+                             "ARC2=$ArcFrame2 FRACTION=$fraction " .
+                             "OUTPUT=$Obj$Postfix";
+
+#        Display the command about to be executed.
+            print "$XCOPI_COMMAND\n";
+
+#        Run FIGARO XCOPI.
+            open( XCOPI, "$XCOPI_COMMAND |" );
+
+#        Display messages from the XCOPI run.
+            while ( <XCOPI> ) {
+               print;
+            }
+            close( XCOPI );
+         }
+      }
+
+#   End of main program.
+
+sub getmjd
+#+
+#  Name:
+#     getmjd
+
+#  Purpose:
+#     Get Modified Julian Date from FITS records in ndf file.
+
+#  Description:
+#     This routine uses HDSTRACE to list the contents of the FITS
+#     extension of the input NDF.  The HDSTRACE listing is searched
+#     for the line containing the FITS KEYWORD "MJD" which holds the
+#     Modified Julian Date.  The line is then parsed using the
+#     Perl split() function to extract the actual date.  This date
+#     is then returned along with a status of zero indicating a
+#     successful search.  If the search fails for some reason then
+#     status is returned set equal to one.
+
+#  Arguments:
+#     Targetfile
+#        The name of the NDF image for which the date is required.
+
+#-
+{
+
+# Get subroutine arguments.
+    local( $TargetFile ) = @_;
+
+# Local Variables:
+    local(
+      $found,      # Status of the search.
+      $status,     # Status of the search for the image date.
+      $MJD,        # Stores the FITS tag "MJD" from the HDSTRACE listing.
+      $EQUAL,      # Stores the "=" sign from the HDSTRACE listing.
+      $mjd,        # Stores the date from the HDSTRACE listing.
+      $rest,       # Stores any trailing comments in the FITS record.
+      *EXAMDATA    # File handle for reading the HDSTRACE output.
+      );
+
+# Assume the FITS record will not be found for now.
+    $found = 1;
+
+# Perform simple checks on the file.
+    if ( ! -e $TargetFile . ".sdf" ) {
+        printf( "! Can't find file %s.sdf.\n", $TargetFile );
+
+    } elsif ( ! -r $TargetFile . ".sdf" ) {
+        printf( "! Can't read file %s.sdf.\n", $TargetFile );
+
+    } else {
+
+#     Run HDSTRACE and search the output text for a FITS record "MJD".
+        open( EXAMDATA,
+              "hdstrace $TargetFile.MORE.FITS EACHLINE=T NLINES=1000 |" );
+        while ( <EXAMDATA> ) {
+
+#         This is the line to modify if you want to search for a
+#         different FITS tag.  The tag searched for here is "MJD".
+            if ( /^[^']*'MJD\b/ ) {
+                $found = 0;
+                ( $MJD, $EQUAL, $mjd, $rest ) = split( ' ', $_, 4 );
+            }
+        }
+        close( EXAMDATA );
+
+#     Display search result.
+        if ( $found == 1 ) {
+            printf( "! Could not get Julian Date from file %s.sdf.\n",
+                    $TargetFile );
+
+        } else {
+            printf( "! Modified Julian Date for %s is %.4f.\n", $TargetFile,
+                    $mjd );
+        }
+    }
+
+# Return the date found and status of the search.
+    return ( $mjd, $found );
+}
+
+#  End-of-file.

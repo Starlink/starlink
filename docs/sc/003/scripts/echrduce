@@ -1,0 +1,190 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     echrduce
+
+#  Purpose:
+#     Script to reduce a set of object frames with ECHOMOP.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script reduces a series of object frames using ECHOMOP.  
+#
+#     The output files are named ob_"File" where "File" is the name 
+#     of the input object frame.
+
+#  Usage:
+#     This script can simply be invoked from the shell; in this case
+#     the script will prompt for a list of object frames to be processed 
+#     Alternatively, the input frame names can be supplied on the
+#     command line, for example:
+#
+#        % echrduce run0800 run0801 run0802 run0856 run0857 run0858
+#
+#     If wildcarding facilities are available in your shell, you can use
+#     them to simplify the command line, for example, the above would
+#     become:
+#
+#        % echrduce run080[012] run085[678]
+#
+#     in the C shell.  This wildcarding facility is available when the
+#     script prompts for a list of input images.
+#
+#     In practice, invocation from your shell is unlikely to be a good
+#     method of using this script as 3 environment variables defining
+#     the CCD output characteristic and ECHOMOP reduction structure file
+#     name are required.  Use of these variables is summarised below.
+
+#  Arguments:
+#     If supplied, command-line arguments must be in this order:
+#
+#      1. List of files.
+#        List of files to be processed.
+#
+#     Missing command-line arguments are prompted for.
+
+#  Notes:
+#     1. If needed, the input parameters can be input at the command
+#        line thus:
+#
+#           % nohup echrduce filename [filename...] &
+#
+#        the "nohup" command will ensure that the script continues
+#        to run even when you have logged off the system.  The "&" at
+#        the end of the line will run the script in the background.
+#
+#     2. This script is designed to be used as part of an automated
+#        echelle data reduction package.  If you intend to use it
+#        for this purpose, you should not change the name of the output
+#        frames, "ob_"File.
+#
+#     3. When this script is invoked, 3 environment variables defining
+#        the output characteristics of the CCD used, and the ECHOMOP
+#        reduction structure file used must be defined.
+#        These environment variables are used:
+#
+#         $EchFile
+#           Name of the ECHOMOP reduction structure file.
+#         $Gain
+#           CCD output transfer function in photons per ADU.
+#         $RDN
+#           CCD readout noise in electrons.
+#
+#     4. A file "flatfield" containing a flat-field frame prepared by the
+#        script "prepflat" should exist in the working directory.
+#        You can alter the name of this file, see comments in the
+#        script.
+#
+#     5. The scripts "prepobjs", "prepbias" and "prepflat" should be
+#        used to prepare data for processing with this script.
+#
+#     6. This script is designed to be called by a master reduction
+#        script.  See the example scripts "preprun1" and "preprun2"
+#        for details.
+
+#  Authors:
+#     ACC: Andrew Collier Cameron (St. Andrews)
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     ??-???-???? (ACC):
+#       Original Version.
+#     06-NOV-1995 (MJC):
+#       Minor tidying up for Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Do Starlink login and set up for Starlink applications used.
+#  You can comment out these lines if you already have these set up AND
+#  you invoke the script by "source"ing it, for example:
+#
+#     % source echrduce run080[012] run085[678]
+#
+      source /star/etc/cshrc;
+      source /star/etc/login;
+      echomopsetup;
+
+#  Force standard UNIX commands to "normal" behaviour.
+#  This is to remove any special alias for the remove command.
+      set rm_old = `alias rm`;
+      unalias rm;
+
+#  Get the list of input object frames, either from the command line
+#  or by prompting.
+      if ( "$#argv" == 0 ) then
+         echo '';
+         echo -n '? Object Frame(s) > ';
+         set Files = ( `echo $< ` );
+
+      else
+         set Files = ( $* );
+      endif
+
+#  Set the name of the input flat-field frame.
+#  You can change this line if you are using the script on its own.
+      set Flatfield = 'flatfield';
+
+#  Check that the ECHOMOP reduction structure file exists.
+      if ( ! -e $EchFile ) then
+         echo "! Could not find reduction file $EchFile.";
+
+      else
+
+#     Set loop parameters and cycle.
+         @ found = 0;
+         foreach File ( $Files )
+
+#        Check that input file exists.
+            if ( -e $File ) then
+               echo "! Found file $File OK.";
+
+#           Run ECHOMOP to do the reduction.
+#
+#           Edit this command line for ECHOMOP to fit with your template
+#           reduction.  The parameters set here are only examples and must
+#           be matched to your own manually-determined template reduction.
+#
+#           The general format of this command is to supply a comma-separated
+#           list of ECHMENU options as the value of the TUNE_AUTOMATE
+#           parameter.  The last option must be EXIT, or else echmenu will go
+#           into interactive mode once the list of options is exhausted.
+#           Other parameter values should be supplied as needed.
+#
+#           The output file name is determined by the value supplied for the
+#           ECH_RDUCD parameter.
+               echmenu tune_automate="'4.2,22,7,8,14,EXIT'" \
+                       ech_rdctn=$EchFile:r \
+                       soft="mfile_output" \
+                       inptim=$File:r \
+                       ffield=$Flatfield \
+                       arc='NONE' \
+                       tune_use_nxf=1 \
+                       readout_noise=$RDN \
+                       photon_to_adu=$Gain \
+                       extract_mode=O \
+                       pfl_interact=no \
+                       skyfit=poly \
+                       tune_skypoly=7 \
+                       tune_archive=no \
+                       result_type=extobj \
+                       result_format=ndf \
+                       ech_rducd=ob_$File:r;
+               @ found++;
+
+            else
+               echo "! Could not find $File.";
+            endif
+         end
+      endif
+
+      echo "! $found object spectra extracted.";
+
+#  Reset command aliases.
+      alias rm $rm_old;
+
+#  End-of-file.

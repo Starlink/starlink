@@ -1,0 +1,260 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     preprun2
+
+#  Purpose:
+#     Driver script to set up for an automated echelle data reduction run.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script can be used to coordinate the relatively complex
+#     series of operations required for reducing a large number of
+#     similar echelle spectrograms.  Before using the script, you
+#     should be familiar with the use and parameters of the ECHOMOP
+#     package.  (You can try this out without being familiar with
+#     ECHOMOP - but it is a complex package!)
+#
+#     Essentially the procedure is to "prototype" the reduction
+#     manually using ECHOMOP and then, once you have determined
+#     suitable parameter settings, to use the manually-generated
+#     reduction structure file as a template with which to reduce
+#     the complete dataset.
+#
+#     Which parts of the reduction procedure need to be done for every
+#     frame, and which parts can be copied "as-is" from the manual
+#     template will depend on your data.  For example, you might
+#     use the order traces from the manual reduction for all the
+#     frames.  This will be fine as long as the image of the echellogram
+#     remains stable over the full time period which covers your dataset.
+#     One way to check this sort of thing is to perform two manual
+#     reductions - one from early in the time period covered, one from
+#     late - and then compare the two.  Plotting orders from the reduced
+#     arcs is a good way to spot shifts in the dispersion direction.
+#     Detecting shifts in the spatial direction can be more difficult;
+#     however, you might use the "tracepoly" script to extract the
+#     parameters of the order traces from the ECHOMOP reduction structure
+#     files.  You can then compare the parameters and look for shifts -
+#     for POLY fits checking that the low-order parameters closely
+#     match and that higher-order parameters are small should be enough.
+#
+#     This script calls a set of shortish scripts to perform each of the
+#     data preparation tasks - debiasing, flat fielding, clipping and so on.
+#     You should review the descriptions in these scripts so that you are
+#     happy you understand what each one is doing with your data.  You may
+#     also need to edit the scripts in some places, particularly if your
+#     echellograms have orders which run roughly vertically.
+#
+#     The output of the automated reduction process is a series of
+#     files ob_"file" where "file" is the name of the source object frame.
+#     Arc frames ar_"file" are similarly created.
+
+#  Usage:
+#     You need to know the true detection area of the CCD used to acquire
+#     your data - if you don't, display an image with FIGARO IMAGE and
+#     look for empty parts of the frame at the edges of the image.
+#     These are not used by ECHOMOP and should be cut off by setting
+#     suitable values for the trim parameters.  You should select a part
+#     of the overscan ("dark" area) to be used for measurement of the
+#     electronic bias level.  Use FIGARO ICUR to measure the coordinates
+#     of the various areas.
+#
+#     The following in this script should be edited to suit your data:
+#
+#        1. Detector overscan sample region - for bias-level determination.
+#        2. Detector clipping region (to remove overscan) - to remove
+#           non-science data areas of the input images.
+#        3. Detector output details (noise, gain).
+#        4. List of bias frames.
+#        5. List of flat-field frames.
+#        6. List of arc frames.
+#        7. List of arc mask frames (paired with arcs) - these are used
+#           to configure the processing of arcs so that they are extracted
+#           in the same way as objects.
+#        8. List of object frames.
+#        9. Name of prototype ECHOMOP reduction structure file.
+#
+#     See comments in the script for details.  Example values
+#     have been given for some of these items.
+
+
+#  Arguments:
+#     This script does not use any command-line arguments.
+
+#  Notes:
+#     1. The command line
+#
+#           % nohup source preprun2 &
+#
+#        will ensure that the script continues to run even when you
+#        have logged off the system.  The "&" at the end of the line
+#        will run the script in the background.
+#
+#     2. The environment variables:
+#
+#         $xbimin
+#           X-start of overscan region to use for bias subtract.
+#         $xbimax
+#           X-end of overscan region to use for bias subtract.
+#         $ybimin
+#           Y-start of overscan region to use for bias subtract.
+#         $ybimax
+#           Y-end of overscan region to use for bias subtract.
+#         $xtrmin
+#           X-start of region of image to be retained.
+#         $xtrmax
+#           X-end of region of image to be retained.
+#         $ytrmin
+#           Y-start of region of image to be retained.
+#         $ytrmax
+#           Y-end of region of image to be retained.
+#         $Gain
+#           Detector output characteristic (e/ADU).
+#         $RDN
+#           Detector output noise (e).
+#         $EchFile
+#           Name of the ECHOMOP reduction structure file to be used.
+#
+#        are SET by this script.
+#
+#     3. This script MUST be sourced to work at all!
+#
+#     4. The following scripts are called by this master script.
+#        They should be present in the working directory.
+#
+#         echrdarc - reduces an individual arc frame using ECHOMOP.
+#         echrduce - reduces a series of object frames using ECHOMOP.
+#         preparcs - uses FIGARO to prepare a series of arc frames
+#                    by debiasing, flat fielding and so on.
+#         prepbias - uses FIGARO to merge a set of bias frames into a median
+#                    frame.
+#         prepflat - uses FIGARO to merge a set of flat-field frames into
+#                    a median frame.
+#         prepobjs - uses FIGARO to prepare a series of object frames
+#                    by debiasing, flat fielding and so on.
+#
+#     5. The called scripts will work with FIGARO v5.0-0 or later.
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     06-NOV-1995 (MJC):
+#       Original Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  (Bias and trim parameters are for Tek chip on UCLES binned times 2
+#  in the spatial direction with window TEK1K_SX2.)
+
+#  Overscan sample region.
+      setenv xbimin  516;
+      setenv xbimax  525;
+      setenv ybimin    4;
+      setenv ybimax 1020;
+
+#  Clipping region.
+      setenv xtrmin    4;
+      setenv xtrmax  513;
+      setenv ytrmin    1;
+      setenv ytrmax 1024;
+
+#  Display the regions selected.
+      echo '';
+      echo "Bias region in X: $xbimin to $xbimax";
+      echo "            in Y: $ybimin to $ybimax";
+
+      echo '';
+      echo "Clipping region in X: $xtrmin to $xtrmax";
+      echo "                in Y: $ytrmin to $ytrmax";
+
+#  Detector output details - these are suitable defaults if you do not
+#  the correct values.  You will have to determine the correct values if
+#  you intend to use the optimal extraction algorithm or you require
+#  variance estimates for the extraction.
+      setenv RDN 0;
+      setenv Gain 1;
+
+#  Display detector details.
+      echo '';
+      echo "CCD Readout noise: $RDN electrons";
+      echo "CCD Output Gain:   $Gain electrons/ADU";
+
+#  List of bias frames.
+      set BiasFrames = (  );
+
+#  List of flat-field frames.
+      set FlatFrames = (  );
+
+#  List of arc frames and masks.
+#  If there are three arc frames "aa, ab, ac" you should provide a mask frame
+#  for each (e.g. "ma, ma, mc") and specify the arcs and masks as two lists,
+#  with masks ordered in the same respect as the arcs, e.g.:
+#
+#     set ArcFrames = ( aa ab ac );
+#     set ArcMaskFrames = ( ma mb mc );
+#
+#  for the example given.
+#
+      set ArcFrames = ( );
+      set ArcMaskFrames = ( );
+
+#  List of object frames.
+      set ObjFrames = ( );
+
+#  Merge mask list into object list - this ensures that all the
+#  frames get reduced.
+      foreach Mask ( $ArcMaskFrames )
+         @ found = 0;
+         foreach Obj ( $ObjFrames )
+            if ( "$Obj" == "$Mask" ) then
+               break;
+               @ found = 1;
+            endif
+         end
+         if ( found == 0 ) then
+            set ObjFrames = ( $ObjFrames $Mask );
+         endif
+      end
+
+#  ECHOMOP reduction structure file.
+#  This should be the file prototyped by manual reduction.
+      setenv EchFile 'ech_auto.sdf';
+
+#  Call worker scripts:
+#  Process bias frames.
+      prepbias $BiasFrames;
+
+#  Process flat-field frames.
+      prepflat $FlatFrames;
+
+#  Prepare arc frames.
+      preparcs $ArcFrames;
+
+#  Prepare object frames.
+      prepobjs $ObjFrames;
+
+#  Process each arc frame.
+      @ arcno = 1;
+      foreach Arc ( $ArcFrames )
+         set Mask = $ArcMaskFrames[$arcno];
+         echrdarc a_$Arc o_$Mask;
+         @ arcno++;
+      end
+
+#  Build the list of prepared object frames from the list of input
+#  object frames.
+      set Objrdc = '';
+      foreach Obj ( $ObjFrames )
+         set Objrdc = ( $Objrdc o_$Obj );
+      end
+
+#  Process the list of prepared object frames.
+      echrduce $Objrdc;
+
+#  End-of-file.

@@ -1,0 +1,281 @@
+#!/bin/csh -f
+
+#+
+#  Name:
+#     echtract_echomop
+
+#  Purpose:
+#     Script to extract orders from a reduced echelle image to
+#     individual NDF files suitable for reading into DIPSO.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script performs a common task; slicing out individual orders
+#     from a collapsed, extracted echelle image.  In a collapsed echelle
+#     image each row of the 2-D image is a single order from the
+#     echellogram.   Each order has its own wavelength scale, which is
+#     stored in an NDF extension.  This script will pair up each order
+#     with its wavelength scale and output them as individual NDFs with
+#     flux data in the main NDF data array and wavelength data in the
+#     AXIS(1) data array, in other words, an NDF which can be read by
+#     DIPSO, FIGARO and so on.
+#
+#     The input image should be one output from ECHOMOP or one which
+#     consists of a 2-dimensional image where each order occupies a
+#     single line of the image.  There is a sister to this script
+#     "echtract_echarc" specifically for processing FIGARO ECHARC output.
+#
+#     The script expects the wavelength data in the input images to be 
+#     stored in the NDF extension:
+#
+#        .MORE.ECHELLE.ECH_2DWAVES
+#
+#     if this is not the case you can still use the script by modifying
+#     the value of AXISDATA as indicated.  The full all-order wavelength
+#     scales would normally be propagated to the output NDFs; to reduce the
+#     size of the individual-order NDFs this extension is deleted in each
+#     output file.  You can modify this behaviour by commenting out the
+#     part of the script which "shrinks" the per-order NDFs.
+#
+#     The main 2-D order array is expected to be in the NDF main
+#     DATA_ARRAY (it will be for ECHOMOP data).  If you want to take the
+#     data from a different location, then set FLUXDATA in the script to
+#     reflect the location.  For example, if the data are in the extension
+#     .MORE.ECHELLE.DATA_ARRAY, then edit the appropriate line in the
+#     script to:
+#
+#        set FLUXDATA = '.MORE.ECHELLE.DATA_ARRAY';
+#
+#     Be sure to include the leading "." or the extension will not be
+#     found.
+
+#  Usage:
+#     You can simply invoke this script with no arguments and you
+#     will be prompted for the required information.  Alternatively,
+#     you can supply the arguments on the command line.  For example,
+#     if you have a collapsed echelle spectrum "extobj.sdf" which
+#     contains 42 orders and you want each order to be stored in an NDF
+#     called "extord_nn.sdf", where "nn" is the number of the order,
+#     invoke the script thus:
+#
+#        % echtract extobj 1 42 extord
+#
+#     If supplied, arguments must be in this order:
+#
+#      1. Input image.
+#         Name of the image containing the echelle orders.
+#
+#      2. Number of first order.
+#         Number of the first echelle order to be extracted.
+#
+#      3. Number of last order.
+#         Number of the last echelle order to be extracted.
+#
+#      4. Output root.
+#         Root name for output images, e.g. a value "ech" will
+#         lead to output files ech_01.sdf, ech_02.sdf and so on.
+#
+#     Missing arguments are prompted for.
+
+#  Notes:
+#     1. FIGARO V5.0-0 or higher is required.
+#
+#     2. KAPPA V0.9-0 or higher is required.
+#
+#     3. By default, wavelength data in the input file should be in the 
+#        ECHOMOP extension:
+#
+#           .MORE.ECHELLE.ECH_2DWAVES
+#
+#        Use HDSTRACE to check this.  Edit AXISDATA below to alter
+#        this behaviour.
+#
+#     4. By default, the flux array is assumed to be in the main
+#
+#           .DATA_ARRAY
+#
+#        of the input file.  Use HDSTRACE to check this.  Edit
+#        FLUXDATA below to alter this behaviour.
+#
+#     5. This script performs a Starlink login, setup for FIGARO
+#        and KAPPA commands.  This is so that the script need not be
+#        "source"d to use.  You can reduce the script set up time (and
+#        get rid of the login/setup messages) if you have already done a
+#        Starlink login, setup for FIGARO and for KAPPA.  Edit out the
+#        lines as indicated in the script then, to use this script, you 
+#        MUST source it.  For example:
+#
+#           % source echtract extobj 1 42 extord
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-JAN-1996 (MJC):
+#       Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Source of wavelength information in the collapsed echelle image.
+#  Edit AXISDATA if the wavelength scales live somewhere else in your
+#  input files.
+      set AXISDATA = '.MORE.ECHELLE.ECH_2DWAVES';
+
+#  Source of FLUX information in source file.
+#  Edit this if the input data are not in the main NDF DATA_ARRAY.
+#  Use a leading "." in the variable below if the variable is
+#  "non-null".
+      set FLUXDATA = '';
+
+#  Catch interruptions.
+      onintr quit;
+
+#  Generate two temporary filenames for NDFs used in the process.
+#  These files are deleted after processing.
+      set temp_waves = "twaves_$$";
+      set temp_order = "torder_$$";
+
+#  Get the name of the collapsed echelle frame, either from the
+#  command-line arguments or by prompting.
+      if ( "$1" == "" ) then
+         echo -n "? Echelle frame > ";
+         set input = "$<";
+
+      else
+         set input = "$1";
+      endif
+
+#  Check that the name file exists, report an error if not.
+      if ( ! -e ${input}.sdf ) then
+         echo "! File ${input}.sdf not found.";
+
+      else
+         echo "! File ${input}.sdf found OK.";
+
+#     Do Starlink login, FIGARO and KAPPA setup.
+#     You can delete these lines if you have already performed these
+#     setups AND you intend to use this script by "source"ing it.
+         source /star/etc/cshrc;
+         source /star/etc/login;
+         alias echo 'echo >/dev/null';
+         figaro;
+         kappa;
+         unalias echo;
+
+#     Get the range of orders to be extracted, either from the
+#     command-line arguments or by prompting.
+         if ( "$2" == "" ) then
+            echo -n "? First order > ";
+            @ first_order = $<;
+
+         else
+            @ first_order = $2;
+         endif
+         if ( "$3" == "" ) then
+            echo -n "? Last order > ";
+            @ last_order = $<;
+
+         else
+            @ last_order = $3;
+         endif
+
+#     Get the root name for output NDF files, either from the
+#     command-line arguments or by prompting.
+         if ( "$4" == "" ) then
+            echo -n "? Output root name > ";
+            set output = $<;
+
+         else
+            set output = $4;
+         endif
+
+#     Generate a temporary NDF to hold the wavelength scales.
+         creobj type=NDF dims=0 object=${temp_waves};
+
+#     Copy the wavelength scales from the collapsed echelle image
+#     to the temporary NDF.
+         copobj SOURCE=${input}${AXISDATA} OBJECT=${temp_waves}.DATA_ARRAY;
+
+#     Give the wavelength scales NDF a Y axis with order numbers.
+         setaxis NDF=${temp_waves} MODE=EXPR DIM=2 EXPRS="INDEX";
+
+#     Loop through the range of orders, generating a single-order NDF
+#     for each.
+
+#     Start from the first order.
+         @ order = $first_order;
+
+#     Keep going until we reach the last order.
+         while ( $order <= $last_order )
+
+#        This little test ensures that orders numbered less than 10
+#        get a leading zero in their file name.  So that, for example,
+#        the first file is "echord_01.sdf" instead of  "echord_1.sdf".
+            if ( $order < 10 ) then
+               set ordnum = '0'$order;
+
+            else
+               set ordnum = $order;
+            endif
+
+#        Extract the flux data for the order from the input image and
+#        place it in the appropriate output single-order NDF.
+            extract IMAGE=${input}${FLUXDATA} YSTART=$order YEND=$order \
+                    SPECTRUM=${output}_t_$ordnum;
+
+#        Create a new X-axis for the single-order NDF, this has dummy data
+#        in it at this point.
+            lxset IMAGE=${output}_t_$ordnum WSTART=MIN WEND=MAX \
+                  OUTPUT=${output}_t_$ordnum LOG=FALSE;
+
+#        Take a copy of the wavelength scale for this order from
+#        the temporary NDF holding all the wavelength scales.
+            isubset IMAGE=$temp_waves XSTART=MIN XEND=MAX YSTART=$order \
+                    YEND=$order OUTPUT=$temp_order;
+
+#        Remove the "dummy" axis data.
+            delobj OBJECT=${output}_t_$ordnum.'AXIS(1).DATA_ARRAY';
+
+#        "Paste" the wavelength scale onto the single-order NDF.
+            copobj SOURCE=${temp_order}.DATA_ARRAY \
+                   OBJECT=${output}_t_$ordnum.'AXIS(1).DATA_ARRAY';
+
+#        Delete the ECHOMOP extension holding all-order wavelength scales
+#        to save disk space.
+#        Comment out this line to retain full all-order wavelength scales
+#        in each of the single-order NDFs.
+            delobj OBJECT=${output}_t_$ordnum$AXISDATA;
+
+#        Copy the output spectrum - use NDFCOPY to shrink the output
+#        file size.
+            ndfcopy ${output}_t_$ordnum ${output}_$ordnum;
+
+#        Delete the intermediate order NDF with ECHOMOP extensions.
+            rm -f ${output}_t_${ordnum}.sdf;
+
+#        Delete temporary NDF holding the single-order wavelength scale.
+            rm -f ${temp_order}.sdf;
+
+#        Display an informational message.
+            echo "! Extracted ${input} order ${order}.";
+
+#        Increment the order index.
+            @ order = ( $order + 1 );
+         end
+
+#     Delete the temporary NDF holding wavelength scales.
+         echo "! Removing temporary files.";
+         rm -f ${temp_waves}.sdf;
+
+#     Display completion message.
+         echo "! Order NDF extraction complete.";
+      endif
+
+#  Exit point.
+quit:
+
+#End-of-file.

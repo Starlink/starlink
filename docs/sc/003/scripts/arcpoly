@@ -1,0 +1,146 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     arcpoly
+
+#  Purpose:
+#     Script to extract arc-fitting polynomial coefficients from an ECHOMOP
+#     data reduction structure file.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script uses the Starlink HDSTRACE utility to look for
+#     the object <file>.MORE.ECHELLE.W_POLY in the ECHOMOP reduction
+#     structure file "<file>".sdf which holds the coefficients of arc-
+#     fitting polynomials as determined by the ECHOMOP task ech_idwave.
+#     This allows easy access to these polynomials outside of
+#     ECHOMOP tasks.  The script can be modified to display other
+#     information from ECHOMOP reduction structures.
+
+#  Usage:
+#     You can simply invoke this script with no arguments and you
+#     will be prompted for the required information.  Alternatively,
+#     you can supply the arguments on the command line.  For example,
+#
+#        % arcpoly rdf68 4 7
+#
+#     will display the first seven polynomial coefficients for order 4
+#     of the data in the reduction structure file "rdf68".
+#
+#     If supplied, arguments must be in this order:
+#
+#      1. Reduction structure.
+#         Name of the ECHOMOP reduction structure file.
+#
+#      2. Number of the order.
+#         Number of the order wavelength fit to be displayed.
+#
+#      3. Maximum coefficients.  (Default value 8.)
+#         Number of polynomial coefficients to be displayed.
+#
+#     Arguments 1-2 will be prompted for if not given on the command line.
+#     Argument  3   defaults to the value 8 if not given on the command line.
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink, UCL)
+#     PFLM: Pierre Maxted (Uni. of Sussex)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-JUL-1996 (PFLM):
+#       Adapated from MJC's tracepoly script.
+#     {enter_further_changes_here}
+
+#-
+
+#  Constants:
+#  Object holding the arc polynomial.
+#  This is the normal object used by ECHOMOP.  You might change this to
+#  display some other data from the reduction structure.
+#  Use HDSTRACE to examine a reduction structure file to familiarise
+#  yourself with the contents.
+      set ARCPOLY = '.MORE.ECHELLE.W_POLY';
+
+#  Object holding the arc image name.
+#  This is not strictly required to get the polynomials from the reduction
+#  structure file, but it may well be useful to know which arc was used
+#  to produce the polynomials.
+      set ARC = '.MORE.ECHELLE.ARC';
+
+#  Variables used:
+#     $rdf        The name of the ECHOMOP reduction structure file.
+#     $order      Number of the selected order.
+#     $maxcoeefs  The number of fit coefficients to be displayed.
+#     $traceim    The name of the image which was traced.
+
+#.
+
+#  Catch interruptions.
+      onintr quit;
+
+#  Prompt for ECHOMOP reduction structure file name
+#  Get the name of the ECHOMOP reduction structure file either from the
+#  command-line arguments or by prompting.
+      if ( "$1" == "" ) then
+         echo -n "? Reduction structure > ";
+         set rdf = $<;
+         set rdf = ${rdf:r};
+
+      else
+         set rdf = ${1:r};
+      endif
+
+#  Check that the chosen reduction structure file actually contains
+#  arc polynomials.
+      echo ! Looking for arc polynomial object...;
+      hdstrace ${rdf}${ARCPOLY} nlines=1 newline | grep '(';
+
+#  Get the number of the order to be displayed, either from the
+#  command-line arguments or by prompting.
+      if ( "$2" == "" ) then
+         echo -n "? Order Number > ";
+         @ order = $<;
+
+      else
+         @ order = $2;
+      endif
+
+#  Get the maximum number of coefficients to be displayed, either from the
+#  command-line arguments or by prompting.
+      if ( "$3" != "" ) then
+         @ maxcoeffs = $3;
+
+      else
+         @ maxcoeffs = 8;
+      endif
+
+#  Display heading.
+      set arc = `hdstrace ${rdf}${ARC} newline | grep \'`;
+      echo ! Arc polynomial for order ${order} of image ${arc} \
+           \(in RDF \'${rdf}\'\).;
+
+#  Loop over requested range of coefficients.
+      @ i = 1;
+      while ( $i <= $maxcoeffs )
+
+#     Run HDSTRACE, remove headers, footers etc. using grep and display
+#     the stripped down coefficient value.
+         echo \!\! | \
+         hdstrace ${rdf}${ARCPOLY}'('${i},${order}',1)' \
+                  nlines=10 newline | egrep -iv '[A-Z]|^ *$';
+         if ( $status != 0 ) then
+            echo ! arcpoly failed for order ${order} at coeff. ${i}.;
+            exit;
+         endif
+
+#     Go on to the next coefficient.
+         @ i = $i + 1;
+      end
+
+#  Exit point.
+quit:
+
+#End-of-script.

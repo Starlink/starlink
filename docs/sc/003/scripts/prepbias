@@ -1,0 +1,139 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     prepbias
+
+#  Purpose:
+#     Script to prepare a single biasframe from a series of frames.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script produces a single median image from a series of
+#     "raw" CCD bias frames.  The median bias frame is created using 
+#     FIGARO MEDSKY.  The output image is called "biasframe", this
+#     can be altered by editing the appropriate line in the script.
+
+#  Usage:
+#     This script can simply be invoked from the shell; in this case
+#     the script will prompt for a list of the input bias images.
+#     Alternatively, the list of bias frames can be supplied on the
+#     command line, for example:
+#
+#        % prepbias run0800 run0801 run0802 run0856 run0857 run0858
+#
+#     If wildcarding facilities are available in your shell, you can use
+#     them to simplify the command line, for example, the above would
+#     become:
+#
+#        % prepbias run080[012] run085[678]
+#
+#     in the C shell.  This wildcarding facility is available when the
+#     script prompts for a list of input images.
+
+#  Notes:
+#     1. If needed, the input parameters can be input at the command
+#        line thus:
+#
+#           % nohup prepbias filename [filename...] &
+#
+#        the "nohup" command will ensure that the script continues
+#        to run even when you have logged off the system.  The "&" at
+#        the end of the line will run the script in the background.
+#
+#     2. This script is designed to be used as part of an automated
+#        echelle data reduction package.  If you intend to use it
+#        for this purpose, you should not change the name of the output
+#        median bias frame "biasframe".  See the comments in the script
+#        for changes which can be made if it is to be used stand-alone.
+#
+#     3. This script will work with FIGARO v5.0-0 or later.
+#
+#     4. This script is designed to be called by a master reduction
+#        script.  See the example scripts "preprun1" and "preprun2"
+#        for details.
+
+#  Authors:
+#     ACC: Andrew Collier Cameron (St. Andrews)
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     ??-???-???? (ACC):
+#       Original Version.
+#     06-NOV-1995 (MJC):
+#       Minor tidying up for Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Do Starlink login and set up for Starlink applications used.
+#  You can comment out these lines if you already have these set up AND
+#  you invoke the script by "source"ing it, for example:
+#
+#     % source prepbias run080[012] run085[678]
+#
+      source /star/etc/cshrc;
+      source /star/etc/login;
+      alias echo 'echo >/dev/null';
+      figaro;
+      unalias echo;
+
+#  Force standard UNIX commands to "normal" behaviour.
+#  This is to remove any special alias for the remove command.
+      set rm_old = `alias rm`;
+      unalias rm;
+
+#  Get the list of input bias frames, either from the command line
+#  or by prompting.
+      if ( "$#argv" == 0 ) then
+         echo '';
+         echo -n '? Bias Frame(s) > ';
+         set Files = ( `echo $< ` );
+
+      else
+         set Files = ( $* );
+      endif
+
+#  Set the name of the output median bias frame.
+#  You can change this line if you are using the script on its own.
+      set Biasframe = 'biasframe';
+
+#  Create a new Bias Frame list file.
+#  This file is used to hold the list of bias frames to be processed
+#  by FIGARO MEDSKY.
+      set Biasname = 'biaslist.dat';
+      if ( -e $Biasname ) then
+         echo "! Removing old $Biasname";
+         rm $Biasname;
+      endif
+      touch $Biasname;
+
+#  Go through the list of files, checking whether they exist and writing
+#  their names into the Bias Frame list file.
+      @ found = 0;
+      foreach File ( $Files )
+         if ( -e $File ) then
+            echo $File:r >> $Biasname;
+            @ found++;
+
+         else
+            echo "! Could not find $File.";
+         endif
+      end
+
+#  Display count of Bias Frames found.
+      echo "! $found bias frames found and written to $Biasname";
+
+#  Run FIGARO MEDSKY to generate the bias frame.
+      if ( $found != 0 ) then
+         medsky $Biasname noscaled $Biasframe;
+      endif
+      echo "! Median bias frame written to $Biasframe.";
+
+#  Reset any user command aliases.
+      alias rm $rm_old;
+
+#  End-of-file.

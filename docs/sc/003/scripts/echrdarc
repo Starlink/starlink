@@ -1,0 +1,183 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     echrdarc
+
+#  Purpose:
+#     Script to reduce an arc frame with ECHOMOP.
+
+#  Language:
+#     C shell script.
+
+#  Description:
+#     This script reduces a wavelength-scale reference arc frame using
+#     ECHOMOP.  An object or flat-field frame to be used for order
+#     profiling must be available.  (You could use an arc frame - this
+#     is fine as long as the same frame is used by the script "echrduce"
+#     for reducing the object frames for which this is the arc
+#     reference.)
+#
+#     The output file is named "ar_ArcFile" where "ArcFile" is the name 
+#     of the input arc frame.
+
+#  Usage:
+#     This script can simply be invoked from the shell; in this case
+#     the script will prompt for the arc frame to be processed and the
+#     object frame to be used for order profiling.
+#     Alternatively, the input frame names can be supplied on the
+#     command line, for example:
+#
+#        % echrdarc arc004 obj012
+#
+#     In practice, invocation from your shell is unlikely to be a good
+#     method of using this script as 3 environment variables defining
+#     the CCD output characteristic and ECHOMOP reduction structure file
+#     name are required.  Use of these variables is summarised below.
+
+#  Arguments:
+#     If supplied, command-line arguments must be in this order:
+#
+#      1. Arc Frame.
+#        Name of the Arc frame to be processed.
+#      2. Object Frame.
+#        Name of the Object frame to be processed.
+#
+#     Missing command-line arguments are prompted for.
+
+#  Notes:
+#     1. If needed, the input parameters can be input at the command
+#        line thus:
+#
+#           % nohup echrdarc arcfilename objectfilename &
+#
+#        the "nohup" command will ensure that the script continues
+#        to run even when you have logged off the system.  The "&" at
+#        the end of the line will run the script in the background.
+#
+#     2. This script is designed to be used as part of an automated
+#        echelle data reduction package.  If you intend to use it
+#        for this purpose, you should not change the name of the output
+#        arc frame, "ar_"ArcFile.
+#
+#     3. When this script is invoked, 3 environment variables defining
+#        the output characteristics of the CCD used, and the ECHOMOP
+#        reduction structure file used must be defined.
+#        These environment variables are used:
+#
+#         $EchFile
+#           Name of the ECHOMOP reduction structure file.
+#         $Gain
+#           CCD output transfer function in photons per ADU.
+#         $RDN
+#           CCD readout noise in electrons.
+#
+#     4. A file "flatfield" containing a flat-field frame prepared by the
+#        script "prepflat" should exist in the working directory.
+#        You can alter the name of this file, see comments in the
+#        script.
+#
+#     5. The scripts "preparcs", "prepbias" and "prepflat" should be
+#        used to prepare data for processing with this script.
+#
+#     6. This script is designed to be called by a master reduction
+#        script.  See the example scripts "preprun1" and "preprun2"
+#        for details.
+
+#  Authors:
+#     ACC: Andrew Collier Cameron (St. Andrews)
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     ??-???-???? (ACC):
+#       Original Version.
+#     06-NOV-1995 (MJC):
+#       Minor tidying up for Cookbook Version.
+#     {enter_further_changes_here}
+
+#-
+
+#  Do Starlink login and set up for Starlink applications used.
+#  You can comment out these lines if you already have these set up AND
+#  you invoke the script by "source"ing it, for example:
+#
+#     % source echrdarc run080[012] run085[678]
+#
+      source /star/etc/cshrc;
+      source /star/etc/login;
+      echomopsetup;
+
+#  Force standard UNIX commands to "normal" behaviour.
+#  This is to remove any special alias for the remove command.
+      set rm_old = `alias rm`;
+      unalias rm;
+
+#  Get the input arc-lamp and object frames, either from the command line
+#  or by prompting.
+      if ( "$#argv" < 2 ) then
+         echo '';
+         echo -n '? Arc File > ';
+         set ArcFile = ( `echo $< ` );
+         echo -n '? Object File > ';
+         set ObjectFile = ( `echo $< ` );
+
+      else
+         set ArcFile = $1;
+         set ObjectFile = $2;
+      endif
+
+#  Set the name of the input flat-field frame.
+#  You can change this line if you are using the script on its own.
+      set Flatfield = 'flatfield';
+
+#  Check that the source arc-lamp frame exists.
+      if ( ! -e $ArcFile ) then
+         echo "! Could not find arc $ArcFile.";
+
+#  Check that the source object frame exists.
+      else if ( ! -e $ObjectFile ) then
+         echo "! Could not find object $ObjectFile.";
+
+#  Check that the ECHOMOP reduction structure file exists.
+      else if ( ! -e $EchFile ) then
+         echo "! Could not find reduction file $EchFile.";
+
+      else
+         echo "! Found files OK.";
+
+#  Edit this command line for ECHOMOP to fit with your template reduction.
+#  The parameters set here are only examples and must be matched to your
+#  own manually-determined template reduction.
+#
+#  The general format of this command is to supply a comma-separated list
+#  of ECHMENU options as the value of the TUNE_AUTOMATE parameter.  The
+#  last option must be EXIT, or else echmenu will go into interactive mode
+#  once the list of options is exhausted.  Other parameter values should
+#  be supplied as needed.
+#
+#  The output file name is determined by the value supplied for the
+#  ECH_RDUCD parameter.
+         echmenu tune_automate="'4.2,22,7,8,14,EXIT'" \
+                 ech_rdctn=$EchFile:r \
+                 soft="mfile_output" \
+                 inptim=$ObjectFile:r \
+                 ffield=$Flatfield \
+                 arc=$ArcFile:r \
+                 tune_use_nxf=1 \
+                 readout_noise=$RDN \
+                 photon_to_adu=$Gain \
+                 extract_mode=O \
+                 pfl_interact=no \
+                 skyfit=poly \
+                 tune_skypoly=7 \
+                 tune_archive=no \
+                 result_type=extarc \
+                 result_format=ndf \
+                 ech_rducd=ar_$ArcFile:r;
+      endif
+
+#  Reset command aliases.
+      alias rm $rm_old;
+
+#  End-of-file.
