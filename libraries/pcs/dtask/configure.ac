@@ -21,6 +21,8 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+AC_PATH_PROGS(M4, m4, m4)
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package

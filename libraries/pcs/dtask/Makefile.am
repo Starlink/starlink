@@ -51,6 +51,8 @@ C_ROUTINES = \
 	dts_chdlr.c \
 	dts_setsig.c
 
+EXTRA_DIST = alink.in ilink.in
+
 BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
 
 # The alink and ilink scripts require a dtask_main.o file in $(libdir).
@@ -90,3 +92,8 @@ ilink: Makefile $(srcdir)/ilink.in
 	    $(srcdir)/ilink.in >ilink.tmp
 	chmod +x ilink.tmp
 	mv ilink.tmp ilink
+
+$(srcdir)/alink.in: $(srcdir)/ailink.in.m4
+	$(M4) -DSCRIPTNAME=alink $(srcdir)/ailink.in.m4 >$@
+$(srcdir)/ilink.in: $(srcdir)/ailink.in.m4
+	$(M4) -DSCRIPTNAME=ilink $(srcdir)/ailink.in.m4 >$@
