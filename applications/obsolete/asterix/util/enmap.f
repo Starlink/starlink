@@ -128,7 +128,6 @@
 
       REAL                      THRESH                  ! Threshold below which to zero
 
-      INTEGER                   AXLP
       INTEGER                   AXPTR                   ! Input energy axis data
       INTEGER                   ENAX                    ! Energy axis number
       INTEGER                   IDPTR                   ! Input data
@@ -268,7 +267,7 @@
 
 *  Calculate output array
       CALL ENMAP_CREATE( DIMS, DIMS(1), DIMS(2), DIMS(3), %VAL(IDPTR),
-     :                   QOK, %VAL(IQPTR), IQMASK, ORDER, DIMS(ENAX),
+     :                   QOK, %VAL(IQPTR), ORDER, DIMS(ENAX),
      :                   %VAL(AXPTR), ODIM(1), ODIM(2), THRESH,
      :                   %VAL(TPTR), %VAL(ODPTR), %VAL(OQPTR), STATUS )
 
@@ -300,7 +299,7 @@
 
 *+  ENMAP_CREATE - Fill output array
       SUBROUTINE ENMAP_CREATE( DIMS, DIM1, DIM2, DIM3, INDAT, QOK,
-     :                         INQUAL, IQMASK, ORDER, NEN, ENCHAN,
+     :                         INQUAL, ORDER, NEN, ENCHAN,
      :                         ODIM1, ODIM2, THRESH, NORM, OUTDAT,
      :                         OUTQUAL, STATUS )
 *
