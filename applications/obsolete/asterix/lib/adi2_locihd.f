@@ -101,7 +101,6 @@
       CHARACTER*4		STR
 
       INTEGER			HCID			! HDU container
-      INTEGER			HID			! New HDU
       INTEGER			NDIG			! Digits used in STR
 *.
 
