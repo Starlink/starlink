@@ -47,6 +47,12 @@
 *     polimp in table
 
 *  ADAM Parameters:
+*     ABORT = _LOGICAL (Read)
+*        If TRUE, then the application aborts immediately if an error
+*        occurs whilst processing any of the input data files. If FALSE,
+*        any such errors are annulled, and the application continues to
+*        process any remaining data files. The run time default is TRUE if 
+*        only a single data file is being processed, and FALSE otherwise. []
 *     IN = NDF (Read)
 *        A group of data files. This may take the form of a comma separated 
 *        list of file names, or any of the other forms described in the help 
@@ -269,6 +275,8 @@
 *        POLPACK extensions if an error occurs.
 *     1-APR-1999 (DSB):
 *        Added VERSION. Removed ANGROT from POLPACK extension.
+*     26-OCT-2001 (DSB):
+*        Added parameter ABORT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -304,6 +312,7 @@
       INTEGER IPFIT              ! Pointer to FITS block
       INTEGER NGOOD              ! No. of NDF's processed successfully
       INTEGER NNDF               ! Number of input NDFs
+      LOGICAL ABORT              ! Abort if any NDF cannot be processed?
       LOGICAL QUIET              ! Run silently?
       LOGICAL THERE              ! Object exists
       LOGICAL TOPEN              ! Translation table is open
@@ -353,6 +362,10 @@
    
          CALL MSG_BLANK( STATUS )
       END IF
+
+*  See if we should abort if an error occurs.
+      CALL PAR_DEF0L( 'ABORT', ( NNDF .EQ. 1 ), STATUS )
+      CALL PAR_GET0L( 'ABORT', ABORT, STATUS )
 
 *  Check that everything is ok so far.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -433,8 +446,15 @@
 *  Release the NDF.
          CALL NDF_ANNUL( INDF, STATUS )
 
-*  Flush any error.
-         IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
+*  If an error occurs, abort if ABORT is true, or flush the error
+*  otherwise.
+         IF( STATUS .NE. SAI__OK ) THEN
+            IF( ABORT ) THEN
+               GO TO 200
+            ELSE
+               CALL ERR_FLUSH( STATUS )
+            END IF
+         END IF
 
 *  Rewind the conrol table (if supplied).
          IF( TOPEN ) CALL FIO_RWIND( FDIN, STATUS )
@@ -442,7 +462,11 @@
 *  Space the screen output.
          IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
 
+*  End of input NDF loop.
  100  CONTINUE
+
+*  Arrive here if a fatal error occurs.
+ 200  CONTINUE
 
 *  Report an error if no NDFs were processed successfully.
       CALL GRP_GRPSZ( IGRP2, NGOOD, STATUS )

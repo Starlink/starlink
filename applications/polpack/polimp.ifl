@@ -23,6 +23,15 @@ interface POLIMP
 
    helplib 'POLPACK_HELP:'
 
+   parameter ABORT
+      type     _LOGICAL
+      access   READ
+      vpath    'DYNAMIC'
+      ppath    'DYNAMIC'
+      prompt   'Abort if any data file cannot be processed?'
+      helpkey  '*'
+   endparameter
+
    parameter IN                  # List of Input NDFs
       position 1
       type     LITERAL
