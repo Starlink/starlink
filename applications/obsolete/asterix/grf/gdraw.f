@@ -574,7 +574,7 @@
       INTEGER ISET,NSET
       INTEGER NVAL,VPTR
       INTEGER DPTR,APTR,QPTR,WPTR,XLPTR,XUPTR,YLPTR,YUPTR
-      INTEGER L1,L2,SDPTR,SVPTR,SQPTR
+      INTEGER L1,L2,SDPTR,SVPTR,SQPTR,IDUM
       REAL X1,X2,Y1,Y2,YDIFF
       REAL XMIN,XMAX,YMIN,YMAX
       LOGICAL POLY,STEP,POINTS,ERRS             ! plotting style
@@ -603,7 +603,8 @@
         CALL BDI_CHK( G_ID, 'Quality', QOK, STATUS )
 	IF ( QOK ) THEN
           CALL BDI_MAP( G_ID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
-          CALL BDI_GET( G_ID, 'QualityMask', 'UBYTE', MASK, STATUS )
+	  CALL BDI_GET( G_ID, 'QualityMask', 'UBYTE', 0, 0, MASK, IDUM,
+     :                  STATUS )
 	ENDIF
 
 *  check errors
@@ -911,6 +912,7 @@
       INTEGER YWPTR                             ! pointer to axis width
       INTEGER IX1,IX2,IY1,IY2
       BYTE MASK                                 ! QUALITY mask
+      INTEGER		IDUM
       INTEGER			PIXID,PRJID,SYSID	! Astrometry info
       LOGICAL XOK,YOK
       LOGICAL XREG,YREG,REG
@@ -996,7 +998,8 @@
         CALL BDI_CHK( ID, 'Quality', QOK, STATUS )
 	IF ( QOK ) THEN
           CALL BDI_MAP( ID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
-          CALL BDI_GET0B( ID, 'QualityMask', MASK, STATUS )
+	  CALL BDI_GET( ID, 'QualityMask', 'UBYTE', 0, 0, MASK, IDUM,
+     :                  STATUS )
 	END IF
 
 *  get attitude information
