@@ -83,6 +83,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER IPIC
@@ -93,28 +94,34 @@
 *  Status:
       INTEGER STATUS               ! Global status
 
+*  Local Constants:
+      INTEGER NSAMP                ! No. of samples to test axis linearity
+      PARAMETER ( NSAMP = 500 )
+
 *  Local Variables:
-      CHARACTER DTOW( 2 )*130      ! Data->World transformation expressions
       CHARACTER MODE*6             ! Access mode for picture's MORE structure
       CHARACTER MORLOC*(DAT__SZLOC)! HDS locator for picture's MORE structure
-      CHARACTER WTOD( 2 )*130      ! World->Data transformation expressions
-      DOUBLE PRECISION C           ! Offset constant
-      DOUBLE PRECISION M           ! Scale constant
-      DOUBLE PRECISION XD( 2 )     ! X bounds of picture in AGI Data coords
-      DOUBLE PRECISION XW( 2 )     ! X bounds of picture in AGI world coords
-      DOUBLE PRECISION YD( 2 )     ! Y bounds of picture in AGI Data coords
-      DOUBLE PRECISION YW( 2 )     ! Y bounds of picture in AGI world coords
+      DOUBLE PRECISION DX          ! X increment between axis samples
+      DOUBLE PRECISION DY          ! Y increment between axis samples
+      DOUBLE PRECISION OFFSET( 2 ) ! Offset constants
+      DOUBLE PRECISION SCALE( 2 )  ! Scale constants
+      DOUBLE PRECISION XD( NSAMP ) ! X samples in AGI Data coords
+      DOUBLE PRECISION RMS         ! RMS error of fit
+      DOUBLE PRECISION XW( NSAMP ) ! X samples in AGI world coords
+      DOUBLE PRECISION YD( NSAMP ) ! Y samples in AGI Data coords
+      DOUBLE PRECISION YW( NSAMP ) ! Y samples in AGI world coords
       INTEGER FRM                  ! Pointer to next Frame
-      INTEGER I                    ! Frame index
+      INTEGER I                    ! Frame index/loop counter
       INTEGER IDATA                ! Index of AXIS Frame in IPLOT
       INTEGER IFRM                 ! Index of AGI_DATA Frame
       INTEGER IPIC0                ! Original current AGI picture identifier 
       INTEGER IPICL                ! AGI identifier for picture to use
       INTEGER IWORLD               ! Index of AGI world co-ord Frame in IPLOT
       INTEGER MAP                  ! AST pointer to WORLD->DATA Mapping
-      INTEGER NSUBS                ! No. of token substitutions made
       LOGICAL MORE                 ! Does picture have a MORE structure?
       LOGICAL THERE                ! Does MORE have an AST_PLOT component?
+      LOGICAL XDLIN                ! X Data axis linear?
+      LOGICAL YDLIN                ! Y Data axis linear?
       REAL WX1, WX2, WY1, WY2      ! Bounds of picture in AGI world coords
 
 *.
@@ -197,72 +204,77 @@
 
 *  If both Frames were found, get the mapping from World to Data, and
 *  simplify it.
-      IF( IWORLD .NE. AST__NOFRAME .AND. IDATA .NE. AST__NOFRAME ) THEN
+      IF( IWORLD .NE. AST__NOFRAME .AND. IDATA .NE. AST__NOFRAME 
+     :    .AND. STATUS .EQ. SAI__OK ) THEN
          MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, IWORLD, IDATA, 
      :                                       STATUS ), STATUS )
 
-*  If the simplified Mapping is linear with independant axes (a ZoomMap or a 
-*  WinMap), we can store an equivalent TRANSFORM structure in the AGI database 
-*  giving AGI "Data" co-ordinates. 
-         IF( AST_ISAZOOMMAP( MAP, STATUS ) .OR.
-     :       AST_ISAWINMAP( MAP, STATUS ) ) THEN
+*  Cannot use the mapping unless it has 2 inputs and 2 outputs.
+         IF( AST_GETI( MAP, 'NIN', STATUS ) .EQ. 2 .AND.
+     :       AST_GETI( MAP, 'NOUT', STATUS ) .EQ. 2 .AND.
+     :       STATUS .EQ. SAI__OK ) THEN
 
-*  Get the AGI world co-odinate bounds of the requested picture.
+*  Ensure the requested AGI picture is current (saving the current
+*  picture ID first).
             IF( IPIC .NE. - 1 ) THEN
                CALL AGI_ICURP( IPIC0, STATUS )
                CALL AGI_SELP( IPIC, STATUS )
             END IF
+
+*  Get the AGI world co-odinate bounds of the requested picture.
             CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS ) 
+
+*  Form a list of NSAMP points evenly spread in world co-ordinates along
+*  each axis.
+            DX = DBLE( WX2 - WX1 )/( NSAMP - 1 ) 
+            DY = DBLE( WY2 - WY1 )/( NSAMP - 1 )
+            DO I = 0, NSAMP - 1
+               XW( I + 1 ) = DBLE( WX1 ) + DX*I
+               YW( I + 1 ) = DBLE( WX1 ) + DX*I
+            END DO
+
+*  Transform these World Domain positions into the Data Domain.
+            CALL AST_TRAN2( MAP, NSAMP, XW, YW, .TRUE., XD, YD, STATUS ) 
+
+*  Attempt to fit a straight line through the XD and XW values.
+            CALL KPG1_FIT1D( 1, NSAMP, XD, XW, SCALE( 1 ), OFFSET( 1 ), 
+     :                       RMS, STATUS )
+
+*  Consider the fit good if the RMS error is less than 0.1 of the increment
+*  in XD between samples.
+            XDLIN = ( RMS .LT. ABS( 0.1D0*SCALE( 1 )*DX ) )
+
+*  Attempt to fit a straight line through the YD and YW values.
+            CALL KPG1_FIT1D( 1, NSAMP, YD, YW, SCALE( 2 ), OFFSET( 2 ), 
+     :                       RMS, STATUS )
+
+*  Consider the fit good if the RMS error is less than 0.1 of the increment
+*  in XD between samples.
+            YDLIN = ( RMS .LT. ABS( 0.1D0*SCALE( 2 )*DY ) )
+
+*  If succesful, and both are linear, and the two co-ordinate systems are 
+*  not identical...
+            IF( STATUS .EQ. SAI__OK .AND. XDLIN .AND. YDLIN .AND.
+     :          ABS( SCALE( 1 ) - 1.0D0 ) .GE. VAL__EPSD .OR.
+     :          ABS( OFFSET( 1 ) - 0.0D0 ) .GE. VAL__EPSD .OR.
+     :          ABS( SCALE( 2 ) - 1.0D0 ) .GE. VAL__EPSD .OR.
+     :          ABS( OFFSET( 2 ) - 0.0D0 ) .GE. VAL__EPSD ) THEN
+
+*  Save a linear TRANSFORM structure with the current AGI picture.
+               CALL KPG1_LITRD( SCALE, OFFSET, STATUS )
+
+            END IF
+
+*  If necessary, re-instate the original current AGI picture.
             IF( IPIC .NE. - 1 ) CALL AGI_SELP( IPIC0, STATUS )
-
-*  Transform these into Data co-ordinates using the above Mapping.
-            XW( 1 ) = DBLE( WX1 )
-            XW( 2 ) = DBLE( WX2 )
-            YW( 1 ) = DBLE( WY1 )
-            YW( 2 ) = DBLE( WY2 )
-
-            CALL AST_TRAN2( MAP, 2, XW, YW, .TRUE., XD, YD, STATUS ) 
-
-*  Do not store a transformation if it would be singular.
-            IF( XW( 2 ) .NE. XW( 1 ) .AND.
-     :          YW( 2 ) .NE. YW( 1 ) .AND.
-     :          XD( 2 ) .NE. XD( 1 ) .AND.
-     :          YD( 2 ) .NE. YD( 1 ) ) THEN
-
-*  Create a TRANSFORM structure describing the Mapping, and store with
-*  the picture in the AGI database.
-               WTOD( 1 ) = 'DX = M*WX + C'
-               M = ( XD( 2 ) - XD( 1 ) )/( XW( 2 ) - XW( 1 ) )
-               C = XD( 1 ) - XW( 1 )*M
-               CALL TRN_STOKD( 'M', M, WTOD( 1 ), NSUBS, STATUS )
-               CALL TRN_STOKD( 'C', C, WTOD( 1 ), NSUBS, STATUS )
-
-               WTOD( 2 ) = 'DY = M*WY + C'
-               M = ( YD( 2 ) - YD( 1 ) )/( YW( 2 ) - YW( 1 ) )
-               C = YD( 1 ) - YW( 1 )*M
-               CALL TRN_STOKD( 'M', M, WTOD( 2 ), NSUBS, STATUS )
-               CALL TRN_STOKD( 'C', C, WTOD( 2 ), NSUBS, STATUS )
-
-               DTOW( 1 ) = 'WX = M*DX + C'
-               M = ( XW( 2 ) - XW( 1 ) )/( XD( 2 ) - XD( 1 ) )
-               C = XW( 1 ) - XD( 1 )*M
-               CALL TRN_STOKD( 'M', M, DTOW( 1 ), NSUBS, STATUS )
-               CALL TRN_STOKD( 'C', C, DTOW( 1 ), NSUBS, STATUS )
-
-               DTOW( 2 ) = 'WY = M*DY + C'
-               M = ( YW( 2 ) - YW( 1 ) )/( YD( 2 ) - YD( 1 ) )
-               C = YW( 1 ) - YD( 1 )*M
-               CALL TRN_STOKD( 'M', M, DTOW( 2 ), NSUBS, STATUS )
-               CALL TRN_STOKD( 'C', C, DTOW( 2 ), NSUBS, STATUS )
-
-               CALL AGI_TNEW( 2, 2, DTOW, WTOD, IPIC, STATUS ) 
-
-            ENDIF
 
          END IF
 
 *  Annul the Mapping pointer.
          CALL AST_ANNUL( MAP, STATUS )
+
+*  Annul any error since failure to store a Data TRANSFORM is not fatal.
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
       END IF
 
