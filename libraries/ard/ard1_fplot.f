@@ -114,6 +114,7 @@
       INTEGER FR                 ! Frame pointer
       INTEGER I                  ! Frame index
       INTEGER IAST(2)            ! AST Frame or FrameSet pointer
+      INTEGER IBASE              ! Index of original Base Frame
       INTEGER IMAP               ! AST IntraMap identifier
       INTEGER IOPND              ! Next free entry in operands array
       INTEGER IPAR               ! Index of first region parameters 
@@ -175,6 +176,7 @@
 
 *  If it is a Plot, ensure the GRAPHICS Frame is the Base Frame.
             ELSE
+               IBASE = AST_GETI( IAST( 1 ), 'BASE', STATUS )
                DO I = 1, AST_GETI( IAST( 1 ), 'NFRAME', STATUS )
                   FR = AST_GETFRAME( IAST( 1 ), I, STATUS )
                   IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. 
@@ -329,9 +331,13 @@
             CALL ERR_RLSE
          END IF
 
+*  Reinstate the original Base Frame.
+         CALL AST_SETI( IAST( 1 ), 'BASE', IBASE, STATUS )
+
 *  End the AST context.
          CALL AST_END( STATUS )
 
       END IF
+
 
       END

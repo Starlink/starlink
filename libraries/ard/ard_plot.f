@@ -273,6 +273,9 @@
          CALL ARD1_FPLOT( SZEXPR, %VAL( IPEXPR ), SZOPND, 
      :                    %VAL( IPOPND ), OK, STATUS )
 
+*  Clear the flag which prevents any Mapping being considered Linear.
+         CMN_LINOK = .TRUE.  
+
       END IF
 
 *  If the ARD description was not just a single keyword, we use the
