@@ -21,13 +21,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       INTEGER               S1,S2,S3,S4,S5,S6,S7       ! Array dimensions
       CHARACTER*(*)         DATA(S1,S2,S3,S4,S5,S6,S7) !
-      INTEGER               INDICES(DAT__MXDIM)        ! Element to convert
+      INTEGER               INDICES(ADI__MXDIM)        ! Element to convert
       CHARACTER*(*)         FMT                        ! Conversion format
 *
 *    Export :
@@ -82,13 +82,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       INTEGER               S1,S2,S3,S4,S5,S6,S7       ! Array dimensions
       INTEGER               DATA(S1,S2,S3,S4,S5,S6,S7) !
-      INTEGER               INDICES(DAT__MXDIM)        ! Element to convert
+      INTEGER               INDICES(ADI__MXDIM)        ! Element to convert
       CHARACTER*(*)         FMT                        ! Conversion format
 *
 *    Export :
@@ -176,13 +176,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       INTEGER               S1,S2,S3,S4,S5,S6,S7       ! Array dimensions
       REAL                  DATA(S1,S2,S3,S4,S5,S6,S7) !
-      INTEGER               INDICES(DAT__MXDIM)        ! Element to convert
+      INTEGER               INDICES(ADI__MXDIM)        ! Element to convert
       CHARACTER*(*)         FMT                        ! Conversion format
 *
 *    Export :
@@ -234,13 +234,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       INTEGER               S1,S2,S3,S4,S5,S6,S7       ! Array dimensions
       DOUBLE PRECISION      DATA(S1,S2,S3,S4,S5,S6,S7) !
-      INTEGER               INDICES(DAT__MXDIM)        ! Element to convert
+      INTEGER               INDICES(ADI__MXDIM)        ! Element to convert
       CHARACTER*(*)         FMT                        ! Conversion format
 *
 *    Export :
@@ -292,13 +292,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       INTEGER               S1,S2,S3,S4,S5,S6,S7       ! Array dimensions
       LOGICAL               DATA(S1,S2,S3,S4,S5,S6,S7) !
-      INTEGER               INDICES(DAT__MXDIM)        ! Element to convert
+      INTEGER               INDICES(ADI__MXDIM)        ! Element to convert
       CHARACTER*(*)         FMT                        ! Conversion format
 *
 *    Export :
