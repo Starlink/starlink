@@ -461,7 +461,8 @@ pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
 polversion.f pol1_3dwcs.f pol1_fbbox.f polwrtcl.f pol1_wrtcl.f \
 pol1_gcolr.f pol1_gcold.f pol1_fioer.f  polrdtcl.f pol1_rdtcl.f \
 pol1_ctprp.f pol1_put0r.f pol1_put0d.f pol1_gtcol.f pol1_cnews.f \
-pol1_colnm.f pol1_cnfig.f pol1_tiqac.f pol1_pkaxs.f pol1_fclos.f
+pol1_colnm.f pol1_cnfig.f pol1_tiqac.f pol1_pkaxs.f pol1_fclos.f \
+polzconv.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -501,7 +502,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
 polexpx polexp polvec polplot polbin polsim polimage polstack polprep \
-polversion polwrtcl polrdtcl
+polversion polwrtcl polrdtcl polzconv
 
 #  Monolith routine source name.
 
@@ -520,7 +521,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
 polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl polstack.ifl polprep.ifl \
-polversion.ifl polwrtcl.ifl polrdtcl.ifl
+polversion.ifl polwrtcl.ifl polrdtcl.ifl polzconv.ifl
 
 #  List of help library sources.
 
@@ -1875,6 +1876,7 @@ polstack.o:	 SAE_PAR GRP_PAR PAR_ERR
 polvec.o:	 SAE_PAR PAR_ERR PRM_PAR NDF_PAR AST_PAR
 polversion.o:	 SAE_PAR PAR_ERR
 polwrtcl.o:	 SAE_PAR AST_PAR CAT_PAR PRM_PAR CAT_ERR
+polzconv.o:	 SAE_PAR AST_PAR CAT_PAR PAR_ERR
 pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR

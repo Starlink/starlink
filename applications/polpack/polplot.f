@@ -722,36 +722,24 @@
             ELSE IF( STATUS .EQ. PAR__NULL ) THEN 
                CALL ERR_ANNUL( STATUS )
 
-*  Find the max and min Z values in the Z column.
-               CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, 
-     :                          SZLO, MAXPOS, MINPOS, STATUS )
-
-*  If there is only a single Z value available, use it.
-               IF( SZHI .LE. SZLO ) THEN
-                  ZUSE = SZLO
-                  ZCURR = .TRUE.
-
-*  Otherwise, allow the user to choose a Z value.
-               ELSE
-
 *  Get the required Z value in the current Frame.
-                  CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, Z, 
-     :                             NVAL, STATUS )
+               CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, Z, 
+     :                          NVAL, STATUS )
 
 *  Use the third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-                  CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
+               CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
 
 *  If the result was undefined, we need to get the Z value again, this
 *  time in the base Frame.
-                  IF( Z .EQ. AST__BAD ) THEN
-                     ZCURR = .FALSE.
-                     CALL PAR_GET0C( 'ZAXVAL', ZTEXT, STATUS )
-    
-                     CALL MSG_BLANK( STATUS )
-                     CALL MSG_SETC( 'NAME', NAME )
-                     CALL MSG_SETC( 'Z', ZTEXT )
-                     CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied '//
+               IF( Z .EQ. AST__BAD ) THEN
+                  ZCURR = .FALSE.
+                  CALL PAR_GET0C( 'ZAXVAL', ZTEXT, STATUS )
+ 
+                  CALL MSG_BLANK( STATUS )
+                  CALL MSG_SETC( 'NAME', NAME )
+                  CALL MSG_SETC( 'Z', ZTEXT )
+                  CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied '//
      :                    'value for the ZAXVAL parameter (^Z) could '//
      :                    'not be converted into a value for the '//
      :                    '^NAME column in the catalogue. Please '//
@@ -759,12 +747,10 @@
      :                    'in the same coordinate system as the '//
      :                    'values in the ^NAME column:', STATUS )
 
-                     CALL PAR_CANCL( 'ZCOLVAL', STATUS )
-                     CALL PAR_GET0D( 'ZCOLVAL', Z, STATUS )
-                  ELSE
-                     ZCURR = .TRUE.
-                  END IF
-
+                  CALL PAR_CANCL( 'ZCOLVAL', STATUS )
+                  CALL PAR_GET0D( 'ZCOLVAL', Z, STATUS )
+               ELSE
+                  ZCURR = .TRUE.
                END IF
 
             END IF

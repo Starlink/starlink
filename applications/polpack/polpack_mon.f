@@ -161,6 +161,9 @@
       ELSE IF ( NAME .EQ. 'POLWRTCL' ) THEN
          CALL POLWRTCL( STATUS )
 
+      ELSE IF ( NAME .EQ. 'POLZCONV' ) THEN
+         CALL POLZCONV( STATUS )
+
       ELSE
 
 *  No such option exists.
