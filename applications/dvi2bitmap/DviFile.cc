@@ -48,9 +48,9 @@ using std::cerr;
 using std::endl;
 #endif
 
-#include "DviFile.h"
-#include "PkFont.h"
-#include "InputByteStream.h"
+#include <DviFile.h>
+#include <PkFont.h>
+#include <FileByteStream.h>
 
 // Static debug switch
 verbosities DviFile::verbosity_ = normal;
@@ -122,31 +122,49 @@ DviFile::DviFile (string& fn,
 
     try
     {
+	if (fileName_ == "-") {
+	    fileName_ = "<osfd>0";
+	    seekable = false;
+	}
+
 	if (seekable) {
 	    // ordinary file
-	    if (fileName_ == "-") {
-		read_post = false;
-		dvif_ = new InputByteStream(STDIN_FILENO);
-		if (verbosity_ > normal)
-		    cerr << "DviFile: Reading DVI file from stdin" << endl;
-	    } else {
-		dvif_ = new InputByteStream (fileName_, false, ".dvi");
-	    }
+	    FileByteStream* D = new FileByteStream(fileName_, ".dvi", false);
 	    if (read_post) {
-		read_postamble();
-		dvif_->seek(0);	// return to beginning
+		read_postamble(D);
 	    }
+	    dvif_ = D;
 	} else {
+	    dvif_ = new InputByteStream(fileName_);
 	    read_post = false;
-	    int fd = open(fileName_.c_str(), O_RDONLY, 0);
-	    if (fd < 0)
-		throw InputByteStreamError("Can't open file " + fileName_
-					   + " to read");
-	    dvif_ = new InputByteStream(fd);
-	    if (verbosity_ > normal)
-		cerr << "DviFile: opened unseekable file " << fileName_
-		     << " to read" << endl;
 	}
+	
+// 	if (fileName_ == "-") {
+// 	    // special case: read stdin
+// 	    read_post = false;
+// 	    dvif_ = new InputByteStream(STDIN_FILENO);
+// 	    if (verbosity_ > normal)
+// 		cerr << "DviFile: Reading DVI file from stdin" << endl;
+// 	} else if (seekable) {
+// 	    // ordinary file
+// 	    dvif_ = new FileByteStream (fileName_, ".dvi", false);
+// 	    if (read_post) {
+// 		read_postamble();
+// 		dvif_->seek(0);	// return to beginning
+// 	    }
+// 	} else {
+// 	    // file to be opened by name, but not seekable
+// 	    read_post = false;
+// 	    int fd = open(fileName_.c_str(), O_RDONLY, 0);
+// 	    if (fd < 0)
+// 		throw InputByteStreamError("Can't open file " + fileName_
+// 					   + " to read");
+// 	    dvif_ = new InputByteStream(fd);
+// 	    if (verbosity_ > normal)
+// 		cerr << "DviFile: opened unseekable file " << fileName_
+// 		     << " to read" << endl;
+// 	}
+
 #if HOMEMADE_POSSTATESTACK
 	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
 #endif
@@ -893,11 +911,13 @@ void DviFile::updateV_ (int vup)
 	     << endl;
 }
 
-void DviFile::read_postamble()
+void DviFile::read_postamble(FileByteStream *dvifile)
+    throw (DviError)
 {
     const int tailbuflen = 64;
     // get final 64 bytes of file
-    const Byte *dviBuf = dvif_->getBlock(-tailbuflen, tailbuflen);
+    dvifile->seek(-tailbuflen);
+    const Byte *dviBuf = dvifile->getBlock(tailbuflen);
     const Byte *p;
     for (p=dviBuf+tailbuflen-1; p>=dviBuf; p--)
 	if (*p != 223)
@@ -917,19 +937,19 @@ void DviFile::read_postamble()
     if (verbosity_ > normal)
 	cerr << "Postamble address=" << q << endl;
 
-    dvif_->seek(q);
+    dvifile->seek(q);
     if (getByte() != 248)
 	throw DviError ("DviFile::read_postamble: expected post command");
     // Read and discard four integers
-    (void) dvif_->getUIU(4);	// pointer to final bop
-    (void) dvif_->getUIU(4);	// unit-of-measurement numerator...
-    (void) dvif_->getUIU(4);	// ...and denominator
-    unsigned int dvimag = dvif_->getUIU(4);	// mag
+    (void) dvifile->getUIU(4);	// pointer to final bop
+    (void) dvifile->getUIU(4);	// unit-of-measurement numerator...
+    (void) dvifile->getUIU(4);	// ...and denominator
+    unsigned int dvimag = dvifile->getUIU(4);	// mag
     postamble_.mag = dvimag;	// store dvimag
-    postamble_.l = dvif_->getUIU(4);    
-    postamble_.u = dvif_->getUIU(4);    
-    postamble_.s = dvif_->getUIU(2);    
-    postamble_.t = dvif_->getUIU(2);
+    postamble_.l = dvifile->getUIU(4);    
+    postamble_.u = dvifile->getUIU(4);    
+    postamble_.s = dvifile->getUIU(2);    
+    postamble_.t = dvifile->getUIU(2);
     // Multiply the page sizes by the external magnification.  Do not
     // multiply the postamble sizes by this -- leave them as they were
     // read from the file.
@@ -990,6 +1010,7 @@ void DviFile::read_postamble()
     }
 
     have_read_postamble_ = true;
+    dvifile->seek(0);
 }
 
 /**

@@ -43,11 +43,11 @@ using std::map;
 #endif
 
 
-#include "Byte.h"
-#include "DviError.h"
-#include "InputByteStream.h"
-#include "PkFont.h"
-#include "verbosity.h"
+#include <Byte.h>
+#include <DviError.h>
+#include <FileByteStream.h>
+#include <PkFont.h>
+#include <verbosity.h>
 
 // I think the GCC 2.8.1 stack implementation may be buggy.  
 // Setting this to 1 switches on a home-made version.
@@ -223,7 +223,8 @@ private:
 	{ return (netmag_==1.0
 		  ? i
 		  : static_cast<int>(netmag_*(double)i)); }
-    void read_postamble ();
+    void read_postamble (FileByteStream*)
+	    throw (DviError);
     bool have_read_postamble_;
     void process_preamble(DviFilePreamble *);
     void fnt_def_(double fontmag, int nbytes);

@@ -53,13 +53,13 @@ using std::ios;
 #define STD 
 #endif
 
-#include "DviError.h"
-#include "InputByteStream.h"
-#include "PkFont.h"
-#include "Util.h"
-#include "stringstream.h"
+#include <DviError.h>
+#include <FileByteStream.h>
+#include <PkFont.h>
+#include <Util.h>
+#include <stringstream.h>
 #ifdef ENABLE_KPATHSEA
-#include "kpathsea.h"
+#include <kpathsea.h>
 #endif
 
 
@@ -205,7 +205,7 @@ PkFont::PkFont(double fontmag,
 	}
 	path_ = pk_file_path;
 
-	pkf_ = new InputByteStream (path_, true);
+	pkf_ = new FileByteStream (path_, "", true);
 	for (unsigned int i=0; i<nglyphs_; i++)
 	    glyphs_[i] = 0;
 	read_font (*pkf_);
@@ -617,7 +617,7 @@ void PkFont::read_font (InputByteStream& pkf)
 	    bool two_byte = opcode & 4;
 	    Byte pl_prefix = static_cast<Byte>(opcode & 3);
 	    unsigned int packet_length;
-	    unsigned int pos;	// primarily for debugging output
+	    //unsigned int pos;	// primarily for debugging output
 
 	    unsigned int g_cc, g_tfmwidth, g_dm, g_dx, g_dy, g_w, g_h;
 	    int g_hoff, g_voff;
@@ -638,7 +638,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			throw DviError
 			    ("PK file has out-of-range character code");
 
-		    pos = pkf.pos();
+		    //pos = pkf.pos();
 		    packet_length -= 7*4;
 
 		    if (verbosity_ > debug)
@@ -660,16 +660,18 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << " hoff=" << g_hoff
 			     << " voff=" << g_voff
 			     << STD::dec
-			     << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
+			     << "(len="<<packet_length<<")"
+				//<< "(pos="<<pos<<" len="<<packet_length<<")"
+			     << endl;
 
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
-					    pkf.getBlock(pos,packet_length),
+					    pkf.getBlock(packet_length),
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dx, g_dy, 
 						 g_w, g_h, g_hoff, g_voff,
 						 rd, this);
-		    pkf.skip (packet_length);
+		    //pkf.skip (packet_length);
 		}
 		else		// extended short form character preamble
 		{
@@ -688,7 +690,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			throw DviError
 			    ("PK file has out-of-range character code");
 
-		    pos = pkf.pos();
+		    //pos = pkf.pos();
 		    packet_length -= 3 + 5*2;
 
 		    if (verbosity_ > debug)
@@ -709,16 +711,18 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << " hoff=" << g_hoff
 			     << " voff=" << g_voff
 			     << STD::dec
-			     << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
+			     << "(len="<<packet_length<<")"
+				//<< "(pos="<<pos<<" len="<<packet_length<<")"
+			     << endl;
 
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
-					    pkf.getBlock(pos,packet_length),
+					    pkf.getBlock(packet_length),
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 						 g_w, g_h, g_hoff, g_voff,
 						 rd, this);
-		    pkf.skip (packet_length);
+		    //pkf.skip (packet_length);
 		}
 	    else		// short form character preamble
 	    {
@@ -737,7 +741,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		    throw DviError
 			("PK file has out-of-range character code");
 
-		pos = pkf.pos();
+		//pos = pkf.pos();
 		packet_length -= 8;
 
 		if (verbosity_ > debug)
@@ -758,16 +762,18 @@ void PkFont::read_font (InputByteStream& pkf)
 			 << " hoff=" << g_hoff
 			 << " voff=" << g_voff
 			 << STD::dec
-			 << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
+			 << "(len="<<packet_length<<")"
+			    //<< "(pos="<<pos<<" len="<<packet_length<<")"
+			 << endl;
 
 		PkRasterdata *rd
 		    = new PkRasterdata (opcode,
-					pkf.getBlock(pos,packet_length),
+					pkf.getBlock(packet_length),
 					packet_length, g_w, g_h);
 		glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 					     g_w, g_h, g_hoff, g_voff,
 					     rd, this);
-		pkf.skip(packet_length);
+		//pkf.skip(packet_length);
 	    }
 	    if (verbosity_ > debug)
 		cerr << "charsizes " << g_cc
@@ -775,8 +781,8 @@ void PkFont::read_font (InputByteStream& pkf)
 		     << " w="   << g_w
 		     << " h="   << g_h
 		     << " off=(" << g_hoff << ',' << g_voff
-		     << ") at " << pos
-		     << '(' << packet_length << ")" << endl;
+			//<< ") at " << pos
+		     << "(len " << packet_length << ")" << endl;
 	}
 	else			// opcode is command
 	{

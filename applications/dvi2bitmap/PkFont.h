@@ -33,10 +33,10 @@
 #include <string>
 // We only need to include <ostream> here, but <iostream> is on more machines
 #include <iostream>
-#include "InputByteStream.h"
-#include "Byte.h"
-#include "DviError.h"
-#include "verbosity.h"
+#include <FileByteStream.h>
+#include <Byte.h>
+#include <DviError.h>
+#include <verbosity.h>
 
 class PkFont;
 
@@ -355,7 +355,7 @@ class PkFont {
 
     string name_;
     string path_;		/* name of (tbd) file containing font */
-    InputByteStream *pkf_;
+    FileByteStream *pkf_;
     bool font_loaded_;		/* font loaded successfully */
     struct {
 	unsigned int c;		/* font checksum */

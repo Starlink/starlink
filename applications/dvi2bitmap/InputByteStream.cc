@@ -27,18 +27,20 @@
 
 #include <config.h>
 
-#include "InputByteStream.h"
+#include <InputByteStream.h>
 
 #include <iostream>
 #include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>		// for strerror
+
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
+#include <cstdlib>
+#include <cassert>
 #include <cerrno>
 #else
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 #include <errno.h>
 #endif
 
@@ -50,307 +52,62 @@ using std::endl;
 
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
-unsigned int InputByteStream::buffer_length_ = 512;
+unsigned int InputByteStream::default_buffer_length_ = 512;
 
-/**
- * Opens the requested file.  If preload is true, then open the file
- * and read it entire into memory, since the client will be seeking a
- * lot.  If the file can't be opened, then try adding
- * <code>tryext</code> to the end of it.  Certain methods below can be
- * called only on files which have been preloaded.
- *
- * @param filename the file to be opened
- * @param preload if true, then the file is read entirely into memory
- * @param tryext a file extension which should be added to the end of
- * <code>filename</code> if that cannot be opened
- */
-InputByteStream::InputByteStream (string& filename, bool preload,
-                                  string tryext)
-    : eof_(true), preloaded_(preload), seekable_(true)
+InputByteStream::InputByteStream()
+    : eof_(true), close_callback_(0)
 {
-    //fname_ = filename;
-    cerr << "InputByteStream(" << filename << "," << preload << ","
-	 << tryext << ")" << endl;
-    int newfd = open (filename.c_str(), O_RDONLY);
-    if (newfd < 0 && tryext.length() > 0)
-    {
-	string tfilename = filename + tryext;
-	newfd = open (tfilename.c_str(), O_RDONLY);
-	if (newfd >= 0)
-            // If this succeeds in opening the file, then modify the filename.
-	    filename = tfilename;
-    }
-    if (newfd < 0)
-    {
-	string errstr = strerror (errno);
-	throw InputByteStreamError ("can\'t open file " + filename
-                                    + " to read (" + errstr + ")");
-    }
-
-    struct stat S;
-    if (fstat (newfd, &S))
-    {
-	string errstr = strerror (errno);
-	throw InputByteStreamError ("Can't stat open file (" + errstr + ")");
-    }
-    filesize_ = S.st_size;
-
-    if (preload)
-    {
-	buflen_ = filesize_;
-	buf_ = new Byte[buflen_];
-	size_t bufcontents = read(newfd, buf_, buflen_);
-	if (bufcontents != buflen_)
-	{
-	    string errstr = strerror (errno);
-	    throw InputByteStreamError ("Couldn't preload file "+filename
-					+" ("+errstr+")");
-	}
-	eob_ = buf_ + bufcontents;
-	p_ = buf_;
-	eof_ = false;
-
-	close (newfd);
-	fd_ = -1;
-
-	if (verbosity_ > normal)
-	    cerr << "InputByteStream: preloaded " << fname_
-		 << ", " << filesize_ << " bytes" << endl;
-    } else {
-	bindToFileDescriptor(newfd);
-    }
-    fname_ = filename;
+    // empty
 }
 
 /**
- * Prepare to read from the requested file descriptor.  The
- * descriptor must be open, and can refer to a non-seekable file such
- * as a pipe.
+ * Prepares to read a stream from the specified file descriptor, which
+ * must be open.
  *
- * @param fileno the file descriptor to read from
+ * @param fd an open file descriptor
+ * @throws InputByteStreamError if there is a problem binding to the
+ * descriptor
  */
-InputByteStream::InputByteStream(int fileno)
-    : eof_(true), preloaded_(false), seekable_(false)
+InputByteStream::InputByteStream(int fd)
+    throw (InputByteStreamError)
+    : eof_(true)
 {
-    bindToFileDescriptor(fileno);
+    bindToFileDescriptor(fd, "", 0, false);
 }
-
-bool InputByteStream::bindToFileDescriptor(int fileno)
-{
-    fd_ = fileno;
-    char filenamebuf[20]; // just in case fileno is a _large_ number...
-    sprintf(filenamebuf, "fd:%d", fileno);
-    fname_ = filenamebuf;
-
-    eof_ = false;
-
-    buflen_ = buffer_length_;
-    buf_ = new Byte[buflen_];
-    p_ = eob_ = buf_;		// nothing read in yet -- eob at start
-    if (verbosity_ > normal)
-	cerr << "InputByteStream: reading from fd " << fileno
-	     << ", name=" << fname_
-	     << endl;
-
-    return true;
-}
-
 
 /**
- * Sets the buffer size to be used for reading files.
+ * Prepares to read a stream from the specified source.
  *
- * @param length the size, in bytes, of the input buffer
+ * <p>The source may be
+ * <ul>
+ * <li>a file name, which should be readable
+ * <li>a specifier of the form <code>&lt;osfile&gt;filename</code>:
+ * the specified file is opened
+ * <li>a specifier of the form <code>&lt;osfd&gt;integer</code>,
+ * specifying an (open) OS file descriptor; thus
+ * <code>&lt;osfd&gt;0</code> opens the standard input
+ * </ul>
+ *
+ * @param srcspec a source specification as described above
+ * @throws InputByteStreamError if there is a problem opening or
+ * binding to the descriptor
  */
-void InputByteStream::setBufferSize(unsigned int length)
+InputByteStream::InputByteStream(string srcspec)
+    throw (InputByteStreamError)
+    : eof_(true)
 {
-    buffer_length_ = length;
+    int fd = openSourceSpec(srcspec);
+    bindToFileDescriptor(fd, srcspec, 0, false);
 }
-
 
 /**
  * Closes the file and reclaims any buffers.
  */
 InputByteStream::~InputByteStream ()
 {
-    if (fd_ >= 0)
-	close (fd_);
+    close_fd_();
     if (buf_ != 0)
 	delete[] buf_;
-    buf_ = 0;
-}
-
-/**
- * Reads a byte from the stream.  This method does not signal
- * an error at end-of-file; use the {@ #eof} method to detect if the
- * stream is at an end.
- *
- * @return the byte read, or zero if we are at the end of the file
- * @throws DviBug if an internal inconsistency is found
- */
-Byte InputByteStream::getByte(void)
-    throw (DviBug)
-{
-    if (eof_)
-	return 0;
-
-    if (p_ < buf_)
-	throw DviBug ("InputByteStream:" + fname_
-		      + ": pointer before buffer start");
-    if (p_ > eob_)
-	throw DviBug ("InputByteStream:" + fname_
-		      + ": pointer beyond EOF");
-
-    if (p_ == eob_)
-    {
-	if (preloaded_)		// end of buffer means end of file
-	    eof_ = true;
-	else
-	    read_buf_();
-    }
-    Byte result = eof_ ? static_cast<Byte>(0) : *p_;
-    ++p_;
-    return result;
-}
-
-/**
- * Reads a block of data from anywhere in the file.  The stream
- * pointer is placed at the beginning of this block.
- *
- * @param pos the offset from the beginning of the file from which the
- * block should be read.  If <code>pos</code> is negative, then read
- * the block from an offset <code>-pos</code> from the <em>end</em> of
- * the file.
- *
- * @param length the number of bytes to read, which must be no greater
- * than the buffer size of the file, as obtained from {@link #getBufferSize}
- *
- * @return a pointer to an array of bytes, or a null pointer if we
- * are at the end of the file
- *
- * @throws InputByteStreamError if the stream is not seekable, if
- * <code>|pos|</code> is larger than the size of the file, or if
- * <code>length</code> is greater than the buffer size of the file
- */
-const Byte *InputByteStream::getBlock (int pos, unsigned int length)
-    throw (InputByteStreamError)
-{
-    if (eof_)
-	return 0;
-
-    if (!seekable_)
- 	throw InputByteStreamError("InputByteStream::getblock: stream "
-				   + fname_ + " is not seekable");
-
-    if (length > buffer_length_) {
-	char errbuf[100];
-	sprintf(errbuf,
-		"InputByteStream::getblock: length %d is greater than the stream buffer size, %d",
-		length, buffer_length_);
- 	throw InputByteStreamError(errbuf);
-    }
-
-    seek(pos);
-    Byte *blockp;
-    if (preloaded_)
-	blockp = p_;
-    else {
-	read_buf_();
-	blockp = p_;
-    }
-
-    return blockp;
-}
-
-/** 
- * Skip to a specified place in the file.
- *
- * @param pos the offset from the beginning of the file from which the
- * block should be read.  If <code>pos</code> is negative, then read
- * the block from an offset <code>-pos</code> from the <em>end</em> of
- * the file.
- *
- * @throws InputByteStreamError if argument <code>|pos|</code> is
- * larger than the size of the file
- */
-void InputByteStream::seek (int pos)
-    throw (InputByteStreamError)
-{
-    if (!seekable_)
-	throw InputByteStreamError("getblock: stream " + fname_
-				   + " is not seekable");
-
-    if (pos > 0) {
-	if (pos > filesize_) 
-	    throw InputByteStreamError
-		    ("InputByteStream::seek:"+fname_+": out of range");
-    } else {
-	if (-pos > filesize_)
-	    throw InputByteStreamError
-		    ("InputByteStream::seek:"+fname_+": out of range");
-    }
-
-    if (preloaded_) {
-	if (pos > 0) {
-	    p_ = buf_ + pos;
-	} else {
-	    p_ = buf_ + buflen_ + pos;
-	}
-	if (verbosity_ > normal)
-	    cerr << "seek(" << pos << "),preloaded: p_-buf_=" << p_-buf_
-		 << endl;
-    } else {
-	off_t off;
-	
-	if (pos >= 0)
-	    off = pos;
-	else
-	    off = filesize_ + pos;
-	
-	if (lseek (fd_, off, SEEK_SET) < 0) {
-	    string errstr = strerror(errno);
-	    throw DviBug ("InputByteStream::seek:"+fname_+": can\'t seek ("
-			  +errstr+")");
-	}
-	if (verbosity_ > normal)
-	    cerr << "seek(" << pos << "): off=" << off << endl;
-	p_ = eob_;
-    }
-}
-
-/**
- * Skips a number of bytes forward in the file.  This can be used only
- * for preloaded files.
- *
- * @param skipsize the number of bytes to move forward in the file
- * @throws InputByteStreamError if the file was not preloaded
- */
-void InputByteStream::skip (unsigned int skipsize)
-    throw (InputByteStreamError)
-{
-    Byte *tp = p_ + skipsize;
-    if (preloaded_) {
-	if (tp > eob_)
-	    throw InputByteStreamError ("File " + fname_
-					+ ": skip past end of file");
-	p_ = tp;
-    } else {
-	if (tp <= eob_)
-	    p_ = tp;
-	else {
-	    off_t newpos = lseek(fd_, skipsize, SEEK_CUR);
-	    if (newpos < 0) {
-		string errstr = strerror(errno);
-		throw InputByteStreamError
-			("File " + fname_
-			 + ": error seeking (" + errstr + ")");
-	    } else if (newpos > filesize_) {
-		throw InputByteStreamError
-			("File " + fname_
-			 + ": seek past end of file");
-	    }
-	    p_ = eob_;		// prompts re-reading
-	}
-    }
 }
 
 /**
@@ -363,25 +120,279 @@ bool InputByteStream::eof()
 }
 
 /**
- * Indicates the position within the file.  This information can be
- * reported only for preloaded files.
+ * Binds this stream to a given file descriptor.
  *
- * @return the offset from the beginning of the file
- * @throws InputByteStreamError if the file was not preloaded
+ * <p>If the parameter <code>fillBufferAndClose</code> is true, then
+ * this method will keep reading from the file descriptor until it
+ * reaches either the end of the newly-allocated buffer, or
+ * end-of-file, whichever comes first.  It will then close the file
+ * descriptor.  In this case (and in this case alone), the method
+ * {@link bufferSeek} becomes useful, and can be used by an extending
+ * class to implement an efficient <code>seek</code> operation on the file.
+ *
+ * @param fileno the file descriptor to be handled by this object
+ * @param the file name associated with this descriptor; this may be
+ * the empty string
+ * @param bufsize a size suggested for the input buffer, or zero to
+ * accept the default
+ * @param fillBufferAndClose if true, read the entire contents of the
+ * file into memory
+ *
+ * @throws InputByteStreamError if there is some other problem reading
+ * the file, or if a negative buffer size is given.
+ * 
+ * @return true on success
  */
-int InputByteStream::pos ()
+bool InputByteStream::bindToFileDescriptor(int fileno,
+					   string filename,
+					   int bufsize,
+					   bool fillBufferAndClose)
     throw (InputByteStreamError)
 {
-    if (!preloaded_)
+    fd_ = fileno;
+    if (filename.length() == 0) {
+	char filenamebuf[20]; // just in case fileno is a _large_ number...
+	sprintf(filenamebuf, "fd:%d", fileno);
+	fname_ = filenamebuf;
+    } else {
+	fname_ = filename;
+    }
+
+    eof_ = false;
+
+    if (bufsize < 0)
+	throw InputByteStreamError("InputByteStream: negative bufsize");
+
+    buflen_ = (bufsize == 0 ? default_buffer_length_ : bufsize);
+    buf_ = new Byte[buflen_];
+    if (verbosity_ > normal)
+	cerr << "InputByteStream: reading from fd " << fileno
+	     << ", name=" << fname_
+	     << endl;
+
+    if (fillBufferAndClose) {
+	size_t real_length = certainly_read_(fd_, buf_, buflen_);
+	p_ = buf_;
+	eob_ = buf_ + real_length;
+	close_fd_();
+    } else {
+	read_buf_();
+	assert(p_ == buf_);
+    }
+
+    if (eof()) {
+	close_fd_();
+    } else {
+	assert(buf_ <= p_ && p_ < eob_);
+    }
+    
+    return true;
+}
+
+
+/**
+ * Opens a source.  The source is specified as in {@link
+ * #InputByteStream(string)}.  Throws an exception on any problems,
+ * so that if it returns, it has successfully opened, or determined
+ * the existence of, the file.
+ *
+ * @param srcspec a source specification
+ * @return an open file descriptor
+ * @throws InputByteStreamError if there is any problem opening the file
+ */    
+int InputByteStream::openSourceSpec(string srcspec)
+    throw (InputByteStreamError)
+{
+    int fd = -1;
+    string srcfn;
+    if (srcspec.compare(0, 8, "<osfile>") == 0) {
+	srcfn = srcspec.substr(8);
+    } else if (srcspec.compare(0, 6, "<osfd>") == 0) {
+	string fdstr = srcspec.substr(6);
+	errno = 0;
+	fd = strtol(fdstr.c_str(), 0, 10);
+	if (errno != 0) {
+	    string errmsg = "InputByteStream: Invalid source fd:";
+	    errmsg += fdstr;
+	    errmsg += " (";
+	    errmsg += strerror(errno);
+	    errmsg += ")";
+	    throw InputByteStreamError(errmsg);
+	}
+	if (fd < 0) {
+	    throw InputByteStreamError
+		    ("InputByteStream: negative source fd");
+	}
+    } else {
+	// simple file name
+	srcfn = srcspec;
+    }
+    
+    if (fd < 0 && srcfn.size() == 0)
+	throw InputByteStreamError("InputByteStream: no source spec!");
+
+    if (srcfn.size() > 0) {
+	assert(fd < 0);
+	fd = open(srcfn.c_str(), O_RDONLY);
+	if (verbosity_ > normal)
+	    cerr << "InputByteStream: opening osfile:" << srcfn 
+		 << (fd >= 0 ? " OK" : " failed") << endl;
+	if (fd < 0) {
+	    string errstr = strerror (errno);
+	    throw InputByteStreamError
+		    ("InputByteStream: can\'t open file " + srcfn
+		     + " to read (" + errstr + ")");
+	}
+    }
+    assert(fd >= 0);
+
+    return fd;
+}
+
+/**
+ * Read a given number of bytes, stopping when it has read the
+ * required number, or at end of file, whichever comes first.
+ *
+ * @param fd file descriptor
+ * @param b pointer to buffer to be filled
+ * @param len number of bytes to be read
+ * @return the number of bytes actually read
+ * 
+ * @throws InputByteStreamError if there was an error reading the file
+ */
+size_t InputByteStream::certainly_read_(int fd, Byte* b, size_t len)
+    throw (InputByteStreamError)
+{
+    size_t totread = 0;
+    ssize_t thisread;
+    
+    while (len > 0
+	   && (thisread = read(fd, (void*)b, len)) > 0) {
+	cerr << "certainly_read_: read " << thisread
+	     << ", len=" << len << endl;
+	b += thisread;
+	len -= thisread;
+	totread += thisread;
+    }
+    if (thisread < 0) {
+	string errmsg = strerror(errno);
 	throw InputByteStreamError
-		("InputByteStream:" + fname_
-		 + ": Can't get pos in non-preloaded file");
-    return static_cast<int>(p_ - buf_);
+		("InputByteStream: can't read file " + fname_ + ": " + errmsg);
+    }
+    return totread;
+}
+
+/**
+ * Reads a byte from the stream.  This method does not signal
+ * an error at end-of-file; use the {@ #eof} method to detect if the
+ * stream is at an end.
+ *
+ * @return the byte read, or zero if we are at the end of the file
+ * @throws InputByteStreamError if there is some problem reading the stream
+ */
+Byte InputByteStream::getByte(void)
+    throw (InputByteStreamError)
+{
+    if (eof_)
+	return 0;
+
+    assert(buf_ <= p_ && p_ < eob_);
+
+    Byte result = *p_;
+    if (++p_ == eob_)
+	read_buf_();
+    return result;
+}
+
+/**
+ * Retrieves a block from the stream.   Leaves the pointer pointing after
+ * the block returned.
+ *
+ * @param length the size of block desired
+ *
+ * @return a pointer to a block of bytes
+ * @throws InputByteStreamError if the requested number of bytes
+ * cannot be read
+ */
+const Byte *InputByteStream::getBlock(unsigned int length)
+    throw (InputByteStreamError)
+{
+    Byte *ret;
+
+    assert(buf_ <= p_ && p_ < eob_);
+
+    if (length < eob_-p_) {
+	// not <=, since we must leave p_<eob_
+	ret = p_;
+	p_ += length;
+	//cerr << "small: p_@" << p_-buf_ << endl;
+    } else {
+	// it's not all in the buffer: we'll need to read some more
+	if (fd_ < 0) {
+	    // nothing more to read
+	    char errmsg[100];
+	    sprintf(errmsg, "InputByteStream::getBlock: requested %d, but that's past EOF", length);
+	    throw InputByteStreamError(errmsg);
+	}
+	bool read_ok;
+	size_t inbufalready = eob_-p_;
+	int mustread = length-inbufalready+1; // so (p_=(buf_+length))==eob_-1
+	if (length < buflen_) {
+	    // not length<=buflen_, since we must leave p_<eob_
+	    memmove((void*)buf_, (void*)p_, inbufalready);
+	    read_ok = (certainly_read_(fd_,
+				       buf_+inbufalready,
+				       mustread)
+		       == mustread);
+	    //cerr << "medium: read_ok=" << (read_ok?"true":"false");
+	} else {
+	    // must expand buffer
+	    int newbuflen = length * 3 / 2;
+	    Byte* newbuf = new Byte[newbuflen];
+	    memcpy((void*)newbuf, (void*)p_, inbufalready);
+	    read_ok = (certainly_read_(fd_,
+				       newbuf+inbufalready,
+				       mustread)
+		       == mustread);
+	    if (read_ok) {
+		delete[] buf_;
+		buf_ = newbuf;
+		buflen_ = newbuflen;
+	    }
+	    //cerr << "large: read_ok=" << (read_ok?"true":"false");
+	}
+	if (! read_ok) {
+	    char errmsg[100];
+	    sprintf(errmsg, "InputByteStream::getBlock: requested %d, but that's past EOF", length);
+	    throw InputByteStreamError(errmsg);
+	}
+	ret = buf_;
+	p_ = buf_ + length;
+	eob_ = buf_ + length + 1; // p_ = eob_-1 (ie, p_<eob_)
+	//cerr << "; p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_ << endl;
+    }
+    
+//     cerr << "(ret=";
+//     Byte *x=buf_;
+//     for (int i=0; i<10; i++)
+// 	cerr << *x++;
+//     cerr << ")" << endl;
+
+    assert(buf_ <= p_ && p_ < eob_);
+
+    return ret;
 }
 
 void InputByteStream::read_buf_ ()
     throw (InputByteStreamError)
 {
+    if (fd_ < 0) {
+	eof_ = true;
+	return;
+    }
+    
+    assert(fd_ >= 0);
+    
     ssize_t bufcontents = read(fd_, buf_, buflen_);
     if (bufcontents < 0)
     {
@@ -395,10 +406,115 @@ void InputByteStream::read_buf_ ()
     if (verbosity_ > normal)
 	cerr << "InputByteStream::read_buf_: read "
 	     << bufcontents << '/' << buflen_ << " from fd " << fd_
-	     << "; eof=" << eof_
+	     << "; eof=" << (eof_ ? "true" : "false")
+	     << ", eob=buf+" << eob_-buf_
 	     << endl;
     p_ = buf_;
 }
+
+/**
+ * Skips a given number of bytes forward in the stream.
+ *
+ * @param increment the number of bytes to move forward in the stream
+ * throws InputByteStreamError if we skip past the end of file
+ */
+void InputByteStream::skip (unsigned int increment)
+    throw (InputByteStreamError)
+{
+    if (eof())
+	throw InputByteStreamError("Skip while at EOF");
+
+    assert(buf_ <= p_ && p_ < eob_);
+
+    if (fd_ < 0) {
+	// better be in the buffer already
+	p_ += increment;
+	if (p_ >= eob_) {
+	    p_ = eob_;
+	    eof_ = true;
+	    throw InputByteStreamError("skip past end of file");
+	}
+    } else {
+	if (increment >= eob_-p_) {
+	    increment -= (eob_-p_);
+	    read_buf_();		// changes p_ and eob_
+	    while (increment >= (eob_-p_)) {
+		read_buf_();	// changes p_ and eob_
+		increment -= (eob_-p_);
+	    }
+	}
+	p_ += increment;
+    }
+    
+    assert(buf_ <= p_ && p_ < eob_);
+}
+
+/**
+ * Seeks to a specific point in the buffer.  This is only useful when
+ * the buffer holds the complete file, that is, when
+ * <code>bindToFileDescriptor</code> was called with parameter
+ * <code>fillBufferAndClose</code> true.
+ *
+ * @param offset the offset from the beginning of the buffer, where the
+ * current position is relocated to
+ *
+ * @throws InputByteStreamError if the offset would take the pointer
+ * outside the buffer
+ */
+void InputByteStream::bufferSeek(unsigned int offset)
+    throw (InputByteStreamError)
+{
+    if (offset < 0 || offset >= (buflen_))
+	throw InputByteStreamError
+		("Call to protected bufferSeek too large for buffer");
+    p_ = buf_ + offset;
+    eof_ = (p_ == eob_);
+    cerr << "bufferSeek to " << offset << "; eof=" << (eof_ ? "true" : "false")
+	 << ", p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_
+	 << endl;
+    assert(buf_ <= p_ && p_ < eob_);
+}
+
+/**
+ * Reloads the buffer, presumably after the file descriptor has been
+ * adjusted by an extending class.
+ */
+void InputByteStream::reloadBuffer(void)
+{
+    read_buf_();
+    assert(buf_ <= p_ && p_ < eob_);
+}
+
+void InputByteStream::close_fd_(void)
+{
+    if (fd_ >= 0)
+	close (fd_);
+    fd_ = -1;
+    closedFD();
+//     if (close_callback_ != 0)
+// 	(*close_callback_)();
+}
+
+void InputByteStream::closedFD(void)
+{
+    cerr << "InputByteStream::closedFD..." << endl;
+}
+
+// void InputByteStream::closeCallback(void (*fn)(void)) {
+//     close_callback_ = fn;
+//     cerr << "registered close_callback_=" << fn << endl;
+// }
+
+/**
+ * Sets the default buffer size to be used for reading files.
+ *
+ * @param length the size, in bytes, of the input buffer
+ */
+void InputByteStream::setDefaultBufferSize(unsigned int length)
+{
+    default_buffer_length_ = length;
+}
+
 /*
 #if (sizeof(unsigned int) != 4)
 // The code here is intended to deal with the case where (un)signed
@@ -424,10 +540,9 @@ void InputByteStream::read_buf_ ()
  * @param n the number of bytes to read, in the range 1--4 inclusive
  * @return the next integer from the input stream, as a signed int
  * @throws InputByteStreamError if parameter <code>n</code> was out of range
- * @throws DviBug if an internal inconsistency is found
  */
 signed int InputByteStream::getSIS(int n)
-    throw (InputByteStreamError,DviBug)
+    throw (InputByteStreamError)
 {
     if (n<0 || n>4)
 	throw InputByteStreamError
@@ -480,10 +595,9 @@ signed int InputByteStream::getSIS(int n)
  * (there are no 4-byte unsigned quantities in DVI files)
  * @return the next integer from the input stream, as a signed int
  * @throws InputByteStreamError if parameter <code>n</code> was out of range
- * @throws DviBug if an internal inconsistency is found
  */
 signed int InputByteStream::getSIU(int n)
-    throw (InputByteStreamError,DviBug)
+    throw (InputByteStreamError)
 {
     // disallow n==4 - there are no unsigned 4-byte quantities in the DVI file
     if (n<0 || n>3)
@@ -505,10 +619,9 @@ signed int InputByteStream::getSIU(int n)
  * @param n the number of bytes to read, in the range 1--4 inclusive
  * @return the next integer from the input stream, as an unsigned int
  * @throws InputByteStreamError if parameter <code>n</code> was out of range
- * @throws DviBug if an internal inconsistency is found
  */
 unsigned int InputByteStream::getUIU(int n)
-    throw (InputByteStreamError,DviBug)
+    throw (InputByteStreamError)
 {
     if (n<0 || n>4)
 	throw InputByteStreamError
@@ -532,10 +645,9 @@ unsigned int InputByteStream::getUIU(int n)
  * @param p a pointer to an array of <code>Byte</code> values
  * @return the integer at the beginning of the given array, as an unsigned int
  * @throws InputByteStreamError if parameter <code>n</code> was out of range
- * @throws DviBug if an internal inconsistency is found
  */
 unsigned int InputByteStream::getUIU(int n, const Byte *p)
-    throw (InputByteStreamError,DviBug)
+    throw (InputByteStreamError)
 {
     if (n<0 || n>4)
 	throw InputByteStreamError
@@ -545,4 +657,3 @@ unsigned int InputByteStream::getUIU(int n, const Byte *p)
 	t = t*256 + static_cast<unsigned int>(*b);
     return t;
 }
-

@@ -8,6 +8,8 @@ D2BHEADERS = \
 	DviFile.h \
 	GIFBitmap.h \
 	InputByteStream.h \
+	FileByteStream.h \
+	PipeStream.h \
 	PageRange.h \
 	PNGBitmap.h \
 	PkFont.h \
@@ -25,6 +27,8 @@ libdvi2bitmap_la_SOURCES = \
 	DviError.cc \
 	DviFile.cc \
 	InputByteStream.cc \
+	FileByteStream.cc \
+	PipeStream.cc \
 	PageRange.cc \
 	PkFont.cc \
 	Util.cc \
