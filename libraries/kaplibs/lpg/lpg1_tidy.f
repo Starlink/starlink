@@ -33,6 +33,8 @@
 *        Original version.
 *     28-MAR-2004 (DSB):
 *        Free GRP groups used to hold input and temp output NDF names.
+*     20-MAY-2004 (DSB):
+*        Bug fix to avoid "STATUS set without error report" errors from EMS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,16 +129,16 @@
       NPAR2 = 0
       NRUN = 0
 
+*  Free the groups used to hold input NDF names and temporary output NDF
+*  names.
+      IF( TMPLST .NE. GRP__NOID ) CALL GRP_DELET( TMPLST, STATUS )
+      IF( OPNLST .NE. GRP__NOID ) CALL GRP_DELET( OPNLST, STATUS )
+
 *  If the initial status was bad, then ignore all internal errors.
       IF ( ISTAT .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          STATUS = ISTAT
       END IF
-
-*  Free the groups used to hold input NDF names and temporary output NDF
-*  names.
-      IF( TMPLST .NE. GRP__NOID ) CALL GRP_DELET( TMPLST, STATUS )
-      IF( OPNLST .NE. GRP__NOID ) CALL GRP_DELET( OPNLST, STATUS )
 
 *  Release the current error context.
       CALL ERR_RLSE
