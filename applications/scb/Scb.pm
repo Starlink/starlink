@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl -w
-
 package Scb;
 
 #+
@@ -126,6 +124,7 @@ $docslisfile = "$star/docs/docs_lis";
 
 my $SCB_BROWSER_TMP = "/usr/tmp/scb";
 my $SCB_INDEXER_TMP = "/usr/tmp/scbindex";
+my $SCB_DIR = "";
 $scb_tmpdir      = $ENV{'SCB_BROWSER_TMP'} || "$SCB_BROWSER_TMP";
 $scbindex_tmpdir = $ENV{'SCB_INDEXER_TMP'} || "$SCB_INDEXER_TMP";
 
@@ -162,7 +161,7 @@ $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 #     language-specific tagging routines using the sequence:
 #
 #        use Scb.pm;
-#        $tagged = &{$tagger{$ftype}} ($source, $ftype);
+#        $tagged = &{$tagger{$ftype}} ($sourcefh, $ftype);
 #
 #     where $ftype is the file type (usually the filename extension), as
 #     given in the keys to %tagger below.  The mapping from file type 
@@ -176,9 +175,10 @@ $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 #     for anybody wishing to do this.
 #
 #     The interface is fairly simple: the tagging routine must take the 
-#     raw source code as its first argument (and may optionally read the 
-#     second argument to tell it the file type), and must return the 
-#     tagged source code.  The tagged source is a kind of stripped down 
+#     filehandle from which the raw source code may be read as its first
+#     argument (and may optionally read the second argument to tell it 
+#     the file type), and must return the tagged source code.  
+#     The tagged source is a kind of stripped down 
 #     HTML; it should be the same as the raw source, with the following 
 #     anchor tags added:
 #
@@ -186,20 +186,24 @@ $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 #        <a href=''> tags identifying function/subroutine calls, 
 #        <a href='INCLUDE-'> tags identifying references to files.
 #
+#     Additionally, any '<' or '&' characters in the source must be 
+#     replaced by '&lt;' and '&amp;' respectively (replacement of '>'
+#     by '&gt;' is optional).
+#
 #     Closing </a> tags MUST be supplied (as per the HTML DTD, despite 
 #     the fact that this is often disregarded for <a name=''> tags).  
 #     Thus if the raw source is supplied as:
 #
 #        #include "header.h"
 #        int code (int argc, char **argv) {
-#        (void) do_stuff();
+#           (void) do_stuff();
 #        }
 #
 #     then calling the tagger function should return:
 #
 #        #include "<a href='INCLUDE-header.h'>header.h</a>"
 #        int <a name='code'>code</a> (int argc, char **argv) {
-#        (void) <a href='do_stuff'>do_stuff</a>();
+#           (void) <a href='do_stuff'>do_stuff</a>();
 #        }
 #        
 #     Note that the values of the href attributes are not URLs or even
@@ -224,30 +228,21 @@ $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 #     'func' one currently used.  There are hooks in the indexer and 
 #     extractor programs for this.
 
-use CTag;
-use FortranTag;
+use YyTag;
+
+my( $ctag, $ftag ) = ( \&YyTag::ctag, \&YyTag::fortrantag );
 
 %tagger = ( 
-            c   => \&CTag::tag,
-            h   => \&CTag::tag,
-            C   => \&CTag::tag,
-            cc  => \&CTag::tag,
-            cpp => \&CTag::tag,
-            cxx => \&CTag::tag,
+            c   => $ctag,
+            h   => $ctag,
+            C   => $ctag,
+            cc  => $ctag,
+            cpp => $ctag,
+            cxx => $ctag,
 
-            f   => \&FortranTag::tag,
-            gen => \&FortranTag::tag,
+            f   => $ftag,
+            gen => $ftag,
           );
-
-#  List of files which are not to be tagged.  Each entry is a regular
-#  expression; if it matches the file's logical pathname then no tagging
-#  will be attempted on the file.  Files can be excluded for any reason
-#  you like, but one would be files which are known to be uninteresting
-#  and/or take a very long time to tag in the current implementation of 
-#  the tagging routine.
-
-my (@notag) = ();
-push @notag, 'tixSamLib.c$';  #  2MB file with 6e6 character literals, yuk.
 
 
 ########################################################################
@@ -361,15 +356,6 @@ sub taggable {
 #  points).
 
    $retval &&= !exists $tagged{$untarloc};
-
-#  The file (either in its tar file location or outside it) must not have
-#  been included by (regular expression) name in the list of files to skip.
-
-   my $notag;
-   foreach $notag (@notag) {
-      $retval &&= ($location !~ /$notag/)
-              &&  ($untarloc !~ /$notag/);
-   }
 
 #  If this is going to be tagged mark it as such (calling this routine 
 #  constitutes an assertion that the tagging will be done).
