@@ -7,7 +7,8 @@
 
 *     History
 *     13-JUL-1994  Changed STR$ to CHR_ and LIB$ to FIO_ (SKL@JACH)
-
+*      9-AUG-2004  Use COS/SIN rather than COSD/SIND (TIMJ@JACH)
+*                  Use FIO for open and close
 
 *      Include ADAM parameter defintions
 	INCLUDE 'SAE_PAR'       
@@ -36,6 +37,8 @@
 
 *      Setup fixed parameters
 	PARAMETER ( MAXDATA = 10000)
+	REAL D2R	       ! Degrees to radians
+	PARAMETER ( D2R = 0.017453292519943295769 )
 
 	REAL
      :	  INARR( NX, NY),      ! input image with data
@@ -62,6 +65,7 @@
      :	  STD,                 ! standard deviation in annulus
      :	  ECC,                 ! eccentricity of annuli
      :	  ANG,                 ! position angle of annuli wrt E
+     :    ANGR,                ! position angle ANG in radians
      :	  XR,                  ! rotated pixel vector in X
      :	  YR                   ! rotated pixel vector in Y
 
@@ -79,9 +83,12 @@
 	MAXX = MAX( REAL( ABS( NX-X)), REAL( X))
 	MAXY = MAX( REAL( ABS( NY-Y)), REAL( Y))
 
+*     convert to radians
+	ANGR = ANG * D2R
+
 *      rotate maxima
-	MAXXR = MAXX*COSD( ANG) - MAXY*SIND( ANG)
-	MAXYR = MAXX*SIND( ANG) + MAXY*COSD( ANG)
+	MAXXR = MAXX*COS( ANGR ) - MAXY*SIN( ANGR )
+	MAXYR = MAXX*SIN( ANGR ) + MAXY*COS( ANGR )
 
 *      calculate maximum radius vector
 	MAXR = SQRT( MAXXR**2 + MAXYR**2/( 1-ECC**2))
@@ -104,17 +111,14 @@
      :	  'Number of (^SZ arcsec) annuli in your image is ^NU',
      :	  STATUS)
 
-*      get lun for output ascii file and open it
-	CALL FIO_GUNIT( LUN, STATUS )
-C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
-	OPEN( UNIT=LUN, FILE=OUTFILE, STATUS='NEW',
-     :	      CARRIAGECONTROL='LIST')
+*      Open output file
+	CALL FIO_OPEN( OUTFILE, 'WRITE','LIST',0, LUN, STATUS)
 
 *      write header line for output file
-	WRITE( LUN, '(A)') 
+	CALL FIO_WRITE(LUN, 
      :	  '  No       Ri     Ro       N    BN         ' //
      :	  'Mea         Med         Mod         Sum         ' //
-     :	  'Max         Min         Std'
+     :	  'Max         Min         Std', STATUS)
 
 *      loops to initialize the output array
 	DO K = 1, NYO
@@ -142,8 +146,8 @@ C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 
 *            calculate x and y of current pixel wrt rotated annulus 
 *            centre
-	      XR = ( J-X)*COSD( ANG) - (K-Y)*SIND( ANG)
-	      YR = ( J-X)*SIND( ANG) + (K-Y)*COSD( ANG)
+	      XR = ( J-X)*COS( ANGR ) - (K-Y)*SIN( ANGR )
+	      YR = ( J-X)*SIN( ANGR ) + (K-Y)*COS( ANGR )
 
 *            calculate radius vector from above x,y
 	      R = SQRT( XR**2 + YR**2/( 1-ECC**2))
@@ -152,7 +156,7 @@ C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 	      IF( R .GE. R1 .AND. R .LT. R2) THEN
 
 *              test if current pixel is a good value 
-	        IF( USEBAD .EQ. .TRUE. .AND. 
+	        IF( USEBAD .AND. 
      :	            INARR( J, K) .NE. BADVAL) THEN
 
 *                increment number of good pixels in current annulus
@@ -170,7 +174,7 @@ C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 	          END IF
 
 *              here if current pixel is bad
-	        ELSE IF( USEBAD .EQ. .TRUE. .AND. 
+	        ELSE IF( USEBAD .AND. 
      :	                 INARR( J, K) .EQ. BADVAL) THEN
 
 *                increment number of bad pixels in current array
@@ -180,7 +184,7 @@ C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 	            OUTARR( J, K) = -1
 
 *              here if not using bad pixel value
-	        ELSE IF( USEBAD .NE. .TRUE.) THEN
+	        ELSE IF( .NOT. USEBAD ) THEN
 
 *                increment number of good pixels in annulus
 	          NPTS = NPTS + 1
@@ -232,7 +236,7 @@ C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 *            calculate std over pixels
 	      STD = SUMSQ/NPTS - ( SUM/NPTS)**2
 	      IF( STD .GE. 0.0D0) THEN
-	        STD = SQRT( SNGL( STD))
+	        STD = SQRT( STD )
 	      ELSE
 	       STD = -999.0
 	      END IF
@@ -289,8 +293,7 @@ C###109 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 	END DO
 
 *      close output ascii file and release lun
-	CLOSE( LUN)
-	CALL FIO_PUNIT( LUN, STATUS )
+	CALL FIO_CLOSE( LUN, STATUS )
 
 *      tell user the name of the output ascii file
 	CALL CHR_UCASE( OUTFILE )

@@ -5,6 +5,7 @@
 *     HISTORY
 *     14-JUL-1994  Changed LIB$ to FIO_, removed call to LIB$DATE_TIME
 *                  (VAX specific) (SKL@JACH)
+*      9-AUG-2004  Use FIO for open and close (TIMJ@JACH)
 
         INCLUDE 'FIO_PAR'
 	INCLUDE 'SAE_PAR'
@@ -32,10 +33,8 @@
 *      initialize the number of bad pixels found
 	NUMPIX = 0
 
-*      get lun for output file and open output file
-	CALL FIO_GUNIT( LUN, STATUS )
-	OPEN( UNIT=LUN, FILE=OUTFILE, STATUS='NEW',
-     :	      CARRIAGECONTROL='LIST')
+*      Open output file
+	CALL FIO_OPEN( OUTFILE, 'WRITE','LIST',0, LUN, STATUS)
 
 *      write header line to bad pixel file
 *	CALL LIB$DATE_TIME( DATETIME)
@@ -59,7 +58,6 @@
      :	  'Number of bad pixels found = ^NUMBAD', STATUS)
 
 *      close output file and release lun
-	CLOSE( LUN)
-	CALL FIO_PUNIT( LUN, STATUS )
+	CALL FIO_CLOSE( LUN, STATUS )
 
 	END

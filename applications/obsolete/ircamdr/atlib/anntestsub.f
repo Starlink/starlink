@@ -5,6 +5,8 @@
 
 *    HISTORY 
 *    14-JUL-1994  Changed LIB$ to FIO_ (SKL@JACH)
+*      9-AUG-2004  Use COS/SIN rather than COSD/SIND (TIMJ@JACH)
+*                  Use FIO for open and close
 
 	INCLUDE 'SAE_PAR'       
         INCLUDE 'FIO_PAR'
@@ -26,6 +28,8 @@
      :	  MAXDATA
 
 	PARAMETER ( MAXDATA = 10000)
+	REAL D2R	       ! Degrees to radians
+	PARAMETER ( D2R = 0.017453292519943295769 )
 
 	REAL
      :	  INARR( NX, NY),
@@ -51,6 +55,7 @@
      :	  BADVAL,
      :	  ECC,
      :	  ANG,
+     :    ANGR,		! Angle in radians
      :	  XR,
      :	  YR
 
@@ -66,8 +71,11 @@
 	MAXX = MAX( REAL( ABS( NX-X)), REAL( X))
 	MAXY = MAX( REAL( ABS( NY-Y)), REAL( Y))
 
-	MAXXR = MAXX*COSD( ANG) - MAXY*SIND( ANG)
-	MAXYR = MAXX*SIND( ANG) + MAXY*COSD( ANG)
+*       Convert ANG to radians
+	ANGR = ANG * D2R
+
+	MAXXR = MAXX*COS( ANGR ) - MAXY*SIN( ANGR )
+	MAXYR = MAXX*SIN( ANGR ) + MAXY*COS( ANGR )
 
 	MAXR = SQRT( MAXXR**2 + MAXYR**2/(1-ECC**2))
 	MAXRA = MAXR*PLATSCAL
@@ -83,10 +91,8 @@
 	CALL MSG_OUT( 'MESS', 'Number of ^SZ arcsec annuli in image = ^NU',
      :	              STATUS)
 
-	CALL FIO_GUNIT( LUN, STATUS )
-C###87 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
-	OPEN( UNIT=LUN, FILE='ANNSTATS.RES', STATUS='NEW',
-     :	      CARRIAGECONTROL='LIST')
+*      Open output file
+	CALL FIO_OPEN( 'annstats.res', 'WRITE','LIST',0, LUN, STATUS)
 
 	DO I = 1, NUMANN
 
@@ -102,14 +108,14 @@ C###87 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 
 	    DO J = 1, NX
 
-	      XR = ( J-X)*COSD( ANG) - ( K-Y)*SIND( ANG)
-	      YR = ( J-X)*SIND( ANG) + ( K-Y)*COSD( ANG)
+	      XR = ( J-X)*COS( ANGR ) - ( K-Y)*SIN( ANGR )
+	      YR = ( J-X)*SIN( ANGR ) + ( K-Y)*COS( ANGR )
 
 	      R = SQRT( ( XR**2 + YR**2/(1-ECC**2)))
 
 	      IF( R .GE. R1 .AND. R .LT. R2) THEN
 
-	        IF( USEBAD .EQ. .TRUE. .AND. 
+	        IF( USEBAD .AND. 
      :	            INARR( J, K) .NE. BADVAL) THEN
 
 	          NPTS = NPTS + 1
@@ -122,12 +128,12 @@ C###87 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 	            OUTARR( J, K) = 0
 	          END IF
 
-	        ELSE IF( USEBAD .EQ. .TRUE. .AND. 
+	        ELSE IF( USEBAD .AND. 
      :	                 INARR( J, K) .EQ. BADVAL) THEN
 
 	          BNPTS = BNPTS + 1
 
-	        ELSE IF( USEBAD .NE. .TRUE.) THEN
+	        ELSE IF( .NOT. USEBAD ) THEN
 
 	          NPTS = NPTS + 1
 
@@ -210,8 +216,7 @@ C###87 [Sunf77] Warning: ignoring unimplemented "carriagecontrol" specifier%%%
 
 	END DO
 
-	CLOSE( LUN)
-	CALL FIO_PUNIT( LUN, STATUS )
+	CALL FIO_CLOSE( LUN, STATUS )
 
 	CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	CALL MSG_OUT( 'MESS', 'Results written to ANNSTATS.RES', STATUS)

@@ -10,6 +10,7 @@
 *  14-JUL-1994   Changed LIB$ to FIO_ (SKL@JACH)
 *  14-JUL-1994   Changed arguments so that routine would compile (SKL@JACH)
 *  12-AUG-1994   Changed input DIM arguments for FIND_MEDIAN (SKL@JACH)
+*   9-AUG-2004    Use FIO for open and close (TIMJ@JACH)
 *
 * Type definitions :
 
@@ -84,17 +85,13 @@
 	  RETURN
 	END IF
 
-*      get the lun for data list
-
-	CALL FIO_GUNIT( LUN, STATUS )
 
 *      open the output data list file
+	CALL FIO_OPEN( 'IMAGEDIR/oefix.lis', 'WRITE','LIST',0, LUN, 
+     :        STATUS)
 
-	OPEN( UNIT=LUN, FILE='IMAGEDIR/oefix.lis', STATUS='NEW',
-     :	      CARRIAGECONTROL='LIST')
-
-	WRITE( LUN, *) 
-     :	'Column Number, Median_Odd1, Median_Odd2, Median_Even, Scaler'
+	CALL FIO_WRITE( LUN,
+     :	'Column Number, Median_Odd1, Median_Odd2, Median_Even, Scaler')
 
 *      scan through odd channel and find median value and median in adjacent
 *      even channels
@@ -186,12 +183,7 @@
 	END DO
 
 *      close list file
-
-	CLOSE( LUN)
-
-*      free lun
-
-	CALL FIO_PUNIT( LUN, STATUS )
+	CALL FIO_CLOSE( LUN, STATUS )
 
 *      release histogram image
 
