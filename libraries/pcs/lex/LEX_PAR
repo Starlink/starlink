@@ -1,0 +1,33 @@
+*+ LEX_PAR - Constants used by the ADAM LEX system
+*
+*   Values defining actions types
+*
+      INTEGER LEX__NAME        ! HDS, device name or file name
+      INTEGER LEX__STRING      ! String
+      INTEGER LEX__INTEGER     ! Integer
+      INTEGER LEX__REAL        ! Real
+      INTEGER LEX__AMBIG       ! String name or logical constant
+      INTEGER LEX__STARR       ! Start array ([)
+      INTEGER LEX__ENDARR      ! End array (])
+      INTEGER LEX__KAMBIG      ! Keyword or as LEX__AMBIG
+      INTEGER LEX__KEYWORD     ! Keyword=
+      INTEGER LEX__DOUBLE      ! Double precision number
+      INTEGER LEX__LOGICAL     ! Logical constant
+      INTEGER LEX__ARRAMBIG    ! String, name or logical constant in array
+      INTEGER LEX__ELINE       ! End of line
+      INTEGER LEX__NULL        ! NULL character found
+
+      PARAMETER ( LEX__NAME = 1 )
+      PARAMETER ( LEX__STRING = 2 )
+      PARAMETER ( LEX__INTEGER = 3 )
+      PARAMETER ( LEX__REAL = 4 )
+      PARAMETER ( LEX__AMBIG = 5 )
+      PARAMETER ( LEX__STARR = 6 )
+      PARAMETER ( LEX__ENDARR = 7 )
+      PARAMETER ( LEX__KAMBIG = 8)
+      PARAMETER ( LEX__KEYWORD = 9 )
+      PARAMETER ( LEX__DOUBLE = 10 )
+      PARAMETER ( LEX__LOGICAL = 11 )
+      PARAMETER ( LEX__ARRAMBIG = 12 )
+      PARAMETER ( LEX__ELINE = 98 )
+      PARAMETER ( LEX__NULL = 99 )
