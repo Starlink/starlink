@@ -151,7 +151,7 @@ static char *sourceWrap( const char *(*source)() ) {
   SV * cb;
   SV * retsv;
   int count;
-  int len;
+  STRLEN len;
   char * line;
   char * retval;
 
