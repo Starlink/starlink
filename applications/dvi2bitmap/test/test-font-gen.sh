@@ -3,6 +3,13 @@
 # Test script, to check that dvi2bitmap is working, and to tell the user
 # how to set DVI2BITMAP_PK_PATH.  Should be invoked from the Makefile.
 #
+# This script does make certain `normal' assumptions about the
+# behaviour of mktexpk (or MakeTeXPK): it assumes that if it finds
+# where cmr10 (or whatever font(s) is/are included in the test DVI
+# file) has been placed, by asking kpsewhich to report its location,
+# then this is a reasonable directory to have as the value of
+# DVI2BITMAP_PK_PATH.
+#
 # $Id$
 
 if [ $# != 2 ]; then
@@ -24,38 +31,46 @@ fi
 opfmt='-o test-output-%d'
 defaultftype=`$d2bpath -Qt | awk '/^Qt/{print $2}'`
 opfname="test-output-1.$defaultftype"
-
 rm -f $opfname
+
+preline='vvvvvvvvvvvvvvvvvvvv'
+postline='^^^^^^^^^^^^^^^^^^^^'
 
 # Find out what was enabled in dvi2bitmap,
 # by parsing the output with the -V option
 eval `$d2bpath -V | sed -n '/^ENABLE/s/$/=1/p'`
 
 if [ -z "$ENABLE_FONT_GEN" ]; then
-    echo "Font generation disabled"
+    echo "Font generation ... disabled"
 else
-    echo "Font generation enabled"
+    echo "Font generation ... enabled"
 fi
 if [ -z "$ENABLE_KPATHSEA" ]; then
-    echo "Kpathsea disabled"
+    echo "Kpathsea .......... disabled"
 else
-    echo "Kpathsea enabled"
+    echo "Kpathsea .......... enabled"
 fi
 echo
 
 if [ -n "$ENABLE_KPATHSEA" ]; then
 
+    echo
     if [ -n "$ENABLE_FONT_GEN" ]; then
 	echo "You have enabled both the kpathsea library and"
-	echo "font generation.  I will attempt to convert the test file."
-	echo "This should simply Work."
+	echo "font generation.  I will attempt to process the test file."
+	echo "This should simply Work, and you don't have to do anything"
+	echo "to tell dvi2bitmap where its fonts are."
     else
 	echo "You have enabled the kpathsea library, but disabled"
-	echo "font-generation (you presumably know what you're doing)."
+	echo "font-generation (that's a non-standard configuration,"
+	echo "but I'll assume you know what you're doing)."
 	echo "I will not, therefore, attempt to create any fonts,"
 	echo "but will simply try to convert the test file...."
     fi
+    echo $preline
     $d2bpath $opfmt $infile
+    echo $postline
+    d2bstatus=$?
 
 else
 	
@@ -65,12 +80,15 @@ else
 	echo "You have enabled font-generation.  Either you have disabled"
 	echo "use of the kpathsea library, or else it is not available."
 	echo
-	echo "I will try to generate the fonts required for the test file...."
-	$d2bpath -Qg -n $infile 2>/dev/null | \
+	echo "I will now try to generate the fonts required for the test file."
+	echo "This might be redundant, but it won't be wrong."
+	echo $preline
+	$d2bpath -Qg -n $infile -q | \
 	    sed -n '/^Qg/s/^Qg *//p' | \
 	    sh
+	echo $postline
 
-	fontname=`$d2bpath -QF -n $infile 2>/dev/null | \
+	fontname=`$d2bpath -QF -n $infile -q | \
 	    awk '/^Qf/{printf "%s.%spk",$2,$3}'`
 	echo
 	echo "Looking for font $fontname..."
@@ -83,10 +101,10 @@ else
 	else
 	    echo "I thought I'd generated font $fontname,"
 	    echo "but I (or rather kpsewhich) can't find it anywhere."
-	    echo "This is most puzzling.  Did the font-generation above"
-	    echo "work?  If it did work, why doesn't kpsewhich find the"
-	    echo "generated fonts?  There may be some problem with your"
-	    echo "TeX setup."
+	    echo "This is most puzzling."
+	    echo "Did the font-generation above work?"
+	    echo "If it did work, why doesn't kpsewhich find the generated fonts?"
+	    echo "There may be some problem with your TeX setup."
 	    exit 1
 	fi
 
@@ -100,7 +118,10 @@ else
 
 	echo
 	echo "Trying to convert the test file...."
+	echo $preline
 	$d2bpath $opfmt -fp $d2bpkpath $infile
+	d2bstatus=$?
+	echo $postline
 	
     else
 
@@ -123,7 +144,10 @@ else
 	    rm -f $tfile
 	    echo "However, all the required fonts appear to be available."
 	    echo "So I'll try converting the test file...."
+	    echo $preline
 	    $d2bpath $opfmt $infile
+	    d2bstatus=$?
+	    echo $postline
 	fi
 
     fi
@@ -133,12 +157,17 @@ fi
 if [ -f $opfname ]; then
     echo
     echo "I've found file $opfname!"
-    echo "dvi2bitmap works!"
+    if [ $d2bstatus -ne 0 ]; then
+	echo "but dvi2bitmap returned an error status"
+    else
+	echo "dvi2bitmap works!"
+    fi
 else
     echo
     echo "I was expecting to find file $opfname, but couldn't."
     echo "Something is amiss"
-    exit 1
 fi
 
-exit 0
+echo
+
+exit $d2bstatus
