@@ -6,6 +6,7 @@ SUBDIRS = sculib surflib src docs
 AM_FCFLAGS = -Isrc
 
 dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
+dist_noinst_SCRIPTS = surf_link_adam
 bin_MONOLITHS = surf_mon
 surf_mon_SOURCES = surf_mon.f surf_set_app_name.f
 
