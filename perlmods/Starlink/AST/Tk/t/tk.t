@@ -30,7 +30,7 @@ $x[2] = 0.3; $y[2] = 0.3;
 $x[3] = 0.4; $y[3] = 0.4;
 
 # create GExternal array
-my $e = [ $c, 0.0, 1.0, 0.0, 1.0 ];
+my $e = [ $c, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0 ];
 
 # _Gline( \@x, \@y );
 is( Starlink::AST::Tk::_GLine( $e, \@x, \@y ), 1, "Calling _GLine()" );
