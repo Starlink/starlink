@@ -3,6 +3,7 @@
 * Test subroutines PSX_MALLOC, PSX_REALLOC, PSX_CALLOC and PSX_FREE.
 
       IMPLICIT NONE
+      INCLUDE 'CNF_PAR'
       INCLUDE 'SAE_PAR'
       INTEGER STATUS
 
@@ -19,8 +20,8 @@
 
       CALL PSX_MALLOC( 40, PNTR, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SUBI( %VAL(PNTR), 10 )
-         CALL PRNTI( %VAL(PNTR), 10 )
+         CALL SUBI( %VAL(CNF_PVAL(PNTR)), 10 )
+         CALL PRNTI( %VAL(CNF_PVAL(PNTR)), 10 )
       ELSE
          PRINT *,'Error calling PSX_MALLOC'
       END IF
@@ -34,8 +35,8 @@
          PRINT *,'Testing PSX_REALLOC'
          CALL PSX_REALLOC( 80, PNTR, STATUS )
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SUBI( %VAL(PNTR), 20 )
-            CALL PRNTI( %VAL(PNTR), 20 )
+            CALL SUBI( %VAL(CNF_PVAL(PNTR)), 20 )
+            CALL PRNTI( %VAL(CNF_PVAL(PNTR)), 20 )
          ELSE
             PRINT *,'Error calling PSX_REALLOC'
          END IF
@@ -50,8 +51,8 @@
       PRINT *,'Testing PSX_CALLOC'
       CALL PSX_CALLOC( 10, '_INTEGER', PNTR2, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SUBI( %VAL(PNTR2), 10 )
-         CALL PRNTI( %VAL(PNTR2), 10 )
+         CALL SUBI( %VAL(CNF_PVAL(PNTR2)), 10 )
+         CALL PRNTI( %VAL(CNF_PVAL(PNTR2)), 10 )
       ELSE
          PRINT *,'Error calling PSX_CALLOC'
       END IF
@@ -65,8 +66,8 @@
       PRINT *,'Testing PSX_CALLOC'
       CALL PSX_CALLOC( 10, '_WORD', PNTR3, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SUBW( %VAL(PNTR3), 10 )
-         CALL PRNTW( %VAL(PNTR3), 10 )
+         CALL SUBW( %VAL(CNF_PVAL(PNTR3)), 10 )
+         CALL PRNTW( %VAL(CNF_PVAL(PNTR3)), 10 )
       ELSE
          PRINT *,'Error calling PSX_CALLOC'
       END IF
