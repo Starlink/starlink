@@ -3144,7 +3144,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 
 	END
 
-*+XRT_VIGNET    Finds vignetting correction for XRT datafiles
+*+ XRT_VIGNET - Finds vignetting correction for XRT datafiles
       SUBROUTINE XRT_VIGNET(HEAD, ELOC, NENERGY, ENERGY, MEAN_EN,
      &                     DISPLAY, NP, VCORR, VSING, VFLAG, STATUS)
 *    Description :
@@ -3379,8 +3379,10 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 
       ENDIF
 
-      CALL MSG_SETR('VIG',VSING)
-      CALL MSG_PRNT('Vignetting correction : ^VIG')
+      IF ( DISPLAY ) THEN
+        CALL MSG_SETR('VIG',VSING)
+        CALL MSG_PRNT('Vignetting correction : ^VIG')
+      END IF
 
 999   CONTINUE
 *

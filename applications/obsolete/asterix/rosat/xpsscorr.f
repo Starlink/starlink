@@ -48,7 +48,8 @@
 *     14 Dec 93 : V1.7-0 Correctly default CALDIR on UNIX (DJA)
 *     21 Feb 94 : V1.7-1 Correct div. by zero error when Exposure time is zero (RJV)
 *     23 Nov 94 : V1.7-2 Vignetting correction for HRI (RJV)
-*      8 Feb 95 : V1.8-0 Corrected bu in types of MDATE and MSWITCH (DJA)
+*      8 Feb 95 : V1.8-0 Corrected bug in types of MDATE and MSWITCH.
+*                        HEAD.DET was also not being set up! (DJA)
 *
 *    Type Definitions :
 *
@@ -83,7 +84,6 @@
       CHARACTER*20 DET               ! Name of detector (e.g. PSPCB or C)
       CHARACTER*1 MODE               ! Operation mode 'C' or 'E'
 
-
       REAL        MEAN_EN            ! Photon energy used in PSS (keV)
       REAL        EXPOS              ! Exposure time of searched image
 
@@ -111,7 +111,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION = 'XPSSCORR version 1.7-2')
+        PARAMETER (VERSION = 'XPSSCORR version 1.8-0')
 *-
 
 *    Check status
@@ -363,10 +363,10 @@
             ENDIF
 *
             IF (INDEX(DET, 'PSPCB') .NE. 0) THEN
-               EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcb_eff'
+               EFILE = '$XRTCAL/pspcb_eff'
                CALL USI_DEF0C('EFFILE', EFILE, STATUS)
             ELSEIF (INDEX(DET, 'PSPCC') .NE. 0) THEN
-               EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcc_eff'
+               EFILE = '$XRTCAL/pspcc_eff'
                CALL USI_DEF0C('EFFILE', EFILE, STATUS)
             ENDIF
 *
@@ -521,6 +521,7 @@
       CALL DYN_MAPR(1, NENERGY, DUMMY, STATUS)
 *
 * Find the effective area for this energy in the field centre
+      HEAD.DET = 'PSPC'
       HEAD.OFFAX=0.0
 *
       CALL XRT_VIGNET(HEAD, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
