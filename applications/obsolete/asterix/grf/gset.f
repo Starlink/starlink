@@ -3344,16 +3344,19 @@
 *    Export :
 *    Status :
       INTEGER STATUS
+*    Functions :
+      INTEGER CHR_LEN
 *    Local Constants :
 *    Local variables :
       CHARACTER*132 FNAME
       CHARACTER*80 REC
-      CHARACTER NAME*20,FILE*80
+      CHARACTER NAME*20,FILE*80,PATH*80
       REAL TABLE(3,16)
       REAL RED(16),GREEN(16),BLUE(16)
       INTEGER ISEL,GFID
       INTEGER I
       INTEGER IFD
+      INTEGER PLEN
       LOGICAL SETTAB,SETRGB,SETNEG
       LOGICAL RGB,NEG
 *-
@@ -3364,8 +3367,26 @@
         SETRGB=.FALSE.
         SETNEG=.TRUE.
 
+*  get default path
+        CALL PSX_GETENV('AST_ETC',PATH,STATUS)
+        PLEN=CHR_LEN(PATH)
+
 *  read in colour table
         CALL USI_GET0C('TABLE',FNAME,STATUS)
+
+*  look for default names
+        IF (FNAME.EQ.'default') THEN
+          FNAME=PATH(1:PLEN)//'/default.act'
+        ELSEIF (FNAME.EQ.'grey') THEN
+          FNAME=PATH(1:PLEN)//'/greyscale.act'
+        ELSEIF (FNAME.EQ.'red') THEN
+          FNAME=PATH(1:PLEN)//'/red.act'
+        ELSEIF (FNAME.EQ.'blue') THEN
+          FNAME=PATH(1:PLEN)//'/bluegreen.act'
+        ELSEIF (FNAME.EQ.'rainbow') THEN
+          FNAME=PATH(1:PLEN)//'/rainbow.act'
+        ENDIF
+
         CALL FIO_OPEN(FNAME,'READ','NONE',0,IFD,STATUS)
 
         IF (STATUS.EQ.PAR__NULL) THEN
