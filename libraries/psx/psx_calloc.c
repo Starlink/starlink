@@ -91,6 +91,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     RFWS: R.F. Warren-Smith (Starlink, RAL)
 *     AJC: A.J. Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -111,6 +112,8 @@
 *        Tidy refs to CNF routines
 *      8-JAN-2002 (AJC):
 *        Add type _BYTE, _UBYTE, _WORD and _UWORD
+*      3-SEP-2004 (TIMJ):
+*        Fix -Wall compiler warnings
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,6 +162,9 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
    char type_c[maxlen+1];	 /* A C string copy of the argument TYPE    */
    char *p;			 /* Temporary pointer			    */
    char errbuf[100];		 /* Buffer for error message		    */
+
+/* Variable initialisation */
+   size = 0;
    
 /* Check inherited global status.					    */
 
