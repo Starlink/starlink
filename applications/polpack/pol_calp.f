@@ -1,6 +1,6 @@
       SUBROUTINE POL_CALP( NEL, NSET, NPOS, NPAIR, IPDCOR, IPVCOR,
      :                     NSTATE, VAR, IEST, VIEST, QEST, VQEST, UEST,
-     :                     VUEST, WEIGHT, OUT, VOUT, STATUS )
+     :                     VUEST, WEIGHT, OUT, VOUT, ROT, STATUS )
 *+ 
 *  Name:
 *     POL_CALP
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL POL_CALP(  NEL, NSET, NPOS, NPAIR, IPDCOR, IPVCOR,
 *    :                NSTATE, VAR, IEST, VIEST, QEST, VQEST, UEST,
-*    :                VUEST, WEIGHT, OUT, VOUT, STATUS )
+*    :                VUEST, WEIGHT, OUT, VOUT, ROT, STATUS )
 
 *  Description:
 *     This routine will calculate estimates of the I, Q, and U Stokes
@@ -71,6 +71,12 @@
 *     VOUT( NEL, * ) = REAL (Returned)
 *        Output array containing variances on the stokes images. This
 *        is only valid when VAR is TRUE
+*     ROT = REAL (Given)
+*        If ROT is zero, then the output Stokes vectors will be measured
+*        with respect to a reference direction parallel to the fixed
+*        analyser (WPLATE=0) direction given by the ANGROT value in the
+*        first input NDF. If ROT is non-zero then the reference direction
+*        will be rotated by ROT radians anticlockwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -92,6 +98,9 @@
 *        CCD1_ORVAR to initialise the co-variance matrix.
 *     02-JUN-1998 (TMG):
 *        Correctly dimension IPDCOR and IPVCOR
+*     21-JUN-1999 (DSB):
+*        Added argument ROT in order to make the reference direction
+*        used by dual-beam data the same as for single-beam data.
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -102,6 +111,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
       
 *  Arguments Given:
       INTEGER NEL
@@ -112,6 +122,7 @@
       INTEGER IPVCOR( 8, NSET )
       INTEGER NSTATE( NPOS )
       LOGICAL VAR
+      REAL ROT
       
 *  Arguments Given and Returned:
       REAL IEST( NEL, NPAIR )
@@ -139,7 +150,9 @@
                                  ! workspace pointers
       LOGICAL BAD                ! bad pixel flag
       
-      integer ii      
+      REAL Q, U                  ! Stokes parameters
+      REAL VQ, VU                ! Variances on Stokes parameters
+      REAL K1, K2                ! Constants
 *.
 
 * Check inherited global status.
@@ -340,6 +353,53 @@
      :           %VAL( IPWRK4 ), %VAL( IPWRK5 ), STATUS )
          ENDIF
       ENDIF
+
+* Now rotate the reference direction if required, and if we are operating 
+* in linear (not circular) mode (this is indicated by the presence of 1 or
+* more U images).
+      IF( ROT .NE. 0.0 .AND. NU .GT. 0 ) THEN
+
+         K1 = COS( 2*ROT )
+         K2 = SIN( 2*ROT )
+
+         DO I = 1, NEL
+            Q = OUT( I, 2 )
+            U = OUT( I, 3 )
+
+            IF( Q .NE. VAL__BADR .AND. U .NE. VAL__BADR ) THEN
+               OUT( I, 2 ) = Q*K1 + U*K2
+               OUT( I, 3 ) = U*K1 - Q*K2 
+
+            ELSE
+               OUT( I, 2 ) = VAL__BADR
+               OUT( I, 3 ) = VAL__BADR
+            END IF
+
+         END DO
+
+         IF( VAR ) THEN
+
+            K1 = K1*K1
+            K2 = K2*K2
+
+            DO I = 1, NEL
+               VQ = VOUT( I, 2 )
+               VU = VOUT( I, 3 )
+   
+               IF( VQ .NE. VAL__BADR .AND. VU .NE. VAL__BADR ) THEN
+                  VOUT( I, 2 ) = VQ*K1 + VU*K2
+                  VOUT( I, 3 ) = VQ*K2 + VU*K1
+   
+               ELSE
+                  VOUT( I, 2 ) = VAL__BADR
+                  VOUT( I, 3 ) = VAL__BADR
+               END IF
+   
+            END DO
+
+         END IF
+
+      END IF
 
 * Free workspace.
       IF ( VAR ) CALL PSX_FREE( IPCOV, STATUS )

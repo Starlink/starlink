@@ -74,6 +74,9 @@
 *  History:
 *     25-MAY-1999 (DSB):
 *        Original version.
+*     21-JUN-1999 (DSB):
+*        Move assignment to SAXIS so that it is conditional on INDFT
+*        being supplied.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -306,6 +309,9 @@
             CALL VEC_RTOR( .TRUE., EL, %VAL( IPVOUT ), %VAL( IPVP ), 
      :                     IERR, NERR, STATUS )
 
+*  Store the effective analyser position for the 3rd axis.
+            SAXIS( IOUT ) = ANLANG       
+
 *  Annul the section identifier.
             CALL NDF_ANNUL( INDFS, STATUS )
 
@@ -313,9 +319,6 @@
 
 *  Annul the output NDF identifier.
          CALL NDF_ANNUL( INDFO, STATUS )
-
-*  Store the effective analyser position for the 3rd axis.
-         SAXIS( IOUT ) = ANLANG       
 
 *  Free the work space.
          CALL PSX_FREE( IPCNT, STATUS )

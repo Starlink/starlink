@@ -105,6 +105,9 @@
 *        Original version.
 *     8-APR-1999 (DSB):
 *        Do not store ANGROT in the output anymore.
+*     21-JUN-1999 (DSB):
+*        Output reference direction is now north or +ve Y (like for
+*        single-beam data).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,7 +202,8 @@
                                  ! of I, Q and U
       INTEGER IWCS               ! Identifier for the WCS information
        
-      REAL ANGROT( MAXIN )       ! ACW angles from X to ref direction (degs)
+      REAL ANGROT( MAXIN )       ! Orientation of input ref directions
+      REAL ANGRT                 ! Orientation of output ref direction
       REAL WPLATE( MAXIN )       ! Waveplate positions of images 
       REAL TOLS, TOLZ            ! tolerances for image intercomparisons
       REAL SKYSUP                ! sky supression factor
@@ -748,6 +752,12 @@
       CALL NDF_SECT( NDFVAL( 1 ), 3, LBND, UBND, INDFT, STATUS ) 
       CALL KPG1_GTWCS( INDFT, IWCS, STATUS )
 
+*  Decide on the orientation of the reference direction in the output
+*  cube.
+      CALL POL1_ANGRT( IWCS, 0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ), 
+     :                 0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ), ANGRT, 
+     :                 STATUS )
+
 *  At this point we can release the input images since we now have
 *  versions corrected with the efficiency factors. Do this by ending the
 *  current NDF context.
@@ -828,14 +838,12 @@
       CALL DAT_ANNUL( XLOC, STATUS )         
 
 *  Add a POLANAL Frame to the WCS FrameSet. The first axis in this Frame 
-*  defines the reference direction in the output cube. The reference
-*  direction is just copied from the first input NDF, since there can be 
-*  no rotation between input images.
-      CALL POL1_PTANG( ANGROT( 1 ), IWCS, STATUS )
+*  defines the reference direction in the output cube. 
+      CALL POL1_PTANG( ANGRT, IWCS, STATUS )
 
-*  Store teh WCS FrameSet in the output NDF. All the input NDFs are assumed 
+*  Store the WCS FrameSet in the output NDF. All the input NDFs are assumed 
 *  to be aligned with each other, and with the output NDF. So just copy the 
-*  WCS component from the first input NDF (with the extra OLANAL FRame
+*  WCS component from the first input NDF (with the extra POLANAL Frame
 *  added above) to the output NDF, and then annul the AST identifier.
       CALL NDF_PTWCS( IWCS, NDFOUT, STATUS )
       CALL AST_ANNUL( IWCS, STATUS )
@@ -851,12 +859,15 @@
       ENDIF
 
 * Pass the images and parameters to the routine that calculates the
-* polarisation. Put the results directly into the output array.
+* polarisation. Put the results directly into the output array. The
+* reference direction for the Stokes parameters is rotated to the angle
+* specified by ANGRT.
       CALL POL_CALP( NEL, NSET, NPOS, NI,  IPDCOR, IPVCOR, NSTATE,
      :               VAR, %VAL( IPIEST ), %VAL( IPVIEST ),
      :               %VAL( IPQEST ), %VAL( IPVQEST ), %VAL( IPUEST ),
      :               %VAL( IPVUEST ), %VAL( IPWEIGHT ), %VAL( IPDOUT ),
-     :               %VAL( IPVOUT ), STATUS )
+     :               %VAL( IPVOUT ), DTOR*( ANGRT - ANGROT( 1 ) ), 
+     :               STATUS )
 
 * Release unwanted workspace.
       CALL PSX_FREE( IPIEST, STATUS )
