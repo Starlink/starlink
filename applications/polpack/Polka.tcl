@@ -56,6 +56,8 @@
 #     3-NOV-1998 (DSB):
 #        Ensure the current WCS Frame in the copies of the supplied input
 #        images is PIXEL. 
+#     22-MAR-1999 (DSB):
+*        Make rotation available in single-beam mode.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -110,16 +112,6 @@
    set MAPTYPE(3) "Shift and magnification"
    set MAPTYPE(4) "Shift, rotation and magnification"
    set MAPTYPE(5) "Full 6 parameter fit"
-   set MAPSTATE(1,0) normal
-   set MAPSTATE(2,0) normal
-   set MAPSTATE(3,0) normal
-   set MAPSTATE(4,0) normal
-   set MAPSTATE(5,0) normal
-   set MAPSTATE(1,1) normal
-   set MAPSTATE(2,1) disabled
-   set MAPSTATE(3,1) normal
-   set MAPSTATE(4,1) disabled
-   set MAPSTATE(5,1) disabled
    set MENUBACK "#b0b0b0"
    set NONE 5
    set O_RAY_FEATURES 0
@@ -787,6 +779,30 @@
 
    SetHelp $skymenu ".  The order of the polynomial fit used on each axis when fitting sky surfaces. Larger values allow more flexibility in the fitted surfaces."
 
+# Decide which mapping types are available.
+   if { !$POL } {
+      set MAPSTATE(1) normal
+      set MAPSTATE(2) normal
+      set MAPSTATE(3) normal
+      set MAPSTATE(4) normal
+      set MAPSTATE(5) normal
+
+   } elseif { $DBEAM } { 
+      set MAPSTATE(1) normal
+      set MAPSTATE(2) disabled
+      set MAPSTATE(3) normal
+      set MAPSTATE(4) disabled
+      set MAPSTATE(5) disabled
+
+   } else {
+      set MAPSTATE(1) normal
+      set MAPSTATE(2) normal
+      set MAPSTATE(3) normal
+      set MAPSTATE(4) normal
+      set MAPSTATE(5) disabled
+
+   }
+
 # Add items to the "Mapping Types" sub-menu. The available mapping types
 # depend on whether or not we are processing polarimeter data (as
 # specified by global POL - set by the atask).
@@ -794,7 +810,7 @@
    for {set type 1} {$type < 6} {incr type} {
       $mapmenu add radiobutton -label $MAPTYPE($type) -variable FITTYPE \
                                -selectcolor $RB_COL -value $MAPTYPE($type) \
-                               -state $MAPSTATE($type,$POL)
+                               -state $MAPSTATE($type)
       MenuHelp $mapmenu $MAPTYPE($type) ".  Align images using \"$MAPTYPE($type)\"."
    }
    $mapmenu add separator
@@ -808,7 +824,7 @@
    for {set type 1} {$type < 6} {incr type} {
       $oemapmenu add radiobutton -label $MAPTYPE($type) -variable OEFITTYPE \
                                  -selectcolor $RB_COL -value $MAPTYPE($type) \
-                                 -state $MAPSTATE($type,$POL)
+                                 -state $MAPSTATE($type)
    }
 
    SetHelp $oemapmenu ".  The type of mapping to use when aligning the O and E rays. "

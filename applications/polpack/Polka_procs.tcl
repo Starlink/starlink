@@ -11212,7 +11212,7 @@ proc Save {} {
             update idletasks
 
 #  Create the Stokes cube.
-            if { ![Obey polpack polcal "in=^$intfiles pmode=$POLMODE out=$STKOUT maxit=30 dualbeam=$DBEAM niter=3"] } {
+            if { ![Obey polpack polcal "in=^$intfiles pmode=$POLMODE out=$STKOUT maxit=30 dualbeam=$DBEAM"] } {
                set ok 0
             }
 
