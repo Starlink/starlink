@@ -26,13 +26,16 @@
 #	 Add ALLBOLS parameter
 #     1997 May 22 (TimJ)
 #	 Make '!' the default for FILE
+#     1997 June 10 (TimJ)
+#        Change FILE to _CHAR instead of type FILENAME
+#        Fixes problems with uninitialised parameter.
 #     {enter_further_changes_here}
  
 #-
 
    INTERFACE SCUPHOT
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
       PARAMETER IN
 	 POSITION 1
@@ -72,7 +75,7 @@
       ENDPARAMETER
 
       PARAMETER FILE
-         TYPE    'FILENAME'
+         TYPE    '_CHAR'
          VPATH   'PROMPT'
          PROMPT  'Name of ASCII file to contain results summary'
 	 DEFAULT !
