@@ -15,10 +15,6 @@
 *     CALL KPG1_ASFRM( PARAM, EPARAM, IWCS, WCDOM, DCDOM, PROMPT, TOKEN,
 *                      STATUS )
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Description:
 *     This routine allows the user to specify a new Current Frame for a 
 *     FrameSet using an environment parameter.

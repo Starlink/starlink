@@ -12,10 +12,6 @@
 *  Invocation:
 *     CALL KPG1_ASFGT( PDOM, PDIM, PEP, FRM, NAX, STATUS )
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Description:
 *     This routine creates a new AST Frame with a Domain specified through
 *     the environment. If the string obtained for the parameter looks
