@@ -2374,6 +2374,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StringsControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TODO
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TickControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TitleControls.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/Utilities.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/package.html
 cvs checkout: Updating java/source/astgui/src/main/uk/ac/starlink/ast/gui/images
 cvs checkout: Updating java/source/astgui/src/testcases
