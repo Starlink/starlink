@@ -111,6 +111,9 @@ void gsd2_nativd( unsigned char *bytes );
 void gsd2_nativc( unsigned char *bytes );
 void gsd2_nativa( char *ch_ptr, enum type_tag d_type, int d_length );
 
+int gsd2_copya( enum type_tag itype, enum type_tag otype,
+		int size, unsigned char *in, unsigned char *out );
+
 
 int gsd1_rdfildsc( FILE *fptr, struct file_descriptor *file_dsc );
 int gsd1_rdhead(   FILE *fptr, struct file_descriptor *file_dsc,

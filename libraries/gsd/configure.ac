@@ -24,6 +24,14 @@ AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    Make sure the variable types are okay for GSD
+AC_CHECK_TYPES([int8_t, int16_t, int32_t, int64_t])
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(short int)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(float)
+AC_CHECK_SIZEOF(double)
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [prm cnf])
 STAR_DECLARE_DEPENDENCIES(link,  [prm cnf])

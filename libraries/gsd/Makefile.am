@@ -23,7 +23,9 @@ gsd1_rdfildsc.c  gsd2_nativx.c  gsdFind.c   gsdInqSize.c
 # Testing. Just build gsd_print although we can not really test
 # it unless we ask it to default to the test GSD file
 
-TESTS = gsd_test
-check_PROGRAMS = gsd_test
+TESTS = gsd2_testcp gsd_test
+check_PROGRAMS = gsd2_testcp gsd_test
 gsd_test_SOURCES = gsd_test.f
-
+gsd_test_LDADD = `$(srcdir)/gsd_link` -lm
+gsd2_testcp_SOURCES = gsd2_testcp.c
+gsd2_testcp_LDADD = `$(srcdir)/gsd_link` -lm

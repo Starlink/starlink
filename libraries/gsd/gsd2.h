@@ -50,6 +50,9 @@
 /* System specfic defines */
 #include <config.h>
 
+/* Bad values */
+#include "prm_par.h"
+
 /* General gsd definitions */
 #include "gsd1.h"
 
@@ -92,17 +95,42 @@
 #   define GSD_FLOAT  IEEE
 # else
     /* have no idea */
-#   define GSD_FLOAT IEEE
+#   error "Big endian system without IEEE floats. Do not know what to do"
 # endif
 #else
 # define GSD_INTEND LITTLEEND
 # ifdef HAVE_IEEE_FLOATS
 #   define GSD_FLOAT  IEEEBS
 # else
-#   define GSD_FLOAT  VAXF
+#   warn "Little endian system without IEEE floats. Assuming VAX floats"
+#   define GSD_FLOAT VAXF
 # endif
 #endif
 
+/* GSD requires that we have 1 byte char, 2 byte short, 4 byte float
+   and int and 8 byte double. All else will break the conversions.
+   Probably should use types that are guaranteed to be the correct
+   size (int32_t?). For now just abort if this is not the case */
+
+# if SIZEOF_CHAR != 1
+#  error "GSD library assumes 1 byte char"
+# endif
+
+# if SIZEOF_SHORT_INT != 2
+#  error "GSD library assumes 2 byte short int"
+# endif
+
+# if SIZEOF_INT != 4
+#  error "GSD library assumes 4 byte int"
+# endif
+
+# if SIZEOF_FLOAT != 4
+#  error "GSD library assumes 4 byte float"
+# endif
+
+# if SIZEOF_DOUBLE != 8
+#  error "GSD library assumes 8 byte double"
+# endif
 
 
 /* Since I have not worked out how configure will tell me the form
@@ -129,53 +157,29 @@ static const unsigned char gsd__dbad[8] = { 0xFF, 0xFF, 0xF7, 0xFF,
 /* Set the PRIMDAT bad value pattern for the local machine. The VAX/GSD bad
  * patterns are replaced with these (even on a VAX).
  *
- * This simply switches on endiannes. In principal we should be using
- * primdat directly.
+ * Store the PRIMDAT values in a union so that we can convert them
+ * easily to a byte array (for byte to byte comparison).
  */
 
-#ifdef WORDS_BIGENDIAN
-static const union { unsigned char c[1]; char b; }
-   val1__badb = { 0x80 };
-static const union { unsigned char c[2]; short w; }
-   val1__badw = { 0x80, 0x00 };
-static const union { unsigned char c[4]; int i; }
-   val1__badi = { 0x80, 0x00, 0x00, 0x00 };
-static const union { unsigned char c[4]; float r; }
-   val1__badr = { 0xFF, 0x7F, 0xFF, 0xFF };
-static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; 
-#else
-static const union { unsigned char c[1]; char b; }
-   val1__badb = { 0x80 };
-static const union { unsigned char c[2]; short w; }
-   val1__badw = { 0x00, 0x80 };
-static const union { unsigned char c[4]; int i; }
-   val1__badi = { 0x00, 0x00, 0x00, 0x80 };
-# if GSD_FLOAT == VAXF
-static const union { unsigned char c[4]; float r; }
-   val1__badr = { 0xFF, 0xFF, 0xFF, 0xFF };
-static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-# else
-static const union { unsigned char c[4]; float r; }
-   val1__badr = { 0xFF, 0xFF, 0x7F, 0xFF };
-static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF };
-# endif
-#endif
+/* Create the unions with primdat bad values */
+static const union { char b; unsigned char c[1];}
+  val1__badb = { VAL__BADB };
+static const union { short w; unsigned char c[2]; }
+  val1__badw = { VAL__BADW };
+static const union { int i; unsigned char c[4]; }
+  val1__badi = { VAL__BADI };
+static const union { float r; unsigned char c[4]; }
+  val1__badr = { VAL__BADR };
+static const union { double d; unsigned char c[8]; }
+  val1__badd = { VAL__BADD };
 
-/* Now actually set up the shorthand macros */
+/* Now actually set up the shorthand macros to the byte arrays*/
 
 #define val__badb val1__badb.c
-#define VAL__BADB val1__badb.b
 #define val__badw val1__badw.c
-#define VAL__BADW val1__badw.w
 #define val__badi val1__badi.c
-#define VAL__BADI val1__badi.i
 #define val__badr val1__badr.c
-#define VAL__BADR val1__badr.r
 #define val__badd val1__badd.c
-#define VAL__BADD val1__badd.d
 
 #endif
 /* Bottom of gsd2.h */
