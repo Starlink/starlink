@@ -26,8 +26,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+extern int yy_flex_debug;
+extern int yydebug;
 
-   main( int argc, char *argv[] ) {
+   main( int argc, char **argv ) {
 /*
 *+
 *  Name:
@@ -47,24 +49,57 @@
 
 /* Declare external function. */
       int yyparse();
+
+/* Declare local variables. */
+      char *name;
+      char c;
+
+/* Get name of program. */
+      name = *(argv++);
+      argc--;
+
+/* Work through any command line flags. */
+      yy_flex_debug = 0;
+      yydebug = 0;
+      while ( argc > 0 && **argv == '-' ) {
+         switch( *(++(*argv)) ) {
+            case 'd':
+               while ( c = *(++(*argv)) )
+                  switch( c ) {
+                     case 'l':
+                        yy_flex_debug = 1;
+                        break;
+                     case 'y':
+                        yydebug = 1;
+                        break;
+                  };
+               break;
+            default:
+               printf( "Usage: %s [ -d[l][y] ] [ in [ out ] ]\n", name );
+               exit( 1 );
+         }
+         argv++;
+         argc--;
+      }
    
 /* Open standard input and output appropriately according to command line
    arguments. */
       switch( argc ) {
-         case 3:
-            if ( freopen( argv[ 2 ], "w", stdout ) == NULL ) {
-               perror( argv[ 2 ] );
-               exit( 1 );
-            }
          case 2:
-            if ( freopen( argv[ 1 ], "r", stdin ) == NULL ) {
+            if ( freopen( argv[ 1 ], "w", stdout ) == NULL ) {
                perror( argv[ 1 ] );
                exit( 1 );
             }
          case 1:
+            if ( freopen( argv[ 0 ], "r", stdin ) == NULL ) {
+               perror( argv[ 0 ] );
+               exit( 1 );
+            }
+         case 0:
             break;
          default:
-            printf( "Usage: %s [ in [ out ] ]\n", argv[ 0 ] );
+            printf( "Usage: %s [ in [ out ] ]\n", name );
+            exit( 1 );
       }
          
 /* Call the parser and return. */
