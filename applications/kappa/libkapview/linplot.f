@@ -403,6 +403,17 @@
 *        the bounds of the previous plot on both axes. A warning will be 
 *        reported if the labels for the horizontal axes of the two plots
 *        are different.
+*     linplot spectrum system="'system(1)=freq,unit(1)=GHz'"
+*        This example assumes that the current co-ordinate Frame of NDF 
+*        "spectrum" is a SpecFrame. The horizontal axis (axis "1") is labelled 
+*        with frequency values, in units of GHz. If the SpecFrame represents 
+*        some other system (such as wavelength, velocity, energy, etc.),
+*        or has some other units, then the conversion is done automatically. 
+*        Note, a SpecFrame is a specialised class of Frame which knows how to 
+*        do these conversions - the above command will fail if the current
+*        co-ordinate Frame in the NDF is a simple Frame (such as the AXIS 
+*        Frame). A SpecFrame can be created from an AXIS Frame using KAPPA 
+*        command WCSADD.
 
 *  Notes:
 *     -  The Title component in the NDF is used as the default title for 

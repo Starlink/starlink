@@ -24366,9 +24366,9 @@ plot (6k).
       default values which encompass the entire supplied data set. The
       current picture is usually cleared before plotting the new picture,
       but parameter CLEAR can be used to prevent this, allowing several
-      plots to be {\tt "}stacked{\tt "} together. If a new plot is drawn 
-      over an existing plot, then there is an option to allow the new plot 
-      to be aligned with the existing plot (see parameter ALIGN).
+      plots to be {\tt "}stacked{\tt "} together. If a new plot is drawn over an
+      existing plot, then there is an option to allow the new plot to be
+      aligned with the existing plot (see parameter ALIGN).
 
       The input NDF may, for instance, contain a spectrum of data values
       against wavelength, or it may contain data values along a
@@ -24396,15 +24396,15 @@ plot (6k).
          existing data plot. If ALIGN is TRUE, the X axis values of the
          new plot will be mapped into the coordinate system of the X axis in
          the existing plot before being used (if this is not possible an
-         error is reported). In this case, the XLEFT, XRIGHT, YBOT and YTOP 
-         parameters are ignored and the bounds of the existing plot are used 
-         instead. If ALIGN is FALSE, the new X axis values are used without 
-         change. The bounds of the new plot are specified using parameters 
+         error is reported). In this case, the XLEFT, XRIGHT, YBOT and YTOP
+         parameters are ignored and the bounds of the existing plot are used
+         instead. If ALIGN is FALSE, the new X axis values are used without
+         change. The bounds of the new plot are specified using parameters
          XLEFT, XRIGHT, YBOT and YTOP as usual, and these bounds are mapped
          to the edges of the existing picture. The ALIGN parameter is only
-         accessed if parameter CLEAR is FALSE, and if there is another line 
-         plot within the current picture. If a null (!) value is supplied, 
-         a value of TRUE will be used if and only if a mapping can be found 
+         accessed if parameter CLEAR is FALSE, and if there is another line
+         plot within the current picture. If a null (!) value is supplied,
+         a value of TRUE will be used if and only if a mapping can be found
          between the existing and the new plots. A value of FALSE will
          be used otherwise. {\tt [!]}
       }
@@ -24439,12 +24439,12 @@ plot (6k).
          {\tt "}Variance{\tt "} and causes the square root of the variance values
          to be displayed).  If {\tt "}Quality{\tt "} is specified, then the quality
          values are treated as numerical values (in the range 0 to
-         255). {\tt [{\tt "}Data{\tt "}]}
+         255). {\tt ["Data"]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [}current graphics device{\tt ]}
+         The plotting device. {\tt [current graphics device]}
       }
       \sstsubsection{
          ERRBAR = \_LOGICAL (Read)
@@ -24454,7 +24454,8 @@ plot (6k).
          depending on what is available in the supplied dataset.  The
          parameter SHAPE controls the appearance of the error bars, and
          XSIGMA and YSIGMA control their lengths. The ERRBAR parameter is
-         ignored unless the parameter COMP is set to {\tt "}Data{\tt "}. {\tt [FALSE]}
+         ignored unless the parameter COMP is set to {\tt "}Data{\tt "}. 
+         {\tt [FALSE]}
       }
       \sstsubsection{
          FREQ = \_INTEGER (Read)
@@ -24509,66 +24510,62 @@ plot (6k).
          defaulted if a null value (!) is supplied. See section {\tt "}Plotting
          Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
-         reported). {\tt [}current value{\tt ]}
+         reported). {\tt [current value]}
       }
       \sstsubsection{
-         LMODE = LITERAL(Read)
+         LMODE = LITERAL (Read)
       }{
-         LMODE specifies how the defaults for parameters YBOT and YTOP (the 
-         lower and upper limit of the vertical axis of the plot) should be 
+         LMODE specifies how the defaults for parameters YBOT and YTOP (the
+         lower and upper limit of the vertical axis of the plot) should be
          found. The supplied string should consist of up to three sub-strings,
-         separated by commas. The first sub-string must specify the method 
-         to use. If supplied, the other two sub-strings should be numerical 
+         separated by commas. The first sub-string must specify the method
+         to use. If supplied, the other two sub-strings should be numerical
          values as described below (default values will be used if these
          sub-strings are not supplied). The following methods are available:
- 
+
          \sstitemlist{
 
             \sstitem
-            {\tt "}Range{\tt "} -- The minimum and maximum data values
-	    (including any error bars) are used as the defaults for YBOT
-	    and YTOP. No other sub-strings are needed by this option.
+            {\tt "}Range{\tt "} -- The minimum and maximum data values (including any
+            error bars) are used as the defaults for YBOT and YTOP. No other
+            sub-strings are needed by this option.
 
             \sstitem
-            {\tt "}Extended{\tt "} -- The minimum and maximum data values
-	    (including error bars) are extended by percentages of the
-	    data range, specified by the second and third sub-strings.
-	    For instance, if the value {\tt "}Ex,10,5{\tt "} is supplied, then the
-	    default for YBOT is set to the minimum data value minus 10%
-	    of the data range, and the default for YTOP is set to the
-	    maximum data value plus 5% of the data range. If only one
-	    value is supplied, the second value defaults to the supplied
-	    value. If no values are supplied, both values default to
-	    {\tt "}2.5{\tt "}.
+            {\tt "}Extended{\tt "} -- The minimum and maximum data values (including error
+            bars) are extended by percentages of the data range, specified by
+            the second and third sub-strings. For instance, if the value
+            {\tt "}Ex,10,5{\tt "} is supplied, then the default for YBOT is set to the
+            minimum data value minus 10\% of the data range, and the default
+            for YTOP is set to the maximum data value plus 5\% of the data range.
+            If only one value is supplied, the second value defaults to the
+            supplied value. If no values are supplied, both values default to
+            {\tt "}2.5{\tt "}.
 
             \sstitem
-            {\tt "}Percentile{\tt "} -- The default values for YBOT and
-	    YTOP are set to the specified percentiles of the data
-	    (excluding error bars). For instance, if the value
-	    {\tt "}Per,10,99{\tt "} is supplied, then the default for YBOT is set so
-	    that the lowest 10% of the plotted points are off the bottom
-	    of the plot, and the default for YTOP is set so that the
-	    highest 1% of the points are off the top of the plot. If only
-	    one value, p1, is supplied, the second value, p2, defaults to
-	    (100 - p1). If no values are supplied, the values default to
-	    {\tt "}5,95{\tt "}.
+            {\tt "}Percentile{\tt "} -- The default values for YBOT and YTOP are set to
+            the specified percentiles of the data (excluding error bars). For
+            instance, if the value {\tt "}Per,10,99{\tt "} is supplied, then the default
+            for YBOT is set so that the lowest 10\% of the plotted points are
+            off the bottom of the plot, and the default for YTOP is set so
+            that the highest 1\% of the points are off the top of the plot.
+            If only one value, p1, is supplied, the second value, p2, defaults
+            to (100 - p1). If no values are supplied, the values default to
+            {\tt "}5,95{\tt "}.
 
             \sstitem
-            {\tt "}Sigma{\tt "} -- The default values for YBOT and YTOP
-	    are set to the specified numbers of standard deviations below
-	    and above the mean of the data. For instance, if the value
-	    {\tt "}sig,1.5,3.0{\tt "} is supplied, then the default for YBOT is set
-	    to the mean of the data minus 1.5 standard deviations, and
-	    the default for YTOP is set to the mean plus 3 standard
-	    deviations. If only one value is supplied, the second value
-	    defaults to the supplied value. If no values are supplied,
-	    both default to {\tt "}3.0{\tt "}.
+            {\tt "}Sigma{\tt "} -- The default values for YBOT and YTOP are set to the
+            specified numbers of standard deviations below and above the mean
+            of the data. For instance, if the value {\tt "}sig,1.5,3.0{\tt "} is supplied,
+            then the default for YBOT is set to the mean of the data minus 1.5
+            standard deviations, and the default for YTOP is set to the mean
+            plus 3 standard deviations. If only one value is supplied, the
+            second value defaults to the supplied value. If no values are
+            supplied, both default to {\tt "}3.0{\tt "}.
 
          }
-
          The method name can be abbreviated to a single character, and is
          case insensitive. The initial value is {\tt "}Extended{\tt "}. 
-         {\tt [}current value{\tt ]}
+         {\tt [current value]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -24580,7 +24577,7 @@ plot (6k).
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
          value used is 0.15 (for all edges) if either annotated axes or a
-         key are produced, and zero otherwise. {\tt [}current value{\tt ]}
+         key are produced, and zero otherwise. {\tt [current value]}
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
@@ -24590,7 +24587,7 @@ plot (6k).
          position should be marked, and should be given as an integer
          PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
          2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-         value must be larger than or equal to -31. {\tt [}current value{\tt ]}
+         value must be larger than or equal to -31. {\tt [current value]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -24624,7 +24621,7 @@ plot (6k).
             length is specified by the axis width of the pixel.
 
          }
-         {\tt [}current value{\tt ]}
+         {\tt [current value]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -24660,7 +24657,7 @@ plot (6k).
          draw them can be controlled using the plotting attributes
          {\tt "}Colour(ErrBars){\tt "}, {\tt "}Width(ErrBars){\tt "} and {\tt "}Style(ErrBars){\tt "} (see
          parameter STYLE). SHAPE is only accessed when parameter ERRBAR
-         is TRUE.  {\tt [}current value{\tt ]}
+         is TRUE.  {\tt [current value]}
       }
       \sstsubsection{
          STYLE = LITERAL (Read)
@@ -24695,7 +24692,7 @@ plot (6k).
          Colour(Markers), Width(Markers), \emph{etc} (the synonym Symbols may be
          used in place of Markers). The appearance of the error symbols is
          controlled using Colour(ErrBars), Width(ErrBars), \emph{etc}, (see
-         parameter SHAPE). {\tt [}current value{\tt ]}
+         parameter SHAPE). {\tt [current value]}
       }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
@@ -24745,14 +24742,14 @@ plot (6k).
       }{
          If horizontal error bars are produced (see parameter ERRBAR), then
          XSIGMA gives the number of standard deviations which the error
-         bars are to represent. {\tt [}current value{\tt ]}
+         bars are to represent. {\tt [current value]}
       }
       \sstsubsection{
          YBOT = LITERAL (Read)
       }{
          The axis value to place at the bottom end of the vertical
          axis. If a null (!) value is supplied, the value used is
-         determined by parameter LMODE. The value of LBOT may be 
+         determined by parameter LMODE. The value of LBOT may be
          greater than or less than the value supplied for YTOP, and
          should be supplied as a floating point value for the quantity
          specified by parameter YLOG. See also parameter ALIGN. {\tt [!]}
@@ -24770,14 +24767,14 @@ plot (6k).
       }{
          If vertical error bars are produced (see parameter ERRBAR), then
          YSIGMA gives the number of standard deviations which the error
-         bars are to represent. {\tt [}current value{\tt ]}
+         bars are to represent. {\tt [current value]}
       }
       \sstsubsection{
          YTOP = LITERAL (Read)
       }{
          The axis value to place at the top end of the vertical
          axis. If a null (!) value is supplied, the value used is
-         determined by parameter LMODE. The value of LTOP may be 
+         determined by parameter LMODE. The value of LTOP may be
          greater than or less than the value supplied for YBOT, and
          should be supplied as a floating point value for the quantity
          specified by parameter YLOG. See also parameter ALIGN. {\tt [!]}
@@ -24855,6 +24852,20 @@ plot (6k).
          reported if the labels for the horizontal axes of the two plots
          are different.
       }
+      \sstexamplesubsection{
+         linplot spectrum system={\tt "}{\tt '}system(1)=freq,unit(1)=GHz{\tt '}{\tt "}
+      }{
+         This example assumes that the current co-ordinate Frame of NDF
+         {\tt "}spectrum{\tt "} is a SpecFrame. The horizontal axis (axis {\tt "}1{\tt "}) is labelled
+         with frequency values, in units of GHz. If the SpecFrame represents
+         some other system (such as wavelength, velocity, energy, \emph{etc}.),
+         or has some other units, then the conversion is done automatically.
+         Note, a SpecFrame is a specialised class of Frame which knows how to
+         do these conversions - the above command will fail if the current
+         co-ordinate Frame in the NDF is a simple Frame (such as the AXIS
+         Frame). A SpecFrame can be created from an AXIS Frame using KAPPA
+         command WCSADD.
+      }
    }
    \sstnotes{
       \sstitemlist{
@@ -24884,9 +24895,10 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications:
+      Related Applications
    }{
-      KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, SPECGRID, MSPLOT, SPLOT.
+      KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
+      SPECDRE: SPECGRID.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -40002,18 +40014,25 @@ plot (7k).
       optionally use the Mapping to add a new co-ordinate Frame into
       the WCS component of an NDF (see parameter NDF). An output text file
       may also be created holding a textual representation of the
-      Mapping for future use by other applications such as REGRID (see
+      Mapping for future use by other applications such as RESAMPLE (see
       parameter MAPOUT). A number of different types of Mapping can be
       used (see parameter MAPTYPE).
 
       When adding a new Frame to a WCS component, the Mapping is used to
-      connect the the new Frame to an existing one (called the {\tt "}basis{\tt "}
-      Frame). The newly added Frame is a copy of the basis Frame, with
-      the new Domain attribute specified by parameter DOMAIN, and becomes
-      the current co-ordinate Frame in the NDF. If necessary, other
-      attributes of the new Frame (Title, Label, Format, \emph{etc}) can be
-      changed using application WCSATTRIB.
+      connect the new Frame to an existing one (called the {\tt "}basis{\tt "} Frame
+      \sstitemlist{
 
+         \sstitem
+         see parameter FRAME). The specific type of Frame to add is specified
+         using parameter FRMTYPE (the default is to simply copy the basis Frame).
+         Attributes which have been assigned an explicit value in the basis Frame
+         are transfered to the new Frame (but only if they are relevant to the
+         type of the new Frame). The value of the Domain attribute for the new
+         Frame can be specified using parameter DOMAIN. Other attribute values
+         for the new Frame may be specified using parameters ATTRS. The new
+         Frame becomes the current co-ordinate Frame in the NDF.
+
+      }
       WCSADD will only generate Mappings with the same number of
       input and output axes; this number is determined by the number
       of axes in the basis Frame if an NDF is supplied, or by the
@@ -40023,6 +40042,31 @@ plot (7k).
       wcsadd ndf frame domain maptype
    }
    \sstparameters{
+      \sstsubsection{
+         ATTRS = GROUP (Read)
+      }{
+         A group of attribute settings to be applied to the new Frame
+         before adding it into the NDF.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of an attribute appropriate to the type
+         of Frame specified by parameter FRMTYPE (see SUN/210 for a complete
+         description of all attributes), and $<$value$>$ is the value to assign
+         to the attribute. Default values will be used for any unspecified
+         attributes - these defaults are inherited from the basis Frame.
+         Any unrecognised attributes are ignored (no error is reported).
+      }
       \sstsubsection{
          CENTRE( 2 ) = \_DOUBLE (Read)
       }{
@@ -40045,12 +40089,13 @@ plot (7k).
          The distortion coefficient of a pincushion distortion. Used
          in conjunction with the CENTRE parameter, this defines the
          forward transformation to be used as follows:
-      \begin{eqnarray*}
-            XX &=& X + D * (X - C1) * ( (X - C1)^2 + (Y - C2)^2 ) \\
-            YY &=& Y + D * (Y - C2) * ( (X - C1)^2 + (Y - C2)^2 ) 
-         \end{eqnarray*}
-         where $(X,Y)$ are the input co-ordinates, $(XX,YY)$ the output
-         co-ordinates, $D$ is DISCO, and $C1$ and C2 are the two elements of
+
+                 XX = X $+$ D $*$ (X - C1) $*$ ( (X - C1)$*$$*$2 $+$ (Y - C2)$*$$*$2 )
+
+                 YY = Y $+$ D $*$ (Y - C2) $*$ ( (X - C1)$*$$*$2 $+$ (Y - C2)$*$$*$2 )
+
+         where (X,Y) are the input co-ordinates, (XX,YY) the output
+         co-ordinates, D is DISCO, and C1 and C2 are the two elements of
          CENTRE. Only used when MAPTYPE=PINCUSHION.
       }
       \sstsubsection{
@@ -40088,9 +40133,9 @@ plot (7k).
          should be separated by commas or, if they are supplied in a file,
          new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
          which is within the section {\tt "}Parameters{\tt "}). The suntax for each
-         expression is Fortran-like; see the {\tt "}Examples{\tt "} section 
-         below, and the Appendix entitled ``\htmlref{Using MathMaps}{ap:MathMaps}''
-         in SUN/95 for details. Only used when MAPTYPE=MATH.
+         expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
+         the Appendix entitled {\tt "}Using MathMaps{\tt "} in SUN/95 for details. Only
+         used when MAPTYPE=MATH.
       }
       \sstsubsection{
          FRAME = LITERAL (Read)
@@ -40117,6 +40162,30 @@ plot (7k).
          }
       }
       \sstsubsection{
+         FRMTYPE = LITERAL (Read)
+      }{
+         The type of Frame to add to the NDF. If a null (!) value is
+         supplied, a copy of the basis Frame is used (as modified by
+         parameters ATTRS and DOMAIN). The allows values are:
+
+         \sstitemlist{
+
+            \sstitem
+            FRAME      -- A simple Cartesian Frame (the number of axes is
+                            equal to the number of outputs from the Mapping)
+
+            \sstitem
+            SKYFRAME   -- A 2-dimensional Frame representing positions on
+                            the celestial sphere.
+
+            \sstitem
+            SPECFRAME  -- A 1-dimensional Frame representing positions
+                            within an electromagnetic spectrum
+
+         }
+         {\tt [!]}
+      }
+      \sstsubsection{
          INVEXP = LITERAL (Read)
       }{
          The expressions to be used for the inverse co-ordinate
@@ -40138,7 +40207,7 @@ plot (7k).
          MAPOUT = FILENAME (Write)
       }{
          The name of a text file in which to store a textual representation
-         of the Mapping. This can be used, for instance, by the REGRID
+         of the Mapping. This can be used, for instance, by the RESAMPLE
          application. If a null (!) value is supplied, no file is
          created. {\tt [!]}
       }
@@ -40228,27 +40297,37 @@ plot (7k).
          the basis Frame, and co-ordinates (U,V,W,...) in the new Frame,
          then the following transformations would be used, depending on
          how many axes the two Frames have:
-         \begin{itemize}
 
-            \item 1-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X 
-            \end{eqnarray*}
+         \sstitemlist{
 
-            \item 2-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X + TR(3)*Y \\
-               V & = & TR(4) + TR(5)*X + TR(6)*Y
-            \end{eqnarray*}
+            \sstitem
+            1-dimensional:
 
-            \item 3-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z \\
-               V & = & TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z \\
-               W & = & TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
-            \end{eqnarray*}
+         }
+               U = TR(1) $+$ TR(2)$*$X
 
-         \end{itemize}
+         \sstitemlist{
+
+            \sstitem
+            2-dimensional:
+
+         }
+               U = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y
+
+               V = TR(4) $+$ TR(5)$*$X $+$ TR(6)$*$Y
+
+         \sstitemlist{
+
+            \sstitem
+            3-dimensional:
+
+         }
+               U = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y $+$ TR(4)$*$Z
+
+               V = TR(5) $+$ TR(6)$*$X $+$ TR(7)$*$Y $+$ TR(8)$*$Z
+
+               W = TR(9) $+$ TR(10)$*$X $+$ TR(11)$*$Y $+$ TR(12)$*$Z
+
          The correct number of values must be supplied (that is, N$*$(N$+$1)
          where N is the number of axes in the new and old Frames). If a
          null value (!) is given it is assumed that the new Frame and the
@@ -40259,12 +40338,25 @@ plot (7k).
       \sstsubsection{
          ZOOM = \_DOUBLE (Read)
       }{
-         The scaling factor for a ZoomMap; every co-ordinate will be
+         The scaling factor for a ZoomMap; every coordinate will be
          multiplied by this factor in the forward transformation.
          Only used when MAPTYPE=ZOOM.
       }
    }
    \sstexamples{
+      \sstexamplesubsection{
+         wcsadd speca axis frmtype=specframe maptype=unit $\backslash$
+      }{
+             attrs={\tt "}{\tt '}system=wave,unit=Angstrom{\tt '}{\tt "}
+         This example assumes the NDF {\tt "}speca{\tt "} has an Axis structure
+         describing wavelength in Angstroms. It adds a corresponding
+         SpecFrame into the WCS component of the NDF. The SpecFrame
+         is connected to the Frame describing the NDF Axis structure
+         using a unit Mapping. Subsequently, WCSATTRIB  can be used to
+         modify the SpecFrame so that it describes the spectral axis
+         value in some other system (frequency, velocities of various
+         forms, energy, wave number, \emph{etc}).
+      }
       \sstexamplesubsection{
          wcsadd ngc5128 pixel old\_pixel unit
       }{
@@ -40307,10 +40399,10 @@ plot (7k).
          axes, but is translated by 1024 pixels on the third axis.
       }
       \sstexamplesubsection{
-         wcsadd plane pixel polar math simpif simpfi \\
-            forexp={\tt "}{\tt '}r=sqrt(x$*$x$+$y$*$y),theta=atan2(y,x){\tt '}{\tt "} \\
-            invexp={\tt "}{\tt '}x=r$*$cos(theta),y=r$*$sin(theta){\tt '}{\tt "}
+         wcsadd plane pixel polar math simpif simpfi
       }{
+            forexp={\tt "}{\tt '}r=sqrt(x$*$x$+$y$*$y),theta=atan2(y,x){\tt '}{\tt "}
+            invexp={\tt "}{\tt '}x=r$*$cos(theta),y=r$*$sin(theta){\tt '}{\tt "}
          A new Frame is added which gives pixel positions in polar
          co-ordinates. Fortran-like expressions are supplied which define
          both the forward and inverse transformations of the Mapping. The
@@ -40330,12 +40422,13 @@ plot (7k).
          two separate lines.
       }
       \sstexamplesubsection{
-         wcsadd ndf=$\backslash$! naxes=2 mapout=pcd.ast maptype=pincushion disco=5.3e-10
+         wcsadd ndf=$\backslash$! naxes=2 mapout=pcd.ast maptype=pincushion
       }{
+            disco=5.3e-10
          This constructs a pincushion-type distortion Mapping centred
          on the origin with a distortion coefficient of 5.3e-10,
          and writes out the Mapping as a text file called pcd.ast.
-         This file could then be used by REGRID to resample
+         This file could then be used by RESAMPLE to resample
          the pixels of an NDF according to this transformation.
          No NDF is accessed.
       }
@@ -40352,9 +40445,457 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications:
+      Related Applications
    }{
-      KAPPA: REGRID, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+      CCDPACK: WCSEDIT.
+   }
+}
+\sstroutine{
+   WCSADD
+}{
+   Creates a Mapping and optionally adds a new co-ordinate Frame into the
+   WCS component of an NDF
+}{
+   \sstdescription{
+      This application can be used to create a new AST Mapping and
+      optionally use the Mapping to add a new co-ordinate Frame into
+      the WCS component of an NDF (see parameter NDF). An output text file
+      may also be created holding a textual representation of the
+      Mapping for future use by other applications such as RESAMPLE (see
+      parameter MAPOUT). A number of different types of Mapping can be
+      used (see parameter MAPTYPE).
+
+      When adding a new Frame to a WCS component, the Mapping is used to
+      connect the new Frame to an existing one (called the {\tt "}basis{\tt "} Frame
+      \sstitemlist{
+
+         \sstitem
+         see parameter FRAME). The specific type of Frame to add is specified
+         using parameter FRMTYPE (the default is to simply copy the basis Frame).
+         Attributes which have been assigned an explicit value in the basis Frame
+         are transfered to the new Frame (but only if they are relevant to the
+         type of the new Frame). The value of the Domain attribute for the new
+         Frame can be specified using parameter DOMAIN. Other attribute values
+         for the new Frame may be specified using parameters ATTRS. The new
+         Frame becomes the current co-ordinate Frame in the NDF.
+
+      }
+      WCSADD will only generate Mappings with the same number of
+      input and output axes; this number is determined by the number
+      of axes in the basis Frame if an NDF is supplied, or by the
+      NAXES parameter otherwise.
+   }
+   \sstusage{
+      wcsadd ndf frame domain maptype
+   }
+   \sstparameters{
+      \sstsubsection{
+         ATTRS = GROUP (Read)
+      }{
+         A group of attribute settings to be applied to the new Frame
+         before adding it into the NDF.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of an attribute appropriate to the type
+         of Frame specified by parameter FRMTYPE (see SUN/210 for a complete
+         description of all attributes), and $<$value$>$ is the value to assign
+         to the attribute. Default values will be used for any unspecified
+         attributes - these defaults are inherited from the basis Frame.
+         Any unrecognised attributes are ignored (no error is reported).
+      }
+      \sstsubsection{
+         CENTRE( 2 ) = \_DOUBLE (Read)
+      }{
+         The co-ordinates of the centre of a pincushion distortion.
+         Only used when MAPTYPE=PINCUSHION. See also DISCO.
+         {\tt [0,0]}
+      }
+      \sstsubsection{
+         DIAG( ) = \_DOUBLE (Read)
+      }{
+         The elements along the diagonal of the linear transformation
+         matrix. There will be as many of these as there are axes in the
+         basis Frame. Each effectively gives the factor by which
+         co-ordinates on the corresponding axis should be multiplied.
+         This parameter is only used when MAPTYPE=DIAG.
+      }
+      \sstsubsection{
+         DISCO = \_DOUBLE (Read)
+      }{
+         The distortion coefficient of a pincushion distortion. Used
+         in conjunction with the CENTRE parameter, this defines the
+         forward transformation to be used as follows:
+
+                 XX = X $+$ D $*$ (X - C1) $*$ ( (X - C1)$*$$*$2 $+$ (Y - C2)$*$$*$2 )
+
+                 YY = Y $+$ D $*$ (Y - C2) $*$ ( (X - C1)$*$$*$2 $+$ (Y - C2)$*$$*$2 )
+
+         where (X,Y) are the input co-ordinates, (XX,YY) the output
+         co-ordinates, D is DISCO, and C1 and C2 are the two elements of
+         CENTRE. Only used when MAPTYPE=PINCUSHION.
+      }
+      \sstsubsection{
+         DOMAIN = LITERAL (Read)
+      }{
+         The value for the Domain attribute for the new Frame. Care should be
+         taken to ensure that domain names are used consistently. This
+         will usually mean avoiding any domain names which are already in
+         use within the WCS component, particularly the standard domain names
+         such as GRID, PIXEL, AXIS and GRAPHICS. The supplied value is
+         stripped of spaces, and converted to upper case before being used.
+      }
+      \sstsubsection{
+         EPOCH = \_DOUBLE (Read)
+      }{
+         If the basis Frame is specified using a {\tt "}Sky Co-ordinate System{\tt "}
+         specification for a celestial co-ordinate system (see parameter
+         FRAME), then an epoch value is needed to qualify it. This is the
+         epoch at which the supplied sky positions were determined. It should
+         be given as a decimal years value, with or without decimal places
+         ({\tt "}1996.8{\tt "} for example). Such values are interpreted as a Besselian
+         epoch if less than 1984.0 and as a Julian epoch otherwise. The
+         suggested default is the value stored in the basis Frame.
+      }
+      \sstsubsection{
+         FOREXP = LITERAL (Read)
+      }{
+         A group of expressions to be used for the forward co-ordinate
+         transformations in a MathMap. There must be at least as many
+         expressions as the number of axes of the Mapping, but there
+         may be more if intermediate expressions are to be used. The
+         expressions may be given directly in response to the prompt, or
+         read from a text file, in which case the name of the file should
+         be given, preceeded by a {\tt "}$\wedge${\tt "} character. Individual expression
+         should be separated by commas or, if they are supplied in a file,
+         new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
+         which is within the section {\tt "}Parameters{\tt "}). The suntax for each
+         expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
+         the Appendix entitled {\tt "}Using MathMaps{\tt "} in SUN/95 for details. Only
+         used when MAPTYPE=MATH.
+      }
+      \sstsubsection{
+         FRAME = LITERAL (Read)
+      }{
+         A string specifying the basis Frame. If a null value is supplied
+         the current co-ordinate Frame in the NDF is used. The string can
+         be one of the following:
+
+         \sstitemlist{
+
+            \sstitem
+            A domain name such as SKY, AXIS, PIXEL, \emph{etc}. The two
+            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
+            translated into PIXEL and AXIS respectively, so long as the WCS
+            component of the NDF does not contain Frames with these domains.
+
+            \sstitem
+            An integer value giving the index of the required Frame within
+            the WCS component.
+
+            \sstitem
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000)
+            (see section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+         }
+      }
+      \sstsubsection{
+         FRMTYPE = LITERAL (Read)
+      }{
+         The type of Frame to add to the NDF. If a null (!) value is
+         supplied, a copy of the basis Frame is used (as modified by
+         parameters ATTRS and DOMAIN). The allows values are:
+
+         \sstitemlist{
+
+            \sstitem
+            FRAME      -- A simple Cartesian Frame (the number of axes is
+                            equal to the number of outputs from the Mapping)
+
+            \sstitem
+            SKYFRAME   -- A 2-dimensional Frame representing positions on
+                            the celestial sphere.
+
+            \sstitem
+            SPECFRAME  -- A 1-dimensional Frame representing positions
+                            within an electromagnetic spectrum
+
+         }
+         {\tt [!]}
+      }
+      \sstsubsection{
+         INVEXP = LITERAL (Read)
+      }{
+         The expressions to be used for the inverse co-ordinate
+         transformations in a MathMap. See FOREXP. Only used when
+         MAPTYPE=MATH.
+      }
+      \sstsubsection{
+         MAPIN = FILENAME (Read)
+      }{
+         The  name of a file containing an AST Mapping with which to
+         connect the basis Frame to the new one. The file may be a text
+         file which contains the textual representation of an AST Mapping,
+         or a FITS file which contains the Mapping as an AST object
+         encoded in its headers, or an NDF. If it is an NDF, the
+         Mapping from its base (GRID-domain) to current Frame will be
+         used. Only used when MAPTYPE=FILE.
+      }
+      \sstsubsection{
+         MAPOUT = FILENAME (Write)
+      }{
+         The name of a text file in which to store a textual representation
+         of the Mapping. This can be used, for instance, by the RESAMPLE
+         application. If a null (!) value is supplied, no file is
+         created. {\tt [!]}
+      }
+      \sstsubsection{
+         MAPTYPE = LITERAL (Read)
+      }{
+         The type of Mapping to be used to connect the new Frame to the
+         basis Frame. It must be one of the following strings, each
+         of which require some additional parameters as indicated:
+
+         \sstitemlist{
+
+            \sstitem
+            DIAGONAL   -- A linear mapping with no translation
+                            of off-diagonal coefficients (see parameter DIAG)
+
+            \sstitem
+            FILE       -- A mapping defined by an AST Mapping supplied
+                            in a separate file (see parameter MAPIN)
+
+            \sstitem
+            LINEAR     -- A general linear mapping (see parameter TR)
+
+            \sstitem
+            MATH       -- A general algebraically defined mapping
+                            (see parameters FOREXP, INVEXP, SIMPFI, SIMPIF)
+
+            \sstitem
+            PINCUSHION -- A pincushion/barrel distortion (see parameters DISCO,
+                            CENTRE)
+
+            \sstitem
+            SHIFT      -- A translation (see parameter SHIFT)
+
+            \sstitem
+            UNIT       -- A unit mapping
+
+            \sstitem
+            ZOOM       -- A uniform expansion/contraction (see parameter ZOOM)
+
+         }
+         {\tt ["LINEAR"]}
+      }
+      \sstsubsection{
+         NAXES = \_INTEGER (Read)
+      }{
+         The number of input and output axes which the Mapping will have.
+         Only used if a null value is supplied for parameter NDF.
+      }
+      \sstsubsection{
+         NDF = NDF (Read and Write)
+      }{
+         The NDF in which to store a new co-ordinate Frame. Supply a null (!)
+         value if you do not wish to add a Frame to an NDF (you can still
+         use the MAPOUT parameter to write the Mapping to a text file).
+      }
+      \sstsubsection{
+         SHIFT( ) = \_DOUBLE (Read)
+      }{
+         A vector giving the displacement represented by the translation.
+         There must be one element for each axis. Only used when
+         MAPTYPE=SHIFT.
+      }
+      \sstsubsection{
+         SIMPFI = \_LOGICAL (Read)
+      }{
+         The value of the Mapping{\tt '}s SimpFI attribute (whether it is
+         legitimate to simplify the forward followed by the inverse
+         transformation to a unit transformation). Only used when
+         MAPTYPE=MATH.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         SIMPIF = \_LOGICAL (Read)
+      }{
+         The value of the Mapping{\tt '}s SimpIF attribute (whether it is
+         legitimate to simplify the inverse followed by the forward
+         transformation to a unit transformation). Only used when
+         MAPTYPE=MATH.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         TR( ) = \_DOUBLE (Read)
+      }{
+         The values of this parameter are the coefficients of a linear
+         transformation from the basis Frame specified by parameter FRAME
+         to the new Frame. This parameter is only used when MAPTYPE=LINEAR.
+         For instance, if a feature has co-ordinates (X,Y,Z,...) in
+         the basis Frame, and co-ordinates (U,V,W,...) in the new Frame,
+         then the following transformations would be used, depending on
+         how many axes the two Frames have:
+
+         \sstitemlist{
+
+            \sstitem
+            1-dimensional:
+
+         }
+               U = TR(1) $+$ TR(2)$*$X
+
+         \sstitemlist{
+
+            \sstitem
+            2-dimensional:
+
+         }
+               U = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y
+
+               V = TR(4) $+$ TR(5)$*$X $+$ TR(6)$*$Y
+
+         \sstitemlist{
+
+            \sstitem
+            3-dimensional:
+
+         }
+               U = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y $+$ TR(4)$*$Z
+
+               V = TR(5) $+$ TR(6)$*$X $+$ TR(7)$*$Y $+$ TR(8)$*$Z
+
+               W = TR(9) $+$ TR(10)$*$X $+$ TR(11)$*$Y $+$ TR(12)$*$Z
+
+         The correct number of values must be supplied (that is, N$*$(N$+$1)
+         where N is the number of axes in the new and old Frames). If a
+         null value (!) is given it is assumed that the new Frame and the
+         basis Frame are connected using a unit mapping (\emph{i.e.} corresponding
+         axis values are identical in the two Frames). Only used when
+         MAPTYPE=LINEAR. {\tt [!]}
+      }
+      \sstsubsection{
+         ZOOM = \_DOUBLE (Read)
+      }{
+         The scaling factor for a ZoomMap; every coordinate will be
+         multiplied by this factor in the forward transformation.
+         Only used when MAPTYPE=ZOOM.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsadd speca axis frmtype=specframe maptype=unit $\backslash$
+      }{
+             attrs={\tt "}{\tt '}system=wave,unit=Angstrom{\tt '}{\tt "}
+         This example assumes the NDF {\tt "}speca{\tt "} has an Axis structure
+         describing wavelength in Angstroms. It adds a corresponding
+         SpecFrame into the WCS component of the NDF. The SpecFrame
+         is connected to the Frame describing the NDF Axis structure
+         using a unit Mapping. Subsequently, WCSATTRIB  can be used to
+         modify the SpecFrame so that it describes the spectral axis
+         value in some other system (frequency, velocities of various
+         forms, energy, wave number, \emph{etc}).
+      }
+      \sstexamplesubsection{
+         wcsadd ngc5128 pixel old\_pixel unit
+      }{
+         This adds a new co-ordinate Frame into the WCS component of the
+         NDF called ngc5128. The new Frame is given the domain OLD\_PIXEL
+         and is a copy of the existing PIXEL Frame. This OLD\_PIXEL Frame
+         will be retained through further processing and can be used as a
+         record of the original pixel co-ordinate Frame.
+      }
+      \sstexamplesubsection{
+         wcsadd my\_data dist-lum dist(au)-lum linear tr=[0,2.0628E5,0,0,0,1]
+      }{
+         This adds a new co-ordinate Frame into the WCS component of the
+         NDF called my\_data. The new Frame is given the domain DIST(AU)-LUM
+         and is a copy of an existing Frame with domain DIST-LUM. The first
+         axis in the new Frame is derived from the first axis in the basis
+         Frame but is in different units (AU instead of parsecs). This
+         change of units is achieved by multiplying the old Frame axis 1
+         values by 2.0628E5. The values on the second axis are copied
+         without change. You could then use application WCSATTRIB to set
+         the {\tt "}Unit{\tt "} attribute for axis 1 of the new Frame to {\tt "}AU{\tt "}.
+      }
+      \sstexamplesubsection{
+         wcsadd my\_data dist-lum dist(au)-lum diag diag=[2.0628E5,1]
+      }{
+         This does exactly the same as the previous example.
+      }
+      \sstexamplesubsection{
+         wcsadd ax322 ! shrunk zoom zoom=0.25 mapout=zoom.ast
+      }{
+         This adds a new Frame to the WCS component of ax322 which is a
+         one-quarter-scale copy of its current co-ordinate Frame. The
+         Mapping is also stored in the text file {\tt "}zoom.ast{\tt "}.
+      }
+      \sstexamplesubsection{
+         wcsadd cube grid slid shift shift=[0,0,1024]
+      }{
+         This adds a new Frame to the WCS component of the NDF cube
+         which matches the GRID-domain co-ordinates in the first two
+         axes, but is translated by 1024 pixels on the third axis.
+      }
+      \sstexamplesubsection{
+         wcsadd plane pixel polar math simpif simpfi
+      }{
+            forexp={\tt "}{\tt '}r=sqrt(x$*$x$+$y$*$y),theta=atan2(y,x){\tt '}{\tt "}
+            invexp={\tt "}{\tt '}x=r$*$cos(theta),y=r$*$sin(theta){\tt '}{\tt "}
+         A new Frame is added which gives pixel positions in polar
+         co-ordinates. Fortran-like expressions are supplied which define
+         both the forward and inverse transformations of the Mapping. The
+         symbols {\tt "}x{\tt "} and {\tt "}y{\tt "} are used to represent the two input Cartesian
+         pixel co-ordinate axes, and the symbols {\tt "}r{\tt "} and {\tt "}theta{\tt "} are used to
+         represent the output polar co-ordinates. Note, the single quotes
+         are needed when running from the Unix shell in order to prevent
+         the shell interpreting the parentheses and commas within the
+         expressions.
+      }
+      \sstexamplesubsection{
+         wcsadd plane pixel polar math simpif simpfi forexp=$\wedge$ft invexp=$\wedge$it
+      }{
+         As above, but the expressions defining the transformations are
+         supplied in two text files called {\tt "}ft{\tt "} and {\tt "}it{\tt "}, instead of being
+         supplied directly. Each file could contain the two expression on
+         two separate lines.
+      }
+      \sstexamplesubsection{
+         wcsadd ndf=$\backslash$! naxes=2 mapout=pcd.ast maptype=pincushion
+      }{
+            disco=5.3e-10
+         This constructs a pincushion-type distortion Mapping centred
+         on the origin with a distortion coefficient of 5.3e-10,
+         and writes out the Mapping as a text file called pcd.ast.
+         This file could then be used by RESAMPLE to resample
+         the pixels of an NDF according to this transformation.
+         No NDF is accessed.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The new Frame has the same number of axes as the basis Frame.
+
+         \sstitem
+         An error is reported if the transformation supplied using parameter
+         TR is singular.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
       CCDPACK: WCSEDIT.
    }
 }
@@ -40673,12 +41214,12 @@ plot (7k).
    \sstdescription{
       This application can be used to manage the values of attributes
       associated with the current co-ordinate Frame of an NDF (title, axis
-      labels, axis units, {\it etc}).
+      labels, axis units, \emph{etc}).
 
       Each attribute has a name, a value, and a state. This application
       accesses all attribute values as character strings, converting to
       and from other data types as necessary. The attribute state is a
-      Boolean flag ({\it{i.e.}}\ {\tt TRUE} or {\tt FALSE}) indicating whether or not a value
+      Boolean flag (\emph{i.e.} TRUE or FALSE) indicating whether or not a value
       has been assigned to the attribute. If no value has been assigned to
       an attribute, then it adopts a default value until an explicit value
       is assigned to it. An attribute value can be cleared, causing the
@@ -40690,28 +41231,27 @@ plot (7k).
       \sstitemlist{
 
          \sstitem
-         display the value of an attribute,
+         display the value of an attribute.
 
          \sstitem
-         set a new value for an attribute,
+         set a new value for an attribute.
 
          \sstitem
-         clear an attribute value,
+         clear an attribute value.
 
          \sstitem
          test the state of an attribute.
-      }
 
+      }
       Note, the attributes of the PIXEL, GRID and AXIS Frames are managed
       internally by the NDF library. They may be examined using this
-      application, but an error is reported if any attempt is made to 
+      application, but an error is reported if any attempt is made to
       change them. The exception to this is that the DOMAIN attribute may
-      be changed, resulting in a copy of the Frame being added to the WCS 
-      compnent of the NDF with the new Domain name. The AXIS Frame is 
-      derived from the AXIS structures within the NDF, so the AXLABEL 
-      and AXUNITS commands may be used to change the axis label or units 
+      be changed, resulting in a copy of the Frame being added to the WCS
+      compnent of the NDF with the new Domain name. The AXIS Frame is
+      derived from the AXIS structures within the NDF, so the AXLABEL
+      and AXUNITS commands may be used to change the axis label or units
       string for the AXIS Frame.
-
    }
    \sstusage{
       wcsattrib ndf mode name newval
@@ -40762,7 +41302,23 @@ plot (7k).
          The new value to assign to the attribute.
       }
       \sstsubsection{
-         STATE = LOGICAL (Write)
+         REMAP = \_LOGICAL (Read)
+      }{
+         Only accessed if MODE is {\tt "}Set{\tt "}. If REMAP is TRUE, then the
+         Mappings which connect the current Frame to the other Frames
+         within the WCS FrameSet will be modified (if necessary) to
+         maintain the FrameSet integrity. For instance, if the current
+         Frame of the NDF represents FK5 RA and DEC, and you change
+         System from {\tt "}FK5{\tt "} to {\tt "}Galactic{\tt "}, then the Mappings which connect
+         the SKY Frame to the other Frames (\emph{e.g.} PIXEL, AXIS, \emph{etc}) will
+         be modified so that each pixel corresponds to the correct
+         Galactic co-ordinates. If REMAP is FALSE, then the Mappings will
+         not be changed. This can be useful if the FrameSet has incorrect
+         attribute values for some reason, which need to be corrected
+         without altering the Mappings to take account of the change. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         STATE = \_LOGICAL (Write)
       }{
          On exit, this holds the state of the attribute on entry to this
          application.
@@ -40775,6 +41331,15 @@ plot (7k).
       }
    }
    \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_spec set System freq
+      }{
+         This sets the System attribute of the current co-ordinate Frame in
+         the NDF called my\_Spec so that the Frame represents frequency
+         (this assumes the current Frame is a SpecFrame). The Mappings
+         between the current Frame and the other Frames are modified to take
+         account of the change of system.
+      }
       \sstexamplesubsection{
          wcsattrib ngc5128 set title {\tt "}Polarization map of Centaurus-A{\tt "}
       }{
@@ -40826,6 +41391,21 @@ plot (7k).
          co-ordinate Frame in the NDF called my\_data. It reverts to its
          default value.
       }
+      \sstexamplesubsection{
+         wcsattrib my\_data set equinox J2000 remap=no
+      }{
+         This assumes that the Equinox attribute for the current
+         co-ordinate Frame within NDF {\tt "}my\_data{\tt "} has been set to some
+         incorrect value, which needs to be corrected to {\tt "}J2000{\tt "}. The
+         REMAP parameter is set false, which prevents the inter-Frame
+         Mappings from being altered to take account of the new Equinox
+         value. This means that each pixel in the NDF will retain its
+         original RA and DEC values (but they will now be interpreted as
+         J2000). If REMAP had been left at its default value of TRUE,
+         then the RA and DEC associated with each pixel would have been
+         modified in order to precess them from the original (incorrect)
+         equinox to J2000.
+      }
    }
    \sstnotes{
       \sstitemlist{
@@ -40836,15 +41416,14 @@ plot (7k).
 
          \sstitem
          The Domain names GRID, AXIS and PIXEL are reserved for use by
-	 the NDF library and an error will be reported if an attempt is
-	 made to assign one of these Domain values to any Frame.
-
+         the NDF library and an error will be reported if an attempt is made
+         to assign one of these values to any Frame.
       }
    }
    \sstdiytopic{
-      Related Applications:
+      Related Applications
    }{
-      KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXUNITS, AXLABEL.
+      KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, AXUNITS
    }
 }
 \sstroutine{
@@ -41025,6 +41604,11 @@ plot (7k).
       current co-ordinate Frame determines the co-ordinate system in
       which positions within the NDF will be expressed when communicating
       with the user.
+
+      Having selected a new current co-ordinate Frame, its attributes
+      (such the specific system it uses to represents points within its
+      Domain, its units, \emph{etc}.) can be changed using KAPPA command
+      WCSATTRIB.
    }
    \sstusage{
       wcsframe ndf frame epoch
@@ -41052,7 +41636,7 @@ plot (7k).
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, {\it etc.}\ The two
+            A domain name such as SKY, SPECTRAL, AXIS, PIXEL, \emph{etc}. The two
             {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -41062,8 +41646,12 @@ plot (7k).
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000)
-            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). Using an SCS value
+            is equivalent to specifying {\tt "}SKY{\tt "} for this parameter and then setting
+            the System attribute (to {\tt "}FK5{\tt "}, {\tt "}Galactic{\tt "}, \emph{etc}.) using KAPPA command
+            WCSATTRIB. The specific system used to describe positions in other
+            Domains (SPECTRAL, for instance) must be set using WCSATTRIB.
          }
       }
       \sstsubsection{
@@ -41084,8 +41672,20 @@ plot (7k).
          wcsframe m51 sky
       }{
          This chooses celestial co-ordinates for the current co-ordinate
-         Frame in the NDF m51. The specific celestial co-ordinate system
-         will depend on the contents of the WCS component of the NDF.
+         Frame in the NDF m51 (if available). The specific celestial
+         co-ordinate system (FK5, Galactic, \emph{etc}.) will depend on the contents
+         of the WCS component of the NDF, but may be changed by setting a
+         new value for the System attribute using the WCSATTRIB command.
+      }
+      \sstexamplesubsection{
+         wcsframe m51 spectral
+      }{
+         This chooses spectral co-ordinates for the current co-ordinate
+         Frame in the NDF m51 (if available). The specific spectral
+         co-ordinate system (wavelength, frequency, \emph{etc}) will depend on the
+         contents of the WCS component of the NDF, but may be changed by
+         setting a new value for the System attribute using the WCSATTRIB
+         command.
       }
       \sstexamplesubsection{
          wcsframe m51 equ(J2000) epoch=1998.2
@@ -41133,9 +41733,9 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications:
+      Related Applications
    }{
-      KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB.
+      KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
    }
 }
 \sstroutine{
@@ -46087,6 +46687,21 @@ The following applications have been modified:
                old DATAPLOT pictures is now used (previously a unit
                mapping was always used). The changed behaviour is described 
                in the documentation for LINPLOT.
+      \end{itemize}
+
+   \item [\htmlref{WCSADD}{WCSADD}] \mbox{}
+      \begin{itemize}
+         \item New parameters FRMTYPE and ATTRS allows the class and
+               attributes to be specified fro the new Frame which is to
+               be added to the NDF.
+      \end{itemize}
+
+   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] \mbox{}
+      \begin{itemize}
+         \item New parameter REMAP provides an option to prevent any
+               modifications being made to the mappings between co-ordinate 
+               Frames as a consequence of assigning new values to the
+               attributes of the current frame.
       \end{itemize}
 
    \item [\htmlref{WCSFRAME}{WCSFRAME}] \mbox{}

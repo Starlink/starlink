@@ -1,92 +1,11 @@
-1 KAPPA_Version_1.0
+1 KAPPA_Version_1.1
 
-   A new release of KAPPA has been made. This is the long awaited
-   "Version 1.0" which marks the completion of several on-going 
-   conversions within KAPPA. The main changes include:
+   A new release of KAPPA (v1.1) has been made. The main changes are:
 
-      - The few remaining applications which previously created output 
-      files in the old IMAGE format have been re-written to use the 
-      standard Starlink NDF format.
+   - Initial support for spectral world coordinate systems (see WCSADD,
+   LINPLOT, etc). This includes flexible conversion between different
+   units, spectral systems and reference frames.
 
-      - All applications are now ``WCS-aware'' (except those for which
-      WCS is not relevant).
-
-      - All graphics are now produced using native PGPLOT.
-   
-      - Graphics applications are no longer restricted to 8-bit displays.
-
-      - Use of the NDF Quality component has been simplified by the 
-      addition of four new applications.
-
-   Further information on these and other changes is given below. For 
-   complete details of all changes, see the "Release Notes" appendix in 
+   For complete details of all changes, see the "Release Notes" appendix in 
    SUN/95. 
-
-
-   General Changes:
-   ---------------
-
-   - >>> IMPORTANT <<< Graphics applications are now linked with native
-   PGPLOT, instead of the Starlink GKS-based version of PGPLOT. One
-   consequence of this is that postscript output is now written to a file
-   called "pgplot.ps" by default, and each graphics command will
-   over-write any existing file with this name. Therefore, if you want to
-   keep your postscript output you should either rename this file after
-   running the graphics command, or specify an alternative output file
-   name as part of the device name (e.g. device="epsfcol_l;fred.ps" or
-   device="fred.ps/CPS").
-
-   - The appearance of textual labels, numerical labels, tick marks, and
-   axes can now be specified independently for the two axes of a plot.
-
-   - Applications which read positions lists from catalogue files can now
-   read lists from catalogues which do not contain a WCS FrameSet, so
-   long as they contain a pair of columns called "RA" and "DEC, or a pair
-   of columns called "X" and "Y".
-
-   - Applications which create catalogues holding positions lists now
-   allow the user to specify the co-ordinate Frame in which positions
-   should be stored within the catalogue columns.
-
-
-   New Commands: 
-   -------------
-
-   - DRAWNORTH: Draws a pair of arrows on top of a previously displayed 
-   picture indicating the directions of the labelled axes in the
-   picture (e.g. north and east).
-
-   - LUTCOLD: Loads a colour table which goes from black to white,
-   passing through cold shades of pale blue and grey.
-
-   - LUTEDIT: A GUI which allows graphics device colour tables to be
-   created or edited in many ways.
-
-   - REGRID Applies an arbitrary geometrical transformation to an NDF.
-   This is a WCS-aware replacement for the old TRANSFORMER command.
-
-   - SETQUAL, SHOWQUAL, REMQUAL and QUALTOBAD: Four new commands which
-   allow flexible usage of the NDF Quality component. They allow qualities
-   to be referred to by used-defined names instead of by bit number.
-
-
-   Removed Commands:
-   ----------------
-   The following obsolete commands have been moved from KAPPA into the
-   KAPRH package (see SUN/239): CRELUT IDCLEAR IDINVISIBLE IDPAZO IDSET
-   IDSTATE LUTFLIP LUTHILITE LUTROT LUTTWEAK OVCLEAR OVSET TRANINVERT
-   TRANJOIN TRANMAKE TRANSFORMER TRANTRACE
-
-
-   Modified Commands:
-   -----------------
-   The following commands have had major changes to functionality which
-   may break any existing scripts, etc, which use them: APERADD, LAPLACE,
-   LUTABLE, LUTSAVE, MANIC, MSTATS, OUTSET, POW, SQORST, SLIDE, TRIG
-
-   The following commands have extra functionality: ARDMASK, COLLAPSE,
-   GDSET, GDSTATE, ROTATE, SETSKY, WCSADD, WCSALIGN.
-
-   The following commands have had minor changes to functionality: NOMAGIC
-
 
