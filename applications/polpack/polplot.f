@@ -523,16 +523,16 @@
       CALL CTG_ASSO1( 'CAT', VERB, 'READ', CI, FIELDS, STATUS )
 
 *  Set up dynamic defaults for the column names.
-      CALL POL1_COLNM( 'P', COLNM, STATUS )
+      CALL POL1_COLNM( 'P', .FALSE., COLNM, STATUS )
       IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLMAG', COLNM, STATUS )
 
-      CALL POL1_COLNM( 'ANG', COLNM, STATUS )
+      CALL POL1_COLNM( 'ANG', .FALSE., COLNM, STATUS )
       IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLANG', COLNM, STATUS )
 
-      CALL POL1_COLNM( 'X', COLNM, STATUS )
+      CALL POL1_COLNM( 'X', .FALSE., COLNM, STATUS )
       IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLX', COLNM, STATUS )
 
-      CALL POL1_COLNM( 'Y', COLNM, STATUS )
+      CALL POL1_COLNM( 'Y', .FALSE., COLNM, STATUS )
       IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLY', COLNM, STATUS )
 
 *  Get CAT identifiers for the columns which are to be used to define the 

@@ -93,7 +93,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the extenal name to use for the column.
-      CALL POL1_COLNM( FNAME, ENAME, STATUS )
+      CALL POL1_COLNM( FNAME, .FALSE., ENAME, STATUS )
 
 *  If the user has not supplied a name for this column, report an error
 *  if required.

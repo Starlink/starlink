@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_COLNM( INAME, ENAME, STATUS )
+      SUBROUTINE POL1_COLNM( INAME, INVERT, ENAME, STATUS )
 *+ 
 *  Name: 
 *     POL1_COLNM
@@ -10,11 +10,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_COLNM( INAME, ENAME, STATUS )
+*     CALL POL1_COLNM( INAME, INVERT, ENAME, STATUS )
 
 *  Description:
 *     This routine returns the name to use for catalogue columns holding
-*     the quantity specified by INAME.
+*     the quantity specified by INAME (or the opposite if INVERT is TRUE).
 *
 *     The returned external column name is read from the POLPACK
 *     configuration file $HOME/.polpackrc. Any lines in this file which
@@ -56,6 +56,11 @@
 *        The name of the quantity (e.g. X, Y, RA, DEC, I, Q, U, V, DI, DQ, 
 *        DU, DV, P, DP, ANG, DANG, PI, DPI, ID, etc). If INAME is blank,
 *        the config file is re-read, but no ENAME value is returned.
+*     INVERT = LOGICAL (Given)
+*        If .TRUE., then the role of INAME and ENAME are swapped (i.e. INAME 
+*        is assumed to be the external column name, and ENAME is returned 
+*        holding the corresponding internal quantity name, or blank if the
+*        column does not store any of the known quantities).
 *     ENAME = CHARACTER * ( * ) (Returned)
 *        The catalogue column name to use for the given quantity. Not
 *        accessed if INAME is blank.
@@ -88,6 +93,7 @@
 
 *  Arguments Given:
       CHARACTER INAME*(*)
+      LOGICAL INVERT
 
 *  Arguments Returned:
       CHARACTER ENAME*(*)
@@ -250,35 +256,67 @@
       IF( INIT .AND. INAME .NE. ' ' ) THEN 
          ENAME = ' '
 
+*  First handle the normal case...
+         IF( .NOT. INVERT ) THEN 
+
 *  Check the supplied internal name is known.
-         DO I = 1, MXCOL         
-            IF( INAME .EQ. NAMES( I ) ) THEN 
-               GO TO 20
-            END IF
-         END DO
+            DO I = 1, MXCOL         
+               IF( INAME .EQ. NAMES( I ) ) THEN 
+                  GO TO 20
+               END IF
+            END DO
 
 *  Arrive here if the internal name is not known.
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'Q', INAME )
-         CALL ERR_REP( 'POL1_COLNM_ERR1', 'POL1_COLNM: Unknown '//
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'Q', INAME )
+            CALL ERR_REP( 'POL1_COLNM_ERR1', 'POL1_COLNM: Unknown '//
      :                 'quantity ''^Q'' supplied (programming error).', 
      :                 STATUS )
 
- 20      CONTINUE
-         IF( STATUS .EQ. SAI__OK ) THEN      
+ 20         CONTINUE
+            IF( STATUS .EQ. SAI__OK ) THEN      
 
 *  Find and return the external column name for the given internal column 
 *  name. If no matching internal column name was included in the config
 *  file, use the internal name.
-            ENAME = INAME 
-            DO I = 1, NCOL
-               IF( NAME( I ) .EQ. INAME ) THEN
-                  ENAME = COL( I )
-                  GO TO 30
+               ENAME = INAME 
+               DO I = 1, NCOL
+                  IF( NAME( I ) .EQ. INAME ) THEN
+                     ENAME = COL( I )
+                     GO TO 30
+                  END IF
+               END DO
+
+ 30            CONTINUE
+
+            END IF
+
+*  Now handle the inverted case.
+         ELSE
+
+*  If the external column name is the same as one of the internal
+*  quantity names, use the internal quanity name as the default value.
+*  If the external column name is unknown, use a blank default.
+            ENAME = ' '
+            DO I = 1, MXCOL         
+               IF( INAME .EQ. NAMES( I ) ) THEN 
+                  ENAME = INAME
+                  GO TO 40
                END IF
             END DO
 
- 30         CONTINUE
+ 40         CONTINUE
+
+*  Find and return the internal quantity name for the given external column 
+*  name. 
+            DO I = 1, NCOL
+               IF( COL( I ) .EQ. INAME ) THEN
+                  ENAME = NAME( I )
+                  GO TO 50
+               END IF
+            END DO
+
+ 50         CONTINUE
 
          END IF
 
