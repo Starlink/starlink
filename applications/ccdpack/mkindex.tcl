@@ -72,7 +72,9 @@
 #  Work out a list of files to read when constructing the index.
       set files [glob {[a-z]*.tcl} {[a-z]*.tk}]
       if { $hasItcl && $hasItk } {
-         lappend files [glob {[A-Z]*.tcl} {[A-Z]*.tk} *.itcl *.itk]
+         foreach f [glob {[A-Z]*.tcl} {[A-Z]*.tk} *.itcl *.itk] {
+            lappend files $f
+         }
       } {
          lappend exclude_files itcl.tcl itk.tcl
       }
