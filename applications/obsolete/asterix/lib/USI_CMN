@@ -43,6 +43,8 @@
         INTEGER			F_PAR			! First parameter name
         CHARACTER*20		NAME			! Task name
         INTEGER			NPAR			! Number of parameters
+        INTEGER                 PARDAT			! Parameter data
+        INTEGER                 SPARE(3)
       END STRUCTURE
 
 *    Parameter system
@@ -68,7 +70,6 @@
         INTEGER                 PARTYPE(USI__MXACTPAR)	! Par types
         INTEGER                 PARVAL(USI__MXACTPAR)	! Par values
         INTEGER			PARDYN(USI__MXACTPAR)	! Par dynamic defaults
-        CHARACTER*(DAT__SZLOC)  PSTORE			! Parameter values
       END STRUCTURE
 
 *    Master USI initialised switch
