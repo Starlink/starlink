@@ -1,3 +1,8 @@
+1999-04-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Core.pm (adamtask_init): Fix -w with RELAY_NAME
+	(adamtask): Use Proc::Simple rather than SimpleKill
+
 1998-07-04  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Core.pm (adamtask_control): Protect from -w warnings when

@@ -54,7 +54,7 @@ use Starlink::ADAM qw/:adam/;
 use IO::Pipe;
 
 # Use the Proc module to start the monoliths and keep track of process IDs
-use Proc::SimpleKill;
+use Proc::Simple 1.13;
 
 
 
@@ -140,7 +140,7 @@ sub adamtask_init {
   my ($taskname);
 
   # See if we have a RELAY running already
-  if ($RELAY_NAME =~ /./) { 
+  if (defined $RELAY_NAME && $RELAY_NAME =~ /./) { 
     if (adam_path($RELAY_NAME) == 1) {
       print $MSGHAND "Relay task is already running\n" unless $msg_hide;
       return &Starlink::ADAM::SAI__OK;
@@ -300,9 +300,9 @@ Default is 'A'.
 
 Example:
 
-  $obj = new Starlink::AMS::Task("kappa_mon",
-                                 "$ENV{KAPPA_DIR}/kappa_mon",
-                                 { TASKTYPE => 'A' });
+  ($obj,$status) = adamtask("kappa_mon",
+                            "$ENV{KAPPA_DIR}/kappa_mon",
+                            { TASKTYPE => 'A' });
 
 =cut
 
@@ -377,7 +377,8 @@ sub adamtask {
      # If I use this method for starting the tasks they 
      # kill themselves when I shutdown.
 #    print "Starting $image...";
-    my $pid = Proc::SimpleKill->new();
+    my $pid = new Proc::Simple;
+    $pid->kill_on_destroy(1);
     my $status = $pid->start("$image");
 #    print "with status = $status (1 is good))\n";
 
