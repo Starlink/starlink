@@ -1,5 +1,5 @@
 /*
- * E.S.O. - VLT project 
+ * E.S.O. - VLT project
  * "@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $"
  *
  * RtdImage.C - member routines for class RtdImage,
@@ -18,7 +18,7 @@
  * P.Biereichel    30/06/97  processMotionEvent()'s call to getValues() changed
  *                           Added RtdImage::remoteTclCmd
  *
- * Allan Brighton  10/03/98  Minor changes based on changes made by 
+ * Allan Brighton  10/03/98  Minor changes based on changes made by
  * 			     Peter W. Draper <P.W.Draper@durham.ac.uk>
  *                           for GAIA, which defines a subclass of
  *                           RtdImage, so that we can use some of the
@@ -45,11 +45,15 @@
  * Allan Brighton  13/03/98  Define RTD_OPTIONS as a macro, so that derived
  *                           classes can add new options more easily.
  *
- *                 30/03/98  Fixed the -shm_data and -shm_header options to 
+ *                 30/03/98  Fixed the -shm_data and -shm_header options to
  *                           work again (they were lost in previous changes at
  *                           some point).
  *
  * Peter W. Draper 13/01/99  Changed to use non 8 bit visuals.
+ *                 10/05/00  Always update colormap, some private maps
+ *                           are used when screen visual differs to
+ *                           requested one and would not otherwise be
+ *                           installed. 
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $";
 
@@ -127,17 +131,17 @@ ImageColor* RtdImage::colors_ = (ImageColor*) NULL;
 // (used to update display on real-time image events)
 static RtdImage* motionView_ = NULL;
 
-// Rtd Record 
+// Rtd Record
 extern "C" int RtdrecordInit(Tcl_Interp *);
 
 // this routine is defined in tclutil/tclutil/src/TkCanvasPsImage.C
 // to work around the tk canvas clipping coordinates to short range.
 extern "C" void Tk_CanvasWindowCoordsNoClip(
-    Tk_Canvas canvas, 
+    Tk_Canvas canvas,
     double x, double y,
     int *screenXPtr, int *screenYPtr);
 
-/* 
+/*
  * declare a table of image subcommands and the methods that handle them.
  *
  * NOTE: keep this table sorted, so we can use a binary search on it !
@@ -149,7 +153,7 @@ public:
     int (RtdImage::*fptr)(int argc, char* argv[]); // ptr to method
     int min_args;    // minimum number of args
     int max_args;    // maximum number of args
-} subcmds_[] = { 
+} subcmds_[] = {
     {"alloccolors", &RtdImage::alloccolorsCmd,  0,  1},
     {"autocut",     &RtdImage::autocutCmd,      0,  2},
     {"bitpix",      &RtdImage::bitpixCmd,       0,  0},
@@ -208,7 +212,7 @@ public:
 };
 
 
-/* 
+/*
  * image config options - used to process command line options and for the
  * image "configure" subcommand.
  */
@@ -238,11 +242,11 @@ static Tk_ImageType rtdImageType = {
  * for loading images from shared memory or other outside sources
  */
 class RtdImageCamera : public RtdCamera {
-    RtdImage* rtdimage_;		// keep this ptr for calling display method 
+    RtdImage* rtdimage_;		// keep this ptr for calling display method
 public:
     // constructor
     RtdImageCamera(RtdImage* rtdimage)
-	: RtdCamera(rtdimage->name(), rtdimage->interp(), rtdimage->verbose()), 
+	: RtdCamera(rtdimage->name(), rtdimage->interp(), rtdimage->verbose()),
 	  rtdimage_(rtdimage) {}
 
     // called from the Camera class to display image from shared memory.
@@ -267,7 +271,7 @@ int RtdImageCamera::display(const rtdIMAGE_INFO& info, const Mem& data)
     }
 
     status |= rtdimage_->displayImageEvent(info, data);
-    
+
     if (rtdimage_->cameraPostCmd()) {
         sprintf(buf, "%s %d", rtdimage_->cameraPostCmd(), info.frameId);
         status |= Tcl_Eval(interp_, buf);
@@ -279,17 +283,17 @@ int RtdImageCamera::display(const rtdIMAGE_INFO& info, const Mem& data)
 /*
  * derive a simple RtdRemote subclass that handles the remote access to
  * the widget.
- *  
+ *
  * This class is a bit different than the above RtdImageCamera class. It
  * is designed to be of more general use (not just for real-time updates)
  * and doesn't make use of the rtdServer daemon.
  */
 class RtdImageRemote : public RtdRemote {
-    RtdImage* rtdimage_;		// keep this ptr for calling display method 
+    RtdImage* rtdimage_;		// keep this ptr for calling display method
 public:
     // constructor
     RtdImageRemote(RtdImage* rtdimage, int port)
-	: RtdRemote(rtdimage->interp(), port, rtdimage->verbose()), 
+	: RtdRemote(rtdimage->interp(), port, rtdimage->verbose()),
 	  rtdimage_(rtdimage) {}
     // call an rtdimage command method by name
     int call(const char* name, int len, int argc, char* argv[]) {
@@ -308,7 +312,7 @@ static void clip(double& x, double x0, double x1)
 	    x = x0;
 	else if (x > x1)
 	    x = x1;
-    } 
+    }
     else {
 	if (x > x0)
 	    x = x0;
@@ -328,7 +332,7 @@ static void rtd_new_handler()
 }
 
 
-/* 
+/*
  * Delete event handler - called to clean up shared memory when main window
  * is deleted
  */
@@ -336,7 +340,7 @@ static void destroy_notify(ClientData, XEvent*)
 {
     // XXX this method seems to be called at the wrong times
     // XXX (such as when the mouse enters the window!)
-    // Mem::cleanup();   
+    // Mem::cleanup();
 }
 
 
@@ -346,7 +350,7 @@ static void destroy_notify(ClientData, XEvent*)
  */
 static int rtd_load_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv)
 {
-    if (argc != 2) 
+    if (argc != 2)
 	return error("usage: rtd_load_cmap cmapfile");
     return (ColorMapInfo::get(argv[1]) ? TCL_OK : TCL_ERROR);
 }
@@ -358,7 +362,7 @@ static int rtd_load_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv)
  */
 static int rtd_load_itt(ClientData, Tcl_Interp* interp, int argc, char** argv)
 {
-    if (argc != 2) 
+    if (argc != 2)
 	return error("usage: rtd_load_itt ittfile");
     return (ITTInfo::get(argv[1]) ? TCL_OK : TCL_ERROR);
 }
@@ -370,21 +374,21 @@ static int rtd_load_itt(ClientData, Tcl_Interp* interp, int argc, char** argv)
  * usage: rtd_set_cmap $toplevel
  *
  * This command can be used to make a top level window use the same colormap
- * as the rtd images, so that there is less color flashing in popup windows 
+ * as the rtd images, so that there is less color flashing in popup windows
  * when we are using a private colormap.
  */
 int RtdImage::rtd_set_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv)
 {
-    if (argc != 2) 
+    if (argc != 2)
 	return ::error("usage: rtd_set_cmap $toplevel");
-    
+
     Tk_Window w = Tk_NameToWindow(interp, argv[1], Tk_MainWindow(interp));
-    if (w == NULL) 
+    if (w == NULL)
 	return TCL_ERROR;
 
     if (!colors_)
 	return ::error("rtd_set_cmap: colormap is not initialized yet");
-    
+
     return colors_->setColormap(w); // colors_ is a static member
 }
 
@@ -397,7 +401,7 @@ int RtdImage::rtd_set_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv
  * already loaded in memory)
  */
 extern "C"
-int CmapITT_Init(Tcl_Interp* interp)  
+int CmapITT_Init(Tcl_Interp* interp)
 {
     Tcl_CreateCommand(interp, "rtd_load_cmap", rtd_load_cmap, NULL, NULL);
     Tcl_CreateCommand(interp, "rtd_load_itt", rtd_load_itt, NULL, NULL);
@@ -409,18 +413,18 @@ int CmapITT_Init(Tcl_Interp* interp)
  * to install the RtdImage image type and do global initialization
  */
 extern "C"
-int Rtd_Init(Tcl_Interp* interp)  
+int Rtd_Init(Tcl_Interp* interp)
 {
     // For backward compatibility, initialize 2 local packages that rtd
     // depends on:
 
-    // initialize the tclutil package 
+    // initialize the tclutil package
     if (Tclutil_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
     Tcl_StaticPackage (interp, "Tclutil", Tclutil_Init, (Tcl_PackageInitProc *) NULL);
 
-    // initialize the astrotcl package 
+    // initialize the astrotcl package
     if (Astrotcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
@@ -438,7 +442,7 @@ int Rtd_Init(Tcl_Interp* interp)
     // define bitmaps used by Tcl library
     defineRtdBitmaps(interp);
 
-    // define colormaps used 
+    // define colormaps used
     defineColormaps();
 
     // add the rtdimage image type
@@ -447,7 +451,7 @@ int Rtd_Init(Tcl_Interp* interp)
     // add a tcl command to set the colormap on application windows so that
     // there is no flashing when there is a private colormap
     Tcl_CreateCommand(interp, "rtd_set_cmap", RtdImage::rtd_set_cmap, NULL, NULL);
-    
+
     // clean up shared memory on exit
     signal(SIGINT, RtdImage_cleanup);
     signal(SIGTERM, RtdImage_cleanup);
@@ -469,7 +473,7 @@ int Rtd_Init(Tcl_Interp* interp)
 	libDir = RTD_LIBRARY;
     }
 
-    // Set the global Tcl variables rtd_library and rtd_version 
+    // Set the global Tcl variables rtd_library and rtd_version
     // and add rtd_library to the auto_path.
     Tcl_SetVar(interp, "rtd_library", libDir, TCL_GLOBAL_ONLY);
     Tcl_SetVar(interp, "rtd_version", RTD_VERSION, TCL_GLOBAL_ONLY);
@@ -487,7 +491,7 @@ int Rtd_Init(Tcl_Interp* interp)
 	return TCL_ERROR;
 
     // set up the namespaces used by the itcl/itk classes
-    if (Tcl_Eval(interp, 
+    if (Tcl_Eval(interp,
 #if (TCL_MAJOR_VERSION >= 8)
 		 "namespace eval rtd {namespace export *}; "
 		 "namespace import -force rtd::*; "
@@ -498,7 +502,7 @@ int Rtd_Init(Tcl_Interp* interp)
 	) != TCL_OK)
 	return TCL_ERROR;
 
-    return TCL_OK; 
+    return TCL_OK;
 }
 
 
@@ -511,7 +515,7 @@ int RtdImage::CreateImage(
     char *name,			// Name to use for image.
     int argc,			// Number of arguments.
     char **argv,		// Argument strings for options (not including image name or type)
-    Tk_ImageType *typePtr,	// Pointer to our type record (not used). 
+    Tk_ImageType *typePtr,	// Pointer to our type record (not used).
     Tk_ImageMaster master,	// Token for image, to be used by us in later callbacks.
     ClientData *clientDataPtr)	// Store manager's token (this ptr) for image here
 				// it will be returned in later callbacks.
@@ -526,11 +530,11 @@ int RtdImage::CreateImage(
 }
 
 
-/* 
+/*
  * for backward compat.
  */
 extern "C"
-int RtdImage_Init(Tcl_Interp* interp)  
+int RtdImage_Init(Tcl_Interp* interp)
 {
     return Rtd_Init(interp);
 }
@@ -538,11 +542,11 @@ int RtdImage_Init(Tcl_Interp* interp)
 
 /*
  * Constructor: initialize a new rtdimage with the command line args.
- * 
- * This constructor is called for each rtd image declared in tk. The destructor
- * is called when the image image is destroyed. 
  *
- * Args: 
+ * This constructor is called for each rtd image declared in tk. The destructor
+ * is called when the image image is destroyed.
+ *
+ * Args:
  *   interp          -  Tk interpreter
  *   instname        - instance name of image object
  *   arc, argv       - command line args
@@ -550,17 +554,17 @@ int RtdImage_Init(Tcl_Interp* interp)
  *   imageType       - name of image type ("rtdimage")
  *   specs, options  - optional args to be used by derived class.
  *
- * The last 2 arguments are optional. They are designed to be used by a derived 
+ * The last 2 arguments are optional. They are designed to be used by a derived
  * class to add new image options. If "specs" is specified, then the
  * initImage() method must also be called by the caller to process the options,
  * otherwise initImage() is called here (for backward compatibility).
  */
-RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** argv, 
+RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** argv,
 		   Tk_ImageMaster master, const char* imageType,
 		   Tk_ConfigSpec* specs, RtdImageOptions* options)
-: TkImage(interp, imageType, instname, 
-	  (specs ? specs : configSpecs_), 
-	  (options ? options : (options = new RtdImageOptions)), 
+: TkImage(interp, imageType, instname,
+	  (specs ? specs : configSpecs_),
+	  (options ? options : (options = new RtdImageOptions)),
 	  master, "Canvas"),
   image_((ImageData*)NULL),
   options_(options),
@@ -568,7 +572,7 @@ RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** ar
   cameraPreCmd_(NULL),
   cameraPostCmd_(NULL),
   remote_(NULL),
-  frameId_(0), 
+  frameId_(0),
   frameX_(0.0), frameY_(0.0),
   xOffset_(0.0), yOffset_(0.0),
   rapidX_(0.0), rapidY_(0.0),
@@ -608,16 +612,16 @@ RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** ar
   intPerfTest_(0),
   perfTestType(TIME)
 {
-    // errors may have occured in the base class ... 
+    // errors may have occured in the base class ...
     if (status() != TCL_OK)
 	return;
- 
+
     // if we are on the console, check for XSHM, X shared memory extension
     char hostname[64];
     gethostname(hostname, sizeof(hostname));
     int n = strlen(hostname);
     char* display = DisplayString(display_);
-    if (display[0] == ':' || 
+    if (display[0] == ':' ||
 	(strncmp(hostname, display, n) == 0 && display[n] == ':')) {
 	haveXShm_ = XShmQueryExtension(display_);
     }
@@ -645,7 +649,7 @@ RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** ar
 
     // Initialise if we haven't and it isn't already.
     if (haveXSync_) {
-        if (!usingXSync_) { 
+        if (!usingXSync_) {
             if (XSyncInitialize(display_, &mj_vr, &mn_vr)) {
                 usingXSync_ = 1;
             }
@@ -689,12 +693,12 @@ RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** ar
 RtdImage::~RtdImage()
 {
 #ifdef DEBUG
-    if (verbose()) 
+    if (verbose())
 	printf("RtdImage::~RtdImage(): deleting %s (%s)\n", instname(), name());
 #endif
 
     // there might be more than one image in a canvas window
-    // Tk_DeleteEventHandler(tkwin_, ButtonMotionMask|StructureNotifyMask, 
+    // Tk_DeleteEventHandler(tkwin_, ButtonMotionMask|StructureNotifyMask,
     // eventProc, (ClientData)this);
 
     // if this is a view, remove it from the master's list
@@ -767,16 +771,16 @@ RtdImage::~RtdImage()
  */
 int RtdImage::call(const char* name, int len, int argc, char* argv[])
 {
-    // since this tcl command has a lot of subcommands, 
+    // since this tcl command has a lot of subcommands,
     // we do a binary search on the method table
-    int low = 0, 
+    int low = 0,
 	high = sizeof(subcmds_)/sizeof(*subcmds_) - 1,
-	mid, 
+	mid,
 	cond;
 
     while (low <= high) {
 	mid = (low + high) / 2;
-	if ((cond = strncmp(name, subcmds_[mid].name, len)) < 0) 
+	if ((cond = strncmp(name, subcmds_[mid].name, len)) < 0)
 	    high = mid - 1;
 	else if (cond > 0)
 	    low = mid + 1;
@@ -787,7 +791,7 @@ int RtdImage::call(const char* name, int len, int argc, char* argv[])
 	    return (this->*t.fptr)(argc, argv);
 	}
     }
-    
+
     // not found ? extend search to parent class
     return TkImage::call(name, len, argc, argv);
 }
@@ -807,33 +811,38 @@ int RtdImage::initColors(Tcl_Interp* interp)
 
     // make sure the window exists now before setting the colormap
     Tk_Window tkwin = Tk_MainWindow(interp);
-    
+
     //  XXX these should be options: min and max number of colors to allocate.
     // If this many are not available, use private colormap.
     int min_colors = 30, max_colors = 60;
-    
+
     // Use the default visual for now...
     //    Visual* visual = Tk_GetVisual(interp, tkwin, "default", &depth, &colormap);
 
     //  PWD: use "." here as "default" returns screen visual, not the
-    //  "-visual" command-line option. Making this function static has 
+    //  "-visual" command-line option. Making this function static has
     //  some drawbacks (the tkwin was previously the parent of the image?).
     Visual* visual = Tk_GetVisual(interp, tkwin, ".", &depth, &colormap);
     if (! visual)
       return TCL_ERROR;
-    
+
     Tk_MakeWindowExist(tkwin);
     colors_ = new ImageColor(Tk_Display(tkwin), visual, depth, max_colors);
     if (colors_->status() != 0) {
 	return TCL_ERROR;
     }
     if (colors_->colorCount() < min_colors) {
-	if (colors_->usePrivateCmap() || colors_->allocate(max_colors)) {
-	    return TCL_ERROR;
-	}
-	return colors_->setColormap(tkwin);
+       if (colors_->usePrivateCmap() || colors_->allocate(max_colors)) {
+          return TCL_ERROR;
+       }
     }
-    return TCL_OK;
+
+    //  PWD: always set the colormap. This can be "private" when the
+    //  default visual doesn't match the one requested, in which case
+    //  we still need to set the colormap (I noticed this using a
+    //  default truecolor visual when attempting to get a pseudocolor
+    //  visual).
+    return colors_->setColormap(tkwin);
 }
 
 
@@ -841,7 +850,7 @@ int RtdImage::initColors(Tcl_Interp* interp)
  * Utility method to change the equinox of ra and dec
  * from in_quinox to out_equinox, if dist_flag is 0.
  */
-void RtdImage::changeEquinox(int dist_flag, double& ra, double& dec, 
+void RtdImage::changeEquinox(int dist_flag, double& ra, double& dec,
 			     double in_equinox, double out_equinox)
 {
     if (!dist_flag) {
@@ -909,19 +918,19 @@ void RtdImage::changeEquinox(int dist_flag, double& ra, double& dec,
  * Note: the coordinate types may be abbrieviated.
  */
 int RtdImage::convertCoordsStr(int dist_flag, const char* inx_buf, const char* iny_buf,
-			       char* outx_buf, char* outy_buf, 
+			       char* outx_buf, char* outy_buf,
 			       double& x, double& y,
 			       const char* in_type, const char* out_type)
 {
     char in = *in_type, out = *out_type;
-    
+
     if (outx_buf)
 	outx_buf[0] = '\0';
     if (outy_buf)
 	outy_buf[0] = '\0';
 
     // get x and y as doubles
-    if (in == 'w') { 
+    if (in == 'w') {
 	// convert H:M:S to degrees
 	WorldCoords wcs(inx_buf, iny_buf);
 	if (wcs.status() != TCL_OK)
@@ -930,17 +939,17 @@ int RtdImage::convertCoordsStr(int dist_flag, const char* inx_buf, const char* i
 	y = wcs.dec_deg();
     }
     else {
-	if (Tcl_GetDouble(interp_, (char*)inx_buf, &x) != TCL_OK 
+	if (Tcl_GetDouble(interp_, (char*)inx_buf, &x) != TCL_OK
 	    || Tcl_GetDouble(interp_, (char*)iny_buf, &y) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
- 
+
     if (convertCoords(dist_flag, x, y, in_type, out_type) != TCL_OK)
 	return TCL_ERROR;
-    
+
     // format world coords in h:m:s if needed
-    if (out == 'w' && outx_buf && outy_buf) { 
+    if (out == 'w' && outx_buf && outy_buf) {
 	WorldCoords wcs(x, y);
 	wcs.print(outx_buf, outy_buf);
     }
@@ -965,11 +974,11 @@ void RtdImage::doTrans(double& x, double& y, int distFlag)
 	image_->doTrans(x, y, distFlag);
     }
     else if (viewMaster_) {
-	if (viewMaster_->tkwin_ == tkwin_) { 
+	if (viewMaster_->tkwin_ == tkwin_) {
 	    viewMaster_->doTrans(x, y, distFlag);
 	}
 	else {
-	    image_->doTrans(x, y, distFlag, rapidX_, rapidY_, 
+	    image_->doTrans(x, y, distFlag, rapidX_, rapidY_,
 			    viewMaster_->image_->width(), viewMaster_->image_->height());
 	}
     }
@@ -979,7 +988,7 @@ void RtdImage::doTrans(double& x, double& y, int distFlag)
 }
 
 
-/* 
+/*
  * undo the current transformations on the given coordinates.
  * If distFlag is 1, x and y are treated as a distance, otherwise
  * they are treated as a point and flipped as needed.
@@ -990,11 +999,11 @@ void RtdImage::undoTrans(double& x, double& y, int distFlag)
 	image_->undoTrans(x, y, distFlag);
     }
     else if (viewMaster_) {
-	if (viewMaster_->tkwin_ == tkwin_) { 
+	if (viewMaster_->tkwin_ == tkwin_) {
 	    viewMaster_->undoTrans(x, y, distFlag);
 	}
 	else {
-	    image_->undoTrans(x, y, distFlag, rapidX_, rapidY_, 
+	    image_->undoTrans(x, y, distFlag, rapidX_, rapidY_,
 			    viewMaster_->image_->width(), viewMaster_->image_->height());
 	}
     }
@@ -1011,9 +1020,9 @@ void RtdImage::coordsToDist(double& x, double& y)
 {
     // for image frame in same window, use master coords
     if (viewMaster_) {
-	if (viewMaster_->tkwin_ == tkwin_) 
+	if (viewMaster_->tkwin_ == tkwin_)
 	    viewMaster_->coordsToDist(x, y);
-	else 
+	else
 	    image_->coordsToDist(x, y, viewMaster_->image_->width(), viewMaster_->image_->height());
     }
     else {
@@ -1029,9 +1038,9 @@ void RtdImage::distToCoords(double& x, double& y)
 {
     // for image frame in same window, use master coords
     if (viewMaster_) {
-	if (viewMaster_->tkwin_ == tkwin_) 
+	if (viewMaster_->tkwin_ == tkwin_)
 	    viewMaster_->distToCoords(x, y);
-	else 
+	else
 	    image_->distToCoords(x, y, viewMaster_->image_->width(), viewMaster_->image_->height());
     }
     else {
@@ -1056,10 +1065,10 @@ int RtdImage::canvasToScreenCoords(double& x, double& y, int dist_flag)
 /*
  * convert canvas to image coords
  *
- * Note: there are 2 cases to handle here: 
+ * Note: there are 2 cases to handle here:
  * 1. a frame displaying an image at an offset with the origin at 0,0
  * 2. same as above, but with the origin at xOffset,yOffset
- * 
+ *
  * In the normal case, the offset and origin are both zero...
  */
 int RtdImage::canvasToImageCoords(double& x, double& y, int dist_flag)
@@ -1155,11 +1164,11 @@ int RtdImage::imageToWorldCoords(double& x, double& y, int dist_flag)
 {
     double ra, dec;
     if (dist_flag) {
-	if (image_->wcs().pix2wcsDist(x, y, ra, dec) != 0) 
+	if (image_->wcs().pix2wcsDist(x, y, ra, dec) != 0)
 	    return TCL_ERROR;
     }
     else {
-	if (image_->wcs().pix2wcs(x, y, ra, dec) != 0) 
+	if (image_->wcs().pix2wcs(x, y, ra, dec) != 0)
 	    return TCL_ERROR;
     }
 
@@ -1175,7 +1184,7 @@ int RtdImage::imageToWorldCoords(double& x, double& y, int dist_flag)
  */
 int RtdImage::worldToCanvasCoords(double& x, double& y, int dist_flag)
 {
-    return worldToImageCoords(x, y, dist_flag) || 
+    return worldToImageCoords(x, y, dist_flag) ||
 	imageToCanvasCoords(x, y, dist_flag);
 }
 
@@ -1197,10 +1206,10 @@ int RtdImage::worldToImageCoords(double& x, double& y, int dist_flag)
 {
     double ra = x, dec = y;
     if (dist_flag) {
-	if (image_->wcs().wcs2pixDist(ra, dec, x, y) != 0) 
+	if (image_->wcs().wcs2pixDist(ra, dec, x, y) != 0)
 	    return TCL_ERROR;
     }
-    else if (image_->wcs().wcs2pix(ra, dec, x, y) != 0) 
+    else if (image_->wcs().wcs2pix(ra, dec, x, y) != 0)
 	return TCL_ERROR;
 
     return TCL_OK;
@@ -1238,7 +1247,7 @@ int RtdImage::worldToChipCoords(double& x, double& y, int dist_flag)
 
 int RtdImage::chipToImageCoords(double& x, double& y, int dist_flag)
 {
-    if (! dist_flag) 
+    if (! dist_flag)
 	image_->chipToImageCoords(x, y);
     return TCL_OK;
 }
@@ -1281,13 +1290,13 @@ void RtdImage::getOffsetInXImage(double px, double py, int& x, int& y)
 
 	// printf("%s: getOffsetInXImage: (%.17g,%.17g) ==> (%d,%d) ", instname(), px, py, x, y);
 
-	if (px < 0) 
+	if (px < 0)
 	    x += xyscale;
 	if (py < 0)
 	    y += xyscale;
 	if (image_->rotate())
 	    swap(x, y);
-	
+
 	// printf("==> (%d,%d)\n", x, y);
     }
 }
@@ -1326,7 +1335,7 @@ int RtdImage::imageToRawImageCoords(double& x, double& y)
 	    y -= dy;
 	else
 	    y -= viewMaster_->image_->height() - image_->height() - dy;
-	
+
 	if (image_->flipX())
 	    x -= viewMaster_->image_->width() - image_->width() - dx;
 	else
@@ -1345,7 +1354,7 @@ int RtdImage::screenToXImageCoords(double& x, double& y)
     if (displaymode() == 0) {
 	x -= canvasX_;
 	y -= canvasY_;
-    } 
+    }
     else {
 	// if the xImage smaller than the window, add the neg. scroll offset
 	double fx = frameX_, fy = frameY_;
@@ -1360,7 +1369,7 @@ int RtdImage::screenToXImageCoords(double& x, double& y)
 	    y += -canvasY_ - fy;
 	else if (fy)
 	    y -= (fy + canvasY_);
-	
+
     }
     return TCL_OK;
 }
@@ -1412,7 +1421,7 @@ int RtdImage::convertCoords(int dist_flag, double& x, double& y, char in_type, c
  * To convert coordinates we have to take some or all of the following
  * into account:
  *
- * 1. Transformations: rotate, scale, flipX,Y 
+ * 1. Transformations: rotate, scale, flipX,Y
  * 	These handled by the ImageData methods doTrans() and
  * 	undoTrans().
  *
@@ -1430,7 +1439,7 @@ int RtdImage::convertCoords(int dist_flag, double& x, double& y, char in_type, c
  * STRY indicate the chip origin. If this information is not available,
  * then chip coordinates are the same as image coordinates.
  */
-int RtdImage::convertCoords(int dist_flag, double& x, double& y, 
+int RtdImage::convertCoords(int dist_flag, double& x, double& y,
 			    const char* in_type, const char* out_type)
 {
     CoordinateType in = getCoordinateType(in_type),
@@ -1439,7 +1448,7 @@ int RtdImage::convertCoords(int dist_flag, double& x, double& y,
     if (in == CT_NONE || out == CT_NONE)
 	return TCL_ERROR;
 
-    if (in == out) 
+    if (in == out)
 	return TCL_OK;
 
     double in_equinox = 2000.0, out_equinox = 2000.0;
@@ -1533,11 +1542,11 @@ int RtdImage::convertCoords(int dist_flag, double& x, double& y,
 	break;
 
     case CT_DEG:			// input is world coords
-    case CT_WCS:		
+    case CT_WCS:
 	// convert to image equinox
 	sscanf(in_type, "%*[^0-9]%lf", &in_equinox);
 	changeEquinox(dist_flag, x, y, in_equinox, image_->wcs().equinox());
-	
+
 	switch(out) {
 	case CT_CANVAS:		// convert world to canvas coords
 	    return worldToCanvasCoords(x, y, dist_flag);
@@ -1567,7 +1576,7 @@ int RtdImage::convertCoords(int dist_flag, double& x, double& y,
  * image from shared memory.  "info" contains all we need to know about
  * the image and "data" gives access to the shared memory for the image.
  */
-int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data) 
+int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
 {
     // if this event is for us, display it
     if (info.frameId == frameId_) {
@@ -1577,24 +1586,24 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
         resetPerfTest();
 
 #ifdef DEBUG
-	if (verbose()) 
+	if (verbose())
 	    printf("%s: got image event\n", name());
 #endif
 
-	// update the x and y offsets 
+	// update the x and y offsets
 	// (these are normally 0, when the rapid frame has its own shared memory area)
 	xOffset_ = info.frameX;
 	yOffset_ = info.frameY;
-	
+
 	// if the image changed, delete it and create a new one, otherwise reuse
-	if (image_ == NULL 
-	    || info.xPixels != image_->width() 
-	    || info.yPixels != image_->height() 
+	if (image_ == NULL
+	    || info.xPixels != image_->width()
+	    || info.yPixels != image_->height()
 	    || info.dataType != image_->dataType()) {
-	    
+
 #ifdef DEBUG
 	    if (verbose())
-		printf("%s: new image received: %d x %d\n", 
+		printf("%s: new image received: %d x %d\n",
 		       name(), info.xPixels, info.yPixels);
 #endif
 
@@ -1602,7 +1611,7 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
 	    ImageDataParams p;
 	    if (image_) {
 		image_->saveParams(p);
-		delete image_; 
+		delete image_;
 		image_ = NULL;
 		updateViews();
 	    }
@@ -1610,7 +1619,7 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
 	    // make a FitsIO object to represent the new image data and use it to
 	    // make a new ImageData object, which manages the image and transformations.
 	    Mem header;		// empty header (use wcs command to set wcs keywords)
-	    FitsIO* fits = new FitsIO(info.xPixels, info.yPixels, info.dataType, 
+	    FitsIO* fits = new FitsIO(info.xPixels, info.yPixels, info.dataType,
 				      0.0, 1.0, header, data);
 	    if (!fits || fits->status() != 0)
 		return TCL_ERROR;
@@ -1624,10 +1633,10 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
             }
             timeInc(&MEMtime_);
 
-	    // set object name to camera name 
+	    // set object name to camera name
 	    if (camera_)
-		image_->object(camera_->camera()); 
-	    
+		image_->object(camera_->camera());
+
 	    //  restore transformations, cut levels, etc from the previous image
 	    image_->restoreParams(p, !autoSetCutLevels_);
 
@@ -1647,11 +1656,11 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
 	    // reuse the current image and just update the image data
 #ifdef DEBUG
 	    if (verbose())
-		printf("%s: new image data received: %d x %d (size: %d bytes)\n", 
+		printf("%s: new image data received: %d x %d (size: %d bytes)\n",
 		       name(), info.xPixels, info.yPixels, data.length());
 #endif
 	    // if the image event contains valid cut levels, use them
-	    if (info.lowCut != info.highCut) 
+	    if (info.lowCut != info.highCut)
 		setCutLevels(info.lowCut, info.highCut, 1, 0);
 
 	    // update the image with the new data
@@ -1664,8 +1673,8 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
                 camera_->timeStamp("GEN_XPROC");
             }
             timeInc(&Xtime_);
-	} 
-	
+	}
+
 	// now we have the new image...
 
 	// set detector parameters
@@ -1675,12 +1684,12 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
 	    image_->binX(info.binningX);
 	if (info.binningY > 0)
 	    image_->binY(info.binningY);
-	    
+
 	// set WCS info, if available
 	if (info.secpix != 0.) {
-	    if (image_->wcs().set(info.ra, info.dec, 
+	    if (image_->wcs().set(info.ra, info.dec,
 				  info.secpix, info.xrefpix, info.yrefpix,
-				  info.xPixels, info.yPixels, info.rotate, 
+				  info.xPixels, info.yPixels, info.rotate,
 				  info.equinox, info.epoch, info.proj) != 0)
 		return TCL_ERROR;
 	}
@@ -1728,7 +1737,7 @@ int RtdImage::displayImageEvent(const rtdIMAGE_INFO& info, const Mem& data)
  * if displaymode is 1, optimize memory usage by only allocating space for
  * the visible image.
  */
-void RtdImage::displayImage(Drawable d, int imageX, int imageY, 
+void RtdImage::displayImage(Drawable d, int imageX, int imageY,
 			    int width, int height,
 			    int drawableX, int drawableY)
 {
@@ -1745,18 +1754,18 @@ void RtdImage::displayImage(Drawable d, int imageX, int imageY,
     // object to get the unclipped int coords, but that would require including
     // private Tk header files that are not normally installed.
     Tk_CanvasWindowCoordsNoClip(canvas_, 0., 0., &canvasX_, &canvasY_);
-    
-    if (displaymode() == 0) { 
+
+    if (displaymode() == 0) {
 	// do entire image, as needed
 	if (xImage_->usingXShm()) {
 	    // with X shared memory, should be fast enough to write directly to X server
-	    if (update_pending_)  
+	    if (update_pending_)
 		image_->update();
 	    xImage_->put(d, imageX, imageY, drawableX, drawableY, width, height);
 	}
 	else {
 	    // not using X shared mem, use an offscreen pixmap
-	    if (update_pending_) { 
+	    if (update_pending_) {
 		image_->update();
 		xImage_->put(pm_, 0, 0, 0, 0, dispWidth(), dispHeight());
 	    }
@@ -1786,19 +1795,19 @@ void RtdImage::displayImage(Drawable d, int imageX, int imageY,
 
 	if (xImage_->usingXShm()) {
 	    // with X shared memory, should be fast enough to write directly to X server
-	    if (update) 
+	    if (update)
 		image_->updateOffset(dx, dy);
 	    xImage_->put(d, imageX-x+px, imageY-y+py, drawableX, drawableY, width, height);
 	}
 	else {
 	    // not using X shared mem, use an offscreen pixmap
-	    if (update) { 
+	    if (update) {
 		image_->updateOffset(dx, dy);
 		xImage_->put(pm_, 0, 0, 0, 0, pixw_, pixh_);
 	    }
 	    // do a quick copy within the X server
 	    if (pm_)
-		XCopyArea(display_, pm_, d, gc_, imageX-x+px, imageY-y+py, 
+		XCopyArea(display_, pm_, d, gc_, imageX-x+px, imageY-y+py,
 			  width, height, drawableX, drawableY);
 	}
     }
@@ -1814,7 +1823,7 @@ void RtdImage::displayImage(Drawable d, int imageX, int imageY,
         viewMaster_->camera_->timeStamp(buffer);
         timeInc(&Xtime_);
     }
-    
+
     // notify the panning window, if necessary
     if (panCommand_)
 	autoPan();
@@ -1843,7 +1852,7 @@ void RtdImage::timeInc(double *timevar)
 
     // Get the current time.
     gettimeofday(&currentTime, NULL);
-    curTimeStamp = (double)currentTime.tv_sec + 
+    curTimeStamp = (double)currentTime.tv_sec +
         (double)(currentTime.tv_usec / 1000000.);
 
     // Increment the appropriate variable.
@@ -1870,7 +1879,7 @@ void RtdImage::resetPerfTest()
 
     // Set the last time stamp for future events.
     gettimeofday(&currentTime, NULL);
-    lastTimeStamp_ = (double)currentTime.tv_sec + 
+    lastTimeStamp_ = (double)currentTime.tv_sec +
         (double)(currentTime.tv_usec / 1000000.);
 
     // Reset the performance variables.
@@ -2004,16 +2013,16 @@ void RtdImage::setPerfTestVars()
 
 /*
  * This procedure is called to process an argv/argc list, plus
- * the Tk option database, in order to configure (or reconfigure) 
+ * the Tk option database, in order to configure (or reconfigure)
  * a image.
- * 
+ *
  * redefined here to check which changes were made.
  */
 int RtdImage::configureImage(int argc, char* argv[], int flags)
 {
-    if (TkImage::configureImage(argc, argv, flags) != TCL_OK) 
+    if (TkImage::configureImage(argc, argv, flags) != TCL_OK)
 	return TCL_ERROR;
-    
+
     int status = TCL_OK;
     int reset = 0;
     int coordsFlag = 0;
@@ -2036,7 +2045,7 @@ int RtdImage::configureImage(int argc, char* argv[], int flags)
 		}
 		break;
 
-#if _HAVE_R6            
+#if _HAVE_R6
             case RTD_OPTION(usexsync):
                 if (usingXSync_ && usexsync()) {
 #ifdef DEBUF
@@ -2046,11 +2055,11 @@ int RtdImage::configureImage(int argc, char* argv[], int flags)
                 }
                 break;
 #endif  // _HAVE_R6
-		
+
 	    case RTD_OPTION(displaymode):
 	    case RTD_OPTION(shm_header):
 	    case RTD_OPTION(shm_data):
-		if (initialized_) 
+		if (initialized_)
 		    reset++;
 		break;
 
@@ -2070,14 +2079,14 @@ int RtdImage::configureImage(int argc, char* argv[], int flags)
 	    }
 	}
     }
-    
+
     if (reset)
 	return resetImage();
     return status;
 }
 
 
-/* 
+/*
  * util: return true if this is an embedded rapid frame
  * (i.e.: a rapid frame in the same canvas with the master image)
  */
@@ -2087,8 +2096,8 @@ int RtdImage::isEmbeddedRapidFrame()
 }
 
 
-/* 
- * util: return true if this is a rapid frame that is not embedded 
+/*
+ * util: return true if this is a rapid frame that is not embedded
  * (i.e.: a rapid frame that is not in the same canvas with the master image)
  */
 int RtdImage::isSeparateRapidFrame()
@@ -2124,11 +2133,11 @@ int RtdImage::setCutLevels(double min, double max, int scaled, int user)
     // make sure the new lookup table is propagated
     LookupTable lookup = image_->lookup();
     for(int i = 0; i < MAX_VIEWS; i++) {
-	if (view_[i] && view_[i]->image_ && !view_[i]->isSeparateRapidFrame()) 
+	if (view_[i] && view_[i]->image_ && !view_[i]->isSeparateRapidFrame())
 	    view_[i]->image_->lookup(lookup);
     }
 
-    return updateViews(1) || updateImage(); 
+    return updateViews(1) || updateImage();
 }
 
 
@@ -2143,7 +2152,7 @@ int RtdImage::setScale(int xScale, int yScale)
 	xScale = 1;
     if (yScale == 0 || yScale == -1)
 	yScale = 1;
-    
+
     // magnify by zoom factor, if requested
     if (zoomFactor_ > 1) {
 	if (xScale > 0) {
@@ -2154,7 +2163,7 @@ int RtdImage::setScale(int xScale, int yScale)
 	    xScale = yScale = zoomFactor_;
 	}
 #ifdef XXXDEBUG
-	if (verbose()) 
+	if (verbose())
 	    printf("%s: setting scale to (%d, %d), factor %d\n",
 		   name(), xScale, yScale, zoomFactor_);
 #endif
@@ -2171,7 +2180,7 @@ int RtdImage::setScale(int xScale, int yScale)
 	}
 	return TCL_OK;
     }
-	
+
     image_->setScale(xScale, yScale);
     panx1_ = pany1_ = panx2_ = pany2_ = 0; // make sure panning is updated
 
@@ -2225,7 +2234,7 @@ int RtdImage::resetImage()
 	if (h < pixh)
 	    pixh = h;
 
-	// round up the size to the nearest scale factor multiple (+1?), so that no 
+	// round up the size to the nearest scale factor multiple (+1?), so that no
 	// empty spaces are left around the edges of the image (allan, 10.10.95)
 	int xs = image_->xScale(), ys = image_->yScale();
 	if (xs > 1) {
@@ -2241,7 +2250,7 @@ int RtdImage::resetImage()
 
     // make a new X image if needed and update the size
     if (!xImage_)
-	xImage_ = new ImageDisplay(display_, visual_, gc_, depth_, 
+	xImage_ = new ImageDisplay(display_, visual_, gc_, depth_,
 				   usingXShm_, verbose());
 
     if (xImage_->update(pixw, pixh) != TCL_OK) {
@@ -2273,22 +2282,22 @@ int RtdImage::loadFile()
 
     // used to save and restore image transformation parameters
     ImageDataParams p;
-    
+
     if (image_) {
 	image_->saveParams(p);
-	delete image_; 
+	delete image_;
 	image_ = NULL;
 	updateViews();
     }
 
     // if not '-' (stdin) check that it is a file
-    if (strcmp(file(), "-") != 0) { 
+    if (strcmp(file(), "-") != 0) {
 	struct stat buf;
 	if (stat(file(), &buf) != 0 || S_ISREG(buf.st_mode) == 0)
 	    return error("expected a file, but got: ", file());
     }
 
-    // read the FITS image 
+    // read the FITS image
     image_ = makeImage(FitsIO::read(file()));
     if (! image_)
 	return TCL_ERROR;
@@ -2310,7 +2319,7 @@ int RtdImage::loadFile()
  * this method is called to do all the necessary work
  * after a new image has been loaded from file or shared memory
  */
-int RtdImage::initNewImage() 
+int RtdImage::initNewImage()
 {
     if (!image_) {
 	return updateViews();
@@ -2351,7 +2360,7 @@ int RtdImage::initNewImage()
         camera_->timeStamp("INIT_GEN_XPROC");
         timeInc(&Xtime_);
     }
-    
+
     // evaluate the newImageCmd, if there is one
     if (strlen(newImageCmd())) {
 	return Tcl_Eval(interp_, newImageCmd());
@@ -2364,7 +2373,7 @@ int RtdImage::initNewImage()
 /*
  * this method causes the image and its views to be redrawn.
  */
-int RtdImage::updateImage() 
+int RtdImage::updateImage()
 {
     imageChanged();
     if (image_)
@@ -2377,22 +2386,22 @@ int RtdImage::updateImage()
  * This method is called to update an existing image with new
  * raw data of the same size and type.
  */
-int RtdImage::updateImageNewData(const Mem& data) 
+int RtdImage::updateImageNewData(const Mem& data)
 {
 #ifdef DEBUG
-    if (verbose()) 
+    if (verbose())
 	printf("%s: update image with new data (size: %d)\n", name(), data.length());
 #endif
-    
+
     if (image_)
 	image_->data(data);
 
     // update the data in any views
     for(int i = 0; i < MAX_VIEWS; i++) {
-	if (view_[i] && view_[i]->image_ && !view_[i]->rapidFrame_ 
+	if (view_[i] && view_[i]->image_ && !view_[i]->rapidFrame_
 	    && view_[i] != zoomView_ && view_[i] != zoomView2_) {
 #ifdef DEBUG
-	    if (verbose()) 
+	    if (verbose())
 		printf("%s: update %s with new data\n", name(), view_[i]->name());
 #endif
 
@@ -2408,7 +2417,7 @@ int RtdImage::updateImageNewData(const Mem& data)
 }
 
 
-/* 
+/*
  * delete the XImage used to display the image
  */
 int RtdImage::deleteXImage()
@@ -2417,9 +2426,9 @@ int RtdImage::deleteXImage()
 	delete xImage_;
 	xImage_ = NULL;
     }
-    
+
     // also reset the pointer in the class that manages the XImage data
-    if (image_) 
+    if (image_)
 	image_->setXImage( NULL );
 
     return 0;
@@ -2521,7 +2530,7 @@ int RtdImage::updateView(ImageData* im, int flag)
 	image_ = NULL;
 	return TCL_OK;
     }
-    
+
     if (image_ && flag != 1) {
 	// this is an existing image, update it
 	if (flag == 2) {  // only transformations changed
@@ -2571,19 +2580,19 @@ int RtdImage::updateView(ImageData* im, int flag)
 	image_->name(name()); // reset the name of the slave image
     }
 
-    if (fitWidth() || fitHeight()) { 
+    if (fitWidth() || fitHeight()) {
 	// used for pan window - shrink to fit whole image in window
 	image_->shrinkToFit(fitWidth(), fitHeight());
     }
     else if (zoomFactor_ > 1) {
 	// used for zoom view: make scale relative to main image
-	if (setScale(im->xScale(), im->yScale()) != TCL_OK) 
+	if (setScale(im->xScale(), im->yScale()) != TCL_OK)
 	    return TCL_ERROR;
     } else if (xs && propagateScale_ == 0) {
 	// if the scale factors should not propagate to the view, restore them here
 	image_->setScale(xs, ys);
     }
-    
+
     if (resetImage() != TCL_OK)
 	return TCL_ERROR;
 
@@ -2615,9 +2624,9 @@ RtdImage* RtdImage::getView(char* name)
 
 
 
-/* 
+/*
  * This virtual method is called indirectly by the Tk image handling routines
- * for each use of the image in a widget. 
+ * for each use of the image in a widget.
  * It is redefined here so that we can set up an event handler on the instance
  * window for autozooming.
  */
@@ -2631,7 +2640,7 @@ TkImage* RtdImage::getImage(Tk_Window tkwin)
     canvasName_ = Tk_PathName(tkwin);
 
     // set up event handler for motion events and resizing
-    Tk_CreateEventHandler(tkwin, ButtonMotionMask|StructureNotifyMask, 
+    Tk_CreateEventHandler(tkwin, ButtonMotionMask|StructureNotifyMask,
 			  eventProc, (ClientData)this);
 
     // get a handle to the canvas and save it for later reference
@@ -2652,8 +2661,8 @@ TkImage* RtdImage::getImage(Tk_Window tkwin)
 }
 
 
-/* 
- * This static method is called for motion and configure events 
+/*
+ * This static method is called for motion and configure events
  * in the image window
  */
 void RtdImage::eventProc(ClientData clientData, XEvent* eventPtr)
@@ -2665,7 +2674,7 @@ void RtdImage::eventProc(ClientData clientData, XEvent* eventPtr)
 	    // use current view as set by view command, which defaults to this
 	    // image, in case more than one image is in canvas
 	    (motionView_ = thisPtr->currentView_)->motionNotify(eventPtr);
-	} 
+	}
 	else if (eventPtr->type == ConfigureNotify) {
 	    thisPtr->configureNotify(eventPtr);
 	}
@@ -2673,7 +2682,7 @@ void RtdImage::eventProc(ClientData clientData, XEvent* eventPtr)
 }
 
 
-/* 
+/*
  * This method is called for MotionNotify events in the image window
  * Arrange for the zoom window to be updated.
  */
@@ -2704,17 +2713,17 @@ void RtdImage::motionNotify(XEvent* eventPtr)
 }
 
 
-/* 
+/*
  * This method is called for ConfigureNotify events in the image window
  * (when the image window is resized).
  * Make sure it is redrawn.
  */
 void RtdImage::configureNotify(XEvent* eventPtr)
 {
-    if (image_ && displaymode() == 1) { 
+    if (image_ && displaymode() == 1) {
 #ifdef DEBUG
-	if (verbose()) 
-	    printf("RtdImage::configureNotify: %d, %d\n", 
+	if (verbose())
+	    printf("RtdImage::configureNotify: %d, %d\n",
 		   eventPtr->xconfigure.width, eventPtr->xconfigure.height);
 #endif
 	resetImage();
@@ -2722,7 +2731,7 @@ void RtdImage::configureNotify(XEvent* eventPtr)
 }
 
 
-/* 
+/*
  * This static method is called, if needed, when there is nothing else to do
  * to update the zoom window and other motion sensitive widgets
  */
@@ -2757,15 +2766,15 @@ void RtdImage::processMotionEvent()
 	else if (zoomer_) {
 	    double zx = motionX_, zy = motionY_;
 	    screenToXImageCoords(zx, zy);
-	    zoomer_->zoom(xImage_->data(), 
-			  int(zx), int(zy), 
-			  xImage_->bytesPerLine(), xImage_->height(), 
+	    zoomer_->zoom(xImage_->data(),
+			  int(zx), int(zy),
+			  xImage_->bytesPerLine(), xImage_->height(),
 			  image_->xScale(), image_->yScale(),
 			  colors_->pixelval(0));
 	}
 
 	// update a global Tcl array with the current x, y, pixval, ra, dec, equinox
-	// values for speedy trace update in Tk. The array has the same name as 
+	// values for speedy trace update in Tk. The array has the same name as
 	// the main image and is indexed by X, Y, VALUE, RA, DEC, EQUINOX.
 	char xStr[32], yStr[32], valueStr[32], raStr[32], decStr[32], equinoxStr[32];
 	char* var = (viewMaster_ ? viewMaster_->instname_ : instname_);
@@ -2779,7 +2788,7 @@ void RtdImage::processMotionEvent()
 	Tcl_SetVar2(interp_, var, "RA", raStr, TCL_GLOBAL_ONLY);
 	Tcl_SetVar2(interp_, var, "DEC", decStr, TCL_GLOBAL_ONLY);
 	Tcl_SetVar2(interp_, var, "EQUINOX", equinoxStr, TCL_GLOBAL_ONLY);
-	
+
 	// update the pixtab trace variables, if necessary
 	// (ease up when B3 is pressed, due to measure band...)
 	if (pixTab_ && (motionState_ & Button1Mask & Button3Mask) == 0) {
@@ -2848,7 +2857,7 @@ void RtdImage::processMotionEvent()
 
 
 /*
- * this virtual method is called for motion events when 
+ * this virtual method is called for motion events when
  * a "zoomview" is being used. x and y are the image
  * coordinates distance from origin.
  */
@@ -2878,7 +2887,7 @@ void RtdImage::updateZoomView(RtdImage* view, double x, double y)
 
 
 /*
- * This method is called to notify the panning window of the coords 
+ * This method is called to notify the panning window of the coords
  * of the visible image. If the size or position of the visible part
  * of the image has changed, evaluate the panning command with the
  * new coordinates and a flag indicating whether the image is new or
@@ -2886,19 +2895,19 @@ void RtdImage::updateZoomView(RtdImage* view, double x, double y)
  * newImageFlag is set to one if a new image was loaded from file or
  * shared memory.
  */
-void RtdImage::autoPan(int newImageFlag) 
+void RtdImage::autoPan(int newImageFlag)
 {
     int x1 = -canvasX_;
     if (x1 < 0)
     	x1 = 0;
 
-    int y1 = -canvasY_; 
+    int y1 = -canvasY_;
      if (y1 < 0)
 	 y1 = 0;
 
     int w = dispWidth(), h = dispHeight();
 
-    int x2 = x1+Tk_Width(tkwin_)-1; 
+    int x2 = x1+Tk_Width(tkwin_)-1;
     if (x2 >= (w-1))
 	x2 = w-1;
     if (x2 <= x1)
@@ -2909,7 +2918,7 @@ void RtdImage::autoPan(int newImageFlag)
 	y2 = h-1;
     if (y2 <= y1)
 	y2 = y1+1;
-    
+
     // if the coords have changed...
     if (newImageFlag || x1 != panx1_ || y1 != pany1_ || x2 != panx2_ || y2 != pany2_) {
 	// save the coords
@@ -2918,7 +2927,7 @@ void RtdImage::autoPan(int newImageFlag)
 	panx2_ = x2;
 	pany2_ = y2;
 
-	// make sure the coords are in range and  take the scale factors of 
+	// make sure the coords are in range and  take the scale factors of
 	// both the pan image and the target image into account
 	int xs = image_->xScale(), ys = image_->yScale();
 
@@ -2940,7 +2949,7 @@ void RtdImage::autoPan(int newImageFlag)
 	}
 
 	char buf[1024];
-	sprintf(buf, "%s %d %d %d %d %d", 
+	sprintf(buf, "%s %d %d %d %d %d",
 		panCommand_, x1, y1, x2, y2, newImageFlag);
 	if (Tcl_Eval(interp_, buf) != TCL_OK) {
 	    Tk_BackgroundError(interp_);
@@ -2977,13 +2986,13 @@ ImageData* RtdImage::makeImage(ImageIO imio)
 
 
 /*
- * Generate and load a blank image. 
+ * Generate and load a blank image.
  *
  * usage:  $image clear
  *
  *         $image clear ?ximage?
  *
- *         $image clear ?-reuse $reuse 
+ *         $image clear ?-reuse $reuse
  *                       -ra $ra -dec $dec -equinox $equinox -radius $radius \
  *                       -width $width -height $height?
  *
@@ -3017,7 +3026,7 @@ int RtdImage::clearCmd(int argc, char* argv[])
 
     double ra = -1.0, dec = 0.0, equinox = 2000.0, radius = 1;
     int reuse = 0, width = 2, height = 2;
-    
+
     // parse options
     for (int i = 0; i < argc; i+=2) {
 	char* opt = argv[i];
@@ -3031,18 +3040,18 @@ int RtdImage::clearCmd(int argc, char* argv[])
 	    || (strcmp(opt, "-height") == 0 && Tcl_GetInt(interp_, arg, &height) != TCL_OK))
 	    return TCL_ERROR;
     }
-    
+
     // if -ra and -dec were specified, generate an image with world coords, otherwise
     // just a plain image with image coords
     if (ra >= 0) {
 	// for world coords, to make it easier, use an equal width and height
 	width = height = max(width, height);
-    
+
 	// see if we can reuse the current image.
 	// (only if no file or object is loaded and the coords are the same)
 	double image_ra, image_dec, err = .1;
 	if (reuse && image_ && strlen(file()) == 0 && strlen(image_->object()) == 0 &&
-	    width == image_->width() && height == image_->height() 
+	    width == image_->width() && height == image_->height()
 	    && fabs(radius - image_->wcs().radius()) < err) {
 
 	    image_->wcs().pix2wcs(width/2, height/2, image_ra, image_dec);
@@ -3059,11 +3068,11 @@ int RtdImage::clearCmd(int argc, char* argv[])
 	delete image_;
 	image_ = NULL;
     }
-    
+
     // generate the blank image
     FitsIO* fits = FitsIO::blankImage(ra, dec, equinox, radius, width, height,
 				      colors_->pixelval(0));
-    if (fits) 
+    if (fits)
 	image_ = makeImage(fits);
 
     //  restore transformations, cut levels, etc from the previous image
@@ -3078,7 +3087,7 @@ int RtdImage::clearCmd(int argc, char* argv[])
  */
 int RtdImage::isclear()
 {
-    return (!image_ || (image_->width() <= 2 && image_->height() <= 2 
+    return (!image_ || (image_->width() <= 2 && image_->height() <= 2
 			&& image_->header().length() == 0));
 }
 
@@ -3110,7 +3119,7 @@ int RtdImage::isclearCmd(int argc, char* argv[])
  */
 int RtdImage::previewCmd(int argc, char* argv[])
 {
-    
+
 #ifdef DEBUG
     if (verbose()) {
 	printf("%s: previewCmd: camera = %x\n", name(), camera_);
@@ -3120,10 +3129,10 @@ int RtdImage::previewCmd(int argc, char* argv[])
     if (! camera_)
 	return TCL_OK;
 
-    int flag; 
-    if (Tcl_GetBoolean(interp_, argv[0], &flag) != TCL_OK) 
+    int flag;
+    if (Tcl_GetBoolean(interp_, argv[0], &flag) != TCL_OK)
 	return TCL_ERROR;
-  
+
     if (flag) {
 	// enter preview mode, get local copy of image data
 	if (camera_->attached()) {
@@ -3199,7 +3208,7 @@ int RtdImage::cameraCmd(int argc, char* argv[])
 	return camera_->stop();
     }
     else {
-	return error("invalid camera subcommand: expected: start, stop, pause or continue");	
+	return error("invalid camera subcommand: expected: start, stop, pause or continue");
     }
     return TCL_OK;
 }
@@ -3208,7 +3217,7 @@ int RtdImage::cameraCmd(int argc, char* argv[])
 /*
  * Implement the "cmap" subcommand
  *
- * usage: 
+ * usage:
  *      <path> cmap file ?<colormapFile>?
  *      <path> cmap rotate <amount>
  *      <path> cmap shift <amount>
@@ -3222,7 +3231,7 @@ int RtdImage::cameraCmd(int argc, char* argv[])
  *
  * where the file, if specified, should contain 256 lines of R, G, B
  * values. Each line should contain 3 floating point values between 0.0
- * and 1.0, for the reg, grean, and blue color scale values. 
+ * and 1.0, for the reg, grean, and blue color scale values.
  * If the filename is not specified, the current colormap file name is
  * returned.
  *
@@ -3302,7 +3311,7 @@ int RtdImage::cmapCmd(int argc, char* argv[])
 	unsigned long* p = colors_->pixelval();
 	char buf[MAX_COLOR*10];
 	ostrstream os(buf, sizeof(buf));
-	for (int i = 0; i < n; i++) 
+	for (int i = 0; i < n; i++)
 	    os << *p++ << " ";
 	os << ends;
 	return set_result(buf);
@@ -3324,7 +3333,7 @@ int RtdImage::cmapCmd(int argc, char* argv[])
      if (strcmp(argv[0], "isreadonly") == 0) {
 	 return set_result(colors_->readOnly());
      }
-  
+
     return error("unknown rtdimage cmap subcommand");
 }
 
@@ -3336,10 +3345,10 @@ int RtdImage::cmapCmd(int argc, char* argv[])
  *        <path> itt scale <amount>
  *        <path> itt list
  *
- * where the file should contain 256 intensity values (0.0..1.0), 
+ * where the file should contain 256 intensity values (0.0..1.0),
  * one per line.
  *
- * "file" sets the itt file, 
+ * "file" sets the itt file,
  * "scale" scales the itt by the given amount
  * "list" returns a list of itt files loaded
  */
@@ -3391,11 +3400,11 @@ int RtdImage::ittCmd(int argc, char* argv[])
  * Implement the "cut" subcommand to set cut levels:
  *
  * usage: <path> cut <min> <max>  ?fromUser?
- *    or: <path> cut 
+ *    or: <path> cut
  *
  * If the min and max arguments are specified, the cut levels are set.
  *
- * The optional ?fromUser? argument indicates whether or not this is 
+ * The optional ?fromUser? argument indicates whether or not this is
  * a result of a user action and defaults to 1 (true). Once a user has
  * set the cut levels, automatic cut level setting is disabled.
  *
@@ -3415,8 +3424,8 @@ int RtdImage::cutCmd(int argc, char* argv[])
     if (argc >= 2) {
 	// set the cut levels
 	double min, max;
-	
-	if (Tcl_GetDouble(interp_, argv[0], &min) != TCL_OK 
+
+	if (Tcl_GetDouble(interp_, argv[0], &min) != TCL_OK
 	    || Tcl_GetDouble(interp_, argv[1], &max) != TCL_OK) {
 	    return TCL_ERROR;
 	}
@@ -3441,7 +3450,7 @@ int RtdImage::cutCmd(int argc, char* argv[])
  * usage: <path> autocut ?-percent number?
  *
  * Two different algorithms are supported. The default is median
- * filtering. 
+ * filtering.
  *
  * If -percent is specified, the argument is a number between 0 and 100,
  * such as 90 for 90%, where that percent of the image should be visible
@@ -3454,7 +3463,7 @@ int RtdImage::autocutCmd(int argc, char* argv[])
 {
     if (!image_ || image_->dataType() == X_IMAGE)
 	return TCL_OK;
-    
+
     if (argc == 2) {
 	if (strcmp(argv[0], "-percent") == 0) {
 	    double percent;
@@ -3462,7 +3471,7 @@ int RtdImage::autocutCmd(int argc, char* argv[])
 		|| percent < 0.0 || percent > 100.0)
 		return TCL_ERROR;
 	    image_->autoSetCutLevels(percent);
-	} 
+	}
 	else {
 	    return error("expected -percent arg for autocut");
 	}
@@ -3484,10 +3493,10 @@ int RtdImage::autocutCmd(int argc, char* argv[])
     // make sure the new lookup table is propagated
     LookupTable lookup = image_->lookup();
     for(int i = 0; i < MAX_VIEWS; i++) {
-	if (view_[i] && view_[i]->image_ && !view_[i]->isSeparateRapidFrame()) 
+	if (view_[i] && view_[i]->image_ && !view_[i]->isSeparateRapidFrame())
 	    view_[i]->image_->lookup(lookup);
     }
-    return updateViews(1) || updateImage(); 
+    return updateViews(1) || updateImage();
 }
 
 
@@ -3526,7 +3535,7 @@ int RtdImage::dispwidthCmd(int argc, char* argv[])
 {
     if (!image_)
 	return set_result(0);
-    
+
     double rw = reqWidth_, rh = reqHeight_;
     doTrans(rw, rh, 1);
     return set_result(rw ? rw : dispWidth());
@@ -3636,7 +3645,7 @@ int RtdImage::objectCmd(int argc, char* argv[])
 
 /*
  * Implement the "type" subcommand - returns the
- * data type of the raw image as a string 
+ * data type of the raw image as a string
  */
 int RtdImage::typeCmd(int argc, char* argv[])
 {
@@ -3644,17 +3653,17 @@ int RtdImage::typeCmd(int argc, char* argv[])
 	return TCL_OK;
 
     switch (image_->dataType()) {
-    case FLOAT_IMAGE: 
+    case FLOAT_IMAGE:
 	return set_result("float");
-    case SHORT_IMAGE: 
+    case SHORT_IMAGE:
 	return set_result("short");
-    case USHORT_IMAGE: 
+    case USHORT_IMAGE:
 	return set_result("ushort");
-    case LONG_IMAGE: 
+    case LONG_IMAGE:
 	return set_result("long");
-    case BYTE_IMAGE: 
+    case BYTE_IMAGE:
 	return set_result("byte");
-    case X_IMAGE: 
+    case X_IMAGE:
 	return set_result("XImage");
     default:
 	break;
@@ -3664,13 +3673,13 @@ int RtdImage::typeCmd(int argc, char* argv[])
 
 
 /*
- * Implement the "update" subcommand 
+ * Implement the "update" subcommand
  *
  * usage:  $image update
  * or:     $image update idletasks
  *
  * With no arguments, just make sure that the image is up to date with
- * the raw data (which may have changed via shared memory).  
+ * the raw data (which may have changed via shared memory).
  *
  * With 1 arg, do the equivalent of the Tk update idletasks command
  * (this one is for use via the remote interface).
@@ -3686,12 +3695,12 @@ int RtdImage::updateCmd(int argc, char* argv[])
 
 
 /*
- * Implement the "alloccolors" subcommand 
+ * Implement the "alloccolors" subcommand
  *
  * usage: alloccolors ?numColors?
  *
- * With no args, return a Tcl list containing the number of 
- * allocated and the number of free colors, 
+ * With no args, return a Tcl list containing the number of
+ * allocated and the number of free colors,
  * with one arg reallocate up to numColors colors.
  */
 int RtdImage::alloccolorsCmd(int argc, char* argv[])
@@ -3701,19 +3710,19 @@ int RtdImage::alloccolorsCmd(int argc, char* argv[])
 	sprintf(buf, "%d %d", colors_->colorCount(), colors_->freeCount());
 	return set_result(buf);
     }
-    
+
     int numColors;
     if (Tcl_GetInt(interp_, argv[0], &numColors) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (colors_->reallocate(numColors)) 
+    if (colors_->reallocate(numColors))
 	return TCL_ERROR;
 
     if (image_) {
 	image_->colorScale(colors_->colorCount(), colors_->pixelval());
-	return updateImage(); 
+	return updateImage();
     }
-    
+
    return TCL_OK;
 }
 
@@ -3722,7 +3731,7 @@ int RtdImage::alloccolorsCmd(int argc, char* argv[])
  * implement the graphdist subcommand to display the distribution
  * of values in the image.
  *
- * usage:  
+ * usage:
  *        pathName graphdist bltGraph bltElem numValues xVector yVector
  *
  *
@@ -3771,7 +3780,7 @@ int RtdImage::graphdistCmd(int argc, char* argv[])
  * usage: <path> get $x $y  coord_type ?nrows ncols?
  *
  * x and y are the coordinates in the image window in the given coordinate
- * system (one of: canvas, image, screen, wcs, deg). 
+ * system (one of: canvas, image, screen, wcs, deg).
  *
  * The return value is a tcl list where each item consists of a list of
  * {X Y Value}, where X and Y are the image coords in the raw image
@@ -3786,13 +3795,13 @@ int RtdImage::getCmd(int argc, char* argv[])
 	return TCL_OK;
 
     double x, y;
-    int nrows = 1, ncols = 1; 
+    int nrows = 1, ncols = 1;
     char buf[80];
 
-    if (convertCoordsStr(0, argv[0], argv[1], NULL, NULL, 
+    if (convertCoordsStr(0, argv[0], argv[1], NULL, NULL,
 			 x, y, argv[2], "image") != TCL_OK)
 	return TCL_ERROR;
-    
+
     if (argc == 5) {
 	if (Tcl_GetInt(interp_, argv[3], &nrows) != TCL_OK ||
 	    Tcl_GetInt(interp_, argv[4], &ncols) != TCL_OK) {
@@ -3803,16 +3812,16 @@ int RtdImage::getCmd(int argc, char* argv[])
     if (nrows == 1 && ncols == 1) {
 	return set_result(image_->getValue(buf, x, y));
     }
-    
+
     int n = nrows/2;
     int m = ncols/2;
     for (int j = -m; j <= m; j++) {
 	Tcl_AppendResult(interp_, " { ", NULL);
 	for (int i = -n; i <= n; i++) {
-	    Tcl_AppendResult(interp_, 
-			     " { ", 
-			     image_->getValue(buf, x+i, y+j), 
-			     " } ", 
+	    Tcl_AppendResult(interp_,
+			     " { ",
+			     image_->getValue(buf, x+i, y+j),
+			     " } ",
 			     NULL);
 	}
 	Tcl_AppendResult(interp_, " } ", NULL);
@@ -3830,7 +3839,7 @@ int RtdImage::getCmd(int argc, char* argv[])
  *
  * The optional format option determines the format of the result:
  *     -format 0 ==> H:M:S [+-]D:M:S Equinox (default)
- *     -format 1 ==> RA DEC Equinox (RA and DEC in degrees) 
+ *     -format 1 ==> RA DEC Equinox (RA and DEC in degrees)
  *
  * The return value is a tcl list, formatted according to the format
  * option, or an empty string if the coordinates are out of range or WCS
@@ -3852,8 +3861,8 @@ int RtdImage::wcscenterCmd(int argc, char* argv[])
     }
 
     // get x and y
-    double x = image_->width()/2., y = image_->height()/2.; 
-    
+    double x = image_->width()/2., y = image_->height()/2.;
+
     // do the conversion and return the result
     switch(format) {
     case 0:
@@ -3933,7 +3942,7 @@ int RtdImage::wcsheightCmd(int argc, char* argv[])
  * 	lassign [$image radecbox $ra $dec $radius] ra0 dec0 ra1 dec1
  *
  * ra and dec are the world coords (h:m:s or decimal deg) and radius is expected in
- * arcmin. 
+ * arcmin.
  *
  * The return value in Tcl is a list of 4 values {ra0 dec0 ra1 dec1} that form a
  * ra,dec box with the given center point and radius
@@ -3947,10 +3956,10 @@ int RtdImage::radecboxCmd(int argc, char* argv[])
     double radius;
     if (Tcl_GetDouble(interp_, argv[2], &radius) != TCL_OK)
 	return TCL_ERROR;
-    
+
     WorldCoords pos1, pos2;
     pos.box(radius, pos1, pos2);
-    
+
     char buf[255];
     ostrstream os(buf, sizeof(buf));
     os << pos1 << ' ' << pos2 << ends;
@@ -3965,7 +3974,7 @@ int RtdImage::radecboxCmd(int argc, char* argv[])
  * usage:
  * 	set equinox [$image wcsequinox]
  *
- * The return value in Tcl is the world coordinate equinox 
+ * The return value in Tcl is the world coordinate equinox
  * for the values of RA and DEC returned by the wcs...
  * commands.
  */
@@ -3991,7 +4000,7 @@ int RtdImage::wcsequinoxCmd(int argc, char* argv[])
  *
  * The arguments are expected in canvas coords (canvasx, canvasy,
  * doubles).
- * The return value in Tcl is the WCS distance in arcsec between 2 
+ * The return value in Tcl is the WCS distance in arcsec between 2
  * points (after transformations).
  */
 int RtdImage::wcsdistCmd(int argc, char* argv[])
@@ -4040,7 +4049,7 @@ int RtdImage::wcsdistCmd(int argc, char* argv[])
  *
  *     <pathName> spectrum <bltGraph> <bltElem> x0 y0 x1 y1 coord_type xVector yVector
  *
- * where: 
+ * where:
  *      x0, y0, x1 and y1 are the end points of a line in the image in the
  *                  given coordinate system (canvas, image, screen, wcs, deg).
  *
@@ -4064,12 +4073,12 @@ int RtdImage::spectrumCmd(int argc, char* argv[])
 
     // convert to image coords
     double rx0, ry0, rx1, ry1;
-    if (convertCoordsStr(0, argv[2], argv[3], NULL, NULL, 
+    if (convertCoordsStr(0, argv[2], argv[3], NULL, NULL,
 			 rx0, ry0, argv[6], "image") != TCL_OK
-	|| convertCoordsStr(0, argv[4], argv[5], NULL, NULL, 
+	|| convertCoordsStr(0, argv[4], argv[5], NULL, NULL,
 			    rx1, ry1, argv[6], "image") != TCL_OK)
 	return TCL_ERROR;
-    
+
     // get distance between endpoints (add a little to be safe)
     int x0 = int(rx0), y0 = int(ry0), x1 = int(rx1), y1 = int(ry1);
     int w = abs(x1-x0) + 1;
@@ -4091,11 +4100,11 @@ int RtdImage::spectrumCmd(int argc, char* argv[])
 
 int RtdImage::motioneventCmd(int argc, char* argv[])
 {
-    if (argc == 0) 
+    if (argc == 0)
 	// return the current values
 	return set_result(saveMotion_);
 
-    if (argc != 1) 
+    if (argc != 1)
         return error("wrong number of args: should be <path> motionevent ?0/1");
     int value;
     if (Tcl_GetInt(interp_, argv[0], &value) != TCL_OK) {
@@ -4111,23 +4120,23 @@ int RtdImage::motioneventCmd(int argc, char* argv[])
  *  usage: <path> scale ?sx sy restFlag?
  *
  * With 2 args scale (zoom) the image by the specified X and Y
- * amount. 
+ * amount.
  *
  * With no args, return the current scaling factors.
  *
  */
 int RtdImage::scaleCmd(int argc, char* argv[])
 {
-    if (!image_)  
+    if (!image_)
 	return TCL_OK;
 
     int xs = image_->xScale() , ys = image_->yScale();
-    if (argc == 0) 
+    if (argc == 0)
 	// return the current values
 	return set_result(xs, ys);
-     
-    
-    if (argc != 2) 
+
+
+    if (argc != 2)
 	return error("wrong number of args: should be <path> scale ?sx sy?");
 
     // set the scale factor:
@@ -4138,19 +4147,19 @@ int RtdImage::scaleCmd(int argc, char* argv[])
 	Tcl_GetInt(interp_, argv[1], &yScale) != TCL_OK) {
 	return error("invalid arguments, expected x and y scale factors");
     }
-    
+
     // check arguments
     if (xScale == -1 || xScale == 0)
 	xScale = 1;
     if (yScale == -1 || yScale == 0)
 	yScale = 1;
-    if ((xScale < 0 && yScale > 0) || (xScale > 0 && yScale < 0)) 
+    if ((xScale < 0 && yScale > 0) || (xScale > 0 && yScale < 0))
 	return error("invalid arguments, expected 2 positive or 2 negative integer values");
 
 #if 0
     // add a check for the Tk limit on canvas coords
-    if (xScale > 0 && xScale * image_->width() > 32767 
-	|| yScale > 0 && yScale * image_->height() > 32767) 
+    if (xScale > 0 && xScale * image_->width() > 32767
+	|| yScale > 0 && yScale * image_->height() > 32767)
 	return error("sorry, can't scale image to this size without exceeding maximum Tk canvas coordinate range");
 #endif
 
@@ -4178,7 +4187,7 @@ int RtdImage::fitsCmd(int argc, char* argv[])
 	if (argc == 1 && image_->header().size()) {
 	    // return a copy of the FITS header, format it in 80 char lines and
 	    // replace any NULL chars with blanks
-	
+
 	    ostrstream os;
 	    image_->getFitsHeader(os);
 	    set_result(os.str());
@@ -4209,13 +4218,13 @@ int RtdImage::fitsCmd(int argc, char* argv[])
  */
 int RtdImage::flipCmd(int argc, char* argv[])
 {
-    if (!image_)  
+    if (!image_)
 	return TCL_OK;
 
     int flipX = 0, flipY = 0, arg = 1;
 
     if (argc == 2) {
-	if (Tcl_GetBoolean(interp_, argv[1], &arg) != TCL_OK) 
+	if (Tcl_GetBoolean(interp_, argv[1], &arg) != TCL_OK)
 	    return TCL_ERROR;
     }
     if (strcmp(argv[0], "x") == 0 || strcmp(argv[0], "X") == 0) {
@@ -4231,7 +4240,7 @@ int RtdImage::flipCmd(int argc, char* argv[])
 	return error("expected: flip, followed by: x, y, xy or none");
 
     // if the image is rotated, it is more intuitive to exchange the X and Y axis
-    if (image_->rotate()) 
+    if (image_->rotate())
 	swap(flipX, flipY);
 
     if (flipX) {
@@ -4244,17 +4253,17 @@ int RtdImage::flipCmd(int argc, char* argv[])
 	if (image_->dataType() == X_IMAGE) {
 	    if (argc == 2)
 		image_->flipY(!arg);
-	    else 
+	    else
 		return set_result(!image_->flipY());
 	}
 	else {
 	    if (argc == 2)
 		image_->flipY(arg);
-	    else 
+	    else
 		return set_result(image_->flipY());
 	}
     }
-    
+
     // update other views
     if (updateViews(1) != TCL_OK)
 	return TCL_ERROR;
@@ -4286,18 +4295,18 @@ int RtdImage::flipCmd(int argc, char* argv[])
  */
 int RtdImage::rotateCmd(int argc, char* argv[])
 {
-    if (!image_)  
+    if (!image_)
 	return TCL_OK;
 
     int angle = 0;
     if (argc == 1) {
 	if (Tcl_GetInt(interp_, argv[0], &angle) != TCL_OK)
-	    return TCL_ERROR;  
+	    return TCL_ERROR;
     }
     else {
 	return set_result(image_->rotate());
     }
-    
+
     image_->rotate(angle != 0);
 
     // update other views
@@ -4330,9 +4339,9 @@ int RtdImage::rotateCmd(int argc, char* argv[])
  */
 int RtdImage::colorscaleCmd(int argc, char* argv[])
 {
-    if (!image_)  
+    if (!image_)
 	return TCL_OK;
-    
+
     if (argc == 0) {
 	switch(image_->colorScaleType()) {
 	case ImageData::LINEAR_SCALE:
@@ -4347,8 +4356,8 @@ int RtdImage::colorscaleCmd(int argc, char* argv[])
 	    return set_result("none");
 	}
     }
-    
-    if (argc != 1) 
+
+    if (argc != 1)
 	return error("wrong number of args: should be <path> colorscale ?scale_type?");
 
     // set the color scale type
@@ -4360,21 +4369,21 @@ int RtdImage::colorscaleCmd(int argc, char* argv[])
 	image_->colorScaleType(ImageData::SQRT_SCALE);
     else if (strcmp(argv[0], "histeq") == 0)
 	image_->colorScaleType(ImageData::HISTEQ_SCALE);
-    else 
-	return fmt_error("unknown color scale algorithm: %s, %s", 
+    else
+	return fmt_error("unknown color scale algorithm: %s, %s",
 			 argv[0], "should be one of: linear, log, sqrt, histeq");
 
     // color scale the image
     image_->colorScale(colors_->colorCount(), colors_->pixelval());
-    
+
     // make sure the image is regenerated
-    return updateImage(); 
+    return updateImage();
 }
 
 
 /*
- * zoom subcommand: 
- * usage: 
+ * zoom subcommand:
+ * usage:
  *     zoom start <frame> <zoomFactor>
  *     zoom stop
  *
@@ -4391,18 +4400,18 @@ int RtdImage::zoomCmd(int argc, char* argv[])
     int status = TCL_OK;
     if (strcmp(argv[0], "start") == 0) {
 	// zoom start subcommand
-	if (argc != 3) 
+	if (argc != 3)
 	    return error("wrong # of args: should be \"pathName zoom start win factor\"");
 
 	int zoomFactor;
 	if (Tcl_GetInt(interp_, argv[2], &zoomFactor) != TCL_OK)
-	    return TCL_ERROR;  
- 
-	if (zoomFactor < 1 || zoomFactor > 10) 
+	    return TCL_ERROR;
+
+	if (zoomFactor < 1 || zoomFactor > 10)
 	    return error("zoomFactor should be between 1 and 10");
 
 	Tk_Window zoomWin = Tk_NameToWindow(interp_, argv[1], tkwin_);
-	if (zoomWin == NULL) 
+	if (zoomWin == NULL)
 	    return TCL_ERROR;
 
 	int width = Tk_Width(zoomWin);
@@ -4411,12 +4420,12 @@ int RtdImage::zoomCmd(int argc, char* argv[])
 	// round off size to be a multiple of the zoom factor
 	width += (zoomFactor - width % zoomFactor);
 	height += (zoomFactor - height % zoomFactor);
-	
+
 	if (zoomer_)
 	    delete zoomer_;
-	zoomer_ = new ImageZoom(zoomWin, gc_, width, height, zoomFactor, 
+	zoomer_ = new ImageZoom(zoomWin, gc_, width, height, zoomFactor,
 				usingXShm_, verbose());
-	
+
 	status = zoomer_->status();
     }
     else if (strcmp(argv[0], "stop") == 0) {
@@ -4443,7 +4452,7 @@ int RtdImage::zoomCmd(int argc, char* argv[])
 	    view_[i]->zoomSpeed_ = zoomSpeed_;
 	}
     }
-	
+
     return TCL_OK;
 }
 
@@ -4452,7 +4461,7 @@ int RtdImage::zoomCmd(int argc, char* argv[])
  * zoomview subcommand: alternative zoom window, using rtdimage view, so that
  * zoom is always accurate, even when image is shrunk.
  *
- * usage: 
+ * usage:
  *     zoomview start <view> <zoomFactor> <propagateScale?> ?count?
  *     zoomview stop ?count?
  *     zoom slow
@@ -4477,25 +4486,25 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
 {
     if (strcmp(argv[0],"start") == 0) {
 	// zoom start subcommand
-	if (argc < 4) 
+	if (argc < 4)
 	    return error("wrong # of args: should be \"pathName zoom start $view $zoomFactor $propagateScale?\"");
 
 	int zoomFactor, propagateScale, count = 1;
-	if (Tcl_GetInt(interp_, argv[2], &zoomFactor) != TCL_OK 
+	if (Tcl_GetInt(interp_, argv[2], &zoomFactor) != TCL_OK
 	    || Tcl_GetInt(interp_, argv[3], &propagateScale) != TCL_OK)
-	    return TCL_ERROR;  
-	
-	if (argc > 4 && Tcl_GetInt(interp_, argv[4], &count) != TCL_OK)
- 	    return TCL_ERROR;  
+	    return TCL_ERROR;
 
-	if (zoomFactor < 1 || zoomFactor > 10) 
+	if (argc > 4 && Tcl_GetInt(interp_, argv[4], &count) != TCL_OK)
+ 	    return TCL_ERROR;
+
+	if (zoomFactor < 1 || zoomFactor > 10)
 	    return error("zoomFactor should be between 1 and 10");
 
 	// allow an optional second zoom view
 	RtdImage*& view = (count == 1) ? zoomView_ : zoomView2_;
 
 	view = getView(argv[1]);
-	if (view == NULL) 
+	if (view == NULL)
 	    return TCL_ERROR;
 	view->propagateScale_ = propagateScale;
 	view->zoomFactor_ = zoomFactor;
@@ -4506,7 +4515,7 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
 	// zoom unset subcommand
 	int count = 1;
 	if (argc > 1 && Tcl_GetInt(interp_, argv[1], &count) != TCL_OK)
- 	    return TCL_ERROR;  
+ 	    return TCL_ERROR;
 	RtdImage*& view = (count == 1) ? zoomView_ : zoomView2_;
 	view = NULL;
     }
@@ -4520,13 +4529,13 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
     }
     else {
 	return error("invalid image zoomview subcommand: should be \"start\", \"stop\", ...");
-    }	
+    }
 
     // tell the other views to use the zoom window too
     // note: the check for displaymode() != 0 is to keep the pan window
     // from using the zoom window, which can be very slow on huge images.
     for(int i = 0; i < MAX_VIEWS; i++) {
-	if (view_[i] && view_[i]->displaymode() != 0) { 
+	if (view_[i] && view_[i]->displaymode() != 0) {
 	    view_[i]->zoomView_ = zoomView_;
 	    view_[i]->zoomView2_ = zoomView2_;
 	    view_[i]->zoomSpeed_ = zoomSpeed_;
@@ -4540,51 +4549,51 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
 	zoomView2_->zoomView_ = NULL;
 	zoomView2_->zoomView2_ = NULL;
     }
-	
+
     return TCL_OK;
 }
 
 
 /*
- * pan subcommand: 
+ * pan subcommand:
  *
- * usage: 
+ * usage:
  *     pan start <tclCommand> <shrinkFactor>
  *     pan stop
  *     pan update
  *
  * start - arrange to have a tcl command evaluated whenever the image size changes
- *     (due to scaling or loading a new image) or whenever the image position has 
+ *     (due to scaling or loading a new image) or whenever the image position has
  *     changed (due to scrolling)
  *
- * pan stop - stop evaluating the tcl command... 
+ * pan stop - stop evaluating the tcl command...
  *
  * pan upadte - force an update of the pan window (normally done whenever
  *              image size or position changes)
  *
- * The tclCommand will be called with 5 arguments: x1 y1 x2 y2, which are the coords 
+ * The tclCommand will be called with 5 arguments: x1 y1 x2 y2, which are the coords
  * of the visible part of  the image, scaled by the given shrinkFactor, and a flag
- * indicating whether the image is new (1) or an update of the existing image (0). 
+ * indicating whether the image is new (1) or an update of the existing image (0).
  * This can be used to draw the panning rectangle on the panning image.
  */
 int RtdImage::panCmd(int argc, char* argv[])
 {
     if (strcmp(argv[0],"start") == 0) {
 	// pan start subcommand
-	if (argc != 3) 
+	if (argc != 3)
 	    return error("wrong # of args: should be \"pathName pan start tclCommand shrinkFactor\"");
-	
+
 	if (panCommand_)
 	    free(panCommand_);
 	panCommand_ = strdup(argv[1]);
 
 	if (Tcl_GetInt(interp_, argv[2], &panFactor_) != TCL_OK)
-	    return TCL_ERROR;  
- 
-	if (panFactor_ > -2 && panFactor_ != 1 && panFactor_ != -1) 
+	    return TCL_ERROR;
+
+	if (panFactor_ > -2 && panFactor_ != 1 && panFactor_ != -1)
 	    return error("pan shrinkFactor should be -2 for 1/2 size, -3 for 1/3, etc. or 1");
 
-	if (panFactor_ == 1) 
+	if (panFactor_ == 1)
 	    panFactor_ = -1;	// for calculations, should be negative
 
 	// cause panning window to be reset
@@ -4607,13 +4616,13 @@ int RtdImage::panCmd(int argc, char* argv[])
    }
     else {
 	return error("invalid image pan subcommand: should be \"start\" or \"stop\"");
-    }	
+    }
     return TCL_OK;
 }
 
 /*
  * The following function is called when the interactive performance testing
- * is enabled or disabled. It sets the required flag, and resets the variables 
+ * is enabled or disabled. It sets the required flag, and resets the variables
  * if required.
  *
  * Usage:
@@ -4664,15 +4673,15 @@ int RtdImage::perfTestCmd(int argc, char *argv[])
 
 /*
  * view subcommand: specify a viewing image to view the same
- * image, possibly at a different size. 
+ * image, possibly at a different size.
  *
- * The new view will share data with the original and be updated 
+ * The new view will share data with the original and be updated
  * when the original is updated.
  *
- * This can be used, for example, to build a panning window 
+ * This can be used, for example, to build a panning window
  * or a rapid frame.
  *
- * usage: 
+ * usage:
  *     view add    <path> ?propagateScale? ?rapidFrame?
  *     view remove <path>
  *     view update <path> xOffset yOffset width height frameX frameY rapidX rapidY coordType
@@ -4690,10 +4699,10 @@ int RtdImage::perfTestCmd(int argc, char *argv[])
  * 	    view (this is the default behavior). If "rapidFrame" is specified
  *          as true, then the view is treated as a rapid frame and is only updated
  *          from image events and not from the main image.
- *  
+ *
  * remove - removes the view
  *
- * update - updates the frame from this image with the given sizes and offsets: 
+ * update - updates the frame from this image with the given sizes and offsets:
  *
  *          xOffset, yOffset - X,Y offset of image frame in image canvas
  *          width, height    - dimensions of image
@@ -4722,16 +4731,16 @@ int RtdImage::viewCmd(int argc, char* argv[])
 	    double width, height;
 	    char* from_type = argv[4];
 	    char* to_type = "image";
-	    if (convertCoordsStr(1, argv[2], argv[3], NULL, NULL, width, height, 
-				 from_type, to_type) != TCL_OK) 
+	    if (convertCoordsStr(1, argv[2], argv[3], NULL, NULL, width, height,
+				 from_type, to_type) != TCL_OK)
 		return TCL_ERROR;
 
 	    // add 1 so that there is no space left at right and bottom
 	    // when only a partial zoomed pixel is displayed on the left or top
-	    view->reqWidth_ = width+1;  
-	    view->reqHeight_ = height+1; 
+	    view->reqWidth_ = width+1;
+	    view->reqHeight_ = height+1;
 	    return view->updateView(image_, 1);
-	} 
+	}
 	else if (argc != 11)
 	    return error("usage: $image view update $view xOffset yOffset ",
 			 "width height frameX frameY rapidX rapidY coordType");
@@ -4740,22 +4749,22 @@ int RtdImage::viewCmd(int argc, char* argv[])
 	double xOffset, yOffset, width, height, frameX, frameY, rapidX, rapidY;
 	char* from_type = argv[10];
 	char* to_type = "image";
-	if (convertCoordsStr(1, argv[2], argv[3], NULL, NULL, xOffset, yOffset, 
+	if (convertCoordsStr(1, argv[2], argv[3], NULL, NULL, xOffset, yOffset,
 			     from_type, to_type) != TCL_OK
-	    || convertCoordsStr(1, argv[4], argv[5], NULL, NULL, width, height, 
+	    || convertCoordsStr(1, argv[4], argv[5], NULL, NULL, width, height,
 				from_type, to_type) != TCL_OK
-	    || convertCoordsStr(1, argv[6], argv[7], NULL, NULL, frameX, frameY, 
-				from_type, to_type) != TCL_OK 
-	    || convertCoordsStr(1, argv[8], argv[9], NULL, NULL, rapidX, rapidY, 
-				from_type, to_type) != TCL_OK) 
+	    || convertCoordsStr(1, argv[6], argv[7], NULL, NULL, frameX, frameY,
+				from_type, to_type) != TCL_OK
+	    || convertCoordsStr(1, argv[8], argv[9], NULL, NULL, rapidX, rapidY,
+				from_type, to_type) != TCL_OK)
 	    return TCL_ERROR;
 #ifdef DEBUG
-	if (verbose()) 
-	    printf("update %s from %s: xyOffset(%g,%g), size(%g,%g), frame(%g,%g), rapid(%g,%g)\n", 
-		   view->name(), name(), xOffset, yOffset, width, height, frameX, frameY, 
+	if (verbose())
+	    printf("update %s from %s: xyOffset(%g,%g), size(%g,%g), frame(%g,%g), rapid(%g,%g)\n",
+		   view->name(), name(), xOffset, yOffset, width, height, frameX, frameY,
 		   rapidX, rapidY);
 #endif
-	
+
 	view->xOffset_ = xOffset;
 	view->yOffset_ = yOffset;
 	// add 1 so that there is no space left at right and bottom
@@ -4772,11 +4781,11 @@ int RtdImage::viewCmd(int argc, char* argv[])
 	// add the view to the list
 	int propagateScale = 1, rapidFrame = 0;
 	if (argc >= 3) {
-	    if (Tcl_GetBoolean(interp_, argv[2], &propagateScale) != TCL_OK) 
+	    if (Tcl_GetBoolean(interp_, argv[2], &propagateScale) != TCL_OK)
 		return TCL_ERROR;
 	}
 	if (argc >= 4) {
-	    if (Tcl_GetBoolean(interp_, argv[3], &rapidFrame) != TCL_OK) 
+	    if (Tcl_GetBoolean(interp_, argv[3], &rapidFrame) != TCL_OK)
 		return TCL_ERROR;
 	}
 	// allow the zoom window to be updated from the new view also
@@ -4795,7 +4804,7 @@ int RtdImage::viewCmd(int argc, char* argv[])
 
 	// we only need one event handler per window
 	if (view->tkwin_ == tkwin_) {
-	    Tk_DeleteEventHandler(tkwin_, ButtonMotionMask|StructureNotifyMask, 
+	    Tk_DeleteEventHandler(tkwin_, ButtonMotionMask|StructureNotifyMask,
 				  eventProc, (ClientData)view);
 	}
 
@@ -4812,7 +4821,7 @@ int RtdImage::viewCmd(int argc, char* argv[])
     }
     else {
 	return error("invalid rtdimage view subcommand");
-    }	
+    }
     return TCL_OK;
 }
 
@@ -4833,8 +4842,8 @@ int RtdImage::frameidCmd(int argc, char* argv[])
  */
 int RtdImage::colorrampCmd(int argc, char* argv[])
 {
-    int w = Tk_Width(tkwin_); 
-    int h = Tk_Height(tkwin_); 
+    int w = Tk_Width(tkwin_);
+    int h = Tk_Height(tkwin_);
     if (w == 1 && h == 1)
 	return TCL_OK; // wait for resize event on image window
 
@@ -4896,8 +4905,8 @@ int RtdImage::dumpCmd(int argc, char* argv[])
 }
 
 
-/* 
- * local utility to format a floting point value in arcsec 
+/*
+ * local utility to format a floting point value in arcsec
  * as minutes and seconds
  */
 static void formatHM(double val, char* buf)
@@ -4929,7 +4938,7 @@ static void formatHM(double val, char* buf)
  * redone here for better performance. The canvas tags used correspond to
  * items created in the itcl class RtdImageMBand:
  *
- * 	mband               all items         
+ * 	mband               all items
  * 	mband_line          diagonal line
  * 	mband_angle         angle line (horiz. and vert.)
  *
@@ -4958,12 +4967,12 @@ int RtdImage::mbandCmd(int argc, char* argv[])
 
     // get args
     double x0, y0, x1, y1;
-    int show_angle; 
+    int show_angle;
     char* from_type = argv[4];
     char* to_type = "canvas";
     char buf[1024];
 
-    if (Tcl_GetInt(interp_, argv[5], &show_angle) != TCL_OK) 
+    if (Tcl_GetInt(interp_, argv[5], &show_angle) != TCL_OK)
 	return TCL_OK;
 
     // convert to canvas coords
@@ -4973,9 +4982,9 @@ int RtdImage::mbandCmd(int argc, char* argv[])
     }
 
     // clip to image bounds
-    double ix0 = 1, 
-	   iy0 = 1, 
-	   ix1 = image_->width()-1, 
+    double ix0 = 1,
+	   iy0 = 1,
+	   ix1 = image_->width()-1,
 	   iy1 = image_->height()-1;
     if (imageToCanvasCoords(ix0, iy0, 0) != TCL_OK
 	|| imageToCanvasCoords(ix1, iy1, 0) != TCL_OK)
@@ -4984,14 +4993,14 @@ int RtdImage::mbandCmd(int argc, char* argv[])
     clip(x1, ix0, ix1);
     clip(y0, iy0, iy1);
     clip(y1, iy0, iy1);
-    
+
     // note: wcs coords are not linear, so we need all 3 points in wcs
     double ra0 = x0, dec0 = y0, ra1 = x1, dec1 = y1, ra2 = x1, dec2 = y0;
     if (canvasToWorldCoords(ra0, dec0, 0) != TCL_OK
 	|| canvasToWorldCoords(ra1, dec1, 0) != TCL_OK
 	|| canvasToWorldCoords(ra2, dec2, 0) != TCL_OK)
 	return TCL_OK;
-   
+
     // get distances in world coords
     double width, height, dist = WorldCoords::dist(ra0, dec0, ra1, dec1)*60.;
     char widthStr[32], heightStr[32], distStr[32];
@@ -5002,7 +5011,7 @@ int RtdImage::mbandCmd(int argc, char* argv[])
  	height = WorldCoords::dist(ra2, dec2, ra1, dec1)*60;
  	formatHM(height, heightStr);
     }
-	
+
     // calculate canvas coords for lines and labels and
     // try to keep the labels out of the way so they don't block anything
     double mx = (x0 + x1)/2;
@@ -5017,21 +5026,21 @@ int RtdImage::mbandCmd(int argc, char* argv[])
 	diag_yoffset = 0,
 	width_yoffset = 0,
 	height_xoffset = 0;
-	
+
     if (fabs(y0 - y1) < 5) {
 	diag_anchor = "s";
 	diag_yoffset = offset;
 	show_angle = 0;
-    } 
+    }
     else if (y0 < y1) {
 	width_anchor = "s";
 	width_yoffset = -offset;
-    } 
+    }
     else {
 	width_anchor = "n";
 	width_yoffset = offset;
     }
-  
+
     if (fabs(x0 - x1) < 5) {
 	diag_anchor  = "w";
 	diag_xoffset = offset;
@@ -5043,7 +5052,7 @@ int RtdImage::mbandCmd(int argc, char* argv[])
 	diag_yoffset = offset;
 	height_anchor = "w";
 	height_xoffset = offset;
-    } 
+    }
     else {
 	diag_anchor = "nw";
 	diag_xoffset = offset;
@@ -5056,16 +5065,16 @@ int RtdImage::mbandCmd(int argc, char* argv[])
     const char* canvas = canvasName_;
 
     // set diagonal line coords
-    sprintf(buf, "%s coords mband_line %g %g %g %g\n", 
+    sprintf(buf, "%s coords mband_line %g %g %g %g\n",
 	      canvas, x0, y0, x1, y1);
     Tcl_Eval(interp_, buf);
 
     // adjust labels
-    sprintf(buf, "%s coords mband_diag_text %g %g\n", 
+    sprintf(buf, "%s coords mband_diag_text %g %g\n",
 	      canvas, mx+diag_xoffset, my+diag_yoffset);
     Tcl_Eval(interp_, buf);
 
-    sprintf(buf, "%s itemconfig mband_diag_text -text %s -anchor %s\n", 
+    sprintf(buf, "%s itemconfig mband_diag_text -text %s -anchor %s\n",
 	    canvas, distStr, diag_anchor);
     Tcl_Eval(interp_, buf);
 
@@ -5073,19 +5082,19 @@ int RtdImage::mbandCmd(int argc, char* argv[])
     Tcl_Eval(interp_, buf);
 
     double rx0, ry0, rx1, ry1;
-    if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4) 
+    if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
 	return TCL_OK;
 
-    sprintf(buf, "%s coords mband_diag_rect %g %g %g %g\n", 
+    sprintf(buf, "%s coords mband_diag_rect %g %g %g %g\n",
 	      canvas,  rx0, ry0, rx1, ry1);
     Tcl_Eval(interp_, buf);
 
     if (show_angle) {
 	// set angle line coords
-	sprintf(buf, "%s coords mband_angle %g %g %g %g %g %g\n", 
+	sprintf(buf, "%s coords mband_angle %g %g %g %g %g %g\n",
 		  canvas, x0, y0, x1, y0, x1, y1);
 	Tcl_Eval(interp_, buf);
-    
+
 	sprintf(buf, "%s coords mband_width_text %g %g\n",
 		  canvas, mx, y0+width_yoffset);
 	Tcl_Eval(interp_, buf);
@@ -5097,9 +5106,9 @@ int RtdImage::mbandCmd(int argc, char* argv[])
 	sprintf(buf, "%s bbox mband_width_text\n", canvas);
 	Tcl_Eval(interp_, buf);
 
-	if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4) 
+	if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
 	    return TCL_OK;
-	sprintf(buf, "%s coords mband_width_rect %g %g %g %g\n", 
+	sprintf(buf, "%s coords mband_width_rect %g %g %g %g\n",
 		  canvas,  rx0, ry0, rx1, ry1);
 	Tcl_Eval(interp_, buf);
 
@@ -5114,12 +5123,12 @@ int RtdImage::mbandCmd(int argc, char* argv[])
 	sprintf(buf, "%s bbox mband_height_text\n", canvas);
 	Tcl_Eval(interp_, buf);
 
-	if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4) 
+	if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
 	    return TCL_OK;
-	sprintf(buf, "%s coords mband_height_rect %g %g %g %g\n", 
+	sprintf(buf, "%s coords mband_height_rect %g %g %g %g\n",
 		  canvas,  rx0, ry0, rx1, ry1);
 	Tcl_Eval(interp_, buf);
-    } 
+    }
     else {
 	// hide the width and height labels and lines
 	    x1 = x0 + 1;
@@ -5169,7 +5178,7 @@ int RtdImage::warpCmd(int argc, char* argv[])
  *        $image pixtab stop
  *
  * All this commmand does is set a flag causing Tcl array variables
- * to be updated on motion events, which can cause the display to be 
+ * to be updated on motion events, which can cause the display to be
  * updated via the "-textvariable" widget option on the table items.
  *
  * The array name is fixed as: RtdPixTab and the elements are indexed as
@@ -5207,7 +5216,7 @@ int RtdImage::pixtabCmd(int argc, char* argv[])
 	// generate an array of pixel values with left and right headings
 	// for the x/y coordinates
 	pixTab_ = new double[++nrows*++ncols];
-	if (pixTab_) 
+	if (pixTab_)
 	    memset((void*)pixTab_, '\0', nrows*ncols*sizeof(double));
     }
     else if (strcmp(argv[0], "stop") == 0) {
@@ -5233,7 +5242,7 @@ int RtdImage::pixtabCmd(int argc, char* argv[])
  * chosen.
  *
  * If no port number is specified, the current port number is returned,
- * or "" if there is none. This is a way to determine the port number 
+ * or "" if there is none. This is a way to determine the port number
  * at the Tcl level.
  */
 int RtdImage::remoteCmd(int argc, char* argv[])
@@ -5249,12 +5258,12 @@ int RtdImage::remoteCmd(int argc, char* argv[])
 
     if (Tcl_GetInt(interp_, argv[0], &port) == TCL_ERROR)
 	return TCL_ERROR;
-    
+
     if (remote_)
 	delete remote_;
 
     remote_ = new RtdImageRemote(this, port);
-    if (remote_) 
+    if (remote_)
 	return remote_->status();
 
     return TCL_ERROR;
@@ -5278,7 +5287,7 @@ int RtdImage::remoteTclCmd(int argc, char* argv[])
  * implement the "convert" subcommand to convert between different
  * coordinate representations.
  *
- * usage: 
+ * usage:
  *     $image convert coords inx iny input_coord_type outx outy output_coord_type
  *     $image convert dist inx iny input_coord_type outx outy output_coord_type
  *
@@ -5322,23 +5331,23 @@ int RtdImage::convertCmd(int argc, char* argv[])
     char* outy_name = argv[5];
 
     // if no variable names are specified, return the values as a list
-    if (strlen(outx_name) == 0) 
+    if (strlen(outx_name) == 0)
 	outx_name = NULL;
-    if (strlen(outy_name) == 0) 
+    if (strlen(outy_name) == 0)
 	outy_name = NULL;
-    
+
     double x, y;
-    if (convertCoordsStr(dist_flag, argv[1], argv[2], outx_buf, outy_buf, 
+    if (convertCoordsStr(dist_flag, argv[1], argv[2], outx_buf, outy_buf,
 			 x, y, argv[3], argv[6]) != TCL_OK)
 	return TCL_ERROR;
 
     Tcl_ResetResult(interp_);
-    if (outx_name) 
+    if (outx_name)
 	Tcl_SetVar(interp_, outx_name, outx_buf, 0);
     else
 	Tcl_AppendElement(interp_, outx_buf);
 
-    if (outy_name) 
+    if (outy_name)
 	Tcl_SetVar(interp_, outy_name, outy_buf, 0);
     else
 	Tcl_AppendElement(interp_, outy_buf);
@@ -5401,13 +5410,13 @@ int RtdImage::convertCmd(int argc, char* argv[])
 int RtdImage::mmapCmd(int argc, char* argv[])
 {
     char* msg = "invalid arguments for mmap subcommand";
-    
+
     // this is used to keep track of memory areas for the "create" and
     // "delete" subcommands here
     static Mem* mem_areas[10];
     const int max_mem_areas = sizeof(mem_areas)/sizeof(Mem*);
 
-    if (strcmp(argv[0], "set") == 0) { // $image mmap set ... 
+    if (strcmp(argv[0], "set") == 0) { // $image mmap set ...
 	if (argc != 4 && argc != 7)
 	    return error(msg);
 
@@ -5419,7 +5428,7 @@ int RtdImage::mmapCmd(int argc, char* argv[])
 	if (Tcl_GetInt(interp_, argv[2], &data_offset) == TCL_ERROR
 	    || Tcl_GetBoolean(interp_, argv[3], &data_owner) == TCL_ERROR)
 	    return TCL_ERROR;
-	
+
 	if (argc == 7) {
 	    header_filename = argv[4];
 	    if (Tcl_GetInt(interp_, argv[5], &header_offset) == TCL_ERROR
@@ -5442,7 +5451,7 @@ int RtdImage::mmapCmd(int argc, char* argv[])
 	    if (data.length() < image_->data().length())
 		return error("mmap data file is to small for current image header");
 	    header = image_->header();
-	} 
+	}
 	else {
 	    header = Mem(header_filename, verbose());
 	    if (header.status() != 0)
@@ -5455,10 +5464,10 @@ int RtdImage::mmapCmd(int argc, char* argv[])
 
 	// used to save and restore image transformation parameters
 	ImageDataParams p;
-    
+
 	if (image_) {
 	    image_->saveParams(p);
-	    delete image_; 
+	    delete image_;
 	    image_ = NULL;
 	    updateViews();
 	}
@@ -5501,7 +5510,7 @@ int RtdImage::mmapCmd(int argc, char* argv[])
 	return updateImage();
     }
     else  if (strcmp(argv[0], "create") == 0) {
-	if (argc != 3) 
+	if (argc != 3)
 	    return error(msg);
 	char* filename = argv[1];
 	int size = 0;
@@ -5520,7 +5529,7 @@ int RtdImage::mmapCmd(int argc, char* argv[])
 	return error("too many mmap files for 'mmap create' subcommand");
     }
     else  if (strcmp(argv[0], "delete") == 0) {
-	if (argc != 2) 
+	if (argc != 2)
 	    return error(msg);
 	char* filename = argv[1];
 	for (int i = 0; i<max_mem_areas; i++) {
@@ -5581,7 +5590,7 @@ int RtdImage::mmapCmd(int argc, char* argv[])
 int RtdImage::shmCmd(int argc, char* argv[])
 {
     char* msg = "invalid arguments for shm subcommand";
-    
+
     // this is used to keep track of memory areas for the "create" and
     // "delete" subcommands here
     static Mem* mem_areas[10];
@@ -5598,7 +5607,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
 	    || Tcl_GetInt(interp_, argv[2], &data_id) == TCL_ERROR
 	    || Tcl_GetBoolean(interp_, argv[3], &data_owner) == TCL_ERROR)
 	    return TCL_ERROR;
-	
+
 	if (argc == 7) {
 	    if (Tcl_GetInt(interp_, argv[4], &header_size) == TCL_ERROR
 		|| Tcl_GetInt(interp_, argv[5], &header_id) == TCL_ERROR
@@ -5617,7 +5626,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
 	    if (data_size < image_->data().length())
 		return error("shared memory area is to small for current image");
 	    header = image_->header();
-	} 
+	}
 	else {
 	    header = Mem(header_size, header_id, header_owner, verbose());
 	}
@@ -5626,10 +5635,10 @@ int RtdImage::shmCmd(int argc, char* argv[])
 
 	// used to save and restore image transformation parameters
 	ImageDataParams p;
-    
+
 	if (image_) {
 	    image_->saveParams(p);
-	    delete image_; 
+	    delete image_;
 	    image_ = NULL;
 	    updateViews();
 	}
@@ -5643,7 +5652,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
 	image_->restoreParams(p, !autoSetCutLevels_);
 
 	return initNewImage();
-	
+
     }
     else  if (strcmp(argv[0], "get") == 0) {
 	if (argc != 2)
@@ -5668,7 +5677,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
 	return updateImage();
     }
     else  if (strcmp(argv[0], "create") == 0) {
-	if (argc != 2) 
+	if (argc != 2)
 	    return error(msg);
 	int size = 0;
 	if (Tcl_GetInt(interp_, argv[1], &size) == TCL_ERROR)
@@ -5686,7 +5695,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
 	return error("too many shared memory areas for 'shm create' subcommand");
     }
     else  if (strcmp(argv[0], "delete") == 0) {
-	if (argc != 2) 
+	if (argc != 2)
 	    return error(msg);
 	int shmId = -1;
 	if (Tcl_GetInt(interp_, argv[1], &shmId) == TCL_ERROR)
@@ -5713,7 +5722,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
  *
  * usage:  set list [$image statistics]
  *
- * The return value in Tcl is a list of the following values: 
+ * The return value in Tcl is a list of the following values:
  *
  * {x y ra dec equinox fwhmX fwhmY angle objectPeak meanBackground}
  *
@@ -5722,7 +5731,7 @@ int RtdImage::shmCmd(int argc, char* argv[])
  * x              = X image coordinate
  * y              = Y image coordinate
  * ra             = RA position (calculated from mean X pos)
- * dec            = DEC position (calculated from mean Y position) 
+ * dec            = DEC position (calculated from mean Y position)
  * equinox        = equinox of RA and DEC
  * fwhmX          = FWHM in X
  * fwhmY          = FWHM in Y
@@ -5757,8 +5766,8 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
     }
 
     distToCoords(x, y); // get coords from offsets
-    
-    double meanX=0., meanY=0., fwhmX=0., fwhmY=0., angle=0., 
+
+    double meanX=0., meanY=0., fwhmX=0., fwhmY=0., angle=0.,
 	objectPeak=0., meanBackground=0.;
 
     if (image_->getStatistics(x, y, int(w), int(h), meanX, meanY, fwhmX, fwhmY,
@@ -5772,7 +5781,7 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
     x += meanX;
     y +=  meanY;
     double ix = x, iy = y;
-    
+
     // get the world coords position from the image coords
     WorldCoords pos;
     if (imageToWorldCoords(x, y, 0) == TCL_OK) {
@@ -5784,14 +5793,14 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
     char buf[1024];
     ostrstream os(buf, sizeof(buf));
     os << ix << ' ' << iy << ' ';
-    
+
     if (pos.status() == 0 && ! pos.isNull())
 	os << pos << " J2000 ";	// ra, dec, equinox: XXX use default equinox ?
-    else 
+    else
 	os << "{} {} {} ";	// no world coords
 
-    os << fwhmX << ' ' << fwhmY << ' ' << angle << ' ' 
-       << objectPeak << ' ' << meanBackground 
+    os << fwhmX << ' ' << fwhmY << ' ' << angle << ' '
+       << objectPeak << ' ' << meanBackground
        << ends;
 
     return set_result(buf);
@@ -5799,11 +5808,11 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
 
 
 /*
- * wcsset subcommand: 
+ * wcsset subcommand:
  *
  * usage:
  *
- *    $image wcsset $ra $dec $secpix $xrefpix $yrefpix $nxpix $nypix $rotate \ 
+ *    $image wcsset $ra $dec $secpix $xrefpix $yrefpix $nxpix $nypix $rotate \
  *                  $equinox $epoch $proj
  *    $image wcsset
  *
@@ -5811,17 +5820,17 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
  * from the given information about the image:
  *
  *    Args:
- * 	ra      = Center right ascension in degrees 
- * 	dec     = Center declination in degrees 
- * 	secpix  = Number of arcseconds per pixel 
+ * 	ra      = Center right ascension in degrees
+ * 	dec     = Center declination in degrees
+ * 	secpix  = Number of arcseconds per pixel
  *      xrefpix = Reference pixel X coordinate
  *      yrefpix	= Reference pixel Y coordinate
- * 	nxpix   = Number of pixels along x-axis 
- * 	nypix   = Number of pixels along y-axis 
- * 	rotate  = Rotation angle (clockwise positive) in degrees 
- * 	equinox = Equinox of coordinates, 1950 and 2000 supported 
- * 	epoch   = Epoch of coordinates, used for FK4/FK5 conversion no effect if 0 
- *      proj    = Projection 
+ * 	nxpix   = Number of pixels along x-axis
+ * 	nypix   = Number of pixels along y-axis
+ * 	rotate  = Rotation angle (clockwise positive) in degrees
+ * 	equinox = Equinox of coordinates, 1950 and 2000 supported
+ * 	epoch   = Epoch of coordinates, used for FK4/FK5 conversion no effect if 0
+ *      proj    = Projection
  *
  * With no arguments, the command returns a list of the basic WCS
  * parameter values: {ra dec secpix nxpix nypix rotate equinox epoch}.
@@ -5840,28 +5849,28 @@ int RtdImage::wcssetCmd(int argc, char* argv[])
 	// no args, return list of values
 	char buf[256];
 	if (wcs.isWcs()) {
-	    
+
 	    // get RA and DEC of the center of the image
 	    char raStr[32], decStr[32];
 	    raStr[0] = decStr[0] = '\0';
 	    WorldCoords pos = wcs.center();
-	    if (pos.status() != 0) 
+	    if (pos.status() != 0)
 		return TCL_ERROR;
 	    pos.print(raStr, decStr, wcs.equinox());
 
 	    // make the result list
-	    sprintf(buf, "%s %s %g %g %g %d %d %g %g %g %s", 
-		    raStr, decStr, wcs.secPix(), 
+	    sprintf(buf, "%s %s %g %g %g %d %d %g %g %g %s",
+		    raStr, decStr, wcs.secPix(),
 		    wcs.xRefPix(), wcs.yRefPix(),
-		    wcs.pixWidth(), wcs.pixHeight(), 
-		    wcs.rotate(), 
+		    wcs.pixWidth(), wcs.pixHeight(),
+		    wcs.rotate(),
 		    wcs.equinox(), wcs.epoch(),
 		    wcs.projection());
 	    return set_result(buf);
 	}
 	else {
 	    // no WCS, return default info
-	    sprintf(buf, "{} {} {} {} {} %d %d 0 2000 2000 {}", 
+	    sprintf(buf, "{} {} {} {} {} %d %d 0 2000 2000 {}",
 		    image_->width(), image_->height());
 	    return set_result(buf);
 	}
@@ -5888,7 +5897,7 @@ int RtdImage::wcssetCmd(int argc, char* argv[])
 	if (pos.status() != 0)
 	    return TCL_ERROR;
 	pos.get(ra, dec, equinox); // get ra and dec in the right equinox
-	
+
 	// set WCS info
 	if (Tcl_GetDouble(interp_, argv[2], &secpix) != TCL_OK
 	    || Tcl_GetDouble(interp_, argv[3], &xrefpix) != TCL_OK
@@ -5896,11 +5905,11 @@ int RtdImage::wcssetCmd(int argc, char* argv[])
 	    || Tcl_GetInt(interp_, argv[5], &nxpix) != TCL_OK
 	    || Tcl_GetInt(interp_, argv[6], &nypix) != TCL_OK
 	    || Tcl_GetDouble(interp_, argv[7], &rotate) != TCL_OK
-	    || Tcl_GetDouble(interp_, argv[9], &epoch) != TCL_OK) 
+	    || Tcl_GetDouble(interp_, argv[9], &epoch) != TCL_OK)
 	    return TCL_ERROR;
 
 	proj = argv[10];
-	return wcs.set(ra, dec, secpix, xrefpix, yrefpix, nxpix, nypix, rotate, 
+	return wcs.set(ra, dec, secpix, xrefpix, yrefpix, nxpix, nypix, rotate,
 		       int(equinox), epoch, proj);
     }
     return error("wrong number of arguments for wcsset subcommand");
@@ -5914,10 +5923,10 @@ int RtdImage::wcssetCmd(int argc, char* argv[])
  *    $image wcsshift $ra $dec $coorsys
  *
  * This command resets the center of the WCS structure.
- * 
+ *
  *    Args:
- * 	ra        = New center right ascension in degrees 
- * 	dec       = New center declination in degrees 
+ * 	ra        = New center right ascension in degrees
+ * 	dec       = New center declination in degrees
  * 	equinox   = (must be 2000 or 1950)
  *
  */
@@ -5927,9 +5936,9 @@ int RtdImage::wcsshiftCmd(int argc, char* argv[])
 	return TCL_OK;
 
     double ra, dec, equinox;
-    if (Tcl_GetDouble(interp_, argv[0], &ra) != TCL_OK 
+    if (Tcl_GetDouble(interp_, argv[0], &ra) != TCL_OK
 	|| Tcl_GetDouble(interp_, argv[1], &dec) != TCL_OK
-	|| Tcl_GetDouble(interp_, argv[2], &equinox) != TCL_OK) 
+	|| Tcl_GetDouble(interp_, argv[2], &equinox) != TCL_OK)
 	return TCL_ERROR;
     return image_->wcs().shift(ra, dec, equinox);
 }
@@ -5956,11 +5965,11 @@ int RtdImage::colorUpdate( int force )
     }
     return TCL_OK;
 }
-    
+
 
 // RtdImage signal handler
 
-void RtdImage_cleanup(int sig) 
+void RtdImage_cleanup(int sig)
 {
     Mem_RPTcleanup();    // cleanup shm of Rtd Recorder/Playback tool
     Mem_cleanup(sig);    // cleanup shm of RtdImage and exit
