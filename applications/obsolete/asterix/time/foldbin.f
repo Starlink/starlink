@@ -52,6 +52,7 @@
 *                       different function (DJA)
 *     30 Mar 93: V1.7-1 Updated by someone (not me!) (DJA)
 *     17 Aug 93: V1.7-2 Trivial changes to ARR_REG routines (DJA)
+*     18 Apr 95 : V1.8-0 Updated data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -60,9 +61,8 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -75,10 +75,6 @@
 *
 *    Local variables :
 *
-      CHARACTER          ILOC*(DAT__SZLOC)      ! Input object locator
-      CHARACTER          FLOC*(DAT__SZLOC)      ! Folded data object locator
-      CHARACTER          HEADER*(DAT__SZLOC)    ! Locator to HEADER
-
       CHARACTER*132      HTXT(MAXHTXT)          ! History text
       CHARACTER*80       UNITS                  ! Value of AXIS(1) UNITS.
 
@@ -91,6 +87,9 @@
       REAL               CHISQ                  ! Chi-squared fit to constant
                                                 ! level (i.e.phase indept.)
 
+      INTEGER			FFID			! Folded dataset id
+      INTEGER			IFID			! Input dataset id
+      INTEGER			TIMID			! Timing info
       INTEGER            HLEN                   ! Length of a history string
       INTEGER            I                      ! Dummy variable for loops.
       INTEGER            N
@@ -102,11 +101,11 @@
       INTEGER            NELM2
       INTEGER            NACTDIM                ! Dimensionality of data
       INTEGER            VNDIM                  ! Dimensions of variance
-      INTEGER            VDIMS(DAT__MXDIM)      ! size of variance
-      INTEGER            VDIM(DAT__MXDIM)
+      INTEGER            VDIMS(ADI__MXDIM)      ! size of variance
+      INTEGER            VDIM(ADI__MXDIM)
       INTEGER            QNDIM                  ! dimensions of quality
-      INTEGER            QDIMS(DAT__MXDIM)      ! size of quality
-      INTEGER            QDIM(DAT__MXDIM)
+      INTEGER            QDIMS(ADI__MXDIM)      ! size of quality
+      INTEGER            QDIM(ADI__MXDIM)
       INTEGER            DPTR                   ! Pointer to data array
       INTEGER            XPTR                   ! Pointer to axis data
       INTEGER            XWPTR                  ! Pointer to width data
@@ -126,9 +125,9 @@
       INTEGER            YBARPTR
       INTEGER            SUMPTR
       INTEGER            NDOF                   ! No. of d.o.f. for chi-squared
-      INTEGER            IDIM(DAT__MXDIM)       ! Size of each dimension
-      INTEGER            ODIM(DAT__MXDIM)
-      INTEGER            OAX(DAT__MXDIM)
+      INTEGER            IDIM(ADI__MXDIM)       ! Size of each dimension
+      INTEGER            ODIM(ADI__MXDIM)
+      INTEGER            OAX(ADI__MXDIM)
       INTEGER            AXDIM
       INTEGER            INBINS                 ! Number of input bins/ period.
       INTEGER            SIZ
@@ -139,7 +138,6 @@
       LOGICAL            OK                 	! things ok?
       LOGICAL            VOK                    ! Variance present?
       LOGICAL            QOK                    ! Data quality present?
-      LOGICAL            INPRIM                 ! Is input primitive object?
       LOGICAL            REGULAR                ! Is input regularly binned?
       LOGICAL            BOK                    ! BASE_TAI present
       LOGICAL            BAD                    ! Any BAD data?
@@ -147,8 +145,8 @@
 *
 *    Version id
 *
-      CHARACTER*30       VERSION
-         PARAMETER       ( VERSION = 'FOLDBIN Version 1.7-2')
+      CHARACTER*30		VERSION
+        PARAMETER       	( VERSION = 'FOLDBIN Version 1.8-0' )
 *-
 
 *    Check status.
@@ -161,23 +159,24 @@
       CALL MSG_PRNT( VERSION )
 
 *    Obtain data object, access and check it.
-      CALL USI_ASSOCI( 'INP', 'READ',ILOC, INPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
 
 *    Check status - drop out if bad
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check and map input data
-      CALL BDA_CHKDATA( ILOC, OK, NACTDIM, ODIM, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NACTDIM, ODIM, STATUS )
       IF ( OK ) THEN
-         CALL BDA_MAPDATA( ILOC, 'READ', PTR, STATUS )
+         CALL BDI_MAPDATA( IFID, 'READ', PTR, STATUS )
+
 *    Swap axes if necessary
-         CALL AXIS_FIND(ILOC,'TIME',NACTDIM,AXDIM,STATUS)
+         CALL AXIS_TFIND(IFID,'TIME',NACTDIM,AXDIM,STATUS)
          IF(AXDIM.NE.1)THEN
             OAX(1)=AXDIM
             DO I=2,AXDIM
                OAX(I)=I-1
             ENDDO
-            DO I=AXDIM+1,DAT__MXDIM
+            DO I=AXDIM+1,ADI__MXDIM
                OAX(I)=I
             ENDDO
             IDIM(1)=ODIM(AXDIM)
@@ -188,7 +187,7 @@
                IDIM(I)=ODIM(I)
             ENDDO
             CALL DYN_MAPR(NACTDIM,IDIM,DPTR,STATUS)
-            DO I=NACTDIM,DAT__MXDIM
+            DO I=NACTDIM,ADI__MXDIM
                IF(ODIM(I).EQ.0)ODIM(I)=1
                IF(IDIM(I).EQ.0)IDIM(I)=1
             ENDDO
@@ -206,52 +205,50 @@
          CALL MSG_PRNT( 'FATAL ERROR: No data!' )
       END IF
 
-*    Check number of dimensions
-         CALL MSG_SETI('DIMS',NACTDIM,STATUS)
-         CALL MSG_PRNT( 'Data is ^DIMS dimensional' )
+*  Check number of dimensions
+      CALL MSG_SETI('DIMS',NACTDIM)
+      CALL MSG_PRNT( 'Data is ^DIMS dimensional' )
 
-*    Create a folded data object.
-      CALL USI_ASSOCO( 'OUT', 'FOLDED_SERIES', FLOC, STATUS )
-
-*    Check status - drop out if bad.
-      IF (STATUS .NE. SAI__OK) GOTO 999
+*  Create a folded data object.
+      CALL USI_TASSOCO( 'OUT', 'FOLDED_SERIES', FFID, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    If AXIS(1) UNITS are defined, then display them.
       UNITS = 'Units'
-      CALL BDA_GETAXUNITS( ILOC, AXDIM, UNITS, STATUS )
-      CALL MSG_SETC( 'UNITS', UNITS, STATUS )
+      CALL BDI_GETAXUNITS( IFID, AXDIM, UNITS, STATUS )
+      CALL MSG_SETC( 'UNITS', UNITS )
       CALL MSG_PRNT( 'TIME UNITS are ^UNITS' )
 
 *    Get period
       CALL USI_GET0R( 'PERIOD', PERIOD, STATUS )
 
 *    Define base epoch
-      CALL BDA_LOCHEAD( ILOC, HEADER, STATUS )
-      CALL DAT_THERE(HEADER,'BASE_TAI',BOK,STATUS)
-      IF(BOK) THEN
-        CALL CMP_GET0D( HEADER, 'BASE_TAI', BASE_TAI, STATUS )
+      CALL TCI_GETID( IFID, TIMID, STATUS )
+      CALL ADI_THERE( TIMID, 'TAIObs', BOK, STATUS )
+      IF ( BOK ) THEN
+        CALL ADI_CGET0D( TIMID, 'TAIObs', BASE_TAI, STATUS )
       ELSE
         CALL MSG_PRNT( 'No atomic time: set to zero' )
-        BASE_TAI=0.0
+        BASE_TAI = 0.0D0
       ENDIF
       CALL USI_DEF0D( 'EPOCH', BASE_TAI, STATUS )
       CALL USI_GET0D( 'EPOCH', ZeroEpoch, STATUS )
       ZEROOFFSET = (ZEROEPOCH - BASE_TAI) * 86400.D0
 
 *    Check axis and data match
-      CALL BDA_CHKAXVAL( ILOC, AXDIM, OK, REGULAR, SIZ, STATUS )
+      CALL BDI_CHKAXVAL( IFID, AXDIM, OK, REGULAR, SIZ, STATUS )
       IF ( SIZ .NE. NDATA ) THEN
+         STATUS=SAI__ERROR
          CALL ERR_REP('NBAD','Axis and Data do not match',STATUS)
          CALL ERR_FLUSH(STATUS)
-         STATUS=SAI__ERROR
       END IF
       IF ( OK ) THEN
 
 *       Find number of input bins within period.
          IF ( REGULAR ) THEN
-            CALL BDA_GETAXVAL( ILOC, AXDIM, BASE, SCALE, SIZ, STATUS )
+            CALL BDI_GETAXVAL( IFID, AXDIM, BASE, SCALE, SIZ, STATUS )
             INBINS = INT( PERIOD / ABS(SCALE) )
-            CALL MSG_SETI( 'INBINS', INBINS, STATUS )
+            CALL MSG_SETI( 'INBINS', INBINS )
 C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
             CALL USI_DEF0I( 'BINS', INBINS, STATUS )
             CALL DYN_MAPR( 1, NDATA, XPTR, STATUS )
@@ -261,8 +258,8 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
          ELSE
 
 *          Map time AXIS data
-            CALL BDA_MAPAXVAL( ILOC, 'READ', AXDIM, XPTR, STATUS )
-            CALL BDA_MAPAXWID( ILOC, 'READ', AXDIM, XWPTR, STATUS )
+            CALL BDI_MAPAXVAL( IFID, 'READ', AXDIM, XPTR, STATUS )
+            CALL BDI_MAPAXWID( IFID, 'READ', AXDIM, XWPTR, STATUS )
          END IF
 
       ELSE
@@ -285,19 +282,17 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 
 *    Ask if weighted mean required
       CALL USI_GET0L('WEIGHT',WEIGHT,STATUS)
-
-*    Check status - drop out if bad.
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Data error ... set up scratch area for variances
-      CALL BDA_CHKVAR(ILOC,VOK,VNDIM,VDIMS,STATUS)
+      CALL BDI_CHKVAR(IFID,VOK,VNDIM,VDIMS,STATUS)
       IF ( VOK ) THEN
          IF(VNDIM.NE.NACTDIM) THEN
+            STATUS=SAI__ERROR
             CALL ERR_REP('DIM','Variance does not match Data',STATUS)
             CALL ERR_FLUSH(STATUS)
-            STATUS=SAI__ERROR
          END IF
-         CALL BDA_MAPVAR(ILOC,'READ',VAPTR,STATUS)
+         CALL BDI_MAPVAR(IFID,'READ',VAPTR,STATUS)
          IF(AXDIM.NE.1)THEN
             CALL DYN_MAPR(NACTDIM,IDIM,VPTR,STATUS)
             CALL AR7_AXSWAP_R(VDIMS,%VAL(VAPTR),OAX,VDIM,
@@ -313,15 +308,15 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       ENDIF
 
 *    and data quality
-      CALL BDA_CHKQUAL(ILOC,QOK,QNDIM,QDIMS,STATUS)
+      CALL BDI_CHKQUAL(IFID,QOK,QNDIM,QDIMS,STATUS)
       IF ( QOK ) THEN
          IF(QNDIM.NE.NACTDIM) THEN
             CALL ERR_REP('QIM','Quality does not match Data',STATUS)
             CALL ERR_FLUSH(STATUS)
             STATUS=SAI__ERROR
          END IF
-         CALL BDA_GETMASK(ILOC,MASK,STATUS)
-         CALL BDA_MAPLQUAL(ILOC,'READ',BAD,QAPTR,STATUS)
+         CALL BDI_GETMASK(IFID,MASK,STATUS)
+         CALL BDI_MAPLQUAL(IFID,'READ',BAD,QAPTR,STATUS)
          IF(AXDIM.NE.1)THEN
            CALL DYN_MAPR(NACTDIM,IDIM,QPTR,STATUS)
            CALL AR7_AXSWAP_B(QDIMS,%VAL(QAPTR),OAX,QDIM,
@@ -344,30 +339,30 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       CALL DYN_MAPR(NACTDIM,IDIM,SUMPTR,STATUS)
 
 *    Set up and map components in output object
-      CALL BDA_CREDATA(FLOC,NACTDIM,IDIM,STATUS)
-      CALL BDA_CREVAR(FLOC,NACTDIM,IDIM,STATUS)
-      CALL BDA_CREAXES(FLOC,NACTDIM,STATUS)
+      CALL BDI_CREDATA(FFID,NACTDIM,IDIM,STATUS)
+      CALL BDI_CREVAR(FFID,NACTDIM,IDIM,STATUS)
+      CALL BDI_CREAXES(FFID,NACTDIM,STATUS)
       DO L=1,NACTDIM
-      CALL BDA_CREAXVAL(FLOC,L,.FALSE.,IDIM(L),STATUS)
+      CALL BDI_CREAXVAL(FFID,L,.FALSE.,IDIM(L),STATUS)
       ENDDO
-      CALL BDA_CREQUAL(FLOC,NACTDIM,IDIM,STATUS)
-      CALL BDA_MAPDATA(FLOC,'WRITE',FDPTR,STATUS)
-      CALL BDA_MAPVAR(FLOC,'WRITE',FVPTR,STATUS)
-      CALL BDA_MAPAXVAL(FLOC,'WRITE',1,FXPTR,STATUS)
-      CALL BDA_MAPQUAL(FLOC,'WRITE',FQPTR,STATUS)
-      CALL BDA_PUTMASK(FLOC,MASK,STATUS)
+      CALL BDI_CREQUAL(FFID,NACTDIM,IDIM,STATUS)
+      CALL BDI_MAPDATA(FFID,'WRITE',FDPTR,STATUS)
+      CALL BDI_MAPVAR(FFID,'WRITE',FVPTR,STATUS)
+      CALL BDI_MAPAXVAL(FFID,'WRITE',1,FXPTR,STATUS)
+      CALL BDI_MAPQUAL(FFID,'WRITE',FQPTR,STATUS)
+      CALL BDI_PUTMASK(FFID,MASK,STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-      CALL DAT_NEW(FLOC,'N_OCCUPANTS','_INTEGER',NACTDIM,IDIM,STATUS)
-      CALL CMP_MAPN( FLOC, 'N_OCCUPANTS', '_INTEGER',
+      CALL DAT_NEW(FFID,'N_OCCUPANTS','_INTEGER',NACTDIM,IDIM,STATUS)
+      CALL CMP_MAPN( FFID, 'N_OCCUPANTS', '_INTEGER',
      :                       'WRITE', NACTDIM, FNPTR,IDIM,STATUS)
       IDIM(1)=1
-      CALL DAT_NEW(FLOC,'CHISQUARED','_REAL',NACTDIM,IDIM,STATUS)
-      CALL DAT_NEW(FLOC,'DEG_OF_FREEDOM','_INTEGER',NACTDIM,IDIM,STATUS)
-      CALL CMP_MAPN(FLOC,'CHISQUARED','_REAL','WRITE',NACTDIM,FCPTR,
+      CALL DAT_NEW(FFID,'CHISQUARED','_REAL',NACTDIM,IDIM,STATUS)
+      CALL DAT_NEW(FFID,'DEG_OF_FREEDOM','_INTEGER',NACTDIM,IDIM,STATUS)
+      CALL CMP_MAPN(FFID,'CHISQUARED','_REAL','WRITE',NACTDIM,FCPTR,
      :                                    IDIM,STATUS)
-      CALL CMP_MAPN(FLOC,'DEG_OF_FREEDOM','_INTEGER','WRITE',NACTDIM,
+      CALL CMP_MAPN(FFID,'DEG_OF_FREEDOM','_INTEGER','WRITE',NACTDIM,
      :                             FFPTR,IDIM,STATUS)
       IDIM(1)=NBINS
 *    Set output quality to GOOD (as all bad data has been excluded)
@@ -407,43 +402,24 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       CALL ARR_REG1R( 0.5/REAL(NBINS), 1.0/REAL(NBINS), NBINS,
      :                                   %VAL(FXPTR), STATUS )
 
-*    Unmap- Input
-      CALL BDA_UNMAPDATA(ILOC,STATUS)
-      IF ( VOK ) THEN
-         CALL BDA_UNMAPVAR(ILOC,STATUS)
-      END IF
-      CALL BDA_UNMAPAXVAL(ILOC,1,STATUS)
-      IF ( QOK ) THEN
-         CALL BDA_UNMAPLQUAL(ILOC,STATUS)
-      END IF
-
-*    And Output
-
-      CALL BDA_UNMAPDATA(FLOC,STATUS)
-      CALL BDA_UNMAPVAR(FLOC,STATUS)
-      CALL BDA_UNMAPAXVAL(FLOC,1,STATUS)
-      CALL BDA_UNMAPQUAL(FLOC,STATUS)
-      CALL CMP_UNMAP(FLOC,'N_OCCUPANTS',STATUS)
-      CALL CMP_UNMAP(FLOC,'CHISQUARED',STATUS)
-      CALL CMP_UNMAP(FLOC,'DEG_OF_FREEDOM',STATUS)
 *    Write components to output object
       N=2
       DO WHILE (N.LE.NACTDIM)
-      CALL BDA_COPAXIS(ILOC,FLOC,OAX(N),N,STATUS)
+      CALL BDI_COPAXIS(IFID,FFID,OAX(N),N,STATUS)
       N=N+1
       ENDDO
-      CALL BDA_COPTEXT( ILOC, FLOC, STATUS )
+      CALL BDI_COPTEXT( IFID, FFID, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-      CALL BDA_PUTAXLABEL(FLOC,1,'Phase',STATUS)
-      CALL BDA_PUTAXNORM(FLOC,1,.TRUE.,STATUS)
+      CALL BDI_PUTAXLABEL(FFID,1,'Phase',STATUS)
+      CALL BDI_PUTAXNORM(FFID,1,.TRUE.,STATUS)
 *    Copy other info from input to output file
-      CALL BDA_COPMORE( ILOC, FLOC, STATUS )
+      CALL BDI_COPMORE( IFID, FFID, STATUS )
 
 *    Add history records
-      CALL HIST_COPY( ILOC, FLOC, STATUS )
-      CALL HIST_ADD( FLOC, VERSION, STATUS )
+      CALL HIST_COPY( IFID, FFID, STATUS )
+      CALL HIST_ADD( FFID, VERSION, STATUS )
       HTXT(1) = 'Input {INP}'
       HTXT(2) = 'Folded output {OUT}'
       CALL MSG_SETR( 'PERIOD', PERIOD )
@@ -455,29 +431,23 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
      :                                                       HLEN)
       USED = MAXHTXT
       CALL USI_TEXT( 4, HTXT, USED, STATUS )
-      CALL HIST_PTXT(FLOC,USED,HTXT,STATUS)
+      CALL HIST_PTXT(FFID,USED,HTXT,STATUS)
 
-*    Output CHISQR value to user if 1D dataset
-      IF (NACTDIM.EQ.1)THEN
-         CALL MSG_SETR('CHISQR',CHISQ, STATUS )
-         CALL MSG_SETI('NDOF',NDOF, STATUS )
-         CALL MSG_PRNT( 'Chi squared value of fit to mean = ^CHISQR'/
-     &             /' with ^NDOF degrees of freedom')
+*  Output CHISQR value to user if 1D dataset
+      IF ( NACTDIM .EQ. 1 ) THEN
+        CALL MSG_SETR('CHISQR',CHISQ )
+        CALL MSG_SETI('NDOF',NDOF )
+        CALL MSG_PRNT( 'Chi squared value of fit to mean = ^CHISQR'/
+     :L             /' with ^NDOF degrees of freedom')
       END IF
-*
-*    Release datasets
-      CALL BDA_RELEASE( ILOC, STATUS )
-      CALL BDA_RELEASE( FLOC, STATUS )
+
+*  Release datasets
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( FFID, STATUS )
 
 *   Tidy up
-999   CONTINUE
-
-      CALL AST_CLOSE
-
-*    Exit
-      IF (STATUS.NE.SAI__OK) THEN
-         CALL ERR_REP('EXERR','Error report from FOLDBIN',STATUS)
-      END IF
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -513,12 +483,11 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
       INTEGER            NACTDIM                ! Number of input data dims
-      INTEGER            IDIM(DAT__MXDIM)       ! Dimensions of data points
+      INTEGER            IDIM(ADI__MXDIM)       ! Dimensions of data points
       INTEGER            L1,L2,L3,L4,L5,L6,L7
       INTEGER            L8
       INTEGER            A,B,C,D,E,F,G
@@ -696,13 +665,12 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       INTEGER            NACTDIM                ! Number of input data dims
-      INTEGER            IDIM(DAT__MXDIM)       ! Dimensions of data points
+      INTEGER            IDIM(ADI__MXDIM)       ! Dimensions of data points
       INTEGER            L1,L2,L3,L4,L5,L6,L7
       INTEGER            L8
       INTEGER            A,B,C,D,E,F,G
