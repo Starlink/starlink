@@ -38,9 +38,8 @@
 *     current picture is usually cleared before plotting the new picture,
 *     but parameter CLEAR can be used to prevent this, allowing several
 *     plots to be "stacked" together. If a new plot is drawn over an
-*     existing plot, then there is an option to allow the bounds of the
-*     new plot to be set to the bounds of the existing plot (see parameter
-*     ALIGN).
+*     existing plot, then there is an option to allow the new plot to be 
+*     aligned with the existing plot (see parameter ALIGN).
 *
 *     The input NDF may, for instance, contain a spectrum of data values
 *     against wavelength, or it may contain data values along a
@@ -62,17 +61,21 @@
 
 *  ADAM Parameters:
 *     ALIGN = _LOGICAL (Read)
-*        Controls the way in which the bounds of a new plot are
-*        determined if it is drawn over an existing plot. If ALIGN
-*        is FALSE, then the bounds of the new plot are specified
-*        using parameters XLEFT, XRIGHT, YBOT and YTOP as usual. If ALIGN
-*        is TRUE, then the bounds of the new plot are set equal to 
-*        the bounds of the existing plot (on both axes), and parameters 
-*        XLEFT, XRIGHT, YBOT and YTOP are ignored. This parameter is only
+*        Controls whether or not the new data plot should be aligned with an
+*        existing data plot. If ALIGN is TRUE, the X axis values of the
+*        new plot will be mapped into the coordinate system of the X axis in
+*        the existing plot before being used (if this is not possible an
+*        error is reported). In this case, the XLEFT, XRIGHT, YBOT and YTOP 
+*        parameters are ignored and the bounds of the existing plot are used 
+*        instead. If ALIGN is FALSE, the new X axis values are used without 
+*        change. The bounds of the new plot are specified using parameters 
+*        XLEFT, XRIGHT, YBOT and YTOP as usual, and these bounds are mapped
+*        to the edges of the existing picture. The ALIGN parameter is only
 *        accessed if parameter CLEAR is FALSE, and if there is another line 
 *        plot within the current picture. If a null (!) value is supplied, 
-*        the plots are aligned if the labels on the horizontal axes are the 
-*        same, but they are not aligned if the labels are different. [!]
+*        a value of TRUE will be used if and only if a mapping can be found 
+*        between the existing and the new plots. A value of FALSE will
+*        be used otherwise. [!]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot. If a null (!) value is supplied, the value used is FALSE if 
@@ -455,6 +458,9 @@
 *        DATA picture.
 *     15-FEB-2000 (DSB):
 *        Modified for new KPG1_GTAXV argument list.
+*     9-JAN-2003 (DSB):
+*        Use the correct Mapping between new and old DATAPLOT pictures if
+*        ALIGN is TRUE (previously a UnitMap was always used).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -492,8 +498,6 @@
       CHARACTER KEYLN2*80      ! Second line of key text
       CHARACTER MCOMP*8        ! Component to be mapped
       CHARACTER NDFNAM*255     ! Full NDF specification 
-      CHARACTER NEWLAB*80      ! X axis label from new Plot
-      CHARACTER OLDLAB*80      ! X axis label from existing Plot
       CHARACTER TEXT*255       ! A general text string
       CHARACTER UNITS*20       ! Units of the data
       DOUBLE PRECISION BL( 2 ) ! "w.w. want" X/Y values at bottom left corner
@@ -510,6 +514,8 @@
       INTEGER AXMAP            ! Point to NDFs AXIS->GRID Mapping
       INTEGER AXMAPS( 2 )      ! Axis mappings for displayed data plot
       INTEGER DIM              ! Number of elements in the input array
+      INTEGER DPFS             ! FrameSet connecting old and new DATAPLOT Frames
+      INTEGER DPMAP            ! Mapping between old and new DATAPLOT Frames
       INTEGER EL               ! Number of mapped elements 
       INTEGER FREQ             ! Interval between error bars
       INTEGER FSET             ! Pointer to FrameSet 
@@ -574,7 +580,6 @@
       LOGICAL NOINV            ! Did any mapping not have an inverse?
       LOGICAL OLDPIC           ! Was an existing DATA picture found?
       LOGICAL THERE            ! Does object exist?
-      LOGICAL XLABEQ           ! Are x axis labels equal?
       LOGICAL XVAR             ! Display x axis centre variances?
       LOGICAL YLOG             ! Show log of data value?
       LOGICAL YVAR             ! Display y data variances?
@@ -946,47 +951,41 @@
 *  application and so we cannot align the new picture with it.
          IF( AST_GETC( IPLOT, 'DOMAIN', STATUS ) .EQ. 'DATAPLOT' ) THEN
 
-*  Get the X axis labels in the old and new DATAPLOTs, and remove leading 
-*  blanks.
-            OLDLAB = AST_GETC( IPLOT, 'LABEL(1)', STATUS )
-            CALL CHR_LDBLK( OLDLAB )         
-
-            NEWLAB = AST_GETC( FSET, 'LABEL(1)', STATUS )
-            CALL CHR_LDBLK( NEWLAB )         
-
-*  Issue a warning if the labels are different (apart from case).
-            XLABEQ = CHR_SIMLR( OLDLAB, NEWLAB )
-
-            IF( .NOT. XLABEQ ) THEN
-               CALL MSG_BLANK( STATUS )
-               CALL MSG_SETC( 'OLDLAB', OLDLAB )
-               CALL MSG_SETC( 'NEWLAB', NEWLAB )
-               CALL MSG_OUT( 'LINPLOT_MSG3', '  WARNING: The value '//
-     :                       'being used to annotated the horizontal '//
-     :                       'axis (^NEWLAB), is not the same as in '//
-     :                       'the existing plot (^OLDLAB).', STATUS )
-            END IF
+*  Attempt to find a Mapping from the DATAPLOT Frame in the existing 
+*  picture to the DATAPLOT Frame in the new picture.
+            DPFS = AST_CONVERT( AST_GETFRAME( IPLOT, AST__CURRENT,
+     :                                        STATUS ),
+     :                          AST_GETFRAME( FSET, AST__CURRENT,
+     :                                        STATUS ),
+     :                          'DATAPLOT', STATUS )
 
 *  Abort if an error has occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  We now decide whether to shift the X axis of the new DATAPLOT so that
-*  it aligns with the existing DATAPLOT. First of all, choose a default
-*  value on the basis of the axis labels. If the X axis labels are equal,
-*  assume alignment is required.
-            CALL PAR_DEF0L( 'ALIGN', XLABEQ, STATUS )
-
-*  Allow the user to change this value.
+*  it aligns with the existing DATAPLOT. Set a default of TRUE if a
+*  Mapping was found above, and FALSE if not. Then allow the user to change 
+*  the default.
+            CALL PAR_DEF0L( 'ALIGN', ( DPFS .NE. AST__NULL ), STATUS )
             CALL PAR_GET0L( 'ALIGN', ALIGN, STATUS )
 
 *  Use the dynamic default if a null value was supplied.
             IF( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
-               ALIGN = XLABEQ
+               ALIGN = ( DPFS .NE. AST__NULL )
             END IF
 
 *  If they are to be aligned...
             IF( ALIGN ) THEN
+
+*  Report an error if no Mapping is available.
+               IF( DPFS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'LINPLOT_ERR', 'Cannot convert '//
+     :                          'positions between the existing plot '//
+     :                          'and the new plot.', STATUS )
+                  GO TO 999
+               END IF
 
 *  Save the index of the current Frame in the Plot. 
                ICURR0 = AST_GETI( IPLOT, 'CURRENT', STATUS )
@@ -996,9 +995,8 @@
 
 *  Merge the new FrameSet into the existing Plot, aligning them in the 
 *  current Frame (i.e. the DATAPLOT Domain) using a UnitMap.
-               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, 
-     :                            AST_UNITMAP( 2, ' ', STATUS ), 
-     :                            FSET, STATUS ) 
+               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, DPFS, FSET, 
+     :                            STATUS ) 
 
 *  Save the indices within the Plot of the "what we've got" and "what we 
 *  want" Frames relating to the original NDF.
@@ -1363,6 +1361,31 @@
 *  We now have a Plot and a new DATA picture. Prepare to produce the
 *  graphical output.
 *  =================================================================
+*  Get the 1-D mappings which transform each of the GRAPHICS Frame axes
+*  onto the corresponding "what we want" Frame axes.
+      CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
+
+*  Map all the required axis values from "what we want" into GRAPHICS.
+      CALL AST_TRAN1( AXMAPS( 1 ), DIM, %VAL( IPXCEN ), .FALSE., 
+     :                %VAL( IPXCEN ), STATUS ) 
+
+      CALL AST_TRAN1( AXMAPS( 2 ), DIM, %VAL( IPYCEN ), .FALSE., 
+     :                %VAL( IPYCEN ), STATUS ) 
+
+      IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, %VAL( IPXBAR ), 
+     :                           .FALSE., %VAL( IPXBAR ), STATUS ) 
+
+
+      IF( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2*DIM, %VAL( IPYBAR ), 
+     :                           .FALSE., %VAL( IPYBAR ), STATUS ) 
+
+      IF( IMODE .EQ. 4 ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, 
+     :                                       %VAL( IPSTEP ), .FALSE., 
+     :                                       %VAL( IPSTEP ), STATUS ) 
+
+*  Allow the user to specify the units for either axis.
+      CALL AST_SETACTIVEUNIT( IPLOT, .TRUE., STATUS )
+
 *  Set the attributes of the Plot to give the required Plotting style.     
       CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'STYLE', IPLOT, STATUS )
 
@@ -1408,30 +1431,9 @@
 
 *  Produce the plot.
 *  =================
+
 *  Draw the grid if required.
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
-
-*  Get the 1-D mappings which transform each of the GRAPHICS Frame axes
-*  onto the corresponding "what we want" Frame axes.
-      CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
-
-*  Map all the required axis values from "what we want" into GRAPHICS.
-      CALL AST_TRAN1( AXMAPS( 1 ), DIM, %VAL( IPXCEN ), .FALSE., 
-     :                %VAL( IPXCEN ), STATUS ) 
-
-      CALL AST_TRAN1( AXMAPS( 2 ), DIM, %VAL( IPYCEN ), .FALSE., 
-     :                %VAL( IPYCEN ), STATUS ) 
-
-      IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, %VAL( IPXBAR ), 
-     :                           .FALSE., %VAL( IPXBAR ), STATUS ) 
-
-
-      IF( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2*DIM, %VAL( IPYBAR ), 
-     :                           .FALSE., %VAL( IPYBAR ), STATUS ) 
-
-      IF( IMODE .EQ. 4 ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, 
-     :                                       %VAL( IPSTEP ), .FALSE., 
-     :                                       %VAL( IPSTEP ), STATUS ) 
 
 *  Produce the data plot.
       CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( IPXCEN ), %VAL( IPYCEN ), 
