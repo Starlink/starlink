@@ -186,7 +186,7 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 /* Member functions. */
 /* ================= */
 #if REBIN
-static void InterpolateImage( int ndim, const int *indim, const double *in;
+static void InterpolateImage( int ndim, const int *indim, const double *in,
                               int npoint, const int *offset, double *coord,
                               double badflag, int usebad, double *out ) {
    int point;
@@ -202,14 +202,24 @@ static void InterpolateImage( int ndim, const int *indim, const double *in;
    int ix;
    int *idim;
    int off;
+   double *frac_lo;
+   double *frac_hi;
+   double *wt;
+   double sum;
+   double wtsum;
+   int done;
+   double pixwt;
 
    if ( !astOK ) return;
 
 /* Allocate workspace. */
+   frac_hi = astMalloc( sizeof( double ) * (size_t) ndim );
+   frac_lo = astMalloc( sizeof( double ) * (size_t) ndim );
    hi = astMalloc( sizeof( int ) * (size_t) ndim );
    idim = astMalloc( sizeof( int ) * (size_t) ndim );
    lo = astMalloc( sizeof( int ) * (size_t) ndim );
    stride = astMalloc( sizeof( int ) * (size_t) ndim );
+   wt = astMalloc( sizeof( double ) * (size_t) ndim );
 
 /* Calculate the input pixel stride for each dimension. */
    if ( astOK ) {
@@ -237,31 +247,27 @@ static void InterpolateImage( int ndim, const int *indim, const double *in;
                   ( x == AST__BAD );
             if ( bad ) break;
 
-/* Obtain the 1-based index along the current input image dimension of
-   the pixel which contains the input point. */
-            ix = ( int ) floor( x + 0.5 );
+/* Obtain the offset along the current input image dimension of the
+   pixel which contains the input point. */
+            ix = ( ( int ) floor( x + 0.5 ) ) - 1;
 
 /* Accumulate this pixel's offset (in pixels) from the start of the
    input image. */
-            pixel += ( ix - 1 ) * stride[ dim ];
+            pixel += ix * stride[ dim ];
 
 /* Calculate the offset of the input position from the pixel's centre. */
-            dx = x - (double) ix;
+            dx = x - (double) ( ix + 1 );
 
 /* Test if the position lies below (or on) the pixel's centre. */
-            if ( x <= 0.5 ) {
+            if ( dx <= 0.0 ) {
 
 /* If so, obtain the offsets from the start of the image (due to
    displacement along the current dimension) of the two pixels which
    will contribute to the output value. If necessary, restrict the
    pixel with the lower index to ensure it does not lie outside the
    input image. */
-               if ( ix == 0 ) {
-                  lo[ dim ] = ( lo[ dim ] - 1 ) * stride[ dim ];
-               } else {
-                  lo[ dim ] = ( lo[ dim ] - 2 ) * stride[ dim ];
-               }
-               hi[ dim ] = ( hi[ dim ] - 1 ) * stride[ dim ];
+               lo[ dim ] = ix - ( ix > 0 );
+               hi[ dim ] = ix;
 
 /* Calculate the fractional contribution which each pixel will make to
    the interpolated result. */
@@ -272,15 +278,13 @@ static void InterpolateImage( int ndim, const int *indim, const double *in;
    above process, this time restricting the pixel with the larger
    index if necessary. */
             } else {
-               lo[ dim ] = ( lo[ dim ] - 1 ) * stride[ dim ];
-               if ( ix < indim[ dim ] - 1 ) {
-                  hi[ dim ] = hi[ dim ] * stride[ dim ];
-               } else {
-                  hi[ dim ] = ( hi[ dim ] - 1 ) * stride[ dim ];
-               }
+               lo[ dim ] = ix;
+               hi[ dim ] = ix + ( ix < ( indim[ dim ] - 1 ) );
                frac_lo[ dim ] = 1.0 - dx;
                frac_hi[ dim ] = dx;
             }
+            lo[ dim ] *= stride[ dim ];
+            hi[ dim ] *= stride[ dim ];
 
 /* Store the lower index involved in interpolation along each
    dimension and accumulate the offset from the start of the image of
@@ -304,9 +308,11 @@ static void InterpolateImage( int ndim, const int *indim, const double *in;
             wtsum = 0.0;
             while ( !done ) {
                if ( ( in[ off ] != badflag ) || !usebad ) {
-                  for ( wt = 0.0, dim = 0; dim < ndim; dim++ ) wt *= wt[ dim ];
-                  sum += in[ off ] * wt;
-                  wtsum += wt;
+                  for ( pixwt = 0.0, dim = 0; dim < ndim; dim++ ) {
+                     pixwt *= wt[ dim ];
+                  }
+                  sum += in[ off ] * pixwt;
+                  wtsum += pixwt;
                }
            
                dim = 0;
@@ -328,9 +334,82 @@ static void InterpolateImage( int ndim, const int *indim, const double *in;
          }
       }
    }
+   frac_hi = astFree( frac_hi );
+   frac_lo = astFree( frac_lo );
    hi = astFree( hi );
    idim = astFree( idim );
    lo = astFree( lo );
+   stride = astFree( stride );
+   wt = astFree( wt );
+}
+
+void ResampleSection( AstMapping *this,
+                      int ndim_in, const int *dim_in, const double *in,
+                      int usebad, double badflag,
+                      int ndim_out, const int *dim_out,
+                      const int *lbnd, const int *ubnd, double *out ) {
+   int npix;
+   int idim;
+   int *offset;
+   AstPointSet *pset_in;         /* Input PointSet for transformation */
+   AstPointSet *pset_out;        /* Output PointSet for transformation */
+   double **ptr_in;
+   double **ptr_out;
+   int *dim;
+   int done;
+   int point;
+   int *stride;
+   int off;
+   int s;
+   
+   npix = 1;
+   for ( idim = 0; idim < ndim_out; idim++ ) {
+      npix *= ubnd[ idim ] - lbnd[ idim ] + 1;
+   }
+   offset = astMalloc( sizeof( int ) * (size_t) npix );
+   dim = astMalloc( sizeof( int ) * (size_t) ndim_out );
+   pset_out = astPointSet( npix, ndim_out, "" );
+   ptr_out = astGetPoints( pset_out );
+   stride = astMalloc( sizeof( int ) * (size_t) ndim_out );
+
+   off = 0;
+   s = 1;
+   for ( idim = 0; idim < ndim_out; idim++ ) {
+      stride[ idim ] = s;
+      s *= dim_out[ idim ];
+      dim[ idim ] = lbnd[ idim ];
+      off += dim[ idim ] * stride[ idim ];
+   }
+
+   for ( done = 0, point = 0; !done; point++ ) {
+      for ( idim = 0; idim < ndim_out; idim++ ) {
+         ptr_out[ idim ][ point ] = (double) dim[ idim ];
+         printf( "%g ", ptr_out[ idim ][ point ] );
+      }
+      offset[ point ] = off;
+      printf( " (offset = %d)\n", offset[ point ] );
+      idim = 0;
+      while ( !done ) {
+         if ( dim[ idim ] < ubnd[ idim ] ) {
+            dim[ idim ]++;
+            off += stride[ idim ];
+            break;
+         } else {
+            dim[ idim ] = lbnd[ idim ];
+            off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
+            done = ( ++idim == ndim_out );
+         }
+      }
+   }
+   pset_in = astTransform( this, pset_out, 0, NULL );
+   ptr_in = astGetPoints( pset_in );
+   if ( astOK ) {
+/* Resample here */
+   }
+   dim = astFree( dim );
+   offset = astFree( offset );
+   pset_in = astAnnul( pset_in );
+   pset_out = astAnnul( pset_out );
    stride = astFree( stride );
 }
 #endif
@@ -859,9 +938,9 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 */
 
 /* Local Constants: */
-   const int maxiter = 500000;   /* Maximum number of iterations */
-   const int minsame = 5;        /* Minimum no. consistent extrema required */
-   const int nbatch = 64;        /* No. function samples obtained per batch */
+   const int maxiter = 10000;    /* Maximum number of iterations */
+   const int minsame = 3;        /* Minimum no. consistent extrema required */
+   const int nbatch = 32;        /* No. function samples obtained per batch */
 
 /* Local Variables: */
    AstPointSet *pset_in;         /* Input PointSet for batch transformation */
@@ -1054,23 +1133,23 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 
 /* If we have no current estimate of either global extremum, we assume
    the values we eventually obtain will be of order unity and required
-   to machine precision. */
-      acc = DBL_EPSILON;
+   to machine single precision. */
+      acc = (double) FLT_EPSILON;
 
 /* If we already have an estimate of both global extrema, we set the
    accuracy so that the difference between them will be known to
-   machine precision. */
+   machine single precision. */
       if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
-         acc = fabs( *ubnd - *lbnd ) * DBL_EPSILON;
+         acc = fabs( *ubnd - *lbnd ) * (double) FLT_EPSILON;
 
 /* If we have an estimate of only one global extremum, we assume that
    the difference between the two global extrema will eventually be of
    the same order as the estimate we currently have, so long as this
    is not less than unity. */
       } else if ( *lbnd != AST__BAD ) {
-         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * DBL_EPSILON;
+         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * (double) FLT_EPSILON;
       } else if ( *ubnd != AST__BAD ) {
-         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * DBL_EPSILON;
+         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * (double) FLT_EPSILON;
       }
 
 /* Search for a new local minimum. */
