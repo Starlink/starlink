@@ -1,6 +1,13 @@
 <!DOCTYPE style-sheet PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN">
 (define RCSID "$Id$")
 
+;;; Redesigned.  Rather than having _two_ documents, and leaping
+;;; athletically between them, we now have just one document, conforming
+;;; to the dtddescription DTD, which now includes the structures of the
+;;; old dtdelementlist DTD.  Thus, rather than the dtd2sgml.pl script
+;;; producing a standalone document, it generates a document fragment,
+;;; which is included in the description document.
+
 
 (declare-flow-object-class element
   "UNREGISTERED::James Clark//Flow Object Class::element")
