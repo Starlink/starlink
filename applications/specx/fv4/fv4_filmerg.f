@@ -30,6 +30,8 @@
 *        Original version.
 *     21 Sep 2000 (ajc):
 *        Unused NFIL
+*      5-NOV-2002 (timj):
+*        Correctly call MDATA_READ with STATUS
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -207,8 +209,8 @@ D      PRINT *, 'File B has : ',NUMSCAN(2)
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FV4_FILMERG( MFILE, NUMSCAN, N, OFFS, IDX, NQUAD, CHANN, LSR, 
-*                       FREQ, FINC, RADEC, IFAIL )
+*     CALL MDATA_READ( MFILE, NUMSCAN, N, OFFS, IDX, NQUAD, CHANN, LSR, 
+*                       FREQ, FINC, RADEC, IFAIL, STATUS )
 
 *  Description:
 *     Reads and sorts header information from two files
@@ -242,10 +244,10 @@ D      PRINT *, 'File B has : ',NUMSCAN(2)
       INTEGER N                  ! Total number of scan
       INTEGER MFILE( 3 )         ! Files ids (#3 is output id)
       INTEGER NUMSCAN( 2 )       ! Number of scans in input files
-C      INTEGER IFAIL              ! Specx error status
-* Adjustable arrays
       INTEGER IFAIL              ! Specx error status
       INTEGER STATUS             ! Starlink status
+
+* Adjustable arrays
       REAL*8  TJIDX(N)           ! Index array
       INTEGER TJNQUAD(N)         ! Number of quadrants
       INTEGER TJCHANN(N)         ! Number of channels

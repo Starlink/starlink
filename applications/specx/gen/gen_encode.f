@@ -4,9 +4,9 @@
 *        Use format I3 to read type size
 *        Unused I, J, ICH1, ICH2, LUN, READONLY, SYM_INDEX, LENGTH, ADDRESS
 *        Change error message to "-- gen_encode --" (was gen_sprint)
-*        Remove "unevuable" error message - now in GEN_EVAL_AE
-*     19 November 2002 (TIMJ):
-*        Initalise ISTAT
+*        Remove "unevaluable" error message - now in GEN_EVAL_AE
+*     30 October 2002 (ajc):
+*        Initialise ISTAT
 *-----------------------------------------------------------------------
 
 
@@ -55,8 +55,8 @@
 
 *  Do it
 
-      ISTAT = 0
       IERR = 0
+      ISTAT = 0
 
 *     Initialize the output line
 
@@ -156,6 +156,7 @@ D         PRINT *,' calling gen_eval_ae on string --> ', string(ist:iend)
               END IF
             END IF
           ELSE IF (TYPE(1:1).EQ.'C') THEN
+       
             IF (FORMAT.NE.' ') THEN
               WRITE (OUT_LINE(L:LOUT), FORMAT, IOSTAT=ISTAT, ERR=999)
      &               CVALUE(:NBYTES)
