@@ -33,6 +33,7 @@ WriteMakefile(
     'PREREQ_PM' => {
                               'Test' => undef,
                              },
+    'EXE_FILES' => ['gsdprint'],
     'DEFINE'    => '',
     'INC'       => "-I$StarConfig{Star_Inc}",
     dist          => { COMPRESS => "gzip -9f" },
