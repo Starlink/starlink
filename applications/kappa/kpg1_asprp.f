@@ -5,8 +5,8 @@
 *     KPG1_ASPRP
 
 *  Purpose:
-*     Propagate the WCS component from one NDF to another, allowing 
-*     for a linear mapping of the pixel coordinates.
+*     Propagate the WCS component from one NDF to another with the same
+*     number of axes, allowing for a linear mapping of the pixel coordinates.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,9 +18,10 @@
 *     This routine copies the WCS FrameSet from INDF1, re-mapping the
 *     GRID Frame in the process so that pixel coordinates in the output
 *     NDF are related to pixel coordinates in the input NDF by the 
-*     supplied linear transformation. The mapping from pixel coordinates 
-*     in INDF1 ("PIX1") to the corresponding pixel coordinates in INDF2
-*     ("PIX2") is:
+*     supplied linear transformation. The two NDFs must have the same 
+*     number of axes (given by argument NDIM). The mapping from pixel 
+*     coordinates in INDF1 ("PIX1") to the corresponding pixel 
+*     coordinates in INDF2 ("PIX2") is:
 *
 *        PIX2 = MATRIX . PIX1 + OFFSET 
 *
@@ -105,20 +106,46 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Check that the input NDF has the specified number of dimensions.
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, ND, STATUS )
+      IF( ND .NE. NDIM .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL NDF_MSG( 'NDF', INDF1 ) 
+         CALL MSG_SETI( 'NDIM', NDIM )
+         CALL MSG_SETI( 'ND', ND )
+         CALL ERR_REP( 'KPG1_ASPRP_1', 'KPG1_ASPRP: Programming error'//
+     :                 ' - argument NDIM specifies ^NDIM axes, but '//
+     :                 '''^NDF'' (INDF1) has ^ND axes.', STATUS )
+      END IF
+
+*  Check that the output NDF has the specified number of dimensions.
+      CALL NDF_BOUND( INDF2, NDF__MXDIM, LBND, UBND, ND, STATUS )
+      IF( ND .NE. NDIM .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL NDF_MSG( 'NDF', INDF2 ) 
+         CALL MSG_SETI( 'NDIM', NDIM )
+         CALL MSG_SETI( 'ND', ND )
+         CALL ERR_REP( 'KPG1_ASPRP_2', 'KPG1_ASPRP: Programming error'//
+     :                 ' - argument NDIM specifies ^NDIM axes, but '//
+     :                 '''^NDF'' (INDF2) has ^ND axes.', STATUS )
+      END IF
+
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Create a MatrixMap from the supplied MATRIX array.
       MTRMAP = AST_MATRIXMAP( NDIM, NDIM, 0, MATRIX, ' ', STATUS )
 
-*  Create a WinMap which gives the required shift of origin. 
-      CALL NDF_BOUND( INDF1, NDIM, LBND, UBND, ND, STATUS )
+*  Create a WinMap which gives the required shift of pixel origin. 
+*  Map a window in pixel coordinates covering 1000 pixels on each 
+*  axis (a typical image size).
       DO I = 1, NDIM
-         INA( I ) = DBLE( LBND( I ) )
-         INB( I ) = MAX( DBLE( UBND( I ) ), INA( I ) + 1.0D0 )
+         INA( I ) = 0.0D0 
+         INB( I ) = 1.0D3
          OUTA( I ) = INA( I ) + OFFSET( I )
          OUTB( I ) = INB( I ) + OFFSET( I )
       END DO
+
       WINMAP = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Concatenate these two mappings in series to get the mapping from pixel
@@ -146,7 +173,7 @@
       IF( STATUS .EQ. SAI__OK .AND. IPIX1 .EQ. AST__NOFRAME ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF1 )
-         CALL ERR_REP( 'KPG1_ASPRP_1', 'No PIXEL Frame found in '//
+         CALL ERR_REP( 'KPG1_ASPRP_3', 'No PIXEL Frame found in '//
      :                 'the WCS component of ''^NDF''.', STATUS )
       END IF
 
@@ -174,7 +201,7 @@
       IF( STATUS .EQ. SAI__OK .AND. IPIX2 .EQ. AST__NOFRAME ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF2 )
-         CALL ERR_REP( 'KPG1_ASPRP_2', 'No PIXEL Frame found in '//
+         CALL ERR_REP( 'KPG1_ASPRP_4', 'No PIXEL Frame found in '//
      :                 'the WCS component of ''^NDF''.', STATUS )
       END IF
 
@@ -220,5 +247,17 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
+
+*  If an error has occurred, flush it, delete the output WCS component, 
+*  and then carry on since an output NDF with no WCS component may still 
+*  be useful.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL NDF_MSG( 'NDF', INDF2 )
+         CALL ERR_REP( 'KPG1_ASPRP_5', 'The output ''^NDF'' will have'//
+     :                 ' no World Coordinate System information.', 
+     :                 STATUS )
+         CALL ERR_FLUSH( STATUS )
+         CALL NDF_RESET( INDF2, 'WCS', STATUS )
+      END IF
 
       END

@@ -130,7 +130,8 @@
 *     1995 May 14 (MJC):
 *        Original NDF version.
 *     12-JUN-1998 (DSB):
-*        Added propagation of the NDF WCS component.
+*        Added propagation of the NDF WCS component. Fixed bug which
+*        prevented 2-D slices from n-D cubes being processed.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -171,8 +172,8 @@
      :  COSANG,                  ! Cosine of rotation angle
      :  IXC,                     ! X pix. coord. at centre of input array
      :  IYC,                     ! Y pix. coord. at centre of input array
-     :  MATRIX( NDIM*NDIM ),     ! Rotation matrix for i/p -> o/p mapping
-     :  OFFSET( NDIM ),          ! Offset vector for i/p -> o/p mapping
+     :  MATRIX( NDF__MXDIM*NDF__MXDIM ), ! Rotation matrix for i/p -> o/p mapping
+     :  OFFSET( NDF__MXDIM ),    ! Offset vector for i/p -> o/p mapping
      :  OXC,                     ! X pix. coord. at centre of output array
      :  OYC,                     ! Y pix. coord. at centre of output array
      :  SINANG                   ! Sine of rotation angle
@@ -356,7 +357,7 @@
 *
 *  Take a shortcut to propagate ancillary data from the input NDF.
 *  Create a section from the input NDF of the size of the required NDF.
-      CALL NDF_SECT( NDFI, NDIM, LBNDO, UBNDO, NDFS, STATUS )
+      CALL NDF_SECT( NDFI, IDIM, LBNDO, UBNDO, NDFS, STATUS )
 
 *  Create the output NDF.  One of the special cases (180-degree
 *  rotation) needs the array components to be copied.  Axes will be
@@ -999,25 +1000,46 @@
 
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel coordinates. This mapping is described by a matrix and an offset
-*  vector. Set these up. 
+*  vector. Initialise the matrix to hold a unit matrix, and the offset
+*  vector to be zero vector. The matrix is declared as a 1-d array because
+*  the dimensionality of the output NDF is only known at run time.
+*  Therefore we have to do the conversion from row and column numbers to
+*  a 1-d vectorised index explicitly. Row I, column J of the matrix is
+*  stored in element I + IDIM*( J - 1 ).
+      DO I = 1, IDIM*IDIM
+         MATRIX( I ) = 0.0D0
+      END DO
+
+      DO I = 1, IDIM
+         MATRIX( I + IDIM*( I - 1 ) ) = 1.0D0
+         OFFSET( I ) = 0.0D0
+      END DO
+
+*  Calculate the required cosine and sine values, and store them
+*  in the matrix elements for the plane spanned by the significant
+*  axes.
       COSANG = DBLE( COS( ANGLE * DTOR ) )
       SINANG = DBLE( SIN( ANGLE * DTOR ) )
 
-      MATRIX( 1 ) = COSANG
-      MATRIX( 2 ) = SINANG
-      MATRIX( 3 ) = -SINANG
-      MATRIX( 4 ) = COSANG
+      MATRIX( SDIM( 1 ) + IDIM*( SDIM( 1 ) - 1 ) ) = COSANG
+      MATRIX( SDIM( 1 ) + IDIM*( SDIM( 2 ) - 1 ) ) = -SINANG
+      MATRIX( SDIM( 2 ) + IDIM*( SDIM( 1 ) - 1 ) ) = SINANG
+      MATRIX( SDIM( 2 ) + IDIM*( SDIM( 2 ) - 1 ) ) = COSANG
 
-      OXC = 0.5D0*DBLE( UBNDO( 1 ) + LBNDO( 1 ) - 1 )
-      OYC = 0.5D0*DBLE( UBNDO( 2 ) + LBNDO( 2 ) - 1 )
+*  Calculate the pixel coordinates on the significant axes at the centre of 
+*  the output image
+      OXC = 0.5D0*DBLE( UBNDO( SDIM( 1 ) ) + LBNDO( SDIM( 1 ) ) - 1 )
+      OYC = 0.5D0*DBLE( UBNDO( SDIM( 2 ) ) + LBNDO( SDIM( 2 ) ) - 1 )
       IXC = 0.5D0*DBLE( SUBNDI( 1 ) + SLBNDI( 1 ) - 1 )
       IYC = 0.5D0*DBLE( SUBNDI( 2 ) + SLBNDI( 2 ) - 1 )
 
-      OFFSET( 1 ) = OXC - IXC*COSANG - IYC*SINANG
-      OFFSET( 2 ) = OYC + IXC*SINANG - IYC*COSANG
+*  Calculate the pixel offsets produced by the rotation on the significant
+*  axes.
+      OFFSET( SDIM( 1 ) ) = OXC - IXC*COSANG - IYC*SINANG
+      OFFSET( SDIM( 2 ) ) = OYC + IXC*SINANG - IYC*COSANG
 
 *  Propagate the WCS component.
-      CALL KPG1_ASPRP( 2, NDFI, NDFO, MATRIX, OFFSET, STATUS )
+      CALL KPG1_ASPRP( IDIM, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
   999 CONTINUE
 
