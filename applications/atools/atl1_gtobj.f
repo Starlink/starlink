@@ -89,6 +89,13 @@
          CALL KPG1_GTWCS( INDF, IAST, STATUS )
          CALL NDF_ANNUL( INDF, STATUS )
 
+*  Tell the user where the object came from. 
+         IF( IAST .NE. AST__NULL ) THEN
+            CALL NDF_MSG( 'NDF', INDF ) 
+            CALL MSG_OUT( ' ', '   AST data read from NDF ''^NDF''.', 
+     :                    STATUS )
+         END IF
+
 *  If it was not an NDF...
       ELSE
 

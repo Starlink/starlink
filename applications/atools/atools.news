@@ -10,8 +10,13 @@
 
   Changes in this release:
 
-  - Commands astinvert and astmapbox added. These are straight analogues
-  of the AST_INVERT and AST_MAPBOX routines.
+  - New commands added: astinvert, astmapbox, astspecframe, astsetrefpos,
+   astgetrefpos. These are straight analogues of the corresponding AST 
+   routines.
+
+  - When reading or writing AST objects, ATOOLS commands now indicate the
+  nature of the file accessed (i.e. whether it is an NDF, a FITS file or
+  a text file).
 
   Changes in release 1.3:
 

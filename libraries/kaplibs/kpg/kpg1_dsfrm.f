@@ -63,21 +63,26 @@
 *  External References:
       INTEGER CHR_LEN
       LOGICAL CHR_SIMLR
+      DOUBLE PRECISION SLA_EPJ2D
+      DOUBLE PRECISION SLA_EPB2D
 
 *  Local Variables :
       CHARACTER ATTRIB*20        ! AST Frame attribute name
       CHARACTER FRMDMN*80        ! Frame domain
       CHARACTER FRMTTL*80        ! Frame title
+      CHARACTER MONTH( 12 )*3    ! Month names
       CHARACTER POSBUF*80        ! Buffer for position
       CHARACTER PRJ*50           ! Sky projection
-      CHARACTER SIGN*1
+      CHARACTER SIGN*1           ! Sign of day value
       CHARACTER SOR*30           ! Spectral standard of rest 
       CHARACTER SYS*30           ! Sky coordinate system
       CHARACTER UNIT*15          ! Units string
-      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
-      DOUBLE PRECISION EQ        ! Epoch of reference equinox
-      DOUBLE PRECISION EP        ! Epoch of observattion
       DOUBLE PRECISION CFIRST( 1, NDF__MXDIM ) ! Frame coords of first pixel
+      DOUBLE PRECISION EP        ! Epoch of observation
+      DOUBLE PRECISION EQ        ! Epoch of reference equinox
+      DOUBLE PRECISION FD        ! Fraction of day (+ve)
+      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
+      DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
       INTEGER CFRM               ! Frame to be described
       INTEGER FRMNAX             ! Frame dimensionality
       INTEGER I                  ! Loop counter for dimensions
@@ -85,10 +90,19 @@
       INTEGER IAXIS              ! Loop counter for axes
       INTEGER IBASE              ! Index of Base Frame in FrameSet
       INTEGER ICURR              ! Index of Current Frame in FrameSet
-      INTEGER IDMSF(4)
+      INTEGER ID                 ! Day of month
       INTEGER IGRID              ! Index of GRID Frame in FrameSet
+      INTEGER IHMSF( 4 )         ! Hours, mins, secs, fraction of sec
+      INTEGER IM                 ! Index of month
+      INTEGER IY                 ! Year
+      INTEGER J                  ! SLALIB status
       INTEGER NDIM               ! Number of dimensions
       LOGICAL GOTFS              ! Was a FrameSet supplied?
+      LOGICAL SHOWEP             ! Display the Epoch value?
+
+      DATA MONTH/ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 
+     :            'AUG', 'SEP', 'OCT', 'NOV', 'DEC' /
+
 *.
 
 *  Check the inherited status. 
@@ -135,12 +149,17 @@
       CALL MSG_OUT( 'WCS_DOMAIN',
      :   '      Domain              : ^DOMAIN', STATUS )
 
-*  If the Frame is a SkyFrame, display the epoch, equinox, system and
-*  projection.
+*  Initialise a flag to induicate that we do not have a SkyFrame or a
+*  SpecFrame, and should therefore not display the EPOCH.
+      SHOWEP = .FALSE.
+
+*  If the Frame is a SkyFrame, display the equinox, system and projection.
       IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
 
-*  First get the epoch, equinox, system and projection.
-         EP = AST_GETD( CFRM, 'EPOCH', STATUS )
+*  Indicate that the EPOCH should be displayed.
+         SHOWEP = .TRUE.
+
+*  First get the equinox, system and projection.
          EQ = AST_GETD( CFRM, 'EQUINOX', STATUS )
          SYS = AST_GETC( CFRM, 'SYSTEM', STATUS )
          PRJ = AST_GETC( CFRM, 'PROJECTION', STATUS )
@@ -202,16 +221,6 @@
          CALL MSG_OUT( 'WCS_SYS', 
      :   '      System              : ^SYS', STATUS )
 
-*  Display the epoch.
-         IF( EP .LT. 1984.0 ) THEN
-            CALL MSG_SETC( 'EPOCH', 'B' )
-         ELSE 
-            CALL MSG_SETC( 'EPOCH', 'J' )
-         END IF
-         CALL MSG_SETD( 'EPOCH', EP )
-         CALL MSG_OUT( 'WCS_EPOCH', 
-     :   '      Epoch of observation: ^EPOCH', STATUS )
-
 *  Display the projection.
          IF( PRJ .NE. ' ' ) THEN
             CALL MSG_SETC( 'PROJ', PRJ )
@@ -222,6 +231,9 @@
 
 *  If the Frame is a SpecFrame, display SpecFrame specific information...
       ELSE IF( AST_ISASPECFRAME( CFRM, STATUS ) ) THEN
+
+*  Indicate that the EPOCH should be displayed.
+         SHOWEP = .TRUE.
 
 *  System...
          SYS = AST_GETC( CFRM, 'SYSTEM', STATUS )
@@ -255,17 +267,6 @@
          CALL MSG_OUT( 'WCS_SYS', '      System              : ^SYS', 
      :                 STATUS )
 
-*  Epoch...
-         EP = AST_GETD( CFRM, 'EPOCH', STATUS )
-         IF( EP .LT. 1984.0 ) THEN
-            CALL MSG_SETC( 'EPOCH', 'B' )
-         ELSE 
-            CALL MSG_SETC( 'EPOCH', 'J' )
-         END IF
-         CALL MSG_SETD( 'EPOCH', EP )
-         CALL MSG_OUT( 'WCS_EPOCH',
-     :         '      Epoch of observation: ^EPOCH', STATUS )
-
 *  Rest Frequency...
          IF( AST_TEST( CFRM, 'RestFreq', STATUS ) ) THEN
             CALL MSG_SETD( 'RF', AST_GETD( CFRM, 'RestFreq', STATUS ) )
@@ -291,6 +292,16 @@
 
          ELSE IF(  CHR_SIMLR( SOR, 'LOCAL_GROUP' ) ) THEN
             CALL MSG_SETC( 'SOR', 'Local group' )
+
+         ELSE IF(  CHR_SIMLR( SOR, 'SOURCE' ) ) THEN
+            CALL AST_SETC( CFRM, 'StdOfRest', 'HELIO', STATUS )
+            POSBUF = 'Source ('
+            IAT = 8
+            CALL CHR_PUTR( AST_GETR( CFRM, 'SourceVel', STATUS ), 
+     :                     POSBUF, IAT )
+            CALL CHR_APPND( ' km/s - heliocentric)', POSBUF, IAT )
+            CALL MSG_SETC( 'SOR', POSBUF( : IAT ) )
+            CALL AST_SETC( CFRM, 'StdOfRest', 'SOURCE', STATUS )
 
          ELSE 
             CALL MSG_SETC( 'SOR', SOR )
@@ -338,6 +349,41 @@
          CALL MSG_OUT( 'WCS_REF', '      Observer (Lon,Lat)  : ^OBS', 
      :                 STATUS )
 
+      END IF
+
+*  Display the epoch for all Frames (as a Julian or Besselian epoch followed 
+*  by a Gregorian date). For SkyFrames and SpecFrames, always display the
+*  epoch. For other Frames, only display it if set. 
+      IF( .NOT. SHOWEP ) SHOWEP = AST_TEST( CFRM, 'EPOCH', STATUS )
+
+      IF( SHOWEP ) THEN
+         EP = AST_GETD( CFRM, 'EPOCH', STATUS )
+         IF( EP .LT. 1984.0 ) THEN
+            CALL MSG_SETC( 'EPOCH', 'B' )
+            MJD = SLA_EPB2D( EP )
+         ELSE 
+            CALL MSG_SETC( 'EPOCH', 'J' )
+            MJD = SLA_EPJ2D( EP )
+         END IF
+   
+         CALL MSG_SETD( 'EPOCH', EP )
+   
+         CALL SLA_DJCL( MJD, IY, IM, ID, FD, J ) 
+         CALL SLA_CD2TF( 0, REAL( FD ), SIGN, IHMSF ) 
+   
+         CALL MSG_SETI( 'DATE', ID )
+         CALL MSG_SETC( 'DATE', '-' )
+         CALL MSG_SETC( 'DATE', MONTH( IM ) )
+         CALL MSG_SETC( 'DATE', '-' )
+         CALL MSG_SETI( 'DATE', IY )
+         CALL MSG_SETI( 'TIME', IHMSF( 1 ) )
+         CALL MSG_SETC( 'TIME', ':' )
+         CALL MSG_SETI( 'TIME', IHMSF( 2 ) )
+         CALL MSG_SETC( 'TIME', ':' )
+         CALL MSG_SETI( 'TIME', IHMSF( 3 ) )
+   
+         CALL MSG_OUT( 'WCS_EPOCH', 
+     :   '      Epoch of observation: ^EPOCH (^DATE ^TIME)', STATUS )
       END IF
 
 *  Only proceed if we have a FrameSet.

@@ -88,13 +88,18 @@
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'ATL1_CREAT_ERR1', 'Failed to write an AST '//
      :                 'Object to file ''$^P''.', STATUS )
+
+      ELSE
+         CALL MSG_SETC( 'P', PARAM )
+         CALL MSG_OUT( ' ', 'AST data written to text file ''$^P''.', 
+     :                 STATUS )
       END IF
 
 *  Annul the channel.
       CALL AST_ANNUL( CHAN, STATUS )
 
 *  Close the file.
-      CALL FIO_CLOSE( FD, STATUS )
+      CALL FIO_ANNUL( FD, STATUS )
 
       END
 

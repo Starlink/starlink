@@ -249,6 +249,8 @@
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
       LOGICAL CHR_SIMLR          ! Strings equal apart from case?
+      DOUBLE PRECISION SLA_EPJ2D
+      DOUBLE PRECISION SLA_EPB2D
 
 *  Local Constants:
       INTEGER MXEXTN             ! Maximum number of extensions
@@ -258,85 +260,95 @@
       PARAMETER ( MXFRM = 32 )
 
 *  Local Variables:
-      DOUBLE PRECISION AEND( NDF__MXDIM ) ! End of NDF extent along an axis
-      CHARACTER * ( 80 ) ALABEL( NDF__MXDIM ) ! Axis label
-      CHARACTER * ( 35 ) APPN    ! Last recorded application name
-      DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start of NDF extent along an axis
-      CHARACTER * ( 20 ) ATTRIB  ! AST Frame attribute name
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Type for axis extent value
-      CHARACTER * ( 80 ) AUNITS( NDF__MXDIM ) ! Axis units
-      LOGICAL AVAR( NDF__MXDIM ) ! Whether NDF axis-variance components are defined
-      INTEGER AXPNTR( 1 )        ! Pointer to axis centres
-      LOGICAL BAD                ! Bad pixel flag
       BYTE BADBIT                ! Bad-bits mask
-      INTEGER BBI                ! Bad-bits value as an integer
+      CHARACTER * ( 20 ) ATTRIB  ! AST Frame attribute name
+      CHARACTER * ( 30 ) SOR     ! Spectral standard of rest
+      CHARACTER * ( 30 ) SYS     ! Coordinate system
+      CHARACTER * ( 35 ) APPN    ! Last recorded application name
+      CHARACTER * ( 50 ) PRJ     ! Sky projection
       CHARACTER * ( 8 ) BINSTR   ! Binary bad-bits mask string
-      CHARACTER * ( 80 ) POSBUF  ! Buffer for position
-      CHARACTER * ( NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 ) BUF ! Text buffer for shape information
+      CHARACTER * ( 80 ) ALABEL( NDF__MXDIM ) ! Axis label
+      CHARACTER * ( 80 ) AUNITS( NDF__MXDIM ) ! Axis units
       CHARACTER * ( 80 ) CCOMP   ! Character component
-      DOUBLE PRECISION CFIRST( 1, NDF__MXDIM ) ! Frame coords of first pixel
+      CHARACTER * ( 80 ) FRMDMN  ! Frame domain
+      CHARACTER * ( 80 ) FRMTTL  ! Frame title
+      CHARACTER * ( 80 ) POSBUF  ! Buffer for position
+      CHARACTER * ( 80 ) WCSDMN( MXFRM )  ! Frame domains
+      CHARACTER * ( 80 ) WCSTTL( MXFRM )  ! Frame titles
+      CHARACTER * ( DAT__SZLOC ) XLOC ! Extension locator
+      CHARACTER * ( DAT__SZTYP ) TYPE ! Data type
+      CHARACTER * ( NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 ) BUF ! Text buffer for shape information
       CHARACTER * ( NDF__SZFRM ) CFORM( NDF__MXDIM ) ! Type for axis centres 
+      CHARACTER * ( NDF__SZFRM ) FORM ! Storage form
+      CHARACTER * ( NDF__SZFTP ) FTYPE ! Full data type
       CHARACTER * ( NDF__SZHDT ) CREAT ! History component creation date
-      CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis centres 
       CHARACTER * ( NDF__SZHDT ) DATE ! Date of last history update
+      CHARACTER * ( NDF__SZHUM ) HMODE ! History update mode
+      CHARACTER * ( NDF__SZTYP ) ATYPE ! Type for axis extent value
+      CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis centres 
+      CHARACTER * ( NDF__SZTYP ) XTYPE( MXEXTN ) ! Extension name
+      CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
+      CHARACTER * 80 TEXT                        ! General text string
+      CHARACTER * 3 MONTH( 12 )  ! Month names
+      CHARACTER * 1 SIGN         ! Sign of day value
+      DOUBLE PRECISION AEND( NDF__MXDIM ) ! End of NDF extent along an axis
+      DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start of NDF extent along an axis
+      DOUBLE PRECISION CFIRST( 1, NDF__MXDIM ) ! Frame coords of first pixel
+      DOUBLE PRECISION EP        ! Epoch of observattion
+      DOUBLE PRECISION EQ        ! Epoch of reference equinox
+      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
+      DOUBLE PRECISION FD        ! Fraction of day
+      DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
+      INTEGER AXPNTR( 1 )        ! Pointer to axis centres
+      INTEGER BBI                ! Bad-bits value as an integer
       INTEGER DIGVAL             ! Binary digit value
       INTEGER DIM( NDF__MXDIM )  ! Dimension sizes
       INTEGER EL                 ! Number of array elements mapped
-      DOUBLE PRECISION EP        ! Epoch of observattion
-      DOUBLE PRECISION EQ        ! Epoch of reference equinox
-      CHARACTER * ( NDF__SZFRM ) FORM ! Storage form
       INTEGER FRM                ! AST pointer to Frame
-      CHARACTER * ( 80 ) FRMDMN  ! Frame domain
       INTEGER FRMNAX             ! Frame dimensionality
-      CHARACTER * ( 80 ) FRMTTL  ! Frame title
-      CHARACTER * ( NDF__SZFTP ) FTYPE ! Full data type
-      LOGICAL FULLAX             ! Display full axis information?
-      LOGICAL FULLFR             ! Display more details for each WCS Frame 
-      LOGICAL FULLWC             ! Display full WCS information?
-      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
-      CHARACTER * ( NDF__SZHUM ) HMODE ! History update mode
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IAT                ! Current length of a string
       INTEGER IAXIS              ! Loop counter for axes
       INTEGER IBASE              ! Index of Base Frame in WCS FrameSet
       INTEGER ICURR              ! Index of Current Frame in WCS FrameSet
+      INTEGER ID                 ! Day of month
       INTEGER IDIG               ! Loop counter for binary digits
       INTEGER IEXTN              ! Extension index
       INTEGER IFRAME             ! Frame index
+      INTEGER IHMSF( 4 )         ! Hours, mins, secs, fraction of sec
+      INTEGER IM                 ! Index of month
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST identifier for NDF's WCS FrameSet
+      INTEGER IY                 ! Year
+      INTEGER J                  ! SLALIB status
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
-      LOGICAL MONOTO( NDF__MXDIM ) ! Axis monotonic flags
       INTEGER N                  ! Loop counter for extensions
       INTEGER NC                 ! Character count
       INTEGER NDIM               ! Number of dimensions
       INTEGER NEXTN              ! Number of extensions
       INTEGER NFRAME             ! Total number of WCS Frames
       INTEGER NFRM               ! Indexof next WCS Frame
-      LOGICAL NORM( NDF__MXDIM ) ! Axis normalisation flags
       INTEGER NREC               ! Number of history records
       INTEGER PNTR( 2 )          ! Pointers to axis elements
-      CHARACTER * ( 50 ) PRJ     ! Sky projection
+      INTEGER SIZE               ! Total number of pixels
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds
+      INTEGER WCSNAX( MXFRM )    ! Frame dimensionalities
+      LOGICAL AVAR( NDF__MXDIM ) ! Whether NDF axis-variance components are defined
+      LOGICAL BAD                ! Bad pixel flag
+      LOGICAL FULLAX             ! Display full axis information?
+      LOGICAL FULLFR             ! Display more details for each WCS Frame 
+      LOGICAL FULLWC             ! Display full WCS information?
+      LOGICAL MONOTO( NDF__MXDIM ) ! Axis monotonic flags
+      LOGICAL NORM( NDF__MXDIM ) ! Axis normalisation flags
       LOGICAL QUIET              ! Do not report the trace?
       LOGICAL REPORT             ! Report the trace?
-      INTEGER SIZE               ! Total number of pixels
       LOGICAL SHOWCS             ! Display an AST dump of the WCS component?
-      CHARACTER * ( 30 ) SOR     ! Spectral standard of rest
-      CHARACTER * ( 30 ) SYS     ! Coordinate system
+      LOGICAL SHOWEP             ! Display the Epoch value?
       LOGICAL THERE              ! Whether NDF component is defined
-      CHARACTER * ( DAT__SZTYP ) TYPE ! Data type
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds
-      CHARACTER * ( 80 ) WCSDMN( MXFRM )  ! Frame domains
-      INTEGER WCSNAX( MXFRM )    ! Frame dimensionalities
-      CHARACTER * ( 80 ) WCSTTL( MXFRM )  ! Frame titles
       LOGICAL WIDTH( NDF__MXDIM ) ! Whether NDF axis-width components are defined
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Extension locator
-      CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
-      CHARACTER * ( NDF__SZTYP ) XTYPE( MXEXTN ) ! Extension name
-      CHARACTER * 80 TEXT                        ! General text string
-      CHARACTER SIGN
-      INTEGER IDMSF(4)
 
+      DATA MONTH/ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 
+     :            'AUG', 'SEP', 'OCT', 'NOV', 'DEC' /
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
@@ -996,10 +1008,16 @@
 *  The rest is only displayed for full Frame descriptions.
                IF( FULLFR ) THEN
 
-*  If the Frame is a SkyFrame, display the epoch, equinox, system and
-*  projection.
+*  Initialise a flag to induicate that we do not have a SkyFrame or a
+*  SpecFrame, and should therefore not display the EPOCH.
+                  SHOWEP = .FALSE.
+
+*  If the Frame is a SkyFrame, display the equinox, system and projection.
                   IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
-                     EP = AST_GETD( FRM, 'EPOCH', STATUS )
+
+*  Indicate that the EPOCH should be displayed.
+                     SHOWEP = .TRUE.
+
                      EQ = AST_GETD( FRM, 'EQUINOX', STATUS )
                      SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
                      PRJ = AST_GETC( FRM, 'PROJECTION', STATUS )
@@ -1053,15 +1071,6 @@
                      CALL MSG_OUT( 'WCS_SYS',
      :         '        System              : ^SYS', STATUS )
 
-                     IF( EP .LT. 1984.0 ) THEN
-                        CALL MSG_SETC( 'EPOCH', 'B' )
-                     ELSE 
-                        CALL MSG_SETC( 'EPOCH', 'J' )
-                     END IF
-                     CALL MSG_SETD( 'EPOCH', EP )
-                     CALL MSG_OUT( 'WCS_EPOCH',
-     :         '        Epoch of observation: ^EPOCH', STATUS )
-
                      IF( PRJ .NE. ' ' ) THEN
                         CALL MSG_SETC( 'PROJ', PRJ )
                         CALL MSG_OUT( 'WCS_PROJ',
@@ -1070,6 +1079,9 @@
 
 *  If the Frame is a SpecFrame, display SpecFrame specific information...
                   ELSE IF( AST_ISASPECFRAME( FRM, STATUS ) ) THEN
+
+*  Indicate that the EPOCH should be displayed.
+                     SHOWEP = .TRUE.
 
 *  System...
                      SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
@@ -1104,19 +1116,6 @@
                      CALL MSG_OUT( 'WCS_SYS',
      :         '        System              : ^SYS', STATUS )
 
-
-*  Epoch...
-                     EP = AST_GETD( FRM, 'EPOCH', STATUS )
-                     IF( EP .LT. 1984.0 ) THEN
-                        CALL MSG_SETC( 'EPOCH', 'B' )
-                     ELSE 
-                        CALL MSG_SETC( 'EPOCH', 'J' )
-                     END IF
-                     CALL MSG_SETD( 'EPOCH', EP )
-                     CALL MSG_OUT( 'WCS_EPOCH',
-     :         '        Epoch of observation: ^EPOCH', STATUS )
-
-
 *  Rest Frequency...
                      IF( AST_TEST( FRM, 'RestFreq', STATUS ) ) THEN
                         CALL MSG_SETD( 'RF', AST_GETD( FRM, 'RestFreq',
@@ -1144,6 +1143,19 @@
             
                      ELSE IF(  CHR_SIMLR( SOR, 'LOCAL_GROUP' ) ) THEN
                         CALL MSG_SETC( 'SOR', 'Local group' )
+            
+                     ELSE IF(  CHR_SIMLR( SOR, 'SOURCE' ) ) THEN
+                        CALL AST_SETC( FRM, 'StdOfRest', 'HELIO', 
+     :                                 STATUS )
+                        POSBUF = 'Source ('
+                        IAT = 8
+                        CALL CHR_PUTR( AST_GETR( FRM, 'SourceVel',
+     :                                           STATUS ), POSBUF, IAT )
+                        CALL CHR_APPND( ' km/s - heliocentric)', POSBUF, 
+     :                                  IAT )
+                        CALL MSG_SETC( 'SOR', POSBUF( : IAT ) )
+                        CALL AST_SETC( FRM, 'StdOfRest', 'SOURCE', 
+     :                                 STATUS )
             
                      ELSE 
                         CALL MSG_SETC( 'SOR', SOR )
@@ -1191,6 +1203,42 @@
                      CALL MSG_OUT( 'WCS_REF',
      :         '        Observer (Lon,Lat)  : ^OBS', STATUS )
 
+                  END IF
+
+*  Display the epoch for all Frames (as a Julian or Besselian epoch followed 
+*  by a Gregorian date). For SkyFrames and SpecFrames, always display the
+*  epoch. For other Frames, only display it if set. 
+                  IF( .NOT. SHOWEP ) SHOWEP = AST_TEST( FRM, 'EPOCH', 
+     :                                                  STATUS )
+
+                  IF( SHOWEP ) THEN
+                     EP = AST_GETD( FRM, 'EPOCH', STATUS )
+                     IF( EP .LT. 1984.0 ) THEN
+                        CALL MSG_SETC( 'EPOCH', 'B' )
+                        MJD = SLA_EPB2D( EP )
+                     ELSE 
+                        CALL MSG_SETC( 'EPOCH', 'J' )
+                        MJD = SLA_EPJ2D( EP )
+                     END IF
+               
+                     CALL MSG_SETD( 'EPOCH', EP )
+               
+                     CALL SLA_DJCL( MJD, IY, IM, ID, FD, J ) 
+                     CALL SLA_CD2TF( 0, REAL( FD ), SIGN, IHMSF ) 
+               
+                     CALL MSG_SETI( 'DATE', ID )
+                     CALL MSG_SETC( 'DATE', '-' )
+                     CALL MSG_SETC( 'DATE', MONTH( IM ) )
+                     CALL MSG_SETC( 'DATE', '-' )
+                     CALL MSG_SETI( 'DATE', IY )
+                     CALL MSG_SETI( 'TIME', IHMSF( 1 ) )
+                     CALL MSG_SETC( 'TIME', ':' )
+                     CALL MSG_SETI( 'TIME', IHMSF( 2 ) )
+                     CALL MSG_SETC( 'TIME', ':' )
+                     CALL MSG_SETI( 'TIME', IHMSF( 3 ) )
+               
+                     CALL MSG_OUT( 'WCS_EPOCH', 
+     :   '        Epoch of observation: ^EPOCH (^DATE ^TIME)', STATUS )
                   END IF
 
 *  Map the GRID coordinates at the centre of the first pixel to obtain the 

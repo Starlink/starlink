@@ -55,6 +55,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -175,5 +176,22 @@
 
 *  Delete the group if an error occurred.
       IF( STATUS .NE. SAI__OK ) CALL GRP_DELET( IGRP, STATUS )
+
+*  Tell the user where the object came from. 
+      IF( IGRP .NE. GRP__NOID ) THEN
+         CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+         IF( SIZE .GT. 0 ) THEN
+            CALL MSG_SETC( 'FILE', FNAME ) 
+   
+            IF( ISFITS ) THEN
+               CALL MSG_SETC( 'TYP', 'FITS' )
+            ELSE 
+               CALL MSG_SETC( 'TYP', 'text' )
+            END IF
+   
+            CALL MSG_OUT( ' ', '   AST data read from ^TYP file '//
+     :                    '''^FILE''.', STATUS )
+         END IF
+      END IF
 
       END

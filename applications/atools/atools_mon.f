@@ -99,6 +99,9 @@
       ELSE IF ( NAME .EQ. 'ASTSKYFRAME' ) THEN
          CALL ASTSKYFRAME( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTSPECFRAME' ) THEN
+         CALL ASTSPECFRAME( STATUS )
+
       ELSE IF ( NAME .EQ. 'ASTFRAMESET' ) THEN
          CALL ASTFRAMESET( STATUS )
 
@@ -152,6 +155,12 @@
 
       ELSE IF ( NAME .EQ. 'ASTINVERT' ) THEN
          CALL ASTINVERT( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTSETREFPOS' ) THEN
+         CALL ASTSETREFPOS( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTGETREFPOS' ) THEN
+         CALL ASTGETREFPOS( STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE

@@ -394,7 +394,7 @@ PKG_LINK = ATOOLS
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.4
+PKG_VERS = 1.3
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -447,7 +447,7 @@ I_SUB2 =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = HLPCMD SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDF_PAR NDF_ERR \
+EXTERNAL_INCLUDES = SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDF_PAR NDF_ERR \
 PAR_ERR PAR_PAR FIO_ERR AST_PAR CNF_PAR
 
 #  List of Fortran routines required for building the package.  This is
@@ -462,8 +462,8 @@ atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astfindframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f astpermaxes.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
-astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f gethlp.f astinvert.f \
-astmapbox.f
+astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f astmapbox.f astinvert.f \
+astspecframe.f astsetrefpos.f astgetrefpos.f
 
 F_SUB2 = 
 
@@ -501,7 +501,7 @@ TASKS = astcopy astaddframe astclear astget astset asttest astcmpframe \
 astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astfindframe astpermaxes astpickaxes \
-astsimplify asttrann astinvert astmapbox
+astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos astgetrefpos
 
 #  Monolith routine source name.
 
@@ -587,7 +587,6 @@ SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 CNF_PAR:   $(STAR_INC)/cnf_par;   $(LINK) $? $@
-HLPCMD:    $(STAR_INC)/hlpcmd;     $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -1196,9 +1195,18 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-	$(INSTALL_BIN)/astpcdmap disco=1 pcdcen=\[100,100\] result=atools-test.ast accept
-	$(INSTALL_BIN)/astshow.tcl atools-test.ast
-	rm atools-test.ast
+	@ echo
+	@ echo '$(PACK_NAME) does not have a make driven installation test'
+	@ echo
+	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
+	@ echo 'thus (% is the shell prompt):'
+	@ echo
+	@ echo ' % cd /empty_directory'
+	@ echo ' % source /star/etc/cshrc'
+	@ echo ' % xdisplay'
+	@ echo ' % $(PKG_NAME)setup'
+	@ echo ' % command_name'
+	@ echo
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
@@ -1345,50 +1353,52 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 
-atl1_cpcol.o: SAE_PAR
-atl1_rdch.o : SAE_PAR AST_PAR
-atl1_rdfch.o: SAE_PAR AST_PAR
+astaddframe.o  : SAE_PAR AST_PAR
+astclear.o     : SAE_PAR AST_PAR
+astcmpframe.o  : SAE_PAR AST_PAR
+astcmpmap.o    : SAE_PAR AST_PAR
+astconvert.o   : SAE_PAR AST_PAR PAR_ERR
+astcopy.o      : SAE_PAR AST_PAR
+astfindframe.o : SAE_PAR AST_PAR PAR_ERR
+astframe.o     : SAE_PAR NDF_PAR AST_PAR
+astframeset.o  : SAE_PAR AST_PAR
+astget.o       : SAE_PAR AST_PAR
+astgetframe.o  : SAE_PAR AST_PAR       
+astgetmapping.o: SAE_PAR AST_PAR     
+astinvert.o    : SAE_PAR AST_PAR 
+astlutmap.o    : SAE_PAR AST_PAR
+astmapbox.o    : SAE_PAR NDF_PAR AST_PAR 
+astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
+astpcdmap.o    : SAE_PAR AST_PAR
+astpermaxes.o  : SAE_PAR AST_PAR NDF_PAR
+astpermmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
+astpickaxes.o  : SAE_PAR AST_PAR NDF_PAR PAR_ERR
+astremapframe.o: SAE_PAR AST_PAR
+astremoveframe.o: SAE_PAR AST_PAR
+astset.o       : SAE_PAR AST_PAR
+astsetrefpos.o : SAE_PAR AST_PAR PAR_ERR
+astgetrefpos.o : SAE_PAR AST_PAR PAR_ERR
+astsimplify.o  : SAE_PAR AST_PAR 
+astskyframe.o  : SAE_PAR AST_PAR
+astspecframe.o : SAE_PAR AST_PAR
+asttest.o      : SAE_PAR AST_PAR
+asttrann.o     : SAE_PAR NDF_PAR AST_PAR PAR_ERR 
+astunitmap.o   : SAE_PAR NDF_PAR AST_PAR
+astwinmap.o    : SAE_PAR AST_PAR NDF_PAR
 atl1_assoc.o: SAE_PAR
+atl1_cpcol.o: SAE_PAR
 atl1_creat.o: SAE_PAR AST_PAR SAE_PAR FIO_ERR
 atl1_gtfrm.o: SAE_PAR AST_PAR
 atl1_gtgrp.o: SAE_PAR GRP_PAR
 atl1_gtobj.o: SAE_PAR AST_PAR NDF_PAR 
-atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
-atl1_rdgrp.o: SAE_PAR GRP_PAR AST_PAR
 atl1_gtofl.o: SAE_PAR GRP_PAR 
+atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
+atl1_rdch.o : SAE_PAR AST_PAR
+atl1_rdfch.o: SAE_PAR AST_PAR
+atl1_rdgrp.o: SAE_PAR GRP_PAR AST_PAR
 atl1_setop.o: SAE_PAR AST_PAR GRP_PAR PAR_ERR
 atlhelp.o   : SAE_PAR PAR_ERR
 atools_mon.o: SAE_PAR 
-astaddframe.o  : SAE_PAR AST_PAR
-astcopy.o   : SAE_PAR AST_PAR
-astremapframe.o: SAE_PAR AST_PAR
-astremoveframe.o: SAE_PAR AST_PAR
-astclear.o  : SAE_PAR AST_PAR
-astget.o    : SAE_PAR AST_PAR
-astset.o    : SAE_PAR AST_PAR
-asttest.o   : SAE_PAR AST_PAR
-astcmpframe.o  : SAE_PAR AST_PAR
-astcmpmap.o    : SAE_PAR AST_PAR
-astframe.o     : SAE_PAR NDF_PAR AST_PAR
-astframeset.o  : SAE_PAR AST_PAR
-astskyframe.o  : SAE_PAR AST_PAR
-astgetframe.o  : SAE_PAR AST_PAR       
-astgetmapping.o: SAE_PAR AST_PAR     
-astconvert.o   : SAE_PAR AST_PAR PAR_ERR
-astfindframe.o : SAE_PAR AST_PAR PAR_ERR
-astpermaxes.o  : SAE_PAR AST_PAR NDF_PAR
-astpickaxes.o  : SAE_PAR AST_PAR NDF_PAR PAR_ERR
-astsimplify.o  : SAE_PAR AST_PAR 
-asttrann.o     : SAE_PAR NDF_PAR AST_PAR PAR_ERR 
-astinvert.o    : SAE_PAR AST_PAR 
-astmapbox.o    : SAE_PAR NDF_PAR AST_PAR PAR_ERR 
-astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
-astlutmap.o    : SAE_PAR AST_PAR
-astpcdmap.o    : SAE_PAR AST_PAR
-astwinmap.o    : SAE_PAR AST_PAR NDF_PAR
-astunitmap.o   : SAE_PAR NDF_PAR AST_PAR
-astpermmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
-gethlp.o       : SAE_PAR HLPCMD
 
 #-------------------------------------------------------------------------------
 #

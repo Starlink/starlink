@@ -138,6 +138,9 @@
 
 *  Store the FrameSet in the NDF, and annul the identifier.
             CALL NDF_PTWCS( IAST, INDF, STATUS )
+            CALL NDF_MSG( 'NDF', INDF )
+            CALL MSG_OUT( ' ', '   AST data written to NDF ''^NDF''.', 
+     :                    STATUS )
             CALL NDF_ANNUL( INDF, STATUS )
 
 *  If no NDF was found, annul the error and store the AST Object in a text 
