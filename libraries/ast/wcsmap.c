@@ -124,7 +124,8 @@ f     The WcsMap class does not define any new routines beyond those
 *        Ignore leading and trailing spaces in astWCsPrjType (some
 *        CTYPE FITS keywords have appeared with trailing white space).
 *     26-SEP-2001 (DSB):
-*        Changed names of all function to avoid name clashes with wcslib.
+*        Changed names of all functions and structure to avoid name clashes 
+*        with wcslib.
 *class--
 */
 
@@ -544,9 +545,9 @@ typedef struct PrjData {
    int prj;                     /* WCSLIB projection identifier value */
    char desc[60];               /* Long projection description */
    char ctype[5];               /* FITS CTYPE identifying string */
-   int (* WcsFwd)(double, double, struct prjprm *, double *, double *);
+   int (* WcsFwd)(double, double, struct AstPrjPar *, double *, double *);
                                 /* Pointer to forward projection function */
-   int (* WcsRev)(double, double, struct prjprm *, double *, double *);
+   int (* WcsRev)(double, double, struct AstPrjPar *, double *, double *);
                                 /* Pointer to reverse projection function */
    double theta0;               /* Native latitude of reference point */
 } PrjData;
@@ -632,7 +633,7 @@ static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
 static void FreePV( AstWcsMap * );
 static void InitVtab( AstWcsMapVtab * );
-static void LongRange( const PrjData *, struct prjprm *, double *, double *);
+static void LongRange( const PrjData *, struct AstPrjPar *, double *, double *);
 static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
 static void WcsPerm( AstMapping **, int *, int );
@@ -1057,7 +1058,7 @@ static void ClearPV( AstWcsMap *this, int j, int m ) {
       if( m < npar && this->p[ j ] ) this->p[ j ][ m ] = AST__BAD;
    } 
 
-/* Indicate that the intermediary values stored in the "prjprm" structure 
+/* Indicate that the intermediary values stored in the "AstPrjPar" structure 
    (which is used by the WCSLIB proj.c module) need to be re-calculated. */
     this->params.flag = 0;   
 
@@ -1136,7 +1137,7 @@ static void CopyPV( AstWcsMap *in, AstWcsMap *out ) {
 
    }
 
-/* Set the prjprm structure values. */
+/* Set the AstPrjPar structure values. */
    out->params.flag = 0;   
    out->params.p = out->p;
    out->params.np = out->np;  
@@ -1580,7 +1581,7 @@ static void InitVtab( AstWcsMapVtab *vtab ) {
    astSetDump( vtab, Dump, "WcsMap", "FITS-WCS sky projection" );
 }
 
-static void LongRange( const PrjData *prjdata, struct prjprm *params,
+static void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
                        double *high, double *low ){
 /*
 *
@@ -1596,7 +1597,7 @@ static void LongRange( const PrjData *prjdata, struct prjprm *params,
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     void LongRange( const PrjData *prjdata, struct prjprm *params,
+*     void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
 *                     double *high, double *low )
 
 *  Class Membership:
@@ -1610,7 +1611,7 @@ static void LongRange( const PrjData *prjdata, struct prjprm *params,
 *     prjdata
 *        A pointer to information about the mapping.
 *     params
-*        Pointer to a WCSLIB "prjprm" structure containing the projection 
+*        Pointer to a WCSLIB "AstPrjPar" structure containing the projection 
 *        parameters, etc.
 *     high
 *        A pointer to a location at which is returned the upper bound of
@@ -1724,7 +1725,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 */
 
 /* Local Variables: */
-   struct prjprm *params;        /* Pointer to structure holding WCSLIB info */
+   struct AstPrjPar *params;        /* Pointer to structure holding WCSLIB info */
    const PrjData *prjdata;       /* Information about the projection */
    double latitude;              /* Latitude value in degrees */
    double longitude;             /* Longitude value in degrees */
@@ -2667,7 +2668,7 @@ static void SetPV( AstWcsMap *this, int j, int m, double val ) {
       }   
    }
 
-/* Indicate that the intermediary values stored in the "prjprm" structure 
+/* Indicate that the intermediary values stored in the "AstPrjPar" structure 
    (which is used by the WCSLIB proj.c module) need to be re-calculated. 
    Also, update the pointers to the parameter arrays. */
     this->params.flag = 0;   
@@ -4136,7 +4137,7 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
          new->p = NULL;
          new->np = NULL;
 
-/* Initialise the "prjprm" structure (defined in proj.h). */
+/* Initialise the "AstPrjPar" structure (defined in proj.h). */
          new->params.flag = 0;   /* Tells FITS-WCS to re-initialise the structure. */
          new->params.unset = AST__BAD; /* Value for unset parameters */
          new->params.r0 = 0;     /* Tells FITS-WCS to use a unit sphere. */

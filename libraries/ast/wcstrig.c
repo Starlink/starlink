@@ -35,7 +35,8 @@
 *     -  Undefine PI, if previously defined
 *        (R.F. Warren-Smith, 15th November 1996).
 *     -  Changed names of projection functions and degrees trig functions
-*        to avoid clashes with wcslib. 
+*        to avoid clashes with wcslib. Also made variables "r2d" and "d2r"
+*        static.
 *        (D.S. Berry 26th September 2001)
 *
 *=============================================================================
@@ -50,8 +51,8 @@
 #undef PI
 #endif
 #define PI 3.141592653589793238462643
-const double d2r = PI / 180.0;
-const double r2d = 180.0 / PI;
+static const double d2r = PI / 180.0;
+static const double r2d = 180.0 / PI;
 
 double astCosd(angle)
 

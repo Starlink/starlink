@@ -312,7 +312,7 @@ typedef struct AstWcsMap {
    int wcsaxis[2];               /* Indices of lon and lat. axes */
    double **p;                   /* Pointer to array of projection parameter arrays */
    int *np;                      /* Pointer to array of projection parameter counts */
-   struct prjprm params;         /* WCS structure holding projection
+   struct AstPrjPar params;      /* WCS structure holding projection
                                     parameters, etc. Defined in proj.h */
 
 } AstWcsMap;

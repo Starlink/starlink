@@ -15,13 +15,14 @@
 *     -  Changed prjprm.p to use"PVj_m" instead of "PROJPi" ("double p[10]" 
 *        changed to "double **p", w[10] changed to w[110], and np, unset,
 *        axlat and axlon added). (D.S. Berry 1st April 2000).
-*     -  Changed names of all function to avoid name clashes with wcslib.
+*     -  Changed names of all functions and structures to avoid name clashes 
+*        with wcslib.
 *=============================================================================
 */
 
 #include "wcstrig.h"
 
-struct prjprm {
+struct AstPrjPar {
    int flag;
    int n;
    double r0;
@@ -33,81 +34,81 @@ struct prjprm {
    int axlon;
 };
 
-   int astAzpset(struct prjprm *);
-   int astAzpfwd(double, double, struct prjprm *, double *, double *);
-   int astAzprev(double, double, struct prjprm *, double *, double *);
-   int astTanset(struct prjprm *);
-   int astTanfwd(double, double, struct prjprm *, double *, double *);
-   int astTanrev(double, double, struct prjprm *, double *, double *);
-   int astSinset(struct prjprm *);
-   int astSinfwd(double, double, struct prjprm *, double *, double *);
-   int astSinrev(double, double, struct prjprm *, double *, double *);
-   int astStgset(struct prjprm *);
-   int astStgfwd(double, double, struct prjprm *, double *, double *);
-   int astStgrev(double, double, struct prjprm *, double *, double *);
-   int astArcset(struct prjprm *);
-   int astArcfwd(double, double, struct prjprm *, double *, double *);
-   int astArcrev(double, double, struct prjprm *, double *, double *);
-   int astZpnset(struct prjprm *);
-   int astZpnfwd(double, double, struct prjprm *, double *, double *);
-   int astZpnrev(double, double, struct prjprm *, double *, double *);
-   int astZeaset(struct prjprm *);
-   int astZeafwd(double, double, struct prjprm *, double *, double *);
-   int astZearev(double, double, struct prjprm *, double *, double *);
-   int astAirset(struct prjprm *);
-   int astAirfwd(double, double, struct prjprm *, double *, double *);
-   int astAirrev(double, double, struct prjprm *, double *, double *);
-   int astCypset(struct prjprm *);
-   int astCypfwd(double, double, struct prjprm *, double *, double *);
-   int astCyprev(double, double, struct prjprm *, double *, double *);
-   int astCarset(struct prjprm *);
-   int astCarfwd(double, double, struct prjprm *, double *, double *);
-   int astCarrev(double, double, struct prjprm *, double *, double *);
-   int astMerset(struct prjprm *);
-   int astMerfwd(double, double, struct prjprm *, double *, double *);
-   int astMerrev(double, double, struct prjprm *, double *, double *);
-   int astCeaset(struct prjprm *);
-   int astCeafwd(double, double, struct prjprm *, double *, double *);
-   int astCearev(double, double, struct prjprm *, double *, double *);
-   int astCopset(struct prjprm *);
-   int astCopfwd(double, double, struct prjprm *, double *, double *);
-   int astCoprev(double, double, struct prjprm *, double *, double *);
-   int astCodset(struct prjprm *);
-   int astCodfwd(double, double, struct prjprm *, double *, double *);
-   int astCodrev(double, double, struct prjprm *, double *, double *);
-   int astCoeset(struct prjprm *);
-   int astCoefwd(double, double, struct prjprm *, double *, double *);
-   int astCoerev(double, double, struct prjprm *, double *, double *);
-   int astCooset(struct prjprm *);
-   int astCoofwd(double, double, struct prjprm *, double *, double *);
-   int astCoorev(double, double, struct prjprm *, double *, double *);
-   int astBonset(struct prjprm *);
-   int astBonfwd(double, double, struct prjprm *, double *, double *);
-   int astBonrev(double, double, struct prjprm *, double *, double *);
-   int astPcoset(struct prjprm *);
-   int astPcofwd(double, double, struct prjprm *, double *, double *);
-   int astPcorev(double, double, struct prjprm *, double *, double *);
-   int astSflset(struct prjprm *);
-   int astSflfwd(double, double, struct prjprm *, double *, double *);
-   int astSflrev(double, double, struct prjprm *, double *, double *);
-   int astParset(struct prjprm *);
-   int astParfwd(double, double, struct prjprm *, double *, double *);
-   int astParrev(double, double, struct prjprm *, double *, double *);
-   int astAitset(struct prjprm *);
-   int astAitfwd(double, double, struct prjprm *, double *, double *);
-   int astAitrev(double, double, struct prjprm *, double *, double *);
-   int astMolset(struct prjprm *);
-   int astMolfwd(double, double, struct prjprm *, double *, double *);
-   int astMolrev(double, double, struct prjprm *, double *, double *);
-   int astCscset(struct prjprm *);
-   int astCscfwd(double, double, struct prjprm *, double *, double *);
-   int astCscrev(double, double, struct prjprm *, double *, double *);
-   int astQscset(struct prjprm *);
-   int astQscfwd(double, double, struct prjprm *, double *, double *);
-   int astQscrev(double, double, struct prjprm *, double *, double *);
-   int astTscset(struct prjprm *);
-   int astTscfwd(double, double, struct prjprm *, double *, double *);
-   int astTscrev(double, double, struct prjprm *, double *, double *);
+   int astAzpset(struct AstPrjPar *);
+   int astAzpfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astAzprev(double, double, struct AstPrjPar *, double *, double *);
+   int astTanset(struct AstPrjPar *);
+   int astTanfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astTanrev(double, double, struct AstPrjPar *, double *, double *);
+   int astSinset(struct AstPrjPar *);
+   int astSinfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astSinrev(double, double, struct AstPrjPar *, double *, double *);
+   int astStgset(struct AstPrjPar *);
+   int astStgfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astStgrev(double, double, struct AstPrjPar *, double *, double *);
+   int astArcset(struct AstPrjPar *);
+   int astArcfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astArcrev(double, double, struct AstPrjPar *, double *, double *);
+   int astZpnset(struct AstPrjPar *);
+   int astZpnfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astZpnrev(double, double, struct AstPrjPar *, double *, double *);
+   int astZeaset(struct AstPrjPar *);
+   int astZeafwd(double, double, struct AstPrjPar *, double *, double *);
+   int astZearev(double, double, struct AstPrjPar *, double *, double *);
+   int astAirset(struct AstPrjPar *);
+   int astAirfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astAirrev(double, double, struct AstPrjPar *, double *, double *);
+   int astCypset(struct AstPrjPar *);
+   int astCypfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCyprev(double, double, struct AstPrjPar *, double *, double *);
+   int astCarset(struct AstPrjPar *);
+   int astCarfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCarrev(double, double, struct AstPrjPar *, double *, double *);
+   int astMerset(struct AstPrjPar *);
+   int astMerfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astMerrev(double, double, struct AstPrjPar *, double *, double *);
+   int astCeaset(struct AstPrjPar *);
+   int astCeafwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCearev(double, double, struct AstPrjPar *, double *, double *);
+   int astCopset(struct AstPrjPar *);
+   int astCopfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCoprev(double, double, struct AstPrjPar *, double *, double *);
+   int astCodset(struct AstPrjPar *);
+   int astCodfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCodrev(double, double, struct AstPrjPar *, double *, double *);
+   int astCoeset(struct AstPrjPar *);
+   int astCoefwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCoerev(double, double, struct AstPrjPar *, double *, double *);
+   int astCooset(struct AstPrjPar *);
+   int astCoofwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCoorev(double, double, struct AstPrjPar *, double *, double *);
+   int astBonset(struct AstPrjPar *);
+   int astBonfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astBonrev(double, double, struct AstPrjPar *, double *, double *);
+   int astPcoset(struct AstPrjPar *);
+   int astPcofwd(double, double, struct AstPrjPar *, double *, double *);
+   int astPcorev(double, double, struct AstPrjPar *, double *, double *);
+   int astSflset(struct AstPrjPar *);
+   int astSflfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astSflrev(double, double, struct AstPrjPar *, double *, double *);
+   int astParset(struct AstPrjPar *);
+   int astParfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astParrev(double, double, struct AstPrjPar *, double *, double *);
+   int astAitset(struct AstPrjPar *);
+   int astAitfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astAitrev(double, double, struct AstPrjPar *, double *, double *);
+   int astMolset(struct AstPrjPar *);
+   int astMolfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astMolrev(double, double, struct AstPrjPar *, double *, double *);
+   int astCscset(struct AstPrjPar *);
+   int astCscfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astCscrev(double, double, struct AstPrjPar *, double *, double *);
+   int astQscset(struct AstPrjPar *);
+   int astQscfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astQscrev(double, double, struct AstPrjPar *, double *, double *);
+   int astTscset(struct AstPrjPar *);
+   int astTscfwd(double, double, struct AstPrjPar *, double *, double *);
+   int astTscrev(double, double, struct AstPrjPar *, double *, double *);
 
 #if defined( PI )
 #undef PI

@@ -64,7 +64,8 @@
 *
 *  D.S. Berry (26th September 2001)
 *     - Changed names of projection functions and degrees trig functions
-*     to avoid clashes with wcslib.
+*     to avoid clashes with wcslib. Also rename prmprm structure to
+*     AstPrjPar.
 *
 *=============================================================================
 *
@@ -109,13 +110,13 @@
 *
 *   Initialization routine; *set()
 *   ------------------------------
-*   Initializes members of a prjprm data structure which hold intermediate
+*   Initializes members of a AstPrjPar data structure which hold intermediate
 *   values.  Note that this routine need not be called directly; it will be
 *   invoked by prjfwd() and prjrev() if the "flag" structure member is
 *   anything other than a predefined magic value.
 *
 *   Given and/or returned:
-*      prj      prjprm*  Projection parameters (see below).
+*      prj      AstPrjPar*  Projection parameters (see below).
 *
 *   Function return value:
 *               int      Error status
@@ -136,7 +137,7 @@
 *      theta             native spherical coordinates, in degrees.
 *
 *   Given and returned:
-*      prj      prjprm*  Projection parameters (see below).
+*      prj      AstPrjPar*  Projection parameters (see below).
 *
 *   Returned:
 *      x,y      double*  Projected coordinates.
@@ -160,7 +161,7 @@
 *      x,y      double   Projected coordinates.
 *
 *   Given and returned:
-*      prj      prjprm*  Projection parameters (see below).
+*      prj      AstPrjPar*  Projection parameters (see below).
 *
 *   Returned:
 *      phi,     double*  Longitude and latitude of the projected point in
@@ -178,7 +179,7 @@
 *
 *   Projection parameters
 *   ---------------------
-*   The prjprm struct consists of the following:
+*   The AstPrjPar struct consists of the following:
 *
 *      int flag
 *         This flag must be set to zero whenever any of p, np, axlat,
@@ -215,7 +216,7 @@
 *         The index within p[] and np[] of the longitude axis values.
 
 *
-*   The remaining members of the prjprm struct are maintained by the
+*   The remaining members of the AstPrjPar struct are maintained by the
 *   initialization routines and should not be modified.  This is done for the
 *   sake of efficiency and to allow an arbitrary number of contexts to be
 *   maintained simultaneously.
@@ -289,7 +290,7 @@
 
 int astAzpset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) prj->r0 = R2D;
@@ -320,7 +321,7 @@ struct prjprm *prj;
 int astAzpfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r, s, sinth, mu;
@@ -358,7 +359,7 @@ struct prjprm *prj;
 int astAzprev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r, rho, s;
@@ -412,7 +413,7 @@ struct prjprm *prj;
 
 int astTanset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int m;
@@ -477,7 +478,7 @@ struct prjprm *prj;
 int astTanfwd(phi, theta, prj, xx, yy)
 
 double phi, theta, *xx, *yy;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r, s, xi, eta, x2, xy, y2, r2, x3, x2y, xy2, y3, r3, x4, x3y,
@@ -679,7 +680,7 @@ struct prjprm *prj;
 int astTanrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r, xi, eta, x2, xy, y2, r2, x3, x2y, xy2, y3, r3, x4, x3y,
@@ -807,7 +808,7 @@ struct prjprm *prj;
 
 int astSinset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) prj->r0 = R2D;
@@ -841,7 +842,7 @@ struct prjprm *prj;
 int astSinfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double cthe, t, z, sinth;
@@ -878,7 +879,7 @@ struct prjprm *prj;
 int astSinrev (x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    const double tol = 1.0e-13;
@@ -974,7 +975,7 @@ struct prjprm *prj;
 
 int astStgset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -995,7 +996,7 @@ struct prjprm *prj;
 int astStgfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r, s;
@@ -1023,7 +1024,7 @@ struct prjprm *prj;
 int astStgrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r;
@@ -1056,7 +1057,7 @@ struct prjprm *prj;
 
 int astArcset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -1077,7 +1078,7 @@ struct prjprm *prj;
 int astArcfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r;
@@ -1100,7 +1101,7 @@ struct prjprm *prj;
 int astArcrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r;
@@ -1140,7 +1141,7 @@ struct prjprm *prj;
 
 int astZpnset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int   i, j, k;
@@ -1234,7 +1235,7 @@ struct prjprm *prj;
 int astZpnfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int   j;
@@ -1264,7 +1265,7 @@ struct prjprm *prj;
 int astZpnrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int   i, j, k;
@@ -1385,7 +1386,7 @@ struct prjprm *prj;
 
 int astZeaset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -1406,7 +1407,7 @@ struct prjprm *prj;
 int astZeafwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r;
@@ -1429,7 +1430,7 @@ struct prjprm *prj;
 int astZearev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double r;
@@ -1484,7 +1485,7 @@ struct prjprm *prj;
 
 int astAirset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    const double tol = 1.0e-4;
@@ -1524,7 +1525,7 @@ struct prjprm *prj;
 int astAirfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double cxi, r, txi, xi;
@@ -1561,7 +1562,7 @@ struct prjprm *prj;
 int astAirrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int   j;
@@ -1659,7 +1660,7 @@ struct prjprm *prj;
 
 int astCypset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
 
@@ -1718,7 +1719,7 @@ struct prjprm *prj;
 int astCypfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double s;
@@ -1745,7 +1746,7 @@ struct prjprm *prj;
 int astCyprev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double eta, a;
@@ -1789,7 +1790,7 @@ struct prjprm *prj;
 
 int astCarset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
 
@@ -1811,7 +1812,7 @@ struct prjprm *prj;
 int astCarfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int seterr;
@@ -1832,7 +1833,7 @@ struct prjprm *prj;
 int astCarrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int seterr;
@@ -1859,7 +1860,7 @@ struct prjprm *prj;
 
 int astMerset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -1880,7 +1881,7 @@ struct prjprm *prj;
 int astMerfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int seterr;
@@ -1905,7 +1906,7 @@ struct prjprm *prj;
 int astMerrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int seterr;
@@ -1943,7 +1944,7 @@ struct prjprm *prj;
 
 int astCeaset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if( prj->np && prj->p && prj->np[ prj->axlat ] > 1 ){
@@ -1981,7 +1982,7 @@ struct prjprm *prj;
 int astCeafwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int seterr;
@@ -2002,7 +2003,7 @@ struct prjprm *prj;
 int astCearev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double s;
@@ -2050,7 +2051,7 @@ struct prjprm *prj;
 
 int astCopset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
 
@@ -2096,7 +2097,7 @@ struct prjprm *prj;
 int astCopfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, r;
@@ -2121,7 +2122,7 @@ struct prjprm *prj;
 int astCoprev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, dy, r;
@@ -2172,7 +2173,7 @@ struct prjprm *prj;
 
 int astCodset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if( prj->np && prj->p && prj->np[ prj->axlat ] > 1 ){
@@ -2214,7 +2215,7 @@ struct prjprm *prj;
 int astCodfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, r;
@@ -2239,7 +2240,7 @@ struct prjprm *prj;
 int astCodrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, dy, r;
@@ -2295,7 +2296,7 @@ struct prjprm *prj;
 
 int astCoeset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double theta1, theta2;
@@ -2344,7 +2345,7 @@ struct prjprm *prj;
 int astCoefwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, r;
@@ -2373,7 +2374,7 @@ struct prjprm *prj;
 int astCoerev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, dy, r, w;
@@ -2443,7 +2444,7 @@ struct prjprm *prj;
 
 int astCooset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double cos1, cos2, tan1, tan2, theta1, theta2;
@@ -2499,7 +2500,7 @@ struct prjprm *prj;
 int astCoofwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, r;
@@ -2532,7 +2533,7 @@ struct prjprm *prj;
 int astCoorev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, dy, r;
@@ -2586,7 +2587,7 @@ struct prjprm *prj;
 
 int astBonset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if( prj->np && prj->p && prj->np[ prj->axlat ] > 1 ){
@@ -2614,7 +2615,7 @@ struct prjprm *prj;
 int astBonfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, r;
@@ -2644,7 +2645,7 @@ struct prjprm *prj;
 int astBonrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, dy, costhe, r;
@@ -2693,7 +2694,7 @@ struct prjprm *prj;
 
 int astPcoset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -2716,7 +2717,7 @@ struct prjprm *prj;
 int astPcofwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double a, costhe, cotthe, sinthe;
@@ -2748,7 +2749,7 @@ struct prjprm *prj;
 int astPcorev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int   j;
@@ -2839,7 +2840,7 @@ struct prjprm *prj;
 
 int astSflset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -2860,7 +2861,7 @@ struct prjprm *prj;
 int astSflfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int seterr;
@@ -2881,7 +2882,7 @@ struct prjprm *prj;
 int astSflrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double w;
@@ -2916,7 +2917,7 @@ struct prjprm *prj;
 
 int astParset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -2941,7 +2942,7 @@ struct prjprm *prj;
 int astParfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double s;
@@ -2964,7 +2965,7 @@ struct prjprm *prj;
 int astParrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double s, t;
@@ -3009,7 +3010,7 @@ struct prjprm *prj;
 
 int astAitset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) prj->r0 = R2D;
@@ -3028,7 +3029,7 @@ struct prjprm *prj;
 int astAitfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double costhe, w;
@@ -3052,7 +3053,7 @@ struct prjprm *prj;
 int astAitrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double s, u, xp, yp, z;
@@ -3098,7 +3099,7 @@ struct prjprm *prj;
 
 int astMolset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) prj->r0 = R2D;
@@ -3118,7 +3119,7 @@ struct prjprm *prj;
 int astMolfwd(phi, theta, prj, x, y)
 
 double phi, theta, *x, *y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    int   j;
@@ -3167,7 +3168,7 @@ struct prjprm *prj;
 int astMolrev(x, y, prj, phi, theta)
 
 double x, y, *phi, *theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    double s, y0, z;
@@ -3231,7 +3232,7 @@ struct prjprm *prj;
 
 int astCscset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -3252,7 +3253,7 @@ struct prjprm *prj;
 int astCscfwd(phi, theta, prj, x, y)
 
 double phi, theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 double *x, *y;
 
 {
@@ -3385,7 +3386,7 @@ double *x, *y;
 int astCscrev(x, y, prj, phi, theta)
 
 double x, y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 double *phi, *theta;
 
 {
@@ -3532,7 +3533,7 @@ double *phi, *theta;
 
 int astQscset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -3553,7 +3554,7 @@ struct prjprm *prj;
 int astQscfwd(phi, theta, prj, x, y)
 
 double phi, theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 double *x, *y;
 
 {
@@ -3728,7 +3729,7 @@ double *x, *y;
 int astQscrev(x, y, prj, phi, theta)
 
 double x, y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 double *phi, *theta;
 
 {
@@ -3904,7 +3905,7 @@ double *phi, *theta;
 
 int astTscset(prj)
 
-struct prjprm *prj;
+struct AstPrjPar *prj;
 
 {
    if (prj->r0 == 0.0) {
@@ -3925,7 +3926,7 @@ struct prjprm *prj;
 int astTscfwd(phi, theta, prj, x, y)
 
 double phi, theta;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 double *x, *y;
 
 {
@@ -4023,7 +4024,7 @@ double *x, *y;
 int astTscrev(x, y, prj, phi, theta)
 
 double x, y;
-struct prjprm *prj;
+struct AstPrjPar *prj;
 double *phi, *theta;
 
 {
