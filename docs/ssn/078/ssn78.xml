@@ -5806,39 +5806,6 @@ target: dependency
             present are <code>per-package-dirs</code> and
             <code>docs-only</code>.</p>
 
-          <p>The option
-            <code>per-package-dirs</code><index>per-package-dirs</index>,
-            has three consequences:
-            <ol>
-              <li>
-                <p>applications, help and etc files are installed in a
-                  package-specific directory</p>
-              </li>
-              <li>
-                <p>The otherwise-forbidden variable
-                <code>bin_DATA</code> is permitted: any files assigned
-                to this variable are installed in the
-                (package-specific) binary directory as data, as
-                opposed to executables.</p>
-              </li>
-              <li>
-                <p>A file <code>version.dat</code> is
-                created<index>version.dat</index> (at make 
-                rather than install time).  This holds the bare
-                <code>PACKAGE_VERSION</code> number, and is installed in the
-                binary directory.</p>
-              </li>
-            </ol>
-            See also <ref id="developments"/>.
-          </p>
-
-          <p>The <code>docs-dir</code> option declares that this
-            component contains only documentation (or at least, no
-            code).  This triggers mild changes in the behaviour of the
-            <code>STAR_DEFAULTS</code> macro which should make
-            configuration somewhat faster in this case.  Certain other
-            macros, such as <code>STAR_MESSGEN</code><index>starconf!macros!STAR_MESSGEN</index>, are disabled.</p>
-
           <p>As part of its initialisation, this macro does the following:
             <ul>
               <li>
@@ -5887,6 +5854,43 @@ target: dependency
             package in a subdirectory, by calling its
             <code>./configure</code> script with a suitable
             <code>--prefix</code> option.</p>
+
+          <p>The option
+            <code>per-package-dirs</code><index>per-package-dirs</index>,
+            has three consequences:
+            <ol>
+              <li>
+                <p>applications, help and etc files are installed in a
+                  package-specific directory (however the
+                  <code>fac_*_err</code> files are regarded as being
+                  in a separate category, and still install in
+                  <code>/star/help</code>, without any
+                  package-specific prefix);</p>
+              </li>
+              <li>
+                <p>the otherwise-forbidden variable
+                <code>bin_DATA</code> is permitted: any files assigned
+                to this variable are installed in the
+                (package-specific) binary directory as data, as
+                opposed to executables;</p>
+              </li>
+              <li>
+                <p>a file <code>version.dat</code> is
+                created<index>version.dat</index> (at make 
+                rather than install time).  This holds the bare
+                <code>PACKAGE_VERSION</code> number, and is installed in the
+                binary directory.</p>
+              </li>
+            </ol>
+            See also <ref id="developments"/>.
+          </p>
+
+          <p>The <code>docs-dir</code> option declares that this
+            component contains only documentation (or at least, no
+            code).  This triggers mild changes in the behaviour of the
+            <code>STAR_DEFAULTS</code> macro which should make
+            configuration somewhat faster in this case.  Certain other
+            macros, such as <code>STAR_MESSGEN</code><index>starconf!macros!STAR_MESSGEN</index>, are disabled.</p>
 
         </subsect>
 
