@@ -60,3 +60,8 @@ make-starconf: make-starconf.in
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
 	mv make-starconf.tmp make-starconf
 	chmod +x make-starconf
+
+## It would be good to include making GenerateDependencies.class in
+## here, but that would require finessing automake, which demands that
+## Java files be guilt with gcj.  At least, it would be good to
+## install the build class files from subdirectory java/.
