@@ -1,8 +1,25 @@
+2000-05-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm (calls): Only use a single arg to constant
+
+2000-04-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Change constant() routine to only have a single argument
+
+	* NDF.pm (AUTOLOAD): Fix autloader so that it only asks for the
+	constant name without delving deeper into @_
+
+2000-04-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* getarg.c: Replace na with PL_na
+
 2000-01-25  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm: Check for defined value for $value from
 	fits_get_nth_item to fix -w warning.
 
+	--- RELEASE V1.41 to Starlink ---
+	
 1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Makefile.PL: Use Starlink::Config
