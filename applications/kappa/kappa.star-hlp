@@ -3471,10 +3471,10 @@ The following applications now propagate the WCS component of an NDF
 structure: 
 
    ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT COMPADD COMPAVE COMPICK
-   CONVOLVE CSUB DISPLAY ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ 
-   INSPECT DIV LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC 
-   NORMALIZE PASTE RIFT SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT 
-   THRESH WIENER ZAPLIN
+   CONVOLVE CSUB DISPLAY ERRCLIP FFCLEAN FILLBAD FLIP GAUSMOOTH GREYPLOT 
+   HISTEQ INSPECT DIV LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY 
+   NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB 
+   SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
 
 1 CHPIX
 Replaces the values of selected pixels in an NDF.
@@ -11320,10 +11320,10 @@ For information on individual parameters, select from the list below:
 3 AXIS
 AXIS = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
-   then any axis values associated with the NDF dimension being
-   reversed will also be reversed in the same way.  If a FALSE
-   value is given, then all axis values will be left unchanged.
-   [TRUE]
+   then any axis values and WCS information associated with the
+   NDF dimension being reversed will also be reversed in the same
+   way.  If a FALSE value is given, then all axis values and WCS
+   information will be left unchanged. [TRUE]
 3 DIM
 DIM = _INTEGER (Read)
    The number of the dimension along which the NDF's pixels
@@ -11365,6 +11365,8 @@ The pixel-index bounds of the NDF are unchanged by this routine.
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  13-MAR-1991 (RFWS):
     Original version.
@@ -11372,9 +11374,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
+
+ 11-JUN-1998 (DSB):
+    Added propagation of the NDF WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -25138,10 +25143,16 @@ pixdupe cube1 cube2 [3,1,2]  title="Reconfigured cube"
    KAPPA: COMPADD, COMPAVE, COMPICK.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1995 April 28 (MJC):
     Original NDF version.
 
+ 11-JUN-1998 (DSB):
+    Added propagation of the NDF WCS component.
+
+ {enter_any_changes_here}
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
@@ -26705,23 +26716,29 @@ four pixels are bad, the result is bad.
    KAPPA: FLIP, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1995 May 14 (MJC):
     Original NDF version.
 
+ 12-JUN-1998 (DSB):
+    Added propagation of the NDF WCS component.
+
+ {enter_any_changes_here}
 2 Implementation_Status
    The propagation rules depend on parameters ANGLE and NNMETH.
 
    -  For rotations that are multiples of 90-degrees, VARIANCE,
-   QUALITY, AXIS, HISTORY, LABEL and UNITS components of the input
-   NDF are propagated to the output NDF.  The axis components are
-   switched and flipped as appropriate.
+   QUALITY, AXIS, HISTORY, LABEL WCS and UNITS components of the input
+   NDF are propagated to the output NDF.  The axis and WCS components
+   are switched and flipped as appropriate.
 
    -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
-   LABEL and UNITS components of the input NDF are propagated to the
-   output NDF.
+   LABEL, WCS and UNITS components of the input NDF are propagated to
+   the output NDF.
 
-   -  For the linear interpolation method HISTORY, LABEL and
+   -  For the linear interpolation method HISTORY, LABEL, WCS and
    UNITS components of the input NDF are propagated to the output
    NDF.  In addition if parameter VARIANCE is TRUE, variance
    information is derived from the input variance; and if parameter
