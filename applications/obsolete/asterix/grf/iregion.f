@@ -754,7 +754,7 @@
 *    Local variables :
       CHARACTER CH
       CHARACTER*80 TEXT
-      CHARACTER*(DAT__SZLOC) ALOC       ! Locator to attitude file
+c     CHARACTER*(DAT__SZLOC) ALOC       ! Locator to attitude file
       REAL X1,Y1,X2,Y2,XC,YC
       REAL RAD,RADWID,INNRAD,OUTRAD
       REAL SLENGTH                      ! length of spokes in degs
@@ -765,15 +765,15 @@
       REAL XSP(4),YSP(4)                ! cornes of spoke
       REAL XEND,YEND                    ! centre of end of spoke
       REAL XANG                         ! X value to calc spoke angle from.
-      REAL RMEAN                        ! mean roll angle Degrees
+c     REAL RMEAN                        ! mean roll angle Degrees
       REAL THETA                        ! mean roll angle (radians)
       REAL EXTRA                        ! additional width of ribs (degs)
       REAL ANGLE
       REAL XSC,YSC
       INTEGER L
-      INTEGER RPNTR                     ! pointer to the roll angle array
-      INTEGER TPNTR                     ! pointer to the time array
-      INTEGER NVALS                     ! number of time/roll values
+c     INTEGER RPNTR                     ! pointer to the roll angle array
+c     INTEGER TPNTR                     ! pointer to the time array
+c     INTEGER NVALS                     ! number of time/roll values
       INTEGER LP
 *-
 

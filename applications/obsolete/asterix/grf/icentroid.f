@@ -24,9 +24,9 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*1 CH
-      REAL XC,YC
-      REAL XR,YR,RAD
+c     CHARACTER*1 CH
+      REAL XC,YC,RAD
+c     REAL XR,YR
       REAL XCENT,YCENT
       INTEGER I,ITER
 *    Version :
