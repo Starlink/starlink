@@ -1151,11 +1151,14 @@
       IF (STATUS .NE. SAI__OK) RETURN
 *
 *     Get header information
+	print *,'getting RAT header'
       CALL RAT_GETXRTHEAD(RTNAME,HEAD,STATUS)
+	print *,'got header'
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Copy the times into the right output variables
       NSEL = HEAD.NTRANGE * 2
+	print *,'time ranges=',nsel
 *
       DO LP=1,HEAD.NTRANGE
          RAWTIM(1+(LP-1)*2) = HEAD.TSTART(LP)
