@@ -196,7 +196,7 @@
 *    Write the command name
         CALL ADI_GET0C( ARGS(2), NAME, STATUS )
         NLEN = MAX( 1, CHR_LEN(NAME) )
-        CALL DAT_NEW0C( CRLOC, 'COMMAND', NAME(:NLEN), STATUS )
+        CALL DAT_NEW0C( CRLOC, 'COMMAND', NLEN, STATUS )
         CALL CMP_PUT0C( CRLOC, 'COMMAND', NAME(:NLEN), STATUS )
 
 *    Release current record
