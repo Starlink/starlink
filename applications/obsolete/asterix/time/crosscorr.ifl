@@ -1,20 +1,22 @@
 Interface CROSSCORR
    Parameter      INP1
       position    1
-      type        'UNIV'
+      type        'LITERAL'
+      ppath 'GLOBAL'
+      association '<-GLOBAL.BINDS'
       prompt      'Input object 1'
    EndParameter
 
    Parameter      INP2
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Input object 2'
    EndParameter
 
    Parameter    OUT
       position    3
-      type        'UNIV'
-      association '->GLOBAL.GRAFDS'
+      type        'LITERAL'
+      association '->GLOBAL.BINDS'
       prompt      'Output object'
    EndParameter
 
