@@ -1984,7 +1984,6 @@ DSB: David S. Berry (STARLINK)
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
- {enter_any_changes_here
 2 Implementation_Status
    -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
    TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF; and
@@ -33438,6 +33437,17 @@ Description:
    -  clear an attribute value.
 
    -  test the state of an attribute.
+
+   Note, the attributes of the PIXEL, GRID and AXIS Frames are managed
+   internally by the NDF library. They may be examined using this
+   application, but an error is reported if any attempt is made to 
+   change them. The exception to this is that the DOMAIN attribute may
+   be changed, resulting in a copy of the Frame being added to the WCS 
+   compnent of the NDF with the new Domain name. The AXIS Frame is 
+   derived from the AXIS structures within the NDF, so the AXLABEL 
+   and AXUNITS commands may be used to change the axis label or units 
+   string for the AXIS Frame.
+
 2 Parameters
 For information on individual parameters, select from the list below:
 3 NAME
@@ -33517,8 +33527,11 @@ wcsattrib my_data clear label(1)
 2 Notes
 -  An error is reported if an attempt is made to set or clear the
 Base Frame in the WCS component.
+-  The Domain names GRID, AXIS and PIXEL are reserved for use by
+the NDF library and an error will be reported if an attempt is made 
+to assign one of these Domain values to any Frame.
 2 Related_Applications
-   KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD
+   KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXUNITS, AXLABEL
 2 Authors
 DSB: David Berry (STARLINK)
 2 History

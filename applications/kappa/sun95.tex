@@ -42345,6 +42345,17 @@ plot (7k).
          \sstitem
          test the state of an attribute.
       }
+
+      Note, the attributes of the PIXEL, GRID and AXIS Frames are managed
+      internally by the NDF library. They may be examined using this
+      application, but an error is reported if any attempt is made to 
+      change them. The exception to this is that the DOMAIN attribute may
+      be changed, resulting in a copy of the Frame being added to the WCS 
+      compnent of the NDF with the new Domain name. The AXIS Frame is 
+      derived from the AXIS structures within the NDF, so the AXLABEL 
+      and AXUNITS commands may be used to change the axis label or units 
+      string for the AXIS Frame.
+
    }
    \sstusage{
       wcsattrib ndf mode name newval
@@ -42466,12 +42477,18 @@ plot (7k).
          \sstitem
          An error is reported if an attempt is made to set or clear the
          Base Frame in the WCS component.
+
+         \sstitem
+         The Domain names GRID, AXIS and PIXEL are reserved for use by
+	 the NDF library and an error will be reported if an attempt is
+	 made to assign one of these Domain values to any Frame.
+
       }
    }
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD.
+      KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXUNITS, AXLABEL.
    }
 }
 \sstroutine{
@@ -46256,6 +46273,10 @@ background colour to use when drawing text strings within a plot. It can be
 set to a specified colour, or can be set to produce a transparent
 background.
 
+\item A bug has been fixed which could cause catalogues stored in a
+``Small Text List'' format (\emph{i.e.} with a file type of {\tt .txt}) 
+to be unreadable as a KAPPA positions list.
+
 \end{itemize}
 
 \subsection{Modified applications}
@@ -46278,6 +46299,12 @@ The following applications have been modified:
                TRUE has been increased from 3 to 5.
       \end{itemize}
 
+   \item [\htmlref{FILLBAD}{FILLBAD}] \mbox{}
+      \begin{itemize}
+         \item A bug has been fixed in FILLBAD which caused the MEMORY=YES
+               option to produce incorrect results.
+      \end{itemize}
+
    \item [\htmlref{FITSEDIT}{FITSEDIT}] \mbox{}
       \begin{itemize}
          \item FITSEDIT and FITSTEXT both now allow blank keyword values
@@ -46287,12 +46314,14 @@ The following applications have been modified:
                they abut the keyword value in the text file.
       \end{itemize}
 
-   \item [\htmlref{THRESH}{THRESH}] \mbox{}
-      \begin{itemize}
-         \item May now be used to replace data \emph{between} specified
-               thresholds as well as \emph{outside} specified thresholds,
-               by setting the lower threshold greater than the upper
-               threshold.
+   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] \mbox{} 
+      \begin{itemize} 
+         \item WCSATTRIB now reports an error if an attempt is made to
+	       change attribute values in any of the Frames which are
+	       managed internally by the NDF library (that is, Frames
+	       with Domains PIXEL, AXIS and GRID). The exception to this
+               is that the Domain attribute itself may be changed, thereby 
+               adding a new Frame to the WCS component.
       \end{itemize}
 
 \end{description}

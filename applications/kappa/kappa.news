@@ -32,3 +32,15 @@
    colour for text to be selected (or set transparent) has been documented 
    in SUN/95.
 
+   - A bug has been fixed which could cause catalogues stored in a
+   "Small Text List" format (i.e. with a file type of ".txt") to be 
+   unreadable as a KAPPA positions list.
+
+   - A bug has been fixed in FILLBAD which caused the MEMORY=YES option
+   to produce incorrect results. 
+
+   - WCSATTRIB now reports an error if an attempt is made to change
+   attribute values in any of the Frames which are managed internally by
+   the NDF library (that is, Frames with Domains PIXEL, AXIS and GRID).
+   The exception to this is that the Domain attribute itself may be
+   changed, thereby adding a new Frame to the WCS component. 
