@@ -553,6 +553,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -773,6 +774,7 @@ dist:
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 435 files to /apps/cvsbuild/java/source/splat/docs/splat
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -1000,4 +1002,4 @@ install:
 [loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 15 seconds
+Total time: 5 minutes 43 seconds
