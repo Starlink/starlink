@@ -836,71 +836,88 @@ Starlink Software Support
 \section{Isophotal radii}
 
 \SExtractor\ can measure the areas of objects at $8$ optimally selected
-intensity thresholds. These intensities are consequently different for
-each object. Traditionally this has not been the case and isophotal
-areas/radii have been measured at fixed magnitude intervals above some
-threshold. Consequently, for convenience and compatibility with
-existing data and analysis methods, the \EXTRACTOR\ and Starlink
+thresholds (such information is often used to estimate object
+profiles). These thresholds are consequently different for each
+object. Traditionally this has not been the case and isophotal
+areas/radii have been measured at fixed magnitude intervals above the
+detection threshold. Consequently, for convenience and compatibility
+with existing data and analysis methods, the \EXTRACTOR\ and Starlink
 \SExtractor\ programs have been extended to provide a flexible
 configuration scheme that allows this traditional behaviour to be
-recovered and extended.
+recovered and naturally extended.
 
-The configuration options that control what intensities are used for
-the isophotal radii estimates are:
+The configuration options that control the chosen isophotal thresholds 
+are:
 \begin{itemize}
-  \item \texttt{RAD\_TYPE}
+  \item \texttt{RAD\_TYPE} and
   \item \texttt{RAD\_THRESH}
 \end{itemize}
-\texttt{RAD\_TYPE} can be either \texttt{SB} or
-\texttt{INT}, which indicate that the levels will be defined in terms
-of surface brightnesses or plain intensities, respectively.
+\texttt{RAD\_TYPE} can be either \texttt{SB} or \texttt{INT}, 
+which indicate that the levels will be defined in terms of surface
+brightnesses or intensities (i.e. data counts and magnitudes),
+respectively.
 
 The \texttt{RAD\_THRESH} option can have up to three qualifying
 values, depending on the value of \texttt{RAD\_TYPE}. If
 \texttt{RAD\_TYPE} is \texttt{SB} then you should enter a line
 consisting of:
 \begin{quote}
-   \texttt{RAD\_THRESH        step[,start,zp]}
+   \texttt{RAD\_THRESH\hspace{0.5in} step[,start,zp]}
 \end{quote}
 in your \texttt{default.sex} file. The value \texttt{step} being the
-required interval between levels, \texttt{start} being the value of
-the first level and \texttt{zp} the data zero point, all in magnitudes
-per square arcsecond. If only one value is given then the starting
-point is assumed to be the analysis threshold and the zero point is
-derived from the photometric value (\texttt{MAG\_ZEROPOINT}).
+required interval between levels, \texttt{start} being the value used
+as the first threshold and \texttt{zp} the data zero point, all in
+magnitudes per square arc-second. If only one value is given then the
+starting point is assumed to be the analysis threshold and the zero
+point is derived from the photometric value (\texttt{MAG\_ZEROPOINT}).
 
 If a \texttt{RAD\_THRESH} value is not given then a default step of
 $0.75$ magnitudes per square arcsec is used.
 
-If \texttt{RAD\_TYPE} is \texttt{INT} then the correct line format is:
+The actual formula used to generate the thresholds is:
 \begin{quote}
-   \texttt{RAD\_THRESH        step[,start]}
+    $I_{i} = A * 10^{-0.4 * (start+step*i-zp)},\ i = 0, 15$
 \end{quote}
-\texttt{step} being the interval between levels in plain magnitudes
-and \texttt{start} being the intensity of the first level. If
+where $I_{i}$ is the $i$th threshold, $A$ is the area of an image pixel 
+in arcseconds, $start$, $step$ and $zp$ are as described above.
+
+If \texttt{RAD\_TYPE} is \texttt{INT} then the correct
+\texttt{RAD\_THRESH} format is:
+\begin{quote}
+   \texttt{RAD\_THRESH \hspace{0.5in} step[,start]}
+\end{quote}
+\texttt{step} being the interval between thresholds in magnitudes
+and \texttt{start} being the threshold used for the first level. If
 \texttt{start} is not given then the analysis threshold is used.
+
+The formula used to generate these thresholds is:
+\begin{quote}
+    $I_{i} = start * 10^{-0.4*step*i},\ i = 0, 15$
+\end{quote}
 
 If no \texttt{RAD\_THRESH} values are given this time then the
 APM/PISA (see \xref{SUN/109}{sun109}{}) analysis thresholds are used:
 \begin{quote}
-    $I_{i} = I_{t} * 2^{(i+2)},\ i = 2, 16$
+    $I_{i} = start * 2^{(i+2)},\ i = 1, 15$
 \end{quote}
-where $I_{i}$ = threshold for $i$th level, $I_{t}$ = measurement
-threshold. This gives approx $0.75$ magnitude steps ($2.5*log(2)$).
+This gives approx $0.75$ magnitude steps ($2.5*log(2)$). The first
+threshold is set to the analysis threshold.
 
-The actual measurements are associated with the catalogue parameters,
-\texttt{RAD0} through \texttt{RAD15}, these must be present in the
-\texttt{default.param} file.
+\paragraph{Notes:} before any measurements will be made at least one
+of the catalogue parameters \texttt{RAD0} through \texttt{RAD15} must
+be present in the \texttt{default.param} file. The minimum starting
+threshold that can be used is the analysis one ---  no information about
+values below this is available.
 
 For completeness the existing \texttt{ISO0}-\texttt{ISO7} areas in
 \SExtractor\ are based on an \texttt{optimal} sampling of each object
-profile. Under this scheme each level is:
+profile. Under this scheme each threshold is:
 \begin{quote}
-    $I_{i} = I_{t} * (I_{p}/I_{t})^{i/8}, \ i=1,8$
+    $I_{i} = start * (\frac{I_{p}}{start})^{i/8}, \ i = 0, 7$
 \end{quote}
-where $I_{p}$ = peak intensity and $I_{t}$ and $I_{i}$ are as above.
-So you get a range of levels for each object spanning the range from
-its peak intensity down to the threshold.
+where $I_{p}$ = peak intensity.  So you get a range of levels for each
+object spanning the range from its analysis threshold to just below
+the peak intensity.
 
 \section{Changes}
 \subsection{Version 1.2-0}
