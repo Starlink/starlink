@@ -81,7 +81,7 @@
 *    Version :
 *
 	CHARACTER*30   		VERSION
-	PARAMETER               (VERSION = 'BSUB Version 2.0-0')
+	PARAMETER               (VERSION = 'BSUB Version 2.1-0')
 
 	CHARACTER*80		  UNITS		!units of axis
 

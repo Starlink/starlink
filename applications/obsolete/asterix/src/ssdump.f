@@ -143,7 +143,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSDUMP Version 1.8-2' )
+        PARAMETER           ( VERSION = 'SSDUMP Version 2.1-0' )
 *-
 
 *    Check status

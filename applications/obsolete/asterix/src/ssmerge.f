@@ -142,7 +142,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSMERGE Version 1.8-2' )
+        PARAMETER           ( VERSION = 'SSMERGE Version 2.1-0' )
 *-
 
 *    Check status

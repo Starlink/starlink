@@ -173,7 +173,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-        PARAMETER       ( VERSION = 'IMSIM Version 2.0-1' )
+        PARAMETER       ( VERSION = 'IMSIM Version 2.1-0' )
 *
 *    Local Data:
 *

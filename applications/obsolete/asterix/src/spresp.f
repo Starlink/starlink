@@ -150,7 +150,7 @@
         PARAMETER 		( SRESP = 'SPATIAL_RESP' )
 
       CHARACTER*30       	VERSION
-        PARAMETER        	( VERSION = 'SPRESP Version 2.0-5' )
+        PARAMETER        	( VERSION = 'SPRESP Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) 	ALOC           		! Input ASTERIX structure

@@ -167,7 +167,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPCONVOL Version 1.8-2' )
+        PARAMETER        ( VERSION = 'SPCONVOL Version 2.1-0' )
 *.
 
 *    Check inherited global status.
