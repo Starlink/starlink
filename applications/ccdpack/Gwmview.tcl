@@ -258,7 +258,7 @@ class Gwmview {
          itk_component add zoom {
             zoomcontrol $panel.zoom \
                -min 0.05 \
-               -max 8 \
+               -max 12 \
                -value 1 \
                -valuevar zoom
          }
@@ -381,8 +381,8 @@ class Gwmview {
 #-----------------------------------------------------------------------
       public method canv2view { cx cy } {
 #-----------------------------------------------------------------------
-         set vx [ expr $cx / $zoomfactor ]
-         set vy [ expr - $cy / $zoomfactor ]
+         set vx [ expr $cx * ( 1.0 / $zoomfactor ) ]
+         set vy [ expr - $cy * ( 1.0 / $zoomfactor ) ]
          return [ list $vx $vy ]
       }
 
@@ -517,25 +517,26 @@ class Gwmview {
          set mitem ""
          set mconfig ""
          if { $type <= 4 } {
-            set s [ expr $size / 2 ]
-            set mitem "line 0 -$s  0 $s  0 0  -$s 0  $s 0"
+            set s [ expr int( $size / 2 ) ]
+            set mitem "line 0 0  0 -$s  0 0  0 $s  0 0  -$s 0  0 0  $s 0   0 0"
             switch $type {
                1 { set mconfig "-width 2" }
                2 { set mconfig "-width 3" }
                3 { set mconfig "-width [ expr $scale / 10 ]" }
                4 { set mconfig "-width [ expr $scale / 6 ]" }
             }
+            lappend mconfig -fill $colour
          } elseif { $type <= 8 } {
-            set s [ expr $size / 2 ]
-            set mitem "line -$s -$s  -$s $s  $s $s  $s -$s  -$s -$s"
-            switch { expr $type -4 } {
-               1 { set mconfig "-width 2" }
-               2 { set mconfig "-width 3" }
+            set s [ expr int( $size / 2 ) ]
+            set mitem "polygon -$s -$s  -$s $s  $s $s  $s -$s"
+            switch [ expr $type - 4 ] {
+               1 { set mconfig "-width 1" }
+               2 { set mconfig "-width 2" }
                3 { set mconfig "-width [ expr $scale / 10 ]" }
                4 { set mconfig "-width [ expr $scale / 6 ]" }
             }
+            lappend mconfig -fill {} -outline $colour
          }
-         lappend mconfig -fill $colour
          if { $mitem == "" } {
             error "Invalid marker specification (programming error)"
             exit
@@ -545,9 +546,9 @@ class Gwmview {
 #  reflect the new values.
          if { $markitem != "" } {
             if { [ lindex $mitem 0 ] != [ lindex $markitem 0 ] } {
-               puts "Different item types - not currently dealt with."
+               error "Different item types - not currently dealt with."
             } elseif { $mitem != $markitem } {
-               puts "Different item geometries - not currently dealt with."
+               error "Different item geometries - not currently dealt with."
             } elseif { $mconfig != $markconfig } {
                eval $canvas itemconfigure marker $mconfig
             }
@@ -568,20 +569,6 @@ class Gwmview {
             marker [ lindex $p 1 ] [ lindex $p 2 ] [ lindex $p 3 ] \
                    [ lindex $p 0 ]
          }
-      }
-
-
-#-----------------------------------------------------------------------
-      public method jiggle {} {
-#-----------------------------------------------------------------------
-#  I don't have the first idea what's going on here, but writing output
-#  to the screen seems to prevent the display from showing up squiffy
-#  before you've jiggled it round using the scroll bars first.  This
-#  has to be a bug, but I don't know what it's in - probably GWM canvas
-#  item, the scrolledcanvas iwidget, or the canvas widget itself.
-#  I've tried some other things (reading scrollbar position, writing
-#  an empty string) but they don't seem to do the trick.  Jeez.
-           puts ""
       }
 
 
@@ -659,9 +646,9 @@ class Gwmview {
          set mitem $markitem
          set mitem [ lindex $markitem 0 ]
          set pos [ view2canv $vx $vy ]
-         set cx [ lindex $pos 0 ]
-         set cy [ lindex $pos 1 ]
-         for { set i 0 } { $i < [ llength $markitem ] } { } {
+         set cx [ expr [ lindex $pos 0 ] + 0.5 ]
+         set cy [ expr [ lindex $pos 1 ] - 0.5 ]
+         for { set i 0 } { $i < [ expr [ llength $markitem ] - 2 ] } { } {
             lappend mitem [ expr [ lindex $markitem [ incr i ] ] + $cx ]
             lappend mitem [ expr [ lindex $markitem [ incr i ] ] + $cy ]
          }
@@ -691,7 +678,7 @@ class Gwmview {
 #-----------------------------------------------------------------------
       public variable pixelsize 1 {
 #-----------------------------------------------------------------------
-         configure -zoomfactor [ expr $zoom / $pixelsize ]
+         configure -zoomfactor [ expr $zoom * ( 1.0 / $pixelsize ) ]
       }
 
 
@@ -705,7 +692,7 @@ class Gwmview {
 #-----------------------------------------------------------------------
       public variable zoom { 1 } {
 #-----------------------------------------------------------------------
-         configure -zoomfactor [ expr $zoom / $pixelsize ]
+         configure -zoomfactor [ expr $zoom * ( 1.0 / $pixelsize ) ]
       }
 
 
