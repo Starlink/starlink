@@ -12,9 +12,9 @@
 #  Description:
 #     This class provides a very simple control which just contains a 
 #     button.  It just provides the -cmd and -text configuration
-#     options, and doesn't do anything fancy, but it inherits from
-#     the Control class, and so inherits any appropriate behaviour 
-#     from there.
+#     options, along with the possiblity to specify a confirmation
+#     dialog, but it inherits from the Control class, and so inherits
+#     any appropriate behaviour from there.
 
 #  Public Methods:
 #
@@ -29,6 +29,12 @@
 #        A command string to execute when the button is pressed.  Note
 #        this is not called -command becuase of a clash with the 
 #        -command option inherited from the Control class.
+#
+#     confirmcmd
+#        The expression given by this variable will be evaluated when
+#        the button is pressed.  Only if it evaluates to a true value
+#        will the 'cmd' command be executed.  This will typically be
+#        set to the activate method of a confirmation dialog box.
 #
 #     Buttoncontrol also inherits all the appropriate public variables
 #     of the Control widget.
@@ -70,7 +76,8 @@
 #-----------------------------------------------------------------------
       public variable cmd {} {
 #-----------------------------------------------------------------------
-         $itk_component(button) configure -command $cmd
+         $itk_component(button) configure -command \
+            "if { $confirmcmd } { $cmd }"
       }
 
 
@@ -85,6 +92,14 @@
 #-----------------------------------------------------------------------
          $itk_component(button) configure -text $text
       }
+
+
+#-----------------------------------------------------------------------
+      public variable confirmcmd {1} {
+#-----------------------------------------------------------------------
+         configure -cmd $cmd
+      }
+
 
 #-----------------------------------------------------------------------
       public variable state { normal } {
