@@ -12,8 +12,8 @@ PKG = surf
 
 LIBS = -L. -lsurf -L$(SURFLIB) -lsurflib -L$(SCULIB) -lsculib -L$(SURF_KAP) -lsurf_kap
 SLIB = libsurflib.a libsculib.a libsurf.a libsurf_kap.a
-IRAS = -L/star/iras90 -lira
-ADAMLIBS = $(IRAS) `./surf_link_adam`
+# IRAS = -L/star/iras90 -lira : This is all in surf_link_adam
+ADAMLIBS = `./surf_link_adam`
 
 # Includes
 
@@ -53,21 +53,20 @@ FSOURCES= surf_extinction.f surf_flatfield.f \
 	surf_recurse_read.f surf_write_photom_header.f surf_scan_rlb.f\
 	surf_despike.f surf_scuclip.f surf_extflat.f \
 	surf_grid_despike.f surf_scuba2mem.f surf_make_weight.f \
-	surf_grid_calcsky.f surf_reduce_noise.f surf_add_dbm.f
+	surf_grid_calcsky.f surf_reduce_noise.f surf_add_dbm.f \
+	surf_remip.f
 
 FCPPSOURCES=	surf_write_map_info.F
 
 PKG_IFL = surf_mon.ifl
 
-IFL=    extinction.ifl reduce_switch.ifl flatfield.ifl \
-	rebin.ifl scucat.ifl scuphot.ifl skydip.ifl \
-	change_pointing.ifl change_flat.ifl change_quality.ifl\
-	intrebin.ifl change_data.ifl extract_data.ifl scan_rlb.ifl\
-	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl\
-	despike.ifl scuclip.ifl extract_flat.ifl scuba2mem.ifl \
-	calcsky.ifl reduce_noise.ifl scumakewt.ifl despike2.ifl \
-	add_dbm.ifl
+TASKS    = \
+bolrebin calcsky  change_data change_flat change_pointing change_quality \
+despike despike2 extinction extract_data extract_flat flatfield intrebin \
+rebin reduce_switch remsky restore scucat scan_rlb scuclip scuhelp scuover \
+scuphot skydip scuba2mem scumakewt reduce_noise add_dbm remip
 
+IFL =   $(TASKS:=.ifl)
 
 # Dont include $PKG_SRC since that should not be included
 # in tar file
@@ -95,7 +94,7 @@ LOCAL_INCLUDES = SURF_PAR
 
 # Some targets
 
-all:	${PKG}_mon ifc
+all:	${PKG}_mon ifc $(TASKS)
 
 
 libsculib.a: $(SCULIB)/libsculib.a
@@ -105,8 +104,19 @@ libsurf_kap.a: $(SURF_KAP)/libsurf_kap.a
 libsurf.a: ${OBJS}
 	ar r $@ $?
 
+
+# Build the monolith
 surf_mon: surf_mon.o $(SLIB)
 	${ALINK} ${@}.o ${LDFLAGS} ${LIBS} ${ADAMLIBS}
+
+# This target creates the monolith IFL file from the individual
+# ifl files
+
+surf_mon.ifl: $(IFL)
+	rm -f $@ 1>/dev/null 2>/dev/null; \
+	echo MONOLITH SURF_MON > $@ ; \
+	cat ${IFL} >> $@ ; \
+	echo ENDMONOLITH >> $@
 
 ifc:	${IFC}
 
@@ -119,7 +129,7 @@ clean:
 $(EXTERNAL_INCLUDES) libsurf.a
 
 distclean: clean
-	/bin/rm surf_mon $(IFC)
+	/bin/rm surf_mon $(IFC) $(TASKS)
 
 export: ${PKG}_sub.tar ${PKG}_ifls.tar
 
@@ -131,6 +141,9 @@ surf_ifls.tar: $(IFL)
 	rm -f $@ 1>/dev/null 2>/dev/null; \
 	tar cf $@ $(IFL) 
 
+# This line makes sure all the soft links are done for the executable
+$(TASKS):
+	$(LINK) ./surf_mon $@
 
 # Dependencies
 
@@ -182,6 +195,6 @@ surf_write_data.o: PRM_PAR SAE_PAR
 surf_write_photom.o: PRM_PAR SAE_PAR
 surf_write_photom_header.o: PRM_PAR SAE_PAR SURF_PAR
 surf_add_dbm.o: SAE_PAR SURF_PAR NDF_ERR PAR_ERR DAT_PAR
-
+surf_remip.o: SAE_PAR PRM_PAR SURF_PAR DAT_PAR
 
 
