@@ -55,7 +55,7 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
-      Richard Beard (Birmingham)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
