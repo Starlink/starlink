@@ -1,0 +1,23 @@
+
+SLALIB imported into CVS and autoconfed, January 2003.
+
+Platform-dependencies: there were three platform-dependent files, for
+random.f, gresid.f (both requiring a random number function) and
+wait.f (sleeps).  The original set of files had extensions alpha_OSF1,
+convex, ix86_Linux, mips, pcm, sun4, sun4_Solaris, and vax.  In each
+case, there were a number of files for unix-like platforms, one
+Windows/MSFortran (pcm) and one VAX one.  For random and gresid, the
+unix ones were largely the same, differing only in whether they called
+a function random() or ran(), and with different calls -- these could
+be handled using fpp.
+
+The Windows and VMS ones were sufficiently different that they've
+remained in separate files.  Each of the three has a __win file,
+specific to MSFortran (or to Windows, I'm not sure).  In each of the
+three cases, the __vms file is the original _vax file -- it's specific
+to VMS, not the VAX.  For random and gresid, the files are called
+random.fpp{__win,_dec_osf} even though there's nothing preprocessable
+in them.
+
+I _think_ I've got the __vms and __win dependencies right, but I've no
+way of testing them.
