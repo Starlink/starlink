@@ -1,6 +1,6 @@
 { ICL initialisation for package KAPPA
 { Created automatically from kappa.ifd using ifd2star
-{ Thu Jul  1 10:00:24 BST 2004
+{ Thu Jul  1 10:33:30 BST 2004
 
 define mem2(d) $KAPPA_DIR/mem2d mem2d
 defhelp mem2d $KAPPA_HELP mem2d
@@ -1081,7 +1081,7 @@ defhelp kappa $KAPPA_HELP 0
 
 print ""
 print ""
-print "     KAPPA commands are now available -- (Version PKG_VERS)"
+print "     KAPPA commands are now available -- (Version 1.3-1)"
 print ""
 print "     Type kaphelp for help on KAPPA commands."
 print "     Type 'showme sun95' to browse the hypertext documentation."

@@ -2,7 +2,7 @@
 
 SUBDIRS = @subdirs@
 
-bin_SCRIPTS = $(DATA_FILES) $(PUBLICSCRIPTS) kappa.csh kappa.icl
+bin_SCRIPTS = $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
 
 LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la `$(srcdir)/kappa_nogks_link_adam`
 
@@ -18,6 +18,14 @@ kapview_mon_TASKS = $(KAPVIEW_TASKS)
 ndfpack_mon_SOURCES = ndfpack_mon.f $(NDFPACK_F_ROUTINES)
 ndfpack_mon_LDADD = $(LOCAL_LINK)
 ndfpack_mon_TASKS = $(NDFPACK_TASKS)
+
+#  version.dat is just the package verion in a file for kapversion command
+#  This is for backwards compatibility since, of course, we could make
+#  kapversion have the value compiled in
+
+version.dat:
+	-rm -f version.dat
+	echo $(PACKAGE_VERSION) > version.dat
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -184,6 +192,7 @@ MEM_IFL = $(MEM_F_ROUTINES:.f=.ifl)
 
 MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
+DYNSCRIPTS = kappa.csh kappa.icl
 
-$(IFL_FILES): kappa.ifd
+$(IFL_FILES) $(DYNSCRIPTS): kappa.ifd
 	$(IFD2STAR) kappa

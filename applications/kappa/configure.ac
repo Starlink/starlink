@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([kappa_mon.f])
+AC_CONFIG_SRCDIR([kappa_mon.f.in])
 
 STAR_DEFAULTS(per-package-dirs)
 
@@ -32,6 +32,6 @@ STAR_LATEX_DOCUMENTATION(sun95 sun221)
 
 AC_CONFIG_SUBDIRS([kapsub ccdpack atools])
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd)
 
 AC_OUTPUT

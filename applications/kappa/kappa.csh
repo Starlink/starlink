@@ -1,6 +1,6 @@
 # Shell initialisation for package KAPPA
 # Created automatically from kappa.ifd using ifd2star
-# Thu Jul  1 10:00:24 BST 2004
+# Thu Jul  1 10:33:30 BST 2004
 
 alias mem2d $KAPPA_DIR/mem2d
 alias kap_mem2d $KAPPA_DIR/mem2d
@@ -640,7 +640,7 @@ alias kap_crelut echo  The crelut command has been retired. Use \\\"lutedit\\\" 
 
 echo ""
 echo ""
-echo "     KAPPA commands are now available -- (Version PKG_VERS)"
+echo "     KAPPA commands are now available -- (Version 1.3-1)"
 echo ""
 echo "     Type kaphelp for help on KAPPA commands."
 echo "     Type 'showme sun95' to browse the hypertext documentation."

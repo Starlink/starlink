@@ -1,5 +1,5 @@
 package kappa {
-   version PKG_VERS
+   version @PACKAGE_VERSION@
    prefix kap
 
    executable mem2d {
@@ -16013,7 +16013,7 @@ iraf! {
 
    display {
 
-     KAPPA commands are now available -- (Version PKG_VERS)
+     KAPPA commands are now available -- (Version @PACKAGE_VERSION@)
 
      Type kaphelp for help on KAPPA commands.
      Type "showme sun95" to browse the hypertext documentation.
