@@ -25,7 +25,7 @@ INTERFACE PSS
     ASSOCIATION '->GLOBAL.SSDS'
     POSITION 3
     VPATH 'PROMPT'
-    DEFAULT srclist
+    DEFAULT 'srclist'
     PPATH 'DEFAULT'
     PROMPT 'Source search results file (! for none)'
     HELP 'ASTERIX source search results filename'
