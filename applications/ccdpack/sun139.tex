@@ -16176,9 +16176,9 @@ This is a major update to CCDPACK.
   The following minor changes have also been made since v3.1-0:
   \begin{itemize}
   \item
-     There have been bug fixes to \xroutine{MAKEMOS}: when SCALE was true, data
-     combination methods MEAN and MEDIAN were applying weights to the
-     wrong input images in overlap regions.
+     There have been bug fixes to \xroutine{MAKEMOS}: previously when USEVAR was 
+     false, and SCALE was true or WEIGHTS were set, the wrong weights 
+     were sometimes applied to images in overlap regions.
   \item
      There have been some improvements and bug fixes to the percentile
      location routine used by \xroutine{FINDOBJ}.
