@@ -7201,7 +7201,7 @@ STYLE = GROUP (Read)
    restricted to one of the two lines by appending either a "+" or a
    "-" to the "Nsig<i>" string. Thus, "Width(Nsig2-)" sets the line
    width for the lower of the two lines associated with the second
-   clipping level, and "Width(Nsig2-)" sets the width for the upper
+   clipping level, and "Width(Nsig2+)" sets the width for the upper
    of the two lines. [current value]
 
 2 Examples
