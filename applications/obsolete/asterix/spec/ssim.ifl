@@ -2,7 +2,7 @@ INTERFACE SSIM
 
    PARAMETER INP
       POSITION 1
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       PROMPT 'Object containing instrument response'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_DATA'
@@ -11,7 +11,7 @@ INTERFACE SSIM
 
    PARAMETER MODEL
       POSITION 2
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -21,7 +21,7 @@ INTERFACE SSIM
 
    PARAMETER BG
       POSITION 3
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       DEFAULT !
       PROMPT 'Background spectrum'
       HELP 'This will be added to the source spectrum - return ! for no b/g'
@@ -51,7 +51,7 @@ INTERFACE SSIM
 
    PARAMETER OUT
       POSITION 6
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       ASSOCIATION '->GLOBAL.GRAFDS'
       PROMPT 'Output spectrum'
       HELP 'Container file for simulated spectrum'
