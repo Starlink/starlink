@@ -3959,34 +3959,34 @@ the range of facilities available:
 
 \begin{quote}
 \begin{description}
-\item[\htmlref{Naxes}{Naxes}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Naxes}{Naxes}]\mbox{}\\
 A read-only integer giving the number of Frame axes.
 
-\item[\htmlref{Title}{Title}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Title}{Title}]\mbox{}\\
 A string describing the coordinate system which the Frame represents.
 
-\item[\htmlref{Label(axis)}{Labelaxis}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Label(axis)}{Labelaxis}]\mbox{}\\
 A label string for each axis.
 
-\item[\htmlref{Unit(axis)}{Unitaxis}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Unit(axis)}{Unitaxis}]\mbox{}\\
 A string describing the physical units on each axis.
 
-\item[\htmlref{Symbol(axis)}{Symbolaxis}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Symbol(axis)}{Symbolaxis}]\mbox{}\\
 A string containing a ``short form'' symbol ({\em{e.g.}}\ like ``X''
 or ``Y'') used to represent the quantity plotted on each axis.
 
-\item[Digits or Digits(axis)]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[Digits or Digits(axis)]\mbox{}\\
 The preferred number of digits of precision to be used when formatting
 values for display on each axis.
 
-\item[\htmlref{Format(axis)}{Formataxis}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Format(axis)}{Formataxis}]\mbox{}\\
 A string containing a {\em{format specifier}} which determines exactly
 how values should be formatted for display on each axis
 (\secref{ss:formattingaxisvalues}). If this attribute is un-set, the
 formatting is based on the Digits value, otherwise the Format string
 over-rides the Digits value.
 
-\item[\htmlref{Direction(axis)}{Directionaxis}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Direction(axis)}{Directionaxis}]\mbox{}\\
 A boolean (integer) value which indicates in which direction each axis
 should be plotted. If it is non-zero (the default), the axis should be
 plotted in the conventional direction---{\em{i.e.}}\ increasing to the
@@ -3995,7 +3995,7 @@ is zero, the axis should be plotted in reverse.  This attribute is
 provided as a hint only and programs are free to ignore it if they
 wish.
 
-\item[\htmlref{Domain}{Domain}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Domain}{Domain}]\mbox{}\\
 A character string which identifies the {\em{physical domain}} to
 which the Frame's coordinate system applies. The primary purpose of
 this attribute is to prevent unwanted conversions from occurring
@@ -4651,21 +4651,21 @@ use recommended below should be carefully observed:
 
 \begin{quote}
 \begin{description}
-\item[GRAPHICS]\begin{latexonly}\mbox{}\\ \end{latexonly} Identifies
-the coordinate space used by an underlying computer graphics system
-to specify plotting operations. Typically, when performing graphical
-operations, AST is used to define additional coordinate systems which
-are related to these ``native'' graphical coordinates.  Plotting may
-be carried out in any of these coordinate systems, but the GRAPHICS
-domain identifies the native coordinates through which AST
-communicates with the underlying graphics system.
+\item[GRAPHICS]\mbox{}\\
+Identifies the coordinate space used by an underlying computer
+graphics system to specify plotting operations. Typically, when
+performing graphical operations, AST is used to define additional
+coordinate systems which are related to these ``native'' graphical
+coordinates.  Plotting may be carried out in any of these coordinate
+systems, but the GRAPHICS domain identifies the native coordinates
+through which AST communicates with the underlying graphics system.
 
-\item[GRID]\begin{latexonly}\mbox{}\\ \end{latexonly} Identifies the
-instantaneous {\em{data grid}} used to store and handle data, together
-with an associated coordinate system. In this coordinate system, the
-first element stored in an array of data always has a coordinate value
-of unity at its centre and all elements have unit extent. This applies
-to all dimensions.
+\item[GRID]\mbox{}\\
+Identifies the instantaneous {\em{data grid}} used to store and handle
+data, together with an associated coordinate system. In this
+coordinate system, the first element stored in an array of data always
+has a coordinate value of unity at its centre and all elements have
+unit extent. This applies to all dimensions.
 
 If data are copied or transformed to a new data grid (by whatever
 means), or a subset of the original grid is extracted, then the same
@@ -4675,7 +4675,7 @@ that GRID coordinates remain attached to the first element of the data
 grid and not to its data content ({\em{e.g.}}\ the features in an
 image).
 
-\item[PIXEL]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[PIXEL]\mbox{}\\
 Identifies an array of pixels and an associated {\em{pixel-based}}
 coordinate system which is related to the GRID coordinate system
 (above) simply by a shift of origin along each axis. This shift may be
@@ -4696,7 +4696,7 @@ used by FITS) is a special case of the PIXEL domain and avoids this
 uncertainty. In general, additional information is required in order
 to convert from one to the other.
 
-\item[SKY]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[SKY]\mbox{}\\
 Identifies the domain which contains all equivalent celestial
 coordinate systems. Because these are represented in AST by SkyFrames
 (\secref{ss:skyframes}), it should be no surprise that the default
@@ -4819,7 +4819,7 @@ The main SkyFrame attributes which qualify the System attribute are:
 
 \begin{quote}
 \begin{description}
-\item[\htmlref{Epoch}{Epoch}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Epoch}{Epoch}]\mbox{}\\
 This value is used to qualify celestial coordinate systems by giving
 the moment in time when the coordinates are correct for the
 astronomical source under study. Usually, this will be the date of
@@ -4833,7 +4833,7 @@ systems ({\em{e.g.}}\ the FK4 system), or proper motion of the source
 itself (although this last effect is not supported by the SkyFrame
 class).
 
-\item[\label{ss:equinoxitem}\htmlref{Equinox}{Equinox}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\label{ss:equinoxitem}\htmlref{Equinox}{Equinox}]\mbox{}\\
 This value is used to qualify celestial coordinate systems that are
 notionally based on the Earth's equator and/or the ecliptic (the plane
 of the Earth's orbit around the Sun). The position of either of these
@@ -6005,17 +6005,22 @@ Frames and FrameSets behave in this way, such as \htmlref{Naxes}{Naxes}, \htmlre
 
 \begin{quote}
 \begin{description}
-\item[\htmlref{Class}{Class}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[\htmlref{Class}{Class}]\mbox{}\\
 Has the value ``FrameSet''.
-\item[\htmlref{ID}{ID}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+
+\item[\htmlref{ID}{ID}]\mbox{}\\
 Identifies the particular FrameSet (not its current Frame).
-\item[\htmlref{Nin}{Nin}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+
+\item[\htmlref{Nin}{Nin}]\mbox{}\\
 Equals the number of axes in the FrameSet's base Frame.
-\item[\htmlref{Invert}{Invert}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+
+\item[\htmlref{Invert}{Invert}]\mbox{}\\
 Is independent of any of the Objects within the FrameSet.
-\item[\htmlref{Nobject}{Nobject}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+
+\item[\htmlref{Nobject}{Nobject}]\mbox{}\\
 Counts the number of active FrameSets.
-\item[\htmlref{RefCount}{RefCount}]\begin{latexonly}\mbox{}\\ \end{latexonly}
+
+\item[\htmlref{RefCount}{RefCount}]\mbox{}\\
 Counts the number of active pointers to the FrameSet (not to its
 current Frame).
 \end{description}
@@ -8191,7 +8196,7 @@ following (character string) values:
 
 \begin{quote}
 \begin{description}
-\item[DSS]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[DSS]\mbox{}\\
 This encoding stores WCS information using the convention developed at
 the Space Telescope Science Institute for the Digitised Sky Survey
 (DSS) astrometric plate calibrations.  DSS images which use this
@@ -8206,7 +8211,7 @@ as a ``read-only'' format. It is possible, however, to read in WCS
 information using this encoding and then to write it back out again,
 so long as only minor changes have been made.
 
-\item[FITS-WCS]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[FITS-WCS]\mbox{}\\
 This encoding is potentially very important because it is based on a
 proposed new FITS standard which should, for the first time, address
 the problem of celestial coordinate systems in a proper manner, by
@@ -8235,7 +8240,7 @@ hopes that final agreement on a FITS-WCS standard may now be close.
 Meanwhile, a suitable (stable) interim standard can be found in the
 form of the FITS-IRAF encoding.}
 
-\item[FITS-IRAF]\begin{latexonly}\mbox{}\\ \end{latexonly}
+\item[FITS-IRAF]\mbox{}\\
 This encoding is based on the conventions described in the document
 "World Coordinate Systems Representations Within the FITS Format" by
 R.J. Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
