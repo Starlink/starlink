@@ -292,7 +292,8 @@
          "CCDGetFileUpdate $Filebox \
           $Directbox  \
           $Directory \
-          $Filefilter
+          $Filefilter \
+          1
           CCDRecordDirectoryinMenu $Menu Options \
              \[$Directory get\] $Directory $Choice Filter
          "

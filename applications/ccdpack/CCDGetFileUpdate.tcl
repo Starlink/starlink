@@ -1,4 +1,4 @@
-   proc CCDGetFileUpdate { namebox dirbox dirent filterent } {
+   proc CCDGetFileUpdate { namebox dirbox dirent filterent images } {
 #+
 #  Name:
 #     CCDGetFileUpdate 
@@ -10,13 +10,32 @@
 #    Updates the contents of the filename and directory name listboxes
 #    used by the routines CCDGetFileName(s).
 
-#  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
-#     {enter_new_authors_here}
+#  Arguments:
+#     namebox = string
+#        Listbox in which filenames should be displayed.
+#     dirbox = string
+#        Listbox in which directory names should be displayed.
+#     dirent = string
+#        Entry widget from which directory name is read.
+#     filterent = string
+#        Entry widget from which file filter is read.
+#     images = boolean
+#        If true, then the intention is to display image files into the
+#        namebox; if false the intention is to display all files.
+#        Currently the difference is that if images is true any HDS
+#        container file which is encountered is passed to ndgexpand
+#        in order to look inside it for NDF structures.
+
+#  Implementation status:
+#     The images argument is only treated specially for HDS container
+#     files.  It would be nice to have it do the same thing for 
+#     Multi-Extension FITS files.  This is not easy however.
 
 #  History:
 #     2-MAR-1994 (PDRAPER):
 #     	 Original version.
+#     14-JUN-2001 (MBT):
+#        Added the images argument and associated functionality.
 #     {enter_changes_here}
 
 #-
@@ -61,8 +80,20 @@
 #  Now for normal file which do need the file filter.
       foreach name [lsort [glob -nocomplain $newfiles ] ] {
          if { ! [file isdirectory $name] } { 
-            set shortname [ file tail $name ]
-            $namebox insert end $shortname
+
+#  In general use the filename as it is, but in the case where we are
+#  specifically looking for images, treat HDS container files specially
+#  by passing them to ndgexpand.  This may find zero, one or more 
+#  NDF structures in each file.
+            if { $images && [ regsub {.sdf$} $name "" clipped ] } {
+               set namelist [ ndgexpand $clipped ]
+            } else {
+               set namelist $name
+            }
+            foreach iname $namelist {
+               set shortname [ file tail $iname ]
+               $namebox insert end $shortname
+            }
          }
       } 
 

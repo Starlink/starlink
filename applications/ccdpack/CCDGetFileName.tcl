@@ -230,7 +230,7 @@
 #  "Filter" button. Updates the current directory lists and adds a menu
 #  item for the directory (also updates CCDcurrentdirectory).
       $Choice addbutton Filter \
-         "CCDGetFileUpdate $Filebox $Directbox $Directory $Filefilter
+         "CCDGetFileUpdate $Filebox $Directbox $Directory $Filefilter 0
           CCDRecordDirectoryinMenu $Menu Options \
              \[$Directory get\] $Directory $Choice Filter
          "

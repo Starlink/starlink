@@ -504,7 +504,7 @@
 #  enters a command in the options to return to any directory we have
 #  visited.
       $Choice addbutton Filter \
-         "CCDGetFileUpdate $Filesbox $Directbox  $Directory $FileFilter
+         "CCDGetFileUpdate $Filesbox $Directbox  $Directory $FileFilter 1
           CCDRecordDirectoryinMenu $Menu Options \
              \[$Directory get\] \
              $Directory \
