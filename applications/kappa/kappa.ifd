@@ -10774,15 +10774,6 @@ package kappa {
             helpkey *
           }
 
-         parameter numbin {
-            position 5
-            type _INTEGER
-            vpath DEFAULT
-            default 2048
-            prompt {Number of histogram bins}
-            helpkey *
-          }
-
          parameter numgood {
             type _INTEGER
             access WRITE

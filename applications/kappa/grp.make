@@ -86,12 +86,12 @@ kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
 kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
 kpg1_hstaub.f kpg1_hstauw.f 
 
-# Generic source files needed for kapsub_sub.tar:
+# Generic source files needed for kapgen_sub.tar:
 KAPGEN_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
 kpg1_hsta.gen
 
 # Non-generic source files needed for kapgen_sub.tar:
-KAPSUB_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
+KAPGEN_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f \
 chvalr.f chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f \
 cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f elnmbr.f \

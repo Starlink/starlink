@@ -49,6 +49,12 @@
    - HISTOGRAM: Now supports various methods for specifying the upper and 
      lower horizontal limits of the plot. See parameter RANGE.
 
+   - HISTAT: 
+      o Now uses an improved algorithm for calculating the median 
+        and percentiles which reduces the effect of extreme outliers 
+        on the results.
+      o The NUMBIN parameter has been removed.
+
    - IDSTATE: The changes made to GDSTATE have also been made to IDSTATE.
 
    - SEGMENT:

@@ -23656,13 +23656,14 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
 \sstroutine{
    HISTAT
 }{
-   Computes ordered statistics for an NDF's pixels using an histogram
+   Computes ordered statistics for an NDF{\tt '}s pixels using an
+   histogram
 }{
    \sstdescription{
       This application computes and displays simple ordered statistics
-      for the pixels in an NDF's data, quality, error, or variance
+      for the pixels in an NDF{\tt '}s data, quality, error, or variance
       array.  The statistics available are:
-      \ssthitemlist{
+      \sstitemlist{
 
          \sstitem
          the pixel sum,
@@ -23694,7 +23695,7 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
       }
    }
    \sstusage{
-      histat ndf [comp] [percentiles] [logfile] [numbin]
+      histat ndf [comp] [percentiles] [logfile]
    }
    \sstparameters{
       \sstsubsection{
@@ -23702,12 +23703,12 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
       }{
          The name of the NDF array component for which statistics are
          required.  The options are limited to the arrays within the
-         supplied NDF.  In general the value may {\tt "Data"}, {\tt "Error"},
-         {\tt "Quality"} or {\tt "Variance"} (note that {\tt "Error"} is the
-         alternative to {\tt "Variance"} and causes the square root of
-         the variance values to be taken before computing the statistics).  If
-         {\tt "Quality"} is specified, then the quality values are treated as
-         numerical values (in the range 0 to 255).  {\tt ["Data"]}
+         supplied NDF.  In general the value may {\tt "}Data{\tt "}, {\tt "}Error{\tt "},
+         {\tt "}Quality{\tt "} or {\tt "}Variance{\tt "} (note that {\tt "}Error{\tt "} is the alternative
+         to {\tt "}Variance{\tt "} and causes the square root of the variance
+         values to be taken before computing the statistics).  If
+         {\tt "}Quality{\tt "} is specified, then the quality values are treated as
+         numerical values (in the range 0 to 255).  {\tt [Data]}
       }
       \sstsubsection{
          LOGFILE = FILENAME (Write)
@@ -23716,40 +23717,6 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
          value is supplied (the default), then no logging of results
          will take place. {\tt [!]}
       }
-      \sstsubsection{
-         NDF = NDF (Read)
-      }{
-         The NDF data structure to be analysed.
-      }
-      \sstsubsection{
-         NUMBIN = \_INTEGER (Read)
-      }{
-         The number of histogram bins to be used.  There is a tradeoff
-         between accuracy and processing time depending on the value
-         of NUMBIN. Increasing the number of bins yields more accurate
-         results, because it reduces quantisation errors biasing
-         the computed statistics, but takes longer to compute.  The
-         bias is in the same sense as the skewness, so generally it
-         will add positive bias.  The default value of NUMBIN is a
-         compromise and generally will give satisfactory results.
-
-         It is hard to quantify the tradeoff precisely; testing with a
-         typical CCD image of stars and galaxies the increase in time
-         went approximately as log of the number of bins, and the
-         accuracy of the pixel sum for some values of NUMBIN were: 100,
-         2.8\%; 1000, 0.1\% 10000, 0.03\%; and 100000, 0.002\%.
-
-         NUMBIN must be in the range 100 to 100000. {\tt [2048]}
-      }
-      \sstsubsection{
-         PERCENTILES( 100 ) = \_REAL (Read)
-      }{
-         A list of percentiles to be found.  None are computed if this
-         parameter is null ({\tt !}).  The percentiles must be in the range
-         0.0 to 100.0. {\tt [!]}
-      }
-   }
-   \sstresparameters{
       \sstsubsection{
          MAXCOORD( ) = \_DOUBLE (Write)
       }{
@@ -23804,8 +23771,13 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
          MODE = \_DOUBLE (Write)
       }{
          The modal value of all the valid pixels in the NDF array.  It
-         is estimated from 3 $*$ median $-$ 2 $*$ mean.  This is only valid
+         is estimated from 3 $*$ median - 2 $*$ mean.  This is only valid
          for moderately skew distributions.
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         The NDF data structure to be analysed.
       }
       \sstsubsection{
          NUMBAD = \_INTEGER (Write)
@@ -23824,6 +23796,13 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
          NUMPIX = \_INTEGER (Write)
       }{
          The total number of pixels in the NDF (both good and bad).
+      }
+      \sstsubsection{
+         PERCENTILES( 100 ) = \_REAL (Read)
+      }{
+         A list of percentiles to be found.  None are computed if this
+         parameter is null (!).  The percentiles must be in the range
+         0.0 to 100.0 {\tt [!]}
       }
       \sstsubsection{
          PERVAL() = \_DOUBLE (Write)
@@ -23863,27 +23842,38 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
       }{
          Computes ordered statistics for the data array in the NDF
          called halley, and writes the results to a logfile called
-         {\tt stats.dat}.
+         stats.dat.
       }
       \sstexamplesubsection{
-         histat ngc1333 percentiles=[0.25,0.75] numbin=100000
+         histat ngc1333 percentiles=[0.25,0.75]
       }{
          Computes ordered statistics for the data array in the NDF
-         called ngc1333, including the quartile values.  The highest
-         accuracy is used.
+         called ngc1333, including the quartile values.
       }
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         If the array has a few extreme outliers this can bias the
-         statistics unless the number of bins in the histogram is large,
-         or the outliers are removed (flagged) via application THRESH.
+         Where the histogram contains a few extreme outliers, the
+         histogram limits are adjusted to reduce greatly the bias upon
+         the statistics, even if a chosen percentile corresponds to an
+         extreme outlier.  The outliers are still accounted in the median
+         and percentiles.  The histogram normally uses 10000 bins.  For
+         small arrays the number of bins is at most a half of the number
+         of array elements.  Integer arrays have a minimum bin width of
+         one; this can also reduce the number of bins.  The goal is to
+         avoid most histogram bins being empty artificially, since the
+         sparseness of the histogram is the main criterion for detecting
+         outliers.  Outliers can also be removed (flagged) via application
+         THRESH prior to using this application.
 
          \sstitem
-         There is quantisation bias in the statistics.  See parameter
-         NUMBIN.
+         There is quantisation bias in the statistics, but for
+         non-pathological distributions this should be insignificant.
+         Accuracy to better than 0.01 of a percentile is normal.  Linear
+         interpolation within a bin is used, so the largest errors arise
+         near the median.
       }
    }
    \sstdiytopic{
@@ -23913,7 +23903,6 @@ KAPPA. Use ``DISPLAY KEY=YES'' instead.}
       }
    }
 }
-
 \sstroutine{
    HISTEQ
 }{
@@ -45731,6 +45720,14 @@ The following applications have been modified:
    \item [\htmlref{HISTOGRAM}{HISTOGRAM}] now supports various methods
          for specifying the upper and lower horizontal limits of the plot.
          See parameter RANGE.
+
+   \item [\htmlref{HISTAT}{HISTAT}] \mbox{}
+         \begin{itemize}
+            \item Now uses an improved algorithm for calculating
+                  the median and percentiles which reduces the effect of 
+                  extreme outliers on the results.
+            \item The NUMBIN parameter has been removed.
+         \end{itemize}
 
    \item [\htmlref{IDSTATE}{IDSTATE}] The changes made to GDSTATE have
    also been made to IDSTATE.
