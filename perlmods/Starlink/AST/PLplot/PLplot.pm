@@ -77,8 +77,10 @@ sub _GLine {
   my $y = shift;
 
   if( scalar(@$x) > 1 && scalar(@$x) == scalar(@$y) ) {
+    plcol0(1);
     plline( $x, $y );
   }
+  _GFlush();
   return 1;
 }
 
@@ -98,8 +100,10 @@ sub _GMark {
    my $type = shift;
 
    if( scalar(@$x) >= 1 && scalar(@$x) == scalar(@$y) ) {
+      plcol0(2);
       plpoin( $x, $y, $type );
    }
+   _GFlush();
    return 1;
 }
 
@@ -134,10 +138,92 @@ top on the screen.
 =cut
 
 sub _GText {
-  my ( $text, $x, $y, $just, $upx, $upy ) = @_;
+   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
+   #warn "_GText: not yet implemented for PLplot\n";
+   
+   # check we have a string to print
+   if( defined $text && length($text) != 0 ) {
+   
+      # validate the justifcation
+      my $just1 = substr $just, 0, 1;
+      my $just2 = substr $just, 1, 1;
+      if ( defined $just && length($just) == 2 ) {
+         
+        # if we have a bogus justification string default it 
+        unless( $just1 =~ /[TBC]/ ) {
+           warn "_GText: bad vertical justification defaulting to 'C'\n";
+           $just1 = "C";
+        }
+        unless( $just2 =~ /[LCR]/ ) {
+           warn "_GText: bad horizontal justification defaulting to 'C'\n";
+           $just2 = "C"; 
+        }
+      } else {
+         warn "_GText: No justification string defaulting to 'CC'\n";
+         $just1 = "C";
+         $just2 = "C";
+      }
+      $just = $just1 . $just2;
+      
+      # get the axis scaling
+      my ( $ret, $alpha, $beta ) = _GScales();
+      return 0 if $ret == 0;
+      
+      # If either axis is reversed, reverse the supplied up-vector 
+      # components so that they refer to the world-coordinates axes.
+      $upx = -$upx if $alpha < 0.0;
+      $upy = -$upy if $beta < 0.0;
+      
+      # Get the angle between the text base-line and horizontal. 
+      my $angle = atan2( -$upx*$alpha, $upy*$beta)*R2D;
+      
+      # Get the fractional horizontal justification as needed by PGPLOT.
+      my $fjust;
+      if( $just2 eq "L" ) {
+        $fjust = 0.0;
+      } elsif ( $just2 eq "R" ) {
+        $fjust = 1.0;
+      } else {
+        $fjust = 0.5;
+      }
+  
+      # Unless the requested justification is "Bottom", we need to adjust
+      # the supplied reference position before we use it with PGPLOT because
+      # PGPLOT assumes "Bottom" justification.
+      if( $just1 ne "B" ) {
+      
+         # Get the bounding box of the string. Note, only the size of the box 
+         # is significant here, not its position. Also note, leading and 
+         # trailing spaces are not included in the bounding box.
+         my ( @xbox, @ybox );
+        
+         #pgqtxt( $x, $y, $angle, $fjust, $text, \@xbox, \@ybox );
+         plptex ( $x, $y, $upy, $upx , $fjust, $text);
+         # Normalise the up-vector in world coordinates.
+         my $uplen = sqrt( $upx*$upx + $upy*$upy );
+         if( $uplen > 0.0 ){ 
+            $upx /= $uplen;
+            $upy /= $uplen;
+         } else {
+            ReportGrfError("_GText: Zero length up-vector supplied.");
+            return 0;
+         }
+      }
 
-  warn "_GText: not yet implemented for PLplot\n";
-  return 0;
+      # Display the text, erasing any graphics.
+      #my $tbg;
+      #pgqtbg( $tbg );
+      #pgstbg( 0 );
+      #pgptxt( $x, $y, $angle, $fjust, $text ); 
+      #pgstbg( $tbg );
+      plcol0(15);
+      plptex ( $x, $y, $upy, $upx, $fjust, $text);
+      
+   }
+   
+   # Return, all is well strangely
+   _GFlush();
+   return 1;
 }
 
 =item B<_GScales>
@@ -156,19 +242,17 @@ sub _GScales {
   my $alpha = shift;
   my $beta = shift;
 
-  my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
-  plgvpd( $nx1, $nx2, $ny1, $ny2 );
-  plgvpw( $wx1, $wx2, $wy1, $wy2 );
+  my ( $nx1, $nx2, $ny1, $ny2 ) = plgvpd();
+  my ( $wx1, $wx2, $wy1, $wy2 ) = plgvpw();
 
   if( $wx2 != $wx1 && $wy2 != $wy1 && $nx2 != $nx1 && $ny2 != $ny1 ) {
     $alpha = ( $nx2 - $nx1 ) / ( $wx2 - $wx1 );
     $beta = ( $ny2 - $ny1 ) / ( $wy2 - $wy1 );
-    $ret = 1
   } else {
     ReportGrfError("_GScales: The graphics window has zero size\n");
-    $ret = 0;
+    return(0);
   }
-  return ( $ret, $alpha, $beta );
+  return ( 1, $alpha, $beta );
 }
 
 
@@ -219,9 +303,22 @@ Notes:
 
 sub _GTxExt {
   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
-
-  warn "_GTxExt: not yet implemented for PLplot\n";
-  return 0;
+  #warn "_GTxExt: not yet implemented for PLplot\n";
+  
+  # initalise @$xb and @$yb
+  my ( @xb, @yb );
+  $xb[0] = $x;
+  $yb[0] = $y;
+  $xb[1] = $x;
+  $yb[1] = $y;
+  $xb[2] = $x;
+  $yb[2] = $y;
+  $xb[3] = $x;
+  $yb[3] = $y;
+   
+  # Return
+  _GFlush();
+  return (1, \@xb, \@yb );     
 }
 
 =item B<_GQch>
@@ -276,13 +373,48 @@ AST's grf.h:
 
 =cut
 
+my @gattrs; # Global
 sub _GAttr {
-  my $attr = shift;
-  my $value = shift;
+  my $att = shift;
+  my $val = shift;
   my $prim = shift;
+  #print "# _GAttr: Placeholder routine called\n";
 
-  warn "_GAttr: not yet implemented for PLplot\n";
-  return 0;
+  my $MAX_ATTR = 5;
+  my $i;
+  if ($att == &Starlink::AST::Grf::GRF__STYLE() ) {
+    $i = 1;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__WIDTH() ) {
+    $i = 2;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__SIZE() ) {
+    $i = 3;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__FONT() ) {
+    $i = 4;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__COLOUR() ) {
+    $i = 5;
+  } else {
+    print "# Bad ATT value: ", $att ."\n";
+  }
+
+  my $j;
+  if ($prim == &Starlink::AST::Grf::GRF__LINE() ) {
+    $j = 1;
+  } elsif ($prim == &Starlink::AST::Grf::GRF__MARK() ) {
+    $j = 2;
+  } elsif ($prim == &Starlink::AST::Grf::GRF__TEXT() ) {
+    $j = 3;
+  } else {
+    print "# Bad PRIM value: $prim\n";
+  }
+
+  # Store the new value if required
+  # Convert prim and att to index of 2d array
+  my $index = ( $MAX_ATTR * ($att - 1) + $prim );
+  my $old = $gattrs[$index];
+  $old = &Starlink::AST::AST__BAD() if !defined $old;
+  $gattrs[$index] = $val if $val != &Starlink::AST::AST__BAD();
+
+  return (1, $old);
 }
 
 =item B<_GCap>
@@ -359,7 +491,32 @@ it under the terms of the GNU Public License.
 =head1 AUTHORS
 
 Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+Alasdair Allan <aa@astro.ex.ac.uk>
 
 =cut
+
+
+package Starlink::AST::Plot;
+
+use strict;
+use vars qw/ $VERSION /;
+
+use Starlink::AST::PLplot;
+
+sub plplot {
+  my $self = shift;
+
+  $self->GFlush(\&Starlink::AST::PLplot::_GFlush);
+  $self->GLine(\&Starlink::AST::PLplot::_GLine);
+  $self->GMark(\&Starlink::AST::PLplot::_GMark);
+  $self->GText(\&Starlink::AST::PLplot::_GText);
+  $self->GTxExt(\&Starlink::AST::PLplot::_GTxExt);
+  $self->GQch(\&Starlink::AST::PLplot::_GQch);
+  $self->GAttr(\&Starlink::AST::PLplot::_GAttr);
+  $self->GScales(\&Starlink::AST::PLplot::_GScales);
+  $self->GCap(\&Starlink::AST::PLplot::_GCap);
+
+  return 1;
+}
 
 1;
