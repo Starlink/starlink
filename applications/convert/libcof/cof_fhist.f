@@ -1,0 +1,140 @@
+      SUBROUTINE COF_FHIST( FUNIT, KEYNO, THERE, STATUS )
+*+
+*  Name:
+*     COF_FHIST
+
+*  Purpose:
+*     Locates the next HISTORY card in a FITS header.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COF_FHIST( FUNIT, KEYNO, THERE, STATUS )
+
+*  Description:
+*     This routine searches forward through a FITS header looking for
+*     the next HISTORY card, starting from the KEYNOth card.  It
+*     returns the index number of the HISTORY card, and a flag to
+*     indicate whether or not a HISTORY card was found.
+
+*  Arguments:
+*     FUNIT = INTEGER (Given)
+*        The FITSIO unit number for the FITS file.
+*     KEYNO = INTEGER (Given and Returned)
+*        On input, it is the index number within the FITS header of the
+*        record where the search is to begin.  On exit it is the
+*        index number of the next HISTORY record, unless THERE is
+*        .FALSE..  KEYNO=1 is the first FITS card.
+*     THERE = LOGICAL (Returned)
+*        If .TRUE., a HISTORY record was located.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Prior Requirements:
+*     The FITS file must be open.
+
+*  [optional_subroutine_items]...
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1997 March 6 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER FUNIT
+
+*  Arguments Given and Returned:
+      INTEGER KEYNO
+
+*  Arguments Returned:
+      LOGICAL THERE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER FITSOK             ! Good status for FITSIO library
+      PARAMETER( FITSOK = 0 )
+
+*  Local Variables:
+      CHARACTER * ( 80 ) CARD    ! FITS header card
+      INTEGER FSTAT              ! FITSIO status
+      INTEGER KEY                ! Keyword index
+      INTEGER MAXKEY             ! Number of keywords in the header
+      LOGICAL NOTHIS             ! HISTORY not found?
+
+*.
+
+*  Initialise the THERE flag.
+      THERE = .FALSE.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the number of keywords in the header.
+      CALL FTGHPS( FUNIT, MAXKEY, KEY, STATUS )
+
+*  Check for a FITSIO error.  Handle a bad status.  Negative values are
+*  reserved for non-fatal warnings.
+      IF ( FSTAT .GT. FITSOK ) THEN
+         CALL COF_FIOER( FSTAT, 'COF_FHIST_ERR1', 'FTGHPS',
+     :                   'Error finding number of FITS keywords.', 
+     :                   STATUS )
+         GOTO 999
+      END IF
+
+*  Check that the the chosen key number is within range.
+      KEY = MAX( 1, KEYNO )
+
+*  Read each keyword in turn until HISTORY is found or the header is
+*  exhausted of cards.
+      NOTHIS = .TRUE.
+  100 CONTINUE     ! Start of DO WHILE loop
+      IF ( NOTHIS .AND. KEY .LE. MAXKEY ) THEN
+
+*  Obtain the current card.
+         CALL FTGREC( FUNIT, KEY, CARD, FSTAT )
+
+*  Is this a HISTORY card.
+         IF ( CARD( 1:8 ) .EQ. 'HISTORY' )  THEN
+            NOTHIS = .FALSE.
+
+*  Assign returned values.
+            THERE = .TRUE.
+            KEYNO = KEY
+
+*  Skip to the next key.
+         ELSE
+            KEY = KEY + 1
+         END IF
+
+*  End of DO WHILE loop.
+         GOTO 100
+      END IF
+
+*  Check for a FITSIO error.  Handle a bad status.  Negative values are
+*  reserved for non-fatal warnings.
+      IF ( FSTAT .GT. FITSOK ) THEN
+         CALL COF_FIOER( FSTAT, 'COF_FHIST_ERR', 'FTGREC',
+     :                   'Error searching for the next HISTORY card '/
+     :                   /'in the FITS headers', STATUS )
+      END IF
+
+  999 CONTINUE
+
+      END
