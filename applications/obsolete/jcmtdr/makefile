@@ -431,7 +431,7 @@ LICENCE = $(PACK_NAME)_CONDITIONS
 #  List of documentation files. These are just left where they are.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
-	$(PKG_NAME)_news.txt $(LICENCE)
+	$(PKG_NAME).news $(LICENCE)
 
 
 #  Other macros.
