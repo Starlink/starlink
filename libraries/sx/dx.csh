@@ -28,6 +28,8 @@
 
 #  Authors:
 #     DSB: D.S. Berry (STARLINK)
+#     BLY: Martin Bly (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -37,6 +39,8 @@
 #        Modified search for installed `dx' command.
 #     10-MAR-1997 (BLY):
 #        Modified invokation of swapon command for OSF1 to use full path.
+#     29-AUG-2004 (TIMJ):
+#        Add swap check for Linux
 #     {enter_changes_here}
 
 #-
@@ -59,7 +63,14 @@ if ("`uname -s`" == "OSF1" ) then
    set t = `/usr/sbin/swapon -s | grep Available`
    @ use = $t[3] / 171
 
+else if ("`uname -s`" == "Linux" ) then
+   # run top once in batch mode
+   set t = `top -b -n 1 | grep Swap`
+   # Answer is in kB, we need it in megabytes (divide by 1024 / 3/4 = 1365 )
+   @ use = `echo $t[6] | sed "s/k//"` / 1365
+
 else
+   # Solaris
    set t = `/usr/sbin/swap -s`
    @ use = `echo $t[11] | sed "s/k//"` / 1365
 
