@@ -646,7 +646,7 @@ m51.sdf).  If it could not locate that NDF, STATS would then look
 for a file called m51.fit, and then m51.imh, and finally m51.dst,
 stopping once a file was found and associating the appropriate
 format with it.  If none of the files exist, you'll receive a
-``file not found'' error message.
+"file not found" error message.
 
 You can still define an NDF section (see topic "NDF_Sections") when
 you access an existing data file in a foreign format.  Thus
@@ -3396,7 +3396,7 @@ withdrawn, two to enable KAPPA to be NAG-free.
 
   o CONTOVER, CONTOUR, and TURBOCONT have had several improvements.
     There are two new methods for selecting the contour heights
-    using percentiles (MODE="Equalised" and "Percentiles"}).  There
+    using percentiles (MODE="Equalised" and "Percentiles").  There
     is a CONCOL parameter for selecting the colour of the contours.
     Dashed contours may be plotted for those with heights below the
     value of a new DASHED parameter.  There is a new THICK parameter
@@ -3543,6 +3543,464 @@ structure:
    NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB 
    SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
 
+2 V0.13
+
+Several applications have been changed to enable them to make use
+of the NDF WCS component, which stores descriptions of world
+co-ordinate systems within NDF data structures. In some cases,
+this has involved major changes, including the removal of existing
+parameters and the addition of new parameters.
+
+
+       Scripts which make use of any of the removed or
+       modified parameters will fail when run with KAPPA
+       V0.13. Such scripts will need to be changed to take
+       account of the new features introduced in this
+       release. Check the lists below for details.
+
+
+Several new applications have also been written to support the use
+of the WCS component. If no WCS component is present within an
+NDF, applications which read the WCS component will attempt to
+find suitable WCS information in one of two other sources.
+Firstly, any IRAS90 astrometry structure contained within an NDF
+extension will be used. If no such structure can be found, any
+FITS header cards in the FITS extension will be used. Applications
+which write WCS information to an NDF will always write it in the
+form of a WCS component.
+
+One of the major changes is that some graphics applications which
+previously had many parameters to control the appearance of the
+plot (ABSLAB, ORDLAB, FONT, PLTITL, etc), now use a single STYLE
+parameter instead. The value supplied for a STYLE parameter should
+be a group of plotting attributes. Defaults for unspecified
+plotting attributes are read from the text file $KAPPA_DIR/style.def. 
+A different defaults file may be specified by setting the
+environment variable KAPPA_STYLE to hold the name of the defaults
+file to use.
+
+Another major change is that the new and modified applications no
+longer use the global COSYS parameter to select data (i.e. axis)
+or world (i.e. pixel) co-ordinates. Instead, each NDF carries
+knowledge around with it of several co-ordinate "Frames", one of
+which is nominated as the current co-ordinate Frame. This
+information is stored in the WCS component of each NDF. All
+interaction with a given NDF uses the current co-ordinate Frame
+when referring to positions within the NDF. The new application
+WCSFRAME can be used to change the current co-ordinate Frame in an
+NDF.
+
+A more minor change is that the PXSIZE and PYSIZE parameters have
+been removed from the modified graphics applications. These
+parameters were previously used to specify the absolute size of
+the picture in metres. PICDEF can now be used to do this, using
+the new SIZE parameter. A picture of the required size should be
+created before running the appropriate plotting application.
+
+The section of SUN/95 entitled "Graphics Database" has been
+completely re-written to illustrate the new WCS facilities of the
+AGI graphics database. In addition, two new sections have been
+added, "Using World Co-ordinate Systems" describing the use of WCS
+information within NDFs, and section "Using Plotting Styles"
+describing the use of graphical style parameters.
+
+3 Modified applications
+The following applications have been modified:
+
+4 COMPADD
+
+- The way in which the pixel index bounds of the output NDF are
+chosen has been changed in order to retain the pixel origin. The
+compression is now centred on the origin of pixel co-ordinates
+(previously the lower left corner of the output NDF was assigned
+the arbitrary pixel indices [1,1,...] irrespective of the origin
+of the supplied NDF).
+
+- Bug fixed which caused errors to be reported if COMPADD was used
+to compress 1-dimensional data.
+
+4 COMPAVE
+ - The choice of origin for the output NDF has been changed. See
+COMPADD.
+
+- Bug fixed which caused errors to be reported if COMPAVE was used
+to compress 1-dimensional data.
+
+4 COMPICK
+- The choice of origin for the output NDF has been changed. See
+COMPADD.
+
+4 CONTOUR
+
+- Axes are now annotated with values in the current co-ordinate
+Frame of the supplied NDF.
+
+- Information describing the co-ordinate Frames available in the
+supplied NDF is stored with the DATA picture in the AGI graphics
+database.
+
+- If the screen is not cleared before plotting a contour map (i.e.
+if the parameter CLEAR is set to FALSE), then an attempt will be
+made to align the new contour map spatially with any existing DATA
+picture. This alignment occurs by preference in the current
+co-ordinate Frame of the supplied NDF, but may occur in another
+Frame if the existing DATA picture does not have suitable WCS
+information stored with it.
+
+- There is now much greater control over the appearance of the
+map. This is provided through the STYLE and KEYSTYLE parameters
+which allow plotting attributes to be set.
+
+- The position of the key can now be controlled both vertically
+and horizontally.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute {\tt Label(1).
+
+   o BORDER -- Set AXES=TRUE, and suppress everything but the
+   border by setting suitable plotting attributes (e.g.
+   MajTickLen=0, MinTickLen=0, TextLab=0, etc).
+
+   o CONCOL -- Use the Colour(Cont) plotting attribute (or
+   parameter PENS).
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+   o FONT -- Use the Font plotting attributes.
+
+   o MAJTIC -- Use the Gap plotting attributes.
+
+   o MINTIC -- Use the MinTick plotting attribute.
+
+   o ORDLAB -- Use Label(2) plotting attribute.
+
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+
+   o PLTITL -- Use the Title plotting attribute.
+
+   o PXSIZE -- Create the picture first using PICDEF, specifying
+   the required picture size using the new parameter SIZE.
+
+   o PYSIZE -- See PXSIZE.
+
+   o THICK -- Use the Width plotting attributes.
+
+
+- The following new parameters have been added: KEYPOS, KEYSTYLE,
+MARGIN, PENS, STYLE, USEAXIS.
+
+- The following parameters have been modified:
+
+   o AXES -- Axes are now annotated with the current co-ordinate
+   Frame of the NDF.
+
+   o CLEAR -- Setting CLEAR=FALSE cause the new contour map to be
+   aligned spatially with any existing DATA picture (if possible).
+
+   o KEY -- The appearance of the key can now be controlled using
+   parameter KEYSTYLE, and the position of the key can be
+   controlled using parameter KEYPOS.
+
+4 CURSOR 
+
+- The positions are now reported in the current co-ordinate Frame
+of the picture (by default). This can be changed using the new
+parameter FRAME.
+
+- The format of the reported positions has changed (axis symbols
+and units are now included, and the picture comment, name and
+label are displayed on a separate line).
+
+- There are now many more options for marking the positions on the
+screen. Detailed control over the appearance of these graphics is
+provided through the new STYLE parameter.
+
+- Control is now available over the minimum and maximum number of
+position which may be supplied.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o COLOUR -- Use the STYLE parameter to specify values for the
+   Colour plotting attributes.
+
+   o COSYS -- Use parameter FRAME.
+                  
+   o DOUBLE -- Double precision is now always used.
+                  
+   o XC -- Use parameters LASTPOS and LASTDIM.
+
+   o XP -- Specify an output catalogue using parameter OUTCAT, and
+   then read the required positions using application LISTSHOW.
+
+   o YC -- Use parameters LASTPOS and LASTDIM.
+                  
+   o YP -- See XP.
+
+- The following new parameters have been added: DESCRIBE, EPOCH,
+FRAME, GEODESIC, INFO, LASTDIM, LASTPOS, MARKER, MAXPOS, MINPOS,
+OUTLIST, QUIET, SHOWPIXEL, STRINGS, STYLE.
+
+- The following parameters have been modified:
+
+   o PLOT -- Option "Cross" has been changed (it now produces a
+   full-screen cross-hair), and the new options "Mark", "Chain",
+   "Box", "Vline", "Hline" and "Text" have been added.
+
+
+4 DISPLAY
+
+- Axes are now annotated with values in the current co-ordinate
+Frame of the supplied NDF.
+
+- Information describing the co-ordinate Frames available in the
+supplied NDF is stored with the DATA picture in the AGI graphics
+database.
+
+- There is now much greater control over the appearance of the
+axes or border. This is provided through the STYLE and BORSTYLE
+parameters which allow plotting attributes to be set.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute Label(1).
+
+   o BCOLOUR -- Use the Colour(Border) plotting attribute.
+
+   o BWIDTH -- Use the Width(Border) plotting attribute.
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+   o FONT -- Use the Font plotting attributes.
+                  
+   o MAJTIC -- Use the Gap plotting attributes.
+                  
+   o MINTIC -- Use the MinTick plotting attribute.
+                  
+   o ORDLAB -- Use Label(2) plotting attribute.
+
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+
+   o PLTITL -- Use the Title plotting attribute.
+
+   o SQUASH -- Specify the required scale factors explicitly using
+   parameters XMAGN and YMAGN.
+
+   o THICK -- Use the Width plotting attributes.
+
+- The following new parameters have been added: BORSTYLE, MARGIN,
+STYLE, USEAXIS.
+
+- The following parameters have been modified:
+
+   o AXES -- Axes are now annotated with the current co-ordinate
+   Frame of the NDF. The default value is now the current value
+   (initially TRUE) instead of FALSE.
+
+   o BORDER -- The default value is now the current value
+   (initially FALSE) instead of FALSE.
+
+   o CENTRE -- This is now a literal string value which should be
+   given the formatted co-ordinates of the position to put at the
+   centre of the picture. These co-ordinates should be expressed
+   within the current co-ordinate Frame of the NDF.
+
+   o CLEAR -- The default value is now the current value instead
+   of FALSE.
+
+   o FILL -- The default value is now TRUE if the input NDF is
+   1-dimensional, and FALSE otherwise.
+
+   o XMAGN -- This used to be the number of device pixels per NDF
+   pixel along the horizontal axis. It is now a scaling factor,
+   with a value of 1.0 producing an image which just fills the
+   available width on the screen.
+
+   o YMAGN -- This has been changed in the same way as XMAGN.
+
+4 LINPLOT
+
+- NDFs in which the current co-ordinate Frame has more than 1
+dimension can now be handled. For example, a 1-d trace through a
+2-d image will in general have a 2-d current co-ordinate Frame,
+even though the pixel array itself is only 1-d. In this case, the
+current co-ordinate Frame gives the position of each pixel within
+the original 2-d image.
+
+- The horizontal axis is now annotated using the current
+co-ordinate Frame of the supplied NDF. If this has more than one
+dimension, then the horizontal axis can be annotated using any
+specified axis in the current Frame. Alternatively, the distance
+from the starting point to each position on the horizontal axis
+may be used for the annotation.
+
+- There is now much greater control over the appearance of the
+plot. This is provided through the STYLE parameter.
+
+- A key can now be produced indicating the starting and ending
+points of the plot within the current co-ordinate Frame of the
+NDF. Its appearance can be controlled using the KEYSTYLE
+parameter.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute Label(1).
+
+   o ABSLIM -- Use parameters YBOT and YTOP.
+                  
+   o AXLIM -- Use parameter ALIGN.
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+   o ERRCOL -- Use the Colour(ErrBars) plotting attribute.
+                  
+   o FONT -- Use the Font plotting attributes.
+                  
+   o LINCOL -- Use the Colour(Lines) plotting attribute.
+                  
+   o MAJTIC -- Use the Gap plotting attributes.
+                  
+   o MINTIC -- Use the MinTick plotting attribute.
+                  
+   o ORDLAB -- Use Label(2) plotting attribute.
+                  
+   o ORDLIM -- Use parameters XLEFT and XRIGHT.
+                  
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+                  
+   o PLTITL -- Use the Title plotting attribute.
+
+   o PXSIZE -- Create the picture first using PICDEF, specifying
+   the required picture size using the new parameter SIZE.
+
+   o PYSIZE -- See PXSIZE.
+                  
+   o SYMCOL -- Use the Colour(Symbols) plotting attribute.
+                  
+   o THICK -- Use the Width plotting attributes.
+                  
+   o XLOG -- Logarithmic X axes are not currently supported.
+
+- The following new parameters have been added: ALIGN, AXES, KEY,
+KEYSTYLE, MARGIN, MARKER, STYLE, USEAXIS, XLEFT, XRIGHT, XSIGMA,
+YTOP, YBOT, YSIGMA.
+
+- The following parameters have been modified:
+
+   o MODE -- The option of supplying an integer marker type has
+   been removed (replaced by parameter MARKER). Options "Mark" and
+   "Chain" have been added.
+
+   o YLOG -- Logarithmic data values are now represented as
+   equally spaced values of log(data), instead of logarithmically
+   spaced values of data.
+
+4 NATIVE
+
+- Any floating point NaN or Inf values in the supplied HDS object
+are now converted to the appropriate Starlink bad value. This
+occurs even if the object already has the appropriate primitive
+data representation for the machine in use.
+
+4 NDFTRACE 
+
+- This now displays the available WCS information within an NDF.
+If a WCS component is not present within the NDF, then it will
+display WCS information derived from an IRAS90 astrometry
+structure or FITS extension (if possible) as described earlier.
+
+- The following new parameters have been added: CURRENT, FDIM,
+FDOMAIN, FTITLE, FULLFRAME, FULLWCS, WCS.
+
+4 PICDEF 
+
+- This now allows the picture size to be specified in absolute
+units (centimetres).
+
+- The following new parameter has been added: SIZE
+
+4 PSF
+
+- This now allows the gamma coefficient to be constrained to be
+two.  A failure to meet the tolerance test is no longer fatal.
+Warning messages showing the requested and used tolerances replace
+the error message.
+
+- The following new parameter has been added: GAUSS
+
+3 New applications
+
+- CHAIN -- Concatenates a series of NDFs, in the order supplied
+and treated as vectors, to form a 1-dimensional output NDF.  The
+dimensions of the NDFs may be different, and indeed so may their
+dimensionalities.
+
+- COPYBAD -- Copies the bad pixels from one NDF into another.
+
+- LISTMAKE -- Creates a catalogue holding a positions list. These
+are used to communicate positions between applications, together
+with associated WCS information. In addition to numerical axis
+values, they also contain an integer identifier for each position,
+and a description of the available co-ordinate Frames. The
+positions are supplied by the user in a file or in response to
+parameter prompts. Alternatively, the pixel centres in a specified
+NDF may be used.
+
+- LISTSHOW -- Shows a sub-set of the positions contained within a
+positions list catalogue, in any of the co-ordinate Frames
+described within the catalogue. It can also write the selected
+positions to a new positions list. The positions are displayed on
+the screen, and can also be marked on the current graphics device
+in a variety of ways.
+
+- PROFILE -- Produces a 1-dimensional NDF containing a profile
+through an N-dimensional NDF, retaining the current co-ordinate
+Frame of the n-dimensional NDF. The data values in the output NDF
+are samples taken along a specified 1-dimensional curve through
+the input NDF.
+
+- RESHAPE -- This application reshapes an NDF to create another
+NDF by copying array values.  The array components in the input
+NDF are treated as vectors.  Each output array is filled in order
+with values from the input vector, until it is full or the input
+vector is exhausted.
+
+- WCSADD -- Allows a new co-ordinate Frame to be added into the
+WCS component of an NDF. The new Frame must be linearly related to
+an existing Frame.
+
+- WCSALIGN -- Resamples a group of 2-dimensional NDFs in order to
+align them with a specified reference NDF. The WCS information
+within the NDFs is used to determine the transformations required
+to achieve alignment.
+
+- WCSATTRIB -- Allows attributes within the WCS component of an
+NDF to be examined or changed.
+
+- WCSCOPY -- Copies the WCS component from one NDF to another. One
+use of this is to allow WCS information to be re-instated in an
+NDF after being stripped out by an application which does not
+propagate WCS information.
+
+- WCSFRAME -- Allows the current co-ordinate Frame within an NDF
+to be examined and changed.
+
+- WCSREMOVE -- Removes one or more co-ordinate Frames from the WCS
+component of an NDF.
+
+- WCSTRAN -- Transforms a position from one NDF WCS co-ordinate
+Frame to another.
+
 1 CHPIX
 Replaces the values of selected pixels in an NDF.
 
@@ -3637,7 +4095,7 @@ DSB: David S. Berry (STARLINK)
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
- {enter_any_changes_here}
+ {enter_any_changes_here
 2 Implementation_Status
    -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
    TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF; and
@@ -3649,6 +4107,7 @@ DSB: David S. Berry (STARLINK)
 1 Classified_commands
 KAPPA applications may be classified in terms of their functions as 
 follows:
+
 
 2 Data_import_&_export
 
@@ -3756,13 +4215,13 @@ CONTOUR     - Contours a 2-d NDF.
 CONTOVER    - Contours a 2-d data array overlaid on an image displayed
               previously.
 DISPLAY     - Displays a 1-d or 2-d NDF.
-DRAWSIG     - Draws +/- n standard-deviation lines on a line plot.
+DRAWSIG     - Draws n standard-deviation lines on a line plot.
 ELPROF      - Creates a radial or azimuthal profile of a 2-dimensional
               image.
 GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
-LINPLOT     - Draws a line plot of a 1-d NDF's data values against their
-              axis co-ordinates.
+LINPLOT     - Draws a line plot of the data values in a 1-d NDF.
+LISTSHOW    - Displays the positions stored in a positions list.
 LOOK        - Outputs the values of a sub-array of a 2-d data array to
               the screen or a text file.
 MLINPLOT    - Draws a multi-line plot of a 2-d NDF's data values against
@@ -3789,8 +4248,7 @@ CSUB        - Subtracts a scalar from an NDF data structure.
 DIV         - Divides one NDF data structure by another.
 EXP10       - Takes the base-10 exponential of each pixel of a data
               array.
-EXPE        - Takes the exponential of each pixel of a data array 
-              (base e).
+EXPE        - Takes the exponential of each pixel of a data array (base e).
 EXPON       - Takes the exponential of each pixel of a data array
               (specified base).
 LOG10       - Takes the base-10 logarithm of each pixel of a data array.
@@ -3825,13 +4283,17 @@ PIXDUPE     - Expands an NDF by pixel duplication.
 SQORST      - Squashes or stretches a 2-d data array in either or both
               axes.
 TRANSFORMER - Applies a transformation to an NDF.
+WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
 
 3 Configuration_change
+CHAIN       - Concatenates a series of vectorized NDFs.
 FLIP        - Reverses an NDF's pixels along a specified dimension.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
 MANIC       - Converts all or part of a data array from one
               dimensionality to another.
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
+PROFILE     - Creates a 1-d profile through an N-d NDF.
+RESHAPE     - Reshapes an NDF, treating its arrays as vectors.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through any
               angle.
 SETBOUND    - Sets new bounds for an NDF.
@@ -3905,11 +4367,26 @@ HISCOM      - Adds commentary to the history of an NDF.
 HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
 
+3 NDF_world_coordinate_systems
+WCSADD      - Adds a new co-ordinate Frame into the WCS component of an
+              NDF.
+WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
+WCSATTRIB   - Manages attribute values associated with the WCS component
+              of an NDF.
+WCSCOPY     - Copies WCS information from one NDF to another.
+WCSFRAME    - Changes the current co-ordinate Frame in the WCS component
+              of an NDF.
+WCSREMOVE   - Removes co-ordinate Frames from the WCS component of an
+              NDF.
+WCSTRAN     - Transforms a position from one NDF co-ordinate Frame to
+              another.
+
 3 Pixel_editing_and_masking
 ARDGEN      - Creates a text file describing selected regions of an
               image.
 ARDMASK     - Uses an ARD file to set some pixels of an NDF to be bad.
 CHPIX       - Replaces the values of selected pixels in an NDF.
+COPYBAD     - Copies the bad pixel mask from one NDF to another.
 ERRCLIP     - Removes pixels with large errors from an NDF.
 FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
@@ -3941,6 +4418,7 @@ TRANMAKE    - Makes a transformation structure given its co-ordinate
               mappings.
 TRANSFORMER - Applies a transformation to an NDF.
 TRANTRACE   - Lists the contents of a transformation structure.
+WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
 
 3 Surface_fitting
 FITSURFACE  - FITS a polynomial surface to 2-dimensional data array.
@@ -3987,6 +4465,7 @@ NOGLOBALS   - Resets the KAPPA global parameters.
 
 2 Miscellaneous
 KAPHELP     - Gives help about KAPPA.
+LISTMAKE    - Create a catalogue holding a positions list.
 
 1 CMULT
 Multiplies an NDF by a scalar.
@@ -4058,6 +4537,46 @@ DSB: David S. Berry (STARLINK)
    is carried out using the appropriate floating-point type, but the
    numeric type of the input pixels is preserved in the output NDF.
 1 Co-ordinate_Systems
+
+     KAPPA is currently undergoing major changes in the way
+     it handles co-ordinate information. The new system uses
+     the WCS (World Co-ordinate System) component of the NDF
+     structure to allow access to a much wider range of
+     co-ordinate systems than has previously been available.
+     For this reason, you will find some inconsistencies in
+     the way co-ordinate information is handled by different
+     applications. This situation will be rectified once all
+     applications have been modified to use the WCS
+     component. Until then, please pay particular attention
+     to the descriptions of the co-ordinate handling
+     facilities of each application you use.
+
+     The new (converted) applications are identified by the
+     fact that their descriptions in this help library and in
+     SUN/95 include references to the "WCS component" or to
+     "WCS information". In the new system, each NDF has a
+     "current co-ordinate Frame". The converted applications
+     use this co-ordinate Frame when referring to any
+     position within the NDF, for instance when producing
+     axis annotation, or requesting a position from the user.
+     Each NDF has its own current co-ordinate Frame, and the
+     global parameter GLOBAL.COORD_SYSTEM is ignored. These
+     application do not have a COSYS parameter which has
+     previously been used to specify a co-ordinate system.
+
+     In the previous system, there was a "global" co-ordinate
+     system which was used by all applications irrespective
+     of the contents of the NDF. This co-ordinate system was
+     either data or world and was obtained by each
+     application using a COSYS parameter. These parameters
+     were associated with the global parameter
+     GLOBAL.COORD_SYSTEM.
+
+     The rest of this section describes the old pre-WCS
+     system and will be removed when the conversion process
+     is complete. The new system is described in SUN/95
+     section "Using World Co-ordinate Systems"
+
 
 KAPPA uses a number of co-ordinate systems; this topic describes
 them, and how to select one.  NDFTRACE reports the bounds of an NDF
@@ -5329,7 +5848,7 @@ DSB: David S. Berry (STARLINK)
     Changed the way in which the bounds of the output image are
     determined so that pixel origin information is retained.
 
- {enter_further_changes}
+ {enter_further_changes
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
    LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
@@ -5827,7 +6346,7 @@ of the WCS information in the NDF are stored in the DATA picture. On
 exit the current database picture for the chosen device reverts to the
 input picture.
 2 Related_Applications
-   KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
+   KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT, SPECCONT.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 
@@ -6216,7 +6735,7 @@ override this default behaviour are listed below.
 
 Pen rotation takes precedence over colour control through CONCOL.
 2 Related_Applications
-   KAPPA: CONTOUR, TURBOCONT; Figaro: ICONT; SPECDRE: SPECCONT.
+   KAPPA: CONTOUR, TURBOCONT; Figaro: ICONT, SPECCONT.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 2 History
@@ -6692,7 +7211,7 @@ TDCA: Tim D.C. Ash(STARLINK)
   ppath       'CURRENT,DYNAMIC'
   prompt      'Maximum peak intensity for Gaussians'
   help        'Give the value to be used as the upper limit to 
-              Gaussians'' peak values'
+              Gaussians" peak values'
 3 MIN
   keyword     'MIN'
   type        '_REAL'
@@ -6701,7 +7220,7 @@ TDCA: Tim D.C. Ash(STARLINK)
   ppath       'CURRENT,DYNAMIC'
   prompt      'Minimum peak intensity for Gaussians'
   help        'Give the value to be used as the lower limit to 
-              Gaussians'' peak values'
+              Gaussians" peak values'
 3 BACKGROUND
   keyword     'BACKGROUND'
   type        '_REAL'
@@ -7700,7 +8219,7 @@ There is an easier method of tailoring KAPPA to your requirements.
 If you frequently use certain commands, especially those with a long
 list of keywords and fixed values, you can define some C-shell
 aliases or ICL symbols for the commands.  Like the shell's
-$HOME/.login, ICL has a login file. (See the ``ICL for Unix''
+$HOME/.login, ICL has a login file. (See the "ICL for Unix"
 Appendix in SUN/144, or SSN/64 for details.)  If you add symbols to
 this file, each time you activate ICL these abbreviations will be
 available to you without further typing.  What you should do is to
@@ -7712,7 +8231,7 @@ It is possible to have several ICL login files, each for different
 work in different directories.  Now to abbreviate a command you put
 a DEFSTRING entry into the ICL login file.  For example, 
 
-     DEFSTRING MYC{ON} TURBOCONT CLEAR=F PENROT MODE=AU NCONT=7
+     DEFSTRING MYC{ON TURBOCONT CLEAR=F PENROT MODE=AU NCONT=7
 
 defines MYC or MYCO or MYCON to run TURBOCONT without clearing the
 screen, with pen rotation and seven equally spaced contour heights. 
@@ -7869,14 +8388,14 @@ the hierarchy is indented.
       TITLE          <_CHAR*30>      'HR6259 - AAT fibre data'
       LABEL          <_CHAR*20>      'Flux'
       UNITS          <_CHAR*20>      'Counts/s'
-      QUALITY        <QUALITY>       {structure}
+      QUALITY        <QUALITY>       {structure
          BADBITS        <_UBYTE>        1
          QUALITY(856)   <_UBYTE>        1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
                                      ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
 
       VARIANCE(856)  <_REAL>         2.1,0.1713413,1.5301,34.38378,42.35531,
                                      ... 615.6732,427.5547,353.9127,337.1805
-      AXIS(1)        <AXIS>          {structure}
+      AXIS(1)        <AXIS>          {structure
 
       Contents of AXIS(1)
          DATA_ARRAY(856)  <_REAL>       3847.142,3847.672,3848.201,3848.731,
@@ -7884,10 +8403,10 @@ the hierarchy is indented.
          LABEL          <_CHAR*20>      'Wavelength'
          UNITS          <_CHAR*20>      'Angstroms'
 
-      HISTORY        <HISTORY>       {structure}
+      HISTORY        <HISTORY>       {structure
          CREATED        <_CHAR*30>      '1990-DEC-12 08:21:02.324'
          CURRENT_RECORD  <_INTEGER>     3
-         RECORDS(10)    <HIST_REC>      {array of structures}
+         RECORDS(10)    <HIST_REC>      {array of structures
 
          Contents of RECORDS(1)
             TEXT           <_CHAR*40>      'Extracted spectrum from fibre data.'
@@ -7895,8 +8414,8 @@ the hierarchy is indented.
             COMMAND        <_CHAR*30>      'FIGARO V2.4 FINDSP command'
 
 
-      MORE           <EXT>           {structure}
-         FIGARO         <EXT>           {structure}
+      MORE           <EXT>           {structure
+         FIGARO         <EXT>           {structure
             TIME           <_REAL>         1275
             SECZ           <_REAL>         2.13
 
@@ -7968,6 +8487,31 @@ variance of the axis centres.  All axes or none must be present.
 Use SETAXIS to set the values of an AXIS array component; AXLABEL
 and AXUNITS to set an axis LABEL or UNITS component; and SETNORM
 to set an axis normalisation flag.
+
+3 WCS 
+This component provides an alternative, and superior, method for
+storing co-ordinate information. The AXIS structure described
+above has the severe limitation that it can only describe
+co-ordinate systems in which all axes are independant (i.e. the
+value on any axis can be changed without needing to change the
+values on any other axes). This means for instance that axes
+cannot be rotated (other than by multiples of 90 degrees), and
+cannot be used to describe celestial co-ordinates over a large
+field, or near a pole. The WCS component overcomes these
+restrictions. It contains descriptions of an arbitrary number of
+different co-ordinate Frames, together with the mappings required
+to convert positions between these Frames. All NDFs have three
+default Frames available; these are known as the GRID, PIXEL and
+AXIS Frames. The PIXEL Frame corresponds to pixel co-ordinates.
+The AXIS Frame corresponds to the co-ordinate Frame implied by
+the NDF AXIS structures. The GRID Frame is similar to the PIXEL
+Frame, the main difference being that it has a different origin;
+the centre of the first ("bottom left") pixel is always (1.0,1.0)
+in the GRID Frame regardless of the pixel origin of the NDF.
+Other Frames can be added to the WCS component in various ways,
+for instance, by importing them from appropriate FIST headers
+(FITSIN, FITSDIN), or using an appropriate application to create
+them from scratch (eg WCSADD, SETSKY or GAIA ).
 
 3 HISTORY
 This component provides a record of the processing history of the
@@ -8449,7 +8993,7 @@ NDF (because the bad-pixel flag is set to false in order to
 access the maximum colour index, and to handle sections),
 therefore only NDF-compliant applications can process it.
 2 Related_Applications
-   KAPPA: GREYPLOT, WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+   KAPPA: GREYPLOT, WCSFRAME, PICDEF; Figaro: IGREY, IMAGE, MOVIE.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
 
@@ -9336,10 +9880,7 @@ MJC: Malcolm J. Currie (STARLINK)
 
 1 Feedback
 Bug reports should be mailed to ussc@star.rl.ac.uk in the normal
-way.  A copy to the author (mjc@star.rl.ac.uk) may accelerate a fix.
-Normally, fix will be made the same day, and often immediately; you
-will be told from where you can copy a revised application until
-KAPPA is re-released.
+way.  
 
 Constructive comments are always welcome.  If you wish to suggest
 new tasks or enhancements to existing ones please contact the
@@ -10202,7 +10743,7 @@ MJC: Malcolm J. Currie (STARLINK)
    FITS extension into the requested order, removing the relocated
    cards.  It then inserts the new values.  If there are multiple
    occurrences of a keyword, this process can leave behind cards
-   having the token value '{undefined}'.
+   having the token value '{undefined'.
 1 FITSHEAD
 Lists the headers of FITS files.
 
@@ -11058,7 +11599,7 @@ convenient to use command FITSEDIT to make minor corrections.
 
    The format is summarised below:
 
-     command keyword{[occur]}{(keyword{[occur]})} {value {comment}}
+     command keyword{[occur]{(keyword{[occur]) {value {comment
 
    where braces indicate optional values, and occur is the
    occurrence of the keyword.  In effect there are four fields
@@ -11109,7 +11650,7 @@ convenient to use command FITSEDIT to make minor corrections.
       COMMENT or HISTORY.  Any text between the brackets other than
       a positive integer is interpreted as the first occurrence.
 
-      Use a null value ('' or "") if you want the card to be a
+      Use a null value (" or "") if you want the card to be a
       comment with keyword other than COMMENT or HISTORY.  As blank
       keywords are used for hierarchical keywords, to write a
       comment in a blank keyword you must give a null edit keyword.
@@ -11208,12 +11749,12 @@ convenient to use command FITSEDIT to make minor corrections.
    the comment being "Following values apply to mid-observation".
    Note the full stop.
 
-       W DROCOM(AIRMASS) '' Following values apply to mid-observation
+       W DROCOM(AIRMASS) " Following values apply to mid-observation
    As the preceding example but this writes to a non-standard
    comment keyword called DROCOM.  Note the need to supply a null
    value.
 
-       W (AIRMASS) '' Following values apply to mid-observation
+       W (AIRMASS) " Following values apply to mid-observation
    As the preceding example but this writes to a blank-keyword
    comment.
 
@@ -12477,7 +13018,7 @@ these work `directly' with KAPPA.
 You can run CONVERT (cf. SUN/55) directly to perform conversions.
 There is also TRANDAT, which will read a text file of data values,
 or co-ordinates and data values into an NDF, and ASCIN in the
-SPECDRE package (SUN/140).
+FIGARO package.
 
 2 FITS_Readers
 Automatic conversion does not allow you the full control of the
@@ -12490,7 +13031,7 @@ files.  The sub-topics show the FITS readers in action.
 2 Tape
 
 FITSIN reads FITS files stored on tape.  For efficiency, you should
-select the ``no-rewind'' device for the particular tape drive, for
+select the "no-rewind" device for the particular tape drive, for
 example /dev/nrmt0h on OSF and /dev/rmt/1n on Solaris.
 
 We ask for the second file on the tape, and the headers are
@@ -12544,7 +13085,7 @@ its purpose in sub-topic "FITS_Airlock".
                                        ... 216,218,218,204,221,218,219,222,221,218
         TITLE          <_CHAR*13>      'SYS:ARCCL.002'
         UNITS          <_CHAR*3>       'ADU'
-        MORE           <EXT>           {structure}
+        MORE           <EXT>           {structure
            FITS(84)       <_CHAR*80>      'SIMPLE  =                    T','BI...'
                                           ... '   ...','         ING PACKEND','END'
    
@@ -13120,438 +13661,6 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 December 6 (MJC):
     Revised the displayed wording for the current DATA_ARRAY to
     apply to foreign formats too.
-1 Graphics_Database
-Have you ever faced the problem that you would like an application
-to know about graphics drawn by some other programme?  For instance,
-you display an image of the sky, then later you want to obtain the
-co-ordinates of the stars within the image via the cursor.  There
-are two main approaches to achieve this functionality. The first is
-to duplicate the display code in the cursor application.  This is
-wasteful and inflexible.  The second is to store information about
-pictures in a database that can be accessed by graphics programmes.
-A picture's position and extent are added to the database
-immediately after the plot is created.  The latter technique is
-incorporated in AGI (cf. SUN/48)--the graphics database---which
-can store information about plots on any graphics device.
-
-AGI also stores a name and a comment for each picture.  Optionally,
-a label may be added. `Name' is something of a misnomer---`type'
-would give a clearer indication of its purpose.  In the same way
-`label' would have been called `name', but for the fact that `name'
-was in use.  Confused?  Don't worry.  It will become clear in a
-moment. 
-
-Currently, the name can take one of four values: "BASE" or "FRAME"
-or  "DATA" or  "KEY".  "BASE" is reserved for the base picture; this
-is the picture that extends over the whole of the plotting area.
-"DATA" indicates that the picture contains a representation of data
-in a graphical form, e.g. a greyscale, an histogram.  "KEY" is used
-for keys---there's a surprise.  "FRAME" usually contains a
-collection of data pictures.  For instance in a contour plot, the
-data picture is the area where contours may potentially be drawn;
-whereas the frame picture comprises the annotated axes and labels,
-the key, and data area.  The comment is a one-line description of
-the picture.  At present in KAPPA the comment is just
-"KAPPA_<application>" where <application> is the name of the
-application that created the picture. However, in later versions of
-KAPPA commentary might be under your control via a parameter
-in each graphics application, and that defaults to the application
-name as above.  What you can control now is the label.  This is a
-name you assign to a picture for easy reference and selection. 
-
-All KAPPA graphics applications use AGI, where new plots are being
-drawn or co-ordinates are required. The best way to demonstrate
-KAPPA and AGI in harness is to see some illustrated examples. 
-See Section 9.1 of SUN/95.
-
-2 AGI_and_KAPPA_in_action
-
-This has been lifted from SUN/95 with slight modifications, and
-probably ought to be re-written and re-structured for help library
-use, particularly because the figures cannot be reproduced here. You
-are recommended to consult SUN/95 Section 9.1.  However, if you
-extract this item from the help library ($KAPPA_DIR/kappa.hlp) and
-follow this tutorial you will see the effects more clearly on the
-terminal screen than in the high-contrast photocopies.  It's
-probably best seen in the hypertext form of this topic, as the
-figures there are in glorious colour. 
-
-Assuming that KAPPA is loaded and the graphics device---an
-X-window of geometry 1024 by 780 pixels in the following
-examples---is available.  To create such a window use the xmake
-SUN/130) command
-
-     % xmake xwindows -geom 1024x780 -overlay -colours 64
-
-selecting an overlay and not too many colours.
-
-First of all we make the X-window the current graphics device and
-image display, and the X-window overlay the image-display overlay
-(as described in topic "Selecting_Graphics_Devices").  These will
-remain in force until changed.  The following commands would not be
-necessary if the global parameters already had these values.
-
-     ICL> gdset xwindows
-     ICL> idset xwindows
-     ICL> ovset xoverlay
-
-Next we shall clear the X-window, and purge the database of xwindows
-and xoverlay pictures.  Note it does not clear the overlay, just the
-database entries, because AGI knows that the two graphics devices
-use the same screen, but GKS does not.
-
-     ICL> gdclear
-
-One picture remains in the database---the BASE---because AGI must
-always have a current picture into which further plots are drawn.
-
-Next we display a CCD frame scaled between defined limits.  (The NDF
-used in this demonstration is $KAPPA_DIR/ccdframec).  Details of
-the displayed image are recorded in the graphics database, but the
-current picture continues to be the BASE.  In other words the
-current picture on input is the current picture on output.  This is
-standard practice in KAPPA.  The only exceptions are applications
-that manage the database rather than plotting data. (Aside: an
-uncontrolled exit from an application, e.g. CTRL/C may leave the
-database in an abnormal state.)  If this rule was not enacted,
-pictures would become progressively smaller, vanishing into the
-distance, since new pictures cannot be drawn outside the current
-picture.  DISPLAY, in keeping with other graphics applications,
-does not write a label.  We'll see later how to annotate a picture
-with a label.
-
-     ICL> display $KAPPA_DIR/ccdframec centre=[390,300]
-     MODE - Method to define scaling limits /'FLASH'/ > SC
-     LOW - Low value for display /2250/ > 2300
-     HIGH - High value for display /30790.99/ > 4700
-
-Unlike the earlier example where the image was plotted in the
-centre of the screen, here it is shifted down and to the left. 
-CENTRE=[390,300] means position the pixel (390,300) in the array
-at the centre of the current picture.  As you can see the pixel can
-lie outside the bounds of the array.  By default DISPLAY places the
-central pixel at the centre of the current picture.  When the
-current picture is the BASE, this location is therefore at the
-centre of the screen as we have here.
-
-To illustrate this point and introduce a new command we shall plot
-the same data array in a picture at the top right of the screen
-
-     ICL> picdef mode=tr
-     ICL> display
-     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
-     MODE - Method to define scaling limits /'SCALE'/ >
-     LOW - Low value for display /2250/ > 2300
-     HIGH - High value for display /30790.99/ > 4700
-
-PICDEF creates a new FRAME picture in the database.  It is half the
-linear size of the BASE picture, and is located in the top-right
-corner (hence MODE=TR).  The picture is empty, but it still becomes
-the new current picture.  Therefore when DISPLAY comes along and
-puts the image in the centre of the current picture it plots in
-the top-right corner of the screen.  You will also notice that the
-magnification is correspondingly reduced by a factor of two, from
-1.55 to 0.775.  DISPLAY has two parameters that control the x and y
-magnifications, but these default to the give the largest
-magnification that displays the image without clipping or
-distortion.  Now we can exceed the default magnifications to produce
-an enlarged portion of the image within the current picture.
-(See topic NDF_Sections for an alternative way to displaying or
-processing a rectangular portion of an NDF.)  Only the part of the
-magnified image that is located within the current picture will be
-visible; there is no spillage into other pictures.
-
-     ICL> display xmagn=2.5 ymagn=2.5
-     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
-     MODE - Method to define scaling limits /'SCALE'/ >
-     LOW - Low value for display /2250/ > 2300
-     HIGH - High value for display /30790.99/ > 4700
-
-Before we plot any more pictures we can give the current
-picture---still the frame created by PICDEF---a label.
-
-     ICL> piclabel eric
-
-If we move to or create a new current picture, and then want to
-return to ERIC all we have to enter is
-
-     ICL> picsel eric
-
-The graphics database is not restricted to images.  To show this we
-shall draw a contour plot in the bottom-right corner of the BASE
-picture.  The new picture has the aspect ratio of the BASE picture.
-Its dimension is measured as a fraction of the linear size of the
-BASE picture, which is controlled by the parameter FRACTION.  The
-current picture is not cleared before plotting so you can see
-through the contour plot to the galaxy image behind.  The
-NOOUTLINE prevents an outline from being drawn around the picture.
-
-     ICL> picdef mode=br fraction=0.65 nooutline
-     ICL> turbocont $KAPPA_DIR/ccdframec(51:250,141:330) noclear ~
-     pltitl="AGI demonstration"
-     MODE - Method for selecting contour heights /'FREE'/ > ar
-     NCONT - Give the number of contour heights /6/ > 5
-     Contour heights used:
-     2478.022,   2560,958,   2697.029,   3042.488,   4050.937.
-
-The PICDEF command allows you to define new pictures with any
-aspect ratio.  To do this you can supply a value for the ASPECT
-parameter, or define explicit limits (mode=xy) or use the cursor
-(mode=cursor)---the default.  Also, you may constrain the new
-picture to lie within the current picture with parameter CURRENT.
-In this case the fractional size and aspect ratio relate to the
-current picture.
-
-     ICL> picdef current
-     To select a point press the left button on the mouse or trackerball.
-     To exit press the right button.
-     Use the cursor to select 2 distinct points.
-
-If you try to select a point outside the current picture you will
-be told and the cursor position is reset.
-
-     Point lies outside the allowed region.
-     Co-ordinates are ( 0.5160462, 1.0269577E-02 ) and ( 0.8908858, 0.6046214 )
-
-Notice there is an outline of the region selected, as it is drawn
-by default.
-
-Now draw a greyscale plot and its key within the region.  The extent
-of the new current picture can be seen in silhouette against the
-earlier pictures.
-
-     ICL> greyplot $KAPPA_DIR/ccdframec pltitl="AGI demonstration"
-     KEY - Do you want a key of the grey levels and a title ? /TRUE/ >
-     MODE - Method to define scaling limits /'SCALE'/ >
-     BLACK - Value to be black in the plot? /30790.99/ > 4700
-     WHITE - Value to be white in the plot? /2250/ > 2300
-
-PICDEF has one further mode---Array.  This enables you to create an
-n x m grid of new FRAME pictures.  It also has a mechanism for
-labelling all the pictures, so you can easily switch between the
-elements of the picture array.  You might use the following command
-in an ICL procedure to display a series of up to twelve spectra.
-
-     ICL> picdef mode=a prefix=spec xpic=3 ypic=4
-
-The bottom-left picture would be labelled SPEC1 and the rest are
-numbered in sequence from left to right to SPEC12---the top-right
-picture.  You'd call PICSEL to select each picture in turn via
-the ICL SNAME function (see topic "Procedures ICL" or the ICL help),
-or use a while loop in a C-shell script (see topic "Procedures
-C_Shell").  Since this is a common operation a shorthand command,
-PICGRID, is available.  For instance,
-
-     ICL> picgrid 3 4
-
-is equivalent to the previous example, except that the pictures are
-labelled 1 to 12.
-
-You can see that montages of pictures can rapidly be built.
-Occasionally, you will want some earlier picture to become the
-current picture.  As we've seen labelled picture can be recalled
-via PICSEL, but not all pictures will be labelled, especially ones
-with name DATA, because of the rule that applications must not
-change the current picture.  Another way to select a new current
-picture is via the command PICCUR.  It displays a cursor.  Move the
-cursor to lie on top of the picture you require and select a point
-following the instructions (usually by pressing the left-button of
-the mouse), then exit (normally by hitting the right-hand mouse
-button).  Generally, this will be fine, but you can have cases where
-one plot is still visible through a transparent plot drawn
-subsequently.  If the later picture extends entirely over the image
-you require, PICCUR will not let you access it.  The moral is
-"be careful when arranging your pictures".  A picture may only be
-partially obscured, so by moving the cursor around and hitting the
-left-hand button you can often find a portion that is topmost.
-PICCUR reports the name, comment and the label (if it there is one)
-of the picture in which the cursor is located to assist you.  It is
-usually quite obvious where pictures begin and end, so in practice
-it is easier than described here.
-
-There is another way of selecting a new current picture, and is
-essential for accessing `obscured' pictures---PICLIST.  Besides
-listing all the pictures with a specified name for the current
-graphics device, PICLIST offers a means of making any of the listed
-pictures the current picture.  There are a number of synonym
-commands derived from PICLIST; these let you select the
-last-created picture (PICLAST) or the BASE picture (PICBASE),
-amongst others.
-
-Sometimes you will want to know where you can place another picture
-without it hiding or overwriting an existing plot.  There are three
-tasks for selecting suitable FRAME pictures: PICEMPTY, PICENTIRE,
-and PICVIS.  Suppose, for instance, you have created a substantial
-array of FRAME pictures, perhaps for plotting spectra from a
-Fabry-Perot data cube.  Now you could select each FRAME picture by
-remembering or computing its label and passing it to PICSEL.
-A quicker approach is to run PICEMPTY, to select the next empty
-FRAME picture before plotting each spectrum.
-
-If you do get lost or forget what and where the current picture is,
-the GDSTATE command will come to your rescue.  You can even plot an
-outline with the OUTLINE keyword if you can't visualise the device
-co-ordinates.  The current picture does not have a label.  If it did
-this too would be listed by GDSTATE.  PICLIST also flags the current
-picture with a C to the left of the picture numbers.
-
-     ICL> gdstate
- 
-     Status of the xwindows window graphics device...
-        Physical device: 
- 
-        The current picture is a FRAME picture.
-        Comment: KAPPA_PICDEF
-        World co-ordinates:
-                    X = 0.5160462 to 0.8908858
-                    Y = 1.0269577E-02 to 0.6046214
-        Normalised device co-ordinates:
-                    X = 0.3930821 to 0.6786044
-                    Y = 7.822529E-03 to 0.4605515
- 
-
-Let us select the first picture that we displayed (the image to the
-bottom left).  Having done so we can then inspect some of the data
-in that picture.  INSPECT looks for the topmost data picture within
-the current picture.  This may be the current picture itself.  Using
-the database entries it knows the position and extent of the
-picture, and so when you come to place the cursor on a point, its
-pixel co-ordinates can be evaluated.  Notice that AGI remembers the
-name of the source data array and so you need not re-enter it here.
-If you want to inspect another NDF of the same dimensions you can
-override the NDF stored in AGI by specifying the NDF you want on the
-command line.  Sometimes you might obtain the wrong array; see topic
-"Problems_Problems" on what to do.  In the example below a slice
-through the CCD frame is plotted on the overlay plane.
-
-     ICL> piccur
-
-     Use the graphics cursor to define the next point or picture...
-        Press left button on mouse/trackerball to select a point.
-        Press right button on mouse/trackerball to end input.
-
-      X = 183.4733, Y = 264.575 in KAPPA_DISPLAY ( DATA )
-
-     ICL> inspect
-
-     For certain options, boxes will appear...
-        Press keyboard "1" or the space bar to select the operation shown to the left
-        Press keyboard "2" to select the operation shown in the middle box.
-        Press keyboard "." to select the operation shown in the right box.
-
-     Current picture has name: DATA, comment: KAPPA_DISPLAY
-     Using /star/bin/kappa/ccdframec as the input NDF.
-     GDEVICE - Graphics device is to be used for line plots > xov
-     OPTION - Option required /'Region'/ > SL
-     Co-ordinates are ( 150, 175 ) and ( 211, 318 )
-     Type the null character, !, if the slice is not to be saved.
-     SLNAME - Name of file to save slice /!/ >
-     OPTION - Option required /'Region'/ > E
-
-A word of warning about the device for GDEVICE.  Don't use the base
-plane of the image display, in this case xwindows.  Otherwise your
-underlying images will be erased when a line plot is drawn.  The
-current-graphics-device scheme breaks down here.  Both options: no
-default or occasionally a harmful default, are undesirable.  Anyway
-you've been warned!
-
-Using the same picture we can now demonstrate the contour-overlay
-application, CONTOVER.  The data array we have employed so far is
-smoothed with GAUSMOOTH; the origin is shifted with SETORIGIN,
-(moving the image ten pixels left and twenty down); and then all
-values outside a circle centred at pixel (160,230), radius 70
-pixels are set to zero via OUTSET to make ccdcircle.sdf.  The plot
-is made to the current overlay device, defined by OVSET, namely
-xov.  Currently, only pixel offsets may be used, but eventually
-complicated transformations will be possible, say for overlaying a
-radio map on the infra-red image of a source.  Note that CONTOVER
-reports the name of the NDF used for the underlying image, so if
-for some reason it is not the one you intended, just abort (!!) at
-the prompt for parameter OFFSET.  (You can check what the reference
-object will be with the PICIN command.)
-
-     ICL> contover
-     NDF - Image to be contoured /@$KAPPA_DIR/ccdframec/ > ccdcircle
-     Current picture has name: DATA, comment: KAPPA_DISPLAY
-        Reference data object: /star/bin/kappa/ccdframec.
-     OFFSET - x-y displacement in pixels /0,0/ > 10,20
-     MODE - Method for selecting contour heights /'Free'/ >
-     HEIGHTS - Give the heights of the contours > [2400,2500,2650,2900,3300,3900]
-
-Application PICCUR has a dual role.  It also provides a means of
-determining the co-ordinates of points in pictures selected with the
-cursor.  Again only the topmost picture at a given cursor location
-is accessible.  Each time the left-hand button is pressed the
-co-ordinates of the position in the topmost picture at that point is
-presented.  This is the dynamic mode ("Dynamic").  The other options
-let you obtain co-ordinates in the reference frames of the current
-picture ("Current") or anchored ("Anchor") to the picture at the
-first cursor position selected.
-
-     ICL> piccur
-
-     Use the graphics cursor to define the next point or picture...
-        Press left button on mouse/trackerball to select a point.
-         Press right button on mouse/trackerball to end input.
-     To select a point press the left button on the mouse or trackerball.
-     To exit press the right button.
-
-      X = 245.6915, Y = 400.4704 in KAPPA_GREYPLOT ( DATA )
-      X = 0.8398062, Y = 1.04369 in KAPPA_GREYPLOT ( FRAME )
-      X = 239.562, Y = 279.4127 in KAPPA_CONTOUR ( DATA )
-      X = 241.1404, Y = 298.2021
-      X = 255.3456, Y = 293.2284
-      X = 153.5614, Y = 236.91 in KAPPA_DISPLAY ( DATA ), label = ERIC.
-      X = 3.2948352E-02, Y = 0.5845106 in KAPPA_CONTOUR ( FRAME )
-      X = 0.5291266, Y = 1.805826 in KAPPA_GREYPLOT ( FRAME )
-      X = 0.7304244, Y = 0.9760387 in KAPPA_CONTOUR ( FRAME )
-      X = -7.8452587E-02, Y = 0.838221 in KAPPA_CONTOUR ( KEY )
-      X = 0.7147477, Y = 0.5338036
-      X = 0.7361856, Y = 0.5252284
-
-You can record the co-ordinates in a text file.
-
-If you don't want to affect the graphics database, but still obtain
-co-ordinates of features in an image, use the closely related
-CURSOR, which also allows selected points to marked or joined. It
-also permits you to remove previous points if you make a mistake.
-CURSOR has output parameters so that you can pass the co-ordinates
-of the selected points to a script or other applications.  There is
-also the XYcur option in INSPECT; it marks the points selected, and
-allows updating of lists of x-y positions stored in text files. 
-
-2 Tidying
-The contents of the graphics database are ephemeral.  Therefore you
-should regularly purge the database entries with GDCLEAR (or
-optionally via IDCLEAR for the current image display), or delete
-the database file.  The location of the AGI database can be
-controlled by setting the environment variable AGI_USER to the
-desired location.  If AGI_USER is undefined, the database file is
-placed in your home directory.  Thus by default the file is
-$HOME/agi_<node>.sdf, where you substitute your computer's node name
-for <node>, e.g. /home/dro/agi_rlsaxp.sdf.  A new database is
-created when you run an AGI application if none exists.  AGI will
-purge the database for a device if the graph window has changed
-size, or if you switch between portrait and landscape formats for
-a printer device. 
- 
-2 Co-ordinate_system
-
-Programmers who wish to have their own graphics applications
-co-operating with KAPPA will need to use the same co-ordinate
-systems and convention for storing them in the graphics database.
-See topic: "Co-ordinate_systems".  For clarity, the Starlink
-convention described in the aforementioned topic, is re-iterated
-in the database context. 
-
-KAPPA uses the Starlink standard co-ordinate system for data arrays
-as described in SSN/22.  Thus the picture extent of greyscales and
-contour plots of an image is LOW-1 to HIGH in each axis, where LOW
-and HIGH are the pixel indices defining the lower and upper limits
-of a sub-array.  For example, if the upper half of a 2-dimensional
-array of dimensions 320,512 was contoured, the graphics database
-records the extent of the picture as being 0.0 to 320.0 in the first
-axis, and 256.0 to 512.0 in the second. 
 1 GREYPLOT
 Produces a greyscale plot of a 1-d or 2-d NDF.
 
@@ -13907,7 +14016,7 @@ NDF (because the bad-pixel flag is set to false in order to
 access the maximum grey level), therefore only NDF-compliant
 applications can process it.
 2 Related_Applications
-   KAPPA: DISPLAY; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+   KAPPA: DISPLAY; Figaro: IGREY, IMAGE, MOVIE.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
 
@@ -14076,12 +14185,12 @@ If you want to produce graphics, first see
 See topic "Selecting_Graphics_Devices" for selecting an output
 device for your plots.  If you are using an image display topic
 "Colour_Table_and_Palette" gives details of how to control the
-appearance of colour tables and the annotation palette.  There are
-also examples of how to create lookup tables.  See topic
-"Graphics_Database" for an explanation of the graphics database, and
-Section 9 of SUN/95 has illustrated examples of how to use the
-database.  The topics on "Co-ordinate_Systems" and
-"Interaction_Mode" are partially related to the graphics database.
+appearance of colour tables and the annotation palette.  There
+are also examples of how to create lookup tables. SUN/95 has a
+section called "The Graphics Database" containing illustrated
+examples of how to use the AGI graphics database.  The topics on
+"Co-ordinate_Systems" and "Interaction_Mode" are partially
+related to the graphics database.
 
 2 Issuing_Commands
 To run an application you then can just give its name---you will be
@@ -16050,7 +16159,7 @@ SUBSUBSUBTOPIC = LITERAL (Read)
       o  a <CR> to see more text at a "Press RETURN to continue ..."
          request;
 
-      o  a <CR>} at topic and subtopic prompts to move up one level
+      o  a <CR> at topic and subtopic prompts to move up one level
          in the hierarchy, and if you are at the top level it will
          terminate the help session;
 
@@ -16119,7 +16228,7 @@ applications, particularly for image processing, data visualisation,
 and manipulating components in the Starlink standard data format:
 the NDF.  KAPPA provides facilities that integrate with specialised
 packages such as CCDPACK, ESP, Figaro, IRAS90, JCMTDR, PHOTOM, PISA,
-SPECDRE, and TSP.  Topic "Role of KAPPA" explains this more fully.
+and TSP.  Topic "Role of KAPPA" explains this more fully.
 
 KAPPA commands are available from both the UNIX C-shell (and
 variants) and from the ICL command language.  The "Functionality"
@@ -16876,8 +16985,8 @@ to offset along the profile on the horizontal axis, and data value
 (or logarithm of data value) on the vertical axis. On exit the current
 database picture for the chosen device reverts to the input picture.
 2 Related_Applications
-   KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
-   SPECDRE: SPECGRID.
+   KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT,
+   SPECGRID.
 2 Authors
 Malcolm Currie STARLINK (RAL::CUR)
 
@@ -19956,7 +20065,7 @@ a rotated box.
      Region completed. Identify another 'ROTBOX' region...
 
 If you make a mistake, enter List at the OPTION prompt to see a list
-of the regions.  Note the ``Region Index'' of the region(s) you wish
+of the regions.  Note the "Region Index" of the region(s) you wish
 to remove, and select the Delete option.  At the REGION prompt,
 give a list of the regions you want to remove.  If you change your
 mind, enter ! at the prompt for parameter REGIONS, and no regions are
@@ -21567,8 +21676,8 @@ data values if the plot is to have a logarithmic ordinate.
 different portions of the plot may be adjusted using the PAL*
 commands.
 2 Related_Applications
-   KAPPA: INSPECT, LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
-   SPECDRE: SPECGRID.
+   KAPPA: INSPECT, LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT,
+   SPECGRID.
 2 Authors
 WG: Wei Gong (IPMAF)
 
@@ -23097,7 +23206,7 @@ abort.
 the bad values.
 2 Related_Applications
    KAPPA: CHPIX, FILLBAD, GLITCH, SEGMENT, SETMAGIC, SUBSTITUTE,
-   ZAPLIN; SPECDRE: GOODVAR.
+   ZAPLIN; FIGARO: GOODVAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 
@@ -25384,7 +25493,7 @@ Description:
    the line.  This is repeated in each line until the top-right
    picture.
 
-   This command is a synonym for "picdef array 1.0 false prefix=''"}.
+   This command is a synonym for "picdef array 1.0 false prefix="".
 2 Parameters
 For information on individual parameters, select from the list below:
 3 CURRENT
@@ -25476,7 +25585,7 @@ COMMENT = LITERAL (Write)
    will be written.
 3 CURRENT
 CURRENT = _LOGICAL (Read)
-   If this is {\tt TRUE}, the current picture is compared against the
+   If this is TRUE, the current picture is compared against the
    chosen name before searching from the most-recent picture
    within the current picture. [FALSE]
 3 DEVICE
@@ -25997,7 +26106,7 @@ Description:
    reference picture.  On completion the new picture becomes the
    current picture.
 
-   This command is a synonym for {\tt picdef xy 1.0}.
+   This command is a synonym for picdef xy 1.0.
 
 2 Parameters
 For information on individual parameters, select from the list below:
@@ -26091,7 +26200,7 @@ pixdupe cube1 cube2 [3,1,2]  title="Reconfigured cube"
    This expands the NDF called cube1 by having three pixels for
    each pixel along the first axis and duplicating along the
    third axis, and stores the enlarged data in the NDF called
-   cube2.  The title of cube2 is {\tt "Reconfigured cube"}.
+   cube2.  The title of cube2 is "Reconfigured cube".
 2 Related_Applications
    KAPPA: COMPADD, COMPAVE, COMPICK.
 2 Authors
@@ -26105,7 +26214,7 @@ DSB: David S. Berry (STARLINK)
  11-JUN-1998 (DSB):
     Added propagation of the NDF WCS component.
 
- {enter_any_changes_here}
+ {enter_any_changes_here
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
@@ -26214,7 +26323,7 @@ to hurdle them.  Please suggest additions to this compilation.
 
 2 Unable_to_Obtain_Work_Space
 One group of error messages which may puzzle you, mostly because
-they are incomplete reads like ``Unable to create work array''.
+they are incomplete reads like "Unable to create work array".
 Many applications require temporary or work space to perform their
 calculations.  This space is stored in an HDS file within directory
 $HDS_SCRATCH and most likely is charged to your disc quota.  (If you
@@ -26277,7 +26386,7 @@ delete the work-space container file.
 2 Application_Automatically_pPcks_up_the_Wrong_NDF
 Some applications read the name of the NDF used to create a plot or
 image from the graphics database in order to save typing.  Rarely,
-you'll say ``that's not the one I wanted''.  This is because AGI
+you'll say "that's not the one I wanted".  This is because AGI
 finds the last DATA picture situated within the current picture.
 Abort the application via !!, then use PICCUR or PICLIST to select
 the required FRAME picture enclosing the DATA picture, or even
@@ -26421,7 +26530,7 @@ position of the tape between invocations of Starlink applications.
 
 When FITSIN is given a name, the magnetic-tape system validates the
 name to check that it is a known device.  There should be a
-{\tt devdataset.sdf} file (within {\tt /star/etc} at Starlink sites)
+devdataset.sdf file (within /star/etc at Starlink sites)
 containing a list of at least all the available drives at your site.
 What FITSIN is complaining about above, is that the device you have
 given is not included in the DEVDATASET file.  Now this might be
@@ -26479,10 +26588,10 @@ monolith interface files.
      % hdstrace $ADAM_USER/kappa_mon full
 
 
-If that doesn't cure the problem, send me mjc@star.rl.ac.uk or the
-Starlink Software Librarian ussc@star.rl.ac.uk a log of the session
-demonstrating the problem, and we shall endeavour to interpret it
-for you, and find out what's going wrong.
+If that doesn't cure the problem, send a log of the session
+demonstrating the problem to the Starlink Software Librarian
+ussc@star.rl.ac.uk, and we shall endeavour to interpret it for
+you and find out what's going wrong.
 
 1 Procedures
 
@@ -26748,7 +26857,7 @@ space between the left bracket and parenthesis is essential.
            PRINT Unable to find or plot the star.
         END EXCEPTION
      END PROC
-\end{verbatim}
+\end{verbatim
 \normalsize
 
 Here is another that creates a fancy display of an image with axes and
@@ -27609,19 +27718,18 @@ MJC: Malcolm J. Currie (STARLINK)
               the central one.'
 
 1 Requests
-
 KAPPA is continuing to be developed and additional applications
-functionality are envisaged, particularly a graphical-user interface
-for image processing.  If you wish to suggest new tasks or
-enhancements to existing ones please contact the author
-(mjc@star.rl.ac.uk).  Small jobs may be undertaken quite quickly.
+functionality are envisaged, particularly a graphical-user
+interface for image processing.  If you wish to suggest new tasks
+or enhancements to existing ones please contact the
+ussc@star.rl.ac.uk. Small jobs may be undertaken quite quickly.
 Requests involving substantial pieces of work need to gain the
-support of others to be included in Starlink's software plans, and
-so the best way to influence the priority given to KAPPA is to
-contact the chairman of the Image Processing Software Strategy
-Group. The Starlink World Wide Web pages will periodically contain
-news of plans and work in progress.  KAPPA also receives a high
-level of support, and bug reports are dealt with promptly. 
+support of others to be included in Starlink's software plans,
+and so the best way to influence the priority given to KAPPA is
+to contact the chairman of the Image Processing Software Strategy
+Group. The Starlink World Wide Web pages will periodically
+contain news of plans and work in progress.  KAPPA also receives
+a high level of support, and bug reports are dealt with promptly.
 
 1 RESHAPE
 Reshapes an NDF, treating its arrays as vectors.
@@ -27810,16 +27918,16 @@ extensions, to store any ancillary data associated with the data
 array, even other NDFs. 
 
 The backbone of the applications packages is KAPPA (Kernel
-APplication PAckage).  It provides general-purpose applications that
-have wide applicability, concentrating on image processing, data
-visualisation, and manipulating NDF components.  KAPPA provides
-facilities that integrate with specialised Starlink packages such as
-those for CCD reduction (CCDPACK), stellar and galaxy photometry
-(PHOTOM, PISA, ESP), spectroscopy (ECHOMOP, Figaro, SPECDRE,
-TWODSPEC), X-ray (ASTERIX), graphics (PONGO), time-series
-polarimetry (TSP), instrument-specific (CGS4DR, IRAS90, IRCAMPACK,
-JCMTDR) etc.  Thus the functionality of KAPPA should not be regarded
-in isolation. 
+APplication PAckage).  It provides general-purpose applications
+that have wide applicability, concentrating on image processing,
+data visualisation, and manipulating NDF components.  KAPPA
+provides facilities that integrate with specialised Starlink
+packages such as those for CCD reduction (CCDPACK), stellar and
+galaxy photometry (PHOTOM, PISA, ESP), spectroscopy (ECHOMOP,
+Figaro, TWODSPEC), X-ray (ASTERIX), graphics (PONGO), time-series
+polarimetry (TSP), instrument-specific (CGS4DR, IRAS90,
+IRCAMPACK, JCMTDR) etc.  Thus the functionality of KAPPA should
+not be regarded in isolation.
 
 Nor KAPPA should not be perceived as a rival to Figaro.  As Figaro
 applications become more integrated with Starlink packages, for
@@ -27939,7 +28047,7 @@ DSB: David S. Berry (STARLINK)
  12-JUN-1998 (DSB):
     Added propagation of the NDF WCS component.
 
- {enter_any_changes_here}
+ {enter_any_changes_here
 2 Implementation_Status
    The propagation rules depend on parameters ANGLE and NNMETH.
 
@@ -28339,7 +28447,7 @@ CONTOVER, INSPECT or SEGMENT.  A GWM overlay does have one drawback,
 however: it halves the number of available colour indices.  If you
 want to use an X-windows overlay, you must ensure that you have made
 the window with the -overlay qualifier to xmake, or change your
-X-defaults file, or use a {\tt +} suffix to the device name.
+X-defaults file, or use a + suffix to the device name.
 
 The following set up to place in your X-defaults file is a reasonable
 compromise, as it maximises the number of colour indices for the
@@ -29210,7 +29318,7 @@ difference between the replacement value and the element value is
 less than their mean times the precision of the data type.
 2 Related_Applications
    KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SUBSTITUTE,
-   ZAPLIN; SPECDRE: GOODVAR.
+   ZAPLIN; FIGARO: GOODVAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 
@@ -30720,7 +30828,7 @@ difference between the replacement value and the element value is
 less than their mean times the precision of the data type.
 2 Related_Applications
    KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC, ZAPLIN;
-   SPECDRE: GOODVAR.
+   FIGARO: GOODVAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 
@@ -30756,17 +30864,14 @@ AXLABEL     - Sets a new label value for an axis within an NDF data
               structure.
 AXUNITS     - Sets a new units value for an axis within an NDF data
               structure.
-
-
 BLOCK       - Smooths a 1- or 2-dimensional image using a square or
               rectangular box filter.
-
-
 CADD        - Adds a scalar to an NDF data structure.
 CALC        - Evaluates a mathematical expression.
 CALPOL      - Calculates polarisation parameters.
 CDIV        - Divides an NDF by a scalar.
 CENTROID    - Finds the centroids of star-like features in an NDF.
+CHAIN	    -  Concatenates a series of vectorized NDFs.
 CHPIX       - Replaces the values of selected pixels in an NDF.
 CMULT       - Multiplies an NDF by a scalar.
 COMPADD     - Reduces the size of an NDF by adding values in
@@ -30779,6 +30884,7 @@ CONTOUR     - Contours a 2-d NDF.
 CONTOVER    - Contours a 2-d NDF overlaid on an image displayed
               previously.
 CONVOLVE    - Convolves a pair of 1- or 2-dimensional NDFs together.
+COPYBAD	    - Copies the bad pixel mask from one NDF to another.
 CREFRAME    - Generates a test 2-d data array from a selection of
               several types.
 CRELUT      - Creates or manipulates an image-display lookup table
@@ -30786,12 +30892,9 @@ CRELUT      - Creates or manipulates an image-display lookup table
 CSUB        - Subtracts a scalar from an NDF data structure.
 CURSOR      - Reports the co-ordinates of points selected using the
               cursor.
-
-
 DISPLAY     - Displays a 1-d or 2-d NDF.
 DIV         - Divides one NDF data structure by another.
 DRAWSIG     - Draws +/-n standard-deviation lines on a line plot.
-
 ELPROF      - Creates a radial or azimuthal profile of a
               2-dimensional image.
 ERASE       - Erases an HDS object.
@@ -30801,8 +30904,6 @@ EXP10       - Takes the base-10 exponential of each pixel of a data
 EXPE        - Takes the exponential of each pixel of a data array
               (base e).
 EXPON       - Takes the exponential of each pixel  of a data array.
-
-
 FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
 FILLBAD     - Removes regions of bad values from a 2-dimensional NDF.
@@ -30827,8 +30928,6 @@ FITSWRITE   - Writes a new keyword to the FITS extension.
 FLIP        - Reverses an NDF's pixels along a specified dimension.
 FOURIER     - Performs forward and inverse Fourier transforms of
               1- or 2-dimensional NDFs.
-
-
 GAUSMOOTH   - Smooths a 1- or 2-dimensional image using a Gaussian
               filter.
 GDCLEAR     - Clears a graphics device and purges its database
@@ -30840,8 +30939,6 @@ GLITCH      - Replaces bad pixels in a 2-d data array with the local
               median.
 GLOBALS     - Displays the values of the KAPPA global parameters.
 GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
-
-
 HISCOM      - Adds commentary to the history of an NDF.
 HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
@@ -30849,8 +30946,6 @@ HISTAT      - Computes ordered statistics for an NDF's pixels using
               an histogram.
 HISTEQ      - Performs an histogram equalisation on an NDF.
 HISTOGRAM   - Computes an histogram of an NDF's values.
-
-
 IDCLEAR     - Clears an image display and purges its database
               entries.
 IDINVISIBLE - Makes memory planes of an image-display device
@@ -30859,15 +30954,14 @@ IDPAZO      - Pans and zooms an image-display device.
 IDSET       - Selects a current image-display device.
 IDSTATE     - Shows the current status of an image display.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
-
-
 KAPHELP     - Gives help about KAPPA.
 KSTEST      - Compares data sets using the Kolmogorov-Smirnov test.
-
 LAPLACE     - Performs a Laplacian convolution as an edge detector
               in a 2-d data array.
 LINPLOT     - Draws a line plot of a 1-d NDF's data values against
               their axis co-ordinates.
+LISTMAKE    - Create a catalogue holding a positions list.
+LISTSHOW    - Reports the positions stored in a positions list.
 LOG10       - Takes the base-10 logarithm of each pixel of a data
               array.
 LOGAR       - Takes the logarithm of each pixel of a data array
@@ -30899,8 +30993,6 @@ LUTSPEC     - Loads a spectrum-like lookup table.
 LUTTWEAK    - Tweaks a colour table of an image-display device.
 LUTVIEW     - Draws a colour-table key.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
-
-
 MAKESURFACE - Creates a 2-dimensional NDF from the coefficients of
               a polynomial surface.
 MANIC       - Converts all or part of a data array from one
@@ -30918,8 +31010,6 @@ MOSAIC      - Merges several non-congruent 2-d data arrays into one
 MSTATS      - Does cumulative statistics on a 2-d sub-array over a
               sequence of data arrays.
 MULT        - Multiplies two NDF data structures.
-
-
 NATIVE      - Converts an HDS object to native machine data
               representation.
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
@@ -30931,14 +31021,10 @@ NORMALIZE   - Normalises one NDF to a similar NDF by calculating a
               scale factor and zero difference.
 NUMB        - Counts the number of elements of an NDF with values or
               absolute values above or below a threshold.
-
-
 OUTSET      - Sets pixels outside a specified circle in a 2-d data
               array to a specified value.
 OVCLEAR     - Clears an image-display overlay.
 OVSET       - Selects a current image-display overlay.
-
-
 PALDEF      - Loads the default palette to a colour table.
 PALENTRY    - Enters a colour into an image display's palette.
 PALREAD     - Fills the palette of a colour table from an NDF.
@@ -30975,20 +31061,16 @@ PICXY       - Creates a new picture defined by co-ordinate bounds.
 PIXDUPE     - Expands an NDF by pixel duplication.
 POW         - Takes the specified power of each pixel of a data
               array.
+PROFILE	    -  Creates a 1-d profile through an N-d NDF.
 PSF         - Determines the parameters of a model star profile by
               fitting star images in a two-dimensional NDF.
-
-
 QUILT       - Generates a mosaic from equally sized 2-d data arrays,
               optionally specified from an ASCII file.
-
-
+RESHAPE	    -  Reshapes an NDF, treating its arrays as vectors.
 RIFT        - Adds a scalar to a section of an NDF data structure
               to correct rift-valley defects.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through
               any angle.
-
-
 SEGMENT     - Copies polygonal segments from one NDF to another.
 SETAXIS     - Sets values for an axis array component within an NDF
               data structure.
@@ -31022,8 +31104,6 @@ SUBSTITUTE  - Replaces all occurrences of a given value in an NDF
               array with another value.
 SURFIT      - Fits a polynomial or spline surface to a 2-d data
               array using blocking.
-
-
 THRESH      - Edits an NDF such that array values below and above
               two thresholds take constant values.
 TRANDAT     - Converts free-format text data into an NDF.
@@ -31036,9 +31116,14 @@ TRANTRACE   - Lists the contents of a transformation structure.
 TRIG        - Performs a trigonometric transformation on a data
               array.
 TURBOCONT   - Contours a 2-d NDF quickly.
-
-
 VECPLOT     - Plots a 2-dimensional vector map.
+WCSADD	    -  Adds a new co-ordinate Frame into the WCS component of an NDF.
+WCSALIGN    -  Aligns a group of 2-d NDFs using WCS information.
+WCSATTRIB   -  Manages attribute values associated with the WCS component of an NDF.
+WCSCOPY	    -  Copies WCS information from one NDF to another.
+WCSFRAME    - Changes the current co-ordinate Frame in the WCS component of an NDF.
+WCSREMOVE   -  Removes co-ordinate Frames from the WCS component of an NDF.
+WCSTRAN	    -  Transforms a position from one NDF co-ordinate Frame to another.
 WIENER      - Applies a Wiener filter to a 1- or 2-dimensional
               array.
 ZAPLIN      - Replaces regions in a 2-d NDF by bad values or by
@@ -31581,7 +31666,7 @@ incremented by the scale factor.
 -  In automatic mode, an error is reported if the shape does not
 use all the data points in the file.
 2 Related_Applications
-   CONVERT: ASCII2NDF, NDF2ASCII; SPECDRE: ASCIN, ASCOUT.
+   CONVERT: ASCII2NDF, NDF2ASCII; FIGARO: ASCIN, ASCOUT.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 2 History
@@ -32874,7 +32959,7 @@ override this default behaviour are listed below.
 Annotation takes precedence over pen rotation, which in turn
 overrides colour control through CONCOL.
 2 Related_Applications
-   KAPPA: CONTOUR, CONTOVER; Figaro: ICONT; SPECDRE: SPECCONT.
+   KAPPA: CONTOUR, CONTOVER; Figaro: ICONT, SPECCONT.
 2 Authors
 MJC: Malcolm J. Currie  STARLINK
 2 History
