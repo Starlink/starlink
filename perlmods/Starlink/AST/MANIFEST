@@ -3,6 +3,7 @@ AST.pm
 AST.xs
 AST_ERR.xsh
 AST_WCSMAP.xsh
+AST_GRF.xsh
 arrays.c
 arrays.h
 ppport.h
