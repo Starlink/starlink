@@ -1,5 +1,37 @@
 <!-- $Id$ -->
 
+
+<subsect id="release-0.5" export="export">
+<subhead><title>Version 0.5</title></subhead>
+
+  <p>This is release 0.5.</p>
+
+  <p><strong>THIS IS BETA SOFTWARE.  Some features work only partially or
+      unreliably.  It does not have all the functionality of a
+      production release.  The interface may well
+      change.</strong></p>
+
+  <p>See the <ref id="release-0.4" >version 0.4 release notes</ref>
+    for building guidelines.</p>
+
+  <p>Changes since version 0.4:
+    <ul>
+      <li>&autoastrom; now supports plugins, and there is one plugin
+	supplied, for the `match' matching application available at
+	<url>http://acd188a-005.rit.edu/match/</url>.  This is not
+	distributed with &autoastrom;, but it is easy to download,
+	build, and install in the directory
+	<code>$AUTOASTROM_DIR</code>.</li>
+
+      <li>Now, if you type Control-C, &autoastrom; will delete the
+	monoliths it is using, and tidy up after itself.</li>
+    </ul>
+  </p>
+
+</subsect>
+
+
+
 <subsect id="release-0.4" export="export">
 <subhead><title>Version 0.4</title></subhead>
 
@@ -105,9 +137,11 @@ kit is to errors in the initial astrometry.</p></li>
 
 </subsect>
 
+<!-- The sgml-parent-document setting here _should_ be right, but it
+doesn't work... -->
 <!-- Local Variables: -->
 <!-- mode: xml -->
-<!-- sgml-parent-document: '("sun242.xml" "sect" "subsect") -->
+<!-- sgml-parent-document: '("sun242.xml" "sun" "docbody" "sect" ("subhead")) -->
 <!-- sgml-indent-data: t -->
 <!-- sgml-indent-step: 2 -->
 <!-- End: -->
