@@ -307,7 +307,8 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
      including ones for the related applications.  There are
      additional notes in SUN/55 Appendix C.1 on how to process BDF
      files on STADAT.  The messages in the startup scripts mention
-     how to obtain the hypertext documentation.
+     how to obtain the hypertext documentation.  Several application
+     modules missing from the online help are now present.
 
   o  FITS keywords -- In several places, the CRTYPEn and CTYPEn
      keywords were confused.  Likewise, a BUNITS keywords was
