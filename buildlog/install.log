@@ -703,7 +703,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/jpcs
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/jpcs
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 36 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 37 files to /apps/cvsbuild/starjava/docs
      [echo] Executing SOG target: install
 
 prepare:
@@ -1000,4 +1000,4 @@ install:
 [loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 18 seconds
+Total time: 5 minutes 14 seconds

@@ -6659,6 +6659,7 @@ U java/source/jpcs/src/main/uk/ac/starlink/jpcs/StringArrayReader.java
 U java/source/jpcs/src/main/uk/ac/starlink/jpcs/StringParameter.java
 U java/source/jpcs/src/main/uk/ac/starlink/jpcs/TaskReply.java
 U java/source/jpcs/src/main/uk/ac/starlink/jpcs/TaskReplyHandler.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Utilities.java
 U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ValuePath.java
 U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Vpath.java
 U java/source/jpcs/src/main/uk/ac/starlink/jpcs/package.html

@@ -125,7 +125,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jpcs/build/java
-     [copy] Copying 32 files to /apps/cvsbuild/java/source/jpcs/build/java
+     [copy] Copying 33 files to /apps/cvsbuild/java/source/jpcs/build/java
      [echo] Executing SOG target: javadoc-sources
 
 javadoc-sources:
@@ -1232,14 +1232,14 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeAdapter.java:49: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/EdgeController.java:78: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/GraphModel.html...
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeController.java:90: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/NodeController.html...
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 42 seconds
+Total time: 2 minutes 1 second
