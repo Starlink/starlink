@@ -89,9 +89,9 @@ set gaia_version [gaia_version]
 #  Make a local copy of about_skycat so we can divert bug reports.
 set about_skycat ""
 set about_gaia "
-GAIA version $gaia_version
+Starlink GAIA version $gaia_version
 
-Copyright (C) 1997-2003 Central Laboratory of the Research Councils (U.K.)
+Copyright (C) 1997-2004 Central Laboratory of the Research Councils (U.K.)
 
 Authors:
 Peter W. Draper (p.w.draper@durham.ac.uk)
@@ -1848,7 +1848,7 @@ window gives you access to this."
    # -- Protected variables --
 
    #  Application name.
-   protected variable appname_ "GAIA::Skycat"
+   protected variable appname_ "Starlink GAIA::Skycat"
 
    #  Clone number of this window.
    protected variable clone_ 0
