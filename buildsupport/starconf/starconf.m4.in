@@ -144,6 +144,10 @@ if test -n "$STARLINK"; then
     LDFLAGS="$LDFLAGS -L$STARLINK/lib"
 fi
 
+# Fixups for the notorious restFP link problem on OSX+g77.
+# This macro does nothing on other platforms.
+_STAR_RESTFP_FIX
+
 # Installation directory options.  This must match the variables handled
 # by _STAR_EXTRADIR_COMMON
 AC_SUBST([stardocsdir],     ['${prefix}/docs'])dnl
@@ -367,16 +371,6 @@ done
 ])# STAR_PREDIST_SOURCES
 
 
-# STAR_HAVE_FC_OPEN_READONLY
-# ---------------------------
-#
-# Tests if the Fortran compiler supports the READONLY option on the
-# OPEN command.  If it does, it defines HAVE_FC_OPEN_READONLY to 1.
-AU_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
-         [AC_FC_OPEN_SPECIFIERS(READONLY)],
-         [STAR_HAVE_FC_OPEN_READONLY obsolete -- use AC_FC_OPEN_SPECIFIERS instead])
-
-
 # STAR_CNF_COMPATIBLE_SYMBOLS
 # ---------------------------
 #
@@ -450,35 +444,6 @@ func_two_();
               FFLAGS="$FFLAGS $star_cv_cnf_compatible_symbols"
           fi
 ])# STAR_CNF_COMPATIBLE_SYMBOLS
-
-
-# STAR_FC_LIBRARY_LDFLAGS
-# -----------------------
-#
-# Wrapper for AC_FC_LIBRARY_LDFLAGS.
-#
-# There's a library problem using gcc under OSX 10.3 (10.3.4 Panther =
-# Darwin 7.4.0), which results in the symbols restFP and saveFP being
-# undefined at link time.  There's a shortage of authoritative
-# explanations, but <http://www.ccp4.ac.uk/problems/mac_4_2.html#29>
-# gives at least one resolution.  It's not clear (to Norman) what the
-# real cause of this is, but it apparently doesn't affect OSX versions
-# before 10.3, and will presumably be fixed in versions soon after
-# this.  The following isn't terribly pretty, and will need maintainance.
-AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
-         [AC_FC_LIBRARY_LDFLAGS
-          case $build_os in
-              darwin7*)
-                  if test "$GCC" = yes; then
-                      AC_MSG_NOTICE([Fixing the OSX 10.3 restFP problem with -lcc_dynamic])
-                      FCLIBS="$FCLIBS -lcc_dynamic"
-                  fi
-                  ;;
-              *)
-                  # No library issues
-                  ;;
-          esac
-])# STAR_FC_LIBRARY_LDFLAGS
 
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
@@ -1155,6 +1120,114 @@ AC_DEFUN([_STAR_EXTRA_DIST],
     [m4_ifval([$1], [], [AC_FATAL([$0: no argument])])dnl
      STAR_EXTRA_DIST="$STAR_EXTRA_DIST $1"
 ])# _STAR_EXTRA_DIST
+
+
+# _STAR_RESTFP_FIX
+# ----------------
+# Determines if we need to make any library fixes to get things to link 
+# properly.  In fact, there's only a problem on OSX/Darwin, since the
+# GCC installation which provides g77 and the (system) GCC which provides
+# gcc can generate slightly incompatible object code.  The following test
+# is therefore pretty specific to OSX/Darwin.
+#
+# If there are any libraries that need to be added to the path, this adds
+# them to LIBS.  Compare AC_FC_LIBRARY_LDFLAGS.
+#
+# See the thread: http://lists.apple.com/mhonarc/fortran-dev/msg00768.html
+AC_DEFUN([_STAR_RESTFP_FIX],
+   [AC_CACHE_CHECK([whether we need any library fixups],
+       [star_cv_restfp_fixup],
+       [AC_REQUIRE([AC_CANONICAL_BUILD])
+        AC_REQUIRE([AC_PROG_CC])
+        AC_REQUIRE([AC_PROG_FC])
+        if expr $build_os : 'darwin7' >/dev/null; then
+dnl Only affects OSX/Darwin
+            if test "$GCC" = yes; then
+dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
+                AC_LANG_PUSH(C)
+                rm -f conftest*
+                star_cv_restfp_fixup=unknown
+                AC_LANG_CONFTEST(AC_LANG_PROGRAM([], restFP()))
+                { AC_TRY_COMMAND($CC -o conftest.x -S conftest.c)
+                  test $ac_status = 0
+                } &&
+                sed 's/_restFP/restFP/g' conftest.x>conftest.s &&
+                { AC_TRY_COMMAND($CC -c -o conftest.$objext conftest.s)
+                  test $ac_status = 0
+                } || star_cv_restfp_fixup=broken
+                AC_LANG_POP(C)
+                if test $star_cv_restfp_fixup = broken; then
+                    AC_MSG_WARN([unable to assemble restFP test])
+                else
+                    # Link this with the C compiler
+                    AC_TRY_COMMAND($CC -o conftest conftest.$ac_object)
+                    _s_cstatus=$ac_status
+                    # Link this with the Fortran compiler
+                    AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext)
+                    if test $_s_cstatus = 0 -a $ac_status = 0; then
+                        # both compilers can compile it
+                        star_cv_restfp_fixup=no
+                    elif test $_s_cstatus != 0 -a $ac_status != 0; then
+                        # neither compiler can compile it
+                        star_cv_restfp_fixup=no
+                    elif test $_s_cstatus = 0; then
+                        # The C compiler can, but the Fortran cannot
+                        star_cv_restfp_fixup=yes
+                    else
+                        # The C compiler can't compile, but the Fortran can.
+                        # Haven't heard of this case!  Don't know what to do.
+                        star_cv_restfp_fixup=broken
+                    fi
+                fi
+                # Don't even try linking with -lcc_dynamic.  It may work, but
+                # will be unpredictable: 
+                # http://lists.apple.com/mhonarc/fortran-dev/msg00769.html
+                if test $star_cv_restfp_fixup = yes; then
+                    AC_TRY_COMMAND($FC -o conftest conftest.$objext -L/usr/lib -lgcc)
+                    if test $ac_status = 0; then
+                        star_cv_restfp_fixup=lgcc
+                    fi
+                fi
+                if test $star_cv_restfp_fixup = yes; then
+                    # ooops
+                    AC_MSG_WARN([unable to solve restFP problem])
+                    star_cv_restfp_fixup=broken
+                fi
+                rm -f conftest*
+            else # !gcc
+                star_cv_restfp_fixup=no
+            fi
+        else # !Darwin
+            star_cv_restfp_fixup=no
+        fi
+        ])
+   # Define FCLIBS, just as AC_FC_LIBRARY_LDFLAGS does
+   if test $star_cv_restfp_fixup = lgcc; then
+       LIBS="$LIBS -L/usr/lib -lgcc"
+   fi
+])# _STAR_RESTFP_FIX
+
+# Obsolete macros
+# ===============
+
+# STAR_HAVE_FC_OPEN_READONLY
+# ---------------------------
+#
+# Tests if the Fortran compiler supports the READONLY option on the
+# OPEN command.  If it does, it defines HAVE_FC_OPEN_READONLY to 1.
+AC_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
+   [AC_FATAL([Macro STAR_HAVE_FC_OPEN_READONLY is obsolete; use AC_FC_OPEN_SPECIFIERS(readonly) instead])])
+
+
+# STAR_FC_LIBRARY_LDFLAGS
+# -----------------------
+#
+# This was once a wrapper for AC_[]FC_LIBRARY_LDFLAGS which added
+# functionality.  That functionality is now incorporated into STAR_[]DEFAULTS,
+# using the helper macro _STAR_[]RESTFP_FIXUP.  Configure.ac files should use
+# use AC_[]FC_LIBRARY_LDFLAGS instead.
+AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
+   [AC_FATAL([Macro STAR_FC_LIBRARY_LDFLAGS is obsolete: if necessary, use standard AC_FC_LIBRARY_LDFLAGS instead])])
 
 
 # end of starconf macros
