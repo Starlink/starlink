@@ -38,6 +38,7 @@
  * System includes
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -49,6 +50,22 @@
 #include "ems.h"
 #include "sae_par.h"
 #include "nbs_err.h"
+
+/*
+ * internal prototypes
+ */
+
+void parse ( char item[], char file[], char name[], char *path[], int *np);
+void list ( int level, char* patt[], int id);
+void output ( int level, char * patt, int id, int *done);
+int match( char *name, char *type );
+
+void output_type(int id, char type[]);
+void output_name(char name[]);
+void output_shape(int id);
+void output_value(char type[], int id);
+void modify_type(char type[], int actbytes, char tmod[]);
+int siglen(char string[]);
 
 /*
  *  DELTA_INDENT is the extra indent for each level down the structure
@@ -63,6 +80,7 @@
 #define MIN(i,j) ((i)<(j) ? (i) : (j))
 #define ODD(i) ((i)&1 == 1)
 
+int
 main (argc,argv)
 
 /*                           
@@ -92,8 +110,9 @@ char		*argv[];
    int          restore_status;
    int	       	find_status;
    int		status=0;
+   int          retval=EXIT_SUCCESS;
 
-   ems_begin_c( &status );
+   emsBegin( &status );
 
    if (argc < 2) {
       printf ("Item name: ");
@@ -161,9 +180,16 @@ char		*argv[];
       list (0,path+np,id);
       }
 
-   ems_end_c( &status );
+   if ( status == SAI__OK) {
+     retval = EXIT_SUCCESS;
+   } else {
+     retval = EXIT_FAILURE;
+   }
+   emsEnd( &status );
+   return retval;
 }
 
+void
 parse (item,file,name,path,np)
 
 /*+ PARSE
@@ -225,6 +251,7 @@ int		*np;
       *np = pnum;
 }
 
+void
 list (level,patt,id)
 
 /*+ LIST
@@ -248,7 +275,7 @@ int		id;
      nbc_find_nth_item (id,1,&son_id,&status);
 
      if ( status == NBS__PRIMITIVE )
-       ems_annul_c( &status );
+       emsAnnul( &status );
      else
        {
        for (item = 1; status == 0;
@@ -260,11 +287,12 @@ int		id;
          level--;
          }
        if ( status == NBS__ITEMNOTFOUND )
-         ems_annul_c( &status );
+         emsAnnul( &status );
        }
      }
 }
 
+void
 output (level,patt,id,done)
 
 /*+ OUTPUT
@@ -302,6 +330,7 @@ int		*done;
       }
 }
 
+int
 match (word,patt)
 
 /*+ MATCH
@@ -348,6 +377,7 @@ char		*patt;
    return match;
 }
 
+void
 output_type (id,type)
 
 /*+ OUTPUT_TYPE
@@ -367,6 +397,7 @@ char		type[];
    printf ("%s\t",type);
 }
 
+void
 output_name (name)
 
 /*+ OUTPUT_NAME
@@ -379,6 +410,7 @@ char		name[];
    printf ("%s",name);
 }
 
+void
 output_shape (id)
 
 /*+ OUTPUT_SHAPE
@@ -429,6 +461,7 @@ int		id;
       printf ("Failed to get item shape / number of children\n");
 }
 
+void
 output_value (type,id)
 
 /*+ OUTPUT_VALUE
@@ -546,6 +579,7 @@ int		id;
       printf ("Failed to get item value\n");
 }
 
+void
 modify_type (type,actbytes,tmod)
 
 /*+ MODIFY_TYPE

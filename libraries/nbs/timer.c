@@ -9,6 +9,10 @@
  *		elapsed times as integer microseconds.
  */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #ifdef vms
 typedef	long time_t;
 struct tms
@@ -22,18 +26,23 @@ struct tms
 #endif
 
 
-/* see Apple Developer Connection Tech Notes
-  http://developer.apple.com/technotes/tn2002/tn2071.html */
-#if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
+#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
 
-#include <sys/types.h>
+#if HAVE_TIME_H
+#  include <time.h>
+#  define TIMEUNIT	60.0		/* time unit is 1/60 second */
+#endif
+
+#if HAVE_SYS_TIMES_H 
 #include <sys/times.h>
-#define TIMEUNIT	60.0		/* time unit is 1/60 second */
 #endif
 
 long tstart;
 struct tms start;
 
+void
 timer_start()
 {
    time (&tstart);

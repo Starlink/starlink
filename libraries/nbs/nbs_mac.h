@@ -167,6 +167,22 @@ if (!_ADAWI(1,(unsigned short *)(dptr))) (*(dptr))+=0x10000
 #define RW_INTEGER_ARRAY(x) int x []
 #define RW_POINTER(x)       char * x
 
+/* Make sure these macros do nothing on the pure C interface */
+
+/* First force inclusion of cnf macros */
+#include "cnf.h"
+
+/* Then undefine */
+#undef GENPTR_CHARACTER
+#undef GENPTR_CHARACTER
+#undef GENPTR_INTEGER
+#undef GENPTR_BYTE_ARRAY
+#undef GENPTR_INTEGER_ARRAY
+#undef GENPTR_POINTER
+#undef TRAIL
+
+/* Now define them */
+
 #define GENPTR_CHARACTER(x)
 #define GENPTR_INTEGER(x)
 #define GENPTR_BYTE_ARRAY(x)

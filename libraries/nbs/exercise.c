@@ -16,6 +16,8 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
+#include "ems.h"
 
 /* NBS error codes */
 
@@ -63,9 +65,13 @@ enum REPORT_FUNCTION
    expect_impossible		= NBS__IMPOSSIBLE
    };
 
-/* Static variables */
 
-int trigger ();
+/* Prototypes */
+void report(enum REPORT_FUNCTION function, char * message);
+char * errtext( int status );
+int trigger( int id, int * status );
+
+/* Static variables */
 
 static enum REPORT_LEVEL report_level = report_all;
 static int error_count = 0;
@@ -77,6 +83,7 @@ static int status = SAI__OK;
 /******************************************************************************/
 /******************************************************************************/
 
+int
 main ()
 {
 
@@ -703,8 +710,9 @@ report (expect_ok,"nbc_lose_noticeboard e3n");
 
 /* Close down the reporting system */
 
-report (report_close);
+ report (report_close, NULL);
 
+ return EXIT_SUCCESS;
 }
 
 /******************************************************************************/
@@ -713,14 +721,13 @@ report (report_close);
 /******************************************************************************/
 /******************************************************************************/
 
+void
 report (function,message)
 enum REPORT_FUNCTION function;
 char *message;
 {
 static FILE *file;
 int error,output;
-char *errtext();
-int strcmp();
 
 /* Handle special functions first */
 
@@ -763,12 +770,13 @@ if (error)
 /* Output? */
 
 output = (report_level == report_all) || error;
-if (output)
+ if (output) {
    if (error)
       fprintf (file,"*%s: expected %s but got %s\n",message,errtext(function),
 							     errtext(status));
    else
       fprintf (file," %s: %s\n",message,errtext(status));
+ }
 #ifndef vms
 fflush(file);
 #endif
@@ -866,4 +874,5 @@ int trigger (id,status)
 int id;
 int *status;
 {
+  return 0;
 }

@@ -127,6 +127,7 @@
 *     DJA: David J. Allan (ROSAT)
 *     BKM: Brian McIIwrath (Starlink)
 *     AA: Alasdair Allan (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Version Date:
@@ -282,6 +283,8 @@
 *        Omit unnecessary malloc and free declarations.
 *     28-Jun-04 - (AA):
 *        Fixed ifdef logic for building under Mac OSX
+*     12-Sep-04 - (TIMJ):
+*        Minimize compiler warnings. Use new style ems calling convention.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -289,6 +292,10 @@
 
 *
 */
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 
 /* Depending on whether c_string macro is defined or not, define macros
@@ -714,8 +721,8 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
       else                                                 /* Report error */
          {
 	 *status = NBS__BADOPTION;
-         ems_setc_c( "OPT", tname, MAXNAME );
-         ems_rep_c( "NBS_TUNE_BADOPT", "Bad tune option /^OPT/", status );
+         emsSetc( "OPT", tname, MAXNAME );
+         emsRep( "NBS_TUNE_BADOPT", "Bad tune option /^OPT/", status );
          }
       }
    return (*status);
@@ -837,7 +844,7 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
       if (tid == NIL)
          {
 	 *status = NBS__NILID;
-         ems_rep_c( "NBS_TUNE_NB_NILID", "NIL item ID", status );
+         emsRep( "NBS_TUNE_NB_NILID", "NIL item ID", status );
          }
 
 /* Set the value as appropriate. Allow abbreviation. */
@@ -857,8 +864,8 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
       else
          {
 	 *status = NBS__BADOPTION;
-         ems_setc_c( "OPT", tname, MAXNAME );
-         ems_rep_c( "NBS_TUNE_NB_BADOPT",
+         emsSetc( "OPT", tname, MAXNAME );
+         emsRep( "NBS_TUNE_NB_BADOPT",
                 "Bad noticeboard tune option /^OPT/", status );
          }
       }
@@ -973,7 +980,7 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
       if (NBS_INIT_ALLOC (max_defn_size,DATA_BASE) == NIL)
          {
 	 *status = NBS__INITALLOCFAILED;
-         ems_rep_c( "NBS_BEGIN_DEFINITION_ALLOCFAIL",
+         emsRep( "NBS_BEGIN_DEFINITION_ALLOCFAIL",
               "Couldn't initialise storage allocator",
               status );
          }
@@ -990,7 +997,7 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 	 if (lsid == NIL || fid == NIL || bid == NIL)
             {
 	    *status = NBS__NOMOREROOM;
-            ems_rep_c( "NBS_BEGIN_DEFINITION_NOMOREROOM",
+            emsRep( "NBS_BEGIN_DEFINITION_NOMOREROOM",
               "Couldn't get memory - increase MAX_DEFN_SIZE when defining",
               status );
             }
@@ -1028,7 +1035,7 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 /* Finally the board information. Most fields are overwritten when their
    values are known.	*/
 
-	    bid->version = VERSION;
+	    bid->version = NBSVERSION;
 	    bid->file_size = 0;
 	    bid->defn_size = 0;
 	    bid->section_size = 0;
@@ -1171,12 +1178,12 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
       if (tenvsid == NIL)
          {
 	 *status = NBS__NILSID;
-         ems_rep_c( "NBS_DEFINE_STRUCTURE_NILSID", "NIL static ID", status );
+         emsRep( "NBS_DEFINE_STRUCTURE_NILSID", "NIL static ID", status );
          }
       else if (tenvsid->fixed->primitive)
          {
 	 *status = NBS__PRIMITIVE;
-         ems_rep_c( "NBS_DEFINE_STRUCTURE_PRIM", "Item is primitive", status );
+         emsRep( "NBS_DEFINE_STRUCTURE_PRIM", "Item is primitive", status );
          }
 
 /* Allocate an item descriptor (which consists of pointers) and a fixed
@@ -1188,7 +1195,7 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 	 if (lsid == NIL || fid == NIL)
             {
 	    *status = NBS__NOMOREROOM;
-            ems_rep_c( "NBS_DEFINE_STRUCTURE_NOMOREROOM",
+            emsRep( "NBS_DEFINE_STRUCTURE_NOMOREROOM",
               "Couldn't get memory - increase MAX_DEFN_SIZE when defining",
               status );
             }
@@ -1372,12 +1379,12 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 
       if (tenvsid == NIL) {
 	 *status = NBS__NILSID;
-         ems_rep_c( "NBS_DEFINE_PRIMITIVE_NILSID", "NIL static ID", status );
+         emsRep( "NBS_DEFINE_PRIMITIVE_NILSID", "NIL static ID", status );
          }
       else if (tenvsid->fixed->primitive) /* Must be structured */
          {
 	 *status = NBS__PRIMITIVE;
-         ems_rep_c( "NBS_DEFINE_PRIMITIVE_PRIM", "Item is primitive", status );
+         emsRep( "NBS_DEFINE_PRIMITIVE_PRIM", "Item is primitive", status );
          }
 
 /* Allocate an item descriptor (which consists of pointers) and a fixed
@@ -1391,7 +1398,7 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 	 if (lsid == NIL || fid == NIL || shape == NIL || data == NIL)
             {
 	    *status = NBS__NOMOREROOM;
-            ems_rep_c( "NBS_BEGIN_PRIMITIVE_NOMOREROOM",
+            emsRep( "NBS_BEGIN_PRIMITIVE_NOMOREROOM",
               "Couldn't get memory - increase MAX_DEFN_SIZE when defining",
               status );
             }
@@ -1540,17 +1547,17 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
       if (tsid == NIL)
          {
 	 *status = NBS__NILSID;
-         ems_rep_c( "NBS_DEFINE_SHAPE_NILSID", "NIL static ID", status );
+         emsRep( "NBS_DEFINE_SHAPE_NILSID", "NIL static ID", status );
          }
       else if (!tsid->fixed->primitive) /* Must be primitive */
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_DEFINE_SHAPE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_DEFINE_SHAPE_NOTPRIM", "Item is not primitive", status );
          }
       else if (tndims > tsid->fixed->maxdims) /* Too many dimensions? */
          {
          *status = NBS__TOOMANYDIMS;
-         ems_rep_c( "NBS_DEFINE_SHAPE_TOOMANYDIMS",
+         emsRep( "NBS_DEFINE_SHAPE_TOOMANYDIMS",
                  "More dimensions than maximum allowed", status );
          }
 
@@ -1669,7 +1676,7 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
    extern char	*NBS_CREATE_SECTION();
    extern char	*NBS_DEINIT_ALLOC();
    extern char	*NBS_RELOCATE_ADDRESS();
-   extern int	NBS_RELOCATE_POINTERS();
+   extern void	NBS_RELOCATE_POINTERS();
    extern int	*NBS_WRITE_FILE();
 
 /* Local variable declarations */
@@ -1896,7 +1903,7 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 	 if (file_size != defn_size)
             {
 	    *status = NBS__DATASAVED;
-            ems_rep_c( "NBS_RESTORE_DEFINITION_DATASAVED",
+            emsRep( "NBS_RESTORE_DEFINITION_DATASAVED",
               "Data part of noticeboard saved - cannot restore definition",
               status );
             }
@@ -2096,7 +2103,7 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 	    if (file_size != section_size)
                {
 	       *status = NBS__DATANOTSAVED;
-               ems_rep_c( "NBS_RESTORE_NB_DATANOTSAVED",
+               emsRep( "NBS_RESTORE_NB_DATANOTSAVED",
                  "Data part of noticeboard not saved - cannot restore it",
                  status );
                }
@@ -2193,12 +2200,12 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_SAVE_NB_NILID", "NIL item ID", status );
+         emsRep( "NBS_SAVE_NB_NILID", "NIL item ID", status );
          }
       else if (nbs_gl_pid != tid->board->pid)
          {
          *status = NBS__NOTOWNER;
-         ems_rep_c( "NBS_SAVE_NB_NOTOWN", "Not owner of noticeboard", status );
+         emsRep( "NBS_SAVE_NB_NOTOWN", "Not owner of noticeboard", status );
          }
 
 /* Check that the noticeboard data was restored from a file in the first
@@ -2207,7 +2214,7 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
       else if (tid->board->file_size != tid->board->section_size)
          {
 	 *status = NBS__DATANOTRESTORED;
-         ems_rep_c( "NBS_SAVE_NB_DATANOTSAVED",
+         emsRep( "NBS_SAVE_NB_DATANOTSAVED",
                "Data was not restored from noticeboard file - cannot save it",
                status );
          }
@@ -2338,7 +2345,7 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 /* External function declarations */
 
    extern char	*NBS_MAP_SECTION();
-   extern int	NBS_RELOCATE_ITEM();
+   extern void	NBS_RELOCATE_ITEM();
    extern int	NBS_UNMAP_SECTION();
 
 /* Local variable declarations */
@@ -2369,7 +2376,7 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 	 if (global_base->vp.valid == NO)
             {
 	    *status = NBS__TIMEOUT;
-            ems_rep_c( "NBS_FIND_NB_TIMEOUT",
+            emsRep( "NBS_FIND_NB_TIMEOUT",
               "Time out finding noticeboard", status );
             }
 
@@ -2382,7 +2389,7 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 	    if (locid == NIL)
                {
 	       *status = NBS__NOMOREROOM;
-               ems_rep_c( "NBS_FIND_NB_NOMOREROOM",
+               emsRep( "NBS_FIND_NB_NOMOREROOM",
                  "Couldn't get memory - increase MAX_DEFN_SIZE when defining",
                  status );
                }
@@ -2395,10 +2402,10 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 /* Check that the version number held in the noticeboard (which is the version
    of the software that created the noticeboard) matches the software version.*/
 
-	       if (locid->board->version != VERSION) {
+	       if (locid->board->version != NBSVERSION) {
                   ITEM_FREE (locid);
 	          *status = NBS__BADVERSION;
-                  ems_rep_c( "NBS_FIND_NB_BADVER",
+                  emsRep( "NBS_FIND_NB_BADVER",
                     "Noticeboard or definition file had wrong version", status );
 	       }
 
@@ -2414,7 +2421,7 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 	          if (locid == NIL)
                      {
 	             *status = NBS__NOMOREROOM;
-                     ems_rep_c( "NBS_FIND_NB_NOMOREROOM",
+                     emsRep( "NBS_FIND_NB_NOMOREROOM",
                       "Couldn't get memory - increase MAX_DEFN_SIZE when defining",
                       status );
                      }
@@ -2582,12 +2589,12 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
       if (tenvid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_FIND_ITEM_NILID", "NIL item ID", status );
+         emsRep( "NBS_FIND_ITEM_NILID", "NIL item ID", status );
          }
       else if (tenvid->fixed->primitive)
          {
 	 *status = NBS__PRIMITIVE;
-         ems_rep_c( "NBS_FIND_ITEM_PRIM", "Item is primitive", status );
+         emsRep( "NBS_FIND_ITEM_PRIM", "Item is primitive", status );
          }
 
 /* Search for an item of the required name. Use a binary chop search to
@@ -2620,7 +2627,7 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
 	 if (locid == NIL)
             {
             *status = NBS__ITEMNOTFOUND;
-            ems_rep_c( "NBS_FIND_ITEM_NOTFOUND", "Item not found", status );
+            emsRep( "NBS_FIND_ITEM_NOTFOUND", "Item not found", status );
             }
 	 else
  	    tenvid->da.accessed++;
@@ -2714,12 +2721,12 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
       if (tenvid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_FIND_NTH_ITEM_NILID", "NIL item ID", status );
+         emsRep( "NBS_FIND_NTH_ITEM_NILID", "NIL item ID", status );
          }
       else if (tenvid->fixed->primitive)
          {
 	 *status = NBS__PRIMITIVE;
-         ems_rep_c( "NBS_FIND_NTH_ITEM_PRIM", "Item is primitive", status );
+         emsRep( "NBS_FIND_NTH_ITEM_PRIM", "Item is primitive", status );
          }
 
 /* Search for the item in the required position. */
@@ -2735,7 +2742,7 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
 	 if (locid == NIL)
             {
             *status = NBS__ITEMNOTFOUND;
-            ems_rep_c( "NBS_FIND_NTH_ITEM_NOTFOUND", "Item not found", status );
+            emsRep( "NBS_FIND_NTH_ITEM_NOTFOUND", "Item not found", status );
             }
 	 else
  	    tenvid->da.accessed++;
@@ -2874,18 +2881,18 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_LOSE_NB_NILID", "NIL item ID", status );
+         emsRep( "NBS_LOSE_NB_NILID", "NIL item ID", status );
          }
       else if (tid->vp.parent != NIL)
          {
          *status = NBS__NOTTOPLEVEL;
-         ems_rep_c( "NBS_LOSE_NB_NOTTOPLEV",
+         emsRep( "NBS_LOSE_NB_NOTTOPLEV",
            "Item is not top-level (ie. not a noticeboard) - cannot lose it", status );
          }
       else if (!tid->fixed->primitive && tid->da.accessed > 0 && toption != 'F')
          {
          *status = NBS__HASIDS;
-         ems_rep_c( "NBS_LOSE_NB_HASIDS",
+         emsRep( "NBS_LOSE_NB_HASIDS",
            "Noticeboard has items derived from it - cannot lose it", status );
          }
 
@@ -3000,24 +3007,24 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_LOSE_ITEM_NILID", "NIL item ID", status );
+         emsRep( "NBS_LOSE_ITEM_NILID", "NIL item ID", status );
          }
       else if (tid->vp.parent == NIL)
          {
          *status = NBS__TOPLEVEL;
-         ems_rep_c( "NBS_LOSE_ITEM_TOPLEV",
+         emsRep( "NBS_LOSE_ITEM_TOPLEV",
             "Item is top-level (ie noticeboard) - cannot lose it", status );
          }
       else if (tid->vp.parent->da.accessed <= 0)
          {
 	 *status = NBS__NEVERFOUND;
-         ems_rep_c( "NBS_LOSE_ITEM_NEVERFOUND",
+         emsRep( "NBS_LOSE_ITEM_NEVERFOUND",
            "Parent has no items derived from it - cannot lose it", status );
          }
       else if (!tid->fixed->primitive && tid->da.accessed > 0 && toption != 'F')
          {
          *status = NBS__HASIDS;
-         ems_rep_c( "NBS_LOSE_ITEM_HASIDS",
+         emsRep( "NBS_LOSE_ITEM_HASIDS",
            "Item has items derived from it - cannot lose it", status );
          }
 
@@ -3203,30 +3210,30 @@ int NBS_PUT_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(nbytes),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_PUT_VALUE_NILID", "NIL item ID", status );
+         emsRep( "NBS_PUT_VALUE_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_PUT_VALUE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_PUT_VALUE_NOTPRIM", "Item is not primitive", status );
          }
       else if (!world_write && !tid->board->world_write &&
 						nbs_gl_pid != tid->board->pid)
          {
          *status = NBS__NOTOWNER;
-         ems_rep_c( "NBS_PUT_VALUE_NOTOWN",
+         emsRep( "NBS_PUT_VALUE_NOTOWN",
               "Non-owner attempted to alter noticeboard", status );
          }
       else if (toffset < 0)
          {
          *status = NBS__BADOFFSET;
-         ems_rep_c( "NBS_PUT_VALUE_BADOFF",
+         emsRep( "NBS_PUT_VALUE_BADOFF",
                     "Offset is less than zero", status );
          }
       else if (toffset + tnbytes > tid->fixed->maxbytes)
          {
          *status = NBS__TOOMANYBYTES;
-         ems_rep_c( "NBS_PUT_VALUE_TOOMANYBYTES",
+         emsRep( "NBS_PUT_VALUE_TOOMANYBYTES",
                  "More bytes than maximum allowed", status );
          }
 
@@ -3319,7 +3326,9 @@ int NBS_PUT_CVALUE ( R_INTEGER(id), R_INTEGER(offset), RW_CHARACTER(string),
   GENPTR_CHARACTER(string)
   GENPTR_INTEGER(status)
 
+#ifdef c_string
   int len;
+#endif
 
 IF_OK {
 #ifdef c_string
@@ -3421,24 +3430,24 @@ int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_PUT_SHAPE_NILID", "NIL item ID", status );
+         emsRep( "NBS_PUT_SHAPE_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_PUT_SHAPE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_PUT_SHAPE_NOTPRIM", "Item is not primitive", status );
          }
       else if (!world_write && !tid->board->world_write &&
 						nbs_gl_pid != tid->board->pid)
          {
          *status = NBS__NOTOWNER;
-         ems_rep_c( "NBS_PUT_SHAPE_NOTOWN",
+         emsRep( "NBS_PUT_SHAPE_NOTOWN",
               "Non-owner attempted to alter noticeboard", status );
          }
       else if (tndims > tid->fixed->maxdims)
          {
          *status = NBS__TOOMANYDIMS;
-         ems_rep_c( "NBS_PUT_SHAPE_TOOMANYDIMS",
+         emsRep( "NBS_PUT_SHAPE_TOOMANYDIMS",
                  "More dimensions than maximum allowed", status );
          }
 
@@ -3554,24 +3563,24 @@ int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_PUT_SIZE_NILID", "NIL item ID", status );
+         emsRep( "NBS_PUT_SIZE_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_PUT_SIZE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_PUT_SIZE_NOTPRIM", "Item is not primitive", status );
          }
       else if (!world_write && !tid->board->world_write &&
 						nbs_gl_pid != tid->board->pid)
          {
          *status = NBS__NOTOWNER;
-         ems_rep_c( "NBS_PUT_SIZE_NOTOWN",
+         emsRep( "NBS_PUT_SIZE_NOTOWN",
               "Non-owner attempted to alter noticeboard", status );
          }
       else if (tnbytes > tid->fixed->maxbytes)
          {
          *status = NBS__TOOMANYBYTES;
-         ems_rep_c( "NBS_PUT_SIZE_TOOMANYBYTES",
+         emsRep( "NBS_PUT_SIZE_TOOMANYBYTES",
                  "More bytes than maximum allowed", status );
          }
 
@@ -3674,13 +3683,13 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_INC_MODIFIED_NILID", "NIL item ID", status );
+         emsRep( "NBS_INC_MODIFIED_NILID", "NIL item ID", status );
          }
       else if (!world_write && !tid->board->world_write &&
 						nbs_gl_pid != tid->board->pid)
          {
          *status = NBS__NOTOWNER;
-         ems_rep_c( "NBS_INC_MODIFIED_NOTOWN",
+         emsRep( "NBS_INC_MODIFIED_NOTOWN",
               "Non-owner attempted to alter noticeboard", status );
          }
 
@@ -3782,18 +3791,18 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_PUT_TRIGGER_NILID", "NIL item ID", status );
+         emsRep( "NBS_PUT_TRIGGER_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_PUT_TRIGGER_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_PUT_TRIGGER_NOTPRIM", "Item is not primitive", status );
          }
       else if (!world_write && !tid->board->world_write &&
 						nbs_gl_pid != tid->board->pid)
          {
          *status = NBS__NOTOWNER;
-         ems_rep_c( "NBS_PUT_TRIGGER_NOTOWN",
+         emsRep( "NBS_PUT_TRIGGER_NOTOWN",
               "Non-owner attempted to alter noticeboard", status );
          }
 
@@ -3949,17 +3958,17 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_VALUE_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_VALUE_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_GET_VALUE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_GET_VALUE_NOTPRIM", "Item is not primitive", status );
          }
       else if (toffset < 0)
          {
          *status = NBS__BADOFFSET;
-         ems_rep_c( "NBS_GET_VALUE_BADOFF",
+         emsRep( "NBS_GET_VALUE_BADOFF",
                     "Offset is less than zero", status );
          }
 
@@ -3982,7 +3991,7 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
          if (before != after || ODD (after))
             {
 	    *status = NBS__TIMEOUT;
-            ems_rep_c( "NBS_GET_VALUE_TIMEOUT",
+            emsRep( "NBS_GET_VALUE_TIMEOUT",
               "Time out getting item value", status );
             }
       }
@@ -4072,9 +4081,11 @@ int NBS_GET_CVALUE ( R_INTEGER(id), R_INTEGER(offset),
   GENPTR_INTEGER(status)
 
 IF_OK {
-  NBS_GET_VALUE( id, offset, &string_length, (F77_BYTE_TYPE *) string, 
+  return NBS_GET_VALUE( id, offset, &string_length, (F77_BYTE_TYPE *) string, 
                  actbytes, status );
   }
+
+  return 0;
 }
 #endif
 
@@ -4186,12 +4197,12 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_SHAPE_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_SHAPE_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_GET_SHAPE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_GET_SHAPE_NOTPRIM", "Item is not primitive", status );
          }
 
 /* If CHECK_MODIFY is TRUE: repeat: read modified count, return actual number
@@ -4214,7 +4225,7 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
          if (before != after || ODD (after))
             {
 	    *status = NBS__TIMEOUT;
-            ems_rep_c( "NBS_GET_SHAPE_TIMEOUT",
+            emsRep( "NBS_GET_SHAPE_TIMEOUT",
               "Time out getting item shape", status );
             }
          *maxdims = tid->fixed->maxdims;
@@ -4315,7 +4326,7 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_MODIFIED_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_MODIFIED_NILID", "NIL item ID", status );
          }
 
 /* If primitive, get the item's modified count.	*/
@@ -4415,7 +4426,7 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_MODIFIED_POINTER_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_MODIFIED_POINTER_NILID", "NIL item ID", status );
          }
 
 /* If primitive, return a pointer to the item's modified count.	*/
@@ -4507,7 +4518,7 @@ int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_UPDATED_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_UPDATED_NILID", "NIL item ID", status );
          }
 
 /* If primitive, use the item's modified count.	*/
@@ -4595,12 +4606,12 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_POINTER_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_POINTER_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_GET_POINTER_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_GET_POINTER_NOTPRIM", "Item is not primitive", status );
          }
 
 /* Return the address of the first byte of the item's noticeboard data.	*/
@@ -4679,7 +4690,7 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_NAME_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_NAME_NILID", "NIL item ID", status );
          }
 
 /* Export the item name.    */
@@ -4758,7 +4769,7 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_TYPE_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_TYPE_NILID", "NIL item ID", status );
          }
 
 /* Export the item type.    */
@@ -4841,12 +4852,12 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_SIZE_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_SIZE_NILID", "NIL item ID", status );
          }
       else if (!tid->fixed->primitive)
          {
 	 *status = NBS__NOTPRIMITIVE;
-         ems_rep_c( "NBS_GET_SIZE_NOTPRIM", "Item is not primitive", status );
+         emsRep( "NBS_GET_SIZE_NOTPRIM", "Item is not primitive", status );
          }
 
 /* Return the maximum and actual sizes of the item's noticeboard data.	*/
@@ -4926,7 +4937,7 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_PRIMITIVE_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_PRIMITIVE_NILID", "NIL item ID", status );
          }
 
 /* Return YES (1) if primitive, NO (0) if structured.	*/
@@ -5010,7 +5021,7 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_PARENT_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_PARENT_NILID", "NIL item ID", status );
          }
 
 /* Return the ID of the item's parent.	*/
@@ -5089,12 +5100,12 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_CHILDREN_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_CHILDREN_NILID", "NIL item ID", status );
          }
       else if (tid->fixed->primitive)
          {
 	 *status = NBS__PRIMITIVE;
-         ems_rep_c( "NBS_GET_CHILDREN_PRIM", "Item is primitive", status );
+         emsRep( "NBS_GET_CHILDREN_PRIM", "Item is primitive", status );
          }
 
 /* Return the number of children.	*/
@@ -5178,7 +5189,6 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 /* Local variable declarations */
 
    int          *ivalue = value;
-   float        *rvalue = (float *) value;
    item_id	tid;
    char		tname[2];
 
@@ -5197,7 +5207,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_INFO_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_INFO_NILID", "NIL item ID", status );
          }
 
 /* Import the name (converting case) and set the value as appropriate. */
@@ -5220,8 +5230,8 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
          else if (strncmp (tname,"SAVE_NAME",2) == 0)	/* File name */
             {
 	    *status = NBS__BADOPTION;
-            ems_setc_c( "OPT", tname, MAXNAME );
-            ems_rep_c( "NBS_GET_INFO_BADOPT",
+            emsSetc( "OPT", tname, MAXNAME );
+            emsRep( "NBS_GET_INFO_BADOPT",
                "Bad info option /^OPT/ - now supported by NBS_GET_CINFO",
                status );
             }
@@ -5237,8 +5247,8 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 	 else
             {
 	    *status = NBS__BADOPTION;
-            ems_setc_c( "OPT", tname, MAXNAME );
-            ems_rep_c( "NBS_GET_INFO_BADOPT", "Bad info option /^OPT/", status );
+            emsSetc( "OPT", tname, MAXNAME );
+            emsRep( "NBS_GET_INFO_BADOPT", "Bad info option /^OPT/", status );
             }
       }
    }
@@ -5323,7 +5333,7 @@ int NBS_GET_CINFO ( R_INTEGER(id), RW_CHARACTER(name), RW_CHARACTER(value),
       if (tid == NIL)
          {
          *status = NBS__NILID;
-         ems_rep_c( "NBS_GET_CINFO_NILID", "NIL item ID", status );
+         emsRep( "NBS_GET_CINFO_NILID", "NIL item ID", status );
          }
 
 /* Import the name (converting case) and set the value as appropriate. */
@@ -5339,8 +5349,8 @@ int NBS_GET_CINFO ( R_INTEGER(id), RW_CHARACTER(name), RW_CHARACTER(value),
 	 else
             {
 	    *status = NBS__BADOPTION;
-            ems_setc_c( "OPT", tname, MAXNAME );
-            ems_rep_c( "NBS_GET_CINFO_BADOPT", "Bad info option /^OPT/", status );
+            emsSetc( "OPT", tname, MAXNAME );
+            emsRep( "NBS_GET_CINFO_BADOPT", "Bad info option /^OPT/", status );
             }
       }
    }

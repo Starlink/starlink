@@ -5,8 +5,13 @@
 
 /* Include files							    */
 
+#include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+
+/* prototypes */
+int find_word(int envid,int n,char *word);
 
 /* External variable declarations					    */
 
@@ -17,6 +22,7 @@ static int status;	/* Global status				    */
 
 static FILE *fid;	/* Input file id				    */
 
+int
 main(argc,argv)
 int	argc;
 char	*argv[];
@@ -72,7 +78,7 @@ create_tree (envsid,'A','Z',n);
 /* Loop getting words and creating primitive items. 			    */
 
 while (get_word (word))
-    nbc_define_primitive(lsid[word[0]],word,"word",0,0,&dsid,&status);
+  nbc_define_primitive(lsid[(int)word[0]],word,"word",0,0,&dsid,&status);
 
 /* End definition, saving to file.					    */
 
@@ -191,7 +197,7 @@ char *word;
 /* Local variable declarations */
 
 int i;
-char c;
+char c = 0;
 
 /* Start of code */
 

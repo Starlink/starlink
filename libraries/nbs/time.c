@@ -2,26 +2,38 @@
 
 /*	Converted from Fortran to portable C, 31-Mar-88, William Lupton. */
 
-#include <time.h>
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#if HAVE_TIME_H
+#  include <time.h>
+#endif
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 #ifdef vms
 #define _chmove(n,sptr,dptr) ots$move3(n,sptr,dptr)
 #endif
 
+void report(FILE*, int);
 
-/* see Apple Developer Connection Tech Notes
-  http://developer.apple.com/technotes/tn2002/tn2071.html */
-#if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
+/* in timer.c */
+int timer_stime( void );
+int timer_utime( void );
+void timer_start( void );
 
+#if HAVE_MEMCPY
 #define _chmove(n,sptr,dptr) memcpy(dptr,sptr,n)
 #endif
 
+int
 main ()
 
 {
 
-int tim;		/* Current time */
+time_t tim;		/* Current time */
 int count,items,item;	/* # iterations, # items, item no */
 int inc,check;		/* Control flags */
 int old_inc,old_check;	/* Previous values of control flags */
@@ -82,7 +94,7 @@ if (status == 0)
 	nbc_begin_definition (&sid,&status);
 	for (i = 0; i < items; i++)
 		{
-		sprintf (name,"%06.6d",i);
+		sprintf (name,"%6.6d",i);
 		if (i == 0)
 			j = 4096;
 		else
@@ -254,10 +266,12 @@ if (status == 0)
 if (status != 0)
 	exit (status);
 
+ return EXIT_SUCCESS;
 }
 
 /*	Report on elapsed and processor time.	*/
 
+void
 report (file,count)
 FILE *file;
 int count;

@@ -24,8 +24,17 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS([time.h])
 AC_CHECK_HEADERS([sys/times.h])
+AC_CHECK_HEADERS([sys/types.h])
 AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([sys/ipc.h])
+AC_CHECK_HEADERS([sys/shm.h])
+AC_CHECK_HEADERS([descrip.h])
+AC_CHECK_HEADERS([secdef.h])
+AC_CHECK_HEADERS([ssdef.h])
+AC_CHECK_FUNCS([atexit on_exit])
+AC_CHECK_FUNCS([memcpy ots\$move3])
+AC_CHECK_FUNCS([shmctl])
+AC_CHECK_FUNCS([LIB\$WAIT select])
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS

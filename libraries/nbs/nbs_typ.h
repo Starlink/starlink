@@ -135,6 +135,7 @@
       19-Nov-93 - DJA - string_id removed in favour of F77 usage.
       24-Nov-94 - DJA - Allocated item sizes rounded up to long boundaries
       11-Sep-95 - DJA - Fixed bug in _ALIGN_ITEM macro
+      12-Sep-04 - TIMJ- VERSION now NBSVERSION.
  */
 
 /* Constant definitions	*/
@@ -145,7 +146,7 @@
  *  Note that this format changes implicitly when practically any of the data
  *  types defined here change.	*/
 
-#define VERSION 5
+#define NBSVERSION 5
 
 /*  MAXNAME and MAXTYPE are maximum lengths of item names and types */
 

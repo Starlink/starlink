@@ -92,11 +92,19 @@
 *        Add include of <string.h> and omit unnecessary declarations.
 *     28-Jun-04 (AA):
 *        Changed ifdef logic for Mac OSX support.
+*     12-Sep-04 (TIMJ):
+*        Minimize compiler warnings. Use config.h
 *     {enter_changes_here}
 */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 /* System includes */
-#include <time.h>
+#if HAVE_TIME_H
+# include <time.h>
+#endif
 
 /* Depending on whether c_string macro is defined or not, define macros
    for routine names and define module name */
@@ -152,7 +160,6 @@ void  NBS_STREXP ();
 
 /* Starlink packages to interface Fortran and C */
 
-#include "f77.h"
 #include "cnf.h"
 
 #define NBS_MAKE_KEY		F77_EXTERNAL_NAME(nbs_make_key)
@@ -205,15 +212,15 @@ extern void   NBS_MLIST_UNMAP (char *,int *);
 #endif
 
 
-/* see Apple Developer Connection Tech Notes
-  http://developer.apple.com/technotes/tn2002/tn2071.html */
-#if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
+/* Assume unix shared memory if we have sys/ipc.h */
 
-#include <errno.h>		    /* Error code definitions		*/
-#include <sys/types.h>		    /* System dependent types		*/
-#include <sys/ipc.h>		    /* Inter-process comms definitions	*/
-#include <sys/time.h>
-#include <string.h>
+#if HAVE_SYS_IPC_H
+# include <errno.h>		    /* Error code definitions		*/
+# include <sys/types.h>		    /* System dependent types		*/
+# include <sys/ipc.h>		    /* Inter-process comms definitions	*/
+# include <sys/shm.h>                /* Shared memory definitions        */
+# include <sys/time.h>
+# include <string.h>
 #endif
 
 
@@ -694,6 +701,7 @@ char *NBS_DEINIT_ALLOC ()
 *     {note_any_bugs_here}
 *-
 */
+void
 NBS_WRITE_FILE (
                 RW_CHARACTER(name),
                 RW_BYTE_ARRAY(data),
@@ -729,14 +737,14 @@ NBS_WRITE_FILE (
    if (chan == NIL)
       {
       *status = NBS__CANTOPEN;
-      ems_rep_c( "NBS_WRITE_FILE_CANTOPEN",
+      emsRep( "NBS_WRITE_FILE_CANTOPEN",
                  "Can't open noticeboard definition file", status );
       }
 
 /* Encode and write the header.	*/
 
    else {
-      header.version = VERSION;
+      header.version = NBSVERSION;
       header.file_size = file_size;
       header.defn_size = defn_size;
       header.section_size = section_size;
@@ -745,7 +753,7 @@ NBS_WRITE_FILE (
       if (num == 0)
          {
          *status = NBS__CANTWRITE;
-         ems_rep_c( "NBS_WRITE_FILE_CANTWRITE",
+         emsRep( "NBS_WRITE_FILE_CANTWRITE",
                  "Can't write noticeboard definition file", status );
          }
 
@@ -756,7 +764,7 @@ NBS_WRITE_FILE (
 	 if (num == 0)
             {
             *status = NBS__CANTWRITE;
-            ems_rep_c( "NBS_WRITE_FILE_CANTWRITE",
+            emsRep( "NBS_WRITE_FILE_CANTWRITE",
                  "Can't write noticeboard definition file", status );
             }
       }
@@ -829,6 +837,7 @@ NBS_WRITE_FILE (
 *     {note_any_bugs_here}
 *-
 */
+void
 NBS_OPEN_FILE ( RW_CHARACTER(name),
                 FILE **chan,
                 W_INTEGER(file_size),
@@ -864,7 +873,7 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
    if (*chan == NIL)
       {
       *status = NBS__CANTOPEN;
-      ems_rep_c( "NBS_OPEN_FILE_CANTOPEN",
+      emsRep( "NBS_OPEN_FILE_CANTOPEN",
                  "Can't open noticeboard definition file", status );
       }
 
@@ -875,16 +884,16 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
       if (num == 0)
          {
 	 *status = NBS__CANTREAD;
-         ems_rep_c( "NBS_OPEN_FILE_CANTREAD",
+         emsRep( "NBS_OPEN_FILE_CANTREAD",
                  "Can't read noticeboard definition file", status );
          }
 
 /* Check that the file was written with the current software version.	*/
 
-      else if (header.version != VERSION)
+      else if (header.version != NBSVERSION)
          {
          *status = NBS__BADVERSION;
-         ems_rep_c( "NBS_OPEN_FILE_BADVER",
+         emsRep( "NBS_OPEN_FILE_BADVER",
                 "Noticeboard or definition file had wrong version", status );
          }
       else {
@@ -942,6 +951,7 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
 *     {note_any_bugs_here}
 *-
 */
+void
 NBS_READ_FILE ( FILE *chan,
                 int defn_size,
                 RW_BYTE_ARRAY(data),
@@ -964,7 +974,7 @@ NBS_READ_FILE ( FILE *chan,
    if (num == 0)
       {
       *status = NBS__CANTREAD;
-      ems_rep_c( "NBS_READ_FILE_CANTREAD",
+      emsRep( "NBS_READ_FILE_CANTREAD",
                  "Can't read noticeboard definition file", status );
       }
 }
@@ -1009,6 +1019,7 @@ NBS_READ_FILE ( FILE *chan,
 *     {note_any_bugs_here}
 *-
 */
+void
 NBS_CLOSE_FILE ( RW_POINTER(chan) )
 {
   GENPTR_POINTER(chan)
@@ -1067,6 +1078,7 @@ NBS_CLOSE_FILE ( RW_POINTER(chan) )
 *     {note_any_bugs_here}
 *-
 */
+void
 NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
 {
 /* Start of code */
@@ -1083,7 +1095,7 @@ NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
    if (*chan == NIL)
       {
       *status = NBS__CANTOPEN;
-      ems_rep_c( "NBS_OPEN_WRITE_CANTOPEN",
+      emsRep( "NBS_OPEN_WRITE_CANTOPEN",
                  "Can't open noticeboard definition file", status );
       }
 }
@@ -1143,6 +1155,7 @@ NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
 *     {note_any_bugs_here}
 *-
 */
+void
 NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 {
 
@@ -1161,7 +1174,7 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
    if (seek != 0)
       {
       *status = NBS__CANTWRITE;
-      ems_rep_c( "NBS_UPDATE_FILE_CANTWRITE",
+      emsRep( "NBS_UPDATE_FILE_CANTWRITE",
                  "Can't write noticeboard definition file", status );
       }
 
@@ -1172,7 +1185,7 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
       if (num == 0)
          {
          *status = NBS__CANTWRITE;
-         ems_rep_c( "NBS_WRITE_FILE_CANTWRITE",
+         emsRep( "NBS_WRITE_FILE_CANTWRITE",
                  "Can't write noticeboard definition file", status );
          }
    }
@@ -1335,8 +1348,6 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 
 /* External function declarations	*/
 
-   extern int     shmget();
-   extern char    *shmat();
    extern void    NBS_MLIST_ADD ();
 
 /* Local variable declarations	*/
@@ -1362,13 +1373,13 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
    to all processes.	*/
    flags = 0x1ff | IPC_CREAT | IPC_EXCL;
    if ((memid = shmget (key,section_size,flags)) == -1) {
-      ems_rep_c( "NBS_CREATE_SECTION_SECEXIST",
+      emsRep( "NBS_CREATE_SECTION_SECEXIST",
                  "Section already existed", status );
       }
 
 /* Attach to it */
    else if ((int)(retadr[0] = shmat (memid,(char *)0,0)) == -1) {
-      ems_rep_c( "NBS_CREATE_SECTION_ERRMAP",
+      emsRep( "NBS_CREATE_SECTION_ERRMAP",
                  "Error mapping global memory section", status );
       }
 
@@ -1509,7 +1520,7 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
    else if (*status == SS$_NOSUCHSEC)
       {
       *status = NBS__SECTIONNOTFOUND;
-      ems_rep_c( "NBS_MAP_SECTION_SECNOTFOUND", "Section not found", status );
+      emsRep( "NBS_MAP_SECTION_SECNOTFOUND", "Section not found", status );
       }
 
 /* End of VMS-specific section.	*/
@@ -1526,15 +1537,12 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 
 /* External function declarations	*/
 
-   extern int shmget();
-   extern char *shmat();
    extern char *NBS_MLIST_FIND ();
    extern void NBS_MLIST_ADD ();
 
 /* Local variable declarations	*/
 
    key_t	key;		/* Key to shared memory segment */
-   int		offset;		/* Offset to end of second part of key name */
    int		memid;		/* Shared memory segment id */
 
 /* Start of code	*/
@@ -1556,7 +1564,7 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 /* Get the id of the shared memory segment - it must already exist.	*/
    flags = 0;
    if ((memid = shmget (key,0,flags)) == -1) {
-      ems_rep_c( "NBS_CREATE_SECTION_SECNOTFOUND",
+      emsRep( "NBS_CREATE_SECTION_SECNOTFOUND",
                  "Section not found", status );
       }
    else if ((int)(retadr[0] = NBS_MLIST_FIND (memid,status)) != -1 )
@@ -1564,7 +1572,7 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 
 /* Attach to the shared memory segment.	*/
    else if ((int)(retadr[0] = shmat (memid,(char*)0,0)) == -1) {
-      ems_rep_c( "NBS_MAP_SECTION_ERRMAP",
+      emsRep( "NBS_MAP_SECTION_ERRMAP",
                  "Error mapping global memory section", status );
       }
 
@@ -1629,7 +1637,8 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 *     {enter_changes_here}
 *-
 */
-int NBS_UNMAP_SECTION ( RW_POINTER(start), int section_size, W_INTEGER(status) )
+void
+NBS_UNMAP_SECTION ( RW_POINTER(start), int section_size, W_INTEGER(status) )
 {
   GENPTR_POINTER(start)
   GENPTR_INTEGER(status)
@@ -1781,14 +1790,15 @@ NBS_MLIST_UNMAP ((char *) start,status);
 *     {enter_changes_here}
 *-
 */
+void
 NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
                        int d_offset,int add)
 {
 
 /* External function declarations   */
 
-   extern int	NBS_RELOCATE_ITEM();
-   extern int	NBS_RELOCATE_POINTERS();
+   extern void	NBS_RELOCATE_ITEM();
+   extern void	NBS_RELOCATE_POINTERS();
 
 /* Start of code */
 
@@ -1865,6 +1875,7 @@ NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
 *     {enter_changes_here}
 *-
 */
+void
 NBS_RELOCATE_ITEM (item_id id,int i_offset,int fbs_offset,int d_offset,int add)
 {
 
@@ -2045,10 +2056,6 @@ char *F77_EXTERNAL_NAME(nbs_strimp) ( char *out, RW_CHARACTER(in),
   GENPTR_CHARACTER(in)
 #endif
 
-/* External function declarations	*/
-
-/*   extern int strlen(); */
-
 /* Local variable declarations	*/
 
    int		length;
@@ -2141,9 +2148,11 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
 
 /* Local variable declarations	*/
 
+#ifdef c_string
    int		length;
    int		in_ptr;
    int	     	out_ptr;
+#endif
 
 /* Start of code */
 
@@ -2165,7 +2174,7 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
       out[out_ptr++] = '\0';
 
 #else
-   cnf_expn( in, maxchar, out, out_length );
+   cnfExpn( in, maxchar, out, out_length );
 
 #endif
 
@@ -2244,10 +2253,7 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
 void NBS_MLIST_EXITHANDLER ()
 {
 /* Local variable declarations	*/
-  static         first = YES;
-  int            found = NO;
   int            lstatus = SAI__OK;
-  mapping_id     mapping;
 
   /* Keep reducing the mapping list until it reaches zero size */
 
@@ -2319,7 +2325,7 @@ void NBS_MLIST_EXITHANDLER ()
 void NBS_MLIST_ADD ( int creator, int memid, char *addr, int *status )
 {
 /* Local variable declarations	*/
-  static         first = YES;
+  static int     first = YES;
   int            found = NO;
   mapping_id     mapping;
 
@@ -2336,10 +2342,14 @@ if ( nbs_gl_mlist )
   }
 else if ( first )
   {
-#ifdef use_on_exit
-  on_exit( NBS_MLIST_EXITHANDLER, NULL );
-#else
+#if HAVE_ATEXIT
   atexit( NBS_MLIST_EXITHANDLER );
+#else
+#  if HAVE_ON_EXIT
+  on_exit( NBS_MLIST_EXITHANDLER, NULL );
+#  else
+#    error "no way to register exit handler"
+#  endif
 #endif
   first = NO;
   }
@@ -2347,7 +2357,7 @@ else if ( first )
 if ( found )
   {
   *status = NBS__IMPOSSIBLE;
-  ems_rep_c( "NBS_MLIST_ADD_IMPOS",
+  emsRep( "NBS_MLIST_ADD_IMPOS",
              "Section already exists, internal NBS error", status );
   }
 else
@@ -2356,7 +2366,7 @@ else
   if ( mapping == NIL )
     {
     *status = NBS__INITALLOCFAILED;
-    ems_rep_c( "NBS_MLIST_ADD_ALLOCFAIL",
+    emsRep( "NBS_MLIST_ADD_ALLOCFAIL",
                "Memory allocation failure", status );
     }
   else
@@ -2421,7 +2431,7 @@ char * NBS_MLIST_FIND ( int memid, int *status )
 
   int              found = NO;
   char             *addr = (char *)-1;
-  mapping_id       mapping;
+  mapping_id       mapping = NIL;
 
 if ( nbs_gl_mlist )
   {
@@ -2494,11 +2504,6 @@ return addr;
 void NBS_MLIST_UNMAP ( char *addr, int *status )
 {
 
-/* External function declarations   */
-
-   extern int     shmdt();
-   extern int     shmctl();
-
 /* Local variable declarations	*/
 
   int               found = NO;
@@ -2542,7 +2547,7 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
   else
     {
     *status = NBS__SECTIONNOTFOUND;
-    ems_rep_c( "NBS_MLIST_UNMAP_SECNOTFOUND",
+    emsRep( "NBS_MLIST_UNMAP_SECNOTFOUND",
                "No global section mapped at this address", status );
     }
 }
@@ -2611,9 +2616,12 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *-
 */
 
-#ifndef vax
-#include <sys/time.h>
-#include <sys/types.h>
+#if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+#endif
+
+#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
 #endif
 
 void NBS_SLEEPMS ( int msecs )
