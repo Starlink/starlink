@@ -105,7 +105,7 @@
       INTEGER STATUS             ! Global status
  
 *  External References:
-      <TYPE> VAL_DTO<R>          ! Double to <TYPE> conversion
+      <TYPE> VAL_DTO<T>          ! Double to <TYPE> conversion
  
 *  Local Variables:
       CHARACTER * ( 26 ) CDEF    ! Dynamic default

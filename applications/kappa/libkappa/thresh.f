@@ -422,6 +422,8 @@
 
          END IF
 
+      END IF
+
 *  If there may have been bad values substituted, set the bad-pixel
 *  flag.
       IF ( COMP .NE. 'QUALITY' )
