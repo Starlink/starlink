@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Astrotcl.C,v 1.5 1998/10/28 17:36:12 abrighto Exp $"
+ * "@(#) $Id: Astrotcl.C,v 1.6 1999/03/11 20:58:40 abrighto Exp $"
  *
  * Astrotcl.C - Initialize Astrotcl package
  * 
@@ -8,7 +8,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  21 Nov 97  Created
  */
-static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.5 1998/10/28 17:36:12 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.6 1999/03/11 20:58:40 abrighto Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -46,7 +46,7 @@ static int astrotcl_cmd(ClientData, Tcl_Interp* interp, int argc, char** argv)
 extern "C"
 int Astrotcl_Init(Tcl_Interp* interp)  
 {
-    static initialized = 0;
+    static int initialized = 0;
     if (initialized++)
 	return TCL_OK;
 

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroCatalog.C,v 1.35 1998/09/25 21:33:36 abrighto Exp $
+ * $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59:14 abrighto Exp $
  *
  * AstroCatalog.C - method definitions for class AstroCatalog
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: AstroCatalog.C,v 1.35 1998/09/25 21:33:36 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59:14 abrighto Exp $";
 
 
 #include <sys/types.h>
@@ -853,7 +853,7 @@ int AstroCatalog::CatalogSearch(
  */
 void AstroCatalog::newTempFile()
 {
-    static count = 0;		// used to make a unique file name
+    static int count = 0;		// used to make a unique file name
 
     if (!tmpfile_ || strncmp(tmpfile_, "/tmp/cat", 8) == 0) {
 	// set default temp file for holding preview data

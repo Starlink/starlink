@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: QueryResult.C,v 1.21 1998/09/23 19:12:56 abrighto Exp $
+ * $Id: QueryResult.C,v 1.22 1999/03/11 20:59:15 abrighto Exp $
  *
  * QueryResult.C - method definitions for class QueryResult
  *
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  07 Nov 95  Created
  */
-static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.21 1998/09/23 19:12:56 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.22 1999/03/11 20:59:15 abrighto Exp $";
 
 
 #include <stdio.h>
@@ -139,7 +139,7 @@ int QueryResult::circularSearch(
     int mag_col = inputColIndex("mag");
 
     // get array of col indexed for search columns
-    const maxcols = 255;
+    const int maxcols = 255;
     if ((n = q.numSearchCols()) > maxcols)
 	return error("too many search columns");
     int search_cols[maxcols];

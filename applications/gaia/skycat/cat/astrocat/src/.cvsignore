@@ -1,4 +1,5 @@
 .objs
+CatalogInfo.C-
 CatalogInfo.C.save
 LocalCatalog.C-
 LocalCatalog.C.tmp

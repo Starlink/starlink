@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: FloatImageData.C,v 1.8 1998/07/28 21:23:46 abrighto Exp $" 
+ * "@(#) $Id: FloatImageData.C,v 1.9 1999/03/19 20:10:08 abrighto Exp $" 
  *
  * FloatImageData.C - member functions for class FloatImageData
  *

@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePan.tcl,v 1.20 1998/10/28 17:42:29 abrighto Exp $"
+# "@(#) $Id: RtdImagePan.tcl,v 1.21 1999/03/19 20:09:39 abrighto Exp $"
 #
 # RtdImagePan.tcl - itcl widget managing the RtdImage panning window
 # 
@@ -180,6 +180,7 @@ itcl::class rtd::RtdImagePan {
 	    $target_canvas_ xview moveto [expr $x1/($panImageWidth_-1)]
 	    $target_canvas_ yview moveto [expr $y1/($panImageHeight_-1)]
 	    $target_image_ pan update
+	    $itk_option(-target_image) maybe_center
 	} 
 	return 0
     }

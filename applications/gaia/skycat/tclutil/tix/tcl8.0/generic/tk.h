@@ -7,11 +7,12 @@
  * Copyright (c) 1989-1994 The Regents of the University of California.
  * Copyright (c) 1994 The Australian National University.
  * Copyright (c) 1994-1997 Sun Microsystems, Inc.
+ * Copyright (c) 1998-1999 Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tk.h 1.211 97/11/20 12:44:45
+ * RCS: @(#) $Id: tk.h,v 1.2 1999/03/11 21:02:23 abrighto Exp $
  */
 
 #ifndef _TK
@@ -23,9 +24,11 @@
  *
  * README
  * unix/configure.in
- * win/makefile.bc	(Not for patch release updates)
- * win/makefile.vc	(Not for patch release updates)
- * library/tk.tcl
+ * win/makefile.bc
+ * win/makefile.vc
+ * win/README
+ * mac/README
+ * library/tk.tcl	(Not for patch release updates)
  *
  * The release level should be  0 for alpha, 1 for beta, and 2 for
  * final/patch.  The release serial value is the number that follows the
@@ -41,10 +44,10 @@
 #define TK_MAJOR_VERSION   8
 #define TK_MINOR_VERSION   0
 #define TK_RELEASE_LEVEL   2
-#define TK_RELEASE_SERIAL  3
+#define TK_RELEASE_SERIAL  5
 
 #define TK_VERSION "8.0"
-#define TK_PATCH_LEVEL "8.0.3"
+#define TK_PATCH_LEVEL "8.0.5"
 
 /* 
  * A special definition used to allow this header file to be included 
@@ -415,11 +418,14 @@ typedef struct Tk_GeomMgr {
 #define VirtualEvent	    (LASTEvent)
 #define ActivateNotify	    (LASTEvent + 1)
 #define DeactivateNotify    (LASTEvent + 2)
-#define TK_LASTEVENT	    (LASTEvent + 3)
+#define MouseWheelEvent     (LASTEvent + 3)
+#define TK_LASTEVENT	    (LASTEvent + 4)
 
-#define VirtualEventMask    (1L << 30)
+#define MouseWheelMask	    (1L << 28)
+
 #define ActivateMask	    (1L << 29)
-#define TK_LASTEVENT	    (LASTEvent + 3)
+#define VirtualEventMask    (1L << 30)
+#define TK_LASTEVENT	    (LASTEvent + 4)
 
 
 /*
@@ -666,10 +672,13 @@ typedef struct Tk_Item  {
 					 * pixel drawn in item.  Item area
 					 * includes x1 and y1 but not x2
 					 * and y2. */
+    struct Tk_Item *prevPtr;		/* Previous in display list of all
+					 * items in this canvas. Later items
+					 * in list are drawn just below earlier
+					 * ones. */
     int   reserved1;			/* This padding is for compatibility */
     char *reserved2;			/* with Jan Nijtmans dash patch */
     int   reserved3;
-    char *reserved4;
 
     /*
      *------------------------------------------------------------------
@@ -1008,13 +1017,11 @@ struct Tk_PhotoImageFormat {
 #define Tk_DoWhenIdle		Tcl_DoWhenIdle
 #define Tk_Sleep		Tcl_Sleep
 
-/* Additional stuff that has moved to Tcl: */
-
-#define Tk_AfterCmd		Tcl_AfterCmd
 #define Tk_EventuallyFree	Tcl_EventuallyFree
 #define Tk_FreeProc		Tcl_FreeProc
 #define Tk_Preserve		Tcl_Preserve
 #define Tk_Release		Tcl_Release
+#define Tk_FileeventCmd		Tcl_FileEventCmd
 
 /*
  *--------------------------------------------------------------
@@ -1456,10 +1463,9 @@ EXTERN void		Tk_UpdatePointer _ANSI_ARGS_((Tk_Window tkwin,
  * Tcl commands exported by Tk:
  */
 
-EXTERN int		Tk_AfterCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-EXTERN int		Tk_BellCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
+EXTERN int		Tk_BellObjCmd _ANSI_ARGS_((ClientData clientData,
+			    Tcl_Interp *interp, int objc,
+			    Tcl_Obj *CONST objv[]));
 EXTERN int		Tk_BindCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
 EXTERN int		Tk_BindtagsCmd _ANSI_ARGS_((ClientData clientData,
@@ -1474,15 +1480,11 @@ EXTERN int		Tk_ClipboardCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
 EXTERN int              Tk_ChooseColorCmd _ANSI_ARGS_((ClientData clientData,
                             Tcl_Interp *interp, int argc, char **argv));
-EXTERN int              Tk_ChooseFontCmd _ANSI_ARGS_((ClientData clientData,
-                            Tcl_Interp *interp, int argc, char **argv));
 EXTERN int		Tk_DestroyCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
 EXTERN int		Tk_EntryCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
 EXTERN int		Tk_EventCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-EXTERN int		Tk_FileeventCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
 EXTERN int		Tk_FrameCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));

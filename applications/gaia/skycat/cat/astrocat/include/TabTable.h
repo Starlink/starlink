@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TabTable.h,v 1.14 1998/09/23 19:12:40 abrighto Exp $
+ * $Id: TabTable.h,v 1.15 1999/03/22 21:41:06 abrighto Exp $
  *
  * TabTable.h - class definitions for accessing values from a char buffer
  * 	        in the format of table, such as the result of a database query,
@@ -120,11 +120,12 @@ public:
     virtual int clear();
 
     // fill the table from the given buffer in tab table format
-    virtual int init(const char* buf, int maxRows = 0);
+    virtual int init(const char* buf, int maxRows = 0, int owner = 0);
 
     // fill the table from the given buffer in tab table format, with headings
     // specified separately
-    virtual int init(int numCols, char** colNames, const char* buf, int maxRows = 0);
+    virtual int init(int numCols, char** colNames, const char* buf, 
+		     int maxRows = 0, int owner = 0);
 
     // access to row,column values
     // set the parameter value and return 0 on success

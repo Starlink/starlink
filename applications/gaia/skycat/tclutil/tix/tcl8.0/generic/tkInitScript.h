@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkInitScript.h 1.3 97/08/11 19:12:28
+ * RCS: @(#) $Id: tkInitScript.h,v 1.2 1999/03/11 21:02:24 abrighto Exp $
  */
 
 /*

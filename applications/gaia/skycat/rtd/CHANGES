@@ -4,6 +4,49 @@ CHANGES to the RTD Sources
 This file contains a list of changes to the RTD software and user
 interface. The latest changes are at the top.
 
+
+---------------  22.03.99 released rtd-2.19.25 ----------------------------
+
+* Fixed socket error check in rtdrmt/src/rtdRemote.c.
+
+* Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.
+
+* Changed "quit" method in Rtd.tcl to use "delete object $this"
+  instead of "destroy $w_" and "exit", so that class destructors are
+  called as expected.
+
+* RtdImageSpectrum.tcl, RtdImageCut.tcl: removed "global" declaration
+  for BLT vectors, since it caused a crash in tcl8.0.5/blt2.4g
+  (something to do with variable traces).
+
+* ImageData.C: flip(): fixed an "off by one" bug that caused the wrong
+  coordinates to be displayed for pixels when the image was rotated
+  and/or flipped at zoom 1.
+
+* RtdImageZoomView.tcl: corrected the location of the square in the
+  center of the zoom window (was off by one at zoom 1).
+
+* Merged in changes from Peter W. Draper (Starlink) to support 16 and
+  24 bit color.
+
+* Added minor fix to pan window to center the target image if needed.
+
+* Change min/max colors to 0/256 in RtdImageColors.tcl when using a 
+  read-only colormap.
+
+* Fixed the colormap shift method so that it takes the current ITT
+  into account.
+
+* Added replacements for calls to memset in class LookupTable and
+  ImageData when dealing with ulong instead of byte.
+
+* class ImageDisplay: made putpixel() inline and removed unnecessary
+  check, to improve performance. Also fixed the "clear()" method to
+  work with ulongs instead of bytes (for truecolor support).
+
+* Added code to RtdImageColors.tcl to update the color ramp when
+  changing colormap files or itts in truecolor mode.
+
 ---------------  28.12.98 released rtd-2.19.24 ----------------------------
 
 * Rebuild tclIndex file whenever configure is run, since Tcl8 version

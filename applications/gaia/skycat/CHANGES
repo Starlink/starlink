@@ -7,6 +7,39 @@ and user interface. The latest changes are at the top.
 See also the CHANGES files in the tclutil, astrotcl, rtd, cat and
 skycat directories for changes specific to those packages.
 
+---------------  22.03.99 released skycat-2.4 ---------------------
+
+* Tested with SuSE-Linux-6.0 (gnulibc), TclPro-1.2, tcl8.0.5, the
+  egcs-1.1.1 compiler and fixed a number of bugs that turned up there.
+
+* The single binary skycat release is now created using Scriptics
+  TclPro-1.2 (tcl8.0.5). You can still create Tcl7.6 versions using
+  the older "ET" utility. The ET version does not work with tcl8.x.
+
+* Changed the GAIA binary release to use Scriptics TclPro to generate
+  a binary including all of the necessary scripts and extensions.  Now
+  "skycatgaia" is just a large binary. The release also includes a
+  large number of STARLINK and PPM binaries that are used to convert
+  between various image formats.  
+  (Note: skycatgaia is released as a separate package: see the skycat
+  ftp site: ftp://ftp.archive.eso.org/pub/skycat/README.html).
+
+* Added scrollbars to the catalog entry widget.
+
+* RTD remote interface: Fixed socket error check in
+  rtdrmt/src/rtdRemote.c.
+
+* Rtd: Coordinates/Zoom window: Fixed an "off by one" bug that caused
+  the wrong coordinates to be displayed for pixels when the image was
+  rotated and/or flipped at zoom 1.
+
+* Merged in changes from Peter W. Draper (Starlink) to support 16 and
+  24 bit color. Skycat now supports 16 and 24 bit color displays!
+  Thanks to Peter Draper (P.W.Draper@durham.ac.uk) for providing the
+  necessary changes!
+
+* Fixed a bug in the handling of local catalogs and "mmap" that could
+  cause a core dump in certain cases.
 
 ---------------  4.02.99 released skycat-2.3.2 ----------------------
 

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: EntryForm.tcl,v 1.9 1998/10/28 17:46:37 abrighto Exp $"
+# "@(#) $Id: EntryForm.tcl,v 1.10 1999/03/11 21:01:31 abrighto Exp $"
 #
 # EntryForm.tcl - Form dialog for entering data at given labels
 #
@@ -31,16 +31,26 @@ itcl::class util::EntryForm {
 	itk_component add title {
 	    label $w_.title -text $itk_option(-title)
 	}
-	pack $itk_component(title) -side top -fill x -expand 1 -pady 2m -padx 2m
+	pack $itk_component(title) -side top -fill x -pady 2m -padx 2m
+
+	# Canvas used to add a scrollbar
+	itk_component add canvas {
+	    CanvasWidget $w_.canvas
+	}
+	set canvas [$w_.canvas component canvas]
+	pack $w_.canvas -side top -fill both -expand 1 \
+	    -padx 1m -pady 1m -ipadx 1m -ipady 1m
 
 	# Frame containing entries.
 	itk_component add entries {
-	    set f [frame $w_.entries -bd 3 -relief groove]
+	    set f [frame $canvas.entries -bd 3 -relief groove]
 	}
-	pack $f -side top -fill both -expand 1 \
-	    -padx 1m -pady 1m -ipadx 1m -ipady 1m
-	blt::table $f
+
+	$canvas create window 0 0 -window $f -anchor nw -tags frame
+	$canvas configure -background [$f cget -background]
+	bind $canvas <Configure> [code $this resize $f $canvas %w %h]
 	
+	blt::table $f
 	set row 0
 	foreach label $itk_option(-labels) {
 	    blt::table $f \
@@ -80,12 +90,26 @@ itcl::class util::EntryForm {
     }
 
    
+    # Called when the window is resized. the arguments are the
+    # entries frame (in the canvas), the canvas and the canvas
+    # width and hight.
+    
+    public method resize {frame canvas cw ch} {
+	set fh [winfo height $frame]
+	if {$fh < $ch} {
+	    $canvas configure -height $fh
+	}
+	$canvas itemconfigure frame -width $cw -height $fh
+	$canvas configure -scrollregion "0 0 $cw $fh"
+    }
+
+
     # reset to the original values
     
     public method reset {} {
 	set row 0
 	foreach i $itk_option(-values) {
-	    set w $w_.entries.entry$row
+	    set w [component entries].entry$row
 	    $w delete 0 end
 	    $w insert end $i
 	    incr row

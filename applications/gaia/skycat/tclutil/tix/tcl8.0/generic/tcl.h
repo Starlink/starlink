@@ -7,11 +7,12 @@
  * Copyright (c) 1987-1994 The Regents of the University of California.
  * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  * Copyright (c) 1993-1996 Lucent Technologies.
+ * Copyright (c) 1998-1999 Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tcl.h 1.24 98/08/06 12:10:41
+ * RCS: @(#) $Id: tcl.h,v 1.2 1999/03/11 21:02:22 abrighto Exp $
  */
 
 #ifndef _TCL
@@ -26,6 +27,9 @@
  * unix/configure.in
  * win/makefile.bc	(only if major.minor changes, not patchlevel)
  * win/makefile.vc	(only if major.minor changes, not patchlevel)
+ * win/README
+ * win/README.binary
+ * mac/README
  *
  * The release level should be  0 for alpha, 1 for beta, and 2 for
  * final/patch.  The release serial value is the number that follows the
@@ -38,10 +42,10 @@
 #define TCL_MAJOR_VERSION   8
 #define TCL_MINOR_VERSION   0
 #define TCL_RELEASE_LEVEL   2
-#define TCL_RELEASE_SERIAL  3
+#define TCL_RELEASE_SERIAL  5
 
 #define TCL_VERSION	    "8.0"
-#define TCL_PATCH_LEVEL	    "8.0.3"
+#define TCL_PATCH_LEVEL	    "8.0.5"
 
 /*
  * The following definitions set up the proper options for Windows
@@ -67,6 +71,12 @@
 #   ifndef USE_PROTOTYPE
 #	define USE_PROTOTYPE 1
 #   endif
+
+/*
+ * Under Windows we need to call Tcl_Alloc in all cases to avoid competing
+ * C run-time library issues.
+ */
+
 #   ifndef USE_TCLALLOC
 #	define USE_TCLALLOC 1
 #   endif
@@ -173,7 +183,7 @@
 #  define DLLIMPORT
 #  define DLLEXPORT
 # else
-#  ifdef _MSC_VER
+#  if defined(_MSC_VER) || (defined(__GNUC__) && defined(__declspec))
 #   define DLLIMPORT __declspec(dllimport)
 #   define DLLEXPORT __declspec(dllexport)
 #  else
@@ -739,6 +749,14 @@ EXTERN void		Tcl_ValidateAllMemory _ANSI_ARGS_((char *file,
 
 #else
 
+/*
+ * If USE_TCLALLOC is true, then we need to call Tcl_Alloc instead of
+ * the native malloc/free.  The only time USE_TCLALLOC should not be
+ * true is when compiling the Tcl/Tk libraries on Unix systems.  In this
+ * case we can safely call the native malloc/free directly as a performance
+ * optimization.
+ */
+
 #  if USE_TCLALLOC
 #     define ckalloc(x) Tcl_Alloc(x)
 #     define ckfree(x) Tcl_Free(x)
@@ -1054,7 +1072,6 @@ EXTERN void		Tcl_AppendToObj _ANSI_ARGS_((Tcl_Obj *objPtr,
 			    char *bytes, int length));
 EXTERN void		Tcl_AppendStringsToObj _ANSI_ARGS_(
 			    TCL_VARARGS(Tcl_Obj *,interp));
-EXTERN int		Tcl_AppInit _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN Tcl_AsyncHandler	Tcl_AsyncCreate _ANSI_ARGS_((Tcl_AsyncProc *proc,
 			    ClientData clientData));
 EXTERN void		Tcl_AsyncDelete _ANSI_ARGS_((Tcl_AsyncHandler async));
@@ -1279,14 +1296,12 @@ EXTERN int		Tcl_GetCommandInfo _ANSI_ARGS_((Tcl_Interp *interp,
 			    char *cmdName, Tcl_CmdInfo *infoPtr));
 EXTERN char *		Tcl_GetCommandName _ANSI_ARGS_((Tcl_Interp *interp,
 			    Tcl_Command command));
-EXTERN char *		Tcl_GetCwd _ANSI_ARGS_((char *buf, int len));
 EXTERN int		Tcl_GetDouble _ANSI_ARGS_((Tcl_Interp *interp,
 			    char *string, double *doublePtr));
 EXTERN int		Tcl_GetDoubleFromObj _ANSI_ARGS_((
 			    Tcl_Interp *interp, Tcl_Obj *objPtr,
 			    double *doublePtr));
 EXTERN int		Tcl_GetErrno _ANSI_ARGS_((void));
-EXTERN int		Tcl_GetErrorLine _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN char *		Tcl_GetHostName _ANSI_ARGS_((void));
 EXTERN int		Tcl_GetIndexFromObj _ANSI_ARGS_((Tcl_Interp *interp,
 			    Tcl_Obj *objPtr, char **tablePtr, char *msg,
@@ -1306,8 +1321,6 @@ EXTERN Tcl_ObjType *	Tcl_GetObjType _ANSI_ARGS_((char *typeName));
 EXTERN int		Tcl_GetOpenFile _ANSI_ARGS_((Tcl_Interp *interp,
 			    char *string, int write, int checkUsage,
 			    ClientData *filePtr));
-EXTERN Tcl_Command	Tcl_GetOriginalCommand _ANSI_ARGS_((
-			    Tcl_Command command));
 EXTERN Tcl_PathType	Tcl_GetPathType _ANSI_ARGS_((char *path));
 EXTERN int		Tcl_Gets _ANSI_ARGS_((Tcl_Channel chan,
         		    Tcl_DString *dsPtr));
@@ -1426,7 +1439,6 @@ EXTERN void		Tcl_RegisterChannel _ANSI_ARGS_((Tcl_Interp *interp,
 EXTERN void		Tcl_RegisterObjType _ANSI_ARGS_((
 			    Tcl_ObjType *typePtr));
 EXTERN void		Tcl_Release _ANSI_ARGS_((ClientData clientData));
-EXTERN void		Tcl_RestartIdleTimer _ANSI_ARGS_((void));
 EXTERN void		Tcl_ResetResult _ANSI_ARGS_((Tcl_Interp *interp));
 #define Tcl_Return Tcl_SetResult
 EXTERN int		Tcl_ScanCountedElement _ANSI_ARGS_((CONST char *string,
@@ -1548,6 +1560,17 @@ EXTERN int		Tcl_Write _ANSI_ARGS_((Tcl_Channel chan,
 			    char *s, int slen));
 EXTERN void		Tcl_WrongNumArgs _ANSI_ARGS_((Tcl_Interp *interp,
 			    int objc, Tcl_Obj *CONST objv[], char *message));
+
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS
+
+/*
+ * Convenience declaration of Tcl_AppInit for backwards compatibility.
+ * This function is not *implemented* by the tcl library, so the storage
+ * class is neither DLLEXPORT nor DLLIMPORT
+ */
+
+EXTERN int             Tcl_AppInit _ANSI_ARGS_((Tcl_Interp *interp));
 
 #endif /* RESOURCE_INCLUDED */
 

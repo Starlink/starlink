@@ -5,6 +5,13 @@ This file contains a list of changes to the Astrotcl software.
 The latest changes are at the top.
 
 
+---------------  22.03.99 released astrotcl-1.2.4 -------------------------
+
+* Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.
+
+* compress: Moved some global declarations from gzip.h to gzip.c to
+  avoid linker warnings.
+
 ---------------  14.01.99 released astrotcl-1.2.3 -------------------------
 
 * Upgraded the cfitsio sources to version cfitsio2027 (includes ESO HIERARCH

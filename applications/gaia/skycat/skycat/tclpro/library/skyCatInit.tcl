@@ -1,10 +1,8 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: skyCatInit.tcl,v 1.1 1998/10/30 18:20:52 abrighto Exp $"
+# "@(#) $Id: skyCatInit.tcl,v 1.2 1999/03/16 21:17:35 abrighto Exp $"
 #
-# skyCatInit.tcl - one time initialization for skycat application
-#
-# This script creates a single Tcl source file out of all of the
-# Tcl libraries for use with ET.
+# skyCatInit.tcl - This script generates a scriptics prowrap config 
+#                file on the stdout.
 #
 # who             when       what
 # --------------  ---------  ----------------------------------------

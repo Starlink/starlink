@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ColorMapInfo.C,v 1.4 1997/11/19 21:48:44 abrighto Exp $"
+ * "@(#) $Id: ColorMapInfo.C,v 1.5 1999/03/19 20:09:48 abrighto Exp $"
  *
  * ColorMapInfo.C - member routines for class ColorMapInfo
  * 
@@ -13,7 +13,7 @@
  * Peter W. Draper 14/07/98  Changed interpolate to get last colorcell 
  *                           (so pure white/black is available in principle).
  */
-static const char* const rcsId="@(#) $Id: ColorMapInfo.C,v 1.4 1997/11/19 21:48:44 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ColorMapInfo.C,v 1.5 1999/03/19 20:09:48 abrighto Exp $";
 
 
 #include <string.h>

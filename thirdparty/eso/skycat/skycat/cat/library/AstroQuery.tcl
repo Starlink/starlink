@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroQuery.tcl,v 1.16 1998/11/20 14:19:35 abrighto Exp $
+# @(#) $Id: AstroQuery.tcl,v 1.17 1999/03/11 20:59:31 abrighto Exp $
 #
 # AstroQuery.tcl - widget for searching astronomical catalogs.
 #
@@ -645,23 +645,23 @@ itcl::class cat::AstroQuery {
 
     public method set_pos_width_height {list} {
 	set n [llength $list]
-	if {[$astrocat iswcs] && $n == 5} {
+	if {[$astrocat iswcs] || $n == 5} {
 	    # using world coords 
 	    lassign $list ra dec equinox width height name
 	    $ra_ config -value $ra
 	    $dec_ config -value $dec
 	    $equinox_ config -value $equinox
-	    $width_ config -value [format "%.2f" $width]
-	    $height_ config -value [format "%.2f" $height]
+	    catch {$width_ config -value [format "%.2f" $width]}
+	    catch {$height_ config -value [format "%.2f" $height]}
 	    $name_ config -value $name
-	} elseif {[$astrocat ispix] && $n == 4}  {
+	} elseif {[$astrocat ispix] || $n == 4}  {
 	    # using image coords
 	    lassign $list x y width height
 	    $x_ config -value $x
 	    $y_ config -value $y
 	    $equinox_ config -value ""
-	    $width_ config -value [format "%.2f" $width]
-	    $height_ config -value [format "%.2f" $height]
+	    catch {$width_ config -value [format "%.2f" $width]}
+	    catch {$height_ config -value [format "%.2f" $height]}
 	}
     }
 

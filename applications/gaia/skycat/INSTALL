@@ -23,17 +23,25 @@ For Tcl7.6:
 	BLT2.1     - BLT toolkit, graphs and other widgets 
 	tclX7.6.0  - Extended Tcl
 
-Or for Tcl8.0 (or newer, TclPro also supported - see below):
-	Tcl8.0.3   - Tcl Shell
-	Tk8.0.3    - Tk X Toolkit
+Or for Tcl8.0 (or newer, TclPro also supported):
+	Tcl8.0.5   - Tcl Shell  (*** NOTE: bug in init.tcl, see below)
+	Tk8.0.5    - Tk X Toolkit
 	itcl3.0.1  - [Incr Tcl]
-	BLT2.4f    - BLT toolkit, graphs and other widgets 
-	tclX8.0.3  - Extended Tcl
+	BLT2.4g    - BLT toolkit, graphs and other widgets 
+	tclX8.0.4  - Extended Tcl
 
 These packages are available from the TCL archives. 
   See: http://www.tcltk.com/ for Itcl.
   and  http://www.NeoSoft.com/tcl/ for TclX and other contributed Tcl software
   and: http://www.scriptics.com/tclpro/ for Tcl8.x, TclPro and the latest releases.
+
+------------------------------------------------------------------------
+Note: There is a bug in the tcl8.0.5 init.tcl script (also in
+tclpro-1.2).  See bug# 1481 at www.scriptics.com for a description and
+patch. This bug causes problems generating the tclIndex files for
+Itcl classes. The skycat configure scripts do this automatically, so 
+you will need this patch if you are using tcl-8.0.5.
+------------------------------------------------------------------------
 
 You can install the standard Tcl/Tk packages anywhere, however it is
 easiest to install them all in the same directory (using the same

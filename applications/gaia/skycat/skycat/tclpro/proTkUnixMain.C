@@ -14,6 +14,8 @@
  * Allan Brighton  29 Oct 98  Modified from Tclpro-1.0, changed C to C++
  */
 
+/* declare command procedures here */
+extern "C" {
 #include "tk.h"
 #include "itcl.h"
 #include "itk.h"
@@ -25,9 +27,6 @@
 
 #define RCFILE "~/.itkshrc"
 
-/* declare command procedures here */
-extern "C" {
-#include "tk.h"
 extern int Blt_Init(Tcl_Interp *interp);
 extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);

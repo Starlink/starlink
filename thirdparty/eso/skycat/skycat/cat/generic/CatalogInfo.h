@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: CatalogInfo.h,v 1.21 1998/07/28 21:22:37 abrighto Exp $
+ * $Id: CatalogInfo.h,v 1.22 1999/03/11 20:59:04 abrighto Exp $
  *
  * CatalogInfo.h - class holding catalog config information
  *                 from the Catalog.cfg file
@@ -54,9 +54,6 @@ private:
     // Lines ending with backslash are continued on the next line
     static istream& getline(istream& f, char* buf, int size);
 
-    // update the old catalog entry with the info from the new one (recursive)
-    static int reload(CatalogInfoEntry* oldEntry, CatalogInfoEntry* newEntry);
-
     // Remove the given entry from the given catalog directory list. 
     static void remove(CatalogInfoEntry* e, CatalogInfoEntry* dir);
 
@@ -67,15 +64,18 @@ public:
     // load the default catalog config file
     static int load();
 
+    // load a catalog config file
+    static int load(CatalogInfoEntry*);
+
     // reload the default catalog config file after it has been edited by hand
     // and update recursively any already opened catalog directories
     static int reload();
 
+    // update the old catalog entry with the info from the new one (recursive)
+    static int reload(CatalogInfoEntry* oldEntry, CatalogInfoEntry* newEntry);
+
     // load config file info from the given stream (filename for error reporting)
     static CatalogInfoEntry* load(istream&, const char* filename = "internal");
-
-    // load a catalog config file
-    static int load(CatalogInfoEntry*);
 
     // return a pointer to the catalog config file entry for the given catalog
     static CatalogInfoEntry* lookup(const char* catalogName);

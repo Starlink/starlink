@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: Rtd.tcl,v 1.58 1998/12/28 22:15:02 abrighto Exp $"
+# "@(#) $Id: Rtd.tcl,v 1.59 1999/03/11 21:00:22 abrighto Exp $"
 #
 # Rtd.tcl - real-time image display application class
 # See man page Rtd(n) for a complete description.
@@ -429,8 +429,8 @@ itcl::class rtd::Rtd {
     # quit the application
 
     public method quit {} {
-	destroy .
-	exit
+	delete object $this
+	# destroy $w_
     }
 
     # attach the current camera

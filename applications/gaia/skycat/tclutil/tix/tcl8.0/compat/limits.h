@@ -13,7 +13,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) limits.h 1.8 96/07/08 18:00:13
+ * RCS: @(#) $Id: limits.h,v 1.2 1999/03/11 21:01:59 abrighto Exp $
  */
 
 #define LONG_MIN		0x80000000

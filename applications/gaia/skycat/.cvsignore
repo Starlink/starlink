@@ -17,6 +17,7 @@ Makefile-
 Makefile.save
 README.bin
 arc
+changedFiles
 config.cache
 config.debug.gaia
 config.log

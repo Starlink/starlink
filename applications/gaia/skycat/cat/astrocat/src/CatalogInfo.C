@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: CatalogInfo.C,v 1.31 1998/10/12 10:37:22 abrighto Exp $
+ * $Id: CatalogInfo.C,v 1.33 1999/03/15 12:30:04 abrighto Exp $
  *
  * CatalogInfo.C - method definitions for class CatalogInfo, CatalogInfoEntry
  *
@@ -126,7 +126,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  29 Oct 95  Created
  */
-static const char* const rcsId="@(#) $Id: CatalogInfo.C,v 1.31 1998/10/12 10:37:22 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: CatalogInfo.C,v 1.33 1999/03/15 12:30:04 abrighto Exp $";
 
 
 #include <string.h>
@@ -174,7 +174,7 @@ static const char* config_info_ =
 CatalogInfoEntry* CatalogInfo::entries_ = NULL;
 
 // initial undefined column index value
-static const undef_col_ = -99;
+static const int undef_col_ = -99;
 
 /*
  * strip leading and trailing white space from s and
@@ -507,8 +507,10 @@ int CatalogInfo::reload(CatalogInfoEntry* oldEntry, CatalogInfoEntry* newEntry)
 		// and restore the catalog directory link, if any, since 
 		// the update is recursive and follows directory links.
 		CatalogInfoEntry* link = e->link();
+		CatalogInfoEntry* next = e->next();
 		*e = *ne;  // (see CatalogInfoEntry::operator=, no links copied)
 		e->link(link);
+		e->next(next);
 		found++;
 		break;
 	    }

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Tclutil.C,v 1.6 1999/02/02 21:51:02 abrighto Exp $"
+ * "@(#) $Id: Tclutil.C,v 1.7 1999/03/11 21:01:36 abrighto Exp $"
  *
  * Tclutil.C - Initialize Tclutil package
  * 
@@ -8,7 +8,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  21 Nov 97  Created
  */
-static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.6 1999/02/02 21:51:02 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.7 1999/03/11 21:01:36 abrighto Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -47,7 +47,7 @@ static int tclutil_cmd(ClientData, Tcl_Interp* interp, int argc, char** argv)
 extern "C"
 int Tclutil_Init(Tcl_Interp* interp)  
 {
-    static initialized = 0;
+    static int initialized = 0;
     if (initialized++)
 	return TCL_OK;
 

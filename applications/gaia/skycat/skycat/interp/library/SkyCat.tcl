@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: SkyCat.tcl,v 1.71 1999/02/02 21:42:03 abrighto Exp $"
+# "@(#) $Id: SkyCat.tcl,v 1.73 1999/03/12 18:42:20 abrighto Exp $"
 #
 # SkyCat.tcl - image display application class with catalog extensions
 #
@@ -129,6 +129,10 @@ itcl::class skycat::SkyCat {
 	    cat::AstroCat::open_catalog_window $itk_option(-catalog) \
 		[code $image_] ::skycat::SkySearch $itk_option(-debug) $w_
 	}
+	
+	# check the main window size to make sure it is not too large
+	bind SkyCat::resize <Configure> [code $this resize %w %h]
+	bindtags $w_ SkyCat::resize
     }
 
 
@@ -140,8 +144,10 @@ itcl::class skycat::SkyCat {
 	
 	# kill any catalog windows referring to this image window
 	foreach w [cat::AstroCat::instances all] {
-	    if {"[$w cget -id]" == "[code $image_]"} {
-		destroy $w
+	    catch {
+		if {"[$w cget -id]" == "[code $image_]"} {
+		    destroy $w
+		}
 	    }
 	}
 
@@ -184,6 +190,19 @@ itcl::class skycat::SkyCat {
 	}
 	catch {wm geometry $w_ [gets $fd]}
 	::close $fd
+    }
+
+
+    # Called when the main window is resized:
+    # Check the geometry to make sure it fits on the screen.
+
+    protected method resize {w h} {
+	bind SkyCat::resize <Configure> { }
+	set sw [winfo screenwidth $w_]
+	set sh [winfo screenheight $w_]
+	if {$w > $sw || $h > $sh} {
+	    wm geometry $w_ "[min $w $sw]x[min $h $sh]+0+0"
+	}
     }
 
 

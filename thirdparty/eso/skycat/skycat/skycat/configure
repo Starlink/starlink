@@ -984,8 +984,39 @@ fi
 # -----------------------------------------------------------------------
 echo $ac_n "checking TclPro ""... $ac_c" 1>&6
 echo "configure:987: checking TclPro " >&5
-file=`which prowrap`
-if test -f "$file" ; then
+file=""
+# Extract the first word of "prowrap", so it can be a program name with args.
+set dummy prowrap; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:992: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_path_file'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  case "$file" in
+  /*)
+  ac_cv_path_file="$file" # Let the user override the test with a path.
+  ;;
+  *)
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  for ac_dir in $PATH; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_path_file="$ac_dir/$ac_word"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  ;;
+esac
+fi
+file="$ac_cv_path_file"
+if test -n "$file"; then
+  echo "$ac_t""$file" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+if test "$file" != "" ; then
 	f=`dirname $file`
 	TCLPRO_MACH_DIR=`dirname $f`
 	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`
@@ -1018,7 +1049,7 @@ CXX_INCLUDE=$TCLUTIL_CXX_INCLUDE
 #
 # -----------------------------------------------------------------------
 echo $ac_n "checking static C++ library ""... $ac_c" 1>&6
-echo "configure:1022: checking static C++ library " >&5
+echo "configure:1053: checking static C++ library " >&5
 tmpfile=/tmp/tmp$$.C
 tmp1=/tmp/tmp1$$
 tmp2=/tmp/tmp2$$
@@ -1688,6 +1719,7 @@ s%@ITCL_VERSION@%$ITCL_VERSION%g
 s%@ITK_VERSION@%$ITK_VERSION%g
 s%@TCLX_VERSION@%$TCLX_VERSION%g
 s%@BLT_VERSION@%$BLT_VERSION%g
+s%@file@%$file%g
 s%@TCLPRO_MACH_DIR@%$TCLPRO_MACH_DIR%g
 s%@TCLPRO_DIR@%$TCLPRO_DIR%g
 s%@CXX_INCLUDE@%$CXX_INCLUDE%g

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tk3d.h 1.1 96/11/04 13:52:59
+ * RCS: @(#) $Id: tk3d.h,v 1.2 1999/03/11 21:02:23 abrighto Exp $
  */
 
 #ifndef _TK3D

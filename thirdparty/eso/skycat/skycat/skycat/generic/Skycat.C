@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Skycat.C,v 1.17 1999/02/02 21:50:48 abrighto Exp $"
+ * "@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 abrighto Exp $"
  *
  * Skycat.C - Initialize Skycat package
  * 
@@ -11,7 +11,7 @@
  *                 10/03/98  Added optional args to constructor to allow derived
  *                           class to specify its own configuration options.
  */
-static const char* const rcsId="@(#) $Id: Skycat.C,v 1.17 1999/02/02 21:50:48 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 abrighto Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -47,7 +47,7 @@ static const double pi_ = 3.14159265358979323846;
 static const double rad_ = pi_/180.;
 
 // size of buffer to use to hold tcl commands to evaluate
-static const eval_buf_size_ = 4*1024;
+static const int eval_buf_size_ = 4*1024;
 
 /* 
  * declare a table of skycat image subcommands and the methods that 

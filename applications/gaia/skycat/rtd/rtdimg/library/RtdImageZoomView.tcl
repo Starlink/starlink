@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageZoomView.tcl,v 1.18 1998/10/28 17:42:30 abrighto Exp $"
+# "@(#) $Id: RtdImageZoomView.tcl,v 1.19 1999/03/15 22:45:16 abrighto Exp $"
 #
 # RtdImageZoomView.tcl - itcl widget managing the RtdImage zoom window
 #
@@ -175,7 +175,7 @@ itcl::class rtd::RtdImageZoomView {
 	if {$target_scale_ <= 1} {
 	    # box around pixel
 	    set x0  [expr $itk_option(-width)/2.0]
-	    set y0 [expr $itk_option(-height)/2.0-$f]
+	    set y0 [expr $itk_option(-height)/2.0]
 	} else {
 	    # box part of pixel
 	    set x0  [expr $itk_option(-width)/2.0-$f/2.0]

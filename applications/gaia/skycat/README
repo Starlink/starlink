@@ -16,14 +16,17 @@ The following URLs may also be of interest:
 Skycat home page:
 	http://archive.eso.org/skycat/
 
+Sources and binaries:
+	ftp://ftp.archive.eso.org/pub/skycat/README.html
+
+GAIA Extensions (added by Peter Draper <P.W.Draper@durham.ac.uk>):
+	ftp://ftp.archive.eso.org/pub/skycat/plugins/README.html
+
 Postscript, PDF, and FrameMaker Documentation:
 	ftp://ftp.archive.eso.org/pub/skycat/doc/
 
 HTML Docs:
 	http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
-
-Sources and binaries:
-	ftp://ftp.archive.eso.org/pub/skycat/
 
 ------------------------------------------------------------------
 Contact: Allan Brighton (abrighto@eso.org) 

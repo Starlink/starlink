@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: SkyCatCtrl.tcl,v 1.37 1998/12/14 17:32:07 abrighto Exp $
+# $Id: SkyCatCtrl.tcl,v 1.38 1999/03/22 21:42:15 abrighto Exp $
 #
 # SkyCatCtrl.tcl - image display widget with catalog extensions
 #
@@ -210,6 +210,7 @@ itcl::class skycat::SkyCatCtrl {
 	RtdImage::load_fits_
 	update_title
 	apply_history $itk_option(-file)
+	component colorramp update_colors
     }
     
 

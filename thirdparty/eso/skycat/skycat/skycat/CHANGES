@@ -5,6 +5,13 @@ This file contains a list of changes to the Skycat software and user
 interface. The latest changes are at the top.
 
 
+---------------  22.03.99 released skycat-2.4 ---------------------
+
+* Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.
+
+* Removed -visual option in skycat.tcl, since truecolor visuals 
+  are now supported.
+
 ---------------  14.01.99 released skycat-2.3.2 ---------------------
 
 * Removed redundant calls to Rtd_Init and Cat_Init in tkAppInit.C

@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageColors.tcl,v 1.21 1998/10/28 17:42:27 abrighto Exp $"
+# "@(#) $Id: RtdImageColors.tcl,v 1.23 1999/03/22 21:41:31 abrighto Exp $"
 #
 # RtdImageColors.tcl - itcl widget for managing colormap for an rtdimage
 # 
@@ -90,6 +90,12 @@ itcl::class rtd::RtdImageColors {
 	# if we are using a private colormap, ignore -max_colors
 	if {[$image_ cmap isprivate]} {
 	    set itk_option(-max_colors) 128
+	}
+
+	# if we are using a read-only colormap, ignore -min and max colors
+	if {[$image_ cmap isreadonly]} {
+	    set itk_option(-min_free) 0
+	    set itk_option(-max_colors) 256
 	}
 
 	# LabelEntryScale widget displaying the number of allocated colors
@@ -260,6 +266,11 @@ itcl::class rtd::RtdImageColors {
     
     public method set_cmap {cmap} {
 	$image_ cmap file $cmap
+	
+	# if the colormap is read-only, we need to regenerate the color ramp
+	if {[$image_ cmap isreadonly]} {
+	    catch {$itk_option(-image) component colorramp update_colors}
+	}
     }
 
  
@@ -267,6 +278,11 @@ itcl::class rtd::RtdImageColors {
     
     public method set_itt {itt} {
 	$image_ itt file $itt
+
+	# if the colormap is read-only, we need to regenerate the color ramp
+	if {[$image_ cmap isreadonly]} {
+	    catch {$itk_option(-image) component colorramp update_colors}
+	}
     }
  
 

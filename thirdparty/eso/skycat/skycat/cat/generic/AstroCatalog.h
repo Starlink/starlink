@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroCatalog.h,v 1.15 1998/09/23 19:12:40 abrighto Exp $
+ * $Id: AstroCatalog.h,v 1.16 1999/03/19 20:09:17 abrighto Exp $
  *
  * AstroCatalog.h - class definitions for accessing astronomical
  *                  catalogs

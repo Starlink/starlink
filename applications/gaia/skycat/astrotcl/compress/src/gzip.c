@@ -64,6 +64,12 @@
 #include "local_press.h"
 #include "gzip.h"
 
+/* allan: 15-03-99: moved globals to here from gzip.h to avoid linker warning */
+unsigned short	*dbuf;		/* buffer for distances, see trees.c	*/
+unsigned char	*swindow;	/* Sliding window and suffix table (unlzw) */
+unsigned short	*tab_prefix;	/* prefix code (see unlzw.c)		*/
+
+
 unsigned	inptr;		/* Index of next byte to be processed 	*/
 				/* in inbuf.				*/
 unsigned	insize;		/* valid bytes in inbuf 		*/

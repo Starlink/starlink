@@ -48,12 +48,14 @@
 
 #define DIST_BUFSIZE 0x8000 	/* buffer for distances, see trees.c	*/
 
-unsigned short	*dbuf;		/* buffer for distances, see trees.c	*/
-unsigned char	*swindow;	/* Sliding window and suffix table (unlzw) */
+
+/* allan: 15-03-99: added "extern" to avoid linker warning */
+extern unsigned short	*dbuf;		/* buffer for distances, see trees.c	*/
+extern unsigned char	*swindow;	/* Sliding window and suffix table (unlzw) */
 #define tab_suffix swindow
 #define tab_prefix sprev	/* hash link (see deflate.c) 		*/
 #define head (sprev+WSIZE)	/* hash head (see deflate.c) 		*/
-unsigned short	*tab_prefix;	/* prefix code (see unlzw.c)		*/
+extern unsigned short	*tab_prefix;	/* prefix code (see unlzw.c)		*/
 
 extern unsigned insize;		/* valid bytes in inbuf */
 extern unsigned inptr;  /* index of next byte to be processed in inbuf */

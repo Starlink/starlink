@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.3 1998/03/02 21:14:31 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.4 1999/03/11 21:01:26 abrighto Exp $"
 
 # ------------------------------------------------------------------------
 # 	Makefile
@@ -22,7 +22,7 @@ all: $(TARGET)
 # generate a C file that creates all of the bitmap files
 # in this directory and installs them for Tk access by basename
 $(TARGET): $(FILES) bitmaps.tcl
-	itclsh2.2 bitmaps.tcl > $(TARGET)
+	tclsh@TCL_VERSION@ bitmaps.tcl > $(TARGET)
 
 All: 
 	cd ..; $(MAKE)

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: rtdRemote.c,v 1.4 1997/04/11 10:51:09 abrighto Exp $"
+ * "@(#) $Id: rtdRemote.c,v 1.6 1999/03/19 20:09:56 abrighto Exp $"
  *
  * rtdRemote.c - client library for remote control of an RtdImage
  *               widget, communicates over a socket with a remote
@@ -14,7 +14,7 @@
  * Allan Brighton  05/03/96  Created
  * Peter W. Draper 09/02/98  Removed sys_errlist and replaced with strerror.
  */
-static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.4 1997/04/11 10:51:09 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.6 1999/03/19 20:09:56 abrighto Exp $";
 
 
 
@@ -303,7 +303,7 @@ int rtdRemoteConnect(int pid, char* host, int port)
  */
 void rtdRemoteDisconnect()
 {
-    if (info.socket > 0) {
+    if (info.socket != -1) {
 	close(info.socket);
 	info.socket = -1;
     }
@@ -421,7 +421,7 @@ int rtdRemoteGetResult(int sock, char** result)
  */
 int rtdRemoteSend(char* cmd, char** result)
 {
-    if (info.socket <= 0) 
+    if (info.socket == -1) 
 	return error("no connection to the image display: rtdRemoteConnect was not called");
     
     if (rtdRemoteSendOnly(cmd) != 0)

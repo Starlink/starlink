@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: FitsIO.C,v 1.22 1998/12/29 20:19:13 abrighto Exp $" 
+ * "@(#) $Id: FitsIO.C,v 1.23 1999/03/22 21:40:56 abrighto Exp $" 
  *
  * FitsIO.C - method definitions for class FitsIO, for operating on
  *            Fits files.
@@ -14,7 +14,7 @@
  *                           for bitpix=16 for H_COMPRESS.
  *                 12/03/98  Initialize WCS in constructor.
  */
-static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.22 1998/12/29 20:19:13 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.23 1999/03/22 21:40:56 abrighto Exp $";
 
 
 #include <string.h>
@@ -140,7 +140,7 @@ const char* FitsIO::check_compress(const char* filename, char* buf, int bufsz, i
 				   int decompress_flag, int bitpix)
 {
     // check the file extension for recognized compression types
-    const char* suffix = fileSuffix(filename);
+    const char* suffix = fileSuffix(fileSuffix(filename)); // fits.gz => .gz
     Compress::CompressType ctype = Compress::NO_COMPRESS;
     if (strcmp(suffix, "hfits") == 0) {
 	if (bitpix && abs(bitpix) != 16) {

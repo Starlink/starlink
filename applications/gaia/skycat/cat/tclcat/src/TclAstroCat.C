@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclAstroCat.C,v 1.46 1999/02/02 21:49:39 abrighto Exp $
+ * $Id: TclAstroCat.C,v 1.48 1999/03/15 12:30:49 abrighto Exp $
  *
  * TclAstroCat.C - method definitions for class TclAstroCat
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.46 1999/02/02 21:49:39 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.48 1999/03/15 12:30:49 abrighto Exp $";
 
 
 #include <string.h>

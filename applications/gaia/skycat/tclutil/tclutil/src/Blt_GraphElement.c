@@ -38,8 +38,8 @@ int Blt_GraphElement(
 
     /* Allocate space for the new vectors, if needed */
     if (xVecPtr->arraySize < nbytes) {
-	xArray = (double *)malloc(nbytes);
-	yArray = (double *)malloc(nbytes);
+	xArray = (double *)Tcl_Alloc(nbytes);
+	yArray = (double *)Tcl_Alloc(nbytes);
 	if (xArray == NULL || yArray == NULL) {
 	    fprintf(stderr, "malloc: out of memory\n");
 	    return TCL_ERROR;
@@ -71,8 +71,8 @@ int Blt_GraphElement(
     xVec.numValues = yVec.numValues = xVec.arraySize = yVec.arraySize = num;
 
     /* Allocate space for the new vectors */
-    xVec.valueArr = (double *)malloc(nbytes);
-    yVec.valueArr = (double *)malloc(nbytes);
+    xVec.valueArr = (double *)Tcl_Alloc(nbytes);
+    yVec.valueArr = (double *)Tcl_Alloc(nbytes);
     if (xVec.valueArr == NULL || yVec.valueArr == NULL) {
 	fprintf(stderr, "malloc: out of memory\n");
         return TCL_ERROR;

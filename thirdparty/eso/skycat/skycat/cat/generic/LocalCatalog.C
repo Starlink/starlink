@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: LocalCatalog.C,v 1.8 1997/10/18 23:03:44 abrighto Exp $
+ * $Id: LocalCatalog.C,v 1.9 1999/03/22 21:41:12 abrighto Exp $
  *
  * LocalCatalog.C - method definitions for class LocalCatalog
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  11 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: LocalCatalog.C,v 1.8 1997/10/18 23:03:44 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: LocalCatalog.C,v 1.9 1999/03/22 21:41:12 abrighto Exp $";
 
 
 #include <sys/types.h>
@@ -132,11 +132,20 @@ int LocalCatalog::getInfo()
     Mem m(filename_);
     if (m.status() != 0)
 	return 1;
-    if (info_.init((char*)m.ptr()) != 0)
+    
+    // make a null terminated copy, which will be managed by info_
+    int size = m.size() + 1;
+    char* data = (char*)malloc(size);
+    if (!data)
+	return fmt_error("can't allocate %d bytes for %s", size, filename_);
+    strncpy(data, (char*)m.ptr(), size-1);
+    data[size-1] = '\0';
+
+    if (info_.init(data, 0, 1) != 0)
 	return 1;
 
     // this will extract any catalog config info from the file's header
-    info_.entry(entry_, (char*)m.ptr());
+    info_.entry(entry_, data);
     return 0;
 }
 

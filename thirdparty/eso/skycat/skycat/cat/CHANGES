@@ -4,6 +4,16 @@ CHANGES to the "catlib" Catalog Interface Library
 This file contains a list of changes to the "catlib" libraries. 
 The latest changes are at the top.
 
+---------------  22.03.99 released catlib-3.3.2 ----------------------
+
+* Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.
+
+* Fixed a potential bug in the handling of local catalogs. "mmap" was
+  being used to read the catalog file and the resulting string was not
+  always null terminated. Now class LocalCatalog makes a null
+  terminated copy and passes it to class TabTable, which reuses it
+  instead of making a copy of it again.
+
 ---------------  28.12.98 released catlib-3.3.1 ----------------------
 
 * Rebuild tclIndex file whenever configure is run, since Tcl8 version

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.5 1999/02/02 21:50:55 abrighto Exp $
+# $Id: Makefile.in,v 1.7 1999/03/18 13:06:53 abrighto Exp $
 #
 # Makefile.in - Makefile to create the "skycat" binary
 #               (uses Scriptics Tclpro to create one binary with tcl scripts loaded)
@@ -58,7 +58,7 @@ TCLPRO_WRAP  = $(TCLPRO_MACH_DIR)/bin/prowrap
 TCL_LIB      = $(TCLPRO_LIBDIR)/libtcl8.0.a
 TK_LIB       = $(TCLPRO_LIBDIR)/libtk8.0.a
 ITCL_LIB     = $(TCLPRO_LIBDIR)/libitcl30s.a $(TCLPRO_LIBDIR)/libitk30s.a
-TCLX_LIB     = @TCLX_LIB_SPEC_STATIC@
+TCLX_LIB     = $(TCLPRO_LIBDIR)/libtclx8.0.5.a
 BLT_LIB      = @BLT_LIB_SPEC_STATIC@
 
 # config file used to hold arguments to prowrap
@@ -132,11 +132,8 @@ BLT_LIBRARY=@BLT_LIBRARY@
 all: $(PROG) 
 
 # build the tclpro wrapped skycat executable
-# Note: the -uses option is only a trick to avoid an error message when loading 
-# shared library plugins at run time.
 $(PROG): $(WISH_INTERP) $(TCLPRO_CONFIG)
 	$(TCLPRO_WRAP) \
-		-uses wish-dynamic \
 		-executable $(WISH_INTERP) \
 		-out $(PROG) \
 		$(START_SCRIPT) \
@@ -147,6 +144,7 @@ $(WISH_INTERP): $(OBJECTS) $(TCL_LIBS) $(SKYCAT_LIB)
 	@echo "linking \"$(WISH_INTERP)\"..."
 	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) \
 	    -o $(WISH_INTERP) -L. $(LD_SEARCH_FLAGS) $(LIBRARIES)
+	strip $(WISH_INTERP)
 
 $(TCLPRO_CONFIG): FORCE
 	TCLUTIL_LIBRARY=$(TCLUTIL_LIBRARY); export TCLUTIL_LIBRARY; \

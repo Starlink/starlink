@@ -53,7 +53,8 @@ static int use_saolib=0;
 
 char *hgetc ();
 
-char val[30];
+/* allan: 15-03-99: added static */
+static char val[30];
 
 
 /* Set the length of the header string, if not terminated by NULL */

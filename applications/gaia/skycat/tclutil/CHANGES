@@ -6,6 +6,31 @@ The latest changes are at the top.
 
 ------------------------------------------------------------------------
 
+---------------  22.03.99 released tclutil-1.1.2 ------------------------
+
+* Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.
+
+* EntryForm.tcl: added scrollbars to make it easier to view many
+  entries.
+
+* Changed "quit" method in TopLevelWidget to use "delete object $this"
+  instead of "destroy $w_".
+
+* Removed lib -lieee from configure.in, since it caused problems with 
+  shared libraries later on in the gaia plugin.
+
+* error.C: removed "#include errno.h" to avoid problems with new
+  linux versions.
+
+* configure.in: removed -lieee library from configure script, since
+  it caused linking problems on glibc linux versions.
+
+* updated local copies of tcl headers for the local tix package
+  for tcl8.0.5.
+
+* Merged in changes from Peter W. Draper (Starlink) to support 16 and
+  24 bit color.
+
 ---------------  28.12.98 released tclutil-1.1.1 ------------------------
 
 * Minor change in udialog.tcl to avoid multiple error message problems.

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: TabTable.C,v 1.17 1999/01/14 16:55:28 abrighto Exp $
+ * $Id: TabTable.C,v 1.19 1999/03/22 21:41:12 abrighto Exp $
  *
  * TabTable.C - method definitions for class TabTable
  *
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  08 Jan 96  Created
  */
-static const char* const rcsId="@(#) $Id: TabTable.C,v 1.17 1999/01/14 16:55:28 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TabTable.C,v 1.19 1999/03/22 21:41:12 abrighto Exp $";
 
 
 #include <stdio.h>
@@ -117,13 +117,20 @@ TabTable::~TabTable()
 /*
  * Fill the table from the given buffer in tab table format.
  * If maxRows is nonzero, only upto that many rows are taken from buf.
+ * If owner is nonzero, this class will take control of the memory
+ * for buf, otherwise it makes a copy. The data string in buf should be 
+ * null terminated.
  */
-int TabTable::init(const char* buf, int maxRows)
+int TabTable::init(const char* buf, int maxRows, int owner)
 {
     clear();			// erase any existing rows
 
+    if (owner)
+	buf_ = (char*)buf;
+    else
+	buf_ = strdup(buf);
+
     // scan the table to set colNames, numRows, numCols and get start of data
-    buf_ = strdup(buf);
     char* line = NULL;
     if (scanTable(maxRows, line) != 0)
 	return ERROR;
@@ -136,11 +143,15 @@ int TabTable::init(const char* buf, int maxRows)
  * Initialize the table from the data buffer (without heading lines).
  * The first two args specify the number column headings and their names.
  * If maxRows is nonzero, only upto that many rows are taken from buf.
+ * If owner is nonzero, this class will take control of the memory
+ * for buf, otherwise it makes a copy. The data string in buf should be 
+ * null terminated.
  */
-int TabTable::init(int numCols, char** colNames, const char* buf, int maxRows)
+int TabTable::init(int numCols, char** colNames, const char* buf, 
+		   int maxRows, int owner)
 {
     // count the data rows
-    char* nbuf = strdup(buf);
+    char* nbuf = (owner ? (char*)buf : strdup(buf));
 
     // (watch out for this: t.init(t.colNames()) (don't delete before using...))
     char** cnames = copyArray(numCols, colNames);
@@ -254,7 +265,7 @@ int TabTable::scanTable(int maxRows, char*& start)
  */
 int TabTable::fillTable(char* buf)
 {
-    if (numRows_ == 0 || numCols == 0) 
+    if (numRows_ == 0 || numCols_ == 0) 
 	return 0;  // empty table without a header
 
     table_ = new char*[numRows_*numCols_];

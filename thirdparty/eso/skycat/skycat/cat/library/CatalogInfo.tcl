@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: CatalogInfo.tcl,v 1.16 1998/10/30 18:16:52 abrighto Exp $"
+# "@(#) $Id: CatalogInfo.tcl,v 1.18 1999/03/15 12:30:12 abrighto Exp $"
 #
 # CatalogInfo.tcl - widget for browsing through a hierarchical list of catalogs
 #
@@ -454,8 +454,11 @@ itcl::class cat::CatalogInfo {
 	    }
 	}
 
-	# change the bitmap on $name tp show that it has been accessed
+	# change the bitmap on $name to show that it has been accessed
 	$hlist_ entryconfigure $path -image [tix getimage nsopenfold]
+	
+	# scroll so that the selected directory is at the top of the window
+	$hlist_ yview $path
     }
 
 
@@ -483,7 +486,8 @@ itcl::class cat::CatalogInfo {
 	if {[llength $children]} {
 	    # hide existing list
 	    foreach child $children {
-		$hlist_ hide entry $child
+		#$hlist_ hide entry $child
+		$hlist_ delete entry $child
 	    }
 	}
 

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroCat.tcl,v 1.54 1998/11/16 21:23:33 abrighto Exp $
+# @(#) $Id: AstroCat.tcl,v 1.56 1999/03/12 18:42:02 abrighto Exp $
 #
 # AstroCat.tcl - user interface class for viewing catalog info
 #
@@ -546,19 +546,6 @@ itcl::class cat::AstroCat {
     }
 
     
-    # quit the application (for standalone version)
-
-    public method quit {} {
-	if {$itk_option(-standalone)} {
-	    clear
-	    destroy $w_
-	    exit
-	} else {
-	    wm withdraw $w_
-	}
-    }
-
-
     # pop up a dialog to sort the list
 
     public method sort_dialog {} {
@@ -621,6 +608,11 @@ itcl::class cat::AstroCat {
 		-label $namesvr \
 		-command [code $this set_namesvr $namesvr] \
 		-variable $m
+	}
+
+	if {![info exists namesvr]} {
+	    error_dialog "No default name server found for astronomical objects"
+	    return
 	}
 
 	# set default name server

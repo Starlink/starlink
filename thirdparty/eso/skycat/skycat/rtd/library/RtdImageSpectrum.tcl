@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageSpectrum.tcl,v 1.23 1998/11/20 14:19:47 abrighto Exp $"
+# "@(#) $Id: RtdImageSpectrum.tcl,v 1.25 1999/03/15 12:31:12 abrighto Exp $"
 #
 # RtdImageSpectrum.tcl - itcl widget for displaying graph of image data values 
 #                        along a line
@@ -51,6 +51,7 @@ itcl::class rtd::RtdImageSpectrum {
 	$draw_ remove_notify_cmd $itk_option(-line_id)
 	$draw_ delete_object $itk_option(-line_id)
  	if {$tcl_version >= 8.0} {
+	    global $xVector_ $yVector_
 	    blt::vector destroy $xVector_ $yVector_
 	}
    }
@@ -83,11 +84,10 @@ itcl::class rtd::RtdImageSpectrum {
 
 	$graph_ yaxis configure -title {}
 
-	# blt2.4f vector names ust start with a letter, no dots...
+	# blt2.4f vector names must start with a letter, no dots...
 	# someone also changed the default symbol to circle. Why?
 	regsub -all {\.} v$graph_.xVector _ xVector_ 
 	regsub -all {\.} v$graph_.yVector _ yVector_ 
-	global $xVector_ $yVector_
 	if {$tcl_version >= 8.0} {
 	    $graph_ legend config -hide 1
 	    if {![info exists $xVector_]} {
@@ -95,6 +95,7 @@ itcl::class rtd::RtdImageSpectrum {
 	    }
 	    set symbol {}
 	} else {
+	    global $xVector_ $yVector_
 	    $graph_ legend config -mapped 0
 	    if {![info exists $xVector_]} {
 		blt::vector $xVector_ $yVector_
@@ -141,7 +142,10 @@ itcl::class rtd::RtdImageSpectrum {
     # display x, y values at cursor position
 
     protected method dispXY {x y} {
-	global $yVector_
+	global ::tcl_version
+	if {$tcl_version < 8.0} {
+	    global $yVector_
+	}
 	if {![$graph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
 	    return
 	}
@@ -187,6 +191,7 @@ itcl::class rtd::RtdImageSpectrum {
     # It updates the graph to show the image values along the line.
 
     public method notify_cmd {{op update}} {
+	global ::tcl_version
 	if {"$op" == "delete"} {
 	    destroy $w_
 	    return 0
@@ -194,7 +199,9 @@ itcl::class rtd::RtdImageSpectrum {
 	lassign [$canvas_ coords $itk_option(-line_id)] x0 y0 x1 y1
 
 	# plot the distribution of pixel values
-	global $xVector_ $yVector_
+	if {$tcl_version < 8.0} {
+	    global $xVector_ $yVector_
+	}
 	if {[catch {set numValues_ [$image_ spectrum $graph_ elem $x0 $y0 $x1 $y1 canvas \
 		$xVector_ $yVector_]}]} {
 	    return 0

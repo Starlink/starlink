@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.37 1999/02/02 21:41:54 abrighto Exp $
+# $Id: configure.in,v 1.38 1999/03/16 21:17:31 abrighto Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Skycat modules.
@@ -166,9 +166,9 @@ fi
 # -----------------------------------------------------------------------
 # Check for the Tclpro package from Scriptics
 # -----------------------------------------------------------------------
-AC_MSG_CHECKING([TclPro ])
-file=`which prowrap`
-if test -f "$file" ; then
+file=""
+AC_PATH_PROG(file,  prowrap)
+if test "$file" != "" ; then
 	f=`dirname $file`
 	TCLPRO_MACH_DIR=`dirname $f`
 	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.15 1998/11/16 21:27:30 abrighto Exp $
+# $Id: configure.in,v 1.17 1999/03/11 21:50:17 abrighto Exp $
 #
 # This file is used with GNU autoconf to generate a configure script
 #
@@ -139,7 +139,13 @@ getConfig() {
    /vlt/tcltk/lib/itcl \
    /vlt/tcltk/lib \
    /usr/local/lib/itcl \
-   /usr/local/lib"
+   /usr/local/lib \
+   /usr/lib/itcl \
+   /usr/lib \
+   /usr/X11R6/lib \
+   /usr/X11/lib \
+   /usr/lib/tcltk/tclX7.6.0/lib \
+   /usr/lib/tcltk/itcl2.2p2/lib/itcl"
   for dir in $places; do
     if test -r $dir/${name} ; then
       TCL_CONFIG_DIR=$dir
@@ -511,14 +517,6 @@ AC_CHECK_LIB(socket, main, [LIBS="$LIBS -lsocket"])
 AC_CHECK_LIB(resolv, main, [LIBS="$LIBS -lresolv"])
 AC_CHECK_LIB(w, main, [LIBS="$LIBS -lw"])
 AC_CHECK_LIB(dl, main, [LIBS="$LIBS -ldl"])
-
-# -----------------------------------------------------------------------
-# 	The library libieee.a is a Linux deal. I don't know what effect 
-#	it will have.
-# -----------------------------------------------------------------------
-AC_CHECK_LIB(ieee, main, [LIBS="$LIBS -lieee"])
-AC_CHECK_LIB(m, main, [LIBS="$LIBS -lm"])
-AC_SUBST(LIBS)
 
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) socket (sys/socket.h) prototypes

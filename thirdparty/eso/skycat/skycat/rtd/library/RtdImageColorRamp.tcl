@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageColorRamp.tcl,v 1.11 1998/10/28 17:42:27 abrighto Exp $"
+# "@(#) $Id: RtdImageColorRamp.tcl,v 1.13 1999/03/22 21:41:31 abrighto Exp $"
 #
 # RtdImageColorRamp.tcl - itcl widget used to display contents of the 
 #                         colormap for an RtdImage in a generated image
@@ -59,7 +59,7 @@ itcl::class rtd::RtdImageColorRamp {
 	# add bindings for rotating the colormap
 	# (these will change later when more functions are available)
 	# Note: need shift of single color ? (see saoimage)
-	bind $canvas_ <1> [code $this mark %x]
+	bind $canvas_ <1> [code $this mark_for_shift %x]
 	bind $canvas_ <2> [code $this mark %x]
         bind $canvas_ <3> [code $this reset_colors]
 	bind $canvas_ <B1-Motion> [code $this shift_colors %x]
@@ -83,6 +83,16 @@ itcl::class rtd::RtdImageColorRamp {
 
     protected method mark {pos} {
 	set mark_ $pos
+    }
+
+    # mark the given position for later reference and set 
+    # things up for a shift operation.
+    # (The dummy rotate op causes an internal copy between cmap and itt
+    #  that initializes the shift from the current itt.)
+
+    protected method mark_for_shift {pos} {
+	set mark_ $pos
+	$image_ cmap rotate 0
     }
 
     
