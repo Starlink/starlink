@@ -11,8 +11,7 @@ lib_LTLIBRARIES = convert_idl.la
 ## Declare the sources for the library.
 convert_idl_la_SOURCES = \
  $(PRIVATE_INCLUDES) \
- $(C_ROUTINES) \
- $(F_ROUTINES)
+ $(C_ROUTINES)
 
 convert_idl_la_LIBADD = $(LIBADD) `ndf_link`
 
@@ -28,7 +27,8 @@ C_ROUTINES = read_ndf.c write_ndf.c probe_ndf.c crehds.c hds2idl.c \
  getcomp.c checkarr.c IDL_Load.c hds.c dat.c
 
 ##  Dummy Fortran routine to make sure we can handle the Fortran in the
-##  dependency libraries.
+##  dependency libraries. Removed as got duplicate main reports in OS X.
+##  Should revisit this question sometime.
 F_ROUTINES = dummy.f
 
 ## In order to get the correct name for the dlopened library we need to let
