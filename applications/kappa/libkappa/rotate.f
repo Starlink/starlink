@@ -20,13 +20,13 @@
 *        The global status.
 
 *  Description:
-*     This rotates a 2-dimensional array stored in an NDF data
+*     This routine rotates a 2-dimensional array stored in an NDF data
 *     structure by an arbitrary angle.  The origin of the rotation is
-*     the centre of the array.  The output array dimensions just
-*     accommodate the rotated array.  Output pixels can be generated
-*     from the input array by one of two methods: nearest-neighbour
-*     substitution or by bi-linear interpolation.  The latter is
-*     slower, but gives better results.  Output pixels not
+*     around the point (0,0) in pixel co-ordinates.  The output array 
+*     dimensions just accommodate the rotated array.  Output pixels can 
+*     be generated from the input array by one of two methods: 
+*     nearest-neighbour substitution or by bi-linear interpolation.  The 
+*     latter is slower, but gives better results. Output pixels not 
 *     corresponding to input pixels take the bad value.
 
 *  Usage:
@@ -35,7 +35,7 @@
 *  ADAM Parameters:
 *     ANGLE  = _REAL (Read)
 *        Number of clockwise degrees by which the data array is to be
-*        rotated.  It must lie between 0 and 360 degrees.  The suggested
+*        rotated.  It must lie between -360 and 360 degrees.  The suggested
 *        default is the current value.
 *     IN = NDF (Read)
 *        NDF structure containing the 2-dimensional array to be rotated.
@@ -49,23 +49,21 @@
 *        This parameter is only accessed when NNMETH is FALSE and ANGLE
 *        is not a multiple of 90 degrees.  Strictly, the quality values
 *        are undefined by the bi-linear interpolation and hence cannot
-*        be propagated.  However, QUALITY = TRUE offers an
-*        approximation to the quality array by propagating the
-*        nearest-neighbour quality to the output NDF. [FALSE]
+*        be propagated.  However, QUALITY = TRUE offers an approximation 
+*        to the quality array by propagating the nearest-neighbour quality 
+*        to the output NDF. [FALSE]
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
 *        of the NDF supplied for parameter IN to be used instead. [!]
 *     VARIANCE = _LOGICAL (Read)
-*        VARIANCE = TRUE instructs that variance values weight the
-*        pixels in the bi-linear interpolation and that output variance
-*        is derived from the neighbouring pixels' variance values,
-*        otherwise the data values are given equal weight.  This
-*        parameter is ignored if ANGLE is a multiple of 90 degrees or
-*        NNMETH=TRUE; in these cases the variance array is merely
-*        propagated.  The run-time default is TRUE if the input NDF has
-*        a VARIANCE component, and FALSE otherwise.  Note that
-*        following this operation the errors are no longer independent.
-*        []
+*        A TRUE value causes variance values to be used as weights for
+*        the pixel values in bi-linear interpolation, and also causes 
+*        output variances to be created. This parameter is ignored if 
+*        ANGLE is a multiple of 90 degrees or NNMETH=TRUE; in these cases 
+*        the variance array is merely propagated.  The run-time default 
+*        is TRUE if the input NDF has a VARIANCE component, and FALSE 
+*        otherwise.  Note that following this operation the errors are 
+*        no longer independent. []
 
 *  Notes:
 *     -  Bad pixels are ignored in the bi-linear interpolation.  If all
@@ -74,27 +72,28 @@
 *  Examples:
 *     rotate ns ew 90
 *        This rotates the array components in the NDF called ns by 90
-*        degrees clockwise, and stores the result in the NDF called
-*        ew.  The former x axis becomes the new y axis, and the former
-*        y axis becomes the new x axis.  The former y-axis arrays are
-*        also reversed in the process.
+*        degrees clockwise around pixel co-ordinates [0,0] and stores the 
+*        result in the NDF called ew.  The former x axis becomes the new
+*        y axis, and the former y axis becomes the new x axis. The former 
+*        y-axis arrays are also reversed in the process.
 *     rotate angle=180 out=sn in=ns
 *        This rotates the array components in the NDF called ns by 180
-*        degrees clockwise, and stores the result in the NDF called
-*        sn.  The axis arrays are flipped in the output NDF.
+*        degrees clockwise around the pixel co-ordinates [0,0], and stores 
+*        the result in the NDF called sn.  The axis arrays are flipped in 
+*        the output NDF.
 *     rotate f1 f1r 37.2 novariance
 *        This rotates the array components in the NDF called f1 by 37.2
-*        degrees clockwise, and stores the result in the NDF called
-*        f1r.  The original axis information is lost.  Bi-linear
-*        interpolation is used without variance information.  No
-*        quality or variance information is propagated.
+*        degrees clockwise around the pixel co-ordinates [0,0], and stores 
+*        the result in the NDF called f1r.  The original axis information 
+*        is lost.  Bi-linear interpolation is used without variance 
+*        information.  No quality or variance information is propagated.
 *     rotate f1 f1r 106 nnmeth title="Reoriented features map"
 *        This rotates the array components in the NDF called f1 by 106
-*        degrees clockwise, and stores the result in the NDF called
-*        f1r.  The original axis information is lost.  The resultant
-*        array components, all of which are propagated, are calculated
-*        by the nearest-neighbour method.  The title of the output
-*        NDF is "Reoriented features map".
+*        degrees clockwise around the pixel co-ordinates [0,0], and stores 
+*        the result in the NDF called f1r.  The original axis information 
+*        is lost.  The resultant array components, all of which are 
+*        propagated, are calculated by the nearest-neighbour method. The 
+*        title of the output NDF is "Reoriented features map".
 
 *  Related Applications:
 *     KAPPA: FLIP, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
@@ -124,6 +123,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -132,6 +132,13 @@
 *     12-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component. Fixed bug which
 *        prevented 2-D slices from n-D cubes being processed.
+*     30-JUN-1999 (TDCA):
+*        Allowed rotation around an arbitary point.
+*     02-JUL-1999 (TDCA):
+*        Removed PIVOT parameter, and restricted rotation to around
+*        point (0,0) in pixel co-ordinates.
+*     17-AUG-1999 (DSB):
+*        Tidied up the above TDCA changes.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -197,9 +204,12 @@
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Total number of dimensions
+      INTEGER IDIMS( 2 )         ! Dimensions of input array
       INTEGER IERR               ! Location of first conversion error
+      INTEGER ISHIFT( 2 )        ! Extra shift required to align pivot points
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output array
       INTEGER LONG               ! Longer dimension of input array
+      INTEGER M( 4 )             ! MATRIX indices
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFO               ! Output NDF identifier
       INTEGER NDFS               ! NDF section identifier
@@ -208,6 +218,7 @@
       LOGICAL NRAFLG             ! Non-right angle rotation requested?
       INTEGER NUMRA              ! Number of clockwise right angles to
                                  ! be applied
+      INTEGER ODIMS( 2 )         ! Dimensions of output array
       INTEGER PNTRI( 2 )         ! Pointer to mapped input arrays
       INTEGER PNTRO( 2 )         ! Pointer to mapped output arrays
       LOGICAL QUAL               ! Propagate quality?
@@ -237,8 +248,10 @@
 *  =============================
 
 *  Get the number of clockwise degrees rotation to be applied
-      CALL PAR_GDR0R( 'ANGLE', 90.0, VAL__SMLR, 360.0 - VAL__SMLR,
-     :                .FALSE., ANGLE, STATUS )
+      CALL PAR_GDR0R( 'ANGLE', 90.0, -360.0 + VAL__SMLR, 
+     :                360.0 - VAL__SMLR, .FALSE., ANGLE, STATUS )
+
+      IF( ANGLE .LT. 0.0 ) ANGLE = 360 + ANGLE
 
 *  Look for the special cases.
 *  A simple 90-degree rotation...
@@ -290,12 +303,11 @@
          CALL KPS1_ROSIZ( DIMSI, ANGLE, DIMSO, STATUS )
 
 *  Compute the output bounds and dimensions.
-         DO I = 1, NDIM
-            LBNDO( SDIM( I ) ) = 1
-            UBNDO( SDIM( I ) ) = DIMSO( I )
-         END DO
-      ELSE
-
+          LBNDO( SDIM( 1 ) ) = 1
+          LBNDO( SDIM( 2 ) ) = 1
+          UBNDO( SDIM( 1 ) ) = DIMSO( 1 )
+          UBNDO( SDIM( 2 ) ) = DIMSO( 2 )
+       ELSE
 *  A rotation angle divisible by 90.0 degrees has been requested;
 *  proceed according to the set value of NUMRA.
          IF ( NUMRA .EQ. 2 ) THEN
@@ -398,13 +410,13 @@
 *  If so, then determine its numeric type and map the input and output
 *  arrays for access using this type.  The number of elements is the
 *  same for both.
-            IF ( THERE ) THEN      
+            IF ( THERE ) THEN
                CALL NDF_TYPE( NDFI, COMP( ICOMP ), TYPE, STATUS )
 
                CALL KPG1_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
-     :                       EL, STATUS )
+     :                        EL, STATUS )
                CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'WRITE', PNTRO,
-     :                       EL, STATUS )
+     :                        EL, STATUS )
 
 *  Call the appropriate routine to generate the output array using
 *  the nearest-neighbour method, depending on its numeric type.
@@ -540,9 +552,9 @@
 
 *  Map the quality arrays using the only valid type, unsigned byte.
             CALL KPG1_MAP( NDFI, 'Quality', '_UBYTE', 'Read', PNTRI,
-     :                    EL, STATUS )
+     :                     EL, STATUS )
             CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE', 'Write', PNTRO,
-     :                    EL, STATUS )
+     :                     EL, STATUS )
 
 *  Assign the QUALITY array using the nearest-neghbour technique.  This
 *  is an approximation to retain quality information.
@@ -590,14 +602,14 @@
                END IF
 
                CALL KPG1_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
-     :                       EL, STATUS )
+     :                        EL, STATUS )
 
                IF ( NUMRA .EQ. 2 ) THEN
                   CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'UPDATE',
-     :                          PNTRO, EL, STATUS )
+     :                           PNTRO, EL, STATUS )
                ELSE
                   CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'WRITE',
-     :                          PNTRO, EL, STATUS )
+     :                           PNTRO, EL, STATUS )
                END IF
 
 *  Rotation is through 180 degrees
@@ -1021,10 +1033,15 @@
       COSANG = DBLE( COS( ANGLE * DTOR ) )
       SINANG = DBLE( SIN( ANGLE * DTOR ) )
 
-      MATRIX( SDIM( 1 ) + IDIM*( SDIM( 1 ) - 1 ) ) = COSANG
-      MATRIX( SDIM( 1 ) + IDIM*( SDIM( 2 ) - 1 ) ) = -SINANG
-      MATRIX( SDIM( 2 ) + IDIM*( SDIM( 1 ) - 1 ) ) = SINANG
-      MATRIX( SDIM( 2 ) + IDIM*( SDIM( 2 ) - 1 ) ) = COSANG
+      M( 1 ) = SDIM( 1 ) + IDIM*( SDIM( 1 ) - 1 )
+      M( 2 ) = SDIM( 1 ) + IDIM*( SDIM( 2 ) - 1 )
+      M( 3 ) = SDIM( 2 ) + IDIM*( SDIM( 1 ) - 1 )
+      M( 4 ) = SDIM( 2 ) + IDIM*( SDIM( 2 ) - 1 )
+
+      MATRIX( M( 1 ) ) = COSANG
+      MATRIX( M( 2 ) ) = -SINANG
+      MATRIX( M( 3 ) ) = SINANG
+      MATRIX( M( 4 ) ) = COSANG
 
 *  Calculate the pixel coordinates on the significant axes at the centre of 
 *  the output image
@@ -1038,8 +1055,15 @@
       OFFSET( SDIM( 1 ) ) = OXC - IXC*COSANG - IYC*SINANG
       OFFSET( SDIM( 2 ) ) = OYC + IXC*SINANG - IYC*COSANG
 
+*  Calculate shift required to align old and new pivot points.
+      ISHIFT( SDIM( 1 ) ) = NINT( - OFFSET( SDIM( 1 ) ) )
+      ISHIFT( SDIM( 2 ) ) = NINT( - OFFSET( SDIM( 2 ) ) )
+
 *  Propagate the WCS component.
       CALL KPG1_ASPRP( IDIM, NDFI, NDFO, MATRIX, OFFSET, STATUS )
+
+*  Apply shift to align old and new pivot points.
+      CALL NDF_SHIFT( 2, ISHIFT, NDFO, STATUS )
 
   999 CONTINUE
 
