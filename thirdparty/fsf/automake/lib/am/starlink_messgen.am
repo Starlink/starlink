@@ -4,14 +4,16 @@
 ## This file contains material ADDITIONAL to FSF automake, for
 ## supporting the Starlink build system.
 
-# Compile messages for message file %MSG%
+# Compile messages for message file %MSG%.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
 %UFAC%_ERR: %MSG%
-	$(STARLINK)/bin/messgen -F %MSG%
+	@MESSGEN@ -F %MSG%
 %LFAC%_err: %MSG%
-	$(STARLINK)/bin/messgen -f %MSG%
+	@MESSGEN@ -f %MSG%
 %LFAC%_err.h: %MSG%
-	$(STARLINK)/bin/messgen -c %MSG%
+	@MESSGEN@ -c %MSG%
 fac_%CODE%_err: %MSG%
-	$(STARLINK)/bin/messgen -e %MSG%
+	@MESSGEN@ -e %MSG%
 
 
