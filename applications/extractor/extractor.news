@@ -3,7 +3,7 @@
  A minor update to the EXTRACTOR package with several significant
  changes:
 
-    o The version of SExtractor has been updated to version 2.1.6. 
+    o SExtractor has been updated to version 2.1.6. 
 
     o New parameters to control the measurement of "mean" object radii
       at configurable intensity levels have been added to the Starlink
@@ -13,7 +13,7 @@
  the SExtractor change log).
 
      o Version 2.1.6
-       - crowding-flag bug introduced in V2.1.5 fixed.
+       - Crowding-flag bug introduced in V2.1.5 fixed.
 
      o Version 2.1.5
         - Small inaccuracy in crowding-flag positioning fixed.

@@ -28,6 +28,9 @@ an astronomical image and build a catalogue listing them. It is based on the
 popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
+
+\newcommand{\sexversion}{2.1.6}
+
 % -----------------------------------------------------------------------------
 
 % +
@@ -567,12 +570,12 @@ by using the \xref{\CONVERT}{sun55}{abstract} package \latex{(see
 SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
 \htmladdnormallink{IRAF}{\IRAFURL} OIF.
 
-An unmodified version of \SExtractor\ (2.0.19) is also included in the
+An unmodified version of \SExtractor\ \sexversion\ is also included in the
 distribution of \EXTRACTOR.  You can find details of \SExtractor's
 operation, and how to configure it, in the
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
 as a Starlink Miscellaneous User Document, MUD/165\footnote{Note this
-document is still in draft consequently you should read this in
+document is still in draft, consequently you should read this in
 conjunction with the A\&AS paper.}) \dash\ you configure \EXTRACTOR\
 in much the same way, although with
 \htmlref{some restrictions}{implementation_notes}
@@ -594,18 +597,19 @@ The examples below assume you are running from the Unix shell but the commands
 and parameters are exactly the same from ICL.
 
 After normal Starlink startup, at the shell prompt, type:
-
+\begin{quote} \begin{verbatim}
+% extractor
+\end{verbatim} \end{quote}
+to initialise the package and then:
 \begin{quote} \begin{verbatim}
 % extract
 \end{verbatim} \end{quote}
-
-You will be prompted for the values of parameters CONFIG and IMAGE in turn:
-
+to run the program.  You will now be prompted for the values of parameters
+CONFIG and IMAGE in turn:
 \begin{quote} \begin{verbatim}
 CONFIG - Configuration file /'$EXTRACTOR_DIR/config/default.sex'/ >
 IMAGE - Input image /'image'/ >
 \end{verbatim} \end{quote}
-
 where CONFIG is the name of the `preferences' file and IMAGE is the name of
 the image file to be processed.
 
@@ -743,7 +747,7 @@ an appropriate extension. For example:
 \begin{quote} \begin{verbatim}
 % convert
 
-   CONVERT commands are now available -- (Version 1.1-1, 1998 June)
+   CONVERT commands are now available
 
    Defaults for automatic NDF conversion are set.
 
@@ -770,12 +774,9 @@ Either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH} or define an alias:
 \end{verbatim}\end{quote}
 then type:
 \begin{quote}
-\texttt{\% sex \textit{image} [-c \textit{configuration-file}]} \verb!\! \\
-\texttt{? [-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
+\texttt{\% sex \textit{image} [-c \textit{configuration-file}]} 
+\texttt{[-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
 \end{quote}
-(see the
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
-for details).
 
 Note that if the \texttt{-c} option is omitted, file \texttt{default.sex} in the
 current working directory will be used \dash\ if you want to use the installed
@@ -835,21 +836,26 @@ Starlink Software Support
 \section{Isophotal radii}
 
 \SExtractor\ can measure the areas of objects at $8$ optimally selected
-intensities. These intensities are consequently different for each
-object. Traditionally this has not been the case and isophotal
-areas/radii have been measured at fixed intervals above some
+intensity thresholds. These intensities are consequently different for
+each object. Traditionally this has not been the case and isophotal
+areas/radii have been measured at fixed magnitude intervals above some
 threshold. Consequently, for convenience and compatibility with
-existing data and analysis methods, the \EXTRACTOR\ and \SExtractor\
-programs have been extended to provide a flexible configuration scheme
-that allows this traditional behaviour to be recovered and extended.
+existing data and analysis methods, the \EXTRACTOR\ and Starlink
+\SExtractor\ programs have been extended to provide a flexible
+configuration scheme that allows this traditional behaviour to be
+recovered and extended.
 
 The configuration options that control what intensities are used for
-the isophotal radii estimates are \texttt{RAD\_TYPE} and 
-\texttt{RAD\_THRESH}. \texttt{RAD\_TYPE} can be either \texttt{SB} or
+the isophotal radii estimates are:
+\begin{itemize}
+  \item \texttt{RAD\_TYPE}
+  \item \texttt{RAD\_THRESH}
+\end{itemize}
+\texttt{RAD\_TYPE} can be either \texttt{SB} or
 \texttt{INT}, which indicate that the levels will be defined in terms
 of surface brightnesses or plain intensities, respectively.
 
-The \texttt{RAD\_THRESH} option can have up to three values qualifying
+The \texttt{RAD\_THRESH} option can have up to three qualifying
 values, depending on the value of \texttt{RAD\_TYPE}. If
 \texttt{RAD\_TYPE} is \texttt{SB} then you should enter a line
 consisting of:
@@ -858,14 +864,13 @@ consisting of:
 \end{quote}
 in your \texttt{default.sex} file. The value \texttt{step} being the
 required interval between levels, \texttt{start} being the value of
-the first level and \texttt{zp} the data zero point (all in magnitudes per
-square arcsecond). If only one value is given then the starting point
-is assumed to be the analysis threshold and the zero point is derived
-from the photometric value (\texttt{MAG\_ZEROPOINT}).
+the first level and \texttt{zp} the data zero point, all in magnitudes
+per square arcsecond. If only one value is given then the starting
+point is assumed to be the analysis threshold and the zero point is
+derived from the photometric value (\texttt{MAG\_ZEROPOINT}).
 
-If a \texttt{RAD\_THRESH} value is not given (and any of the catalogue
-parameters \texttt{RAD0} -- \texttt{RAD15} are requested) then a
-default step of $0.75$ magnitudes per square arcsec is used.
+If a \texttt{RAD\_THRESH} value is not given then a default step of
+$0.75$ magnitudes per square arcsec is used.
 
 If \texttt{RAD\_TYPE} is \texttt{INT} then the correct line format is:
 \begin{quote}
@@ -880,7 +885,7 @@ APM/PISA (see \xref{SUN/109}{sun109}{}) analysis thresholds are used:
 \begin{quote}
     $I_{i} = I_{t} * 2^{(i+2)},\ i = 2, 16$
 \end{quote}
-where $I_{i}$ = threshold for ith level, $I_{t}$ = measurement
+where $I_{i}$ = threshold for $i$th level, $I_{t}$ = measurement
 threshold. This gives approx $0.75$ magnitude steps ($2.5*log(2)$).
 
 The actual measurements are associated with the catalogue parameters,
@@ -902,7 +907,7 @@ its peak intensity down to the threshold.
  This is a minor update to the \EXTRACTOR\ package with several
  significant changes:
  \begin{itemize}
-   \item The version of \SExtractor\ has been updated to version 2.1.6. 
+   \item \SExtractor\ has been updated to version 2.1.6. 
 
    \item New parameters to control the measurement of \texttt{mean}
          object radii at configurable intensity levels have been
@@ -913,7 +918,7 @@ its peak intensity down to the threshold.
  \begin{itemize}
    \item Version 2.1.6
      \begin{itemize}
-        \item crowding-flag bug introduced in V2.1.5 fixed.
+        \item Crowding-flag bug introduced in V2.1.5 fixed.
      \end{itemize}
    \item Version 2.1.5
       \begin{itemize}
@@ -975,7 +980,7 @@ its peak intensity down to the threshold.
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
-Bertin E. : MUD/165 : SExtractor V2.0 User's Guide (DRAFT).\\
+Bertin E. : MUD/165 : SExtractor User's Guide (DRAFT).\\
 Bertin E. and Arnouts S., 1996, A\&AS 117,393\\
 Currie M.J. : \xref{SUN/95}{sun95}{} : KAPPA \dash\ Kernel Application Package.\\
 Currie M.J. \textit{et al.} : \xref{SUN/55}{sun55}{} : CONVERT \dash\ A Format-conversion Package.\\
