@@ -7437,9 +7437,12 @@ L1:
       if( free_axis_setting ) {
          setting = old_setting;
          axis_setting = astFree( axis_setting );
+         free_axis_setting = 0;
       }
       (*parent_setattrib)( this_object, setting );
    }
+
+   if( free_axis_setting ) axis_setting = astFree( axis_setting );
 
 /* Undefine macros local to this function. */
 #undef MATCH
