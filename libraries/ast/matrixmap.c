@@ -150,7 +150,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *, AstMatrixMap *);
 static AstMatrixMap *MtrRot( AstMatrixMap *, double, const double[] );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double *InvertMatrix( int, int, int, double * );
-static int FindStrin( int, const char *[], const char *, const char *, const char *, const char * );
+static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int Ustrcmp( const char *, const char * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
@@ -2210,7 +2210,6 @@ static int PermOK( AstMapping *pm ){
    AstPointSet *pset1;       /* PointSet holding input positions for PermMap */
    AstPointSet *pset2;       /* PointSet holding output positions for PermMap */
    double **ptr1;            /* Pointer to pset1 data */
-   double **ptr2;            /* Pointer to pset2 data */
    int i;                    /* Loop count */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */

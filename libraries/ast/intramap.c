@@ -417,7 +417,7 @@ static void IntraReg( const char *name, int nin, int nout,
    if ( astOK ) {
       found = 0;
       for ( ifun = 0; ifun < tran_nfun; ifun++ ) {
-         if ( found = !strcmp( clname, tran_data[ ifun ].name ) ) break;
+         if ( ( found = !strcmp( clname, tran_data[ ifun ].name ) ) ) break;
       }
 
 /* If so, then check that the information supplied this time is
@@ -1749,7 +1749,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
    if ( astOK ) {
       found = 0;
       for ( ifun = 0; ifun < tran_nfun; ifun++ ) {
-         if ( found = !strcmp( clname, tran_data[ ifun ].name ) ) break;
+         if ( ( found = !strcmp( clname, tran_data[ ifun ].name ) ) ) break;
       }
    }
 
@@ -1972,7 +1972,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
       if ( astOK ) {
          found = 0;
          for ( ifun = 0; ifun < tran_nfun; ifun++ ) {
-            if ( found = !strcmp( fname, tran_data[ ifun ].name ) ) break;
+            if ( ( found = !strcmp( fname, tran_data[ ifun ].name ) ) ) break;
          }
 
 /* If the transformation function has not been registered, report an

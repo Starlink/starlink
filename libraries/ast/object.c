@@ -308,7 +308,7 @@ f        This routine applies to all Objects.
 
 /* Change the comma at the end of each element to a null to terminate
    the name. */
-            if ( name_end = strchr( name, ',' ) ) *name_end = '\0';
+            if ( ( name_end = strchr( name, ',' ) ) ) *name_end = '\0';
 
 /* Remove white space and upper case characters from the attribute
    name. */
@@ -2378,7 +2378,7 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
 
 /* Change the '\n' at the end of each assignment to a null to
    terminate it. */
-                  if ( assign_end = strchr( assign, '\n' ) ) {
+                  if ( ( assign_end = strchr( assign, '\n' ) ) ) {
                      *assign_end = '\0';
                   }
 

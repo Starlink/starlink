@@ -197,7 +197,6 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
 */
 
 /* Local Variables: */
-   char card[ 81 ];               /* FITS header card */
    char name_buff[ 10 ];          /* Buffer for keyword name */
    char *name;                    /* Pointer to jeyword name string */
    char *ckeyval;                 /* Pointer to string keyword value */
@@ -1413,7 +1412,7 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
    "platepos" function. The required values are extracted from the
    supplied FitsChan. An error is reported and NULL returned if any required 
    keywords are missing or unusable. */
-   if( wcs = BuildWcs( fits, "astInitDssMap", name ) ) {
+   if ( ( wcs = BuildWcs( fits, "astInitDssMap", name ) ) ) {
 
 /* Initialise a 2-D Mapping structure (the parent class) as the first component
    within the DssMap structure, allocating memory if necessary. Specify that

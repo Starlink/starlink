@@ -389,11 +389,14 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 /* Decide which Frame contains the axis and invoke its astTest... method to \
    test the attribute. */ \
       if ( axis < naxes1 ) { \
-         astTest##attribute( this->frame1, axis ); \
+         result = astTest##attribute( this->frame1, axis ); \
       } else { \
-         astTest##attribute( this->frame2, axis - naxes1 ); \
+         result = astTest##attribute( this->frame2, axis - naxes1 ); \
       } \
    } \
+\
+/* Return the result. */ \
+   return result; \
 }
 
 /* Include files. */
@@ -1924,6 +1927,7 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
    frame->GetSymbol = GetSymbol;
    frame->GetUnit = GetUnit;
    frame->Match = Match;
+   frame->Norm = Norm;
    frame->Offset = Offset;
    frame->PermAxes = PermAxes;
    frame->PrimaryFrame = PrimaryFrame;
@@ -1933,6 +1937,7 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
    frame->SetLabel = SetLabel;
    frame->SetMaxAxes = SetMaxAxes;
    frame->SetMinAxes = SetMinAxes;
+   frame->SetSymbol = SetSymbol;
    frame->SetUnit = SetUnit;
    frame->SubFrame = SubFrame;
    frame->TestDirection = TestDirection;
@@ -2819,8 +2824,6 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
    int match_end;                /* MatchEnd attribute for template */
    int match_end_set;            /* Component MatchEnd attribute set? */
    int output_axis;              /* Output axis index */
-   int part_ref_axis;            /* Reference Frame component axis index */
-   int part_ref_naxes;           /* Number of reference Frame component axes */
    int part_result_axis;         /* Result Frame component axis index */
    int part_target_axis;         /* Target Frame component axis index */
    int part_template_axis;       /* Template CmpFrame component axis index */
@@ -2828,7 +2831,6 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
    int permute_value;            /* Component Permute attribute value */
    int preserve_axes;            /* Template PreserveAxes attribute value */
    int preserve_axes_set;        /* Component PreserveAxes attribute set? */
-   int ref_axis;                 /* Reference Frame axis index */
    int ref_naxes;                /* Number of reference Frame axes */
    int result_axis;              /* Result Frame axis index */
    int result_naxes1;            /* Number of result Frame axes, component 1 */

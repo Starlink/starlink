@@ -2047,7 +2047,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 
 /* Change the comma at the end of each field to a null to terminate
    the domain. */
-         if ( domain_end = strchr( domain, ',' ) ) *domain_end = '\0';
+         if ( ( domain_end = strchr( domain, ',' ) ) ) *domain_end = '\0';
 
 /* For any given domain, we will ignore imperfect matches in favour of
    better ones by assigning a score to each match. Initialise the best
@@ -2421,7 +2421,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 
 /* Change the comma at the end of each field to a null to terminate
    the domain. */
-         if ( domain_end = strchr( domain, ',' ) ) *domain_end = '\0';
+         if ( ( domain_end = strchr( domain, ',' ) ) ) *domain_end = '\0';
 
 /* Loop to try and match each target Frame in turn, in the order
    identified above. Quit the loop early if an error occurs or a match
@@ -4915,13 +4915,6 @@ f     IFRAME argument to specify the base Frame or the current
 /* Local Variables: */
    int ifr;                      /* Loop counter for Frames */
    int ii;                       /* Base/current Frame index */
-   int inode;                    /* Loop counter for nodes */
-   int last_link;                /* Last node to refer via "link" array */
-   int link_ref;                 /* Reference count from "link" array */
-   int node_ref;                 /* Reference arises from "node" array? */
-   int orphan;                   /* Loop counter to test for orphaned nodes */
-   int orphaned;                 /* Node orphaned? */
-   int remove;                   /* Number of node to be removed */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -6309,7 +6302,7 @@ static void TidyNodes( AstFrameSet *this ) {
 /* Test for at least one reference from within the "node" array which
    associates Frames with particular nodes. */
          for ( ifr = 1; ifr <= this->nframe; ifr++ ) {
-            if ( needed = ( this->node[ ifr - 1 ] == suspect ) ) break;
+            if ( ( needed = ( this->node[ ifr - 1 ] == suspect ) ) ) break;
          }
 
 /* If no references were found above, look for references in the
@@ -6320,7 +6313,7 @@ static void TidyNodes( AstFrameSet *this ) {
 
 /* Node zero must be retained if it has more than two links
    referencing it, while other nodes only require more than one. */
-                  if ( needed = ( link_ref >= ( suspect ? 1 : 2 ) ) ) break;
+                  if ( ( needed = ( link_ref >= ( suspect ? 1 : 2 ) ) ) ) break;
 
 /* Remember (up to) the first two nodes which reference the current one. */
                   last_link[ link_ref++ ] = inode;

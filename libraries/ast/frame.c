@@ -1645,7 +1645,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 /* Change the comma at the end of each field to a null to terminate
    the domain. Then convert the domain to upper case and eliminate
    white space. */
-         if ( domain_end = strchr( domain, ',' ) ) *domain_end = '\0';
+         if ( ( domain_end = strchr( domain, ',' ) ) ) *domain_end = '\0';
          CleanDomain( domain );
 
 /* For any given domain, we will ignore imperfect matches in favour of
