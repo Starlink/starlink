@@ -1,0 +1,72 @@
+## SCUCLIP - Simple despiking
+ 
+#+
+#  Name:
+#     SCUCLIP.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1996 November 17 (TIMJ)
+#        Original Version
+#     1996 November 22 (TIMJ)
+#        Added ITER_SIGMA and remove DROP
+#     1997 April 29 (TIMJ)
+#        Add MSG_FILTER
+#     1997 June 12 (TimJ)
+#        Change name of CLIP to DESPIKE
+#     1997 October 16 (TimJ)
+#        Rename to SCUCLIP
+#     {enter_further_changes_here}
+#-
+
+
+   INTERFACE SCUCLIP
+
+      HELPLIB 'SURF_HELP:'
+
+      PARAMETER IN
+	 POSITION 1
+         TYPE    'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of input file containing demodulated map data'
+	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER NSIGMA
+         POSITION 3
+         TYPE    '_DOUBLE'
+         PROMPT  'How many sigma to despike bolometers'
+         DEFAULT 5.0
+	HELPKEY '*'
+      ENDPARAMETER
+
+
+      PARAMETER   OUT
+         POSITION 2
+         PROMPT   'Name of output file'
+         TYPE     'FILENAME'
+         ACCESS   'WRITE'
+         VPATH    'PROMPT'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+ 
+   ENDINTERFACE
+
