@@ -4,7 +4,7 @@
 *      DST2NDF
 
 *   Purpose:
-*      Converts a Figaro V2 '.DST' file to a V3 '.SDF' SGP/38 file.
+*      Converts a Figaro version 2 DST file to an NDF.
 
 *   Language:
 *      Starlink Fortran 77
@@ -20,15 +20,19 @@
 *         The global status.
 
 *   Description:
-*      Converts a Figaro V2 '.DST' file to a V3 '.SDF' i.e. an NDF.
+*      This application converts a Figaro version 2 DST file to a
+*      version 3 file, i.e. to an NDF.  The rules for converting the
+*      various components of a DST are listed in the notes.  Since
+*      both are hierarchical formats most files can be be converted with
+*      little or no information lost.
 
 *   Usage:
 *      DST2NDF IN OUT
 
 *   ADAM Parameters:       
 *      IN = Figaro file (Read)
-*         The file name of the V2 file.  A file extension must not be
-*         given after the name, since ".DST" is appended by the
+*         The file name of the version 2 file.  A file extension must
+*         not be given after the name, since ".DST" is appended by the
 *         application.  The file name is limited to 80 characters.
 *      OUT = NDF (Write)     
 *         The file name of the output NDF file.  A file extension must
@@ -46,11 +50,11 @@
 *        HORSE in file HORSE.SDF.
 
 *  Notes:
-*     The rules for the conversion are as follows:
-*______________________________________________________________________
+*     The rules for the conversion of the various components are as
+*     follows:
+*     _________________________________________________________________
 *            Figaro file          NDF
-*______________________________________________________________________
-*
+*     -----------------------------------------------------------------
 *            .Z.DATA         ->   .DATA_ARRAY
 *            .Z.ERRORS       ->   .VARIANCE (after processing)
 *            .Z.QUALITY      ->   .QUALITY.QUALITY (must be BYTE array)
@@ -59,6 +63,8 @@
 *            .Z.LABEL        ->   .LABEL
 *            .Z.UNITS        ->   .UNITS
 *            .Z.IMAGINARY    ->   .DATA_ARRAY.IMAGINARY_DATA
+*            .Z.MAGFLAG      ->   .MORE.FIGARO.MAGFLAG
+*            .Z.RANGE        ->   .MORE.FIGARO.RANGE
 *            .Z.xxxx         ->   .MORE.FIGARO.Z.xxxx
 *
 *            .X.DATA         ->   .AXIS(1).DATA_ARRAY
@@ -69,9 +75,11 @@
 *            .X.LOG          ->   .AXIS(1).MORE.FIGARO.LOG
 *            .X.xxxx         ->   .AXIS(1).MORE.FIGARO.xxxx
 *            (Similarly for .Y .T .U .V or .W structures which are
-*             renamed to AXIS(2:6) in the NDF.) 
+*             renamed to AXIS(2), ..., AXIS(6) in the NDF.) 
 
 *            .OBS.OBJECT     ->   .TITLE
+*            .OBS.SECZ       ->   .MORE.FIGARO.SECZ
+*            .OBS.TIME       ->   .MORE.FIGARO.TIME
 *            .OBS.xxxx       ->   .MORE.FIGARO.OBS.xxxx
 *
 *            .FITS.xxxx      ->   .MORE.FITS.xxxx  (into value part of
@@ -87,7 +95,18 @@
 
 *            .TABLE          ->   .MORE.FIGARO.TABLE
 *            .xxxx           ->   .MORE.FIGARO.xxxx
-* 
+
+*     -  Axis arrays with dimensionality greater than one are not
+*     supported by the NDF.  Therefore, if the application encounters
+*     such an axis array, it processes the array using the following
+*     rules, rather than those given above.
+*
+*            .X.DATA         ->   .AXIS[1].MORE.FIGARO.DATA
+*                                 (AXIS[1].DATA_ARRAY is filled with
+*                                 pixel co-ordinates)
+*            .X.ERRORS       ->   .AXIS[1].MORE.FIGARO.VARIANCE (after
+*                                 processing)
+*            .X.WIDTH        ->   .AXIS[1].MORE.FIGARO.WIDTH
 
 *  Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag
@@ -106,7 +125,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
-*  History
+*  History:
 *     29-June-1989 (JM):
 *        Original version.  See the history of DSA_CONVERT_FORMAT.
 *     1992 January 31 (MJC):
@@ -125,10 +144,18 @@
 *        Fixed bug that caused a phantom 2-d FITS structure to be
 *        created when there is an empty FITS structure within the DST
 *        file.
+*     1992 September 8 (MJC):
+*        Improved the documentation and added the rules for
+*        non-1-dimensional axis arrays.   Handles axis variance in
+*        addition to axis errors.
+*     1992 September 10 (MJC):
+*        Moved special cases of .OBS.SECZ, .OBS.TIME, .Z.MAGFLAG,
+*        .Z.RANGE to the top-level Figaro extension as this is where
+*        DSA_ now expects to find them in an NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
-*     {note_bugs_here}
+*     {note_any_bugs_here}
 
 *- 
 *  Type Definitions:

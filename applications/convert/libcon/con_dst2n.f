@@ -4,8 +4,8 @@
 *     CON_DST2N
 
 *  Purpose:
-*     Converts a Figaro V2 file into a Figaro V3 file (i.e. a Starlink
-*     NDF).
+*     Converts a Figaro version 2 file into an NDF (Figaro version 3
+*     file)
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,7 +17,7 @@
 *     This routine reads through a file in Figaro version 2 format.
 *     Objects that it finds whose function is understood---that is, 
 *     those objects whose purpose has been documented (in the version
-*     2 Figaro  structures document will be converted to the 
+*     2 Figaro structures document) will be converted to the 
 *     appropriate object in the output file, whose format corresponds 
 *     to that described in SGP/38 and which is used by Version 3 of 
 *     Figaro.  
@@ -47,6 +47,8 @@
 *     .Z.LABEL ->        .LABEL
 *     .Z.UNITS ->        .UNITS
 *     .Z.IMAGINARY ->    .DATA_ARRAY.IMAGINARY_DATA
+*     .Z.MAGFLAG ->      .MORE.FIGARO.MAGFLAG
+*     .Z.RANGE ->        .MORE.FIGARO.RANGE
 *     .Z.xxxx  ->        .MORE.FIGARO.Z.xxxx
 *
 *     .X.DATA    ->      .AXIS[1].DATA_ARRAY
@@ -56,8 +58,12 @@
 *     .X.UNITS   ->      .AXIS[1].UNITS
 *     .X.LOG     ->      .AXIS[1].MORE.FIGARO.LOG
 *     .X.xxxx    ->      .AXIS[1].MORE.FIGARO.xxxx
+*     (Similarly for .Y .T .U .V or .W structures which are renamed to
+*     AXIS[2], ..., AXIS[6] in the NDF.)
 
 *     .OBS.OBJECT   ->   .TITLE
+*     .OBS.SECZ    ->    .MORE.FIGARO.SECZ
+*     .OBS.TIME    ->    .MORE.FIGARO.TIME
 *     .OBS.xxxx    ->    .MORE.FIGARO.OBS.xxxx
 *
 *     .FITS.xxxx     ->  .MORE.FITS.xxxx (into value part of the string)
@@ -69,6 +75,18 @@
 *                                     ( "   comment "   "   "   "   )
 *     .TABLE   ->        .MORE.FIGARO.TABLE
 *     .xxxx    ->        .MORE.FIGARO.xxxx
+
+*     -  Axis arrays with dimensionality greater than one are not
+*     supported by the NDF.  Therefore, if the application encounters
+*     such an axis array, it processes the array using the following
+*     rules, rather than those given above.
+*
+*     .X.DATA    ->      .AXIS[1].MORE.FIGARO.DATA
+*                        (AXIS[1].DATA_ARRAY is filled with pixel
+*                        co-ordinates)
+*     .X.ERRORS  ->      .AXIS[1].MORE.FIGARO.VARIANCE (after
+*                        processing)
+*     .X.WIDTH   ->      .AXIS[1].MORE.FIGARO.WIDTH
 
 *  Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag
@@ -130,6 +148,16 @@
 *        'STRUCT'.  Convert the MSG_OUTs to error reports.  Reordered
 *        the axis validation to before the closedown sequence.
 *        Corrected some typo's in the prologue.
+*     1992 September 8 (MJC):
+*        Fixed bug in the initialisation of the flags indiciating
+*        whether an axis data array or Figaro extension are created
+*        or not.  Tested for the non-1-dimensional axis arrays.  These
+*        are written to the Figaro axis extension.  Handles axis
+*        variance in addition to axis errors.
+*     1992 September 10 (MJC):
+*        Moved special cases of .OBS.SECZ, .OBS.TIME, .Z.MAGFLAG,
+*        .Z.RANGE to the top-level Figaro extension as this is where
+*        DSA_ now expects to find them in an NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,19 +184,23 @@
 *  External Functions:
       INTEGER CHR_LEN            ! Length of a character string ignoring
                                  ! trailing blanks  
+*  Local Constants:
+      INTEGER NDSTAX             ! Maximum number of axes in a DST.
+      PARAMETER ( NDSTAX = 6 )
 
-*   Local variables:
+*  Local Variables:
       LOGICAL   ANAXIS           ! True if a substructure is an axis
-      LOGICAL   AXTHER(6)        ! TRUE if AXIS(1...6).DATA_ARRAY
+      LOGICAL   AXTHER(NDSTAX)   ! TRUE if AXIS(1...6).DATA_ARRAY
                                  ! created
-      LOGICAL   AXMFEX(6)        ! TRUE if AXIS(1...6).MORE.FIGARO
+      LOGICAL   AXMFEX(NDSTAX)   ! TRUE if AXIS(1...6).MORE.FIGARO
                                  ! exists
       CHARACTER AXMOR*40         ! AXIS.MORE name
       CHARACTER AXMORF*40        ! AXIS.MORE.FIGARO name
       CHARACTER AXNAME*32        ! Axis structure element name
       CHARACTER AXOUT*32         ! Name of output axis 
-      CHARACTER AXOUTD*40        ! Name of output axis data array
-      CHARACTER AXOUTW*40        ! Name of output axis width array
+      CHARACTER AXOUTD*50        ! Name of output axis data array
+      CHARACTER AXOUTV*50        ! Name of output axis variance array
+      CHARACTER AXOUTW*50        ! Name of output axis width array
       BYTE      BARRAY(100)      ! Used to read in BYTE type data items
       CHARACTER COMMENT*50       ! FITS item comment
       DOUBLE PRECISION DARRAY(100) ! Used to read in DP type data items
@@ -209,7 +241,6 @@
                                  ! .MORE.FIGARO.Z
       CHARACTER MORNAM*80        ! Name of item in .MORE structure
       INTEGER   N                ! Loop variable
-      INTEGER   NAXOUT           ! Length of string AXOUT
       CHARACTER NAME*64          ! Name of data object
       CHARACTER NAME1*40         ! 1st level object
       CHARACTER NAME2*40         ! 2nd level object
@@ -245,10 +276,6 @@
       CHARACTER STRING*64        ! Used for units and labels
       LOGICAL   STRUCT           ! True if item is a structure
       CHARACTER TYPE*16          ! Data object type
-
-*  Local Data:
-      DATA AXMFEX/6*.FALSE./      
-      DATA AXTHER/6*.FALSE./      
 
 *.
 
@@ -289,8 +316,7 @@
 *  b) whether or not an OUTPUT.MORE structure is needed, 
 *  c) whether or not an OUTPUT.MORE.FITS structure is needed, 
 *  d) whether or not an OUTPUT.MORE.FIGARO structure is needed, 
-*  e) whether or not an OUTPUT.AXIS (N).MORE.FIGARO structure is needed,
-*  f) and whether or not an OUTPUT.DATA_ARRAY structure is needed (in
+*  e) and whether or not an OUTPUT.DATA_ARRAY structure is needed (in
 *  other words determine the form of the output data array).
 *
 *  Initialise some counters and flags.
@@ -301,6 +327,12 @@
       MORE = .FALSE.
       MOREFG = .FALSE.
       MORFGO = .FALSE.
+
+      DO I = 1, NDSTAX
+         AXMFEX( I ) = .FALSE.
+         AXTHER( I ) = .FALSE.
+      END DO
+
       MORFGZ = .FALSE.
       FITS = .FALSE.
       NFITS = 0
@@ -788,6 +820,15 @@
                   ELSE IF ( NAME2 .EQ. 'FLAGGED' ) THEN
                      CONTINUE
 
+*               Test for the magnitude flag or the data range.  These
+*               are not copied to the .Z structure within the
+*               extension, but go in at the top level of the Figaro
+*               extension.
+                  ELSE IF ( NAME2 .EQ. 'MAGFLAG' .OR.
+     :                      NAME2 .EQ. 'RANGE' ) THEN
+                     CALL DTA_CYVAR( LEVEL2, 'OUTPUT.MORE.FIGARO.'/
+     :                               /NAME2, DSTAT)
+
 *               Must be a non-standard component.
                   ELSE
 
@@ -833,6 +874,15 @@
                         CALL DTA_CYVAR (LEVEL2, 
      :                                 'OUTPUT.TITLE', DSTAT)
                         IF (DSTAT .NE. 0) GOTO 400
+
+*                  Test for the airmass or time.  These are not copied
+*                  to the .OBS structure within the extension, but go in
+*                  at the top level of the Figaro extension.
+                     ELSE IF ( NAME2 .EQ. 'SECZ' .OR.
+     :                         NAME2 .EQ. 'TIME' ) THEN
+                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.MORE.FIGARO.'/
+     :                                  /NAME2, DSTAT)
+                           
                      ELSE
 
 *                     Create the Figaro OBS extension for other
@@ -889,82 +939,152 @@
                   CALL DTA_CRNAM (LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT)
                   IF (NMSTAT1.EQ.0) THEN
 
+*                  Inquire its dimensions.
+                     CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
+
 *                  Deal with the axis centres.
 *                  ===========================
                      IF (NAME2 .EQ. 'DATA') THEN
 
-*                     Create the full names of the input and output
-*                     axis arrays.
-                        CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', NDIM, 
-     :                                  DIMS, AXOUTD, DSTAT)
-                        CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 0, 0, 
-     :                                  AXOUTD, DSTAT)
+*                     Only 1-d axes are supported within NDFs.
+                        IF ( NDIM .EQ. 1 ) THEN
 
-*                     Copy the axis data array (axis centres).
-                        CALL DTA_CYVAR (LEVEL2, AXOUTD, DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+*                        Create the full name of the output axis array.
+                           CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 0, 0, 
+     :                                     AXOUTD, DSTAT)
 
-*                     Record that AXIS(IAXIS).DATA_ARRAY has been 
-*                     created.
-                        AXTHER(IAXIS) = .TRUE.
+*                        Copy the axis data array (axis centres).
+                           CALL DTA_CYVAR (LEVEL2, AXOUTD, DSTAT)
+                           IF (DSTAT .NE. 0) GOTO 400
+
+*                        Record that AXIS(IAXIS).DATA_ARRAY has been 
+*                        created.
+                           AXTHER(IAXIS) = .TRUE.
+
+*                     The axes are not 1-dimensional so move them to the
+*                     Figaro axis extension.
+                        ELSE
+
+*                        Create the Figaro axis extension if not already
+*                        present in the NDF, by generating the full
+*                        component names of the input and output
+*                        objects.
+                           IF ( .NOT. AXMFEX (IAXIS) ) THEN
+                              CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
+     :                                        AXMOR, DSTAT)
+                              CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
+                              CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
+     :                                        AXMORF, DSTAT)
+                              CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+
+*                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
+*                           structure is created.
+                              AXMFEX (IAXIS) = .TRUE. 
+                           END IF
+
+*                        Copy the non-standard data to 
+*                        OUTPUT.AXIS(n).MORE.FIGARO.DATA.  Since the
+*                        flag to indicate whether or not the NDF's
+*                        AXIS(n).DATA_ARRAY has been created is still
+*                        false, the NDF axis centres will be filled
+*                        with pixel co-ordinates near the end of this
+*                        routine.
+                           CALL DTA_CRNAM (AXMORF, 'DATA', 0, 0,
+     :                                     AXOUTD, DSTAT)
+                           CALL DTA_CYVAR (LEVEL2, AXOUTD, DSTAT)
+                           IF (DSTAT .NE. 0) GOTO 400
+                        END IF
 
 *                  Deal with axis errors.
 *                  ======================
-                     ELSE IF (NAME2 .EQ. 'ERRORS') THEN
+                     ELSE IF ( NAME2 .EQ. 'ERRORS' .OR.
+     :                         NAME2 .EQ. 'VARIANCE' ) THEN
 
-*                     Inquire the dimensions of the axis.
-                        CALL DTA_SZVAR (LEVEL2, 7, NDIM, DIMS, DSTAT)
-
-*                     Find the the total number of elements.  Why is
-*                     this not 1-dimensional?  Answer: Figaro can have
-*                     2-dimensional axis arrays, I think.
+*                     Find the the total number of elements.  This is
+*                     not 1-dimensional because Figaro can have
+*                     2-dimensional axis arrays.
                         NDATA = 1
                         DO N = 1, NDIM
                            NDATA = DIMS (N)*NDATA
                         END DO
-                        NAXOUT = CHR_LEN (AXOUT)
 
-*                     Create the output variance array and copy the
-*                     errors to it.
-                        CALL DTA_CYVAR (LEVEL2, 
-     :                           AXOUT (1:NAXOUT)//'.VARIANCE', 
-     :                                  DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+*                     Only 1-d axes are supported within NDFs.
+                        IF ( NDIM .EQ. 1 ) THEN
 
-*                     Map the variance array.
-                        CALL DTA_MUVARF (AXOUT (1:NAXOUT)//'.VARIANCE', 
-     :                                   NDATA, IPTR, DSTAT)
+*                        Create the full name of the output axis
+*                        variance array.
+                           CALL DTA_CRNAM (AXOUT, 'VARIANCE', 0, 0, 
+     :                                     AXOUTV, DSTAT)
 
-*                     Report an error condition.
-                        IF (DSTAT .NE. 0) THEN
-                           STATUS = DSTAT
-                           CALL MSG_SETI( 'AXNO', IAXIS )
-                           CALL ERR_REP( 'DST2NDF_MAPAVA', 
-     :                       'DST2NDF: Error mapping output axis '/
-     :                       /'variance array in dimension ^AXNO.', 
-     :                       STATUS )
-                           GOTO 500
+*                     The axis variance array is not 1-dimensional so
+*                     move it to the Figaro axis extension.
+                        ELSE
+
+*                        Create the Figaro axis extension if not already
+*                        present in the NDF, by generating the full
+*                        component names of the input and output
+*                        objects.
+                           IF ( .NOT. AXMFEX (IAXIS) ) THEN
+                              CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
+     :                                        AXMOR, DSTAT)
+                              CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
+                              CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
+     :                                        AXMORF, DSTAT)
+                              CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+
+*                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
+*                           structure is created.
+                              AXMFEX (IAXIS) = .TRUE. 
+                           END IF
+
+*                        Copy the non-standard variance to 
+*                        OUTPUT.AXIS(n).MORE.FIGARO.VARIANCE.
+                           CALL DTA_CRNAM (AXMORF, 'VARIANCE', 0, 0,
+     :                                     AXOUTV, DSTAT)
                         END IF
 
-*                     Axis error arrays are converted from standard
-*                     deviations to variance in situ.
-                        CALL VEC_MULR (.TRUE., NDATA, %VAL (IPTR), 
-     :                                 %VAL (IPTR), %VAL (IPTR), IERR, 
-     :                                 NERR, STATUS)
+*                     Create the output variance array and copy the
+*                     errors or variances to it.
+                        CALL DTA_CYVAR (LEVEL2, AXOUTV, DSTAT)
+                        IF (DSTAT .NE. 0) GOTO 400
 
-*                     Unmap the axis variance.
-                        CALL DTA_FRVAR (AXOUT (1:NAXOUT)//'.VARIANCE', 
-     :                                  DSTAT)
+*                     Convert standard deviations to variances.
+*                     =========================================
+                        IF ( NAME2 .EQ. 'ERRORS' ) THEN
 
-*                     Report an error condition.
-                        IF (DSTAT .NE. 0) THEN
-                           STATUS = DSTAT
-                           CALL MSG_SETI( 'AXNO', IAXIS )
-                           CALL ERR_REP( 'DST2NDF_UMPAVA', 
-     :                       'DST2NDF: Error unmapping output axis '/
-     :                       /'variance array in dimension ^AXNO.', 
-     :                       STATUS )
-                           GOTO 500
+*                        Map the variance array.
+                           CALL DTA_MUVARF (AXOUTV, NDATA, IPTR, DSTAT)
+
+*                        Report an error condition.
+                           IF (DSTAT .NE. 0) THEN
+                              STATUS = DSTAT
+                              CALL MSG_SETI( 'AXNO', IAXIS )
+                              CALL ERR_REP( 'DST2NDF_MAPAVA', 
+     :                          'DST2NDF: Error mapping output axis '/
+     :                          /'variance array in dimension ^AXNO.', 
+     :                          STATUS )
+                              GOTO 500
+                           END IF
+
+*                        Axis error arrays are converted from standard
+*                        deviations to variance in situ.
+                           CALL VEC_MULR( .TRUE., NDATA, %VAL (IPTR), 
+     :                                    %VAL (IPTR), %VAL (IPTR),
+     :                                    IERR, NERR, STATUS)
+
+*                        Unmap the axis variance.
+                           CALL DTA_FRVAR (AXOUTV, DSTAT)
+
+*                        Report an error condition.
+                           IF (DSTAT .NE. 0) THEN
+                              STATUS = DSTAT
+                              CALL MSG_SETI( 'AXNO', IAXIS )
+                              CALL ERR_REP( 'DST2NDF_UMPAVA', 
+     :                          'DST2NDF: Error unmapping output axis '/
+     :                          /'variance array in dimension ^AXNO.', 
+     :                          STATUS )
+                              GOTO 500
+                           END IF
                         END IF
 
 *                  Deal with axis width.
@@ -972,16 +1092,45 @@
 
                      ELSE IF (NAME2 .EQ. 'WIDTH') THEN
 
-*                     Create the full names of the input and output
-*                     axis arrays.
-                        CALL DTA_CRNAM (AXOUT, 'WIDTH', NDIM, 
-     :                                  DIMS, AXOUTW, DSTAT)
-                        CALL DTA_CRNAM (AXOUT, 'WIDTH', 0, 0, 
-     :                                  AXOUTW, DSTAT)
+*                     Only 1-d axes are supported within NDFs.
+                        IF ( NDIM .EQ. 1 ) THEN
 
-*                     Copy the axis width array.
-                        CALL DTA_CYVAR (LEVEL2, AXOUTW, DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+*                        Create the full name of the output axis array.
+                           CALL DTA_CRNAM (AXOUT, 'WIDTH', 0, 0, 
+     :                                     AXOUTW, DSTAT)
+
+*                       Copy the axis width array.
+                           CALL DTA_CYVAR (LEVEL2, AXOUTW, DSTAT)
+                           IF (DSTAT .NE. 0) GOTO 400
+
+*                     The axis widths are not 1-dimensional so move
+*                     them to the Figaro axis extension.
+                        ELSE
+
+*                        Create the Figaro axis extension if not already
+*                        present in the NDF, by generating the full
+*                        component names of the input and output
+*                        objects.
+                           IF ( .NOT. AXMFEX (IAXIS) ) THEN
+                              CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
+     :                                        AXMOR, DSTAT)
+                              CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
+                              CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
+     :                                        AXMORF, DSTAT)
+                              CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+
+*                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
+*                           structure is created.
+                              AXMFEX (IAXIS) = .TRUE. 
+                           END IF
+
+*                        Copy the non-standard widths to 
+*                        OUTPUT.AXIS(n).MORE.FIGARO.WIDTH.
+                           CALL DTA_CRNAM (AXMORF, 'WIDTH', 0, 0,
+     :                                     AXOUTW, DSTAT)
+                           CALL DTA_CYVAR (LEVEL2, AXOUTW, DSTAT)
+                           IF (DSTAT .NE. 0) GOTO 400
+                        END IF
 
 *                  Deal with other standard axis components.
 *                  =========================================
@@ -1011,8 +1160,8 @@
                         CALL DTA_WRVARC (NAMOUT, NDATA, STRING, DSTAT)
                         IF (DSTAT .NE. 0) GOTO 500
 
-*                  Deal wih non-standard axis components.
-*                  ======================================
+*                  Deal with non-standard axis components.
+*                  =======================================
                      ELSE
 
 *                     Create the Figaro axis extension if not already
@@ -1318,17 +1467,17 @@
 *         Check if axis data array has been created for each axis.
             IF (.NOT. AXTHER(IAXIS)) THEN
 
-*             Generate the full name of the output axis data-array
-*             structure.
+*            Generate the full name of the output axis data-array
+*            structure.
                CALL DTA_CRNAM ('OUTPUT', 'AXIS', 1, IAXIS, AXOUT, DSTAT)
                CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 1, DIMS(IAXIS), 
      :                         AXOUTD, DSTAT)
 
-*             Create an axis data array of the appropriate size.
+*            Create an axis data array of the appropriate size.
                CALL DTA_CRVAR (AXOUTD, 'FLOAT', DSTAT)
 
-*             Generate the full name of the output axis data-array
-*             primitive component.
+*            Generate the full name of the output axis data-array
+*            primitive component.
                CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 0, 0, 
      :                         AXOUTD, DSTAT)
 
