@@ -10,7 +10,7 @@
 
 	    PARAMETER INP
 		POSITION 	1
-		TYPE 		'UNIV'
+		TYPE 		'LITERAL'
 		PROMPT  	'Input datafile'
                 PPATH           'GLOBAL,CURRENT'
                 HELP            'File to interpolate bad points'
@@ -20,7 +20,7 @@
 
 	    PARAMETER OUT
 		POSITION 	2
-		TYPE 		'UNIV'
+		TYPE 		'LITERAL'
 		PROMPT  	'Output datafile'
                 PPATH           'CURRENT'
                 ASSOCIATION     '->GLOBAL.BINDS'
