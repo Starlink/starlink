@@ -184,13 +184,20 @@ StarWCS::StarWCS( const char *header, const int lheader )
                 }
             }
 
+
+//  If AST is version 1.8-7 or greater then...
+#if ( AST_MAJOR_VERS > 1 ) || \
+    ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS == 8 && AST_RELEASE >= 7 ) || \
+    ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS > 8 )
+                 
             //  CAR projections are sometimes incorrect and what is
             //  required in a linear transformation. Make this the
             //  default until someone complains that they want the
             //  proper behaviour (will need to be parameterised at
             //  that time).
 	    astSet( fitschan, "CarLin=1" );
-
+#endif
+ 
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
             //  convenient.
