@@ -33,7 +33,7 @@ ccg1_cenr.f ccg1_cenr.f ccg1_clipr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_is4d.f ccg1_is4d.f ccg1_mdr1r.f ccg1_mdr3r.f \
 ccg1_mer1r.f ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f ccg1_wtm2r.f \
 ccg1_wtm3r.f ctm_par datapic.f datapic.ifl dialog.tcl feature.bit \
-gethlp.f gthlpi.f gui.gif hlpcmd irg_wild pol1_hist.f pol1_angrt.f \
+gethlp.f gthlpi.f gui.gif hlpcmd pol1_hist.f pol1_angrt.f \
 lablist left_arrow.bit pol1_chkex.f pol1_clcat.f pol1_ptvrs.f \
 pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
 pol1_ctclm.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
