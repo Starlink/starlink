@@ -202,7 +202,7 @@
       CHARACTER*20		OCLASS			! Output object class
       CHARACTER*20		O_NAME(MAXNAX)		! Output axis name
       CHARACTER*40		O_UNITS(MAXNAX)		! Output axis units
-      CHARACTER*12              PAR              ! Parameter name
+      CHARACTER*12              PAR              	! Parameter name
       CHARACTER*80              TEMP             ! Temporary store for LABEL
                                                  ! & UNITS info
 
@@ -216,6 +216,7 @@
 
       INTEGER                   AXPTR            	! Output axis array
       INTEGER			ALEN			! Action length
+      INTEGER			ANUM			! List # from EDI_QFND
       INTEGER                   BADQUAL          	! Bad event quality
 							! threshold
       INTEGER			BID			! Output BinDS object
@@ -516,7 +517,25 @@
 *  chosen
       OCLASS = 'BinDS'
       IF ( ONDIM .EQ. 1 ) THEN
+        CALL EDI_QFND( IFID, 'T', LNAME, ANUM, STATUS )
+        IF ( ANUM .EQ. LBIN(1) ) THEN
+          OCLASS = 'TimeSeries'
+        ELSE
+          CALL EDI_QFND( IFID, 'E', LNAME, ANUM, STATUS )
+          IF ( ANUM .EQ. LBIN(1) ) THEN
+            OCLASS = 'Spectrum'
+          END IF
+        END IF
+
       ELSE IF ( ONDIM .EQ. 2 ) THEN
+        CALL EDI_QFND( IFID, 'X', LNAME, ANUM, STATUS )
+        IF ( ANUM .EQ. LBIN(1) ) THEN
+          CALL EDI_QFND( IFID, 'Y', LNAME, ANUM, STATUS )
+          IF ( ANUM .EQ. LBIN(2) ) THEN
+            OCLASS = 'XYimage'
+          END IF
+        END IF
+
       END IF
       CALL USI_DEF0C( 'OUTFORM', OCLASS, STATUS )
       CALL USI_GET0C( 'OUTFORM', OCLASS, STATUS )
