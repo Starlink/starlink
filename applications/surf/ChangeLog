@@ -1,3 +1,22 @@
+1999-03-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_skydip.f (SURF_SKYDIP): Add real check for SAM_MODE
+
+1999-03-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_skydip.f: Add RASTER mode. Requires many kluges in
+	terms of copying data from one place to another. Includes new
+	calculation of AIRMASS.
+
+	* sculib/sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Increase
+	max number of input points to 500
+
+	* sculib/sculib_skydip_var.f (SCULIB_SKYDIP_VAR): Increase
+	max number of input points to 500
+
+	* sculib/sculib_skydip_xisq.f (SCULIB_SKYDIP_XISQ): Increase
+	max number of input points to 500
+
 1999-02-26  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_mon.f (SURF_MON): Add REMIP abd polarimeter support
