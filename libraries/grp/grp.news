@@ -1,7 +1,8 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V3.0) of the GRP library is now available. It includes
-new facilities to allow control characters to be escaped within group
-expresions.
+A new release (V3.0-1) of the GRP library is now available. It includes
+a fix to a bug which prevented the last line of a file being read
+correctly if the line was terminated by an end-of-file rather than a
+newline.
 

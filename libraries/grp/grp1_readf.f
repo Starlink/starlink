@@ -15,15 +15,13 @@
 *  Description:
 *     The routine reads an input record from a formatted sequential file
 *     and handles any error which may arise. If the end of file is
-*     reached, EOF is set true and LINE is returned blank, but no error
-*     is reported.
+*     reached, EOF is set true but no error is reported.
 
 *  Arguments:
 *     UNIT = INTEGER (Given)
 *        Fortran I/O unit attached to the file.
 *     LINE = CHARACTER * ( * ) (Returned)
-*        Line read from the file. Returned blank if the end of file
-*        has been reached.
+*        Line read from the file. 
 *     EOF = LOGICAL (Returned)
 *        True if the end of file has been reached. False otherwise.
 *     STATUS = INTEGER (Given and Returned)
@@ -36,6 +34,9 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     27-OCT-2000 (DSB):
+*        Changed to return any text read from the last line in a file if
+*        the line is terminated by EOF rather than newline.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,11 +69,11 @@
       INTEGER   IOS               ! INQUIRE error status
 
 *.
-
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Read the file.
+      LINE = ' '
       READ( UNIT, '(A)', END = 10, IOSTAT = IOERR ) LINE
 
 *  If an error occurred, then construct a message and report it.
@@ -105,7 +106,6 @@
 *  Arrive here if the end of file has been reached.
  10   CONTINUE
       EOF = .TRUE.
-      LINE = ' '
 
  999  CONTINUE
 
