@@ -48,9 +48,11 @@
 *        specified by parameter COLANG are assumed to be angles measured 
 *        anti-clockwise from this reference direction. The value of ANGROT 
 *        should be the anti-clockwise angle from the positive X axis to the 
-*        reference direction, in degrees. The run time default value is equal 
+*        reference direction, in degrees. For catalopgues created by
+*        POLPACK V2.0 or later, the run time default value is equal 
 *        to the value of the ANGROT parameter within the supplied catalogue, 
-*        or zero if the catalogue does not contain an ANGROT parameter. []
+*        or zero if the catalogue does not contain an ANGROT parameter. 
+*        For earlier catalogues, the run time default is zero. []
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows, with the size of the arrow head
 *        specified by this parameter. Simple lines can be drawn by setting
@@ -460,6 +462,7 @@
       LOGICAL HINIT              ! Initialise histogram?
       LOGICAL NEGATE             ! Negate supplied angles?
       LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
+      LOGICAL V2PLUS             ! Catalogue created by POLPACK V2 or later?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
       REAL AHSIZM                ! Arrowhead size in metres
       REAL ANGFAC                ! NDF2 data to radians conversion factor
@@ -848,24 +851,38 @@
 *  Obtain the vector-plot characteristics.
 *  =======================================
 
+*  See if the input catalogue was created by V2.0 or later of POLPACK.
+      CALL POL1_GTVRC( CI, '2.0', V2PLUS, STATUS )
+
+*  If the catalogue was created before V2.0 of POLPACK, use zero as the
+*  run-time defaulot for ANGROT.
+      IF( .NOT. V2PLUS ) THEN
+         ANGROT = 0.0
+
+*  Otherwise, for V2 catalogues (or later), get the default ANGROT value
+*  from the catalogue...
+      ELSE
+
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+         IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get a CAT identifier for the ANGROT parameter in the
 *  supplied catalogue.
-      CALL CAT_TIDNT( CI, 'ANGROT', GANG, STATUS )       
+         CALL CAT_TIDNT( CI, 'ANGROT', GANG, STATUS )       
 
 *  If this failed, annul the error nad use a dynamic default of zero for
 *  parameter ANGROT.
-      IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )
-         ANGROT = 0.0
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            ANGROT = 0.0
 
 *  Otherwise, get the value of the ANGROT parameter and release the
 *  identifier.
-      ELSE
-         CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
-         CALL CAT_TRLSE( GANG, STATUS )
+         ELSE
+            CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
+            CALL CAT_TRLSE( GANG, STATUS )
+         END IF
+
       END IF
 
 *  Set the dynamic default for ANGROT.
