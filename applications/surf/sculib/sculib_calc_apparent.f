@@ -1,8 +1,8 @@
 *+  SCULIB_CALC_APPARENT - calculate apparent RA, Dec of plate centre and angle
 *                          of input coord system N relative to apparent N.
       SUBROUTINE SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X,
-     :  MAP_Y, COORD_TYPE, MJD, MJD1, MJD2, RA_APP, DEC_APP, ROTATION, 
-     :  STATUS)
+     :  MAP_Y, COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP,
+     :  ROTATION, STATUS)
 *    Description :
 *     This routine takes the input coordinates and coordinate system of the
 *     map centre and converts them to the apparent coords at the time of the
@@ -11,6 +11,38 @@
 *     (measured anti-clockwise from input north, in radians). See SCU/3.0/JFL/
 *     0393.
 *
+*
+*     AZ coords -
+*        Calculate the apparent RA and DEC at the LST when the routine is
+*        called by:-
+*          sin(dec_app) = sin(lat_obs) * sin(el) + cos(lat_obs) * cos(el) * cos(az)
+*
+*          sin(H_A) = - sin(az) * cos(el)
+*                       -----------------
+*                           cos(dec_app)
+*
+*          cos(H_A) = sin(el) - sin(dec_app) * sin(lat_obs)
+*                     -------------------------------------
+*                        cos(dec_app) * cos(lat_obs)
+*
+*         Cos(dec_app) is present in the denominator of both the sin(H_A)
+*         and cos(H_A) terms and it could cause both to blow up - so
+*         it's left out as only the ratio is important
+*
+*          RA_app = LST - H_A
+*
+*          sin(rotation) =   sin(az) * cos(lat_obs)
+*                            ----------------------
+*                               cos(dec_app)
+*
+*          cos(rotation) = sin(lat_obs) - sin(dec_app) * sin(el)
+*                     -------------------------------------
+*                        cos(dec_app) * cos(el)
+*
+*        Again, cos(dec_app) appears in the denominator of both sin and cos
+*        expressions and is left out of the calculation because on ly the ratio
+*        is important.
+
 *     RB coords - 
 *        Use SLA_FK54Z to convert to RJ.
 *        Use SLA_MAP to convert to apparent, giving ra_app, dec_app.
@@ -72,7 +104,7 @@
 *
 *    Invocation :
 *     CALL SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X, MAP_Y,
-*    :  COORD_TYPE, MJD, MJD1, MJD2, RA_APP, DEC_APP, ROTATION, STATUS)
+*    :  COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP, ROTATION, STATUS)
 *    Parameters :
 *     LONG                   = DOUBLE PRECISION (Given)
 *           longitude of centre in input coord system (radians)
@@ -88,6 +120,8 @@
 *           y tangent plane offset of point from centre (radians)
 *     COORD_TYPE             = CHARACTER*(*) (Given)
 *           Coord system of input centre, RD, RB, RJ, GA, EQ, PLANET
+*     LST                    = DOUBLE PRECISION (Given)
+*           LST for requested coordinates (for AZ and HA)
 *     MJD                    = DOUBLE PRECISION (Given)
 *           Modified Julian date of observation
 *     MJD1                   = DOUBLE PRECISION (Given)
@@ -128,20 +162,26 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-      DOUBLE PRECISION SCULIB_LST             ! function returning LST
 *    Global variables :
 *    Local Constants :
       DOUBLE PRECISION DPI
       PARAMETER       (DPI = 3.14159265359D0)
       DOUBLE PRECISION DPI2
       PARAMETER       (DPI2 = DPI / 2.0D0)
+      DOUBLE PRECISION LAT_OBS_RAD
+      PARAMETER       (LAT_OBS_RAD = 3.46026051751D-1)
 *    Local variables :
+      DOUBLE PRECISION COS_HA                 ! cos of hour angle
+      DOUBLE PRECISION HA                     ! Hour angle
+      DOUBLE PRECISION LST                    ! LST
       DOUBLE PRECISION RA_2000, DEC_2000      ! RA, Dec 2000 coords of point
       DOUBLE PRECISION RA_N_2000, DEC_N_2000  ! RA, Dec 2000 coords of N pole
                                               !   of input coord system
       DOUBLE PRECISION RA_N_APP, DEC_N_APP    ! apparent RA, Dec of N pole of
                                               !   input coord system
       DOUBLE PRECISION DRA                    ! 
+      DOUBLE PRECISION SIN_DEC                ! Sine of apparent dec
+      DOUBLE PRECISION SIN_HA                 ! Sine of hour angle
       DOUBLE PRECISION SIN_ROT, COS_ROT       ! sin and cos of ROTATION, 
 *                                             !   multiplied by cos (lat)
 *    Internal References :
@@ -216,8 +256,26 @@
             ROTATION = ATAN2 (SIN_ROT, COS_ROT)
          END IF
 
+      ELSE IF (COORD_TYPE .EQ. 'AZ') THEN
+         SIN_DEC = SIN(LAT_OBS_RAD) * SIN(LAT) +
+     :        COS(LAT_OBS_RAD) * COS(LAT) * COS(LONG)
+         DEC_APP = ASIN(SIN_DEC)
+
+         SIN_HA = -SIN(LONG) * COS(LAT)
+         COS_HA = (SIN(LAT) - SIN(DEC_APP) * SIN(LAT_OBS_RAD)) /
+     :        COS(LAT_OBS_RAD)
+
+         HA = ATAN2( SIN_HA, COS_HA)
+         RA_APP = LST - HA
+         
+         SIN_ROT = SIN(LONG) * COS(LAT_OBS_RAD)
+         COS_ROT = (SIN(LAT_OBS_RAD) - SIN(DEC_APP) * SIN(LAT)) /
+     :        COS(LAT)
+         
+         ROTATION = ATAN2(SIN_ROT, COS_ROT)
+
       ELSE IF (COORD_TYPE .EQ. 'HA') THEN
-         RA_APP = SCULIB_LST() - LONG
+         RA_APP = LST - LONG
          DEC_APP = LAT
          ROTATION = 0.0D0
 
@@ -241,7 +299,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_CALC_APPARENT: can only '//
-     :        'handle PLANET, RJ, RB, RD, GA and EQ coordinates', 
+     :        'handle PLANET, RJ, RB, RD, GA, AZ and EQ coordinates', 
      :        STATUS)
          END IF
       END IF
