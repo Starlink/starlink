@@ -48,7 +48,7 @@
 *        The telescope efficiency. If available the current telescope value 
 *        is used as the default.  Values must be between 0 and 1.0. 
 *        A negative value allows this parameter to be free.
-*     ETA_TEL = REAL (Write)
+*     ETA_TEL_FIT = REAL (Write)
 *        The fitted value of ETA_TEL.
 *     GOODFIT = LOGICAL (Write)
 *        Flag to indicate whether the fit was good (TRUE) or bad (FALSE).
@@ -70,9 +70,12 @@
 *        Temperature of the cold load. The default value is
 *        taken from the input file. This parameter is ignored if the
 *        REDUCE_SWITCH'ed data is supplied.
+*     T_HOT = REAL (Read)
+*        Temperature of the hot load. This parameter is ignored if the
+*        REDUCE_SWITCH'ed data is supplied.
 *     WAVELENGTH = REAL (Write)
 *        The wavelength of the fitted data.
-*     XISW = REAL (Write)
+*     XISQ = REAL (Write)
 *        The reduced chi square of the fit.
 
 *  Examples:
@@ -80,7 +83,7 @@
 *        Process the short sub-instrument using the default value
 *        for T_COLD and allowing ETA_TEL and B to be free parameters.
 *        No output files are written.
-*     skydip 19970610_dem_0003 long eta_tel=0.9 out=sky model_out=model
+*     skydip 19970610_dem_0003 long eta_tel=0.9 out=sky model_out=model b_val=-1
 *        Process the long wave sub-instrument with ETA_TEL fixed at 0.9
 *        and B free. Write the sky temperature to sky.sdf and the fitted
 *        model to model.sdf.
@@ -128,6 +131,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.26  1998/01/23 04:01:33  timj
+*     Fix some typos in the header.
+*
 *     Revision 1.25  1998/01/15 01:59:33  timj
 *     Check for aborted skydips.
 *     Always write the fit parameters (even when status is bad)
