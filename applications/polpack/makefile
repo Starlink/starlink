@@ -461,7 +461,7 @@ pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
 polversion.f pol1_3dwcs.f pol1_fbbox.f polwrtcl.f pol1_wrtcl.f \
 pol1_gcolr.f pol1_gcold.f pol1_fioer.f  polrdtcl.f pol1_rdtcl.f \
 pol1_ctprp.f pol1_put0r.f pol1_put0d.f pol1_gtcol.f pol1_cnews.f \
-pol1_colnm.f
+pol1_colnm.f pol1_cnfig.f 
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -1795,10 +1795,6 @@ ctg_setsz.o:	 SAE_PAR GRP_PAR
 datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
-pol1_colnm.o:    SAE_PAR FIO_ERR
-pol1_put0r.o:    CAT_PAR
-pol1_cnews.o:    SAE_PAR CAT_PAR
-pol1_put0d.o:    CAT_PAR
 pol1_angrt.o:	 SAE_PAR AST_PAR
 pol1_blkwr.o:	 SAE_PAR PRM_PAR
 pol1_chkex.o:	 SAE_PAR GRP_PAR DAT_PAR NDF_PAR AST_PAR
@@ -1806,6 +1802,9 @@ pol1_clcat.o:	 SAE_PAR AST_PAR
 pol1_clcnt.o:	 SAE_PAR PRM_PAR
 pol1_cm1rr.o:	 SAE_PAR
 pol1_cm3rr.o:	 SAE_PAR
+pol1_cnews.o:    SAE_PAR CAT_PAR
+pol1_cnfig.o:    SAE_PAR
+pol1_colnm.o:    SAE_PAR FIO_ERR
 pol1_cpctd.o:	 SAE_PAR PRM_PAR
 pol1_cpctr.o:	 SAE_PAR PRM_PAR
 pol1_ctclm.o:	 SAE_PAR PRM_PAR
@@ -1817,6 +1816,7 @@ pol1_fillr.o:	 SAE_PAR
 pol1_fioer.o:	 SAE_PAR 
 pol1_gcold.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
 pol1_gcolr.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
+pol1_gtcol.o:	 SAE_PAR CAT_PAR
 pol1_gtcta.o:	 SAE_PAR AST_PAR CAT_PAR
 pol1_gtctc.o:	 SAE_PAR CAT_PAR CAT_ERR PAR_ERR
 pol1_gtctw.o:	 SAE_PAR AST_PAR CAT_PAR
@@ -1827,6 +1827,8 @@ pol1_knext.o:	 SAE_PAR
 pol1_lnam.o:	 SAE_PAR GRP_PAR FIO_PAR
 pol1_mkcat.o:	 SAE_PAR AST_PAR CAT_PAR
 pol1_plvec.o:	 SAE_PAR PRM_PAR
+pol1_put0d.o:    CAT_PAR
+pol1_put0r.o:    CAT_PAR
 pol1_rdtcl.o:	 SAE_PAR CAT_PAR PRM_PAR 
 pol1_rmbnd.o:	 SAE_PAR PRM_PAR
 pol1_setd.o:	 SAE_PAR
@@ -1848,7 +1850,6 @@ pol1_vecky.o:	 SAE_PAR AST_PAR
 pol1_vecpl.o:	 SAE_PAR PRM_PAR MSG_PAR
 pol1_vect.o:	 SAE_PAR
 pol1_wrtcl.o:	 SAE_PAR PRM_PAR 
-pol1_gtcol.o:	 SAE_PAR CAT_PAR
 pol1_xeval.o:	 SAE_PAR DAT_PAR GRP_PAR TRN_ERR
 pol_cale.o:	 SAE_PAR PRM_PAR
 pol_calf.o:	 SAE_PAR PRM_PAR
