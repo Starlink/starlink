@@ -118,7 +118,7 @@
 *        used in place of "Border"). In addition, the following attributes 
 *        may be set in order to control the appearance of the formatted axis 
 *        values reported on the screen: Format, Digits, Symbol, Unit. These
-*        may be suffixed with an axis number (eg "Digits(2)") to refer to 
+*        may be suffixed with an axis number (e.g. "Digits(2)") to refer to 
 *        the values displayed for a specific axis. [current value]
 *     X1 = LITERAL (Write)
 *        The lowest value found within the current picture for axis 1 of the 
