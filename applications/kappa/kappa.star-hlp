@@ -17223,6 +17223,17 @@ MARKER = INTEGER (Read)
    PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
    2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
    value must be larger than or equal to -31. [current value]
+3 NAME
+NAME = LITERAL (Read)
+   Determines the graphics database picture with which the supplied
+   positions are to be aligned. Only accessed if parameter PLOT
+   indicates that some graphics are to be produced. A search is made
+   for the most recent picture with the specified name (eg DATA,
+   FRAME or KEY) within the current picture. If no such picture can
+   be found, or if a null value is supplied, the current picture
+   itself is used. The name BASE can also be supplied as a special
+   case, which causes the BASE picture to be used even though it
+   will not in general fall within the current picture. [DATA]
 3 NUMBER
 NUMBER = _INTEGER (Write)
    The number of positions selected.

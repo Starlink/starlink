@@ -36,13 +36,11 @@
 *     axis values can be controlled using parameter STYLE.
 *
 *     Graphics may also be drawn marking the selected positions (see
-*     parameters PLOT and LABEL). If a DATA picture can be found on the 
-*     specified graphics device, the supplied positions are aligned with the 
-*     DATA picture. If no DATA picture is found, positions are aligned with 
-*     the current picture. If possible, this alignment occurs within the 
-*     co-ordinate Frame specified using parameter FRAME. If this is not 
-*     possible, alignment may occur in some other suitable Frame. A message 
-*     is displayed indicating the Frame in which alignment occurred.
+*     parameters PLOT and LABEL). The supplied positions are aligned with the 
+*     picture specified by parameter NAME. If possible, this alignment occurs 
+*     within the  co-ordinate Frame specified using parameter FRAME. If this 
+*     is not possible, alignment may occur in some other suitable Frame. A 
+*     message is displayed indicating the Frame in which alignment occurred.
 
 *  Usage:
 *     listshow incat [frame] [first] [last] [plot] [device]
@@ -130,6 +128,16 @@
 *        PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot, 
 *        2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The 
 *        value must be larger than or equal to -31. [current value]
+*     NAME = LITERAL (Read)
+*        Determines the graphics database picture with which the supplied
+*        positions are to be aligned. Only accessed if parameter PLOT
+*        indicates that some graphics are to be produced. A search is made
+*        for the most recent picture with the specified name (eg DATA,
+*        FRAME or KEY) within the current picture. If no such picture can 
+*        be found, or if a null value is supplied, the current picture itself 
+*        is used. The name BASE can also be supplied as a special case, which 
+*        causes the BASE picture to be used even though it will not in
+*        general fall within the current picture. [DATA]
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected.
 *     OUTCAT = FILENAME (Write)
@@ -287,6 +295,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER PICNAM*15        ! AGI picture name.
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER TEXT*(GRP__SZNAM)! Text buffer
       CHARACTER TITLE*80         ! Title from positions list
@@ -589,16 +598,38 @@
 *  Abort the graphics section if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 998
 
-*  See if the current picture is a DATA picture or contains a 
-*  DATA picture. If found, the DATA picture becomes the current picture 
-*  and its AGI id is returned. If not found an error will be reported.
-         CALL KPG1_AGFND( 'DATA', IPIC, STATUS )
+*  Get the name of the picture to use, convert to upper case and remove 
+*  blanks.
+         CALL PAR_GET0C( 'NAME', PICNAM, STATUS )
+         CALL CHR_UCASE( PICNAM )
+         CALL CHR_RMBLK( PICNAM )
 
-*  If no DATA picture was found, annul the error and use the original 
-*  current picture.
-         IF( STATUS .NE. SAI__OK ) THEN
+*  If a null value was supplied, annul the error and use the current
+*  picture.
+         IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             IPIC = IPIC0
+
+*  If the string BASE was supplied, use the BASE picture.
+         ELSE IF( PICNAM .EQ. 'BASE' ) THEN
+            CALL AGI_IBASE( IPIC, STATUS )
+            CALL AGI_SELP( IPIC, STATUS )
+
+*  Otherwise...
+         ELSE
+
+*  See if the current picture has the specified name or contains a picture
+*  with the specified NAME. If found, the picture becomes the current picture 
+*  and its AGI id is returned. If not found an error will be reported.
+            CALL KPG1_AGFND( PICNAM, IPIC, STATUS )
+
+*  If no picture was found, annul the error and use the original current 
+*  picture.
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               IPIC = IPIC0
+            END IF
+
          END IF
 
 *  Set the PGPLOT viewport and AST Plot for the current picture.
