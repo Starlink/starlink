@@ -164,7 +164,7 @@ Tcl_AppInit(interp)
      * they weren't already created by the init procedures called above.
      *
      * Note that commands which could block for a significant amount of
-     * time are declared via the tclbgcmd mechanism.
+     * time can be declared via the tclbgcmd mechanism.
      */
 
     Tcl_CreateObjCommand( interp, "ndfdrawpair", NdfDrawpair,
