@@ -1,8 +1,9 @@
       SUBROUTINE SURF_WRITE_PHOTOM (FD, PARABOLA, MAX_BEAM,
-     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_INTEGRATIONS, 
-     :  PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
-     :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
-     :  MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
+     :     N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, 
+     :     N_MEASUREMENTS, N_INTEGRATIONS, 
+     :     PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
+     :     MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
+     :     MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
 *+
 *  Name:
 *     SURF_WRITE_PHOTOM 
@@ -30,8 +31,8 @@
 
 *    Invocation :
 *      CALL SURF_WRITE_PHOTOM (FD, MAX_BEAM, 
-*     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_INTEGRATIONS, 
-*     :  PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
+*     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_MEASUREMENTS,
+*     :  N_INTEGRATIONS,PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
 *     :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
 *     :  MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
 
@@ -54,6 +55,8 @@
 *           each beam in the BOL_CHAN and BOL_ADC arrays
 *     MAX_INT                = INTEGER (Given)
 *           the maximum number of integrations in an observation
+*     N_MEASUREMENTS         = INTEGER (Given)
+*           the number of measurements in the observation
 *     N_INTEGRATIONS         = INTEGER (Given)
 *           the number of integrations in the observation
 *     PEAK_D (MAX_INT, MAX_BEAM)
@@ -116,6 +119,7 @@
       INTEGER       PHOT_BB (MAX_BEAM)
       INTEGER       MAX_INT
       INTEGER       N_INTEGRATIONS
+      INTEGER       N_MEASUREMENTS
       LOGICAL       PARABOLA
       REAL          PEAK_D (MAX_INT, MAX_BEAM)
       REAL          PEAK_V (MAX_INT, MAX_BEAM)
@@ -142,11 +146,13 @@
       PARAMETER (RECLEN = 80)            !
 *    Local variables :
       INTEGER            BEAM            ! beam index
+      INTEGER            COUNT           ! Loop counter
       REAL               ERROR           ! SQRT variance
       INTEGER            FD              ! FIO file identifier
       INTEGER            I               ! DO loop index
       INTEGER            ITEMP           ! scratch integer
       CHARACTER*(RECLEN) LINE            ! line to be written to file
+      INTEGER            M               ! Measurement counter
       CHARACTER*15       STEMP           ! scratch string
       REAL               STON            ! Signal to noise
 *    Internal References :
@@ -173,34 +179,40 @@
 
             CALL FIO_WRITE (FD, ' ', STATUS)
  
-            LINE = 'Integration  Peak    Error       S/N      '//
+            LINE = 'Meas/Int        Peak    Error       S/N      '//
      ;        'Peak_x     Peak_y'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
-            DO I = 1, N_INTEGRATIONS
-               IF (PEAK_D(I,BEAM).EQ.VAL__BADR .OR. 
-     :              PEAK_Q(I,BEAM) .GT. 0) THEN
-                  WRITE(LINE,15) I
-               ELSE
-                  ERROR = SQRT(PEAK_V(I,BEAM))
+            DO M = 1, N_MEASUREMENTS
+               DO I = 1, N_INTEGRATIONS
+                  
+*     Total number of integrations so fat
+                  COUNT = I + ((M-1) * N_INTEGRATIONS)
+
+                  IF (PEAK_D(COUNT,BEAM).EQ.VAL__BADR .OR. 
+     :                 PEAK_Q(COUNT,BEAM) .GT. 0) THEN
+                     WRITE(LINE,15) I
+                  ELSE
+                     ERROR = SQRT(PEAK_V(COUNT,BEAM))
 
 *     Protect against division by zero and 0.0/0.0
-                  IF (ERROR .GT. 1.0E-10) THEN
-                     STON = PEAK_D(I,BEAM)/ERROR
-                  ELSE
-                     STON = 0.0
-                  END IF
+                     IF (ERROR .GT. 1.0E-10) THEN
+                        STON = PEAK_D(COUNT,BEAM)/ERROR
+                     ELSE
+                        STON = 0.0
+                     END IF
 
-                  WRITE (LINE, 10) I, PEAK_D(I,BEAM), ERROR,
-     :                 STON, PEAK_X(I,BEAM),
-     :                 PEAK_Y(I,BEAM)
-               END IF
-               CALL FIO_WRITE (FD, LINE, STATUS)
+                     WRITE (LINE, 10) M, I, PEAK_D(COUNT,BEAM), ERROR,
+     :                    STON, PEAK_X(COUNT,BEAM),
+     :                    PEAK_Y(COUNT,BEAM)
+                  END IF
+                  CALL FIO_WRITE (FD, LINE, STATUS)
+               END DO
             END DO
 
 	    CALL FIO_WRITE (FD, ' ', STATUS)
 
-            LINE = 'Measurement results:'
+            LINE = 'Complete observation results:'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
 *       Parabola
@@ -237,7 +249,7 @@
          END IF
       END DO
 
-  10  FORMAT (I4, '  ', 2E11.3, ' ', F8.3, 2E11.3)
+  10  FORMAT (I4,'/',I4, '  ', 2E11.3, ' ', F8.3, 2E11.3)
   15  FORMAT (I4, ' Bad integration')
   20  FORMAT ('      ', 2E11.3, ' ', F8.3, 2E11.3)
   30  FORMAT ('      ', 2E11.3, ' ', F8.3)
