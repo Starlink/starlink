@@ -530,7 +530,7 @@ AC_EGREP_HEADER([connect.*\(], [sys/socket.h],
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) the socklen_t type.
 # -----------------------------------------------------------------------
-AC_CHECK_TYPES([socklen_t],,[sys/socket.h])
+AC_CHECK_TYPES([socklen_t],,,[#include <sys/socket.h>])
 
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) shared memory (sysv/shm) prototypes
