@@ -9791,7 +9791,9 @@ f        not being processed.  In this case, this array may be a dummy
 f        (e.g. one-element) array and should not be used.
 c     nbad
 f     NBAD = INTEGER (Returned)
-*        This should return the number of interpolation points at
+c        Pointer to an int in which to return the number of interpolation
+c        points at
+f        This should return the number of interpolation points at
 *        which an output data value (and/or a variance value if
 c        relevant) equal to "badval" has been assigned because no
 f        relevant) equal to BADVAL has been assigned because no
@@ -9891,7 +9893,7 @@ c        "params" parameter of astResample<X>. You may use this to
 f        This will be the same array as was given via the
 f        PARAMS argument of AST_RESAMPLE<X>. You may use this to
 *        pass any additional parameter values required by your kernel,
-c        but note that params[0] will already have been used to specify
+c        but note that "params[0]" will already have been used to specify
 f        but note that PARAMS(1) will already have been used to specify
 *        the number of neighbouring pixels which contribute to the
 *        interpolated value.

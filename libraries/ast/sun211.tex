@@ -10260,6 +10260,7 @@ Object            - Base class for all AST Objects
       IntraMap    - Map points using a private transformation function
       LutMap      - Transform 1-dimensional coordinates using a lookup table
       MatrixMap   - Map positions by multiplying them by a matrix
+      PcdMap      - Apply 2-dimensional pincushion/barrel distortion
       PermMap     - Coordinate permutation Mapping
       SlaMap      - Sequence of celestial coordinate conversions
       SphMap      - Map 3-d Cartesian to 2-d spherical coordinates
@@ -10394,6 +10395,13 @@ Object            - Base class for all AST Objects
          A null Object pointer (AST\_\_NULL) is always returned.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -10406,12 +10414,6 @@ Object            - Base class for all AST Objects
          but this will only be reported if the error status is clear on
          entry.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -10433,6 +10435,13 @@ Object            - Base class for all AST Objects
    \sstsynopsis{
       void astBegin
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This macro applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -10444,12 +10453,6 @@ Object            - Base class for all AST Objects
          Contexts delimited by astBegin and astEnd may be nested to any
          depth.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This macro applies to all Objects.
    }
 }
 \sstroutine{
@@ -10626,6 +10629,13 @@ Object            - Base class for all AST Objects
          comma-separated list of the names of the attributes to be cleared.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -10641,12 +10651,6 @@ Object            - Base class for all AST Objects
          An error will result if an attempt is made to clear the value
          of a read-only attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -10814,6 +10818,13 @@ Object            - Base class for all AST Objects
          A duplicate pointer to the same Object.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -10822,12 +10833,6 @@ Object            - Base class for all AST Objects
          function is invoked with the AST error status set, or if it
          should fail for any reason.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -11143,6 +11148,84 @@ Object            - Base class for all AST Objects
          destination coordinate system.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         This function applies to all Frames.
+      }
+      \sstsubsection{
+         FrameSet
+      }{
+         If either of the {\tt{"}}from{\tt{"}} or {\tt{"}}to{\tt{"}} parameters is a pointer to a
+         FrameSet, then astConvert will attempt to convert from the
+         coordinate system described by the current Frame of the {\tt{"}}from{\tt{"}}
+         FrameSet to that described by the current Frame of the {\tt{"}}to{\tt{"}}
+         FrameSet.
+
+         To achieve this, it will consider all of the Frames within
+         each FrameSet as a possible way of reaching an intermediate
+         coordinate system that can be used for the conversion. There
+         is then the possibility that more than one conversion path
+         may exist and, unless the choice is sufficiently restricted
+         by the {\tt{"}}domainlist{\tt{"}} string, the sequence in which the Frames
+         are considered can be important. In this case, the search
+         for a conversion path proceeds as follows:
+         \sstitemlist{
+
+            \sstitem
+            Each field in the {\tt{"}}domainlist{\tt{"}} string is considered in turn.
+
+            \sstitem
+            The Frames within each FrameSet are considered in a
+            specific order: (1) the base Frame is always considered
+            first, (2) after this come all the other Frames in
+            Frame-index order (but omitting the base and current Frames),
+            (3) the current Frame is always considered last.  However, if
+            either FrameSet's \htmlref{Invert}{Invert} attribute is set to a non-zero value
+            (so that the FrameSet is inverted), then its Frames are
+            considered in reverse order. (Note that this still means that
+            the base Frame is considered first and the current Frame
+            last, because the Invert value will also cause these Frames
+            to swap places.)
+
+            \sstitem
+            All source Frames are first considered (in the appropriate
+            order) for conversion to the first destination Frame. If no
+            suitable intermediate coordinate system emerges, they are
+            then considered again for conversion to the second
+            destination Frame (in the appropriate order), and so on.
+
+            \sstitem
+            Generally, the first suitable intermediate coordinate
+            system found is used. However, the overall Mapping between
+            the source and destination coordinate systems is also
+            examined.  Preference is given to cases where both the
+            forward and inverse transformations are defined (as indicated
+            by the \htmlref{TranForward}{TranForward} and \htmlref{TranInverse}{TranInverse} attributes). If only one
+            transformation is defined, the forward one is preferred.
+
+            \sstitem
+            If the domain of the intermediate coordinate system matches
+            the current {\tt{"}}domainlist{\tt{"}} field, the conversion path is
+            accepted. Otherwise, the next {\tt{"}}domainlist{\tt{"}} field is considered
+            and the process repeated.
+
+         }
+         If conversion is possible, the Base attributes of the two
+         FrameSets will be modified on exit to identify the Frames
+         used to access the intermediate coordinate system which was
+         finally accepted.
+
+         Note that it is possible to force a particular Frame within a
+         FrameSet to be used as the basis for the intermediate
+         coordinate system, if it is suitable, by (a) focussing
+         attention on
+         it by specifying its domain in the {\tt{"}}domainlist{\tt{"}} string, or (b)
+         making it the base Frame, since this is always considered
+         first.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          cvt = astConvert( a, b, {\tt{"}}{\tt{"}} );
@@ -11213,80 +11296,6 @@ Object            - Base class for all AST Objects
          should fail for any reason.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         This function applies to all Frames.
-      FrameSet
-         If either of the {\tt{"}}from{\tt{"}} or {\tt{"}}to{\tt{"}} parameters is a pointer to a
-         FrameSet, then astConvert will attempt to convert from the
-         coordinate system described by the current Frame of the {\tt{"}}from{\tt{"}}
-         FrameSet to that described by the current Frame of the {\tt{"}}to{\tt{"}}
-         FrameSet.
-
-         To achieve this, it will consider all of the Frames within
-         each FrameSet as a possible way of reaching an intermediate
-         coordinate system that can be used for the conversion. There
-         is then the possibility that more than one conversion path
-         may exist and, unless the choice is sufficiently restricted
-         by the {\tt{"}}domainlist{\tt{"}} string, the sequence in which the Frames
-         are considered can be important. In this case, the search
-         for a conversion path proceeds as follows:
-      \sstitemlist{
-
-         \sstitem
-            Each field in the {\tt{"}}domainlist{\tt{"}} string is considered in turn.
-
-         \sstitem
-            The Frames within each FrameSet are considered in a
-            specific order: (1) the base Frame is always considered
-            first, (2) after this come all the other Frames in
-            Frame-index order (but omitting the base and current Frames),
-            (3) the current Frame is always considered last.  However, if
-            either FrameSet's \htmlref{Invert}{Invert} attribute is set to a non-zero value
-            (so that the FrameSet is inverted), then its Frames are
-            considered in reverse order. (Note that this still means that
-            the base Frame is considered first and the current Frame
-            last, because the Invert value will also cause these Frames
-            to swap places.)
-
-         \sstitem
-            All source Frames are first considered (in the appropriate
-            order) for conversion to the first destination Frame. If no
-            suitable intermediate coordinate system emerges, they are
-            then considered again for conversion to the second
-            destination Frame (in the appropriate order), and so on.
-
-         \sstitem
-            Generally, the first suitable intermediate coordinate
-            system found is used. However, the overall Mapping between
-            the source and destination coordinate systems is also
-            examined.  Preference is given to cases where both the
-            forward and inverse transformations are defined (as indicated
-            by the \htmlref{TranForward}{TranForward} and \htmlref{TranInverse}{TranInverse} attributes). If only one
-            transformation is defined, the forward one is preferred.
-
-         \sstitem
-            If the domain of the intermediate coordinate system matches
-            the current {\tt{"}}domainlist{\tt{"}} field, the conversion path is
-            accepted. Otherwise, the next {\tt{"}}domainlist{\tt{"}} field is considered
-            and the process repeated.
-
-      }
-         If conversion is possible, the Base attributes of the two
-         FrameSets will be modified on exit to identify the Frames
-         used to access the intermediate coordinate system which was
-         finally accepted.
-
-         Note that it is possible to force a particular Frame within a
-         FrameSet to be used as the basis for the intermediate
-         coordinate system, if it is suitable, by (a) focussing
-         attention on
-         it by specifying its domain in the {\tt{"}}domainlist{\tt{"}} string, or (b)
-         making it the base Frame, since this is always considered
-         first.
-   }
 }
 \sstroutine{
    astCopy\sstlabel{astCopy}
@@ -11319,6 +11328,13 @@ Object            - Base class for all AST Objects
          Pointer to the new Object.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -11327,12 +11343,6 @@ Object            - Base class for all AST Objects
          function is invoked with the AST error status set, or if it
          should fail for any reason.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -11477,6 +11487,13 @@ Object            - Base class for all AST Objects
          A null Object pointer (AST\_\_NULL) is always returned.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -11486,12 +11503,6 @@ Object            - Base class for all AST Objects
          on entry, although no further error report will be
          made if it subsequently fails under these circumstances.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -11573,6 +11584,13 @@ Object            - Base class for all AST Objects
    \sstsynopsis{
       void astEnd
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This macro applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -11583,12 +11601,6 @@ Object            - Base class for all AST Objects
          Contexts delimited by astBegin and astEnd may be nested to any
          depth.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This macro applies to all Objects.
    }
 }
 \sstroutine{
@@ -11619,11 +11631,12 @@ Object            - Base class for all AST Objects
          Object pointer to be exempted from context handling.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
          This function applies to all Objects.
+      }
    }
 }
 \sstroutine{
@@ -11648,6 +11661,13 @@ Object            - Base class for all AST Objects
          Object pointer to be exported.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -11657,12 +11677,6 @@ Object            - Base class for all AST Objects
          and have not been rendered exempt using \htmlref{astExempt}{astExempt}.
          Applying it to an unsuitable Object pointer has no effect.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -12005,6 +12019,54 @@ Object            - Base class for all AST Objects
          attributes will describe the new coordinate system.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         This function applies to all Frames.
+      }
+      \sstsubsection{
+         FrameSet
+      }{
+         If the target is a FrameSet, the possibility exists that
+         several of the Frames within it might be matched by the
+         template.  Unless the choice is sufficiently restricted by
+         the {\tt{"}}domainlist{\tt{"}} string, the sequence in which Frames are
+         searched can then become important. In this case, the search
+         proceeds as follows:
+         \sstitemlist{
+
+            \sstitem
+            Each field in the {\tt{"}}domainlist{\tt{"}} string is considered in turn.
+
+            \sstitem
+            An attempt is made to match the template to each of the
+            target's Frames in the order: (1) the current Frame, (2) the
+            base Frame, (3) each remaining Frame in the order of being
+            added to the target FrameSet.
+
+            \sstitem
+            Generally, the first match found is used. However, the
+            Mapping between the target coordinate system and the
+            resulting Frame is also examined. Preference is given to
+            cases where both the forward and inverse transformations are
+            defined (as indicated by the \htmlref{TranForward}{TranForward} and \htmlref{TranInverse}{TranInverse}
+            attributes). If only one transformation is defined, the
+            forward one is preferred.
+
+            \sstitem
+            If a match is found and the domain of the resulting Frame also
+            matches the current {\tt{"}}domainlist{\tt{"}} field, it is
+            accepted. Otherwise, the next {\tt{"}}domainlist{\tt{"}} field is considered
+            and the process repeated.
+
+         }
+         If a suitable coordinate system is found, the Current
+         attribute of the target FrameSet will be modified on exit to
+         identify the Frame whose match with the target was eventually
+         accepted.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          result = astFindFrame( target, \htmlref{astFrame}{astFrame}( 3, {\tt{"}}{\tt{"}} ), {\tt{"}}{\tt{"}} );
@@ -12103,50 +12165,6 @@ Object            - Base class for all AST Objects
          function is invoked with the AST error status set, or if it
          should fail for any reason.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         This function applies to all Frames.
-      FrameSet
-         If the target is a FrameSet, the possibility exists that
-         several of the Frames within it might be matched by the
-         template.  Unless the choice is sufficiently restricted by
-         the {\tt{"}}domainlist{\tt{"}} string, the sequence in which Frames are
-         searched can then become important. In this case, the search
-         proceeds as follows:
-      \sstitemlist{
-
-         \sstitem
-            Each field in the {\tt{"}}domainlist{\tt{"}} string is considered in turn.
-
-         \sstitem
-            An attempt is made to match the template to each of the
-            target's Frames in the order: (1) the current Frame, (2) the
-            base Frame, (3) each remaining Frame in the order of being
-            added to the target FrameSet.
-
-         \sstitem
-            Generally, the first match found is used. However, the
-            Mapping between the target coordinate system and the
-            resulting Frame is also examined. Preference is given to
-            cases where both the forward and inverse transformations are
-            defined (as indicated by the \htmlref{TranForward}{TranForward} and \htmlref{TranInverse}{TranInverse}
-            attributes). If only one transformation is defined, the
-            forward one is preferred.
-
-         \sstitem
-            If a match is found and the domain of the resulting Frame also
-            matches the current {\tt{"}}domainlist{\tt{"}} field, it is
-            accepted. Otherwise, the next {\tt{"}}domainlist{\tt{"}} field is considered
-            and the process repeated.
-
-      }
-         If a suitable coordinate system is found, the Current
-         attribute of the target FrameSet will be modified on exit to
-         identify the Frame whose match with the target was eventually
-         accepted.
    }
    \sstdiytopic{
       More on Using Templates
@@ -12662,6 +12680,13 @@ Object            - Base class for all AST Objects
          character string containing this value).
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         These functions apply to all Objects.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          printf( {\tt{"}}\htmlref{RefCount}{RefCount} = \%d$\backslash$n{\tt{"}}, astGetI( z, {\tt{"}}RefCount{\tt{"}} ) );
@@ -12695,12 +12720,6 @@ Object            - Base class for all AST Objects
          the memory containing the string may be re-used, so a copy of
          the string should be made if it is needed for longer than this.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         These functions apply to all Objects.
    }
 }
 \sstroutine{
@@ -13258,6 +13277,13 @@ Object            - Base class for all AST Objects
          class derived from it), otherwise zero.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         These functions apply to all Objects.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          member = astIsAFrame( obj );
@@ -13284,12 +13310,6 @@ Object            - Base class for all AST Objects
          for any reason. In particular, it will fail if the pointer
          supplied does not identify an Object of any sort.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         These functions apply to all Objects.
    }
 }
 \sstroutine{
@@ -13893,6 +13913,101 @@ Object            - Base class for all AST Objects
          {\tt{"}}Bad{\tt{"}} coordinate values will also be returned if the two
          points supplied are coincident (or otherwise fail to uniquely
          specify a geodesic curve) but the requested offset is non-zero.
+      }
+   }
+}
+\sstroutine{
+   astPcdMap\sstlabel{astPcdMap}
+}{
+   Create a PcdMap
+}{
+   \sstdescription{
+      This function creates a new \htmlref{PcdMap}{PcdMap} and optionally initialises its
+      attributes.
+
+      A PcdMap is a non-linear \htmlref{Mapping}{Mapping} which transforms 2-dimensional
+      positions to correct for the radial distortion introduced by some
+      cameras and telescopes. This can take the form either of pincushion
+      or barrel distortion, and is characterized by a single distortion
+      coefficient.
+
+      A PcdMap is specified by giving this distortion coefficient and the
+      coordinates of the centre of the radial distortion. The forward
+      transformation of a PcdMap applies the distortion:
+
+         RD = R $*$ ( 1 $+$ C $*$ R $*$ R )
+
+      where R is the undistorted radial distance from the distortion
+      centre (specified by attribute PcdCen), RD is the radial distance
+      from the same centre in the presence of distortion, and C is the
+      distortion coefficient (given by attribute \htmlref{Disco}{Disco}).
+
+      The inverse transformation of a PcdMap removes the distortion
+      produced by the forward transformation. The expression used to derive
+      R from RD is an approximate inverse of the expression above, obtained
+      from two iterations of the Newton-Raphson method. The mismatch between
+      the forward and inverse expressions is negligible for astrometric
+      applications (to reach 1 milliarcsec at the edge of the Anglo-Australian
+      Telescope triplet or a Schmidt field would require field diameters of
+      2.4 and 42 degrees respectively).
+
+      If a PcdMap is inverted (e.g. using \htmlref{astInvert}{astInvert}) then the roles of the
+      forward and inverse transformations are reversed; the forward
+      transformation will remove the distortion, and the inverse
+      transformation will apply it.
+   }
+   \sstsynopsis{
+      AstPcdMap $*$astPcdMap( double disco, const double pcdcen[2],
+                            const char $*$options, ... )
+   }
+   \sstparameters{
+      \sstsubsection{
+         disco
+      }{
+         The distortion coefficient. Negative values give barrel
+         distortion, positive values give pincushion distortion, and
+         zero gives no distortion.
+      }
+      \sstsubsection{
+         pcdcen
+      }{
+         A 2-element array containing the coordinates of the centre of the
+         distortion.
+      }
+      \sstsubsection{
+         options
+      }{
+         Pointer to a null-terminated string containing an optional
+         comma-separated list of attribute assignments to be used for
+         initialising the new PcdMap. The syntax used is identical to
+         that for the \htmlref{astSet}{astSet} function and may include {\tt{"}}printf{\tt{"}} format
+         specifiers identified by {\tt{"}}\%{\tt{"}} symbols in the normal way.
+      }
+      \sstsubsection{
+         ...
+      }{
+         If the {\tt{"}}options{\tt{"}} string contains {\tt{"}}\%{\tt{"}} format specifiers, then
+         an optional list of additional arguments may follow it in
+         order to supply values to be substituted for these
+         specifiers. The rules for supplying these are identical to
+         those for the astSet function (and for the C {\tt{"}}printf{\tt{"}}
+         function).
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astPcdMap()
+      }{
+         A pointer to the new PcdMap.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
+         function is invoked with the AST error status set, or if it
+         should fail for any reason.
       }
    }
 }
@@ -15356,6 +15471,13 @@ Object            - Base class for all AST Objects
          appear in the {\tt{"}}settings{\tt{"}} string.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          astSet( map, {\tt{"}}\htmlref{Report}{Report} = 1, \htmlref{Zoom}{Zoom} = 25.0{\tt{"}} );
@@ -15406,12 +15528,6 @@ Object            - Base class for all AST Objects
          a read-only attribute.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
-   }
 }
 \sstroutine{
    astSet$<$X$>$\sstlabel{astSetX}
@@ -15452,6 +15568,13 @@ Object            - Base class for all AST Objects
          character string containing this value).
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         These functions apply to all Objects.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          astSetI( frame, {\tt{"}}Preserve{\tt{"}}, 1 );
@@ -15476,12 +15599,6 @@ Object            - Base class for all AST Objects
          An error will result if an attempt is made to set a value for
          a read-only attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         These functions apply to all Objects.
    }
 }
 \sstroutine{
@@ -15542,11 +15659,12 @@ Object            - Base class for all AST Objects
          Pointer to the Object to be displayed.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
          This function applies to all Objects.
+      }
    }
 }
 \sstroutine{
@@ -16105,6 +16223,13 @@ Object            - Base class for all AST Objects
          (and hasn't been cleared), otherwise zero.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This function applies to all Objects.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -16120,12 +16245,6 @@ Object            - Base class for all AST Objects
          A value of zero will also be returned if this function is used
          to test a read-only attribute, although no error will result.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         This function applies to all Objects.
    }
 }
 \sstroutine{
@@ -16881,6 +17000,30 @@ Object            - Base class for all AST Objects
          space which occurs before or after the value.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         This function applies to all Frames. See the {\tt{"}}Frame Input
+         Format{\tt{"}} section below for details of the input formats
+         accepted by a basic Frame.
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the input format to be suitable
+         for representing angles and times, with the resulting
+         coordinate value returned in radians.  See the {\tt{"}}SkyFrame
+         Input Format{\tt{"}} section below for details of the formats
+         accepted.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The input formats accepted by a FrameSet are determined by
+         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -16917,23 +17060,6 @@ Object            - Base class for all AST Objects
          is invoked with the AST error status set, or if it should fail
          for any reason.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         This function applies to all Frames. See the {\tt{"}}Frame Input
-         Format{\tt{"}} section below for details of the input formats
-         accepted by a basic Frame.
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the input format to be suitable
-         for representing angles and times, with the resulting
-         coordinate value returned in radians.  See the {\tt{"}}SkyFrame
-         Input Format{\tt{"}} section below for details of the formats
-         accepted.
-      \htmlref{FrameSet}{FrameSet}
-         The input formats accepted by a FrameSet are determined by
-         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
    \sstdiytopic{
       Frame Input Format
@@ -17643,6 +17769,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -17656,12 +17789,6 @@ Object            - Base class for all AST Objects
          value. If an explicit Format(axis) value is set, it will
          over-ride any effect from the AsTime attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      SkyFrame
-         All SkyFrames have this attribute.
    }
 }
 \sstroutine{
@@ -17678,6 +17805,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         FrameSet
+      }{
+         All FrameSets have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -17686,12 +17820,6 @@ Object            - Base class for all AST Objects
          \htmlref{Invert}{Invert} attribute, with the \htmlref{astInvert}{astInvert} function for example) will
          interchange the values of its Base and \htmlref{Current}{Current} attributes.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      FrameSet
-         All FrameSets have this attribute.
    }
 }
 \sstroutine{
@@ -17717,11 +17845,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
          All Plots have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -17753,11 +17882,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      FitsChan
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
          All FitsChans have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -17772,11 +17902,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Character string, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
          All Objects have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -17806,11 +17937,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
          All Plots have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -17835,6 +17967,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -17849,12 +17988,6 @@ Object            - Base class for all AST Objects
          {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}} operation will use just the Colour(TextLab)
          value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -17874,11 +18007,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Channel
+   \sstapplicability{
+      \sstsubsection{
+         Channel
+      }{
          All Channels have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -17895,6 +18029,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         FrameSet
+      }{
+         All FrameSets have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -17903,12 +18044,6 @@ Object            - Base class for all AST Objects
          \htmlref{Invert}{Invert} attribute, with the \htmlref{astInvert}{astInvert} function for example) will
          interchange the values of its \htmlref{Base}{Base} and Current attributes.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      FrameSet
-         All FrameSets have this attribute.
    }
 }
 \sstroutine{
@@ -17932,16 +18067,20 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
          The default Digits value supplied by the Frame class is 7. If
          a value less than 1 is supplied, then 1 is used instead.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The Digits attribute of a FrameSet (or one of its axes) is
          the same as that of its current Frame (as specified by the
          \htmlref{Current}{Current} attribute).
+      }
    }
 }
 \sstroutine{
@@ -17962,6 +18101,29 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default Direction value supplied by the Frame class is 1,
+         indicating that all axes should be displayed in the
+         conventional direction.
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the default Direction value to
+         suggest that certain axes (e.g. right ascension) should be
+         plotted in reverse when appropriate.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The Direction attribute of a FrameSet axis is the same as
+         that of its current Frame (as specified by the \htmlref{Current}{Current}
+         attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -17978,21 +18140,37 @@ Object            - Base class for all AST Objects
          ignore this hint if they wish.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default Direction value supplied by the Frame class is 1,
-         indicating that all axes should be displayed in the
-         conventional direction.
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the default Direction value to
-         suggest that certain axes (e.g. right ascension) should be
-         plotted in reverse when appropriate.
-      \htmlref{FrameSet}{FrameSet}
-         The Direction attribute of a FrameSet axis is the same as
-         that of its current Frame (as specified by the \htmlref{Current}{Current}
-         attribute).
+}
+\sstroutine{
+   Disco\sstlabel{Disco}
+}{
+   PcdMap pincushion/barrel distortion coefficient
+}{
+   \sstdescription{
+      This attribute specifies the pincushion/barrel distortion coefficient
+      used by a \htmlref{PcdMap}{PcdMap}. This coefficient is set when the PcdMap is created,
+      but may later be modified. If the attribute is cleared, its default
+      value is zero, which gives no distortion. For pincushion distortion,
+      the value should be positive. For barrel distortion, it should be
+      negative.
+
+      Note that the forward transformation of a PcdMap applies the
+      distortion specified by this attribute and the inverse
+      transformation removes this distortion. If the PcdMap is inverted
+      (e.g. using \htmlref{astInvert}{astInvert}), then the forward transformation will
+      remove the distortion and the inverse transformation will apply
+      it. The distortion itself will still be given by the same value of
+      Disco.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         PcdMap
+      }{
+         All PcdMaps have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -18016,6 +18194,32 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default Domain value supplied by the Frame class is an
+         empty string.
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the default Domain value to be
+         {\tt{"}}SKY{\tt{"}}.
+      }
+      \sstsubsection{
+         \htmlref{CmpFrame}{CmpFrame}
+      }{
+         The CmpFrame class re-defines the default Domain value to be
+         {\tt{"}}CMP{\tt{"}}.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The Domain attribute of a FrameSet is the same as that of its
+         current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18023,22 +18227,6 @@ Object            - Base class for all AST Objects
          All Domain values are converted to upper case and white space
          is removed before use.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default Domain value supplied by the Frame class is an
-         empty string.
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the default Domain value to be
-         {\tt{"}}SKY{\tt{"}}.
-      \htmlref{CmpFrame}{CmpFrame}
-         The CmpFrame class re-defines the default Domain value to be
-         {\tt{"}}CMP{\tt{"}}.
-      \htmlref{FrameSet}{FrameSet}
-         The Domain attribute of a FrameSet is the same as that of its
-         current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -18062,6 +18250,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18076,12 +18271,6 @@ Object            - Base class for all AST Objects
          attribute).  In this case, the value of the DrawAxes attribute
          is ignored.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -18100,6 +18289,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18111,12 +18307,6 @@ Object            - Base class for all AST Objects
          The vertical placement of the title can be controlled using
          the \htmlref{TitleGap}{TitleGap} attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -18144,6 +18334,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18155,12 +18352,6 @@ Object            - Base class for all AST Objects
          drawn at the edges of the plotting area, rather than along the
          axis lines).
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -18213,6 +18404,13 @@ Object            - Base class for all AST Objects
    }
    \sstattributetype{
       String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
+         All FitsChans have this attribute.
+      }
    }
    \sstdiytopic{
       Encodings Available
@@ -18519,12 +18717,6 @@ Object            - Base class for all AST Objects
       astWrite should (barring errors) always transfer data and
       return a value of 1.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      FitsChan
-         All FitsChans have this attribute.
-   }
 }
 \sstroutine{
    Epoch\sstlabel{Epoch}
@@ -18559,6 +18751,13 @@ Object            - Base class for all AST Objects
    }
    \sstattributetype{
       Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
    }
    \sstnotes{
       \sstitemlist{
@@ -18630,12 +18829,6 @@ Object            - Base class for all AST Objects
       prefix, this format allows the Epoch value to be obtained as
       either a character string or a floating point value.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      SkyFrame
-         All SkyFrames have this attribute.
-   }
 }
 \sstroutine{
    Equinox\sstlabel{Equinox}
@@ -18677,6 +18870,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18695,12 +18895,6 @@ Object            - Base class for all AST Objects
          which qualifying attributes apply to each celestial coordinate
          system.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      SkyFrame
-         All SkyFrames have this attribute.
    }
 }
 \sstroutine{
@@ -18737,11 +18931,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      FitsChan
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
          All FitsChans have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -18765,6 +18960,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18779,12 +18981,6 @@ Object            - Base class for all AST Objects
          {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}} operation will use just the Font(TextLab)
          value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -18807,19 +19003,10 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         When specifying this attribute by name, it should be
-         subscripted with the number of the Frame axis to which it
-         applies.
-      }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
          The Frame class interprets this attribute as a format
          specification string to be passed to the C {\tt{"}}printf{\tt{"}} function
          (e.g. {\tt{"}}\%1.7G{\tt{"}}) in order to format a single coordinate value
@@ -18830,18 +19017,34 @@ Object            - Base class for all AST Objects
          specification by some printf-like functions (such as
          \htmlref{astSet}{astSet}). You may need to double it (i.e. use {\tt{"}}\%\%{\tt{"}}) to avoid
          this.
-      \htmlref{SkyFrame}{SkyFrame}
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
          The SkyFrame class re-defines the syntax and default value of
          the Format string to allow the formatting of sexagesimal
          values as appropriate for the particular celestial coordinate
          system being represented. The syntax of SkyFrame Format
          strings is described (below) in the {\tt{"}}SkyFrame Formats{\tt{"}}
          section.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The Format attribute of a FrameSet axis is the same as that
          of its current Frame (as specified by the \htmlref{Current}{Current}
          attribute). Note that the syntax of the Format string is also
          determined by the current Frame.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
    }
    \sstdiytopic{
       SkyFrame Formats
@@ -18935,6 +19138,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Channel
+      }{
+         All Channels have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18942,12 +19152,6 @@ Object            - Base class for all AST Objects
          All positive values supplied for this attribute are converted
          to $+$1 and all negative values are converted to -1.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Channel
-         All Channels have this attribute.
    }
 }
 \sstroutine{
@@ -18975,6 +19179,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -18990,12 +19201,6 @@ Object            - Base class for all AST Objects
          value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}} operation
          will use just the Gap(1) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19018,6 +19223,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19025,12 +19237,6 @@ Object            - Base class for all AST Objects
          The spacing between major axis values, which determines the
          spacing of grid lines, may be set using the \htmlref{Gap(axis)}{Gapaxis} attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19057,6 +19263,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         All Objects have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19067,12 +19280,6 @@ Object            - Base class for all AST Objects
          copy. However, it is retained in any external representation of
          an Object produced by the astWrite function.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
-         All Objects have this attribute.
    }
 }
 \sstroutine{
@@ -19099,15 +19306,21 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Mapping
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
          All Mappings have this attribute.
-      \htmlref{UnitMap}{UnitMap}
+      }
+      \sstsubsection{
+         \htmlref{UnitMap}{UnitMap}
+      }{
          The value of the Invert attribute has no effect on the
          behaviour of a UnitMap.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          Inverting the boolean sense of the Invert attribute for a
          FrameSet will cause its base and current Frames (and its \htmlref{Base}{Base}
          and \htmlref{Current}{Current} attributes) to be interchanged. This, in turn,
@@ -19115,6 +19328,7 @@ Object            - Base class for all AST Objects
          (such as Nin, Nout, \htmlref{Naxes}{Naxes}, TranForward, TranInverse,
          etc.). The Invert attribute of a FrameSet is not itself
          affected by selecting a new base or current \htmlref{Frame}{Frame}.
+      }
    }
 }
 \sstroutine{
@@ -19132,11 +19346,33 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default supplied by the Frame class is the string {\tt{"}}\htmlref{Axis}{Axis}
+         $<$n$>${\tt{"}}, where $<$n$>$ is 1, 2, etc. for each successive axis.
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the default Label value
+         (e.g. to {\tt{"}}Right ascension{\tt{"}} or {\tt{"}}Galactic latitude{\tt{"}}) as
+         appropriate for the particular celestial coordinate system
+         being represented.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The Label attribute of a FrameSet axis is the same as that of
+         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         \htmlref{Axis}{Axis} labels are intended purely for interpretation by human
+         Axis labels are intended purely for interpretation by human
          readers and not by software.
 
          \sstitem
@@ -19144,21 +19380,6 @@ Object            - Base class for all AST Objects
          subscripted with the number of the Frame axis to which it
          applies.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default supplied by the Frame class is the string {\tt{"}}Axis
-         $<$n$>${\tt{"}}, where $<$n$>$ is 1, 2, etc. for each successive axis.
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the default Label value
-         (e.g. to {\tt{"}}Right ascension{\tt{"}} or {\tt{"}}Galactic latitude{\tt{"}}) as
-         appropriate for the particular celestial coordinate system
-         being represented.
-      \htmlref{FrameSet}{FrameSet}
-         The Label attribute of a FrameSet axis is the same as that of
-         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -19190,6 +19411,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19211,12 +19439,6 @@ Object            - Base class for all AST Objects
          attribute).  In this case, the value of the LabelAt attribute is
          ignored.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19244,6 +19466,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19263,12 +19492,6 @@ Object            - Base class for all AST Objects
          is to include a unit description only for those axes which were not
          extracted from a SkyFrame.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19293,6 +19516,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19308,12 +19538,6 @@ Object            - Base class for all AST Objects
          attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}}
          operation will use just the LabelUp(1) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19335,6 +19559,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19343,12 +19574,6 @@ Object            - Base class for all AST Objects
          placement of labels and tick marks that are drawn inside the
          plotting area.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19376,11 +19601,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
          All Plots have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -19405,15 +19631,19 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
          The default MatchEnd value for a Frame is zero, so that
          trailing axes are disregarded.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The MatchEnd attribute of a FrameSet is the same as that of
          its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
    }
 }
 \sstroutine{
@@ -19436,6 +19666,34 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default MaxAxes value for a Frame is equal to the number
+         of Frame axes (\htmlref{Naxes}{Naxes} attribute).
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class constrains the MaxAxes value to be 2.  Any
+         attempt to alter this value is simply ignored.
+      }
+      \sstsubsection{
+         \htmlref{CmpFrame}{CmpFrame}
+      }{
+         The MaxAxes attribute of a CmpFrame is equal to the sum of
+         the MaxAxes values of its two component Frames. Any attempt
+         to alter this value (other than through the component Frames)
+         is simply ignored.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The MaxAxes attribute of a FrameSet is the same as that of
+         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19451,24 +19709,6 @@ Object            - Base class for all AST Objects
          number of axes, the \htmlref{MatchEnd}{MatchEnd} attribute of the template is used
          to determine how the individual axes of each Frame should match.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default MaxAxes value for a Frame is equal to the number
-         of Frame axes (\htmlref{Naxes}{Naxes} attribute).
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class constrains the MaxAxes value to be 2.  Any
-         attempt to alter this value is simply ignored.
-      \htmlref{CmpFrame}{CmpFrame}
-         The MaxAxes attribute of a CmpFrame is equal to the sum of
-         the MaxAxes values of its two component Frames. Any attempt
-         to alter this value (other than through the component Frames)
-         is simply ignored.
-      \htmlref{FrameSet}{FrameSet}
-         The MaxAxes attribute of a FrameSet is the same as that of
-         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -19491,6 +19731,34 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default MinAxes value for a Frame is equal to the number
+         of Frame axes (\htmlref{Naxes}{Naxes} attribute).
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class constrains the MinAxes value to be 2. Any
+         attempt to alter this value is simply ignored.
+      }
+      \sstsubsection{
+         \htmlref{CmpFrame}{CmpFrame}
+      }{
+         The MinAxes attribute of a CmpFrame is equal to the sum of
+         the MinAxes values of its two component Frames. Any attempt
+         to alter this value (other than through the component Frames)
+         is simply ignored.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The MinAxes attribute of a FrameSet is the same as that of
+         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19506,24 +19774,6 @@ Object            - Base class for all AST Objects
          number of axes, the \htmlref{MatchEnd}{MatchEnd} attribute of the template is used
          to determine how the individual axes of each Frame should match.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default MinAxes value for a Frame is equal to the number
-         of Frame axes (\htmlref{Naxes}{Naxes} attribute).
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class constrains the MinAxes value to be 2. Any
-         attempt to alter this value is simply ignored.
-      \htmlref{CmpFrame}{CmpFrame}
-         The MinAxes attribute of a CmpFrame is equal to the sum of
-         the MinAxes values of its two component Frames. Any attempt
-         to alter this value (other than through the component Frames)
-         is simply ignored.
-      \htmlref{FrameSet}{FrameSet}
-         The MinAxes attribute of a FrameSet is the same as that of
-         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -19549,6 +19799,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19558,12 +19815,6 @@ Object            - Base class for all AST Objects
          the attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or
          {\tt{"}}test{\tt{"}} operation will use just the MinTick(1) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19588,6 +19839,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19595,12 +19853,6 @@ Object            - Base class for all AST Objects
          The number of minor tick marks drawn is determined by the
          Plot's \htmlref{MinTick(axis)}{MinTickaxis} attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19619,6 +19871,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point, read-only.
    }
+   \sstapplicability{
+      \sstsubsection{
+         WcsMap
+      }{
+         All WcsMaps have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19630,12 +19889,6 @@ Object            - Base class for all AST Objects
          For a definition of the reference point for a projection, see
          the FITS-WCS paper.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      WcsMap
-         All WcsMaps have this attribute.
    }
 }
 \sstroutine{
@@ -19652,17 +19905,24 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
          All Frames have this attribute.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The Naxes attribute of a FrameSet is the same as that of its
          current Frame (as specified by the \htmlref{Current}{Current} attribute).
-      \htmlref{CmpFrame}{CmpFrame}
+      }
+      \sstsubsection{
+         \htmlref{CmpFrame}{CmpFrame}
+      }{
          The Naxes attribute of a CmpFrame is equal to the sum of the
          Naxes values of its two component Frames.
+      }
    }
 }
 \sstroutine{
@@ -19678,11 +19938,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      FitsChan
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
          All FitsChans have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -19698,11 +19959,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      FrameSet
+   \sstapplicability{
+      \sstsubsection{
+         FrameSet
+      }{
          All FrameSets have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -19719,12 +19981,15 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Mapping
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
          All Mappings have this attribute.
-      \htmlref{CmpMap}{CmpMap}
+      }
+      \sstsubsection{
+         \htmlref{CmpMap}{CmpMap}
+      }{
          If a CmpMap's component Mappings are joined in series, then
          its Nin attribute is equal to the Nin attribute of the first
          component (or to the \htmlref{Nout}{Nout} attribute of the second component
@@ -19734,14 +19999,21 @@ Object            - Base class for all AST Objects
          its Nin attribute is given by the sum of the Nin attributes
          of each component (or to the sum of their Nout attributes if
          the CmpMap's Invert attribute is non-zero).
-      \htmlref{Frame}{Frame}
+      }
+      \sstsubsection{
+         \htmlref{Frame}{Frame}
+      }{
          The Nin attribute for a Frame is always equal to the number
          of Frame axes (\htmlref{Naxes}{Naxes} attribute).
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The Nin attribute of a FrameSet is equal to the number of
          axes (Naxes attribute) of its base Frame (as specified by the
          FrameSet's \htmlref{Base}{Base} attribute). The Nin attribute value may
          therefore change if a new base Frame is selected.
+      }
    }
 }
 \sstroutine{
@@ -19762,11 +20034,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
          All Objects have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -19783,12 +20056,15 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Mapping
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
          All Mappings have this attribute.
-      \htmlref{CmpMap}{CmpMap}
+      }
+      \sstsubsection{
+         \htmlref{CmpMap}{CmpMap}
+      }{
          If a CmpMap's component Mappings are joined in series, then
          its Nout attribute is equal to the Nout attribute of the
          second component (or to the \htmlref{Nin}{Nin} attribute of the first
@@ -19798,15 +20074,22 @@ Object            - Base class for all AST Objects
          its Nout attribute is given by the sum of the Nout attributes
          of each component (or to the sum of their Nin attributes if
          the CmpMap's Invert attribute is non-zero).
-      \htmlref{Frame}{Frame}
+      }
+      \sstsubsection{
+         \htmlref{Frame}{Frame}
+      }{
          The Nout attribute for a Frame is always equal to the number
          of Frame axes (\htmlref{Naxes}{Naxes} attribute).
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The Nout attribute of a FrameSet is equal to the number of
          FrameSet axes (Naxes attribute) which, in turn, is equal to
          the Naxes attribute of the FrameSet's current Frame (as
          specified by the \htmlref{Current}{Current} attribute). The Nout attribute value
          may therefore change if a new current Frame is selected.
+      }
    }
 }
 \sstroutine{
@@ -19830,6 +20113,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19844,12 +20134,6 @@ Object            - Base class for all AST Objects
          attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}}
          operation will use just the NumLab(1) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -19879,6 +20163,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -19889,11 +20180,41 @@ Object            - Base class for all AST Objects
          {\tt{"}}test{\tt{"}} operation will use just the NumLabGap(1) value.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
+}
+\sstroutine{
+   PcdCen(axis)\sstlabel{PcdCenaxis}
+}{
+   Centre coordinates of pincushion/barrel distortion
+}{
+   \sstdescription{
+      This attribute specifies the centre of the pincushion/barrel
+      distortion implemented by a \htmlref{PcdMap}{PcdMap}. It takes a separate value for
+      each axis of the PcdMap so that, for instance, the settings
+      {\tt{"}}PcdCen(1)=345.0,PcdCen(2)=-104.4{\tt{"}} specify that the pincushion
+      distortion is centred at positions of 345.0 and -104.4 on axes 1 and 2
+      respectively. This attribute is set when a PcdMap is created, but may
+      later be modified. If the attribute is cleared, the default value for
+      both axes is zero.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         PcdMap
+      }{
+         All PcdMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If no axis is specified, (e.g. {\tt{"}}PcdCen{\tt{"}} instead of
+         {\tt{"}}PcdCen(2){\tt{"}}), then a {\tt{"}}set{\tt{"}} or {\tt{"}}clear{\tt{"}} operation will affect
+         the attribute value of both axes, while a {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}}
+         operation will use just the PcdCen(1) value.
+      }
    }
 }
 \sstroutine{
@@ -19917,21 +20238,28 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
          All Frames have this attribute. However, the Frame class
          effectively ignores this attribute and behaves as if it has
          the value 1. This is because the axes of a basic Frame are
          not distinguishable and will always match any other Frame
          whatever their order.
-      \htmlref{SkyFrame}{SkyFrame}
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
          Unlike a basic Frame, the SkyFrame class makes use of this
          attribute.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The Permute attribute of a FrameSet is the same as that of
          its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
    }
 }
 \sstroutine{
@@ -19957,14 +20285,18 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
          All Frames have this attribute.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The PreserveAxes attribute of a FrameSet is the same as that
          of its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
    }
 }
 \sstroutine{
@@ -20007,6 +20339,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         WcsMap
+      }{
+         All WcsMaps have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20016,12 +20355,6 @@ Object            - Base class for all AST Objects
          paper), then an error will result when the WcsMap is used to
          transform coordinates.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      WcsMap
-         All WcsMaps have this attribute.
    }
 }
 \sstroutine{
@@ -20047,11 +20380,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      SkyFrame
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
          All SkyFrames have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -20071,11 +20405,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Object
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
          All Objects have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -20097,6 +20432,39 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
+         All Mappings have this attribute.
+      }
+      \sstsubsection{
+         \htmlref{CmpMap}{CmpMap}
+      }{
+         When applied to a compound Mapping (CmpMap), only the Report
+         attribute of the CmpMap, and not those of its component
+         Mappings, is used.  Coordinate information is never reported
+         for the component Mappings individually, only for the
+         complete CmpMap.
+      }
+      \sstsubsection{
+         \htmlref{Frame}{Frame}
+      }{
+         When applied to any Frame, the formatting capabilities of the
+         Frame (as provided by the \htmlref{astFormat}{astFormat} function) will be used to
+         format the reported coordinates.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         When applied to any FrameSet, the formatting capabilities of
+         the base and current Frames will be used (as above) to
+         individually format the input and output coordinates, as
+         appropriate. The Report attribute of a FrameSet is not itself
+         affected by selecting a new base or current Frame, but the
+         resulting formatting capabilities may be.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20107,29 +20475,6 @@ Object            - Base class for all AST Objects
          copy. Similarly, it becomes undefined in any external
          representation of a Mapping produced by the \htmlref{astWrite}{astWrite} function.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Mapping
-         All Mappings have this attribute.
-      \htmlref{CmpMap}{CmpMap}
-         When applied to a compound Mapping (CmpMap), only the Report
-         attribute of the CmpMap, and not those of its component
-         Mappings, is used.  Coordinate information is never reported
-         for the component Mappings individually, only for the
-         complete CmpMap.
-      \htmlref{Frame}{Frame}
-         When applied to any Frame, the formatting capabilities of the
-         Frame (as provided by the \htmlref{astFormat}{astFormat} function) will be used to
-         format the reported coordinates.
-      \htmlref{FrameSet}{FrameSet}
-         When applied to any FrameSet, the formatting capabilities of
-         the base and current Frames will be used (as above) to
-         individually format the input and output coordinates, as
-         appropriate. The Report attribute of a FrameSet is not itself
-         affected by selecting a new base or current Frame, but the
-         resulting formatting capabilities may be.
    }
 }
 \sstroutine{
@@ -20153,6 +20498,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating Point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20167,12 +20519,6 @@ Object            - Base class for all AST Objects
          {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}} operation will use just the Size(TextLab)
          value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20195,15 +20541,19 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Channel
+   \sstapplicability{
+      \sstsubsection{
+         Channel
+      }{
          All Channels have this attribute.
-      \htmlref{FitsChan}{FitsChan}
+      }
+      \sstsubsection{
+         \htmlref{FitsChan}{FitsChan}
+      }{
          The FitsChan class sets the default value of this attribute
          to 1, so that all irrelevant FITS headers will normally be
          ignored.
+      }
    }
 }
 \sstroutine{
@@ -20227,6 +20577,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20240,12 +20597,6 @@ Object            - Base class for all AST Objects
          the attribute value of all graphical elements, while a {\tt{"}}get{\tt{"}} or
          {\tt{"}}test{\tt{"}} operation will use just the Style(\htmlref{Border}{Border}) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20266,6 +20617,32 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default Symbol value supplied by the Frame class is the
+         string {\tt{"}}$<$\htmlref{Domain}{Domain}$>$$<$n$>${\tt{"}}, where $<$n$>$ is 1, 2, etc. for successive
+         axes, and $<$Domain$>$ is the value of the Frame's Domain
+         attribute (truncated if necessary so that the final string
+         does not exceed 15 characters). If no Domain value has been
+         set, {\tt{"}}x{\tt{"}} is used as the $<$Domain$>$ value in constructing this
+         default string.
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the default Symbol value
+         (e.g. to {\tt{"}}RA{\tt{"}} or {\tt{"}}Dec{\tt{"}}) as appropriate for the particular
+         celestial coordinate system being represented.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The Symbol attribute of a FrameSet axis is the same as that
+         of its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20274,25 +20651,6 @@ Object            - Base class for all AST Objects
          subscripted with the number of the Frame axis to which it
          applies.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default Symbol value supplied by the Frame class is the
-         string {\tt{"}}$<$\htmlref{Domain}{Domain}$>$$<$n$>${\tt{"}}, where $<$n$>$ is 1, 2, etc. for successive
-         axes, and $<$Domain$>$ is the value of the Frame's Domain
-         attribute (truncated if necessary so that the final string
-         does not exceed 15 characters). If no Domain value has been
-         set, {\tt{"}}x{\tt{"}} is used as the $<$Domain$>$ value in constructing this
-         default string.
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the default Symbol value
-         (e.g. to {\tt{"}}RA{\tt{"}} or {\tt{"}}Dec{\tt{"}}) as appropriate for the particular
-         celestial coordinate system being represented.
-      \htmlref{FrameSet}{FrameSet}
-         The Symbol attribute of a FrameSet axis is the same as that
-         of its current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -20316,11 +20674,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      SkyFrame
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
          All SkyFrames have this attribute.
+      }
    }
    \sstdiytopic{
       Celestial Coordinate Systems
@@ -20409,6 +20768,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20428,12 +20794,6 @@ Object            - Base class for all AST Objects
          the attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or
          {\tt{"}}test{\tt{"}} operation will use just the TextLab(1) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20464,6 +20824,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20479,12 +20846,6 @@ Object            - Base class for all AST Objects
          the attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or
          {\tt{"}}test{\tt{"}} operation will use just the TextLabGap(1) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20506,6 +20867,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20515,12 +20883,6 @@ Object            - Base class for all AST Objects
          around its edges (see the \htmlref{Labelling}{Labelling} attribute).  In this case,
          the value of the TickAll attribute is ignored.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20540,6 +20902,36 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default supplied by the Frame class is {\tt{"}}$<$n$>$-d coordinate
+         system{\tt{"}}, where $<$n$>$ is the number of Frame axes (\htmlref{Naxes}{Naxes}
+         attribute).
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the default Title value
+         (e.g. to {\tt{"}}FK5 equatorial coordinates, mean equinox J2000.0{\tt{"}})
+         as appropriate to the particular celestial coordinate system
+         being represented.
+      }
+      \sstsubsection{
+         \htmlref{CmpFrame}{CmpFrame}
+      }{
+         The CmpFrame class re-defines the default Title value to be
+         {\tt{"}}$<$n$>$-d compound coordinate system{\tt{"}}, where $<$n$>$ is the number
+         of CmpFrame axes (Naxes attribute).
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The Title attribute of a FrameSet is the same as that of its
+         current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20547,26 +20939,6 @@ Object            - Base class for all AST Objects
          A Frame's Title is intended purely for interpretation by human
          readers and not by software.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default supplied by the Frame class is {\tt{"}}$<$n$>$-d coordinate
-         system{\tt{"}}, where $<$n$>$ is the number of Frame axes (\htmlref{Naxes}{Naxes}
-         attribute).
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the default Title value
-         (e.g. to {\tt{"}}FK5 equatorial coordinates, mean equinox J2000.0{\tt{"}})
-         as appropriate to the particular celestial coordinate system
-         being represented.
-      \htmlref{CmpFrame}{CmpFrame}
-         The CmpFrame class re-defines the default Title value to be
-         {\tt{"}}$<$n$>$-d compound coordinate system{\tt{"}}, where $<$n$>$ is the number
-         of CmpFrame axes (Naxes attribute).
-      \htmlref{FrameSet}{FrameSet}
-         The Title attribute of a FrameSet is the same as that of its
-         current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -20591,6 +20963,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20598,12 +20977,6 @@ Object            - Base class for all AST Objects
          The text used for the title is obtained from the Plot's \htmlref{Title}{Title}
          attribute.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20626,11 +20999,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
          All Plots have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -20648,23 +21022,21 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean), read-only.
    }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         An error will result if a Mapping with a TranForward value of
-         zero is used to transform coordinates in the forward direction.
-      }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Mapping
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
          All Mappings have this attribute.
-      \htmlref{CmpMap}{CmpMap}
+      }
+      \sstsubsection{
+         \htmlref{CmpMap}{CmpMap}
+      }{
          The TranForward attribute value for a CmpMap is given by the
          boolean AND of the value for each component Mapping.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The TranForward attribute of a FrameSet applies to the
          transformation which converts between the FrameSet's base
          \htmlref{Frame}{Frame} and its current Frame (as specified by the \htmlref{Base}{Base} and
@@ -20673,6 +21045,15 @@ Object            - Base class for all AST Objects
          individual sub-Mappings required to perform this conversion.
          The TranForward attribute value for a FrameSet may therefore
          change if a new Base or Current Frame is selected.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error will result if a Mapping with a TranForward value of
+         zero is used to transform coordinates in the forward direction.
+      }
    }
 }
 \sstroutine{
@@ -20690,23 +21071,21 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean), readonly.
    }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         An error will result if a Mapping with a TranInverse value of
-         zero is used to transform coordinates in the inverse direction.
-      }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Mapping
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
          All Mappings have this attribute.
-      \htmlref{CmpMap}{CmpMap}
+      }
+      \sstsubsection{
+         \htmlref{CmpMap}{CmpMap}
+      }{
          The TranInverse attribute value for a CmpMap is given by the
          boolean AND of the value for each component Mapping.
-      \htmlref{FrameSet}{FrameSet}
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
          The TranInverse attribute of a FrameSet applies to the
          transformation which converts between the FrameSet's current
          \htmlref{Frame}{Frame} and its base Frame (as specified by the \htmlref{Current}{Current} and
@@ -20715,6 +21094,15 @@ Object            - Base class for all AST Objects
          sub-Mappings required to perform this conversion.
          The TranInverse attribute value for a FrameSet may therefore
          change if a new Base or Current Frame is selected.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error will result if a Mapping with a TranInverse value of
+         zero is used to transform coordinates in the inverse direction.
+      }
    }
 }
 \sstroutine{
@@ -20730,6 +21118,26 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       String.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The default supplied by the Frame class is an empty string.
+      }
+      \sstsubsection{
+         \htmlref{SkyFrame}{SkyFrame}
+      }{
+         The SkyFrame class re-defines the default Unit value (e.g. to
+         {\tt{"}}hh:mm:ss.sss{\tt{"}}) to describe the character string returned by
+         the \htmlref{astFormat}{astFormat} function when formatting coordinate values.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         The Unit attribute of a FrameSet axis is the same as that of
+         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20738,19 +21146,6 @@ Object            - Base class for all AST Objects
          subscripted with the number of the Frame axis to which it
          applies.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Frame
-         The default supplied by the Frame class is an empty string.
-      \htmlref{SkyFrame}{SkyFrame}
-         The SkyFrame class re-defines the default Unit value (e.g. to
-         {\tt{"}}hh:mm:ss.sss{\tt{"}}) to describe the character string returned by
-         the \htmlref{astFormat}{astFormat} function when formatting coordinate values.
-      \htmlref{FrameSet}{FrameSet}
-         The Unit attribute of a FrameSet axis is the same as that of
-         its current Frame (as specified by the \htmlref{Current}{Current} attribute).
    }
 }
 \sstroutine{
@@ -20781,6 +21176,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer (boolean).
    }
+   \sstapplicability{
+      \sstsubsection{
+         SphMap
+      }{
+         All SphMaps have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20806,12 +21208,6 @@ Object            - Base class for all AST Objects
          ignored, even if UnitRadius is non-zero.
       }
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      SphMap
-         All SphMaps have this attribute.
-   }
 }
 \sstroutine{
    WcsAxis(lonlat)\sstlabel{WcsAxislonlat}
@@ -20832,11 +21228,12 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
-   \sstdiytopic{
-      Applicability
-   }{
-      WcsMap
+   \sstapplicability{
+      \sstsubsection{
+         WcsMap
+      }{
          All WcsMaps have this attribute.
+      }
    }
 }
 \sstroutine{
@@ -20860,18 +21257,19 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Integer, read-only.
    }
+   \sstapplicability{
+      \sstsubsection{
+         WcsMap
+      }{
+         All WcsMaps have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
          For a list of available projections, see the FITS-WCS paper.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      WcsMap
-         All WcsMaps have this attribute.
    }
 }
 \sstroutine{
@@ -20898,6 +21296,13 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Floating point.
    }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -20911,12 +21316,6 @@ Object            - Base class for all AST Objects
          the attribute value of all graphical elements, while a {\tt{"}}get{\tt{"}} or
          {\tt{"}}test{\tt{"}} operation will use just the Width(\htmlref{Border}{Border}) value.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      Plot
-         All Plots have this attribute.
    }
 }
 \sstroutine{
@@ -20938,18 +21337,19 @@ Object            - Base class for all AST Objects
    \sstattributetype{
       Double precision.
    }
+   \sstapplicability{
+      \sstsubsection{
+         ZoomMap
+      }{
+         All ZoomMaps have this attribute.
+      }
+   }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
          The Zoom attribute may not be set to zero.
       }
-   }
-   \sstdiytopic{
-      Applicability
-   }{
-      ZoomMap
-         All ZoomMaps have this attribute.
    }
 }
 \normalsize
@@ -21824,6 +22224,63 @@ Object            - Base class for all AST Objects
          \sstitem
          \htmlref{astTest}{astTest}: Test if an attribute value is set for an Object
       }
+   }
+}
+\sstroutine{
+   PcdMap\sstlabel{PcdMap}
+}{
+   Apply 2-dimensional pincushion/barrel distortion
+}{
+   \sstdescription{
+      A PcdMap is a non-linear \htmlref{Mapping}{Mapping} which transforms 2-dimensional
+      positions to correct for the radial distortion introduced by some
+      cameras and telescopes. This can take the form either of pincushion
+      or barrel distortion, and is characterized by a single distortion
+      coefficient.
+
+      A PcdMap is specified by giving this distortion coefficient and the
+      coordinates of the centre of the radial distortion. The forward
+      transformation of a PcdMap applies the distortion:
+
+         RD = R $*$ ( 1 $+$ C $*$ R $*$ R )
+
+      where R is the undistorted radial distance from the distortion
+      centre (specified by attribute PcdCen), RD is the radial distance
+      from the same centre in the presence of distortion, and C is the
+      distortion coefficient (given by attribute \htmlref{Disco}{Disco}).
+
+      The inverse transformation of a PcdMap removes the distortion
+      produced by the forward transformation. The expression used to derive
+      R from RD is an approximate inverse of the expression above.
+   }
+   \sstconstructor{
+      \htmlref{astPcdMap}{astPcdMap}
+   }
+   \sstdiytopic{
+      Inheritance
+   }{
+      The PcdMap class inherits from the Mapping class.
+   }
+   \sstdiytopic{
+      Attributes
+   }{
+      In addition to those attributes common to all Mappings, every
+      PcdMap also has the following attributes:
+
+      \sstitemlist{
+
+         \sstitem
+         Disco: PcdMap pincushion/barrel distortion coefficient
+
+         \sstitem
+         \htmlref{PcdCen(axis)}{PcdCenaxis}: Centre coordinates of pincushion/barrel distortion
+      }
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The PcdMap class does not define any new functions beyond those
+      which are applicable to all Mappings.
    }
 }
 \sstroutine{
