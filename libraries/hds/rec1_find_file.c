@@ -1,8 +1,10 @@
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 #if defined( vms )
-void rec1_find_file( void ){};	 /* This routine not used on VMS systems    */
+void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 #else
+
+#include <config.h>              /* Autoconf definitions */
 
 /* C include files:							    */
 /* ===============							    */
@@ -13,7 +15,9 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems    */
 /* ===================							    */
 #include <signal.h>
 #include <sys/types.h>
+#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
 #include <unistd.h>
 
 /* Other include files:							    */
@@ -316,9 +320,11 @@ shell process - ^MESSAGE",
          else
          {
             (void) fclose( str[ 0 ] );
+#if HAVE_SYS_WAIT_H
 	    (void) kill( *pid, SIGKILL );
 	    (void) waitpid( *pid, &stat_val, 0 );
 	    *pid = (pid_t) -1;
+#endif
          }
       }
 

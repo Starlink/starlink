@@ -1,5 +1,7 @@
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
+#include <config.h>              /* Autoconf definitions */
+
 /* VMS version include files:						    */
 /* =========================						    */
 #if defined( vms )
@@ -84,7 +86,7 @@
       unsigned int lksb[ 2 ];	 /* Lock status block			    */
       unsigned int systat;	 /* System status code			    */
 
-#else				 /* POSIX version local variables:	    */
+#elif HAVE_FCNTL		 /* POSIX version local variables:	    */
       int fd;			 /* File descriptor			    */
       struct flock lockbuf;	 /* Lock structure for fcntl		    */
 #endif
@@ -159,7 +161,8 @@ access - ^MESSAGE.",
 /* POSIX version:							    */
 /* =============							    */
 #else
-#if 0				 /* Disabled pending fix for NFS locking    */
+#if HAVE_FCNTL		         
+#if 0                            /* Disabled pending fix for NFS locking    */
 /* Set up an flock structure to request an exclusive write lock on the	    */
 /* whole file.								    */
          lockbuf.l_type = F_WRLCK;
@@ -195,6 +198,7 @@ access - ^MESSAGE",
 
 /* If successful, note the slot is locked.				    */
 	 else
+#endif
 #endif
 	 {
             rec_ga_fcv[ slot ].locked = 1;

@@ -1,7 +1,8 @@
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
-#if defined( vms )
-void rec1_shell( void ){};	 /* This routine not used on VMS systems    */
+#if defined( vms ) || defined __MINGW32__
+void rec1_shell( void ){};	 /* This routine not used on VMS and
+                                  * Windows systems    */
 #else
 
 /* C include files:							    */

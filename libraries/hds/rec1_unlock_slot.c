@@ -1,5 +1,7 @@
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
+#include <config.h>              /* Autoconf definitions */
+
 /* VMS version include files:						    */
 /* =========================						    */
 #if defined( vms )
@@ -106,7 +108,7 @@
 #if defined( vms )		 /* VMS version local variables:	    */
       unsigned int systat;	 /* System error code			    */
 
-#else				 /* POSIX version local variables:	    */
+#elif HAVE_FCNTL		 /* POSIX version local variables:	    */
       int fd;			 /* File descriptor			    */
       struct flock lockbuf;	 /* Lock structure for fcntl		    */
 #endif
@@ -239,6 +241,7 @@
 /* POSIX version:							    */
 /* =============							    */
 #else
+#if HAVE_FCNTL
 #if 0				 /* Disabled pending fix for NFS locking    */
 
 /* Set up an flock structure to release locks on the whole file.	    */
@@ -273,6 +276,7 @@ the file ^FILE - ^MESSAGE",
 
 /* If successful, note the slot is no longer locked.			    */
 	    else
+#endif
 #endif
 	    {
                rec_ga_fcv[ slot ].locked = 0;

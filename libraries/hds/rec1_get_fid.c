@@ -23,6 +23,7 @@ void rec1_get_fid( void ){};	 /* This routine is not used on VMS systems */
 #include "rec.h"		 /* Public rec_ definitions		    */
 #include "rec1.h"		 /* Internal rec_ definitions		    */
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
+#include "win_fixups.h"          /* Windows special functions               */
 
    void rec1_get_fid( const char *fns, struct FID *fid )
    {
@@ -65,6 +66,7 @@ void rec1_get_fid( void ){};	 /* This routine is not used on VMS systems */
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    PWD: Peter W. Draper (Starlink - Durham University)                   */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -74,6 +76,8 @@ void rec1_get_fid( void ){};	 /* This routine is not used on VMS systems */
 /*       Added checks for regular files.				    */
 /*    25-NOV-1992 (RFWS):						    */
 /*       Do not return a function value.				    */
+/*    16-DEC-2002 (PWD):                                                    */
+/*       Added windows support (problem with inodes not being available)    */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -145,6 +149,13 @@ void rec1_get_fid( void ){};	 /* This routine is not used on VMS systems */
 /* File ID.								    */
          fid->st_ino = statbuf.st_ino;
          fid->st_dev = statbuf.st_dev;
+
+#if defined __MING32__
+         /* Windows doesn't have inodes, so we need additional information to
+          * determine if a file is really the same as another file. This extra
+          * bit is stored in st_rdev (which usually a duplicate of device) */
+         win_get_inodes( fns, &fid->st_ino, &fid->st_rdev );
+#endif
       }
 
 /* Return the current global status value.				    */

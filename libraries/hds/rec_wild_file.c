@@ -1,5 +1,7 @@
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
+#include <config.h>              /* Autoconf definitions                    */
+
 /* C include files:							    */
 /* ===============							    */
 #include <ctype.h>
@@ -19,7 +21,9 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+#if HAVE_SYS_WAIT_H
+#include <sys/wait.h>*/
+#endif
 #include <unistd.h>
 #endif
 
@@ -612,8 +616,10 @@ from a shell process - ^MESSAGE",
 	       ems_end_c( &hds_gl_status );
 
 /* Kill the shell process (just to be sure) and wait for it to terminate.   */
+#if HAVE_SYS_WAIT_H
 	       (void) kill( pid, SIGKILL );
 	       (void) waitpid( pid, &stat_val, 0 );
+#endif
             }
 #endif
 

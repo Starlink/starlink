@@ -33,7 +33,8 @@ PUBLIC_INCLUDES = CMP_ERR DAT_ERR DAT_PAR dat_par.h
 PRIVATE_INCLUDES = \
 	CMP_CCT CMP_CONST DAT1_SYS \
 	dat1.h dat_err.h hds1.h \
-	hds1_feature.h rec.h rec1.h str.h
+	hds1_feature.h rec.h rec1.h str.h \
+        win_fixups.h
 
 F_ROUTINES = \
 	cmp_activ.f cmp_deact.f cmp_erdsn.f cmp_get0x.f cmp_get1x.f \
@@ -94,7 +95,9 @@ C_ROUTINES = \
 	rec_same_file.c rec_shrink_record.c rec_start.c rec_stop.c \
 	rec_unlock.c rec_where.c rec_wild_file.c \
 	\
-	rtl_fixups.c
+	rtl_fixups.c \
+        \
+        win_fixups.c
 
 dat_par.h: dat_par_h
 	./dat_par_h >dat_par.h

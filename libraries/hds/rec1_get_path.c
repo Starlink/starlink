@@ -1,8 +1,10 @@
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 #if defined( vms )
-void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
+void rec1_get_path( void ){};	 /* This routine not used on VMS systems */
 #else
+
+#include <config.h>              /* Autoconf definitions */
 
 /* C include files:							    */
 /* ===============							    */
@@ -15,7 +17,9 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
 /* ===================							    */
 #include <signal.h>
 #include <sys/types.h>
+#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
 #include <unistd.h>
 
 /* Other include files:							    */
@@ -82,6 +86,7 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)				    */
+/*    PWD: Peter W. Draper (STARLINK, Durham University)                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -89,6 +94,10 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
 /*       Original version.						    */
 /*    9-DEC-1992 (RFWS):						    */
 /*	 Report an error if the file name is completely blank.		    */
+/*    21-JUL-2004 (PWD):                                                    */
+/*       Add changes to support MinGW under Windows (no process control,    */
+/*       plus Windows filename conventions), so that we can build           */
+/*       shareable libraries for JNIHDS.                                    */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -121,6 +130,13 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
       int special;		 /* Special characters in file name?	    */
       int stat_val;		 /* Shell process status information	    */
       pid_t pid;		 /* ID of shell process			    */
+
+#if defined __MINGW32__
+      /* Use Windows separator */
+#define SLASH  '/'
+#else
+#define SLASH  '\\'
+#endif
 
 /*.									    */
 
@@ -155,7 +171,7 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
 		    "Invalid blank file name given.",
 		    &hds_gl_status );
       }
-      
+
 /* Scan the file name, classifying the characters that appear in it.	    */
       else
       {
@@ -171,7 +187,7 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
 	          break;
 
 /* Note where the last slash '/' occurs.				    */
-	       case '/':
+               case SLASH:
 	          islash = i + 1;
 	          break;
 
@@ -196,8 +212,16 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
 
 /* Ignore the possible presence of special characters if the HDS__SHELL	    */
 /* tuning parameter specifies that shell expansion of such characters is    */
-/* not to occur.							    */
+/* not to occur.
+ * */
+
+#if defined __MINGW32__
+      /* MinGW doesn't offer a shell facility so make sure it is disabled */
+      hds_gl_shell = HDS__NOSHELL;
+      special = 0;
+#else
       if ( hds_gl_shell == HDS__NOSHELL ) special = 0;
+#endif
 
 /* If there are no speciaal characters present, then the file name can be   */
 /* used as the basis of the full path name, without further translation.    */
@@ -213,7 +237,7 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems    */
          extn = ( idot > islash );
          lbase  = fname_len - start - ( idot == fname_len );
       }
-	 
+
 /* If special characters are present in the file name, then we must use a   */
 /* shell process to interpret them. We only do this if it is really	    */
 /* necessary, since it is slower. Note that file extension information will */
@@ -304,7 +328,9 @@ a shell process - ^MESSAGE",
             ems_end_c( &hds_gl_status );
 
 /* Kill the shell process (just to be sure).				    */
+#if HAVE_SYS_WAIT_H
 	    (void) kill( pid, SIGKILL );
+#endif
 
 /* Use the expanded file name as the base name for forming the full path    */
 /* name (it may not yet have a directory prefix).			    */
@@ -317,7 +343,13 @@ a shell process - ^MESSAGE",
 /* directory.								    */
       if ( _ok( hds_gl_status ) )
       {
-         absolute = ( basename[ 0 ] == '/' );
+#if defined __MINGW32__
+         /* Windows has absolute names starting with "x:" where x
+          * is the drive letter */
+         absolute = ( basename[ 1 ] == ':' );
+#else
+         absolute = ( basename[ 0 ] == SLASH );
+#endif
          if ( !absolute )
 	 {
             rec1_getcwd( &cwd, &lcwd );
@@ -337,7 +369,7 @@ a shell process - ^MESSAGE",
 	    if ( !absolute )
 	    {
 	       (void) strcpy( *path, (const char *) cwd );
-	       (*path)[ lcwd ] = '/';
+	       (*path)[ lcwd ] = SLASH;
 	    }
 	    (void) strncpy( (*path) + ( absolute ? 0 : lcwd + 1 ), basename,
 			    (size_t) lbase );
@@ -354,7 +386,9 @@ a shell process - ^MESSAGE",
       if ( special )
       {
          rec_deall_mem( mxbuf, (void **) &buffer );
+#if HAVE_SYS_WAIT_H
 	 if ( pid != (pid_t) -1 ) (void) waitpid( pid, &stat_val, 0 );
+#endif
       }
 
 /* If an error occurred, then deallocate any space allocated for the path   */

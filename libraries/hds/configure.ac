@@ -25,6 +25,12 @@ AC_C_BIGENDIAN
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    MinGW doesn't have this one.
+AC_CHECK_HEADERS(sys/wait.h)
+
+dnl    Or file locking.
+AC_CHECK_FUNCS(fcntl)
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae cnf ems])
 STAR_DECLARE_DEPENDENCIES([link],  [chr cnf ems])

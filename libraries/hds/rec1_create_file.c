@@ -29,10 +29,11 @@
 #include "rec.h"		 /* Public rec_ definitions		    */
 #include "rec1.h"		 /* Internal rec_ definitions		    */
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
+#include "win_fixups.h"          /* Windows special functions */
 
    void rec1_create_file( int expand, const char *file, INT file_len,
 			  INT size, INT *slot, INT *alq )
-   {     
+   {
 /*+									    */
 /* Name:								    */
 /*    rec1_create_file							    */
@@ -272,7 +273,7 @@
             *alq = fab.fab$l_alq;
 	 }
       }
-    
+
 /* Connect a record stream to the file for performing block I/O.	    */
       if ( _ok( hds_gl_status ) )
       {
@@ -374,6 +375,10 @@
       {
          if ( stat( fns, &statbuf ) == 0 )
 	 {
+#if defined __MINGW32__
+             /* Need windows pseudo inode data */
+             win_get_inodes( fns, &statbuf.st_ino, &statbuf.st_rdev );
+#endif
 
 /* If the file appears to exist already, then loop to search the File	    */
 /* Control Vector for any slot which is currently open and associated with  */
@@ -386,6 +391,9 @@
 /* existing one. Report an error.					    */
                if ( rec_ga_fcv[ i ].open &&
 	            ( statbuf.st_ino == rec_ga_fcv[ i ].fid->st_ino ) &&
+#if defined __MINGW32__
+	            ( statbuf.st_rdev == rec_ga_fcv[ i ].fid->st_rdev ) &&
+#endif
 		    ( statbuf.st_dev == rec_ga_fcv[ i ].fid->st_dev ) )
                {
 		  hds_gl_status = DAT__FILIN;
