@@ -285,7 +285,7 @@
           DO I=1,16
             WRITE(REC,'(3(F4.2,1X))')
      :                       COLTAB(1,I),COLTAB(2,I),COLTAB(3,I)
-            CALL FIO_WRITEF(IFD,REC,STATUS)
+            CALL FIO_WRITE(IFD,REC,STATUS)
           ENDDO
           CALL FIO_CLOSE(IFD,STATUS)
 
