@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ems">
+  <version>2.0-7</version>
+  <path>libraries/ems</path>
+  <description>EMS -- Error Message Service</description>
+  <abstract><p>The purpose of EMS is to provide facilities for
+      constructing and storing error messages for future delivery to
+      the user -- usually via the Starlink Error Reporting System, ERR
+      (see SUN/104).  EMS can be regarded as a simplified version of
+      ERR without the binding to any software environment (e.g., for
+      message output or access to the parameter and data
+      systems).</p></abstract>
+  <dependencies>
+    <build> sae cnf messgen</build>
+    <use> cnf ems</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

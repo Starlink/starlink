@@ -1,0 +1,59 @@
+*+
+*  Name:
+*     EMS_PAR
+
+*  Purpose:
+*     Define the EMS_ public constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains the definitions of the public global constants 
+*     used by the EMS_ system.
+
+*  Authors:
+*     PCTR: P.C.T. Rees (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     24-JAN-1990 (PCTR):
+*        Original version adapted from MSG_SYS.
+*     25-SEP-1990 (PCTR):
+*        Added EMS__SZPAR.
+*     25-AUG-1992 (PCTR):
+*        Added EMS__MXOUT.
+*     8-DEC-1993 (PCTR):
+*        Moved EMS__MXMSG from EMS_SYS.
+*     22-MAR-2001 (AJC):
+*        Add EMS__BASE
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+      INTEGER EMS__MXMSG                ! Maximum number of messages
+      PARAMETER( EMS__MXMSG = 32 )
+
+      INTEGER EMS__MXOUT                ! Maximum length of output text
+      PARAMETER( EMS__MXOUT = 133 )
+
+      INTEGER EMS__SZMSG                ! Maximum length of error message text
+      PARAMETER ( EMS__SZMSG = 200 )
+
+      INTEGER EMS__SZPAR                ! Maximum length of error message name
+      PARAMETER ( EMS__SZPAR = 15 )
+
+      INTEGER EMS__SZTOK                ! Maximum length of message token text
+      PARAMETER( EMS__SZTOK = 200 )
+
+      INTEGER EMS__BASE                 ! Base context number
+      PARAMETER ( EMS__BASE = 1 )
+
+      CHARACTER EMS__TOKEC              ! Message token escape character
+      PARAMETER( EMS__TOKEC = '^' )
+
+*.

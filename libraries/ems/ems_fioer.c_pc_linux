@@ -1,0 +1,114 @@
+/*
+*      SUBROUTINE EMS_FIOER( TOKEN, IOSTAT )
+*+
+*  Name:
+*     EMS_FIOER
+
+*  Purpose:
+*     Assign a Fortran I/O error message to a token (Linux version).
+
+*  Language:
+*     ANSII C
+
+*  Invocation:
+*     CALL EMS_FIOER( TOKEN, IOSTAT )
+
+*  Description:
+*     The text of the error message associated with the Fortran I/O status 
+*     value, IOSTAT, is assigned to the message token, TOKEN. This token may
+*     then be included in an error message. 
+
+*  Implementation Notes:
+*     This function is only expected to be called from Fortran, so there is
+*     not a C function emsFioer underlying this Fortran interface.
+
+*  Linux-specific features used:
+*     Linux IOSTAT error codes similar (but not identical) to sun4. 
+
+*  Arguments:
+*     TOKEN = CHARACTER * ( * ) (Given)
+*        The message token name.
+*     IOSTAT = INTEGER (Given)
+*        The Fortran I/O status value.
+
+*  Authors:
+*     A.J.Chipperfield (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-MAR-2001 (AJC):
+*        Original version, based upon Fortran version.
+*     13-AUG-2000 (AJC):
+*        #include ems1.h
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+#include "f77.h"
+#include "ems_par.h"                  /* EMS_ parameters */
+#include "ems_sys.h"                  /* EMS_ System constants */
+#include "ems.h"                      /* EMS_ function prototypes */
+#include "ems1.h"                     /* EMS_ function prototypes */
+
+F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
+{
+   char *msgs[] = {
+        "Error in format",
+        "Illegal unit number",
+        "Formatted I/O not allowed",
+        "Unformatted I/O not allowed",
+        "Direct I/O not allowed",
+        "Sequential I/O not allowed",
+        "Cannot backspace file",
+        "Off beginning of record",
+        "Cannot stat file",
+        "Unit not connected",
+        "Off end of record",
+        "Truncation failed",
+        "Incomprehensible list input",
+        "Out of free space",
+        "Unit not connected",
+        "Read unexpected character",
+        "Blank logical input field",
+        "Format/variable type mismatch",
+        "Syntax error in NAMELIST input",
+        "Illegal NAMELIST input",
+        "Unexpected IOSTAT value (120)",
+        "Format/variable type mismatch",
+        "Illegal reference to variable",
+        "Illegal reference to variable",
+        "Illegal reference to variable",
+        "Illegal reference to variable",
+        "File read error",
+        "File write error",
+        "NEW file already exists",
+        "File write error"
+   };
+   char ctok[ EMS__SZMSG + 1 ];     /* Imported token name */
+
+   GENPTR_CHARACTER(token)
+   GENPTR_INTEGER(iostat)
+
+/* Import the token name */
+   cnfImpn( token, token_length, EMS__SZMSG, ctok );
+
+   if ( *iostat == 0 ) {
+      ems1Stok( ctok, "No error" );
+
+   } else if ( *iostat < 0 ) {
+      ems1Stok( ctok, "End-of-file");
+
+   } else if ( ( *iostat > 999 ) && ( *iostat < 1028 ) ) {
+      ems1Stok( ctok, msgs[ *iostat - 1000 ] );
+
+   } else {
+/* iostat value not recognised, assume it is a system error */
+      emsSyser( ctok, *iostat );
+   }
+   
+   return;
+}
+
