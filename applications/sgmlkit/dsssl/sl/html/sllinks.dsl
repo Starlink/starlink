@@ -43,8 +43,8 @@ immediately resolve the indirection.
 		     (element-with-id (attribute-string (normalize "to")
 							tmp-target))
 		     tmp-target))
-	 (linktext (attribute-string (normalize "text")
-				     (current-node))))
+	 (linktext (data (current-node)))
+	 )
     (if (and target
 	     (member (gi target) (ref-target-element-list)))
 	(make element
@@ -52,13 +52,13 @@ immediately resolve the indirection.
 	  attributes: (list (list "href" (href-to target)))
 	  ;(with-mode section-reference
 	  ;  (process-node-list target))
-	  (if linktext
-	      (literal linktext)
+	  (if (string=? linktext "")
 	      (if (member (gi target) (section-element-list))
 		  (make-section-reference target: target specify-type: #t
 					  short-ref: %short-crossrefs%)
 		  (with-mode section-reference
-		    (process-node-list target))))
+		    (process-node-list target)))
+	      (literal linktext))
 	  )
 	(if target
 	    (error (string-append

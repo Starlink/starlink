@@ -96,18 +96,23 @@ $Id$
 	    (process-children))))
   (element author
     (let ((affil (attribute-string (normalize "affiliation")))
-	  (id (attribute-string (normalize "id"))))
-    (make element gi: "li"
-	  (let ((kids (children (current-node))))
-	    (make sequence
-	      (make element gi: "a"
-		    attributes: (list (list "name" (string-append "AUTHOR_"
-								  id)))
-		    (process-node-list (node-list-first kids)))
-	      (process-node-list (node-list-rest kids))
-	      (if affil
-		  (literal (string-append " (" affil ")"))
-		  (empty-sosofo)))))))
+	  (id (attribute-string (normalize "id")))
+	  (kids (children (current-node)))
+	  (link (or (attribute-string (normalize "webpage"))
+		    (and (attribute-string (normalize "email"))
+			 (string-append "mailto:"
+					(attribute-string (normalize
+							   "email")))))))
+      (make element gi: "li"
+	    (make element gi: "a"
+		  attributes: `(("name" ,(string-append "AUTHOR_"
+								id))
+				,(if link `("href" ,link) #f))
+		  (process-node-list (node-list-first kids)))
+	    (process-node-list (node-list-rest kids))
+	    (if affil
+		(literal (string-append " (" affil ")"))
+		(empty-sosofo)))))
   (element authorref
     (let* ((aut-id (attribute-string (normalize "id")))
 	   (aut-el (and aut-id
@@ -355,13 +360,13 @@ $Id$
     (process-matching-children 'title))
   (element title
     (process-children))
-;  (element author
-;    (let ((attrib (attribute-string (normalize "affiliation"))))
-;    (make element gi: "li"
-;	  (process-matching-children 'name)
-;	  (if attrib
-;	      (literal (string-append " (" attrib ")"))
-;	      (empty-sosofo)))))
+  (element author
+    (let ((note (attribute-string (normalize "authornote"))))
+    (make sequence
+	  (process-matching-children 'name)
+	  (if note
+	      (literal (string-append " (" note ")"))
+	      (empty-sosofo)))))
   (element name
     (process-children))
   (element routinename
@@ -371,8 +376,12 @@ $Id$
 ;  (let ((id (or (attribute-string (normalize "id"))
 ;		(select-elements (children (current-node)) 'routineprologue))))
 ;    (string-append "_R")))
-(define (href-to-fragid-routine)
-  (string-append "_R" (number->string (element-number (current-node)))))
+;; Define a href-to function.  Note that this will generate a fragid
+;; which is unique in the target file, but which wouldn't be unique
+;; document-wide.  That doesn't matter in this application, because
+;; routinelists are _always_ in separate files.
+(define (href-to-fragid-routine nd)
+  (string-append "_R" (number->string (element-number nd))))
 
 (element coderef
   (let* ((cc (node-list-or-false

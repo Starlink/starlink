@@ -164,7 +164,7 @@ returns <code/#f/.
 	       (string-append "_ID" 
 			      (number->string (all-element-number target))))
 	      ((equal? (gi target) (normalize "routine"))
-	       (href-to-fragid-routine))
+	       (href-to-fragid-routine target))
 	      ((equal? (gi target) (normalize "mlabel"))
 	       (href-to-fragid-mlabel target))
 	      (else #f)))
