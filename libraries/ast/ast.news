@@ -15,7 +15,6 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-
 o The organisation of the AST distribution and the commands for
 building it have been changed. Whereas AST used to be built and installed
 with "./mk build; ./mk install", it now builds using the more standard
@@ -25,6 +24,21 @@ for other packages which use this scheme).  Note that the INSTALL environment
 variable now has a different meaning to that which it had
 before, and it should generally be unset. Also, there is no need to
 set the SYSTEM variable.
+
+o Options have been added to the SkyFrame class which allows the origin 
+of celestial coordinates to be moved to any specified point. See the new
+attributes SkyRef, SkyRefIs, SkyRefP and AlignOffset.
+
+o An option has been added to the FitsChan class which allows extra
+Frames representing cartesian projection plane coordinates ("intermediate 
+world coordinates" in the parlance of FITS-WCS) to be created when reading 
+WCS information from a foreign FITS header. This option is controlled by
+a new attribute called "Iwc".
+
+o The FitsChan class which been modified to interpret FITS-WCS CAR
+projection headers correctly if the longitude reference pixel (CRPIX) is 
+very large.
+
 
 For further details of these changes, see the final appendix of Starlink
 User Note SUN/210 (Fortran version) or SUN/211 (C version). These are

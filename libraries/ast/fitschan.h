@@ -25,154 +25,6 @@
 *  Inheritance:
 *     The FitsChan class inherits from the Channel class.
 
-*  Attributes Over-Ridden:
-*     Full (integer)
-*        The FitsChan class modifies the default value of the Full
-*        attribute to become -1. This prevents the output of
-*        non-essential information to a FitsChan by astWrite, unless
-*        it is explicitly requested by setting a Full value.
-*     Skip (integer)
-*        The FitsChan class modifies the default value of the Skip
-*        attribute to become 1. This default value allows the astRead
-*        function to skip over unrelated FITS data when searching for
-*        the next Object to read.
-
-*  New Attributes Defined:
-*     AllWarnings
-*        A read-only string holding a space sperated list of all the
-*        available condition names.
-*     Card
-*        This attribute gives the index of the current card in a FitsChan
-*        (i.e. the next card to be read). The first card in the FitsChan has 
-*        index 1. This attribute can be set to a value greater than the number 
-*        of cards in the FitsChan in order to position the current card at
-*        the "end-of-file". In this case no more cards can be read from the
-*        FitsChan, and any new cards stored in the FitsChan will be appended
-*        to the end. In this situation, the value of the attribute will
-*        always be returned as one greater than the number of cards in the 
-*        FitsChan. Clearing this attribute is equivelent to setting its value 
-*        to 1 (this is like performing a "rewind" on the FitsChan). Testing the
-*        attribute returns 1 if the current card is at the "start-of-file"
-*        and zero otherwise.
-*     DefB1950
-*        Use FK4 B1950 in the abscence of any other indication within a
-*        foreign FITS header? Otherwise, FK5 J2000 is used.
-*     CarLin
-*        Treat CAR projections in foreign headers as simple linear
-*        mappings from pixel to celestial coordinates? Otherwise, they are
-*        treated as celestial projections according to the conventions of
-*        the Greisen and Calabretta papers.
-*     CDMatrix
-*        If non-zero, use a CD matrix in FITS-WCS Encoding. If zero, use
-*        a PC matrix with associated CDELT values.
-*     Encoding
-*        This attribute specifies the system to use when encoding AST
-*        objects into FITS headers. A value of "Native" causes AST objects 
-*        to be described using FITS keywords recognised only by the AST
-*        library. Such FITS headers may only be read using other AST
-*        applications. A value of "FitsWcs" causes AST objects to be
-*        described using the keywords reserved for the FITS World Coordinate
-*        System (CRVAL1, CRPIX1, etc). Such FITS headers can be read using
-*        any FITS WCS application. Using encoding systems other than
-*        "Native" may impose restrictions on the number and class of objects 
-*        which can be stored in a FITS header.
-*     FitsDigits
-*        This attribute gives the number of digits to display after the
-*        decimal point when formatting floating point FITS keyword values. 
-*        By default, a value is used which results in no loss of information.
-*        This may need to be set to a smaller value such as 15 to satisfy 
-*        the recommendations of the FITS standard, which says that floating
-*        point values should be formatted in no more than 20 columns.
-*     Ncard
-*        This read-only attribute gives the number of cards in the FitsChan.
-*     Warnings
-*        A set of conditions which are to be reported by the addition of
-*        ASTWARN cards to the FitsChan.
-
-*  Methods Over-Ridden:
-*     Public:
-*        astRead
-*           Read an Object from a FitsChan.
-*        astWrite
-*           Write an Object to a FitsChan.
-*
-*     Protected:
-*        astClearAttrib
-*           Clear an attribute value for a FitsChan.
-*        astGetAttrib
-*           Get an attribute value for a FitsChan.
-*        astGetFull
-*           Get the value of the Full attribute for a FitsChan.
-*        astGetNextData
-*           Read the next item of data from a data source.
-*        astGetSkip
-*           Get the value of the Skip attribute for a FitsChan.
-*        astSetAttrib
-*           Set an attribute value for a FitsChan.
-*        astTestAttrib
-*           Test if an attribute value has been set for a FitsChan.
-*        astWriteBegin
-*           Write a "Begin" data item to a data sink.
-*        astWriteDouble
-*           Write a double value to a data sink.
-*        astWriteEnd
-*           Write an "End" data item to a data sink.
-*        astWriteInt
-*           Write an int value to a data sink.
-*        astWriteIsA
-*           Write an "IsA" data item to a data sink.
-*        astWriteObject
-*           Write an Object value to a data sink.
-*        astWriteString
-*           Write a string value to a data sink.
-
-*  New Methods Defined:
-*     Public:
-*        astDelFits
-*           Delete a FITS header card from a FitsChan.
-*        astFindFits
-*           Find the next FITS header card for a given keyword.
-*        astPutFits
-*           Store a FITS header card in a FitsChan.
-*        astPutCards
-*           Store a set of FITS header cards in a FitsChan.
-*
-*     Protected:
-*        Test, Clear, Get and Set functions for all the above attributes,
-*        plus:
-*
-*        astFitsEof
-*           See if the FitsChan is at "end-of-file".
-*        astFitsGet<X>
-*           Get a value for a keyword from a FitsChan.
-*        astFitsGetCom
-*           Get a keyword comment from a FitsChan.
-*        astFitsSet<X>
-*           Store a keyword value in a FitsChan.
-*        astSplit
-*           Splits a header card up into its component parts.
-*        astEmpty
-*           Remove all cards and related data from a FitsChan.
-*        astKeyFields
-*           Find the ranges taken by fields within keyword names.
-           
-*  Other Class Functions:
-*     Public:
-*        astIsAFitsChan
-*           Test class membership.
-*        astFitsChan
-*           Create a FitsChan.
-*
-*     Protected:
-*        astCheckFitsChan
-*           Validate class membership.
-*        astInitFitsChan
-*           Initialise a FitsChan.
-*        astInitFitsChanVtab
-*           Initialise the virtual function table for the FitsChan class.
-*        astLoadFitsChan
-*           Load a FitsChan.
-
 *  Macros:
 *     Public:
 *        None.
@@ -196,15 +48,6 @@
 *           Integer dentifier for the complex integer FITS data type.
 *        AST__LOGICAL 
 *           Integer dentifier for the logical FITS data type.
-
-*  Type Definitions:
-*     Public:
-*        AstFitsChan
-*           FitsChan object type.
-*
-*     Protected:
-*        AstFitsChanVtab
-*           FitsChan virtual function table type.
 
 *  Feature Test Macros:
 *     astCLASS
@@ -289,6 +132,7 @@ typedef struct AstFitsChan {
    int defb1950;    /* Use FK4 B1950 as defaults? */
    int cdmatrix;    /* Use a CD matrix in FITS-WCS Encoding? */
    int carlin;      /* Use linear CAR mappings? */
+   int iwc;         /* Include an IWC Frame? */
    int clean;       /* Remove used cards even if an error occurs? */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
    char *warnings;  /* Pointer to a string containing warning conditions */
@@ -375,6 +219,11 @@ typedef struct AstFitsChanVtab {
    int (* TestCDMatrix)( AstFitsChan * );
    void (* SetCDMatrix)( AstFitsChan *, int );
    void (* ClearCDMatrix)( AstFitsChan * );
+
+   int (* GetIwc)( AstFitsChan * );
+   int (* TestIwc)( AstFitsChan * );
+   void (* SetIwc)( AstFitsChan *, int );
+   void (* ClearIwc)( AstFitsChan * );
 
 } AstFitsChanVtab;
 #endif
@@ -470,6 +319,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
    int astTestCarLin_( AstFitsChan * );
    void astSetCarLin_( AstFitsChan *, int );
    void astClearCarLin_( AstFitsChan * );
+
+   int astGetIwc_( AstFitsChan * );
+   int astTestIwc_( AstFitsChan * );
+   void astSetIwc_( AstFitsChan *, int );
+   void astClearIwc_( AstFitsChan * );
 
    int astGetClean_( AstFitsChan * );
    int astTestClean_( AstFitsChan * );
@@ -694,6 +548,15 @@ astINVOKE(V,astGetEncoding_(astCheckFitsChan(this)))
 astINVOKE(V,astSetEncoding_(astCheckFitsChan(this),encoding))
 #define astTestEncoding(this) \
 astINVOKE(V,astTestEncoding_(astCheckFitsChan(this)))
+
+#define astClearIwc(this) \
+astINVOKE(V,astClearIwc_(astCheckFitsChan(this)))
+#define astGetIwc(this) \
+astINVOKE(V,astGetIwc_(astCheckFitsChan(this)))
+#define astSetIwc(this,iwc) \
+astINVOKE(V,astSetIwc_(astCheckFitsChan(this),iwc))
+#define astTestIwc(this) \
+astINVOKE(V,astTestIwc_(astCheckFitsChan(this)))
 
 #endif
 

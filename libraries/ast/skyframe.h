@@ -22,245 +22,6 @@
 *  Inheritance:
 *     The SkyFrame class inherits from the Frame class.
 
-*  Attributes Over-Ridden:
-*     Direction(axis) (integer)
-*        Specifies in which direction an axis should be plotted
-*        (e.g. in a graph) to display coordinate values for each
-*        SkyFrame axis. The SkyFrame class re-defines the default so
-*        that certain axes (e.g. Right Ascension) are plotted in
-*        reverse when appropriate.
-*     Domain (string)
-*        A string which may be used to identify a SkyFrame and used as
-*        an additional key when matching a target SkyFrame with a
-*        template.  The SkyFrame class re-defines the default value to
-*        "SKY".
-*     Format(axis) (string)
-*        Specifies the format to be used to display coordinate values
-*        for each SkyFrame axis (i.e. to convert them from binary
-*        radians to character form). The SkyFrame class re-defines the
-*        syntax of this string (e.g. "dms" or "zhms.3"), and its
-*        default, to allow the formatting of sexagessimal values in a
-*        manner appropriate to the sky coordinate system being
-*        represented. The syntax of SkyFrame Format strings is
-*        identical to that defined by the SkyAxis class.
-*     Label(axis) (string)
-*        Specifies the label to be attached to each SkyFrame axis when
-*        it is represented in (e.g.) a graph. The SkyFrame class
-*        re-defines the default values (e.g. to "Right Ascension") to
-*        be appropriate to the sky coordinate system being
-*        represented.
-*     MaxAxes (integer)
-*        Specifies the maximum number of axes in a target Frame that
-*        can be matched when using the SkyFrame as a template. The
-*        SkyFrame class constrains this to be 2.
-*     MinAxes (integer)
-*        Specifies the minimum number of axes in a target Frame that
-*        can be matched when using the SkyFrame as a template. The
-*        SkyFrame class constrains this to be 2.
-*     Permute (integer)
-*        A boolean value which specifies whether the axis order of a
-*        target Frame may be permuted in order to obtain a match with
-*        a SkyFrame template. If this value is set to zero in the
-*        template SkyFrame, it will only match a target if it can do
-*        so without changing the order of its axes. The SkyFrame class
-*        implements this restriction (it is effectively ignored by the
-*        Frame class which does not distinguish axes from each other,
-*        and will therefore match any target Frame axis order).
-*     Symbol(axis) (string)
-*        Specifies the symbol to be used to represent coordinate
-*        values for each SkyFrame axis in "short form", such as in
-*        algebraic expressions where a full description of the axis
-*        would be inappropriate. The SkyFrame class re-defines the
-*        default values (e.g. to "RA" and "Dec") to be appropriate to
-*        the sky coordinate system being represented.
-*     System (string)
-*        This attribute takes one of the following values to identify the 
-*        sky coordinate system that the SkyFrame represents:
-*
-*        "FK4"
-*           The old FK4 (barycentric) equatorial coordinate
-*           system.
-*        "FK4-NO-E" or "FK4_NO_E"
-*           The old FK4 (barycentric) equatorial system but without
-*           the "E-terms of aberration" (e.g. some radio
-*           catalogues).
-*        "FK5" or "EQUATORIAL"
-*           The modern FK5 (barycentric) equatorial coordinate
-*           system.
-*        "ICRS" 
-*           The International Celestial Reference System, realised
-*           through the Hipparcos catalogue.
-*        "GAPPT", "APPARENT" or "GEOCENTRIC"
-*           The geocentric apparent equatorial coordinate system,
-*           which gives the apparent positions of objects relative to
-*           the true plane of the Earth's equator and the equinox
-*           (the coordinate origin) at a time specified by the
-*           qualifying Epoch value.
-*        "ECLIPTIC"
-*           Ecliptic coordinates (IAU 1980), referred to the ecliptic
-*           and mean equinox as specified by the qualifying Equinox
-*           value.
-*        "HELIOECLIPTIC"
-*           Ecliptic coordinates (IAU 1980), referred to the ecliptic
-*           and mean equinox of J2000.0, in which an offset is added to
-*           the longitude value which results in the centre of the Sun
-*           being at zero longitude at the date given by the Epoch attribute.
-*        "GALACTIC"
-*           Galactic coordinates (IAU 1958).
-*        "SUPERGALACTIC"
-*           De Vaucouleurs Supergalactic coordinates.
-*        "UNKNOWN"
-*           An unknown spherical coordinate system.
-*     Title (string)
-*        Specifies a string to be used as a title on (e.g.) graphs to
-*        describe the coordinate system which the SkyFrame
-*        represents. The SkyFrame class re-defines the default to
-*        describe the sky coordinate system being represented
-*        (e.g. "FK5 Equatorial Coordinates, Mean Equinox J2000.0").
-*     Unit(axis) (string)
-*        Describes the units used to represent coordinate values on
-*        each SkyFrame axis. The SkyFrame class re-defines the default
-*        to describe the character string returned by the astFormat
-*        method when formatting sexagessimal values
-*        (e.g. "hh:mm:ss.sss").
-
-*  New Attributes Defined:
-*     AsTime(axis) (integer)
-*        A boolean value that specifies whether each axis of a
-*        SkyFrame should have its values formatted as times (e.g. in
-*        hours, minutes and seconds) rather than as angles (in
-*        degrees). This value affects the default value of the Format
-*        and Unit attributes for each axis and the operation of the
-*        astFormat method. The default value is chosen to be
-*        appropriate to the sky coordinate system being represented.
-*     Equinox (double)
-*        This value is used to qualify sky coordinate systems that are
-*        notionally based on the ecliptic (the plane of the Earth's
-*        orbit around the Sun) and/or the Earth's equator.
-*     LatAxis (integer)
-*        A read-only attribute giving the index of the latitude axis, 
-*        taking account of any current axis permutation.
-*     LonAxis (integer)
-*        A read-only attribute giving the index of the longitude axis, 
-*        taking account of any current axis permutation.
-*     NegLon (integer)
-*        A boolean value that controls how a longitude value is
-*        normalized by astNorm. If non-zero, then longitude values are
-*        normalized into the range [-pi,+pi]. Otherwise (the default), 
-*        they are normalized into the range [0,2.pi].
-*     Projection (string)
-*        This attribute contains a human-readable description of the
-*        type of sky projection used when a SkyFrame is attached to a
-*        2-dimensional object such as an image or plotting surface
-*        (for example, "tangent-plane projection"). It does not affect
-*        the behaviour of the SkyFrame, but serves simply to inform.
-*        If set to a non-blank value, it may appear as part of the
-*        default value of the SkyFrame's Title attribute. The default
-*        value is an empty string.
-
-*  Methods Over-Ridden:
-*     Public:
-*        astDistance
-*           Calculate the distance between two points.
-*        astFormat
-*           Format a coordinate value for a SkyFrame axis.
-*        astNorm
-*           Normalise a set of SkyFrame coordinates.
-*        astOffset
-*           Calculate an offset along a geodesic curve.
-*        astUnformat
-*           Read a formatted coordinate value for a SkyFrame axis.
-
-*     Protected:
-*        astGap
-*           Find a "nice" gap for tabulating SkyFrame axis values.
-*        astGetDirection
-*           Obtain the value of the Direction attribute for a SkyFrame axis.
-*        astGetDomain
-*           Obtain a pointer to the Domain string for a SkyFrame axis.
-*        astGetFormat
-*           Obtain a pointer to the Format string for a SkyFrame axis.
-*        astGetLabel
-*           Obtain a pointer to the Label string for a SkyFrame axis.
-*        astGetSymbol
-*           Obtain a pointer to the Symbol string for a SkyFrame axis.
-*        astGetTitle
-*           Obtain a pointer to the Title string for a SkyFrame axis.
-*        astGetUnit
-*           Obtain a pointer to the Unit string for a SkyFrame axis.
-*        astMatch
-*           Determine if conversion is possible between two coordinate systems.
-*        astOverlay
-*           Overlay the attributes of a template SkyFrame on to another Frame.
-*        astSetAttrib
-*           Set an attribute value for a SkyFrame.
-*        astSetMaxAxes
-*           Set a value for the MaxAxes attribute of a SkyFrame.
-*        astSetMinAxes
-*           Set a value for the MinAxes attribute of a SkyFrame.
-*        astSubFrame
-*           Select axes from a SkyFrame and convert to the new coordinate
-*           system.
-
-*  New Methods Defined:
-*     Public
-*        None.
-
-*     Protected:
-*        astClearAsTime
-*           Clear the value of the AsTime attribute for a SkyFrame axis.
-*        astClearEquinox
-*           Clear the value of the Equinox attribute for a SkyFrame.
-*        astClearNegLon
-*           Clear the value of the NegLon attribute for a SkyFrame.
-*        astClearProjection
-*           Clear the value of the Projection attribute for a SkyFrame.
-*        astGetAsTime
-*           Obtain the value of the AsTime attribute for a SkyFrame axis.
-*        astGetEquinox
-*           Obtain the value of the Equinox attribute for a SkyFrame.
-*        astGetNegLon
-*           Obtain the value of the NegLon attribute for a SkyFrame.
-*        astGetProjection
-*           Obtain the value of the Projection attribute for a SkyFrame.
-*        astSetAsTime
-*           Set a value for the AsTime attribute of a SkyFrame axis.
-*        astSetEquinox
-*           Set a value for the Equinox attribute of a SkyFrame.
-*        astSetNegLon
-*           Set a value for the NegLon attribute of a SkyFrame.
-*        astSetProjection
-*           Set a value for the Projection attribute of a SkyFrame.
-*        astTestAsTime
-*           Test if a value has been set for the AsTime attribute of a SkyFrame
-*           axis.
-*        astTestEquinox
-*           Test if a value has been set for the Equinox attribute of a
-*           SkyFrame.
-*        astTestNegLon
-*           Test if a value has been set for the NegLon attribute of a
-*           SkyFrame.
-*        astTestProjection
-*           Test if a value has been set for the Projection attribute of a
-*           SkyFrame.
-
-*  Other Class Functions:
-*     Public:
-*        astIsASkyFrame
-*           Test class membership.
-*        astSkyFrame
-*           Create a SkyFrame.
-
-*     Protected:
-*        astCheckSkyFrame
-*           Validate class membership.
-*        astInitSkyFrame
-*           Initialise a SkyFrame.
-*        astInitSkyFrameVtab
-*           Initialise the virtual function table for the SkyFrame class.
-*        astLoadSkyFrame
-*           Load a SkyFrame.
-
 *  Macros:
 *     None.
 
@@ -310,6 +71,9 @@
 *        class.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitSkyFrameVtab method.
+*     19-APR-2004 (DSB):
+*        Added SkyRef, SkyRefIs, SkyRefP and AlignOffset attributes.
+*        Simplified prologue.
 *-
 */
 
@@ -355,6 +119,10 @@ typedef struct AstSkyFrame {
    char *projection;             /* Description of sky projection */
    double equinox;               /* Modified Julian Date of mean equinox */
    int neglon;                   /* Display negative longitude values? */
+   int alignoffset;              /* Align SkyFrame in offset coords? */
+   int skyrefis;                 /* Nature of offset coord system */
+   double skyref[ 2 ];           /* Origin or pole of offset coord system */
+   double skyrefp[ 2 ];          /* Point on primary meridian of offset coord system */
 } AstSkyFrame;
 
 /* Virtual function table. */
@@ -389,6 +157,28 @@ typedef struct AstSkyFrameVtab {
    void (* SetEquinox)( AstSkyFrame *, double );
    void (* SetNegLon)( AstSkyFrame *, int );
    void (* SetProjection)( AstSkyFrame *, const char * );
+
+   int (* GetSkyRefIs)( AstSkyFrame * );
+   int (* TestSkyRefIs)( AstSkyFrame * );
+   void (* ClearSkyRefIs)( AstSkyFrame * );
+   void (* SetSkyRefIs)( AstSkyFrame *, int );
+
+   double (* GetSkyRef)( AstSkyFrame *, int );
+   int (* TestSkyRef)( AstSkyFrame *, int );
+   void (* ClearSkyRef)( AstSkyFrame *, int );
+   void (* SetSkyRef)( AstSkyFrame *, int, double );
+
+   double (* GetSkyRefP)( AstSkyFrame *, int );
+   int (* TestSkyRefP)( AstSkyFrame *, int );
+   void (* ClearSkyRefP)( AstSkyFrame *, int );
+   void (* SetSkyRefP)( AstSkyFrame *, int, double );
+
+   int (* GetAlignOffset)( AstSkyFrame * );
+   int (* TestAlignOffset)( AstSkyFrame * );
+   void (* ClearAlignOffset)( AstSkyFrame * );
+   void (* SetAlignOffset)( AstSkyFrame *, int );
+
+
 } AstSkyFrameVtab;
 #endif
 
@@ -441,6 +231,27 @@ void astSetAsTime_( AstSkyFrame *, int, int );
 void astSetEquinox_( AstSkyFrame *, double );
 void astSetNegLon_( AstSkyFrame *, int );
 void astSetProjection_( AstSkyFrame *, const char * );
+
+int astGetAlignOffset_( AstSkyFrame * );
+int astTestAlignOffset_( AstSkyFrame * );
+void astClearAlignOffset_( AstSkyFrame * );
+void astSetAlignOffset_( AstSkyFrame *, int );
+
+int astGetSkyRefIs_( AstSkyFrame * );
+int astTestSkyRefIs_( AstSkyFrame * );
+void astClearSkyRefIs_( AstSkyFrame * );
+void astSetSkyRefIs_( AstSkyFrame *, int );
+
+double astGetSkyRef_( AstSkyFrame *, int );
+int astTestSkyRef_( AstSkyFrame *, int );
+void astClearSkyRef_( AstSkyFrame *, int );
+void astSetSkyRef_( AstSkyFrame *, int, double );
+
+double astGetSkyRefP_( AstSkyFrame *, int );
+int astTestSkyRefP_( AstSkyFrame *, int );
+void astClearSkyRefP_( AstSkyFrame *, int );
+void astSetSkyRefP_( AstSkyFrame *, int, double );
+
 #endif
 
 /* Function interfaces. */
@@ -531,5 +342,26 @@ astINVOKE(V,astTestEquinox_(astCheckSkyFrame(this)))
 astINVOKE(V,astTestNegLon_(astCheckSkyFrame(this)))
 #define astTestProjection(this) \
 astINVOKE(V,astTestProjection_(astCheckSkyFrame(this)))
+
+#define astClearAlignOffset(this) astINVOKE(V,astClearAlignOffset_(astCheckSkyFrame(this)))
+#define astGetAlignOffset(this) astINVOKE(V,astGetAlignOffset_(astCheckSkyFrame(this)))
+#define astSetAlignOffset(this,value) astINVOKE(V,astSetAlignOffset_(astCheckSkyFrame(this),value))
+#define astTestAlignOffset(this) astINVOKE(V,astTestAlignOffset_(astCheckSkyFrame(this)))
+
+#define astClearSkyRefIs(this) astINVOKE(V,astClearSkyRefIs_(astCheckSkyFrame(this)))
+#define astGetSkyRefIs(this) astINVOKE(V,astGetSkyRefIs_(astCheckSkyFrame(this)))
+#define astSetSkyRefIs(this,value) astINVOKE(V,astSetSkyRefIs_(astCheckSkyFrame(this),value))
+#define astTestSkyRefIs(this) astINVOKE(V,astTestSkyRefIs_(astCheckSkyFrame(this)))
+
+#define astClearSkyRef(this,axis) astINVOKE(V,astClearSkyRef_(astCheckSkyFrame(this),axis))
+#define astGetSkyRef(this,axis) astINVOKE(V,astGetSkyRef_(astCheckSkyFrame(this),axis))
+#define astSetSkyRef(this,axis,value) astINVOKE(V,astSetSkyRef_(astCheckSkyFrame(this),axis,value))
+#define astTestSkyRef(this,axis) astINVOKE(V,astTestSkyRef_(astCheckSkyFrame(this),axis))
+
+#define astClearSkyRefP(this,axis) astINVOKE(V,astClearSkyRefP_(astCheckSkyFrame(this),axis))
+#define astGetSkyRefP(this,axis) astINVOKE(V,astGetSkyRefP_(astCheckSkyFrame(this),axis))
+#define astSetSkyRefP(this,axis,value) astINVOKE(V,astSetSkyRefP_(astCheckSkyFrame(this),axis,value))
+#define astTestSkyRefP(this,axis) astINVOKE(V,astTestSkyRefP_(astCheckSkyFrame(this),axis))
+
 #endif
 #endif

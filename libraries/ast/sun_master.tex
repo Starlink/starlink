@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.15}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {29th March 2004}
+\newcommand{\stardocdate}      {15th June 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1515,6 +1515,21 @@ to read the introduction to AST programming concepts in
 \secref{ss:primer} first. Otherwise, references to more detailed
 reading are given after each example, just in case they don't quite do
 what you want.
+
+\subsection{\ldots Obtain and Install AST}
+The AST library is available both as a stand-alone package and also as 
+part of the Starlink Software Collection\footnote{The Starlink Software 
+Collection can be downloaded from
+\htmladdnormallink{http://www.starlink.ac.uk/$
+{http://www.starlink.ac.uk/Download/}.}. If your site has the Starlink
+Software Collection installed then AST should already be available. 
+
+If not, you can download the AST library by itself from
+\htmladdnormallink{http://www.starlink.ac.uk/ast/}
+{http://www.starlink.ac.uk/ast/}.}. 
+
+Note, AST requires the SLALIB library (\xref{SUN/67}{sun67}{}) to be 
+installed.
 
 \subsection{\ldots Structure an AST Program}
 
@@ -8343,6 +8358,11 @@ coordinate system residing on the celestial sphere. Many such
 coordinate systems can be represented by a SkyFrame, as we will see
 shortly.
 
+A SkyFrame can represent any of the commonly used celestial coordinate
+systems. Optionally, the origin of the longitude/latitude system can be 
+moved to any specified point in the standard celestial system, allowing
+a SkyFrame to represent offsets from a specified sky position.
+
 c+
 When it is first created, a SkyFrame's axes are always in the order
 (longitude,~latitude) but this can be changed, if required, by using the
@@ -8970,6 +8990,33 @@ it should contain ``d'' or ``h'' to ensure that the first field
 entered by the user will be interpreted as degrees or hours, unless
 otherwise identified. This is the normal behaviour unless an explicit
 Format(axis) value has been set to override the default.
+
+\subsection{Representing Offsets from a Specified Sky Position}
+A SkyFrame can be modified so that its longitude and latitude axes are
+referred to an origin at any specified sky position. Such a coordinate
+system is referred to as an ``offset'' coordinate syetem. First, the System
+attribute should be set to represent the celestial coordinate system in
+which the origin is to be specified. Then the SkyRef attribute should be
+set to hold the coordinates of the origin within the selected celestial
+coordinate system. 
+
+By default, ``north'' in the new offset coordinate system is parallel to
+north in the original celestial coordinate system. However, the direction
+of north in the offset system can be controlled by assigning a value to
+the SkyRefP attribute. This attribute should be assigned the celestial
+coordinates of a point which is on the zero longitude meridian and which
+has non-zero latitude.
+
+By default, the position given by the SkyRef attribute is used as the
+origin of the new longitude/latitude system, but an option exists to use
+it as the north pole of the system instead. This option is controlled by
+the SkyRefIs attribute. The choice of value for SkyRefIs depends on what
+sort of offset coordinate system you want. Setting SkyRefIs to
+``Origin'' (the default) produces an offset coordinate system which is
+approximately Cartesian close to the specified position. Setting SkyRefIs
+to
+``Pole'' produces an offset coordinate system which is approximately Polar
+close to the specified position. 
 
 \cleardoublepage
 \section{\xlabel{ss_specframes}\label{ss:specframes}Spectral Coordinate Systems (SpecFrames)}
@@ -20276,6 +20323,22 @@ occurred in the AST library between versions V3.2 and V3.3 (the
 current version):
 
 \begin{enumerate}
+
+\item Options have been added to the SkyFrame class which allows the
+origin 
+of celestial coordinates to be moved to any specified point. See the new
+attributes SkyRef, SkyRefIs, SkyRefP and AlignOffset.
+
+\item An option has been added to the FitsChan class which allows extra
+Frames representing cartesian projection plane coordinates (``intermediate 
+world coordinates'' in the parlance of FITS-WCS) to be created when
+reading 
+WCS information from a foreign FITS header. This option is controlled by
+a new attribute called Iwc.
+
+\item The FitsChan class which been modified to interpret FITS-WCS CAR
+projection headers correctly if the longitude reference pixel (CRPIX) is 
+very large.
 
 \item The organisation of the AST distribution and the commands for
 building it have been changed. Whereas AST used to be built and installed

@@ -134,4 +134,7 @@ XMLWF           <supplied XML document is not well formed>
 ! New codes introduced for V3.2
 ZERAX           <Range of log axis scale includes zero>
 
+! New codes introduced for V3.3
+BADOC           <Invalid parameters for offset sky coordinate system>
+
 .END

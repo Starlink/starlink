@@ -18,6 +18,13 @@ f     AST_SKYFRAME
 *     is ICRS) qualified, as necessary, by a mean Equinox value and/or
 *     an Epoch.
 *
+*     For each of the supported celestial coordinate systems, a SkyFrame
+*     can apply an optional shift of origin to create a coordinate system 
+*     representing offsets within the celestial coordinate system from some 
+*     specified reference point. This offset coordinate system can also be 
+*     rotated to define new longitude and latitude axes. See attributes 
+*     SkyRef, SkyRefIs, SkyRefP and AlignOffset.
+*
 *     All the coordinate values used by a SkyFrame are in
 *     radians. These may be formatted in more conventional ways for
 c     display by using astFormat.
@@ -30,12 +37,16 @@ f     display by using AST_FORMAT.
 *     In addition to those attributes common to all Frames, every
 *     SkyFrame also has the following attributes:
 *
+*     - AlignOffset: Align SkyFrames using the offset coordinate system? 
 *     - AsTime(axis): Format celestial coordinates as times?
 *     - Equinox: Epoch of the mean equinox
 *     - LatAxis: Index of the latitude axis
 *     - LonAxis: Index of the longitude axis
 *     - NegLon: Display longitude values in the range [-pi,pi]?
 *     - Projection: Sky projection description.
+*     - SkyRef: Position defining location of the offset coordinate system
+*     - SkyRefIs: Selects the nature of the offset coordinate system
+*     - SkyRefP: Position defining orientation of the offset coordinate system
 
 *  Functions:
 c     The SkyFrame class does not define any new functions beyond those
@@ -43,7 +54,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *     which are applicable to all Frames.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -108,6 +119,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        in place of FK5.
 *     27-SEP-2003 (DSB):
 *        Added HELIOECLIPTIC option for System attribute.
+*     19-APR-2004 (DSB):
+*        Added SkyRef, SkyRefIs, SkyRefP and AlignOffset attributes.
 *class--
 */
 
@@ -121,6 +134,365 @@ f     The SkyFrame class does not define any new routines beyond those
 /* Define the first and last acceptable System values. */
 #define FIRST_SYSTEM AST__FK4
 #define LAST_SYSTEM AST__UNKNOWN
+
+/* Define values for the different values of the SkyRefIs attribute. */
+#define BAD_REF 0
+#define POLE_REF 1
+#define ORIGIN_REF 2
+#define POLE_STRING "Pole"
+#define ORIGIN_STRING "Origin"
+
+/*
+*
+*  Name:
+*     MAKE_CLEAR
+
+*  Purpose:
+*     Implement a method to clear a single value in a multi-valued attribute.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     MAKE_CLEAR(attr,component,assign,nval)
+
+*  Class Membership:
+*     Defined by the SkyFrame class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static void Clear<Attribute>( AstSkyFrame *this, int axis )
+*
+*     and an external interface function of the form:
+*
+*        void astClear<Attribute>_( AstSkyFrame *this, int axis )
+*
+*     which implement a method for clearing a single value in a specified 
+*     multi-valued attribute for an axis of a SkyFrame.
+
+*  Parameters:
+*     attr
+*        The name of the attribute to be cleared, as it appears in the function
+*        name (e.g. Label in "astClearLabelAt").
+*     component
+*        The name of the class structure component that holds the attribute
+*        value.
+*     assign
+*        An expression that evaluates to the value to assign to the component
+*        to clear its value.
+*     nval
+*        Specifies the number of values in the multi-valued attribute. The
+*        "axis" values supplied to the created function should be in the
+*        range zero to (nval - 1).
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*
+*/
+
+/* Define the macro. */
+#define MAKE_CLEAR(attr,component,assign,nval) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static void Clear##attr( AstSkyFrame *this, int axis ) { \
+\
+   int axis_p; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Validate and permute the axis index. */ \
+   axis_p = astValidateAxis( this, axis, "astClear" #attr ); \
+\
+/* Assign the "clear" value. */ \
+   if( astOK ) { \
+      this->component[ axis_p ] = (assign); \
+   } \
+} \
+\
+/* External interface. */ \
+/* ------------------- */ \
+void astClear##attr##_( AstSkyFrame *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   (**astMEMBER(this,SkyFrame,Clear##attr))( this, axis ); \
+}   
+
+
+/*
+*
+*  Name:
+*     MAKE_GET
+
+*  Purpose:
+*     Implement a method to get a single value in a multi-valued attribute.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     MAKE_GET(attr,type,bad_value,assign,nval)
+
+*  Class Membership:
+*     Defined by the SkyFrame class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static <Type> Get<Attribute>( AstSkyFrame *this, int axis )
+*
+*     and an external interface function of the form:
+*
+*        <Type> astGet<Attribute>_( AstSkyFrame *this, int axis )
+*
+*     which implement a method for getting a single value from a specified 
+*     multi-valued attribute for an axis of a SkyFrame.
+
+*  Parameters:
+*     attr
+*        The name of the attribute whose value is to be obtained, as it
+*        appears in the function name (e.g. Label in "astGetLabel").
+*     type
+*        The C type of the attribute.
+*     bad_value
+*        A constant value to return if the global error status is set, or if
+*        the function fails.
+*     assign
+*        An expression that evaluates to the value to be returned. This can
+*        use the string "axis" to represent the zero-based value index.
+*     nval
+*        Specifies the number of values in the multi-valued attribute. The
+*        "axis" values supplied to the created function should be in the
+*        range zero to (nval - 1).
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*
+*/
+
+/* Define the macro. */
+#define MAKE_GET(attr,type,bad_value,assign,nval) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static type Get##attr( AstSkyFrame *this, int axis ) { \
+   int axis_p;                   /* Permuted axis index */ \
+   type result;                  /* Result to be returned */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return (bad_value); \
+\
+/* Validate and permute the axis index. */ \
+   axis_p = astValidateAxis( this, axis, "astGet" #attr ); \
+\
+/* Assign the result value. */ \
+   if( astOK ) { \
+      result = (assign); \
+   } \
+\
+/* Check for errors and clear the result if necessary. */ \
+   if ( !astOK ) result = (bad_value); \
+\
+/* Return the result. */ \
+   return result; \
+} \
+/* External interface. */ \
+/* ------------------- */  \
+type astGet##attr##_( AstSkyFrame *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return (bad_value); \
+\
+/* Invoke the required method via the virtual function table. */ \
+   return (**astMEMBER(this,SkyFrame,Get##attr))( this, axis ); \
+}
+
+/*
+*
+*  Name:
+*     MAKE_SET
+
+*  Purpose:
+*     Implement a method to set a single value in a multi-valued attribute 
+*     for a SkyFrame.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     MAKE_SET(attr,type,component,assign,nval)
+
+*  Class Membership:
+*     Defined by the SkyFrame class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static void Set<Attribute>( AstSkyFrame *this, int axis, <Type> value )
+*
+*     and an external interface function of the form:
+*
+*        void astSet<Attribute>_( AstSkyFrame *this, int axis, <Type> value )
+*
+*     which implement a method for setting a single value in a specified
+*     multi-valued attribute for a SkyFrame.
+
+*  Parameters:
+*      attr
+*         The name of the attribute to be set, as it appears in the function
+*         name (e.g. Label in "astSetLabelAt").
+*      type
+*         The C type of the attribute.
+*      component
+*         The name of the class structure component that holds the attribute
+*         value.
+*      assign
+*         An expression that evaluates to the value to be assigned to the
+*         component.
+*      nval
+*         Specifies the number of values in the multi-valued attribute. The
+*         "axis" values supplied to the created function should be in the
+*         range zero to (nval - 1).
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*-
+*/
+
+/* Define the macro. */
+#define MAKE_SET(attr,type,component,assign,nval) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static void Set##attr( AstSkyFrame *this, int axis, type value ) { \
+\
+   int axis_p; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Validate and permute the axis index. */ \
+   axis_p = astValidateAxis( this, axis, "astSet" #attr ); \
+\
+/* Store the new value in the structure component. */ \
+   if( astOK ) { \
+      this->component[ axis ] = (assign); \
+   } \
+} \
+\
+/* External interface. */ \
+/* ------------------- */ \
+void astSet##attr##_( AstSkyFrame *this, int axis, type value ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   (**astMEMBER(this,SkyFrame,Set##attr))( this, axis, value ); \
+}
+
+/*
+*
+*  Name:
+*     MAKE_TEST
+
+*  Purpose:
+*     Implement a method to test if a single value has been set in a 
+*     multi-valued attribute for a class.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     MAKE_TEST(attr,assign,nval)
+
+*  Class Membership:
+*     Defined by the SkyFrame class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static int Test<Attribute>( AstSkyFrame *this, int axis )
+*
+*     and an external interface function of the form:
+*
+*        int astTest<Attribute>_( AstSkyFrame *this, int axis )
+*
+*     which implement a method for testing if a single value in a specified 
+*     multi-valued attribute has been set for a class.
+
+*  Parameters:
+*      attr
+*         The name of the attribute to be tested, as it appears in the function
+*         name (e.g. Label in "astTestLabelAt").
+*      assign
+*         An expression that evaluates to 0 or 1, to be used as the returned
+*         value. This can use the string "axis" to represent the zero-based
+*         index of the value within the attribute.
+*      nval
+*         Specifies the number of values in the multi-valued attribute. The
+*         "axis" values supplied to the created function should be in the
+*         range zero to (nval - 1).
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*-
+*/
+
+/* Define the macro. */
+#define MAKE_TEST(attr,assign,nval) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static int Test##attr( AstSkyFrame *this, int axis ) { \
+   int result;                   /* Value to return */ \
+   int axis_p;                   /* Permuted axis index */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return 0; \
+\
+/* Validate and permute the axis index. */ \
+   axis_p = astValidateAxis( this, axis, "astTest" #attr ); \
+\
+/* Assign the result value. */ \
+   if( astOK ) { \
+      result = (assign); \
+   } \
+\
+/* Check for errors and clear the result if necessary. */ \
+   if ( !astOK ) result = 0; \
+\
+/* Return the result. */ \
+   return result; \
+} \
+/* External interface. */ \
+/* ------------------- */ \
+int astTest##attr##_( AstSkyFrame *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return 0; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   return (**astMEMBER(this,SkyFrame,Test##attr))( this, axis ); \
+}
+
 
 /* Header files. */
 /* ============= */
@@ -136,6 +508,8 @@ f     The SkyFrame class does not define any new routines beyond those
 #include "slamap.h"              /* SLALIB sky coordinate Mappings */
 #include "skyaxis.h"             /* Sky axes */
 #include "frame.h"               /* Parent Frame class */
+#include "matrixmap.h"           /* Matrix multiplication */
+#include "sphmap.h"              /* Cartesian<->Spherical transformations */
 #include "skyframe.h"            /* Interface definition for this class */
 #include "slalib.h"              /* SLALIB library interface */
 
@@ -164,6 +538,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are used or extended by this
    class. */
 static AstSystemType (* parent_getsystem)( AstFrame * );
+static void (* parent_setsystem)( AstFrame *, AstSystemType );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static const char *(* parent_format)( AstFrame *, int, double );
 static const char *(* parent_getattrib)( AstObject *, const char * );
@@ -199,8 +574,10 @@ static double piby2;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstMapping *OffsetMap( AstSkyFrame * );
 static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType GetSystem( AstFrame * );
+static void SetSystem( AstFrame *, AstSystemType );
 static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
 static const char *Format( AstFrame *, int, double );
@@ -257,6 +634,26 @@ static void SetNegLon( AstSkyFrame *, int );
 static void SetProjection( AstSkyFrame *, const char * );
 static void Shapp( double, double *, double *, double, double * );
 static void Shcal( double, double, double, double *, double * );
+
+static double GetSkyRef( AstSkyFrame *, int );
+static int TestSkyRef( AstSkyFrame *, int );
+static void SetSkyRef( AstSkyFrame *, int, double );
+static void ClearSkyRef( AstSkyFrame *, int );
+
+static double GetSkyRefP( AstSkyFrame *, int );
+static int TestSkyRefP( AstSkyFrame *, int );
+static void SetSkyRefP( AstSkyFrame *, int, double );
+static void ClearSkyRefP( AstSkyFrame *, int );
+
+static int GetSkyRefIs( AstSkyFrame * );
+static int TestSkyRefIs( AstSkyFrame * );
+static void SetSkyRefIs( AstSkyFrame *, int );
+static void ClearSkyRefIs( AstSkyFrame * );
+
+static int GetAlignOffset( AstSkyFrame * );
+static int TestAlignOffset( AstSkyFrame * );
+static void SetAlignOffset( AstSkyFrame *, int );
+static void ClearAlignOffset( AstSkyFrame * );
 
 /* Member functions. */
 /* ================= */
@@ -509,6 +906,42 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "projection" ) ) {
       astClearProjection( this );
+
+/* SkyRef. */
+/* ------- */
+   } else if ( !strcmp( attrib, "skyref" ) ) {
+      astClearSkyRef( this, 0 );
+      astClearSkyRef( this, 1 );
+
+/* SkyRef(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( attrib, "skyref(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      astClearSkyRef( this, axis - 1 );
+
+/* SkyRefP. */
+/* -------- */
+   } else if ( !strcmp( attrib, "skyrefp" ) ) {
+      astClearSkyRefP( this, 0 );
+      astClearSkyRefP( this, 1 );
+
+/* SkyRefP(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( attrib, "skyrefp(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      astClearSkyRefP( this, axis - 1 );
+
+/* SkyRefIs. */
+/* --------- */
+   } else if ( !strcmp( attrib, "skyrefis" ) ) {
+      astClearSkyRefIs( this );
+
+/* AlignOffset. */
+/* ------------ */
+   } else if ( !strcmp( attrib, "alignoffset" ) ) {
+      astClearAlignOffset( this );
 
 /* If the name was not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then report an
@@ -913,17 +1346,20 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 */
 
 /* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
+#define BUFF_LEN 200             /* Max. characters in result buffer */
 
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   const char *cval;             /* Pointer to character attribute value */
    const char *result;           /* Pointer value to return */
+   double dval;                  /* Floating point attribute value */
    double equinox;               /* Equinox attribute value (as MJD) */
    int as_time;                  /* AsTime attribute value */
    int axis;                     /* SkyFrame axis number */
-   int neglon;                   /* Display long. values as [-pi,pi]? */
+   int ival;                     /* Integer attribute value */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
+   int neglon;                   /* Display long. values as [-pi,pi]? */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -998,6 +1434,75 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "projection" ) ) {
       result = astGetProjection( this );
+
+/* SkyRef. */
+/* ------- */
+   } else if ( !strcmp( attrib, "skyref" ) ) {
+      cval = astFormat( this, 0, astGetSkyRef( this, 0 ) );
+      if ( astOK ) {
+         nc = sprintf( buff, "%s, ", cval );
+         cval = astFormat( this, 1, astGetSkyRef( this, 1 ) );
+         if ( astOK ) {
+            (void) sprintf( buff + nc, "%s", cval );
+            result = buff;
+         }
+      }
+
+/* SkyRef(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( attrib, "skyref(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      dval = astGetSkyRef( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* SkyRefP. */
+/* -------- */
+   } else if ( !strcmp( attrib, "skyrefp" ) ) {
+      cval = astFormat( this, 0, astGetSkyRefP( this, 0 ) );
+      if ( astOK ) {
+         nc = sprintf( buff, "%s, ", cval );
+         cval = astFormat( this, 1, astGetSkyRefP( this, 1 ) );
+         if ( astOK ) {
+            (void) sprintf( buff + nc, "%s", cval );
+            result = buff;
+         }
+      }
+
+/* SkyRefP(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( attrib, "skyrefp(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      dval = astGetSkyRefP( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* SkyRefIs. */
+/* --------- */
+   } else if ( !strcmp( attrib, "skyrefis" ) ) {
+      ival = astGetSkyRefIs( this );
+      if ( astOK ) {
+         if( ival == POLE_REF ){
+            result = POLE_STRING;
+         } else {
+            result = ORIGIN_STRING;
+         }
+      }
+
+/* AlignOffset */
+/* ----------- */
+   } else if ( !strcmp( attrib, "alignoffset" ) ) {
+      ival = astGetAlignOffset( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1655,6 +2160,7 @@ static const char *GetLabel( AstFrame *this, int axis ) {
    AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *result;           /* Pointer to label string */
    int axis_p;                   /* Permuted axis index */
+   static char buff[ 40 ];       /* Buffer for returned value */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1713,6 +2219,12 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 		      "invalid sky coordinate system identification code "
 		      "(%d).", astGetClass( this ), astGetClass( this ),
 		      (int) system );
+         }
+
+/* If the SkyRef attribute has a set value, append " offset" to the label. */
+         if( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ) {
+            sprintf( buff, "%s offset", result );
+            result = buff;
          }
       }
    }
@@ -1845,6 +2357,83 @@ static int GetLonAxis( AstSkyFrame *this ) {
 
 }
 
+static double GetSkyRefP( AstSkyFrame *this, int axis ) {
+/*
+*  Name:
+*     GetSkyRefP
+
+*  Purpose:
+*     Obtain the value of the SkyRefP attribute for a SkyFrame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetSkyRefP( AstSkyFrame *this, int axis )
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function returns the value of the SkyRefP attribute for a
+*     SkyFrame axis, providing suitable defaults.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     axis
+*        Axis index (zero-based) identifying the axis for which information is
+*        required.
+
+*  Returned Value:
+*     The SkyRefP value to be used.
+
+*  Notes:
+*     -  A value of zero will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   double result;                /* Returned value */
+   int axis_p;                   /* Permuted axis index */
+
+/* Initialise. */
+   result = 0.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Validate and permute the axis index. */
+   axis_p = astValidateAxis( this, axis, "astGetSkyRefP" );
+
+/* Check if a value has been set for the required axis. If so, return it. */
+   if( this->skyrefp[ axis_p ] != AST__BAD ) {
+      result = this->skyrefp[ axis_p ];
+
+/* Otherwise, return the default value */
+   } else {
+
+/* The default longitude value is always zero. */
+      if( axis_p == 0 ) {
+         result= 0.0;
+
+/* The default latitude value depends on SkyRef. The usual default is the 
+   north pole. The exception to this is if the SkyRef attribute identifies 
+   either the north or the south pole, in which case the origin is used as 
+   the default. Allow some tolerance. */
+      } else if( fabs( cos( this->skyref[ 1 ] ) ) > 1.0E-10 ) {
+         result = pi/2;
+
+      } else {
+         result = 0.0;
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static const char *GetSymbol( AstFrame *this, int axis ) {
 /*
 *  Name:
@@ -1888,6 +2477,7 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
    AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *result;           /* Pointer to symbol string */
    int axis_p;                   /* Permuted axis index */
+   static char buff[ 20 ];       /* Buffer for returned value */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1940,6 +2530,12 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
 		      "invalid sky coordinate system identification code "
 		      "(%d).", astGetClass( this ), astGetClass( this ),
 		      (int) system );
+         }
+
+/* If the SkyRef attribute had a set value, prepend "D" to the Symbol. */
+         if( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ){
+            sprintf( buff, "D%s", result );
+            result = buff;
          }
       }
    }
@@ -2110,13 +2706,17 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to SkyFrame structure */
    AstSystemType system;         /* Code identifying type of sky coordinates */
+   const char *extra;            /* Pointer to extra information */
    const char *p;                /* Character pointer */
    const char *projection;       /* Pointer to sky projection description */
    const char *result;           /* Pointer to result string */
+   const char *word;             /* Pointer to critical word */
    double epoch;                 /* Value of Epoch attribute */
    double equinox;               /* Value of Equinox attribute */
-   int lproj;                    /* Length of sky projection description */
+   int lextra;                   /* Length of extra information */
+   int offset;                   /* Using offset coordinate system? */
    int pos;                      /* Buffer position to enter text */
+   static char buff2[ BUFF_LEN + 1 ];/* Buffer for extra information */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Check the global error status. */
@@ -2141,6 +2741,13 @@ static const char *GetTitle( AstFrame *this_frame ) {
       projection = astGetProjection( this );
       system = astGetSystem( this );
 
+/* See if an offset coordinate system is being used.*/
+      offset = astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 );
+
+/* Use this to determine if the word "coordinates" or "offsets" should be
+   used.*/
+      word = offset ? "offsets" : "coordinates";
+
 /* Classify the coordinate system type and create an appropriate Title
    string.  (Note that when invoking the astFmtDecimalYr function we must
    use a separate sprintf on each occasion so as not to over-write its
@@ -2154,7 +2761,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Display the Equinox and Epoch values. */
 	 case AST__FK4:
 	    pos = sprintf( buff,
-		           "FK4 equatorial coordinates; mean equinox B%s; ",
+		           "FK4 equatorial %s; mean equinox B%s; ", word,
 		           astFmtDecimalYr( slaEpb( equinox ), 9 ) );
             pos += sprintf( buff + pos,
                             "epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
@@ -2165,8 +2772,8 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Display the Equinox and Epoch values. */
 	 case AST__FK4_NO_E:
 	    pos = sprintf( buff,
-			   "FK4 equatorial coordinates; no E-terms; mean "
-			   "equinox B%s; ",
+			   "FK4 equatorial %s; no E-terms; mean "
+			   "equinox B%s; ", word,
                            astFmtDecimalYr( slaEpb( equinox ), 9 ) );
             pos += sprintf( buff + pos,
                             "epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
@@ -2177,7 +2784,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Display only the Equinox value. */
 	 case AST__FK5:
 	    pos = sprintf( buff,
-                           "FK5 equatorial coordinates; mean equinox J%s",
+                           "FK5 equatorial %s; mean equinox J%s", word,
                            astFmtDecimalYr( slaEpj( equinox ), 9 ) );
 	    break;
 
@@ -2186,7 +2793,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* ICRS is only like RA/Dec by co-incidence, it is not really an
    equatorial system by definition. */
 	 case AST__ICRS:
-	    pos = sprintf( buff, "ICRS coordinates" );
+	    pos = sprintf( buff, "ICRS %s", word );
 	    break;
 
 /* Geocentrc apparent equatorial coordinates. */
@@ -2194,8 +2801,8 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Display only the Epoch value. */
 	 case AST__GAPPT:
 	    pos = sprintf( buff,
-                           "Geocentric apparent equatorial coordinates; "
-                           "epoch J%s", astFmtDecimalYr( slaEpj( epoch ), 9 ) );
+                           "Geocentric apparent equatorial %s; "
+                           "epoch J%s", word, astFmtDecimalYr( slaEpj( epoch ), 9 ) );
 	    break;
 
 /* Ecliptic coordinates. */
@@ -2203,7 +2810,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Display only the Equinox value. */
 	 case AST__ECLIPTIC:
 	    pos = sprintf( buff,
-                           "Ecliptic coordinates; mean equinox J%s",
+                           "Ecliptic %s; mean equinox J%s", word,
                            astFmtDecimalYr( slaEpj( equinox ), 9 ) );
 	    break;
 
@@ -2212,8 +2819,8 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Display only the Epoch value (equinox is fixed). */
 	 case AST__HELIOECLIPTIC:
 	    pos = sprintf( buff,
-                           "Helio-ecliptic coordinates; mean equinox J2000,"
-                           " epoch J%s",
+                           "Helio-ecliptic %s; mean equinox J2000,"
+                           " epoch J%s", word,
                            astFmtDecimalYr( slaEpj( epoch ), 9 ) );
 	    break;
 
@@ -2221,7 +2828,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* --------------------- */
 /* Do not display an Equinox or Epoch value. */
 	 case AST__GALACTIC:
-	    pos = sprintf( buff, "IAU (1958) galactic coordinates" );
+	    pos = sprintf( buff, "IAU (1958) galactic %s", word );
 	    break;
 
 /* Supergalactic coordinates. */
@@ -2229,14 +2836,14 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Do not display an Equinox or Epoch value. */
 	 case AST__SUPERGALACTIC:
 	    pos = sprintf( buff,
-                           "De Vaucouleurs supergalactic coordinates" );
+                           "De Vaucouleurs supergalactic %s", word );
 	    break;
 
 /* Unknown coordinates. */
 /* -------------------------- */
 	 case AST__UNKNOWN:
 	    pos = sprintf( buff,
-                           "Spherical coordinates" );
+                           "Spherical %s", word );
 	    break;
 
 /* Report an error if the coordinate system was not recognised. */
@@ -2248,24 +2855,45 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    break;
          }
 
-/* If OK, determine the length of the sky projection description,
-   after removing trailing white space. */
+/* If OK, we add either a description of the sky projection, or (if used)
+   a description of the origin or pole of the offset coordinate system.
+   We include only one of these two strings in order to keep the length
+   of the title down to a reasonable value.*/
          if ( astOK ) {
-            for ( lproj = (int) strlen( projection ); lproj > 0; lproj-- ) {
-               if ( !isspace( projection[ lproj - 1 ] ) ) break;
+
+/* If the SkyRef attribute has set values, create a description of the offset
+   coordinate system. */
+            if( offset ){
+               word = ( astGetSkyRefIs( this ) == POLE_REF )?"pole":"origin";
+               lextra = sprintf( buff2, "%s at %s ", word, 
+                           astFormat( this, 0, astGetSkyRef( this, 0 ) ) );
+               lextra += sprintf( buff2 + lextra, "%s", 
+                           astFormat( this, 1, astGetSkyRef( this, 1 ) ) );
+               extra = buff2;
+
+/* Otherwise, get the sky projection description. */
+            } else {            
+               extra = projection;
+
+/* Determine the length of the extra information, after removing trailing 
+   white space. */
+               for ( lextra = (int) strlen( extra ); lextra > 0; lextra-- ) {
+                  if ( !isspace( extra[ lextra - 1 ] ) ) break;
+               }
             }
 
-/* If a non-blank description of the sky projection is available,
-   append it to the title string, checking that the end of the buffer
-   is not over-run. */
-            if ( lproj ) {
+/* If non-blank extra information is available, append it to the title string, 
+   checking that the end of the buffer is not over-run. */
+            if ( lextra ) {
                p = "; ";
                while ( ( pos < BUFF_LEN ) && *p ) buff[ pos++ ] = *p++;
-               p = projection;
+               p = extra;
                while ( ( pos < BUFF_LEN ) &&
-                       ( p < ( projection + lproj ) ) ) buff[ pos++ ] = *p++;
-               p = " projection";
-               while ( ( pos < BUFF_LEN ) && *p ) buff[ pos++ ] = *p++;
+                       ( p < ( extra + lextra ) ) ) buff[ pos++ ] = *p++;
+               if( extra == projection ) {
+                  p = " projection";
+                  while ( ( pos < BUFF_LEN ) && *p ) buff[ pos++ ] = *p++;
+               }
                buff[ pos ] = '\0';
             }
          }
@@ -2440,6 +3068,26 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    vtab->TestNegLon = TestNegLon;
    vtab->TestProjection = TestProjection;
 
+   vtab->TestSkyRef = TestSkyRef;
+   vtab->SetSkyRef = SetSkyRef;
+   vtab->GetSkyRef = GetSkyRef;
+   vtab->ClearSkyRef = ClearSkyRef;
+
+   vtab->TestSkyRefP = TestSkyRefP;
+   vtab->SetSkyRefP = SetSkyRefP;
+   vtab->GetSkyRefP = GetSkyRefP;
+   vtab->ClearSkyRefP = ClearSkyRefP;
+
+   vtab->TestSkyRefIs = TestSkyRefIs;
+   vtab->SetSkyRefIs = SetSkyRefIs;
+   vtab->GetSkyRefIs = GetSkyRefIs;
+   vtab->ClearSkyRefIs = ClearSkyRefIs;
+
+   vtab->TestAlignOffset = TestAlignOffset;
+   vtab->SetAlignOffset = SetAlignOffset;
+   vtab->GetAlignOffset = GetAlignOffset;
+   vtab->ClearAlignOffset = ClearAlignOffset;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
@@ -2473,6 +3121,8 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->GetDomain = GetDomain;
    parent_getsystem = frame->GetSystem;
    frame->GetSystem = GetSystem;
+   parent_setsystem = frame->SetSystem;
+   frame->SetSystem = SetSystem;
    parent_getalignsystem = frame->GetAlignSystem;
    frame->GetAlignSystem = GetAlignSystem;
    parent_getformat = frame->GetFormat;
@@ -2639,17 +3289,20 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 #define MAX_ARGS 4               /* Max arguments for an SlaMap conversion */
 
 /* Local Variables: */
-   AstSystemType system;         /* Code to identify coordinate system */
+   AstMapping *omap;             /* Mapping from coorinates to offsets */
+   AstMapping *tmap2;            /* Temporary Mapping */
+   AstMapping *tmap;             /* Temporary Mapping */
    AstSlaMap *slamap;            /* Pointer to SlaMap */
+   AstSystemType system;         /* Code to identify coordinate system */
    double args[ MAX_ARGS ];      /* Conversion argument array */
-   double result_epoch;          /* Result frame Epoch */
-   double target_epoch;          /* Target frame Epoch */
    double epoch;                 /* Epoch as Modified Julian Date */
    double epoch_B;               /* Besselian epoch as decimal years */
    double epoch_J;               /* Julian epoch as decimal years */
    double equinox;               /* Equinox as Modified Julian Date */
    double equinox_B;             /* Besselian equinox as decimal years */
    double equinox_J;             /* Julian equinox as decimal years */
+   double result_epoch;          /* Result frame Epoch */
+   double target_epoch;          /* Target frame Epoch */
    int match;                    /* Mapping can be generated? */
 
 /* Check the global error status. */
@@ -3084,10 +3737,41 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       }
    }
 
-/* Simplify the SlaMap produced above (this eliminates any redundant
+/* Now need to take account of the possibility that the input or output
+   SkyFrame may represent an offset system rather than a coordinate system. 
+   Form the Mapping from the target coordinate system to the associated
+   offset system. A UnitMap is returned if the target does not use an
+   offset system, or if the SkyFrame wishes the alignment to occur in the
+   offset system itself rather than the system specified by the System
+   attribute. */
+   omap = OffsetMap( target );
+
+/* Invert it to get the Mapping from the actual used system (whther
+   offsets or coordinates) to the coordinate system. */
+   astInvert( omap );
+
+/* Combine it with the slamap created earlier, so that its coordinate
+   outputs feed the inputs of the slamap. Annul redundant pointers 
+   afterwards. */
+   tmap = (AstMapping *) astCmpMap( omap, slamap, 1, "" );
+   omap = astAnnul( omap );
+   slamap =astAnnul( slamap );
+
+/* Now form the Mapping from the result coordinate system to the associated
+   offset system. A UnitMap is returned if the result does not use an
+   offset system. */
+   omap = OffsetMap( result );
+
+/* Combine it with the above CmpMap, so that the CmpMap outputs feed the
+   new Mapping inputs. Annul redundant pointers afterwards. */
+   tmap2 = (AstMapping *) astCmpMap( tmap, omap, 1, "" );
+   omap =astAnnul( omap );
+   tmap =astAnnul( tmap );
+
+/* Simplify the Mapping produced above (this eliminates any redundant
    conversions) and annul the original pointer. */
-   *map = astSimplify( slamap );
-   slamap = astAnnul( slamap );
+   *map = astSimplify( tmap2 );
+   tmap2 = astAnnul( tmap2 );
 
 /* If an error occurred, annul the returned Mapping and clear the
    returned values. */
@@ -3644,6 +4328,177 @@ static void Offset( AstFrame *this_frame, const double point1[],
    }
 }
 
+static AstMapping *OffsetMap( AstSkyFrame *this ){
+/*
+*  Name:
+*     OffsetMap
+
+*  Purpose:
+*     Returns a Mapping which goes from System coordinates to offsets.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     AstMapping *OffsetMap( AstSkyFrame *this )
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function returns a Mapping in which the forward transformation
+*     transforms a position in the coordinate system given by the System
+*     attribute, into the offset coordinate system specified by the SkyRef,
+*     SkyRefP and SkyRefIs attributes.
+*
+*     A UnitMap is returned if the SkyFrame does not define am offset
+*     coordinate system, or if the SkyFrame wishes alignment to occur in
+*     the offset coordinate system rather than the system specified by
+*     the System attribute (i.e. if the AlignOffset attribute has a
+*     non-zero value).
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     A pointer to the new Mapping.
+
+*  Notes:
+*     - This function will return NULL if an error has already occurred,
+*     or if the function fails for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpMap *map3;            /* Partial Mapping. */
+   AstMapping *result;         /* The returned Mapping. */
+   AstMatrixMap *map1;         /* Spherical rotation in 3D cartesian space */
+   AstSphMap *map2;            /* 3D Cartesian to 2D spherical Mapping */
+   double *vx;                 /* Pointer to x unit vector. */
+   double *vy;                 /* Pointer to y unit vector. */
+   double *vz;                 /* Pointer to z unit vector. */
+   double mat[ 9 ];            /* Spherical rotation matrix */
+   double vmod;                /* Length of vector (+ve) */
+   double vp[ 3 ];             /* Unit vector representin SkyRefP position. */
+   int lataxis;                /* Index of the latitude axis */
+   int lonaxis;                /* Index of the longitude axis */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Return a UnitMap if the offset coordinate system is not defined, or if
+   the AlignOffset attribute has a non-zero value. */
+   if( astGetAlignOffset( this ) || ( !astTestSkyRef( this, 0 ) && 
+                                      !astTestSkyRef( this, 1 ) ) ) {
+      result = (AstMapping *) astUnitMap( 2, "" );
+
+/* Otherwise... */
+   } else {
+
+/* Get the longitude and latitude at the reference point and at a point
+   on the primary meridian. */
+      lataxis = astGetLatAxis( this );
+      lonaxis = 1 - lataxis;
+
+/* Initialise pointers to the rows of the 3x3 matrix. Each row will be
+   used to store a unit vector. */
+      vx = mat;
+      vy = mat + 3;
+      vz = mat + 6;
+
+/* The following trig converts between (longitude,latitude) and (x,y,z)
+   on a unit sphere, in which (0,0) is at (1,0,0), (0,pi/2) is (0,0,1)
+   and (pi/2,0) is at (0,1,0). */
+
+/* First deal with cases where the SkyRef attribute holds the standard
+   coords at the origin of the offset coordinate system. */
+      if( astGetSkyRefIs( this ) == ORIGIN_REF ) {
+
+/* Convert each point into a 3-vector of unit length. The SkyRef position
+   defines the X axis in the offset coord system. */
+         slaDcs2c( astGetSkyRef( this, lonaxis ), astGetSkyRef( this, lataxis ), vx );
+         slaDcs2c( astGetSkyRefP( this, lonaxis ), astGetSkyRefP( this, lataxis ), vp );
+
+/* The Y axis is perpendicular to both the X axis and the skyrefp
+   position. That is, it is parallel to the cross product of the 2 above 
+   vectors.*/
+         slaDvxv( vp, vx, vy );
+
+/* Normalize the y vector. */
+         slaDvn( vy, vy, &vmod );
+
+/* Report an error if the modulus of the vector is zero.*/
+         if( vmod == 0.0 ) {
+            astError( AST__BADOC, "astConvert(%s): The position specified by the SkyRefP "
+                      "attribute is either coincident, with or opposite to, the "
+                      "position specified by the SkyRef attribute.", astGetClass( this ) );
+
+/* If OK, form the Z axis as the cross product of the x and y axes. */
+         } else {
+            slaDvxv( vx, vy, vz );
+
+         }
+
+/* Now deal with cases where the SkyRef attribute holds the standard
+   coords at the north pole of the offset coordinate system. */
+      } else {
+
+/* Convert each point into a 3-vector of unit length. The SkyRef position
+   defines the Z axis in the offset coord system. */
+         slaDcs2c( astGetSkyRef( this, lonaxis ), astGetSkyRef( this, lataxis ), vz );
+         slaDcs2c( astGetSkyRefP( this, lonaxis ), astGetSkyRefP( this, lataxis ), vp );
+
+/* The Y axis is perpendicular to both the Z axis and the skyrefp
+   position. That is, it is parallel to the cross product of the 2 above 
+   vectors.*/
+         slaDvxv( vz, vp, vy );
+
+/* Normalize the y vector. */
+         slaDvn( vy, vy, &vmod );
+
+/* Report an error if the modulus of the vector is zero.*/
+         if( vmod == 0.0 ) {
+            astError( AST__BADOC, "astConvert(%s): The position specified by the SkyRefP "
+                      "attribute is either coincident, with or opposite to, the "
+                      "position specified by the SkyRef attribute.", astGetClass( this ) );
+
+/* If OK, form the X axis as the cross product of the y and z axes. */
+         } else {
+            slaDvxv( vy, vz, vx );
+         }
+      }
+
+/* Create a MatrixMap which implements the above spherical rotation. Each
+   row in this matrix represents one of the unit axis vectors found above. */
+      map1 = astMatrixMap( 3, 3, 0, mat, "" );
+
+/* Create a 3D cartesian to 2D spherical Mapping. */
+      map2 = astSphMap( "UnitRadius=1" );
+
+/* Form a series CmpMap which converts from 2D (long,lat) in the base
+   System to 2D (long,lat) in the offset coordinate system. */
+      map3 = astCmpMap( map1, map2, 1, "" );
+      astInvert( map2 );
+      result = (AstMapping *) astCmpMap( map2, map3, 1, "" );
+
+/* Free resources. */
+      map1 = astAnnul( map1 );      
+      map2 = astAnnul( map2 );      
+      map3 = astAnnul( map3 );      
+   }
+
+/* Annul the returned Mapping if anything has gone wrong. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+
+}
+
 static double Offset2( AstFrame *this_frame, const double point1[2],
                        double angle, double offset, double point2[2] ) {
 /*
@@ -3892,34 +4747,42 @@ static void Overlay( AstFrame *template, const int *template_axes,
    AstSystemType new_system;     /* Code identifying new sky cordinates */
    AstSystemType old_system;     /* Code identifying old sky coordinates */
    int axis;                     /* Loop counter for result SkyFrame axes */
+   int skyref_changed;           /* Has the SkyRef attribute changed? */
+   int reset_system;             /* Was the template System value cleared? */
    int skyframe;                 /* Result Frame is a SkyFrame? */
-   int resetSystem;              /* Was the template System value cleared? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Indicate that we do not need to reset the System attribute of the
    template. */
-   resetSystem = 0;
+   reset_system = 0;
 
 /* If the result Frame is a SkyFrame, we must test to see if overlaying its
    System attribute will change the type of sky coordinate system it
    describes. Determine the value of this attribute for the result and template
-   SkyFrames. */
+   SkyFrames. We also need to do this if either SkyRef attribute would
+   change. */
    skyframe = astIsASkyFrame( result );   
    if ( skyframe ) {
       old_system = astGetSystem( result );
       new_system = astGetSystem( template );
+      skyref_changed = ( astGetSkyRef( result, 0 ) != 
+                         astGetSkyRef( template, 0 ) ) ||
+                       ( astGetSkyRef( result, 1 ) != 
+                         astGetSkyRef( template, 1 ) );
 
 /* If the coordinate system will change, any value already set for the result
    SkyFrame's Title will no longer be appropriate, so clear it. */
-      if ( new_system != old_system ) {
+      if ( new_system != old_system || skyref_changed ) {
          astClearTitle( result );
 
 /* Test if the old and new sky coordinate systems are similar enough to make
    use of the same axis attribute values (e.g. if they are both equatorial
-   systems, then they can both use the same axis labels, etc.). */
-         if ( IsEquatorial( new_system ) != IsEquatorial( old_system ) ) {
+   systems, then they can both use the same axis labels, etc.,so long as
+   the SKyRefIs value has not changed). */
+         if ( IsEquatorial( new_system ) != IsEquatorial( old_system ) ||
+              skyref_changed ) {
 
 /* If necessary, clear inappropriate values for all those axis attributes
    whose access functions are over-ridden by this class (these access functions
@@ -3943,7 +4806,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
       if( astTestSystem( template ) ) {
          new_system = astGetSystem( template );
          astClearSystem( template );
-         resetSystem = 1;
+         reset_system = 1;
       }
    }
 
@@ -3952,7 +4815,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    (*parent_overlay)( template, template_axes, result );
 
 /* Reset the System value if necessary */
-   if( resetSystem ) astSetSystem( template, new_system );
+   if( reset_system ) astSetSystem( template, new_system );
 
 /* Check if the result Frame is a SkyFrame or from a class derived from
    SkyFrame. If not, we cannot transfer SkyFrame attributes to it as it is
@@ -3961,19 +4824,35 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 /* Define a macro that tests whether an attribute is set in the template and,
    if so, transfers its value to the result. */
-#define OVERLAY(attribute) \
-   if ( astTest##attribute( template ) ) { \
-      astSet##attribute( result, astGet##attribute( template ) ); \
+#define OVERLAY(attr) \
+   if ( astTest##attr( template ) ) { \
+      astSet##attr( result, astGet##attr( template ) ); \
    }
+
+/* Define a similar macro that does the same for SkyFrame specific axis 
+   attributes. */
+#define OVERLAY2(attr) \
+   if( astTest##attr( template, template_axes[ 0 ] ) ) { \
+      astSet##attr( result, 0, astGet##attr( template, template_axes[ 0 ] ) ); \
+   } \
+   if( astTest##attr( template, template_axes[ 1 ] ) ) { \
+      astSet##attr( result, 1, astGet##attr( template, template_axes[ 1 ] ) ); \
+   }         
 
 /* Use the macro to transfer each SkyFrame attribute in turn. */
       OVERLAY(Equinox);
       OVERLAY(Projection);
       OVERLAY(NegLon);
+      OVERLAY(AlignOffset);
+      OVERLAY(SkyRefIs);
+      OVERLAY2(SkyRef);
+      OVERLAY2(SkyRefP);
+
    }
 
 /* Undefine macros local to this function. */
 #undef OVERLAY
+#undef OVERLAY2
 }
 
 static void Resolve( AstFrame *this_frame, const double point1[], 
@@ -4285,13 +5164,19 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Vaiables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   double dval;                  /* Floating point attribute value */
+   double dval1;                 /* Floating point attribute value */
+   double dval2;                 /* Floating point attribute value */
    double mjd;                   /* Modified Julian Date */
    int astime;                   /* Value of AsTime attribute */
    int axis;                     /* Axis index */
    int equinox;                  /* Offset of Equinox attribute value */
+   int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
    int neglon;                   /* Display -ve longitudes? */
+   int ok;                       /* Can string be used? */
+   int offset;                   /* Offset of start of attribute value */
    int projection;               /* Offset of projection attribute value */
 
 /* Check the global error status. */
@@ -4348,6 +5233,97 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               &projection, &nc ) )
                && ( nc >= len ) ) {
       astSetProjection( this, setting + projection );
+
+/* SkyRef. */
+/* ------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "skyref=%n%*[^\n]%n",
+                                 &offset, &nc ) )
+               && ( nc >= len ) ) {
+      ok = 0;
+      nc = astUnformat( this, 0, setting + offset, &dval1 );
+      if( setting[ offset + nc ] == ',' ) {
+         nc++;
+         nc += astUnformat( this, 1, setting + offset + nc, &dval2 );
+         if( nc == strlen( setting + offset ) ) {   
+            astSetSkyRef( this, 0, dval1 );
+            astSetSkyRef( this, 1, dval2 );
+            ok = 1;
+         }
+      }
+
+      if( !ok && astOK ) {
+         astError( AST__BADOC, "astSetAttrib(%s): Invalid axis values string "
+                   "\"%.*s\" given for SkyRef attribute.", astGetClass( this ),
+                   astChrLen( setting + offset ), setting + offset );
+      }
+
+/* SkyRef(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "skyref(%d)= %lg %n",
+                                 &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetSkyRef( this, axis - 1, dval );
+
+/* SkyRefIs. */
+/* --------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "skyrefis=%n%*[^\n]%n",
+                              &offset, &nc ) )
+               && ( nc >= len ) ) {
+
+      if( astChrMatch( setting + offset, POLE_STRING ) ) {
+         astSetSkyRefIs( this, POLE_REF );
+
+      } else if( astChrMatch( setting + offset, ORIGIN_STRING ) ) {
+         astSetSkyRefIs( this, ORIGIN_REF );
+
+      } else if( astOK ) {
+         astError( AST__OPT, "astSet(%s): option '%s' is unknown in '%s'.",
+                   astGetClass( this ), setting+offset, setting );
+      }
+
+/* SkyRefP. */
+/* -------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "skyrefp=%n%*[^\n]%n",
+                                 &offset, &nc ) )
+               && ( nc >= len ) ) {
+
+      ok = 0;
+      nc = astUnformat( this, 0, setting + offset, &dval1 );
+      if( setting[ offset + nc ] == ',' ) {
+         nc++;
+         nc += astUnformat( this, 1, setting + offset + nc, &dval2 );
+         if( nc == strlen( setting + offset ) ) {   
+            astSetSkyRefP( this, 0, dval1 );
+            astSetSkyRefP( this, 1, dval2 );
+            ok = 1;
+         }
+      }
+
+      if( !ok && astOK ) {
+         astError( AST__BADOC, "astSetAttrib(%s): Invalid axis values string "
+                   "\"%.*s\" given for SkyRefP attribute.", astGetClass( this ),
+                   astChrLen( setting + offset ), setting + offset );
+      }
+
+
+/* SkyRefP(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "skyrefp(%d)= %lg %n",
+                                 &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetSkyRefP( this, axis - 1, dval );
+
+/* AlignOffset. */
+/* ------------ */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( setting, "alignoffset= %d %n", &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetAlignOffset( this, ival );
 
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
@@ -4448,6 +5424,109 @@ static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
 
 /* Use the parent astSetMinAxes method to set a value of 2. */
    (*parent_setminaxes)( this_frame, 2 );
+}
+
+static void SetSystem( AstFrame *this_frame, AstSystemType system ) {
+/*
+*  Name:
+*     SetSystem
+
+*  Purpose:
+*     Set the System attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void SetSystem( AstFrame *this_frame, AstSystemType system )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astSetSystem protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function assigns a new value to the System attribute for a SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     system
+*        The new System value.
+
+*/
+
+/* Local Variables: */
+   AstFrameSet *fs;              /* FrameSet to be used as the Mapping */
+   AstSkyFrame *sfrm;            /* Copy of original SkyFrame */
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   double xin[ 2 ];              /* Axis 0 values */
+   double yin[ 2 ];              /* Axis 1 values */
+   double xout[ 2 ];             /* Axis 0 values */
+   double yout[ 2 ];             /* Axis 1 values */
+   int skyref_set;               /* Is either SkyRef attribute set? */
+   int skyrefp_set;              /* Is either SkyRefP attribute set? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* See if either the SkyRef or SkyRefP attribute is set. */
+   skyref_set = astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 );
+   skyrefp_set = astTestSkyRefP( this, 0 ) || astTestSkyRefP( this, 1 );
+
+/* If so, we will need to transform their values into the new coordinate 
+   system. Save a copy of the SkyFrame with its original System value. */
+   sfrm = ( skyref_set || skyrefp_set )?astCopy( this ):NULL;
+
+/* Use the parent method to set the new System value. */
+   (*parent_setsystem)( this_frame, system );
+
+/* Now modify the SkyRef and SkyRefP attributes if necessary. */
+   if( sfrm ) {
+
+/* Save the SkyRef and SkyRefP values. */
+      xin[ 0 ] = astGetSkyRef( sfrm, 0 );
+      xin[ 1 ] = astGetSkyRefP( sfrm, 0 );
+      yin[ 0 ] = astGetSkyRef( sfrm, 1 );
+      yin[ 1 ] = astGetSkyRefP( sfrm, 1 );
+
+/* Clear the SkyRef values to avoid infinite recursion in the following
+   call to astConvert. */
+      if( skyref_set ) {
+         astClearSkyRef( sfrm, 0 );
+         astClearSkyRef( sfrm, 1 );
+         astClearSkyRef( this, 0 );
+         astClearSkyRef( this, 1 );
+      }
+
+/* Get the Mapping from the original System to the new System. Invoking 
+   astConvert will recursively invoke SetSystem again. This is why we need
+   to be careful to ensure that SkyRef is cleared above - doing so ensure 
+   we do not end up with infinite recursion. */
+      fs = astConvert( sfrm, this, "" );
+
+/* Use the Mapping to find the SkyRef and SkyRefP positions in the new 
+   coordinate system. */
+      astTran2( fs, 2, xin, yin, 1, xout, yout );
+
+/* Store the values as required. */
+      if( skyref_set ) {
+         astSetSkyRef( this, 0, xout[ 0 ] );
+         astSetSkyRef( this, 1, yout[ 0 ] );
+      }
+
+      if( skyrefp_set ) {
+         astSetSkyRefP( this, 0, xout[ 1 ] );
+         astSetSkyRefP( this, 1, yout[ 1 ] );
+      }
+
+/* Free resources. */
+      fs = astAnnul( fs );
+      sfrm = astAnnul( sfrm );
+   }
 }
 
 static void Shapp( double dist, double *r0, double *r3, double a0, 
@@ -5267,6 +6346,40 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "projection" ) ) {
       result = astTestProjection( this );
 
+/* SkyRefIs. */
+/* --------- */
+   } else if ( !strcmp( attrib, "skyrefis" ) ) {
+      result = astTestSkyRefIs( this );
+
+/* SkyRef. */
+/* ------- */
+   } else if ( !strcmp( attrib, "skyref" ) ) {
+      result = astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 );
+
+/* SkyRef(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( attrib, "skyref(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      result = astTestSkyRef( this, axis - 1 );
+
+/* SkyRefP. */
+/* -------- */
+   } else if ( !strcmp( attrib, "skyrefp" ) ) {
+      result = astTestSkyRefP( this, 0 ) || astTestSkyRefP( this, 1 );
+
+/* SkyRefP(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( attrib, "skyrefp(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      result = astTestSkyRefP( this, axis - 1 );
+
+/* AlignOffset */
+/* ----------- */
+   } else if ( !strcmp( attrib, "alignoffset" ) ) {
+      result = astTestAlignOffset( this );
+
 /* If the name is not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then return
    zero. */
@@ -5468,6 +6581,44 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
+/*
+*att++
+*  Name:
+*     AlignOffset
+
+*  Purpose:
+*     Align SkyFrames using the offset coordinate system? 
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which controls how a SkyFrame
+*     behaves when it is used (by
+c     astFindFrame or astConvert) as a template to match another (target)
+f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
+*     SkyFrame. It determines the coordinate system in which the two 
+*     SkyFrames are aligned if a match occurs.
+*
+*     A non-zero value results in alignment occuring in the offset
+*     coordinate system defined by attributes SkyRef, SkyRefP and SkyRefIs. 
+*     The default value of zero results in alignment occurring within the 
+*     coordinate system specified by the AlignSystem attribute.
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+*att--
+*/
+astMAKE_CLEAR(SkyFrame,AlignOffset,alignoffset,-INT_MAX)
+astMAKE_GET(SkyFrame,AlignOffset,int,0,( ( this->alignoffset != -INT_MAX ) ?
+                                   this->alignoffset : 0 ))
+astMAKE_SET(SkyFrame,AlignOffset,int,alignoffset,( value != 0 ))
+astMAKE_TEST(SkyFrame,AlignOffset,( this->alignoffset != -INT_MAX ))
+
 /*
 *att++
 *  Name:
@@ -5745,6 +6896,203 @@ astMAKE_SET(SkyFrame,Projection,const char *,projection,astStore(
 /* The Projection value is set if the pointer to it is not NULL. */
 astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 
+/*
+*att++
+*  Name:
+*     SkyRefIs
+
+*  Purpose:
+*     Selects the nature of the offset coordinate system.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute controls how the values supplied for the SkyRef and
+*     SkyRefP attributes are used. These three attributes together allow
+*     a SkyFrame to represent offsets relative to some specified origin
+*     or pole within the coordinate system specified by the System attribute, 
+*     rather than absolute axis values. SkyRefIs can take either of the 
+*     case-insensitive values "Origin" or "Pole". 
+*
+*     If SkyRefIs is set to "Origin" (the default), then the coordinate system
+*     represented by the SkyFrame is modified to put the origin of longitude
+*     and latitude at the position specified by the SkyRef attribute.
+*
+*     If SkyRefIs is set to "Pole", then the coordinate system represented 
+*     by the SkyFrame is modified to put the north pole at the position 
+*     specified by the SkyRef attribute. 
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(SkyFrame,SkyRefIs,skyrefis,BAD_REF)
+astMAKE_SET(SkyFrame,SkyRefIs,int,skyrefis,value)
+astMAKE_TEST(SkyFrame,SkyRefIs,( this->skyrefis != BAD_REF ))
+astMAKE_GET(SkyFrame,SkyRefIs,int,ORIGIN_REF,(this->skyrefis == BAD_REF ? ORIGIN_REF : this->skyrefis))
+
+/*
+*att++
+*  Name:
+*     SkyRef(axis)
+
+*  Purpose:
+*     Position defining the offset coordinate system.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute allows a SkyFrame to represent offsets, rather than 
+*     absolute axis values, within the coordinate system specified by the 
+*     System attribute. If supplied, SkyRef should be set to hold the
+*     longitude and latitude of a point within the coordinate system 
+*     specified by the System attribute. The coordinate system represented
+*     by the SkyFrame will then be rotated in order to put the specified
+*     position at either the pole or the origin of the new coordinate system
+*     (as indicated by the SkyRefIs attribute). The orientation of the
+*     modified coordinate system is then controlled using the SkyRefP 
+*     attribute. 
+*
+*     If an integer axis index is included in the attribute name (e.g.
+*     "SkyRef(1)") then the attribute value should be supplied as a single 
+*     floating point axis value, in radians, when setting a value for the
+*     attribute, and will be returned in the same form when getting the value 
+*     of the attribute. In this case the integer axis index should be "1"
+*     or "2" (the values to use for longitude and latitue axes are
+*     given by the LonAxis and LatAxis attributes).
+*
+*     If no axis index is included in the attribute name (e.g. "SkyRef") then 
+*     the attribute value should be supplied as a character string
+*     containing two formatted axis values (an axis 1 value followed by a
+*     comma, followed by an axis 2 value). The same form
+*     will be used when getting the value of the attribute. 
+*
+*     The default values for SkyRef are zero longitude and zero latitude,
+*     but no rotation of the SkyFrame coordinate system will occur
+*     until a value is set explicitly for at least one axis.
+
+*  Aligning SkyFrames with Offset Coordinate Systems:
+*     The offset coordinate system within a SkyFrame should normally be 
+*     considered as a superficial "re-badging" of the axes of the coordinate 
+*     system specified by the System attribute - it merely provides an 
+*     alternative numerical "label" for each position in the System coordinate 
+*     system. The SkyFrame retains full knowledge of the celestial coordinate 
+*     system on which the offset coordinate system is based (given by the 
+*     System attribute). For instance, the SkyFrame retains knowledge of the 
+*     way that one celestial coordinate system may "drift" with respect to 
+*     another over time. Normally, if you attempt to align two SkyFrames (e.g. 
+f     using the AST_CONVERT or AST_FINDFRAME routine),
+c     using the astConvert or astFindFrame routine),
+*     the effect of any offset coordinate system defined in either SkyFrame 
+*     will be removed, resulting in alignment being performed in the
+*     celestial coordinate system given by the AlignSystem attribute.
+*     However, by setting the AlignOffset attribute ot a non-zero value, it 
+*     is possible to change this behaviour so that the effect of the offset 
+*     coordinate system is not removed when aligning two SkyFrames.
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+
+*  Notes:
+*     - If the System attribute of the SkyFrame is changed, any position
+*     given for SkyRef is transformed into the new System.
+*     - If a value has been assigned to SkyRef attribute, then 
+*     the default values for certain attributes are changed as follows:
+*     the default axis Labels for the SkyFrame are modified by appending 
+*     " offset" to the end, the default axis Symbols for the SkyFrame are 
+*     modified by prepending the character "D" to the start, and the
+*     default title is modified by replacing the projection information by the
+*     origin information.
+
+*att--
+*/
+MAKE_CLEAR(SkyRef,skyref,AST__BAD,2)
+MAKE_SET(SkyRef,double,skyref,value,2)
+MAKE_TEST(SkyRef,( this->skyref[axis_p] != AST__BAD ),2)
+MAKE_GET(SkyRef,double,0.0,((this->skyref[axis_p]!=AST__BAD)?this->skyref[axis_p]:0.0),2)
+
+/*
+*att++
+*  Name:
+*     SkyRefP(axis)
+
+*  Purpose:
+*     Position on primary meridian of offset coordinate system.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute is used to control the orientation of the offset
+*     coordinate system defined by attributes SkyRef and SkyRefIs. If used, 
+*     it should be set to hold the longitude and latitude of a point within 
+*     the coordinate system specified by the System attribute. The offset 
+*     coordinate system represented by the SkyFrame will then be rotated in 
+*     order to put the position supplied for SkyRefP on the zero longitude 
+*     meridian. This rotation is about an axis from the centre of the 
+*     celestial sphere to the point specified by the SkyRef attribute. 
+*     The default value for SkyRefP is usually the north pole (that is, a 
+*     latitude of +90 degrees in the coordinate system specified by the System 
+*     attribute). The exception to this is if the SkyRef attribute is
+*     itself set to either the north or south pole. In these cases the
+*     default for SkyRefP is the origin (that is, a (0,0) in the coordinate 
+*     system specified by the System attribute).
+*
+*     If an integer axis index is included in the attribute name (e.g.
+*     "SkyRefP(1)") then the attribute value should be supplied as a single 
+*     floating point axis value, in radians, when setting a value for the
+*     attribute, and will be returned in the same form when getting the value 
+*     of the attribute. In this case the integer axis index should be "1"
+*     or "2" (the values to use for longitude and latitue axes are
+*     given by the LonAxis and LatAxis attributes).
+*
+*     If no axis index is included in the attribute name (e.g. "SkyRefP") then 
+*     the attribute value should be supplied as a character string
+*     containing two formatted axis values (an axis 1 value followed by a
+*     comma, followed by an axis 2 value). The same form
+*     will be used when getting the value of the attribute. 
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+
+*  Notes:
+*     - If the position given by the SkyRef attribute defines the origin
+*     of the offset coordinate system (that is, if the SkyRefIs attribute 
+*     is set to "origin"), then there will in general be two orientations 
+*     which will put the supplied SkyRefP position on the zero longitude
+*     meridian. The orientation which is actually used is the one which
+*     gives the SkyRefP position a positive latitude in the offset coordinate 
+*     system (the other possible orientation would give the SkyRefP position 
+*     a negative latitude).
+*     - An error will be reported if an attempt is made to use a 
+*     SkyRefP value which is co-incident with SkyRef or with the point
+*     diametrically opposite to SkyRef on the celestial sphere. The
+*     reporting of this error is deferred until the SkyRef and SkyRefP 
+*     attribute values are used within a calculation. 
+*     - If the System attribute of the SkyFrame is changed, any position
+*     given for SkyRefP is transformed into the new System.
+
+*att--
+*/
+MAKE_CLEAR(SkyRefP,skyrefp,AST__BAD,2)
+MAKE_SET(SkyRefP,double,skyrefp,value,2)
+MAKE_TEST(SkyRefP,( this->skyrefp[axis_p] != AST__BAD ),2)
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -5869,6 +7217,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    AstSystemType system;         /* System attribute value */
    const char *sval;             /* Pointer to string value */
+   char buf[ 100 ];              /* Comment buffer */
    double dval;                  /* Double value */
    int bessyr;                   /* Use a Besselian year value ?*/
    int helpful;                  /* Helpful to display un-set value? */
@@ -5931,6 +7280,51 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteDouble( channel, "Eqnox", set, helpful, dval,
                    bessyr ? "Besselian epoch of mean equinox" :
                             "Julian epoch of mean equinox" );
+
+/* SkyRefIs. */
+/* --------- */
+   set = TestSkyRefIs( this );
+   ival = set ? GetSkyRefIs( this ) : astGetSkyRefIs( this );
+   if( ival == POLE_REF ) {
+      astWriteString( channel, "SRefIs", set, 0, POLE_STRING,
+                      "Rotated to put pole at ref. pos." );
+
+   } else {
+      astWriteString( channel, "SRefIs", set, 0, ORIGIN_STRING,
+                      "Rotated to put origin at ref. pos." );
+   }
+
+/* SkyRef. */
+/* ------- */
+   set = TestSkyRef( this, 0 );
+   dval = set ? GetSkyRef( this, 0 ) : astGetSkyRef( this, 0 );
+   sprintf( buf, "Ref. pos. %s %s", astGetSymbol( this, 0 ), astFormat( this, 0, dval ) );
+   astWriteDouble( channel, "SRef1", set, 0, dval, buf );
+
+   set = TestSkyRef( this, 1 );
+   dval = set ? GetSkyRef( this, 1 ) : astGetSkyRef( this, 1 );
+   sprintf( buf, "Ref. pos. %s %s", astGetSymbol( this, 1 ), astFormat( this, 1, dval ) );
+   astWriteDouble( channel, "SRef2", set, 0, dval, buf );
+
+/* SkyRefP. */
+/* -------- */
+   set = TestSkyRefP( this, 0 );
+   dval = set ? GetSkyRefP( this, 0 ) : astGetSkyRefP( this, 0 );
+   sprintf( buf, "Ref. north %s %s", astGetSymbol( this, 0 ), astFormat( this, 0, dval ) );
+   astWriteDouble( channel, "SRefP1", set, 0, dval, buf );
+
+   set = TestSkyRefP( this, 1 );
+   dval = set ? GetSkyRefP( this, 1 ) : astGetSkyRefP( this, 1 );
+   sprintf( buf, "Ref. north %s %s", astGetSymbol( this, 1 ), astFormat( this, 1, dval ) );
+   astWriteDouble( channel, "SRefP2", set, 0, dval, buf );
+
+/* AlignOffset. */
+/* ------------ */
+   set = TestAlignOffset( this );
+   ival = set ? GetAlignOffset( this ) : astGetAlignOffset( this );
+   astWriteInt( channel, "AlignOffset", set, 0, ival,
+                ival ? "Align in offset coords" :
+                       "Align in system coords" );
 }
 
 /* Standard class functions. */
@@ -6110,6 +7504,12 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->equinox = AST__BAD;
       new->projection = NULL;
       new->neglon = -INT_MAX;
+      new->alignoffset = -INT_MAX;
+      new->skyrefis = BAD_REF;
+      new->skyref[ 0 ] = AST__BAD;
+      new->skyref[ 1 ] = AST__BAD;
+      new->skyrefp[ 0 ] = AST__BAD;
+      new->skyrefp[ 1 ] = AST__BAD;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
    a SkyAxis object instead. */
@@ -6250,6 +7650,47 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
 
+/* The attributes defining the offset coordinate system must be loaded
+   before the System attrivbute, since SetSystem uses them. */
+
+/* AlignOffset */
+/* ----------- */
+      new->alignoffset = astReadInt( channel, "alignoffset", -INT_MAX );
+      if ( TestAlignOffset( new ) ) SetAlignOffset( new, new->alignoffset );
+
+/* SkyRefIs. */
+/* --------- */
+      sval = astReadString( channel, "srefis", " " );
+      if( astOK ){
+         new->skyrefis = BAD_REF;
+         if( astChrMatch( sval, POLE_STRING ) ) {
+            new->skyrefis = POLE_REF;
+         } else if( astChrMatch( sval, ORIGIN_STRING ) ) {
+            new->skyrefis = ORIGIN_REF;
+         } else if( !astChrMatch( sval, " " ) && astOK ){
+	    astError( AST__INTER, "astRead(SkyFrame): Corrupt SkyFrame contains "
+		      "invalid SkyRefIs attribute value (%d).", sval );
+         }
+         if( TestSkyRefIs( new ) ) SetSkyRefIs( new, new->skyrefis );
+      }
+
+/* SkyRef. */
+/* ------- */
+      new->skyref[ 0 ] = astReadDouble( channel, "sref1", AST__BAD );
+      if ( TestSkyRef( new, 0 ) ) SetSkyRef( new, 0, new->skyref[ 0 ] );
+
+      new->skyref[ 1 ] = astReadDouble( channel, "sref2", AST__BAD );
+      if ( TestSkyRef( new, 1 ) ) SetSkyRef( new, 1, new->skyref[ 1 ] );
+
+/* SkyRefP. */
+/* -------- */
+      new->skyrefp[ 0 ] = astReadDouble( channel, "srefp1", AST__BAD );
+      if ( TestSkyRefP( new, 0 ) ) SetSkyRefP( new, 0, new->skyrefp[ 0 ] );
+
+      new->skyrefp[ 1 ] = astReadDouble( channel, "srefp2", AST__BAD );
+      if ( TestSkyRefP( new, 1 ) ) SetSkyRefP( new, 1, new->skyrefp[ 1 ] );
+
+
 /* System. */
 /* ------- */
 /* The System attribute is now part of the Frame class, but this code is
@@ -6313,6 +7754,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
       new->neglon = astReadInt( channel, "neglon", -INT_MAX );
       if ( TestNegLon( new ) ) SetNegLon( new, new->neglon );
 
+
 /* If an error occurred, clean up by deleting the new SkyFrame. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -6355,6 +7797,10 @@ int astGetLatAxis_( AstSkyFrame *this ) {
 int astGetLonAxis_( AstSkyFrame *this ) { 
    if ( !astOK ) return 0; 
    return (**astMEMBER(this,SkyFrame,GetLonAxis))( this ); 
+}
+double astGetSkyRefP_( AstSkyFrame *this, int axis ) { 
+   if ( !astOK ) return 0.0; 
+   return (**astMEMBER(this,SkyFrame,GetSkyRefP))( this, axis ); 
 }
 
 /* Special public interface functions. */
@@ -6405,6 +7851,13 @@ f     RESULT = AST_SKYFRAME( OPTIONS, STATUS )
 *     setting the SkyFrame's System attribute (currently, the default
 *     is ICRS) qualified, as necessary, by a mean Equinox value and/or
 *     an Epoch.
+*
+*     For each of the supported celestial coordinate systems, a SkyFrame
+*     can apply an optional shift of origin to create a coordinate system 
+*     representing offsets within the celestial coordinate system from some 
+*     specified point. This offset coordinate system can also be rotated to 
+*     define new longitude and latitude axes. See attributes SkyRef, SkyRefIs 
+*     and SkyRefP
 *
 *     All the coordinate values used by a SkyFrame are in
 *     radians. These may be formatted in more conventional ways for

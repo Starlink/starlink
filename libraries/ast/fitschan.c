@@ -104,6 +104,7 @@ f     encodings), then write operations using AST_WRITE will
 *     - DefB1950: Use FK4 B1950 as default equatorial coordinates?
 *     - Encoding: System for encoding Objects as FITS headers
 *     - FitsDigits: Digits of precision for floating-point FITS values
+*     - Iwc: Add a Frame describing Intermediate World Coords?
 *     - Ncard: Number of FITS header cards in a FitsChan
 *     - Warnings: Produces warnings about selected conditions
 
@@ -549,6 +550,11 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - WCSFromStore modified to avouid writing partial axis descriptions.
 *     26-APR-2004 (DSB):
 *        - Corrected text of output SPECSYS keyword values.
+*     17-MAY-2004 (DSB):
+*        - Added IWC attribute.
+*     15-JUNE-2004 (DSB):
+*        - Ensure out-of-bounds longitude CRPIX values for CAR
+*        projections are wrapped back into bounds.
 *class--
 */
 
@@ -900,6 +906,11 @@ static int GetCarLin( AstFitsChan * );
 static int TestCarLin( AstFitsChan * );
 static void SetCarLin( AstFitsChan *, int );
 
+static void ClearIwc( AstFitsChan * );
+static int GetIwc( AstFitsChan * );
+static int TestIwc( AstFitsChan * );
+static void SetIwc( AstFitsChan *, int );
+
 static void ClearClean( AstFitsChan * );
 static int GetClean( AstFitsChan * );
 static int TestClean( AstFitsChan * );
@@ -926,12 +937,12 @@ static AstMapping *NonLinSpecWcs( AstFitsChan *, char *, FitsStore *, int, char,
 static AstMapping *OtherAxes( AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char * );
 static AstMapping *SIPMapping( FitsStore *, char, int, const char *, const char * );
 static AstMapping *SpectralAxes( AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char * );
-static AstMapping *WcsCelestial( AstFitsChan *, FitsStore *, char, AstFrame **, double *, double *, AstSkyFrame **, const char *, const char * );
+static AstMapping *WcsCelestial( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, double *, double *, AstSkyFrame **, const char *, const char * );
 static AstMapping *WcsIntWorld( AstFitsChan *, FitsStore *, char, int, const char *, const char *);
 static AstMapping *WcsMapFrm( AstFitsChan *, FitsStore *, char, AstFrame **, const char *, const char * );
 static AstMapping *WcsNative( AstFitsChan *, FitsStore *, char, AstWcsMap *, int, int, const char *, const char * );
-static AstMapping *WcsOthers( AstFitsChan *, FitsStore *, char, AstFrame **, const char *, const char * );
-static AstMapping *WcsSpectral( AstFitsChan *, FitsStore *, char, AstFrame **, double, double, AstSkyFrame *, const char *, const char * );
+static AstMapping *WcsOthers( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, const char *, const char * );
+static AstMapping *WcsSpectral( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, double, double, AstSkyFrame *, const char *, const char * );
 static AstMatrixMap *WcsCDeltMatrix( FitsStore *, char, int, const char *, const char * );
 static AstMatrixMap *WcsPCMatrix( FitsStore *, char, int, const char *, const char * );
 static AstObject *FsetFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
@@ -1758,6 +1769,8 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Check that rotation is restricted to the celestial plane, and extract
    the CDELT (diagonal) terms, etc. */
+   cdlat_lon = 0.0;
+   cdlon_lat = 0.0;
    for( i = 0; i < naxis && ok; i++ ){
       cdl = GetItem( &(store->cdelt), i, 0, s, NULL, method, class );
       if( cdl == AST__BAD ) cdl = 1.0;
@@ -3055,6 +3068,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ------ */
    } else if ( !strcmp( attrib, "carlin" ) ) {
       astClearCarLin( this );
+
+/* Iwc */
+/* --- */
+   } else if ( !strcmp( attrib, "iwc" ) ) {
+      astClearIwc( this );
 
 /* Clean */
 /* ----- */
@@ -7331,19 +7349,25 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
             frms[ (int) s ] = 0;
          }
 
-/* Loop round all frames (excluding the current and base Frames which do not 
-   need version letters). If the Frame has an Ident attribute consisting of a
-   single upper case letter, use it as its version letter unless that
-   letter has already been given to an earlier frame. */
+/* Loop round all frames (excluding the current and base and IWC Frames which 
+   do not need version letters). If the Frame has an Ident attribute consisting 
+   of a single upper case letter, use it as its version letter unless that
+   letter has already been given to an earlier frame. IWC Frames are not
+   written out - identify them by giving thema a "sid" value of 1 (an
+   illegal FITS axis description character). */
          for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
             sid[ ifrm ] = 0;
             if( ifrm != icurr && ifrm != ibase ) { 
                frame = astGetFrame( fset, ifrm );
-               id = astGetIdent( frame );
-               if( strlen( id ) == 1 && isupper( id[ 0 ] ) ) {
-                  if( frms[ (int) id[ 0 ] ] == 0 ) {
-                     frms[ (int) id[ 0 ] ] = ifrm;
-                     sid[ ifrm ] = id[ 0 ];
+               if( astChrMatchN( astGetDomain( frame ), "IWC", 3 ) ) {
+                  sid[ ifrm ] = 1;
+               } else {
+                  id = astGetIdent( frame );
+                  if( strlen( id ) == 1 && isupper( id[ 0 ] ) ) {
+                     if( frms[ (int) id[ 0 ] ] == 0 ) {
+                        frms[ (int) id[ 0 ] ] = ifrm;
+                        sid[ ifrm ] = id[ 0 ];
+                     }
                   }
                }
                astAnnul( frame );
@@ -7356,14 +7380,12 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
    (lowest to highest). */
          s = 'A' - 1;
          for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
-            if( ifrm != icurr && ifrm != ibase ) { 
+            if( ifrm != icurr && ifrm != ibase && sid[ ifrm ] != 1 ) { 
                if( sid[ ifrm ] == 0 ){
-                  if( ifrm != icurr && ifrm != ibase ) { 
-                     while( frms[ (int) ++s ] != 0 );
-                     if( s <= 'Z' ) { 
-                        sid[ ifrm ] = s;
-                        frms[ (int) s ] = ifrm;
-                     }
+                  while( frms[ (int) ++s ] != 0 );
+                  if( s <= 'Z' ) { 
+                     sid[ ifrm ] = s;
+                     frms[ (int) s ] = ifrm;
                   }
                }
             }
@@ -7373,7 +7395,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
    create alternate axis descriptions for each one. */
          for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
             s = sid[ ifrm ];
-            if( s != 0 ) {
+            if( s != 0 && s != 1 ) {
                secok = AddVersion( this, fset, ibase, ifrm, ret, dim, 
                                    s, method, class );
             }
@@ -10987,6 +11009,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* Iwc */
+/* --- */
+   } else if ( !strcmp( attrib, "iwc" ) ) {
+      ival = astGetIwc( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* Clean */
 /* ----- */
    } else if ( !strcmp( attrib, "clean" ) ) {
@@ -11451,7 +11482,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
 /* Initialise the returned pointer values. */
    *name = NULL;
    *val = NULL;
-
+   
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -11466,6 +11497,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
    at the "current" card) until a valid data item is read or "end of
    file" is reached. Also quit the loop if an error occurs. */
    done = 0;
+   newdata = NULL;
    while ( !done && !astFitsEof( this ) && astOK ){
 
 /* Obtain the keyword string, data type code and data value pointer
@@ -12071,6 +12103,10 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    vtab->TestCarLin = TestCarLin;
    vtab->SetCarLin = SetCarLin;
    vtab->GetCarLin = GetCarLin;
+   vtab->ClearIwc = ClearIwc;
+   vtab->TestIwc = TestIwc;
+   vtab->SetIwc = SetIwc;
+   vtab->GetIwc = GetIwc;
    vtab->ClearWarnings = ClearWarnings;
    vtab->TestWarnings = TestWarnings;
    vtab->SetWarnings = SetWarnings;
@@ -13298,6 +13334,8 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs ) {
    specfrm = NULL;
    skyfrm = NULL;
    ok = 1;
+   ilat = -1;
+   ilon = -1;
    for( iax = 0; iax < nwcs; iax++ ) {
 
 /* Obtain a pointer to the primary Frame containing the current WCS axis. */
@@ -13924,6 +13962,8 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          sfrm = NULL;
          skydiag0 = AST__BAD;
          skydiag1 = AST__BAD;
+         skycol0 = -1;
+         skycol1 = -1;
          for( i = 0; i < nout; i++ ) {
             pperm[ wperm[ i ] ] = i;
 
@@ -15292,6 +15332,7 @@ static AstMapping *NonLinSpecWcs( AstFitsChan *this, char *algcode,
 
 /* If the X system was identified, find a Mapping from the "S" (specfrm)
    system to the X system. */
+   map1 = NULL;
    if( ok ) { 
       ok = 0;
       fs = astConvert( specfrm, xfrm, "" );
@@ -15301,10 +15342,10 @@ static AstMapping *NonLinSpecWcs( AstFitsChan *this, char *algcode,
          ok = 1;
       }
 
-
 /* Issue a warning if the "P" system is not the correct one for the given 
    "S" system. We can however continue, sine AST interprets illegal "P" 
    systems correctly. */
+      pc = 0;
       s_sys = astGetSystem( specfrm );
       if( s_sys == AST__FREQ || s_sys == AST__ENERGY || 
           s_sys == AST__WAVENUM ||  s_sys == AST__VRADIO ) {
@@ -16089,6 +16130,12 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    can only encode 10 axis descriptions (including primary). */
    sup = GetMaxS( &(store->crval) ); 
    if( sup > 'I' ) return ret;
+
+/* Initialise */
+   primdt = AST__BAD;
+   primeq = AST__BAD;
+   primln = AST__BAD;
+   primlt = AST__BAD;
 
 /* Loop round all co-ordinate versions (0-9) */
    primpc = NULL;
@@ -17785,6 +17832,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetCarLin( this, ival );
 
+/* Iwc */
+/* --- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "iwc= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetIwc( this, ival );
+
 /* Clean */
 /* ----- */
    } else if ( nc = 0,
@@ -18796,16 +18850,15 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    them. Otherwise, set the values bad to indicate that the default values
    should be used. Note, these projection parameters are used for other
    purposes in a TPN projection. */
+   lonpole = AST__BAD;
+   latpole = AST__BAD;
    if( astIsZenithal( map2 ) ) {
       if( astGetWcsType( map2 ) != AST__TPN ) {
          lonpole = astTestPV( map2, axlon, 3 ) ? astGetPV( map2, axlon, 3 ) 
                                                 : AST__BAD;
          latpole = astTestPV( map2, axlon, 4 ) ? astGetPV( map2, axlon, 4 ) 
                                                 : AST__BAD;
-      } else {
-         lonpole = AST__BAD;
-         latpole = AST__BAD;
-      }
+      } 
 
 /* For non-zenithal projections, do the full calculation. */
    } else {
@@ -20527,7 +20580,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                   }
 
 /* Save it as CDELTis */
-                  sprintf( keyname, "CDELT%d%c", i, ss );
+                  sprintf( keyname, "CDELT%d%c", j + 1, ss );
                   SetValue( ret, keyname, (void *) &cdeltj, AST__FLOAT,
                             CardComm( this ) );
 
@@ -20857,6 +20910,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* If found, extract the numerical values which follow. */
                if( start ) {
                   start = strstr( start, "\"" ) + 1;
+                  mp = 0;
                   j = 0;
                   nch = 0;
                   porder = -1;
@@ -20873,6 +20927,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    first TAN projection parameter index to use. */
                      } else if( j == 1 ){
                         porder = dval - 1;
+
                      } else if( j == 2 ){
                         if( dval - 1 != porder || dval < 0 || dval > 7 ) ok = 0;
                         mp = (i?b:a) + abskip[ porder ];
@@ -20924,6 +20979,29 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    
 /*  Release the memory used to hold the concatenated WAT keywords. */
                watmem = (char *) astFree( (void *) watmem );
+            }
+         }
+      }
+
+/* MSX CAR projections.
+   ------------------- */
+      if( !Ustrcmp( prj, "-CAR" ) ) {
+
+/* If the projection is a CAR projection, check that the CRPIX value for
+   the longitude axis corresponds to a projection plane point which has 
+   valid native longitude. The CAR projection has valid projection plane
+   points only for native longitudes in the range [-180,+180, so we
+   modify the CRPIX value if necessary by the number of pixels corresponding
+   to 360 degres of longitude in order to bring the refernce pixel into
+   the valid domain of the projection. */
+         if( GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, s ),
+                        AST__FLOAT, (void *) &cdelti, 1, method, class ) &&
+             GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s ),
+                        AST__FLOAT, (void *) &dval, 0, method, class ) ) {
+            if( cdelti != 0.0 ) {   
+               dval = AST__DR2D*slaDrange( AST__DD2R*dval*cdelti )/cdelti;
+               SetValue( ret, FormatKey( "CRPIX", axlon + 1, -1, s ), 
+                         (void *) &dval, AST__FLOAT, CardComm( this ) );
             }
          }
       }
@@ -21752,6 +21830,7 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
    class = astGetClass( map );
 
 /* If the supplied Mapping is a CmpMap... */
+   wcsaxis = -1;
    if( !strcmp( class, "CmpMap" ) ){
 
 /* Decompose the Mapping into a sequence of Mappings to be applied in
@@ -22132,6 +22211,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* --------- */
    } else if ( !strcmp( attrib, "carlin" ) ) {
       result = astTestCarLin( this );
+
+/* Iwc. */
+/* ---- */
+   } else if ( !strcmp( attrib, "iwc" ) ) {
+      result = astTestIwc( this );
 
 /* Clean. */
 /* ------ */
@@ -22799,7 +22883,7 @@ static AstMatrixMap *WcsCDeltMatrix( FitsStore *store, char s, int naxes,
 }
 
 static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
-                                 AstFrame **frm, double *reflon, double *reflat,
+                                 AstFrame **frm, AstFrame *iwcfrm, double *reflon, double *reflat,
                                  AstSkyFrame **reffrm, const char *method, const char *class ){
 /*
 *  Name:
@@ -22814,7 +22898,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 
 *  Synopsis:
 *     AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
-*                               AstFrame **frm, double *reflon, double *reflat,
+*                               AstFrame **frm, AstFrame *iwcfrm, double *reflon, double *reflat,
 *                               AstSkyFrame **reffrm, const char *method, const char *class )
 
 *  Class Membership:
@@ -22844,6 +22928,9 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 *     frm
 *        The address of a location at which to store a pointer to the
 *        Frame describing the world coordinate axes.
+*     iwcfrm
+*        A pointer to the Frame describing the intermediate world coordinate 
+*        axes. The properties of this Frame may be changed on exit.
 *     reflon
 *        Address of a location at which to return the celestial longitude
 *        at the reference point. It is returned as AST__BAD if no
@@ -22933,6 +23020,9 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* We have not yet found any celestial axes. */
    axlon = -1;
    axlat = -1;
+   latprj = AST__WCSBAD;
+   lonprj = AST__WCSBAD;
+   prj = AST__WCSBAD;
 
 /* First, we examine the CTYPE values in the FitsStore to determine
    which axes are the longitude and latitude axes, and what the celestial 
@@ -23119,6 +23209,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    set, then we consider the CAR projection to be a simple linear mapping
    of pixel coords to celestial coords. Do this by using a WcsMap with no 
    projection. All axes will then be treated as linear and non-celestial. */
+         map3 = NULL;
          if( latprj == AST__CAR && astGetCarLin( this ) ) {
             map2 = (AstMapping *) astWcsMap( naxes, AST__WCSBAD, axlon + 1, 
                                              axlat + 1, "" );
@@ -23339,6 +23430,12 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* Free the axes array. */
             axes= astFree( axes );
          }
+
+/* Set the units in the supplied IWC Frame for the longitude and latitude
+   axes. These are degrees (the conversion from degs to rads is part of
+   the Mapping fronm IWC to WCS). */
+         astSetUnit( iwcfrm, axlon, "deg" ); 
+         astSetUnit( iwcfrm, axlat, "deg" ); 
       }
    }
 
@@ -23417,6 +23514,10 @@ static void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
 /* Loop round all the cards in the FitsChan obtaining the keyword name for 
    each card. Note, the single "=" is correct in the following "while"
    statement. */
+   s = 0;
+   jm =-1;
+   i = -1;
+   type = AST__NOTYPE;
    while( (keynam = CardName( fc )) ){
       item = NULL;
 
@@ -24477,7 +24578,10 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 *        upper-case alphabetical characters ('A' to 'Z').
 *     frm
 *        The address of a location at which to store a pointer to the
-*        Frame describing the world coordinate axes.
+*        Frame describing the world coordinate axes. If the Iwc attribute
+*        is non-zero, then this is actually a FrameSet in which the current 
+*        Frame is the required WCS system. The FrameSet also contains one 
+*        other Frame which defines the FITS IWC system.
 *     method
 *        A pointer to a string holding the name of the calling method.
 *        This is used only in the construction of error messages.
@@ -24491,17 +24595,22 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 */
 
 /* Local Variables: */
-   AstMapping   *map1;       /* Pointer to a Mapping */
-   AstMapping   *map2;       /* Pointer to a Mapping */
-   AstMapping   *map3;       /* Pointer to a Mapping */
-   AstMapping   *map4;       /* Pointer to a Mapping */
-   AstMapping   *map5;       /* Pointer to a Mapping */
-   AstMapping   *map6;       /* Pointer to a Mapping */
-   AstMapping   *map7;       /* Pointer to a Mapping */
-   AstMapping   *ret;        /* Pointer to the returned Mapping */
+   AstFrame *iwcfrm;         /* Frame defining IWC system */
+   AstFrameSet *fs;          /* Pointer to returned FrameSet */
+   AstMapping *map1;         /* Pointer to a Mapping */
+   AstMapping *map2;         /* Pointer to a Mapping */
+   AstMapping *map3;         /* Pointer to a Mapping */
+   AstMapping *map4;         /* Pointer to a Mapping */
+   AstMapping *map5;         /* Pointer to a Mapping */
+   AstMapping *map6;         /* Pointer to a Mapping */
+   AstMapping *map7;         /* Pointer to a Mapping */
+   AstMapping *map8;         /* Pointer to a Mapping */
+   AstMapping *map9;         /* Pointer to a Mapping */
+   AstMapping *ret;          /* Pointer to the returned Mapping */
    AstSkyFrame *reffrm;      /* SkyFrame defining reflon and reflat */
-   const char *cc;           /* Pointer to Domain */
+   char iwc[5];              /* Domain name for IWC Frame */
    char id[2];               /* ID string for returned Frame */
+   const char *cc;           /* Pointer to Domain */
    double dval;              /* Temporary double value */
    double reflat;            /* Reference celestial latitude */
    double reflon;            /* Reference celestial longitude */
@@ -24522,6 +24631,13 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    } else {
       wcsaxes = store->naxis;
    }
+
+/* Create a simple Frame to represent IWC coords. */
+   iwcfrm = astFrame( wcsaxes, "Title=FITS Intermediate World Coordinates" );
+   strcpy( iwc, "IWC" );
+   iwc[ 3 ]= s;  
+   iwc[ 4 ]= 0;  
+   astSetDomain( iwcfrm, iwc );
 
 /* Create a simple Frame which will be used as the initial representation
    for the physical axes. This Frame will be changed later (or possibly
@@ -24561,21 +24677,21 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    coordinates to the final celestial coordinates. Other axes are left
    unchanged by the Mapping. It also modifies the Frame so that a
    SkyFrame is used to describe the celestial axes. */
-   map2 = WcsCelestial( this, store, s, frm, &reflon, &reflat, &reffrm, 
-                        method, class );
+   map2 = WcsCelestial( this, store, s, frm, iwcfrm, &reflon, &reflat, 
+                        &reffrm, method, class );
 
 /* Spectral coordinate axes. The following call returns a Mapping which
    transforms any spectral coordinate axes from intermediate world
    coordinates to the final spectral coordinates. Other axes are left
    unchanged by the Mapping. It also modifies the Frame so that a
    SpecFrame is used to describe the spectral axes. */
-   map3 = WcsSpectral( this, store, s, frm, reflon, reflat, reffrm,
+   map3 = WcsSpectral( this, store, s, frm, iwcfrm, reflon, reflat, reffrm,
                        method, class );
 
 /* Any axes which were not recognized by the above calls are assumed to
    be linear. Create a Mapping which adds on the reference value for such
    axes, and modify the Frame to desribe the axes. */
-   map4 = WcsOthers( this, store, s, frm, method, class );
+   map4 = WcsOthers( this, store, s, frm, iwcfrm, method, class );
 
 /* If the Frame still has the Domain "AST_FITSCHAN", clear it. */
    cc = astGetDomain( *frm );
@@ -24591,7 +24707,30 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    attribute for the returned Frame (the above calls may have changed it). */
    astSetIdent( *frm, id );
 
+/* The returned Frame is actually a FrameSet in which the current Frame
+   is the required WCS Frame. The FrameSet contains one other Frame,
+   which is the Frame representing IWC. Create a FrameSet containing these
+   two Frames. */
+   if( astGetIwc( this ) ) {
+      fs = astFrameSet( iwcfrm, "" );
+      astInvert( map1 );
+      map8 = (AstMapping *) astCmpMap( map1, ret, 1, "" );
+      astInvert( map1 );
+      map9 = astSimplify( map8 );
+      astAddFrame( fs, AST__BASE, map9, *frm );
+
+/* Return this FrameSet instead of the Frame. */
+      *frm = astAnnul( *frm );
+      *frm = (AstFrame *) fs;
+
+/* Free resources */
+      map8 = astAnnul( map8 );
+      map9 = astAnnul( map9 );
+
+   }
+
 /* Annull temporary resources. */
+   iwcfrm = astAnnul( iwcfrm );
    map1 = astAnnul( map1 );
    map2 = astAnnul( map2 );
    map3 = astAnnul( map3 );
@@ -25354,7 +25493,7 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
 }
 
 static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s, 
-                              AstFrame **frm, const char *method, 
+                              AstFrame **frm,  AstFrame *iwcfrm, const char *method, 
                               const char *class ){
 /*
 *  Name:
@@ -25369,7 +25508,7 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 
 *  Synopsis:
 *     AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s, 
-*                            AstFrame **frm, const char *method, 
+*                            AstFrame **frm,  AstFrame *iwcfrm, const char *method, 
 *                            const char *class )
 
 *  Class Membership:
@@ -25396,6 +25535,9 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 *     frm
 *        The address of a location at which to store a pointer to the
 *        Frame describing the world coordinate axes.
+*     iwcfrm
+*        A pointer to the Frame describing the intermediate world coordinate 
+*        axes. The properties of this Frame may be changed on exit.
 *     method
 *        A pointer to a string holding the name of the calling method.
 *        This is used only in the construction of error messages.
@@ -25437,16 +25579,16 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 /* Get the number of physical axes. */
    naxes = astGetNaxes( *frm );
 
+/* Assume we will use CTYPE comments as the axis labels. */
+   usecom = 1;
+
+/* Initialise the count of "other" axes. */
+   nother = 0;
+
 /* Get the comments associated with the CTYPE keywords for all "other"
    axes. */
    comms = astMalloc( naxes*sizeof( char * ) );
    if( comms ) {
-
-/* Assume we will use CTYPE comments as the axis labels. */
-      usecom = 1;
-
-/* Initialise the count of "other" axes. */
-      nother = 0;
 
 /* Loop round all axes in the Frame, and initialise the pointer to its
    comment. */
@@ -25558,7 +25700,8 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
             }
 
 /* Now modify the axis in the Frame to have appropriate values for the 
-   Unit, Label and Symbol attributes. */
+   Unit, Label and Symbol attributes. Also set the Unit attribute for
+   the corresponding axis in the IWC Frame. */
             if( ckeyval ) astSetSymbol( *frm, i, buf2 );
 
             ckeyval = GetItemC( &(store->cname), i, s, NULL, method, class );
@@ -25568,7 +25711,10 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
             if( ckeyval ) astSetLabel( *frm, i, ckeyval );
 
             ckeyval = GetItemC( &(store->cunit), i, s, NULL, method, class );
-            if( ckeyval ) astSetUnit( *frm, i, ckeyval );
+            if( ckeyval ) {
+               astSetUnit( *frm, i, ckeyval );
+               astSetUnit( iwcfrm, i, ckeyval ); 
+            }
 
 /* If this axis has been described by an earlier function (because it
    uses specialised conventions such as those described in FITS-WCS papers
@@ -25815,6 +25961,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
    unrecognised system is supplied. Store NORADEC if the keyword was 
    not supplied. */
    ckeyval = GetItemC( &(store->radesys), 0, s, NULL, method, class );
+   radesys = NORADEC;
    if( ckeyval ){
       if( !strncmp( ckeyval, "FK4 ", 4 ) || 
           !strcmp( ckeyval, "FK4" ) ){
@@ -25850,6 +25997,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
 
 /* For FK4 and FK4-NO-E any supplied equinox value is Besselian. For all 
    other systems, the equinox value is Julian. */
+   bj = 0;
    if( equinox != AST__BAD ){
       if( radesys == FK4 || radesys == FK4NOE ){
          bj = 'B';
@@ -26040,7 +26188,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
 }
 
 static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s, 
-                                AstFrame **frm, double reflon, double reflat, 
+                                AstFrame **frm, AstFrame *iwcfrm, double reflon, double reflat, 
                                 AstSkyFrame *reffrm, const char *method, 
                                 const char *class ){
 /*
@@ -26056,9 +26204,9 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 
 *  Synopsis:
 *     AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s, 
-*                              AstFrame **frm, double reflon, double reflat, 
-*                              AstSkyFrame *reffrm, const char *method, 
-*                              const char *class )
+*                              AstFrame **frm, AstFrame *iwcfrm, double reflon,
+*                              double reflat, AstSkyFrame *reffrm, 
+*                              const char *method, const char *class )
 
 *  Class Membership:
 *     FitsChan
@@ -26087,6 +26235,9 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 *     frm
 *        The address of a location at which to store a pointer to the
 *        Frame describing the world coordinate axes.
+*     iwcfrm
+*        A pointer to the Frame describing the intermediate world coordinate 
+*        axes. The properties of this Frame may be changed on exit.
 *     reflon
 *        The reference celestial longitude, in the frame given by reffrm.
 *     reflat
@@ -26147,6 +26298,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
    axes = astMalloc( naxes*sizeof( int ) );
 
 /* Loop round checking each axis. */
+   defunit = NULL;
    map1 = NULL;
    for( i = 0; i < naxes && astOK; i++ ) {
 
@@ -26237,6 +26389,9 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             cunit = GetItemC( &(store->cunit), i, s, NULL, method, class );
             if( !cunit ) cunit = defunit;
             astSetUnit( specfrm, 0, cunit );
+
+/* Set the axis unit in the IWC Frame. */
+            astSetUnit( iwcfrm, i, cunit );
 
 /* Date of observation. */
             mjd = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
@@ -26659,6 +26814,7 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
    is the length of the projection of the vector onto the "j"th pixel
    axis.  */
                s = 0.0;
+               sj = 0.0;
                for( j2 = 0; j2 < nin; j2++ ) {
                   if( ptr1[ j2 ][ 0 ] != AST__BAD ) {
                       dg = ptr1[ j2 ][ 0 ] - g0[ j2 ];
@@ -26689,6 +26845,9 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
          ntn = tn;
          nwt = wt;
          tnmin = AST__BAD;
+         wtmax = AST__BAD;
+         imin = 0;
+         jmin = 0;
          for( i = 0; i < nout; i++ ) {
             for( j = 0; j < nin; j++ ) {
                if( *ntn != AST__BAD ) {
@@ -28466,6 +28625,52 @@ astMAKE_GET(FitsChan,CarLin,int,1,(this->carlin == -1 ? 0 : this->carlin))
 astMAKE_SET(FitsChan,CarLin,int,carlin,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,CarLin,( this->carlin != -1 ))
 
+/* Iwc */
+/* === */
+/*
+*att++
+*  Name:
+*     Iwc
+
+*  Purpose:
+*     Include a Frame representing FITS-WCS intermediate world coordinates?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which is used when a FrameSet is
+*     read from a FitsChan with a foreign FITS encoding (e.g. FITS-WCS) using
+c     astRead.
+f     AST_READ.
+*     If it has a non-zero value then the returned FrameSet will include
+*     Frames representing "intermediate world coordinates" (IWC). These
+*     Frames will have Domain name "IWC" for primary axis descriptions, and
+*     "IWCa" for secondary axis descriptions, where "a" is replaced by
+*     the single alternate axis description character, as used in the
+*     FITS-WCS header. The default value for "Iwc" is zero.
+*
+*     FITS-WCS paper 1 defines IWC as a Cartesian coordinate system with one 
+*     axis for each WCS axis, and is the coordinate system produced by the
+*     rotation matrix (represented by FITS keyword PCi_j, CDi_j, etc).
+*     For instance, for a 2-D FITS-WCS header describing projected
+*     celestial longitude and latitude, the intermediate world
+*     coordinates represent offsets in degrees from the reference point
+*     within the plane of projection.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,Iwc,iwc,-1)
+astMAKE_GET(FitsChan,Iwc,int,1,(this->iwc == -1 ? 0 : this->iwc))
+astMAKE_SET(FitsChan,Iwc,int,iwc,( value ? 1 : 0 ))
+astMAKE_TEST(FitsChan,Iwc,( this->iwc != -1 ))
+
 /*
 *att++
 *  Name:
@@ -29090,6 +29295,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    set = TestCarLin( this );
    ival = set ? GetCarLin( this ) : astGetCarLin( this );
    astWriteInt( channel, "CarLin", set, 1, ival, (ival ? "Use simple linear CAR projections": "Use full FITS-WCS CAR projections") );
+
+/* Iwc */
+/* --- */
+   set = TestIwc( this );
+   ival = set ? GetIwc( this ) : astGetIwc( this );
+   astWriteInt( channel, "Iwc", set, 1, ival, (ival ? "Include an IWC Frame": "Do not include an IWC Frame") );
 
 /* Clean */
 /* ----- */
@@ -29869,6 +30080,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->defb1950 = -1;
       new->cdmatrix = -1;
       new->carlin = -1;
+      new->iwc = -1;
       new->clean = -1;
       new->fitsdigits = DBL_DIG;
       new->encoding = UNKNOWN_ENCODING;
@@ -30068,6 +30280,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 /* ------ */
       new->carlin = astReadInt( channel, "carlin", -1 );
       if ( TestCarLin( new ) ) SetCarLin( new, new->carlin );
+
+/* Iwc */
+/* --- */
+      new->iwc = astReadInt( channel, "iwc", -1 );
+      if ( TestIwc( new ) ) SetIwc( new, new->iwc );
 
 /* Clean */
 /* ----- */
