@@ -604,14 +604,6 @@
 
 *  Status:
       INTEGER			STATUS             	! Global status
-
-*  Local Variables:
-      CHARACTER*4		STR			! String of I
-
-      REAL			X, Y, R			! Source attrs
-
-      INTEGER			I			! Loop over sources
-      INTEGER			NDIGIT			! # chars used in STR
 *.
 
 *  Check inherited global status.
