@@ -1,37 +1,20 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = parsecon_link_adam
-bin_PROGRAMS = compifl
-lib_LTLIBRARIES = libparsecon_adam.la
+noinst_LTLIBRARIES = libparsecon_convenience.la
 
-libparsecon_adam_la_SOURCES = \
+libparsecon_convenience_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES)
 
-compifl_SOURCES = \
-	compifl.f
-
-# This must be compifl_LDFLAGS or AM_LDFLAGS, but _not_ plain LDFLAGS,
-# since that would override a configure variable.  This includes the
-# contents of ./parsecon_link_adam, but expanded so that we definitely
-# use the local libparsecon_adam.la rather than any installed one
-# (must be first, since subpar_link_adam also refers to the installed
-# libparsecon).
-compifl_LDFLAGS = \
-	libparsecon_adam.la \
-	`ems_link_adam` `string_link_adam` `chr_link_adam` \
-	`subpar_link_adam`
-# Declare the dependency on the library, since this isn't picked up from
-# the presence of the file in the above compifl_LDFLAGS line.
-compifl_DEPENDENCIES = libparsecon_adam.la
-
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 PUBLIC_INCLUDES = PARSECON_ERR PARSECON_PAR
 
-PRIVATE_INCLUDES = PARSECON_CMN PARSECON2_CMN PARSECON3_CMN PARSECON4_CMN 
+PRIVATE_INCLUDES = \
+	PARSECON_CMN PARSECON2_CMN PARSECON3_CMN PARSECON4_CMN \
+	SUBPAR_CMN
 
 FPP_ROUTINES = \
 	pcn_openifl.fpp
@@ -64,4 +47,12 @@ noinst_MESSAGES = PARSE_ERR
 PARSECON_ERR: PARSE_ERR
 	cp PARSE_ERR PARSECON_ERR
 
-BUILT_SOURCES = PARSECON_ERR
+# SUBPAR_CMN is kept in ../subpar, but we need to use it, because
+# parsecon has a particularly close relationship with subpar, which
+# extends to sharing its common blocks (ugh).  This is horrible
+# enough, that just linking to the common block declaration from here
+# doesn't make things appreciably worse.
+SUBPAR_CMN:
+	$(LN_S) ../subpar/SUBPAR_CMN SUBPAR_CMN
+
+BUILT_SOURCES = PARSECON_ERR SUBPAR_CMN
