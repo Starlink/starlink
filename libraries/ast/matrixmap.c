@@ -1,4 +1,3 @@
-
 /*
 *class++
 *  Name:
@@ -81,6 +80,10 @@ f     The MatrixMap class does not define any new routines beyond those
 *        could merge.
 *     22-FEB-1999 (DSB):
 *        Changed logic of MapMerge to avoid infinite looping.
+*     5-MAY-1999 (DSB):
+*        More corrections to MapMerge: Cleared up errors in the use of the 
+*        supplied invert flags, and corrected logic for deciding which 
+*        neighbouring Mapping to swap with. 
 *class--
 */
 
@@ -165,7 +168,7 @@ static int FindString( int, const char *[], const char *, const char *, const ch
 static int Ustrcmp( const char *, const char * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
-static int CanSwap( AstMapping *, AstMapping * );
+static int CanSwap( AstMapping *, AstMapping *, int, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int PermOK( AstMapping * );
 static int ScalingRowCol( AstMatrixMap *, int );
@@ -182,7 +185,7 @@ static void SMtrMult( int, int, int, const double *, double *, double* );
 
 /* Member functions. */
 /* ================= */
-static int CanSwap( AstMapping *map1, AstMapping *map2 ){
+static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 /*
 *  Name:
 *     CanSwap
@@ -195,7 +198,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     int CanSwap( AstMapping *map1, AstMapping *map2 )
+*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 )
 
 *  Class Membership:
 *     MatrixMap member function 
@@ -212,6 +215,12 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
 *        The Mapping to be applied first.
 *     map2
 *        The Mapping to be applied second.
+*     inv1
+*        The invert flag to use with map1. A value of zero causes the forward
+*        mapping to be used, and a non-zero value causes the inverse
+*        mapping to be used.
+*     inv2
+*        The invert flag to use with map2. 
 
 *  Returned Value:
 *     1 if the Mappings could be swapped, 0 otherwise.
@@ -232,6 +241,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
    int *inperm;              /* Pointer to input axis permutation array */
    int *outperm;             /* Pointer to output axis permutation array */
    int i;                    /* Loop count */
+   int invert[ 2 ];          /* Original invert flags */
    int nax;                  /* No. of in/out coordinates for the MatrixMap */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */
@@ -243,6 +253,14 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
 /* Initialise */
    ret = 0;
 
+/* Temporarily set the Invert attributes of both Mappings to the supplied 
+   values. */
+   invert[ 0 ] = astGetInvert( map1 );
+   astSetInvert( map1, inv1 );
+
+   invert[ 1 ] = astGetInvert( map2 );
+   astSetInvert( map2, inv2 );
+   
 /* Get the classes of the two mappings. */
    class1 = astGetClass( map1 );
    class2 = astGetClass( map2 );
@@ -330,8 +348,14 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
    forward direction. */
             if( ret && ( nomat == map1 ) ) {
 
+               if( nout != nax ){
+                  astError( AST__RDERR, "PermMap produces %d outputs, but the following"
+                            "MatrixMap has %d inputs\n", nout, nax );
+                  ret = 0;
+               }
+
 /* Consider each output axis of the PermMap. */
-               for( i = 0; i < nout; i++ ) {
+               for( i = 0; i < nout && astOK ; i++ ) {
 
 /* If this PermMap output is assigned a constant... */
                   if( outperm[ i ] < 0 || outperm[ i ] >= nin ) {
@@ -351,8 +375,14 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
    of the PermMap are fed into the MatrixMap in the inverse direction. */
             if( ret && ( nomat == map2 ) ) {
 
+               if( nin != nax ){
+                  astError( AST__RDERR, "Inverse PermMap produces %d inputs, but the "
+                            "preceeding MatrixMap has %d outputs\n", nin, nax );
+                  ret = 0;
+               }
+
 /* Consider each input axis of the PermMap. */
-               for( i = 0; i < nin; i++ ){
+               for( i = 0; i < nin && astOK; i++ ){
 
 /* If this PermMap input is assigned a constant (by the inverse Mapping)... */
                   if( inperm[ i ] < 0 || inperm[ i ] >= nout ) {
@@ -376,6 +406,11 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
       }
    }
 
+/* Re-instate the original settings of the Invert attributes for the
+   supplied MatrixMaps. */
+   astSetInvert( map1, invert[ 0 ] );
+   astSetInvert( map2, invert[ 1 ] );
+   
 /* Return the answer. */
    return astOK ? ret : 0;
 }
@@ -1212,9 +1247,21 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get the number of input and output axes for the MatrixMap. */
-   nin = astGetNin( ( *map_list )[ where ] );
-   nout = astGetNout( ( *map_list )[ where ] );
+/* Get the Invert attribute for the specified mapping. */
+   invert = astGetInvert( ( *map_list )[ where ] );
+
+/* Get the number of input and output axes for the MatrixMap. Swap these
+   if the supplied invert flag is not the same as the Invert attribute of
+   the Mapping. */
+   if(  invert && !( *invert_list )[ where ] || 
+       !invert && ( *invert_list )[ where ] ){
+      nout = astGetNin( ( *map_list )[ where ] );
+      nin = astGetNout( ( *map_list )[ where ] );
+
+   } else {
+      nin = astGetNin( ( *map_list )[ where ] );
+      nout = astGetNout( ( *map_list )[ where ] );
+   }
 
 /* First of all, see if the MatrixMap can be replaced by a simpler Mapping,
    without reference to the neighbouring Mappings in the list.           */
@@ -1382,56 +1429,78 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    in the list. */
          } else {
 
-/* Step through each of the Mappings which follow the MatrixMap, looking for 
-   a Mapping with which the MatrixMap could merge directly. Stop when such a
-   Mapping is found, or when a Mapping is found with which the MatrixMap
-   cannot swap. Note the number of Mappings which separate the MatrixMap
-   from the Mapping with which it could merge (if any). */
-            swaphi = 0;
+/* Set a flag if we could swap the MatrixMap with its higher neighbour. */
+            if( where + 1 < *nmap ){
+               swaphi = CanSwap(  ( *map_list )[ where ], 
+                                  ( *map_list )[ where + 1 ],
+                                  ( *invert_list )[ where ], 
+                                  ( *invert_list )[ where + 1 ] );
+            } else {
+               swaphi = 0;
+            }
+
+/* If so, step through each of the Mappings which follow the MatrixMap, 
+   looking for a Mapping with which the MatrixMap could merge directly. Stop 
+   when such a Mapping is found, or if a Mapping is found with which the
+   MatrixMap could definitely not swap. Note the number of Mappings which 
+   separate the MatrixMap from the Mapping with which it could merge (if 
+   any). */
             nstep2 = -1;
-            for( i2 = where + 1; i2 < *nmap; i2++ ){
+            if( swaphi ){
+               for( i2 = where + 1; i2 < *nmap; i2++ ){
 
-               nclass = astGetClass( ( *map_list )[ i2 ] );
-               if( !strcmp( nclass, "MatrixMap" ) ||
-                   !strcmp( nclass, "ZoomMap" ) ||
-                   ( !strcmp( nclass, "PermMap" ) && PermOK( ( *map_list )[ i2 ] ) ) ||
-                   !strcmp( nclass, "UnitMap" ) ) {
-                  nstep2 = i2 - where - 1;
-                  break;
+/* See if we can merge with this Mapping. If so, note the number of steps
+   between the two Mappings and leave the loop. */
+                  nclass = astGetClass( ( *map_list )[ i2 ] );
+                  if( !strcmp( nclass, "MatrixMap" ) ||
+                      !strcmp( nclass, "ZoomMap" ) ||
+                      ( !strcmp( nclass, "PermMap" ) && PermOK( ( *map_list )[ i2 ] ) ) ||
+                      !strcmp( nclass, "UnitMap" ) ) {
+                     nstep2 = i2 - where - 1;
+                     break;
+                  }
+
+/* If there is no chance that we can swap with this Mapping, leave the loop 
+   with -1 for the number of steps to indicate that no merging is possible. 
+   MatrixMaps can swap with WinMaps and some permmaps. */
+                  if( strcmp( nclass, "WinMap" ) &&
+                      strcmp( nclass, "PermMap" ) ) {
+                     break;
+                  }
+
                }
 
-/* If we cannot swap with this Mapping, leave the loop. */
-               if( !CanSwap(  ( *map_list )[ where ], 
-                              ( *map_list )[ i2 ] ) ) {
-                  break;
-
-/* Otherwise, set a flag to indicate that we could swap the WinMap with its 
-   higher neighbour if needed. */
-               } else {
-                  swaphi = 1;
-               }
             }
 
 /* Do the same working forward from the MatrixMap towards the start of the map
    list. */
-            swaplo = 0;
+            if( where > 0 ){
+               swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
+                                  ( *map_list )[ where ],
+                                  ( *invert_list )[ where - 1 ], 
+                                  ( *invert_list )[ where ] );
+            } else {
+               swaplo = 0;
+            }
+
             nstep1 = -1;
-            for( i1 = where - 1; i1 >= 0; i1-- ){
+            if( swaplo ){
+               for( i1 = where - 1; i1 >= 0; i1-- ){
 
-               nclass = astGetClass( ( *map_list )[ i1 ] );
-               if( !strcmp( nclass, "MatrixMap" ) ||
-                   ( !strcmp( nclass, "PermMap" ) && PermOK( ( *map_list )[ i1 ] ) ) ||
-                   !strcmp( nclass, "ZoomMap" ) ||
-                   !strcmp( nclass, "UnitMap" ) ) {
-                  nstep1 = where - 1 - i1;
-                  break;
-               }
+                  nclass = astGetClass( ( *map_list )[ i1 ] );
+                  if( !strcmp( nclass, "MatrixMap" ) ||
+                      ( !strcmp( nclass, "PermMap" ) && PermOK( ( *map_list )[ i1 ] ) ) ||
+                      !strcmp( nclass, "ZoomMap" ) ||
+                      !strcmp( nclass, "UnitMap" ) ) {
+                     nstep1 = where - 1 - i1;
+                     break;
+                  }
 
-               if( !CanSwap(  ( *map_list )[ where ], 
-                              ( *map_list )[ i1 ] ) ) {
-                  break;
-               } else {
-                  swaplo = 1;
+                  if( strcmp( nclass, "WinMap" ) &&
+                      strcmp( nclass, "PermMap" ) ) {
+                     break;
+                  }
+
                }
 
             }
