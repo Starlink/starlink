@@ -46,8 +46,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Use internal routine to get data
-      CALL PSF1_GETAXVAL( PSID, AX, DIM, REG, PTR, BASE, SCALE,
+      CALL PSF0_GETAXVAL( PSID, AX, DIM, REG, PTR, BASE, SCALE,
      :                    TOR, STATUS )
-      CALL PSF1_GETAXTXT( PSID, AX, LABEL, UNITS, STATUS )
+      CALL PSF0_GETAXTXT( PSID, AX, LABEL, UNITS, STATUS )
 
       END

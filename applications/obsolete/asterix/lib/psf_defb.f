@@ -78,7 +78,7 @@
 
 *    Time axis defined?
       IF ( T_AX .GT. 0 ) THEN
-        CALL PSF1_GETAXVAL( PSID, T_AX, DIM, REG, APTR, BASE,
+        CALL PSF0_GETAXVAL( PSID, T_AX, DIM, REG, APTR, BASE,
      :                      SCALE, TOR, STATUS )
         IF ( REG ) THEN
           LOWT = BASE + (ALOWT-1)*SCALE
@@ -96,7 +96,7 @@
 
 *    Energy axis defined?
       IF ( E_AX .GT. 0 ) THEN
-        CALL PSF1_GETAXVAL( PSID, E_AX, DIM, REG, APTR, BASE,
+        CALL PSF0_GETAXVAL( PSID, E_AX, DIM, REG, APTR, BASE,
      :                      SCALE, TOR, STATUS )
         IF ( REG ) THEN
           LOWE = BASE + (ALOWE-1)*SCALE

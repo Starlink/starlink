@@ -109,7 +109,7 @@
       CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Direction of increase of X axis
-      IF ( PSF1_GETAXDR( PSID, X_AX, STATUS ) .GT. 0.0 ) THEN
+      IF ( PSF0_GETAXDR( PSID, X_AX, STATUS ) .GT. 0.0 ) THEN
         XDIR = 1.0
       ELSE
         XDIR = -1.0

@@ -83,9 +83,9 @@
       IF ( ISMODEL ) THEN
 
 *    Extract axis data from internal storage
-        CALL PSF1_GETAXVAL( PSID, X_AX, X_DIM, X_REG, X_PTR,
+        CALL PSF0_GETAXVAL( PSID, X_AX, X_DIM, X_REG, X_PTR,
      :                      X_BR, X_DR, X_TOR, STATUS )
-        CALL PSF1_GETAXVAL( PSID, Y_AX, Y_DIM, Y_REG, Y_PTR,
+        CALL PSF0_GETAXVAL( PSID, Y_AX, Y_DIM, Y_REG, Y_PTR,
      :                      Y_BR, Y_DR, Y_TOR, STATUS )
 
 *    Extract model info
