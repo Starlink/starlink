@@ -60,6 +60,8 @@
             CALL IREGION_ANNULUS(STATUS)
           ELSEIF (MODE.EQ.'WHO') THEN
             CALL IREGION_WHOLE(STATUS)
+          ELSEIF (MODE.EQ.'SLI') THEN
+            CALL IREGION_SLICE(STATUS)
           ELSEIF (MODE.EQ.'GTE') THEN
             CALL IREGION_GTE(STATUS)
           ELSEIF (MODE.EQ.'ARD') THEN
@@ -165,6 +167,51 @@
       ENDIF
 
       END
+
+
+
+
+*+
+      SUBROUTINE IREGION_SLICE(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      REAL XC,YC,ANGLE,LENGTH,WIDTH
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL IMG_GETSLICE('XC','YC','ANGLE','LENGTH',WIDTH',
+     :                           XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
+        CALL IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
+
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from IREGION_SLICE',STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
 
 
 
