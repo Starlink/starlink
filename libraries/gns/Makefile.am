@@ -36,15 +36,9 @@ BUILT_SOURCES = GNS_ERR
 
 # Need to specify how to create the binary database files
 
-# Not sure if this is the correct way of building helper applications
-# that are neither for testing nor for final install. Maybe there is
-# a local version of bin_PROGRAMS
-
-gksbuild: gksbuild.o
-	$(FCLINK) gksbuild.o 
-
-idibuild: idibuild.o
-	$(FCLINK) idibuild.o
+noinst_PROGRAMS = gksbuild idibuild
+gksbuild_SOURCES = gksbuild.fpp
+idibuild_SOURCES = idibuild.fpp
 
 gns_gksdevices : gksbuild gksdevices.txt
 	-rm gns_gksdevices
