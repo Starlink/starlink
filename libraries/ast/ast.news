@@ -15,25 +15,36 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-o  A new set of functions, astResample<X>, has been introduced for
-   resampling gridded data such as images (i.e. re-gridding) under
-   the control of a geometrical transformation specified by a
-   Mapping.
+o  A new MathMap class has been introduced. This is a form of Mapping
+   that allows you to define coordinate transformations in a flexible
+   and transportable way using arithmetic operations and mathematical
+   functions similar to those available in C or Fortran.
 
-o  A new class of Object, the PcdMap, has been introduced. This is a
-   specialised form of Mapping which implements 2-dimensional
-   pincushion or barrel distortion.
+o  WARNING---INCOMPATIBLE CHANGE. Transformation functions used with
+   the IntraMap class (see, for example, astIntraReg/AST_INTRAREG) now
+   require a "this" pointer as their first argument. EXISTING
+   IMPLEMENTATIONS WHICH USE INTRAMAPS WILL NOT CONTINUE TO WORK
+   CORRECTLY WITH THIS VERSION OF AST UNLESS THIS IS ADDED. There is no
+   need for existing software to make use of this pointer, but it must be
+   present.
 
-o  A few minor bugs have been fixed.
+   This change has been introduced so that transformation functions can
+   gain access to IntraMap attributes.
+
+o  A new IntraFlag attribute has been added to the IntraMap class. This
+   allows the transformation functions used by IntraMaps to adapt to
+   produce the required transformation on a per-IntraMap basis.
+
+o  A small number of documentation errors have been corrected.
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
 These are available on the WWW at:
 
-      http://star-www.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
+      http://www.starlink.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
 
 and
-      http://star-www.rl.ac.uk/cgi-bin/htxserver/sun211.htx/
+      http://www.starlink.rl.ac.uk/cgi-bin/htxserver/sun211.htx/
 
 Alternatively, on Starlink systems, type:
 
@@ -42,4 +53,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-4/6/1999
+29/9/1999
