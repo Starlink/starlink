@@ -124,6 +124,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
+      INCLUDE 'QUAL_PAR'
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -139,6 +140,7 @@
       REAL			SPARR(2)		! Spaced array data
 
       INTEGER                	I                     	! Loop counter
+      INTEGER			IAPTR			! Input axis pointer
       INTEGER                	IDPTR                 	! Input data pointer
       INTEGER			IFID			! Input dataset id
       INTEGER                	IQPTR                 	! Input quality pointer
@@ -269,8 +271,8 @@
       UNITS = 'pixels'
 
       IF ( OK ) THEN
-        CALL BDI_AXMAPR( IFID, T_AXIS, 'Data', 'READ', APTR, STATUS )
-        CALL ARR_CHKREG( %VAL(APTR), LDIMS(T_AXIS), REG, BASE, SCALE,
+        CALL BDI_AXMAPR( IFID, T_AXIS, 'Data', 'READ', IAPTR, STATUS )
+        CALL ARR_CHKREG( %VAL(IAPTR), LDIMS(T_AXIS), REG, BASE, SCALE,
      :                   STATUS )
         IF ( .NOT. REG ) THEN
         CALL MSG_PRNT ('WARNING: Autocorrelation axis is not regularly '
