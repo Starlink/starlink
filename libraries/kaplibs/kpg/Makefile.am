@@ -38,7 +38,7 @@ KPG_BDIRW_GEN = kpg1_iscl.gbdirw
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
-kpg1_bloc.gdr kpg1_litn.gdr kpg1_ludc.gdr
+kpg1_bloc.gdr kpg1_litn.gdr kpg1_ludc.gdr kpg1_mdet.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir
 
@@ -93,8 +93,8 @@ kpg1_kgodr.f kpg1_lasto.f \
 kpg1_lgtrn.f kpg1_listc.f kpg1_litrd.f \
 kpg1_litrr.f kpg1_lltrd.f kpg1_lltrr.f kpg1_loctb.f kpg1_loctd.f \
 kpg1_locti.f kpg1_loctr.f kpg1_loctub.f kpg1_loctuw.f kpg1_loctw.f \
-kpg1_lutin.f kpg1_mdetd.f \
-kpg1_mdetr.f kpg1_meanb.f kpg1_meand.f kpg1_meani.f kpg1_meanr.f \
+kpg1_lutin.f \
+kpg1_meanb.f kpg1_meand.f kpg1_meani.f kpg1_meanr.f \
 kpg1_meanub.f kpg1_meanuw.f kpg1_meanw.f \
 kpg1_mmthb.f kpg1_mmthd.f kpg1_mmthi.f kpg1_mmthr.f kpg1_mmthub.f \
 kpg1_mmthuw.f kpg1_mmthw.f kpg1_modeb.f kpg1_moded.f kpg1_modei.f \
