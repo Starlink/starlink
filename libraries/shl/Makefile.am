@@ -6,8 +6,8 @@ bin_PROGRAMS = browsehlp
 include_HEADERS = shl.h
 
 browsehlp_SOURCES = browsehlp.c
-browsehlp_LDADD = `hlp_link` `fio_link` `err_link` `one_link` \
-	libshl.la @FCLIBS@
+browsehlp_LDADD = libshl.la `fio_link` `err_link` `one_link` `hlp_link`\
+	@FCLIBS@
 browsehlp_DEPENDENCIES = shl.h
 
 lib_LTLIBRARIES = libshl.la libshl_adam.la
@@ -43,7 +43,7 @@ TESTS = testhelp
 check_MONOLITHS = testhelp
 testhelp_TASKS = 
 testhelp_SOURCES = testhelp.f
-testhelp_LDADD = libshl.la libshl_adam.la \
+testhelp_LDADD = libshl_adam.la libshl.la \
 	`hlp_link_adam` `one_link` `fio_link_adam`
 
 testhelp_DEPENDENCIES = demo.shl
