@@ -770,7 +770,8 @@ C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE) $(GRF_SOURCE)
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
  tcltalk.c tclbg.c ndf.c ndfdrawpair.c ccdputs.c \
  ccdAppInit.c ccdaux.c ndgexpand.c \
- ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c
+ ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c \
+ ccd1_linflt.c
 
 #  List of applications/tasks in monoliths.
 
@@ -1061,7 +1062,7 @@ $(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
 
 #  Top of package support tree.
 
-CCDPACK_HOME = /mbt/support/ccdpack
+CCDPACK_HOME = /home/mbt/support/ccdpack
 
 #  Files under RCS control.
 
