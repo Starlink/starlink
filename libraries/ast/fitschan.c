@@ -407,6 +407,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - WcsWithWcs: Avoid using LONPOLE keywords when creating headers
 *        for a zenithal projection. Instead, add the corresponding rotation 
 *        into the CD matrix.
+*     22-OCT-2002 (DSB):
+*        - Retain leading and trailing white space within COMMENT cards.
+*        - Only use CTYPE comments as axis labels if all non-celestial
+*          axes have a unique non-blank comment (otherwise use CTYPE
+*          values as labels).
 *class--
 */
 
@@ -11157,16 +11162,22 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
       }
 
 /* Find the first non-blank character in the comment, and find the used
-   length of the remaining string. */
+   length of the remaining string. We retain leading and trailing white
+   space if the card is a COMMENT card. */
       if( comment ){
          a = comment;
-         while( isspace( *a ) ) a++;
-         nc = ChrLen( a );
+         if( type != AST__COMMENT ) {
+            while( isspace( *a ) ) a++;
+            nc = ChrLen( a );
+         } else {
+            nc = strlen( a );
+         }
       } else {
          nc = 0;
       }
 
-/* Copy any comment (excluding leading and trailing white space). */
+/* Copy any comment, excluding leading and trailing white space unless
+   this is a COMMENT card */
       if( nc > 0 ){
          new->comment = astStore( NULL, (void *) a, (size_t)( nc + 1 ) );
          ( (char *) new->comment)[ nc ] = 0;
@@ -16537,24 +16548,26 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
    AstFrame *ret;                 /* Returned Frame */
    AstSkyFrame *skyframe;         /* Celestial coordinates Frame */
    char *ckeyval;                 /* Pointer to string item value */
+   char *comm0;                   /* First non-celestial CTYPE comment */
    char *lattype;                 /* Pointer to latitude CTYPE value */
    char *lontype;                 /* Pointer to longitude CTYPE value */
    char bj;                       /* Besselian/Julian selector */
    char buf[300];                 /* Text buffer */
    char id[2];                    /* ID string for returned Frame */
    char sym[10];                  /* Axis symbol */
-   double equinox;                /* EQUINOX value */
    double eqmjd;                  /* MJD equivalent of equinox */
+   double equinox;                /* EQUINOX value */
    double mjdobs;                 /* MJD-OBS value */
    int *perm;                     /* Permuted axis indices */
-   int axis;                      /* Axis index */
    int axis2;                     /* Another axis index */
+   int axis;                      /* Axis index */
    int inon;                      /* Index of next non-celestial axis */
    int naxis;                     /* No. of axes */
    int noncel;                    /* Number of non-celestial axes */
    int ok;                        /* No identical labels found yet? */
    int radesys;                   /* RADESYS value */
    int skperm[2];                 /* Axis permutation for SkyFrames */
+   int usecom;                    /* Use CTYPE comments as axis labels? */
 
 /* Initialise. */
    ret = NULL;
@@ -16834,14 +16847,36 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
 
       }
 
+/* Decide whether to use the CTYPE comments or CTYPE values as the axis
+   labels for non-celestial axes. We use the comments so long as ALL
+   non-celestial CTYPE keywords have non-blank comments, and all these
+   comments are different. Otherwise we use the CTYPE values. */
+      usecom = 1;
+      comm0 = NULL;
+      for( axis = 0; axis < naxis; axis++ ){
+         if( axis != axlon && axis != axlat ){
+            ckeyval = GetItemC( &(store->ctype_com), axis, s, NULL, method, class );
+            if( !ckeyval || strlen( ckeyval ) == 0 ) {
+               usecom = 0;
+               break;
+            } else {
+               if( !comm0 ) {
+                  comm0 = (char *) astStore( NULL, (void *) ckeyval, 
+                                             strlen( ckeyval ) + 1 );
+               } else if( !Ustrcmp( comm0, ckeyval ) )  {
+                  usecom = 0;
+                  break;
+               }
+            }
+         }
+      }
+      if( comm0 ) comm0 = (char *) astFree( (void *) comm0 );
+
 /* We now assign Unit, Label and Symbol attributes to all non-celestial axes. 
    The celestial axes retain the defaults established by the SkyFrame class. 
    Store copies of the FITS CTYPE keyword values as the axis symbols, and
    the FITS CUNIT keyword values as the axis units. Leave these Frame
-   attributes unset if the relevant keywords were not supplied. If the axis
-   values are relative rather than absolute, include the reference value
-   in the axis label. Any comment with the CTYPE keyword is used as the
-   axis label. */
+   attributes unset if the relevant keywords were not supplied. */
       for( axis = 0; axis < naxis; axis++ ){
 
 /* Leave celestial axes unchanged. */
@@ -16849,37 +16884,14 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             ckeyval = GetItemC( &(store->ctype), axis, s, NULL, method, class );
             if( ckeyval ) astSetSymbol( ret, axis, ckeyval );
 
-            ckeyval = GetItemC( &(store->ctype_com), axis, s, NULL, method, class );
+            if( usecom ) ckeyval = GetItemC( &(store->ctype_com), axis, s, 
+                                             NULL, method, class );
             if( ckeyval ) astSetLabel( ret, axis, ckeyval );
 
             ckeyval = GetItemC( &(store->cunit), axis, s, NULL, method, class );
             if( ckeyval ) astSetUnit( ret, axis, ckeyval );
          }            
 
-      }
-
-/* Now check that no two axis labels are identical. If so we clear all the
-   axis labels. */
-      ok = 1;
-      for( axis = 0; axis < naxis-1 && ok; axis++ ){
-         if( axis != axlon && axis != axlat ){
-            ckeyval = (char *) astGetLabel( ret, axis );
-            for( axis2 = axis+1; axis2 < naxis && ok; axis2++ ){
-               if( axis2 != axlon && axis2 != axlat ){
-                  if( !strcmp( astGetLabel( ret, axis2 ), ckeyval ) ) {
-                     ok = 0;
-                  }
-               }
-            }
-         }
-      }
-               
-      if( !ok ){
-         for( axis = 0; axis < naxis; axis++ ){
-            if( axis != axlon && axis != axlat ){
-               astClearLabel( ret, axis );
-            }
-         }
       }
 
 /* If there are no non-celestial axes, the returned Frame is just the
