@@ -1789,7 +1789,7 @@ static int DefaultMaxAxes( AstFrame *this ) {
 
 *  Synopsis:
 *     #include "frame.h"
-*     int DefaultMaxAxes( AstFrame *this ) {
+*     int DefaultMaxAxes( AstFrame *this )
 
 *  Class Membership:
 *     Frame member function.
@@ -1855,7 +1855,7 @@ static int DefaultMinAxes( AstFrame *this ) {
 
 *  Synopsis:
 *     #include "frame.h"
-*     int DefaultMinAxes( AstFrame *this ) {
+*     int DefaultMinAxes( AstFrame *this )
 
 *  Class Membership:
 *     Frame member function.
