@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASSHR( FIXAR, IPLOT, STATUS )
+      SUBROUTINE KPG1_ASSHR( FIXAR, F, IPLOT, STATUS )
 *+
 *  Name:
 *     KPG1_PLOT
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSHR( FIXAR, IPLOT, STATUS )
+*     CALL KPG1_ASSHR( FIXAR, F, IPLOT, STATUS )
 
 *  Description:
 *     This routine creates a new Plot covering the same window as the 
@@ -23,6 +23,13 @@
 *     FIXAR = LOGICAL (Given)
 *        Should the aspect ratio of the window be retained? If not, the 
 *        largest possible area is used for the new window.
+*     F = REAL (Given)
+*        An amount by which to extend the margins left for annotation,
+*        expressed as a factor of the height or width of the plotting 
+*        area. For instance, a value of 0.1 could be given to fit the 
+*        annotation "comfortably" into the Plot. A value of 0.0 will 
+*        result in the annotation being hard up against the edge of the 
+*        plot.
 *     IPLOT = INTEGER (Given and Returned)
 *        The Plot. The supplied Plot is annulled and a new one is
 *        returned in its place. The new Plot contains all the Frames of
@@ -54,6 +61,7 @@
 
 *  Arguments Given:
       LOGICAL FIXAR
+      REAL F
 
 *  Arguments Given and Returned:
       INTEGER IPLOT
@@ -267,6 +275,12 @@
       ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
          MRIGHT = MRIGHT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*VTHGT )
       END IF
+
+*  Extend all margins by the specified fraction of the viewport size.
+      MLEFT = MLEFT + F*ABS( X2 - X1 )
+      MRIGHT = MRIGHT + F*ABS( X2 - X1 )
+      MBOT = MBOT + F*ABS( Y2 - Y1 )
+      MTOP = MTOP + F*ABS( Y2 - Y1 )
 
 *  Find the bounds to use for the unclipped region. If no aspect ratio
 *  has been specified, use the whole of the available space, excluding

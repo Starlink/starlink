@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP, 
-     :                       LP, UP, WORK, STATUS )
+     :                       LP, UP, F, WORK, STATUS )
 *+
 *  Name:
 *     KPG1_LUTKY
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP, LP, UP, WORK, 
-*                      STATUS )
+*     CALL KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP, LP, UP, F,
+*                      WORK, STATUS )
 
 *  Description:
 *     The key consists of a ramp of colour covering the specified range
@@ -39,6 +39,13 @@
 *        The smallest colour index to include in the display.
 *     UP = INTEGER (Given)
 *        The largest colour index to include in the display.
+*     F = REAL (Given)
+*        An amount by which to extend the margins left for annotation,
+*        expressed as a factor of the height or width of the plotting 
+*        area. For instance, a value of 0.1 could be given to fit the 
+*        annotation "comfortably" into the Plot. A value of 0.0 will 
+*        result in the annotation being hard up against the edge of the 
+*        plot.
 *     WORK( LP : UP ) = REAL (Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -77,6 +84,7 @@
       CHARACTER APP*(*)
       INTEGER LP
       INTEGER UP
+      REAL F
 
 *  Arguments Returned:
       INTEGER WORK( LP : UP )
@@ -228,7 +236,7 @@
 
 *  Replace the Plot with a new Plot covering a smaller area so that there
 *  is room for the annotation within the current viewport.
-      CALL KPG1_ASSHR( .FALSE., IPLOT, STATUS )
+      CALL KPG1_ASSHR( .FALSE., F, IPLOT, STATUS )
 
 *  Re-establish the attributes of the new Plot so that it is like the old
 *  Plot.
