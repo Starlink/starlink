@@ -264,7 +264,7 @@
          char *estart;
          char *fmt = ( tclrtn == TCL_ERROR ) ? "Tcl error:\n%s" 
                                              : "Unexpected Tcl return:\n%s";
-         snprintf( buffer, BUFLENG - strlen( fmt ), fmt, retbuf );
+         sprintf( buffer, fmt, retbuf );
          *status = SAI__ERROR;
          for ( estart = buffer; ! done; estart = c + 1 ) {
             for ( c = estart; *c != '\n' && *c != '\0'; c++ );
