@@ -2,6 +2,34 @@
 # Top level bootstrap file.
 # This is not a standard starconf bootstrap file.
 
+buildsupportonly=false
+dryrun=false
+need_gnu_m4=false
+
+USAGE="Usage: $0 [--buildsupport-only | --dry-run | -n | --help]"
+
+while test $# -gt 0
+do
+    case $1 in
+    --buildsupport-only)
+        buildsupportonly=true
+        ;;
+    --dry-run|-n)
+        dryrun=true;
+        ;;
+    --help)
+        echo $USAGE
+        exit 0
+        ;;
+    *)
+        echo $USAGE >&2
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
 
@@ -33,15 +61,37 @@ if test "X$STARCONF_DEFAULT_PREFIX" = X; then
     done
 fi
 
+# Test whether system m4 (or at least the first m4 in the path) is GNU m4.
+# The autotools built below require features present only in GNU m4.
+if m4 --version >conftest.m4version 2>/dev/null; then
+    if grep -i 'gnu *m4' conftest.m4version >/dev/null 2>&1; then
+        # this is GNU m4
+        need_gnu_m4=false
+    else
+        # m4 accepts the --version option, but it seems not to be the GNU one
+        need_gnu_m4=true
+    fi
+else
+    # m4 doesn't accept the --version option, so it's not GNU m4
+    need_gnu_m4=true
+fi
+rm -f conftest.m4version
+
 # Makefile.dependencies uses BUILDSUPPORT_PREFIX to configure
 # the buildsupport tools
 BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_PREFIX/buildsupport
 
 # Let the user know what we've decided
 echo "Bootstrapping with"
-echo "    STARCONF_DEFAULT_STARLINK = $STARCONF_DEFAULT_STARLINK"
-echo "    STARCONF_DEFAULT_PREFIX   = $STARCONF_DEFAULT_PREFIX"
-echo "    BUILDSUPPORT_PREFIX       = $BUILDSUPPORT_PREFIX"
+echo "    STARCONF_DEFAULT_STARLINK  = $STARCONF_DEFAULT_STARLINK"
+echo "    STARCONF_DEFAULT_PREFIX    = $STARCONF_DEFAULT_PREFIX"
+echo "    BUILDSUPPORT_PREFIX        = $BUILDSUPPORT_PREFIX"
+echo "    Do we need to build GNU m4?  $need_gnu_m4"
+
+
+if $dryrun; then
+    exit 0
+fi
 
 
 # We invoke autoconf below, so must make sure it's on the path,
@@ -83,6 +133,14 @@ sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
     # The commands run within makefiles must use the correct buildsupport tools
     export PATH
 
+    if $need_gnu_m4; then
+        echo "Building GNU m4:"
+        echorun make -f $tempmakefile \
+            prefix=$BUILDSUPPORT_PREFIX \
+            MANIFEST=$STAR_MANIFEST_DIR \
+            $STAR_MANIFEST_DIR/m4
+    fi
+
     echo "Bootstrapping buildsupport:"
     echo "    make -f $tempmakefile \\"
     echo "        prefix=$BUILDSUPPORT_PREFIX \\"
@@ -96,6 +154,11 @@ sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 
 ) || { echo "Failed to make buildsupport"; exit 1; }
 rm -f $tempmakefile
+
+
+if $buildsupportonly; then
+    exit 0
+fi
 
 
 
