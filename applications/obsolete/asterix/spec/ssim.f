@@ -72,8 +72,6 @@
 	INCLUDE 'FIT_STRUC'
 *    Status :
 	INTEGER STATUS
-*    Function declarations :
-	INTEGER CHR_LEN
 *    Local variables :
 	RECORD/DATASET/ OBDAT		! Observed dataset (dummy structure)
 	RECORD/PREDICTION/ PREDDAT	! Data predicted by model
@@ -197,10 +195,8 @@
 *  Read timing info from input, adjust and write to output
       IF ( POISS ) THEN
         CALL TCI_GETID( IFID, TIMID, STATUS )
-	CALL ADI_PRINT( TIMID, STATUS )
         CALL ADI_CPUT0R( TIMID, 'ObsLength', TOBS, STATUS )
         CALL ADI_CPUT0R( TIMID, 'Exposure', TOBS, STATUS )
-	CALL ADI_PRINT( TIMID, STATUS )
         CALL TCI_PUTID( OFID, TIMID, STATUS )
       END IF
 
@@ -250,32 +246,32 @@
 
 *  Map background data and ...
       IF ( BG ) THEN
-	CALL BDI_CHKDATA( BGID,OK,NDIM,DIMS,STATUS)
+	CALL BDI_CHKDATA( BGID, OK, NDIM, DIMS, STATUS )
 	IF ( .NOT. OK ) THEN
 	  CALL MSG_PRNT( 'No background spectrum available' )
-	  BG=.FALSE.
+	  BG = .FALSE.
 	  GOTO 10
 	END IF
 	IF ( DIMS(1) .NE. NCHAN ) THEN
 	  CALL MSG_PRNT( 'Background spectrum has wrong number of'/
      :        /' channels - not used' )
-	  BG=.FALSE.
+	  BG = .FALSE.
 	  GOTO 10
 	END IF
-	CALL BDI_MAPDATA(BGID,'READ',BPTR,STATUS)
+	CALL BDI_MAPDATA( BGID, 'READ', BPTR, STATUS )
 
-* ...write b/g dataset name to output file (ASTERIX box)
-	CALL ADI_FTRACE(BGID,I,BGOBJ,FILE,STATUS)
+* ...write b/g dataset name to output file
+	CALL ADI_FTRACE( BGID, I, BGOBJ, FILE, STATUS )
         CALL AUI_PUT0C( OFID, 'ASTERIX.BGFILE', BGOBJ, STATUS )
-	IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+	IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH( STATUS )
 
       END IF
  10   CONTINUE
 
 *  If necessary pass to subroutine to add b/g and calculate variances
       IF ( POISS .OR. BG ) THEN
-	CALL SSIM_BGERR(NCHAN,POISS,TOBS,BG,%VAL(BPTR),%VAL(DPTR),
-     :    %VAL(VPTR))
+	CALL SSIM_BGERR( NCHAN, POISS, TOBS, BG, %VAL(BPTR), %VAL(DPTR),
+     :                   %VAL(VPTR), STATUS )
       END IF
 
 *  Report total count rate
@@ -288,16 +284,9 @@
       CALL ADI_CGET0C( DETID, 'Mission', TELES, STATUS )
       CALL ADI_CGET0C( DETID, 'Instrument', INSTRUM, STATUS )
       IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
-      NCH = CHR_LEN(TELES)
-      IF ( NCH .GT. 0 ) THEN
-	LEGEND(1)=TELES(1:NCH)//' : '
-	NCH = NCH + 3
-      END IF
-      IF(CHR_LEN(INSTRUM).GT.0)THEN
-	LEGEND(1)=LEGEND(1)(1:NCH)//INSTRUM(1:CHR_LEN(INSTRUM))//' : '
-	NCH=NCH+CHR_LEN(INSTRUM)+3
-      END IF
-      LEGEND(1)=LEGEND(1)(1:NCH)//'Simulated data'
+      CALL MSG_SETC( 'TEL', TELES )
+      CALL MSG_SETC( 'INS', INSTRUM )
+      CALL MSG_MAKE( '^TEL / ^INS : Simulated data', LEGEND(1), NCH )
       IF ( POISS ) THEN
         CALL MSG_SETR( 'TOBS', TOBS )
         CALL MSG_MAKE( 'Observation length : ^TOBS sec', LEGEND(2),
@@ -311,11 +300,11 @@
 *  Attach GCB and write attributes
       CALL GCB_LCONNECT( STATUS )
       DO I = 1, 3
-        CALL GCB_SET1C('TITLE_TEXT',I,1,LEGEND(I),STATUS)
+        CALL GCB_SET1C( 'TITLE_TEXT', I, 1, LEGEND(I), STATUS )
       END DO
-      CALL GCB_SETI('TITLE_N',3,STATUS)
+      CALL GCB_SETI( 'TITLE_N', 3, STATUS )
       CALL GCB_FSAVE( OFID, STATUS )
-      CALL GCB_DETACH(STATUS)
+      CALL GCB_DETACH( STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *  History

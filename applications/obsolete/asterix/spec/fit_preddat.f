@@ -48,6 +48,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
@@ -96,10 +97,18 @@
      :                  %VAL(PREDDAT(N).MUBNDPTR),%VAL(MODEL.STACKPTR),
      :                  %VAL(PREDDAT(N).MPTR),STATUS)
 
-*      Fold through instrument response
-	CALL FIT_FOLD(PREDDAT(N).NMDAT,OBDAT(N).NDAT,INSTR(N).NRESP,
+*      Fold through instrument response. Test for new style response
+        IF ( INSTR(N).R_ID .NE. ADI__NULLID ) THEN
+          CALL ERI_FOLD( PREDDAT(N).NMDAT, %VAL(PREDDAT(N).MPTR),
+     :                   OBDAT(N).NDAT, INSTR(N).R_ID, INSTR(N).A_ID,
+     :                   PRED, STATUS )
+
+        ELSE
+	  CALL FIT_FOLD(PREDDAT(N).NMDAT,OBDAT(N).NDAT,INSTR(N).NRESP,
      :    %VAL(PREDDAT(N).MPTR),%VAL(INSTR(N).MIPTR),
      :    %VAL(INSTR(N).DIPTR),%VAL(INSTR(N).RESPTR),PRED,STATUS)
+
+        END IF
 
       ELSE
 
