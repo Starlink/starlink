@@ -28,6 +28,7 @@
 #define NULL 0
 #include <iostream>
 #include <assert.h>
+#include <string>
 
 #include <config.h>
 
