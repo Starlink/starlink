@@ -2350,12 +2350,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       REAL                    TOR               ! Conversion to radians
 
-      INTEGER                 APTR              ! Ptr to axis data
       INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NVAL,NDIM              ! Dimensionality
       INTEGER			TFID			! Tabular dataset
-      INTEGER                 WPTR              ! Ptr to axis width data
 
       LOGICAL                 OK                ! General validity check
       LOGICAL                 VALID             ! Have we a valid dataset?
@@ -3009,7 +3007,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                STATUS )
 
 *  Get radial limit so we can use BDI to access the axis structures
-      CALL CMP_GET0I( SLOC, 'RADIAL', RLIM, STATUS )
+      CALL CMP_GET0I( SLOC, 'RLIMIT', RLIM, STATUS )
       DX = RF_DIMS(1,SLOT)
       DY = RF_DIMS(2,SLOT)
       RF_DIMS(1,SLOT) = RLIM*2 + 1
