@@ -37,7 +37,9 @@ verbosities DviFile::verbosity_ = normal;
 // I made the problem go away by (a) having the InputByteStreamError
 // handler rethrow a static string, and (b), altering the eof()
 // function to check if dvif_ was non-zero before testing it (which is
-// good anyway).  But this isn't really a fix.
+// good anyway).  But this isn't really a fix.  I suspect this might
+// be a GCC error, but I can't pin it down accurately enough to
+// identify a specific fault.
 
 DviFile::DviFile (string& s, int res, double magmag)
     : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0),
@@ -143,7 +145,7 @@ DviFileEvent *DviFile::getEvent()
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
-		gotEvent = new DviFileSetChar (opcode, this);
+		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 129:		// set2
 		charno = getSIU(2);
@@ -152,7 +154,7 @@ DviFileEvent *DviFile::getEvent()
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
-		gotEvent = new DviFileSetChar (opcode, this);
+		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 130:		// set3
 		charno = getSIU(3);
@@ -161,7 +163,7 @@ DviFileEvent *DviFile::getEvent()
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
-		gotEvent = new DviFileSetChar (opcode, this);
+		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 131:		// set4
 		charno = getSIS(4);
@@ -170,7 +172,7 @@ DviFileEvent *DviFile::getEvent()
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
-		gotEvent = new DviFileSetChar (opcode, this);
+		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 132:		// set_rule
 		{
