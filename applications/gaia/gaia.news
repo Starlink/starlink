@@ -76,3 +76,11 @@
   2.5-3, SKYCAT_CONFIG from CURSA now ignored. Stops lock up when 
          behind web proxy.
 
+
+  2.5-3, UKSTU plate library removed from the default catalogue list.
+         (waiting for SSS configuration changes)
+
+
+  2.6-0  Facilities for selected the secndary coordinate system are now 
+         available. The "pixel" system from the celestial coordinate system
+         toolbox is now removed.
