@@ -14,16 +14,15 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Local Constants :
-      DOUBLE PRECISION PI,DTOR,RTOD,DTOM,DTOS
-      PARAMETER (PI=3.141592653589979D0,DTOR=PI/180.0D0,RTOD=180.0D0/PI,
-     :               DTOM=60.0D0,DTOS=3600.0D0)
+      DOUBLE PRECISION DTOM,DTOS
+      PARAMETER (DTOM=60.0D0,DTOS=3600.0D0)
 *    Local variables :
       CHARACTER*1 CH
       CHARACTER*15 SRA,SDEC
@@ -137,19 +136,18 @@
 
         ENDIF
 
-
       ENDIF
 
       IF (STATUS.EQ.SAI__OK) THEN
 *  convert to radian
-        AZ1=AZ1*DTOR
-        EL1=EL1*DTOR
-        AZ2=AZ2*DTOR
-        EL2=EL2*DTOR
+        AZ1=AZ1*MATH__DDTOR
+        EL1=EL1*MATH__DDTOR
+        AZ2=AZ2*MATH__DDTOR
+        EL2=EL2*MATH__DDTOR
 
 *  get separation
         SEPR=SLA_DSEP(AZ1,EL1,AZ2,EL2)
-        SEPD=SEPR*RTOD
+        SEPD=SEPR*MATH__DRTOD
         SEPM=SEPD*DTOM
         SEPS=SEPD*DTOS
 
@@ -175,5 +173,3 @@
       CALL USI_CLOSE()
 
       END
-
-

@@ -13,7 +13,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
 *    Import-Export :
@@ -88,7 +87,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
 *    Import-Export :
@@ -172,7 +170,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIO_ERR'
 *    Import :
@@ -184,7 +181,6 @@
       INTEGER CHR_LEN
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) SLOC
       CHARACTER*132 TEXT
       CHARACTER*80 REC
       CHARACTER*20 RAS,DECS
@@ -194,7 +190,7 @@
       INTEGER IFD
       INTEGER RAPTR,DECPTR
       INTEGER ISRC,NSRC
-      INTEGER L
+      INTEGER L,SFID
       LOGICAL EXIST
       LOGICAL POK
       LOGICAL RADEC
@@ -308,20 +304,21 @@
 
 *  otherwise assume HDS file in PSS format
             ELSE
-              CALL HDS_OPEN( TEXT,'READ',SLOC,STATUS )
+
+              CALL ADI_FOPEN( TEXT, '*', 'READ', SFID, STATUS )
               IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
                 CALL SSO_INIT( STATUS )
-                CALL SSO_VALID( SLOC, POK, STATUS )
-                CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+                CALL SSI_VALID( SFID, POK, STATUS )
+                CALL SSI_GETNSRC( SFID, NSRC, STATUS )
                 IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
                   CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
                 ELSE
 *  get RA DEC of sources
-                  CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ',
+                  CALL SSI_MAPFLD( SFID, 'RA', '_DOUBLE', 'READ',
      :                                            RAPTR, STATUS )
-                  CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ',
+                  CALL SSI_MAPFLD( SFID, 'DEC', '_DOUBLE', 'READ',
      :                                           DECPTR, STATUS )
                   DO ISRC=1,NSRC
 *  get each position
@@ -347,8 +344,8 @@
 
                 ENDIF
 
-                CALL SSO_RELEASE(SLOC,STATUS)
-                CALL HDS_CLOSE(SLOC,STATUS)
+                CALL SSI_RELEASE(SFID,STATUS)
+                CALL ADI_FCLOSE(SFID,STATUS)
 
               ENDIF
 
@@ -375,7 +372,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
 *    Import-Export :
@@ -420,8 +416,6 @@
 
 
 
-
-
 *+  IPOSIT_SHOW - list positions
       SUBROUTINE IPOSIT_SHOW(STATUS)
 *    Description :
@@ -432,8 +426,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -475,8 +467,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       CHARACTER*(*) TEXT
 *    Import-Export :
