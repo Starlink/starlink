@@ -5292,7 +5292,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CHARACTER*20            MASK              ! Mask name
 
       INTEGER                 CDIMS(3)          ! XRT pf cube dimensions
-      INTEGER                 SLOT              !
 
       LOGICAL                 OK, UNIF          !
 *-
