@@ -180,6 +180,11 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        - Avoid using astStore to allocate more storage than is supplied
 *        in the "data" pointer. This can cause access violations since 
 *        astStore will then read beyond the end of the "data" area.
+*     17-FEB-2005 (DSB):
+*        - Change use of ActiveUnit flag so that both target and template
+*        Frames must have active units in order for the Mapping to take 
+*        account of differences in units. Previously, the test was based 
+*        on the template Frame alone.
 *class--
 */
 
@@ -7435,32 +7440,33 @@ f     CALL AST_SETACTIVEUNIT( THIS, VALUE, STATUS )
 c     This function
 f     This routine
 *     sets the current value of the ActiveUnit flag for a Frame, which
-*     controls how the Frame
-c     behaves when it is used (by astFindFrame) as a template to match
-c     another (target) Frame, or is used as the "to" Frame by astConvert.
-f     behaves when it is used (by AST_FINDFRAME) as a template to match
-f     another (target) Frame, or is used as the TO Frame by AST_CONVERT.
-*     It determines if the Mapping between the template and target Frames
-*     should take differences in axis units into account. The default value
-*     for simple Frames is zero, which preserves the behaviour of versions
-*     of AST prior to version 2.0.
+*     controls how the Frame behaves when it is used (by 
+c     astFindFrame or astConvert) 
+f     AST_FINDFRAME or AST_CONVERT) 
+*     to match another Frame. If the ActiveUnit flag is set in both
+*     template and target Frames then the returned Mapping takes into account 
+*     any differences in axis units. The default value for simple Frames is 
+*     zero, which preserves the behaviour of versions of AST prior to 
+*     version 2.0.
 *
-c     If the ActiveUnit flag of the template Frame is zero, then the
-f     If the ActiveUnit flag of the template Frame is .FALSE., then the
-*     Mapping will ignore any difference in the Unit attributes of
+*     If the ActiveUnit flag of either Frame is 
+c     zero,
+f     .FALSE.,
+*     then the Mapping will ignore any difference in the Unit attributes of
 *     corresponding template and target axes. In this mode, the Unit
 *     attributes are purely descriptive commentary for the benefit of
 *     human readers and do not influence the Mappings between Frames.
 *     This is the behaviour which all Frames had in older version of AST,
 *     prior to the introduction of this attribute.
 *
-c     If the ActiveUnit flag of the template Frame is non-zero, then the
-f     If the ActiveUnit flag of the template Frame is .TRUE., then the
-*     Mapping from template to target will take account of any difference
-*     in the axis Unit attributes, where-ever possible. For instance, if
-*     corresponding target and template axes have Unit strings of "km" and
-*     "m", then the FrameSet class will use a ZoomMap to connect them
-*     which introduces a scaling of 1000. If no Mapping can be found
+*     If the ActiveUnit flag of both Frames is 
+c     non-zero,
+f     .TRUE.,
+*     then the Mapping from template to target will take account of any 
+*     difference in the axis Unit attributes, where-ever possible. For 
+*     instance, if corresponding target and template axes have Unit strings of 
+*     "km" and "m", then the FrameSet class will use a ZoomMap to connect 
+*     them which introduces a scaling of 1000. If no Mapping can be found
 *     between the corresponding units string, then an error is reported.
 *     In this mode, it is assumed that values of the Unit attribute conform
 *     to the syntax for units strings described in the FITS WCS Paper I
@@ -7472,6 +7478,10 @@ f     If the ActiveUnit flag of the template Frame is .TRUE., then the
 *     will then not be possible (except to units which depend only on the
 *     same unknown units - thus "flops" can be transformed to "Mflops"
 *     even though "flops" is not a standard FITS unit symbol).
+*
+*     Some common variations of unit names are allowed, such as adding an
+*     "s" to the end of Angstrom, using a lower case "a" at the start of
+*     "angstrom", "micron" instead of "um", etc.
 *
 c     If the ActiveUnit flag is non-zero, setting a new Unit value for an
 f     If the ActiveUnit flag is .TRUE., setting a new Unit value for an
@@ -7499,6 +7509,11 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Applicability:
+*     SkyFrame
+c        The ActiveUnit flag for a SkyFrame is always 0 (any value
+c        supplied using this function is ignored).
+f        The ActiveUnit flag for a SkyFrame is always .FALSE. (any value
+f        supplied using this routine is ignored).
 *     SpecFrame
 c        The ActiveUnit flag for a SpecFrame is always 1 (any value
 c        supplied using this function is ignored).
@@ -7518,6 +7533,8 @@ f        component Frames are using active units, and .FALSE. otherwise. When
 *        is propagated to the component Frames. This change will be
 *        reflected through all references to the component Frames, not
 *        just those encapsulated within the CmpFrame.
+*     Region:
+*        Regions always use active units if possible.
 
 *  Notes:
 *     - The ActiveUnit flag resembles a Frame attribute, except that it
@@ -8347,10 +8364,11 @@ static int SubFrame( AstFrame *target, AstFrame *template,
 /* Note that coordinate conversion is possible. */
          match = 1;
 
-/* If the ActiveUnit flag in the template Frame is non-zero, we now
-   modify the Mapping to take account of any differences in the Units
+/* If the ActiveUnit flag in both template and result Frame is non-zero, we 
+   now modify the Mapping to take account of any differences in the Units
    attributes of the target and results Frames. */
-         if( template && astGetActiveUnit( template ) ) {
+         if( template && astGetActiveUnit( template ) &&
+                         astGetActiveUnit( result ) ) {
 
 /* Loop round the axes of the results Frame, accumulating a parallel CmpMap
    ("umap") in which each Mapping is the 1-D Mapping which transforms the
