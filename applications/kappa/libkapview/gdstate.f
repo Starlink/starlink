@@ -554,6 +554,8 @@
            CALL MSG_OUT( 'GDSTATE_MSG10', '   ^L', STATUS )
          END DO
 
+         CALL MSG_BLANK( STATUS )
+
       END IF
 
 *  Tidy up.
