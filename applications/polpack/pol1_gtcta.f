@@ -1,5 +1,4 @@
-      SUBROUTINE POL1_GTCTA( PARAM, EPARAM, CI, NDIM, GI, CONST,
-     :                       IWCS, STATUS )
+      SUBROUTINE POL1_GTCTA( CI, NDIM, GI, IWCS, STATUS )
 *+
 *  Name:
 *     POL1_GTCTA
@@ -11,29 +10,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_GTCTA( PARAM, EPARAM, CI, NDIM, GI, IWCS, STATUS )
+*     CALL POL1_GTCTA( CI, NDIM, GI, IWCS, STATUS )
 
 *  Description:
 *     This routine attempts to read an AST FrameSet from the textual 
 *     information stored with the supplied catalogue (class COMMENT). To
 *     be usable the Base Frame of the FrameSet must contain axes with
-*     symbols equal to the names of the supplied catalogue columns (GI).
-*     If not succesful, a default FrameSet is created containing a single 
-*     Frame. If the catalogue columns are known to be RA/DEC values then 
-*     a SkyFrame is used. Otherwise a simple Frame (with no Domain) is used. 
-*     If the Base Frame obtained in this way (default or not) has no Domain, 
-*     it is given a Domain equal to "<COLX>-<COLY>..." where <COLX>, <COLY>, 
-*     ... are the names of the catalogue columns supplied in GI. Finally, 
-*     the user is allowed to change the Current Frame in the returned 
-*     FrameSet using the parameter specified by PARAM/EPARAM.
+*     symbols equal to the names of the supplied catalogue columns (GI)
+*     (and no other axes). If not succesful, a default FrameSet is created 
+*     containing a single Frame. The attribute sof th eaxes of this Frame
+*     are taken from the supplied columns. If these columns include an
+*     RA/DEC pair, then the retruned Frame will either be a SkyFrame, or a
+*     CmpFrame including a Skyframe.
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter to use when setting the Current Frame
-*        in the returned FrameSet. 
-*     EPARAM = CHARACTER * ( * ) (Given)
-*        The name of the epoch parameter to use when setting the Current Frame
-*        in the returned FrameSet. 
 *     CI = INTEGER (Given)
 *        A CAT identifier (see SUN/181) for the supplied catalogue.
 *     NDIM = INTEGER (Given)
@@ -68,6 +58,8 @@
 *        Added TOKEN argument to KPG1_ASFRM calls.
 *     2-FEB-2001 (DSB):
 *        Changed to allow Base Frame to be 3D.
+*     14-FEB-2001 (DSB:
+*        Remove arguments PARAM, EPARAM and CONST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,12 +77,9 @@
       INCLUDE 'NDF_PAR'          ! NDF constants 
 
 *  Arguments Given:
-      CHARACTER PARAM*(*)
-      CHARACTER EPARAM*(*)
       INTEGER CI
       INTEGER NDIM
       INTEGER GI( NDIM )
-      DOUBLE PRECISION CONST( NDIM )
 
 *  Arguments Returned:
       INTEGER IWCS
@@ -104,12 +93,10 @@
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER CVAL*255         ! Textual attribute value
-      CHARACTER DOM*255          ! Domain for Base Frame
       CHARACTER NAME( NDF__MXDIM )*(CAT__SZCMP)! Axis name
       CHARACTER SYM*20           ! Symbol attribute value
       CHARACTER SYS*3            ! Ref. frame for RA/DEC values
       CHARACTER TEXT*30          ! Attribute value
-      DOUBLE PRECISION CON( NDF__MXDIM )! Good constants
       DOUBLE PRECISION EP        ! Epoch of RA/DEC values
       DOUBLE PRECISION EQ        ! Equinox of RA/DEC values
       INTEGER AXES( NDF__MXDIM ) ! Indices of axes to use
@@ -121,19 +108,10 @@
       INTEGER GC                 ! CAT identifier for a catalogue parameter
       INTEGER I                  ! Axis index
       INTEGER IAT                ! No. of characters in string
-      INTEGER IBASE              ! Original Base Frame index
       INTEGER ICURR              ! Original Current Frame index
-      INTEGER INEW               ! Index of new Frame
-      INTEGER INPRM( NDF__MXDIM )! Input axis permutation
       INTEGER J                  ! Axis index
-      INTEGER MAP                ! Pointer to a Mapping
-      INTEGER NCON               ! Number fo good constants supplied
-      INTEGER NFRM               ! Pointer to a Frame
-      INTEGER NREQ               ! Number of required axes
       INTEGER NUSED              ! Number or axes allocated so far
-      INTEGER OUTPRM( NDF__MXDIM )! Output axis permutation
       INTEGER PERM( NDF__MXDIM ) ! Axis permutation array
-      INTEGER PMAP               ! Pointer to PermMap
       INTEGER RAAX               ! Index of catalogue RA axis
       LOGICAL DONE               ! Have we read enough AST Objects?
 *.
@@ -418,73 +396,6 @@
 *  array.
       BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
       CALL AST_PERMAXES( BFRM, AXES, STATUS ) 
-
-*  Set up the information required to create a PermMap which goes from
-*  the NDIM-dimensional Base Frame found above, to a Frame containing only the
-*  required axes.
-      NREQ = 0
-      NCON = 0
-      DO J = 1, NDIM
-         IF( CONST( J ) .EQ. AST__BAD ) THEN
-            NREQ = NREQ + 1
-            OUTPRM( NREQ ) = J
-            INPRM( J ) = NREQ
-         ELSE
-            NCON = NCON + 1
-            INPRM( J ) = -NCON
-            CON( NCON ) = CONST( J )
-         END IF
-      END DO
-
-*  If it would not be a unit mapping, create the PermMap.
-      IF( NCON .GT. 0 ) THEN
-         PMAP = AST_PERMMAP( NDIM, INPRM, NREQ, OUTPRM, CON, ' ', 
-     :                       STATUS )
-
-*  Create a new Base Frame by picking the required axes from the 
-*  original Base Frame.
-         NFRM = AST_PICKAXES( BFRM, NREQ, OUTPRM, MAP, STATUS ) 
-
-*  Add this new Frame into the FrameSet, remembering the index of the
-*  Current and Base Frames.
-         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
-         IBASE = AST_GETI( IWCS, 'BASE', STATUS )
-         CALL AST_ADDFRAME( IWCS, AST__BASE, PMAP, NFRM, STATUS ) 
-
-*  Get the index of the newly added Frame.
-         INEW = AST_GETI( IWCS, 'CURRENT', STATUS )
-
-*  Re-instate the original Current Frame.
-         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
-
-*  Make the new Frame the Base Frame.
-         CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )
-
-*  Set the domain of the original Base Frame to POLNDBASE.
-         CALL AST_SETC( BFRM, 'DOMAIN', 'POLNDBASE', STATUS )
-
-      END IF
-
-*  If the Base Frame has no Domain value, give it a default Domain based
-*  on the names of the catalogue columns.
-      BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-      IF( .NOT. AST_TEST( BFRM, 'DOMAIN', STATUS ) ) THEN 
-         DOM = ' '
-         IAT = 0
-
-         DO J = 1, NDIM
-            IF( CONST( J ) .EQ. AST__BAD ) THEN
-               IF( IAT .GT. 0 ) CALL CHR_APPND( '-', DOM, IAT )
-               CALL CHR_APPND( NAME( J ), DOM, IAT )
-            END IF
-         END DO
-
-         CALL AST_SETC( BFRM, 'DOMAIN', DOM( : IAT ), STATUS )
-      END IF
-
-*  Give the user the chance to change the Current Frame. 
-      CALL KPG1_ASFRM( PARAM, EPARAM, IWCS, 'PIXEL', 'AXIS', .TRUE.,
-     :                 'catalogue', STATUS )
 
 *  If an error has occurred, annul the returned FrameSet pointer. Otherwise
 *  export the pointer (if it is not null) from the current AST context.

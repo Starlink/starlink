@@ -429,6 +429,7 @@
       DOUBLE PRECISION DY        ! Extension of Y axis
       DOUBLE PRECISION LBND      ! Lower axis bound
       DOUBLE PRECISION UBND      ! Upper axis bound
+      DOUBLE PRECISION Z         ! Value of Z parameter
       INTEGER CI                 ! CAT catalogue identifier
       INTEGER FRM                ! Frame pointer
       INTEGER GI                 ! CAT column identifier
@@ -454,6 +455,7 @@
       INTEGER IPZ                ! Pointer to array holding vector Z positions
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
       INTEGER MAP                ! Mapping pointer
+      INTEGER MAPS( 3 )          ! Individual axis mappings
       INTEGER MAXPOS             ! Position of maximum value
       INTEGER MINPOS             ! Position of minimum value
       INTEGER NBAD               ! No. of bad values
@@ -467,8 +469,8 @@
       INTEGER NIN                ! No. of positions in user-specified bounds
       INTEGER NKP                ! No. of values supplied for parameter KEYPOS
       INTEGER NMARG              ! No. of margin values given
+      INTEGER NVAL               ! No. of values obtained
       INTEGER NVEC               ! No. of vectors in catalogue
-      INTEGER VCI                ! Vector colour index
       LOGICAL ALIGN              ! Was DATA pic aligned with an old DATA pic?
       LOGICAL AXES               ! Annotated axes to be drawn?
       LOGICAL GOTZ               ! Was a Z column supplied?
@@ -477,6 +479,7 @@
       LOGICAL NEGATE             ! Negate supplied angles?
       LOGICAL V2PLUS             ! Catalogue created by POLPACK V2 or later?
       LOGICAL VERB               ! Verose errors required?
+      LOGICAL ZCURR              ! Was the Z value given in the current Frame?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
       REAL AHSIZM                ! Arrowhead size in metres
       REAL ANGFAC                ! Supplied angles to radians conversion factor
@@ -503,7 +506,7 @@
       REAL Y1                    ! Lower y w.c. bound of picture
       REAL Y2                    ! Upper y w.c. bound of picture
       REAL YM                    ! DATA zone y size in metres
-      REAL Z                     ! Z value to display
+      REAL ZUSE                  ! Z column value to display
 
 *.
 
@@ -560,9 +563,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an identifier for the Z column. If a null (!) value is
-*  given, annul the error and indicate no Z column is to be used. Also
-*  get the Z value to be used (only vectors with the specified Z value
-*  are plotted).
+*  given, annul the error and indicate no Z column is to be used.
       CONST( 1 ) = AST__BAD
       CONST( 2 ) = AST__BAD
       CALL POL1_GTCTC( 'COLZ', CI, CAT__FITYP, ' ', GIS( 3 ), STATUS )
@@ -570,47 +571,12 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GOTZ = .FALSE.
-         Z = VAL__BADR
          NDIM = 2
       ELSE
          GOTZ = .TRUE.
-         CALL PAR_GET0R( 'Z', Z, STATUS )
          NDIM = 3
-         CONST( 3 ) = DBLE( Z )
       END IF
 
-*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
-*  this FrameSet will be spanned by axes corresponding to the X and Y 
-*  catalogue columns. The Current Frame is set by the user, using
-*  parameters FRAME and EPOCH.
-      CALL POL1_GTCTA( 'FRAME', 'EPOCH', CI, NDIM, GIS, CONST, IWCS, 
-     :                 STATUS )
-
-*  Obtain the units of the magnitude column.
-      UNITS1 = ' '
-      CALL POL1_TIQAC( GIMAG, 'UNITS', UNITS1, STATUS )
-
-*  Obtain the units of the orientation column.
-      UNITS2 = ' '
-      CALL POL1_TIQAC( GIANG, 'UNITS', UNITS2, STATUS )
-
-*  Set up a factor which converts values stored in the orientation column
-*  into units of radians.  If the UNITS attribute does not have the value 
-*  "RADIANS" (case insensitive), then assume the data values are in degrees.
-      IF ( UNITS2 .NE. ' ' ) THEN
-         CALL CHR_RMBLK( UNITS2 )
-         CALL CHR_UCASE( UNITS2 )
-         IF ( UNITS2 .EQ. 'RADIANS' ) THEN
-            ANGFAC = 1.0
-         ELSE
-            ANGFAC = DTOR
-         END IF
-      ELSE
-         ANGFAC = DTOR
-      END IF
-
-*  Store the values of all 4/5 catalogue columns in 4/5 arrays.
-*  ============================================================
 *  Find the number of rows in the catalogue. This is the number of
 *  vectors to be plotted.
       CALL CAT_TROWS( CI, NVEC, STATUS )
@@ -673,6 +639,97 @@
          CALL MSG_SETC( 'NAME', NAME )
          CALL ERR_REP( 'POLPLOT_1', 'The ^COL column '//
      :                 '(^NAME) contains no data.', STATUS )
+      END IF
+
+*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
+*  this FrameSet will be spanned by axes corresponding to the columns
+*  in GIS. 
+      CALL POL1_GTCTA( CI, NDIM, GIS, IWCS, STATUS )
+
+*  If required, get the Z column value to use. Only vectors with this
+*  value of Z are displayed.
+      IF( GOTZ ) THEN
+
+*  Get the required Z value in the current Frame.
+         CALL KPG1_GTAXV( 'Z', 1, .TRUE., IWCS, 3, Z, NVAL, STATUS )
+
+*  First split the Base Frame to Current Frame Mapping up into 3 separate
+*  1D Mappings.
+         CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
+
+*  Use the third Mapping to transform the current Frame Z value into a
+*  base Frame Z value.
+         CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
+
+*  If the result was undefined, we need to get the Z value again, this
+*  time in the base Frame.
+         IF( Z .EQ. AST__BAD ) THEN
+            ZCURR = .FALSE.
+            CALL PAR_GET0C( 'Z', ZTEXT, STATUS )
+            CALL CAT_TIQAC( GIS( 3 ), 'NAME', NAME, STATUS )
+
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_SETC( 'NAME', NAME )
+            CALL MSG_SETC( 'Z', ZTEXT )
+            CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied value for '//
+     :                    'the Z parameter (^Z) could not be '//
+     :                    'converted into a value for the ^NAME '//
+     :                    'column in the catalogue. Please supply '//
+     :                    'a new value for the Z parameter in the '//
+     :                    'same coordinate system as the values in '//
+     :                    'the ^NAME column:', STATUS )
+
+            CALL PAR_CANCL( 'Z', STATUS )
+            CALL PAR_GET0D( 'Z', Z, STATUS )
+         ELSE
+            ZCURR = .TRUE.
+         END IF
+
+*  Find the closest available value to the requested Z value.
+         CALL POL1_FCLOS( NVEC, %VAL( IPZ ), REAL( Z ), ZUSE, STATUS )
+
+*  If the Z value was given in the current Frame, transform this value back into 
+*  the current Frame, and format it.
+         IF( ZCURR ) THEN 
+            CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
+     :                      STATUS )
+            ZTEXT = AST_FORMAT( IWCS, 3, Z, STATUS )
+         ELSE
+            CALL CHR_RTOC( ZUSE, ZTEXT, STATUS )
+         END IF
+
+*  Modify the WCS FrameSet so that the Base Frame has only two axes (the
+*  original Base Frame may have 3 when dealing with spectropolarimtry data).
+         CONST( 3 ) = DBLE( ZUSE )
+         CALL POL1_PKAXS( NDIM, GIS, CONST, IWCS, STATUS )
+
+      END IF
+
+*  Give the user the chance to change the Current Frame. 
+      CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', .TRUE.,
+     :                 'catalogue', STATUS )
+
+*  Obtain the units of the magnitude column.
+      UNITS1 = ' '
+      CALL POL1_TIQAC( GIMAG, 'UNITS', UNITS1, STATUS )
+
+*  Obtain the units of the orientation column.
+      UNITS2 = ' '
+      CALL POL1_TIQAC( GIANG, 'UNITS', UNITS2, STATUS )
+
+*  Set up a factor which converts values stored in the orientation column
+*  into units of radians.  If the UNITS attribute does not have the value 
+*  "RADIANS" (case insensitive), then assume the data values are in degrees.
+      IF ( UNITS2 .NE. ' ' ) THEN
+         CALL CHR_RMBLK( UNITS2 )
+         CALL CHR_UCASE( UNITS2 )
+         IF ( UNITS2 .EQ. 'RADIANS' ) THEN
+            ANGFAC = 1.0
+         ELSE
+            ANGFAC = DTOR
+         END IF
+      ELSE
+         ANGFAC = DTOR
       END IF
 
 *  Remove data outside user-specified bounds.
@@ -907,9 +964,7 @@
 
 *  Get a string describing any Z plane selection.
       IF( GOTZ ) THEN
-         ZTEXT = ' Z = '
-         IAT = 5
-         CALL CHR_PUTR( Z, ZTEXT, IAT )
+         CALL CHR_PREFX( ' Z = ', ZTEXT, IAT ) 
       ELSE
          ZTEXT = ' '
       END IF
