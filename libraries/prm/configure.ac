@@ -24,7 +24,7 @@ AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
 dnl STAR_HAVE_F77_OPEN_READONLY
-dnl STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CHECK_HEADERS([fenv.h limits.h float.h stdint.h time.h])
 AC_CHECK_FUNCS([nextafter nextafterf])
