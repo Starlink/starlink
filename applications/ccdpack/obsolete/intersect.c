@@ -1,4 +1,121 @@
+/*
+*+
+*  Name:
+*     intersect
 
+*  Type of Module:
+*     C extension to Tcl.
+
+*  Language:
+*     ANSI C.
+
+*  Purpose:
+*     Calculates the vertices of the overlap of two convex polygons.
+
+*  Usage:
+*     intersect points1 points2
+
+*  Description:
+*     This command calculates the vertices of the polygon which forms
+*     the intersection between two given convex polygons.
+
+*  Arguments:
+*     points1 = list of pairs
+*        Vertices of the first polygon.  May or may not be closed.
+*        Vertices must be in clockwise order.
+*     points2 = list of pairs
+*        Vertices of the second polygon.  May or may not be closed.
+*        Vertices must be in clockwise order.
+
+*  Return Value:
+*     A list of points giving the vertices of the intersect polygon.
+*     It will be closed.
+
+*  Authors:
+*     OROURKE: J. O'Rourke
+*     MBT: Mark Taylor (Starlink)
+
+*  History:
+*     1-JAN-1994 (OROURKE):
+*        Original version published in "Computational Geometry in C",
+*        Cambridge University Press, 1994, J. O'Rourke.
+*     25-OCT-2000 (MBT):
+*        Adapted for use with Tcl.
+
+*-
+*/
+
+#include        <stdio.h>
+#include        <math.h>
+#define X       0
+#define Y       1
+#define DIM     2               /* Dimension of points */
+typedef double  tPointi[DIM];   /* type integer point */
+typedef double  tPointd[DIM];   /* type double point */
+#define PMAX    100             /* Max # of pts in polygon */
+
+#include <tcl.h>
+
+
+   int IntersectCmd( ClientData clientData, Tcl_Interp *interp, int objc,
+                     Tcl_Obj *CONST objv[] ) {
+
+/* Local Variables. */
+      tPolygoni poly[ 2 ];
+      int i;
+      int j;
+      int nvertex[ 2 ];
+
+/* Check syntax. */
+      if ( objc != 3 ) {
+         Tcl_WrongNumArgs( interp, 1, objv, "points1 points2" );
+         return TCL_ERROR;
+      }
+
+/* Get arguments. */
+      for ( i = 0; i < 2; i++ ) {
+         Tcl_Obj **ov;
+         if ( Tcl_ListObjGetElements( interp, objv[ 1 + i ], &nvertex[ i ], 
+                                      &ov ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+         if ( nvertex[ i ] < 3 || nvertex[ i ] > PMAX ) {
+            Tcl_SetObjResult( interp,
+               Tcl_NewStringObj( "Invalid number of points in polygon", -1 ) );
+            return TCL_ERROR;
+         }
+         for ( j = 0; j < nvertex[ i ]; j++ ) {
+            Tcl_Obj **pov;
+            int poc;
+            if ( Tcl_ListObjGetElements( interp, ov[ j ], &poc, &pov ) 
+                 != TCL_OK ) {
+               return TCL_ERROR;
+            }
+            if ( poc != 2 ) {
+               Tcl_SetObjResult( interp,
+                  Tcl_NewStringObj( "Each point must be a double", -1 ) );
+               return TCL_ERROR;
+            }
+            if ( Tcl_GetDoubleFromObj( interp, pov[ 0 ], &poly[ i ][ j ][ X ] ) 
+                 != TCL_OK ||
+                 Tcl_GetDoubleFromObj( interp, pov[ 1 ], &poly[ i ][ j ][ Y ] )
+                 != TCL_OK ) {
+               return TCL_ERROR;
+            }
+         }
+      }
+
+      
+      for ( i = 0; i < 2; i++ ) {
+         for ( j = 0; j < nvertex[ i ]; j++ ) {
+            printf( "{%6lf %6lf}  ", poly[ i ][ j ][ X ], poly[ i ][ j ][ Y ] );
+         }
+         printf( "\n" );
+      }
+
+      return TCL_OK;
+
+   }
 
 
 
@@ -16,19 +133,10 @@ redistributed in its entirety provided that this copyright notice is
 not removed.
 --------------------------------------------------------------------
 */
-#include        <stdio.h>
-#include        <math.h>
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
-#define X       0
-#define Y       1
 typedef enum { FALSE, TRUE } bool;
 typedef enum { Pin, Qin, Unknown } tInFlag;
-
-#define DIM     2               /* Dimension of points */
-typedef double  tPointi[DIM];   /* type integer point */
-typedef double  tPointd[DIM];   /* type double point */
-#define PMAX    100             /* Max # of pts in polygon */
 
 
 typedef tPointi tPolygoni[PMAX];/* type integer polygon */
