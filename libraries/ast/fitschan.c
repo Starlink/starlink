@@ -491,6 +491,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - SpecTrans: Use 1.0 (instead of the CDELT value) as the
 *        diagonal PCi_j term for non-celestial axes with associated CROTA 
 *        values.  
+*     12-JAN-2004 (DSB):
+*        - Initialise "tmap1" pointer to NULL in case of error in
+*        CelestialAxes (avoids a segvio happening in the case of an error).
 *class--
 */
 
@@ -2431,6 +2434,8 @@ static AstMapping *CelestialAxes( AstFrameSet *fs, double *dim, int *wperm,
                mat[ ilat ] = AST__DD2R;
                tmap1 = (AstMapping *) astMatrixMap( nwcs, nwcs, 1, mat, "" );
                mat = astFree( mat );
+            } else {
+               tmap1 = NULL;
             }
 
 /* Now create the Mapping from Native Spherical Coords to WCS. */
