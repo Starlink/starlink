@@ -1522,7 +1522,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
           CALL ARR_ELEM1R( ABPTR, 2*DIMS(E_AX), 1, CLO, STATUS )
           CALL ARR_ELEM1R( ABPTR, 2*DIMS(E_AX), 2*DIMS(E_AX),
      :                     CHI, STATUS )
-          CALL BDI_AXUNMAP( FID, E_AX, ABPTR, STATUS )
+          CALL BDI_AXUNMAP( FID, E_AX, 'Bounds', ABPTR, STATUS )
           CSCALE = REAL(RCHI-RCLO)/REAL(CHI-CLO)
           CALL MSG_SETR( 'SC', CSCALE )
 	  CALL MSG_PRNT( 'User to RAW channel scaling = ^SC' )
