@@ -121,7 +121,7 @@ D     TYPE *, '   telluric centre freq from vels = ', FCEN_T
 
       DF = + 2.D3 * (LOFREQ(NQ)-FCEN_T)
       WRITE (6, 
-     &     '('' Sector '',I2.1,'' : New I.F. = '', F9.6, '' GHz'')',
+     &     '('' Sector '',I2.1,'' : New I.F. = '', F11.6, '' GHz'')',
      &       IOSTAT=IERR) NQ, DF/2.D3
 
 *     Correct back to offset frequency in *source* frame using appropriate 

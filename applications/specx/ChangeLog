@@ -1,5 +1,8 @@
 2000-05-18  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* exprt/calc_image.f (CALC_IMAGE): Allow for bigger format for new 
+	IF -- this will make it easier to spot an incorrect calculation.
+
 	* exprt/wrfitsspec.f (SPECX_WRFITSSPEC): Write a FITS Y2K
 	compliant DATE keyword.
 
