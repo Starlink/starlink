@@ -664,7 +664,9 @@
 	&autoastrom; requires AST version 1.8-1 or better), then use the
 	<code>STARLINKS</code> variable, setting it to a
 	colon-separated list of directories: for example <code>setenv
-	  STARLINKS /path/to/my/star:/star</code>.</p>
+	  STARLINKS /path/to/my/star:/star</code> (this facility is
+	intended primarily for developers, and you really shouldn't
+	need to use it in `normal' building of the software).</p>
     </sect>
 
     <sect id="helpers" export="export">
@@ -838,6 +840,7 @@
 </sun>
 
 <!-- Local Variables: -->
+<!-- mode: sgml -->
 <!-- sgml-indent-data: t -->
 <!-- sgml-indent-step: 2 -->
 <!-- End: -->
