@@ -1,3 +1,8 @@
+1999-06-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/remdbm.pl: Turn off variance in MATHS command.
+	Add high frequency filter.
+
 1999-05-28  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_rebin.f (SURF_REBIN): no longer raise an error when
