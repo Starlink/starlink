@@ -209,10 +209,11 @@
         BDS_QUAL_OK = .TRUE.
 
 *  No search region supplied?
-      ELSE IF ( STATUS .NE. PAR__NULL ) THEN
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
 
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Which way to use quality if present?
       IF ( BDS_QUAL_OK ) THEN
