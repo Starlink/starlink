@@ -1,5 +1,11 @@
 2001-10-29  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* src/surf_scan_rlb.f (SURF_SCAN_RLB): We now have POLMAP
+
+	* src/surf_despike.f (SURF_DESPIKE): We now have POLMAP
+
+	* starlink/surf.news: Update for 1.6-8
+
 	* scripts/remdbm.pl: Support ARDMASK from kappa 0.18
 
 2001-04-09  Tim Jenness  <timj@jach.hawaii.edu>

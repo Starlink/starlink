@@ -122,6 +122,9 @@
 
 *    History:
 *     $Log$
+*     Revision 1.9  2001/10/30 03:02:03  timj
+*     POLMAP is a MAP observation
+*
 *     Revision 1.8  1999/08/03 20:36:40  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -288,7 +291,8 @@
 *  check that the observation was suitable for DESPIKE
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .NE. 'MAP') THEN
+         IF (OBSERVING_MODE .NE. 'MAP' 
+     :        .AND. OBSERVING_MODE .NE. 'POLMAP') THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: file does not contain '//
