@@ -133,6 +133,8 @@
 #        Version 2.1-2.
 #     17-JAN-2000 (MBT):
 #        Adapted for EXTREME package.
+#     13-AUG-2001 (MBT):
+#        Changed some /bin/echo's to printf's and bumped version to 0.1-1.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -316,7 +318,7 @@ PKG_NAME = extreme
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.1-0
+PKG_VERS = 0.1-1
 
 #  List of files comprising the distributed source-only system. This
 #  defines the minimum set of files required to rebuild completely the
@@ -953,28 +955,31 @@ do_test:
 	@/bin/echo " "
 	@/bin/echo "inscnf test:"
 	@/bin/echo "------------"
-	@/bin/echo "      INCLUDE 'SAE_PAR'          ! Standard SAE constants" \
-               "\n\n      CALL EXT_SUB( %VAL( IP1 ), %VAL( IP2 ), STATUS )" \
+	@printf "%s\n%s\n%s\n" \
+	        "      INCLUDE 'SAE_PAR'          ! Standard SAE constants" \
+                "" \
+                "      CALL EXT_SUB( %VAL( IP1 ), %VAL( IP2 ), STATUS )" \
            | $(INSTALL_BIN)/inscnf
 	@/bin/echo " "
 	@/bin/echo "crepint test:"
 	@/bin/echo "-------------"
-	@/bin/echo     '      int i;              /* int variable    */' \
-                   "\n"'      short int j;        /* short variable  */' \
-                   "\n"'      char *str = "int";  /* string variable */' \
-                   "\n" \
-                   "\n"'      printf( "%s variable value: %d\\n", str, i );' \
+	@printf "%s\n%s\n%s\n%s\n%s\n" \
+	        '      int i;              /* int variable    */' \
+                '      short int j;        /* short variable  */' \
+                '      char *str = "int";  /* string variable */' \
+                '' \
+                '      printf( "%s variable value: %d\\n", str, i );' \
            | $(INSTALL_BIN)/crepint
 	@/bin/echo " "
 	@/bin/echo "frepint test:"
 	@/bin/echo "-------------"
-	@/bin/echo "      INCLUDE 'SAE_PAR'         ! Standard SAE constants" \
-                 "\n " \
-                 "\n      REAL XSIZE                ! Horizontal size" \
-	         "\n      INTEGER NPIX              ! Number of pixels" \
-                 "\n      INTEGER I1, I2, I3, I4, I5, I6, I7, I8," \
-                                 "I10, I11, I12, I13, I14" \
-                 "\n      I1 = EXT_ADD( I2, 4, STATUS )" \
+	@printf "%s\n%s\n%s\n%s\n%s\n%s\n" \
+	        "      INCLUDE 'SAE_PAR'         ! Standard SAE constants" \
+                "" \
+                "      REAL XSIZE                ! Horizontal size" \
+	        "      INTEGER NPIX              ! Number of pixels" \
+                "      INTEGER I1, I2, I3, I4, I5, I6, I7, I8, I10, I11, I12, I13, I14" \
+                "      I1 = EXT_ADD( I2, 4, STATUS )" \
            | $(INSTALL_BIN)/frepint
 	@/bin/echo " "
 #
