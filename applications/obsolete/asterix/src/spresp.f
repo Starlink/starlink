@@ -431,7 +431,7 @@
 
 *  Copy energy axis if present
       IF ( (E_AX.GT.0) .AND. (ONEBIN .EQ. IDIMS(E_AX)) ) THEN
-        CALL BDI_AXCOPY( IFID, E_AX, ' ', OFID, E_AX, STATUS )
+        CALL BDI_AXCOPY( IFID, E_AX, ' ', BIID, E_AX, STATUS )
       ELSE IF ( E_AX .GT. 0 ) THEN
         CALL BDI_AXPUT0C( BIID, NDIM, 'Label', EAXLAB, STATUS )
         CALL BDI_AXCOPY( IFID, E_AX, 'Units', BIID, NDIM, STATUS )
