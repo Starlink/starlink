@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER NX,NY
       INTEGER IX1,IX2,IY1,IY2
@@ -76,7 +75,6 @@
       INTEGER STATUS
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
       INTEGER I,J,II,JJ
 *-
@@ -110,7 +108,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       INTEGER KX, NY
@@ -325,7 +322,6 @@ C
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       INTEGER MN
