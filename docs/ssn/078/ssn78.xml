@@ -1578,6 +1578,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
 <verbatim>
 % rm &lt;my-star&gt;/manifests/starconf
 % ./bootstrap
+% rm config.cache
 </verbatim>
                   The first command forces the bootstrap to remake and
                   reinstall the starconf component (since its manifest
@@ -1587,6 +1588,12 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
                   the second command simply calls the bootstrap
                   script, which overwrites the little state
                   associated with it.</p>
+
+                <p>You should also remove any
+                  <code>config.cache</code> files, both in the
+                  top-level directory and elsewhere, since these often
+                  store paths to applications and libraries which
+                  are probably not appropriate for your new prefix.</p>
 
                 <p>For more details, see the notes on state in <ref
                     id="state-details"/>.</p>
