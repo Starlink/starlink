@@ -1,0 +1,50 @@
+#!/bin/csh
+#################################################
+# starmanhypergripe
+#
+# Script accessing the hyptext gripe for Starman
+#
+#   a j penny           ral         1994 Oct
+#   Pat Morris          UCG         1995 Jan
+
+set command = none
+set progs = 'lynx xmosaic Mosaic mosaic arena netscape'
+
+set string = 'not found'
+
+# Find out how `which` responds when it cant find anything
+
+if ( `which hope_this_doesnt_exist | grep -c -i "$string" ` == 0 ) then
+   set string = 'no'
+endif
+
+foreach st ( $progs )
+  if ( `which $st | grep -c -i "$string" ` == 0 ) then
+    set command = $st
+  endif
+end
+
+if ( $command != 'none' ) then
+   if ( $command == 'netscape' ) then
+      netscape -mono $STARMAN_HYPER/comments_send.html
+   else
+      $command $STARMAN_HYPER/comments_send.html
+   endif
+else
+   echo "  "
+   echo "ERROR:  "
+   echo "  Starmanhypergripe tries to use one of the hypertext programs "
+   echo "      - netscape, arena, Mosaic, xmosaic or  lynx -"
+   echo "  but cant find any of them."
+   echo "  If one is installed on your system, put it in your PATH."
+   echo "  If none installed, your system manager can install one."
+   echo "  "
+   echo "  The file pointed to is:   $STARMAN_HYPER/comments_send.html"
+   echo "  "
+   echo "  If this does not make sense, e-mail the author (see the"
+   echo "  message put out when you start Starman) for advice."
+   echo "  "
+endif
+unset string
+unset command
+unset progs

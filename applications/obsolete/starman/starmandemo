@@ -1,0 +1,525 @@
+#!/bin/csh
+
+############################################
+# STARMANDEMO
+#  Runs three demonstrations:-
+#    1) Runs from a test data image to mag list
+#    2) Runs from 2 test data images to CMD diagram
+#    3) Runs from a user image to mag list
+#    4) Runs from 2 user images to CMD diagram
+#
+#   alan penny             ral          1994 Nov
+
+#-------------------------
+
+echo " "
+echo "****************************************************"
+echo "*  Starmandemo - a demonstration of Starman        *" 
+echo "*                                                  *" 
+echo "*  This must be run in a directory with enough     *" 
+echo "*  space for temporary files and output files.     *" 
+echo "*                                                  *" 
+echo "*  Starmandemo has four demonstration options:-    *"
+echo "*    1) Runs from a test image to a magnitude list *"
+echo "*    2) Runs from 2 test images to a CMD diagram   *"
+echo "*    3) Runs from a user image to a magnitude list *"
+echo "*    4) Runs from 2 user images to a CMD diagram   *"
+echo "*                                                  *" 
+echo "****************************************************"
+echo " "
+echo " "
+
+#-------------------------
+demo0:
+
+if ( $1 == "" ) then
+echo "Input Option Choice (1:2:3:4)"
+set option = $<
+else
+set option = $1
+endif
+ 
+if ( $option == "1" ) then
+goto demo1
+endif
+if ( $option == "2" ) then
+goto demo2
+endif
+if ( $option == "3" ) then
+goto demo3
+endif
+if ( $option == "4" ) then
+goto demo4
+endif
+
+echo "ERROR: Option choice must be 1, 2, 3, or 4. Have another go"
+goto demo0
+
+#-------------------------
+demo2:
+
+echo " "
+echo "*********************************************************** "
+echo "This script will take two images (non-aligned) of a star field"
+echo "and automatically find the stars, work out the transformation "
+echo "between the images, measure their PSFs, measure the stars, and "
+echo "display a colour/magnitude diagram."
+echo " "
+echo "The two images are in files $STARMAN_DATA/stars_v.sdf  and"
+echo " $STARMAN_DATA/stars_r_rotated.sdf. These are copied into  "
+echo "the present directory."
+echo " "
+echo " A number of files called temp_* are created and destroyed"
+echo " when running this demonstration."
+echo " "
+echo "Files prof_XXX1.sdf, mag_XXX1.sdf, clean_XXX1.sdf"
+echo "      prof_XXX2.sdf, mag_XXX2.sdf, clean_XXX2.sdf"
+echo "are created"
+echo "  where XXX1 and XXX2 are the names of the input files, and"
+echo "  the prof_ files conatin the profile (in Starman terms),"
+echo "  the mag_ files contains Starman tables with the results, and"
+echo "  the clean_ files contain copies of the cleaned images."
+echo " "
+echo "Use tblist, tbsheet and diagram to look at the tables,"
+echo "    imflash and interact to look at the images"
+echo " "
+echo "*********************************************************** "
+echo " "
+
+
+echo " "
+echo "STARTING - copying images from Starman test data directory"
+echo "Commands:  cp $STARMAN_DATA/stars_v.sdf ./."
+echo "           cp $STARMAN_DATA/stars_r_rotated.sdf ./."
+echo "           set file1 = stars_v "
+echo "           set file2 = stars_r_rotated"
+echo " "
+
+ cp $STARMAN_DATA/stars_v.sdf ./.
+ cp $STARMAN_DATA/stars_r_rotated.sdf ./.
+ set file1 = "stars_v"
+ set file2 = "stars_r_rotated"
+
+echo " "
+echo "COPIED images - doing starfind - to find all stars"
+echo "Command:  starfind $file1 radius=2 out=temp_xy_1 \\  "
+echo "Command:    "
+echo " "
+
+ starfind $file1 radius=2 out=temp_xy_1 \\
+
+echo " "
+echo "DONE STARFIND - doing tbsort - to sort with bright ones first"
+echo "Command:  tbsort temp_xy_1 numcol=3 option='descending' \"
+echo "                 out=temp_xy_1_a \\  "
+echo " "
+
+ tbsort temp_xy_1 numcol=3 option='descending' out=temp_xy_1_a \\
+
+echo " "
+echo "DONE TBSORT - doing tbcut - to get brightest stars"
+echo "Command:   tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] \ "
+echo "                 out=temp_xy_1_b \\  "
+echo " "
+
+ tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] out=temp_xy_1_b \\
+
+echo " "
+echo "DONE TBCUT - doing profile - to determine stellar point-spread-function"
+echo "Command:   profile $file1 instars=temp_xy_1_b use='auto' \"
+echo "                   out=prof_$file1 \\  "
+echo " "
+
+ profile $file1 instars=temp_xy_1_b use='auto' out=prof_$file1 \\
+
+echo " "
+echo "DONE PROFILE - doing measure - to measure magnitudes of all stars"
+echo "Command:    measure $file1 instars=temp_xy_1_a profile=prof_$file1 \"
+echo "                    out=mag_$file1 outim=clean_$file1 \\ "
+echo " "
+
+ measure $file1 instars=temp_xy_1_a profile=prof_$file1 out=mag_$file1 outim=clean_$file1 \\
+
+echo " "
+echo "DONE MEASURE - doing starfind on 2nd image - to get stars for profile "
+echo "Command:    starfind $file2 radius=2 out=temp_xy_2 \\ "
+echo " "
+
+ starfind $file2 radius=2 out=temp_xy_2 \\
+
+echo " "
+echo "DONE STARFIND - doing tbsort - to sort with bright ones first"
+echo "Command:    tbsort temp_xy_2 numcol=3 option='descending' \"
+echo "                   out=temp_xy_2_a \\ "
+echo " "
+
+ tbsort temp_xy_2 numcol=3 option='descending' out=temp_xy_2_a \\
+
+echo " "
+echo "DONE TBSORT - doing tbcut - to get brightest stars"
+echo "Command:    tbcut temp_xy_2_a col_1=\[1,6\] row_1=\[1,30\] \"
+echo "                  out=temp_xy_2_b \\"
+echo " "
+
+ tbcut temp_xy_2_a col_1=\[1,6\] row_1=\[1,30\] out=temp_xy_2_b \\
+
+echo " "
+echo "DONE TBCUT - doing profile - to determine stellar point-spread-function"
+echo "Command:    profile $file2 instars=temp_xy_2_b use='auto' \"
+echo "                    out=prof_$file2 \\"
+echo " "
+
+ profile $file2 instars=temp_xy_2_b use='auto' out=prof_$file2 \\
+
+echo " "
+echo "DONE PROFILE - doing tbtran_auto - to get 1st star list on 2nd image"
+echo "Command:    tbtran_auto mag_$file1 temp_xy_2_c temp_xy_2_a \\"
+echo " "
+
+ tbtran_auto mag_$file1 temp_xy_2_c temp_xy_2_a \\
+
+echo " "
+echo "DONE TBTRAN_AUTO - doing measure - to measure magnitudes of all stars"
+echo "Command:    measure $file2 instars=temp_xy_2_c profile=prof_$file2 \"
+echo "                    out=mag_$file2 outim=clean_$file2 \\"
+echo " "
+
+ measure $file2 instars=temp_xy_2_c profile=prof_$file2 out=mag_$file2 outim=clean_$file2 \\
+
+echo " "
+echo "DONE MEASURE - doing diagram  - to display colour/magnitude diagram"
+echo "Command:    diagram easycmd='yes' in2=mag_$file2 in3=mag_$file1 \"
+echo "                    exit='yes' \\"
+echo " "
+
+ diagram easycmd='yes' in2=mag_$file2 in3=mag_$file1 exit='yes' \\
+
+echo " "
+echo "DONE  DIAGRAM  - deleting temporary files "
+echo " "
+
+rm temp_xy_2.sdf temp_xy_2_a.sdf temp_xy_2_b.sdf temp_xy_2_c.sdf
+rm temp_xy_1.sdf temp_xy_1_a.sdf temp_xy_1_b.sdf temp_xy_1_c.sdf
+
+goto demo_end
+
+#-------------------------
+demo4:
+
+echo " "
+echo "*********************************************************** "
+echo "This script will take two images (non-aligned) of a star field"
+echo "and automatically find the stars, work out the transformation "
+echo "between the images, measure their PSFs, measure the stars, and "
+echo "display a colour/magnitude diagram."
+echo " "
+echo " A number of files called temp_* are created and destroyed"
+echo " when running this demonstration."
+echo " "
+echo "Files prof_XXX1.sdf, mag_XXX1.sdf, clean_XXX1.sdf"
+echo "      prof_XXX2.sdf, mag_XXX2.sdf, clean_XXX2.sdf"
+echo "are created"
+echo "  where XXX1 and XXX2 are the names of the input files, and"
+echo "  the prof_ files conatin the profile (in Starman terms),"
+echo "  the mag_ files contains Starman tables with the results, and"
+echo "  the clean_ files contain copies of the cleaned images."
+echo " "
+echo "Use tblist, tbsheet and diagram to look at the tables,"
+echo "    imflash and interact to look at the images"
+echo " "
+echo "*********************************************************** "
+echo " "
+echo "The names of short and long wavelength images are input by the"
+echo "user as the second and third parameters of the script."
+echo "They must already be in the current directory."
+echo " "
+
+if ( $1 == "" ) then
+echo "Input 1st (short wavelength) image name"
+set file1 = $<
+else
+set file1 = $2
+endif
+
+if ( $2 == "" ) then
+echo "Input 2nd (long wavelength) image name"
+set file2 = $<
+else
+set file2 = $3
+endif
+
+
+echo " "
+echo "COPIED images - doing starfind - to find all stars"
+echo "Command:  starfind $file1 radius=2 out=temp_xy_1 \\  "
+echo "Command:    "
+echo " "
+
+ starfind $file1 radius=2 out=temp_xy_1 \\
+
+echo " "
+echo "DONE STARFIND - doing tbsort - to sort with bright ones first"
+echo "Command:  tbsort temp_xy_1 numcol=3 option='descending' \"
+echo "                 out=temp_xy_1_a \\  "
+echo " "
+
+ tbsort temp_xy_1 numcol=3 option='descending' out=temp_xy_1_a \\
+
+echo " "
+echo "DONE TBSORT - doing tbcut - to get brightest stars"
+echo "Command:   tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] \ "
+echo "                 out=temp_xy_1_b \\  "
+echo " "
+
+ tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] out=temp_xy_1_b \\
+
+echo " "
+echo "DONE TBCUT - doing profile - to determine stellar point-spread-function"
+echo "Command:   profile $file1 instars=temp_xy_1_b use='auto' \"
+echo "                   out=prof_$file1 \\  "
+echo " "
+
+ profile $file1 instars=temp_xy_1_b use='auto' out=prof_$file1 \\
+
+echo " "
+echo "DONE PROFILE - doing measure - to measure magnitudes of all stars"
+echo "Command:    measure $file1 instars=temp_xy_1_a profile=prof_$file1 \"
+echo "                    out=mag_$file1 outim=clean_$file1 \\ "
+echo " "
+
+ measure $file1 instars=temp_xy_1_a profile=prof_$file1 out=mag_$file1 outim=clean_$file1 \\
+
+echo " "
+echo "DONE MEASURE - doing starfind on 2nd image - to get stars for profile "
+echo "Command:    starfind $file2 radius=2 out=temp_xy_2 \\ "
+echo " "
+
+ starfind $file2 radius=2 out=temp_xy_2 \\
+
+echo " "
+echo "DONE STARFIND - doing tbsort - to sort with bright ones first"
+echo "Command:    tbsort temp_xy_2 numcol=3 option='descending' \"
+echo "                   out=temp_xy_2_a \\ "
+echo " "
+
+ tbsort temp_xy_2 numcol=3 option='descending' out=temp_xy_2_a \\
+
+echo " "
+echo "DONE TBSORT - doing tbcut - to get brightest stars"
+echo "Command:    tbcut temp_xy_2_a col_1=\[1,6\] row_1=\[1,30\] \"
+echo "                  out=temp_xy_2_b \\"
+echo " "
+
+ tbcut temp_xy_2_a col_1=\[1,6\] row_1=\[1,30\] out=temp_xy_2_b \\
+
+echo " "
+echo "DONE TBCUT - doing profile - to determine stellar point-spread-function"
+echo "Command:    profile $file2 instars=temp_xy_2_b use='auto' \"
+echo "                    out=prof_$file2 \\"
+echo " "
+
+ profile $file2 instars=temp_xy_2_b use='auto' out=prof_$file2 \\
+
+echo " "
+echo "DONE PROFILE - doing tbtran_auto - to get 1st star list on 2nd image"
+echo "Command:    tbtran_auto mag_$file1 temp_xy_2_c temp_xy_2_a \\"
+echo " "
+
+ tbtran_auto mag_$file1 temp_xy_2_c temp_xy_2_a \\
+
+echo " "
+echo "DONE TBTRAN_AUTO - doing measure - to measure magnitudes of all stars"
+echo "Command:    measure $file2 instars=temp_xy_2_c profile=prof_$file2 \"
+echo "                    out=mag_$file2 outim=clean_$file2 \\"
+echo " "
+
+ measure $file2 instars=temp_xy_2_c profile=prof_$file2 out=mag_$file2 outim=clean_$file2 \\
+
+echo " "
+echo "DONE MEASURE - doing diagram  - to display colour/magnitude diagram"
+echo "Command:    diagram easycmd='yes' in2=mag_$file2 in3=mag_$file1 \"
+echo "                    exit='yes' \\"
+echo " "
+
+ diagram easycmd='yes' in2=mag_$file2 in3=mag_$file1 exit='yes' \\
+
+echo " "
+echo "DONE  DIAGRAM  - deleting temporary files "
+echo " "
+
+rm temp_xy_2.sdf temp_xy_2_a.sdf temp_xy_2_b.sdf temp_xy_2_c.sdf
+rm temp_xy_1.sdf temp_xy_1_a.sdf temp_xy_1_b.sdf temp_xy_1_c.sdf
+
+goto demo_end
+
+#-----------------------------
+demo1:
+
+echo " "
+echo "*********************************************************** "
+echo "This script will take an image of a star field"
+echo "and automatically find the stars, measure their PSFs, and measure "
+echo "the stars. "
+echo " "
+echo "The image is in file $STARMAN_DATA/stars_v.sdf. This is copied "
+echo "into the present directory."
+echo " "
+echo " A number of files called temp_* are created and destroyed"
+echo " when running this demonstration."
+echo " "
+echo "Files prof_XXX1.sdf, mag_XXX1.sdf, clean_XXX1.sdf are created"
+echo "  where XXX1 is the name of the input file, and"
+echo "  the prof_ files conatin the profile (in Starman terms),"
+echo "  the mag_ files contains Starman tables with the results, and"
+echo "  the clean_ files contain copies of the cleaned images."
+echo " "
+echo "Use tblist and tbsheet to look at the tables,"
+echo "    imflash and interact to look at the images"
+echo " "
+echo "*********************************************************** "
+echo " "
+
+echo " "
+echo "STARTING - copying image from Starman test data directory"
+echo "Commands:  cp $STARMAN_DATA/stars_v.sdf ./."
+echo "           set file1 = stars_v "
+echo " "
+
+ cp $STARMAN_DATA/stars_v.sdf ./.
+ set file1 = "stars_v"
+
+echo " "
+echo "DONE copying - doing starfind - to find all stars"
+echo "Command:    starfind $file1 radius=2 out=temp_xy_1 \\"
+echo " "
+
+ starfind $file1 radius=2 out=temp_xy_1 \\
+
+echo " "
+echo "DONE STARFIND - doing tbsort - to sort with bright ones first"
+echo "Command:    tbsort temp_xy_1 numcol=3 option='descending' \"
+echo "                   out=temp_xy_1_a \\"
+echo " "
+
+ tbsort temp_xy_1 numcol=3 option='descending' out=temp_xy_1_a \\
+
+echo " "
+echo "DONE TBSORT - doing tbcut - to get brightest stars"
+echo "Command:    tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] \"
+echo "                  out=temp_xy_1_b \\"
+echo " "
+
+ tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] out=temp_xy_1_b \\
+
+echo " "
+echo "DONE TBCUT - doing profile - to determine stellar point-spread-function"
+echo "Command:    profile $file1 instars=temp_xy_1_b use='auto' \"
+echo "            out=prof_$file1 \\"
+echo " "
+
+ profile $file1 instars=temp_xy_1_b use='auto' out=prof_$file1 \\
+
+echo " "
+echo "DONE PROFILE - doing measure - to measure magnitudes of all stars"
+echo "Command:    measure $file1 instars=temp_xy_1_a profile=prof_$file1 \"
+echo "                    out=mag_$file1 outim=clean_$file1 \\"
+echo " "
+
+ measure $file1 instars=temp_xy_1_a profile=prof_$file1 out=mag_$file1 \
+         outim=clean_$file1 \\
+
+echo " "
+echo "DONE  MEASURE - deleting temporary files "
+echo " "
+
+rm temp_xy_1.sdf temp_xy_1_a.sdf temp_xy_1_b.sdf
+
+
+goto demo_end
+
+#-----------------------------
+demo3:
+
+echo " "
+echo "*********************************************************** "
+echo "This script will take an image of a star field"
+echo "and automatically find the stars, measure their PSFs, and measure "
+echo "the stars. "
+echo " "
+echo " A number of files called temp_* are created and destroyed"
+echo " when running this demonstration."
+echo " "
+echo "Files prof_XXX1.sdf, mag_XXX1.sdf, clean_XXX1.sdf are created"
+echo "  where XXX1 is the name of the input file, and"
+echo "  the prof_ files conatin the profile (in Starman terms),"
+echo "  the mag_ files contains Starman tables with the results, and"
+echo "  the clean_ files contain copies of the cleaned images."
+echo " "
+echo "Use tblist and tbsheet to look at the tables,"
+echo "    imflash and interact to look at the images"
+echo " "
+echo "*********************************************************** "
+echo " "
+echo "The name of the image is input by the user as the second parameter"
+echo "of this script. This must already be in the current directory."
+echo " "
+
+if ( $2 == "" ) then
+echo "Input image name"
+set file1 = $<
+else
+set file1 = $2
+endif
+
+
+echo " "
+echo "STARTING - doing starfind - to find all stars"
+echo "Command:    starfind $file1 radius=2 out=temp_xy_1 \\"
+echo " "
+
+ starfind $file1 radius=2 out=temp_xy_1 \\
+
+echo " "
+echo "DONE STARFIND - doing tbsort - to sort with bright ones first"
+echo "Command:    tbsort temp_xy_1 numcol=3 option='descending' \"
+echo "                   out=temp_xy_1_a \\"
+echo " "
+
+ tbsort temp_xy_1 numcol=3 option='descending' out=temp_xy_1_a \\
+
+echo " "
+echo "DONE TBSORT - doing tbcut - to get brightest stars"
+echo "Command:    tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] \"
+echo "                  out=temp_xy_1_b \\"
+echo " "
+
+ tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,30\] out=temp_xy_1_b \\
+
+echo " "
+echo "DONE TBCUT - doing profile - to determine stellar point-spread-function"
+echo "Command:    profile $file1 instars=temp_xy_1_b use='auto' \"
+echo "            out=prof_$file1 \\"
+echo " "
+
+ profile $file1 instars=temp_xy_1_b use='auto' out=prof_$file1 \\
+
+echo " "
+echo "DONE PROFILE - doing measure - to measure magnitudes of all stars"
+echo "Command:    measure $file1 instars=temp_xy_1_a profile=prof_$file1 \"
+echo "                    out=mag_$file1 outim=clean_$file1 \\"
+echo " "
+
+ measure $file1 instars=temp_xy_1_a profile=prof_$file1 out=mag_$file1 \
+         outim=clean_$file1 \\
+
+echo " "
+echo "DONE  MEASURE - deleting temporary files "
+echo " "
+
+rm temp_xy_1.sdf temp_xy_1_a.sdf temp_xy_1_b.sdf
+
+goto demo_end
+
+#-----------------------------
+demo_end:
+
