@@ -1,136 +1,134 @@
 #! /bin/sh -
+# original bootstrap file, installed by starconf 1.2, rnum=1002000
+# If you _need_ to change this file, delete `original' in the line above,
+# or else starconf may overwrite it with an updated version.
+#
 # bootstrap.installed.  Generated from bootstrap.installed.in by configure.
-
-use_autoheader=false
-use_libtool=false
-for feature in `sed -n -e 's/^ *\(A[CM]_[A-Z_]*\).*/\1/p' configure.ac`
-do
-    case $feature in
-    AC_CONFIG_HEADER*)
-        use_autoheader=true
-        ;;
-    AM_CONFIG_HEADER*)
-        use_autoheader=true
-        ;;
-    AC_PROG_LIBTOOL)
-        use_libtool=true
-        ;;
-    esac
-done
-
-echo "use_autoheader=$use_autoheader"
-echo "use_libtool=$use_libtool"
-
-sed -e '1,/^ENDCONFIG/d' \
-    -e "s,!run_libtool!,$use_libtool," \
-    -e "s,!run_autoheader!,$use_autoheader," \
-    $0 >$0.tmp
-mv $0.tmp $0
-chmod +x $0
-exec $0
-
-ENDCONFIG
-#! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-2, rnum=1000002
-# If you _need_ to change this file, delete or replace `original' above
-# or else starconf may overwrite it with an updated version
-
+#
 # Bootstrap a checked-out component of the Starlink software tree.
 # Run this script in a freshly checked-out directory to bring the
 # system to the point where you can just type ./configure;make
 #
 # Usage:
 #     ./bootstrap
-#
-# Important environment variables:
-#
-#     STARCONF_BUILDSUPPORT: this bootstrap script executes the
-#     configuration script $STARCONF_BUILDSUPPORT/bin/starconf, and
-#     objects if it can't find it.  This script adds required files,
-#     and establishes installation directories.
-#
-# The configuration script here works with automake versions 1.6.3 and
-# 1.7.5, and autoconf 2.57, and probably not much that's significantly
-# older than those.
 
-run_libtool=!run_libtool!
-run_autoheader=!run_autoheader!
 
-# Echo a command then run it, terminating the script if the command fails
-echorun() { echo $*; eval $* || exit 1; }
-
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    # Use a default.  We don't normally refer to the STARLINK
-    # variable, but we've little choice here.  Try it, but don't fail
-    # if it's not there -- that simply means we won't default
-    # STARCONF_BUILDSUPPORT and we'll take other actions below.
-    if test -n "$STARLINK"; then
-        STARCONF_BUILDSUPPORT=$STARLINK/buildsupport
-        echo "Defaulting STARCONF_BUILDSUPPORT to $STARCONF_BUILDSUPPORT"
-    fi
-fi
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    echo "STARCONF_BUILDSUPPORT is empty -- hope that's OK"
-fi
-
-# Run starconf, by running the starconf script installed in
-# $STARCONF_BUILDSUPPORT.
+# This script should be installed, by starconf, in all `component
+# directories'.  A `component directory' is a directory which has a
+# component.xml.in file in it.  All component directories will have a
+# manifest file created and installed in .../manifests; non-component
+# directories will not have manifest files.  Everything that's
+# installed should be installed as part of some component
+# or other.
 #
-# It is possible to recreate the current starconf configuration by
-# running the ./starconf.status script in the current directory.  At
-# present, we _do_ this as a fallback, but we might not in future.
-if test -x $STARCONF_BUILDSUPPORT/bin/starconf; then
-    echorun $STARCONF_BUILDSUPPORT/bin/starconf
-elif test -x ./starconf.status; then
-    # When starconf is run, it finishes by execing ./starconf.status
-    # with arguments which do final configuration (indicating
-    # installation location).  These arguments can be defaulted from
-    # the environment, and we rely on this here -- the script exits if
-    # the required variables are not findable.
-    echorun ./starconf.status
-else
-    echo "No starconf found in $STARCONF_BUILDSUPPORT, and no ./starconf.status.  Exiting"
+# The ./bootstrap scripts will stop recursing when they find a
+# component.xml.in file.  They'll warn if they find a component.xml.in
+# file in any AC_CONFIG_SUBDIRS directory, but ignore it, and exit
+# with an error if they do not find a component.xml.in file and there
+# are no AC_CONFIG_SUBDIRS directories in which to search further.
+# That is, the tree of directories which the top-level bootstrap
+# traverses should have component.xml.in files at or above all its
+# leaves.
+
+
+# The starconf below might update bootstrap, if a newer version is
+# available.  Unfortunately, this confuses sh, which appears _not_ to
+# keep open the script it's reading, but to reopen it afresh, or reseek
+# within the file, for each line (or something like that!?).
+# So rewrite this script to a temporary file and exec it.
+tempfile="${TMP-/tmp}/$0-$$.tmp"
+rm -f $tempfile
+echo "trap 'rm -f $tempfile' 0" >$tempfile   # remove temporary at exit
+sed '1,/^--TRAMPOLINE--/d' $0 >>$tempfile    # strip out the trampoline
+exec /bin/sh $tempfile                       # exec the temporary
+--TRAMPOLINE--
+
+
+echo "Bootstrapping `pwd` ..."
+
+if test ! -f configure.ac; then
+    echo "bootstrap: No configure.ac in directory `pwd`" >&2
     exit 1
 fi
 
-# Bootstrap any child directories
-for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` ''
-do
-    if test -n "$d"; then
-        echo "Bootstrapping $d..."
-        (cd $d; ./bootstrap)
+subdirs=`autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac`
+
+if test -f component.xml.in; then
+
+    if starconf --show buildsupport >/dev/null 2>&1; then
+
+        # starconf is in the path
+        echo "...using starconf in " `starconf --show buildsupport`
+        starconf || exit 1
+
+    else
+
+        # The temptation here is to use ./starconf.status to find the
+        # starconf that it came from and invoke that explicitly.  Don't do
+        # this, however: we don't want to be too clever, and it's better
+        # to be consistent with the way the autotools behave (the first
+        # one in your path is the one that works, and they don't have this
+        # sort of `phone home' cleverness in them).
+
+        echo "bootstrap error: The starconf application is not in your path"
+
+        # This doesn't stop us being helpful, however.
+        if test -f ./starconf.status; then
+            starconf_home=`./starconf.status --show buildsupport`
+            echo "This directory was last bootstrapped with $starconf_home/bin/starconf"
+        fi
+
+        exit 1
     fi
-done
 
-# aclocal is about to be deprecated by the autoconf maintainers, and replaced
-# by autoreconf, which is already the preferred tool for updating the 
-# configuration.  I should switch to autoreconf.
-echorun aclocal
-
-# If there is an AC_CONFIG_HEADERS line in configure.ac, then we need
-# to run autoheader to do its magic.  If there is no such macro in
-# configure.ac, then we must not invoke autoheader here.
-$run_autoheader && echorun autoheader
-
-# We need to explicitly run libtoolize only if ltmain.sh is not present
-# (it won't be, in the case when we really are bootstrapping, but it might
-# be if we're running bootstrap redundantly, which ought to be OK).
-# Generally, it's (re)run implicitly by automake, which does it with
-# some extra options we probably shouldn't interfere with.
-if $run_libtool; then
-    if test ! -e ltmain.sh; then
-        echorun libtoolize
+    # Check that there are no component.xml.in files in any subdirectories
+    if test -n "$subdirs"; then
+        for d in $subdirs
+        do
+            if test -d "$d" && test -f "$d/component.xml.in"; then
+                echo "bootstrap: warning: ignoring child $d/component.xml.in" >&2
+            fi
+        done
     fi
+
+    # If STAR_SUPPRESS_AUTORECONF is true in the environment, then we
+    # suppress the call of `autoreconf'.  This is here _only_ so that
+    # the top-level bootstrap file can suppress multiple calls of this
+    # in bootstrap scripts in its children.  This mechanism must not
+    # be used by users, as it is likely to change without warning. 
+    if ${STAR_SUPPRESS_AUTORECONF-false}; then
+        echo "Suppressing autoreconf in" `pwd`
+    else
+        echo autoreconf --install --symlink
+        autoreconf --install --symlink || exit 1
+    fi
+
+else
+
+    # This is not a component directory, so simply recurse into the children.
+
+    # ...if there are any, that is.
+    if test -z "$subdirs"; then
+        echo "bootstrap: error: non-component directory `pwd` has no subdirs" >&2
+        exit 1
+    fi
+
+    # Bootstrap the child directories mentioned in AC_CONFIG_SUBDIRS.
+    # These bootstrap files must exist.
+    for d in $subdirs
+    do
+        if test -d "$d"; then
+            echo "Bootstrapping $d..."
+            if test -f $d/bootstrap; then
+                # good...
+                (cd $d; /bin/sh ./bootstrap)
+            else
+                echo "bootstrap: no file $d/bootstrap" >&2
+                exit 1
+            fi
+        fi
+    done
+
 fi
-
-# Generate Makefile.in, and add links to standard tools such as
-# install-sh, missing and friends.
-#
-# Use --foreign so automake doesn't check strict adherence
-# to GNU coding standards
-echorun automake --add-missing --foreign
-
-# Generate configure from configure.ac
-echorun autoconf
 
 exit 0
