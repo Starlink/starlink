@@ -10674,7 +10674,7 @@ Mike Lawden helped produce the quick-reference card.
 \menuitem{ADD}{
  Adds two NDF data structures.}
 \menuitem{APERADD}{
- Derives statistics of pixels within a  specified circle of a 2-d data array.}
+ Derives statistics of pixels within a  specified aperture of an NDF.}
 \menuitem{ARDGEN}{
  Creates a text file describing selected regions of an image.}
 \menuitem{ARDMASK}{
@@ -11602,7 +11602,7 @@ functions as follows.
 \item {\large\bf Statistics}
 \begin{description}
 \classitem{APERADD}
- Derives statistics of pixels within a specified circle of a 2-d data array.
+ Derives statistics of pixels within a specified aperture of an NDF.
 \classitem{HISTAT}
  Computes ordered statistics for an NDF's pixels using an histogram.
 \classitem{HISTOGRAM}
@@ -11719,16 +11719,8 @@ current values use the {\bf limit} command without any arguments.
 \newpage
 \section{\xlabel{ap_full}Specifications of KAPPA applications\label{ap:full}}
 \subsection{Explanatory Notes}
-For historical reasons, in this Appendix there are two formats---the
-first, exemplified by \htmlref{ADD}{ADD}, is the new layout indicating
-that this is one of the applications converted to use the NDF. An
-example of the old style is \htmlref{APERADD}{APERADD}.  Applications
-in this format use the moribund \htmlref{IMAGE format}{ap:IMAGEformat}.
 
-\begin{description}
-\item [NDF layout]
-In this layout the specification of parameters has the following
-format. 
+The specification of parameters has the following format. 
 
 \begin{verbatim}
      name  =  type (access)
@@ -11783,15 +11775,7 @@ the fourth example of COMPAVE would be written like this
 
 from the C-shell.
 
-\item [IMAGE layout]
-In this layout the specification of parameters has the following format
-\begin{verbatim}
-    name    type    access    description
-\end{verbatim}
-\end{description}
 \medskip
-
-The following notes apply to both layouts.
 
 Some parameters will only be used when another parameter has a certain
 value or mode. These are indicated by the name of the mode in
@@ -11904,71 +11888,265 @@ default value.
       }
    }
 }
-\manroutine {{\manheadstyle{APERADD}}}{ Derives statistics of pixels within a
-  specified circle of a 2-d data array.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes an input 2-d data array in an {\mantt{IMAGE}} structure
-  and bins up all the pixels that lie within specified circles to
-  either increase the signal-to-noise over that region, or to
-  simulate a circular-aperture measurement of the image.
 
-  WARNING: This simple task does not divide the light of pixels
-  spanning the circle.  If the pixel's centre lies within the circle,
-  its full value is included in the summation; if it lies outside
-  the circle, the pixel value is excluded from the summation.
-  Therefore this task is not suitable for accurate aperture
-  photometry, especially where the aperture diameter is less than
-  about ten times the pixel size.  Use PHOTOM where accuracy, rather
-  than speed, is paramount.
+\sstroutine{
+   APERADD
+}{
+   Integrates pixel values within an aperture of an NDF
+}{
+   \sstdescription{
+      This routine displays statistics for pixels that lie within a
+      specified aperture of an NDF. The aperture can either be circular
+      (specified by parameters CENTRE and DIAM), or arbitrary (specified
+      by parameter ARDFILE). If the aperture is specified using parameters
+      CENTRE and DIAM, then it must be either 1 or 2 dimensional.
 
-  The following are displayed: the standard deviation of the
-  intensity of the pixels within the aperture before binning, the
-  integrated value over the aperture, and the calculated mean level
-  and reduced noise after binning.
+      The following statistics are displayed:
 
-  The magic-value method is used for processing bad data.
+      \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  APERADD
+         \sstitem
+         The total number of pixels within the aperture
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{LOGFILE}} }{{\mantt{FILENAME}}}
-  Name of the text file to record the statistics. If null,
-  there will be no logging. {\mantt [!]}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}} }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing data array to be processed.
-\manparameterentry {{\mantt{READ}} }{{\mantt{XCEN}} }{{\mantt{\_REAL}}}
-  {$x$} co-ordinate of the circle centre.
-\manparameterentry {{\mantt{READ}} }{{\mantt{YCEN}} }{{\mantt{\_REAL}}}
-  {$y$} co-ordinate of the circle centre.
-\manparameterentry {{\mantt{READ}} }{{\mantt{DIAM}} }{{\mantt{\_REAL}}}
-  Diameter of the circle in pixels.
-\manparameterentry {{\mantt{READ}} }{{\mantt{AGAIN}} }{{\mantt{\_LOGICAL}}}
-  If true then another aperture can be chosen.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{NUMPIX}} }{{\mantt{\_INTEGER}}}
-  The number of pixels within the aperture.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{TOTAL}} }{{\mantt{\_REAL}}}
-  The total of the pixel values within the aperture.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{MEAN}} }{{\mantt{\_REAL}}}
-  The mean of the pixel values within the aperture.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{SIGMA}} }{{\mantt{\_REAL}}}
-  The standard deviation of the pixel values within the aperture.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{NOISE}} }{{\mantt{\_REAL}}}
-  The standard deviation of the pixel values within the aperture after
-  binning.
-\end{manparametertable}
-\manroutineitem {Deficiencies }{}
-  The circle centre must lie somewhere on the array, which is
-  by far the most likely option, but it not totally general.
+         \sstitem
+         The number of good pixels within the aperture
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         The total data sum within the aperture
 
-\newpage
+         \sstitem
+         The standard deviation on the total data sum (that is, the
+           square root of the sum of the individual pixel variances)
+
+         \sstitem
+         The mean pixel value within the aperture
+
+         \sstitem
+         The standard deviation on the mean pixel value (that is, the
+           standard deviation on the total data sum divided by the number of
+           values)
+
+         \sstitem
+         The standard deviation of the pixel values within the aperture
+
+      }
+      If individual pixel variances are not available within the input NDF
+      (\emph{i.e.} if it has no VARIANCE component), then each pixel is assumed to
+      have a constant variance equal to the variance of the pixel values
+      within the aperture. There is an option to weight pixels so that
+      pixels with larger variances are given less weight (see parameter
+      WEIGHT). The statistics are displayed on the screen and written to
+      output parameters. They may also be written to a log file.
+
+      A pixel is included if its centre is within the aperture, and is not
+      included otherwise. This simple approach may not be suitable for
+      accurate aperture photometry, especially where the aperture diameter
+      is less than about ten times the pixel size. A specialist photometry
+      package should be used if accuracy, rather than speed, is paramount.
+   }
+   \sstusage{
+      aperadd ndf centre diam
+   }
+   \sstparameters{
+      \sstsubsection{
+         ARDFILE = FILENAME (Read)
+      }{
+         The name of an ARD file containing a description of the aperture.
+         This allows apertures of almost any shape to be used. If a null
+         (!) value is supplied then the aperture is assumed to be circular
+         with centre and diameter given by parameters CENTRE and DIAM. ARD
+         files can be created either {\tt "}by hand{\tt "} using an editor, or using a
+         specialist application should as KAPPA:ARDGEN.
+
+         The co-ordinate system in which positions within the ARD file are
+         given should be indicated by including suitable COFRAME or WCS
+         statements within the file (see SUN/183), but will default to
+         pixel co-ordinates in the absence of any such statements. For
+         instance, starting the file with a line containing the text
+         {\tt "}COFRAME(SKY,System=FK5){\tt "} would indicate that positions are
+         specified in RA/DEC (FK5,J2000). The statement {\tt "}COFRAME(PIXEL){\tt "}
+         indicates explicitly that positions are specified in pixel
+         co-ordinates. {\tt [!]}
+      }
+      \sstsubsection{
+         CENTRE = LITERAL (Read)
+      }{
+         The co-ordinates of the centre of the circular aperture. Only
+         used if parameter ARDFILE is set to null. The position must be
+         given in the current co-ordinate Frame of the NDF (supplying
+         a colon {\tt "}:{\tt "} will display details of the current co-ordinate
+         Frame). The position should be supplied as a list of formatted
+         axis values separated by spaces or commas. See also parameter
+         USEAXIS. The current co-ordinate Frame can be changed using
+         KAPPA:WCSFRAME.
+      }
+      \sstsubsection{
+         DIAM = LITERAL (Read)
+      }{
+         The diameter of the circular aperture. Only used if parameter
+         ARDFILE is set to null. If the current co-ordinate Frame of the
+         NDF is a SKY Frame (\emph{e.g.} RA and DEC), then the value should be
+         supplied as an increment of celestial latitude (\emph{e.g.} DEC). Thus,
+         {\tt "}10.2{\tt "} means 10.2 arc-seconds, {\tt "}30:0{\tt "} would mean 30 arc-minutes,
+         and {\tt "}1:0:0{\tt "} would mean 1 degree. If the current co-ordinate
+         Frame is not a SKY Frame, then the diameter should be specified
+         as an increment along axis 1 of the current co-ordinate Frame.
+         Thus, if the current Frame is PIXEL, the value should be given
+         simply as a number of pixels.
+      }
+      \sstsubsection{
+         LOGFILE  =  FILENAME (Read)
+      }{
+         Name of the text file to log the results.  If null, there
+         will be no logging.  Note this is intended for the human reader
+         and is not intended for passing to other applications. {\tt [!]}
+      }
+      \sstsubsection{
+         MEAN = \_DOUBLE (Write)
+      }{
+         The mean of the pixel values within the aperture.
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         The input NDF.
+      }
+      \sstsubsection{
+         NGOOD = \_INTEGER (Write)
+      }{
+         The number of good pixels within the aperture.
+      }
+      \sstsubsection{
+         NUMPIX = \_INTEGER (Write)
+      }{
+         The total number of pixels within the aperture.
+      }
+      \sstsubsection{
+         QUIET = LOGICAL (Read)
+      }{
+         If TRUE then the statistics are not displayed on the screen.
+         Output parameters and log files are still created. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         SIGMA = \_DOUBLE (Write)
+      }{
+         The standard deviation of the pixel values within the
+         aperture.
+      }
+      \sstsubsection{
+         SIGMEAN = \_DOUBLE (Write)
+      }{
+         The standard deviation on the mean pixel value. If variances are
+         available this is the RMS value of the standard deviations
+         associated with each included pixel value. If variances are not
+         available, it is the standard deviation of the pixel values
+         divided by the square root of the number of good pixels in
+         the aperture.
+      }
+      \sstsubsection{
+         SIGTOTAL = \_DOUBLE (Write)
+      }{
+         The standard deviation on the total data sum. Only created if If variances are
+         available this is the RMS value of the standard deviations
+         associated with each included pixel value. If variances are not
+         available, it is the standard deviation of the pixel values
+         divided by the square root of the number of good pixels in
+         the aperture.
+      }
+      \sstsubsection{
+         TOTAL = \_DOUBLE (Write)
+      }{
+         The total of the pixel values within the aperture.
+      }
+      \sstsubsection{
+         USEAXIS = GROUP (Read)
+      }{
+         USEAXIS is only accessed if the current co-ordinate Frame of the
+         NDF has too many axes. A group of strings should be supplied
+         specifying the axes which are to be used when specifying the
+         aperture using parameters ARDFILE, CENTRE and DIAM. Each axis can
+         be specified either by its integer index within the current Frame
+         (in the range 1 to the number of axes in the current Frame), or by
+         its symbol string. A list of acceptable values is displayed if an
+         illegal value is supplied. If a null (!) value is supplied, the
+         axes with the same indices as the 2 used pixel axes within the
+         NDF are used. {\tt [!]}
+      }
+      \sstsubsection{
+         WEIGHT = \_LOGICAL (Read)
+      }{
+         If a TRUE value is supplied, and the input NDF has a VARIANCE
+         component, then pixels with larger variances will be given
+         smaller weight in the statistics. The weight associated with
+         each pixel is proportional to the reciprocal of its variance.
+         The constant of proportionality is chosen so that the mean weight
+         is unity. The pixel value and pixel variance are multiplied by
+         the pixels weight before being used to calculate the statistics.
+         The calculation of the statistics remains unchanged in all other
+         respects. {\tt [FALSE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         aperadd neb1 {\tt "}13.5,201.3{\tt "} 20
+      }{
+         This calculates the statistics of the pixels within a circular
+         aperture of NDF neb1. Assuming the current co-ordinate Frame of
+         neb1 is PIXEL, the aperture is centred at pixel co-ordinates
+         (13.5, 201.3) and has a diameter of 20 pixels.
+      }
+      \sstexamplesubsection{
+         aperadd neb1 {\tt "}15:23:43.2 -22:23:34.2{\tt "} {\tt "}10:0{\tt "}
+      }{
+         This also calculates the statistics of the pixels within a circular
+         aperture of NDF neb1. Assuming the current co-ordinate Frame of
+         neb1 is a SKY Frame describing RA and DEC, the aperture is centred
+         at RA 15:23:43.2 and DEC -22:23:34.2, and has a diameter of 10
+         arc-minutes.
+      }
+      \sstexamplesubsection{
+         aperadd ndf=neb1 ardfile=outline.dat quiet logfile=obj1
+      }{
+         This calculates the statistics of the pixels within an aperture
+         of NDF neb1 described within the file {\tt "}outline.dat{\tt "}. The file
+         contains an ARD description of the required aperture. The results
+         are written to the log file {\tt "}obj1{\tt "}, but are not displayed on the
+         screen.
+      }
+   }
+   \sstdiytopic{
+      ASCII-region-definition Descriptors
+   }{
+      The ARD file may be created by ARDGEN or written manually.  In the
+      latter case consult SUN/183 for full details of the ARD
+      descriptors and syntax; however, much may be learnt from looking
+      at the ARD files created by ARDGEN and the ARDGEN documentation.
+      There is also a summary with examples in the main body of SUN/95.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: STATS, MSTATS, ARDGEN, ARDMASK, ARDPLOT, WCSFRAME.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the WCS, AXIS, DATA, and VARIANCE
+         components of an NDF data structure.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         Bad pixels and automatic quality masking are supported.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
 \sstroutine{
    ARDGEN
 }{
@@ -43328,6 +43506,14 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{APERADD}{APERADD}] \mbox{}
+      \begin{itemize}
+         \item Modified to use the full NDF data structure, including
+         variances and WCS. All parameters have been changed. The aperture can 
+         now optionally be specified using an ARD file. Some ARD files
+         allow N-dimensional NDFs to be processed.
+      \end{itemize}
+
    \item [\htmlref{GDSET}{GDSET}] \mbox{}
       \begin{itemize}
          \item If a postscript device is selected, GDSET now reports the name of the 
@@ -43908,7 +44094,7 @@ functions as follows.
 \item {\large\bf Statistics}
 \begin{description}
 \classitem{APERADD}
- Derives statistics of pixels within a specified circle of a 2-d data array.
+ Derives statistics of pixels within a specified aperture of an NDF.
 \classitem{HISTAT}
  Computes ordered statistics for an NDF's pixels using an histogram.
 \classitem{HISTOGRAM}
