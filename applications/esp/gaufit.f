@@ -787,7 +787,7 @@
 *+
 *  Name:
 *     GAU1_FILER
-
+*
 *  Purpose:
 *     Opens a user specified text file and reads from it a list of
 *     values that specify the source position and radius.
@@ -797,17 +797,17 @@
 *     co-ordinates are legal (i.e. within the image) then another value 
 *     is read from the line (if available) and this is used as the radius 
 *     when the profile is calculated.
-
+*
 *     If column 3-6 are found, these are assumed to be the estimate 
 *     of position angle, Sa, Sb and peak values provided by the user. 
-      
+*      
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *      CALL GAU1_FILER(FIOID,INDF,NSOUR,
 *                      XC,YC,RLIM,HINT,FWHM,STATUS)    
-
+*
 *  Description:
 *     Looks at each line of the required file in turn.
 *     Ignores blank lines and those starting with # or ! since these
@@ -823,7 +823,7 @@
 *     counter is incremented and the values stored in arrays XC and YC.
 *     The line is then examined to determine if a further value is present.
 *     If a value is found it is to used as the initial HINT value.
-
+*
 *  Arguments:               
 *     FIOID = INTEGER (Given)
 *        FIO identifier for the input file.
@@ -848,22 +848,28 @@
 *        Work in units of FWHM, rather than sigma.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
-
+*     NG: Norman Gray (Starlink, Glasgow)
+*
 *  History:
 *     9-Mar-1996 (GJP)
 *     (Original version)
 *     26-OCT-1999 (MBT):
-*     Modified to cope with COSYS=C.
+*        Modified to cope with COSYS=C.
 *     8-NOV-1999 (MBT):
-*     Removed COSYS altogether.
-
+*       Removed COSYS altogether.
+*     8-Nov-1999 (NG)
+*       Corrected estimate of rlim() from crazy averaging of major axis
+*       and _angle_!  Altered so that if it finds 3 numbers on the input
+*       line, the third is taken to be the source radius (ie, now matches
+*       the `purpose' line at the top).
+*
 *  Bugs:
 *     None known.
-
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -1048,7 +1054,12 @@
                XC(NSOUR,1)=VALUE(1)
                YC(NSOUR,1)=VALUE(2)
                IF (FAILN.EQ.0.OR.FAIL) THEN          
-                  RLIM(NSOUR)= (VALUE(3)+VALUE(4))/2.
+*               Six good values on the line:
+*               Make an estimate of the source limit by averaging the 
+*               major and minor axes.  A bit hokey, but the precise value
+*               of rlim() isn't terribly important.  Note that this was WRONG,
+*               averaging value(3) & value(4), before fix of 8-Nov-1999.
+                  RLIM(NSOUR)= (VALUE(4)+VALUE(5))/2.
                   HINT(3,NSOUR)=VALUE(3) ! angle
                   HINT(1,NSOUR)=VALUE(4) ! sigma_a
                   HINT(2,NSOUR)=VALUE(5) ! sigma_b
@@ -1060,11 +1071,19 @@
                      HINT(2,NSOUR) = HINT(2,NSOUR) * 0.5/SQRT(LOG(2.0))
                   ENDIF
                ELSE
-                  CALL MSG_FMTR('XV','F6.1',XC(NSOUR,1))
-                  CALL MSG_FMTR('YV','F6.1',YC(NSOUR,1))
-                  CALL MSG_OUT(' ','Will deduce a radius for the'//
-     :                            ' source at ^XV, ^YV ',STATUS) 
-                  RLIM(NSOUR)=VAL__BADR
+*               If FAILN is three (ie, there are precisely three good numbers
+*               in the line), then the third is taken as the value of RLIM
+*               to choose for this coordinate pair.
+                  IF (FAILN.EQ.3) THEN
+                     RLIM(NSOUR) = VALUE(3)
+                  ELSE
+                     CALL MSG_FMTR('XV','F6.1',XC(NSOUR,1))
+                     CALL MSG_FMTR('YV','F6.1',YC(NSOUR,1))
+                     CALL MSG_OUT(' ','Should be 2, 3 or 6 numbers'//
+     :                    ' on input line.  Will deduce a radius for'//
+     :                    ' the source at ^XV, ^YV ',STATUS) 
+                     RLIM(NSOUR)=VAL__BADR
+                  ENDIF
                   HINT(1,NSOUR)=VAL__BADR
                   HINT(2,NSOUR)=VAL__BADR
                   HINT(3,NSOUR)=VAL__BADR
