@@ -2895,7 +2895,7 @@
       WRITE (LUS,8995)
       IF (LUX.GT.0) WRITE (LUX, 8895)
  8995 FORMAT (1X,'--------- UNKNOWNS BUT NO SOLUTION ----------')
- 8895 FORMAT ('ERROR 019 Unknowns but no solution
+ 8895 FORMAT ('ERROR 019 Unknowns but no solution')
 
 *  Skip rest of input records if any
  997  CONTINUE
