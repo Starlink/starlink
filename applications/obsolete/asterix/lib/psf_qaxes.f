@@ -17,7 +17,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -41,6 +40,6 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Call internal routine
-      CALL PSF1_GETAXID( P_INST(SLOT), X_AX, Y_AX, E_AX, T_AX, STATUS )
+      CALL PSF0_GETAXID( P_PSID(SLOT), X_AX, Y_AX, E_AX, T_AX, STATUS )
 
       END

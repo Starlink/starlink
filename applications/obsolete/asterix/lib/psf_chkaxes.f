@@ -207,7 +207,7 @@
       END IF
 
 *  Write axis identifiers
-      CALL PSF1_PUTAXID( P_INST(SLOT), AXID(1), AXID(2), AXID(3),
+      CALL PSF0_PUTAXID( P_PSID(SLOT), AXID(1), AXID(2), AXID(3),
      :                   AXID(4), STATUS )
 
 *  Mark as done

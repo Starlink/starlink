@@ -526,7 +526,7 @@
 
 *  Identify spatial axes
       CALL ADI_CGET0I( PSID, 'Instance', INST, STATUS )
-      CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
+      CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Tell the user about the pixel size if we have a dataset.
       X_OK = PSF1_GETAXOK( INST, X_AX, STATUS )
@@ -2020,7 +2020,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( MAJOR .GE. 1.73 ) THEN
 
 *    Identify spatial axes
-        CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
+        CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *    Get X and Y axis parameters, and compare with dataset
         DO IAX = 1, 2
