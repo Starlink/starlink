@@ -1991,7 +1991,7 @@ sub check_kwd_list ($$) {
     foreach my $k (keys(%$t)) {
 	return $t->{$k} unless defined($m->{$k});
 	my $pattern = '^'.$m->{$k}.'$';
-	return $t->{$k} unless $t->{$k} =~ m{$pattern};
+	return "$k=".$t->{$k} unless $t->{$k} =~ m{$pattern};
     }
     return undef;
 }
