@@ -2848,12 +2848,12 @@ void adix_mtacop_l( ADIboolean in_c, UT_CTYPE_l *in, int n,
 		    ADIboolean out_c, UT_CTYPE_l *out, ADIstatus status )
   {
   int		i;
-  UT_CTYPE_l	iptr = in;
-  UT_CTYPE_l	optr = out;
+  UT_CTYPE_l	*iptr = in;
+  UT_CTYPE_l	*optr = out;
 
   if ( in_c && ! out_c ) {
     for( i=0; i<n; i++ )
-      *optr++ = *iptr++ ? F77_TRUE : F77_FALSE;
+      *optr++ = (*iptr++) ? F77_TRUE : F77_FALSE;
     }
   else if ( out_c && ! in_c ) {
     for( i=0; i<n; i++ )
