@@ -1,5 +1,5 @@
       SUBROUTINE SURFLIB_PLOT_GRID (UNIT, NX, NY, NMAX, 
-     :     NSIGMA, IPOS, JPOS, BINS, PNTS, POS, STATUS)
+     :     NSIGMA, IPOS, JPOS, BINS, STATS, PNTS, POS, STATUS)
 *+
 *  Name:
 *     SURFLIB_PLOT_GRID
@@ -12,7 +12,7 @@
  
 *  Invocation:
 *     CALL SURFLIB_PLOT_GRID(UNIT, NX, NY, NMAX, NSIGMA, IPOS, JPOS
-*    :    BINS, PNTS, POS, STATUS)
+*    :    BINS, STATS, PNTS, POS, STATUS)
 
 *  Description:
 *     Given the binned data calculated by SURFLIB_FILL_GRID
@@ -34,7 +34,9 @@
 *     IPOS(NX * NY) = INTEGER (Given)
 *       I coordinate for each pixel
 *     JPOS(NX * NY) = INTEGER (Given)
-*       J coordinate for each pixel
+*       J coordinate for each pixe
+*     STATS(NX, NY, 3) = REAL (Given)
+*       Statistics for each bin. 1=Median, 2=high, 3=low
 *     BINS(NX, NY, NMAX) = REAL (Given)
 *       The data stored in relation to its position
 *     PNTS(NMAX) = REAL (Given)
@@ -56,6 +58,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.2  1997/11/12 00:09:14  timj
+*     Pass the line parameters (statistics) into subroutine.
+*
 *     Revision 1.1  1997/11/10 19:42:17  timj
 *     Initial revision
 *
@@ -84,6 +89,7 @@
       REAL    POS (NMAX)
       INTEGER IPOS(NX * NY)
       INTEGER JPOS(NX * NY)
+      REAL    STATS(NX, NY, 3)
 
 *  Arguments Given & Returned:
 
@@ -94,17 +100,12 @@
 
 *     Local Variables:
       INTEGER AXIS            ! PGPLOT axis type
-      BYTE    BTEMP           ! Dummy byte variable
       INTEGER COUNT           ! Loop counter
       REAL    DMAX            ! Maximum of data
       REAL    DMIN            ! Minimum of data
-      DOUBLE PRECISION DTEMP  ! Temporary double
       INTEGER I               ! Loop variable
       INTEGER IERR            ! For VEC_
-      INTEGER ITEMP           ! Temporary integer
       INTEGER J               ! J coordinate
-      DOUBLE PRECISION MEAN   ! Mean
-      DOUBLE PRECISION MEDIAN ! Median
       INTEGER MED_X_PTR       ! Position of medians
       INTEGER MED_X_END       ! End of MED_X_PTR
       INTEGER MED_PTR         ! Medians for each bin
@@ -114,15 +115,8 @@
       INTEGER NGOOD           ! Number of good points
       INTEGER N_MEDIANS       ! Number of medians calculated
       INTEGER N_SIGS          ! Number of standard deviations calculated
-      INTEGER QUAL_END        ! end of dummy quality array
-      INTEGER QUAL_PTR        ! Dummy quality array
-      INTEGER QSORT_END       ! End of sorted array
-      INTEGER QSORT_PTR       ! Sort array for statr
       REAL    RANGE           ! Y extent
       INTEGER STEP            ! Step size for loop
-      DOUBLE PRECISION STDEV  ! Standard deviation
-      DOUBLE PRECISION SUM    ! Sum of data
-      DOUBLE PRECISION SUMSQ  ! Sum of squares
       INTEGER STDEVM_PTR      ! Mean - stdev
       INTEGER STDEVM_END      ! End
       INTEGER STDEVP_PTR      ! Mean + stdev
@@ -137,10 +131,6 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Initialise pointers
-      QUAL_PTR = 0
-      QUAL_END = 0
-      QSORT_PTR = 0
-      QSORT_END = 0
       MED_X_PTR = 0
       MED_X_END = 0
       MED_PTR = 0 
@@ -207,19 +197,6 @@
             DMAX = DMAX + (0.05 * RANGE)
             DMIN = DMIN - (0.05 * RANGE)
 
-*     Get some memory for the stats routine
-
-            CALL SCULIB_MALLOC(NMAX * VAL__NBR, QSORT_PTR, QSORT_END,
-     :           STATUS)
-            CALL SCULIB_MALLOC(NMAX * VAL__NBUB, QUAL_PTR, QUAL_END,
-     :           STATUS)
-
-*     Fill this dummy quality array with 0
-            BTEMP = 0
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_CFILLB(NMAX, BTEMP, %VAL(QUAL_PTR))
-            END IF
-
 *     Get some memory for the line drawing routine
             CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_X_PTR, 
      :           MED_X_END, STATUS)
@@ -279,16 +256,13 @@
 *     Plot the points using PGPT
                   CALL PGPT(NGOOD, POS, PNTS, SYMBOL)
 
-*     Find the mean and sigma
-                  CALL SCULIB_STATR(NGOOD, NSIGMA, PNTS, 
-     :                 %VAL(QUAL_PTR), 
-     :                 BTEMP, ITEMP, MEAN, MEDIAN, SUM, SUMSQ, STDEV, 
-     :                 %VAL(QSORT_PTR), STATUS)
+*     ...and read the statistics associated with this (I,J)
+*     Have to use pointers again for the scratch space
                   
 *     Store the median and sigma for later plotting
 *     D**M pointers!
                   
-                  CALL VEC_DTOR(.FALSE., 1, MEDIAN, 
+                  CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
      :                 %VAL(MED_PTR + (N_MEDIANS * VAL__NBR)),
      :                 IERR, NERR, STATUS)
                   
@@ -299,14 +273,13 @@
                   
                   N_MEDIANS = N_MEDIANS + 1
                   
-                  IF (STDEV .NE. VAL__BADD .AND. NSIGMA .GT.0.0) THEN
-                     DTEMP = MEAN + (DBLE(NSIGMA) * STDEV)
-                     CALL VEC_DTOR(.FALSE., 1, DTEMP, 
+                  IF (STATS(I,J,2) .NE. VAL__BADR) THEN
+
+                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,2), 
      :                    %VAL(STDEVP_PTR + (N_SIGS * VAL__NBR)),
      :                    IERR, NERR, STATUS)
                      
-                     DTEMP = MEAN - (DBLE(NSIGMA) * STDEV)
-                     CALL VEC_DTOR(.FALSE., 1, DTEMP, 
+                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,3), 
      :                    %VAL(STDEVM_PTR + (N_SIGS * VAL__NBR)),
      :                    IERR, NERR, STATUS)
                      
@@ -341,8 +314,6 @@
             END IF
             
 *     Free the memory
-            CALL SCULIB_FREE('QSORT', QSORT_PTR, QSORT_END, STATUS)
-            CALL SCULIB_FREE('QUAL', QUAL_PTR, QUAL_END, STATUS)
             CALL SCULIB_FREE('MED_PTR', MED_PTR, MED_END, STATUS)
             CALL SCULIB_FREE('MED_X_PTR',MED_X_PTR, MED_X_END, 
      :           STATUS)
