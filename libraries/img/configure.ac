@@ -39,6 +39,9 @@ dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
 dnl    which correspond to it.
 STAR_MESSGEN(img_err.msg)
 
+dnl    The IMG test is an atask so we need to be able to build monoliths.
+STAR_MONOLITHS
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])

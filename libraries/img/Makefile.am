@@ -116,4 +116,9 @@ GNPFLAGS = rlid
 MAINTAINERCLEANFILES = $(G_ROUTINES:.gen=.f) $(GNP_ROUTINES:.gnp=.f) \
  $(GCP_ROUTINES:.gcp=.f)
 
-#  Installation check, sorry, don't know how to do this for an Atask.
+#  Installation check.
+TESTS = img_test
+check_MONOLITHS = img_test
+img_test_SOURCES = img_test.f libimg_adam.la
+img_test_TASKS =
+img_test_LDADD = $(LDADD) `$(srcdir)/img_link_adam`
