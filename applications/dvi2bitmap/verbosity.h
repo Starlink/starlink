@@ -25,8 +25,31 @@
 //    $Id$
 
 
-// leave `everything' as the last in this enum
 #ifndef VERBOSITY_HEADER_READ
 #define VERBOSITY_HEADER_READ 1
+
+/**
+ * Expresses a verbosity level.  Several classes report a different
+ * level of detail depending on the value of some internal verbosity
+ * variable, usually set with a function such as {@link
+ * DviFile#verbosity}.
+ *
+ * <p>The initial value of this is always <code>normal</code>.  The
+ * value <code>everything</code> is the highest level (but not
+ * <em>necessarily</em> higher than <code>debug</code>; the value
+ * <code>silent</code> causes the class to produce no output at all.
+ *
+ * <p>The values are ordered, so that 
+ * <pre>
+ *   enum verbosities verbosity_;
+ *   ...
+ *   if (verbosity_ > normal) {
+ *     // chatter
+ *   }
+ * </pre>
+ * is a good way of testing whether the verbosity level is above normal.
+ */
 enum verbosities { silent, quiet, normal, debug, everything };
+// leave `everything' as the last in this enum
+
 #endif
