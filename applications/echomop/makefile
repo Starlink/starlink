@@ -240,9 +240,16 @@
 #        Several fixes to mismatched data types and precisions in
 #           various routines.  Fix to uninitialised variable and illegal
 #           format specifiers (Linux).   Version 3.3-3
+#     12-OCT-1998 (BLY):
+#        Changed link script to use pgp_link for Starlink_PGPLOT.
+#           *** NOTE: should be using pgp_link_adam but graphics is
+#           not set up correctly.
+#     13-OCT-1998 (BLY):
+#        Modify clean target to remove $(HELPTASK_SOURCE:.c=.o)
+#        Version 3.3-4
 #     05-JUL-1999 (NG):
 #        Added sun152.htx target.  Brought sources into CVS.  Fixed
-#        controls on OPEN statements (unsupported by g77).  Version 3.3-4
+#        controls on OPEN statements (unsupported by g77).  Version 3.3-5
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -437,7 +444,7 @@ PKG_LINK = ECHOMOP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.3-4
+PKG_VERS = 3.3-5
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -802,8 +809,8 @@ lib$(PKG_NAME).a: $(OBJECT_FILES)
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES)
 	$(ALINK) $@.o -o $@ $(OBJECT_LIBRARIES) \
 	 -L$(FIGARO_SOURCE) -lgen $(ADDLIBS) \
-	 `pda_link` `hlp_link` `pgplot_link` `sla_link_adam` \
-	 `psx_link_adam` `fio_link_adam` `ndf_link_adam`
+	 `pda_link_adam` `pgp_link` `sla_link_adam` \
+         `hlp_link` `fio_link_adam` `ndf_link_adam`
 
 #  Rules for building the help browser.
 
@@ -813,7 +820,6 @@ $(HELPTASK): $(HELPTASK_SOURCE)
 	$(CFLINK) helpm.o helpc.o -o $(HELPTASK) \
            $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
            `hlp_link` `fio_link` `cnf_link` $(CFLIBS) $(LDFLAG2)
-	- rm -f help[mc].o
 
 #  Rules for building the help libraries.
 
@@ -1695,7 +1701,8 @@ clean:
 	@- rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
               $(PLATFORM_F) $(BLOCK_DATA) $(IFL_FILES) $(MONO_IFL) \
               $(C_ROUTINES) $(OBJECT_FILES) $(MONO_SOURCE) \
-              $(MONO_OBJECT) $(HELP_SOURCES) $(HELPTASK_SOURCE) junk.sdf \
+              $(MONO_OBJECT) $(HELP_SOURCES) $(HELPTASK_SOURCE) \
+              $(HELPTASK_SOURCE:.c=.o) junk.sdf \
               1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
