@@ -25,6 +25,8 @@
 *        Added definitions for the IntraMap class.
 *     21-DEC-1998 (RFWS):
 *        Added resampling definitions for the Mapping class.
+*     15-NOV-1999 (RFWS):
+*        Added definitions for PcdMap.
 *-
 
 *  Length of character string returned by a character function.
@@ -161,6 +163,10 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  LutMap class.
       INTEGER AST_LUTMAP
       LOGICAL AST_ISALUTMAP
+
+*  PcdMap class.
+      INTEGER AST_PCDMAP
+      LOGICAL AST_ISAPCDMAP
 
 *  Plot class.
       INTEGER AST_PLOT
