@@ -601,8 +601,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_pnply.f ccd1_prmin.f \
- ccd1_prndf.f ccd1_prsel.f ccd1_prune.f ccd1_ptbad.f ccd1_pthmp.f \
- ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
+ ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_prune.f ccd1_ptbad.f \
+ ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
  ccd1_rend.f ccd1_reov.f ccd1_repc.f ccd1_rexp.f \
  ccd1_rfcr.f ccd1_rflt.f ccd1_rglo.f ccd1_rmcom.f \
@@ -616,7 +616,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_wdpc.f ccd1_wedge.f ccd1_wffc.f \
  ccd1_wgtrn.f ccd1_winad.f ccd1_windr.f ccd1_wlis.f \
  ccd1_wltrn.f ccd1_wmmc.f ccd1_wrgra.f ccd1_wrixy.f \
- ccd1_wrxyp.f ccd1_xadd.f fio1_cllog.f fio1_errep.f \
+ ccd1_wrxyp.f ccd1_xadd.f ccd1_xyfmt.f fio1_cllog.f fio1_errep.f \
  fio1_msg.f fio1_msgl.f fio1_oplog.f fio1_silev.f \
  ccd1_lsfun1.f ccd1_lsfuns.f ccd1_imfit.f ccd1_ftgrp.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
@@ -1980,19 +1980,21 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then $(RM) .TESTED_$(SYSTEM); else :; fi
 #
+	@ echo ' '
+	@ echo ' $(PACK_NAME) does not have a make driven installation test'
 	@ echo
-	@ echo '$(PACK_NAME) does not have a make driven installation test'
+	@ echo ' To test $(PACK_NAME), you should run the demonstration scripts, thus'
+	@ echo ' (% is the shell prompt):'
 	@ echo
-	@ echo 'To test $(PACK_NAME), you should run the demonstration scripts,'
-	@ echo 'thus (% is the shell prompt):'
-	@ echo
-	@ echo ' % cd /empty_directory'
-	@ echo ' % source /star/etc/cshrc'
-	@ echo ' % xdisplay'
-	@ echo ' % $(PKG_NAME)'
-	@ echo ' % ccdexercise'
-	@ echo ' % wcsexercise'
-	@ echo
+	@ echo '    % cd /empty_directory'
+	@ echo '    % source /star/etc/cshrc'
+	@ echo '    % xdisplay'
+	@ echo '    % $(PKG_NAME)'
+	@ echo '    % ccdexercise'
+	@ echo '    % wcsexercise'
+	@ echo ' '
+	@ echo ' These scripts create a number of files, which you can delete afterwards.'
+	@ echo ' '
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
@@ -2314,6 +2316,7 @@ ccd1_pnply.o: SAE_PAR
 ccd1_prin.o: CCD1_PAR FIO_ERR IRG_FAC PAR_ERR SAE_PAR
 ccd1_prmin.o: PRM_PAR SAE_PAR
 ccd1_prndf.o: SAE_PAR
+ccd1_proff.o: MSG_PAR SAE_PAR
 ccd1_prsel.o: SAE_PAR
 ccd1_prune.o: SAE_PAR
 ccd1_ptbad.o: SAE_PAR
@@ -2379,6 +2382,7 @@ ccd1_wrixy.o: PRM_PAR SAE_PAR
 ccd1_wrtpa.o: MSG_PAR SAE_PAR
 ccd1_wrxyp.o: PRM_PAR SAE_PAR
 ccd1_xadd.o: PAR_ERR SAE_PAR
+ccd1_xyfmt.o: AST_PAR SAE_PAR
 ccdalign.o: FIO_ERR MSG_PAR PSX_ERR SAE_PAR
 ccdclear.o: DAT_ERR DAT_PAR IRH_PAR SAE_PAR
 ccdedit.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
