@@ -136,24 +136,10 @@
  *       in supplied value, and optional .shl
  *    28 Jul 2004 (timj):
  *       Add isenv. Now call fortran SHL code rather than duplicate loads
- *       of that code in C.
-
- * ToDo:
- *    It probably makes sense for this routine to be rewritten
- *    to simply call SHL_TRNVAR and SHL_GETHELP. There does not
- *    seem to be a good reason for keeping this C code separate
- *    from the fortran code which duplicates it. This is historically
- *    in place as the figaro version of help (or specdre) and
- *    so long as the calling interface is retained (and the trapping
- *    of -l) then there is no reason to keep the bulk of the callback
- *    C code. 
- 
+ *       of that code in C. Now have return status.
 
  * Bugs: 
- *    It's arguably a bug that status is not returned by this
- *    function.  on abort (or bad Starlink status) this should return
- *    some kind of status (either throught inherited status or by return
- *    value) such that the caller can report the error to the shell.
+ *    {Enter_new_bugs_here}
 
  *-
  */
