@@ -1,7 +1,7 @@
-      SUBROUTINE FSI1_PUT( NARG, ARGS, OARG, STATUS )
+      SUBROUTINE FSI1_PUTREF( NARG, ARGS, OARG, STATUS )
 *+
 *  Name:
-*     FSI1_PUT
+*     FSI1_PUTREF
 
 *  Purpose:
 *     Write file reference to an HDS object attached to a FileSet
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL FSI1_PUT( NARG, ARGS, OARG, STATUS )
+*     CALL FSI1_PUTREF( NARG, ARGS, OARG, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -118,6 +118,6 @@
       CALL FRI1_PUT1( TLOC, CNAM, ARGS(3), STATUS )
 
 *  Report any errors
- 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FSI1_PUT', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FSI1_PUTREF', STATUS )
 
       END
