@@ -40,6 +40,7 @@
 *                         sizes which have large prime factors
 *     10 Jun 94 : V1.8-0  Imported into Asterix - cut workspace requirements
 *                         drastically. (DJA)
+*     29 Nov 94 : V1.8-1  Fixed memory corruption bug (DJA)
 *
 *    Type Definitions :
 *
@@ -486,6 +487,8 @@
 *    Default OP to -AV
       IF ((MA.LT.MB).OR.(NA.LT.NB)) THEN
         CALL ARR_INIT1D( DBLE(-AV), MB*NB, B, STATUS )
+      ELSE
+        CALL ARR_INIT1D( 0.0, MB*NB, B, STATUS )
       END IF
 
 *    Copy to middle
