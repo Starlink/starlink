@@ -152,12 +152,12 @@
 *     {routine_description}
 
 *  Arguments:
-*     NARG = INTEGER (given)
-*        Number of method arguments
-*     ARGS(*) = INTEGER (given)
-*        ADI identifier of method arguments
-*     OARG = INTEGER (returned)
-*        Output data
+*     FID = INTEGER (given)
+*        ADI identifier of FITSfile object
+*     NBYTE = INTEGER (given)
+*        Number of bytes to save
+*     GCBPTR = INTEGER (given)
+*        Address of compressed GCB data
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -243,7 +243,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Does GCB extension already exist?
-      CALL ADI2_FNDHDU( ARGS(1), 'GCB', GCBHDU, STATUS )
+      CALL ADI2_FNDHDU( FID, 'GCB', GCBHDU, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Get existing size
@@ -260,7 +260,7 @@
         CALL ERR_ANNUL( STATUS )
 
 *    Define new extension
-        CALL ADI2_CREIMG( ARGS(1), 'GCB', 1, NBYTE, 'BYTE',
+        CALL ADI2_CREIMG( FID, 'GCB', 1, NBYTE, 'BYTE',
      :                    GCBHDU, STATUS )
 
 *    Write some keywords
