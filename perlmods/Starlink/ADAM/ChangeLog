@@ -1,3 +1,8 @@
+2000-07-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* ADAM.pm: Increment version number to 1.12 to match next starlink
+	release.
+
 2000-05-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* ADAM.pm (adam_receive): MSG_NAME_LEN and MSG_VAL_LEN are no

@@ -82,7 +82,7 @@ require DynaLoader;
 
 Exporter::export_tags('ams','adam');
 
-$VERSION = '1.01';
+$VERSION = '1.12';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -245,7 +245,7 @@ sub adam_process_message {
 
       # Now look at $prompt (dont know why since prompt CAN only
       # equal $inmsg_value!)
-      # Need to work this out      
+      # Need to work this out
 
       if ($prompt) {
 	$value = $prompt;
@@ -301,7 +301,7 @@ subroutine (not necessarily the status of the transaction).
 #
 #  Usage: adam_getreply timeout path messid
 #
-#  Returns: 
+#  Returns:
 #    ($command, $task, $inmsg_name, $path, $messid, $facerr, $inmsg_value,
 #     $status)
 
@@ -410,8 +410,8 @@ sub adam_receive {
 
   # Now examine this message to see what we can found out about it
 
-  ($command, $task, $facerr, $status) = 
-    adam_process_message($path,$messid, $inmsg_status, $inmsg_context, 
+  ($command, $task, $facerr, $status) =
+    adam_process_message($path,$messid, $inmsg_status, $inmsg_context,
 			 $inmsg_name, $inmsg_length, $inmsg_value, $status);
 
   # Strip trailing spaces from inmsg_value
@@ -562,7 +562,7 @@ Initialise the adam system and identify it in the messaging system by
 #    where my_name is the name of this perl process
 
 sub adam_start {
-  
+
   my ($fac, $ident, $text);
 
   croak "Usage: adam_start task_name"
@@ -684,7 +684,7 @@ directly from the autoloader.
 
 # adam_strtostatus
 #   Convert a string to a status number
-# 
+#
 #   Usage: adam_strtostatus string status
 #
 #   Returns  msg_status
@@ -702,13 +702,13 @@ sub adam_strtostatus {
 
   ($string eq 'ACTSTART') && (return &DTASK__ACTSTART);
   ($string eq 'ACTCOMPLETE') && (return &DTASK__ACTCOMPLETE);
-  ($string eq 'PARAMREP') && (return &MESSYS__PARAMREP);  
-  ($string eq 'PARAMREQ') && (return &MESSYS__PARAMREQ);  
-  ($string eq 'INFORM') && (return &MESSYS__INFORM);  
-  ($string eq 'SYNC') && (return &MESSYS__SYNC);  
-  ($string eq 'SYNCREP') && (return &MESSYS__SYNCREP);  
+  ($string eq 'PARAMREP') && (return &MESSYS__PARAMREP);
+  ($string eq 'PARAMREQ') && (return &MESSYS__PARAMREQ);
+  ($string eq 'INFORM') && (return &MESSYS__INFORM);
+  ($string eq 'SYNC') && (return &MESSYS__SYNC);
+  ($string eq 'SYNCREP') && (return &MESSYS__SYNCREP);
   ($string eq 'TRIGGER') && (return &MESSYS__TRIGGER);
-  
+
   # Error
   carp "adam_strtostatus: $string is not a recognised status\n";
 
@@ -748,7 +748,7 @@ sub adam_appendstatus {
   ems1_get_facility_error($istat, $facility, $ident, $text);
 
   return ($facility, $ident, $text);
-  
+
 }
 
 
@@ -788,8 +788,8 @@ perl(1). L<Starlink::EMS>, L<Starlink::AMS::Task>
 
 =head1 AUTHOR
 
-Tim Jenness (t.jenness@jach.hawaii.edu), 
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>,
 Copyright (c) Particle Physics and Research Council
-and Tim Jenness 1997, 1998. All Rights Reserved.
+and Tim Jenness 1997-2000. All Rights Reserved.
 
 =cut
