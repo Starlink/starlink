@@ -768,7 +768,7 @@
      :             / (ABS(DX)*MATH__RTOD*60.0)
             CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, REAL(TPW)/2.0,
      :                          REAL(TPW)/2.0, 0.0, 0.0, TPW, TPW,
-     :                          PKERN, STATUS ))
+     :                          PKERN, STATUS )
 
 *          Make copy of psf
             CALL ARR_COP1R( TPW*TPW, PD(-PW,-PW,ISRC), PTEMP, STATUS )
