@@ -31,7 +31,7 @@
       I=1
 
 *  Scan list to find first empty slot
-      DO WHILE ( (ID.EQ.ADI__NULLID .AND. (I.LE.USI__NMAX))
+      DO WHILE ( (ID.EQ.ADI__NULLID) .AND. (I.LE.USI__NMAX))
 
 *    Slot in use?
         IF ( DS(I).USED ) THEN
