@@ -7,12 +7,6 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 dnl    Following sanity-check isn't terribly helpful...
 AC_CONFIG_SRCDIR(bootstrap)
 
-dnl    Common definitions for use in non-starconf Makefiles. Include
-dnl    any macros created here using make "include" of make.config.
-
-dnl    Get EXEEXT for make.config.
-AC_PROG_CC
-
 STAR_DEFAULTS
 
 AC_PROG_MAKE_SET
@@ -22,6 +16,6 @@ dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line).
 AC_CONFIG_SUBDIRS([tcl tk itcl])
 
-AC_CONFIG_FILES([Makefile make.config])
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
