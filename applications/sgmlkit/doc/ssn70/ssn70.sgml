@@ -125,7 +125,7 @@ There will be a proper distribution before 1 June.
 <change date='2-Jun-2000' versionid='v0-6-3' author=ng>
 <px>Some restructuring.  Preparing for distribution
 
-<distribution string='DR-0.7" date='11-Jun-2000' author=ng versionid='v0-7'>
+<distribution string='DR-0.7' date='11-Jun-2000' author=ng versionid='v0-7'>
 <px>RCS $Id$
 <px>First real release to programmers not directly concerned with the
 SGML project.
