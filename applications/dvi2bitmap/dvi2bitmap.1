@@ -8,7 +8,7 @@ dvi2bitmap
     [\-fp font-path] [\-fm mfmode] [\-fg] [\-fG]
     [\-P[bt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
     [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
-    [\-nqQV] [\-L[L]] [\-p num] [\-l num] [\-pp ranges]
+    [\-nqV] [\-Q[fFt]] [\-p num] [\-l num] [\-pp ranges]
     dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -89,24 +89,17 @@ number.
 Switch automatic generation of fonts off and on, respectively.  The
 default is set at compile time.
 .TP
+.I "\-g(d|p|r|i|b|m|g)"
+Switch on debugging.  The options are to trace DVI file parsing
+(`d'), PK file parsing (`p'), font rasterdata parsing (`r'), input
+(`i'), bitmap generation (`b') or the main program (`m').  Adding an
+extra `g' increases still further the amount of debugging code.  The
+debugging information may be uninformative or unintelligible; it might
+even crash the program (mention that to me).
+.TP
 .I "-l pagenum"
 See option 
 .I "\-p"
-.TP
-.I "\-L"
-Show missing fonts.
-The program writes on standard output one line per missing font, with
-five fields: the 
-font name, the DPI value it was looking for, the base-DPI of the font,
-the magnification factor, and a dummy metafont mode.
-This output can 
-be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
-generate the required fonts.
-.IP
-If the option is
-.I "\-LL"
-, then do the same, 
-except that found fonts are also listed, prefixed by a % character.
 .TP
 .I "\-m magnification"
 The TeX magnification parameter which is used when processing the DVI
@@ -118,9 +111,12 @@ will search for PK files at 200 dpi.
 .I "\-n"
 Do not actually process the DVI file, but read the DVI pre- and
 postamble.  Useful in conjunction with the 
-.I "\-L"
+.I "\-Qf"
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
+.TP
+.I "\-nf"
+Do process the DVI file, but switch off font generation.
 .TP
 .I "\-o output"
 Choose the output filename pattern.  The value is a 
@@ -221,8 +217,31 @@ that's supported by the particular format you choose using option
 .I "\-q"
 Quiet mode -- suppress some chatter.
 .TP
-.I "\-Q"
+.I "\-qq"
 Silent mode -- do not display warnings or errors.
+.TP
+.I "\-Q..."
+Query various things.  The available possibilities are
+.TP
+.I "\-Qf"
+Show missing fonts.
+The program writes on standard output one line per missing font, with
+five fields: the 
+font name, the DPI value it was looking for, the base-DPI of the font,
+the magnification factor, and a dummy metafont mode.
+This output can 
+be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
+generate the required fonts.
+.TP
+.I "\-QF"
+As for
+.I "\-Qf"
+except that found fonts are also listed, prefixed by a % character.
+.TP
+.I "\-Qt"
+List the output image formats which the program can generate, on
+stdout, separated by whitespace.  The first output format is the default.
+The program then exits.
 .TP
 .I "\-r resolution"
 Specifies the output resolution, in pixels-per-inch.  This is used
@@ -355,7 +374,7 @@ magnification factor to 2, so that the program uses a double-size font
 (eg, .../cmr10.220pk), then scales the bitmap down by a factor of 2 to
 obtain a bitmap of the correct size.
 .PP
-% dvi2bitmap -n -L -r 110 -m 1.5 -q hello.dvi
+% dvi2bitmap -n -Qf -r 110 -m 1.5 -q hello.dvi
 .br
 cmr10 165 110 1.5 localfont
 .PP
@@ -436,6 +455,10 @@ This incorporates sections of the DVItype documentation.
 .SH BUGS
 If the program doesn't conform to the DVI Driver Standard, please let
 me know.
+.PP
+There's probably too many options, but the program is designed to sit
+inside layers of scripting as one element in a complicated toolbox, so
+maybe it's defensible.
 .PP
 It would be nice to output a greater range of bitmap types.  Sometime....
 .SH AUTHOR
