@@ -454,14 +454,14 @@ c      INCLUDE 'CIO_INC'
       INTEGER GAI
       INTEGER  RAI      ! Right Ascension.
       INTEGER  DECI     ! Declination.
-      INTEGER  SYMBI    ! Symbol.
-      INTEGER  COLI     ! Colour.
-      INTEGER  SUNI     ! Units.
-      INTEGER  LABLI    ! Label.
-      INTEGER  SIZ1I    ! First  size.
-      INTEGER  SIZ2I    ! Second  "  .
-      INTEGER  SIZ3I    ! Third   "  .
-      INTEGER  SIZ4I     ! Fourth  "  .
+c     INTEGER  SYMBI    ! Symbol.
+c     INTEGER  COLI     ! Colour.
+c     INTEGER  SUNI     ! Units.
+c     INTEGER  LABLI    ! Label.
+c     INTEGER  SIZ1I    ! First  size.
+c     INTEGER  SIZ2I    ! Second  "  .
+c     INTEGER  SIZ3I    ! Third   "  .
+c     INTEGER  SIZ4I     ! Fourth  "  .
 
       LOGICAL NULFLG,MORE
       INTEGER ROW
@@ -476,10 +476,10 @@ c      INCLUDE 'CIO_INC'
 
           CALL CAT_TIDNT (GAI, 'RA', RAI, STATUS)
           CALL CAT_TIDNT (GAI, 'DEC', DECI, STATUS)
-c          CALL CAT_TIDNT (GAI, 'SYMBOL', SYMBI, STATUS)
-c          CALL CAT_TIDNT (GAI, 'COLOUR', COLI, STATUS)
-c          CALL CAT_TIDNT (GAI, 'SUNITS', SUNI, STATUS)
-c          CALL CAT_TIDNT (GAI, 'LABEL', LABLI, STATUS)
+c         CALL CAT_TIDNT (GAI, 'SYMBOL', SYMBI, STATUS)
+c         CALL CAT_TIDNT (GAI, 'COLOUR', COLI, STATUS)
+c         CALL CAT_TIDNT (GAI, 'SUNITS', SUNI, STATUS)
+c         CALL CAT_TIDNT (GAI, 'LABEL', LABLI, STATUS)
 
 
           CALL CAT_TROWS (GAI, ROWS, STATUS)
@@ -504,76 +504,76 @@ c          CALL CAT_TIDNT (GAI, 'LABEL', LABLI, STATUS)
               RA=RA/DTOR
               DEC=DEC/DTOR
 
-c              CALL CAT_EGT0I (SYMBI, SYMBOL, NULFLG, STATUS)
-c              CALL CAT_EGT0I (COLI, COLOUR, NULFLG, STATUS)
-c              CALL CAT_EGT0I (SUNI, SUNITS, NULFLG, STATUS)
-C              CALL CAT_EGT0C (LABLI, LABEL, NULFLG, STATUS)
+c             CALL CAT_EGT0I (SYMBI, SYMBOL, NULFLG, STATUS)
+c             CALL CAT_EGT0I (COLI, COLOUR, NULFLG, STATUS)
+c             CALL CAT_EGT0I (SUNI, SUNITS, NULFLG, STATUS)
+C             CALL CAT_EGT0C (LABLI, LABEL, NULFLG, STATUS)
 
-c              CALL CAT_TIDNT (GAI, 'SIZE1', SIZ1I, STATUS)
-c              IF (STATUS .EQ. CAT__NOCMP) THEN
-c                CALL ERR_ANNUL (STATUS)
-c              END IF
+c             CALL CAT_TIDNT (GAI, 'SIZE1', SIZ1I, STATUS)
+c             IF (STATUS .EQ. CAT__NOCMP) THEN
+c               CALL ERR_ANNUL (STATUS)
+c             END IF
 
-c              CALL CAT_TIDNT (GAI, 'SIZE2', SIZ2I, STATUS)
-c              IF (STATUS .EQ. CAT__NOCMP) THEN
-c                CALL ERR_ANNUL (STATUS)
-c              END IF
+c             CALL CAT_TIDNT (GAI, 'SIZE2', SIZ2I, STATUS)
+c             IF (STATUS .EQ. CAT__NOCMP) THEN
+c               CALL ERR_ANNUL (STATUS)
+c             END IF
 
-c              CALL CAT_TIDNT (GAI, 'SIZE3', SIZ3I, STATUS)
-c              IF (STATUS .EQ. CAT__NOCMP) THEN
-c                CALL ERR_ANNUL (STATUS)
-c              END IF
+c             CALL CAT_TIDNT (GAI, 'SIZE3', SIZ3I, STATUS)
+c             IF (STATUS .EQ. CAT__NOCMP) THEN
+c               CALL ERR_ANNUL (STATUS)
+c             END IF
 
-c              CALL CAT_TIDNT (GAI, 'SIZE4', SIZ4I, STATUS)
-c              IF (STATUS .EQ. CAT__NOCMP) THEN
-c                CALL ERR_ANNUL (STATUS)
-c              END IF
+c             CALL CAT_TIDNT (GAI, 'SIZE4', SIZ4I, STATUS)
+c             IF (STATUS .EQ. CAT__NOCMP) THEN
+c               CALL ERR_ANNUL (STATUS)
+c             END IF
 
 
 
 *  Convert to PGPLOT colour indices
-c              IF (COLOUR .EQ. CIO__CRED) THEN
-c                COLOUR = 2
-c              ELSE IF (COLOUR .EQ. CIO__CGRN) THEN
-c                COLOUR = 3
-c              ELSE IF (COLOUR .EQ. CIO__CBLUE) THEN
-c                COLOUR = 4
-c              ELSE IF (COLOUR .EQ. CIO__CCYAN) THEN
-c                COLOUR = 5
-c              ELSE IF (COLOUR .EQ. CIO__CMAGN) THEN
-c                COLOUR = 6
-c              ELSE IF (COLOUR .EQ. CIO__CYELL) THEN
-c                COLOUR = 7
-c              ELSE
-c                COLOUR = 1
-c              END IF
+c             IF (COLOUR .EQ. CIO__CRED) THEN
+c               COLOUR = 2
+c             ELSE IF (COLOUR .EQ. CIO__CGRN) THEN
+c               COLOUR = 3
+c             ELSE IF (COLOUR .EQ. CIO__CBLUE) THEN
+c               COLOUR = 4
+c             ELSE IF (COLOUR .EQ. CIO__CCYAN) THEN
+c               COLOUR = 5
+c             ELSE IF (COLOUR .EQ. CIO__CMAGN) THEN
+c               COLOUR = 6
+c             ELSE IF (COLOUR .EQ. CIO__CYELL) THEN
+c               COLOUR = 7
+c             ELSE
+c               COLOUR = 1
+c             END IF
 
 *  Convert to PGPLOT symbol numbers
-c              IF (SYMBOL .EQ. CIO__SOPCR) THEN
-c                SYMBOL = 4
-c              ELSE IF (SYMBOL .EQ. CIO__SFLCR) THEN
-c                SYMBOL = 17
-c              ELSE IF (SYMBOL .EQ. CIO__SOPSQ) THEN
-c                SYMBOL = 6
-c              ELSE IF (SYMBOL .EQ. CIO__SFLSQ) THEN
-c                SYMBOL = 16
-c              ELSE IF (SYMBOL .EQ. CIO__SOPTR) THEN
-c                SYMBOL = 7
-c              ELSE IF (SYMBOL .EQ. CIO__SFLTR) THEN
-c                SYMBOL = 13
-c              ELSE IF (SYMBOL .EQ. CIO__SOPSR) THEN
-c                SYMBOL = 12
-c              ELSE IF (SYMBOL .EQ. CIO__SFLSR) THEN
-c                SYMBOL = 18
-c              ELSE IF (SYMBOL .EQ. CIO__SPLUS) THEN
-c                SYMBOL = 2
-c              ELSE IF (SYMBOL .EQ. CIO__SMULT) THEN
-c                SYMBOL = 5
-c              ELSE IF (SYMBOL .EQ. CIO__SAST) THEN
-c                SYMBOL = 3
-c              ELSE
-c                SYMBOL=2
-c              END IF
+c             IF (SYMBOL .EQ. CIO__SOPCR) THEN
+c               SYMBOL = 4
+c             ELSE IF (SYMBOL .EQ. CIO__SFLCR) THEN
+c               SYMBOL = 17
+c             ELSE IF (SYMBOL .EQ. CIO__SOPSQ) THEN
+c               SYMBOL = 6
+c             ELSE IF (SYMBOL .EQ. CIO__SFLSQ) THEN
+c               SYMBOL = 16
+c             ELSE IF (SYMBOL .EQ. CIO__SOPTR) THEN
+c               SYMBOL = 7
+c             ELSE IF (SYMBOL .EQ. CIO__SFLTR) THEN
+c               SYMBOL = 13
+c             ELSE IF (SYMBOL .EQ. CIO__SOPSR) THEN
+c               SYMBOL = 12
+c             ELSE IF (SYMBOL .EQ. CIO__SFLSR) THEN
+c               SYMBOL = 18
+c             ELSE IF (SYMBOL .EQ. CIO__SPLUS) THEN
+c               SYMBOL = 2
+c             ELSE IF (SYMBOL .EQ. CIO__SMULT) THEN
+c               SYMBOL = 5
+c             ELSE IF (SYMBOL .EQ. CIO__SAST) THEN
+c               SYMBOL = 3
+c             ELSE
+c               SYMBOL=2
+c             END IF
 
 
               CALL IMARK_SAVE(1,RA,DEC,SYMBOL,COLOUR,SIZE,BOLD,

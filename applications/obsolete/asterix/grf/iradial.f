@@ -27,13 +27,11 @@
         EXTERNAL CHR_LEN
 *    Local constants :
 *    Local variables :
-      CHARACTER*1 CH
       CHARACTER*12 OPT
       INTEGER WPNTR
       REAL XC,YC,PXC,PYC
       REAL XR,YR,PXR,PYR,RAD,PRAD
       INTEGER NBIN
-      INTEGER FLAG
       LOGICAL PLOT
 *    Version :
       CHARACTER*30 VERSION
