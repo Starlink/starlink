@@ -563,7 +563,7 @@ proc BltFlashPoint { graph name index count } {
 	after 200 [list catch [list BltFlashPoint $graph $name $index $count]]
 	update
     } else {
-	$graph marker delete "bltClosest_*"
+       eval $graph marker delete [$graph marker names ""bltClosest_*"]
     }
 }
 
@@ -628,14 +628,14 @@ proc BltPopZoom { graph } {
 	after 2000 [list catch $cmd]
 	blt::busy release $graph
     } else {
-	$graph marker delete "bltZoom_title"
+       catch {$graph marker delete "bltZoom_title"}
     }
 }
 
 # Push the old axis limits on the stack and set the new ones
 
 proc BltPushZoom { graph } {
-    $graph marker delete "bltZoom_*" 
+    eval $graph marker delete [$graph marker names "bltZoom_*"]
 
     global bltZoom
     set x1 $bltZoom($graph,A,x)
@@ -674,7 +674,7 @@ proc BltPushZoom { graph } {
 proc BltResetZoom { graph } {
     global bltZoom
 
-    $graph marker delete "bltZoom_*" 
+    eval $graph marker delete [$graph marker names "bltZoom_*"]
     if { $bltZoom($graph,corner) == "A" } {
 	# Reset the whole axis
 	BltPopZoom $graph
@@ -888,7 +888,7 @@ proc BltFlashPoint { graph name index count } {
 	after 200 [list catch [list BltFlashPoint $graph $name $index $count]]
 	update
     } else {
-	$graph marker delete "bltClosest_*"
+        eval $graph marker delete [$graph marker names "bltClosest_*"]
     }
 }
 
@@ -960,7 +960,7 @@ proc BltPopZoom { graph } {
 # Push the old axis limits on the stack and set the new ones
 
 proc BltPushZoom { graph } {
-    $graph marker delete "bltZoom_*" 
+    eval $graph marker delete [$graph marker names "bltZoom_*"]
 
     global bltZoom
     set x1 $bltZoom($graph,A,x)
@@ -999,7 +999,7 @@ proc BltPushZoom { graph } {
 proc BltResetZoom { graph } {
     global bltZoom
 
-    $graph marker delete "bltZoom_*" 
+    eval $graph marker delete [$graph marker names "bltZoom_*"]
     if { $bltZoom($graph,corner) == "A" } {
 	# Reset the whole axis
 	BltPopZoom $graph
