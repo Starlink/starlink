@@ -139,14 +139,14 @@
 *            calculate std over pixels
 	      STD1 = SUMSQ1/NPTS1 - ( SUM1/NPTS1)**2
 	      IF( STD1 .GE. 0.0D0) THEN
-	        STD1 = SQRT( SNGL( STD1))
+	        STD1 = SQRT( STD1 )
 	      ELSE
 	       STD1 = -999.0
 	      END IF
 	    ELSE
 	      STD1 = -999.0
 	    END IF
-	    CALL MSG_SETR( 'STD1', SNGL( STD1))
+	    CALL MSG_SETR( 'STD1',  STD1 )
 	    CALL MSG_OUT( 'MESS',
      :	      'Standard deviation in comparison area 1 = ^STD1',
      :	      STATUS)
@@ -213,14 +213,14 @@
 *            calculate std over pixels
 	      STD2 = SUMSQ2/NPTS2 - ( SUM2/NPTS2)**2
 	      IF( STD2 .GE. 0.0D0) THEN
-	        STD2 = SQRT( SNGL( STD2))
+	        STD2 = SQRT( STD2 )
 	      ELSE
 	       STD2 = -999.0
 	      END IF
 	    ELSE
 	      STD2 = -999.0
 	    END IF
-	    CALL MSG_SETR( 'STD2', SNGL( STD2))
+	    CALL MSG_SETR( 'STD2', STD2 )
 	    CALL MSG_OUT( 'MESS',
      :	      'Standard deviation in comparison area 2 = ^STD2',
      :	      STATUS)
