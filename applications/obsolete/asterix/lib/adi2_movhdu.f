@@ -100,6 +100,7 @@
 *  Local Variables:
       CHARACTER*20		HDUTYPE			!
 
+      INTEGER			FSTAT			! FITSIO status
       INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU number
 
@@ -122,7 +123,11 @@
 
 *  Move the specified unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
-      CALL FTMAHD( LUN, NHDU, HDUTYPE, STATUS )
+      FSTAT = 0
+      CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
+      IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
+        CALL ADI2_FITERP( FSTAT, STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_MOVHDU', STATUS )

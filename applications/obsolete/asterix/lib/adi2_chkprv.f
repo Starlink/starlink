@@ -136,7 +136,7 @@
           WRITE( STR, '(A,I1.1)' ) '.HDU', IHDU
           CALL ADI_CGET0C( FID, STR, HDU, STATUS )
         END IF
-        CALL ADI2_LOCHDU1( FID, HDU, .FALSE., OHID, 0, STATUS )
+        CALL ADI2_LOCHDU( FID, HDU, OHID, STATUS )
 
 *    Is the definition incomplete?
         CALL ADI_CGET0L( OHID, '.DEF_END', DEFEND, STATUS )
@@ -161,6 +161,13 @@
                 CALL FTCRHD( LUN, FSTAT )
               END IF
               CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
+              IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
+                CALL ADI2_FITERP( FSTAT, STATUS )
+                GOTO 99
+              ELSE IF ( FSTAT .EQ. 107 ) THEN
+                FSTAT = 0
+              END IF
+
               MOVED = .TRUE.
               CALL ADI_CPUT0L( OHID, '.CREATED', .TRUE., STATUS )
 
