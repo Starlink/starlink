@@ -29,6 +29,7 @@
 *
 *  Authors :
 *     NE: Nick Eaton (Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History :
 *     Sep 1988 (NE):
@@ -43,6 +44,8 @@
 *        Clear transformation flags in cache
 *     Nov 1991 (NE):
 *        Set global status at end
+*     Jul 2004 (TIMJ):
+*        Replace GNS_STOP call with AGI1_ENDGNS
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -117,9 +120,8 @@
          ENDDO
       ENDDO
 
-*   Make sure GNS is shut down for all packages
-      CALL GNS_STOP( 'GKS', LSTAT )
-      CALL GNS_STOP( 'IDI', LSTAT )
+*   Make sure GNS is shut down for all packages (if required)
+      CALL AGI1_ENDGNS( LSTAT )
 
 *   Return the local error status if the global status is zero
       IF ( STATUS .EQ. SAI__OK ) THEN

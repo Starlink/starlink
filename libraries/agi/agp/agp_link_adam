@@ -32,6 +32,7 @@
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     DLT:  D.L. Terrett (Starlink, RAL)
 #     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -40,6 +41,8 @@
 #     14-DEC-1999 (BKM):
 #        Derive agp_link_adam from agi_link_adam (change AGI->AGP, 
 #        PGP->PGPLOT).
+#     14-JUL-2004 (TIMJ):
+#        Remove gns_link_adam (no longer required)
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -47,7 +50,7 @@
 
 #-
 
-      echo -lagp_adam  `gns_link_adam` `ref_link_adam` `trn_link_adam` \
+      echo -lagp_adam  `ref_link_adam` `trn_link_adam` \
                              `pgplot_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

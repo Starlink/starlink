@@ -58,7 +58,7 @@ AGI_F_ROUTINES = agd1_iidip.f agd1_iinit.f agd1_sidip.f agd_activ.f \
               agd_deact.f agd_nwind.f agd_swind.f agd_updat.f \
               agi1_defba.f agi1_gwnam.f agp_nview.f agp_sview.f \
               agp_activ.f ags1_gksnm.f ags_activ.f ags_deact.f ags_nzone.f \
-              ags_szone.f agp_aspec.f agp_curag.f agp_gdlst.f
+              ags_szone.f agp_aspec.f agp_curag.f agp_gdlst.f agi1_endgns.f
 
 AGI_ADAM_F_ROUTINES =  agd_assoc.f agd_deass.f agi_assoc.f agi_cancl.f \
                agp_assoc.f agp_deass.f ags_assoc.f ags_deass.f

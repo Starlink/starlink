@@ -45,6 +45,7 @@
 #        Derive agp_link from agi_link (change AGI->AGP, PGP->PGPLOT).
 #     14-JUL-2004 (TIMJ):
 #        Use new -star option to pgplot
+#        Remove gns_link
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -52,7 +53,7 @@
 
 #-
 
-      echo -lagp `gns_link` `ref_link` `trn_link` `pgplot_link -star`  \
+      echo -lagp `ref_link` `trn_link` `pgplot_link -star`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

@@ -35,6 +35,7 @@
 *
 *  Authors :
 *     NE: Nick Eaton (Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History :
 *     Jun 1989 (NE):
@@ -51,6 +52,8 @@
 *        Clear transformations flags in cache
 *     Nov 1991 (NE):
 *        Correct use of local status
+*     Jul 2004 (TIMJ):
+*        Replace GNS_STOP call with AGI1_ENDGNS
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -186,9 +189,8 @@
                   ENDDO
                ENDDO
 
-*   Make sure GNS is shut down for all packages
-               CALL GNS_STOP( 'GKS', LSTAT )
-               CALL GNS_STOP( 'IDI', LSTAT )
+*   Make sure GNS is shut down for all packages (if required)
+               CALL AGI1_ENDGNS( LSTAT )
             ENDIF
 
 *   Otherwise indicate that AGI_END should close the database

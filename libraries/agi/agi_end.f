@@ -166,9 +166,8 @@
                ENDDO
             ENDDO
 
-*   Make sure GNS is shut down for all packages
-            CALL GNS_STOP( 'GKS', LSTAT )
-            CALL GNS_STOP( 'IDI', LSTAT )
+*   Make sure GNS is shut down for all packages (if relevant)
+            CALL AGI1_ENDGNS( LSTAT )
          ENDIF
 
 *   Reset the flag

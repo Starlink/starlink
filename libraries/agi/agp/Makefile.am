@@ -28,7 +28,7 @@ AGP_F_NONDYN = agp_nview.f agp_sview.f agp_activ.f \
               agi1_defba.f agi1_gwnam.f agp1_envgt.f \
               agp1_fndty.f agp1_pgbeg.f agp_curag.f \
               agp_gdlst.f agp1_trans.f agp_aspec.f \
-              agp1_chkdv.f
+              agp1_chkdv.f agi1_endgns.f
 
 AGP_F_ROUTINES = $(AGP_F_NONDYN) $(AGP_F_DYN)
 
