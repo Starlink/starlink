@@ -5,8 +5,8 @@
    Converts an NDF to an IRAF image
 }{
    \sstdescription{
-      This application converts an NDF to an IRAF image. 
-      See the Notes for details of the conversion.
+      This application converts an NDF to an IRAF image.  See the Notes
+      for details of the conversion.
    }
    \sstusage{
       ndf2iraf in out [fillbad]
@@ -22,9 +22,9 @@
          FILLBAD = \_REAL (Read)
       }{
          The value used to replace bad pixels in the NDF's data array
-         before it is copied to the IRAF file.  A null value ({\tt{!}}) means
+         before it is copied to the IRAF file.  A null value ({\tt !}) means
          no replacements are to be made.  This parameter is ignored if
-         there are no bad values.  {\tt [!]}
+         there are no bad values.  {\tt [0]}
       }
       \sstsubsection{
          OUT = LITERAL (Write)
@@ -35,22 +35,51 @@
          file that may contain a copy of the NDF's FITS extension.
          The suggested default is the current value.
       }
+      \sstsubsection{
+         PROFITS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the contents of the FITS extension of the NDF are
+         merged with the header information derived from the standard
+         NDF components.  See the Notes for details of the merger.
+         {\tt [TRUE]}
+      }
+      \sstsubsection{
+         PROHIS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, any NDF history records are written to the primary
+         FITS header as HISTORY cards.  These follow the mandatory
+         headers and any merged FITS-extension headers (see parameter
+         PROFITS).  {\tt [TRUE]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
          ndf2iraf abell119 a119
       }{
          Converts an NDF called abell119 into the IRAF image comprising
-         the pixel file {\tt a119.pix} and the header file {\tt a119.imh}.  
-         If there are any bad values present they are copied verbatim to the
-         IRAF image.
+         the pixel file {\tt a119.pix} and the header file {\tt a119.imh}.  If there
+         are any bad values present they are copied verbatim to the IRAF
+         image.
+      }
+      \sstexamplesubsection{
+         ndf2iraf abell119 a119 noprohis
+      }{
+         As the previous example, except that NDF HISTORY records are
+         not transferred to the headers in {\tt a119.imh}.
       }
       \sstexamplesubsection{
          ndf2iraf qsospe qsospe fillbad=0
       }{
          Converts the NDF called qsospe to an IRAF image comprising the
-         pixel file {\tt qsospe.imh} and the header file {\tt qsospe.pix}.
-         Any bad values in the data array are replaced by zero.
+         pixel file {\tt qsospe.imh} and the header file {\tt qsospe.pix}.  Any bad
+         values in the data array are replaced by zero.
+      }
+      \sstexamplesubsection{
+         ndf2iraf qsospe qsospe fillbad=0 profits=f
+      }{
+         As the previous example, except that any FITS airlock
+         information in the NDF are not transferred to the headers in
+         {\tt qsospe.imh}.
       }
    }
    \sstnotes{
@@ -58,17 +87,61 @@
       \sstitemlist{
 
          \sstitem
-         The NDF data array is copied to the {\tt ".pix"} file.
+         The NDF data array is copied to the {\tt ".pix"} file.  Ancillary
+         information listed below is written to the {\tt ".imh"} header file in
+         FITS-like headers.
 
          \sstitem
-         The NDF title is written to the header object i\_title in
-         the {\tt ".imh"} header file.  There is a limit of twenty
-         characters.
+         The IRAF ``Mini World Coordinate System'' (MWCS) is used to
+         record axis information whenever one of the following criteria is
+         satisfied:
+
+         \begin{enumerate}
+            \item the dataset has some linear axes (system=world);
+
+            \item the dataset is one-dimensional with a non-linear axis, or is
+            two-dimensional with the first axis non-linear and the
+            second being some aperture number or index
+            (system=multispec);
+
+            \item the dataset has a linear spectral/dispersion axis along the
+            first dimension and all other dimensions are pixel indices
+            (system=equispec).
+         \end{enumerate}
+
+         \sstitem
+         The NDF title, label, units are written to the header keywords
+         TITLE, OBJECT, and BUNIT respectively if they are defined.
+         Otherwise anys values for these keywords found in the FITS
+         extension are used (provided parameter PROFITS is {\tt TRUE}).  There
+         is a limit of twenty characters for each.
+
+         \sstitem
+         The NDF pixel origins are stored in keywords LBOUND$n$ for the
+         nth dimension when any of the pixel origins is not equal to 1.
+
+         \sstitem
+         Keywords HDUCLAS1, HDUCLAS$n$ are set to {\tt "NDF"} and the
+         array-component name respectively.
+
+         \sstitem
+         The BLANK keyword is set to the Starlink standard bad value,
+         but only for the \_WORD data type and not for a quality array.  It
+         appears regardless of whether or not there are bad values
+         actually present in the array.
+
+         \sstitem
+         HISTORY headers are propagated from the FITS extension when
+         PROFITS is {\tt TRUE}, and from the NDF history component when PROHIS
+         is {\tt TRUE}.
 
          \sstitem
          If there is a FITS extension in the NDF, then the elements up
          to the first END keyword of this are added to the `user area' of
-         the IRAF header file.
+         the IRAF header file, when PROFITS={\tt TRUE}.  However, certain
+         keywords are excluded: SIMPLE, NAXIS, NAXIS$n$, BITPIX, EXTEND,
+         PCOUNT, GCOUNT, BSCALE, BZERO, END, and any already created from
+         standard components of the NDF listed above.
 
          \sstitem
          A HISTORY record is added to the IRAF header file indicating
@@ -76,19 +149,35 @@
          NDF2IRAF.
 
          \sstitem
-         All other NDF components are ignored.
+         All other NDF components are not propagated.
       }
    }
    \sstdiytopic{
       Related Applications
    }{
-      \CONVERT: IRAF2NDF.
+      CONVERT: IRAF2NDF.
    }
+   \sstdiytopic{
+      Pitfalls
+   }{
+      The IMFORT routines refuse to overwrite an IRAF image if an image
+      with the same name exists.  The application then aborts.
+
+      Some of the routines required for accessing the IRAF header image
+      are written in SPP. Macros are used to find the start of the
+      header line section, this constitutes an `Interface violation' as
+      these macros are not part of the IMFORT interface specification.
+      It is possible that these may be changed in the future, so
+      beware.
+   }
+   \sstdiytopic{
+      References
+   }{
+      IRAF User Handbook Volume 1A: ``A User's Guide to FORTRAN
+      Programming in IRAF, the IMFORT Interface'', by Doug Tody.
+    }
    \sstimplementationstatus{
       \sstitemlist{
-
-         \sstitem
-         It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 
          \sstitem
          Only handles one-, two-, and three-dimensional NDFs.
@@ -99,13 +188,13 @@
 
          \sstitem
          The IRAF image produced has type SIGNED WORD or REAL dependent
-         of the type of the NDF's data array.  (The IRAF imfort FORTRAN
+         of the type of the NDF's data array.  (The IRAF IMFORT FORTRAN
          subroutine library only supports these data types.)  For \_BYTE,
          \_UBYTE, and \_WORD data arrays the IRAF image will have type
          SIGNED WORD; for all other data types of the NDF data array a
          REAL IRAF image is made.  The pixel type of the image can be
-         changed from within IRAF using the {\bf chpixtype} task in the
-         {\bf images} package.
+         changed from within IRAF using the `chpixtype' task in the
+         `images' package.
 
          \sstitem
          Bad values may arise due to type conversion.  These too are

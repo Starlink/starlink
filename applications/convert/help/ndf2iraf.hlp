@@ -20,7 +20,7 @@ FILLBAD = _REAL (Read)
    The value used to replace bad pixels in the NDF's data array
    before it is copied to the IRAF file.  A null value (!) means
    no replacements are to be made.  This parameter is ignored if
-   there are no bad values.  [!]
+   there are no bad values.  [0]
 3 OUT
 OUT = LITERAL (Write)
    The name of the output IRAF image.  Two files are produced
@@ -28,6 +28,18 @@ OUT = LITERAL (Write)
    contains the data array, and ".imh" is the associated header
    file that may contain a copy of the NDF's FITS extension.
    The suggested default is the current value.
+3 PROFITS
+PROFITS = _LOGICAL (Read)
+   If TRUE, the contents of the FITS extension of the NDF are
+   merged with the header information derived from the standard
+   NDF components.  See the Notes for details of the merger.
+   [TRUE]
+3 PROHIS
+PROHIS = _LOGICAL (Read)
+   If TRUE, any NDF history records are written to the primary
+   FITS header as HISTORY cards.  These follow the mandatory
+   headers and any merged FITS-extension headers (see parameter
+   PROFITS).  [TRUE]
 2 Examples
 ndf2iraf abell119 a119
    Converts an NDF called abell119 into the IRAF image comprising
@@ -35,27 +47,74 @@ ndf2iraf abell119 a119
    are any bad values present they are copied verbatim to the IRAF
    image.
 
+ndf2iraf abell119 a119 noprohis
+   As the previous example, except that NDF HISTORY records are
+   not transferred to the headers in a119.imh.
+
 ndf2iraf qsospe qsospe fillbad=0
    Converts the NDF called qsospe to an IRAF image comprising the
    pixel file qsospe.imh and the header file qsospe.pix.  Any bad
    values in the data array are replaced by zero.
+
+ndf2iraf qsospe qsospe fillbad=0 profits=f
+   As the previous example, except that any FITS airlock
+   information in the NDF are not transferred to the headers in
+   qsospe.imh.
 2 Notes
 The rules for the conversion are as follows:
 
--  The NDF data array is copied to the ".pix" file.
+-  The NDF data array is copied to the ".pix" file.  Ancillary
+information listed below is written to the ".imh" header file in
+FITS-like headers.
 
--  The NDF title is written to the header object i_title in
-the ".imh" header file.  There is a limit of twenty characters.
+-  The IRAF "Mini World Coordinate System" (MWCS) is used to
+record axis information whenever one of the following criteria is
+satisfied:
+
+   1) the dataset has some linear axes (system=world);
+
+   2) the dataset is one-dimensional with a non-linear axis, or is
+      two-dimensional with the first axis non-linear and the
+      second being some aperture number or index
+      (system=multispec);
+
+   3) the dataset has a linear spectral/dispersion axis along the
+      first dimension and all other dimensions are pixel indices
+      (system=equispec).
+
+-  The NDF title, label, units are written to the header keywords
+TITLE, OBJECT, and BUNIT respectively if they are defined.
+Otherwise anys values for these keywords found in the FITS
+extension are used (provided parameter PROFITS is TRUE).  There
+is a limit of twenty characters for each.
+
+-  The NDF pixel origins are stored in keywords LBOUNDn for the
+nth dimension when any of the pixel origins is not equal to 1.
+
+-  Keywords HDUCLAS1, HDUCLASn are set to "NDF" and the
+array-component name respectively.
+
+-  The BLANK keyword is set to the Starlink standard bad value,
+but only for the _WORD data type and not for a quality array.  It
+appears regardless of whether or not there are bad values
+actually present in the array.
+
+-  HISTORY headers are propagated from the FITS extension when
+PROFITS is TRUE, and from the NDF history component when PROHIS
+is TRUE.
 
 -  If there is a FITS extension in the NDF, then the elements up
 to the first END keyword of this are added to the `user area' of
-the IRAF header file.
+the IRAF header file, when PROFITS=TRUE.  However, certain
+keywords are excluded: SIMPLE, NAXIS, NAXISn, BITPIX, EXTEND,
+PCOUNT, GCOUNT, BSCALE, BZERO, END, and any already created from
+standard components of the NDF listed above.
 
 -  A HISTORY record is added to the IRAF header file indicating
 that it originated in the named NDF and was converted by
 NDF2IRAF.
 
--  All other NDF components are ignored.
+-  All other NDF components are not propagated.
 2 Related_Applications
    CONVERT: IRAF2NDF.
 2 Pitfalls
@@ -68,13 +127,11 @@ NDF2IRAF.
    these macros are not part of the IMFORT interface specification.
    It is possible that these may be changed in the future, so
    beware.
-2 Prior_Requirements
-   This routine can only be linked on a machine which has the IRAF
-   system installed, or access to the object libraries required.
 2 External_Routines_Used
    IRAF IMFORT subroutine library.
 2 References
-   IRAF IMFORT subroutine library manual.
+   IRAF User Handbook Volume 1A: "A User's Guide to FORTRAN
+   Programming in IRAF, the IMFORT Interface", by Doug Tody.
 2 Keywords
    CONVERT, IRAF
 2 Authors
@@ -94,16 +151,27 @@ MJC: Malcolm J. Currie (STARLINK)
     Added FILLBAD option, full support for one-dimensional NDFs,
     allow conversion of cubes, and able to make a signed-word IRAF
     image.
-2 Implementation_Status
-   -  It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 
+ 1997 March 28 (MJC):
+    Writes keywords for the label, units, axes, history, origin,
+    bad value, and class.  Avoid duplication of keywords when merging
+    the FITS extension.  Control of propagation of the history
+    records and the FITS extension.  Used more efficient workspace
+    mechanism.  Restriction to lowercase IRAF file names removed.
+    Parameter FILLBAD defaults to 0.
+
+ 1997 July 31 (MJC):
+    No longer write an END header.  The END keyword is not
+    significant in the IRAF headers, and additional headers may be
+    written following it.  Added examples.
+2 Implementation_Status
    -  Only handles one-, two-, and three-dimensional NDFs.
 
    -  Of the NDF's array components only the data array may be
    copied.
 
    -  The IRAF image produced has type SIGNED WORD or REAL dependent
-   of the type of the NDF's data array.  (The IRAF imfort FORTRAN
+   of the type of the NDF's data array.  (The IRAF IMFORT FORTRAN
    subroutine library only supports these data types.)  For _BYTE,
    _UBYTE, and _WORD data arrays the IRAF image will have type
    SIGNED WORD; for all other data types of the NDF data array a

@@ -20,6 +20,8 @@
 #	 the parameteres to IN and OUT.  Removed unused parameter.
 #     1993 July 21 (MJC):
 #     	 Added FILLBAD.
+#     1997 March 28 (MJC):
+#     	 Added PROFITS and PROHIS.  Made default for FILLBAD 0.
 #     {enter_further_changes_here}
 
 #-
@@ -27,6 +29,16 @@
 interface NDF2IRAF
 
    helplib        'CONVERT_HELP:'
+
+   parameter      FILLBAD       # Replacement value for bad pixels
+      position    3
+      type        '_REAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Value to replace any bad values'
+      default     0
+      helpkey     '*'
+   endparameter
 
    parameter      IN            # The input NDF
       position    1
@@ -39,22 +51,28 @@ interface NDF2IRAF
       helpkey     '*'
    endparameter
 
-   parameter      FILLBAD       # Replacement value for bad pixels
-      position    3
-      type        '_REAL'
-      vpath       'DEFAULT'
-      ppath       'CURRENT'
-      prompt      'Value to replace any bad values'
-      default     !
-      helpkey     '*'
-   endparameter
-
    parameter      OUT           # The output IRAF name
       position    2
       type        'LITERAL'
       vpath       'PROMPT'
       ppath       'CURRENT'
       prompt      'Name of IRAF image to be produced'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the NDF's FITS extension
+      type        '_LOGICAL'
+      prompt      'Merge the FITS extension of the NDF in the OIF header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROHIS         # Propagate the NDF's HISTORY information
+      type        '_LOGICAL'
+      prompt      'Relay any NDF history information to the OIF header?'
+      vpath       'DEFAULT'
+      default     TRUE
       helpkey     '*'
    endparameter
 
