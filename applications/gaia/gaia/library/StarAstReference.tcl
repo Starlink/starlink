@@ -435,13 +435,13 @@ itcl::class gaia::StarAstReference {
       pack $itk_component(projp2) -side top -pady 2 -padx 2 -anchor w
       pack $itk_component(xislong) -side top -pady 2 -padx 2 -anchor w
 
-      pack $itk_component(results) -side bottom -fill x -pady 3 -padx 3
-
-      pack $itk_component(actionframe) -fill x -side bottom -pady 3 -padx 3
+      pack $itk_component(actionframe) -fill x -side top -pady 3 -padx 3
       pack $itk_component(accept) -side right -expand 1 -pady 2 -padx 2
       pack $itk_component(cancel) -side right -expand 1 -pady 2 -padx 2
       pack $itk_component(reset)  -side right -expand 1 -pady 2 -padx 2
       pack $itk_component(test)   -side right -expand 1 -pady 2 -padx 2
+
+      pack $itk_component(results) -side bottom -fill x -pady 3 -padx 3
    }
 
    #  Destructor:

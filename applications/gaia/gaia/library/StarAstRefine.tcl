@@ -363,15 +363,14 @@ itcl::class gaia::StarAstRefine {
       pack $itk_component(xcentre) -side top -fill x -pady 3 -padx 3
       pack $itk_component(ycentre) -side top -fill x -pady 3 -padx 3
 
-      pack $itk_component(results) -side bottom -fill x -pady 5 -padx 5
-
-      pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
+      pack $itk_component(actionframe) -side top -fill x -pady 5 -padx 5
       pack $itk_component(accept) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(cancel) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(reset) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(assign) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(refine) -side right -expand 1 -pady 3 -padx 3
 
+      pack $itk_component(results) -side bottom -fill x -pady 5 -padx 5
    }
 
    #  Destructor:
