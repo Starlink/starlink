@@ -260,7 +260,8 @@ void StarFitsIO::mergeHeader()
     //  any new cards).
     char *endPtr = (char *) newheader;
     int newlength = 0;
-    for ( int i = 0 ; i < fixedcards; i++, endPtr += 80, newlength += 80 ) {
+    int i = 0;
+    for ( i = 0 ; i < fixedcards; i++, endPtr += 80, newlength += 80 ) {
         if ( strncmp( endPtr, "END     ", 8 ) == 0 ) {
             break;
         }
@@ -271,7 +272,7 @@ void StarFitsIO::mergeHeader()
     //  cards to the end of the new headers.
     char *extraPtr = (char *) primaryHeader_.ptr();
     int skip = 0;
-    for ( int i = 0 ; i < extracards; i++, extraPtr += 80 ) {
+    for ( i = 0 ; i < extracards; i++, extraPtr += 80 ) {
 
         //  Special cards are always added to the end. Note END card
         //  is always copied from primary headers.
@@ -303,11 +304,6 @@ void StarFitsIO::mergeHeader()
             newlength += 80;
         }
     }
-    char *tmpPtr = newheader;
-    for ( int i = 0; i < newlength; i++ ) {
-        printf( "%c", *tmpPtr++ );
-    }
-    printf( "\n" );
 
     //  Truncate memory to that actually used.
     char *finalheader = (char *) realloc( (void *)newheader, newlength );
