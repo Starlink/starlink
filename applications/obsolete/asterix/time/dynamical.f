@@ -50,6 +50,7 @@
 *      8 Dec 89 : V1.0-2 Bug fixed in HIST_PTXT (DJA)
 *      8 Oct 92 : V1.7-0 Use common copy of TIM_FPOWER with POWER (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1 Updated data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -58,8 +59,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -71,16 +71,11 @@
 *
 *   Local Constants :
 *
-      CHARACTER*24           VERSION
-        PARAMETER         ( VERSION=' DYNAMICAL Version 1.8-0' )
-
       INTEGER                MAXLINES
          PARAMETER           (MAXLINES = 9)
 *
 *   Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC         ! Input data object locator
-      CHARACTER*(DAT__SZLOC) PLOC         ! Locator to power spectrum obj
       CHARACTER*80           ACTION(MAXLINES)! What the program does.
       CHARACTER*40           DUNITS       ! Data units
       CHARACTER*40           TUNITS       ! Time units
@@ -91,6 +86,8 @@
       REAL                   DX           ! Data spacing
       REAL                   X1           ! 1st and 2nd  x values
 
+      INTEGER			IFID			! Input dataset id
+      INTEGER			PFID			! Output dataset id
       INTEGER                TLEN         ! Length of a character string
       INTEGER                NELM         ! No.of data points
       INTEGER                NDIM         ! Dimensionality of data
@@ -105,35 +102,41 @@
                                           ! power spectrum
       INTEGER                LSECT        ! Length of data sections
       INTEGER                NSECT        ! Number of data sections
-      INTEGER                DIMS(DAT__MXDIM)! Size of each dimension
+      INTEGER                DIMS(ADI__MXDIM)! Size of each dimension
 
       LOGICAL                OK           ! General test
       LOGICAL                PRIM         ! Input primitive object?
       LOGICAL                REG          ! Is the input data regularly spaced?
+*
+*  Version:
+*
+      CHARACTER*24    		VERSION
+        PARAMETER         	( VERSION='DYNAMICAL Version 1.8-1' )
 *-
 
 *    Check status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version announcement
+*  Version announcement
       CALL MSG_PRNT( VERSION )
 
-*    Initialise ASTERIX system
-      CALL AST_INIT
+*  Initialise ASTERIX
+      CALL AST_INIT()
 
-*    Obtain data object, access and check it.
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, PRIM, STATUS )
+*  Obtain data object, access and check it.
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL BDI_PRIM( IFID, PRIM, STATUS )
 
 *    Inform user if quality is present
-      CALL BDA_CHKQUAL( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, OK, NDIM, DIMS, STATUS )
       IF ( OK ) THEN
         CALL MSG_PRNT( '** Quality is present in this input file - '/
      :                               /'DYNAMICAL will ignore it **' )
       END IF
 
-      CALL BDA_CHKDATA( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       IF ( OK ) THEN
-        CALL BDA_MAPDATA( ILOC, 'READ', YPTR, STATUS )
+        CALL BDI_MAPDATA( IFID, 'READ', YPTR, STATUS )
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
       ELSE
         STATUS = SAI__ERROR
@@ -152,10 +155,10 @@
             CALL MSG_PRNT( 'Primitive data : Unit spacing assumed.' )
 
          ELSE
-            CALL BDA_CHKAXVAL( ILOC, 1, OK, REG, NVAL, STATUS )
+            CALL BDI_CHKAXVAL( IFID, 1, OK, REG, NVAL, STATUS )
 
             IF ( OK .AND. REG ) THEN
-               CALL BDA_GETAXVAL( ILOC, 1, BASE, DX, NVAL, STATUS )
+               CALL BDI_GETAXVAL( IFID, 1, BASE, DX, NVAL, STATUS )
 
             ELSE
                DX = 1.0
@@ -206,30 +209,30 @@
             CALL DYN_MAPR( 1, LSECT, WPTR, STATUS )
 
 *          Create a POWER_SPECTRUM object
-            CALL USI_ASSOCO( 'OUT', 'DYN_SPECTRUM', PLOC, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
+            CALL USI_TASSOCO( 'OUT', 'DYN_SPECTRUM', PFID, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *          Create components in output file
 *          First the data array
             NV = LSECT/2
             DIMS(1) = NV
             DIMS(2) = NSECT
-            CALL BDA_CREDATA( PLOC, 2, DIMS, STATUS )
-            CALL BDA_MAPDATA( PLOC, 'WRITE', DPTR, STATUS )
+            CALL BDI_CREDATA( PFID, 2, DIMS, STATUS )
+            CALL BDI_MAPDATA( PFID, 'WRITE', DPTR, STATUS )
 
 *          Read the input units
             IF ( .NOT. PRIM) THEN
-               CALL BDA_GETUNITS( ILOC, DUNITS, STATUS )
-               CALL BDA_GETAXUNITS( ILOC, 1, TUNITS, STATUS )
+               CALL BDI_GETUNITS( IFID, DUNITS, STATUS )
+               CALL BDI_GETAXUNITS( IFID, 1, TUNITS, STATUS )
             END IF
 
 *          Create the the new 2-axis structure and map the DATA_ARRAYs
-            CALL BDA_CREAXES( PLOC, 2, STATUS )
-            CALL BDA_CREAXVAL( PLOC, 1, .FALSE., NV, STATUS )
-            CALL BDA_MAPAXVAL( PLOC, 'WRITE', 1, VPTR, STATUS )
+            CALL BDI_CREAXES( PFID, 2, STATUS )
+            CALL BDI_CREAXVAL( PFID, 1, .FALSE., NV, STATUS )
+            CALL BDI_MAPAXVAL( PFID, 'WRITE', 1, VPTR, STATUS )
 
-            CALL BDA_CREAXVAL( PLOC, 2, .FALSE., NSECT, STATUS )
-            CALL BDA_MAPAXVAL( PLOC, 'WRITE', 2, TPTR, STATUS )
+            CALL BDI_CREAXVAL( PFID, 2, .FALSE., NSECT, STATUS )
+            CALL BDI_MAPAXVAL( PFID, 'WRITE', 2, TPTR, STATUS )
 
 *          Compute dynamical power spectrum
             CALL DYNAM_DOIT( NELM, %VAL(YPTR), LSECT, NSECT, NV,
@@ -237,21 +240,21 @@
 
 
 *          Check status.
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
+            IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *          Write things general to all output
-            CALL BDA_PUTTITLE( PLOC, 'Dynamical power spectrum',
+            CALL BDI_PUTTITLE( PFID, 'Dynamical power spectrum',
      :                                                  STATUS )
-            CALL BDA_PUTLABEL( PLOC, 'Power', STATUS)
+            CALL BDI_PUTLABEL( PFID, 'Power', STATUS)
 
 *          Put the frequency and time information into the axis arrays
             CALL DYNAM_FREQS( LSECT, DX, NV, %VAL(VPTR) )
             CALL DYNAM_TIMES( NSECT, LSECT, X1, DX, %VAL(TPTR) )
 
 *          Set axis labels. Units depend on whether input was primitive
-            CALL BDA_PUTAXLABEL( PLOC, 1, 'Frequency', STATUS )
-            CALL BDA_PUTAXLABEL( PLOC, 2, 'Time', STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
+            CALL BDI_PUTAXLABEL( PFID, 1, 'Frequency', STATUS )
+            CALL BDI_PUTAXLABEL( PFID, 2, 'Time', STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *          Do output specific to non-primitive input
             IF ( .NOT. PRIM ) THEN
@@ -259,21 +262,21 @@
 *             Set units
                IF ( DUNITS .GT. ' ' ) THEN
                   PUNITS = '('//DUNITS(1:CHR_LEN(DUNITS))//')**2'
-                  CALL BDA_PUTUNITS( PLOC, PUNITS, STATUS )
+                  CALL BDI_PUTUNITS( PFID, PUNITS, STATUS )
                END IF
 
 *             Set the axis units
                IF ( TUNITS .GT. ' ' ) THEN
                   FUNITS = '('//TUNITS(1:CHR_LEN(TUNITS))//')**-1'
-                  CALL BDA_PUTAXUNITS( PLOC, 1, FUNITS, STATUS )
-                  CALL BDA_PUTAXUNITS( PLOC, 2, TUNITS, STATUS )
+                  CALL BDI_PUTAXUNITS( PFID, 1, FUNITS, STATUS )
+                  CALL BDI_PUTAXUNITS( PFID, 2, TUNITS, STATUS )
                END IF
 
 *             Copy MORE structure
-               CALL BDA_COPMORE( ILOC, PLOC, STATUS )
+               CALL BDI_COPMORE( IFID, PFID, STATUS )
 
 *             Copy HISTORY structure
-               CALL HIST_COPY( ILOC, PLOC, STATUS )
+               CALL HSI_COPY( IFID, PFID, STATUS )
                IF (STATUS .NE. SAI__OK) THEN
                  CALL ERR_FLUSH(STATUS)
                END IF
@@ -281,14 +284,14 @@
             ELSE
 
 *             Create new HISTORY structure since input is primitive
-               CALL HIST_NEW( PLOC, STATUS )
+               CALL HSI_NEW( PFID, STATUS )
 
             END IF
 
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
+            IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *          Add info to HISTORY structure
-            CALL HIST_ADD( PLOC, VERSION, STATUS )
+            CALL HSI_ADD( PFID, VERSION, STATUS )
 
             ACTION(1) = 'Input dataset {INP}'
             CALL MSG_SETI( 'NDAT', NELM )
@@ -302,7 +305,7 @@
 
             USED = MAXLINES
             CALL USI_TEXT( 3, ACTION, USED, STATUS )
-            CALL HIST_PTXT( PLOC, USED, ACTION, STATUS )
+            CALL HSI_PTXT( PFID, USED, ACTION, STATUS )
 
          END IF
       ELSE
@@ -316,7 +319,7 @@
       END IF
 
 *    Exit
- 999  CALL AST_CLOSE
+ 99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
       END
@@ -425,7 +428,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NDAT                          ! No. of input data
       INTEGER                LSECT                         ! Length of each data section
@@ -453,7 +455,7 @@
 *    Check NSECT,LSECT
       IF ( LSECT .LE. 0 ) THEN
         STATUS = SAI__ERROR
-        GOTO 9999
+        GOTO 99
 
       ELSE IF ( LSECT .GT. NDAT ) THEN
         LSECT = NDAT
@@ -472,7 +474,7 @@
 
       IF ( NFREQ .NE. NV ) THEN
         STATUS = SAI__ERROR
-        GOTO 9999
+        GOTO 99
 
       END IF
 
@@ -487,13 +489,13 @@
 
         DO J = 1, NFREQ
           POWER(J,I) = WORK(J + 1)
-
         END DO
+
       END DO
 
 *    Exit
-9999  IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP(' ', '...from DYNAM_DOIT', STATUS )
-
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'DYNAM_DOIT', STATUS )
       END IF
+
       END
