@@ -198,6 +198,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.57  1998/06/09 21:59:21  timj
+*     Ask for smoothing size in calcsky. Calculate smoothing size in pixels
+*     and pass to CALCSKY routine.
+*
 *     Revision 1.56  1998/06/09 20:29:45  timj
 *     Add configurable weight function rebin
 *
@@ -448,6 +452,8 @@ c
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
+      REAL             BOXSZ           ! Box size in seconds
+      INTEGER          BOX_SIZE(MAX_FILE) ! Size of smoothing box (pixels)
       LOGICAL          CALCSKY         ! Are we calc skying?
       CHARACTER*5      CHOP_CRD        ! Chop coordinate frame
       REAL             CHOP_PA         ! Chop PA in arcsec
@@ -1385,12 +1391,31 @@ c
      :           SKY_END(I), STATUS)
             CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_VPTR(I), 
      :           SKY_VEND(I), STATUS)
-            
+
+         END DO
+
+*     Need to calculate the size of the smoothing box in pixels
+*     for each input file
+*     Default is 2.0 seconds
+         CALL PAR_DEF0R('BOXSZ', 2.0, STATUS)
+         CALL PAR_GET0R('BOXSZ', BOXSZ, STATUS)
+         IF (BOXSZ .LT. 0.0) BOXSZ = 0.0
+
+*     Loop over files and convert box size in seconds to box size
+*     in pixels
+         DO I = 1, FILE
+
+            CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+     :           FITS(1,I), 'EXP_TIME', RTEMP, STATUS)
+
+*     Width of bin must be an integer (and can be 0)
+            BOX_SIZE(I) = INT (BOXSZ / RTEMP)
+
          END DO
 
 *     Calculate the sky contribution
          CALL SURF_GRID_CALCSKY(TSKNAME, FILE, N_PTS, N_POS, N_BOL,
-     :        WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
+     :        WAVELENGTH, DIAMETER, BOX_SIZE, BOL_RA_PTR, BOL_DEC_PTR, 
      :        IN_DATA_PTR, IN_QUALITY_PTR, SKY_PTR, SKY_VPTR, QBITS,
      :        STATUS)
 
