@@ -51,7 +51,7 @@
    $now = localtime;
    print "\n";
    print "*  FITS headers from $ARGV[0] ($now)\n";
-   print "      ELSE IF( REG_TEST .EQ. xxx ) THEN\n";
+   print "      ELSE IF( CMN_FTEST .EQ. xxx ) THEN\n";
 
 # Read in wach line from standard input.
    $n = 0;
@@ -67,9 +67,9 @@
 
 # Print out the control code.
       if( $n == 1 ) {
-         print "         IF( REG_LINE .EQ. 1 ) THEN\n";
+         print "         IF( CMN_LINE .EQ. 1 ) THEN\n";
       } else {
-         print "         ELSE IF( REG_LINE .EQ. $n ) THEN\n";
+         print "         ELSE IF( CMN_LINE .EQ. $n ) THEN\n";
       }
 
 # Print the line out. If this is a long string split it over two lines.
