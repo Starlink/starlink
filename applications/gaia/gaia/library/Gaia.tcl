@@ -20,10 +20,11 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
 
 #  Inherits:
 #     Methods and configuration options of SkyCat (and Rtd).
@@ -48,13 +49,13 @@
 #     10-SEP-1998 (PDRAPER):
 #        Added SExtractor toolbox.
 #     10-MAR-1999 (PDRAPER):
-#        Attempt merge of GAIA plugin differences...
+#        Attempt merge of Allan's GAIA plugin differences...
 #     {enter_changes_here}
 
 #-
 
 #  Version.
-set gaia_version "@GAIA_VERSION@"
+set gaia_version [gaia_version]
 
 #  Make a local copy of about_skycat so we can divert bug reports.
 set about_gaia "\
@@ -87,22 +88,23 @@ Usage: gaia ?fitsFile? ?-option value ...?
 
 Options:
  -colorramp_height <n>    - height of colorramp window (default: 12).
- -float_panel <bool>      - put info panel in a popup window (default: 0).
- -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
- -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"    
- -min_scale <n>           - minimum scale for magnification menu (default: -10).
- -max_scale <n>           - maximum scale for magnification menu (default: 20).
- -remote <bool>           - Use existing skycat process, if available, with Tk send.
+ -component <component>   - NDF component to display (one of: data, variance)
  -debug <bool>            - debug flag: run bg processes in fg.
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
  -file <file>             - fits file to load ('-' for stdin).
+ -float_panel <bool>      - put info panel in a popup window (default: 0).
+ -max_scale <n>           - maximum scale for magnification menu (default: 20).
+ -min_scale <n>           - minimum scale for magnification menu (default: -10).
+ -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
+ -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"    
  -port <port>             - Listen for remote cmds on port (default: 0 = choose port).
+ -remote <bool>           - Use existing skycat process, if available, with Tk send.
  -scrollbars <bool>       - Display scrollbars (not displayed by default).
  -shm_data <bool>         - Put image data in sysV shared memory.
  -shm_header <bool>       - Put image header in sysV shared memory.
- -usexshm <bool>          - Use X shared mem, if available (default).
  -use_zoom_view <bool>    - Use a "view" of the image for the zoom window (default).
+ -usexshm <bool>          - Use X shared mem, if available (default).
  -verbose <bool>          - Print diagnostic messages.
  -with_colorramp <bool>   - Display the color bar (default).
  -with_pan_window <bool>  - Display the pan window (default).
@@ -113,7 +115,7 @@ Options:
 itk::usual Gaia {}
 
 #  Create a class for the application.
-class gaia::Gaia {
+itcl::class gaia::Gaia {
    inherit skycat::SkyCat
 
    #  Constructor: create a toplevel window.
@@ -157,115 +159,39 @@ class gaia::Gaia {
       }
    }
 
-   #  Called after the options have been evaluated. Note this method is
-   #  a hybrid of the Rtd/SkyCat inits.
+   #  Called after the options have been evaluated. Add GAIA menu and
+   #  extra items for other menus.
    public method init {} {
-      wm withdraw $w_
+      SkyCat::init
 
+      #  Override top-level names.
+      wm title $w_ "GAIA/SkyCat ($clone_)"
+      wm iconname $w_ "GAIA/SkyCat ($clone_)"
+      
       #  Intercept window manager delete and close down correctly
       #  (as in the Exit option).
       wm protocol $w_ WM_DELETE_WINDOW [code $this remove 0]
 
-      #  Try to fit to the available viewing area. Assumes fits onto
-      #  anything taller than 880 naturally (i.e. Sparc console), and
-      #  has a width of at least 740 pixels (i.e. will do 800x600).
-      set sheight [winfo screenheight $w_]
-      if { $sheight < 880 } {
-	 set newheight [expr int($sheight*0.95)] ;# Leave little room at top/bottom
-	 wm geometry $w_ 740x${newheight}
-      }
-
       #  Get the clone number for this window.
       set clone_ $itk_option(-number)
-      #regsub {\.rtd} $w_ {} clone_
 
       #  Set/get X defaults - can be overridden in subclass and/or
       #  in user's .Xdefaults file.
       tk appname GAIA
       util::setXdefaults
       Rtd::setXdefaults
-      cat::setXdefaults
-      skycat::setXdefaults
       gaia::setXdefaults
 
-      #  Start the introduction window going.
-      set Init_ [TopLevelWidget $w_.init -center 1 \
-                    -background red -cursor watch]
-      wm overrideredirect $Init_ 1
-      global env about_skycat
-      set Message [message $Init_.msg -text $about_skycat \
-                       -justify center \
-                       -width 6i \
-                       -borderwidth 2 -relief groove]
-      set Progress_ [ProgressBar $Init_.progress \
-                        -from 0 -to 12 -value 0 \
-                        -borderwidth 5 -relief ridge -cursor watch]
-      pack $Message -side top -fill x -padx 2m -pady 2m
-      pack $Progress_ -side bottom -fill x -padx 2m -pady 2m
-      tkwait visibility $Init_
-
-      #  Now start the interface.
-      global gaia_version
-      feedback "\nGAIA/SkyCat ($clone_) $gaia_version initializing...\n\n"
-      wm title $w_ "GAIA/SkyCat ($clone_)"
-      wm iconname $w_ "GAIA/SkyCat ($clone_)"
-      feedback "making image window..."
-
-      #  Create the rtd image widget and exit on errors, such as no more
-      #  colors, no more memory...
-      make_rtdimage
-
-      #  Set rtd camera if not set on command line default to
-      #  environment variable.
-      global ::env
-      if {"$itk_option(-camera)" == ""} {
-         if {[info exists env(RTD_CAMERA)]} {
-            config -camera $env(RTD_CAMERA)
-         } else {
-            config -camera RTDSIMULATOR
-         }
-      }
-
-      #  Display the image also as an icon.
-      feedback "Icon..."
+      #  On openwindows iconwindows are displayed but do not
+      #  redirect events, so add a fake deiconify binding.
       if {$itk_option(-disp_image_icon)} {
-         itk_component add icon {
-            RtdImageIcon $w_.icon \
-               -image $itk_component(image) \
-               -usexshm $itk_option(-usexshm) \
-               -verbose $itk_option(-verbose) \
-               -subsample $itk_option(-subsample) \
-               -center 0
-         }
-         wm iconwindow $w_ $w_.icon
-
-         #  On openwindows iconwindows are displayed but do not
-         #  redirect events, so add a fake deiconify binding.
 	 bind $itk_component(icon) <Double-1> "wm deiconify $w_"
       }
 
-      #  Add the menubars and short help.
-      feedback "menubar..."
-      add_menubar
-      make_short_help
-      add_help_menu
-
+      #  Add the GAIA menubar.
       feedback "GAIA toolboxes..."
       if { $itk_option(-gaia) } {
          add_gaia_menu
-      }
-      feedback "real time menus..."
-      if { ! $itk_option(-rtd) } {
-         pack forget $itk_component(menubar).real-time
-      }
-      feedback "catalogue menus..."
-      if { $itk_option(-cat) } {
-         AstroCat::add_catalog_menu $w_ [code $image_] ::gaia::GaiaSearch \
-            $itk_option(-debug)
-         set m "[get_menubutton "Data-Servers"].m"
-         add_menuitem $m command "Load ESO config file..."  \
-            "Load the default ESO catalog config file" \
-            -command [code $this load_eso_config]
       }
 
       #  Add the filters menu if required (not used at present).
@@ -273,63 +199,53 @@ class gaia::Gaia {
       if { $itk_option(-filters) } {
          make_filters_menu
       }
-      pack $itk_component(image) -fill both -expand 1
 
       #  Add the SkyCat graphics features (really a plugin, but we're
-      #  now using these yet).
+      #  not using these yet).
       add_graphics_features $w_
 
-      # make a message if we are using a private colormap
-      if {[$image_ cmap isprivate]} {
-         catch {
-            puts stderr \
-               "Unable to allocate enough colors for image display\
-             in the default colormap - using a private colormap. If this\
-             causes any problems with color flashing, try exiting other\
-             color intensive applications (such as netscape) first and then\
-             restarting. (Tip: use `netscape -ncols 60' to start netscape)\n"
-         }
-      }
-
-      #  Remove the introduction window.
-      destroy $Init_
-      wm deiconify $w_
+      #  And the other changes to menus that we require.
+      make_menu_changes
    }
 
-   # this method can be redefined in a subclass to get feedback during
-   # startup
-   public method feedback {msg} {
-      if { [winfo exists $Progress_] } {
-         $Progress_ configure -text $msg -value [incr sofar_]
-         update idletasks
-      }
+   #  Display a window while the application is starting up, overriden 
+   #  to remove skycat logo. Put back for plugin?
+   protected method make_init_window {} {
+      global ::about_skycat ::skycat_library
+      set w [util::TopLevelWidget $w_.init -center 1]
+      rtd_set_cmap $w
+      wm title $w " "
+      wm withdraw $w_
+      pack \
+         [message $w.msg -text $about_skycat \
+             -width 6i \
+             -justify center \
+             -borderwidth 2 -relief groove] \
+         [ProgressBar $w.progress \
+             -from 0 -to 10 -value 0 \
+             -borderwidth 2 -relief groove] \
+         -side top -fill x -padx 1m -pady 2m
+      tkwait visibility $w
    }
 
    #  Add help for GAIA and SkyCat.
    public method add_help_menu {} {
-      global env
-      set m [add_help_button $env(GAIA_DIR)/Gaia.hlp "On Window..." \
-             {Display help on this window and general features}   ]
+      global ::gaia_library
+      set m [add_help_button $gaia_library/Gaia.hlp "On Window..." \
+                {Display help on this window and general features}   ]
 
       add_menuitem $m command "About GAIA/SkyCat..." \
          {Display a window with information about this GAIA/SkyCat version} \
          -command [code $itk_component(image) about]
-
+      
       add_menuitem $m command "SkyCat..." \
          {Display information about SkyCat in netscape (if netscape is available)} \
          -command [code $itk_component(image) send_to_netscape $itk_option(-help_url)]
-
+      
       add_short_help $itk_component(menubar).help \
          {Help menu: display information about this application}
    }
-
-   #  Set default X resources for colors and fonts, and set some default key
-   #  Bindings.
-   public method setXdefaults {} {
-      skycat::setXdefaults
-      gaia::setXdefaults
-   }
-
+   
    #  Create the rtd image widget with the extended RTD functionality
    #  needed by GAIA.
    public method make_rtdimage {} {
@@ -369,6 +285,7 @@ class gaia::Gaia {
             -float_panel $itk_option(-float_panel) \
             -newimagecmd [code $this cleared] \
             -temporary $itk_option(-temporary) \
+            -grid_tag "grid_${this}" \
             -grid_command [code $this maybe_draw_grid_] \
             -with_warp 1 \
             -panel_layout $itk_option(-panel_layout) \
@@ -384,113 +301,37 @@ class gaia::Gaia {
       lappend skycat_images $itk_component(image)
    }
 
-   #  Add the menubar at the top of the window (override this so we can
-   #  Add keyboard bindings).
-   public method add_menubar {} {
-      # menu bar
-      TopLevelWidget::add_menubar
+   #  Make changes to Skycat menus that we require.
+   public method make_menu_changes {} {
 
-      # File menu
-      set m [add_menubutton File]
-
-      configure_menubutton File -underline 0
-      add_menuitem $m command "Open..." \
-         {Open and display an image} \
-         -command [code $image_ open] \
-         -accelerator {Control-o}
+      #  Note bindings are not really needed, unless working with 
+      #  plugin (GAIA version of TopLevelWidget is fixed).
+      
+      #  File menu. This needs the bindings changing to work with the 
+      #  keyboard shortcuts and the "save region" removing.
+      set m [get_menu File]
       bind $w_  <Control-o> [code $image_ open]
+      bind $w_  <Control-v> [code $image_ reopen]
+      bind $w_  <Control-s> [code $image_ save_as]
+      catch {$m delete "Save region as..."}
+      bind $w_  <Control-p> [code $image_ print]
+      bind $w_  <Control-n> [code $this clone]
+      bind $w_  <Control-q> [code $this quit]
 
+      #  View menu. Add new items, rename "Cuts..." to Slice, add
+      #  bindings for accelerators.
+      set m [get_menu View]
+      bind $w_  <Control-c> [code $image_ set_colors]
+      bind $w_  <Control-l> [code $image_ component info cut_level_dialog]
+      $m entryconfigure "Cuts..." -label "Slice..." -accelerator {Control-a}
+      bind $w_  <Control-a> [code $image_ spectrum 0]
+      $m entryconfigure "Pick Object..." -accelerator {Control-i}
+      bind $w_  <Control-i> [code $image_ pick_dialog]
+      bind $w_  <Control-f> [code $image_ view_fits_header]
 
-      add_menuitem $m command "Save as..." \
-         {Save current image to a file} \
-         -command [code $image_ save_as] \
-         -accelerator {Control-v}
-      bind $w_ <Control-v> [code $image_ save_as]
-
-
-      add_menuitem $m command "Print..." \
-         {Print the current image and graphics to a file or printer} \
-         -command [code $image_ print] \
-         -accelerator {Control-i}
-      bind $w_ <Control-i> [code $image_ print]
-
-      $m add separator
-
-      add_menuitem $m command "New Window" \
-         {Create a new main window} \
-         -command [code $this clone] \
-         -accelerator {Control-n}
-      bind $w_ <Control-n> [code $this clone]
-
-      add_menuitem $m command "Delete Window" \
-         {Close this window} \
-         -command [code $this remove 0] \
-         -accelerator {Control-d}
-      bind $w_ <Control-d> [code $this remove 0]
-
-      $m add separator
-
-      add_menuitem $m command "Exit"\
-         {Exit the program} \
-         -command "destroy ." \
-         -accelerator {Control-x}
-      bind $w_ <Control-x> "destroy ."
-
-      # View menu
-      set m [add_menubutton View]
-      configure_menubutton View -underline 0
-      add_menuitem $m command "Colors..." \
-         {Change the display colours} \
-         -command [code $image_ set_colors] \
-         -accelerator {Control-u}
-      bind $w_ <Control-u> [code $image_ set_colors]
-
-      add_menuitem $m command "Cut Levels..." \
-         {Change the maximum and minimum display levels} \
-         -command [code $image_ set_cut_levels] \
-         -accelerator {Control-l}
-      bind $w_ <Control-l> [code $image_ set_cut_levels]
-
-      add_menuitem $m command "Slice..." \
-         {Display the data values along a line} \
-         -command [code $image_ spectrum 1] \
-         -accelerator {Control-s}
-      bind $w_ <Control-s> [code $image_ spectrum 0]
-
-      add_menuitem $m command "Fits header..." \
-         {Display the image FITS headers} \
-         -command [code $image_ view_fits_header]
-
-      add_menuitem $m command "Pick Object..." \
-         {Select an object or star in the image and display statistics} \
-         -command [code $image_ pick_dialog]
-
-      add_menuitem $m cascade "Pixel Table..." \
-         {Display a table of values about the cursor position} \
-         -menu [menu $m.pix]
-      $m.pix add command -label "3x3" -command [code $image_ pixel_table 3 3]
-      $m.pix add command -label "5x5" -command [code $image_ pixel_table 5 5]
-      $m.pix add command -label "7x7" -command [code $image_ pixel_table 7 7]
-      $m.pix add command -label "9x9" -command [code $image_ pixel_table 9 9]
-
-      add_menuitem $m cascade "Magnification" \
-         {Change the image magnification} \
-         -menu [menu $m.mag]
-      after idle [code $itk_component(image).panel.info.trans fill_mag_menu $m.mag]
-
-      add_menuitem $m cascade "Image background" \
-         {Change the background colour of the main window} \
-         -menu [menu $m.back]
-      foreach colour $colours_ {
-         $m.back add radiobutton \
-            -background $colour \
-            -variable $w_.colour \
-            -value $colour \
-            -label {    } \
-            -command [code $this set_background_ $colour]
-      }
-
-      add_menuitem $m cascade "Blank pixel color" \
+      set index [$m index "Hide Control Panel"]
+      incr index -1
+      insert_menuitem $m $index cascade "Blank pixel color" \
          {Change the colour of blank pixels} \
          -menu [menu $m.blank]
       foreach colour $colours_ {
@@ -502,72 +343,17 @@ class gaia::Gaia {
             -command [code $this set_blankcolour_ $colour]
       }
 
-      $m add separator
-
-      if { ! $itk_option(-float_panel) } {
-         add_menuitem $m checkbutton "Hide Control Panel" \
-            {Toggle the visibility of the upper control panel} \
-            -variable $w_.hide_control_panel -onvalue 1 -offvalue 0 \
-            -command [code $image_ hide_control_panel $w_.hide_control_panel]
+      insert_menuitem $m $index cascade "Image background" \
+         {Change the background colour of the main window} \
+         -menu [menu $m.back]
+      foreach colour $colours_ {
+         $m.back add radiobutton \
+            -background $colour \
+            -variable $w_.colour \
+            -value $colour \
+            -label {    } \
+            -command [code $this set_background_ $colour]
       }
-
-      add_menuitem $m checkbutton "Hide Popup Windows" \
-         {Toggle the visibility of the popup windows} \
-         -variable $w_.hide_windows -onvalue 1 -offvalue 0 \
-         -command [code $this hide_windows $w_.hide_windows]
-
-      # Graphics menu
-      set m [add_menubutton Graphics]
-
-      add_menuitem $m command "Toolbox..." \
-         {Display the graphics toolbox for drawing on the image} \
-         -command [code $image_ show_toolbox]
-
-      $m add separator
-
-      [$image_ component draw] add_menuitems $m
-      $m add separator
-
-      add_menuitem $m checkbutton "Hide Graphics" \
-         {Toggle the visibility of the image line graphics} \
-         -variable $w_.hide_graphics -onvalue 1 -offvalue 0 \
-         -command [code $image_ hide_graphics $w_.hide_graphics]
-
-	# Real-time menu
-	set m [add_menubutton "Real-time"]
-
-	add_menuitem $m command "Attach Camera" \
-	    {Attach the real-time camera - start receiving images} \
-	    -command [code $this attach_camera]
-
-	add_menuitem $m command "Detach Camera" \
-	    {Detach the real-time camera - stop receiving images} \
-	    -command [code $this detach_camera]
-
-	add_menuitem $m command "Set Camera..." \
-	    {Set the real-time camera name} \
-	    -command [code $this set_camera]
-
-	$m add separator
-
-	add_menuitem $m cascade "Rapid Frame" \
-	    {Create a rapid frame by interactively drawing a rectangle on the image} \
-	    -menu [menu $m.rapid]
-
-	$m.rapid add command -label "In Canvas" \
-	    -command [code $image_ rapid_frame 0]
-	$m.rapid add command -label "In Separate Window" \
-	    -command [code $image_ rapid_frame 1]
-
-	$m add separator
-
-	global ::$w_.preview_mode
-	set $w_.preview_mode 0
-
-	add_menuitem $m checkbutton "Preview Mode" \
-	    {Preview mode: copy the real-time image from shared memory to local memory} \
-	    -variable $w_.preview_mode -onvalue 1 -offvalue 0 \
-	    -command [code $image_ preview $w_.preview_mode]
    }
 
    #  Add a menubutton with the GAIA options.
@@ -591,8 +377,8 @@ class gaia::Gaia {
       add_menuitem $m.photom command "Results in data counts..." \
          {Display aperture photometry toolbox (results in image data units)} \
          -command [code $this make_toolbox countphotom] \
-         -accelerator {Control-c}
-      bind $w_ <Control-c> [code $this make_toolbox countphotom]
+         -accelerator {Control-d}
+      bind $w_ <Control-d> [code $this make_toolbox countphotom]
 
       add_menuitem $m command "Image regions..." \
          {Perform operations on regions of image} \
@@ -603,8 +389,8 @@ class gaia::Gaia {
       add_menuitem $m command "Patch image..." \
          {Realistically replace parts of image} \
          -command [code $this make_toolbox patch] \
-         -accelerator {Control-p}
-      bind $w_ <Control-p> [code $this make_toolbox patch]
+         -accelerator {Control-u}
+      bind $w_ <Control-u> [code $this make_toolbox patch]
 
       add_menuitem $m command "Blink images..." \
          {Blink compare all the displayed images} \
@@ -625,8 +411,8 @@ class gaia::Gaia {
       add_menuitem $m.astrom command "Fit to star positions..." \
          {Create a WCS for image using reference positions} \
          -command [code $this make_toolbox astreference] \
-         -accelerator {Control-f}
-      bind $w_ <Control-f> [code $this make_toolbox astreference]
+         -accelerator {Control-k}
+      bind $w_ <Control-k> [code $this make_toolbox astreference]
 
       add_menuitem $m.astrom command "Tweak an existing calibration..." \
          {Use linear transforms to refine the WCS associated with this image} \
