@@ -176,6 +176,9 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Length of FILE
+      FLEN = CHR_LEN(FILE)
+
 *    Length of default extension
       ELEN = CHR_LEN(AIO_DEFEXT)
 
