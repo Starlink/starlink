@@ -1,5 +1,5 @@
       SUBROUTINE SURF_GRID_DESPIKE( N_FILES, N_PTS, N_POS, N_BOLS,
-     :     BITNUM, WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
+     :     BITNUM, NYQUIST, BOL_RA_PTR, BOL_DEC_PTR, 
      :     DATA_PTR, QUALITY_PTR, NX, NY, ICEN, JCEN, NSPIKES,
      :     BADBIT, STATUS )
 *+
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL SURF_GRID_DESPIKE ( N_FILES, N_PTS, N_POS, N_BOLS, WAVELENGTH, 
-*    :     DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, DATA_PTR, QUALITY_PTR,
+*     CALL SURF_GRID_DESPIKE ( N_FILES, N_PTS, N_POS, N_BOLS, NYQUIST,
+*    :     BOL_RA_PTR, BOL_DEC_PTR, DATA_PTR, QUALITY_PTR,
 *    :     NX, NY, ICEN, JCEN, NSPIKES,
 *    :     BADBIT, STATUS ) 
 
@@ -55,10 +55,8 @@
 *       Number of bolometers per set (X positions)
 *     BITNUM = INTEGER (Given)
 *       Bit number to be affected by this routine
-*     WAVELENGTH = REAL (Given)
-*       Wavelength of data (microns)
-*     DIAMETER = REAL (Given)
-*       Diameter of telescope (metres)
+*     NYQUIST = DOUBLE PRECISION (Given)
+*       Nyquist sampling (radians)
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (X coords)
 *       Note that each data set has positions for N_POS * N_BOLS 
@@ -84,9 +82,12 @@
 *       Global Status
 
 *  ADAM Parameters:
-*     DEVICE = DEVICE (Given)
+*     CLEAR = LITERAL (Read)
+*       Controls whether the plot device should be cleared before use.
+*       Default is TRUE.
+*     DEVICE = DEVICE (Read)
 *       Device to display plot.
-*     DMODE = CHAR (Given)
+*     DMODE = CHAR (Read)
 *       Display mode for plot. Allowed values are:
 *         SPIRAL  - A Spiral outwards from the reference pixel
 *         XLINEAR - unfold each X strip in turn for each Y
@@ -96,9 +97,9 @@
 *       (see SURFLIB_CALC_GRIDIJ subroutine)
 *       Also used when pixel smoothing is required to smooth out the
 *       variations between bins.
-*     NSIGMA = REAL (Given)
+*     NSIGMA = REAL (Read)
 *       Number of sigma used in clipping
-*     SMODE = CHAR (Given)
+*     SMODE = CHAR (Read)
 *       Mode used for smoothing the clipping envelope.
 *       Available modes are:
 *         NONE  - No smoothing (this is not dependent on the DMODE)
@@ -106,7 +107,9 @@
 *       All modes except 'NONE' depend on the unwrapping mode (given
 *       by parameter DMODE) since this determines which pixels are adjacent
 *       to a given bin.
-*     XRANGE = INTEGER (Given)
+*     STYLE = LITERAL (Read)
+*       Plot style to use. See the KAPPA manual for more information on styles.
+*     XRANGE = INTEGER (Read)
 *       X Range of plot
 
 *  Notes:
@@ -123,6 +126,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.8  2005/03/23 08:02:46  timj
+*     Use NYQUIST as the input parameter instead of DIAMETER and WAVELENGTH
+*
 *     Revision 1.7  2005/03/18 19:32:45  timj
 *     Replace plotting directly with PGPLOT to plotting using KAPLIBS and AST.
 *
@@ -171,8 +177,7 @@
       INTEGER BOL_RA_PTR ( N_FILES )
       INTEGER DATA_PTR ( N_FILES )
       INTEGER QUALITY_PTR ( N_FILES )
-      REAL    WAVELENGTH
-      REAL    DIAMETER
+      DOUBLE PRECISION NYQUIST
       INTEGER NX
       INTEGER NY
       INTEGER ICEN
@@ -272,7 +277,7 @@
 *     and dish diameter.
 *     Try for quarter beam size first.
 
-      OUT_PIXEL = (WAVELENGTH * 1.0E-6 / DIAMETER) / 4.0
+      OUT_PIXEL = REAL(NYQUIST) / 2.0
 
 *     Now find out how big an output grid is needed
 

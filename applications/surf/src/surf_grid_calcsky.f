@@ -1,5 +1,5 @@
       SUBROUTINE SURF_GRID_CALCSKY( TSKNAME, N_FILES, N_PTS, N_POS, 
-     :     N_BOLS, WAVELENGTH, DIAMETER, IMNDF, N_M_FITS, MODEL_FITS, 
+     :     N_BOLS, NYQUIST, IMNDF, N_M_FITS, MODEL_FITS, 
      :     CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,  BOL_DEC_PTR, 
      :     DATA_PTR, QUALITY_PTR, SKY_PTR, SKY_ERR, BADBIT, STATUS )
 *+
@@ -14,7 +14,7 @@
  
 *  Invocation:
 *     CALL SURF_GRID_CALCSKY ( TSKNAME, N_FILES, N_PTS, N_POS, N_BOLS, 
-*    :     N_BOLS, WAVELENGTH, DIAMETER, IMNDF, N_M_FITS, MODEL_FITS,
+*    :     N_BOLS, NYQUIST, IMNDF, N_M_FITS, MODEL_FITS,
 *    :     CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,  BOL_DEC_PTR, 
 *    :     DATA_PTR, QUALITY_PTR, SKY_PTR, SKY_ERR, BADBIT, STATUS )
 
@@ -53,10 +53,8 @@
 *       Number of positions per set (Y positions)
 *     N_BOLS( N_FILES ) = INTEGER (Given)
 *       Number of bolometers per set (X positions)
-*     WAVELENGTH = REAL (Given)
-*       Wavelength of observation in microns
-*     DIAMETER = REAL (Given)
-*       Diameter of telescope in metres
+*     NYQUIST = DOUBLE PRECISION (Given)
+*       Nyquist sampling (radians)
 *     IMNDF = INTEGER (Given)
 *       NDF identifier of the supplied model. If this is equal to
 *       NDF__NOID then no external model is used.
@@ -187,6 +185,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.13  2005/03/23 08:02:46  timj
+*     Use NYQUIST as the input parameter instead of DIAMETER and WAVELENGTH
+*
 *     Revision 1.12  2005/03/18 06:27:21  timj
 *     Protect some calls with STATUS checks
 *
@@ -262,8 +263,7 @@
       INTEGER DATA_PTR ( N_FILES )
       INTEGER QUALITY_PTR ( N_FILES )
       CHARACTER*(*) MODEL_FITS(N_M_FITS)
-      REAL    WAVELENGTH
-      REAL    DIAMETER
+      DOUBLE PRECISION NYQUIST
       INTEGER IMNDF
       INTEGER NX
       INTEGER NY
@@ -433,7 +433,7 @@
 *     and dish diameter.
 *     Try for quarter beam size first.
             
-         OUT_PIXEL = (WAVELENGTH * 1.0E-6 / DIAMETER) / 4.0
+         OUT_PIXEL = REAL(NYQUIST) / 2.0
 
 *     Now find out how big an output grid is needed
 
