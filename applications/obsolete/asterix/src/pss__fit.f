@@ -222,7 +222,7 @@
 *      Produce p(x,y,s) cube?
         IF ( DI_P_XYS_CUBE ) THEN
           CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
-     :                ISTAT, PSCALE, -1, 'xyf', ' ', STATUS )
+     :                ISTAT, PSCALE, 0, 'xyf', ' ', STATUS )
         END IF
 
 *      Produce Stat(f) profile?
