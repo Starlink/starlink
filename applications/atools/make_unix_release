@@ -48,6 +48,19 @@
       echo "Setting protection for all files"
       chmod 777 *
 
+#  Edit in the current package version number into any required source files.
+      echo "Editing the current package version number into source files"
+      set vers = `grep "PKG_VERS = " makefile`
+      if ( "$vers" == "" ) then
+         echo "Can't get package version number from makefile."
+         exit
+      endif
+
+      foreach file (kappa.ifd)
+         sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
+         mv -f temp $file
+      end
+
 #  Create the on-line help file.
       foreach file (`grp user_tasks`)
          prohlp in=$file out=$file.help
