@@ -9,4 +9,5 @@ INTYP	<Invalid argument TYPE given in call to PSX_CALLOC>
 NOTIM	<Could not get current time with time()>
 NOGMT	<Could not get GMT with gmtime()>
 NOMEM	<Could not get required memory>
+ERRNO   <System error during POSIX call>
 .END

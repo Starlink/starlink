@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="psx">
-  <version>0.4</version>
+  <version>0.5</version>
   <path>libraries/psx</path>
   <description>POSIX interface routines</description>
    <abstract><p>PSX is a FORTRAN subroutine library that allows

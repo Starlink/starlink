@@ -1,5 +1,12 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.5:
+     New autoconf-based build system
+     Added PSX_REMOVE
+     Added PSX__ERRNO to PSX_ERR
+     Added TEST_REMOVE
+     Many portability fixes (including 64bit time_t)
+
 v0.4:
      Added PSX_PUTENV from Tim Jenness (JACH)
      Added PSX__NOMEM to psx_err

@@ -39,6 +39,7 @@ C_ROUTINES = \
 	psx_putenv.c \
 	psx_rand.c \
 	psx_realloc.c \
+	psx_remove.c \
 	psx_srand.c \
 	psx_time.c \
 	psx_ttyname.c \
@@ -49,10 +50,12 @@ BUILT_SOURCES = $(noinst_MESSAGES) $(include_MESSAGES)
 # Tests
 
 TESTS = psx_test test_alloc test_cuserid test_getenv test_getpid \
-	test_getuid test_putenv test_rand test_term test_time test_uname
+	test_getuid test_putenv test_rand test_term test_time test_uname \
+	test_remove
 
 check_PROGRAMS = psx_test test_alloc test_cuserid test_getenv test_getpid \
-	test_getuid test_putenv test_rand test_term test_time test_uname
+	test_getuid test_putenv test_rand test_term test_time test_uname \
+	test_remove
 
 psx_test_SOURCES = psx_test.f
 psx_test_LDADD = `$(srcdir)/psx_link`
@@ -77,6 +80,9 @@ test_putenv_LDADD = `$(srcdir)/psx_link`
 
 test_rand_SOURCES = test_rand.f
 test_rand_LDADD = `$(srcdir)/psx_link`
+
+test_remove_SOURCES = test_remove.f
+test_remove_LDADD = `$(srcdir)/psx_link`
 
 test_term_SOURCES = test_term.f
 test_term_LDADD = `$(srcdir)/psx_link`
