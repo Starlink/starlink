@@ -5,7 +5,7 @@
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/figaro</path>
-  <description>FIGARO spectral line data reduction</description>
+  <description>FIGARO general data-reduction system</description>
   <abstract><p>
 Figaro is a general-purpose data reduction package.
 The programs it contains can be used to process a
