@@ -658,6 +658,7 @@
       CALL PSX_CALLOC( NPOS*5, '_REAL', IPW2, STATUS )
 
 *  Get the input NDF data units.
+      UNITS = ' '
       CALL NDF_CGET( INDF1, 'UNITS', UNITS, STATUS )
 
 *  Find the mean star profile parameters calling the routine of the
