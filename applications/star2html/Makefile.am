@@ -13,7 +13,8 @@ dist_data_DATA = sun.tex ssn.tex sgp.tex sg.tex sc.tex sst.tex
 l2hdir=$(datadir)/star2html-l2hsys
 
 # Distribute the l2h directories as a tarball.
-EXTRA_DIST = l2h_source.tar
+EXTRA_DIST = l2h_source.tar star2html.in latex2html.in xlabel.in
+
 # The tarball consists of the contents of the l2h directory, minus any
 # CVS directories.
 l2h_source.tar:
