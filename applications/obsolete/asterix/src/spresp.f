@@ -179,7 +179,6 @@
       INTEGER		     XSMAX, YSMAX	! Extreme psf sizes
       LOGICAL                EVDS           	! Input is event dataset?
       LOGICAL 		     H_OK		! Could psf system do a hint?
-      LOGICAL                IPRIM          	! Input primitive?
       LOGICAL                OK             	! General validity check
       LOGICAL                PIXCENT            ! Pixel centred?
       LOGICAL                RADIAL         	! Psf is only function of R
