@@ -155,7 +155,6 @@
                                           ! extension
       INTEGER          IN_NDF             ! NDF index of input file
       INTEGER          IN_QUALITY_PTR     ! pointer to QUALITY array
-      CHARACTER*(DAT__SZLOC) IN_REDSX_LOC ! HDS locator of .REDS extension
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                           ! HDS locator of .SCUBA extension
       INTEGER          ITEMP              ! scratch integer
@@ -214,7 +213,6 @@
 
       IN_FITSX_LOC = DAT__NOLOC
       IN_SCUBAX_LOC = DAT__NOLOC
-      IN_REDSX_LOC = DAT__NOLOC
 
 *     start up the NDF system and open the demodulated data file
 
@@ -302,17 +300,9 @@
 
 *     get some locators
 
-      CALL NDF_XLOC (IN_NDF, 'FITS', 'UPDATE', IN_FITSX_LOC, STATUS)
-      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'UPDATE', IN_SCUBAX_LOC, STATUS)
+      CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC, STATUS)
+      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL NDF_XLOC (IN_NDF, 'REDS', 'UPDATE', IN_REDSX_LOC, STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL ERR_ANNUL (STATUS)
-            IN_REDSX_LOC = DAT__NOLOC
-         END IF
-      END IF
-      
 *     and read in some parameters describing the observation
       
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
@@ -488,10 +478,6 @@
       IF (IN_SCUBAX_LOC .NE. DAT__NOLOC) THEN
          CALL CMP_UNMAP (IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
          CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
-      END IF
-
-      IF (IN_REDSX_LOC .NE. DAT__NOLOC) THEN
-         CALL DAT_ANNUL (IN_REDSX_LOC, STATUS)
       END IF
 
       CALL NDF_ANNUL(IN_NDF, STATUS)
