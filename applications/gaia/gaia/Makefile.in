@@ -175,7 +175,7 @@ $(DEMO_TCL): normallib tclAppInit.o FORCE
 
 $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
-	$(ALINK) gaiaMon.c $(LOCAL_LIBRARY) $(ADDLIBS) \
+	$(ALINK) gaiaMon.c -I$(STAR_INC) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) \
 	   `fio_link_adam` `ard_link_adam` `ndf_link_adam` `cat_link_adam`
 	if test -f $(GAIAMON); then \
