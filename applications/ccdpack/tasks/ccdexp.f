@@ -169,7 +169,6 @@
 *  Get the name of the I'th header item (note that deleting a header
 *  reorders the remaining ones).
             CALL HDR_NAME( 'IN', ' ', I, KEYWRD, STATUS )
-            write(*,*)'keyword = ', keywrd
             IF ( KEYWRD .NE. ' ' ) THEN 
                IF ( KEYWRD( 1 : 5 ) .EQ. 'CCDPK' ) THEN 
                   CALL HDR_DELET( 'IN', 'FITS', KEYWRD, 1, STATUS )

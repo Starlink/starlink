@@ -64,6 +64,13 @@
 *     with an exclamation mark. The remainder of the line will then be
 *     ignored.
 
+*  Notes:
+*     If a TRANSFORM structure is located in the CCDPACK extension
+*     already then it will not be overwritten. This is based on the
+*     assumption that the FITS2NDF program is most likely to have
+*     restored it (and it will be complete already). Could really extend
+*     this principle to whole of CCDPACK extension... at least for FITS.
+
 *  Authors:
 *     PDRAPER: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
@@ -73,6 +80,8 @@
 *        Original version, heavily based on KAPPA:FITSIMP.
 *     12-NOV-1997 (PDRAPER):
 *        Modified to switch off NDF conversion.
+*     14-NOV-1997 (PDRAPER):
+*        Stopped existing TRANSFORM structures from being overwritten.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,8 +143,9 @@
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL FOUND             ! Was a value found?
       LOGICAL LVAL              ! Logical FITS value
-      LOGICAL SEETRN            ! TRANSFORM keywords are located 
+      LOGICAL SEETRN            ! TRANSFORM keywords are located
       LOGICAL SPLIT             ! TRANSFORM elements may be split across lines
+      LOGICAL THERE             ! TRANSFORM structure already exists
       LOGICAL TRNL( TRN__MXCLS + 2 ) ! TRANSFORM workspace
       REAL RVAL                 ! Real FITS value
 
@@ -170,10 +180,10 @@
       DO 3 I = 1, TRN__MXCLS + 2
          TRNL( I ) = .FALSE.
  3    CONTINUE
-      DO 4 I = 1, 6 
+      DO 4 I = 1, 6
          TRNC( I ) = ' '
  4    CONTINUE
-      TRNI( 1 ) = 0 
+      TRNI( 1 ) = 0
       TRNI( 2 ) = 0
       SEETRN = .FALSE.
 
@@ -219,44 +229,44 @@
             ELSE
 
 *  Need to check if the item to be written is part of a TRANSFORM
-*  structure. If so then use special code to deal with this (the 
+*  structure. If so then use special code to deal with this (the
 *  TRANSFORM package is fussy about the types etc. of this so we cannot
 *  just unpack blindly).
                IF ( LINE( I1( 1 ): I1( 1 ) + 8 ) .EQ.  'TRANSFORM' )
-     :              THEN 
+     :              THEN
 
 *  Some parts of a TRANSFORM structure may extend over several cards, we
 *  need to trap these and deal with them correctly.
                   KEYWRD = LINE( I1( 3 ) : I2( 3 ) )
                   SPLIT = .FALSE.
-                  IF ( INDEX( LINE( I1(3): I2(3) ), '[' ) .NE. 0 ) THEN 
+                  IF ( INDEX( LINE( I1(3): I2(3) ), '[' ) .NE. 0 ) THEN
                      SPLIT = .TRUE.
                      CALL CCD1_HDRRN( KEYWRD, FIRST, LAST, INSERT,
      :                                STATUS  )
                      KEYWRD( INSERT: ) = ' '
-                  ELSE 
+                  ELSE
                      FIRST = 1
                      LAST = 1
                   END IF
                   DO 5 I = FIRST, LAST
 
 *  Construct the keyword if dealing with a range.
-                     IF ( SPLIT ) THEN 
+                     IF ( SPLIT ) THEN
                         ITMP = INSERT - 1
                         CALL CHR_PUTI( I, KEYWRD, ITMP )
                      END IF
                      CALL FTS1_GKEYC( EL, %VAL( PNTR( 1 ) ), 1,
-     :                                KEYWRD, FOUND, CVAL, CARD, 
+     :                                KEYWRD, FOUND, CVAL, CARD,
      :                                STATUS, %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
-                        
-*  If a TRANSFORM value was found, then inform the necessary routine 
+
+*  If a TRANSFORM value was found, then inform the necessary routine
 *  to store it ready for reconstructing the whole TRANSFORM.
                         IF ( FOUND ) THEN
                            SEETRN = .TRUE.
                            CALL CCD1_ENTRN( CCDLOC, .TRUE.,
      :                                      LINE( I1( 1 ): I2( 1 ) ),
-     :                                      CVAL, TRNI, TRNC, 
+     :                                      CVAL, TRNI, TRNC,
      :                                      TRNL, STATUS )
                         END IF
                      END IF
@@ -279,7 +289,7 @@
 *  extension.
                         IF ( FOUND ) THEN
                            NC = MAX ( 1, CHR_LEN( CVAL ) )
-                           CALL CCG1_STOCC( IDIN, 
+                           CALL CCG1_STOCC( IDIN,
      :                                      LINE( I1( 1 ):I2( 1 ) ),
      :                                      CVAL( : NC ), STATUS )
                         END IF
@@ -298,7 +308,7 @@
 
 *  If a value was found, then store it in the extension.
                         IF ( FOUND ) THEN
-                           CALL CCG1_STOCD( IDIN, 
+                           CALL CCG1_STOCD( IDIN,
      :                                      LINE( I1( 1 ):I2( 1 ) ),
      ;                                      DVAL, STATUS )
                         END IF
@@ -317,7 +327,7 @@
 
 *  If a value was found, then store it in the extension.
                         IF ( FOUND ) THEN
-                           CALL CCG1_STOCI( IDIN, 
+                           CALL CCG1_STOCI( IDIN,
      :                                      LINE( I1( 1 ):I2( 1 ) ),
      :                                      IVAL, STATUS )
                         END IF
@@ -336,7 +346,7 @@
 
 *  If a value was found, then store it in the extension.
                         IF ( FOUND ) THEN
-                           CALL CCG1_STOCL( IDIN, 
+                           CALL CCG1_STOCL( IDIN,
      :                                      LINE( I1( 1 ):I2( 1 ) ),
      :                                      LVAL, STATUS )
                         END IF
@@ -354,7 +364,7 @@
 
 *  If a value was found, then store it in the extension.
                         IF ( FOUND ) THEN
-                           CALL CCG1_STOCR( IDIN, 
+                           CALL CCG1_STOCR( IDIN,
      :                                      LINE( I1( 1 ):I2( 1 ) ),
      :                                      RVAL, STATUS )
                         END IF
@@ -370,7 +380,7 @@
                   END IF
                END IF
             END IF
-            
+
 *  If a fatal error has occurred, report which line of the translation
 *  table it occurred in and display the line contents.
             IF ( STATUS .NE. SAI__OK ) THEN
@@ -385,17 +395,21 @@
          END IF
          GO TO 1
       END IF
-      
+
 *  Annul end-of-file errors, end the deferral of error reporting and
 *  close the translation table file.
       IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
       CALL ERR_RLSE
       CALL FIO_CLOSE( IFIL, STATUS )
 
-*  If necessary write the new TRANSFORM structure.
-      IF ( SEETRN ) THEN 
-         CALL CCD1_ENTRN( CCDLOC, .FALSE., LINE, CVAL, 
-     :                    TRNI, TRNC, TRNL, STATUS )
+*  If necessary write the new TRANSFORM structure (only do this if one
+*  doesn't exist already).
+      IF ( SEETRN ) THEN
+         CALL DAT_THERE( CCDLOC, 'TRANSFORM', THERE, STATUS )
+         IF ( .NOT. THERE ) THEN 
+            CALL CCD1_ENTRN( CCDLOC, .FALSE., LINE, CVAL,
+     :                       TRNI, TRNC, TRNL, STATUS )
+         END IF
       END IF
 
 *  See if the LBOUND1 and LBOUND2 keywords are present. If so use these
@@ -410,13 +424,13 @@
          CALL FTS1_GKEYI( EL, %VAL( PNTR( 1 ) ), 1,
      :                    KEYWRD, FOUND, IVAL, CARD, STATUS,
      :                    %VAL( LENGTH ) )
-         IF ( STATUS .NE. SAI__OK ) THEN 
+         IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             GO TO 7
          END IF
-         IF ( FOUND ) THEN 
+         IF ( FOUND ) THEN
             LBND( I ) = IVAL - LBND( I )
-         ELSE 
+         ELSE
             GO TO 7
          END IF
  6    CONTINUE
@@ -425,13 +439,13 @@
 *  Exit from above loop when in error.
  7    CONTINUE
       CALL ERR_RLSE
-      
+
 *  Annul (thereby unmapping) the FITS extension locator and the NDF
 *  identifier.
       CALL DAT_ANNUL( CCDLOC, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
       CALL NDF_ANNUL( IDIN, STATUS )
-      
+
 *  Restore the NDF tuning parameter.
       CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS )
 
