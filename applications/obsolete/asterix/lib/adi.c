@@ -3532,7 +3532,7 @@ void adix_chkmode( char *mode, int mlen, ADIacmode *amode, ADIstatus status )
   {
   _chk_stat;                            /* Check status on entry */
 
-  _GET_STRING(mode,mlen);               /* Import the string */
+  _GET_NAME(mode,mlen);               /* Import the string */
 
   if ( ! strx_cmpi2c( mode, mlen, "READ", _MIN(4,mlen) ) )
     *amode = ADI__read;
