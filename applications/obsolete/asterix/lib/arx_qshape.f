@@ -39,7 +39,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       INTEGER ARDID
@@ -58,7 +57,6 @@
       REAL XW1,XW2,YW1,YW2,XR1,XR2,YR1,YR2,A1,A2
       INTEGER IL,NL
       INTEGER C1,C2,N
-      INTEGER SUB
       INTEGER NCIRC,NELL,NBOX,NAND,NNOT
       INTEGER ERROR
 *-

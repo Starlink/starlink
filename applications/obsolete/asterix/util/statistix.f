@@ -908,8 +908,6 @@
       DOUBLE PRECISION           WTSUM2               ! Sum of weights squared
 
       INTEGER                    I,J                  ! Loop over data
-      INTEGER                    IFAIL                ! NAG status
-      INTEGER                    USEWEIGHT            !
 *-
 
 *    Check status
