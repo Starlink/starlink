@@ -77,7 +77,7 @@
       CALL TASK_GET_NAME( NAME, STATUS )      
 
 *  Define the current application name for history. The package version
-*  number gets substituted in here when the KAPPA release source tar file 
+*  number gets substituted in here when the POLPACK release source tar file 
 *  is contructed.
       CALL NDF_HAPPN( NAME // ' (POLPACK PKG_VERS)', STATUS )
 
