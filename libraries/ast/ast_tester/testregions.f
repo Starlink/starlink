@@ -2705,6 +2705,51 @@ C
 
 
 
+      frm1 = ast_skyframe( ' ', status )
+      p1(1)=0.0D0
+      p1(2)=0.0D0
+      p2(1)=0.01D0
+      p2(2)=0.01D0
+      p3(1)=0.0D0
+      p3(2)=0.0D0
+      ell1 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
+
+      p1(1)=-0.015D0
+      p1(2)=0.0D0
+      p2(1)=0.01D0
+      p2(2)=0.01D0
+      p3(1)=0.0D0
+      p3(2)=0.0D0
+      ell2 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
+
+      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status, 
+     :                                          'Ellipse: Error 20' )
+
+      p1(1)=6.2681853D0
+      p1(2)=0.0D0
+      p2(1)=0.01D0
+      p2(2)=0.01D0
+      p3(1)=0.0D0
+      p3(2)=0.0D0
+      ell2 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
+
+      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status, 
+     :                                          'Ellipse: Error 21' )
+
+      p1(1)=-0.015D0
+      p1(2)=0.0D0
+      p2(1)=0.01D0
+      p2(2)=0.01D0
+      p3(1)=0.0D0
+      p3(2)=0.0D0
+      ell1 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
+
+      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status, 
+     :                                          'Ellipse: Error 22' )
+
+
+
+
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'Ellipse tests failed'
 

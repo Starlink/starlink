@@ -700,13 +700,6 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    for( i = 0; i < nc; i++ ) {
       axcen = this->centre[ i ];
       axlen = this->extent[ i ]*this->shrink;
-
-/* Not sure whether the next two lines should not in fact be:
-      lbnd[ i ] = astAxDistance( frame, i + 1, axcen, -axlen );
-      ubnd[ i ] = astAxDistance( frame, i + 1, axcen, axlen );
-
-   Time will tell... */
-
       lbnd[ i ] = axcen - axlen;
       ubnd[ i ] = axcen + axlen;
    }

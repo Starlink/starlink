@@ -6815,7 +6815,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          }
 
 /* If it is not interested, report an error if skip is zero. */
-         if( !newwanted && !skip ) {
+         if( newwanted != 1 && !skip ) {
             if( parent ) {
                astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
                          "the input data \"%s\" within element %s.", 

@@ -301,8 +301,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
             }
 
 /* Now convert these offsets to actual axis values. */
-            this->lbnd[ ic ] = astAxOffset( frm, ic + 1, p0, this->lbnd[ ic ] );
-            this->ubnd[ ic ] = astAxOffset( frm, ic + 1, p0, this->ubnd[ ic ] );
+            this->lbnd[ ic ] = p0 + this->lbnd[ ic ];
+            this->ubnd[ ic ] = p0 + this->ubnd[ ic ];
 
          }
       }

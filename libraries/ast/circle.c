@@ -461,14 +461,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 /* Get the value on this axis at the centre. */
       axcen = this->centre[ i ];
 
-/* Store the upper and lower bounds. 
-
-   (Not sure whether the next two lines should not in fact be:
-      lbnd[ i ] = astAxDistance( frame, i + 1, axcen, -this->radius );
-      ubnd[ i ] = astAxDistance( frame, i + 1, axcen, this->radius );
-
-   Time will tell...) */
-
+/* Store the upper and lower bounds. */
       lbnd[ i ] = axcen - this->radius;
       ubnd[ i ] = axcen + this->radius;
    }
