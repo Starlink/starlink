@@ -4719,7 +4719,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         ROFF = SQRT( X0**2 + Y0**2 ) * MATH__RTOD * 60.0
 
 *      Get gaussian FWHM in arcseconds
-        CALL XRT_FWHM( ROFF, ENERGY, FWHM )
+        CALL PSF_XRT_FWHM( ROFF, ENERGY, FWHM )
 
 *      Convolve
         FWHM = SQRT( FWHM**2 )
@@ -4956,6 +4956,59 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
       END
+
+
+*+  PSF_XRT_FWHM  calculates the full width half max of the XRT point spread fn.
+      SUBROUTINE PSF_XRT_FWHM(FOVR, ENERGY, FWHM)
+*    Description :
+*      Calculates the fwhm of the point spread function.
+*
+*   calculates the preliminary gaussian blur-circle as a function of
+*   the off-axis distance which was calibrated with simulations.
+*   point-spread function is based on a simple gaussian fit, where in
+*   in the outer regions of the field of view the hole in the point
+*   spread function has been filtered out by a gradient filter.
+*   the fwhm of the detector was assumed to be
+*   fwhm(d) = 23.3 / sqrt(e) [arcsec]       (e is energy in kev)
+*   !!!!  NEW after PSF simulations  !!!
+*   fwhm(d) = sqrt(409.65/e + 69.28*e**2.88 + 66.29)
+*   the fwhm of the telescope was determined to
+*   fwhm(t) = 0.29 * (eps**1.74) [arcsec]   (eps is off-axis angle ')
+*
+*    History :
+*      author : GRH               date: 1987     original
+*      update : RDS               date: 10-Dec-1990   Asterix version
+*    Type definitions :
+      IMPLICIT NONE
+*    Import :
+      REAL FOVR                ! Off axis angle in arcmins
+      REAL ENERGY              ! Energy in keV
+*    Import-Export :
+*    Export :
+      REAL FWHM                ! Full width half maximum of gaussian
+*                              ! point spread in arcsecs
+*    Local constants :
+*    Local variables :
+*-
+      REAL DETECT              ! fwhm of the detector
+      REAL TELESC              ! fwhm of the telescope
+*
+      REAL TELES
+*    Local data :
+      DATA TELES/0.29/
+*
+*  Calculate the telescope contribution
+      TELESC = TELES * TELES * (FOVR)**3.48
+*
+*  Calculate the detector contribution
+      DETECT = 409.65/ENERGY + 69.28*ENERGY**2.88 + 66.29
+*
+*  Calculate the total FWHM of the gaussian approximation to the point
+*  spread function
+      FWHM   = SQRT(DETECT+TELESC)
+*
+      END
+
 
 
 *+  PSF_XRT_PSPC_EXC - Extract psf surface brightness from profile in cube
