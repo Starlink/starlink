@@ -1,0 +1,151 @@
+      SUBROUTINE COI_CHEV<T>( ORDER, COEFF, PMIN, PMAX, Z, EL, CENTRE,
+     :                        STATUS )
+*+
+*  Name:
+*     COI_CHEVx
+
+*  Purpose:
+*     Creates axis centres within an NDF from Multispec ftype=1 axis
+*     information in an IRAF header.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COI_CHEVx( ORDER, COEFF, PMIN, PMAX, Z, EL, CENTRE, STATUS )
+
+*  Description:
+*     The routine evaluates a Chebyshev polynomial for each axis centre.
+*     It uses the information from a Multispec specN parameter.
+*     derived from the WAT2_nnn headers which define an axis structure
+*     stored using the IRAF Mini World Co-ordinate System (MWCS) in the
+*     Multispec format.  The redshift correction is applied.
+*
+*     It uses recursion to compute the x_i co-ordinates at each order.
+
+*  Arguments:
+*     ORDER = INTEGER (Given)
+*        The number of polynomial coefficients.  The maximum value is
+*        15.
+*     COEFF( ORDER ) = ? (Given)
+*        The Chebyshev polynomial coefficients.
+*     PMIN = ? (Given)
+*        The lower scaling limit for the polynomial.
+*     PMAX = ? (Given)
+*        The upper scaling limit for the polynomial.
+*     Z = ? (Returned)
+*        Redshift.  This is normally 0.  The axis centres are scaled
+*        by 1/(1+Z).
+*     EL = INTEGER (Given)
+*        The number of axis values in the axis centre-array.
+*     CENTRE( EL ) = ? (Returned)
+*        The evaluated array axis centres.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - There is a routine for real and double precision data types:
+*     replace "x" in the routine name by R or D as appropriate.  The
+*     COEFF, PMIN, PMAX, Z, and CENTRE arguments must have this data
+*     type.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1997 July 31 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+
+*  Arguments Given:
+      INTEGER ORDER
+      <TYPE> COEFF( ORDER )
+      <TYPE> PMIN
+      <TYPE> PMAX
+      <TYPE> Z
+      INTEGER EL
+
+*  Arguments Returned:
+      <TYPE> CENTRE( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER MXCOEF             ! Maximum number of polynomial
+                                 ! coefficents
+      PARAMETER( MXCOEF = 15 )
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      <LTYPE> NORM               ! Normalised co-ordinate
+      <LTYPE> P                  ! Scaled co-ordinate
+      <LTYPE> PRANGE             ! Scaling range
+      <LTYPE> SUM                ! Used for summation of polynomial
+      <LTYPE> X( MXCOEF )        ! Co-ordinates at each order
+      <LTYPE> ZCORR              ! Redshift correction
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Evaluate the redshift correction factor, ensuring that it is
+*  positive.
+      ZCORR = MAX( VAL__EPS<T>, 1<CONST> + Z )
+
+*  Define a useful variable.
+      PRANGE = PMAX - PMIN
+
+*  The first order is constant.
+      X( 1 ) = 1<CONST>
+
+*  Loop for each element.
+      DO I = 1, EL
+
+*  Normalise the co-ordinate to lie in the range -1 to +1.  This form of
+*  the expression guarantees that the computed normalised value lies
+*  no more than four times the machine precision from its true value.
+         P = NUM_ITO<T>( I )
+         NORM = ( ( P - PMIN ) - ( PMAX - P ) ) / PRANGE
+
+*  Find the other orders, using recursion after the first two.
+         X( 2 ) = NORM
+         IF ( ORDER .GT. 2 ) THEN
+            DO J = 3, ORDER
+               X( J ) = 2<CONST> * NORM * X( J-1 ) - X( J-2 )
+            END DO
+         END IF
+
+*  Evaluate the polynomial.
+         SUM = 0<CONST>
+         DO J = 1, ORDER
+            SUM = SUM + COEFF( J ) * X( J )
+         END DO
+
+*  Assign the axis-centre value to the evaluated polynomial.  Apply the
+*  redshift correction.
+         CENTRE( I ) = SUM / ZCORR
+      END DO
+
+  999 CONTINUE
+
+      END
