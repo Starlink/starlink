@@ -217,31 +217,6 @@ WCSLIB_FILES = \
     wcsmath.h \
     wcstrig.h
 
-## Some of the following groups are probably redundant, yes?
-## From here...
-#UNIX_LINK_FILES = \
-#    ast_link \
-#    ast_link_adam
-#
-#UNIX_STARTUP_FILES = \
-#    ast_dev
-#
-#VERSION_FILES = \
-#    makefile \
-#    sun_master.tex
-#
-#MESSAGE_SYSTEM_FILES = \
-#    ast_err.msg
-#
-#UTILITY_PROGS = \
-#    astbad.c
-#
-#TEST_PROGS = \
-#    ast_test.c
-#
-#DEVELOPMENT_TOOLS = \
-#    makeh
-## ... to here
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
