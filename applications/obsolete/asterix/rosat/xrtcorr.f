@@ -65,6 +65,7 @@
 *    20 Nov 94    V1.7-2  HRI deadtime (RJV)
 *    15 Feb 95    V1.8-0  Option not to do exposure correction (RJV)
 *     9 Oct 95    V1.8-1  Fixed cock-up with effective exposure (RJV)
+*    11 Jan 1996 V1.8-2 Some ADI connversion (DJA)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -89,8 +90,6 @@
 *
       LOGICAL OVER                        ! Overwrite the input file ?
 
-      CHARACTER*(DAT__SZLOC) LOC1         ! Locator to input file
-      CHARACTER*(DAT__SZLOC) LOCOUT       ! Locator to output file
       CHARACTER*(DAT__SZLOC) RLOC         ! Locator to the response matrix
       CHARACTER*(DAT__SZLOC) ELOC         ! Locator to the eff. area file
       CHARACTER*(DAT__SZLOC) ILOC         ! Locator to the instrument box
@@ -134,8 +133,7 @@
       INTEGER NENERGY                     ! Number of trial energies
       INTEGER NWIRE                       ! Number of wire corrs.
       INTEGER NTHRESH                     ! No. of thresholding corrections
-      INTEGER NLINES                      ! Number of lines of history text
-      CHARACTER*80 PATH(8)                ! History text
+      INTEGER			IFILES
       REAL MEAN_ENERGY                    ! Mean photon energy received at det.
       REAL PSING                          ! Point spread correction for mean en.
       REAL VSING                          ! Single vignetting correction
@@ -152,56 +150,38 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTCORR version 1.8-1')
+      PARAMETER (VERSION = 'XRTCORR version 1.8-2')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
       CALL MSG_PRNT(VERSION)
 *
       CALL AST_INIT
-*
-* Should input file be overwritten ?
+
+*  Should input file be overwritten ?
       CALL USI_GET0L('OVER',OVER,STATUS)
-*
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
+*  Get file identifiers
       IF (OVER) THEN
-*
-         CALL USI_ASSOCI('INP','UPDATE',LOC1,INPRIM,STATUS)
-*
-*   Clone an output locator
-         CALL DAT_CLONE(LOC1,LOCOUT,STATUS)
-         CALL ADI1_MKFILE( LOCOUT, 'UPDATE', OFID, STATUS )
-*
+        CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
+        CALL ADI_CLONE( IID, OFID, STATUS )
       ELSE
-*
-         CALL USI_ASSOC2('INP','OUT','READ',LOC1,LOCOUT,
-     &                                               INPRIM,STATUS)
-*
-         IF (INPRIM) THEN
-            CALL MSG_PRNT('Primitive arrays must be corrected in'/
-     &              /' their original data file: use the OVER switch')
-            GOTO 999
-         ENDIF
-*
-*   Copy all components from old file into new file
-         CALL HDX_COPY(LOC1,LOCOUT,STATUS)
-         CALL ADI1_MKFILE( LOCOUT, 'WRITE', OFID, STATUS )
-*
+
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       ENDIF
-*
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-* Read header information into a structured array
-      CALL XRTCORR_GETHEAD(LOCOUT, HEAD, STATUS)
-*
+
+*  Read header information into a structured array
+      CALL XRTCORR_GETHEAD( OFID, HEAD, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
 *    Find dimensions of data array and map it. The data array is reordered
 *    in this routine so that the axes are in the order X,Y,Time,corrected
 *    amplitude. If variance or quality arrays are not found they are
 *    created. Also gets further XRT specific header info.
-      CALL XRTCORR_GETDATA(LOCOUT, HEAD, DIMS, ORDER, DPNTR,
+      CALL XRTCORR_GETDATA( OFID, HEAD, DIMS, ORDER, DPNTR,
      &             TDPNTR, VPNTR, TVPNTR, QPNTR, TQPNTR, MASK, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -284,7 +264,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Find out if this file was produced from US format data
-      CALL BDA_LOCINSTR(LOCOUT, ILOC, STATUS)
+      CALL ADI1_LOCINSTR( OFID, .FALSE., ILOC, STATUS )
       CALL DAT_THERE(ILOC, 'RAWDATA', THERE, STATUS)
 *
       IF (THERE) THEN
@@ -298,13 +278,14 @@
          CALL ERR_ANNUL(STATUS)
          HEAD.ORIGIN = 'OMD'
       ENDIF
-*
-*    Map an array to take the energies at each pulse height channel
+
+*  Map an array to take the energies at each pulse height channel
       CALL DYN_MAPR(1, NP, EPHPTR, STATUS)
-*
-*    Map the axis array if present
+
+*  Map the axis array if present
       IF (NP .GT. 1) THEN
-         CALL BDA_MAPAXVAL(LOCOUT, 'READ', ORDER(4), EAXPTR, STATUS)
+         CALL BDI_AXMAPR( OFID, ORDER(4), 'Data', 'READ', EAXPTR,
+     :                    STATUS )
       ELSE
          CALL DYN_MAPR(1, 1, EAXPTR, STATUS)
       ENDIF
@@ -528,8 +509,7 @@
 *
         IF (STATUS .NE. SAI__OK) GOTO 999
 * Write the livetime values
-        CALL BDA_CRELIVE(LOCOUT, STATUS)
-        CALL BDA_LOCLIVE(LOCOUT, LLOC, STATUS )
+        CALL ADI1_LOCLIVE( OFID, .TRUE., LLOC, STATUS )
         CALL DAT_NEW (LLOC, 'ON',  '_DOUBLE', 1, NT, STATUS )
         CALL DAT_NEW (LLOC, 'OFF', '_DOUBLE', 1, NT, STATUS )
         CALL DAT_NEW (LLOC, 'DURATION', '_REAL', 1, NT, STATUS )
@@ -537,8 +517,7 @@
         CALL CMP_PUT1D (LLOC, 'ON', NT, %val(SXPNTR), STATUS)
         CALL CMP_PUT1D (LLOC, 'OFF', NT, %val(EXPNTR), STATUS)
         CALL CMP_PUT1R (LLOC, 'DURATION', NT, %val(DXPNTR), STATUS)
-*       CALL DAT_ANNUL (LLOC, STATUS)
-*
+
       ELSE
 
         CALL DYN_MAPR(1, NT, DXPNTR, STATUS)
@@ -549,7 +528,7 @@
 
 * correct data array, variance and set quality bad if no
 * exposure in a given bin.
-      CALL XRTCORR_DOIT(LOCOUT, HEAD, NX, NY, NT, NP, NR, NWIRE,
+      CALL XRTCORR_DOIT( OFID, HEAD, NX, NY, NT, NP, NR, NWIRE,
      &          NTHRESH, %val(CDPNTR), %val(PVSING), PSING,
      &          %val(CIVPNTR), %val(CTPNTR), %val(CWPNTR), %val(DXPNTR),
      &          %val(DPNTR), %val(VPNTR), %val(QPNTR),STATUS)
@@ -576,7 +555,8 @@
 *
 * Change the normalised flag to true on the time axis - if it exists
       IF (NT .GT. 1) THEN
-         CALL BDA_PUTAXNORM(LOCOUT, ORDER(3), .TRUE., STATUS)
+         CALL BDI_AXPUT0L( OFID, ORDER(3), 'Normalised', .TRUE.,
+     :                     STATUS )
       ENDIF
 *
 * Write energy dependent factors to the instrument box within the
@@ -592,7 +572,7 @@
             GOTO 999
          ENDIF
 *
-         CALL XRTCORR_ENCORR(LOCOUT, NENERGY, NR, %val(CVPNTR),
+         CALL XRTCORR_ENCORR( OFID, NENERGY, NR, %val(CVPNTR),
      &                        %val(CPPNTR), %val(TEPNTR), STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
@@ -603,35 +583,27 @@
 
       IF (LECORR) THEN
 * Change data units to counts / second
-        CALL BDA_PUTUNITS(LOCOUT, 'counts / second', STATUS)
-        CALL BDA_PUTLABEL(LOCOUT, 'Intensity', STATUS)
+        CALL BDI_PUT0C( OFID, 'Units', 'counts / second', STATUS )
+        CALL BDI_PUT0C( OFID, 'Label', 'Intensity', STATUS )
       ENDIF
-*
+
 * Amend corrections structure
-      CALL XRTCORR_WRIPROC(LOCOUT, VFLAG, DFLAG, LECORR, STATUS)
-*
+      CALL XRTCORR_WRIPROC( OFID, VFLAG, DFLAG, LECORR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
 * Write history record
 *   Trace path of input data.
-      CALL USI_NAMEI(NLINES,PATH,STATUS)
-*
+      CALL USI_NAMES( 'I', IFILES, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS)
-*
-      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS)
-*
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error writing history record')
       ENDIF
-*
-999   CONTINUE
-*
-      CALL AST_CLOSE(STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XRTCORR',STATUS)
-      ENDIF
-*
+
+*  Tidy up
+ 999  CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END
 
 
@@ -1331,8 +1303,8 @@ D            WRITE(3,*)EXPOS(TLP)
 
 
 
-*+XRTCORR_ENCORR   Writes energy dependent correction factors into file
-      SUBROUTINE XRTCORR_ENCORR(LOCOUT, NENERGY, NR, RVCORR, PCORR,
+*+ XRTCORR_ENCORR - Writes energy dependent correction factors into file
+      SUBROUTINE XRTCORR_ENCORR( OFID, NENERGY, NR, RVCORR, PCORR,
      &                                               TOT_EN, STATUS)
 *    Description :
 *     Multiplies the vignetting and point spread corrections for each
@@ -1349,7 +1321,7 @@ D            WRITE(3,*)EXPOS(TLP)
 *    Status :
       INTEGER STATUS
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCOUT        ! Locator to output file
+      INTEGER			OFID			! Output file id
       INTEGER NENERGY                      ! Number of trial energies
       INTEGER NR                           ! Number of radial bins
       REAL RVCORR(NENERGY,NR)              ! Vignetting correction
@@ -1365,20 +1337,18 @@ D            WRITE(3,*)EXPOS(TLP)
       INTEGER RLP,ELP
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
-* Get locator to instrument box in output file
-      CALL BDA_LOCINSTR(LOCOUT, ILOC, STATUS)
-*
+
+*  Get locator to instrument box in output file
+      CALL ADI1_LOCINSTR( OFID, .FALSE., ILOC, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error getting locator to instrument box '/
      &                /'in output file')
          GOTO 999
       ENDIF
-*
-* Create energy corrections array structure
+
+*  Create energy corrections array structure
       CALL DAT_NEW(ILOC, 'ENCORR', 'Correction', 1, NR, STATUS)
       CALL DAT_FIND(ILOC, 'ENCORR', ELOC, STATUS)
-*
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating energy corrections array')
          GOTO 999
@@ -1418,7 +1388,7 @@ D        WRITE(*,*) RLP
       END
 
 *+  XRTCORR_DOIT - apply corrections to an XRT data array
-      SUBROUTINE XRTCORR_DOIT(LOC, HEAD, NX, NY, NT, NP, NR,
+      SUBROUTINE XRTCORR_DOIT( FID, HEAD, NX, NY, NT, NP, NR,
      &                    NWIRE, NTHRESH, DCORR, VCORR, PCORR, VIMCOR,
      &                    TCORR, WCORR, EXPOS, DATA, VAR, QUAL, STATUS)
 *    Description :
@@ -1438,7 +1408,7 @@ D        WRITE(*,*) RLP
 *    Status :
       INTEGER STATUS
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC      ! Locator to output file
+      INTEGER			FID			! Output file id
       RECORD /CORR/ HEAD              ! Header info. for file
       INTEGER NX,NY,NT,NP,NR          ! Dimensions of data array
       INTEGER NWIRE                   ! Dimensions of wire factor
@@ -1466,8 +1436,6 @@ D        WRITE(*,*) RLP
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-
 
 * Apply corrections to each bin
       DO RLP=1,NR
@@ -1515,8 +1483,8 @@ D        WRITE(*,*) RLP
 * Write in an effective exposure value into the header for non time series
       IF (NT.EQ.1) THEN
         EFF_EXPOS=EXPOS(1)/DCORR(1)
-        CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
-        CALL HDX_PUTR(HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS)
+        CALL ADI1_LOCHEAD( FID, .FALSE., HLOC, STATUS)
+        CALL HDX_PUTR( HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS )
       ENDIF
 
  999  IF (STATUS .NE. SAI__OK) THEN
@@ -1526,7 +1494,7 @@ D        WRITE(*,*) RLP
       END
 
 *+XRTCORR_GETDATA    Maps the data array and reorders if necessary
-      SUBROUTINE XRTCORR_GETDATA(LOCIN, HEAD, ODIMS, ORDER, DPNTR,
+      SUBROUTINE XRTCORR_GETDATA(IFID, HEAD, ODIMS, ORDER, DPNTR,
      &              TDPNTR, VPNTR, TVPNTR, QPNTR, TQPNTR, MASK, STATUS)
 *    Description :
 *      Maps the data_array and puts it in the axis order, X,Y,Time,CPHA
@@ -1560,7 +1528,7 @@ D        WRITE(*,*) RLP
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCIN       ! Locator to input fle
+      INTEGER			IFID			! Input file id
 *    Import-Export :
       RECORD /CORR/ HEAD
 *    Export :
@@ -1583,21 +1551,17 @@ D        WRITE(*,*) RLP
       LOGICAL OK              ! Is axis array present and regular ?
       CHARACTER*40 LABEL                 ! Axis label
       CHARACTER*(DAT__SZLOC) HLOC  ! Locator to header ans instrument box
-      INTEGER VNDIM, VDIMS(DAT__MXDIM)   ! Variance dimensions
       INTEGER AXTYPE                     ! Axis type
       INTEGER NELS                       ! Tot size of array
-      INTEGER QNDIM,QDIMS(DAT__MXDIM)    ! Quality dimensions
       LOGICAL LVAR                       ! Are variances present in input file?
       LOGICAL LQUAL                      ! Is quality present in input file?
       REAL BASE                          ! Axis base values
-      INTEGER DUM(DAT__MXDIM)            ! Dummy dimensions
-*    Local data :
+      INTEGER			IDUM			! Dummy dimension
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
 * Initialise dimension arrays
       DO LP=1,7
-         DIMS(LP)=1
          ODIMS(LP)=1
       ENDDO
 *
@@ -1611,41 +1575,33 @@ D        WRITE(*,*) RLP
       ENDDO
 *
 * Check data_array is present
-      CALL BDA_CHKDATA(LOCIN, OK, NDIM, DIMS, STATUS)
-*
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, 5, DIMS, NDIM, STATUS )
       IF (STATUS .NE. SAI__OK .OR. .NOT. OK) THEN
           CALL MSG_PRNT('Error accessing data array')
           STATUS=SAI__ERROR
           GOTO 999
       ENDIF
-*
-      IF (NDIM .GT. 5) THEN
-          CALL MSG_PRNT('Cant correct files with more than 4 dims.')
-          STATUS=SAI__ERROR
-          GOTO 999
-      ENDIF
-*
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
+
 * Calc size of array
-      NELS=DIMS(1)*DIMS(2)*DIMS(3)*DIMS(4)*DIMS(5)
-*
+      CALL ARR_SUMDIM( NDIM, DIMS, NELS )
+
 * Map the data array
-      CALL BDA_MAPDATA(LOCIN, 'UPDATE', TDPNTR, STATUS)
-*
+      CALL BDI_MAPR( IFID, 'Data', 'UPDATE', TDPNTR, STATUS)
       IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('Error mapping data array')
           GOTO 999
       ENDIF
 *
 * Check variance array is present
-      CALL BDA_CHKVAR(LOCIN, LVAR, VNDIM, VDIMS, STATUS)
-*
+      CALL BDI_CHK( IFID, 'Variance', LVAR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Map variance array if present
       IF (LVAR) THEN
 *
-         CALL BDA_MAPVAR(LOCIN, 'UPDATE', TVPNTR, STATUS)
-*
+         CALL BDI_MAPR(IFID, 'Variance', 'UPDATE', TVPNTR, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping variance array')
             GOTO 999
@@ -1655,15 +1611,12 @@ D        WRITE(*,*) RLP
 *
 * Variance array not present: create array in output file and set to
 * same value as data array.
-         CALL BDA_CREVAR(LOCIN, NDIM, DIMS, STATUS)
-*
-         CALL BDA_MAPVAR(LOCIN, 'WRITE', TVPNTR, STATUS)
-*
+         CALL BDI_MAPR(IFID, 'Variance', 'WRITE', TVPNTR, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error creating variance array')
             GOTO 999
          ENDIF
-*
+
 * Set var. array to data array values - if data=0 then set variance to
 * be one photon.
          CALL DTA_VARDATA(DIMS(1), DIMS(2), DIMS(3), DIMS(4),
@@ -1672,56 +1625,49 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Quality:
-      CALL BDA_CHKQUAL(LOCIN, LQUAL, QNDIM, QDIMS, STATUS)
-*
+      CALL BDI_CHK( IFID, 'Quality', LQUAL, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
 * Map quality array if present
       IF (LQUAL) THEN
 *
-         CALL BDA_MAPQUAL(LOCIN, 'UPDATE', TQPNTR, STATUS)
-*
+         CALL BDI_MAPUB( IFID, 'Quality', 'UPDATE', TQPNTR, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping quality array')
             GOTO 999
          ENDIF
-*
+
 *   Get mask
-         CALL BDA_GETMASK(LOCIN, MASK, STATUS)
-*
+         CALL BDI_GET0UB( IFID, 'QualityMask', MASK, STATUS )
+
       ELSE
 *
 * Quality array not present: create array in output file and set to zero
-         CALL BDA_CREQUAL(LOCIN, NDIM, DIMS, STATUS)
-*
-         CALL BDA_MAPQUAL(LOCIN, 'WRITE', TQPNTR, STATUS)
-*
+         CALL BDI_MAPUB( IFID, 'Quality', 'WRITE', TQPNTR, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error creating quality array')
             GOTO 999
          ENDIF
-*
+
 *  Zero array
-         CALL ARR_INIT1B(0, NELS, %val(TQPNTR),STATUS)
-*
+         CALL ARR_INIT1B( QUAL__GOOD, NELS, %val(TQPNTR), STATUS )
+
 *  Create mask in output file
          MASK=QUAL__MASK
-         CALL BDA_PUTMASK(LOCIN, MASK, STATUS)
-*
+         CALL BDI_PUT0UB( IFID, 'QualityMask', MASK, STATUS )
+
       ENDIF
 *
 * Find which axis is which
       DO LP=1,NDIM
 *
-         CALL BDA_GETAXLABEL(LOCIN, LP, LABEL, STATUS)
-*
+         CALL BDI_AXGET0C( IFID, LP, 'Label', LABEL, STATUS )
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error reading axis label')
             GOTO 999
          ENDIF
-*
          CALL CHR_UCASE(LABEL)
-*
+
 *   The order array contains the axis positions of the X,Y and TIME axes
          IF ( INDEX(LABEL(1:1),'X') .NE. 0 ) THEN
             ORDER(1)=LP
@@ -1830,15 +1776,14 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Access header info from the datafile
-      CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
-*
+      CALL ADI1_GETHEAD( IFID, .FALSE., HLOC, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('Error getting locator to header structure')
           GOTO 999
       ENDIF
 *
 * Get the sort ranges
-      CALL XRT_GETSORT(LOCIN, HEAD, STATUS)
+      CALL XRT_GETSORT( IFID, HEAD, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1849,10 +1794,13 @@ D        WRITE(*,*) RLP
       ELSE
 *
 * Get pixel widths from the axes
-         CALL BDA_GETAXVAL(LOCIN, ORDER(1), BASE, HEAD.XSCALE,
-     &                                                 DUM, STATUS)
-         CALL BDA_GETAXVAL(LOCIN, ORDER(2), BASE, HEAD.YSCALE,
-     &                                                 DUM, STATUS)
+        CALL BDI_AXGET1R( IFID, ORDER(1), 'SpacedData', 2, SPARR,
+     :                    IDUM, STATUS )
+        HEAD.XSCALE = SPARR(1)
+        CALL BDI_AXGET1R( IFID, ORDER(2), 'SpacedData', 2, SPARR,
+     :                    IDUM, STATUS )
+        HEAD.YSCALE = SPARR(2)
+
       ENDIF
 *
       HEAD.TSCALE(1) = (HEAD.TMAX(HEAD.NTRANGE) - HEAD.TMIN(1))
@@ -1868,8 +1816,9 @@ D        WRITE(*,*) RLP
 *
       END
 
+
 *+  XRTCORR_GETENERGY - Reads trial energies from the detector response file
-      SUBROUTINE XRTCORR_GETENERGY(RLOC, NP, PAX, NENERGY,
+      SUBROUTINE XRTCORR_GETENERGY( RLOC, NP, PAX, NENERGY,
      &                                    EPNTR, EPHBIN, STATUS)
 *    Description :
 *    Bugs :
@@ -1902,7 +1851,7 @@ D        WRITE(*,*) RLP
          PARAMETER (MAXHEAD=1000)
 *    Local variables :
       CHARACTER*90 FHEAD(MAXHEAD)               !Array for header records
-      CHARACTER*(DAT__SZLOC) MLOC,FLOC
+      CHARACTER*(DAT__SZLOC) MLOC,FLOC,DLOC
       LOGICAL OK
       INTEGER NDIM,DMX_DIM(DAT__MXDIM)
       INTEGER NHEAD                             !Number of header records
@@ -1910,12 +1859,14 @@ D        WRITE(*,*) RLP
       INTEGER EBWPTR,ENBPTR,EPBPTR              !Pointers
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Find the size of the response array
-      CALL BDA_CHKDATA(RLOC, OK, NDIM, DMX_DIM, STATUS)
-*
+*  Find the size of the response array
+      CALL DAT_FIND( RLOC, 'DATA_ARRAY', DLOC, STATUS )
+      CALL DAT_VALID( DLOC, OK, STATUS )
+      CALL DAT_SHAPE( DLOC, 2, DMX_DIM, NDIM, STATUS )
+      CALL DAT_ANNUL( DLOC, STATUS )
       IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error accessing detector response array')
          GOTO 999
@@ -1923,12 +1874,12 @@ D        WRITE(*,*) RLP
          CALL MSG_PRNT('Response array does not have 2 dimensions')
          GOTO 999
       ENDIF
-*
+
 * Set number of ENERGY bins in the response file. NB: This relies
 * on the PHA axis being first.
       NPHA_OUT=DMX_DIM(1)
       NENERGY=DMX_DIM(2)
-*
+
 *  Read the FITS header lines in this datafile
       CALL DAT_FIND(RLOC, 'MORE', MLOC, STATUS)
       CALL DAT_FIND(MLOC, 'FITS', FLOC, STATUS)
@@ -1973,9 +1924,9 @@ D        WRITE(*,*) RLP
      &     NPHA_OUT, %val(EPBPTR), NP, PAX, EPHBIN, %val(EPNTR), STATUS)
 
  999  IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XRTCORR_GETENEGY',STATUS)
+         CALL AST_REXIT('XRTCORR_GETENEGY',STATUS)
       ENDIF
-*
+
       END
 
 *+  XRTCORR_GETENERGY_INT
@@ -2077,8 +2028,8 @@ D        WRITE(*,*) RLP
 *
       END
 
-*+XRTCORR_GETHEAD    Gets header info. from the input datafile
-      SUBROUTINE XRTCORR_GETHEAD(LOCIN, HEAD, STATUS)
+*+ XRTCORR_GETHEAD - Gets header info. from the input datafile
+      SUBROUTINE XRTCORR_GETHEAD( IFID, HEAD, STATUS )
 *    Description :
 *    Environment parameters :
 *    Method :
@@ -2093,14 +2044,10 @@ D        WRITE(*,*) RLP
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCIN       ! Locator to input fle
+      INTEGER			IFID			! input file id
 *    Import-Export :
       RECORD /CORR/ HEAD
 *    Export :
@@ -2112,19 +2059,17 @@ D        WRITE(*,*) RLP
       CHARACTER*(DAT__SZLOC) HLOC,ILOC   ! Locator to header ans instrument box
       CHARACTER*(DAT__SZLOC) ALOC,PLOC   ! Locator to ASTERIX and PROC boxes
       LOGICAL LBARY
-*    Local data :
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
-* Access header info from the datafile
-      CALL BDA_LOCAST(LOCIN, ALOC, STATUS)
-      CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
-*
+
+*  Access header info from the datafile
+      CALL ADI1_LOCAST( IFID, .FALSE., ALOC, STATUS )
+      CALL ADI1_LOCHEAD( IFID, .FALSE., HLOC, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
-          CALL MSG_PRNT('Error getting locator to header structure')
-          GOTO 999
-      ENDIF
-*
+        CALL MSG_PRNT('Error getting locator to header structure')
+        GOTO 999
+      END IF
+
 * Check whether this file has been barycentrically corrected
       CALL DAT_FIND(ALOC, 'PROCESSING', PLOC, STATUS)
       CALL DAT_THERE(PLOC, 'BARY_CORR_DONE', LBARY, STATUS)
@@ -2153,8 +2098,8 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Get locator to the instrument box
-      CALL BDA_LOCINSTR(LOCIN, ILOC, STATUS)
-*
+      CALL ADI1_LOCINSTR( IFID, .FALSE., ILOC, STATUS )
+
 * Get detector type
       CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
 *
@@ -2612,7 +2557,7 @@ C            TCORR(LP) = fn(MEAN_ENERGY)
       END
 
 *+XRTCORR_WRIPROC   Updates the processing box of the output file
-      SUBROUTINE XRTCORR_WRIPROC(LOCOUT, VFLAG, DFLAG, EFLAG, STATUS)
+      SUBROUTINE XRTCORR_WRIPROC( OFID, VFLAG, DFLAG, EFLAG, STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -2628,50 +2573,30 @@ C            TCORR(LP) = fn(MEAN_ENERGY)
 *    Global variables :
 *    Structure definitions :
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCOUT                ! Locator to output file
+      INTEGER			OFID			! Output file id
       LOGICAL VFLAG                                ! Vignetting correction ?
       LOGICAL DFLAG                                ! Dead time correction ?
       LOGICAL EFLAG                                ! Exposure corrrection ?
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Function declarations :
-*     <declarations for function references>
-*    Local constants :
-*    Local variables :
-      CHARACTER*(DAT__SZLOC) ALOC                  ! Locator to ASTERIX box
-*    Local data :
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
-* Get locator to the Asterix box
-      CALL BDA_LOCAST(LOCOUT, ALOC, STATUS)
-*
-* Write in dead time value
-      IF (EFLAG) THEN
-        CALL HDX_PUTL(ALOC, 'PROCESSING.CORRECTED.EXPOSURE',
-     &                                         1, .TRUE., STATUS)
-      ENDIF
-*
-* Write in dead time value
-      IF (DFLAG) THEN
-        CALL HDX_PUTL(ALOC, 'PROCESSING.CORRECTED.DEAD_TIME',
-     &                                         1, DFLAG, STATUS)
-      ENDIF
-*
-* Write in vignetting value
-      IF (VFLAG) THEN
-        CALL HDX_PUTL(ALOC, 'PROCESSING.CORRECTED.VIGNETTING',
-     &                                         1, VFLAG, STATUS)
-      ENDIF
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing processing structure')
-         CALL ERR_ANNUL(STATUS)
-      ENDIF
 
-      IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','from XRTCORR_WRIPROC',STATUS)
-      ENDIF
-*
+*  Write the flags
+      IF ( EFLAG ) THEN
+        CALL PRF_SET( OFID, 'CORRECTED.EXPOSURE', .TRUE., STATUS )
+      END IF
+      IF ( DFLAG ) THEN
+        CALL PRF_SET( OFID, 'CORRECTED.DEAD_TIME', DFLAG, STATUS )
+      END IF
+      IF ( VFLAG ) THEN
+        CALL PRF_SET( OFID, 'CORRECTED.VIGNETTING', VFLAG, STATUS )
+      END IF
+
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT('Error writing processing structure')
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
       END
