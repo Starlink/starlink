@@ -1033,6 +1033,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
                       ELSE
 
+	print *,i1,frbnd1(1,i1),frbnd1(2,i1)
+
                         LOFOUND=.FALSE.
                         IBIN=1
 *  lower receptor bin
@@ -1071,6 +1073,9 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                           ENDIF
                         ENDDO
                         HIFOUND=.FALSE.
+
+	print *,'lo',ibin,tobnd1(1,ibin),tobnd1(2,ibin)
+
 *  upper receptor bin
                         DO WHILE (IBIN.LE.NBIN(IAX).AND..NOT.HIFOUND
      :                                                  .AND.LOFOUND)
@@ -1097,6 +1102,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                             RTOP(IAX)=TOBND7(2,IBIN)
                           ENDIF
 
+	print *,'hi',ibin,tobnd1(1,ibin),tobnd1(2,ibin)
+
                           IF((DTOP(IAX)-RBOT(IAX))*DIR(IAX).GE.0.0
      :                                                            .AND.
      :                       (RTOP(IAX)-DTOP(IAX))*DIR(IAX).GE.0.0)
@@ -1122,7 +1129,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                       RIH(IAX)=1
                     ENDDO
 
-	print *,i1,frbnd1(1,i1),frbnd1(2,i1),ril(1),rih(1)
 
 *  if donor is to be included then loop through receptor bins containing it
                     IF (INCLUDE) THEN
