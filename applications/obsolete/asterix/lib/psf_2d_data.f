@@ -34,6 +34,8 @@
 *        Spectral model functionality
 *      5 Jan 1994 (DJA):
 *        Added defaulting of DX and DY
+*     19 Jun 1996 (DJA):
+*        Fixed bug in POLAR mode
 *
 *    Type definitions :
 *
@@ -149,6 +151,8 @@
           CALL ADI_CPUT0I( PSID, 'ModelNy', NY, STATUS )
           NELM = NX*NY
           CALL ADI_CPUT0I( PSID, 'ModelNelm', NELM, STATUS )
+          GNX = NX
+          GNY = NY
 
 *      Allocate new memory
           IF ( .NOT. GOTDATA ) THEN
@@ -163,6 +167,8 @@
         ELSE
           CALL ADI_CGET0I( PSID, 'ModelData', MDATA, STATUS )
           CALL ADI_CGET0I( PSID, 'ModelFlag', MFLAG, STATUS )
+          CALL ADI_CGET0I( PSID, 'ModelNx', GNX, STATUS )
+          CALL ADI_CGET0I( PSID, 'ModelNy', GNY, STATUS )
 
         END IF
 
