@@ -13,7 +13,7 @@
 //     Allan Brighton, ESO (ALLAN)
 //
 //  Copyright:
-//     Copyright (C) 1997-2003 Central Laboratory of the Research Councils
+//     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
 //
 //  History:
 //     15-FEB-1996 (PWD):
@@ -244,6 +244,7 @@ public:
     { "astrefine",     &StarRtdImage::astrefineCmd,    4, 4 },
     { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
     { "astreset",      &StarRtdImage::astresetCmd,     1, 1 },
+    { "astfontresize", &StarRtdImage::astfontresizeCmd,1, 1 },
     { "astrestore",    &StarRtdImage::astrestoreCmd,   0, 1 },
     { "astset",        &StarRtdImage::astsetCmd,       2, 2 },
     { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
@@ -1610,6 +1611,30 @@ int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
         astTk_Init( interp_, canvasName_ );
         astTk_AddColour( index, argv[1] );
     }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::astfontresizeCmd
+//
+//   Purpose:
+//       Set whether fonts are resized as the canvas is scaled.
+//
+//    Return:
+//       TCL status.
+//
+//-
+int StarRtdImage::astfontresizeCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astfontresizeCmd" << endl;
+#endif
+    astTk_Init( interp_, canvasName_ );
+    int resize = 0;
+    if ( *argv[0] == '1' ) {
+        resize = 1;
+    }
+    astTk_ResizeFonts( resize );
     return TCL_OK;
 }
 
