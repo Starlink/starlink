@@ -112,7 +112,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate the list
-      CALL EDI_IDXNAM( FID, NAME, LID, STATUS )
+      CALL EDI_IDXNAM( FID, LIST, LID, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Do both Min and Max exist?
@@ -130,7 +130,8 @@
 
         ELSE
           STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Cannot get list range from extrema',
+          CALL MSG_SETC( 'L', LIST )
+          CALL ERR_REP( ' ', 'Cannot get ^L range from extrema',
      :                  STATUS )
 
         END IF
