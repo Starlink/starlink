@@ -13,7 +13,7 @@ IRAS = -L/star/iras90 -lira -L/jcmt_sw/scuba/surf_kap -lsurf_kap
 # -L/star/kappa -lkapsub -lkapgen
 IRAS = -L/jcmt_sw/scuba/surf_kap -lsurf_kap
 STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam` `hlp_link_adam` `pda_link_adam`
-ADAMLIBS = $(IRAS) `surf_link_adam`
+ADAMLIBS = $(IRAS) `./surf_link_adam`
 
 # Includes
 
@@ -46,7 +46,8 @@ FSOURCES= surf_mon.f surf_extinction.f surf_flatfield.f \
 	surf_skydip.f surf_scucat.f \
 	surf_chgpnt.f surf_chgflat.f surf_chgqual.f \
 	surf_scuhelp.f surf_remsky.f surf_scuover.f surf_chgdata.f\
-	surf_recurse_read.f surf_write_photom_header.f surf_scan_rlb.f
+	surf_recurse_read.f surf_write_photom_header.f surf_scan_rlb.f\
+	surf_despike.f
 
 FCPP=	surf_write_map_info.F
 
@@ -54,7 +55,8 @@ IFL=    surf.ifl extinction.ifl reduce_switch.ifl flatfield.ifl \
 	rebin.ifl scucat.ifl scuphot.ifl skydip.ifl drawsig.ifl \
 	change_pointing.ifl change_flat.ifl change_quality.ifl\
 	intrebin.ifl change_data.ifl extract_data.ifl scan_rlb.ifl\
-	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl
+	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl\
+	despike.ifl
 
 OBJS = ${FSOURCES:.f=.o}
 FCPPOBJ = ${FCPP:.F=.o}
