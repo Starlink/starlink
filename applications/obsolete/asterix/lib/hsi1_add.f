@@ -90,6 +90,7 @@
       INCLUDE 'SAE_PAR'          			! SAE constants
       INCLUDE 'ADI_PAR'					! ADI constants
       INCLUDE 'DAT_PAR'					! HDS constants
+      INCLUDE 'HIST_PAR'
 
 *  Arguments Given:
       INTEGER			NARG			! # arguments
@@ -124,6 +125,7 @@
 
       INTEGER			CURREC			! Current rec number
       INTEGER			ESIZE			! Extend size
+      INTEGER			IVERB			! Verbosity
       INTEGER			SIZE			! Number of records
 
       LOGICAL			THERE			! Exists already?
@@ -208,42 +210,8 @@
 *  Release HISTORY component
       CALL DAT_ANNUL( HLOC, STATUS )
 
-
-*  History exists?
-      CALL DAT_THERE( LOC, 'HISTORY', THERE, STATUS )
-      IF ( THERE ) THEN
-
-*    Delete existing history in output
-        CALL DAT_ERASE( LOC, 'HISTORY', STATUS )
-        CALL MSG_PRNT( 'Erasing existing history structure...' )
-
-      END IF
-
-*  Create and locate new structure
-      CALL DAT_NEW( LOC, 'HISTORY', 'HISTORY', 0, 0, STATUS )
-      CALL DAT_FIND( LOC, 'HISTORY', HLOC, STATUS )
-
-*  Create sub-components
-      CALL DAT_NEW0C( HLOC, 'CREATED', 18, STATUS )
-      CALL DAT_NEW0C( HLOC, 'UPDATE_MODE', 10, STATUS )
-      CALL DAT_NEW0I( HLOC, 'EXTEND_SIZE', STATUS )
-      CALL DAT_NEW0I( HLOC, 'CURRENT_RECORD', STATUS )
-      CALL DAT_NEW( HLOC, 'RECORDS', 'HIST_REC', 1, ESIZE, STATUS )
-
-*  Get time string
-      CALL HSI0_TIME( TSTR, STATUS )
-
-*  Fill values of these objects
-      CALL CMP_PUT0C( HLOC, 'CREATED', TSTR, STATUS )
-      CALL CMP_PUT0C( HLOC, 'UPDATE_MODE', UMODE, STATUS )
-      CALL CMP_PUT0I( HLOC, 'EXTEND_SIZE', ESIZE, STATUS )
-      CALL CMP_PUT0I( HLOC, 'CURRENT_RECORD', 0, STATUS )
-
-*  Free top-level structure
-      CALL DAT_ANNUL( HLOC, STATUS )
-
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'HSI1_ADD', STATUS )
       END IF
 
