@@ -2113,7 +2113,7 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Read in the base time in spacecraft clock units
-      CALL CMP_GET0R(ILOC, 'SC_BASE', HEAD.SCBASE, STATUS)
+      CALL CMP_GET0D(ILOC, 'SC_BASE', HEAD.SCBASE, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error reading base s/c clock time')
