@@ -1,0 +1,278 @@
+%APN3_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TEMPLATE.TEX -- APN3 (2003) ASP Conference Proceedings template.
+%
+% Derived from ADASS VIII (98) ASP Conference Proceedings template
+% Updated by N. Manset for ADASS IX (99), F. Primini for ADASS 2000,
+% D.Bohlender for ADASS 2001, and H. Payne for ADASS XII and LaTeX2e.
+%
+% Use this template to create your proceedings paper in LaTeX format
+% by following the instructions given below.  Much of the input will
+% be enclosed by braces (i.e., { }).  The percent sign, "%", denotes
+% the start of a comment; text after it will be ignored by LaTeX.  
+% You might also notice in some of the examples below the use of "\ "
+% after a period; this prevents LaTeX from interpreting the period as
+% the end of a sentence and putting extra space after it.  
+% 
+% You should check your paper by processing it with LaTeX.  For
+% details about how to run LaTeX as well as how to print out the User
+% Guide, consult the README file.  You should also consult the sample
+% LaTeX papers, sample1.tex and sample2.tex, for examples of including
+% figures, html links, special symbols, and other advanced features.
+%
+% If you do not have access to the LaTeX software or a laser printer
+% at your site, you can still prepare your paper following the
+% instructions in the User Guide.  In such cases, the editors will
+% process the file and make any necessary editorial adjustments.
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+\documentclass[11pt,twoside]{article}  % Leave intact
+\usepackage{adassconf}
+
+% If you have the old LaTeX 2.09, and not the current LaTeX2e, comment
+% out the \documentclass and \usepackage lines above and uncomment
+% the following:
+
+%\documentstyle[11pt,twoside,adassconf]{article}
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your
+% paper is the session number associated with your presentation as
+% published in the official conference proceedings.  You can           
+% find this number locating your abstract in the printed proceedings
+% that you received at the meeting or on-line at the conference web
+% site; the ID code is the letter/number sequence proceeding the title 
+% of your presentation. 
+%
+% This will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.  Note that
+% you should only have one \paperID, and it should not include a
+% trailing period.
+%
+% EXAMPLE: \paperID{O4-1}
+% EXAMPLE: \paperID{P7-7}
+%
+
+\paperID{ }
+
+%-----------------------------------------------------------------------
+%		            Paper Title 
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+% 
+% If your title is so long as to fill the page header when you print it,
+% then please supply a short form as a \titlemark.
+%
+% EXAMPLE: 
+%  \title{Rapid Development for Distributed Computing, with Implications
+%         for the Virtual Observatory}
+%  \titlemark{Rapid Development for Distributed Computing}
+%
+
+\title{ }
+%\titlemark{ }
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary (see example
+% below).  List each author by giving the first name or initials first
+% followed by the last name.  Authors with the same affiliations
+% should grouped together. 
+%
+% EXAMPLE: \author{Raymond Plante, Doug Roberts, 
+%                  R.\ M.\ Crutcher\altaffilmark{1}}
+%          \affil{National Center for Supercomputing Applications, 
+%                 University of Illinois Urbana-Champaign, Urbana, IL
+%                 61801}
+%          \author{Tom Troland}
+%          \affil{University of Kentucky}
+%
+%          \altaffiltext{1}{Astronomy Department, UIUC}
+%
+% In this example, the first three authors, "Plante", "Roberts", and
+% "Crutcher" are affiliated with "NCSA".  "Crutcher" has an alternate 
+% affiliation with the "Astronomy Department".  The fourth author,
+% "Troland", is affiliated with "University of Kentucky"
+
+\author{ }
+\affil{ }
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+% 
+% EXAMPLE:  \contact{Dennis Crabtree}
+%           \email{crabtree@cfht.hawaii.edu}
+%
+
+\contact{ }
+\email{ }
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The 
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following
+% syntax: 
+%
+% SYNTAX:  \aindex{Lastname, F. M.}
+% 
+% where F is the first initial and M is the second initial (if
+% used).  This guarantees that authors that appear in multiple papers
+% will appear only once in the author index.  
+%
+% EXAMPLE: \paindex{Crabtree, D.}
+%          \aindex{Manset, N.}        
+%          \aindex{Veillet, C.}        
+%
+% NOTE: this information is also used to build the author list that
+% appears in the table of contents.  Authors will be listed in the order
+% of the \paindex and \aindex commmands.
+%
+
+\paindex{ }
+\aindex{ }     % Remove this line if there is only one author
+
+%-----------------------------------------------------------------------
+%		      Author list for page header	
+%-----------------------------------------------------------------------
+% Please supply a list of author last names for the page header. in
+% one of these formats:
+%
+% EXAMPLES:
+% \authormark{Lastname}
+% \authormark{Lastname1 \& Lastname2}
+% \authormark{Lastname1, Lastname2, ... \& LastnameN}
+% \authormark{Lastname et al.}
+%
+% Use the "et al." form in the case of seven or more authors, or if
+% the preferred form is too long to fit in the header.
+
+\authormark{ }
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter a comma separated list of up to 6 keywords describing your
+% paper.  These will NOT be printed as part of your paper; however,
+% they will be used to generate the subject index for the proceedings.
+% There is no standard list; however, you can consult the indices
+% for past proceedings (http://adass.org/adass/proceedings/).
+%
+% EXAMPLE:  \keywords{visualization, astronomy: radio, parallel
+%                     computing, AIPS++, Galactic Center}
+%
+% In this example, the author noticed that "radio astronomy" appeared
+% in the ADASS VII Index as "astronomy" being the major keyword and
+% "radio" as the minor keyword.  The colon is used to introduce another
+% level into the index.
+
+\keywords{  }
+
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting 
+% special symbols). Do not leave a blank line between \begin{abstract} 
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+% Place the text of your abstract here - NO BLANK LINES
+
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically. 
+%
+% EXAMPLE:  \section{Introduction}
+%           ...
+%           \subsection{Our View of the World}
+%           ...
+%           \section{A New Approach}
+%
+% It is recommended that you look at the sample papers, sample1.tex
+% and sample2.tex, for examples for formatting references, footnotes,
+% figures, equations, html links, lists, and other special features.  
+
+\section{ }
+
+
+
+
+
+
+
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  Observe the following order when listing
+% bibliographical information for each reference:  author name(s),
+% publication year, journal name, volume, and page number for
+% articles.  Note that many journal names are available as macros; see
+% the User Guide listing "macro-ized" journals.   
+%
+% EXAMPLE:  \reference Hagiwara, K., \& Zeppenfeld, D.\  1986, 
+%                Nucl.Phys., 274, 1
+%           \reference H\'enon, M.\  1961, Ann.d'Ap., 24, 369
+%           \reference King, I.\ R.\  1966, \aj, 71, 276
+%           \reference King, I.\ R.\  1975, in Dynamics of Stellar 
+%                Systems, ed.\ A.\ Hayli (Dordrecht: Reidel), 99
+%           \reference Tody, D.\  1998, \adassvii, 146
+%           \reference Zacharias, N.\ \& Zacharias, M.\ 2003,
+%                \adassxii, \paperref{P7.6}
+% 
+% Note the following tricks used in the example above:
+%
+%   o  \& is used to format an ampersand symbol (&).
+%   o  \'e puts an accent agu over the letter e.  See the User Guide
+%      and the sample files for details on formatting special
+%      characters.  
+%   o  "\ " after a period prevents LaTeX from interpreting the period 
+%      as an end of a sentence.
+%   o  \aj is a macro that expands to "Astron. J."  See the User Guide
+%      for a full list of journal macros
+%   o  \adassvii is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS VII conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through XI.
+%   o  When referencing a paper in the current volume, use the
+%      \adassxii and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the 
+%      note in the "Paper ID Code" section above for details on how to 
+%      determine the paper ID code for the paper you reference.  
+%
+\begin{references}
+
+
+
+
+\end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
