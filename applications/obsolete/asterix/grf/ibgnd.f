@@ -2200,6 +2200,7 @@
           CALL ARR_SELEM1B( I_QPTR_1D, I_BGM_NSAMP, S, SQ, STATUS )
 
         END DO
+        IF ( .NOT. I_QOK ) I_MASK = QUAL__MASK
 
 *    Set default axis ranges
         I_X1_1D = 0.0
@@ -2213,7 +2214,7 @@
         CALL GCB_SETDEF( STATUS )
         CALL GCB_SETL( 'ERR_FLAG', .TRUE., STATUS )
         CALL GCB_SETL( 'STEP_FLAG', .FALSE., STATUS )
-        CALL GCB_SETL( 'POLY_FLAG', .FALSE., STATUS )
+        CALL GCB_SETL( 'POLY_FLAG', .TRUE., STATUS )
         CALL GCB_SETL( 'POINT_FLAG', .FALSE., STATUS )
 
 *    Cache the GCB
