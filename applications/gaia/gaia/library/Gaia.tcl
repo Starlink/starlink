@@ -752,9 +752,8 @@ itcl::class gaia::Gaia {
          }
       } else {
          #  New clone required.
-         set clone [incr clone_max_]
+         set clone [expr [incr clone_max_] +1]
       }
-
       incr clone_cnt_
 
       #  Do not use TopLevelWidget::start as this blocks with a tkwait

@@ -336,9 +336,9 @@ itcl::class gaia::StarDemo {
    method start {} {
       if { ! $running_ } {
 	 set running_ 1
-
-	 while { $running_ } {
-	    display {
+         while { $running_ } {
+            if { ! $quick_start_ } { 
+               display {
 
 		       Welcome to the GAIA demo
 		       ========================
@@ -352,61 +352,62 @@ itcl::class gaia::StarDemo {
  coordinate readout, calibration and modification), grid overlays,
  blink comparison, defect patching and the ability to query on-line
  (WWW) catalogues.
-            }
-            display {
+                    }
+               display {
  During this demonstration GAIA will be controlled non-interactively.
  So although you may interact with it (if you feel the need, but 
  don't be surprised if things move on, or go horribly wrong), you 
  should really just stand back and watch.
-            }
-            display {
+               }
+               display {
  By the way, GAIA stands for:
  
              Graphical Astronomy and Image Analysis Tool.
 
  It is based on the SkyCat tool from ESO (the European Southern
  Observatory):
-	    }
-	    #  Display credits.
-	    global ::about_gaia
-	    set init [message $w_.message \
-		  -justify center \
-		  -text $about_gaia \
-		  -borderwidth 3 \
-		  -relief raised\
-		  -foreground blue \
-		  -font [lindex $fonts_ 1]]
-	    place $init -in $w_ -relx 0.5 -rely 0.5 \
+               }
+               #  Display credits.
+               global ::about_gaia
+               set init [message $w_.message \
+                            -justify center \
+                            -text $about_gaia \
+                            -borderwidth 3 \
+                            -relief raised\
+                            -foreground blue \
+                            -font [lindex $fonts_ 1]]
+               place $init -in $w_ -relx 0.5 -rely 0.5 \
 		  -relwidth 1.0 -relheight 1.0 -anchor c
-            wm deiconify $w_
-	    update idletasks
-	    wait_ $readtime_
-	    destroy $init
-            wm withdraw $w_
+               wm deiconify $w_
+               update idletasks
+               wait_ $readtime_
+               destroy $init
+               wm withdraw $w_
 
-            #  Final message is a warning for those sensitive to
-            #  flashing images.
-            display {
-
+               #  Final message is a warning for those sensitive to
+               #  flashing images.
+               display {
+                  
                        WARNING: FLASHING IMAGES
                        ========================
 
  This demonstration contains flashing images, look away if this
  may affect you.
-
-      }
+                       
+                    }
+            }
             # Main loop.
-	    foreach demo $demolist_ {
-	       if { $running_ } {
-		  catch { $demo }
-	       } else {
-		  really_stop_
-		  return
-	       }
-	    }
-	    really_stop_
-	    set running_ 1
-	 }
+            foreach demo $demolist_ {
+               if { $running_ } {
+                  catch { $demo }
+               } else {
+                  really_stop_
+                  return
+               }
+            }
+            really_stop_
+            set running_ 1
+         }
       }
    }
 
@@ -609,15 +610,19 @@ itcl::class gaia::StarDemo {
       set y0 [expr int($ycen-$stride)]
       set x1 [expr int($xcen+$stride)]
       set y1 [expr int($ycen+$stride)]
-      set id [$itk_option(-canvasdraw) create_line 100 100]
-      $itk_option(-canvas) coords $id $x0 $y0 $x1 $y1
+      set id [$itk_option(-canvas) create line $x0 $y0 $x1 $y1 \
+                 -fill white -width 2]
+      $itk_option(-canvasdraw) add_object_bindings $id
       $itk_option(-gaiactrl) make_spectrum $id $x0 $y0 $x1 $y1
       refresh_
       move_to_side_ [winfo toplevel $itk_option(-gaiactrl).spectrum]
-      $itk_option(-canvasdraw) mark $x0 $y0
       wait_ $readtime_
+      #  Move the line in a radial fashion, notify spectrum to update
+      #  itself from the line...
       for { set i $y0 } { $i < $y1 } { incr i 3 } {
-         $itk_option(-canvasdraw) resize_line $id $x0 $i e 0
+         lassign [$itk_option(-canvas) coords $id] x0 d x1 y1
+         $itk_option(-canvas) coords $id $x0 $i $x1 $y1
+         $itk_option(-gaiactrl).spectrum notify_cmd
 	 refresh_
       }
       wait_ $readtime_
@@ -859,7 +864,9 @@ itcl::class gaia::StarDemo {
  other.
       }
       show_image_ frame.sdf 90 1
+      puts "cloning..."
       set clone [::$itk_option(-gaiamain) noblock_clone "" "$demo_dir_/frame.sdf(5:,5:)"]
+      puts "continuing..."
       set cloneimg [[$clone get_image] get_image]
       update
       $clone make_toolbox blink
@@ -1407,11 +1414,13 @@ $catlist
    protected variable running_ 0
 
    #  List of all known demos.
-    protected variable demolist_ \
-       "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-        blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
-        skycat_ archives_"
-
+#   protected variable demolist_ \
+#      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+#       blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
+#       skycat_ archives_"
+   protected variable demolist_ \
+      "blink_"
+   
    #  Interval to wait while reading text
    protected variable readtime_ 15000
 
@@ -1426,6 +1435,9 @@ $catlist
 
    #  Directory for demo files.
    protected variable demo_dir_ [pwd]
+
+   #  Development mode.
+   protected variable quick_start_ 1
 
    #  Common variables: (shared by all instances)
    #  -----------------

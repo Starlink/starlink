@@ -134,3 +134,4 @@ set auto_index(::gaia::setXdefaults) [list source [file join $dir gaia_defaults.
 set auto_index(setup_convert) [list source [file join $dir convert.tcl]]
 set auto_index(::gaia::GaiaImagePick) [list source [file join $dir GaiaImagePick.tcl]]
 set auto_index(::gaia::GaiaImagePrint) [list source [file join $dir GaiaImagePrint.tcl]]
+set auto_index(::util::LabelMenu) [list source [file join $dir LabelMenu.tcl]]
