@@ -21,6 +21,8 @@
 #        Use GLOBAL defaults
 #     1996 November 13 (TIMJ)
 #        Add NA,AZ output coords
+#     1997 January 9 (TIMJ)
+#        Comment out defaults and in for REBIN_METHOD (using PAR_CHOIC)
 
 #-
 
@@ -50,8 +52,8 @@
       PARAMETER REBIN_METHOD
          TYPE    '_CHAR'
          PROMPT  'Rebinning method to be used'
-         DEFAULT 'LINEAR'
-	 IN      'BESSEL','LINEAR'
+#        DEFAULT 'LINEAR'
+#	 IN      'BESSEL','LINEAR'
 	 HELPKEY  '*'
       ENDPARAMETER
  
