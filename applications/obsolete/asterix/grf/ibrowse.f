@@ -18,12 +18,12 @@
 *    23 May 94 : V1.2-7 Errors and Significance added (RJV)
 *     1 Sep 94 : V1.2-8 Positioning error fixed (RJV)
 *    25 aug 95 : V1.8-0 GUI interface (RJV)
+*    11 Jan 96 : V1.8-1 TSM removed (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'TSM_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -148,29 +148,11 @@
                 YW=YYW
               ELSE
 
-                IF (FIRST) THEN
-*  Initialise screen management and get display size
-                  CALL TSM_INIT( ' ', STATUS )
-                  CALL TSM_GETDIMS( 0, NCOLS, NROWS, STATUS )
-                  IF ( (NCOLS .LT. 80) .OR. (NROWS.LT.10) ) THEN
-                    CALL MSG_PRNT(
-     :             '** Terminal is too small for IBROWSE'/
-     :                                 /' - resize it **' )
-                    GOTO 99
-                  END IF
+              IF (FIRST) THEN
 
-*  Number of data columns
-                  NX = 9
+                NX = 9
+                NY = 9
 
-*  Number of data rows that can be displayed. Ensure that it is odd.
-*  The number of rows is given by the number of rows on the screen,
-*  minus 4 rows for the positions window and 2 for the data border.
-                  NY = (NROWS-6)/2
-                  IF (MOD(NY,2).EQ.0 ) NY = NY - 1
-
-                  CALL TSM_CREWIN( 80, NROWS, 1, 1, DWIN, STATUS )
-
-                ENDIF
 
                 IF (CH.EQ.'D') THEN
                   XW=XXW
@@ -226,7 +208,6 @@
               ENDIF
             ENDDO
 
-            CALL TSM_CLOSE( STATUS )
 
           ENDIF
 
@@ -264,7 +245,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'TSM_PAR'
 *    Import :
       LOGICAL KEYB
       LOGICAL FIRST
@@ -334,11 +314,7 @@
           STRING(34:)='Data values'
         ENDIF
 
-        IF (KEYB) THEN
-          CALL MSG_PRNT(STRING)
-        ELSE
-          CALL TSM_PUTSTRAT( DWIN, STRING, 1,1, STATUS )
-        ENDIF
+        CALL MSG_PRNT(STRING)
 
 *  convert to other frames
         CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
@@ -414,33 +390,13 @@
               ENDIF
             ENDIF
 
-            IF (KEYB) THEN
-              IC1=IC1+8
-              IC2=IC2+8
-            ELSE
-              IC1=IC1+9
-              IC2=IC2+9
-            ENDIF
+            IC1=IC1+8
+            IC2=IC2+8
 
           ENDDO
 
-          IF (KEYB) THEN
-            CALL MSG_PRNT(STRING)
-            CALL MSG_BLNK()
-          ELSE
-            CALL TSM_PUTSTRAT( DWIN, STRING, 1, ROW, STATUS )
-
-            IF ( J .EQ. IY ) THEN
-              CPOS = (NX/2)*9 + 1
-              CALL TSM_REFRESH( DWIN, STATUS )
-              STR8 = STRING(CPOS:CPOS+7)
-              CALL TSM_MOVCUR( DWIN, 1, 1, STATUS )
-              CALL TSM_SETSTYLE( DWIN, TSM__REVERSE, STATUS )
-              CALL TSM_PUTSTRAT( DWIN, STR8, CPOS, ROW, STATUS )
-              CALL TSM_SETSTYLE( DWIN, 0, STATUS )
-            ENDIF
-
-          ENDIF
+          CALL MSG_PRNT(STRING)
+          CALL MSG_BLNK()
 
           ROW=ROW+2
 
@@ -472,19 +428,10 @@
         WRITE(GSTR(11:18),'(F8.4)') REAL(GLON)
         WRITE(GSTR(29:36),'(F8.2)') REAL(GLAT)
 
-        IF (KEYB) THEN
-          CALL MSG_BLNK()
-          CALL MSG_PRNT(LIN1)
-          CALL MSG_PRNT(XYSTR//RASTR//DECSTR)
-          CALL MSG_PRNT(ESTR//GSTR)
-        ELSE
-          CALL TSM_PUTSTRAT( DWIN, LIN1, 1, NROWS-4, STATUS )
-          CALL TSM_PUTSTRAT( DWIN, XYSTR//RASTR//DECSTR,1,NROWS-3,
-     :                                                     STATUS)
-          CALL TSM_PUTSTRAT( DWIN,ESTR//GSTR,1,NROWS-2,STATUS)
-          CALL TSM_PUTSTRAT( DWIN,CMD1//CMD2,1,NROWS,STATUS)
-          CALL TSM_REFRESH( DWIN, STATUS )
-        ENDIF
+        CALL MSG_BLNK()
+        CALL MSG_PRNT(LIN1)
+        CALL MSG_PRNT(XYSTR//RASTR//DECSTR)
+        CALL MSG_PRNT(ESTR//GSTR)
 
 
       ENDIF
