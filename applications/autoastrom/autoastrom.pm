@@ -41,6 +41,7 @@ sub extract_objects ($$$$);
 sub ndf_info ($$$$);
 sub get_catalogue ($\%$$);
 sub match_positions ($$$$$);
+sub match_positions_findoff ($$$$$);
 sub generate_astrom ($);
 sub run_astrom ($$);
 sub deg2sex ($$;$);
@@ -786,6 +787,35 @@ sub get_catalogue ($\%$$) {
 }
 
 
+# Invoke one of several routines to match the positions of the objects
+# in the two input catalogues.
+#
+# Return an array containing the two files which are the match result
+# catalogues (in the same form as the input catalogues), in the same order
+# as the corresponding input files, plus a flag (1=ok, 0=error)
+# indicating whether the match succeeded or not.
+sub match_positions ($$$$$) {
+    my $helpers = shift;	# Reference to hash of helper programs.
+    my $cat1 = shift;		# First position list
+    my $cat2 = shift;		# Second position list
+    my $matchopts = shift;	# Reference to hash of options
+                                # (may include {poserr}, {objsize},
+                                # {area}).  Crucially may also contain
+                                # element {method}, which can be
+                                # `findoff', the default, or the name
+                                # of some other program loaded in a plugin.
+    my $tempfn = shift;		# Temporary filename prefix
+
+    my $matchmethod = (defined($matchopts->{method})
+		       ? $matchopts->{method}
+		       : 'findoff');
+    my $handlersub = $helpers->{'plugin-match-'.$matchmethod};
+    defined($handlersub)
+      || wmessage ('error', "Plugin plugin-match-$matchmethod unknown");
+
+    return &$handlersub ($helpers, $cat1, $cat2, $matchopts, $tempfn);
+}
+
 
 # Invoke FINDOFF to match the positions of the objects in the two
 # input catalogues.  $tempfn is a filename prefix, to make temporary
@@ -794,21 +824,22 @@ sub get_catalogue ($\%$$) {
 # Return an array containing the two files containing the FINDOFF
 # results, in the same order as the corresponding input files, plus a
 # flag (1=ok, 0=error) indicating whether the match succeeded or not.
-sub match_positions ($$$$$) {
-    my $ccdpack = shift;	# CCDPack monolith
+sub match_positions_findoff ($$$$$) {
+    my $helpers = shift;	# References to hash of helper programs.
     my $cat1 = shift;		# First position list
     my $cat2 = shift;		# Second position list
-    my $matchopts = shift;	# Reference to hash of findoff options
-                                # (may include {poserr}, {objsize}, {area}.
+    my $matchopts = shift;	# Reference to hash of options
+                                # (may include {poserr}, {objsize}, {area}).
     my $tempfn = shift;		# Temporary filename prefix
 
 
+    my $ccdpack = $helpers->{ccdpack};
     my $cat1out = "$tempfn-cat1.out";
     my $cat2out = "$tempfn-cat2.out";
     my $myname = 'match_positions_findoff';
     if ($noregenerate && -e $cat1out && -e $cat2out) {
 	printf STDERR ("%s: Reusing %s and %s...\n",
-		       $myname, $cat1out, $cat2out);
+		       $myname, $cat1out, $cat2out)
 	  if $verbose;
 	return ($cat1out, $cat2out);
     }
