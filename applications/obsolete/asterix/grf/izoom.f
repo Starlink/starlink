@@ -21,6 +21,7 @@
       CHARACTER*12 MODE
       REAL XC,YC,DX,DY
       REAL PX,PY
+      REAL FACTOR
       INTEGER NX,NY
       INTEGER IPX,IPY
 *    Global Variables :

@@ -793,11 +793,13 @@
         IF (I_QOK.AND.I_BAD) THEN
 
 *  plot pixels
-          CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+          CALL GFX_PIXELQ(I_WKPTR,
+     :               I_NX,I_NY,I_ZM_IX1,I_ZM_IX2,I_ZM_IY1,I_ZM_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,%VAL(I_DPTR),
      :                         I_PMIN,I_PMAX,%VAL(I_QPTR),I_MASK,STATUS)
         ELSE
-          CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+          CALL GFX_PIXEL(I_WKPTR,
+     :               I_NX,I_NY,I_ZM_IX1,I_ZM_IX2,I_ZM_IY1,I_ZM_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,%VAL(I_DPTR),
      :                                             I_PMIN,I_PMAX,STATUS)
         ENDIF
@@ -833,9 +835,10 @@
         IF (I_QOK) THEN
 
 *  plot pixels
-          CALL GFX_QPIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+          CALL GFX_QPIXEL(I_WKPTR,
+     :                 I_NX,I_NY,I_ZM_IX1,I_ZM_IX2,I_ZM_IY1,I_ZM_IY2,
      :                           .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
-     :                                    %VAL(I_QPTR),I_MASK,STATUS)
+     :                                      %VAL(I_QPTR),I_MASK,STATUS)
         ENDIF
 
       ENDIF
@@ -870,7 +873,8 @@
         IF (I_QOK) THEN
 
 *  plot pixels
-          CALL GFX_QPIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+          CALL GFX_QPIXEL(I_WKPTR,
+     :                  I_NX,I_NY,I_ZM_IX1,I_ZM_IX2,I_ZM_IY1,I_ZM_IY2,
      :                           .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
      :                              %VAL(I_REG_PTR),QUAL__MASK,STATUS)
         ENDIF
@@ -943,11 +947,13 @@
         I_PMIN=I_DMIN
         I_PMAX=I_DMAX
         IF (I_QOK.AND.I_BAD) THEN
-          CALL GFX_CONTOURQ(I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+          CALL GFX_CONTOURQ(I_NX,I_NY,
+     :                      I_ZM_IX1,I_ZM_IX2,I_ZM_IY1,I_ZM_IY2,
      :                      %VAL(I_XPTR),%VAL(I_YPTR),%VAL(I_DPTR),
      :                        I_PMIN,I_PMAX,%VAL(I_QPTR),I_MASK,STATUS)
         ELSE
-          CALL GFX_CONTOUR(I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+          CALL GFX_CONTOUR(I_NX,I_NY,
+     :                       I_ZM_IX1,I_ZM_IX2,I_ZM_IY1,I_ZM_IY2,
      :                        %VAL(I_XPTR),%VAL(I_YPTR),%VAL(I_DPTR),
      :                                           I_PMIN,I_PMAX,STATUS)
         ENDIF
@@ -1060,10 +1066,10 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get world coords of edges of image
-        XP1=REAL(I_IX1)-0.5
-        XP2=REAL(I_IX2)+0.5
-        YP1=REAL(I_IY1)-0.5
-        YP2=REAL(I_IY2)+0.5
+        XP1=REAL(I_ZM_IX1)-0.5
+        XP2=REAL(I_ZM_IX2)+0.5
+        YP1=REAL(I_ZM_IY1)-0.5
+        YP2=REAL(I_ZM_IY2)+0.5
         CALL IMG_PIXTOWORLD(XP1,YP1,XW1,YW1,STATUS)
         CALL IMG_PIXTOWORLD(XP2,YP2,XW2,YW2,STATUS)
 
@@ -1949,6 +1955,25 @@ c      LOGICAL VOK,QOK
 *  get min and max
         CALL IMG_MINMAX(STATUS)
 
+*  set data slice
+        I_IX1=1
+        I_IX2=I_NX
+        I_IY1=1
+        I_IY2=I_NY
+
+*  set zoom window to whole image
+        I_ZM_IX1=1
+        I_ZM_IX2=I_NX
+        I_ZM_IY1=1
+        I_ZM_IY2=I_NY
+
+*  set current position to centre of image
+        I_X=I_XBASE+(REAL(I_NX)/2.0-1.0)*I_XSCALE
+        I_Y=I_YBASE+(REAL(I_NY)/2.0-1.0)*I_YSCALE
+        I_DX=ABS(I_X-I_XBASE)
+        I_DY=ABS(I_Y-I_YBASE)
+        I_R=0.0
+
 *  get top level text
         CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
         CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
@@ -2064,6 +2089,12 @@ c      LOGICAL VOK,QOK
         I_IX2=I_NX
         I_IY1=1
         I_IY2=I_NY
+
+*  set zoom window to whole image
+        I_ZM_IX1=1
+        I_ZM_IX2=I_NX
+        I_ZM_IY1=1
+        I_ZM_IY2=I_NY
 
 *  set current position to centre of image
         I_X=I_XBASE+(REAL(I_NX)/2.0-1.0)*I_XSCALE
@@ -3165,11 +3196,11 @@ c        REAL XX,XP,YP
       INTEGER I1,I2,J1,J2
       INTEGER I,J
 
-*  get range of pixels containing circle
+*  get range of pixels containing polygon
       CALL IMG_POLYTOBOX(NV,XV,YV,I1,I2,J1,J2,STATUS)
 
-      DO J=I_IY1,I_IY2
-        DO I=I_IX1,I_IX2
+      DO J=J1,J2
+        DO I=I1,I2
           IF (IMG_INPOLY(I,J,NV,XV,YV)) THEN
             REG(I,J)=FLAG
           ENDIF
