@@ -471,7 +471,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 
 PRIVATE_INCLUDES = c1_com me_com irm_com ira_par ira_com ira_err ctm_com \
                    ctm_par fts_par hlpcmd sft_com ndg_const ndg_err \
-                   kpg_ast kpg_par grf.h
+                   kpg_ast kpg_par grf.h grecom.inc grerr
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -637,7 +637,7 @@ kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
 normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
-kpg1_wcatw.f kpg1_srcta.f
+kpg1_wcatw.f kpg1_srcta.f gropen.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -2549,6 +2549,7 @@ gltclt.o:	 SAE_PAR FIO_ERR
 gltcsb.o:	 SAE_PAR PRM_PAR
 greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
 grf_kappa.o:     grf.h
+gropen.o:        grecom.inc grerr GKS_PAR
 gthlpi.o:	 SAE_PAR HLPCMD
 hiscom.o:	 SAE_PAR NDF_PAR MSG_PAR PAR_PAR PAR_ERR FIO_ERR
 hislist.o:	 SAE_PAR NDF_PAR
