@@ -233,6 +233,7 @@ SYSTEM "img-eqlist"					"img-eqlist.dtd"
 PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"	../dsssl/sl/common/slparams.dsl
 PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"	../dsssl/sl/html/slparams.dsl
 PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"	../dsssl/sl/latex/slparams.dsl
+PUBLIC "-//Starlink//TEXT DSSSL TeXML Parameterisation//EN"	../dsssl/sl/texml/slparams.dsl
 
 	-- Back door for hacky extra code.  See the file for explanation --
 PUBLIC "-//Starlink//TEXT DSSSL HTML Special Code//EN"		../dsssl/sl/html/slspecial.dsl
