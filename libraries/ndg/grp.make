@@ -24,7 +24,7 @@ ndg1_open.f   ndg1_forxt.f
 
 #  C source files 
 C_FILES = \
-ndg1_wild.c
+ndg1_wild.c ndg1_regsb.c
 
 #  Text files destined for UNIX release ndg_source.tar.
 OTHER_UNIX_SOURCES = ndg_dev ndg_link ndg_link_adam ndg_test.f 

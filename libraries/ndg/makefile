@@ -313,7 +313,7 @@ PKG_NUM =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0-1
+PKG_VERS = 4.1
 
 #  Library version number.
 #
@@ -413,7 +413,7 @@ PLATFORM_F =
 
 #  C routines required for both standalone and ADAM versions of the library.
 
-BASIC_C_ROUTINES = ndg1_wild.c
+BASIC_C_ROUTINES = ndg1_wild.c ndg1_regsb.c
 
 #  The facility error file.
 

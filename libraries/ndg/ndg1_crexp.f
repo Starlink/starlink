@@ -124,6 +124,7 @@
       INTEGER IGRPD              ! Group of directories
       INTEGER IGRPH              ! Group of full HDS paths
       INTEGER IGRPT              ! Group of file types
+      INTEGER INSIZE             ! Size of supplied basis group
       INTEGER MODIND             ! Index of basis spec
       INTEGER NTYP               ! No. of known foreign data formats
       INTEGER SIZE0              ! Size of group on entry.
@@ -196,9 +197,10 @@
 *  See if IGRP0 is a valid GRP identifier.
       CALL GRP_VALID( IGRP0, INGRP, STATUS )
 
-*  If the identifier is valid, get identifiers for the associated groups 
-*  holding the individual fields.
+*  If the identifier is valid, find the size of the basis group and get 
+*  identifiers for the associated groups holding the individual fields.
       IF( INGRP ) THEN
+         CALL GRP_GRPSZ( IGRP0, INSIZE, STATUS )
          CALL GRP_OWN( IGRP0, IGRPD, STATUS )
          IF( IGRPD .NE. GRP__NOID ) THEN 
             CALL GRP_OWN( IGRPD, IGRPB, STATUS )
@@ -209,12 +211,53 @@
             IGRPT = GRP__NOID
             IGRPH = GRP__NOID
          END IF
+      ELSE
+         INSIZE = 0
       END IF
 
-*  Call GRP_GRPEX to append NDF names specified using the supplied 
+*  If the group expression begins with "s/" then assume it is a regular
+*  expression substitution command to be processed using sed to create
+*  the output NDF names.
+      IF( GRPEXP( : 2 ) .EQ. 's/' ) THEN
+         IF( .NOT. INGRP ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN 
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'NDG_CREXP_ERR1', 'Output NDFs cannot be'//
+     :                    ' specified using a regular expression '//
+     :                    'since no group of input NDFs is available.', 
+     :                    STATUS )
+            END IF
+         ELSE
+            CALL NDG1_REGSB( GRPEXP( : MAX( 1, CHR_LEN( GRPEXP ) ) ), 
+     :                       IGRP0, IGRP, SIZE, STATUS )          
+
+            IF( SIZE .LT. INSIZE .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               IF( INSIZE .GT. 1 ) THEN
+                  CALL MSG_SETI( 'SZ', SIZE )
+                  CALL MSG_SETI( 'INSZ', INSIZE )
+                  CALL ERR_REP( 'NDG_CREXP_ERR2A', 'The supplied '//
+     :                    'regular expression matched only ^SZ of '//
+     :                    'the ^INSZ input NDFs and so cannot be used.', 
+     :                          STATUS ) 
+               ELSE
+                  CALL ERR_REP( 'NDG_CREXP_ERR2B', 'The supplied '//
+     :                    'regular expression did not match the '//
+     :                    'input NDF and so cannot be used.', 
+     :                          STATUS ) 
+               END IF
+
+            END IF
+
+         END IF
+
+*  Otherwise, call GRP_GRPEX to append NDF names specified using the supplied 
 *  group expresson, to the group. Any modification elements are based on
 *  the group holding the file base names.
-      CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG, STATUS )
+      ELSE
+         CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG, 
+     :                   STATUS )
+      END IF
 
 *  Go through each new name in the group.
       DO I = SIZE0 + 1, SIZE
@@ -336,7 +379,7 @@
 
 *  Give a context message.
          CALL MSG_SETC( 'P', GRPEXP )
-         CALL ERR_REP( 'NDG_CREXP_ERR1','Error obtaining a group of '//
+         CALL ERR_REP( 'NDG_CREXP_ERR3','Error obtaining a group of '//
      :                 'NDFs using group expression ''^P''.', STATUS )
 
       END IF
