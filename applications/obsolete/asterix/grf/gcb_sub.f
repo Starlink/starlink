@@ -1246,6 +1246,7 @@
       INCLUDE 'GCB_CMN'
 *    Structure definitions :
 *    Import :
+      INTEGER ID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -1259,12 +1260,12 @@
 
         DO NSCAL=1,G_NSCAL
           CALL NBS_DEFINE_PRIMITIVE(ID,G_SCNAME(NSCAL),'_CHAR',
-     :                                     0,G_SCSIZE(NSCAL),SID,STATUS)
+     :                                     0,G_SCSIZ(NSCAL),SID,STATUS)
         ENDDO
         DO NSTRUC=1,G_NSTRUC
           DO NCOMP=1,G_NCOMP(NSTRUC)
             CALL NBS_DEFINE_PRIMITIVE(ID,G_CNAME(NSTRUC,NCOMP),'_CHAR',
-     :                               0,G_CSIZE(NSTRUC,NCOMP),SID,STATUS)
+     :                               0,G_CSIZ(NSTRUC,NCOMP),SID,STATUS)
           ENDDO
         ENDDO
 
