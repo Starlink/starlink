@@ -349,10 +349,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        celestial FITS headers for a Mapping which includes more than
 *        one WcsMap.
 *     13-AUG-2001 (DSB):
-*        Modified FixNew so that it retains the current card index if possible.
+*        - Modified FixNew so that it retains the current card index if possible.
 *        This fixed a bug which could cause headers written out using Native 
 *        encodings to be non-contiguous.
-
+*        - Corrected ComBlock to correctly remove AST comment blocks in
+*        native encoded fitschans.
 *class--
 */
 
@@ -2667,6 +2668,9 @@ static int ComBlock( AstFitsChan *this, int incr, const char *method,
    complete comment block. Break out of the loop. */
          if( CardType( this ) != AST__COMMENT ) break;
 
+/* Increment the number of cards in the comment block. */
+         ncard++;
+
 /* Get the text of the comment, and its length. */
          text = CardComm( this );
          if( text ){
@@ -2679,9 +2683,6 @@ static int ComBlock( AstFitsChan *this, int incr, const char *method,
 /* Check the last 3 characters. Break out of the loop if they are not
    "AST". */
             if( strcmp( "AST", text + len - 3 ) ) break;
-
-/* Increment the number of cards in the comment block. */
-            ncard++;
 
 /* If the comment is the appropriate block delimiter (a line of +'s or
    -'s depending on the direction), then set the flag to indicate that we
