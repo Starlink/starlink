@@ -33,6 +33,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
@@ -119,9 +120,9 @@
       ELSE
 
 *      Decide whether event or image dataset
-        CALL DAT_TYPE( P_LOC(SLOT), TYPE, STATUS )
+        CALL DAT_TYPE( LOC, TYPE, STATUS )
 
-        CALL DAT_THERE( P_LOC(SLOT), 'X_CORR', XTHERE, STATUS )
+        CALL DAT_THERE( LOC, 'X_CORR', XTHERE, STATUS )
 
 *      If binned
         IF ( .NOT. ((TYPE(:4).EQ.'EVDS') .OR.
@@ -244,14 +245,14 @@
 *        Look for X_CORR list
           XOK = XTHERE
           IF ( XOK ) THEN
-            CALL DAT_FIND( P_LOC(SLOT), 'X_CORR', LLOC(1), STATUS )
+            CALL DAT_FIND( LOC, 'X_CORR', LLOC(1), STATUS )
             LSUF = '_CORR'
           ELSE
 
 *          Look for X_RAW list
-            CALL DAT_THERE( P_LOC(SLOT), 'X_RAW', XOK, STATUS )
+            CALL DAT_THERE( LOC, 'X_RAW', XOK, STATUS )
             IF ( XOK ) THEN
-              CALL DAT_FIND( P_LOC(SLOT), 'X_RAW', LLOC(1), STATUS )
+              CALL DAT_FIND( LOC, 'X_RAW', LLOC(1), STATUS )
               LSUF = '_RAW'
 
 *          Give up
@@ -265,9 +266,9 @@
           END IF
 
 *        Look for matching Y list
-          CALL DAT_THERE( P_LOC(SLOT), 'Y'//LSUF, YOK, STATUS )
+          CALL DAT_THERE( LOC, 'Y'//LSUF, YOK, STATUS )
           IF ( YOK ) THEN
-            CALL DAT_FIND( P_LOC(SLOT), 'Y'//LSUF, LLOC(2), STATUS )
+            CALL DAT_FIND( LOC, 'Y'//LSUF, LLOC(2), STATUS )
           ELSE
             CALL MSG_PRNT( '! No Y axis list data present' )
             STATUS = SAI__ERROR
