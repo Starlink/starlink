@@ -87,6 +87,8 @@ KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
 KPG_R_GEN = kps1_pgft.gr
 
+SUFFIXES = .gen .gdr .gr .gbdirw .f
+
 #  Run generic to get numeric types.
 .gen.f:
 	$(GENERIC)  -t n $<
@@ -101,7 +103,7 @@ KPG_R_GEN = kps1_pgft.gr
 	$(GENERIC)  -t r $(<:.gr=.gen)
 	rm $(<:.gr=.gen)
 
-.gbdriw.f:
-	cp $< $(<:.gbdriw=.gen)
-	$(GENERIC)  -t bdriw $(<:.gbdriw=.gen)
-	rm $(<:.gbdriw=.gen)
+.gbdirw.f:
+	cp $< $(<:.gbdirw=.gen)
+	$(GENERIC)  -t bdirw $(<:.gbdirw=.gen)
+	rm $(<:.gbdirw=.gen)
