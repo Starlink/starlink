@@ -124,14 +124,13 @@ $docslisfile = "$star/docs/docs_lis";
 
 my $SCB_BROWSER_TMP = "/usr/tmp/scb";
 my $SCB_INDEXER_TMP = "/usr/tmp/scbindex";
-my $SCB_DIR = "";
 $scb_tmpdir      = $ENV{'SCB_BROWSER_TMP'} || "$SCB_BROWSER_TMP";
 $scbindex_tmpdir = $ENV{'SCB_INDEXER_TMP'} || "$SCB_INDEXER_TMP";
 
 #  System file locations.
 
-my $MIMETYPES_FILE = "/etc/mime.types"; 
-$mimetypes_file = "$MIMETYPES_FILE";
+my $SCB_DIR = ".";
+$mimetypes_file = "$SCB_DIR" . "/mime.types"; 
 
 #  HTX server base URL
 
