@@ -52,6 +52,8 @@
             CALL MSG_PRNT('Loading data....')
             CALL IMG_LOAD1D(IFID,STATUS)
 
+            CALL GFX_DEF1DWND(I_N_1D,%val(I_APTR_1D),%val(I_DPTR_1D),
+     :                        I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,STATUS)
 
             CALL GCB_ATTACH('IMAGE',STATUS)
             CALL IMG_1DGCB(STATUS)
