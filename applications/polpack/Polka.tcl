@@ -623,11 +623,11 @@
 
 # Add menu items to the Dump and Restore sub-menus.
    $dumpmenu add command -label "Everything " -command {Dump ""} -accelerator "Ctrl-d"
-   $dumpmenu add command -label "Mask Only  " -command {DumpMask ""} 
+   $dumpmenu add command -label "Masks Only  " -command {DumpMask ""} 
    bind . <Control-d> {Dump ""}
 
    $restmenu add command -label "Everything " -command {Restore ""} -accelerator "Ctrl-r"
-   $restmenu add command -label "Mask Only  " -command {RestoreMask ""} 
+   $restmenu add command -label "Masks Only  " -command {RestoreMask ""} 
    bind . <Control-r> {Restore ""}
 
 # Add menu items to the Effects menu.

@@ -3379,9 +3379,8 @@ proc DumpMask {file} {
 #     DumpMask
 #
 #  Purpose:
-#     Dump the current O-ray mask, together with the O-E mapping from the 
-#     first (reference) image, to a text file which can be restored 
-#     later (using procedure RestoreMask).
+#     Dump the current O and E ray masks from the first (reference) image, to 
+#     a text file which can be restored later (using procedure RestoreMask).
 #
 #  Arguments:
 #     file 
@@ -3396,8 +3395,8 @@ proc DumpMask {file} {
 #-
    global DBEAM
    global IMAGES
+   global E_RAY_MASK 
    global O_RAY_MASK 
-   global OEMAP
    global PNTPX
    global PNTPY
    global PNTNXT
@@ -3429,10 +3428,10 @@ proc DumpMask {file} {
       if { ![CreateMask $im0 $O_RAY_MASK] } {
          Message "The mask defining the O-ray areas in $im0 has not yet been supplied."
 
-# If we are in dual-beam mode, check that the O-E mapping is available for the 
+# If we are in dual-beam mode, check that the E-ray mask is available for the 
 # reference image
-      } elseif { [OEMapping $im0] == "" && $DBEAM } {
-         Message "The mapping between the E and O rays cannot yet be found."
+      } elseif { ![CreateMask $im0 $E_RAY_MASK] && $DBEAM } {
+         Message "The mask defining the E-ray areas in $im0 has not yet been supplied."
 
 # If these checks were passed, open a file specified by the user.
       } {
@@ -3445,30 +3444,24 @@ proc DumpMask {file} {
    if { $ok } {
 
 # Tell the user what is happening.
-      set told [SetInfo "Dumping current mask to disk..." 0]
+      set told [SetInfo "Dumping current masks to disk..." 0]
 
 # Store a string in the text file indicating that it only contains a mask.
-      puts $fd "Mask only"
+      puts $fd "Masks only"
 
-# If in Dual-beam mode write the OE Mapping to the output file.
-      if { $DBEAM } {
-         puts $fd [OEMapping $im0] 
-      } {
-         puts $fd ""
-      }
+# Loop round each mask...
+      foreach object [list $O_RAY_MASK $E_RAY_MASK] {
 
-# Loop round each object type...
-      set object $O_RAY_MASK 
-
-# Write out the number of positions in the O-ray mask list.
-      puts $fd [llength $PNTPX($im0,$O_RAY_MASK)]
+# Write out the number of positions in this mask list.
+         puts $fd [llength $PNTPX($im0,$object)]
 
 # Write out the arrays holding information describing the list.
-      puts $fd $PNTPX($im0,$O_RAY_MASK)
-      puts $fd $PNTPY($im0,$O_RAY_MASK)
-      puts $fd $PNTNXT($im0,$O_RAY_MASK)
-      puts $fd $PNTLBL($im0,$O_RAY_MASK)
-      puts $fd $PNTTAG($im0,$O_RAY_MASK)
+         puts $fd $PNTPX($im0,$object)
+         puts $fd $PNTPY($im0,$object)
+         puts $fd $PNTNXT($im0,$object)
+         puts $fd $PNTLBL($im0,$object)
+         puts $fd $PNTTAG($im0,$object)
+      }
 
 # Close the output dump file.
       close $fd
@@ -10246,8 +10239,8 @@ proc RestoreMask {file} {
 #     RestoreMask
 #
 #  Purpose:
-#     Restore O and E ray masks and O-E mappings from a dump file created
-#     by DumpMask. Current masks and O-E mappings are first cleared.
+#     Restore O and E ray masks from a dump file created by DumpMask. 
+#     Current masks are first cleared.
 #
 #  Arguments:
 #     file 
@@ -10261,7 +10254,6 @@ proc RestoreMask {file} {
    global DBEAM
    global IMAGES
    global O_RAY_MASK 
-   global OEMAP
    global PNTCY
    global PNTCX
    global PNTID
@@ -10283,7 +10275,7 @@ proc RestoreMask {file} {
    } {
       set backup 0
       set ok [OpenFile "r" "Dump file" "Give name of mask dump file to read:" file fd]
-      set info "Restoring mask from disk."
+      set info "Restoring masks from disk."
    }
 
 # Only proceed if a file was opened.
@@ -10305,9 +10297,8 @@ proc RestoreMask {file} {
          }
       }
 
-# Clear the O-E mapping, and the O and E ray masks for all images.
+# Clear the O and E ray masks for all images.
       foreach image $IMAGES {
-         catch { unset OEMAP($image) }
 
          while { [NumPosn "" $image $O_RAY_MASK] > 0 } {
             DelPosn 0 0 $image $O_RAY_MASK
@@ -10323,79 +10314,68 @@ proc RestoreMask {file} {
 # can use a break command to jump to the end.
       foreach image [lindex $IMAGES 0] {
 
-# The first line should be "Mask only". Check that this is the case.
+# The first line should be "Masks only". Check that this is the case.
          if { [gets $fd line] == -1 } {
             set bad 1
             break
          } 
   
-         if { ![regexp {^Mask only} $line] } { 
+         if { ![regexp {^Masks only} $line] } { 
             set bad 1
             break
          }
 
-# Restore the the OE Mapping.
-         if { [gets $fd line] == -1 } {
-            set bad 1
-            break
-         } 
-   
-         if { $line != "" } {
-            if { [llength $line] == 6 } {
-               set OEMAP($image) $line
-            } {
+#  Do each mask.
+         foreach object [list $O_RAY_MASK $E_RAY_MASK] {
+
+# Get the number of positions in the supplied mask ($npnt).
+            if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
                set bad 1
-               break
             } 
-         }
-
-# Get the number of positions in the supplied O-ray mask ($npnt).
-         if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
-            set bad 1
-         } 
 
 # Read the arrays from the text file holding information describing the list.
-         foreach item "PX PY NXT LBL TAG" {
-            set aryname "PNT${item}"
-            upvar #0 $aryname ary 
-
-            if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
-               set bad 1
-            } 
+            foreach item "PX PY NXT LBL TAG" {
+               set aryname "PNT${item}"
+               upvar #0 $aryname ary 
+   
+               if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
+                  set bad 1
+               } 
 
 # Store the new array values.
-            if { !$bad } {
-               set ary($image,$O_RAY_MASK) $line
-            } {
-               set ary($image,$O_RAY_MASK) ""
+               if { !$bad } {
+                  set ary($image,$object) $line
+               } {
+                  set ary($image,$object) ""
+               }
             }
-         }
 
 #  The rest is only done if the O-ray mask was restored succesfully.
-         if { !$bad } {
+            if { !$bad } {
 
 #  Set up the arrays holding the number of times each label is used.
-            foreach lbl $PNTLBL($image,$O_RAY_MASK) {
-               Labels $lbl 1
-            }
+               foreach lbl $PNTLBL($image,$object) {
+                  Labels $lbl 1
+               }
 
 # Initialise the other required arrays to indicate that nothing is
 # currently drawn.
-            catch { unset PNTID($image,$O_RAY_MASK) }
-            catch { unset PNTCX($image,$O_RAY_MASK) }
-            catch { unset PNTCY($image,$O_RAY_MASK) }
-            catch { unset PNTVID($image,$O_RAY_MASK) }
-
-            foreach nxt $PNTNXT($image,$O_RAY_MASK) {
-               lappend PNTID($image,$O_RAY_MASK) -1
-               lappend PNTCX($image,$O_RAY_MASK) ""
-               lappend PNTCY($image,$O_RAY_MASK) ""
-               if { $nxt == "" } {
-                  lappend PNTVID($image,$O_RAY_MASK) ""
-               } {
-                  lappend PNTVID($image,$O_RAY_MASK) -1
-               }
-            }            
+               catch { unset PNTID($image,$object) }
+               catch { unset PNTCX($image,$object) }
+               catch { unset PNTCY($image,$object) }
+               catch { unset PNTVID($image,$object) }
+   
+               foreach nxt $PNTNXT($image,$object) {
+                  lappend PNTID($image,$object) -1
+                  lappend PNTCX($image,$object) ""
+                  lappend PNTCY($image,$object) ""
+                  if { $nxt == "" } {
+                     lappend PNTVID($image,$object) ""
+                  } {
+                     lappend PNTVID($image,$object) -1
+                  }
+               }            
+            }
          }
       }
 
@@ -10409,7 +10389,7 @@ proc RestoreMask {file} {
 # of this procedure. Do not do this if we are already restoring a saved
 # "backup" dump.
       if { $bad && !$backup } { 
-         Message "Syntax error encountered restoring mask from \"$file\". Last line read was:\n\n\"$line\""
+         Message "Syntax error encountered restoring masks from \"$file\". Last line read was:\n\n\"$line\""
          if { $safefile != "" } { RestoreMask $safefile }
       }
 
