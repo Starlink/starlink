@@ -66,6 +66,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,8 @@
 *        Original version.
 *     19 Feb 1996 (DJA):
 *        No direct terminal output
+*     20 Feb 1997 (RB):
+*        Add case for pixels (meaningless)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,16 +116,20 @@
 
 *  Arcminutes
       ELSE IF ( STR_ABBREV( UNITS, 'ARCMINUTES' ) .OR.
-     :                          (UNITS.EQ.'ARCMINS') ) THEN
+     :          ( UNITS .EQ. 'ARCMINS' ) ) THEN
         CONV = MATH__DTOR / 60.0
 
 *  Arcseconds
       ELSE IF ( STR_ABBREV( UNITS, 'ARCSECONDS' ) .OR.
-     :                          (UNITS.EQ.'ARCSECS') ) THEN
+     :          ( UNITS .EQ. 'ARCSECS' ) ) THEN
         CONV = MATH__DTOR / 3600.0
 
 *  Radians
-      ELSE IF ( STR_ABBREV(UNITS, 'RADIANS') ) THEN
+      ELSE IF ( STR_ABBREV( UNITS, 'RADIANS') ) THEN
+        CONV = 1.0
+
+*  Pixels!
+      ELSE IF ( STR_ABBREV( UNITS, 'PIXELS') ) THEN
         CONV = 1.0
 
 *  Otherwise duff
