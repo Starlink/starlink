@@ -1,9 +1,8 @@
  INTERFACE XRTCORR
 
-     PARAMETER INPUT
+     PARAMETER INP
                POSITION 1
                TYPE    '_UNIV'
-               KEYWORD 'INP'
                PROMPT  'Input dataset name'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.BINDS'
@@ -11,10 +10,9 @@
                HELP 'Enter dataset name without an extension'
             ENDPARAMETER
 
-     PARAMETER OUTPUT
+     PARAMETER OUT
                POSITION 2
                TYPE    '_UNIV'
-               KEYWORD 'OUT'
                PROMPT  'Output dataset name'
                PPATH   'CURRENT'
                VPATH   'PROMPT'

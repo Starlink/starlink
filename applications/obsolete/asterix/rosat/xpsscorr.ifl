@@ -1,9 +1,8 @@
  INTERFACE XPSSCORR
 
-     PARAMETER INPUT
+     PARAMETER INP
                POSITION 1
                TYPE    '_UNIV'
-               KEYWORD 'INP'
                PROMPT  'Input dataset name'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.SSDS'

@@ -1,9 +1,8 @@
  INTERFACE XRTRESP
 
-     PARAMETER INPUT
+     PARAMETER INP
                POSITION 1
                TYPE    'UNIV'
-               KEYWORD 'INP'
                PROMPT  'Name of source file'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.BINDS'

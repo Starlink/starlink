@@ -20,10 +20,9 @@
                HELP 'Enter dataset name without an extension'
             ENDPARAMETER
 
-     PARAMETER OUTPUT
+     PARAMETER OUT
                POSITION 3
                TYPE    'UNIV'
-               KEYWORD 'OUT'
                PROMPT  'Name of output file'
                PPATH   'CURRENT'
                ASSOCIATION '->GLOBAL.BINDS'
