@@ -112,6 +112,11 @@
 //        Added changes to support NDFs stored within container files.
 //     15-OCT-1999 (PWD):
 //        Added changes to astsystem to select a pixel coordinate system.
+//     178-NOV-1999 (PWD):
+//        Changed dumpCmd to attempt to write a native encoding of the 
+//        WCS, if the default encoding isn't Native (this happens -
+//        sometimes - when the channel contains a known WCS that is
+//        illegal?). 
 //-
 
 #include <string.h>
@@ -602,22 +607,26 @@ StarWCS* StarRtdImage::getStarWCSPtr(ImageData* image)
 // already) if the original WCS has been overwritten (a sign that at
 // least some WCS modification has been attempted).
 //
-// Two encodings can be written. A native one is always written (as
-// this is accurate and can be output to an NDF WCS component) and one
-// other (presumably FITS-WCS) which is passed as an optional
-// argument. If the selected encoding fails an error message is
-// printed, but is not considered fatal (as the native encoding will
-// always work).
+// Two encodings of the WCS can be written. The first is uses the
+// default encoding of a channel that contains the image FITS headers.
+// Normally this is a native encoding which is accurate and can be
+// output to an NDF WCS component. A second attempt to encode the WCS
+// is made if a suitable encoding form passed as an optional argument
+// (normally this will be FITS-WCS or DSS).
 //-
 int StarRtdImage::dumpCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
   cout << "Called StarRtdImage::dumpCmd (" << argv[0] << ")" << endl;
 #endif
+
   int native = 1;
   int saved = 1;
+  int nwrite = 0;
+  int nextra = 0;
   if ( image_ ) {
     if ( origset_ ) {
+
       // WCS has been played with. Attempt to write the current WCS
       // out to the FITS headers. We do this by reading the existing
       // FITS headers into a channel, attempting to repeat the process
@@ -662,33 +671,61 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         tmpset = (AstFrameSet *) astAnnul( tmpset );
       }
 
-      // Now we can try to add the WCS object. If we've been given a
-      // preferred encoding then use this as well as a native encoding.
-      //      astSet( chan, "Encoding=Native" );
+      // Now we can try to add the WCS encoding. The encoding type of
+      // the channel is either set to "Native" or (sometimes!) the
+      // type of the WCS object just read. The first attempt to update
+      // will use whatever this is set to. If this fails then an
+      // attempt to write a native encoding will be made, if the type
+      // wasn't native.
       StarWCS* wcsp = getStarWCSPtr();
       if ( !wcsp ) {
 	return TCL_ERROR;
       }
       AstFrameSet *newwcs = wcsp->astWCSClone();
-      int nwrite = astWrite( chan, newwcs );
-      if ( !astOK ) {
-        astClearStatus;
-        native = 0;
+      nwrite = astWrite( chan, newwcs );
+      const char *encod = astGetC( chan, "Encoding" );
+      if ( !astOK || nwrite == 0 ) {
+
+        //  Failed to write WCS using default encoding. Try native.
+        if ( ! astOK ) astClearStatus;
+        if ( strcmp( "NATIVE", encod ) != 0 ) {
+          astSet( chan, "Encoding=Native" );
+          nwrite = astWrite( chan, newwcs );
+          if ( astOK && nwrite != 0 ) {
+            native = 1;
+            saved = 1;
+          } else {
+
+            //  Failed this time too.
+            native = 0;
+            saved = 0;
+          }
+        } else {
+          native = 0;
+          saved = 0;
+        }
       } else {
-        native = 1;
+
+        //  Succeeded write using default encoding.
+        saved = 1;
+        if ( strcmp( "NATIVE", encod ) == 0 ) {
+          native = 1;
+        } else {
+          native = 0;
+        }
       }
 
-      // Now try with the given encoding (which shouldn't be native).
-      int nextra = 0;
+      // Now try with the given encoding (which shouldn't be native),
+      // if this is the same as that just written then we'll just get
+      // the same values again (all encodings except native will only
+      // have one representations).
       if ( argc == 2 ) {
 	astSet( chan, "Encoding=%s", argv[1] );
 	nextra = astWrite( chan, newwcs );
-	if ( !astOK || nextra == 0 ) {
-	  if ( !astOK ) astClearStatus;
-          saved = 0;
-	} else {
+	if ( astOK && nextra != 0 ) {
           saved = 1;
         }
+        if ( !astOK ) astClearStatus;
       }
       if ( nwrite != 0 || nextra != 0 ) {
 
@@ -711,13 +748,15 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
       chan = (AstFitsChan *) astAnnul( chan );
       newwcs = (AstFrameSet *) astAnnul( newwcs );
     }
-    int result = image_->write(argv[0]);
+    int result = image_->write( argv[0] );
     if ( result == TCL_OK ) {
-      if ( ! saved && native ) {
-        return error( "information: WCS could only be saved"
-                      " as an AST native representation");
-      } else if ( !saved && !native ) {
-        return error( "Failed to save WCS information");
+      if ( origset_ ) {
+        if ( saved && native && ( nextra == 0 ) ) {
+          return error( "information: WCS could only be saved"
+                        " as an AST native representation");
+        } else if ( !saved ) {
+          return error( "Failed to save WCS information");
+        }
       }
       return TCL_OK;
     } else {
