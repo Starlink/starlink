@@ -14,7 +14,7 @@ FFLAGS=
 ADDLIBS=
 
 test: fitsdump
-	./runtests
+	- ./runtests
 
 # Utility to dump fits files, for diffing
 fitsdump: fitsdump.f

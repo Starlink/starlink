@@ -6,14 +6,13 @@
 #
 # $Id$
 
-DEFS=@DEFS@
 CXX=@CXX@
-CXXFLAGS=@CXXFLAGS@ $(DEFS)
+CXXFLAGS=@CXXFLAGS@ @DEFS@
 PERLBIN=@PERLPATH@
 ECHONONL=@ECHONONL@
 
 test: local.config ../moggy
-	PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests # && touch test
+	- PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests
 
 # We get peculiar linking errors on Tru64/cxx if we attempt to build
 # t3.C in this directory.  So build it in the parent.

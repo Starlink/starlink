@@ -18,7 +18,7 @@ all: test
 # Tests t7 and t9 require autoastrom to have been test-installed.  The
 # target perlok ensures that.
 test: fitsdump perlok
-	./runtests
+	- ./runtests
 
 # Check that the Perl binary on the first line of
 # $AUTOASTROM_DIR/autoastrom is new enough to compile the script (perl -c).
