@@ -87,8 +87,13 @@
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the maximum number of iterations to be used when 
 *        estimating input variances and rejecting aberrant input values. 
-*        Each iteration is a computationally expensive process, and for
-*        this reason, the default value is zero. [0]
+*        The default value depends on the value supplied for parameter
+*        WEIGHTS. If WEIGHTS indicates that estimates of the input
+*        variances are to be made (i.e. if WEIGHTS has the value 2 or 3), 
+*        then the default value is 6. Otherwise (i.e. if WEIGHTS has the
+*        value 1 or 4), the default is zero. This is because each iteration 
+*        is a computationally expensive process, and so iterations should
+*        only be performed if they are really necessary. []
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the threshold at which to reject input data values. If

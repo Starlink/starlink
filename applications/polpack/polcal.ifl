@@ -83,9 +83,8 @@ interface POLCAL
    parameter   NITER
       type     _INTEGER
       access   READ
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      default  0
+      vpath    'DYNAMIC'
+      ppath    'DYNAMIC'
       prompt   'Maximum number of iterations in single-beam mode'
       helpkey  '*'
    endparameter

@@ -42,9 +42,9 @@
 *        The lowest value in EXDATA.
 *     VAR( DIM1, DIM2 ) = REAL (Returned)
 *        The variance estimate associated with each EXDATA value. 
-*     WORK1( DIM1 ) = REAL (Returned)
+*     WORK1( DIM1 ) = DOUBLE PRECISION (Returned)
 *        A work array. 
-*     WORK2( DIM1 ) = REAL (Returned)
+*     WORK2( DIM1 ) = DOUBLE PRECISION (Returned)
 *        A work array. 
 *     NOISE = REAL (Returned)
 *        An estimate of the standard deviation of the noise in the
@@ -74,6 +74,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER DIM1
@@ -86,8 +87,8 @@
 
 *  Arguments Returned:
       REAL VAR( DIM1, DIM2 )
-      REAL WORK1( DIM1 )
-      REAL WORK2( DIM1 )
+      DOUBLE PRECISION WORK1( DIM1 )
+      DOUBLE PRECISION WORK2( DIM1 )
       REAL NOISE
 
 *  Status:
@@ -112,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Smooth the squared residuals to get the variance estimates.
-      CALL POL1_BLKWR( DIM1, DIM2, SQRES, WGT, 3, 3, 0.0, 
+      CALL POL1_BLKWR( DIM1, DIM2, SQRES, WGT, 3, 3, VAL__EPSR, 
      :                 VAR, WORK1, WORK2, STATUS )
 
 *  Form a histogram of variance against expected data value.

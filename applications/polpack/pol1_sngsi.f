@@ -106,7 +106,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER HW                 ! Half width of smoothing box in pixels
+      INTEGER HW                 ! No. of pixels to smooth over
       PARAMETER( HW = 4 ) 
 
 *  Local Variables:
@@ -117,6 +117,7 @@
       REAL EXPECT                ! Expected input data value
       REAL K1, K2, K3            ! Constants
       REAL K1S, K2S, K3S         ! Constants
+      REAL MINWGT                ! Smallest non-zero weight
 *.
 
 *  Check the inherited global status.
@@ -133,6 +134,9 @@
 *  Initialise the returned data limits
       DMAX = VAL__MINR
       DMIN = VAL__MAXR
+
+*  Initialise the smallest non-zero weight used.   
+      MINWGT = VAL__MAXR
 
 *  Do each pixel.
       DO I = 1, EL
@@ -158,6 +162,7 @@
 *  Store a weight for the residual.
             IF( EVAR .GT. 1.0E-15 ) THEN
                WGT( I ) = 1.0/EVAR
+               MINWGT = MIN( MINWGT, WGT( I ) )
             ELSE
                CALL MSG_SETR( 'V', EVAR )
                CALL MSG_OUT( ' ', 'WARNING: Zero or negative '//
@@ -168,7 +173,6 @@
 *  Store the difference between the above expected intensity and
 *  the intensity in the NDF,
             DOUT( I ) = ( EXPECT - DIN( I ) )
-            work( i ) = expect
 
 *  Update the data limits.
             DMAX = MAX( DMAX, EXPECT )
@@ -183,13 +187,14 @@
       END DO
 
 *  Allocate work space for the smoothing routine.
-      CALL PSX_CALLOC( DIM1, '_REAL', IPW1, STATUS )
-      CALL PSX_CALLOC( DIM1, '_REAL', IPW2, STATUS )
+      CALL PSX_CALLOC( DIM1, '_DOUBLE', IPW1, STATUS )
+      CALL PSX_CALLOC( DIM1, '_DOUBLE', IPW2, STATUS )
 
 *  Smooth the residuals array, putting the results in the work array.
 *  This is a 9x9 mean box-filter.
-      CALL POL1_BLKWR( DIM1, DIM2, DOUT, WGT, HW, HW, 0.0, 
-     :                 WORK, %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
+      CALL POL1_BLKWR( DIM1, DIM2, DOUT, WGT, HW, HW, 
+     :                 0.01*MINWGT, WORK, %VAL( IPW1 ), %VAL( IPW2 ), 
+     :                 STATUS )
 
 *  Subtract these smoothed residuals from the original residuals, and
 *  square them. Also return the expected data value, and square the

@@ -57,7 +57,7 @@
 #        Ensure the current WCS Frame in the copies of the supplied input
 #        images is PIXEL. 
 #     22-MAR-1999 (DSB):
-*        Make rotation available in single-beam mode.
+#        Make rotation available in single-beam mode.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 

@@ -151,6 +151,13 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999     
 
+*  Set teh dynamic default for NITER.
+      IF( WEIGHT .EQ. 1 .OR. WEIGHT .EQ. 4 ) THEN 
+         CALL PAR_DEF0I( 'NITER', 0, STATUS )
+      ELSE
+         CALL PAR_DEF0I( 'NITER', 6, STATUS )
+      END IF
+
 *  Get the number of rejection iterations to perform.
       CALL PAR_GET0I( 'NITER', NITER, STATUS )
       NITER = MAX( 0, NITER )

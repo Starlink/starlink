@@ -40,9 +40,9 @@
 *        order to produce a good smoothed output pixel value. 
 *     B( NX, NY ) = REAL (Returned)
 *        The smoothed output image.
-*     ASUM( NX ) = REAL (Returned)
+*     ASUM( NX ) = DOUBLE PRECISION (Returned)
 *        Workspace for the pixel sums.
-*     WSUM( NX ) = REAL (Returned)
+*     WSUM( NX ) = DOUBLE PRECISION (Returned)
 *        Workspace for the weight sums.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -80,8 +80,8 @@
  
 *  Arguments Returned:
       REAL B( NX, NY )
-      REAL ASUM( NX )
-      REAL WSUM( NX )
+      DOUBLE PRECISION ASUM( NX )
+      DOUBLE PRECISION WSUM( NX )
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -97,9 +97,8 @@
       INTEGER NEWY               ! Y position of new pixel
       INTEGER OLDX               ! X position of old pixel
       INTEGER OLDY               ! Y position of old line
-      REAL ASUM0                 ! Good pixel sum
-      REAL NPIX                  ! Number of pixels in smoothing box
-      REAL WSUM0                 ! Good pixel count
+      DOUBLE PRECISION ASUM0     ! Good pixel sum
+      DOUBLE PRECISION WSUM0     ! Good pixel count
 *.
  
 *  Check inherited global status.
@@ -107,12 +106,9 @@
 
 *  Initialise the workspace arrays.
       DO 1 IX = 1, NX
-         ASUM( IX ) = 0.0E0
-         WSUM( IX ) = 0.0E0
+         ASUM( IX ) = 0.0D0
+         WSUM( IX ) = 0.0D0
  1    CONTINUE
- 
-*  Calculate the number of pixels in the smoothing box.
-      NPIX = ( 2 * IBOXX + 1 ) * ( 2 * IBOXY + 1 )
  
 *  Loop to initialise elements of the two workspace arrays so that they
 *  contain sum for the good pixels in a box of size 1x(2*IBOXY+1)
@@ -170,8 +166,8 @@
 *  ============================
 *  Form initial sums for a box of size (2*IBOXX+1)x1 centred on pixel
 *  (0,IY).
-         ASUM0 = 0.0E0
-         WSUM0 = 0
+         ASUM0 = 0.0D0
+         WSUM0 = 0.0D0
          DO 7 IIX = -IBOXX, IBOXX
  
 *  Allow for the image boundaries.
