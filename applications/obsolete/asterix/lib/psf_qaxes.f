@@ -17,15 +17,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! Psf handle
+      INTEGER                  PSID                    ! Psf handle
 *
 *    Export :
 *
@@ -36,10 +31,10 @@
       INTEGER                  STATUS
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Call internal routine
-      CALL PSF0_GETAXID( P_PSID(SLOT), X_AX, Y_AX, E_AX, T_AX, STATUS )
+*  Call internal routine
+      CALL PSF0_GETAXID( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
       END

@@ -104,7 +104,7 @@
       EXTERNAL			PSF_BLK
 
 *  Local Constants:
-      CHARACTER*4		PSF_PROP
+      CHARACTER*4		PROP
         PARAMETER		( PROP = '.PSFID' )
 
 *  Local Variables:
