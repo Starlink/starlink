@@ -1,7 +1,7 @@
 /*
  * Purpose:
- *    Home for routines that fixup problems with the MINGW (and
- *    probably CYGWIN) windows ports. Currently these are to do with
+ *    Home for routines that fixup problems with the MINGW and
+ *    CYGWIN windows ports. Currently these are to do with
  *    supporting inode-like functionality.
  *
  * Authors:
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#if !defined __MINGW32__
+#if ! __MINGW32__ && ! __CYGWIN__
 
 /* Not used */
 void win_get_inodes( const char *fns, ino_t *st_ino, dev_t *st_rdev ){}

@@ -81,7 +81,7 @@
          dev_t st_dev;		 /* ID of device containing file (POSIX)    */
          ino_t st_ino;		 /* File serial number (POSIX)		    */
 
-#if defined __MINGW32__
+#if defined __MINGW32__ || __CYGWIN__
          dev_t st_rdev;		 /* Extra part of win32 file information    */
 #endif
 

@@ -375,7 +375,7 @@
       {
          if ( stat( fns, &statbuf ) == 0 )
 	 {
-#if defined __MINGW32__
+#if defined __MINGW32__ || __CYGWIN__
              /* Need windows pseudo inode data */
              win_get_inodes( fns, &statbuf.st_ino, &statbuf.st_rdev );
 #endif
@@ -391,7 +391,7 @@
 /* existing one. Report an error.					    */
                if ( rec_ga_fcv[ i ].open &&
 	            ( statbuf.st_ino == rec_ga_fcv[ i ].fid->st_ino ) &&
-#if defined __MINGW32__
+#if defined __MINGW32__ || __CYGWIN__
 	            ( statbuf.st_rdev == rec_ga_fcv[ i ].fid->st_rdev ) &&
 #endif
 		    ( statbuf.st_dev == rec_ga_fcv[ i ].fid->st_dev ) )
