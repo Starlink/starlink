@@ -337,8 +337,37 @@ drawn with a horizontal baseline. This will be an increment in the Y axis.
 =cut
 
 sub _GQch {
-  warn "_GQch: not yet implemented for PLplot\n";
-  return 0;
+  # Get the height in millimetres
+  my ($def, $ht) = plgchr();
+
+  # page size in millimetres
+  my ($mx1,$mx2,$my1,$my2) = plgspa();
+
+  # Size of viewport in world coordinates
+  my ($wx1, $wx2, $wy1, $wy2) = plgvpw();
+
+  # now convert height in mm to world coordinates
+
+  # X direction
+  my $chv = $ht;
+  if ($mx1 != $mx2) {
+    $chv *= ($wx2 - $wx1 ) / ( $mx2 - $mx1 );
+  } else {
+    ReportGrfError("astGQch: The graphics viewport has zero size in the X direction.");
+    return 0;
+  }
+
+  # Y direction
+  my $chh = $ht;
+  if ($my1 != $my2) {
+    $chh *= ($wy2 - $wy1 ) / ( $my2 - $my1 );
+  } else {
+    ReportGrfError("astGQch: The graphics viewport has zero size in the Y direction.");
+    return 0;
+  }
+
+  # Return the result in world coordinates
+  return (1,$chv, $chh);
 }
 
 =item B<_GAttr>
@@ -466,7 +495,7 @@ sub _GCap {
   my $cap = shift;
   my $value = shift;
 
-  warn "_GCap: not yet implemented in PLplot\n";
+  warn "_GCap: not yet implemented in PLplot [assume lack capability $cap]\n";
   return 0;
 }
 
