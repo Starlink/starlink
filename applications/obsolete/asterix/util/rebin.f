@@ -277,11 +277,10 @@
 * Map bin attributes
       DO I=1,NDIM
 
-        CALL BDI_AXCHK( IFID, I, ' ', AOK(I), STATUS )
-
 * axis values
         CALL BDI_AXCHK( IFID, I, 'Data', AXOK(I), STATUS )
-        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
+        REG(I) = .FALSE.
+c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         CALL BDI_AXGET0C( IFID, I, 'Label', AXLABEL(I), STATUS )
         CALL BDI_AXMAPR( IFID, I, 'Data', 'READ', AXVP(I), STATUS )
 
