@@ -49,8 +49,7 @@
             repeated
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            prompt {List of NDFs}
-            default !
+            prompt {List of NDFs for display}
             helpkey *
           }
 
@@ -157,7 +156,7 @@
             vpath PROMPT
             ppath DEFAULT
             default !
-            prompt {Additional frames in the same position}
+            prompt {Additional frames in the sky same position}
             helpkey *
          }
 
