@@ -6,7 +6,7 @@
 *     Opens an output text device specified by DEVICE. It can take the
 *     following values,
 *
-*       TERMINAL/CONSOLE     - The standard output stream
+*       TERMINAL/CONSOLE/STDOUT     - The standard output stream
 *       PRINTER	             - A temporary file is created which is spooled
 *                              when closed
 *       OLDFILE[=default]    - An existing file defined by the environment
@@ -203,6 +203,7 @@
 
 *    Console?
       ELSE IF ( STR_ABBREV( DEVICE, 'TERMINAL' ) .OR.
+     :          STR_ABBREV( DEVICE, 'STDOUT' ) .OR.
      :          STR_ABBREV( DEVICE, 'CONSOLE' ) ) THEN
 
 *      Set mode
