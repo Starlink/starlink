@@ -538,7 +538,7 @@
 
 *        Input file(s) and model
           HBUF(1) = 'Data {INP}'
-          HBUF(2) = 'Model {FIT_MOD}'
+          HBUF(2) = 'Model {MODEL}'
           NHBUF = 6
           CALL USI_TEXT( 2, HBUF, NHBUF, STATUS )
           CALL HIST_PTXT( GLOC(1), NHBUF, HBUF, STATUS )
