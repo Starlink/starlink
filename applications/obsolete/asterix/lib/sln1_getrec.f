@@ -1,7 +1,7 @@
       SUBROUTINE SLN1_GETREC( NARG, ARGS, OARG, STATUS )
 *+
 *  Name:
-*     SLN1_PUTREC
+*     SLN1_GETREC
 
 *  Purpose:
 *     Read a selection record from an HDS file
@@ -72,8 +72,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     4 Sep 1995 (DJA):
+*      4 Sep 1995 (DJA):
 *        Original version.
+*     20 Dec 1995 (DJA):
+*        'A' recognised as a valid shape code
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,11 +92,10 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -246,7 +247,7 @@
                   CALL ERR_REP( 'SLN1_GETREC', 'Error reading sort '/
      :                          /'spatial area description', STATUS )
 
-                ELSE IF ( SCODE .EQ. 'C' ) THEN
+                ELSE IF ( (SCODE .EQ. 'C') .OR. (SCODE .EQ. 'A') ) THEN
 
                   IF ( (XIN.EQ.0.0) .AND. (YIN.EQ.0.0) ) THEN
                     CALL ARX_CIRCLE( GRPID, 1, ' ', .FALSE., XCENT,

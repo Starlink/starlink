@@ -110,7 +110,7 @@
       CALL ADI_NEW0( 'TimingInfo', TIMID, STATUS )
 
 *  Define system if supplied
-      IF ( SYSY .GT. ' ' ) THEN
+      IF ( SYSTEM .GT. ' ' ) THEN
         CALL ADI_CPUT0C( TIMID, 'System', SYSTEM, STATUS )
       END IF
 
