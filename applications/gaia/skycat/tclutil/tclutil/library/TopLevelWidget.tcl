@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: TopLevelWidget.tcl,v 1.25 1998/11/17 17:57:27 abrighto Exp $"
+# "@(#) $Id: TopLevelWidget.tcl,v 1.26 1998/11/26 22:39:09 abrighto Exp $"
 #
 # TopLevelWidget.tcl - Itk base class for popup windows
 #
@@ -446,6 +446,23 @@ itcl::class util::TopLevelWidget {
 
     public method add_menuitem {menu type label msg args} {
 	eval [concat [list $menu add $type -label $label] $args]
+	setup_menuitem $menu $label $msg $args
+    }
+    
+
+    # Insert a menu item of the given type in the given menu before the given index 
+    # and arrange to have the given short help message displayed when the mouse is 
+    # over the item. The extra args are passed to the "$menu insert" command.
+
+    public method insert_menuitem {menu index type label msg args} {
+	eval [concat [list $menu insert $index $type -label $label] $args]
+	setup_menuitem $menu $label $msg $args
+    }
+
+    
+    # Local method to set up the menu accelerator, help text, and command bindings.
+
+    protected method setup_menuitem {menu label msg args} {
 	set menu_item_help_($menu,$label) $msg
 
 	# if -accelerator was specified, add key binding for command

@@ -56,7 +56,7 @@
 
 #.
 
-class gaia::StarPhotomObject {
+itcl::class gaia::StarPhotomObject {
 
    #  Inheritances:
    #  -------------

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: SkyCat.tcl,v 1.69 1998/11/17 09:39:07 abrighto Exp $"
+# "@(#) $Id: SkyCat.tcl,v 1.71 1999/02/02 21:42:03 abrighto Exp $"
 #
 # SkyCat.tcl - image display application class with catalog extensions
 #
@@ -95,7 +95,8 @@ itcl::class skycat::SkyCat {
 	feedback "catalog and help menu..."
 	
 	add_go_menu
-	add_hdu_menu
+	add_view_hdu_menu_item
+	add_graphics_save_menu_item
 
 	if {$itk_option(-cat)} {
 	    cat::AstroCat::add_catalog_menu \
@@ -204,9 +205,9 @@ itcl::class skycat::SkyCat {
     }
 
 
-    # Add a menu item for selecting the current HDU
+    # Add a menu item to the View menu for selecting the current HDU
 
-    protected method add_hdu_menu {} {
+    protected method add_view_hdu_menu_item {} {
 	if {[catch {[$image_ get_image] hdu count} msg]} {
 	    # might be a plugin, such as GAIA that doesn't have the HDU features...
 	    return
@@ -218,6 +219,24 @@ itcl::class skycat::SkyCat {
 	    {Display the available FITS HDUs (header/data units) and select the current HDU} \
 	    -command [code $image_ display_fits_hdus]
     }
+
+
+    # Add a menu item to the Graphics menu for saving the line graphics in a FITS
+    # table in the image.
+
+    protected method add_graphics_save_menu_item {} {
+	if {[catch {[$image_ get_image] hdu count} msg]} {
+	    # might be a plugin, such as GAIA that doesn't have the HDU features...
+	    return
+	}
+	
+	set m [get_menu Graphics]
+	$m add separator
+	add_menuitem $m command "Save graphics with image" \
+	    {Save line graphics in a FITS binary table in the image} \
+	    -command [code $image_ save_graphics_with_image]
+    }
+
 
 
     # set default X resources for colors and fonts, and set some default key
@@ -378,9 +397,69 @@ itcl::class skycat::SkyCat {
 	}
     }
 
+
+    # This method is called for the -remote option. If another skycat is running,
+    # use it to display the image and exit, otherwise do it in this process.
+    # Try Tk send, and if that fails, fall back on the RTD socket interface.
+
+    protected method start_remote {} {
+	global ::argc ::argv ::env
+
+	set name [winfo name .]
+	foreach interp [winfo interps] {
+	    if {"$interp" != "$name" && [string match "Skycat*" $interp]} {
+		
+		# command to eval in the remote skycat application
+		set cmd [list skycat::SkyCat::remote_start $argc $argv]
+		
+		# try Tk send
+		if {[catch {send $interp $cmd}]} {
+		    # failed: try rtd remote socket interface 
+		    # (rtd creates the file below on startup with pid, host and port info)
+		    set file $env(HOME)/.rtd-remote
+		    if {[catch {set fd [open $env(HOME)/.rtd-remote]}]} {
+			return
+		    }
+		    set s [gets $fd]
+		    close $fd
+		    set status 0
+		    if {[scan $s {%d %s %d} pid host port] != 3} {
+			return
+		    }
+		    if {[catch {
+			# see if the process is still running
+			exec kill -0 $pid
+			set fd [server_connect -nobuf $host $port]
+		    }]} {
+			return
+		    }
+		    if {[catch {
+			# use the rtdimage "remotetcl" subcommand 
+			# (see rtd/rtdimg/src/RtdImage.C)
+			puts $fd [list remotetcl $cmd]
+			lassign [gets $fd] status length
+			set result {}
+			if {$length > 0} {
+			    set result [read $fd $length]
+			}
+		    }]} {
+			close $fd
+			return
+		    }
+		    if {$status != 0} {
+			return
+		    }
+		}
+		# looks like we were successful, so we can exit
+		exit
+	    }
+	}
+    }
+    
+
     # start the application with the above class as the main window
     # This proc is called from tkAppInit.c when we are running the single
-    # binary version (dumped with emacs unexec)
+    # binary version.
     # Note that the binary version doesn't need to set auto_path or look for 
     # Tcl sources or colormaps at run-time, since they are already loaded in 
     # the binary.
@@ -576,7 +655,7 @@ itcl::class skycat::SkyCat {
 	}
     }
 
-    
+
     # This proc is called via Tcl send from a remote skycat application when the
     # -remote option is used. The arguments are the argc and argv of the remote
     # skycat application. We extract the file and catalog arguments and ignore 
@@ -600,12 +679,17 @@ itcl::class skycat::SkyCat {
 		set catalog $arg
 	    }
 	}
-	
+
 	# open a new main window using the new arguments
 	foreach w [get_skycat_images] {
 	    if {[winfo exists $w]} {
 		if {"$file" != ""} {
-		    $w configure -file $file
+		    if {[file exists $file]} {
+			$w configure -file $file
+		    } else {
+			error_dialog "File does not exist: $file"
+			return
+		    }
 		}
 		if {"$catalog" != ""} {
 		    # open a window for the given catalog
@@ -653,17 +737,8 @@ itcl::class skycat::SkyCat {
     # if another skycat application is running on this display, use
     # it rather than this process (saves memory and colors in the colormap).
     itk_option define -remote remote Remote 0 {
-	global ::argc ::argv
 	if {"$itk_option(-remote)" == "1"} {
-	    set name [winfo name .]
-	    foreach interp [winfo interps] {
-		if {"$interp" != "$name" && [string match "Skycat*" $interp]} {
-		    if {[catch {send $interp [list skycat::SkyCat::remote_start $argc $argv]} msg]} {
-			puts "Error sending command to $interp: $msg"
-		    }
-		    exit 0
-		}
-	    }
+	    start_remote
 	}
     }
 

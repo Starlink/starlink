@@ -1418,7 +1418,7 @@ case $CC in
 		CFLAGS=`echo $CFLAGS | sed -e "s/-g/-O/"`
 		case $system in
 		    SunOS-5*)
-         		CFLAGS="$CFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS -Xc"
+         		CFLAGS="$CFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS"
 			;;
 		    *)
 			echo "== No special changes for $system"

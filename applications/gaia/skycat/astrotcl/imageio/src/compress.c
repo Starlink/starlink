@@ -33,36 +33,35 @@ DECLARE(uch, window, 2L*WSIZE);
     DECLARE(ush, tab_prefix1, 1L<<(BITS-1));
 #endif
 
-long header_bytes;   /* number of bytes in gzip header */
+static long header_bytes;   /* number of bytes in gzip header */
 
 		/* local variables */
 
-int force = 0;        /* don't ask questions, compress links (-f) */
-int verbose = 0;      /* be verbose (-v) */
-int quiet = 0;        /* be very quiet (-q) */
-int maxbits = BITS;   /* max bits per code for LZW */
-int method = DEFLATED;/* compression method */
-int level = 6;        /* compression level */
-int exit_code = OK;   /* program exit code */
-int last_member;      /* set for .zip and .Z files */
-int part_nb;          /* number of parts in .gz file */
+/* 11/25/98: added 'static' to local variable definitions, to avoid */
+/* conflict with external source files */
 
-long bytes_in;             /* number of input bytes */
-long bytes_out;            /* number of output bytes */
-long total_in = 0;         /* input bytes for all files */
-long total_out = 0;        /* output bytes for all files */
-char ifname[128];          /* input file name */
+static int force = 0;        /* don't ask questions, compress links (-f) */
+static int maxbits = BITS;   /* max bits per code for LZW */
+static int method = DEFLATED;/* compression method */
+/* static int level = 6;  */      /* compression level */
+static int exit_code = OK;   /* program exit code */
+static int last_member;      /* set for .zip and .Z files */
+static int part_nb;          /* number of parts in .gz file */
 
-FILE *ifd;               /* input file descriptor */
-FILE *ofd;               /* output file descriptor */
+static long bytes_in;             /* number of input bytes */
+static long bytes_out;            /* number of output bytes */
+static char ifname[128];          /* input file name */
 
-void **memptr;          /* memory location for uncompressed file */
-size_t *memsize;        /* size (bytes) of memory allocated for file */
+static FILE *ifd;               /* input file descriptor */
+static FILE *ofd;               /* output file descriptor */
+
+static void **memptr;          /* memory location for uncompressed file */
+static size_t *memsize;        /* size (bytes) of memory allocated for file */
 void *(*realloc_fn)(void *p, size_t newsize);  /* reallocation function */
 
-unsigned insize;           /* valid bytes in inbuf */
-unsigned inptr;            /* index of next byte to be processed in inbuf */
-unsigned outcnt;           /* bytes in output buffer */
+static unsigned insize;     /* valid bytes in inbuf */
+static unsigned inptr;      /* index of next byte to be processed in inbuf */
+static unsigned outcnt;     /* bytes in output buffer */
 
 /* prototype for the following functions */
 int uncompress2mem(char *filename, 
@@ -422,7 +421,8 @@ local void write_buf(buf, cnt)
     if (!realloc_fn)
     {
       /* append buffer to file */
-      if ((long) fwrite(buf, 1, cnt, ofd) != cnt)
+      /* added 'unsigned' to get rid of compiler warning (WDP 1/1/99) */
+      if ((unsigned long) fwrite(buf, 1, cnt, ofd) != cnt)
       {
           error
           ("failed to write buffer to uncompressed output file (write_buf)");
@@ -821,14 +821,15 @@ local void huf_decode_start()
 /***********************************************************
         decode.c
 ***********************************************************/
+/* changed 'j' to 'jj1' to avoid conflicts  - WDP 1/1/99) */
 
-local int j;    /* remaining bytes to copy */
+local int jj1;    /* remaining bytes to copy */
 local int done; /* set at end of input */
 
 local void decode_start()
 {
     huf_decode_start();
-    j = 0;
+    jj1 = 0;
     done = 0;
 }
 
@@ -850,7 +851,7 @@ local unsigned decode(count, buffer)
     unsigned r, c;
 
     r = 0;
-    while (--j >= 0) {
+    while (--jj1 >= 0) {
 	buffer[r] = buffer[i];
 	i = (i + 1) & (DICSIZ - 1);
 	if (++r == count) return r;
@@ -868,9 +869,9 @@ local unsigned decode(count, buffer)
 	    buffer[r] = c;
 	    if (++r == count) return r;
 	} else {
-	    j = c - (UCHAR_MAX + 1 - THRESHOLD);
+	    jj1 = c - (UCHAR_MAX + 1 - THRESHOLD);
 	    i = (r - decode_p() - 1) & (DICSIZ - 1);
-	    while (--j >= 0) {
+	    while (--jj1 >= 0) {
 		buffer[r] = buffer[i];
 		i = (i + 1) & (DICSIZ - 1);
 		if (++r == count) return r;
@@ -1534,11 +1535,12 @@ local int unpack(in, out)
 
 
 /* Globals */
+/* added 'static' to the following 4 lines - WDP (1/1/99) */
 
-int decrypt;        /* flag to turn on decryption */
-char *key;          /* not used--needed to link crypt.c */
-int pkzip = 0;      /* set for a pkzip file */
-int ext_header = 0; /* set if extended local header */
+static int decrypt;        /* flag to turn on decryption */
+/* static char *key;  */        /* not used--needed to link crypt.c */
+static int pkzip = 0;      /* set for a pkzip file */
+static int ext_header = 0; /* set if extended local header */
 
 /* ===========================================================================
  * Check zip file and advance inptr to the start of the compressed data.
@@ -1592,7 +1594,10 @@ local int unzip(in, out)
     FILE *in, *out;   /* input and output file descriptors */
 {
     ulg orig_crc = 0;       /* original crc */
-    ulg orig_len = 0;       /* original uncompressed length */
+
+/* orig_len has already been defined statically before */
+/*    ulg orig_len = 0;  */     /* original uncompressed length */
+
     int n;
     uch buf[EXTHDR];        /* extended local header */
 
@@ -1621,13 +1626,15 @@ local int unzip(in, out)
 
     } else if (pkzip && method == STORED) {
 
-	register ulg n = LG(inbuf + LOCLEN);
+   /* 'nn' here was originally declared 'n' which conflicts with the */
+   /*  previous local declaration of 'n'.  It was changed to 'nn' on 1/4/99 */
+	register ulg nn = LG(inbuf + LOCLEN);
 
-	if (n != LG(inbuf + LOCSIZ) - (decrypt ? 12 : 0)) {
+	if (nn != LG(inbuf + LOCSIZ) - (decrypt ? 12 : 0)) {
 	    error("invalid compressed data--length mismatch");
             return ERROR;
 	}
-	while (n--) {
+	while (nn--) {
 	    uch c = (uch)get_byte();
 #ifdef CRYPT
 	    if (decrypt) zdecode(c);

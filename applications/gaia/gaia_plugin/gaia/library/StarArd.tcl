@@ -159,12 +159,12 @@
 
 itk::usual StarArd {}
 
-class gaia::StarArd {
+itcl::class gaia::StarArd {
 
    #  Inheritances:
    #  -------------
 
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

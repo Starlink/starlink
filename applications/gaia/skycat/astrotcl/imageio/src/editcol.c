@@ -25,7 +25,7 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
 {
     int ii, simple, obitpix, onaxis, extend, nmodify;
     long onaxes[99], pcount, gcount, newsize, oldsize, nblocks, longval;
-    char comment[25], keyname[9], message[FLEN_ERRMSG];
+    char comment[25], keyname[FLEN_KEYWORD], message[FLEN_ERRMSG];
 
     if (*status > 0)
         return(*status);
@@ -1212,7 +1212,7 @@ int ffcpky(fitsfile *infptr,    /* I - FITS file pointer to input file  */
     if (ffgkey(infptr, keyname, value, comment, &tstatus) <= 0)
     {
         ffkeyn(rootname, outcol, keyname, &tstatus);
-        ffmkky(keyname, value, comment, card);
+        ffmkky(keyname, value, comment, card, status);
         ffprec(outfptr, card, status);
     }
     return(*status);

@@ -228,10 +228,10 @@
 
 itk::usual ETable {}
 
-class rtd::ETable {
+itcl::class gaia::ETable {
 
    #  Inheritances:
-   inherit FrameWidget
+   inherit util::FrameWidget
 
    #  Constructor: creates a instance of the class and configures it with
    #  the default and command-line options.

@@ -17,7 +17,7 @@ util::setXdefaults
 
 # test class for CanvasDraw widget
 
-class tStarCanvasDraw {
+itcl::class tStarCanvasDraw {
     inherit TopLevelWidget
 
     constructor {args} {
@@ -80,4 +80,4 @@ class tStarCanvasDraw {
     }
 }
 
-TopLevelWidget::start tStarCanvasDraw
+util::TopLevelWidget::start tStarCanvasDraw

@@ -82,12 +82,12 @@
 
 #.
 
-class gaia::StarArdPrim {
+itcl::class gaia::StarArdPrim {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarCanvasObject
+   inherit gaia::StarCanvasObject
 
    #  Constructor:
    #  ------------

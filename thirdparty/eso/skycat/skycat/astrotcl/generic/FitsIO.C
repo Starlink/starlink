@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: FitsIO.C,v 1.15 1998/11/16 21:22:42 abrighto Exp $" 
+ * "@(#) $Id: FitsIO.C,v 1.22 1998/12/29 20:19:13 abrighto Exp $" 
  *
  * FitsIO.C - method definitions for class FitsIO, for operating on
  *            Fits files.
@@ -14,7 +14,7 @@
  *                           for bitpix=16 for H_COMPRESS.
  *                 12/03/98  Initialize WCS in constructor.
  */
-static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.15 1998/11/16 21:22:42 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.22 1998/12/29 20:19:13 abrighto Exp $";
 
 
 #include <string.h>
@@ -40,8 +40,13 @@ enum {FITSBLOCK=2880};
 // common error message
 const char* noFitsErrMsg = "No FITS file is currently open";
 
+const char* noHdrErrMsg = "Can't get keyword: no FITS header.";
+
 // local buffer used to return keyword and table values
-static char buf_[81];
+static char buf_[1024];
+
+// "current" FitsIO object pointer, needed for cfitsio realloc callback
+FitsIO* FitsIO::fits_ = NULL;
 
 
 /*
@@ -58,13 +63,6 @@ FitsIO::FitsIO(int width, int height, int bitpix, double bzero,
     : ImageIORep(width, height, bitpix, bzero, bscale, header, data),
       fitsio_(fitsio) 
 {
-    // Note: In some cases, there is no header, just raw data.
-    // If there is a header, try to initialize the cfitsio object.
-    if (! fitsio_ && header_.ptr()) {
-	fitsio_ = openFitsMem(header_);
-	if (!fitsio_)
-	    status_ = 1;		// error
-    }
 }
 
 
@@ -229,6 +227,9 @@ FitsIO* FitsIO::read(const char* filename, int mem_options)
     }
     
     // map image file to memory to speed up image loading
+    if (mem_options == 0 && access(filename, W_OK) == 0)
+	mem_options = Mem::FILE_RDWR;
+
     Mem header(filename, mem_options, 0);
     if (header.status() != 0) 
 	return NULL;
@@ -262,6 +263,36 @@ int FitsIO::cfitsio_error()
 }
 
 
+/* 
+ * This static method is called by the cfitsio routines when the size of the file
+ * has to be increased, such as when adding a new FITS block or table to the file.
+ * Since a client data pointer is not part of the interface, we use the "current"
+ * FitsIO object, set before any operations that could result in a call to this
+ * method.
+ */
+void* FitsIO::reallocFile(void* p, size_t newsize)
+{
+    if (!fits_) {
+	error("No current FITS file");
+	return NULL;
+    }
+    if (fits_->checkWritable() != 0)
+	return NULL;		// not a writable FITS file
+    
+    // OK, we have a writable FITS file. Extend the size, remap and
+    // return the mmap pointer.
+    Mem m = fits_->header_;
+    m.offset(0);
+    if (newsize <= m.size())
+	return p;
+    
+    m.unmap();
+    if (m.remap(m.options(), newsize) != 0) 
+	return NULL;		// error
+    return m.ptr();
+}
+
+
 /*
  * This static method returns a cfitsio handle, given the Mem object for the
  * FITS header.
@@ -289,11 +320,27 @@ fitsfile* FitsIO::openFitsMem(Mem& header)
     // XXX (make sure the values are not actually modified...)
     MemRep* mrep = (MemRep*)header.rep();
     if (fits_open_memfile(&fitsio, filename, rw_flag, &mrep->ptr, (size_t*)&mrep->size, 
-			  FITSBLOCK, NULL, &status) != 0) {
+			  FITSBLOCK, FitsIO::reallocFile, &status) != 0) {
 	cfitsio_error();
 	return NULL;
     }
     return fitsio;
+}
+
+
+/* 
+ * Check that this object represents a FITS file (and not just some kind of memory)
+ * and return 0 if it does. If not, return an error message.
+ */
+int FitsIO::checkFitsFile()
+{
+    // For now, only support extending headers in mmap'ed FITS files
+    if (!fitsio_ 
+	|| (! (header_.filename() && data_.filename() 
+	   && strcmp(header_.filename(), data_.filename()) == 0))) { 
+	return error("FitsIO: Operation not allowed on memory image");
+    }
+    return 0;
 }
 
 
@@ -566,10 +613,12 @@ int FitsIO::write(const char *filename) const
     char tmpfilename[1024];
     int istemp = 1;
 
-    // flush any changes done in a memory FITS file
-    int status = 0;
-    if (fits_flush_file(fitsio_, &status) != 0)
-	return cfitsio_error();
+    if (fitsio_) {
+	// flush any changes done in a memory FITS file
+	int status = 0;
+	if (fits_flush_file(fitsio_, &status) != 0)
+	    return cfitsio_error();
+    }
     
     // if the file exists, rename it to make a backup and to avoid
     // crashing if we have the file mapped already
@@ -717,8 +766,9 @@ int FitsIO::getFitsHeader(ostream& os) const
  */
 int FitsIO::checkKeywordSpace(const char* keyword)
 {
-    if (! fitsio_)
-	return error("Can't insert keyword: no FITS header.");
+    // make sure the file was mapped with write permission
+    if (checkWritable() != 0) 
+	return 1;		// error
 
     if (!get(keyword)) {	// keyword not found in header?
 
@@ -733,6 +783,21 @@ int FitsIO::checkKeywordSpace(const char* keyword)
 	if (moreKeys == 0 && extendHeader() != 0)
 	    return 1;
     }
+    return 0;
+}
+
+
+/*
+ * flush any memory changes to the file
+ */
+int FitsIO::flush() 
+{
+    int status = 0;
+    fits_ = this;		// reallocFile() might be called
+    fits_flush_file(fitsio_, &status);
+    fits_ = NULL;
+    if (status != 0)
+	return cfitsio_error();
     return 0;
 }
 
@@ -752,7 +817,7 @@ int FitsIO::put(const char* keyword, double val, const char* comment)
     if (fits_update_key(fitsio_, TDOUBLE, (char*)keyword, &val, (char*)comment, &status) != 0)
 	return cfitsio_error();
 
-    return 0;
+    return flush();
 }
 
 
@@ -766,7 +831,7 @@ int FitsIO::put(const char* keyword, float val, const char* comment)
     if (fits_update_key(fitsio_, TFLOAT, (char*)keyword, &val, (char*)comment, &status) != 0)
 	return cfitsio_error();
 
-    return 0;
+    return flush();
 }
 
 
@@ -780,7 +845,7 @@ int FitsIO::put(const char* keyword, int val, const char* comment)
     if (fits_update_key(fitsio_, TINT, (char*)keyword, &val, (char*)comment, &status) != 0)
 	return cfitsio_error();
 
-    return 0;
+    return flush();
 }
 
 
@@ -794,70 +859,39 @@ int FitsIO::put(const char* keyword, const char* val, const char* comment)
     if (fits_update_key(fitsio_, TSTRING, (char*)keyword, (char*)val, (char*)comment, &status) != 0)
 	return cfitsio_error();
 
-    return 0;
+    return flush();
 }
 
 
 /*
  * extend the size of the FITS header by one header block and if the
  * header is part of an mmap'ed file, rewrite the file with the
- * new enlarged header. This creates a temp file in the same dir
- * as the file called <file>.tmp
+ * new enlarged header. 
  */
 int FitsIO::extendHeader()
 {
-    // For now, only support extending headers in mmap'ed FITS files
-    if (! (header_.filename() && data_.filename() 
-	   && strcmp(header_.filename(), data_.filename()) == 0)) { 
-	return error("No more space in FTS header.");
-    }
+    // Make sure we have a writable FITS file
+    if (checkWritable() != 0)
+	return 1;		// error
 
-    // close the  file, open it as a plain file, insert a history keyword,
-    // causing cfitsio to extend the header (since it is full),
-    // then close it again and open it via mmap as before.
     int status = 0;
-
-    if (fits_close_file(fitsio_, &status) != 0)
+    if (fits_write_comment(fitsio_, "FitsIO: added 1 block to header", &status) != 0) 
 	return cfitsio_error();
 
-    if (fits_open_file(&fitsio_, header_.filename(), 1, &status) != 0)
-	return cfitsio_error();
-
-    if (fits_write_comment(fitsio_, "FitsIO: added 1 block to header", &status) != 0)
-	return cfitsio_error();
-    
-    if (fits_close_file(fitsio_, &status) != 0)
-	return cfitsio_error();
-
-    // remap the file, since it may have been rewritten
-    if (header_.remap(header_.options()) != 0)
+    // calling flush will cause reallocFile() to be called
+    if (flush() != 0)
 	return 1;		// error
 
-    fitsio_ = openFitsMem(header_);
-    if (!fitsio_)
-	return 1;		// error
-
-    // reset the header and data offsets
-    long headStart = 0, dataStart = 0, dataEnd = 0;
-    if (fits_get_hduaddr(fitsio_, &headStart, &dataStart, &dataEnd, &status) != 0)
-	return cfitsio_error();
-
-    // The data part is the same mmap area as the header, with an offset
-    header_.length(dataStart - headStart);  // set usable length of header
-    data_.offset(dataStart);    // set offset for data
-    data_.length(dataEnd-dataStart);
-
-    return 0;
+    return setHDU(getHDUNum());		// reset header/data mem offsets
 }
 
-const char* nohdr = "Can't get keyword: no FITS header.";
 
 /*
  * get value for the given FITS keyword and return 0 if OK (found)
  */
 int FitsIO::get(const char* keyword, double& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TDOUBLE, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -867,7 +901,7 @@ int FitsIO::get(const char* keyword, double& val) const {
 
 int FitsIO::get(const char* keyword, float& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TFLOAT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -877,7 +911,7 @@ int FitsIO::get(const char* keyword, float& val) const {
 
 int FitsIO::get(const char* keyword, int& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TINT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -887,7 +921,7 @@ int FitsIO::get(const char* keyword, int& val) const {
 
 int FitsIO::get(const char* keyword, long& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TLONG, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -897,7 +931,7 @@ int FitsIO::get(const char* keyword, long& val) const {
 
 int FitsIO::get(const char* keyword, unsigned char& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TBYTE, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -907,7 +941,7 @@ int FitsIO::get(const char* keyword, unsigned char& val) const {
 
 int FitsIO::get(const char* keyword, short& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TSHORT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -917,7 +951,7 @@ int FitsIO::get(const char* keyword, short& val) const {
 
 int FitsIO::get(const char* keyword, unsigned short& val) const {
     if (! fitsio_)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio_, TUSHORT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -932,7 +966,7 @@ int FitsIO::get(const char* keyword, unsigned short& val) const {
  */
 char* FitsIO::get(const char* keyword) const {
     if (! fitsio_) {
-	error(nohdr);
+	error(noHdrErrMsg);
 	return NULL;
     }
     int status = 0;
@@ -964,7 +998,7 @@ char* FitsIO::get(const char* keyword, char* buf, int bufsz) const
  */
 int FitsIO::get(fitsfile* fitsio, const char* keyword, double& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TDOUBLE, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -974,7 +1008,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, double& val) {
 
 int FitsIO::get(fitsfile* fitsio, const char* keyword, float& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TFLOAT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -984,7 +1018,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, float& val) {
 
 int FitsIO::get(fitsfile* fitsio, const char* keyword, int& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TINT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -994,7 +1028,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, int& val) {
 
 int FitsIO::get(fitsfile* fitsio, const char* keyword, long& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TLONG, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -1004,7 +1038,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, long& val) {
 
 int FitsIO::get(fitsfile* fitsio, const char* keyword, unsigned char& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TBYTE, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -1014,7 +1048,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, unsigned char& val) {
 
 int FitsIO::get(fitsfile* fitsio, const char* keyword, unsigned short& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TUSHORT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -1024,7 +1058,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, unsigned short& val) {
 
 int FitsIO::get(fitsfile* fitsio, const char* keyword, short& val) {
     if (! fitsio)
-	return error(nohdr);
+	return error(noHdrErrMsg);
     int status = 0;
     if (fits_read_key(fitsio, TSHORT, (char*)keyword, &val, NULL, &status) != 0)
 	return cfitsio_error();
@@ -1039,7 +1073,7 @@ int FitsIO::get(fitsfile* fitsio, const char* keyword, short& val) {
  */
 char* FitsIO::get(fitsfile* fitsio, const char* keyword) {
     if (! fitsio) {
-	error(nohdr);
+	error(noHdrErrMsg);
 	return NULL;
     }
     int status = 0;
@@ -1059,6 +1093,9 @@ char* FitsIO::get(fitsfile* fitsio, const char* keyword) {
  */
 int FitsIO::getNumHDUs()
 {
+    if (!fitsio_)
+	return 0;		// file might be only in memory
+
     int status = 0, num = 0;
     if (fits_get_num_hdus(fitsio_, &num, &status) != 0) {
 	cfitsio_error();
@@ -1074,6 +1111,11 @@ int FitsIO::getNumHDUs()
  */
 const char* FitsIO::getHDUType()
 {
+    if (!fitsio_) {
+	error(noFitsErrMsg);
+	return NULL;
+    }
+	
     int status = 0, type = 0;
     if (fits_get_hdu_type(fitsio_, &type, &status) != 0) {
 	cfitsio_error();
@@ -1093,6 +1135,9 @@ const char* FitsIO::getHDUType()
  */
 int FitsIO::getHDUNum()
 {
+    if (!fitsio_)
+	return error(noFitsErrMsg);
+	
     int num = 1;
     return fits_get_hdu_num(fitsio_, &num); 
 }
@@ -1103,10 +1148,8 @@ int FitsIO::getHDUNum()
  */
 int FitsIO::setHDU(int num)
 {
-    if (! (header_.filename() && data_.filename() 
-	   && strcmp(header_.filename(), data_.filename()) == 0)) { 
-	return error("Can't change HDU: no FITS file is loaded");
-    }
+    if (checkFitsFile() != 0)
+	return 1;		// error
 
     int status = 0, type = 0;
     if (fits_movabs_hdu(fitsio_, num, &type, &status) != 0) 
@@ -1133,6 +1176,31 @@ int FitsIO::setHDU(int num)
     get(fitsio_, "BSCALE", bscale_);
     get(fitsio_, "BZERO", bzero_);
 
+    return 0;
+}
+
+
+/*
+ * Delete the given HDU. Any following HDUs are shifted to fill the gap.
+ */
+int FitsIO::deleteHDU(int num)
+{
+    // make sure the file was mapped with write permission
+    if (checkWritable() != 0) 
+	return 1;		// error
+
+    int curHDU = getHDUNum();
+
+    if (setHDU(num) != 0)
+	return 1;		// error
+
+    int status = 0;
+    if (fits_delete_hdu(fitsio_, NULL, &status) != 0) 
+	return cfitsio_error();
+    
+    // reset to the original HDU
+    if (curHDU <= getNumHDUs())
+	return setHDU(curHDU);
     return 0;
 }
 
@@ -1284,3 +1352,148 @@ char* FitsIO::getTableValue(long row, int col)
     return buf_;
 }
 
+ 
+/*
+ * Create a FITS table and make it the current HDU
+ *
+ * extname gives the name of the table.
+ *
+ * The initial size will be rows x cols entries.
+ *
+ * tform is an array giving the FITS data type for each column
+ * (For example: 16A, for a 16 char string, see FITS description.)
+ *
+ * If asciiFlag is 1, an ASCII table is created, otherwise a binary table.
+ */
+int FitsIO::createTable(const char* extname, long rows, int cols,
+			char** headings, char** tform, int asciiFlag)
+{
+    // make sure the file was mapped with write permission
+    if (checkWritable() != 0) 
+	return 1;		// error
+
+    int status = 0;
+    int tbltype = (asciiFlag ? ASCII_TBL : BINARY_TBL);
+
+    fits_ = this;		// reallocFile() might be called
+    if (fits_create_tbl(fitsio_, tbltype, rows, cols, headings,
+			tform, NULL, (char*)extname, &status) != 0) {
+	fits_ = NULL;
+	return cfitsio_error();
+    }
+    if (flush() != 0) 
+	return 1;		// error flushing data
+
+    if (fits_movnam_hdu(fitsio_, tbltype, (char*)extname, 0, &status) != 0) {
+	return cfitsio_error();
+    }
+    
+    return setHDU(getHDUNum());	// remap after modifying file
+}
+
+
+/*
+ * Set the value in the current FITS table at the given row and column
+ * (For now, all data types are treated as strings)
+ */
+int FitsIO::setTableValue(long row, int col, const char* value)
+{
+    // make sure the file was mapped with write permission
+    if (checkWritable() != 0) 
+	return 1;		// error
+
+    if (row < 1)
+	return fmt_error("FITS table row index %d out of range: should be >= 1", row);
+    if (col < 1)
+	return fmt_error("FITS table column index %d out of range: should be >= 1", col);
+
+    // make sure the file was mapped with write permission
+    if (checkWritable() != 0) 
+	return 1;		// error
+
+    int status = 0, typecode = 0;
+    long repeat = 0, width = 0;
+
+    if (fits_get_coltype(fitsio_, col, &typecode, &repeat, &width, &status) != 0) 
+	return cfitsio_error();
+    
+    switch(typecode) {
+    case TSTRING:
+	if (fits_write_col(fitsio_, TSTRING, col, row, 1, 1, (char**)&value, &status) != 0) 
+	    return cfitsio_error();
+	break;
+
+    case TBYTE:
+    case TSHORT:
+    case TINT:
+    case TLONG:
+	long l;
+	if (sscanf(value, "%ld", &l) != 1) 
+	    return error("invalid int value: ", value);
+	if (fits_write_col(fitsio_, TLONG, col, row, 1, 1, &l, &status) != 0) 
+	    return cfitsio_error();
+	break;
+
+    case TUSHORT:
+    case TUINT:
+    case TULONG:
+	unsigned long ul;
+	if (sscanf(value, "%lu", &l) != 1) 
+	    return error("invalid unsigned value: ", value);
+	if (fits_write_col(fitsio_, TULONG, col, row, 1, 1, &l, &status) != 0) 
+	    return cfitsio_error();
+	break;
+
+    case TFLOAT:
+    case TDOUBLE:
+	double d;
+	if (sscanf(value, "%lf", &d) != 1) 
+	    return error("invalid floating point value: ", value);
+	if (fits_write_col(fitsio_, TDOUBLE, col, row, 1, 1, &d, &status) != 0) 
+	    return cfitsio_error();
+	break;
+
+    case TLOGICAL:
+	char c;
+	if (fits_write_col(fitsio_, TLOGICAL, col, row, 1, 1, (char*)value, &status) != 0) 
+	    return cfitsio_error();
+	break;
+
+    default:
+	return fmt_error("cfitsio data type (%d) not supported");
+    }
+
+    return flush();
+}
+
+
+/*
+ * Make sure that this object represents a writable FITS file that was
+ * also mapped with read/write permission. The default for FitsIO::read()
+ * is to map the file read-only. If you plan to edit the file by
+ * inserting keywords or tables, you must pass the read-write flag, for
+ * example:
+ *
+ *    FitsIO* fits = FitsIO::read(filename, Mem::FILE_RDWR);
+ *
+ * If this was not the case, this method attempts to remap the file read/write.
+ *
+ * The return value is 0 if the file was or could be mapped read-write, 
+ * otherwise 1.
+ */
+int FitsIO::checkWritable()
+{
+    if (!fitsio_) 
+	return error(noFitsErrMsg);
+
+    if (checkFitsFile() != 0)
+	return 1;
+    
+    if (!(header_.options() & Mem::FILE_RDWR)) {
+	if (access(header_.filename(), W_OK) != 0)
+	    return error("FitsIO: no wite permission on file: ", header_.filename());
+	return header_.remap(Mem::FILE_RDWR);
+    }
+
+    return 0;
+}

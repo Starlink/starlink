@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclAstroCat.C,v 1.45 1998/11/16 21:23:51 abrighto Exp $
+ * $Id: TclAstroCat.C,v 1.46 1999/02/02 21:49:39 abrighto Exp $
  *
  * TclAstroCat.C - method definitions for class TclAstroCat
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.45 1998/11/16 21:23:51 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.46 1999/02/02 21:49:39 abrighto Exp $";
 
 
 #include <string.h>
@@ -228,7 +228,7 @@ int Cat_Init(Tcl_Interp* interp)
 		 "namespace ::cat {};"
 		 "import add cat;"
 #endif
-	) != 0)
+	) != TCL_OK)
 	return TCL_ERROR;
 
     return TCL_OK; 

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroImage.tcl,v 1.24 1998/10/30 18:16:52 abrighto Exp $
+# @(#) $Id: AstroImage.tcl,v 1.25 1998/11/20 14:19:35 abrighto Exp $
 #
 # AstroImage.tcl - user interface class for accessing image servers
 #                     such as DSS (Digitized Sky Survey) 
@@ -284,7 +284,7 @@ itcl::class cat::AstroImage {
 		 -command [code $this interrupt]] \
 	    [button $w_.close \
 		 -text "Close" \
-		 -command "wm withdraw $w_"] \
+		 -command "wm withdraw $w_" ] \
 	    -side left -expand 1 -pady 2m -in $w_.buttons
 
 	# set the image server (default if not set)
@@ -733,8 +733,8 @@ itcl::class cat::AstroImage {
 	    # using world coords 
 	    set equinox [get_imagesvr_equinox]
 	    if {[catch {
-		lassign [convert_coords $x $y canvas "wcs $equinox"] ra dec
-		lassign [convert_dist $w $h canvas "deg $equinox"] width height
+		lassign [convert_coords $x $y canvas "wcs $equinox" ] ra dec
+		lassign [convert_dist $w $h canvas "deg $equinox" ] width height
 	    } msg]} {
 		error_dialog "error converting canvas ($x, $y) to world coordinates: $msg" $w_
 		return

@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: Mem.C,v 1.8 1998/11/16 21:28:14 abrighto Exp $" 
+ * "@(#) $Id: Mem.C,v 1.9 1998/12/03 22:11:47 abrighto Exp $" 
  *
  * Mem.C - method definitions for class Mem, for managing memory
  *         areas with or without shared memory.
@@ -11,7 +11,7 @@
  * Allan Brighton  07/03/96  Created
  * D.Hopkinson     21/01/97  Added constructor to use when multi-buffering shared memory.
  */
-static const char* const rcsId="@(#) $Id: Mem.C,v 1.8 1998/11/16 21:28:14 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Mem.C,v 1.9 1998/12/03 22:11:47 abrighto Exp $";
 
 
 #include <string.h>
@@ -376,8 +376,10 @@ void MemRep::unmap()
 /*
  * remap the shared memory after a call to unmap()
  * (may be used to unmap and remap with different options, see MemFileOptions)
+ * If the optional newsize arg is given and is not -1, it indicates a new
+ * file size. This can be used to extend the file size.
  */
-int MemRep::remap(int opts) 
+int MemRep::remap(int opts, int newsize) 
 {
     if (!m_map || !m_map->filename()) 
 	return error("can't remap memory, not mapped");
@@ -403,7 +405,7 @@ int MemRep::remap(int opts)
 
     // now remap
     if (m_map->map(m_map->filename(), 
-		   -1, // remap the file, default perms
+		   newsize, 
 		   flags, 
 		   MMAP_DEFAULT_PERMS, 
 		   prot, 

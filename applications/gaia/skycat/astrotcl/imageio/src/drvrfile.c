@@ -360,7 +360,8 @@ int file_compress_open(char *filename, int rwmode, int *hdl)
 */
 {
     FILE *indiskfile, *outdiskfile;
-    int status;
+    int status, clobber = 0;
+    char *cptr;
 
     /* open the compressed disk file */
     status = file_openfile(filename, READONLY, &indiskfile);
@@ -374,17 +375,28 @@ int file_compress_open(char *filename, int rwmode, int *hdl)
     /* name of the output uncompressed file is stored in the */
     /* global variable called 'file_outfile'.                */
 
-    outdiskfile = fopen(file_outfile, "r"); /* does file already exist? */
-
-    if (outdiskfile)
+    cptr = file_outfile;
+    if (*cptr == '!')
     {
-        ffpmsg("uncompressed file already exists: (file_compress_open)");
-        ffpmsg(file_outfile);
-        fclose(outdiskfile);         /* close file and exit with error */
-        return(FILE_NOT_CREATED); 
+        /* clobber any existing file with the same name */
+        clobber = 1;
+        cptr++;
+        remove(cptr);
+    }
+    else
+    {
+        outdiskfile = fopen(file_outfile, "r"); /* does file already exist? */
+
+        if (outdiskfile)
+        {
+          ffpmsg("uncompressed file already exists: (file_compress_open)");
+          ffpmsg(file_outfile);
+          fclose(outdiskfile);         /* close file and exit with error */
+          return(FILE_NOT_CREATED); 
+        }
     }
 
-    outdiskfile = fopen(file_outfile, "w+b"); /* create new file */
+    outdiskfile = fopen(cptr, "w+b"); /* create new file */
     if (!outdiskfile)
     {
         ffpmsg("could not create uncompressed file: (file_compress_open)");
@@ -406,7 +418,7 @@ int file_compress_open(char *filename, int rwmode, int *hdl)
         return(status);
     }
 
-    strcpy(filename, file_outfile);  /* switch the names */
+    strcpy(filename, cptr);  /* switch the names */
     file_outfile[0] = '\0';
 
     status = file_open(filename, rwmode, hdl);

@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdRemoteTcl.tcl,v 1.8 1998/10/28 17:42:31 abrighto Exp $"
+# "@(#) $Id: RtdRemoteTcl.tcl,v 1.9 1998/11/20 14:19:47 abrighto Exp $"
 #
 # RtdRemoteTcl.tcl - itcl widget testing the remote Tcl interface
 #                    and some Rtd functions
@@ -40,7 +40,7 @@ itcl::class rtd::RtdRemoteTcl {
     protected method init {} {
 	global ::rtd_library
 	# image widget names
-	set image [etcl "$itk_option(-rtd) component image"]
+	set image [etcl "$itk_option(-rtd) component image" ]
 	# load a FITS file, scale to 1 and set autocut
 	etcl "$image config -file $rtd_library/../images/$itk_option(-file)"
 	etcl "$image scale 1 1"
@@ -59,7 +59,7 @@ itcl::class rtd::RtdRemoteTcl {
 	set cmds_ "fliprotate zoom colors cut pixtab fitsh rapid record perft cuts pick"
 	set text [list "Flip/Rotate test" "Zoom test" "Color test" "Cut levels test" \
 		      "Test Pixel Table" "Fits header test"  "Rapid Frame test" \
-		      "Recorder test" "Performance test" "Test Spectrum" "Test Pick Object"]
+		      "Recorder test" "Performance test" "Test Spectrum" "Test Pick Object" ]
 	foreach el [set cmds_] {
 	    # $el is one of: fliprotate zoom colors cut pixtab fitsh rapid 
 	    # record perft cuts pick
@@ -103,7 +103,7 @@ itcl::class rtd::RtdRemoteTcl {
     # flip and rotate
 
     public method fliprotate {} {
-	set trans [etcl "$image component info component trans"]
+	set trans [etcl "$image component info component trans" ]
 	foreach el {flipx flipy rotate} {
 	    foreach counter {1 2} {
 		if [testcancel] {return}
@@ -119,14 +119,14 @@ itcl::class rtd::RtdRemoteTcl {
 	etcl "info_dialog {The test will be continued when the Spectrum window has been closed}"
 	etcl "$image spectrum"
 	if [testcancel] {return}
-	while {![etcl "winfo exists $image.spectrum"]} {
+	while {![etcl "winfo exists $image.spectrum" ]} {
 	    puts "Waiting for spectrum window to come up"
 	    if [testcancel] {return}
 	    after 1000
 	    $itk_component(cuts) flash
 	}
 	etcl "wm geometry $image.spectrum +0+0"
-	while {[etcl "if \!\[winfo exists $image.spectrum\] {return 0}; winfo viewable $image.spectrum"]} {
+	while {[etcl "if \!\[winfo exists $image.spectrum\] {return 0}; winfo viewable $image.spectrum" ]} {
 	    puts "Waiting until spectrum window is closed"
 	    if [testcancel] {return}
 	    after 1000
@@ -140,7 +140,7 @@ itcl::class rtd::RtdRemoteTcl {
 	etcl "info_dialog {The test will be continued when the Pick Object window has been closed}"
 	etcl "$image pick_dialog"
 	etcl "wm geometry $image.pick +0+0"
-	while {[etcl "if \!\[winfo exists $image.pick\] {return 0};winfo viewable $image.pick"]} {
+	while {[etcl "if \!\[winfo exists $image.pick\] {return 0};winfo viewable $image.pick" ]} {
 	    puts "Waiting until Pick Objec window is closed"
 	    if [testcancel] {return}
 	    after 1000
@@ -258,8 +258,8 @@ itcl::class rtd::RtdRemoteTcl {
     # zoom test
 
     public method zoom {} {
-	set trans [etcl "$image component info component trans"]
-	set larger [etcl "$trans component larger"]
+	set trans [etcl "$image component info component trans" ]
+	set larger [etcl "$trans component larger" ]
 	set i 9
 	while {$i} {
 	    if [testcancel] {return}
@@ -268,7 +268,7 @@ itcl::class rtd::RtdRemoteTcl {
 	    $itk_component(zoom) flash
 	}
 	etcl "$image scale 1 1"
-	set smaller [etcl "$trans component smaller"]
+	set smaller [etcl "$trans component smaller" ]
 	set i 4
 	while {$i} {
 	    if [testcancel] {return}

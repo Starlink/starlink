@@ -75,11 +75,11 @@
 
 itk::usual StarAstReference {}
 
-class gaia::StarAstReference {
+itcl::class gaia::StarAstReference {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

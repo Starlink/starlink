@@ -57,12 +57,12 @@
 
 #.
 
-class gaia::StarArdAnnList {
+itcl::class gaia::StarArdAnnList {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdList
+   inherit gaia::StarArdList
 
    #  Constructor:
    #  ------------
@@ -96,6 +96,7 @@ class gaia::StarArdAnnList {
    #  Provide create_region that also sets the configurations required
    #  at this level.
    public method create_region {type {resize 1} {desc ""}} {
+      global ::tcl_version
       if { [string first $type $known_types_] != -1 } {
          set selected_ [incr highest_index_]
          set local_objects_($selected_) \
@@ -112,8 +113,12 @@ class gaia::StarArdAnnList {
                 -canvasdraw $canvasdraw ]
 
          #  Make sure base classes can use these objects in their
-         #  namespaces.
-         set objects_($selected_) [scope $local_objects_($selected_)]
+         #  namespaces. (allan: 21.1.99 added tcl8 check)
+ 	 if {$tcl_version >= 8.0} {
+	    set objects_($selected_) [code $local_objects_($selected_)]
+	 } else {
+	    set objects_($selected_) [scope $local_objects_($selected_)]
+	 }
 
          #  Create with or without resizing as appropriate.
          if { $resize } { 

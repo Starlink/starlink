@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# $Id: skycat.tcl,v 1.16 1998/10/28 17:44:33 abrighto Exp $ 
+# $Id: skycat.tcl,v 1.17 1998/12/29 20:19:44 abrighto Exp $ 
 #
 # skycat.tcl - image display application with catalog support 
 #              (AstroCatalog classes)
@@ -28,14 +28,15 @@ if {"[lindex $argv 0]" == "-help"} {
 # loading packages dynamically from shared libraries, since the
 # auto_path tcl variable determines the search path for the pkgIndex.tcl
 # files used to load the shared libraries at run time.
-foreach pkg {BLT RTD CAT SKYCAT} {
+foreach pkg {BLT SKYCAT} {
     if {[info exists env(${pkg}_LIBRARY)]} {
 	lappend auto_path $env(${pkg}_LIBRARY)
     }
 }
 
 # load the required packages, if it is not already loaded
-foreach pkg {Rtd Cat Skycat} {
+# (Note: the Skycat package now contains the required packages...)
+foreach pkg {Skycat} {
     if {[catch {package require $pkg} msg]} {
 	puts "error loading $pkg package: $msg"
 	exit 1

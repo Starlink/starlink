@@ -19,6 +19,7 @@ typedef struct {  /*  Structure holding all the histogramming information   */
    int   haxis, hcolnum[4], himagetype;
    long  haxis1, haxis2, haxis3, haxis4;
    float amin1, amin2, amin3, amin4;
+   float maxbin1, maxbin2, maxbin3, maxbin4;
    float binsize1, binsize2, binsize3, binsize4;
    int   wtrecip, wtcolnum;
    float weight;
@@ -381,7 +382,7 @@ int ffbinr(char **ptr,
     {
         /* this looks like the column name */
 
-        if (token[0] == '#' && isdigit(token[1]) )
+        if (token[0] == '#' && isdigit((int) token[1]) )
         {
             /* omit the leading '#' in the column number */
             strcpy(colname, token+1);
@@ -473,7 +474,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
            int recip,              /* I - use reciprocal of the weight?     */
            int *status)
 {
-    int ii, datatype, repeat, imin, imax, ibin, bitpix, tstatus;
+    int ii, datatype, repeat, imin, imax, ibin, bitpix, tstatus, use_datamax = 0;
     long haxes[4];
     fitsfile *histptr;
     char errmsg[FLEN_ERRMSG], keyname[FLEN_KEYWORD];
@@ -484,7 +485,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
     long n_per_loop = -1;  /* force whole array to be passed at one time */
     histType histData;    /* Structure holding histogram info for iterator */
     
-    float amin[4], amax, binsize[4];
+    float amin[4], amax[4], binsize[4], maxbin[4];
     float datamin = FLOATNULLVALUE, datamax = FLOATNULLVALUE;
     char svalue[FLEN_VALUE];
     double dvalue;
@@ -640,29 +641,31 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
       if (maxin[ii] == DOUBLENULLVALUE)
       {
         ffkeyn("TLMAX", histData.hcolnum[ii], keyname, status);
-        if (ffgky(*fptr, TFLOAT, keyname, &amax, NULL, status) > 0)
+        if (ffgky(*fptr, TFLOAT, keyname, &amax[ii], NULL, status) > 0)
         {
           *status = 0;
           if(datamax != FLOATNULLVALUE)  /* already computed max value */
           {
-             amax = datamax;
+             amax[ii] = datamax;
           }
           else
           {
              /* use actual data maximum value for the histogram maximum */
-             if (fits_get_col_minmax(*fptr, histData.hcolnum[ii], &datamin, &amax, status) > 0)
+             if (fits_get_col_minmax(*fptr, histData.hcolnum[ii], &datamin, &amax[ii], status) > 0)
              {
                  strcpy(errmsg, "Error calculating datamin and datamax for column: ");
                  strcat(errmsg, colname[ii]);
                  ffpmsg(errmsg);
                  return(*status);
              }
-           }
-         }
+          }
+        }
+        use_datamax = 1;  /* flag that the max was determined by the data values */
+                          /* and not specifically set by the calling program */
       }
       else
       {
-        amax = maxin[ii];
+        amax[ii] = maxin[ii];
       }
 
       /* use TDBINn keyword or else 1 if bin size is not given */
@@ -673,49 +676,78 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
          if (ffgky(*fptr, TFLOAT, keyname, binsizein + ii, NULL, &tstatus) > 0)
          {
 	    /* make at least 10 bins */
-            binsizein[ii] = (amax - amin[ii]) / 10. ;
+            binsizein[ii] = (amax[ii] - amin[ii]) / 10. ;
             if (binsizein[ii] > 1.)
                 binsizein[ii] = 1.;  /* use default bin size */
          }
       }
 
-      if ( (amin[ii] > amax && binsizein[ii] > 0. ) ||
-           (amin[ii] < amax && binsizein[ii] < 0. ) )
+      if ( (amin[ii] > amax[ii] && binsizein[ii] > 0. ) ||
+           (amin[ii] < amax[ii] && binsizein[ii] < 0. ) )
           binsize[ii] = -binsizein[ii];  /* reverse the sign of binsize */
       else
           binsize[ii] =  binsizein[ii];  /* binsize has the correct sign */
 
       ibin = binsize[ii];
       imin = amin[ii];
-      imax = amax;
+      imax = amax[ii];
 
       /* Determine the range and number of bins in the histogram. This  */
       /* depends on whether the input columns are integer or floats, so */
       /* treat each case separately.                                    */
 
       if (datatype <= TLONG && (float) imin == amin[ii] &&
-                               (float) imax == amax &&
+                               (float) imax == amax[ii] &&
                                (float) ibin == binsize[ii] )
       {
-        /* this is an integer column and integer limits were entered */
-        haxes[ii] = (imax - imin + ibin) / ibin;
- 
-        /* shift limits by 1/2 to make sure they are inclusive */
-        if (amin[ii] < amax)
+        /* This is an integer column and integer limits were entered. */
+        /* Shift the lower and upper histogramming limits by 0.5, so that */
+        /* the values fall in the center of the bin, not on the edge. */
+
+        haxes[ii] = (imax - imin) / ibin + 1;  /* last bin may only */
+                                               /* be partially full */
+        maxbin[ii] = haxes[ii] + 1.;  /* add 1. instead of .5 to avoid roundoff */
+
+        if (amin[ii] < amax[ii])
         {
           amin[ii] = amin[ii] - 0.5;
-          amax = amax + 0.5;
+          amax[ii] = amax[ii] + 0.5;
         }
         else
         {
           amin[ii] = amin[ii] + 0.5;
-          amax = amax - 0.5;
+          amax[ii] = amax[ii] - 0.5;
         }
       }
-      else  /*  float datatype column and/or limits */
+      else if (use_datamax)  
       {
-        /* the lower limit is inclusive, but upper limit is exclusive */
-        haxes[ii] = (amax - amin[ii]) / binsize[ii];
+        /* Either the column datatype and/or the limits are floating point, */
+        /* and the histogram limits are being defined by the min and max */
+        /* values of the array.  Add 1 to the number of histogram bins to */
+        /* make sure that pixels that are equal to the maximum or are */
+        /* in the last partial bin are included.  */
+
+        maxbin[ii] = (amax[ii] - amin[ii]) / binsize[ii]; 
+        haxes[ii] = maxbin[ii] + 1;
+      }
+      else  
+      {
+        /*  float datatype column and/or limits, and the maximum value to */
+        /*  include in the histogram is specified by the calling program. */
+        /*  The lower limit is inclusive, but upper limit is exclusive    */
+        maxbin[ii] = (amax[ii] - amin[ii]) / binsize[ii];
+        haxes[ii] = maxbin[ii];
+
+        if (amin[ii] < amax[ii])
+        {
+          if (amin[ii] + (haxes[ii] * binsize[ii]) < amax[ii])
+            haxes[ii]++;   /* need to include another partial bin */
+        }
+        else
+        {
+          if (amin[ii] + (haxes[ii] * binsize[ii]) > amax[ii])
+            haxes[ii]++;   /* need to include another partial bin */
+        }
       }
     }
 
@@ -774,24 +806,28 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
     /* it is more efficient when computing the histogram.       */
 
     histData.amin1 = amin[0];
+    histData.maxbin1 = maxbin[0];
     histData.binsize1 = binsize[0];
     histData.haxis1 = haxes[0];
 
     if (histData.haxis > 1)
     {
       histData.amin2 = amin[1];
+      histData.maxbin2 = maxbin[1];
       histData.binsize2 = binsize[1];
       histData.haxis2 = haxes[1];
 
       if (histData.haxis > 2)
       {
         histData.amin3 = amin[2];
+        histData.maxbin3 = maxbin[2];
         histData.binsize3 = binsize[2];
         histData.haxis3 = haxes[2];
 
         if (histData.haxis > 3)
         {
           histData.amin4 = amin[3];
+          histData.maxbin4 = maxbin[3];
           histData.binsize4 = binsize[3];
           histData.haxis4 = haxes[3];
         }
@@ -1010,7 +1046,8 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
    Interator work function that calculates values for the 2D histogram.
 */
 {
-    long ii, ipix, axisbin;
+    long ii, ipix, iaxisbin;
+    float pix, axisbin;
     static float *col1, *col2, *col3, *col4; /* static to preserve values */
     static float *wtcol;
     static long incr2, incr3, incr4;
@@ -1057,10 +1094,11 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
         if (col1[ii] == FLOATNULLVALUE)  /* test for null value */
             continue;
 
-        /* add 1 because the 1st pixel is the null pixel value */
-        ipix = (col1[ii] - histData.amin1) / histData.binsize1 + 1;
+        pix = (col1[ii] - histData.amin1) / histData.binsize1;
+        ipix = pix + 1; /* add 1 because the 1st pixel is the null value */
+
 	/* test if bin is within range */
-        if (ipix < 1 || ipix > histData.haxis1)
+        if (ipix < 1 || ipix > histData.haxis1 || pix > histData.maxbin1)
             continue;
 
         if (histData.haxis > 1)
@@ -1069,10 +1107,11 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
               continue;
 
           axisbin = (col2[ii] - histData.amin2) / histData.binsize2;
-          if (axisbin < 0 || axisbin >= histData.haxis2)
+          iaxisbin = axisbin;
+          if (iaxisbin < 0 || iaxisbin >= histData.haxis2 || axisbin > histData.maxbin2)
               continue;
 
-          ipix += (axisbin * incr2);
+          ipix += (iaxisbin * incr2);
 
           if (histData.haxis > 2)
           {
@@ -1080,10 +1119,11 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
                 continue;
 
             axisbin = (col3[ii] - histData.amin3) / histData.binsize3;
-            if (axisbin < 0 || axisbin >= histData.haxis3)
+            iaxisbin = axisbin;
+            if (iaxisbin < 0 || iaxisbin >= histData.haxis3 || axisbin > histData.maxbin3)
                 continue;
 
-            ipix += (axisbin * incr3);
+            ipix += (iaxisbin * incr3);
  
             if (histData.haxis > 3)
             {
@@ -1091,13 +1131,15 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
                   continue;
 
               axisbin = (col4[ii] - histData.amin4) / histData.binsize4;
-              if (axisbin < 0 || axisbin >= histData.haxis4)
+              iaxisbin = axisbin;
+              if (iaxisbin < 0 || iaxisbin >= histData.haxis4 || axisbin > histData.maxbin4)
                   continue;
 
-              ipix += (axisbin * incr4);
-            }
-          }  /* end of haxis > 2 case */
-        }  /* end of haxis > 1 case */
+              ipix += (iaxisbin * incr4);
+
+            }  /* end of haxis > 3 case */
+          }    /* end of haxis > 2 case */
+        }      /* end of haxis > 1 case */
 
         /* increment the histogram pixel */
         if (histData.weight != FLOATNULLVALUE) /* constant weight factor */
@@ -1126,7 +1168,7 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
             else if (histData.himagetype == TBYTE)
               histData.hist.b[ipix] += 1./wtcol[ii];
         }
-        else
+        else   /* no weights */
         {
             if (histData.himagetype == TINT)
               histData.hist.j[ipix] += wtcol[ii];

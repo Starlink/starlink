@@ -33,4 +33,5 @@ rtd_version.tcl
 rtd_version.tcl.in-
 save.with_compass
 save.with_ruler
+tclIndex
 test.tcl

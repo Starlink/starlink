@@ -10,3 +10,4 @@ SymbolConfig.tcl.save2
 cat_version.tcl
 pkgIndex.tcl
 tcl
+tclIndex

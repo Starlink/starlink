@@ -63,12 +63,12 @@
 #.
 itk::usual StarPhotomDetails {}
 
-class gaia::StarPhotomDetails {
+itcl::class gaia::StarPhotomDetails {
 
    #  Inheritances:
    #  -------------
 
-   inherit FrameWidget
+   inherit util::FrameWidget
 
    #  Constructor:
    #  ------------

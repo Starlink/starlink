@@ -63,6 +63,40 @@ void Cfffiou( int unit, int *status )
 FCALLSCSUB2(Cfffiou,FTFIOU,ftfiou,INT,PINT)
 
 
+int CFits2Unit( fitsfile *fptr );
+int CFits2Unit( fitsfile *fptr )
+     /* Utility routine to convert a fitspointer to a Fortran unit number */
+     /* for use when a C program is calling a Fortran routine which could */
+     /* in turn call CFITSIO... Modelled after code by Ning Gan.          */
+{
+   static fitsfile *last_fptr = (fitsfile *)NULL; /* Remember last fptr */
+   static int last_unit = 0;                      /* Remember last unit */
+   int status = 0;
+
+   /*  Test whether we are repeating the last lookup  */
+
+   if( last_unit && fptr==gFitsFiles[last_unit] )
+      return( last_unit );
+
+   /*  Check if gFitsFiles has an entry for this fptr.  */
+   /*  Allows Fortran to call C to call Fortran to      */
+   /*  call CFITSIO... OUCH!!!                          */
+
+   last_fptr = fptr;
+   for( last_unit=1; last_unit<MAXFITSFILES; last_unit++ ) {
+      if( fptr == gFitsFiles[last_unit] )
+	 return( last_unit );
+   }
+
+   /*  Allocate a new unit number for this fptr  */
+   Cffgiou( &last_unit, &status );
+   if( status )
+      last_unit = 0;
+   else
+      gFitsFiles[last_unit] = fptr;
+   return( last_unit );
+}
+
      /**************************************************/
      /*   Start of wrappers for routines in fitsio.h   */
      /**************************************************/

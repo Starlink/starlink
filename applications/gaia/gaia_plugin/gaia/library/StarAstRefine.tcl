@@ -63,11 +63,11 @@
 
 itk::usual StarAstRefine {}
 
-class gaia::StarAstRefine {
+itcl::class gaia::StarAstRefine {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

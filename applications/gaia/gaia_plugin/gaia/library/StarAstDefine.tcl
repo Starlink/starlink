@@ -66,11 +66,11 @@
 #.
 
 itk::usual StarAstDefine {}
-class gaia::StarAstDefine {
+itcl::class gaia::StarAstDefine {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -150,7 +150,7 @@ class gaia::StarAstDefine {
       #  CTYPE, CDELT, CROTA and CRPIX for both axes,
       #  plus LONGPOLE and LATPOLE
       itk_component add space2 {
-         LabelRule $itk_component(f1).space2 -text "Transformation:"
+         util::LabelRule $itk_component(f1).space2 -text "Transformation:"
       }
       set vwby2 [expr $vwidth_/2]
 

@@ -4,6 +4,42 @@ CHANGES to Astrotcl
 This file contains a list of changes to the Astrotcl software.
 The latest changes are at the top.
 
+
+---------------  14.01.99 released astrotcl-1.2.3 -------------------------
+
+* Upgraded the cfitsio sources to version cfitsio2027 (includes ESO HIERARCH
+  keyword support).
+
+---------------  29.12.98 released astrotcl-1.2.2 -------------------------
+
+* FitsIO.C: bug fix: set fits_ member variable in flush().
+
+---------------  28.12.98 released astrotcl-1.2.1 -------------------------
+
+* Rebuild tclIndex file whenever configure is run, since Tcl8 version
+  is not compatible with tcl7 version (see makelinks script).
+
+* wcslib/src/iraf2fits.c: fixed undefined ref: calloc_errchk()
+
+* imageio/src/FitsIO.h: added #include "fitsio.h" to avoid sunpro 
+  compiler error message.
+
+* Removed -Xc option from configure.in (should not have been there).
+
+---------------  03.12.98 released astrotcl-1.2 -------------------------
+
+* Made some corrections to the "ESO HIERARCH" changes in the cfitsio
+  sources (removed the 29 char keyword limit).
+
+* Changed cfitsio to allow lower case letters in FITS keywords (since
+  we had some files that contained these).
+
+* Added a number of new FitsIO methods for working with HDUs and
+  FITS tables.
+
+* Added a "realloc" method for use with cfitsio that extends the size
+  of an image file when needed for inserting a new FITS block.
+
 ---------------  16.11.98 released astrotcl-1.1 -------------------------
 
 * The FitsIO C++ class is now based on the CFITSIO package (URL:

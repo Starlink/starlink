@@ -89,7 +89,8 @@ static OptionStruct tixOption;
  */
 
 #ifndef TIX_DEF_FONTSET
-#define TIX_DEF_FONTSET "14Point"
+/* #define TIX_DEF_FONTSET "14Point" (allan: 15.12.98: caused errors on HP/CDE) */
+#define TIX_DEF_FONTSET "TK"
 #endif
 
 #ifndef TIX_DEF_SCHEME

@@ -32,6 +32,8 @@ extern "C" {
 #define	NGP_MAX_NAME		(20)			/* max size for KEYWORD (FITS limits it to 8 chars) */
 #define	NGP_MAX_STRING		(80)			/* max size for various strings */
 #define	NGP_MAX_ARRAY_DIM	(999)			/* max. number of dimensions in array */
+#define NGP_MAX_FNAME           (1000)                  /* max size of combined path+fname */
+#define	NGP_MAX_ENVFILES	(10000)			/* max size of CFITSIO_INCLUDE_FILES env. variable */
 
 #define	NGP_TOKEN_UNKNOWN	(-1)			/* token type unknown */
 #define	NGP_TOKEN_INCLUDE	(0)			/* \INCLUDE token */
@@ -131,13 +133,25 @@ typedef struct NGP_TKDEF_STRUCT
       } NGP_TKDEF;
 
 
+typedef struct NGP_EXTVER_TAB_STRUCT
+      {	char	*extname;
+	int	version;
+      } NGP_EXTVER_TAB;
+
+
 	/* globally visible variables declarations */
 
 extern	NGP_RAW_LINE	ngp_curline;
 extern	NGP_RAW_LINE	ngp_prevline;
 
+extern	int		ngp_extver_tab_size;
+extern	NGP_EXTVER_TAB	*ngp_extver_tab;
+
+
 	/* globally visible functions declarations */
 
+int	ngp_get_extver(char *extname, int *version);
+int	ngp_delete_extver_tab(void);
 int	ngp_strcasecmp(char *p1, char *p2);
 int	ngp_line_from_file(FILE *fp, char **p);
 int	ngp_free_line(void);

@@ -47,7 +47,7 @@
 
 itk::usual GaiaImageCtrl {}
 
-class gaia::GaiaImageCtrl {
+itcl::class gaia::GaiaImageCtrl {
    inherit skycat::SkyCatCtrl
 
    #  Constructor: create a new instance of this class.

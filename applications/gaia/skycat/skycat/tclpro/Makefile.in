@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.2 1998/11/17 21:18:40 abrighto Exp $
+# $Id: Makefile.in,v 1.5 1999/02/02 21:50:55 abrighto Exp $
 #
 # Makefile.in - Makefile to create the "skycat" binary
 #               (uses Scriptics Tclpro to create one binary with tcl scripts loaded)
@@ -74,14 +74,8 @@ TCL_LIBS     = \
 	$(TK_LIB) \
 	$(TCL_LIB)
 
-# ------------------------------------------------------------------------
-# Required Libs
-# ------------------------------------------------------------------------
-RTD_LIB      = @RTD_LIB_STATIC@
-CAT_LIB      = @CAT_LIB_STATIC@
-
-# local skycat util lib
-SKYCAT_LIB  = ../interp/lib/libskycat.a
+# skycat lib
+SKYCAT_LIB  = ../libskycat.a
 
 # ------------------------------------------------------------------------
 # tcl script to load all of the tcl library files
@@ -108,8 +102,6 @@ CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 # libraries to link
 LIBRARIES    = \
 	$(SKYCAT_LIB) \
-	$(CAT_LIB) \
-	$(RTD_LIB) \
 	$(TCL_LIBS) \
 	$(X_LIB) \
 	$(EXTRA_LIBS)
@@ -140,15 +132,18 @@ BLT_LIBRARY=@BLT_LIBRARY@
 all: $(PROG) 
 
 # build the tclpro wrapped skycat executable
+# Note: the -uses option is only a trick to avoid an error message when loading 
+# shared library plugins at run time.
 $(PROG): $(WISH_INTERP) $(TCLPRO_CONFIG)
 	$(TCLPRO_WRAP) \
+		-uses wish-dynamic \
 		-executable $(WISH_INTERP) \
 		-out $(PROG) \
 		$(START_SCRIPT) \
 		`cat $(TCLPRO_CONFIG)`
 
 # build the wish interpreter
-$(WISH_INTERP): $(OBJECTS) 
+$(WISH_INTERP): $(OBJECTS) $(TCL_LIBS) $(SKYCAT_LIB) 
 	@echo "linking \"$(WISH_INTERP)\"..."
 	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) \
 	    -o $(WISH_INTERP) -L. $(LD_SEARCH_FLAGS) $(LIBRARIES)

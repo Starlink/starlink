@@ -300,9 +300,8 @@ int ffpkyu( fitsfile *fptr,     /* I - FITS file pointer        */
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
 
-    strcpy(valstring,"0");  /* create a dummy value string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword */
-    card[29] = ' ';        /* reset the dummy value string to a blank */
+    strcpy(valstring," ");  /* create a dummy value string */
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword */
     ffprec(fptr, card, status);
 
     return(*status);
@@ -326,7 +325,7 @@ int ffpkys( fitsfile *fptr,     /* I - FITS file pointer        */
         return(*status);
 
     ffs2c(value, valstring, status);   /* put quotes around the string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword */
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword */
     ffprec(fptr, card, status);
 
     return(*status);
@@ -350,7 +349,7 @@ int ffpkls( fitsfile *fptr,     /* I - FITS file pointer        */
     char valstring[FLEN_VALUE];
     char card[FLEN_CARD];
     char tstring[FLEN_VALUE], *cptr;
-    int next, remain, vlen, nquote, nchar, contin;
+    int next, remain, vlen, nquote, nchar, namelen, contin, tstatus = -1;
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
@@ -369,8 +368,29 @@ int ffpkls( fitsfile *fptr,     /* I - FITS file pointer        */
         cptr = strchr(cptr, '\'');  /* search for another quote char */
     }
 
-    /* each quote character is expanded to 2 quotes, so leave enough space */
-    nchar = 68 - nquote;    /*  max of 68 chars fit in a FITS string value */
+    cptr = keyname;
+    while(*cptr == ' ')   /* skip over leading spaces in name */
+        cptr++;
+
+    /* determine the number of characters that will fit on the line */
+    /* Note: each quote character is expanded to 2 quotes */
+
+    namelen = strlen(cptr);
+    if (namelen <= 8 && (fftkey(cptr, &tstatus) <= 0) )
+    {
+        /* This a normal 8-character FITS keyword */
+        nchar = 68 - nquote; /*  max of 68 chars fit in a FITS string value */
+    }
+    else
+    {
+        /* This a HIERARCH keyword */
+        if (FSTRNCMP(cptr, "HIERARCH ", 9) && 
+            FSTRNCMP(cptr, "hierarch ", 9))
+            nchar = 66 - nquote - namelen;
+        else
+            nchar = 75 - nquote - namelen;  /* don't count 'HIERARCH' twice */
+
+    }
 
     contin = 0;
     while (remain > 0)
@@ -393,17 +413,22 @@ int ffpkls( fitsfile *fptr,     /* I - FITS file pointer        */
             }
         }
 
-        ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
-
         if (contin)           /* This is a CONTINUEd keyword */
-            strncpy(card, "CONTINUE   ", 10);  /* overwrite the name and = */
- 
+        {
+           ffmkky("CONTINUE", valstring, comm, card, status); /* make keyword */
+           strncpy(&card[8], "   ",  2);  /* overwrite the '=' */
+        }
+        else
+        {
+           ffmkky(keyname, valstring, comm, card, status);  /* make keyword */
+        }
+
         ffprec(fptr, card, status);  /* write the keyword */
 
         contin = 1;
         remain -= nchar;
         next  += nchar;
-        nchar += 1;    /* this compensates for the earlier decrement */
+        nchar = 68 - nquote;
     }
     return(*status);
 }
@@ -465,7 +490,7 @@ int ffpkyl( fitsfile *fptr,     /* I - FITS file pointer        */
         return(*status);
 
     ffl2c(value, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -488,7 +513,7 @@ int ffpkyj( fitsfile *fptr,     /* I - FITS file pointer        */
         return(*status);
 
     ffi2c(value, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -512,7 +537,7 @@ int ffpkyf( fitsfile *fptr,      /* I - FITS file pointer                   */
         return(*status);
 
     ffr2f(value, decim, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -536,7 +561,7 @@ int ffpkye( fitsfile *fptr,      /* I - FITS file pointer                   */
         return(*status);
 
     ffr2e(value, decim, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -559,7 +584,7 @@ int ffpkyg( fitsfile *fptr,      /* I - FITS file pointer                   */
         return(*status);
 
     ffd2f(value, decim, valstring, status);  /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -582,7 +607,7 @@ int ffpkyd( fitsfile *fptr,      /* I - FITS file pointer                   */
         return(*status);
 
     ffd2e(value, decim, valstring, status);  /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -613,7 +638,7 @@ int ffpkyc( fitsfile *fptr,      /* I - FITS file pointer                   */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -644,7 +669,7 @@ int ffpkym( fitsfile *fptr,      /* I - FITS file pointer                   */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -675,7 +700,7 @@ int ffpkfc( fitsfile *fptr,      /* I - FITS file pointer                   */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -706,7 +731,7 @@ int ffpkfm( fitsfile *fptr,      /* I - FITS file pointer                   */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -743,7 +768,7 @@ int ffpkyt( fitsfile *fptr,      /* I - FITS file pointer        */
     cptr = strchr(fstring, '.');    /* find the decimal point */
     strcat(valstring, cptr);    /* append the fraction to the integer */
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffprec(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -940,8 +965,9 @@ int ffs2dt(char *datestr,   /* I - date string: "YYYY-MM-DD" or "dd/mm/yy" */
 
     if (slen == 8 && datestr[2] == '/' && datestr[5] == '/')
     {
-        if (isdigit(datestr[0]) && isdigit(datestr[1]) && isdigit(datestr[3]) 
-         && isdigit(datestr[4]) && isdigit(datestr[6]) && isdigit(datestr[7]) )
+        if (isdigit((int) datestr[0]) && isdigit((int) datestr[1])
+         && isdigit((int) datestr[3]) && isdigit((int) datestr[4])
+         && isdigit((int) datestr[6]) && isdigit((int) datestr[7]) )
         {
             /* this is an old format string: "dd/mm/yy" */
             if (year)
@@ -961,9 +987,10 @@ int ffs2dt(char *datestr,   /* I - date string: "YYYY-MM-DD" or "dd/mm/yy" */
     }
     else if (slen >= 10 && datestr[4] == '-' && datestr[7] == '-')
         {
-        if (isdigit(datestr[0]) && isdigit(datestr[1]) && isdigit(datestr[2]) 
-         && isdigit(datestr[3]) && isdigit(datestr[5]) && isdigit(datestr[6])
-         && isdigit(datestr[8]) && isdigit(datestr[9]) )
+        if (isdigit((int) datestr[0]) && isdigit((int) datestr[1])
+         && isdigit((int) datestr[2]) && isdigit((int) datestr[3])
+         && isdigit((int) datestr[5]) && isdigit((int) datestr[6])
+         && isdigit((int) datestr[8]) && isdigit((int) datestr[9]) )
         {
             if (slen > 10 && datestr[10] != 'T')
             {
@@ -1176,8 +1203,9 @@ int ffs2tm(char *datestr,     /* I - date string: "YYYY-MM-DD"    */
 
         else if (datestr[10] == 'T' && datestr[13] == ':' && datestr[16] == ':')
         {
-          if (isdigit(datestr[11]) && isdigit(datestr[12]) && isdigit(datestr[14]) 
-           && isdigit(datestr[15]) && isdigit(datestr[17]) && isdigit(datestr[18]) )
+          if (isdigit((int) datestr[11]) && isdigit((int) datestr[12])
+           && isdigit((int) datestr[14]) && isdigit((int) datestr[15])
+           && isdigit((int) datestr[17]) && isdigit((int) datestr[18]) )
             {
                 if (slen > 19 && datestr[19] != '.')
                 {
@@ -1218,8 +1246,9 @@ int ffs2tm(char *datestr,     /* I - date string: "YYYY-MM-DD"    */
 
         if (datestr[2] == ':' && datestr[5] == ':')   /* time string */
         {
-            if (isdigit(datestr[0]) && isdigit(datestr[1]) && isdigit(datestr[3]) 
-            && isdigit(datestr[4]) && isdigit(datestr[6]) && isdigit(datestr[7]) )
+            if (isdigit((int) datestr[0]) && isdigit((int) datestr[1])
+             && isdigit((int) datestr[3]) && isdigit((int) datestr[4])
+             && isdigit((int) datestr[6]) && isdigit((int) datestr[7]) )
             {
                  /* this is a time string: "hh:mm:ss.dddd" */
                  if (hour)
@@ -2461,7 +2490,7 @@ int ffr2e(float fval,  /* I - value to be converted to a string */
             if ( !strchr(cval, '.') && strchr(cval,'E') )
             {
                 /* reformat value with a decimal point and single zero */
-                if ( sprintf(cval, "%.*1E", fval) < 0)
+                if ( sprintf(cval, "%.1E", fval) < 0)
                 {
                     ffpmsg("Error in ffr2e converting float to string");
                     *status = BAD_F2C;
@@ -2559,7 +2588,7 @@ int ffd2e(double dval,  /* I - value to be converted to a string */
             if ( !strchr(cval, '.') && strchr(cval,'E') )
             {
                 /* reformat value with a decimal point and single zero */
-                if ( sprintf(cval, "%.*1E", dval) < 0)
+                if ( sprintf(cval, "%.1E", dval) < 0)
                 {
                     ffpmsg("Error in ffd2e converting float to string");
                     *status = BAD_F2C;

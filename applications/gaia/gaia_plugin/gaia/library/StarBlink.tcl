@@ -115,12 +115,12 @@
 
 itk::usual StarBlink {}
 
-class gaia::StarBlink {
+itcl::class gaia::StarBlink {
 
    #  Inheritances:
    #  -------------
 
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

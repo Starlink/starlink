@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: Skycat.man3,v 1.3 1998/05/28 13:15:03 abrighto Exp $" 
+# "@(#) $Id: Skycat.man3,v 1.4 1998/11/27 13:40:57 abrighto Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -128,18 +128,20 @@ public:
 		   const char* label = NULL, const char* label_tags = NULL);
    
     int symbolCmd(int argc, char* argv[]);
+    int hduCmd(int argc, char* argv[]);
 
 };
 
 DESCRIPTION
 Class Skycat extends the RtdImage C++ class by adding methods for
-drawing symbols in an image based in world or image coordinates. Since
-the RtdImage class implements the rtdimage Tk image type, this class
-adds features to the rtdimage command as well.
+drawing symbols in an image based in world or image coordinates and by
+adding support for FITS tables and multiple FITS HDUs. Since the
+RtdImage class implements the rtdimage Tk image type, this class adds
+features to the rtdimage command as well.
 
-The methods defined here were originally implemented in Itcl and were
-later moved here to improve performance when plotting large numbers of
-symbols in an image.
+The symbol drawing methods defined here were originally implemented in
+Itcl and were later moved here to improve performance when plotting
+large numbers of symbols in an image.
 
 CONSTRUCTOR
 Skycat(interp, instname, argc, argv, master, imageType, specs, options)
@@ -287,7 +289,92 @@ symbolCmd(argc, argv)
 	orientation, for symbols that support it (i.e.: rotation is
 	relative to WCS north).
 
+
+hduCmd(argc, argv)
+	This method implements the "hdu" subcommand, to access
+	different FITS HDUs (header data units). Each HDU may be of
+	type "image", "binary" table or "ascii" table.
+	
+	 Usage: <path> hdu count
+	 or:    <path> hdu list
+	 or:    <path> hdu listheadings
+	 or:    <path> hdu type ?number?
+	 or:    <path> hdu headings ?$number?
+	 or:    <path> hdu get ?$number? ?$filename? ?$entry?
+	 or:    <path> hdu create $type $extname $headings $tform $data
+	 or:    <path> hdu delete $number
+	 or:    <path> hdu set $number
+	 or:    <path> hdu ?$number?
+	
+	If the "hdu count" subcommand is specified, it returns the
+	number of HDUs in the current image.
+	
+	The "hdu type" subcommand returns the type of the current or
+	given HDU as a string "ascii", "binary" or "image".
+	
+	If the "hdu list" subcommand is specified, it returns a Tcl
+	list of FITS HDU information of the form:
+	
+	  {{number type extname naxis naxis1 naxis2 naxis3 crpix1 
+	    crpix2} ...}
+	
+	Where: 
+	
+	  - number is the HDU number
+
+	  - type is the HDU type: one of "image", "binary table", 
+	    "ascii table".
+
+	  - extname is the value of the EXTNAME keyword, if set
+
+	  - naxis, naxis1, naxis2, naxis3 match the FITS keyword
+	    values.
+	
+	The "hdu listheadings" subcommand returns a list of the column
+	names returned by the "hdu list" subcommand. This can be used
+	to set the title of a table listing of the HDUs in a FITS
+	file.
+	
+	The "hdu headings" subcommand returns a list of the column
+	names in the current or given FITS table.
+	
+	The "hdu get" subcommand with no arguments returns the
+	contents of the current ASCII or binary table as a Tcl list (a
+	list of rows, where each row is a list of column values). If
+	the HDU number is given, the contents of the given HDU are
+	returned. If a filename argument is given, the FITS table is
+	written to the given file in the form of a local (tab
+	separated) catalog.  If optional "entry" argument is given, it
+	specifies the catalog config entry as a list of {{keyword
+	value} {keyword value} ...}, as defined in the catalog config
+	file (~/.skycat/skycat.cfg). The entry is written to the
+	header of the local catalog file and is used mainly to specify
+	plot symbol information for the catalog.
+	
+	The "hdu create" command creates a new FITS table in the
+	current image file. $type maye be "ascii" for an ASCII table
+	or "binary" for a binary FITS table. The name of the table is
+	given by extname. The table headings and data correspond to
+	the catalog headings and data. The tform argument is a list of
+	FITS storage formats, one for each column, of the form {16A 2D
+	12A ...} (similar to FORTRAN formats, see the FITS docs).
+	
+	The "hdu delete" command deletes the given HDU. The argument
+	is the HDU number. The other HDUs in the file following the
+	deleted one are moved to fill the gap.
+	
+	If the "hdu" subcommand is specified with no arguments, it
+	returns the current HDU number. If a number argument is given,
+	the current HDU is set to that number.
+	
+	The "hdu set" subcommand sets the current HDU to the given
+	number.  The keyword "set" is optional (see below).
+	
+	An optional numerical argument may be passed to the "hdu"
+	subcommand, in which case the "current HDU" is set to the
+	given number.
+
 SEE ALSO
-SkyCat(n), SkySearch(3), RtdImage(3), TkImage(3)
+SkyCat(n), SkySearch(3), RtdImage(3), TkImage(3), FitsIO(3)
 --------------------------------------------------------------------
 

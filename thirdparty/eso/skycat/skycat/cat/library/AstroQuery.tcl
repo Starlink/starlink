@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroQuery.tcl,v 1.15 1998/10/28 17:37:22 abrighto Exp $
+# @(#) $Id: AstroQuery.tcl,v 1.16 1998/11/20 14:19:35 abrighto Exp $
 #
 # AstroQuery.tcl - widget for searching astronomical catalogs.
 #
@@ -77,7 +77,7 @@ itcl::class cat::AstroQuery {
 		-side top -fill x
 
 	    pack \
-		[label $w_.options.head -text "Search Options"] \
+		[label $w_.options.head -text "Search Options" ] \
 		-side top -pady 2
 	}
 	if {[winfo exists $w_.options.f]} {

@@ -9,7 +9,7 @@
 /* global variables */
  
 #define FLEN_FILENAME 257  /* max length of a filename  */
-#define FLEN_KEYWORD    9  /* max length of a keyword */
+#define FLEN_KEYWORD   72  /* max length of a keyword (HIERARCH convention) */
 #define FLEN_CARD      81  /* length of a FITS header card */
 #define FLEN_VALUE     71  /* max length of a keyword value string */
 #define FLEN_COMMENT   73  /* max length of a keyword comment string */
@@ -204,6 +204,17 @@ typedef struct  /* structure for the iterator function column information */
 #define NO_MATCHING_DRIVER 124  /* matching driver is not registered */
 #define URL_PARSE_ERROR    125  /* failed to parse input file URL */
 
+#define	SHARED_ERRBASE	(150)
+#define	SHARED_BADARG	(SHARED_ERRBASE + 1)
+#define	SHARED_NULPTR	(SHARED_ERRBASE + 2)
+#define	SHARED_TABFULL	(SHARED_ERRBASE + 3)
+#define	SHARED_NOTINIT	(SHARED_ERRBASE + 4)
+#define	SHARED_IPCERR	(SHARED_ERRBASE + 5)
+#define	SHARED_NOMEM	(SHARED_ERRBASE + 6)
+#define	SHARED_AGAIN	(SHARED_ERRBASE + 7)
+#define	SHARED_NOFILE	(SHARED_ERRBASE + 8)
+#define	SHARED_NORESIZE	(SHARED_ERRBASE + 9)
+
 #define HEADER_NOT_EMPTY  201  /* header already contains keywords */
 #define KEY_NO_EXIST      202  /* keyword not found in header */
 #define KEY_OUT_BOUNDS    203  /* keyword record number is out of bounds */
@@ -331,9 +342,10 @@ int ffiurl(char *url,  char *urltype, char *infile,
 int ffrtnm(char *url, char *rootname, int *status);
 int ffourl(char *url, char *urltype, char *outfile, char *tmplfile,
             int *status);
-int ffexts(char *extspec, int *extnum,  char *extname,
-                       int *extvers, int *hdutype, int *status);
+int ffexts(char *extspec, int *extnum,  char *extname, int *extvers,
+          int *hdutype, char *colname, char *rowexpress, int *status);
 int ffextn(char *url, int *extension_num, int *status);
+int ffurlt(fitsfile *fptr, char *urlType, int *status);
 int ffbins(char *binspec, int *imagetype, int *haxis, 
                       char colname[4][FLEN_VALUE], double *minin,
                       double *maxin, double *binsizein,
@@ -377,6 +389,7 @@ int ffkeyn(char *keyroot, int value, char *keyname, int *status);
 int ffnkey(int value, char *keyroot, char *keyname, int *status);
 int ffdtyp(char *cval, char *dtype, int *status);
 int ffpsvc(char *card, char *value, char *comm, int *status);
+int ffgknm(char *card, char *name, int *length, int *status);
 int ffgthd(char *tmplt, char *card, int *hdtype, int *status);
 int ffasfm(char *tform, int *datacode, long *width, int *decim, int *status);
 int ffbnfm(char *tform, int *datacode, long *repeat, long *width, int *status);
@@ -866,7 +879,11 @@ int ffgcvm(fitsfile *fptr, int colnum, long firstrow, long firstelem,
          long nelem, double nulval, double *array, int *anynul, int *status);
 int ffgcx(fitsfile *fptr, int colnum, long firstrow, long firstbit,
             long nbits, char *larray, int *status);
- 
+int ffgcxui(fitsfile *fptr, int colnum, long firstrow, long nrows,
+            long firstbit, int nbits, unsigned short *array, int *status);
+int ffgcxuk(fitsfile *fptr, int colnum, long firstrow, long nrows,
+            long firstbit, int nbits, unsigned int *array, int *status);
+
 int ffgcfs(fitsfile *fptr, int colnum, long firstrow, long firstelem, long
           nelem, char **array, char *nularray, int *anynul, int *status);
 int ffgcfl(fitsfile *fptr, int colnum, long firstrow, long firstelem, long
@@ -1151,7 +1168,9 @@ int ffwldp(double xpix, double ypix, double xref, double yref,
 int ffxypx(double xpos, double ypos, double xref, double yref, 
            double xrefpix, double yrefpix, double xinc, double yinc,
            double rot, char *type, double *xpix, double *ypix, int *status);
-int ffiwcs(fitsfile *fptr,  void **wcs, int *status);
+
+/*  temporarily remove ffiwcs until full WCS support is added */
+/*  int ffiwcs(fitsfile *fptr,  void **wcs, int *status);     */
 
 /*--------------------- lexical parsing routines ------------------*/
 int fftexp( fitsfile *fptr, char *expr, int maxdim,
@@ -1161,6 +1180,8 @@ int fftexp( fitsfile *fptr, char *expr, int maxdim,
 int fffrow( fitsfile *infptr, char *expr,
 	    long firstrow, long nrows,
             long *n_good_rows, char *row_status, int *status);
+
+int ffffrw( fitsfile *fptr, char *expr, long *rownum, int *status);
 
 int fffrwc( fitsfile *fptr, char *expr, char *timeCol,    
             char *parCol, char *valCol, long ntimes,      

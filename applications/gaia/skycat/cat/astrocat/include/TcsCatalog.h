@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsCatalog.h,v 1.3 1997/09/30 15:54:43 abrighto Exp $
+ * $Id: TcsCatalog.h,v 1.4 1998/12/24 00:37:24 abrighto Exp $
  *
  * TcsCatalog.h - class specialized for accessing GSC, PPM or similar catalogs 
  *                for use by the TCS (Telescope Control Software).
@@ -32,7 +32,33 @@
 class TcsCatalog : public AstroCatalog {
 private:
 
-protected:
+public:
+    // Note: these two methods are inherited. We just need to redefine them here to avoid
+    // compiler warnings about hiding the parent versions.
+    
+    // Get the values for the specified columns for the object given by "id"
+    // in the catalog and return 0 if all is OK
+    virtual int getObject(
+	const char* id,		      // in  - object id in catalog 
+	int numCols,		      // in  - number of columns to get
+	char** colNames,              // in  - array of column names to read 
+	QueryResult& result) {	      // out - ref to object managing result 
+	return AstroCatalog::getObject(id, numCols, colNames, result);
+    }
+
+    // search for the star closest to the given position, with the magnitude in 
+    // the given range and return (via the last 2 args) the columns requested
+    // by "colNames"
+    virtual int searchClosestStar(
+	int numCols,		     // in  - number of columns to get
+	char** colNames,             // in  - array of column names to read 
+	const WorldOrImageCoords& pos,	     // in  - center position in world coordinates
+	double mag0,		     // in  - min magnitude 
+	double mag1,		     // in  - max magnitude 
+	QueryResult& result) {	     // out - ref to object managing result 
+	return AstroCatalog::searchClosestStar(numCols, colNames, pos, mag0, mag1, result);
+    }
+
 
 public:
     // constructor - create catalog class instance
@@ -64,13 +90,13 @@ public:
     // -- the interface for the next 2 methods is different for TCS --
 
     // Get the object given by "id" in the catalog and return 0 if all is OK
-    int getObject(
+    virtual int getObject(
 	const char* id,		      // in  - object id in catalog 
 	TcsCatalogObject& obj);	      // out - object for row, if found
     
     // search for the star closest to the given position, with the magnitude in 
     // the given range 
-    int searchClosestStar(
+    virtual int searchClosestStar(
 	const WorldCoords& pos,	     // in  - center position in world coordinates
 	double mag0,		     // in  - min magnitude 
 	double mag1,		     // in  - max magnitude 

@@ -19,7 +19,7 @@
 /*  by Jennings, Pence, Folk and Schlesinger. The development of the       */
 /*  grouping structure was partially funded under the NASA AISRP Program.  */ 
     
-#include "fitsio2.h"
+#include "fitsio.h"
 #include "group.h"
 #include <string.h>
 #include <stdlib.h>
@@ -30,6 +30,10 @@
 D. Jennings, 18/06/98, version 1.0 of group module delivered to B. Pence for
                        integration into CFITSIO 2.005
 
+D. Jennings, 17/11/98, fixed bug in ffgtcpr(). Now use fits_find_nextkey()
+                       correctly and insert auxiliary keyword records 
+		       directly before the TTYPE1 keyword in the copied
+		       group table.
 -----------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
@@ -3146,6 +3150,7 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
   int groupHDUnum  = 0;
   int numkeys      = 0;
   int keypos       = 0;
+  int startSearch  = 0;
   int newPosition  = 0;
 
   long nmembers    = 0;
@@ -3156,8 +3161,9 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
   char keyvalue[FLEN_VALUE];
   char card[FLEN_CARD];
 
-  char *excludeList[] ={"EXTNAME","EXTVER","GRPNAME","GRPID#","GRPLC#",
-			"THEAP","TDIM#","T????#"};
+  char *includeList[] = {"*"};
+  char *excludeList[] = {"EXTNAME","EXTVER","GRPNAME","GRPID#","GRPLC#",
+			 "THEAP","TDIM#","T????#"};
 
   fitsfile *mfptr = NULL;
 
@@ -3189,20 +3195,30 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
 
       /*
 	 copy all auxiliary keyword records from the original grouping table
-	 to the new grouping table; we attempt to write the keywords into
-	 the same position that they had in the original grouping table
+	 to the new grouping table; they are copied in their original order
+	 and inserted just before the TTYPE1 keyword record
       */
 
-      ffgrec(infptr,8,card,status);
+      *status = fits_read_card(outfptr,"TTYPE1",card,status);
+      *status = fits_get_hdrpos(outfptr,&numkeys,&keypos,status);
+      --keypos;
+
+      startSearch = 8;
 
       while(*status == 0)
 	{
+	  ffgrec(infptr,startSearch,card,status);
 
-	  *status = fits_find_nextkey(infptr,NULL,0,excludeList,nexclude,
-				      card,status);
-	  *status = fits_get_hdrpos(infptr,&numkeys,&keypos,status);
-	  
-	  *status = fits_insert_record(outfptr,keypos-1,card,status);
+	  *status = fits_find_nextkey(infptr,includeList,1,excludeList,
+				      nexclude,card,status);
+
+	  *status = fits_get_hdrpos(infptr,&numkeys,&startSearch,status);
+
+	  --startSearch;
+
+	  *status = fits_insert_record(outfptr,keypos,card,status);
+
+	  ++keypos;
 	}
 
       if(*status == KEY_NO_EXIST) 
@@ -3607,4 +3623,3 @@ void prepare_keyvalue(char *keyvalue) /* string containing keyword value     */
       for(i = length; i >= 0 && keyvalue[i] == ' '; --i) keyvalue[i] = '\0';
     }
 }
-

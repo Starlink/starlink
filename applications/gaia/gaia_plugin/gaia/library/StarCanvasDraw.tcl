@@ -57,7 +57,7 @@
 
 itk::usual StarCanvasDraw {}
 
-class gaia::StarCanvasDraw {
+itcl::class gaia::StarCanvasDraw {
 
    #  Inheritances:
    #  -------------

@@ -1,6 +1,6 @@
 #!/bin/sh
 # E.S.O. - VLT project/ ESO Archive 
-# "@(#) $Id: makelinks,v 1.1 1998/04/06 23:52:43 abrighto Exp $"
+# "@(#) $Id: makelinks,v 1.2 1998/12/23 12:33:18 abrighto Exp $"
 #
 # script to make some links used during development
 #
@@ -19,6 +19,7 @@ fi
 
 echo "making links in skycat/gaia/library..."
 cd gaia/library
+make index
 for i in demos 
 do
   rm -f $i

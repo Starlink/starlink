@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: tkCanvasPsImage.c,v 1.1 1998/06/19 14:45:17 abrighto Exp $" 
+ * "@(#) $Id: tkCanvasPsImage.c,v 1.2 1998/12/24 00:37:55 abrighto Exp $" 
  *
  * TkCanvasPsImage.C -  Implement Tk postscript output for images
  *
@@ -24,7 +24,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  19/06/98  Created
  */
-static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.1 1998/06/19 14:45:17 abrighto Exp $";
+static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.2 1998/12/24 00:37:55 abrighto Exp $";
 
 
 #include <stdio.h>
@@ -384,7 +384,7 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
     
      int i, result, ncolors;
      double x, y;
-     unsigned int width, height, depth;
+     int width, height, depth;
      Pixmap pmap;
      Colormap cmap;
      XImage *ximage;

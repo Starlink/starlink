@@ -115,7 +115,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     char irafchar;
     int n, ib, imu, pixoff, impixoff;
     int imndim, imphyslen, impixtype;
-    char *calloc_errchk();
+    /* char *calloc_errchk(); (allan: def was missing) */
 
     /* Set up last line of FITS header */
     (void)strncpy (endline,"END", 3);
@@ -141,7 +141,8 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     /*  Initialize FITS header */
     nblock = (nlines * 80) / 2880;
     *nbfits = (nblock + 3) * 2880;
-    fitsheader = calloc_errchk(*nbfits, 1, "FITS header");
+    /* fitsheader = calloc_errchk(*nbfits, 1, "FITS header"); (allan: def was missing) */
+    fitsheader = calloc(*nbfits, 1);
     fhead = fitsheader;
     lfhead = 0;
     (void)strncpy (fitsheader, endline, 80);

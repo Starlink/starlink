@@ -4,6 +4,14 @@ CHANGES to the "catlib" Catalog Interface Library
 This file contains a list of changes to the "catlib" libraries. 
 The latest changes are at the top.
 
+---------------  28.12.98 released catlib-3.3.1 ----------------------
+
+* Rebuild tclIndex file whenever configure is run, since Tcl8 version
+  is not compatible with tcl7 version (see makelinks script).
+
+* TcsCatalog.h: fixed problem with hidden virtual methods reported
+  by the sunpro CC compiler.
+
 ---------------  16.11.98 released catlib-3.3 ----------------------
 
 * Ported to tcl8.0.3 (still compatible with tcl7.6/tk4.2/BLT2.1)

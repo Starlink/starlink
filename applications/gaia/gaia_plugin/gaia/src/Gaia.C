@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ ESO Archive 
- * "@(#) $Id: Gaia.C,v 1.4 1998/04/20 20:23:26 abrighto Exp $"
+ * "@(#) $Id: Gaia.C,v 1.7 1999/02/03 20:14:54 abrighto Exp $"
  *
  * Gaia.C - Initialize Gaia Tcl package
  * 
@@ -8,7 +8,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  25 Mar 98  Created
  */
-static const char* const rcsId="@(#) $Id: Gaia.C,v 1.4 1998/04/20 20:23:26 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Gaia.C,v 1.7 1999/02/03 20:14:54 abrighto Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -34,9 +34,11 @@ extern "C" {
 // generated code for bitmaps used in tcl scripts
 void defineGaiaBitmaps(Tcl_Interp*);
 
+#ifdef linux
 #ifdef __GNUC__
 int xargc = 1;
 char* xargv[] = {"gaia", NULL};
+#endif
 #endif
 
 /*
@@ -45,8 +47,10 @@ char* xargv[] = {"gaia", NULL};
  */
 extern "C" int Gaia_Init( Tcl_Interp *interp )
 {
+#ifdef linux
 #ifdef __GNUC__
     f_init();
+#endif
 #endif
 
     // set up Tcl package
@@ -87,11 +91,6 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 	return TCL_ERROR;
     }
 
-    // create the namespaces used by the itcl/itk classes
-    // (This is just a convenience so you don't have to always call some init proc)
-    if (Tcl_Eval(interp, "namespace ::gaia {}; import add gaia") != 0)
-	return TCL_ERROR;
-
     // The gaia_library path can be found in several places.  Here is the order
     // in which the are searched.
     //		1) the variable may already exist
@@ -112,7 +111,24 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     char cmd[1048];
     sprintf(cmd, "lappend auto_path %s", libDir);
-    int status = Tcl_Eval(interp, cmd);
-    return status; 
+    if (Tcl_Eval(interp, cmd) != TCL_OK)
+	return TCL_ERROR; 
+
+    // set up the namespaces used by the itcl/itk classes
+    if (Tcl_Eval(interp, 
+#if (TCL_MAJOR_VERSION >= 8)
+		 "namespace eval gaia {namespace export *};"
+		 "namespace import -force gaia::*;"
+		 "package require Iwidgets;"
+		 "namespace import -force iwidgets::*;"
+#else
+		 "namespace ::gaia {}; import add gaia;"
+		 "package require Iwidgets;"
+		 "namespace ::iwidgets; import add ::iwidgets"
+#endif
+	) != TCL_OK)
+	return TCL_ERROR;
+
+    return TCL_OK; 
 }
 

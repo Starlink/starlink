@@ -1,10 +1,13 @@
 # ESO/Archive
-# $Id: Makefile.in,v 1.13 1998/10/30 18:17:49 abrighto Exp $
+# $Id: Makefile.in,v 1.17 1999/02/04 22:12:29 abrighto Exp $
 #
 # Component level Makefile
 
+# source dir used to build single binary
+SKYCAT_WRAPPER_DIR = @SKYCAT_WRAPPER_DIR@
+
 # directories to run make in
-SUBDIRS = interp @SKYCAT_WRAPPER_DIR@
+SUBDIRS = interp $(SKYCAT_WRAPPER_DIR)
 
 # this dir
 SRCDIR = @SRC_ROOT@
@@ -16,7 +19,7 @@ DEP_LIB_SUBDIRS	= $(SRCDIR)/interp
 LIBDIRS = interp
 
 # run "make clean" in these dirs
-CLEANDIRS = $(LIBDIRS) @SKYCAT_WRAPPER_DIR@
+CLEANDIRS = $(LIBDIRS) $(SKYCAT_WRAPPER_DIR)
 
 # names of master libraries to generate
 LIBRARY_a 	= libskycat.a
@@ -64,33 +67,42 @@ TCLTKLIBS = \
 
 # catalog lib
 CAT_LIB = @CAT_LIB@
+CAT_LIB_STATIC = @CAT_LIB_STATIC@
 
 # rtd lib
 RTD_LIB = @RTD_LIB@
+RTD_LIB_STATIC = @RTD_LIB_STATIC@
 
 # This flag is set to 1 by configure if a shared library should be made
 SHARED  = @SHARED@
 
 # Dependent libraries added to command line to build master shared library,
 # on systems where that is needed. 
-MASTER_DEP_LIBS = $(CAT_LIB) $(RTD_LIB) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS)
+MASTER_DEP_LIBS = $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS)
 
 # -------------------------------------------------------------------------
 # make all in subdirs and generate shared lib if needed
-all: sub master_lib
+all: src master_lib bin
 
-# make all in subdirs
-sub:
-	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) all) done
+# build local sources
+src: FORCE
+	(cd interp; echo "interp:"; $(MAKE) all)
+
+# make single binary version
+bin: FORCE
+	test -d "$(SKYCAT_WRAPPER_DIR)" \
+	  && (cd $(SKYCAT_WRAPPER_DIR); echo "$(SKYCAT_WRAPPER_DIR):"; $(MAKE) all)
 
 # generate master library
-master_lib:
+master_lib: FORCE
 	test -d tmp || mkdir tmp
 	@cd tmp ;\
 	 rm -f *.o ;\
 	 for i in $(DEP_LIB_SUBDIRS); do \
 	   cp `cat $$i/src/.objs` . ; \
 	 done ;\
+	 ar x $(CAT_LIB_STATIC) ;\
+	 ar x $(RTD_LIB_STATIC) ;\
 	 if test $(SHARED) -eq 1 ; then \
 	   echo "making master $(LIBRARY_sl) shared library" ;\
 	   test -f ../$(LIBRARY_sl) && chmod 755 ../$(LIBRARY_sl) ;\

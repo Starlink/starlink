@@ -58,7 +58,13 @@ typedef struct WordItem  {
   int resize;                 /* Scale font on scale */
   Tk_Anchor tkanchor;	      /* Where to anchor word relative to (x,y). */
   int anchor;                 /* Native anchor format */
+
+#if TK_MAJOR_VERSION >= 8
+  Tk_Font fontPtr;            /* Font used for drawing word (allan: 3.2.99: changed in tk8) */
+#else
   XFontStruct *fontPtr;       /* Font used for drawing word */
+#endif
+
   XColor *color;	      /* Word colour */
   Pixmap stipple;	      /* Stipple bitmap */
   GC GC;		      /* Graphics context for filling item. */
@@ -373,7 +379,14 @@ ConfigureWord(interp, canvas, itemPtr, argc, argv, flags)
   newGC = None;
   if ((wordPtr->color != NULL) && (wordPtr->fontPtr != NULL)) {
     gcValues.foreground = wordPtr->color->pixel;
+
+#if TK_MAJOR_VERSION >= 8
+    /* (allan: 3.2.99: changed for tk8) */
+    gcValues.font = Tk_FontId(wordPtr->fontPtr);
+#else
     gcValues.font = wordPtr->fontPtr->fid;
+#endif
+
     mask = GCForeground|GCFont;
     if (wordPtr->stipple != None) {
       gcValues.stipple = wordPtr->stipple;
@@ -482,10 +495,22 @@ ComputeWordBbox(canvas, wordPtr)
   int x1, y1, x2, y2;
   if ( wordPtr->word != NULL ) {
     XRotSetMagnification( wordPtr->scale );
+
+
+#if TK_MAJOR_VERSION >= 8
     bbox = XRotTextExtents(Tk_Display(Tk_CanvasTkwin(canvas)),
-                           wordPtr->fontPtr, wordPtr->angle,
+                           XQueryFont(Tk_Display(Tk_CanvasTkwin(canvas)), Tk_FontId(wordPtr->fontPtr)), 
+			   wordPtr->angle,
                            (int) wordPtr->x, (int) wordPtr->y, wordPtr->word,
                            wordPtr->anchor);
+#else
+    bbox = XRotTextExtents(Tk_Display(Tk_CanvasTkwin(canvas)),
+                           wordPtr->fontPtr, 
+			   wordPtr->angle,
+                           (int) wordPtr->x, (int) wordPtr->y, wordPtr->word,
+                           wordPtr->anchor);
+#endif
+
     if ( bbox != NULL ) {
       x1 = MIN( bbox[0].x, bbox[1].x );
       x1 = MIN( x1, bbox[2].x );
@@ -576,10 +601,28 @@ DisplayWord(canvas, itemPtr, display, drawable, x, y, width, height)
   /* Set the magnification factor */
   XRotSetMagnification( wordPtr->scale );
 
-  /* And draw the string */
-  XRotDrawAlignedString( display, wordPtr->fontPtr, wordPtr->angle,
-                         drawable, wordPtr->GC, drawableX, drawableY,
-                         wordPtr->word, wordPtr->anchor );
+  /* And draw the string (allan: 3.2.99: changed for tk8) */
+#if TK_MAJOR_VERSION >= 8
+  XRotDrawAlignedString( display, 
+                         XQueryFont(display, Tk_FontId(wordPtr->fontPtr)), 
+			 wordPtr->angle,
+                         drawable, 
+			 wordPtr->GC, 
+			 drawableX, 
+			 drawableY,
+                         wordPtr->word, 
+			 wordPtr->anchor );
+#else
+  XRotDrawAlignedString( display, 
+			 wordPtr->fontPtr, 
+			 wordPtr->angle,
+                         drawable, 
+			 wordPtr->GC, 
+			 drawableX, 
+			 drawableY,
+                         wordPtr->word, 
+			 wordPtr->anchor );
+#endif
 
   if (wordPtr->stipple != None) {
     XSetTSOrigin(display, wordPtr->GC, 0, 0);
@@ -831,6 +874,7 @@ WordToPostscript(interp, canvas, itemPtr, prepass)
     if (Tk_CanvasPsFont(interp, canvas, wordPtr->fontPtr) != TCL_OK) {
 	return TCL_ERROR;
     }
+
     if (Tk_CanvasPsColor(interp, canvas, wordPtr->color) != TCL_OK) {
 	return TCL_ERROR;
     }

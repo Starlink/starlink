@@ -1,16 +1,19 @@
 # ESO/Archive
-# $Id: Makefile.in,v 1.8 1998/05/20 19:24:53 abrighto Exp $
+# $Id: Makefile.in,v 1.16 1999/02/04 22:12:17 abrighto Exp $
 #
 # Component level Makefile
 
+# source dir used to build single binary
+GAIA_WRAPPER_DIR = @GAIA_WRAPPER_DIR@
+
 # directories to run make in
-SUBDIRS = gaia
+SUBDIRS = gaia $(GAIA_WRAPPER_DIR)
 
 # make libgaia.so from these dirs
 LIBDIRS = gaia
 
 # run "make clean" in these dirs
-CLEANDIRS = $(LIBDIRS)
+CLEANDIRS = $(LIBDIRS) $(GAIA_WRAPPER_DIR)
 
 # names of master libraries to generate
 LIBRARY_a 	= libgaia.a
@@ -98,19 +101,27 @@ SHARED  = @SHARED@
 
 # Dependent libraries added to command line to build master shared library,
 # on systems where that is needed. 
-MASTER_DEP_LIBS = $(SKYCAT_LIB) $(CAT_LIB) $(RTD_LIB) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) 
+MASTER_DEP_LIBS = $(SKYCAT_LIB) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) 
 
 # libraries for sources that belong in the shared library.
 MASTER_LIBS = $(SRCDIR)/gaia/lib/libgaia.a $(STAR_LIBS) $(EXTRA_LIBS)
 
+# OS version string for skjcat binary
+OSVERSION=@OSVERSION@
+
 # -------------------------------------------------------------------------
 
 # make all in subdirs and generate shared lib if needed
-all: sub master_lib gaia_plugin
+all: src master_lib bin gaia_plugin
 
-# make all in subdirs
-sub:
-	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) all) done
+# build local sources
+src: FORCE
+	(cd gaia; echo "gaia:"; $(MAKE) all)
+
+# make single binary version
+bin: FORCE
+	-test -d "$(GAIA_WRAPPER_DIR)" \
+	  && (cd $(GAIA_WRAPPER_DIR); echo "$(GAIA_WRAPPER_DIR):"; $(MAKE) all)
 
 # generate master library
 master_lib:
@@ -132,12 +143,17 @@ master_lib:
 	   (cd ../gaia; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
 	 fi ;\
 	 echo "making master $(LIBRARY_a) library" ;\
-	 rm -f ../$(LIBRARY_a) ;\
-	 $(AR) ../$(LIBRARY_a) *.o ;\
+	 cp $(SRCDIR)/gaia/lib/libgaia.a ../$(LIBRARY_a) ;\
 	 $(RANLIB) ../$(LIBRARY_a) ;\
 	 rm -f *.o
 
 # set up a plugin dir for testing the gaia plugin
+#
+# Note: The gaia plugin also needs libskycat.sl on HP-UX.
+#
+# Note: In order to be complete, the plugin dir should also contain the
+#  convert and pbmplus (netpbm for HP) binaries. These are added later
+# by a release script.
 plugin gaia_plugin: FORCE
 	if test $(SHARED) -eq 1 ; then \
 	  rm -rf gaia_plugin ;\
@@ -150,14 +166,19 @@ plugin gaia_plugin: FORCE
 	  cp gaia/bin/gaia_tcl gaia_plugin/atclsh; strip gaia_plugin/atclsh ;\
 	  cp gaia/bin/ardstat* gaia_plugin; strip gaia_plugin/ardstat ;\
 	  cp gaia/bin/autocrop* gaia_plugin; strip gaia_plugin/autocrop  ;\
-	  (cd gaia_plugin; ln -s . demos) ;\
+	  (cd gaia_plugin; ln -s . demos; ln -s . bin; ln -s . convert) ;\
 	  cp $(LIBRARY_sl) gaia_plugin ;\
+	  test -f ../../skycat/libskycat.sl && cp ../../skycat/libskycat.sl gaia_plugin ;\
+	  test -f ../../skycat/libskycat.so && cp ../../skycat/libskycat.so gaia_plugin ;\
 	  sed -e 's/\[file dirname \$dir\]/$dir/' \
 	     < gaia/library/pkgIndex.tcl \
 	     > gaia_plugin/pkgIndex.tcl ;\
+	  sed -e "s/^skycat=skycat.*/skycat=skycat-$(OSVERSION)/" \
+	     < gaia/demos/skycatgaia.sh \
+	     > gaia_plugin/skycatgaia ;\
+	  chmod 755 gaia_plugin/skycatgaia ;\
 	  (cd $(TCL_LIBRARY)/..; tar cf - `basename $(TCL_LIBRARY)` iwidgets* \
 	       | (cd $(SRCDIR)/gaia_plugin; tar xf -)) ;\
-	  cp $(STAR_BIN)/gaiapack/* gaia_plugin; strip gaia_plugin/ardmask; strip gaia_plugin/autophotom;\
 	fi
 
 # for quick tests

@@ -297,6 +297,8 @@ FCALLSCSUB9(ffgcvm,FTGCVM,ftgcvm,FITSUNIT,INT,LONG,LONG,LONG,DOUBLE,DOUBLEV,PLOG
 
 #define ftgcx_LOGV_A6 A5
 FCALLSCSUB7(ffgcx,FTGCX,ftgcx,FITSUNIT,INT,LONG,LONG,LONG,LOGICALV,PINT)
+FCALLSCSUB8(ffgcxui,FTGCXI,ftgcxi,FITSUNIT,INT,LONG,LONG,LONG,INT,SHORTV,PINT)
+FCALLSCSUB8(ffgcxuk,FTGCXJ,ftgcxj,FITSUNIT,INT,LONG,LONG,LONG,INT,INTV,PINT)
 
 /*   To guarantee that we allocate enough memory to hold strings within
      a table, call FFGTCL first to obtain width of the unique string

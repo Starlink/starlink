@@ -158,11 +158,11 @@
 
 itk::usual StarAstGrid {}
 
-class gaia::StarAstGrid {
+itcl::class gaia::StarAstGrid {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -1276,11 +1276,12 @@ class gaia::StarAstGrid {
       }
       pack $itk_component(label1) -side top -fill x -ipadx 1m -ipady 1m
       foreach {sname lname} $labelattrib_ {
+	 set label_($this,$sname) ""
          itk_component add Label$sname {
             LabelEntry $parent.label$sname \
                -text "$lname:" \
                -labelwidth 8 \
-               -textvariable [scope label_($this,$sname)] \
+               -textvariable [ scope label_($this,$sname) ] \
                -command [code $this redraw_]
          }
          pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
@@ -1709,8 +1710,11 @@ class gaia::StarAstGrid {
    #  Short and long names of any labels that can be modified.
    protected variable labelannounce_ \
       {Plot labels:}
+
+   # allan: 2.2.99: changed from "{title {Main Title} {label(1)} {X Axis} {label(2)} {Y Axis}}"
+   # to avoid tcl8 problems with scope command later on...
    protected variable labelattrib_ \
-      {title {Main Title} {label(1)} {X Axis} {label(2)} {Y Axis}}
+      {title {Main Title} {label1} {X Axis} {label2} {Y Axis}}
 
    #  Short and long names of format elements that control the
    #  way numbers are plotted along the axes.

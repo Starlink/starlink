@@ -39,6 +39,7 @@
 /* this shoulf be C++ compliant, thanks to 
      vlp@latina.inesc.pt (Vasco Lopes Paulo) */
 
+#undef EXTERN /* allan: conflict with tcl.h */
 #if defined(__cplusplus) || defined(c_plusplus)
 #define EXTERN extern "C"
 #else

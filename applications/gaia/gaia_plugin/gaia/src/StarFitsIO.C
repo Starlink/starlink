@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: StarFitsIO.C,v 1.3 1998/06/25 13:29:54 abrighto Exp $" 
+ * "@(#) $Id: StarFitsIO.C,v 1.5 1998/12/02 23:53:34 abrighto Exp $" 
  *
  * StarFitsIO.C - method definitions for class StarFitsIO, for operating on
  *                Fits files. This class redefines class FitsIO to keep the
@@ -12,7 +12,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  24/03/95  Created
  */
-static const char* const rcsId="@(#) $Id: StarFitsIO.C,v 1.3 1998/06/25 13:29:54 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: StarFitsIO.C,v 1.5 1998/12/02 23:53:34 abrighto Exp $";
 
 #include <netinet/in.h>
 #include <string.h>
@@ -59,7 +59,7 @@ StarFitsIO* StarFitsIO::read(const char* filename, int mem_options)
     // if the file is read-only and read-write access was requested, read
     // the file into memory rather than returning an error.
     int roflag = 0;
-    if (mem_options && Mem::FILE_RDWR && access(filename, W_OK) != 0) {
+    if ((mem_options & Mem::FILE_RDWR) && access(filename, W_OK) != 0) {
 	roflag++;
 	mem_options = 0;
     }
@@ -103,6 +103,8 @@ StarFitsIO* StarFitsIO::read(const char* filename, int mem_options)
 int StarFitsIO::write(const char *filename) const
 {
     FitsIO fits(width_, height_, bitpix_, bzero_, bscale_, header_, data_);
+    if (fits.status() != 0)
+	return 1;   // error
 
     // byte swap the data
     if (fits.byteSwapData() != 0)

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CanvasDraw.tcl,v 1.19 1998/10/28 17:46:35 abrighto Exp $"
+# "@(#) $Id: CanvasDraw.tcl,v 1.20 1998/11/20 14:20:14 abrighto Exp $"
 #
 # CanvasDraw.tcl - Add interactive drawing capabilities to a Tk canvas.
 #
@@ -84,11 +84,6 @@ itcl::class util::CanvasDraw {
 	add_short_help $itk_component(clear) "Clear all line graphics"
 	add_short_help $itk_component(delete) "Delete selected line graphic objects"
 
-	# add short help for canvas objects
-	#set msg "Canvas object: {bitmap b1} = select object, {bitmap dragb1} = move object"
-	#$canvas_ bind $w_.objects <Enter> "+[code $short_help_win_ short_help $msg]"
-	#$canvas_ bind $w_.objects <Leave> "+[code $short_help_win_ short_help {}]"
-
 	# short help for selection grips
 	if {$itk_option(-withrotate)} {
 	    set msg "Selection grips: {bitmap dragb1} = resize object, \
@@ -97,7 +92,7 @@ itcl::class util::CanvasDraw {
 	    set msg "Selection grips: {bitmap dragb1} = resize object"
 	}
 	$canvas_ bind grip <Enter> "+[code $short_help_win_ short_help $msg]"
-	$canvas_ bind grip <Leave> "+[code $short_help_win_ short_help {}]"
+	$canvas_ bind grip <Leave> "+[code $short_help_win_ short_help {} ]"
     }
 
     
@@ -215,7 +210,7 @@ itcl::class util::CanvasDraw {
 	$m.fill add radiobutton \
 	    -variable $w_.fill -value "" \
 	    -label None \
-	    -command [code $this set_fillcolor {}]
+	    -command [code $this set_fillcolor {} ]
 	foreach i $itk_option(-colors) {
 	    $m.fill add radiobutton \
 		-variable $w_.fill -value $i \
@@ -233,7 +228,7 @@ itcl::class util::CanvasDraw {
 	$m.outline add radiobutton \
 	    -variable $w_.outline -value "" \
 	    -label None \
-	    -command [code $this set_outlinecolor {}]
+	    -command [code $this set_outlinecolor {} ]
 
 	# Stipple  menu
 	for {set i 0} {$i < 16} {incr i} {
@@ -400,7 +395,7 @@ itcl::class util::CanvasDraw {
 	# fill  menu
 	$f.fill add \
 	    -label None \
-	    -command [code $this set_fillcolor {}] \
+	    -command [code $this set_fillcolor {} ] \
 	    -background [. cget -background]
 	foreach i $itk_option(-colors) {
 	    $f.fill add \
@@ -422,7 +417,7 @@ itcl::class util::CanvasDraw {
 	}
 	$f.outline add \
 	    -label None \
-	    -command [code $this set_outlinecolor {}] \
+	    -command [code $this set_outlinecolor {} ] \
 	    -background [. cget -background]
 	set $w_.outline white
 	add_short_help $f.outline "set the outline color for drawing"
@@ -610,7 +605,7 @@ itcl::class util::CanvasDraw {
 	set drawing_mode_ [set $w_.mode $type]
 	set create_cmd_ $create_cmd
 
-	set drawing_ [expr {"$type" != "objselect" && "$type" != "anyselect"}]
+	set drawing_ [expr {"$type" != "objselect" && "$type" != "anyselect"} ]
 	if {$drawing_} {
 	    deselect_objects
 	    $canvas_ config -cursor $itk_option(-drawcursor)
@@ -1027,7 +1022,7 @@ itcl::class util::CanvasDraw {
 
 	    $canvas_ bind $sel_id <Any-Enter> \
 		[list $canvas_ config \
-		     -cursor "$cursors_($side) white black"]
+		     -cursor "$cursors_($side) white black" ]
 
 	    $canvas_ bind $sel_id <Any-Leave> [code $this reset_cursor]
 
@@ -1114,7 +1109,7 @@ itcl::class util::CanvasDraw {
 		       "se $x1 $y1" \
 		       "s $xm $y1" \
 		       "sw $x0 $y1" \
-		       "w $x0 $ym"] {
+		       "w $x0 $ym" ] {
 	    lassign $i side x y 
 	    $canvas_ coords grip.$id.$side \
 		[expr $x-$w] [expr $y-$w] \
@@ -1132,7 +1127,7 @@ itcl::class util::CanvasDraw {
 	set w [expr $itk_option(-gripwidth)/2]
 	foreach i [list \
 		       "e $x0 $y0" \
-		       "w $x1 $y1"] {
+		       "w $x1 $y1" ] {
 	    lassign $i side x y 
 	    $canvas_ coords grip.$id.$side \
 		[expr $x-$w] [expr $y-$w] \

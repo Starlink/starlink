@@ -77,7 +77,7 @@
 
 itk::usual GaiaImageSpectrum {}
 
-class gaia::GaiaImageSpectrum {
+itcl::class gaia::GaiaImageSpectrum {
    inherit rtd::RtdImageSpectrum
 
    #  Constructor: create a new instance of this class. Note we need

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImage.tcl,v 1.53 1998/10/30 18:17:24 abrighto Exp $"
+# "@(#) $Id: RtdImage.tcl,v 1.54 1998/12/03 22:11:09 abrighto Exp $"
 #
 # RtdImage.tcl - itcl widget wrapper for the rtdimage type extension
 #
@@ -107,6 +107,7 @@ itcl::class rtd::RtdImage {
     destructor {
 	catch {$itk_component(draw) deselect_objects}
 	catch {$canvas_ delete $image_}
+	catch {image delete $image_}
     }
     
     

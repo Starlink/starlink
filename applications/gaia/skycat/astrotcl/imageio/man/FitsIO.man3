@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: FitsIO.man3,v 1.3 1998/03/29 20:26:27 abrighto Exp $" 
+# "@(#) $Id: FitsIO.man3,v 1.5 1998/11/27 13:41:21 abrighto Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -21,17 +21,20 @@ class FitsIO : public ImageIORep {
 ...
 public:
     FitsIO(int width, int height, int bitpix, double bzero, 
-	   double bscale, const Mem& header, const Mem& data);
-
-    ~FitsIO() {}
+	   double bscale, const Mem& header, const Mem& data,
+	   fitsfile* fitsio = NULL);
+    ~FitsIO();
 
     int wcsinit();
-
     int nativeByteOrder() const;
     const char* classname() const;
 
     static FitsIO* read(const char* filename, int memOptions = 0);
     int write(const char *filename) const;
+
+    static const char* check_compress(const char* filename, char* buf, int bufsz, 
+				      int& istemp, int decompress_flag = 1, 
+				      int bitpix = 0);
 
     static FitsIO* initialize(Mem& header);
     static FitsIO* initialize(Mem& header, Mem& data);
@@ -43,28 +46,51 @@ public:
     int get(const char* keyword, double& val) const;
     int get(const char* keyword, float& val) const;
     int get(const char* keyword, int& val) const;
+    int get(const char* keyword, long& val) const;
+    int get(const char* keyword, unsigned char& val) const;
+    int get(const char* keyword, unsigned short& val) const;
+    int get(const char* keyword, short& val) const;
     char* get(const char* keyword) const;
+    char* get(const char* keyword, char* buf, int bufsz) const;
 
-    static int get(const Mem& header, const char* keyword, double& val);
-    static int get(const Mem& header, const char* keyword, float& val);
-    static int get(const Mem& header, const char* keyword, int& val);
-    static char* get(const Mem& header, const char* keyword);
+    static int get(fitsfile*, const char* keyword, double& val);
+    static int get(fitsfile*, const char* keyword, float& val);
+    static int get(fitsfile*, const char* keyword, int& val);
+    static int get(fitsfile*, const char* keyword, long& val);
+    static int get(fitsfile*, const char* keyword, unsigned char& val);
+    static int get(fitsfile*, const char* keyword, unsigned short& val);
+    static int get(fitsfile*, const char* keyword, short& val);
+    static char* get(fitsfile*, const char* keyword);
 
     int getFitsHeader(ostream& os) const;
 
-    int put(const char* keyword, double val, const char* comment);
-    int put(const char* keyword, float val, const char* comment);
-    int put(const char* keyword, int val, const char* comment);
-    int put(const char* keyword, const char* val, const char* comment);
+    int put(const char* keyword, double val, const char* comment = NULL);
+    int put(const char* keyword, float val, const char* comment = NULL);
+    int put(const char* keyword, int val, const char* comment = NULL);
+    int put(const char* keyword, const char* val, const char* comment = NULL);
+
+    int getNumHDUs();
+    const char* getHDUType();
+    int getHDUNum();
+    int setHDU(int num);
+    int deleteHDU(int num);
+
+    int getTableDims(long& rows, int& cols);
+    char* getTableHead(int col);
+    char* getTableValue(long row, int col);
+    int getTableColumn(int col, double* values, int numValues);
+    int createTable(const char* extname, long rows, int cols,
+    int setTableValue(long row, int col, const char* value);
 };
 
 
 DESCRIPTION
-This class handles the reading and writing of FITS images and access
-to the FITS header and keywords. It is based in part on the saoimage
-routines in the wcslib directory. Currently the reading and writing is
-implemented in this class, but that may be replaced by a standard FITS
-I/O package in the future. 
+This class manages the reading and writing of FITS images, including
+ASCII and binary tables, FITS headers and keywords. FITS file access
+is based on William Pence's CFITSIO package.  World coordinates
+support is based on Doug Mink's WCSSUBS package (also used by
+saoimage). The sources from both packages are included in this
+package.
 
 This class is a subclass of ImageIORep, which is the internal class
 used by class ImageIO for reference counting. The public interface is
@@ -94,6 +120,28 @@ Images are compressed and decompressed automatically by the read and
 write methods based on the file name suffix: ".hfits" for H-compress,
 ".gzfits" or ".gfits" for gzip compression, and ".cfits" for UNIX
 compression. See Compress for details.
+
+IMAGE EXTENSIONS
+Methods are provided to query the number of FITS HDUs (header data
+units) and switch to a given HDU. You can iterate through a FITS table
+by first switching to the HDU containing the table and then calling
+one of the HDU methods described below. When switching HDUs, make sure
+that the image display code is not still accessing a different HDU.
+It might be necessary to save the current HDU number before reading a
+FITS table and then restore the HDU settings afterwards in this case.
+
+FITS TABLES
+Reading and writing of FITS ASCII and binary tables is supported.
+FITS tables may also be created and deleted. (Note this class does not
+support the full functionality of the cfitsio library (yet), but only
+the features that we needed so far.)
+
+WRITING FITS IMAGES
+Care must be taken when modifying FITS image files used with the
+FitsIO class, since the files are memory mapped. When using the
+"put()" method to insert FITS keywords, the FitsIO class automatically
+handles adding new FITS blocks as needed and remapping the file. This
+may change the starting location of the FITS image data or extensions.
 
 METHODS
 FitsIO(width, height, bitpix, bzero, bscale, header,  data)
@@ -141,8 +189,60 @@ put(keyword, val, comment)
 	enough space in the FITS header, extend the size of the FITS
 	header by one header block and if the header is part of an
 	mmap'ed file, rewrite the file with the new enlarged
-	header. This creates a temp file in the same dir as the file
-	called <file>.tmp.
+	header. 
+
+getNumHDUs()
+	Return the total number of HDUs (FITS header/data units).
+
+getHDUType()
+	Return the type of the current HDU as a string: "image",
+	"ascii", or "binary" or NULL if there was as error.
+
+getHDUNum()
+	Return the index of the current HDU.
+
+setHDU(num)
+	Move to the specified HDU and make it the current one.
+
+deleteHDU(num);
+    	Delete the given HDU. All following HDUs are moved to fill the
+    	space.
+
+getTableDims(rows, cols)
+	Get the dimensions of the current FITS table.
+
+getTableHead(col);
+	Return the table heading for the given column, or NULL if
+	there is an error. The return value points to static
+	storage.
+
+getTableValue(row, col)
+	Return the value in the current FITS table at the given row
+	and column, or NULL if there was an error.  The returned
+	pointer points to static storage and will be overwritten on
+	the next call to this method or one of the get(keyword)
+	methods.
+
+getTableColumn(col, values, numValues)
+	Get the contents of the given column as an array of doubles.
+	The caller should pass an array of numValues doubles.
+
+createTable(extname, rows, cols, headings, tform, asciiFlag)
+	Create a FITS table and make it the current HDU
+
+	extname gives the name of the table.
+
+	The initial size will be rows x cols entries.
+
+	tform is an array giving the FITS data type for each column
+	(For example: 16A, for a 16 char string, see FITS description.)
+
+	If asciiFlag is 1, an ASCII table is created, otherwise a
+	binary table.
+
+setTableValue(row, col, value)
+	Set the value in the current FITS table at the given row and
+	column (For now, all data types are treated as strings)
 
 SEE ALSO
 ImageIO(3++), ImageData, Mem(3C++), Compress(3C++)

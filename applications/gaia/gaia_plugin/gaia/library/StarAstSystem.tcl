@@ -57,12 +57,12 @@
 
 itk::usual StarAstSystem {}
 
-class gaia::StarAstSystem {
+itcl::class gaia::StarAstSystem {
 
    #  Inheritances:
    #  -------------
 
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

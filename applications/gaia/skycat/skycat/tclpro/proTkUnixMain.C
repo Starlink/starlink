@@ -33,8 +33,6 @@ extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);
 extern int Tclx_Init(Tcl_Interp *interp);
 
-extern int Rtd_Init(Tcl_Interp *interp);
-extern int Cat_Init(Tcl_Interp *interp);
 extern int Skycat_Init(Tcl_Interp *interp);
 }
 
@@ -184,18 +182,6 @@ ProTclAppInit(Tcl_Interp* interp)
 	|| !Tcl_SetVar2(interp, "::env", "SKYCAT_LIBRARY", "interp/library", TCL_LEAVE_ERR_MSG)) {
         return TCL_ERROR;
     }
-
-    // install the Cat package 
-    if (Cat_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Cat", Cat_Init, (Tcl_PackageInitProc *) NULL);
-
-    // install the Rtd package 
-    if (Rtd_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Rtd", Rtd_Init, (Tcl_PackageInitProc *) NULL);
 
     // install the Skycat package 
     if (Skycat_Init(interp) == TCL_ERROR) {

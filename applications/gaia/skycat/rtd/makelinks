@@ -1,6 +1,6 @@
 #!/bin/sh
 # E.S.O. - VLT project 
-# "@(#) $Id: makelinks,v 1.3 1997/04/11 10:47:20 abrighto Exp $"
+# "@(#) $Id: makelinks,v 1.4 1998/12/23 12:33:24 abrighto Exp $"
 #
 # script to make some links used during development
 #
@@ -20,6 +20,7 @@ fi
 
 echo "making links in rtd/rtdimg/library..."
 cd rtdimg/library
+make index
 for i in demos colormaps images
 do
   rm -f $i

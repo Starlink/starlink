@@ -55,7 +55,7 @@
 
 #.
 
-class gaia::StarCanvasObject {
+itcl::class gaia::StarCanvasObject {
 
    #  Inheritances:
    #  -------------

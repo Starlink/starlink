@@ -35,7 +35,7 @@ itcl::class util::DoubleTableList {
 	pack [frame $w_.arrows -bd 1m] \
 		-side left -fill y -ipadx 0.5m
 
-	pack [label $w_.arrows.fill -text " "] \
+	pack [label $w_.arrows.fill -text " " ] \
 		-side top -fill x
 
 	pack [button $w_.arrows.right \

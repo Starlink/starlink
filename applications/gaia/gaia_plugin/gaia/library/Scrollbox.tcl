@@ -132,7 +132,7 @@
 #-
 itk::usual Scrollbox {}
 
-class gaia::Scrollbox {
+itcl::class gaia::Scrollbox {
 
    #  Inheritances:
    inherit util::FrameWidget

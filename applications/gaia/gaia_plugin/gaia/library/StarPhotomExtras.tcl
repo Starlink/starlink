@@ -116,11 +116,11 @@
 #.
 itk::usual StarPhotomExtras {}
 
-class gaia::StarPhotomExtras {
+itcl::class gaia::StarPhotomExtras {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

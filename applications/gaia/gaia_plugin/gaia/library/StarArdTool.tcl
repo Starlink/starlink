@@ -151,6 +151,8 @@
 #        Converted to itcl2.0.
 #     24-Mar-1998 (ALLAN)
 #        There was a conflict with an rtd bitmap named "rect", use "rectangle"
+#     4-FEB-1999 (ALLAN)
+#        Added [code ...] to object_list_ for correct scope in tcl8
 #
 #     {enter_further_changes_here}
 
@@ -158,7 +160,7 @@
 
 #.
 
-class gaia::StarArdTool {
+itcl::class gaia::StarArdTool {
 
    #  Inheritances:
    #  -------------
@@ -173,14 +175,15 @@ class gaia::StarArdTool {
       eval configure $args
 
       #  Create the StarArdList object to deal with the ARD objects.
-      set object_list_ [gaia::${routine_prefix}List \#auto \
-                           -canvasdraw $canvasdraw \
-                           -canvas $canvas \
-                           -rtdimage $rtdimage \
-                           -notify_created_cmd [code $this created_object_] \
-                           -selected_colour $selected_colour \
-                           -deselected_colour $deselected_colour \
-                           -continuous_updates $continuous_updates]
+      # (allan: 4.2.99: added "code" for correct scope in tcl8)
+      set object_list_ [code [gaia::${routine_prefix}List \#auto \
+				  -canvasdraw $canvasdraw \
+				  -canvas $canvas \
+				  -rtdimage $rtdimage \
+				  -notify_created_cmd [code $this created_object_] \
+				  -selected_colour $selected_colour \
+				  -deselected_colour $deselected_colour \
+				  -continuous_updates $continuous_updates]]
    }
 
    #  Destructor:

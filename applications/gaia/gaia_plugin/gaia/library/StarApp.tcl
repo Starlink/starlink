@@ -121,7 +121,7 @@
 
 #.
 
-class gaia::StarApp {
+itcl::class gaia::StarApp {
 
    #  Inheritances:
    #  -------------
@@ -144,7 +144,7 @@ class gaia::StarApp {
       }
 
       #  Create the command queue.
-      set command_queue_ [Queue \#auto]
+      set command_queue_ [gaia::Queue \#auto]
 
       #  And evaluate any configuration options.
       if { $args != {} } {

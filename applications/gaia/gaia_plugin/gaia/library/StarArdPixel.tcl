@@ -58,12 +58,12 @@
 
 #.
 
-class gaia::StarArdPixel {
+itcl::class gaia::StarArdPixel {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdPrim
+   inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------

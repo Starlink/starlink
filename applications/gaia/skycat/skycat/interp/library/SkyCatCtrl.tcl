@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: SkyCatCtrl.tcl,v 1.32 1998/11/17 15:23:49 abrighto Exp $
+# $Id: SkyCatCtrl.tcl,v 1.37 1998/12/14 17:32:07 abrighto Exp $
 #
 # SkyCatCtrl.tcl - image display widget with catalog extensions
 #
@@ -118,24 +118,12 @@ itcl::class skycat::SkyCatCtrl {
 
     protected method new_image_cmd {} {
  	RtdImageCtrl::new_image_cmd
+	
+	# display HDU list, if there are multiple HDUs
+	update_fits_hdus
 
-	if {[catch {set n [$image_ hdu count]}]} {
-	    set n 0
-	}
-
-	# display and hide window automatically as needed
-	if {[winfo exists $w_.hdu]} {
-	    if {$n > 1} {
-		$w_.hdu show_hdu_list
-	    } else {
-		after 0 "destroy $w_.hdu"
-	    }
-	} else {
-	    # if there is more than one HDU, display the HDU select window
-	    if {$n > 1} {
-		display_fits_hdus
-	    }
-	}
+	# check for saved line graphics
+	after idle [code $this load_graphics_from_image]
     }
 
     
@@ -146,6 +134,29 @@ itcl::class skycat::SkyCatCtrl {
 	    -image $this \
 	    -center 0 \
 	    -transient 0
+    }
+
+
+    # Update the popup window listing the HDUs in the current image
+
+    public method update_fits_hdus {} {
+	if {[catch {set n [$image_ hdu count]}]} {
+	    set n 0
+	}
+
+	# display and hide window automatically as needed
+	if {[winfo exists $w_.hdu]} {
+	    if {$n > 1} {
+		after idle [code $w_.hdu show_hdu_list]
+	    } else {
+		after idle "destroy $w_.hdu"
+	    }
+	} else {
+	    # if there is more than one HDU, display the HDU select window
+	    if {$n > 1} {
+		display_fits_hdus
+	    }
+	}
     }
 
     
@@ -167,16 +178,22 @@ itcl::class skycat::SkyCatCtrl {
     protected method check_save {} {
 	if {"$filename_" != ""} {
 	    if {! [file exists $filename_] && ! [$image_ isclear]} {
-		if {[confirm_dialog \
-			 "Do you want to save the current image to a file\
-                          and add it to the history list first before loading\
-                          a new one?" $w_]} {
-		    save_as
-		} else {
+		# XXX this doesn't always work as expected...
+		#
+		#set s [choice_dialog \
+		#	   "Do you want to save the current image to a file\
+                #            and add it to the history list first before loading\
+                #           a new one?" \
+		#	   {Yes No} \
+		#	   {No} \
+		#	   $w_]
+		#if {"$s" == "Yes"} {
+		#    save_as
+		#} else {
 		    # don't add to history
 		    set filename_ $itk_option(-file)
 		    return
-		}
+		#}
 	    }
 	    add_history $filename_
 	}
@@ -211,6 +228,173 @@ itcl::class skycat::SkyCatCtrl {
 	    set filename_ $file
 	}
 	return $file
+    }
+
+
+    # convert the given coordinates from $from_units to $to_units and return 
+    # the result. $coords may be a list of an even number of values 
+    # {x1 y1 x2 y2 x3 y3 ...}. The result is the same list, converted to the 
+    # output coordinates.
+
+    public method convert_coords {coords from_units to_units} {
+	set result {}
+	set len [llength $coords]
+	for {set i 0} {$i < $len} {incr i 2} {
+	    set ix [lindex $coords $i]
+	    set iy [lindex $coords [expr $i+1]]
+	    $image_ convert coords $ix $iy $from_units x y $to_units
+	    lappend result $x $y
+	}
+	return $result
+    }
+
+
+    # Save the current line graphics in a FITS binary table in the image.
+    # The table has 3 columns: "type", "coords", and "config". 
+    # "type" gives the shape and is one of the Tk canvas item types.
+    # "coords" is a list of coordinates for the item.
+    # "config" is a Tcl list of configuration options for the item.
+    # There can be one graphics table for each image extension. For each
+    # image extension, the graphics table is called "${extname}.GRAPHICS".
+
+    public method save_graphics_with_image {} {
+	busy {
+	    save_graphics_with_image_
+	}
+    }
+    public method save_graphics_with_image_ {} {
+	# deselect any objects
+	$w_.draw deselect_objects
+
+	# table headings
+	set headings {type coords config}
+	
+	# table data
+	set info {}
+	
+	# max table column widths
+	set width(type) 0
+	set width(coords) 0
+	set width(config) 0
+	
+	# loop through the canvas items
+	foreach item [$canvas_ find all] {
+	    set type [$canvas_ type $item]
+	    if {"$type" == "image"} {
+		continue
+	    }
+	    # get item coords and convert from canvas to image coords
+	    set coords [convert_coords [$canvas_ coords $item] canvas image]
+
+	    # add a special tag to this item so we can delete it before reloading it
+	    $canvas_ addtag "graphics" withtag $item
+
+	    # get list of configuration options for the item
+	    set config {}
+	    foreach cfg [$canvas_ itemconfigure $item] {
+		lappend config [list [lindex $cfg 0] [lindex $cfg 4]]
+	    }
+
+	    set width(type) [max $width(type) [string length $type]]
+	    set width(coords) [max $width(coords) [string length $coords]]
+	    set width(config) [max $width(config) [string length $config]]
+	    lappend info [list $type $coords $config]
+	}
+	
+	# set table column formats (FITS style: 16A, for char[16], etc...)
+	set tform "$width(type)A $width(coords)A $width(config)A"
+
+	set listheadings [$image_ hdu listheadings]
+	set hdu_list [$image_ hdu list]
+	set extname [$image_ fits get EXTNAME]
+	set table "${extname}.GRAPHICS"
+
+	# Look for an existing graphics table and delete it, so we can
+	# replace it with a new one
+	foreach row $hdu_list {
+	    eval lassign [list $row] $listheadings
+	    if {"$ExtName" == "$table"} {
+		$image_ hdu delete $HDU
+		break
+	    }
+	}
+
+	# create a new binary table and insert the info
+	if {[catch {
+	    $image_ hdu create binary $table $headings $tform $info
+	} msg]} {
+	    error_dialog "error creating FITS table '$table': $msg"
+	    return
+	}
+
+	# update and display the HDU window
+	update_fits_hdus
+    }
+
+
+    # Check if there is a FITS table with the same name as the current
+    # image extension, but with ".GRAPHICS" appended.
+    # If found, restore the previously saved line graphics from the table. 
+    # This method is called automatically when a new image extension is 
+    # loaded.
+
+    public method load_graphics_from_image {} {
+	busy {
+	    load_graphics_from_image_
+	}
+    }
+    public method load_graphics_from_image_ {} {
+	# only do this for image extensions
+	if {[catch {set type [$image_ hdu type]}]} {
+	    return
+	}
+	if {"$type" != "image"} {
+	    return
+	}
+
+	# get the name of the graphics table
+	set extname [$image_ fits get EXTNAME]
+	set name "${extname}.GRAPHICS"
+
+	# get the hdu
+	set headings [$image_ hdu listheadings]
+	set hdu_list [$image_ hdu list]
+	set hdu 0
+	foreach i $hdu_list {
+	    eval lassign [list $i] $headings
+	    if {"$ExtName" == "$name"} {
+		set hdu $HDU
+		break
+	    }
+	}
+	if {$hdu == 0} {
+	    return
+	}
+
+	# make sure we don't create 2 of each object
+	$canvas_ delete "graphics"
+
+	# Now we have the hdu number of the graphics table. Read it and
+	# restore the graphics
+	set headings {type coords config}
+	foreach row [$image_ hdu get $hdu] {
+	    eval lassign [list $row] $headings
+
+	    # convert from image to canvas coords
+	    if {[catch {set coords [convert_coords $coords image canvas]} msg]} {
+		puts $msg
+		continue
+	    }
+	    set id [eval $canvas_ create $type $coords]
+
+	    foreach cfg $config {
+		lassign $cfg opt arg
+		$canvas_ itemconfigure $id $opt $arg
+	    }
+
+	    # add bindings so that the items may be edited and saved again
+	    $w_.draw add_object_bindings $id
+	}
     }
 
 

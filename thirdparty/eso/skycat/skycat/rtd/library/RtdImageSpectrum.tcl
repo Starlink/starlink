@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageSpectrum.tcl,v 1.22 1998/11/16 21:24:33 abrighto Exp $"
+# "@(#) $Id: RtdImageSpectrum.tcl,v 1.23 1998/11/20 14:19:47 abrighto Exp $"
 #
 # RtdImageSpectrum.tcl - itcl widget for displaying graph of image data values 
 #                        along a line
@@ -69,7 +69,7 @@ itcl::class rtd::RtdImageSpectrum {
 		-height 3i \
 		-borderwidth 3 \
 		-relief groove \
-		-title "Pixel Values"]
+		-title "Pixel Values" ]
 	# BLT graph of pixel values
         itk_component add graph {
             set graph_ [uplevel "#0" $cmd]

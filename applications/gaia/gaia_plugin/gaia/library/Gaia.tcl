@@ -49,8 +49,7 @@ set gaia_version "2.0"
 
 #  Make a local copy of about_skycat so we can divert bug reports.
 set about_gaia "\
-
-GAIA/SkyCat version $gaia_version
+GAIA version $gaia_version
 
 Copyright (C) 1997-1998 Central Laboratory of the Research Councils (U.K.)
 
@@ -68,15 +67,42 @@ Daniel Durand (durand@dao.nrc.ca)
 Peter Biereichel (pbiereic@eso.org)
 
 Bug reports and suggestions to: ussc@star.rl.ac.uk
-
 "
 
 set about_skycat ""
 
+set gaia_usage {
+Usage: gaia ?fitsFile? ?-option value ...?
+
+Options:
+ -colorramp_height <n>    - height of colorramp window (default: 12).
+ -float_panel <bool>      - put info panel in a popup window (default: 0).
+ -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
+ -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"    
+ -min_scale <n>           - minimum scale for magnification menu (default: -10).
+ -max_scale <n>           - maximum scale for magnification menu (default: 20).
+ -remote <bool>           - Use existing skycat process, if available, with Tk send.
+ -debug <bool>            - debug flag: run bg processes in fg.
+ -default_cmap <cmap>     - default colormap.
+ -default_itt <itt>       - default intensity transfer table.
+ -file <file>             - fits file to load ('-' for stdin).
+ -port <port>             - Listen for remote cmds on port (default: 0 = choose port).
+ -scrollbars <bool>       - Display scrollbars (not displayed by default).
+ -shm_data <bool>         - Put image data in sysV shared memory.
+ -shm_header <bool>       - Put image header in sysV shared memory.
+ -usexshm <bool>          - Use X shared mem, if available (default).
+ -use_zoom_view <bool>    - Use a "view" of the image for the zoom window (default).
+ -verbose <bool>          - Print diagnostic messages.
+ -with_colorramp <bool>   - Display the color bar (default).
+ -with_pan_window <bool>  - Display the pan window (default).
+ -with_zoom_window <bool> - Display the zoom window (default).
+ -zoom_factor <n>         - zooming factor (default: 4).
+}
+
 itk::usual Gaia {}
 
 #  Create a class for the application.
-class gaia::Gaia {
+itcl::class gaia::Gaia {
    inherit skycat::SkyCat
 
    #  Constructor: create a toplevel window.
@@ -107,7 +133,7 @@ class gaia::Gaia {
 
       #  Set/get X defaults - can be overridden in subclass and/or
       #  in user's .Xdefaults file.
-      tk appname GAIA
+      # tk appname GAIA
 
       feedback "GAIA toolboxes..."
       if { $itk_option(-gaia) } { 
@@ -162,7 +188,7 @@ class gaia::Gaia {
    #  Set default X resources for colors and fonts, and set some default key
    #  Bindings.
    method setXdefaults {} {
-       SkyCat::setXdefaults
+       skycat::SkyCat::setXdefaults
        gaia::setXdefaults
    }
 
@@ -587,7 +613,7 @@ class gaia::Gaia {
        set argv $args
        set argc [llength $argv]
        # use the -noop option to avoid reloading the main image (part of $argv list)
-       after 0 [code TopLevelWidget::start Gaia "-file"]
+       after 0 [code util::TopLevelWidget::start Gaia "-file"]
        return $prefix_[expr $clone_+1]
    }
 
@@ -689,6 +715,142 @@ class gaia::Gaia {
       [$image_ get_canvas] configure -background $colour
    }
    
+
+   # start the application with the above class as the main window
+   # This proc is called from tkAppInit.c when we are running the single
+   # binary version 
+   # Note that the binary version doesn't need to set auto_path or look for 
+   # Tcl sources or colormaps at run-time, since they are already loaded in 
+   # the binary.
+
+   public proc startGaia {} {
+       global ::rtd_library ::skycat_library ::gaia_usage ::tk_strictMotif \
+	   ::argv0 ::argv ::argc ::env
+
+       if {! [info exists rtd_library]} {
+	   set rtd_library .
+       }
+
+       # where to look for catalog config file: 
+       # use ~/.skycat/skycat.cfg if it exists, since it may contain user's 
+       # preferences, otherwise use $SKYCAT_CONFIG if set, or $CATLIB_CONFIG.
+       set config_file $env(HOME)/.skycat/skycat.cfg
+       if {[file exists $config_file]} {
+	   set env(CATLIB_CONFIG) "file:$config_file"
+       } elseif {[info exists env(SKYCAT_CONFIG)]} {
+	   set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
+       } 
+
+       # Check for a plugin or binary installation
+       setup_starlink_env [file dirname [info nameofexecutable]]
+       
+       # set some application options 
+       tk appname Gaia
+       set tk_strictMotif 0
+       tk_focusFollowsMouse
+
+       # insert some default options
+       set argv [linsert $argv 0 -disp_image_icon 1]
+       set argc [llength $argv]
+
+       # start the application
+       util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
+   }
+
+
+   # set up the STARLINK environment based on the given directory.
+    
+    public proc setup_starlink_env {dir} {
+	global ::tcl_version ::env ::argv ::argc ::gaia_library
+
+	# we need this for the local atclsh binary for running external tcl commands
+	if {[file isdirectory $dir/tcl$tcl_version]} {
+	    set env(TCL_LIBRARY) $dir/tcl$tcl_version
+	}
+
+	if {! [file isdirectory $gaia_library]} {
+	    set $gaia_library $dir
+	}
+	
+	# Check if using local Starlink binaries
+	if {[file exists $dir/autophotom]} {
+	    set env(PHOTOM_DIR) $dir
+	}
+
+	if {[file exists $dir/ardmask]} {
+	    set env(KAPPA_DIR) $dir
+	}
+
+	# use given dir for STARLINK, unless another value is defined
+	if {! [info exists env(STARLINK)]} {
+	    set env(STARLINK) $dir
+	} else {
+	    set dir $env(STARLINK)
+	}
+
+	if {![info exists env(PHOTOM_DIR)] && [file exists $dir/bin/photom/autophotom]} {
+	    set env(PHOTOM_DIR) $dir/bin/photom
+	}
+	if {![info exists env(KAPPA_DIR)] && [file exists $dir/bin/kappa/ardmask]} {
+	    set env(KAPPA_DIR) $dir/bin/kappa
+	}
+	# alternate dirs
+	if {[file exists $dir/bin/gaiapack/ardmask]} {
+	    set env(KAPPA_DIR) $dir/bin/gaiapack
+	}
+	if {[file exists $dir/bin/gaiapack/autophotom]} {
+	    set env(PHOTOM_DIR) $dir/bin/gaiapack
+	}
+	if {![info exists env(CONVERT_DIR)] && [file exists $dir/bin/convert/ndf2fits]} {
+	    set env(CONVERT_DIR) $dir/bin/convert
+	    set env(CONVERT_HELP) $dir/bin/convert
+	}
+
+	# add the plugin bin dir to the path
+	set env(PATH) "${dir}/bin:$env(PATH)"
+
+	# See if the user already sourced convert.csh
+	if {! [info exists env(NDF_FORMATS_IN)] && [info exists env(CONVERT_DIR)]} {
+	    # Define environment variables (normally done in convert.csh)
+	    setup_convert
+	}
+	# Set up CONVERT to work for .fits file as well as .fit.
+	if {[info exists env(NDF_FORMATS_IN)]} {
+	    append env(NDF_FORMATS_IN) ",FITS(.fits),FITS(.fit)"
+	    append env(NDF_FORMATS_OUT) ",FITS(.fits),FITS(.fit)"
+	}
+
+	#  Extract the known file types and set these up as defaults. These
+	#  are entered as if command-line arguments so that they propagate
+	#  to clone windows.
+	set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} {FITS(fits) *.fits}}
+	if { [info exists env(NDF_FORMATS_IN)] } {
+	    set new_types [split $env(NDF_FORMATS_IN) ","]
+	    foreach pair $new_types {
+		regexp {([^\(]*).([^\)]*)} $pair dummy name type
+		if { $name != "NDF" && $type != ".fits" && $type != ".fit" } {
+		    lappend file_types [list $name\($type\) *${type}]
+		}
+	    }
+	}
+	lappend argv "-file_types"
+	lappend argv $file_types
+	incr argc 2
+
+	# need this for library/StarApp.tcl  to find adamtask.tcl
+	if {! [info exists env(TCLADAM_DIR)]} {
+	    set env(TCLADAM_DIR) $gaia_library/demos
+	}
+	# XXX should use ~/adam/gaia-[pid] here, but not sure about cleanup...
+	if {! [info exists env(ADAM_USER)]} {
+	    set env(ADAM_USER) $env(HOME)/adam/gaia
+	}
+	if {[file isdirectory $env(ADAM_USER)]} {
+	    exec rm -rf $env(ADAM_USER)
+	}
+    }
+
+
    # -- options and public variables (also program options) --
 
    #  Mark displayed image as temporary, these are deleted on exit

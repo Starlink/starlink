@@ -39,7 +39,7 @@
 
 itk::usual GaiaImagePanel {}
 
-class gaia::GaiaImagePanel {
+itcl::class gaia::GaiaImagePanel {
    inherit rtd::RtdImagePanel
 
    #  Constructor.

@@ -193,11 +193,10 @@ proc tixAppContext:config-fontset {w value} {
 	    tixPref:InitFontSet:$data(-fontset)
 	    tixAppContext:CheckFontSets $w
 	    tixPref:SetFontSet:$data(-fontset)
-	}] {
+	} msg] {
 	    # User chose non-existent fontset
-	    #
 	    tixAppContext:StartupError \
-		"\aError: cannot use fontset \"$data(-fontset)\""
+		"\aError: cannot use fontset \"$data(-fontset)\" : $msg"
 	    tixAppContext:StartupError \
 		"       Using default fontset "
 	    tixSetDefaultFontset

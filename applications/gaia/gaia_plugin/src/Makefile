@@ -1,5 +1,5 @@
 # E.S.O. - VLT project / ESO Archive
-# "@(#) $Id: Makefile,v 1.1 1998/04/06 23:55:42 abrighto Exp $"
+# "@(#) $Id: Makefile,v 1.2 1998/09/04 20:29:50 abrighto Exp $"
 #
 # Makefile 
 #
@@ -13,7 +13,7 @@
 PREFIX=/usr/local
 
 # additional configure flags
-CONFIGURE_FLAGS="--with-gcc --enable-shared"
+CONFIGURE_FLAGS=--with-gcc --enable-shared
 
 # configure and make
 all: 

@@ -58,11 +58,11 @@
 
 itk::usual StarAstCopy {}
 
-class gaia::StarAstCopy {
+itcl::class gaia::StarAstCopy {
 
    #  Inheritances:
    #  -------------
-   inherit FileSelect
+   inherit util::FileSelect
 
    #  Constructor:
    #  ------------

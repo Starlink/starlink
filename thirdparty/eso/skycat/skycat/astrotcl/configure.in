@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.10 1998/11/16 21:15:31 abrighto Exp $
+# $Id: configure.in,v 1.11 1998/12/24 00:37:11 abrighto Exp $
 #
 # This file is used with GNU autoconf to generate a configure script
 #
@@ -500,7 +500,7 @@ case $CC in
 		CFLAGS=`echo $CFLAGS | sed -e "s/-g/-O/"`
 		case $system in
 		    SunOS-5*)
-         		CFLAGS="$CFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS -Xc"
+         		CFLAGS="$CFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS"
 			;;
 		    *)
 			echo "== No special changes for $system"

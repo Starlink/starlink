@@ -559,16 +559,13 @@ int mem_iraf_open(char *filename, int rwmode, int *hdl)
   open the IRAF disk file and convert it to a FITS file in memeory.
 */
 {
-    FILE *diskfile;
     int status;
     size_t filesize = 0;
-    char *ptr;
 
     /* create a memory file with size = 0 for the FITS converted IRAF file */
     status = mem_createmem(filesize, hdl);
     if (status)
     {
-        fclose(diskfile);
         ffpmsg("failed to create empty memory file (mem_iraf_open)");
         return(status);
     }

@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: Mem.h,v 1.2 1998/11/16 21:27:54 abrighto Exp $" 
+ * "@(#) $Id: Mem.h,v 1.3 1998/12/03 22:11:42 abrighto Exp $" 
  *
  * Mem.h - declarations for class Mem, a class for managing memory areas,
  *         which may or may not be shared memory.
@@ -58,8 +58,9 @@ struct MemRep {
     // temporarily unmap the shared memory
     void unmap();
 
-    // remap the shared memory after a call to unmap()
-    int remap(int options = 0);
+    // remap the shared memory after a call to unmap(), optionally specifying
+    // new mapping options and a new file size.
+    int remap(int options = 0, int newsize = -1);
 
 };
 
@@ -140,12 +141,15 @@ public:
     // temporarily unmap the shared memory
     void unmap() {rep_->unmap();}
 
-    // remap the shared memory after a call to unmap()
-    int remap(int options = 0) {return rep_->remap(options);}
-
+    // remap the shared memory after a call to unmap(), optionally specifying
+    // new mapping options and a new file size 
+    int remap(int options = 0, int newsize = -1) {
+	return rep_->remap(options, newsize);
+    }
+    
     // remove all "owned" shared memory areas (should be called before exit)
     static void cleanup();
-
+    
     // return the working length of the memory
     int length() const {return int(length_ ? length_ : (rep_->size - offset_));}
 

@@ -95,12 +95,12 @@
 
 #.
 
-class gaia::StarArdRect {
+itcl::class gaia::StarArdRect {
    
    #  Inheritances:
    #  -------------
    
-   inherit StarArdPrim
+   inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------

@@ -79,11 +79,11 @@
 
 itk::usual StarLabelCheck {}
 
-class gaia::StarLabelCheck {
+itcl::class gaia::StarLabelCheck {
 
    #  Inheritances:
    #  -------------
-   inherit LabelWidget
+   inherit util::LabelWidget
 
    #  Constructor:
    #  ------------

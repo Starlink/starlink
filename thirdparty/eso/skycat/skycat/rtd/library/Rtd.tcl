@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: Rtd.tcl,v 1.56 1998/10/28 17:42:27 abrighto Exp $"
+# "@(#) $Id: Rtd.tcl,v 1.58 1998/12/28 22:15:02 abrighto Exp $"
 #
 # Rtd.tcl - real-time image display application class
 # See man page Rtd(n) for a complete description.
@@ -51,7 +51,7 @@ itcl::class rtd::Rtd {
     # This method is called after the options have been evaluated.
 
     protected method init {} {
-	global ::argv0
+	global ::argv0 ::errorInfo
 
 	# set/get X defaults first time through - can be overridden in 
 	# subclass and/or in user's .Xdefaults file
@@ -78,7 +78,7 @@ itcl::class rtd::Rtd {
 	# create the rtd image widget and exit on errors, such as no more 
 	# colors, no more memory...
 	if {[catch {make_rtdimage} msg]} {
-	    puts $msg
+	    puts $errorInfo
 	    exit 1
 	}
 

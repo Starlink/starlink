@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: SkySearch.tcl,v 1.31 1998/10/30 18:18:05 abrighto Exp $
+# @(#) $Id: SkySearch.tcl,v 1.35 1998/12/14 17:32:08 abrighto Exp $
 #
 # SkySearch.tcl - Widget for searching a catalog and plotting the results
 #                 in the skycat image viewer. 
@@ -35,6 +35,14 @@ itcl::class skycat::SkySearch {
 	    set symbols_($i) 1
 	}
 
+	# add a menu item to the File menu to save the catalog as a FITS table
+	if {$iscat_} {
+	    set m [get_menu File]
+	    insert_menuitem $m "Add to..." command "Save with image" \
+		{Save the listed objects to the current FITS file as a binary table} \
+		-command [code $this save_with_image]
+	}
+
 	# this unique canvas tag is used for all symbols (see also SkySearch.C)
 	set tag_ $w_.cat
 	set object_tag_ $tag_.objects
@@ -60,6 +68,15 @@ itcl::class skycat::SkySearch {
     }
 
     
+    # save the current data as a FITS table in the current image file.
+    
+    public method save_with_image {} {
+	busy {
+	    $results_ save_with_image [$w_.cat entry get]
+	}
+    }
+
+
     # insert the id for the given object in the image near the object
     # and return a string containing status info. name identifies the
     # source catalog (short_name).
@@ -747,7 +764,7 @@ itcl::class skycat::SkySearch {
     
     # Optional unique id, used in searching for already existing catalog widgets.
     itk_option define -id id Id "" {
-	# in SkyCat.tcl, we passed the name of the SkyCat Itcl image widget as -id.
+	# in SkyCat.tcl, we passed the name of the SkyCatCtrl Itcl image widget as -id.
 	set skycat_ $itk_option(-id)
 	set canvas_ [$skycat_ get_canvas]
 	set image_ [$skycat_ get_image]
@@ -760,13 +777,13 @@ itcl::class skycat::SkySearch {
 
     # -- protected members --
 
-    #  SkyCatCtrl widget instance
+    # SkyCatCtrl widget instance
     protected variable skycat_ {}
 
     # internal rtdimage image for main image
     protected variable image_ {}
 
-    #  canvas window containing main image
+    # canvas window containing main image
     protected variable canvas_ {}
 
     # CanvasDraw object for drawing on image
@@ -775,9 +792,13 @@ itcl::class skycat::SkySearch {
     # array containing supported symbol names
     protected variable symbols_
 
-    # canvas tag used to identify all symbols (objects, labels) for this instance
+    # canvas tag used to identify all symbols for this instance
     protected variable tag_
+
+    # canvas tag used to identify all objects for this instance
     protected variable object_tag_
+
+    # canvas tag used to identify all labels for this instance
     protected variable label_tag_
 
     # name of wcs object for converting between hh:mm:ss and double deg

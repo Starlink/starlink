@@ -60,12 +60,12 @@
 
 #.
 
-class gaia::StarArdAnnEllipse {
+itcl::class gaia::StarArdAnnEllipse {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdEllipse
+   inherit gaia::StarArdEllipse
 
    #  Constructor:
    #  ------------

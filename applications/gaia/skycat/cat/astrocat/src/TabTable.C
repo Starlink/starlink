@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: TabTable.C,v 1.16 1998/09/23 19:12:57 abrighto Exp $
+ * $Id: TabTable.C,v 1.17 1999/01/14 16:55:28 abrighto Exp $
  *
  * TabTable.C - method definitions for class TabTable
  *
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  08 Jan 96  Created
  */
-static const char* const rcsId="@(#) $Id: TabTable.C,v 1.16 1998/09/23 19:12:57 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TabTable.C,v 1.17 1999/01/14 16:55:28 abrighto Exp $";
 
 
 #include <stdio.h>
@@ -474,6 +474,10 @@ int TabTable::insert(const char* filename, int col)
     if (numRows() == 0 || numCols() == 0)
 	return error("no data to insert");
 
+    // make sure we have a valid id column
+    if (col < 0)
+	col = 0;
+
     if (checkTableIndex(0, col) != 0) 
 	return ERROR;
 
@@ -551,6 +555,10 @@ int TabTable::insert(const char* filename, int col)
  */
 int TabTable::remove(const char* filename, int col)
 {
+    // make sure we have a valid id column
+    if (col < 0)
+	col = 0;
+
     if (numRows() == 0 || numCols() == 0)
 	return error("no data rows to remove");
 

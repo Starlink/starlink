@@ -4,6 +4,27 @@ CHANGES to the RTD Sources
 This file contains a list of changes to the RTD software and user
 interface. The latest changes are at the top.
 
+---------------  28.12.98 released rtd-2.19.24 ----------------------------
+
+* Rebuild tclIndex file whenever configure is run, since Tcl8 version
+  is not compatible with tcl7 version (see makelinks script).
+
+* rtdimg/src/RtdImage.h: added include rtdImageEvt.h to avoid Sunpro
+  cc compiler warning.
+
+* rtilib/src/saoutil.c: commented out calloc declaration to avoid
+  conflict reported by sunpro cc.
+
+---------------  03.12.98 released rtd-2.19.23 ----------------------------
+
+* Fixed a minor bug in the destructors for the itcl classes RtdImage
+  and RtdImagePopup. In the first case, the rtdimage object was not
+  being deleted as it should; in the second it was, but should not
+  have been.
+
+* Changed the ImageData::write() method (used to save a FITS file or a
+  section of one to disk) to be compatible with the new FitsIO class.
+
 ---------------  16.11.98 released rtd-2.19.22 ----------------------------
 
 * Ported to tcl8.0.3 (still compatible with tcl7.6/tk4.2)

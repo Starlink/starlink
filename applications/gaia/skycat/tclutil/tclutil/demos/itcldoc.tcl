@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: itcldoc.tcl,v 1.9 1998/10/28 17:45:45 abrighto Exp $" 
+# "@(#) $Id: itcldoc.tcl,v 1.10 1998/11/20 14:20:06 abrighto Exp $" 
 #
 # itcldoc.tcl - script to extract man pages from itcl class source files.
 #
@@ -173,11 +173,10 @@ itcl::class ItclDoc {
     # to document
 
     protected method doc_body {body} {
-
 	if {! [regsub -- "itk_component add" $body {} {}]} {
 	    return
 	}
-
+	
 	# make array of tokens from body
 	set n 0
 	foreach tok $body {
@@ -201,12 +200,14 @@ itcl::class ItclDoc {
 		    }
 		    incr i
 		    set comment {}
-		    switch -exact -- "[lindex $ar([expr $i+1]) 0]" {
-			"keep" -
-			"rename" -
-			"usual" -
-			"ignore" {
-			    doc_component $ar([incr i])
+		    if {[info exists ar([expr $i+1])]} {
+			switch -exact -- "[lindex $ar([expr $i+1]) 0]" {
+			    "keep" -
+			    "rename" -
+			    "usual" -
+			    "ignore" {
+				doc_component $ar([incr i])
+			    }
 			}
 		    }
 		}
@@ -250,6 +251,7 @@ itcl::class ItclDoc {
 	    set ar($n) $tok
 	    incr n
 	}
+	set ar($n) {}
 
 	set comment {}
 	set public_methods {}
@@ -312,12 +314,16 @@ itcl::class ItclDoc {
 		    switch -exact -- $ar([incr i]) {
 			"variable" {
 			    lappend options [list -$ar([incr i]) $comment]
-			    incr i
+			    if {[info exists ar([expr $i+1])] && "$ar([expr $i+1])" != "#"} {
+				incr i
+			    }
 			    set comment {}
 			}
 			"method" {
 			    lappend public_methods [list $ar([incr i]) $ar([incr i]) $comment]
-			    catch {doc_body $ar([incr i])}
+			    if {[catch {doc_body $ar([incr i])} msg]} {
+				puts "warning: $msg"
+			    }
 			    set comment {}
 			}
 			"common" {
@@ -330,12 +336,16 @@ itcl::class ItclDoc {
 		    switch -exact -- $ar([incr i]) {
 			"variable" {
 			    lappend protected_variables [list $ar([incr i]) $comment]
-			    incr i
+			    if {[info exists ar([expr $i+1])] && "$ar([expr $i+1])" != "#"} {
+				incr i
+			    }
 			    set comment {}
 			}
 			"method" {
 			    lappend protected_methods [list $ar([incr i]) $ar([incr i]) $comment]
-			    catch {doc_body $ar([incr i])}
+			    if {[catch {doc_body $ar([incr i])} msg]} {
+				puts "warning: $msg"
+			    }
 			    set comment {}
 			}
 			"common" {
@@ -352,7 +362,9 @@ itcl::class ItclDoc {
 			}
 			"method" {
 			    incr i 2
-			    catch {doc_body $ar([incr i])}
+			    if {[catch {doc_body $ar([incr i])} msg]} {
+				puts "warning: $msg"
+			    }
 			    set comment {}
 			}
 			"common" {

@@ -55,7 +55,7 @@
 
 #.
 
-class rtd::Queue {
+itcl::class gaia::Queue {
    constructor {} {}
    destructor {}
 

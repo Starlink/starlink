@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.19 1998/03/19 23:10:32 abrighto Exp $
+# $Id: Makefile.in,v 1.20 1998/12/29 20:19:39 abrighto Exp $
 #
 # Makefile.in - Makefile
 #
@@ -120,7 +120,7 @@ $(WISH_INTERP): lib tkAppInit.o FORCE
 	else \
 	  set -x; \
 	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) tkAppInit.o -o $(WISH_INTERP) \
-	         $(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) $(CAT_LIB) $(RTD_LIB) \
+	         $(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) $(CAT_LIB_STATIC) $(RTD_LIB_STATIC) \
 		 $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
 	fi
 	@echo "making all in ./demos"

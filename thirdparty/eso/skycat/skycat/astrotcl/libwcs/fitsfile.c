@@ -185,7 +185,8 @@ int	*nbhead;	/* Number of bytes before start of data (returned) */
 		nbh = (nrec + 4) * FITSBLOCK + 4;
 		header = (char *) realloc (header,(unsigned int) nbh);
 		}
-	    headnext = headnext + FITSBLOCK;
+	    /* headnext = headnext + FITSBLOCK; */
+	    headnext = headnext + *nbhead;  /* allan: 30.11.98: fix from Andreas */
 	    }
 
 	else {

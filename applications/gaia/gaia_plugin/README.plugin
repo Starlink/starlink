@@ -11,53 +11,41 @@ with a newer version of Skycat. It can be compiled as a standalone
 application or loaded dynamically as a Tcl package in a running Skycat
 application.
 
-This package contains (nearly) everything you need to use the GAIA
-plugin with skycat (version 2.0.13 or newer).
+This package contains everything you need to use the GAIA plugin with
+skycat. Please always use the version of skycat that is released with
+the GAIA plugin to avoid any incompatibilities.
 
-In addition, the following packages are required at run-time for some
-operations (not included here):
+Installing the GAIA Plugin
+--------------------------
 
-* Starlink/convert  - convert between FITS and NDF image formats
+To install this package, just unpack the contents into a directory of
+your choice, for example:
 
-* pbmplus  - portable bitmap utilities (v. 10dec91), required by
-             Starlink/convert. If you have this package, you can use
-             GAIA/Skycat to view images in other formats, such as GIF...
-
-Note: At the time of writing, the Starlink/convert package was not
-available in source form or for HP-UX. Please contact the Starlink
-people for more information.
+    % mkdir /usr/local/lib/skycat_plugins
+    % cd /usr/local/lib/skycat_plugins
+    % gunzip < gaia_plugin-Linux-2.0.35.tar.gz | tar xvf -
 
 
-INSTALLATION
-------------
+Running Skycat with the GAIA Plugin
+-----------------------------------
 
-To install this package, copy the contents to some directory and set the
-environment variable SKYCAT_PLUGIN to include it (or its parent dir).
-For example:
 
-  setenv SKYCAT_PLUGIN $gaia_plugin_dir
+The easiest way to run Skycat with the GAIA plugin is to start skycat
+with the script "skycatgaia" in this package:
 
-Or: 
+    % skycatgaia
 
-  setenv SKYCAT_PLUGIN "$gaia_plugin_dir:$other_plugin_dir:..."
+This script just sets the SKYCAT_PLUGIN environment variable to  
+include the GAIA plugin dir and starts skycat.
 
-If you have installed the Starlink "convert" package, you should
-either source the "convert.csh" file from that package before starting
-skycat, or set the STARLINK environment variable to the top level
-Starlink installation directory. For example:
+Note that if you have other Skycat plugins that you want to
+use with the GAIA plugin, you should set the GAIA_PLUGIN
+environment variable to include them.
+See the Skycat documentation for information about plugins:
 
-  setenv STARLINK /star
+  http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
 
-Or (optionally): 
-
-  source /star/bin/convert/convert.csh
-
-To start the application, just start skycat in the normal way:
-
-  skycat file.fits ...
-
-On startup, skycat should dynamically load the GAIA plugin and add the
-new features.
+--------------------------------------
 
 Please send any questions, suggestions, or bug reports to:
 

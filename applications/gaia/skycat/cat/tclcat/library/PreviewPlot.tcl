@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: PreviewPlot.tcl,v 1.17 1998/11/16 21:23:33 abrighto Exp $"
+# "@(#) $Id: PreviewPlot.tcl,v 1.18 1998/11/20 14:19:35 abrighto Exp $"
 #
 # PreviewPlot.tcl - Widget for displaying a graph of tab table data
 # 
@@ -58,7 +58,7 @@ itcl::class cat::PreviewPlot {
 		 -height 5i \
 		 -borderwidth 3 \
 		 -relief groove \
-		 -title "Preview Data for $itk_option(-name)"]
+		 -title "Preview Data for $itk_option(-name)" ]
 	# BLT graph widget
 	itk_component add graph {
 	    set graph_ [uplevel "#0" $cmd]

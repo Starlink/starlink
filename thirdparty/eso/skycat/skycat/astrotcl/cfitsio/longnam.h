@@ -18,6 +18,7 @@
 #define fits_delete_file    ffdelt
 #define fits_file_name      ffflnm
 #define fits_file_mode      ffflmd
+#define fits_url_type       ffurlt
 
 #define fits_get_version    ffvers
 #define fits_uppercase      ffupch
@@ -295,6 +296,8 @@
 #define fits_read_col_cmp    ffgcvc
 #define fits_read_col_dblcmp ffgcvm
 #define fits_read_col_bit    ffgcx
+#define fits_read_col_bit_usht ffgcxui
+#define fits_read_col_bit_uint ffgcxuk
 
 #define fits_read_colnull_str    ffgcfs
 #define fits_read_colnull_log    ffgcfl
@@ -427,6 +430,7 @@
 #define fits_init_wcs_img ffiwcs
 
 #define fits_find_rows          fffrow
+#define fits_find_first_row     ffffrw
 #define fits_find_rows_cmp      fffrwc
 #define fits_select_rows        ffsrow
 #define fits_calc_rows          ffcrow

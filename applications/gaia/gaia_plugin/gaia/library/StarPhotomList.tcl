@@ -202,7 +202,7 @@
 
 #.
 
-class gaia::StarPhotomList {
+itcl::class gaia::StarPhotomList {
 
    #  Inheritances:
    #  -------------
@@ -525,7 +525,7 @@ class gaia::StarPhotomList {
    private method update_scrollbox_ {} {
       if { [winfo exists $scrollbox] } {
          $scrollbox clear all
-         $scrollbox insert 0 [StarPhotomObject::header short]
+         $scrollbox insert 0 [gaia::StarPhotomObject::header short]
          for { set i 0 } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
                $scrollbox insert end [$objects_($i) getvalues short]
@@ -536,12 +536,19 @@ class gaia::StarPhotomList {
    }
    #  Update the displayed details of current object.
    private method update_details_ {} {
+      global ::tcl_version
+       
       if { [winfo exists $details] && $canvasdraw != {} } {
          if { $selected_ != {} && [info exists objects_($selected_)] } {
             set id [$objects_($selected_) canvas_id]
             if { "$id" != "" } {
                set selected_ $objects_ids_($id)
-               $details update_display [scope $objects_($selected_)]
+	       # allan: 21.1.99, added tcl8 check
+	       if {$tcl_version >= 8.0} {
+		   $details update_display [code $objects_($selected_)]
+	       } else {
+		   $details update_display [scope $objects_($selected_)]
+	       }
             }
          } else {
             # Reset details.

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.6 1998/07/28 21:23:13 abrighto Exp $
+# $Id: Makefile.in,v 1.8 1999/01/15 22:30:39 abrighto Exp $
 #
 # Makefile.in - Makefile
 #
@@ -61,12 +61,6 @@ TCLTKLIBS = \
 	@TK_LIB_SPEC@ \
 	@BLT_LIB_SPEC@ \
 	$(TCLLIBS)
-
-# Rtd library
-RTD_LIB		= @RTD_LIB@
-
-# Catalog library
-CAT_LIB		= @CAT_LIB@
 
 # Catalog library
 SKYCAT_LIB	= @SKYCAT_LIB@
@@ -164,8 +158,7 @@ $(WISH_INTERP): lib tkAppInit.o FORCE
 	  set -x; \
 	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) tkAppInit.o -o $(WISH_INTERP) \
 	         $(TCLTKLIBS) $(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) \
-		 $(SKYCAT_LIB) $(CAT_LIB) $(RTD_LIB) \
-		 $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
+		 $(SKYCAT_LIB) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
 	fi
 	@echo "making all in ./demos"
 	@(cd demos; $(MAKE))

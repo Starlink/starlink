@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: EnterObject.tcl,v 1.13 1998/10/28 17:37:22 abrighto Exp $
+# @(#) $Id: EnterObject.tcl,v 1.14 1999/02/04 19:18:51 abrighto Exp $
 #
 # EnterObject.tcl - Widget for entering data to add to a local catalog.
 #
@@ -13,7 +13,7 @@ itk::usual EnterObject {}
 # EnterObject is a dialog widget for entering object data to add to a 
 # local catalog.
 
-itcl::class util::EnterObject {
+itcl::class cat::EnterObject {
     inherit util::EntryForm
 
 

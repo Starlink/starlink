@@ -985,7 +985,7 @@ fi
 echo $ac_n "checking TclPro ""... $ac_c" 1>&6
 echo "configure:987: checking TclPro " >&5
 file=`which prowrap`
-if test -f $file ; then
+if test -f "$file" ; then
 	f=`dirname $file`
 	TCLPRO_MACH_DIR=`dirname $f`
 	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`
@@ -1276,14 +1276,6 @@ BLT_LIB_SPEC_STATIC=`getStaticLib $BLT_LIB_SPEC`
 
 
 
-
-# add Tix support (there is no tixConfig.sh, but catlib set this up
-# already in catConfig.sh)
-# TIX_LIB_SPEC=$CAT_TIX_LIB_SPEC
-# TIX_SAM_LIB_SPEC=$CAT_TIX_SAM_LIB_SPEC
-# TIX_LIB_SPEC_STATIC=`getStaticLib $TIX_SAM_LIB_SPEC`
-# AC_SUBST(TIX_LIB_SPEC)
-# AC_SUBST(TIX_LIB_SPEC_STATIC)
 
 # -----------------------------------------------------------------------
 # tcl package library files

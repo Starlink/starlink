@@ -1,14 +1,12 @@
 Image I/O Library
 -----------------
-"@(#) $Id: README,v 1.2 1998/11/17 21:03:11 abrighto Exp $"
+"@(#) $Id: README,v 1.3 1999/01/14 16:54:27 abrighto Exp $"
 
 Note: the plain C sources here were taken from the "cfitsio" package
-(version: cfitsio2023beta), which was written by William D. Pence
+(version: cfitsio2027), which was written by William D. Pence
 (pence@tetra.gsfc.nasa.gov) of HEASARC, NASA/GSFC.
 
   URL: http://legacy.gsfc.nasa.gov/docs/software/fitsio
-
-Any local changes are commented with "allan".
 
 See the URL above for a complete description of the cfitsio library.
 
@@ -16,17 +14,4 @@ I wrote the FitsIO C++ class and then modified it to work with the
 cfitsio library. It is a kind of wrapper class, to be used by
 other C++ classes to access FITS files, although it does not provide
 all of the functionality of the C library.
-
-CHANGES to the original package:
---------------------------------
-
-* Copied the cfitsio sources here and merged relevant parts of the
-  configure script into the astrotcl configure script, so that we re
-  not dependent on an external library and can build static and/or
-  shared versions as required.
-
-* Added support for ESO HIERARCH keywords
-
-* Changed some globals to static in compress.c to avoid conflicts
-
 

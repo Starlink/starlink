@@ -19,7 +19,7 @@ char *calloc_errchk ( count, size, errmess )
      char *errmess;
 {
   char *space;
-  char *calloc();
+  /* char *calloc(); allan: gets error with Sun cc */
 
   if( (space = (char *)calloc((unsigned)count, size)) == NULL ) {
     if( errmess == NULL )

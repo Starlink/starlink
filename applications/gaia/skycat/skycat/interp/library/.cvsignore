@@ -6,6 +6,7 @@ CatalogInfo.tcl.save3
 Makefile
 SearchConfig.tcl.save
 SkyCatCtrl.tcl.save
+SkyCatHduChooser.tcl.save
 SkySearch.tcl.save
 SymbolConfig.tcl.save
 SymbolConfig.tcl.save2
@@ -13,3 +14,4 @@ pkgIndex.tcl
 server
 skycat.cfg
 skycat_version.tcl
+tclIndex

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: RtdImagePick.tcl,v 1.23 1998/10/28 17:42:29 abrighto Exp $"
+# "@(#) $Id: RtdImagePick.tcl,v 1.24 1998/11/20 14:19:47 abrighto Exp $"
 #
 # RtdImagePick.tcl - widget to select an object in an image using a centroid alg.
 #
@@ -87,7 +87,7 @@ itcl::class rtd::RtdImagePick {
             -side $side -fill both -expand 0
 
         # title for label area
-        pack [label $labelf.title -text "Image Statistics:"] \
+        pack [label $labelf.title -text "Image Statistics:" ] \
             -side top -padx 1m -pady 1m
         
 	# LabelValue(n) widget: "Image X" 
@@ -250,7 +250,7 @@ itcl::class rtd::RtdImagePick {
             -side $side -fill both -expand 0
 
         # add a frame to show the size of the square selected by the scale
-        pack [label $rectf.label -text "Area of image to be examined:"] \
+        pack [label $rectf.label -text "Area of image to be examined:" ] \
             -side top -padx 1m -pady 1m
 
         pack [set rf [frame $rectf.rf \

@@ -1,7 +1,7 @@
 # dialog.tcl - general purpose dialogs
 #
 # Copyright (C) 1994 Allan Brighton (abrighto@eso.org)
-# "@(#) $Id: udialog.tcl,v 1.5 1998/07/28 21:24:23 abrighto Exp $"
+# "@(#) $Id: udialog.tcl,v 1.6 1998/12/03 22:11:37 abrighto Exp $"
 
 
 # Get a file name from the user and return it or the empty string.
@@ -57,7 +57,8 @@ proc error_dialog {msg {parent ""}} {
 	    set parent ""
 	}
     }
-    set w $parent.error_dialog
+    set w $parent.error_dialog[clock clicks]
+
     catch {destroy $w} 
     [util::DialogWidget $w \
 	 -title Error \

@@ -31,16 +31,35 @@
 		last keyword(s) defined for given HDU are blank keywords
 		consisting of only 80 spaces, then (some of) those keywords
 		may be silently deleted by CFITSIO.
+13-Nov-98: bugfix: parser was writing GRPNAME twice. Parser still creates
+                GRPNAME keywords for GROUP HDU's which do not specify them.
+                However, values (of form DEFAULT_GROUP_XXX) are assigned
+                not necessarily in order HDUs appear in template file, but
+                rather in order parser completes their creation in FITS
+                file. Also, when including files, if fopen fails, parser
+                tries to open file with a name = directory_of_top_level
+                file + name of file to be included, as long as name
+                of file to be included does not specify absolute pathname.
+16-Nov-98: bugfix to bugfix from 13-Nov-98
+19-Nov-98: EXTVER keyword is now automatically assigned value by parser.
+17-Dev-98: 2 new things added: 1st: CFITSIO_INCLUDE_FILES environment
+		variable can contain a colon separated list of directories
+		to look for when looking for template include files (and master
+		template also). 2nd: it is now possible to append template
+		to nonempty FITS. file. fitsfile *ff no longer needs to point
+		to an empty FITS file with 0 HDUs in it. All data written by
+		parser will simple be appended at the end of file.
 */
 
 
 #include <stdio.h>
-#ifdef macintosh
 #include <stdlib.h>
-#else
+
+#ifndef macintosh
 #include <malloc.h>
 #include <memory.h>
 #endif
+
 #include <string.h>
 
 #include "fitsio.h"
@@ -58,6 +77,7 @@ FILE		*ngp_fp[NGP_MAX_INCLUDE];	/* stack of included file handles */
 int		ngp_keyidx = NGP_TOKEN_UNKNOWN;	/* index of token in current line */
 NGP_TOKEN	ngp_linkey;			/* keyword after line analyze */
 
+char            ngp_master_dir[NGP_MAX_FNAME];  /* directory of top level include file */
 
 NGP_TKDEF	ngp_tkdef[] = 			/* tokens recognized by parser */
       { {	"\\INCLUDE",	NGP_TOKEN_INCLUDE },
@@ -70,6 +90,69 @@ NGP_TKDEF	ngp_tkdef[] = 			/* tokens recognized by parser */
 
 int	master_grp_idx = 1;			/* current unnamed group in object */
 
+int		ngp_extver_tab_size = 0;
+NGP_EXTVER_TAB	*ngp_extver_tab = NULL;
+
+
+int	ngp_get_extver(char *extname, int *version)
+ { NGP_EXTVER_TAB *p;
+   char 	*p2;
+   int		i;
+
+   if ((NULL == extname) || (NULL == version)) return(NGP_BAD_ARG);
+   if ((NULL == ngp_extver_tab) && (ngp_extver_tab_size > 0)) return(NGP_BAD_ARG);
+   if ((NULL != ngp_extver_tab) && (ngp_extver_tab_size <= 0)) return(NGP_BAD_ARG);
+
+   for (i=0; i<ngp_extver_tab_size; i++)
+    { if (0 == strcmp(extname, ngp_extver_tab[i].extname))
+        { *version = (++ngp_extver_tab[i].version);
+          return(NGP_OK);
+        }
+    }
+
+   if (NULL == ngp_extver_tab)
+     { p = (NGP_EXTVER_TAB *)ngp_alloc(sizeof(NGP_EXTVER_TAB)); }
+   else
+     { p = (NGP_EXTVER_TAB *)ngp_realloc(ngp_extver_tab, (ngp_extver_tab_size + 1) * sizeof(NGP_EXTVER_TAB)); }
+
+   if (NULL == p) return(NGP_NO_MEMORY);
+
+   p2 = ngp_alloc(strlen(extname) + 1);
+   if (NULL == p2)
+     { ngp_free(p);
+       return(NGP_NO_MEMORY);
+     }
+
+   strcpy(p2, extname);
+   ngp_extver_tab = p;
+   ngp_extver_tab[ngp_extver_tab_size].extname = p2;
+   *version = ngp_extver_tab[ngp_extver_tab_size].version = 1;
+
+   ngp_extver_tab_size++;
+
+   return(NGP_OK);
+ }
+
+
+int	ngp_delete_extver_tab(void)
+ { int i;
+
+   if ((NULL == ngp_extver_tab) && (ngp_extver_tab_size > 0)) return(NGP_BAD_ARG);
+   if ((NULL != ngp_extver_tab) && (ngp_extver_tab_size <= 0)) return(NGP_BAD_ARG);
+   if ((NULL == ngp_extver_tab) && (0 == ngp_extver_tab_size)) return(NGP_OK);
+
+   for (i=0; i<ngp_extver_tab_size; i++)
+    { if (NULL != ngp_extver_tab[i].extname)
+        { ngp_free(ngp_extver_tab[i].extname);
+          ngp_extver_tab[i].extname = NULL;
+        }
+      ngp_extver_tab[i].version = 0;
+    }
+   ngp_free(ngp_extver_tab);
+   ngp_extver_tab = NULL;
+   ngp_extver_tab_size = 0;
+   return(NGP_OK);
+ }
 
 	/* compare strings, case does not matter */
 
@@ -293,6 +376,19 @@ int	ngp_extract_tokens(NGP_RAW_LINE *cl)
        cl->type = NGP_TTYPE_RAW;
        return(NGP_OK);
      }
+
+   if (!ngp_strcasecmp("\\INCLUDE", cl->name))
+     {
+       for (;; p++)  if ((' ' != *p) && ('\t' != *p)) break; /* skip whitespace */
+
+       cl->value = p;
+       for (s = cl->value;; s++)		/* filter out any EOS characters */
+        { if ('\n' == *s) *s = 0;
+	  if (0 == *s) break;
+        }
+       cl->type = NGP_TTYPE_UNKNOWN;
+       return(NGP_OK);
+     }
        
    for (;; p++)
     { if ((0 == *p) || ('\n' == *p))  return(NGP_OK);	/* test if at end of string */
@@ -364,16 +460,73 @@ int	ngp_extract_tokens(NGP_RAW_LINE *cl)
    return(NGP_OK);				/* too many tokens ... */
  }
 
+/*      try to open include file. If open fails and fname
+        does not specify absolute pathname, try to open fname
+        in any directory specified in CFITSIO_INCLUDE_FILES
+        environment variable. Finally try to open fname
+        relative to ngp_master_dir, which is directory of top
+        level include file
+*/
 
 int	ngp_include_file(char *fname)		/* try to open include file */
- {
+ { char *p, *p2, *cp, *envar, envfiles[NGP_MAX_ENVFILES];
+
    if (NULL == fname) return(NGP_NUL_PTR);
 
    if (ngp_inclevel >= NGP_MAX_INCLUDE)		/* too many include files */
      return(NGP_INC_NESTING);
 
    if (NULL == (ngp_fp[ngp_inclevel] = fopen(fname, "r")))
-     return(NGP_ERR_FOPEN);
+     {                                          /* if simple open failed .. */
+       envar = getenv("CFITSIO_INCLUDE_FILES");	/* scan env. variable, and retry to open */
+
+       if (NULL != envar)			/* is env. variable defined ? */
+         { strncpy(envfiles, envar, NGP_MAX_ENVFILES - 1);
+           envfiles[NGP_MAX_ENVFILES - 1] = 0;	/* copy search path to local variable, env. is fragile */
+
+           for (p2 = strtok(envfiles, ":"); NULL != p2; p2 = strtok(NULL, ":"))
+            {
+	      cp = (char *)ngp_alloc(strlen(fname) + strlen(p2) + 2);
+	      if (NULL == cp) return(NGP_NO_MEMORY);
+
+	      strcpy(cp, p2);
+#ifdef  MSDOS
+              strcat(cp, "\\");			/* abs. pathname for MSDOS */
+               
+#else
+              strcat(cp, "/");			/* and for unix */
+#endif
+	      strcat(cp, fname);
+	  
+	      ngp_fp[ngp_inclevel] = fopen(cp, "r");
+	      ngp_free(cp);
+
+	      if (NULL != ngp_fp[ngp_inclevel]) break;
+	    }
+        }
+                                      
+       if (NULL == ngp_fp[ngp_inclevel])	/* finally try to open relative to top level */
+         {
+#ifdef  MSDOS
+           if ('\\' == fname[0]) return(NGP_ERR_FOPEN); /* abs. pathname for MSDOS, does not support C:\\PATH */
+#else
+           if ('/' == fname[0]) return(NGP_ERR_FOPEN); /* and for unix */
+#endif
+           if (0 == ngp_master_dir[0]) return(NGP_ERR_FOPEN);
+
+	   p = ngp_alloc(strlen(fname) + strlen(ngp_master_dir) + 1);
+           if (NULL == p) return(NGP_NO_MEMORY);
+
+           strcpy(p, ngp_master_dir);		/* construct composite pathname */
+           strcat(p, fname);			/* comp = master + fname */
+
+           ngp_fp[ngp_inclevel] = fopen(p, "r");/* try to open composite */
+           ngp_free(p);				/* we don't need buffer anymore */
+
+           if (NULL == ngp_fp[ngp_inclevel])
+             return(NGP_ERR_FOPEN);		/* fail if error */
+         }
+     }
 
    ngp_inclevel++;
    return(NGP_OK);
@@ -522,7 +675,7 @@ int	ngp_keyword_is_write(NGP_TOKEN *ngp_tok)
                         /* non indexed variables not allowed to write */
   
    static char *nmni[] = { "SIMPLE", "XTENSION", "BITPIX", "NAXIS", "PCOUNT",
-                           "GCOUNT", "TFIELDS", "THEAP", "EXTEND",
+                           "GCOUNT", "TFIELDS", "THEAP", "EXTEND", "EXTVER",
                            NULL } ;
 
    if (NULL == ngp_tok) return(NGP_NUL_PTR);
@@ -719,9 +872,9 @@ int	ngp_append_columns(fitsfile *ff, NGP_HDU *ngph, int aftercol)
 
 int	ngp_read_xtension(fitsfile *ff, int parent_hn, int simple_mode)
  { int		r, exflg, l, my_hn, tmp0, incrementor_index, i, j;
-   int		ngph_dim, ngph_bitpix, ngph_node_type;
+   int		ngph_dim, ngph_bitpix, ngph_node_type, my_version;
    char		incrementor_name[NGP_MAX_STRING], ngph_ctmp;
-   char 	*ngph_extname;
+   char 	*ngph_extname = 0;
    long		ngph_size[NGP_MAX_ARRAY_DIM];
    NGP_HDU	ngph;
 
@@ -858,6 +1011,11 @@ int	ngp_read_xtension(fitsfile *ff, int parent_hn, int simple_mode)
 
      }
 
+   if ((NGP_OK == r) && (NULL != ngph_extname))
+     { r = ngp_get_extver(ngph_extname, &my_version);	/* write correct ext version number */
+       fits_write_key(ff, TLONG, "EXTVER", &my_version, "auto assigned by template parser", &r); 
+     }
+
    if (NGP_OK == r)
      { if (parent_hn > 0)
          { fits_get_hdu_num(ff, &my_hn);
@@ -973,7 +1131,7 @@ int	ngp_read_group(fitsfile *ff, char *grpname, int parent_hn)
 /* read whole template. ff should point to the opened empty fits file. */
 
 int	fits_execute_template(fitsfile *ff, char *ngp_template, int *status)
- { int r, exit_flg, first_extension;
+ { int r, exit_flg, first_extension, i, my_hn, tmp0, keys_exist, more_keys;
    char grnm[NGP_MAX_STRING];
 
    if (NULL == ff) return(NGP_NUL_PTR);
@@ -985,12 +1143,49 @@ int	fits_execute_template(fitsfile *ff, char *ngp_template, int *status)
    ngp_grplevel = 0;
    master_grp_idx = 1;
    exit_flg = 0;
-   first_extension = 1;
+   ngp_master_dir[0] = 0;			/* this should be before 1st call to ngp_include_file */
+   first_extension = 1;				/* we need to create PHDU */
+
+   fits_get_hdu_num(ff, &my_hn);		/* our HDU position */
+   if (my_hn <= 1)				/* check whether we really need to create PHDU */
+     { fits_movabs_hdu(ff, 1, &tmp0, status);
+       fits_get_hdrspace(ff, &keys_exist, &more_keys, status);
+       fits_movabs_hdu(ff, my_hn, &tmp0, status);
+       if (NGP_OK != *status) return(*status);	/* error here means file is corrupted */
+       if (keys_exist > 0) first_extension = 0;	/* if keywords exist assume PHDU already exist */
+     }
+   else
+     { first_extension = 0;			/* PHDU (followed by 1+ extensions) exist */
+     }
+                                                                          
+
+   if (NGP_OK != (r = ngp_delete_extver_tab()))
+     { *status = r;
+       return(r);
+     }
    
    if (NGP_OK != (r = ngp_include_file(ngp_template))) 
      { *status = r;
        return(r);
      }
+
+   for (i = strlen(ngp_template) - 1; i >= 0; i--) /* strlen is > 0, otherwise fopen failed */
+    { 
+#ifdef MSDOS
+      if ('\\' == ngp_template[i]) break;
+#else
+      if ('/' == ngp_template[i]) break;
+#endif
+    } 
+      
+   i++;
+   if (i > (NGP_MAX_FNAME - 1)) i = NGP_MAX_FNAME - 1;
+
+   if (i > 0)
+     { memcpy(ngp_master_dir, ngp_template, i);
+       ngp_master_dir[i] = 0;
+     }
+
 
    for (;;)
     { if (NGP_OK != (r = ngp_read_line(1))) break;	/* EOF always means error here */
@@ -1038,6 +1233,7 @@ int	fits_execute_template(fitsfile *ff, char *ngp_template, int *status)
 
    ngp_free_line();		/* deallocate last line (if any) */
    ngp_free_prevline();		/* deallocate cached line (if any) */
+   ngp_delete_extver_tab();	/* delete extver table (if present), error ignored */
    
    *status = r;
    return(r);

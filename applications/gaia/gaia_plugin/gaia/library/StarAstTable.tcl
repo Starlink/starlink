@@ -81,11 +81,11 @@
 
 itk::usual StarAstTable {}
 
-class gaia::StarAstTable {
+itcl::class gaia::StarAstTable {
 
    #  Inheritances:
    #  -------------
-   inherit FrameWidget
+   inherit util::FrameWidget
 
    #  Constructor:
    #  ------------
@@ -95,7 +95,8 @@ class gaia::StarAstTable {
        eval itk_initialize $args
 
        #  Get name of TopLevelWidget (no . allowed!).
-       set top_ [winfo command [winfo toplevel $w_]]
+       #set top_ [winfo command [winfo toplevel $w_]]
+       set top_ [winfo toplevel $w_]
 
        # Add options to the edit menu if given.
        if { $itk_option(-editmenu) != {} } {
@@ -235,7 +236,7 @@ class gaia::StarAstTable {
 
    #  Grab a catalogue of objects from an AstroCat window.
    public method grab {} {
-      set astrocats [AstroCat::instances]
+      set astrocats [cat::AstroCat::instances]
       if { $astrocats != {} } {
 
          #  Create a Name chooser to display the possible catalogues

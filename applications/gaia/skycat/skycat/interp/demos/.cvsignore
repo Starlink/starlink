@@ -16,6 +16,7 @@
 24.0.gsc.table
 AAA.fits
 A_I_st_00_30931.mini.table
+A_I_st_00_30931.save.fits
 A_I_st_00_30931.scat
 A_I_st_00_part.UNSO.cat
 A_I_st_00_part.cat
@@ -132,6 +133,7 @@ tmp.table
 tmp1.table
 tmp2.table
 tmp3.table
+tmp6.fits
 ttest.table
 wcstest.gsc.table
 wcstest.ned.table
@@ -147,6 +149,7 @@ xxx
 xxx.fits
 xxx.gz
 xxx.gzfits
+xxx.table
 xxx.warp.fits
 xyz
 y.ps

@@ -4,6 +4,58 @@ CHANGES to the GAIA plugin
 This file contains a list of changes to the GAIA plugin software and
 user interface. The latest changes are at the top.
 
+---------------  4.02.99 released gaia_plugin-1.0.10 ------------------------
+
+* Tested with Tcl8.0.3 and made corrections in the GAIA Tcl sources
+  (scope and namespace syntax changed).
+
+* rtdWord.c: added #ifdefs for tk8, since the C Font handling routines
+  changed in tk8 (need to use Tk_Font in place of XFontStruct).
+
+* Removed redundant calls to Rtd_Init and Cat_Init in tkAppInit.C (These
+  are called automatically in Skycat_Init now).
+
+* Changed the plugin release to include the necessary starlink and pbm binaries
+  and added a script "skycatgaia" that starts skycat with the GAIA plugin, 
+  so that the user does not need to set any environment variables.
+
+* Compiled starlink convert for HP-UX (without IRAF support). This is
+  a newer version that what we are using on Sun and Linux. It uses
+  the netpbm package, while the others still use the pbmplus package.
+
+* Started trying to make a binary version to make distribution
+  easier using ET (tk4.2) or TclPro (Tk8.x). (Still under development).
+
+---------------  14.01.99 released gaia_plugin-1.0.10 ------------------------
+
+* Included libskycat.sl in the HP-UX binary release, since libgaia.sl
+  depends on it on HP. Also set the SHLIB_PATH environment variable in
+  SkyCat_Plugin.tcl, so that the library will be found.
+
+---------------  29.12.98 released gaia_plugin-1.0.9 ------------------------
+
+* Rebuild tclIndex file whenever configure is run, since Tcl8 version
+  is not compatible with tcl7 version (see makelinks script).
+
+* configure.in: reversed order of g77 and f77 so that correct FORTRAN
+  compiler is selected with sunpro.
+
+* Removed dependency on the Rtd and Cat packages, since these are now part
+  of the Skycat package.
+
+---------------  16.11.98 released gaia_plugin-1.0.8 ------------------------
+
+* Minor changes to support Tcl8.0.x/Itcl3.0.x: changed "class" to itcl::class",
+  call member procs with namespace prefix, added Tcl version checks to namespace
+  code that changed in Tcl8.
+
+---------------  7.9.98 released gaia_plugin-1.0.7 --------------------------
+
+* Commented out line: "tk appname GAIA", so that "send Skycat ..." 
+  and  -remote option works also in GAIA.
+
+* Minor fix in Makefile: (added "\" in gaia/gaia/src/Makefile.in).
+
 ---------------  25.6.98 released gaia_plugin-1.0.6 --------------------------
 
 * StarFItsIO: Fixed a bug that caused a crash (on solaris, at least), when loading

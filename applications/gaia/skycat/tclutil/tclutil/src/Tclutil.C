@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Tclutil.C,v 1.5 1998/11/16 21:27:48 abrighto Exp $"
+ * "@(#) $Id: Tclutil.C,v 1.6 1999/02/02 21:51:02 abrighto Exp $"
  *
  * Tclutil.C - Initialize Tclutil package
  * 
@@ -8,7 +8,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  21 Nov 97  Created
  */
-static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.5 1998/11/16 21:27:48 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.6 1999/02/02 21:51:02 abrighto Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -105,7 +105,7 @@ int Tclutil_Init(Tcl_Interp* interp)
 		 "namespace ::util {};"
 		 "import add util;"
 #endif
-	) != 0)
+	) != TCL_OK)
 	return TCL_ERROR;
 
     return TCL_OK; 

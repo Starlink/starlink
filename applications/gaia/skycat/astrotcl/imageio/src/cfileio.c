@@ -64,6 +64,7 @@ int ffomem(fitsfile **fptr,      /* O - FITS file pointer                   */
     char urltype[MAX_PREFIX_LEN], infile[FLEN_FILENAME], outfile[FLEN_FILENAME];
     char extspec[FLEN_FILENAME], rowfilter[FLEN_FILENAME];
     char binspec[FLEN_FILENAME], colspec[FLEN_FILENAME];
+    char imagecolname[FLEN_VALUE], rowexpress[FLEN_FILENAME];
     char *url, errmsg[FLEN_ERRMSG];
     char *hdtype[3] = {"IMAGE", "TABLE", "BINTABLE"};
 
@@ -188,11 +189,15 @@ int ffomem(fitsfile **fptr,      /* O - FITS file pointer                   */
     /* move to desired extension, if specified as part of the URL */
     /* ---------------------------------------------------------- */
 
+    imagecolname[0] = '\0';
+    rowexpress[0] = '\0';
+
     if (*extspec)
     {
        /* parse the extension specifier into individual parameters */
        ffexts(extspec, &extnum, 
-                            extname, &extvers, &movetotype, status);
+         extname, &extvers, &movetotype, imagecolname, rowexpress, status);
+
 
       if (*status > 0)
           return(*status);
@@ -253,16 +258,19 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
 */
 {
     int  driver, hdutyp, slen, writecopy, isopen;
-    long filesize;
+    long filesize, rownum;
     int extnum, extvers, handle, movetotype;
     char urltype[MAX_PREFIX_LEN], infile[FLEN_FILENAME], outfile[FLEN_FILENAME];
     char origurltype[MAX_PREFIX_LEN], extspec[FLEN_FILENAME];
     char extname[FLEN_VALUE], rowfilter[FLEN_FILENAME];
+    char imagecolname[FLEN_VALUE], rowexpress[FLEN_FILENAME];
     char binspec[FLEN_FILENAME], colspec[FLEN_FILENAME];
     char histfilename[FLEN_FILENAME];
+    char filtfilename[FLEN_FILENAME];
     char wtcol[FLEN_VALUE];
     char minname[4][FLEN_VALUE], maxname[4][FLEN_VALUE];
     char binname[4][FLEN_VALUE];
+    char card[FLEN_CARD];
 
     char *url;
     double minin[4], maxin[4], binsizein[4], weight;
@@ -304,20 +312,42 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
         return(*status);
     }
 
+    imagecolname[0] = '\0';
+    rowexpress[0] = '\0';
+
+    if (*extspec)
+    {
+       /* parse the extension specifier into individual parameters */
+       ffexts(extspec, &extnum, 
+         extname, &extvers, &movetotype, imagecolname, rowexpress, status);
+
+      if (*status > 0)
+          return(*status);
+    }
+
     /*-------------------------------------------------------------------*/
-    /* special case: if outfile and binspec are both specified, then     */
-    /* the output file name is intended for the final histogram, and not */
-    /* the copy of the input file that will be created if colspec or     */
-    /* rowfilter are specified.                                          */
+    /* special cases:                                                    */
     /*-------------------------------------------------------------------*/
 
     histfilename[0] = '\0';
-    if (*outfile && *binspec)
+    filtfilename[0] = '\0';
+    if (*outfile && (*binspec || *imagecolname))
     {
+        /* if binspec or imagecolumn are specified, then the  */
+        /* output file name is intended for the final image,  */
+        /* and not a copy of the input file.                  */
         strcpy(histfilename, outfile);
         outfile[0] = '\0';
     }
-        
+    else if (*outfile && (*rowfilter || *colspec))
+    {
+        /* if rowfilter or colspece are specified, then the    */
+        /* output file name is intended for the filtered file  */
+        /* and not a copy of the input file.                   */
+        strcpy(filtfilename, outfile);
+        outfile[0] = '\0';
+    }
+
     /*-------------------------------------------------------------------*/
     /* check if this same file is already open, and if so, attach to it  */
     /*-------------------------------------------------------------------*/
@@ -490,13 +520,6 @@ move2hdu:
 
     if (*extspec)
     {
-       /* parse the extension specifier into individual parameters */
-       ffexts(extspec, &extnum, 
-                            extname, &extvers, &movetotype, status);
-
-      if (*status > 0)
-          return(*status);
-
       if (extnum)  /* extension number was specified */
       {
         ffmahd(*fptr, extnum + 1, &hdutyp, status);
@@ -541,6 +564,67 @@ move2hdu:
       }
     }
 
+    if (*imagecolname)
+    {
+       /* we need to open an image contained in a single table cell */
+       /* First, determine which row of the table to use. */
+
+       if (isdigit((int) *rowexpress))  /* is the row specification a number? */
+       {
+          sscanf(rowexpress, "%ld", &rownum);
+          if (rownum < 1)
+          {
+             ffpmsg("illegal rownum for image cell:");
+             ffpmsg(rowexpress);
+             ffpmsg("Could not open the following image in a table cell:");
+             ffpmsg(extspec);
+             return(*status = BAD_ROW_NUM);
+          }
+       }
+       else if (fits_find_first_row(*fptr, rowexpress, &rownum, status) > 0)
+       {
+          ffpmsg("Failed to find row matching this expression:");
+          ffpmsg(rowexpress);
+          ffpmsg("Could not open the following image in a table cell:");
+          ffpmsg(extspec);
+          return(*status);
+       }
+
+       if (rownum == 0)
+       {
+          ffpmsg("row statisfying this expression doesn't exist::");
+          ffpmsg(rowexpress);
+          ffpmsg("Could not open the following image in a table cell:");
+          ffpmsg(extspec);
+          return(*status = BAD_ROW_NUM);
+       }
+
+       /* determine the name of the new file to contain copy of the image */
+       if (*histfilename)
+           strcpy(outfile, histfilename); /* the original outfile name */
+       else
+           strcpy(outfile, "mem://_1");  /* create image file in memory */
+
+       /* Copy the image into new primary array and open it as the current */
+       /* fptr.  This will close the table that contains the original image. */
+
+       if (fits_copy_image_cell(fptr, outfile, imagecolname, rownum,
+                                status) > 0)
+       {
+          ffpmsg("Failed to copy table cell to new primary array:");
+          ffpmsg(extspec);
+          return(*status);
+       }
+
+       /* add some HISTORY */
+       if (*extname)
+         sprintf(card,"HISTORY  in HDU '%.16s' of file '%.36s'", extname, infile);
+       else
+         sprintf(card,"HISTORY  in HDU %d of file '%.45s'", extnum, infile);
+
+       ffprec(*fptr, card, status);
+    }
+
     /* --------------------------------------------------------------------- */
     /* edit columns (and/or keywords) in the table, if specified in the URL  */
     /* --------------------------------------------------------------------- */
@@ -555,7 +639,12 @@ move2hdu:
 
        if (!writecopy)
        {
-           strcpy(outfile, "mem://_1");  /* will create copy in memory */
+           if (*filtfilename && *outfile == '\0')
+               strcpy(outfile, filtfilename); /* the original outfile name */
+           else
+               strcpy(outfile, "mem://_1");   /* will create copy in memory */
+
+           writecopy = 1;
        }
        else
        {
@@ -581,7 +670,10 @@ move2hdu:
 
        if (!writecopy)
        {
-           strcpy(outfile, "mem://_2");  /* will create copy in memory */
+           if (*filtfilename && *outfile == '\0')
+               strcpy(outfile, filtfilename); /* the original outfile name */
+           else if (*outfile == '\0')  /* output file name not already defined? */
+             strcpy(outfile, "mem://_2");  /* will create copy in memory */
        }
        else
        {
@@ -619,7 +711,7 @@ move2hdu:
                           minname, maxname, binname,
                           &weight, wtcol, &recip, status);
 
-       /* Create the histogram in memory and open it as the current fptr.  */
+       /* Create the histogram primary array and open it as the current fptr.  */
        /* This will close the table that was used to create the histogram. */
        ffhist(fptr, outfile, imagetype, haxis, colname, minin, maxin,
               binsizein, minname, maxname, binname,
@@ -1004,6 +1096,324 @@ int ffedit_columns(
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int fits_copy_image_cell(
+           fitsfile **fptr,  /* IO - pointer to input table; on output it  */
+                             /*      points to the new image primary array */
+           char *outfile,    /* I - name for output file                   */
+           char *colname,    /* I - name of column containing the image    */
+           long rownum,      /* I - number of the row containing the image */
+           int *status)
+{
+    fitsfile *newptr;
+    unsigned char buffer[50000];
+    int ii, hdutype, colnum, typecode, bitpix, naxis, maxelem, tstatus;
+    long repeat, naxes[9], nbytes, firstbyte, twidth;
+    long startpos, elemnum, incre, rowlen, tnull, ntodo;
+    double scale, zero;
+    char tform[20];
+    char keyname[FLEN_KEYWORD], card[FLEN_CARD];
+    char axisnum[10], root[9];
+
+    if (*status > 0)
+        return(*status);
+
+    /* get column number */
+    if (ffgcno(*fptr, CASEINSEN, colname, &colnum, status) > 0)
+    {
+        ffpmsg("column containing image in table cell does not exist:");
+        ffpmsg(colname);
+        return(*status);
+    }
+
+    /*---------------------------------------------------*/
+    /*  Check input and get parameters about the column: */
+    /*---------------------------------------------------*/
+    if ( ffgcpr(*fptr, colnum, rownum, 1L, 1L, 0, &scale, &zero,
+         tform, &twidth, &typecode, &maxelem, &startpos, &elemnum, &incre,
+         &repeat, &rowlen, &hdutype, &tnull, (char *) buffer, status) > 0 )
+         return(*status);
+
+    if (hdutype != BINARY_TBL)
+    {
+        ffpmsg("This extension is not a binary table.");
+        ffpmsg(" Cannot open the image in a binary table cell.");
+        return(*status = NOT_BTABLE);
+    }
+
+    if (typecode < 0)
+    {
+        /* variable length array */
+        typecode *= -1;  
+
+        /* variable length arrays are 1-dimensional by default */
+        naxis = 1;
+        naxes[0] = repeat;
+    }
+    else
+    {
+        /* get the dimensions of the image */
+        ffgtdm(*fptr, colnum, 9, &naxis, naxes, status);
+    }
+
+    if (*status > 0)
+    {
+        ffpmsg("Error getting the dimensions of the image");
+        return(*status);
+    }
+
+    /* determine BITPIX value for the image */
+    if (typecode == TBYTE)
+    {
+        bitpix = BYTE_IMG;
+        nbytes = repeat;
+    }
+    else if (typecode == TSHORT)
+    {
+        bitpix = SHORT_IMG;
+        nbytes = repeat * 2;
+    }
+    else if (typecode == TLONG)
+    {
+        bitpix = LONG_IMG;
+        nbytes = repeat * 4;
+    }
+    else if (typecode == TFLOAT)
+    {
+        bitpix = FLOAT_IMG;
+        nbytes = repeat * 4;
+    }
+    else if (typecode == TDOUBLE)
+    {
+        bitpix = DOUBLE_IMG;
+        nbytes = repeat * 8;
+    }
+    else
+    {
+        ffpmsg("Error: the following image column has invalid datatype:");
+        ffpmsg(colname);
+        ffpmsg(tform);
+        ffpmsg("Cannot open an image in a single row of this column.");
+        return(*status = BAD_TFORM);
+    }
+
+    /* create new empty file to hold copy of the image */
+    if (ffinit(&newptr, outfile, status) > 0)
+    {
+        ffpmsg("failed to create file for copy of image in table cell:");
+        ffpmsg(outfile);
+        return(*status);
+    }
+
+    if (ffcrim(newptr, bitpix, naxis, naxes, status) > 0)
+    {
+        ffpmsg("failed to write required primary array keywords in this file:");
+        ffpmsg(outfile);
+        return(*status);
+    }
+
+    /* write the BSCAL and BZERO keywords, if needed */
+    if (scale != 1.0)
+        ffpky(newptr, TDOUBLE, "BSCALE", &scale, "Array scaling factor",
+              status);
+
+    if (zero != 0.0)
+        ffpky(newptr, TDOUBLE, "BZERO", &zero, "Array scaling zero point",
+              status);
+
+    ffkeyn("TUNIT", colnum, keyname, status);
+    tstatus = 0;
+    if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+    {
+        strncpy(card, "BUNIT   ", 8);
+        ffprec(newptr, card, status);
+    }
+
+    ffkeyn("TNULL", colnum, keyname, status);
+    tstatus = 0;
+    if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+    {
+        strncpy(card, "BLANK   ", 8);
+        ffprec(newptr, card, status);
+    }
+
+    /* convert the nominal WCS keywords, if present */
+    strcpy(axisnum,"123456789");
+    for (ii = 0; ii < naxis; ii++)
+    {
+      strcpy(root, "1CTYP");
+      root[0] = axisnum[ii];
+      ffkeyn(root, colnum, keyname, status);
+      tstatus = 0;
+      if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+      {
+        strncpy(card, "CTYPE1  ", 8);
+        card[5] = axisnum[ii];
+        ffprec(newptr, card, status);
+      }
+
+      strcpy(root, "1CUNI");
+      root[0] = axisnum[ii];
+      ffkeyn(root, colnum, keyname, status);
+      tstatus = 0;
+      if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+      {
+        strncpy(card, "CUNIT1  ", 8);
+        card[5] = axisnum[ii];
+        ffprec(newptr, card, status);
+      }
+
+      strcpy(root, "1CRPX");
+      root[0] = axisnum[ii];
+      ffkeyn(root, colnum, keyname, status);
+      tstatus = 0;
+      if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+      {
+        strncpy(card, "CRPIX1  ", 8);
+        card[5] = axisnum[ii];
+        ffprec(newptr, card, status);
+      }
+
+      strcpy(root, "1CRVL");
+      root[0] = axisnum[ii];
+      ffkeyn(root, colnum, keyname, status);
+      tstatus = 0;
+      if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+      {
+        strncpy(card, "CRVAL1  ", 8);
+        card[5] = axisnum[ii];
+        ffprec(newptr, card, status);
+      }
+
+      strcpy(root, "1CDLT");
+      root[0] = axisnum[ii];
+      ffkeyn(root, colnum, keyname, status);
+      tstatus = 0;
+      if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+      {
+        strncpy(card, "CDELT1  ", 8);
+        card[5] = axisnum[ii];
+        ffprec(newptr, card, status);
+      }
+
+      strcpy(root, "1CROT");
+      root[0] = axisnum[ii];
+      ffkeyn(root, colnum, keyname, status);
+      tstatus = 0;
+      if (ffgcrd(*fptr, keyname, card, &tstatus) == 0)
+      {
+        strncpy(card, "CROTA1  ", 8);
+        card[5] = axisnum[ii];
+        ffprec(newptr, card, status);
+      }
+    }
+
+    /* copy all other relevant keywords */
+    fits_copy_image_keywords(*fptr, newptr, status);
+
+    /* add some HISTORY  */
+    sprintf(card,"HISTORY  This image was copied from row %ld of column '%s',",
+            rownum, colname);
+    ffprec(newptr, card, status);
+
+    /* finally, copy the data, one buffer size at a time */
+    ffmbyt(*fptr, startpos, TRUE, status);
+    firstbyte = 1; 
+    while (nbytes && (*status <= 0) )
+    {
+        ntodo = minvalue(50000L, nbytes);
+        ffgbyt(*fptr, ntodo, buffer, status);
+        ffptbb(newptr, 1, firstbyte, ntodo, buffer, status);
+        nbytes    -= ntodo;
+        firstbyte += ntodo;
+    }
+
+    /* close the original file and return ptr to the new image */
+    ffclos(*fptr, status);
+
+    *fptr = newptr; /* reset the pointer to the new table */
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int fits_copy_image_keywords(
+           fitsfile *infptr,   /* I - pointer to input table */
+           fitsfile *outfptr,  /* I - pointer to input table */
+           int *status)
+/*
+     Copy relevant keywords from the table header into the newly created 
+     primary array header.  Convert names of keywords where appropriate.
+*/
+{
+    int nrec, nkeys, nmore;
+    char rec[FLEN_CARD], *root;
+
+    if (*status > 0)
+        return(*status);
+
+    ffghsp(infptr, &nkeys, &nmore, status);  /* get number of keywords */
+    root = rec + 1;
+
+    for (nrec = 9; nrec <= nkeys; nrec++)
+    {     
+        ffgrec(infptr, nrec, rec, status);
+
+        if (*rec == 'T')
+        {
+            if (!strncmp(root, "FORM", 4) || !strncmp(root, "HEAP", 4) ||
+                !strncmp(root, "TYPE", 4) || !strncmp(root, "SCAL", 4) ||
+                !strncmp(root, "ZERO", 4) || !strncmp(root, "DISP", 4) ||
+                !strncmp(root, "LMIN", 4) || !strncmp(root, "LMAX", 4) ||
+                !strncmp(root, "DMIN", 4) || !strncmp(root, "DMAX", 4) ||
+                !strncmp(root, "CTYP", 4) || !strncmp(root, "CRPX", 4) ||
+                !strncmp(root, "CRVL", 4) || !strncmp(root, "CDLT", 4) ||
+                !strncmp(root, "CROT", 4) || !strncmp(root, "CUNI", 4) ||
+                !strncmp(root, "UNIT", 4) || !strncmp(root, "NULL", 4) ||
+                !strncmp(root, "DIM" , 3) || !strncmp(root, "BCOL", 4) )
+
+                /* will have to deal with the WCS keywords separately */
+            {
+               continue;   /* ignore these keywords */
+            }
+            else
+            {
+               ffprec(outfptr, rec, status); /* copy the keyword */
+            }
+        }
+        else if (isdigit((int) *rec) )
+        {
+           if ( !strncmp(root, "CTYP", 4) || !strncmp(root, "CRPX", 4) ||
+                !strncmp(root, "CRVL", 4) || !strncmp(root, "CDLT", 4) ||
+                !strncmp(root, "CROT", 4) || !strncmp(root, "CUNI", 4) )
+
+                /* will have to deal with the WCS keywords separately */
+            {
+               continue;   /* ignore these keywords */
+            }
+            else
+            {
+               ffprec(outfptr, rec, status); /* copy the keyword */
+            }
+        }
+        else if (*rec == 'E' && *root == 'X')
+        {
+            if (!strncmp(root, "XTNAME", 6) || !strncmp(root, "XTVER", 5) ||
+                !strncmp(root, "XTLEVEL", 7)  )
+            {
+               continue;
+            }
+            else
+            {
+               ffprec(outfptr, rec, status); /* copy the keyword */
+            }
+        }
+        else
+        {
+           ffprec(outfptr, rec, status); /* copy the keyword */
+        }
+    }
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffselect_table(
            fitsfile **fptr,  /* IO - pointer to input table; on output it  */
                              /*      points to the new selected rows table */
@@ -1020,7 +1430,8 @@ int ffselect_table(
       if (ffinit(&newptr, outfile, status) > 0)
       {
         ffpmsg(
-         "failed to create memory file for selected rows from input table");
+         "failed to create file for selected rows from input table");
+        ffpmsg(outfile);
         return(*status);
       }
 
@@ -1830,7 +2241,7 @@ int ffiurl(char *url,
 */
 
 { 
-    int ii, jj, slen, infilelen, plus_ext = 0;
+    int ii, jj, slen, infilelen, plus_ext = 0, collen;
     char *ptr1, *ptr2, *ptr3;
 
     /* must have temporary variable for these, in case inputs are NULL */
@@ -2026,7 +2437,7 @@ int ffiurl(char *url,
 
         for (; ii < jj; ii++)
         {
-            if (!isdigit( infile[ii] ) ) /* are all the chars digits? */
+            if (!isdigit((int) infile[ii] ) ) /* are all the chars digits? */
                 break;
         }
 
@@ -2170,37 +2581,56 @@ int ffiurl(char *url,
 
     ptr1 = strstr(rowfilter, "[col ");
     if (!ptr1)
+    {
         ptr1 = strstr(rowfilter, "[COL ");
-    if (!ptr1)
-        ptr1 = strstr(rowfilter, "[Col ");
+
+        if (!ptr1)
+            ptr1 = strstr(rowfilter, "[Col ");
+    }
 
     if (ptr1)
-    {
-        if (colspec)
+    {           /* find the end of the column specifier */
+        ptr2 = ptr1 + 5;
+        while (*ptr2 != ']')
         {
-            strcpy(colspec, ptr1 + 1);       
-
-            ptr2 = strchr(colspec, ']');
-
-            if (ptr2)      /* terminate the binning filter */
-            {
-                *ptr2 = '\0';
-
-                if ( *(--ptr2) == ' ')  /* delete trailing spaces */
-                    *ptr2 = '\0';
-            }
-            else
+            if (*ptr2 == '\0')
             {
                 ffpmsg("input file URL is missing closing bracket ']'");
                 free(infile);
                 return(*status = URL_PARSE_ERROR);  /* error, no closing ] */
             }
+
+            if (*ptr2 == '\'')  /* start of a literal string */
+            {
+                ptr2 = strchr(ptr2 + 1, '\'');  /* find closing quote */
+                if (!ptr2)
+                {
+                  ffpmsg
+          ("literal string in input file URL is missing closing single quote");
+                  free(infile);
+                  return(*status = URL_PARSE_ERROR);  /* error, no closing ] */
+                }
+            }
+
+            ptr2++;  /* continue search for the closing bracket character */
+        } 
+
+        collen = ptr2 - ptr1 - 1;
+
+        if (colspec)    /* copy the column specifier to output string */
+        {
+            strncpy(colspec, ptr1 + 1, collen);       
+            colspec[collen] = '\0';
+ 
+            while (colspec[--collen] == ' ')
+            {
+                colspec[collen] = '\0';  /* strip trailing blanks */
+            }
         }
 
         /* delete the column selection spec from the row filter string */
-        ptr2 = strchr(ptr1, ']');
-        strcpy(tmpstr, ptr2+1);  /* copy any chars after the colspec */
-        strcpy(ptr1, tmpstr);    /* overwrite binspec */
+        strcpy(tmpstr, ptr2 + 1);  /* copy any chars after the colspec */
+        strcpy(ptr1, tmpstr);      /* overwrite binspec */
     }
 
     /* copy the remaining string to the rowfilter output... should only */
@@ -2346,7 +2776,7 @@ int ffrtnm(char *url,
 
         for (; ii < jj; ii++)
         {
-            if (!isdigit( infile[ii] ) ) /* are all the chars digits? */
+            if (!isdigit((int) infile[ii] ) ) /* are all the chars digits? */
                 break;
         }
 
@@ -2443,14 +2873,18 @@ int ffexts(char *extspec,
                        char *extname,
                        int *extvers,
                        int *hdutype,
+                       char *imagecolname,
+                       char *rowexpress,
                        int *status)
 {
 /*
    Parse the input extension specification string, returning either the
    extension number or the values of the EXTNAME, EXTVERS, and XTENSION
-   keywords in desired extension.
+   keywords in desired extension. Also return the name of the column containing
+   an image, and an expression to be used to determine which row to use,
+   if present.
 */
-    char *ptr1;
+    char *ptr1, *ptr2;
     int slen, nvals;
     char tmpname[FLEN_VALUE];
 
@@ -2458,6 +2892,8 @@ int ffexts(char *extspec,
     *extname = '\0';
     *extvers = 0;
     *hdutype = ANY_HDU;
+    *imagecolname = '\0';
+    *rowexpress = '\0';
 
     if (*status > 0)
         return(*status);
@@ -2467,7 +2903,7 @@ int ffexts(char *extspec,
     while (*ptr1 == ' ')  /* skip over any leading blanks */
         ptr1++;
 
-    if (isdigit(*ptr1))  /* is the extension specification a number? */
+    if (isdigit((int) *ptr1))  /* is the extension specification a number? */
     {
         sscanf(ptr1, "%d", extnum);
         if (*extnum < 0 || *extnum > 9999)
@@ -2483,14 +2919,14 @@ int ffexts(char *extspec,
            /* not a number, so EXTNAME must be specified, followed by */
            /* optional EXTVERS and XTENSION  values */
 
-           slen = strcspn(ptr1, " ,:");   /* length of EXTNAME */
+           slen = strcspn(ptr1, " ,:;");   /* length of EXTNAME */
            strncat(extname, ptr1, slen);  /* EXTNAME value */
 
            ptr1 += slen;
            slen = strspn(ptr1, " ,:");  /* skip delimiter characters */
            ptr1 += slen;
 
-           slen = strcspn(ptr1, " ,:");   /* length of EXTVERS */
+           slen = strcspn(ptr1, " ,:;");   /* length of EXTVERS */
            if (slen)
            {
                nvals = sscanf(ptr1, "%d", extvers);  /* EXTVERS value */
@@ -2505,7 +2941,7 @@ int ffexts(char *extspec,
                slen = strspn(ptr1, " ,:");  /* skip delimiter characters */
                ptr1 += slen;
 
-               slen = strlen(ptr1);   /* length of HDUTYPE */
+               slen = strcspn(ptr1, ";");   /* length of HDUTYPE */
                if (slen)
                {
                  if (*ptr1 == 'b' || *ptr1 == 'B')
@@ -2531,6 +2967,46 @@ int ffexts(char *extspec,
                     *extname = '\0';  /* return extnum = 0 */
            }
     }
+
+    ptr1 = strchr(ptr1, ';');
+    if (ptr1)
+    {
+        /* an image is to be opened; the image is contained in a single */
+        /* cell of a binary table.  A column name and an expression to  */
+        /* determine which row to use has been entered.                 */
+
+        ptr1++;  /* skip over the ';' delimiter */
+        while (*ptr1 == ' ')  /* skip over any leading blanks */
+            ptr1++;
+
+        ptr2 = strchr(ptr1, '(');
+        if (!ptr2)
+        {
+            ffpmsg("illegal specification of image in table cell in input URL:");
+            ffpmsg(" did not find a row expression enclosed in ( )");
+            ffpmsg(extspec);
+            return(*status = URL_PARSE_ERROR);
+        }
+
+        strncat(imagecolname, ptr1, ptr2 - ptr1); /* copy column name */
+
+        ptr2++;  /* skip over the '(' delimiter */
+        while (*ptr2 == ' ')  /* skip over any leading blanks */
+            ptr2++;
+
+
+        ptr1 = strchr(ptr2, ')');
+        if (!ptr2)
+        {
+            ffpmsg("illegal specification of image in table cell in input URL:");
+            ffpmsg(" missing closing ')' character in row expression");
+            ffpmsg(extspec);
+            return(*status = URL_PARSE_ERROR);
+        }
+
+        strncat(rowexpress, ptr2, ptr1 - ptr2); /* row expression */
+    }
+
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -2550,7 +3026,8 @@ int ffextn(char *url,           /* I - input filename/URL  */
    1. If the input URL includes a binning specification (e.g.
    'myfile.fits[3][bin X,Y]') then the returned extension number
    will always = 1, since CFITSIO would create a temporary primary
-   image on the fly in this case.
+   image on the fly in this case.  The same is true if an image
+   within a single cell of a binary table is opened.
 
    2.  Else if the input URL specifies an extension number (e.g.,
    'myfile.fits[3]' or 'myfile.fits+3') then the specified extension
@@ -2577,6 +3054,7 @@ int ffextn(char *url,           /* I - input filename/URL  */
     char rowfilter[FLEN_FILENAME];
     char binspec[FLEN_FILENAME];
     char colspec[FLEN_FILENAME];
+    char imagecolname[FLEN_VALUE], rowexpress[FLEN_FILENAME];
     char *cptr;
     int extnum, extvers, hdutype;
 
@@ -2598,10 +3076,17 @@ int ffextn(char *url,           /* I - input filename/URL  */
 
     if (*extspec)   /* is an extension specified? */
     {
-      ffexts(extspec, &extnum, extname, &extvers,
-                                  &hdutype, status);
+       ffexts(extspec, &extnum, 
+         extname, &extvers, &hdutype, imagecolname, rowexpress, status);
+
       if (*status > 0)
         return(*status);
+
+      if (*imagecolname)   /* is an image within a table cell being opened? */
+      {
+         *extension_num = 1; /* a temporary primary array image is created */
+         return(*status);
+      }
 
       if (*extname)
       {
@@ -2645,6 +3130,18 @@ int ffextn(char *url,           /* I - input filename/URL  */
                                 /* defaults to primary array */
          return(*status);
     }
+}
+/*--------------------------------------------------------------------------*/
+
+int ffurlt(fitsfile *fptr, char *urlType, int *status)
+/*
+   return the prefix string associated with the driver in use by the
+   fitsfile pointer fptr
+*/
+
+{ 
+  strcpy(urlType, driverTable[fptr->Fptr->driver].prefix);
+  return(*status);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -2734,7 +3231,8 @@ int fits_get_token(char **ptr,
  
             for (ii = 0; ii < slen; ii++)
             {
-                if ( !isdigit(token[ii]) && token[ii] != '.' && token[ii] != '-')
+                if ( !isdigit((int) token[ii]) && token[ii] != '.' && 
+                     token[ii] != '-')
                 {
                     *isanumber = 0;
                     break;

@@ -72,11 +72,11 @@ option add *LabelRule.rightHeight  2
 option add *LabelRule.rightRelief  sunken
 option add *LabelRule.rightBorder  2
 
-class util::LabelRule {
+itcl::class gaia::LabelRule {
    
    #  Inheritances:
    #  -------------
-   inherit LabelWidget
+   inherit util::LabelWidget
    
    #  Constructor:
    #  ------------

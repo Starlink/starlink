@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.7 1998/07/28 21:23:08 abrighto Exp $
+# $Id: configure.in,v 1.11 1999/02/04 12:03:51 abrighto Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Gaia modules.
@@ -169,6 +169,22 @@ if test "$CAT_NO_TCL" = "1"; then
 fi
 
 # -----------------------------------------------------------------------
+# Check for the Tclpro package from Scriptics
+# -----------------------------------------------------------------------
+AC_MSG_CHECKING([TclPro ])
+file=`which prowrap`
+if test -f "$file" ; then
+	f=`dirname $file`
+	TCLPRO_MACH_DIR=`dirname $f`
+	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`
+	AC_MSG_RESULT([ yes ])
+else
+	AC_MSG_RESULT([ no ])
+fi
+AC_SUBST(TCLPRO_MACH_DIR)
+AC_SUBST(TCLPRO_DIR)
+
+# -----------------------------------------------------------------------
 #
 # "makedepend" info
 #
@@ -185,10 +201,11 @@ AC_SUBST(CXX_DEPEND_FLAGS)
 # -----------------------------------------------------------------------
 #
 # Try to find the location of the static C++ libraries for g++ or CC and
-# make links so that the binary version will not be depending on the C++ 
-# shared library, which might not always be installed.
+# make links in the et dir so that the single binary version will not
+# be depending on the C++ shared library, which might not always be installed.
 #
 # -----------------------------------------------------------------------
+
 AC_MSG_CHECKING([static C++ library ])
 tmpfile=/tmp/tmp$$.C
 tmp1=/tmp/tmp1$$
@@ -203,7 +220,8 @@ dirs="`grep -- -L $tmp2` /usr/lib /lib"
 for i in $dirs ; do
 	dir=`echo $i | sed -e 's/-L//'`
 	if test -f $dir/libg++.a ; then
-		(cd gaia; rm -f libg++.a libstdc++.a; ln -s $dir/libg++.a $dir/libstdc++.a . )
+		test -d et && (cd et; rm -f libg++.a libstdc++.a; ln -s $dir/libg++.a $dir/libstdc++.a . )
+		test -d tclpro && (cd tclpro; rm -f libg++.a libstdc++.a; ln -s $dir/libg++.a $dir/libstdc++.a . )
 		AC_MSG_RESULT($dir/libg++.a)
 		break
 	fi
@@ -211,7 +229,8 @@ done
 for i in $dirs ; do
 	dir=`echo $i | sed -e 's/-L//'`
 	if test -f $dir/libC.a ; then
-		(cd gaia; rm -f libC.a; ln -s $dir/libC.a . )
+		test -d et && (cd et; rm -f libC.a; ln -s $dir/libC.a . )
+		test -d tclpro && (cd tclpro; rm -f libC.a; ln -s $dir/libC.a . )
 		AC_MSG_RESULT($dir/libC.a)
 		break
 	fi
@@ -334,11 +353,12 @@ XINCSW=$TCLUTIL_XINCSW
 # Linker switch(es) to use to link with the X11 library archive.
 XLIBSW=$TCLUTIL_XLIBSW
 
-# Linker switch(es) to use to link with the static X11 library archive.
-XLIBSW=$TCLUTIL_XLIBSW
+# dir for X libs
+XLIBDIR=$TCLUTIL_XLIBDIR
 
 AC_SUBST(XINCSW)
 AC_SUBST(XLIBSW)
+AC_SUBST(XLIBDIR)
 
 # -----------------------------------------------------------------------
 #
@@ -369,6 +389,25 @@ TKINCSW=$TCLUTIL_TKINCSW
 
 AC_SUBST(TCLINCSW)
 AC_SUBST(TKINCSW)
+
+# -----------------------------------------------------------------------
+# static libraries for single binary version
+# -----------------------------------------------------------------------
+XLIBSW_STATIC=$SKYCAT_XLIBSW_STATIC
+TCL_LIB_SPEC_STATIC=$SKYCAT_TCL_LIB_SPEC_STATIC
+TK_LIB_SPEC_STATIC=$SKYCAT_TK_LIB_SPEC_STATIC
+TCLX_LIB_SPEC_STATIC=$SKYCAT_TCLX_LIB_SPEC_STATIC
+ITCL_LIB_SPEC_STATIC=$SKYCAT_ITCL_LIB_SPEC_STATIC
+ITK_LIB_SPEC_STATIC=$SKYCAT_ITK_LIB_SPEC_STATIC
+BLT_LIB_SPEC_STATIC=$SKYCAT_BLT_LIB_SPEC_STATIC
+
+AC_SUBST(XLIBSW_STATIC)
+AC_SUBST(TCL_LIB_SPEC_STATIC)
+AC_SUBST(TK_LIB_SPEC_STATIC)
+AC_SUBST(TCLX_LIB_SPEC_STATIC)
+AC_SUBST(ITCL_LIB_SPEC_STATIC)
+AC_SUBST(ITK_LIB_SPEC_STATIC)
+AC_SUBST(BLT_LIB_SPEC_STATIC)
 
 # -----------------------------------------------------------------------
 # tcl package library files
@@ -506,9 +545,14 @@ fi
 AC_MSG_RESULT($STARLINK)
 AC_SUBST(STARLINK)
 
-#  Name of Fortran compiler
+#  Name of Fortran compiler 
+# (XXX: Note: GNU g77 and GNU f77 are not equivalent! (additional underscore?))
 if test "${FC}" = ""; then
-   AC_CHECK_PROGS( FC, g77 f77, fort77 )
+   if test "${CC}" = "gcc -fwritable-strings"; then
+       AC_CHECK_PROGS( FC, g77, f77 fort77 )
+   else
+       AC_CHECK_PROGS( FC, f77, g77 fort77 )
+   fi
 fi
 
 #  Compilation flags, for g77 we also need -fno-second-underscore.
@@ -675,6 +719,19 @@ AC_SUBST(GAIA_LIB_SPEC)
 AC_SUBST(GAIA_LIB_SPEC_STATIC)
 
 #--------------------------------------------------------------------
+#	Set the directory to use to build the single binary "wrapped" 
+#       version.
+#--------------------------------------------------------------------
+
+case "$TCL_VERSION" in
+#  7.6) GAIA_WRAPPER_DIR=et;;
+  7.6) GAIA_WRAPPER_DIR="";;
+  8.*) if test "$TCLPRO_DIR" != "" ; then GAIA_WRAPPER_DIR=tclpro; fi;;
+  *)   echo "unsupported Tcl version: $TCL_VERSION, expected at least tcl 7.6"; exit 1 ;;
+esac
+AC_SUBST(GAIA_WRAPPER_DIR)
+
+#--------------------------------------------------------------------
 #	Print out some of the more important settings 
 #--------------------------------------------------------------------
 echo "
@@ -744,6 +801,8 @@ AC_OUTPUT(\
 	gaia/demos/gaia_env.sh \
 	gaia/bitmaps/Makefile \
 	gaia/library/pkgIndex.tcl \
+\
+	tclpro/Makefile \
 \
 	, chmod +x gaia/demos/gaia.sh; sh makelinks; make -k depend \
 )

@@ -42,6 +42,7 @@
 /*                              resulting in a speed increase of        */
 /*                              10-100 times.                           */
 /*   Peter D Wilson   Jul 1998  gtifilter(a,b,c,d) function added       */
+/*   Peter D Wilson   Aug 1998  regfilter(a,b,c,d) function added       */
 /*                                                                      */
 /************************************************************************/
 
@@ -196,6 +197,10 @@ int ffsrow( fitsfile *infptr,   /* I - Input FITS file                      */
    inExt.rowLength = (infptr->Fptr)->rowlength;
    inExt.numRows   = (infptr->Fptr)->numrows;
    inExt.heapSize  = (infptr->Fptr)->heapsize;
+   if( inExt.numRows == 0 ) { /* Nothing to copy */
+      ffcprs();
+      return( *status );
+   }
 
    if( outfptr->HDUposition != (outfptr->Fptr)->curhdu )
       ffmahd( outfptr, (outfptr->HDUposition) + 1, NULL, status );
@@ -449,11 +454,11 @@ int ffcalc( fitsfile *infptr,   /* I - Input FITS file                      */
 /*--------------------------------------------------------------------------*/
 {
    parseInfo Info;
-   int naxis, constant;
-   long nelem, naxes[MAXDIMS];
+   int naxis, constant, typecode, newNullKwd=0;
+   long nelem, naxes[MAXDIMS], repeat, width;
    int col_cnt, colNo;
    Node *result;
-   char card[81];
+   char card[81], tform[16], nullKwd[9];
    int hdutype;
 
    if( *status ) return( *status );
@@ -512,13 +517,13 @@ int ffcalc( fitsfile *infptr,   /* I - Input FITS file                      */
 	 if( parInfo==NULL || *parInfo=='\0' ) {
 	    /*  Figure out best default column type  */
 	    if( hdutype==BINARY_TBL ) {
-	       sprintf(card,"%ld",nelem);
+	       sprintf(tform,"%ld",nelem);
 	       switch( Info.datatype ) {
-	       case TLOGICAL:  strcat(card,"L");  break;
-	       case TLONG:     strcat(card,"J");  break;
-	       case TDOUBLE:   strcat(card,"D");  break;
-	       case TSTRING:   strcat(card,"A");  break;
-	       case TBIT:      strcat(card,"X");  break;
+	       case TLOGICAL:  strcat(tform,"L");  break;
+	       case TLONG:     strcat(tform,"J");  break;
+	       case TDOUBLE:   strcat(tform,"D");  break;
+	       case TSTRING:   strcat(tform,"A");  break;
+	       case TBIT:      strcat(tform,"X");  break;
 	       }
 	    } else {
 	       switch( Info.datatype ) {
@@ -527,22 +532,51 @@ int ffcalc( fitsfile *infptr,   /* I - Input FITS file                      */
 		  ffpmsg("Cannot create LOGICAL column in ASCII table");
 		  return( *status = NOT_BTABLE );
 		  break;
-	       case TLONG:     strcpy(card,"I11");     break;
-	       case TDOUBLE:   strcpy(card,"D23.15");  break;
+	       case TLONG:     strcpy(tform,"I11");     break;
+	       case TDOUBLE:   strcpy(tform,"D23.15");  break;
 	       case TSTRING:   
-	       case TBIT:      sprintf(card,"A%ld",nelem);  break;
+	       case TBIT:      sprintf(tform,"A%ld",nelem);  break;
 	       }
 	    }
-	    parInfo = card;
-	 } else if( !(isdigit(*parInfo)) && hdutype==BINARY_TBL ) {
+	    parInfo = tform;
+	 } else if( !(isdigit((int) *parInfo)) && hdutype==BINARY_TBL ) {
 	    if( Info.datatype==TBIT && *parInfo=='B' )
 	       nelem = (nelem+7)/8;
-	    sprintf(card,"%ld%s",nelem,parInfo);
-	    parInfo = card;
+	    sprintf(tform,"%ld%s",nelem,parInfo);
+	    parInfo = tform;
 	 }
 	 fficol( outfptr, colNo, parName, parInfo, status );
 	 if( naxis>1 )
 	    ffptdm( outfptr, colNo, naxis, naxes, status );
+
+	 /*  Setup TNULLn keyword in case NULLs are encountered  */
+
+	 ffkeyn("TNULL", colNo, nullKwd, status);
+	 if( ffgcrd( outfptr, nullKwd, card, status )==KEY_NO_EXIST ) {
+	    *status = 0;
+	    if( hdutype==BINARY_TBL ) {
+	       long nullVal=0;
+	       fits_binary_tform( parInfo, &typecode, &repeat, &width, status );
+	       if( typecode==TBYTE )
+		  nullVal = UCHAR_MAX;
+	       else if( typecode==TSHORT )
+		  nullVal = SHRT_MIN;
+	       else if( typecode==TINT )
+		  nullVal = INT_MIN;
+	       else if( typecode==TLONG )
+		  nullVal = LONG_MIN;
+	       if( nullVal ) {
+		  ffpkyj( outfptr, nullKwd, nullVal, "Null value", status );
+		  fits_set_btblnull( outfptr, colNo, nullVal, status );
+		  newNullKwd = 1;
+	       }
+	    } else if( hdutype==ASCII_TBL ) {
+	       ffpkys( outfptr, nullKwd, "NULL", "Null value string", status );
+	       fits_set_atblnull( outfptr, colNo, "NULL", status );
+	       newNullKwd = 1;
+	    }
+	 }
+
       }
 
    } else if( *status ) {
@@ -573,6 +607,11 @@ int ffcalc( fitsfile *infptr,   /* I - Input FITS file                      */
 
       ffiter( gParse.nCols, gParse.colData, 0, 0,
 	      parse_data, (void*)&Info, status );
+
+      if( newNullKwd && !Info.anyNull ) {
+	 ffdkey( outfptr, nullKwd, status );
+      }
+
    } else {
 
       /* Put constant result into keyword */
@@ -775,7 +814,7 @@ int parse_data( long        totalrows, /* I - Total rows to be processed     */
 /* structure.                                                                */
 /*---------------------------------------------------------------------------*/
 {
-    int status, constant=0;
+    int status, constant=0, anyNullThisTime=0;
     long jj, kk, idx, remain, rowOffset, ntodo;
     Node *result;
 
@@ -792,6 +831,7 @@ int parse_data( long        totalrows, /* I - Total rows to be processed     */
     if (firstrow == offset+1)
     {
        userInfo = (parseInfo*)userPtr;
+       userInfo->anyNull = 0;
 
        if( userInfo->maxRows>0 )
           userInfo->maxRows = minvalue(totalrows,userInfo->maxRows);
@@ -818,6 +858,14 @@ int parse_data( long        totalrows, /* I - Total rows to be processed     */
 	  jnull = 0L;
 	  ffgknj( colData[nCols-1].fptr, "TNULL", colData[nCols-1].colnum,
 		  1, &jnull, (int*)&jj, &status );
+	  if( status==BAD_INTKEY ) {
+	     /*  Probably ASCII table with text TNULL keyword  */
+	     switch( userInfo->datatype ) {
+	     case TSHORT:  jnull = SHRT_MIN;      break;
+	     case TINT:    jnull = INT_MIN;       break;
+	     case TLONG:   jnull = LONG_MIN;      break;
+	     }
+	  }
 
        } else {
 
@@ -848,7 +896,6 @@ int parse_data( long        totalrows, /* I - Total rows to be processed     */
     /*  If writing to output column, set first element to appropriate  */
     /*  null value.  If no NULLs encounter, zero out before returning. */
 
-    userInfo->anyNull = 0;
     if( userInfo->dataPtr == NULL ) {
        /* First, reset Data pointer to start of output array */
        Data = (char*)colData[nCols-1].array + datasize;
@@ -906,14 +953,14 @@ int parse_data( long        totalrows, /* I - Total rows to be processed     */
 			&undef, result->value.nelem,
 			userInfo->datatype, Null,
 			(char*)Data+kk*datasize*result->value.nelem,
-			&userInfo->anyNull, &gParse.status );
+			&anyNullThisTime, &gParse.status );
 	  } else {
 	     ffcvtn( gParse.datatype,
 		     result->value.data.ptr,
 		     result->value.undef,
 		     result->value.nelem*ntodo,
 		     userInfo->datatype, Null, Data,
-		     &userInfo->anyNull, &gParse.status );
+		     &anyNullThisTime, &gParse.status );
 	     if( result->operation>0 ) {
 		free( result->value.data.ptr );
 	     }
@@ -1012,7 +1059,9 @@ int parse_data( long        totalrows, /* I - Total rows to be processed     */
     /* If no NULLs encountered during this pass, set Null value to */
     /* zero to make the writing of the output column data faster   */
 
-    if( userInfo->dataPtr == NULL && !userInfo->anyNull )
+    if( anyNullThisTime )
+       userInfo->anyNull = 1;
+    else if( userInfo->dataPtr == NULL )
        memcpy( Null, zeros, datasize );
 
     /*-------------------------------------------------------*/
@@ -1107,15 +1156,22 @@ int ffcvtn( int   inputType,  /* I - Data type of input array               */
          break;
       case TLONG:
          for (i = 0; i < ntodo; i++) {
-            if( ((long*)input)[i] < 0 ) {
-               *status = OVERFLOW_ERR;
-               ((unsigned char*)output)[i] = 0;
-            } else if( ((long*)input)[i] > UCHAR_MAX ) {
-               *status = OVERFLOW_ERR;
-               ((unsigned char*)output)[i] = UCHAR_MAX;
-            } else
-               ((unsigned char*)output)[i] = (unsigned char) ((long*)input)[i];
+	    if( undef[i] ) {
+	       ((unsigned char*)output)[i] = *(unsigned char*)nulval;
+	       *anynull = 1;
+	    } else {
+	       if( ((long*)input)[i] < 0 ) {
+		  *status = OVERFLOW_ERR;
+		  ((unsigned char*)output)[i] = 0;
+	       } else if( ((long*)input)[i] > UCHAR_MAX ) {
+		  *status = OVERFLOW_ERR;
+		  ((unsigned char*)output)[i] = UCHAR_MAX;
+	       } else
+		  ((unsigned char*)output)[i] = 
+		     (unsigned char) ((long*)input)[i];
+	    }
          }
+	 return( *status );
          break;
       case TFLOAT:
          fffr4i1((float*)input,ntodo,1.,0.,0,0,NULL,NULL,
@@ -1150,15 +1206,21 @@ int ffcvtn( int   inputType,  /* I - Data type of input array               */
          break;
       case TLONG:
          for (i = 0; i < ntodo; i++) {
-            if( ((long*)input)[i] < SHRT_MIN ) {
-               *status = OVERFLOW_ERR;
-               ((short*)output)[i] = SHRT_MIN;
-            } else if ( ((long*)input)[i] > SHRT_MAX ) {
-               *status = OVERFLOW_ERR;
-               ((short*)output)[i] = SHRT_MAX;
-            } else
-               ((short*)output)[i] = (short) ((long*)input)[i];
+	    if( undef[i] ) {
+	       ((short*)output)[i] = *(short*)nulval;
+	       *anynull = 1;
+	    } else {
+	       if( ((long*)input)[i] < SHRT_MIN ) {
+		  *status = OVERFLOW_ERR;
+		  ((short*)output)[i] = SHRT_MIN;
+	       } else if ( ((long*)input)[i] > SHRT_MAX ) {
+		  *status = OVERFLOW_ERR;
+		  ((short*)output)[i] = SHRT_MAX;
+	       } else
+		  ((short*)output)[i] = (short) ((long*)input)[i];
+	    }
          }
+	 return( *status );
          break;
       case TFLOAT:
          fffr4i2((float*)input,ntodo,1.,0.,0,0,NULL,NULL,
@@ -1491,10 +1553,6 @@ int uncompress_hkdata( fitsfile *fptr,
                   &newtime, &anynul, status ) ) return( *status );
       if( newtime != currtime ) {
          /*  New time encountered... propogate parameters to next row  */
-         if( newtime<currtime ) {
-            ffpmsg("Time stamps out of order");
-            return( *status = PARSE_BAD_COL );
-         }
          if( currelem==ntimes ) {
             ffpmsg("Found more unique time stamps than caller indicated");
             return( *status = PARSE_BAD_COL );
@@ -1566,4 +1624,98 @@ int uncompress_hkdata( fitsfile *fptr,
 	 *status = PARSE_SYNTAX_ERR;
       }
    return( *status );
+}
+
+/*---------------------------------------------------------------------------*/
+int ffffrw( fitsfile *fptr,         /* I - Input FITS file                   */
+            char     *expr,         /* I - Boolean expression                */
+            long     *rownum,       /* O - First row of table to eval to T   */
+            int      *status )      /* O - Error status                      */
+/*                                                                           */
+/* Evaluate a boolean expression, returning the row number of the first      */
+/* row which evaluates to TRUE                                               */
+/*---------------------------------------------------------------------------*/
+{
+   int naxis, constant, dtype;
+   long nelem, naxes[MAXDIMS];
+   char result;
+
+   if( *status ) return( *status );
+
+   if( ffiprs( fptr, 0, expr, MAXDIMS, &dtype, &nelem, &naxis,
+               naxes, status ) ) {
+      ffcprs();
+      return( *status );
+   }
+   if( nelem<0 ) {
+      constant = 1;
+      nelem = -nelem;
+   } else
+      constant = 0;
+
+   if( dtype!=TLOGICAL || nelem!=1 ) {
+      ffcprs();
+      ffpmsg("Expression does not evaluate to a logical scalar.");
+      return( *status = PARSE_BAD_TYPE );
+   }
+
+   *rownum = 0;
+   if( constant ) { /* No need to call parser... have result from ffiprs */
+      result = gParse.Nodes[gParse.nNodes-1].value.data.log;
+      if( result ) {
+	 /*  Make sure there is at least 1 row in table  */
+	 ffgnrw( fptr, &nelem, status );
+	 if( nelem )
+	    *rownum = 1;
+      }
+   } else {
+      if( ffiter( gParse.nCols, gParse.colData, 0, 0,
+		  ffffrw_work, (void*)rownum, status ) == -1 )
+	 *status = 0;  /* -1 indicates exitted without error before end... OK */
+   }
+
+   ffcprs();
+   return(*status);
+}
+
+/*---------------------------------------------------------------------------*/
+int ffffrw_work(long        totalrows, /* I - Total rows to be processed     */
+                long        offset,    /* I - Number of rows skipped at start*/
+                long        firstrow,  /* I - First row of this iteration    */
+                long        nrows,     /* I - Number of rows in this iter    */
+                int         nCols,     /* I - Number of columns in use       */
+                iteratorCol *colData,  /* IO- Column information/data        */
+                void        *userPtr ) /* I - Data handling instructions     */
+/*                                                                           */
+/* Iterator work function which calls the parser and searches for the        */
+/* first row which evaluates to TRUE.                                        */
+/*---------------------------------------------------------------------------*/
+{
+    long idx;
+    Node *result;
+
+    Reset_Parser ( firstrow, 0, nrows );
+    Evaluate_Node( gParse.nNodes-1 );
+
+    if( !gParse.status ) {
+
+       result = gParse.Nodes + gParse.nNodes-1;
+       if( result->operation==CONST_OP ) {
+
+	  if( result->value.data.log ) {
+	     *(long*)userPtr = firstrow;
+	     return( -1 );
+	  }
+
+       } else {
+
+	  for( idx=0; idx<nrows; idx++ )
+	     if( result->value.data.logptr[idx] && !result->value.undef[idx] ) {
+		*(long*)userPtr = firstrow + idx;
+		return( -1 );
+	     }
+       }
+    }
+
+    return( gParse.status );
 }

@@ -100,7 +100,7 @@
 
 itk::usual StarPatch {}
 
-class gaia::StarPatch {
+itcl::class gaia::StarPatch {
 
    #  Inheritances:
    #  -------------

@@ -409,7 +409,7 @@ int ffmnam(fitsfile *fptr,    /* I - FITS file pointer     */
     if (ffgkey(fptr, oldname, value, comm, status) > 0)
         return(*status);
 
-    ffmkky(newname, value, comm, card);  /* construct the card */
+    ffmkky(newname, value, comm, card, status);  /* construct the card */
     ffmkey(fptr, card, status);  /* rewrite with new name */
 
     return(*status);
@@ -430,7 +430,7 @@ int ffmcom(fitsfile *fptr,    /* I - FITS file pointer  */
     if (ffgkey(fptr, keyname, value, oldcomm, status) > 0)
         return(*status);
 
-    ffmkky(keyname, value, comm, card);  /* construct the card */
+    ffmkky(keyname, value, comm, card, status);  /* construct the card */
     ffmkey(fptr, card, status);  /* rewrite with new comment */
 
     return(*status);
@@ -498,7 +498,7 @@ int ffpunt(fitsfile *fptr,    /* I - FITS file pointer   */
         strncat(newcomm, oldcomm, len);
     }
 
-    ffmkky(keyname, value, newcomm, card);  /* construct the card */
+    ffmkky(keyname, value, newcomm, card, status);  /* construct the card */
     ffmkey(fptr, card, status);  /* rewrite with new units string */
 
     return(*status);
@@ -519,14 +519,13 @@ int ffmkyu(fitsfile *fptr,    /* I - FITS file pointer  */
     if (ffgkey(fptr, keyname, valstring, oldcomm, status) > 0)
         return(*status);                               /* get old comment */
 
-    strcpy(valstring,"0");  /* create a dummy value string */
+    strcpy(valstring," ");  /* create a dummy value string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
-    card[29] = ' ';        /* reset the dummy value string to a blank */
     ffmkey(fptr, card, status);
 
     return(*status);
@@ -554,9 +553,9 @@ int ffmkys(fitsfile *fptr,    /* I - FITS file pointer  */
     ffs2c(value, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status); /* overwrite the previous keyword */
 
@@ -600,9 +599,9 @@ int ffmkyl(fitsfile *fptr,    /* I - FITS file pointer  */
     ffl2c(value, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -628,9 +627,9 @@ int ffmkyj(fitsfile *fptr,    /* I - FITS file pointer  */
     ffi2c(value, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -657,9 +656,9 @@ int ffmkyf(fitsfile *fptr,    /* I - FITS file pointer  */
     ffr2f(value, decim, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -686,9 +685,9 @@ int ffmkye(fitsfile *fptr,    /* I - FITS file pointer  */
     ffr2e(value, decim, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -715,9 +714,9 @@ int ffmkyg(fitsfile *fptr,    /* I - FITS file pointer  */
     ffd2f(value, decim, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -744,9 +743,9 @@ int ffmkyd(fitsfile *fptr,    /* I - FITS file pointer  */
     ffd2e(value, decim, valstring, status);   /* convert value to a string */
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -779,9 +778,9 @@ int ffmkfc(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, ")");
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -814,9 +813,9 @@ int ffmkyc(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, ")");
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -849,9 +848,9 @@ int ffmkfm(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, ")");
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -884,9 +883,9 @@ int ffmkym(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, ")");
 
     if (!comm || comm[0] == '&')  /* preserve the current comment string */
-        ffmkky(keyname, valstring, oldcomm, card);
+        ffmkky(keyname, valstring, oldcomm, card, status);
     else
-        ffmkky(keyname, valstring, comm, card);
+        ffmkky(keyname, valstring, comm, card, status);
 
     ffmkey(fptr, card, status);
 
@@ -907,9 +906,8 @@ int ffikyu(fitsfile *fptr,    /* I - FITS file pointer  */
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
 
-    strcpy(valstring,"0");  /* create a dummy value string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
-    card[29] = ' ';        /* reset the dummy value string to a blank */
+    strcpy(valstring," ");  /* create a dummy value string */
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);
 
     return(*status);
@@ -928,7 +926,7 @@ int ffikys(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffs2c(value, valstring, status);   /* put quotes around the string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);
 
     return(*status);
@@ -947,7 +945,7 @@ int ffikyl(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffl2c(value, valstring, status);   /* convert logical to 'T' or 'F' */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -966,7 +964,7 @@ int ffikyj(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffi2c(value, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -986,7 +984,7 @@ int ffikyf(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffr2f(value, decim, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1006,7 +1004,7 @@ int ffikye(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffr2e(value, decim, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1026,7 +1024,7 @@ int ffikyg(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffd2f(value, decim, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1046,7 +1044,7 @@ int ffikyd(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffd2e(value, decim, valstring, status);   /* convert to formatted string */
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1073,7 +1071,7 @@ int ffikfc(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1100,7 +1098,7 @@ int ffikyc(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1128,7 +1126,7 @@ int ffikfm(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);
@@ -1155,7 +1153,7 @@ int ffikym(fitsfile *fptr,    /* I - FITS file pointer  */
     strcat(valstring, tmpstring);
     strcat(valstring, ")");
 
-    ffmkky(keyname, valstring, comm, card);  /* construct the keyword*/
+    ffmkky(keyname, valstring, comm, card, status);  /* construct the keyword*/
     ffikey(fptr, card, status);  /* write the keyword*/
 
     return(*status);

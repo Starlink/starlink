@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePopup.tcl,v 1.22 1998/10/28 17:42:30 abrighto Exp $"
+# "@(#) $Id: RtdImagePopup.tcl,v 1.23 1998/12/03 22:11:09 abrighto Exp $"
 #
 # RtdImagePopup.tcl - A toplevel widget for displaying rapid frames for RtdImage
 # 
@@ -124,7 +124,6 @@ itcl::class rtd::RtdImagePopup {
     # destructor - clean up when deleted
     
     destructor {
-	image delete $image_
 	$draw_ remove_notify_cmd $itk_option(-region_id)
 	$draw_ delete_object $rectId_
 	$draw_ delete_object $itk_option(-region_id)

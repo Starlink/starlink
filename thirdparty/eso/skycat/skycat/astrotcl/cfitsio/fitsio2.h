@@ -188,7 +188,7 @@
 #define INT32_MIN -2147483647 /* min 32-bit integer */
 #endif
 
-void ffmkky(char *keyname, char *keyval, char *comm, char *card);
+int ffmkky(char *keyname, char *keyval, char *comm, char *card, int *status);
 int ffgnky(fitsfile *fptr, char *card, int *status);
 void ffcfmt(char *tform, char *cform);
 void ffswap2(short *values, long nvalues);
@@ -259,7 +259,9 @@ int ffwritehisto(long totaln, long offset, long firstn, long nvalues,
              int narrays, iteratorCol *imagepars, void *userPointer);
 int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
              int ncols, iteratorCol *colpars, void *userPointer);
-
+int fits_copy_image_cell(fitsfile **fptr, char *outfile, char *colname,
+           long rownum, int *status);
+int fits_copy_image_keywords(fitsfile *infptr, fitsfile *outfptr, int *status);
 int ffrhdu(fitsfile *fptr, int *hdutype, int *status);
 int ffpinit(fitsfile *fptr, int *status);
 int ffainit(fitsfile *fptr, int *status);
@@ -650,7 +652,6 @@ int ffr8fstr(double *input, long ntodo, double scale, double zero,
 void ieevpd(double *inarray, double *outarray, long *nvals);
 void ieevud(double *inarray, double *outarray, long *nvals);
 
-
 /*  routines related to the lexical parser  */
 int  ffselect_table(fitsfile **fptr, char *outfile, char *expr,  int *status);
 int  ffiprs( fitsfile *fptr, int compressed, char *expr, int maxdim,
@@ -665,6 +666,9 @@ int  parse_data( long totalrows, long offset, long firstrow,
                  void *userPtr );
 int  uncompress_hkdata( fitsfile *fptr, long ntimes, 
                         double *times, int *status );
+int  ffffrw_work( long totalrows, long offset, long firstrow,
+                  long nrows, int nCols, iteratorCol *colData,
+                  void *userPtr );
 
 /* general driver routines */
 
@@ -673,21 +677,21 @@ int fits_init_cfitsio(void);
 
 int fits_register_driver( char *prefix,
 	int (*init)(void),
-	int (*shutdown)(void),
+	int (*fitsshutdown)(void),
 	int (*setoptions)(int option),
 	int (*getoptions)(int *options),
 	int (*getversion)(int *version),
 	int (*checkfile) (char *urltype, char *infile, char *outfile),
-	int (*open)(char *filename, int rwmode, int *driverhandle),
-	int (*create)(char *filename, int *driverhandle),
-	int (*truncate)(int driverhandle, long filesize),
-	int (*close)(int driverhandle),
+	int (*fitsopen)(char *filename, int rwmode, int *driverhandle),
+	int (*fitscreate)(char *filename, int *driverhandle),
+	int (*fitstruncate)(int driverhandle, long filesize),
+	int (*fitsclose)(int driverhandle),
 	int (*fremove)(char *filename),
         int (*size)(int driverhandle, long *size),
 	int (*flush)(int driverhandle),
 	int (*seek)(int driverhandle, long offset),
-	int (*read) (int driverhandle, void *buffer, long nbytes),
-	int (*write)(int driverhandle, void *buffer, long nbytes));
+	int (*fitsread) (int driverhandle, void *buffer, long nbytes),
+	int (*fitswrite)(int driverhandle, void *buffer, long nbytes));
 
 /* file driver I/O routines */
 

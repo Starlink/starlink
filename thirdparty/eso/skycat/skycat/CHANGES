@@ -7,10 +7,78 @@ and user interface. The latest changes are at the top.
 See also the CHANGES files in the tclutil, astrotcl, rtd, cat and
 skycat directories for changes specific to those packages.
 
----------------  16.11.98 released skycat-2.2b1 -----------------------
+
+---------------  4.02.99 released skycat-2.3.2 ----------------------
+
+* Ported the GAIA plugin to tcl8.0.3 and changed the release structure
+  to make it easier to install and start. Now you can just unpack the
+  tar file in a directory and start the script "skycatgaia".
+
+* Removed redundant calls to Rtd_Init and Cat_Init in the skycat 
+  tkAppInit.C file.
+
+---------------  14.01.99 released skycat-2.3.1 ---------------------
+
+* Upgraded the cfitsio sources to version cfitsio2027 (includes ESO
+  HIERARCH keyword support).
+
+---------------  29.12.98 released skycat-2.3 -----------------------
+
+* The Skycat Tcl package and shared library now "contains" the Rtd and
+  Cat packages. Previously it was dependent on them. This means that
+  you should no longer load and/or link the Rtd and Cat libraries.
+  Only the Skycat library is now required. This change was necessary,
+  to avoid problems with static variables in shared libraries, since
+  both the Cat and Rtd libraries contain some of the same object files
+  (For backward compatibility reasons, both the Rtd and Cat libraries
+  contain the contents of the Astrotcl and Tclutil packages).
+
+---------------  28.12.98 released skycat-2.2.2 -----------------------
+
+* Removed dialog asking if you want to save a temporary image, for
+  example from an image server, since it sometimes caused
+  problems. Now, if you save the temporary image, it will be added to
+  the history catalog and menu. otherwise not.
+
+* Fixed a bug in opening the image server window (error complains
+  about the "Add to..." menu item not being found).
+
+* Tested with Sunpro CC-2.4 and Solaris-2.6 and fixed minor
+  compilation and linking problems.
+
+* HDU window: Allow different NAXIS[12] values and try to determine
+  correct row,col indexes anyway. If images overlap, the display order
+  will be the oder of the HDUs as they are found in the file.
+
+* HDU window: Show the selected HDU. The line in the table is now
+  highlighted and the selected image HDU is displayed with a sunken
+  relief.
+
+---------------  03.12.98 released skycat-2.2.1 -----------------------
+
+* Added a new item to the catalog window File menu: "Save with image",
+  for saving catalogs as FITS binary tables and reloading them again.
+  Now you can save local catalogs with the image, including plot
+  symbol information.  Catalog configuration information is stored in
+  the CATINFO table, which contains one row for each FITS table
+  created from a catalog.
+
+* Added a menu item to the Graphics menu: "Save graphics with image".
+  Selecting this item adds a FITS table to the current image
+  containing descriptions of all of the line graphics objects in the
+  image. When you load the image again later, the graphics are
+  restored automatically. The name of the FITS table is based on the
+  name (EXTNAME) of the current FITS image extension, so you can save
+  different graphics with each image extension.
+
+* Changed the "-remote" option to use the RTD remote socket interface,
+  if "Tk send" does not work. "Tk send" only works when you use X-Auth
+  style X security.
+
+---------------  16.11.98 released skycat-2.2 -----------------------
 
 * Added support for multiple FITS HDUs. Now, when you open a FITS file
-  with multiple HDUs, a windows is displayed where you can choose
+  with multiple HDUs, a window is displayed where you can choose
   which parts to display. FITS tables are displayed as local
   catalogs. Small versions of the images are displayed in a table, in
   the correct orientation, if posible, using the values of the CRPIX*

@@ -86,7 +86,7 @@
 
 #.
 
-class gaia::StarAppFilter {
+itcl::class gaia::StarAppFilter {
 
    #  Inheritances:
    #  -------------

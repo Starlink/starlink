@@ -25,7 +25,7 @@ int Blt_GraphElement(
     int num = numValues/2;
     int nbytes = sizeof(double) * num;
 
-    // There were a lot of changes between tcl7.6/BLT2.1 and tcl8.0/BLT2.4... (allan)
+    /* There were a lot of changes between tcl7.6/BLT2.1 and tcl8.0/BLT2.4... (allan) */
 #if (TCL_MAJOR_VERSION >= 8)
 
     /* Note: Blt_Vector::arraySize is the number of bytes bytes! */
@@ -46,7 +46,7 @@ int Blt_GraphElement(
 	}
     } 
     else {
-	// reuse existing arrays
+	/* reuse existing arrays */
 	xArray = xVecPtr->valueArr;
 	yArray = yVecPtr->valueArr;
 	nbytes = xVecPtr->arraySize;

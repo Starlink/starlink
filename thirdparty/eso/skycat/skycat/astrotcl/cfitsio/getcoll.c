@@ -327,4 +327,264 @@ int ffgcx(  fitsfile *fptr,  /* I - FITS file pointer                       */
       bitloc = 0;
     }
 }
+/*--------------------------------------------------------------------------*/
+int ffgcxui(fitsfile *fptr,   /* I - FITS file pointer                       */
+            int  colnum,      /* I - number of column to read (1 = 1st col)  */
+            long  firstrow,   /* I - first row to read (1 = 1st row)         */
+            long  nrows,      /* I - no. of rows to read                     */
+            long  input_first_bit, /* I - first bit to read (1 = 1st)        */
+            int   input_nbits,     /* I - number of bits to read (<= 32)     */
+            unsigned short *array, /* O - array of integer values            */
+            int  *status)     /* IO - error status                           */
+/*
+  Read a consecutive string of bits from and 'X' or 'B' column and
+  interprete them as an unsigned integer.  The number of bits must be
+  less than or equal to 16 or the total number of bits in the column, 
+  which ever is less.
+*/
+{
+    int ii, firstbit, nbits, bytenum, startbit, numbits, endbit;
+    int firstbyte, lastbyte, nbytes, rshift, lshift;
+    unsigned short colbyte[5];
+    tcolumn *colptr;
+    char message[81];
 
+    if (*status > 0 || nrows == 0)
+        return(*status);
+
+    /*  check input parameters */
+    if (firstrow < 1)
+    {
+          sprintf(message, "Starting row number is less than 1: %ld (ffgcxui)",
+                firstrow);
+          ffpmsg(message);
+          return(*status = BAD_ROW_NUM);
+    }
+    else if (input_first_bit < 1)
+    {
+          sprintf(message, "Starting bit number is less than 1: %ld (ffgcxui)",
+                input_first_bit);
+          ffpmsg(message);
+          return(*status = BAD_ELEM_NUM);
+    }
+    else if (input_nbits > 16)
+    {
+          sprintf(message, "Number of bits to read is > 16: %d (ffgcxui)",
+                input_nbits);
+          ffpmsg(message);
+          return(*status = BAD_ELEM_NUM);
+    }
+
+    /* position to the correct HDU */
+    if (fptr->HDUposition != (fptr->Fptr)->curhdu)
+        ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
+
+    /* rescan header if data structure is undefined */
+    else if ((fptr->Fptr)->datastart == DATA_UNDEFINED)
+        if ( ffrdef(fptr, status) > 0)               
+            return(*status);
+
+    if ((fptr->Fptr)->hdutype != BINARY_TBL)
+    {
+        ffpmsg("This is not a binary table extension (ffgcxui)");
+        return(*status = NOT_BTABLE);
+    }
+
+    if (colnum > (fptr->Fptr)->tfield)
+    {
+      sprintf(message, "Specified column number is out of range: %d (ffgcxui)",
+                colnum);
+        ffpmsg(message);
+        sprintf(message, "  There are %d columns in this table.",
+                (fptr->Fptr)->tfield );
+        ffpmsg(message);
+
+        return(*status = BAD_COL_NUM);
+    }       
+
+    colptr  = (fptr->Fptr)->tableptr;   /* point to first column */
+    colptr += (colnum - 1);     /* offset to correct column structure */
+
+    if (abs(colptr->tdatatype) > TBYTE)
+    {
+        ffpmsg("Can only read bits from X or B type columns. (ffgcxui)");
+        return(*status = NOT_LOGICAL_COL); /* not correct datatype column */
+    }
+
+    firstbyte = (input_first_bit - 1              ) / 8 + 1;
+    lastbyte  = (input_first_bit - 1 + input_nbits) / 8 + 1;
+    nbytes = lastbyte - firstbyte + 1;
+
+    if (colptr->tdatatype > 0 && lastbyte > colptr->trepeat)
+    {
+        ffpmsg("Too many bits. Tried to read past width of column (ffgcxui)");
+        return(*status = BAD_ELEM_NUM);
+    }
+
+    for (ii = 0; ii < nrows; ii++)
+    {
+        /* read the relevant bytes from the row */
+        if (ffgcvui(fptr, colnum, firstrow+ii, firstbyte, nbytes, 0, 
+               colbyte, NULL, status) > 0)
+        {
+             ffpmsg("Error reading bytes from column (ffgcxui)");
+             return(*status);
+        }
+
+        firstbit = (input_first_bit - 1) % 8; /* modulus operator */
+        nbits = input_nbits;
+
+        array[ii] = 0;
+
+        /* select and shift the bits from each byte into the output word */
+        while(nbits)
+        {
+            bytenum = firstbit / 8;
+
+            startbit = firstbit % 8;  
+            numbits = minvalue(nbits, 8 - startbit);
+            endbit = startbit + numbits - 1;
+
+            rshift = 7 - endbit;
+            lshift = nbits - numbits;
+
+            array[ii] = ((colbyte[bytenum] >> rshift) << lshift) | array[ii];
+
+            nbits -= numbits;
+            firstbit += numbits;
+        }
+    }
+
+    return(*status);
+}
+
+/*--------------------------------------------------------------------------*/
+int ffgcxuk(fitsfile *fptr,   /* I - FITS file pointer                       */
+            int  colnum,      /* I - number of column to read (1 = 1st col)  */
+            long  firstrow,   /* I - first row to read (1 = 1st row)         */
+            long  nrows,      /* I - no. of rows to read                     */
+            long  input_first_bit, /* I - first bit to read (1 = 1st)        */
+            int   input_nbits,     /* I - number of bits to read (<= 32)     */
+            unsigned int *array,   /* O - array of integer values            */
+            int  *status)     /* IO - error status                           */
+/*
+  Read a consecutive string of bits from and 'X' or 'B' column and
+  interprete them as an unsigned integer.  The number of bits must be
+  less than or equal to 32 or the total number of bits in the column, 
+  which ever is less.
+*/
+{
+    int ii, firstbit, nbits, bytenum, startbit, numbits, endbit;
+    int firstbyte, lastbyte, nbytes, rshift, lshift;
+    unsigned int colbyte[5];
+    tcolumn *colptr;
+    char message[81];
+
+    if (*status > 0 || nrows == 0)
+        return(*status);
+
+    /*  check input parameters */
+    if (firstrow < 1)
+    {
+          sprintf(message, "Starting row number is less than 1: %ld (ffgcxuk)",
+                firstrow);
+          ffpmsg(message);
+          return(*status = BAD_ROW_NUM);
+    }
+    else if (input_first_bit < 1)
+    {
+          sprintf(message, "Starting bit number is less than 1: %ld (ffgcxuk)",
+                input_first_bit);
+          ffpmsg(message);
+          return(*status = BAD_ELEM_NUM);
+    }
+    else if (input_nbits > 32)
+    {
+          sprintf(message, "Number of bits to read is > 32: %d (ffgcxuk)",
+                input_nbits);
+          ffpmsg(message);
+          return(*status = BAD_ELEM_NUM);
+    }
+
+    /* position to the correct HDU */
+    if (fptr->HDUposition != (fptr->Fptr)->curhdu)
+        ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
+
+    /* rescan header if data structure is undefined */
+    else if ((fptr->Fptr)->datastart == DATA_UNDEFINED)
+        if ( ffrdef(fptr, status) > 0)               
+            return(*status);
+
+    if ((fptr->Fptr)->hdutype != BINARY_TBL)
+    {
+        ffpmsg("This is not a binary table extension (ffgcxuk)");
+        return(*status = NOT_BTABLE);
+    }
+
+    if (colnum > (fptr->Fptr)->tfield)
+    {
+      sprintf(message, "Specified column number is out of range: %d (ffgcxuk)",
+                colnum);
+        ffpmsg(message);
+        sprintf(message, "  There are %d columns in this table.",
+                (fptr->Fptr)->tfield );
+        ffpmsg(message);
+
+        return(*status = BAD_COL_NUM);
+    }       
+
+    colptr  = (fptr->Fptr)->tableptr;   /* point to first column */
+    colptr += (colnum - 1);     /* offset to correct column structure */
+
+    if (abs(colptr->tdatatype) > TBYTE)
+    {
+        ffpmsg("Can only read bits from X or B type columns. (ffgcxuk)");
+        return(*status = NOT_LOGICAL_COL); /* not correct datatype column */
+    }
+
+    firstbyte = (input_first_bit - 1              ) / 8 + 1;
+    lastbyte  = (input_first_bit - 1 + input_nbits) / 8 + 1;
+    nbytes = lastbyte - firstbyte + 1;
+
+    if (colptr->tdatatype > 0 && lastbyte > colptr->trepeat)
+    {
+        ffpmsg("Too many bits. Tried to read past width of column (ffgcxuk)");
+        return(*status = BAD_ELEM_NUM);
+    }
+
+    for (ii = 0; ii < nrows; ii++)
+    {
+        /* read the relevant bytes from the row */
+        if (ffgcvuk(fptr, colnum, firstrow+ii, firstbyte, nbytes, 0, 
+               colbyte, NULL, status) > 0)
+        {
+             ffpmsg("Error reading bytes from column (ffgcxuk)");
+             return(*status);
+        }
+
+        firstbit = (input_first_bit - 1) % 8; /* modulus operator */
+        nbits = input_nbits;
+
+        array[ii] = 0;
+
+        /* select and shift the bits from each byte into the output word */
+        while(nbits)
+        {
+            bytenum = firstbit / 8;
+
+            startbit = firstbit % 8;  
+            numbits = minvalue(nbits, 8 - startbit);
+            endbit = startbit + numbits - 1;
+
+            rshift = 7 - endbit;
+            lshift = nbits - numbits;
+
+            array[ii] = ((colbyte[bytenum] >> rshift) << lshift) | array[ii];
+
+            nbits -= numbits;
+            firstbit += numbits;
+        }
+    }
+
+    return(*status);
+}

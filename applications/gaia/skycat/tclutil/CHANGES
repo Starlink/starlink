@@ -6,6 +6,21 @@ The latest changes are at the top.
 
 ------------------------------------------------------------------------
 
+---------------  28.12.98 released tclutil-1.1.1 ------------------------
+
+* Minor change in udialog.tcl to avoid multiple error message problems.
+
+* Added an optional argument to Mem::remap() to allow increasing the
+  size of an mmapped file.
+
+* Fixed mistaken "//" comments in Blt_GraphElement.c.
+
+* Rebuild tclIndex file whenever configure is run, since Tcl8 version
+  is not compatible with tcl7 version (see makelinks script).
+
+* tkCanvasPsImage.c: changed "unsigned int" to "int" to avoid sunpro
+  cc warning.
+
 ---------------  16.11.98 released tclutil-1.1 ------------------------
 
 * Ported to tcl8.0.3 (still compatible with tcl7.6):

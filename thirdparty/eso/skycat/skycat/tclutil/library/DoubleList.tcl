@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: DoubleList.tcl,v 1.6 1998/10/28 17:46:37 abrighto Exp $"
+# "@(#) $Id: DoubleList.tcl,v 1.7 1998/11/20 14:20:15 abrighto Exp $"
 #
 # DoubleList.tcl - Widget displaying two lists with arrows between them
 # 
@@ -35,7 +35,7 @@ itcl::class util::DoubleList {
 	pack [frame $w_.arrows -bd 1m] \
 		-side left -fill y -ipadx 0.5m
 
-	pack [label $w_.arrows.fill -text " "] \
+	pack [label $w_.arrows.fill -text " " ] \
 		-side top -fill x
 
 	pack [button $w_.arrows.right \

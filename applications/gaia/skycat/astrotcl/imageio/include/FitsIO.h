@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: FitsIO.h,v 1.9 1998/11/16 21:16:37 abrighto Exp $" 
+ * "@(#) $Id: FitsIO.h,v 1.16 1998/12/29 20:19:07 abrighto Exp $" 
  *
  * FitsIO.h - declarations for class FitsIO, a class representing the
  *            contents of a FITS image file (or other image source)
@@ -17,9 +17,7 @@
 #include <stdio.h>
 #include <iostream.h>
 #include "ImageIO.h"
-
-// forward ref: cfitsio handle type, only referenced as pointer here
-struct fitsfile;
+#include "fitsio.h"
 
 /*
  * This class manages reading and writing FITS files and storing the
@@ -29,6 +27,7 @@ struct fitsfile;
 class FitsIO : public ImageIORep {
 private:
     fitsfile* fitsio_;		// handle to use for cfitsio C library routines
+    static FitsIO* fits_;	// current class ptr for reallocFile callback
     
     // set wcslib header length for searching
     static void set_header_length(const Mem& header);
@@ -40,7 +39,16 @@ private:
     // extend the size of the FITS header by one header block 
     int extendHeader();
 
+    static void* FitsIO::reallocFile(void* p, size_t newsize);
+
 protected:   
+    // Check that this object represents a FITS file (and not just some kind of memory)
+    // and return 0 if it does. If not, return an error message.
+    int checkFitsFile();
+
+    // return 0 if this object represents a FITS file that was mapped for read/write
+    int checkWritable();
+
     // write the keyword/value pair to the given open file descriptor.
     static int put_keyword(FILE* f, const char* keyword, int value);
     static int put_keyword(FILE* f, const char* keyword, double value);
@@ -61,6 +69,9 @@ protected:
 
     // return a cfitsio handle, given the Mem object for the FITS header.
     static fitsfile* openFitsMem(Mem& header);
+
+    // flush any memory changes to the file
+    int flush();
 
     // Return an allocated FitsIO object, given the Mem objects for the header and data
     // and the cfitsio handle to use to access the file.
@@ -166,8 +177,11 @@ public:
     // Move to the specified HDU and make it the current one
     int setHDU(int num);
 
+    // Delete the given HDU
+    int deleteHDU(int num);
+
     
-    // -- Fits Tables --
+    // -- Read Fits Tables --
 
     // get the dimensions of the current FITS table
     int getTableDims(long& rows, int& cols);
@@ -181,6 +195,16 @@ public:
     // get the contents of the given column as an array of doubles
     int getTableColumn(int col, double* values, int numValues);
 
+
+    // -- Write Fits Tables --
+
+    // Create a FITS table and make it the current HDU
+    int createTable(const char* extname, long rows, int cols,
+		    char** headings, char** tform, int asciiFlag = 0);
+
+    // Set the value in the current FITS table at the given row and column
+    // (For now, all data types are treated as strings)
+    int setTableValue(long row, int col, const char* value);
 };
 
 #endif _FitsIO_h_

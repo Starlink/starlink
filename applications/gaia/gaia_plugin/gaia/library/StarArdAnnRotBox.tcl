@@ -63,12 +63,12 @@
 
 #.
 
-class gaia::StarArdAnnRotBox {
+itcl::class gaia::StarArdAnnRotBox {
    
    #  Inheritances:
    #  -------------
    
-   inherit StarArdRotBox
+   inherit gaia::StarArdRotBox
 
    #  Constructor:
    #  ------------

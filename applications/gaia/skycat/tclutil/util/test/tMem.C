@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tMem.C,v 1.3 1998/11/16 21:28:19 abrighto Exp $
+ * $Id: tMem.C,v 1.4 1998/12/03 22:11:51 abrighto Exp $
  *
  * tMem.C - test cases for class Mem
  * 
@@ -116,13 +116,18 @@ main()
 
     // create the file and try again (should pass)
     createTestFile(TEST_FILE);
-    Mem m6(TEST_FILE);
+    Mem m6(TEST_FILE, Mem::FILE_RDWR);
     TEST(m6.status() == 0);
-
+    
     // test using an offset
     m6.offset(LONG_OFFSET);
     char* cmem = (char*)m6.ptr();
     TEST(strcmp(cmem, "long string!") == 0);
+
+    // test extending the file size
+    m6.unmap();
+    TEST(m6.remap(Mem::FILE_RDWR, 1024) == 0);
+    TEST(m6.size() == 1024);
 
     // test creating an empty mmapped file
     const char* tmpfile = "tmp.test";

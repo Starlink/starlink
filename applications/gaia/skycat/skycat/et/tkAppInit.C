@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: tkAppInit.C,v 1.11 1998/10/28 17:44:23 abrighto Exp $
+ * $Id: tkAppInit.C,v 1.12 1999/01/15 22:06:59 abrighto Exp $
  *
  * tkAppInit.C -- This version is based on ET - Embedded Tk.
  *
@@ -34,8 +34,6 @@ extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);
 extern int Tclx_Init(Tcl_Interp *interp);
 
-extern int Rtd_Init(Tcl_Interp *interp);
-extern int Cat_Init(Tcl_Interp *interp);
 extern int Skycat_Init(Tcl_Interp *interp);
 }
 
@@ -86,20 +84,6 @@ main(int argc, char** argv)
 	// return TCL_ERROR;
     }
     Tcl_StaticPackage (interp, "Tclx", Tclx_Init, (Tcl_PackageInitProc *) NULL);
-
-    // install the Cat package 
-    if (Cat_Init(interp) == TCL_ERROR) {
-	cerr << interp->result << endl; 
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Cat", Cat_Init, (Tcl_PackageInitProc *) NULL);
-
-    // install the Rtd package 
-    if (Rtd_Init(interp) == TCL_ERROR) {
-	cerr << interp->result << endl; 
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Rtd", Rtd_Init, (Tcl_PackageInitProc *) NULL);
 
     // install the Skycat package 
     if (Skycat_Init(interp) == TCL_ERROR) {

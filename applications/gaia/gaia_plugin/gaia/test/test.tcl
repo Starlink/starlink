@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: test.tcl,v 1.1 1998/04/06 23:55:38 abrighto Exp $" 
+# "@(#) $Id: test.tcl,v 1.2 1998/10/28 17:40:48 abrighto Exp $" 
 #
 # test.tcl - tcl defs to set up environment for test scripts
 #
@@ -15,9 +15,6 @@ foreach pkg {BLT RTD CAT SKYCAT GAIA} {
 	lappend auto_path $env(${pkg}_LIBRARY)
     }
 }
-
-# add blt namespace to the import list in the current namespace context
-import add ::blt
 
 set tk_strictMotif 0
 tk appname Gaia
