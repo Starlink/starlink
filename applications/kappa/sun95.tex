@@ -15580,7 +15580,9 @@ default value.
       This application produces a contour map of a 2-dimensional NDF on
       the current graphics device, with single-pixel resolution. Contour
       levels can be chosen automatically in various ways, or specified
-      explicitly (see parameter MODE).
+      explicitly (see parameter MODE). In addition, this application can
+      also draw an outline around either the whole data array, or around
+      the good pixels in the data array (set MODE to {\tt "}Bounds{\tt "} or {\tt "}Good{\tt "}).
 
       The plot is produced within the current graphics database picture,
       and may be aligned with an existing DATA picture if the existing
@@ -15649,7 +15651,7 @@ default value.
          alternative to {\tt "}Variance{\tt "} and causes the square root of the
          variance values to be displayed).  If
          {\tt "}Quality{\tt "} is specified, then the quality values are treated as
-         numerical values (in the range 0 to 255). {\tt [{\tt "}Data{\tt "}]}
+         numerical values (in the range 0 to 255). {\tt ["Data"]}
       }
       \sstsubsection{
          DASHED = \_REAL (Read)
@@ -15759,6 +15761,16 @@ default value.
          place of the value 2). {\tt [current value]}
       }
       \sstsubsection{
+         LABOUT = \_LOGICAL (Read)
+      }{
+         Only used if parameter MODE is set to {\tt "}Good{\tt "} or {\tt "}Bounds{\tt "}. If a TRUE
+         value is supplied then the name of the input NDF is included in
+         the plot as a label. The label is positioned so that its bottom
+         left corner is close to the bottom left pixel in the NDF. The
+         appearance of the label can be set by using the STYLE parameter
+         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [TRUE]}
+      }
+      \sstsubsection{
          LENGTH() = \_REAL (Write)
       }{
          On exit this holds the total length in pixels of the contours at each
@@ -15768,17 +15780,17 @@ default value.
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
       }{
-         The widths of the margins to leave around the contour map for axis
-         annotation. The widths should be given as fractions of the
-         corresponding dimension of the current picture. The actual margins 
-         used may be increased to preserve the aspect
-         ratio of the DATA picture. Four values may be given, in the order;
-         bottom, right, top, left. If fewer than four values are given,
-         extra values are used equal to the first supplied value. If these
-         margins are too narrow any axis annotation may be clipped. If a
-         null (!) value is supplied, the value used is 0.15 (for all edges)
-         if annotated axes are being produced, and zero otherwise. See also
-         parameter KEYPOS. {\tt [current value]}
+         The widths of the margins to leave around the contour map for
+         axis annotation. The widths should be given as fractions of the
+         corresponding dimension of the current picture. The actual margins
+         used may be increased to preserve the aspect ratio of the DATA
+         picture. Four values may be given, in the order; bottom, right,
+         top, left. If fewer than four values are given, extra values are
+         used equal to the first supplied value. If these margins are too
+         narrow any axis annotation may be clipped. If a null (!) value is
+         supplied, the value used is 0.15 (for all edges) if annotated axes
+         are being produced, and zero otherwise. See also parameter KEYPOS.
+         {\tt [current value]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -15798,11 +15810,20 @@ default value.
               the number of contour levels.
 
             \sstitem
+              {\tt "}Bounds{\tt "} -- A single {\tt "}contour{\tt "} is drawn representing the
+              bounds of the input array. A label may also be added (see
+              parameter LABOUT).
+
+            \sstitem
               {\tt "}Equalised{\tt "} -- You define the number of equally spaced
               percentiles.
 
             \sstitem
               {\tt "}Free{\tt "} -- You specify a series of contour values explicitly.
+
+            \sstitem
+              {\tt "}Good{\tt "} -- A single {\tt "}contour{\tt "} is drawn outlining the good pixel
+              values. A label may also be added (see parameter LABOUT).
 
             \sstitem
               {\tt "}Linear{\tt "} -- You define the number of contours, the start
@@ -15828,10 +15849,10 @@ default value.
       \sstsubsection{
          NCONT = \_INTEGER (Read)
       }{
-         The number of contours required (in all modes except Free and
-         Percentiles).  It must be between 1 and 50.  If the number is
-         large, the plot may be cluttered and take longer to produce.
-         The initial suggested default of 6 gives reasonable results.
+         The number of contours to draw (only required in certain modes).
+         It must be between 1 and 50.  If the number is large, the plot
+         may be cluttered and take longer to produce. The initial
+         suggested default of 6 gives reasonable results.
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -15983,7 +16004,7 @@ default value.
          4 digits to be used when formatting the contour values.
       }
       \sstexamplesubsection{
-         contour ss443 mode=pe percentiles=[80,90,95] stats keypos=0.05
+         contour ss443 mode=pe percentiles=[80,90,95] stats keypos=0.02
       }{
          Contours the data array in the NDF called ss443 on the current
          graphics device.  Contours at heights corresponding to the 80,
@@ -16046,7 +16067,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: WCSFRAME, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
+      KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
    }
    \sstimplementationstatus{
       \sstitemlist{
