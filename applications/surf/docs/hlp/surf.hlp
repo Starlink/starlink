@@ -219,6 +219,16 @@ using the following format:
 
 1 Release_notes
 
+2 New_in_version_1_6_9
+
+This is a bug fix release. Main changes are:
+
+  - Fix problems with SCUBA2MEM when using SC (EKH) scanning
+
+  - Correctly rebin photometry observations taken with AZ jiggling.
+    [previously AZ offsets were simply ignored unless pointing
+     corrections were being applied]
+
 2 New_in_version_1_6_8
 
 This is a bug fix release. Main changes are:
