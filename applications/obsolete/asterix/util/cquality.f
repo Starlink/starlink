@@ -37,6 +37,7 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (RB)
 *
 *    History :
 *
@@ -47,9 +48,10 @@
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *      6 Dec 94 : V1.8-1  Use updated QUALITY routines (DJA)
 *     21 Feb 95 : V1.8-2  Don't die if axes unrecognised (DJA)
-*     13 Dec 1995 : V2.0-0 ADI port (DJA)
+*     13 Dec 95 : V2.0-0  ADI port (DJA)
 *     26 Apr 96 : V2.0-1  Option to set outside circle (RJV)
-*      6 Oct 97 : V2.0-2 Linux port (RJV)
+*      6 Oct 97 : V2.0-2  Linux port (RJV)
+*      2 Feb 98 : V2.2-1  Fix operation of keyword OUTISDE
 *
 *    Type Definitions :
 *
@@ -88,7 +90,6 @@
       INTEGER                	TCPTR, CPTR            	! Pointer to dynamic
 							! array
       INTEGER                	DIMS(ADI__MXDIM)       ! Length of each dimension
-      INTEGER                FSTAT                  ! i/o status
       INTEGER                I,L                      ! Loop counters
       INTEGER			IFID			! Input dataset id
       INTEGER                INORDER(ADI__MXDIM)    ! Inverse of AORDER
@@ -115,12 +116,12 @@
                                                     ! Value to modify?
       LOGICAL                Q_AND, Q_OR, Q_IGNORE  ! Quality modes
       LOGICAL                Q_RESTORE, Q_SET, Q_EOR, Q_NOT
-      LOGICAL OUTSIDE
+      LOGICAL                OUTSIDE                ! Edit quality outside of a region
 *
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 2.1-2')
+        PARAMETER           (VERSION = 'CQUALITY Version 2.2-1')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -432,7 +433,7 @@
       INTEGER                DIMS(*)            ! DATA_ARRAY dimensions
       REAL                   XC,YC,RC           ! Circle centre and radius
       REAL                   XAX(*), YAX(*)     ! Spatial axes
-      LOGICAL OUTSIDE
+      LOGICAL                OUTSIDE            ! Edit quality outside of a region
 *
 *    Export :
 *
@@ -506,6 +507,14 @@
      :                                          XLO, XHI, STATUS )
       CALL AXIS_VAL2PIX( D2, YAX, .FALSE., YC-YDIR*RC, YC+YDIR*RC,
      :                                          YLO, YHI, STATUS )
+
+*    If its an OUTSIDE operation the need the whole range
+      IF ( OUTSIDE ) THEN
+        CALL AXIS_VAL2PIX( D1, XAX, .FALSE., XAX(1), XAX(D1),
+     :                     XLO, XHI, STATUS )
+        CALL AXIS_VAL2PIX( D2, YAX, .FALSE., YAX(1), YAX(D2),
+     :                     YLO, YHI,STATUS )
+      END IF
 
       RC2 = RC*RC
 
