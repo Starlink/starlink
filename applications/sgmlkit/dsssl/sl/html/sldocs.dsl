@@ -59,6 +59,18 @@ These are the document element types.
 (element authorlist
   (process-children))
 
+(element otherauthors
+  (let ((a (children (current-node))))
+    (if (node-list-empty? a)
+	(empty-sosofo)
+	(node-list-reduce a
+			  (lambda (res i)
+			    (sosofo-append res
+					   (make sequence
+					     (process-node-list i)
+					     (literal "; "))))
+			  (literal "With: ")))))
+
 (mode make-html-author-links
   (element author
     (let ((email (attribute-string "email")))
