@@ -19,7 +19,8 @@ C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
 kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
 
 F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
-	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f)
+	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
+	$(KPG_BDIRW_GEN:.gbdirw=.f)
 
 # Numeric types except Double precision
 # Note that in this case the suffix is strange since a case insensitive
@@ -31,6 +32,8 @@ KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn \
 kpg1_csub.gn
 
+# All except unsigned types
+KPG_BDIRW_GEN = kpg1_iscl.gbdirw
 
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
@@ -85,7 +88,6 @@ kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f kpg1_cpsty.f \
 kpg1_hstlo.f kpg1_hstqb.f kpg1_reprt.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_imprg.f kpg1_incod.f kpg1_incor.f \
-kpg1_isclb.f kpg1_iscld.f kpg1_iscli.f kpg1_isclr.f kpg1_isclw.f \
 kpg1_kgodr.f kpg1_lasto.f \
 kpg1_lgtrn.f kpg1_listc.f kpg1_litnd.f kpg1_litnr.f kpg1_litrd.f \
 kpg1_litrr.f kpg1_lltrd.f kpg1_lltrr.f kpg1_loctb.f kpg1_loctd.f \
@@ -188,6 +190,9 @@ kpg1_pgsht.f kpg1_pacol.f
 	rm $(<:.gnxd=.gen)
 
 .gdir.f:
+	$(GENERIC) $(<)
+
+.gbdirw.f:
 	$(GENERIC) $(<)
 
 
