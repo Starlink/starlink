@@ -930,8 +930,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 	REAL DTOP(7)		! donor bin upper boundary
 	REAL RBOT(7)		! receptor lower boundary
 	REAL RTOP(7)		! receptor upper boundary
-        REAL BASEO(7)		! regular axis base
-        REAL SCALEO(7)		! regular axis scale
+c       REAL BASEO(7)		! regular axis base
+c       REAL SCALEO(7)		! regular axis scale
 	INTEGER RIL(7)		! lower receptor bin index
 	INTEGER RIH(7)		! upper receptor bin index
         INTEGER FPTR		! pointer to flag array
