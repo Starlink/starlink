@@ -138,7 +138,7 @@
 
 *    Input is not a set?
         IF ( OBDAT(1).SETINDEX .EQ. 0 ) THEN
-          CALL ADI_CLONE( DID, OBDAT(1).D_ID, STATUS )
+          CALL ADI_CLONE( ID, OBDAT(1).D_ID, STATUS )
         ELSE
           DO I = 1, NDS
             CALL ADI1_PUTLOC( OBDAT(I).DLOC, OBDAT(I).D_ID, STATUS )
