@@ -156,6 +156,12 @@
 *     1996 July 17 (MJC):
 *        Transfers the DATA_ARRAY.IMAGINARY_DATA component to
 *        .Z.IMAGINARY
+*     1997 April 24 (MJC):
+*        Fixed bug that could result in .OBS and .Z structures of the
+*        FIGARO extension being lost.  This occurred when FIGARO
+*        extension components SECZ or TIME (for OBS), and MAGFLAG or
+*        RANGE (for Z) are present and are physically stored following
+*        their respective structure.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -346,6 +352,32 @@
 *      Look out for an empty extension.
          IF ( NCOMP .GE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
 
+*         Some special Figaro-extension components---SECZ, TIME,
+*         MAGFLAG, RANGE---are written to structures (OBS and Z).  If
+*         these structures also exist in the NDF they must be copied to
+*         the DST before inserting the special values.
+*
+*         Deal with the OBS structure first.
+            CALL DAT_THERE( NXFIG, 'OBS', EXIST, STATUS )
+            IF ( EXIST ) THEN
+
+*            Copy the OBS component to the Figaro structure.
+               CALL DAT_FIND( NXFIG, 'OBS', NXFIGI, STATUS )
+               CALL DAT_COPY( NXFIGI, LF, 'OBS', STATUS )
+               CALL DAT_ANNUL( NXFIGI, STATUS )
+            END IF
+
+*         Now copy any Z structure.
+            CALL DAT_THERE( NXFIG, 'Z', EXIST, STATUS )
+            IF ( EXIST ) THEN
+
+*            Copy the Z component to the Figaro structure.
+               CALL DAT_FIND( NXFIG, 'Z', NXFIGI, STATUS )
+               CALL DAT_COPY( NXFIGI, LF, 'Z', STATUS )
+               CALL DAT_ANNUL( NXFIGI, STATUS )
+            END IF
+
+*         Why in this order Jo? (MJC)
             DO I = NCOMP, 1, -1
 
 *            Obtain a locator to the component and find its name.
@@ -383,14 +415,13 @@
                   CALL DAT_COPY( NXFIGI, LFO, MFNAM, STATUS )
 
 *            Move a non-standard object to the default destination
-*            structure.
-               ELSE
+*            structure.  OBS and Z structures have already been created.
+               ELSE IF ( MFNAM .NE. 'OBS' .AND. MFNAM .EQ. 'Z' ) THEN
 
 *               Before performing the copy, ensure that the object does
 *               not exist. Ideally, one would like to cope with the
 *               non-standard objects by going down a level and
-*               processing them individually.  It's only a problem if
-*               there is a .OBS or .Z component.
+*               processing them individually.
                   CALL DAT_THERE( LF, MFNAM, EXIST, STATUS )
                   IF ( .NOT. EXIST ) THEN
 
