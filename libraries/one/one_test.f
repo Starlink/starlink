@@ -57,6 +57,7 @@
       INTEGER CONTEXT
       INTEGER COLUMNS, ROWS
       LOGICAL FOUND
+      INTEGER NFOUND
       CHARACTER*30 COMMAND, FILES, FILENAME
 
       COMMAND = 'ls'            ! Command for one_exec test.
@@ -68,6 +69,8 @@
 
 *  Set STATUS OK and report start of test.
       STATUS = SAI__OK      
+      CALL ERR_BEGIN( STATUS )
+
       WRITE(*,*) 'Test of libone routines ...'
       WRITE(*,*) ' '
 
@@ -94,23 +97,27 @@
 
       CONTEXT = 0  
 
-      DO WHILE ( STATUS .NE. ONE__NOFILES ) 
-         FOUND = ONE_FIND_FILE( FILES, FILENAME, CONTEXT, STATUS )
+      NFOUND = 0
+      DO WHILE ( STATUS .EQ. SAI__OK) 
+         FOUND = ONE_FIND_FILE( FILES, .FALSE., FILENAME, CONTEXT,
+     :        STATUS)
          IF ( FOUND ) THEN
+            NFOUND = NFOUND + 1
             WRITE(*,*) '   ... found file: ', FILENAME
          ELSE
             WRITE(*,*) '   ... no more files match search mask: ', FILES
          ENDIF 
       END DO
 
-*  Reset staus and close find file system.
+*  Reset status and close find file system.
 
-      STATUS = SAI__OK
+      CALL ERR_ANNUL( STATUS )
       CALL ONE_FIND_FILE_END( CONTEXT, STATUS )
 
       WRITE(*,*) ' '
-      IF (STATUS .NE. SAI__OK ) THEN
+      IF (STATUS .NE. SAI__OK .OR. NFOUND .EQ. 0) THEN
          WRITE(*,*) '... test of one_find_file failed ... aborting'
+         IF (NFOUND .EQ. 0) WRITE(*,*) '   ... No files found ...'
          GOTO 9999
       ELSE
          WRITE(*,*) '... test of one_find_file successful.'
@@ -141,5 +148,7 @@
       ELSE
          WRITE(*,*) 'Test of libone failed.'
       ENDIF
+
+      CALL ERR_END( STATUS )
 
       END
