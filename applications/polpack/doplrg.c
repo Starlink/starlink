@@ -43,7 +43,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(BADCOL), CHARACTER(CURCOL), 
                         CHARACTER(REFCOL), CHARACTER(SELCOL), 
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
-                        LOGICAL(XHAIR), CHARACTER(XHRCOL),
+                        LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(STATUS) TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) ){
@@ -121,6 +121,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        The colour with which to draw the cross-hair (if required). The 
 *        supplied variable should be long enough to receive the longest 
 *        colour name.
+*     STHLP = LOGICAL (Given)
+*        Should a hyper-text browser be created automatically at start-up
+*        displaying the help system contents?
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -160,6 +163,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_LOGICAL(NEWCM)
    GENPTR_LOGICAL(XHAIR)
    GENPTR_CHARACTER(XHRCOL)
+   GENPTR_LOGICAL(STHLP)
 
    Tcl_Interp *interp = NULL;
    char *col = NULL;
@@ -221,6 +225,12 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 /* Store the number of "argv" values in "argc". */
    SetVar( interp, "argc", "3", TCL_LEAVE_ERR_MSG, STATUS );
+
+/* If a WWW browser is to be created at start-up define the START_HELP
+   variable. */
+   if( F77_ISTRUE(*STHLP) ) {
+      SetVar( interp, "START_HELP", "1", TCL_LEAVE_ERR_MSG, STATUS );
+   }
 
 /* Set the Tcl variables storing the options values to use. */
    SetVar( interp, "ATASK_XHAIR", ( F77_ISTRUE(*XHAIR) ? "1" : "0" ), 

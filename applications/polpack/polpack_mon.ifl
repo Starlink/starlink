@@ -517,6 +517,16 @@ interface POLREG
       helpkey  '*'
    endparameter
 
+   parameter STARTHELP
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Display hyper-text help automatically at start-up?'
+      helpkey  '*'
+   endparameter
+
    parameter STATUSAREA           
       type     _LOGICAL
       access   UPDATE

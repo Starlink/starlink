@@ -377,6 +377,14 @@ SELCOL = LITERAL (Update)
    This should be one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK.
    Any unambiguous abbreviation can be supplied, and the value is
    case-insensitive. [RED]
+3 STARTHELP
+STARTHELP = _LOGICAL (Read)
+   If a true value is supplied, then a hyper-text browser will be
+   created with the GUI, displaying the contents page of the PolReg
+   on-line help documentation. Otherwise, the browser is only created
+   if the user accesses the on-line help information explicitly
+   from within the GUI by using the "Help" menu or the F1 key on 
+   the keyboard. [TRUE]
 3 STATUSAREA
 STATUSAREA = _LOGICAL (Update)
    If a true value is supplied, then information describing the

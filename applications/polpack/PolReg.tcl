@@ -208,6 +208,10 @@
    source $POLPACK_DIR/PolReg_procs.tcl
    source $POLPACK_DIR/CCDShowHelp.tcl
 
+# If the variable START_HELP has been defined (by the polreg a-task) then
+# start up a hyper-text browser displaying the polreg manual contents page.
+   if { [info exists START_HELP] } { ShowHelp POLREG_CONTENTS }
+
 # Quit when control-c is pressed.
    bind . <Control-c> {Finish 0}
 

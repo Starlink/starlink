@@ -174,6 +174,13 @@
 *        This should be one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. 
 *        Any unambiguous abbreviation can be supplied, and the value is 
 *        case-insensitive. [RED]
+*     STARTHELP = _LOGICAL (Read)
+*        If a true value is supplied, then a hyper-text browser will be
+*        created with the GUI, displaying the contents page of the PolReg
+*        on-line help documentation. Otherwise, the browser is only created
+*        if the user accesses the on-line help information explicitly
+*        from within the GUI by using the "Help" menu or the F1 key on 
+*        the keyboard. [TRUE]
 *     STATUSAREA = _LOGICAL (Update)
 *        If a true value is supplied, then information describing the
 *        currently displayed image, current options values, etc, will be 
@@ -309,6 +316,7 @@
      :        DBEAM,             ! Run in Dual-beam mode?
      :        HAREA,             ! Is the help area to be displayed?
      :        SAREA,             ! Is the status area to be displayed?
+     :        STHLP,             ! Display a WWW browser at start-up?
      :        XHAIR              ! Is a cross-hair required?
       REAL
      :        PERCNT(2),         ! Display percentiles
@@ -370,6 +378,10 @@
 
 *  See if the status area is to be displayed.
       CALL PAR_GET0L( 'STATUSAREA', SAREA, STATUS )
+
+*  See if a WWW browser displaying the PolReg manual contents page should
+*  be created at start-up.
+      CALL PAR_GET0L( 'STARTHELP', STHLP, STATUS )
 
 *  Get the size of the image features to search for.
       CALL PAR_GET0I( 'PSFSIZE', PSF, STATUS )
@@ -434,7 +446,7 @@
       CALL DOPLRG( IGRP1, IGRP2, IGRP3, DPI, HAREA, SAREA, PSF, 
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
-     :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STATUS )
+     :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.
