@@ -10,7 +10,7 @@ libgraph_la_SOURCES = \
      $(F_ROUTINES) 
 
 PRIVATE_INCLUDES = \
-gr_fotor_gca gr_inc gr_inc2 bytesdef
+gr_fotor_gca gr_inc2
          
 F_ROUTINES = \
 arrow.f clgrap.f colrain.f disp_window2.f drawpoly.f get_grey.f \

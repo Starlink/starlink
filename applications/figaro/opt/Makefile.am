@@ -6,13 +6,9 @@ AM_FCFLAGS = -I../include
 lib_LTLIBRARIES = libopt.la
 
 libopt_la_SOURCES = \
-     $(PRIVATE_INCLUDES) \
      $(C_ROUTINES) \
      $(F_ROUTINES) 
 
-PRIVATE_INCLUDES = \
-fit_coding_inc opt_cmn arc_dims gr_inc status_inc
-         
 C_ROUTINES = perform_fit.c
 
 F_ROUTINES = \
