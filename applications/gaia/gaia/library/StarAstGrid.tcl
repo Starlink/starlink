@@ -184,8 +184,8 @@ itcl::class gaia::StarAstGrid {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/StarAstGrid.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/StarAstGrid.hlp "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \

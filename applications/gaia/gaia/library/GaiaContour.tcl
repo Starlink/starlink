@@ -98,8 +98,8 @@ itcl::class gaia::GaiaContour {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/GaiaContour.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/GaiaContour.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

@@ -32,27 +32,16 @@
 #     {enter_changes_here}
 
 #-
-global ::env ::tcl_version
+global ::env ::tcl_version ::gaia_library ::gaia_dir
 
 #.
 
 #  Withdraw the . window as this cannot be controlled as a metawidget.
 wm withdraw .
 
-#  Set the auto_load path for all the GAIA source TCL files. Note GAIA
-#  goes first so we can override files from anywhere else.
+#  Set the place for locating all external files.
 if { [info exists env(GAIA_DIR)] } { 
-   set gaia_library $env(GAIA_DIR)
-} else {
-   if { ![info exists gaia_library] } { 
-      set gaia_library "/star/bin/gaia"
-   }
-}
-set auto_path [concat $gaia_library $auto_path]
-
-#  Add blt library to auto_path.
-if {[info exists env(BLT_LIBRARY)]} {
-    lappend auto_path $env(BLT_LIBRARY)
+   set gaia_dir $env(GAIA_DIR)
 }
 
 #  Check any command-line arguments that we've been passed. The first

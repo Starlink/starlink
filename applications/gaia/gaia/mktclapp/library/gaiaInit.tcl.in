@@ -16,20 +16,21 @@ proc main {} {
    set fd [open $outfile w]
    
    #  Set names of source directories.
-   set tcl_library      /home/pdraper/gaia/top/built/lib/tcl8.0
-   set tk_library       /home/pdraper/gaia/top/built/lib/tk8.0
-   set itcl_library     /home/pdraper/gaia/top/built/lib/itcl3.0
-   set itk_library      /home/pdraper/gaia/top/built/lib/itk3.0
-   set tclutil_library  /home/pdraper/gaia/top/built/lib/tclutil
-   set astrotcl_library /home/pdraper/gaia/top/built/lib/astrotcl
-   set cat_library      /home/pdraper/gaia/top/built/lib/cat
-   set rtd_library      /home/pdraper/gaia/top/built/lib/rtd
-   set skycat_library   /home/pdraper/gaia/top/built/lib/skycat
-   set gaia_library     /home/pdraper/gaia/top/built/lib/gaia
-   set blt_library      /home/pdraper/gaia/top/built/lib/blt2.4
-   set iwidgets_library /home/pdraper/gaia/top/built/lib/iwidgets3.0.0
-   set iscripts_library /home/pdraper/gaia/top/built/lib/iwidgets3.0.0/scripts
-   set tclx_library     /home/pdraper/gaia/top/built/lib/tclX8.0.3
+   set tcl_library      @TCL_LIBRARY@
+   set tk_library       @TK_LIBRARY@
+   set itcl_library     @ITCL_LIBRARY@
+   set itk_library      @ITK_LIBRARY@
+   set tclutil_library  @TCLUTIL_LIBRARY@
+   set astrotcl_library @ASTROTCL_LIBRARY@
+   set cat_library      @CAT_LIBRARY@
+   set rtd_library      @RTD_LIBRARY@
+   set skycat_library   @SKYCAT_LIBRARY@
+   set gaia_library     @GAIA_LIBRARY@
+   set tcladam_library  @TCLADAM_LIBRARY@
+   set blt_library      @BLT_LIBRARY@
+   set iwidgets_library @IWIDGETS_LIBRARY@
+   set iscripts_library @IWIDGETS_LIBRARY@/scripts
+   set tclx_library     @TCLX_LIBRARY@
    
     set srcdirs [list \
 		     $tcl_library \
@@ -45,6 +46,7 @@ proc main {} {
 		     $rtd_library \
 		     $cat_library \
 		     $skycat_library \
+                     $tcladam_library \
 		     $gaia_library]
    
    #  Set location of startup script.

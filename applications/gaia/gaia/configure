@@ -1414,6 +1414,22 @@ BLT_LIBRARY=$TCLUTIL_BLT_LIBRARY
 
 
 
+
+#  No one seems to record the same information for tclX, Itcl, Itk
+#  & Iwidgets, so guess.
+DESTDIR="$prefix"
+ITCL_LIBRARY="$DESTDIR/lib/itcl$ITCL_VERSION"
+
+ITK_LIBRARY="$DESTDIR/lib/itk$ITCL_VERSION"
+
+TCLX_LIBRARY="$DESTDIR/lib/tclX$TCLX_VERSION"
+
+
+IWIDGETS_VERSION="3.0.0"
+IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets$IWIDGETS_VERSION"
+
+
+
 # -----------------------------------------------------------------------
 # system libs
 # -----------------------------------------------------------------------
@@ -1537,7 +1553,7 @@ fi
 #       Check for local installation point of Starlink s/w.
 #--------------------------------------------------------------------
 echo $ac_n "checking Starlink installation""... $ac_c" 1>&6
-echo "configure:1541: checking Starlink installation" >&5
+echo "configure:1557: checking Starlink installation" >&5
 STARLINK=${STARLINK=/star}
 if test ! -x "${STARLINK}"; then
     echo "What directory is the root of the Starlink development system?"
@@ -1553,7 +1569,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1557: checking for $ac_word" >&5
+echo "configure:1573: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_FC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1586,7 +1602,7 @@ fi
 
 #  Compilation flags, for g77 we also need -fno-second-underscore.
 echo $ac_n "checking Fortran flags""... $ac_c" 1>&6
-echo "configure:1590: checking Fortran flags" >&5
+echo "configure:1606: checking Fortran flags" >&5
 FFLAGS=${FFLAGS=-O}
 if test "${FC}" = "g77"; then
    FFLAGS="$FFLAGS -fno-second-underscore"
@@ -1596,7 +1612,7 @@ echo "$ac_t""$FFLAGS" 1>&6
 
 #  How to link files.
 echo $ac_n "checking whether ln -s works""... $ac_c" 1>&6
-echo "configure:1600: checking whether ln -s works" >&5
+echo "configure:1616: checking whether ln -s works" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_LN_S'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1623,7 +1639,7 @@ LINK=${LN_S}
 # Extract the first word of "alink", so it can be a program name with args.
 set dummy alink; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1627: checking for $ac_word" >&5
+echo "configure:1643: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ALINK'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1656,7 +1672,7 @@ fi
 #--------------------------------------------------------------------
 #  Create a dummy program.
 echo $ac_n "checking mixed language libraries""... $ac_c" 1>&6
-echo "configure:1660: checking mixed language libraries" >&5
+echo "configure:1676: checking mixed language libraries" >&5
 
 echo >  /tmp/tmp$$.f "      program tmp"
 echo >> /tmp/tmp$$.f "      end"
@@ -1692,7 +1708,7 @@ echo "$ac_t""$F77_LIBS" 1>&6
 #   clashes with main in tkAppinit.C.
 if test "$FC" = "g77"; then
    echo $ac_n "checking main in -lf2c""... $ac_c" 1>&6
-echo "configure:1696: checking main in -lf2c" >&5
+echo "configure:1712: checking main in -lf2c" >&5
 
 #  Create and compile a dummy program. The compilation uses
 #  -v to get all the information we should require.
@@ -1736,10 +1752,6 @@ LIBDIR="$DESTDIR/lib"
 GAIA_DIR="$LIBDIR/gaia"
 GAIA_LIBRARY=$GAIA_DIR
 GAIA_BUILD_LIBRARY=$SRC_ROOT/library
-IWIDGETS_VERSION="3.0.0"
-IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets$IWIDGETS_VERSION"
-
-
 
 
 
@@ -1882,6 +1894,7 @@ trap 'rm -fr `echo "Makefile \
         library/gaia_version.tcl \
         src/Makefile \
         mktclapp/Makefile \
+        mktclapp/library/gaiaInit.tcl \
         colormaps/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -1974,6 +1987,12 @@ s%@TCLUTIL_LIBRARY@%$TCLUTIL_LIBRARY%g
 s%@ASTROTCL_LIBRARY@%$ASTROTCL_LIBRARY%g
 s%@RTD_LIBRARY@%$RTD_LIBRARY%g
 s%@CAT_LIBRARY@%$CAT_LIBRARY%g
+s%@SKYCAT_LIBRARY@%$SKYCAT_LIBRARY%g
+s%@ITCL_LIBRARY@%$ITCL_LIBRARY%g
+s%@ITK_LIBRARY@%$ITK_LIBRARY%g
+s%@TCLX_LIBRARY@%$TCLX_LIBRARY%g
+s%@IWIDGETS_VERSION@%$IWIDGETS_VERSION%g
+s%@IWIDGETS_LIBRARY@%$IWIDGETS_LIBRARY%g
 s%@TCLUTIL_LIB@%$TCLUTIL_LIB%g
 s%@TCLUTIL_LIB_SPEC@%$TCLUTIL_LIB_SPEC%g
 s%@TCLUTIL_LIB_STATIC@%$TCLUTIL_LIB_STATIC%g
@@ -2007,8 +2026,6 @@ s%@LIBDIR@%$LIBDIR%g
 s%@GAIA_DIR@%$GAIA_DIR%g
 s%@GAIA_LIBRARY@%$GAIA_LIBRARY%g
 s%@GAIA_BUILD_LIBRARY@%$GAIA_BUILD_LIBRARY%g
-s%@IWIDGETS_VERSION@%$IWIDGETS_VERSION%g
-s%@IWIDGETS_LIBRARY@%$IWIDGETS_LIBRARY%g
 
 CEOF
 EOF
@@ -2055,6 +2072,7 @@ CONFIG_FILES=\${CONFIG_FILES-"Makefile \
         library/gaia_version.tcl \
         src/Makefile \
         mktclapp/Makefile \
+        mktclapp/library/gaiaInit.tcl \
         colormaps/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

@@ -268,8 +268,8 @@ itcl::class gaia::StarPhotom {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/StarPhotom.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/StarPhotom.hlp "On Window..."
 
       #  Add the option to create a new window.
       $File add command -label {New window} \

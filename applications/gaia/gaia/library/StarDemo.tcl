@@ -42,7 +42,7 @@
 #  Notes:
 #     Some of this is a blantant hack as it assumes knowledge of the
 #     names of the various components to control. Future maintainers
-#     beware.
+#     beware...
 
 #  Inheritance:
 #     TopLevelWidget
@@ -205,9 +205,9 @@ itcl::class gaia::StarDemo {
    public method init {} {
 
       #  Check for demo data. This such be stored in a tar file in 
-      #  the main gaia_library directory.
-      global gaia_library
-      if { ! [file exists $gaia_library/demodata.tar] } { 
+      #  the main gaia_dir directory.
+      global gaia_dir
+      if { ! [file exists $gaia_dir/demodata.tar] } { 
          error_dialog {Failed to locate demonstration files \
                        in $GAIA_DIR/demodata.tar. Cannot continue\
                        with demonstration.}
@@ -232,7 +232,7 @@ itcl::class gaia::StarDemo {
             if { [info exists env(TAR_OUT)] } {
                set tar_out $env(TAR_OUT)
             }
-            eval exec $tar_out $gaia_library/demodata.tar
+            eval exec $tar_out $gaia_dir/demodata.tar
          }
       }
       wm deiconify $w_
@@ -505,28 +505,18 @@ itcl::class gaia::StarDemo {
       short_display {Interchanged X and Y axes}
       refresh_
 
-      global gaia_library
-      foreach map {aips0.lasc backgr.lasc bgyrw.lasc blue.lasc blulut.lasc \
-	    color.lasc green.lasc heat.lasc idl11.lasc idl12.lasc \
-	    idl14.lasc idl15.lasc idl2.lasc idl4.lasc idl5.lasc \
-	    idl6.lasc isophot.lasc light.lasc manycol.lasc pastel.lasc \
-	    rainbow.lasc rainbow1.lasc rainbow2.lasc rainbow3.lasc \
-	    rainbow4.lasc ramp.lasc random.lasc random1.lasc random2.lasc \
-	    random3.lasc random4.lasc random5.lasc random6.lasc \
-	    real.lasc red.lasc smooth.lasc smooth1.lasc smooth2.lasc \
-	    smooth3.lasc staircase.lasc stairs8.lasc stairs9.lasc \
-	    standard.lasc} {
-	 $itk_option(-gaiactrl) cmap file $gaia_library/colormaps/$map
-	 foreach imap {ramp.iasc equa.iasc expo.iasc gamma.iasc \
-                          jigsaw.iasc lasritt.iasc log.iasc neg.iasc \
-                          neglog.iasc stairs.iasc} { 
-	    $itk_option(-gaiactrl) itt file $gaia_library/colormaps/$imap
-	    short_display "Cycling through tables... cmap: $map, itt: $imap"
-	    refresh_
+      foreach cmap [$itk_option(-rtdimage) cmap list] {
+	 $itk_option(-rtdimage) cmap file $cmap
+	 foreach imap [$itk_option(-rtdimage) itt list] {
+            if { $imap != "null.iasc" } { 
+               $itk_option(-gaiactrl) itt file $imap
+               short_display "Cycling through tables... cmap: $cmap, itt: $imap"
+               refresh_
+            }
 	 }
       }
-      $itk_option(-gaiactrl) cmap file $gaia_library/colormaps/real.lasc
-      $itk_option(-gaiactrl) itt file $gaia_library/colormaps/ramp.iasc
+      $itk_option(-gaiactrl) cmap file real.lasc
+      $itk_option(-gaiactrl) itt file ramp.iasc
       refresh_
    }
 
@@ -733,7 +723,7 @@ itcl::class gaia::StarDemo {
       short_display {Displaying a new image...}
       show_image_ frame.sdf 98 1
       global gaia_library
-      $itk_option(-gaiactrl) cmap file $gaia_library/colormaps/real.lasc
+      $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating photometry toolbox...}
       $itk_option(-gaiamain) make_toolbox magphotom
@@ -781,7 +771,7 @@ itcl::class gaia::StarDemo {
       short_display {Displaying an image...}
       show_image_ frame.sdf 90 1
       global gaia_library
-      $itk_option(-gaiactrl) cmap file $gaia_library/colormaps/real.lasc
+      $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating regions toolbox...}
       $itk_option(-gaiamain) make_toolbox ard
@@ -821,7 +811,7 @@ itcl::class gaia::StarDemo {
       short_display {Displaying an image...}
       show_image_ frame.sdf 90 3
       global gaia_library
-      $itk_option(-gaiactrl) cmap file $gaia_library/colormaps/real.lasc
+      $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating patch toolbox...}
       $itk_option(-gaiamain) make_toolbox patch
@@ -900,7 +890,7 @@ itcl::class gaia::StarDemo {
       short_display {Displaying an image...}
       show_image_ ngc1275.fits 95 1
       global gaia_library
-      $itk_option(-gaiactrl) cmap file $gaia_library/colormaps/real.lasc
+      $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Drawing grid...}
       $itk_option(-gaiamain) make_toolbox astgrid

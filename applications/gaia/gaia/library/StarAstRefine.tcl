@@ -128,9 +128,9 @@ itcl::class gaia::StarAstRefine {
       set Edit [add_menubutton Edit]
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/StarAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_library/StarAstRefine.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/StarAst.hlp "Astrometry Overview..."
+      add_help_button $gaia_dir/StarAstRefine.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

@@ -128,9 +128,9 @@ itcl::class gaia::StarAstDefine {
          -offvalue disabled
 
       #  Add window help.
-      global env gaia_library
-      add_help_button $gaia_library/StarAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_library/StarAstDefine.hlp "On Window..."
+      global env gaia_dir
+      add_help_button $gaia_dir/StarAst.hlp "Astrometry Overview..."
+      add_help_button $gaia_dir/StarAstDefine.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

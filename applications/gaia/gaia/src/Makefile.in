@@ -32,7 +32,7 @@ X_INCLUDE     	= @XINCSW@
 # ------------------------------------------------------------------------
 CPPSRCS         =  GaiaSkySearch.C StarRtdImage.C \
                    Gaia.C NDFIO.C StarWCS.C GaiaLocalCatalog.C  \
-                   StarFitsIO.C bitmaps.C Contour.C
+                   StarFitsIO.C bitmaps.C Contour.C colormaps.C
 
 CSRCS           =  ast_tclerr.c patch.c rtdNDF.c writeslice.c \
                    centroid.c rotated.c rtdRotBoxEllipse.c \

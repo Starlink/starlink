@@ -96,7 +96,7 @@ itcl::class gaia::StarAppFilter {
    #  Constructor:
    #  ------------
    constructor {rtdwidget args} {
-       global env gaia_library
+       global env gaia_dir
 
        #  Record the name of the Gaia widget.
        set rtdwidget_ $rtdwidget
@@ -104,10 +104,10 @@ itcl::class gaia::StarAppFilter {
        #  Evaluate any configuration options.
        eval configure $args
 
-       #  Look for the gaFilter files. First in gaia_library and then
+       #  Look for the gaFilter files. First in gaia_dir and then
        #  in the HOME directory.
-       if { [file readable $gaia_library/.gaFilters] } {
-	   if { ![catch {set ios [open $gaia_library/.gaFilters]}] } {
+       if { [file readable $gaia_dir/.gaFilters] } {
+	   if { ![catch {set ios [open $gaia_dir/.gaFilters]}] } {
 	       process_filters_ $ios
 	       close $ios
 	   }

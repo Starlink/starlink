@@ -218,13 +218,13 @@ itcl::class gaia::Gaia {
    #  to remove skycat logo and add plain option for showing
    #  minimalist stuff when creating a clone.
    protected method make_init_window {{plain 0}} {
-      global ::about_skycat ::gaia_library
+      global ::about_skycat ::gaia_dir
       set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
       rtd_set_cmap $w
       wm title $w "GAIA::SkyCat loading..."
       wm withdraw $w_
       if { ! $plain } { 
-         set gaia_logo [image create pixmap -file $gaia_library/gaia_logo.xpm]
+         set gaia_logo [image create pixmap -file $gaia_dir/gaia_logo.xpm]
          pack \
             [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
             -side top -padx 1m -pady 1m
@@ -248,8 +248,8 @@ itcl::class gaia::Gaia {
 
    #  Add help for GAIA and SkyCat.
    public method add_help_menu {} {
-      global ::gaia_library
-      set m [add_help_button $gaia_library/Gaia.hlp "On Window..." \
+      global ::gaia_dir
+      set m [add_help_button $gaia_dir/Gaia.hlp "On Window..." \
                 {Display help on this window and general features}   ]
 
       add_menuitem $m command "About GAIA/SkyCat..." \
@@ -907,15 +907,15 @@ itcl::class gaia::Gaia {
    #  Set up the STARLINK environment based on the given
    #  directory. PLUGIN SPECIFIC.
    public proc setup_starlink_env {dir} {
-      global ::tcl_version ::env ::argv ::argc ::gaia_library
+      global ::tcl_version ::env ::argv ::argc ::gaia_dir
 
       # we need this for the local atclsh binary for running external tcl commands
       if {[file isdirectory $dir/tcl$tcl_version]} {
          set env(TCL_LIBRARY) $dir/tcl$tcl_version
       }
 
-      if {! [file isdirectory $gaia_library]} {
-         set $gaia_library $dir
+      if {! [file isdirectory $gaia_dir]} {
+         set $gaia_library $gaia_dir
       }
 
       # Check if using local Starlink binaries
@@ -985,7 +985,7 @@ itcl::class gaia::Gaia {
 
       # need this for library/StarApp.tcl  to find adamtask.tcl
       if {! [info exists env(TCLADAM_DIR)]} {
-         set env(TCLADAM_DIR) $gaia_library/demos
+         set env(TCLADAM_DIR) $gaia_dir/demos
       }
       # XXX should use ~/adam/gaia-[pid] here, but not sure about cleanup...
       if {! [info exists env(ADAM_USER)]} {

@@ -5,38 +5,37 @@
 # This file is processed by configure to produce the actual Makefile.
 #
 # who             when       what
-# --------------  ---------  ---------------------------------------------
+# --------------- ---------- ---------------------------------------------
 # Peter W. Draper 6-Oct-1997 Created
-# ------------------------------------------------------------------------
+# --------------- ---------- ---------------------------------------------
 
-# C compiler
+#  C compiler
 CC 	     = @CC@
 
-# C++ compiler
+#  C++ compiler
 CXX          = @CXX@
 
-# -D flags
+#  -D flags
 DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@
 
-# other flags to pass to compiler
+#  Other flags to pass to compiler
 CFLAGS       = @CXXDEBUGFLAGS@
 
-# install directories
+#  Install directories
 TOPDIR	     = @DESTDIR@
 BINDIR       = @BINDIR@
 LIBDIR       = @LIBDIR@
-RTD_DIR      = @RTD_DIR@
 
-# Include directives for Tcl, Tk, and X include files
+#  Include directives for Tcl, Tk, and X include files
 TCL_INCLUDE   = @TCLINCSW@
 TK_INCLUDE    = @TKINCSW@
 X_INCLUDE     = @XINCSW@
 
-# X Libraries
+#  X Libraries
 X_LIB        = @XLIBSW@
 EXTRA_LIBS   = @LIBS@
 
-# Tk libs
+#  Tk libs
 TCLTKLIBS = @ITK_LIB_SPEC@ \
 	    @TIX_LIB_SPEC@ \
             @TK_LIB_SPEC@ \
@@ -45,31 +44,31 @@ TCLTKLIBS = @ITK_LIB_SPEC@ \
             @ITCL_LIB_SPEC@ \
             @TCL_LIB_SPEC@
 
-# Tclutil library
+#  Tclutil library
 TCLUTIL_LIB          = @TCLUTIL_LIB@
 TCLUTIL_LIB_STATIC   = @TCLUTIL_LIB_STATIC@
 
-# Astrotcl library
+#  Astrotcl library
 ASTROTCL_LIB         = @ASTROTCL_LIB@
 ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
 
-# Rtd library
+#  Rtd library
 RTD_LIB              = @RTD_LIB@
 RTD_LIB_STATIC       = @RTD_LIB_STATIC@
 
-# Catalog library
+#  Catalog library
 CAT_LIB              = @CAT_LIB@
 CAT_LIB_STATIC       = @CAT_LIB_STATIC@
 
-# Skycat libraries
+#  Skycat libraries
 SKYCAT_LIB	     = @SKYCAT_LIB@
 SKYCAT_LIB_STATIC    = @SKYCAT_LIB_STATIC@
 
 #  Local GAIA library.
 LOCAL_LIBRARY = ../lib/libgaia.a
 
-# info needed for shared libraries (see configure.in or tclConfig.sh
-# for an explanation)
+#  Info needed for shared libraries (see configure.in or tclConfig.sh
+#  for an explanation)
 SHLIB_CFLAGS=@SHLIB_CFLAGS@
 SHLIB_LD=@SHLIB_LD@
 SHLIB_SUFFIX=@SHLIB_SUFFIX@
@@ -105,7 +104,7 @@ INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 
 # these objects are only needed to make the gaia_wish binary for the demos
-OBJECTS      = EtAppInit.o gaiainit.o
+OBJECTS      = gaiainit.o EtAppInit.o 
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -115,12 +114,17 @@ RM 	     = rm -f
 LN 	     = ln -s
 
 # ------------------------------------------------------------------------
-all: $(mktclapp) $(PROG)
+all: $(PROG)
 
 $(MKTCLAPP): mktclapp.o
 	$(CC) -o $(MKTCLAPP) mktclapp.o
 
-$(PROG): $(OBJECTS) FORCE
+gaiainit.c: $(MKTCLAPP) library/gaiaInit.tcl
+	$(BINDIR)/skycat_tcl library/gaiaInit.tcl gaiainit.mta
+	$(MKTCLAPP) -header > gaiainit.h
+	$(MKTCLAPP) -f gaiainit.mta > gaiainit.c
+
+$(PROG): $(MKTCLAPP) $(OBJECTS) FORCE
 	@echo "linking \"$(PROG)\"..."
 	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(PROG)  \
 	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \

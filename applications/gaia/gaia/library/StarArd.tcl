@@ -194,8 +194,8 @@ itcl::class gaia::StarArd {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/StarArd.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/StarArd.hlp "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \
@@ -423,9 +423,9 @@ itcl::class gaia::StarArd {
       if { $ok } {
          #  Now startup the Ardstat application.
          if { $ardstat_ == {} } {
-            global gaia_library
+            global gaia_dir
             set ardstat_ [StarApp \#auto -application \
-                             $gaia_library/ardstat \
+                             $gaia_dir/ardstat \
                              -notify [code $this measured_stats_] \
                              -show_output $itk_component(statsresults)]
          }
@@ -588,9 +588,9 @@ itcl::class gaia::StarArd {
 
       #  Now startup the autocrop application.
       if { $autocrop_ == {} } {
-         global gaia_library
+         global gaia_dir
          set autocrop_ [StarApp \#auto -application \
-                           $gaia_library/autocrop \
+                           $gaia_dir/autocrop \
                            -notify [code $this modified_image_]]
       }
 

@@ -102,8 +102,8 @@ itcl::class gaia::StarAstSystem {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/StarAstSystem.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/StarAstSystem.hlp "On Window..."
 
       #  There are only three elements that can be controlled: epoch,
       #  equinox and system. Each of these defaults to the string

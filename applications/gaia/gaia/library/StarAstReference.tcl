@@ -140,9 +140,9 @@ itcl::class gaia::StarAstReference {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add window help.
-      global gaia_library
-      add_help_button $gaia_library/StarAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_library/StarAstReference.hlp "On Window..."
+      global gaia_dir
+      add_help_button $gaia_dir/StarAst.hlp "Astrometry Overview..."
+      add_help_button $gaia_dir/StarAstReference.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

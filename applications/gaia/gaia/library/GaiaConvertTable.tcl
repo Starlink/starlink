@@ -62,16 +62,16 @@ itcl::class gaia::GaiaConvertTable {
    constructor  {args} {
 
        #  Set the names of the conversion filters.
-       global gaia_library
+       global gaia_dir
        foreach type $cattypes_ {
-          set to_app_($type) "$gaia_library/cat2tab"
-          set from_app_($type) "$gaia_library/tab2cat"
+          set to_app_($type) "$gaia_dir/cat2tab"
+          set from_app_($type) "$gaia_dir/tab2cat"
           set to_filter_($type) {}
           set from_filter_($type) {}
        }
        foreach type $asciitypes_ {
-          set to_app_($type) "$gaia_library/asc2tab"
-          set from_app_($type) "$gaia_library/tab2asc"
+          set to_app_($type) "$gaia_dir/asc2tab"
+          set from_app_($type) "$gaia_dir/tab2asc"
           set to_filter_($type) {}
           set from_filter_($type) {}
        }

@@ -1,9 +1,9 @@
 /*
- * E.S.O. - VLT project/ ESO Archive 
+ * E.S.O. - VLT project/ ESO Archive
  * "@(#) $Id$"
  *
  * Gaia.C - Initialize Gaia Tcl package
- * 
+ *
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  25 Mar 98  Created
@@ -34,8 +34,11 @@ extern "C" {
 #endif
 }
 
-// generated code for bitmaps used in tcl scripts
+//  Generated code for bitmaps used in tcl scripts.
 void defineGaiaBitmaps(Tcl_Interp*);
+
+//  Generated code for colormaps.
+void defineGaiaColormaps();
 
 #ifdef __GNUC__
 int xargc = 1;
@@ -52,13 +55,16 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     f_init();
 #endif
 
-    // set up Tcl package
+    //  Set up Tcl package.
     if (Tcl_PkgProvide(interp, "Gaia", GAIA_VERSION ) != TCL_OK) {
 	return TCL_ERROR;
     }
 
-    // define bitmaps used by Tcl library
+    //  Define bitmaps used by Tcl library.
     defineGaiaBitmaps(interp);
+
+    //  Define colormaps added by GAIA.
+    defineGaiaColormaps();
 
     // initialize the new image type and Tcl commands
     if (StarRtd_Init(interp) != TCL_OK)
@@ -68,7 +74,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     if (Ellipse_Init() != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (RotBox_Init() != TCL_OK) { 
+    if (RotBox_Init() != TCL_OK) {
 	return TCL_ERROR;
     }
 
@@ -84,12 +90,12 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     if (Segment_Init() != TCL_OK) {
 	return TCL_ERROR;
     }
-        
+
     /*  Add rtd_polyline for drawing many polyline at speed */
     if (Polyline_Init() != TCL_OK) {
 	return TCL_ERROR;
     }
-        
+
     /* Add Starlink task control commands*/
     if (Tcladam_Init(interp) != TCL_OK) {
 	return TCL_ERROR;
@@ -114,22 +120,23 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 	libDir = GAIA_LIBRARY;
     }
 
-    // Set the global Tcl variables gaia_library and gaia_version 
-    // and add gaia_library to the auto_path.
+    // Set the global Tcl variables gaia_library and gaia_version
+    // and add gaia_library to the auto_path (goes first, so used
+    // first).
     Tcl_SetVar(interp, "gaia_library", libDir, TCL_GLOBAL_ONLY);
     Tcl_SetVar(interp, "gaia_version", GAIA_VERSION, TCL_GLOBAL_ONLY);
-
     char cmd[1048];
-    sprintf(cmd, "lappend auto_path %s", libDir);
+    sprintf(cmd, "set auto_path [linsert $auto_path 0 %s]", libDir );
     if (Tcl_Eval(interp, cmd) != TCL_OK)
-	return TCL_ERROR; 
+	return TCL_ERROR;
 
     //  Do the Iwidgets initialisation, needed for single binary as
-    //  Iwidget doesn't have a builtin init function (so the script
+    //  Iwidgets doesn't have a builtin init function (so the script
     //  method of doing the init gets confused).
     libDir = Tcl_GetVar(interp, "iwidgets_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
-      libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY", TCL_GLOBAL_ONLY);
+      libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY",
+                           TCL_GLOBAL_ONLY); 
     }
     if (libDir == NULL) {
       libDir = IWIDGETS_LIBRARY;
@@ -139,7 +146,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     sprintf(cmd, "lappend auto_path %s", libDir);
     if (Tcl_Eval(interp, cmd) != TCL_OK)
         return TCL_ERROR;
-    
+
     //  Also do the package provide.
     if (Tcl_Eval(interp, "
 global iwidgets_library iwidgets_version
@@ -154,14 +161,14 @@ namespace eval ::iwidgets {
 }
 lappend auto_path \"$iwidgets_library/scripts\"
 package provide Iwidgets $iwidgets_version
-"   
+"
                  ) != TCL_OK) {
       return TCL_ERROR;
     }
-      
+
 
     //  Set up the namespaces used by the itcl/itk classes.
-    if (Tcl_Eval(interp, 
+    if (Tcl_Eval(interp,
 #if (TCL_MAJOR_VERSION >= 8)
 		 "namespace eval gaia {namespace export *};"
 		 "namespace import -force gaia::*;"
@@ -174,6 +181,6 @@ package provide Iwidgets $iwidgets_version
                  ) != TCL_OK) {
       return TCL_ERROR;
     }
-    return TCL_OK; 
+    return TCL_OK;
 }
 

@@ -414,6 +414,22 @@ AC_SUBST(TCLUTIL_LIBRARY)
 AC_SUBST(ASTROTCL_LIBRARY)
 AC_SUBST(RTD_LIBRARY)
 AC_SUBST(CAT_LIBRARY)
+AC_SUBST(SKYCAT_LIBRARY)
+
+#  No one seems to record the same information for tclX, Itcl, Itk
+#  & Iwidgets, so guess.
+DESTDIR="$prefix"
+ITCL_LIBRARY="$DESTDIR/lib/itcl$ITCL_VERSION"
+AC_SUBST(ITCL_LIBRARY)
+ITK_LIBRARY="$DESTDIR/lib/itk$ITCL_VERSION"
+AC_SUBST(ITK_LIBRARY)
+TCLX_LIBRARY="$DESTDIR/lib/tclX$TCLX_VERSION"
+AC_SUBST(TCLX_LIBRARY)
+
+IWIDGETS_VERSION="3.0.0"
+IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets$IWIDGETS_VERSION"
+AC_SUBST(IWIDGETS_VERSION)
+AC_SUBST(IWIDGETS_LIBRARY)
 
 # -----------------------------------------------------------------------
 # system libs
@@ -650,10 +666,9 @@ DESTDIR="$prefix"
 BINDIR="$DESTDIR/bin"
 LIBDIR="$DESTDIR/lib"
 GAIA_DIR="$LIBDIR/gaia"
-GAIA_LIBRARY=$GAIA_DIR
-GAIA_BUILD_LIBRARY=$SRC_ROOT/library
-IWIDGETS_VERSION="3.0.0"
-IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets$IWIDGETS_VERSION"
+GAIA_LIBRARY="$GAIA_DIR"
+GAIA_BUILD_LIBRARY="$SRC_ROOT/library"
+TCLADAM_DIR="$LIBDIR/startcl"
 
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
@@ -661,8 +676,7 @@ AC_SUBST(LIBDIR)
 AC_SUBST(GAIA_DIR)
 AC_SUBST(GAIA_LIBRARY)
 AC_SUBST(GAIA_BUILD_LIBRARY)
-AC_SUBST(IWIDGETS_VERSION)
-AC_SUBST(IWIDGETS_LIBRARY)
+AC_SUBST(TCLADAM_DIR)
 
 #--------------------------------------------------------------------
 #	Print out some of the more important settings
@@ -685,4 +699,5 @@ AC_OUTPUT(Makefile \
         library/gaia_version.tcl \
         src/Makefile \
         mktclapp/Makefile \
+        mktclapp/library/gaiaInit.tcl \
         colormaps/Makefile, sh makelinks)

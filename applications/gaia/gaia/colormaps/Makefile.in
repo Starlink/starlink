@@ -1,34 +1,53 @@
 # ------------------------------------------------------------------------
-# 	Makefile for GAIA colormaps directory, just installs with RTD 
-#       versions.
+# E.S.O. - VLT project
+#
+# "@(#) $Id$"
+#
+#  
+# 	Makefile for RTD colormaps directory
 # ------------------------------------------------------------------------
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-GAIA_LIB     = @RTD_DIR@/../gaia
+LIBDIR       = @LIBDIR@
 RM           = rm -f
 SHELL        = /bin/sh
-FILES        = bgyrw.lasc
+FILES        = *.lasc 
+TARGET       = ../src/colormaps.C
 srcdir	     = @srcdir@
 
-all:
+all: $(TARGET)
+
+# generate a C file inclulding static versions of all of the colormap files
+# in this directory
+$(TARGET): $(FILES) colormaps.tcl
+	tcl colormaps.tcl > $(TARGET)
 
 All: 
 	cd ..; $(MAKE)
 
 install-top:
-	@if test -d $(GAIA_LIB)/colormaps ; then \
+	@if test -d $(LIBDIR)/colormaps ; then \
 	    : ; \
 	else \
-	    mkdir -p $(GAIA_LIB)/colormaps ; \
+	    mkdir $(LIBDIR)/colormaps ; \
 	fi
 
 install-files: install-top
 	@set -x; for i in $(srcdir)/$(FILES) ; do \
-	    $(INSTALL_DATA) $$i $(GAIA_LIB)/colormaps ; \
+	    $(INSTALL_DATA) $$i $(LIBDIR)/colormaps ; \
+	done 
+
+vlt-install-files: install-top
+	@gunzip -cd colormap.taz | tar xvf - 
+	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	    $(INSTALL_DATA) $$i $(LIBDIR)/colormaps ; \
 	done 
 
 install: install-files
+
+# Note: the default colormap files are now compiled in to the binary...
+install: install-top
 
 clean:
 	$(RM) *\~ "#"* core
@@ -37,6 +56,9 @@ depend:
 
 distclean: clean
 	rm -f Makefile	
+
+vlt-distclean: distclean
+	rm -f *.lasc *.prg *.fmt
 
 man:
 
