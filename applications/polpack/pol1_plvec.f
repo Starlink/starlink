@@ -229,6 +229,8 @@
       REAL VUIN                  ! Input U variance
       REAL VV                    ! Variance on normalised V Stokes par.
       REAL VVIN                  ! Input V variance
+      REAL VQN                   ! Rotated Q variance value
+      REAL VUN                   ! Rotated U variance value
 
 *  CAT identifiers for catalogue columns.
       INTEGER XCAT, YCAT, ICAT, PCAT, ANCAT, PICAT, VCAT, QCAT, UCAT,
@@ -371,20 +373,20 @@
 *  Copy the total intensity from input to output.
                   I = IIN
 
-*  Normalised Stokes parameters.
-                  Q = QIN / IIN
-                  U = UIN / IIN
-
-*  If required, rotate the Q and U vectors to the new reference direction.
+*  If required, rotate the Q and U values to the new reference direction.
                   IF( ANGROT .NE. ANGRT ) THEN
                      COS2D = COS( 2*( ANGRT - ANGROT )/RTOD )
                      SIN2D = SIN( 2*( ANGRT - ANGROT )/RTOD )
-                     QN = Q*COS2D + U*SIN2D
-                     UN = U*COS2D - Q*SIN2D
-                     Q = QN
-                     U = UN
+                     QN = QIN*COS2D + UIN*SIN2D
+                     UN = UIN*COS2D - QIN*SIN2D
+                     QIN = QN
+                     UIN = UN
                   END IF
    
+*  Normalise theStokes parameters.
+                  Q = QIN / IIN
+                  U = UIN / IIN
+
 *  Get the squared Q and U values.
                   Q2 = Q * Q
                   U2 = U * U
@@ -421,6 +423,14 @@
 *  Otherwise, calculate the variances.
                      ELSE
 
+*  If required, rotate the Q and U variances to the new reference direction.
+                        IF( ANGROT .NE. ANGRT ) THEN
+                           VQN = VQIN*COS2D*COS2D + VUIN*SIN2D*SIN2D
+                           VUN = VUIN*COS2D*COS2D + VQIN*SIN2D*SIN2D
+                           VQIN = VQN
+                           VUIN = VUN
+                        END IF
+   
 *  Normalised Stokes parameter, Q and U.
                         VQ = ( Q2 * VIIN + VQIN )/( I**2 )
                         VU = ( U2 * VIIN + VUIN )/( I**2 )
