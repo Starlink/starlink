@@ -65,7 +65,7 @@
       CALL AST_INIT()
 
 *    Retrieve fit_model object
-      CALL USI_TASSOCI( 'MODEL', '*', 'READ', FID, STATUS )
+      CALL USI_ASSOC( 'MODEL', '*', 'READ', FID, STATUS )
 
 *    Declare file to user :
       CALL DISP_FILENAM( FID, 'Model', STATUS )

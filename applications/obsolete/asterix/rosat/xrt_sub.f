@@ -311,7 +311,7 @@
 
 
 *+XRT_CREPROC     Writes processing box into binned dataset
-      SUBROUTINE XRT_CREPROC(LOC, VIGCOR, DTCOR, BGND, STATUS)
+      SUBROUTINE XRT_CREPROC(FID, VIGCOR, DTCOR, BGND, STATUS)
 *    Description :
 *      Creates a processing box in a datafile.
 *    Bugs :
@@ -320,83 +320,31 @@
 *    History :
 *     14-JUN-1989   ORIGINAL     (LTVAD::RDS)
 *     6-Mar-1990    Now sets background flag false whatever
+*    19 Dec 1995 Use idenntifier rather than locator, and use PRF (DJA)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Structure definitions :
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC                  ! Locator to binned datafile
+      INTEGER			FID			! Output file id
       LOGICAL VIGCOR                              ! Vignetting correction flag
       LOGICAL DTCOR                               ! Dead time correction flag
       LOGICAL BGND                                ! Background subtraction flag
 *    Status :
       INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-*    Local variables :
-      CHARACTER*(DAT__SZLOC) ALOC                 ! Locator to ASTERIX box
-      CHARACTER*(DAT__SZLOC) PLOC                 ! Locator to processing box
-      CHARACTER*(DAT__SZLOC) CLOC                 ! Locator to corrected box
 *
       IF (STATUS .NE. SAI__OK) RETURN
-*
-* Get locator to asterix box
-      CALL BDA_LOCAST(LOC, ALOC, STATUS)
-*
-* Create processing box.
-      CALL DAT_NEW(ALOC, 'PROCESSING', 'EXTENSION', 0, 0, STATUS)
-      CALL DAT_FIND(ALOC, 'PROCESSING', PLOC, STATUS)
-*
+
+      CALL PRF_SET( FID, 'BGND_SUBTRACTED', BGND, STATUS )
+      CALL PRF_SET( FID, 'CORRECTED.VIGNETTING', VIGCOR, STATUS )
+      CALL PRF_SET( FID, 'CORRECTED.DEAD_TIME', DTCOR, STATUS )
+
       IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','Error creating processing box',STATUS)
-         GOTO 999
+          CALL AST_REXIT('XRT_CREPROC',STATUS)
       ENDIF
-*
-* Test if background subtraction has been performed
-      CALL HDX_PUTL(PLOC, 'BGND_SUBTRACTED', 1, BGND, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing background subtracted flag')
-      ENDIF
-*
-* Create corrections box
-      CALL DAT_NEW(PLOC, 'CORRECTED', 'EXTENSION', 0, 0, STATUS)
-      CALL DAT_FIND(PLOC, 'CORRECTED', CLOC, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','Error creating corrections box',STATUS)
-         GOTO 999
-      ENDIF
-*
-* Write dead time object
-      CALL HDX_PUTL(CLOC, 'Dead_time', 1, DTCOR, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing dead_time corrected object')
-         GOTO 999
-      ENDIF
-*
-* Write vignetting object
-      CALL HDX_PUTL(CLOC, 'VIGNETTING', 1, VIGCOR, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing vignetting corrected object')
-         GOTO 999
-      ENDIF
-*
-* Annul locators
-      CALL DAT_ANNUL(CLOC, STATUS)
-      CALL DAT_ANNUL(PLOC, STATUS)
-*
-999   CONTINUE
-*
-      IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','from XRT_CREPROC',STATUS)
-      ENDIF
-*
+
       END
 
 *+  XRT_DIROPEN - Open a direct access file on a logical unit
@@ -1272,7 +1220,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       END
 
 
-*+XRT_GETSEL  - Gets event selection parameters from a file
+*+ XRT_GETSEL - Gets event selection parameters from a file
       SUBROUTINE XRT_GETSEL(ID, HEAD, STATUS)
 *    Description :
 *    Method :
@@ -1294,7 +1242,6 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOCIN               ! Locator to input file
       CHARACTER*(DAT__SZLOC) ILOC,HLOC
       CHARACTER*20 SNAME
       INTEGER NREC
@@ -1305,13 +1252,11 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
-      CALL ADI1_GETLOC(ID,LOCIN,STATUS)
 
-* Get locator to the instrument box
-      CALL BDA_LOCINSTR(LOCIN, ILOC, STATUS)
-*
-* Get detector type i.e. PSPC or HRI
+*  Get locator to instrument box
+      CALL ADI1_LOCINSTR( ID, .FALSE., ILOC, STATUS )
+
+*  Get detector type i.e. PSPC or HRI
       CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
@@ -1328,7 +1273,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
      &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
 *
 *      Get the observation date as an MJD (use MJDs to compare dates)
-         CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
+         CALL ADI1_LOCHEAD( ID, .FALSE., HLOC, STATUS )
 *
          CALL CMP_GET0I(HLOC, 'BASE_MJD', MDATE, STATUS)
 *
@@ -1349,10 +1294,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
          ENDIF
 *
       ENDIF
-*
-*
       IF (STATUS .NE. SAI__OK) GOTO 999
-
 
 *  Get number of selection records
       CALL SLN_NREC( ID, NREC, STATUS )
@@ -1431,9 +1373,6 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL ADI_ERASE( SID, STATUS )
       CALL ADI_ERASE( SELID, STATUS )
 
-
-
-*
 *   Calculate the off axis angle of the collection box
       CALL XRT_OFFAX(1, 1, HEAD)
 *
