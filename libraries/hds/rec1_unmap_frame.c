@@ -16,6 +16,11 @@
 #if defined( _mmap) || defined( HAVE_MMAP )
 #include <sys/types.h>           /* OS X requires this */
 #include <sys/mman.h>		 /* Definitions for memory management	    */
+
+#if __APPLE__
+#undef MS_ASYNC            /* 10.3 always returns an error for MS_ASYNC     */
+#define MS_ASYNC MS_SYNC
+#endif
 #endif
 
 /* Portable version include files:					    */
