@@ -1,9 +1,19 @@
-20 March 2000. Peter Draper. Added RAD_THRESH and RAD_TYPE 
-parameters for determiningf average radii of objects above
-a range of different intensities.
+This is V2.2.1 (February  8 2001). New features include:
+- Memory allocation bug for large images on Alphas while
+  preparing the background-map fixed.
+- CLEANing bug with hollow objects on weighted images
+  fixed.
 
+/*- Previous notes for V2.2.0 (February  4 2001) */
+- MAP_RMS weight-map bug fixed.
+- Huge MAP_WEIGHT calibration bugs fixed.
 
-This is V2.1.6 (February 11 2000). New features include:
+PWD: 20 March 2000. Peter Draper. Added RAD_THRESH and RAD_TYPE 
+     parameters for determining average radii of objects above
+     a range of different intensities.
+
+/*- Previous notes for V2.1.6 (February 11 2000) */
+
 - crowding-flag bug introduced in V2.1.5 fixed.
 
 /*- Previous notes for V2.1.5 (February 8 2000) */
