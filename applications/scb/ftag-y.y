@@ -45,7 +45,7 @@
 
 
 
-%token LINE_START LINE_END COMMENT_LINE BLANK_LINE
+%token LINE_START LINE_END BLANK_LINE COMMENT_LINE
 %token SUBROUTINE ENTRY BLOCKDATA PROGRAM FUNCTION
 
 %token INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL CHARACTER
@@ -440,7 +440,7 @@ token_brac
 *     attrib = const char *
 *        Gives the name of the attribute to be set to name.  The sensible
 *        values would be "href" and "name".
-*     fname = char *
+*     name = char *
 *        Gives the string to be used both as the contents of the tag,
 *        and of the value of the attribute of the A tag.  This will be
 *        free'd by the routine, so must previously have been malloc'd.
@@ -471,34 +471,39 @@ token_brac
 */
 
 /* Local variables. */
-      char *string, *rname, *genpos;
+      char *string, *rname, *genpos, *vname, *fend;
       char *gencode[] = { "i", "r", "d", "l", "c", "b", "ub", "w", "uw", "" };
       int i, l, leng, nspace;
 
+/* Find the start of the identifier itself, which is assumed to be right
+   at the end of the string. */
+      fend = name + strlen( name );
+      for ( vname = fend - 1; vname >= name; vname-- ) {
+         if ( ! isalnum( *vname ) && strchr( "<>$_%&;", *vname ) == NULL )
+            break;
+      }
+      if ( vname < fend )
+         vname++;
+
 /* Get the significant part of the name of the module to be tagged. */ 
-      rname = refname( name );
+      rname = refname( vname );
 
 /* Find out if we need to tag it as a generic function.  We only need to
    worry about this if attrib is "name" (an href does not need multiple
    tags). */
-      genpos = strcmp( attrib, "name" ) 
-                  ? NULL : strstr( rname, "&lt;t&gt;" );
+      genpos = strcmp( attrib, "name" ) ? NULL : strstr( rname, "&lt;t&gt;" );
 
 /* Work out how much space is needed for the final string and allocate it. */
       leng = strlen( attrib ) + strlen( rname ) + strlen( name ) + 13
            + ( ( genpos != NULL ) ? ( ( strlen( rname ) + 8 ) * 9 + 2 ) : 0 );
       string = (char *) malloc( leng );
 
-/* Write the start tag and the tagged text. */
-      sprintf( string, "<a %s=\"%s_\">%s", attrib, rname, name );
+/* Write the whole input text into the output string. */
+      strcpy( string, name );
 
-/* Work out how much of the text at the end is trailing whitespace. */
-      for ( i = strlen( name ); i >= 0 && isspace( name[ i - 1 ] ); i-- );
-      nspace = strlen( name ) - i;
-
-/* Print the end tag before any trailing whitespace. */
-      sprintf( string + 8 + strlen( attrib ) + strlen( rname ) 
-                      + strlen( name ) - nspace, "</a>" );
+/* Overwrite the bare vname at the end with the tag. */
+      sprintf( string + (int) (vname - name), "<a %s=\"%s_\">%s</a>",
+               attrib, rname, vname );
 
 /* If it's a generic function, add all the tags for the specific ones. */
       if ( genpos != NULL ) {
@@ -510,9 +515,6 @@ token_brac
             l += strlen( genpos ) - 9 + strlen( gencode[ i ] ) + 7;
          }
       }
-
-/* Append any trailing whitespace after the last tag. */
-      strcat( string, name + strlen( name ) - nspace );
 
 /* Return. */
       return( string );
@@ -791,9 +793,16 @@ token_brac
 *     it is not OK to put an error token just anywhere in the grammar.
 *-
 */
+
+/* Local variables. */
       char *text;
+
+/* Get the unprocessed text. */
       text = ucontent();
+
+/* Do something appropriate with it. */
       if ( strict ) {
+         fflush( stdout );
          fprintf( stderr, "\nError in this line:\n\n   %s\n", text );
          exit( 1 );
       }
@@ -802,6 +811,8 @@ token_brac
          yyerrok;
          yyclearin;
       }
+
+/* Release memory allocated by ucontent. */
       free( text );
    }
       
