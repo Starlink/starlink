@@ -79,7 +79,7 @@ Adjustments to distribution -- no functionality change.
 </distribution>
 
 <distribution string="0.9-5" date="27-Jun-2000" author=ng" versionid="v0-9-5">
-Added -bp, -cx, -Qp options, and corrected bug which caused fonts to
+Added -bp, -PC, -Qp options, and corrected bug which caused fonts to
 be generated at the wrong sizes.
 
 </history>
@@ -133,10 +133,10 @@ make things a little clearer.</update>
 <p>Synopsis:
 <verbatim>
 dvi2bitmap 
-    [-f font-path] [-r resolution] [-m magnification] [-P[BbTt]]
+    [-f font-path] [-r resolution] [-m magnification] [-P[BbTtCc]]
     [-s scalefactor] [-t pbm|gif|xbm] [-o output]
     [-b(h|w) size] [-bp a4|a4l|usletter...]
-    [-c[lrtb] dimen] [-cx] [-C[lrtb] dimen] [-nqV] [-Q[fFgGtbp]]
+    [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFgGtbp]]
     [-R[fb] int,int,int]
     [-p num] [-l num] [-pp ranges]
     dvi-file
@@ -178,7 +178,7 @@ options.  Note that the old -l and -L options have changed into the
 new -L and -LL options.</update>
 <update versionid="v0-7">Clarified the -p, -l and -pp options.
 Changed -Q into -qq, and -L into -Qf.</update>
-<update versionid="v0-9-5">Added -bp, -Qp, -cx</update>
+<update versionid="v0-9-5">Added -bp, -Qp, -PC</update>
 
 <p><dl>
 <dt><code>-bh size, -bw size</code>
@@ -198,8 +198,8 @@ height, not horizontal!  At some point, I'd like to make the bitmap
 <dt><code>-bp papersize</code>
 <dd>Set the initial size of the bitmap to be one of the paper sizes
 returned by <code>-Qp</code>.  This is useful either to make sure that
-there is enough room on the initial bitmap, to aboid the warning
-above, or, along with the <code/-cx> option, to force the output
+there is enough room on the initial bitmap, to avoid the warning
+above, or, along with the <code/-PC> option, to force the output
 bitmap to be a certain size.
 
 <dt><code>-c[edge] dimen, -C[edge] dimen</code>
@@ -220,9 +220,6 @@ already, but it doesn't notice if that's set after this option, and it
 takes no account of any magnification in the DVI file. 
 <p>See <ref id=usage.special/> for &tex; <code/\special> commands which
 set this within the &tex; file.
-
-<dt><code/-cx>
-<dd>Do not crop the output.
 
 <dt id=usage.options.fp><code>-fp font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
@@ -306,10 +303,11 @@ dvi2bitmap -pp 3,6-10 ... # process only the specified pages
 dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
 </verbatim>
 
-<dt><code/-P[BbTt]>
-<dd><p><update versionid=v0-8>Added -PB and -PT</update>Specifies
+<dt><code/-P[BbTtCc]>
+<dd><p><update versionid=v0-8>Added -PB and -PT</update><update
+versionid=v0-9-5>Added -PC</update>Specifies
 processing of the output bitmap. 
-<code/-Pb> blurs the bitmap, making a half-hearted attempt to make a
+<p><code/-Pb> blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
 generated, a better way is to use the <code/-m> option to magnify the
@@ -318,9 +316,16 @@ correct size.
 <p>The <code/-Pt> option makes the output bitmap have a transparent
 background, if 
 that's supported by the particular format you choose using option
-<code/-t>.  The options <code/-PB> and <code/-PT> disable blurring and
-transparency, respectively.
-<p>By default, bitmaps are not blurred, but are transparent if possible.
+<code/-t>.
+<p>The <code/-Pc> option specifies that you want the output bitmap to
+be cropped.  This is done by default, so you'll more often use the
+<code/-PC> option to specify that you <em/don't> want the output
+cropped (for example, if you're using the <code/-bp> option and want
+the output to stay the specified size).
+<p>The options <code/-PB>, <code/-PC> and <code/-PT> disable blurring,
+cropping, and transparency, respectively.
+<p>By default, bitmaps are not blurred, are cropped, and are
+transparent if possible.
 <p>For PNG files, the output bitmap uses a
 palette plus an alpha channel; these are calculated in such a way that
 if you display the resulting bitmap on the same colour background as
@@ -1061,7 +1066,7 @@ enabled if library support for them is found).
 <row><entry>Platform<entry>Compiler
 <tbody>
 <row><entry>i686-pc-linux-gnu (RedHat 6.0)<entry>egcs-2.91.66
-<row><entry>powerpc-mac-linux-gnu (mklinux DR-0.3?)<entry>gcc 2.8.1?
+<row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
 <row><entry>sparc-sun-solaris2.7<entry>egcs-2.91.66
 <row><entry>sparc-sun-solaris2.7<entry>gcc 2.8.1
 <row><entry>sparc-sun-solaris2.7<entry>WorkShop Compilers 5.0 98/12/15 C++ 5.0

@@ -5,9 +5,9 @@ dvi2bitmap
 .SH SYNOPSIS
 .B dvi2bitmap 
     [\-fp font-path] [\-r resolution] [\-m magnification] 
-    [\-P[BbTt]] [\-s scalefactor] [\-t pbm|gif|xbm]
+    [\-P[BbTtCc]] [\-s scalefactor] [\-t pbm|gif|xbm]
     [\-o output] [\-b(h|w) size] [\-bp a4|a4l|usletter...]
-    [\-c[lrtb] dimen] [\-cx] [\-C[lrtb] dimen] [\-nqV]
+    [\-c[lrtb] dimen] [\-C[lrtb] dimen] [\-nqV]
     [\-Q[fFgGtbp]] [\-R[fb] int,int,int]
     [\-p num] [\-l num] [\-pp ranges]
     dvi-file
@@ -48,9 +48,9 @@ Set the initial size of the bitmap to be one of the paper sizes
 returned by
 .I "\-Qp."
 This is useful either to make sure that
-there is enough room on the initial bitmap, to aboid the warning
+there is enough room on the initial bitmap, to avoid the warning
 above, or, along with the
-.I "\-cx"
+.I "\-PC"
 option, to force the output bitmap to be a certain size.
 .TP
 .I "\-c[edge] dimen, \-C[edge] dimen"
@@ -88,9 +88,6 @@ takes no account of any magnification in the DVI file.
 See below for TeX 
 .I "\especial"
 commands which set this within the TeX file.
-.TP
-.I "\-cx"
-Do not crop the output.
 .TP
 .I "\-fp font-path"
 Specifies the path to the PK fonts which dvi2bitmap will use.  See
@@ -216,8 +213,9 @@ process only pages where
 .I "\ecount2"
 was 1.
 .TP
-.I "\-P[BbTt]"
+.I "\-P[BbTtCc]"
 Specifies processing of the output bitmap.
+.IP
 .I "\-Pb"
 blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
@@ -233,14 +231,27 @@ The
 option makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
 .I "\-t"
+.IP
+The
+.I "\-Pc"
+option specifies that you want the output bitmap to
+be cropped.  This is done by default, so you'll more often use the
+.I "\-PC"
+option to specify that you do not want the output
+cropped (for example, if you're using the
+.I "\-bp"
+option and want the output to stay the specified size).
+.IP
 The options
 .I "\-PB"
+,
+.I "\-PC"
 and
 .I "\-PT"
-disable blurring and
-transparency, respectively.
+disable blurring, cropping and transparency, respectively.
 .IP
-By default, bitmaps are not blurred, but are transparent if possible.
+By default, bitmaps are not blurred, are cropped, and are transparent
+if possible.
 .IP
 For PNG files, the output bitmap uses a
 palette plus an alpha channel; these are calculated in such a way that
