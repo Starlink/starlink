@@ -65,7 +65,8 @@ fi
 
 
 dnl    Determine whether the Fortran compiler supports the 'xxx'X notation
-dnl    for integers and reals.
+dnl    for integers and reals.  The notation Z"xxx" is the one blessed
+dnl    by ISO-1539, but 'xxx'X hasn't caused problems so far.
 AC_CACHE_CHECK([whether ${FC} supports hex notation for numbers],
                [ac_cv_fc_has_hex_numbers],
                [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
@@ -77,6 +78,25 @@ AC_CACHE_CHECK([whether ${FC} supports hex notation for numbers],
 if test $ac_cv_fc_has_hex_numbers = yes; then
     AC_DEFINE([FC_HAVE_HEX_NUMBERS], 1,
               [Define as 1 if the Fortran compiler supports 'xxx'X numbers])
+fi
+
+
+dnl    Determine whether the Fortran compiler supports the type-kind
+dnl    parameter notation (eg, I=1_4), as described in ISO-1539
+dnl    section 4.3.1.  Unfortunately, the standard doesn't specify
+dnl    what these parameters are, other than that they are as
+dnl    returned by the KIND intrinsic function.  We'll test for _8 for
+dnl    integers, however, since that's the one we want to use.
+AC_CACHE_CHECK([Whether ${FC} supports type-kind notation],
+   [ac_cv_fc_type_kind],
+   [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
+      I=1_8
+]),
+        ac_cv_fc_type_kind=yes,
+        ac_cv_fc_type_kind=no)])
+if test $ac_cv_fc_type_kind = yes; then
+    AC_DEFINE([FC_HAVE_TYPE_KIND], 1, 
+       [Define to 1 if the Fortran compiler supports type-kind notation])
 fi
 
 
