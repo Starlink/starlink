@@ -717,6 +717,10 @@ SCALE = REAL (Read)
   to the zero of the cone, for BESSEL it is the first zero of the
   Bessel function (PI) and for Gaussian it is the half-width
   half maximum (HWHM).
+3 SFACTOR
+SFACTOR = REAL (Read)
+  This is the smoothing factor to use for a SPLINE2 regrid.
+  See the PDA_SURFIT documentation for more information.
 3 SIZE
 SIZE ( 2 ) = INTEGER (Read)
    This array parameter sets the size of the output grid (nx, ny).
@@ -2012,6 +2016,10 @@ SCALE = REAL (Read)
   to the zero of the cone, for BESSEL it is the first zero of the
   Bessel function (PI) and for Gaussian it is the half-width
   half maximum (HWHM).
+3 SFACTOR
+SFACTOR = REAL (Read)
+  This is the smoothing factor to use for a SPLINE2 regrid.
+  See the PDA_SURFIT documentation for more information.
 3 SIZE
 SIZE ( 2 ) = INTEGER (Read)
    This array parameter sets the size of the output grid (nx, ny).
@@ -2716,6 +2724,10 @@ SCALE = REAL (Read)
   to the zero of the cone, for BESSEL it is the first zero of the
   Bessel function (PI) and for Gaussian it is the half-width
   half maximum (HWHM).
+3 SFACTOR
+SFACTOR = REAL (Read)
+  This is the smoothing factor to use for a SPLINE2 regrid.
+  See the PDA_SURFIT documentation for more information.
 3 SIZE
 SIZE ( 2 ) = INTEGER (Read)
    This array parameter sets the size of the output grid (nx, ny).
