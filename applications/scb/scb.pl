@@ -265,9 +265,15 @@ sub query_form {
 
 #     Print list of all packages.
 
+      hprint "
+         <h2>Packages</h2>
+         <ul compact>
+      ";
       foreach $pack (@packages) {
-         print "<a href='$scb?module=&package=$pack'>$pack</a></br>\n";
+         print "<li> ";
+         print "<a href='$scb?module=&package=$pack'>$pack</a>\n";
       }
+      print "<\ul>\n";
    }
    footer;
 
@@ -433,8 +439,11 @@ sub output {
 
 #        Substitute for HTML meta-characters.
 
+         s%&%##AMPERSAND##%g;
          s%>%&gt;%g;
          s%<%&lt;%g;
+         s%"%&quot%g;
+         s%##AMPERSAND##%&amp;%g;
 
          if ($body) {
 
@@ -449,7 +458,7 @@ sub output {
 #              Add anchors (multiple ones if generic function).
 
                @names = ($name);
-               if ($name =~ /^(.*)&LT;T&GT;(.*)/) {
+               if ($name =~ /^(.*)&lt;T&gt;(.*)/i) {
                   ($g1, $g2) = ($1, $2);
                   @names = map "$g1$_$g2", qw/I R D L C B UB W UW/; 
                }
