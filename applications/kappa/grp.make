@@ -20,7 +20,8 @@ colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com ctm_com ctm_par fts_par hlpcmd grecom.inc grerr \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
-ira_err kpg_ast kpg_par grf.h kappa_style.def tkast.tcl
+ira_err kpg_ast kpg_par grf.h kappa_style.def tkast.tcl \
+kappa_lutview_style.def
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -186,7 +187,7 @@ kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_mixvr.f kpg1_expob.f \
 kpg1_expod.f kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f \
 kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
 kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
-kpg1_pgcls.f kpg1_pgopn.f 
+kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \

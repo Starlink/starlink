@@ -673,7 +673,8 @@ kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_grlm2.f kpg1_grlm1.f \
 kpg1_cpbdd.f kpg1_cpbdr.f kpg1_mixvr.f kpg1_pgopn.f kpg1_pgcls.f \
 kpg1_expob.f kpg1_expoi.f kpg1_expoub.f kpg1_expow.f kpg1_expod.f \
 kpg1_expor.f kpg1_expouw.f kpg1_logab.f kpg1_logai.f kpg1_logaub.f \
-kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f
+kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f kpg1_asshr.f \
+kpg1_lutky.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -895,7 +896,7 @@ TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf
 
 #  Define the plotting style files.
 
-STYLE_FILES = kappa_style.def
+STYLE_FILES = kappa_style.def kappa_lutview_style.def
 
 #  List of TK/TCL object libraries.
 
