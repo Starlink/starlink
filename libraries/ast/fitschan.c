@@ -17210,8 +17210,9 @@ static AstCmpMap *WcsNative( AstFitsChan *this, FitsStore *store, char s,
       }
       if( alphap != delta0 ) {
          sprintf( buf, "The original FITS header specified a reference "
-                  "point with latitude %.8g. A value of %.8g is being used "
-                  "instead. ", alphap, delta0 );
+                  "point with latitude %.*g. A value of %.*g is being used "
+                  "instead. ", DBL_DIG, alphap*AST__DR2D, DBL_DIG, 
+                  delta0*AST__DR2D );
          Warn( this, "badlat", buf, method, class );
       }
 
