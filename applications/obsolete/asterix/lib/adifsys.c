@@ -437,6 +437,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
   {
   ADIlogical		found = ADI__false;
+  ADIobj		rval = id;
 
 /* Check inherited global status. Return input argument if bad */
   _chk_stat_ret(id);
@@ -510,7 +511,7 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /*   Linkage worked? Return new object */
         if ( _ok(status) ) {
           found = ADI__true;
-          id = newid;
+          rval = newid;
           }
 
 /*   Status was no applicable method, in which case we try the next list */
@@ -530,12 +531,13 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
       }
 
 /* Report error if no linkage */
-    if ( ! found ) {
+    if ( ! found )
       adic_setecs( ADI__NOMTH, "Unable to link object of class %S to any of %*s",
                    status, ocls, clen, cls );
     }
 
-  return id;
+/* Set return object */
+  return rval;
   }
 
 
