@@ -79,6 +79,8 @@
             CALL IREGION_ARD(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'SHO') THEN
             CALL IREGION_SHOW(STATUS)
+          ELSEIF (MODE.EQ.'EXP') THEN
+            CALL IREGION_EXPORT(STATUS)
           ELSE
             CALL MSG_PRNT('AST_ERR: unknown mode '//MODE)
           ENDIF
@@ -575,10 +577,63 @@
 
         CALL GFX_QCONTOUR(I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                   %val(I_XPTR),%val(I_YPTR),%val(I_REG_PTR),
-     :                                            QUAL_MASK,STATUS)
+     :                                            QUAL__MASK,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_SHOW',STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
+
+
+
+*+
+      SUBROUTINE IREGION_EXPORT(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER*(DAT__SZLOC) LOC
+      CHARACTER*40 FILE
+      INTEGER DIMS(2)
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL USI_ASSOCO('OUT','REGION_MASK',LOC,STATUS)
+        DIMS(1)=I_NX
+        DIMS(2)=I_NY
+        CALL BDA_CRETDATA(LOC,'_BYTE',2,DIMS,STATUS)
+        CALL BDA_MAPTDATA(LOC,'_BYTE','W',PTR,STATUS)
+        CALL ARR_COP1B(I_NX*I_NY,%val(I_REG_PTR),%val(PTR),STATUS)
+        CALL BDA_COPAXES(I_LOC,LOC,STATUS)
+        CALL BDA_COPMORE(I_LOC,LOC,STATUS)
+        CALL BDA_RELEASE(LOC,STATUS)
+        CALL USI_ANNUL(LOC,STATUS)
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from IREGION_EXPORT',STATUS)
         ENDIF
 
       ENDIF

@@ -61,6 +61,7 @@
 *                         fault in LOG10 errors (probably introduced 25/2/87!)
 *                         (DJA).
 *     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -117,7 +118,7 @@
 *    Version :
 *
       CHARACTER*26           VERSION
-         PARAMETER         ( VERSION = 'OPERATE Version 1.7-1' )
+         PARAMETER         ( VERSION = 'OPERATE Version 1.8-0' )
 *-
 
 *    Version
@@ -127,7 +128,7 @@
       CALL AST_INIT
 
 *    Check for overwriting
-      CALL PAR_GET0L( 'OVER', OVER, STATUS )
+      CALL USI_GET0L( 'OVER', OVER, STATUS )
 
 *    Get input object
       IF ( OVER ) THEN
@@ -148,15 +149,15 @@
       IF ( OK ) THEN
         CALL BDA_MAPTDATA( OLOC, '_DOUBLE', 'UPDATE', DPTR, STATUS )
       ELSE
-        CALL MSG_PRNT( '! Invalid data' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Invalid data', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    If input is primitive, get error estimate
       IF ( PRIM ) THEN
 
-        CALL PAR_GET0D( 'ERR', EVALUE, STATUS )
+        CALL USI_GET0D( 'ERR', EVALUE, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           ERR = .TRUE.
           CALL DYN_MAPD( 1, NELM, VPTR, STATUS )
@@ -198,7 +199,7 @@
       INPUT = .TRUE.
 
       DO WHILE ( INPUT )
-        CALL PAR_GET0C( 'OPER', OPER, STATUS )
+        CALL USI_GET0C( 'OPER', OPER, STATUS )
         CALL CHR_UCASE( OPER )
 
         IF ( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
@@ -221,7 +222,7 @@
         ELSE
           CALL MSG_SETC( 'OP', OPER )
           CALL MSG_PRNT( 'The operation /^OP/ is not available' )
-          CALL PAR_CANCL( 'OPER', STATUS )
+          CALL USI_CANCL( 'OPER', STATUS )
 
         END IF
       END DO
@@ -308,7 +309,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                NDAT                     ! Number of data points
 *    Import-Export :
