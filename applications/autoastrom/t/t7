@@ -50,8 +50,8 @@ $AUTOASTROM_DIR/autoastrom \
 
 for f in 1 2 3; do
     echo "====================" $f
-    # Remove version-number lines
-    grep -v 'autoastrom, v' $TDIR/stdout$f
+    # Remove lines containing version-number and HTTP proxy
+    grep -v '\(autoastrom, v\|HTTP proxy\)' $TDIR/stdout$f
     cat $TDIR/dump$f
     echo "--------------------"
 done

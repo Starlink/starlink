@@ -45,11 +45,20 @@ $AUTOASTROM_DIR/autoastrom \
 
 # Dump results to stdout, removing version string
 echo "=== Test 1 ==="
-grep -v 'autoastrom, v' ${PREFIX}testndf1.STDOUT
-./fitsdump ${PREFIX}testndf1.final-fits.fits
+# Remove lines containing version-number and HTTP proxy
+grep -v '\(autoastrom, v\|HTTP proxy\)' ${PREFIX}testndf1.STDOUT
+if test -f ${PREFIX}testndf1.final-fits.fits; then
+    ./fitsdump ${PREFIX}testndf1.final-fits.fits
+else
+    echo "Can't find file ${PREFIX}testndf1.final-fits.fits"
+fi
 echo "=== Test 2 ==="
-grep -v 'autoastrom, v' ${PREFIX}testndf2.STDOUT
-./fitsdump ${PREFIX}testndf2.final-fits.fits
+grep -v '\(autoastrom, v\|HTTP proxy\)' ${PREFIX}testndf2.STDOUT
+if test -f ${PREFIX}testndf2.final-fits.fits; then
+    ./fitsdump ${PREFIX}testndf2.final-fits.fits
+else
+    echo "Can't find file ${PREFIX}testndf2.final-fits.fits
+fi
 
 rm -f ${PREFIX}*
 

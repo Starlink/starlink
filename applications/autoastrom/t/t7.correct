@@ -2,7 +2,6 @@
 -- Starting monoliths...
 -- Monoliths OK
 -- Processing NDF <t5>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
 -- NDF <t5> examined OK
 -- WCS information from AST
 -- Dumping state, and exiting...
@@ -589,7 +588,6 @@ $NDFinfo->{wcs}: ref to ARRAY:
 -- Starting monoliths...
 -- Monoliths OK
 -- Processing NDF <t5>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
 -- NDF <t5> examined OK
 -- WCS information from FITS
 -- Dumping state, and exiting...
@@ -1141,7 +1139,6 @@ $NDFinfo->{wcs}: ref to ARRAY:
 -- Starting monoliths...
 -- Monoliths OK
 -- Processing NDF <t5>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
 -- NDF <t5> examined OK
 -- WCS information from command line
 -- Dumping state, and exiting...
@@ -1539,7 +1536,7 @@ $NDFinfo->{wcs}: ref to ARRAY:
     CTYPE2  = 'DEC--AZP  '
     PV2_1   =             0.000000
     LONPOLE =           180.000000
-    COMMENT   dec=-12:34:56 ra=+210 source=USER:AST:FITS pa=-30
+    COMMENT   dec=-12:34:56 pa=-30 ra=+210 source=USER:AST:FITS
     CRVAL1  =           210.000000 / RA    14 00 00.000
     CRVAL2  =           -11.417778 / Dec   -11 25 04.000
     CUNIT1  = 'deg       '
