@@ -104,6 +104,7 @@ sub write_entry;
 
 #  Set up scratch directory.
 
+$tmpdir = "/local/junk/scb/index";
 print "rm -rf $tmpdir\n";
 system "rm -rf $tmpdir" and die "Couldn't clean out $tmpdir: $?\n";
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
@@ -440,14 +441,16 @@ sub write_entry {
 
 #  Tidy logical pathname.
 
-   $location =~ s%/./%/%g;
+   $location =~ s%([/#>])./%$1%g;
    $location =~ s%//*%/%g;
 
 #  If logical path looks like it starts with a package reference,
 #  rephrase it as a logical reference to the package.
 
    $location =~ 
-      s%^SOURCE#([^./]+)(.tar.Z>|.tar.gz>|.tar>|/)(.*)$% uc($1) . "#$3" %e;
+      s%^SOURCE#([^./]+)(.tar.Z>|.tar.gz>|.tar>|/)(.*)$% 
+         ($package = uc $1) . "#$3" %e;
+   $tasks{$package} = [] unless (defined $tasks{$package});
 
 #  Write entry to database (hash of hashes %locate); if no identifiable 
 #  package the hash key is ''.
