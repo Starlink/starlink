@@ -133,9 +133,9 @@ void rec1_get_path( void ){};	 /* This routine not used on VMS systems */
 
 #if defined __MINGW32__
       /* Use Windows separator */
-#define SLASH  '/'
-#else
 #define SLASH  '\\'
+#else
+#define SLASH  '/'
 #endif
 
 /*.									    */
