@@ -52,14 +52,19 @@
         CALL MSG_BLNK()
 
 *  set region mask
+	print *,'1'
         CALL IMG_SETWHOLE(STATUS)
+	print *,'2'
         CALL IMG_SETBOX(XC,YC,DX,DY,STATUS)
+	print *,'3'
 
 *  store box parameters
         CALL IMG_STOREBOX(XC,YC,DX,DY,STATUS)
+	print *,'4'
 
 *  mark box
         CALL IMG_BOX(XC,YC,DX,DY,STATUS)
+	print *,'5'
 
       ENDIF
 
