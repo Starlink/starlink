@@ -351,7 +351,7 @@
                TEXT = ' '
                CALL POL1_TIQAC( GI( I ), 'UNITS', TEXT, STATUS )
                IF( TEXT .NE. ' ' ) THEN
-                  ATTR = 'Units('
+                  ATTR = 'Unit('
                   IAT = 6
                   CALL CHR_PUTI( I, ATTR, IAT )
                   CALL CHR_APPND( ')', ATTR, IAT )
@@ -390,12 +390,11 @@
 
          CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
-      END IF
-
 *  Permute the Base Frame axes so that they are in the same order as the GI
 *  array.
-      BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-      CALL AST_PERMAXES( BFRM, AXES, STATUS ) 
+         BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+         CALL AST_PERMAXES( BFRM, AXES, STATUS ) 
+      END IF
 
 *  If an error has occurred, annul the returned FrameSet pointer. Otherwise
 *  export the pointer (if it is not null) from the current AST context.

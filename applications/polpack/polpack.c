@@ -1396,10 +1396,10 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    DECLARE_DOUBLE(dval);
    char mess[255];
    char *file;
-   int i, ok, n, use, nc;
+   int i, ok, n, use, nc, found;
    char buf[81];
    char numbuf[81];
-   char *p, *e, *q;
+   char *p, *e, *q, *key, *pkey;
    FILE *fd;
 
 /* Define an f77 false value. */
@@ -1429,7 +1429,9 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
       q = numbuf;
       *q = 0;
       nc = 0;
-   
+      key = "set data_";
+      pkey = key;
+
 /* Loop round reading the data stream from the file. */
       while( 1 ) {
 
@@ -1439,19 +1441,48 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
             n = fread( (void *) buf, 1, 81, fd );
             if( !n ) break;
 
-/* If we have not yet found a line containing the string "set data_",
-   check the buffer now. If the buffer does not contain the string, 
-   continue on for a new buffer. Otherwise, move p on to point to the
-   text following the string.*/
+/* If we have not yet the string "set data_", check the current buffer now. 
+   We have to take care because the string may be split across two buffers. */
             if( !ok ) {
-               p = strstr( buf, "set data_" );
-               if( !p ){
-                  p = e;
+
+/* The pointer to the next character to be tested is initialised to the 
+   start of the buffer. We have not yet found the required key string 
+   ("set data_"). */
+               p = buf;
+               found = 0;
+
+/*  Check every character in the buffer */
+               while( *p ) {
+
+/* pkey points to the next key character to be searched for. See if the 
+   current buffer character matches the netx key character. */
+                  if( *p == *pkey ){
+
+/* If so, move on to search for the next key character. If the end of the 
+   key string has been reached, we have dound the string. Move p on so that it points to the first character after the key string, and leave the loop. */
+                     pkey++;
+                     if( ! *pkey ){
+                        found = 1;
+                        p++;
+                        break;
+                     }
+
+/* If the current buffer character differs from the next key character, 
+   reset the next required key character back to the first character in the key string. */
+                  } else {
+                     pkey = key;
+                  }
+                  p++;
+               }
+
+/*  If we have not yet found the key string, loop round for a new buffer. 
+    Otherwise, indicate that we can now continue to read numerical values. */
+               if( !found ){
                   continue;
                } else {
-                  p += 9;
                   ok = 1;
                }
+
             } else {
                p = buf;
             }
