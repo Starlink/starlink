@@ -115,7 +115,8 @@
       CHARACTER*3		RADECSYS		! Coord system name
       CHARACTER*3		SYS			! Coord system name
       CHARACTER*40		UNITS(2)		! X,Y axis units
-      CHARACTER*72		CMNT			! (rb)
+      CHARACTER*72		CMNT			! Keyword comment string
+      CHARACTER*20		DECSGN			! Sign of declination
 
       DOUBLE PRECISION		EPOCH			! Epoch
       DOUBLE PRECISION		LONGPOLE		!
@@ -127,7 +128,9 @@
       REAL			EQNX			! Equinox
       REAL			PPARS(MAXPP)		! Projections params
       REAL			TOR			! Radian conversion
+      REAL			SECS			! RA/DEC componemts
 
+      INTEGER			DEGS, MINS, HOURS	! RA/DEC componemts
       INTEGER			DIMS(2)			! Axis dimensions
       INTEGER			IP			! Loop over proj params
       INTEGER			IPSF			! Psf system handle
@@ -303,15 +306,38 @@
       END IF
 
 *  Extract axis info
+*  Right ascension
       CALL ADI2_HGKYD( PHDU, 'CRVAL1', SPOINT(1), CMNT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
+        CALL ADI2_HGKYI( PHDU, 'PLTRAH', HOURS, CMNT, STATUS )
+        CALL ADI2_HGKYI( PHDU, 'PLTRAM', MINS, CMNT, STATUS )
+        CALL ADI2_HGKYR( PHDU, 'PLTRAS', SECS, CMNT, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+        ELSE
+          SPOINT(1) = (HOURS*15.0D0) + (MINS/60.0D0) + (SECS/3600.0D0)
+          RAOK = .TRUE.
+        END IF
       ELSE
         RAOK = .TRUE.
       END IF
+
+*  Declination
       CALL ADI2_HGKYD( PHDU, 'CRVAL2', SPOINT(2), CMNT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
+        CALL ADI2_HGKYC( PHDU, 'PLTDECSN', DECSGN, CMNT, STATUS )
+        CALL ADI2_HGKYI( PHDU, 'PLTDECD', DEGS, CMNT, STATUS )
+        CALL ADI2_HGKYI( PHDU, 'PLTDECM', MINS, CMNT, STATUS )
+        CALL ADI2_HGKYR( PHDU, 'PLTDECS', SECS, CMNT, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+        ELSE
+          SPOINT(2) = (DEGS/1.0D0) + (MINS/60.0D0) + (SECS/3600.0D0)
+          IF ( DECSGN(1:1) .EQ. '-' ) SPOINT(2) = -1.0D0 * SPOINT(2)
+          DECOK = .TRUE.
+        END IF
       ELSE
         DECOK = .TRUE.
       END IF
