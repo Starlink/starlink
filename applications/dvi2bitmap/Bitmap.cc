@@ -37,11 +37,13 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>		// g++ doesn't have <limits>
+#include <cmath>
 #else
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <math.h>
 #endif
 
 #ifdef HAVE_STD_NAMESPACE
