@@ -1760,6 +1760,16 @@ unexpected behaviour is encountered while using POLPACK:
 
 \begin{description}
 
+\item [``POLPLOT cannot align the vector map with a previously displayed
+image''] - If you use the CURSA application \xref{XCATVIEW}{sun190}{XVIEW} 
+to create a catalogue, you should ensure that textual information is
+stored with the output catalogue. This is done by selecting the
+appropriate option when you use the \texttt{Save} command  in the
+\texttt{File} menu. The textual information stored with a POLPACK
+catalogue contains the information describing how to align the vectors with
+other co-ordinate systems, and so failure to copy this information will
+mean that the output catalogue cannot be aligned with other images.
+
 \item [``\texttt{Command not found}''] - Have you started up POLPACK
 as described \hyperref{here}{in section }{}{SEC:START}?
 
