@@ -62,8 +62,6 @@ man1_MANS = dvi2bitmap.1 dvireport.1
 
 
 # Special handling for distribution
-#
-# Include both the manual and the library documentation in the distribution
 EXTRA_DIST = $(libdocdir) $(man1_MANS) VERSION
 
 # Generate library documentation using Doxygen
