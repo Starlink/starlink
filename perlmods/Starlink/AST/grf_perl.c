@@ -65,7 +65,6 @@ static void Report( const char * );
 /* ==================== */
 
 void Perl_storeGrfObject ( SV * plotobject ) {
-  printf( "Storing object in plot object\n");
   CurrentPlot = plotobject;
 }
 
@@ -90,7 +89,7 @@ SV* Perl_getcb ( char * attr ) {
 
   elem = hv_fetch( hash_object, attr, strlen(attr), 0);
 
-  if (elem == NULL) {
+  if (elem == NULL || !SvOK(*elem) ) {
     return NULL;
   } else {
     return *elem;
@@ -143,6 +142,9 @@ int astGLine( int n, const float *x, const float *y ){
   AV * XX;
   AV * YY;
   int retval;
+
+  printf("Calling astGLine with %d points\n", n);
+  if (n == 0 ) return 1;
 
   if (!astOK) return 0;
   if (CurrentPlot == NULL ) {
@@ -216,6 +218,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
   dSP;
   SV * cb;
   int retval;
+  double cache;
 
   if (!astOK) return 0;
   if (CurrentPlot == NULL ) {
@@ -223,7 +226,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
     return 0;
   }
 
-  cb = Perl_getcb( "_gline" );
+  cb = Perl_getcb( "_gattr" );
  
   if ( cb != NULL ) {
     int count;
@@ -245,8 +248,11 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
     if (count != 2) 
       Perl_croak(aTHX_ "Must return 2 args from GAttr callback\n");
 
+    /* The status will be on the stack furthest back so we 
+       need to read off old_val first */
+    cache = POPn;
+    if (old_value != NULL) *old_value = cache;
     retval = POPi;
-    *old_value = POPn;
 
     PUTBACK;
 
