@@ -129,7 +129,7 @@
 
 *    Read the HDS data
         IF ( NDIM .EQ. 0 ) THEN
-          CALL DAT_GET0<T>( LOC, VALUE, STATUS )
+          CALL DAT_GET0<T>( CLOC, VALUE, STATUS )
         ELSE
           CALL DAT_MAPV( CLOC, '<HTYPE>', 'READ', VPTR, NELM, STATUS )
         END IF
