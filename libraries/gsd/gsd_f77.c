@@ -16,10 +16,13 @@
 
  * Authors:
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    05 Dec 1994 (hme):
  *       Original version.
+ *    16 Dec 1999 (timj):
+ *       Fix prototype warning in gsdGet1b
 
  * Copyright:
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
@@ -1118,7 +1121,7 @@ F77_SUBROUTINE(gsd_get1b)( INTEGER_ARRAY(index), INTEGER(no_dims),
  * and do not cast afterwards.
  */
    cstatus = gsdGet1b( gsd_fdsc[cfd], gsd_idsc[cfd], gsd_dptr[cfd],
-      cnumber, *no_dims, dimvals, start, end, bvalues, actvals );
+      cnumber, *no_dims, dimvals, start, end, (char *)bvalues, actvals );
    if ( cstatus ) { *status = SAI__ERROR; goto abort; }
 
 /* Return.
