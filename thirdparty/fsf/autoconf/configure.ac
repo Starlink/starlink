@@ -22,7 +22,17 @@
 # We need AC_CONFIG_TESTDIR.
 AC_PREREQ([2.57])
 
-AC_INIT([GNU Autoconf], [2.59-starlink1], [bug-autoconf@gnu.org])
+dnl  Since this is a Starlink-customised version of autoconf, change the
+dnl  package name and bug-reporting address.  It would be good to change
+dnl  the version number, too, but that would require surgery on macro
+dnl  lib/m4sugar/m4sugar.m4:m4_version_prereq.
+dnl
+dnl  Include the TARNAME field, not because we want to distribute
+dnl  this package, but so that autoconf uses this when building some
+dnl  installation locations rather than the "starlink-autoconf" it
+dnl  would otherwise construct.
+AC_INIT([Starlink Autoconf], [2.59], [ussc@star.rl.ac.uk], autoconf)
+dnl AC_INIT([GNU Autoconf], [2.59], [bug-autoconf@gnu.org])
 AC_SUBST([PACKAGE_NAME])dnl
 AC_CONFIG_SRCDIR([ChangeLog])
 
@@ -133,6 +143,9 @@ AC_CONFIG_FILES([Makefile doc/Makefile
                  lib/m4sugar/Makefile
                  lib/autoconf/Makefile lib/autotest/Makefile
                  bin/Makefile])
+
+dnl  Starlink-specific bookkeeping
+AC_CONFIG_FILES([component.xml])
 
 AC_OUTPUT
 # Report the state of this version of Autoconf if this is a beta.
