@@ -102,7 +102,7 @@
       INTEGER			BSIZE			! FITS block size
       INTEGER			FITSTAT			! FITS inherited status
       INTEGER			HDU			! HDU number
-      INTEGER			MODE			! FITSIO mode
+      INTEGER			IMODE			! FITSIO mode
       INTEGER			LFILEC			! Last char in filename
       INTEGER			LUN			! Logical unit number
 *.
