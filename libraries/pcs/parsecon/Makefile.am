@@ -36,6 +36,8 @@ PRIVATE_INCLUDES = PARSECON_CMN PARSECON2_CMN PARSECON3_CMN PARSECON4_CMN
 FPP_ROUTINES = \
 	pcn_openifl.fpp
 
+pcn_openifl.f: pcn_openifl.fpp
+
 F_ROUTINES = \
 	pcn_actend.f pcn_actlist.f pcn_actres.f pcn_arrchar.f		\
 	pcn_convert.f pcn_creatifc.f pcn_creq.f pcn_decval.f		\

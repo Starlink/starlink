@@ -54,6 +54,8 @@ F_ROUTINES = \
 FPP_ROUTINES = \
 	dts_control.fpp
 
+dts_control.f: dts_control.fpp
+
 C_ROUTINES = \
 	dts_chdlr.c \
 	dts_setsig.c
