@@ -922,11 +922,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/topcat-1.3.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.3.tar
-     [gzip] Building: /apps/cvsbuild/export/topcat-1.3.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/topcat-1.3.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.3.tar
+      [zip] Building zip: /apps/cvsbuild/export/topcat-1.3-1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.3-1.tar
+     [gzip] Building: /apps/cvsbuild/export/topcat-1.3-1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/topcat-1.3-1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.3-1.tar
      [echo] Executing Treeview target: export
 
 export:
@@ -1069,4 +1069,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.7.0.tar
 
 BUILD SUCCESSFUL
-Total time: 24 minutes 47 seconds
+Total time: 25 minutes 3 seconds
