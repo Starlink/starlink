@@ -955,25 +955,50 @@ with a slightly restricted content model.
 <p>A reference to another point in the same document.  If the element
 has any content, this will be used as the link text, but if it has no
 content, the link text will be generated, based on
-the link target.  Any element which has an ID attribute may be linked
-to.  A small subtlety is that the link is to a complete <em>element</em> of the
-document, rather than a <em>point</em> of the document.
-<example>See also &lt;ref id=other.ref&gt;&lt;/> for more details.  There's
-yet more information &lt;ref
-id=even.more>elsewhere&lt;/ref></example></p>
+the link target.
+Note, by the way, that the link is to a complete <em>element</em> of the
+document, rather than a <em>point</em> of the document.</p>
+
+<p>The list of elements you can use as the target of a reference is
+the same as the list of elements which have `id' attributes, and is currently
+<elemref gi="abstract"/>,
+<elemref gi="sect"/>,
+<elemref gi="subsect"/>,
+<elemref gi="subsubsect"/>,
+<elemref gi="subsubsubsect"/>,
+<elemref gi="appendices"/>,
+<elemref gi="figure"/>,
+<elemref gi="table"/>,
+<elemref gi="mlabel"/>,
+<elemref gi="routine"/>,
+<elemref gi="dt"/>, and
+<elemref gi="li"/>.
+You can also refer to <elemref gi="p"/> elements, though in this case
+the reference will actually be to the section which contains the
+paragraph.</p>
+
+<p>When you give the element no content, the generated text will be of
+the form `section XXX', or `equation XXX'.  That is, the generated
+texts should be grammatically consistent with each other.  Note,
+however, that this mechanism for generating text is intended to be a
+shorthand, with pretensions to no more than being correct <em>most</em> of
+the time; sometimes you will need to help it out.  You may prefer, on
+the other hand, to specify the link text (almost) every time; in this
+case, I'm sure you don't need me to remind you that link text like
+`<code>more details &lt;ref id="somewhere" >here&lt;/ref></code>' is
+unlikely to be terrifically useful in a paper version of the document.</p>
 
 <p>You cannot link to code prologues using this mechanism.  For that,
 see the <elemref gi='coderef'/> element.</p>
+
+<p><example>See also &lt;ref id=other.ref/> for more details.
+There's yet more information 
+&lt;ref id=even.more>elsewhere&lt;/ref></example></p>
+
 <attribute name="id">
 <p>The ID of the element to link to.</p>
 </attribute>
-<!--
-<attribute name="text">
-<p>If present, the attribute's data is used to form the link text,
-rather than generating it based on the target.
-</p>
-</attribute>
--->
+
 </element>
 
 
