@@ -5,16 +5,16 @@
 bltlib	        = libBLT@SHLIB_SUFFIX@
 
 # ------------------------------------------------------------------------
-# 	C Compiler options 
+# 	C Compiler options
 # ------------------------------------------------------------------------
 
 CC 		= @CC@
-CFLAGS 		= @CFLAGS@ 
+CFLAGS 		= @CFLAGS@
 EXTRA_CFLAGS	= @GCCFLAGS@ @SHLIB_CFLAGS@
-DEFINES 	= 
+DEFINES 	=
 DEF_BLTINIT	= -DBLT_LIBRARY=\"$(scriptdir)\"
-SHLIB_LD_FLAGS 	= @SHLIB_LD_FLAGS@ 
-SHLIB_LD_LIBS 	= @SHLIB_LD_LIBS@ 
+SHLIB_LD_FLAGS 	= @SHLIB_LD_FLAGS@
+SHLIB_LD_LIBS 	= @SHLIB_LD_LIBS@
 SHLIB_LD 	= @SHLIB_LD@
 
 prefix          = @prefix@
@@ -23,7 +23,7 @@ libdir          = @libdir@
 bindir          = @bindir@
 srcdir 		= @srcdir@/..
 
-instdirs =	$(exec_prefix) $(libdir) 
+instdirs =	$(exec_prefix) $(libdir)
 
 scriptdir =	@BLT_LIBRARY@
 
@@ -32,8 +32,8 @@ scriptdir =	@BLT_LIBRARY@
 # ------------------------------------------------------------------------
 
 #N_OBJS =	bltTed.o
-V3_OBJS =	bltTri.o bltGrMt.o 
-TK_OBJS =	tkButton.o tkFrame.o tkScrollbar.o 
+V3_OBJS =	bltTri.o bltGrMt.o
+TK_OBJS =	tkButton.o tkFrame.o tkScrollbar.o
 
 OBJS =		bltGraph.o bltGrAxis.o bltGrBar.o bltGrElem.o \
 		bltGrGrid.o bltGrHairs.o bltGrLegd.o bltGrLine.o \
@@ -46,10 +46,10 @@ OBJS =		bltGraph.o bltGrAxis.o bltGrBar.o bltGrElem.o \
 		bltConfig.o bltImage.o bltInput.o bltList.o \
 		bltNsUtil.o bltParse.o bltPs.o bltText.o bltTile.o \
 		bltUnixPipe.o bltUtil.o \
-		$(TK_OBJS) $(N_OBJS) 
+		$(TK_OBJS) $(N_OBJS)
 
 INCLUDES =	-I.. -I$(srcdir) -I$(srcdir)/.. @INCLUDES@
-CC_SWITCHES =	$(EXTRA_CFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES =	$(EXTRA_CFLAGS) $(DEFINES) $(INCLUDES) $(CFLAGS)
 INSTALL =	@INSTALL@
 INSTALL_DATA =	@INSTALL_DATA@
 SHELL =		/bin/sh
@@ -57,7 +57,7 @@ RM =		rm -f
 LN_S =		@LN_S@
 
 
-all: $(bltlib) 
+all: $(bltlib)
 
 $(bltlib):  $(OBJS)
 	$(RM) $@
@@ -80,13 +80,13 @@ clean:
 	$(RM) $(OBJS) $(bltlib)  *pure* .pure*
 
 distclean: clean
-	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"* 
+	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"*
 
 
 # ------------------------------------------------------------------------
 # 	in lieu of viewpath-ing...
 #
-bltBeep.o: 	$(srcdir)/bltBeep.c 
+bltBeep.o: 	$(srcdir)/bltBeep.c
 	$(CC) -c $(CC_SWITCHES) $?
 bltBgexec.o: 	$(srcdir)/bltBgexec.c
 	$(CC) -c $(CC_SWITCHES) $?
@@ -98,9 +98,9 @@ bltBusy.o: 	$(srcdir)/bltBusy.c
 	$(CC) -c $(CC_SWITCHES) $?
 bltCanvEps.o: 	$(srcdir)/bltCanvEps.c
 	$(CC) -c $(CC_SWITCHES) $?
-bltColor.o: 	$(srcdir)/bltColor.c       
+bltColor.o: 	$(srcdir)/bltColor.c
 	$(CC) -c $(CC_SWITCHES) $?
-bltConfig.o: 	$(srcdir)/bltConfig.c       
+bltConfig.o: 	$(srcdir)/bltConfig.c
 	$(CC) -c $(CC_SWITCHES) $?
 bltContainer.o: $(srcdir)/bltContainer.c
 	$(CC) -c $(CC_SWITCHES) $?
@@ -142,11 +142,11 @@ bltHier.o: 	$(srcdir)/bltHier.c
 	$(CC) -c $(CC_SWITCHES) $?
 bltHtext.o: 	$(srcdir)/bltHtext.c
 	$(CC) -c $(CC_SWITCHES) $?
-bltImage.o: 	$(srcdir)/bltImage.c       
+bltImage.o: 	$(srcdir)/bltImage.c
 	$(CC) -c $(CC_SWITCHES) $?
-bltInit.o: 	$(srcdir)/bltInit.c       
+bltInit.o: 	$(srcdir)/bltInit.c
 	$(CC) -c $(CC_SWITCHES) $(DEF_BLTINIT) $?
-bltInput.o: 	$(srcdir)/bltInput.c       
+bltInput.o: 	$(srcdir)/bltInput.c
 	$(CC) -c $(CC_SWITCHES) $?
 bltList.o: 	$(srcdir)/bltList.c
 	$(CC) -c $(CC_SWITCHES) $?

@@ -3,11 +3,11 @@
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
-#       C Compiler options 
+#       C Compiler options
 # ------------------------------------------------------------------------
 
-DEFINES      = 
-CFLAGS       = @CFLAGS@ 
+DEFINES      =
+CFLAGS       = @CFLAGS@
 EXTRA_CFLAGS = @GCCFLAGS@
 CC 	     = @CC@
 
@@ -25,7 +25,7 @@ libdir	     = @libdir@
 instdirs  = $(prefix) $(exec_prefix) $(bindir) $(libdir) $(includedir)
 
 # ------------------------------------------------------------------------
-#       Include directives for Tcl, Tk, and X include files 
+#       Include directives for Tcl, Tk, and X include files
 # ------------------------------------------------------------------------
 
 INCLUDES     = -I. @INCLUDES@
@@ -43,7 +43,7 @@ LIBRARIES    = @LIBS@
 demo 	     = bltwish
 headers	     = blt.h
 
-CC_SWITCHES  = $(EXTRA_CFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES  = $(EXTRA_CFLAGS) $(DEFINES) $(INCLUDES) $(CFLAGS)
 LDFLAGS      = @LDFLAGS@
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -52,29 +52,29 @@ SHELL 	     = /bin/sh
 RM 	     = rm -f
 LN_S	     = @LN_S@
 
-subdirs	     = src src/shared demos library man 
+subdirs	     = src src/shared demos library man
 
-all:  bltwish @SHLIB_TARGET@ lib.tcl manuals 
+all:  bltwish @SHLIB_TARGET@ lib.tcl manuals
 
 bltwish: static
 	@echo "making BLT demo \"bltwish\"..."
 	$(RM) bltwish
 	$(CC) $(CC_SWITCHES) $(LDFLAGS) \
-		$(srcdir)/bltUnixMain.c -o bltwish ./src/libBLT.a $(LIBRARIES) 
+		$(srcdir)/bltUnixMain.c -o bltwish ./src/libBLT.a $(LIBRARIES)
 	@echo "make finished on `date`"
 
 shared:
-	(cd src/shared; $(MAKE) CFLAGS="$(CFLAGS)" all) 
-static: 
-	(cd src; $(MAKE) CFLAGS="$(CFLAGS)" all) 
+	(cd src/shared; $(MAKE) CFLAGS="$(CFLAGS)" all)
+static:
+	(cd src; $(MAKE) CFLAGS="$(CFLAGS)" all)
 
 lib.tcl:
-	(cd library; $(MAKE) CFLAGS="$(CFLAGS)" all) 
+	(cd library; $(MAKE) CFLAGS="$(CFLAGS)" all)
 manuals:
-	(cd man; $(MAKE) CFLAGS="$(CFLAGS)" all) 
+	(cd man; $(MAKE) CFLAGS="$(CFLAGS)" all)
 
 
-install: bltwish mkdirs install-headers install-libs 
+install: bltwish mkdirs install-headers install-libs
 	$(INSTALL) -m 0755 bltwish $(bindir)/bltwish@BLT_VERSION@
 	(cd $(bindir); $(RM) bltwish ; $(LN_S) bltwish@BLT_VERSION@ bltwish)
 
@@ -118,7 +118,7 @@ GENERATED_FILES = \
 	library/Makefile \
 	demos/*.ps
 
-distclean: 
+distclean:
 	@for i in $(subdirs) ; do \
 	    echo "cleaning $$i..." ; \
 	    (cd $$i; $(MAKE) distclean) ; \
