@@ -49,30 +49,18 @@ BUILT_SOURCES = $(PLATFORM_CF) EMS_ERR ems_err.h
 #  -------
 #  There are no regression tests as such.  The program ems_test.c does
 #  some simple checking of the installation.  test_iostat produces
-#  some Fortran errors, and calls ems_fioer, however these can't be
-#  tested mechanically since the results are necessarily platform dependent.
+#  some Fortran errors, and calls ems_fioer, however these returned
+#  messages can't be tested mechanically since they are
+#  necessarily platform dependent.
 
 TESTS = ems_test test_iostat
 check_PROGRAMS = test_iostat ems_test
 
-#  Make a test_iostat program.  The test_iostat_wrap.c program simply
-#  turns the return value of the function in test_iostat.f into the
-#  exit status.  We must make sure that we link test_iostat against
-#  the newly-built libraries in this directory, rather than installed
-#  versions, so use libtool explicitly, rather than through the
-#  default automake build rule.
-test_iostat_SOURCES = test_iostat.f test_iostat_wrap.c
-test_iostat_wrap.c:
-	echo "int main() { exit (test_iostat_()); }" >test_iostat_wrap.c
-test_iostat: $(test_iostat_OBJECTS)
-	$(LIBTOOL) --mode=link $(FC) -o test_iostat \
-		$(test_iostat_OBJECTS) -lemsf -lems \
-		`cnf_link`
+#  Make a test_iostat program.  Make sure that we link test_iostat against
+#  the newly-built libraries in this directory.
+test_iostat_SOURCES = test_iostat.f
+test_iostat_LDADD = libemsf.la libems.la `cnf_link`
 
-#  Because we invoke `ems_link` while building the test program -- ie,
-#  before the scripts are installed -- the following LDADD assignment
-#  must have  $(srcdir) in it, so that it's the uninstalled ems_link
-#  that's invoked.
 ems_test_SOURCES = ems_test.c
-ems_test_LDADD = `$(srcdir)/ems_link`
+ems_test_LDADD = libemsf.la libems.la `cnf_link`
 

@@ -16,7 +16,6 @@
 
 
 
-
 SOURCES = $(libems_la_SOURCES) $(libemsf_la_SOURCES) $(ems_test_SOURCES) $(test_iostat_SOURCES)
 
 srcdir = @srcdir@
@@ -57,7 +56,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(mkdir_p)
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = component.xml ems_fioer.c
-am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(starhelpdir)
+am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libems_la_LIBADD =
@@ -86,11 +85,10 @@ am_libemsf_la_OBJECTS = $(am__objects_1) $(am__objects_3) \
 libemsf_la_OBJECTS = $(am_libemsf_la_OBJECTS)
 am_ems_test_OBJECTS = ems_test.$(OBJEXT)
 ems_test_OBJECTS = $(am_ems_test_OBJECTS)
-ems_test_DEPENDENCIES =
-am_test_iostat_OBJECTS = test_iostat.$(OBJEXT) \
-	test_iostat_wrap.$(OBJEXT)
+ems_test_DEPENDENCIES = libemsf.la libems.la
+am_test_iostat_OBJECTS = test_iostat.$(OBJEXT)
 test_iostat_OBJECTS = $(am_test_iostat_OBJECTS)
-test_iostat_LDADD = $(LDADD)
+test_iostat_DEPENDENCIES = libemsf.la libems.la
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -133,8 +131,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/ems_setd.Plo ./$(DEPDIR)/ems_seti.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ems_setl.Plo ./$(DEPDIR)/ems_setr.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ems_stat.Plo ./$(DEPDIR)/ems_syser.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ems_test.Po ./$(DEPDIR)/ems_tune.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/test_iostat_wrap.Po
+@AMDEP_TRUE@	./$(DEPDIR)/ems_test.Po ./$(DEPDIR)/ems_tune.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -156,10 +153,6 @@ includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-stardocsSTARDATA_INSTALL = $(INSTALL_STARDATA)
-starhelpSTARDATA_INSTALL = $(INSTALL_STARDATA)
-STARDATA = $(stardocs_STARDATA) $(starhelp_STARDATA)
-INSTALL_STARDATA = $(INSTALL_DATA)
 SUFFIXES = .tex .dvi .ps .htx_tar
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -331,21 +324,17 @@ BUILT_SOURCES = $(PLATFORM_CF) EMS_ERR ems_err.h
 #  -------
 #  There are no regression tests as such.  The program ems_test.c does
 #  some simple checking of the installation.  test_iostat produces
-#  some Fortran errors, and calls ems_fioer, however these can't be
-#  tested mechanically since the results are necessarily platform dependent.
+#  some Fortran errors, and calls ems_fioer, however these returned
+#  messages can't be tested mechanically since they are
+#  necessarily platform dependent.
 TESTS = ems_test test_iostat
 
-#  Make a test_iostat program.  The test_iostat_wrap.c program simply
-#  turns the return value of the function in test_iostat.f into the
-#  exit status.  We must make sure that we link test_iostat against
-#  the newly-built libraries in this directory, rather than installed
-#  versions, so use libtool explicitly, rather than through the
-#  default automake build rule.
-test_iostat_SOURCES = test_iostat.f test_iostat_wrap.c
-
-#  Because we invoke `ems_link`, the following
+#  Make a test_iostat program.  Make sure that we link test_iostat against
+#  the newly-built libraries in this directory.
+test_iostat_SOURCES = test_iostat.f
+test_iostat_LDADD = libemsf.la libems.la `cnf_link`
 ems_test_SOURCES = ems_test.c
-ems_test_LDADD = `$(srcdir)/ems_link`
+ems_test_LDADD = libemsf.la libems.la `cnf_link`
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -461,6 +450,9 @@ clean-checkPROGRAMS:
 ems_test$(EXEEXT): $(ems_test_OBJECTS) $(ems_test_DEPENDENCIES) 
 	@rm -f ems_test$(EXEEXT)
 	$(LINK) $(ems_test_LDFLAGS) $(ems_test_OBJECTS) $(ems_test_LDADD) $(LIBS)
+test_iostat$(EXEEXT): $(test_iostat_OBJECTS) $(test_iostat_DEPENDENCIES) 
+	@rm -f test_iostat$(EXEEXT)
+	$(FCLINK) $(test_iostat_LDFLAGS) $(test_iostat_OBJECTS) $(test_iostat_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -556,7 +548,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ems_syser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ems_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ems_tune.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_iostat_wrap.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -751,46 +742,6 @@ ems_err.h: ems_err.msg
 	@MESSGEN@ -c ems_err.msg
 fac_104_err: ems_err.msg
 	@MESSGEN@ -e ems_err.msg
-install-stardocsSTARDATA: $(stardocs_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(stardocsdir)
-	@list='$(stardocs_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f"; \
-	  $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(stardocsdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-stardocsSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(stardocs_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(stardocsdir)/$$f"; \
-	  rm -f $(DESTDIR)$(stardocsdir)/$$f; \
-	done
-install-starhelpSTARDATA: $(starhelp_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(starhelpdir)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
-	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-starhelpSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
-	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
-	done
 
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
@@ -959,10 +910,9 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(HEADERS) $(STARDATA) \
-		config.h
+all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(HEADERS) config.h
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(starhelpdir)
+	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -1011,8 +961,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS install-stardocsSTARDATA \
-	install-starhelpSTARDATA
+install-data-am: install-includeHEADERS
 
 install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
 
@@ -1043,8 +992,7 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-stardocsSTARDATA uninstall-starhelpSTARDATA
+	uninstall-info-am uninstall-libLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-TESTS check-am \
 	clean clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -1056,22 +1004,14 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	install install-am install-binSCRIPTS install-data \
 	install-data-am install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
-	install-libLTLIBRARIES install-man install-stardocsSTARDATA \
-	install-starhelpSTARDATA install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-stardocsSTARDATA \
-	uninstall-starhelpSTARDATA
+	install-libLTLIBRARIES install-man install-manifest \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binSCRIPTS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES
 
-test_iostat_wrap.c:
-	echo "int main() { exit (test_iostat_()); }" >test_iostat_wrap.c
-test_iostat: $(test_iostat_OBJECTS)
-	$(LIBTOOL) --mode=link $(FC) -o test_iostat \
-		$(test_iostat_OBJECTS) -lemsf -lems \
-		`cnf_link`
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

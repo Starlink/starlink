@@ -2,7 +2,7 @@
 *   that we get a reasonable message.  We can't check mechanically that
 *   the message is reasonable, but we can check that it does appear, and
 *   doesn't appear at the wrong times.
-      integer function test_iostat()
+      program test_iostat
 
       implicit none
       integer ios
@@ -15,6 +15,8 @@
      
 *   Should produce an IOSTAT error for `illegal unit number'
       open (unit=-10, file='wibble', status='OLD', iostat=ios)
+*   Initialise to success return
+      rval = 0
       
       if ( ios .lt. 0 ) then
          write (*,'("test_iostat: Unexpected EOF")')
@@ -33,11 +35,12 @@
          if ( retmsg(:10) .eq. 'ems_fioer:' ) then
 *         The ems_fioer failure messages start with this string
             rval = 1
-         else
-            rval = 0
          endif
       endif
 
-      test_iostat = rval
+*   exit(integer) is an intrinsic function in many Fortran compilers,
+*   but it's not standard, and this may fail sometimes.  In which case,
+*   moan to your compiler vendor.
+      call exit (rval)
 
       end
