@@ -11491,9 +11491,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Creates a 1-d profile through an N-d NDF.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
-\menuitem{QUILT}{
- Generates a mosaic from equally sized 2-d data arrays, optionally specified
- from an ASCII file.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -11888,9 +11885,6 @@ functions as follows.
 \classitem{NORMALIZE}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero
  difference.
-\classitem{QUILT}
- Generates a mosaic from equally sized 2-d data arrays, optionally specified
- from an ASCII file.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -34103,108 +34097,6 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 (6k).
 \end{htmlonly}
 
-\manroutine {{\manheadstyle{QUILT}}}{ Generates a mosaic from equally sized
-  2-d data arrays, optionally specified from an ASCII file.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine provides a more-sophisticated version of the {\mantt{MOSAIC}}
-  application for combining many 2-d data arrays into one large
-  output data array. All the data arrays are stored in {\mantt{IMAGE}}
-  structures.  The pixels in overlapping regions may be averaged or
-  summed.
-
-  The names of {\mantt{IMAGE}} structures to be concatenated and their
-  respective offsets of their data arrays from a central
-  data array can be input either one by one from the interface, or
-  all at once from a free-format file.  The format of the file is
-  as follows:  \mbox {}
-
-  \begin{tabular}{@{\hspace{11mm}}l@{\hspace{24mm}}l}
-        \\
-        {\tt Mosaic title}     & ! header \\
-        {\tt central\_image}   & ! name of central {\mantt{IMAGE}} \\
-        {\tt 125}              & ! total number of frames \\
-        {\tt 345  229}         & ! maximum {$x$}-{$y$} offsets \\
-        {\tt -356  -232}       & ! minimum {$x$}-{$y$} offsets \\
-        {\tt image\_2}         & ! subsequent {\mantt{IMAGE}} and \\ 
-        {\tt 35  34}           & ! its {$x$}-{$y$} offsets \\
-        {\tt image\_3}         & \\
-        {\tt 36  -33}          & \\
-        {\tt .}                & \\
-        {\tt .}                & \\
-        {\tt .}                & \\
-        \\
-  \end{tabular}
-
-  Only like-sized data arrays may be input. The reason for this is
-  that it is difficult to work out how big the output data array
-  needs to be until all the input data arrays and their offsets have
-  been read in. By confining the data arrays to be the same size,
-  only the maximum and minimum {$x$} and {$y$} offsets from the central data
-  array need be input by the user, then the output image size can be
-  worked out from these numbers along with the size of the central
-  data array.
-
-  Bad pixels are processed by the magic-value method.
-
-\manroutineitem {Invocation }{}
-  QUILT
-
-\newpage
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{WHERE}}  }{{\mantt{\_CHAR}}}
-  Whether input comes from an ASCII {\mantt{'File'}} or from the
-  {\mantt{'Interface'}}.
-\manparameterentry {{\mantt{READ}} }{{\mantt{FNAME}}  }{{\mantt{\_CHAR}}}
-  Name of the ASCII file holding the input information to define 
-  the mosaic.
-\manparameterentry {{\mantt{READ}} }{{\mantt{NUMBER}}  }{{\mantt{\_INTEGER}}}
-  Number of data arrays to form the mosaic.
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPICI}}  }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} structure containing the central data array (offset 0, 0).
-\manparameterentry {{\mantt{READ}} }{{\mantt{MAXX}}  }{{\mantt{\_INTEGER}}}
-  Maximum {$x$} offset of any data array from the central data array
-  in {\mantt Interface} mode (must be {$\geq$}0).
-\manparameterentry {{\mantt{READ}} }{{\mantt{MAXY}}  }{{\mantt{\_INTEGER}}}
-  Maximum {$y$} offset of any data array from the central data array
-  in {\mantt Interface} mode (must be {$\geq$}0).
-\manparameterentry {{\mantt{READ}} }{{\mantt{MINX}}  }{{\mantt{\_INTEGER}}}
-  Minimum {$x$} offset of any data array from the central data array
-  in {\mantt Interface} mode (must be {$\leq$}0).
-\manparameterentry {{\mantt{READ}} }{{\mantt{MINY}}  }{{\mantt{\_INTEGER}}}
-  Minimum {$y$} offset of any data array from the central data array
-  in {\mantt Interface} mode (must be {$\leq$}0).
-\manparameterentry {{\mantt{READ}} }{{\mantt{AVERAGE}}  }{{\mantt{\_LOGICAL}}}
-  If true overlap regions are averaged, alternatively, they are
-  summed.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for output {\mantt{IMAGE}} structure.
- \mbox{{\mantt ['KAPPA - Quilt']}}
-\manparameterentry {{\mantt{READ}} }{{\mantt{CURPIC}}  }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} containing the current data array being concatenated to
-  the mosaic.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OFFSETX}}  }{{\mantt{\_INTEGER}}}
-  {$x$} offset of current data array from the central one
-  ({\mantt{Interface}} mode).
-\manparameterentry {{\mantt{READ}} }{{\mantt{OFFSETY}}  }{{\mantt{\_INTEGER}}}
-  {$y$} offset of current data array from the central one
-  ({\mantt{Interface}} mode).
-\end{manparametertable}
-\manroutineitem {Deficiencies }{}
-  Works with like-sized images only and uses Fortran i/o for getting
-  stuff from a file. 
-
-\manroutineitem {Bugs }{}
-  None known.
-
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
-
 \sstroutine{
    RESHAPE
 }{
@@ -44287,7 +44179,8 @@ need that may occur for them (see SUN/xxx).
 CLEAR to ``N''.
 \item [GREYPLOT] Use \htmlref{DISPLAY}{DISPLAY} instead setting parameter
 KEY to ``Y''.
-\item [INSPECT] Use Gaia instead.
+\item [INSPECT] Use \GAIAref\ instead.
+\item [QUILT] Use \CCDPACKref\ makemos instead.
 \item [SNAPSHOT] Use a commonly available utility such as {\tt xv} instead.
 \item [TURBOCONT] Use \htmlref{CONTOUR}{CONTOUR} instead.
 \end{description}
@@ -44600,9 +44493,6 @@ functions as follows.
 \classitem{NORMALIZE}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero
  difference.
-\classitem{QUILT}
- Generates a mosaic from equally sized 2-d data arrays, optionally specified
- from an ASCII file.
 \end{description}
 \vspace*{0.7ex}
 %

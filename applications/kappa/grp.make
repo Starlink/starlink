@@ -64,7 +64,7 @@ noglobals.par nomagic.par normalize.par numb.par outset.par ovclear.par \
 ovset.par paldef.par palentry.par palread.par palsave.par parget.par \
 paste.par piccur.par picdef.par picempty.par picentire.par picgrid.par \
 picin.par piclabel.par piclist.par picsel.par pictrans.par picvis.par \
-picxy.par pixdupe.par psf.par quilt.par rift.par rotate.par segment.par \
+picxy.par pixdupe.par psf.par rift.par rotate.par segment.par \
 setaxis.par setbad.par setbb.par setbound.par setext.par setlabel.par \
 setmagic.par setnorm.par setorigin.par setsky.par settitle.par \
 settype.par setunits.par setvar.par shadow.par slide.par \
@@ -108,7 +108,7 @@ palread.hlp palsave.hlp parameters.hlp parget.hlp paste.hlp picbase.hlp \
 piccur.hlp picdata.hlp picdef.hlp picempty.hlp picentire.hlp picframe.hlp \
 picgrid.hlp picin.hlp piclabel.hlp piclast.hlp piclist.hlp picsel.hlp \
 pictrans.hlp picvis.hlp picxy.hlp pixdupe.hlp problems_problems.hlp \
-procedures.hlp psf.hlp quilt.hlp requests.hlp rift.hlp sub.hlp \
+procedures.hlp psf.hlp requests.hlp rift.hlp sub.hlp \
 role_of_kappa.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
 setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
@@ -140,7 +140,7 @@ globals.ifl histat.ifl histeq.ifl histogram.ifl kaphelp.ifl laplace.ifl \
 kstest.ifl logar.ifl look.ifl lucy.ifl manic.ifl \
 makesurface.ifl maths.ifl median.ifl mosaic.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
-paste.ifl pixdupe.ifl pow.ifl psf.ifl quilt.ifl rift.ifl rotate.ifl \
+paste.ifl pixdupe.ifl pow.ifl psf.ifl rift.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
@@ -170,7 +170,7 @@ ffclean.f fillbad.f fitsurface.f flip.f fourier.f gausmooth.f glitch.f \
 globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f permaxes.f \
 kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
 median.f mosaic.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
-numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
+numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \

@@ -553,7 +553,7 @@ logar.f look.f lucy.f manic.f \
 makesurface.f maths.f median.f \
 mosaic.f mstats.f mult.f noglobals.f nomagic.f \
 normalize.f numb.f outset.f parget.f paste.f \
-permaxes.f pixdupe.f psf.f quilt.f rift.f \
+permaxes.f pixdupe.f psf.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
@@ -2773,7 +2773,6 @@ picvis.o:	 SAE_PAR AGI_ERR
 pixdupe.o:	 SAE_PAR NDF_PAR PRM_PAR MSG_PAR
 profile.o:	 SAE_PAR NDF_PAR PAR_ERR PAR_PAR AST_PAR
 psf.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR AST_PAR
-quilt.o:	 SAE_PAR DAT_PAR PAR_ERR
 reshape.o:	 SAE_PAR NDF_PAR PRM_PAR
 rift.o:	 SAE_PAR NDF_PAR DAT_PAR
 rotate.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR

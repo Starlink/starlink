@@ -790,6 +790,133 @@ iraf! {
       }
 }
 
+      action quilt {
+         alias {quil(t)}
+
+         parameter where {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Input source}
+            default File
+            help "Choose File (ASCII file) or Interface as the source of frames and offsets."
+          }
+
+         parameter fname {
+            type FILENAME
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Source file name}
+            help "Name of ASCII file holding mosaic information (header, number of arrays, max-min offsets, names and offsets)."
+          }
+
+         parameter number {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            prompt {Number of data arrays}
+            help "Give total number of 2-d data arrays to form a mosaic, including the central one."
+          }
+
+         parameter inpici {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Central image}
+            help "Name of IMAGE structure containing the central 2-d data array to be added."
+          }
+
+         parameter maxx {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Maximum x offset}
+            help "Give the maximum x offset of any data array (including the central one)."
+          }
+
+         parameter maxy {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Maximum y offset}
+            help "Give the maximum y offset of any data array (including the central one)."
+          }
+
+         parameter minx {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Minimum x offset}
+            help "Give the minimum x offset of any data array (including the central one)."
+          }
+
+         parameter miny {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Minimum y offset}
+            help "Give the minimum y offset of any data array (including the central one)."
+          }
+
+         parameter average {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            prompt {Are overlapped input pixels to be averaged in the output array?}
+            help "Input pixels may be occupy the same position in the output array. So output pixels can be averaged or summed."
+            default TRUE
+          }
+
+         parameter outpic {
+            type IMAGE
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output mosaic image}
+            help "Name given to the IMAGE structure to hold the mosaic data array."
+          }
+
+         parameter otitle {
+            type _CHAR
+            vpath DEFAULT
+            prompt {Title for output image}
+            default {KAPPA - Quilt}
+            help "Character string used as a title for the output IMAGE structure."
+          }
+
+         parameter curpic {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Next Image}
+            help "Give the name of the current IMAGE structure containing the 2-d data array to be part of the mosaic."
+          }
+
+         parameter offsetx {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            prompt {x offset of the array from the first}
+            help "Give x offset in pixels of the current data array from the central one."
+          }
+
+         parameter offsety {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            prompt {y offset of the array from the first}
+            help "Give y offset in pixels of the current data array from the central one."
+          }
+
+      }
+
       action snapshot {
          alias {snap(shot)}
 

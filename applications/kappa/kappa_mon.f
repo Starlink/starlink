@@ -383,11 +383,6 @@
          ELSE IF ( NAME .EQ. 'PSF' ) THEN
             CALL PSF ( STATUS )
 
-*  Generates a mosaic from equally sized 2-d data arrays, optionally
-*  specified from an ASCII file.
-         ELSE IF ( NAME .EQ. 'QUILT' ) THEN
-            CALL QUILT ( STATUS )
-
 *  Adds a scalar to a section of a an NDF data structure to correct
 *  rift-valley defects.
          ELSE IF ( NAME .EQ. 'RIFT' ) THEN
