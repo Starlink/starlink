@@ -59,7 +59,6 @@ javadocs:
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/index-all.html...
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e."
@@ -70,6 +69,7 @@ javadocs:
   [javadoc]  attached to it). "
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
@@ -2763,4 +2763,4 @@ javadocs:
   [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 11 seconds
+Total time: 3 minutes 13 seconds
