@@ -450,7 +450,7 @@
 
 <!ENTITY % additional.special "| index | note | draftnote">
 <!ENTITY % additional.structuring "| tabular">
-<!ENTITY % additional.references  "| citation">
+<!ENTITY % additional.references  "| citation | coderef">
 
 <![ %Full.SGML.Only; [
 <!ENTITY % paragraph.elements 
@@ -489,6 +489,24 @@
 	>
 	<!-- attributes:
 		key	key, if not element contents 
+	-->
+
+<!-- coderef element is for linking to code elements via a
+     codecollection element.  The model should be modified to match
+     whatever happens to the REF element.
+     -->
+<!ELEMENT coderef %MXX (#PCDATA)>
+<!ATTLIST coderef
+	collection	IDREF	#REQUIRED
+	id		CDATA	#REQUIRED
+	>
+	<!-- attributes:
+		collection	An ID which points to a codecollection
+				element, which in turn refers to an
+				instance of the programcode DTD.
+		id		An ID which exists within the document
+				referred to by the collection
+				attribute.
 	-->
 
 
@@ -887,14 +905,15 @@
 <!ELEMENT codecollection	%MXO; EMPTY>
 <!ATTLIST codecollection
 	doc		ENTITY	#REQUIRED
-	ids		CDATA	#IMPLIED
+	includeonly	CDATA	#IMPLIED
+	id		ID	#IMPLIED
 	>
 	<!-- attributes:
 		doc		document with source marked up in one
 				of the clients of the programcode
 				architecture. 
 
-		ids		if this attribute is present, then
+		includeonly	if this attribute is present, then
 				only the elements with these ids
 				should be processed.
 		-->

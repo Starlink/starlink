@@ -187,6 +187,13 @@
 <!ELEMENT codebody	O O (#PCDATA)
 		-- The actual code -->
 
+<!ATTLIST routine
+	id	ID	#IMPLIED
+	>
+	<!-- attributes:
+		id		ID indentifying this function
+	-->
+
 <!ENTITY % gversion.attr 
 	"generalversion CDATA #FIXED '%DTD.Programcode.Version;'">
 <!ENTITY % version.attr
@@ -356,6 +363,18 @@
 			   referenced function. -->
 
 
+<!ATTLIST routinename
+	id	ID	#IMPLIED
+	>
+	<!-- attributes:
+		id		ID identifying this routine.  This is
+				_equivalent_ to having this same ID on
+				the routine element, and is included
+				as an alternative since it might be
+				more convenient in some circumstances
+				for the ID to be mentioned here rather
+				than on <routine>.
+	-->
 
 <!ATTLIST argumentlist
 	none		-- Attribute present if there are no
