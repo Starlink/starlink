@@ -8,6 +8,7 @@ type radius
 nrow 10
 radius 10
 name dummy@home
+columns ALL
 search
 quit
 EOD

@@ -1,0 +1,10 @@
+make t3.run >/dev/null 2>&1
+run=./t3.run
+
+$run "hello there"
+$run "      one  	  two   three    "
+$run ""
+$run "  one"
+$run one:two:three :
+$run :one::two::three::: :
+$run one=two*three=*four "=*"

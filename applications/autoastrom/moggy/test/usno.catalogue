@@ -6,7 +6,7 @@ usnoquery
 #  Search radius:  5 arcminutes
 
 
-ID		ra		dec		r_mag	b_mag	qual	field	gsc	d'	pa
+ID      	ra      	dec     	r_mag	b_mag	qual	field	gsc	d'	pa
 --		--		---		-----	-----	----	-----	---	--	--
 U1575_03799648	261.50261	74.32087	17.6	19.8	0	00044	-	4.734	259.413	
 U1575_03800012	261.53434	74.31496	18.1	18.7	0	00044	-	4.318	253.497	
