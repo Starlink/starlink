@@ -3384,10 +3384,10 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
       //  Draw the contour.
       if ( astOK && ! inerror ) {
-	double levels[3] = {6000.0, 8000.0, 10000.0};
-	char *props[] = { "colour(curve)=red", 
-			  "colour(curve)=blue",
-			  "colour(curve)=green" };
+	double levels[3] = {1000.0, 1500.0, 2000.0};
+	char *props[] = { "colour(curve)=2,width(curve)=0.02", 
+			  "colour(curve)=3,width(curve)=0.01",
+			  "colour(curve)=4,width(curve)=0.005" };
 	ImageIO imageIO = image_->image();
 	float *image = (float *)imageIO.dataPtr();
 	gaiaContour( image, image_->width(), image_->height(), 

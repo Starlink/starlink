@@ -11,7 +11,7 @@
  *  Invocation:
  *     status = gaiaContour( const float *image, int nx, int ny,
  *                           const double *cont, int ncont,
- *                           const AstPlot *plot, const char *props,
+ *                           const AstPlot *plot, const char *props[],
  *                           int nprops, int xll, int yll,
  *                           int xsize, int ysize, int fast )
 
@@ -123,15 +123,14 @@
 
  *  History:
  *     06-APR-1999 (PWD):
- *        Original version. Based on Fortran routine KPS1_CNTF,
- *        written by RFWS, MJC and DSB.
+ *        Original version. This is a C version of the Fortran routine
+ *        KPS1_CNTF, written by RFWS, MJC and DSB.
  *     {enter_further_changes_here}
 
  *  Bugs:
  *     {note_new_bugs_here}
 
- *-
- */
+ *- */
 
 /*  Include files: */
 /*  ============== */
@@ -260,17 +259,14 @@ int gaiaContour( const DATA_TYPE *image, int nx, int ny,
   int jmove[NCELL] =  { -1, 0, 1,  0 };  /* Y directions to move from
                                             the cell side where a
                                             contour leaves */
-  /*  int newsid[NCELL] = {  3, 4, 1,  2 };/*  /* Side of entry in the new
-                                            cell from the side of exit
-                                            from the old cell */
   int newsid[NCELL] = {  2, 3, 0,  1 };  /* Side of entry in the new
                                             cell from the side of exit
                                             from the old cell */
 
   /*  Check that the current frame in the supplied plot is a "GRID" */
-  //if ( strcmp( astGetC( plot, "Domain" ), "GRID" ) != 0 ) {
-  //  return 1;
-  //}
+  if ( strcmp( astGetC( plot, "Domain" ), "GRID" ) != 0 ) {
+    return 1;
+  }
 
   astShow( plot );
 
@@ -311,7 +307,7 @@ int gaiaContour( const DATA_TYPE *image, int nx, int ny,
       lplot = astCopy( plot );
 
       /*  Set the AST Attribute settings from properties lists */
-      //astSet( lplot, props[i] );
+      astSet( lplot, props[icont] );
     } else {
 
       /*  If the same properties are being used for all contours, just
@@ -320,7 +316,7 @@ int gaiaContour( const DATA_TYPE *image, int nx, int ny,
 
       /*  And set the values (if not already done). */
       if ( icont == 0 ) {
-        //astSet( lplot, props[0] );
+        astSet( lplot, props[0] );
       }
     }
 
