@@ -1,7 +1,6 @@
 	-- catalog: SGML Open style entity catalogue for Starlink DTDs --
 
 SGMLDECL starlink.decl
--- SGMLDECL /home/norman/s/src/sgml/dtd/starlink.decl --
 
 	-- listed most general to most specific --
 
@@ -31,6 +30,14 @@ public "-//Starlink//DTD DSSSL Source Code 0.2//EN"	"dssslcode-0.2.dtd"
 
 public "-//Starlink//DTD tth equation list//EN"		"tth-equations.dtd"
 
+
+	--
+	   OASIS exchange table model.
+	   See http://www.oasis-open.org/html/a503.htm
+	   and http://www.oasis-open.org/html/publtext.htm
+	--
+public "-//OASIS//DTD Exchange Table Model 19960430//EN"
+						"oasis-exchange-table.dtd"
 
 	-- ISO latin 1 entity set for HTML and LaTeX -- 
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"   
