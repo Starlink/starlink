@@ -3,17 +3,18 @@
   <!ENTITY dtdsummary SYSTEM 'programcode-0.7.dtdsummary'>
   <!NOTATION XML SYSTEM ''>
   <!ENTITY sundtd SYSTEM 'starlink-0.7.description' NDATA XML>
+  <!-- commentary actually in /home/norman/s/commentary -->
+  <!ENTITY comm SYSTEM 'programcode-0.7.commentary' NDATA XML>
 ]>
 <!-- $Id$ -->
 
-<dtddescription docelem="programcode">
+<dtddescription docelem="programcode" commentary="comm">
 
 &dtdsummary;
 
 
 <element gi="angle" status="beta">
 <p>See <elemxref gi="angle" dtd="sundtd"/></p>
-<!--splice:angle-->
 </element>
 
 <element gi="argumentlist" status="beta">
@@ -26,13 +27,11 @@ list of parameters to an ADAM task.
 arguments.  In this case, there should be no <elemref gi="parameter"/> content.
 </p>
 </attribute>
-<!--splice:argumentlist-->
 </element>
 
 <element gi="attribution" status="beta">
 <p>See <elemxref gi="attribution" dtd="sundtd"/>
 </p>
-<!--splice:attribution-->
 </element>
 
 <element gi="author" status="beta">
@@ -73,7 +72,6 @@ the source-code files for documentation purposes.
 <p>A URL for the author.
 </p>
 </attribute>
-<!--splice:author-->
 </element>
 
 <element gi="authorlist" status="beta">
@@ -82,111 +80,6 @@ particular function.  Authors who have indirectly contributed code --
 perhaps a package you've based the function on -- can be credited in
 the <elemref gi="otherauthors"/> element.
 </p>
-<commentary>
-<from>Norman Gray</from>
-<email>norman@astro.gla.ac.uk</email>
-<date>Fri, 12 May 2000 17:30:29 +0100 (BST)</date>
-<subject>Clumsy cross-referencing</subject>
-<otherheader name='From '>norman@astro.gla.ac.uk Fri May 12 17:30:30 2000</otherheader>
-<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='Envelope-to'>sgml-programcode-0.7+authorlist@astro.gla.ac.uk</otherheader>
-<otherheader name='Delivery-date'>Fri, 12 May 2000 17:30:30 +0100</otherheader>
-<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12qIKc-0004q6-00 for sgml-programcode-0.7+authorlist@astro.gla.ac.uk; Fri, 12 May 2000 17:30:30 +0100</otherheader>
-<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12qIKb-0005Mf-00 for sgml-programcode-0.7+authorlist@astro.gla.ac.uk; Fri, 12 May 2000 17:30:29 +0100</otherheader>
-<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005121721270.18710-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-
-The way that authors are listed in the programcode DTD is rather
-clumsy (Mark has made this point before -- this is a note of it in
-these comments plus a proposed solution).
-
-Within the code prologues, you'd like to be able to say something like
-
-    &lt;author id=ng affiliation='Glasgow'&gt;Norman Gray
-
-and be done with it.  No -- the id attribute here is an SGML ID, which
-means there can be only one of them in a document.  Since routines are
-generally bundled together in skeleton documents (at least, that's how
-I do it, and how it's designed to be used), this is a problem, and the
-current way of referring to authors has the &lt;author&gt; element in the
-skeleton document, and &lt;authorref&gt; elements in the routine prologues,
-which cross refer to the `definition' of the author at the top of the
-skeleton document.
-
-This has some advantages, in that the &lt;author&gt; definition at the top
-of the document can be longer, and have things like webpage and email
-attributes attached to it, which it would be tedious to add to every
-&lt;authorref&gt; element.  However it's also confusing and error-prone.
-
-As an alternative, how about losing the &lt;authorref&gt; elements, and making
-the id attribute of the &lt;author&gt; elements in the prologues be simply a
-CDATA string, with the understanding that &lt;author&gt; elements displaying
-the same id are for the same author.  When the document's being processed,
-author information can be collected from all the &lt;author&gt; elements
-with the same id, and possibly bundled together at the top of the
-generated document.  The only thing is what to do when some of these
-elements have conflicting further attributes.  Just pick the first
-one?  Or object?
-
-Norman
-
-
--- 
----------------------------------------------------------------------------
-Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
-Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
-
-
-
-</body>
-</commentary>
-<commentary>
-<from>Mark Taylor</from>
-<email>mbt@ast.cam.ac.uk</email>
-<date>Tue, 16 May 2000 17:13:02 +0100 (BST)</date>
-<subject>Re: clumsy cross-referencing</subject>
-<otherheader name='From '>mbt@ast.cam.ac.uk Tue May 16 17:13:07 2000</otherheader>
-<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
-<otherheader name='Envelope-to'>sgml-programcode-0.7+authorlist@astro.gla.ac.uk</otherheader>
-<otherheader name='Delivery-date'>Tue, 16 May 2000 17:13:07 +0100</otherheader>
-<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12rjxz-0000IE-00; Tue, 16 May 2000 17:13:07 +0100</otherheader>
-<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12rjy1-0008Jv-00; Tue, 16 May 2000 17:13:09 +0100</otherheader>
-<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12rjxw-00049l-00; Tue, 16 May 2000 17:13:04 +0100</otherheader>
-<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id RAA06711; Tue, 16 May 2000 17:13:03 +0100 (BST)</otherheader>
-<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id RAA18988; Tue, 16 May 2000 17:13:02 +0100 (BST)</otherheader>
-<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
-<otherheader name='X-Sender'>mbt@cass29</otherheader>
-<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005161659480.18852-100000@cass29&gt;</otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-I am in favour of this suggestion (getting rid of &lt;authorref&gt; elements
-altogether), since it simplifies things and makes the information
-available in human-readable form in the prologues themselves, which 
-is historically where it's been.  I'm slightly surprised to see it
-suggested by Norman, since it sort of subverts the meaning of  what
-appears to be an 'id' attribute, and weakens the crossreferencing.
-However, this doesn't count as an objection.
-
-I think conflicting attributes should be treated as something which
-authors ought to avoid, but which is guaranteed to be coped with
-(i.e. document processing will not abort in this case).
-As such the downconverters can decide how to react; a sensible 
-reaction would be to use the first values and if possible emit
-some mild warning if there are inconsistencies.
-
----------------------------------------------------------------------------
-| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
-| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
----------------------------------------------------------------------------
-
-
-
-</body>
-</commentary>
-<!--splice:authorlist-->
 </element>
 
 <element gi="authornote" status="beta">
@@ -201,19 +94,16 @@ as primitives in the Jade system.  The standard was therefore listed
 as an `other author' of some parts of the code, with a note explaining
 this in the <elemref gi="authornote" self="self"/> element.
 </p>
-<!--splice:authornote-->
 </element>
 
 <element gi="blockquote" status="beta">
 <p>See <elemxref gi="blockquote" dtd="sundtd"/>
 </p>
-<!--splice:blockquote-->
 </element>
 
 <element gi="bugs" status="beta">
 <p>A note of any bugs known in this routine.
 </p>
-<!--splice:bugs-->
 </element>
 
 <element gi="change" status="beta">
@@ -229,19 +119,16 @@ day of month, a three-letter abbreviation for the month (uppercase),
 and a four-digit year.
 </p>
 </attribute>
-<!--splice:change-->
 </element>
 
 <element gi="cite" status="beta">
 <p>See <elemxref gi="cite" dtd="sundtd"/>
 </p>
-<!--splice:cite-->
 </element>
 
 <element gi="code" status="beta">
 <p>See <elemxref gi="code" dtd="sundtd"/>
 </p>
-<!--splice:code-->
 </element>
 
 <element gi="codebody" status="beta">
@@ -253,7 +140,6 @@ code actually included within the document, so that the element is
 empty, then this may be indicated by the presence of this attribute.
 </p>
 </attribute>
-<!--splice:codebody-->
 </element>
 
 <element gi="codegroup" status="beta">
@@ -273,7 +159,6 @@ will be set by the DTD which includes this programcode DTD, and you
 need not (indeed cannot) set it.
 </p>
 </attribute>
-<!--splice:codegroup-->
 </element>
 
 <element gi="codeopener" status="beta">
@@ -293,7 +178,6 @@ using a script, then the usage is:
    print hello
    return</example>
 </p>
-<!--splice:codeopener-->
 </element>
 
 <element gi="codereference" status="beta">
@@ -316,19 +200,16 @@ semantics to this element.  It maps this element to the
 <p>A subdoc entity which references the document being linked to.
 </p>
 </attribute>
-<!--splice:codereference-->
 </element>
 
 <element gi="colspec" status="beta">
 <p>See <elemxref gi="colspec" dtd="sundtd"/>
 </p>
-<!--splice:colspec-->
 </element>
 
 <element gi="copyright" status="beta">
 <p>A copyright statement attached to the code.
 </p>
-<!--splice:copyright-->
 </element>
 
 <element gi="description" status="beta">
@@ -336,72 +217,60 @@ semantics to this element.  It maps this element to the
 extensive, then a brief statement should be included within the
 optional <elemref gi="purpose"/> element.
 </p>
-<!--splice:description-->
 </element>
 
 <element gi="dd" status="beta">
 <p>See <elemxref gi="dd" dtd="sundtd"/>
 </p>
-<!--splice:dd-->
 </element>
 
 <element gi="dl" status="beta">
 <p>See <elemxref gi="dl" dtd="sundtd"/>
 </p>
-<!--splice:dl-->
 </element>
 
 <element gi="docblock" status="beta">
 <p>A block of documentation, introducing either a complete document,
 or one of the <elemref gi="codegroup"/> or <elemref gi="codereference"/> blocks.
 </p>
-<!--splice:docblock-->
 </element>
 
 <element gi="docxref" status="experimental">
 <p>See <elemxref gi="docxref" dtd="sundtd"/></p>
-<!--splice:docxref-->
 </element>
 
 <element gi="dt" status="beta">
 <p>See <elemxref gi="dt" dtd="sundtd"/>
 </p>
-<!--splice:dt-->
 </element>
 
 <element gi="em" status="beta">
 <p>See <elemxref gi="em" dtd="sundtd"/>
 </p>
-<!--splice:em-->
 </element>
 
 <element gi="entry" status="beta">
 <p>See <elemxref gi="entry" dtd="sundtd"/>
 </p>
-<!--splice:entry-->
 </element>
 
 <element gi="example" status="beta">
 <p>The text of an example, which is formatted as verbatim text.
 This must be followed by an <elemref gi="examplenote"/> element, which
 gives an explanation of the example.</p>
-<!--splice:example-->
 </element>
 
 <element gi="examplelist" status="beta">
 <p>A list of examples.</p>
-<!--splice:examplelist-->
 </element>
 
 <element gi="examplenote" status="beta">
 <p>The explanation of an example.</p>
-<!--splice:examplenote-->
 </element>
 
 <element gi="foreign" status="beta">
 <p>See <elemxref gi="foreign" dtd="sundtd"/>
 </p>
-<!--splice:blockquote-->
 </element>
 
 <element gi="funcname" status="beta">
@@ -410,14 +279,12 @@ There are no restrictions on what function names you can list here.
 The formatting system might, for example, be able to make a link to
 the documentation of that function, if it can find it.
 </p>
-<!--splice:funcname-->
 </element>
 
 <element gi="history" status="beta">
 <p>The change history for the document or block.  The changes should
 be in chronological order, with newest last.
 </p>
-<!--splice:history-->
 </element>
 
 <element gi="implementationstatus" status="beta">
@@ -425,85 +292,71 @@ be in chronological order, with newest last.
 here).
 
 </p>
-<!--splice:implementationstatus-->
 </element>
 
 <element gi="invocation" status="beta">
 <p>An example of how to invoke the function or task.
 </p>
-<!--splice:invocation-->
 </element>
 
 <element gi="kbd" status="beta">
 <p>See <elemxref gi="kbd" dtd="sundtd"/>
 </p>
-<!--splice:kbd-->
 </element>
 
 <element gi="li" status="beta">
 <p>See <elemxref gi="li" dtd="sundtd"/>
 </p>
-<!--splice:li-->
 </element>
 
 <element gi="line" status="beta">
 <p>See <elemxref gi="line" dtd="sundtd"/>
 </p>
-<!--splice:line-->
 </element>
 
 <element gi="linespecific" status="beta">
 <p>See <elemxref gi="linespecific" dtd="sundtd"/>
 </p>
-<!--splice:linespecific-->
 </element>
 
 <element gi="m" status="beta">
 <p>See <elemxref gi="m" dtd="sundtd"/>
 </p>
-<!--splice:m-->
 </element>
 
 <element gi="meqnarray" status="beta">
 <p>See <elemxref gi="meqnarray" dtd="sundtd"/>
 </p>
-<!--splice:meqnarray-->
 </element>
 
 <element gi="mequation" status="beta">
 <p>See <elemxref gi="mequation" dtd="sundtd"/>
 </p>
-<!--splice:mequation-->
 </element>
 
 <element gi="mlabel" status="beta">
 <p>See <elemxref gi="mlabel" dtd="sundtd"/>
 </p>
-<!--splice:mlabel-->
 </element>
 
 <element gi="mline" status="beta">
 <p>See <elemxref gi="mline" dtd="sundtd"/>
 </p>
-<!--splice:mline-->
 </element>
 
 <element gi="moduletype" status="beta">
 <p>Indicate what type of module this is, for example
 <code>&lt;moduletype>Perl module</code>.</p>
-<!--splice:moduletype-->
 </element>
 
 <element gi="name" status="beta">
 <p>The author/function/parameter name, depending on context.
 </p>
-<!--splice:name-->
 </element>
 
 <element gi="ol" status="beta">
 <p>See <elemxref gi="ol" dtd="sundtd"/>
 </p>
-<!--splice:ol-->
 </element>
 
 <element gi="otherauthors" status="beta">
@@ -511,7 +364,6 @@ here).
 it than would be appropriate for inclusion in an <elemref gi="author"/>
 element.
 </p>
-<!--splice:otherauthors-->
 </element>
 
 <element gi="othernames" status="beta">
@@ -520,20 +372,17 @@ forms for, for example, single and double precision.  In this case,
 the function's generic name can be given in the <elemref gi="routinename"/>'s <elemref gi="name"/> element, and other names for it
 can be included as <elemref gi="othernames" self="self"/>.
 </p>
-<!--splice:othernames-->
 </element>
 
 <element gi="diytopic" status="beta">
 <p>A note, which will be displayed in the same format as the other
 headings in this context.
 </p>
-<!--splice:diytopic-->
 </element>
 
 <element gi="p" status="beta">
 <p>See <elemxref gi="p" dtd="sundtd"/>
 </p>
-<!--splice:p-->
 </element>
 
 <element gi="parameter" status="beta">
@@ -560,243 +409,6 @@ are used in both DSSSL and IDL (for
 example). 
 </p>
 </attribute>
-<commentary>
-<from>Mark Taylor</from>
-<email>mbt@ast.cam.ac.uk</email>
-<date>Fri, 7 Apr 2000 17:15:57 +0100 (BST)</date>
-<subject>parameter dimensions</subject>
-<otherheader name='From '>mbt@ast.cam.ac.uk Fri Apr 07 17:15:59 2000</otherheader>
-<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12dbQN-0007Fj-00; Fri, 07 Apr 2000 17:15:59 +0100</otherheader>
-<otherheader name='Received'>from lilac.csi.cam.ac.uk ([131.111.8.44] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12dbQQ-0001e4-00; Fri, 07 Apr 2000 17:16:02 +0100</otherheader>
-<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by lilac.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12dbQN-0002dQ-00; Fri, 07 Apr 2000 17:15:59 +0100</otherheader>
-<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29.ast.cam.ac.uk [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id RAA21343; Fri, 7 Apr 2000 17:15:58 +0100 (BST)</otherheader>
-<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id RAA12020; Fri, 7 Apr 2000 17:15:57 +0100 (BST)</otherheader>
-<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
-<otherheader name='X-Sender'>mbt@cass29 Rodney Warren-Smith &lt;rfws@star.rl.ac.uk></otherheader>
-<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10004071650530.11745-100000@cass29></otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-Problem with the &lt;parameter> element:
-
-The current usage in prologues for documenting scalar parameters is to
-write something like:
-
-   *     NDF = LITERAL (Read)
-   *        The input NDF.
-
-which can be upconverted to
-
-   *     &lt;parameter given>
-   *     NDF = LITERAL 
-   *        The input NDF.
-
-which is equivalent by shortref magic to
-
-         &lt;parameter given>
-         &lt;name>NDF &lt;type>LITERAL
-            &lt;description>&lt;p>The input NDF.
-
-However this doesn't work for array-type parameters, for which the current
-usage is:
-
-   *     ORIGIN( 2 ) = _INTEGER
-   *        Position of the origin.
-
-(the contents of the parenthesis, which indicate the shape of the array,
-can take a number of forms, including a comma-separated list of integers, 
-name of another parameter, an asterisk, empty...)
-
-There are various possibilities to accommodate this:
-
-   1)  A 'shape' attribute (CDATA) on the &lt;type> or &lt;parameter> elements
-   2)  A &lt;shape> optional element (PCDATA) in the content of &lt;type>
-          or &lt;parameter>
-   3)  Just write the size as part of the PCDATA content of &lt;type>
-
-I suggest (3), so one would have
-
-   *  &lt;parameter given>
-   *     ORIGIN = _INTEGER( 3 )
-
-which means
-
-      &lt;parameter given>
-         &lt;name>ORIGIN &lt;type>_INTEGER( 3 )
-
-This actually seems to me like a more logical way round to write it, 
-but it's not the way it has been done historically.  I don't think
-the benefits of recording the dimensionality of the parameter are
-all that great.  Also, I think the shortrefs required to implement (2)
-would get a bit hairy (and impossible for (1)) - but if you feel you 
-can implement them before breakfast with one hand behind your back 
-don't let me stop you).
-
-Agree?  Disagree?
-
----------------------------------------------------------------------------
-| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
-| mbt@ast.cam.ac.uk    http://www.ast.cam.ac.uk/~mbt/        01223 337535 |
----------------------------------------------------------------------------
-
-
-</body>
-</commentary>
-<commentary>
-<from>Norman Gray</from>
-<email>norman@astro.gla.ac.uk</email>
-<date>Thu, 25 May 2000 11:48:22 +0100 (BST)</date>
-<subject>script options as parameters</subject>
-<otherheader name='From '>norman@astro.gla.ac.uk Thu May 25 11:48:24 2000</otherheader>
-<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
-<otherheader name='Delivery-date'>Thu, 25 May 2000 11:48:24 +0100</otherheader>
-<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12uvBe-0000UK-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Thu, 25 May 2000 11:48:22 +0100</otherheader>
-<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12uvBe-0005GG-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Thu, 25 May 2000 11:48:22 +0100</otherheader>
-<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005251147490.19954-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-
-What's the best way to document script (or indeed program) options?
-So far, I've done it `by hand', using a diytopic, but that's not
-really appropriate.  I'm inclined to suggest adding a &lt;optionlist&gt;
-element, as a companion to &lt;argumentlist&gt; and &lt;parameterlist&gt;, with
-the options listed as &lt;parameter&gt; elements inside.
-
-Alternatively, we could have options as content to &lt;argumentlist&gt; (or
-do I mean &lt;parameterlist&gt;?), but with some attribute on the &lt;parameter&gt;
-element which indicates that these are options.  That strikes me as
-rather confusing.
-
-It wouldn't be appropriate to simply treat options as another type of
-argument, since that would obscure the well-founded distinction
-between the two types of ways of controlling a program.
-
-A disadvantage with the &lt;optionlist&gt; scheme is that there would then
-be three elements with very similar semantics, which is not a big problem
-in itself, but suggests that we're missing some generalisation.
-
-Any ideas?
-
-Norman
-
--- 
----------------------------------------------------------------------------
-Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
-Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
-
-
-
-
-</body>
-</commentary>
-<commentary>
-<from>Mark Taylor</from>
-<email>mbt@ast.cam.ac.uk</email>
-<date>Fri, 2 Jun 2000 10:12:10 +0100 (BST)</date>
-<subject>Re: script options as parameters</subject>
-<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 02 10:12:20 2000</otherheader>
-<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
-<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
-<otherheader name='Delivery-date'>Fri, 02 Jun 2000 10:12:20 +0100</otherheader>
-<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xnV5-00033n-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 10:12:19 +0100</otherheader>
-<otherheader name='Received'>from navy.csi.cam.ac.uk ([131.111.8.49] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12xnV7-00081v-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 10:12:21 +0100</otherheader>
-<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by navy.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12xnUx-00018S-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 10:12:11 +0100</otherheader>
-<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id KAA15867 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 10:12:11 +0100 (BST)</otherheader>
-<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id KAA26332 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 10:12:10 +0100 (BST)</otherheader>
-<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
-<otherheader name='X-Sender'>mbt@cass29</otherheader>
-<otherheader name='In-Reply-To'>&lt;Pine.LNX.4.10.10005251147490.19954-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006021010450.26239-100000@cass29&gt;</otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-Can you explain what you mean by 'options'?  Do you mean command line
-flags which are not ADAM ones, or something else?
-
----------------------------------------------------------------------------
-| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
-| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
----------------------------------------------------------------------------
-
-
-
-</body>
-</commentary>
-<commentary>
-<from>Norman Gray</from>
-<email>norman@astro.gla.ac.uk</email>
-<date>Fri, 2 Jun 2000 17:58:58 +0100 (BST)</date>
-<subject>Re: script options as parameters</subject>
-<otherheader name='From '>norman@astro.gla.ac.uk Fri Jun 02 17:58:59 2000</otherheader>
-<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
-<otherheader name='Delivery-date'>Fri, 02 Jun 2000 17:58:59 +0100</otherheader>
-<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xumg-000407-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 17:58:58 +0100</otherheader>
-<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12xumg-0005AO-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 17:58:58 +0100</otherheader>
-<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10006021749300.17541-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-
-Mmm, I hadn't thought of that.  I was thinking of options to scripts,
-or other programs: --like-this.  I suppose we _could_ overload the
-parameterlist element so that when the program language was a script
-type, these were formatted as options, but that's a rather shaky
-approach, I think.
-
--- 
----------------------------------------------------------------------------
-Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
-Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
-
-
-
-</body>
-</commentary>
-<commentary>
-<from>Mark Taylor</from>
-<email>mbt@ast.cam.ac.uk</email>
-<date>Fri, 2 Jun 2000 18:12:17 +0100 (BST)</date>
-<subject>Re: script options as parameters</subject>
-<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 02 18:12:24 2000</otherheader>
-<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
-<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
-<otherheader name='Delivery-date'>Fri, 02 Jun 2000 18:12:24 +0100</otherheader>
-<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xuzf-00040m-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 18:12:23 +0100</otherheader>
-<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12xuzh-0000yh-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 18:12:25 +0100</otherheader>
-<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12xuzc-0006rQ-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 18:12:20 +0100</otherheader>
-<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id SAA25472 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 18:12:19 +0100 (BST)</otherheader>
-<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id SAA28925 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 18:12:18 +0100 (BST)</otherheader>
-<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
-<otherheader name='X-Sender'>mbt@cass29</otherheader>
-<otherheader name='In-Reply-To'>&lt;Pine.LNX.4.10.10006021749300.17541-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
-<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006021802450.28856-100000@cass29&gt;</otherheader>
-<otherheader name='MIME-Version'>1.0</otherheader>
-<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
-<body>
-No I wasn't suggesting that, I was just asking whether --like-this 
-is what you meant or not.
-
-I suppose a new optionlist element with content something like
-(option, description)* would make sense.  Because these can take
-various forms I'd be inclined not to give it any more structure
-than that.  `Option' isn't a very definite word to use (witness
-my confusion above) - `flag' might be better but does tend to 
-suggest things with leading minus signs, which could be overly 
-restrictive.  In the mean time, like you, I've been using diytopics.
-
----------------------------------------------------------------------------
-| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
-| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
----------------------------------------------------------------------------
-
-
-
-</body>
-</commentary>
-<!--splice:parameter-->
 </element>
 
 <element gi="parameterlist" status="beta">
@@ -804,13 +416,11 @@ restrictive.  In the mean time, like you, I've been using diytopics.
 different from the <elemref gi="argumentlist"/> element, which is the
 list of parameters to a function.
 </p>
-<!--splice:parameterlist-->
 </element>
 
 <element gi="programcode" status="beta">
 <p>The top level element
 </p>
-<!--splice:programcode-->
 </element>
 
 <element gi="purpose" status="beta">
@@ -820,19 +430,16 @@ instead, but if that element has a lot of content, then you should
 provide a <elemref gi="purpose" self="self"/> element, to be used in contexts
 where only a brief function description is required.
 </p>
-<!--splice:purpose-->
 </element>
 
 <element gi="px" status="beta">
 <p>See <elemxref gi="px" dtd="sundtd"/>
 </p>
-<!--splice:px-->
 </element>
 
 <element gi="quote" status="beta">
 <p>See <elemxref gi="quote" dtd="sundtd"/>
 </p>
-<!--splice:quote-->
 </element>
 
 <element gi="ref" status="alpha">
@@ -848,7 +455,6 @@ element.</p>
 
 <p>What you cannot do at all, at present, is refer to a routine in a
 <em>different</em> programcode document.</p>
-<!--splice:ref-->
 </element>
 
 <element gi="returnvalue" status="beta">
@@ -862,7 +468,6 @@ attribute none should be present.
 <p>A string indicating the type of the return value of the function.
 </p>
 </attribute>
-<!--splice:returnvalue-->
 </element>
 
 <element gi="routine" status="beta">
@@ -877,7 +482,6 @@ returnvalues, and the like.</p>
 General DTD.
 </p>
 </attribute>
-<!--splice:routine-->
 </element>
 
 <element gi="routinename" status="beta">
@@ -891,19 +495,16 @@ gi='routinename'/> is entirely equivalent to a reference to the ID
 attribute on the <elemref gi='routine'/> element, so that the document
 author can choose which is more convenient.</p>
 </attribute>
-<!--splice:routinename-->
 </element>
 
 <element gi="routineprologue" status="beta">
 <p>This is the header which documents the routine, or other code, to follow.
 </p>
-<!--splice:routineprologue-->
 </element>
 
 <element gi="row" status="beta">
 <p>See <elemxref gi="row" dtd="sundtd"/>
 </p>
-<!--splice:row-->
 </element>
 
 <element gi="softwarekeywords" status="beta">
@@ -952,74 +553,62 @@ Graphics (GRPL).
 </dd>
 </dl>
 </p>
-<!--splice:softwarekeywords-->
 </element>
 
 <element gi="strong" status="beta">
 <p>See <elemxref gi="strong" dtd="sundtd"/>
 </p>
-<!--splice:strong-->
 </element>
 
 <element gi="span" status="beta">
 <p>See <elemxref gi="span" dtd="sundtd"/>
 </p>
-<!--splice:span-->
 </element>
 
 <element gi="tabular" status="beta">
 <p>See <elemxref gi="tabular" dtd="sundtd"/>
 </p>
-<!--splice:tabular-->
 </element>
 
 <element gi="tbody" status="beta">
 <p>See <elemxref gi="tbody" dtd="sundtd"/>
 </p>
-<!--splice:tbody-->
 </element>
 
 <element gi="tgroup" status="beta">
 <p>See <elemxref gi="tgroup" dtd="sundtd"/>
 </p>
-<!--splice:tgroup-->
 </element>
 
 <element gi="thead" status="beta">
 <p>See <elemxref gi="thead" dtd="sundtd"/>
 </p>
-<!--splice:thead-->
 </element>
 
 <element gi="title" status="beta">
 <p>The title of the document, or code block.
 </p>
-<!--splice:title-->
 </element>
 
 <element gi="type" status="beta">
 <p>The type of a parameter, as a string.
 </p>
-<!--splice:type-->
 </element>
 
 <element gi="ul" status="beta">
 <p>See <elemxref gi="ul" dtd="sundtd"/>
 </p>
-<!--splice:ul-->
 </element>
 
 <element gi="url" status="beta">
 <p>See <elemxref gi="url" dtd="sundtd"/>
 </p>
-<!--splice:url-->
 </element>
 
 <element gi="usage" status="beta">
 <p>An example of the usage of this function (how is this different
 from `invocation'?)
 </p>
-<!--splice:usage-->
 </element>
 
 <element gi="userkeywords" status="beta">
@@ -1036,22 +625,18 @@ long as the keywords you invent are prefixed with `general: ...'.
 </p>
 <p>See also <elemref gi="softwarekeywords"/>.
 </p>
-<!--splice:userkeywords-->
 </element>
 
 <element gi="verbatim" status="beta">
 <p>See <elemxref gi="verbatim" dtd="sundtd"/>
 </p>
-<!--splice:verbatim-->
 </element>
 
 <element gi="webref" status="beta">
 <p>See <elemxref gi="webref" dtd="sundtd"/>
 </p>
-<!--splice:webref-->
 </element>
 
-<!--splice:general-comments-->
 </dtddescription>
 
 <!--

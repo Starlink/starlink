@@ -12,8 +12,8 @@
      $Id$
      -->
 
-<!ELEMENT dtddescription	(dtdsummary, element+, commentary*)>
-<!ELEMENT element		(p+, attribute*, commentary*)>
+<!ELEMENT dtddescription	(dtdsummary, element+)>
+<!ELEMENT element		(p+, attribute*)>
 <!ELEMENT attribute		(p+)>
 
 <!ENTITY % phrase "#PCDATA | code | em | url | webref | elemref | elemxref ">
@@ -51,27 +51,20 @@
 <!ELEMENT dtdattribute		(#PCDATA)>
 <!ELEMENT dtdelemref		EMPTY>
 
-<!-- The element documentation can include a series of bits of
-     commentary, laid out like email messages.
-     -->
-<!ELEMENT commentary		(from?, email?, date?, subject?,
-					otherheader*, body)>
-<!ELEMENT from			(#PCDATA)>
-<!ELEMENT email			(#PCDATA)>
-<!ELEMENT date			(#PCDATA)>
-<!ELEMENT subject		(#PCDATA)>
-<!ELEMENT otherheader		(#PCDATA)>
-<!ELEMENT body			(#PCDATA | url)*>
-
 <!ATTLIST dtddescription
 	docelem
-		CDATA #REQUIRED
+		CDATA
+		#REQUIRED
+	commentary
+		ENTITY
+		#IMPLIED
 	>
 	<!-- attributes:
 		docelem		Name of the document element of the DTD
-				this describes.  This must match the
-				document element of the dtdelementlist
-				document which invokes this.
+				this describes.
+		commentary	Entity pointing to a document of
+				commentary, conforming to the
+				commentaries.dtd.
 	-->
 
 <!ATTLIST element
@@ -192,14 +185,6 @@
 		id		reference to dtdelement element
 	-->
 
-
-<!ATTLIST otherheader
-	name
-		CDATA #REQUIRED
-	>
-	<!-- attributes:
-		name		name of the header
-	-->
 
 <!-- Declare an entity referencing the XML declaration -->
 <!ENTITY xml.decl PUBLIC "-//Starlink//TEXT XML Declaration//EN"
