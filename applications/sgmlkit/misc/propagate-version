@@ -1,6 +1,6 @@
 #!/bin/sh -
 
-top=..
+top=$STARLINK_SGML_DIR
 
 # Little script to propagate the version stored in the file VERSION.  The
 # version strings to be replaced must either be on a line which
