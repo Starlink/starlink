@@ -1,43 +1,38 @@
 *+  SSO_CMN - SSO system
 *-
 
-*    Max active datasets
+*  Max active datasets
       INTEGER      SSO__MXDS
         PARAMETER  ( SSO__MXDS = 12 )
 
-*    Max mapped items
+*  Max mapped items
       INTEGER      SSO__MXMI
         PARAMETER  ( SSO__MXMI = SSO__MXDS*4 )
 
-*    The two types of mapped item
+*  The two types of mapped item
       INTEGER      SSO__MI_DATA, SSO__MI_ERROR
         PARAMETER  ( SSO__MI_DATA=1, SSO__MI_ERROR=2 )
 
-*    Dataset description
-      STRUCTURE    /SSO_DS_REC/
-        CHARACTER*(DAT__SZLOC)      LOC              ! Dataset locator
-        LOGICAL                     USED             ! Slot in use?
-      END STRUCTURE
-
-*    SSO mapped item
-      STRUCTURE    /SSO_MI_REC/
-        INTEGER                     DS               ! Dataset number
-        CHARACTER*(DAT__SZNAM)      FLD              ! Field name
-        CHARACTER*(DAT__SZLOC)      FLOC             ! Field locator
-        INTEGER                     TYPE             ! Type of mapped item
-        INTEGER                     PTR              ! Pointer to object
-        LOGICAL                     MAPPED           ! Object mapped?
-        LOGICAL                     USED             ! Slot in use?
-      END STRUCTURE
-
-*    SSO system block
-      STRUCTURE    /SSO_SYS/
-        RECORD /SSO_DS_REC/         DS(SSO__MXDS)
-        RECORD /SSO_MI_REC/         MI(SSO__MXMI)
-      END STRUCTURE
-
+*  System initialised flag
       LOGICAL SSO_INIT_Q
 
-*    Declare common block
-      RECORD /SSO_SYS/ SSO
-      COMMON /SSO_CMN/ SSO,SSO_INIT_Q
+*  Dataset store
+      CHARACTER*(DAT__SZLOC)	SSO_DS_LOC(SSO__MXDS)
+      LOGICAL			SSO_DS_USED(SSO__MXDS)
+
+*  Mapped item store
+      INTEGER			SSO_MI_DS(SSO__MXMI)
+      CHARACTER*(DAT__SZNAM)	SSO_MI_FNAM(SSO__MXMI)
+      CHARACTER*(DAT__SZLOC)	SSO_MI_FLOC(SSO__MXMI)
+      INTEGER			SSO_MI_TYPE(SSO__MXMI)
+      INTEGER			SSO_MI_PTR(SSO__MXMI)
+      LOGICAL			SSO_MI_MAPPED(SSO__MXMI)
+      INTEGER			SSO_MI_USED(SSO__MXMI)
+
+*  Non-character stuff
+      COMMON /SSO_CMN/ SSO_INIT_Q, SSO_DS_USED, SSO_MI_DS,
+     :                 SSO_MI_TYPE, SSO_MI_PTR, SSO_MI_MAPPED,
+     :                 SSO_MI_USED
+
+*  Character stuff
+      COMMON /SSO_CMN_C/ SSO_DS_LOC, SSO_MI_FNAM, SSO_MI_FLOC
