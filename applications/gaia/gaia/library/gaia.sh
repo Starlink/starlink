@@ -27,6 +27,8 @@
 #        Original version.
 #     17-MAY-1999 (PWD):
 #        Now starts up single binary version of GAIA.
+#     23-SEP-2004 (PWD):
+#        Added CYGWIN environment variable.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -66,6 +68,14 @@ if test -x $GAIA_DIR/gaia_swish; then
 #  Set the BLT_LIBRARY variable. This is needed to locate some .pro files.
   BLT_LIBRARY=$GAIA_DIR
   export BLT_LIBRARY
+
+#  Cywgin setup. Need "server" in CYGWIN for cygserver to work.
+  if test "$CYGWIN" = ""; then
+     CYGWIN="server"
+  else
+     CYGWIN="$CYGWIN server"
+  fi
+  export CYGWIN
 
 #  And run up the interface.
   $GAIA_DIR/gaia_swish ${1+"$@"}
