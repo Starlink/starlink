@@ -709,7 +709,7 @@
 *        Map vignetting array
               CALL BDI_MAPR( VFID(N), 'Data', 'READ', OBDAT(N).VIGPTR,
      :                          STATUS )
-	      CALL MSG_PRNT('Loaded associated vignetting array')
+	      CALL MSG_PRNT('    Loaded associated vignetting array')
 
             END IF
 
