@@ -107,6 +107,8 @@
 *        Some corrections to NUM_<func> and intrinisc-function usage.
 *        thus curing a potential divide-by-zero error if maximum were
 *        -1 times the minimum.
+*     15-NOV-2000 (MBT):
+*        Fixed overflow bug possible when using signed integer types.
 *     {enter_further_changes_here}
 
 *-
@@ -150,7 +152,7 @@
                                ! because average value is 0.5, not 1)
 
 *  Local Variables:
-      <LTYPE> AVELIM           ! Average of data limits
+      <LTYPE> AVELIM           ! Half the average of data limits
       DOUBLE PRECISION BINSIZ  ! Bin width of histogram
       DOUBLE PRECISION CLIPFR( NLIMIT ) ! Bin contents clipped as fraction
       INTEGER CLIPSU( NLIMIT ) ! Count of bin contents clipped
@@ -183,7 +185,7 @@
       INTEGER NUMBER           ! Number of non-zero histogram bins
       INTEGER NUMOUT           ! Number of outliers computed separately?
       INTEGER NUMVAL           ! Number of good values in input array
-      <LTYPE> RANGE            ! Data range
+      <LTYPE> RANGE            ! Half the data range
       DOUBLE PRECISION SCALE   ! Fractional range after clipping
       INTEGER SUM              ! Sum of histogram count
       LOGICAL TRIMED( NLIMIT ) ! Trimmed the histogram at either end?
@@ -350,20 +352,26 @@
          IF ( FINDHI ) THEN
 
 *  Set the minimum width of a bin so that each of the histogram bins
-*  is resolvable.  This is one for integers.  Thus the maximum number
-*  of bins is data range plus one.
+*  is resolvable.  The halving of the data limits in the below code
+*  prevents arithmetic overflow for data with a very large dynamic
+*  range.
+            RANGE = ABS( DATLIM( 2 ) / 2<CONST> -
+     :                   DATLIM( 1 ) / 2<CONST> )
+
+*  For the case of integers the maximum number of bins is data range 
+*  plus one.
             IF ( INTVAL ) THEN
-               MAXBIN = NUM_<T>TOI( DATLIM( 2 ) - DATLIM( 1 ) ) + 1
+               IF ( NUM_<T>TOI( RANGE ) .LE. ( VAL__MAXI - 1 ) / 2 )
+     :         THEN
+                  MAXBIN = NUM_<T>TOI( RANGE ) * 2 + 1
+               ELSE
+                  MAXBIN = VAL__MAXI
+               END IF
 
-*  For floating point we have at least two bins.  The halving of the
-*  data limits prevents arithmetic overflow for data with a very large
-*  dynamic range.
+*  For floating point we have at least two bins.
             ELSE
-               RANGE = ABS( DATLIM( 2 ) / 2<CONST> -
-     :                 DATLIM( 1 ) / 2<CONST> ) * 2<CONST>
                AVELIM = ( ABS( DATLIM( 2 ) / 2<CONST> ) +
-     :                    ABS( DATLIM( 1 ) / 2<CONST> ) ) * 2<CONST>
-
+     :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
                MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
      :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) ) )
             END IF
