@@ -177,7 +177,7 @@
 *     are normalised so that the shorter of the two axes has length 1.0.
 
 *  Related Applications:
-*     KAPPA: IDSTATE.
+*     KAPPA: GDSET, GDCLEAR.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)

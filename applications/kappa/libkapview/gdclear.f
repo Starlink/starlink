@@ -45,7 +45,7 @@
 *        Clears the xw device and purges its graphics database entries.
 
 *  Related Applications:
-*     KAPPA: GDSET, GDSTATE, IDSET, IDCLEAR, OVSET, OVCLEAR.
+*     KAPPA: GDSET, GDSTATE, OVSET, OVCLEAR.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
