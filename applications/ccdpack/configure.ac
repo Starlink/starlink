@@ -19,6 +19,6 @@ STAR_DECLARE_DEPENDENCIES([build],
                            psx trn pda ndg tclsys startcl])
 # STAR_LATEX_DOCUMENTATION(sun139)
 # STAR_LATEX_DOCUMENTATION(ccdpack)
-# AC_CONFIG_SUBDIRS([tasks gen help main])
+AC_CONFIG_SUBDIRS([tasks gen help main])
 AC_CONFIG_FILES([Makefile component.xml ccdpack.ifd CCD1_PAR])
 AC_OUTPUT
