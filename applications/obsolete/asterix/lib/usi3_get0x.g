@@ -4,7 +4,7 @@
 *     USI3_GET0<T>
 
 *  Purpose:
-*     Read a <TYPE> parameter value using the FTOOLS parameter system
+*     Read a <COMM> parameter value using the FTOOLS parameter system
 
 *  Language:
 *     Starlink Fortran
@@ -18,9 +18,11 @@
 *     {routine_description}
 
 *  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
+*     PAR = CHARACTER*(*) (given)
+*        The name of the parameter
+*     VALUE = <TYPE> (returned)
+*        The value of the parameter
+*     STATUS = INTEGER (given and returned)
 *        The global status.
 
 *  Examples:
@@ -98,34 +100,55 @@
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
+*  Local Constants:
+      INTEGER			MAXTRY
+        PARAMETER		( MAXTRY = 5 )
+
 *  Local Variables:
       CHARACTER*300		CVAL			! Transfer value
 
       INTEGER			CLEN			! Length of CVAL used
       INTEGER			FSTAT			! XPI status
+      INTEGER			NTRY			! Number of tries
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Read text string
-      FSTAT = 0
-      CALL UCLGST( PAR, CVAL, FSTAT )
+      CLEN = 0
+      NTRY = 0
+      DO WHILE ( (CLEN.EQ.0) .AND. (NTRY.LT.MAXTRY)
+     :           .AND. (STATUS.EQ.SAI__OK) )
 
-*  Find length of returned string
-      CLEN = CHR_LEN(CVAL)
+*    Get value from environment
+        CALL UCLGST( PAR, CVAL, CLEN )
 
-*  Trap special values
-      IF ( CVAL(:CLEN) .EQ. '!' ) THEN
-        STATUS = PAR__NULL
+*    Increment try counter
+        NTRY = NTRY + 1
 
-      ELSE IF ( CVAL(:CLEN) .EQ. '!!' ) THEN
-        STATUS = PAR__ABORT
+*    Trap special values
+        IF ( CLEN .EQ. 0 ) THEN
+        IF ( CVAL(:CLEN) .EQ. '!' ) THEN
+          STATUS = PAR__NULL
 
-      ELSE
-        CALL CHR_CTO<T>( CVAL, VALUE, STATUS )
+        ELSE IF ( CVAL(:CLEN) .EQ. '!!' ) THEN
+          STATUS = PAR__ABORT
 
-      END IF
+        ELSE
+          CALL CHR_CTO<T>( CVAL, VALUE, STATUS )
+
+        END IF
+
+*    Duff status? Try again unless too many times already
+        IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.PAR__NULL) .AND.
+     :       (STATUS.NE.PAR__ABORT) .AND. (NTRY .LT. MAXTRY) ) THEN
+          CALL ERR_ANNUL( STATUS )
+
+        END IF
+
+      END DO
+
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'USI3_GET0<T>', STATUS )
