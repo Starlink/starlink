@@ -489,7 +489,7 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
  CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
  Buttoncontrol.tcl Ccdtop.tcl Control.tcl Gwmview.tcl \
- Helpcontrol.tcl Marknumcontrol.tcl Ndfalign.tcl \
+ Helpcontrol.tcl Marknumcontrol.tcl Markstylecontrol.tcl Ndfalign.tcl \
  Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
  Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
  raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
@@ -546,7 +546,7 @@ CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  TEK3STANDARD.DAT TEK4QUICK.DAT TEK4STANDARD.DAT TEK5QUICK.DAT \
  TEK5STANDARD.DAT WHTFLAT.DAT WHTSKY.DAT \
  INTWIDEFLAT.DAT  INTWIDESKY.DAT  WHT2000FLAT.DAT  WHT2000SKY.DAT \
- INT-WFC.ast
+ INT-WFC.ast ccdpack_style.def
 
 #  List of IRAF script files. These will be installed in
 #  $(INSTALL_BIN_IRAF). This also includes any other miscellaneous
@@ -579,7 +579,7 @@ PRIVATE_SCRIPTS = dgeneric
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
+PRIVATE_INCLUDES = ccd1_cacm ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
  ndf_const user_err slv.h ccdtcl.h tclndf.h grp_par.h
 
@@ -617,7 +617,7 @@ TASKSRC = $(REDTASKS:=.f) $(REGTASKS:=.f) $(RESTASKS:=.f) $(SCRTASKS:=.f)
 
 SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_agtmd.f ccd1_aldif.f \
- ccd1_anoi.f ccd1_appnd.f ccd1_asfio.f ccd1_asnk.f ccd1_asrc.f \
+ ccd1_anoi.f ccd1_aplot.f ccd1_appnd.f ccd1_asfio.f ccd1_asnk.f ccd1_asrc.f \
  ccd1_auto.f ccd1_cen2.f \
  ccd1_cent.f ccd1_cext.f ccd1_cff.f ccd1_ckcdb.f \
  ccd1_ckcon.f ccd1_ckfla.f ccd1_ckfty.f ccd1_cktyp.f \
@@ -635,7 +635,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_grrep.f ccd1_gtbds.f \
  ccd1_gtcmp.f ccd1_gtcpb.f ccd1_gtcpc.f ccd1_gtdir.f \
  ccd1_gtlig.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
- ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hisp.f ccd1_hvcon.f \
+ ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hchan.f ccd1_hisp.f ccd1_hvcon.f \
  ccd1_hvusr.f ccd1_inply.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
  ccd1_ktidy.f ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
  ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f \
@@ -650,7 +650,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_ndfgl.f ccd1_ndfgr.f ccd1_ndfgu.f ccd1_ndfin.f \
  ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nglis.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
- ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_pnply.f ccd1_prmin.f \
+ ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_plsty.f ccd1_pnply.f ccd1_prmin.f \
  ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_prune.f \
  ccd1_ptbad.f ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
@@ -672,7 +672,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
  ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
- ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f pda_drnor.f \
+ ccd1_fcov.f ccd1_c2ca.f ccd1_ca2c.f \
+ ccd1_casrc.f ccd1_casnk.f ccd1_calcj.f pda_dsvdc.f pda_drnor.f \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
@@ -754,7 +755,7 @@ CSUBSRC = ccd1_exec.c slv.c find_file.c \
 
 REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
- pairndf ccdedit makemos tranndf drizzle astimp astexp wcsreg wcsedit
+ pairndf ccdedit makemos tranndf drizzle astimp astexp wcsreg wcsedit outline
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 SCRTASKS = reduce ccdalign xreduce
@@ -811,7 +812,7 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
    debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
    tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
    use_globals.hlp idicurs.hlp xreduce.hlp import.hlp \
-   drizzle.hlp astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp
+   drizzle.hlp astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp outline.hlp
 
 #  Name of the help task.
 
@@ -877,14 +878,15 @@ BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PUBLIC_SCRIPTS) \
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
-                CCD1_MOSCM CCD1_MOSPR CCD1_PAR CCD1_TMPCM FIO1_CLOG \
-                HLPCMD.INC IRA_ERR IRA_PAR NDF_CONST USER_ERR
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_CACM CCD1_FDCM CCD1_FITCM \
+                CCD1_MEMCM CCD1_MOSCM CCD1_MOSPR CCD1_PAR CCD1_TMPCM \
+                FIO1_CLOG HLPCMD.INC IRA_ERR IRA_PAR NDF_CONST USER_ERR
 
 #  Rules to set up links to locate each of the above include files.
 
 AST_PAR:	$(STAR_INC)/ast_par;	  $(LINK) $? $@
 AST_ERR:	$(STAR_INC)/ast_err;	  $(LINK) $? $@ 
+CCD1_CACM:	ccd1_cacm;                $(LINK) $? $@
 CCD1_FDCM:	ccd1_fdcm;	          $(LINK) $? $@
 CCD1_FITCM:	ccd1_fitcm;	          $(LINK) $? $@
 CCD1_MEMCM:	ccd1_memcm;	          $(LINK) $? $@
@@ -1270,7 +1272,7 @@ $(MONOLITH2): $(PKG_NAME)_reg.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
               $(LINK_SCRIPT2)
 	$(ALINK) $(PKG_NAME)_reg.o -o $(PKG_NAME)_reg \
 	        $(ADDLIBS) $(OBJECT_LIBRARIES) \
-                `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+                `ast_link_adam -pgp` `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
 		$(OBJECT_LIBRARIES) -lpda
 
 $(MONOLITH3): $(PKG_NAME)_res.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
@@ -2244,13 +2246,18 @@ ccd1_adkey.o: SAE_PAR
 ccd1_agtmd.o: FIO_ERR CCD1_PAR SAE_PAR
 ccd1_aldif.o: PRM_PAR SAE_PAR
 ccd1_anoi.o: PRM_PAR SAE_PAR
+ccd1_aplot.o: SAE_PAR AST_PAR DAT_PAR
 ccd1_appnd.o: SAE_PAR
 ccd1_asfio.o: FIO_PAR PAR_ERR SAE_PAR
 ccd1_asnk.o: CCD1_PAR CCD1_FDCM SAE_PAR
 ccd1_asrc.o: CCD1_PAR CCD1_FDCM FIO_ERR SAE_PAR
 ccd1_auto.o: CCD1_PAR MSG_PAR SAE_PAR GRP_PAR
 ccd1_box.o: SAE_PAR
+ccd1_c2ca.o: SAE_PAR
+ccd1_ca2c.o: SAE_PAR
 ccd1_calcj.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
+ccd1_casrc.o: SAE_PAR DAT_PAR CCD1_PAR CCD1_CACM
+ccd1_casnk.o: SAE_PAR DAT_PAR CCD1_PAR CCD1_CACM
 ccd1_cat.o: FIO_ERR MSG_PAR SAE_PAR
 ccd1_cen2.o: SAE_PAR
 ccd1_cent.o: SAE_PAR
@@ -2339,6 +2346,7 @@ ccd1_gtmsk.o: CCD1_PAR DAT_PAR MSG_PAR PRM_PAR SAE_PAR
 ccd1_gtsec.o: MSG_PAR SAE_PAR
 ccd1_gtwcs.o: AST_PAR SAE_PAR
 ccd1_hdrrn.o: SAE_PAR
+ccd1_hchan.o: SAE_PAR AST_PAR DAT_PAR CCD1_PAR CCD1_CACM
 ccd1_hisp.o: SAE_PAR
 ccd1_hvcon.o: SAE_PAR
 ccd1_hvusr.o: SAE_PAR
@@ -2406,6 +2414,7 @@ ccd1_orvar.o: CCD1_PAR SAE_PAR
 ccd1_ovcom.o: PRM_PAR SAE_PAR
 ccd1_ovlap.o: NDF_PAR SAE_PAR
 ccd1_plof.o: SAE_PAR
+ccd1_plsty.o: SAE_PAR AST_PAR GRP_PAR
 ccd1_pnply.o: SAE_PAR
 ccd1_prin.o: CCD1_PAR FIO_ERR PAR_ERR SAE_PAR GRP_PAR NDG_ERR
 ccd1_prmin.o: PRM_PAR SAE_PAR
@@ -2668,6 +2677,7 @@ tranndf.o: AST_PAR CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 drizzle.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PRM_PAR SAE_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
 wcsedit.o: AST_PAR PAR_ERR SAE_PAR GRP_PAR
+outline.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR CCD1_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
