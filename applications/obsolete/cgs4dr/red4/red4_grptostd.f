@@ -29,6 +29,7 @@
 *      7-Dec-1990: Original version.                       (SMB)
 *     19-Feb-1993: Conform to error strategy               (PND)
 *      9-Nov-1994: Attempt to make vaguely portable        (AB)
+*     13-Jun-1996: Remove suffixes after obs num           (PND)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -36,6 +37,7 @@
       INCLUDE 'ADAMDEFNS'
       INCLUDE 'ADAMERRS'
       INCLUDE 'SAI_ERR'
+      INCLUDE 'RED4_COMMON.INC'
 *    Global variables:
 *    Import :
       CHARACTER*(*)
@@ -49,7 +51,9 @@
 *    Local Constants :
 *    Local variables :
       INTEGER
-     :  COLON_POS            ! Position of colon in character string
+     :  COLON_POS,           ! Position of colon in character string
+     :  UNDER_POS1,          ! Position of underscore in character string
+     :  UNDER_POS2           ! Position of underscore in character string
 *    Local data :
 *-
 
@@ -71,6 +75,14 @@
 
          STD_FILE = 'st' // GRP_FILE(3:)
       END IF
+
+*   We now have a file but might have some _pf _dbs _imspc or other suffixes
+      CALL CHR_RMBLK( STD_FILE )
+      UNDER_POS1 = INDEX( STD_FILE, '_' )
+      UNDER_POS2 = INDEX( STD_FILE(UNDER_POS1+1:LEN(STD_FILE)), '_' )
+      IF ( UNDER_POS2 .GT. 0 ) STD_FILE = STD_FILE(1:UNDER_POS1+UNDER_POS2-1)
+      CALL CHR_RMBLK( STD_FILE )
+      IF (VERBOSE) CALL MSG_OUT( ' ', 'Standard file is '//STD_FILE, STATUS )
 
       END
 

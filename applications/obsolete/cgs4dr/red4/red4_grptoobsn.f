@@ -23,6 +23,7 @@
 *     17-Jul-1992: Original version.                       (PND)
 *     19-Feb-1993: Conform to error strategy               (PND)
 *      7-Nov-1994: Make vaguely portable                   (AB)
+*     13-Jun-1996: Allow _<num>_pf_dbs etc!                (PND)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -42,7 +43,8 @@
       INTEGER CHR_LEN
 *    Local Constants :
 *    Local variables :
-      CHARACTER*20 TMP        ! A small temporary character string
+      CHARACTER*20 TMP1       ! A small temporary character string
+      CHARACTER*20 TMP2       ! A small temporary character string
       CHARACTER*20 LPREFIX    ! Prefix to add to file
       INTEGER
      :  UNDER_POS,            ! Position of underscore in character string
@@ -81,9 +83,17 @@
         ENDIF
 
 *    Set a maximum file counter
-        CALL CHR_FILL( ' ', TMP )
-        TMP = GRP_FILE( UNDER_POS+1:LEN(GRP_FILE) )
-        CALL CHR_CTOI( TMP, MAX_FILE_CNT, STATUS )
+        CALL CHR_FILL( ' ', TMP1 )
+        CALL CHR_FILL( ' ', TMP2 )
+        TMP1 = GRP_FILE( UNDER_POS+1:LEN(GRP_FILE) )
+        UNDER_POS = INDEX( TMP1, '_' )
+        IF ( UNDER_POS .GT. 0 ) THEN
+          TMP2 = TMP1( 1:UNDER_POS-1 )
+        ELSE
+          TMP2 = TMP1
+        ENDIF
+        CALL CHR_CTOI( TMP2, MAX_FILE_CNT, STATUS )
+        IF ( VERBOSE) CALL MSG_OUT( ' ', 'Maximum file counter = '//TMP2(1:CHR_LEN(TMP2)), STATUS )
 
         DO WHILE (.NOT. FILE_EXISTS)
 
@@ -101,9 +111,9 @@
           ENDIF
 
 *       Form a filename
-          CALL CHR_FILL( ' ', TMP )
-          CALL CHR_ITOC( FILE_COUNTER, TMP, CLEN )
-          OBS1_FILE = OBS1_FILE(1:CHR_LEN(OBS1_FILE)) // TMP(1:CLEN)
+          CALL CHR_FILL( ' ', TMP1 )
+          CALL CHR_ITOC( FILE_COUNTER, TMP1, CLEN )
+          OBS1_FILE = OBS1_FILE(1:CHR_LEN(OBS1_FILE)) // TMP1(1:CLEN)
 
 *       Inquire if file exists
           CALL DSA_SEEK_NAMED_STRUCTURE( OBS1_FILE, FILE_EXISTS, STATUS )
