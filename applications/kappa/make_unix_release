@@ -31,6 +31,9 @@
 #  Ensure the sdt grp command is available.
       source $SDT_DIR/startup.csh
 
+#  Ensure the sst prohlp command is available.
+      source /dsbwork/bin/sst/start
+
 #  Store the name of the release directory, and go there.
       set REL_DIR = ${TEMPDIR}/kappa_${SYSTEM}
       cd ${REL_DIR}
@@ -115,7 +118,7 @@
          prohlp in=$ffile out=$hfile
       end
       cat kappa.star-hlp *.help > new.hlp
-      mv new.hlp kappa.hlp
+      mv new.hlp kappa.hlp kappa.star-hlp
       rm *.help
 
 #  Generate the IRAF documentation.
