@@ -1,6 +1,9 @@
 #!/bin/sh -
 # This is not a starconf bootstrap file
 
+# Echo a command then run it, terminating the script if the command fails
+echorun() { echo $*; eval $* || exit 1; }
+
 # If STAR_SUPPRESS_AUTORECONF is true in the environment, then we
 # suppress the call of `autoreconf'.  This is here _only_ so that the top-level
 # bootstrap file can suppress multiple calls of this in bootstrap scripts
