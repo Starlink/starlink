@@ -137,11 +137,11 @@
          CALL CMP_GET0C( LOC, 'WPLATE', WPLATE, STATUS )
 
 *  If the value is "45" or "0", use "45.0" and "0.0"
-         IF( WPLATE .EQ. "0" ) THEN
-            CALL CMP_PUT0C( LOC, 'WPLATE', "0.0", STATUS ) 
+         IF( WPLATE .EQ. '0' ) THEN
+            CALL CMP_PUT0C( LOC, 'WPLATE', '0.0', STATUS ) 
 
-         ELSE IF( WPLATE .EQ. "45" ) THEN
-            CALL CMP_PUT0C( LOC, 'WPLATE', "45.0", STATUS ) 
+         ELSE IF( WPLATE .EQ. '45' ) THEN
+            CALL CMP_PUT0C( LOC, 'WPLATE', '45.0', STATUS ) 
 
 *  Report an error if the WPLATE extension item has an illegal value.
          ELSE IF( WPLATE .NE. '0.0' .AND. WPLATE .NE. '45.0' .AND.
