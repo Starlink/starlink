@@ -14,6 +14,7 @@
 *       1 Jul 93 :v1.7-3 GTR used (RJV)
 *       8 Sep 93 :v1.7-4 RJV
 *       1 Jul 94 :v1.7-5 more intelligent screen clearing (RJV)
+*       3 Sep 98 :v2.2-1 increase max levels to 100 (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -26,16 +27,18 @@
       INTEGER STATUS
 *    Function declarations :
 *    Local constants :
+      INTEGER MAXLEV
+      PARAMETER (MAXLEV=100)
 *    Local variables :
       CHARACTER*20 CONTEXT
-      REAL LEVELS(16)
+      REAL LEVELS(MAXLEV)
       INTEGER NLEV
       LOGICAL ACTIVE
       LOGICAL OFF
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICONTOUR Version 2.2-0')
+      PARAMETER (VERSION = 'ICONTOUR Version 2.2-1')
 *-
       CALL USI_INIT()
 
@@ -62,7 +65,7 @@
           CALL GCB_CANL('CONT_FLAG',STATUS)
         ELSE
 
-          CALL USI_GET1R('LEVELS',16,LEVELS,NLEV,STATUS)
+          CALL USI_GET1R('LEVELS',MAXLEV,LEVELS,NLEV,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
