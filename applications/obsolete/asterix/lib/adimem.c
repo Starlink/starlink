@@ -902,7 +902,7 @@ for( ; j<ADI__MXMTR; j++ )
 }
 #endif
 
-  if ( ADI_G_nbyte )
+/*  if ( ADI_G_nbyte )
     printf( "ADI left %ld bytes in %ld allocations...\n",
-	    ADI_G_nbyte, ADI_G_nalloc );
+	    ADI_G_nbyte, ADI_G_nalloc );*/
   }
