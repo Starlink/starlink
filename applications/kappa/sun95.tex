@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun95.13}
 \newcommand{\stardocnumber}    {95.13}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {7 October 1998}
+\newcommand{\stardocdate}      {12 October 1998}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -7130,6 +7130,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Finds the centroids of star-like features in an NDF.}
 \menuitem{CHPIX}{
  Replaces the values of selected pixels in an NDF.}
+\menuitem{CHAIN}{
+ Concatenates a series of vectorized NDFs.}
 \menuitem{CMULT}{
  Multiplies an NDF by a scalar.}
 \menuitem{COMPADD}{
@@ -7397,6 +7399,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
 \menuitem{QUILT}{
  Generates a mosaic from equally sized 2-d data arrays, optionally specified
  from an ASCII file.}
+\menuitem{RESHAPE}{
+ Reshapes an NDF, treating its arrays as vectors.
 \menuitem{RIFT}{
  Adds a scalar to a section of an NDF data structure to correct rift-valley defects.}
 \menuitem{ROTATE}{
@@ -7816,6 +7820,8 @@ functions as follows.
 %
 \item {\large\bf Configuration change}
 \begin{description}
+\classitem{CHAIN}
+ Concatenates a series of vectorized NDFs.}
 \classitem{FLIP}
  Reverses an NDF's pixels along a specified dimension.
 \classitem{INSPECT}
@@ -7826,6 +7832,8 @@ functions as follows.
  Copies an NDF (or NDF section) to a new location.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
+\classitem{RESHAPE}
+ Reshapes an NDF, treating its arrays as vectors.}
 \classitem{ROTATE}
  Rotates a 2-dimensional NDF about its centre through any angle.
 \classitem{SETBOUND}
@@ -9997,6 +10005,89 @@ default value.
          dimensions for historical reasons.  The 2-dimensional has a tabular layout
          with headings.  Logging awaits a proper table system to make this
          consistent.
+      }
+   }
+}
+
+\sstroutine{
+   CHAIN
+}{
+   Concatenates a series of vectorized NDFs
+}{
+   \sstdescription{
+      This application concatenates a series of NDFs, in the order
+      supplied and treated as vectors, to form a 1-dimensional output
+      NDF.  The dimensions of the NDFs may be different, and indeed so
+      may their dimensionalities.
+   }
+   \sstusage{
+      chain in c1 [c2] [c3] ... [c25] out=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The base NDF after which the other input NDFs will be
+         concatenated.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The one-dimensional NDF resulting from concatenating the input
+         NDFs.
+      }
+      \sstsubsection{
+         C1-C25 = NDF (Read)
+      }{
+         The NDFs to be concatenated to the base NDF.  The NDFs are
+         joined in the order C1, C2, \ldots C25.  There can be no missing
+         NDFs, {\em e.g.}\ in order for C3 to be processed there must be a C2
+         given as well.   A null value ({\tt !}) indicates that there is no
+         NDF.  NDFs C2 to C25 are defaulted to {\tt !}.  At least one NDF
+         must be pasted, therefore C1 may not be null.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF structure.  A null value ({\tt !})
+         propagates the title from the base NDF to the output NDF. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         chain obs1 obs2 out=stream
+      }{
+         This concatenates the NDF called obs2 on to the arrays in the
+         NDF called obs1 to produce the 1-dimensional NDF stream.
+      }
+      \sstexamplesubsection{
+         chain c1=obs2 c2=obs1 in=obs3 out=stream
+      }{
+         This concatenates the NDF called obs2 on to the arrays in the
+         NDF called obs3, and then concatenates the arrays from obs1
+         to them to produce the 1-dimensional NDF stream.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: PASTE, RESHAPE.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+         data structure and propagates all extensions.  Propagation is from
+         the base NDF.  WCS and AXIS information is lost.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+
+         \sstitem
+         Any number of NDF dimensions is supported.
+
       }
    }
 }
@@ -29310,6 +29401,100 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \end{manroutinedescription}
 
 \sstroutine{
+   RESHAPE
+}{
+   Reshapes an NDF, treating its arrays as vectors
+}{
+   \sstdescription{
+      This application reshapes an NDF to create another NDF by copying
+      array values.  The array components in the input NDF are treated
+      as vectors.  Each output array is filled in order with values from
+      the input vector, until it is full or the input vector is
+      exhausted.  Output data and variance pixels not filled are set to
+      the bad value; unfilled quality pixels are set to zero.  The
+      filling is in Fortran order, namely the first dimension, followed
+      by the second dimension,\ldots to the highest dimension.
+
+      It is possible to form a vectorized NDF using parameter VECTORIZE
+      without having to specify the shape.
+   }
+   \sstusage{
+      reshape in out shape=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF to be reshaped.
+      }
+      \sstsubsection{
+         OUT = NDF (Read)
+      }{
+         The NDF after reshaping.
+      }
+      \sstsubsection{
+         SHAPE( ) = \_INTEGER (Read)
+      }{
+         The shape of the output NDF.  For example, {\tt [50,30,20] }would
+         create 50 columns by 30 lines by 20 bands.  It is only
+         accessed when VECTORIZE = FALSE.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF structure.  A null value ({\tt !})
+         propagates the title from the base NDF to the output NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         VECTORIZE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the output NDF is the vectorized form of the input
+         NDF.  If {\tt FALSE}, parameter SHAPE is used to specify the new
+         shape.  {\tt [FALSE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         reshape shear normal shape=[511,512]
+      }{
+         This reshapes the NDF called shear to form NDF normal, whose
+         shape is 511$\times$512 pixels.  One example is where the original
+         image has 512$\times$512 pixels but one pixel was omitted from each
+         line during some data capture, causing the image to be sheared
+         between lines.
+      }
+      \sstexamplesubsection{
+         reshape cube cube1d vectorize
+      }{
+         This vectorizes the NDF called cube to form NDF cube1d.  This
+         could be used for a task that only permits one-dimensional
+         data.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: CHAIN, PASTE, RESHAPE.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+         data structure and propagates all extensions.  WCS and AXIS 
+         information is lost.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+
+         \sstitem
+         Any number of NDF dimensions is supported.
+      }
+   }
+}
+
+\sstroutine{
    RIFT
 }{
    Adds a scalar to a section of an NDF data structure to correct
@@ -37950,6 +38135,9 @@ plotting application.
    \begin{description}
       \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
          \begin{itemize}
+            \item Information describing the co-ordinate Frames available
+                  in the supplied NDF is stored with the DATA picture in 
+                  the AGI graphics database.
             \item Axes are now annotated with values in the current co-ordinate
                   Frame of the supplied NDF.
             \item If the screen is not cleared before plotting a contour
@@ -37990,7 +38178,7 @@ plotting application.
 
       \item [\htmlref{CURSOR}{CURSOR}] \mbox{} 
          \begin{itemize}
-            \item The positions are now reported in a current co-ordinate
+            \item The positions are now reported in the current co-ordinate
                   Frame of the picture (by default). This can be changed
                   using the new parameter FRAME.
 
@@ -38000,8 +38188,8 @@ plotting application.
                   line).
 
             \item There are now more options for marking the positions
-                  on the screen, with detailed control over the appearance
-                  of these graphics being provided through the new STYLE 
+                  on the screen. Detailed control over the appearance
+                  of these graphics is provided through the new STYLE 
                   parameter.
 
             \item Control is now available over the minimum and maximum number 
@@ -38025,6 +38213,10 @@ plotting application.
 
       \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{} 
          \begin{itemize}
+            \item Information describing the co-ordinate Frames available
+                  in the supplied NDF is stored with the DATA picture in 
+                  the AGI graphics database.
+
             \item Axes are now annotated with values in the current co-ordinate
                   Frame of the supplied NDF.
 
@@ -38074,10 +38266,11 @@ plotting application.
                   only 1-d. In this case, the current co-ordinate Frame gives 
                   the position of each pixel within the original 2-d image.
 
-            \item The horizontal axis is now annotated with values in the 
-                  current co-ordinate Frame of the supplied NDF. This can
-                  either be values on one of the Frame axes, or distance 
-                  from the starting point.
+            \item The horizontal axis is now annotated using the 
+                  current co-ordinate Frame of the supplied NDF. A
+                  specific axis within the current Frame may be used,
+                  or alternaively, the distance from the starting point
+                  may be used.
 
             \item There is now much greater control over the appearance
                   of the plot. This is provided through the STYLE
@@ -38099,7 +38292,7 @@ plotting application.
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [MODE] The option of supplying an integer value
+                  \item [MODE] The option of supplying an integer marker type
                                has been removed (replaced by parameter MARKER).
                                Options ``Mark'' and ``Chain'' have been added.
                   \item [YLOG] Logarithmic data values are now
@@ -38134,7 +38327,7 @@ plotting application.
 
             \item No parameters have been removed.
 
-            \item The following new parameters have been added: SIZE
+            \item The following new parameter has been added: SIZE
          
             \item No parameters have been modified.
 
@@ -38144,18 +38337,23 @@ plotting application.
 
 \subsection{New applications}
 \begin{description}
+   \item [\htmlref{CHAIN}{CHAIN}] Concatenates a series of NDFs, in the order
+         supplied and treated as vectors, to form a 1-dimensional output
+         NDF.  The dimensions of the NDFs may be different, and indeed so
+         may their dimensionalities.
+
    \item [\htmlref{LISTMAKE}{LISTMAKE}] Creates a text file holding a
-         \emph{positions list}. These are used to communicate positions,
-         together with associated WCS information, between applications. 
+         \emph{positions list}. These are used to communicate positions
+         between applications, together with associated WCS information.
          In addition to numerical axis values, they also contain an
          integer identifier for each position, and comments describing the
          available co-ordinate Frames. The positions are supplied by the
          user in a file or in response to parameter prompts. 
 
-   \item [\htmlref{LISTSHOW}{LISTSHOW}] This shows the positions
+   \item [\htmlref{LISTSHOW}{LISTSHOW}] Shows the positions
          contained within a \emph{positions list} text file, in any 
          of the co-ordinate Frames described within the file. It can also
-         extract a subset of a positions list and write it to a new
+         extract a subset of the positions and write it to a new
          positions list. The positions are displayed on the screen, and
          can also be marker on the current graphics device in a variety
          of ways.
@@ -38164,11 +38362,17 @@ plotting application.
          containing a profile through an N-dimensional NDF, retaining the
          current co-ordinate Frame of the n-dimensional NDF. The data
          values in the output NDF are samples taken along a specified
-         1-dimensional curve in the input NDF. 
+         1-dimensional curve through the input NDF. 
     
+   \item [\htmlref{RESHAPE}{RESHAPE}] This application reshapes an NDF to 
+         create another NDF by copying array values.  The array components 
+         in the input NDF are treated as vectors.  Each output array is 
+         filled in order with values from the input vector, until it is 
+         full or the input vector is exhausted.  
+
    \item [\htmlref{WCSADD}{WCSADD}] Allows a new co-ordinate Frame to be
          added into the WCS component of an NDF. The new Frame must be
-         related linearly to an existing Frame.
+         linearly related to an existing Frame.
 
    \item [\htmlref{WCSALIGN}{WCSALIGN}] Resamples a group of
          2-dimensional NDFs in order to align them with a specified
@@ -38521,6 +38725,8 @@ functions as follows.
 %
 \item {\large\bf Configuration change}
 \begin{description}
+\classitem{CHAIN}
+ Concatenates a series of vectorized NDFs.}
 \classitem{FLIP}
  Reverses an NDF's pixels along a specified dimension.
 \classitem{INSPECT}
@@ -38531,6 +38737,8 @@ functions as follows.
  Copies an NDF (or NDF section) to a new location.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
+\classitem{RESHAPE}
+ Reshapes an NDF, treating its arrays as vectors.}
 \classitem{ROTATE}
  Rotates a 2-dimensional NDF about its centre through any angle.
 \classitem{SETBOUND}
