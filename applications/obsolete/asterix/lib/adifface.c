@@ -137,6 +137,7 @@
 *       adi_fclose	 - Close a file system object
 *       adi_fcomit	 - Commit buffered file changes to disk
 *       adi_fcreat	 - Create a new file system object
+*       adi_flink	 - Make link between existing object and name class
 *       adi_fopen	 - Open existing file system object
 *	adi_setlnk	 - Set ADI link field for ADIbase derived class pairs
 *
@@ -2451,6 +2452,22 @@ F77_SUBROUTINE(adifn(fcreat))( CHARACTER(fspec), INTEGER(id),
   adix_fcreat( fspec, fspec_length, (ADIobj) *id, (ADIobj *) fid, status );
 
   _ERR_REP( "ADI_FCREAT", Estr__CreFilObj );
+  }
+
+F77_SUBROUTINE(adifn(flink))( INTEGER(fid), CHARACTER(cls),
+			      INTEGER(id), INTEGER(status) TRAIL(cls) )
+  {
+  GENPTR_INTEGER(fid)
+  GENPTR_CHARACTER(cls)
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;				/* Check initialised and ok */
+
+/* Invoke kernel routine */
+  *id = adix_link_efile( fid, cls, cls_length, status );
+
+  _ERR_REP( "ADI_FOPEN", Estr__LnkFilObj );
   }
 
 F77_SUBROUTINE(adifn(fopen))( CHARACTER(fspec), CHARACTER(cls),

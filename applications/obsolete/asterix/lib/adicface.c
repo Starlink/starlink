@@ -139,6 +139,7 @@
 *       adic_fclose      - Close a file system object
 *       adic_fcomit      - Comit any buffered file changes to disk
 *       adic_fcreat      - Create a new file system object
+*       adic_flink       - Make link between named class object and object
 *       adic_fopen       - Open existing file system object
 *       adic_setlnk      - Link two objects
 
@@ -1763,6 +1764,15 @@ void adic_fcreat( char *fspec, ADIobj id, ADIobj *fid,
   adix_fcreat( fspec, _CSM, id, fid, status );
 
   _ERR_REP( "adic_fcreat", Estr__CreFilObj );
+  }
+
+void adic_flink( ADIobj fid, char *cls, ADIobj *id, ADIstatus status )
+  {
+  _chk_stat;
+
+  *id = adix_link_efile( fid, cls, _CSM, status );
+
+  _ERR_REP( "adic_flink", Estr__LnkFilObj );
   }
 
 void adic_fopen( char *fspec, char *cls, char *mode, ADIobj *id,
