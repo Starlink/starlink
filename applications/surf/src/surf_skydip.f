@@ -128,6 +128,10 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.25  1998/01/15 01:59:33  timj
+*     Check for aborted skydips.
+*     Always write the fit parameters (even when status is bad)
+*
 *     Revision 1.24  1998/01/12 21:01:43  timj
 *     Add output parameters and update header to reflect change.
 *
@@ -256,6 +260,7 @@ c
       PARAMETER (TSKNAME = 'SKYDIP')
 
 *    Local variables :
+      LOGICAL ABORTED                   ! Was the observation aborted
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
       REAL    AIRMASS(SCUBA__MAX_MEAS)  ! Array of AIRMASS data
       REAL    AIRMASST(SCUBA__MAX_MEAS)  ! First Array of AIRMASS data
@@ -274,6 +279,12 @@ c
       REAL    B                         ! requested B
       LOGICAL BADPIX                    ! are there bad pixels
       REAL    B_FIT                     ! B parameter
+      INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! A/D numbers of bolometers measured in
+                                        ! input file
+      INTEGER BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! channel numbers of bolometers
+                                        ! measured in input file
       CHARACTER*20 BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! bolometer types
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
@@ -304,24 +315,23 @@ c
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
+      INTEGER GOOD                      ! dummy status for PAR_PUT/GOODFIT
       INTEGER I                         ! DO loop index
       INTEGER IERR                      ! For VEC_
       INTEGER ITEMP                     ! scratch integer
-      INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! A/D numbers of bolometers measured in
-                                        ! input file
-      INTEGER BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! channel numbers of bolometers
-                                        ! measured in input file
       BYTE    IN_BADBIT                 ! input Bad bit mask
       INTEGER IN_DEM_PNTR_PTR           ! pointer to input .SCUBA.DEM_PNTR array
       INTEGER IN_DATA_PTR               ! pointer to data array of input file
       INTEGER IN_NDF                    ! NDF identifier of input file
-      INTEGER IN_QUAL_PTR            ! pointer to qual array of input file
-      REAL    JSKY (SCUBA__MAX_MEAS)     ! Average SKY data for used SUB-INS
-      REAL    JSKY_VAR (SCUBA__MAX_MEAS) ! Variance of JSKY
+      INTEGER IN_QUAL_PTR               ! pointer to qual array of input file
+      REAL    JSKY (SCUBA__MAX_MEAS)    ! Average SKY data for used SUB-INS
+      REAL    JSKY_VAR (SCUBA__MAX_MEAS)! Variance of JSKY
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
       CHARACTER * 15 LABEL              ! File label
+      INTEGER      LAST_INT             ! the last integration number in
+                                        ! an aborted observation
+      INTEGER      LAST_MEAS            ! the last measurement number in
+                                        ! an aborted observation
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
       DOUBLE PRECISION MEAN             ! Mean of measurement
@@ -357,6 +367,9 @@ c
       INTEGER SLICE_PTR                 ! Pointer to start of slice
       INTEGER SLICE_PTR_END             ! Pointer to end of slice
       CHARACTER*80 STEMP                ! scratch string
+      CHARACTER*80 STATE                ! string describing the 'state'
+                                        ! of SCUCD when the observation
+                                        ! finished
       REAL    START_EL                  ! Start elevation of skydip
       CHARACTER * 15 SUB_INST           ! Name of selected SUB instrument
       INTEGER SUB_POINTER               ! index of SUB_REQUIRED in sub-
@@ -505,6 +518,9 @@ c
       CALL SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, 'SUB_INSTRUMENT',
      :     N_SUB, SUB_POINTER, WAVE, SUB_INST, FILT, STATUS)
 
+*     Store the wavelength
+      CALL PAR_PUT0R('WAVELENGTH', WAVE, STATUS)
+
 * Add _DC suffix to data
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -645,14 +661,52 @@ c
          END IF
       END IF
 
+*     see if the observation completed normally or was aborted
+ 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
+     :  STATE, STATUS)
+      CALL CHR_UCASE (STATE)
+      ABORTED = .FALSE.
+      IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
+         ABORTED = .TRUE.
+      END IF
+
+
 *     Report general information about the SKYDIP
 
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
       CALL MSG_SETC ('PKG', PACKAGE)
+
+      IF (.NOT. ABORTED) THEN
       
-      CALL MSG_OUTIF (MSG__NORM, ' ', '^PKG: file contains data for '//
-     :  '^N_I integration(s) in ^N_M measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', '^PKG: file contains data '//
+     :        'for ^N_I integration(s) in ^N_M measurement(s)', STATUS)
+
+
+      ELSE
+
+*  get the exposure, integration, measurement numbers at which the 
+*  abort occurred
+ 
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'INT_NO', LAST_INT, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MEAS_NO', LAST_MEAS, STATUS)
+ 
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: the observation should have '//
+     :        'contained data for ^N_I '//
+     :        'integration(s) in ^N_M measurement(s)', STATUS)
+         CALL MSG_SETI ('N_I', LAST_INT)
+         CALL MSG_SETI ('N_M', LAST_MEAS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        ' - However, the observation was '//
+     :        'ABORTED during integration ^N_I '//
+     :        'of measurement ^N_M', STATUS)
+
+
+      END IF
 
 * Read in the elevation data from the FITS header
 * Read from START and END EL first
@@ -882,6 +936,16 @@ c
       CALL DAT_ANNUL(IN_SCUBAX_LOC, STATUS)
       CALL NDF_ANNUL (IN_NDF, STATUS)
 
+*     If NKEPT is zero then we may as well set status to bad since
+*     we arent going to make any progress
+
+      IF (NKEPT .EQ. 0 .AND. STATUS .EQ. SAI__OK) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC('PKG',PACKAGE)
+         CALL ERR_REP(' ','^PKG: All data are bad. No fit possible',
+     :        STATUS)
+      END IF
+
 *     Get the temperatures from the FITS extension
 
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'T_AMB',
@@ -926,6 +990,12 @@ c
 
 *     Send to fit skydip
 
+      FITFAIL = .TRUE.
+      B_FIT = VAL__BADR
+      TAUZ_FIT = VAL__BADR
+      REXISQ = VAL__BADR
+      ETA_TEL_FIT = VAL__BADR
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FIT_SKYDIP (CVAR, NKEPT, AIRMASS, JSKY,JSKY_VAR,
      :        WAVE, SUB_INST, FILT, T_TEL, T_AMB, ETA_TEL,B,ETA_TEL_FIT,
@@ -941,14 +1011,20 @@ c
          ENDIF
       END IF
 
-*     Store the fit parameters
+*     Store the fit parameters even if status was bad before the fit
+*     (In which case the parameters are bad)
+*     Want to make sure that the GOODFIT parameter is set to false if
+*     we have had any problems at all. Just make sure it is written
+*     with a good status
       
-      CALL PAR_PUT0L('GOODFIT', .NOT.FITFAIL, STATUS)
-      CALL PAR_PUT0R('TAUZ_FIT', TAUZ_FIT, STATUS)
-      CALL PAR_PUT0R('B_FIT', B_FIT, STATUS)
-      CALL PAR_PUT0R('ETA_TEL_FIT', ETA_TEL_FIT, STATUS)
-      CALL PAR_PUT0R('XISQ', REXISQ, STATUS)
-      CALL PAR_PUT0R('WAVELENGTH', WAVE, STATUS)
+      GOOD = SAI__OK
+      CALL PAR_PUT0L('GOODFIT', .NOT.FITFAIL, GOOD)
+      CALL PAR_PUT0R('TAUZ_FIT', TAUZ_FIT, GOOD)
+      CALL PAR_PUT0R('B_FIT', B_FIT, GOOD)
+      CALL PAR_PUT0R('ETA_TEL_FIT', ETA_TEL_FIT, GOOD)
+      CALL PAR_PUT0R('XISQ', REXISQ, GOOD)
+
+
 
 *     Now create output files
 *     Only create model if we fitted okay
