@@ -307,6 +307,9 @@ c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
 *    Flag to use all spectra
 	IF (SPECSET(1)) DETNO(1) = 0
 
+*    No scaling to be applied
+        DATASET_SCALE(NDSC) = 1.0
+
       ELSE
 
 *    User has supplied a file set
@@ -317,6 +320,9 @@ c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
 
 *      Open the referenced file
           CALL FSI_FOPEN( ID, I, 'BinDS', DCFID(I), STATUS )
+
+*      Find and apply any scaling
+          CALL FSI_GETSCL( ID, I, DATASET_SCALE(I), STATUS )
 
 *      Is it a spectral set?
 	  CALL SPEC_SETSRCH( DCFID(I), SPECSET(I), STATUS )
@@ -366,6 +372,8 @@ c DCFID(I)
             CALL MSG_SETI( 'N', N )
             CALL MSG_PRNT( 'Dataset ^N :-' )
             CALL MSG_PRNT( '      File : '//FILE(:I) )
+            CALL MSG_SETR( 'SCAL', DATASET_SCALE(N) )
+            CALL MSG_PRNT( '      Scaling : ^SCAL' )
           END IF
         END IF
 	IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
