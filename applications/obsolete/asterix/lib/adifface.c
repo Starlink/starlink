@@ -361,7 +361,7 @@ F77_SUBROUTINE(adifn(clone))( INTEGER(id), INTEGER(cid), INTEGER(status) )
 
   _ERR_IN("ADI_CLONE");			/* Mark routine for error reporting */
 
-  *((ADIobj *) &cid) = adix_clone( (ADIobj) id,
+  *((ADIobj *) cid) = adix_clone( (ADIobj) id,
 	status );
   _ERR_OUT;
   }
@@ -1791,7 +1791,7 @@ F77_SUBROUTINE(adifn(find))( INTEGER(id), CHARACTER(name),
 
   _ERR_IN("ADI_FIND");		/* Mark routine for error reporting */
 
-  *((ADIobj *) &cid) = adix_find( (ADIobj) *id, name,
+  *((ADIobj *) cid) = adix_find( (ADIobj) *id, name,
 		      name_length, status );
 
   _ERR_OUT;

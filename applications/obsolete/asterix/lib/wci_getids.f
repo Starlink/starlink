@@ -136,9 +136,6 @@
 *  If ok, extract results
       IF ( (STATUS .EQ. SAI__OK) .AND. (RESID.NE.ADI__NULLID) ) THEN
 
-*    Store the returned object on the property list of the object
-        CALL ADI_CPUTID( ID, '.WCS', RESID, STATUS )
-
 *    Locate sub-components for callee
         CALL ADI_THERE( RESID, 'Pix', THERE, STATUS )
         IF ( THERE ) THEN
@@ -152,6 +149,9 @@
         IF ( THERE ) THEN
           CALL ADI_FIND( RESID, 'Sys', SYSID, STATUS )
         END IF
+
+*    Store the returned object on the property list of the object
+        CALL ADI_CPUTID( ID, '.WCS', RESID, STATUS )
 
       END IF
 
