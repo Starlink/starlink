@@ -111,7 +111,8 @@
 
 *  Set the heap size
       FSTAT = 0
-      CALL FTPTHP( LUN, NBYTES, FSTAT )
+      CALL FTMKYJ( LUN, 'PCOUNT', NBYTES, '&', FSTAT )
+      CALL FTRDEF( LUN, FSTAT )
       IF ( FSTAT .NE. 0 ) CALL ADI2_FITERP( FSTAT, STATUS )
 
 *  Flag HDU as defined and release it
