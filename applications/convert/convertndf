@@ -1,0 +1,343 @@
+
+#+ The preceding line must be blank
+#  Name:
+#     convertndf
+#
+#  Purpose:
+#     Run the CONVERT default conversion commands for the NDF on-the-fly
+#     conversion system.
+#
+#  Type of Module:
+#     Bourne-shell script
+#
+#  Invocation:
+#     convertndf from/to fmt dir name type ndf
+#
+#  Arguments 
+#     from/to - from or to the foreign format.
+#
+#     fmt - The foreign format name.
+#
+#     dir - The directory component of the foreign format filepath.
+#
+#     name - The file basename (without extension).
+#
+#     type - The file extension.
+#
+#     ndf - The NDF name.
+#
+#  Description:
+#     The appropriate conversion utility is invoked with suitable
+#     parameters.  For standard Starlink utilities stdin is redirected
+#     to /dev/null so any attempt to prompt will cause the application
+#     to stop.  Output is piped through sed to replace !! with ! at the
+#     start of messages.  It is then piped through awk (using the
+#     program file convertawk) which will display any error messages
+#     (starting with !) and discard any others.  A suitable first error
+#     message (starting with !!) is added if any other error messages
+#     are found.
+#
+#     For ADAM tasks, the ICL_TASK_NAME variable must be unset to ensure
+#     that the system will run correctly from ICL etc.
+#
+#     For TEXT and UNF0 in, the appropriate NDF_FROM_fmt_PARS environment
+#     variable is checked as it must contain a SHAPE parameter.
+#
+#     A slightly different method of checking for failure is used for the 
+#     COMPRESS format.
+#
+#  Authors:
+#     AJC: A.J.Chipperfield (STARLINK)
+#     {enter_new_authors_here}
+#
+#  History:
+#     1995 October 30 (AJC):
+#        Original version
+#     1995 November 30 (AJC):
+#        Added TIFF and GIF
+#     {enter_further_changes_here}
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+#-
+#  Define format conversion commands.
+#  =================================
+
+#  Ensure that ADAM tasks think they are running from the shell
+unset ICL_TASK_NAME
+export ICL_TASK_NAME
+
+#  Now select the required command according to the format
+case $2 in
+
+FITS)
+#  FITS conversions.
+#  ----------------
+   case $1 in
+   from)
+      appl=FITSDIN
+      $KAPPA_DIR/fitsdin files=$3$4$5 out=$6 FMTCNV=F $NDF_FROM_FITS_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2FITS
+      $CONVERT_DIR/ndf2fits in=$6 out=$3$4$5 $NDF_TO_FITS_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;;
+   esac
+   ;;
+
+FIGARO)
+#  FIGARO conversions.
+#  ------------------
+   case $1 in
+   from)
+      appl=DST2NDF
+      $CONVERT_DIR/dst2ndf in=$3$4 out=$6 $NDF_FROM_FIGARO_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2DST
+      $CONVERT_DIR/ndf2dst in=$6 out=$3$4 \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;;
+   esac
+   ;;
+
+IRAF)
+#  IRAF conversions:
+#  ----------------
+   case $1 in
+   from)
+      appl=IRAF2NDF
+      $CONVERT_DIR/iraf2ndf in=$3$4 out=$6 \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2IRAF
+      $CONVERT_DIR/ndf2iraf in=$6 out=$3$4 fillbad=0 $NDF_TO_IRAF_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;;
+   esac
+   ;;
+
+GASP)
+#  GASP conversions:
+#  ----------------
+   case $1 in
+   from)
+      appl=GASP2NDF
+      $CONVERT_DIR/gasp2ndf in=$3$4 out=$6 $NDF_FROM_GASP_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2GASP
+      $CONVERT_DIR/ndf2gasp in=$6 out=$3$4 fillbad=0 $NDF_TO_GASP_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+
+UNFORMATTED)
+#  UNFORMATTED conversions (with FITS headers). 
+#  ------------------------------------------- 
+   case $1 in
+   from)
+      appl=UNF2NDF
+      $CONVERT_DIR/unf2ndf fits=t in=$3$4$5 out=$6 noperec=! \
+      $NDF_FROM_UNFORMATTED_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2UNF
+      $CONVERT_DIR/ndf2unf fits=t in=$6 out=$3$4$5 $NDF_TO_UNFORMATTED_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+
+UNF0) 
+#  UNF0 conversions (no FITS headers). 
+#  ---------------------------------- 
+   case $1 in
+   from)
+      appl=UNF2NDF
+      echo "$NDF_FROM_UNF0_PARS" | grep -i 'shape *=' >/dev/null || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        D=`echo $1 | tr '[a-z]' '[A-Z]'`
+        echo "!  You must set the SHAPE parameter for $appl"
+        echo "!  in environment variable NDF_FROM_$2_PARS"
+        echo "!  ** Returning to main application"
+        echo ""
+        exit 1
+       ) || exit 1
+      $CONVERT_DIR/unf2ndf fits=f in=$3$4$5 out=$6 noperec=! \
+      $NDF_FROM_UNF0_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2UNF
+      $CONVERT_DIR/ndf2unf fits=f in=$6 out=$3$4$5 $NDF_TO_UNF0_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+
+ASCII) 
+#  ASCII conversions (with FITS headers). 
+#  ------------------------------------- 
+   case $1 in
+   from)
+      appl=ASCII2NDF
+      $CONVERT_DIR/ascii2ndf fits=t in=$3$4$5 out=$6 $NDF_FROM_ASCII_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2ASCII
+      $CONVERT_DIR/ndf2ascii fits=t in=$6 out=$3$4$5 reclen=80 \
+      $NDF_TO_ASCII_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+
+TEXT) 
+#  TEXT conversions (like ASCII but without FITS headers). 
+#  ------------------------------------------------------ 
+   case $1 in
+   from)
+      appl=ASCII2NDF
+      echo "$NDF_FROM_TEXT_PARS" | grep -i 'shape *=' >/dev/null || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        D=`echo $1 | tr '[a-z]' '[A-Z]'`
+        echo "!  You must set the SHAPE parameter for $appl"
+        echo "!  in environment variable NDF_FROM_$2_PARS"
+        echo "!  ** Returning to main application"
+        echo ""
+        exit 1
+       ) || exit 1
+      $CONVERT_DIR/ascii2ndf in=$3$4$5 out=$6 $NDF_FROM_TEXT_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2ASCII
+      $CONVERT_DIR/ndf2ascii fits=f in=$6 out=$3$4$5 reclen=80 \
+      $NDF_TO_ASCII_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+      
+GIF)
+#  GIF conversions.
+#  -----------------
+   case $1 in
+   from)
+      appl=GIF2NDF
+      $CONVERT_DIR/gif2ndf $3$4 $6 \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2GIF
+      $CONVERT_DIR/ndf2gif $6 $3$4 \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+      
+TIFF)
+#  TIFF conversions.
+#  -----------------
+   case $1 in
+   from)
+      appl=TIFF2NDF
+      $CONVERT_DIR/tiff2ndf $3$4 $6 \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2TIFF
+      $CONVERT_DIR/ndf2tiff $6 $3$4 \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+
+COMPRESSED) 
+#  COMPRESSED conversions. 
+#  ---------------------- 
+#  N.B. These commands sometimes return an error status to the calling 
+#  process, even when they appear to have worked OK.  It's not clear why. 
+   case $1 in
+   from)
+      appl=uncompress
+      uncompress -c -f $3$4$5 >$6.sdf 2>Z_err_$4.lis || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        sed 's/^/!  /' Z_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f Z_err_$4.lis $6.sdf
+        exit 1
+       )
+      rm -f Z_err_$4.lis
+      ;;
+   to)
+      appl=compress
+      compress -c -f $6.sdf >$3$4$5 || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        sed 's/^/!  /' Z_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f Z_err_reports.lis $6.sdf
+        exit 1
+       )
+      rm -f Z_err_reports.lis
+
+      ;;
+   esac
+   ;;
+esac
