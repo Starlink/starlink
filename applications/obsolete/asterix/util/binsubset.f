@@ -586,6 +586,8 @@
 
       INTEGER			AXPTR			! Ptr to axis values
       INTEGER                	I                  	! loop variable
+
+      LOGICAL			OK			! Axis data there?
 *-
 
 *  Status check
@@ -610,7 +612,7 @@
             CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
 
           ELSE
-            AXUNIT(I) = 'pixels'
+            AXUNT(I) = 'pixels'
             AXLO(I) = 1.0
             AXHI(I) = DIMS(I)
           CALL MSG_SETI( 'NA', I )
