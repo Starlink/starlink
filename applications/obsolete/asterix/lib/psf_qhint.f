@@ -1,5 +1,5 @@
 *+  PSF_QHINT - Ask for hints about psf properties
-      SUBROUTINE PSF_QHINT( SLOT, HINT, OK, DATA, STATUS )
+      SUBROUTINE PSF_QHINT( PSID, HINT, OK, DATA, STATUS )
 *
 *    Description :
 *
@@ -30,15 +30,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! The PSF id
+      INTEGER                  PSID                    ! The PSF id
       CHARACTER*(*)            HINT		       ! Hint name
 *
 *    Export :
@@ -59,10 +54,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Routine exists?
-      CALL PSF0_FNDRTN( P_PSID(SLOT), 'Hint', OK, RTNPTR, STATUS )
+      CALL PSF0_FNDRTN( PSID, 'Hint', OK, RTNPTR, STATUS )
       IF ( OK ) THEN
-        CALL PSF_QHINT_EXEC( %VAL(RTNPTR), P_PSID(SLOT), HINT,
-     :                       DATA, STATUS )
+        CALL PSF_QHINT_EXEC( %VAL(RTNPTR), PSID, HINT, DATA, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           OK = .TRUE.
         ELSE

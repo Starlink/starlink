@@ -88,6 +88,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PKG'
+      INCLUDE 'PSF_PAR'
 
 *  Arguments Given:
       INTEGER			FID

@@ -1,5 +1,5 @@
 *+  PSF_DEFB - Define time and energy band for a psf by BIN number
-      SUBROUTINE PSF_DEFB( SLOT, ALOWT, AHIGHT, ALOWE, AHIGHE, USERIN,
+      SUBROUTINE PSF_DEFB( PSID, ALOWT, AHIGHT, ALOWE, AHIGHE, USERIN,
      :                                               USEROUT, STATUS )
 *
 *    Description :
@@ -29,16 +29,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT                    	! The PSF to use
+      INTEGER                  PSID                    	! The PSF to use
       DOUBLE PRECISION         ALOWT, AHIGHT            ! Time band
       INTEGER                  ALOWE, AHIGHE            ! Energy band
       INTEGER                  USERIN                  	! User extras in
@@ -63,14 +57,16 @@
       INTEGER                  LOWE, HIGHE             	! Energy band
       INTEGER                  X_AX, Y_AX, E_AX, T_AX	! Axis identifiers
 
+      LOGICAL			EVDS			! Dataset is an EventDS
       LOGICAL                  REG			! Regular axis?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Check that this is an event dataset
-      IF ( P_EVDS(SLOT) ) THEN
+*  Is this psf attached to an event dataset?
+      CALL ADI_CGET0L( PSID, 'IsEventDS', EVDS, STATUS )
+      IF ( EVDS ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Cannot define time and/or energy bands by'/
      :                     /'bin number for event dataset', STATUS )
@@ -78,11 +74,11 @@
       END IF
 
 *    Get the defined axes for this psf
-      CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
+      CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *    Time axis defined?
       IF ( T_AX .GT. 0 ) THEN
-        CALL PSF1_GETAXVAL( P_INST(SLOT), T_AX, DIM, REG, APTR, BASE,
+        CALL PSF1_GETAXVAL( PSID, T_AX, DIM, REG, APTR, BASE,
      :                      SCALE, TOR, STATUS )
         IF ( REG ) THEN
           LOWT = BASE + (ALOWT-1)*SCALE
@@ -100,7 +96,7 @@
 
 *    Energy axis defined?
       IF ( E_AX .GT. 0 ) THEN
-        CALL PSF1_GETAXVAL( P_INST(SLOT), E_AX, DIM, REG, APTR, BASE,
+        CALL PSF1_GETAXVAL( PSID, E_AX, DIM, REG, APTR, BASE,
      :                      SCALE, TOR, STATUS )
         IF ( REG ) THEN
           LOWE = BASE + (ALOWE-1)*SCALE
@@ -116,11 +112,11 @@
         HIGHE = 0
       END IF
 
-*    Is a definition routine ddefined?
-      CALL PSF_DEF( SLOT, LOWT, HIGHT, LOWE, HIGHE, USERIN, USEROUT,
+*  Is a definition routine ddefined?
+      CALL PSF_DEF( PSID, LOWT, HIGHT, LOWE, HIGHE, USERIN, USEROUT,
      :              STATUS )
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_DEFB', STATUS )
       END IF
