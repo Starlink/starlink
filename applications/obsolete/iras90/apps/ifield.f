@@ -309,7 +309,7 @@ c  If known, then add the fact thas this corner lies on the plate
               ENDIF
             ENDDO
 
-            IF (KNOWN .EQ. .FALSE.) THEN
+            IF (.NOT. KNOWN ) THEN
 c  Otherwise, add this plate the the list of known plates
               TOTPLT = TOTPLT + 1            ! Increment the number of plates
               FINPLT(TOTPLT) = PLATE(J)
@@ -365,7 +365,7 @@ c  and if different, in the input coordinate system
 
 
 c  If a logfile is wanted, then write all this to the logfile as well
-      IF (LOG .EQ. .TRUE. .AND. OPEN .EQ. .TRUE.) THEN
+      IF (LOG .AND. OPEN) THEN
 
       CALL FIO_WRITE( FD, ' ', STATUS)
 
@@ -469,7 +469,7 @@ c  originally input in
 
 c  Build the reject string
         CALL CHR_FILL(' ', FREJ)
-        IF (REJECT .EQ. .TRUE.) THEN
+        IF (REJECT) THEN
           LENGTH = 0
           CALL CHR_APPND('REJECT', FREJ, LENGTH)
         ENDIF
@@ -494,7 +494,7 @@ c  Output all the information for this plate
 
 
 c  Write it to the logfile if a logfile is open
-        IF (LOG .EQ. .TRUE. .AND. OPEN .EQ. .TRUE.) THEN
+        IF (LOG .AND. OPEN ) THEN
           CALL FIO_WRITE(FD, LINE, STATUS)
         ENDIF
 
@@ -504,7 +504,7 @@ c  Write it to the logfile if a logfile is open
       CALL MSG_OUT(' ','============================================'
      *    // '===========================', STATUS)
 
-      IF (LOG .EQ. .TRUE. .AND. OPEN .EQ. .TRUE.) THEN
+      IF (LOG .AND. OPEN ) THEN
         CALL FIO_WRITE(FD, ' ', STATUS)
         CALL FIO_WRITE(FD, '========================================'
      *    // '===============================', STATUS)
@@ -517,7 +517,7 @@ c  See if the user wants to input another position
       ENDDO
 
 c  If a logfile was requested and opened correctly the close the file again
-      IF (LOG .EQ. .TRUE. .AND. OPEN .EQ. .TRUE.) THEN
+      IF (LOG .AND. OPEN) THEN
         CALL FIO_CLOSE(FD, STATUS)
       ENDIF
 

@@ -287,7 +287,7 @@ c  If the offset at this row is set, this check if this is a valid plate
           IF (OFFSET(I,J) .NE. -1) THEN
             CALL IFLDZ3(CNTRA(I,J), CNTDEC(I), RA, DEC, 
      +                  INSIDE, STATUS)
-            IF (INSIDE .EQ. .TRUE.) THEN
+            IF (INSIDE) THEN
               NUMPLT = NUMPLT + 1
               PLATE(NUMPLT) = STAROW(ROW(I)) + OFFSET(I,J)
               CRA(NUMPLT) = CNTRA(I,J)
