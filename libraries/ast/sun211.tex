@@ -587,8 +587,8 @@ and \htmlref{ZoomMap}{ZoomMap}).
 \item Lookup tables (the \htmlref{LutMap}{LutMap}).
 
 \item General-purpose transformations expressed using arithmetic
-operations and function invocations similar to those available in C
-(the \htmlref{MathMap}{MathMap}).
+operations and functions similar to those available in C (the
+\htmlref{MathMap}{MathMap}).
 
 \item Transformations for internal use within a program, based on
 private transformation functions which you write yourself in C (the
@@ -24376,6 +24376,11 @@ occurred in the AST library between versions V1.3 and V1.4 (the
 current version):
 
 \begin{enumerate}
+\item A new \htmlref{MathMap}{MathMap} class has been introduced. This is a form of
+\htmlref{Mapping}{Mapping} that allows you to define coordinate transformations in a
+flexible and transportable way using arithmetic operations and
+mathematical functions similar to those available in C.
+
 \item {\bf{WARNING---INCOMPATIBLE CHANGE.}} Transformation functions
 used with the \htmlref{IntraMap}{IntraMap} class (see, for example, \htmlref{astIntraReg}{astIntraReg}) now
 require a ``this'' pointer as their first parameter. {\bf{Existing
@@ -24390,11 +24395,6 @@ access to IntraMap attributes.
 class. This allows the transformation functions used by IntraMaps to
 adapt to produce the required transformation on a per-IntraMap basis
 (\secref{ss:intraflag}).
-
-\item A new \htmlref{MathMap}{MathMap} class has been introduced. This is a form of
-\htmlref{Mapping}{Mapping} that allows you to define coordinate transformations in a
-flexible and transportable way using arithmetic operations and
-mathematical functions similar to those provided in C.
 
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
