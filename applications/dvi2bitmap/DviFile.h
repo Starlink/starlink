@@ -92,6 +92,10 @@ public:
      */
     enum DviUnits {
 	/**
+	 * An invalid unit.
+	 */
+	unit_BAD,
+	/**
 	 * Traditional printer's point.  There are 72.27pt in 1in.
 	 */
 	unit_pt,
@@ -155,6 +159,8 @@ public:
 	 */
 	unit_dvi,
     };
+    static DviUnits unitType(string unitString);
+    static string unitString(DviUnits unit);
     /**
      * Obtains the current horizontal position.  The position can be
      * reported in any of {@link #unit_pixels}, {@link #unit_dvi} or
