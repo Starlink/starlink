@@ -23,6 +23,8 @@
 #        Added REDUCED parameter.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     21-FEB-2001 (MBT):
+#        Added CONTAINER parameter.
 #     {enter_changes_here}
 
 #-
@@ -83,6 +85,15 @@
             vpath PROMPT
             ppath CURRENT DEFAULT
             prompt {Reduced data, or unreduced with bias and flats?}
+            default FALSE
+          }
+
+         parameter container {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Write NDFs into HDS container files?}
             default FALSE
           }
 
