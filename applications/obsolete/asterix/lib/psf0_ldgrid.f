@@ -217,7 +217,7 @@
           CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
 *      Scale the radii
-          CALL ARR_MULTR( TOR, DIMS(3), %VAL(RPTR) )
+          CALL ARR_MULTR( TOR, DIMS(3), %VAL(RPTR), STATUS )
 
 *    Rectangular grid
         ELSE
