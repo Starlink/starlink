@@ -65,15 +65,23 @@ SGMLDECL starlink.decl
 DELEGATE "-//Starlink" CATALOG.starlink
 --
 
-	-- Include here a public-id for the Starlink
-	   declaration, so it can be referred to from within the
-	   stylesheets.
+	-- Include here a public-id for the Starlink and XML
+           declarations, so they can be referred to from within the
+           stylesheets.
 
-	   I _think_ that a public text class of `SYNTAX' is correct here,
-	   as described in 8879 clause 10.2.2.1, and clause 13, but I'm not
-	   convinced.
+	   Use a public text class of `TEXT', since none of the public
+	   text classes of 10.2.2.1 match.  `SYNTAX' isn't correct,
+	   since that refers to a specific part of the declaration,
+	   and `SD', as described in Annex K.3.1, in the Web SGML
+	   adaptations (ISO 8879 TC2), isn't correct either, since
+	   that refers to the `SGML declaration body', rather than the
+	   declaration itself.  In any case, the need for this
+	   declaration is so that it can be prepended to documents in
+	   auxiliary parses (within DSSSL), in which context it is
+	   treated as an ordinary text file anyway.
 	   --
-PUBLIC "-//Starlink//SYNTAX Starlink Declaration//EN"	starlink.decl
+PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"	starlink.decl
+PUBLIC "-//Starlink//TEXT XML Declaration//EN"		xml.decl
 
 	-- Starlink DTDs, listed most general to most specific --
 
@@ -107,6 +115,7 @@ PUBLIC "-//Starlink//DTD Starlink SUN 0.1//EN"		sun-0.1.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.6//EN"		ssn-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.6 (XML)//EN"	ssn-xml-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.5//EN"		ssn-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.4//EN"		ssn-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.3//EN"		ssn-0.3.dtd
@@ -217,6 +226,7 @@ PUBLIC "-//W3C//ENTITIES Symbols//EN//HTML"		html4/HTMLsymbol.ent
 	   and http://www.oasis-open.org/html/publtext.htm
 	   --
 PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN"	oasis-exchange-table.dtd
+PUBLIC "-//OASIS//DTD XML Exchange Table Model 19990315//EN"	oasis-exchange-table-xml.dtd
 
 	-- ISO latin 1 entity set for HTML and LaTeX -- 
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"   	ISOent/ISOlat1-html.ent

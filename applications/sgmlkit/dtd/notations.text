@@ -9,9 +9,10 @@
   ISO/IEC 9070:1991, `Information Technology - SGML support facilities
   - Registration procedures for public text owner identifiers'
 
-  JPEG notation from the recommendations in ISO/IEC JTC1/WG4 N1958:
+  JPEG notation from the recommendations in ISO/IEC JTC1/WG4 N1990:
   `Information Processing - Text and office systems - Using SGML
-  Public Identifiers for Specifying Data Notations'.  GIF, EPS and
+  Public Identifiers for Specifying Data Notations' (see
+  <http://www.ornl.gov/sgml/wg8/document/1990.htm>.  GIF, EPS and
   linespecific notations from DocBook's dbnotn.mod module.
 
   The latexmaths notation is specifically LaTeX maths, nothing else.
@@ -23,6 +24,15 @@
   in the documentation against taking advantage of this to get up to
   mucky hacks (you'll grow hairs on the backs of your hands, you know).
 -->
+<!-- SGML and XML notations -->
+<!NOTATION SGML     PUBLIC "ISO 8879:1986//NOTATION
+                            Information processing -
+                            Text and office systems -
+                            Standard Generalized Markup Language
+                            (SGML)//EN"                            >
+<!NOTATION XML PUBLIC
+  "+//IDN www.w3.org/TR/1998/REC-xml-19980210//NOTATION XML//EN">
+
 <!NOTATION texmaths   PUBLIC
   "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
 <!NOTATION latexmaths PUBLIC
@@ -31,9 +41,9 @@
   "+//ISBN 0-201-54199//NOTATION The LaTeX Companion, ch. 10//EN">
 <!NOTATION metapost PUBLIC
   "+//IDN cm.bell-labs.com/who/hobby/MetaPost.html//NOTATION MetaPost//EN">
-<!NOTATION jpeg     PUBLIC 
-  "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
-    Continuous-tone Still Images (JPEG)//EN">
+<!NOTATION jpeg     PUBLIC "ISO/IEC 10918-1:1994//NOTATION
+                            Digital Compression and Coding of
+                            Continuous-tone Still Images (JPEG)//EN">
 <!NOTATION eps      PUBLIC
   "+//ISBN 0-201-18127::Adobe//NOTATION PostScript Language Ref. Manual//EN">
 <!NOTATION gif89a   PUBLIC
@@ -41,10 +51,10 @@
 <!NOTATION linespecific SYSTEM
   "line ends and leading white space must be preserved in output">
 
-<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'
-	-- Figure notations which use only SGML characters (terminology? see
-	   8879, 9.2), which can therefore be included directly within
-	   figurecontent element -->
+<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'>
+	<!-- Figure notations which use only SGML characters (terminology? see
+	     8879, 9.2), which can therefore be included directly within
+	     figurecontent element -->
 
 <!-- Declare an attribute for the latexgraphics notation.  If there is
      indeed a need for this (and it's not implemented at present),
@@ -66,11 +76,13 @@
      there's no way to refer to data attributes in an element
      attribute.
      -->
+<![ %Full.SGML; [
 <!ATTLIST #NOTATION latexgraphics
 	package		-- LaTeX packages required for this to be processed --
 		CDATA
 		#IMPLIED
 	>
+]]>
 
 <!-- Define this parameter entity so we can avoid reading this entity a 
      second time -->
