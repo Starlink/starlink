@@ -88,25 +88,38 @@
       INCLUDE 'DAT_PAR'					! HDS constants
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset id
-      CHARACTER*(*)		FLAG			! Flag name
+      INTEGER			ID
+      CHARACTER*(*)		FLAG
 
 *  Arguments Returned:
-      LOGICAL			VALUE			! Flag value
+      LOGICAL			VALUE
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Temporary !
+
+      INTEGER			LID
+
+      LOGICAL			ISHDS			! HDS object?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get locator and invoke HDS version
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
+*  Derived from HDSfile?
+      CALL ADI_GETLINK( ID, LID, STATUS )
+      CALL ADI_DERVD( LID, 'HDSfile', ISHDS, STATUS )
+      IF ( ISHDS ) THEN
+
+*    Get locator and invoke HDS version
+        CALL ADI1_GETLOC( ID, LOC, STATUS )
+        CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
+      ELSE
+        VALUE = .FALSE.
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF_GET', STATUS )
