@@ -1,3 +1,9 @@
+2003-10-27  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* dvi2bitmap.cc (process_special): in `outputfile' special,
+	support both %d and # as page-number indicators (significant
+	rewriting of this branch)
+
 2003-10-03  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* dvi2bitmap.cc (process_special): add `unit' special, and
