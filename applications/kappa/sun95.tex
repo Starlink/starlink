@@ -3127,14 +3127,17 @@ airlock}{se:fitsairlock}.}
 editing HDS components.
 
 \subsection{\xlabel{se_native}Native Format\label{se:native}}
+
 Although \HDSref\ files are portable you are recommended to copy them to
 the host machine, and run application \htmlref{NATIVE}{NATIVE} on them
-for efficiency gains.  NATIVE converts the data to the native format
-of the machine on which you issue the command.  If you don't do this,
-every time you access the data in your \NDFref{NDF}, say, this conversion
-process occurs.  In the C-shell you can use a {\bf foreach} construct
-to process several files.  The following converts all the HDS files in
-the current directory.
+for efficiency gains.  NATIVE converts the data to the native format of
+the machine on which you issue the command. If you don't do this, every
+time you access the data in your \NDFref{NDF}, say, this conversion
+process occurs. for efficiency gains.  NATIVE also replaces any IEEE
+floating point NaN or Inf values with the appropriate Starlink bad value.
+In the C-shell you can use a {\bf foreach} construct to process several
+files.  The following converts all the HDS files in the current
+directory.
 
 \small
 \begin{verbatim}
@@ -25458,6 +25461,12 @@ plot (9k).
       order, and will minimise the subsequent access time on the new
       machine.  Conversion is performed by modifying the data {\it in situ}.
       No separate output file is produced.
+
+      This application can also be used to replace any IEEE floating point 
+      NaN or Inf values in an HDS object with the appropriate Starlink 
+      bad value. This conversion is performed even if the data values
+      within the object are already represented using the appropriate
+      native data representation for the machine in use.
    }
    \sstusage{
       native object
@@ -38346,6 +38355,15 @@ plotting application.
 
          \end{itemize}
 
+      \item [\htmlref{NATIVE}{NATIVE}] \mbox{} 
+         \begin{itemize}
+            \item Any floating point NaN or Inf values in the supplied
+                  HDS object are now converted to the appropriate Starlink 
+                  bad value. This occurs even if the object already has
+                  the appropriate primative data representation for the
+                  machine in use.
+         \end{itemize}
+
       \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{} 
          \begin{itemize}
             \item This now displays the available WCS information within
@@ -38437,6 +38455,7 @@ plotting application.
          Frames from the WCS component of an NDF.
 
 \end{description}
+
 
 \begin{latexonly}
 \newpage
