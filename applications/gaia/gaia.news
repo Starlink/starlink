@@ -11,6 +11,17 @@
       at the wrong size, again when North and East where
       interchanged. This problem is now fixed.
    
+    - The command-line options of GAIA can now be configured using the
+      new "File"->"Startup options" window. The set of options
+      selected are used whenever GAIA starts up (this removes the
+      tedious need to either specify these on the command-line, or 
+      add them to your X resources).
+
+    - A new configuration option "-extended_precision" has been
+      added. This makes GAIA work at approximately milli-arcsecond
+      resolution. This option can be switched on using the new 
+      "File"->"Startup options" window.
+
   To try out GAIA for yourself type the following command:
 
       %  gaia [image_file]
@@ -23,4 +34,4 @@
 
   Peter W. Draper (p.w.draper@durham.ac.uk) and
 
-  21st Novemeber 2002.
+  23rd January 2003

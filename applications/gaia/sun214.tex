@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.11}
+\newcommand{\stardocnumber}    {214.12}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {4th December 2002}
+\newcommand{\stardocdate}      {23rd January 2003}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.7}
+\newcommand{\stardocversion}   {2.8}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -635,7 +635,7 @@ option (this allows fixed column widths or other separators). If you
 need to import such a file into a catalogue window, (this is the sort
 of window that queries to on-line catalogues are shown in, and provide
 extra facilities like applying intensity cuts etc.) then use the
-`Import plain text file...' toolbox from the `Positions...' menu.
+\mytt{Import plain text file...} toolbox from the \mytt{Positions...} menu.
 
 You can also create your own local catalogues in TST format. This
 allows you to describe how to plot the catalogue. For instance if you
@@ -757,9 +757,9 @@ note that this means that FITS files will now be accessed as foreign,
 
 \section{\xlabel{configuration_options}\label{configuration_options}Configuration options}
 
-GAIA has many options that can be defined when starting it up. These
-are set on the command line in \mytt{-option value} pairs.  Among the
-more interesting are:
+GAIA has many options that can be defined when starting it up. \textit{These
+are best set using the \mytt{Startup options...} window located in the
+\mytt{File} menu}, but you also define these on the command-line:
 
 \hspace{2em}
 \mytt{
@@ -775,8 +775,9 @@ more interesting are:
  -demo\_mode         &  Make the demo toolbox available \\
  -component          &  The NDF component (data, variance or quality) \\
  -focus\_follows\_mouse & Image and entry focus follows mouse pointer \\
- -visual             & X visual to use (pseudocolor, truecolor, visual id...)\\
- -quiet\_exit        & Issue a warning before exiting GAIA (default 0)
+ -visual             & X visual (pseudocolor, truecolor, visual id)\\
+ -quiet\_exit        & Issue a warning before exiting GAIA (default 0)\\
+ -extended\_precision & Display RA and Dec at milli-arcsecond resolution
 \end{tabular}
 }
 
@@ -794,15 +795,6 @@ some space without floating the panel try:
 \end{quote}
 (\mytt{1} means true and \mytt{0} false).
 
-Alternatively you can set these in your \mytt{.Xdefaults} file:
-\begin{quote}
-\begin{verbatim}
-*default_cmap:     ramp
-*with_pan_window:  0
-*with_zoom_window: 0
-\end{verbatim}
-\end{quote}
-
 If you'd like the toolboxes to remain on top of the display window
 they are associated with then set the \mytt{transient\_tools} option
 to 1 (the precise behaviour you get depends on your window
@@ -811,17 +803,6 @@ window managers can still cause many perceived problems dealing with
 toolboxes. Make sure that you have `autoraise' and `autoraise on first
 focus' type options switched off, if you feel that toolboxes and
 dialogs unnecessarily take charge of things like the focus.}).
-Two useful options that can only be set as X preferences
-are:
-\begin{quote}
-\begin{verbatim}
-*max_scale: 30
-*min_scale: -10
-\end{verbatim}
-\end{quote}
-These define the upper and lower limits for zooming the main
-image. These are normally set to \mytt{20} and \mytt{-6}
-respectively.
 
 If you prefer to point at the image and text entry fields before using
 the keyboard, rather than having to click in them first (versions of
@@ -829,13 +810,6 @@ GAIA pre-2.4 used this behaviour by default), then use the command:
 \begin{quote}
 \begin{verbatim}
 % gaia image_name -focus_follows_mouse 1
-\end{verbatim}
-\end{quote}
-Add this to your X preferences if you want this behaviour to be
-permanent:
-\begin{quote}
-\begin{verbatim}
-*focus_follows_mouse: 1
 \end{verbatim}
 \end{quote}
 
@@ -857,7 +831,7 @@ Rather than just absorbing the rather dry descriptions above, you can
 see some of GAIA facilities in action in a special demonstration
 mode. To activate this set your current working directory to an empty
 one (with several megabytes of space free). Now select the item
-``Demonstration mode...'', under the ``Image-Analysis'' menu and
+\mytt{Demonstration mode...}, under the \mytt{Image-Analysis} menu and
 answer \mytt{yes} when a dialog window offering to unpack the
 demonstration files appears. After a while a toolbox window will
 reveal itself, just press the ``Start'' button to see the demo. Note
@@ -960,8 +934,8 @@ to read about ``SkyCat plugins''.
      \item SuperCOSMOS surveys are now available. To access these you need
        to remove the file \mytt{\$HOME/.skycat/skycat.cfg}, if it
        exists, and then look in the ``Browse Catalog Directories...''
-       dialog under the ``Data-Servers'' menu for the sub-list
-       ``SuperCOSMOS catalogues''. 
+       dialog under the \mytt{Data-Servers} menu for the sub-list
+       \mytt{SuperCOSMOS catalogues}. 
 
 
      \item FITS file with more than one period in their names can now be
