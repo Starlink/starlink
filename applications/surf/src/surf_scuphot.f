@@ -155,6 +155,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.23  1998/10/06 20:56:20  timj
+*     Check for aborted observations.
+*     Modify N_INTEGRATIONS if aborted.
+*
 *     Revision 1.22  1998/06/09 21:57:34  timj
 *     Propogate Units to IPEAK rather than setting it.
 *
@@ -259,6 +263,8 @@ c
       PARAMETER (TSKNAME = 'SCUPHOT')
 
 *    Local variables :
+      LOGICAL          ABORTED         ! .TRUE. if the observation was
+                                       ! aborted
       INTEGER          ALL             ! Beam to use for ALLBOLS
       LOGICAL          ALL_BOLS        ! Select all bolometers
       CHARACTER*10     ANALYSIS        ! analysis mode
@@ -350,6 +356,14 @@ c
       INTEGER          JPOS (SCUBA__MAX_JIGGLE)
 				       ! j index of jiggle measurement in
 				       ! 2d map
+      INTEGER          LAST_EXP        ! the number of the exposure being
+                                       ! measured when the abort occurred
+      INTEGER          LAST_INT        ! the number of the integration
+                                       ! being measured when the abort 
+                                       ! occurred
+      INTEGER          LAST_MEAS       ! the number of the measurement
+                                       ! being measured when the abort 
+                                       ! occurred
       CHARACTER*15     LAT             ! the latitude of the telescope centre
       CHARACTER*15     LAT2            ! the second latitude of the telescope
                                        ! centre for a PLANET coord system
@@ -474,6 +488,8 @@ c
       LOGICAL          SKY_ERROR       ! .TRUE. if SKY_ERROR application has
                                        ! been run on the data
       INTEGER          START_BOL       ! First bolometer
+      CHARACTER*80     STATE           ! the state of SCUCD when the 
+                                       ! datafile was closed
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
@@ -752,16 +768,63 @@ c
 *     unmap DEM_PNTR
       CALL CMP_UNMAP(IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
 
+*  see if the observation completed normally or was aborted
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
+     :  STATE, STATUS)
+      CALL CHR_UCASE (STATE)
+      ABORTED = .FALSE.
+      IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
+         ABORTED = .TRUE.
+      END IF
+
 *     write out some information
       CALL MSG_SETI ('N_E', N_EXPOSURES)
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
+      CALL MSG_SETC ('PKG', PACKAGE)
+         
 
-      CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
-     :     '^PKG: file contains data for ^N_E '//
-     :     'exposure(s) in ^N_I integrations(s) in ^N_M '//
-     :     'measurement(s)', STATUS)
+*     Everything okay
+      IF (.NOT. ABORTED) THEN
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: file contains data for ^N_E '//
+     :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
+     :        'measurement(s)', STATUS)
+
+      ELSE
+
+*  get the exposure, integration, measurement numbers at which the abort
+*  occurred
+
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'EXP_NO', LAST_EXP, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'INT_NO', LAST_INT, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MEAS_NO', LAST_MEAS, STATUS)
+
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: the observation should have '//
+     :        'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
+     :        'measurement(s)', STATUS)
+         CALL MSG_SETI ('N_E', LAST_EXP)
+         CALL MSG_SETI ('N_I', LAST_INT)
+         CALL MSG_SETI ('N_M', LAST_MEAS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        ' - However, the observation was '//
+     :        'ABORTED during exposure ^N_E of integration ^N_I '//
+     :        'of measurement ^N_M', STATUS)
+
+*     For an aborted observation we can simply reduce the number of
+*     integrations that are processed. Can do this since the data
+*     are just processed in order, looping over N_INTGRATIONS
+*     and N_BEAMS
+         N_INTEGRATIONS = LAST_INT
+
+      END IF
+
+
 
       IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN 
 *     get the target indices of the bolometers in the data array
