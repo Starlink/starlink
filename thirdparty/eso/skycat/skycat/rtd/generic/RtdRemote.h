@@ -34,7 +34,6 @@ protected:
     struct Client {
 	int socket;		// client socket for sending results
 	int callback_socket;	// socket used for callback operations
-        Tcl_File handle;        // Tcl file handle for events
 	RtdRemote* thisPtr;	// hook to get back to class from callback
     };
     Client clients_[MAX_CLIENTS]; // array of client connection sockets

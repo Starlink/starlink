@@ -10,9 +10,6 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  04/03/96  Created
- * Peter W. Draper 13/03/98  Now stores Tcl_File handle. This is to
- *                           work around a bug in OSF/1 Tcl which
- *                           loses this values occasionally. 
  */
 static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.12 1998/10/28 17:43:32 abrighto Exp $";
 
@@ -269,7 +266,6 @@ int RtdRemote::enterClient(int sock)
     for (int i = 0; i < MAX_CLIENTS; i++) {
 	if (clients_[i].socket == 0) {
 	    clients_[i].socket = sock;
-            clients_[i].handle = Tcl_GetFile((void *)sock, TCL_UNIX_FD);
 	    clients_[i].thisPtr = this;
 	    return i;
 	}
@@ -286,10 +282,8 @@ void RtdRemote::removeClient(int sock)
     for (int i = 0; i < MAX_CLIENTS; i++) {
 	if (clients_[i].socket == sock) {
 	    Tcl_DeleteFileHandler(RTD_TCL_GETFILE_(sock));
-            Tcl_FreeFile( clients_[i].handle );
 	    close(sock);
 	    clients_[i].socket = 0;
-	    clients_[i].handle = NULL;
 	    clients_[i].thisPtr = NULL;
 	    return;
 	}
