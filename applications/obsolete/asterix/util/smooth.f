@@ -160,10 +160,9 @@
 *  Local Variables:
       CHARACTER*1             DO                ! Are gaps to be restored (Y/N)
       CHARACTER*10            EMETH		! How to treat the data ends
+      CHARACTER*80		HTXT(2)			! History text
       CHARACTER*40	      LINE		! Line from mask file
       CHARACTER*40            MASK,DUNIT
-      CHARACTER*80            PATH(8)           ! Input data path including
-                                                ! Text string for history file
 
       REAL                    	RMASK(NMASK)
       REAL                    	RN
@@ -174,6 +173,7 @@
       REAL    			WDTH                	! Width of mask in bins.
 
       INTEGER			IFID			! Input dataset
+      INTEGER			IFILES			! Input file info
       INTEGER			OFID			! Output dataset
 
       INTEGER                 DPNTR		! Pointer to output data array
@@ -193,7 +193,6 @@
       INTEGER IDO1                                !Fill gaps in on 1st pass?
       INTEGER LL
       INTEGER                 LMASK		! Width of mask made odd.
-      INTEGER 			NLINES
       INTEGER 			LM2
       INTEGER                 	NLIM			! Dimension of temp arrays
       INTEGER IDUM
@@ -235,7 +234,6 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Trace path of input data.
-      CALL USI_NAMEI( NLINES, PATH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check data in file
@@ -611,18 +609,21 @@
 *  Update the history.
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
+*  Write input files to history
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
       CALL MSG_SETC( 'MAS', MASK )
       CALL MSG_SETR( 'WID', WDTH )
       CALL MSG_MAKE( 'Smoothed with a ^MAS mask of width ^WID pixels',
-     :               PATH(NLINES+1), IDUM )
+     :               HTXT(1), IDUM )
       IF (IDO .EQ. 1) THEN
-        PATH(NLINES+2)='Bad quality data have been set to zero'
+        HTXT(2)='Bad quality data have been set to zero'
       ELSE
-        PATH(NLINES+2)='Bad quality data have been interpolated'
+        HTXT(2)='Bad quality data have been interpolated'
       END IF
 
 *  Write input file and action into history
-      CALL HSI_PTXT( OFID, NLINES+2, PATH, STATUS )
+      CALL HSI_PTXT( OFID, 2, HTXT, STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE

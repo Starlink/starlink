@@ -107,16 +107,16 @@
       INTEGER FIXTOT                            !Total no of interpolated pnts.
       LOGICAL LAX                               !Is axis info present
 
-      CHARACTER*80 PATH(5)                      !Input data path
-      CHARACTER*6 TOTCHAR                       !No pixels replaced (char form)
+      CHARACTER*80		HTXT			! History text
       CHARACTER*2 CLP                           !Loop number as a character
 
       INTEGER			IFID			! I/p dataset id
+      INTEGER			IFILES			! Input file info
       INTEGER 			IDUM
-      INTEGER 			NCHAR
       INTEGER 			NFAIL                   ! # failures in SPLREC
       INTEGER 			NLINES                  ! No of lines of text
       INTEGER			OFID			! O/p dataset id
+      INTEGER			TLEN			! Length of string
 
       LOGICAL 			OVER                    ! Overwrite input file?
 
@@ -155,9 +155,6 @@
 
       END IF
       IF (STATUS .NE. SAI__OK) GOTO 99
-
-*  Trace path of input data.
-      CALL USI_NAMEI(NLINES,PATH,STATUS)
 
 *  Check components in this file and get dimensions
       CALL BDI_GETSHP( OFID, ADI__MXDIM, DIM, NDIM, STATUS )
@@ -467,13 +464,16 @@
 *  Update history record
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*  Add action record
-      CALL CHR_ITOC( FIXTOT, TOTCHAR, NCHAR )
-      PATH(NLINES+1) = TOTCHAR//' bad quality pixels replaced'
-      CALL HSI_PTXT(OFID,NLINES+1,PATH,STATUS)
+*  Trace path of input data.
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
+*  Add action record
+      CALL MSG_SETI( 'NFIX', FIXTOT )
+      CALL MSG_MAKE( '^NFIX bad quality pixels replaced', HTXT, TLEN )
       CALL MSG_SETI( 'NFIX', FIXTOT )
       CALL MSG_PRNT( '^NFIX points have been replaced' )
+      CALL HSI_PTXT(OFID,1,HTXT,STATUS)
 
 *  Tidy up
  99   CALL AST_CLOSE()
