@@ -28,7 +28,7 @@ F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
 #  kaprh routines for which the atask action name can be derived from the 
 #  the f file name by remving the .f file suffix.
 KAPRH_F_ROUTINES = \
-crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f kphhelp.f \
+crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f krhhelp.f \
 mosaic.f quilt.f lutflip.f luthilite.f lutrot.f luttweak.f idinvisible.f \
 idpazo.f idset.f idclear.f idstate.f ovset.f ovclear.f \
 transformer.f traninvert.f tranjoin.f tranmake.f trantrace.f
