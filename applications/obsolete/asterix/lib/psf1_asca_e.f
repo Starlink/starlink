@@ -85,11 +85,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*  Global Variables:
-      INCLUDE '{global_variables_file}' ! [global_variables_description]
-*        {global_name}[dimensions] = {data_type} ({global_access_mode})
-*           [global_variable_purpose]
-
 *  Arguments Given:
       INTEGER			PSID
 
