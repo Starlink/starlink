@@ -81,9 +81,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER*(*)		FSPEC
-      CHARACTER*(*)		MODE
-      INTEGER			ID
+      INTEGER			FID, MID, ID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
