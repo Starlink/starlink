@@ -1,0 +1,108 @@
+#!/usr/local/bin/perl -w 
+
+#+
+#  Name:
+#     scbcp.pl
+
+#  Purpose:
+#     Copy SCB indexes from one directory to another.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     scbcp.pl $dir1 $dir2
+
+#  Description:
+#     This utility copies all the index files used by the SCB package
+#     from one directory to another.  It is an improvement on copying
+#     the files using cp in two ways:
+#
+#        1) It knows which files to copy.
+#        2) It will copy sparse files in a sparse way.
+#
+#     The second may be important depending on the implementation of 
+#     DBM being used.  Some DBMs can create sparse files, that is ones
+#     with large 'holes' in them, which occupy few disk blocks but 
+#     when copied in any of the usual ways (for instance with cp(1))
+#     produce files which occupy many more blocks.  Whether a file is
+#     sparse can be determined by comparing the output of 'ls -l' and 
+#     'ls -s'.
+#
+#     This utility is not required for normal operation of the package,
+#     it is provided for optional use.
+
+#  Arguments:
+#     $dir1
+#        Source directory containing SCB indices.
+#     $dir2
+#        Target directory into which SCB indices are to be copied.
+
+#  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     03-DEC-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+use strict;
+use vars;
+
+#  Required packages.
+
+use StarIndex;
+use Scb;
+
+#  Get arguments.
+
+my ($dir1, $dir2) = (shift, shift);
+
+#  Name of this program.
+
+my $self = $0;
+$self =~ s%.*/%%;
+
+#  Set usage message.
+
+my $usage = "Usage:  $self source-dir target-dir\n";
+
+#  Exit if command line arguments are not exactly two directories.
+
+die $usage unless ((@ARGV == 0) && (-d $dir1)  && (-d $dir2));
+
+#  Copy tasks index.
+
+print "$dir1/tasks -> $dir2/tasks\n";
+open TASKS1, "$dir1/tasks" or die "Failed to open $dir1/tasks for reading\n";
+open TASKS2, ">$dir2/tasks" or die "Failed to open $dir2/tasks for writing\n";
+while (<TASKS1>) {
+   print TASKS2;
+}
+close TASKS1;
+close TASKS2;
+
+#  Copy index DBM files.
+
+my ($iname, $index1, $index2);
+foreach $iname (@indexes) {
+   print "$dir1/$iname -> $dir2/$iname\n";
+   $index1 = StarIndex->new("$dir1/$iname", 'read');
+   $index2 = $index1->duplicate("$dir2/$iname");
+   $index1->finish();
+   $index2->finish();
+}
+
+
+# $Id$
