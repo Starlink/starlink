@@ -116,6 +116,7 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 #include "mapping.h"             /* Coordinate Mappings */
 #include "cmpmap.h"              /* Compound Mappings */
 #include "unitmap.h"             /* Unit Mappings */
+#include "slalib.h"              /* SlaLib interface */
 
 
 /* Error code definitions. */
@@ -587,7 +588,13 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "geolat" ) ) {
       dval = astGetGeoLat( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+
+/* Display absolute value preceeded by "N" or "S" as appropriate. */
+         if( dval < 0 ) {         
+            (void) sprintf( buff, "S%s",  astFormat( skyframe, 1, -dval ) );
+         } else {
+            (void) sprintf( buff, "N%s",  astFormat( skyframe, 1, dval ) );
+         }
          result = buff;
       }
 
@@ -596,8 +603,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "geolon" ) ) {
       dval = astGetGeoLon( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+
+/* Put into range +/- PI. */
+         dval = slaDrange( dval );
+
+/* Temporarily make the SkyFrame use degrees for longitude axis. */
+         astSetAsTime( skyframe, 0, 0 );
+
+/* Display absolute value preceeded by "E" or "W" as appropriate. */
+         if( dval < 0 ) {         
+            (void) sprintf( buff, "W%s",  astFormat( skyframe, 0, -dval ) );
+         } else {
+            (void) sprintf( buff, "E%s",  astFormat( skyframe, 0, dval ) );
+         }
          result = buff;
+
+/* Make the SkyFrame use hours for longitude axis again. */
+         astSetAsTime( skyframe, 0, 1 );
+
       }
 
 /* RefDec. */
@@ -623,7 +646,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "restfreq" ) ) {
       dval = astGetRestFreq( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval*1.0E-9 );
          result = buff;
       }
 
@@ -1324,8 +1347,8 @@ static const char *GetTitle( AstFrame *this_frame ) {
          }
 
 /* Append the rest frequency if relevant. */
-         if( ABS_SYSTEM(system) && rf != AST__BAD ) {
-            pos += sprintf( buff+pos, ", rest frequency = %g Hz", rf );
+         if( !ABS_SYSTEM(system) && rf != AST__BAD ) {
+            pos += sprintf( buff+pos, ", rest frequency = %g GHz", rf*1.0E-9 );
          }
       }
    }
@@ -2613,9 +2636,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    double dtemp;                 /* Temporary double atribute value */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
+   int ulen;                     /* Used length of setting string */
    int namelen;                  /* Length of attribute name in setting */
    int nc;                       /* Number of characters read by astSscanf */
    int off;                      /* Offset of attribute value */
+   int off2;                     /* Modified offset of attribute value */
+   int sign;                     /* Sign of longitude value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2625,6 +2651,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Obtain the length of the setting string. */
    len = strlen( setting );
+
+/* Obtain the used length of the setting string. */
+   ulen = astChrLen( setting );
 
 /* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
@@ -2677,16 +2706,69 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* GeoLat. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == astSscanf( setting, "geolat= %lg %n", &dval, &nc ) )
-        && ( nc >= len ) ) {
-      astSetGeoLat( this, dval );
+              ( 0 == astSscanf( setting, "geolat=%n%*s %n", &off, &nc ) )
+              && ( nc >= 7 ) ) {
+
+/* If the first character in the value string is "N" or "S", remember the
+   sign of the value and skip over the sign character. Default is north
+   (+ve). */
+      off2 = off;
+      if( setting[ off ] == 'N' || setting[ off ] == 'n' ) {
+         off2++;
+         sign = +1;
+      } else if( setting[ off ] == 'S' || setting[ off ] == 's' ) {
+         off2++;
+         sign = -1;
+      } else {
+         sign = +1;
+      } 
+
+/* Convert the string to a radians value before use. */
+      ival = astUnformat( skyframe, 1, setting + off2, &dval );
+      if ( ival == ulen - off2  ) {
+         astSetGeoLat( this, dval*sign );
+
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
+                   "GeoLat (observers latitude) \"%s\".", astGetClass( this ), 
+                   setting + off );
+      }
 
 /* GeoLon. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == astSscanf( setting, "geolon= %lg %n", &dval, &nc ) )
-        && ( nc >= len ) ) {
-      astSetGeoLon( this, dval );
+              ( 0 == astSscanf( setting, "geolon=%n%*s %n", &off, &nc ) )
+              && ( nc >= 7 ) ) {
+
+/* If the first character in the value string is "E" or "W", remember the
+   sign of the value and skip over the sign character. Default is east
+   (+ve). */
+      off2 = off;
+      if( setting[ off ] == 'E' || setting[ off ] == 'e' ) {
+         off2++;
+         sign = +1;
+      } else if( setting[ off ] == 'W' || setting[ off ] == 'w' ) {
+         off2++;
+         sign = -1;
+      } else {
+         sign = +1;
+      } 
+
+/* Convert the string to a radians value before use (temporarily make the 
+   SkyFrame use degrees for longitude axis). */
+      astSetAsTime( skyframe, 0, 0 );
+      ival = astUnformat( skyframe, 0, setting + off2, &dval );
+      astSetAsTime( skyframe, 0, 1 );
+      if ( ival == ulen - off2  ) {
+         astSetGeoLon( this, dval*sign );
+
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
+                   "GeoLon (observers longitude) \"%s\".", astGetClass( this ), 
+                   setting + off );
+      }
 
 /* RefDec. */
 /* ------- */
@@ -2696,7 +2778,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Convert the string to a radians value before use. */
       ival = astUnformat( skyframe, 1, setting + off, &dval );
-      if ( ival != 0 ) {
+      if ( ival == ulen - off  ) {
          astSetRefDec( this, dval );
 
 /* Report an error if the string value wasn't recognised. */
@@ -2713,7 +2795,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Convert the string to a radians value before use. */
       ival = astUnformat( skyframe, 0, setting + off, &dval );
-      if ( ival != 0 ) {
+      if ( ival == ulen - off  ) {
          astSetRefRA( this, dval );
 
 /* Report an error if the string value wasn't recognised. */
@@ -2724,11 +2806,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* RestFreq. */
 /* --------- */
-/* Without any units indication - assume Hz. */
+/* Without any units indication - assume GHz. Convert to Hz for storage. */
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "restfreq= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetRestFreq( this, dval );
+      astSetRestFreq( this, dval*1.0E9 );
 
 /* With units indication. */
    } else if ( nc = 0,
@@ -3066,6 +3148,14 @@ static void SetSystem( AstFrame *this_frame, AstSystemType newsys ) {
       }
    }
 
+/* Also, if the System value is being changed, clear all attributes which 
+   have system-specific defaults. */
+   if( newsys != astGetSystem( this ) ) {
+      astClearLabel( this, 0 );
+      astClearSymbol( this, 0 );
+      astClearTitle( this );
+   }
+
 /* Now use the parent SetSystem method to store the new System value. */
    (*parent_setsystem)( this_frame, newsys );
 
@@ -3137,7 +3227,7 @@ static AstStdOfRestType StdOfRestCode( const char *sor ) {
    } else if ( astChrMatch( "HELIO", sor ) || astChrMatch( "HELIOCEN", sor ) || astChrMatch( "HELIOCENTRIC", sor ) ) {
       result = AST__HLSOR;
 
-   } else if ( astChrMatch( "LSRK", sor ) ) {
+   } else if ( astChrMatch( "LSRK", sor ) || astChrMatch( "LSR", sor ) ) {
       result = AST__LKSOR;
 
    } else if ( astChrMatch( "LSRD", sor ) ) {
@@ -3146,7 +3236,8 @@ static AstStdOfRestType StdOfRestCode( const char *sor ) {
    } else if ( astChrMatch( "GAL", sor ) || astChrMatch( "GALACTOC", sor ) || astChrMatch( "GALACTIC", sor ) ) {
       result = AST__GLSOR;
 
-   } else if ( astChrMatch( "LG", sor ) || astChrMatch( "LOCALGRP", sor ) || astChrMatch( "LOCALGROUP", sor ) ) {
+   } else if ( astChrMatch( "LG", sor ) || astChrMatch( "LOCALGRP", sor ) || 
+               astChrMatch( "LOCAL_GROUP", sor ) || astChrMatch( "LOCAL-GROUP", sor ) ) { 
       result = AST__LGSOR;
 
    }
@@ -3209,23 +3300,23 @@ static const char *StdOfRestString( AstStdOfRestType sor ) {
    switch ( sor ) {
 
    case AST__NOSOR:
-      result = "NONE";
+      result = "None";
       break;
 
    case AST__TPSOR:
-      result = "TOPOCENT";
+      result = "Topocentric";
       break;
 
    case AST__GESOR:
-      result = "GEOCENTR";
+      result = "Geocentric";
       break;
 
    case AST__BYSOR:
-      result = "BARYCENT";
+      result = "Barycentric";
       break;
 
    case AST__HLSOR:
-      result = "HELIOCEN";
+      result = "Heliocentric";
       break;
 
    case AST__LDSOR:
@@ -3233,15 +3324,15 @@ static const char *StdOfRestString( AstStdOfRestType sor ) {
       break;
 
    case AST__LKSOR:
-      result = "LSRK";
+      result = "LSR";
       break;
 
    case AST__LGSOR:
-      result = "LOCALGRP";
+      result = "Local_group";
       break;
 
    case AST__GLSOR:
-      result = "GALACTOC";
+      result = "Galactic";
       break;
 
    }
@@ -4011,16 +4102,24 @@ astMAKE_SET(SpecFrame,AlignStdOfRest,AstStdOfRestType,alignstdofrest,(
 *     Public attribute.
 
 *  Synopsis:
-*     Floating point.
+*     String.
 
 *  Description:
 *     This attribute specifies the geodetic latitude of the observer, in
-*     radians. Together with the GeoLon, Epoch, RefRA and RefDec attributes, 
+*     degrees. Together with the GeoLon, Epoch, RefRA and RefDec attributes, 
 *     it defines the Doppler shift introduced by the observers diurnal 
 *     motion around the earths axis, which is needed when converting to 
 *     or from the topocentric standard of rest. The maximum velocity
 *     error which can be caused by an incorrect value is 0.5 Km/s. The 
 *     default value for the attribute is zero.
+
+*     The value is stored internally in radians, but is converted to and 
+*     from a degrees string for access. Some example input formats are: 
+*     "22:19:23.2", "22 19 23.2", "22:19.387", "22.32311", "N22.32311", 
+*     "-45.6", "S45.6". As indicated, the sign of the latitude can 
+*     optionally be indicated using characters "N" and "S" in place of the 
+*     usual "+" and "-". When converting the stored value to a string, the 
+*     format "[s]dd:mm:ss.s" is used, when "[s]" is "N" or "S".
 
 *  Applicability:
 *     SpecFrame
@@ -4053,8 +4152,17 @@ astMAKE_TEST(SpecFrame,GeoLat,(this->geolat!=AST__BAD))
 
 *  Description:
 *     This attribute specifies the geodetic (or equivalently, geocentric)
-*     longitude of the observer, in radians. See the description of attribute 
-*     GeoLat for details. The default value is zero.
+*     longitude of the observer, in degrees, measured positive eastwards. 
+*     See also attribute GeoLat. The default value is zero.
+*
+*     The value is stored internally in radians, but is converted to and 
+*     from a degrees string for access. Some example input formats are: 
+*     "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311", "E155.32311", 
+*     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
+*     optionally be indicated using characters "E" and "W" in place of the 
+*     usual "+" and "-". When converting the stored value to a string, the 
+*     format "[s]ddd:mm:ss.s" is used, when "[s]" is "E" or "W" and the 
+*     numerical value is chosen to be less than 180 degrees.
 
 *  Applicability:
 *     SpecFrame
@@ -4213,18 +4321,18 @@ f     AST_FINDFRAME and AST_CONVERT
 *     before being stored. The nature of the supplied value is indicated by 
 *     appending text to the end of the numerical value indicating the units in 
 *     which the value is supplied. If the units are not specified, then the 
-*     supplied value is assumed to be a frequency in units of Hertz. If the 
+*     supplied value is assumed to be a frequency in units of GHz. If the 
 *     supplied unit is a unit of frequency, the supplied value is assumed to 
 *     be a frequency in the given units. If the supplied unit is a unit of 
 *     length, the supplied value is assumed to be a (vacuum) wavelength. If 
 *     the supplied unit is a unit of energy, the supplied value is assumed to 
 *     be an energy. For instance, the following strings all result in 
-*     a rest frequency of around 1.4E14 Hz being used: "1.4E14", "1.4E14 Hz",
+*     a rest frequency of around 1.4E14 Hz being used: "1.4E5", "1.4E14 Hz",
 *     "1.4E14 s**-1", "1.4E5 GHz", "2.14E-6 m", "21400 Angstrom", "9.28E-20 J",
 *     "9.28E-13 erg", "0.58 eV", etc. 
 *
 *     When getting the value of this attribute, the returned value is
-*     always a frequency in units of Hertz.
+*     always a frequency in units of GHz.
 
 *  Applicability:
 *     SpecFrame
@@ -4268,39 +4376,39 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *     The SpecFrame class supports the following StdOfRest values (all are
 *     case-insensitive):
 *
-*     - "NONE": This is a special value which indicates that no correction 
+*     - "None": This is a special value which indicates that no correction 
 *     for the Doppler shift caused by changing standard of rest should be made 
 *     when aligning this SpecFrame with another, 
 *
-*     - "TOPOCENT", "TOPOCENTRIC" or "TOPO": The observers rest-frame (assumed 
+*     - "Topocentric", "Topocent" or "Topo": The observers rest-frame (assumed 
 *     to be on the surface of the earth). Spectra recorded in this standard of 
 *     rest suffer a Doppler shift which varies over the course of a day
 *     because of the rotation of the observer around the axis of the earth.
 *     This standard of rest must be qualified using the GeoLat, GeoLon, Epoch, 
 *     RefRA and RefDec attributes. 
 *
-*     - "GEOCENTR", "GEOCENTRIC" or "GEO": The rest-frame of the earth centre. 
+*     - "Geocentric", "Geocentr" or "Geo": The rest-frame of the earth centre. 
 *     Spectra recorded in this standard of rest suffer a Doppler shift which 
 *     varies over the course of a year because of the rotation of the earth 
 *     around the Sun. This standard of rest must be qualified using the Epoch, 
 *     RefRA and RefDec attributes. 
 *
-*     - "BARYCENT", "BARYCENTRIC" or "BARY": The rest-frame of the solar-system
+*     - "Barycentric", "Barycent" or "Bary": The rest-frame of the solar-system
 *     barycentre. Spectra recorded in this standard of rest suffer a Doppler 
 *     shift which depends both on the velocity of the Sun through the Local 
 *     Standard of Rest, and on the movement of the planets through the solar 
 *     system. This standard of rest must be qualified using the Epoch, RefRA 
 *     and RefDec attributes. 
 *
-*     - "HELIOCEN", "HELIOCENTRIC" or "HELIO": The rest-frame of the Sun. 
+*     - "Heliocentric", "Heliocen" or "Helio": The rest-frame of the Sun. 
 *     Spectra recorded in this standard of rest suffer a Doppler shift which 
 *     depends on the velocity of the Sun through the Local Standard of Rest. 
 *     This standard of rest must be qualified using the RefRA and RefDec 
 *     attributes. 
 *
-*     - "LSRK": The rest-frame of the kinematical Local Standard of Rest. 
-*     Spectra recorded in this standard of rest suffer a Doppler shift which 
-*     depends on the velocity of the kinematical Local Standard of Rest 
+*     - "LSR", "LSRK": The rest-frame of the kinematical Local Standard of 
+*     Rest. Spectra recorded in this standard of rest suffer a Doppler shift 
+*     which depends on the velocity of the kinematical Local Standard of Rest 
 *     through the galaxy. This standard of rest must be qualified using the 
 *     RefRA and RefDec attributes. 
 *
@@ -4310,13 +4418,13 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *     galaxy.  This standard of rest must be qualified using the RefRA and 
 *     RefDec attributes. 
 *
-*     - "GALACTOC", "GALACTIC" or "GAL": The rest-frame of the galactic centre.
+*     - "Galactic", "Galactoc" or "Gal": The rest-frame of the galactic centre.
 *     Spectra recorded in this standard of rest suffer a Doppler shift which 
 *     depends on the velocity of the galactic centre through the local group. 
 *     This standard of rest must be qualified using the RefRA and RefDec 
 *     attributes.
 *
-*     - "LOCALGRP", "LOCALGROUP" or "LG": The rest-frame of the local group. 
+*     - "Local_group", "Localgrp" or "LG": The rest-frame of the local group. 
 *     This standard of rest must be qualified using the RefRA and RefDec 
 *     attributes.
 *

@@ -388,6 +388,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Changed private InitVtab method to protected astInitPlotVtab
 *        method.
 *        - Use private IsASkyFrame method in place of astIsASkyFrame.
+*        - Modify PlotLabels to excluding exponents when counting trailing
+*        zeros, and also to pad trailing fields with trailing zeros up to
+*        the max number of decimal places when estimating label priorities.
+*        - Modified Overlap to ensure that axis labels are speced by at 
+*        least two spaces.
 *class--
 */
 
@@ -1305,6 +1310,9 @@ static const char *xedge[4] = { "left", "top", "right", "bottom" };
 
 /* Text values used to represent Labelling externally. */
 static const char *xlbling[2] = { "interior", "exterior" };
+
+/* Index of root label used by PlotLabel */
+static int PlotLabel_Root_Index;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -6136,21 +6144,33 @@ static int Compare_LL2( const void *elem1, const void *elem2 ){
 /* Local Variables: */
    LabelList *ll1;           /* Pointer to the first LabelList */
    LabelList *ll2;           /* Pointer to the second LabelList */
+   int off1;                 /* Index offset from root to label 1 */
+   int off2;                 /* Index offset from root to label 2 */
    int ret;                  /* The returned value */
    
 /* Get pointers to the two LabelList structures. */
    ll1 = (LabelList *) elem1;
    ll2 = (LabelList *) elem2;
 
-/* Compare the indices for the two label's. */
+/* Compare the priority for the two label's. */
    if( ll1->priority < ll2->priority ){
       ret = 1;
 
    } else if( ll1->priority > ll2->priority ){
       ret = -1;
 
+/* If priorities are equal, compare the distances from the root label,
+   giving higher priority to those which are nearer to the root label. */
    } else {
-      ret = 0;
+      off1 = abs( ll1->index - PlotLabel_Root_Index );
+      off2 = abs( ll2->index - PlotLabel_Root_Index );
+      if( off1 > off2 ) {
+         ret = 1;
+      } else if( off1 < off2 ) {
+         ret = -1;
+      } else {
+         ret = 0;
+      }
    }
 
 /* Return the answer. */
@@ -17816,15 +17836,19 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 /* Local Variables: */
    LabelList *ll;         /* Pointer to next label structure */
    char *a;               /* Pointer to next character */
+   char *b;               /* Pointer to next character */
+   char *c;               /* Pointer to next character */
    char *text;            /* Pointer to label text */
    float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
    float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
+   int dp;                /* Number of decimal places */
    int i;                 /* Label index */
    int ioff;              /* Distance from this label to root label */
    int ipri;              /* Priority of label i */
    int j;                 /* Label index offset */
    int jpri;              /* Priority of label i+j */
    int lab0;              /* Index of middle label */
+   int mxdp;              /* Maximum number of decimal places */
    int nbox;              /* The number of bounding boxes stored previously */
    int nremove;           /* No. of labels rejected by the current loop */
    int nz;                /* Number of trailing zeros in this label */
@@ -17836,15 +17860,39 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    draw. */
    if( !astOK || nlab == 0 || !list || !astGetNumLab( this, axis ) ) return;
 
+/* Find the maximum number of decimal places in any label. */
+   mxdp = 0;
+   ll = list - 1;
+   for( i = 0; i < nlab; i++ ) {
+      ll++;
+      c = strchr( ll->text, '.' );
+      if( c ) {
+         b = c + 1;
+         while( ( c = strchr( b, '.' ) ) ) b = c + 1;
+
+         a = strchr( b, 'E' );
+         if( !a ) a = strchr( b, 'e' );
+         if( a ) {
+            dp = a - b;
+         } else {
+            dp = strlen( b );
+         }
+         if( dp > mxdp ) mxdp = dp;
+      }
+   }
+
 /* Sort the labels into increasing index order. */
    qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
 
 /* Assign a priority to each label, equal to the number of trailing zeros
-   in the label text. At the same time, find the highest priority label,
-   giving preference to labels which occur in the middle of the index order.
-   This label will be the "root" label - a label which is guaranteed not
-   to be abbreviated. At the same time, initialize the abbreviated text
-   for each label to be equal to the unabbreviated text. */
+   in the label text. If the text has fewer tan the maximum number of
+   decimal places, pretend the text is padded with trailing zeros to
+   bring the number of decimal places up to the maximum. At the same time, 
+   find the highest priority label, giving preference to labels which occur
+   in the middle of the index order. This label will be the "root" label -
+   a label which is guaranteed not to be abbreviated. At the same time, 
+   initialize the abbreviated text for each label to be equal to the 
+   unabbreviated text. */
    lab0 = ( nlab + 1 )/2;
    nzmax = -1;
    ll = list - 1;
@@ -17852,22 +17900,48 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       ll++;
       text = ll->text;
       nz = 0;
-      for( a = text + strlen( text ) - 1; a >= text; a-- ) {
+
+/* Get a pointer to the final decimal point. */
+      b = strchr( text, '.' );
+      while( b && ( c = strchr( b + 1, '.' ) ) ) b = c;
+
+/* Get a pointer to the first character beyond the end of the string, ignoring 
+   any exponent. */
+      a = strchr( text, 'E' );
+      if( !a ) a = strchr( text, 'e' );
+      if( !a ) a = text + strlen( text );
+
+/* Initialise the number of trailing zeros to be the difference between
+   the number of decimal places in this label and the maximum numberof
+   decimal places in any label. */
+      if( b && mxdp != -1 ) {
+         dp = a - b - 1;
+         nz = mxdp - dp;
+      } else {
+         nz = mxdp;
+      }
+
+/* Now add on any actual trailing zeros in the label. */
+      for( a = a-1; a >= text; a-- ) {
          if( isdigit( (int) *a ) && *a != '0' ) break;
          nz++;
       }
 
+/* Store the priority for this label. */
       ll->priority = nz;
 
+/* Choose the root label. */
       if( nz > nzmax ) {
          nzmax = nz;
          root = i;
          rootoff = abs( i - lab0 );
+         PlotLabel_Root_Index = ll->index;
       } else if( nz == nzmax ) {
          ioff = abs( i - lab0 );
          if( ioff < rootoff ) {
             root = i;
             rootoff = ioff;
+            PlotLabel_Root_Index = ll->index;
          }
       }
 
@@ -17948,7 +18022,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 /* We now look for labels which overlap, removing labels with lower
    priority if they are overlapped by labels of higher priority. First
    sort the labels into decreasing priority order. Previouslty rejected 
-   labnels (with negative priority) will be placed at he end of the list.*/
+   labels (with negative priority) will be placed at he end of the list.*/
       qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL2 );
 
 /* Now pass through the labels in priority order. For each one we find
@@ -17962,14 +18036,12 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       for( i = 0; i < nlab-1; i++ ) {
          ll++;
          if( ll->priority < 0 ) break;
-
          if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
                       ll->just, (float) ll->upx, (float) ll->upy, box, 
                       method, class ) ){
             ll->priority = -1;
             nremove++;
          }
-
       }
 
 /* If any labels were removed, we will be doing another abbreviation and

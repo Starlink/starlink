@@ -1760,29 +1760,35 @@ static void ClearUnit( AstFrame *this, int axis ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Validate the axis index and obtain a pointer to the required Axis. */
+/* Validate the axis index. */
    (void) astValidateAxis( this, axis, "astSetUnit" );
-   ax = astGetAxis( this, axis );
+
+/* Do nothing more if the attribute is already cleared. */
+   if( astTestUnit( this, axis ) ) {
+
+/* Obtain a pointer to the required Axis. */
+      ax = astGetAxis( this, axis );
 
 /* Save a copy of the old units. */
-   units = astGetAxisUnit( ax );
-   old_units = astStore( NULL, units, strlen( units ) + 1 );
+      units = astGetAxisUnit( ax );
+      old_units = astStore( NULL, units, strlen( units ) + 1 );
 
 /* Clear the Axis Unit attribute value, and then get a pointer to the
    new default Units string. */
-   astClearAxisUnit( ax );
-   units = astGetUnit( this, axis );
+      astClearAxisUnit( ax );
+      units = astGetUnit( this, axis );
 
 /* The new unit may require the Label and/or Symbol to be changed, but
    only if the Frames ActiveUnit flag is set. */
-   if( astGetActiveUnit( this ) ) NewUnit( ax, old_units, units,
-                                           "astSetUnit", astGetClass( this ) );
+      if( astGetActiveUnit( this ) ) NewUnit( ax, old_units, units,
+                                              "astSetUnit", astGetClass( this ) );
 
 /* Free resources. */
-   old_units = astFree( old_units );
+      old_units = astFree( old_units );
 
 /* Annul the Axis pointer. */
-   ax = astAnnul( ax );
+      ax = astAnnul( ax );
+   }
 }
 
 static int ConsistentMaxAxes( AstFrame *this, int value ) {
@@ -5063,6 +5069,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 /* Local Variables: */
    AstAxis *result_ax;           /* Pointer to result Axis object */
    AstAxis *template_ax;         /* Pointer to template Axis object */
+   AstSystemType sys;            /* System value */
    int result_axis;              /* Loop counter for result Frame axes */
    int result_naxes;             /* Number of result Frame axes */
    int template_axis;            /* Index of template Frame axis */
@@ -5083,8 +5090,22 @@ static void Overlay( AstFrame *template, const int *template_axes,
    OVERLAY(Domain);
    OVERLAY(Epoch);
    OVERLAY(Title);
-   OVERLAY(System);
-   OVERLAY(AlignSystem);
+
+/* Only overlay the System and AlignSystem attribute if the values are
+   valid for the result class. */
+   if( astTestSystem( template ) ) {
+      sys = astGetSystem( template );
+      if( astValidateSystem( result, sys, "astOverlay" ) ) {
+         astSetSystem( result, sys );
+      }
+   }
+
+   if( astTestAlignSystem( template ) ) {
+      sys = astGetAlignSystem( template );
+      if( astValidateSystem( result, sys, "astOverlay" ) ) {
+         astSetAlignSystem( result, sys );
+      }
+   }
 
 /* Now transfer attributes associated with individual axes. Obtain the number
    of axes in the template and result Frames. */
@@ -6568,6 +6589,7 @@ static void SetUnit( AstFrame *this, int axis, const char *unit ) {
 
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis object */
+   const char *oldunit;          /* Pointer to old units string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -6578,8 +6600,17 @@ static void SetUnit( AstFrame *this, int axis, const char *unit ) {
 
 /* The new unit may require the Label and/or Symbol to be changed, but
    only if the Frames ActiveUnit flag is set. */
-   if( astGetActiveUnit( this ) ) NewUnit( ax, astGetAxisUnit( ax ), unit, 
-                                           "astSetUnit", astGetClass( this ) );
+   if( astGetActiveUnit( this ) ) {
+
+/* Get the existing Axis unit, using the astGetUnit method (rather than
+   astGetAxisUnit) in order to get any default value in the case where
+   the Unit attribute is not set. */
+      oldunit = astGetUnit( this, axis );
+
+/* Assign the new Unit value. This modifies labels and/or Symbols if 
+   necessary. */
+      NewUnit( ax, oldunit, unit, "astSetUnit", astGetClass( this ) );
+   }
 
 /* Set the Axis Unit attribute value. */
    astSetAxisUnit( ax, unit );

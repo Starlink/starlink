@@ -100,6 +100,7 @@ void *astGrow_( void *, int, size_t );
 void *astMalloc_( size_t );
 void *astRealloc_( void *, size_t );
 void *astStore_( void *, const void *, size_t );
+size_t astChrLen_( const char * );
 #endif
 
 /* Function interfaces. */

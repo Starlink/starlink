@@ -984,8 +984,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *argra = 3;
       *argdec = 4;
       *szargs = 6;
-      arg[ 0 ] = "Geodetic longitude (radians)";
-      arg[ 1 ] = "Geodetic latitude (radians)";
+      arg[ 0 ] = "Longitude (positive eastwards, radians)";
+      arg[ 1 ] = "Latitude (geodetic, radians)";
       arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
       arg[ 3 ] = "RA of source (FK5 J2000, radians)";
       arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
@@ -999,8 +999,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *argra = 3;
       *argdec = 4;
       *szargs = 6;
-      arg[ 0 ] = "Geodetic longitude (radians)";
-      arg[ 1 ] = "Geodetic latitude (radians)";
+      arg[ 0 ] = "Longitude (positive eastwards, radians)";
+      arg[ 1 ] = "Latitude (geodetic, radians)";
       arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
       arg[ 3 ] = "RA of source (FK5 J2000, radians)";
       arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
@@ -1177,8 +1177,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *argdec = 4;
       *nargs = 5;
       *szargs = 6;
-      arg[ 0 ] = "Geodetic longitude (radians)";
-      arg[ 1 ] = "Geodetic latitude (radians)";
+      arg[ 0 ] = "Longitude (positive eastwards, radians)";
+      arg[ 1 ] = "Latitude (geodetic, radians)";
       arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
       arg[ 3 ] = "RA of source (FK5 J2000, radians)";
       arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
@@ -2549,7 +2549,7 @@ f     these arguments should be given, via the ARGS array, in the
 *
 *     - RF: Rest frequency (Hz).
 *     - GLAT: Geodetic latitude of observer (radians).
-*     - GLON: Geodetic longitude of observer (radians).
+*     - GLON: Geodetic longitude of observer (radians - positive eastwards).
 *     - EPOCH: Epoch of observation (UT1 expressed as a Modified Julian Date).
 *     - RA: Right Ascension of source (radians, FK5 J2000).
 *     - DEC: Declination of source (radians, FK5 J2000).
@@ -2611,7 +2611,7 @@ static double TopoVel( double lon, double lat, double epoch, double ra,
 
 *  Parameters:
 *    lon 
-*       Geodetic longitude of observer (radians)
+*       Geodetic longitude of observer (radians - positive eastwards)
 *    lat 
 *       Geodetic latitude of observer (radians)
 *    epoch 
@@ -3667,7 +3667,7 @@ static void vltobt( int npoint, double *values, double *ra, double *dec, double 
 
 
 /* Topocentric to heliocentric frequency correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians)
+*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
 *    args[ 1 ] = Geodetic latitude of observer (radians)
 *    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
 *    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
@@ -3745,7 +3745,7 @@ static void tpf2hl( int npoint, double *values, double *ra, double *dec, double 
 
 
 /* Heliocentric to topocentric frequency correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians)
+*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
 *    args[ 1 ] = Geodetic latitude of observer (radians)
 *    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
 *    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
@@ -4617,7 +4617,7 @@ static void hlf2gl( int npoint, double *values, double *ra, double *dec, double 
 
 
 /* Topocentric to heliocentric velocity correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians)
+*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
 *    args[ 1 ] = Geodetic latitude of observer (radians)
 *    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
 *    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
@@ -4679,7 +4679,7 @@ static void tpv2hl( int npoint, double *values, double *ra, double *dec, double 
 }
 
 /* Heliocentric to topocentric velocity correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians)
+*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
 *    args[ 1 ] = Geodetic latitude of observer (radians)
 *    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
 *    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)

@@ -3815,6 +3815,10 @@ static void Overlay( AstFrame *template, const int *template_axes,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Indicate that we do not need to reset the System attribute of the
+   template. */
+   resetSystem = 0;
+
 /* If the result Frame is a SkyFrame, we must test to see if overlaying its
    System attribute will change the type of sky coordinate system it
    describes. Determine the value of this attribute for the result and template
