@@ -43,6 +43,8 @@
 #        Change message in DUMMY
 #     1998 January 20 (TIMJ)
 #        Add the SIZE parameter
+#     1998 January 22 (TIMJ)
+#        Add the WEIGHTS and TIMES parameters
 #     {enter_further_changes_here}
 
 #-
@@ -178,5 +180,20 @@
          PROMPT  'Name of file to contain rebinned map'
 	 HELPKEY  '*'
       ENDPARAMETER
+
+      PARAMETER WEIGHTS
+         TYPE '_LOGICAL'
+         DEFAULT 'FALSE'
+         PROMPT 'Store the weights array'
+         VPATH 'DEFAULT'
+      ENDPARAMETER
          
+      PARAMETER TIMES
+         TYPE '_LOGICAL'
+         DEFAULT 'FALSE'
+         PROMPT 'Store the times array'
+         VPATH 'DEFAULT'
+      ENDPARAMETER
+
+
    ENDINTERFACE
