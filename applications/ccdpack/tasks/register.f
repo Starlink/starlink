@@ -49,13 +49,14 @@
 *     and then coded either as new frames with a domain name given
 *     by the OUTDOMAIN parameter in the WCS component of the NDFs, 
 *     or as TRANSFORM structures, containing the final algebraic 
-*     solutions for each input list.  Transform structures may be 
-*     stored in the CCDPACK exensions of the associated NDFs or within 
-*     a named HDS container file if no associated NDFs exist.  Whether 
-*     TRANSFORM structures or frames within the WCS components are 
-*     chosen, they can be used by the applications TRANLIST and 
-*     TRANNDF to transform position lists and resample the actual 
-*     datasets respectively.
+*     solutions for each input list.  The new frame will be a copy of
+*     the PIXEL-domain frame of the input image identified by REFPOS.
+*     Transform structures may be stored in the CCDPACK exensions 
+*     of the associated NDFs or within a named HDS container file 
+*     if no associated NDFs exist.  Whether TRANSFORM structures or 
+*     frames within the WCS components are chosen, they can be used 
+*     by the applications TRANLIST and TRANNDF to transform position 
+*     lists and resample the actual datasets respectively.
 
 *  Usage:
 *     register inlist fittype refpos
@@ -353,7 +354,7 @@
 *        position lists associated with the NDFs myndf1 and myndf2.
 *        The reference positions are chosen to be those associated with
 *        myndf2, so that the CCD_REG frame coordinates will be the
-*        same as the Current frame in NDF myndf2.
+*        same as the pixel coordinates of NDF myndf2.
 *
 *     register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
 *        In this example the position lists associated with the NDFs
@@ -582,7 +583,8 @@
       INTEGER JCUR              ! Incdex of (original) Current frame in frameset
       INTEGER JPIX              ! Index of Pixel domain frame in frameset
       INTEGER JREG              ! Index of OUTDM domain frame in frameset
-      INTEGER MAPS( CCD1__MXLIS + 1 ) ! AST Mapping from current to pixel frames
+      INTEGER MAPCP             ! AST mapping from Current to pixel frame of ref
+      INTEGER MAPS( CCD1__MXLIS + 1 ) ! AST Mapping from pixel to Current frames
       INTEGER MAPTFM            ! AST pointer for Pixel - OUTDM mapping
       INTEGER MAP1              ! Temporary AST mapping
       INTEGER MAXIN             ! Maximum number of input lists
@@ -735,6 +737,13 @@
       IPREF = 1
       CALL PAR_GET0I( 'REFPOS', IPREF, STATUS )
       IPREF = MAX( 1, MIN( IPREF, NOPEN ) )
+
+*  Get the mapping between the Current and the PIXEL-domain frames
+*  of the reference NDF.
+      IF ( USEWCS ) THEN
+         MAPCP = AST_COPY( MAPS( IPREF ), STATUS )
+         CALL AST_INVERT( MAPCP, STATUS )
+      END IF
 
 *  Get all the names of the input lists and report them.
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -995,14 +1004,23 @@
                         CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
                      END IF
                      
-*  Generate a mapping representing the linear transformation.
+*  Generate a mapping representing the linear transformation between
+*  the Current frame of this NDF and that of the reference NDF.
                      CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
+
+*  Combine it with the mapping between the Current and PIXEL-domain 
+*  frames of the reference NDF so that the registration frame is a 
+*  copy of the PIXEL-domain frame of the reference NDF.
+                     IF ( USEWCS ) THEN
+                        MAPTFM = AST_CMPMAP( MAPTFM, MAPCP, .TRUE., ' ',
+     :                                       STATUS )
+                        MAPTFM = AST_SIMPLIFY( MAPTFM, STATUS )
+                     END IF
 
 *  Generate a frame in domain called OUTDM, the purpose of which is to 
 *  group the frames produced by this application.  It is a doctored 
 *  copy of the frame it's defined relative to.
-                     FRREG = AST_COPY( AST_GETFRAME( IWCS, AST__CURRENT,
-     :                                               STATUS), STATUS )
+                     FRREG = AST_FRAME( 2, ' ', STATUS )
                      CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
                      CALL AST_SETC( FRREG, 'Title', 
      :                              'Alignment by REGISTER', STATUS )
