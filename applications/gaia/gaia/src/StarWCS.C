@@ -67,11 +67,8 @@
 
 //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
-static const double rad_ = pi_/180.;
-
-//  Conversions that have been lost from AST.
-static const double r2d_ = rad_;
-static const double d2r_ = 180.0/pi_;
+static const double r2d_ = 180.0/pi_;
+static const double d2r_ = pi_/180.0;
 
 //
 //  Define a function to wrap the AST TranN function using a
