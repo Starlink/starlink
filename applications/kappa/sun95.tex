@@ -1,4 +1,10 @@
-\documentstyle[11pt,epsf,twoside]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -3636,11 +3642,11 @@ Have you ever faced the problem that you would like an application to
 know about graphics drawn by some other programme?  For instance, you
 display an image of the sky, then later you want to obtain the
 co-ordinates of the stars within the image via the cursor.  There are
-two main approaches to achieve this functionality.  The first is to
+two main approaches to achieving this functionality.  The first is to
 duplicate the display code in the cursor application.  This is
 wasteful and inflexible.  The second is to store information about
 {\em pictures\/} in a database that can be accessed by subsequent graphics
-programmes.  This is the technique used by \footnotesize{KAPPA}.
+programmes.  This is the technique used by {\footnotesize KAPPA}.
 
 Each graphics application which creates a display on a graphics device,
 also stores information describing the display in the \emph{graphics
@@ -3663,24 +3669,23 @@ some illustrated examples.
 \subsection{\xlabel{se_agiaction}The Graphics Database in Action\label{se:agiaction}}
 
 The following examples assume that {\footnotesize KAPPA} is loaded and
-the graphics device---an X-window containing a plotting area of 900 by
-600 pixels---is available.  To create such a window use the {\tt xmake}
+the graphics device---an X-window containing a plotting area of 850 by 500 
+pixels---is available.  To create such a window use the {\tt xmake}
 (\xref{SUN/130}{sun130}{}) command:
 
 \small
 \begin{verbatim}
-     % xmake xwindows -height 600 -width 900 -overlay -colours 64 
+     % xmake xwindows -height 500 -width 850 -colours 64 
 \end{verbatim}
 \normalsize
 
 This command limits the number of colours used by the X-window to
-64\footnote{It is usally a good idea to be sparing with X-window colours.
-Creating X-windows with too many colours can restrict the availabilty of
-colours for other X applications.} and creates an image overlay plane.
+64. It is usually a good idea to be sparing with X-window colours.
+Creating X-windows with too many colours can restrict the availability of
+colours for other X applications.
 
 First of all we make the X-window the current graphics device and image
-display, and the X-window overlay the image-display overlay (as described
-in \latexelsehtml{Section~\ref{se:devglobal}).}{in
+display (as described in \latexelsehtml{Section~\ref{se:devglobal}).}{in
 \htmlref{global device names}{se:devglobal}.)}  These will remain in force
 until changed.  The following commands would not be necessary if the
 global parameters already had these values:
@@ -3689,11 +3694,10 @@ global parameters already had these values:
 \begin{verbatim}
      % gdset xwindows
      % idset xwindows
-     % ovset xoverlay
 \end{verbatim}
 \normalsize
 Next we shall clear the X-window, and empty the graphics database
-of xwindows and xoverlay pictures (pictures relating to other graphics 
+of xwindows pictures (pictures relating to other graphics 
 devices are retained):
 
 \small
@@ -3704,40 +3708,40 @@ devices are retained):
 
 The display is now clear, but one picture remains in the graphics
 database; this is the \emph{base} picture and corresponds to the entire
-plotting area. To understand why this base picture is required we need to
+plotting area. To understand why this BASE picture is required we need to
 introduce the idea of the \emph{current picture}.
 
 At any time, one of the pictures stored within the graphics database is
-nominated as the \emph{current picture}. All graphical output created by 
-subsequent applications must reside within this current picture. Thus,
-the plotting area used by a graphics application can be controlled by
-selecting a suitable current picture before running the application.
-Since we have just cleared the database, the only picture remaining is the
-base picture, which consequently becomes the current picture. This allows
-subsequent applications to draw in any part of the plotting area.
+nominated as the \emph{current picture}. All graphical applications are
+written so that the graphical output which they create is scaled to fit
+within the current picture. Thus, the plotting area used by a graphics
+application can be controlled by selecting a suitable current picture
+before running the application. Since we have just cleared the database,
+the only picture remaining is the BASE picture, which consequently
+becomes the current picture. This allows subsequent applications to draw
+in any part of the plotting area.
 
-We now load a grey-scale colour table into the X-windows and display a
-negative image of a CCD frame such that 1 percent of the pixels appear as
-pure black, and 30 percent appear as pure white. We ensure that no
-annotated axes or border are produced (this will result in the image
-being a little larger since no margins need to be left for the axes or
-border):
+We now load a grey-scale colour table into the X-windows and display an
+IRAS 12 $\mu$m image of M31 such that 10 percent of the pixels 
+appear as pure black, and 1 percent appear as pure white. We ensure that no
+annotated axes are produced (this will result in the image
+being a little larger since no margins need to be left for the axes):
 
 \small
 \begin{verbatim}
      % lutgrey
-     % display $KAPPA_DIR/ccdframec noaxes noborder
+     % display $KAPPA_DIR/iras noaxes 
      MODE - Method to define the scaling limits /'FLASH'/ > perc
-     PERCENTILES - Percentiles for scaling /[10,90]/ > 99,30
-     Data will be scaled from 3918.688 to 2394.616.
+     PERCENTILES - Percentiles for scaling /[10,90]/ > 10,99
+     Data will be scaled from 0.05178363 to 1.051904.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd1.eps}
-   \caption{A CCD frame displayed in the middle of the base picture.}
+   \includegraphics[clip,height=110mm]{sun95_gd1.eps}
+   \caption{An IRAS 12 $\mu$m image of M31 displayed in the middle of the BASE picture.}
    \label{fi:agi1}
    \end{center}
    \end{figure}
@@ -3747,18 +3751,19 @@ border):
    \label{fi:agi1}
    \htmladdimg{sun95_gd1.gif}
 
-   Figure 1: A CCD frame displayed in the middle of the base picture.
+   Figure 1: An IRAS 12 micron image of M31 displayed in the middle of the BASE picture.
 \end{htmlonly}
 
 The X-window should now look like Figure~
 \latexelsehtml{\ref{fi:agi1}}{1}). The application has displayed the
-image in the middle of the current picture (the base picture), and has made 
+image in the middle of the current picture (the BASE picture), and has made 
 it as large as possible, subject to the constraints that it must lie entirely 
-within the current picture. As you see, the aspect ratio of the data
-array is retained by default.
+within the current picture. Note, as with many IRAS images, equatorial
+north is downwards in this image
 
-Let's now look at the contents of the graphics database (press return in 
-response for the prompt for parameter {\tt PICNUM}):
+Let's now use the \htmlref{PICLIST}{PICLIST} command to look at the contents 
+of the graphics database (press return in response for the prompt for 
+parameter {\tt PICNUM}):
 
 \small
 \begin{verbatim}
@@ -3776,15 +3781,14 @@ This shows us that there are now two pictures in the database, listed in
 the order in which they were created. The current picture is still the
 base picture, as indicated by the letter {\tt C} at the left of the line
 describing picture number 1. The second picture was created by the
-\footnotesize{KAPPA} application DISPLAY, and has the name ``DATA'',
-indicating that it contains a representation of a set of data values. This
-is one of four standard picture \emph{names}. BASE is another of these
-standard names. We shall come across the other two shortly. We will come
-back to the other two columns in the above report (``Label'' and ``Ref'') 
-later. The \htmlref{PICLIST}{PICLIST} application allows you to select a
-new current picture by supplying a picture number in response to the
-prompt for parameter {\tt PICNUM}. Accepting the null default by
-pressing return causes the current picture on entry to be retained.
+{\footnotesize KAPPA} application DISPLAY, and has the name ``DATA'',
+indicating that it contains a representation of a set of data values.
+DATA is one of four standard picture \emph{names}. BASE is another of
+these standard names. We shall come across the other two shortly. The
+PICLIST application allows you to select a new current picture by
+supplying a picture number in response to the prompt for parameter {\tt
+PICNUM}. Accepting the null default by pressing return causes the current
+picture on entry to be retained.
 
 The above use of \htmlref{DISPLAY}{DISPLAY} illustrates an important 
 rule regarding the behaviour of most graphical applications; {\em the
@@ -3798,32 +3802,84 @@ If it were not for this rule, pictures would become progressively
 smaller, vanishing into the distance, since new pictures cannot be
 drawn outside the current picture.  
 
-We will now display the same image again, but this time we will arrange
-for it to be placed in the top right corner of the X-window. To do this,
+We will now display an optical image of M31. This time we will arrange
+for it to be placed towards the left hand side of the X-window. To do this,
 we first clear the whole X-window and graphics database using
-\htmlref{GDCLEAR}{GDCLEAR}, and then create a new picture using the
-\htmlref{PICDEF}{PICDEF} command prior to displaying the image. 
-\htmlref{PICDEF}{PICDEF} makes the new picture the current picture, and 
-so \htmlref{DISPLAY}{DISPLAY} is constrained to create its output within 
-this new picture:
+\htmlref{GDCLEAR}{GDCLEAR}:
 
 \small
 \begin{verbatim}
      % gdclear
-     % picdef mode=tr
-     % display 
-     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
+\end{verbatim}
+\normalsize
+
+We now create a new picture using the \htmlref{PICDEF}{PICDEF} command.
+
+\small
+\begin{verbatim}
+     % picdef mode=cl fraction=\[0.6,1.0\] outline=no
+\end{verbatim}
+\normalsize
+
+The MODE parameter specifies the position of the new picture within the 
+BASE picture; in this case ``cl'' indicates that the new picture is to be
+centred (``c'') vertically within the BASE picture and placed at the left
+(``l'') hand edge. The FRACTION parameter specifies the dimensions of the
+picture; the first value (0.6) gives the horizontal size of the picture
+as a fraction of the horizontal size of the BASE picture, and the second
+value (1.0) gives the vertical size in the same way. Thus, the new picture is
+just over half the width of the BASE picture, and is the full height of
+the BASE picture. The OUTLINE parameter specifies whether a box should be
+drawn on the screen showing the outline of the new picture. In this case 
+we switch this option off.
+
+If we run PICLIST again, we get:
+
+\small
+\begin{verbatim}
+     % piclist
+
+       No. Name             Comment                   Label            Ref
+       -------------------------------------------------------------------
+         1 BASE             Base picture
+     C   2 FRAME            KAPPA_PICDEF
+     PICNUM - Number of new current picture /!/ > 
+\end{verbatim}
+\normalsize
+
+The picture created earlier by DISPLAY was deleted when we ran GDCLEAR.
+The BASE picture is still there (of course), and we also have the picture
+created by PICDEF. This is a FRAME picture, another of the four standard
+picture names. A FRAME picture acts as a ``frame'' for other pictures. A
+FRAME picture can itself contain other nested FRAME pictures, together
+with DATA and KEY pictures. The picture created by PICDEF is the current
+picture (indicated by the letter {\tt C} again), and so subsequent
+graphics applications will arrange for any pictures they create to fall
+entirely within this FRAME picture.
+
+Now display the image, this time including annotated axes around the
+edges\footnote{The current co-ordinate Frame in the image being used is
+RA/DEC and so the axis will be annotated in RA and DEC.}. DISPLAY will
+ensure that all its output (both the image and the axis annotation) fall
+within the current picture (i.e. the picture created by PICDEF above). We
+scale the pixel values to produce a negative image in which 1 percent of
+the pixels appear black and 30 percent appear white:
+
+\small
+\begin{verbatim}
+     % display axes
+     IN - NDF to be displayed /@$KAPPA_DIR/iras/ > $KAPPA_DIR/m31
      MODE - Method to define scaling limits /'perc'/ >
-     PERCENTILES - Percentiles for scaling /[99,30]/ > 
-     Data will be scaled from 3918.688 to 2394.616.
+     PERCENTILES - Percentiles for scaling /[10,99]/ > 99,30
+     Data will be scaled from 10854.78 to 3889.016.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd2.eps}
-   \caption{CCD image DISPLAYed in the top-right quarter of the BASE picture.}
+   \includegraphics[clip,height=110mm]{sun95_gd2.eps}
+   \caption{Optical M31 image with axes displayed toward the left of the BASE picture.}
    \label{fi:agi2}
    \end{center}
    \end{figure}
@@ -3833,7 +3889,8 @@ this new picture:
    \label{fi:agi2}
    \htmladdimg{sun95_gd2.gif}
 
-   Figure 2: CCD image DISPLAYed in the top-right quarter of the BASE picture.
+   Figure 2: Optical M31 image with axes displayed toward the left of the BASE picture.
+
 \end{htmlonly}
 
 
@@ -3848,55 +3905,53 @@ again to list the pictures stored in the database:
        -------------------------------------------------------------------
          1 BASE             Base picture
      C   2 FRAME            KAPPA_PICDEF
-         3 DATA             KAPPA_DISPLAY                              Ref
+         3 FRAME            KAPPA_DISPLAY
+         4 DATA             KAPPA_DISPLAY                              Ref
      PICNUM - Number of new current picture /!/ > 
 \end{verbatim}
 \normalsize
 
-There are three pictures this time; the BASE picture, the picture created
-by \htmlref{PICDEF}{PICDEF} (number 2), and the picture created by
-\htmlref{DISPLAY}{DISPLAY} (number 3). Picture number 2 was made the
+There are four pictures this time; the BASE picture, the picture created
+by \htmlref{PICDEF}{PICDEF} (number 2), and two pictures created by
+\htmlref{DISPLAY}{DISPLAY} (numbers 3 and 4). Picture number 2 was made the
 current picture by \htmlref{PICDEF}{PICDEF}, and (as explained above)
-\htmlref{DISPLAY}{DISPLAY} did not change this. You can see that picture
-number 2 is a FRAME picture. This is the third of the four standard picture
-names mentioned above. A FRAME picture is a special picture which acts as a
-``frame'' for a group of other pictures. A FRAME picture can itself
-contain other nested FRAME pictures, together with DATA and KEY pictures.
+\htmlref{DISPLAY}{DISPLAY} did not change this. DISPLAY creates two
+pictures, one (the DATA picture) containing just the image area itself,
+and another (the FRAME picture) to act as a frame for the DATA picture
+and the annotated axes. 
 
-The FRAME picture created by \htmlref{PICDEF}{PICDEF} is half the linear
-size of the BASE picture, and is located in the top-right corner (hence
-{\tt mode=tr}).  The picture is initially empty, but it still becomes the
-new current picture.  Therefore when DISPLAY comes along and puts the
-image in the centre of the current picture it plots in the top-right
-corner of the screen, reducing the magnification by a factor of two in
-order to fit the image into the smaller picture.
-
-\htmlref{DISPLAY}{DISPLAY} has two parameters that control the $x$ and $y$ 
-magnifications, but these default to 1.0 on both axes. This produces the 
-largest magnification that displays the image without clipping or distortion. 
-We shall now re-display the image within the same current picture, but with
-magnification of 3.0 on each axis in order to produce an enlarged portion of
-the image.  (See \latexelsehtml{Section~\ref{se:ndfsect}}{\htmlref{NDF
-Sections}{se:ndfsect}} for an alternative way of displaying or
-processing a rectangular portion of an NDF.) Only the part of the
-magnified image that is located within the current picture will be
-visible; there is no spillage into other pictures:
+Let's say you wanted to display an enlarged sub-section of the image in
+the top right corner of the X-window. First, you need to decide on the
+bounds of the sub-section to be displayed. Here, we use a graphics cursor to 
+indicate the bottom left and top right corners of a box enclosing the
+require area. Click the left mouse button at the bottom left and top
+right corners of a box enclosing the required sub-section of the image:
 
 \small
 \begin{verbatim}
-     % display xmagn=3 ymagn=3
-     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
-     MODE - Method to define scaling limits /'perc'/ >
-     PERCENTILES - Percentiles for scaling /[99,30]/ > 
-     Data will be scaled from 4890.225 to 2404.794.
+     % cursor showpixel plot=box maxpos=2
+
+       Use the cursor to select up to 2 positions to be reported.
+         To select a position press the space bar or left mouse button
+         To forget the previous position press "d" or the middle mouse button
+         To quit press "." or the right mouse button
+
+      Picture comment: KAPPA_DISPLAY, name: DATA, reporting: SKY co-ordinates
+     
+      RA = 0:41:33.5 (hh:mm:ss.s)   Dec = 40:33:01 (ddd:mm:ss)
+      (172.4       78.2)
+     
+      RA = 0:39:25.0    Dec = 40:54:17
+      (212.8       113.9)
+
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd3.eps}
-   \caption{Magnified portion of the CCD image to the top right.}
+   \includegraphics[clip,height=110mm]{sun95_gd3.eps}
+   \caption{A box is drawn using the CURSOR application.}
    \label{fi:agi3}
    \end{center}
    \end{figure}
@@ -3906,63 +3961,90 @@ visible; there is no spillage into other pictures:
    \label{fi:agi3}
    \htmladdimg{sun95_gd3.gif}
 
-   Figure 3: Magnified portion of the CCD image to the top right.
+   Figure 3: A box is drawn using the CURSOR application.
+
 \end{htmlonly}
 
-The X-window should now look like Figure~
-\latexelsehtml{\ref{fi:agi3}}{3}). Looking again at the pictures stored in 
-the database:
+The box I selected is indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}). 
+
+When an application such as DISPLAY produces a DATA Picture containing a
+representation of an NDF, it saves a copy of the NDF's WCS component
+(which contains co-ordinate Frame information) with the DATA Picture in
+the graphics database. When \htmlref{CURSOR}{CURSOR} subsequently reports
+a position, it uses this saved WCS information to convert the graphics
+co-ordinates at the cursor into any of the available co-ordinate Frames.
+By default, CURSOR reports positions in the co-ordinate Frame which was
+current when the NDF was displayed (RA/DEC in this case), but other
+co-ordinate Frames may be requested using the FRAME parameter (e.g. {\tt
+FRAME=PIXEL} displays pixel co-ordinates). In addition to the co-ordinate
+Frames inherited from the NDF, there is also an extra Frame available
+called GRAPHICS. This Frame specifies positions in terms of millimetres
+from the bottom left corner of the graphics device (e.g. X-window or
+paper).
+
+Going through the parameters supplied to the above CURSOR command, the
+first one (SHOWPIXEL) causes the pixel co-ordinates at each selected
+position to be displayed, in addition to the co-ordinates selected using
+parameter FRAME (which defaults in this case to RA/DEC since FRAME was
+not specified). For instance, the first position is at an RA of $0^{h}
+41^{m} 33.5^{s}$ and a Dec of $40^{\circ} 33^{'} 01^{''}$, and has pixel
+co-ordinates $(172.4,78.2)$\footnote{Pixel \emph{co-ordinates} are
+fractional, where-as pixel \emph{indices} are integer. The pixel with
+indices $(1,1)$ covers a range of pixel co-ordinates between $0.0$ and
+$1.0$ on each axis, with its centre at pixel co-ordinates $(0.5,0.5)$.}.
+The second parameter ({\tt PLOT=BOX}) causes a box to be drawn on the
+screen between each pair of positions. There are several other allowed
+values for the PLOT parameter which mark the positions in different ways
+(markers, poly-lines, chains, text, etc). The last parameter ({\tt
+MAXPOS=2}) is purely a convenience, and causes the application to
+terminate when two positions have been supplied. Without this, you would
+need to press the right mouse button once the two positions had been
+given to indicate that you do not want to supply any more positions.
+
+We now need to create a new FRAME picture to contain the enlarged image. 
+We have
+seen how PICDEF can be used to create a FRAME picture of a given size at
+a given position within the BASE picture, but there are also several
+other ways in which PICDEF can be used. Here, we use PICDEF in ``cursor''
+mode; the bottom left and top right corners of the new picture are
+specified by pointing and clicking with the mouse\footnote{Note, by
+default, the FRAME picture created by PICDEF is \emph{not} constrained to be
+within the current picture, it can be anywhere within the BASE picture.}.
+We use this mode to create a new FRAME picture occupying the area to the
+top right of the existing image:
 
 \small
 \begin{verbatim}
-     % piclist
-       No. Name             Comment                   Label            Ref
-       -------------------------------------------------------------------
-         1 BASE             Base picture
-     C   2 FRAME            KAPPA_PICDEF
-         3 DATA             KAPPA_DISPLAY                              Ref
-         4 DATA             KAPPA_DISPLAY                              Ref
-     PICNUM - Number of new current picture /!/ > 
+     % picdef mode=cursor nooutline
+
+       Use the cursor to select 2 distinct points.
+         To select a point press the space bar or left mouse button
+         To quit press "." or the right mouse button
+     
+     Co-ordinates are ( 0.9155139, 0.5470942 ) and ( 1.683106, 0.9799599 )
+
 \end{verbatim}
 \normalsize
 
-We see there are now four pictures. The previous three are still there,
-since we did not empty the database by running \htmlref{GDCLEAR}{GDCLEAR}
-before creating the magnified image. In addition, \htmlref{DISPLAY}{DISPLAY} 
-has added a fourth picture corresponding to the magnified image.
-
-Let's say we now wanted to include an image of the whole CCD frame in the
-left half of the window. This involves plotting outside the FRAME picture
-created by \htmlref{PICDEF}{PICDEF} above, and so we first need to create
-a new FRAME picture in the bottom left corner ({\tt mode=BL}) using
-\htmlref{PICDEF}{PICDEF} as we did above\footnote{By default, the pictures
-created by PICDEF are not constarined to lie within the current
-picture.}. By default this picture would have half the height and width
-of the whole window, giving a short wide picture. This is not well
-matched to the shape of the CCD frame which is taller than it is wide.
-For this reason we specify that the picture should occupy the full height
-of the window and half its width using the {\tt FRACTION} parameter (we
-also suppress the drawing of a box round the picture using the {\tt
-NOOUTLINE} keyword). We then display the image in this new FRAME picture,
-this time including annotated axes (showing pixel co-ordinates in this
-particular case):
+We now display the required image section in this new FRAME picture. The
+screen output from CURSOR above shows that the selected image section
+runs from pixel 173 to 213 on the first (X) axis, and from pixel 79 to
+114 on the second (Y) axis. To display just this section we include the
+pixel bounds in the specification of the input NDF when we run DISPLAY:
 
 \small
 \begin{verbatim}
-     % picdef mode=bl fraction='[0.5,1.0]' nooutline
-     % display axes
-     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
-     MODE - Method to define scaling limits /'perc'/ >
-     PERCENTILES - Percentiles for scaling /[99,30]/ > 
-     Data will be scaled from 3918.688 to 2394.616.
+     % display border noaxes mode=scale high=3889.016 low=10854.78
+     IN - NDF to be displayed /@m31/ > m31(173:213,79:114)
+     Data will be scaled from 10854.78 to 3889.016.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd4.eps}
-   \caption{Original CCD image with a magnified sub-section.}
+   \includegraphics[clip,height=110mm]{sun95_gd4.eps}
+   \caption{The selected section of the NDF is re-displayed.}
    \label{fi:agi4}
    \end{center}
    \end{figure}
@@ -3972,80 +4054,63 @@ particular case):
    \label{fi:agi4}
    \htmladdimg{sun95_gd4.gif}
 
-   Figure 4: Original CCD image with a magnified sub-section.
+   Figure 4: The selected section of the NDF is re-displayed.
+
 \end{htmlonly}
 
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi4}}{4}). 
 
-The X-window should now look like Figure~
-\latexelsehtml{\ref{fi:agi4}}{4}). The graphics database now contains the
-following pictures:
+The string \verb+m31(173:213,79:114)+ is called an \emph{NDF section
+specifier}. These are described more fully in \hyperref{here}{in section }
+{}{se:ndfsect}. The image is surrounded by a thin border instead of fully
+annotated axes in order to make the image larger. This is achieved using
+the BORDER and NOAXES keywords (equivalent to setting BORDER=YES and 
+AXES=NO). The pixel scaling was specified explicitly using parameters HIGH
+and LOW in order to ensure that the image was displayed with the same
+grey-scale as the main image (the high and low data values are the data
+values corresponding to black and white -- or white and black if reversed
+-- and were reported when the main image was displayed earlier).
 
-\small
-\begin{verbatim}
-     % piclist
-       No. Name             Comment                   Label            Ref
-       -------------------------------------------------------------------
-         1 BASE             Base picture
-         2 FRAME            KAPPA_PICDEF
-         3 DATA             KAPPA_DISPLAY                              Ref
-     C   4 FRAME            KAPPA_PICDEF
-         5 FRAME            KAPPA_DISPLAY
-         6 DATA             KAPPA_DISPLAY                              Ref
-     PICNUM - Number of new current picture /!/ > 
-\end{verbatim}
-\normalsize
-
-The bottom-left FRAME picture created by \htmlref{PICDEF}{PICDEF} is
-number 4, and is the current picture. This FRAME picture contains another
-FRAME picture created by \htmlref{DISPLAY}{DISPLAY} (number 5) containing
-the DATA picture (number 6) and the annotated axes.
-
-
-Before we plot any more pictures we can give the current picture---
-the bottom-left frame created by PICDEF---a label:
+Remember the IRAS image of M31 we started with? We'll now overlay
+contours of the IRAS image on top of the magnified section of the visual
+image we have just displayed. Don't forget, these two images have not
+been aligned -- for instance, north is up in the visual image, but down
+in the IRAS image. However, both images have information within the WCS
+component describing the relationship between pixel co-ordinates and
+RA/DEC. This WCS information was stored with the DATA picture created by
+DISPLAY above, and so can be used by the \htmlref{CONTOUR}{CONTOUR}
+application in order to draw the IRAS contours in alignment with the
+displayed visual image\footnote{The accuracy of this alignment will
+depend on the accuracy of the astrometry information supplied with the
+image.}. In addition, we also use CURSOR to mark a position with a text
+string giving a title for the contour plot:
 
 \small
 \begin{verbatim}
-     % piclabel eric
-\end{verbatim}
-\normalsize
-If we move to or create a new current picture, and then want to return
-to ERIC all we have to enter is:
+     % contour noclear noaxes nokey iras mode=perc percentiles=\[55,75,95\] 
+     Alignment has occurred within the SKY Domain.
 
-\small
-\begin{verbatim}
-     % picsel eric
-\end{verbatim}
-\normalsize
-
-The graphics database is not restricted to images.  To show this we shall
-draw a contour plot in the bottom-right corner of the BASE picture. We
-again create a new FRAME picture using \htmlref{PICDEF}{PICDEF} to hold
-the contour map. The new FRAME picture has the aspect ratio of the BASE
-picture.  Its dimension is measured as a fraction of the linear size of
-the BASE picture, which is controlled by the parameter {\tt FRACTION}.
-The current picture is not cleared before plotting so you can see through
-the contour plot to the galaxy image behind (Figure~
-\latexelsehtml{\ref{fi:agi5}}{5}).  The {\tt NOOUTLINE} again prevents an
-outline from being drawn around the picture:
-
-\small
-\begin{verbatim}
-     % picdef mode=br fraction=0.65 nooutline
-     % contour '$KAPPA_DIR/ccdframec(51:250,141:330)' noclear \
-               keystyle='colour=blue'
-     MODE - Method for selecting contour heights /'FREE'/ > ar
-     NCONT - Give the number of contour heights /6/ > 5
      Contour heights used:
-     2478.022,   2560,958,   2697.029,   3042.488,   4050.937.
+     0.5499523,   0.7577766,   1.012756.
+
+     % cursor plot=text maxpos=1 minpos=1 strings='"IRAS 12 \gmm contours"'
+
+     Use the cursor to select 1 position to be reported.
+       To select a position press the space bar or left mouse button
+       To quit press "." or the right mouse button
+
+       Picture comment: Base picture, name: BASE, reporting: AGI_WORLD
+       co-ordinates
+       X = 1.308796      Y = 0.9839679
+
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd5.eps}
-   \caption{Contour plot added to bottom right.}
+   \includegraphics[clip,height=110mm]{sun95_gd5.eps}
+   \caption{IRAS contours overlayed on the visual image.}
    \label{fi:agi5}
    \end{center}
    \end{figure}
@@ -4055,62 +4120,117 @@ outline from being drawn around the picture:
    \label{fi:agi5}
    \htmladdimg{sun95_gd5.gif}
 
-   Figure 5: Contour plot added to bottom right.
+   Figure 5: IRAS contours overlayed on the visual image.
+
 \end{htmlonly}
 
-The PICDEF command allows you to define new pictures with any
-aspect ratio.  To do this you can supply a value for the ASPECT
-parameter, or define explicit limits ({\tt{mode=xy}}) or
-use the cursor ({\tt{mode=cursor}})---the default.  Also, you may
-constrain the new picture to lie within the current picture with
-parameter {\tt CURRENT}.  In this case the fractional size and aspect
-ratio relate to the current picture:
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi5}}{5}). 
+
+The most important parameter in the above invocation of CONTOUR is the
+NOCLEAR keyword (equivalent to CLEAR=NO). This tells CONTOUR not to clear
+the graphics device before drawing the contours. Instead, CONTOUR
+looks for an existing DATA picture contained within the current picture.
+If one is found, then CONTOUR attempts to align the contours using the 
+WCS information stored with the existing DATA picture. In our case, the
+current picture is still the top right FRAME picture created by PICDEF,
+and so the contours are aligned using the WCS information stored with the 
+DATA picture contained within this FRAME picture (i.e. the magnified image 
+section). CONTOUR tells us that this alignment occurred with the ``SKY
+Domain'' -- if either of the two NDFs had not contained a calibration in a
+suitable celestial co-ordinate system, then alignment on the sky could
+not have been performed. In this case, CONTOUR would have aligned the
+contours in the ``PIXEL Domain'' (i.e. in pixel co-ordinates). 
+
+Since we produced no annotated axes, a title string was added using the text
+drawing abilities of CURSOR. The pointer was position above the the contour
+plot, and the left button clicked. The specified text string was drawn
+centred at this cursor position. Note, the string \verb+\gm+ is a
+``PGPLOT escape sequence'' which represents the Greek letter micron
+(``$\mu$''). See the PGPLOT manual for a detailed description of the
+available escape sequences.
+
+Let's say we wanted to compare the data values in the visual and IRAS 
+images along a given line through the magnified sub-section. To do this,
+we first use the application \htmlref{PROFILE}{PROFILE} to create a pair
+of 1-dimensional NDFs containing the data values along the line in each
+of the two images. We then display these 1-dimensional NDFs using
+application \htmlref{LINPLOT}{LINPLOT}.  First we choose the line along
+which the profiles are to be taken, using CURSOR (again!):
 
 \small
 \begin{verbatim}
-     % picdef current
+     % cursor plot=chain marker=3 style='colour=white' outcat=zz maxpos=2 
 
-     Use the cursor to select 2 distinct points.
-       To select a point press the space bar or left mouse button
+     Use the cursor to select up to 2 positions to be reported.
+       To select a position press the space bar or left mouse button
+       To forget the previous position press "d" or the middle mouse button
        To quit press "." or the right mouse button
 
+
+     Picture comment: KAPPA_CONTOUR, name: DATA, reporting: SKY co-ordinates
+       RA = 0:41:22.7 (hh:mm:ss.s)   Dec = 40:35:12 (ddd:mm:ss)
+       (175.8467    81.82527)
+      
+       RA = 0:39:56.5    Dec = 40:50:27
+       (202.917     107.3986)
+
 \end{verbatim}
 \normalsize
 
-If you try to select a point outside the current picture you will be told
-and the cursor position is reset:
+The pointer is positioned at the two ends of the required profile, and the
+left button clicked at each position. The supplied positions are marked by 
+two markers of PGPLOT type 3 (small crosses), and a white line is drawn between
+them (forming a ``chain''). The selected positions are written to an
+output catalogue (stored in file zz.FIT). We now sample the data in the
+two images along this profile to create a pair of  1-dimensional NDFs
+(\verb+m31_prof+ and \verb+iras_prof+):
 
 \small
 \begin{verbatim}
-     Point lies outside the allowed region.
-     Co-ordinates are ( 0.5160462, 1.0269577E-02 ) and ( 0.8908858, 0.6046214 )
+     % profile m31 incat=zz out=m31_prof
+       Alignment has occurred within the SKY Domain.
+       Profile contains 38 samples.
+
+     % profile iras incat=zz out=iras_prof
+       Alignment has occurred within the SKY Domain.
+       Profile contains 38 samples.
+
 \end{verbatim}
 \normalsize
 
-Notice there is an outline of the region selected, as it is drawn
-by default.
-
-Now draw a positive greyscale plot and its key within the region.
-The extent of the new current picture can be seen in silhouette against
-the earlier pictures (Figure~
-\latexelsehtml{\ref{fi:agi6}}{6}):
+We want to draw the two line profiles in a new plot in the clear area at
+the bottom right of the X-window. We therefore need to create a new FRAME
+picture. This time we use PICDEF in ``XY mode'', in which the bounds of
+the new FRAME picture are given explicitly using parameters UBOUND and
+LBOOUND (we could have used cursor mode again; we use XY mode just to
+explore the different possibilities):
 
 \small
 \begin{verbatim}
-     % greyplot $KAPPA_DIR/ccdframec 
-     KEY - Do you want a key of the grey levels and a title ? /TRUE/ >
-     MODE - Method to define the scaling limits /'scale'/ > perc
-     PERCENTILES - Percentiles for scaling /[10,90]/ > 30,99
-     Data will be scaled from 2394.616 to 3918.688.
+     % picdef mode=xy lbound=\[0.93,0.03\] ubound=\[1.67,0.54\] nooutline
+       Bounds are ( 0, 0 ) and ( 1.701635, 1 )
+\end{verbatim}
+\normalsize
+
+The bounds are given in terms of the co-ordinate system associated with the 
+BASE picture. The new FRAME picture is, as usual, made the current
+picture by PICDEF and so any subsequent graphics applications will draw
+in the new FRAME picture. 
+
+We now draw the first of the two line profiles:
+
+\small
+\begin{verbatim}
+     % linplot m31_prof style='"tickall=0,colour(curve)=black, \
+               drawtitle=0,label(2)=DSS data value (black)"'
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
-   \begin{figure}[ht]
+   \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd6.eps}
-   \caption{Greyplot added within the region of contour picture defined by
-   PICDEF's cursor.}
+   \includegraphics[clip,height=110mm]{sun95_gd6.eps}
+   \caption{Data trace through the visual image.}
    \label{fi:agi6}
    \end{center}
    \end{figure}
@@ -4120,11 +4240,160 @@ the earlier pictures (Figure~
    \label{fi:agi6}
    \htmladdimg{sun95_gd6.gif}
 
-   Figure 6: Greyplot added within the region of contour picture defined by
-   PICDEF's cursor.
+   Figure 6: Data trace through the visual image.
+
 \end{htmlonly}
 
-PICDEF has one further mode---Array.  This enables you to create an
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi6}}{6}). 
+The plotting attributes specified by the STYLE parameter do the following;
+\verb+tickall=0+ stops tick marks from being drawn on the un-labelled
+edges (i.e. the top and right edges); \verb+colour(curve)=black+
+specifies that the data curve is to be drawn in black; \verb+drawtitle=0+
+prevents a title being drawn at the top of the plot; 
+\verb+label(2)=DSS data value (black)+ specifies the textual label for
+the left hand edge.
+
+We now draw the second line plot over the top of the first line plot:
+
+\small
+\begin{verbatim}
+     % linplot iras_prof noclear noalign style='"edge(2)=r,tickall=0, \
+               colour(curve)=white,drawtitle=0, \
+               label(2)=IRAS data value (white)"'
+
+\end{verbatim}
+\normalsize
+
+Again, the NOCLEAR keyword prevents LINPLOT from clearing the graphics
+device before drawing the new line plot. Instead, the new line plot is
+drawn within the same axes as any existing line plot within the current
+picture. By default, the new line plot would adopt the bounds of the two 
+existing axes. This would be inappropriate in this case since the two
+images have very different data scales. To prevent this, we specify
+the NOALIGN keyword which causes the default bounds for the new axes to be 
+determined from the supplied data instead of the existing line plot. The
+STYLE parameter is similar to the previous line plot except that the data
+values are annotated on the right hand edge (\verb+edge(2)=r+), the data
+curve is drawn in white, and data label is different.
+
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \includegraphics[clip,height=110mm]{sun95_gd7.eps}
+   \caption{Data traces through both images.}
+   \label{fi:agi7}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:agi7}
+   \htmladdimg{sun95_gd7.gif}
+
+   Figure 7: Data traces through both images.
+
+\end{htmlonly}
+
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi7}}{7}). 
+
+As a final touch, we will add two ``warp'' lines to the display joining
+the corners of the box marking the enlarged image area to the
+corresponding corners on the enlarged image. CURSOR can be used to draw
+these lines, but we need to take a little care. Normally, graphics
+produced by CURSOR will be clipped at the edge of the picture in which
+the supplied positions fall. In our case, the required lines start in one
+picture (the main image display DATA picture), but end in another (the
+magnified image DATA picture). To avoid the lines being clipped when they
+leave the main image DATA picture, we first ensure that the current
+picture is the BASE picture (i.e. the whole screen), and we tell CURSOR
+to report positions within the current picture. Normally, CURSOR reports
+each position within the most recent picture under the cursor, but
+setting the parameter MODE to CURRENT when running CURSOR means that
+reported positions always refer to the co-ordinate system of the current
+picture. So, first make the BASE picture the current picture. This is
+done using PICLIST, remembering that he BASE picture is always picture
+number 1:
+
+\small
+\begin{verbatim}
+     % piclist picnum=1
+\end{verbatim}
+\normalsize
+
+We now run CURSOR to draw the first warp line:
+
+\small
+\begin{verbatim}
+     % cursor plot=poly mode=current maxpos=2 
+\end{verbatim}
+\normalsize
+
+Position the pointer over the top left corner of the black box marking
+the selected image section in the main image display, and click the left
+button. Then position the pointer over the top left corner of the border
+surrounding the enlarged image display, and click again. A line is drawn
+between these two points. 
+
+We now run CURSOR again to draw the second warp line:
+
+\small
+\begin{verbatim}
+     % cursor plot=poly mode=current maxpos=2 
+\end{verbatim}
+\normalsize
+
+Point and click over the bottom right corners of the two boxes this time.
+The final X-window should look now look like Figure~ 
+\latexelsehtml{\ref{fi:agi8}}{8}). 
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \includegraphics[clip,height=110mm]{sun95_gd8.eps}
+   \caption{The complete display with warps.}
+   \label{fi:agi8}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:agi8}
+   \htmladdimg{sun95_gd8.gif}
+
+   Figure 8: The complete display with warps.
+
+\end{htmlonly}
+
+\subsection{\xlabel{se_agiother}Other Graphics Database Facilities \label{se:agiother}}
+Various other facilities related to the graphics database exist as well
+as those described in the previous section. This section gives a brief
+description of a few more:
+
+\begin{itemize}
+
+\item A ``label'' can be associated with a picture, using application
+\htmlref{PICLABEL}. This provides a convenient ``handle'' by which
+pictures can be referred to. For instance:
+
+\small
+\begin{verbatim}
+     % piclabel fred
+\end{verbatim}
+\normalsize
+
+will give the label FRED to the current picture. This picture could be
+made current again at a later time by re-selecting it using
+\htmlref{PICSEL}{PICSEL}:
+
+\small
+\begin{verbatim}
+     % picsel fred
+\end{verbatim}
+\normalsize
+
+Any label associated with a picture is displayed in the list produced by
+PICLIST.
+
+\item PICDEF has one further mode---Array.  This enables you to create an
 $n\times m$ grid of new FRAME pictures.  It also has a mechanism for
 labelling all the pictures, so you can easily switch between the
 elements of the picture array.  You might use the following command in
@@ -4153,7 +4422,7 @@ available.  For instance:
 is equivalent to the previous example, except that the pictures are
 labelled 1 to 12.
 
-You can see that montages of pictures can rapidly be built.
+\item You can see that montages of pictures can rapidly be built.
 Occasionally, you will want some earlier picture to become the current
 picture.  As we've seen, a labelled picture can be recalled via PICSEL,
 but not all pictures will be labelled, especially ones with name {\tt
@@ -4174,35 +4443,11 @@ label (if it there is one) of the picture in which the cursor is
 located to assist you.  It is usually quite obvious where pictures
 begin and end, so in practice it is easier than described here.
 
-There is another way of selecting a new current picture, and is
-essential for accessing `obscured'
-pictures---\htmlref{PICLIST}{PICLIST}.  Besides listing all the
-pictures with a specified name for the current graphics device,
-PICLIST offers a means of making any of the listed pictures the
-current picture.  There are a number of synonym commands derived from
-PICLIST; these let you select the last-created picture
-(\htmlref{PICLAST}{PICLAST}) or the BASE picture
-(\htmlref{PICBASE}{PICBASE}), amongst others.
-
-Sometimes you will want to know where you can place another picture
-without it hiding or overwriting an existing plot.  There are three
-tasks for selecting suitable FRAME pictures:
-\htmlref{PICEMPTY}{PICEMPTY}, \htmlref{PICENTIRE}{PICENTIRE},
-and \htmlref{PICVIS}{PICVIS}.  Suppose, for instance, you have created
-a substantial array of FRAME pictures, perhaps for plotting spectra
-from a Fabry-Perot data cube.  Now you could select each FRAME picture
-by remembering or computing its label and passing it to PICSEL. A
-quicker approach is to run PICEMPTY, to select the next empty FRAME
-picture before plotting each spectrum.
-
-
-If you do get lost or forget what and where the current picture is,
-the \htmlref{GDSTATE}{GDSTATE} command will come to your rescue.  You
-can even plot an outline with the OUTLINE keyword if you can't
-visualise the device co-ordinates.  The current picture does not have
-a label.  If it did this too would be listed by GDSTATE.  PICLIST also
-flags the current picture with a {\tt C} to the left of the picture
-numbers:
+\item If you do get lost or forget what and where the current picture is,
+the \htmlref{GDSTATE}{GDSTATE} command will come to your rescue.  You can
+even plot an outline with the OUTLINE keyword if you can't visualise the
+device co-ordinates.  In the following example, the current picture does
+not have a label.  If it did this too would be listed by GDSTATE:
 
 \small
 \begin{verbatim}
@@ -4223,170 +4468,6 @@ numbers:
 \end{verbatim}
 \normalsize
 
-Let us select the second picture that we displayed (the image to the
-bottom left).  Having done so we can then inspect some of the data in
-that picture.  \htmlref{INSPECT}{INSPECT} looks for the topmost data
-picture within the current picture.  This may be the current picture
-itself. Using the database entries it knows the position and extent of
-the picture, and so when you come to place the cursor on a point, its
-pixel co-ordinates can be evaluated.  Now we come to that ``Ref'' string
-at the right hand side of the report produced by
-\htmlref{PICLIST}{PICLIST}. It indicates that theDATA picture includes a
-\emph{reference} to the data array which was displayed in the picture 
-(a reference is basically the name of a data file). Since the database
-contains the name of the data file, you need not re-enter it here.
-If you want to inspect another NDF of the same dimensions you can
-override the NDF stored in the database by specifying the NDF you want on the
-command line.  Sometimes you might obtain the wrong array; see
-\latexelsehtml{Section~\ref{se:probwrongNDF}}{\htmlref{Problems
-Problems}{se:probwrongNDF}} on what to do.  In the example below a
-slice through the CCD frame is plotted on the overlay plane (Figure~
-\latexelsehtml{\ref{fi:agi7}}{7}):
-
-\small
-\begin{verbatim}
-     % piccur
-
-     Use the graphics cursor to define the next point or picture...
-        Press left button on mouse/trackerball to select a point.
-        Press right button on mouse/trackerball to end input.
-
-      X = 183.4733, Y = 264.575 in KAPPA_DISPLAY ( DATA )
-
-     % inspect
-
-     For certain options, boxes will appear.  The functions are controlled
-     by the mouse/trackerball buttons and keyboard...
-        Press left button to select the operation shown in the left box.
-        Press middle button/keyboard "2" to select the operation shown in the middle box.
-        Press right button to select the operation shown in the right box.
-
-     Current picture has name: DATA, comment: KAPPA_DISPLAY
-     Using /star/bin/kappa/ccdframec as the input NDF.
-     GDEVICE - Graphics device is to be used for line plots > xov
-     OPTION - Option required /'Region'/ > SL
-     Co-ordinates are ( 150, 175 ) and ( 211, 318 )
-     Type the null character, !, if the slice is not to be saved.
-     SLNAME - Name of file to save slice /!/ >
-     OPTION - Option required /'Region'/ > E
-\end{verbatim}
-\normalsize
-
-\begin{latexonly}
-   \begin{figure}[hbt]
-   \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd7.eps}
-   \caption{A slice through the image drawn on the overlay plane.}
-   \label{fi:gd7}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-   \label{fi:agi7}
-   \htmladdimg{sun95_gd7.gif}
-
-   Figure 7: A slice through the image drawn on the overlay plane.
-\end{htmlonly}
-
-A word of warning about the device for GDEVICE.  Don't use the base
-plane of the image display, in this case {\tt xwindows}.  Otherwise
-your underlying images will be erased when a line plot is drawn.
-The current-graphics-device scheme breaks down here.  Both
-options: no default or occasionally a harmful default,
-are undesirable.  Anyway you've been warned!
-
-Using the same picture we can now demonstrate the overlaying of contours
-using \htmlref{CONTOUR}{CONTOUR}.  The data array we have
-employed so far is smoothed with \htmlref{GAUSMOOTH}{GAUSMOOTH}; the
-origin is shifted with \htmlref{SETORIGIN}{SETORIGIN}, (moving the
-image ten pixels left and twenty down); and then all values outside a
-circle centred at pixel (160,~230), radius 70 pixels are set to zero
-via \htmlref{OUTSET}{OUTSET} to make {\tt \mbox{ccdcircle.sdf}}. See Figure~
-\latexelsehtml{\ref{fi:agi7}}{7}.  The plot is made to the current
-overlay device, defined by \htmlref{OVSET}{OVSET}, namely {\tt xov}.
-If the {\tt NOCLEAR} keyword is specified when running CONTOUR, then an
-attempt is made to align the new data with the previously displayed data.
-This alignment is based on information describing the World Co-ordinate
-Systems stored with the two data arrays. When \htmlref{DISPLAY}{DISPLAY}
-creates a picture it stores such information with the picture in the
-graphics database. CONTOUR can then read this information from the
-database, and use it to align the new data array with the image created
-by DISPLAY:
-
-\small
-\begin{verbatim}
-     % contour noclear 
-     NDF - Image to be contoured /@$KAPPA_DIR/ccdframec/ > ccdcircle
-     Current picture has name: DATA, comment: KAPPA_DISPLAY
-        Reference data object: /star/bin/kappa/ccdframec.
-     OFFSET - x-y displacement in pixels /0,0/ > 10,20
-     MODE - Method for selecting contour heights /'Free'/ >
-     HEIGHTS - Give the heights of the contours > [2400,2500,2650,2900,3300,3900]
-\end{verbatim}
-\normalsize
-
-\begin{latexonly}
-   \begin{figure}[hbt]
-   \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi7.eps}
-   \caption{Contour overlay of a different data array on top of the
-   original CCD image.}
-   \label{fi:agi7}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-\begin{htmlonly}
-   \label{fi:agi7}
-   \htmladdimg{sun95_agi7.gif}
-
-   Figure 7: Contour overlay of a different data array on top of the
-   original CCD image.
-\end{htmlonly}
-
-Application PICCUR has a dual role.  It also provides a means of
-determining the co-ordinates of points in pictures selected with the
-cursor.  Again only the topmost picture at a given cursor location is
-accessible.  Each time the left-hand button is pressed the co-ordinates
-of the position in the topmost picture at that point is presented.
-This is the dynamic mode ({\tt{"Dynamic"}}).  The other options let you
-obtain co-ordinates in the reference frames of the current picture
-({\tt{"Current"}}) or anchored ({\tt{"Anchor"}}) to the picture at the first
-cursor position selected.
-
-\small
-\begin{verbatim}
-     % piccur
-
-     Use the graphics cursor to define the next point or picture...
-        Press left button on mouse/trackerball to select a point.
-        Press right button on mouse/trackerball to end input.
-
-      X = 245.6915, Y = 400.4704 in KAPPA_GREYPLOT ( DATA )
-      X = 0.8398062, Y = 1.04369 in KAPPA_GREYPLOT ( FRAME )
-      X = 239.562, Y = 279.4127 in KAPPA_CONTOUR ( DATA )
-      X = 241.1404, Y = 298.2021
-      X = 255.3456, Y = 293.2284
-      X = 153.5614, Y = 236.91 in KAPPA_DISPLAY ( DATA ), label = ERIC.
-      X = 3.2948352E-02, Y = 0.5845106 in KAPPA_CONTOUR ( FRAME )
-      X = 0.5291266, Y = 1.805826 in KAPPA_GREYPLOT ( FRAME )
-      X = 0.7304244, Y = 0.9760387 in KAPPA_CONTOUR ( FRAME )
-      X = -7.8452587E-02, Y = 0.838221 in KAPPA_CONTOUR ( KEY )
-      X = 0.7147477, Y = 0.5338036
-      X = 0.7361856, Y = 0.5252284
-\end{verbatim}
-\normalsize
-You can record the co-ordinates in a text file.
-
-If you don't want to affect the graphics database, but still obtain
-co-ordinates of features in an image, use the closely related
-\htmlref{CURSOR}{CURSOR}, which also allows selected points to
-be marked or joined.  It also permits you to remove previous points
-if you make a mistake.  CURSOR has output parameters so that you can
-pass the co-ordinates of the selected points to a script or other
-applications.  There is also the {\tt XYcur} option in INSPECT; it marks
-the points selected, and allows updating of lists of $x$-$y$ positions
-stored in text files.
 
 \subsection{\xlabel{se_agitidy}The Graphics Database File\label{se:agitidy}}
 
@@ -4396,7 +4477,7 @@ is undefined, the database file is placed in your home directory.
 Thus by default the file is {\tt \$HOME/agi\_}{\it $<$node$>$}{\tt
 .sdf}, where you substitute your computer's node name for {\it
 $<$node$>$}, {\it{e.g.}}\ {\tt /home/dro/agi\_rlsaxp.sdf}. A new
-database is created when you run an AGI application if none exists.
+database is created when you run a graphics application if none exists.
 AGI will purge the database for a device if the graph window has
 changed size, or if you switch between portrait and landscape formats
 for a printer device.
@@ -4413,52 +4494,13 @@ applications are run. If you get ``strange'' behaviour when running a
 graphics application, deleting the graphics database file and starting
 again will often cure the problem.
 
-\subsection{\xlabel{se_agicomp}The Components of a Picture\label{se:agicomp}}
-
-In addition to the dimensions and position of a rectangular area on the
-graphics device, each AGI picture also contains a {\em name\/} and a {\em
-comment\/}. Optionally, a {\em label\/} may be added.  `Name' is
-something of a misnomer---`type' would give a clearer indication of its
-purpose.  In the same way `label' would have been called `name', but for
-the fact that `name' was in use.  
-
-Currently, the name can take one of four values: {\tt "BASE"} or
-{\tt "FRAME"} or {\tt "DATA"} or {\tt "KEY"}. {\tt "BASE"} is reserved for
-the BASE picture; this is the picture that extends over the whole of the
-plotting area.  {\tt "DATA"} indicates that the picture contains a
-representation of data in a graphical form, {\it{e.g.}}\ a greyscale, an
-histogram.  {\tt "KEY"} is used for keys---there's a surprise. 
-{\tt "FRAME"} usually contains a collection of DATA pictures.  For instance, in
-a contour plot the DATA picture is the area where contours may
-potentially be drawn; whereas the FRAME picture comprises the annotated
-axes and labels, the key, and data area.
-
-The comment is a one-line description of the picture.  At present in
-{\footnotesize KAPPA} the comment is just {\tt "KAPPA\_}{\it
-$<$application$>$}{\tt{"}} where {\it $<$application$>$} is
-the name of the application that created the picture.  However, if
-there is a demand, commentary might be modified to be under your
-control via a parameter in each graphics application, and that
-defaults to the application name as above.  What you can control now
-is the {\em label\/}.  This is a name you assign to a picture for easy
-reference and selection.
-
-A DATA picture may also have associated World Co-ordinate System (WCS) 
-information stored with it in the AGI database. This information is
-copied from the displayed NDF when the picture is is created, and enables 
-subsequent applications to use positions in any of the co-ordinates Frames 
-which were available in the NDF.\footnote{Not all {\footnotesize KAPPA}
-applications use this facility as yet. Those which do will indicate the
-fact in the {\bf Notes:} section of the application description in
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
-KAPPA applications}{ap:full}}.}
+\end{itemize}
 
 \newpage
 \section{\xlabel{se_co-ordsystem}Co-ordinate Systems
 \label{se:co-ordsystem}}
 
 \begin{quote}
-\begin{center}
 
 {\em 
 
@@ -4504,7 +4546,6 @@ Information which is common to both systems (for instance the definition
 of pixel co-ordinates) is included in both sections.
 
 }
-\end{center}
 \end{quote}
 
 {\footnotesize KAPPA} uses a number of co-ordinate systems; this section
@@ -4685,7 +4726,6 @@ on the screen.
 \section{\xlabel{se_wcsuse}Using World Co-ordinate Systems\label{se:wcsuse}}
 
 \begin{quote}
-\begin{center}
 
 {\em 
 
@@ -4702,7 +4742,7 @@ parameter) which is being replaced.
 The new (converted) applications are identified by the fact that their
 descriptions in
 \latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
-KAPPA applications}{ap:full}} include references to the ``WCS
+{\footnotesize KAPPA} applications}{ap:full}} include references to the ``WCS
 component'' or to ``WCS information''. These applications no longer have a 
 {\tt COSYS} parameter.
 
@@ -4710,31 +4750,1118 @@ The older applications are identified by the fact they make no reference
 to the WCS component, and have a {\tt COSYS} parameter. 
 
 }
-\end{center}
 \end{quote}
 
-\subsection{Introduction}
-What are co-ordinate Frames, and why are they important?
-Some simple examples.
-A general outline of the scheme.
+\subsection{Pixel Indices, Pixel Co-ordinates, and Grid Co-ordinates}
+In this sub-section we will look at the definition of the three basic
+co-ordinate systems available in all NDFs -- pixel indices, pixel
+co-ordinates, and grid co-ordinates.
 
-\subsection{Distinguishing between Co-ordinate Frames --- Domains}
-Domain names, SCS specifications, etc.
+\emph{Pixel indices} are integer values which are used to count the
+pixels along each axis of an NDF. The first pixel can be given any
+arbitrary pixel index, and this value is known as the \emph{pixel origin}.
+When a section is extracted from an NDF, the pixel origin in the
+extracted section is set so that each pixel retains its original pixel
+indices (see Figure~\latexelsehtml{\ref{fi:pixind}}{1}). 
 
-\subsection{Creating a WCS component}
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \includegraphics[clip,height=100mm]{sun95_pixind.eps}
+   \caption{Pixel indices.}
+   \label{fi:pixind}
+   \end{center}
+   \end{figure}
+\end{latexonly}
 
-\subsection{Modifying a WCS component}
-Propagation, attributes.
+\begin{htmlonly}
+   \label{fi:pixind}
+   \htmladdimg{sun95_pixind.gif}
 
-\subsection{Restrictions on Mappings}
-Problems if Mappings are not bi-directional (eg if Axes are not monotonic).
+   Figure 1: Pixel indices
 
-\subsection{How is World Co-ordinate Information Stored in an NDF?}
-Frames, Mappings, FrameSets. 
-WCS, IRAS90, FITS. 
-AXIS structures.
+\end{htmlonly}
 
-\subsection{Positions lists}
+
+\emph{Pixel co-ordinates} are floating point values which allow positions
+to be specified with sub-pixel accuracy. They are related to pixel indices
+as indicated in Figure~\latexelsehtml{\ref{fi:pixco}}{2}). 
+
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \includegraphics[clip,height=54mm]{sun95_pixco.eps}
+   \caption{Pixel co-ordinates.}
+   \label{fi:pixco}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:pixco}
+   \htmladdimg{sun95_pixco.gif}
+
+   Figure 1: Pixel co-ordinates.
+
+\end{htmlonly}
+
+
+\emph{Grid co-ordinates} are floating point values which are similar to
+pixel co-ordinates except that the origin is fixed so that the first
+pixel on an axis is centred at a grid co-ordinate value of $1.0$, no matter
+what the pixel origin is. This corresponds to the FITS idea of ``pixel 
+co-ordinates'' (FITS does not make provision for an arbitrary pixel
+origin). When a section is extracted from an array, the grid co-ordinates
+of the extracted section include no knowledge of where the section
+was located in the original array. See
+Figure~\latexelsehtml{\ref{fi:gridco}}{3}). 
+
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \includegraphics[clip,height=76mm]{sun95_gridco.eps}
+   \caption{Grid co-ordinates.}
+   \label{fi:gridco}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:gridco}
+   \htmladdimg{sun95_gridco.gif}
+
+   Figure 1: Grid co-ordinates.
+
+\end{htmlonly}
+
+\subsection{Co-ordinate Frames, Axes and Domains}
+
+A \emph{co-ordinate Frame} is a system of co-ordinate axes which can be
+used to specify a position within an NDF data array. Within an NDF such
+co-ordinate Frames also have associated descriptive information such as
+axis labels, axis units, a Frame title, etc. These are called the
+\emph{attributes} of the Frame. The most important single attribute is
+called the Frame \emph{Domain}, and is an upper-case character string
+indicating the physical domain in which the co-ordinate system is
+defined. Frames with the same Domain can, in general, be aligned with
+each other.
+
+Frames with the following Domains are defined within all NDFs, no matter
+how they are created:
+
+\begin{description}
+
+\item[GRID]\begin{latexonly}\mbox{}\\ \end{latexonly} Corresponds to grid
+co-ordinates.
+
+\item[PIXEL]\begin{latexonly}\mbox{}\\ \end{latexonly} Corresponds to
+pixel co-ordinates. 
+
+\item[AXIS]\begin{latexonly}\mbox{}\\ \end{latexonly} Corresponds to
+the co-ordinate system defined by the AXIS structures within the NDF.
+
+An AXIS structure is a 1-dimensional array which maps pixel index along a
+given axis onto another related co-ordinate axis (e.g. wavelength). Each
+dimension in the NDF should have an associated AXIS structure. Such
+structures can be created (for instance) using \htmlref{SETAXIS}{SETAXIS}.
+
+AXIS structures can only be used to represent independent axes. For
+instance, celestial co-ordinates cannot (in general) be described using 
+AXIS structures because celestial longitude and latitude may both vary
+along any given row or column of an NDF.
+
+\end{description}
+
+The dimensionality of each of these Frames is equal to that of the NDF
+(e.g. a 2-dimensional NDF will have 2-dimensional PIXEL, GRID and AXIS
+Frames). Axes within a Frame are identified by an integer index in the
+range 1 to the number of axes in the Frame. The above Frames are not
+stored permanently in the NDF, but are generated automatically by the NDF
+access library each time a reference is made to them.
+
+In addition to the PIXEL, AXIS and GRID Frames, an NDF may also contain any
+number of additional co-ordinates Frames. Descriptions of these extra
+Frames, together with recipes describing how to convert positions between
+them, are stored permanently in the NDFs WCS component. Application
+\htmlref{WCSADD}{WCSADD} allows new Frames to be added to the WCS
+component (positions in the new Frame must be linearly related to the 
+corresponding positions in an existing Frame).
+\htmlref{WCSREMOVE}{WCSREMOVE} allows Frames to be removed from the WCS
+component.
+
+One common additional Frame Domain is SKY. This is reserved to refer to
+2-dimensional Frames which describe celestial longitude and latitude. Such 
+Frames are known as ``SkyFrames'' and have additional attributes indicating
+the particular celestial co-ordinate system in use (e.g. equatorial,
+galactic, ecliptic, etc), and any required qualifying parameters (epoch,
+equinox, etc). A SkyFrame can be added to an NDF by importing it
+from suitable FITS headers using \htmlref{FITSDIN}{FITSDIN}, 
+\htmlref{FITSIN}{FITSIN} or the CONVERT package (see \xref{SUN/55}{sun55}{}).
+Alternatively, a SkyFrame can be created directly by specifying the pixel
+co-ordinates of stars with known celestial co-ordinates (see
+\htmlref{SETSKY}{SETSKY} and \GAIAref\ ).
+
+\subsection{FrameSets, and the Current Frame}
+Any co-ordinate Frames described in the WCS component, together with the
+standard GRID, PIXEL and AXIS Frames, form a collection of inter-related
+Frames called a \emph{FrameSet}. A FrameSet contains descriptions of each
+Frame, plus recipes (called \emph{Mappings}) describing how to convert
+positions from one Frame to another\footnote{A Mapping need not
+necessarily be defined in both directions. For instance, a Mapping which
+goes from a 3-dimensional Frame to a 2-dimensional Frame (maybe by simply
+throwing away one of the axis values) may not be defined in the other
+direction. {\footnotesize KAPPA} applications will report an error if a Mapping is not
+defined in the required direction. Another common example of a
+uni-directional Mapping is that between the GRID and AXIS Frames in 
+cases where the AXIS structures are non-monotonic.}.
+
+Frames within a FrameSet are distinguished by their attribute values,
+primarily their Domain value. In addition, each Frame has an integer
+\emph{Frame index}. These indices are (in general) allocated sequentially
+in chronological order as Frames are added into the FrameSet.
+Applications which require the user to specify a Frame will usually allow
+the Frame to be specified either by Domain name, or by index. Frame indices
+can be examined using \htmlref{NDFTRACE}{NDFTRACE} (see below).
+
+One Frame within the FrameSet of an NDF is nominated as the \emph{current
+co-ordinate Frame}. When-ever an application reports positions within
+an NDF (for instance, when annotating plot axes), the positions reported 
+will refer to the current co-ordinate Frame. Likewise, when-ever an 
+application requests a position from the user (for instance, the position
+to be placed at the centred of a displayed image), it will expect the
+position to be given within the current co-ordinate Frame of the NDF,
+
+The contents of the WCS component of an an NDF can be examined using
+\htmlref{NDFTRACE}{NDFTRACE}. By default, this just shows the number of
+co-ordinates Frames defined within the NDF (including the three standard
+ones), and the Title and Domain of the current co-ordinate Frame. More
+detail can be obtained using the keywords FULLWCS and FULLFRAME. The
+first causes the Title, index and Domain of all Frames to be displayed,
+together with the index of the current Frame. The second causes a more
+complete description of each Frame to be displayed, including axis
+labels, units, celestial co-ordinate system (for SkyFrames), etc.
+
+The current co-ordinate Frame can also be examined using
+\htmlref{WCSFRAME}{WCSFRAME}. This is an important application because
+it also allows you to change the current co-ordinate Frame in the NDF.
+For instance:
+
+\small
+\begin{verbatim}
+     % wcsframe m31 pixel
+\end{verbatim}
+\normalsize
+
+will make the PIXEL Frame the current co-ordinate Frame in the NDF
+\verb+m31+. After this, all references to positions within the NDF
+\verb+m31+ will refer to pixel co-ordinates.
+
+\subsection{Reserved Domain Names}
+New co-ordinates Frames can be created and added into an NDF using 
+\htmlref{WCSADD}{WCSADD}. When you create a new Frame you should give it
+a meaningful Domain name which indicates the sort of co-ordinates which it
+represents. You are free to choose any name you like (white space is removed, 
+and lower case characters are converted to upper case before using the
+supplied Domain string), but you should usually avoid the following reserved 
+Domain names:
+
+\begin{description}
+\item [GRID] -- Reserved to represent grid co-ordinates (in units of
+pixels).
+\item [PIXEL] -- Reserved to represent pixel co-ordinates (in units of
+pixels).
+\item [AXIS] -- Reserved to represent AXIS co-ordinates (in arbitrary units).
+\item [SKY] -- Reserved to represent celestial longitude and latitude (in
+any suitable system, but always stored internally in units of radians).
+\item [GRAPHICS] -- Reserved to represent positions on a graphics device 
+(in units of millimetres. measured from the bottom left corner 
+of the device).
+\end{description}
+
+\subsection{\xlabel{se_scs}Specifying a Co-ordinate Frame\label{se:scs}}
+Several applications (\htmlref{WCSFRAME}{WCSFRAME},
+\htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE}, etc) have
+parameters which are used to specify a particular co-ordinate Frame.
+These parameters are usually called FRAME. When selecting a Frame from an 
+existing FrameSet (e.g. read from the WCS component of an NDF), the Frame may 
+be specified in one of the following ways:
+
+\begin{itemize}
+
+\item As an integer Frame index within the specified FrameSet. 
+
+\item As a Domain name (e.g. PIXEL, AXIS, SKY, etc). 
+
+\item As a ``Sky Co-ordinate System'' (SCS) specification. This notation
+has been inherited from the IRAS90 package (see \xref{SUN/163}{sun163{}} ),
+and can be used to indicate a specific celestial co-ordinate system.
+Simply specifying the Domain name SKY will select any SkyFrame which is
+present, irrespective of the particular celestial co-ordinate system which
+the SkyFrame represents. If you want to request a particular celestial
+co-ordinate system (e.g. galactic, equatorial, ecliptic, etc), then use an
+SCS specification. If the requested system is not present, but a related
+SkyFrame can be found for a different system, then the SkyFrame will be
+modified so that it represents the requested system (the Mappings between
+the SkyFrame and the other Frames in the FrameSet will also be modified 
+appropriately).
+
+An SCS specification is made up of two parts; a co-ordinate system name,
+followed by an optional epoch giving the reference equinox. Any of the
+three system names {\small EQUATORIAL, ECLIPTIC} and {\small GALACTIC}
+can be used. Case is insignificant, and abbreviations may be given.
+
+Ecliptic and equatorial coordinates are referred to the mean equinox of a
+given epoch. This epoch is specified by appending it to the end of the
+name of the sky coordinate system, in parentheses; for instance {\small
+EQUATORIAL(1983.5)} (only the four most significant decimal places are
+used). The epoch may be preceded by a single character, B or J,
+indicating if the epoch is a Besselian epoch (B) or a Julian epoch (J).
+If this character is missing (as in the above example), then the epoch is
+assumed to be Besselian if it less than 1984.0, and Julian otherwise. If no 
+equinox is specified in this way, then a default of B1950.0 is used.
+
+If a Julian epoch is used to specify the reference equinox for
+an equatorial coordinate system, then the equatorial coordinates
+are assumed to be in the IAU 1976, FK5, Fricke system. If the
+equinox is specified using a Besselian epoch, then the
+coordinates are assumed to be in the FK4, Bessel-Newcomb system.
+
+When a Frame is specified using an SCS specification, it will usually
+also be necessary to specify the epoch at which the positions were
+determined. This will be done using the separate parameter EPOCH. This
+epoch is required because some celestial co-ordinate systems are
+non-inertial and rotate slowly with respect to other celestial
+co-ordinate systems, introducing fictitious proper motions. Knowing the
+date at which the positions were determined allows the effect of this
+fictitious proper motion to be eliminated when converting between
+different systems.
+
+\end{itemize}
+
+\subsection{Propagation of WCS Information}
+{\footnotesize KAPPA} applications which create an output NDF on the basis of a given
+input NDF usually copy the contents of the WCS component from the input
+to the output, modifying it as appropriate to take account of any linear 
+mapping of pixel co-ordinates introducing by the application. The following 
+are exceptions to this rule:
+
+\begin{itemize}
+
+\item Applications which still use the old IMAGE-format data structures
+(see \latexelsehtml{Section~\ref{se:datastr}}{``\htmlref{Data Structures}
+{se:datastr}''}). E.g. \htmlref{SQORST}{SQORST}, \htmlref{MANIC}{MANIC},
+etc.
+
+\item Applications in which positions in the output NDF are
+not linearly related to corresponding positions in the input NDF 
+(e.g. \htmlref{TRANSFORMER}{TRANSFORMER}, \htmlref{ELPROF}{ELPROF}).
+
+\item Applications in which the output NDF is not a direct representation
+of the input NDF (e.g. \htmlref{FOURIER}{FOURIER}).
+
+\end{itemize}
+
+The output NDFs produced by such applications will contain no WCS component
+(but they will still have the three standard Frames -- GRID, PIXEL and AXIS).
+
+The application \htmlref{WCSCOPY}{WCSCOPY} can be used to copy the WCS
+component from one NDF to another, optionally introducing a linear
+transformation of pixel co-ordinates in the process. This can be used to
+add WCS information back into an NDF which has been stripped of WCS
+information by one of the above applications. 
+
+\subsection{Reading WCS Information Stored in Other Forms}
+
+When a {\footnotesize KAPPA} application requires WCS information, it looks
+first in the WCS component of the NDF. If no WCS component is defined
+within the NDF, then it will attempt to obtain WCS information from two
+other locations, in the following order:
+
+\begin{enumerate}
+
+\item If an IRAS90 astrometry structure (see \xref{SUN/163}{sun163}{} ) is 
+present within the NDF, then WCS information will be read from it, and
+added to the FrameSet holding the GRID, PIXEL and AXIS Frames. IRAS90 
+astrometry structures have been used by several applications packages in
+the past for storing astrometry information. {\footnotesize KAPPA} contains 
+the \htmlref{SETSKY}{SETSKY} application which can be used to create such
+a structure, either by supplying the required numerical parameters (pixel
+size, image orientation, etc), or by doing a least squares fit to a set of
+pixel co-ordinates with corresponding celestial co-ordinates. 
+
+\item If no IRAS90 astrometry structure can be found, an attempt is made
+to read WCS information from the FITS header cards in the FITS extension.
+
+\end{enumerate}
+
+Note, {\footnotesize KAPPA} applications always \emph{write} WCS
+information in the form of a standard WCS component. You should remember
+that astrometry information stored within an IRAS90 or FITS extension will
+not be corrected to take account of geometric manipulation produced by 
+applications such as \htmlref{ROTATE}{ROTATE}, \htmlref{COMPAVE}{COMPAVE},
+etc. Use of such applications will render IRAS90 and FITS astrometry
+information incorrect. For this reason, applications always warn the user
+if astrometry information is being read from an IRAS90 or FITS extension.
+These extension can be deleted if necessary, using the \htmlref{ERASE}{ERASE}
+command. For instance:
+
+\small
+\begin{verbatim}
+   % erase m31.more.iras90
+   % erase m31.more.fits
+\end{verbatim}
+\normalsize
+
+will erase the IRAS90 and FITS extensions from the NDF \verb+m31+.
+
+\subsection{Using SETSKY to Add a Celestial Co-ordinate Frame to an NDF}
+As mentioned in the previous section, the \htmlref{SETSKY}{SETSKY}
+application stores astrometry information within an NDF in the form of an
+IRAS90 astrometry structure. Such structures are limited in several ways
+compared to a full WCS component, but can none-the-less be used by other
+{\footnotesize KAPPA} applications. It is hoped that SETSKY will be replaced
+at some point in the future with a fully compliant WCS application.
+
+To use SETSKY, you need to know the celestial co-ordinates at a set of
+points within the image. You may be able to find these, for instance,
+using software such as CHART (see \xref{SUN/32}{sun32}{}), or by comparing
+your image with other images, such as those available from the 
+Digitised Sky Survey, which already have astrometry information
+associated with them. You create a text file holding the pixel and
+celestial co-ordinates at a single position on each line. For instance, 
+if you have five known RA/DEC (B1950) positions in your image, the file 
+may look like:
+
+\small
+\begin{verbatim}
+
+ 0 49 05.9,   42 25 30,    32,    266
+ 0 48 31.7,   40 03 36,    39,    29
+ 0 37 03.0,   40 04 48,    258,   31
+ 0 36 54.6,   42 26 47,    257,   268
+ 0 45 47.7,   41 54 03,    93,    213
+
+\end{verbatim}
+\normalsize
+
+The first column gives the RA values (hours, minutes and seconds), the 
+second gives the DEC values (degrees, arc-minutes and arc-seconds), the 
+third gives the pixel X co-ordinates, and the fourth gives the pixel Y
+co-ordinates.
+
+If this file is called \verb+pos.dat+, then the following command can be
+used to create the IRAS90 astrometry structure:
+
+\small
+\begin{verbatim}
+   % setsky m31 ^pos.dat coords='equ(b1950)' epoch=1998.0 projtype=gno
+
+     Trying GNOMONIC projection...
+
+     These parameter values give an RMS positional error of 0.3647723 pixels ...
+       Projection type                      : GNOMONIC
+       Sky co-ordinates of reference point  : 0h 40m 31.29s, 42d 37m 53.15s
+       Image co-ordinates of reference point: (190.3287,285.795)
+       Pixel dimensions                     : (36.04451,36.00686) arcsecs
+       Position angle of image Y axis       : 359d 38m 35.77s
+       Tilt of celestial sphere             : 0d 0m 0.00s
+
+\end{verbatim}
+\normalsize
+
+Note the up-arrow character (``\verb+^+'') before the file name
+(\verb+pos.dat+). This tells SETSKY that the string is a file name. A
+gnomonic (or \emph{tangent plane}) projection was requested using the
+PROJTYPE parameter. If no projection type is specified then SETSKY will
+try four different projections (gnomonic, Aitoff, Lambert equivalent
+cylindrical, and orthographic) in turn, and choose the one which gives
+the smallest RMS position error.
+
+An alternative way to add a celestial co-ordinate Frame to an NDF is to
+use the facilities of GAIA (see \xref{SUN/214}{sun214}{}). This provides
+much more sophisticated facilities, and creates a standard WCS
+component instead of an IRAS90 astrometry structure.
+
+\subsection{Frame Attributes}
+
+Each co-ordinate \xref{Frame}{sun210}{Frame} has several \emph{attributes} 
+which determine its
+properties. This section lists the most important of these. See
+\xref{SUN/210}{sun210}{} for a complete description of the properties of
+Frames and their attributes. The application \htmlref{WCSATTRIB}{WCSATTRIB} 
+can be used to examine attribute values associated with the current Frame
+of an NDF, and change the values of those which are not read-only:
+
+\sstroutine{
+   Digits/Digits(axis)
+}{
+   Number of digits of precision
+}{
+   \sstdescription{
+      This attribute specifies how many digits of precision are
+      required by default when a co-ordinate value is formatted for a
+      \xref{Frame}{sun210}{Frame} axis (e.g. when producing annotated
+      plot axes). Its value may be set either
+      for a Frame as a whole, or (by subscripting the attribute name
+      with the number of an axis) for each axis individually. Any
+      value set for an individual axis will over-ride the value for
+      the Frame as a whole.
+
+      Note that the Digits value acts only as a means of determining a
+      default value for the \xref{Format}{sun210}{Format} attribute. Its 
+      effects are over-ridden if a Format string is set explicitly for an 
+      axis.
+
+      The default Digits value for a Frame is 7. If a value less than 1 is 
+      supplied, then 1 is used instead.
+
+      If the Frame is actually a \xref{SkyFrame}{sun210}{SkyFrame} 
+      (e.g. describes celestial longitude and latitude), then the Digits 
+      value specifies the total number of digits in the formatted axis
+      value -- that is, the sum of the hours (or degrees), minutes and 
+      seconds digits.
+
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib m51 set digits 4
+      }{
+         This sets the Digits attribute to the value 4 for all axes in
+         the current Frame of the NDF {\tt m51}. This results in axis
+         values being formatted with 4 digits of precision when they are
+         displayed by any application, so long as no value has been set
+         for the Format attribute.
+      }
+      \sstexamplesubsection{
+         wcsattrib m51 set digits(1) 4
+      }{
+         This is like the previous example, except that the Digits value
+         is only set for the first axis in the current Frame of the NDF.
+      }
+   }
+}
+
+\sstroutine{
+   Domain
+}{
+   Co-ordinate system domain
+}{
+   \sstdescription{
+      This attribute contains a string which identifies the physical
+      domain of the co-ordinate system that a \xref{Frame}{sun210}{Frame} 
+      describes.
+
+      The Domain attribute also controls how Frames align with each other.
+      If the Domain value in a Frame is set, then only Frames with the
+      same Domain value can be aligned with it. 
+
+      Some Frames are given standard Domain values when they are created
+      (e.g. GRID, PIXEL, AXIS, SKY, GRAPHICS). Frames created by the user 
+      (for instance, using \htmlref{WCSADD}{WCSADD}) can have any Domain
+      value, but the standard Domain names should be avoided unless the
+      standard meanings are appropriate for the Frame being created.
+
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib m51 set domain oldpixel
+      }{
+         If the current co-ordinate Frame in the NDF {\tt m51} is the
+         PIXEL Frame, then this command takes a ``snap-shot'' of the PIXEL 
+         Frame and stores it as a new Frame with Domain OLDPIXEL in the WCS 
+         component. Subsequent changes to the PIXEL Frame (for instance,
+         produced by applications which rotate, or move the contents of
+         the NDF) will not effect the OLDPIXEL Frame, which will thus 
+         provide a ``frozen'' record of the original PIXEL Frame.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All Domain values are converted to upper case and white space
+         is removed before use.
+      }
+   }
+}
+
+\sstroutine{
+   Epoch
+}{
+   Epoch of observation
+}{
+   \sstdescription{
+      This attribute is used to qualify the celestial coordinate
+      system described by a \xref{SkyFrame}{sun210}{SkyFrame}, by giving the 
+      moment 
+      in time when the coordinates are known to be correct. Often, this will
+      be the date of observation.
+
+      The Epoch value is important in cases where the coordinates of
+      sources may change with time. Possible reasons for this include:
+      (i) changing aberration of light caused by the observer's
+      velocity (e.g. due to the Earth's motion around the Sun), (ii)
+      changing gravitational deflection by the Sun due to changes in
+      the observer's position with time, (iii) fictitious motion due
+      to rotation of non-inertial coordinate systems (e.g. the old FK4
+      system), and (iv) proper motion of the source itself (although
+      this last effect is not handled by the SkyFrame class because it
+      affects individual sources rather than the coordinate system as
+      a whole).
+
+      The Epoch attribute is stored as a Modified Julian Date, and is not
+      usually changed.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Care must be taken to distinguish the Epoch value, which
+         relates to motion (or apparent motion) of the source, from the
+         superficially similar \xref{Equinox}{sun210}{Equinox} value. The 
+         latter is used to
+         qualify a coordinate system which is itself in motion in a
+         (notionally) predictable way as a result of being referred to a
+         slowly moving reference plane (e.g. the equator).
+
+         \sstitem
+         See the description of the \xref{System}{sun210}{System} attribute 
+         for details of
+         which qualifying attributes apply to each celestial coordinate
+         system.
+      }
+   }
+   \sstdiytopic{
+      Input Formats
+   }{
+      The formats accepted when setting an Epoch value are listed
+      below. They are all case-insensitive and are generally tolerant
+      of extra white space and alternative field delimiters:
+
+      \sstitemlist{
+
+         \sstitem
+         Besselian Epoch: Expressed in decimal years, with or without
+         decimal places ({\tt{"}}B1950{\tt{"}} or {\tt{"}}B1976.13{\tt{"}} for example).
+
+         \sstitem
+         Julian Epoch: Expressed in decimal years, with or without
+         decimal places ({\tt{"}}J2000{\tt{"}} or {\tt{"}}J2100.9{\tt{"}} for example).
+
+         \sstitem
+         Year: Decimal years, with or without decimal places ({\tt{"}}1996.8{\tt{"}}
+         for example).  Such values are interpreted as a Besselian epoch
+         (see above) if less than 1984.0 and as a Julian epoch otherwise.
+
+         \sstitem
+         Julian Date: With or without decimal places ({\tt{"}}JD 2454321.9{\tt{"}} for
+         example).
+
+         \sstitem
+         Modified Julian Date: With or without decimal places
+         ({\tt{"}}MJD 54321.4{\tt{"}} for example).
+
+         \sstitem
+         Gregorian Calendar Date: With the month expressed either as an
+         integer or a 3-character abbreviation, and with optional decimal
+         places to represent a fraction of a day ({\tt{"}}1996-10-2{\tt{"}} or
+         {\tt{"}}1996-Oct-2.6{\tt{"}} for example). If no fractional part of a day is
+         given, the time refers to the start of the day (zero hours).
+
+         \sstitem
+         Gregorian Date and Time: Any calendar date (as above) but with
+         a fraction of a day expressed as hours, minutes and seconds
+         ({\tt{"}}1996-Oct-2 12:13:56.985{\tt{"}} for example).
+      }
+   }
+   \sstdiytopic{
+      Output Format
+   }{
+      When enquiring Epoch values, the format used is the {\tt{"}}Year{\tt{"}}
+      format described under {\tt{"}}Input Formats{\tt{"}}. This is a value in
+      decimal years which will be a Besselian epoch if less than
+      1984.0 and a Julian epoch otherwise.  
+   }
+}
+\sstroutine{
+   Equinox
+}{
+   Epoch of the mean equinox
+}{
+   \sstdescription{
+      This attribute is used to qualify those celestial coordinate
+      systems described by a \xref{SkyFrame}{sun210}{SkyFrame} which are 
+      notionally based on
+      the ecliptic (the plane of the Earth's orbit around the Sun)
+      and/or the Earth's equator.
+
+      Both of these planes are in motion and their positions are
+      difficult to specify precisely. In practice, therefore, a model
+      ecliptic and/or equator are used instead. These, together with
+      the point on the sky that defines the coordinate origin (the
+      intersection of the two planes termed the {\tt{"}}mean equinox{\tt{"}}) move
+      with time according to some model which removes the more rapid
+      fluctuations. The SkyFrame class supports both the old FK4 and
+      the current FK5 models.
+
+      The position of a fixed source expressed in any of these
+      coordinate systems will appear to change with time due to
+      movement of the coordinate system itself (rather than motion of
+      the source).  Such coordinate systems must therefore be
+      qualified by a moment in time (the {\tt{"}}epoch of the mean equinox{\tt{"}}
+      or {\tt{"}}equinox{\tt{"}} for short) which allows the position of the model
+      coordinate system on the sky to be determined. This is the role
+      of the Equinox attribute.
+
+      The Equinox attribute is stored as a Modified Julian Date, but
+      when setting or getting its value you may use the same formats
+      as for the \htmlref{Epoch}{Epoch} attribute (q.v.).
+
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Care must be taken to distinguish the Equinox value, which
+         relates to the definition of a time-dependent coordinate system
+         (based on solar system reference planes which are in motion),
+         from the superficially similar Epoch value. The latter is used
+         to qualify coordinate systems where the positions of sources
+         change with time (or appear to do so) for a variety of other
+         reasons, such as aberration of light caused by the observer's
+         motion, etc.
+
+         \sstitem
+         See the description of the System attribute for details of
+         which qualifying attributes apply to each celestial coordinate
+         system.
+      }
+   }
+}
+
+\sstroutine{
+   Format(axis)
+}{
+   Format specification for axis values
+}{
+   \sstdescription{
+      This attribute specifies the format to be used when displaying
+      co-ordinate values associated with a particular \xref{Frame}{sun210}{Frame} axis
+      (i.e. to convert values from binary to character form). 
+
+      If no Format value is set for a Frame axis, a default value is
+      supplied instead. This is based on the value of the Digits, or
+      Digits(axis), attribute and is chosen so that it displays the
+      requested number of digits of precision.
+
+      The interpretation of this string depends on whether or not the
+      Frame is a \xref{SkyFrame}{sun210}{SkyFrame}. If it is not, the string is interpreted as a 
+      format specification string to be passed to the C {\tt{"}}printf{\tt{"}} 
+      function (e.g. {\tt{"}}\%1.7G{\tt{"}}) in order to format a single 
+      co-ordinate value (supplied as a double precision number).
+
+      For SkyFrames, the syntax and default value of the Format string is
+      re-defined to allow the formatting of sexagesimal values as appropriate 
+      for the particular celestial co-ordinate system being represented. The 
+      syntax of SkyFrame Format strings is described (below) in the 
+      {\tt{"}}SkyFrame Formats{\tt{"}} section.
+
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstdiytopic{
+      SkyFrame Formats
+   }{
+      The Format string supplied for a \xref{SkyFrame}{sun210}{SkyFrame} should contain zero or
+      more of the following characters. These may occur in any order,
+      but the following is recommended for clarity:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}$+${\tt{"}}: Indicates that a plus sign should be prefixed to positive
+         values. By default, no plus sign is used.
+
+         \sstitem
+         {\tt{"}}z{\tt{"}}: Indicates that leading zeros should be prefixed to the
+         value so that the first field is of constant width, as would be
+         required in a fixed-width table (leading zeros are always
+         prefixed to any fields that follow). By default, no leading
+         zeros are added.
+
+         \sstitem
+         {\tt{"}}i{\tt{"}}: Use the standard ISO field separator (a colon) between
+         fields. This is the default behaviour.
+
+         \sstitem
+         {\tt{"}}b{\tt{"}}: Use a blank to separate fields.
+
+         \sstitem
+         {\tt{"}}l{\tt{"}}: Use a letter ({\tt{"}}h{\tt{"}}/{\tt{"}}d{\tt{"}}, {\tt{"}}m{\tt{"}} or {\tt{"}}s{\tt{"}} as appropriate) to
+         separate fields.
+
+         \sstitem
+         {\tt{"}}d{\tt{"}}: Include a degrees field. Expressing the angle purely in
+         degrees is also the default if none of {\tt{"}}h{\tt{"}}, {\tt{"}}m{\tt{"}}, {\tt{"}}s{\tt{"}} or {\tt{"}}t{\tt{"}} are
+         given.
+
+         \sstitem
+         {\tt{"}}h{\tt{"}}: Express the angle as a time and include an hours field
+         (where 24 hours correspond to 360 degrees). Expressing the angle
+         purely in hours is also the default if {\tt{"}}t{\tt{"}} is given without
+         either {\tt{"}}m{\tt{"}} or {\tt{"}}s{\tt{"}}.
+
+         \sstitem
+         {\tt{"}}m{\tt{"}}: Include a minutes field. By default this is not included.
+
+         \sstitem
+         {\tt{"}}s{\tt{"}}: Include a seconds field. By default this is not included.
+         This request is ignored if {\tt{"}}d{\tt{"}} or {\tt{"}}h{\tt{"}} is given, unless a minutes
+         field is also included.
+
+         \sstitem
+         {\tt{"}}t{\tt{"}}: Express the angle as a time (where 24 hours correspond to
+         360 degrees). This option is ignored if either {\tt{"}}d{\tt{"}} or {\tt{"}}h{\tt{"}} is
+         given and is intended for use where the value is to be expressed
+         purely in minutes and/or seconds of time (with no hours
+         field). If {\tt{"}}t{\tt{"}} is given without {\tt{"}}d{\tt{"}}, {\tt{"}}h{\tt{"}}, {\tt{"}}m{\tt{"}} or {\tt{"}}s{\tt{"}} being
+         present, then it is equivalent to {\tt{"}}h{\tt{"}}.
+
+         \sstitem
+         {\tt{"}}.{\tt{"}}: Indicates that decimal places are to be given for the
+         final field in the formatted string (whichever field this
+         is). The {\tt{"}}.{\tt{"}} should be followed immediately by an unsigned
+         integer which gives the number of decimal places required. By
+         default, no decimal places are given.
+
+      }
+      All of the above format specifiers are case-insensitive. If
+      several characters make conflicting requests (e.g. if both {\tt{"}}i{\tt{"}}
+      and {\tt{"}}b{\tt{"}} appear), then the character occurring last takes
+      precedence, except that {\tt{"}}d{\tt{"}} and {\tt{"}}h{\tt{"}} always override {\tt{"}}t{\tt{"}}.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set format(1) {\tt{"}}\%10.5G{\tt{"}}
+      }{
+         This sets the Format attribute for axis 1 in the current
+	 co-ordinate Frame in the NDF called {\tt my\_data}, so that axis values
+	 are formated as floating point values using a minimum field
+	 width of 10 characters, and displaying 5 significant figures. An
+	 exponent is used if necessary.
+      }
+      \sstexamplesubsection{
+         wcsattrib ngc5128 set format(2) bdms.2
+      }{
+         This sets the Format attribute for axis 2 in the current
+	 co-ordinate Frame in the NDF called {\tt ngc5128}, so that axis 
+         values
+	 are formated as separate degrees, minutes and seconds field,
+	 separated by blanks. The seconds field has 2 decimal places.
+	 This assumes the current co-ordinate Frame in the NDF is a
+	 celestial co-ordinate Frame (i.e. a SkyFrame).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
+
+\sstroutine{
+   Label(axis)
+}{
+   Axis label
+}{
+   \sstdescription{
+      This attribute specifies a label to be attached to each axis of
+      a \xref{Frame}{sun210}{Frame} when it is represented (e.g.) in 
+      graphical output.
+
+      If a Label value has not been set for a Frame axis, then a
+      suitable default is supplied, depending on whether or not the 
+      Frame is a \xref{SkyFrame}{sun210}{SkyFrame}:
+
+      The default for simple Frames is the string {\tt{"}}\htmlref{Axis}{Axis}
+      $<$n$>${\tt{"}}, where $<$n$>$ is 1, 2, etc. for each successive axis.
+
+      The default Labels for SkyFrames depend on the particular celestial
+      co-ordinate system represented by the SkyFrame (e.g. {\tt{"}}Right 
+      ascension{\tt{"}} or {\tt{"}}Galactic latitude{\tt{"}}).
+
+   }
+   \sstattributetype{
+      String.
+   }
+
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set label(2) {\tt{"}}IRAS data (marked in white){\tt{"}}
+      }{
+         This sets the Label for axis 2 in the current Frame in the NDF 
+         called {\tt my\_data}, to the string ``IRAS data (marked in white)''.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Axis labels are intended purely for interpretation by human
+         readers and not by software.
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
+
+\sstroutine{
+   Naxes
+}{
+   Number of Frame axes
+}{
+   \sstdescription{
+      This is a read-only attribute giving the number of axes in a
+      \xref{Frame}{sun210}{Frame} (i.e. the number of dimensions of the 
+      co-ordinate space which the Frame describes). This value is determined 
+      when the Frame is created.
+   }
+   \sstattributetype{
+      Integer, read-only.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data get naxes
+      }{
+         This displays the number of axes in the current Frame of the NDF 
+         called {\tt my\_data}.
+      }
+   }
+}
+
+\sstroutine{
+   Symbol(axis)
+}{
+   Axis symbol
+}{
+   \sstdescription{
+      This attribute specifies a short-form symbol to be used to
+      represent co-ordinate values for a particular axis of a
+      \xref{Frame}{sun210}{Frame}. This might be used (e.g.) in algebraic 
+      expressions where
+      a full description of the axis would be inappropriate. Examples
+      include {\tt{"}}RA{\tt{"}} and {\tt{"}}Dec{\tt{"}} (for Right Ascension and Declination).
+
+      If a Symbol value has not been set for a Frame axis, then a
+      suitable default is supplied:
+
+      The default Symbol value supplied for simple Frames is the
+      string {\tt{"}}$<$\xref{Domain}{sun210}{Domain}$>$$<$n$>${\tt{"}}, where 
+      $<$n$>$ is 1, 2, etc. for successive
+      axes, and $<$Domain$>$ is the value of the Frame's Domain
+      attribute (truncated if necessary so that the final string
+      does not exceed 15 characters). If no Domain value has been
+      set, {\tt{"}}x{\tt{"}} is used as the $<$Domain$>$ value in constructing 
+      this default string.
+
+      The \xref{SkyFrame}{sun210}{SkyFrame} class re-defines the default Symbol value
+      (e.g. to {\tt{"}}RA{\tt{"}} or {\tt{"}}Dec{\tt{"}}) as appropriate for 
+      the particular celestial co-ordinate system being represented.
+
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set symbol(2)  AR
+      }{
+         This sets the Symbol for axis 2 in the current Frame in the NDF 
+         called {\tt my\_data}, to the string ``AR''.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
+\sstroutine{
+   System
+}{
+   Celestial coordinate system
+}{
+   \sstdescription{
+      This attribute identifies the particular celestial coordinate
+      system represented by a \htmlref{SkyFrame}{SkyFrame}, and may take any of the values
+      listed in the {\tt{"}}Celestial Coordinate Systems{\tt{"}} section (below).
+
+   }
+   \sstattributetype{
+      String.
+   }
+  \sstdiytopic{
+      Celestial Coordinate Systems
+   }{
+      The SkyFrame class supports the following System values (all are
+      case-insensitive) and associated celestial coordinate systems:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}FK4{\tt{"}}: The old FK4 (barycentric) equatorial coordinate system,
+         which should be qualified by an \htmlref{Equinox}{Equinox} value. The underlying
+         model on which this is based is non-inertial and rotates slowly
+         with time, so for accurate work FK4 coordinate systems should
+         also be qualified by an \htmlref{Epoch}{Epoch} value.
+
+         \sstitem
+         {\tt{"}}FK4-NO-E{\tt{"}} or {\tt{"}}FK4\_NO\_E{\tt{"}}: The old FK4 (barycentric) equatorial
+         system but without the {\tt{"}}E-terms of aberration{\tt{"}} (e.g. some radio
+         catalogues). This coordinate system should also be qualified by
+         both an Equinox and an Epoch value.
+
+         \sstitem
+         {\tt{"}}FK5{\tt{"}} or {\tt{"}}EQUATORIAL{\tt{"}}: The modern FK5 (barycentric) equatorial
+         coordinate system. This should be qualified by an Equinox value.
+
+         \sstitem
+         {\tt{"}}GAPPT{\tt{"}}, {\tt{"}}GEOCENTRIC{\tt{"}} or {\tt{"}}APPARENT{\tt{"}}: The geocentric apparent
+         equatorial coordinate system, which gives the apparent positions
+         of sources relative to the true plane of the Earth's equator and
+         the equinox (the coordinate origin) at a time specified by the
+         qualifying Epoch value. (Note that no Equinox is needed to
+         qualify this coordinate system because no model {\tt{"}}mean equinox{\tt{"}}
+         is involved.)  These coordinates give the apparent right
+         ascension and declination of a source for a specified date of
+         observation, and therefore form an approximate basis for
+         pointing a telescope. Note, however, that they are applicable to
+         a fictitious observer at the Earth's centre, and therefore
+         ignore such effects as atmospheric refraction and the (normally
+         much smaller) aberration of light due to the rotational velocity
+         of the Earth's surface.  Geocentric apparent coordinates are
+         derived from the standard FK5 (J2000.0) barycentric coordinates
+         by taking account of the gravitational deflection of light by
+         the Sun (usually small), the aberration of light caused by the
+         motion of the Earth's centre with respect to the barycentre
+         (larger), and the precession and nutation of the Earth's spin
+         axis (normally larger still).
+
+         \sstitem
+         {\tt{"}}ECLIPTIC{\tt{"}}: Ecliptic coordinates (IAU 1980), referred to the
+         ecliptic and mean equinox specified by the qualifying Equinox
+         value.
+
+         \sstitem
+         {\tt{"}}GALACTIC{\tt{"}}: Galactic coordinates (IAU 1958).
+
+         \sstitem
+         {\tt{"}}SUPERGALACTIC{\tt{"}}: De Vaucouleurs Supergalactic coordinates.
+
+      }
+      Where more than one alternative System value is shown above, the
+      first of these will be returned when an enquiry is made.
+   }
+}
+
+\sstroutine{
+   Title
+}{
+   Frame title
+}{
+   \sstdescription{
+      This attribute holds a string which is used as a title in (e.g.)
+      graphical output to describe the co-ordinate system which a 
+      \xref{Frame}{sun210}{Frame}
+      represents. Examples might be {\tt{"}}Detector Co-ordinates{\tt{"}} or
+      {\tt{"}}Galactic Co-ordinates{\tt{"}}.
+
+      If a Title value has not been set for a Frame, then a suitable
+      default is supplied:
+
+      The default supplied by the Frame class is {\tt{"}}$<$n$>$-d co-ordinate
+      system{\tt{"}}, where $<$n$>$ is the number of Frame axes 
+      (\xref{Naxes}{sun210}{Naxes} attribute).
+
+      The \xref{SkyFrame}{sun210}{SkyFrame} class re-defines the default Title value
+      (e.g. to {\tt{"}}FK5 equatorial co-ordinates, mean equinox J2000.0{\tt{"}})
+      as appropriate to the particular celestial co-ordinate system
+      being represented.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set Title "My own data"
+      }{
+         This sets the Title for the current Frame in the NDF 
+         called {\tt my\_data}, to the string ``My own data''.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A Frame's Title is intended purely for interpretation by human
+         readers and not by software.
+      }
+   }
+}
+
+\sstroutine{
+   Unit(axis)
+}{
+   Axis physical units
+}{
+   \sstdescription{
+      This attribute contains a textual representation of the physical
+      units used to represent co-ordinate values on a particular axis
+      of a \xref{Frame}{sun210}{Frame}.
+
+      The default supplied by the Frame class is an empty string.
+
+      The \xref{SkyFrame}{sun210}{SkyFrame} class re-defines the default Unit value (e.g. to
+      {\tt{"}}hh:mm:ss.sss{\tt{"}}) to describe the character strings
+      returned when co-ordinate values are formatted.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
 
 \newpage
 \section{\xlabel{se_interaction}Interaction Mode\label{se:interaction}}
@@ -5501,7 +6628,7 @@ masked image with \htmlref{ARDMASK}{ARDMASK}.
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=118mm\epsfbox{sun95_ardwork.eps}
+   \includegraphics[clip,height=118mm]{sun95_ardwork.eps}
    \caption{Masking of {\tt \$KAPPA\_DIR/ccdframec}. To the left shows
    the original ARDMASK regions, and to the right shows the final
    masked regions after some have been combined.}
@@ -12747,8 +13874,9 @@ default value.
             An integer value giving the index of the required Frame.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) 
+            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
+
 
          }
          If a null value (!) is supplied, positions are reported in the
@@ -14605,7 +15733,7 @@ plot (101k).
          {\tt [FALSE]}
       }
       \sstsubsection{
-         NITER = INTEGER (Read)
+         NITER = \_INTEGER (Read)
       }{
          The number of iterations of the relaxation algorithm.  This
          value cannot be less than two, since this is the minimum
@@ -19008,7 +20136,7 @@ plot (101k).
          The NDF structure to be transformed.
       }
       \sstsubsection{
-         NUMBIN = INTEGER (Read)
+         NUMBIN = \_INTEGER (Read)
       }{
          The number of histogram bins to be used.  This should be a
          large number, say 2000, to reduce quantisation errors.  It
@@ -21208,11 +22336,14 @@ plot (10k).
          value is supplied for parameter NDF.
       }
       \sstsubsection{
-         DOMAIN = LITERAL (Read)
+         FRAME = LITERAL (Read)
       }{
-         Specifies the Domain of the positions supplied using parameter
-         POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string
-         such as EQUAT(J2000) is supplied (see SUN/163), then the positions
+         Specifies the co-ordinate Frame for the positions supplied using 
+         parameter
+         POSITION or FILE. If an Sky Co-ordinate System (SCS) string
+         such as EQUAT(J2000) is supplied (see section 
+         \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ),
+         then the positions
          are assumed to be 2-dimensional celestial co-ordinates in the
          specified system. Otherwise, the given Domain name is used without
          any interpretation. Any string may be supplied, but normally one
@@ -21224,8 +22355,8 @@ plot (10k).
       \sstsubsection{
          EPOCH = DOUBLE PRECISION (Read)
       }{
-         If an IRAS90 Sky Co-ordinate System specification is supplied
-         (using parameter DOMAIN) for a celestial co-ordinate system,
+         If an Sky Co-ordinate System specification is supplied
+         (using parameter FRAME) for a celestial co-ordinate system,
          then an epoch value is needed to qualify it. This is the epoch at
          which the supplied sky positions were determined. It should be
          given as a decimal years value, with or without decimal places
@@ -21284,7 +22415,7 @@ plot (10k).
          the current co-ordinate Frame of the NDF, and the WCS component
          of the NDF is copied to the output positions list. If a null
          value is supplied, the single co-ordinate Frame defined by parameter
-         DOMAIN is stored in the output positions list, and supplied
+         FRAME is stored in the output positions list, and supplied
          positions are assumed to be in the same Frame. [!]
       }
       \sstsubsection{
@@ -21315,7 +22446,7 @@ plot (10k).
    }
    \sstexamples{
       \sstexamplesubsection{
-         listmake newlist domain=pixel dim=2
+         listmake newlist frame=pixel dim=2
       }{
          This creates a FITS binary catalogue called newlist.fit containing a
          list of positions, together with a description of a single
@@ -21324,7 +22455,7 @@ plot (10k).
          prompts for the parameter POSITION.
       }
       \sstexamplesubsection{
-         listmake stars.txt domain=equat(B1950) epoch=1962.3
+         listmake stars.txt frame=equat(B1950) epoch=1962.3
       }{
          This creates a catalogue called stars.txt containing a list of
          positions, together with a description of a single FK4 equatorial
@@ -21348,7 +22479,7 @@ plot (10k).
          The positions are supplied in a text file called stars.
       }
       \sstexamplesubsection{
-         listmake out.txt incat=old.fit domain=gal
+         listmake out.txt incat=old.fit frame=gal
       }{
          This creates an STL format catalogue stored in a text file called
          out.txt containing a list of positions, together with a description
@@ -21472,7 +22603,7 @@ plot (10k).
       \sstsubsection{
          EPOCH = DOUBLE PRECISION (Read)
       }{
-         If an IRAS90 Sky Co-ordinate System specification is supplied
+         If an Sky Co-ordinate System specification is supplied
          (using parameter FRAME) for a celestial co-ordinate system,
          then an epoch value is needed to qualify it. This is the epoch at
          which the supplied sky positions were determined. It should be
@@ -21481,7 +22612,7 @@ plot (10k).
          epoch if less than 1984.0 and as a Julian epoch otherwise.
       }
       \sstsubsection{
-         FIRST = INTEGER (Read)
+         FIRST = \_INTEGER (Read)
       }{
          The identifier for the first position to be displayed. Positions
          are only displayed which have identifiers in the range given by
@@ -21499,14 +22630,14 @@ plot (10k).
          \sstitemlist{
 
             \sstitem
-            A Domain name such as SKY, AXIS, PIXEL, etc.
+            A domain name such as SKY, AXIS, PIXEL, etc. 
 
             \sstitem
             An integer value giving the index of the required Frame.
 
             \sstitem
-            An IRAS90 Sky Co-ordinate System (SCS) values such as
-            EQUAT(J2000) (see SUN/163).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) 
+            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
 
          }
          If a null value (!) is supplied, positions are reported in the
@@ -21544,7 +22675,7 @@ plot (10k).
          These attributes may be specified using parameter STYLE. [FALSE]
       }
       \sstsubsection{
-         LAST = INTEGER (Read)
+         LAST = \_INTEGER (Read)
       }{
          The identifier for the last position to be displayed. Positions
          are only displayed which have identifiers in the range given by
@@ -21561,7 +22692,7 @@ plot (10k).
          no file is created.  [!]
       }
       \sstsubsection{
-         MARKER = INTEGER (Read)
+         MARKER = \_INTEGER (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Mark{\tt "}. It specifies the symbol with which each
@@ -28976,7 +30107,7 @@ plot (9k).
          [Curve]
       }
       \sstsubsection{
-         NSAMP = INTEGER (Read)
+         NSAMP = \_INTEGER (Read)
       }{
          The number of samples required along the length of the profile.
          The first sample is at the first supplied vertex, and the last
@@ -31486,7 +32617,9 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       include annotation of a displayed image with a grid of celestial
       co-ordinates, marking the location of a given celestial position
       given a pixel position, and aligning a group of images.  See
-      SUN/163 for details.
+      SUN/163 for details. Note, the resulting astrometry structure can
+      also be read by KAPPA applications which use the NDF WCS component
+      (eg DISPLAY, CONTOUR, etc -- see the V0.13 release notes).
 
       The astrometry is determined either by you supplying explicit
       values for certain projection parameters, or by you providing the
@@ -33842,7 +34975,7 @@ right.
          This parameter is ignored unless TRTYPE={\tt "Expres"}.
       }
       \sstsubsection{
-         NVIN = INTEGER (Read)
+         NVIN = \_INTEGER (Read)
       }{
          The number of input variables in the transformation.  It must
          lie in the range 1 to 7.  The suggested default is the current
@@ -33850,7 +34983,7 @@ right.
          TRTYPE={\tt "Expres"}.
       }
       \sstsubsection{
-         NVOUT = INTEGER (Read)
+         NVOUT = \_INTEGER (Read)
       }{
          The number of output variables in the transformation.  It must
          lie in the range 1 to 7.  The suggested default is the number
@@ -35492,8 +36625,9 @@ plot (7k).
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) 
+            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
+
          }
       }
       \sstsubsection{
@@ -36241,8 +37375,8 @@ plot (7k).
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000)
+            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
          }
       }
       \sstsubsection{
@@ -36433,7 +37567,7 @@ plot (7k).
 
             \sstitem
             A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+            section {\tt "}Specifying a Co-ordinate Frame{\tt "} in SUN/95).
          }
       }
       \sstsubsection{
@@ -36457,7 +37591,7 @@ plot (7k).
 
             \sstitem
             A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). [!]
+            section {\tt "}Specifying a Co-ordinate Frame{\tt "} in SUN/95). [!]
          }
       }
       \sstsubsection{
@@ -37352,7 +38486,8 @@ from a set of standard items and extensions (see \xref{SUN/33}{sun33}{}).
 Only the main data array must be present; all the other items are optional.
 
 {\tt \$KAPPA\_DIR/example.sdf} is an NDF which contains all the standard 
-NDF components, except a FITS extension; it also has a FIGARO extension.
+NDF components, except a WCS component and a FITS extension; it also has 
+a FIGARO extension.
 The structure of the file (as revealed by
 {\tt \%~hdstrace \$KAPPA\_DIR/example}) is shown below.  The layout is
 \begin{verbatim} 
@@ -37476,6 +38611,31 @@ of the axis centres.  All axes or none must be present.  Use
 \htmlref{AXLABEL}{AXLABEL} and \htmlref{AXUNITS}{AXUNITS} to set an
 axis LABEL or UNITS component; and \htmlref{SETNORM}{SETNORM} to set
 an axis normalisation flag.
+
+\label{apndf:wcs}
+\item[{\bf WCS}] -- this component provides an alternative, and superior,
+method for storing co-ordinate information. The AXIS structure described
+above has the severe limitation that it can only describe co-ordinate
+systems in which all axes are independant (i.e. the value on
+any axis can be changed without needing to change the values on any 
+other axes). This means for instance that axes cannot be rotated (other
+than by multiples of 90\dgs), and cannot be used to describe celestial
+co-ordinates over a large field, or near a pole. The WCS component
+overcomes these restrictions. It contains descriptions of an arbitrary
+number of different co-ordinate Frames, together with the mappings
+required to convert positions between these Frames. All NDFs have three
+default Frames available; these are known as the GRID, PIXEL and AXIS
+Frames. The PIXEL Frame corresponds to pixel co-ordinates. The AXIS
+Frame corresponds to the co-ordinate Frame implied by the NDF AXIS 
+structures. The GRID Frame is similar to the PIXEL Frame, the main
+difference being that it has a different origin; the centre of the first 
+(``bottom left'') pixel is always $(1.0,1.0)$ in the GRID Frame regardless 
+of the pixel origin of the NDF. Other Frames can be added to the WCS
+component in various ways, for instance, by importing them from
+appropriate FIST headers (\htmlref{FITSIN}{FITSIN},
+\htmlref{FITSDIN}{FITSDIN}), or using an appropriate application to 
+create them from scratch (eg \htmlref{WCSADD}{WCSADD},
+\htmlref{SETSKY}{SETSKY} or \GAIAref\ ).
 
 \label{apndf:history}
 \item[{\bf HISTORY}] -- this component provides a record of the
