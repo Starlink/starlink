@@ -213,7 +213,8 @@
       INTEGER NSTY               ! Number of style elements in group
       INTEGER PAXES( 2 )         ! Map for picking two axes from many
       INTEGER PENGID             ! GRP identifier for pen style strings
-      INTEGER PICID              ! AGI identifier for current picture
+      INTEGER PICID              ! AGI identifier for initial DATA picture
+      INTEGER PICOD              ! AGI identifier for new picture
       INTEGER PLOT               ! AST identifier of plot
       INTEGER STYLEN             ! Length of style element
       LOGICAL AXES               ! Draw axes?
@@ -406,6 +407,12 @@
             FRM = AST_PICKAXES( FRM, 2, PAXES, MAP, STATUS )
          END IF
 
+*  Change the Domain of the Base frame; this doesn't make any difference
+*  to this application, but the resulting global frameset will get 
+*  written into the AGI database, where having a lot of frames all 
+*  called GRID is unlikely to be a good thing.
+         CALL AST_SETC( FRM, 'Domain', 'CCD_GRID-' // NDFNAM, STATUS )
+
 *  Add the Base (GRID-domain) frame of the NDF to the global frameset,
 *  using the correct mapping from the common coordinate system.
 *  Note the index of this frame within the frameset will be JCOM + I.
@@ -524,12 +531,18 @@ c        CALL PGSCLP( 0 )
          CALL PGWNAD( REAL( XMIN ), REAL( XMAX ), REAL( YMIN ),
      :                REAL( YMAX ) )
 
-*  Create a new AGI picture with the name 'DATA'.
-         CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE', PICID, STATUS )
-
 *  Turn the global frameset into an AST Plot.
          CALL CCD1_APLOT( FSET, PICID, .FALSE., PLOT, STATUS )
       END IF
+
+*  Apply default and user-selected style settings to the plot.
+      CALL CCD1_PLSTY( PLOT, 'STYLE', STATUS )
+
+*  Save the PGPLOT viewport as a new picture in the AGI database.
+      CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE', PICOD, STATUS )
+
+*  Save the Plot in the new picture.
+      CALL CCD1_SPLOT( PICOD, PLOT, STATUS )
 
 *  Set the common frame index to its correct value for the Plot object;
 *  it will be the Current frame of the Plot object, since it was the
@@ -539,9 +552,6 @@ c        CALL PGSCLP( 0 )
 *  the position of the common one, we can easily get the positions of
 *  the others.
       JCOM = AST_GETI( PLOT, 'Current', STATUS )
-
-*  Apply default and user-selected style settings to the plot.
-      CALL CCD1_PLSTY( PLOT, 'STYLE', STATUS )
 
 *  Plot the coordinate axes if required.
       IF ( AXES ) THEN
