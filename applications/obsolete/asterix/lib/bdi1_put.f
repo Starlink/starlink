@@ -71,8 +71,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     23 Feb 1996 (DJA):
+*        Write array variant when moving data array for bad pixel flag
 *     {enter_changes_here}
 
 *  Bugs:
@@ -202,6 +204,10 @@
           CLOC = DLOC
 
         END IF
+
+*    Write the array variant
+        CALL DAT_NEW0C( DLOC, 'VARIANT', 6, STATUS )
+        CALL CMP_PUT0C( DLOC, 'VARIANT', 'SIMPLE', STATUS )
 
 *    Write the flag
         CALL ADI1_CCA2HL( ARGS(4), ' ', DLOC, 'BAD_PIXEL', STATUS )
