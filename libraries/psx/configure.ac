@@ -18,6 +18,7 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
+AC_CHECK_FUNCS([getpwuid geteuid getlogin cuserid])
 AC_PROG_LIBTOOL
 
 dnl    Declare the build and use dependencies for this package
@@ -28,6 +29,7 @@ STAR_LATEX_DOCUMENTATION(sun121)
 
 STAR_MESSGEN(psx_err.msg)
 
+AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES(Makefile component.xml)
 
 AC_OUTPUT
