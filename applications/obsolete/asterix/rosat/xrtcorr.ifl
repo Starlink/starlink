@@ -2,7 +2,7 @@
 
      PARAMETER INP
                POSITION 1
-               TYPE    '_UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Input dataset name'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.BINDS'
@@ -12,7 +12,7 @@
 
      PARAMETER OUT
                POSITION 2
-               TYPE    '_UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Output dataset name'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
