@@ -1,0 +1,43 @@
+#! /usr/local/bin/scsh \
+-e main -s
+!#
+
+;; Scsh script to check that all the <path> elements in all the
+;; component.xml files are telling the truth.  When run at the top
+;; level of the checkout, finds the <path> element of each
+;; component.xml file and verifies that it matches the actual path to
+;; the component.xml file.
+
+(define (main args)
+  (for-each check-cpt
+            (run/strings (find "." -name component.xml))))
+
+(define (check-cpt cpt-filename)
+  (let ((file-path (match:substring
+                    (regexp-search (rx (: "./"
+                                          (submatch (* printing))
+                                          "/component.xml"))
+                                   cpt-filename)
+                    1)))
+    ;; Check a line at a time of the current input port.  Return #f if we
+    ;; establish the component file is OK, or a string if there's a problem
+    (define (check-a-line)
+      (let ((line (read-line)))
+        (if (eof-object? line)
+            (format #f "File ~A has no path element!~%" cpt-filename)
+            (if-match (regexp-search (rx (: "<path>"
+                                            (submatch (* printing))
+                                            "</path>"))
+                                     line)
+                      (whole-line path-path)
+                      (if (string=? path-path file-path)
+                          #f            ;no errors
+                          (format #f "Component ~A: file-path=~A <path>~A</path>~%"
+                                  cpt-filename file-path path-path))
+                      (check-a-line))))) ; recurse -- check next line
+    (format #t "Checking ~A   " cpt-filename)
+    (let ((res (with-input-from-file cpt-filename
+                 check-a-line)))
+      (if res
+          (format #t "~A~%" res)
+          (format #t "OK~%")))))
