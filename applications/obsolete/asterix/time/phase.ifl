@@ -2,7 +2,7 @@ INTERFACE PHASE
 
   PARAMETER     INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.BINDS'
     PROMPT      'Enter name of input file'
@@ -11,7 +11,7 @@ INTERFACE PHASE
 
   PARAMETER     OUT
     POSITION    2
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     ASSOCIATION '->GLOBAL.BINDS'
     PROMPT      'Enter name of output file'
   ENDPARAMETER
