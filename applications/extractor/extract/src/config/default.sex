@@ -16,7 +16,7 @@ PARAMETERS_NAME	$EXTRACTOR_DIR/config/default.param
 #------------------------------- Extraction ----------------------------------
 
 DETECT_TYPE	CCD		# "CCD" or "PHOTO" (*)
-FLAG_IMAGE	flag.fits	# filename for an input FLAG-image
+#FLAG_IMAGE	flag.fits	# filename for an input FLAG-image
 DETECT_MINAREA	5		# minimum number of pixels above threshold
 DETECT_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 ANALYSIS_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
@@ -66,7 +66,7 @@ CHECKIMAGE_TYPE	NONE		# can be one of "NONE", "BACKGROUND",
 				# "MINIBACKGROUND", "-BACKGROUND", "OBJECTS",
 				# "-OBJECTS", "SEGMENTATION", "APERTURES",
 				# or "FILTERED" (*)
-CHECKIMAGE_NAME	check.fits	# Filename for the check-image (*)
+#CHECKIMAGE_NAME	check.fits	# Filename for the check-image (*)
 
 #--------------------- Memory (change with caution!) -------------------------
 
