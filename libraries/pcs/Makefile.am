@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = adam ams atimer dtask hdspar lex messys misc msp parsecon \
-	pcs-docs sock string subpar task
+# This build order is important, it is one of several which builds all
+# of the PCS component dependencies before they're required.
+SUBDIRS = messys adam atimer lex subpar dtask task sock msp ams misc string \
+	hdspar parsecon pcs-docs
 ## Missing from above list: adamnet -- redundant, and may not work
 
 lib_LTLIBRARIES = libsubpar_adam.la
