@@ -117,7 +117,6 @@
 *  Read text string
       CLEN = 0
       NTRY = 0
-      OK = .FALSE.
       DO WHILE ( (CLEN.EQ.0) .AND. (NTRY.LT.MAXTRY)
      :                  .AND. (STATUS.EQ.SAI__OK) )
 
