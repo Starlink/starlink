@@ -19,6 +19,8 @@
 #        Add MSG_FILTER
 #     1997 June 12 (TimJ)
 #        Change name of CLIP to DESPIKE
+#     1997 October 16 (TimJ)
+#        Remove the despiking parameters
 #     {enter_further_changes_here}
 #-
 
@@ -60,27 +62,11 @@
 	HELPKEY '*'
       ENDPARAMETER
 
-
-      PARAMETER DESPIKE
-	TYPE '_LOGICAL'
-	PROMPT 'Do you wish to despike the bolometers?'
-	DEFAULT FALSE
-	HELPKEY '*'
-      ENDPARAMETER
-
       PARAMETER MODE
 	TYPE '_CHAR'
 	PROMPT 'Sky removal mode'
 	HELPKEY '*'
       ENDPARAMETER
-
-
-      PARAMETER NSIGMA
-         TYPE    '_DOUBLE'
-         PROMPT  'How many sigma to despike bolometers'
-	HELPKEY '*'
-      ENDPARAMETER
-
 
       PARAMETER   OUT
          POSITION 2
