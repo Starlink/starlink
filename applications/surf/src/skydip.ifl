@@ -28,6 +28,8 @@
 #        Add the CVAR variable.
 #     1998 Jan 12 (TimJ)
 #        Add the FIT parameters
+#     1998 Jan 15 (TimJ)
+#        Add T_HOT
 #-
 
    INTERFACE SKYDIP
@@ -143,6 +145,14 @@
         TYPE     '_REAL'
         RANGE    1, 300
 	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER   T_HOT
+        PROMPT   'Temperature of hot load (K)'
+        TYPE     '_REAL'
+        RANGE    1,350
+        VPATH    'DEFAULT'
+        HELPKEY '*'
       ENDPARAMETER
 
       PARAMETER WAVELENGTH

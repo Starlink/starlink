@@ -26,7 +26,8 @@
 #        Add ability to select a switch
 #     1997 June 20 (TIMJ)
 #        Use default value as VPATH in USE_CALIBRATOR and SPIKE_LEVEL
-
+#     1998 Januart 15 (TIMJ)
+#        Add T_HOT for skydips
 #     {enter_further_changes_here}
 
 #-
@@ -79,6 +80,14 @@
         PROMPT   'Temperature of cold load'
         TYPE     '_REAL'
         RANGE    1, 300
+        HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER   T_HOT
+        PROMPT   'Temperature of hot load'
+        TYPE     '_REAL'
+        RANGE    1,350
+        VPATH    'DEFAULT'
         HELPKEY '*'
       ENDPARAMETER
 
