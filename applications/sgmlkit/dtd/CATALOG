@@ -1,45 +1,48 @@
-	-- catalog: SGML Open style entity catalogue for Starlink DTDs --
+	-- 
+	  catalog: SGML Open style entity catalogue for Starlink DTDs
+	  $Id$
+	--
 
 SGMLDECL starlink.decl
 
 	-- listed most general to most specific --
 
-public "-//Starlink//DTD Starlink General//EN"		"starlink-0.2.dtd"
-public "-//Starlink//DTD Starlink General 0.2//EN"	"starlink-0.2.dtd"
-public "-//Starlink//DTD Starlink General 0.1//EN"	"starlink-0.1.dtd"
+PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.2//EN"	starlink-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.1//EN"	starlink-0.1.dtd
 
-public "-//Starlink//DTD Starlink SUN//EN"		"sun-0.2.dtd"
-public "-//Starlink//DTD Starlink SUN 0.2//EN"		"sun-0.2.dtd"
-public "-//Starlink//DTD Starlink SUN 0.1//EN"		"sun-0.1.dtd"
+PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.2//EN"		sun-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.1//EN"		sun-0.1.dtd
 
-public "-//Starlink//DTD Starlink SSN//EN"		"ssn-0.2.dtd"
-public "-//Starlink//DTD Starlink SSN 0.2//EN"		"ssn-0.2.dtd"
-public "-//Starlink//DTD Starlink SSN 0.1//EN"		"ssn-0.1.dtd"
+PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.2//EN"		ssn-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.1//EN"		ssn-0.1.dtd
 
-public "-//Starlink//DTD Starlink MUD//EN"		"mud-0.2.dtd"
-public "-//Starlink//DTD Starlink MUD 0.2//EN"		"mud-0.2.dtd"
-public "-//Starlink//DTD Starlink MUD 0.1//EN"		"mud-0.1.dtd"
+PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.2//EN"		mud-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.1//EN"		mud-0.1.dtd
 
-public "-//Starlink//DTD Document Summary 0.1//EN"	"summary-0.1.dtd"
+PUBLIC "-//Starlink//DTD Document Summary 0.1//EN"	summary-0.1.dtd
 
-public "-//Starlink//DTD Program Source Code 0.1//EN"	"programcode-0.1.dtd"
-public "-//Starlink//DTD Program Source Code 0.2//EN"	"programcode-0.2.dtd"
-public "-//Starlink//DTD Fortran Source Code 0.1//EN"	"fortrancode-0.1.dtd"
-public "-//Starlink//DTD Fortran Source Code 0.2//EN"	"fortrancode-0.2.dtd"
-public "-//Starlink//DTD DSSSL Source Code 0.2//EN"	"dssslcode-0.2.dtd"
+PUBLIC "-//Starlink//DTD Program Source Code 0.1//EN"	programcode-0.1.dtd
+PUBLIC "-//Starlink//DTD Program Source Code 0.2//EN"	programcode-0.2.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.1//EN"	fortrancode-0.1.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.2//EN"	fortrancode-0.2.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN"	dssslcode-0.2.dtd
 
 --
-public "-//Starlink//DTD tth equation list//EN"		"tth-equations.dtd"
+PUBLIC "-//Starlink//DTD tth equation list//EN"		tth-equations.dtd
 --
-system "tth-equation-list"				"tth-equations.dtd"
-system "img-eqlist"					"img-eqlist.dtd"
+SYSTEM "tth-equation-list"				tth-equations.dtd
+SYSTEM "img-eqlist"					img-eqlist.dtd
 
+	-- 
+	  OASIS exchange table model.
+	  See http://www.oasis-open.org/html/a503.htm
+	  and http://www.oasis-open.org/html/publtext.htm
 	--
-	   OASIS exchange table model.
-	   See http://www.oasis-open.org/html/a503.htm
-	   and http://www.oasis-open.org/html/publtext.htm
-	--
-public "-//OASIS//DTD Exchange Table Model 19960430//EN"	"oasis-exchange-table.dtd"
+PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN"	oasis-exchange-table.dtd
 
 	-- ISO latin 1 entity set for HTML and LaTeX -- 
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"   	ISOent/ISOlat1-html.ent
@@ -47,14 +50,14 @@ PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"  	ISOent/ISOlat1-latex
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"  	ISOent/ISOlat1.sdata
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//ENT"    	ISOent/ISOlat1-ent.ent
 
-public "-//Starlink//ENTITIES Additional entities//EN//HTML"	entities-html.ent
-public "-//Starlink//ENTITIES Additional entities//EN//LATEX"	entities-latex.ent
-public "-//Starlink//ENTITIES Additional entities//EN//PLAIN"	entities-plain.ent
+PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML"	entities-html.ent
+PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX"	entities-latex.ent
+PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN"	entities-plain.ent
 
 	-- DSSSL DTDs, added from Jade1.1.1 --
-PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" "dsssl/fot.dtd"
-PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN" "dsssl/dsssl.dtd"
-PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" 	"dsssl/style-sheet.dtd"
+PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" dsssl/fot.dtd
+PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN" dsssl/dsssl.dtd
+PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" 	dsssl/style-sheet.dtd
 
 --
   Catalog entry for HyTime meta-DTD
@@ -73,19 +76,19 @@ PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" 	"dsssl/style-sheet.dtd"
   not sure what's the best way to get round this, short of fiddling
   with the HyTime DTD (which is what I've still done).
 --
-PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD Hypermedia/Time-based Structuring Language (HyTime)//EN'		'hytime/hi2mdhyt.sgm-mod'
-PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD Property Set//EN'	'hytime/hi2mdps.sgm'
-PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD General Architecture//EN' 'hytime/hi2mdga.sgm'
-PUBLIC	'ISO/IEC 10744:1997//NONSGML LEXTYPES HyTime Lexical Types//EN'	'hytime/hytime-lextypes.sgm'
+PUBLIC	"ISO/IEC 10744:1997//DTD AFDR Meta-DTD Hypermedia/Time-based Structuring Language (HyTime)//EN"		hytime/hi2mdhyt.sgm-mod
+PUBLIC	"ISO/IEC 10744:1997//DTD AFDR Meta-DTD Property Set//EN"	hytime/hi2mdps.sgm
+PUBLIC	"ISO/IEC 10744:1997//DTD AFDR Meta-DTD General Architecture//EN" hytime/hi2mdga.sgm
+PUBLIC	"ISO/IEC 10744:1997//NONSGML LEXTYPES HyTime Lexical Types//EN"	hytime/hytime-lextypes.sgm
 	-- The following is *not* the public identifier suggested in --
 	-- the file (the one above is).  However, the HyTime meta-DTD --
 	-- appears to want this file, but refers to it by this --
 	-- following entity name.  So add it, and hope for the best! --
-PUBLIC	'ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES HyTime Lexical Types//EN' 'hytime/hytime-lextypes.sgm'
-PUBLIC	'ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES SGML Lexical Types//EN' 'hytime/sgml-lextypes.sgm'
+PUBLIC	"ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES HyTime Lexical Types//EN" hytime/hytime-lextypes.sgm
+PUBLIC	"ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES SGML Lexical Types//EN" hytime/sgml-lextypes.sgm
 
 	-- Notations --
 	-- What is supposed to go in this entity? --
 --
-PUBLIC 'ISO/IEC 10744:1997//NOTATION Hypermedia/Time-based Structuring Language (HyTime)//EN'	'hytime/hytime.notation'
+PUBLIC "ISO/IEC 10744:1997//NOTATION Hypermedia/Time-based Structuring Language (HyTime)//EN"	hytime/hytime.notation
 --
