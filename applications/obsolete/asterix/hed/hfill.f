@@ -20,6 +20,8 @@
 *      ? ??? ?? : V1.0-0  Original (RJV)
 *      6 Jan 93 : V1.7-0  Use ARR_ routines to fill arrays (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     17 Jan 1996 V2.0-0 (DJA):
+*        Updated use of USI
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -34,8 +36,12 @@
       CHARACTER*(DAT__SZLOC) VALOC       ! locator to values
       CHARACTER*(DAT__SZLOC) OBJLOC      ! locator to object to be modified
       CHARACTER*(DAT__SZTYP) TYPE        ! type of object
+
       CHARACTER*80 CHARVAL               ! character value
+
       DOUBLE PRECISION NUMVAL            ! numeric value
+
+      INTEGER			OBJID, VALID		! File identifiers
       INTEGER INTVAL                     ! integer values in object
       INTEGER NVAL                       ! number of values in object
       INTEGER OPTR                       ! pointer to mapped object
@@ -48,7 +54,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HFILL Version 1.8-0')
+        PARAMETER (VERSION='HFILL Version 2.0-0')
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -56,14 +62,18 @@
       CALL AST_INIT()
 
 *    get locator to object if it exists
-      CALL USI_ASSOCI('INP','UPDATE',OBJLOC,PRIM,STATUS)
-      IF (PRIM) THEN
+      CALL USI_ASSOC( 'INP%hds', '*', 'UPDATE', OBJID, STATUS )
+      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
+      CALL DAT_PRIM( OBJLOC, PRIM, STATUS )
+      IF ( PRIM ) THEN
 
-*        get object type
+*     get object type
         CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get value from console or other data object
-        CALL USI_DASSOC('VALUE','READ',VALOC,STATUS)
+        CALL USI_ASSOC( 'VALUE%hds', '*', 'READ', VALID, STATUS )
+        CALL ADI1_GETLOC( VALID, VALOC, STATUS )
+
 *        check value is simple scalar
         CALL DAT_SHAPE(VALOC,DAT__MXDIM,DIMS,NDIM,STATUS)
         SCALAR=(NDIM.EQ.0)
@@ -108,8 +118,6 @@
           STATUS = SAI__ERROR
           CALL ERR_REP(' ', 'Value incompatible with object', STATUS )
         ENDIF
-
-        CALL DAT_ANNUL(VALOC,STATUS)
 
       ELSE
         STATUS = SAI__ERROR
