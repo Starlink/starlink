@@ -149,7 +149,7 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   if ( fp ) {
 
 /* Set up parser stream */
-    pstream = ADIstrmNew( status );
+    pstream = ADIstrmNew( "r", status );
     ADIstrmExtendFile( pstream, fp, status );
 
     ADInextToken( pstream, status );

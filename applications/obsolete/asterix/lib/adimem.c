@@ -639,14 +639,8 @@ ADIobj ADImemAllocObj( ADIclassDef *cdef, int nval, ADIstatus status )
 void ADImemFreeBlock( int iblk, ADIstatus status )
   {
   ADIblock	*bptr = ADI_G_blks[iblk];
-  ADIidIndex	*fptr = &(bptr->cdef->alloc.f_block);
   ADIidIndex	onext = bptr->next;
   ADIlogical	slave = ADI__false;
-
-/* Locate the address of the variable pointing to this block in the */
-/* type's block chain */
-  while ( *fptr != iblk )
-    fptr = &ADI_G_blks[*fptr]->next;
 
 /* Standard block? */
   if ( bptr->master == ADI__nullid ) {

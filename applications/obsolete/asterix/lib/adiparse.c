@@ -337,7 +337,7 @@ void ADIclearStreamInt( ADIstream *stream, ADIstatus status )
     stream->nc_pb = 0;
     stream->nt_pb = 0;
     stream->dev = NULL;
-    stream->flags = ADI_STREAM__DEFAULT;
+    stream->flags &= (ADI_STREAM__MODEBITS^0xFFFF);
     }
   }
 
@@ -375,13 +375,19 @@ int ADIsetStreamAttr( ADIobj stream, int flag, ADIstatus status )
 /*
  * Construct a new stream of undefined type
  */
-ADIobj ADIstrmNew( ADIstatus status )
+ADIobj ADIstrmNew( char *mode, ADIstatus status )
   {
+  int		modemask = 0;
   ADIobj	str = ADI__nullid;
 
   if ( _ok(status) ) {
     str = adix_cls_alloc( &KT_DEFN_strm, status );
     ADIclearStream( str, status );
+    if ( (*mode == 'r') || (*mode == 'R') )
+      modemask = ADI_STREAM__IN;
+    else if ( (*mode == 'w') || (*mode == 'W') )
+      modemask = ADI_STREAM__OUT;
+    _strm_data(str)->flags = modemask;
     }
 
   return str;
@@ -406,6 +412,7 @@ void ADIstrmFlushDev( ADIdevice *dev, ADIstatus status )
   dev->bnc = 0;
   }
 
+
 /*
  * Flush a stream
  */
@@ -423,14 +430,15 @@ void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
   {
   char	*buf = dev->buf;
   int	i;
+  int	eblen = dev->bufsiz - 1;	/* Useful buffer length */
   char	*scur = str;
-  int	sleft = dev->bufsiz - dev->bnc;	/* Amount of space left */
+  int	sleft = eblen - dev->bnc;	/* Amount of space left */
 
-/* Null terminated */
+/* Null terminated input? */
   if ( slen == _CSM ) {
     while ( *scur ) {
-      while ( *scur && (dev->bnc<dev->bufsiz) ) {
-	dev->buf[dev->bnc++] = *scur++;
+      while ( *scur && (dev->bnc < eblen) ) {
+	buf[dev->bnc++] = *scur++;
 	}
       if ( *scur )
 	ADIstrmFlushDev( dev, status );
@@ -453,7 +461,7 @@ void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
 	buf[dev->bnc++] = *scur++;
       ADIstrmFlushDev( dev, status );
       nleft -= sleft;
-      sleft = dev->bufsiz;
+      sleft = eblen;
       }
     }
   }
@@ -461,10 +469,9 @@ void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
 void ADIstrmPutCh( ADIobj stream, char ch, ADIstatus status )
   {
   if ( _ok(status) ) {
-    ADIstream	*pstr = _strm_data(stream);
-    ADIdevice	*dev = pstr->dev;
+    ADIdevice	*dev = _strm_data(stream)->dev;
 
-    if ( dev->bnc == dev->bufsiz )
+    if ( dev->bnc == (dev->bufsiz-1) )
       ADIstrmFlushDev( dev, status );
     dev->buf[dev->bnc++] = ch;
     }
@@ -494,6 +501,9 @@ void ADIstrmPutStrI( ADIobj stream, ADIobj str, ADIstatus status )
  *   %S		- an ADI string
  *   \n		- new line
  *   \t		- tab character
+ *
+ * Writes data into user supplied buffer. If the buffer fills up then
+ * the user supplied flushing function is invoked
  */
 void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
   {
@@ -554,7 +564,7 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
 	    ADIstrmPutInt( dev, lbuf, _CSM, status );
 	    break;
 	  case 'c':
-            sh_arg = va_arg(ap,short);
+	    sh_arg = va_arg(ap,short);
 	    fct = sh_arg;
 	    ADIstrmPutInt( dev, &fct, 1, status );
 	    break;
@@ -616,7 +626,7 @@ void ADIdropDeviceInt( ADIstream *str, ADIstatus status )
 	if ( dev->bufsiz ) {
 	  if ( dev->bnc )
 	    ADIstrmFlushDev( dev, status );
-	  ADImemFree( dev->buf, dev->bufsiz+1, status );
+	  ADImemFree( dev->buf, dev->bufsiz, status );
 	  }
 	if ( ! dev->pstatic )
 	  fclose( dev->f );
@@ -668,7 +678,7 @@ ADIobj ADIstrmExtendC( ADIobj stream, char *buf, int blen, ADIstatus status )
     ADIstream	*str = _strm_data(stream);
 
     ADIaddDeviceToStream( stream, ADIdevCstring, status );
-    str->dev->ptr = buf;
+    str->dev->ptr = str->dev->buf = buf;
     str->dev->bufsiz = blen;
     str->dev->pstatic = ADI__true;
     }
@@ -682,7 +692,7 @@ ADIobj ADIstrmExtendCst( ADIobj stream, char *buf, int blen, ADIstatus status )
     ADIstream	*str = _strm_data(stream);
 
     ADIaddDeviceToStream( stream, ADIdevCstring, status );
-    str->dev->ptr = buf;
+    str->dev->ptr = str->dev->buf = buf;
     str->dev->bufsiz = blen;
     str->dev->pstatic = ADI__true;
     str->dev->dstatic = ADI__true;
@@ -718,8 +728,7 @@ ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
     str->dev->f = f;
     str->dev->pstatic = ADI__true;
     str->dev->buf = ADImemAlloc( FILEBUF, status );
-    str->dev->bufsiz = FILEBUF - 1;
-    str->dev->bnc = 0;
+    str->dev->bufsiz = FILEBUF;
     }
 
   return stream;
@@ -738,6 +747,9 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
       }
     else if ( str->dev ) {
       switch( str->dev->type ) {
+	case ADIdevCstring:
+	  ch = *(str->dev->ptr++); gotit = ADI__true;
+	  break;
 	case ADIdevFile:
 	  if ( feof(str->dev->f) )
 	    ADIdropDevice( stream, status );
@@ -765,9 +777,6 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
 	      str->dev->buf[0] = '\0'; ch = '\n'; gotit = ADI__true;
 	      } */
 	    }
-	  break;
-	case ADIdevCstring:
-	  ch = *(str->dev->ptr++); gotit = ADI__true;
 	  break;
 	}
       }

@@ -131,9 +131,11 @@
 *      Enquiry routines :
 *
 *	adic_class	- Enquire object class
-* 	adic_cshape	- Enquire object dimensions
+* 	adic_cshape	- Enquire object component dimensions
+* 	adic_csize	- Enquire object component number of elements
 * 	adic_name	- Enquire object name
 * 	adic_shape	- Enquire object dimensions
+* 	adic_size	- Enquire object number of elements
 *	adic_state	- Enquire object data state
 *
 *      Changing object attributes :
@@ -1484,6 +1486,18 @@ void adic_cshape( ADIobj id, char *name, int mxndim, int dims[], int *ndim, ADIs
   _ERR_OUT;
   }
 
+void adic_csize( ADIobj id, char *name, int *nelm, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;             /* Standard entry checks */
+
+  _ERR_IN("adic_csize");		/* Mark routine for error reporting */
+
+/* Invoke kernel routine */
+  adix_size( id, name, _CSM, nelm, status );
+
+  _ERR_OUT;
+  }
+
 void adic_name( ADIobj id, int blen, char *buf, ADIstatus status )
   {
   char 	*cname;
@@ -1508,6 +1522,18 @@ void adic_shape( ADIobj id, int mxndim, int dims[], int *ndim, ADIstatus status 
 
   adix_shape( id, NULL, 0, mxndim, dims,/* Invoke kernel routine */
 	      ndim, status );
+
+  _ERR_OUT;
+  }
+
+void adic_size( ADIobj id, int *nelm, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;             /* Standard entry checks */
+
+  _ERR_IN("adic_size");			/* Mark routine for error reporting */
+
+/* Invoke kernel routine */
+  adix_size( id, NULL, 0, nelm, status );
 
   _ERR_OUT;
   }

@@ -891,7 +891,7 @@ void adix_defgen( char *spec, int slen, char *options, int olen,
   _GET_NAME(options,olen);
 
 /* Put specification into parse stream */
-  pstream = ADIstrmExtendC( ADIstrmNew( status ), spec, slen, status );
+  pstream = ADIstrmExtendC( ADIstrmNew( "r", status ), spec, slen, status );
 
   ctok = ADInextToken( pstream, status );
 
@@ -962,7 +962,7 @@ void adix_defmth( char *spec, int slen,
   _GET_NAME(spec,slen);                 /* Import strings used in this rtn */
 
 /* Put specification into parse stream */
-  pstream = ADIstrmExtendC( ADIstrmNew( status ), spec, slen, status );
+  pstream = ADIstrmExtendC( ADIstrmNew( "r", status ), spec, slen, status );
 
   ctok = ADInextToken( pstream, status );
 
@@ -1432,7 +1432,7 @@ void ADIdefClass_e( char *name, int nlen, char *parents, int plen,
   if ( parents && (plen>0) ) {
 
 /* Put parents specification into parse stream */
-    pstream = ADIstrmExtendC( ADIstrmNew( status ), parents, plen, status );
+    pstream = ADIstrmExtendC( ADIstrmNew( "r", status ), parents, plen, status );
 
     ADInextToken( pstream, status );
 
@@ -1442,7 +1442,7 @@ void ADIdefClass_e( char *name, int nlen, char *parents, int plen,
 /* Parse member specification if the string isn't empty */
   if ( members && (mlen>0) ) {
     if ( _null_q(pstream) )
-      pstream = ADIstrmNew( status );
+      pstream = ADIstrmNew( "r", status );
     else
       ADIclearStream( pstream, status );
 
@@ -1610,8 +1610,6 @@ void adix_prnt_struc( ADIobj stream, ADIobj id, ADIstatus status )
   {
   ADIobj  sid = *_struc_data(id);
 
-  _chk_stat;
-
   ADIstrmPutCh( stream, '{', status );
 
   while ( _valid_q(sid) ) {
@@ -1619,8 +1617,10 @@ void adix_prnt_struc( ADIobj stream, ADIobj id, ADIstatus status )
 
     sid = _CDR(sid);
     ADIstrmPrintf( stream, "%S = %O%s", status, _CAR(scar),
-		   _CDR(scar), _valid_q(sid) ? ", " : "}" );
+		   _CDR(scar), _valid_q(sid) ? ", " : "" );
+
     }
+  ADIstrmPutCh( stream, '}', status );
   }
 
 
@@ -1820,8 +1820,8 @@ void adi_init( ADIstatus status )
     prsx_init( status );
 
 /* Create the constant stream object pointing to standard output & error */
-    ADIcvStdOut = ADIstrmExtendFile( ADIstrmNew( status ), stdout, status );
-    ADIcvStdErr = ADIstrmExtendFile( ADIstrmNew( status ), stderr, status );
+    ADIcvStdOut = ADIstrmExtendFile( ADIstrmNew( "w", status ), stdout, status );
+    ADIcvStdErr = ADIstrmExtendFile( ADIstrmNew( "w", status ), stderr, status );
 /*    _han_readonly(ADIcvStdOut) = ADI__true; */
 
 /* Install "Standard" method combination */
@@ -3470,6 +3470,28 @@ void adix_shape( ADIobj id, char *name, int nlen, int mxndim, int dims[],
       for( idim=0; idim<mxndim; idim++ )
 	dims[idim] = 0;
       }
+    }
+  }
+
+void adix_size( ADIobj id, char *name, int nlen, int *nelm, ADIstatus status )
+  {
+  ADIobj        *lid;
+
+/* Find data address */
+  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, status );
+
+  if ( _ok(status) ) {
+    ADIobj              hid = _han_id(*lid);
+    int         idim;
+
+/* Array object? */
+    if ( _ary_q(hid) ) {
+      ADIarrayPtr       adata = _ary_data(hid);
+
+      *nelm = ADIaryCountNelm( adata->ndim, adata->dims );
+      }
+    else
+      *nelm = 1;
     }
   }
 

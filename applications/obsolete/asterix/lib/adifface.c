@@ -130,8 +130,10 @@
 *
 *	adi_class	- Enquire object class
 * 	adi_cshape	- Enquire object component dimensions
+*	adi_csize	- Enquire object number of elements
 * 	adi_name	- Enquire object name
 * 	adi_shape	- Enquire object dimensions
+*	adi_size	- Enquire object number of elements
 *	adi_state	- Enquire object data state
 *
 *      Changing object attributes :
@@ -1910,8 +1912,8 @@ F77_SUBROUTINE(adifn(class))( INTEGER(id), CHARACTER(cls), INTEGER(status) TRAIL
   }
 
 F77_SUBROUTINE(adifn(cshape))( INTEGER(id), CHARACTER(name), INTEGER(mxndim),
-                               INTEGER_ARRAY(dims), INTEGER(ndim),
-                               INTEGER(status) TRAIL(name) )
+			       INTEGER_ARRAY(dims), INTEGER(ndim),
+			       INTEGER(status) TRAIL(name) )
   {
   GENPTR_INTEGER(id)
   GENPTR_CHARACTER(name)
@@ -1925,8 +1927,26 @@ F77_SUBROUTINE(adifn(cshape))( INTEGER(id), CHARACTER(name), INTEGER(mxndim),
   _ERR_IN("ADI_CSHAPE");		/* Mark routine for error reporting */
 
   adix_shape( (ADIobj) *id, name,	/* Invoke kernel routine */
-              name_length, *mxndim,
+	      name_length, *mxndim,
 	      dims, ndim, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(csize))( INTEGER(id), CHARACTER(name), INTEGER(nelm),
+			      INTEGER(status) TRAIL(name) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_INTEGER(nelm)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;             /* Standard entry checks */
+
+  _ERR_IN("ADI_CSIZE");			/* Mark routine for error reporting */
+
+/* Invoke kernel routine */
+  adix_size( (ADIobj) *id, name, name_length, nelm, status );
 
   _ERR_OUT;
   }
@@ -1965,8 +1985,23 @@ F77_SUBROUTINE(adifn(shape))( INTEGER(id), INTEGER(mxndim), INTEGER_ARRAY(dims),
   _ERR_IN("ADI_SHAPE");			/* Mark routine for error reporting */
 
   adix_shape( (ADIobj) *id, NULL, 0,	/* Invoke kernel routine */
-              *mxndim,
+	      *mxndim,
 	      dims, ndim, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(size))( INTEGER(id), INTEGER(nelm), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(nelm)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;             /* Standard entry checks */
+
+  _ERR_IN("ADI_SIZE");			/* Mark routine for error reporting */
+
+  adix_size( (ADIobj) *id, NULL, 0, nelm, status );
 
   _ERR_OUT;
   }
