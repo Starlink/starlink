@@ -30,9 +30,14 @@
 *    Bugs :
 *    Authors :
 *     J.Lightfoot (jfl@roe.ac.uk)
+*     T.Jenness (timj@jach.hawaii.edu)
 *    History :
 *     $Id$
 *     15-AUG-1995: original version
+*     $Log$
+*     Revision 1.2  1997/10/16 19:48:08  timj
+*     Make sure the comment character is always included in the string.
+*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -88,15 +93,19 @@
          NCHAR = CHR_LEN (VALUE)
          IF (NCHAR .LT. 8) THEN
             NCHAR = 8
-         ELSE IF (NCHAR .GT. 68) THEN
-            NCHAR = 68
+         ELSE IF (NCHAR .GT. 66) THEN
+            NCHAR = 66
          END IF
          FITS (N_FITS)(NCHAR+12:NCHAR+12) = ''''
 
          CPTR = MAX (32,NCHAR+14)
+
+*     The fits string MUST include the comment character
+         FITS (N_FITS)(CPTR:CPTR) = '/'
+
          IF (CPTR+2 .LE. 80) THEN
-            FITS (N_FITS)(CPTR:CPTR) = '/'
             FITS (N_FITS)(CPTR+2:) = COMMENT
          END IF
+
       END IF
       END
