@@ -260,32 +260,8 @@ AC_SUBST(PACKAGE_VERSION)
 # test of starconf.status: in a pre-distribution state, this file must
 # be present in the component directory (where we are running
 # ./configure), but must not be present in any subdirectory.
-## We have to force at least one call to STAR_PREDIST_SOURCES for the sake of
-## STAR_LATEX_DOCUMENTATION, since the Makefile.in template generated
-## for that by automake depends on @PREDIST@ being substituted
-## correctly, even although there are no predist-only files which
-## that macro can itself use to trigger this.   In any case,
-## starconf.status will always be present in a bootstrapped
-## pre-distribution directory, and should never be distributed, so
-## this is a reliable and harmless test, which we might as well
-## perform in any case.
-: ${_star_predist_status=unknown}
-export _star_predist_status
-case $_star_predist_status in
-  unknown)
-    STAR_PREDIST_SOURCES(starconf.status)
-    # ...sets PREDIST
-    ;;
-  predist)
-    PREDIST=
-    ;;
-  postdist)
-    PREDIST='#'
-    ;;
-  *)
-    AC_MSG_ERROR([impossible predist status $_star_predist_status])
-    ;;
-esac
+_star_predist_status=unknown
+PREDIST='#'  # safe default
 AC_SUBST(PREDIST)
 
 # pax and/or tar are used in some install targets.
@@ -914,6 +890,9 @@ AC_DEFUN([STAR_CHECK_PROGS],
 # a way of copying a directory tree, preserving symlinks, as used by
 # the install targets in automake/lib/am/install.am.  Try 'cp -R'
 # then pax, and if both fail, collapse.
+dnl link test is `test -h': more portable than -L, according to autoconf notes
+dnl `cp --no-dereference' is GNU cp: -P gives a compatibility warning
+dnl include broken link in test: OSX 10.2 cp fails to copy these
 AC_DEFUN([STAR_SPECIAL_INSTALL_COMMAND],
    [AC_REQUIRE([AC_PROG_LN_S])dnl
     AC_PATH_PROG(CP, cp)dnl
@@ -924,17 +903,17 @@ dnl    AC_PATH_PROG(PAX, pax)dnl
                     mkdir conftest-d1 conftest-d2
                     mkdir conftest-d1/d
                     date >conftest-d1/d/f
-                    (cd conftest-d1/d; $LN_S f l)
+                    (cd conftest-d1/d; $LN_S f l; $LN_S x broken)
                     if test ! -h conftest-d1/d/l; then
                         # We don't have links!  So plain cp -R will do
                         star_cv_cp_r="$CP -R"
                     else
                         star_cv_cp_r=
-                        for try in "$CP -R -P -p" "$CP -R -p" "${PAX-false} -r -w -p e"
+                        for try in "$CP -R --no-dereference -p -f" "$CP -R -P -p -f" "$CP -R -P -p" "$CP -R -p" "${PAX-false} -r -w -p e"
                         do
                             rm -Rf conftest-d2/*
                             if (cd conftest-d1; $try . ../conftest-d2 2>/dev/null); then
-                                if test -h conftest-d2/d/l; then
+                                if test -h conftest-d2/d/l -a -h conftest-d2/d/broken; then
                                     star_cv_cp_r="$try"
                                     break
                                 fi
@@ -1288,14 +1267,12 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
                         star_cv_restfp_fixup=broken
                     fi
                 fi
-                # Don't even try linking with -lcc_dynamic.  It may work, but
-                # will be unpredictable:
-                # http://lists.apple.com/archives/fortran-dev/2004/Jul/msg00036.html
-                # (was http://lists.apple.com/mhonarc/fortran-dev/msg00769.html)
+                # Link with -lcc_dynamic.
+                # See http://www.astro.gla.ac.uk/users/norman/note/2004/restFP/
                 if test $star_cv_restfp_fixup = yes; then
-                    AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext -L/usr/lib -lgcc)
+                    AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext -lcc_dynamic)
                     if test $ac_status = 0; then
-                        star_cv_restfp_fixup=lgcc
+                        star_cv_restfp_fixup=cc_dynamic
                     fi
                 fi
                 if test $star_cv_restfp_fixup = yes; then
@@ -1318,21 +1295,22 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
             star_cv_restfp_fixup=no
         fi
         ])
+   C_FC_FCLINK_MAGIC=
+   C_FC_PPFC_FCLINK_MAGIC=
    case $star_cv_restfp_fixup in
-     lgcc)
-       # Add the required libraries to LIBS, so that the fixup happens
-       # invisibly, rather than requiring extra substitution tokens in
-       # the sources.  AC_FC_LIBRARY_LDFLAGS (which defines FCLIBS) does
-       # things differently, because there the user knows they want these
-       # extra libraries.
-       AC_SUBST(C_FC_FCLINK_MAGIC, "-L/usr/lib -lgcc")
-       AC_SUBST(C_FC_PPFC_FCLINK_MAGIC, "-L/usr/lib -lgcc")
+     cc_dynamic)
+       # Add the required libraries to C_FC_... variables, which are
+       # generated in the required places by (our) automake.
+       C_FC_FCLINK_MAGIC="-lcc_dynamic"
+       C_FC_PPFC_FCLINK_MAGIC="-lcc_dynamic"
        ;;
      nofortran)
        AC_MSG_NOTICE([No Fortran in path, so presumably no g77/gcc library problems])
        ;;
      *) ;;
    esac
+   AC_SUBST(C_FC_FCLINK_MAGIC)
+   AC_SUBST(C_FC_PPFC_FCLINK_MAGIC)
 ])# _STAR_RESTFP_FIX
 
 # Obsolete macros
