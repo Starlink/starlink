@@ -272,8 +272,9 @@
 *  NDF. This will create a 2D NDF. We will convert it into a 3D NDF later.
 *  Propagation from the input NDF ensures that WCS and AXIS  (etc)
 *  information is copied from input to output. The HISTORY, LABEL and 
-*  TITLE components and all extensions are also propagated.
-      CALL NDF_PROP( INDF1, 'WCS,AXIS', 'OUT', INDFO, STATUS )
+*  TITLE components (but no extensions) are also propagated.
+      CALL NDF_PROP( INDF1, 'WCS,AXIS,NOEXT(FITS,CCDPACK,POLPACK)', 
+     :               'OUT', INDFO, STATUS )
 
 *  Set the LABEL component for the output.
       CALL NDF_CPUT( 'Stokes parameters (I, Q, U)', INDFO, 'LABEL', 
