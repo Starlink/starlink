@@ -1,3 +1,8 @@
+1998-10-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* ADAM.xs: Tidy up autoload so that it uses int rather than double 
+	and remove second argument.
+
 1998-07-04  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* ADAM.pm (AUTOLOAD): Change so that @_ is not used! (Constants do 
