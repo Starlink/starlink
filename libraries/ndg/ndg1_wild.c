@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -25,6 +26,8 @@ typedef struct ContextStruct {
   int Fds[2];          /* Input and output file descriptors for the pipe */
   int pid;             /* PID for child process */        
 } ContextStruct;
+
+extern int errno;
 
 
 F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
@@ -87,6 +90,7 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 *  Authors:
 *     PWD: Peter W. Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     MBT: Mark B. Taylor (STARLINK)
 
 *  History:
 *     26-AUG-1999 (DSB):
@@ -106,6 +110,9 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 *     8-OCT-1999 (DSB):
 *        Modified so that the shell run in the child process does not
 *        execute a (t)csh start up script (eg .cshrc).
+*     29-AUG-2000 (MBT):
+*        Added a check for the parent process catching a (probably SIGCHLD)
+*        signal while attempting a read() from the child.
 */
    GENPTR_CHARACTER(FileSpec) /* Pointer to file specification. Length is
                                  FileSpec_length */
@@ -276,6 +283,17 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
          Ichar = 0;
          for ( ;; ) {
             Bytes = read( Fdptr[0], &Char, 1 );
+
+/* Check for read() interrupted by a signal.  This may well occur as a
+   result of a SIGCHLD caught as the child process exits normally; in 
+   this case attempt the read again. */
+            if ( Bytes == -1 && errno == EINTR ) 
+               Bytes = read( Fdptr[0], &Char, 1 );
+
+/* If the read has returned no bytes even after checking for a signal then
+   there is either no more output from the child process or a second signal
+   or some other error has occurred.  In any case this is regarded of the
+   end of useful output from the child. */
             if ( Bytes <= 0 ) break;
 
             if( !isspace( Char ) ) {
