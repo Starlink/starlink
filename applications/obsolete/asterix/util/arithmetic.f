@@ -156,6 +156,8 @@
 *        Create quality in 1st input in overwrite mode if it exists in 2nd
 *     11 Dec 1995 V2.0-0 (DJA):
 *        ADI port
+*      6 Mar 1996 V2.0-1 (DJA):
+*        Removed scalar insert to history as this now done by USI
 *     {enter_changes_here}
 
 *  Bugs:
@@ -187,7 +189,7 @@
         PARAMETER		( ICLS = 'BinDS|Array|Scalar' )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ARITHMETIC Version V2.0-0' )
+        PARAMETER		( VERSION = 'ARITHMETIC Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER              	OPER             	! Operation
@@ -215,7 +217,6 @@
       INTEGER			OFID			! Output file id
       INTEGER 			OUT_DIMS(ADI__MXDIM)    ! Output dimensions
       INTEGER			TID
-      INTEGER			TLEN			! Length of a string
 
       BYTE                    	IN1_MASK        	! 1st i/p quality mask
       BYTE                    	IN2_MASK        	! 2nd i/p quality mask
@@ -651,20 +652,8 @@
         NHIN = 1
         TEXT(1) = 'Input 1 : {INP1}'
         TEXT(2) = '  value = '
-*    Display value if scalar
-        IF ( IN1_SCALAR ) THEN
-          NHIN = NHIN + 1
-          TEXT(NHIN) = '  value = '
-          CALL CHR_RTOC( %VAL(IN1_DPTR), TEXT(NHIN)(11:), TLEN )
-        END IF
         NHIN = NHIN + 1
         TEXT(NHIN) = 'Input 2 : {INP2}'
-*    Display value if scalar
-        IF ( IN2_SCALAR ) THEN
-          NHIN = NHIN + 1
-          TEXT(NHIN) = '  value = '
-          CALL CHR_RTOC( %VAL(IN2_DPTR), TEXT(NHIN)(11:), TLEN )
-        END IF
 
 *    Convert text
         NLINE = MAXTXT
