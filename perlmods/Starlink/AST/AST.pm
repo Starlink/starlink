@@ -29,7 +29,18 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 Copyright (C) 2004 Tim Jenness. All Rights Reserved.
 
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
 
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
 
 =cut
 
@@ -49,6 +60,19 @@ sub Set {
   return $self->_Set( $string );
 }
 
+# Rebless cloned/copied object into the original class
+sub Clone {
+  my $self = shift;
+  my $new = $self->_Clone();
+  return bless $new, ref($self);
+}
+
+sub Copy {
+  my $self = shift;
+  my $new = $self->_Clone();
+  return bless $new, ref($self);
+}
+
 package AstAxisPtr;
 use base qw/ AstObjectPtr /;
 
@@ -57,6 +81,20 @@ use base qw/ AstAxisPtr /;
 
 package AstChannelPtr;
 use base qw/ AstObjectPtr /;
+
+# Need to rebless objects obtained from an astRead into the
+# correct class rather than generic variant.
+
+sub Read {
+  my $self = shift;
+  my $new = $self->_Read();
+  return if !defined $new;
+  return if !Starlink::AST::OK();
+  my $ast_class = $new->GetC( "Class" );
+  my $perl_class = "Ast" . $ast_class . "Ptr";
+  return bless $new, $perl_class;
+}
+
 
 package AstFitsChanPtr;
 use base qw/ AstChannelPtr /;
