@@ -1722,10 +1722,7 @@ void adic_putref( ADIobj rid, ADIobj id, ADIstatus status )
   {
   _chk_stat;
 
-/*  adix_putref( rid, NULL, 0, id, status ); */
-
-  adix_put_n( 1, rid, NULL, 0, 0, NULL, &_TM_alloc(_t), \
-	      sizeof(id), &id, status ); \
+  adix_putref( rid, NULL, 0, id, status );
 
   _ERR_REP( "adic_putref", Estr__PutRefObj );
   }

@@ -20,11 +20,11 @@
 
 #include "asterix.h"                    /* Asterix definitions */
 #include "ems.h"
-#include "sae_par.h"
 
 #include "adi_err.h"
 #include "aditypes.h"
 #include "adimem.h"
+#include "adiarray.h"
 #include "adisyms.h"
 #include "adilist.h"
 #include "adikrnl.h"                    /* Internal ADI kernel */
@@ -38,7 +38,7 @@
  * The class definition object
  */
 ADIclassDef	*cdef_etn;
-ADIobj	UT_ALLOC_etn = ADI__nullid;
+ADIobj	UT_cid_etn = ADI__nullid;
 
 
 _DEF_STATIC_CDEF("_SymbolBinding",sbind,128,ADIsymBinding);
@@ -58,7 +58,9 @@ _DEF_STATIC_CDEF("_SymbolBinding",sbind,128,ADIsymBinding);
 #define 	MAXARG		512
 #define         VSSIZE		2048
 
-ADIclassDef	*argcls[512];
+
+char		argary[MAXARG];
+ADIclassDef	*argcls[MAXARG];
 ADIobj		ADI_G_vs[VSSIZE];
 
 #define		vs_org		ADI_G_vs;
@@ -80,6 +82,9 @@ ADIstackFrame	*fs_top;		/* Frame stack top */
 
 void ADIexprPopFS( ADIstatus status )
   {
+  if ( _valid_q(fs_top->syms) )
+    adix_erase( &fs_top->syms, 1, status );
+
   ss_top -= fs_top->nslot;
   fs_top--;
   }
@@ -224,6 +229,39 @@ void ADIexecAccept( char *except, int elen, ADIstatus status )
   }
 
 
+ADIclassDef *ADIexprArgClass( int iarg, ADIobj arg, ADIstatus status )
+  {
+  ADIclassDef	*acdef;
+  char		*data;
+  ADIobj	hid;
+
+/* Not array by default */
+  argary[iarg] = 0;
+
+/* Valid argument? */
+  if ( _valid_q(arg) ) {
+
+/* Get argument class */
+    data = adix_iddt( arg, &acdef );
+    if ( acdef == &KT_DEFN_han ) {
+      hid = ((ADIobjHan *) data)->id;
+      acdef = _ID_TYPE(hid);
+      if ( acdef == &KT_DEFN_ary ) {
+	argary[iarg] = 1;
+	argcls[iarg] = acdef = _ID_TYPE(_ary_data(hid)->data);
+	}
+      else
+	argcls[iarg] = acdef;
+      }
+    else
+      argcls[iarg] = acdef;
+    }
+  else
+    argcls[iarg] = acdef = NULL;
+
+  return acdef;
+  }
+
 
 /*
  *  Test a method/function definition against values on the stack. Method
@@ -233,20 +271,24 @@ void ADIexecAccept( char *except, int elen, ADIstatus status )
  *  values is stored for each slot. If arguments have names then entries in
  *  the local symbol table are made.
  */
-ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
+ADIlogical ADIexprTestBind( ADIobj sbind, int narg, ADIobj args[],
+                            ADIstatus status )
   {
   ADIobj	arg;			/* Current defined args */
   ADIobj	carg;			/* Cursor over defined args */
-  ADIobj	*cur_sp;
+  ADIobj	*cur_sp = args;
+  ADIinteger	dims[ADI__MXDIM];
   ADIobj	earg;
   ADIobj	head;
   int		iarg;
   ADIlogical	match = ADI__true;
   ADIclassDef   *margc;
-  ADIobj	mclass,marg;
+  ADIlogical	matcharray;
+  ADIobj	mclass,patobj,parg,phead;
   ADIlogical	mmode;			/* Method (or function) mode */
   ADImethod	*mthd;
-  int		nleft;			/* Number of values to process */
+  int		ndim;
+  int		nleft = narg;	        /* Number of values to process */
   int		nslot = 0;
   int		nmin, nmax;		/* Allowed slot value count */
   ADIlogical	ok;
@@ -265,10 +307,6 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
 /* class instances are not valid arguments to functions with specified */
 /* argument classes */
   mmode = _valid_q( mthd->form );
-
-/* Current stack position */
-  cur_sp = vs_base;
-  nleft = _NARG;
 
 /* Test no argument case. This is a bit different because the null argument case */
 /* is represented as the special null cons cell */
@@ -296,14 +334,14 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
 	}
       else if ( head == K_BlankSeq ) {
 	nmin = 1;
-	nmax = 999;
+	nmax = MAXARG;
 	}
       else if ( head == K_BlankNullSeq ) {
 	nmin = 0;
-	nmax = 999;
+	nmax = MAXARG;
 	}
       else
-	adic_setecs( ADI__INVARG, "Invalid arg spec %O", status, arg );
+	adic_setecs( ADI__INVARG, "Invalid argument specification /%O/", status, arg );
       }
 
 /* Argument spec is not an expression tree */
@@ -315,15 +353,56 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
     if ( _ok(status) ) {
 
       if ( mode == m_pattern ) {
+
+/* Not array by default */
+	matcharray = ADI__false;
+
 /* Locate match class */
-	mclass = _CAR(earg);
-	if ( _null_q(mclass) )
+	patobj = _CAR(earg);
+
+/* Null pattern object should mean global all-containing class */
+	if ( _null_q(patobj) )
 	  mclass = K_WildCard;
-	else if ( _etn_q(mclass) ) {
-	  _GET_HEDARG( mclass, marg, mclass );
+
+/* Expression structured pattern object */
+	else if ( _etn_q(patobj) ) {
+
+/* Get bits of pattern expression */
+	  _GET_HEDARG( phead, parg, patobj );
+
+/* Is it an array specifier? */
+	  if ( phead == K_ArrayRef ) {
+
+	    ADIobj	nxtarg,dobj;
+
+	    matcharray = ADI__true;
+	    ndim = -1;
+
+/* First element of list is type name. If subsequent arguments are present */
+/* they specify the dimensions of the array. Both the dimensionality and *
+/* dimensions have a special value of -1 meaning "not specified" */
+	    _GET_CARCDR( mclass, nxtarg, parg );
+
+	    mclass = _etn_head(mclass);
+
+	    while ( _valid_q(nxtarg) ) {
+	      if ( ndim == -1 )
+		ndim = 1;
+	      else
+		ndim++;
+	      _GET_CARCDR( dobj, nxtarg, nxtarg );
+	      if ( _valid_q(dobj) )
+		adic_get0i( dobj, &dims[ndim-1], status );
+	      else
+		dims[ndim-1] = -1;
+	      }
+	    }
+	  else
+	    mclass = phead;
 	  }
+
 	else
-	  ADIstrmPrintf( "Comp %O and %O\n",status,mclass,argcls[iarg]->aname);
+	  ADIstrmPrintf( "Comp %O and %O\n",status,patobj,argcls[iarg]->aname);
 	}
 
 /* Count matching stack values up to a limit of nmax */
@@ -333,8 +412,10 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
 	if ( mode == m_compare )
 	  ok = adix_equal( arg, *cur_sp, status );
 
-	else if ( mclass == argcls[iarg]->aname )
-	  ;
+/* Need to check dimensions here too */
+	else if ( mclass == argcls[iarg]->aname ) {
+	  ok = ( (matcharray  ? 1 : 0) == argary[iarg]);
+	  }
 
 	else if ( mclass == K_Symbol ) {
 	  ok = _etn_q(*cur_sp);
@@ -461,7 +542,7 @@ ADIobj ADIexprMapFun( ADIobj head, ADIobj *first, ADIinteger llen,
  * a list is returned of all the collected bindings. This list should be
  * be destroyed using lstx_sperase
  */
-ADIobj ADIsymFind( ADIobj name, ADIlogical takefirst, int forms,
+ADIobj ADIsymFind( ADIobj name, int upvar, ADIlogical takefirst, int forms,
 		   ADIstatus status )
   {
   ADIobj	cbind;
@@ -472,13 +553,18 @@ ADIobj ADIsymFind( ADIobj name, ADIlogical takefirst, int forms,
   ADIobj	*ipoint = &rval;
   ADIsymBinding *bind;
 
-  while ( (curfs >= ADI_G_fs) && ! found ) {
+  if ( upvar < 0 )
+    curfs = ADI_G_fs;
+  else
+    curfs = fs_top - upvar;
+
+/*  while ( (curfs >= ADI_G_fs) && ! found ) { */
 
     nvpair = tblx_findi( &curfs->syms, name, status );
     if ( _valid_q(nvpair) ) {
       cbind = _CDR(nvpair);
       while ( _valid_q(cbind) && ! found ) {
-        bind = _sbind_data(cbind);
+	bind = _sbind_data(cbind);
 
 	if ( bind->form & forms ) {
 	  if ( takefirst ) {
@@ -493,23 +579,25 @@ ADIobj ADIsymFind( ADIobj name, ADIlogical takefirst, int forms,
 	}
       }
 
-    curfs--;
-    }
+/*    curfs--;
+    } */
 
   return rval;
   }
 
 
-ADIobj ADIsymAddBind( ADIobj name, ADIlogical global, ADIobj bind,
-		      ADIstatus status )
+ADIobj ADIsymAddBind( ADIobj name, int upvar, ADIobj bind, ADIstatus status )
   {
   ADIsymBinding		*bdata = _sbind_data(bind);
   ADIsymBinding		*cbdata;
   ADIstackFrame		*fs;
   ADIinteger		exclusive_forms = ADI__class_sb|ADI__mcf_sb;
-  ADIobj	nvpair;
+  ADIobj		nvpair;
 
-  fs = (global ? ADI_G_fs : fs_top);
+  if ( upvar < 0 )
+    fs = ADI_G_fs;
+  else
+    fs = fs_top - upvar;
 
   nvpair = tblx_saddi( &fs->syms, name, ADI__nullid, status );
 
@@ -569,7 +657,6 @@ ADIobj ADIetnNew( ADIobj head, ADIobj args, ADIstatus status )
   return adix_cls_nallocd( cdef_etn, 0, 0, idata, status );
   }
 
-
 void ADIetnPrint( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj          arglink;
@@ -597,6 +684,35 @@ void ADIetnPrint( int narg, ADIobj args[], ADIstatus status )
   }
 
 
+ADIobj ADIexprEvalMapList( ADIobj head, int narg, ADIobj args[],
+			   ADIinteger llen, ADIobj symlist, int level,
+			   ADIstatus status )
+  {
+  ADIlogical	cachanged;
+  ADIobj	robj = ADI__nullid;
+  ADIobj	*rcar,*rcdr,curp,newval;
+
+  _chk_stat_ret(ADI__nullid);
+
+  robj = curp = ADIexprMapFun( head, args, llen, narg, status );
+
+  while ( _valid_q(curp) ) {
+    _GET_CARCDR_A(rcar,rcdr,curp);
+
+    newval = ADIexprEvalInt( *rcar, symlist, level+1, &cachanged, status );
+
+    if ( cachanged ) {
+      adix_erase( rcar, 1, status );
+      *rcar = newval;
+      }
+
+    curp = *rcdr;
+    }
+
+  return robj;
+  }
+
+
 /* The expression evaluator.
  *
  *  Step 1 :
@@ -605,7 +721,7 @@ void ADIetnPrint( int narg, ADIobj args[], ADIstatus status )
  *
  *
  */
-ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
+ADIobj ADIexprEvalInt( ADIobj expr, ADIobj symlist, int level, ADIlogical *changed,
 			ADIstatus status )
   {
   ADIobj                a_bind;         /* Loop over binding list */
@@ -617,7 +733,6 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
   ADIlogical               onstack = ADI__false;/* Arguments already on stack? */
   ADIobj                carg;           /* Loop over arguments */
   ADIinteger            cllen;          /* Length of list argument */
-  char			*data;
   ADIobj		earg;
   ADIobj		ae_head,ae_args;
   ADIlogical            defer_error = ADI__false;
@@ -626,7 +741,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
   ADIlogical	    	hasprops;
   ADIobj		head;
   ADIobj		*hpobj;		/* Header property list address */
-  ADIinteger		iarg;
+  int			iarg;
   ADIlogical		is_etn;
   int                   iter = 0;       /* Iterations through eval loop */
   ADIinteger            llen;           /* Length of list argument */
@@ -694,7 +809,8 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 
 	    _GET_CARCDR( car, carg, carg );
 	    vs_push( car );
-	    _han_ref(car)++;
+	    if ( _valid_q(car) )
+	      _han_ref(car)++;
 	    }
 	  }
 	}
@@ -707,7 +823,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
       anyargeval = ADI__false;
 
 /* Gather the list of bindings of type Function */
-      s_bind = ADIsymFind( head, ADI__false, ADI__fun_sb, status );
+      s_bind = ADIsymFind( head, -1, ADI__false, ADI__fun_sb, status );
 
       if ( _valid_q(s_bind) && hasargs && hasprops ) {
 
@@ -733,7 +849,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	if ( _etn_q(*vs_ptr) ) {
 
 /* Evaluate stacked item */
-	  newval = ADIexprEvalInt( *vs_ptr, level+1, &argchanged, status );
+	  newval = ADIexprEvalInt( *vs_ptr, symlist, level+1, &argchanged, status );
 
 /* Did the value change? */
 	  if ( argchanged ) {
@@ -764,14 +880,10 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	  if ( _valid_q(*vs_ptr) ) {
 
 /* Get argument class */
-	    data = adix_iddt( *vs_ptr, &acdef );
-	    if ( acdef == &KT_DEFN_han )
-	      argcls[iarg] = acdef = _ID_TYPE(((ADIobjHan *) data)->id);
-	    else
-	      argcls[iarg] = acdef;
+            acdef = ADIexprArgClass( iarg, *vs_ptr, status );
 
 /* Argument is a raw list */
-	    if ( acdef->selfid == UT_ALLOC_list ) {
+	    if ( acdef->selfid == UT_cid_list ) {
 	      cllen = lstx_len( *vs_ptr, status );
 	      if ( iarg )
 		this_a_list = (llen == cllen);
@@ -808,24 +920,8 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 
 /* Map over lists? */
       if ( all_list ) {
-
-	ADIobj	*rcar,*rcdr,curp,newval;
-	ADIlogical	cachanged;
-
-	robj = curp = ADIexprMapFun( head, vs_base, llen, vs_top-vs_base, status );
-
-	while ( _valid_q(curp) ) {
-	  _GET_CARCDR_A(rcar,rcdr,curp);
-
-	  newval = ADIexprEvalInt( *rcar, level+1, &cachanged, status );
-
-	  if ( cachanged ) {
-	    adix_erase( rcar, 1, status );
-	    *rcar = newval;
-	    }
-
-	  curp = *rcdr;
-	  }
+	robj = ADIexprEvalMapList( head, vs_top-vs_base, vs_base,
+			   llen, symlist, level, status );
 
 	*changed = ADI__true;
 	}
@@ -837,18 +933,8 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	if ( _valid_q(s_bind) ) {
 
 /* Put argument classes into argcls */
-	  for( vs_ptr = vs_base + iarg; vs_ptr <= vs_last; vs_ptr++, iarg++ ) {
-
-	    if ( _valid_q(*vs_ptr) ) {
-	      data = adix_iddt( *vs_ptr, &acdef );
-	      if ( acdef == &KT_DEFN_han )
-		argcls[iarg] = _ID_TYPE(((ADIobjHan *) data)->id);
-	      else
-		argcls[iarg] = acdef;
-	      }
-	    else
-	      argcls[iarg] = NULL;
-	    }
+	  for( vs_ptr = vs_base + iarg; vs_ptr <= vs_last; vs_ptr++, iarg++ )
+            ADIexprArgClass( iarg, *vs_ptr, status );
 
 /* Find a matching symbol definition? */
 	  match = ADI__false;
@@ -857,7 +943,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 
 	    _GET_CARCDR( car_ab, cdr_ab, a_bind );
 	    bind = _sbind_data(car_ab);
-	    match = ADIexprTestBind( bind->defn, status );
+	    match = ADIexprTestBind( bind->defn, _NARG, vs_base, status );
 	    if ( ! match )
 	      a_bind = cdr_ab;
 	    }
@@ -870,6 +956,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	  if ( bind->form == ADI__trnsfm_sb )
 	    robj = adix_copy( bind->defn, status );
 	  else {
+
 	    robj = adix_exemth( ADI__nullid, _mthd_exec(bind->defn), _NARG,
 				vs_base, status );
 
@@ -947,7 +1034,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 /* Non-functional expression tree */
     else if ( is_etn ) {
 
-      s_bind = ADIsymFind( head, ADI__true, ADI__defn_sb|ADI__trnsfm_sb, status );
+      s_bind = ADIsymFind( head, 0, ADI__true, ADI__defn_sb|ADI__trnsfm_sb, status );
 
 /* Did we match the symbol? */
       if ( _valid_q(s_bind) ) {
@@ -986,7 +1073,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
   }
 
 
-ADIobj ADIexprEval( ADIobj expr, ADIlogical ownres, ADIstatus status )
+ADIobj ADIexprEval( ADIobj expr, ADIobj symlist, ADIlogical ownres, ADIstatus status )
   {
   ADIlogical	changed;
   ADIobj	res;
@@ -994,7 +1081,7 @@ ADIobj ADIexprEval( ADIobj expr, ADIlogical ownres, ADIstatus status )
 
   ADI_G_curint->exec.name = ADI__nullid;
 
-  res = rval = ADIexprEvalInt( expr, 0, &changed, status );
+  res = rval = ADIexprEvalInt( expr, symlist, 0, &changed, status );
 
   if ( ownres && _valid_q(res) ) {
     if ( _han_ref(res) > 1 ) {
@@ -1010,7 +1097,7 @@ ADIobj ADIexprEval( ADIobj expr, ADIlogical ownres, ADIstatus status )
 /*
  *  Evaluate list of expressions, returning value of last one evaluated
  */
-ADIobj ADIexprEvalList( ADIobj elist, ADIstatus status )
+ADIobj ADIexprEvalList( ADIobj elist, ADIobj symlist, ADIstatus status )
   {
   ADIobj	car,curp;
   ADIobj	robj = ADI__nullid;
@@ -1020,7 +1107,7 @@ ADIobj ADIexprEvalList( ADIobj elist, ADIstatus status )
     _GET_CARCDR(car,curp,curp);
 
     if ( _valid_q(car) )
-      robj = ADIexprEval( car, ADI__false, status );
+      robj = ADIexprEval( car, symlist, ADI__false, status );
     else
       robj = ADI__nullid;
 
@@ -1032,17 +1119,254 @@ ADIobj ADIexprEvalList( ADIobj elist, ADIstatus status )
   }
 
 
+void adix_rep_nofun( ADIobj name, int narg, ADIobj args[],
+		     ADIstatus status )
+  {
+  adix_rep_nomf( ADI__NOMTH, "functions", name, narg, args, status );
+  }
+
+
+ADIobj adix_fexec( char *func, int flen, int narg, ADIobj args[],
+		   ADIstatus status )
+  {
+  ADIobj                a_bind;         /* Loop over binding list */
+  ADIclassDef		*acdef;		/* Argument class definition */
+  ADIlogical               all_list;
+  ADIsymBinding		*bind;
+  ADIinteger            cllen;          /* Length of list argument */
+  ADIobj		ae_head,ae_args;
+  ADIlogical            defer_error = ADI__false;
+  ADIlogical	    	hasprops;
+  ADIobj		head;
+  ADIobj		*hpobj;		/* Header property list address */
+  int			iarg;
+  ADIinteger            llen;           /* Length of list argument */
+  ADIlogical            match;          /* Binding match found? */
+  unsigned int		*raddr;
+  ADIobj                robj;           /* Result object */
+  ADIobj                s_bind;
+  ADIobj                *old_vs_base,*old_vs_top;
+  ADIlogical		this_a_list;
+  ADIobj                *vs_last;
+  ADIobj                *vs_ptr;        /* Loop over virtual stack */
+
+/* Check inherited global status */
+  if ( !_ok(status) )
+    return ADI__nullid;
+
+/* Locate function in common table */
+  head = adix_cmn( func, flen, status );
+
+/* Gather the list of bindings of type Function */
+  s_bind = ADIsymFind( head, -1, ADI__false, ADI__fun_sb, status );
+
+/* Slot storage for next exec */
+  (fs_top+1)->first_slot = ss_top;
+
+/* Zero next frame's slot counter */
+  (fs_top+1)->nslot = 0;
+
+/* Set up stack */
+  old_vs_base = vs_base;
+  old_vs_top = vs_top;
+  vs_base = vs_top;
+
+/* Stack the unevaluated arguments */
+  for( iarg=0; iarg<narg; iarg ++ ) {
+    vs_push( args[iarg] );
+    if ( _valid_q(args[iarg]) )
+      _han_ref( args[iarg] )++;
+    }
+
+/* Default bounds for arg evaluation */
+  vs_last = vs_top-1;
+
+/* Initialise the counter which denotes the next argument whose class is to be */
+/* ascertained. By storing that information during the Listable test we don't  */
+/* waste it when testing function symbol bindings */
+  iarg = 0;
+
+/* Locate property list */
+  hpobj = &_han_pl(head);
+  hasprops = _valid_q(*hpobj);
+
+/* Listable form? */
+  if ( hasprops ) {
+
+/* Are all the arguments lists? */
+    all_list = ADI__true;
+    _ARGLOOP_1ST_TO_NTH_AND(vs_ptr,all_list) {
+
+      this_a_list = ADI__false;
+      if ( _valid_q(*vs_ptr) ) {
+
+/* Get argument class */
+        acdef = ADIexprArgClass( iarg, *vs_ptr, status );
+
+/* Argument is a raw list */
+        if ( acdef->selfid == UT_cid_list ) {
+	  cllen = lstx_len( *vs_ptr, status );
+	  if ( iarg )
+	    this_a_list = (llen == cllen);
+	  else {
+	    this_a_list = ADI__true;
+	    llen = cllen;
+	    }
+	  }
+
+/* Argument is a list constructor */
+        else if ( acdef == cdef_etn ) {
+	  _GET_HEDARG( ae_head, ae_args, *vs_ptr );
+	  if ( ae_head == K_List ) {
+	    cllen = lstx_len( ae_args, status );
+	    if ( iarg )
+	      this_a_list = (llen == cllen);
+	    else {
+	      this_a_list = ADI__true;
+	      llen = cllen;
+	      }
+	    }
+	  }
+        }
+      else
+        argcls[iarg] = NULL;
+
+      iarg++;
+
+      all_list &= this_a_list;
+      }
+    }
+  else
+    all_list = ADI__false;
+
+/* Map over lists? */
+  if ( all_list ) {
+    robj = ADIexprEvalMapList( head, vs_top-vs_base, vs_base,
+				llen, ADI__nullid, 1, status );
+    }
+
+  else {
+
+    ADIobj	car_ab,cdr_ab;
+
+    if ( _valid_q(s_bind) ) {
+
+/* Put argument classes into argcls */
+      for( vs_ptr = vs_base + iarg; vs_ptr <= vs_last; vs_ptr++, iarg++ )
+        ADIexprArgClass( iarg, *vs_ptr, status );
+
+/* Find a matching symbol definition? */
+      match = ADI__false;
+      a_bind = s_bind;
+      while ( _valid_q(a_bind) && ! match ) {
+
+        _GET_CARCDR( car_ab, cdr_ab, a_bind );
+	bind = _sbind_data(car_ab);
+	match = ADIexprTestBind( bind->defn, _NARG, vs_base, status );
+	if ( ! match )
+	  a_bind = cdr_ab;
+	}
+      }
+    else
+      match = ADI__false;
+
+    if ( match ) {                   /* Invoke function if match */
+      a_bind = car_ab;
+      if ( bind->form == ADI__trnsfm_sb )
+	robj = adix_copy( bind->defn, status );
+      else {
+
+	robj = adix_exemth( ADI__nullid, _mthd_exec(bind->defn), _NARG,
+				vs_base, status );
+
+	if ( ADI_G_curint->exec.name == EXC_ReturnValue ) {
+	  robj = ADI_G_curint->exec.errtext;
+	  ADI_G_curint->exec.errtext = ADI__nullid;
+	  ADIexecAcceptI( EXC_ReturnValue, status );
+	  }
+
+	if ( !_ok(status) ) {       /* Bad status from procedure? */
+	  defer_error = ADI__true;
+	  }
+	}
+      }
+
+/* No match is an error in this routine */
+    else {
+      adix_rep_nofun( head, narg, args, status );
+      defer_error = ADI__true;
+      }
+
+    if ( defer_error )
+      ems_begin_c( status );
+    }
+
+/* Release stacked items. Input arguments must have a ref count of at least 2 */
+/* Evaluated arguments which are being discarded will have a count of only one */
+  for( vs_ptr = vs_base; vs_ptr <= vs_last; vs_ptr++ )
+    if ( _valid_q(*vs_ptr) ) {
+      raddr = &_han_ref(*vs_ptr);
+      if ( *raddr > 1 )
+	(*raddr)--;
+      else
+	adix_erase( vs_ptr, 1, status );
+    }
+
+/* Remove binding list if defined */
+  if ( _valid_q(s_bind) )
+    lstx_sperase( &s_bind, status );
+
+/* Restore stack */
+  vs_base = old_vs_base;
+  vs_top = old_vs_top;
+
+  if ( defer_error )                    /* Did we defer error reporting? */
+    ems_end_c( status );
+
+  return robj;
+  }
+
+
 void ADIetnInit( ADIstatus status )
   {
 /* Define the expression node class */
-  adic_defcls( "Expression", "", "head,args", &UT_ALLOC_etn, status );
+  adic_defcls( "Expression", "", "head,args", &UT_cid_etn, status );
 
-  cdef_etn = _cdef_data(UT_ALLOC_etn);
+  cdef_etn = _cdef_data(UT_cid_etn);
 
 /* Define the printer */
-  adic_defprt( UT_ALLOC_etn, (ADIcMethodCB) ADIetnPrint, status );
+  adic_defprt( UT_cid_etn, (ADIcMethodCB) ADIetnPrint, status );
 
 /* Initialise frame stack */
   fs_top = ADI_G_fs - 1;
   }
 
+
+ADIobj ADIexprParseString( char *string, int slen, ADIobj grammar,
+			   ADIstatus status )
+  {
+  ADItokenType	ctok;
+  ADIobj	pstream;
+  ADIobj	robj;
+
+  _chk_init; _chk_stat_ret(ADI__nullid);
+
+/* Construct a stream from the string supplied */
+  pstream = ADIstrmExtendC( ADIstrmNew( "r", status ), string, slen, status );
+  ADInextToken( pstream, status );
+
+/* Parse an expression */
+  robj = ADIparseExpInt( pstream, grammar, 1, status );
+
+/* Look at last token before we destory the stream */
+  ctok = ADIcurrentToken( pstream, status );
+
+/* Destroy the stream */
+  adic_erase( &pstream, status );
+
+/* Error unless end of stream met */
+  if ( ! ((ctok == TOK__END) || (ctok==TOK__NULL)) )
+    adic_setecs( ADI__INVARG, "Extra text following valid expression", status );
+
+  return robj;
+  }

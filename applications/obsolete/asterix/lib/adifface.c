@@ -18,23 +18,24 @@
 *
 *      Error system :
 *
-*	adi_errctx	- return error context string
-* 	adi_errmsg	- return error message given code
-*	adi_setecs	- set error code and context string
+*	adi_erranl	 - Annul a reported error
+*	adi_errctx	 - Return error context string
+* 	adi_errmsg	 - Return error message given code
+*	adi_setecs	 - Set error code and context string
 *
 *      Property handling :
 *
-*	adi_delprp	 - delete named property
-*	adi_locprp	 - locate named property
-*       adi_nprp	 - return number of properties
-*       adi_indprp	 - locate property by number
+*	adi_delprp	 - Delete named property
+*	adi_locprp	 - Locate named property
+*       adi_nprp	 - Return number of properties
+*       adi_indprp	 - Locate property by number
 *
 *      Structure handling :
 *
-*	adi_delcmp	 - delete named structure component
-*	adi_loccmp	 - locate named structure component
-*	adi_ncmp	 - number of components in structure
-*	adi_indcmp	 - locate structure component by number
+*	adi_delcmp	 - Delete named structure component
+*	adi_loccmp	 - Locate named structure component
+*	adi_ncmp	 - Number of components in structure
+*	adi_indcmp	 - Locate structure component by number
 *
 *      Reference count :
 *
@@ -59,10 +60,11 @@
 *
 *      Method execution :
 *
+*	adi_calnxt	 - Invoke next method in method hierarchy
 *       adi_exec	 - Execute named method
 *       adi_exec2	 - Execute named method with 2 arguments
 *	adi_execi	 - Execute named method (ADI string)
-*	adi_calnxt	 - Invoke next method in method hierarchy
+*	adi_nulmth	 - Null method with standard argument list
 *
 *      System method interfaces :
 *
@@ -87,18 +89,22 @@
 *      Data access :
 *
 *	adi_find	 - Locate object component
+*	adi_findi	 - Locate object component with ADI name
+*       adi_[c]get	 - Get n-D object [component] values with user type
 *       adi_[c]get<t>	 - Get n-D object [component] values
+*       adi_[c]get0	 - Get scalar object [component] value with user type
 *       adi_[c]get0<t>	 - Get scalar object [component] value
+*       adi_[c]get1	 - Get 1-D object [component] values with user type
 *       adi_[c]get1<t>	 - Get 1-D object [component] values
-*	adi_[c]map	 - Map object [component] with user specified type
+*	adi_[c]map	 - Map object [component] with user type
 *	adi_[c]map<t>	 - Map object [component] with a specific type
+*       adi_[c]put	 - Put n-D object [component] values with user type
 *       adi_[c]put<t>	 - Put n-D object [component] values
+*       adi_[c]put0	 - Put scalar object [component] value with user type
 *       adi_[c]put0<t>	 - Put scalar object [component] value
+*       adi_[c]put1	 - Put 1-D object [component] values with user type
 *       adi_[c]put1<t>	 - Put 1-D object [component] values
 *	adi_[c]putid	 - Put ADI object into object [component]
-*       adi_[c]set<t>	 - Set n-D object [component] values
-*       adi_[c]set0<t>	 - Set scalar object [component] value
-*       adi_[c]set1<t>	 - Set 1-D object [component] values
 *	adi_there	 - Does an object component exist?
 *	adi_[c]unmap	 - Unmap object [component]
 *
@@ -133,7 +139,9 @@
 *
 *      Data system :
 *
+*       adi_fclone	 - Create a file as clone of input
 *       adi_fclose	 - Close a file system object
+*       adi_fcomit	 - Commit buffered file changes to disk
 *       adi_fcreat	 - Create a new file system object
 *       adi_fopen	 - Open existing file system object
 *
@@ -206,6 +214,13 @@
  * ADI error handling
  * -------------------------------------------------------------------------
  */
+F77_SUBROUTINE(adifn(erranl))( INTEGER(status) )
+  {
+  GENPTR_INTEGER(status)
+
+  adix_erranl( status );
+  }
+
 F77_SUBROUTINE(adifn(errmsg))( INTEGER(code), CHARACTER(buf) TRAIL(buf) )
   {
   GENPTR_INTEGER(code)
@@ -552,7 +567,7 @@ F77_SUBROUTINE(adifn(defvar))( CHARACTER(name), LOGICAL(global), INTEGER(valid),
   {
   GENPTR_CHARACTER(name)
   GENPTR_LOGICAL(global)
-  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(valid)
   GENPTR_INTEGER(status)
 
   _chk_stat;                 		/* Standard checks */
@@ -652,6 +667,16 @@ F77_SUBROUTINE(adifn(execi))( INTEGER(func), INTEGER(narg),
   _ERR_REP( "ADI_EXECI", Estr__ExeMth );
   }
 
+F77_SUBROUTINE(adifn(nulmth))( INTEGER(narg), INTEGER_ARRAY(args), INTEGER(oarg),
+			       INTEGER(status) )
+  {
+  GENPTR_INTEGER(narg)
+  GENPTR_INTEGER(args)
+  GENPTR_INTEGER(oarg)
+  GENPTR_INTEGER(status)
+  }
+
+
 /* -------------------------------------------------------------------------
  * System method interfaces
  * -------------------------------------------------------------------------
@@ -698,6 +723,7 @@ F77_SUBROUTINE(adifn(print))( INTEGER(id), INTEGER(status) )
   _ERR_REP( "ADI_PRINT", Estr__PriObj );
   }
 
+/*
 F77_SUBROUTINE(adifn(setlnk))( INTEGER(id), INTEGER(lid), INTEGER(status) )
   {
   GENPTR_INTEGER(id)
@@ -722,6 +748,7 @@ F77_SUBROUTINE(adifn(unlnk))( INTEGER(id), INTEGER(status) )
 
   _ERR_REP( "ADI_UNLNK", Estr__UlnFilObj );
   }
+*/
 
 /* -------------------------------------------------------------------------
  * Data creation
@@ -926,6 +953,28 @@ F77_SUBROUTINE(adifn(newv1c))( INTEGER(nval), CHARACTER_ARRAY(value),
  * -------------------------------------------------------------------------
  */
 
+F77_SUBROUTINE(adifn(get))( INTEGER(id), CHARACTER(type), INTEGER(ndim),
+		            INTEGER_ARRAY(dimx), BYTE(value),
+                            INTEGER_ARRAY(dims),
+                            INTEGER(status) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(ndim)
+  GENPTR_INTEGER(dimx)
+  GENPTR_BYTE(value)
+  GENPTR_INTEGER(dims)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  adix_get_nn( 0, (ADIobj) *id, NULL, 0, type, type_length, *ndim, dimx,
+	       value, dims, status );
+
+  _ERR_REP( "ADI_GET", Estr__GetObjDat );
+  }
+
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(get,_t))( INTEGER(id), INTEGER(ndim), \
 		INTEGER_ARRAY(dims), _TM_ftype(_t) *value, INTEGER(status) ) \
@@ -944,23 +993,40 @@ _genproc(b)	_genproc(w)
 _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
-F77_SUBROUTINE(adifn(getc))( INTEGER(id), INTEGER(ndim), INTEGER_ARRAY(dims),
-		CHARACTER_ARRAY(value), INTEGER(status) TRAIL(value) )
+F77_SUBROUTINE(adifn(getc))( INTEGER(id), INTEGER(ndim), INTEGER_ARRAY(dimx),
+		CHARACTER_ARRAY(value), INTEGER_ARRAY(dims), INTEGER(status)
+                TRAIL(value) )
   {
   GENPTR_INTEGER(id)
   GENPTR_INTEGER(ndim)
-  GENPTR_INTEGER_ARRAY(dims)
+  GENPTR_INTEGER_ARRAY(dimx)
   GENPTR_CHARACTER_ARRAY(value)
-  GENPTR_INTEGER(nactval)
+  GENPTR_INTEGER_ARRAY(dims)
   GENPTR_INTEGER(status)
 
   _chk_stat;
 
-  adix_get_n( 0, (ADIobj) *id, NULL, 0, *ndim, dims, &_TM_alloc(c),
-	      value_length, value, NULL, status );
+  adix_get_n( 0, (ADIobj) *id, NULL, 0, *ndim, dimx, &_TM_alloc(c),
+	      value_length, value, dims, status );
 
   _ERR_REP( "ADI_GETC", Estr__GetObjDat );
   }
+
+
+F77_SUBROUTINE(adifn(get0))( INTEGER(id), CHARACTER(type), void *value,
+                             INTEGER(status) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+
+  adix_get_nn( 0, (ADIobj) *id, NULL, 0, type, type_length, 0, NULL,
+	       value, NULL, status );
+
+  _ERR_REP( "ADI_GET0", Estr__GetObjDat );
+  }
+
 
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(get0,_t))( INTEGER(id), _TM_ftype(_t) *value, INTEGER(status) ) \
@@ -989,6 +1055,23 @@ F77_SUBROUTINE(adifn(get0c))( INTEGER(id), CHARACTER(value), INTEGER(status) TRA
 
   _ERR_REP( "ADI_GET0C", Estr__GetObjDat );
   }
+
+
+F77_SUBROUTINE(adifn(get1))( INTEGER(id), CHARACTER(type), INTEGER(mxval),
+		void *value, INTEGER(nactval), INTEGER(status) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(mxval)
+  GENPTR_INTEGER(nactval)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_get_nn( 0, (ADIobj) *id, NULL, 0, type, type_length, 1, mxval,
+	       value, nactval, status );
+
+  _ERR_REP( "ADI_GET1", Estr__GetObjDat );
+  }
+
 
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(get1,_t))( INTEGER(id), INTEGER(mxval), \
@@ -1065,6 +1148,22 @@ _genproc(b)	_genproc(w)
 _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
+
+F77_SUBROUTINE(adifn(put))( INTEGER(id), CHARACTER(type), INTEGER(ndim),
+		INTEGER_ARRAY(dims), void *value, INTEGER(status) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(ndim)
+  GENPTR_INTEGER_ARRAY(dims)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_put_nn( 0, (ADIobj) *id, NULL, 0, type, type_length, *ndim, dims,
+	      value, status );
+  _ERR_REP( "ADI_PUT", Estr__PutObjDat );
+  }
+
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(put,_t))( INTEGER(id), INTEGER(ndim), \
 		INTEGER_ARRAY(dims), _TM_ftype(_t) *value, INTEGER(status) ) \
@@ -1100,6 +1199,18 @@ F77_SUBROUTINE(adifn(putc))( INTEGER(id), INTEGER(ndim), INTEGER_ARRAY(dims),
   _ERR_REP( "ADI_PUTC", Estr__PutObjDat );
   }
 
+F77_SUBROUTINE(adifn(put0))( INTEGER(id), CHARACTER(type), void *value,
+                             INTEGER(status) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_put_nn( 0, (ADIobj) *id, NULL, 0, type, type_length,
+	       0, NULL, value, status );
+
+  _ERR_REP( "ADI_PUT0", Estr__PutObjDat );
+  }
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(put0,_t))( INTEGER(id), _TM_ftype(_t) *value, INTEGER(status) ) \
   { \
@@ -1127,6 +1238,19 @@ F77_SUBROUTINE(adifn(put0c))( INTEGER(id), CHARACTER(value), INTEGER(status) TRA
 	      value_length, (void *) value, status );
 
   _ERR_REP( "ADI_PUT0C", Estr__PutObjDat );
+  }
+
+F77_SUBROUTINE(adifn(put1))( INTEGER(id), CHARACTER(type), INTEGER(nval),
+		void *value, INTEGER(status) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(nval)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_put_nn( 0, (ADIobj) *id, NULL, 0, type, type_length, 1, nval,
+	      value, status );
+  _ERR_REP( "ADI_PUT1", Estr__PutObjDat );
   }
 
 #define _genproc(_t) \
@@ -1394,6 +1518,29 @@ F77_SUBROUTINE(adifn(cnewv1c))( INTEGER(pid), CHARACTER(name), INTEGER(nval),
  * -------------------------------------------------------------------------
  */
 
+F77_SUBROUTINE(adifn(cget))( INTEGER(id), CHARACTER(name), CHARACTER(type),
+                             INTEGER(ndim), INTEGER_ARRAY(dimx),
+		             BYTE(value), INTEGER_ARRAY(dims),
+                             INTEGER(status) TRAIL(name) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(ndim)
+  GENPTR_INTEGER(dimx)
+  GENPTR_BYTE(value)
+  GENPTR_INTEGER(dims)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  adix_get_nn( 0, (ADIobj) *id, name, name_length, type,
+               type_length, *ndim, dimx, value, dims, status );
+
+  _ERR_REP( "ADI_CGET", Estr__GetObjDat );
+  }
+
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(cget,_t))( INTEGER(id), CHARACTER(name), INTEGER(ndim), INTEGER_ARRAY(dims), \
 		_TM_ftype(_t) *value, INTEGER(nactval), INTEGER(status) TRAIL(name) ) \
@@ -1414,23 +1561,43 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
 F77_SUBROUTINE(adifn(cgetc))( INTEGER(id), CHARACTER(name), INTEGER(ndim),
-		INTEGER_ARRAY(dims), CHARACTER_ARRAY(value), INTEGER(status)
+		INTEGER_ARRAY(dimx), CHARACTER_ARRAY(value),
+                INTEGER_ARRAY(dims), INTEGER(status)
 		TRAIL(name) TRAIL(value) )
   {
   GENPTR_INTEGER(id)
   GENPTR_CHARACTER(name)
   GENPTR_INTEGER(ndim)
-  GENPTR_INTEGER_ARRAY(dims)
+  GENPTR_INTEGER_ARRAY(dimx)
   GENPTR_CHARACTER_ARRAY(value)
+  GENPTR_INTEGER_ARRAY(dims)
   GENPTR_INTEGER(status)
 
   _chk_stat;
 
-  adix_get_n( 0, (ADIobj) *id, name, name_length, *ndim, dims,
-	      &_TM_alloc(c), value_length, value, NULL, status );
+  adix_get_n( 0, (ADIobj) *id, name, name_length, *ndim, dimx,
+	      &_TM_alloc(c), value_length, value, dims, status );
 
   _ERR_REP( "ADI_CGETC", Estr__GetObjDat );
   }
+
+
+F77_SUBROUTINE(adifn(cget0))( INTEGER(id), CHARACTER(name),
+	 CHARACTER(type), void *value, INTEGER(status) TRAIL(name) TRAIL(type))
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  adix_get_nn( 0, (ADIobj) *id, name, name_length, type, type_length,
+               0, NULL, value, NULL, status );
+
+  _ERR_REP( "ADI_CGET0", Estr__CreObjDat );
+  }
+
 
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(cget0,_t))( INTEGER(id), CHARACTER(name), \
@@ -1463,6 +1630,26 @@ F77_SUBROUTINE(adifn(cget0c))( INTEGER(id), CHARACTER(name),
 
   _ERR_REP( "ADI_CGET0C", Estr__GetObjDat );
   }
+
+
+F77_SUBROUTINE(adifn(cget1))( INTEGER(id), CHARACTER(name), CHARACTER(type),
+                              INTEGER(mxval), void *value, INTEGER(nactval),
+                              INTEGER(status) TRAIL(name) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(mxval)
+  GENPTR_INTEGER(nactval)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+
+  adix_get_nn( 0, (ADIobj) *id, name, name_length, type, type_length, 1, mxval,
+	       value, nactval, status );
+
+  _ERR_REP( "ADI_CGET1", Estr__CreObjDat );
+  }
+
 
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(cget1,_t))( INTEGER(id), CHARACTER(name), INTEGER(mxval), \
@@ -1547,6 +1734,24 @@ _genproc(b)	_genproc(w)
 _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
+F77_SUBROUTINE(adifn(cput))( INTEGER(id), CHARACTER(name), CHARACTER(type),
+		INTEGER(ndim), INTEGER_ARRAY(dims),
+		void *value, INTEGER(status) TRAIL(name) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(ndim)
+  GENPTR_INTEGER_ARRAY(dims)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_put_nn( 0, (ADIobj) *id, name, name_length, type, type_length,
+              *ndim, dims, value, status );
+
+  _ERR_REP( "ADI_CPUT", Estr__PutObjDat );
+  }
+
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(cput,_t))( INTEGER(id), CHARACTER(name), \
 		INTEGER(ndim), INTEGER_ARRAY(dims), \
@@ -1585,6 +1790,22 @@ F77_SUBROUTINE(adifn(cputc))( INTEGER(id), CHARACTER(name), INTEGER(ndim),
   _ERR_REP( "ADI_CPUTC", Estr__PutObjDat );
   }
 
+
+F77_SUBROUTINE(adifn(cput0))( INTEGER(id), CHARACTER(name), CHARACTER(type),
+	 void *value, INTEGER(status) TRAIL(name) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_put_nn( 0, (ADIobj) *id, name, name_length, type, type_length,
+	      0, NULL, value, status );
+
+  _ERR_REP( _TM_fnames(cput0,_t), Estr__PutObjDat );
+  }
+
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(cput0,_t))( INTEGER(id), CHARACTER(name), \
 	 _TM_ftype(_t) *value, INTEGER(status) TRAIL(name) ) \
@@ -1616,6 +1837,22 @@ F77_SUBROUTINE(adifn(cput0c))( INTEGER(id), CHARACTER(name),
 	      value_length, (void *) value, status );
 
   _ERR_REP( "ADI_CPUT0C", Estr__PutObjDat );
+  }
+
+
+F77_SUBROUTINE(adifn(cput1))( INTEGER(id), CHARACTER(name), CHARACTER(type),
+		INTEGER(nval),
+		void *value, INTEGER(status) TRAIL(name) TRAIL(type) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_INTEGER(nval)
+  GENPTR_INTEGER(status)
+  _chk_stat;
+  adix_put_nn( 0, (ADIobj) *id, name, name_length, type, type_length, 1, nval,
+	      value, status );
+  _ERR_REP( "ADI_CPUT1", Estr__PutObjDat );
   }
 
 #define _genproc(_t) \
@@ -1654,74 +1891,6 @@ F77_SUBROUTINE(adifn(cput1c))( INTEGER(id), CHARACTER(name), INTEGER(nval),
   _ERR_REP( "ADI_CPUT1C", Estr__PutObjDat );
   }
 
-#define _genproc(_t) \
-F77_SUBROUTINE(_TM_fname(cset0,_t))( INTEGER(id), CHARACTER(name), \
-	 _TM_ftype(_t) *value, INTEGER(status) TRAIL(name) ) \
-  { \
-  GENPTR_INTEGER(id) \
-  GENPTR_CHARACTER(name) \
-  GENPTR_INTEGER(status) \
-  _chk_stat; \
-  adix_set_n( 0, (ADIobj) *id, name, name_length, \
-	      0, NULL, &_TM_alloc(_t),\
-	     sizeof(_TM_ftype(_t)), value, status ); \
-  _ERR_REP( _TM_fnames(cset0,_t), Estr__SetObjDat );}
-
-_genproc(b)	_genproc(w)
-_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
-#undef _genproc
-
-F77_SUBROUTINE(adifn(cset0c))( INTEGER(id), CHARACTER(name),
-	     CHARACTER(value), INTEGER(status) TRAIL(name) TRAIL(value) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_CHARACTER(name)
-  GENPTR_CHARACTER(value)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_set_n( 0, (ADIobj) *id, name, name_length, 0, NULL, &_TM_alloc(c),
-	      value_length, (void *) value, status );
-
-  _ERR_REP( "ADI_CSET0C", Estr__SetObjDat );
-  }
-
-#define _genproc(_t) \
-F77_SUBROUTINE(_TM_fname(cset1,_t))( INTEGER(id), CHARACTER(name), \
-		INTEGER(nval), \
-		_TM_ftype(_t) *value, INTEGER(status) TRAIL(name) ) \
-  { \
-  GENPTR_INTEGER(id) \
-  GENPTR_CHARACTER(name) \
-  GENPTR_INTEGER(nval) \
-  GENPTR_INTEGER(status) \
-  _chk_stat; \
-  adix_set_n( 0, (ADIobj) *id, name, name_length, 1, nval, \
-	      &_TM_alloc(_t), sizeof(_TM_ftype(_t)), \
-	      value, status );\
-  _ERR_REP( _TM_fnames(cset1,_t), Estr__SetObjDat );}
-
-_genproc(b)	_genproc(w)
-_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
-#undef _genproc
-
-F77_SUBROUTINE(adifn(cset1c))( INTEGER(id), CHARACTER(name), INTEGER(nval),
-		CHARACTER_ARRAY(value), INTEGER(status) TRAIL(name) TRAIL(value) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_CHARACTER(name)
-  GENPTR_INTEGER(nval)
-  GENPTR_CHARACTER_ARRAY(value)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_set_n( 0, (ADIobj) *id, name, name_length, 1, nval,
-	      &_TM_alloc(c), value_length, value, status );
-
-  _ERR_REP( "ADI_CSET1C", Estr__SetObjDat );
-  }
 
 F77_SUBROUTINE(adifn(putid))( INTEGER(id), INTEGER(vid), INTEGER(status) )
   {
@@ -1779,6 +1948,21 @@ F77_SUBROUTINE(adifn(find))( INTEGER(id), CHARACTER(name),
   *((ADIobj *) cid) = adix_find( (ADIobj) *id, name, name_length, status );
 
   _ERR_REP( "ADI_FIND", Estr__LocObjCmp );
+  }
+
+F77_SUBROUTINE(adifn(findi))( INTEGER(id), INTEGER(name),
+			      INTEGER(cid), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(name)
+  GENPTR_INTEGER(cid)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  *((ADIobj *) cid) = adix_findi( (ADIobj) *id, (ADIobj ) *name, status );
+
+  _ERR_REP( "ADI_FINDI", Estr__LocObjCmp );
   }
 
 F77_SUBROUTINE(adifn(there))( INTEGER(id), CHARACTER(name),
@@ -2131,6 +2315,36 @@ F77_SUBROUTINE(adifn(reqpkg))( CHARACTER(pkg), INTEGER(status) TRAIL(pkg) )
  * -------------------------------------------------------------------------
  */
 
+F77_SUBROUTINE(adifn(cgetref))( INTEGER(id), CHARACTER(name),
+                                INTEGER(rid), INTEGER(status) TRAIL(name) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_INTEGER(rid)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  *((ADIobj *) rid) = adix_getref( (ADIobj) *id, name, name_length, status );
+
+  _ERR_REP( "ADI_CGETREF", Estr__GetRefObj );
+  }
+
+F77_SUBROUTINE(adifn(cputref))( INTEGER(id), CHARACTER(name), INTEGER(rid),
+                                INTEGER(status) TRAIL(name) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_INTEGER(rid)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  adix_putref( (ADIobj) *id, name, name_length, (ADIobj) *rid, status );
+
+  _ERR_REP( "ADI_CPUTREF", Estr__PutRefObj );
+  }
+
 F77_SUBROUTINE(adifn(getref))( INTEGER(id), INTEGER(rid), INTEGER(status) )
   {
   GENPTR_INTEGER(id)
@@ -2139,7 +2353,7 @@ F77_SUBROUTINE(adifn(getref))( INTEGER(id), INTEGER(rid), INTEGER(status) )
 
   _chk_stat;
 
-  *((ADIobj *) rid) = adix_getref( (ADIobj) *id, status );
+  *((ADIobj *) rid) = adix_getref( (ADIobj) *id, NULL, 0, status );
 
   _ERR_REP( "ADI_GETREF", Estr__GetRefObj );
   }
@@ -2165,7 +2379,7 @@ F77_SUBROUTINE(adifn(putref))( INTEGER(id), INTEGER(rid), INTEGER(status) )
 
   _chk_stat;
 
-  adix_putref( (ADIobj) *id, (ADIobj) *rid, status );
+  adix_putref( (ADIobj) *id, NULL, 0, (ADIobj) *rid, status );
 
   _ERR_REP( "ADI_PUTREF", Estr__PutRefObj );
   }
@@ -2175,6 +2389,24 @@ F77_SUBROUTINE(adifn(putref))( INTEGER(id), INTEGER(rid), INTEGER(status) )
  * Data system routines
  * -------------------------------------------------------------------------
  */
+
+F77_SUBROUTINE(adifn(fclone))( INTEGER(id), CHARACTER(fspec), CHARACTER(cls),
+			       INTEGER(fid), INTEGER(status)
+			       TRAIL(fspec) TRAIL(cls) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(fspec)
+  GENPTR_CHARACTER(cls)
+  GENPTR_INTEGER(fid)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;				/* Check initialised and ok */
+
+  adix_fclone( (ADIobj) *id, fspec, fspec_length, cls, cls_length,
+               (ADIobj *) fid, status );
+
+  _ERR_REP( "ADI_FCLONE", Estr__CreFilObj );
+  }
 
 F77_SUBROUTINE(adifn(fclose))( INTEGER(id), INTEGER(status) )
   {
@@ -2187,6 +2419,19 @@ F77_SUBROUTINE(adifn(fclose))( INTEGER(id), INTEGER(status) )
   ADIfsysFileClose( (ADIobj) *id, status );
 
   _ERR_REP( "ADI_FCLOSE", Estr__CloFilObj );
+  }
+
+F77_SUBROUTINE(adifn(fcomit))( INTEGER(id), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;				/* Check initialised and ok */
+
+/* Invoke kernel routine to close file */
+  ADIfsysFileComit( (ADIobj) *id, status );
+
+  _ERR_REP( "ADI_FCOMIT", Estr__ComFilObj );
   }
 
 F77_SUBROUTINE(adifn(fcreat))( CHARACTER(fspec), INTEGER(id),
@@ -2368,6 +2613,57 @@ F77_SUBROUTINE(adifn(probe))( INTEGER(status) )
   GENPTR_INTEGER(status)
 
   adix_probe( status );
+  }
+
+
+F77_SUBROUTINE(adifn(eprsc))( CHARACTER(string), INTEGER(grammar),
+			      INTEGER(expr), INTEGER(status) TRAIL(string) )
+  {
+  GENPTR_CHARACTER(string)
+  GENPTR_INTEGER(grammar)
+  GENPTR_INTEGER(expr)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  *expr = ADIexprParseString( string, string_length, (ADIobj) *grammar, status );
+
+  _ERR_REP( "ADI_EPRSC", Estr__PrsExp );
+  }
+
+
+F77_SUBROUTINE(adifn(fexec))( CHARACTER(func), INTEGER(narg),
+			      INTEGER_ARRAY(args), INTEGER(res),
+			      INTEGER(status) TRAIL(func) )
+  {
+  GENPTR_CHARACTER(func)
+  GENPTR_INTEGER(narg)
+  GENPTR_INTEGER_ARRAY(args)
+  GENPTR_INTEGER(res)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;             		/* Standard entry checks */
+
+  *res = (F77_INTEGER_TYPE)
+	  adix_fexec( func, func_length,
+		      *narg, (ADIobj *) args, status );
+
+  _ERR_REP( "ADI_FEXEC", Estr__ExeFun );
+  }
+
+
+F77_SUBROUTINE(adifn(eeval))( INTEGER(expr), INTEGER(symlist), LOGICAL(ownres),
+			      INTEGER(value), INTEGER(status) )
+  {
+  GENPTR_INTEGER(expr)
+  GENPTR_INTEGER(symlist)
+  GENPTR_LOGICAL(ownres)
+  GENPTR_INTEGER(value)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  *value = ADIexprEval( *expr, *symlist, F77_ISTRUE(*ownres), status );
   }
 
 /* End of ADI_F77 defined test

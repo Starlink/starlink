@@ -11,11 +11,11 @@
 #include "io.h"
 #endif
 #include "asterix.h"                    /* Asterix definitions */
-#include "sae_par.h"
 
 #include "adi_err.h"
 #include "aditypes.h"
 #include "adimem.h"
+#include "adierror.h"
 #include "adisyms.h"
 #include "adilist.h"
 #include "adikrnl.h"                    /* Internal ADI kernel */
@@ -26,6 +26,9 @@
 #include "adiparse.h"                   /* Prototypes for this sub-package */
 
 #include "adi_err.h"                    /* ADI error codes */
+#include "adisyms.h"
+
+#define FILEBUF 256
 
 
 /*
@@ -63,6 +66,7 @@ ADIobj  K_Condition = ADI__nullid;
 ADIobj  K_DefClass = ADI__nullid;
 ADIobj  K_DefEnum = ADI__nullid;
 ADIobj  K_DefProc = ADI__nullid;
+ADIobj  K_DefRep = ADI__nullid;
 ADIobj  K_Divide = ADI__nullid;
 ADIobj  K_DivideBy = ADI__nullid;
 ADIobj  K_Dot = ADI__nullid;
@@ -77,6 +81,7 @@ ADIobj  K_Foreach = ADI__nullid;
 ADIobj  K_Get = ADI__nullid;
 ADIobj  K_GE = ADI__nullid;
 ADIobj  K_GT = ADI__nullid;
+ADIobj  K_Global = ADI__nullid;
 
 ADIobj  K_HoldAll = ADI__nullid;
 ADIobj  K_HoldFirst = ADI__nullid;
@@ -88,6 +93,7 @@ ADIobj  K_List = ADI__nullid;
 ADIobj  K_Listable = ADI__nullid;
 ADIobj  K_LE = ADI__nullid;
 ADIobj  K_LT = ADI__nullid;
+ADIobj  K_Local = ADI__nullid;
 
 ADIobj  K_Map = ADI__nullid;
 ADIobj  K_Multiply = ADI__nullid;
@@ -114,6 +120,7 @@ ADIobj  K_Query = ADI__nullid;
 
 ADIobj  K_Raise = ADI__nullid;
 ADIobj  K_Range = ADI__nullid;
+ADIobj  K_Require = ADI__nullid;
 ADIobj  K_ReRaise = ADI__nullid;
 ADIobj  K_Return = ADI__nullid;
 
@@ -129,7 +136,44 @@ ADIobj  K_Try = ADI__nullid;
 ADIobj  K_While = ADI__nullid;
 ADIobj	K_WildCard = ADI__nullid;
 
-#define FILEBUF 256
+
+
+/*
+ *  Report an error and append a description of the stream position
+ */
+void ADIparseError( ADIobj stream, ADIstatype code, char *ctx, ADIstatus status, ... )
+  {
+  va_list	ap;
+  ADIstream	*str = _strm_data(stream);
+  ADIdevice	*dptr = str->dev;
+
+  va_start(ap,status);
+
+  adix_setecs( code, ctx, _CSM, ap, status );
+
+/* Report position in stream by reporting position in each device */
+  if ( dptr ) {
+    do {
+      if ( (stream == ADI_G_curint->StdIn ) && dptr->isatty ) {
+	adic_setecs( code, "At column %d of input data", status, dptr->col );
+	}
+      else if ( (stream == ADI_G_curint->StdIn ) && ! dptr->isatty ) {
+	adic_setecs( code, "At line %d, column %d of standard input", status,
+			dptr->line, dptr->col );
+	}
+      else if ( (dptr->type == ADIdevFile) && _valid_q(dptr->name) ) {
+	adic_setecs( code, "At line %d, column %d of file %S", status,
+			dptr->line, dptr->col, dptr->name );
+	}
+      dptr = dptr->last;
+      }
+    while ( dptr && (dptr != &str->basedev) );
+    }
+
+  va_end(ap);
+  }
+
+
 
 ADIobj prsx_symname( ADIobj stream, ADIstatus status )
   {
@@ -137,7 +181,10 @@ ADIobj prsx_symname( ADIobj stream, ADIstatus status )
 
   _chk_stat_ret(ADI__nullid);
 
-  return adix_cmn( str->ctok.dat, str->ctok.nc, status );
+  if ( ! _valid_q(str->ctok.cs) )
+    str->ctok.cs = adix_cmn( str->ctok.dat, str->ctok.nc, status );
+
+  return str->ctok.cs;
   }
 
 /*
@@ -165,42 +212,42 @@ ADIobj prsx_cvalue( ADIobj stream, ADIstatus status )
     case TOK__CONST:
 
 /*  Integer data? */
-      if ( str->ctok.dt == UT_ALLOC_i ) {
+      if ( str->ctok.dt == UT_cid_i ) {
 	base = 10;
 	idata = str->ctok;
 	ADInextToken( stream, status );
 	if ( str->ctok.t == TOK__CARAT2 ) {
 	  ADInextToken( stream, status );
 	  if ( (str->ctok.t != TOK__CONST) ||
-	       (str->ctok.dt != UT_ALLOC_i ) )
-	    adic_setecs( ADI__SYNTAX, "Numeric base expected", status );
+	       (str->ctok.dt != UT_cid_i ) )
+	    ADIparseError( stream, ADI__SYNTAX, "Numeric base expected", status );
 	  else {
-	    base = (int) ADIparseScanInt( str->ctok.dat, 10, status );
+	    base = (int) ADIparseScanInt( stream, str->ctok.dat, 10, status );
 	    if ( (base<2) || (base>36) || ! _ok(status) ) {
-	      adic_setecs( ADI__SYNTAX, "Invalid base specifier /%d/ - must lie between 2 and 36", status, base );
+	      ADIparseError( stream, ADI__SYNTAX, "Invalid base specifier /%d/ - must lie between 2 and 36", status, base );
 	      }
 	    }
 	  }
 	else
 	  next = ADI__false;
 
-	ival = ADIparseScanInt( idata.dat, base, status );
+	ival = ADIparseScanInt( stream, idata.dat, base, status );
 	adic_newv0i( ival, &rval, status );
 	}
 
-      else if ( str->ctok.dt == UT_ALLOC_d ) {
+      else if ( str->ctok.dt == UT_cid_d ) {
 	adic_new0d( &rval, status );
 	adic_put0c( rval, str->ctok.dat, status );
 	break;
 	}
 
-      else if ( str->ctok.dt == UT_ALLOC_r ) {
+      else if ( str->ctok.dt == UT_cid_r ) {
 	adic_new0r( &rval, status );
 	adic_put0c( rval, str->ctok.dat, status );
 	break;
 	}
 
-      else if ( str->ctok.dt == UT_ALLOC_c ) {
+      else if ( str->ctok.dt == UT_cid_c ) {
 	adic_newv0c( str->ctok.dat, &rval, status );
 	}
       else
@@ -217,7 +264,7 @@ ADIobj prsx_cvalue( ADIobj stream, ADIstatus status )
     default:
       rval = ADI__nullid;
       next = ADI__false;
-      adic_setecs( SAI__ERROR, "Invalid constant", status );
+      ADIparseError( stream, ADI__SYNTAX, "Invalid constant", status );
     }
 
 /* Next token if no error */
@@ -284,7 +331,10 @@ void ADIaddDeviceToStream( ADIobj stream, ADIdeviceType type, ADIstatus status )
     dev->pstatic = ADI__false;
     dev->isatty = ADI__false;
     dev->bufsiz = dev->bnc = 0;
+    dev->line = 1;
+    dev->col = 1;
     str->dev = dev;
+    dev->name = ADI__nullid;
     }
   }
 
@@ -339,7 +389,7 @@ ADIobj ADIstrmNew( char *mode, ADIstatus status )
   ADIobj	str = ADI__nullid;
 
   if ( _ok(status) ) {
-    str = adix_cls_alloc( _cdef_data(UT_ALLOC_strm), status );
+    str = adix_cls_alloc( _cdef_data(UT_cid_strm), status );
     ADIclearStream( str, status );
     if ( (*mode == 'r') || (*mode == 'R') )
       modemask = ADI_STREAM__IN;
@@ -1417,6 +1467,8 @@ void ADIdropDeviceInt( ADIstream *str, ADIstatus status )
 	if ( ! dev->pstatic )
 	  fclose( dev->f );
 	}
+      if ( dev->name )
+	adix_erase( &dev->name, 1, status );
       str->dev = dev->last;
       if ( dev != &str->basedev )
 	ADImemFree( dev->buf, sizeof(ADIdevice), status );
@@ -1460,15 +1512,28 @@ ADIobj ADIstrmDel( int narg, ADIobj args[], ADIstatus status )
 
 ADIobj ADIstrmExtendC( ADIobj stream, char *buf, int blen, ADIstatus status )
   {
+  int	lblen = blen;
+
   if ( _ok(status) ) {
     ADIstream	*str = _strm_data(stream);
 
-    ADIaddDeviceToStream( stream, ADIdevCstring, status );
-    str->dev->ptr = str->dev->buf = buf;
-    str->dev->bufsiz = blen;
-    str->dev->pstatic = ADI__true;
+/* Allow user to specify length of read stream buffer with the null terminated */
+/* marker value */
+    if ( lblen == _CSM ) {
+      if ( str->flags & ADI_STREAM__IN )
+	lblen = strlen( buf );
+      else
+	adic_setecs( ADI__INVARG, "Output buffer length must be specified for new C string device on stream", status );
+      }
 
-    _han_set(stream) = ADI__true;
+    if ( _ok(status) ) {
+      ADIaddDeviceToStream( stream, ADIdevCstring, status );
+      str->dev->ptr = str->dev->buf = buf;
+      str->dev->bufsiz = lblen;
+      str->dev->pstatic = ADI__true;
+
+      _han_set(stream) = ADI__true;
+      }
     }
 
   return stream;
@@ -1491,7 +1556,7 @@ ADIobj ADIstrmExtendCst( ADIobj stream, char *buf, int blen, ADIstatus status )
   return stream;
   }
 
-ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
+ADIobj ADIstrmExtendFile( ADIobj stream, ADIobj name, FILE *f, ADIstatus status )
   {
   if ( _ok(status) ) {
     ADIstream	*str = _strm_data(stream);
@@ -1505,7 +1570,7 @@ ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
     str->dev->isatty = isatty(fileno(f));
     str->dev->buf[0] = '\0';
     str->dev->ptr = str->dev->buf;
-
+    str->dev->name = name;
     _han_set(stream) = ADI__true;
     }
 
@@ -1513,29 +1578,30 @@ ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
   }
 
 
-char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
+char ADIreadCharFromStream( ADIstream *stream, ADIstatus status )
   {
-  ADIstream	*str = _strm_data(stream);
   char          ch = '\0';
+  ADIdevice	*dev;
   int           gotit = ADI__false;
 
   while ( _ok(status) && ! gotit ) {
-    ADIdevice	*dev = str->dev;
+    dev = stream->dev;
 
-    if ( str->nc_pb ) {
-      ch = str->c_pb[--str->nc_pb]; gotit = ADI__true;
+    if ( stream->nc_pb ) {
+      ch = stream->c_pb[--stream->nc_pb]; gotit = ADI__true; dev->col++;
       }
     else if ( dev ) {
       switch( dev->type ) {
 	case ADIdevCstring:
-	  ch = *(str->dev->ptr++); gotit = ADI__true;
+	  ch = *(dev->ptr++); gotit = ADI__true;
+	  dev->col++;
 	  break;
 	case ADIdevFile:
 	  if ( feof(dev->f) )
-	    ADIdropDevice( stream, status );
+	    ADIdropDeviceInt( stream, status );
 	  else {
 	    if ( *dev->ptr ) {
-	      ch = *(dev->ptr++); gotit = ADI__true;
+	      ch = *(dev->ptr++); gotit = ADI__true; dev->col++;
 	      }
 	    else {
 	      dev->ptr = dev->buf;
@@ -1543,9 +1609,9 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
 		printf( "> " );
 	      fgets( dev->buf, dev->bufsiz, dev->f );
 	      if ( feof(dev->f) )
-		ADIdropDevice( stream, status );
+		ADIdropDeviceInt( stream, status );
 	      else {
-		ch = *(dev->ptr++); gotit = ADI__true;
+		ch = *(dev->ptr++); gotit = ADI__true; dev->col++;
 		}
 	      }
 	    }
@@ -1556,8 +1622,17 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
       *status = SAI__ERROR;
     }
 
-  if ( gotit ) str->ctok.dat[str->ctok.nc++] = ch;
+  if ( gotit ) stream->ctok.dat[stream->ctok.nc++] = ch;
   return ch;
+  }
+
+
+void ADIreadCharsFromStream( ADIstream *stream, int n, char *data, ADIstatus status )
+  {
+  int		i;
+
+  for( i=0; i<n; i++ )
+    data[i] = ADIreadCharFromStream( stream, status );
   }
 
 
@@ -1566,6 +1641,7 @@ void ADIreturnCharToStream( ADIobj stream, char ch, ADIstatus status )
   if ( _ok(status) ) {
     ADIstream	*str = _strm_data(stream);
     str->c_pb[str->nc_pb++] = ch;
+    str->dev->col--;
     str->ctok.nc--;
     }
   }
@@ -1594,6 +1670,8 @@ void ADIdescribeToken( ADItokenType tok, char **str, int *len )
       {TOK__SYM,        "symbol"},
       {TOK__END,	"end of line"},
       {TOK__NOTATOK,	"unrecognised data"},
+      {TOK__AT,         "@"},
+      {TOK__ATAT,       "@@"},
       {TOK__TRAP,       " "}
       };
 
@@ -1686,6 +1764,9 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 
   str = _strm_data(stream);
 
+/* Symbol common string */
+  str->ctok.cs = ADI__nullid;
+
 /* The token to return if a logical end of line is met. If end-of-lines are */
 /* ignored then the flag token is chosen, which forces more parsing */
   if ( str->flags & ADI_STREAM__EOLISP )
@@ -1697,7 +1778,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 
     str->ctok.nc = 0;
     str->ctok.dt = 0;
-    ch = ADIreadCharFromStream( stream, status );
+    ch = ADIreadCharFromStream( str, status );
 
     if ( (ch==' ') || ch==9 )
       {;}
@@ -1707,49 +1788,50 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
       }
     else if ( ch == '\n' ) {
       tok = etok;
+      str->dev->line++; str->dev->col = 1;
       }
     else if ( isalpha(ch) || (ch=='%') )
       {
       str->ctok.ptr0 = str->dev->ptr - 1;
       while( isalpha(ch) || (ch=='%') || isdigit(ch) ) {
-	ch = ADIreadCharFromStream( stream, status );
+	ch = ADIreadCharFromStream( str, status );
 	}
       ADIreturnCharToStream( stream, ch, status );
       str->ctok.dat[str->ctok.nc] = '\0';
       tok = TOK__SYM;
-      str->ctok.dt = UT_ALLOC_c;
+      str->ctok.dt = UT_cid_c;
       }
 
     else if ( isdigit(ch) ) {
       str->ctok.ptr0 = str->dev->ptr - 1;
       while( isalnum(ch) )
-	ch = ADIreadCharFromStream( stream, status );
+	ch = ADIreadCharFromStream( str, status );
 
 /* Decimal point found */
       if ( ch == '.' ) {
 	int	ndig = 0;
 
-	ch = ADIreadCharFromStream( stream, status );
+	ch = ADIreadCharFromStream( str, status );
 	while( isdigit(ch) ) {
 	  ndig++;
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  }
 
 	if ( ndig > 7 )
-	  str->ctok.dt = UT_ALLOC_d;
+	  str->ctok.dt = UT_cid_d;
 	else
-	  str->ctok.dt = UT_ALLOC_r;
+	  str->ctok.dt = UT_cid_r;
 	}
       else
-	str->ctok.dt = UT_ALLOC_i;
+	str->ctok.dt = UT_cid_i;
 
       if ( ch == 'e' || ch == 'E' || ch == 'd' || ch == 'D' ) {
-	str->ctok.dt = ((ch=='e') || (ch=='E')) ? UT_ALLOC_r : UT_ALLOC_d;
-	ch = ADIreadCharFromStream( stream, status );
+	str->ctok.dt = ((ch=='e') || (ch=='E')) ? UT_cid_r : UT_cid_d;
+	ch = ADIreadCharFromStream( str, status );
 	if ( ch == '+' || ch == '-' )
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	while ( isdigit(ch) && _ok(status) )
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	}
 
       ADIreturnCharToStream( stream, ch, status );
@@ -1760,7 +1842,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
     else if ( ch == '#' )		/* Comments return TOK__END */
       {
       do
-	ch = ADIreadCharFromStream( stream, status );
+	ch = ADIreadCharFromStream( str, status );
       while ( (ch != '\n') && _ok(status) );
       tok = etok;
       }
@@ -1768,10 +1850,10 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
       {
       str->ctok.nc = 0;
       while( inquotes ) {
-	ch = ADIreadCharFromStream( stream, status );
+	ch = ADIreadCharFromStream( str, status );
 	switch( ch ) {
 	  case '\\':
-	    ch = ADIreadCharFromStream( stream, status );
+	    ch = ADIreadCharFromStream( str, status );
 	    switch (ch) {
 	      case '\\':
 		str->ctok.dat[--str->ctok.nc] = '\\';
@@ -1798,7 +1880,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	}
       str->ctok.dat[str->ctok.nc-1] = '\0';
       tok = TOK__CONST;
-      str->ctok.dt = UT_ALLOC_c;
+      str->ctok.dt = UT_cid_c;
       }
     else
       switch (ch) {
@@ -1827,7 +1909,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	  tok = TOK__PERIOD;
 	  break;
 	case '=':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '=' )
 	    tok = TOK__EQ;
 	  else {
@@ -1836,9 +1918,9 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '_':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '_' ) {
-	    ch = ADIreadCharFromStream( stream, status );
+	    ch = ADIreadCharFromStream( str, status );
 	    if ( ch == '_' )
 	      tok = TOK__UND3;
 	    else {
@@ -1852,7 +1934,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '+':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '+' )
 	    tok = TOK__INCR;
 	  else if ( ch == '=' )
@@ -1863,7 +1945,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '-':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '-' )
 	    tok = TOK__DECR;
 	  else if ( ch == '=' )
@@ -1876,7 +1958,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '*':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '*' )
 	    tok = TOK__CARAT;
 	  else if ( ch == '=' )
@@ -1887,7 +1969,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '?':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '?' )
 	    tok = TOK__QUERY2;
 	  else {
@@ -1899,7 +1981,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	  tok = TOK__DOLLAR;
 	  break;
 	case '/':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '=' )
 	    tok = TOK__DIVEQ;
 	  else if ( ch == '/' )
@@ -1914,10 +1996,10 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case ';':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
           if ( ch == ';' ) {
             do
-	      ch = ADIreadCharFromStream( stream, status );
+	      ch = ADIreadCharFromStream( str, status );
             while ( (ch != '\n') && _ok(status) );
             tok = etok;
             }
@@ -1927,16 +2009,16 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '@':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '@' )
-	    tok = TOK__AT;
+	    tok = TOK__ATAT;
 	  else {
 	    ADIreturnCharToStream( stream, ch, status );
 	    tok = TOK__AT;
 	    }
 	  break;
 	case ':':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == ':' )
 	    tok = TOK__SCOPE;
 	  else if ( ch == '=' )
@@ -1947,7 +2029,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '|':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '|' )
 	    tok = TOK__OR;
 	  else {
@@ -1956,7 +2038,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '!':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '=' )
 	    tok = TOK__NE;
 	  else {
@@ -1965,7 +2047,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '&':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '&' )
 	    tok = TOK__AND;
 	  else {
@@ -1974,13 +2056,13 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '>':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  switch( ch ) {
 	    case '=':
 	      tok = TOK__GE;
 	      break;
 	    case '>':
-	      ch = ADIreadCharFromStream( stream, status );
+	      ch = ADIreadCharFromStream( str, status );
 	      if ( ch == '>' )
 		tok = TOK__RCHEV3;
 	      else
@@ -1993,14 +2075,14 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '\\':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '\n' )		/* Continuation character */
 	    {;}
 	  else if ( ch == '\\' )
 	    tok = TOK__BSLASH;
 	  break;
 	case '<':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  switch ( ch )
 	    {
 	    case '>':
@@ -2018,7 +2100,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case '^':
-	  ch = ADIreadCharFromStream( stream, status );
+	  ch = ADIreadCharFromStream( str, status );
 	  if ( ch == '^' )
 	    tok = TOK__CARAT2;
 	  else {
@@ -2056,7 +2138,7 @@ void ADImatchToken( ADIobj stream, ADItokenType tok, ADIstatus status )
     else {
       ADIdescribeToken( ctok, &gstr, &glen );
       ADIdescribeToken( tok, &estr, &elen );
-      adic_setecs( ADI__SYNTAX, "Parse error, %*s found where %*s expected.",
+      ADIparseError( stream, ADI__SYNTAX, "Parse error, %*s found where %*s expected.",
 		     status, glen, gstr, elen, estr );
       }
     }
@@ -2078,7 +2160,7 @@ ADIlogical ADIifMatchToken( ADIobj str, ADItokenType t, ADIstatus status )
  *  Parses a list of expressions separated by commas, and terminated by
  *  'endtok'. The list may be empty.
  */
-ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
+ADIobj ADIparseComDelList( ADIobj pstream, ADIobj grammar, ADItokenType endtok,
 			   ADIlogical matchend, ADIstatus status )
   {
   ADIobj	*caradr;		/* Address of _CAR cell */
@@ -2111,13 +2193,13 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
       if ( ADIifMatchToken( pstream, TOK__COMMA, status ) )
 	*caradr = adix_clone( ADIcvNulCons, status );
       else
-	*caradr = ADIparseExpInt( pstream, 10, status );
+	*caradr = ADIparseExpInt( pstream, grammar, 10, status );
 
       if ( ! ADIifMatchToken( pstream, TOK__COMMA, status ) ) {
 	more = ADI__false;
 	if ( matchend && (_strm_data(pstream)->ctok.t != endtok) ) {
 	  ADIdescribeToken( endtok, &tstr, &tlen );
-	  adic_setecs( ADI__SYNTAX,
+	  ADIparseError( pstream, ADI__SYNTAX,
 		"Error reading list - comma or %*s expected",
 		status, tlen, tstr );
 	  }
@@ -2136,7 +2218,7 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
   }
 
 
-ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
+ADIobj ADIparseBlankExp( ADIobj stream, ADIobj grammar, ADIstatus status )
   {
   ADIobj                arg;            /* Argument to blank function */
   ADIobj                car,cdr;        /* _CAR(arg) and _CDR(arg) */
@@ -2157,7 +2239,7 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
 
   if ( str->ctok.t == TOK__SYM )
     arg = lstx_cell(
-	    ADIparseExpInt( stream, 960, status ),
+	    ADIparseExpInt( stream, grammar, 960, status ),
 	    ADI__nullid, status );
   else
     arg = adix_clone( ADIcvNulCons, status );
@@ -2220,7 +2302,7 @@ ADIlogical ADIparseScanLog( ADIobj stream, ADIlogical *lval,
   }
 
 
-ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
+ADIinteger ADIparseScanInt( ADIobj stream, char *data, int base, ADIstatus status )
   {
   char		*cp = data;
   int		dig;
@@ -2234,14 +2316,14 @@ ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
       if ( isalpha(*cp) )
 	dig = (_toupper(*cp)-'A')+10;
       else {
-	adic_setecs( ADI__SYNTAX,
+	ADIparseError( stream, ADI__SYNTAX,
 	  "Character /%c/ is not valid digit in any base", status, *cp );
 	}
       }
     else
       dig = *cp - '0';
     if ( dig >= base ) {
-      adic_setecs( ADI__SYNTAX, "Digit /%c/ is not a valid base %d digit",
+      ADIparseError( stream, ADI__SYNTAX, "Digit /%c/ is not a valid base %d digit",
 	status, *cp, base );
       }
     else
@@ -2254,7 +2336,8 @@ ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
   }
 
 
-ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
+ADIobj ADIparseExpInt( ADIobj stream, ADIobj grammar, int priority,
+		       ADIstatus status )
   {
   DEFINE_OP_TABLE(PreUnary)
     DEFINE_OP_TENTRY(TOK__LCHEV,  950,  None,  K_Get ),
@@ -2271,8 +2354,8 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
     DEFINE_OP_TENTRY(TOK__ATAT,   890,  RtoL,  K_Apply),
     DEFINE_OP_TENTRY(TOK__PERIOD, 860,  None,  K_Dot),
     DEFINE_OP_TENTRY(TOK__CARAT,  850,  RtoL,  K_Power),
-    DEFINE_OP_TENTRY(TOK__DIV,    770,  LtoR,  K_Divide),
-    DEFINE_OP_TENTRY(TOK__MUL,    750,  LtoR,  K_Multiply),
+    DEFINE_OP_TENTRY(TOK__MUL,    770,  LtoR,  K_Multiply),   /* In MM these two */
+    DEFINE_OP_TENTRY(TOK__DIV,    750,  LtoR,  K_Divide),     /* are swapped?! */
     DEFINE_OP_TENTRY(TOK__PLUS,   700,  LtoR,  K_Plus),
     DEFINE_OP_TENTRY(TOK__MINUS,  690,  LtoR,  K_Subtract),
     DEFINE_OP_TENTRY(TOK__EQ,     600,  None,  K_Equal),
@@ -2317,7 +2400,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
     case TOK__UND1:
     case TOK__UND2:
     case TOK__UND3:
-      expr = ADIparseBlankExp( stream, status );
+      expr = ADIparseBlankExp( stream, grammar, status );
       break;
 
     case TOK__SYM:
@@ -2339,14 +2422,15 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
 /* Left parenthesis indicates start of function argument list */
       if ( ADIifMatchToken( stream, TOK__LPAREN, status ) )
-	_etn_args(expr) = ADIparseComDelList( stream, TOK__RPAREN, ADI__true, status );
+	_etn_args(expr) = ADIparseComDelList( stream, grammar,
+				TOK__RPAREN, ADI__true, status );
 
 /* Underscore sequences indicate start of argument constraint spec */
       else if ( (str->ctok.t == TOK__UND1) ||
 		(str->ctok.t == TOK__UND2) ||
 		(str->ctok.t == TOK__UND2) ) {
 	first = expr;
-	expr = ADIparseBlankExp( stream, status );
+	expr = ADIparseBlankExp( stream, grammar, status );
 
 	expr = ADIetnNew( adix_clone( K_Pattern, status ),
 			  lstx_new2( first, expr, status),
@@ -2358,7 +2442,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	symbol = expr;                  /* Store symbol for later */
 
 	expr = ADIetnNew( adix_clone( K_ArrayRef, status ),
-	      ADIparseComDelList( stream, TOK__RBRAK, ADI__true, status ),
+	      ADIparseComDelList( stream, grammar, TOK__RBRAK, ADI__true, status ),
 	      status );
 
 /* Splice symbol into arg list */
@@ -2372,7 +2456,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
 /* Parse the array elements and construct list constructor expression */
       expr = ADIetnNew( adix_clone( K_List, status ),
-	       ADIparseComDelList( stream, TOK__RBRAK, ADI__true, status ),
+	       ADIparseComDelList( stream, grammar, TOK__RBRAK, ADI__true, status ),
 	       status );
 
 /* Return an array constructor expression using the list */
@@ -2384,14 +2468,14 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
     case TOK__LBRACE:
       ADInextToken( stream, status );
       expr = ADIetnNew( adix_clone( K_List, status ),/* Create List(e1..) constructor */
-	  ADIparseComDelList( stream,
+	  ADIparseComDelList( stream, grammar,
 	    TOK__RBRACE, ADI__true, status ),
 	  status );
       break;
 
     case TOK__LPAREN:
       ADInextToken( stream, status );
-      expr = ADIparseExpInt( stream, 0, status );
+      expr = ADIparseExpInt( stream, grammar, 0, status );
       ADImatchToken( stream, TOK__RPAREN, status );
       break;
 
@@ -2410,7 +2494,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	  ADInextToken( stream, status );
 	  expr = ADIetnNew( adix_clone( *PreUnary[tp-1].key, status ),
 		     lstx_cell(
-		       ADIparseExpInt( stream, PreUnary[tp-1].priority, status ),
+		       ADIparseExpInt( stream, grammar, PreUnary[tp-1].priority, status ),
 		       ADI__nullid, status ),
 		     status );
 	  }
@@ -2435,12 +2519,12 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	    if ( _null_q(first) )
 	      first = expr;
 	    _CDR(_etn_args(expr)) = lstx_cell(
-		  ADIparseExpInt( stream, Binary[tp-1].priority, status ),
+		  ADIparseExpInt( stream, grammar, Binary[tp-1].priority, status ),
 		  ADI__nullid, status );
 	    }
 	  else
 	    _CDR(_etn_args(expr)) = lstx_cell(
-		  ADIparseExpInt( stream, Binary[tp-1].priority+1, status ),
+		  ADIparseExpInt( stream, grammar, Binary[tp-1].priority+1, status ),
 		  ADI__nullid, status );
 
 	  tp = ADIparseTokenInOpSet( stream, Binary, status );
@@ -2511,6 +2595,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_DefClass,"DefClass"),
     CSTR_TENTRY(K_DefEnum,"DefEnum"),
     CSTR_TENTRY(K_DefProc,"DefProc"),
+    CSTR_TENTRY(K_DefRep,"DefRep"),
     CSTR_TENTRY(K_Divide,"Divide"),
     CSTR_TENTRY(K_DivideBy,"DivideBy"),
     CSTR_TENTRY(K_Dot,"Dot"),
@@ -2518,6 +2603,7 @@ void prsx_init( ADIstatus status )
 
     CSTR_TENTRY(K_Echo,"Echo"),
     CSTR_TENTRY(K_Equal,"Equal"),
+
     CSTR_TENTRY(K_Factorial,"Factorial"),
     CSTR_TENTRY(K_Finally,"Finally"),
     CSTR_TENTRY(K_Foreach,"Foreach"),
@@ -2525,6 +2611,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Get,"Get"),
     CSTR_TENTRY(K_GE,"GreaterThanOrEqual"),
     CSTR_TENTRY(K_GT,"GreaterThan"),
+    CSTR_TENTRY(K_Global,"Global"),
 
     CSTR_TENTRY(K_HoldAll,"HoldAll"),
     CSTR_TENTRY(K_HoldFirst,"HoldFirst"),
@@ -2536,6 +2623,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Listable,"Listable"),
     CSTR_TENTRY(K_LE,"LessThanOrEqual"),
     CSTR_TENTRY(K_LT,"LessThan"),
+    CSTR_TENTRY(K_Local,"Local"),
 
     CSTR_TENTRY(K_Map,"Map"),
     CSTR_TENTRY(K_Multiply,"Multiply"),
@@ -2562,6 +2650,7 @@ void prsx_init( ADIstatus status )
 
     CSTR_TENTRY(K_Raise,"Raise"),
     CSTR_TENTRY(K_Range,"Range"),
+    CSTR_TENTRY(K_Require,"Require"),
     CSTR_TENTRY(K_ReRaise,"ReRaise"),
     CSTR_TENTRY(K_Return,"Return"),
 
@@ -2579,5 +2668,4 @@ void prsx_init( ADIstatus status )
   END_CSTR_TABLE;
 
   ADIkrnlAddCommonStrings( stringtable, status );
-
   }

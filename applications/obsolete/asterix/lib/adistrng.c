@@ -32,7 +32,7 @@
 #endif
 #endif
 
-extern ADIobj UT_ALLOC_c;
+extern ADIobj UT_cid_c;
 
 typedef
   struct StrStoreTag *StrStorePtr;
@@ -170,7 +170,7 @@ void strx_init( ADIstatus status )
   _chk_stat;
 
 /* Install the string destructor */
-  adic_defdes( UT_ALLOC_c, strx_dstrc, status );
+  adic_defdes( UT_cid_c, strx_dstrc, status );
   }
 
 
@@ -221,6 +221,9 @@ int strx_cmp2c( char *str1, int len1, char *str2, int len2 )
 
 int strx_cmpc( char *str1, int len1, ADIobj str2 )
   {
+  ADIstatype	gstatus = SAI__OK;
+  ADIstatus	status = &gstatus;
+
   ADIstring	*s2 = _str_data(str2);
 
   return strx_cmp2c( str1, len1, s2->data, s2->len );
@@ -229,6 +232,9 @@ int strx_cmpc( char *str1, int len1, ADIobj str2 )
 
 int strx_cmp( ADIobj str1, ADIobj str2 )
   {
+  ADIstatype	gstatus = SAI__OK;
+  ADIstatus	status = &gstatus;
+
   if ( str1 == str2 )
     return 0;
   else {
@@ -271,6 +277,9 @@ int strx_cmpi2c( char *str1, int len1, char *str2, int len2 )
 
 int strx_cmpi( ADIobj str1, ADIobj str2 )
   {
+  ADIstatype	gstatus = SAI__OK;
+  ADIstatus	status = &gstatus;
+
   if ( str1 == str2 )
     return 0;
   else {
@@ -284,6 +293,9 @@ int strx_cmpi( ADIobj str1, ADIobj str2 )
 
 int strx_cmpic( char *str1, int len1, ADIobj str2 )
   {
+  ADIstatype	gstatus = SAI__OK;
+  ADIstatus	status = &gstatus;
+
   ADIstring	*s2 = _str_data(str2);
 
   return strx_cmpi2c( str1, len1, s2->data, s2->len );

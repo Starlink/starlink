@@ -8,8 +8,6 @@
 #include <stdarg.h>
 
 #include "asterix.h"                    /* Asterix definitions */
-#include "ems.h"
-#include "sae_par.h"
 
 #include "aditypes.h"
 #include "adimem.h"
@@ -34,6 +32,8 @@
 #endif
 
 ADIobj		ADI_G_pkglist = ADI__nullid;
+ADIobj		*ADI_G_pkglisti = &ADI_G_pkglist;
+
 char		*ADI_G_ldpath = NULL;
 size_t          ADI_G_ldpath_len = 0;
 ADIlogical	ADI_G_getenv = ADI__false;
@@ -115,7 +115,7 @@ ADIobj adix_prs_defclass( int narg, ADIobj args[], ADIstatus status )
   ADIlogical	matchend = ADI__false;
   int		oflags;			/* Old stream flags */
 
-  ADIobj	cargs[3] = {ADI__nullid, ADI__nullid, ADI__nullid};
+  ADIobj	cargs[4] = {ADI__nullid, ADI__nullid, ADI__nullid, ADI__nullid};
 
 /* Tell parser that end-of-lines can be ignored */
   oflags = ADIsetStreamAttr( pstream, ADI_STREAM__EOLISP, status );
@@ -131,6 +131,21 @@ ADIobj adix_prs_defclass( int narg, ADIobj args[], ADIstatus status )
   if ( ADIcurrentToken(pstream,status) == TOK__SYM )
     ADIparseClassSupers( pstream, cargs+1, cargs+2, status );
 
+/* Parse options */
+  if ( ADIifMatchToken( pstream, TOK__LBRAK, status ) ) {
+
+/* Create container */
+    adic_new0( "STRUC", &cargs[3], status );
+
+/* Parse components */
+    prsx_namvalcmp( pstream, cargs[3], status );
+
+    if ( ADIcurrentToken(pstream,status) == TOK__RBRAK )
+      ADInextToken( pstream, status );
+    else
+      ADIparseError( pstream, ADI__SYNTAX, "Right bracket expected at end of class option list", status );
+    }
+
 /* Parse the class member list */
   if ( ADIifMatchToken( pstream, TOK__LBRACE, status ) ) {
     ADIparseClassMembers( pstream, cargs+2, status );
@@ -141,6 +156,8 @@ ADIobj adix_prs_defclass( int narg, ADIobj args[], ADIstatus status )
       adic_setecs( ADI__INVARG, "Closing brace expected", status );
       }
     }
+  else
+    matchend = ADI__true;
 
 /* Restore stream flags */
   ADIputStreamAttrs( pstream, oflags, status );
@@ -150,7 +167,7 @@ ADIobj adix_prs_defclass( int narg, ADIobj args[], ADIstatus status )
     ADInextToken( pstream, status );
 
 /* Define class, ignoring returned identifier */
-  ADIdefClass_i( 3, cargs, status );
+  ADIdefClass_i( 4, cargs, status );
 
   return ADI__nullid;
   }
@@ -168,7 +185,7 @@ ADIobj adix_prs_defproc( int narg, ADIobj args[], ADIstatus status )
   ADInextToken( pstream, status );
 
 /* Get the definition expression */
-  defn = ADIparseExpInt( pstream, 1, status );
+  defn = ADIparseExpInt( pstream, ADI__nullid, 1, status );
 
 /* Check it */
   if ( _ok(status) ) {
@@ -188,6 +205,27 @@ ADIobj adix_prs_defproc( int narg, ADIobj args[], ADIstatus status )
 
 /* Create the expression node */
   return robj;
+  }
+
+
+ADIobj adix_prs_defrep( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	repname;
+  ADIobj	pstream = args[0];
+
+/* Skip the DEFREP keyword */
+  ADInextToken( pstream, status );
+
+/* Optional data */
+  if ( ADIcurrentToken(pstream,status) == TOK__CONST )
+    repname = prsx_cvalue( pstream, status );
+  else
+    ADIparseError( pstream, ADI__SYNTAX, "Representation name expected", status );
+
+/* Create the expression node */
+  return ADIetnNew( adix_clone( K_DefRep, status ),
+		    lstx_cell( repname, ADI__nullid, status ),
+		    status );
   }
 
 
@@ -212,7 +250,7 @@ ADIobj adix_prs_dowhile( int narg, ADIobj args[], ADIstatus status )
 
 /* Get the conditional expression */
   ADImatchToken( pstream, TOK__LPAREN, status );
-  test = ADIparseExpInt( pstream, 1, status );
+  test = ADIparseExpInt( pstream, ADI__nullid, 1, status );
   ADImatchToken( pstream, TOK__RPAREN, status );
 
 /* Construct argument list */
@@ -225,16 +263,11 @@ ADIobj adix_prs_dowhile( int narg, ADIobj args[], ADIstatus status )
 ADIobj adix_prs_global( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	pstream = args[0];
-  ADIobj	cargs[3] = {ADI__nullid, ADI__nullid, ADI__nullid};
-  ADIobj	lcell;
   ADIobj	rlist = ADI__nullid;
   ADIobj	*ipoint = &rlist;
   ADIlogical	more = ADI__true;
 
-  ADInextToken( pstream, status );
-
-/* Get new class name from stream */
-  cargs[0] = prsx_symname( pstream, status );
+/* Skip the GLOBAL keyword */
   ADInextToken( pstream, status );
 
 /* Parse the list of symbols and construct a list of expression nodes whose */
@@ -242,30 +275,22 @@ ADIobj adix_prs_global( int narg, ADIobj args[], ADIstatus status )
   while ( ADIcurrentToken(pstream,status) == TOK__SYM && more ) {
 
 /* Get symbol name */
-    lcell = lstx_cell(
-		ADIetnNew(
+    lstx_inscel( ADIetnNew(
 		   prsx_symname( pstream, status ),
-		   ADI__nullid,
-		   status ),
-		ADI__nullid,
-		status );
+		   ADI__nullid, status ),
+		 &ipoint, status );
 
     ADInextToken( pstream, status );
-
-/* Add to list of symbols */
-    *ipoint = lcell;
-    ipoint = &_CDR(lcell);
 
 /* End of list if not a comma */
     more = ADIifMatchToken( pstream, TOK__COMMA, status );
     }
 
   if ( ! _valid_q(rlist) )
-    adic_setecs( ADI__SYNTAX, "Symbol name expected", status );
+    ADIparseError( pstream, ADI__SYNTAX, "Symbol name expected", status );
 
-/* Define class, ignoring returned identifier */
-/*  return ADIdefGlobal_i( 1, &rlist, status ); */
-  return ADI__nullid;
+/* Return expression */
+  return ADIetnNew( adix_clone( K_Global, status ), rlist, status );
   }
 
 
@@ -283,7 +308,7 @@ ADIobj adix_prs_if( int narg, ADIobj args[], ADIstatus status )
 
 /* Get the conditional expression */
   ADImatchToken( pstream, TOK__LPAREN, status );
-  lstx_inscel( ADIparseExpInt( pstream, 1, status ), &ipoint, status );
+  lstx_inscel( ADIparseExpInt( pstream, ADI__nullid, 1, status ), &ipoint, status );
   ADImatchToken( pstream, TOK__RPAREN, status );
 
 /* There are 2 forms of 'if' statement. The simple form is simply
@@ -302,7 +327,7 @@ ADIobj adix_prs_if( int narg, ADIobj args[], ADIstatus status )
 	first = ADI__false;
       else {
 	ADImatchToken( pstream, TOK__LPAREN, status );
-	lstx_inscel( ADIparseExpInt( pstream, 1, status ), &ipoint, status );
+	lstx_inscel( ADIparseExpInt( pstream, ADI__nullid, 1, status ), &ipoint, status );
 	ADImatchToken( pstream, TOK__RPAREN, status );
 	}
 
@@ -312,7 +337,7 @@ ADIobj adix_prs_if( int narg, ADIobj args[], ADIstatus status )
 	ADImatchToken( pstream, TOK__END, status );
 	}
       else
-	adic_setecs( ADI__SYNTAX, "THEN keyword expected", status );
+	ADIparseError( pstream, ADI__SYNTAX, "THEN keyword expected", status );
 
 /* Append truth action list */
       lstx_inscel( adix_prs_cmdlist( pstream, "|else|endif", &choice, status ),
@@ -330,7 +355,8 @@ ADIobj adix_prs_if( int narg, ADIobj args[], ADIstatus status )
 	    if ( ADIisTokenCstring( pstream, "if", status ) )
 	      ADInextToken( pstream, status );
 	    else
-	      adic_setecs( ADI__SYNTAX, "Illegal token - can only be IF () THEN or end of line at this point", status );
+	      ADIparseError( pstream, ADI__SYNTAX,
+	      "Illegal token - can only be IF () THEN or end of line at this point", status );
 	    }
 	  else {
 
@@ -366,6 +392,38 @@ ADIobj adix_prs_if( int narg, ADIobj args[], ADIstatus status )
   return ADIetnNew( adix_clone( K_If, status ), robj, status );
   }
 
+ADIobj adix_prs_local( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	pstream = args[0];
+  ADIobj	rlist = ADI__nullid;
+  ADIobj	*ipoint = &rlist;
+  ADIlogical	more = ADI__true;
+
+/* Skip the GLOBAL keyword */
+  ADInextToken( pstream, status );
+
+/* Parse the list of symbols and construct a list of expression nodes whose */
+/* heads are the names of the symbols */
+  while ( ADIcurrentToken(pstream,status) == TOK__SYM && more ) {
+
+/* Get symbol name */
+    lstx_inscel( ADIetnNew(
+		   prsx_symname( pstream, status ),
+		   ADI__nullid, status ),
+		 &ipoint, status );
+
+    ADInextToken( pstream, status );
+
+/* End of list if not a comma */
+    more = ADIifMatchToken( pstream, TOK__COMMA, status );
+    }
+
+  if ( ! _valid_q(rlist) )
+    ADIparseError( pstream, ADI__SYNTAX, "Symbol name expected", status );
+
+/* Return expression */
+  return ADIetnNew( adix_clone( K_Local, status ), rlist, status );
+  }
 
 ADIobj adix_prs_print( int narg, ADIobj args[], ADIstatus status )
   {
@@ -376,7 +434,7 @@ ADIobj adix_prs_print( int narg, ADIobj args[], ADIstatus status )
   ADInextToken( pstream, status );
 
 /* Gather arguments - separated by commas */
-  pargs = ADIparseComDelList( pstream, TOK__END, ADI__false, status );
+  pargs = ADIparseComDelList( pstream, ADI__nullid, TOK__END, ADI__false, status );
 
 /* Return expression */
   return ADIetnNew( adix_clone( K_Print, status ), pargs, status );
@@ -402,7 +460,7 @@ ADIobj adix_prs_raise( int narg, ADIobj args[], ADIstatus status )
       exdata = prsx_cvalue( pstream, status );
     }
   else
-    adic_setecs( ADI__SYNTAX, "Exception name expected", status );
+    ADIparseError( pstream, ADI__SYNTAX, "Exception name expected", status );
 
 /* Create the expression node */
   return ADIetnNew( adix_clone( K_Raise, status ),
@@ -410,6 +468,35 @@ ADIobj adix_prs_raise( int narg, ADIobj args[], ADIstatus status )
 		       lstx_cell( exname, ADI__nullid, status ) :
 		       lstx_new2( exname, exdata, status ),
 		    status );
+  }
+
+
+ADIobj adix_prs_require( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	pstream = args[0];
+  ADIobj	rlist = ADI__nullid;
+  ADIobj	*ipoint = &rlist;
+  ADIlogical	more = ADI__true;
+
+/* Skip the REQUIRE keyword */
+  ADInextToken( pstream, status );
+
+/* Parse the list of strings and construct a list of expression nodes whose */
+/* heads are the names of the symbols */
+  while ( ADIcurrentToken(pstream,status) == TOK__CONST && more ) {
+
+/* Get package name */
+    lstx_inscel( prsx_cvalue( pstream, status ), &ipoint, status );
+
+/* End of list if not a comma */
+    more = ADIifMatchToken( pstream, TOK__COMMA, status );
+    }
+
+  if ( ! _valid_q(rlist) )
+    ADIparseError( pstream, ADI__SYNTAX, "Package name string expected", status );
+
+/* Return expression */
+  return ADIetnNew( adix_clone( K_Require, status ), rlist, status );
   }
 
 
@@ -422,7 +509,7 @@ ADIobj adix_prs_return( int narg, ADIobj args[], ADIstatus status )
   ADInextToken( pstream, status );
 
 /* Get the return expression */
-  defn = ADIparseExpInt( pstream, 1, status );
+  defn = ADIparseExpInt( pstream, ADI__nullid, 1, status );
 
   return ADIetnNew( adix_clone( K_Return, status ),
 		    lstx_cell( defn, ADI__nullid, status ),
@@ -475,7 +562,7 @@ ADIobj adix_prs_try( int narg, ADIobj args[], ADIstatus status )
 	first = ADI__false;
       else {
 	ADImatchToken( pstream, TOK__LPAREN, status );
-	lstx_inscel( ADIparseExpInt( pstream, 1, status ), &ipoint, status );
+	lstx_inscel( ADIparseExpInt( pstream, ADI__nullid, 1, status ), &ipoint, status );
 	ADImatchToken( pstream, TOK__RPAREN, status );
 	}
 
@@ -485,7 +572,7 @@ ADIobj adix_prs_try( int narg, ADIobj args[], ADIstatus status )
 	ADImatchToken( pstream, TOK__END, status );
 	}
       else
-	adic_setecs( ADI__SYNTAX, "THEN keyword expected", status );
+	ADIparseError( pstream, ADI__SYNTAX, "THEN keyword expected", status );
 
 /* Append truth action list */
       lstx_inscel( adix_prs_cmdlist( pstream, "|else|endif", &choice, status ),
@@ -503,7 +590,8 @@ ADIobj adix_prs_try( int narg, ADIobj args[], ADIstatus status )
 	    if ( ADIisTokenCstring( pstream, "if", status ) )
 	      ADInextToken( pstream, status );
 	    else
-	      adic_setecs( ADI__SYNTAX, "Illegal token - can only be IF () THEN or end of line at this point", status );
+	      ADIparseError( pstream, ADI__SYNTAX,
+	      "Illegal token - can only be IF () THEN or end of line at this point", status );
 	    }
 	  else {
 
@@ -552,7 +640,7 @@ ADIobj adix_prs_while( int narg, ADIobj args[], ADIstatus status )
   ADInextToken( pstream, status );
 
   ADImatchToken( pstream, TOK__LPAREN, status );
-  test = ADIparseExpInt( pstream, 1, status );
+  test = ADIparseExpInt( pstream, ADI__nullid, 1, status );
   ADImatchToken( pstream, TOK__RPAREN, status );
 
   ADImatchToken( pstream, TOK__END, status );
@@ -589,7 +677,7 @@ ADIobj adix_prs_cmd( ADIobj pstream, ADIstatus status )
 
     name = prsx_symname( pstream, status );
 
-    cbind = ADIsymFind( name, ADI__true, ADI__command_sb, status );
+    cbind = ADIsymFind( name, -1, ADI__true, ADI__command_sb, status );
 
 /* Located a command symbol? */
     if ( _valid_q(cbind) ) {
@@ -600,10 +688,10 @@ ADIobj adix_prs_cmd( ADIobj pstream, ADIstatus status )
       }
 
     else
-      rval = ADIparseExpInt( pstream, 1, status );
+      rval = ADIparseExpInt( pstream, ADI__nullid, 1, status );
     }
   else
-    rval = ADIparseExpInt( pstream, 1, status );
+    rval = ADIparseExpInt( pstream, ADI__nullid, 1, status );
 
 /* Check for garbage following statement */
   if ( _valid_q(rval) && _ok(status) ) {
@@ -614,7 +702,7 @@ ADIobj adix_prs_cmd( ADIobj pstream, ADIstatus status )
       int	tlen;
 
       ADIdescribeToken( ctok, &tstr, &tlen );
-      adic_setecs( ADI__SYNTAX,
+      ADIparseError( pstream, ADI__SYNTAX,
 		"Error reading statement - %*s found where semi-colon or end of line expected",
 		status, tlen, tstr );
       }
@@ -641,16 +729,16 @@ void ADIcmdExec( ADIobj istream, ADIobj ostream, ADIstatus status )
     ADInextToken( istream, status );
     cmd = adix_prs_cmd( istream, status );
     if ( _valid_q(cmd) ) {
-      res = ADIexprEval( cmd, ADI__true, status );
+      res = ADIexprEval( cmd, ADI__nullid, ADI__true, status );
       if ( _valid_q(ADI_G_curint->exec.name) ) {
-	adic_setecs( ADI_G_curint->exec.code, "Break on unhandled exception %S", status,
+	ADIparseError( istream, ADI_G_curint->exec.code, "Break on unhandled exception %S", status,
 		ADI_G_curint->exec.name );
 	if ( _valid_q(ADI_G_curint->exec.errtext) ) {
 	  adic_setecs( ADI_G_curint->exec.code, "%O", status,
 			 ADI_G_curint->exec.errtext );
 	  }
 	ADIexecAcceptI( ADI_G_curint->exec.name, status );
-	ems_annul_c( status ); *status = SAI__OK;
+	*status = SAI__OK;
 	}
       else if ( _valid_q(res) ) {
 	if ( _valid_q(ostream) ) {
@@ -671,10 +759,14 @@ void ADIcmdExec( ADIobj istream, ADIobj ostream, ADIstatus status )
 
 void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   {
-  char			fname[200];
+  ADIobj		afname;
+  ADIobj		curp = ADI_G_pkglist;
+  char			fname[ADI_FILENAME_BUF];
   FILE			*fp;
+  ADIobj		nid, nstr;
   char			*pptr;
   ADIobj		pstream;
+  ADIlogical		there = ADI__false;
   int			ulen = 0, flen;
 
   _chk_init; _chk_stat;
@@ -689,50 +781,76 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
     ADI_G_getenv = ADI__true;
     }
 
+/* Import name string to an ADI string */
   _GET_STRING(name,nlen);
+  adic_newv0c_n( name, nlen, &nid, status );
 
-  pptr = ADI_G_ldpath;
-
-  do {
-    int             i;
-
-    flen = 0;
-
-    if ( pptr ) {
-      for( ;pptr[ulen] == ' ' && (ulen<ADI_G_ldpath_len) ; ulen++ )
-	{;}
-      for( ;pptr[ulen] != PATH_SEPARATOR && (ulen<ADI_G_ldpath_len) ; ulen++ )
-	fname[flen++] = pptr[ulen];
-      fname[flen++] = FILE_DELIMITER;
-      }
-
-    for( i=0; i<nlen; i++ )
-      fname[flen++] = name[i];
-
-    strcpy( fname + flen, ".adi" );
-
-    fp = fopen( fname, "r" );
-
-    if ( pptr && ! fp )
-      ulen++;
+/* Search existing list of loaded packages */
+  while ( _valid_q(curp) && ! there ) {
+    _GET_CARCDR(nstr,curp,curp);
+    there = (! strx_cmpi( nid, nstr ) );
     }
-  while ( pptr && (ulen<flen) && ! fp );
 
-  if ( fp ) {
+/* Only load the package if not done so already */
+  if ( ! there ) {
+
+/* Scan directories looking for file */
+    pptr = ADI_G_ldpath;
+    do {
+      int             i;
+
+      flen = 0;
+
+      if ( pptr ) {
+	for( ;pptr[ulen] == ' ' && (ulen<ADI_G_ldpath_len) ; ulen++ )
+	  {;}
+	for( ;pptr[ulen] != PATH_SEPARATOR && (ulen<ADI_G_ldpath_len) ; ulen++ )
+	  fname[flen++] = pptr[ulen];
+	fname[flen++] = FILE_DELIMITER;
+	}
+
+      for( i=0; i<nlen; i++ )
+	fname[flen++] = name[i];
+
+      strcpy( fname + flen, ".adi" );
+
+      fp = fopen( fname, "r" );
+
+      if ( pptr && ! fp )
+	ulen++;
+      }
+    while ( pptr && (ulen<flen) && ! fp );
+
+    if ( fp ) {
+
+/* Create name string */
+      adic_newv0c( fname, &afname, status );
 
 /* Set up parser stream */
-    pstream = ADIstrmNew( "r", status );
-    ADIstrmExtendFile( pstream, fp, status );
+      pstream = ADIstrmNew( "r", status );
+      ADIstrmExtendFile( pstream, afname, fp, status );
 
-    ADIcmdExec( pstream, ADI_G_curint->StdOut, status );
+      ADIcmdExec( pstream, ADI_G_curint->StdOut, status );
 
 /* Close stream and file */
-    adic_erase( &pstream, status );
-    fclose( fp );
+      adic_erase( &pstream, status );
+      fclose( fp );
+
+/* If ok mark package as loaded */
+      if ( _ok(status) ) {
+	lstx_inscel( nid, &ADI_G_pkglisti, status );
+	}
+      }
+    else {
+      adix_erase( &nid, 1, status );
+      adic_setecs( ADI__INVARG, "Package /%*s/ not found", status, nlen, name );
+      }
     }
-  else
-    adic_setecs( ADI__INVARG, "Package /%*s/ not found", status,
-	nlen, name );
+
+/* Release temporary string */
+  else {
+    adix_erase( &nid, 1, status );
+    }
   }
 
 
@@ -742,11 +860,14 @@ void ADIpkgInit( ADIstatus status )
     CMDPAR_TENTRY( "break",	adix_prs_break ),
     CMDPAR_TENTRY( "defclass",	adix_prs_defclass ),
     CMDPAR_TENTRY( "defproc",	adix_prs_defproc ),
+    CMDPAR_TENTRY( "defrep",	adix_prs_defrep ),
     CMDPAR_TENTRY( "do",	adix_prs_dowhile ),
     CMDPAR_TENTRY( "global",	adix_prs_global ),
     CMDPAR_TENTRY( "if",	adix_prs_if ),
+    CMDPAR_TENTRY( "local",	adix_prs_local ),
     CMDPAR_TENTRY( "print",	adix_prs_print ),
     CMDPAR_TENTRY( "raise",	adix_prs_raise ),
+    CMDPAR_TENTRY( "require",	adix_prs_require ),
     CMDPAR_TENTRY( "return",	adix_prs_return ),
     CMDPAR_TENTRY( "try",	adix_prs_try ),
     CMDPAR_TENTRY( "while",	adix_prs_while ),

@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <limits.h>
 
+#include "ems.h"
 #include "asterix.h"
 
 #include "aditypes.h"
@@ -21,12 +22,7 @@
 #include "adifsys.h"
 
 ADIobj DsysADIbase      = ADI__nullid;
-ADIobj DsysFileRep      = ADI__nullid;
-ADIobj DsysFileObj      = ADI__nullid;
-ADIobj DsysScalar       = ADI__nullid;
-ADIobj DsysArray        = ADI__nullid;
-ADIobj DsysBinDS        = ADI__nullid;
-ADIobj DsysSpectrum     = ADI__nullid;
+ADIclassDef *DsysFileObjTdef  = NULL;
 
 /* Globals for holding information about representations
  *
@@ -34,6 +30,19 @@ ADIobj DsysSpectrum     = ADI__nullid;
 static int      ADI_G_nrep = 0;
 ADIobj   ADI_G_replist = ADI__nullid;
 ADIobj		ADI_G_exten_rep_alist = ADI__nullid;
+
+
+/* Globals holding useful string names */
+
+ADIobj	DnameFileCommit = ADI__nullid;
+ADIobj	DnameFileClone = ADI__nullid;
+ADIobj	DnameFileClose = ADI__nullid;
+
+
+void adix_base_null1( ADIobj id, ADIstatus status )
+  {
+  ;
+  }
 
 void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
@@ -45,9 +54,9 @@ void adix_base_SetLink( ADIobj id, ADIobj lid, ADIstatus status )
   adic_cputid( id, "ADIlink", adix_newref( lid, status ), status );
   }
 
-void adix_base_UnLink( ADIobj id, ADIstatus status )
+void adix_base_UnLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-  adic_cputid( id, "ADIlink", ADI__nullid, status );
+  adic_cerase( id, "ADIlink", status );
   }
 
 void adix_newlnk( ADIobj id, ADIobj lid, ADIstatus status )
@@ -70,18 +79,41 @@ void adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   adix_execi( DnameSetLink, 2, args, status );
   }
 
-void adix_unlnk( ADIobj id, ADIstatus status )
+void adix_unlnk( ADIobj id, ADIobj lid, ADIstatus status )
   {
+  ADIobj        args[2];
+
   _chk_init_err; _chk_stat;
 
-  adix_execi( DnameUnLink, 1, &id, status );
+  args[0] = id; args[1] = lid;
+
+  adix_execi( DnameUnLink, 2, args, status );
   }
+
+
+ADIobj adix_do_fclone( ADIobj id, ADIobj name, ADIstatus status )
+  {
+  return adix_execi2( DnameFileClone, id, name, status );
+  }
+
+void adix_do_fclose( ADIobj id, ADIstatus status )
+  {
+  _chk_stat;
+  adix_execi( DnameFileClose, 1, &id, status );
+  }
+
+void adix_do_fcomit( ADIobj id, ADIstatus status )
+  {
+  _chk_stat;
+  adix_execi( DnameFileCommit, 1, &id, status );
+  }
+
 
 ADIlogical adix_isfile( ADIobj id, ADIstatus status )
   {
   ADIclassDef *tdef = _DTDEF(id);
 
-  return adix_chkder( tdef, _cdef_data(DsysFileObj), status );
+  return adix_chkder( tdef, DsysFileObjTdef, status );
   }
 
 
@@ -92,7 +124,7 @@ ADIobj adix_getlink( ADIobj id, ADIstatus status )
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
   adic_find( id, "ADIlink", &lid, status );
-  rid = adix_getref( lid, status );
+  adic_getref( lid, &rid, status );
   adic_erase( &lid, status );
 
   return rid;
@@ -141,7 +173,7 @@ void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
   while ( (lid!=ADI__nullid) && _ok(status) ) {
     tdef = _DTDEF(lid);
 
-    if ( tdef->selfid == DsysFileObj ) {
+    if ( tdef == DsysFileObjTdef ) {
       lc = '%';
       adic_cget0i( lid, "REP", (ADIinteger *) &rep, status );
       adic_cget0c( rep, "NAME", 30, lbit, status );
@@ -181,51 +213,81 @@ void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
  * Data system routines
  */
 
-void ADIfsysFileClose( ADIobj id, ADIstatus status )
-  {
-  char		cmode[7];		/* The file access mode */
-  ADIobj	fid;			/* File object at end of chain */
-  ADIobj	ortn;			/* Close routine */
-  ADIobj        repid;
-  ADIlogical	there;
-
-  _chk_init_err; _chk_stat;
-
-/* Get file object */
-  adix_getfile( id, &fid, status );
-
-/* Extract representation id from file object */
-  adic_cget0i( fid, "REP", &repid, status );
-
-/* If the mode was WRITE or UPDATE, and an FCOMIT method exists, call it */
-  adic_cget0c( fid, "MODE", 7, cmode, status );
-  if ( (cmode[0] != 'r') && (cmode[0] != 'R') ) {
-
-    adic_there( repid, "ComitRtn", &there, status );
-    if ( there ) {
-      adix_locrcb( repid, "ComitRtn", _CSM, &ortn, status );
-
-/* Try to close the file */
-      ADIkrnlExecO( ortn, fid, status );
-      }
-    }
-
-/* Representation has supplied a closure routine? */
-  adic_there( repid, "CloseRtn", &there, status );
-
-  if ( there ) {
-    adix_locrcb( repid, "CloseRtn",	/* Locate the opening routine */
-              _CSM, &ortn, status );
-
-/* Try to close the file */
-    ADIkrnlExecO( ortn, fid, status );
-    }
-
-  }
 
 /*
- * Data system routines
+ * Pass down the object chain, committing changes and closing if required
  */
+void adix_comit_or_close( ADIobj id, ADIlogical close, ADIstatus status )
+  {
+  ADIobj	cid = id;		/* Cursor down object chain */
+  char		cmode[7];		/* The file access mode */
+  ADIobj	lid;			/* Next object in chain */
+  ADIobj        repid;
+
+/* Check inherited status on entry, and that system is initialised */
+  _chk_init_err; _chk_stat;
+
+/* Unhook all leading linked objects down to the FileObject derived object */
+/* at the end of the chain */
+  while ( _valid_q(cid) && _ok(status) ) {
+
+/* Is this a FileObject? */
+    if ( adix_isfile( cid, status ) ) {
+
+/* Extract representation id from file object */
+      adic_cget0i( cid, "REP", &repid, status );
+
+/* If the mode was WRITE or UPDATE, commit changes to disk */
+      adic_cget0c( cid, "MODE", 7, cmode, status );
+      if ( (cmode[0] != 'r') && (cmode[0] != 'R') ) {
+        adix_do_fcomit( cid, status );
+        }
+
+/* Close the file if required */
+      if ( close )
+        adix_do_fclose( cid, status );
+      }
+
+/* Get next object in chain */
+    lid = adix_getlink( cid, status );
+
+/* Close? */
+    if ( close ) {
+
+/* Break the link between these objects */
+      if ( _valid_q(lid) )
+        adix_unlnk( id, lid, status );
+
+/* Erase the current object */
+      adic_erase( &cid, status );
+      }
+
+/* Next object down the chain */
+    cid = lid;
+    }
+  }
+
+
+
+void ADIfsysFileClose( ADIobj id, ADIstatus status )
+  {
+/* Check inherited status on entry, and that system is initialised */
+  _chk_init_err; _chk_stat;
+
+/* Invoke worker routine in close mode */
+  adix_comit_or_close( id, ADI__true, status );
+  }
+
+
+void ADIfsysFileComit( ADIobj id, ADIstatus status )
+  {
+/* Check inherited status on entry, and that system is initialised */
+  _chk_init_err; _chk_stat;
+
+/* Invoke worker routine in commit mode */
+  adix_comit_or_close( id, ADI__false, status );
+  }
+
 
 
 void adix_fcreat_int( ADIobj rtn, ADIobj fspec, ADIobj id, ADIobj *fileid,
@@ -249,34 +311,35 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
 
-  _chk_init; _chk_stat;			/* Check status on entry */
+/* Check inherited global status, and that the system is initialised */
+  _chk_init; _chk_stat;
 
-  _GET_NAME(fspec,flen);		/* Import strings resolving lengths */
+/* Import strings resolving lengths */
+  _GET_NAME(fspec,flen);
 
-  adic_newv0c_n( fspec, flen, &fid,	/* Construct ADI strings */
-			  status );
+/* Construct ADI strings */
+  adic_newv0c_n( fspec, flen, &fid, status );
 
-  ppos = strstr( fspec, "%" );		/* Look for representation delimiter */
+/* Look for representation delimiter */
+  ppos = strstr( fspec, "%" );
 
-  if ( ppos ) { 			/* User specified a representation? */
-    rlen = flen - (ppos-fspec) - 1;	/* Length of representation code */
+/* User specified a representation? */
+  if ( ppos ) {
 
-    adix_locrep( ppos+1, rlen, &rid,	/* Look for representation */
-		 status );
+/* Length of representation code */
+    rlen = flen - (ppos-fspec) - 1;
 
-    if ( _null_q(rid) )
-      adic_setecs( ADI__INVARG, "File representation /%*s/ not known",
-		   status, rlen, ppos+1 );
-    else {
+/* Look for representation */
+    adix_locrep( ppos+1, rlen, &rid, status );
 
 /* Locate the file creation routine */
-      adix_locrcb( rid, "CreatRtn", _CSM, &ortn, status );
+    adix_locrcb( rid, "CreatRtn", _CSM, &ortn, status );
 
 /* Try to create the file */
-      adix_fcreat_int( ortn, fid, id, fileid, status );
+    adix_fcreat_int( ortn, fid, id, fileid, status );
 
-      found = _ok(status);		/* Opened ok? */
-      }
+/* Opened ok? */
+    found = _ok(status);
     }
   else {
     ADIobj	curp = ADI_G_replist;
@@ -300,7 +363,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
 	else
-	  adix_errcnl( status );
+	  adic_erranl( status );
 	}
 
       if ( ! found )			/* Next one */
@@ -337,6 +400,112 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
   }
 
 
+/*
+ * Construct an object chain with the named class at the head, and the
+ * input object specified by the first argument at the tail. Build any
+ * intervening links required to construct the chain.
+ */
+ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
+  {
+  ADIlogical		found = ADI__false;
+
+/* Check inherited global status. Return input argument if bad */
+  _chk_stat_ret(id);
+
+/* If the user has specified wildcard type then we're done */
+  if ( *cls != '*' ) {
+
+    ADIobj	ocls;
+    ADIlogical  atend;
+    int		icp,jcp,fjcp;
+
+/* Import the class name string */
+    _GET_NAME(cls,clen);
+
+/* Class name of opened object */
+    ocls = _DTDEF(id)->aname;
+
+/* Loop over class list supplied to see if we have a match */
+    icp = 0;
+    while ( (icp < clen) && _ok(status) && ! found ) {
+
+/* Find end of this class name */
+      jcp = icp;
+      atend = ADI__false;
+      while ( (jcp<clen) && ! atend ) {
+        if ( cls[jcp] == '|' )
+          atend = ADI__true;
+        else
+          jcp++;
+        }
+
+/* Store end of first word for later */
+      if ( ! icp ) fjcp = jcp;
+
+/* Doesn't match what we've got? Advance to next class name */
+      if ( strx_cmpc( cls + icp, jcp - icp, ocls ) )
+        icp = jcp + 1;
+      else
+        found = ADI__true;
+      }
+
+/* We haven't matched any of the requested classes */
+    if ( ! found ) {
+      ADIobj newid;
+
+/* Create first requested class object */
+      adix_newn( ADI__nullid, NULL, 0, cls, fjcp, 0, NULL,
+		 &newid, status );
+
+/* Try to link them */
+      adix_setlnk( newid, id, status );
+
+      if ( _ok(status) )
+        id = newid;
+      }
+    }
+
+  return id;
+  }
+
+
+void adix_fclone( ADIobj id, char *fspec, int flen, char *cls, int clen,
+	          ADIobj *fileid, ADIstatus status )
+  {
+  ADIobj	ifd;			/* File object at end of id chain */
+  ADIobj	fid;			/* ADI version of fspec */
+  ADIobj	rid = ADI__nullid;	/* Representation chosen */
+
+/* Check inherited global status, and that the system is initialised */
+  _chk_init; _chk_stat;
+
+/* Import strings resolving lengths */
+  _GET_NAME(fspec,flen);
+
+/* Locate file object at base of input chain */
+  adix_getfile( id, &ifd, status );
+
+/* Construct ADI strings */
+  adic_newv0c_n( fspec, flen, &fid, status );
+
+/* Try to clone the file */
+  *fileid = adix_do_fclone( ifd, fid, status );
+
+/* Cloned ok? If so, write in details of representation and access mode */
+  if ( _ok(status) ) {
+    adic_cget0i( ifd, "REP", &rid, status );
+    adic_cput0i( *fileid, "REP", rid, status );
+    adic_cput0c( *fileid, "MODE", "WRITE", status );
+    }
+
+/* Release file name string */
+  adic_erase( &fid, status );
+
+/* Make link to requested object class */
+  *fileid = adix_link_efile( *fileid, cls, clen, status );
+  }
+
+
 void adix_fopen_int( ADIobj rtn, ADIobj fspec, ADIobj mode, ADIobj *id,
                      ADIstatus status )
   {
@@ -345,6 +514,7 @@ void adix_fopen_int( ADIobj rtn, ADIobj fspec, ADIobj mode, ADIobj *id,
   else					/* Fortran routine */
     ((ADIfOpenRCB) _eprc_prc(rtn))( &fspec, &mode, id, status );
   }
+
 
 void adix_fopen( char *fspec, int flen, char *cls, int clen,
                  char *mode, int mlen, ADIobj *id, ADIstatus status )
@@ -361,7 +531,6 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
 /* Import strings resolving lengths */
   _GET_NAME(fspec,flen);
-  _GET_STRING(cls,clen);
   _GET_STRING(mode,mlen);
 
 /* Construct ADI strings */
@@ -380,19 +549,14 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 /* Look for representation */
     adix_locrep( ppos+1, rlen, &rid, status );
 
-    if ( _null_q(rid) )
-      adic_setecs( ADI__INVARG, "File representation /^REP/ not known", status );
-    else {
-
 /* Locate the open routine */
-      adix_locrcb( rid, "OpenRtn", _CSM, &ortn, status );
+    adix_locrcb( rid, "OpenRtn", _CSM, &ortn, status );
 
 /* Try to open file */
-      adix_fopen_int( ortn, fid, mid, id, status );
+    adix_fopen_int( ortn, fid, mid, id, status );
 
 /* Opened ok? */
-      found = _ok(status);
-      }
+    found = _ok(status);
     }
   else {
     ADIobj	curp = ADI_G_replist;
@@ -417,7 +581,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
 	else
-	  adix_errcnl( status );
+	  adic_erranl( status );
 	}
 
       if ( ! found )			/* Next one */
@@ -436,7 +600,8 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
     *status = istat;
 
     if ( ! ppos )
-      adic_setecs( ADI__INVARG, "File %*s cannot be opened", status, flen, fspec );
+      adic_setecs( ADI__INVARG, "File %*s cannot be opened", status,
+                   flen, fspec );
     }
 
 /* Opened ok? If so, write in details of representation and access mode */
@@ -445,26 +610,8 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
     adic_cputid( *id, "MODE", mid, status );
     }
 
-  if ( _ok(status) && (*cls!='*') ) {	/* We've opened the file ok? */
-    ADIobj	ocls;
-
-    ocls = _DTDEF(*id)->aname;		/* Class name of opened object */
-
-    if ( strx_cmpc( cls, clen, ocls)) {	/* They're different! */
-      ADIobj newid;
-
-/* Create requested class object */
-      adix_newn( ADI__nullid, NULL, 0, cls, clen, 0, NULL,
-		 &newid, status );
-
-/* Try to link them */
-      adix_setlnk( newid, *id, status );
-
-      if ( _ok(status) )
-        *id = newid;
-      }
-    }
-
+/* Make link to requested object class */
+  *id = adix_link_efile( *id, cls, clen, status );
   }
 
 
@@ -479,6 +626,9 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
   ADIobj        nid;                    /* NAME member address */
 
   _chk_init; _chk_stat;                 /* Check status on entry */
+
+/* Initialise */
+  *id = ADI__nullid;
 
   _GET_NAME(name,nlen);               	/* Import string */
 
@@ -500,6 +650,10 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
 /*  Release NAME member */
     adic_erase( &nid, status );
     }
+
+  if ( ! found )
+    adic_setecs( ADI__INVARG, "File representation /%*s/ not known",
+		 status, nlen, name );
   }
 
 
@@ -515,23 +669,34 @@ void adix_defrep( char *name, int nlen, ADIobj *id, ADIstatus status )
 
   _GET_NAME(name,nlen);               	/* Import string */
 
-  adic_new0( "FileRepresentation", &newid, status );
+/* See if representation already defined */
+  adix_locrep( name, nlen, &nid, status );
 
-  adic_newv0c_n( name, nlen,            /* Create object holding name */
-		 &nid, status );
+  if ( _valid_q(nid) )
+    adic_setecs( ADI__EXISTS, "File representation /%*s/ already defined",
+	status, nlen, name );
 
-  adic_cputid( newid, "NAME",           /* Set the representation name */
-	       nid, status );
+  else {
+    ems_annul_c( status );
 
-  ADI_G_nrep++;                         /* Increment count */
+    adic_new0( "FileRepresentation", &newid, status );
 
-  ADI_G_replist = lstx_append(          /* Add new representation to list */
+/* Create object holding name */
+    adic_newv0c_n( name, nlen, &nid, status );
+
+/* Set the representation name */
+    adic_cputid( newid, "NAME", nid, status );
+
+    ADI_G_nrep++;                         /* Increment count */
+
+    ADI_G_replist = lstx_append(          /* Add new representation to list */
 	ADI_G_replist,
 	lstx_cell( newid, ADI__nullid,
 		   status ),
 	status );
 
-  *id = newid;                          /* Set return value */
+    *id = newid;                          /* Set return value */
+    }
   }
 
 
@@ -553,8 +718,8 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
   {
   _chk_init_err; _chk_stat;
 
-  *rtn = adix_find( rid, name, nlen,   	/* Find member data identifier */
-		    status );
+/* Find member data identifier */
+  *rtn = adix_find( rid, name, nlen, status );
   }
 
 
@@ -564,6 +729,9 @@ void ADIfsysInit( ADIstatus status )
     CSTR_TENTRY(DnameAround, "Around"),
     CSTR_TENTRY(DnameAfter,  "After"),
     CSTR_TENTRY(DnameBefore, "Before"),
+    CSTR_TENTRY(DnameFileCommit,"FileCommit"),
+    CSTR_TENTRY(DnameFileClone,"FileClone"),
+    CSTR_TENTRY(DnameFileClose,"FileClose"),
     CSTR_TENTRY(DnamePrimary,"Primary"),
     CSTR_TENTRY(DnameNewLink,"NewLink"),
     CSTR_TENTRY(DnameSetLink,"SetLink"),
@@ -571,15 +739,19 @@ void ADIfsysInit( ADIstatus status )
   END_CSTR_TABLE;
 
   DEFINE_GNRC_TABLE(gnrctable)
+    GNRC_TENTRY("FileClose(file)",  adix_cdsp_vo,	adix_fdsp_vo),
+    GNRC_TENTRY("FileCommit(file)",  adix_cdsp_vo,	adix_fdsp_vo),
     GNRC_TENTRY("NewLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
     GNRC_TENTRY("SetLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
-    GNRC_TENTRY("UnLink(lhs,rhs)",  adix_cdsp_vo,	adix_fdsp_vo),
+    GNRC_TENTRY("UnLink(lhs,rhs)",  adix_cdsp_voo,	adix_fdsp_voo),
   END_GNRC_TABLE;
 
   DEFINE_MTHD_TABLE(mthdtable)
-    MTHD_TENTRY( "NewLink(ADIbase,ADIbase)", adix_base_NewLink ),
-    MTHD_TENTRY( "SetLink(ADIbase,ADIbase)", adix_base_SetLink ),
-    MTHD_TENTRY( "UnLink(ADIbase,ADIbase)",  adix_base_UnLink ),
+    MTHD_TENTRY( "FileCommit(_ADIbase)",        adix_base_null1 ),
+    MTHD_TENTRY( "FileClose(_ADIbase)",        adix_base_null1 ),
+    MTHD_TENTRY( "NewLink(_ADIbase,_ADIbase)", adix_base_NewLink ),
+    MTHD_TENTRY( "SetLink(_ADIbase,_ADIbase)", adix_base_SetLink ),
+    MTHD_TENTRY( "UnLink(_ADIbase,_ADIbase)",  adix_base_UnLink ),
   END_MTHD_TABLE;
 
   _chk_stat;
@@ -587,30 +759,13 @@ void ADIfsysInit( ADIstatus status )
 /* Add our common strings to the system */
   ADIkrnlAddCommonStrings( stringtable, status );
 
-  adic_defcls( "FileRepresentation", "",
-	   "NAME,OpenRtn,CreatRtn,NatrlRtn,CloseRtn,ComitRtn",
-	       &DsysFileRep, status );
-  adic_defcac( DsysFileRep, 8, status );
+/* Load file system package */
+  adic_reqpkg( "filesys", status );
 
-  adic_defcls( "FileObject", "ADIbase", "REP,MODE",
-	       &DsysFileObj, status );
+/* Locate class object */
+  DsysFileObjTdef = ADIkrnlFindClsC( "FileObject", _CSM, status );
 
-  adic_defcls( "Scalar",
-	       "ADIbase", "TYPE,Value*",
-	       &DsysScalar, status );
-
-  adic_defcls( "Array",
-	       "ADIbase", "TYPE,SHAPE,Origin,Values*,SpacedValues",
-	       &DsysArray, status );
-
-  adic_defcls( "BinDS",
-	       "ADIbase", "TYPE,SHAPE,Data,Variance,Quality,QualityMask",
-	       &DsysBinDS, status );
-
-  adic_defcls( "Spectrum",
-	       "BinDS", "",
-	       &DsysSpectrum, status );
-
+  adic_reqpkg( "dsmodels", status );
 
 /* Install generics from table */
   ADIkrnlAddGenerics( gnrctable, status );

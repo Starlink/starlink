@@ -37,10 +37,33 @@
 #include "adicface.h"                   /* C programmer interface */
 #include "adilist.h"                    /* Prototypes for this sub-package */
 #include "adiparse.h"
+#include "adiconv.h"
 #include "adierror.h"                   /* ADI error handling */
 
 ADIclassDef	*cdef_lst;
-ADIobj       UT_ALLOC_list;             /* _List object allocator */
+ADIobj       UT_cid_list;             /* _List object allocator */
+
+ADIinteger ADIostrmLst( ADIstream *stream, ADIobj id, char *data, int wmode,
+			ADIstatus status )
+  {
+  ADIlist	*lst = (ADIlist *) data;
+  ADIinteger	len;
+
+  len = adix_ostrm_i( stream, lst->car, wmode, status );
+  len += adix_ostrm_i( stream, lst->cdr, wmode, status );
+
+  return len;
+  }
+
+ADIobj ADIistrmLst( ADIstream *stream, ADIstatus status )
+  {
+  ADIlist	lst;
+
+  lst.car = adix_istrm_i( stream, status );
+  lst.cdr = adix_istrm_i( stream, status );
+
+  return adix_cls_nallocd( cdef_lst, 0, 0, &lst, status );
+  }
 
 ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
   {
@@ -75,16 +98,33 @@ ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
   return ADI__nullid;
   }
 
+void ADIlstCnv( ADImta *idd, int n, char *in, ADImta *odd, char *out,
+		int *nerr, ADIstatus status )
+  {
+  int		i;
+  ADIlist	*ilst = (ADIlist *) in;
+  ADIlist	*olst = (ADIlist *) out;
+
+  for( i=n; i; i--, ilst++, olst++ ) {
+    olst->car = adix_copy( ilst->car, status );
+    olst->cdr = adix_copy( ilst->cdr, status );
+    }
+  }
 
 void lstx_init( ADIstatus status )
   {
+  DEFINE_PTYPE_TABLE(ptable)
+    PTYPE_TENTRY( "List", ADIlist, &UT_cid_list, lstx_print, ADIistrmLst, ADIostrmLst ),
+  END_PTYPE_TABLE;
+
   _chk_stat;                            /* Check status on entry */
 
-  adic_defcls( "List", "", "first,rest", &UT_ALLOC_list, status );
+/* Install table type */
+  ADIkrnlAddPtypes( ptable, status );
 
-  adic_defprt( UT_ALLOC_list, (ADIcMethodCB) lstx_print, status );
+  cdef_lst = _cdef_data(UT_cid_list);
 
-  cdef_lst = _cdef_data(UT_ALLOC_list);
+  ADIcnvNew( cdef_lst, cdef_lst, ADIlstCnv, status );
   }
 
 
@@ -158,14 +198,14 @@ ADIobj lstx_rest( ADIobj list, ADIstatus status )
 
 ADIobj lstx_cell( ADIobj aid, ADIobj bid, ADIstatus status )
   {
-  ADIobj	idata[2];
+  ADIlist	list;
 
 /* Set up initialisation */
-  idata[0] = aid;
-  idata[1] = bid;
+  list.car = aid;
+  list.cdr = bid;
 
 /* Create object with data */
-  return adix_cls_nallocd( cdef_lst, 0, 0, idata, status );
+  return adix_cls_nallocd( cdef_lst, 0, 0, &list, status );
   }
 
 ADIobj lstx_new2( ADIobj aid, ADIobj bid, ADIstatus status )
@@ -186,7 +226,7 @@ int lstx_len( ADIobj lid, ADIstatus status )
   if ( !_ok(status) )                   /* Check status on entry */
     return ADI__nullid;
 
-  _chk_type(lid,UT_ALLOC_list);
+  _chk_type(lid,UT_cid_list);
 
   lptr = lid;
   while ( (lptr != ADI__nullid) && _ok(status) )
@@ -228,13 +268,13 @@ ADIobj lstx_append( ADIobj lst1, ADIobj lst2, ADIstatus status )
  */
 void lstx_inscel( ADIobj id, ADIobj **ipoint, ADIstatus status )
   {
-  ADIobj	idata[2];
   ADIobj	lid;
+  ADIlist	list;
 
-  idata[0] = id;
-  idata[1] = ADI__nullid;
+  list.car = id;
+  list.cdr = ADI__nullid;
 
-  lid = adix_cls_nallocd( cdef_lst, 0, 0, idata, status );
+  lid = adix_cls_nallocd( cdef_lst, 0, 0, &list, status );
 
   if ( _ok(status) ) {
     **ipoint = lid;
@@ -248,7 +288,7 @@ void lstx_inscel( ADIobj id, ADIobj **ipoint, ADIstatus status )
  */
 void lstx_sperase( ADIobj *list, ADIstatus status )
   {
-  ADIobj curp = *list;
+  ADIobj 	curp = *list;
   ADIobj	*car,*cdr;
   ADIobj	last;
 
@@ -325,18 +365,18 @@ ADIobj adix_mapcar1( ADIobj (*proc)(ADIobj,ADIstatus),
   return rval;
   }
 
-ADIlogical adix_eql_p( ADIobj x, ADIobj y )
+ADIlogical adix_eql_p( ADIobj x, ADIobj y, ADIstatus status )
   {
   return (x==y) ? ADI__true : ADI__false;
   }
 
 ADIlogical adix_member( ADIobj element, ADIobj list,
-				       ADIlogical (*test)(ADIobj,ADIobj),
-				       ADIstatus status )
+			ADIlogical (*test)(ADIobj,ADIobj,ADIstatus),
+			ADIstatus status )
   {
   ADIobj        curp = list;
   ADIobj	elem;
-  ADIlogical    (*ltest)(ADIobj,ADIobj) = test;
+  ADIlogical    (*ltest)(ADIobj,ADIobj,ADIstatus) = test;
   ADIlogical    rval = ADI__false;
 
   _chk_stat_ret(ADI__false);
@@ -348,7 +388,7 @@ ADIlogical adix_member( ADIobj element, ADIobj list,
 
     _GET_CARCDR(elem,curp,curp);
 
-    if ( (*ltest)(element,elem) )
+    if ( (*ltest)(element,elem,status) )
       rval = ADI__true;
     }
 
@@ -377,13 +417,13 @@ ADIobj adix_assoc( ADIobj idx, ADIobj lst, ADIstatus status )
   return rval;
   }
 
-ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj),
+ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj,ADIstatus),
 		      ADIobj args, ADIobj lst,
 		      ADIstatus status )
   {
   ADIobj	car;
   ADIobj        curp = lst;
-  ADIlogical    (*ltest)(ADIobj,ADIobj) = test;
+  ADIlogical    (*ltest)(ADIobj,ADIobj,ADIstatus) = test;
   ADIobj        newlist = ADI__nullid;
   ADIobj        *ipoint = &newlist;
 
@@ -395,7 +435,7 @@ ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj),
   while ( _valid_q(curp) && _ok(status) ) {
     _GET_CARCDR(car,curp,curp);
 
-    if ( ! (*ltest)(car,args) )
+    if ( ! (*ltest)(car,args,status) )
       lstx_inscel( adix_copy(car,status), &ipoint, status );
     }
 

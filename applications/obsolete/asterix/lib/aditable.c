@@ -13,7 +13,7 @@
 #include "adierror.h"                   /* ADI error handling */
 
 
-ADIobj UT_ALLOC_tbl = ADI__nullid;
+ADIobj UT_cid_tbl = ADI__nullid;
 
 
 void tblx_prnt( int narg, ADIobj args[], ADIstatus status )
@@ -33,7 +33,7 @@ void tblx_prnt( int narg, ADIobj args[], ADIstatus status )
 void tblx_init( ADIstatus status )
   {
   DEFINE_PTYPE_TABLE(ptable)
-    PTYPE_TENTRY("HashTable",   ADItable,    &UT_ALLOC_tbl, tblx_prnt ),
+    PTYPE_TENTRY("HashTable",   ADItable,    &UT_cid_tbl, tblx_prnt, NULL, NULL ),
   END_PTYPE_TABLE;
 
   _chk_stat;                            /* Check status on entry */
@@ -170,7 +170,7 @@ ADIobj *tblx_lochead( ADIobj *table, char *str, int slen, ADIstatus status )
   if ( _tbl_q(*table) )	{		/* Table or a-list? */
     tdata = _tbl_data(*table);
 
-    head = (ADIobj *) adix_dtdat(tdata->heads) + strx_hash( str, slen, (int) tdata->htsize );
+    head = (ADIobj *) _DTDAT(tdata->heads) + strx_hash( str, slen, (int) tdata->htsize );
     }
 
   return head;
@@ -188,7 +188,7 @@ ADIobj tblx_new( int size, ADIstatus status )
   adic_new1( "*", size, &tinit.heads, status );
 
 /* Create new table object */
-  return adix_cls_nallocd( _cdef_data(UT_ALLOC_tbl), 0, 0, &tinit, status );
+  return adix_cls_nallocd( _cdef_data(UT_cid_tbl), 0, 0, &tinit, status );
   }
 
 

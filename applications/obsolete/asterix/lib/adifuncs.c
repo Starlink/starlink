@@ -65,13 +65,19 @@
 #include "adiexpr.h"
 #include "adiarray.h"
 #include "aditable.h"
+#include "adifsys.h"
+#include "adipkg.h"
 
 extern ADIstackFrame	ADI_G_fs[];
 
-ADIclassDef	*cdef_i;
-ADIclassDef	*cdef_r;
-ADIclassDef	*cdef_d;
-ADIclassDef	*cdef_l;
+ADIclassDef	*cdef_B;
+ADIclassDef	*cdef_UB;
+ADIclassDef	*cdef_W;
+ADIclassDef	*cdef_UW;
+ADIclassDef	*cdef_I;
+ADIclassDef	*cdef_R;
+ADIclassDef	*cdef_D;
+ADIclassDef	*cdef_L;
 
 /*
  * Macro to define a logical operation on an arbitrary data type
@@ -81,27 +87,22 @@ ADIobj ADI##_tcode##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
   {\
   ADIlogical	res;\
   res = _tacc(args[0]) _oop _tacc(args[1]);\
-  return adix_mkl( res ? ADI__true : ADI__false, status );}
+  return ADImkL( res ? ADI__true : ADI__false, status );}
 
-ADIobj adix_mki( ADIinteger value, ADIstatus status )
-  {
-  return adix_cls_nallocd( cdef_i, 0, 0, (void *) &value, status );
+#define _GEN_MK(_type,_T) \
+ADIobj ADImk##_T( _type value, ADIstatus status ) { \
+  return adix_cls_nallocd( cdef_##_T, 0, 0, (void *) &value, status );\
   }
 
-ADIobj adix_mkr( ADIreal value, ADIstatus status )
-  {
-  return adix_cls_nallocd( cdef_r, 0, 0, (void *) &value, status );
-  }
+_GEN_MK(ADIbyte,B)
+_GEN_MK(ADIubyte,UB)
+_GEN_MK(ADIword,W)
+_GEN_MK(ADIuword,UW)
+_GEN_MK(ADIinteger,I)
+_GEN_MK(ADIreal,R)
+_GEN_MK(ADIdouble,D)
+_GEN_MK(ADIlogical,L)
 
-ADIobj adix_mkd( ADIdouble value, ADIstatus status )
-  {
-  return adix_cls_nallocd( cdef_d, 0, 0, (void *) &value, status );
-  }
-
-ADIobj adix_mkl( ADIlogical value, ADIstatus status )
-  {
-  return adix_cls_nallocd( cdef_l, 0, 0, (void *) &value, status );
-  }
 
 
 void ADIexecCtrlC(int sig)
@@ -150,7 +151,7 @@ ADIobj ADIsysGetPid_i( int narg, ADIobj args[], ADIstatus status )
 
   pid = (ADIinteger) getpid();
 
-  return adix_mki( pid, status );
+  return ADImkI( pid, status );
   }
 
 /*
@@ -163,7 +164,7 @@ ADIobj ADIgenAtomQ_i( int narg, ADIobj args[], ADIstatus status )
   if ( _valid_q(args[0]) )
     res = _DTDEF(args[0])->prim;
 
-  return adix_mkl( res, status );
+  return ADImkL( res, status );
   }
 
 ADIobj ADIgenBreak_i( int narg, ADIobj args[], ADIstatus status )
@@ -190,9 +191,19 @@ ADIobj ADIgenDefProc_i( int narg, ADIobj args[], ADIstatus status )
   newid = ADIkrnlNewMth( &mth, status );
 
 /* Create function symbol binding and add to symbol table */
-  ADIsymAddBind( adix_clone( dhead, status ), ADI__true,
+  ADIsymAddBind( adix_clone( dhead, status ), -1,
 		 ADIsbindNew( ADI__fun_sb, newid, status ),
 		 status );
+
+  return ADI__nullid;
+  }
+
+ADIobj ADIgenDefRep_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	dummy;
+  ADIstring	*sptr = _str_data(args[0]);
+
+  adix_defrep( sptr->data, sptr->len, &dummy, status );
 
   return ADI__nullid;
   }
@@ -207,14 +218,14 @@ ADIobj ADIgenDoWhile_i( int narg, ADIobj args[], ADIstatus status )
   while ( _ok(status) && tval ) {
 
 /* Execute actions */
-    robj = ADIexprEvalList( vs_base[0], status );
+    robj = ADIexprEvalList( vs_base[0], ADI__nullid, status );
 
 /* Destroy result */
     if ( _valid_q(robj) )
       adix_erase( &robj, 1, status );
 
 /* Evaluate test expression */
-    test = ADIexprEval( vs_base[1], ADI__false, status );
+    test = ADIexprEval( vs_base[1], ADI__nullid, ADI__false, status );
 
     if ( _ok(status) ) {
 
@@ -246,14 +257,39 @@ ADIobj ADIgenGet_i( int narg, ADIobj args[], ADIstatus status )
 
   fp = fopen( _str_dat(tstr), "r" );
 
-/* Delete temporary string */
-  adix_erase( &tstr, 1, status );
-
   if ( fp )
-    ADIstrmExtendFile( ADI_G_curint->StdIn, fp, status );
-  else
+    ADIstrmExtendFile( ADI_G_curint->StdIn, tstr, fp, status );
+  else {
+/* Delete temporary string */
+    adix_erase( &tstr, 1, status );
+
     ADIexecRaiseI( EXC_InvalidArg, ADI__INVARG, "No such file %O\n", _CSM,
 		status, args[0] );
+    }
+
+  return ADI__nullid;
+  }
+
+ADIobj ADIgenGlobal_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	dbind;
+  ADIobj	name;
+  ADIobj	*vs_ptr;
+
+  _ARGLOOP_1ST_TO_NTH(vs_ptr) {
+
+/* Extract symbol name */
+    name = _etn_head(*vs_ptr);
+
+/* Look for definition binding */
+    dbind = ADIsymFind( name, -1, ADI__true, ADI__defn_sb, status );
+
+/* If it doesn't exist, create it */
+    if ( ! _valid_q(dbind) )
+      ADIsymAddBind( name, -1,
+		     ADIsbindNew( ADI__defn_sb, ADI__nullid, status ),
+		     status );
+    }
 
   return ADI__nullid;
   }
@@ -280,12 +316,12 @@ ADIobj ADIgenIf_i( int narg, ADIobj args[], ADIstatus status )
   while ( (nleft>0) && _ok(status) ) {
 
     if ( nleft == 1 )
-      robj = ADIexprEvalList( *vptr, status );
+      robj = ADIexprEvalList( *vptr, ADI__nullid, status );
 
     else {
 
 /* Evaluate test expression */
-      test = ADIexprEval( *vptr, ADI__false, status );
+      test = ADIexprEval( *vptr, ADI__nullid, ADI__false, status );
 
       if ( _ok(status) ) {
 
@@ -307,7 +343,7 @@ ADIobj ADIgenIf_i( int narg, ADIobj args[], ADIstatus status )
 	    nleft = 0;
 
 /* True actions */
-	    robj = ADIexprEvalList( *vptr, status );
+	    robj = ADIexprEvalList( *vptr, ADI__nullid, status );
 
 	    if ( _valid_q(robj) )                 /* Destroy result */
 	      adix_erase( &robj, 1, status );
@@ -321,6 +357,30 @@ ADIobj ADIgenIf_i( int narg, ADIobj args[], ADIstatus status )
 	}
       }
     nleft--; vptr++;
+    }
+
+  return ADI__nullid;
+  }
+
+ADIobj ADIgenLocal_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	dbind;
+  ADIobj	name;
+  ADIobj	*vs_ptr;
+
+  _ARGLOOP_1ST_TO_NTH(vs_ptr) {
+
+/* Extract symbol name */
+    name = _etn_head(*vs_ptr);
+
+/* Look for definition binding */
+    dbind = ADIsymFind( name, 1, ADI__true, ADI__defn_sb, status );
+
+/* If it doesn't exist, create it */
+    if ( ! _valid_q(dbind) )
+      ADIsymAddBind( name, 1,
+		   ADIsbindNew( ADI__defn_sb, ADI__nullid, status ),
+		   status );
     }
 
   return ADI__nullid;
@@ -342,12 +402,12 @@ ADIobj ADIgenLtime_i( int narg, ADIobj args[], ADIstatus status )
 /* Converts date/time to a structure */
   tblock = localtime(&timer);
 
-  res = lstx_cell( adix_mki( tblock->tm_sec, status ), res, status );
-  res = lstx_cell( adix_mki( tblock->tm_min, status ), res, status );
-  res = lstx_cell( adix_mki( tblock->tm_hour, status ), res, status );
-  res = lstx_cell( adix_mki( tblock->tm_mday, status ), res, status );
-  res = lstx_cell( adix_mki( tblock->tm_mon, status ), res, status );
-  res = lstx_cell( adix_mki( tblock->tm_year, status ), res, status );
+  res = lstx_cell( ADImkI( tblock->tm_sec, status ), res, status );
+  res = lstx_cell( ADImkI( tblock->tm_min, status ), res, status );
+  res = lstx_cell( ADImkI( tblock->tm_hour, status ), res, status );
+  res = lstx_cell( ADImkI( tblock->tm_mday, status ), res, status );
+  res = lstx_cell( ADImkI( tblock->tm_mon, status ), res, status );
+  res = lstx_cell( ADImkI( tblock->tm_year, status ), res, status );
 
   return res;
   }
@@ -370,16 +430,23 @@ ADIobj ADIgenName_i( int narg, ADIobj args[], ADIstatus status )
 
 ADIobj ADIgenNullQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _null_q(args[0]), status );
+  return ADImkL( _null_q(args[0]), status );
   }
 
 ADIobj ADIgenPrint_i( int narg, ADIobj args[], ADIstatus status )
   {
-  int		iarg;
-  ADIobj	*vs_ptr;
+  int		iarg = 0;
+  ADIobj	*vs_ptr = args;
 
-  _ARGLOOP_1ST_TO_NTH(vs_ptr)
-    ADIstrmPrintf( "%s%O", status, (iarg++) ? " " : "", *vs_ptr );
+  while ( iarg < narg ) {
+    if ( iarg )
+      ADIstrmPrintf( " %O", status, *vs_ptr );
+    else {
+      ADIstrmPrintf( "%O", status, *vs_ptr );
+      iarg++;
+      }
+    vs_ptr++;
+    }
 
   ADIstrmPrintf( "\n", status );
   ADIstrmFlush( status );
@@ -402,6 +469,18 @@ ADIobj ADIgenRaise_i( int narg, ADIobj args[], ADIstatus status )
   return ADI__nullid;
   }
 
+ADIobj ADIgenRequire_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  int		iarg;
+  ADIstring	*sptr;
+
+  for( iarg = 0; iarg < narg; iarg++ ) {
+    sptr = _str_data(args[iarg]);
+    ADIpkgRequire( sptr->data, sptr->len, status );
+    }
+
+  return ADI__nullid;
+  }
 
 ADIobj ADIgenReturn_i( int narg, ADIobj args[], ADIstatus status )
   {
@@ -436,7 +515,7 @@ ADIobj ADIgenSet_i( int narg, ADIobj args[], ADIstatus status )
   name = _etn_head(args[0]);
 
 /* Look for definition binding */
-  dbind = ADIsymFind( name, ADI__true, ADI__defn_sb, status );
+  dbind = ADIsymFind( name, 0, ADI__true, ADI__defn_sb, status );
 
 /* If it exists, delete definition object from existing binding */
   if ( _valid_q(dbind) ) {
@@ -447,7 +526,7 @@ ADIobj ADIgenSet_i( int narg, ADIobj args[], ADIstatus status )
 
 /* Otherwise create a new one */
   else
-    ADIsymAddBind( name, ADI__true,
+    ADIsymAddBind( name, 0,
 		   ADIsbindNew( ADI__defn_sb, rval, status ),
 		   status );
 
@@ -463,7 +542,7 @@ ADIobj ADIgenTime_i( int narg, ADIobj args[], ADIstatus status )
   if ( narg )
     timer += _IVAL(args[0])*3600;
 
-  return adix_mki( timer, status );
+  return ADImkI( timer, status );
   }
 
 ADIobj ADIgenTimeIt_i( int narg, ADIobj args[], ADIstatus status )
@@ -493,7 +572,7 @@ ADIobj ADIgenTimeIt_i( int narg, ADIobj args[], ADIstatus status )
 #endif
 
   while ( ic-- ) {
-    res = ADIexprEval( args[0], ADI__false, status );
+    res = ADIexprEval( args[0], ADI__nullid, ADI__false, status );
     adix_erase( &res, 1, status );
     }
 
@@ -526,9 +605,9 @@ ADIobj ADIgenType_i( int narg, ADIobj args[], ADIstatus status )
 ADIobj ADIgenTzone_i( int narg, ADIobj args[], ADIstatus status )
   {
 #ifdef __MSDOS__
-  return adix_mki( _timezone / 3600, status );
+  return ADImkI( _timezone / 3600, status );
 #else
-  return adix_mki( timezone / 3600, status );
+  return ADImkI( timezone / 3600, status );
 #endif
   }
 
@@ -542,7 +621,7 @@ ADIobj ADIgenWhile_i( int narg, ADIobj args[], ADIstatus status )
   while ( _ok(status) && tval ) {
 
 /* Evaluate test expression */
-    test = ADIexprEval( *vs_base, ADI__false, status );
+    test = ADIexprEval( *vs_base, ADI__nullid, ADI__false, status );
 
 /* Logical result? */
     isbool = _logical_q(test);
@@ -558,7 +637,7 @@ ADIobj ADIgenWhile_i( int narg, ADIobj args[], ADIstatus status )
 /* Execute actions if true */
       if ( tval ) {
 
-	robj = ADIexprEvalList( vs_base[1], status );
+	robj = ADIexprEvalList( vs_base[1], ADI__nullid, status );
 
 	adix_erase( &robj, 1, status );
 	}
@@ -604,7 +683,7 @@ ADIobj ADIintAnd_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_2ND_TO_NTH(carg)
     result &= _IVAL(*carg);
 
-  return adix_mki( result, status );
+  return ADImkI( result, status );
   }
 
 ADIobj ADIintCaste_i( int narg, ADIobj args[], ADIstatus status )
@@ -613,7 +692,7 @@ ADIobj ADIintCaste_i( int narg, ADIobj args[], ADIstatus status )
 
   adic_get0i( args[0], &value, status );
 
-  return adix_mki( value, status );
+  return ADImkI( value, status );
   }
 
 ADIobj ADIintDiv_i( int narg, ADIobj args[], ADIstatus status )
@@ -626,14 +705,14 @@ ADIobj ADIintDiv_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, ADI__INVARG, "Division by zero", _CSM,
 		   status );
   else
-    rval = adix_mki( d1 / d2, status );
+    rval = ADImkI( d1 / d2, status );
 
   return rval;
   }
 
 ADIobj ADIintEvenQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( ! (_IVAL(args[0]) % 2), status );
+  return ADImkL( ! (_IVAL(args[0]) % 2), status );
   }
 
 ADIobj ADIintFact_i( int narg, ADIobj args[], ADIstatus status )
@@ -649,7 +728,7 @@ ADIobj ADIintFact_i( int narg, ADIobj args[], ADIstatus status )
     while ( inp > 1 )
       res *= inp--;
 
-    rval = adix_mki( res, status );
+    rval = ADImkI( res, status );
     }
 
   else {
@@ -658,7 +737,7 @@ ADIobj ADIintFact_i( int narg, ADIobj args[], ADIstatus status )
     while ( inp > 12 )
       res *= inp--;
 
-    rval = adix_mkd( res, status );
+    rval = ADImkD( res, status );
     }
 
   return rval;
@@ -678,7 +757,7 @@ ADIobj ADIintGCD_i( int narg, ADIobj args[], ADIstatus status )
     r = c % d; c = d; d = r;
     }
 
-  return adix_mki( c, status );
+  return ADImkI( c, status );
   }
 
 ADIobj ADIintMax_i( int narg, ADIobj args[], ADIstatus status )
@@ -694,7 +773,7 @@ ADIobj ADIintMax_i( int narg, ADIobj args[], ADIstatus status )
       result = ival;
     }
 
-  return adix_mki( result, status );
+  return ADImkI( result, status );
   }
 
 ADIobj ADIintMin_i( int narg, ADIobj args[], ADIstatus status )
@@ -710,12 +789,12 @@ ADIobj ADIintMin_i( int narg, ADIobj args[], ADIstatus status )
       result = ival;
     }
 
-  return adix_mki( result, status );
+  return ADImkI( result, status );
   }
 
 ADIobj ADIintMod_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mki( _IVAL(args[0]) % _IVAL(args[1]), status );
+  return ADImkI( _IVAL(args[0]) % _IVAL(args[1]), status );
   }
 
 ADIobj ADIintMult_i( int narg, ADIobj args[], ADIstatus status )
@@ -726,7 +805,7 @@ ADIobj ADIintMult_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_1ST_TO_NTH(carg)
     result *= _IVAL(*carg);
 
-  return adix_mki( result, status );
+  return ADImkI( result, status );
   }
 
 ADIobj ADIintNeg_i( int narg, ADIobj args[], ADIstatus status )
@@ -759,7 +838,7 @@ ADIobj ADIintNot_i( int narg, ADIobj args[], ADIstatus status )
 
 ADIobj ADIintOddQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( (_IVAL(args[0]) % 2), status );
+  return ADImkL( (_IVAL(args[0]) % 2), status );
   }
 
 ADIobj ADIintOr_i( int narg, ADIobj args[], ADIstatus status )
@@ -772,7 +851,7 @@ ADIobj ADIintOr_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_2ND_TO_NTH(carg)
     result |= _IVAL(*carg);
 
-  return adix_mki( result, status );
+  return ADImkI( result, status );
   }
 
 
@@ -785,14 +864,14 @@ ADIobj ADIintPlus_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_1ST_TO_NTH(carg)
     result += _IVAL(*carg);
 
-  return adix_mki( result, status );
+  return ADImkI( result, status );
   }
 
 ADIobj ADIintPow2_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIinteger	res = _IVAL(args[0]);
 
-  return adix_mki( res*res, status );
+  return ADImkI( res*res, status );
   }
 
 ADIobj ADIintPower_i( int narg, ADIobj args[], ADIstatus status )
@@ -800,12 +879,12 @@ ADIobj ADIintPower_i( int narg, ADIobj args[], ADIstatus status )
   ADIinteger	a1 = _IVAL(args[0]);
   ADIinteger	a2 = _IVAL(args[1]);
 
-  return adix_mkd( pow((ADIdouble) a1,(ADIdouble) a2), status );
+  return ADImkD( pow((ADIdouble) a1,(ADIdouble) a2), status );
   }
 
 ADIobj ADIintQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _int_q(args[0]), status );
+  return ADImkL( _int_q(args[0]), status );
   }
 
 ADIobj ADIintShift_i( int narg, ADIobj args[], ADIstatus status )
@@ -822,7 +901,7 @@ ADIobj ADIintShift_i( int narg, ADIobj args[], ADIstatus status )
   else
     res = val;
 
-  return adix_mki( res, status );
+  return ADImkI( res, status );
   }
 
 ADIobj ADIintSign_i( int narg, ADIobj args[], ADIstatus status )
@@ -832,17 +911,23 @@ ADIobj ADIintSign_i( int narg, ADIobj args[], ADIstatus status )
   if ( _IVAL(args[1]) < 0 )
     sign = -1;
 
-  return adix_mki( abs(_IVAL(args[0]))*sign, status );
+  return ADImkI( abs(_IVAL(args[0]))*sign, status );
   }
 
 ADIobj ADIintSub_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mki( _IVAL(args[0]) - _IVAL(args[1]), status );
+  return ADImkI( _IVAL(args[0]) - _IVAL(args[1]), status );
   }
+
+ADIobj ADIintSum_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  return ADImkI( 999, status );
+  }
+
 
 ADIobj ADIintXor_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mki( _IVAL(args[0]) ^ _IVAL(args[1]), status );
+  return ADImkI( _IVAL(args[0]) ^ _IVAL(args[1]), status );
   }
 
 _logp(int,EQ,_IVAL,==)
@@ -859,7 +944,7 @@ _logp(int,NE,_IVAL,!=)
 #define _math_rop(_ocode,_oop) \
 ADIobj ADIreal##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
   {\
-  return adix_mkr( (ADIreal) _oop((ADIdouble) _RVAL(args[0])), status );}\
+  return ADImkR( (ADIreal) _oop((ADIdouble) _RVAL(args[0])), status );}\
 
 ADIobj ADIrealArcCos_i( int narg, ADIobj args[], ADIstatus status )
   {
@@ -870,7 +955,7 @@ ADIobj ADIrealArcCos_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, SAI__OK, "Domain error in ArcCos, |arg| > 1", _CSM,
 		   status, arg );
   else
-    rval = adix_mkr( (ADIreal) acos((ADIdouble) arg), status );
+    rval = ADImkR( (ADIreal) acos((ADIdouble) arg), status );
 
   return rval;
   }
@@ -884,7 +969,7 @@ ADIobj ADIrealArcSin_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, SAI__OK, "Domain error in ArcSin, |arg| > 1", _CSM,
 		   status, arg );
   else
-    rval = adix_mkr( (ADIreal) asin((ADIdouble) arg), status );
+    rval = ADImkR( (ADIreal) asin((ADIdouble) arg), status );
 
   return rval;
   }
@@ -909,7 +994,7 @@ ADIobj ADIrealSqrt_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, SAI__OK, "Square root of negative number %f", _CSM,
 		   status, arg );
   else
-    rval = adix_mkr( (ADIreal) sqrt((ADIdouble) arg), status );
+    rval = ADImkR( (ADIreal) sqrt((ADIdouble) arg), status );
 
   return rval;
   }
@@ -937,7 +1022,7 @@ ADIobj ADIrealArcTan2_i( int narg, ADIobj args[], ADIstatus status )
 
   value = atan2( _RVAL(args[0]), _RVAL(args[1]) );
 
-  return adix_mkr( value, status );
+  return ADImkR( value, status );
   }
 
 ADIobj ADIrealCaste_i( int narg, ADIobj args[], ADIstatus status )
@@ -946,7 +1031,7 @@ ADIobj ADIrealCaste_i( int narg, ADIobj args[], ADIstatus status )
 
   adic_get0r( args[0], &value, status );
 
-  return adix_mkr( value, status );
+  return ADImkR( value, status );
   }
 
 ADIobj ADIrealDiv_i( int narg, ADIobj args[], ADIstatus status )
@@ -959,7 +1044,7 @@ ADIobj ADIrealDiv_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, ADI__INVARG, "Division by zero", _CSM,
 		   status );
   else
-    rval = adix_mkr( d1 / d2, status );
+    rval = ADImkR( d1 / d2, status );
 
   return rval;
   }
@@ -977,7 +1062,7 @@ ADIobj ADIrealMax_i( int narg, ADIobj args[], ADIstatus status )
       result = ival;
     }
 
-  return adix_mkr( result, status );
+  return ADImkR( result, status );
   }
 
 ADIobj ADIrealMin_i( int narg, ADIobj args[], ADIstatus status )
@@ -993,7 +1078,7 @@ ADIobj ADIrealMin_i( int narg, ADIobj args[], ADIstatus status )
       result = ival;
     }
 
-  return adix_mkr( result, status );
+  return ADImkR( result, status );
   }
 
 ADIobj ADIrealMod_i( int narg, ADIobj args[], ADIstatus status )
@@ -1002,7 +1087,7 @@ ADIobj ADIrealMod_i( int narg, ADIobj args[], ADIstatus status )
 
   value = (ADIreal) fmod( _RVAL(args[0]), _RVAL(args[1]) );
 
-  return adix_mkr( value, status );
+  return ADImkR( value, status );
   }
 
 ADIobj ADIrealMult_i( int narg, ADIobj args[], ADIstatus status )
@@ -1013,7 +1098,7 @@ ADIobj ADIrealMult_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_1ST_TO_NTH(carg)
     result *= _RVAL(*carg);
 
-  return adix_mkr( result, status );
+  return ADImkR( result, status );
   }
 
 ADIobj ADIrealNeg_i( int narg, ADIobj args[], ADIstatus status )
@@ -1046,7 +1131,7 @@ ADIobj ADIrealNint_i( int narg, ADIobj args[], ADIstatus status )
       fvalue += 1.0;
     }
 
-  return adix_mkr( fvalue, status );
+  return ADImkR( fvalue, status );
   }
 
 ADIobj ADIrealPlus_i( int narg, ADIobj args[], ADIstatus status )
@@ -1057,7 +1142,7 @@ ADIobj ADIrealPlus_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_1ST_TO_NTH(carg)
     result += _RVAL(*carg);
 
-  return adix_mkr( result, status );
+  return ADImkR( result, status );
   }
 
 ADIobj ADIrealPower_i( int narg, ADIobj args[], ADIstatus status )
@@ -1065,7 +1150,7 @@ ADIobj ADIrealPower_i( int narg, ADIobj args[], ADIstatus status )
   ADIreal	a1 = _RVAL(args[0]);
   ADIreal	a2 = _RVAL(args[1]);
 
-  return adix_mkr( (ADIreal) pow((ADIdouble) a1,(ADIdouble) a2), status );
+  return ADImkR( (ADIreal) pow((ADIdouble) a1,(ADIdouble) a2), status );
   }
 
 ADIobj ADIrealPowerI_i( int narg, ADIobj args[], ADIstatus status )
@@ -1073,12 +1158,12 @@ ADIobj ADIrealPowerI_i( int narg, ADIobj args[], ADIstatus status )
   ADIreal	a1 = _RVAL(args[0]);
   ADIinteger	a2 = _IVAL(args[1]);
 
-  return adix_mkr( (ADIreal) pow((ADIdouble) a1,(ADIdouble) a2), status );
+  return ADImkR( (ADIreal) pow((ADIdouble) a1,(ADIdouble) a2), status );
   }
 
 ADIobj ADIrealQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _real_q(args[0]), status );
+  return ADImkL( _real_q(args[0]), status );
   }
 
 ADIobj ADIrealSign_i( int narg, ADIobj args[], ADIstatus status )
@@ -1088,12 +1173,12 @@ ADIobj ADIrealSign_i( int narg, ADIobj args[], ADIstatus status )
   if ( _RVAL(args[1]) < 0.0 )
     sign = -1.0;
 
-  return adix_mkr( (ADIreal) fabs(_RVAL(args[0]))*sign, status );
+  return ADImkR( (ADIreal) fabs(_RVAL(args[0]))*sign, status );
   }
 
 ADIobj ADIrealSub_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkr( _RVAL(args[0]) - _RVAL(args[1]), status );
+  return ADImkR( _RVAL(args[0]) - _RVAL(args[1]), status );
   }
 
 _logp(real,EQ,_RVAL,==)
@@ -1110,7 +1195,7 @@ _logp(real,NE,_RVAL,!=)
 #define _math_dop(_ocode,_oop) \
 ADIobj ADIdble##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
   {\
-  return adix_mkd( _oop(_DVAL(args[0])), status );}
+  return ADImkD( _oop(_DVAL(args[0])), status );}
 
 ADIobj ADIdbleArcCos_i( int narg, ADIobj args[], ADIstatus status )
   {
@@ -1121,7 +1206,7 @@ ADIobj ADIdbleArcCos_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, SAI__OK, "Domain error in ArcCos, |arg| > 1", _CSM,
 		   status, arg );
   else
-    rval = adix_mkd( acos(arg), status );
+    rval = ADImkD( acos(arg), status );
 
   return rval;
   }
@@ -1135,7 +1220,7 @@ ADIobj ADIdbleArcSin_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, SAI__OK, "Domain error in ArcSin, |arg| > 1", _CSM,
 		   status, arg );
   else
-    rval = adix_mkd( asin(arg), status );
+    rval = ADImkD( asin(arg), status );
 
   return rval;
   }
@@ -1160,7 +1245,7 @@ ADIobj ADIdbleSqrt_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, SAI__OK, "Square root of negative number %f", _CSM,
 		   status, arg );
   else
-    rval = adix_mkd( sqrt(arg), status );
+    rval = ADImkD( sqrt(arg), status );
 
   return rval;
   }
@@ -1188,7 +1273,7 @@ ADIobj ADIdbleArcTan2_i( int narg, ADIobj args[], ADIstatus status )
 
   value = atan2( _RVAL(args[0]), _RVAL(args[1]) );
 
-  return adix_mkd( value, status );
+  return ADImkD( value, status );
   }
 
 ADIobj ADIdbleCaste_i( int narg, ADIobj args[], ADIstatus status )
@@ -1197,7 +1282,7 @@ ADIobj ADIdbleCaste_i( int narg, ADIobj args[], ADIstatus status )
 
   adic_get0d( args[0], &value, status );
 
-  return adix_mkd( value, status );
+  return ADImkD( value, status );
   }
 
 ADIobj ADIdbleDiv_i( int narg, ADIobj args[], ADIstatus status )
@@ -1210,7 +1295,7 @@ ADIobj ADIdbleDiv_i( int narg, ADIobj args[], ADIstatus status )
     ADIexecRaiseI( EXC_MathErr, ADI__INVARG, "Division by zero", _CSM,
 		   status );
   else
-    rval = adix_mkd( d1 / d2, status );
+    rval = ADImkD( d1 / d2, status );
 
   return rval;
   }
@@ -1228,7 +1313,7 @@ ADIobj ADIdbleMax_i( int narg, ADIobj args[], ADIstatus status )
       result = ival;
     }
 
-  return adix_mkd( result, status );
+  return ADImkD( result, status );
   }
 
 ADIobj ADIdbleMin_i( int narg, ADIobj args[], ADIstatus status )
@@ -1244,7 +1329,7 @@ ADIobj ADIdbleMin_i( int narg, ADIobj args[], ADIstatus status )
       result = ival;
     }
 
-  return adix_mkd( result, status );
+  return ADImkD( result, status );
   }
 
 ADIobj ADIdbleMod_i( int narg, ADIobj args[], ADIstatus status )
@@ -1253,7 +1338,7 @@ ADIobj ADIdbleMod_i( int narg, ADIobj args[], ADIstatus status )
 
   result = fmod( _DVAL(args[0]), _DVAL(args[1]) );
 
-  return adix_mkd( result, status );
+  return ADImkD( result, status );
   }
 
 ADIobj ADIdbleMult_i( int narg, ADIobj args[], ADIstatus status )
@@ -1264,7 +1349,7 @@ ADIobj ADIdbleMult_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_1ST_TO_NTH(carg)
     result *= _DVAL(*carg);
 
-  return adix_mkd( result, status );
+  return ADImkD( result, status );
   }
 
 ADIobj ADIdbleNeg_i( int narg, ADIobj args[], ADIstatus status )
@@ -1297,7 +1382,7 @@ ADIobj ADIdbleNint_i( int narg, ADIobj args[], ADIstatus status )
       fvalue += 1.0;
     }
 
-  return adix_mkd( fvalue, status );
+  return ADImkD( fvalue, status );
   }
 
 ADIobj ADIdblePlus_i( int narg, ADIobj args[], ADIstatus status )
@@ -1308,7 +1393,7 @@ ADIobj ADIdblePlus_i( int narg, ADIobj args[], ADIstatus status )
   _ARGLOOP_1ST_TO_NTH(carg)
     result += _DVAL(*carg);
 
-  return adix_mkd( result, status );
+  return ADImkD( result, status );
   }
 
 ADIobj ADIdblePower_i( int narg, ADIobj args[], ADIstatus status )
@@ -1316,7 +1401,7 @@ ADIobj ADIdblePower_i( int narg, ADIobj args[], ADIstatus status )
   ADIdouble	a1 = _DVAL(args[0]);
   ADIdouble	a2 = _DVAL(args[1]);
 
-  return adix_mkd( pow(a1,a2), status );
+  return ADImkD( pow(a1,a2), status );
   }
 
 ADIobj ADIdblePowerI_i( int narg, ADIobj args[], ADIstatus status )
@@ -1324,12 +1409,12 @@ ADIobj ADIdblePowerI_i( int narg, ADIobj args[], ADIstatus status )
   ADIdouble	a1 = _DVAL(args[0]);
   ADIinteger	a2 = _IVAL(args[1]);
 
-  return adix_mkd( pow(a1,(ADIdouble) a2), status );
+  return ADImkD( pow(a1,(ADIdouble) a2), status );
   }
 
 ADIobj ADIdbleQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _dble_q(args[0]), status );
+  return ADImkL( _dble_q(args[0]), status );
   }
 
 ADIobj ADIdbleSign_i( int narg, ADIobj args[], ADIstatus status )
@@ -1339,12 +1424,12 @@ ADIobj ADIdbleSign_i( int narg, ADIobj args[], ADIstatus status )
   if ( _DVAL(args[1]) < 0.0 )
     sign = -1.0;
 
-  return adix_mkd( fabs(_DVAL(args[0]))*sign, status );
+  return ADImkD( fabs(_DVAL(args[0]))*sign, status );
   }
 
 ADIobj ADIdbleSub_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkd( _DVAL(args[0]) - _DVAL(args[1]), status );
+  return ADImkD( _DVAL(args[0]) - _DVAL(args[1]), status );
   }
 
 _logp(dble,EQ,_DVAL,==)
@@ -1366,12 +1451,12 @@ ADIobj ADIlogAnd_i( int narg, ADIobj args[], ADIstatus status )
     if ( ! _LVAL(*carg) )
       result = ADI__false;
 
-  return adix_mkl( result, status );
+  return ADImkL( result, status );
   }
 
 ADIobj ADIlogNot_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( ! _LVAL(args[0]), status );
+  return ADImkL( ! _LVAL(args[0]), status );
   }
 
 ADIobj ADIlogOr_i( int narg, ADIobj args[], ADIstatus status )
@@ -1383,17 +1468,17 @@ ADIobj ADIlogOr_i( int narg, ADIobj args[], ADIstatus status )
     if ( _LVAL(*carg) )
       result = ADI__true;
 
-  return adix_mkl( result, status );
+  return ADImkL( result, status );
   }
 
 ADIobj ADIlogQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _logical_q(args[0]), status );
+  return ADImkL( _logical_q(args[0]), status );
   }
 
 ADIobj ADIlogXor_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _LVAL(args[0]) != _LVAL(args[1]), status );
+  return ADImkL( _LVAL(args[0]) != _LVAL(args[1]), status );
   }
 
 /*
@@ -1406,7 +1491,7 @@ ADIobj ADIstr##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
   ADIlogical	res = ADI__false;\
   ADIstring	*sdat = _str_data(args[0]);\
   if ( sdat->len > 0 ) res = _oop( *(sdat->data) );\
-  return adix_mkl( res ? ADI__true : ADI__false, status );}
+  return ADImkL( res ? ADI__true : ADI__false, status );}
 
 _strp(AlnumQ,isalnum)
 _strp(AlphaQ,isalpha)
@@ -1425,7 +1510,7 @@ ADIobj ADIstr##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
   {\
   ADIlogical	res;\
   res = strx_cmp( args[0], args[1] ) _oop 0;\
-  return adix_mkl( res ? ADI__true : ADI__false, status );}
+  return ADImkL( res ? ADI__true : ADI__false, status );}
 
 _slogp(EQ,==)
 _slogp(GE,>=)
@@ -1549,12 +1634,12 @@ ADIobj ADIstrIchar_i( int narg, ADIobj args[], ADIstatus status )
   if ( sdat->len )
     res = sdat->data[0];
 
-  return adix_mki( res, status );
+  return ADImkI( res, status );
   }
 
 ADIobj ADIstrLen_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mki( _str_len(args[0]), status );
+  return ADImkI( _str_len(args[0]), status );
   }
 
 ADIobj ADIstrLower_i( int narg, ADIobj args[], ADIstatus status )
@@ -1608,7 +1693,7 @@ ADIobj ADIstrRvrse_i( int narg, ADIobj args[], ADIstatus status )
 
 ADIobj ADIstrQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _str_q(args[0]), status );
+  return ADImkL( _str_q(args[0]), status );
   }
 
 ADIobj ADIstrSimQ_i( int narg, ADIobj args[], ADIstatus status )
@@ -1617,7 +1702,7 @@ ADIobj ADIstrSimQ_i( int narg, ADIobj args[], ADIstatus status )
 
   res = (strx_cmpi( args[0], args[1] ) == 0);
 
-  return adix_mkl( res ? ADI__true : ADI__false, status );
+  return ADImkL( res ? ADI__true : ADI__false, status );
   }
 
 ADIobj ADIstrTake_i( int narg, ADIobj args[], ADIstatus status )
@@ -1674,9 +1759,93 @@ ADIobj ADIstrUpper_i( int narg, ADIobj args[], ADIstatus status )
 /*
  *  Functions on List's
  */
+ADIobj ADIlstAppend_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIlist	*curl;
+  ADIobj	rval;
+  ADIobj	*ipoint;
+  int		iarg = 1;
+  ADIobj	*aptr = args + 1;
+  ADIlogical	more;
+
+/* Make copy of first argument */
+  rval = ADIexprOwnArg( args, status );
+
+/* Locate address of last CDR cell in the list */
+  curl = _list_data(rval);
+  more = ADI__true;
+  do {
+    if ( _valid_q(curl->cdr) )
+      curl = _list_data(curl->cdr);
+    else
+      more = ADI__false;
+    }
+  while ( more );
+  ipoint = &curl->cdr;
+
+/* Loop over remaining arguments */
+  while ( iarg++ < narg ) {
+
+/* Iinsert an owned copy of the argument into the output list */
+    lstx_inscel( ADIexprOwnArg( aptr++, status ), &ipoint, status );
+    }
+
+  return rval;
+  }
+
+ADIobj ADIlstConcat_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIlist	*curl = NULL;
+  ADIobj	rval = ADI__nullid;
+  ADIobj	*ipoint = &rval;
+  ADIobj	ilst;
+  int		iarg = 0;
+  ADIobj	*aptr = args;
+  ADIlogical	more;
+
+/* Loop over supplied lists */
+  while ( iarg++ < narg ) {
+
+/* Make a copy */
+    ilst = ADIexprOwnArg( aptr, status );
+
+/* Locate address of last CDR cell in the list */
+    curl = _list_data(ilst);
+    more = ADI__true;
+    do {
+      if ( _valid_q(curl->cdr) )
+	curl = _list_data(curl->cdr);
+      else
+	more = ADI__false;
+      }
+    while ( more );
+
+/* Splice into list */
+    *ipoint = ilst;
+    ipoint = &curl->cdr;
+
+/* Next argument */
+    aptr++;
+    }
+
+  return rval;
+  }
+
+ADIobj ADIlstHead_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  return adix_clone( _CAR(args[0]), status );
+  }
+
 ADIobj ADIlstLen_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mki( lstx_len( args[0], status ), status );
+  return ADImkI( lstx_len( args[0], status ), status );
+  }
+
+ADIobj ADIlstMap_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  return ADIetnNew( adix_clone( K_List, status ),
+		ADIexprMapFun( args[0], args + 1, lstx_len( args[1], status ),
+			narg - 1, status ), status );
   }
 
 ADIobj ADIlstMk_i( int narg, ADIobj args[], ADIstatus status )
@@ -1700,9 +1869,32 @@ ADIobj ADIlstMk_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIlstNth_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIinteger	n = _IVAL(args[1]);
+  ADIobj	*addr = NULL;
+
+  if ( n > 0 )
+    addr = lstx_nth( args[0], n, status );
+
+  return adix_clone( addr ? *addr : ADIcvNulCons, status );
+  }
+
 ADIobj ADIlstQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _list_q(args[0]), status );
+  return ADImkL( _list_q(args[0]), status );
+  }
+
+ADIobj ADIlstReverse_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  return lstx_revrsi( ADIexprOwnArg( args, status ), status );
+  }
+
+ADIobj ADIlstTail_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	tail = _CDR(args[0]);
+
+  return adix_clone( _valid_q(tail) ? tail : ADIcvNulCons, status );
   }
 
 /*
@@ -1711,7 +1903,7 @@ ADIobj ADIlstQ_i( int narg, ADIobj args[], ADIstatus status )
 
 ADIobj ADIstrmQ_i( int narg, ADIobj args[], ADIstatus status )
   {
-  return adix_mkl( _strm_q(args[0]), status );
+  return ADImkL( _strm_q(args[0]), status );
   }
 
 /*
@@ -1775,14 +1967,14 @@ ADIobj ADIaryQ_i( int narg, ADIobj args[], ADIstatus status )
   if ( _han_q(args[0]) )
     res = _ary_q(_han_id(args[0]));
 
-  return adix_mkl( res, status );
+  return ADImkL( res, status );
   }
 
 ADIobj ADIaryRank_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIarray	*ary = _ary_data(_han_id(args[0]));
 
-  return adix_mki( ary->ndim, status );
+  return ADImkI( ary->ndim, status );
   }
 
 ADIobj ADIaryRef_i( int narg, ADIobj args[], ADIstatus status )
@@ -1794,14 +1986,16 @@ ADIobj ADIaryRef_i( int narg, ADIobj args[], ADIstatus status )
   ADIobj	rval = ADI__nullid;
 
   if ( (narg-1) != ary->ndim )
-    adic_setecs( ADI__INVARG, "Number of indices does not match array dimensionality", status );
+    ADIexecRaiseI( EXC_InvalidArg, ADI__INVARG,
+		   "Number of indices does not match array dimensionality",
+		   _CSM, status );
   else {
     for( idim=0; idim<(narg-1) && _ok(status); idim++ ) {
       inds[idim] = _IVAL(args[idim+1]);
       if ( (inds[idim] < 1) || (inds[idim]>ary->dims[idim]) )
-	adic_setecs( ADI__INVARG,
-"Array bound violation in dimension %d, index value %d vs. dimension %d",
-status, idim+1, inds[idim], ary->dims[idim] );
+	ADIexecRaiseI( EXC_InvalidArg, ADI__INVARG,
+	"Array bound violation in dimension %d, index value %d vs. dimension %d",
+	_CSM, status, idim+1, inds[idim], ary->dims[idim] );
       }
 
     if ( _ok(status) ) {
@@ -1829,7 +2023,10 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "AtomQ(_)",				ADIgenAtomQ_i,	FA_L ),
     FUNC_TENTRY( "Break()",				ADIgenBreak_i,	0 ),
     FUNC_TENTRY( "DefProc(_,_)",			ADIgenDefProc_i,FA_A ),
+    FUNC_TENTRY( "DefRep(_CHAR)",			ADIgenDefRep_i, FA_A ),
     FUNC_TENTRY( "DoWhile(__)",				ADIgenDoWhile_i,FA_A ),
+    FUNC_TENTRY( "Global(__Symbol)",			ADIgenGlobal_i,	FA_L1 ),
+    FUNC_TENTRY( "Local(__Symbol)",			ADIgenLocal_i,	FA_L1 ),
     FUNC_TENTRY( "LocalTime()",				ADIgenLtime_i,	0 ),
     FUNC_TENTRY( "LocalTime(_INTEGER)",			ADIgenLtime_i,	0 ),
     FUNC_TENTRY( "Get(_CHAR)",				ADIgenGet_i,	FA_L ),
@@ -1840,6 +2037,7 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Print(__)",				ADIgenPrint_i,	0 ),
     FUNC_TENTRY( "Probe()",				ADIgenProbe_i,	FA_L ),
     FUNC_TENTRY( "Raise(__)",				ADIgenRaise_i,	0 ),
+    FUNC_TENTRY( "Require(__CHAR)",			ADIgenRequire_i,FA_L ),
     FUNC_TENTRY( "Return(_)",				ADIgenReturn_i,	0 ),
     FUNC_TENTRY( "Set(_Symbol,_)",			ADIgenSet_i,	FA_L1 ),
     FUNC_TENTRY( "Time()",				ADIgenTime_i,	0 ),
@@ -1880,13 +2078,21 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Shift(_INTEGER,_INTEGER)",		ADIintShift_i,	FA_L ),
     FUNC_TENTRY( "Sign(_INTEGER,_INTEGER)",		ADIintSign_i,	FA_L ),
     FUNC_TENTRY( "Subtract(_INTEGER,_INTEGER)", 	ADIintSub_i,	FA_L ),
+    FUNC_TENTRY( "Sum(_INTEGER[])",			ADIintSum_i,	FA_L ),
     FUNC_TENTRY( "Xor(_INTEGER,_INTEGER)",		ADIintXor_i,	FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(list_funcs)
-    FUNC_TENTRY( "Length(_List)",			ADIlstLen_i,	0 ),
+    FUNC_TENTRY( "Lappend(_List,__)",			ADIlstAppend_i,	0 ),
+    FUNC_TENTRY( "Lconcat(__List)",			ADIlstConcat_i,	0 ),
+    FUNC_TENTRY( "Head(_List)",				ADIlstHead_i,	0 ),
+    FUNC_TENTRY( "Llength(_List)",			ADIlstLen_i,	0 ),
     FUNC_TENTRY( "List(__)",				ADIlstMk_i,	0 ),
     FUNC_TENTRY( "ListQ(_)",				ADIlstQ_i,	FA_L ),
+    FUNC_TENTRY( "Map(_Symbol,__List)",			ADIlstMap_i,	FA_1 ),
+    FUNC_TENTRY( "Nth(_List,_INTEGER)",			ADIlstNth_i,	0 ),
+    FUNC_TENTRY( "Lreverse(_List)",			ADIlstReverse_i,0 ),
+    FUNC_TENTRY( "Tail(_List)",				ADIlstTail_i,	0 ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(array_funcs)
@@ -1959,6 +2165,7 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "GreaterThan(_CHAR,_CHAR)", 		ADIstrGT_i,	FA_L ),
     FUNC_TENTRY( "GreaterThanOrEqual(_CHAR,_CHAR)", 	ADIstrGE_i,	FA_L ),
     FUNC_TENTRY( "Ichar(_CHAR)",			ADIstrIchar_i,	FA_L ),
+    FUNC_TENTRY( "Length(_CHAR)",			ADIstrLen_i,	FA_L ),
     FUNC_TENTRY( "LessThan(_CHAR,_CHAR)", 		ADIstrLT_i,	FA_L ),
     FUNC_TENTRY( "LessThanOrEqual(_CHAR,_CHAR)", 	ADIstrLE_i,	FA_L ),
     FUNC_TENTRY( "LowerCase(_CHAR)",			ADIstrLower_i,  FA_L ),
@@ -1973,7 +2180,6 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "String(_INTEGER)",			ADIstrCaste_i,	FA_L ),
     FUNC_TENTRY( "String(_REAL)",			ADIstrCaste_i,	FA_L ),
     FUNC_TENTRY( "String(_DOUBLE)",			ADIstrCaste_i,	FA_L ),
-    FUNC_TENTRY( "StringLength(_CHAR)",			ADIstrLen_i,	FA_L ),
     FUNC_TENTRY( "StringQ(_)",				ADIstrQ_i,	FA_L ),
     FUNC_TENTRY( "Take(_CHAR,_INTEGER)",		ADIstrTake_i,	FA_L ),
     FUNC_TENTRY( "UpperCase(_CHAR)",			ADIstrUpper_i,  FA_L ),
@@ -2040,9 +2246,13 @@ void ADIfuncInit( ADIstatus status )
   ADIkrnlAddFuncs( string_funcs, status );
   ADIkrnlAddFuncs( strm_funcs, status );
 
-  cdef_i = _cdef_data(UT_ALLOC_i);
-  cdef_r = _cdef_data(UT_ALLOC_r);
-  cdef_d = _cdef_data(UT_ALLOC_d);
-  cdef_l = _cdef_data(UT_ALLOC_l);
+  cdef_B = _cdef_data(UT_cid_b);
+  cdef_UB = _cdef_data(UT_cid_ub);
+  cdef_W = _cdef_data(UT_cid_w);
+  cdef_UW = _cdef_data(UT_cid_uw);
+  cdef_I = _cdef_data(UT_cid_i);
+  cdef_R = _cdef_data(UT_cid_r);
+  cdef_D = _cdef_data(UT_cid_d);
+  cdef_L = _cdef_data(UT_cid_l);
   }
 
