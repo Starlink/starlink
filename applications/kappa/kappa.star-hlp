@@ -9346,6 +9346,30 @@ DSCFTABLE = FILENAME (Read)
    immediately prior to prompting in manual mode.  It is the name
    of the catalogue, as written in the FITS header, with a "dscf"
    prefix.
+3 ENCODINGS
+ENCODINGS = LITERAL (Read)
+   Determines which FITS keywords should be used to define the
+   world co-ordinate information stored in NDF's WCS component.
+   The allowed values (case-insensitive) are:
+
+   "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+      PCiiijjj, etc., as described in the (draft) FITS world
+      co-ordinate system paper by E.W.Greisen and M.Calabretta
+      (A & A, in preparation).
+
+   "DSS" --- This is the system used by the Digital Sky Survey,
+      and uses keywords AMDXn, AMDYn, PLTRAH, etc.
+
+   "Native" --- This is the native system used by the AST library
+      (see SUN/210), and is the most general.  The others are
+      limited in the co-ordinate systems they can describe, and
+      may thus not fully describe the NDF's WCS component.
+
+   A comma-separated list of up to three values may be supplied,
+   in which case the value actually used is in the first in the
+   list for which corresponding keywords can be found in the FITS
+   header. If a null parameter value (!) is supplied, the encoding
+   is chosen automatically on the basis of the available headers. [!]
 3 FILES
 FILES() = LITERAL (Read)
    A list of (optionally wild-carded) file specifications which
@@ -9429,6 +9453,8 @@ fitsdin files="*.*fits,*.mt" glocon fmtcnv
 MJC: Malcolm J. Currie (STARLINK)
 
 RDS: Richard D. Saxton (STARLINK, Leicester)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1990 December 4 (MJC):
     Original version.
@@ -9474,6 +9500,9 @@ RDS: Richard D. Saxton (STARLINK, Leicester)
 
  1996 June 6 (MJC):
     Linux usage enabled.
+
+ 9-JUN-1998 (DSB):
+    Added support for WCS component.
 2 Implementation_Status
    -  The application processes files blocked at other than an
    integer multiple of 2880 bytes up to a maximum of 28800, provided
@@ -9998,6 +10027,30 @@ DSCFTABLE = FILENAME (Read)
    immediately prior to prompting in manual mode.  It is the name
    of the catalogue, as written in the FITS header, with a "dscf"
    prefix.
+3 ENCODINGS
+ENCODINGS = LITERAL (Read)
+   Determines which FITS keywords should be used to define the
+   world co-ordinate information stored in NDF's WCS component.
+   The allowed values (case-insensitive) are:
+
+   "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+      PCiiijjj, etc., as described in the (draft) FITS world
+      co-ordinate system paper by E.W.Greisen and M.Calabretta
+      (A & A, in preparation).
+
+   "DSS" --- This is the system used by the Digital Sky Survey,
+      and uses keywords AMDXn, AMDYn, PLTRAH, etc.
+
+   "Native" --- This is the native system used by the AST library
+      (see SUN/210), and is the most general.  The others are
+      limited in the co-ordinate systems they can describe, and
+      may thus not fully describe the NDF's WCS component.
+
+   A comma-separated list of up to three values may be supplied,
+   in which case the value actually used is in the first in the
+   list for which corresponding keywords can be found in the FITS
+   header. If a null parameter value (!) is supplied, the encoding
+   is chosen automatically on the basis of the available headers. [!]
 3 FILES
 FILES()  = _CHAR (Read)
    The list of the file numbers to be processed.  Files are
@@ -10111,6 +10164,8 @@ fitsin mt=$TAPE files=* auto prefix=ccd fmtcnv logfile=jkt.log
 MJC: Malcolm J. Currie (STARLINK)
 
 PMA: Peter Allan (University of Manchester)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1987 Jul  8 (PMA):
     Uses HDS but not the NDF format as it was not then defined.
@@ -10232,6 +10287,13 @@ PMA: Peter Allan (University of Manchester)
  1996 June 11 (MJC):
     Added REWIND parameter to control initial rewinding.  Linux
     usage enabled.
+
+ 18-FEB-1998 (DSB):
+    Call to FTS1_GKEYL had arguments THERE and NOCCUR swapped, causing
+    a segmentation violation.
+
+ 9-JUN-1998 (DSB):
+    Added support for WCS component.
 2 Implementation_Status
    -  The application processes tapes blocked at other than an
    integer multiple of 2880 bytes up to a maximum of 63360, provided
