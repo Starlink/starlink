@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 require_ok("Starlink::AST");
 
@@ -52,6 +52,13 @@ my $actual;
 is( $actual, $angle, "Angle using Offset2()" );
 is( $$point3[0], 4, "X distance using Offset2()" );
 is( $$point3[1], 3, "Y distance using Offset2()" );
+
+# Resolve
+# -------
+my ($p4, $d1, $d2) = $wcsinfo->Resolve( [3,3],[6,7],[8,3] );
+is($d1, 3, "Distance from basis vector");
+is($d2, 4, "Distance from basis vector");
+
 
 __DATA__
 SIMPLE  =                    T / file does conform to FITS standard             
