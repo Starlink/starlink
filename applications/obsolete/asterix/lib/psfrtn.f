@@ -4313,9 +4313,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                  I, J                    ! Major pixel loops
       INTEGER                  II, JJ                  ! Sub-pixel loops
       INTEGER                  MNX, MNY                ! Local calc bounds
+      INTEGER			PHALO			! PHA lower bound
       INTEGER                  XSUB, YSUB              ! Sub-pixel factors
 
-      LOGICAL                  SYMMETRIC               ! Symmetric about centre?
+      LOGICAL			PHADEF			! PHA band defined?
+      LOGICAL                   SYMMETRIC               ! Symmetric about centre?
 *
 *    Inline functions :
 *
@@ -4816,6 +4818,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PSF_PAR'
 *
 *    Import :
 *
@@ -4914,23 +4917,24 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Function declarations :
 *
-      LOGICAL                 STR_ABBREV
-      LOGICAL                 CHR_SIMLR
+      LOGICAL                  STR_ABBREV
+      LOGICAL                  CHR_SIMLR
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)	CBLOC			! Cube locator
-      CHARACTER*3		OPT			! Profile option
+      CHARACTER*(DAT__SZLOC)   CBLOC			! Cube locator
+      CHARACTER*3	       OPT			! Profile option
 
-      REAL			ENERGY			! Psf energy
-      REAL			SPARR(2)
+      REAL		       ENERGY			! Psf energy
+      REAL		       SPARR(2)
 
-      CHARACTER*132           FNAME             ! File name of cube
-      CHARACTER*20            MASK              ! Mask name
+      CHARACTER*132            FNAME             	! File name of cube
+      CHARACTER*20             MASK              	! Mask name
 
-      INTEGER                 IDUM,CDIMS(3)          ! XRT pf cube dimensions
+      INTEGER                  IDUM,CDIMS(3)          	! XRT pf cube dimensions
 
-      LOGICAL                 OK			!
+      LOGICAL                  OK		      	!
+      LOGICAL                  PHADEF		      	! PHA band defined?
 *-
 
 *    Check status
