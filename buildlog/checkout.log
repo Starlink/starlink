@@ -1,6 +1,4 @@
 cvs checkout: Updating java
-U java/makefile
-U java/package-list
 cvs checkout: Updating java/pal
 cvs checkout: Updating java/pal/src
 cvs checkout: Updating java/pal/src/main
