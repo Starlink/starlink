@@ -1,0 +1,58 @@
+## Process this file with automake to produce Makefile.in
+
+## Template Makefile.am -- uses the cnf library as an example
+## Comments starting `##' are removed by automake; comments starting
+## with `#' are copied into the output Makefile.
+
+## Always include Makefile.starconf -- provides necessary boilerplate
+include $(srcdir)/Makefile.starconf
+
+## List the scripts which are to be installed in the `bin' directory,
+## wherever it ends up.  bin_PROGRAMS is similar, but the variable
+## lists programs which are to be built first.  In automake
+## terminology, this is the `bin' prefix to the `SCRIPTS' primary.
+bin_SCRIPTS = cnf_link cnf_link_adam
+
+## List headers which are to be installed -- these are built first if necessary
+include_HEADERS = CNF_PAR f77.h cnf.h
+
+## List libraries which are to be built, and installed in `lib'.  Note
+## that the file extension is .la, not .a or .so.  This is the
+## extension for a `libtool library' -- the actual libraries will be
+## installed using whatever names are appropriate for the platform.
+## The variable name LTLIBRARIES requests that we build both sharable
+## and static libraries.
+lib_LTLIBRARIES = libcnf.la
+
+## Declare the sources for the libcnf.la library.  Note that the
+## prefix which corresponds to the libcnf.la library has non-letters
+## canonicalised to underscores.
+libcnf_la_SOURCES = \
+	$(C_ROUTINES) \
+	CNF_PAR
+
+C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
+	etc.c
+
+## We can add any other Makefile rules we require, and automake will
+## copy them through to the output.
+
+# f77.h is a duplicate of cnf.h, maintained as such because old software
+# (actually including some of the code in this library -- that should
+# probably be fixed!) uses it under its old name
+f77.h: cnf.h
+	$(LN_S) cnf.h f77.h
+
+## The file f77.h is input by some of the C_ROUTINES but, because it's
+## generated, it doesn't exist in a fresh checkout. We can't rely on
+## the generated dependency checking to sort this out, because that
+## isn't generated until after the library is built the first time.
+## Declaring the file as a `built source' simply ensures that the file
+## is generated at the very beginning of the build.  However the
+## targets listed here _won't_ be built unless they are listed in some
+## other dependency above.
+##
+## As an extension to the automake conventions, we require that one of
+## the values in this line is `@BUILT_SOURCES@', which allows the
+## configuration macros to insert other values in this line when necessary.
+BUILT_SOURCES = f77.h @BUILT_SOURCES@
