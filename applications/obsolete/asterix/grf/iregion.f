@@ -9,6 +9,7 @@
 *    3 Oct 94 : v1.7-0 original (RJV)
 *   13 Dec 94 : v1.8-0 sub-mode added (RJV)
 *    6 Jan 95 : v1.8-1 writes ARD (RJV)
+*   25 Jan 95 : v1.8-2 MODE and SUBMODE merged (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -22,13 +23,14 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*10 MODE,SUBMODE
+      CHARACTER*16 CMD
+      CHARACTER*8 MODE,SUBMODE
       INTEGER RPTR
       LOGICAL EXCLUDE
       LOGICAL MERGE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IREGION Version 1.8-1')
+      PARAMETER (VERSION = 'IREGION Version 1.8-2')
 *-
       CALL USI_INIT()
 
@@ -46,46 +48,32 @@
 *  get main mode
         MERGE=.FALSE.
         EXCLUDE=.FALSE.
-        MODE=' '
-        DO WHILE (MODE.EQ.' '.AND.STATUS.EQ.SAI__OK)
-          CALL USI_GET0C('MODE',MODE,STATUS)
-          CALL CHR_UCASE(MODE)
-          IF (MODE.EQ.'HELP') THEN
+        CMD=' '
+        DO WHILE (CMD.EQ.' '.AND.STATUS.EQ.SAI__OK)
+          CALL USI_GET0C('MODE',CMD,STATUS)
+          CALL CHR_UCASE(CMD)
+          IF (CMD.EQ.'HELP') THEN
             CALL IREGION_HELP()
             CALL USI_CANCL('MODE',STATUS)
-            MODE=' '
+            CMD=' '
           ENDIF
         ENDDO
-        CALL IREGION_PARSE_MODE(MODE,MERGE,STATUS)
 
+        CALL IREGION_PARSE(CMD,MODE,SUBMODE,EXCLUDE,MERGE,STATUS)
 
-*  if main mode is mergeable with previous region - get sub-mode
-        IF (MERGE) THEN
-          SUBMODE=' '
-          DO WHILE (SUBMODE.EQ.' '.AND.STATUS.EQ.SAI__OK)
-            CALL USI_GET0C('SUBMODE',SUBMODE,STATUS)
-            CALL CHR_UCASE(SUBMODE)
-            IF (SUBMODE.EQ.'HELP') THEN
-              CALL IREGION_SUBHELP()
-              CALL USI_CANCL('SUBMODE',STATUS)
-              MODE=' '
-            ENDIF
-          ENDDO
-          CALL IREGION_PARSE_SUBMODE(SUBMODE,EXCLUDE,STATUS)
 *  if fresh region - clear decks
-          IF (SUBMODE.EQ.'NEW') THEN
-            CALL IMG_SETWHOLE(STATUS)
-            MERGE=.FALSE.
-            CALL ARX_RESET(I_ARD_ID,STATUS)
-          ELSE
+        IF (SUBMODE.EQ.'NEW') THEN
+          CALL IMG_SETWHOLE(STATUS)
+          MERGE=.FALSE.
+          CALL ARX_RESET(I_ARD_ID,STATUS)
+        ELSEIF (MERGE) THEN
 *  otherwise save current region mask and get memory to store new stuff
-            RPTR=I_REG_PTR
-            CALL DYN_MAPB(1,I_NX*I_NY,I_REG_PTR,STATUS)
-            IF (EXCLUDE) THEN
-              CALL ARR_INIT1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
-            ELSE
-              CALL ARR_INIT1B('00'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
-            ENDIF
+          RPTR=I_REG_PTR
+          CALL DYN_MAPB(1,I_NX*I_NY,I_REG_PTR,STATUS)
+          IF (EXCLUDE) THEN
+            CALL ARR_INIT1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
+          ELSE
+            CALL ARR_INIT1B('00'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
           ENDIF
         ENDIF
 
@@ -1142,7 +1130,7 @@ c        ENDIF
 
 
 *+
-      SUBROUTINE IREGION_PARSE_MODE(MODE,MERGE,STATUS)
+      SUBROUTINE IREGION_PARSE(CMD,MODE,SUBMODE,EXCLUDE,MERGE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -1156,9 +1144,10 @@ c        ENDIF
       INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import/Export :
-      CHARACTER*(*) MODE
+      CHARACTER*(*) CMD
 *    Export :
-      LOGICAL MERGE
+      CHARACTER*(*) MODE,SUBMODE
+      LOGICAL EXCLUDE,MERGE
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1167,83 +1156,76 @@ c        ENDIF
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        MODE=MODE(:3)
 
-        IF (MODE.EQ.'CIR'.OR.		! circle
-     :      MODE.EQ.'BOX'.OR.		! box
-     :      MODE.EQ.'POL'.OR.		! polygon
-     :      MODE.EQ.'ANN'.OR.		! annulus
-     :      MODE.EQ.'ELL'.OR.		! ellipse
-     :      MODE.EQ.'SLI'.OR.		! rectangular slice
-     :      MODE.EQ.'CON') THEN		! >= level
-
-           MERGE=.TRUE.
-
-        ELSEIF (MODE.EQ.'WHO'.OR.
-     :          MODE.EQ.'SHO'.OR.
-     :          MODE.EQ.'EXP'.OR.
-     :          MODE.EQ.'CON'.OR.
-     :          MODE.EQ.'INV'.OR.
-     :          MODE.EQ.'LIS') THEN
-
-           MERGE=.FALSE.
-
-        ELSE
-           CALL MSG_PRNT('AST_ERR: invalid mode')
-           STATUS=SAI__ERROR
-        ENDIF
-
-
-      ENDIF
-
-      END
-
-
-
-*+
-      SUBROUTINE IREGION_PARSE_SUBMODE(SUBMODE,EXCLUDE,STATUS)
-*    Description :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Global variables :
-*    Import/Export :
-      CHARACTER*(*) SUBMODE
-*    Export :
-      LOGICAL EXCLUDE
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-*    Local variables :
-*-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-        EXCLUDE=(INDEX(SUBMODE,'NOT').GT.0.OR.
-     :           INDEX(SUBMODE,'EXC').GT.0)
-
-        IF (INDEX(SUBMODE,'ADD').GT.0.OR.
-     :      INDEX(SUBMODE,'OR').GT.0) THEN
-          SUBMODE='ADD'
-        ELSEIF (INDEX(SUBMODE,'AND').GT.0) THEN
-          SUBMODE='AND'
-        ELSEIF (INDEX(SUBMODE,'NEW').GT.0) THEN
-          SUBMODE='NEW'
-        ELSEIF (EXCLUDE) THEN
-          SUBMODE='NEW'
+        IF (INDEX(CMD,'CIR').NE.0) THEN		! circle
+          MODE='CIR'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'BOX').NE.0) THEN	! box
+          MODE='BOX'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'POL').NE.0) THEN	! polygon
+          MODE='POL'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'ANN').NE.0) THEN	! annulus
+          MODE='ANN'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'ELL').NE.0) THEN	! ellipse
+          MODE='ELL'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'SLI').NE.0) THEN	! rectangular slice
+          MODE='SLI'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'CON'.NE.0) THEN	! inside contour
+          MODE='CON'
+          MERGE=.TRUE.
+        ELSEIF (INDEX(CMD,'WHO').NE.0) THEN
+          MODE='WHO'
+          MERGE=.FALSE.
+        ELSEIF (INDEX(CMD,'SHO').NE.0) THEN
+          MODE='SHO'
+          MERGE=.FALSE.
+        ELSEIF (INDEX(CMD,'EXP').NE.0) THEN
+          MODE='EXP'
+          MERGE=.FALSE.
+        ELSEIF (INDEX(CMD,'CON').NE.0) THEN
+          MODE='IMP'
+          MERGE=.FALSE.
+        ELSEIF (INDEX(CMD,'INV').NE.0) THEN
+          MODE='INV'
+          MERGE=.FALSE
+        ELSEIF (INDEX(CMD,'LIS').NE.0) THEN
+          MODE='LIS'
+          MERGE=.FALSE.
 
         ELSE
-           CALL MSG_PRNT('AST_ERR: invalid sub-mode')
-           STATUS=SAI__ERROR
+          CALL MSG_PRNT('AST_ERR: invalid mode')
+          STATUS=SAI__ERROR
         ENDIF
 
+*  if in a mergeable mode then get sub-mode
+        IF (MERGE.AND.STATUS.EQ.SAI__OK) THEN
+
+
+          IF (INDEX(CMD,'NOT').GT.0.OR.
+     :           INDEX(CMD,'EXC').GT.0) THEN
+            EXCLUDE=.TRUE.
+          ELSE
+            EXCLUDE=.FALSE.
+          ENDIF
+
+          IF (INDEX(CMD,'ADD').GT.0) THEN
+            SUBMODE='ADD'
+          ELSEIF (INDEX(CMD,'AND').GT.0) THEN
+            SUBMODE='AND'
+          ELSE
+            SUBMODE='NEW'
+          ENDIF
+
+        ELSE
+
+          SUBMODE=' '
+
+        ENDIF
 
       ENDIF
 
