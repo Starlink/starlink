@@ -813,6 +813,7 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaAutoAstromSimple $w_.\#auto \
             -rtdimage [$image_ get_image] \
+            -image $image_ \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -notify_cmd [code $this redraw_specials_ 1] \

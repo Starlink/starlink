@@ -8,8 +8,6 @@
 #  Purpose:
 #     Toolbox for performing "simple" astrometry using autoastrom.
 
-#  Description:
-
 #  Invocations:
 #
 #        GaiaAutoAstromSimple object_name [configuration options]
@@ -122,34 +120,61 @@ itcl::class gaia::GaiaAutoAstromSimple {
       
       #  If WCS source isn't the image, then we need some parameters.
       itk_component add racentre {
-         LabelEntry $w_.racentre \
+         FITSLabelEntry $w_.racentre \
             -text "RA centre:" \
             -labelwidth $lwidth \
-            -textvariable [scope values_(racentre)]
+            -textvariable [scope values_(racentre)] \
+            -rtdimage $itk_option(-rtdimage)
       }
       add_short_help $itk_component(racentre) \
          {Centre in Right Ascension (hh:mm:ss.ss/dd.dd)}
       set values_(racentre) "00:00:00"
 
       itk_component add deccentre {
-         LabelEntry $w_.deccentre \
+         FITSLabelEntry $w_.deccentre \
             -text "Dec centre:" \
             -labelwidth $lwidth \
-            -textvariable [scope values_(deccentre)]
+            -textvariable [scope values_(deccentre)] \
+            -rtdimage $itk_option(-rtdimage)
       }
       add_short_help $itk_component(deccentre) \
          {Centre in Declination (dd:mm:ss.ss/dd.dd)}
       set values_(deccentre) "00:00:00"
       
       itk_component add imagescale {
-         LabelEntry $w_.imagescale \
+         FITSLabelEntry $w_.imagescale \
             -text "Image scale:" \
             -labelwidth $lwidth \
-            -textvariable [scope values_(imagescale)]
+            -textvariable [scope values_(imagescale)] \
+            -rtdimage $itk_option(-rtdimage)
       }
       add_short_help $itk_component(imagescale) \
          {Image scale in arc-seconds per pixel}
       set values_(imagescale) "1.0"
+
+      itk_component add angle {
+         FITSLabelEntry $w_.angle \
+            -text "Position Angle:" \
+            -labelwidth $lwidth \
+            -textvariable [scope values_(angle)] \
+            -rtdimage $itk_option(-rtdimage)
+      }
+      add_short_help $itk_component(angle) \
+         {Position angle, Dec axis anti-clock degrees}
+      set values_(angle) "0.0"
+
+      itk_component add invert {
+         StarLabelCheck $w_.invert \
+            -text "Axes are flipped:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -anchor w \
+            -variable [scope values_(invert)]
+      }
+      add_short_help $itk_component(invert) \
+         {One of the axes is flipped WRT to normal convention}
+      set values_(invert) 0
 
       #  Choose an calibration catalogue. This should contain
       #  all the remote reference RA and Dec catalogues.
@@ -167,7 +192,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  Region for showing the output from AUTOASTROM.
       itk_component add status {
-         Scrollbox $w_.status
+         Scrollbox $w_.status -singleselect 0 -exportselection 1  
       }
       $w_.status configure -height 5
       add_short_help $itk_component(status) \
@@ -209,11 +234,13 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Reset image to the original astrometric calibration}
 
       #  Pack widgets into place.
-      pack $itk_component(wcssource) -side top -fill x -expand 1 -pady 5 -padx 5
-      pack $itk_component(racentre) -side top -fill x -expand 1 -pady 5 -padx 5
-      pack $itk_component(deccentre) -side top -fill x -expand 1 -pady 5 -padx 5
-      pack $itk_component(imagescale) -side top -fill x -expand 1 -pady 5 -padx 5
-      pack $itk_component(refcat) -side top -fill x -expand 1 -pady 5 -padx 5
+      pack $itk_component(wcssource) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(racentre) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(deccentre) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(imagescale) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(angle) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(invert) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(refcat) -side top -fill x -pady 5 -padx 5
       pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
@@ -315,7 +342,13 @@ itcl::class gaia::GaiaAutoAstromSimple {
             if { $values_(wcssource) == "Y" } {
                set wcssource "--obsdata=source=AST:FITS"
             } else {
-               set wcssource "--obsdata=source=USER,ra=$values_(racentre),dec=$values_(deccentre),scale=$values_(imagescale)"
+               #  Do this carefully, obsdata doesn't like spaces.
+               set wcssource "--obsdata=source=USER"
+               append wcssource ",ra=[string trim $values_(racentre)]"
+               append wcssource ",dec=[string trim $values_(deccentre)]"
+               append wcssource ",scale=[string trim $values_(imagescale)]"
+               append wcssource ",angle=[string trim $values_(angle)]"
+               append wcssource ",invert=[string trim $values_(invert)]"
             }
 
             #  Run program, monitoring output...
@@ -328,6 +361,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
                --noinsert \
                --keepfits=$solution_ \
                --temp=autoastrom_tmp \
+               --matchcatalogue=$solution_catalogue_ \
+               --nomessages \
                $diskimage"
 
             #  Use local SExtractor catalogue...
@@ -342,7 +377,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
    protected method completed_ {} {
       puts "Completed"
       if { [file exists $solution_] } {
-         puts "$solution_ exists"
 
          #  Need to read the file to extract the solution so GAIA can
          #  display this. Simplest thing to do is read as a new image
@@ -350,8 +384,12 @@ itcl::class gaia::GaiaAutoAstromSimple {
          $itk_option(-rtdimage) astcopy $solution_
          $itk_option(-rtdimage) astreplace
          notify_
+
+         #  Re-draw the positions used in the solution.
+         puts "calling display_solution_cat_"
+         display_solution_cat_
       } else {
-         puts "$solution_ doesn't exist"
+         error_dialog "Failed to determine a solution"
       }
    }
 
@@ -390,7 +428,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
                -label $longname \
                -value $shortname \
                -command [code $this set_value_ refcat $shortname]
-            puts "$shortname"
          }
 
          #  Set the default.
@@ -412,6 +449,24 @@ itcl::class gaia::GaiaAutoAstromSimple {
       $itk_component(racentre) configure -state $state
       $itk_component(deccentre) configure -state $state
       $itk_component(imagescale) configure -state $state
+      $itk_component(angle) configure -state $state
+      $itk_component(invert) configure -state $state
+   }
+
+   #  Display the solution positions.
+   protected method display_solution_cat_ {} {
+      puts "in display_solution_cat_"
+
+      #  Open the catalogue window. Returns {} is already around.
+      set astrocat [gaia::GaiaSearch::new_local_catalog \
+                       $solution_catalogue_ [code $itk_option(-image)] \
+                       ::gaia::GaiaSearch 0 catalog $w_]
+      
+      if { $astrocat != {} } {
+         set astrocatname_ $astrocat
+         after idle "$astrocatname_ set_symbol {} {circle red {} {} {} {}} {{4.0} {}}"
+      }
+      $astrocatname_ search
    }
 
    #  Configuration options: (public variables)
@@ -419,6 +474,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {} {}
+
+   #  Name of RtdImageCtrl widget or a derived class.
+   itk_option define -image image Image {} {}
 
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
@@ -444,11 +502,18 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  Values from widgets.
    protected variable values_
 
+   #  Name of astrocat instance we're using to display the positions
+   #  catalogue.
+   protected variable astrocatname_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
    #  Name of file to store the solution.
-   common solution_ GaiaAstSolution.fits
+   common solution_ GaiaAutoAstSolution.fits
+
+   #  Name of file to store the catalogue of positions used in fit.
+   common solution_catalogue_ GaiaAutoAstSolutionPos.ASC
 
    # C++ astrocat object used here to access catalog entries
    common astrocat_ [astrocat ::gaia::.cat]

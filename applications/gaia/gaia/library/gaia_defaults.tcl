@@ -99,6 +99,8 @@ proc gaia::setXdefaults {} {
 
     option add *GaiaTabStops.textFont        $textFont
 
+    option add *FITSLabelEntry.anchor w 
+
     #  Stop ugly tearoff menus and post using "flush", as in Tk4.2.
     option add *TearOff  0 userDefault
     option add *Menubutton*direction flush
