@@ -14,7 +14,7 @@
 #
 # Certain features of this macro are documented in SSN/78, in particular
 #   - Sets STARLINK
-#   - Sets FCFLAGS, FFLAGS, CFLAGS, LDFLAGS to appropriate values
+#   - Sets AM_FCFLAGS, AM_FFLAGS, AM_CFLAGS, AM_LDFLAGS to appropriate values
 #   - Sets PACKAGE_VERSION_{MAJOR,MINOR,RELEASE,INTEGER}
 # The behaviour of these should not be changed without changing the
 # documentation, or without due consideration of the package which use
@@ -155,22 +155,28 @@ AC_ARG_VAR(STARLINK, [Location of a current Starlink tree (used if necessary)])d
 # Makefile.in, and we need that.
 AC_SUBST(STARLINK)
 
+# We set the AM_*FLAGS variables, below, so need to substitute them.
+AC_SUBST(AM_FCFLAGS)
+AC_SUBST(AM_FFLAGS)
+AC_SUBST(AM_CFLAGS)
+AC_SUBST(AM_LDFLAGS)
+
 # Use the above information: $STARLINK indicates a preexisting
-# Starlink tree.  Note that we are using FCFLAGS rather than FFLAGS --
+# Starlink tree.  Note that we are using AM_FCFLAGS rather than AM_FFLAGS --
 # we prefer the FC macros to the F77 ones, and have modified automake
-# to generate these.  However, we maintain FFLAGS also, so that we
+# to generate these.  However, we maintain AM_FFLAGS also, so that we
 # allow both.  Avoid doing anything if $STARLINK was unset above.
 if test -n "$STARLINK"; then
     if test "$STARLINK" != "per_dir_PREFIX"; then
-        FCFLAGS="$FCFLAGS -I[]per_dir_PREFIX/include"
-        FFLAGS="$FFLAGS -I[]per_dir_PREFIX/include"
-        CFLAGS="$CFLAGS -I[]per_dir_PREFIX/include"
-        LDFLAGS="$LDFLAGS -L[]per_dir_PREFIX/lib"
+        AM_FCFLAGS="$AM_FCFLAGS -I[]per_dir_PREFIX/include"
+        AM_FFLAGS="$AM_FFLAGS -I[]per_dir_PREFIX/include"
+        AM_CFLAGS="$AM_CFLAGS -I[]per_dir_PREFIX/include"
+        AM_LDFLAGS="$AM_LDFLAGS -L[]per_dir_PREFIX/lib"
     fi
-    FCFLAGS="$FCFLAGS -I$STARLINK/include"
-    FFLAGS="$FFLAGS -I$STARLINK/include"
-    CFLAGS="$CFLAGS -I$STARLINK/include"
-    LDFLAGS="$LDFLAGS -L$STARLINK/lib"
+    AM_FCFLAGS="$AM_FCFLAGS -I$STARLINK/include"
+    AM_FFLAGS="$AM_FFLAGS -I$STARLINK/include"
+    AM_CFLAGS="$AM_CFLAGS -I$STARLINK/include"
+    AM_LDFLAGS="$AM_LDFLAGS -L$STARLINK/lib"
 fi
 
 ## If the docs-only option was given, this expands to nothing,
@@ -384,75 +390,92 @@ done
 #
 # Work out what is required to have the Fortran compiler produce
 # library symbols which are compatible with those expected by the CNF
-# package.  If you are building a library which includes Fortran code,
-# then you should call this macro, which possibly adjusts the FCFLAGS
-# variable.
+# package.  If you are building a library in which C code refers to
+# Fortran libraries, then you should call this macro, which possibly
+# adjusts the AM_FCFLAGS variable.  That is, if you include cnf.h, you
+# should have this macro in the configure.ac.
 #
-# At present, all this macro has to do is simply work out whether it
-# needs to stop g77 adding a second underscore to generated symbol
-# names (it adds a single underscore to most Fortran symbols, but by
-# default adds two when the symbol name already contains an
-# underscore); the other Fortran compilers we use don't need any extra
-# options, as it happens.  However this could potentially be much more
-# complicated.  The autoconf AC_F77_WRAPPERS macro detects more
-# possibilities, but probably not a completely exhaustive set.  In
-# future it might be necessary to extend the CNF macros, by somehow
-# merging the results of AC_F77_WRAPPERS into it, and at that point it
-# might be necessary to extend this macro.
+# This macro deals with the following issue.  The cnf.h header
+# includes a macro F77_EXTERNAL_NAME which mangles a C name into the
+# corresponding name the Fortran compiler would generate; this
+# generally means no more than appending a single underscore.  As the
+# autoconf documentation for AC_FC_WRAPPERS points out, this is less
+# general than it could be, as some Fortrans fold symbols to
+# uppercase, and some (in particular g77) add two underscores to
+# symbols which already contain one (thus mangling 'ab' to 'ab_', but
+# 'a_b' to 'a_b__').  This behaviour would break the F77_EXTERNAL_NAME
+# macro, which is used throughout the Starlink code in both cases,
+# unless we compiled all the Starlink Fortran libraries in a mode which
+# suppressed this second underscore.  Working out how to do that --
+# if it's necessary at all -- is what this macro does.
+#
+# The more restricted interface of F77_EXTERNAL_NAME is, by the way,
+# the reason why we cannot simply copy the FC_FUNC definition to the
+# cnf.h file as F77_EXTERNAL_NAME: the latter macro is used for
+# symbols both with and without an underscore.
+#
+# If we ever have to migrate the Starlink software to a Fortran which
+# does more complicated name mangling, we'll almost certainly have to
+# perform more serious surgery on cnf.h, using the results of
+# AC_FC_WRAPPERS, along with similar surgery on the code which invokes
+# it.
 #
 # This macro is designed to work with CNF, however it does _not_
 # require the cnf.h headers to be installed, because it should remain
 # callable at configuration time before _anything_ has been installed.
-# Instead we fake the functionality of the definition
-# F77_EXTERNAL_NAME in cnf.h, which appends an underscore (just one)
+# In the test code below, we therefore emulate the definition of
+# F77_EXTERNAL_NAME in cnf.h, which appends a single underscore.
 # to the end of C symbols.
 #
 AC_DEFUN([STAR_CNF_COMPATIBLE_SYMBOLS],
-         [$_star_docs_only &&
-              AC_MSG_ERROR([STAR[]_CNF_COMPATIBLE_SYMBOLS in docs-only dir])
-          AC_CACHE_CHECK([how to make Fortran and C play nicely],
-                         [star_cv_cnf_compatible_symbols],
-                         [AC_REQUIRE([AC_PROG_FC])dnl
-                          AC_REQUIRE([AC_PROG_CC])dnl
-                          AC_LANG_PUSH([C])
-                          AC_LANG_CONFTEST([AC_LANG_PROGRAM([
-void funcone_(); 
-void func_two_();
-],[
-funcone_();
-func_two_();
+   [$_star_docs_only &&
+        AC_MSG_ERROR([STAR[]_CNF_COMPATIBLE_SYMBOLS in docs-only dir])
+    AC_CACHE_CHECK([how to make Fortran and C play nicely],
+       [star_cv_cnf_compatible_symbols],
+       [AC_REQUIRE([AC_PROG_FC])dnl
+        AC_REQUIRE([AC_PROG_CC])dnl
+        AC_LANG_PUSH([C])
+        AC_LANG_CONFTEST([AC_LANG_SOURCE([
+void funcone_() { return; }
+void func_two_() { return; }
 ])])
-                          if (eval $ac_compile) 2>&5; then
-                              mv conftest.$ac_objext c-conftest.$ac_objext
-                          else
-                              AC_MSG_ERROR([cannot compile a C program!])
-                          fi
-                          AC_LANG_POP(C)
-                          AC_LANG_PUSH([Fortran])
-                          AC_LANG_CONFTEST([AC_LANG_SOURCE([
-      SUBROUTINE funcone
-      END
-      SUBROUTINE func_two
+        if (eval $ac_compile) 2>&5
+        then
+            mv conftest.$ac_objext c-conftest.$ac_objext
+        else
+            AC_MSG_ERROR([cannot compile a C program!])
+        fi
+        AC_LANG_POP(C)
+        AC_LANG_PUSH([Fortran])
+        AC_LANG_CONFTEST([AC_LANG_SOURCE([
+      PROGRAM conftest
+      CALL funcone
+      CALL func_two
       END
 ])])
-                          star_cv_cnf_compatible_symbols=X
-                          for opt in "" "-fno-second-underscore"
-
-                          do
-                              if $FC $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5; then
-                                  star_cv_cnf_compatible_symbols=$opt
-                                  break
-                              fi
-                          done
-                          AC_LANG_POP([Fortran])
-                          rm -f conftest* c-conftest*
-                          ])
-          if test "$star_cv_cnf_compatible_symbols" = X; then
-              AC_MSG_ERROR([cannot work out how])
-          else
-              FCFLAGS="$FCFLAGS $star_cv_cnf_compatible_symbols"
-              FFLAGS="$FFLAGS $star_cv_cnf_compatible_symbols"
-          fi
+        star_cv_cnf_compatible_symbols=cantlink
+        # The only Fortran we (need to) handle at present is
+        # g77, which has a -fno-second-underscore option for
+        # simplifying the mangling here.  Other Fortrans we've
+        # used do only the single-underscore mangling.
+        for opt in "" "-fno-second-underscore"
+        do
+            if $FC $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5
+            then
+                star_cv_cnf_compatible_symbols=$opt
+                break
+            fi
+        done
+        AC_LANG_POP([Fortran])
+        rm -f conftest* c-conftest*
+])
+    if test "$star_cv_cnf_compatible_symbols" = cantlink
+    then
+        AC_MSG_ERROR([cannot work out how])
+    else
+        AM_FCFLAGS="$AM_FCFLAGS $star_cv_cnf_compatible_symbols"
+        AM_FFLAGS="$AM_FFLAGS $star_cv_cnf_compatible_symbols"
+    fi
 ])# STAR_CNF_COMPATIBLE_SYMBOLS
 
 
