@@ -141,20 +141,22 @@
 #  first named NDF as an example.
          set allfits [ [ lindex $ndflist 1 ] fitshead ]
 
-#  Add buttons to the control panel.
+#  Add control groups to the control panel.
+         addgroup style Style
+         addgroup action Control
+
+#  Construct control widgets.
          set panel [ panel ]
-         itk_component add showfits {
-            button $panel.showfits \
-               -text "Show FITS" \
-               -command [ code $this fitsselect ]
-         }
-         addcontrol $itk_component(showfits)
          itk_component add dstyle {
             stylecontrol $panel.dstyle \
                -value "drawaxes=0,grid=0,numlab=0" \
                -valuevar displaystyle
          }
-         addcontrol $itk_component(dstyle)
+         itk_component add showfits {
+            button $panel.showfits \
+               -text "Show FITS" \
+               -command [ code $this fitsselect ]
+         }
          itk_component add gotpair {
             button $panel.gotpair \
                -text "Use this pair" \
@@ -164,13 +166,17 @@
             usual
             ignore -state
          }
-         addcontrol $itk_component(gotpair)
          itk_component add done {
             button $panel.done \
                -text "Exit" \
                -command [ code $this configure -state done ]
          }
-         addcontrol $itk_component(done)
+
+#  Add control widgets to the control groups.
+         addcontrol $itk_component(dstyle) style
+         addcontrol $itk_component(showfits) style
+         addcontrol $itk_component(gotpair) action
+         addcontrol $itk_component(done) action
 
 #  Construct the choosing area.  This is the business end of the widget
 #  and consists of two tabsets and two frames in which NDFs can be 

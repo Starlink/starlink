@@ -242,7 +242,12 @@ class Gwmview {
 ########################################################################
       constructor { args } {
 
-#  Add buttons to the control panel.
+#  Add control groups to the control panel.
+         addgroup zoom Zoom
+         addgroup marknum Index
+         addgroup action Control
+
+#  Construct control widgets.
          set panel [ panel ]
          itk_component add zoom {
             zoomcontrol $panel.zoom \
@@ -251,23 +256,23 @@ class Gwmview {
                -value 1 \
                -valuevar zoom
          }
-         addcontrol $itk_component(zoom)
          itk_component add marknum {
             marknumcontrol $panel.marknum
          }
-         addcontrol $itk_component(marknum)
          itk_component add exit {
             button $panel.exit \
                -text "Done" \
                -command [ code $this deactivate ]
          }
-         addcontrol $itk_component(exit)
-
       #  itk_component add colour {
       #     button $itk_component(panel).colour \
       #        -text "Colours" -command "$this docolours"
       #  }
 
+#  Add control widgets to the control panel.
+         addcontrol $itk_component(zoom) zoom
+         addcontrol $itk_component(marknum) marknum
+         addcontrol $itk_component(exit) action
 
 #  Add the frame to hold the actual GWM viewing window.
          set interior [ Ccdtop::childsite ]

@@ -17,12 +17,23 @@ class Ccdtop {
 
 #  Public methods:
 #
-#     addcontrol control
-#        Adds a control widget to the control panel.  The control
+#     addcontrol widget grpname
+#        Adds a control widget to the control panel.  The widget
 #        argument should be the pathname of a widget which has 
 #        as an ancestor the path given by the 'panel' method of this
 #        class, and which has a '-state' configuration variable with
-#        valid 'normal' and 'disabled' values.
+#        valid 'normal' and 'disabled' values.  Such widgets should be
+#        children of the window returned by the [panel] method.
+#           - widget     -- Pathname of a control-type widget
+#           - grpname    -- Unique tag identifying this group
+#
+#     addgroup grouptag heading
+#        Adds a grouping frame to the control panel.  This can be used
+#        for grouping controls; the grpname specified here, which should
+#        be unique, must be referred to when controls are added 
+#        with the addcontrol method.
+#           - grpname    -- Tag to identify the group (see addcontrol)
+#           - heading    -- Short text string to label the group
 # 
 #     childsite
 #        Returns the path of a frame into which windows can be placed.
@@ -140,10 +151,26 @@ class Ccdtop {
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public method addcontrol { widget } {
+      public method addcontrol { widget grpname } {
 #-----------------------------------------------------------------------
          lappend controls $widget
-         pack $widget -side left
+         pack $widget \
+            -side left \
+            -padx 2 -pady 2 -fill y \
+            -in [ $groups($grpname) childsite ]
+      }
+
+
+#-----------------------------------------------------------------------
+      public method addgroup { grpname heading } {
+#-----------------------------------------------------------------------
+         incr ngroup
+         itk_component add group$ngroup {
+            iwidgets::labeledframe [ panel ].group$ngroup \
+               -labeltext $heading -ipadx 2 -ipady 2
+         }
+         pack $itk_component(group$ngroup) -side left
+         set groups($grpname) $itk_component(group$ngroup)
       }
 
 
@@ -247,10 +274,8 @@ class Ccdtop {
 #-----------------------------------------------------------------------
 
 #  Arrange for geometry constraints to be met.
-         wm deiconify $itk_interior
-         update idletasks
-         set wnow [ winfo width $itk_component(panel) ]
-         set hnow [ winfo height $itk_interior ]
+         set wnow [ winfo reqwidth $itk_component(panel) ]
+         set hnow [ winfo reqheight $itk_interior ]
          wm minsize $itk_interior $wnow [ min $hnow $wnow ]
 
 #  Set binding to handle window resize events.
@@ -359,6 +384,8 @@ class Ccdtop {
 
 #  Instance Variables.
       private variable controls        ;# List of control widgets in panel
+      private variable groups          ;# List of control groups in panel
+      private variable ngroup 0        ;# Number of control groups in panel
       private variable watchlevel 0    ;# Call stack level of calling code
 
    }

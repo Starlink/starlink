@@ -87,14 +87,17 @@
          rename -font -trackfont trackFont Font
       }
 
-#  Set up additional controls.
+#  Add more control groups.
+      addgroup style Style
+      addgroup cutoff Cutoff
+
+#  Construct additional control widgets.
       set panel [ panel ]
       itk_component add dstyle {
          stylecontrol $panel.dstyle \
             -value "drawaxes=0,grid=0,numlab=0" \
             -valuevar displaystyle
       }
-      addcontrol $itk_component(dstyle)
       itk_component add percut {
          percentilecontrol $panel.percut \
             -choices { { 20 80 } { 10 90 } { 5 95 } \
@@ -103,7 +106,10 @@
             -value { 6 94 } \
             -valuevar percentiles
       }
-      addcontrol $itk_component(percut)
+
+#  Add new control widgets to the panel.
+      addcontrol $itk_component(dstyle) style
+      addcontrol $itk_component(percut) cutoff
 
 #  Do requested configuration.
       eval itk_initialize $args
