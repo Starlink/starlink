@@ -3,10 +3,12 @@
 bin_SCRIPTS = hlps_link hlps_link_adam
 
 bin_PROGRAMS = browsehlp
+include_HEADERS = hlps.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = `hlp_link` `fio_link` `err_link` `one_link` \
 	libhlps.la @FCLIBS@
+browsehlp_DEPENDENCIES = hlps.h
 
 lib_LTLIBRARIES = libhlps.la libhlps_adam.la
 
@@ -17,7 +19,7 @@ libhlps_la_SOURCES = \
 
 libhlps_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
-PRIVATE_INCLUDES = HLPS_HLPCMD hlps.h
+PRIVATE_INCLUDES = HLPS_HLPCMD
 
 # These are the standard KAPPA help routines renamed to
 # enter the HLPS namespace
