@@ -242,12 +242,13 @@
 *  X axis label and units
       CALL BDI_AXGET0C( IFID, 1, 'Label', LABEL, STATUS )
       IF ( LABEL .GT. ' ' ) THEN
-        CALL MSG_SETC( 'LAB', LABEL )
         CALL BDI_AXGET0C( IFID, 1, 'Units', UNITS, STATUS )
         IF ( UNITS .GT. ' ' ) THEN
           CALL MSG_SETC( 'UNIT', UNITS )
+          CALL MSG_SETC( 'LAB', LABEL )
           CALL AIO_WRITE( OID, 'LAB X "^LAB (^UNIT)"', STATUS )
         ELSE
+          CALL MSG_SETC( 'LAB', LABEL )
           CALL AIO_WRITE( OID, 'LAB X "^LAB"', STATUS )
         END IF
       END IF
