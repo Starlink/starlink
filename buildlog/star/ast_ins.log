@@ -118,8 +118,8 @@ if test -n "sun210.htx sun211.htx"; then \
               /apps/cvsbuild/star/bin/hlink /apps/cvsbuild/star/docs /apps/cvsbuild/star/help;\
            else :; fi;\
         fi;
-Updating index file for document: sun210
 Updating index file for document: sun211
+Updating index file for document: sun210
 2 hypertext documents need re-linking
    updating cross-references in document sun210 (8 files to modify)...
    replacing original files with re-linked versions...
