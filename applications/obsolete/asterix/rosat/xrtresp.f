@@ -34,8 +34,8 @@
       CHARACTER*(DAT__SZLOC) LOC              ! Locator to input file
       CHARACTER*(DAT__SZLOC) RLOC             ! Locator to response file
       CHARACTER*80 HTEXT(2)                   ! Text for history.
-      CHARACTER*100 RFILE                     ! Name of detector response file
-      CHARACTER*80 CALDIR                     ! Name of XRT cal. dir
+      CHARACTER*132 RFILE                     ! Name of detector response file
+      CHARACTER*132 CALDIR                     ! Name of XRT cal. dir
       LOGICAL INPRIM                          ! Is the input data primitive ?
       LOGICAL OK                              ! Is data array in input file ?
       LOGICAL LCONT                           ! Continue execution ?
@@ -105,13 +105,17 @@
          CALL MSG_PRNT('Warning: XRT cal directory not found')
          CALL ERR_ANNUL(STATUS)
       ENDIF
-*
+
+	print *,caldir
+	print *,'constructing filename...'
       IF (HRI) THEN
         RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'hri_drm'
       ELSE
         RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
       ENDIF
+	print *,'done!'
       CALL USI_DEF0C('RESPFILE', RFILE, STATUS)
+	print *,'prompting...'
 *
 *   Get detector response matrix name
       CALL USI_GET0C('RESPFILE', RFILE, STATUS)
