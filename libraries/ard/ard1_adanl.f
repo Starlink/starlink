@@ -33,10 +33,9 @@
 *        The number of dimensions in the mask supplied to ARD_WORK.
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
-*        should have a Base Frame with Domain PIXEL referring to pixel
-*        coords within the pixel mask and another Frame with Domain 
-*        ARDAPP referring to "Application co-ordinates" (i.e. default
-*        user coords).
+*        should have a Base Frame referring to pixel coords within the 
+*        pixel mask and another Frame with Domain ARDAPP referring to 
+*        "Application co-ordinates" (i.e. default user coords).
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
 *     DUBND( * ) = DOUBLE PRECISION (Given)

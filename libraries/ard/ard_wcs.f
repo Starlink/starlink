@@ -1,4 +1,4 @@
-      SUBROUTINE ARD_WCS( IWCS, STATUS )
+      SUBROUTINE ARD_WCS( IWCS, DOMAIN, STATUS )
 *+
 *  Name:
 *     ARD_WCS
@@ -10,12 +10,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD_WCS( IWCS, STATUS )
+*     CALL ARD_WCS( IWCS, DOMAIN, STATUS )
 
 *  Description:
 *     This routine can be used to specify the cooordinate systems
-*     which can be used in subsequent calls to ARD_WORK. The supplied
-*     FrameSet must include a Frame with Domain "PIXEL". ARD expressions
+*     which can be used in subsequent calls to ARD_WORK. ARD expressions
 *     passed to subsequent calls to ARD_WORK can include positions in any
 *     of the Frames included in the supplied FrameSet (the ARD expression
 *     should include suitable COFRAME or WCS statements to indicate which
@@ -38,6 +37,12 @@
 *  Arguments:
 *     IWCS = INTEGER (Given)
 *        An AST pointer to a FrameSet, or AST__NULL.
+*     DOMAIN = CHARACTER * ( * ) (Given)
+*        The Domain name corresponding to pixel co-ordinates within the
+*        mask array passed to routine ARD_WORK. If a blank value is
+*        supplied, "PIXEL" will be used. The IWCS FrameSet (if supplied) 
+*        must contain a Frame with this Domain. If the supplied string is 
+*        longer than 40 characters, the trailing characters are ignored. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -68,15 +73,20 @@
       INCLUDE 'ARD_COM'          ! ARD common blocks
 *        CMN_AWCS = INTEGER (Write)
 *           A pointer to the application FrameSet.
+*        CMN_ADOM = CHARACTER*40 (Write)
+*           The Domain name associated with pixel
+*           coordinates in the mask array.
 
 *  Arguments Given:
       INTEGER IWCS
+      CHARACTER DOMAIN*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL ARD1_INIT         ! Initialise ARD common blocks
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
       LOGICAL OK                 ! Is the pointer usable?
@@ -101,9 +111,15 @@
 *  End the error reporting context.
       CALL ERR_RLSE
 
-*  If a valid FrameSet pointer (or AST__NULL) was supplied, store it.
+*  If a valid FrameSet pointer (or AST__NULL) was supplied, store it,
+*  together with the pixel Domain name.
       IF( OK ) THEN 
          CMN_AWCS = IWCS
+         IF( CHR_LEN( DOMAIN ) .GT. 0 ) THEN
+            CMN_ADOM = DOMAIN
+         ELSE
+            CMN_ADOM = 'PIXEL'
+         END IF
 
 *  Otherwise, report an error.
       ELSE

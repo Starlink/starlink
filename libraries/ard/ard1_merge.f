@@ -23,9 +23,9 @@
 *        supplied in the ARD description).
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
-*        should have a Base Frame with Domain PIXEL referring to pixel
-*        coords within the pixel mask and another Frame with Domain 
-*        ARDAPP referring to "Application co-ordinates".
+*        should have a Base Frame referring to pixel coords within the 
+*        pixel mask and another Frame with Domain ARDAPP referring to 
+*        "Application co-ordinates".
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
 *     DUBND( * ) = DOUBLE PRECISION (Given)

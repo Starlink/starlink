@@ -58,6 +58,9 @@
       INCLUDE 'ARD_COM'          ! ARD common blocks
 *        CMN_AWCS = INTEGER (Read)
 *           A pointer to the application FrameSet.
+*        CMN_ADOM = CHARACTER*40 (Read)
+*           The Domain name associated with pixel
+*           coordinates in the mask array.
 
 *  Arguments Given:
       INTEGER NDIM
@@ -103,12 +106,12 @@
       IF( CMN_AWCS .NE. AST__NULL ) THEN
          AWCS = AST_COPY( CMN_AWCS, STATUS )
 
-*  Check each Frame until one is found with Domain PIXEL.
+*  Check each Frame until one is found with Domain stored in CMN_ADOM.
          IPIX = AST__NOFRAME       
          DO I = 1, AST_GETI( AWCS, 'NFRAME', STATUS )
             FR = AST_GETFRAME( AWCS, I, STATUS )
    
-            IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
+            IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. CMN_ADOM ) THEN
                CALL AST_ANNUL( FR, STATUS )
                IPIX = I
                GO TO 10
@@ -120,7 +123,7 @@
 
  10      CONTINUE
 
-*  If a PIXEL Frame was found make it the Base Frame.
+*  If a suitable Frame was found make it the Base Frame.
          IF( IPIX .NE. AST__NOFRAME ) THEN
             CALL AST_SETI( AWCS, 'BASE', IPIX, STATUS )
          
@@ -133,9 +136,10 @@
 *  Report an error if no pixel frame was found.
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = ARD__NOPIX 
+            CALL MSG_SETC( 'D', CMN_ADOM )
             CALL ERR_REP( 'ARD1_APWCS_ERR1', 'The FrameSet specified '//
-     :                  'using ARD_WCS has no PIXEL Frame (possible '//
-     :                  'programming error).', STATUS )
+     :                  'using ARD_WCS has no Frame with Domain '//
+     :                  '''^D'' (possible programming error).', STATUS )
          END IF
 
 *  If no WCS FrameSet was supplied, create a new FrameSet containing just 

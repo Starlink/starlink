@@ -20,10 +20,11 @@
 *
 *     1) The domain of the Current Frame in IWCS2, if not blank.
 *     2) "SKY"
-*     3) "PIXEL"
-*     4) "GRID"
-*     5) "ARDAPP"
-*     6) Any other suitable Frame.
+*     3) Pixel coordinates in the mask (i.e. the base Frame of IWCS1)
+*     4) "PIXEL"
+*     5) "GRID"
+*     6) "ARDAPP"
+*     7) Any other suitable Frame.
 *
 *     An error is reported if alignment is not possible.
 
@@ -68,7 +69,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER DOM*80           ! Domain of Current Frame in FrameSet
+      CHARACTER DOM*80           ! Domain of Current Frame in FrameSet 2
+      CHARACTER PDOM*80          ! Domain of Base Frame in FrameSet 1
       CHARACTER DOMLST*255       ! Domain search list
       CHARACTER TEXT*30          ! General text string
       INTEGER IAT                ! No. of characters in string
@@ -105,9 +107,14 @@
 *  FrameSet lives.
       DOM = AST_GETC( IWCS2, 'DOMAIN', STATUS )
 
+*  Get the name of the Domain in which the base Frame of the first
+*  FrameSet lives (pixel coords in the mask array).
+      PDOM = AST_GETC( AST_GETFRAME( IWCS1, AST__BASE, STATUS ),
+     :                 'DOMAIN', STATUS )
+
 *  Create a list of preferences for the Domain in which alignment should
 *  occur. First use the Domain of the Current Frame in IWCS2, then try 
-*  SKY, PIXEL, GRID and ARDAPP, then try any other Domain. 
+*  SKY, pdom, PIXEL, GRID and ARDAPP, then try any other Domain. 
       DOMLST = ' '
       IAT = 0
 
@@ -117,6 +124,13 @@
       END IF
 
       CALL CHR_APPND( 'SKY,PIXEL,GRID,ARDAPP,', DOMLST, IAT )
+
+      IF( PDOM .NE. ' ' .AND. PDOM .NE. 'PIXEL' ) THEN
+         CALL CHR_APPND( PDOM, DOMLST, IAT )
+         CALL CHR_APPND( ',', DOMLST, IAT )
+      END IF
+
+      CALL CHR_APPND( 'PIXEL,GRID,ARDAPP,', DOMLST, IAT )
 
 *  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
 *  returned describing the relationship between the Current Frames in 

@@ -205,12 +205,12 @@
          INDEX1 = REGVAL
       END IF
 
-*  Create an AST FrameSet describing the known coordinate Frames. This
-*  FrameSet will contain a Frame with Domain PIXEL referring to pixel
-*  coords within the pixel mask and another Frame with Domain ARDAPP 
-*  referring to "Application co-ordinates" (i.e. the default user
-*  coordinate system). It may also contain other Frames specified using
-*  the ARD_WCS routine. The PIXEL Frame will be the Base Frame.
+*  Create an AST FrameSet describing the known coordinate Frames. The
+*  base Frame of this FrameSet will be pixel coords within the pixel 
+*  mask, and the current Frame will be "Application co-ordinates" (i.e. 
+*  the default user coordinate system). This Frame wil have Domain ARDAPP.
+*  The FrameSet may also contain other Frames specified using the ARD_WCS 
+*  routine. 
       CALL ARD1_APWCS( NDIM, TRCOEF, AWCS, STATUS )
 
 *  Get work space to hold the algebraic Boolean expression
