@@ -24,13 +24,8 @@ STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
 
 STAR_LATEX_DOCUMENTATION(sun40)
 
-dnl   We do not use messgen to generate the error files for this package.
-dnl   Original .msg file (from Alan Chipperfield) said:
-dnl   ! N.B. This must not be used to generate include files as CHR__ERROR = 1
-dnl   ! is a special case and aliases are defined for the error names for
-dnl   ! historic reasons.
-dnl   Thus the legacy CHR_ERR (renamed from chr_err), and fac_1505_err
-dnl   files are checked in and used instead.
+dnl   We also require an _ext file for the include file
+STAR_MESSGEN(chr_err.msg)
 
 
 dnl   Header checks.  There are no such explicit checks at present,

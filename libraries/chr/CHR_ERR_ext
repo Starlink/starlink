@@ -1,0 +1,22 @@
+*
+*  Non-MESSGEN error codes.
+*
+*  CHR__ERROR = 1
+*    is a special case and aliases are defined for the error names for
+*    historic reasons.
+
+*  CHR__WRDNOTFND and CHR__ENDOFSENT are aliases provided for backwards
+*    compatibility.
+
+*     Error
+      INTEGER CHR__ERROR
+      PARAMETER ( CHR__ERROR = 1 )
+
+*     Word not found
+      INTEGER CHR__WRDNOTFND
+      PARAMETER ( CHR__WRDNOTFND = CHR__WNOTF )
+
+*     End of sentence 
+      INTEGER CHR__ENDOFSENT
+      PARAMETER ( CHR__ENDOFSENT = CHR__EOSNT )
+
