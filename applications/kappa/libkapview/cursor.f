@@ -120,8 +120,8 @@
 *        value must be larger than or equal to -31. [current value]
 *     MAXPOS = _INTEGER (Read)
 *        The maximum number of positions which may be supplied before the
-*        application terminates. The number must be in the range 1 to 500. 
-*        [500]
+*        application terminates. The number must be in the range 1 to 200. 
+*        [200]
 *     MINPOS = _INTEGER (Read)
 *        The minimum number of positions which may be supplied. The user
 *        is asked to supply more if necessary. The number must be in the
@@ -371,7 +371,7 @@
 
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum number of positions
-      PARAMETER ( MAXPTS = 500 )
+      PARAMETER ( MAXPTS = 200 )
 
       INTEGER SZNAM              ! Length of picture name
       PARAMETER ( SZNAM = 15 )
