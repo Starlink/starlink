@@ -212,6 +212,11 @@
 *     wcsedit image1 show
 *        This displays all the coordinate frames in image1 with their 
 *        Domains and titles, and indicates which one is Current.
+*
+*     wcsedit frm mode=add frame=pixel maptype=math simpif simpfi
+*             forexp=["r=sqrt(x*x+y*y)","theta=atan2(y,x)"]
+*             invexp=[x=r*cos(theta),y=r*sin(theta)]
+*        Adds a frame giving a polar coordinate view of the PIXEL frame.
 
 *  Notes:
 *     This routine provides similar functionality to that provided by
@@ -495,8 +500,8 @@
                ELSE IF ( MAPTYP .EQ. 'MATH' ) THEN
 
 *  Get the algebraic expressions for the forward transformation.
- 5                CONTINUE
                   NFEXP = 0
+ 5                CONTINUE
                   CALL PAR_GET1C( 'FOREXP', MAXEXP, FOREXP( NFEXP + 1 ),
      :                            NEXP, STATUS )
                   NFEXP = NFEXP + NEXP
@@ -508,8 +513,8 @@
                  END IF
 
 *  Get the algebraic expressions for the inverse transformation.
- 6                CONTINUE
                   NIEXP = 0
+ 6                CONTINUE
                   CALL PAR_GET1C( 'INVEXP', MAXEXP, INVEXP( NIEXP + 1 ),
      :                            NEXP, STATUS )
                   NIEXP = NIEXP + NEXP
@@ -521,7 +526,8 @@
                   END IF
 
 *  See whether it looks as if non-dummy expressions have been supplied
-*  for both forward and inverse transformations.
+*  for both forward and inverse transformations.  This is not foolproof,
+*  but the consequences of getting it wrong are not serious.
                   FIBOTH = INDEX( FOREXP( NFEXP ), '=' ) .NE. 0
      :               .AND. INDEX( INVEXP( NFEXP ), '=' ) .NE. 0
 
