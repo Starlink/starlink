@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/daophot</path>
+  <description>Stellar Photometry Packagedescription>
+  <abstract>
+    <p>DAOPHOT is a stellar photometry package designed by Peter Stetson
+    at DAO to deal with crowded fields. The package performs various
+    tasks including finding objects, aperture photometry, obtaining the
+    point-spread function, and profile-fitting photometry. 
+    Profile fitting in crowded regions is performed iteratively,
+    which improves the accuracy of the photometry.</p>
+  </abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person><name>Peter Stetson</name><role>Original author</role></person>
+    <person><name>Nicholas Eaton</name></person>
+    <person><name>Grant Privett</name></person>
+    <person><name>Mark Taylor</name></person>
+  </developers>
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
