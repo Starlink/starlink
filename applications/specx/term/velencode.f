@@ -5,6 +5,10 @@
 *        Replace CHR_UCASE with UUCASE
 *      1 Aug 2000 (ajc):
 *        Change TYPE * to PRINT *
+*      12 Apr 2004 (timj):
+*        JCMT Only guarantees first 3 characters of VFRAMES to be
+*        okay for matching.
+*        Trap case where we do not recognize either VDEF or VFRAME
 *-----------------------------------------------------------------------
 
       SUBROUTINE VELENCODE (VFRAME, VDEF, LSRFLG)
@@ -38,7 +42,10 @@
 
       VDEFT = VDEF(1:3)
       CALL UUCASE (VDEFT)
-      VFRAMET = VFRAME(1:4)
+
+*  Only compare first 3 characters, not 4 (historically JCMT
+*  only used first 3)
+      VFRAMET = VFRAME(1:3)
       CALL UUCASE (VFRAMET)
 
 D     PRINT *, ' -- velencode --'
@@ -49,16 +56,31 @@ D     PRINT *, '    vel law   = ', VDEFT
       DO WHILE (I.LE.3 .AND. VDEFT.NE.VDEFS(I))
         I = I + 1
       END DO
-        
+
+      IF ( I .GT. 3 ) THEN
+         print *,'Did not understand velocity definition string: ',
+     +    VDEFT
+         print *,'Assuming RADIO'
+         I = 1
+      END IF
+
       J = 1
-      DO WHILE (J.LE.6 .AND. VFRAMET.NE.VFRAMES(J))
+      DO WHILE (J.LE.6 .AND. VFRAMET.NE.VFRAMES(J)(1:3))
         J = J + 1
       END DO
+      print *,'J for frame = ',J,' and I', I
 
 *     Equate BARYCENTRIC with GEOCENTRIC
       IF (J.EQ.5) J = 4
 *     Equate TELLURIC with TOPOCENTRIC
       IF (J.EQ.6) J = 1
+
+      IF (J .GT. 6 ) THEN
+         print *,'Internal error. Did not recognize velocity frame: ',
+     +        VFRAMET
+         print *,'Assuming LSR'
+         J = 2
+      END IF
 
       LSRFLG = 16*(I-1) + (J-1)
 
