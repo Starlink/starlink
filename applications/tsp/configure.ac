@@ -30,7 +30,7 @@ dnl    Private error file
 STAR_MESSGEN(user_err.msg)
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sla figaro ndf])
+STAR_DECLARE_DEPENDENCIES([build], [sla figaro ndf ifd])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
