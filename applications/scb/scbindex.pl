@@ -199,7 +199,7 @@ foreach $iname (@indexes) {
 
 $taskfile = "$indexdir/tasks";
 
-if (@ARGV && open TASKS, $taskfile) {
+if ($fmode eq 'update' && open TASKS, $taskfile) {
    my ($pack, $itime, $tasks);
    while (<TASKS>) {
       ($pack, $itime, $tasks) = split ":", $_;
@@ -353,14 +353,14 @@ sub index_pack {
 #  Check that we want to index this file (either $update_only is unset,
 #  or there are files more recent than the last index).
 
-   if ($update_only) {
+   if ($update_only && defined $itime{$package}) {
       my $uptodate = 1;
       if ((stat $pack_file)[9] > $itime{$package}) {
          $uptodate = 0;
       }
-      if (-d $pack_file ) {
+      if (-d $pack_file && $uptodate) {
          my $f;
-         foreach $f (<$pack_file/*>) {
+         foreach $f (glob "$pack_file/*") {
             if ((stat $f)[9] > $itime{$package}) {
                $uptodate = 0;
                last;
