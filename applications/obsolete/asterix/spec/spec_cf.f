@@ -1,5 +1,6 @@
 *+ SPEC_CF - Constant pressure cooling flow model
-      SUBROUTINE SPEC_CF(NDS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,STATUS)
+      SUBROUTINE SPEC_CF(GENUS,NDS,NEN,ELBOUND,EUBOUND,PARAM,
+     :                   FLUX,STATUS)
 *
 *    Description :
 *
@@ -50,6 +51,7 @@
 *
 *     15 May 91 : Original (TJP)
 *     25 Feb 93 : Error handling corrected (DJA)
+*     31 Jul 95 : Added GENUS is first argument (DJA)
 *
 *    Type definitions :
 *
@@ -61,6 +63,7 @@
 *
 *    Import :
 *
+      CHARACTER*(*)		GENUS			! Fit genus
 	INTEGER NDS			! Dataset number
 	INTEGER NEN			! No of energy channels
 	REAL ELBOUND(NEN)		! Lower bin bounds (keV)
@@ -127,7 +130,7 @@
 D	  print *,'tlo,thi,tav:',tlo,thi,tav
 
 *   Get spectral and bolometric emissivity
-	  CALL SPEC_RZ_EMISS('SPEC',NDS,TAV,Z,NEN,ELBOUND,EUBOUND,PARAM,
+	  CALL SPEC_RZ_EMISS(GENUS,NDS,TAV,Z,NEN,ELBOUND,EUBOUND,PARAM,
      :	  %VAL(EMSPTR),STATUS)
 	  CALL SPEC_RZ_BOL(NDS,TAV,Z,EMTOT,STATUS)
 	  IF(STATUS.NE.SAI__OK) GO TO 9000

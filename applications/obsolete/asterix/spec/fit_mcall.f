@@ -46,6 +46,7 @@
 *     18 Aug 93 : Handles keys of any length (DJA)
 *      7 Jan 94 : SLICE_DEF and SLICE arguments added. No uses NPAR and only
 *                 has access to its own parameters. (DJA)
+*     31 Jul 95 : Added GENUS parameter to SPEC_CF (DJA)
 *
 *    Type definitions :
 *
@@ -155,7 +156,8 @@
 	  ELSE IF(KEY.EQ.'DM')THEN
 	    CALL SPEC_DM(ND,NMDAT,MLBOUND,MUBOUND,PARAM,PRED,STATUS)
 	  ELSE IF(KEY.EQ.'CF')THEN
-	    CALL SPEC_CF(ND,NMDAT,MLBOUND,MUBOUND,PARAM,PRED,STATUS)
+	    CALL SPEC_CF(GENUS,ND,NMDAT,MLBOUND,MUBOUND,PARAM,PRED,
+     :                   STATUS)
 	  ELSE IF(KEY.EQ.'LG')THEN
 	    CALL SPEC_LG(NMDAT,MLBOUND,MUBOUND,PARAM,PRED,STATUS)
 	  ELSE IF(KEY.EQ.'LL')THEN
