@@ -116,6 +116,11 @@ such as \name{COMPLEX}.
 The \name{CHR} facility should be used for processing character data and for
 converting between character and numerical data types. 
 
+Note added March 2004: This manual refers throughout to VAX floats.
+The package was ported to Unix in 1991, and accordingly most of the
+values now defined by it are those appropriate for IEEE floats
+instead; the manual has not been updated to match.
+
 \subsection{The \name{VAL}, \name{VEC} and \name{NUM} Facilities}
 
 The routines in this package have names of the form
@@ -1117,6 +1122,8 @@ where \name{$<$T$>$} is one of the type codes in Table~\ref{table:types} and
 \name{$<$const$>$} specifies the quantity which the constant represents. 
 In most cases, the two forms of the constant are necessarily identical and
 only the \name{VAL\_\_} form is provided. 
+
+The constants are also available in the C include file \name{prm\_par.h}.
 
 Note that many of these constants may need to change if transported to
 another machine.\footnote{
