@@ -169,7 +169,8 @@ itcl::class gaia::GaiaPhotomObject {
                   index xpos ypos mag magerr sky signal code positions
             } else {
                lassign $args \
-                  index xpos ypos fwhm1 fwhm2 angle code clip seeing positions
+                  index xpos ypos fwhm1 fwhm2 angle code major seeing positions
+               set index 0
             }
          }
       }
@@ -251,7 +252,7 @@ itcl::class gaia::GaiaPhotomObject {
    #  Return the values of all options. If mode is "all" then for
    #  apertures the extended form is used, otherwise only basic PHOTOM
    #  values are returned. If object isn't measured then this will
-   #  return the defaults (index of 0).
+   #  return the defaults.
    public method getvalues {{mode all}} {
 
       #  Make sure values are up to date as canvas zoom events are
@@ -262,14 +263,13 @@ itcl::class gaia::GaiaPhotomObject {
       } else {
          update_ellipse $canvas_id_ resize
       }
-
       if { $phottype == "aperture" } {
-         return getapvals_ $mode
+         return [getapvals_ $mode]
       } else {
          if { $psf } {
-            return getpsfvals_
+            return [getpsfvals_]
          } else {
-            return getoptvals_
+            return [getoptvals_]
          }
       }
    }
@@ -292,13 +292,15 @@ itcl::class gaia::GaiaPhotomObject {
       return "$description"
    }
 
-   #  Return a list of current psf object values.
+   #  Return a list of current psf object values. Only index 0 is allowed.
    protected method getpsfvals_ {} {
       lassign [image_coord $xpos $ypos] x y
+      set maj [image_dist $major]
       set ang [image_angle $angle]
+      configure -index 0
       set description \
-         "[format {%10d %10f %10f %10f %10f %10f %10f %10s %10f %10s} \
-             $index $x $y $fwhm1 $fwhm2 $ang $code $clip $seeing $positions]"
+         "[format {%10d %10f %10f %10f %10f %10f %10s %10f %10f %10s} \
+             $index $x $y $fwhm1 $fwhm2 $ang $code $maj $seeing $positions]"
       append description "\n[list_sky_]"
       return $description
    }
@@ -307,7 +309,7 @@ itcl::class gaia::GaiaPhotomObject {
    protected method getoptvals_ {} {
       lassign [image_coord $xpos $ypos] x y
       set description \
-         "[format {%10d %10f %10f %10f %10f %10f %10s %10f %10f %10s} \
+         "[format {%10d %10f %10f %10f %10f %10f %10f %10s %10s} \
              $index $x $y $mag $magerr $sky $signal $code $positions]"
       append description "\n[list_sky_]"
       return $description
@@ -356,8 +358,8 @@ itcl::class gaia::GaiaPhotomObject {
    }
 
    #  Method to return values specific to the aperture (quick form of
-   #  getapvals_).
-   public method aperture_details {} {
+   #  getapvals_ and friends).
+   public method object_details {} {
 
       #  Make sure values are up to date as canvas zoom events are
       #  never received.
@@ -366,6 +368,21 @@ itcl::class gaia::GaiaPhotomObject {
       } else {
          update_ellipse $canvas_id_ resize
       }
+
+      if { $phottype == "aperture" } {
+         return [getapdets_]
+      } else {
+         if { $psf } {
+            return [getpsfdets_]
+         } else {
+            return [getoptdets_]
+         }
+      }
+
+   }
+   
+   #  Return aperture details.
+   protected method getapdets_ {} {
       lassign [image_coord $xpos $ypos] x y
       set maj [image_dist $major]
       set ang [image_angle $angle]
@@ -373,6 +390,23 @@ itcl::class gaia::GaiaPhotomObject {
       return "$index $x $y $mag $magerr $sky $signal $code $maj \
               $eccen $ang $positions $innerscale $outerscale"
    }
+
+   #  Return optimal details.
+   protected method getoptdets_ {} {
+      lassign [image_coord $xpos $ypos] x y
+      return "$index $x $y $mag $magerr $sky $signal $code \
+              $positions $innerscale $outerscale"
+   }   
+
+   #  Return PSF details.
+   protected method getpsfdets_ {} {
+      lassign [image_coord $xpos $ypos] x y
+      set maj [image_dist $major]
+      set ang [image_angle $angle]
+      configure -index 0
+      return "$index $x $y $fwhm1 $fwhm2 $angle $code $maj $seeing \
+              $positions $innerscale $outerscale"
+   }   
 
    #  Status of object.
    public method status {} {
@@ -685,7 +719,7 @@ itcl::class gaia::GaiaPhotomObject {
          set major $tmajor
          set eccen $teccen
          set angle $tangle
-         set minor [expr $major*(1.0-$eccen*$eccen)]
+         set minor [expr $major*sqrt(1.0-$eccen*$eccen)]
 
          #  Get the position of the ellipse and create it.
          bind $canvas <1> [code eval $this placed_ellipse_ $canvasX_ $canvasY_]
@@ -1138,7 +1172,7 @@ itcl::class gaia::GaiaPhotomObject {
    }
 
    #  Return a header caption for formatted output lists.
-   proc header {mode} {
+   proc header {mode {phottype aperture} {psf 0}} {
       if { $phottype == "aperture" } {
          if { "$mode" == "all" } {
             return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
@@ -1153,10 +1187,10 @@ itcl::class gaia::GaiaPhotomObject {
          }
       } else {
          if { $psf } {
-            return [format {%10d %10f %10f %10f %10f %10f %10f %10s %10f %10s} \
-                       Index Xpos Ypos Fwhm1 Fwhm2 Rot Code Clip Seeing]
+            return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s %10s} \
+                       Index Xpos Ypos Fwhm1 Fwhm2 Rot Code Clip Seeing Positions]
          } else {
-            return [format {%10d %10f %10f %10f %10f %10f %10s %10f %10f %10s} \
+            return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s} \
                        Index Xpos Ypos Mag Magerr Sky Signal Code Positions]
          }
       }
@@ -1258,8 +1292,8 @@ itcl::class gaia::GaiaPhotomObject {
    }
    public variable shape {circle} {
       if { $state_ != "new" } {
-         puts stderr \
-            {It's not possible to change the aperture shape after creation.}
+         #  puts stderr \
+         #  {It's not possible to change the aperture shape after creation.}
          set shape $first_shape_
          notify_change
       } else {
@@ -1287,7 +1321,6 @@ itcl::class gaia::GaiaPhotomObject {
    #  A PSF object defines these extra fields.
    public variable fwhm1 2 {}
    public variable fwhm2 2 {}
-   public variable clip 5 {}
    public variable seeing 2 {}
 
    #  Command to execute if object is possibly updated.
