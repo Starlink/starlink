@@ -651,6 +651,7 @@ sub ndf_info ($$$$) {
     for (my $i=0; $i<=$#fits; $i++) {
 	my ($keyword, $value, $comment) = fits_get_nth_item (@fits, $i);
 	if (defined($keyword) && defined($value)) {
+            $value =~ s/^\s+//; # trim leading spaces
 	    $fitshash{$keyword} = $value;
 	}			# ignore `malformed' cards: blank, HISTORY, END
     }
@@ -660,45 +661,46 @@ sub ndf_info ($$$$) {
     my $ndfdates = get_dates ($indf, $helpers, \%fitshash);
 
     # Attempt to obtain observation for ASTROM observation records
-    # ASTROM Time record
+    # ASTROM Time record. FITS values are most likely to be correct.
     if (defined($obsdata->{time})) {
-	# Command-line specification of time.  We already know that
-	# this is one of the three formats acceptable to ASTROM, so we
-	# simply need to change separator characters to spaces.
-	my $obstime = $obsdata->{time};
-	$obstime =~ s/[^-0-9.]/ /;
-	$returnhash{astromtime} = $obstime;
-	$returnhash{astromtimecomment} = "command-line time";
-    } elsif (defined($ndfdates->{nst})) {
-	my @sthms = split (/[^0-9]+/,$ndfdates->{nst});
-	$returnhash{astromtime} = sprintf ("%d %f",
-					   $sthms[0],
-					   $sthms[1]+($sthms[2]/60));
-	$returnhash{astromtimecomment} = "NDF Sidereal time";
+        # Command-line specification of time.  We already know that
+        # this is one of the three formats acceptable to ASTROM, so we
+        # simply need to change separator characters to spaces.
+        my $obstime = $obsdata->{time};
+        $obstime =~ s/[^-0-9.]/ /;
+        $returnhash{astromtime} = $obstime;
+        $returnhash{astromtimecomment} = "command-line time";
+   } elsif (defined($ndfdates->{fje})) {
+        $returnhash{astromtime} = $ndfdates->{fje};
+       $returnhash{astromtimecomment} = "FITS JE";
+   # PWD: what was nst? Never defined.
+   # } elsif (defined($ndfdates->{nst})) {
+   #     my @sthms = split (/[^0-9]+/,$ndfdates->{nst});
+   #     $returnhash{astromtime} = sprintf ("%d %f",
+   #                                        $sthms[0],
+   #                                        $sthms[1]+($sthms[2]/60));
+   #     $returnhash{astromtimecomment} = "NDF Sidereal time";
     } elsif (defined($ndfdates->{fst})) {
-	my @sthms = split (/[^0-9]+/,$ndfdates->{fst});
-	$returnhash{astromtime} = sprintf ("%d %f",
-					   $sthms[0],
-					   $sthms[1]+($sthms[2]/60));
-	$returnhash{astromtimecomment} = "FITS ST";
+        my @sthms = split (/[^0-9^\.]+/,$ndfdates->{fst});
+        $returnhash{astromtime} = sprintf ("%d %f",
+                                           $sthms[0],
+                                           $sthms[1]+($sthms[2]/60));
+        $returnhash{astromtimecomment} = "FITS ST";
     } elsif (defined($ndfdates->{nje})) {
-	# Epoch is a valid Time record in our custom ASTROM, but not
-	# (yet?) in standard ASTROM.
-	$returnhash{astromtime} = $ndfdates->{nje};
-	$returnhash{astromtimecomment} = "NDF JE";
-    } elsif (defined($ndfdates->{fje})) {
-	$returnhash{astromtime} = $ndfdates->{fje};
-	$returnhash{astromtimecomment} = "FITS JE";
+        # Epoch is a valid Time record in our custom ASTROM, but not
+        # (yet?) in standard ASTROM.
+        $returnhash{astromtime} = $ndfdates->{nje};
+        $returnhash{astromtimecomment} = "NDF JE";
     } elsif (defined($obsdata->{ra})) {
-	# We have no other information about the observation time.  In
-	# this situation, the ASTROM documentation states that it is
-	# legitimate to guess that the observation occurred near upper
-	# culmination, so that we can set the ST to be the
-	# plate-centre RA.  We don't have ready access to the
-	# WCS information in the NDF, else we could use that.
-	my @cmdra = split (/[^0-9]+/, $obsdata->{ra});
-	$returnhash{astromtime} = "$cmdra[0] $cmdra[1]";
-	$returnhash{astromtimecomment} = "command-line RA";
+        # We have no other information about the observation time.  In
+        # this situation, the ASTROM documentation states that it is
+        # legitimate to guess that the observation occurred near upper
+        # culmination, so that we can set the ST to be the
+        # plate-centre RA.  We don't have ready access to the
+        # WCS information in the NDF, else we could use that.
+        my @cmdra = split (/[^0-9^\.]+/, $obsdata->{ra});
+        $returnhash{astromtime} = "$cmdra[0] $cmdra[1]";
+        $returnhash{astromtimecomment} = "command-line RA";
     } elsif (defined($fitshash{CRVAL1})) {
 	# Take it from the FITS extension
 
