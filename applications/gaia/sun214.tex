@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.9}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {6 April 2001}
+\newcommand{\stardocdate}      {13 September 2001}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.6}
@@ -300,7 +300,35 @@ display and catalogue browsing tool, developed as part of the
 \htmladdnormallinkfoot{ESO}{http://www.eso.org/}. SkyCat is free software
 under the terms of the GNU copyright.
 
-\section{\xlabel{using_gaia_from_the_cshell}Using GAIA from the C-shell}
+\section{\xlabel{getting_started}Getting Started}
+
+The following two sections describe the absolute basics of how to
+startup GAIA and how to display images using it. If you need help
+beyond this, and are new to GAIA, then you should probably read the
+`The GAIA CookBook' (\xref{SC/17}{sc17}{}). In addition to the usual
+introductory text this also contains several recipes for achieving
+specific tasks (such as measuring instrumental magnitudes and making
+use of celestial coordinate information).
+
+The other main source of information about GAIA is the on-line
+system. This can only be accessed after starting GAIA (just select the
+\mytt{Help} menus). Many windows also feature `short help'. This is a
+retangular region at the bottom of a window that may display a
+one-line description of the window element under the cursor (an
+approximation of balloon help).
+
+If you need help beyond what is available in these resources (or have
+any suggestions for improvements), then send an email message to:
+\begin{quote}
+\htmladdnormallink{\mytt{gaia@star.rl.ac.uk}}{mailto:gaia@star.rl.ac.uk}.
+\end{quote}
+The GAIA home page (which should have a current list of known bugs and
+work arounds) is at:
+\begin{quote}
+\htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
+\end{quote}
+
+\subsection{\xlabel{using_gaia_from_the_cshell}Using GAIA from the C-shell}
 
 To display an image in GAIA use the following command
 (assuming that you are already initialized to use Starlink software):
@@ -308,8 +336,6 @@ To display an image in GAIA use the following command
 \mytt{\% gaia image\_name}
 \end{quote}
 Alternatively you can use the \mytt{File} menu to load an image.
-Information about specific toolbox windows is available in the
-\mytt{Help} menus.
 
 If you want to display an image in an existing GAIA then use the
 invocation:
@@ -323,7 +349,7 @@ You can also write to a specific window using the clone number:
 This displays into the window with title \mytt{GAIA::SkyCat (2)}. If
 this window doesn't exist it will be created.
 
-\section{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
+\subsection{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
 
 GAIA can be used from the IRAF/CL command-line (providing it has been
 installed on your system). Before you can actually run the main program
@@ -344,28 +370,20 @@ This will either display into an existing GAIA or start up a new
 instance. Note that GAIA is not an IRAF image display and will
 consequently not support any IRAF cursor commands.
 
-\section{Problems}
-
-If you have any problems with GAIA (or suggestions for improvements),
-then send an email message to
-\htmladdnormallink{\mytt{gaia@star.rl.ac.uk}}{mailto:gaia@star.rl.ac.uk}.
-The GAIA home page (which should have a current list of known bugs and
-work arounds) is at
-\htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
-
 \section{\xlabel{what_does_it_actually_do}What does it actually do?}
 
 The capabilities of GAIA fall roughly into three areas; those of an
-image display tool, those provided for the analysis of images and those
-for querying on-line resources (catalogues of images and data). Each
-of these areas is described very briefly in the next sections. As with
-most graphical tools, probably the best way to find out about GAIA is
-to explore it interactively. For specific windows (those which are
-more GAIA than SkyCat) help is available on-line (look for a ``Help''
-menu in the upper right of a window); many windows also
-feature short one-line help descriptions of their controls.
+image display tool, those provided for the analysis of images and
+those for querying on-line resources (catalogues of images and
+data). Each of these areas is described very briefly in the next
+sections. As with most graphical tools, probably the best way to find
+out about GAIA is to explore it interactively. Failing that many
+windows have a one-page description in the on-line help system and
+most graphical elements (\textit{buttons, entry fields etc.}) have
+one-line descriptions that appear in the short-help region at the
+bottom of windows.
 
-Windows that provide a limited range of controls for somekind of
+Windows that provide a limited range of controls for some kind of
 focussed task are called `toolboxes'. In general what they do should
 be obvious or they are really front-ends for other software
 packages. Good examples of this latter type are the photometry and
@@ -447,7 +465,7 @@ astronomical work with images:
  line colours and thicknesses is provided.
 
 \item Polarization vector plotting and manipulation. This provides the
- abilitity to display vector maps produced by the POLPACK
+ ability to display vector maps produced by the POLPACK
  (\xref{SUN/223}{sun223}{}) package. It also allows you to select
  sub-sets of vectors, either by algebraic expressions or by rectangular
  regions. Selected parts can be removed or saved to new catalogues. New
@@ -659,8 +677,10 @@ local catalogue (which you can then edit into your tab files).
 
 To find out more about the TST format and how to configure plot
 symbols you should consult the ESO document
-\htmladdnormallinkfoot{``Astronomical Catalog Library''.}
-{http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}
+\htmladdnormallinkfoot{`Astronomical Catalog Library'}
+{http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz} and 
+`Writing Catalogue and Image Servers for GAIA and CURSA '
+(\xref{SSN/75}{ssn75}{}).
 
 \subsubsection{FITS tables} Much of the above also applies to FITS tables
 that GAIA will read, \textit{i.e.} FITS keywords with the names
@@ -853,71 +873,6 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
-\subsection{Release - 2.3}
-  This release includes two new toolboxes and many other enhancements.
-
-  The new toolboxes are:
-  \begin{itemize}
-     \item Contouring
-     \item Optimal photometry
-  \end{itemize}
-
-  The contouring toolbox allows the overlay of contours from different
-  images, possibly aligned using sky coordinates (naturally it also
-  allows you to contour the displayed image). It also provides control
-  of the colour and line thickness of each contour.
-
-  The optimal photometry toolbox provides facilities similar to the
-  aperture photometry toolbox, both of which are based on the PHOTOM
-  program AUTOPHOTOM (see \xref{SUN/45}{sun45}{}).
-
-  The version of Skycat that GAIA is based on is now 2.4. This has
-  improved catalogue facilities, an image "history" mechanism, main
-  window geometry history, web proxy server dialog, histogram
-  equalization, HTTP password support and many less significant changes.
-
-  Other changes to GAIA include:
-  \begin{itemize}
-    \item The image panel now has quick selections for colour tables and
-      intensity maps, as well as data cuts.
-
-    \item The Sextractor toolbox is updated to work with version 2.0.19.
-      This supports the new parameters:
-        \begin{itemize}
-           \item \mytt{BACK\_TYPE}, \mytt{BACK\_VALUE} and \mytt{THRESH\_TYPE}.
-        \end{itemize}
-
-    \item Sextractor bug fixes:
-        \begin{itemize}
-          \item Photometry aperture now use the given size.
-          \item The messages window now only shows one copy of
-                the output from Sextractor, not two.
-          \item The ranges of scales in the photometry section are
-                now allowed to be outside of the initial range.
-        \end{itemize}
-
-    \item A new method for transferring astrometry between images has been
-      added to the \mytt{Fit to star positions...} toolbox. This works by
-      selecting positions on the reference image and then selecting the
-      same positions on the target image.
-
-    \item The aperture photometry toolbox has been considerably
-      reworked. Fixed apertures are now re-sizable (but keep all the
-      same size) and the general layout is changed. Measurements can
-      be saved and appended to a named file. You can now also change
-      the aperture colours.
-
-    \item The measure band now works when image is scrolled and zoomed.
-
-    \item  The \mytt{pick} and \mytt{ard} toolboxes can now
-           save/append their results to a file.
-
-    \item Many others too numerous to mention.
-\end{itemize}
-Internally there have been many changes to GAIA, one consequence of
-which is that most of the keyboard shortcuts are changed. Most
-notably the interactive slice is now bound to \mytt{<control-a>}.
-
 \subsection{Release - 2.4}
 This is a minor release of GAIA that includes a new toolbox and some
 minor improvements/fixes.
@@ -986,8 +941,9 @@ This is a minor update to GAIA with the following fixes:
 \end{itemize}
 
 \subsection{Release - 2.5}
-  This release includes two new toolboxes, various significant
-  improvements and some bug fixes.
+  This release (which was only available from the Starlink Software
+  Store) includes two new toolboxes, various significant improvements
+  and some bug fixes. 
 
   The first new toolbox provides the long awaited ability to identify
   and record image positions interactively. It also allows the import
@@ -1072,9 +1028,12 @@ This is a minor update to GAIA with the following fixes:
        figures and a more unified presentation.
 
      \item BITPIX -64 FITS files (i.e. double precision) can now be
-       displayed, but note that some external applications cannot
-       properly process this format (e.g. \xref{AUTOPHOTOM}{sun45}{AUTOPHOTOM}
-       and \xref{EXTRACTOR}{sun226}{}).
+       displayed, but note that some external applications that are
+       used by GAIA cannot properly process this format
+       (e.g. \xref{AUTOPHOTOM}{sun45}{AUTOPHOTOM} and
+       \xref{EXTRACTOR}{sun226}{} which are used by the photometry 
+       and object detection toolboxes will truncate to single
+       precision floating point). 
 
      \item The contour toolbox now has new options to use a single colour
        and/or width for all lines.
@@ -1101,7 +1060,7 @@ This is a minor update to GAIA with the following fixes:
 
      \item The irritating 
            \verb+failed to register the shmem:// driver+ 
-       warning message should now be silent.
+       warning message should now be silent. This warning was harmless.
 
      \item The pan window should now work with very thin images (1 pixel wide).
 
@@ -1127,6 +1086,14 @@ This is a minor update to GAIA with the following fixes:
        operations may need much more memory). If you attempt this
        you will still require a system whose virtual memory size is
        bigger than 2Gb.
+
+     \item An error in the RMS fitting estimate for the astrometric
+       toolboxes has been corrected. Previous RMS values were all
+       underestimates by a factor $1/\sqrt{n}$.
+     
+     \item The rendering of ellipses drawn as graphics overlays (such
+       as those used to show object detections) has been improved,
+       especially at low resolutions.
 \end{itemize}
 
 \section{\xlabel{acknowledgements}Acknowledgements}
@@ -1137,7 +1104,7 @@ Daniel Durand and Peter Biereichel, who are responsible for the
 developments at ESO, in particular for making their software free for
 general use.
 GAIA and SkyCat are both based on the scripting language
-\htmladdnormallinkfoot{Tcl/Tk}{http://dev.scriptics.com/} developed by
+\htmladdnormallinkfoot{Tcl/Tk}{http://tcl.activestate.com/} developed by
 John Ousterhout and the \htmladdnormallinkfoot{[incr Tcl]}
 {http://www.tcltk.com/} object oriented extensions developed by
 Michael McLennan.

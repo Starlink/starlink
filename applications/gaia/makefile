@@ -220,6 +220,10 @@
 #        Copy and link for installed documentation.
 #     02-MAY-2001 (PWD):
 #        Update for new on-line help system and GAIA 2.6 release.
+#     13-SEP-2001 (PWD):
+#        Added targets for installing the include files and libraries
+#        used when compiling and linking the UKIRT quick look
+#        facility. These are $(PUBLIC_INCLUDES) and $(OBJECT_LIBRARIES).
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -442,6 +446,13 @@ LINK_SCRIPT =
 
 ICL_SCRIPT =
 
+#  List of public include files.  These are include files which are
+#  necessary for compiling programs that want to use the real-time
+#  event system. They will be installed in the $(INSTALL_INC)
+#  directory. Note rtdConfig.h is really just config.h from RTD.
+
+PUBLIC_INCLUDES = rtdImageEvent.h rtdConfig.h
+
 #  List of private include files.  These are include files
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
@@ -521,7 +532,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
                 $(PKG_NAME).news $(HYPERTEXT_HELP:.htx=.htx_tar)
 
 #  List of files that should be created and copied into the runtime
-#  directory for a sucessful built of GAIA.
+#  directory for a sucessful build of GAIA.
 
 GAIA_LIB_FILES =  \
    skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
@@ -535,11 +546,9 @@ GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 
 GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES)
 
-SKYCAT_FILES = \
- rtdServer rtdClient rtdCubeDisplay
+SKYCAT_FILES = rtdServer rtdClient rtdCubeDisplay
 
-TCL_FILES = \
- bltCanvEps.pro bltGraph.pro
+TCL_FILES = bltCanvEps.pro bltGraph.pro
 
 #  Names of all these files.
 
@@ -574,9 +583,9 @@ RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = \
- $(PUBLIC_SCRIPTS) $(RUNTIME_FILES) \
- $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
+BUILT_FILES = $(PUBLIC_SCRIPTS) $(RUNTIME_FILES) $(IRAF_SCRIPTS) \
+              $(IRAF_HELP) helpdb.mip \
+              $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -643,6 +652,8 @@ INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
+INSTALL_INC = $(INSTALL)/include
+INSTALL_LIB = $(INSTALL)/lib
 INSTALL_HYPERHELP = $(INSTALL)/help
 
 #  And the IRAF equivalents.
@@ -654,7 +665,8 @@ INSTALL_IRAF_DOC = $(INSTALL)/iraf/$(PKG_NAME)/doc
 
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) \
                $(INSTALL_HELP) $(INSTALL_MAPS) $(INSTALL_IRAF_BIN) \
-	       $(INSTALL_IRAF_DOC) $(INSTALL_HYPERHELP)
+	       $(INSTALL_IRAF_DOC) $(INSTALL_HYPERHELP) \
+	       $(INSTALL_INC) $(INSTALL_LIBS)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
@@ -687,7 +699,7 @@ $(TCL_FILES): .tcl.built
 	done
 	touch .tcl.built
 
-#  Rule for building the rtd installation. Again we will actually only
+#  Rule for building the skycat installation. Again we will actually only
 #  install part of this. Note SKYCAT_WRAPPER_DIR works around need for
 #  tclpro (ET build succeeds, but produces an invalid binary).
 $(SKYCAT_FILES): .skycat.built
@@ -706,7 +718,14 @@ $(SKYCAT_FILES): .skycat.built
 	cp -p ./built/bin/rtdClient .
 	cp -p ./built/bin/rtdServer .
 	cp -p ./built/bin/rtdCubeDisplay .
+	cp -p ./built/include/rtd/config.h rtdConfig.h
+	cp -p ./built/include/rtd/rtdImageEvent.h .
+	cp -p ./built/lib/rtdImgEvt.a .
 	touch .skycat.built
+
+#  Names of any object libraries that are required for using the
+#  realtime event system of RTD.
+OBJECT_LIBRARIES = librtdImgEvt.a
 
 #  Rule for building the GAIA installation. This installs into built/
 #  as do the other components. These are then all lifted from built/
@@ -928,6 +947,26 @@ install:
 	   else :; fi;\
 	done
 #
+#  Install the public include files, giving them world read permission.
+	for f in $(PUBLIC_INCLUDES) ""; do \
+	   if test -n "$$f"; then \
+	      cp -p $$f $(INSTALL_INC);\
+	      chmod 644 $(INSTALL_INC)/$$f;\
+	      rm -f $$f;\
+	      $(LINK) $(INSTALL_INC)/$$f $$f;\
+	   else :; fi;\
+	done
+#
+#  Install the object libraries, giving them world read permission.
+	for f in $(OBJECT_LIBRARIES) ""; do \
+	   if test -n "$$f"; then \
+	      cp -p $$f $(INSTALL_LIB);\
+	      chmod 644 $(INSTALL_LIB)/$$f;\
+	      rm -f $$f;\
+	      $(LINK) $(INSTALL_LIB)/$$f $$f;\
+	   else :; fi;\
+	done
+#
 #  Install the whole runtime system.
 	for f in $(RUNTIME_FILES) ""; do \
 	   if test -n "$$f"; then \
@@ -1128,6 +1167,24 @@ do_deinstall:
 	      rm -f $$f;\
 	      cp -p $(INSTALL_BIN)/$$f .;\
 	      rm -f $(INSTALL_BIN)/$$f;\
+	   else :; fi;\
+	done
+#
+#  Deinstall the public include files, if installed versions exist.
+	- for f in $(PUBLIC_INCLUDES) ""; do \
+	   if test -n "$$f" -a -f $(INSTALL_INC)/$$f; then \
+	      rm -f $$f;\
+	      cp -p $(INSTALL_INC)/$$f .;\
+	      rm -f $(INSTALL_INC)/$$f;\
+	   else :; fi;\
+	done
+#
+#  Deinstall the object libraries, if installed versions exist.
+	- for f in $(OBJECT_LIBRARIES) ""; do \
+	   if test -n "$$f" -a -f $(INSTALL_LIB)/$$f; then \
+	      rm -f $$f;\
+	      cp -p $(INSTALL_LIB)/$$f .;\
+	      rm -f $(INSTALL_LIB)/$$f;\
 	   else :; fi;\
 	done
 #
@@ -1350,9 +1407,9 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(PUBLIC_SCRIPTS) $(RUNTIME_FILES)  \
-		$(DATE_STAMP) $(IRAF_SCRIPTS) \
-		$(IRAF_HELP) helpdb.mip .BUILT .gaia.built \
-		.skycat.built .tcl.built \
+		$(DATE_STAMP) $(IRAF_SCRIPTS) $(PUBLIC_INCLUDES) \
+	        $(OBJECT_LIBRARIES) $(IRAF_HELP) helpdb.mip \
+	        .BUILT .gaia.built .skycat.built .tcl.built \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 
 #  export_run: Export the built system (without source).
@@ -1388,8 +1445,9 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(PUBLIC_SCRIPTS) \
-	   $(RUNTIME_FILES) $(DATA_FILES) \
-	   $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip $(DATE_STAMP) .BUILT \
+	   $(RUNTIME_FILES) $(DATA_FILES) $(PUBLIC_INCLUDES) \
+	   $(OBJECT_LIBRARIES) $(IRAF_SCRIPTS) $(IRAF_HELP) \
+	   helpdb.mip $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
