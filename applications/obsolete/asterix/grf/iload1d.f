@@ -32,7 +32,7 @@
       IF (.NOT.I_OPEN) THEN
         CALL AST_INIT()
         I_BGM_ON = .FALSE.
-        I_OPEN - .TRUE.
+        I_OPEN = .TRUE.
       ELSE
         CALL USI_INIT()
       ENDIF
