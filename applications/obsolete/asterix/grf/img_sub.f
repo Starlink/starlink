@@ -5023,6 +5023,7 @@ c      REAL HWID
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -5036,7 +5037,7 @@ c      REAL HWID
       INTEGER I,J,II,JJ
       INTEGER I1,I2,J1,J2
       INTEGER ISTAT
-      INTEGER XPMID,YPMID,FID,XID,YID
+      INTEGER XPID,YPID,XPMID,YPMID,FID,XID,YID
       INTEGER FLAG
       INTEGER NB
       REAL XP1,XP2,YP1,YP2
