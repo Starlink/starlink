@@ -273,8 +273,12 @@
 
 *  Use the third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-               CALL AST_TRAN1( MAPS( 3 ), 1, ZAX, .FALSE., ZCOL, 
-     :                         STATUS )
+               IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
+                  CALL AST_TRAN1( MAPS( 3 ), 1, ZAX, .FALSE., ZCOL, 
+     :                            STATUS )
+               ELSE
+                  ZCOL = AST__BAD 
+               END IF
 
 *  If the result was undefined, issue an error, flush it, and use the
 *  lowest availabel Z value.
@@ -304,8 +308,11 @@
          END IF
 
 *  Find the Z axis value corresponding to the Z column value to be used.
-         CALL AST_TRAN1( MAPS( 3 ), 1, ZCOL, .TRUE., ZAX, STATUS )
-
+         IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
+            CALL AST_TRAN1( MAPS( 3 ), 1, ZCOL, .TRUE., ZAX, STATUS )
+         ELSE
+            ZAX = AST__BAD 
+         END IF
       END IF
 
 *  If we have a Z axis value, format it, and write to the output
