@@ -9,7 +9,7 @@ REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
  pairndf ccdedit makemos tranndf drizzle astimp astexp wcsreg wcsedit drawndf
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
- picinfo import present schedule ccdimp ccdexp makeset showset 
+ picinfo import present schedule ccdimp ccdexp makeset showset
 SCRTASKS = reduce ccdalign xreduce
 
 TASKSRC = $(REDTASKS:=.f) $(REGTASKS:=.f) $(RESTASKS:=.f) $(SCRTASKS:=.f)
