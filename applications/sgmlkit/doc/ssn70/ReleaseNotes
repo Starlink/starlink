@@ -29,16 +29,19 @@ requirements.  I implemented the requirements that the `top' file in
 the <code/.htx/ directory be <code/index.html/ and that the filenames
 shouldn't include the document name.  However, having
 <code/index.html/ confuses <code/hlink/, which seems to need the file
-to be called <code/sunxxx.html/ (apart from that, <code/hlink/ appears
-to work fine, with no trace of a problem with the slightly eccentric
-format of the Jade output).  I've therefore left it with the top file
-being called <code/sunxxx.html/, so that <code/hlink/ will continue to
-work, 
+to be called <code/sunxxx.html/.  So now the top file is still called
+<code/sunxxx.html/ but the component files have short opaque names.
+<code/hlink/ works fine, now that the <code/sgml2docs/ script
+post-processes the Jade output to put <code/&lt;a>/ elements on a
+single line.
 
 <li>The SGML declaration was changed in such a way that IDs within the
 document are now case-sensitive.  This could not be done without
 making all the other SGML in the application case-sensitive as well.
-This required substantial reorganisation.
+This required substantial reorganisation.  As well as forcing the
+whole system to be a little tighter (no bad thing), this helps pave
+the way for an eventual XML version of the DTD (XML has a fixed
+declaration which makes documents case-sensitive).
 
 </ul>
 
@@ -87,7 +90,7 @@ The document name should not be included in the HTML file names;
 The top level HTML file should be <code/index.html/;
 Need shorter names for html files;
 There should be no links within the <code/.htx/ directory.
-<dd>All done.
+<dd>All done.  See notes above.
 
 <dt>Need a fix for line breaks within tags in <code/htx/ index file.
 <dd>??
