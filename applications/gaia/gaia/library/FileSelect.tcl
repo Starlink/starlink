@@ -729,7 +729,7 @@ itcl::class util::FileSelect {
           }
           if { $itk_option(-filter_types) != {} } { 
              set fs(filter_types) [LabelMenu $fs(filterf).types \
-                                      -text {File Filter:}]
+                                      -text {Type Filter:}]
              foreach pair "$itk_option(-filter_types)" {
                 set name [lindex $pair 0]
                 set type [lindex $pair 1]
