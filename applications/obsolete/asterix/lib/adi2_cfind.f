@@ -911,6 +911,7 @@
 
 *  Local Variables:
       CHARACTER*8		IDXSTR			! Index string
+      CHARACTER*80		DOTNAME
       INTEGER			INDEX			! Index value
 
       LOGICAL			THERE			! Object exists?
@@ -921,16 +922,17 @@
 
 *  Initialise
       ID = ADI__NULLID
+      DOTNAME = '.' // NAME
 
 *  Can't do much if there's no table ID
       IF ( TABID .EQ. ADI__NULLID ) RETURN
 
 *  Does the HDU exist in the container property list?
-      CALL ADI_THERE( TABID, '.'//NAME, THERE, STATUS )
+      CALL ADI_THERE( TABID, DOTNAME, THERE, STATUS )
       IF ( THERE ) THEN
 
 *    Get the index string
-        CALL ADI_CGET0I( TABID, '.'//NAME, INDEX, STATUS )
+        CALL ADI_CGET0I( TABID, DOTNAME, INDEX, STATUS )
 
 *    Make the index string
         IDXSTR = ADI2_MKIDX( 'Obj_', INDEX )
@@ -1373,6 +1375,7 @@ c     END IF
       CHARACTER*8		CCOUNT			! Counter name
       CHARACTER*8		CTABLE			! Table name
       CHARACTER*8		IDXSTR			! Index name
+      CHARACTER*80		DOTNAME
 
       INTEGER			COUNT			! Object counter
       INTEGER			TABID			! Table structure
@@ -1404,6 +1407,7 @@ c     END IF
 *  Write the counter to the cache object
       IF ( NAME .GT. ' ' ) THEN
         CALL ADI_CPUT0C( ID, 'Name', NAME, STATUS )
+        DOTNAME = '.' // NAME
         CALL ADI_CPUT0I( TABID, '.'//NAME, COUNT, STATUS )
       END IF
       CALL ADI_CPUT0I( ID, 'Number', COUNT, STATUS )
@@ -1521,6 +1525,7 @@ c     END IF
 
 *  Local Variables:
       CHARACTER*8		CTABLE			! Table name
+      CHARACTER*80		DOTNAME
 
       INTEGER			COUNT			! Object counter
       INTEGER			TABID			! Table structure
@@ -1540,7 +1545,8 @@ c     END IF
 
 *  Write the counter to the cache object
       CALL ADI_CPUT0C( ID, 'Name', NAME, STATUS )
-      CALL ADI_CPUT0I( TABID, '.'//NAME, COUNT, STATUS )
+      DOTNAME = '.' // NAME
+      CALL ADI_CPUT0I( TABID, DOTNAME, COUNT, STATUS )
 
 *  Release the table
       CALL ADI_ERASE( TABID, STATUS )
