@@ -135,10 +135,10 @@
 *           o  NAXIS, and NAXISn define the shape of the NDF.
 *           o  The TITLE, LABEL, and BUNITS are copied to the NDF
 *           TITLE, LABEL, and UNITS NDF components respectively.
-*           o  The CDELTn, CRVALn, CTYPEn, and CRTYPEn keywords make
-*           linear axis structures within the NDF.  CTYPEn define the
-*           axis units, and the axis labels are assigned to CRTYPEn If
-*           some are missing, pixel co-ordinates are used for those
+*           o  The CDELTn, CRVALn, CTYPEn, and CUNITn keywords make
+*           linear axis structures within the NDF.  CUNITn define the
+*           axis units, and the axis labels are assigned to CTYPEn. 
+*           If some are missing, pixel co-ordinates are used for those
 *           axes.
 *           o  BSCALE and BZERO in a FITS extension are ignored.
 *           o  BLANK is not used to indicate which input array values
@@ -164,6 +164,9 @@
 *        Original version.
 *     1993 July 29 (MJC):
 *        Used lowercase examples and filenames with UNIX in mind.
+*     1996 September 16 (MJC):
+*        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+*        for axis units.
 *     {enter_further_changes_here}
 
 *  Bugs:
