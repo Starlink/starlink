@@ -1,6 +1,6 @@
 1 POLPACK
 
- Version 2.1-2 of POLPACK (an applications package for processing imaging 
+ Version 2.1-3 of POLPACK (an applications package for processing imaging 
  polarimetry data) is now available. It is fully documented in SUN/223.
  The main changes since V2.0-14 are:
 
@@ -19,4 +19,7 @@
    o  POLBIN now chooses the bin locations so that the XY origin is always 
       placed at the corner of a bin
 
+   o  POLBIN and POLVEC have a new parameter RADEC which allows RA and
+      DEC columns to be added to the output catalogues, so long as suitable 
+      WCS information is available.
 

@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.5}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {17th March 2000}
+\newcommand{\stardocdate}      {17th May 2000}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 2.1-1}
+\newcommand{\stardocversion}   {Version 2.1-3}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
@@ -2664,6 +2664,15 @@ for NDF applications.
       }{
          The name of the output catalogue. A file type of .FIT is assumed
          if none is provided.
+      }
+      \sstsubsection{
+         RADEC = \_LOGICAL (Read)
+      }{
+         If TRUE, columns holding the RA and DEC (FK5, J2000) are added
+         to the output catalogue, if the input catalogue contains the 
+         necessary WCS information. If FALSE, no RA and DEC columns are 
+         written. For large catalogues, creating RA and DEC columns can 
+         cause a significant delay. [current value]
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
@@ -5359,6 +5368,10 @@ for NDF applications.
          these columns will be formed by prepending the letter D to the
          start of the column names listed above.
 
+         IF RADEC is TRUE, the columns will also contain RA and DEC
+         columns, so long as the input cube contains appropriate WCS 
+         information.
+ 
          When measuring circular polarization, the columns describing Q
          and U will be replaced by equivalent columns describing V; and
          the ANG value will be zero if the normalised Stokes parameter V
@@ -5436,6 +5449,15 @@ for NDF applications.
       }{
          An output NDF holding the Q Stokes parameter. A null value can be
          supplied if this output image is not required. [!]
+      }
+      \sstsubsection{
+         RADEC = \_LOGICAL (Read)
+      }{
+         If TRUE, columns holding the RA and DEC (FK5, J2000) are added
+         to the output catalogue, if the input cube contains the 
+         necessary WCS information. If FALSE, no RA and DEC columns are 
+         written. For large catalogues, creating RA and DEC columns can 
+         cause a significant delay. [current value]
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
@@ -6436,7 +6458,7 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
-\subsection{V2.1-1}
+\subsection{V2.1-3}
 
 \begin{itemize}
 \item The way \htmlref{POLBIN}{POLBIN} chooses the location of its bins
@@ -6447,6 +6469,10 @@ catalogue), is always at the corner of a bin.
 \item The WCS information stored with the output cube created by 
 \htmlref{POLCAL}{POLCAL} now has three axes instead of two (the Stokes
 axis is now described in addition to the two spatial axes). 
+
+\item \htmlref{POLBIN}{POLBIN} and \htmlref{POLVEC}{POLVEC} can now
+optionally add RA and DEC columns to their output catalogues, so long as
+suitable WCS information is available. See the new parameter RADEC.
 
 \end{itemize}
 
