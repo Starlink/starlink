@@ -5415,6 +5415,10 @@ proc exit {args} {
    global OLDKAPPA
    global POLKA_SCRATCH
 
+# Re-instate the original exit command in case anything goes wrong in
+# this procedure.
+   rename tcl_exit exit
+
 # Close any log file.
    if { $LOGFILE_ID != "" } { close $LOGFILE_ID }
 
@@ -5492,7 +5496,7 @@ proc exit {args} {
    SendBack
 
 # Finally, kill the current process.
-   tcl_exit
+   exit
 }
 
 proc Extension {ndf comp type value old} {

@@ -63,6 +63,12 @@
 # (PID,<name>)     : The pid of an adam task.
 # (<path>,<messid>,<type>) : The command to be executed when a message of 
 #                     type <type> arrives.
+#
+#  History:
+#     5-MAY-1999 (DSB):
+#        adamtask.exit modified to re-instate the original exit command 
+#        before doing anything else. This avoids recursion if anything
+#        goes wrong within adamtask.exit.
 
 proc adamtask.init {} {
 #+
@@ -360,6 +366,11 @@ proc adamtask.exit {{n 0}} {
 # Kill all the tasks we know about and cause the relay process to exit
 # then call adam_exit in order to shut down the message system.
 #-
+
+# First re-instate the original exit command to avoid calling this procedure
+# recirsively if anything goes wrong within it.
+    rename adamtask.realExit exit
+
     upvar #0 adamtask_priv priv
     set elements [array names priv "PID,*"]
     foreach task $elements {
