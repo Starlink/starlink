@@ -42,7 +42,7 @@
 
 *  Usage:
 *     ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
-*            AUTOL AUTOLT FRZORI [CURSOR] [COSYS] [IN] [ORIGIN] (FAST) 
+*            AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FAST) 
 *            (FINE) [RLIM] (LIM1) (LIM2) (LIM3) (FRACT) [SAME] 
 *            [AGAIN] [INFILE) [IMGDEV] (COLOUR) (ANGCON) (ANGOFF)
  
@@ -68,9 +68,6 @@
 *        The background count value for the image. Units counts.
 *     COLOUR = _INTEGER (Given)
 *        Colour of the pen used to mark galaxy centres.
-*     COSYS=_CHAR (Read)
-*        What co-ordinate system to use?  D=data, W=world, C=Current
-*        frame of WCS component.
 *     CURSOR=_LOGICAL (Read)
 *        Whether the galaxy locations are to be identified using the 
 *        graphics cursor or the keyboard. True=cursor. False=keyboard.
@@ -104,6 +101,8 @@
 *     INFILE=_CHAR (Read)
 *        Name of a text file containing the co-ordinates of galaxies 
 *        to be profiled. (Only used in file mode i.e. MODE=FALSE)
+*        Co-ordinates are in the Current coordinate system of the
+*        WCS component of IN.
 *     IN=_NDF (Read)
 *        The name of the source NDF data structure/file.
 *     LIM1=_REAL (Read)
@@ -127,7 +126,9 @@
 *        Whether the application is to run in file input mode or 
 *        interactively. Interactive MODE=TRUE. File mode=FALSE.
 *     ORIGIN=_REAL (Read)
-*        Image indices for the origin point to be used. Units pixels.
+*        Image indices for the origin point to be used.  Co-ordinates
+*        are in the Current co-ordinate system of the WCS component
+*        of IN.
 *     OUT=_CHAR (Read)
 *        File name for the output text file containing the profile 
 *        data.
@@ -148,18 +149,20 @@
 *        magnitudes per arc seconds.
 
 *  Examples: 
-*     ellpro mode=true back=6200 sigma=390 psize=1.
+*     ellpro mode=true back=6200 sigma=390
 *            zerop=27.5 ardfil=^ardfile.dat device=xwindows 
 *            out=elp1.dat autol=true frzori=false cursor=false 
-*            cosys=d in=p2 rlim=10 origin=96,92
+*            in=p2 rlim=10 origin="12:36:53.42 62:12:21.8"
 *
-*        Performs profiling on an object positioned at (pixel 
-*        co-ordinates) 96,92 on image P2. The profile determined will 
-*        be output to a graphical display on device XWINDOWS and to 
-*        text file ELP1.DAT. The galaxy centre provided will be 
-*        refined by the application and during profiling the galaxy centre 
-*        will be allowed to change. The profiling will be stopped at 
-*        a radius of 10 pixels.
+*        Performs profiling on an object positioned at the co-ordinates
+*        indicated on image P2; the Current co-ordinate system of P2 is
+*        in the SKY domain.  Pixel size in arcseconds will be determined
+*        automatically from the SKY co-ordinates.  The profile
+*        determined will  be output to a graphical display on device
+*        XWINDOWS and to text file ELP1.DAT. The galaxy centre
+*        provided will be refined by the application and during
+*        profiling the galaxy centre will be allowed to change. The
+*        profiling will be stopped at a radius of 10 pixels.
 *                                       
 *     ellpro mode=true back=6200 sigma=390 psize=1. zerop=27.5
 *            ardfil=^ardfile.dat device=xwindows out=elp1.dat 
@@ -175,10 +178,10 @@
 *
 *     ellpro mode=false back=760 sigma=12 psize=0.44 zerop=27.5 
 *            ardfil=^arddef.dat in=p2 infile=p2log.dat
-*            out=output.dat cosys=w autol=true frzori=false
+*            out=output.dat autol=true frzori=false
 *
 *       The appliication reads the object locations in file P2LOG.DAT
-*       (taking them as world co-ordinates) and performs profiling on 
+*       (in the Current co-ordinates of P2) and performs profiling on 
 *       those locations on image P2. The profiling output is displayed 
 *       on the text screen and is also placed in file OUTPUT.DAT.
 
@@ -188,6 +191,7 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -199,6 +203,8 @@
 *     Modified output formatting to make it work better with 
 *     very large images. Also tweaked ELP1_SOLVE routine
 *     to enhance robustness/speed. Some pointer usage slightly modified.
+*     8-NOV-1999 (MBT).
+*     Modified to work with World Coordinate System components.
 
 *-
 
@@ -233,6 +239,9 @@
       CALL PAR_GET0L('MODE',MODE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
+*   Begin AST context.
+      CALL AST_BEGIN(STATUS)
+
 *   Transfer control to a fully interactive mode or to file input
 *   handling routine.
       IF (.NOT.MODE) THEN
@@ -259,6 +268,9 @@
 
 *   Abort the program.
  9999 CONTINUE
+
+*   End AST context.
+      CALL AST_END(STATUS)
 
       END 
 
@@ -2070,6 +2082,7 @@ C      END IF
                                  ! a terminal
 
       INTEGER HITVAL             ! The selected choice of the cursor
+      INTEGER IWCS               ! AST pointer to WCS frameset of NDF
       INTEGER NIMGMS             ! Number of lines of image-display
                                  ! messages
       INTEGER NTERMS             ! Number of lines of terminal messages
@@ -2098,6 +2111,9 @@ C      END IF
 *   Check inherited global status.
 
       IF (STATUS.NE.SAI__OK) RETURN
+
+*   Begin AST context.
+      CALL AST_BEGIN(STATUS)
 
 *   Create informational messages for use with the cursor.
       CALL ELP1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
@@ -2208,6 +2224,9 @@ C      END IF
 *   Initialise HITVAL before the main loop is entered.
       HITVAL=0
 
+*   Get WCS component from NDF, used for reporting cursor position to user.
+      CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+
 *   Loop until the point is selected.
 *   Values 4 taken as the select.
 *   Value 2 as an emergency exit.
@@ -2240,7 +2259,7 @@ C      END IF
             Y(POINT)=YIN
 *         Display the cursor results if necessary.
             IF (POINT.LT.6.AND.(HITVAL.EQ.1.OR.HITVAL.EQ.3)) THEN
-               CALL ELP1_CURVD(X1,Y1,XIN,YIN,STATUS)
+               CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             END IF
          END IF
                 
@@ -2264,98 +2283,13 @@ C      END IF
       CALL ELP1_AGIC2(GRADEV,1,0,NAME,NDF1,DEVCAN,PICID,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*    Exit point for errors that occurred before the graphics device
-*    was opened.
+*   Exit point for errors that occurred before the graphics device
+*   was opened.
                  
  9999 CONTINUE
 
-      END
-
-
-      SUBROUTINE ELP1_CURVD(X1,Y1,XW,YW,STATUS)
-*+
-*  Name:
-*     ELP1_CURVD
-
-*  Purpose:
-*     Displays information telling the user what the latest value 
-*     is for the cursor position. 
-
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*     CALL ELP1_CURVD(X1,Y1,XW,YW,STATUS)
-
-*  Description:
-*     The routine displays the latest value for the cursor position. 
-*     When an image is being displayed output is in the form of world 
-*     and data co-ordinates.
-
-*  Arguments:
-*     X1 = REAL (Given)
-*        X world co-ordinate of the left-hand edge of the image.
-*     Y1 = REAL (Given)
-*        Y world co-ordinate of the bottom edge of the image.
-*     XW = REAL (Given)
-*        X world co-ordinate.
-*     YW = REAL (Given)
-*        Y world co-ordinate.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Authors:
-*     GJP: Grant Privett (STARLINK)
-
-*  History:
-*     15-Mar-1993 (GJP)
-*     (Original version)
-
-*  Bugs:
-*     None known.
-
-*-
-
-*  Type Definitions:                  ! No implicit typing
-      IMPLICIT NONE
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
-*  Arguments Given:
-      REAL XW                         ! X world co-ordinate
-      REAL X1                         ! X world co-ordinate of the image
-                                      ! edge
-      REAL YW                         ! Y world co-ordinate
-      REAL Y1                         ! Y world co-ordinate of the image
-                                      ! bottom
-
-*  Arguments Returned:
-
-*  Status:     
-      INTEGER STATUS                  ! Global status
-
-*  Local Variables:                                               
-*.
-
-*   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN
-
-*   Put the data co-ordinates into message token.
-      CALL MSG_SETR('XVALD',XW-X1)
-      CALL MSG_SETR('YVALD',YW-Y1)
-
-*   Put the world co-ordinates into message tokens.
-      CALL MSG_SETR('XVALW',XW)
-      CALL MSG_SETR('YVALW',YW)
-
-*   Display the current X and Y values.
-      CALL MSG_OUT(' ','Cursor position (x/y)'/  
-     :             /' ^XVALW, ^YVALW (world), '/
-     :             /'^XVALD, ^YVALD (data)',STATUS)
- 
-*   The following call achieves graphics/text synchronisation.
-      CALL MSG_SYNC(STATUS)
+*   Exit AST context.
+      CALL AST_END(STATUS)
 
       END
 
@@ -2828,8 +2762,7 @@ C      END IF
 
 
 
-      SUBROUTINE ELP1_FILER(FIOID,BACK,INDF,COSYS,
-     :                      NGALS,XC,YC,BACKS,STATUS)
+      SUBROUTINE ELP1_FILER(FIOID,BACK,INDF,NGALS,XC,YC,BACKS,STATUS)
 *+
 *  Name:
 *     ELP1_FILER
@@ -2849,8 +2782,7 @@ C      END IF
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL ELP1_FILER(FIOID,BACK,INDF,COSYS,NGALS,
-*                      XC,YC,BACKS,STATUS)    
+*      CALL ELP1_FILER(FIOID,BACK,INDF,NGALS,XC,YC,BACKS,STATUS)    
 
 *  Description:
 *     Looks at each line of the required file in turn.
@@ -2859,8 +2791,8 @@ C      END IF
 *     of two numbers. If these are found it looks for a further number.
 *
 *     The first two are taken as representing x and y co-ordinates on 
-*     an image and are checked to ensure that they lie within the bounds 
-*     of the image.
+*     an image (in Current co-ordinates of INDF) and are checked to 
+*     ensure that they lie within the bounds of the image.
 *
 *     If it is found that the a co-ordinate pair is not within the 
 *     bounds of the image, the values are not retained, otherwise the
@@ -2875,9 +2807,6 @@ C      END IF
 *        The image global background value. Units counts.
 *     INDF = INTEGER (Given)
 *        NDF identifier for the image.
-*     COSYS *(256) = CHARACTER (Given)
-*        Character defining whether the co-ordinates provided
-*        are world, data or current frame format.
 *     NGALS = INTEGER (Returned)
 *        Number of galaxies to be profiled.
 *     XC(ELP__NGALS) = REAL (Returned)
@@ -2898,7 +2827,9 @@ C      END IF
 *     9-JUL-1993 (GJP)
 *     (Original version)
 *     26-OCT-1999 (MBT):
-*        Modified to deal with COSYS=C.
+*     Modified to deal with COSYS=C.
+*     8-NOV-1999 (MBT):
+*     Removed COSYS altogether.
 
 *  Bugs:
 *     None known.
@@ -2915,8 +2846,6 @@ C      END IF
       INCLUDE 'NDF_PAR'              ! NDF public constants
 
 *  Arguments Given:                              
-      CHARACTER *(256) COSYS          ! Option choice defining how the
-                                      ! pixel data format to be input
       INTEGER FIOID                   ! FIO identifier for the input file
       INTEGER INDF                    ! NDF identifier for image
       REAL BACK                       ! Global background count value
@@ -3054,7 +2983,7 @@ C      END IF
 
 *            Change strings in character buffer into numeric coordinate
 *            values.
-               CALL ESP1_S2PR(COSYS,INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
+               CALL ESP1_S2PR(INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
      :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
      :                        VALUE(2),STATUS)
 
@@ -3209,8 +3138,6 @@ C      END IF
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:      
-      CHARACTER *(256) COSYS          ! Option choice defining how the
-                                      ! pixel data format to be input
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
       LOGICAL ANGCON                  ! Position angle convention
       LOGICAL AUTOL                   ! Is an estimate of the galaxy centre
@@ -3226,6 +3153,7 @@ C      END IF
       INTEGER FIOD                    ! Output FIO file descriptor
       INTEGER FIOID                   ! Input FIO file descriptor
       INTEGER I                       ! Loop variable
+      INTEGER IWCS                    ! AST pointer to NDF's WCS frameset
       INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
       INTEGER MINMOD                  ! Which residual to use in minimisation
       INTEGER NDF1                    ! Identifier for the source NDF  
@@ -3280,10 +3208,16 @@ C      END IF
 *   Begin an NDF context.                               
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
+
+*   Begin an AST context.
+      CALL AST_BEGIN(STATUS)
       
 *   Obtain an identifier for the NDF structure to be examined.       
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
+
+*   Get the WCS frameset for the NDF.
+      CALL NDF_GTWCS(NDF1,IWCS,STATUS)
 
 *   Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
@@ -3312,11 +3246,6 @@ C      END IF
       ELSE
          ANGOFF=0.0
       END IF
-
-*   Get the co-ordinate system mode and convert to upper case.
-      CALL PAR_GET0C('COSYS',COSYS,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      CALL CHR_UCASE(COSYS)
 
 *   Determine whether or not the origin given is to be used throughout
 *   the profiling.
@@ -3437,8 +3366,7 @@ C      END IF
       IF (STATUS.NE.SAI__OK) GOTO 9999
       
 *   Obtain the co-ordinates of the galaxies required.
-      CALL ELP1_FILER(FIOID,BACK,NDF1,COSYS,
-     :                NGALS,XC,YC,BACKS,STATUS)
+      CALL ELP1_FILER(FIOID,BACK,NDF1,NGALS,XC,YC,BACKS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
     
 *   Abort if the number of galaxies is zero.
@@ -3497,9 +3425,9 @@ C      END IF
          YCO=YC(I)
 
 *      Display the current co-ordinates.
-         CALL MSG_FMTR('X','F6.1',XCO)
-         CALL MSG_FMTR('Y','F6.1',YCO)
-         CALL MSG_OUT(' ','Working on data co-ordinates:^X ^Y',STATUS)
+         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
+         CALL MSG_OUT(' ','Working on ^DOM co-ordinates:  ^X  ^Y',
+     :                STATUS)
 
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELP1_AUTOL(BACK,ELEMS,PRANGE,
@@ -3555,6 +3483,9 @@ C      END IF
 
 *   Close the file input ASCII files.
       CALL FIO_ANNUL(FIOID,STATUS)
+
+*   End the AST context.
+      CALL AST_END(STATUS)
 
 *   End the NDF context.
       CALL NDF_END(STATUS)                              
@@ -4727,7 +4658,9 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
 *     16-MAR-1993 (GJP)
 *     (Original version)
 *     26-OCT-1999 (MBT):
-*        Modified to cope with COSYS=C.
+*     Modified to cope with COSYS=C.
+*     8-NOV-1999 (MBT):
+*     Removed COSYS altogether.
 
 *  Bugs:
 *     None known.
@@ -4749,8 +4682,6 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:      
-      CHARACTER *(256) COSYS          ! Option choice defining how the
-                                      ! pixel data format to be input
       CHARACTER *(256) STRINP(2)      ! String array for character input
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
       LOGICAL AGAIN                   ! Look at another part of the image?
@@ -4767,9 +4698,6 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       INTEGER ELEMS                   ! Total number of pixels in the NDF
       INTEGER FIOD                    ! FIO file descriptor
       INTEGER I                       ! Loop variable
-      INTEGER IND                     ! The number of origin indices to
-                                      ! be input at one go i.e. 2
-      INTEGER IND2                    ! Number of indices returned
       INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
       INTEGER MINMOD                  ! Which residual to use in minimisation
       INTEGER NDF1                    ! Identifier for the source NDF  
@@ -4825,11 +4753,6 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       PRANGE(1)=UBND(1)-LBND(1)+1
       PRANGE(2)=UBND(2)-LBND(2)+1
                                        
-*   Get the co-ordinate system mode and convert to upper case.
-      CALL PAR_GET0C('COSYS',COSYS,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      CALL CHR_UCASE(COSYS)
-
 *   Look at the command line value for ANGCON.
 *   Otherwise, use the default.
       CALL PAR_STATE('ANGCON',I,STATUS )
@@ -4857,30 +4780,7 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       DO WHILE ((AGAIN).AND.(STATUS.EQ.SAI__OK))
 
 *      Get the pixel to be used as the galaxy centre.
-         IND=2
-         IND2=2
-
-*      Get the input as strings.
- 11      CONTINUE
-         CALL PAR_EXACC('ORIGIN',2,STRINP,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999
-
-*      Begin error context.
-         CALL ERR_MARK
-
-*      Turn input coordinates into pixel coordinates.
-         CALL ESP1_S2PR(COSYS,NDF1,STRINP(1),STRINP(2),XCO,YCO,STATUS)
-
-*      Check whether the coordinate input went smoothly.
-         IF (STATUS.NE.SAI__OK) THEN
-            CALL ERR_FLUSH(STATUS)
-            CALL ERR_RLSE
-            CALL PAR_CANCL('ORIGIN',STATUS)
-            GO TO 11
-         END IF
-
-*      End error context.
-         CALL ERR_RLSE
+         CALL ESP1_INPOS(NDF1,'ORIGIN',XCO,YCO,STATUS)
 
 *      Determine whether or not the origin given is to be used throughout
 *      the profiling.
@@ -7033,6 +6933,7 @@ c     :              '^DEV   ^POI  ^STAT'
       CHARACTER *(MSG__SZMSG) NAME    ! NDF name
       LOGICAL OPENF                   ! Was the output file opened?
       INTEGER I                       ! Temporary variable
+      INTEGER IWCS                    ! AST pointer to NDF's WCS frameset
       INTEGER J                       ! Temporary variable
       INTEGER NCHAR                   ! Length of output string
 
@@ -7092,11 +6993,9 @@ c     :              '^DEV   ^POI  ^STAT'
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
          NCHAR=0
          CALL NDF_MSG('NAME',NDF1)
-         CALL MSG_LOAD(' ','^NAME',NAME,I,STATUS)
-         NAME=NAME(1:I)
+         CALL MSG_LOAD(' ','^NAME',NAME,NCHAR,STATUS)
          CALL CHR_CLEAN(NAME)
-         CALL CHR_PUTC(NAME,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
+         CALL FIO_WRITE(FIOD,NAME(:NCHAR),STATUS)
 
 *      Output the standard deviation value that was used.
          NCHAR=0
@@ -7117,7 +7016,7 @@ c     :              '^DEV   ^POI  ^STAT'
 
 *      Output X and Y data co-ordinates.
          NCHAR=0
-         CALL CHR_PUTC('## X/Y co-ordinates (data):',
+         CALL CHR_PUTC('## X/Y co-ordinates (Base):',
      :                 LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
          NCHAR=0
@@ -7127,15 +7026,15 @@ c     :              '^DEV   ^POI  ^STAT'
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
 
 *      Output X and Y world co-ordinates.
-         NCHAR=0
-         CALL CHR_PUTC('## X/Y co-ordinates (world):',
-     :                 LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(XCO+LBND(1)-1,LINE,NCHAR)
-         CALL CHR_PUTC(' ',LINE,NCHAR)
-         CALL CHR_PUTR(YCO+LBND(2)-1,LINE,NCHAR)
+         CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
+         CALL MSG_LOAD(' ','## X/Y co-ordinates (^DOM):',LINE,NCHAR,
+     :                 STATUS)
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
+         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
+         CALL MSG_LOAD(' ','^X ^Y',LINE,NCHAR,STATUS)
+         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
+         CALL AST_ANNUL(IWCS,STATUS)
 
 *      Output the background value that was used.
          NCHAR=0
@@ -7236,11 +7135,9 @@ C     :    'PA     Ellipt     Dev   PPU'
  
 *         Output the results in suitably formatted form.
             NCHAR=0
-            CALL MSG_LOAD(' ',TEXT,NAME,J,STATUS)
-            NAME=NAME(1:J)
+            CALL MSG_LOAD(' ',TEXT,NAME,NCHAR,STATUS)
             CALL CHR_CLEAN(NAME)
-            CALL CHR_PUTC(NAME,LINE,NCHAR)
-            CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
+            CALL FIO_WRITE(FIOD,NAME(:NCHAR),STATUS)
 
  500     CONTINUE
 

@@ -61,29 +61,37 @@
       INTEGER STATUS
 
 *  Local variables:
-      CHARACTER*(AST__SZCHR) DOMAIN   ! Domain of frame in WCS component
-      INTEGER FRAME                   ! AST pointer to frame in frameset
       INTEGER I                       ! Loop index
+      INTEGER IPERM(2)                ! Indices for PermMap
       INTEGER IWCS                    ! AST pointer to WCS component of NDF
       INTEGER JGRID                   ! Index of GRID-domain frame in frameset
       INTEGER JSKY                    ! Index of SKY-domain frame in frameset
-      INTEGER MAP                     ! AST pointer to GRID->SKY mapping
+      INTEGER DIM(2)                  ! Lower bounds of NDF
+      INTEGER FSET                    ! AST pointer to conversion frameset
+      INTEGER GSMAP                   ! AST pointer to GRID->SKY frame mapping
+      INTEGER MAP                     ! AST pointer to normalised mapping
+      INTEGER NDIM                    ! Number of dimensions of NDF
+      INTEGER OPERM(2)                ! Indices for PermMap
+      INTEGER PMAP                    ! AST pointer to permutation mapping
+      INTEGER SKYFRM                  ! AST pointer to SkyFrame
       INTEGER STATE                   ! Initial state of PSIZE parameter
       LOGICAL INOKAY                  ! Have we got a good value for PSIZE?
-      DOUBLE PRECISION ASRAD          ! Number of arcseconds in a radian
+      LOGICAL SWAP                    ! Have SkyFrames axes been swapped?
+      DOUBLE PRECISION ARCSEC         ! Size of an arcsecond in radians
+      DOUBLE PRECISION CENX           ! X position of NDF centre in Sky coords
+      DOUBLE PRECISION CENY           ! Y position of NDF centre in Sky coords
       DOUBLE PRECISION DISTX          ! X dimension of transformed box in radian
       DOUBLE PRECISION DISTY          ! Y dimension of transformed box in radian
       DOUBLE PRECISION PI             ! Pi
-      DOUBLE PRECISION PSZX           ! X dimension of transformed box in arcsec
-      DOUBLE PRECISION PSZY           ! Y dimension of transformed box in arcsec
       DOUBLE PRECISION SHAPE          ! Aspect ratio of transformed box
-      DOUBLE PRECISION TRANX(4)       ! X coords of transformed box
-      DOUBLE PRECISION TRANY(4)       ! Y coords of transformed box
-      DOUBLE PRECISION UNITX(4)       ! X coords of box in GRID-domain frame
-      DOUBLE PRECISION UNITY(4)       ! Y coords of box in GRID-domain frame
+      DOUBLE PRECISION TRANX(2)       ! X coords of transformed points
+      DOUBLE PRECISION TRANY(2)       ! Y coords of transformed points
+      DOUBLE PRECISION UNITX(2)       ! X coords of untransformed points
+      DOUBLE PRECISION UNITY(2)       ! Y coords of untransformed points
 
-      DATA UNITX /0D0,1D0,0D0,1D0/    ! X coords of unit box
-      DATA UNITY /0D0,0D0,1D0,1D0/    ! Y coords of unit box
+      DATA CENX,CENY /0D0,0D0/        ! Prevent arithmetic exceptions in
+      DATA TRANX /0D0,0D0/            ! event of failure.
+      DATA TRANY /0D0,0D0/            !
 *.
 
 *   Check the inherited global status.
@@ -107,61 +115,90 @@
 *      Start an AST context.
          CALL AST_BEGIN(STATUS)
 
-*      Get the pixel size.
+*      Get the WCS component of the NDF.
          CALL NDF_GTWCS(INDF,IWCS,STATUS)
 
 *      Get indices for GRID- and SKY-domain frames from the WCS component.
-*      There may be no SKY one.  Work backwards just in case there is a 
-*      spurious duplicate frame in the GRID domain.
-         JSKY=0
-         JGRID=0
-         DO 10 I=AST_GETI(IWCS,'Nframe',STATUS),1,-1
-            FRAME=AST_GETFRAME(IWCS,I,STATUS)
-            DOMAIN=AST_GETC(FRAME,'Domain',STATUS)
-            IF (STATUS.EQ.SAI__OK .AND. DOMAIN.EQ.'SKY') JSKY=I
-            IF (STATUS.EQ.SAI__OK .AND. DOMAIN.EQ.'GRID') JGRID=I
- 10      CONTINUE
+         CALL ESP1_ASFFR(IWCS,'GRID',JGRID,STATUS)
+         CALL ESP1_ASFFR(IWCS,'SKY',JSKY,STATUS)
+
+*      Get the SKY domain frame and check it is a SkyFrame (otherwise
+*      it's been mislabelled and we can't use it).
+         IF (JSKY.NE.AST__NOFRAME) THEN
+            SKYFRM=AST_GETFRAME(IWCS,JSKY,STATUS)
+            IF (.NOT.AST_ISASKYFRAME(SKYFRM)) SKYFRM=AST__NULL
+         ELSE
+            SKYFRM=AST__NULL
+         END IF
 
 *      If there is a sky frame, use it to work out pixel size.
-         IF (JSKY.GT.0 .AND. JGRID.GT.0) THEN
+         IF (SKYFRM.NE.AST__NULL .AND. JGRID.NE.AST__NOFRAME) THEN
          
-*         Get the mapping from the GRID domain to the SKY domain frames.
-            MAP=AST_GETMAPPING(IWCS,JGRID,JSKY,STATUS)
+*         Work out whether the SkyFrame has had its axes swapped over.
+*         Normally the first axis is longitude and the second is 
+*         latitude.  However it may have had them swapped over.
+*         This code is pinched from KAPPA, where it is commented that 
+*         doing this is more complicated than it ought to be.  
+*         We compare it with a newly created SkyFrame to see if the 
+*         axes have been swapped.
+            FSET=AST_FINDFRAME(SKYFRM,AST_SKYFRAME(' ',STATUS),' ',
+     :                         STATUS)
+            SWAP=.NOT.AST_ISAUNITMAP(AST_GETMAPPING(FSET,AST__BASE,
+     :                                              AST__CURRENT,
+     :                                              STATUS),
+     :                               STATUS)
 
-*         Transform a unit box (pixel) from GRID to SKY coordinates.  We use 
-*         a pixel near the origin - one near the middle of the NDF would 
-*         perhaps be better but the difference is going to be very tiny.
-            CALL AST_TRAN2(MAP,4,UNITX,UNITY,.TRUE.,TRANX,TRANY,STATUS)
-
-*         Work out the distance in radians that unit X and Y lengths
-*         transform to.
-            DISTX=SQRT((TRANX(2)-TRANX(1))**2 + (TRANY(2)-TRANY(1))**2)
-            DISTY=SQRT((TRANX(3)-TRANX(1))**2 + (TRANY(3)-TRANY(1))**2)
-
-*         Get radian to arcsecond conversion factor.
-            PI=4D0*ATAN(1D0)
-            ASRAD=36D1*6D1*6D1/2D0/PI
-
-*         Get the pixel dimensions in arcseconds.
-            PSZX=DISTX*ASRAD
-            PSZY=DISTY*ASRAD
-
-*         Check that pixels are of similar size in the X and Y directions.
-*         If not we can't do anything much about it, but the user should be
-*         warned.
-            SHAPE=PSZX/PSZY
-            IF (SHAPE.LT.0.95D0 .OR. SHAPE.GT.1.05D0) THEN
-               CALL MSG_OUT(' ','WARNING!',STATUS)
-               CALL MSG_FMTD('X','G9.2',PSZX)
-               CALL MSG_FMTD('Y','G9.2',PSZY)
-               CALL MSG_OUT(' ','   Pixels are not square:^X arcsec'
-     :                      //' in X and^Y arcsec in Y',STATUS)
-               CALL MSG_OUT(' ','   - using average.',STATUS)
-               CALL MSG_BLANK(STATUS)
+*         Construct a suitable PermMap (i.e. one which either does or
+*         does not switch the Sky axes around) so that in either case
+*         the mapping we have looks like it's to a SkyFrame with axes
+*         in the conventional order.
+            IF (SWAP) THEN
+               IPERM(1)=2
+               IPERM(2)=1
+            ELSE
+               IPERM(1)=1
+               IPERM(2)=2
             END IF
+            OPERM(1)=IPERM(1)
+            OPERM(2)=IPERM(2)
+            PMAP=AST_PERMMAP(2,IPERM,2,OPERM,0D0,' ',STATUS)
 
-*         Average over size in X and size in Y in any case.
-            PSIZE=0.5*REAL(PSZX+PSZY)
+*         Get the mapping from the GRID domain to the SKY domain frames.
+            GSMAP=AST_GETMAPPING(IWCS,JGRID,JSKY,STATUS)
+
+*         Combine and simplify the mappings so we have one which maps
+*         from the GRID domain to a normalised (latitude=second axis)
+*         SkyFrame.
+            MAP=AST_SIMPLIFY(AST_CMPMAP(GSMAP,PMAP,.TRUE.,' ',STATUS),
+     :                       STATUS)
+
+*         Find the bounds of the NDF.
+            CALL NDF_DIM(INDF,2,DIM,NDIM,STATUS)
+
+*         Find the centre of the NDF in SKY coordinates.
+            CALL AST_TRAN2(MAP,1,DBLE(DIM(1)/2),DBLE(DIM(2)/2),.TRUE.,
+     :                     CENX,CENY,STATUS)
+
+*         Get the size of an arcsecond in radians.
+            PI=4D0*ATAN(1D0)
+            ARCSEC=2D0*PI/(36D1*6D1*6D1)
+
+*         Construct two points an arcsecond away from each other in
+*         latitude near the centre of the NDF.
+            UNITX(1)=CENX
+            UNITY(1)=CENY
+            UNITX(2)=CENX
+            UNITY(2)=CENY+ARCSEC
+
+*         Transform the points from SKY to GRID coordinates.
+            CALL AST_TRAN2(MAP,2,UNITX,UNITY,.FALSE.,TRANX,TRANY,STATUS)
+
+*         Work out the distance in pixels that one arcsecond in latitude
+*         transforms to.
+            DISTY=SQRT((TRANX(2)-TRANX(1))**2 + (TRANY(2)-TRANY(1))**2)
+
+*         Get the pixel size in arcseconds.
+            PSIZE=1D0/DISTY
 
 *         Inform the user what size the pixels are.
             CALL MSG_FMTR('PSIZE','G9.2',PSIZE)

@@ -15,6 +15,8 @@
 #        Original version.
 #     25-OCT-1999 (MBT):
 #        Modified ORIGIN and COSYS to accomodate WCS aware changes.
+#     8-NOV-1999 (MBT):
+#        Removed COSYS.
 #     {enter_changes_here}
 
 #-    
@@ -44,18 +46,6 @@ interface SECTOR
     ppath 'current,default'
     vpath 'prompt'
     default y
-    helpkey '*'
-  endparameter
-
-  parameter COSYS    # Coordinate types
-    type '_CHAR'
-    access 'read'
-    keyword 'COSYS'
-    prompt '(W)orld, (D)ata or (C)urrent frame co-ords to define pixel?'
-    ppath 'current,default'
-    vpath 'prompt'
-    in 'd','D','w','W','c','C'
-    default 'D'
     helpkey '*'
   endparameter
 
@@ -260,7 +250,7 @@ interface SECTOR
     prompt 'Indices of the origin'
     ppath 'current,default'
     vpath 'prompt'
-    default 92,96
+    default '92,96'
     helpkey '*'
   endparameter
  

@@ -154,6 +154,7 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -161,6 +162,8 @@
 *     (Original version)
 *     10-JAN-1997 (GJP)
 *     Modified output file format to cope with big images.
+*     10-NOV-1999 (MBT)
+*     Modified for World Coordinate System awareness.
 *      
 
 *-
@@ -210,7 +213,7 @@
       
 
       SUBROUTINE GRA1_FILER(FSTAT,FIOID,RFAIL,POINTS,RESULT,
-     :                      BACK,SIGMA,PSIZE,XCO,YCO,
+     :                      BACK,SIGMA,PSIZE,XCO,YCO,CURCO,
      :                      FILEN,FTYPE,ZEROP,STATUS)    
 *+
 *  Name:
@@ -225,8 +228,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL GRA1_FILER(FSTAT,FIOID,RFAIL,POINTS,RESULT
-*     :                BACK,SIGMA,PSIZE,XCO,YCO,
+*      CALL GRA1_FILER(FSTAT,FIOID,RFAIL,POINTS,RESULT,
+*     :                BACK,SIGMA,PSIZE,XCO,YCO,CURCO,
 *     :                FILEN,FTYPE,ZEROP,STATUS)    
                       
 *  Description:
@@ -261,12 +264,12 @@
 *     PSIZE = REAL (Returned)
 *        Pixel size for the image used to create the current profile.
 *        Units arc seconds.
-*     XCO(2) = REAL (Returned)
-*        X co-ordinate of the galaxy on the source image. Both
-*        world and data co-ordinates.
-*     YCO(2) = REAL (Returned)
-*        Y co-ordinate of the galaxy on the source image. Both
-*        world and data co-ordinates.
+*     XCO = REAL (Returned)
+*        X co-ordinate of the galaxy on the source image (Base frame).
+*     YCO = REAL (Returned)
+*        Y co-ordinate of the galaxy on the source image (Base frame).
+*     CURCO *(80) = CHARACTER (Returned)
+*        Coordinates of the galaxy on the source image (Current frame).
 *     FILEN *(80) = CHARACTER (Returned)
 *        Name of the image from which the data was obtained.
 *     FTYPE *(3) = CHARACTER (Returned)
@@ -299,6 +302,7 @@
       INTEGER FIOID                   ! FIO identifier for the input file
 
 *  Arguments Returned:
+      CHARACTER *(80) CURCO           ! Current coordinates of galaxy centre
       CHARACTER *(80) FILEN           ! Image on which galaxy was found
       CHARACTER *(3) FTYPE            ! File header type
       INTEGER FSTAT                   ! Indicates if an error was found
@@ -310,8 +314,8 @@
       REAL BACK                       ! Background count value
       REAL SIGMA                      ! Background count standard deviation
       REAL PSIZE                      ! Pixel size
-      REAL XCO(2)                     ! Galaxy x co-ordinates
-      REAL YCO(2)                     ! Galaxy y co-ordinates
+      REAL XCO                        ! Galaxy x co-ordinates
+      REAL YCO                        ! Galaxy y co-ordinates
       REAL ZEROP                      ! Magnitude zero point
 
 *  Status:     
@@ -363,7 +367,7 @@
                       CALL MSG_OUT(' ','SECTOR Header found.',STATUS)
                       CALL GRA1_SECT(FIOID,FAIL,POINTS,RESULT,
      :                               FILEN,BACK,SIGMA,PSIZE,
-     :                               XCO,YCO,ZEROP,STATUS)
+     :                               XCO,YCO,CURCO,ZEROP,STATUS)
                       FOUND=1
                       FTYPE='SEC'
                   END IF
@@ -374,7 +378,7 @@
                       CALL MSG_OUT(' ','ELLPRO Header found.',STATUS)
                       CALL GRA1_ELLS(FIOID,FAIL,POINTS,RESULT,
      :                               FILEN,BACK,SIGMA,PSIZE,
-     :                               XCO,YCO,ZEROP,STATUS)
+     :                               XCO,YCO,CURCO,ZEROP,STATUS)
                       FOUND=1
                       FTYPE='ELP'
                   END IF
@@ -385,7 +389,7 @@
                       CALL MSG_OUT(' ','ELLFOU Header found.',STATUS)
                       CALL GRA1_ELLS(FIOID,FAIL,POINTS,RESULT,
      :                         FILEN,BACK,SIGMA,PSIZE,
-     :                         XCO,YCO,ZEROP,STATUS)
+     :                         XCO,YCO,CURCO,ZEROP,STATUS)
                       FOUND=1
                       FTYPE='ELF'
                   END IF
@@ -791,7 +795,7 @@
 
 
       SUBROUTINE GRA1_SECT(FIOID,RFAIL,POINTS,RESULT,
-     :               FILEN,BACK,SIGMA,PSIZE,XCO,YCO,ZEROP,STATUS)
+     :               FILEN,BACK,SIGMA,PSIZE,XCO,YCO,CURCO,ZEROP,STATUS)
 *+
 *  Name:
 *     GRA1_SECT
@@ -804,7 +808,7 @@
 
 *  Invocation:
 *     CALL GRA1_SECT(FIOID,RFAIL,POINTS,RESULT,
-*                    FILEN,BACK,SIGMA,PSIZE,XCO,YCO,ZEROP,STATUS) 
+*                    FILEN,BACK,SIGMA,PSIZE,XCO,YCO,CURCO,ZEROP,STATUS) 
 
 *  Description:
 *     Reads in the lines of a text file until either '## END' or
@@ -842,14 +846,15 @@
       INTEGER RFAIL                   ! Has the end of the file been found?
 
 *  Arguments Returned:
+      CHARACTER *(80) CURCO           ! Current coordinates fo galaxy
       CHARACTER *(80) FILEN           ! Name of the image on which the profiled
                                       ! galaxy is to be found
       INTEGER POINTS                  ! Total number of isophotes
       REAL PSIZE                      ! Pixel size
       REAL SIGMA                      ! Standard deviationof background count
       REAL BACK                       ! Sky background count
-      REAL XCO(2)                     ! X co-ordinate of galaxy
-      REAL YCO(2)                     ! Y co-ordinate of galaxy
+      REAL XCO                        ! X co-ordinate of galaxy
+      REAL YCO                        ! Y co-ordinate of galaxy
       REAL RESULT(GRA__RESUL,17)      ! Results array read from file
       REAL ZEROP                      ! Magnitude scale zero point
 
@@ -879,8 +884,7 @@
       POINTS=0
       FAIL=0
       FILEN=' '
-      XCO(1)=-1
-      XCO(2)=-1
+      XCO=-1
       DO 10 I=1,8
          FOUND(I)=0
  10   CONTINUE
@@ -907,6 +911,7 @@
                STRING=BUFFER
                IF ((STRING.EQ.'FIL').AND.(FAIL.EQ.0)) THEN
                   CALL GRA1_RCHAR(FIOID,RFAIL,BUFFER,STATUS)
+                  CALL CHR_RMBLK(BUFFER)
                   FILEN=BUFFER
                   IF (FILEN.EQ.' ') THEN
                      FAIL=1
@@ -945,13 +950,13 @@
 
 *            Initial galaxy centre co-ordinates.
                IF ((STRING.EQ.'X/Y').AND.(FAIL.EQ.0)) THEN 
-                  CALL GRA1_RNUMBS(FIOID,RFAIL,TEMP,NUMW,STATUS)
-                  IF (XCO(1).LT.0.0) THEN 
-                     XCO(1)=TEMP(1)
-                     YCO(1)=TEMP(2)
+                  IF (XCO.LT.0.0) THEN 
+                     CALL GRA1_RNUMBS(FIOID,RFAIL,TEMP,NUMW,STATUS)
+                     XCO=TEMP(1)
+                     YCO=TEMP(2)
                   ELSE
-                     XCO(2)=TEMP(1)
-                     YCO(2)=TEMP(2)                     
+                     CALL GRA1_RCHAR(FIOID,RFAIL,BUFFER,STATUS)
+                     CURCO=BUFFER
                   END IF
               END IF
 
@@ -1030,7 +1035,7 @@
 
 
       SUBROUTINE GRA1_ELLS(FIOID,RFAIL,POINTS,RESULT,
-     :               FILEN,BACK,SIGMA,PSIZE,XCO,YCO,ZEROP,STATUS)
+     :               FILEN,BACK,SIGMA,PSIZE,XCO,YCO,CURCO,ZEROP,STATUS)
 *+
 *  Name:
 *     GRA1_ELLS
@@ -1043,7 +1048,7 @@
 
 *  Invocation:
 *     CALL GRA1_ELLS(FIOID,RFAIL,POINTS,RESULT,
-*                    FILEN,BACK,SIGMA,PSIZE,XCO,YCO,ZEROP,STATUS) 
+*                    FILEN,BACK,SIGMA,PSIZE,XCO,YCO,CURCO,ZEROP,STATUS) 
 
 *  Description:
 *     Reads in the lines of a text file until either '## END' or
@@ -1081,14 +1086,15 @@
       INTEGER RFAIL                   ! Has the end of the file been found?
 
 *  Arguments Returned:
+      CHARACTER *(80) CURCO           ! Current coordinates of the galaxy
       CHARACTER *(80) FILEN           ! Name of the image on which the profiled
                                       ! galaxy is to be found
       INTEGER POINTS                  ! Total number of isophotes
       REAL PSIZE                      ! Pixel size
       REAL SIGMA                      ! Standard deviation of the background count
       REAL BACK                       ! Sky background count
-      REAL XCO(2)                     ! X co-ordinate of galaxy
-      REAL YCO(2)                     ! Y co-ordinate of galaxy
+      REAL XCO                        ! X co-ordinate of galaxy
+      REAL YCO                        ! Y co-ordinate of galaxy
       REAL RESULT(GRA__RESUL,17)      ! Results array read from file
       REAL ZEROP                      ! Magnitude scale zero point
 
@@ -1117,8 +1123,7 @@
       POINTS=0
       FAIL=0
       FILEN=' '
-      XCO(1)=-1
-      XCO(2)=-1
+      XCO=-1
       DO 10 I=1,9
          FOUND(I)=0
  10   CONTINUE
@@ -1145,6 +1150,7 @@
                STRING=BUFFER
                IF ((STRING.EQ.'FIL').AND.(FAIL.EQ.0)) THEN
                   CALL GRA1_RCHAR(FIOID,RFAIL,BUFFER,STATUS)
+                  CALL CHR_RMBLK(BUFFER)
                   FILEN=BUFFER
                   IF (FILEN.EQ.' ') THEN
                      FAIL=1
@@ -1183,13 +1189,13 @@
 
 *            Initial galaxy centre co-ordinates.
                IF ((STRING.EQ.'X/Y').AND.(FAIL.EQ.0)) THEN 
-                  CALL GRA1_RNUMBS(FIOID,RFAIL,TEMP,NUMW,STATUS)
-                  IF (XCO(1).LT.0.0) THEN 
-                     XCO(1)=TEMP(1)
-                     YCO(1)=TEMP(2)
+                  IF (XCO.LT.0.0) THEN 
+                     CALL GRA1_RNUMBS(FIOID,RFAIL,TEMP,NUMW,STATUS)
+                     XCO=TEMP(1)
+                     YCO=TEMP(2)
                   ELSE
-                     XCO(2)=TEMP(1)
-                     YCO(2)=TEMP(2)                     
+                     CALL GRA1_RCHAR(FIOID,RFAIL,BUFFER,STATUS)
+                     CURCO=BUFFER
                   END IF
               END IF
 
@@ -1502,10 +1508,13 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 
 *  History:
 *     12-DEC-1993 (GJP)
 *     (Original version)
+*     10-NOV-1999 (MBT)
+*     Modified so it doesn't remove blanks.
 
 *  Bugs:
 *     None known.
@@ -1568,8 +1577,7 @@
 
       END DO
        
-*   Remove blanks.
-      CALL CHR_RMBLK(BUFFER)
+*   Check for an empty buffer.
       IF (BUFFER.EQ.' ') FAIL=1
 
  9999 CONTINUE
@@ -2080,6 +2088,7 @@
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
+      CHARACTER *(80) CURCO           ! Current coordinates of galaxy centre
       CHARACTER *(80) FILEN           ! Image on which the galaxy was found   
       CHARACTER *(80) FILEN2          ! Temporary storage of FILEN  
       CHARACTER *(3) FTYPE            ! The type of record being read
@@ -2122,8 +2131,8 @@
       REAL SLEN(2)                    ! Scale length of the galaxy
       REAL RESULT(GRA__RESUL,17)      ! Sum of the pixel counts for all pixels
                                       ! at a given distance from the origin
-      REAL XCO(2)                     ! X index of the sector origin
-      REAL YCO(2)                     ! Y index of the sector origin
+      REAL XCO                        ! X index of the sector origin
+      REAL YCO                        ! Y index of the sector origin
       REAL ZEROP                      ! Zero point of the surface 
                                       ! brightness graphs
 *.
@@ -2174,7 +2183,7 @@
       END IF
 
 *   Create a text file containing the latest profile/fit results.
-      CALL GRA1_TEXTO(0,FILEN,REG,XCO,YCO,SLEN,CONS,ZEROP,
+      CALL GRA1_TEXTO(0,FILEN,REG,XCO,YCO,CURCO,SLEN,CONS,ZEROP,
      :                OPENF,FIOD2,EXCLAIM,STATUS)
       FILEN2=' '
 
@@ -2184,7 +2193,7 @@
 
 *      Obtain the results from the file.
          CALL GRA1_FILER(FSTAT,FIOID,FLAG,POINTS,RESULT,
-     :                   BACK,SIGMA,PSIZE,XCO,YCO,FILEN,
+     :                   BACK,SIGMA,PSIZE,XCO,YCO,CURCO,FILEN,
      :                   FTYPE,ZEROP,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
@@ -2323,8 +2332,8 @@
                   END IF
 
 *               Display the results on the default display.
-                  CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,BACK,SIGMA,CONS,
-     :                            GRAD,PSIZE,NUMBP,ZEROP,SLEN,
+                  CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,CURCO,BACK,SIGMA,
+     :                            CONS,GRAD,PSIZE,NUMBP,ZEROP,SLEN,
      :                            LOR,HIR,REG,STATUS)    
 
                END IF           
@@ -2336,7 +2345,7 @@
 
 *            Create a text file header (if the filename has changed).
                IF (FILEN.NE.FILEN2) THEN 
-                  CALL GRA1_TEXTO(1,FILEN,REG,XCO,YCO,SLEN,
+                  CALL GRA1_TEXTO(1,FILEN,REG,XCO,YCO,CURCO,SLEN,
      :                            CONS,ZEROP,OPENF,FIOD2,
      :                            EXCLAIM,STATUS)
                   FILEN2=FILEN
@@ -2344,7 +2353,7 @@
 
 *            Store the latest profile/fit results 
                IF (.NOT.EXCLAIM) THEN
-                  CALL GRA1_TEXTO(2,FILEN,REG,XCO,YCO,SLEN,
+                  CALL GRA1_TEXTO(2,FILEN,REG,XCO,YCO,CURCO,SLEN,
      :                            CONS,ZEROP,OPENF,
      :                            FIOD2,EXCLAIM,STATUS)
                END IF
@@ -2371,7 +2380,7 @@
 
 *   Close the results file.
       IF (.NOT.EXCLAIM) THEN
-         CALL GRA1_TEXTO(3,FILEN,REG,XCO,YCO,SLEN,CONS,ZEROP,
+         CALL GRA1_TEXTO(3,FILEN,REG,XCO,YCO,CURCO,SLEN,CONS,ZEROP,
      :                   OPENF,FIOD2,EXCLAIM,STATUS)
       END IF
                    
@@ -2438,6 +2447,7 @@
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:   
+      CHARACTER *(80) CURCO           ! Current coordinates of galaxy centre
       CHARACTER *(80) FILEN           ! Image on which the galaxy was found
       CHARACTER *(80) FILEN2          ! Temporary storage for FILEN
       CHARACTER *(3) FTYPE            ! The record type being read
@@ -2480,8 +2490,8 @@
       REAL SLEN(2)                    ! Scale length of the galaxy
       REAL RESULT(GRA__RESUL,17)      ! Sum of the pixel counts for all pixels
                                       ! at a given distance from the origin
-      REAL XCO(2)                     ! X index of the sector origin
-      REAL YCO(2)                     ! Y index of the sector origin
+      REAL XCO                        ! X index of the sector origin
+      REAL YCO                        ! Y index of the sector origin
       REAL ZEROP                      ! Zero point of the surface 
                                       ! brightness graphs
 *.
@@ -2558,7 +2568,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999 
 
 *   Create a text file containing the latest profile/fit results.
-      CALL GRA1_TEXTO(0,FILEN,REG,XCO,YCO,SLEN,CONS,ZEROP,
+      CALL GRA1_TEXTO(0,FILEN,REG,XCO,YCO,CURCO,SLEN,CONS,ZEROP,
      :                OPENF,FIOD2,EXCLAIM,STATUS)
       FILEN2=' '
     
@@ -2568,7 +2578,7 @@
 
 *      Obtain the results from the file.
          CALL GRA1_FILER(FSTAT,FIOID,FLAG,POINTS,RESULT,
-     :                   BACK,SIGMA,PSIZE,XCO,YCO,
+     :                   BACK,SIGMA,PSIZE,XCO,YCO,CURCO,
      :                   FILEN,FTYPE,ZEROP,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
@@ -2606,13 +2616,13 @@
                 IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *            Display the results on the default display.
-               CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,BACK,SIGMA,CONS,GRAD,
-     :                         PSIZE,NUMBP,ZEROP,SLEN,
+               CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,CURCO,BACK,SIGMA,
+     :                         CONS,GRAD,PSIZE,NUMBP,ZEROP,SLEN,
      :                         LOR,HIR,REG,STATUS)    
 
 *            Create a text file header (if the filename has changed).
                IF (FILEN.NE.FILEN2) THEN 
-                  CALL GRA1_TEXTO(1,FILEN,REG,XCO,YCO,SLEN,
+                  CALL GRA1_TEXTO(1,FILEN,REG,XCO,YCO,CURCO,SLEN,
      :                            CONS,ZEROP,OPENF,
      :                            FIOD2,EXCLAIM,STATUS)
                   FILEN2=FILEN
@@ -2620,7 +2630,7 @@
 
 *            Store the latest profile/fit results 
                IF (.NOT.EXCLAIM)  THEN
-                  CALL GRA1_TEXTO(2,FILEN,REG,XCO,YCO,SLEN,
+                  CALL GRA1_TEXTO(2,FILEN,REG,XCO,YCO,CURCO,SLEN,
      :                            CONS,ZEROP,OPENF,FIOD2,
      :                            EXCLAIM,STATUS)
                END IF  
@@ -2638,7 +2648,7 @@
 
 *   Close the results file.
       IF (.NOT.EXCLAIM) THEN
-         CALL GRA1_TEXTO(3,FILEN,REG,XCO,YCO,SLEN,
+         CALL GRA1_TEXTO(3,FILEN,REG,XCO,YCO,CURCO,SLEN,
      :                   CONS,ZEROP,OPENF,
      :                   FIOD2,EXCLAIM,STATUS)
       END IF
@@ -4127,7 +4137,7 @@
       END       
        
 
-      SUBROUTINE GRA1_TEXTD(FLAG,POINTS,XCO,YCO,BACK,SIGMA,CONS,
+      SUBROUTINE GRA1_TEXTD(FLAG,POINTS,XCO,YCO,CURCO,BACK,SIGMA,CONS,
      :                      GRAD,PSIZE,NUMBP,ZEROP,SLEN,
      :                      LOR,HIR,REG,STATUS)
 *+
@@ -4141,7 +4151,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,BACK,SIGMA,CONS,
+*      CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,CURCO,BACK,SIGMA,CONS,
 *                      GRAD,PSIZE,NUMBP,ZEROP,SLEN,
 *                      LOR,HIR,REG,STATUS)    
 
@@ -4157,10 +4167,12 @@
 *        Was a value found for the central pixel flag.                    
 *     POINTS = INTEGER (Given)
 *        Number of data points available.
-*     XCO(2) = REAL (Given)
+*     XCO = REAL (Given)
 *        The X index of the origin used. Units pixels.
-*     YCO(2) = REAL (Given)
+*     YCO = REAL (Given)
 *        The Y index of the origin used. Units pixels.
+*     CURCO *(80) = CHARACTER (Given)
+*        The coordinates in the Current frame of the origin used.
 *     BACK = REAL (Given)
 *        Background value found. Units counts.
 *     SIGMA = REAL (Given)
@@ -4209,6 +4221,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
 *  Arguments Given:                              
+      CHARACTER *(80) CURCO           ! Current coordinates of origin
       INTEGER NUMBP(2)                ! Number of data points used for the
                                       ! radius/brightness fits
       INTEGER FLAG                    ! Was the central pixel value found?
@@ -4226,8 +4239,8 @@
       REAL SIGMA                      ! Standard deviation of the background
       REAL SLEN(2)                    ! Scale length values from the two  
                                       ! fits i.e. spiral and elliptical
-      REAL XCO(2)                     ! X index of the origin
-      REAL YCO(2)                     ! Y index of the origin
+      REAL XCO                        ! X index of the origin
+      REAL YCO                        ! Y index of the origin
       REAL ZEROP                      ! Zero point of the magnitude scale
       
 *  Status:     
@@ -4252,17 +4265,15 @@
       CALL MSG_OUT(' ','Range used (arc sec):  ^VALUE,^VALUE1',
      :             STATUS)
 
-*  Display X and Y data co-ordinates.
-      CALL MSG_FMTR('VALUE','F7.2',XCO(1))
-      CALL MSG_FMTR('VALUE1','F7.2',YCO(1))
-      CALL MSG_OUT(' ','X and Y co-ordinates (data): ^VALUE,^VALUE1 ',
+*  Display X and Y Base frame co-ordinates.
+      CALL MSG_FMTR('VALUE','F7.2',XCO)
+      CALL MSG_FMTR('VALUE1','F7.2',YCO)
+      CALL MSG_OUT(' ','X and Y co-ordinates (Base): ^VALUE ^VALUE1 ',
      :                STATUS)
 
-*  Display X and Y data co-ordinates.
-      CALL MSG_FMTR('VALUE','F7.2',XCO(2))
-      CALL MSG_FMTR('VALUE1','F7.2',YCO(2))
-      CALL MSG_OUT(' ','X and Y co-ordinates (world): ^VALUE,^VALUE1 ',
-     :                STATUS)
+*  Display X and Y Current frame co-ordinates.
+      CALL MSG_SETC('VALUE',CURCO)
+      CALL MSG_OUT(' ','X and Y co-ordinates (Current): ^VALUE ',STATUS)
    
 
 *  Display 'fit' information.
@@ -4318,7 +4329,7 @@
       END 
 
 
-      SUBROUTINE GRA1_TEXTO(MODE,FILEN,REG,XCO,YCO,SLEN,
+      SUBROUTINE GRA1_TEXTO(MODE,FILEN,REG,XCO,YCO,CURCO,SLEN,
      :                      CONS,ZEROP,OPENF,FIOD2,EXCLAIM,STATUS)
 *+
 *  Name:
@@ -4331,7 +4342,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL GRA1_TEXTO(MODE,FILEN,REG,XCO,YCO,SLEN,
+*      CALL GRA1_TEXTO(MODE,FILEN,REG,XCO,YCO,CURCO,SLEN,
 *                      CONS,ZEROP,OPENF,FIOD2,EXCLAIM,STATUS)    
 
 *  Description:
@@ -4349,10 +4360,12 @@
 *        Name of the text file being read. 
 *     REG(2) = REAL (Given)
 *        Linear correlation coefficient squared.
-*     XCO(2) = REAL (Given)
-*        The X index of the origin used. Units pixels.
-*     YCO(2) = REAL (Given)
-*        The Y index of the origin used. Units pixels.
+*     XCO = REAL (Given)
+*        The X coordinate of the origin used (Base frame).
+*     YCO = REAL (Given)
+*        The Y coordinate of the origin used (Base frame).
+*     CURCO *(80) = CHARACTER (Given)
+*        Coordinates of the origin used (Current frame).
 *     SLEN(2) = REAL (Given)
 *        Scale lengths of the galaxy/object in the case of a spiral
 *        or an elliptical. Units arc secs.
@@ -4393,6 +4406,7 @@
       INCLUDE 'MSG_PAR'               ! MSG constants
 
 *  Arguments Given:         
+      CHARACTER *(80) CURCO           ! Current coordinates of galaxy
       CHARACTER *(80) FILEN           ! Image on which the galaxy was found
       INTEGER MODE                    ! Write a header or data?
       REAL CONS(2)                    ! The constant term of the fits
@@ -4400,8 +4414,8 @@
       REAL REG(2)                     ! LCC squared
       REAL SLEN(2)                    ! Scale length values from the two  
                                       ! fits i.e. spiral and elliptical
-      REAL XCO(2)                     ! X index of the origin
-      REAL YCO(2)                     ! Y index of the origin
+      REAL XCO                        ! X index of the origin
+      REAL YCO                        ! Y index of the origin
       REAL ZEROP                      ! Magnitude scale zero point
 
 *  Arguments Given and Returned:
@@ -4413,10 +4427,15 @@
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
+      CHARACTER *(80) BUFFER          ! Temporary storage
       CHARACTER *(120) LINE           ! FIO line output length
       CHARACTER *(MSG__SZMSG) TEMPO1  ! Temporary storage
       CHARACTER *(MSG__SZMSG) TEMPO2  ! Temporary storage
+      CHARACTER *(80) WORDS(3)        ! Words in string
       INTEGER NCHAR                   ! Length of output string
+      INTEGER NWRDS                   ! Number of words in string
+      INTEGER START(3)                ! Start positions of words
+      INTEGER STOP(3)                 ! End positions of words
       REAL VALUE                      ! Temporary storage
 *.
 
@@ -4488,13 +4507,21 @@
 *   Output scale length results and co-ordinates.
       IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.2)) THEN   
      
-*      Format X and Y data co-ordinates.
-         CALL MSG_FMTR('VALUE1','F9.2',XCO(1))
-         CALL MSG_FMTR('VALUE2','F9.2',YCO(1))
+*      Format X and Y Base frame co-ordinates.
+         CALL MSG_FMTR('VALUE1','F9.2',XCO)
+         CALL MSG_FMTR('VALUE2','F9.2',YCO)
       
-*      Format X and Y world co-ordinates.
-         CALL MSG_FMTR('VALUE3','F9.2',XCO(2))
-         CALL MSG_FMTR('VALUE4','F9.2',YCO(2))
+*      Format X and Y Current frame co-ordinates.
+         CALL CHR_DCWRD(CURCO,3,NWRDS,START,STOP,WORDS,STATUS)
+         IF (NWRDS.EQ.2.AND.STOP(1)-START(1).LT.9.AND.
+     :       STOP(2)-START(2).LT.9) THEN
+            BUFFER=' '
+            BUFFER(9-STOP(1)+START(1):)=WORDS(1)
+            BUFFER(19-STOP(2)+START(2):)=WORDS(2)
+            CALL MSG_SETC('VALUE3',BUFFER)
+         ELSE
+            CALL MSG_SETC('VALUE3',CURCO)
+         END IF
 
 *      Format the scale length values.
          IF(SLEN(1).GT.99.999) SLEN(1)=99.999
@@ -4516,7 +4543,7 @@
 
 
 *      Output the co-ordinates, scale lengths and extrapolated CSB.
-         TEMPO1='^VALUE1 ^VALUE2 ^VALUE3 ^VALUE4 ^VALUE5 ^VALUE6'//
+         TEMPO1='^VALUE1 ^VALUE2 ^VALUE3 ^VALUE5 ^VALUE6'//
      :          ' ^VALUE7 ^VALUE8 ^VALUE9 ^VALUE10'
          CALL MSG_LOAD(' ',TEMPO1,TEMPO2,NCHAR,STATUS)
          CALL FIO_WRITE(FIOD2,TEMPO2(1:NCHAR),STATUS)

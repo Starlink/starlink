@@ -490,7 +490,9 @@ F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
 	gaufit2.f dnsg.f d1mach.f_bigieee d1mach.f_littleieee \
 	graphs.f histpeak.f hsub.f loback.f mask.f mixup.f sector.f \
 	selfc.f selfcw.f skew.f topped.f ards.f \
-	esp1_gtpsz.f esp1_s2pr.f esp1_pr2s.f
+        esp1_asffr.f esp1_crpt.f esp1_dsfrm.f esp1_gtpos.f esp1_gtpsz.f \
+        esp1_inpos.f esp1_pr2s.f esp1_s2pr.f esp1_xyfmt.f \
+        kpg1_pgesc.f
 
 F_SUB2 =
 
@@ -608,6 +610,7 @@ NDF_ERR:      $(STAR_INC)/ndf_err;   $(LINK) $? $@
 NDF_PAR:      $(STAR_INC)/ndf_par;   $(LINK) $? $@
 SAE_PAR:      $(STAR_INC)/sae_par;   $(LINK) $? $@
 PSX_ERR:      $(STAR_INC)/psx_err;   $(LINK) $? $@
+AST_ERR:      $(STAR_INC)/ast_err;   $(LINK) $? $@
 AST_PAR:      $(STAR_INC)/ast_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
@@ -1398,9 +1401,15 @@ ellfou.o:   PAR_ERR SAE_PAR AGI_ERR DAT_PAR FIO_ERR MSG_PAR NDF_PAR \
             PAR_ERR PRM_PAR SAE_PAR SUBPAR_PAR elf_par
 ellpro.o:   PAR_ERR SAE_PAR AGI_ERR DAT_PAR FIO_ERR MSG_PAR NDF_PAR \
             PAR_ERR PRM_PAR SAE_PAR SUBPAR_PAR elp_par
+esp1_asffr.o: AST_PAR SAE_PAR
+esp1_crpt.o: AST_PAR SAE_PAR
+esp1_dsfrm.o: AST_PAR NDF_PAR SAE_PAR
+esp1_gtpos.o: AST_ERR AST_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 esp1_gtpsz.o: AST_PAR PAR_PAR SAE_PAR
+esp1_inpos.o: AST_PAR SAE_PAR
 esp1_pr2s.o: AST_PAR SAE_PAR
 esp1_s2pr.o: AST_PAR SAE_PAR
+esp1_xyfmt.o: AST_PAR SAE_PAR
 esp_mon.o:  PAR_PAR SAE_PAR
 esphelp.o:  DAT_PAR PAR_ERR PAR_PAR SAE_PAR hlpcmd.inc
 fastmed.o:  NDF_PAR PRM_PAR SAE_PAR fas_par
@@ -1410,6 +1419,7 @@ graphs.o:   PAR_ERR SAE_PAR AGI_ERR FIO_ERR MSG_PAR PAR_ERR PRM_PAR \
             SAE_PAR SUBPAR_PAR gra_par
 histpeak.o: NDF_PAR PAR_ERR PRM_PAR SAE_PAR his_par
 hsub.o:     NDF_PAR PRM_PAR SAE_PAR hsb_par
+kpg1_pgesc.o: SAE_PAR
 loback.o:   PAR_ERR SAE_PAR FIO_ERR MSG_PAR NDF_PAR PRM_PAR SAE_PAR lob_par
 mask.o:     NDF_PAR PRM_PAR SAE_PAR
 mixup.o:    NDF_PAR SAE_PAR

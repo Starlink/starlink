@@ -19,6 +19,8 @@
 #	parameters as FWHM/arcsecs
 #     26-OCT-1999 (MBT):
 #        MOdified COSYS to accommodate WCS aware changes.
+#     8-NOV-1999 (MBT):
+#        Removed COSYS.
 #     {enter_changes_here}
 
 #-    
@@ -202,20 +204,6 @@ interface GAUFIT
     ppath 'current,default'
     vpath 'prompt'
     default gaufit.dat
-    helpkey *
-  endparameter
-
-  parameter COSYS    # Coordinate types
-    type '_CHAR'
-    access 'read'
-    keyword 'COSYS'
-    prompt '(W)orld, (D)ata or (C)urrent frame co-ords to define pixel?'
-#    ppath 'current,default'
-#	Norman added global, 19980610
-    ppath 'global,current,default'
-    vpath 'prompt'
-    in 'd','D','w','W','c','C'
-    default 'D'
     helpkey *
   endparameter
 

@@ -27,18 +27,18 @@
 *     essential when the package is used with overlapping sources.
 *
 *     Input text files must contain the x and y coordinates of the 
-*     source and may in addition contain estimates for the position 
-*     angle, Sa, Sb (std deviation of the Gaussian functions in 2 
-*     directions - major axis then minor) and the peak value.
-*  
-
+*     source in the Current co-ordinates of the NDF, and may in 
+*     addition contain estimates for the position angle, Sa, Sb 
+*     (std deviation of the Gaussian functions in 2 directions - 
+*     major axis then minor) and the peak value.
+*
 *     Output image options are for the generation of the complete whole 
 *     image model or an image containing the residuals in the regions 
 *     surrounding the sources.
 *
 *      
 *  Usage:
-*     GAUFIT MODE BACK IMGDEV SIGMA NSIGMA OUT COSYS IN MODEL  
+*     GAUFIT MODE BACK IMGDEV SIGMA NSIGMA OUT IN MODEL  
 *            MODTYPE INFILE COLOUR ANGCON ANGOFF AUTOL 
 *            XINC YINC SAINC SBINC PINC ANGINC
  
@@ -58,15 +58,13 @@
 *        The background value for the image.
 *     COLOUR = _INTEGER (Read)
 *        Colour of the pen used to mark source centres.
-*     COSYS = _CHAR (Read)
-*        What co-ordinate system to use?  D=data, W=world, C=Current
-*        frame of WCS component.
 *     IMGDEV = _DEVICE (Read) 
 *        Name of the graphics device on which the results graph should 
 *        be displayed.
 *     INFILE = _CHAR (Read)
 *        Name of a text file containing the co-ordinates sources 
-*        to be profiled.
+*        to be profiled.  Co-ordinates are in the Current co-ordinate
+*        system of the WCS component of IN.
 *     IN = _NDF (Read)
 *        The name of the source NDF data structure/file.
 *     MODE = _LOGICAL (Read)
@@ -77,7 +75,8 @@
 *     MODTYP=_CHAR (Read)
 *        The type of output NDF file to be created. MODTYP=R gives
 *        residuals near the sources. MODTYP=W gives the whole
-*        image model. Angular offset for position angles generated. Units degrees.
+*        image model. Angular offset for position angles generated. 
+*        Units degrees.
 *     NSIGMA = _REAL (Read)
 *        Number of sigma above sky at which pixels are considered 
 *        to be significant.
@@ -109,13 +108,13 @@
 *
 *  Examples:
 *     gaufit mode=false infile=coords.dat in=image out=sources
-*            cosys=w modtyp=w model=imodel
+*            modtyp=w model=imodel
 *
 *        Will read source coordinates from the text file coords.dat. 
 *        The image on which these appear is image, the output image 
 *        containing the model for each pixel will be imodel.
-*        The coordinates provided by the file will be assumed to be
-*        in the form of world coordinates.
+*        The coordinates provided by the file are in the Current 
+*        coordinate system of the WCS component of the NDF image.
 *
 *     gaufit mode=true out=test1 modtyp=r angoff=90
 *        
@@ -128,6 +127,7 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     NG:  Norman Gray (Starlink, GLA)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 *
 *  History:
@@ -135,6 +135,8 @@
 *       (Original version)
 *     10-JUN-1998 (NG)
 *       Merged gau2_pro from gaufit2.f - alternative fitting routine
+*     8-NOV-1999 (MBT)
+*       Modified to work with World Coordinate Systems.
 *
 *-
 
@@ -154,6 +156,9 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN   
+
+*   Enter AST context.
+      CALL AST_BEGIN(STATUS)
 
 *   Show that the application is running.
       CALL MSG_BLANK(STATUS)
@@ -182,10 +187,13 @@
 *   Abort the program.
  9999 CONTINUE
 
+*   Exit AST context.
+      CALL AST_END(STATUS)
+
       END 
 
 
-       SUBROUTINE GAU1_CMODE(STATUS)
+      SUBROUTINE GAU1_CMODE(STATUS)
 *+
 *  Name:
 *     GAU1_CMODE
@@ -774,7 +782,7 @@
       END 
 
 
-      SUBROUTINE GAU1_FILER(FIOID,INDF,COSYS,
+      SUBROUTINE GAU1_FILER(FIOID,INDF,
      :                      NSOUR,XC,YC,RLIM,HINT,FWHM,STATUS)
 *+
 *  Name:
@@ -797,7 +805,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL GAU1_FILER(FIOID,INDF,COSYS,NSOUR,
+*      CALL GAU1_FILER(FIOID,INDF,NSOUR,
 *                      XC,YC,RLIM,HINT,FWHM,STATUS)    
 
 *  Description:
@@ -821,9 +829,6 @@
 *        FIO identifier for the input file.
 *     INDF = INTEGER (Given)
 *        NDF identifier for the image.
-*     COSYS *(256) = CHARACTER (Given)
-*        Character defining whether the co-ordinates provided 
-*        are world, data or current frame format. 
 *     NSOUR = INTEGER (Returned)
 *        Number of sources to be profiled.
 *     XC(10,2) = REAL (Returned)
@@ -852,7 +857,9 @@
 *     9-Mar-1996 (GJP)
 *     (Original version)
 *     26-OCT-1999 (MBT):
-*        Modified to cope with COSYS=C.
+*     Modified to cope with COSYS=C.
+*     8-NOV-1999 (MBT):
+*     Removed COSYS altogether.
 
 *  Bugs:
 *     None known.
@@ -869,8 +876,6 @@
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
 *  Arguments Given:                              
-      CHARACTER *(256) COSYS          ! Option choice defining the
-                                      ! coordinate system being used
       INTEGER FIOID                   ! FIO identifier for the input file
       INTEGER INDF                    ! NDF identifier for image
       LOGICAL FWHM                    ! Are we using FWHM rather than sigma?
@@ -987,7 +992,7 @@
 
 *            Change strings in character buffer into numeric coordinate
 *            values.
-               CALL ESP1_S2PR(COSYS,INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
+               CALL ESP1_S2PR(INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
      :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
      :                        VALUE(2),STATUS)
 
@@ -1181,8 +1186,6 @@
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:   
-      CHARACTER *(256) COSYS          ! User choice defining the data
-                                      ! convention for pixel positions
       CHARACTER *(256) MODTYC         ! Type of output image
       integer modtyp                  ! ...as integer
       LOGICAL ANGCON                  ! Position angle convention
@@ -1235,11 +1238,6 @@
       CALL FIO_ASSOC('INFILE','READ','LIST',80,FIOID,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999  
         
-*   Get the co-ordinate system mode and convert to upper case.
-      CALL PAR_GET0C('COSYS',COSYS,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      CALL CHR_UCASE(COSYS)
- 
 *   Begin an NDF context.                               
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -1274,8 +1272,7 @@
       IF (.NOT.FWHM) PSIZE = -PSIZE
 
 *   Obtain the co-ordinates of the sources required.
-      CALL GAU1_FILER(FIOID,NDF1,COSYS,
-     :                NSOUR,XCO,YCO,RLIM,HINT,fwhm,STATUS)
+      CALL GAU1_FILER(FIOID,NDF1,NSOUR,XCO,YCO,RLIM,HINT,fwhm,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
     
 *   Abort if the number of sources is zero.
@@ -2282,6 +2279,7 @@
       CHARACTER *80 TERMES(4)    ! Informational messages if device is
                                  ! a terminal
       INTEGER HITVAL             ! The selected choice of the cursor
+      INTEGER IWCS               ! AST pointer to WCS frameset of NDF
       INTEGER NIMGMS             ! Number of lines of image-display
                                  ! messages
       INTEGER NTERMS             ! Number of lines of terminal messages
@@ -2303,6 +2301,9 @@
 
 *   Check inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
+
+*   Enter AST context.
+      CALL AST_BEGIN(STATUS)
 
 *   Create informational messages for use with the cursor.
       CALL GAU1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
@@ -2349,6 +2350,9 @@
 *   Initialise HITVAL before the main loop is entered.
       HITVAL=0
 
+*   Get WCS component of NDF, used for reporting cursor position.
+      CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+
 *   Loop until the point is selected.
 *   Value 3 taken as the select.
 *   Value -1 or -9999 as an emergency exit.
@@ -2384,7 +2388,7 @@
 *      Display the cursor results if necessary.
          IF (HITVAL.EQ.0) THEN
             CALL MSG_BLANK(STATUS)
-            CALL GAU1_CURVD(X1,Y1,XIN,YIN,STATUS)
+            CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             CALL MSG_BLANK(STATUS)
          END IF
          
@@ -2426,98 +2430,13 @@
       CALL GAU1_AGIC2(GRADEV,1,0,NDF1,DEVCAN,PICID,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*    Exit point for errors that occurred before the graphics device
-*    was opened.
+*   Exit point for errors that occurred before the graphics device
+*   was opened.
                  
  9999 CONTINUE
 
-      END
-
-
-      SUBROUTINE GAU1_CURVD(X1,Y1,XW,YW,STATUS)
-*+
-*  Name:
-*     GAU1_CURVD
-
-*  Purpose:
-*     Displays information telling the user what the latest value 
-*     is for the cursor position. 
-
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*     CALL GAU1_CURVD(X1,Y1,XW,YW,STATUS)
-
-*  Description:
-*     The routine displays the latest value for the cursor position. 
-*     When an image is being displayed output is in the form of world 
-*     and data co-ordinates.
-
-*  Arguments:
-*     X1 = REAL (Given)
-*        X world co-ordinate of the left-hand edge of the image.
-*     Y1 = REAL (Given)
-*        Y world co-ordinate of the bottom edge of the image.
-*     XW = REAL (Given)
-*        X world co-ordinate.
-*     YW = REAL (Given)
-*        Y world co-ordinate.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Authors:
-*     GJP: Grant Privett (STARLINK)
-
-*  History:
-*     15-Mar-1996 (GJP)
-*     (Original version)
-
-*  Bugs:
-*     None known.
-
-*-
-
-*  Type Definitions:                  ! No implicit typing
-      IMPLICIT NONE
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
-*  Arguments Given:
-      REAL XW                         ! X world co-ordinate
-      REAL X1                         ! X world co-ordinate of the image
-                                      ! edge
-      REAL YW                         ! Y world co-ordinate
-      REAL Y1                         ! Y world co-ordinate of the image
-                                      ! bottom
-
-*  Arguments Returned:
-
-*  Status:     
-      INTEGER STATUS                  ! Global status
-
-*  Local Variables:                                               
-*.
-
-*   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN
-
-*   Put the data co-ordinates into message token.
-      CALL MSG_SETR('XVALD',XW-X1)
-      CALL MSG_SETR('YVALD',YW-Y1)
-
-*   Put the world co-ordinates into message tokens.
-      CALL MSG_SETR('XVALW',XW)
-      CALL MSG_SETR('YVALW',YW)
-
-*   Display the current X and Y values.
-      CALL MSG_OUT(' ','Cursor position (x/y)'/  
-     :             /' ^XVALW, ^YVALW (world), '/
-     :             /'^XVALD, ^YVALD (data)',STATUS)
- 
-*   The following call achieves graphics/text synchronisation.
-      CALL MSG_SYNC(STATUS)
+*   Exit AST context.
+      CALL AST_END(STATUS)
 
       END
 

@@ -48,7 +48,7 @@
 *  Usage:
 *     SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL 
 *            ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG] 
-*            [ANGWID] [RLIM] [COSYS] [SAME] [AGAIN] [ORIGIN] (COLOUR)
+*            [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
  
 *  Examples:
 *     sector cursor=true ardfil=^ardup.dat back=6200 sigma=390 
@@ -67,18 +67,21 @@
 *        defined using the cursor/mouse.
 *       
 *     sector cursor=false ardfil=^ardfile.dat back=760 sigma=23 
-*            psize=0.3 surf=true radisp=q mirror=false autol=false 
-*            zerop=26.4 out in=ic3374 device=xwindows fitlim=0,20 
-*            posang=25 angwid=5 
-*            rlim=25 cosys=d origin=47,123
+*            surf=true radisp=q mirror=false autol=false 
+*            zerop=26.4 in=ic3374 out=ic3374.pro device=xwindows 
+*            fitlm=0,20 posang=25 angwid=5 
+*            rlim=25 origin="12:36:53.42 62:12:21.8"
 * 
-*        An object located at co-ordinates 47,123 or image IC3374 is
-*        profiled in the 25 degree direction out to a distance of 25
-*        arc seconds. The wedge/sector used will be 5 degrees wide
-*        and the scale length will be calculated using data obtained
-*        in the radius range 0-20 arc seconds. The user supplied 
-*        estimate of the galaxy centre will not be refined. The graphs 
-*        generated will be quarter power radius versus surface 
+*        An object located at the co-ordinates indicated on image IC3374
+*        is profiled in the 25 degree direction out to a distance of 25
+*        arc seconds. The Current co-ordinate frame of IC3374 is in 
+*        the SKY domain. The pixel size in arcseconds is determined 
+*        automatically from the SKY coordinate frame. The wedge/sector 
+*        used will be 5 degrees wide and the scale length will be
+*        calculated using data obtained in the radius range 0-20 arc
+*        seconds. The user supplied estimate of the galaxy centre will
+*        not be refined. Output is to the text file ic3374.pro. The 
+*        graphs generated will be quarter power radius versus surface 
 *        brightness.
  
 *  ADAM Parameters:
@@ -98,9 +101,6 @@
 *        The background value for the image. Units counts.
 *     COLOUR = _INTEGER (Read)
 *        Colour used when showing the galaxy centre and profiling radius.
-*     COSYS = _CHAR (Read)
-*        What co-ordinate system to use?  D=data, W=world, C=Current
-*        frame of WCS component.
 *     CURSOR = _LOGICAL (Read)
 *        Whether the galaxy location is to be identified using the 
 *        graphics cursor or the keyboard.
@@ -119,7 +119,8 @@
 *        sectors/wedges/slices of the same size, but on 
 *        diametrically opposite sides of the galaxy origin.
 *     ORIGIN = _REAL (Read)
-*        Image indices for the origin point to be used. Units pixels.
+*        Image indices for the origin point to be used. Given in the
+*        Current coordinate system of the WCS component of IN.
 *     OUT = _CHAR (Read)
 *        File name for the output text file containing the 
 *        profile data.
@@ -156,11 +157,14 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-JUL-1994 (GJP)
 *     (Original version)
+*     8-NOV-1999 (MBT)
+*     Modified to use World Coordinate Systems.
 
 *-
 
@@ -190,6 +194,9 @@
       CALL PAR_GET0L('CURSOR',CURSOR,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
+*   Begin an AST context.
+      CALL AST_BEGIN(STATUS)
+
 *   Pass control to an appropriate routine.
       IF (.NOT.CURSOR) THEN
 *      Keyboard user input.
@@ -201,6 +208,9 @@
 
 *   Abort the program.
  9999 CONTINUE
+
+*   Exit AST context.
+      CALL AST_END(STATUS)
 
       END 
 
@@ -1001,8 +1011,6 @@
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:      
-      CHARACTER *(256) COSYS          ! Option choice defining how the
-                                      ! pixel data format to be input
       CHARACTER *(256) RADISP         ! Option choice defining how the
                                       ! radius data is to be displayed
       CHARACTER *(256) STRINP(2)      ! String array for character input
@@ -1083,40 +1091,12 @@
       PRANGE(1)=UBND(1)-LBND(1)+1
       PRANGE(2)=UBND(2)-LBND(2)+1
                                        
-*   Get the co-ordinate system mode and convert to upper case.
-      CALL PAR_GET0C('COSYS',COSYS,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      CALL CHR_UCASE(COSYS)
-
 *   Look at another location on the image.
       AGAIN=.TRUE.
       DO WHILE (AGAIN.AND.(STATUS.EQ.SAI__OK))
 
 *      Get the pixel to be used as the galaxy centre.
-         IND=2
-         IND2=2
-
-*      Get the input as strings.
- 11      CONTINUE
-         CALL PAR_EXACC('ORIGIN',2,STRINP,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
-
-*      Begin error context.
-         CALL ERR_MARK
-
-*      Turn input coordinates into pixel coordinates.
-         CALL ESP1_S2PR(COSYS,NDF1,STRINP(1),STRINP(2),XCO,YCO,STATUS)
-
-*      Check whether the coordinate input went smoothly.
-         IF (STATUS.NE.SAI__OK) THEN
-            CALL ERR_FLUSH(STATUS)
-            CALL ERR_RLSE
-            CALL PAR_CANCL('ORIGIN',STATUS)
-            GO TO 11
-         END IF
-
-*      End error context.
-         CALL ERR_RLSE
+         CALL ESP1_INPOS(NDF1,'ORIGIN',XCO,YCO,STATUS)
 
 *      Get the position angle for the sector.
          CALL PAR_GET0R('POSANG',POSANG,STATUS)
@@ -2005,13 +1985,13 @@
 *      pass back the value of the pixel chosen.
          XCO=NEWX
          YCO=NEWY
-         OCOUNT=ARRAY((YCO-1)*XMAX+XCO)
+         OCOUNT=ARRAY((NINT(YCO-1))*XMAX+NINT(XCO))
 
       ELSE
 
 *      Obtain the value of the pixel at XCO,YCO if autolocate 
 *      is not selected.
-         OCOUNT=ARRAY((YCO-1)*XMAX+XCO)
+         OCOUNT=ARRAY((NINT(YCO-1))*XMAX+NINT(XCO))
 
 *      Correct and issue warning if the value is bad.
          IF (OCOUNT.EQ.VAL__BADR) THEN
@@ -2313,6 +2293,7 @@
                                  ! a terminal
 
       INTEGER HITVAL             ! The selected choice of the cursor
+      INTEGER IWCS               ! AST pointer to WCS component of NDF
       INTEGER NIMGMS             ! Number of lines of image-display
                                  ! messages
       INTEGER NTERMS             ! Number of lines of terminal messages
@@ -2341,6 +2322,9 @@
 *   Check inherited global status.
 
       IF (STATUS.NE.SAI__OK) RETURN
+
+*   Begin AST context.
+      CALL AST_BEGIN(STATUS)
 
 *   Create informational messages for use with the cursor.
       CALL SEC1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
@@ -2451,6 +2435,10 @@
      :            CURCHO,IMGDIS,STATUS)
       IF ((.NOT.CURCHO).OR.(STATUS.NE.SAI__OK)) GOTO 980
 
+*   Get the WCS component of the NDF, used for outputting messages about
+*   the cursor position.
+      CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+
 *   Initialise HITVAL before the main loop is entered.
       HITVAL=0
 
@@ -2486,7 +2474,7 @@
             Y(POINT)=YIN
 *         Display the cursor results if necessary.
             IF (POINT.LT.5.AND.(HITVAL.EQ.1.OR.HITVAL.EQ.3)) THEN
-               CALL SEC1_CURVD(POINT,X1,Y1,XIN,YIN,STATUS)
+               CALL ESP1_CRPT(IWCS,XIN-X1+1.0,YIN-Y1+1.0,STATUS)
             END IF
          END IF
  
@@ -2518,109 +2506,8 @@
 
  9999 CONTINUE
 
-      END
-
-
-      SUBROUTINE SEC1_CURVD(POINT,X1,Y1,XW,YW,STATUS)
-*+
-*  Name:
-*     SEC1_CURVD
-
-*  Purpose:
-*     Displays information informing the user what the latest value 
-*     is for the cursor position. 
-
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*     CALL SEC1_CURVD(POINT,X1,Y1,XW,YW,STATUS)
-
-*  Description:
-*     Depending on the value of POINT, the routine displays the latest
-*     value for the cursor position. When an image is being displayed 
-*     output is in the form of world and data co-ordinates.
-*
-*     In some cases no messages at all are displayed.
-*
-
-*  Arguments:
-*     POINT = INTEGER (Given)
-*        Defines which values will be displayed is required.
-*     X1 = REAL (Given)
-*        X world co-ordinate of the left-hand edge of the image.
-*     Y1 = REAL (Given)
-*        Y world co-ordinate of the bottom edge of the image.
-*     XW = REAL (Given)
-*        X world co-ordinate.
-*     YW = REAL (Given)
-*        Y world co-ordinate.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Authors:
-*     GJP: Grant Privett (STARLINK)
-
-*  History:
-*     15-Feb-1993 (GJP)
-*     (Original version)
-
-*  Bugs:
-*     None known.
-
-*-
-
-*  Type Definitions:                  ! No implicit typing
-      IMPLICIT NONE
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
-*  Arguments Given:
-      INTEGER POINT                   ! Defines how the cursor position
-                                      ! is displayed
-      REAL XW                         ! X world co-ordinate
-      REAL X1                         ! X world co-ordinate of the image
-                                      ! edge
-      REAL YW                         ! Y world co-ordinate
-      REAL Y1                         ! Y world co-ordinate of the image
-                                      ! bottom
-
-*  Arguments Returned:
-
-*  Status:     
-      INTEGER STATUS                  ! Global status
-
-*  Local Variables:                                               
-      REAL TEMPX                      ! Temporary X value
-      REAL TEMPY                      ! Temporary Y value
-*.
-
-*   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN
-
-*   Sector cursor position when on the image.
-      IF ((POINT.NE.6).AND.(POINT.NE.8).AND.(POINT.NE.9)) THEN
-
-*      Put the data co-ordinates into message token.
-         TEMPX=REAL(INT(XW-X1+1.))
-         TEMPY=REAL(INT(YW-Y1+1.))
-         CALL MSG_SETR('XVALD',TEMPX)
-         CALL MSG_SETR('YVALD',TEMPY)
-
-*      Put the world co-ordinates into message tokens.
-         CALL MSG_SETR('XVALW',XW)
-         CALL MSG_SETR('YVALW',YW)
-
-*      Display the current X and Y values.
-         CALL MSG_OUT(' ','Cursor position (x/y)'/  
-     :                /' ^XVALW, ^YVALW (world), '/
-     :                /'^XVALD, ^YVALD (data)',STATUS)
-  
-*      The following call achieves graphics/text synchronisation.
-         CALL MSG_SYNC(STATUS)
-
-      END IF
+*    End AST context.
+       CALL AST_END(STATUS)
 
       END
 
@@ -4317,6 +4204,7 @@
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
+      INTEGER IWCS                    ! AST pointer to NDF's WCS frameset
       REAL VALUE                      ! Temporary variable
       REAL VALUE1                     ! Temporary variable
 *.
@@ -4334,12 +4222,10 @@
       CALL MSG_BLANK(STATUS)
 
 *   Show the co-ordinates used.
-      CALL MSG_FMTR('VALUE','F7.2',XCO)
-      CALL MSG_FMTR('VALUE1','F7.2',YCO)
-      CALL MSG_OUT(' ','Origin (data):  ^VALUE,^VALUE1',STATUS)
-      CALL MSG_FMTR('VALUE','F7.2',XCO+LBND(1)-1)
-      CALL MSG_FMTR('VALUE1','F7.2',YCO+LBND(2)-1)
-      CALL MSG_OUT(' ','Origin (world): ^VALUE,^VALUE1',STATUS)
+      CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+      CALL ESP1_XYFMT(IWCS,XCO,YCO,'XORIG','YORIG','DOM',STATUS)
+      CALL AST_ANNUL(IWCS,STATUS)
+      CALL MSG_OUT(' ','Origin:  ^XORIG  ^YORIG',STATUS)
 
 *   Store data value in the parameters system.
       CALL PAR_PUT0R('XCO',XCO+LBND(1)-1,STATUS)
@@ -4595,6 +4481,7 @@
       CHARACTER *(100) TEXT           ! Temporary storage
       LOGICAL OPENF                   ! Was the output file opened?
       INTEGER I                       ! Temporary variable
+      INTEGER IWCS                    ! AST pointer to NDF's WCS frameset
       INTEGER NCHAR                   ! Length of output string
       REAL TEMP                       ! Temporary storage
 *.
@@ -4684,7 +4571,7 @@
 
 *      Output X and Y data co-ordinates.
          NCHAR=0
-         CALL CHR_PUTC('## X/Y co-ordinates (data):',
+         CALL CHR_PUTC('## X/Y co-ordinates (Base):',
      :                 LINE,NCHAR)
          CALL FIO_WRITE(FIOD2,LINE(1:NCHAR),STATUS)
          NCHAR=0
@@ -4694,15 +4581,15 @@
          CALL FIO_WRITE(FIOD2,LINE(:NCHAR),STATUS)
 
 *      Output X and Y world co-ordinates.
-         NCHAR=0
-         CALL CHR_PUTC('## X/Y co-ordinates (world):',
-     :                 LINE,NCHAR)
-         CALL FIO_WRITE(FIOD2,LINE(1:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(XCO+LBND(1)-1,LINE,NCHAR)
-         CALL CHR_PUTC(' ',LINE,NCHAR)
-         CALL CHR_PUTR(YCO+LBND(2)-1,LINE,NCHAR)
+         CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
+         CALL MSG_LOAD(' ','## X/Y co-ordinates (^DOM):',LINE,NCHAR,
+     :                 STATUS)
          CALL FIO_WRITE(FIOD2,LINE(:NCHAR),STATUS)
+         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
+         CALL MSG_LOAD(' ','^X ^Y',LINE,NCHAR,STATUS)
+         CALL FIO_WRITE(FIOD2,LINE(:NCHAR),STATUS)
+         CALL AST_ANNUL(IWCS,STATUS)
 
 *      Output the number of points determined.
          NCHAR=0
@@ -4786,9 +4673,6 @@
                TEXT=' ^V1      ^V2       ^V3               ^V4'
                NCHAR=0
                CALL MSG_LOAD(' ',TEXT,NAME,NCHAR,STATUS)
-               NAME=NAME(1:NCHAR)
-               CALL CHR_CLEAN(NAME)
-               CALL CHR_PUTC(NAME,LINE,NCHAR)
                CALL FIO_WRITE(FIOD2,NAME(:NCHAR),STATUS)
 
             END IF

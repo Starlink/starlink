@@ -34,7 +34,8 @@
 *     All co-ordinates are read from a two or three columns
 *     ASCII text file. If two columns are present then these are
 *     taken as representing the image co-ordinates required for the 
-*     regions of the image to be considered. If three columns are
+*     regions of the image to be considered.  Co-ordinates are in 
+*     the Current coordinate system of the NDF. If three columns are
 *     present the third column respresents the width of the area 
 *     to be sampled or the number of contiguous pixels detected there
 *     by FOCAS or IMAGES.
@@ -44,12 +45,9 @@
 *     (32x32).
   
 *  Usage:
-*     LOBACK IN INFILE SFACT THIRD COSYS OUT WIDTH
+*     LOBACK IN INFILE SFACT THIRD OUT WIDTH
 
 *  ADAM Parameters:
-*     COSYS = _CHAR (Read) 
-*        What co-ordinate system to use?  D=data, W=world, C=Current
-*        frame of WCS component.
 *     IN = _NDF (Read)
 *        The name of the NDF data structure/file that is to be 
 *        examined.
@@ -57,7 +55,8 @@
 *        The name of the ASCII text file containing the image 
 *        co-ordinates and number of pixels to be used at each location 
 *        or the number of contiguous pixels found there by FOCAS or 
-*        IMAGES.
+*        IMAGES.  Co-ordinates are in the Current co-ordinate system
+*        of IN.
 *     OUT = _CHAR (Read)
 *        The file name in which the results are stored in text form.  
 *     SFACT = _INTEGER (Read)
@@ -97,18 +96,18 @@
 *        Units pixels.
 
 *  Examples:
-*     loback in=p2 infile=coords.dat sfact=0 third=true cosys=w 
+*     loback in=p2 infile=coords.dat sfact=0 third=true 
 *            out=backs.dat width=64
 *
-*        Reads the world co-ordinate data stored in text file COORDS
-*        and determines the background count value within a 64x64 pixel 
-*        area surrounding each of those locations. The histogram 
-*        generated to do this will not be smoothed. The output will be 
-*        into text file BACKS.DAT. Since THIRD is true, the third 
-*        column represents the number of pixels thought to make up 
-*        the object.
+*        Reads the data stored in text file COORDS (in co-ordinates
+*        of the Current frame of P2) and determines the background
+*        count value within a 64x64 pixel  area surrounding each of
+*        those locations. The histogram generated to do this will not
+*        be smoothed. The output will be into text file BACKS.DAT.
+*        Since THIRD is true, the third column represents the number
+*        of pixels thought to make up the object.
 *
-*     loback in=p2 infile=coords.dat sfact=4 third=false cosys=w 
+*     loback in=p2 infile=coords.dat sfact=4 third=false
 *            out=output.dat width=35
 *
 *        Determines the background count value within a 35x35 pixel 
@@ -117,8 +116,7 @@
 *        smoothed using a Gaussian 4 counts wide. The output will be 
 *        into text file OUTPUT.DAT. Since THIRD is false, the third 
 *        column represent the lower limit of pixels to be taken from 
-*        the image to make up the histogram. The co-ordinate system 
-*        used is world. 
+*        the image to make up the histogram.
 
 *  Notes:
 *     The current version will not accept a pixel value range greater 
@@ -138,7 +136,9 @@
 *     14-Jun-1993 (GJP)
 *     (Original version)
 *     26-OCT-1999 (MBT):
-*        Modified to cope with COSYS=C.
+*     Modified to cope with COSYS=C.
+*     8-NOV-1999 (MBT):
+*     Removed COSYS altogether.
 
 *-
 
@@ -155,8 +155,6 @@
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
-      CHARACTER *(256) COSYS          ! Character defining the 
-                                      ! co-ordinate types
       CHARACTER *(256) FTEXT          ! Formatting string
       CHARACTER *(256) TEXT           ! Output string
       CHARACTER *(256) XSTR           ! Formatted X co-ordinate
@@ -293,13 +291,8 @@
       CALL NDF_MAP(NDF1,'Data','_REAL','READ',POINT0(1),ELEMS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
                       
-*   Get the co-ordinate system mode and convert to upper case.
-      CALL PAR_GET0C('COSYS',COSYS,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      CALL CHR_UCASE(COSYS)
-
 *   Obtain the co-ordinates of the image locations/galaxies required.
-      CALL LOB1_FILER(FIOID,NDF1,COSYS,NGALS,XC,YC,NPIX,STATUS)
+      CALL LOB1_FILER(FIOID,NDF1,NGALS,XC,YC,NPIX,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Loop round for all image locations provided.
@@ -307,7 +300,7 @@
 
 *      Open a file and put in a heading.
          EXCLAIM=.FALSE.
-         CALL LOB1_TEXTO(1,COSYS,NDF1,XC(1),YC(1),MODE,
+         CALL LOB1_TEXTO(1,NDF1,XC(1),YC(1),MODE,
      :                   SDEV,LBND,FIOD,OPENF,EXCLAIM,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999                         
 
@@ -366,7 +359,7 @@
 *         Place in the opened file background results  for these 
 *         co-ordinates.
             IF (.NOT.EXCLAIM) THEN
-               CALL LOB1_TEXTO(2,COSYS,NDF1,XC(I),YC(I),MODE,
+               CALL LOB1_TEXTO(2,NDF1,XC(I),YC(I),MODE,
      :                         SDEV,LBND,FIOD,OPENF,EXCLAIM,STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9999                         
             END IF
@@ -374,8 +367,7 @@
 *         Create an appropriately formatted output string.
 
 *         Co-ordinates.
-            CALL ESP1_PR2S(COSYS,NDF1,XC(I),YC(I),XSTR,YSTR,XLEN,YLEN,
-     :                     STATUS)
+            CALL ESP1_PR2S(NDF1,XC(I),YC(I),XSTR,YSTR,XLEN,YLEN,STATUS)
             FTEXT='A8'
             IF (LEN(XSTR).GT.8.OR.LEN(YSTR).GT.8) FTEXT='A14'
             CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN)) 
@@ -420,7 +412,7 @@
 
 *      Close the opened file.
          IF (.NOT.EXCLAIM) THEN
-            CALL LOB1_TEXTO(3,COSYS,NDF1,XC(1),YC(1),MODE,
+            CALL LOB1_TEXTO(3,NDF1,XC(1),YC(1),MODE,
      :                      SDEV,LBND,FIOD,OPENF,EXCLAIM,STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9999                         
          END IF
@@ -583,7 +575,7 @@
       END
 
 
-      SUBROUTINE LOB1_FILER(FIOID,INDF,COSYS,NGALS,XC,YC,NPIX,STATUS)
+      SUBROUTINE LOB1_FILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)
 *+
 *  Name:
 *     LOB1_FILER
@@ -596,6 +588,7 @@
 *
 *     These are taken as being x and y co-ordinates on an image and are
 *     checked to ensure that they lie within the bounds of the image.
+*     Co-ordinates are in the Current frame of INDF.
 *     If it is found that the a co-ordinate pair is not within the 
 *     bounds of the image, the values are not retained, otherwise the
 *     counter is incremented and the values stored in arrays XC and YC.
@@ -604,7 +597,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL LOB1_FILER(FIOID,INDF,COSYS,NGALS,XC,YC,NPIX,STATUS)    
+*      CALL LOB1_FILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)    
 
 *  Description:
 *     Opens a user specified text file and reads from it a list of co-ordinates
@@ -619,9 +612,6 @@
 *        FIO identifier for the input file.
 *     INDF = INTEGER (Given)
 *        NDF identifier for the image.
-*     COSYS *(256) = CHARACTER (Given)
-*        Character defining whether the co-ordinates provided 
-*        are world or data format. 
 *     NGALS = INTEGER (Returned)
 *        Number of galaxies to be profiled.
 *     XC(LOB__NGALS) = REAL (Returned)
@@ -642,7 +632,9 @@
 *     29-APR-1993 (GJP)
 *     (Original version)
 *     26-OCT-1999 (MBT)
-*        Modified to cope with COSYS=C.
+*     Modified to cope with COSYS=C.
+*     8-NOV-1999 (MBT)
+*     COSYS removed altogether.
 
 *-
 
@@ -655,8 +647,6 @@
       INCLUDE 'lob_par'               ! LOBACK constants
 
 *  Arguments Given:                              
-      CHARACTER *(256) COSYS          ! Option choice defining how the
-                                      ! pixel data format to be input
       INTEGER FIOID                   ! FIO identifier for the input file
       INTEGER INDF                    ! NDF identifier for image
 
@@ -779,7 +769,7 @@
 
 *            Change strings in character buffer into numeric coordinate
 *            values.
-               CALL ESP1_S2PR(COSYS,INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
+               CALL ESP1_S2PR(INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
      :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
      :                        VALUE(2),STATUS)
 
@@ -2606,7 +2596,7 @@
       END 
      
 
-      SUBROUTINE LOB1_TEXTO(WHICH,COSYS,NDF1,XCO,YCO,MODE,SDEV,
+      SUBROUTINE LOB1_TEXTO(WHICH,NDF1,XCO,YCO,MODE,SDEV,
      :                      LBND,FIOD,OPENF,EXCLAIM,STATUS)
 
 *+
@@ -2621,7 +2611,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL LOB1_TEXTO(WHICH,COSYS,NDF1,XCO,YCO,MODE,SDEV,
+*      CALL LOB1_TEXTO(WHICH,NDF1,XCO,YCO,MODE,SDEV,
 *                      LBND,FIOD,OPENF,EXCLAIM,STATUS)
 
 *  Description:
@@ -2636,8 +2626,6 @@
 *  Arguments:               
 *     WHICH = INTEGER (Given)
 *        Used to show which part of the text file is to be created. 
-*     COSYS *(256) = CHAR (Given)
-*        Type of co-ordinates used to represent locations on the image.
 *     NDF1 = INTEGER (Given)
 *        NDF identifier for the image.
 *     XCO = REAL (Given)
@@ -2667,8 +2655,10 @@
 *  History:
 *     12-JUN-1993 (GJP)
 *     (Original version)
-*     26-OCT-1999 (MBT):
-*        Modified to cope with COSYS=C.
+*     26-OCT-1999 (MBT)
+*     Modified to cope with COSYS=C.
+*     8-NOV-1999 (MBT)
+*     Removed COSYS altogether.
 
 *  Bugs:
 *     None known.
@@ -2684,8 +2674,6 @@
       INCLUDE 'MSG_PAR'               ! Parameter system constants
 
 *  Arguments Given:                              
-      CHARACTER *256 COSYS            ! Defines if world or pixel/data
-                                      ! co-ordinates are in use
       INTEGER LBND(10)                ! Lower limits of image world
                                       ! co-ordinate system
       INTEGER NDF1                    ! NDF indentifier
@@ -2804,7 +2792,7 @@
 *      Create an appropriately formatted output string.
 
 *      Co-ordinates.
-         CALL ESP1_PR2S(COSYS,NDF1,XCO,YCO,XSTR,YSTR,XLEN,YLEN,STATUS)
+         CALL ESP1_PR2S(NDF1,XCO,YCO,XSTR,YSTR,XLEN,YLEN,STATUS)
          FTEXT='A8'
          IF (XLEN.GT.8.OR.YLEN.GT.8) FTEXT='A14'
          CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN))
