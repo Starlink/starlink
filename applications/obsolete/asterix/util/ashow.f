@@ -86,6 +86,8 @@
 *        Original version.
 *     14 Aug 1995 1.8-1 (DJA):
 *        Improved timing report and added links option.
+*      6 Sep 1995 2.0-0 (DJA):
+*        Display selection info
 *     {enter_changes_here}
 
 *  Bugs:
@@ -115,11 +117,13 @@
         PARAMETER ( IC_TIM = 4 )
       INTEGER			IC_LNK
         PARAMETER ( IC_LNK = 8 )
+      INTEGER			IC_SEL
+        PARAMETER ( IC_LNK = 16 )
       INTEGER			IC_ALL
-        PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM+IC_LNK )
+        PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM+IC_LNK+IC_SEL )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ASHOW Version 1.8-1' )
+        PARAMETER		( VERSION = 'ASHOW Version 2.0-0' )
 
 *  Local Variables:
       CHARACTER*200		FILE, PATH		! File path info
@@ -168,6 +172,9 @@
           ELSE IF ( CHR_INSET( ITEM, 'LINKS' ) ) THEN
             ITEMC = ITEMC + IC_LNK
 
+          ELSE IF ( CHR_INSET( ITEM, 'SEL' ) ) THEN
+            ITEMC = ITEMC + IC_SEL
+
 *      Otherwise error
           ELSE
             CALL MSG_SETC( 'ITEM', ITEM )
@@ -208,6 +215,11 @@
 *    File links
         IF ( IAND( ITEMC, IC_LNK ) .NE. 0 ) THEN
           CALL ASHOW_LNK( IFID, OCH, STATUS )
+        END IF
+
+*    Dataset selection
+        IF ( IAND( ITEMC, IC_SEL ) .NE. 0 ) THEN
+          CALL ASHOW_SEL( IFID, OCH, STATUS )
         END IF
 
       END IF
@@ -850,6 +862,176 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_LNK', STATUS )
+
+      END
+
+
+      SUBROUTINE ASHOW_SEL( IFID, OCH, STATUS )
+*+
+*  Name:
+*     ASHOW_SEL
+
+*  Purpose:
+*     Display data selection
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ASHOW_SEL( IFID, OCH, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     IFID = INTEGER (given)
+*        Input dataset identifier
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  Keywords:
+*     ashow, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Apr 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			IFID			! Input dataset id
+      INTEGER			OCH			! Output channel
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+
+*  Local Constants:
+      INTEGER			NLINK
+        PARAMETER		( NLINK = 2 )
+
+*  Local Variables:
+      CHARACTER*40		CREATOR			! Selection author
+      CHARACTER*20		VARIANT			! Selector variant
+
+      INTEGER			I			! Loop over selections
+      INTEGER			ICMP			! Loop over selectors
+      INTEGER			NREC			! # selection records
+      INTEGER			SELID			! Selection identifier
+      INTEGER			SID			! Selector identifier
+
+      LOGICAL			OK			! Link is present
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Write heading
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL AIO_IWRITE( OCH, 2, 'Dataset Selection Information :',
+     :                 STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+
+*  Get number of selection records
+      CALL SLN_NREC( IFID, NREC, STATUS )
+
+*  Display selections
+      IF ( NREC .EQ. 0 ) THEN
+
+        CALL AIO_IWRITE( OCH, 4, '** No selection data in input **',
+     :                 STATUS )
+        CALL AIO_BLNK( OCH, STATUS )
+
+      ELSE
+
+*    Write each selection
+        DO I = 1, NREC
+
+*      Announce this one
+          CALL MSG_SETC( 'N', I )
+          CALL AIO_IWRITE( OCH, 4, 'Selection Record ^N', STATUS )
+          CALL AIO_BLNK( OCH, STATUS )
+
+*      Get this record
+          CALL SLN_GETREC( IFID, I, SELID, STATUS )
+
+*      Get program id
+          CALL ADI_CGET0C( SELID, 'Version', CREATOR, STATUS )
+          CALL ASHOW_VAL( CREATOR, 'Creator', ' ', OCH, STATUS )
+
+*      Locate Selectors
+          CALL ADI_FIND( SELID, 'Selectors', SID, STATUS )
+
+*      Get number of components
+          CALL ADI_NCMP( SID, NCMP, STATUS )
+          DO ICMP = 1, NCMP
+          END DO
+
+*      Destroy it
+          CALL ADI_ERASE( SID, STATUS )
+          CALL ADI_ERASE( SELID, STATUS )
+
+        END DO
+
+      END IF
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_SEL', STATUS )
 
       END
 
