@@ -143,6 +143,15 @@ void adix_setec( ADIstatype code, ADIstatus status )
 #endif
   }
 
+char *adix_setecb( ADIstatype code, ADIstatus status )
+  {
+  char		*emsg;			/* Standard error message */
+
+  *status = code;			/* Set the error code */
+
+  return adix_errmsg( code, NULL, 0 );	/* Get text message address */
+  }
+
 
 /*
  *  Set the contextual message string
@@ -185,10 +194,10 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
  */
 void adix_setecs( ADIstatype code, char *ctx, int clen, ADIstatus status )
   {
-  adix_setec( code, status );           /* Set the error code */
-#ifndef NOEMS
-  ems_renew_c();			/* Renew tokens for context error */
-#endif
+  char *buf;
+
+  buf = adix_setecb( code, status );
+
   adix_setes( ctx, clen, status );	/* Set the context string */
   }
 

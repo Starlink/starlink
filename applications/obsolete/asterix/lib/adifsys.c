@@ -202,7 +202,7 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
 
   if ( there ) {
     adix_locrcb( repid, "CLOSE_RTN",	/* Locate the opening routine */
-                     8, &ortn, status );
+              _CSM, &ortn, status );
 
 /* Try to close the file */
     adix_fclose_int( ortn, fid, status );
@@ -272,7 +272,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
       if ( there ) {
         adix_locrcb( repid, "CREAT_RTN",	/* Locate the opening routine */
-                     8, &ortn, status );
+                     _CSM, &ortn, status );
 
 /* Try to create the file */
         adix_fcreat_int( ortn, fid, id, fileid, status );
@@ -384,8 +384,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
       if ( there ) {
         adix_locrcb( repid, "OPEN_RTN",	/* Locate the opening routine */
-                     8,
-                     &ortn, status );
+                     _CSM, &ortn, status );
 
         adix_fopen_int( ortn, fid, mid,	/* Try to open file */
                         id, status );
