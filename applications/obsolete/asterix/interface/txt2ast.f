@@ -1719,6 +1719,11 @@
 
 *  Link to output object
       CALL BDI_LINK( TYPE, NAXES, DIMS, 'REAL', OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        TYPE = 'BinDS'
+        CALL BDI_LINK( TYPE, NAXES, DIMS, 'REAL', OFID, STATUS )
+      END IF
 
 *  Create axis data
       IF ( .NOT. PRIM ) THEN
