@@ -114,8 +114,8 @@
       CALL FSI1_NAME( ARGS(2), 'SEL', CNAM, STATUS )
 
 *  Copy the HDS data to the ADI object
-      CALL DAT_THERE( TLOC, CNAM, STATUS )
       OARG = ADI__NULLID
+      CALL DAT_THERE( TLOC, CNAM, THERE, STATUS )
       IF ( THERE ) THEN
         CALL ADI_CCH2AI( TLOC, CNAM, OARG, ' ', STATUS )
       END IF
