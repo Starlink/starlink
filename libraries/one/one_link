@@ -29,6 +29,7 @@
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -38,6 +39,8 @@
 #        Added new awk script to permit larger numbers of libraries.
 #     22-JUN-1995 (BLY):
 #        Generic version.
+#     28-AUG-2004 (TIMJ):
+#        Use link scripts
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -45,7 +48,7 @@
 
 #-
 
-      echo -lone -lems -lchr -lcnf \
+      echo -lone `ems_link` `cnf_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
