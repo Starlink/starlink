@@ -20,6 +20,7 @@
   <!ENTITY fig-configure-eps  SYSTEM "ssn78-4.eps" NDATA eps>
   <!ENTITY fig-configure-pdf  SYSTEM "ssn78-4.pdf" NDATA pdf>
 ]>
+<!-- $Revision$ -->
 
 <ssn>
   <docinfo>
@@ -3306,18 +3307,19 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                   id="bootstrapping"/>, and in the top level of the
                 checkout, do
 <verbatim>
-% rm &lt;my-star&gt;/manifests/starconf
-% ./bootstrap
+% ./bootstrap --force-starconf
 % rm config.cache
 </verbatim>
-                The first command forces the bootstrap to remake and
-                reinstall the starconf component (since its manifest
-                file is present, it would not otherwise bother),
-                taking the current values of the <code>STARCONF_...</code>
-                variables into account, and
-                the second command simply calls the bootstrap
-                script, which overwrites the little state
-                associated with it.</p>
+                The <code>--force-starconf</code> option forces the
+                bootstrap to remake and reinstall the starconf
+                component, taking the current values of the
+                <code>STARCONF_...</code> variables into account.  In
+                fact, the same effect would be obtained with the
+                simple <kbd>./bootstrap</kbd> command, if you'd done
+                <kbd>rm &lt;my-star&gt;/manifests/starconf</kbd>
+                first.  The starconf component holds the rather little
+                state associated with the <code>STARCONF_...</code>
+                variables.</p>
 
               <p>You should also remove any
                 <code>config.cache</code> files, both in the
@@ -3486,12 +3488,15 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             <code>specifier</code> converted to uppercase and with all
             characters outside <code>[a-zA-Z0-9_]</code> deleted.
             Note that this may include `specifiers' such as
-            <code>access=append</code> and
-            <code>[access=sequential,recl=1]</code> (note quoting of
+            <code>access='append'</code> and
+            <code>[access='sequential',recl=1]</code> (note quoting of
             comma) to check combinations of specifiers.  You may not
             include a space in the `specifier', even quoted.  Each
             argument must be a maximum of 65 characters in length (to
             abide by Fortran 77 line-length limits).</p>
+
+          <p>See <ref id="fortran"/> for an example of using this
+            preprocessor definition in a Fortran program.</p>
 
         </subsect>
 
@@ -3979,13 +3984,8 @@ file.f: file.$(FPP_SRC_EXT)
 
           <p><strong><code>STAR_HAVE_FC_OPEN_READONLY</code></strong></p>
 
-          <p>Tests if the Fortran compiler supports the
-            <code>READONLY</code> option on the <code>OPEN</code>
-            command.  If it does, it defines
-            <code>HAVE_FC_OPEN_READONLY</code> to 1.</p>
-
-          <p>See <ref id="fortran"/> for an example of using this
-            preprocessor definition in a Fortran program.</p>
+          <p>Obsolete -- use <ref id="macro-ac-fc-open-specifiers"
+              ><code>AC_FC_OPEN_SPECIFIERS</code></ref> instead</p>
 
         </subsect>
 
