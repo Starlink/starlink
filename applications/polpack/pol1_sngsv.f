@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, IGRP2, INDFO, INDFC, NITER, NSIGMA, 
-     :                       ILEVEL, HW, ANGROT, STATUS )
+     :                       ILEVEL, HW, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
 *                      IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, HW,
-*                      ANGROT, STATUS )
+*                      STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -103,9 +103,6 @@
 *        The half size of the box to use when smoothing STokes vectors
 *        prior to estimating input variances (in pixels). The full size
 *        used is 2*HW + 1.
-*     ANGROT = REAL (Given)
-*        The anti-clockwise angle from the +ve X axis to the required
-*        reference direction for the calculated Stokes vectors, in degrees.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -149,7 +146,6 @@
       REAL NSIGMA
       INTEGER ILEVEL
       INTEGER HW
-      REAL ANGROT
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -318,7 +314,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Update the work arrays to include the effect of the current input NDF.
-         CALL POL1_SNGAD( ANGROT, EL, %VAL( IPDIN ), %VAL( IPVIN ), 
+         CALL POL1_SNGAD( EL, %VAL( IPDIN ), %VAL( IPVIN ), 
      :                   PHI( I ), T( I ), EPS( I ), 
      :                   %VAL( IPIE1 ),  %VAL( IPIE2 ),  %VAL( IPIE3 ), 
      :                   %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
