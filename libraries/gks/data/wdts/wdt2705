@@ -1,0 +1,231 @@
+2705                                  | A3 Landscape Mono PostScript
+1A                                    |    Driver Identifier
+WDT                                   |    WorkStation Description Table
+0.407    0.285   4807  3366           |       qdsdx qdsdy kdsrx kdsry
+0 0.24   0.24     12.0                |       klnwd qnmlnw qmnlnw qmxlnw
+0 6.0    1.2     561.0                |       kmksz qnmmks qmnmks qmxmks
+0 1.0  561.0                          |       kchh qmnchh qmxchh
+0 0.1 1000.0                          |       kchxpf qmnchx qmxchx
+10                                    |       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+2 1.0 1                               |       klnty qlnwd kplci
+3                                     |       kpli
+3 1.0 1                               |       klnty qlnwd kplci
+4                                     |       kpli
+4 1.0 1                               |       klnty qlnwd kplci
+5                                     |       kpli
+5 1.0 1                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+1 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+2 1.0 1                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+4 1.0 1                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+5 1.0 1                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |       ktxi [Courier]
+-1 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+2                                     |       ktxi [Courier-Bold]
+-2 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+3                                     |       ktxi [Courier-Oblique]
+-3 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+4                                     |       ktxi [Courier-BoldOblique]
+-4 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+5                                     |       ktxi [Times-Roman]
+-5 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+6                                     |       ktxi [Times-Bold]
+-6 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+7                                     |       ktxi [Times-Italic]
+-7 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+8                                     |       ktxi [Times-BoldItalic]
+-8 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+9                                     |       ktxi [Helvetica]
+-9 1 1.0 0.0 1                        |       ktxfn ktxpn qchxp qchsp ktxci
+10                                    |       ktxi [Helvetica-Bold]
+-10 1 1.0 0.0 1                       |       ktxfn ktxpn qchxp qchsp ktxci
+11                                    |       ktxi [Helvetica-Oblique]
+-11 1 1.0 0.0 1                       |       ktxfn ktxpn qchxp qchsp ktxci
+12                                    |       ktxi [Helvetica-BoldOblique]
+-12 1 1.0 0.0 1                       |       ktxfn ktxpn qchxp qchsp ktxci
+13                                    |       ktxi [Symbol]
+-13 1 1.0 0.0 1                       |       ktxfn ktxpn qchxp qchsp ktxci
+-1                                    |    End of Text
+PA                                    |    Pattern
+1                                     |       kpai
+4 4                                   |       kpadx kpady kpa
+    0 0 1 1                           |       kpa
+    0 0 1 1                           |       kpa
+    0 0 1 1                           |       kpa
+    0 0 1 1                           |       kpa
+2                                     |       kpai
+6 6                                   |       kpadx kpady
+    1 1 1 0 0 0                       |       kpa
+    1 1 1 0 0 0                       |       kpa
+    1 1 1 0 0 0                       |       kpa
+    0 0 0 1 1 1                       |       kpa
+    0 0 0 1 1 1                       |       kpa
+    0 0 0 1 1 1                       |       kpa
+3                                     |       kpai
+8 8                                   |       kpadx kpady
+    0 0 0 0 0 0 1 1                   |       kpa
+    0 0 1 1 0 0 0 0                   |       kpa
+    0 1 0 0 1 0 0 0                   |       kpa
+    0 1 0 0 1 0 0 0                   |       kpa
+    0 0 1 1 0 0 0 0                   |       kpa
+    0 0 0 0 0 0 1 1                   |       kpa
+    1 0 0 0 0 1 0 0                   |       kpa
+    1 0 0 0 0 1 0 0                   |       kpa
+-1                                    |    End of Pattern
+FA                                    |    Fill Area
+1                                     |       kfai
+0 1 1                                 |       kis ksi kfaci
+2                                     |       kfai
+1 1 1                                 |       kis ksi kfaci
+3                                     |       kfai
+2 1 1                                 |       kis ksi kfaci
+4                                     |       kfai
+3 -1 1                                |       kis ksi kfaci
+5                                     |       kfai
+3 -2 1                                |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+1.0 1.0 1.0                           |       RGB  white (background)
+    1
+0.0000 0.0000 0.0000                  |       black (foreground)
+    2
+0.1500 0.1500 0.1500                  |       grey for red
+    3
+0.2950 0.2950 0.2950                  |       grey for green
+    4
+0.0550 0.0550 0.0550                  |       grey for blue
+    5
+0.4450 0.4450 0.4450                  |       grey for yellow
+    6
+0.3500 0.3500 0.3500                  |       grey for cyan
+    7
+0.2050 0.2050 0.2050                  |       grey for magenta
+    8
+0.0000 0.0000 0.0000                  |       black (start of grey-scale 8-63)
+    9
+0.0182 0.0182 0.0182
+   10
+0.0364 0.0364 0.0364
+   11
+0.0545 0.0545 0.0545
+   12
+0.0727 0.0727 0.0727
+   13
+0.0909 0.0909 0.0909
+   14
+0.1091 0.1091 0.1091
+   15
+0.1273 0.1273 0.1273
+   16
+0.1454 0.1454 0.1454
+   17
+0.1636 0.1636 0.1636
+   18
+0.1818 0.1818 0.1818
+   19
+0.2000 0.2000 0.2000                  |      dark grey (80% black)
+   20
+0.2182 0.2182 0.2182
+   21
+0.2364 0.2364 0.2364
+   22
+0.2545 0.2545 0.2545
+   23
+0.2727 0.2727 0.2727
+   24
+0.2909 0.2909 0.2909
+   25
+0.3091 0.3091 0.3091
+   26
+0.3273 0.3273 0.3273
+   27
+0.3454 0.3454 0.3454
+   28
+0.3636 0.3636 0.3636
+   29
+0.3818 0.3818 0.3818
+   30
+0.4000 0.4000 0.4000                  |      dark mid-grey (60% black)
+   31
+0.4182 0.4182 0.4182
+   32
+0.4364 0.4364 0.4364
+   33
+0.4545 0.4545 0.4545
+   34
+0.4727 0.4727 0.4727
+   35
+0.4909 0.4909 0.4909
+   36
+0.5091 0.5091 0.5091
+   37
+0.5273 0.5273 0.5273
+   38
+0.5454 0.5454 0.5454
+   39
+0.5636 0.5636 0.5636
+   40
+0.5818 0.5818 0.5818
+   41
+0.6000 0.6000 0.6000                  |      light mid-grey (60% white)
+   42
+0.6182 0.6182 0.6182
+   43
+0.6364 0.6364 0.6364
+   44
+0.6545 0.6545 0.6545
+   45
+0.6727 0.6727 0.6727
+   46
+0.6909 0.6909 0.6909
+   47
+0.7091 0.7091 0.7091
+   48
+0.7273 0.7273 0.7273
+   49
+0.7454 0.7454 0.7454
+   50
+0.7636 0.7636 0.7636
+   51
+0.7818 0.7818 0.7818
+   52
+0.8000 0.8000 0.8000                  |      light grey (80% white)
+   53
+0.8182 0.8182 0.8182
+   54
+0.8364 0.8364 0.8364
+   55
+0.8545 0.8545 0.8545
+   56
+0.8727 0.8727 0.8727
+   57
+0.8909 0.8909 0.8909
+   58
+0.9091 0.9091 0.9091
+   59
+0.9273 0.9273 0.9273
+   60
+0.9454 0.9454 0.9454
+   61
+0.9636 0.9636 0.9636
+   62
+0.9818 0.9818 0.9818
+   63
+1.0000 1.0000 1.0000                  |       white (end of grey-scale 8-63)
+-1                                    |    End of Colour Table
+END                                   | End Apple Laserwriter Workstation
+ 

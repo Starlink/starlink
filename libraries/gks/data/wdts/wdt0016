@@ -1,0 +1,10 @@
+16                                    | SUN GKS Metafile Input Workstat.
+0N                                    |    Driver identifier
+WDT                                   |    Workstation Description Table
+0.0 0.0 0 0                           |       qdsdx qdsdy kdsrx kdsry
+0 0.0 0.0 0.0                         |       klnwd qnmlnw qmnlnw qmxlnw
+0 0.0 0.0 0.0                         |       kmksz qnmmks qmnmks qmxmks
+0 0.0 0.0                             |       kchh qmnchh qmxchh
+0 0.0 0.0                             |       kchxpf qmnchx qmxchx
+0                                     |       kmxpab
+END                                   | End of METAFILE INPUT Workstation

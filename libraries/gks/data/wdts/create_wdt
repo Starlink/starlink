@@ -1,0 +1,15 @@
+#! /bin/sh
+#
+# create_wdt: A script for producing the RAL GKS runtime file "gks.wdt" using
+#             gkswdt.
+#
+# Maintenance Log:
+#
+#   12/08/86  PJWR  Created.
+#
+./gkswdt <<!
+
+
+
+
+!

@@ -1,0 +1,77 @@
+910                                   | R1 XEROX Targetted A4 Portrait
+1V                                    |    Driver identifier
+WDT                                   |    Workstation Description Table
+0.2032 0.2873 2400 3393               |       qdsdx qdsdy kdsrx kdsry
+0 1.0 1.0 10.0                        |       klnwd qnmlnw qmnlnw qmxlnw
+0 10.0 1.0 20.0                       |       kmksz qnmmks qmnmks qmxmks
+0 0.001 0.2                           |       kchh qmnchh qmxchh
+1 1.0 1.0                             |       kchxpf qmnchx qmxchx
+0                                     |       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+2 1.0 1                               |       klnty qlnwd kplci
+3                                     |       kpli
+3 1.0 1                               |       klnty qlnwd kplci
+4                                     |       kpli
+4 1.0 1                               |       klnty qlnwd kplci
+5                                     |       kpli
+5 1.0 1                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+1 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+2 1.0 1                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+4 1.0 1                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+5 1.0 1                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |       ktxi
+1 1 1.0 0.0 1                         |     ktxfn ktxpn qchxp qchsp ktxci
+2                                     |       ktxi
+-102 2 1.0 0.0 1                      |     ktxfn ktxpn qchxp qchsp ktxci
+3                                     |       ktxi
+-103 2 1.0 0.0 1                      |     ktxfn ktxpn qchxp qchsp ktxci
+4                                     |       ktxi
+-104 2 1.0 0.0 1                      |     ktxfn ktxpn qchxp qchsp ktxci
+5                                     |       ktxi
+-105 2 1.0 0.0 1                      |     ktxfn ktxpn qchxp qchsp ktxci
+6                                     |       ktxi
+-106 2 1.0 0.0 1                      |     ktxfn ktxpn qchxp qchsp ktxci
+-1                                    |    End of Text
+FA                                    |    Fill Area
+1                                     |       kfai
+0 1 1                                 |       kis ksi kfaci
+2                                     |       kfai
+1 1 1                                 |       kis ksi kfaci
+3                                     |       kfai
+2 1 1                                 |       kis ksi kfaci
+4                                     |       kfai
+2 2 1                                 |       kis ksi kfaci
+5                                     |       kfai
+2 3 1                                 |       kis ksi kfaci
+6                                     |       kfai
+2 4 1                                 |       kis ksi kfaci
+7                                     |       kfai
+3 -1 1                                |       kis ksi kfaci
+8                                     |       kfai
+3 -2 1                                |       kis ksi kfaci
+9                                     |       kfai
+3 -3 1                                |       kis ksi kfaci
+10                                    |       kfai
+3 -4 1                                |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+1.0 1.0 1.0                           |       red green blue
+1                                     |       kcti
+0.0 0.0 0.0                           |       red green blue
+ 
+-1
+END

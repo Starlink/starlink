@@ -1,0 +1,103 @@
+801                                   | Cifer T5 workstation
+0T                                    |    Driver identifier
+WDT                                   |    WorkStation Description Table
+1024.0 780.0 1024 780                 |       qdsdx qdsdy kdsrx kdsry
+1 1.0 1.0 1.0                         |       klnwd qnmlnw qmnlnw qmxlnw
+0 10.0 9.0 20.0                       |       kmksz qnmmks qmnmks qmxmks
+12 14.0 107.0                         |       kchh qmnchh qmxchh
+1 1.0 1.0                             |       kchxpf qmnchx qmxchx
+0                                     |       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+2 1.0 1                               |       klnty qlnwd kplci
+3                                     |       kpli
+3 1.0 1                               |       klnty qlnwd kplci
+4                                     |       kpli
+4 1.0 1                               |       klnty qlnwd kplci
+5                                     |       kpli
+5 1.0 1                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+1 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+2 1.0 1                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+4 1.0 1                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+5 1.0 1                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |       ktxi
+1 0 1.0 0.0 1                         |       ktxfn ktxpn qchxp qchsp ktxci
+2                                     |       ktxi
+-102 2 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp ktxci
+3                                     |       ktxi
+-103 2 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp ktxci
+4                                     |       ktxi
+-104 2 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp ktxci
+5                                     |       ktxi
+-105 2 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp ktxci
+6                                     |       ktxi
+-106 2 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp ktxci
+-1                                    |    End of Text
+FA                                    |    Fill Area
+1                                     |       kfai
+0 1 1                                 |       kis ksi kfaci
+2                                     |       kfai
+1 1 1                                 |       kis ksi kfaci
+3                                     |       kfai
+3 -1 1                                |       kis ksi kfaci
+4                                     |       kfai
+3 -2 1                                |       kis ksi kfaci
+5                                     |       kfai
+3 -3 1                                |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+0.0 0.0 0.0                           |       red green blue
+1                                     |       kcti
+1.0 1.0 1.0                           |       red green blue
+-1                                    |    End of Colour Table
+LC                                    |    Locators
+1                                     |       LC dev number
+0.0 1023.0 0.0 779.0                  |       echo area
+-1                                    |       end of data record
+0.0 0.0                               |       initial locator
+-1                                    |    End of locators
+SK                                    |    Strokes
+1                                     |       SK device number
+0.0 1023.0 0.0 779.0                  |       echo area
+-1                                    |       end of data record
+100 100                               |       kskmxb kskinb
+-1                                    |    End of strokes
+VL                                    |    Valuators
+1                                     |       VL device number
+1.0 1023.0 1.0 779.0                  |       echo area
+-1                                    |       end of data record
+0.0 0.0 1.0                           |       quivl qmnvl qmxvl
+-1                                    |    End of valuators
+CH                                    |    Choices
+1                                     |       CH device number
+1.0 1023.0 1.0 779.0                  |       echo area
+-1                                    |       end of data record
+2                                     |       CH device number
+1.0 1023.0 1.0 779.0                  |       echo area
+-1                                    |       end of data record
+-1                                    |    End of choices
+PC                                    |    Picks
+1                                     |       PC device number
+0.0 1023.0 0.0 779.0                  |       echo area
+-1                                    |       end of data record
+-1                                    |    End of picks
+ST                                    |    String devices
+1                                     |       ST device number
+1.0 1023.0 1.0 779.0                  |       echo area
+-1                                    |       end of data record
+80 10                                 |       kstmxb kstinb
+-1                                    |    End of string devices
+END                                   | End of Cifer 2634 Workstation

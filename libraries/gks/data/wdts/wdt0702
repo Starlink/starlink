@@ -1,0 +1,78 @@
+702                                   | CalComp 81 Roll A4 8-Pens Workstation
+0C                                    |    Driver Identifier
+WDT                                   |    WorkStation Description Table
+1900.0 2800.0 1900 2800               |       qdsdx qdsdy kdsrx kdsry
+1 1.0 1.0 1.0                         |       klnwd qnmlnw qmnlnw qmxlnw
+0 31.0 15.0 190.0                     |       kmksz qnmmks qmnmks qmxmks
+0 6.0 1500.0                          |       kchh qmnchh qmxchh
+0 1.0 250.0                           |       kchxpf qmnchx qmxchx
+10                                    |       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+1 1.0 2                               |       klnty qlnwd kplci
+3                                     |       kpli
+1 1.0 3                               |       klnty qlnwd kplci
+4                                     |       kpli
+1 1.0 4                               |       klnty qlnwd kplci
+5                                     |       kpli
+1 1.0 5                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+3 1.0 2                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 3                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+3 1.0 4                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+3 1.0 5                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |       ktxi
+1 0 1.0 0.0 1                         |       ktxfn ktxpn qchxp qchsp ktxci
+2                                     |       ktxi
+1 0 1.0 0.0 2                         |       ktxfn ktxpn qchxp qchsp ktxci
+3                                     |       ktxi
+1 0 1.0 0.0 3                         |       ktxfn ktxpn qchxp qchsp ktxci
+4                                     |       ktxi
+1 0 1.0 0.0 4                         |       ktxfn ktxpn qchxp qchsp ktxci
+5                                     |       ktxi
+1 0 1.0 0.0 5                         |       ktxfn ktxpn qchxp qchsp ktxci
+6                                     |       ktxi
+1 0 1.0 0.0 6                         |       ktxfn ktxpn qchxp qchsp ktxci
+-1                                    |    End of Text
+FA                                    |    Fill Area
+1                                     |       kfai
+0 1 1                                 |       kis ksi kfaci
+2                                     |       kfai
+0 1 2                                 |       kis ksi kfaci
+3                                     |       kfai
+0 1 3                                 |       kis ksi kfaci
+4                                     |       kfai
+0 1 4                                 |       kis ksi kfaci
+5                                     |       kfai
+0 1 5                                 |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+1.0 1.0 1.0                           |       red green blue
+1                                     |       kcti
+0.0 0.0 0.0                           |       red green blue
+2                                     |       kcti
+1.0 0.0 0.0                           |       red green blue
+3                                     |       kcti
+0.0 1.0 0.0                           |       red green blue
+4                                     |       kcti
+0.0 0.0 1.0                           |       red green blue
+5                                     |       kcti
+1.0 1.0 0.0                           |       red green blue
+6                                     |       kcti
+0.0 1.0 1.0                           |       red green blue
+7                                     |       kcti
+1.0 0.0 1.0                           |       red green blue
+-1                                    |    End of Colour Table
+END                                   | End CalComp 81 Roll A4 8-Pens

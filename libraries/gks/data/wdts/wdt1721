@@ -1,0 +1,112 @@
+1721                                  | DEC VT241 Colour
+2D                                    |    Driver identifier
+WDT                                   |    WorkStation Description Table
+800.0 480.0 800 480                   |       qdsdx qdsdy kdsrx kdsry
+1 1.0 1.0 1.0                         |       klnwd qnmlnw qmnlnw qmxlnw
+0 5.0 1.0 10.0                        |       kmksz qnmmks qmnmks qmxmks
+1 1.0 1.0                             |       kchh qmnchh qmxchh
+1 1.0 1.0                             |       kchxpf qmnchx qmxchx
+0                                     :       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+2 1.0 1                               |       klnty qlnwd kplci
+3                                     |       kpli
+3 1.0 1                               |       klnty qlnwd kplci
+4                                     |       kpli
+4 1.0 1                               |       klnty qlnwd kplci
+5                                     |       kpli
+5 1.0 1                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+1 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+2 1.0 1                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+4 1.0 1                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+5 1.0 1                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |       ktxi
+1 2 1.0 0.0 1                         |       ktxfn ktxpn qchxp qchsp kt
+2                                     |       ktxi
+-101 1 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp kt
+3                                     |       ktxi
+-102 1 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp kt
+4                                     |       ktxi
+-103 1 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp kt
+5                                     |       ktxi
+-104 1 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp kt
+6                                     |       ktxi
+-105 1 1.0 0.0 1                      |       ktxfn ktxpn qchxp qchsp kt
+-1                                    |    End of Text
+FA                                    |    Fill Area
+1                                     |       kfai
+0 0 1                                 |       kis ksi kfaci
+2                                     |       kfai
+1 0 1                                 |       kis ksi kfaci
+3                                     |       kfai
+3 -1 1                                |       kis ksi kfaci
+4                                     |       kfai
+3 -2 1                                |       kis ksi kfaci
+5                                     |       kfai
+3 -3 1                                |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+1.0 1.0 1.0                           |       red green blue
+1                                     |       kcti
+0.0 0.0 0.0                           |       red green blue
+2                                     |       kcti
+1.0 0.0 0.0                           |       red green blue
+3                                     |       kcti
+0.0 1.0 0.0
+4
+0.0 0.0 1.0
+5
+1.0 1.0 0.0
+6
+0.0 1.0 1.0
+7
+1.0 0.0 1.0
+-1                                    |    End of Colour Table
+LC                                    |    Locators
+1                                     |       LC dev number
+0.0,0.0,0.0,0.0                       |       echo area
+-1                                    |       end of data record
+0.0 0.0                               |       initial locator
+-1                                    |    End of locators
+SK                                    |    Strokes
+1                                     |       SK device number
+0.0,0.0,0.0,0.0                       |       echo area
+-1                                    |       end of data record
+100 0                                 |       kskmxb kskinb
+-1                                    |    End of strokes
+VL                                    |    Valuators
+1                                     |       VL device number
+500.0,700.0,400.0,300.0               |       echo area
+-1                                    |       end of data record
+0.0 0.0 1.0                           |       quivl qmnvl qmxvl
+-1                                    |    End of valuators
+CH                                    |    Choices
+1                                     !       CH device number
+500.0,700.0,250.0,150.0               |       echo area
+-1                                    |       end of data record
+2                                     !       CH device number
+500.0,700.0,250.0,150.0               |       echo area
+-1                                    |       end of data record
+-1                                    |    End of choices
+PC                                    |    Picks
+-1                                    |    End of picks
+ST                                    |    String devices
+1                                     |       ST device number
+500.0,700.0,100.0,0.0                 |       echo area
+-1                                    |       end of data record
+80 10                                 |       kstmxb kstinb
+-1                                    |    End of string devices
+END                                   | End of DEC VT241 Workstation

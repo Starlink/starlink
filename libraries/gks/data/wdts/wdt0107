@@ -1,0 +1,633 @@
+107                                   | SIGMA Workstation 5688 (with joystick)
+0S                                    |    Driver Identifier
+WDT                                   |    WorkStation Description Table
+768.0 512.0 768 512                   |       qdsdx qdsdy kdsrx kdsry
+1 1.0 1.0 1.0                         |       klnwd qnmlnw qmnlnw qmxlnw
+0 5.0 5.0 512.0                       |       kmksz qnmmks qmnmks qmxmks
+0 5.0 512.0                           |       kchh qmnchh qmxchh
+1 1.0 1.0                             |       kchxpf qmnchx qmxchx
+10                                    |       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+1 1.0 2                               |       klnty qlnwd kplci
+3                                     |       kpli
+1 1.0 3                               |       klnty qlnwd kplci
+4                                     |       kpli
+1 1.0 4                               |       klnty qlnwd kplci
+5                                     |       kpli
+1 1.0 5                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+3 1.0 2                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 3                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+3 1.0 4                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+3 1.0 5                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |       ktxi
+1 0 1.0 0.0 1                         |       ktxfn ktxpn qchxp qchsp ktxci
+2                                     |       ktxi
+1 0 1.0 0.0 2                         |       ktxfn ktxpn qchxp qchsp ktxci
+3                                     |       ktxi
+1 0 1.0 0.0 3                         |       ktxfn ktxpn qchxp qchsp ktxci
+4                                     |       ktxi
+1 0 1.0 0.0 4                         |       ktxfn ktxpn qchxp qchsp ktxci
+5                                     |       ktxi
+1 0 1.0 0.0 5                         |       ktxfn ktxpn qchxp qchsp ktxci
+6                                     |       ktxi
+1 0 1.0 0.0 6                         |       ktxfn ktxpn qchxp qchsp ktxci
+-1                                    |    End of Text
+PA                                    |    Pattern
+1                                     |       kpai
+3 3                                   |       kpadx kpady kpa
+    0 0 1
+    0 0 1                             |       kpa
+    0 0 1
+2                                     |       kpai
+6 6                                   |       kpadx kpady
+    2 2 2 0 0 0
+    2 2 2 0 0 0
+    2 2 2 0 0 0
+    0 0 0 2 2 2
+    0 0 0 2 2 2
+    0 0 0 2 2 2                       |       kpa
+3                                     |       kpai
+8 8                                   |       kpadx kpady
+    0 0 0 0 0 0 4 4
+    0 0 3 3 0 0 0 0
+    0 3 0 0 3 0 0 0
+    0 3 0 0 3 0 0 0
+    0 0 3 3 0 0 0 0
+    0 0 0 0 0 0 4 4
+    4 0 0 0 0 4 0 0
+    4 0 0 0 0 4 0 0                   |       kpa
+-1                                    |    End of Pattern
+FA                                    |    Fill Area
+1                                     |       kfai
+1 1 1                                 |       kis ksi kfaci
+2                                     |       kfai
+1 1 2                                 |       kis ksi kfaci
+3                                     |       kfai
+1 1 3                                 |       kis ksi kfaci
+4                                     |       kfai
+1 1 4                                 |       kis ksi kfaci
+5                                     |       kfai
+3 -1 6                                |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+0.0 0.0 0.0                           |       red green blue: 0 black
+1                                     |       kcti
+1.0 1.0 1.0                           |       red green blue: 1 white
+2                                     |       kcti
+1.0 0.0 0.0                           |       red green blue: 2 red
+3                                     |       kcti
+0.0 1.0 0.0                           |       red green blue: 3 green
+4                                     |       kcti
+0.0 0.0 1.0                           |       red green blue: 4 blue
+5                                     |       kcti
+1.0 1.0 0.0                           |       red green blue: 5 yellow
+6                                     |       kcti
+0.0 1.0 1.0                           |       red green blue: 6 cyan
+7                                     |       kcti
+1.0 0.0 1.0                           |       red green blue: 7 magenta
+8                                     |       kcti
+0.0 0.0 0.0                           |       red green blue: 8 black
+9                                     |       kcti
+0.2 0.2 0.2                           |       red green blue: 9 grey 3/15
+10                                    |       kcti
+0.33 0.33 0.33                        |       red green blue:10 grey 5/15
+11                                    |       kcti
+0.47 0.47 0.47                        |       red green blue:11 grey 7/15
+12                                    |       kcti
+0.6 0.6 0.6                           |       red green blue:12 grey 9/15
+13                                    |       kcti
+0.73 0.73 0.73                        |       red green blue:13 grey 11/15
+14                                    |       kcti
+0.87 0.87 0.87                        |       red green blue:14 grey 13/15
+15                                    |       kcti
+1.0 1.0 1.0                           |       red green blue:15 white
+16                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 16 white
+17                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 17 white
+18                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 18 white
+19                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 19 white
+20                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 20 white
+21                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 21 white
+22                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 22 white
+23                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 23 white
+24                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 24 white
+25                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 25 white
+26                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 26 white
+27                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 27 white
+28                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 28 white
+29                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 29 white
+30                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 30 white
+31                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 31 white
+32                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 32 white
+33                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 33 white
+34                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 34 white
+35                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 35 white
+36                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 36 white
+37                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 37 white
+38                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 38 white
+39                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 39 white
+40                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 40 white
+41                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 41 white
+42                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 42 white
+43                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 43 white
+44                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 44 white
+45                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 45 white
+46                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 46 white
+47                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 47 white
+48                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 48 white
+49                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 49 white
+50                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 50 white
+51                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 51 white
+52                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 52 white
+53                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 53 white
+54                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 54 white
+55                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 55 white
+56                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 56 white
+57                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 57 white
+58                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 58 white
+59                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 59 white
+60                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 60 white
+61                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 61 white
+62                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 62 white
+63                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 63 white
+64                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 64 white
+65                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 65 white
+66                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 66 white
+67                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 67 white
+68                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 68 white
+69                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 69 white
+70                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 70 white
+71                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 71 white
+72                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 72 white
+73                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 73 white
+74                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 74 white
+75                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 75 white
+76                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 76 white
+77                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 77 white
+78                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 78 white
+79                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 79 white
+80                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 80 white
+81                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 81 white
+82                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 82 white
+83                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 83 white
+84                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 84 white
+85                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 85 white
+86                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 86 white
+87                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 87 white
+88                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 88 white
+89                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 89 white
+90                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 90 white
+91                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 91 white
+92                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 92 white
+93                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 93 white
+94                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 94 white
+95                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 95 white
+96                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 96 white
+97                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 97 white
+98                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 98 white
+99                                    |       kcti
+1.0 1.0 1.0                           |       red green blue: 99 white
+100                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:100 white
+101                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:101 white
+102                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:102 white
+103                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:103 white
+104                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:104 white
+105                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:105 white
+106                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:106 white
+107                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:107 white
+108                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:108 white
+109                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:109 white
+110                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:110 white
+111                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:111 white
+112                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:112 white
+113                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:113 white
+114                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:114 white
+115                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:115 white
+116                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:116 white
+117                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:117 white
+118                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:118 white
+119                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:119 white
+120                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:120 white
+121                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:121 white
+122                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:122 white
+123                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:123 white
+124                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:124 white
+125                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:125 white
+126                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:126 white
+127                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:127 white
+128                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:128 white
+129                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:129 white
+130                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:130 white
+131                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:131 white
+132                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:132 white
+133                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:133 white
+134                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:134 white
+135                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:135 white
+136                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:136 white
+137                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:137 white
+138                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:138 white
+139                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:139 white
+140                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:140 white
+141                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:141 white
+142                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:142 white
+143                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:143 white
+144                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:144 white
+145                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:145 white
+146                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:146 white
+147                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:147 white
+148                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:148 white
+149                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:149 white
+150                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:150 white
+151                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:151 white
+152                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:152 white
+153                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:153 white
+154                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:154 white
+155                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:155 white
+156                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:156 white
+157                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:157 white
+158                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:158 white
+159                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:159 white
+160                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:160 white
+161                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:161 white
+162                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:162 white
+163                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:163 white
+164                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:164 white
+165                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:165 white
+166                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:166 white
+167                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:167 white
+168                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:168 white
+169                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:169 white
+170                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:170 white
+171                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:171 white
+172                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:172 white
+173                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:173 white
+174                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:174 white
+175                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:175 white
+176                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:176 white
+177                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:177 white
+178                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:178 white
+179                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:179 white
+180                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:180 white
+181                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:181 white
+182                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:182 white
+183                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:183 white
+184                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:184 white
+185                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:185 white
+186                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:186 white
+187                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:187 white
+188                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:188 white
+189                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:189 white
+190                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:190 white
+191                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:191 white
+192                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:192 white
+193                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:193 white
+194                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:194 white
+195                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:195 white
+196                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:196 white
+197                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:197 white
+198                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:198 white
+199                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:199 white
+200                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:200 white
+201                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:201 white
+202                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:202 white
+203                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:203 white
+204                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:204 white
+205                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:205 white
+206                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:206 white
+207                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:207 white
+208                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:208 white
+209                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:209 white
+210                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:210 white
+211                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:211 white
+212                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:212 white
+213                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:213 white
+214                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:214 white
+215                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:215 white
+216                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:216 white
+217                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:217 white
+218                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:218 white
+219                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:219 white
+220                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:220 white
+221                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:221 white
+222                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:222 white
+223                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:223 white
+224                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:224 white
+225                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:225 white
+226                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:226 white
+227                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:227 white
+228                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:228 white
+229                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:229 white
+230                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:230 white
+231                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:231 white
+232                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:232 white
+233                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:233 white
+234                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:234 white
+235                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:235 white
+236                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:236 white
+237                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:237 white
+238                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:238 white
+239                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:239 white
+240                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:240 white
+241                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:241 white
+242                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:242 white
+243                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:243 white
+244                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:244 white
+245                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:245 white
+246                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:246 white
+247                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:247 white
+248                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:248 white
+249                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:249 white
+250                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:250 white
+251                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:251 white
+252                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:252 white
+253                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:253 white
+254                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:254 white
+255                                   |       kcti
+1.0 1.0 1.0                           |       red green blue:255 white
+-1                                    |    End of Colour Table
+LC                                    |    Locators
+1                                     |       LC dev number
+0.0 1.0 0.0 1.0                       |       echo area
+-1                                    |       end of data record
+0.0 0.0                               |       initial locator
+-1                                    |    End of locators
+SK                                    |    Strokes
+1                                     |       SK device number
+0.0 1.0 0.0 1.0                       |       echo area
+-1                                    |       end of data record
+100 100                               |       kskmxb kskinb
+-1                                    |    End of strokes
+VL                                    |    Valuators
+1                                     |       VL device number
+0.0 1.0  0.0 1.0                      |       echo area
+-1                                    |       end of data record
+0.0 0.0 1.0                           |       quivl qmnvl qmxvl
+-1                                    |    End of valuators
+CH                                    |    Choices
+1                                     |       CH device number
+0.0 1.0 0.0 1.0                       |       echo area
+-1                                    |       end of data record
+2                                     |       CH device number
+0.0 1.0 0.0 1.0                       |       echo area
+-1                                    |       end of data record
+-1                                    |    End of choices
+PC                                    |    Picks
+-1                                    |    End of picks
+ST                                    |    String devices
+1                                     |       ST device number
+0.0 1.0   0.0 1.0                     |       echo area
+-1                                    |       end of data record
+80 10                                 |       kstmxb kstinb
+-1                                    |    End of string devices
+END                                   | End of SIGMA Workstation

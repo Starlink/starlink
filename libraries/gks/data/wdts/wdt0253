@@ -1,0 +1,175 @@
+253                                   | TEKTRONIX  4235 (4 bit-planes)
+4T                                    |    Driver Identifier
+WDT                                   |    WorkStation Description Table
+1280.0 1024.0 1280 1024               |       qdsdx qdsdy kdsrx kdsry
+100 1.0 0.0 100.0                     |       klnwd qnmlnw qmnlnw qmxlnw
+0 16.0 4.0 1280.0                     |       kmksz qnmmks qmnmks qmxmks
+0 6.66 1280.0                         |       kchh qmnchh qmxchh
+0 0.01 192.0                          |       kchxpf qmnchx qmxchx
+16                                    |       kmxpab
+PL                                    |    Polyline
+1                                     |       kpli
+1 1.0 1                               |       klnty qlnwd kplci
+2                                     |       kpli
+1 1.0 2                               |       klnty qlnwd kplci
+3                                     |       kpli
+1 1.0 3                               |       klnty qlnwd kplci
+4                                     |       kpli
+1 1.0 4                               |       klnty qlnwd kplci
+5                                     |       kpli
+1 1.0 5                               |       klnty qlnwd kplci
+-1                                    |    End of Polyline
+PM                                    |    Polymarker
+1                                     |       kpmi
+3 1.0 1                               |       kmkty qmksz kpmci
+2                                     |       kpmi
+3 1.0 2                               |       kmkty qmksz kpmci
+3                                     |       kpmi
+3 1.0 3                               |       kmkty qmksz kpmci
+4                                     |       kpmi
+3 1.0 4                               |       kmkty qmksz kpmci
+5                                     |       kpmi
+3 1.0 5                               |       kmkty qmksz kpmci
+-1                                    |    End of Polymarker
+TX                                    |    Text
+1                                     |     ktxi
+1 0 1.0 0.0 1                         |     ktxfn ktxpn qchxp qchsp ktxci
+2                                     |     ktxi
+1 0 1.0 0.0 2                         |     ktxfn ktxpn qchxp qchsp ktxci
+3                                     |     ktxi
+1 0 1.0 0.0 3                         |     ktxfn ktxpn qchxp qchsp ktxci
+4                                     |     ktxi
+1 0 1.0 0.0 4                         |     ktxfn ktxpn qchxp qchsp ktxci
+5                                     |     ktxi
+1 0 1.0 0.0 5                         |     ktxfn ktxpn qchxp qchsp ktxci
+6                                     |     ktxi
+1 0 1.0 0.0 6                         |     ktxfn ktxpn qchxp qchsp ktxci
+-1                                    |    End of Text
+PA                                    |    Pattern
+1                                     |       kpai
+3 3                                   |       kpadx kpady kpa
+    0 0 0
+    1 1 1                             |       kpa
+    2 2 2
+2                                     |       kpai
+6 6                                   |       kpadx kpady
+    2 2 2 0 0 0
+    2 2 2 0 0 0
+    2 2 2 0 0 0
+    0 0 0 2 2 2
+    0 0 0 2 2 2
+    0 0 0 2 2 2                       |       kpa
+3                                     |       kpai
+8 8                                   |       kpadx kpady
+    0 0 0 0 0 0 4 4
+    0 0 3 3 0 0 0 0
+    0 3 3 3 3 0 0 0
+    0 3 3 3 3 0 0 0
+    0 0 3 3 0 0 0 0
+    0 0 0 0 0 0 4 4
+    4 0 0 0 0 4 4 4
+    4 0 0 0 0 4 4 4                   |       kpa
+-1                                    |    End of Pattern
+FA                                    |    Fill Area
+1                                     |       kfai
+1 1 1                                 |       kis ksi kfaci
+2                                     |       kfai
+1 1 2                                 |       kis ksi kfaci
+3                                     |       kfai
+1 1 3                                 |       kis ksi kfaci
+4                                     |       kfai
+1 1 4                                 |       kis ksi kfaci
+5                                     |       kfai
+1 1 5                                 |       kis ksi kfaci
+-1                                    |    End of Fill Area
+CT                                    |    Colour Table
+0                                     |       kcti
+0.0 0.0 0.0                           |       red green blue: 0 black
+1                                     |       kcti
+1.0 1.0 1.0                           |       red green blue: 1 white
+2                                     |       kcti
+1.0 0.0 0.0                           |       red green blue: 2 red
+3                                     |       kcti
+0.0 1.0 0.0                           |       red green blue: 3 green
+4                                     |       kcti
+0.0 0.0 1.0                           |       red green blue: 4 blue
+5                                     |       kcti
+1.0 1.0 0.0                           |       red green blue: 5 yellow
+6                                     |       kcti
+0.0 1.0 1.0                           |       red green blue: 6 cyan
+7                                     |       kcti
+1.0 0.0 1.0                           |       red green blue: 7 magenta
+8                                     |       kcti
+0.0 0.0 0.0                           |       red green blue: 8 black
+9                                     |       kcti
+0.2 0.2 0.2                           |       red green blue: 9 grey 3/15
+10                                    |       kcti
+0.33 0.33 0.33                        |       red green blue:10 grey 5/15
+11                                    |       kcti
+0.47 0.47 0.47                        |       red green blue:11 grey 7/15
+12                                    |       kcti
+0.6 0.6 0.6                           |       red green blue:12 grey 9/15
+13                                    |       kcti
+0.73 0.73 0.73                        |       red green blue:13 grey11/15
+14                                    |       kcti
+0.87 0.87 0.87                        |       red green blue:14 grey13/15
+15                                    |       kcti
+1.0 1.0 1.0                           |       red green blue:15 white
+-1                                    |    End of Colour Table
+LC                                    |    Locators
+1                                     |       LC dev number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+0.5 0.5                               |       initial locator WC NTN=0
+2                                     |       LC dev number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+0.5 0.5                               |       initial locator WC NTN=0
+3                                     |       LC dev number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+0.5 0.5                               |       initial locator WC NTN=0
+-1                                    |    End of locators
+SK                                    |    Strokes
+1                                     |       SK device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+100 100                               |       kskmxb kskinb
+2                                     |       SK device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+100 100                               |       kskmxb kskinb
+3                                     |       SK device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+100 100                               |       kskmxb kskinb
+-1                                    |    End of strokes
+VL                                    |    Valuators
+1                                     |       VL device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+0.0 0.0 1.0                           |       quivl qmnvl qmxvl
+-1                                    |    End of valuators
+CH                                    |    Choices
+1                                     |       CH device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+2                                     |       CH device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+-1                                    |    End of choices
+PC                                    |    Picks
+1                                     |       PC device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+2                                     |       PC device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - not used
+-1                                    |       end of data record
+-1                                    |    End of picks
+ST                                    |    String devices
+1                                     |       ST device number
+0.0 1024.0 0.0 1024.0                 |       echo area DC - bot used
+-1                                    |       end of data record
+72 20                                 |       kstmxb kstinb
+-1                                    |    End of string devices
+END                                   | End of TEKTRONIX Workstation

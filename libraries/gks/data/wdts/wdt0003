@@ -1,0 +1,16 @@
+3                                     | WISS Workstation
+0W                                    |    Driver identifier
+WDT                                   |    Workstation Description Table
+0.0 0.0 0 0                           |       qdsdx qdsdy kdsrx kdsry
+0 0.0 0.0 0.0                         |       klnwd qnmlnw qmnlnw qmxlnw
+0 0.0 0.0 0.0                         |       kmksz qnmmks qmnmks qmxmks
+0 0.0 0.0                             |       kchh qmnchh qmxchh
+0 0.0 0.0                             |       kchxpf qmnchx qmxchx
+0                                     |       kmxpab
+CT                                    |    Colour Table (mandatory?)
+0                                     |       kcti
+0.0 0.0 0.0                           |       red green blue
+1                                     |       kcti
+1.0 1.0 1.0                           |       red green blue
+-1                                    |    End of Colour Table
+END                                   | End of WISS WorkStation
