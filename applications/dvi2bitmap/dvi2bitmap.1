@@ -1,0 +1,146 @@
+.TH DVI2BITMAP 1 "5 June 1999"
+.SH NAME
+dvi2bitmap
+.SH SYNOPSIS
+.B dvi2bitmap
+[\-f font-path] [\-r resolution] [\-m magnification] [\-P[bt]]
+[\-s scalefactor] [\-t gif|xbm] [\-o output] [\-lLnqV]
+dvi-file
+.SH DESCRIPTION
+dvi2bitmap processes a DVI file produced by the TeX typesetting
+system, converting each page to a single bitmap.
+.PP
+This program is intended to conform to the DVI processing standard.
+.SS OPTIONS
+.TP
+.I "\-f font-path"
+Specifies the path to the PK fonts which dvi2bitmap will use.  See
+also the 
+.B DVI2BITMAP_PK_PATH
+environment variable.
+.TP
+.I "\-l"
+Show missing fonts.
+The program writes on standard output one line per missing font, with
+five fields: the 
+font name, the DPI value it was looking for, the base-DPI of the font,
+the magnification factor, and the filename which it tried to look for.
+This output can 
+be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
+generate the required fonts.
+.TP
+.I "\-L"
+Show all fonts in the DVI file.  The output is as for the 
+.I "\-l"
+option, except that found fonts are also listed, prefixed by a % character.
+.TP
+.I "\-m magnification"
+The TeX magnification parameter which is used when processing the DVI
+file. It is a float, with 1.0 corresponding to no magnification (the
+default).  This interacts with the resolution as follows: if you
+specify a resolution of 100, and a magnification of 2, then dvi2bitmap
+will search for PK files at 200 dpi.
+.TP
+.I "\-n"
+Do not actually process the DVI file, but read the DVI pre- and
+postamble.  Useful in conjunction with the 
+.I "\-l"
+option.  If this option is present, then the program returns non-zero
+if any fonts were missing.
+.TP
+.I "\-o output"
+Choose the output filename pattern.  The value is a 
+.B printf
+formatting string, with a single 
+.B %d
+formatting string, which will be replaced in output filenames
+with the page number.  This can be overridden on a per-page basis by
+a TeX \\special embedded in the DVI file (see below).  If there is no
+file extension, or if it does not match the output type, a suitable file
+extension will be added.
+.TP
+.I "\-P[bt]"
+Specifies processing of the output bitmap.
+.B "\-Pb" 
+blurs the bitmap, making a half-hearted attempt to make a
+low-resolution bitmap look better.
+.B "\-Pt" 
+makes the output bitmap have a transparent background, if
+that's supported by the particular format you choose using option
+.B "\-t"
+.TP
+.I "\-q"
+Quiet mode.  Do not display warnings or errors.
+.TP
+.I "\-r resolution"
+Specifies the output resolution, in pixels-per-inch.  This is used
+when deciding which PK files to use. The default is 72.
+.TP
+.I "\-s scalefactor"
+Reduces the linear size of the output bitmap by a factor
+.B scalefactor
+(default 1).
+.TP
+.I "\-t gif|xbm"
+Choose the output format.
+.TP
+.I "\-V"
+Display the version number, and exit.
+.SH "DVI specials"
+dvi2bitmap recognises a single DVI special command, and emits a
+warning if it finds any others.
+.PP
+If the TeX file contains a special command:
+"\\special {dvi2bitmap outputfile thispage}"
+then the output file used for the current page will be 
+.I thispage.gif
+(the extension will depend on the output type selected).
+.SH "EXIT VALUE"
+Exits with a non-zero status if there were any processing errors.  See
+also the 
+.I "\-n"
+option.
+.SH EXAMPLES
+% dvi2bitmap -r 110 -m 2 -s 2 -t gif hello.dvi
+.PP
+This converts the file hello.dvi to a GIF bitmap.  It first sets the
+magnification factor to 2, so that the program uses a double-size font
+(eg, .../cmr10.220pk), then scales the bitmap down by a factor of 2 to
+obtain a bitmap of the correct size.
+.PP
+% dvi2bitmap -n -l -r 110 -m 1.5 -q hello.dvi
+.br
+cmr10 165 110 1.5 /var/lib/.../cm/cmr10.165pk
+.PP
+This reads the DVI file to find out what fonts are required, but does
+not process it further.  It then tries to find the fonts, fails, and
+produces a list of parameters which could be used to generate the
+font files.
+.SH ENVIRONMENT
+The 
+.B DVI2BITMAP_PK_PATH
+environment variable gives the directory which is to be searched for
+PK files.  Note that, although the environment variable refers to a
+`path', you may specify only one directory.  I may make this
+marginally more sophisticated in future versions, but probably not:
+the correct thing to do here is to use the same Kpathsearch library
+that the rest of the TeX system uses.
+.SH "SEE ALSO"
+DVItype and PKtoPX: Knuth programs intended as model DVI and PK file
+readers.  They might be available as part of your TeX distribution,
+but are also available on CTAN.
+.br
+.IR "The DVI Driver Standard, Level 0" ,
+Available on CTAN, in directory 
+.I dviware/driv-standard
+(yes?).
+.SH BUGS
+If the program doesn't conform to the DVI Driver Standard, please let
+me know.
+.PP
+As noted above, the PK path searching should be changed to use the
+Kpathsearch library.
+.PP
+It would be nice to output a greater range of bitmap types.  Sometime....
+.SH AUTHOR
+Norman Gray (norman@astro.gla.ac.uk)
