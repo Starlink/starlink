@@ -9,45 +9,110 @@
 
 A general introduction to POLPACK.
 
-POLPACK is a package of applications for mapping the linear or circular
-polarization of extended astronomical objects, using data obtained from a
-dual-beam polarimeter. It is assumed that the analyser is stepped in
-units of 45 degrees and that no rotation occurs between target exposures.
-Other assumptions regarding the specific form of the data or the
-polarimeter have, as far as possible, been avoided.
+POLPACK is a package of applications for mapping the linear or
+circular polarization of extended astronomical objects. Data
+from both single and dual beam polarimeters can be processed,
+although currently circular polarization can only be measured 
+when using dual-beam data.
 
-POLPACK processes data in NDF format. This is the standard data format
-used by most Starlink software, and is described fully in SUN/33.
-However, other astronomical data formats may also be processed using
-transparent on-the-fly data conversion facilities provided by the NDF
-subroutine library. The use of these facilities is described in SUN/55.
+POLPACK processes data in NDF format. This is the standard data
+format used by most Starlink software, and is described fully
+in SUN/33. However, other astronomical data formats may also be
+processed using transparent on-the-fly data conversion
+facilities provided by the NDF subroutine library, and the
+CONVERT package. The use of these facilities is described in
+SUN/223 and SUN/55.
 
-POLPACK commands are available from both the UNIX C-shell (and variants)
-and from the ICL command language.  The facilities provided by POLPACK
-include:
+The facilities provided by POLPACK include:
 
-   o  alignment of images on the sky.
-   o  extraction of $O$ and $E$ images from a single frame.
-   o  sky subtraction.
-   o  calculation of Stokes parameters.
-   o  binning of Stokes parameters.
-   o  creation of catalogues of polarization vectors.
-   o  graphical display of vector maps.
+  -   alignment of images on the sky.
+  -   extraction of O and E images from a single frame of 
+      dual-beam data.
+  -   sky subtraction.
+  -   calculation of Stokes parameters.
+  -   binning of Stokes parameters.
+  -   creation of catalogues of polarization vectors.
+  -   graphical display of vector maps.
 
 POLPACK does not provide facilities for performing instrumental
-corrections such as flat-fielding, de-biassing, etc. Such corrections
-should be applied to the data before using POLPACK, so that POLPACK can
-assume that pixel values are proportional to the combined intensity of
-sky and object. 
+corrections such as flat-fielding, de-biassing, etc. Such
+corrections should be applied to the data before using POLPACK,
+so that POLPACK can assume that pixel values are proportional
+to the combined intensity of sky and object. Further comments
+on these corrections can be found in SUN/223.
 
-POLPACK can, however, apply certain corrections to the supplied data when
-calculating Stokes parameters. These corrections take account of any
-differences in the exposure times between raw frames, and any difference
-in the sensitivity of the two channels of the dual-beam polarimeter. They
-rely on redundancy in the supplied data, and require a specific set of
-analyser positions to be used (described in SUN/223).
+Slightly different facilities are available when using
+single-beam or dual-beam data, as described in the following
+sections. It is hoped to rationalize the differences between
+these two modes in future releases.
 
 Type ? to see the main help topics.
+
+2 Single-beam Facilities
+
+  -   Data from polarimeters containing the following optical components 
+      can be processed:
+
+         1 - A fixed analyser and a rotating half-wave plate.
+
+         2 - Multiple fixed analysers.
+
+         3 - A single rotating analyser.
+
+  -   Only linear polarization can be measured. 
+
+  -   Different target exposures can be rotated with respect to 
+      one another. That is, the linear mapping between positions 
+      in any two target exposures can include rotation, as well 
+      as magnification and a shift of origin (shear is not
+      allowed).
+
+  -   The transmission and efficiency of non-perfect analysers
+      can be taken into account, if you have known values for
+      these quantities.
+
+  -   Estimates of the variance in the observed intensity
+      images can be made if necessary. This is useful if your
+      data does not have usable variance information associated
+      with it. Variances on the reduced quantities (Stokes
+      vectors, polarization vectors, etc) can then be made on
+      the basis of these estimated variances.
+
+  -   The observed intensity images must all have the same
+      normalization. That is, the "exposure times" are all
+      assumed to be equal.
+
+2 Dual-beam Facilities
+
+  -   It is assumed that the polarimeter contains a fixed
+      analyser and a rotating half or quarter wave-plate which
+      is stepped in units of 45 degrees.
+
+  -   Both linear and circular polarization can be measured. 
+
+  -   Different target exposures must not be rotated with
+      respect to one another. That is, the linear mapping
+      between positions in any two target exposures can only
+      include magnification and a shift of origin (rotation and
+      shear are not allowed).
+
+  -   The analyser is assumed to be perfect (i.e. the
+      transmission and efficiency of the analyser are both
+      assumed to be 1.0).
+
+  -   Variances can only be estimated for the reduced
+      quantities (Stokes vectors, polarization vectors, etc) if
+      the observed intensity images have usable variances
+      associates with them (i.e. these input variances cannot
+      be estimated for dual-beam data).
+
+  -   Corrections can be applied when calculating the Stokes
+      vectors which take account of any differences in the
+      exposure times between raw frames, and any difference in
+      the sensitivity of the two channels of the dual-beam
+      polarimeter. They rely on redundancy in the supplied
+      data, and require a specific set of analyser positions to
+      be used (described in SUN/223) when obtaining the data.
 
 1 Using_Help
 
@@ -198,21 +263,42 @@ existing group which will be used as the basis for the modified strings.
 
 2 Groups of Data Files
 
-If a group expression is used to specify a list of input data files, then
-file names may be specified which contain wild card characters ("*" and
-"?"). These will be expanded into a list of explicit file names before
-returning the group to the application. Note, group expressions
-containing wild-cards must be enclosed in quotes if they are supplied on
-the command line (this prevents the shell from expanding the wild-cards
-itself).
+If a group expression is used to specify a list of input data
+files, then file names may be specified which contain wild card
+characters ("*" and "?"). These will be expanded into a list of
+explicit file names before returning the group to the
+application. Note, group expressions containing wild-cards must
+be enclosed in quotes if they are supplied on the command line
+(this prevents the shell from expanding the wild-cards itself).
 
-If the final character in a group expression is a colon (:), then a list
-of the data files represented by the group expression (minus the colon)
-is displayed, but no data files are actually added to the group of files
-to be processed. The user is then re-prompted for another group
-expression. Note, this facility only applies to group expressions
-representing existing data files, not data files which are to be created
-by the application.
+If the final character in a group expression is a colon (:),
+then a list of the data files represented by the group
+expression (minus the colon) is displayed, but no data files
+are actually added to the group of files to be processed. The
+user is then re-prompted for another group expression. Note,
+this facility only applies to group expressions representing
+existing data files, not data files which are to be created by
+the application.
+
+If an HDS container file is supplied which contains two or more
+NDF structures, then each NDF within the container file is
+processed as a separate image. NDFs which are contained within
+an extension of another NDF are not included. HDS container
+files can usually be identified by the fact they have a file
+type of ".sdf". They can be used to store one or more standard
+Starlink NDF structures.
+
+If a group of output NDFs are created by modification of a
+group of input NDFs. Then the structure of the output container
+files will be copied from the corresponding input container
+file. For instance, if the container file o66_int.sdf contains
+16 NDFs in components I1 to I16, then specifying "o66_int" when
+asked for a group of input images will result in all 16 NDFs
+being used. If the corresponding output images are specified
+using the string "*_A" then an output file named o66_int_A.sdf
+will be created. The structure of this file will be copied from
+the input file, and will therefore contain the 16 output NDFs
+in components I1 to I16.
 
 2 Examples
 
