@@ -144,9 +144,9 @@
       END IF
 
 *  Call the initialisation routine depending on the tag
-      CALL ADI_CGET0C( PSID, 'Tag', TAG, STATUS )
+      CALL ADI_CGET0C( P_PSID(SLOT), 'Tag', TAG, STATUS )
       CALL ADI_CGET0I( P_PLIST, TAG, RTNPTR, STATUS )
-      CALL PSF_INIT_EXEC( %VAL(PSFRTN), P_PSID(SLOT), P_FID(SLOT),
+      CALL PSF_INIT_EXEC( %VAL(RTNPTR), P_PSID(SLOT), P_FID(SLOT),
      :                    P_INST(SLOT), STATUS )
 
 *  Abort point

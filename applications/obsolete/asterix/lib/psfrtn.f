@@ -477,6 +477,7 @@
       INTEGER                 CHR_LEN
       REAL                    PSF1_GETAXDR, PSF1_GETAXTOR
       LOGICAL                 STR_ABBREV, PSF1_GETAXOK
+      EXTERNAL			PSF_ANAL
       EXTERNAL			PSF_ANAL_HINT, PSF_ANAL_PFL
 *
 *    Local variables :
@@ -707,12 +708,12 @@
       END IF
 
 *  Store instance data
-      CALL PSF0_SETID0C( PSID, 'Tag', 'ANALYTIC', STATUS )
       CALL PSF0_SETID0C( PSID, 'Form', CH3, STATUS )
       CALL PSF0_SETID0R( PSID, 'Width1', W1, STATUS )
       CALL PSF0_SETID0R( PSID, 'Width2', W2, STATUS )
 
 *  Set methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_ANAL, STATUS )
       CALL PSF0_SETRTN( PSID, 'Eprofile', PSF_ANAL_PFL, STATUS )
       CALL PSF0_SETRTN( PSID, 'Hint', PSF_ANAL_HINT, STATUS )
 
@@ -1452,6 +1453,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
       INTEGER			CHR_LEN
       LOGICAL                   CHR_SIMLR
+      EXTERNAL			PSF_ASCA_HINT
 *
 *    Local variables :
 *
@@ -1556,8 +1558,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       END IF
 
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'ASCA', STATUS )
+*  Store methods
+      CALL PSF0_SETRTN( PSID, 'Hint', PSF_ASCA_HINT, STATUS )
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
@@ -1687,6 +1689,67 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       END
 
+
+*+  PSF_EXOLE_INIT - EXOSAT LE psf initialisation
+      SUBROUTINE PSF_EXOLE_INIT( PSID, FID, INST, STATUS )
+*
+*    Description :
+*
+*     Associate a slot with an XRT PSPC psf.
+*
+*    Environment parameters :
+*
+*     MASK = CHAR(R)
+*     AUX = ...
+*
+*    Method :
+*    Deficiencies :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*      1 May 1996 (DJA):
+*        Original version
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+*
+*    Import :
+*
+      INTEGER			PSID
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
+*
+*    Status :
+*
+      INTEGER STATUS
+*
+*    Function declarations :
+*
+      EXTERNAL			PSF_EXOLE
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Store methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_XRT_HRI, STATUS )
+
+*  Tidy up
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'PSF_EXOLE_INIT', STATUS )
+      END IF
+
+      END
+
+
 *+  PSF_PWFC - Interrogate the calibration database
       SUBROUTINE PSF_PWFC( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
      :                                                  ARRAY, STATUS )
@@ -1813,9 +1876,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *  Load data from dataset
       CALL PSF_WFC_LOADD( FID, .FALSE., PSID, STATUS )
-
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'PWFC', STATUS )
 
       END
 
@@ -2245,9 +2305,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'RADIAL', STATUS )
-
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_RADIAL_INIT', STATUS )
@@ -2618,10 +2675,13 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    History :
 *
-*     23 Dec 93 : Original (DJA)
-*     13 Jun 95 : Return absolute value of min(dx,dy) for granularity in
-*                 rectangular case (DJA)
-*     21 Dec 1995 : Energy granularity (DJA)
+*     23 Dec 1993 (DJA):
+*        Original version
+*     13 Jun 1995 (DJA):
+*        Return absolute value of min(dx,dy) for granularity in
+*        rectangular case
+*     21 Dec 1995 (DJA):
+*        Energy granularity
 *
 *    Type definitions :
 *
@@ -3011,9 +3071,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Reset workspace
       CALL PSF0_SETID0I( PSID, 'Rptr', 0, STATUS )
-
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'RESPFILE', STATUS )
 
 *  Abort point
  99   CONTINUE
@@ -3439,9 +3496,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'TABULAR', STATUS )
-
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_TABULAR_INIT', STATUS )
@@ -3756,9 +3810,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Load data from file
       CALL PSF_WFC_LOADD( FID, .TRUE., PSID, STATUS )
-
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'WFC', STATUS )
 
       END
 
@@ -5081,6 +5132,8 @@ c     :                           S2 = 4.0419,
 *
       LOGICAL                  STR_ABBREV
       LOGICAL                  CHR_SIMLR
+      EXTERNAL			PSF_XRT_PSPC
+      EXTERNAL			PSF_XRT_PSPC_HINT
 *
 *    Local variables :
 *
@@ -5215,12 +5268,76 @@ c     :                           S2 = 4.0419,
 *  Store option
       CALL PSF0_SETID0C( PSID, 'Form', OPT, STATUS )
 
-*  Set the tag
-      CALL PSF0_SETID0C( PSID, 'Tag', 'XRT_PSPC', STATUS )
+*  Store methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_XRT_PSPC, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Hint', PSF_XRT_PSPC_HINT, STATUS )
 
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_XRT_PSPC_INIT', STATUS )
+      END IF
+
+      END
+
+
+
+*+  PSF_XRT_HRI_INIT - XRT HRI psf initialisation
+      SUBROUTINE PSF_XRT_HRI_INIT( PSID, FID, INST, STATUS )
+*
+*    Description :
+*
+*     Associate a slot with an XRT PSPC psf.
+*
+*    Environment parameters :
+*
+*     MASK = CHAR(R)
+*     AUX = ...
+*
+*    Method :
+*    Deficiencies :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*      1 May 1996 (DJA):
+*        Original version
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+*
+*    Import :
+*
+      INTEGER			PSID
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
+*
+*    Status :
+*
+      INTEGER STATUS
+*
+*    Function declarations :
+*
+      EXTERNAL			PSF_XRT_HRI
+      EXTERNAL			PSF_XRT_HRI_HINT
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Store methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_XRT_HRI, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Hint', PSF_XRT_HRI_HINT, STATUS )
+
+*  Tidy up
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'PSF_XRT_HRI_INIT', STATUS )
       END IF
 
       END
