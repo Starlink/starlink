@@ -1041,7 +1041,7 @@
 
 *  Local Variables:
       REAL			MINFR, MAXFR		! Extreme residuals
-      REAL			RMSFR			! RMS frac residual
+      REAL			FR, RMSFR		! RMS frac residual
 
       INTEGER			I, J			! Loop over image
       INTEGER			MAXFR_X, MAXFR_Y	! Max position
@@ -1081,7 +1081,7 @@
 *      Outside area?
           IF ( BQ(I,J) .NE. QUAL__MISSING ) THEN
 
-            FR = (DATA(I,J) - BGMOD(I,J)
+            FR = DATA(I,J) - BGMOD(I,J)
             IF ( (BGMOD(I,J) .NE. 0.0) .AND.
      :            (BQ(I,J) .EQ. QUAL__GOOD) ) THEN
               NFR = NFR + 1
