@@ -179,8 +179,8 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       ITER = 0
 
 *  Create minimisation control object
-      CALL FCI_CURFMC( 2*PSS__FITMXIT, 0, PSS__FITMINSLO, MCTRL,
-     :		       STATUS )
+      CALL FCI_CURFMC( 2*PSS__FITMXIT, 0, PSS__FITMINSLO,
+     :                 'CURFIT', MCTRL, STATUS )
 
 *  Restart point for re-fit
  10   ITER = ITER + 1
