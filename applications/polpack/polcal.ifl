@@ -105,6 +105,7 @@ interface POLCAL
       type     NDF
       access   WRITE
       ppath    'CURRENT'
+      association '->GLOBAL.DATA_ARRAY'
       prompt   'Output Stokes cube'
       helpkey  '*'
    endparameter
