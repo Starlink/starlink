@@ -53,6 +53,9 @@
 *  History:
 *     16-MAR-1998 (DSB):
 *        Original version.
+*     8-DEC-1998 (DSB):
+*        Check that there are some points to flush (NPBUF .GT. 0) before
+*        flushing the buffer if N is supplied equal to zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,8 +128,8 @@
 *  We need to flush the buffers if we have the maximum number of
 *  polylines stored, or if there is insufficient room to store the
 *  supplied positions, or if zero points have been supplied.
-         IF( NLBUF .EQ. MXL .OR. NPBUF + N .GT. MXP .OR. 
-     :       N .EQ. 0 ) THEN
+         IF( ( NLBUF .EQ. MXL .OR. NPBUF + N .GT. MXP .OR. 
+     :         N .EQ. 0 ) .AND. NPBUF .GT. 0 )  THEN
 
 *  Transform the buffered positions using the inverse of the Plot to get
 *  positions in Graphics coordinates. 
