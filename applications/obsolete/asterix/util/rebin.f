@@ -136,6 +136,7 @@
       REAL BNDS(2,MXBIN,DAT__MXDIM)	! required boundaries (irregular)
       REAL DUMAXVAL(DAT__MXDIM)		! dummy axis values for coerced dims
       REAL DUMAXWID(DAT__MXDIM)		! dummy axis widths
+      REAL DUMAXBND(2,DAT__MXDIM)	! dummy axis bounds
 *
 *    Version id :
 *
@@ -217,8 +218,11 @@
         AXVP(I)=UTIL_PLOC(DUMAXVAL(I))
         AXWP(I)=UTIL_PLOC(DUMAXWID(I))
         AXWPO(I)=UTIL_PLOC(DUMAXWID(I))
+        AXBP(I)=UTIL_PLOC(DUMAXBND(1,I))
         DUMAXVAL(I)=0.5
         DUMAXWID(I)=1.0
+        DUMAXBND(1,I)=0.0
+        DUMAXBND(2,I)=1.0
         DIMS(I)=1
         NORM(I)=.FALSE.
         DIR(I)=1.0
