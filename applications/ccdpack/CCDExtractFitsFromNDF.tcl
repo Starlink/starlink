@@ -21,11 +21,14 @@ proc CCDExtractFitsFromNDF { Top From To } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     2-MAR-1994 (PDRAPER):
 #     	 Original version.
+#     3-AUG-2000 (MBT):
+#        Added extraction of [X1:X2,Y1,Y2] type headers.
 #     {enter_changes_here}
 
 #-
@@ -54,11 +57,25 @@ proc CCDExtractFitsFromNDF { Top From To } {
 #  equals sign. Extract the first eight characters as the FITS item
 #  keyword name.
             if { [string match ????????*=* "$line"] } {
-               set item [ string range "$line" 0 7 ]
-               if { "$item" != "        " } {
-                  
+               set key [ string range "$line" 0 7 ]
+               set value [ string range "$line" 9 end ]
+
 #  Not blank matches the above rules to enter into the listbox.
-                  $To insert end "$item"
+               if { "$key" != "        " } {
+                  $To insert end "$key"
+
+#  If the value contains a string of the form '[X1:X2,Y1:Y2]' then add
+#  items to address each of these values.
+                  set num_rx {[+-]?[0-9]+.?[0-9]*([deDE][+-]?[0-9]+)?}
+                  set xy12_rx "\\\[$num_rx:$num_rx,$num_rx:$num_rx\\\]"
+
+                  if { [ regexp $xy12_rx $value ] } {
+                     regsub { *$} $key "" key
+                     $To insert end "${key}(X1)"
+                     $To insert end "${key}(X2)"
+                     $To insert end "${key}(Y1)"
+                     $To insert end "${key}(Y2)"
+                  }
                }
             }
          }
