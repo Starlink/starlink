@@ -22,13 +22,22 @@
 *  Description:
 *     This application plots vectors defined by the values contained
 *     within four columns in a catalogue. These columns give the magnitude
-*     and orientation of each vector, and the position of each vector.
+*     and orientation of each vector, and the position of each vector (see
+*     parameters COLMAG, COLANG, COLX and COLY).
 *
-*     The plot is produced within the current graphics database picture. 
-*     If there is an existing DATA picture within the current picture, then
-*     the vector map can be aligned with the existing DATA picture (see 
-*     parameter CLEAR). If no DATA picture exists within the current picture, 
-*     then a new DATA picture is created.
+*     The plot is produced within the current graphics database picture,
+*     and may be aligned with an existing DATA picture if the existing
+*     picture contains suitable co-ordinate Frame information (see 
+*     parameter CLEAR). 
+*
+*     Annotated axes can be produced (see parameter AXES), and the appearance 
+*     of the axes can be controlled in detail (see parameter STYLE). The 
+*     axes show co-ordinates in the co-ordinate Frame specified by
+*     parameter FRAME.
+*
+*     A key to the vector scale can be displayed to the right of the 
+*     vector map (see parameter KEY). The appearance and position of this 
+*     key may be controlled using parameters KEYSTYLE and KEYPOS.
 
 *  Usage:
 *     polplot cat colx coly colmag colang [vscale] [arrow] [just] [device]
@@ -54,20 +63,19 @@
 *        is assumed if no file type is supplied.
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the graphics device is to be cleared before displaying
-*        the vector map. This will result in the vector map being drawn
-*        in a new DATA picture. If you want the vector map to be drawn
-*        on top of an existing DATA picture, then set CLEAR to FALSE. The
+*        the vector map. If you want the vector map to be drawn over
+*        the top of an existing DATA picture, then set CLEAR to FALSE. The
 *        vector map will then be drawn in alignment with the displayed 
-*        data. If possible, alignment occurs within the coordinate Frame 
-*        specified using parameter FRAME. If this is not possible, (for 
-*        instance if suitable WCS information was not available when the 
-*        existing DATA picture was created), then an alignment is attempted 
-*        in PIXEL coordinates. If this is not possible, then alignment is
-*        attempted in GRID coordinates. If this is not possible, then
-*        alignment is attempted in the first suitable Frame in the catalogue
-*        irrespective of its Domain. A message is displayed indicating the 
-*        Domain in which alignment occurred. If there are no suitable Frames 
-*        in the catalogue then an error is reported. [TRUE]
+*        data. If possible, alignment occurs within the co-ordinate Frame 
+*        specified by parameter FRAME. If this is not possible, (for instance 
+*        if suitable WCS information was not stored with the existing DATA 
+*        picture), then alignment is attempted in PIXEL co-ordinates. If this 
+*        is not possible, then alignment is attempted in GRID co-ordinates. If 
+*        this is not possible, then alignment is attempted in the first 
+*        suitable Frame found in the catalogue irrespective of its domain. 
+*        A message is displayed indicating the domain in which alignment 
+*        occurred. If there are no suitable Frames in the catalogue then an 
+*        error is reported. [TRUE]
 *     COLANG = LITERAL (Read)
 *        The name of the catalogue column holding the orientation of each 
 *        vector. The values are considered to be in units of degrees unless 
@@ -135,7 +143,7 @@
 *           pixel coordinates.
 *        ["Centre"]
 *     KEY = _LOGICAL (Read)
-*        TRUE if a key is to be produced. [TRUE]
+*        TRUE if a key indicating the vector scale is to be produced. [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key. The first value gives 
 *        the gap between the right hand edge of the contour map and the left 
@@ -205,12 +213,6 @@
 *        margins are too narrow any axis annotation may be clipped. The
 *        dynamic default is 0.18 (for all edges) if annotated axes are being 
 *        produced, and zero otherwise. See also parameter KEYPOS. []
-*     PXSIZE = _REAL (Read)
-*        The length (x axis) of the plot in metres. [Maximum that can
-*        fit in the current picture while preserving square pixels]
-*     PYSIZE = _REAL (Read)
-*        The length (y axis) of the plot in metres. [Maximum that can
-*        fit in the current picture while preserving square pixels]
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
 *        orientation of the polarization (i.e. the values in the column

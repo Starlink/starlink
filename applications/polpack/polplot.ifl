@@ -16,6 +16,8 @@
 #     	 Original version.
 #     6-AUG-1998 (DSB):
 #        Changed default for LBND and UBND to !.
+#     11-NOV-1998 (DSB):
+#        Brought into line with KAPPA V0.13 graphics system.
 #     {enter_further_changes_here}
 
 #-
@@ -206,22 +208,6 @@ interface POLPLOT
       vpath       'DEFAULT'
       ppath       'DEFAULT'
       default     F
-      helpkey     '*'
-   endparameter
-
-   parameter      PXSIZE         
-      type        '_REAL'
-      prompt      'Size of the plot in the x-direction in metres'
-      vpath       'DYNAMIC'
-      ppath       'DYNAMIC'
-      helpkey     '*'
-   endparameter
-
-   parameter      PYSIZE         
-      type        '_REAL'
-      prompt      'Size of the plot in the y-direction in metres'
-      vpath       'DYNAMIC'
-      ppath       'DYNAMIC'
       helpkey     '*'
    endparameter
 
