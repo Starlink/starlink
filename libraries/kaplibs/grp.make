@@ -2,6 +2,9 @@
 #  be included.
 EXCLUDE = ctg_test.f lpg_test.f kaplibs_test.f 
 
+#  The files needed for the www tol for searching prologues.
+SEARCHTOOLS = kapform.html kapresults.html search.html search.js
+
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kaplibs_source ira_source aif_source fts_source kpg_source
 
@@ -203,7 +206,7 @@ UNIX_OTHERS = makefile mk sun238.tex kaplibs.news KAPLIBS_CONDITIONS
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) \
-$(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES)
+$(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES) $(SEARCHTOOLS)
 
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
