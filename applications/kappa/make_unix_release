@@ -50,6 +50,14 @@
          generic -t n -s ${file}
       end
 
+#  Rename unsigned data type files.
+      foreach n (*W.f)
+         mv $n `basename $n W.f`uw.f
+      end
+      foreach n (*B.f)
+         mv $n `basename $n B.f`ub.f
+      end
+
 #  Check for direct calls to NDF parameter routines. These should usually
 #  be replaced by equivalent LPG routines (to allow multiple invocations to 
 #  process groups of NDFs).
