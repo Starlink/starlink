@@ -90,6 +90,7 @@
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -108,6 +109,8 @@
 *     19-APR-2000 (DSB):
 *        Annull ignorable errors instead of flushing them if ILEVEL is
 *        less than 2.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -121,6 +124,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Global Variables:
 *      {include_global_variables}...
@@ -238,15 +242,16 @@
 * I4/I1.
             NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
-     :                       %VAL( IPDIN( 1, ISET ) ),
-     :                       %VAL( IPVIN( 1, ISET ) ),
-     :                       %VAL( IPDIN( 4, ISET ) ),
-     :                       %VAL( IPVIN( 4, ISET ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 1, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 1, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 4, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 4, ISET ) ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
-     :                       NITER, DS, DZ, %VAL( IPWRK1 ),
-     :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
-     :                       %VAL( IPWRK4 ), STATUS )
+     :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
 *  If the iteration limit was reached before convergence was achieved, an
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
@@ -272,15 +277,16 @@
 * states, I2/I3.
             NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
-     :                       %VAL( IPDIN( 3, ISET ) ),
-     :                       %VAL( IPVIN( 3, ISET ) ),
-     :                       %VAL( IPDIN( 2, ISET ) ),
-     :                       %VAL( IPVIN( 2, ISET ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 3, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 3, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 2, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 2, ISET ) ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
-     :                       NITER, DS, DZ, %VAL( IPWRK1 ),
-     :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
-     :                       %VAL( IPWRK4 ), STATUS )
+     :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN
@@ -357,15 +363,16 @@
 * I8/I5.
             NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
-     :                       %VAL( IPDIN( 5, ISET ) ),
-     :                       %VAL( IPVIN( 5, ISET ) ),
-     :                       %VAL( IPDIN( 8, ISET ) ) ,
-     :                       %VAL( IPVIN( 8, ISET ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 5, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 5, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 8, ISET ) ) ) ,
+     :                       %VAL( CNF_PVAL( IPVIN( 8, ISET ) ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
-     :                       NITER, DS, DZ, %VAL( IPWRK1 ),
-     :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
-     :                       %VAL( IPWRK4 ), STATUS )
+     :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN
@@ -387,15 +394,16 @@
 
             NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
-     :                       %VAL( IPDIN( 7, ISET ) ),
-     :                       %VAL( IPVIN( 7, ISET ) ),
-     :                       %VAL( IPDIN( 6, ISET ) ),
-     :                       %VAL( IPVIN( 6, ISET ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 7, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 7, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPDIN( 6, ISET ) ) ),
+     :                       %VAL( CNF_PVAL( IPVIN( 6, ISET ) ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
-     :                       NITER, DS, DZ, %VAL( IPWRK1 ),
-     :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
-     :                       %VAL( IPWRK4 ), STATUS )
+     :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN

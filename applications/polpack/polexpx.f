@@ -41,11 +41,14 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-MAY-1999 (DSB):
 *        Original version.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -59,6 +62,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -189,8 +193,8 @@
 *  variable in the argument list, so that subseqent string lengths get
 *  added after the "%val( 80 )".
          DO J = 1, NITEM
-            CALL POL1_SETFT( ICARD - 1, %VAL( IPFITS ), ITNAM( J ), 
-     :                       FTNAM( J ), POLLOC, ICARD, 
+            CALL POL1_SETFT( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ), 
+     :                       ITNAM( J ), FTNAM( J ), POLLOC, ICARD, 
      :                       COMMNT( J ), NEW, STATUS, %VAL( 80 ) )
 
 *  If a new card was added, increment the index at which the next card will 
@@ -220,7 +224,7 @@
          CALL AST_ANNUL( IWCS, STATUS )
 
 *  Store the ANGROT value in the FITS extension as keyword PPCKANGR.
-         CALL POL1_STFTR( ICARD - 1, %VAL( IPFITS ), ANGROT, 
+         CALL POL1_STFTR( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ), ANGROT,
      :                    'PPCKANGR', ICARD, 'POLPACK: X-axis '//
      :                    'to ref. direction in degs', NEW, 
      :                    STATUS, %VAL( 80 ) )

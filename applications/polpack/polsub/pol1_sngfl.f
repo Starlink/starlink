@@ -84,11 +84,14 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-FEB-1999 (DSB):
 *        Original version.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,6 +104,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -182,7 +186,8 @@
 *  array with the constant value 1.0.
          ELSE
             CALL PSX_CALLOC( EL, '_REAL', IPVIN, STATUS )
-            CALL POL1_FILLR( 1.0, EL, %VAL( IPVIN ), STATUS )
+            CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVIN ) ), 
+     :                       STATUS )
 
 *  Indicate that the variance array must be freed when no longer needed.
             FRVIN = .TRUE.
@@ -207,8 +212,10 @@
 *  returns the max and min NDF intensity values.
          CALL PSX_CALLOC( EL, '_REAL', IPWGT, STATUS )
          CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES, 
-     :                    %VAL( IPD ), %VAL( IPDIN ), WORK, 
-     :                    %VAL( IPWGT ), DINMAX, DINMIN, STATUS )
+     :                    %VAL( CNF_PVAL( IPD ) ), 
+     :                    %VAL( CNF_PVAL( IPDIN ) ), WORK,
+     :                    %VAL( CNF_PVAL( IPWGT ) ), 
+     :                    DINMAX, DINMIN, STATUS )
 
 *  We now need to get the variances for the input image. The scheme
 *  used to do this is selected by VSCH. If the input VARIANCE values 
@@ -232,9 +239,12 @@
             CALL PSX_CALLOC( DIM1, '_DOUBLE', IPW2, STATUS )
 
 
-            CALL POL1_SNGVR( DIM1, DIM2, %VAL( IPDIN ), WORK, 
-     :                       %VAL( IPWGT ), DINMAX, DINMIN, 
-     :                       %VAL( IPVIN ), %VAL( IPW1 ), %VAL( IPW2 ), 
+            CALL POL1_SNGVR( DIM1, DIM2, %VAL( CNF_PVAL( IPDIN ) ), 
+     :                       WORK,
+     :                       %VAL( CNF_PVAL( IPWGT ) ), DINMAX, DINMIN,
+     :                       %VAL( CNF_PVAL( IPVIN ) ), 
+     :                       %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       %VAL( CNF_PVAL( IPW2 ) ),
      :                       NOISE, STATUS )
 
             CALL PSX_FREE( IPW1, STATUS )
@@ -245,12 +255,15 @@
          CALL PSX_FREE( IPWGT, STATUS )
 
 *  Reject aberant data values.
-         CALL POL1_SNGRJ( NSIGMA, EL, %VAL( IPD ), %VAL( IPVIN ), 
-     :                    %VAL( IPDIN ), NREJ, NGOOD, STATUS )
+         CALL POL1_SNGRJ( NSIGMA, EL, %VAL( CNF_PVAL( IPD ) ), 
+     :                    %VAL( CNF_PVAL( IPVIN ) ),
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    NREJ, NGOOD, STATUS )
 
 *  If constant weights are required, fill the variance array with 1.0.
          IF( VSCH .EQ. 4 ) THEN
-            CALL POL1_FILLR( 1.0, EL, %VAL( IPVIN ), STATUS )
+            CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVIN ) ), 
+     :                       STATUS )
          END IF
 
 *  Get the ndf name, and find the end of the directory path (i.e. the

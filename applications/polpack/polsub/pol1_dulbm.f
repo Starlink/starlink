@@ -101,6 +101,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -125,6 +126,8 @@
 *        Map the output data array prior to calling POL1_FBBOX.
 *     3-JUL-2002 (DSB):
 *        Always map the NDF arrays as _REAL.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -141,6 +144,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       INTEGER IGRP
@@ -823,7 +827,8 @@
 *  polarimeter channel relative to the left hand channel.
          CALL POL_CALF( NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR, 
      :                  TOLS, TOLZ, MAXIT, SKYSUP, ID, ILEVEL, 
-     :                  %VAL( IPFEST ), %VAL( IPVFEST ), F, VF, 
+     :                  %VAL( CNF_PVAL( IPFEST ) ), 
+     :                  %VAL( CNF_PVAL( IPVFEST ) ), F, VF,
      :                  STATUS )
 
 * Release unwanted workspace. Abort if an error has occurred.
@@ -861,12 +866,18 @@
 *  gives the relative efficiency of the instrument between exposures.
 *  This routine also produces E and F factor corrected output images.
          CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
-     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, %VAL( IPID ), ID, 
+     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, 
+     :               %VAL( CNF_PVAL( IPID ) ), ID,
      :               ILEVEL, F,
-     :               ETOL, %VAL( IPWEIGHT ), IPDCOR, IPVCOR,
-     :               %VAL( IPEEST ), %VAL( IPZEST ), %VAL( IPVEEST ),
-     :               %VAL( IPVZEST ), %VAL( IPDE ), %VAL( IPTI1 ),
-     :               %VAL( IPTI2 ), STATUS, %VAL( IDLEN ) )
+     :               ETOL, %VAL( CNF_PVAL( IPWEIGHT ) ), IPDCOR, IPVCOR,
+     :               %VAL( CNF_PVAL( IPEEST ) ), 
+     :               %VAL( CNF_PVAL( IPZEST ) ), 
+     :               %VAL( CNF_PVAL( IPVEEST ) ),
+     :               %VAL( CNF_PVAL( IPVZEST ) ), 
+     :               %VAL( CNF_PVAL( IPDE ) ), 
+     :               %VAL( CNF_PVAL( IPTI1 ) ),
+     :               %VAL( CNF_PVAL( IPTI2 ) ), STATUS, 
+     :               %VAL( IDLEN ) )
 
 *   Release unwanted workspace. Keep the weight array (if defined) for
 *   use when calculating the stokes parameters.
@@ -952,10 +963,16 @@
 * reference direction for the Stokes parameters is rotated to the angle
 * specified by ANGRT.
          CALL POL_CALP( NEL, NSET, NPOS, NI,  IPDCOR, IPVCOR, NSTATE,
-     :               VAR, %VAL( IPIEST ), %VAL( IPVIEST ),
-     :               %VAL( IPQEST ), %VAL( IPVQEST ), %VAL( IPUEST ),
-     :               %VAL( IPVUEST ), %VAL( IPWEIGHT ), %VAL( IPDOUT ),
-     :               %VAL( IPVOUT ), DTOR*( ANGRT - ANGROT( 1 ) ), 
+     :               VAR, %VAL( CNF_PVAL( IPIEST ) ), 
+     :               %VAL( CNF_PVAL( IPVIEST ) ),
+     :               %VAL( CNF_PVAL( IPQEST ) ), 
+     :               %VAL( CNF_PVAL( IPVQEST ) ), 
+     :               %VAL( CNF_PVAL( IPUEST ) ),
+     :               %VAL( CNF_PVAL( IPVUEST ) ), 
+     :               %VAL( CNF_PVAL( IPWEIGHT ) ), 
+     :               %VAL( CNF_PVAL( IPDOUT ) ),
+     :               %VAL( CNF_PVAL( IPVOUT ) ), 
+     :               DTOR*( ANGRT - ANGROT( 1 ) ),
      :               STATUS )
 
 *  End the current NDF context
@@ -974,7 +991,8 @@
 *  Find the new bounds.
          CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), 
      :                    UBND( 2 ), LBND( 3 ), UBND( 3 ), LBND( 4 ), 
-     :                    UBND( 4 ), %VAL( IPDOUT ), STATUS )
+     :                    UBND( 4 ), %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    STATUS )
 
 *  Unmap the output NDF so that the call to NDF_SBND below works.
          CALL NDF_UNMAP( NDFOUT, '*', STATUS )

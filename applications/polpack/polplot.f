@@ -384,6 +384,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -414,6 +415,8 @@
 *     11-DEC-2003 (DSB):
 *        Clear the unnecessary Format attribute values set in KPG1_GDGET for 
 *        the key style.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -430,6 +433,7 @@
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
       INCLUDE 'NDF_PAR'          ! NDF_ constants 
       INCLUDE 'PAR_ERR'          ! PAR_ error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -644,11 +648,16 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy each column into the corresponding array.
-      CALL POL1_CPCTR( CI, GIMAG, NVEC, %VAL( IPMAG ), NGMAG, STATUS )
-      CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( IPANG ), NGANG, STATUS )
-      CALL POL1_CPCTD( CI, GIS( 1 ), NVEC, %VAL( IPX ), NGX, STATUS )
-      CALL POL1_CPCTD( CI, GIS( 2 ), NVEC, %VAL( IPY ), NGY, STATUS )
-      IF( GOTZ ) CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, %VAL( IPZ ), NGZ, 
+      CALL POL1_CPCTR( CI, GIMAG, NVEC, %VAL( CNF_PVAL( IPMAG ) ), 
+     :                 NGMAG, STATUS )
+      CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( CNF_PVAL( IPANG ) ), 
+     :                 NGANG, STATUS )
+      CALL POL1_CPCTD( CI, GIS( 1 ), NVEC, %VAL( CNF_PVAL( IPX ) ), 
+     :                 NGX, STATUS )
+      CALL POL1_CPCTD( CI, GIS( 2 ), NVEC, %VAL( CNF_PVAL( IPY ) ), 
+     :                 NGY, STATUS )
+      IF( GOTZ ) CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, 
+     :                            %VAL( CNF_PVAL( IPZ ) ), NGZ,
      :                            STATUS )
 
 *  Check the global status.
@@ -703,7 +712,8 @@
          CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
 
 *  Find the max and min Z values in the Z column.
-         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, 
+         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+     :                    NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
 
 *  If there is only a single Z value available, use it.
@@ -763,7 +773,8 @@
             END IF
 
 *  Find the closest available value to the requested Z value.
-            CALL POL1_FCLOS( NVEC, %VAL( IPZ ), REAL( Z ), ZUSE, 
+            CALL POL1_FCLOS( NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+     :                       REAL( Z ), ZUSE,
      :                       STATUS )
          END IF
 
@@ -881,13 +892,15 @@
          CALL ERR_ANNUL( STATUS )
 
 *  Find the maximum and minimum X value.
-         CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC, %VAL( IPX ), NBAD, 
+         CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC, 
+     :                    %VAL( CNF_PVAL( IPX ) ), NBAD,
      :                    UBND, LBND, MAXPOS, MINPOS, STATUS )
          BHI( 1 ) = REAL( UBND )
          BLO( 1 ) = REAL( LBND )
 
 *  Find the maximum and minimum Y value.
-         CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC, %VAL( IPY ), NBAD, 
+         CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC, 
+     :                    %VAL( CNF_PVAL( IPY ) ), NBAD,
      :                    UBND, LBND, MAXPOS, MINPOS, STATUS )
          BHI( 2 ) = REAL( UBND )
          BLO( 2 ) = REAL( LBND )
@@ -919,8 +932,11 @@
 
 *  Remove any positions outside these bounds. This also shuffles bad 
 *  positions to the end, and counts the number of good positions.
-      CALL POL1_RMBND( NVEC, BLO, BHI, ZUSE, %VAL( IPZ ), %VAL( IPMAG ), 
-     :                 %VAL( IPANG ), %VAL( IPX ), %VAL( IPY ), NIN, 
+      CALL POL1_RMBND( NVEC, BLO, BHI, ZUSE, %VAL( CNF_PVAL( IPZ ) ), 
+     :                 %VAL( CNF_PVAL( IPMAG ) ),
+     :                 %VAL( CNF_PVAL( IPANG ) ), 
+     :                 %VAL( CNF_PVAL( IPX ) ), %VAL( CNF_PVAL( IPY ) ), 
+     :                 NIN,
      :                 STATUS )
 
 *  Report an error if there are no vectors in the selected region.
@@ -937,7 +953,8 @@
       DMAX = 0.0
       DMIN = 0.0 
       HINIT = .TRUE.
-      CALL POL1_HIST( NIN, %VAL( IPMAG ), 0.9, NBIN, .TRUE., HIST, 
+      CALL POL1_HIST( NIN, %VAL( CNF_PVAL( IPMAG ) ), 
+     :                0.9, NBIN, .TRUE., HIST,
      :                DMIN, DMAX, HINIT, TYPDAT, STATUS )
 
       IF( TYPDAT .EQ. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
@@ -984,17 +1001,21 @@
 *  If this Mapping is not a UnitMap, transform the supplied catalogue 
 *  positions into PIXEL positions using this Mapping.
          IF( .NOT. AST_ISAUNITMAP( MAP, STATUS ) ) THEN
-            CALL AST_TRAN2( MAP, NIN, %VAL( IPX ), %VAL( IPY ), .TRUE.,
-     :                      %VAL( IPX2 ), %VAL( IPY2 ), STATUS ) 
+            CALL AST_TRAN2( MAP, NIN, %VAL( CNF_PVAL( IPX ) ), 
+     :                      %VAL( CNF_PVAL( IPY ) ), .TRUE.,
+     :                      %VAL( CNF_PVAL( IPX2 ) ), 
+     :                      %VAL( CNF_PVAL( IPY2 ) ), STATUS )
 
 *  Find the maximum and minimum X PIXEL value.
-            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, %VAL( IPX2 ), NBAD, 
+            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, 
+     :                       %VAL( CNF_PVAL( IPX2 ) ), NBAD,
      :                      UBND, LBND,  MAXPOS, MINPOS, STATUS )
             BHI( 1 ) = REAL( UBND )
             BLO( 1 ) = REAL( LBND )
 
 *  Find the maximum and minimum Y PIXEL value.
-            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, %VAL( IPY2 ), NBAD, 
+            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, 
+     :                       %VAL( CNF_PVAL( IPY2 ) ), NBAD,
      :                      UBND, LBND, MAXPOS, MINPOS, STATUS )
             BHI( 2 ) = REAL( UBND )
             BLO( 2 ) = REAL( LBND )
@@ -1204,16 +1225,21 @@
 
 *  Use this Mapping to transform the (x,y) positions in the catalogue 
 *  into graphics world coordinates.
-      CALL AST_TRAN2( MAP, NIN, %VAL( IPX ), %VAL( IPY ), .TRUE.,
-     :                %VAL( IPX2 ), %VAL( IPY2 ), STATUS ) 
+      CALL AST_TRAN2( MAP, NIN, %VAL( CNF_PVAL( IPX ) ), 
+     :                %VAL( CNF_PVAL( IPY ) ), .TRUE.,
+     :                %VAL( CNF_PVAL( IPX2 ) ), 
+     :                %VAL( CNF_PVAL( IPY2 ) ), STATUS )
 
 *  Set the appearance of lines drawn using PGPLOT so that they mimic 
 *  curves produced using astCurves.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 
 *  Plot the vectors.
-      CALL POL1_VECPL( NIN, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
-     :                 %VAL( IPANG ), ANGFAC, ANGROT, DSCALE, AHSIZE, 
+      CALL POL1_VECPL( NIN, %VAL( CNF_PVAL( IPX2 ) ), 
+     :                 %VAL( CNF_PVAL( IPY2 ) ), 
+     :                 %VAL( CNF_PVAL( IPMAG ) ),
+     :                 %VAL( CNF_PVAL( IPANG ) ), 
+     :                 ANGFAC, ANGROT, DSCALE, AHSIZE,
      :                 JUST, NEGATE, REFANG, STATUS )
 
 *  Re-instate the previous PGPLOT attributes.

@@ -65,6 +65,7 @@
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,8 @@
 *        Original version.
 *     23-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -87,6 +90,7 @@
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -349,8 +353,10 @@
          END IF
 
 *  Generate the simulated intensity values for the current NDF.
-         CALL POL1_SIMCL( VAR, EL, %VAL( IPDIN ), %VAL( IPVIN ), T, EPS,
-     :                    PHI, %VAL( IPDOUT ), %VAL( IPVOUT ), STATUS )
+         CALL POL1_SIMCL( VAR, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    %VAL( CNF_PVAL( IPVIN ) ), T, EPS,
+     :                    PHI, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPVOUT ) ), STATUS )
 
 *  End the NDF context.
          CALL NDF_END( STATUS )

@@ -66,11 +66,14 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-JAN-1998 (DSB):
 *        Original version.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +86,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NPIX
@@ -164,25 +168,34 @@
 *  by IPVAR (but only if VAR is .FALSE.).
          CALL POL1_STK( NPIX, NROW, DIN( 1, 1, IPLANE ), VAR, 
      :                  VIN( 1, 1, IPLANE ), BOX, NXBIN, NYBIN, 
-     :                  %VAL( IPSTDI ), %VAL( IPSTVI ), %VAL( IPVAR ),
+     :                  %VAL( CNF_PVAL( IPSTDI ) ), 
+     :                  %VAL( CNF_PVAL( IPSTVI ) ), 
+     :                  %VAL( CNF_PVAL( IPVAR ) ),
      :                  TR, STATUS )
 
 *  Do the binning.
          IF( VAR ) THEN
-            CALL POL1_CM1RR( %VAL( IPSTDI ), NBIN, BINSZ, 
-     :                       %VAL( IPSTVI ), METH, MINPIX, NSIGMA, 
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPSTDI ) ), NBIN, BINSZ,
+     :                       %VAL( CNF_PVAL( IPSTVI ) ), 
+     :                       METH, MINPIX, NSIGMA,
      :                       DBIN( 1, 1, IPLANE ), 
      :                       VBIN( 1, 1, IPLANE ), 
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                       %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL( IPUSED ), STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPPP ) ), 
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          ELSE
-            CALL POL1_CM3RR( %VAL( IPSTDI ), NBIN, BINSZ, %VAL( IPVAR ),
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPSTDI ) ), NBIN, BINSZ, 
+     :                       %VAL( CNF_PVAL( IPVAR ) ),
      :                       METH, MINPIX, NSIGMA, DBIN( 1, 1, IPLANE ), 
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL( IPUSED ), STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          END IF
 
       END DO

@@ -150,6 +150,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -166,6 +167,8 @@
 *     7-APR-2003 (DSB):
 *        Modified to propagate AXIS Frame from catalogue WCS FrameSet to
 *        the AXIS structures of the output NDF.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,6 +184,7 @@
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -484,7 +488,8 @@
 *  Read the required columns from the catalogue into the work arrays
 *  allocated above. This is done in a single pass through the catalogue
 *  in order to speed it up a bit. 
-         CALL POL1_CTCLM( CI, NCIN, NCOL, GI, %VAL( IP ), STATUS )
+         CALL POL1_CTCLM( CI, NCIN, NCOL, GI, %VAL( CNF_PVAL( IP ) ), 
+     :                    STATUS )
 
 *  Get the coefficients of the linear transformation from (X,Y) position
 *  to bin indices.
@@ -503,16 +508,19 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the maximum and minimum COLX value.
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPX ), NBAD, SXHI,
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPX ) ), 
+     :                    NBAD, SXHI,
      :                     SXLO, MAXPOS, MINPOS, STATUS )
 
 *  Find the maximum and minimum COLY value.
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPY ), NBAD, SYHI,
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPY ) ), 
+     :                    NBAD, SYHI,
      :                     SYLO, MAXPOS, MINPOS, STATUS )
 
 *  If supplied find the maximum and minimum COLZ value.
          IF( GOTZ ) THEN 
-            CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPZ ), NBAD, SZHI,
+            CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPZ ) ), 
+     :                       NBAD, SZHI,
      :                       SZLO, MAXPOS, MINPOS, STATUS )
          ELSE
             SZHI = 1.0
@@ -663,9 +671,11 @@
 
 *  Count the number of input catalogue positions contained in each output
 *  cell. The largest number in any one cell is returned.
-         CALL POL1_CLCNT( NCIN, GOTZ, %VAL( IPX ), %VAL( IPY ), 
-     :                    %VAL( IPZ ), TR, NXBIN, NYBIN, NZBIN, 
-     :                    %VAL( IPW1 ), MXCNT, STATUS )
+         CALL POL1_CLCNT( NCIN, GOTZ, %VAL( CNF_PVAL( IPX ) ), 
+     :                    %VAL( CNF_PVAL( IPY ) ),
+     :                    %VAL( CNF_PVAL( IPZ ) ), 
+     :                    TR, NXBIN, NYBIN, NZBIN,
+     :                    %VAL( CNF_PVAL( IPW1 ) ), MXCNT, STATUS )
 
 *  Now copy the input catalogue values into arrays suitable for binning
 *  using the vector routines of CCDPACK.
@@ -680,9 +690,12 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the data values from the input catalogue to the work array.
-         CALL POL1_STK2( NCIN, GOTZ, %VAL( IPD ), %VAL( IPX ), 
-     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, NZBIN,
-     :                   MXCNT, TR, %VAL( IPDST ), %VAL( IPW1 ), 
+         CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IPD ) ), 
+     :                   %VAL( CNF_PVAL( IPX ) ),
+     :                   %VAL( CNF_PVAL( IPY ) ), 
+     :                   %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN, NZBIN,
+     :                   MXCNT, TR, %VAL( CNF_PVAL( IPDST ) ), 
+     :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
 *  If required, do the same for the variances.
@@ -690,10 +703,12 @@
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
    
-            CALL POL1_STK2( NCIN, GOTZ, %VAL( IPV ), %VAL( IPX ), 
-     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                      NZBIN, MXCNT, TR, %VAL( IPVST ), 
-     :                      %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IPV ) ), 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                      NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVST ) ),
+     :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
          END IF
 
@@ -747,12 +762,18 @@
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Bin the data values and variances...
-            CALL POL1_CM1RR( %VAL( IPDST ), NBIN, MXCNT, %VAL( IPVST ),
-     :                      METH, MINVAL, NSIGMA, %VAL( IPBIN ),
-     :                      %VAL( IPVBIN ), %VAL( IPWRK1 ), 
-     :                      %VAL( IPWRK2 ), %VAL( IPPP ), %VAL( IPCOV ), 
-     :                      NMAT, %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                      %VAL( IPUSED ), STATUS )
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPDST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVST ) ),
+     :                      METH, MINVAL, NSIGMA, 
+     :                      %VAL( CNF_PVAL( IPBIN ) ),
+     :                      %VAL( CNF_PVAL( IPVBIN ) ), 
+     :                      %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                      %VAL( CNF_PVAL( IPPP ) ), 
+     :                      %VAL( CNF_PVAL( IPCOV ) ),
+     :                      NMAT, %VAL( CNF_PVAL( IPNCON ) ), 
+     :                      %VAL( CNF_PVAL( IPPNT ) ),
+     :                      %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  Now do the binning if there are no variances.
          ELSE
@@ -761,14 +782,19 @@
 *  and set each element to 1.0 (i.e. give all input values equal weight).
             CALL PSX_CALLOC( MXCNT, '_DOUBLE', IPVAR, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
-            CALL POL1_SETD( MXCNT, 1.0D0, %VAL( IPVAR ), STATUS )
+            CALL POL1_SETD( MXCNT, 1.0D0, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      STATUS )
 
 *  Bin the data values.
-            CALL POL1_CM3RR( %VAL( IPDST ), NBIN, MXCNT, %VAL( IPVAR ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPBIN ),
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL( IPUSED ), STATUS )
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPDST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVAR ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPBIN ) ),
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
          END IF
 
@@ -787,7 +813,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the data values from the catalogue into the NDF DATA array.
-         CALL POL1_CTCLM( CI, NCIN, 1, GI( DID ), %VAL( IPBIN ), 
+         CALL POL1_CTCLM( CI, NCIN, 1, GI( DID ), 
+     :                    %VAL( CNF_PVAL( IPBIN ) ),
      :                    STATUS )
 
 *  If variances are required, do the same for the VARIANCE array.
@@ -798,7 +825,8 @@
 
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_CTCLM( CI, NCIN, 1, GI( VID ), %VAL( IPVBIN ), 
+            CALL POL1_CTCLM( CI, NCIN, 1, GI( VID ), 
+     :                       %VAL( CNF_PVAL( IPVBIN ) ),
      :                       STATUS )
 
          END IF
@@ -854,7 +882,9 @@
 
 *  Store the Axis values.
          CALL POL1_AXSET( GOTZ, AST__NULL, TR2, NXBIN, NYBIN, NZBIN, 
-     :                    %VAL( IPAX1 ), %VAL( IPAX2 ), %VAL( IPAX3 ), 
+     :                    %VAL( CNF_PVAL( IPAX1 ) ), 
+     :                    %VAL( CNF_PVAL( IPAX2 ) ), 
+     :                    %VAL( CNF_PVAL( IPAX3 ) ),
      :                    STATUS )
 
 *  Store the Axes Label and Units strings.  
@@ -936,8 +966,9 @@
 
 *  Store the Axis values.
             CALL POL1_AXSET( GOTZ, AXMAP, TR2, NXBIN, NYBIN, NZBIN, 
-     :                       %VAL( IPAX1 ), %VAL( IPAX2 ), 
-     :                       %VAL( IPAX3 ), STATUS )
+     :                       %VAL( CNF_PVAL( IPAX1 ) ), 
+     :                       %VAL( CNF_PVAL( IPAX2 ) ),
+     :                       %VAL( CNF_PVAL( IPAX3 ) ), STATUS )
 
 *  Store the Axes Label and Units strings.  
             AXFRM = AST_GETFRAME( IWCSO, IAXIS, STATUS )

@@ -79,6 +79,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -86,6 +87,8 @@
 *        Original version, derived from CCDPACK:FINDCENT. The CCDPACK
 *        version was slow, and it crashed sometimes because it did not 
 *        release its IRH groups before returning.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -100,6 +103,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_ERR'          ! FIO_ error constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -210,7 +214,8 @@
          YPOS = DBLE( YIN( IPNT ) - REAL( LBND( 2 ) ) + 1.5 )
 
 *  Centroid the position.
-         CALL CCG1_CENR( XPOS, YPOS, %VAL( IPIN ), NCOL, NLINE,
+         CALL CCG1_CENR( XPOS, YPOS, %VAL( CNF_PVAL( IPIN ) ), 
+     :                   NCOL, NLINE,
      :                   ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                   XACC, YACC, STATUS )
 

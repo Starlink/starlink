@@ -86,6 +86,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -95,6 +96,8 @@
 *        Modified to support 3D data.
 *     2-MAR-2001 (DSB):
 *        Added zcunit_ and zaunit_,
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,6 +113,7 @@
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
       INCLUDE 'CAT_ERR'          ! CAT_ error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -732,8 +736,11 @@
 *  Write values to the output file.
       CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, 
      :                 NROW, IDCOL, ZCOL, FD, SZBAT, LBND, UBND, 
-     :                 %VAL( IPW1 ), %VAL( IPW2 ), %VAL( IPW3 ), 
-     :                 %VAL( IPW4 ), STATUS, %VAL( IDLEN ) )
+     :                 %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ), 
+     :                 %VAL( CNF_PVAL( IPW3 ) ),
+     :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS, 
+     :                 %VAL( IDLEN ) )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )

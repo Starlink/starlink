@@ -116,6 +116,7 @@
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -139,6 +140,8 @@
 *        for ID.
 *     24-JUN-1998 (DSB):
 *        Continue processing if the image inter-comparisons fail to converge.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -152,6 +155,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Global Variables:
 *      {include_global_variables}...
@@ -291,8 +295,10 @@
 * Add the left and corrected right hand images to form a total intensity
 * image. Index the result into an array of total intensity images.
 
-               CALL POL_CALTI( NEL, %VAL( IPDIN( 2 * IPOS - 1, ISET ) ),
-     :                        %VAL( IPDIN( 2 * IPOS, ISET ) ), F,
+               CALL POL_CALTI( NEL, 
+     :   %VAL( CNF_PVAL( IPDIN( 2 * IPOS - 1, ISET ) ) ),
+     :                        
+     :   %VAL( CNF_PVAL( IPDIN( 2 * IPOS, ISET ) ) ), F,
      :                        TI1( 1, IPAIR ), STATUS )
                ID( IPAIR ) = IMGID( IPOS, ISET )
             ENDIF
@@ -326,9 +332,12 @@
 * Insist on at least two pixels being valid so that different images are
 * intercompared.
 
-         CALL CCG1_MDR3R( TI2, NEL, NPAIR, WEIGHT, 2, %VAL( IPMED ),
-     :        %VAL( IPWRK5 ), %VAL( IPWRK6 ), %VAL( IPWRK7 ),
-     :        %VAL( IPWRK8 ), %VAL( IPWRK9 ), STATUS )
+         CALL CCG1_MDR3R( TI2, NEL, NPAIR, WEIGHT, 2, 
+     :                    %VAL( CNF_PVAL( IPMED ) ),
+     :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK6 ) ), 
+     :        %VAL( CNF_PVAL( IPWRK7 ) ),
+     :        %VAL( CNF_PVAL( IPWRK8 ) ), %VAL( CNF_PVAL( IPWRK9 ) ), 
+     :        STATUS )
         
 * Loop through the intensity images to compare them with the median and
 * form estimates of the scale factors and zero shifts. Variance
@@ -336,14 +345,16 @@
 
          DO IPAIR = 1, NPAIR
             NITER = 0
-            CALL CCD1_CMPRR( BAD, .FALSE., NEL, %VAL( IPMED ), 
-     :                       %VAL( IPMED ), TI1( 1, IPAIR ),
+            CALL CCD1_CMPRR( BAD, .FALSE., NEL, 
+     :                       %VAL( CNF_PVAL( IPMED ) ),
+     :                       %VAL( CNF_PVAL( IPMED ) ), TI1( 1, IPAIR ),
      :                       TI1( 1, IPAIR ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
-     :                       NITER, DS, DZ, %VAL( IPWRK1 ),
-     :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
-     :                       %VAL( IPWRK4 ), STATUS )
+     :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
 *  resulting approximate solution will probably be OK, so just annul (or
@@ -410,9 +421,9 @@
 * estimates.
 
          CALL CCD1_QNTLR( .FALSE., .FALSE., 0.5, NPAIR, EEST, EEST,
-     :        %VAL( IPWRK8 ), EMED, STATUS )
+     :        %VAL( CNF_PVAL( IPWRK8 ) ), EMED, STATUS )
          CALL CCD1_QNTLR( .FALSE., .FALSE., 0.5, NPAIR, ZEST, ZEST,
-     :        %VAL( IPWRK8 ), ZMED, STATUS )
+     :        %VAL( CNF_PVAL( IPWRK8 ) ), ZMED, STATUS )
          DO IPAIR = 1, NPAIR
             EEST( IPAIR ) = EEST( IPAIR ) / EMED
             ZEST( IPAIR ) = ZEST( IPAIR ) / ZMED
@@ -518,11 +529,14 @@
                SENSL = 1.0D0 / DBLE( EEST( IPAIR ) )
                SENSR = SENSL / DBLE( F )
                CALL CCG1_CMLTR( BAD, NEL,
-     :              %VAL( IPDIN( 2 * IPOS - 1, ISET ) ), SENSL,
-     :              %VAL( IPDOU( 2 * IPOS - 1, ISET ) ), NERR, STATUS )
+     :              %VAL( CNF_PVAL( IPDIN( 2 * IPOS - 1, ISET ) ) ), 
+     :              SENSL,
+     :              %VAL( CNF_PVAL( IPDOU( 2 * IPOS - 1, ISET ) ) ), 
+     :              NERR, STATUS )
                CALL CCG1_CMLTR( BAD, NEL,
-     :              %VAL( IPDIN( 2 * IPOS, ISET ) ), SENSR,
-     :              %VAL( IPDOU( 2 * IPOS, ISET ) ), NERR, STATUS )
+     :              %VAL( CNF_PVAL( IPDIN( 2 * IPOS, ISET ) ) ), SENSR,
+     :              %VAL( CNF_PVAL( IPDOU( 2 * IPOS, ISET ) ) ), 
+     :              NERR, STATUS )
 
 * If variance information is present then scale it with the
 * sensitivites. Note that the errors on the sensitivities are not
@@ -532,12 +546,16 @@
                   SENS2L = SENSL * SENSL
                   SENS2R = SENSR * SENSR
                   CALL CCG1_CMLTR( BAD, NEL,
-     :                 %VAL( IPVIN( 2 * IPOS - 1, ISET ) ), SENS2L,
-     :                 %VAL( IPVOU( 2 * IPOS - 1, ISET ) ), NERR,
+     :                 %VAL( CNF_PVAL( IPVIN( 2 * IPOS - 1, ISET ) ) ), 
+     :                 SENS2L,
+     :                 %VAL( CNF_PVAL( IPVOU( 2 * IPOS - 1, ISET ) ) ), 
+     :                 NERR,
      :                 STATUS )
                   CALL CCG1_CMLTR( BAD, NEL,
-     :                 %VAL( IPVIN( 2 * IPOS, ISET ) ), SENS2R,
-     :                 %VAL( IPVOU( 2 * IPOS, ISET ) ), NERR, STATUS )
+     :                 %VAL( CNF_PVAL( IPVIN( 2 * IPOS, ISET ) ) ), 
+     :                 SENS2R,
+     :                 %VAL( CNF_PVAL( IPVOU( 2 * IPOS, ISET ) ) ), 
+     :                 NERR, STATUS )
                ENDIF                  
             ENDIF
          ENDDO

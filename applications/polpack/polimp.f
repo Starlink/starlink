@@ -265,6 +265,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -277,6 +278,8 @@
 *        Added VERSION. Removed ANGROT from POLPACK extension.
 *     26-OCT-2001 (DSB):
 *        Added parameter ABORT.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -292,6 +295,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'GRP_PAR'          ! GRP parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -418,7 +422,8 @@
 *  systems (normally implemented by the compiler), on VMS this makes
 *  no difference.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL POL1_IMPRT(  FITLEN, %VAL( IPFIT), FDIN, FNAME, 
+            CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 
+     :                        FDIN, FNAME,
      :                        POLLOC, QUIET, STATUS, %VAL( 80 ) )
          END IF
 

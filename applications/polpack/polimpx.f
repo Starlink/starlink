@@ -54,11 +54,14 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-MAY-1999 (DSB):
 *        Original version.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,6 +76,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'GRP_PAR'          ! GRP parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -129,7 +133,7 @@
 *  systems (normally implemented by the compiler), on VMS this makes
 *  no difference.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL POL1_IMPRT(  FITLEN, %VAL( IPFIT), 0, ' ', 
+         CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 0, ' ',
      :                     POLLOC, .TRUE., STATUS, %VAL( 80 ) )
       END IF
 

@@ -178,6 +178,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -196,6 +197,8 @@
 *        Added optional RA and DEC columns to the output catalogue.
 *     2-FEB-2001 (DSB):
 *        Added support for 4D input cubes.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -213,6 +216,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'AST_PAR'          ! AST_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -448,9 +452,12 @@
          MINPIX = MAX( 1, MIN( BOX( 1 )*BOX( 2 ), MINPIX ) )
 
 *  Do the binning.
-         CALL POL1_STBIN( DIM( 1 ), DIM( 2 ), NSTOKE, %VAL( IPDIN ),
-     :                    VAR, %VAL( IPVIN ), BOX, METH, MINPIX, NSIGMA,
-     :                    NXBIN, NYBIN, %VAL( IPDBIN ), %VAL( IPVBIN ), 
+         CALL POL1_STBIN( DIM( 1 ), DIM( 2 ), NSTOKE, 
+     :                    %VAL( CNF_PVAL( IPDIN ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVIN ) ), 
+     :                    BOX, METH, MINPIX, NSIGMA,
+     :                    NXBIN, NYBIN, %VAL( CNF_PVAL( IPDBIN ) ), 
+     :                    %VAL( CNF_PVAL( IPVBIN ) ),
      :                    TR, STATUS )
 
       END IF
@@ -849,15 +856,24 @@
 
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE,
-     :                 NXBIN*NYBIN, %VAL( IPDBIN ), %VAL( IPVBIN ), 
+     :                 NXBIN*NYBIN, %VAL( CNF_PVAL( IPDBIN ) ), 
+     :                 %VAL( CNF_PVAL( IPVBIN ) ),
      :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO, MAKEI,
      :                 MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, 
-     :                 MAKECT, CI, %VAL( IPI ), %VAL( IPP ), 
-     :                 %VAL( IPT ), %VAL( IPIP ), %VAL( IPQ ), 
-     :                 %VAL( IPU ), %VAL( IPV ), %VAL( IPIV ), 
-     :                 %VAL( IPPV ), %VAL( IPTV ), %VAL( IPIPV ), 
-     :                 %VAL( IPQV ), %VAL( IPUV ), %VAL( IPVV ), 
-     :                 %VAL( IPW ), STATUS )
+     :                 MAKECT, CI, %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPP ) ),
+     :                 %VAL( CNF_PVAL( IPT ) ), 
+     :                 %VAL( CNF_PVAL( IPIP ) ), 
+     :                 %VAL( CNF_PVAL( IPQ ) ),
+     :                 %VAL( CNF_PVAL( IPU ) ), %VAL( CNF_PVAL( IPV ) ), 
+     :                 %VAL( CNF_PVAL( IPIV ) ),
+     :                 %VAL( CNF_PVAL( IPPV ) ), 
+     :                 %VAL( CNF_PVAL( IPTV ) ), 
+     :                 %VAL( CNF_PVAL( IPIPV ) ),
+     :                 %VAL( CNF_PVAL( IPQV ) ), 
+     :                 %VAL( CNF_PVAL( IPUV ) ), 
+     :                 %VAL( CNF_PVAL( IPVV ) ),
+     :                 %VAL( CNF_PVAL( IPW ) ), STATUS )
 
 *  Free the work space.
       IF( EQMAP .NE. AST__NULL ) CALL PSX_FREE( IPW, STATUS )   

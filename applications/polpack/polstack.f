@@ -134,6 +134,7 @@
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -145,6 +146,8 @@
 *        Added ORIGIN parameter.
 *     19-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,6 +162,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'GRP_PAR'          ! GRP parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -261,7 +265,8 @@
 *  Fill this array, and find the number of output NDFs required and the
 *  output reference direction.
       CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
-     :                 BIN, ANGRT, %VAL( IPW1 ), NOUT, %VAL( IPPHI), 
+     :                 BIN, ANGRT, %VAL( CNF_PVAL( IPW1 ) ), NOUT, 
+     :                 %VAL( CNF_PVAL( IPPHI )),
      :                 NDIMO, LBND, UBND, STATUS )
 
 *  Abort if no output images will be created.
@@ -325,10 +330,11 @@
 *  Create the output NDF if the bin is not empty.
          IF( IOUT .LT. NOUT ) THEN 
             CALL POL1_STKIM( MININ, ANGRT, IGRP1, IGRP3, INDEX, INDF,
-     :                       NBIN, NNDF, %VAL( IPW1 ), %VAL( IPPHI ),
+     :                       NBIN, NNDF, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       %VAL( CNF_PVAL( IPPHI ) ),
      :                       ILEVEL, ( INDEX - 1 )*BIN + ORIGIN, 
      :                       INDEX*BIN + ORIGIN, NDIMO - 1, IOUT, 
-     :                       %VAL( IPSAX ), STATUS )
+     :                       %VAL( CNF_PVAL( IPSAX ) ), STATUS )
          END IF
 
 *  Flush any error.

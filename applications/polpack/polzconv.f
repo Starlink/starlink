@@ -104,11 +104,14 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     26-FEB-2001 (DSB):
 *        Original version.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,6 +126,7 @@
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
       INCLUDE 'PAR_ERR'          ! PAR_ error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -225,7 +229,8 @@
          CALL PSX_CALLOC( NVEC, '_REAL', IPZ, STATUS )
 
 *  Copy the Z column into the corresponding array.
-         CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, %VAL( IPZ ), NGZ, 
+         CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+     :                    NGZ,
      :                    STATUS )
 
 *  Report an error if there were no good Z values.
@@ -250,7 +255,8 @@
          CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
 
 *  Find the max and min Z values in the Z column.
-         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, 
+         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+     :                    NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
 
 *  If there is only a single Z value available, use it.
@@ -302,7 +308,8 @@
             END IF
 
 *  Find the closest available value to the requested Z value.
-            CALL POL1_FCLOS( NVEC, %VAL( IPZ ), REAL( ZCOL ), ZUSE, 
+            CALL POL1_FCLOS( NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+     :                       REAL( ZCOL ), ZUSE,
      :                       STATUS )
             ZCOL = DBLE( ZUSE )
          END IF

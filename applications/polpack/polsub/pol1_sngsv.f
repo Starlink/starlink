@@ -137,6 +137,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -148,6 +149,8 @@
 *        Modified to support 3D data.
 *     22-MAR-2001 (DSB):
 *        Correct expresion for DIMZ.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,6 +165,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -356,12 +360,17 @@
 *  fitting box.
       IF( ITER .GT. 0 ) THEN 
          CALL POL1_SNGSM( ILEVEL, HW, DIMX, DIMY, DIMZ, DIMST, 
-     :                    %VAL( IPVOUT ), %VAL( IPDOUT ), 
-     :                    %VAL( IPCOUT ), %VAL( IPIE1 ),
-     :                    %VAL( IPX4 ), %VAL( IPX3Y ), 
-     :                    %VAL( IPX2Y2 ), %VAL( IPXY3 ), 
-     :                    %VAL( IPX3 ), %VAL( IPX2Y ),
-     :                    %VAL( IPXY2 ), STATUS )
+     :                    %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPDOUT ) ),
+     :                    %VAL( CNF_PVAL( IPCOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPIE1 ) ),
+     :                    %VAL( CNF_PVAL( IPX4 ) ), 
+     :                    %VAL( CNF_PVAL( IPX3Y ) ),
+     :                    %VAL( CNF_PVAL( IPX2Y2 ) ), 
+     :                    %VAL( CNF_PVAL( IPXY3 ) ),
+     :                    %VAL( CNF_PVAL( IPX3 ) ), 
+     :                    %VAL( CNF_PVAL( IPX2Y ) ),
+     :                    %VAL( CNF_PVAL( IPXY2 ) ), STATUS )
 
 *  If required, update the array holding the estimated variance at each
 *  pixel with in the input NDFs. All input NDFs are assumed to have
@@ -369,9 +378,12 @@
 *  as temporary work space.
          IF( WSCH .EQ. 2 ) THEN 
             CALL POL1_SNGVN( NNDF, IGRP1, ILEVEL, T, PHI, EPS, EL, HW,
-     :                       DEZERO, DIMST, %VAL( IPDOUT ), NDIMI, 
-     :                       LBNDI, UBNDI, %VAL( IPIE1 ), TVAR, 
-     :                       %VAL( IPVEST ), %VAL( IPIE2 ), ZERO, 
+     :                       DEZERO, DIMST, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                       NDIMI,
+     :                       LBNDI, UBNDI, %VAL( CNF_PVAL( IPIE1 ) ), 
+     :                       TVAR,
+     :                       %VAL( CNF_PVAL( IPVEST ) ), 
+     :                       %VAL( CNF_PVAL( IPIE2 ) ), ZERO,
      :                       STATUS )
          END IF
 
@@ -387,7 +399,7 @@
 *  1.0 at every pixel. Do not do this if variances in the input NDFs will
 *  be used.
       ELSE IF( WSCH .NE. 1 ) THEN
-         CALL POL1_FILLR( 1.0, EL, %VAL( IPVEST ), STATUS )
+         CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVEST ) ), STATUS )
       END IF
 
 *  Calculate the effective intensities, transmittances, eficiciencies and
@@ -395,16 +407,16 @@
 *  ======================================================================
 
 *  Initialise all the work arrays to hold zero.
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPIE1 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPIE2 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPIE3 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPMT11 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPMT21 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPMT31 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPMT22 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPMT32 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPMT33 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPN ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPIE1 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPIE2 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPIE3 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPMT11 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPMT21 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPMT31 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPMT22 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPMT32 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPMT33 ) ), STATUS )
+      CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPN ) ), STATUS )
 
 *  Indicate that we have not yet found an unconverged NDF during this
 *  iteration.
@@ -444,23 +456,33 @@
 *  from the intensity values implied by the current smoothed Stokes vectors. 
 *  On the zeroth iteration (when no Stokes vectors are available), all 
 *  intensity values are accepted.
-         CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, %VAL( IPDIN ), 
-     :                    %VAL( IPVIN ), T( I ), PHI( I ), EPS( I ), 
-     :                    ZERO( I ), DIMST, %VAL( IPDOUT ), 
+         CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, 
+     :                    %VAL( CNF_PVAL( IPDIN ) ),
+     :                    %VAL( CNF_PVAL( IPVIN ) ), 
+     :                    T( I ), PHI( I ), EPS( I ),
+     :                    ZERO( I ), DIMST, %VAL( CNF_PVAL( IPDOUT ) ),
      :                    NSIGMA, TVAR( I ), TOL, DEZERO, CONV, 
-     :                    NREJ( I ), %VAL( IPDCUT ), STATUS )
+     :                    NREJ( I ), %VAL( CNF_PVAL( IPDCUT ) ), 
+     :                    STATUS )
 
 *  Update the total number of pixels rejected from all images.
          TOTREJ = TOTREJ + NREJ( I )
 
 *  Update the work arrays to include the effect of the current input NDF.
-         CALL POL1_SNGAD( EL, %VAL( IPDCUT ), %VAL( IPVIN ), 
+         CALL POL1_SNGAD( EL, %VAL( CNF_PVAL( IPDCUT ) ), 
+     :                    %VAL( CNF_PVAL( IPVIN ) ),
      :                   PHI( I ), T( I ), EPS( I ), 
-     :                   %VAL( IPIE1 ),  %VAL( IPIE2 ),  %VAL( IPIE3 ), 
-     :                   %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
-     :                                   %VAL( IPMT22 ), %VAL( IPMT32 ),
-     :                                                   %VAL( IPMT33 ), 
-     :                   %VAL( IPN ), STATUS )
+     :                   %VAL( CNF_PVAL( IPIE1 ) ),  
+     :                   %VAL( CNF_PVAL( IPIE2 ) ),  
+     :                   %VAL( CNF_PVAL( IPIE3 ) ),
+     :                   %VAL( CNF_PVAL( IPMT11 ) ), 
+     :                   %VAL( CNF_PVAL( IPMT21 ) ), 
+     :                   %VAL( CNF_PVAL( IPMT31 ) ),
+     :                                   %VAL( CNF_PVAL( IPMT22 ) ), 
+     :                   %VAL( CNF_PVAL( IPMT32 ) ),
+     :                                                   
+     :                   %VAL( CNF_PVAL( IPMT33 ) ),
+     :                   %VAL( CNF_PVAL( IPN ) ), STATUS )
 
 *  End the NDF context.
          CALL NDF_END( STATUS )
@@ -485,18 +507,27 @@
 *  values ahev been rejected.
       IF( ITER .EQ. 0 .AND. MAXIT .GT. 0 ) THEN 
          CALL PSX_CALLOC( EL, '_INTEGER', IPNIN, STATUS )     
-         CALL VEC_RTOI( .FALSE., EL, %VAL( IPN ), %VAL( IPNIN ), IERR,
+         CALL VEC_RTOI( .FALSE., EL, %VAL( CNF_PVAL( IPN ) ), 
+     :                  %VAL( CNF_PVAL( IPNIN ) ), IERR,
      :                  NERR, STATUS )
       END IF
 
 *  Now calculate the output values.
       CALL POL1_SNGCL( EL, 
-     :                 %VAL( IPIE1 ),  %VAL( IPIE2 ),  %VAL( IPIE3 ), 
-     :                 %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
-     :                                 %VAL( IPMT22 ), %VAL( IPMT32 ),
-     :                                                   %VAL( IPMT33 ), 
-     :                 %VAL( IPN ), %VAL( IPDOUT ), %VAL( IPVOUT ), 
-     :                 %VAL( IPCOUT ), STATUS )
+     :                 %VAL( CNF_PVAL( IPIE1 ) ),  
+     :                 %VAL( CNF_PVAL( IPIE2 ) ),  
+     :                 %VAL( CNF_PVAL( IPIE3 ) ),
+     :                 %VAL( CNF_PVAL( IPMT11 ) ), 
+     :                 %VAL( CNF_PVAL( IPMT21 ) ), 
+     :                 %VAL( CNF_PVAL( IPMT31 ) ),
+     :                                 %VAL( CNF_PVAL( IPMT22 ) ), 
+     :                 %VAL( CNF_PVAL( IPMT32 ) ),
+     :                                                   
+     :                 %VAL( CNF_PVAL( IPMT33 ) ),
+     :                 %VAL( CNF_PVAL( IPN ) ), 
+     :                 %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                 %VAL( CNF_PVAL( IPVOUT ) ),
+     :                 %VAL( CNF_PVAL( IPCOUT ) ), STATUS )
 
 *  Go back to recalculate the output I,Q,U values excluding aberrant input
 *  data values unless we have already done the maximum number of
@@ -521,9 +552,11 @@
 *  Set bad any output pixels which were contributed to by fewer than the
 *  required minimum number of uinput images.
       IF( MAXIT .GT. 0 ) THEN
-         CALL POL1_SNGMN( EL, %VAL( IPNIN ), MNFRAC, %VAL( IPN ),
-     :                    ILEVEL, %VAL( IPDOUT ), %VAL( IPVOUT ), 
-     :                    %VAL( IPCOUT ), STATUS )
+         CALL POL1_SNGMN( EL, %VAL( CNF_PVAL( IPNIN ) ), MNFRAC, 
+     :                    %VAL( CNF_PVAL( IPN ) ),
+     :                    ILEVEL, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPVOUT ) ),
+     :                    %VAL( CNF_PVAL( IPCOUT ) ), STATUS )
       END IF
 
 *  If required set the VARIANCE component of each input NDF to the mean
@@ -551,7 +584,8 @@
                CALL MSG_SETR( 'VAR', TVAR( I ) )
                IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG3', 
      :                    '   ^NDF : ^VAR', STATUS )
-               CALL POL1_FILLR( TVAR( I ), EL, %VAL( IPVIN ), STATUS )
+               CALL POL1_FILLR( TVAR( I ), EL, 
+     :                          %VAL( CNF_PVAL( IPVIN ) ), STATUS )
 
             ELSE
                CALL NDF_RESET( INDF, 'VARIANCE', STATUS )
@@ -572,7 +606,8 @@
 *  Find the new bounds.
          CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), 
      :                    UBND( 2 ), LBND( 3 ), UBND( 3 ), LBND( 4 ),
-     :                    UBND( 4 ), %VAL( IPDOUT ), STATUS )
+     :                    UBND( 4 ), %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    STATUS )
 
 *  Unmap the output NDFs so that the calls to NDF_SBND below work.
          CALL NDF_UNMAP( INDFO, '*', STATUS )

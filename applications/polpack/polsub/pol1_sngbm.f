@@ -109,6 +109,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -122,6 +123,8 @@
 *     22-JAN-2001 (DSB):
 *        Modified to support spectro-polarimetry data, which has an extra
 *        axis.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,6 +140,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -272,8 +276,10 @@
 *  the output NDF, a flag indicating if input variances are available
 *  in all input NDFs, and the orientation of the required reference
 *  direction for the Stokes parameters.
-      CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( IPPHI ), 
-     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
+      CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( CNF_PVAL( IPPHI ) ),
+     :                 %VAL( CNF_PVAL( IPAID ) ), 
+     :                 %VAL( CNF_PVAL( IPT ) ), 
+     :                 %VAL( CNF_PVAL( IPEPS ) ), IGRP2,
      :                 LBNDO, UBNDO, NDIMO, ANGROT, STATUS )
 
 *  Choose the weighting scheme to use, taking account of the
@@ -438,11 +444,16 @@
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
 
 *  Calculate the I,Q,U values.        
-      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
-     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
-     :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
+      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, 
+     :                 %VAL( CNF_PVAL( IPPHI ) ),
+     :                 %VAL( CNF_PVAL( IPAID ) ), 
+     :                 %VAL( CNF_PVAL( IPT ) ), 
+     :                 %VAL( CNF_PVAL( IPEPS ) ),
+     :                 %VAL( CNF_PVAL( IPTVAR ) ), 
+     :                 %VAL( CNF_PVAL( IPNREJ ) ), IGRP2, TOL,
      :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, 
-     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
+     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, 
+     :                 %VAL( CNF_PVAL( IPZERO ) ),
      :                 STATUS )
 
 *  Tidy up.

@@ -71,6 +71,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *        input NDF (so that history is propagated).
 *     19-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,6 +104,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER MININ
@@ -215,7 +219,7 @@
          CALL PSX_CALLOC( EL, '_REAL', IPCNT, STATUS )
 
 *  Initialise it to zero at every pixel.
-         CALL POL1_FILLR( 0.0, EL, %VAL( IPCNT ), STATUS )
+         CALL POL1_FILLR( 0.0, EL, %VAL( CNF_PVAL( IPCNT ) ), STATUS )
 
 *  Initialise the sum of the analysis angles.
          ASUM = 0.0
@@ -262,8 +266,10 @@
      :                    STATUS )
 
 *  Add this array into the running sum arrays.
-            CALL POL1_STKSM( EL, %VAL( IPDIN ), %VAL( IPDOUT ), 
-     :                       %VAL( IPVOUT ), %VAL( IPCNT ), STATUS )
+            CALL POL1_STKSM( EL, %VAL( CNF_PVAL( IPDIN ) ), 
+     :                       %VAL( CNF_PVAL( IPDOUT ) ),
+     :                       %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                       %VAL( CNF_PVAL( IPCNT ) ), STATUS )
 
 *  Increment the mean analysis angle.
             ASUM = ASUM + PHI( WORK( IBIN, I ) )
@@ -278,8 +284,9 @@
          END DO
 
 *  Normalize the returned data and variance values.
-         CALL POL1_STKNM( EL, %VAL( IPCNT ), %VAL( IPDOUT ), 
-     :                    %VAL( IPVOUT ), ME, STATUS )
+         CALL POL1_STKNM( EL, %VAL( CNF_PVAL( IPCNT ) ), 
+     :                    %VAL( CNF_PVAL( IPDOUT ) ),
+     :                    %VAL( CNF_PVAL( IPVOUT ) ), ME, STATUS )
 
 *  Find the effective analysis angle for the output image. This is the
 *  ACW angle from the reference direction given by ANGRT, to the
@@ -371,9 +378,11 @@
      :                    EL, STATUS )
 
 *  Copy the data and variance from output to stack.
-            CALL VEC_RTOR( .TRUE., EL, %VAL( IPDOUT ), %VAL( IPDP ), 
+            CALL VEC_RTOR( .TRUE., EL, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                     %VAL( CNF_PVAL( IPDP ) ),
      :                     IERR, NERR, STATUS )
-            CALL VEC_RTOR( .TRUE., EL, %VAL( IPVOUT ), %VAL( IPVP ), 
+            CALL VEC_RTOR( .TRUE., EL, %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                     %VAL( CNF_PVAL( IPVP ) ),
      :                     IERR, NERR, STATUS )
 
 *  Store the effective analyser position for the last axis.

@@ -115,6 +115,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -134,6 +135,8 @@
 *        Added parameter INTEGRATE.
 *     5-FEB-2001 (DSB):
 *        Added support for 3D data.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,6 +153,7 @@
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
       INCLUDE 'NDF_PAR'          ! NDF_ constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -443,16 +447,17 @@
 *  Read the required columns from the catalogue into the work arrays
 *  allocated above. This is done in a single pass through the catalogue
 *  in order to speed it up a bit. 
-      CALL POL1_CTCLM( CIIN, NCIN, NCOL, GI, %VAL( IP ), STATUS )
+      CALL POL1_CTCLM( CIIN, NCIN, NCOL, GI, %VAL( CNF_PVAL( IP ) ), 
+     :                 STATUS )
 
 *  Square the standard deviation columns so that they become variance values.
       IF( VAR ) THEN
-         CALL POL1_SQUAR( NCIN, %VAL( IPVI ), STATUS )
+         CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IPVI ) ), STATUS )
          IF( CIRC ) THEN
-            CALL POL1_SQUAR( NCIN, %VAL( IPVV ), STATUS )
+            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IPVV ) ), STATUS )
          ELSE
-            CALL POL1_SQUAR( NCIN, %VAL( IPVQ ), STATUS )
-            CALL POL1_SQUAR( NCIN, %VAL( IPVU ), STATUS )
+            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IPVQ ) ), STATUS )
+            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IPVU ) ), STATUS )
          END IF          
       END IF
 
@@ -541,7 +546,8 @@
 *  =================================================================
 *  Find the maximum and minimum X value. Ensure that at least one pixel
 *  is spanned by the recorded max and min values.
-      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPX ), NBAD, SXHI,
+      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPX ) ), 
+     :                 NBAD, SXHI,
      :                 SXLO, MAXPOS, MINPOS, STATUS )
       IF( SXHI - SXLO .LT. 1.0  ) THEN
          SXHI = 0.5*( SXHI + SXLO + 1.0 ) 
@@ -549,7 +555,8 @@
       END IF
 
 *  Find the maximum and minimum Y value.
-      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPY ), NBAD, SYHI,
+      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPY ) ), 
+     :                 NBAD, SYHI,
      :                 SYLO, MAXPOS, MINPOS, STATUS )
       IF( SYHI - SYLO .LT. 1.0  ) THEN
          SYHI = 0.5*( SYHI + SYLO + 1.0 ) 
@@ -558,7 +565,8 @@
 
 *  If required find min and max Z values.
       IF( SPEC ) THEN 
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPZ ), NBAD, SZHI,
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPZ ) ), 
+     :                    NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
          IF( SZHI - SZLO .LT. 1.0  ) THEN
             SZHI = 0.5*( SZHI + SZLO + 1.0 ) 
@@ -678,9 +686,10 @@
 
 *  Count the number of input catalogue positions contained in each output
 *  cell. The largest number in any one cell is returned.
-      CALL POL1_CLCNT( NCIN, SPEC, %VAL( IPX ), %VAL( IPY ), 
-     :                 %VAL( IPZ ), TR, NXBIN, NYBIN, NZBIN,
-     :                 %VAL( IPW1 ), MXCNT, STATUS )
+      CALL POL1_CLCNT( NCIN, SPEC, %VAL( CNF_PVAL( IPX ) ), 
+     :                 %VAL( CNF_PVAL( IPY ) ),
+     :                 %VAL( CNF_PVAL( IPZ ) ), TR, NXBIN, NYBIN, NZBIN,
+     :                 %VAL( CNF_PVAL( IPW1 ) ), MXCNT, STATUS )
 
 *  Now copy the input Stokes parameters into arrays suitable for binning
 *  using the vector routines of CCDPACK.
@@ -695,35 +704,47 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the total intensity values from the input catalogue to the work array.
-      CALL POL1_STK2( NCIN, SPEC, %VAL( IPI ), %VAL( IPX ), %VAL( IPY ), 
-     :                %VAL( IPZ ), NXBIN, NYBIN, NZBIN, MXCNT, TR, 
-     :                %VAL( IPIST ), %VAL( IPW1 ), STATUS )
+      CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPI ) ), 
+     :                %VAL( CNF_PVAL( IPX ) ), %VAL( CNF_PVAL( IPY ) ),
+     :                %VAL( CNF_PVAL( IPZ ) ), 
+     :                NXBIN, NYBIN, NZBIN, MXCNT, TR,
+     :                %VAL( CNF_PVAL( IPIST ) ), 
+     :                %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
 *  Do the same for the other required Stokes vectors (V, or Q and U).
       IF( CIRC ) THEN
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( IPV ), %VAL( IPX ), 
-     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                   NZBIN, MXCNT, TR, %VAL( IPVST ), %VAL( IPW1 ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPV ) ), 
+     :                   %VAL( CNF_PVAL( IPX ) ),
+     :                   %VAL( CNF_PVAL( IPY ) ), 
+     :                   %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVST ) ), 
+     :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
       ELSE
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPQST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( IPQ ), %VAL( IPX ), 
-     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                   NZBIN, MXCNT, TR, %VAL( IPQST ), %VAL( IPW1 ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPQ ) ), 
+     :                   %VAL( CNF_PVAL( IPX ) ),
+     :                   %VAL( CNF_PVAL( IPY ) ), 
+     :                   %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPQST ) ), 
+     :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPUST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( IPU ), %VAL( IPX ), 
-     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                   NZBIN, MXCNT, TR, %VAL( IPUST ), %VAL( IPW1 ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPU ) ), 
+     :                   %VAL( CNF_PVAL( IPX ) ),
+     :                   %VAL( CNF_PVAL( IPY ) ), 
+     :                   %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPUST ) ), 
+     :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
       END IF
 
@@ -732,36 +753,48 @@
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVIST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( IPVI ), %VAL( IPX ), 
-     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                   NZBIN, MXCNT, TR, %VAL( IPVIST ), %VAL( IPW1 ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPVI ) ), 
+     :                   %VAL( CNF_PVAL( IPX ) ),
+     :                   %VAL( CNF_PVAL( IPY ) ), 
+     :                   %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVIST ) ), 
+     :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
          IF( CIRC ) THEN
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVVST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, SPEC, %VAL( IPVV ), %VAL( IPX ), 
-     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                      NZBIN, MXCNT, TR, %VAL( IPVVST ), 
-     :                      %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPVV ) ), 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                      NZBIN, MXCNT, TR, 
+     :                      %VAL( CNF_PVAL( IPVVST ) ),
+     :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
          ELSE
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVQST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, SPEC, %VAL( IPVQ ), %VAL( IPX ), 
-     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                      NZBIN, MXCNT, TR, %VAL( IPVQST ), 
-     :                      %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPVQ ) ), 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                      NZBIN, MXCNT, TR, 
+     :                      %VAL( CNF_PVAL( IPVQST ) ),
+     :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVUST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, SPEC, %VAL( IPVU ), %VAL( IPX ), 
-     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
-     :                      NZBIN, MXCNT, TR, %VAL( IPVUST ), 
-     :                      %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IPVU ) ), 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+     :                      NZBIN, MXCNT, TR, 
+     :                      %VAL( CNF_PVAL( IPVUST ) ),
+     :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
          END IF
 
@@ -849,38 +882,62 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Bin the total intensity...
-         CALL POL1_CM1RR( %VAL( IPIST ), NBIN, MXCNT, %VAL( IPVIST ),
-     :                    METH, MINVAL, NSIGMA, %VAL( IPIBN ),
-     :                    %VAL( IPVIBN ), %VAL( IPWRK1 ), 
-     :                    %VAL( IPWRK2 ), %VAL( IPPP ), %VAL( IPCOV ), 
-     :                    NMAT, %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                    %VAL( IPUSED ), STATUS )
+         CALL POL1_CM1RR( %VAL( CNF_PVAL( IPIST ) ), NBIN, MXCNT, 
+     :                    %VAL( CNF_PVAL( IPVIST ) ),
+     :                    METH, MINVAL, NSIGMA, 
+     :                    %VAL( CNF_PVAL( IPIBN ) ),
+     :                    %VAL( CNF_PVAL( IPVIBN ) ), 
+     :                    %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                    %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPPP ) ), 
+     :                    %VAL( CNF_PVAL( IPCOV ) ),
+     :                    NMAT, %VAL( CNF_PVAL( IPNCON ) ), 
+     :                    %VAL( CNF_PVAL( IPPNT ) ),
+     :                    %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  Bin V (if needed)...
          IF( CIRC ) THEN
-            CALL POL1_CM1RR( %VAL( IPVST ), NBIN, MXCNT, %VAL( IPVVST ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPVBN ),
-     :                       %VAL( IPVVBN ), %VAL( IPWRK1 ), 
-     :                       %VAL( IPWRK2 ), %VAL( IPPP ), 
-     :                       %VAL( IPCOV ), NMAT, %VAL( IPNCON ), 
-     :                       %VAL( IPPNT ), %VAL( IPUSED ), STATUS )
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPVST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVVST ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPVBN ) ),
+     :                       %VAL( CNF_PVAL( IPVVBN ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPPP ) ),
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT, 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
+     :                       %VAL( CNF_PVAL( IPPNT ) ), 
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 
 *  Bin Q and U (if needed)...
          ELSE 
-            CALL POL1_CM1RR( %VAL( IPQST ), NBIN, MXCNT, %VAL( IPVQST ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPQBN ),
-     :                       %VAL( IPVQBN ), %VAL( IPWRK1 ), 
-     :                       %VAL( IPWRK2 ), %VAL( IPPP ), 
-     :                       %VAL( IPCOV ), NMAT, %VAL( IPNCON ), 
-     :                       %VAL( IPPNT ), %VAL( IPUSED ), STATUS )
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPQST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVQST ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPQBN ) ),
+     :                       %VAL( CNF_PVAL( IPVQBN ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPPP ) ),
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT, 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
+     :                       %VAL( CNF_PVAL( IPPNT ) ), 
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
-            CALL POL1_CM1RR( %VAL( IPUST ), NBIN, MXCNT, %VAL( IPVUST ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPUBN ),
-     :                       %VAL( IPVUBN ), %VAL( IPWRK1 ), 
-     :                       %VAL( IPWRK2 ), %VAL( IPPP ), 
-     :                       %VAL( IPCOV ), NMAT, %VAL( IPNCON ), 
-     :                       %VAL( IPPNT ), %VAL( IPUSED ), STATUS )
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPUST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVUST ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPUBN ) ),
+     :                       %VAL( CNF_PVAL( IPVUBN ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPPP ) ),
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT, 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
+     :                       %VAL( CNF_PVAL( IPPNT ) ), 
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          END IF
 
 *  Now do the binning if there are no variances.
@@ -890,36 +947,53 @@
 *  and set each element to 1.0 (i.e. give all input values equal weight).
          CALL PSX_CALLOC( MXCNT, '_DOUBLE', IPVAR, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
-         CALL POL1_SETD( MXCNT, 1.0D0, %VAL( IPVAR ), STATUS )
+         CALL POL1_SETD( MXCNT, 1.0D0, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                   STATUS )
 
 *  Total intensity...
-         CALL POL1_CM3RR( %VAL( IPIST ), NBIN, MXCNT, %VAL( IPVAR ),
-     :                    METH, MINVAL, NSIGMA, %VAL( IPIBN ),
-     :                    %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                    %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                    %VAL( IPUSED ), STATUS )
+         CALL POL1_CM3RR( %VAL( CNF_PVAL( IPIST ) ), NBIN, MXCNT, 
+     :                    %VAL( CNF_PVAL( IPVAR ) ),
+     :                    METH, MINVAL, NSIGMA, 
+     :                    %VAL( CNF_PVAL( IPIBN ) ),
+     :                    %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                    %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                    %VAL( CNF_PVAL( IPNCON ) ), 
+     :                    %VAL( CNF_PVAL( IPPNT ) ),
+     :                    %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  V (if needed)...
          IF( CIRC ) THEN
-            CALL POL1_CM3RR( %VAL( IPVST ), NBIN, MXCNT, %VAL( IPVAR ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPVBN ),
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL( IPUSED ), STATUS )
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPVST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVAR ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPVBN ) ),
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  Q and U (if needed)...
          ELSE 
-            CALL POL1_CM3RR( %VAL( IPQST ), NBIN, MXCNT, %VAL( IPVAR ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPQBN ),
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL( IPUSED ), STATUS )
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPQST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVAR ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPQBN ) ),
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
-            CALL POL1_CM3RR( %VAL( IPUST ), NBIN, MXCNT, %VAL( IPVAR ),
-     :                       METH, MINVAL, NSIGMA, %VAL( IPUBN ),
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL( IPUSED ), STATUS )
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPUST ) ), NBIN, MXCNT, 
+     :                       %VAL( CNF_PVAL( IPVAR ) ),
+     :                       METH, MINVAL, NSIGMA, 
+     :                       %VAL( CNF_PVAL( IPUBN ) ),
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          END IF
 
       END IF
@@ -975,15 +1049,21 @@
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IPI as a safe pointer.
       CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE, 
-     :                 NXBIN*NYBIN, %VAL( IPBIN ), %VAL( IPVBIN ), 
+     :                 NXBIN*NYBIN, %VAL( CNF_PVAL( IPBIN ) ), 
+     :                 %VAL( CNF_PVAL( IPVBIN ) ),
      :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO,
      :                 .FALSE., .FALSE., .FALSE., .FALSE.,
      :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
-     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
-     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
-     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
-     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
-     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPW2 ),
+     :                 %VAL( CNF_PVAL( IPI ) ), %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPI ) ),
+     :                 %VAL( CNF_PVAL( IPI ) ), %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPI ) ),
+     :                 %VAL( CNF_PVAL( IPI ) ), %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPI ) ),
+     :                 %VAL( CNF_PVAL( IPI ) ), %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPI ) ),
+     :                 %VAL( CNF_PVAL( IPI ) ), %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 STATUS )
 
 *  Free the work space.

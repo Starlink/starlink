@@ -83,6 +83,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,8 @@
 *        Original version.
 *     22-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,6 +106,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NNDF
@@ -173,7 +177,8 @@
 *  Increment the running sum images to hold this NDF. This call also
 *  returns the mean squared residual (i.e. the mean variance) in the 
 *  current NDF.
-         CALL POL1_SNGVA( EL, %VAL( IPDIN ), T( I ), PHI( I ), EPS( I ), 
+         CALL POL1_SNGVA( EL, %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    T( I ), PHI( I ), EPS( I ),
      :                    DIMST, STOKES, WORK, VEST, TVAR( I ), WORK2, 
      :                    DEZERO, ZERO( I ), STATUS )
 
@@ -217,7 +222,8 @@
 *  Smooth the mean squared residuals in this spatial plane of WORK to get 
 *  the variance estimates (store them back in VEST).
             CALL POL1_BLOCR( NX, NY, WORK( K ), HW, HW, 1, VEST( K ), 
-     :                       %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
+     :                       %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
          END DO
 

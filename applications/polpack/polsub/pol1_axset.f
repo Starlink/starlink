@@ -55,6 +55,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        Modified to support 3D data.
 *     7-APR-2003 (DSB):
 *        Added MAP argument.
+*     22-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,6 +81,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL GOTZ
@@ -177,35 +181,42 @@
 *  Copy the supplied PIXEL axis values into the first work array.
             IF( I .EQ. 1 ) THEN
                NPOINT = NX
-               CALL VEC_RTOD( .TRUE., NX, CENX, %VAL( IPW1 ), IERR,
+               CALL VEC_RTOD( .TRUE., NX, CENX, 
+     :                        %VAL( CNF_PVAL( IPW1 ) ), IERR,
      :                        NERR, STATUS )
 
             ELSE IF( I .EQ. 2 ) THEN
                NPOINT = NY
-               CALL VEC_RTOD( .TRUE., NY, CENY, %VAL( IPW1 ), IERR,
+               CALL VEC_RTOD( .TRUE., NY, CENY, 
+     :                        %VAL( CNF_PVAL( IPW1 ) ), IERR,
      :                        NERR, STATUS )
 
             ELSE 
                NPOINT = NZ
-               CALL VEC_RTOD( .TRUE., NZ, CENZ, %VAL( IPW1 ), IERR, 
+               CALL VEC_RTOD( .TRUE., NZ, CENZ, 
+     :                        %VAL( CNF_PVAL( IPW1 ) ), IERR,
      :                        NERR, STATUS )
             END IF
 
 *  Transform them into the AXIS Frame.
-            CALL AST_TRAN1( CM2, NPOINT, %VAL( IPW1 ), .TRUE., 
-     :                      %VAL( IPW2 ), STATUS ) 
+            CALL AST_TRAN1( CM2, NPOINT, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                      .TRUE.,
+     :                      %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Copy them back into the supplied arrays.
             IF( I .EQ. 1 ) THEN
-               CALL VEC_DTOR( .TRUE., NX, %VAL( IPW2 ), CENX, IERR,
+               CALL VEC_DTOR( .TRUE., NX, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                        CENX, IERR,
      :                        NERR, STATUS )
 
             ELSE IF( I .EQ. 2 ) THEN
-               CALL VEC_DTOR( .TRUE., NY, %VAL( IPW2 ), CENY, IERR,
+               CALL VEC_DTOR( .TRUE., NY, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                        CENY, IERR,
      :                        NERR, STATUS )
 
             ELSE 
-               CALL VEC_DTOR( .TRUE., NZ, %VAL( IPW2 ), CENZ, IERR,
+               CALL VEC_DTOR( .TRUE., NZ, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                        CENZ, IERR,
      :                        NERR, STATUS )
 
             END IF
