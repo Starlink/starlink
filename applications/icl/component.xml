@@ -9,7 +9,7 @@
   <abstract><p>ICL shell.
     </p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset><sourceset>messgen</sourceset><build>pcs</build><build>cnf</build><build>sae</build><link>pcs</link><link>cnf</link><link>hlp</link><link>nbs</link><link>hds</link>
+    <sourceset>star2html</sourceset><sourceset>messgen</sourceset><build option='link'>pcs</build><build option='link'>cnf</build><build option='link'>sae</build><build option='link'>nbs</build><link>pcs</link><link>cnf</link><link>hlp</link><link>nbs</link><link>hds</link>
   </dependencies>
   <developers>
     <person>

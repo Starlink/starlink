@@ -85,7 +85,7 @@ STAR_LATEX_DOCUMENTATION(sg5)
 STAR_MESSGEN(uface_err.msg)
 
 dnl    Dependencies
-STAR_DECLARE_DEPENDENCIES([build],[pcs cnf sae])
+STAR_DECLARE_DEPENDENCIES([build],[pcs cnf sae nbs],[link])
 STAR_DECLARE_DEPENDENCIES([link],[pcs cnf hlp nbs hds])
 
 
