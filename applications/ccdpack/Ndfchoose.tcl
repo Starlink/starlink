@@ -53,6 +53,12 @@
 #        elements {lo hi} where 0 <= lo <= hi <= 100.
 #           - index     -- Index of the image whose percentiles are required
 #
+#     preplot
+#        Prepares all the images so that subsequent selections will 
+#        be effective (almost) instantaneously rather than having to 
+#        display the NDFs on demand (until a subsequent viewport
+#        reconfiguration - i.e. window resize - is done).
+#
 #     wcsframe index
 #        This method returns the domain name of the WCS frame currently
 #        selected for the given image
@@ -417,6 +423,17 @@
             set retval $percentiles
          }
          return $retval
+      }
+
+
+#-----------------------------------------------------------------------
+      public method preplot {} {
+#-----------------------------------------------------------------------
+         waitpush "Plotting all windows"
+         for { set index 1 } { $index <= $nndfset } { incr index } {
+            ndfplotwindow $index
+         }
+         waitpop
       }
 
 
@@ -866,20 +883,6 @@
          }
          wm geometry $itk_interior ""
          update idletasks
-      }
-
-
-#-----------------------------------------------------------------------
-      private method preplot {} {
-#-----------------------------------------------------------------------
-#  If this method is called it prepares all the ndfplot and ndfinfo
-#  windows for display; the effect of this is that subsequent 
-#  select operations are almost instantaneous.
-         waitpush "Plotting all windows"
-         for { set index 1 } { $index <= $nndfset } { incr index } {
-            ndfplotwindow $index
-         }
-         waitpop
       }
 
 
