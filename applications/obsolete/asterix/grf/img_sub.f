@@ -4089,7 +4089,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           PWIDTH=PHWID*2.0
 *  calc width (world coords)
           D=SQRT((XWID-XCENT)**2 + (YWID-YCENT)**2)
-          ALPHA=ATAN2((YWID-YCENT),(XWID-XCENT))
+          ALPHA=ATAN2(ABS(YWID-YCENT),ABS(XWID-XCENT))
           BETA=ALPHA-ANGLE
           WIDTH=2.0*ABS(D*SIN(BETA))
 
@@ -4143,6 +4143,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       ENDIF
 
+	print *,length,width,angle/dtor
 
       END
 
