@@ -102,7 +102,6 @@
 
 *  Flush associated locators
       CALL HDS_FLUSH( GRPNAM, STATUS )
-	print *,'Flushing ',grpnam
 
 *  Extract locator
       CALL ADI1_GETLOC( FID, LOC, STATUS )

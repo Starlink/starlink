@@ -86,6 +86,7 @@
 *  External References:
       EXTERNAL			ADI1_OPEN
       EXTERNAL			ADI1_FCLONE
+      EXTERNAL			ADI1_FCLOSE
       EXTERNAL			ADI1_FCREAT
       EXTERNAL			ADI1_FTRACE
 
@@ -111,6 +112,8 @@ c      EXTERNAL			BDI1_SETLNK
 *  Define the file methods
       CALL ADI_DEFRCB( RID, 'OpenRtn', ADI1_OPEN, STATUS )
       CALL ADI_DEFRCB( RID, 'CreatRtn', ADI1_FCREAT, STATUS )
+      CALL ADI_DEFMTH( 'FileClose(_HDSfile)', ADI1_FCLOSE, DID,
+     :                 STATUS )
       CALL ADI_DEFMTH( 'FileClone(_HDSfile,_CHAR)', ADI1_FCLONE, DID,
      :                 STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_HDSlocator)', ADI1_FTRACE, DID,
