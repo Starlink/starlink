@@ -20648,10 +20648,10 @@ static int UseColour( AstPlot *this, int id ) {
          id = NUMLABS_ID;
       }
 
-/* Likewise for TextLab1 and textLab2 */
+/* Likewise for TextLab1 and TextLab2 */
    } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
       if( !astTestColour( this, id ) ) {
-         id = NUMLABS_ID;
+         id = TEXTLABS_ID;
       }
 
 /* Likewise for Ticks1 and Ticks2 */
