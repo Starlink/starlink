@@ -162,14 +162,15 @@ sub adamtask_init {
   # Start the relay process
   # Hardwire the location
 
-  my $relay_dir = "/local/lib/perl5/site_perl/Starlink/";
+#  my $relay_dir = "/local/lib/perl5/site_perl/Starlink/";
   my $relay = "MessageRelay.pl";
 
 #  open (RELAY, "$relay_dir/$relay $taskname |");
 
   # Create pipe
+  # Relay should be executable and in the users path.
   $RELAY = new IO::Pipe;
-  $RELAY->reader("$relay_dir/$relay $taskname");
+  $RELAY->reader("$relay $taskname");
   $RELAY->autoflush;
 
   # Wait for a message from the RELAY
