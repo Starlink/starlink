@@ -472,8 +472,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       S_SIG(ID) = PSS_CASH_SIG( S_DSTAT(ID) )
 
 *  Evaluate model once more
-      CALL PSS_FIT_GENMODEL( ISTAT, 1, FIT_PRED, 0,
-     :                              PGOOD, 1, DC_MOD, STATUS )
+      CALL PSS_FIT_GENMODEL( ISTAT, 1, 0, PGOOD, 1, DC_MOD, STATUS )
 
 *  Find error in significance
       CALL PSS_STAT_CASH_SIGERR( S_FLUX(ID), S_BSCALE(ID),
