@@ -745,7 +745,7 @@ m31_issa_12a.sdf cobe.sdf scumos.sdf
 
 #  Define the plotting style files.
 
-STYLE_FILES = kappa_style.def kappa_lutview_style.def \
+STYLE_FILES = kappa_style.def kappa_ardplot_style.def kappa_lutview_style.def \
 kappa_keystyle.def kappa_linplot_keystyle.def kappa_vecplot_keystyle.def \
 kappa_display_keystyle.def sty0 sty1 sty2 sty3 kappa_contour_keystyle.def
 
