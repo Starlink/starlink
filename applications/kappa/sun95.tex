@@ -933,7 +933,7 @@ time-series polarimetry (\TSPref ), instrument-specific (\CGSDRref ,
 \IRASref , \IRCAMPACKref , \JCMTDRref ) {\it etc.}  {\em Thus the
 functionality of {\footnotesize KAPPA} should not be regarded in isolation.}
 
-Nor {\footnotesize KAPPA} should not be perceived as a rival to {\footnotesize FIGARO}.
+Nor should {\footnotesize KAPPA} should be perceived as a rival to {\footnotesize FIGARO}.
 As {\footnotesize FIGARO} {\em applications\/} become more integrated with
 Starlink packages, for example by using the NDF library, they should
 be seen as complementary, with {\footnotesize FIGARO} concentrating on
@@ -945,10 +945,10 @@ for instance handling of data errors, quality masking, a graphics
 database, availability from the shell, as well as more $n$-dimensional
 applications, widespread use of data axes, and a different style. It
 integrates with instrument packages developed at UK observatories.
-With the automatic data conversion and the likelihood the {\footnotesize
+With the automatic data conversion and the likelihood that {\footnotesize
 KAPPA} and other Starlink packages will be available from within the
-{\footnotesize IRAF} command language, you should be able to pick the best or
-relevant tools from both systems to get the job done.
+{\footnotesize IRAF} command language, you should be able to pick the
+best of the relevant tools from both systems to get the job done.
 
 \subsection{Functionality of KAPPA}
 
@@ -1103,7 +1103,7 @@ only be issued once per login session.  Thus you will see
 
 \small
 \begin{verbatim}
-      KAPPA commands are now available -- (Version 0.13)
+      KAPPA commands are now available -- (Version 0.14)
  
       Type kaphelp for help on KAPPA commands
 \end{verbatim}
@@ -1112,7 +1112,7 @@ only be issued once per login session.  Thus you will see
 Let's run a {\footnotesize KAPPA} application.  \htmlref{CADD}{CADD} adds a
 scalar constant to an \NDFref{NDF} file---the Starlink standard data
 format---to make a new NDF file (usually called an {\em NDF\/} for
-short.)  In this case ten is added to the pixels in {\tt
+short).  In this case ten is added to the pixels in {\tt
 \$KAPPA\_DIR/comwest.sdf} to create {\tt test.sdf} in the current
 directory.
 
@@ -1126,7 +1126,7 @@ There are three \htmlref{{\em parameters\/}}{se:param} qualifying
 the CADD command: the names of the input and output NDFs and the
 constant.  Notice that these parameters are separated by spaces.  Most
 applications have a few of these positional parameters, usually the
-most commonly used.  Parameter values on the command line are not
+most commonly used.  Parameters given on the command line are not
 subsequently prompted for by the application.  Also you see that the
 NDF file extensions are not given. The {\tt .sdf} extension indicates
 that it was created by the \xref{Hierarchical Data System}{sun92}{}
@@ -1259,7 +1259,7 @@ in the current directory.
 \end{verbatim}
 \normalsize
 
-Next we want to look at the result of our image processing.  First
+Next we want to look at the result of our image processing.  The first
 thing to do is to select an image display.  The {\tt xwindows} device
 becomes the current image display and remains so until the next
 \htmlref{IDSET}{IDSET} command.  (You may need to enter the
@@ -1274,7 +1274,7 @@ the output from the host computer to the screen in front you.)
 
 Now we actually display it on the screen.  Some applications have
 many parameters, and it would be impractical to have to specify all
-those preceding the ones we wanted to alter.  The solution is specify
+those preceding the ones we wanted to alter.  The solution is to specify
 the parameter by keyword.  Here we have requested that the scaling of
 the data values to colour indices within the image display uses the
 current percentile range.  Note that you may abbreviate the options
@@ -1344,7 +1344,7 @@ Press the right-hand button when you have finished.
 designed for use with Starlink applications, like {\footnotesize KAPPA}.  The
 main advantages for the {\footnotesize KAPPA} user are that shell
 metacharacters like {\tt []()$\backslash$"} need not be escaped;
-command names may be abbreviated; far fewer few executables need be
+command names may be abbreviated; far fewer executables need be
 loaded, and therefore it is slightly faster than using the shell when
 you want to invoke more than a few commands on a busy system; there is
 a wide selection of intrinsic functions and floating-point arithmetic;
@@ -1585,7 +1585,7 @@ the command as if you were in the shell, like we do below.
 
 \small
 \begin{verbatim}
-     ICL> lpr -P1 gks74.ps
+     ICL> !lpr -P1 gks74.ps
 \end{verbatim}
 \normalsize
 
@@ -1938,8 +1938,8 @@ and then kill it.
 \end{verbatim}
 \normalsize
 This removes a the {\footnotesize NDFPACK} monolith.  {\footnotesize NDFPACK} will be
-loaded again once you enter one its commands.  If several attempts
-with {\tt CTRL/C} fail to return you to an {\footnotesize ICL} prompt then
+loaded again once you enter one its commands.  If pressing {\tt CTRL/C}
+several times fails to return you to an {\footnotesize ICL} prompt then
 it's time for the heavy artillery---you may have to kill your window.
 Once back to the shell enter {\tt icl} to return to {\footnotesize ICL}, and
 then kill the process as described above.
@@ -1970,7 +1970,7 @@ If you want more information, go to the appropriate section.
 \begin{description}
 
 \item Command-line values \newline
- On the command line values you can supply values by keyword or by position.
+ On the command line you can supply values by keyword or by position.
  See \latexelsehtml{Section~\ref{se:cmdlindef}}{\htmlref{Specifying Parameter
  Values on Command Lines}{se:cmdlindef}} for more details including abbreviated
  keywords.
@@ -2049,7 +2049,7 @@ differences, they are noted.
 \vspace{-5ex}
 \item {\tt max} \newline
  This selects the minimum- or maximum-allowed value, but not all
- parameters have a defined a range of permitted values.  See
+ parameters have a defined range of permitted values.  See
  \latexelsehtml{Section~\ref{se:parminmax}.}{\htmlref{MIN and MAX
  parameter values}{se:parminmax}.}
 
@@ -2209,7 +2209,7 @@ file is situated in {\tt \$HOME/adam}).
 Unfortunately, tasks invoked from \ICLref\ use a monolith parameter
 file, which contains the individual application parameter files for
 the members.  So for example, {\footnotesize KAPPA} has {\tt kappa\_mon.sdf},
-{\tt kapview\_mon.sdf}, and {\tt ndfpack\_mon.sdf} stored in same
+{\tt kapview\_mon.sdf}, and {\tt ndfpack\_mon.sdf} stored in the same
 directory as the individual files.  This duality means that there are
 two independent sets of current values for each task depending on
 where you ran it from.
@@ -2222,15 +2222,16 @@ a task}\latexonly{ (Section~\ref{se:exiting})}, run
 
 \subsection{\xlabel{se_parglobals}Globals\label{se:parglobals}}
 
-{\footnotesize KAPPA} stores a number of global parameters that are used as
-defaults to reduce typing in response to prompts.  Global means that
-they are shared between applications.  The most common is the last 
-dataset (usually NDF) written or accessed.  In the example above, this was
-{\tt horsehead.sdf}.  If you just press {\tt <CR>} to the prompt, the
-global value is unchanged.  Only when you modify the parameter and the
-application completes without error is the global value updated.
+{\footnotesize KAPPA} stores a number of global parameters that are used
+as defaults to reduce typing in response to prompts.  Global means that
+they are shared between applications.  The most common is the last
+dataset (usually NDF) written or accessed.  In the example above, this
+was {\tt horsehead.sdf}.  If you just press {\tt <CR>} in response to the
+prompt, the global value is unchanged.  Only when you modify the
+parameter and the application completes without error is the global value
+updated.
 
-All global parameters are stored in HDS file {\tt
+All global parameters are stored in the HDS file {\tt
 \$ADAM\_USER/GLOBAL.sdf}, or {\tt \$HOME/adam/GLOBAL.sdf} if the {\tt
 \$ADAM\_USER} environment variable is not defined.  The full list is
 given below.
@@ -2461,7 +2462,7 @@ little as a single character.  Here is an example,
 
 \end{verbatim}
 \normalsize
-where a {\tt F} would be sufficient to select the {\tt "Free"} option,
+where an {\tt F} would be sufficient to select the {\tt "Free"} option,
 but at least two characters would be needed if you wanted {\tt "Area"}
 or {\tt "Automatic"}.
 
@@ -2590,7 +2591,7 @@ look in the help topic of the same name at the level beneath the topic
 \label{se:keyvspar}}
 
 For tasks with a few parameters, using position is quick and
-convenient. However, in complex programmes with many parameters it
+convenient. However, in complex applications with many parameters it
 would be tedious not only to enter all the intermediate values between
 the ones you want to define, but also to remember them all.  Another
 consideration is that some parameters do not have defined positions
@@ -3153,6 +3154,7 @@ a new NDF called outndf.
     % csub myndf $mean outndf 
 \end{verbatim}
 \normalsize
+
 \htmlref{STATS}{STATS} calculates the statistics of myndf,
 the displayed output being discarded.  PARGET reports the mean value
 which is assigned to shell variable {\tt mean}.  Thereafter the mean
@@ -3161,14 +3163,16 @@ command subtracts the mean from myndf.
 
 You can obtain vector values too.
 
+\small
 \begin{verbatim}
     % ndftrace myndf > /dev/null
     % set axlab = `parget alabel ndftrace`
     % display otherndf style="'label(1)=$axlab[1],label(2)=$axlab[2]"' axes 
 \end{verbatim}
 \normalsize
+
 This displays the image otherndf surrounded by axes, but the plot's
-axis labels originate from another dataset called myndf.{\footnote
+axis labels originate from another dataset called myndf.\footnote{
 The {\tt style} parameter specifies the appearance of the annotated axes,
 and is given as a comma-separated group of \emph{attribute settings}, each
 of which is a {\tt name=value} string specifying the attribute name and
@@ -3372,7 +3376,7 @@ annotations in \htmlref{CURSOR}{CURSOR} and SEGMENT.
 \subsection{Composite Hardcopy Plots}
 
 {\footnotesize KAPPA} applications are modular so that you can build up
-more-complicated plots, possibly add annotations with other
+more-complicated plots, and possibly add annotations with other
 packages especially \PONGOref\@.  This is fine if the device is
 some sort of screen.  However, when it is a hardcopy device,
 \GKSref\ creates a separate file for each task you run.  So how
@@ -3424,7 +3428,7 @@ appearance of the final plot provided using a collection of applications
 parameters, each of which specified a single attribute of the plot.
 
 This section describes the new system which is based on the AST subroutine
-library (see \xref{SUN/210}{}{sun210}) and the \PGPLOTref plotting 
+library (see \xref{SUN/210}{}{sun210}) and the \PGPLOTref\ plotting 
 package. The new system provides more detailed control of the appearance
 of the plot, with a single application parameter being used to specify
 values for all the required plotting attributes.
@@ -3522,10 +3526,10 @@ unambiguous abbreviations may be used):
 
 \begin{verse}
 {\tt Axes}: Axis lines drawn through tick marks within the plotting area 
-around annotated axes,drawn if attribute {\tt DrawAxes} is given a
+around annotated axes, drawn if attribute {\tt DrawAxes} is given a
 non-zero value.\\
 {\tt Border}: The plot border, drawn if attribute {\tt Border} is given a non-zero value.\\
-{\tt Curves}: Curves drawn over the top of a plot ({\it e.g.} contours, data curves, {\it etc})\\
+{\tt Curves}: Curves drawn over the top of a plot ({\it e.g.} contours, data curves, {\it etc}).\\
 {\tt Grid}: The grid lines, drawn if attribute {\tt Grid} is given a non-zero value.\\
 {\tt Markers}: Graphical markers (symbols) drawn over a plot.\\
 {\tt NumLab}: Numerical axis labels drawn around annotated axes.\\
@@ -3548,17 +3552,17 @@ applications such as \htmlref{CONTOUR}{CONTOUR} and
 \htmlref{LINPLOT}{LINPLOT} which produce keys to the content of the plot
 have a parameter called KEYSTYLE, in addition to the normal STYLE
 parameter. KEYSTYLE is used to specify the plotting style for the key,
-where-as STYLE is used to specify the plotting style for the main plot.
+whereas STYLE is used to specify the plotting style for the main plot.
 
 \subsection{Specifying a Plotting Style}
 \subsubsection{Group Expressions}
 The application parameters which are used to access plotting styles
 (STYLE, KEYSTYLE, {\it etc}) expect a group
 of attribute setting strings to be supplied for the parameter. These
-should be supplied in the form of a \emph{group expression}\footnote{The
+should be supplied in the form of a \emph{group expression}.\footnote{The
 complete group expression syntax is described in \xref{SUN/150}{}{sun150}. 
 This is the documentation for the GRP subroutine library which provides 
-a programming interface for obtaining groups of strings.}.
+a programming interface for obtaining groups of strings.}
 
 A group expression is a character string containing a list of one or more
 sub-strings separated by some specified delimiter. The usual delimiter
@@ -3568,7 +3572,7 @@ different delimiter). Each sub-string is known as a group \emph{element}.
 Each group element must be either:
 
 \begin{itemize}
-\item an attribute setting string ({\it e.g.} ``{\tt Border=1}''),
+\item an attribute setting string ({\it e.g.} ``{\tt Border=1}''), or
 \item the name of a text file, preceded by an up-arrow character (``\verb+^+''). 
 \end{itemize}
 
@@ -3619,9 +3623,9 @@ command line. This can get a bit messy because you need to protect
 special characters (commas, parentheses, spaces, equals signs, and so on)
 both from the Unix shell and from the parameter system. One safe way
 to do this is to enclose the whole group expression in single quotes, and
-then enclose the whole thing again in double quotes\footnote{The up-arrow
+then enclose the whole thing again in double quotes.\footnote{The up-arrow
 character is not one of these special characters, and so a simple
-reference to a single text file does not need to be enclosed in quotes.}.
+reference to a single text file does not need to be enclosed in quotes.}
 So the above style could be given on the command line as follows:
 
 \small
@@ -3699,7 +3703,7 @@ Any particular synonym will only be recognised by certain applications.
 Thus, {\tt Contours} is only recognised as a synonym for {\tt Curves} when 
 running CONTOUR. Applications ignore attributes (or synonyms) which they
 do not recognise, without reporting an error. Thus if the file containing 
-your default plotting style (used by all applications -- see later)
+your default plotting style (used by all applications --- see later)
 contains the two lines:
 
 \small
@@ -3736,7 +3740,7 @@ The resulting colour depends on the colour of pen 3, which can be set using
 
 Colours specified by name are first translated into the corresponding
 colour index. If no pen is currently available with the requested colour,
-then the ``nearest'' colour will be used instead -- sometimes this may
+then the ``nearest'' colour will be used instead --- sometimes this may
 not be very near at all! If you specifically want the requested colour,
 then you should use PALENTRY first to set one of the available pens to the 
 required colour.
@@ -3798,8 +3802,8 @@ attributes later in this section.
 \end{enumerate}
 
 It should be remembered that settings for unknown attributes are ignored,
-and do not cause the application to abort\footnote{This is because they
-may be synonyms recognised by other other applications.}. So if you set a value for an
+and do not cause the application to abort.\footnote{This is because they
+may be synonyms recognised by other other applications.} So if you set a value for an
 attribute and it seems to have no effect, it may be worth checking that
 you have used the correct spelling for the attribute name.
 
@@ -4653,6 +4657,7 @@ additional attributes are described \hyperref{here}{in section }{}{se:frmatt}.
       }
    }
 }
+\markboth{\stardocname}{\stardocname}
 
 \newpage
 \section{\xlabel{se_datastr}Data structures\label{se:datastr}}
@@ -4668,7 +4673,7 @@ However, for historical reasons there are a number of data formats in
 Starlink software, and at the moment {\footnotesize KAPPA} is no exception in
 that it has two formats.
 
-The main one is official standard data format for Starlink
+The main one is the official standard data format for Starlink
 applications---the \NDFextref{NDF}\ (Extensible $N$-dimensional Data
 Format, SUN/33).  The second is the historical and flawed
 \htmlref{IMAGE structure}{ap:IMAGEformat}, which is gradually being
@@ -4756,8 +4761,8 @@ Although \HDSref\ files are portable you are recommended to copy them to
 the host machine, and run application \htmlref{NATIVE}{NATIVE} on them
 for efficiency gains.  NATIVE converts the data to the native format of
 the machine on which you issue the command. If you don't do this, every
-time you access the data in your \NDFref{NDF}, say, this conversion
-process occurs. for efficiency gains.  NATIVE also replaces any IEEE
+time you access the data in your \NDFref{NDF}, this conversion
+process occurs. NATIVE also replaces any IEEE
 floating point NaN or Inf values with the appropriate Starlink bad value.
 In the C-shell you can use a {\bf foreach} construct to process several
 files.  The following converts all the HDS files in the current
@@ -4850,7 +4855,8 @@ dimension, as follows
 
 where `{\tt a:b}', `{\tt c:d}', ({\it etc.}) specify the lower and upper
 bounds. The bounds specified need not necessarily lie within the actual
-bounds of the NDF, because {\em bad\/} pixels will be supplied in the
+bounds of the NDF, because \htmlref{{\em bad\/} pixels}{se:masking} 
+\latexonly{(see Section~\ref{se:masking})} will be supplied in the
 usual way, if required, to pad out the NDF's array components whenever
 they are accessed. However, none of the lower bounds should exceed the
 corresponding upper bound. 
@@ -5062,7 +5068,7 @@ in case they contain irreplaceable data. Some people are very good and
 make copious notes\ldots Even then the result of a casual experiment
 might not be recorded.  For those who are lazy, such files can be a
 frequent dilemma.  Even a quick look at a plot of the data is often
-little assistance.  As you've probably surmised, the
+of little assistance.  As you've probably surmised, the
 \NDFextref{NDF}\ offers a solution.
 
 Within an NDF you may record {\em history\/} information.  This is
@@ -5098,10 +5104,8 @@ the task automatically records the name of the application which was
 run, the date and time, a reference name that identifies the NDF, your
 username, and some text comprising the command-line parameters and the
 full path of the application.  In {\footnotesize KAPPA} the package 
-name and version is appended to the application name.
-This {\em default history recording\/} facility will gradually
-become available in other Starlink packages as they are rebuilt.
-Some of these packages may provide task-dependent additional text. 
+name and version is appended to the application name. Other packages 
+may provide task-dependent additional text. 
 
 If disc space is not a concern, you might prefer the verbose level.
 
@@ -5228,7 +5232,7 @@ Here is another example showing a series of history records.
 \end{verbatim}
 \normalsize
 
-The first history item HISSET enabling history.  This was followed by
+The first history item shows HISSET enabling history.  This was followed by
 a smooth of the data with \htmlref{GAUSMOOTH}{GAUSMOOTH}.  Then the
 recording level was set to verbose.  The fourth record recalls another
 smooth, and this time you can see the machine details.  Finally, some
@@ -5251,9 +5255,9 @@ Each graphics application which creates a display on a graphics device,
 also stores information describing the display in the \emph{graphics
 database}. This is a file which usually resides in the user's home
 directory, and is often referred to as the ``AGI
-database''\footnote{``AGI'' is the name of the subroutine library which
+database.''\footnote{``AGI'' is the name of the subroutine library which
 provides access to the graphics database. AGI stands for ``Applications Graphics
-Interface'', and is documented in \xref{SUN/48}{sun48}{}.}. Displays are
+Interface'', and is documented in \xref{SUN/48}{sun48}{}.} Displays are
 described in terms of \emph{pictures}. A picture is basically a
 rectangular area on the graphics device within which an application
 produces graphical output. Each time an application creates a picture,
@@ -5354,7 +5358,7 @@ a little larger since no margins need to be left for the axes):
 \end{htmlonly}
 
 The X-window should now look like Figure~
-\latexelsehtml{\ref{fi:agi1}}{1}). The application has displayed the
+\latexelsehtml{\ref{fi:agi1}}{1}. The application has displayed the
 image in the middle of the current picture (the BASE picture), and has made 
 it as large as possible, subject to the constraints that it must lie entirely 
 within the current picture. Note, as with many IRAS images, equatorial
@@ -5392,11 +5396,11 @@ picture on entry to be retained.
 The above use of \htmlref{DISPLAY}{DISPLAY} illustrates an important 
 rule regarding the behaviour of most graphical applications; {\em the
 current picture is not changed by applications which produce graphical
-output}\footnote{This rule does not apply to applications which 
+output}.\footnote{This rule does not apply to applications which 
 manage the database itself rather than producing graphical output. Thus,
 for instance, it is legal for PICLIST to change the current picture if
 you request such a change. Also, an uncontrolled exit from an application,
-{\it{e.g.}}\ {\tt CTRL/C} may leave the database in an abnormal state.}.
+{\it{e.g.}}\ {\tt CTRL/C} may leave the database in an abnormal state.}
 If it were not for this rule, pictures would become progressively
 smaller, vanishing into the distance, since new pictures cannot be
 drawn outside the current picture.  
@@ -5460,8 +5464,8 @@ graphics applications will arrange for any pictures they create to fall
 entirely within this FRAME picture.
 
 Now display the image, this time including annotated axes around the
-edges\footnote{The current co-ordinate Frame in the image being used is
-RA/DEC and so the axis will be annotated in RA and DEC.}. DISPLAY will
+edges.\footnote{The current co-ordinate Frame in the image being used is
+RA/DEC and so the axis will be annotated in RA and DEC.} DISPLAY will
 ensure that all its output (both the image and the axis annotation) fall
 within the current picture ({\it i.e.}\ the picture created by PICDEF above). We
 scale the pixel values to produce a negative image in which 1 \% of
@@ -5497,7 +5501,7 @@ the pixels appear black and 30 \% appear white:
 
 
 The X-window should now look like Figure~
-\latexelsehtml{\ref{fi:agi2}}{2}). We can use \htmlref{PICLIST}{PICLIST} 
+\latexelsehtml{\ref{fi:agi2}}{2}. We can use \htmlref{PICLIST}{PICLIST} 
 again to list the pictures stored in the database:
 
 \small
@@ -5526,7 +5530,7 @@ Let's say you wanted to display an enlarged sub-section of the image in
 the top right corner of the X-window. First, you need to decide on the
 bounds of the sub-section to be displayed. Here, we use a graphics cursor to 
 indicate the bottom left and top right corners of a box enclosing the
-require area. Click the left mouse button at the bottom left and top
+required area. Click the left mouse button at the bottom left and top
 right corners of a box enclosing the required sub-section of the image:
 
 \small
@@ -5580,7 +5584,7 @@ current when the NDF was displayed (RA/DEC in this case), but other
 co-ordinate Frames may be requested using the FRAME parameter ({\it e.g.}\ 
 FRAME=PIXEL displays pixel co-ordinates). In addition to the co-ordinate
 Frames inherited from the NDF, there are also two extra Frames available;
-once called GRAPHICS which specifies positions in terms of millimetres
+one called GRAPHICS which specifies positions in terms of millimetres
 from the bottom left corner of the graphics device ({\it e.g.}\ X-window or
 paper), and another called BASEPIC which is similar to GRAPHICS but which
 specifies positions in a normalised co-ordinate system in which the shorter
@@ -5592,10 +5596,10 @@ position to be displayed, in addition to the co-ordinates selected using
 parameter FRAME (which defaults in this case to RA/DEC since FRAME was
 not specified). For instance, the first position is at an RA of $0^{h}
 41^{m} 33.5^{s}$ and a Dec of $40^{\dgs} 33^{\arcm} 01^{\arcsec}$, and has pixel
-co-ordinates $(172.4,78.2)$\footnote{Pixel \emph{co-ordinates} are
+co-ordinates $(172.4,78.2)$.\footnote{Pixel \emph{co-ordinates} are
 fractional, where-as pixel \emph{indices} are integer. The pixel with
 indices $(1,1)$ covers a range of pixel co-ordinates between $0.0$ and
-$1.0$ on each axis, with its centre at pixel co-ordinates $(0.5,0.5)$.}.
+$1.0$ on each axis, with its centre at pixel co-ordinates $(0.5,0.5)$.}
 The second parameter (PLOT=BOX) causes a box to be drawn on the
 screen between each pair of positions. There are several other allowed
 values for the PLOT parameter which mark the positions in different ways
@@ -5611,9 +5615,9 @@ seen how PICDEF can be used to create a FRAME picture of a given size at
 a given position within the BASE picture, but there are also several
 other ways in which PICDEF can be used. Here, we use PICDEF in ``cursor''
 mode; the bottom left and top right corners of the new picture are
-specified by pointing and clicking with the mouse\footnote{Note, by
+specified by pointing and clicking with the mouse.\footnote{Note, by
 default, the FRAME picture created by PICDEF is \emph{not} constrained to be
-within the current picture, it can be anywhere within the BASE picture.}.
+within the current picture, it can be anywhere within the BASE picture.}
 We use this mode to create a new FRAME picture occupying the area to the
 top right of the existing image:
 
@@ -5664,31 +5668,31 @@ pixel bounds in the specification of the input NDF when we run DISPLAY:
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi4}}{4}). 
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi4}}{4}. 
 
 The string \verb+m31(173:213,79:114)+ is called an \emph{NDF section
-specifier}. These are described more fully in \hyperref{here}{in section }
+specifier}. These are described more fully \hyperref{here}{in section }
 {}{se:ndfsect}. The image is surrounded by a thin border instead of fully
 annotated axes in order to make the image larger. This is achieved using
 the BORDER and NOAXES keywords (equivalent to setting BORDER=YES and 
 AXES=NO). The pixel scaling was specified explicitly using parameters HIGH
 and LOW in order to ensure that the image was displayed with the same
 grey-scale as the main image (the high and low data values are the data
-values corresponding to black and white -- or white and black if reversed
+values corresponding to black and white --- or white and black if reversed
 -- and were reported when the main image was displayed earlier).
 
 Remember the IRAS image of M31 we started with? We'll now overlay
 contours of the IRAS image on top of the magnified section of the visual
 image we have just displayed. Don't forget, these two images have not
-been aligned -- for instance, north is up in the visual image, but down
+been aligned --- for instance, north is up in the visual image, but down
 in the IRAS image. However, both images have information within the WCS
 component describing the relationship between pixel co-ordinates and
 RA/DEC. This WCS information was stored with the DATA picture created by
 DISPLAY above, and so can be used by the \htmlref{CONTOUR}{CONTOUR}
 application in order to draw the IRAS contours in alignment with the
-displayed visual image\footnote{The accuracy of this alignment will
+displayed visual image.\footnote{The accuracy of this alignment will
 depend on the accuracy of the astrometry information supplied with the
-image.}. In addition, we also use CURSOR to mark a position with a text
+image.} In addition, we also use CURSOR to mark a position with a text
 string giving a title for the contour plot:
 
 \small
@@ -5730,7 +5734,7 @@ string giving a title for the contour plot:
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi5}}{5}). 
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi5}}{5}. 
 
 The most important parameter in the above invocation of CONTOUR is the
 NOCLEAR keyword (equivalent to CLEAR=NO). This tells CONTOUR not to clear
@@ -5742,16 +5746,16 @@ current picture is still the top right FRAME picture created by PICDEF,
 and so the contours are aligned using the WCS information stored with the 
 DATA picture contained within this FRAME picture ({\it i.e.}\ the magnified image 
 section). CONTOUR tells us that this alignment occurred within the ``SKY
-Domain'' -- if either of the two NDFs had not contained a calibration in a
+Domain'' --- if either of the two NDFs had not contained a calibration in a
 suitable celestial co-ordinate system, then alignment on the sky could
 not have been performed. In this case, CONTOUR would have aligned the
 contours in the ``PIXEL Domain'' ({\it i.e.}\ in pixel co-ordinates). 
 
 Since we produced no annotated axes, a title string was added using the text
-drawing abilities of CURSOR. The pointer was positioned above the the contour
+drawing abilities of CURSOR. The pointer was positioned above the contour
 plot, and the left button clicked. The specified text string was drawn
 centred at this cursor position. Note, the string \verb+\gm+ is a
-``PGPLOT escape sequence'' which represents the Greek letter micron
+``PGPLOT escape sequence'' which represents the Greek letter mu
 (``$\mu$''). See the PGPLOT manual for a detailed description of the
 available escape sequences.
 
@@ -5808,7 +5812,7 @@ We want to draw the two line profiles in a new plot in the clear area at
 the bottom right of the X-window. We therefore need to create a new FRAME
 picture. This time we use PICDEF in ``XY mode'', in which the bounds of
 the new FRAME picture are given explicitly using parameters UBOUND and
-LBOOUND (we could have used cursor mode again; we use XY mode just to
+LBOUND (we could have used cursor mode again; we use XY mode just to
 explore the different possibilities):
 
 \small
@@ -5850,7 +5854,7 @@ We now draw the first of the two line profiles:
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi6}}{6}). 
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi6}}{6}. 
 The plotting attributes specified by the STYLE parameter do the following;
 \verb+tickall=0+ stops tick marks from being drawn on the un-labelled
 edges ({\it i.e.}\ the top and right edges); \verb+colour(curve)=black+
@@ -5900,7 +5904,7 @@ curve is drawn in white, and data label is different.
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi7}}{7}). 
+The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi7}}{7}. 
 
 As a final touch, we will add two ``warp'' lines to the display joining
 the corners of the box marking the enlarged image area to the
@@ -5950,7 +5954,7 @@ We now run CURSOR again to draw the second warp line:
 
 Point and click over the bottom right corners of the two boxes this time.
 The final X-window should look now look like Figure~ 
-\latexelsehtml{\ref{fi:agi8}}{8}). 
+\latexelsehtml{\ref{fi:agi8}}{8}. 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
@@ -6090,9 +6094,9 @@ The following two Domains may be used to specify positions within any
 picture:
 
 \begin{description}
-\item [GRAPHICS] -- This gives positions in millimetres from the bottom
+\item [GRAPHICS] --- This gives positions in millimetres from the bottom
 left corner of the graphics device. 
-\item [BASEPIC] -- This gives positions within a normalised co-ordinate
+\item [BASEPIC] --- This gives positions within a normalised co-ordinate
 system spanning the BASE picture ({\it i.e.} the entire graphics device). The 
 units on both axes are set so that either the width or the
 height of the graphics device, which-ever is smaller, is set to 1.0
@@ -6155,7 +6159,7 @@ the pixel values from the X-window into a PostScript file, and then print
 the file on a suitable PostScript printer. The popular image display and
 manipulation program {\tt xv} can be used to do this, using the {\tt
 Grab} and {\tt Save} commands on the main control panel. The figures in
-this chapter were created using this method. It's easy -- but the results
+this chapter were created using this method. It's easy --- but the results
 only have the resolution of your X screen (typically 72 dots per inch)
 which is usually not good enough for general publication.
 
@@ -6178,16 +6182,16 @@ These differ from normal PostScript files in that they contain information
 which allows them to be included within other PostScript files. The
 \htmlref{GDNAMES}{GDNAMES} command displays a list of all the available
 graphics devices, together with a brief description of each. This should
-enable you to select an appropriate device name\footnote{Most encapsulated 
-PostScript devices start with the string ``{\tt epsf}''.}. There may be
+enable you to select an appropriate device name.\footnote{Most encapsulated 
+PostScript devices start with the string ``{\tt epsf}''.} There may be
 various encapsulated PostScript devices available. For instance, you can
 choose between colour or monochrome devices, and between portrait or
 landscape devices. The choice of colour or monochrome obviously depends
 on the printer you will use. The choice of landscape or portrait depends
-on the shape of the total plot you are producing -- for tall narrow 
-plots choose portrait, for short wide plots choose landscape\footnote{The 
+on the shape of the total plot you are producing --- for tall narrow 
+plots choose portrait, for short wide plots choose landscape.\footnote{The 
 choice or portrait or landscape may also affect the orientation of the
-plot when the resulting PostScript file is included in a document.}.
+plot when the resulting PostScript file is included in a document.}
 
 For instance, if you want all applications to write graphical output to 
 monochrome landscape encapsulated PostScript files set the graphics
@@ -6213,7 +6217,7 @@ etc}.
 These files can be examined without needing to be printed by using the 
 {\tt ghostview} program. Note, some {\footnotesize KAPPA} applications
 produce more than one file each time they are run. Usually, only one of
-these files will contain any actual drawing commands -- the others will
+these files will contain any actual drawing commands --- the others will
 just contain commmand definitions and other set-up information. So if 
 you get a blank screen using {\tt ghostview}, don't worry... just try the
 next PostScript file!
@@ -6289,7 +6293,7 @@ output is that there is no cursor available when using PostScript. This
 means, for instance, that you cannot use \htmlref{PICDEF}{PICDEF} in
 cursor mode, and you cannot use \htmlref{CURSOR}{CURSOR} at all! We made
 use of both these facilities when we produced 
-Figure~ \latexelsehtml{\ref{fi:agi8}}{8}). 
+Figure~ \latexelsehtml{\ref{fi:agi8}}{8}. 
 Pictures must be defined using PICDEF in {\tt XY} mode, or one
 of the other positional mode ({\tt CC}, {\tt BL}, {\it etc}). Annotation
 such as produced by CURSOR can be created using
@@ -6370,7 +6374,7 @@ width of 730 pixels, giving the required aspect ratio. Of course, you
 could produce a larger or smaller X-window so long as the ratio of width to
 height is close to 1.454659.
 
-Another tip to ease prototyping on an X-window -- when you run CURSOR,
+Another tip to ease prototyping on an X-window --- when you run CURSOR,
 always store the selected positions in an output positions list, using
 parameter OUTCAT. When you come to produce the PostScript files, you can
 then supply these positions lists as inputs to LISTSHOW, in order to mimic
@@ -6381,7 +6385,7 @@ the annotation produced by CURSOR when you were prototyping.
 
 As an illustrated example, this section describes how to produce a
 PostScript file containing a plot similar to that in Figure~
-\latexelsehtml{\ref{fi:agi8}}{8}). For clarity (at the time), the earlier
+\latexelsehtml{\ref{fi:agi8}}{8}. For clarity (at the time), the earlier
 sections of this chapter did not adhere to either of the tips given above
 when prototyping in an X-window; that is, we did not choose the shape of
 the X-window to match our PostScript device, and we did not save the
@@ -6438,14 +6442,14 @@ co-ordinates, and so the plotting area extends form $(0,0)$ to
 $(1,1.454659)$ in the BASEPIC Frame.
 
 The choice of a portrait PostScript device may have surprised you, given
-that Figure~ \latexelsehtml{\ref{fi:agi8}}{8}) seems more naturally to fit
+that Figure~ \latexelsehtml{\ref{fi:agi8}}{8} seems more naturally to fit
 into a landscape page. Portrait mode was chosen so that the final plot
 appears up-right when included in a document. If landscape mode had been
 chosen, the final plot would have been rotated by 90\dgs\ when included
 in a latex document such as this one, requiring the page to be viewed on
 its side. However, if we use the entire portrait page, we will have too
 much vertical space between the components of the plot. To avoid this we
-only use the bottom third (roughly) of the page -- that is, we pretend
+only use the bottom third (roughly) of the page --- that is, we pretend
 that the top of our ``page'' is at 0.6 instead of 1.454659.
 
 We start off by delete any existing GKS PostScript files, so that they
@@ -6496,7 +6500,7 @@ current directory, created by PICDEF and DISPLAY. There will be more by the
 time we have finished!
 
 We now draw a box over this image to mark the ``selected region''
-indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}). In this
+indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}. In this
 particular case, we use LISTMAKE to create a positions list holding the
 RA and DEC at the two opposite corners of the box. Alternatively, we
 could have saved the output from CURSOR while prototyping, using the
@@ -6639,7 +6643,7 @@ The file {\tt style2} contains the following attribute settings:
 \end{verbatim}
 \normalsize
 
-Now comes the complicated bit -- the warp lines! The problem is that we
+Now comes the complicated bit --- the warp lines! The problem is that we
 used the cursor to define the start and end of these lines when
 prototyping. This was good enough for an X-window which has relatively
 low resolution, but will not do for PostScript. We cannot place the
@@ -7063,7 +7067,7 @@ to the WCS component, and have a COSYS parameter.
 \subsection{\xlabel{se_pixgrd}Pixel Indices, Pixel Co-ordinates, and Grid
 Co-ordinates\label{se:pixgrd}}
 In this sub-section we will look at the definition of the three basic
-co-ordinate systems available in all NDFs -- pixel indices, pixel
+co-ordinate systems available in all NDFs --- pixel indices, pixel
 co-ordinates, and grid co-ordinates.
 
 \emph{Pixel indices} are integer values which are used to count the
@@ -7195,9 +7199,9 @@ pixel co-ordinates.
 AXIS structures can only be used to represent independent axes. For
 instance, celestial co-ordinates cannot (in general) be described using
 AXIS structures because celestial longitude and latitude may both vary
-along any given row or column of an NDF\footnote{For this and other
+along any given row or column of an NDF.\footnote{For this and other
 reasons, new applications will avoid using AXIS structures, and make use
-of the more versatile WCS component instead.}. If an application is used
+of the more versatile WCS component instead.} If an application is used
 which renders the AXIS structures in an NDF invalid, then the AXIS
 structures will not be copied to the output NDF. For instance, if
 \htmlref{ROTATE}{ROTATE} is used to rotate an NDF by an angle which is
@@ -7241,14 +7245,14 @@ Any co-ordinate Frames described in the WCS component, together with the
 standard GRID, PIXEL and AXIS Frames, form a collection of inter-related
 Frames called a \emph{FrameSet}. A FrameSet contains descriptions of each
 Frame, plus recipes (called \emph{Mappings}) describing how to convert
-positions from one Frame to another\footnote{A Mapping need not
+positions from one Frame to another.\footnote{A Mapping need not
 necessarily be defined in both directions. For instance, a Mapping which
 goes from a 3-dimensional Frame to a 2-dimensional Frame (maybe by simply
 throwing away one of the axis values) may not be defined in the other
 direction. {\footnotesize KAPPA} applications will report an error if a Mapping is not
 defined in the required direction. Another common example of a
 uni-directional Mapping is that between the GRID and AXIS Frames in 
-cases where the AXIS structures are non-monotonic.}.
+cases where the AXIS structures are non-monotonic.}
 
 Frames within a FrameSet are distinguished by their attribute values,
 primarily their {\tt Domain} value. In addition, each Frame has an integer
@@ -7301,17 +7305,17 @@ supplied {\tt Domain} string), but you should usually avoid the following reserv
 {\tt Domain} names:
 
 \begin{description}
-\item [GRID] -- Reserved to represent grid co-ordinates (in units of
+\item [GRID] --- Reserved to represent grid co-ordinates (in units of
 pixels).
-\item [PIXEL] -- Reserved to represent pixel co-ordinates (in units of
+\item [PIXEL] --- Reserved to represent pixel co-ordinates (in units of
 pixels).
-\item [AXIS] -- Reserved to represent AXIS co-ordinates (in arbitrary units).
-\item [SKY] -- Reserved to represent celestial longitude and latitude (in
+\item [AXIS] --- Reserved to represent AXIS co-ordinates (in arbitrary units).
+\item [SKY] --- Reserved to represent celestial longitude and latitude (in
 any suitable system, but always stored internally in units of radians).
-\item [GRAPHICS] -- Reserved to represent positions on a graphics device 
+\item [GRAPHICS] --- Reserved to represent positions on a graphics device 
 in units of millimetres. measured from the bottom left corner 
 of the device.
-\item [BASEPIC] -- Reserved to represent positions on a graphics device 
+\item [BASEPIC] --- Reserved to represent positions on a graphics device 
 in normalised units, in which the shorter axis of the graphics device has
 length 1.0.
 \end{description}
@@ -7412,8 +7416,8 @@ of the input NDF ({\it e.g.}\ \htmlref{FOURIER}{FOURIER}).
 \end{itemize}
 
 The output NDFs produced by such applications will contain no WCS component
-(but they will still have the three standard Frames -- GRID, PIXEL and
-AXIS -- albeit the AXIS Frame will probably just describe pixel
+(but they will still have the three standard Frames --- GRID, PIXEL and
+AXIS --- albeit the AXIS Frame will probably just describe pixel
 co-ordinates since these applications will not usually copy the
 AXIS structures either).
 
@@ -9372,7 +9376,7 @@ application.
 
 \subsection{What Happens if an Error Occurs?}
 If an application fails to execute successfully, the error report will be 
-displayed, and then canceled\footnote{This is called ``flushing'' the error.}.
+displayed, and then canceled.\footnote{This is called ``flushing'' the error.}
 This means that any remaining NDFs will continued to be processed normally.
 
 The exception to this is that if the error is an ``abort request''
@@ -9402,9 +9406,9 @@ that you only want to find a single centroid, and so does not attempt to
 get a new value for INIT, thus leaving the supplied value for the next
 invocation. The same value for INIT is thus used by all invocations. Of
 course, this means you can only find a single centroid in each
-NDF\footnote{If this is a problem, you can always put the INIT values
+NDF.\footnote{If this is a problem, you can always put the INIT values
 into a file or positions list, using a different value for the MODE
-parameter.}.
+parameter.}
 
 Most applications which re-use one or more parameters during a single
 invocation have some similar means of indicating that you do not want to
@@ -9450,7 +9454,7 @@ processed. For instance, if an error occurs processing one of the files,
 it is useful to know which file failed. If the application doesn't display
 this information, then you can force it to by setting the shell
 environment variable KAPPA\_REPORT\_NAMES to an arbitrary
-value\footnote{The actual value does not matter.}. For instance, in the
+value.\footnote{The actual value does not matter.} For instance, in the
 C-shell:
 
 \small
@@ -9527,8 +9531,8 @@ may, for instance, pick up files with types \verb+.fit+,
 In certain circumstances, you may possibly want to disable the automatic
 re-invocation of {\footnotesize KAPPA} applications to process groups of 
 data files. This can be done by setting the environment variable 
-KAPPA\_LOOP\_DISABLE to an arbitrary value\footnote{The actual value does 
-not matter.}. For instance, in the C-shell:
+KAPPA\_LOOP\_DISABLE to an arbitrary value.\footnote{The actual value does 
+not matter.} For instance, in the C-shell:
 
 \small
 \begin{verbatim}
@@ -20025,7 +20029,7 @@ plot (101k).
       }
 
       \sstsubsection{
-         EXISTS = _LOGICAL (Write)
+         EXISTS = \_LOGICAL (Write)
       }{
         An output parameter which is set to the result of the final
         ``Exist'' operation (see parameter EDIT).

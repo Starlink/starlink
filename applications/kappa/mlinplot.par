@@ -19,7 +19,7 @@ keystyle,s,h,INDEF,,,"Plotting style for the key"
 labels,s,h,INDEF,,,"Labels for each curve"
 linlab,b,h,y,,,"Should a label be included within each curve"
 margin,struct,h,,,,"Widths of margins around DATA picture"
-0.2 0.25 0.2 0.25
+INDEF
 marker,i,h,11,,,"PGPLOT marker type"
 offset,struct,a,,,,"Offset value for each line "
 

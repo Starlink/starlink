@@ -6,4 +6,7 @@ ubnd,struct,a,,,,"Upper pixel index bounds for output images"
 
 ref,f,a,!,,,"The reference image"
 acc,r,h,0.5,,,"Positional accuracy in pixels"
-method,s,h,"Nearest",,,"Interpolation method"
+maxpix,i,h,1000,,,"Scale size for mappings (in pixels)"
+method,s,h,"SincSinc",,,"Interpolation method"
+params,struct,h,,,,"Interpolation parameters"
+

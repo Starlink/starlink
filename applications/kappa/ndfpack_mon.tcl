@@ -22,7 +22,7 @@ set OutputParList(fitsin) {}
 set DynParList(fitsin) {}
 set OutputParList(fitslist) {}
 set DynParList(fitslist) {}
-set OutputParList(fitsmod) {}
+set OutputParList(fitsmod) {exists}
 set DynParList(fitsmod) {}
 set OutputParList(fitstext) {}
 set DynParList(fitstext) {}
