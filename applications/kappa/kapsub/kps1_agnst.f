@@ -374,7 +374,7 @@
 
 *  Calculate the length of the semi-minor axis.
          T = SMA**2 - D1**2
-         IF( T > 0.0 ) THEN
+         IF( T .GT. 0.0 ) THEN
             SMI = ( SMA*D2 )/SQRT( T )
          ELSE
             SMI = SMA
