@@ -172,7 +172,7 @@ AC_SUBST([STAR_DOCUMENTATION])
 
 # Create a PACKAGE_VERSION_INTEGER variable, which contains the
 # package's version number as an integer major*1e6+minor*1e3+release.
-eval [`echo $VERSION | sed -e 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\)/PACKAGE_VERSION_MAJOR=\1; PACKAGE_VERSION_MINOR=\2; PACKAGE_VERSION_RELEASE=\3;/'`]
+eval [`echo $VERSION | sed -e 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/PACKAGE_VERSION_MAJOR=\1; PACKAGE_VERSION_MINOR=\2; PACKAGE_VERSION_RELEASE=\3;/'`]
 test -n "$PACKAGE_VERSION_MAJOR"   || PACKAGE_VERSION_MAJOR=0
 test -n "$PACKAGE_VERSION_MINOR"   || PACKAGE_VERSION_MINOR=0
 test -n "$PACKAGE_VERSION_RELEASE" || PACKAGE_VERSION_RELEASE=0
