@@ -118,6 +118,7 @@
 
 *    Version announcement
       CALL MSG_PRNT( PSS__VERSION )
+      CALL NAG_MISSING ( 'G01ECF, G01FAF G01BKF, S15ABF', STATUS )
 
 *    Initialise sub-systems
       CALL AST_INIT()
