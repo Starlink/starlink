@@ -3211,7 +3211,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
             ENDIF
           ENDIF
-	print *,4
 
 *  Check if each event is within the selected time range
           OK = .FALSE.
@@ -3221,7 +3220,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &                                                .GE. TEV)
             TLP=TLP+1
           ENDDO
-	print *,5
 
 *  If quality limits have been made more strict then check quality
           IF (QCHECK) THEN
@@ -3235,7 +3233,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             ENDDO
 
           ENDIF
-	print *,6
 
 *  if timing Ok then check event falls within various other limits
           IF (OK) THEN
@@ -3246,7 +3243,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      :           (SRT.MIN_YD .LE.YDEV .AND.SRT.MAX_YD .GE.YDEV)
 *
           ENDIF
-	print *,7
 
 *  if event has survived this far check spatial selection
           IF (OK) THEN
@@ -3301,7 +3297,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             ENDIF
 
           ENDIF
-	print *,8
 
           IF (SOK) THEN
 
@@ -3359,7 +3354,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 *
-	print *,9
 
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
