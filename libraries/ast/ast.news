@@ -16,41 +16,141 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+ o  Many changes have been made in the FitsChan class in order to bring the
+ FITS-WCS encoding into line with the current versions of the FITS-WCS
+ papers (see http://www.atnf.csiro.au/people/mcalabre/WCS/):
+ 
+   - The rotation and scaling of the pixel axes may now be specified using
+   either CDi_j keywords, or PCi_j and CDELTj keywords. A new attribute
+   called CDMatrix has been added to the FitsChan class to indicate which
+   set of keywords should be used when writing a FrameSet to a FITS-WCS
+   header.
+ 
+   - The FITS-WCS encoding now supports most of the conventions described
+   in FITS-WCS paper III for the description of spectral coordinates. The
+   exceptions are that the SSYSOBS keyword is not supported, and WCS
+   stored in tabular form (as indicated by the "-TAB" algorithm code) is
+   not supported. This means that FrameSets containing SpecFrames can be
+   written out to a FITS-WCS header (so long as the FrameSet conforms to
+   the usual FITS-WCS conventions).
+ 
+   - User-specified fiducial points for WCS projections are now supported
+   by FitsChans which use FITS-WCS encoding. This use keywords PVi_0,
+   PVi_1 and PVi_2 for the longitude axis.
+ 
+   - When reading a FITS-WCS header, a FitsChan will now use keywords
+   PVi_3 and PVi_4 for the longitude axis (if present) in preference to
+   any LONPOLE and LATPOLE keywords which may be present. When writing a
+   FITS-WCS header, both forms are written out.
+ 
+   - The number of WCS axes is stored in the WCSAXES keyword if its value
+   would be different to that of the NAXIS keyword.
+ 
+   - Helio-ecliptic coordinates are now supported by FitsChans which use
+   FITS-WCS encoding. This uses CTYPE codes "HLON" and "HLAT". The
+   resulting SkyFrame will have a System value of "HELIOECLIPTIC", and
+   all the usual facilities, such as conversion to other celestial
+   systems, are available.
+ 
+   - When reading a FITS-WCS header, a FitsChan will now ignore any
+   distortion codes which are present in CTYPE keywords. Here, a
+   "distortion code" is the final group of four characters in a CTYPE
+   value of the form "xxxx-yyy-zzz", as described in FITS-WCS paper IV.
+   The exception to this is that the "-SIP" distortion code (as used by
+   the SIRTF project - see
+   http://sirtf.caltech.edu/SSC/documents/WCSkeywords_v1.3.pdf) is
+   interpreted correctly and results in a PolyMap being used to represent
+   the distortion in the resulting FrameSet. Note, "-SIP" distortion
+   codes can only be read, not written. A FrameSet which uses a PolyMap
+   will not in general be able to be written out to a FitsChan using any
+   foreign encoding (although NATIVE encoding can of course be used).
+ 
+   - The Warnings attribute of the FitsChan class now accepts values
+   "BadVal" (which gives warnings about conversion errors when reading
+   FITS keyword values), "Distortion" (which gives warnings about
+   unsupported distortion codes within CTYPE values), and "BadMat" (which
+   gives a warning if the rotation/scaling matrix cannot be inverted).
+ 
+   - When writing a FrameSet to a FitsChan which uses a non-Native
+   encoding, the comment associated with any card already in the FitsChan
+   will be retained if the keyword value being written is the same as the
+   keyword value already in the FitsChan.
+ 
+   - A FrameSet which uses the non-FITS projection type AST__TPN (a TAN
+   projection with polynomial distortion terms) can now be written to a
+   FitsChan if the Encoding attribute is set to FITS-WCS. The standard
+   "-TAN" code is used within the CTYPE values, and the distortion
+   coefficients are encoded in keywords of the form " QVi_ma", which
+   are directly analogous to the standard "PVi_ma" projection parameter
+   keywords. Thus a FITS reader which does not recognise the QV keywords
+   will still be able to read the header, but the distortion will be
+   ignored.
+ 
+   - The default value for DefB1950 attribute now depends on the value of
+   the Encoding attribute.
+ 
+ 
+ o  The SkyFrame class now supports two new coordinate systems "ICRS" and
+ "HELIOECLIPTIC". The default for the System attribute for SkyFrames has
+ been changed from "FK5" to "ICRS".
+ 
+ o  The astRate (AST_RATE) function has been added which allows an estimate
+ to be made of the rate of change of a Mapping output with respect to one
+ of the Mapping inputs.
+ 
+ o  All attribute names for Frames of any class may now include an optional
+ axis specifier. This includes those attributes which describe a property
+ of the whole Frame. For instance, the Domain attribute may now be
+ specified as "Domain(1)" in addition to the simpler "Domain". In cases
+ such as this, where the attribute describes a property of the whole
+ Frame, axis specifiers will usually be ignored. The exception is that a
+ CmpFrame will use the presence of an axis specifier to indicate that the
+ attribute name relates to the primary Frame containing the specified
+ axis, rather than to the CmpFrame as a whole.
+ 
+ o  A new subclass of Mapping, the PolyMap, has been added which performs a
+ general N-dimensional polynomial mapping.
+ 
+ o  A new subclass of Mapping, the GrismMap, has been added which models
+ the spectral dispersion produced by a grating, prism or grism.
+ 
+ o  A new subclass of Mapping, the ShiftMap, has been added which adds
+ constant values onto all coordinates (this is equivalent to a WinMap with
+ unit scaling on all axes).
+ 
+ o  Minor bugs have been fixed within the Plot class to do with the choice
+ and placement of numerical axis labels.
+ 
+ o  The SphMap class has a new attribute called PolarLong which gives the
+ longitude value to be returned when a Cartesian position corresponding to
+ either the north or south pole is transformed into spherical coordinates.
+ 
+ o  The WcsMap class now assigns a longitude of zero to output celestial
+ coordinates which have a latitude of plus or minus 90 degrees.
+ 
+ o  The NatLat and NatLon attributes of the WcsMap class have been changed
+ so that they now return the fixed native coordinates of the projection
+ reference point, rather than the native coordinates of the user-defined
+ fiducial point.
+ 
+ o  Changes have been made to several Mapping classes in order to allow the
+ astSimplify (AST_SIMPLIFY) function to make simplifications in a CmpMap
+ which previously were not possible.
+ 
+ o  The SlaMap class has been extended by the addition of conversions
+ between FK5 and ICRS coordinates, and between FK5 and helio-ecliptic
+ coordinates.
+ 
+ o  The SpecMap class has been changed to use the equation for the
+ refractive index of air as given in the current version of FITS-WCS paper
+ III. Also, the forward and inverse transformations between frequency and
+ air-wavelength have been made more compatible by using an iterative
+ procedure to calculate the inverse.
 
 
-o The SkyFrame class now supports two extra coordinate systems; "ICRS"
-and "HELIOECLIPTIC". The default coordinate system has been changed from
-FK5 to ICRS.
-
-o A function called astRate (AST_RATE) has been added which allows an
-estimate to be made of the rate of change of a Mapping output with
-respect to one of the Mapping inputs.
-
-o A new subclass of Mapping, the PolyMap, has been added which calculates
-each output coordinate value as a general polynomial function of the
-input coordinate values.
-
-o A new subclass of Mapping, the GrismMap, has been added which models
-the spectral dispersion produced by a grating, prism or grism.
-
-o A new subclass of Mapping, the ShiftMap, has been added which adds
-constant values onto all coordinates (this is equivalent to a WinMap
-with unit scaling on all axes).
-
-o Minor bugs have been fixed within the Plot class to do with the choice 
-and placement of numerical axis labels.
-
-o The SphMap class has a new attribute caller PolarLong which gives the 
-longitude value to be returned when a Cartesian position corresponding to 
-either the north or south pole is transformed into spherical coordinates.
-
-o The WcsMap class now assigns a longitude of zero to output
-celestial coordinates which have a latitude of plus or minus 90 degrees.
-
-
-   For further details of these changes, see the final appendix of
-Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
-These are available on the WWW at:
+For further details of these changes, see the final appendix of Starlink
+User Note SUN/210 (Fortran version) or SUN/211 (C version). These are
+available on the WWW at:
 
       http://www.starlink.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
 
@@ -64,4 +164,5 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-15/7/2003
+3/10/2003
+
