@@ -113,10 +113,10 @@
             CALL IREGION_SLICE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'GTE') THEN
             CALL IREGION_GTE(EXCLUDE,STATUS)
-          ELSEIF (MODE.EQ.'ARD') THEN
-            CALL IREGION_ARD(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'SHO') THEN
             CALL IREGION_SHOW(STATUS)
+          ELSEIF (MODE.EQ.'LIS') THEN
+            CALL IREGION_LIST(STATUS)
           ELSEIF (MODE.EQ.'EXP') THEN
             CALL IREGION_EXPORT(STATUS)
           ELSEIF (MODE.EQ.'IMP') THEN
@@ -426,6 +426,8 @@
 *    Function declarations :
       INTEGER CHR_LEN
 *    Local constants :
+      REAL RTOD
+      PARAMETER (RTOD=180.0/3.14159265)
 *    Local variables :
       CHARACTER*80 TEXT
       INTEGER L
@@ -457,7 +459,7 @@
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('LN',LENGTH)
         CALL MSG_SETR('WD',WIDTH)
-        CALL MSG_SETR('AN',ANGLE)
+        CALL MSG_SETR('AN',ANGLE*RTOD)
         CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN ',
      :                                                    TEXT,L)
         IF (EXCLUDE) THEN
@@ -749,7 +751,7 @@
 
 
 *+
-      SUBROUTINE IREGION_ARD(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_IMPORT(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -897,7 +899,7 @@ c        ENDIF
 
 
 *+
-      SUBROUTINE IREGION_IMPORT(STATUS)
+      SUBROUTINE IREGION_IMPORT_MASK(STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -945,6 +947,42 @@ c        ENDIF
 
 
 
+*+
+      SUBROUTINE IREGION_LIST(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL MSG_BLNK()
+        CALL ARX_LIST(I_ARD_ID,STATUS)
+        CALL MSG_BLNK()
+
+      ENDIF
+
+      END
+
+
+
 
 *+
       SUBROUTINE IREGION_PARSE_MODE(MODE,MERGE,STATUS)
@@ -981,7 +1019,7 @@ c        ENDIF
      :      MODE.EQ.'ELL'.OR.		! ellipse
      :      MODE.EQ.'SLI'.OR.		! rectangular slice
      :      MODE.EQ.'GTE'.OR.		! >= level
-     :      MODE.EQ.'ARD') THEN		! ARD text
+     :      MODE.EQ.'IMP') THEN		! ARD text
 
            MERGE=.TRUE.
 
@@ -989,7 +1027,7 @@ c        ENDIF
      :          MODE.EQ.'SHO'.OR.
      :          MODE.EQ.'EXP'.OR.
      :          MODE.EQ.'INV'.OR.
-     :          MODE.EQ.'IMP') THEN
+     :          MODE.EQ.'LIS') THEN
 
            MERGE=.FALSE.
 
@@ -1080,9 +1118,9 @@ c        ENDIF
      :/' CIRcle  - circular region     BOX     - box parallel to axes',
      : ' POLygon - irregular polygon   SLICE   - rectangular slice',
      : ' ANNulus - annular region      ELLipse - elliptical region',
-     : ' ARD     - ARD input           WHOle   - whole image',
-     : ' GTE     - pixels >= level     SHOw    - outline all regions',
-     : ' IMPort  - read region mask    EXPort  - output mask'/
+     : ' WHOle   - whole image         GTE     - pixels >= level',
+     : ' SHOw    - outline all regions LISt    - list ARD text',
+     : ' IMPort  - input ARD           EXPort  - output ARD'/
       INTEGER ILINE
 *-
 
