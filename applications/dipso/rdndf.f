@@ -386,22 +386,22 @@
 
 *  If the axis label contains the string "wave" set the SpecFrame system to 
 *  wavelength. 
-               IF( INDEX( TEXT, 'WAVE' ) .NE. -1 ) THEN
+               IF( INDEX( TEXT, 'WAVE' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'WAVE', STATUS )
 
 *  If it contains the string "freq" set the SpecFrame system to wavelength. 
-               ELSE IF( INDEX( TEXT, 'FREQ' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'FREQ' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'FREQ', STATUS )
 
 *  If it contains a "v" assume it is some form of velocity.
-               ELSE IF( INDEX( TEXT, 'V' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'V' ) .NE. 0 ) THEN
 
 *  If it also contains "RAD" assume it is radio velocity.
-                  IF( INDEX( TEXT, 'RAD' ) .NE. -1 ) THEN
+                  IF( INDEX( TEXT, 'RAD' ) .NE. 0 ) THEN
                      CALL AST_SETC( SFRM, 'SYSTEM', 'VRAD', STATUS )
 
 *  If it also contains "OP" assume it is optical velocity.
-                  ELSE IF( INDEX( TEXT, 'OP' ) .NE. -1 ) THEN
+                  ELSE IF( INDEX( TEXT, 'OP' ) .NE. 0 ) THEN
                      CALL AST_SETC( SFRM, 'SYSTEM', 'VOPT', STATUS )
 
 *  Otherwise assume it is relativistic velocity.
@@ -410,19 +410,19 @@
                   END IF
 
 *  Check for the other FITS systems.
-               ELSE IF( INDEX( TEXT, 'ENER' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'ENER' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'ENERGY', STATUS )
 
-               ELSE IF( INDEX( TEXT, 'WAVN' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'WAVN' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'WAVN', STATUS )
 
-               ELSE IF( INDEX( TEXT, 'AWAV' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'AWAV' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'AWAV', STATUS )
 
-               ELSE IF( INDEX( TEXT, 'ZOPT' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'ZOPT' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'ZOPT', STATUS )
 
-               ELSE IF( INDEX( TEXT, 'BETA' ) .NE. -1 ) THEN
+               ELSE IF( INDEX( TEXT, 'BETA' ) .NE. 0 ) THEN
                   CALL AST_SETC( SFRM, 'SYSTEM', 'BETA', STATUS )
 
 *  If none of the above checks produced a system, see if the Unit value
