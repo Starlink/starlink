@@ -43,6 +43,7 @@
 *     20 Oct 92 : V1.7-0 Proofed against failure to map output (DJA)
 *     19 Nov 92 : V1.7-1 Changed arguments to AXIS_VAL2PIX (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     25 Apr 95 : V1.8-1 New data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -51,7 +52,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -62,79 +63,77 @@
       INTEGER                DTA__MXRANG        ! max no. permissible ranges
         PARAMETER           (DTA__MXRANG = 20)
       INTEGER                MX__HTEXT
-        PARAMETER           (MX__HTEXT = DAT__MXDIM)
+        PARAMETER           (MX__HTEXT = ADI__MXDIM)
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC               ! Input object
-      CHARACTER*(DAT__SZLOC) OLOC               ! Output object
       CHARACTER*80           TEXTI(4)           ! Input file spec
       CHARACTER*80           TEXTO(4)           ! Output file spec
       CHARACTER*132          HTEXT(MX__HTEXT)   ! History text
-      CHARACTER*80           AXUNT(DAT__MXDIM)  ! Units for each axis
+      CHARACTER*80           AXUNT(ADI__MXDIM)  ! Units for each axis
       CHARACTER*6            PARNAM
       CHARACTER*40           TEM                ! Dummy string
       CHARACTER*7 AXID
 
-      REAL                   AXLO(DAT__MXDIM)   ! axis low
-      REAL                   AXHI(DAT__MXDIM)   ! axis high
-      REAL                   DIR(DAT__MXDIM)	! axis direction indicator
+      REAL                   AXLO(ADI__MXDIM)   ! axis low
+      REAL                   AXHI(ADI__MXDIM)   ! axis high
+      REAL                   DIR(ADI__MXDIM)	! axis direction indicator
       REAL                   BASE               ! Base value of regular axis
-      REAL                   RANGES(2,DTA__MXRANG,DAT__MXDIM)  ! item ranges
+      REAL                   RANGES(2,DTA__MXRANG,ADI__MXDIM)  ! item ranges
       REAL                   SCALE              ! Used in copying values from input to output axes
       REAL                   WID                ! WIDTH of uniform axis
 
-      INTEGER                DIMS(DAT__MXDIM)   ! Input DATA_ARRAY dimensions
-      INTEGER                ODIMS(DAT__MXDIM)  ! Output DATA_ARRAY dimensions
+      INTEGER                DIMS(ADI__MXDIM)   ! Input DATA_ARRAY dimensions
       INTEGER                HU                 ! History lines used
-      INTEGER                NDIM               ! Number of input dimensions
-      INTEGER                ONDIM              ! Number of output dimensions
-      INTEGER                TPTR               ! pointer to temp mapped array of logicals
-      INTEGER                SIZ                ! size of this & that
       INTEGER                IDPTR              ! Pointer to input data
-      INTEGER                ODPTR              ! Pointer to output data
-      INTEGER                PARENT(DAT__MXDIM) ! parent axis of output
-      INTEGER                NRANGE(DAT__MXDIM) ! # item ranges
       INTEGER                IVPTR              ! Pointer to input VARIANCE
+      INTEGER                IWPTR(ADI__MXDIM)  ! Pointer to input axis widths
+      INTEGER                NDIM               ! Number of input dimensions
+      INTEGER                NRANGE(ADI__MXDIM) ! # item ranges
+      INTEGER                ODIMS(ADI__MXDIM)  ! Output DATA_ARRAY dimensions
+      INTEGER                ODPTR              ! Pointer to output data
       INTEGER                OVPTR              ! Pointer to output VARIANCE
-      INTEGER                IWPTR(DAT__MXDIM)  ! Pointer to input axis widths
-      INTEGER                OWPTR(DAT__MXDIM)  ! Pointer to output axis widths
+      INTEGER                OWPTR(ADI__MXDIM)  ! Pointer to output axis widths
+      INTEGER                ONDIM              ! Number of output dimensions
+      INTEGER                PARENT(ADI__MXDIM) ! parent axis of output
+      INTEGER                SIZ                ! size of this & that
+      INTEGER                TPTR               ! pointer to temp mapped array of logicals
       INTEGER                I, J, K            ! Loop counters
       INTEGER                NELM               ! Total length of input data
       INTEGER                IQPTR              ! Pointer to input QUALITY
       INTEGER                OQPTR              ! Pointer to output QUALITY
       INTEGER                INLINES            ! Number of TEXTI lines
-      INTEGER                AXRANGE(2,DTA__MXRANG,DAT__MXDIM)
+      INTEGER                AXRANGE(2,DTA__MXRANG,ADI__MXDIM)
 						! Pixel equivalent of RANGES
-      INTEGER                IAXPTR(DAT__MXDIM) ! Pointers to input axes
+      INTEGER                IAXPTR(ADI__MXDIM) ! Pointers to input axes
       INTEGER                NAX                ! Number of dataset axes
       INTEGER                NSEL,ISEL
-      INTEGER                OAXPTR(DAT__MXDIM) ! Pointers to output axes
-      INTEGER                SELAX(DAT__MXDIM)
+      INTEGER                OAXPTR(ADI__MXDIM) ! Pointers to output axes
+      INTEGER                SELAX(ADI__MXDIM)
       INTEGER                TLEN               ! Text length
 
       BYTE                   MASK               ! Quality mask
 
       LOGICAL                INPRIM             ! Input object is primitive
-      LOGICAL                WIDOK(DAT__MXDIM)  ! Width component od axes ok?
-      LOGICAL                IUNIF(DAT__MXDIM)  ! Uniform widths? - input
-      LOGICAL                OUNIF(DAT__MXDIM)  ! Uniform widths? - output
+      LOGICAL                WIDOK(ADI__MXDIM)  ! Width component od axes ok?
+      LOGICAL                IUNIF(ADI__MXDIM)  ! Uniform widths? - input
+      LOGICAL                OUNIF(ADI__MXDIM)  ! Uniform widths? - output
       LOGICAL                OK                 ! object is ok
-      LOGICAL                KEEP(DAT__MXDIM)   ! Are ranges those to keep?
+      LOGICAL                KEEP(ADI__MXDIM)   ! Are ranges those to keep?
       LOGICAL                KEEPDATA
       LOGICAL 		     SLICE
       LOGICAL                INDEX              ! select by index
-      LOGICAL                IREG(DAT__MXDIM)   ! input axis regularly spaced?
-      LOGICAL                OREG(DAT__MXDIM)   ! output axis regularly spaced?
+      LOGICAL                IREG(ADI__MXDIM)   ! input axis regularly spaced?
+      LOGICAL                OREG(ADI__MXDIM)   ! output axis regularly spaced?
       LOGICAL                QUALOK             ! Input QUALITY OK?
       LOGICAL                VAROK              ! Input VARIANCE OK?
       LOGICAL                NORM               ! Axes normalised?
-      LOGICAL                SEL(DAT__MXDIM)    ! Has axis been selected on?
+      LOGICAL                SEL(ADI__MXDIM)    ! Has axis been selected on?
 *
 *    Version :
 *
       CHARACTER*(25)         VERSION
-        PARAMETER            ( VERSION = 'BINSUBSET Version 1.8-0' )
+        PARAMETER            ( VERSION = 'BINSUBSET Version 1.8-1' )
 *-
 
 *    Version
@@ -144,12 +143,13 @@
       CALL AST_INIT()
       HU = 0
 
-*    Obtain locators to input and output objects
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ',ILOC, OLOC, INPRIM, STATUS)
+*    Obtain identifiers to input and output objects
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ',IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get DATA_ARRAY
-      CALL BDA_CHKDATA( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       IF (.NOT. OK) THEN
         CALL MSG_PRNT('AST_ERR: Invalid data')
         STATUS = SAI__ERROR
@@ -163,7 +163,7 @@
 
 *    Define axis ranges
       NELM = 1
-      DO I = 1, DAT__MXDIM
+      DO I = 1, ADI__MXDIM
         SEL(I) = .FALSE.
         IF ( I .GT. NDIM ) THEN
           DIMS(I) = 1
@@ -185,7 +185,7 @@
       IF ( .NOT. INPRIM ) CALL USI_GET0L('INDEX',INDEX,STATUS)
 
 *    Display axis labels, and get min & max values
-      CALL BINSUBSET_DISPAX( ILOC, INPRIM, NDIM, DIMS, AXUNT, AXLO,
+      CALL BINSUBSET_DISPAX( IFID, INPRIM, NDIM, DIMS, AXUNT, AXLO,
      :                               AXHI, IREG, DIR, NAX, STATUS )
       INDEX = ( INDEX .OR. ( NAX .EQ. 0 ) )
 
@@ -268,7 +268,7 @@
 
 *    Convert ranges into integer pixel ranges
       IF ( INDEX ) THEN
-        DO I = 1,DAT__MXDIM
+        DO I = 1,ADI__MXDIM
           IF (SEL(I)) THEN
             DO J=1,NRANGE(I)
               AXRANGE(1,J,I)=INT(RANGES(1,J,I))
@@ -277,7 +277,7 @@
           END IF
         END DO
       ELSE
-        CALL BINSUBSET_AXRAN( ILOC,DIMS,NRANGE,RANGES,SEL,DIR,AXRANGE,
+        CALL BINSUBSET_AXRAN( IFID,DIMS,NRANGE,RANGES,SEL,DIR,AXRANGE,
      :                                                         STATUS)
       END IF
 
@@ -358,31 +358,31 @@
       END IF
 
 *    Create output dataset
-      CALL BDA_CREDATA (OLOC, ONDIM, ODIMS, STATUS)
-      CALL BDA_MAPDATA (ILOC, 'READ', IDPTR, STATUS)
-      CALL BDA_MAPDATA (OLOC, 'WRITE', ODPTR, STATUS)
+      CALL BDI_CREDATA (OFID, ONDIM, ODIMS, STATUS)
+      CALL BDI_MAPDATA (IFID, 'READ', IDPTR, STATUS)
+      CALL BDI_MAPDATA (OFID, 'WRITE', ODPTR, STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy other stuff
-      CALL BDA_COPTEXT(ILOC,OLOC,STATUS)
+      CALL BDI_COPTEXT(IFID,OFID,STATUS)
 
-      CALL BDA_CHKVAR (ILOC, VAROK, NDIM, DIMS, STATUS)
+      CALL BDI_CHKVAR (IFID, VAROK, NDIM, DIMS, STATUS)
 
 *  variance
       IF ( VAROK ) THEN
-        CALL BDA_MAPVAR (ILOC, 'READ', IVPTR,  STATUS)
-        CALL BDA_CREVAR (OLOC, ONDIM, ODIMS,   STATUS)
-        CALL BDA_MAPVAR (OLOC, 'WRITE', OVPTR, STATUS)
+        CALL BDI_MAPVAR (IFID, 'READ', IVPTR,  STATUS)
+        CALL BDI_CREVAR (OFID, ONDIM, ODIMS,   STATUS)
+        CALL BDI_MAPVAR (OFID, 'WRITE', OVPTR, STATUS)
       END IF
 
 * quality
-      CALL BDA_CHKQUAL (ILOC, QUALOK, NDIM, DIMS, STATUS)
+      CALL BDI_CHKQUAL (IFID, QUALOK, NDIM, DIMS, STATUS)
       IF ( QUALOK ) THEN
-        CALL BDA_MAPQUAL( ILOC, 'READ', IQPTR, STATUS )
-        CALL BDA_CREQUAL( OLOC, ONDIM, ODIMS, STATUS )
-        CALL BDA_MAPQUAL( OLOC, 'WRITE', OQPTR, STATUS )
-        CALL BDA_GETMASK( ILOC, MASK, STATUS )
-        CALL BDA_PUTMASK( OLOC, MASK, STATUS )
+        CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
+        CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
+        CALL BDI_GETMASK( IFID, MASK, STATUS )
+        CALL BDI_PUTMASK( OFID, MASK, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -395,21 +395,21 @@
       CALL DYN_UNMAP( TPTR, STATUS )
 
 *    Do rest of tidying up
-      CALL BDA_UNMAPDATA( ILOC, STATUS )
-      CALL BDA_UNMAPDATA( OLOC, STATUS )
+      CALL BDI_UNMAPDATA( IFID, STATUS )
+      CALL BDI_UNMAPDATA( OFID, STATUS )
       IF ( VAROK ) THEN
-        CALL BDA_UNMAPVAR( ILOC, STATUS )
-        CALL BDA_UNMAPVAR( OLOC, STATUS )
+        CALL BDI_UNMAPVAR( IFID, STATUS )
+        CALL BDI_UNMAPVAR( OFID, STATUS )
       END IF
       IF ( QUALOK ) THEN
-        CALL BDA_UNMAPQUAL( ILOC, STATUS )
-        CALL BDA_UNMAPQUAL( OLOC, STATUS )
+        CALL BDI_UNMAPQUAL( IFID, STATUS )
+        CALL BDI_UNMAPQUAL( OFID, STATUS )
       END IF
 
 *  now deal with axes
       IF ( ( NAX .GT. 0 ) .AND. .NOT. INPRIM ) THEN
 
-        CALL BDA_CREAXES( OLOC, ONDIM, STATUS )
+        CALL BDI_CREAXES( OFID, ONDIM, STATUS )
 
         DO I=1,ONDIM
 *    get parent axis
@@ -418,7 +418,7 @@
 *    if unchanged then just copy
           IF (.NOT.SEL(J)) THEN
 
-            CALL BDA_COPAXIS(ILOC,OLOC,J,I,STATUS)
+            CALL BDI_COPAXIS(IFID,OFID,J,I,STATUS)
 
           ELSE
 
@@ -442,19 +442,19 @@
             END IF
 
 *   create axis value component
-            CALL BDA_CREAXVAL (OLOC, I, OREG(I), ODIMS(I), STATUS)
+            CALL BDI_CREAXVAL (OFID, I, OREG(I), ODIMS(I), STATUS)
 
 *    see if width component needed
-            CALL BDA_CHKAXWID (ILOC, J, WIDOK(J), IUNIF(J), SIZ, STATUS)
+            CALL BDI_CHKAXWID (IFID, J, WIDOK(J), IUNIF(J), SIZ, STATUS)
             OUNIF(I)=(IUNIF(J).AND.OREG(I))
             IF (WIDOK(J)) THEN
-              CALL BDA_CREAXWID (OLOC, I, OUNIF(I), ODIMS(I), STATUS)
+              CALL BDI_CREAXWID (OFID, I, OUNIF(I), ODIMS(I), STATUS)
             END IF
 
             IF (OREG(I)) THEN
 
 *    calculated new base value and write to output
-              CALL BDA_GETAXVAL (ILOC, J, BASE, SCALE, SIZ, STATUS)
+              CALL BDI_GETAXVAL (IFID, J, BASE, SCALE, SIZ, STATUS)
 *    case of single chunk being taken out
               IF (KEEP(J)) THEN
                 BASE=BASE+(AXRANGE(1,1,J)-1)*SCALE
@@ -463,22 +463,22 @@
                   BASE=BASE+AXRANGE(2,1,J)*SCALE
               END IF
 
-              CALL BDA_PUTAXVAL (OLOC, I, BASE, SCALE, ODIMS(I), STATUS)
+              CALL BDI_PUTAXVAL (OFID, I, BASE, SCALE, ODIMS(I), STATUS)
 
 *    write width component if required
               IF (WIDOK(J).AND.OUNIF(I)) THEN
-                CALL BDA_GETAXWID (ILOC, J, WID, STATUS)
-                CALL BDA_PUTAXWID (OLOC, I, WID, STATUS)
+                CALL BDI_GETAXWID (IFID, J, WID, STATUS)
+                CALL BDI_PUTAXWID (OFID, I, WID, STATUS)
               END IF
 
 *    irregular axis
             ELSE
 *          Map axis values
-              CALL BDA_MAPAXVAL (ILOC, 'READ', J, IAXPTR(J), STATUS)
-              CALL BDA_MAPAXVAL (OLOC, 'WRITE', I, OAXPTR(I), STATUS)
+              CALL BDI_MAPAXVAL (IFID, 'READ', J, IAXPTR(J), STATUS)
+              CALL BDI_MAPAXVAL (OFID, 'WRITE', I, OAXPTR(I), STATUS)
               IF (WIDOK(J)) THEN
-                CALL BDA_MAPAXWID(ILOC,'READ',J,IWPTR(J),STATUS)
-                CALL BDA_MAPAXWID(OLOC,'WRITE',I,OWPTR(I),STATUS)
+                CALL BDI_MAPAXWID(IFID,'READ',J,IWPTR(J),STATUS)
+                CALL BDI_MAPAXWID(OFID,'WRITE',I,OWPTR(I),STATUS)
               END IF
 
                CALL BINSUBSET_AXCOP(DIMS(J),NRANGE(J),AXRANGE(1,1,J),
@@ -486,15 +486,13 @@
      :                         WIDOK(J),%VAL(OAXPTR(I)), %VAL(OWPTR(I)),
      :                                                           STATUS)
 
-
-
             END IF
 
 *        Copy labels etc.
-            CALL BDA_COPAXTEXT(ILOC,OLOC,J,I,STATUS)
+            CALL BDI_COPAXTEXT(IFID,OFID,J,I,STATUS)
 
-            CALL BDA_GETAXNORM( ILOC, J, NORM, STATUS )
-            CALL BDA_PUTAXNORM( OLOC, I, NORM, STATUS )
+            CALL BDI_GETAXNORM( IFID, J, NORM, STATUS )
+            CALL BDI_PUTAXNORM( OFID, I, NORM, STATUS )
 
           END IF
 
@@ -503,20 +501,20 @@
       END IF
 
 *    History component
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( INLINES, TEXTI, STATUS )
-      CALL HIST_PTXT( OLOC, INLINES, TEXTI, STATUS )
-      CALL HIST_PTXT( OLOC, HU, HTEXT, STATUS )
+      CALL HSI_PTXT( OFID, INLINES, TEXTI, STATUS )
+      CALL HSI_PTXT( OFID, HU, HTEXT, STATUS )
 
 *    Copy all ancilliary stuff
-      CALL BDA_COPMORE(ILOC,OLOC,STATUS)
+      CALL BDI_COPMORE(IFID,OFID,STATUS)
 
 *    Clean up
- 99   CALL BDA_RELEASE(OLOC,STATUS)
-      CALL USI_ANNUL(OLOC,STATUS)
-      CALL BDA_RELEASE(ILOC,STATUS)
-      CALL USI_ANNUL(ILOC,STATUS)
+ 99   CALL BDI_RELEASE(OFID,STATUS)
+      CALL USI_TANNUL(OFID,STATUS)
+      CALL BDI_RELEASE(IFID,STATUS)
+      CALL USI_TANNUL(IFID,STATUS)
       CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
@@ -525,14 +523,14 @@
 
 
 *+  BINSUBSET_DISPAX - Display axes
-      SUBROUTINE BINSUBSET_DISPAX( LOC, PRIM, NDIM, DIMS, AXUNT, AXLO,
+      SUBROUTINE BINSUBSET_DISPAX( FID, PRIM, NDIM, DIMS, AXUNT, AXLO,
      :                                   AXHI, REG, DIR, NAX, STATUS )
 *
 *    Description :
 *
 *     Returns the range of axis data in AXMIN,AXMAX (REAL); the axis
 *     label in AXLAB; an the axis units in AXUN for the DATA_ARRAY
-*     subclass object located by LOC.
+*     subclass object located by FID.
 *
 *    Method :
 *    Deficiencies :
@@ -544,9 +542,8 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC                ! locator to container object
+      INTEGER			FID			! Dataset identifier
       LOGICAL                PRIM               ! Input primitive?
       INTEGER                NDIM               ! Number of dimensions
       INTEGER                DIMS(*)            ! Length of each axis
@@ -560,16 +557,15 @@
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) CELL               ! Locator to AXIS DATA_ARRAY cell
-      CHARACTER*(DAT__SZLOC) AXLOC              ! Locator to AXIS structure
       CHARACTER*(80)         AXLAB              ! axis labels
 
       REAL                   BASE, SCALE
 
-      INTEGER                I                  ! loop variable
-      INTEGER                SIZ                ! dummy
+      INTEGER			AXPTR			! Ptr to axis values
+      INTEGER                	I                  	! loop variable
+      INTEGER                	SIZ                	! dummy
 
-      LOGICAL                OK
+      LOGICAL                	OK
 *-
 
 *    Status check
@@ -577,7 +573,7 @@
 
 *    Get number of axes
       IF ( .NOT. PRIM ) THEN
-        CALL BDA_CHKAXES( LOC, NAX, STATUS )
+        CALL BDI_CHKAXES( FID, NAX, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_FLUSH( STATUS )
           STATUS = SAI__OK
@@ -591,26 +587,22 @@
         CALL MSG_PRNT ('The axes present are:')
 
         DO I = 1, NDIM
-          CALL BDA_GETAXLABEL (LOC, I, AXLAB,    STATUS)
-          CALL BDA_GETAXUNITS (LOC, I, AXUNT(I), STATUS)
+          CALL BDI_GETAXLABEL( FID, I, AXLAB,    STATUS )
+          CALL BDI_GETAXUNITS( FID, I, AXUNT(I), STATUS )
           CALL MSG_SETI ('I', I)
           CALL MSG_SETC ('NAME', AXLAB)
           CALL MSG_PRNT (' ^I ^NAME')
-          CALL BDA_CHKAXVAL (LOC, I, OK, REG(I), SIZ, STATUS)
+          CALL BDI_CHKAXVAL ( FID, I, OK, REG(I), SIZ, STATUS)
 
           IF (REG(I)) THEN
-            CALL BDA_GETAXVAL (LOC, I, BASE, SCALE, SIZ, STATUS)
+            CALL BDI_GETAXVAL ( FID, I, BASE, SCALE, SIZ, STATUS)
             AXLO(I) = BASE
             AXHI(I) = BASE + (SIZ - 1) * SCALE
 
           ELSE
-            CALL BDA_LOCAXVAL (LOC, I, AXLOC, STATUS)
-            CALL DAT_CELL( AXLOC, 1, 1, CELL, STATUS )
-            CALL DAT_GET0R( CELL, AXLO(I), STATUS )
-            CALL DAT_ANNUL( CELL, STATUS )
-            CALL DAT_CELL( AXLOC, 1, DIMS(I), CELL, STATUS )
-            CALL DAT_GET0R( CELL, AXHI(I), STATUS )
-            CALL DAT_ANNUL( CELL, STATUS )
+            CALL BDI_MAPAXVAL( FID, 'READ', I, AXPTR, STATUS )
+            CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
+            CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AHI(I), STATUS )
           END IF
 
 *    set direction indicator for axis
@@ -639,7 +631,7 @@
       END IF
 
       IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_REP (' ', 'from BINSUBSET_DISPAX', STATUS)
+        CALL AST_REXIT( 'BINSUBSET_DISPAX', STATUS)
       END IF
 
       END
@@ -648,27 +640,27 @@
 
 
 *+  BINSUBSET_AXRAN - Converts selected axis range to pixel values
-      SUBROUTINE BINSUBSET_AXRAN(LOC,DIMS,NRANGE,RANGES,SEL,DIR,
+      SUBROUTINE BINSUBSET_AXRAN(FID,DIMS,NRANGE,RANGES,SEL,DIR,
      :                                             AXRANGE,STATUS)
 *    Description :
 *     Converts the NRANGE RANGES of the selected axes into pixel values.
 *    Type definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 
       INTEGER                DTA__MXRANG        ! max no. permissible ranges
         PARAMETER           (DTA__MXRANG = 20)
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC		! input dataset
+      INTEGER			FID			! Input dataset id
       INTEGER                NRANGE(*)          ! Nuber of ranges for each axis
       INTEGER                DIMS(*)            ! Length of each axis
       REAL                   DIR(*)		! direction indicator
       LOGICAL                SEL(*)             ! Axis selected on?
 *    Import-Export :
-      REAL                   RANGES(2,DTA__MXRANG,DAT__MXDIM)  ! AXIS ranges
+      REAL                   RANGES(2,DTA__MXRANG,ADI__MXDIM)  ! AXIS ranges
 *    Export :
-      INTEGER                AXRANGE(2,DTA__MXRANG,DAT__MXDIM) ! AXIS pixel ranges
+      INTEGER                AXRANGE(2,DTA__MXRANG,ADI__MXDIM) ! AXIS pixel ranges
 *    Status :
       INTEGER STATUS
 *    Local variables :
@@ -680,10 +672,10 @@
 
 
 *    Loop over all possible axes
-        DO IAX = 1, 7
+        DO IAX = 1, ADI__MXDIM
           IF (SEL(IAX)) THEN
-            CALL BDA_MAPAXVAL(LOC,'R',IAX,APTR,STATUS)
-            CALL BDA_MAPAXWID(LOC,'R',IAX,WPTR,STATUS)
+            CALL BDI_MAPAXVAL(FID,'R',IAX,APTR,STATUS)
+            CALL BDI_MAPAXWID(FID,'R',IAX,WPTR,STATUS)
             CALL BINSUBSET_AXRAN_AXISN(%VAL(APTR),%VAL(WPTR),DIMS(IAX),
      :           DIR(IAX),NRANGE(IAX),RANGES(1,1,IAX),AXRANGE(1,1,IAX),
      :                                                          STATUS)
@@ -691,7 +683,7 @@
         END DO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP( ' ', 'from BINSUBSET_AXRAN', STATUS )
+          CALL AST_REXIT( 'BINSUBSET_AXRAN', STATUS )
         END IF
 
       END IF
@@ -709,7 +701,6 @@
 *    Type definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
       INTEGER                DTA__MXRANG          ! max no. permissible ranges
         PARAMETER           (DTA__MXRANG = 20)
@@ -806,13 +797,13 @@ c        END IF
 *    Type definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INTEGER                DTA__MXRANG        ! max no. permissible ranges
         PARAMETER           (DTA__MXRANG = 20)
 *    Import :
       INTEGER D1,D2,D3,D4,D5,D6,D7
-      INTEGER                NRANGE(DAT__MXDIM)          ! # item ranges
-      INTEGER                AXRANGE(2,DTA__MXRANG,DAT__MXDIM)
+      INTEGER                NRANGE(ADI__MXDIM)          ! # item ranges
+      INTEGER                AXRANGE(2,DTA__MXRANG,ADI__MXDIM)
 
 
       LOGICAL                KEEP               ! Keep axis ranges selected?
@@ -871,7 +862,6 @@ c        END IF
 *    Type definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INTEGER                DTA__MXRANG        ! max no. permissible ranges
         PARAMETER           (DTA__MXRANG = 20)
 
@@ -946,7 +936,6 @@ c        END IF
 *    Type definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NPTS               ! Length of input axis
       INTEGER                NR                 ! Number of ranges
