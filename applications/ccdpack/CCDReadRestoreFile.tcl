@@ -34,6 +34,12 @@
 #        SATURATE
 #        SATURATION
 #        SETSAT
+#        USESET
+#
+#     Additionally, some of these parameters may be prefixed by a 
+#     Set Index modifier, which is an integer followed by a comma,
+#     to indicate the value specific to a given Set Index.  E.g.
+#     the value "3,ADC" would be the ADC value for Set Index 3.
 #
 #     Lines may be continued using the character "-" at the end of the
 #     line, comments may be present. These use the characters "#" and
@@ -52,9 +58,12 @@
 #        The resultant global parameters are set using the elements
 #	 CCDglobalpars(GLOBAL_PARNAME). If a value already exists this is
 #	 overwritten. Global parameters with no value are not set.
+#     CCDsetindices = list of integers (write)
+#        The NDF Set Index values that we know about.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -62,17 +71,28 @@
 #     	 Original version.
 #     4-MAR-1994 (PDRAPER):
 #     	 Now named CCDReadRestoreFile.
+#     26-JUN-2001 (MBT):
+#        Upgraded for Sets.
 #     {enter_further_changes_here}
 
 #-
 
 #  Declare global parameters:
    global CCDglobalpars
+   global CCDsetindices
+
+#  Local constants.
+   set ixpars {ADC BOUNDS DEFERRED DIRECTION EXTENT MASK RNOISE SATURATION}
+   set noixpars {GENVAR LOGFILE LOGTO NDFNAMES PRESERVE SATURATE SETSAT USESET}
 
 #.
 
 #  Check that file is readable.
    if [file readable $file]  {
+
+#  Prepare regular expressions.
+      set ixregex "^(-?\[0-9\]+)(?:,)([join $ixpars |])"
+      set noixregex "^([join [eval list $ixpars $noixpars] |])"
 
 #  Open the file.
       set fileid [open $file r]
@@ -81,24 +101,14 @@
 #  Have a line of information to decode. Look for the keyword
 #  which we expect.
          if { [string match "*=*" $line ] } {
-            switch -regexp $line {
-               (^ADC|^adc)              { set keyword "ADC" }
-               (^BOUNDS|^bounds)        { set keyword "BOUNDS" }
-               (^DEFERRED|^deferred)    { set keyword "DEFERRED" }
-               (^DIRECTION|^direction)  { set keyword "DIRECTION" }
-               (^EXTENT|^extent)        { set keyword "EXTENT" }
-               (^GENVAR|^genvar)        { set keyword "GENVAR" }
-               (^LOGFILE|^logfile)      { set keyword "LOGFILE" }
-               (^LOGTO|^logto)          { set keyword "LOGTO" }
-               (^MASK|^mask)            { set keyword "MASK" }
-               (^NDFNAMES|^ndfnames)    { set keyword "NDFNAMES" }
-               (^PRESERVE|^preserve)    { set keyword "PRESERVE" }
-               (^RNOISE|^rnoise)        { set keyword "RNOISE" }
-               (^SATURATE|^saturate)    { set keyword "SATURATE" }
-               (^SATURATION|saturation) { set keyword "SATURATION" }
-               (^SETSAT|^setsat)        { set keyword "SETSAT" }
-               default { CCDIssueInfo "Unrecognised keyword ($line)"
-                         set keyword "default" }
+            if { [regexp -nocase $ixregex $line whole sindex pname] } {
+               set key "$sindex,[string toupper $pname]"
+               set indexfound($sindex) 1
+            } elseif { [regexp -nocase $noixregex $line whole pname] } {
+               set key [string toupper $pname]
+            } else {
+               CCDIssueInfo "Unrecognised keyword ($line)"
+               set keyword "default"
             }
 
 #  Decode statement. Need the trailing value (after the equals sign).
@@ -106,7 +116,7 @@
             incr equalsat
             set trailing [string range $line $equalsat end]
 	    set trailing [string trim $trailing]
-            set CCDglobalpars($keyword) $trailing
+            set CCDglobalpars($key) $trailing
 
 #  Couldn't match this line.
          } else {
@@ -116,6 +126,24 @@
 
 #  Close the file.
       close $fileid
+
+#  Update our knowledge about the Set Index values we will encounter.
+      set CCDsetindices [lsort -integer [array names indexfound]]
+
+#  Ensure that the values are in the form we want.
+      if { [info exists CCDglobalpars(LOGTO)] } {
+         set CCDglobalpars(LOGTO) [string toupper $CCDglobalpars(LOGTO)]
+         if { $CCDglobalpars(LOGTO) != "BOTH" &&
+              $CCDglobalpars(LOGTO) != "TERMINAL" } {
+            unset CCDglobalpars(LOGTO)
+         }
+      }
+      foreach name [array names CCDglobalpars *DIRECTION] {
+         set CCDglobalpars($name) [string toupper $CCDglobalpars($name)]
+         if { $CCDglobalpars($name) != "X" && $CCDglobalpars($name) != "Y" } {
+            unset CCDglobalpars($name)
+         }
+      }
 
 #  Couldn't read the file.
    } else {
