@@ -161,8 +161,6 @@
         PARAMETER		( VERSION = 'REBIN Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80           ITEXT(4)   ! name of input file
-      CHARACTER*80           OTEXT(4)   ! name of output file
       CHARACTER*80           AXLABEL(7) ! AXIS labels
 
       LOGICAL OK			! data valid
@@ -179,6 +177,8 @@
       LOGICAL SEL(ADI__MXDIM)
 
       INTEGER IFID,OFID,CFID
+      INTEGER			IFILES		      	! Input file info
+      INTEGER			OFILES		      	! Output file info
       INTEGER OPT
       INTEGER DIMS(ADI__MXDIM)	! data_array dimensions
       INTEGER TDIMS(ADI__MXDIM)	! temp dimensions
@@ -235,7 +235,7 @@
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
-      CALL USI_NAMEI(INLINES,ITEXT,STATUS)
+      CALL USI_NAMES( 'I', IFILES, STATUS )
 
 *  Check input dataset
       CALL BDI_CHK( IFID, 'Data', OK, STATUS )
@@ -489,9 +489,9 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 *  Copy and update history
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL HSI_PTXT( OFID, INLINES, ITEXT, STATUS )
-      CALL USI_NAMEO( ONLINES, OTEXT, STATUS )
-      CALL HSI_PTXT( OFID, ONLINES, OTEXT,STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
+      CALL USI_NAMES( 'O', OFILES, STATUS )
+      CALL HSI_PTXTI( OFID, OFILES, .TRUE., STATUS )
 
 *  Copy over ancillary components
       CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
