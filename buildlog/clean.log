@@ -59,6 +59,7 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/hdx/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/hdx/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/hdx/docs
      [echo] Executing NDArray target: clean
 
