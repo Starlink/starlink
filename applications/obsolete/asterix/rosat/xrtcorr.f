@@ -659,8 +659,11 @@
       INTEGER IUNIT                       ! Logical I/O unit
       INTEGER MAXRAW                      ! Max value
         PARAMETER (MAXRAW = 500)
+      INTEGER NFILES                      ! Number of files
 *
-      CHARACTER*5 ORIGIN                  ! Origin of FITS file
+      CHARACTER*100 FILES(MAXRAW)         ! List of FITS files
+      CHARACTER*500 FITSDIR               ! FITS directory
+      CHARACTER*5   ORIGIN                ! Origin of FITS file
 
 *    Local data :
 *     <any DATA initialisations for local variables>
@@ -676,7 +679,18 @@
 *
 *  Append extension of FITS extension containing header
          FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) // '_bas.fits'
-         CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
+
+*  Does file exist in current directroy?
+         CALL UTIL_FINDFILE('.', FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+         IF (NFILES .LE. 0) THEN
+            CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS)
+            FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
+         END IF
+
+         CALL MSG_PRNT('XRTCORR : Using FITS file : '//FILENAME)
+
 *
 *  Open the FITS file
          CALL FIO_GUNIT(IUNIT, STATUS)
@@ -811,6 +825,7 @@ D            WRITE(3,*)EXPOS(TLP)
         PARAMETER (MXCOL = 512)
       INTEGER NROWS                                ! Fits table, no of rows
       INTEGER NHDU                                 ! Fits header, unit
+      INTEGER NFILES                               ! Number of files
       INTEGER VARIDAT                              ! Fitsio variable
       INTEGER TFIELDS            ! Fits header, no fields per rows
 
@@ -818,10 +833,20 @@ D            WRITE(3,*)EXPOS(TLP)
       CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
       CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
       CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
-
+      CHARACTER*100 FILES(MAXRAW)                   ! List of FITS files
+      CHARACTER*500 FITSDIR                         ! FITS directory
 *-
 *  Append extension of FITS extension containing header
       FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) // '_bas.fits'
+
+*  Does file exist in current directroy?
+      CALL UTIL_FINDFILE('.', FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+      IF (NFILES .LE. 0) THEN
+         CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS)
+         FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
+      END IF
 *
       CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
 *
@@ -848,6 +873,16 @@ D            WRITE(3,*)EXPOS(TLP)
 *  Both the EVRATE and ASPECT tables are in _ANC.FITS
       FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) //'_anc.fits'
 *
+*  Does file exist in current directroy?
+      CALL UTIL_FINDFILE('.', FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+      IF (NFILES .LE. 0) THEN
+         CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS)
+         FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
+      END IF
+*
+      CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT,STATUS)
       CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
@@ -1173,6 +1208,7 @@ D            WRITE(3,*)EXPOS(TLP)
       INTEGER MXCOL                                ! Max number of columns
         PARAMETER (MXCOL = 512)
       INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NFILES                               ! Number of files
       INTEGER NHDU                                 ! Fits header, unit
       INTEGER VARIDAT                              ! Fitsio variable
       INTEGER TFIELDS            ! Fits header, no fields per rows
@@ -1182,10 +1218,22 @@ D            WRITE(3,*)EXPOS(TLP)
       CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
       CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
       CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+      CHARACTER*100 FILES(MAXRAW)                   ! List of FITS files
+      CHARACTER*500 FITSDIR                         ! FITS directory
+
 
 *-
 *  Append extension of FITS extension containing header
       FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) // '_bas.fits'
+*
+*  Does file exist in current directroy?
+      CALL UTIL_FINDFILE('.', FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+      IF (NFILES .LE. 0) THEN
+         CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS)
+         FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
+      END IF
 *
       CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
 *
@@ -1213,6 +1261,17 @@ D            WRITE(3,*)EXPOS(TLP)
 *  Both the EVRATE and ASPECT tables are in _ANC.FITS
       FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) //'_anc.fits'
 
+*  Does file exist in current directroy?
+      CALL UTIL_FINDFILE('.', FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+      IF (NFILES .LE. 0) THEN
+         CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS)
+         FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
+      END IF
+*
+      CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
+*
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT,STATUS)
       CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
