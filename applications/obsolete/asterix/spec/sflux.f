@@ -55,6 +55,7 @@
 *                        additive model components. (DJA)
 *      8 Feb 94 : V1.7-3 More changes to FIT_MCALC interface (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     24 Apr 95 : V1.8-1 Updated data interface (DJA)
 *
 *    Type definitions :
 *
@@ -88,7 +89,6 @@
       RECORD /MODEL_SPEC/ MODEL      	! model specification
       RECORD /MODEL_SPEC/ TMODEL      	! Term model specification
 
-      CHARACTER*(DAT__SZLOC) MLOC    	! locator to fit_model data object
       CHARACTER*79           TXT        ! Output text
 
       REAL ELBOUND(MAXEN)            	! lower bounds of energy channels
@@ -111,6 +111,7 @@
       REAL Z                         	! redshift [ Eobs/Esource=1/(1+z) ]
 
       INTEGER J                      	! loop counter
+      INTEGER			MFID			! Model spec dataset id
       INTEGER NEN                    	! no of input (energy) channels
       INTEGER NPAR                   	! total no of model parameters
       INTEGER NTERM			! No. additive terms
@@ -119,13 +120,12 @@
       INTEGER TERMS(MAXCOMP,MAXTERM)	! Additive terms
 
       LOGICAL FROZEN(NPAMAX)         	! FROZEN facility
-      LOGICAL INPRIM                 	! primitive input data?
       LOGICAL SPLIT                     ! Split model into components?
 *
 *    Version :
 *
       CHARACTER*30 VERSION
-	PARAMETER		( VERSION='SFLUX Version 1.8-0' )
+	PARAMETER		( VERSION='SFLUX Version 1.8-1' )
 *-
 
 *    Version
@@ -139,8 +139,8 @@
       MODEL.GENUS='SPEC'
 
 *    Read in the model to be fitted
-      CALL USI_ASSOCI('MODEL','READ',MLOC,INPRIM,STATUS)
-      CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
+      CALL USI_TASSOCI( 'MODEL', '*', 'READ', MFID, STATUS )
+      CALL FIT_TMODGET(MFID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
       IF ( STATUS.NE.SAI__OK ) GOTO 9000
 
 *    Look for redshift
@@ -246,7 +246,7 @@
       CALL USI_PUT0R( 'PFLUX', PHOTONS, STATUS )
 
 *    Tidy up and exit
-      CALL USI_ANNUL(MLOC,STATUS)
+      CALL USI_TANNUL(MFID,STATUS)
  9000 CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 

@@ -108,7 +108,6 @@
 
 	CHARACTER*(DAT__SZLOC) ILOC	! Locator to input data (or ref object)
 	CHARACTER*(DAT__SZLOC) OLOC	! Locator to output multiple dataset
-	CHARACTER*(DAT__SZLOC) MLOC	! Locator to model_spec object
 	CHARACTER*(DAT__SZLOC) QLOC	! Locator to quality array
 	CHARACTER*(DAT__SZLOC) SLOC	! Locator to slice
 	CHARACTER*80 MODSPEC		! Model spec (for title)
@@ -126,6 +125,8 @@
 
         INTEGER NGOOD
         INTEGER SSCALE
+        INTEGER			MFID			! Model spec dataset id
+
 	INTEGER N			! Dataset index
 	INTEGER NPAR			! No of parameters
 	INTEGER NACT			! No of values mapped
@@ -197,9 +198,10 @@
         ENDIF
 
 * Get model specification
-	CALL USI_ASSOCI('MODEL','READ',MLOC,MPRIM,STATUS)
-	CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
-	CALL CMP_GET0C(MLOC,'SPEC',MODSPEC,STATUS)
+	CALL USI_ASSOCI('MODEL','*','READ',MFID,STATUS)
+	CALL FIT_TMODGET(MFID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,
+     :                   STATUS)
+        MODSPEC = MODEL.SPEC
 
 *   Look for redshift
         CALL SFIT_GETZ( Z, STATUS )
