@@ -76,9 +76,6 @@ itcl::class gaia::GaiaTextImport {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
-      #  Set title of window.
-      wm title $w_ "GAIA: Text file import ($itk_option(-number))"
-
       #  Add short help window
       make_short_help
 
@@ -131,6 +128,24 @@ itcl::class gaia::GaiaTextImport {
          pack $itk_component(outfile) -side top -fill x -ipadx 1m -ipady 2m
          add_short_help $itk_component(outfile) \
             {Name of output catalogue}
+      }
+
+      #  If the result is a TAB table then we can specify the
+      #  equinox of the values.
+      if { $itk_option(-format) == "tab" } {
+         itk_component add equinox {
+            LabelEntryMenu $w_.equinox \
+               -text "Equinox:" \
+               -labelwidth 9
+         }
+         foreach equinox "2000 1950" {
+            $itk_component(equinox) add \
+               -label $equinox \
+               -value $equinox
+         }
+         pack $itk_component(equinox) -side top -fill x -ipadx 1m -ipady 2m
+         add_short_help $itk_component(equinox) \
+            {Equinox of imported coordinates (decimal years)}
       }
 
       #  Add notebook to contain the various controls.
@@ -230,21 +245,21 @@ itcl::class gaia::GaiaTextImport {
    public method accept {} {
       if { [save_file_] } {
          wm withdraw $w_
-         configure -outfile $itk_option(-outfile)
+         incr saved_
       }
    }
 
    #  Close window without writing file.
    public method cancel {} {
       wm withdraw $w_
-      configure -outfile {}
+      incr saved_
    }
 
    #  Activate interface, waiting until window is closed. Return the 
    #  filename and which coordinates where found.
    public method activate {} {
       wm deiconify $w_
-      tkwait variable [scope itk_option(-outfile)]
+      tkwait variable [scope saved_]
       return [list $itk_option(-outfile) $raout_ $decout_ $xout_ $yout_]
    }
 
@@ -642,6 +657,9 @@ itcl::class gaia::GaiaTextImport {
                puts $outid "dec_col: $values_($this,dec)"
                set decout_ 1
             }
+            if { $values_($this,ra) != {} || $values_($this,dec) != {} } {
+               puts $outid "equinox: [$itk_component(equinox) get]"
+            }            
             if { $values_($this,x) != {} } {
                puts $outid "x_col: $values_($this,x)"
                set xout_ 1
@@ -654,6 +672,12 @@ itcl::class gaia::GaiaTextImport {
             for {set i 0} {$i < $ncolumns_} {incr i} {
                append headings "$values_($this,heading$i)\t"
             }
+            if { $values_($this,ra) != {} && $values_($this,dec) != {}
+                 || 
+                 $values_($this,x) != {} && $values_($this,y) != {} } {
+               puts $outid "symbol: {} circle 4"
+            }
+
             puts $outid "$headings"
             puts $outid "---------"
             set count 0
@@ -851,6 +875,9 @@ itcl::class gaia::GaiaTextImport {
    protected variable decout_ -1
    protected variable xout_ -1
    protected variable yout_ -1
+
+   #  Variable to trace when output file is written.
+   protected variable saved_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

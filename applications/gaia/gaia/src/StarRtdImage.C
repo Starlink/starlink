@@ -203,7 +203,7 @@ public:
   int max_args;                                      // Maximum number of args
 } subcmds_[] = {
    { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
-   { "astaddcolour",  &StarRtdImage::astaddcolourCmd, 1, 1 },
+   { "astaddcolour",  &StarRtdImage::astaddcolourCmd, 2, 2 },
    { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
    { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
    { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
@@ -1410,8 +1410,13 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
 //   Purpose:
 //       Make a Tcl colour available in the AST graphics interface.
 //
+//    Notes:
+//       The two input values are an index for the colour (the maximum
+//       index is 63) and the colour itself (in a form understood by
+//       Tk).
+//
 //    Return:
-//       TCL status and an index for the colour.
+//       TCL status.
 //
 //-
 int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
@@ -1419,9 +1424,17 @@ int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::astaddcolourCmd" << endl;
 #endif
-    astTk_Init( interp_, canvasName_ );  // Make sure that default 
-                                         // colours are established.
-    set_result( astTk_AddColour( argv[0] ) );
+
+    //  Extract the index.
+    int index = 0;
+    if ( Tcl_GetInt( interp_, argv[0], &index ) != TCL_OK ) {
+        return error( argv[0], " is not an integer");
+    } else {
+        // Make sure that default colours are established and add new
+        // one.
+        astTk_Init( interp_, canvasName_ );  
+        astTk_AddColour( index, argv[1] );
+    }
     return TCL_OK;
 }
 

@@ -144,6 +144,10 @@ itcl::class gaia::GaiaPositions {
    #  Destructor:
    #  -----------
    destructor  {
+      if { $importer_ != {} && [winfo exists $importer_] } {
+         catch {delete object $importer_}
+      }
+
    }
 
    #  Methods:
@@ -228,7 +232,7 @@ itcl::class gaia::GaiaPositions {
       {Read a suitable set of positions from an ordinary text file}
 
       #  Set the exit menu item
-      $File add command -label {Exit closing window   } \
+      $File add command -label {Exit} \
          -command [code $this close] \
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
@@ -467,12 +471,21 @@ itcl::class gaia::GaiaPositions {
          #  Start import dialog. The output file is fixed and the user
          #  chooses the input file. The format of the output file is
          #  the correct astrometry format.
-         set importer [gaia::GaiaTextImport $w_.\#auto \
-                          -outfile "GaiaPositions.Dat" \
-                          -format ast \
-                          -show_infile 1 \
-                          -show_outfile 0]
-         lassign [$importer activate] outfile ra dec x y
+         if { $importer_ == {} } {
+            set importer_ [gaia::GaiaTextImport $w_.\#auto \
+                              -outfile "GaiaPositions.Dat" \
+                              -title "Import positions text file" \
+                              -format ast \
+                              -show_infile 1 \
+                              -show_outfile 0]
+         } else {
+            utilReUseWidget gaia::GaiaTextImport $importer_ \
+               -outfile "GaiaPositions.Dat" \
+               -format ast \
+               -show_infile 1 \
+               -show_outfile 0
+         }
+         lassign [$importer_ activate] outfile ra dec x y
 
          #  Get "id ra dec x y" positions from new file and read into
          #  table.
@@ -566,6 +579,9 @@ itcl::class gaia::GaiaPositions {
 
    #  Last content of table when closed.
    protected variable oldcontents_ {}
+
+   #  Window for importing text files.
+   protected variable importer_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

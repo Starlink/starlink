@@ -52,15 +52,17 @@
 #     TopLevelWidget
 
 #  Copyright:
-#     Copyright (C) 1999 Central Laboratory of the Research Councils
+#     Copyright (C) 1999-2001 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     15-APR-1999 (PDRAPER):
+#     15-APR-1999 (PWD):
 #        Original version.
+#     05-APR-2001 (PWD):
+#        Added option to customize colours.
 #     {enter_further_changes_here}
 
 #-
@@ -177,6 +179,14 @@ itcl::class gaia::GaiaContour {
          {Use single width} \
          {Draw all contours with the same width}
 
+      #  Add an option to add a customized colour to menus.
+      $Options add command \
+         -label {Add custom colour...} \
+         -command [code $this choose_custom_colour]
+      $short_help_win_ add_menu_short_help $Options \
+         {Add custom colour...} \
+         {Choose a new colour for menus}
+
       #  Allow selection of the contoured image.
       add_image_controls_
 
@@ -270,6 +280,13 @@ itcl::class gaia::GaiaContour {
       if { $image_rtd_ != {} } {
 	 catch {image delete $image_rtd_}
       }
+
+      #  Release all ColourMenu objects.
+      if { [info exists colour_menu_] } {
+         for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+            delete $colour_menu_($i)
+         }
+      }
    }
 
    #  Methods:
@@ -344,6 +361,14 @@ itcl::class gaia::GaiaContour {
             puts $fid "\# GAIA Contours configuration file."
             puts $fid "\#"
 
+            #  Add any custom colours first. These need to be
+            #  available before being used.
+            set custom [gaia::AstColours::describe_custom]
+            if { $custom != {} } {
+               puts $fid "\#  Customized colours"
+               puts $fid "colours = \{$custom\}"
+            }
+
             #  Get the level attributes.
             set levatts [get_levels_and_atts_]
 
@@ -379,7 +404,7 @@ itcl::class gaia::GaiaContour {
             puts $fid "xkeypos = [$itk_component(xkeypos) get]"
             puts $fid "ykeypos = [$itk_component(ykeypos) get]"
             puts $fid "keyfont = [$itk_component(keyfont) get]"
-            set colour [gaia::ColourMenu::lookup_index [$itk_component(keycolour) get]]
+            set colour [gaia::AstColours::lookup_index [$itk_component(keycolour) get]]
             puts $fid "keycolour = $colour"
             puts $fid "keylength = [$itk_component(keylength) get]"
             puts $fid "keywidth = [$itk_component(keywidth) get]"
@@ -438,12 +463,11 @@ itcl::class gaia::GaiaContour {
    }
 
    #  Add a new contour at a given position.
-   protected method add_contour_ {ncont value colour width} {
+   protected method add_contour_ {ncont value index width} {
       $itk_component(value$ncont) configure -value $value
       $itk_component(width$ncont) configure -value $width
-      #$itk_component(colour$ncont) configure -value $indexcol_($colour)
       $itk_component(colour$ncont) \
-         configure -value [gaia::ColourMenu::lookup_index $colour]
+         configure -value [gaia::AstColours::lookup_colour $index]
    }
 
    #  Assign a parameter value read back from a configuration file.
@@ -472,9 +496,8 @@ itcl::class gaia::GaiaContour {
          keycolour {
             set orig $itk_option(-drawkey)
             set itk_option(-drawkey) 0
-            #$itk_component($param) configure -value $indexcol_($value)
             $itk_component($param) configure \
-               -value [gaia::ColourMenu::lookup_colour $value]
+               -value [gaia::AstColours::lookup_colour $value]
             set itk_option(-drawkey) $orig
          }
          keytitle -
@@ -487,6 +510,9 @@ itcl::class gaia::GaiaContour {
             set itk_option(-drawkey) 0
             $itk_component($param) configure -value $value
             set itk_option(-drawkey) $orig
+         }
+         colours {
+            restore_custom_ $value
          }
          default {
             warning_dialog "unrecognised configuration parameter: $param"
@@ -570,7 +596,7 @@ itcl::class gaia::GaiaContour {
       #  Set up the default colours (wrapped at maximum number).
       for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          set index [expr int(fmod($i,15))]
-         set coldefault_($i) [gaia::ColourMenu::lookup_colour $index]
+         set coldefault_($i) [gaia::AstColours::lookup_colour $index]
       }
 
       #  Now add the controls for the actual values.
@@ -592,10 +618,12 @@ itcl::class gaia::GaiaContour {
          }
 
          #  Now add all the colours to it.
-         gaia::ColourMenu \#auto $itk_component(colour$i) \
-            -change_cmd [code $this set_colour_ $i] \
-            -image $itk_option(-rtdimage) 
-         
+         set colour_menu_($i) \
+            [gaia::ColourMenu \#auto $itk_component(colour$i) \
+                -change_cmd [code $this set_colour_ $i] \
+                -image $itk_option(-rtdimage) \
+                -show_custom 0]
+
          #  Set to next colour in list.
          $itk_component(colour$i) configure -value $coldefault_($i)
 
@@ -616,11 +644,38 @@ itcl::class gaia::GaiaContour {
 
          #  Need to make geometries up to date, otherwise a user define
          #  BorderWidth property seems to leave all widgets size 1.
-         update idletasks 
+         update idletasks
 
          #  Add these to the grid.
          grid $itk_component(value$i) $itk_component(colour$i) \
               $itk_component(width$i)
+      }
+   }
+
+   #  Choose and then add a custom colour to the menus.
+   public method choose_custom_colour {} {
+      set new_colour [gaia::ColourMenu::choose_custom_colour]
+      if { $new_colour != {} } {
+         add_custom_colour $new_colour -1
+      }
+   }
+
+   #  Add a customized colour to the menus. Use an index if
+   #  supplied. Otherwise create one.
+   public method add_custom_colour { new_colour {index -1} } {
+
+      #  Slight trick here is to get a valid index first and then use
+      #  t for all additional entries
+      set index [$colour_menu_(0) add_custom_colour $new_colour $index]
+      for {set i 1} {$i < $itk_option(-maxcnt)} {incr i} {
+         $colour_menu_($i) add_custom_colour $new_colour $index
+      }
+   }
+
+   #  Restore menu custom colours.
+   protected method restore_custom_ {spec} {
+      foreach {index colour} "$spec" {
+         add_custom_colour $colour $index 
       }
    }
 
@@ -774,8 +829,8 @@ itcl::class gaia::GaiaContour {
          set value [$itk_component(value$i) get]
          if { $value != {} } {
             set colour [$itk_component(colour$i) get]
-            set colour [gaia::ColourMenu::lookup_index $colour]
-            #set colour $colindex_($colour)
+            set was $colour
+            set colour [gaia::AstColours::lookup_index $colour]
             set width [expr [$itk_component(width$i) get]*0.005]
             lappend atts "colour(curve)=$colour,width(curve)=$width"
          }
@@ -790,8 +845,7 @@ itcl::class gaia::GaiaContour {
       set value [$itk_component(value$index) get]
       if { $value != {} } {
          set colour [$itk_component(colour$index) get]
-         set colour [gaia::ColourMenu::lookup_index $colour]
-         #set colour $colindex_($colour)
+         set colour [gaia::AstColours::lookup_index $colour]
          set width [expr [$itk_component(width$index) get]*0.005]
          set atts "colour(curve)=$colour,width(curve)=$width"
       }
@@ -817,8 +871,7 @@ itcl::class gaia::GaiaContour {
          set value [$itk_component(value$i) get]
          if { $value != {} } {
             set colour [$itk_component(colour$i) get]
-            set colour [gaia::ColourMenu::lookup_index $colour]
-            #set colour $colindex_($colour)
+            set colour [gaia::AstColours::lookup_index $colour]
             set width [$itk_component(width$i) get]
             lappend atts "$value $colour $width"
          }
@@ -1130,7 +1183,7 @@ itcl::class gaia::GaiaContour {
    #  Set the colour of a contour (if it is drawn), or all contours if
    #  using a single colour.
    protected method set_colour_ {level colindex} {
-      set colour [gaia::ColourMenu::lookup_colour $colindex]
+      set colour [gaia::AstColours::lookup_colour $colindex]
       if { $single_colour_ } {
          for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
             $itk_component(colour$i) configure -value $colour
@@ -1664,6 +1717,9 @@ itcl::class gaia::GaiaContour {
 
    #  Whether to use a single width for all lines.
    protected variable single_width_ 0
+
+   #  Array of the ColourMenu objects in use.
+   protected variable colour_menu_
 
    #  Common variables: (shared by all instances)
    #  -----------------

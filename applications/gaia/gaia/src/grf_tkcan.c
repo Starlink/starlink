@@ -184,7 +184,7 @@ static char *Fonts[19] = {
  *    14   Dark Gray              0.33, 0.33, 0.33
  *    15   Light Gray             0.66, 0.66, 0.66
  */
-static char *FixedColours[] = {
+static char *StandardColours[] = {
     "#fffffffff", "#000", "#f00", "#0f0", "#00f", "#0ff", "#f0f",
     "#ff0", "#f80", "#8f0", "#0f8", "#08f", "#80f", "#f08",
     "#512751275127", "#a8b4a8b4a8b4"
@@ -196,7 +196,7 @@ static char *FixedColours[] = {
 static char *Colours[MAXCOLOURS];
 
 /*
- *  The number of indexed colours.
+ *  The number of indexed colours initialised.
  */
 static int numColours = 0;
 
@@ -241,7 +241,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
 
  *-
  */
-    int i;   /* Loop variable */
+    int i;         /* Loop variable */
 
     /*  Record the names of the canvas and its interpreter */
     if ( thecanvas != NULL ) {
@@ -269,9 +269,18 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     /*  Set the default colormap (this can be overwritten and
         extended, but is only initialised once) */
     if ( numColours == 0 ) {
-        for (i = 0; i < sizeof( FixedColours ) / sizeof( char * ) ; i++ ) {
-            (void) astTk_AddColour( FixedColours[i] );
+        numColours = sizeof( StandardColours ) / sizeof( char * );
+        for (i = 0; i < numColours; i++ ) {
+            Colours[i] = NULL;
+            (void) astTk_AddColour( i, StandardColours[i] );
         }
+
+        /*  Extra colours are white */
+        for (i = numColours; i < MAXCOLOURS; i++ ) {
+            Colours[i] = NULL;
+            (void) astTk_AddColour( i, StandardColours[0] );
+        }
+        numColours = MAXCOLOURS;
     }
 
     /*  Need a line segment item. */
@@ -327,44 +336,45 @@ void astTk_Tag( const char *newtag ) {
     NewSegment = 1;
 }
 
-int astTk_AddColour( const char *colour ) {
+void astTk_AddColour( const int index, const char *colour ) {
 /*
  *+
  *  Name:
  *     astTk_AddColour
-
+ 
  *  Purpose:
  *     Add an indexed Tcl colour to the colour list.
 
  *  Synopsis:
  *     include "grf_tkcan.h"
- *     int astTk_AddColour( const char *colour )
+ *     int astTk_AddColour( const int index, const char *colour )
 
  *  Description:
  *     This routine makes a new colour available to the GRF
  *     interface. The colour is specified by a Tcl string (acceptable
- *     to Tcl_Color, usually a hexidecimal string) which should be
- *     specified by the integer value returned by this routine.
+ *     to Tcl_Color, usually a hexidecimal string) and an index for
+ *     the colour.
  *
- *     By default a list of 16 colours are made available, extra
- *     colours added by this routine are "appended" to this list.
+ *     By default a list of 16 colours are made available. These may
+ *     be overwritten by required. Gaps in an index sequence are set
+ *     to the default colour.
  *
  *     The maximum number of colours is MAXCOLOURS.
+ *
+ *     Failure is silent.
 
  *  Parameters:
  *     const char *colour
  *        The Tcl colour to be added.
 
- *  Return:
- *     integer index to use when specifying this colour via the AST
- *     interface. 
-
  *-
  */
-    if ( numColours < MAXCOLOURS ) {
-        Colours[numColours++] = (char *) strdup( colour );
+    if ( index < MAXCOLOURS ) {
+        if ( Colours[index] != NULL ) {
+            free( Colours[index] );
+        }
+        Colours[index] = (char *) strdup( colour );
     }
-    return numColours - 1;
 }
 
 void astTk_LineType( int segments, int smooth ) {
@@ -1152,7 +1162,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
         if( old_value ) *old_value = (double) ConfigInfo.colour;
         
         if( value != AST__BAD ){
-            ival = MAX( 0, MIN( 15, (int) value ) );
+            ival = MAX( 0, MIN( MAXCOLOURS - 1, (int) value ) );
             
             /* Need a new segment item if the value has changed. */
             if ( ival != ConfigInfo.colour ) {

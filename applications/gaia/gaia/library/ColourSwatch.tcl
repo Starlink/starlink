@@ -6,8 +6,8 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Dialog for choosing an RGB colour, either from the full range or
-#     from a set of standard X11 colours.
+#     Dialog for choosing an RGB/HSB/CMY colour, either from the full
+#     range or from a set of standard X11 colours.
 
 #  Description:
 #     The standard colours are chosen to closely match the "rgb.txt"
@@ -23,6 +23,8 @@
 #     .cs destroy
 #
 #     The object withdraws on accept and close.
+#
+#     The choice of colour space is decided using a file menu option.
 
 #  Invocations:
 #
@@ -94,7 +96,7 @@ itcl::class gaia::ColourSwatch {
          frame $w_.butfrm.sliders
       }
 
-      #  Scale for red component.
+      #  Scale for first component.
       itk_component add red {
          scale $itk_component(sliders).r \
             -label Red: \
@@ -193,17 +195,17 @@ itcl::class gaia::ColourSwatch {
 		     -fill "#$colour" \
 		     -width 2]
          scan $colour "%02x%02x%02x" red green blue
-         
+
          $frm bind $tag <ButtonPress-1> \
 			  [code $this set_rgb_color $red $green $blue]
-         
+
          set temp [expr $red + [expr $green + $blue]]
          set bming [expr abs([expr $green - $blue])]
          set rminb [expr abs([expr $red - $green])]
          set gminr [expr abs([expr $green - $red])]
-         
+
          set sumodiff [expr $gminr + [expr $bming + $rminb]]
-         
+
          set name [lindex $colnamelist $i]
          if {$sumodiff < 350 && $temp < 400} {
 	    set tag [$frm create text 100 [expr [expr $framer *30] + 15] \
@@ -216,7 +218,7 @@ itcl::class gaia::ColourSwatch {
          }
          $frm bind $tag <ButtonPress-1> \
 			  [code $this set_rgb_color $red $green $blue]
-         
+
          incr framer
       }
 
@@ -279,7 +281,7 @@ itcl::class gaia::ColourSwatch {
 
    #  Activate the chooser and allow the selection of a colour.
    #  Result is 1 or 0 according to whether accept or cancel is
-   #  pressed. 
+   #  pressed.
    public method activate {} {
       wm deiconify $w_
       if { $itk_option(-modal) } {
@@ -307,14 +309,14 @@ itcl::class gaia::ColourSwatch {
    public method cancel {} {
       close_window_
       set status_ 0
-   } 
+   }
 
    #  Close the window.
    protected method close_window_ {} {
       wm withdraw $w_
       if {$itk_option(-modal)} {
          grab release $w_
-      }      
+      }
    }
 
    #  Configuration options: (public variables)

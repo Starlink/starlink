@@ -24,7 +24,7 @@
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 
 #  Inherits:
 #     Methods and configuration options of SkyCat (and Rtd).
@@ -178,6 +178,11 @@ itcl::class gaia::Gaia {
             }
          }
          set skycat_images $tmp
+      }
+
+      #  Kill the importer dialog, if used.
+      if { $importer_ != {} && [winfo exists $importer_] } {
+         catch {delete object $importer_}
       }
    }
 
@@ -422,7 +427,7 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-i> [code $image_ pick_dialog]
       bind $w_  <Control-f> [code $image_ view_fits_header]
 
-      #  Add item to show any AST warnings abot the header associated
+      #  Add item to show any AST warnings about the header associated
       #  with the image.
       set index [$m index "Fits header..."]
       incr index
@@ -580,9 +585,17 @@ itcl::class gaia::Gaia {
          {Perform interactive galaxy surface photometry} \
          -command [code $this make_toolbox esp] \
 
-      add_menuitem $m command "Select positions...  " \
-         {Select or identify object positions and properties} \
+      add_menuitem $m cascade "Positions..." \
+         {Select or import object positions} \
+         -menu [menu $m.positions]
+
+      add_menuitem $m.positions command "Select positions...  " \
+         {Record or import object positions and measure properties} \
          -command [code $this make_toolbox positions] \
+
+      add_menuitem $m.positions command "Import plain text file..." \
+         {Import a space or fixed width plain text file as a catalogue} \
+         -command [code $this import_catalogue_]
 
       add_menuitem $m command "Mean X & Y profiles...  " \
          {Show X and Y averaged profiles of a rectangular region} \
@@ -1392,6 +1405,31 @@ itcl::class gaia::Gaia {
 	 -maincanvas [$image_ get_canvas]
    }
 
+   #  Import a text file as a catalogue.
+   protected method import_catalogue_ {} {
+      busy {
+         #  Start import dialog. The output file is fixed and the user
+         #  chooses the input file. The format of the output file is a
+         #  TAB table.
+         utilReUseWidget gaia::GaiaTextImport $importer_ \
+            -title "Import text file to catalogue" \
+            -outfile "GaiaTextImport.TAB" \
+            -format tab \
+            -show_infile 1 \
+            -show_outfile 1
+
+         #  Wait for import to complete and get the catalogue name.
+         lassign [$importer_ activate] outfile
+         if { $outfile != {} && [file exists $outfile] } { 
+            cat::AstroCat::open_catalog_window \
+               $outfile \
+               [code $image_] \
+               ::gaia::GaiaSearch \
+               0 $this
+         }
+      }
+   }
+
    # -- public variables (also program options) --
 
    #  Mark displayed image as temporary, these are deleted on exit
@@ -1481,6 +1519,9 @@ itcl::class gaia::Gaia {
 
    #  Unique identifier for items to be ignored when drawn on canvas.
    protected variable ast_tag_ ast_element
+
+   #  The text catalogue importer dialog.
+   protected variable importer_ .importer
 
    # -- Common variables --
 
