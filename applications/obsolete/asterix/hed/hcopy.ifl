@@ -1,9 +1,10 @@
- INTERFACE HCOPY
+INTERFACE HCOPY
+
     PARAMETER INP
        TYPE 'UNIV'
        position 1
        prompt 'Object to copy'
-       help 'Full specification of input object eg.  FILE.NEXT.OBJECT'
+       help 'Full specification of input object eg. file.next.object'
     ENDPARAMETER
 
     PARAMETER OUT
@@ -13,5 +14,4 @@
        help 'Full name of output object'
     ENDPARAMETER
 
- ENDINTERFACE
-
+ENDINTERFACE
