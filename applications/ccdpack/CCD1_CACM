@@ -13,6 +13,10 @@
 *     information about a mapped character array to the source and 
 *     sink routines required when using AST Channels.
 
+*  Requirements:
+*     DAT__SZLOC must be declared by including DAT_PAR before this 
+*     file is included.
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -36,12 +40,16 @@
 *           Current position in array.
 *        CCD1_CAPTR = INTEGER
 *           Pointer to character array.
+*        CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
+*           Locator for HDS component storing the character array.
       INTEGER CCD1_CALEN
       INTEGER CCD1_CANUM
       INTEGER CCD1_CAPOS
       INTEGER CCD1_CAPTR
+      CHARACTER * ( DAT__SZLOC ) CCD1_CALOC
 
 *  Define common block.
-      COMMON/ CCD1_CACM / CCD1_CALEN, CCD1_CANUM, CCD1_CAPOS, CCD1_CAPTR
+      COMMON/ CCD1_CACM / CCD1_CALEN, CCD1_CANUM, CCD1_CAPOS, 
+     :                    CCD1_CAPTR, CCD1_CALOC
 
 * $Id$

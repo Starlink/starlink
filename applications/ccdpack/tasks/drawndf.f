@@ -4,7 +4,7 @@
 *     OUTLINE
 
 *  Purpose:
-*     Draws outlines of multiple NDFs.
+*     Draws aligned outlines of multiple NDFs.
 
 *  Language:
 *     Starlink Fortran 77
@@ -40,6 +40,13 @@
 *     coordinate system of all the NDFs is one in which they are all
 *     registered.  If they do not all have the same current Domain
 *     name, a warning will be issued.
+*
+*     OUTLINE is aware of the AGI graphics database; if the CLEAR
+*     parameter is set to false then it will attempt to align the
+*     outline drawings with suitably registered images which are
+*     already on the graphics device.  This allows one, for instance,
+*     to overlay the outlines of a set of NDFs on a mosaic image
+*     which has been constructed using those NDFs.
 *
 *     This routine is designed for use on two-dimensional NDFs; if any
 *     of the NDFs presented has more than two dimensions, any extra
@@ -442,9 +449,8 @@ c        CALL AST_CLIP( PLOT, AST__NOFRAME, GLBND, GUBND, STATUS )
 c        CALL PGSCLP( 0 )
       END IF
 
-*  If either the attempt to use AGI failed or we have been asked to 
-*  clear the device, we need to determine the boundaries of the area 
-*  in which to plot.
+*  If we have been asked to clear the device, we need to determine the 
+*  boundaries of the area in which to plot.
       IF ( PLOT .EQ. AST__NULL ) THEN
          XMIN = VAL__MAXD
          YMIN = VAL__MAXD
@@ -497,6 +503,10 @@ c        CALL PGSCLP( 0 )
 *  and with enough space for labelling round the outside.
          CALL PGWNAD( REAL( XMIN ), REAL( XMAX ), REAL( YMIN ),
      :                REAL( YMAX ) )
+
+*  Create a new AGI picture with the name 'DATA'.
+         CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE frame outlines',
+     :                    PICID, STATUS )
 
 *  Turn the global frameset into an AST Plot.
          CALL CCD1_APLOT( FSET, PICID, .FALSE., PLOT, STATUS )
@@ -676,8 +686,8 @@ c        CALL PGSCLP( 0 )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( 'IMPORT_ERR','OUTLINE: {context_message}.',
-     :     STATUS )
+          CALL ERR_REP( 'OUTLINE_ERR',
+     :                  'OUTLINE: Outline plotting failed.', STATUS )
       END IF
 
 *  Close CCDPACK logging system.

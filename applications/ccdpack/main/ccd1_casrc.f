@@ -48,6 +48,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'CCD1_PAR'         ! Local CCDPACK constants
       
 *  Global Variables:
@@ -59,6 +60,8 @@
                                  !    Current position in array
                                  ! CCD1_CAPTR = INTEGER
                                  !    Pointer to character array
+                                 ! CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
+                                 !    Locator for HDS component storing array
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -73,7 +76,6 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
 
 *  If there are no lines left, indicate this to the AST system.
       IF ( CCD1_CAPOS .GT. CCD1_CANUM ) THEN

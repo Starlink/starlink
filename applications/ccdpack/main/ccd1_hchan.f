@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_HCHAN( LOC, OPTIONS, CHAN, STATUS )
+      SUBROUTINE CCD1_HCHAN( LOC, ACMODE, CHAN, STATUS )
 *+
 *  Name:
 *     CCD1_HCHAN
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_HCHAN( LOC, OPTIONS, CHAN, STATUS )
+*     CALL CCD1_HCHAN( LOC, ACMODE, CHAN, STATUS )
 
 *  Description:
 *     This routine creates an AST channel for use within CCDPACK using 
@@ -23,10 +23,13 @@
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
 *        An HDS locator for the component to be read from/written to.
-*        It must be a 1-dimensional array of type _CHAR.
-*     OPTIONS = CHARACTER * ( * ) (Given)
-*        A character string containing an optional comma-separated list
-*        of attribute assignments for passing to AST_CHANNEL.
+*        It must be a 1-dimensional array of type _CHAR*N.  N and the
+*        extent of the array can both be any small integer larger 
+*        than 1; lines are broken into several array elements and
+*        the array extended if necessary.
+*     ACMODE = CHARACTER * ( * ) (Given)
+*        Access mode, 'READ' or 'WRITE' according to whether you want
+*        to read from the Channel or write to it.
 *     CHAN = INTEGER (Returned)
 *        AST pointer to a new channel reading from/writing to the HDS
 *        locator referred to by LOC.
@@ -36,8 +39,7 @@
 *  Restrictions:
 *     As currently implemented, only one AST channel created by this 
 *     routine may be in use at once.  No check is performed that the 
-*     channel is not already in use.  It is probably not a good idea
-*     to read and write on the same channel.
+*     channel is not already in use.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
@@ -74,10 +76,12 @@
                                  !    Current position in array
                                  ! CCD1_CAPTR = INTEGER
                                  !    Pointer to character array
+                                 ! CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
+                                 !    Locator for HDS component storing array
 
 *  Arguments Given:
       CHARACTER * ( DAT__SZLOC ) LOC
-      CHARACTER * ( * ) OPTIONS
+      CHARACTER * ( * ) ACMODE
       
 *  Arguments Returned:
       INTEGER CHAN
@@ -89,12 +93,21 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL CCD1_CASRC        ! Source routine for AST channel
+      EXTERNAL CCD1_CASRC        ! Source routine for AST Channel
+      EXTERNAL CCD1_CASNK        ! Sink routine for AST Channel
       
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Validate the access mode.
+      IF ( ACMODE .NE. 'READ' .AND. ACMODE .NE. 'WRITE' ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCD1_HCHAN_BADMODE', 'CCD1_HCHAN: ' //
+     :                 'Bad access mode specified (programming error)',
+     :                 STATUS )
+      END IF
 
 *  Get the type and shape of the HDS component.
       CALL DAT_TYPE( LOC, TYPE, STATUS )
@@ -111,12 +124,19 @@
      :                 STATUS )
       END IF
 
+*  Store the locator.
+      CCD1_CALOC = LOC
+
 *  Map the component.
-      CALL DAT_MAPV( LOC, '_CHAR', 'UPDATE', CCD1_CAPTR, CCD1_CANUM,
+      CALL DAT_MAPV( LOC, '_CHAR', ACMODE, CCD1_CAPTR, CCD1_CANUM,
      :               STATUS )
 
 *  Create the AST channel.
-      CHAN = AST_CHANNEL( CCD1_CASRC, AST_NULL, OPTIONS, STATUS )
+      IF ( ACMODE .EQ. 'READ' ) THEN
+         CHAN = AST_CHANNEL( CCD1_CASRC, AST_NULL, ' ', STATUS )
+      ELSE IF ( ACMODE .EQ. 'WRITE' ) THEN
+         CHAN = AST_CHANNEL( AST_NULL, CCD1_CASNK, ' ', STATUS )
+      END IF
 
 *  Initialise the position in the array.
       CCD1_CAPOS = 1
