@@ -112,18 +112,13 @@
 *  Create comment object
       CALL ADI_NEWV0C( CMNT, CID, STATUS )
 
-*  Get keyword number and update
-      IF ( UPDATE ) THEN
+*  Allocate a number for the card
+      CALL ADI2_ADDCRC( HDUID, 'C', CID, NCARD, STATUS )
 
-*    Mark as updated
+*  Mark as updated?
+      IF ( UPDATE ) THEN
         CALL ADI2_MRKCHG( HDUID, CID, STATUS )
         CALL ADI_CPUT0L( CID, '.New', .TRUE., STATUS )
-
-      ELSE
-
-*    Allocate a number for the card
-        CALL ADI2_ADDCRC( HDUID, 'C', CID, NCARD, STATUS )
-
       END IF
 
 *  Create structure name from card number

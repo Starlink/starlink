@@ -141,7 +141,7 @@
 
 *    Mark the keyword as changed if the mode wasn't read
         IF ( MODE .NE. 'READ' ) THEN
-          CALL ADI_CPUT0L( KID, '.Changed', .TRUE., STATUS )
+          CALL ADI2_MRKCHG( PHDU, KID, STATUS )
         END IF
 
 *    Store the mapping details

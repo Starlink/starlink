@@ -102,8 +102,12 @@
       EXTERNAL			HSI1_PTXT
       EXTERNAL			HSI1_PUTCTR
 
+      EXTERNAL			HSI2_ADD
+      EXTERNAL			HSI2_PTXT
+
       EXTERNAL			ADI_DEFMTH
       EXTERNAL			ADI_REQPKG
+      EXTERNAL			ADI_NULMTH
 
 *  Local Variables:
       INTEGER			DID			! Unused method id
@@ -140,6 +144,13 @@
         CALL ADI_DEFMTH( 'AddHistory(_HDSfile,_CHAR)', HSI1_ADD,
      :                   DID, STATUS )
         CALL ADI_DEFMTH( 'NewHistory(_HDSfile)', HSI1_NEW,
+     :                   DID, STATUS )
+
+        CALL ADI_DEFMTH( 'AddHistoryText(_FITSfile,_CHAR[])', HSI2_PTXT,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'AddHistory(_FITSfile,_CHAR)', HSI2_ADD,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'NewHistory(_FITSfile)', ADI_NULMTH,
      :                   DID, STATUS )
 
 *    Now initialised

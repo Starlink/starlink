@@ -112,18 +112,13 @@
 *  Create history object
       CALL ADI_NEWV0C( HIST, CID, STATUS )
 
-*  Get keyword number and update
-      IF ( UPDATE ) THEN
+*  Allocate a number for the card
+      CALL ADI2_ADDCRC( HDUID, 'H', CID, NCARD, STATUS )
 
-*    Mark keyword as changed
+*  Mark as an updated card if required
+      IF ( UPDATE ) THEN
         CALL ADI2_MRKCHG( HDUID, CID, STATUS )
         CALL ADI_CPUT0L( CID, '.New', .TRUE., STATUS )
-
-      ELSE
-
-*    Allocate a number for the card
-        CALL ADI2_ADDCRC( HDUID, 'H', CID, NCARD, STATUS )
-
       END IF
 
 *  Create structure name from card number
