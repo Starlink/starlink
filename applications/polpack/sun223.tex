@@ -15,14 +15,15 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.5}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {19th December 2000}
+\newcommand{\stardocdate}      {22nd February 2001}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 2.1-7}
+\newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
-reducing imaging polarimetry data. They cover registration, sky subtraction, 
-calculation of Stokes parameters, and display of vector maps.}
+reducing imaging polarimetry or spectropolarimetry data. They cover 
+registration, sky subtraction, calculation of Stokes parameters, and 
+display of vector maps.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -637,9 +638,11 @@ the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
 
 \section{\xlabel{introduction}Introduction}
 POLPACK is a package of applications for mapping the linear or circular
-polarization of extended astronomical objects. Data from both single and
-dual beam polarimeters can be processed\footnote{At the moment, circular
-polarization can only be measured when using dual-beam data.}.
+polarization of extended astronomical objects, either in a single
+waveband, or in multiple wavebands (spectropolarimetry). Data from both
+single and dual beam polarimeters can be processed\footnote{At the
+moment, circular polarization can only be measured when using dual-beam
+data.}.
 
 POLPACK processes data in \emph{NDF} format. This is the standard data
 format used by most Starlink software, and is described fully in
@@ -677,8 +680,8 @@ releases.}.
 
 \begin{itemize}
 
-\item Data from polarimeters containing the following optical components 
-can be processed:
+\item Data from polarimeters or spectropolarimeters containing the following 
+optical components can be processed:
 
 \begin{enumerate}
 \item A fixed analyser and a rotating half-wave plate.
@@ -712,8 +715,9 @@ That is, the ``exposure times'' are all assumed to be equal.
 
 \begin{itemize}
 
-\item It is assumed that the polarimeter contains a fixed analyser and a
-rotating half or quarter wave-plate which is stepped in units of 45\dgs. 
+\item It is assumed that the polarimeter or spectropolarimeter contains a 
+fixed analyser and a rotating half or quarter wave-plate which is stepped 
+in units of 45\dgs. 
 
 \item Both linear and circular polarization can be measured. 
 
@@ -745,6 +749,9 @@ dual-beam polarimetry. It explains words and concepts used later, and
 defines the data model used by POLPACK. A well established example of a
 dual-beam polarimeter is described by Scarrott et al. (\emph{Mon. Not. R.
 astr. Soc.} (1983) \textbf{204}, 1163 - 1177).
+
+Single waveband polarimetry is described here but the principles can be
+extended to imaging spectropolarimetry (see \hyperref{here}{section }{}{SEC:SPEC}).
 
 \subsection{The Polarimeter}
 A dual-beam polarimeter suitable for measuring linear polarization usually 
@@ -1029,6 +1036,9 @@ This section gives a brief introduction to the general principles of
 single-beam polarimetry. It explains words and concepts used later, and
 defines the data model used by POLPACK. 
 
+Single waveband polarimetry is described here but the principles can be
+extended to imaging spectropolarimetry (see \hyperref{here}{section }{}{SEC:SPEC}).
+
 \subsection{\label{SEC:SBPOLARIM}The Polarimeter}
 An exposure from a single-beam polarimeter consists of an image of the sky 
 in a single state of polarization. Some form of \emph{analyser} within
@@ -1065,7 +1075,7 @@ effect of this is to  rotate the plane of polarization of the light so
 that the axis of the half-wave plate bisects the angle between the planes 
 of polarization in the incoming and outgoing light.
 
-This form of polarimeter is shown diagramatically in 
+This form of polarimeter is shown diagrammatically in 
 \latex{Figure~\ref{fig:singopt}.} \html{the next figure:}
 
 \begin{latexonly}
@@ -1203,10 +1213,36 @@ summarised below. For more details \hyperref{go here}{see section }
 {}{SEC:DBRED}. Details of how POLPACK can be used to implement these
 ideas in practice are given in later sections of this document. 
 
+\section{\label{SEC:SPEC}\xlabel{spectropolarimetrydatareduction}Spectropolarimetry
+Data Reduction}
+POLPACK assumes that spectropolarimetry data is identical to single
+waveband polarimetry data, except that each data file has an extra pixel
+axis giving spectral channel. Thus, analysed intensity data is stored in a
+3 dimensional NDF in which the first two pixel axes are spatial axes, and the
+third axis gives the spectral channel. Stokes vectors are stored in a 4
+dimensional NDF in which axes 1 and 2 are spatial, axis 3 is spectral, and
+axis 4 corresponds to Stokes parameter (1=I, 2=Q, 3=U, \emph{etc}).
+Vector catalogues have an extra column (``Z'') giving the spectral channel.
+
+The data in each spectral channel is processed as if it were data from a
+single waveband polarimeter (\emph{i.e.} the processing of each spectral
+channel is largely independent of the processing of the other spectral
+channels). The one exception to this is that the \htmlref{POLBIN}{POLBIN}
+application can bin adjacent spectral channels, as well as binning
+adjacent spatial pixels.
+
+In general, and unless otherwise stated, all POLPACK applications will handle
+spectropolarimeter data in the same way that it handles single waveband
+data. However, for ``historical reasons'' you may find a bias towards single 
+waveband data in the documentation. References to \emph{intensity images}
+should be understood as meaning \emph{intensity images or cubes}, and 
+\emph{Stokes cubes} should be taken as \emph{Stokes cubes or 4D
+hyper-cubes}.
+
 \section{\label{SEC:POLRED}\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
 This section gives a detailed description of the steps involved in using
 POLPACK to produce a vector map from single-beam or dual-beam polarimetry
-data. It is assumed that the data conforms to the model outlined in one
+or spectropolarimetry data. It is assumed that the data conforms to the model outlined in one
 of the two previous sections. An over-view of the data reduction process
 is given in \latex{Figure~\ref{fig:dataflow}.} \html{the next figure:}
 
@@ -1246,11 +1282,12 @@ information about these issues:
 \end{itemize}
 
 \subsection{\label{SEC:CONVERT}\xlabel{formatconversion}Format Conversion}
+
 The first step is to ensure that your data files are in a format which
-POLPACK can process. The native data format used by POLPACK is the 
-Starlink \xref{NDF}{sun33}{} format (note, NDF structures are usually stored in
-files with a file type of \verb+.sdf+). If your data is already in this
-format, then you can proceed immediately to the next step. Otherwise,
+POLPACK can process. The native data format used by POLPACK is the
+Starlink \xref{NDF}{sun33}{} format (note, NDF structures are usually
+stored in files with a file type of \verb+.sdf+). If your data is already 
+in this format, then you can proceed immediately to the next step. Otherwise, 
 you have two options:
 
 \begin{enumerate}
@@ -1299,6 +1336,29 @@ contrary), and you should understand these as referring to your own
 non-NDF data files.
 
 \end{enumerate}
+
+For spectropolarimetry data, the spectral channel must vary along pixel
+axis 3, and pixel axes 1 and 2 must be spatial axes. The KAPPA
+application \xref{PERMAXES}{sun95}{PERMAXES} can be used to rearrange
+axes into the required order. If your data is one dimensional
+(\emph{i.e.} has no spatial coverage) then you can use PERMAXES as
+follows to add two spatial axes each covering a single pixel:
+
+\begin{myquote}
+\begin{verbatim}
+% permaxes in="data-1d(,1,1)" out=data-3d perm="[2,3,1]"
+\end{verbatim}
+\end{myquote}
+
+where {\tt data-1d.sdf} is the 1-dimensional input file, and {\tt
+data-3d.sdf} is the 3-dimensional output file. The section specifier
+``{\tt (,1,1)}'' indicates that {\tt data-1d} should be treated as if it
+had 2 extra trailing axes each spanning a single pixel. PERMAXES then
+rearranges the axes so that the spectral axis (previously axis 1) becomes
+the last axis (axis 3). Of course, since there is no spatial coverage,
+you will not be able to display such data using \htmlref{POLPLOT}{POLPLOT} 
+(use \htmlref{POLIMAGE}{POLIMAGE} and KAPPA \xref{LINPLOT}{sun95}{LINPLOT} 
+instead). 
 
 \subsection{\label{SEC:CCDPACK}Corrections for Instrumental Effects}
 POLPACK expects your data to be calibrated so that the pixel values are
@@ -1545,7 +1605,15 @@ options are provided to allow the user to customise the exact recipe
 used, POLKA does not provide as much versatility or control over the
 processing as would be available if the individual applications were
 called ``by hand''. If you hit a problem which POLKA cannot handle, then
-you may need to adopt this alternative approach.
+you may need to adopt this alternative approach. 
+
+One specific restriction on POLKA is that it can only be used with
+2-dimensional intensity images (\emph{i.e.} not 3-dimensional
+spectropolarimetry data). To create Stokes vectors from 3-dimensional
+intensity cubes, the cubes must first be aligned in both the spatial and
+the spectral domain (\emph{e.g.} using CCDPACK and KAPPA applications
+``by hand''), and then \htmlref{POLCAL}{POLCAL} should be used to create
+a 4-dimensional hyper cube containing Stokes vectors.
 
 POLKA requires you to identify the following features within the supplied
 images:
@@ -1672,14 +1740,16 @@ describing the polarization at different points on the sky:
 
 \begin{quote}
 \begin{description}
-\item [\htmlref{POLVEC}{POLVEC}] - This converts a 3D cube containing Stokes parameters
-(such as produced by POLKA or POLCAL) into a catalogue of polarization
-vectors containing the following columns:
+\item [\htmlref{POLVEC}{POLVEC}] - This converts a 3 or 4D NDF containing 
+Stokes parameters (such as produced by POLKA or POLCAL) into a catalogue
+of polarization vectors containing the following columns:
 
 \begin{quote}
 \begin{description}
 \item [X] - X pixel co-ordinates within the supplied cube.
 \item [Y] - Y pixel co-ordinates within the supplied cube.
+\item [Z] - Z pixel co-ordinates within the supplied cube (only produced
+            for spectropolarimetry data).
 \item [I] - Total intensity.
 \item [Q] - Stokes parameter Q.
 \item [U] - Stokes parameter U.
@@ -1690,16 +1760,20 @@ the plane of polarization, in degrees.
 \end{quote}
 
 For circular polarimetry, the Q and U columns are replaced by a single V
-column. If variance information is available (see \hyperref{here}{section }
-{}{SEC:CCDPACK}) then columns are also produced holding the standard
-deviations associated with each of the above quantities (except X and Y).
-The catalogue contains a single row for each pixel in the x-y plane of
-the supplied cube. The reference direction for the $Q$, $U$ and $ANG$
-columns is chosen in the same way as when producing the Stokes vectors
-(\emph{i.e.} north, if WCS information is available to define north, or
-the second image axis otherwise).
+column. If variance information is available (see \hyperref{here}{section
+} {}{SEC:CCDPACK}) then columns are also produced holding the standard
+deviations associated with each of the above quantities (except X, Y and
+Z). Each pixel in the x-y plane of the supplied cube produces one or more
+rows in the catalogue, the number being equal to the number of spectral
+channels in the data. So for single waveband polarimetry, the catalogue
+will contain one row for each pixel in the x-y plane, but for
+spectropolarimetry data with (say) 100 spectral channels, there will be
+100 rows for each pixel in the x-y plane. The reference direction for the
+$Q$, $U$ and $ANG$ columns is chosen in the same way as when producing
+the Stokes vectors (\emph{i.e.} north, if WCS information is available to
+define north, or the second image axis otherwise).
 
-POLVEC can also produce a set of 2D images holding the above quantities.
+POLVEC can also produce a set of 2 or 3D NDFS holding the above quantities.
 
 \item [\htmlref{POLBIN}{POLBIN}] - This accepts a catalogue containing Stokes
 parameters as input (such as produced by POLVEC), and creates a new
@@ -1708,14 +1782,23 @@ fewer polarization vectors). The output catalogue is formed by binning the
 Stokes vectors in the input catalogue within a grid of equally sized
 rectangular bins. Corresponding values for the P and ANG columns are
 calculated on the basis of the binned Stokes parameters.
+Spectropolarimetry data can be binned independently in the spatial and
+spectral axes.
 
 \item [\htmlref{POLPLOT}{POLPLOT}] - This displays a map of polarization 
-vectors, obtained from a catalogue produced by POLVEC or POLBIN. If the
-map is drawn over an existing picture, then the vectors can be aligned
-with the previously displayed picture.
+vectors in a single spectral channel, obtained from a catalogue produced
+by POLVEC or POLBIN (the catalogue must contain more than a single
+spatial position). If the data contains more than one spectral channel,
+the specific spectral channel to display can be selected. If the map is
+drawn over an existing picture, then the vectors can be aligned with the
+previously displayed picture.
 
 \end{description}
 \end{quote}
+
+In addition, the catalogues produced by POLBIN and POLVEC can be examined
+and interactively edited using the polarimetry toolbox within 
+\xref{GAIA}{sun214}{} \latexonly{(SUN/214)}.
 
 Since the polarization parameters are stored in a catalogue, the
 \xref{CURSA}{sun190}{} package \latexonly{(see SUN/190)} can be used to
@@ -1746,7 +1829,7 @@ retained. In this case, the image is formed by binning the column values
 into a grid of pixels.
 
 A typical recipe for using the above applications (together with KAPPA)
-would involve the following steps:
+to display a spatial vector map would involve the following steps:
 
 \begin{enumerate}
 
@@ -1917,6 +2000,83 @@ which can be printed on a suitable printer.
 These are just a few examples of the possibilities for varying the above
 recipe. Familiarity with the parameters of the relevant KAPPA and POLPACK
 applications will suggest many more.
+
+\subsubsection{\label{SEC:SPECDISP}Displaying Spectropolarimetry Data}
+The techniques used in the examples in the previous section can also be
+used to display a single spectral channel when using spectropolarimetry
+data, but only if the data has some spatial coverage (\emph{i.e.} has
+more than 1 pixel in the x-y plane). To do this, specify the spectral
+channel to be displayed by POLPLOT, using parameter ZAXVAL or
+ZCOLVAL. These two parameters specify the spectral channel in different
+ways:
+
+\begin{itemize}
+
+\item ZCOLVAL requires the spectral channel to be given as a value for
+the Z column in the catalogue. This column usually holds floating point 
+pixel coordinates which describe a position on the third pixel axis of 
+the original intensity NDFs. These will usually have a fractional part of
+0.5, indicating that the position refers to the \emph{centre} of a pixel.
+
+\item ZAXVAL requires the spectral channel to be given as a value for the 
+third axis in the current Frame of the WCS component of the original
+intensity NDFs. If the spectral axis has been calibrated, this axis may
+specify the spectral channel in some physical units such as Hertz,
+Angstroms, nanometres, microns, km/s, \emph{etc}. If the spectral channel
+has \emph{not} been calibrated, then ZAXVAL will usually require a value
+in pixel coordinates to be supplied (just like ZCOLVAL). The units
+required by ZAXVAL can be determined by entering a colon (``:'') when
+prompted for ZAXVAL. This will produce a description of the current
+coordinate Frame (you should supply a value for axis 3). The details of
+the description depend on the nature of the WCS calibration supplied in
+the original NDFs (which is outside the control of POLPACK).
+
+\end{itemize}
+
+If a ZAXVAL value is supplied, it is converted into the corresponding
+ZCOLVAL value. Either way, only vectors for which the Z column value
+in the catalogue equals the specified ZCOLVAL value are plotted. If
+the catalogue contains no vectors with the specified ZCOLVAL, then the 
+nearest ZCOLVAL for which some vectors are available is used instead of
+the supplied ZCOLVAL. The value actually used is reported to the user
+and included in the default title for the plot.
+
+An alternative method for displaying spectropolarimetry data is to use
+KAPPA \xref{LINPLOT}{sun95}{LINPLOT} to display line plots of the
+quantities of interest, as a function of spectral channel. This method
+has the advantage that, unlike POLPLOT, it can be used even if your data
+has no spatial coverage (\emph{i.e.} covers only a single pixel in the
+x-y plane). Before using LINPLOT you need to create an NDF containing the
+data to be plotted. To do this, use \htmlref{POLIMAGE}{POLIMAGE}. As an
+example, to plot polarization against wavelength at ( x=1.5, y=2.5 ) for
+the data in catalogue {\tt mycat.FIT}, do:
+
+\begin{myquote}
+\begin{verbatim}
+   % polimage in=mycat out=pdata coldat=p colvar="dp*dp" box="[5,5,3\]"
+   % linplot ndf="pdata(2,3,)" errbar
+\end{verbatim}
+\end{myquote}
+
+POLIMAGE creates the file {\tt pdata.sdf} which is a 3D NDF containing
+the values from the ``P'' column in {\tt mycat.FIT}. The VARIANCE
+component of the NDF is filled with the square of the values in the
+``DP'' column (do not supply a value for parameter COLVAR if the
+catalogue does not contain a suitable error column). The values assigned
+to the BOX parameter should usually be the same as the bin sizes used to
+create the catalogue (use 1,1,1 if the catalogue has not been binned).
+The LINPLOT command then plots the NDF data values at X and Y pixel
+indices of 2 and 3 (\emph{i.e.} pixel \emph{coordinates} ( 1.5, 2.5 ) ),
+and covering the entire third (Z) axis. If the catalogue contains data
+only for a single x-y position, then the LINPLOT parameter NDF could be
+assigned the value ``pdata'' (without any section specified) since there
+is no ambiguity about which x-y pixel to use. The ERRBAR parameter
+indicates that error bars are to be plotted (this would not be possible
+if we had not assigned a value to the COLVAR parameter when running
+POLIMAGE).
+
+There are many other options for using these applications. See there
+reference documentation for details.
 
 \subsection{\xlabel{gettinghelp}Getting Help}
 Information describing all POLPACK commands is available in several forms: 
@@ -2560,8 +2720,7 @@ extension.}{ POLEXP }
 \quickdes{POLHELP}{Displays textual help information for POLPACK.}{
 POLHELP }
 
-\quickdes{POLIMAGE}{Converts a catalogue into a 1 or 2-dimensional NDF.}
-{ POLIMAGE }
+\quickdes{POLIMAGE}{Converts a catalogue into an NDF.}{ POLIMAGE }
 
 \quickdes{POLKA}{An X-based GUI which converts raw photometric images
 into Stokes vectors.}{ POLKA }
@@ -2586,6 +2745,7 @@ These descriptions follow the style used in \xref{SUN/95}{sun95}{ap_full}
 for NDF applications.
 
 \newpage
+\newpage
 \sstroutine{
    POLBIN
 }{
@@ -2598,16 +2758,17 @@ for NDF applications.
 
       The bins used form a grid of equally sized rectangular cells, the
       dimensions of each cell being specified by the parameter BOX in
-      terms of the X and Y columns in the catalogue. The grid contains
-      sufficient cells to span the entire range of X and Y covered by the
-      input catalogue. Each position in the output catalogue corresponds
-      to one of these cells. The Stokes parameters for the cell are formed
-      by combining together the Stokes parameters of all input positions
-      which fall within the cell, using the method specified by the
-      parameter METHOD. The degree of polarization, angle of polarization,
-      and polarized intensity are then derived from these combined Stokes
-      parameters. The (X,Y) positions in the output catalogue are the
-      positions at the centre of each of the cells.
+      terms of the X and Y columns in the catalogue. Spectropolarimetry
+      data can also be binned in the frequency axis (see parameter ZBOX).
+      The grid contains sufficient cells to include all the vector
+      positions included in the input catalogue. Each position in the output
+      catalogue corresponds to one of these cells. The Stokes parameters for
+      the cell are formed by combining together the Stokes parameters of all
+      input positions which fall within the cell, using the method specified
+      by the parameter METHOD. The degree of polarization, angle of
+      polarization, and polarized intensity are then derived from these
+      combined Stokes parameters. The vector position in the output catalogue
+      is the position at the centre of the corresponding cell.
    }
    \sstusage{
       polbin in out box [method]
@@ -2619,6 +2780,8 @@ for NDF applications.
          The x and y bin sizes. These values refer to the coordinate Frame
          defined by columns {\tt "}X{\tt "} and {\tt "}Y{\tt "} and will usually be in units of pixels.
          This parameter is not accessed if parameter INTEGRATE is TRUE.
+         Parameter ZBOX specifies binning along the frequency axis when
+         dealing with spectropolarimeter data.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
@@ -2689,6 +2852,14 @@ for NDF applications.
          Number of standard deviations to reject data at. Only used if
          METHOD is set to {\tt "}SIGMA{\tt "}. [4.0]
       }
+      \sstsubsection{
+         ZBOX = \_REAL (Read)
+      }{
+         The bin size along the third (Z) axis in the input catalogue.
+         a Z column. The supplied value should usually be in units of pixels.
+         This parameter is not accessed if parameter INTEGRATE is TRUE, or
+         if the input catalogue does not contain a Z column.
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -2714,15 +2885,17 @@ for NDF applications.
 
          \sstitem
          The bottom left corner of each bin is chosen so that the origin
-         of the (X,Y) Frame would correspond to a bin corner.
+         of the (X,Y) Frame (or (X,Y,Z) Frame if the data is 3D) would
+         correspond to a bin corner.
       }
    }
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1998 Central Laboratory of the Research Councils
+      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
+\newpage
 \sstroutine{
    POLCAL
 }{
@@ -2730,9 +2903,12 @@ for NDF applications.
    vectors
 }{
    \sstdescription{
-      This application converts a set of 2D intensity images into a
-      3D data cube holding a Stokes vector at every pixel in the area
-      covered by the supplied intensity images.
+      This application converts a set of input NDFs holding analysed intensity,
+      into an output NDF holding a Stokes vector at every pixel in the supplied
+      input NDFs. If the input NDFs are 2-dimensional images, the output NDF
+      will be 3-dimensional. If the input NDFs are 3-dimensional cubes
+      (spectropolarimetry data for instance), the output NDF will be
+      4-dimensional.
 
       Either dual or single beam data can be processed, with an
       appropriate algorithm being used in each case. There is also an
@@ -2742,11 +2918,19 @@ for NDF applications.
       All the input images should be aligned pixel-for-pixel, and should
       have had the sky background removed. O and E ray images in
       dual-beam data should have been extracted into separate images.
+      If the input arrays are 3D, the first two pixels axes must be the
+      spatial axes, and all planes within each input cube must be spatially
+      aligned. Corresponding 2D planes within 3D input cubes are processed
+      independently of each other, using the same algorithm used for 2D
+      input images.
 
-      The output consists of a 3D cube containing values of I, Q and U
-      in planes 1, 2 and 3. Currently, circular polarimetry can only be
-      performed by the dual-beam algorithm, in which case the output cube
-      contains only 2 planes holding I and V values (see parameter PMODE).
+      The final axis in the output array corresponds to Stokes parameter
+      and has bounds 1:3 (this will be axis 3 if the inputs are 2D or axis
+      4 if the inputs are 3D). Axis values 1, 2 and 3 correspond to I, Q
+      and U respectively. Currently, circular polarimetry can only be
+      performed by the dual-beam algorithm, in which case the final axis of
+      the output has bounds 1:2, corresponding to I and V values (see
+      parameter PMODE).
    }
    \sstusage{
       polcal in out
@@ -2757,17 +2941,17 @@ for NDF applications.
       }{
          This parameter is only accessed by the single-beam algorithm
          when parameter WEIGHTS is set to 3. If TRUE, a constant value
-         is added to the data values read from each input data array 
+         is added to the data values read from each input data array
          to correct for any differences in zero points. The constant
          value used for each input array is chosen so that the residuals
          between the input array and the corresponding intensity values
-         implied by the Stokes vectors produced on the previous iteration, 
+         implied by the Stokes vectors produced on the previous iteration,
          have a mean value of zero. Set ILEVEL to 3 or more to see the
-         values used. Selecting the DEZERO option can
-         reduce the variances in the output cube, but usually slows down 
-         convergence of the iterative procedure. Thus you may have to give 
-         a larger value for parameter MAXIT, resulting in significantly 
-         longer run time. [FALSE]
+         values used. Selecting the DEZERO option can reduce the variances
+         in the output cube, but usually slows down convergence of the
+         iterative procedure. Thus you may have to give a larger value
+         for parameter MAXIT, resulting in significantly longer run time.
+         [FALSE]
       }
       \sstsubsection{
          DUALBEAM = \_LOGICAL (Read)
@@ -2776,7 +2960,7 @@ for NDF applications.
          If FALSE they are processed as single-beam data. If a null (!)
          value is supplied, the dual-beam algorithm is used if all the input
          images contain a legal value for the RAY item in the POLPACK
-         extension (\emph{i.e.} either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
+         extension (i.e. either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
          algorithm is used. It is possible to process dual-beam data using
          the single-beam algorithm, so DUALBEAM may be set to FALSE even
          if the input images hold dual-beam data. However, the opposite
@@ -2803,26 +2987,26 @@ for NDF applications.
          describing such things as warnings and the E and F factors
          adopted (in dual-beam mode). A value of 2 produces more verbose
          output including details of each iteration in the iterative
-         processes used by both dual and single beam modes. A value of
+         processes used by both dual and single-beam modes. A value of
          3 produces additional details about each individual input image in
-         single beam mode. [1]
+         single-beam mode. [1]
       }
       \sstsubsection{
          IN = NDF (Update)
       }{
-         A group specifying the names of the input intensity images. This
-         may take the form of a comma separated list, or any of the other
-         forms described in the help on {\tt "}Group Expressions{\tt "}. Read access
-         only is required unless the SETVAR parameter is assigned a TRUE
-         value.
+         A group specifying the names of the input intensity images or
+         cubes. This may take the form of a comma separated list, or any of
+         the other forms described in the help on {\tt "}Group Expressions{\tt "}. Read
+         access only is required unless the SETVAR parameter is assigned a
+         TRUE value.
       }
       \sstsubsection{
          MAXIT = \_INTEGER (Read)
       }{
-         This parameter is only accessed by both single and dual-beam
+         This parameter is accessed by both single and dual-beam
          algorithm, but is used slightly differently in each case.
 
-         In dual beam mode, it specifies the maximum number of iterations
+         In dual-beam mode, it specifies the maximum number of iterations
          to be used when inter-comparing pairs of input images to determine
          their relative scale-factor and/or zero-point. If the specified
          number of iterations is exceeded without achieving the accuracy
@@ -2835,23 +3019,23 @@ for NDF applications.
          to be used when estimating input variances or rejecting aberrant
          input values. The default value depends on the value supplied for
          parameter WEIGHTS. If WEIGHTS indicates that estimates of the input
-         variances are to be made (\emph{i.e.} if WEIGHTS has the value 2 or 3),
+         variances are to be made (i.e. if WEIGHTS has the value 2 or 3),
          then the default value is 8. Otherwise, if variances in the input
-         NDFs are to be used (\emph{i.e.} if WEIGHTS is 1), the default is zero.
+         NDFs are to be used (i.e. if WEIGHTS is 1), the default is zero.
          This is because each iteration is a computationally expensive
          process, and so iterations should only be performed if they are
          really necessary. MAXIT is always fixed at zero if WEIGHTS is 4
-         (\emph{i.e.} if all input data are given constant weight). See also
+         (i.e. if all input data are given constant weight). See also
          parameter TOLR. []
       }
       \sstsubsection{
          MINFRAC = \_REAL (Read)
       }{
          This parameter is only accessed by the single-beam algorithm
-         when iteratively rejecting input values (\emph{i.e.} if MAXIT is
+         when iteratively rejecting input values (i.e. if MAXIT is
          greater than zero). It controls how much good input data is
          required to form a good output pixel. It is given as a fraction
-         in the range 0 to 1. The miminum number of good input values
+         in the range 0 to 1. The minimum number of good input values
          required to form a good output value at a particular pixel is
          equal to this fraction multiplied by the number of input NDFs
          which have good values for the pixel. The number is rounded to
@@ -2872,11 +3056,12 @@ for NDF applications.
       \sstsubsection{
          OUT = NDF (Read)
       }{
-         The name of the output 3D cube holding the Stokes parameters.
-         The x-y plane of this cube covers the overlap region of the 
-         supplied intensity images (but see parameter TRIMBAD). Plane 1 
-         contains the total intensity. The other planes contain either Q 
-         and U, or V, depending on the value of parameter PMODE.
+         The name of the output 3D or 4D cube holding the Stokes parameters.
+         The x-y plane of this cube covers the overlap region of the
+         supplied intensity images (but see parameter TRIMBAD). Pixel 1
+         on the final axis contains the total intensity. The others
+         contain either Q and U, or V, depending on the value of parameter
+         PMODE.
       }
       \sstsubsection{
          PMODE = LITERAL (Read)
@@ -2914,7 +3099,7 @@ for NDF applications.
 
          A SKYSUP value of unity can often be effective, but a value
          set by the approximate ratio of sky pixels to useful object
-         pixels (\emph{i.e.} those containing non-sky signal) in a {\tt "}typical{\tt "}
+         pixels (i.e. those containing non-sky signal) in a {\tt "}typical{\tt "}
          image will usually be better. The precise value
          is not critical. A value of zero disables the sky noise
          suppression algorithm completely. The default value for SKYSUP
@@ -2928,7 +3113,7 @@ for NDF applications.
          This parameter is only accessed by the single-beam algorithm. It
          specifies the size (in pixels) of the smoothing box to use
          when estimating the variance of the input data. It is only
-         accessed if parameter WEIGHTS is given the value 2 or 3 (\emph{i.e.} if
+         accessed if parameter WEIGHTS is given the value 2 or 3 (i.e. if
          input variances are to be estimated from the spread of the input
          data values).
 
@@ -2956,7 +3141,7 @@ for NDF applications.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A title for the output cube. [Output from POLCAL]
+         A title for the output NDF. [Output from POLCAL]
       }
       \sstsubsection{
          TOLR = \_INTEGER (Read)
@@ -2965,7 +3150,7 @@ for NDF applications.
          specifies the convergence criterion for the iterative process
          which estimates the input variances, and rejects bad input values.
          If the number of pixels rejected from any input NDF changes by more
-         than TOLR pixels between two succesive iterations, then the process
+         than TOLR pixels between two successive iterations, then the process
          is assumed not to have converged and another iteration will be
          performed unless MAXIT iterations have already been performed. [0]
       }
@@ -3061,7 +3246,7 @@ for NDF applications.
       \sstexamplesubsection{
          polcal {\tt "}$*$\_O,$*$\_E{\tt "} stokes nodualbeam
       }{
-         As above, but the data is processed as if it were single beam data.
+         As above, but the data is processed as if it were single-beam data.
       }
    }
    \sstnotes{
@@ -3092,7 +3277,7 @@ for NDF applications.
    \sstdiytopic{
       The Single-beam Algorithm
    }{
-      In single-bean mode, the I, Q and U values at each output pixel are
+      In single-beam mode, the I, Q and U values at each output pixel are
       chosen to minimise the sum of the squared residuals between the
       supplied intensity values and the intensity values implied by the I,
       Q and U values (this is equivalent to fitting sine curves to the
@@ -3100,9 +3285,9 @@ for NDF applications.
       according to the scheme chosen using parameter WEIGHTS. The basic
       algorithm is described by Sparks and Axon (submitted to P.A.S.P.).
 
-      Single beam mode can take account of imperfections in the analyser.
-      The transmission (\emph{i.e.} the overall throughput) and efficiency
-      (\emph{i.e.} the ability to reject light polarized across the axis) of the
+      Single-beam mode can take account of imperfections in the analyser.
+      The transmission (i.e. the overall throughput) and efficiency
+      (i.e. the ability to reject light polarized across the axis) of the
       analyser are read from the POLPACK extension. If not found, values
       of 1.0 are used for both. These values are appropriate for a
       perfect analyser. A perfectly bad analyser (a piece of high quality
@@ -3110,50 +3295,55 @@ for NDF applications.
       efficiency of zero. The extension items named T and EPS hold the
       transmission and efficiency.
 
-      Single beam mode can handle data taken by polarimeters containing
+      Single-beam mode can handle data taken by polarimeters containing
       a number of fixed analysers, or a single rotating analyser, in
       addition to the normal combination of fixed analyser and rotating
-      half-wave plate. The POLPACK extension in each input image should
+      half-wave plate. The POLPACK extension in each input NDF should
       contain either a WPLATE value (giving the angle between a fixed
       analyser and the half-wave plate), or an ANLANG value (giving the
       angle between the rotating or fixed analyser and the polarimeter
       reference direction). Only one of these two extension items
       should be present. The WPLATE and ANLANG items are free to take
-      any value (\emph{i.e.} they are not restricted to the values 0.0, 22.5,
+      any value (i.e. they are not restricted to the values 0.0, 22.5,
       45.0 and 67.5 degrees as in the dual-beam algorithm).
 
-      If the input intensity images do not contain usable variances,
+      If the input intensity NDFs do not contain usable variances,
       then estimates of these variances can be made from the spread of
       supplied data values. This is an expensive iterative process
       (see parameters TOLR and WEIGHTS). Initially, Stokes vectors
-      are estimated assigning a uniform constant weight to all input
-      data values. The I, Q and U images are then smoothed by fitting
-      a quadratic surface to the data within a box centred on each
-      pixel (the size of the box can be specified using parameter
-      SMBOX). For each input image, a similar image is then created
-      holding the squared residual between the input intensity values,
-      and the intensity values implied by the smoothed Stokes vectors
-      (using the known analyser positions, etc, for the images). These
-      images containing squared residuals are then stacked together
-      to obtain a single image holding the mean squared residual at
-      each pixel. This image is then smoothed using a mean box filter
-      of size specified by parameter SMBOX. The values in the resulting
-      image are used as the variance estimates for the input data (note,
-      the same variance estimates are used for all the input images).
+      are estimated by assigning a uniform constant weight to all input
+      data values. The I, Q and U arrays are then smoothed spatially by
+      fitting a quadratic surface to the data within a box centred on each
+      pixel (the size of the box can be specified using parameter SMBOX
+      \sstitemlist{
 
-      If the input arrays have differing zero points, the residuals
-      for any one image will usually not be centred on zero, but will
+         \sstitem
+         no smoothing is applied along any frequency axis). For each input
+         NDF, a similar array is then created holding the squared residual
+         between the input intensity values, and the intensity values implied
+         by the smoothed Stokes vectors (using the known analyser positions,
+         etc, for the NDFs). These arrays containing squared residuals are
+         then stacked together to obtain a single array holding the mean
+         squared residual at each pixel. This array is then smoothed spatially
+         using a mean box filter of size specified by parameter SMBOX. The
+         values in the resulting array are used as the variance estimates for
+         the input data (note, the same variance estimates are used for all
+         the input NDFs).
+
+      }
+      If the input NDFs have differing zero points, the residuals
+      for any one NDF will usually not be centred on zero, but will
       have some non-zero mean determined by the zero point for the
-      array. If uncorrected this would led to an artifically high
-      estimate of the input variance. There is an option (see parameter 
-      DEZERO) to reduce this effect, by using the mean of the residuals 
+      NDF. If uncorrected this would led to an artificially high
+      estimate of the input variance. There is an option (see parameter
+      DEZERO) to reduce this effect, by using the mean of the residuals
       as a zero point correction for the input array. Note however, that
       selecting this option will usually result in significantly
       longer run times, and may require larger values for parameter
       MAXIT.
-      
+
       In order to provide some safe-guards against aberrant values in
-      the input images, input data values which are badly inconsistent
+      the input NDFs, input data values which are badly inconsistent
       with the smoothed Stokes vectors are rejected at this point. Pixels
       are rejected if the corresponding squared residual is greater than
       NSIGMA times the standard deviation expected for the pixel value.
@@ -3173,14 +3363,14 @@ for NDF applications.
       There are a couple of restrictions in single-beam mode. Firstly,
       there is currently no facility for measuring circular
       polarization. Secondly, no attempt is made to correct for
-      difference in the exposure times of the input images, which
+      difference in the exposure times of the input NDFs, which
       should all have been normalised to the same exposure time.
    }
    \sstdiytopic{
       The Dual-beam Algorithm
    }{
       In dual-beam mode, Q and U are estimated by taking the difference
-      between pairs of orthogonally polarized images (\emph{i.e.} the O and E
+      between pairs of orthogonally polarized images (i.e. the O and E
       ray images extracted from a single dual-beam image). The total
       intensity I is estimated by summing such pairs of images. The
       various estimates of these quantities provided by different pairs
@@ -3219,7 +3409,7 @@ for NDF applications.
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
 \sstroutine{
@@ -3700,45 +3890,50 @@ for NDF applications.
       Copyright (C) 1999 Central Laboratory of the Research Councils
    }
 }
+\newpage
 \sstroutine{
    POLIMAGE
 }{
-   Converts a catalogue into a 1 or 2-dimensional NDF
+   Converts a catalogue into an NDF
 }{
    \sstdescription{
-      This application creates a 1D or 2D NDF from a supplied catalogue
-      (see parameter SHAPE). The columns containing data value and
-      (optionally) variance are specified using parameters COLDAT and COLVAR.
+      This application creates an NDF from a supplied catalogue. The
+      output NDF can be either a simple 1-dimensional list of column values
+      without any spatial information, or it can be a 2 or 3 dimensional
+      array in which column values retain their spatial positions (see
+      parameter SHAPE). The columns containing data value and (optionally)
+      variance are specified using parameters COLDAT and COLVAR.
 
-      If a 2D NDF is created, the spatial position of each data value is
-      read from the catalogue columns specified using parameters COLX and
-      COLY. The NDF is formed by bining the catalogue values into a grid
-      of equally sized rectangular cells, the dimensions of each cell being
-      given by parameter BOX. Each pixel in the output NDF corresponds
-      to one of these cells. The  data values for the cell are formed by
-      combining together the COLDAT values of all input positions which
-      fall within the cell, using the method specified by the parameter
-      METHOD.
+      If parameter SHAPE is set TRUE, a 2 or 3 dimensional NDF is created
+      in which the spatial position of each data value is read from the
+      catalogue columns specified using parameters COLX, COLY and COLZ. The
+      NDF is formed by binning the catalogue values into a grid of equally
+      sized rectangular cells, the dimensions of each cell being given by
+      parameter BOX. Each pixel in the output NDF corresponds to one of
+      these cells. The  data values for the cell are formed by combining
+      together the COLDAT values of all input positions which fall within
+      the cell, using the method specified by the parameter METHOD.
 
-      If a 1D NDF is created, the spatial position of each data value is
-      ignored. The data values are just copied into the 1D NDF in the
-      same order that they appear in the input catalogue. That is, the
-      first value in the catalogue becomes pixel 1, the seconds catalogue
-      value becomes pixel 2, \emph{etc}. This avoids any binning of the data
-      values, and is useful if applications which do not use spatial
-      information (such as the KAPPA applications STATS, HISTOGRAM, \emph{etc.})
-      are to be used.
+      If parameter SHAPE is set FALSE, a 1D NDF is created in which the
+      spatial position of each data value is ignored. The data values are
+      just copied into the 1D NDF in the same order that they appear in the
+      input catalogue. That is, the first value in the catalogue becomes
+      pixel 1, the seconds catalogue value becomes pixel 2, etc. This avoids
+      any binning of the data values, and is useful if applications which do
+      not use spatial information (such as the KAPPA applications STATS,
+      HISTOGRAM, etc) are to be used.
    }
    \sstusage{
-      polimage in out coldat [colvar] [colx] [coly] [method]
+      polimage in out coldat [colvar] [colx] [coly] [method] [colz]
    }
    \sstparameters{
       \sstsubsection{
-         BOX( 2 ) = \_REAL (Read)
+         BOX( 3 ) = \_REAL (Read)
       }{
-         The x and y bin sizes. These values refer to the co-ordinate Frame
+         The x, y and z bin sizes. These values refer to the co-ordinate Frame
          given by parameters COLX and COLY. Only accessed if parameter SHAPE
-         is TRUE.
+         is TRUE. If not supplied, the third value defaults to 1.0 and the
+         second value defaults to the first value.
       }
       \sstsubsection{
          COLDAT = LITERAL (Read)
@@ -3748,7 +3943,7 @@ for NDF applications.
          column names is displayed if a non-existent column name is given.
          An arbitrary algebraic combination of columns may be used by
          supplying a CURSA expression instead of a single column name. See
-         \xref{SUN/190}{sun190}{} for details of the syntax of these expressions.
+         SUN/190 for details of the syntax of these expressions.
       }
       \sstsubsection{
          COLVAR = LITERAL (Read)
@@ -3760,7 +3955,7 @@ for NDF applications.
          An arbitrary algebraic combination of columns may be used by
          supplying a CURSA expression instead of a single column name.
          For instance, supplying the string {\tt "}DP$*$$*$2{\tt "} causes the square of
-         the values in column DP to be used. See \xref{SUN/190}{sun190}{} for details of the
+         the values in column DP to be used. See SUN/190 for details of the
          syntax of these expressions. [!]
       }
       \sstsubsection{
@@ -3770,7 +3965,7 @@ for NDF applications.
          of each data value along the first axis. A list of available column
          names is displayed if a non-existent column name is given. An
          arbitrary algebraic combination of columns may be used by supplying
-         a CURSA expression instead of a single column name. See \xref{SUN/190}{sun190}{} for
+         a CURSA expression instead of a single column name. See SUN/190 for
          details of the syntax of these expressions. Only accessed if
          parameter SHAPE is TRUE. [X]
       }
@@ -3778,18 +3973,23 @@ for NDF applications.
          COLY = LITERAL (Read)
       }{
          The name of the catalogue column which gives the coordinate
-         of each data value along the second axis. A list of available column
-         names is displayed if a non-existent column name is given. An
-         arbitrary algebraic combination of columns may be used by supplying
-         a CURSA expression instead of a single column name. See \xref{SUN/190}{sun190}{} for
-         details of the syntax of these expressions. Only accessed if
-         parameter SHAPE is TRUE. [Y]
+         of each data value along the second axis. See COLX for further
+         details. [Y]
+      }
+      \sstsubsection{
+         COLZ = LITERAL (Read)
+      }{
+         The name of the catalogue column which gives the coordinate
+         of each data value along a third axis. If a null (!) value is
+         supplied the output NDF will be 2-dimensional. The dynamic default
+         is {\tt "}Z{\tt "} if the catalogue contains a column named {\tt "}Z{\tt "}, and is null
+         (!) otherwise. See COLX for further details. []
       }
       \sstsubsection{
          IN = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A file type of .FIT
+         supported by the CAT library (see SUN/181). A file type of .FIT
          is assumed if no file type is supplied.
       }
       \sstsubsection{
@@ -3828,8 +4028,8 @@ for NDF applications.
          SHAPE = \_LOGICAL (Read)
       }{
          If a TRUE value is supplied for parameter SHAPE, then the output
-         NDF is 2-dimensional and inherits the spatial positions given in
-         the columns specified by COLX and COLY. If a FALSE value is
+         NDF is 2 or 3-dimensional and inherits the spatial positions given
+         in the columns specified by COLX, COLY and COLZ. If a FALSE value is
          supplied, the output NDF is 1-dimensional and the spatial position
          of each data value is ignored. In this case, the number of pixels
          in the output NDF will equal the number of rows in the input
@@ -3867,19 +4067,21 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
-         If the output NDF is 2-dimensional, it will have an AXIS component
-         representing the COLX and COLY values. It will also inherit any WCS
-         information from the catalogue.
+         If parameter SHAPE is set TRUE, the output NDF will have an AXIS
+         component representing the COLX, COLY and COLZ values. It will also
+         inherit any WCS information from the catalogue so long as the Base
+         Frame of the WCS information is spanned by axes with symbols equal
+         to the names of the columns given by COLX, COLY and COLZ.
 
          \sstitem
-         If the output NDF is 1-dimensional, it will contain no AXIS or
-         WCS components.
+         If parameter SHAPE is set FALSE, the output NDF will contain no AXIS 
+         or WCS components.
       }
    }
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
 \sstroutine{
@@ -4148,7 +4350,7 @@ for NDF applications.
       string, rather than on the value of keyword MYFITS. The two 
       strings included in a replacement specification may themselves be 
       enclosed within parentheses in which case they may be any complex
-      character expression involing literal strings, concatentation
+      character expression involving literal strings, concatenation
       operators and nested replacement specifications.
 
       If a control table contains more than one line for an extension
@@ -4197,13 +4399,14 @@ for NDF applications.
 \sstroutine{
    POLKA
 }{
-   Creates Stokes vectors from a set of intensity frames
+   Creates Stokes vectors from a set of 2-dimensional intensity frames
 }{
    \sstdescription{
-      This application converts a set of intensity frames into a cube
-      containing a Stokes vector for every measured pixel on the sky. It
-      may also be used as an image alignment tool for non-polarimetric
-      data (see parameter POL).
+      This application converts a set of 2D intensity frames into a 3D
+      cube containing a Stokes vector for every measured pixel on the sky. 
+      It may also be used as an image alignment tool for non-polarimetric
+      2D data (see parameter POL). It cannot be used with 3D intensity
+      frames (\emph{e.g.} spectropolarimetry data).
 
       The main processes applied to the data are:
 
@@ -4462,7 +4665,7 @@ for NDF applications.
          The images specified by parameter IN will be aligned with this
          image. If a null (!) value is supplied, the first image in the
          group supplied for parameter IN is used as the reference image.
-         If the reference image is specified using paremeter IN, it will be
+         If the reference image is specified using parameter IN, it will be
          processed like the other images. If the reference image is
          specified using parameter REFIN, it will not be processed. No
          aligned, extracted images will be created from it, and it will
@@ -4649,6 +4852,7 @@ for NDF applications.
       Copyright (C) 1999 Central Laboratory of the Research Councils
    }
 }
+\newpage
 \sstroutine{
    POLPLOT
 }{
@@ -4658,7 +4862,10 @@ for NDF applications.
       This application plots vectors defined by the values contained
       within four columns in a catalogue. These columns give the magnitude
       and orientation of each vector, and the position of each vector (see
-      parameters COLMAG, COLANG, COLX and COLY).
+      parameters COLMAG, COLANG, COLX and COLY). If the catalogue has a
+      third axis (spectral channel for instance), then only vectors with
+      a specified value on the third axis will be plotted (see parameter
+      ZAXVAL).
 
       The plot is produced within the current graphics database picture,
       and may be aligned with an existing DATA picture if the existing
@@ -4681,11 +4888,11 @@ for NDF applications.
       \sstsubsection{
          ANGROT = \_REAL (Read)
       }{
-         A rotation angle in degrees to be added to each vector orientation 
-         before plotting the vectors (see parameters COLANG and NEGATE). It 
+         A rotation angle in degrees to be added to each vector orientation
+         before plotting the vectors (see parameters COLANG and NEGATE). It
          should be the range 0-360. Note, this parameter is named ANGROT
          for historical reasons, and its use should not be confused with
-         the ANGROT extension item (see POLIMP) which gives the orientation 
+         the ANGROT extension item (see POLIMP) which gives the orientation
          of the reference direction. [0.0]
       }
       \sstsubsection{
@@ -4708,7 +4915,7 @@ for NDF applications.
          CAT = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A file type of .FIT
+         supported by the CAT library (see SUN/181). A file type of .FIT
          is assumed if no file type is supplied.
       }
       \sstsubsection{
@@ -4736,7 +4943,7 @@ for NDF applications.
          vector. The values are considered to be in units of degrees unless
          the UNITS attribute of the column has the value {\tt "}Radians{\tt "} (case
          insensitive).  The angles are assumed to be measured anti-clockwise
-         from the reference direction given by the ANGROT parameter. A list
+         from the reference direction specified in the catalogue. A list
          of available column names is displayed if a non-existent column name
          is given. See also parameter NEGATE. [ANG]
       }
@@ -4764,6 +4971,16 @@ for NDF applications.
          displayed if a non-existent column name is given. See the {\tt "}Notes{\tt "}
          section below for further details of how these positions are
          interpreted. [Y]
+      }
+      \sstsubsection{
+         COLZ = LITERAL (Read)
+      }{
+         The name of the catalogue column which gives the position of each
+         vector along a third axis. A list of available column names is
+         displayed if a non-existent column name is given. A null (!)
+         value should be supplied if no third axis is to be used. The dynamic
+         default is {\tt '}Z{\tt '} if the catalogue contains a Z column, and null
+         (!) otherwise. See also parameter ZAXVAL. []
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -4801,7 +5018,7 @@ for NDF applications.
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, \emph{etc}. The two
+            A domain name such as SKY, AXIS, PIXEL, etc. The two
             {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             FrameSet in the catalogue does not contain Frames with these domains.
@@ -4811,9 +5028,8 @@ for NDF applications.
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as 
-            EQUAT(J2000) (see section {\tt "}\xref{Specifying a
-            Co-ordinate Frame}{sun95}{se_scs}{\tt "} in \xref{SUN/95}{sun95}{}). [!]
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). [!]
          }
       }
       \sstsubsection{
@@ -4845,16 +5061,16 @@ for NDF applications.
       \sstsubsection{
          KEYPOS() = \_REAL (Read)
       }{
-         Two values giving the position of the key. The first value gives 
-         the gap between the right hand edge of the vector map and the left 
+         Two values giving the position of the key. The first value gives
+         the gap between the right hand edge of the vector map and the left
          hand edge of the key (0.0 for no gap, 1.0 for the largest gap). A
          positive value will place the key to the right of (i.e. outside)
          the vector map, and a negative value will place the key inside
-         the vector map. The second value gives the vertical position of the 
-         top of the key (1.0 for the highest position, 0.0 for the lowest). 
-         If the second value is not given, the top of the key is placed 
-         level with the top of the vector map. Both values should be in the 
-         range 0.0 to 1.0. If a key is produced, then the right hand margin 
+         the vector map. The second value gives the vertical position of the
+         top of the key (1.0 for the highest position, 0.0 for the lowest).
+         If the second value is not given, the top of the key is placed
+         level with the top of the vector map. Both values should be in the
+         range 0.0 to 1.0. If a key is produced, then the right hand margin
          specified by parameter MARGIN is ignored. [current value]
       }
       \sstsubsection{
@@ -4878,33 +5094,31 @@ for NDF applications.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section {\tt "}
-         \xref{Plotting Styles and Attributes}{sun95}{se_style}{\tt "} in 
-         \xref{SUN/95}{sun95}{} for a description of the available
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
          By default the key starts with two lines of text, the first
-	 being {\tt "}Vector scale:{\tt "} and the second giving a
-	 numerical value for the scale in units per centimetre. These two
-	 lines may be replaced by assigning alternative text to the Title
-	 attribute using this parameter. If no text is required, either
-	 assign a blank value for Title, or set the DrawTitle attribute
-	 to zero.
+         being {\tt "}Vector scale:{\tt "} and the second giving a numerical value
+         for the scale in units per centimetre. These two lines may be
+         replaced by assigning alternative text to the Title attribute
+         using this parameter. If no text is required, either assign a
+         blank value for Title, or set the DrawTitle attribute to zero.
 
          The appearance of the text in the key is controlled using {\tt "}String{\tt "}
-         attributes (\emph{e.g.} COLOUR(STRINGS), FONT(STRINGS), \emph{etc.} - the synonym
+         attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
          TEXT can be used in place of STRINGS). Note, the Size attribute
          specifies the size of key text relative to the size of the numerical
          labels on the vector map axes. Thus a value of 2.0 for Size will
          result in text which is twice the size of the numerical axis labels.
          The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
-         attributes (\emph{e.g.} COLOUR(CURVES), \emph{etc.} - the synonym VECTOR can be
+         attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
          used in place of CURVES). The numerical scale value is formatted as
-         an axis 1 value (using attributes FORMAT(1), DIGITS(1), \emph{etc.} - the
+         an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
          synonym SCALE can be used in place of the value 1). The length of
          the example vector is formatted as an axis 2 value (using attribute
-         FORMAT(2), \emph{etc.} - the synonym VECTOR can be used in place of the
+         FORMAT(2), etc - the synonym VECTOR can be used in place of the
          value 2). The vertical space between lines in the key can be
          controlled using attribute TextLabGap. A value of 1.0 is used if
          no value is set for this attribute, and produces default vertical
@@ -4944,8 +5158,8 @@ for NDF applications.
          NEGATE = \_LOGICAL (Read)
       }{
          If a TRUE value is supplied, then the angles giving the
-         orientation of the polarization (\emph{i.e.} the values in the column
-         specified by parameter COLANG) are negated before adding on any 
+         orientation of the polarization (i.e. the values in the column
+         specified by parameter COLANG) are negated before adding on any
          value specified by parameter ANGROT. [FALSE]
       }
       \sstsubsection{
@@ -4969,14 +5183,13 @@ for NDF applications.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section {\tt "}
-         \xref{Plotting Styles and Attributes}{sun95}{se_style}{\tt "} in 
-         \xref{SUN/95}{sun95}{} for a description of the available
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
          The appearance of the vectors is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Vectors may be
+         Colour(Curves), Width(Curves), etc (the synonym Vectors may be
          used in place of Curves). [current value]
       }
       \sstsubsection{
@@ -4994,6 +5207,38 @@ for NDF applications.
          should give the data value corresponding to a vector length of
          one centimetre.  []
       }
+      \sstsubsection{
+         ZAXVAL = LITERAL (Read)
+      }{
+         Specifies the Z axis value for the vectors to be displayed. The
+         given value should be in the current coordinate Frame of the
+         supplied catalogue (see parameter COLZ). For instance, if the
+         current coordinate Frame contains a calibrated wavelength axis,
+         the value should be given in the units specified in that frame
+         (angstroms, nanometres, etc.). If the wavelength axis has not been
+         calibrated, the value will probably need to be supplied in units
+         of pixels. Entering a colon ({\tt "}:{\tt "}) for the parameter will result in
+         a description of the current coordinate Frame being shown. This may
+         help to determine the units in which a value is expected. The
+         value actually used is the closest available value within the
+         catalogue. This value is displayed on the screen and included in
+         the default plot title. The ZAXVAL parameter is only accessed if a
+         null (!) value is supplied for parameter ZCOLVAL. See also
+         parameter COLZ.
+      }
+      \sstsubsection{
+         ZCOLVAL = \_REAL (Read)
+      }{
+         Specifies the Z column value for the vectors to be displayed.
+         The given value should be in the same coordinate system as the
+         values stored in the Z column of the catalogue (usually pixels).
+         This parameter provides an alternative to the ZAXVAL parameter.
+         Use the ZCOLVAL parameter to specify the Z value in pixels, and
+         the ZAXVAL parameter to specify the Z value in Hertz, angstroms,
+         nanometres, etc (if the Z axis has been calibrated). If a null
+         value is supplied for ZCOLVAL, then ZAXVAL is used to determine
+         the Z value to display. [!]
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -5008,7 +5253,7 @@ for NDF applications.
          polplot poltab style=$\wedge$mystyle.dat
       }{
          As above, but the annotated axes and vectors are drawn according
-         to the description given in text file \texttt{mystyle.dat}. If this
+         to the description given in text file mystyle.dat. If this
          files contains the following lines:
 
 \begin{tabbing}
@@ -5031,34 +5276,6 @@ for NDF applications.
          polplot poltab ra dec noclear angrot=90 frame=eq(B1950)
       }{
          Produces a vector map in which each vector is rotated by 90
-         degrees from the orientation specified in the {\tt "}poltab{\tt "}
-         catalogue. The position of each vector is specified by columns
-         {\tt "}ra{\tt "} and {\tt "}dec{\tt "}. The annotated axes give equatorial (RA/DEC)
-         coordinates referred to the equinox of B1950. If the vector map
-         is displayed over an existing DATA picture, then the vector map
-         will be aligned on the sky with the previously displayed data if
-         possible (\emph{i.e.} the FrameSet associated with the existing picture
-         in the AGI database contains a sky coordinate Frame). If this is
-         not possible, then the vector map will be aligned in pixel or
-         grid coordinates. A message is displayed indicating the domain
-         in which alignment took place.
-      }
-      \sstexamplesubsection{
-         polplot poltab arrow=0.01 just=start nokey
-      }{
-         Produces a vector map in which each vector is represented by an
-         arrow, starting at the position of the corresponding pixel.  No key
-         to the vector scale and justification is produced.
-      }
-      \sstexamplesubsection{
-         polplot ABEB.FIT clear=no colx=ra coly=dec colmag=l colang=b
-      }{
-         Reads the non-POLPACK FITS table in file ABEB.FIT, and displays a
-         vector for every row defined by the catalogue columns {\tt "}l{\tt "} and {\tt "}b{\tt "}.
-         The position of each vector is given by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}.
-         If a previous DATA picture has been displayed, and has a calibration
-         in terms of any of the common sky coordinate systems, then the
-         vectors are aligned with the existing DATA picture.
       }
    }
    \sstnotes{
@@ -5075,9 +5292,9 @@ for NDF applications.
          \sstitem
          The columns specified by parameters COLX and COLY should hold
          coordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
-         an AST FrameSet (see \xref{SUN/210}{sun210}{}) in the supplied catalogue. If the
-         catalogue has been produced by one of the POLPACK application \htmlref{POLVEC}{POLVEC}
-         or \htmlref{POLBIN}{POLBIN}, then the Base Frame will be pixel co-ordinates within the
+         an AST FrameSet (see SUN/210) in the supplied catalogue. If the
+         catalogue has been produced by one of the POLPACK application polvec
+         or polbin, then the Base Frame will be pixel co-ordinates within the
          aligned intensity images, and these will be stored in columns with
          names {\tt "}X{\tt "} and {\tt "}Y{\tt "}. If the catalogue was not created by POLPACK, it
          may have no usable WCS information, in which case the supplied
@@ -5087,31 +5304,28 @@ for NDF applications.
          specified by the optional catalogue parameters EPOCH and EQUINOX
          (defaults are used for these parameters if they are not present in the
          catalogue). If the vector map is displayed over an existing DATA
-         picture (\emph{i.e.} if CLEAR=NO) then these RA/DEC positions will be aligned
-         with the existing DATA picture if possible (\emph{i.e.} if the existing
+         picture (i.e. if CLEAR=NO) then these RA/DEC positions will be aligned
+         with the existing DATA picture if possible (i.e. if the existing
          picture has sky coordinate information stored with it).
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
-   }
 }
+\newpage
 \sstroutine{
    POLSIM
 }{
-   Produces intensity images corresponding to given Stokes vectors
+   Produces intensity data corresponding to given Stokes vectors
 }{
    \sstdescription{
-      This application produces intensity images corresponding to given
-      Stokes vectors. A set of template input intensity images are
-      supplied which define the pixel positions, analyser angles, efficiencies,
-      transmissions, \emph{etc}. The pixel values supplied in these templates are
-      ignored. A set of corresponding output intensity images are created
-      which inherit the properties of the input intensity images. The pixel
-      values in these images are calculated using the supplied Stokes
-      vectors, using the analyser properties defined in the input images.
+      This application produces intensity data (either 2D images or 3D
+      cubes) corresponding to given Stokes vectors. A set of template input
+      intensity images or cubes are supplied which define the pixel positions,
+      analyser angles, efficiencies, transmissions, etc. The pixel values
+      supplied in these templates are ignored. A set of corresponding output
+      intensity images or cubes are created which inherit the properties of
+      the input NDFs. The pixel values in these images are calculated using
+      the supplied Stokes vectors, using the analyser properties defined in
+      the input images.
    }
    \sstusage{
       polsim cube in out
@@ -5120,13 +5334,13 @@ for NDF applications.
       \sstsubsection{
          CUBE = NDF (Read)
       }{
-         The name of the input 3D cube holding the Stokes parameters,
-         such as produced by \htmlref{POLCAL}{POLCAL}.
+         The name of the input NDF holding the Stokes parameters, such as
+         produced by POLCAL.
       }
       \sstsubsection{
          IN = NDF (Read)
       }{
-         A group specifying the names of the input intensity images. This
+         A group specifying the names of the input intensity NDFs. This
          may take the form of a comma separated list, or any of the other
          forms described in the help on {\tt "}Group Expressions{\tt "}. These images
          must be aligned pixel-for-pixel with the Stokes vectors given by
@@ -5135,13 +5349,13 @@ for NDF applications.
       \sstsubsection{
          OUT = NDF (Read)
       }{
-         A group specifying the names of the output intensity images.
+         A group specifying the names of the output intensity NDFs.
       }
       \sstsubsection{
          QUIET = \_LOGICAL (Read)
       }{
-         If FALSE, then the name of each image will be displayed as it is
-         processed. Otherwise, nothing is written to the screen. [FALSE]
+         If FALSE, then the name of each input NDF will be displayed as it
+         is processed. Otherwise, nothing is written to the screen. [FALSE]
       }
    }
    \sstexamples{
@@ -5161,9 +5375,10 @@ for NDF applications.
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
+\newpage
 \sstroutine{
    POLSTACK
 }{
@@ -5171,15 +5386,17 @@ for NDF applications.
 }{
    \sstdescription{
       This application combines a set of intensity images into a smaller
-      number of similar intensity images. The input images must all be
-      aligned pixel-for-pixel. Each output image corresponds to a range
-      of analysis angle, and is formed by stacking together the input
-      images which have analysis angles within the range of the output
+      number of similar intensity images (it may also be used to combine
+      intensity cubes containing spectropolarimetry data). The input images
+      must all be aligned pixel-for-pixel. Each output image corresponds to
+      a range of analysis angle, and is formed by stacking together the
+      input images which have analysis angles within the range of the output
       image. The variance component of each output image is set to hold
       the standard error of the input images which contribute to the
       output image. The output images may, for instance, be processed by
-      POLCAL. In addition, a 3D stack may be created containing all the
-      output images in a single data array (see parameter STACK).
+      POLCAL. In addition, a 3D (or 4D if processing spectropolarimetry data)
+      stack may be created containing all the output images in a single data
+      array - see parameter STACK.
 
       The same reference direction in used for all output images, and is
       equal to the reference direction in the first input image. For each
@@ -5237,8 +5454,8 @@ for NDF applications.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         A group specifying the names of the input intensity images. This
-         may take the form of a comma separated list, or any of the other
+         A group specifying the names of the input intensity images or cubes.
+         This may take the form of a comma separated list, or any of the other
          forms described in the help on {\tt "}Group Expressions{\tt "}. These images
          must be aligned pixel-for-pixel.
       }
@@ -5260,8 +5477,8 @@ for NDF applications.
       \sstsubsection{
          OUT = NDF (Read)
       }{
-         A group specifying the names of the output intensity images. If
-         the supplied string includes an asterisk ($*$) it is replaced by
+         A group specifying the names of the output intensity images or cubes.
+         If the supplied string includes an asterisk ($*$) it is replaced by
          an integer sequence number ranging from 1 to the number of
          output images. The sequence number increases monotonically with
          analyser position.
@@ -5269,12 +5486,13 @@ for NDF applications.
       \sstsubsection{
          STACK = NDF (Write)
       }{
-         An optional 3-dimensional output cube. If created, each plane
-         contains a copy of the output image with the same sequence number
-         (see parameter OUT). The analyser position corresponding to each
-         plane is stored in the Axis structure for axis 3. No POLPACK
-         extension is created. The stack is not created if a null (!)
-         value is supplied. [!]
+         An optional 3-dimensional (or 4-dimensional when dealing with
+         spectropolarimetry data) output cube. If created, each plane (or
+         cube) contains a copy of the output image (or cube) with the same
+         sequence number (see parameter OUT). The analyser position
+         corresponding to each plane is stored in the Axis structure for the
+         last axis. No POLPACK extension is created. The stack is not created
+         if a null (!) value is supplied. [!]
       }
       \sstsubsection{
          TWOPI = \_LOGICAL (Read)
@@ -5314,9 +5532,10 @@ for NDF applications.
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
+\newpage
 \sstroutine{
    POLVEC
 }{
@@ -5325,11 +5544,10 @@ for NDF applications.
    \sstdescription{
       This application calculates values of percentage polarization,
       polarization angle, total intensity and polarized intensity, based
-      on Stokes parameters in the supplied input cube (which will
-      normally have been created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}). These calculated
-      values may be stored either in a series of 2D NDFs, or in a single
-      catalogue which may be examined and manipulated using the CURSA
-      package (see \xref{SUN/190}{sun190}{}).
+      on Stokes parameters in the supplied input NDF (which will normally
+      have been created by POLKA or POLCAL). These calculated values may
+      be stored either in a series of output NDFs, or in a single
+      catalogue.
    }
    \sstusage{
       polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
@@ -5357,9 +5575,10 @@ for NDF applications.
          cube (the output origin is set to [0.0,0.0] if any binning is
          performed).
 
-         Note, if the output vectors are being stored in a catalogue, it
-         is usually better to use the \htmlref{POLBIN}{POLBIN} application to bin the Stokes
-         vectors. [1]
+         This parameter is not accessed and no binning is performed if the
+         input NDF is 4D. Note, if the output vectors are being stored in a
+         catalogue, you should usually use the POLBIN application to bin the
+         Stokes vectors (this applies to both 3D and 4D data). [1]
       }
       \sstsubsection{
          CAT = LITERAL (Read)
@@ -5376,6 +5595,10 @@ for NDF applications.
 
             \sstitem
                Y  -- The pixel Y coordinate at the tabulated point.
+
+            \sstitem
+               Z  -- The pixel Z coordinate at the tabulated point (this
+                       is only included if the input NDF is 4D).
 
             \sstitem
                I  -- The total intensity.
@@ -5399,14 +5622,14 @@ for NDF applications.
          }
          If VARIANCE is TRUE, then the catalogue will also contain
          additional columns giving the standard deviation on each of the
-         tabulated values (excluding the X and Y columns). The names of
+         tabulated values (excluding the X, Y and Z columns). The names of
          these columns will be formed by prepending the letter D to the
          start of the column names listed above.
 
          IF RADEC is TRUE, the columns will also contain RA and DEC
-         columns, so long as the input cube contains appropriate WCS 
+         columns, so long as the input cube contains appropriate WCS
          information.
- 
+
          When measuring circular polarization, the columns describing Q
          and U will be replaced by equivalent columns describing V; and
          the ANG value will be zero if the normalised Stokes parameter V
@@ -5417,14 +5640,13 @@ for NDF applications.
          to avoid binning the Stokes vectors in this application (see
          parameter BOX). Information describing the mappings between pixel
          coordinates and any other known coordinate Frames will be stored in
-         the catalogue in textual form, as an AST FrameSet (see
-         \xref{SUN/210}{sun210}{}).
+         the catalogue in textual form, as an AST FrameSet (see SUN/210).
 
          The storage format of the catalogue is determined by the {\tt "}file
          type{\tt "} specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
          with file extension {\tt "}.FIT{\tt "}. Other possibilities are described in
-         \xref{SUN/190}{sun190}{}.
+         SUN/190.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
@@ -5433,8 +5655,9 @@ for NDF applications.
          percentage polarization and polarized intensity. The returned
          variance values are unchanged. This correction only applies to
          calculations of linear polarization, and cannot be used if the
-         input cube does not contain variance values. The dynamic default
-         is equal to the value supplied for parameter VARIANCE. []
+         input cube does not contain variance values. If a null value
+         (!) is supplied, then the correction is applied if output variances
+         are being created, and not otherwise.           [!]
       }
       \sstsubsection{
          I = NDF (Write)
@@ -5445,8 +5668,8 @@ for NDF applications.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The 3D cube holding the Stokes parameters. This should have been
-         created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}.
+         The 3D (or 4D) cube holding the Stokes parameters. This should have
+         been created by POLKA or POLCAL.
       }
       \sstsubsection{
          IP = NDF (Write)
@@ -5489,10 +5712,10 @@ for NDF applications.
          RADEC = \_LOGICAL (Read)
       }{
          If TRUE, columns holding the RA and DEC (FK5, J2000) are added
-         to the output catalogue, if the input cube contains the 
-         necessary WCS information. If FALSE, no RA and DEC columns are 
-         written. For large catalogues, creating RA and DEC columns can 
-         cause a significant delay. [current value]
+         to the output catalogue, if the input cube contains the necessary
+         WCS information. If FALSE, no RA and DEC columns are written. For
+         large catalogues, creating RA and DEC columns can cause a
+         significant delay. [current value]
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
@@ -5557,10 +5780,9 @@ for NDF applications.
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
-
 \sstroutine{
    POLVERSION
 }{
@@ -6118,7 +6340,13 @@ representation.
 Calculation of Stokes Vectors in Single-beam Mode}
 
 This section describes the algorithm used by \htmlref{POLCAL}{POLCAL} to 
-created Stokes vectors from single-beam data.
+created Stokes vectors from single-beam data. It assumes that the data is
+single-waveband. Spectropolarimetry data is processed in the same way,
+except that an intensity `image'' is actually an intensity ``cube'' 
+containing two spatial axes and one spectral axis. In this context, no
+distinction is usually made between spatial and spectral axes\footnote{
+The only exception is that when data is ``smoothed'' it is only smoothed
+in the two spatial axes - no smoothing occurs between spectral channels.}.
 
 Given a set of observed intensity values and corresponding variance values,
 a set of Stokes vectors with associated variances can be produced
@@ -6196,7 +6424,7 @@ from the best fitting sine curve given by equation \ref{EQN:IEXP}. This
 allows variances for the output Stokes vectors to be created, and also
 allows the iterative rejection of bad data. This option can be used by
 setting POLCAL parameter WEIGHTS to 3. The technique is described in the
-following pseudo-code, and is illustrated diagramatically in 
+following pseudo-code, and is illustrated diagrammatically in 
 \latex{Figure~\ref{fig:varest}:} \html{the next figure:}
 
 \begin{verbatim}
@@ -6348,7 +6576,7 @@ values which would be expected on the basis of the smoothed Stokes vectors.
 \item For each input image, the residuals between these expected intensity 
 values and the corresponding observed intensity values are found, and
 squared. If the input images have differing zero points (caused by
-instrumental effects or inperfect sky subtraction, for instance), then
+instrumental effects or imperfect sky subtraction, for instance), then
 the residuals for an individual image may well not have a mean of zero.
 If left uncorrected, this would result in the mean squared residual at
 each pixel being an over-estimate of the actual input variance. To reduce
@@ -6493,7 +6721,23 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+
+\subsection{V3.0}
+
+\begin{itemize}
+\item Most POLPACK commands have been changed to allow the processing of
+spectropolarimery data. The main exception to this is the POLKA command,
+which cannot be used with spectropolarimetry data. INstead, you should
+align the data manually, and then use POLCAL directly to create Stokes 
+vectors.
+
+\item A bug in POLPLOT has been fixed which caused inappropriate
+text to be used for the default key heading.
+
+\end{itemize}
+
 \subsection{V2.1-7}
+\begin{itemize}
 
 \item A new logical-valued parameter called INTEGRATE has been added to 
 \htmlref{POLBIN}{POLBIN}. If set to a true value, the output catalogue
@@ -6505,6 +6749,7 @@ vectors for a grid of bins determined by the BOX parameter, as before.
 transfer catalogue data to and from the polarimetry toolbox within
 \xref{GAIA}{sun214}{} \latexonly{(SUN/214)}. These commands are not
 designed for interactive use.
+\end{itemize}
 
 \subsection{V2.1-5}
 
@@ -6754,7 +6999,7 @@ the vector map.
 
 \quickdes{POLHELP}{Displays textual help information for POLPACK.}{ POLHELP }
 
-\quickdes{POLIMAGE}{Converts a catalogue into a 1 or 2-dimensional NDF.}{ POLIMAGE }
+\quickdes{POLIMAGE}{Converts a catalogue into an NDF.}{ POLIMAGE }
 
 \quickdes{POLKA}{An X-based GUI which converts raw photometric images into Stokes vectors.}{ POLKA }
 
