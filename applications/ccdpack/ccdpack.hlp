@@ -2965,9 +2965,6 @@ MAPVAR = _LOGICAL (Read)
    of the entire input image (rather than the pixels own variance)
    is required MAPVAR should be set to .FALSE. and USEVAR should
    be set to .TRUE. (this is the default condition).
-
-   It should be noted that due to the nature of the algorithm
-   variances are not propagated to the final output image.
    [FALSE]
 3 MULTI
 MULTI = _DOUBLE (Read)
@@ -3095,9 +3092,6 @@ USEVAR = _LOGICAL (Read)
 
    If weighting of the input image by the inverse variance map
    (rather than the mean) then the MAPVAR parameter whould be used.
-
-   It should be noted that due to the nature of the algorithm
-   variances are not propagated to the final output image.
    [TRUE]
 3 ZERO
 ZERO = _LOGICAL (Read)

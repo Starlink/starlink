@@ -93,9 +93,6 @@
 *        of the entire input image (rather than the pixels own variance)
 *        is required MAPVAR should be set to .FALSE. and USEVAR should
 *        be set to .TRUE. (this is the default condition).
-*        
-*        It should be noted that due to the nature of the algorithm 
-*        variances are not propagated to the final output image.
 *        [FALSE]
 *     MULTI = _DOUBLE (Read)
 *        The linear scaling between the size of the input and output
@@ -207,7 +204,7 @@
 *        error (variance) information contained in the input NDFs
 *        should be used to weight the input image pixels as they
 *        are drizzled on to the output NDF (see the discussion of the
-*        drizzling algorithm). If USEVAR is set to .TRUE. then the
+*        drizzling algorithm). If USEVAR is set to TRUE then the
 *        ratio of the mean inverse variance of the input image and
 *        the mean inverse variance of the reference frame (or first 
 *        input NDF if no reference frame is provided) will be used as 
@@ -215,9 +212,6 @@
 *
 *        If weighting of the input image by the inverse variance map 
 *        (rather than the mean) then the MAPVAR parameter whould be used.
-*        
-*        It should be noted that due to the nature of the algorithm 
-*        variances are not propagated to the final output image.
 *        [TRUE]
 *     ZERO = _LOGICAL (Read)
 *        This parameter specifies whether DRIZZLE should attempt to
@@ -263,7 +257,7 @@
 *        SCALE = the multiplicative scaling factor for the NDF
 *        ZERO  = the zero-point correction for the NDF
 *
-*     Comment lines may be added, by must be prefixed with a "#"
+*     Comment lines may be added, but must be prefixed with a "#"
 *     character.
 
 *  Pitfalls:

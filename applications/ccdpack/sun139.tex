@@ -4096,7 +4096,7 @@ pixels are shrunk before it is averaged into the output image.
 \end{description}
 \end{myquote}
 
-All of these methods, except drizzling, support variance propagation, 
+All of these methods, support variance propagation, 
 provided that the input data errors have an approximately normal distribution.
 
 In general if the input data comprise less than 5 datasets and spurious
@@ -7436,9 +7436,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          of the entire input image (rather than the pixels own variance)
          is required MAPVAR should be set to .FALSE. and USEVAR should
          be set to .TRUE. (this is the default condition).
-
-         It should be noted that due to the nature of the algorithm
-         variances are not propagated to the final output image.
          [FALSE]
       }
       \sstsubsection{
@@ -7582,9 +7579,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If weighting of the input image by the inverse variance map
          (rather than the mean) then the MAPVAR parameter whould be used.
-
-         It should be noted that due to the nature of the algorithm
-         variances are not propagated to the final output image.
          [TRUE]
       }
       \sstsubsection{
