@@ -111,20 +111,13 @@
 #     packages which must previously have been installed into the
 #     appropriate sub-directories of the $STARLINK directory (/star is
 #     used if the environment variable STARLINK is not defined).
-#        err
-#           Error reporting library
-#        fio
-#           File i/o library
-#        grp
-#           Group access routines.
-#        ndf
-#           NDF access library
-#        par
-#           Parameter sysem interface
-#        sae
-#           Global include files
-#        kappa
-#           Kernel Application Package
+#        ems                                                {
+#           Error message service                           {
+#        hds                                                {  as
+#           Hierarchical data system                        {  appropriate
+#        sae_par                                            {
+#           Global include files                            {
+#        etc                                                {
 #
 #  Notes:
 #     This makefile uses the presence/absence of the hidden files
@@ -134,15 +127,96 @@
 #  Implementation Deficiencies:
 #
 #  Copyright:
-#     Copyright (C) 2001 Rutherford Appleton Laboratory
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
 #
 #  Authors:
-#     DSB: D.S.Berry (Starlink, Manchester)
+#     RFWS: R.F.Warren-Smith (Starlink, RAL)
+#     PMA: P.M.Allan (Starlink, RAL)
+#     PTW: P.T.Wallace (Starlink, RAL)
+#     BLY: M.J.Bly (Starlink, RAL)
+#     AJC: A.J.Chipperfield (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
-#     16-JAN-2001 (DSB):
-#        Original version, based on IRCAMPACK makefile.
+#     4-JAN-1993 (RFWS):
+#        Original version.
+#     15-MAR-1993 (RFWS):
+#        Adapted for use on sun4_Solaris.
+#     11-JUN-1993 (PMA):
+#        Added parts for handling platform specific files.
+#     27-SEP-1993 (PMA):
+#        Added the target "filler1" to prevent the list of platform
+#        specific files being empty, thereby causing a make syntax error.
+#     3-NOV-1993 (PMA):
+#        Change the check target to print out for which system the
+#        software has been built.
+#     3-NOV-1993 (PMA):
+#        Add a test to check that files really are extracted from the
+#        tar file.
+#     18-NOV-1993 (PTW):
+#        Cosmetics.
+#     26-NOV-1993 (PMA):
+#        Remove the dummy file "filler1" and add a dummy target called
+#        dummy_target1.
+#        Add a file called " " to all of the for loops that install and
+#        deinstall files to prevent syntax errors if any of the relevent
+#        macros are null.
+#        Add a macro STARTUP_SCRIPT that is the name of the startup
+#        script.
+#     4-JAN-1994 (PMA):
+#        Add some missing semicolons to for loops. This seems not to
+#        cause errors on our systems, but it is a syntax error.
+#     7-FEB-1994 (PMA):
+#        Move the block data files to the beginning of the definition of
+#        OBJECT_FILES. This makes it possible to extract the block data
+#        modules with the -u loader flag. This is needed when using f2c.
+#     8-AUG-1994 (BLY):
+#        Add dependency on source archive to extraction targets.
+#     30-NOV-1994 (AJC):
+#        Add facility error files
+#        Add export_run target
+#        Add where installed
+#        Prevent installation if not built for this SYSTEM
+#        Ensure deinstall is from where it is installed
+#        Revise use of package name variables, adding PACK_NAME for
+#         use in messages and PKG_LINK for use in INCLUDE FILE links.
+#         Use variables in all references.
+#        Use installed $(PKG_NAME)_dev to handle INCLUDE files for test
+#     24-APR-1995 (AJC):
+#        -p on install mkdir
+#        Add else clause to catch failue of "elif $(MAKE)"
+#        Add exit 1 to detected illegal install and deinstall cases.
+#        Remove dependency of files on source archive.
+#     2-MAY-1995 (BLY):
+#        Shared libraries now in INSTALL_SHARE, also chmod 755.
+#        INSTALL_SHARE added to INSTALL_DIRS.
+#        RANLIB default changed to : (colon).
+#        BLD_SHR default changed to : (colon).
+#     5-JUN-1995 (RFWS):
+#        Added -f flag to rm commands in clean and unbuild targets.
+#     15-JUN-1995 (AJC):
+#        Revised check target to cope with export_run versions.
+#     16-JUN-1995 (BLY):
+#        Designated Mk IVb.
+#     26-JUN-1995 (BLY):
+#        Modified export, export_run and export_source targets.
+#        Cosmetics.
+#        Designated Mk IVc.
+#     29-JUN-1995 (BLY):
+#        Added sections for manipulating Latex and Hypertest documentation.
+#        Revised install and deinstall sequences.
+#        Changed export* targets to make compressed tar files in one step.
+#        Replacing of `rm' with `rm -f' in most cases.
+#        Designated Mk V.
+#     03-JUL-1995 (BLY):
+#        Template makefile now generated automatically.
+#     17-JUL-1995 (AJC):
+#        Modified hypertext installation/deinstallation to avoid linking
+#        if no hypertext documents defined.
+#     12-DEC-1996 (BLY):
+#        Various minor modifications.
+#     07-JUN-1998 (BLY):
+#        Added handling for `Conditions of Use' file.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -187,7 +261,7 @@ help:
         echo \
    '      export        - Make a compressed tar file for exporting the'\
    'built package';\
-	echo \
+        echo \
    '                      complete with source and documentation';\
         echo \
    '      export_run    - Make a compressed tar file for exporting the'\
@@ -287,9 +361,9 @@ AR_IN = ar -r
 ALINK = $(STAR_BIN)/alink
 
 #  Pathname to directories holding KAPPA libraries.
- 
+
 KAPPA_SOURCE = $(STARLINK)/sources/kappa
- 
+
 #-------------------------------------------------------------------------------
 ################################################################################
 #
@@ -300,10 +374,14 @@ KAPPA_SOURCE = $(STARLINK)/sources/kappa
 
 #  Name of the package as specified in documentation
 #  The value is used in messages from make to the user.
+
 PACK_NAME = ATOOLS
 
-#  Prefix for the package in lowercase as used in filenames etc.
+#  Prefix for the package in lower-case as used in filenames etc.
 PKG_NAME = atools
+
+#  Prefix for the package in upper-case as used in include file links.
+PKG_LINK = ATOOLS
 
 #  Version number (as in the documentation - i.e. not the same thing
 #  as the shared library version number).
@@ -325,14 +403,14 @@ PKG_VERS = 1.0
 #  smaller source archives in place of one large one to speed up build
 #  times.
 
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) 
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = 
+PUBLIC_SCRIPTS =
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 
@@ -357,7 +435,11 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = 
+PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
+
+I_SUB1 =
+
+I_SUB2 =
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -372,62 +454,47 @@ PAR_ERR FIO_ERR AST_PAR
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).  
 
-F_ROUTINES = $(F_SUB1) $(MONO_SOURCE)
+F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
 
-F_SUB1 = \
-addframe.f \
-astclear.f \
-astget.f \
-astset.f \
-asttest.f \
-atl1_assoc.f \
-atl1_creat.f \
-atl1_gtfrm.f \
-atl1_gtobj.f \
-atl1_ptobj.f \
-atl1_setop.f \
-cmpframe.f \
-cmpmap.f \
-frame.f \
-getframe.f \
-getmapping.f \
-unitmap.f 
+F_SUB1 = addframe.f astclear.f astget.f astset.f asttest.f \
+atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
+atl1_setop.f cmpframe.f cmpmap.f frame.f getframe.f \
+getmapping.f unitmap.f
+
+F_SUB2 = 
+
+#  List of Fortran BLOCK DATA routines.
+
+BLOCK_DATA = $(B_SUB1) $(B_SUB2)
+
+B_SUB1 = 
+ 
+B_SUB2 = 
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
 #  given here are the general version of the file, e.g. pkg_open.f.  The
 #  names in the tar file will be pkg_open.f_sun4, pkg_open.f_mips, etc.
 
-PLATFORM_F =
+PLATFORM_F = $(PF_SUB1) $(PF_SUB2)
+
+PF_SUB1 =
+
+PF_SUB2 =
 
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = $(C_SUB1)
+C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
 C_SUB1 = atl1_rm.c
 
-#  List of platform specific C routines.  The source tar file will
-#  contain a version of these files for each set of platforms.  The names
-#  given here are the general version of the file, e.g. pkg_open.c.  The
-#  names in the tar file will be pkg_open.c_sun4, pkg_open.c_mips, etc.
- 
-PLATFORM_C =
+C_SUB2 = 
 
 #  List of applications/tasks in monolith.
 
-TASKS = \
-addframe \
-astclear \
-astget \
-astset \
-asttest \
-cmpframe \
-cmpmap \
-frame \
-getframe \
-getmapping \
-unitmap 
+TASKS = addframe astclear astget astset asttest cmpframe \
+cmpmap frame getframe getmapping unitmap
 
 #  Monolith routine source name.
 
@@ -438,23 +505,12 @@ MONO_SOURCE = $(PKG_NAME)_mon.f
 MONOLITH = $(PKG_NAME)_mon
 
 #  Monolith interface file name.
- 
+
 MONO_IFL = $(PKG_NAME)_mon.ifl
 
 #  List of task interface files.
 
-IFL_FILES = \
-addframe.ifl \
-astclear.ifl \
-astget.ifl \
-astset.ifl \
-asttest.ifl \
-cmpframe.ifl \
-cmpmap.ifl \
-frame.ifl \
-getframe.ifl \
-getmapping.ifl \
-unitmap.ifl 
+IFL_FILES = $(TASKS:=.ifl)
 
 #  List of help library sources.
 
@@ -467,11 +523,16 @@ DATA_FILES =
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = 
-HYPERTEXT_DOCS =
+HYPERTEXT_DOCS = 
 
 #  List of documentation files.
 
-DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
+DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+$(PKG_NAME).news $(LICENCE)
+
+#  Conditions of use file.
+
+LICENCE = $(PACK_NAME)_CONDITIONS
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -493,14 +554,18 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
-$(IFC_FILES) $(HELP_FILES) $(STARTUP_SCRIPT) $(ICL_SCRIPT) 
+$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(DATA_FILES) $(STARTUP_SCRIPT)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) 
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(L_SUB1) $(L_SUB2) 
+
+L_SUB1 =
+
+L_SUN2 =
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -516,21 +581,37 @@ AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(PUBLIC_SCRIPTS) $(LINK_SCRIPT) $(MONO_SOURCE) $(HELP_SOURCES) \
-$(F_SUB1) $(I_SUB1) $(C_SUB1) $(STARTUP_SCRIPT) $(IFL_FILES) \
-$(MONO_IFL) $(ICL_SCRIPT):
+$(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) $(MONO_SOURCE) \
+$(HELP_SOURCES) $(MONO_IFL) $(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
+$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2):
+	$(TAR_OUT) $(PKG_NAME)_sub2.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
 #  Rules for extracting platform specific source files from the source
-#  archive.
+#  archives.
+
 #  It is quite likely that there are no platform-specific source files
-#  and that the macro PLATFORM_C is empty. To prevent a syntax error in
+#  and that the macro PF_SUBn is empty. To prevent a syntax error in
 #  make, a dummy target is present.
 
-$(PLATFORM_C) dummy_target1:
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
+$(PF_SUB1) dummy_target1:
+	$(TAR_OUT) $(PKG_NAME)_sub1.tar $@_$(SOURCE_VARIANT)
+	@ if test -f $@_$(SOURCE_VARIANT); then :;\
+           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
+	mv $@_$(SOURCE_VARIANT) $@
+
+$(PF_SUB2) dummy_target2:
+	$(TAR_OUT) $(PKG_NAME)_sub2.tar $@_$(SOURCE_VARIANT)
 	@ if test -f $@_$(SOURCE_VARIANT); then :;\
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
 	mv $@_$(SOURCE_VARIANT) $@
@@ -538,10 +619,13 @@ $(PLATFORM_C) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(O_SUB1) $(MONO_OBJECT)
+OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT)
 
-O_SUB1 = $(F_SUB1:.f=.o) $(C_SUB1:.c=.o)
+O_SUB1 = $(B_SUB1:.f=.o) $(F_SUB1:.f=.o) $(PF_SUB1:.f=.o) $(C_SUB1:.c=.o)
 
+O_SUB2 = $(B_SUB2:.f=.o) $(F_SUB2:.f=.o) $(PF_SUB2:.f=.o) $(C_SUB2:.c=.o)
+
+# Either:
 MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 
 .c.o:
@@ -552,13 +636,13 @@ MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libatools.a
+OBJECT_LIBRARIES = libatools.a 
 
 libatools.a: $(O_SUB1)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
-#  Rule and dependencies for building the monolith.
+#  Rule and dependencies for building the monolith(s).
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
@@ -813,6 +897,16 @@ install:
            else :; fi;\
         done
 #
+#  Install the data files, giving them world read permission.
+	for f in $(DATA_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
+        done
+#
 #  Install the help files, giving them world read permission.
 	for f in $(HELP_FILES) ""; do \
            if test -n "$$f"; then \
@@ -847,10 +941,10 @@ install:
 #  edited into this, and read permission given.  Leave the original file
 #  in place.
 	if test -n "$(ICL_SCRIPT)"; then \
-            sed -e s#PKG_VERS#$(PKG_VERS)# \
-               $(ICL_SCRIPT) >$(INSTALL_BIN)/$(ICL_SCRIPT) ;\
-            chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
-         else :; fi
+           sed -e s#PKG_VERS#$(PKG_VERS)# \
+              $(ICL_SCRIPT) >$(INSTALL_BIN)/$(ICL_SCRIPT) ;\
+           chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
+        else :; fi
 #
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
@@ -861,23 +955,28 @@ install:
            else :; fi;\
         done
 #
-#  Install the hypertext documents, giving world read access to all the files
-#  they contain.
-	pwd=`pwd`;\
-        (cd $(INSTALL_DOCS);\
-        for f in $(HYPERTEXT_DOCS) ""; do \
-           if test -n "$$f"; then \
-              $(TAR_OUT) $$pwd/$${f}_tar;\
-              chmod 755 `find $$f -type d -print`;\
-              chmod 644 `find $$f ! -type d -print`;\
-              touch $$f;\
-           else :; fi;\
-        done)
+#  Install any hypertext documents, giving world read access to all the files
+#  they contain and linking with other documents.
+	if test -n "$(HYPERTEXT_DOCS)"; then \
+           pwd=`pwd`;\
+           (cd $(INSTALL_DOCS);\
+           for f in $(HYPERTEXT_DOCS) ""; do \
+              if test -n "$$f"; then\
+                 $(TAR_OUT) $$pwd/$${f}_tar;\
+                 chmod 755 `find $$f -type d -print`;\
+                 chmod 644 `find $$f ! -type d -print`;\
+                 touch $$f;\
+              else :; fi;\
+           done);\
+           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+           export HTX_PATH;\
+           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+        fi;
 #
-#  Link the hypertext.
-	HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-        export HTX_PATH;\
-        $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP)
+#  Install the conditions of use file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(LICENCE) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(LICENCE)
 #
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
@@ -965,6 +1064,15 @@ do_deinstall:
            else :; fi;\
         done
 #
+#  Deinstall the data files, if installed versions exist.
+	- for f in $(DATA_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
 #  Deinstall the help files, if installed versions exist.
 	- for f in $(HELP_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_HELP)/$$f; then \
@@ -995,11 +1103,11 @@ do_deinstall:
 #  during installation, we remove the installed copy, if present, and
 #  then ensure that the original exists.
 	- if test -n "$(ICL_SCRIPT)"; then \
-            if test -f $(INSTALL_BIN)/$(ICL_SCRIPT); then\
-               rm -f $(INSTALL_BIN)/$(ICL_SCRIPT);\
-            else :; fi ;\
-            $(MAKE) $(ICL_SCRIPT);\
-         else :; fi
+           if test -f $(INSTALL_BIN)/$(ICL_SCRIPT); then\
+              rm -f $(INSTALL_BIN)/$(ICL_SCRIPT);\
+           else :; fi ;\
+           $(MAKE) $(ICL_SCRIPT);\
+        else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
@@ -1008,17 +1116,24 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Deinstall the hypertext documents.
-	- for f in $(HYPERTEXT_DOCS) ""; do \
-           if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
-              rm -f -r $(INSTALL_DOCS)/$$f;\
-           else :; fi;\
-        done
+#  Deinstall any hypertext documents,  and relink the hypertext if required.
+	- if test -n "$(HYPERTEXT_DOCS)"; then \
+           for f in $(HYPERTEXT_DOCS) ""; do \
+              if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
+                 rm -f -r $(INSTALL_DOCS)/$$f;\
+              else :; fi;\
+           done;\
+           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+           export HTX_PATH;\
+           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+        fi
 #
-#  Relink the hypertext.
-	HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-        export HTX_PATH;\
-        $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP)
+#  Deinstall the conditions of use file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
+           chmod 644 $(INSTALL_DATES)/$(LICENCE);\
+           rm -f $(INSTALL_DATES)/$(LICENCE);\
+        else :; fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
@@ -1071,11 +1186,17 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-#  Execute the test script.
 	@ echo
-	$(INSTALL_BIN)/$(PKG_NAME)_test
+	@ echo '$(PACK_NAME) does not have a make driven installation test'
 	@ echo
-	@ echo 'A sucessful test is indicated by 12 "undefined" statements'
+	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
+	@ echo 'thus (% is the shell prompt):'
+	@ echo
+	@ echo ' % cd /empty_directory'
+	@ echo ' % source /star/etc/cshrc'
+	@ echo ' % xdisplay'
+	@ echo ' % $(PKG_NAME)setup'
+	@ echo ' % command_name'
 	@ echo
 #
 #  Note the test has been run.
@@ -1186,7 +1307,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 
 clean:
 	@- rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
-              $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_C) \
+              $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
 	@- rm -f $(F_ROUTINES) 1>/dev/null 2>/dev/null
 	@- rm -f $(OBJECT_FILES) 1>/dev/null 2>/dev/null
@@ -1205,12 +1326,14 @@ unbuild: clean
 	@ echo '*** Built files removed'
 	@ echo
 
-#  strip: strip the monoliths of debug information.
-#  -----------------------------------------------
+#  strip: strip the monolith(s) of debug information.
+#  -------------------------------------------------
 
 strip:
 	strip $(MONOLITH)
-	@ echo '*** Monolith stripped'
+	@ echo
+	@ echo '*** Binaries stripped'
+	@ echo
 
 #-------------------------------------------------------------------------------
 

@@ -35,7 +35,7 @@ unitmap.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.
-UNIX_OTHERS = makefile mk atools.news 
+UNIX_OTHERS = makefile mk atools.news ATOOLS_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
@@ -43,7 +43,8 @@ UNIX_RELEASE =  $(UNIX_OTHERS) atools.star-hlp atools_mon.ifd \
 $(ATOOLS_SOURCE) 
 
 #  The contents of atools.tar.
-UNIX_TOTAL = atools_source.tar makefile mk atools.news atools_iraf.tar
+UNIX_TOTAL = atools_source.tar makefile mk atools.news atools_iraf.tar \
+ATOOLS_CONDITIONS
 
 #  Target for use by the grp command.
 $(action)

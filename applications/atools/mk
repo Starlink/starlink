@@ -44,13 +44,13 @@
 #        alpha_OSF1
 #           DEC Alpha machines running OSF1
 #
+#        ix86_Linux
+#           Intel PC machines running Linux
+#
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
 #
-#        ix86_Linux
-#           Intel PC running Linux
-#
-#     In addition, the following systems have been supported at some
+#     In addition, the following systems may have been supported at some
 #     time in the past.  This script contains the macro definitions 
 #     needed for these systems, but it is not known whether ATOOLS
 #     will still build or run on these systems:
@@ -129,16 +129,6 @@
 #           archive (.a) library.  On some systems the variation 'ar r'
 #           may be required instead.
 #
-#        BLD_IDL_SHR (:)
-#           Command to build a shareable library containing IDL command
-#           when given three arguments specifying:
-#           (1) the name of the library file to be built
-#           (2) a list of the object files to be used in the library 
-#           and (3) a list of any additional libraries against
-#           which to link.  By default, it is assumed that shareable
-#           libraries are not available, and the default acts as a null
-#           command.
-#
 #        CC (c89)
 #           The C compiler command to use.
 #
@@ -212,7 +202,6 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
-#     BKM: B.K.McIlwrath (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -232,20 +221,8 @@
 #        Mk IVb version.
 #     21-JUN-1995 (AJC):
 #        Remove references to /star in CFLAGS.
-#     25-OCT-1995 (AJC):
-#        Modify for ATOOLS
-#        add FFLAGS -w for alpha
-#     10-DEC-1996 (BKM):
-#        Linux support added.
-#     10-JUN-1999 (AJC):
-#        Add BLD_IDL_SHR
-#     28-JAN-2000 (AJC):
-#        Minor correction to Linux BLD_IDL_SHR
-#        Make LINK ln -fs  
-#     18-MAY-2000 (AJC):
-#        Add -expect_unresolved for Alpha
-#      4-JUL-2000 (AJC):
-#        Restore LINK to ln -s
+#     12-DEC-1996 (BLY):
+#        Linux case added.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -255,7 +232,6 @@
 
 #  Export "local" definitions to the environment for use by make.
       export AR_IN
-      export BLD_IDL_SHR
       export CC
       export CFLAGS
       export FC
@@ -282,13 +258,10 @@
 #  -------------------------------
             alpha_OSF1)
                AR_IN='ar -r'
-               BLD_IDL_SHR=\
-'f() $(CC) $(CFLAGS) -K -shared -expect_unresolved "IDL_*" -o $$1 $$2 $$3 \
--lfor -lFutil -lUfor -lm -lots -lc; f'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O -std1'
                FC='f77'
-               FFLAGS='-O -w'
+               FFLAGS='-O'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -334,11 +307,10 @@
 #  ---------------------------------------------
             sun4_Solaris)
                AR_IN='ar -r'
-               BLD_IDL_SHR='f() $(CC) $(CFLAGS) -Kpic -G -o $$1 $$2 $$3; f'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
                FC='f77'
-               FFLAGS='-O -w'
+               FFLAGS='-O'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
@@ -351,12 +323,10 @@
 #  ----------------------
             ix86_Linux)
                AR_IN='ar r'
-               BLD_IDL_SHR=\
-'f() { $(CC) $(CFLAGS) -fPIC -shared -o $$1 $$2 $$3;}; f'
-	       CC='gcc'
+               CC='gcc'
                CFLAGS='-I$(STAR_INC) -O'
                FC='g77'
-	       FFLAGS='-g -fno-second-underscore'
+               FFLAGS='-fno-second-underscore -O'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
