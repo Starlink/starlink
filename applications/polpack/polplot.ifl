@@ -131,7 +131,7 @@ interface POLPLOT
 
    parameter      FRAME
       type        'LITERAL'
-      ppath       'DEFAULT'
+      vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
       prompt      'Required co-ordinate Frame'
       helpkey     '*'
