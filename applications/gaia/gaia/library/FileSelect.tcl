@@ -83,6 +83,10 @@
 #                            this blows up if a file like "~noname" is
 #                            found (a failed attempt to seek
 #                            $env(HOME)/noname is made). 
+#                 16 Oct 00  Also now skips $filename and
+#                            ~$filename. These cannot be handled by
+#                            NDF (user can still enter these names by hand)
+
 
 itk::usual FileSelect {}
 
@@ -526,26 +530,28 @@ itcl::class util::FileSelect {
 	}
     }
 
-    # Clear the file list filling with the
-    # results of an 'glob'.  Use the full 
-    # attribute to determine full file name
-    # insertion.  Select the first element if 
-    # it exists.
+    # Clear the file list filling with the results of an 'glob'.  
+    # Use the full attribute to determine full file name insertion.
+    # Select the first element if it exists.  PWD: modification. NDF's
+    # cannot start with "$" or "~$", so leave these files alone.
 
     protected method _fillfilelist {} {
-	$fs(files) delete 0 end
-
-	set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
-	set filefiller [lsort $file_temp]
-	foreach i $filefiller {
-	    if {[file isfile $i]} {
-		if {$itk_option(-full)} {
-		    $fs(files) insert end $i
-		} else {
-		    $fs(files) insert end [file tail $i]
-		}
-	    }
-	}
+       $fs(files) delete 0 end
+       
+       set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
+       set filefiller [lsort $file_temp]
+       foreach i $filefiller {
+          if { [string match {$*} $tail] || [string match {./~$*} $tail] } {
+             continue
+          }
+          if {[file isfile $i] } {
+             if {$itk_option(-full)} {
+                $fs(files) insert end $i
+             } else {
+                $fs(files) insert end [file tail $i]
+             }
+          }
+       }
     }
 
     # Sets the default button, either ok, filter
