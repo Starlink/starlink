@@ -27,6 +27,14 @@ INTERFACE STATISTIX
       HELP      'If yes, then will weight the calculations accordingly.'
    ENDPARAMETER
 
+   PARAMETER USEGRP
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   YES
+      PROMPT    'Use grouping information'
+      HELP      'Responding N will ignore the grouping data in the file'
+   ENDPARAMETER
+
    PARAMETER QUALITY
       TYPE      '_LOGICAL'
       VPATH     'DEFAULT'
