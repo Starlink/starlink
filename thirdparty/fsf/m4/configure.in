@@ -2,7 +2,7 @@
 # Copyright (C) 1991, 1993, 1994 Free Software Foundation, Inc.
 # Process this file with autoconf to produce a configure script.
 
-undefine([changeword])
+## undefine([changeword])
 
 AC_INIT(src/m4.c)
 AC_CONFIG_HEADER(config.h)
@@ -84,5 +84,5 @@ fi], [AC_MSG_RESULT(no)])
 fp_WITH_DMALLOC
 
 AC_OUTPUT(Makefile doc/Makefile lib/Makefile src/Makefile \
-checks/Makefile examples/Makefile,
+checks/Makefile examples/Makefile component.xml,
 [test -z "$CONFIG_HEADERS" || date > stamp-h])
