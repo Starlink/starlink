@@ -99,7 +99,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      INCLUDE 'AST_PKG'
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local Variables:
       REAL			ABASE(2)		! Axis val at pix 1

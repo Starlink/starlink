@@ -91,22 +91,22 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          		! Standard SAE constants
       INCLUDE 'MATH_PAR'
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'				! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      DOUBLE PRECISION		IPOS(2)			! Input position
-      INTEGER			PIXID			! Object defining rot'n
-      LOGICAL			FORW			! Rotate forward?
+      DOUBLE PRECISION		IPOS(2)
+      INTEGER			PIXID
+      LOGICAL			FORW
 
 *  Arguments Returned:
-      DOUBLE PRECISION		OPOS(2)			! Output position
+      DOUBLE PRECISION		OPOS(2)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local variables:
       DOUBLE PRECISION		CROTA			! Cos(ROTA)
@@ -118,10 +118,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'WCI has not been initialised', STATUS )
-      END IF
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Extract rotation
       CALL ADI_CGET0D( PIXID, 'ROTATION', ROTA, STATUS )

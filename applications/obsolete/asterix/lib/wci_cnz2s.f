@@ -105,7 +105,6 @@
         DOUBLE PRECISION	SLA_EPCO
       EXTERNAL			SLA_EPJ2D		! Epoch -> MJD
         DOUBLE PRECISION	SLA_EPJ2D
-      EXTERNAL			WCI1_BLK		! Common block init
 
 *  Local Variables:
       CHARACTER*1		EFORM			! Epoch code, B|J

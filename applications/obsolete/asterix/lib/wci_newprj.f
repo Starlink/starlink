@@ -110,7 +110,6 @@
         LOGICAL			AST_QPKGI
       EXTERNAL			CHR_INSET
         LOGICAL			CHR_INSET
-      EXTERNAL			WCI1_BLK		! Common block init
 
 *  Local variables:
       CHARACTER*3		LNAME			! Projection name

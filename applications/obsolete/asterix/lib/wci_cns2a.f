@@ -88,11 +88,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MATH_PAR'
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'                 ! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       DOUBLE PRECISION		SPOS(2)
@@ -103,6 +99,10 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local Variables:
       DOUBLE PRECISION		LAPOS(2)		! Position in axis units
@@ -120,10 +120,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'WCI has not been initialised', STATUS )
-      END IF
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Map the rotation matrix
       CALL ADI_CMAPD( PRJID, 'RMATRIX', 'READ', RPTR, STATUS )
