@@ -84,8 +84,8 @@ am__noinst_HEADERS_DIST = ltdl.h
 HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
-	$(STAR_EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
+	$(EXTRA_DIST) 
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 am__remove_distdir = \
