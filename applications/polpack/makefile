@@ -408,10 +408,10 @@ ndg1_init.f ndg1_lasto.f ndg1_ncut.f ndg1_ndfch.f ndg1_slice.f \
 ndg1_stloc.f ndg_annul.f ndg_asexp.f ndg_assoc.f ndg_creat.f \
 ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f ndg_ndfpr.f
 
-F_SUB2 = wrndf.f rdndf.f polcent.f ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f \
-polreg.f polhelp.f segment.f kpg1_chaxd.f kpg1_flcor.f kpg1_rfcor.f \
-kps1_flxyr.f kps1_inxyr.f kps1_plmsk.f kps1_plcpy.f kps1_retr.f kps1_stor.f \
-kps1_plcpx.f kps1_xyd2w.f pda_qsiai.f
+F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
+kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kps1_flxyr.f kps1_inxyr.f kps1_plcpx.f \
+kps1_plcpy.f kps1_plmsk.f kps1_retr.f kps1_stor.f kps1_xyd2w.f pda_qsiai.f \
+polcent.f polhelp.f polreg.f pthlpo.f rdndf.f segment.f sread.f wrndf.f
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
