@@ -120,7 +120,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE*             ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
