@@ -13,9 +13,6 @@
       INTEGER      SSO__MI_DATA, SSO__MI_ERROR
         PARAMETER  ( SSO__MI_DATA=1, SSO__MI_ERROR=2 )
 
-*  System initialised flag
-      LOGICAL SSO_INIT_Q
-
 *  Dataset store
       CHARACTER*(DAT__SZLOC)	SSO_DS_LOC(SSO__MXDS)
       LOGICAL			SSO_DS_USED(SSO__MXDS)
@@ -30,7 +27,7 @@
       LOGICAL			SSO_MI_USED(SSO__MXMI)
 
 *  Non-character stuff
-      COMMON /SSO_CMN/ SSO_INIT_Q, SSO_DS_USED, SSO_MI_DS,
+      COMMON /SSO_CMN/ SSO_DS_USED, SSO_MI_DS,
      :                 SSO_MI_TYPE, SSO_MI_PTR, SSO_MI_MAPPED,
      :                 SSO_MI_USED
 
