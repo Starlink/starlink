@@ -248,6 +248,7 @@
 
       INTEGER			EID			! EXTENSIONS identifier
       INTEGER			HLEN			! Length of LHDU
+      INTEGER			I			! Loop over LHDU
 
       LOGICAL			THERE			! Object exists
 *.
@@ -281,6 +282,9 @@
           CREATED = .TRUE.
         END IF
         CALL ADI_FIND( EID, LHDU(:HLEN), ID, STATUS )
+        IF ( CREATED ) THEN
+          CALL ADI_CPUT0C( ID, '.EXTNAME', HDU, STATUS )
+        END IF
 
 *  Remove temporary
         CALL ADI_ERASE( EID, STATUS )

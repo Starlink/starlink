@@ -112,6 +112,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*40		EXTNAME			! Name of extension
 
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU identifier
@@ -139,7 +140,8 @@
 
 *  Define BINTABLE extension
       FSTAT = 0
-      CALL FTPHBN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, HDU,
+      CALL ADI_CGET0C( HID, '.EXTNAME', EXTNAME, STATUS )
+      CALL FTPHBN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, EXTNAME,
      :             VARIDAT, FSTAT )
       IF ( FSTAT .EQ. 0 ) THEN
         CALL ADI_CPUT0L( HID, '.DEF_START', .TRUE., STATUS )
