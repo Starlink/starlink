@@ -1,0 +1,8 @@
+CTYPE1  = 'GLON-CAR'          
+CRVAL1  =         1.850000e+02
+CDELT1  =        -1.250000e-01
+CRPIX1  =           200.000000
+CTYPE2  = 'GLAT-CAR'          
+CRVAL2  =        -3.500000e+01
+CDELT2  =         1.250000e-01
+CRPIX2  =           200.000000

@@ -1,0 +1,28 @@
+                                                                                
+COMMENT AST ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ AST
+COMMENT AST            Beginning of AST data for CmpFrame object             AST
+COMMENT AST ................................................................ AST
+BEGAST_A= 'CmpFrame'           / Compound coordinate system description         
+FRAMEA_A= '        '           / First component Frame                          
+BEGAST_B= 'SpecFrame'          / Description of spectral coordinate system      
+NAXES_A =                    1 / Number of coordinate axes                      
+SYSTEM_A= 'WAVE    '           / Coordinate system type                         
+AX1_A   = '        '           / Axis number 1                                  
+BEGAST_C= 'Axis    '           / Coordinate axis                                
+UNIT_A  = 'um      '           / Axis units                                     
+ENDAST_A= 'Axis    '           / End of object definition                       
+ISA_A   = 'Frame   '           / Coordinate system description                  
+UWAVE_A = 'um      '           / Preferred units for wavelength                 
+ENDAST_B= 'SpecFrame'          / End of object definition                       
+FRAMEB_A= '        '           / Second component Frame                         
+BEGAST_D= 'Frame   '           / Coordinate system description                  
+NAXES_B =                    1 / Number of coordinate axes                      
+AX1_B   = '        '           / Axis number 1                                  
+BEGAST_E= 'Axis    '           / Coordinate axis                                
+UNIT_B  = '10%^50+%s50+-26%+W/m%^50+%s50+2%+/Angstrom'/ Axis units                               
+ENDAST_C= 'Axis    '           / End of object definition                       
+ENDAST_D= 'Frame   '           / End of object definition                       
+ENDAST_E= 'CmpFrame'           / End of object definition                       
+COMMENT AST ................................................................ AST
+COMMENT AST               End of AST data for CmpFrame object                AST
+COMMENT AST ---------------------------------------------------------------- AST

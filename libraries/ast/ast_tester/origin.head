@@ -1,0 +1,18 @@
+SIMPLE  =                    T / file does conform to FITS standard
+BITPIX  =                   16 / number of bits per data pixel
+NAXIS   =                    2 / number of data axes
+NAXIS1  =                  500 / length of data axis 1
+NAXIS2  =                  500 / length of data axis 2
+EPOCH   =         1.977780E+03 / Epoch of observation
+RADECSYS= 'ICRS    '           / Reference frame for RA/DEC in original file
+CRVAL1  =                  0.0 / Axis 1 reference value
+CRPIX1  =                  250 / Axis 1 pixel value
+CTYPE1  = 'RA---ARC'           / Quantity represented by axis 1
+CRVAL2  =                  0.0 / Axis 2 reference value
+CRPIX2  =                  250 / Axis 2 pixel value
+CTYPE2  = 'DEC--ARC'           / Quantity represented by axis 2
+CDELT1  = 0.001                / Co-ordinate transformation matrix
+CDELT2  = 0.001                / Co-ordinate transformation matrix
+EQUINOX =         2.000000E+03 / Julian reference frame equinox
+
+END

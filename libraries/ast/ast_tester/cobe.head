@@ -1,0 +1,61 @@
+SIMPLE  =                    T / Written by IDL:  30-Jul-1997 05:35:42.00
+BITPIX  =                  -32 / Bits per pixel.
+NAXIS   =                    2 / Number of dimensions
+NAXIS1  =                  300 / Length of x axis.
+NAXIS2  =                  300 / Length of y axis.
+CTYPE1  = 'GLON-ZEA'           / X-axis type
+CTYPE2  = 'GLAT-ZEA'           / Y-axis type
+CRVAL1  =           -149.56866 / Reference pixel value
+CRVAL2  =           -19.758201 / Reference pixel value
+CRPIX1  =              150.500 / Reference pixel
+CRPIX2  =              150.500 / Reference pixel
+CDELT1  =             -1.20000 / Degrees/pixel
+CDELT2  =              1.20000 / Degrees/pixel
+CROTA1  =              0.00000 / Rotation in degrees.
+COMMENT
+COMMENT This file was produced by the SkyView survey analysis system from
+COMMENT available astronomical surveys.  The data are formatted
+COMMENT as a simple two-dimensional FITS image with the same units as
+COMMENT the orginal survey.  A single ASCII table extension may be present
+COMMENT which describes catalog objects found within the field of view.
+COMMENT Copies of relevant copyright notices are included in this file.
+COMMENT
+COMMENT Questions should be directed to:
+COMMENT
+COMMENT     scollick@skyview.gsfc.nasa.gov
+COMMENT          or
+COMMENT     mcglynn@grossc.gsfc.nasa.gov
+COMMENT
+COMMENT     SkyView
+COMMENT     Code 668.1
+COMMENT     Goddard Space Flight Center, Greenbelt, MD 20771
+COMMENT     301-286-7780
+COMMENT
+COMMENT SkyView is supported by NASA ADP grant NAS 5-32068.
+COMMENT
+SURVEY  = 'COBE DIRBE'
+BUNITS  = 'MJy/sr  '           /
+ORIGIN  = 'CDAC    '           / Cosmology Data Analysis Center
+TELESCOP= 'COBE    '           / COsmic Background Explorer satellite
+INSTRUME= 'DIRBE   '           / COBE instrument [DIRBE, DMR, FIRAS]
+PIXRESOL=                    9 / Quad tree pixel resolution [6, 9]
+DATE    = '27/09/94'           / FITS file creation date (dd/mm/yy)
+DATE-MAP= '16/09/94'           / Date of original file creation (dd/mm/yy)
+COMMENT     COBE specific keywords
+DATE-BEG= '08/12/89'           / date of initial data represented (dd/mm/yy)
+DATE-END= '25/09/90'           / date of final data represented   (dd/mm/yy)
+COMMENT
+COMMENT THE COBE DIRBE map is a combination of the original ten
+COMMENT band passes with the following wavelengths:
+COMMENT     Band 1  - 1.25 microns
+COMMENT     Band 2  - 2.2  microns
+COMMENT     Band 3  - 3.5  microns
+COMMENT     Band 4  - 4.9  microns
+COMMENT     Band 5  -  12  microns
+COMMENT     Band 6  -  25  microns
+COMMENT     Band 7  -  60  microns
+COMMENT     Band 8  - 100  microns
+COMMENT     Band 9  - 140  microns
+COMMENT     Band 10 - 240  microns
+COMMENT
+END

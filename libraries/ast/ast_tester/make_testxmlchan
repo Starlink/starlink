@@ -1,0 +1,2 @@
+g77 -fno-second-underscore -g -o testxmlchan testxmlchan.f -L$INSTALL/lib \
+-L/star/lib `ast_link -ems` `chr_link`

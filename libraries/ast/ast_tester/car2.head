@@ -1,0 +1,32 @@
+SIMPLE  =                    T  / Standard FITS format
+BITPIX  =                   16  / Bits per pixel
+NAXIS   =                    2  / Number of axes
+NAXIS1  =                 2961  / Number pixels on axis 1
+NAXIS2  =                  561  / Number pixels on axis 2
+CTYPE1  = 'GLON-CAR'            / axis 1 coord type
+CRVAL1  =         1.850000e+02  / coord value at CRPIX1
+CDELT1  =        -1.250000e-01  / pixel spacing for axis 1
+CRPIX1  =             1.000000  / ref pixel for axis 1
+CTYPE2  = 'GLAT-CAR'            / axis 2 coord type
+CRVAL2  =        -3.500000e+01  / coord value at CRPIX2
+CDELT2  =         1.250000e-01  / pixel spacing for axis 2
+CRPIX2  =             1.000000  / ref pixel for axis 2
+BSCALE  =         2.610167e-02  / real = int*bscale + bzero
+BZERO   =         8.321995e+02  /
+DATAMIN =        -6.326761e+00  / minimum real value
+DATAMAX =         1.670731e+03  / maximum real value
+BLANK   =               -32768  / missing data flag
+COMMENT PARENT DISK FILE: Wco_DHT2001.fits
+COMMENT temp  =colscales( CHANGE-ME , -185.0000, 185.0000)
+COMMENT coords=rowscales( temp, 35.0000, -35.0000)
+COMMENT Written by MacFITS
+COMMENT Created: Tuesday, 14 August, 2001  01:18:06 PM
+COMMENT Whole-Galaxy velocity-integrated CO(1-0) map (Fig. 2) from
+COMMENT "The Milky Way in Molecular Clouds: A New Complete CO Survey"
+COMMENT T. M. Dame, Dap Hartmann, & P. Thaddeus  (2001), ApJ, 547, 792.
+COMMENT WARNING: Both the angular resolution and the sensitivity varies
+COMMENT from region to region in this map: see Fig. 1 and Table 1 from
+COMMENT the paper above. Moment masking and clipping were used as
+COMMENT necessary to keep the noise in the map below ~1.5 K km/s.
+COMMENT See Section 2.2 for details.
+END

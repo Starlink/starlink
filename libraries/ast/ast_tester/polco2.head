@@ -1,0 +1,86 @@
+                                                                                
+COMMENT AST ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ AST
+COMMENT AST            Beginning of AST data for FrameSet object             AST
+COMMENT AST ................................................................ AST
+BEGAST_A= 'FrameSet'           / Set of inter-related coordinate systems        
+NFRAME_A=                    2 / Number of Frames in FrameSet                   
+CURRNT_A=                    2 / Index of current Frame                         
+NOD1_A  =                    2 / Frame 1 is associated with node 2              
+NOD2_A  =                    1 / Frame 2 is associated with node 1              
+LNK2_A  =                    1 / Node 2 is derived from node 1                  
+FRM1_A  = '        '           / Frame number 1                                 
+BEGAST_B= 'Frame   '           / Coordinate system description                  
+TITLE_A = 'Data grid indices; first pixel at (1&'/ Title of coordinate system   
+CONTINUE  '",1)     "'                                                          
+NAXES_A =                    2 / Number of coordinate axes                      
+DOMAIN_A= 'GRID    '           / Coordinate system domain                       
+AX1_A   = '        '           / Axis number 1                                  
+BEGAST_C= 'Axis    '           / Coordinate axis                                
+LABEL_A = 'Data grid index 1'  / Axis Label                                     
+SYMBOL_A= 'g1      '           / Axis symbol                                    
+UNIT_A  = 'pixel   '           / Axis units                                     
+FORMAT_A= '%3.1f   '           / Format specifier                               
+ENDAST_A= 'Axis    '           / End of object definition                       
+AX2_A   = '        '           / Axis number 2                                  
+BEGAST_D= 'Axis    '           / Coordinate axis                                
+LABEL_B = 'Data grid index 2'  / Axis Label                                     
+SYMBOL_B= 'g2      '           / Axis symbol                                    
+UNIT_B  = 'pixel   '           / Axis units                                     
+FORMAT_B= '%3.1f   '           / Format specifier                               
+ENDAST_B= 'Axis    '           / End of object definition                       
+ENDAST_C= 'Frame   '           / End of object definition                       
+FRM2_A  = '        '           / Frame number 2                                 
+BEGAST_E= 'Frame   '           / Coordinate system description                  
+TITLE_B = 'Pixel coordinates; first pixel at (-&'/ Title of coordinate system   
+CONTINUE  '100.5,-200.5)'                                                       
+NAXES_B =                    2 / Number of coordinate axes                      
+DOMAIN_B= 'POLAR   '           / Coordinate system domain                       
+AX1_B   = '        '           / Axis number 1                                  
+BEGAST_F= 'Axis    '           / Coordinate axis                                
+LABEL_C = 'Pixel coordinate 1' / Axis Label                                     
+SYMBOL_C= 'p1      '           / Axis symbol                                    
+UNIT_C  = 'pixel   '           / Axis units                                     
+FORMAT_C= '%3.1f   '           / Format specifier                               
+BOTTOM_A=                  0.0 / Minimum legal axis value                       
+ENDAST_D= 'Axis    '           / End of object definition                       
+AX2_B   = '        '           / Axis number 2                                  
+BEGAST_G= 'Axis    '           / Coordinate axis                                
+LABEL_D = 'Pixel coordinate 2' / Axis Label                                     
+SYMBOL_D= 'p2      '           / Axis symbol                                    
+UNIT_D  = 'pixel   '           / Axis units                                     
+FORMAT_D= '%3.1f   '           / Format specifier                               
+TOP_A   =             3.141592 / Maximum legal axis value                       
+BOTTOM_B=            -3.141592 / Minimum legal axis value                       
+ENDAST_E= 'Axis    '           / End of object definition                       
+ENDAST_F= 'Frame   '           / End of object definition                       
+MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
+BEGAST_H= 'CmpMap  '           / Compound Mapping                               
+NIN_A   =                    2 / Number of input coordinates                    
+ISA_A   = 'Mapping '           / Mapping between coordinate systems             
+INVA_A  =                    1 / First Mapping used in inverse direction        
+INVB_A  =                    1 / Second Mapping used in inverse direction       
+MAPA_A  = '        '           / First component Mapping                        
+BEGAST_I= 'MathMap '           / Transformation using mathematical functions    
+NIN_B   =                    2 / Number of input coordinates                    
+INVERT_A=                    0 / Mapping not inverted                           
+ISA_B   = 'Mapping '           / Mapping between coordinate systems             
+FWD1_A  = 'r=sqrt(x*x+y*y)'    / Forward function 1                             
+FWD2_A  = 'theta=atan2(y,x)'   / Forward function 2                             
+INV1_A  = 'x=r*cos(theta)'     / Inverse function 1                             
+INV2_A  = 'y=r*sin(theta)'     / Inverse function 2                             
+SIMPFI_A=                    1 / Forward-inverse pairs may simplify             
+SIMPIF_A=                    1 / Inverse-forward pairs may simplify             
+ENDAST_G= 'MathMap '           / End of object definition                       
+MAPB_A  = '        '           / Second component Mapping                       
+BEGAST_J= 'WinMap  '           / Map one window on to another                   
+NIN_C   =                    2 / Number of input coordinates                    
+INVERT_B=                    0 / Mapping not inverted                           
+ISA_C   = 'Mapping '           / Mapping between coordinate systems             
+SFT1_A  =               -101.5 / Shift for axis 1                               
+SFT2_A  =               -201.5 / Shift for axis 2                               
+ENDAST_H= 'WinMap  '           / End of object definition                       
+ENDAST_I= 'CmpMap  '           / End of object definition                       
+ENDAST_J= 'FrameSet'           / End of object definition                       
+COMMENT AST ................................................................ AST
+COMMENT AST               End of AST data for FrameSet object                AST
+COMMENT AST ---------------------------------------------------------------- AST

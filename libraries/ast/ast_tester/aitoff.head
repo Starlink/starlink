@@ -1,0 +1,13 @@
+SIMPLE  =                    T / Written by IDL:  30-Jul-1997 05:35:42.00
+BITPIX  =                  -32 / Bits per pixel.
+NAXIS   =                    2 / Number of dimensions
+NAXIS1  =                  300 / Length of x axis.
+NAXIS2  =                  300 / Length of y axis.
+CTYPE1  = 'GLON-AIT'           / X-axis type
+CTYPE2  = 'GLAT-AIT'           / Y-axis type
+CRVAL1  =           -149.56866 / Reference pixel value
+CRVAL2  =           -19.758201 / Reference pixel value
+CRPIX1  =              150.500 / Reference pixel
+CRPIX2  =              150.500 / Reference pixel
+CDELT1  =             -1.20000 / Degrees/pixel
+CDELT2  =              1.20000 / Degrees/pixel
