@@ -6,7 +6,8 @@ include $(STARLINK_SGML_DIR)/lib/Makefile.common
 
 #JADEFLAGS=-V nochunks
 
-ssn70.html.stamp: ssn70.sgml ssn70.htmlback.stamp ../dtd2sgml/sgmltext.stamp
+ssn70.html.stamp: ssn70.sgml ssn70.htmlback.stamp \
+	../dtd2sgml/sgmltext.stamp ../../ReleaseNotes
 ssn70.single.html: ssn70.sgml
 
 ../dtd2sgml/sgmltext.stamp:
