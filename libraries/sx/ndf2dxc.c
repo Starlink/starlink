@@ -269,7 +269,7 @@ F77_INTEGER_FUNCTION(fwritec)( CHARACTER(data) TRAIL(data) ){
  *  get sufficient storage to hold the C string (including a trailing
  *  null). */
 
-      c_data = (char *) malloc( sizeof( char )*( data_length ) );
+      c_data = (char *) malloc( sizeof( char )*( data_length ) + 1);
       if( c_data )
          {
 /*     Get the string */
