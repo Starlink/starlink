@@ -18,6 +18,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * P.Biereichel    30/06/97  Changed parameters in getValues() for pixel table
+ * Peter W. Draper 12/07/99  Added getBlank();
  */
 
 
@@ -70,3 +71,6 @@ void initBlankPixel();
 // visible image area 
 void getHistogram(ImageDataHistogram&);
 
+// return the blank value.
+int haveBlank() {return haveBlank_;}
+double getBlank() {return (double) blank_;}

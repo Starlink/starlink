@@ -28,6 +28,8 @@
  *                 14/07/98  Added LOOKUP_BLANK to use last bin for
  *                           blank pixel (otherwise comes out at
  *                           scaled colour). 
+ *                 12/07/99  Added haveBlank() and getBlank() members
+ *                           to allow return of blank_ value as a double.
  */
 
 
@@ -411,9 +413,11 @@ public:
     LookupTable lookup() {return lookup_;}
     int lookup(LookupTable);
     void clear() {clear_ = 1; update_pending_++;}
+
+    // return the blank value as a double
+    virtual double getBlank() = 0;
+    virtual int haveBlank() = 0;
 };
-
-
 
 // struct used to save transformation parameters of image for use in new image
 struct ImageDataParams {
