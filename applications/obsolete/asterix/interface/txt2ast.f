@@ -331,7 +331,6 @@
       IF ( .NOT. PRIM ) THEN
 
 *      Create HISTORY structure
-        CALL HSI_NEW( OFID, STATUS )
         CALL HSI_ADD( OFID, VERSION, STATUS )
         CALL MSG_SETC( 'FILE', FILE_NAME )
         CALL MSG_MAKE( 'Created from text file ^FILE', HTEXT, HTLEN )
