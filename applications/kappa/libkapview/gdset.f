@@ -92,7 +92,8 @@
                IF( STRING .NE. ' ' ) THEN 
                   CALL MSG_BLANK( STATUS )
                   CALL MSG_SETC( 'F', STRING )
-                  CALL MSG_OUT( ' ', 'All output will go to file ^F. '//
+                  CALL MSG_OUT( ' ', 'All output will go to file ^F '//
+     :                          'by default. '//
      :                          'Each subsequent graphics command '//
      :                          'will overwrite any existing file '//
      :                          'with this name.', STATUS )
