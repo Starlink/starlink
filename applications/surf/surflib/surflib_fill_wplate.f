@@ -31,7 +31,7 @@
 *     Since integrations and measurements are stored sequentially
 *     in a data file (in DEM_PNTR) there is no need to use 
 *     SCULIB_FIND_SWITCH to determine the start and end points
-*     in the data array.
+*     in the data array - use SCULIB_FIND_INT.
 *
 *     The waveplate angles are also stored in a small
 *     array containing a single wave plate angle for each integration
@@ -67,6 +67,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/06/16 21:09:51  timj
+*     use SCULIB_FIND_INT
+*
 *     Revision 1.1  1999/02/27 04:33:18  timj
 *     First version
 *
@@ -103,7 +106,6 @@
       INTEGER MEASUREMENT       ! Current measurement
       INTEGER MEND              ! End position in WPLATE_OUT
       INTEGER MSTART            ! Start position in WPLATE_OUT
-      INTEGER NEXT_INT          ! Next integration
       INTEGER NEXT_MEAS         ! Next measurement
       INTEGER WP_INDEX          ! Position in SCUCD_WPLATE array
       REAL    WPLATE_POS        ! Actual position of wave plate
@@ -160,30 +162,10 @@
          DO MEASUREMENT = 1, N_MEAS
             DO INTEGRATION = 1, N_INT
 
-*     Find where the integration starts
-               MSTART = DEM_PNTR(1,1,INTEGRATION,MEASUREMENT)
-
-*     Find where it stops - add 
-*     This integration will stop one before the start of the
-*     following integration. Unlike the other half of this routine,
-*     there is the complication that the next integration could
-*     in fact be the FIRST integration of the next measurement
-*     [even though for standard map/photometry this should not be
-*     the case]
-
-*     Have to find the next integration
-               NEXT_INT = INTEGRATION + 1
-               NEXT_MEAS = MEASUREMENT
-               IF (NEXT_INT .GT. N_INT) THEN
-                  NEXT_INT = 1
-                  NEXT_MEAS = NEXT_MEAS + 1
-               END IF
-
-               IF (NEXT_MEAS .GT. N_MEAS) THEN
-                  MEND = N_POS
-               ELSE
-                  MEND = DEM_PNTR(1,1,NEXT_INT, NEXT_MEAS) - 1
-               END IF
+*     Find integration start and end
+               CALL SCULIB_FIND_INT(DEM_PNTR, 1, N_EXP, N_INT,
+     :              N_MEAS, N_POS, INTEGRATION, MEASUREMENT,
+     :              MSTART, MEND, STATUS)
 
 *     Now fill the waveplate array (angle in degrees)
                DO I = MSTART, MEND
