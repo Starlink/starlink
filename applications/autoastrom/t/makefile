@@ -11,7 +11,7 @@
 FC=f77
 CC=gcc
 FFLAGS=
-ADDLIBS=
+ADDNETLIBS=
 
 all: test
 
@@ -37,7 +37,7 @@ perlok:
 
 # Utility to dump fits files, for diffing
 fitsdump: fitsdump.f
-	$(FC) $(FFLAGS) -o fitsdump fitsdump.f -L/star/lib -lcfitsio $(ADDLIBS)
+	$(FC) $(FFLAGS) -o fitsdump fitsdump.f -L/star/lib -lcfitsio $(ADDNETLIBS)
 
 clean:
 	rm -f *~ *.run *.stderr *.stdout *.tmp *.delete
