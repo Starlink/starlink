@@ -25,7 +25,7 @@
 *     removing this from the entire scan.
 
 *  Usage:
-*     scan_rlb IN OUT
+*     scan_rlb in out
 
 *  ADAM Parameters:
 *     CHOP = INTEGER (Read)
@@ -41,6 +41,10 @@
 *        The messaging level. Default is NORM. There are no verbose messages.
 *     OUT = NDF (Write)
 *        The name of the output file to contain the processed data.
+*     RLB = INTEGER (Read)
+*        This parameter governs whether the baseline fit is removed from the
+*        input data or stored instead of the data. If RLB is .TRUE. the
+*        corrected data are returned. If RLB is .FALSE. the fit is returned.
 
 *  Examples:
 *     scan_rlb infile \
@@ -80,7 +84,7 @@
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10 TSKNAME            ! Name of task
-      PARAMETER (TSKNAME = 'RESTORE')
+      PARAMETER (TSKNAME = 'SCAN_RLB')
 
 *    Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
@@ -91,6 +95,7 @@
       INTEGER      CHOP_SIZE            ! Chop in pixels
       REAL         CHOP_THROW           ! chopper throw (arcsec)
       INTEGER      DIM (MAXDIM)         ! the dimensions of an array
+      LOGICAL      DORLB                ! Perform the subtraction
       LOGICAL      EXTINCTION           ! .TRUE. if the EXTINCTION application
                                         ! has already been run on the 
                                         ! input file
@@ -381,6 +386,14 @@
 * Bad bit mask
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
+*     Allow for the fit to be stored rather than simply the
+*     data with the fit subtracted. Gives you more flexibility later
+*     since can use the Kappa command SUB to do the subtraction if
+*     required.
+
+      CALL PAR_GET0L('RLB', DORLB, STATUS)
+
+
 *  now go through the various exposures in the observation
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -390,7 +403,7 @@
 
 *       Remove a linear baseline
 
-         CALL SCULIB_REMOVE_LINEAR_BASELINE(N_EXPOSURES,
+         CALL SCULIB_REMOVE_LINEAR_BASELINE(DORLB, N_EXPOSURES,
      :        N_INTEGRATIONS, N_MEASUREMENTS,
      :        %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
      :        %val(IN_DATA_PTR), %VAL(IN_VARIANCE_PTR),
