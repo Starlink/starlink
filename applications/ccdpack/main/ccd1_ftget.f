@@ -112,6 +112,14 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  If there are no mapped cards, we will not find an answer.
+      IF ( NCARD .LE. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCD1_FTGET_NOFITS', 
+     :                 '  No FITS extension found', STATUS )
+         GO TO 99
+      END IF
+
 *  Defer delivery of error messages.
       CALL ERR_MARK
 
