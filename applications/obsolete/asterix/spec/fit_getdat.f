@@ -680,12 +680,13 @@
                 OBDAT(NDS).GPTR = TPTR
 
 	      END IF
-	      CALL MSG_PRNT('    Loaded grouping array')
 
 *          Count number of groups
               CALL FIT_GETDAT_GCNT( OBDAT(NDS).NDAT,
      :                              %VAL(OBDAT(NDS).GPTR),
      :                              OBDAT(NDS).NGDAT, STATUS )
+              CALL MSG_SETI( 'NG', OBDAT(NDS).NGDAT )
+	      CALL MSG_PRNT('    Loaded grouping array with ^NG groups')
 
 *          Create workspace for grouped data
               CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GDPTR,
@@ -704,6 +705,7 @@
 	      OBDAT(NDS).GFLAG = .FALSE.
               OBDAT(NDS).GDPTR = OBDAT(NDS).DPTR
               OBDAT(NDS).GQPTR = OBDAT(NDS).QPTR
+              OBDAT(NDS).NGDAT = OBDAT(NDS).NDAT
 
             END IF
 
