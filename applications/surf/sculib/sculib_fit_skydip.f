@@ -110,6 +110,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.9  1998/01/06 01:55:39  timj
+*     Use constant (mean) variance for all points for fit.
+*
 *     Revision 1.8  1998/01/06 00:34:16  timj
 *     Modernise header
 *
@@ -189,11 +192,14 @@
 *  Local Constants:
       REAL             LIGHT         ! velocity of light
       PARAMETER (LIGHT = 2.997929E8)
+      DOUBLE PRECISION MIN_VAR       ! Minimum variance of a measurement
+      PARAMETER (MIN_VAR = 1.0E-3)
 
 *  Local variables:
       DOUBLE PRECISION ALPHA (3,3)   ! scratch used by SCULIB_FIT_FUNCTION
       DOUBLE PRECISION BETA (3)
       CHARACTER*80     BUFFER        ! buffer to hold results of fit
+      INTEGER          COUNT         ! Counter
       DOUBLE PRECISION DA (6)    
       DOUBLE PRECISION FIT (3)       ! the fitted parameters
       INTEGER          I             ! DO loop variable
@@ -204,10 +210,12 @@
       REAL             J_TEL         ! brightness temperature of telescope 
       DOUBLE PRECISION LAMBDA
       LOGICAL          LOOPING
+      DOUBLE PRECISION MEAN_VAR      ! Mean of the input variances
       INTEGER          NDEG          ! Number of degrees of freedom
       REAL             NU            ! frequency
       INTEGER          QUALITY       ! quality of fit
       REAL             REXISQ        ! Reduced chi square
+      DOUBLE PRECISION SUM           ! Sum of variances
       DOUBLE PRECISION XICUT         ! when an iteration produces an
                                      ! improvement in chi-squared below
                                      ! this limit no further iterations
@@ -234,6 +242,28 @@
       J_TEL = SCULIB_JNU (NU, T_TEL, STATUS)
       J_AMB = SCULIB_JNU (NU, T_AMB, STATUS)
 
+*     Calculate the mean of the input VARIANCE
+*     Try to take care of negative variances (ignore them) and
+*     bad values.
+
+      SUM = 0.0D0
+      COUNT = 0
+
+      DO I = 1, N_MEASUREMENTS
+         IF (J_VARIANCE(I) .NE. VAL__BADR .AND. 
+     :        J_VARIANCE(I) .GE. 0.0D0) THEN
+            SUM = SUM + DBLE(J_VARIANCE(I))
+            COUNT = COUNT + 1
+         END IF
+      END DO
+
+*     Calculate the MEAN
+      IF (COUNT .GT. 0) THEN
+         MEAN_VAR = SUM / DBLE(COUNT)
+      ELSE
+         MEAN_VAR = MIN_VAR   ! No good data anyway
+      END IF
+
 * Put data into common
 
       C_M = N_MEASUREMENTS
@@ -243,7 +273,7 @@
       DO I = 1, N_MEASUREMENTS
          C_AIRMASS (I) = DBLE (AIRMASS(I))
          C_J_MEASURED (I) = DBLE (J_MEASURED(I))
-         C_J_VARIANCE (I) = DBLE (MAX (J_VARIANCE(I), 1.0E-2))
+         C_J_VARIANCE (I) = MAX (MEAN_VAR, MIN_VAR)
          C_J_QUALITY (I) = 0
       END DO
 
