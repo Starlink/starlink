@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 1;
+use Test::More tests => 6;
 
 require_ok("Starlink::AST");
 
@@ -14,10 +14,23 @@ while (<DATA>) {
 
 $fchan->Clear( "Card" );
 my $wcsinfo = $fchan->Read();
+isa_ok( $wcsinfo, "AstFrameSetPtr" );
 
-$wcsinfo->Show();
-print "WCSINFO is $wcsinfo\n";
-print "Shutting down\n";
+my ( @x, @y );
+$x[0] = 0;
+$y[0] = 0;
+my $xpixel = \@x;
+my $ypixel = \@y;
+my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 1 );
+is( $$xworld[0], 4.5, "Forward mapping of X co-ordinate" ); 
+is( $$yworld[0], -0.5, "Forward mapping of Y co-ordinate" );
+
+$x[0] = 4.5;
+$y[0] = -0.5;
+my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 0 );
+is( $$xworld[0], 0, "Reverse mapping of X co-ordinate" ); 
+is( $$yworld[0], 0, "Reverse mapping of Y co-ordinate" );
+
 
 __DATA__
 SIMPLE  =                    T / file does conform to FITS standard             
