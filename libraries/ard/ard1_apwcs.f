@@ -127,7 +127,7 @@
 *  Application coordinates are given by the current Frame of the WCS 
 *  FrameSet. Therefore, the Mapping from the current Frame to Application 
 *  Coordinates Frame is a UnitMap.
-            M3 = AST_UNITMAP( AST_GETI( AWCS, 'NAXIS', STATUS ), ' ',
+            M3 = AST_UNITMAP( AST_GETI( AWCS, 'NAXES', STATUS ), ' ',
      :                        STATUS )  
 
 *  Report an error if no pixel frame was found.
@@ -199,7 +199,7 @@
       END IF
 
 *  Create a Frame representing ARD application coords.
-      F1 = AST_FRAME( AST_GETI( AWCS, 'NAXIS', STATUS ), 
+      F1 = AST_FRAME( AST_GETI( AWCS, 'NAXES', STATUS ), 
      :                'DOMAIN=ARDAPP,Title=ARD application coordinates', 
      :                STATUS )
 

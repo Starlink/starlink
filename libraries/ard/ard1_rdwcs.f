@@ -119,8 +119,8 @@
      :                    ' a FrameSet is required.', STATUS )      
 
 *  Report an error if the Current Frame has the wrong number of axes.
-         ELSE IF( AST_GETI( IWCS, 'NAXIS', STATUS ) .NE. NDIM ) THEN
-            NAX = AST_GETI( IWCS, 'NAXIS', STATUS )
+         ELSE IF( AST_GETI( IWCS, 'NAXES', STATUS ) .NE. NDIM ) THEN
+            NAX = AST_GETI( IWCS, 'NAXES', STATUS )
             CALL AST_ANNUL( IWCS, STATUS )
 
             STATUS = ARD__BADAR
