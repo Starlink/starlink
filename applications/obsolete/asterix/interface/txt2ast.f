@@ -302,7 +302,6 @@
       TITLE_OK = .FALSE.
       TYPE_OK = .FALSE.
       UNITS_OK = .FALSE.
-      VRNT_OK = .FALSE.
 
       DO I = 1, ADI__MXDIM
         AX_LABEL_OK(I) = .FALSE.
