@@ -20,8 +20,9 @@
 *
 *        %VAL( CNF_PVAL( IPTR ) )
 *
-*     If the call to CNF_PVAL is already present no change is made.
-*     Lines with no references to the %VAL directive are left alone.
+*     If the call to CNF_PVAL is already present no change is made,
+*     and a warning is emitted.  Lines with no references to the %VAL 
+*     directive are left alone.
 *
 *     Additionally, for each program unit in which a call to CNF_PVAL
 *     has been made, an attempt is made to insert a line like
@@ -39,7 +40,7 @@
 *
 *     Characters '\r' (carriage return) and '\t' (tab) might possibly
 *     cause erroneous line breaking - if any are encountered a warning
-*     is given (these shouldn't be in the source really).
+*     is given (these should not be in the source really).
 *     Code using columns 73-80 of the source cards for comments is 
 *     likely to be mangled (nobody does this any more do they?).
 *
@@ -48,8 +49,8 @@
 *     exit with error status and an error message.
 *
 *     Some attention is paid to the aesthetic qualities of the output:
-*     line breaks are done, where possible, following the usage in, e.g.,
-*     KAPPA.  An attempt is made copy the style of case usage and bracket 
+*     line breaks are made, where possible, following the usage in, e.g.,
+*     KAPPA.  An attempt is made to copy the style of case usage and bracket 
 *     spacing from the input.
 *
 *     This program wraps ALL occurrences of %VAL in a call to CNF_PVAL,
