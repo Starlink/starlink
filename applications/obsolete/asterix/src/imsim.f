@@ -58,6 +58,7 @@
 *                        uses the GNU generator (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     14 Dec 94 : V1.8-1 Test to see if corrected model (DJA)
+*     28 Mar 95 : V1.8-2 New data interface (DJA)
 *
 *    Type definitions :
 *
@@ -66,9 +67,9 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -87,88 +88,89 @@
 *
 *    Local variables :
 *
-      CHARACTER         FOLOC*(DAT__SZLOC)     ! Copy of first o/p locator
-      CHARACTER         HLOC*(DAT__SZLOC)      ! Locator to o/p HEADER
-      CHARACTER         MLOC*(DAT__SZLOC)      ! Locator to bgnd model
-      CHARACTER         MORELOC*(DAT__SZLOC)   ! Locator to o/p MORE box
-      CHARACTER         OLOC*(DAT__SZLOC)      ! Locator to output dataset
-      CHARACTER         SIMLOC*(DAT__SZLOC)    ! Locator to o/p SIM_DATA box
-      CHARACTER*40      UNITS                  ! Model X axis units
+      CHARACTER*80      	MODEL                  	! Background model file
+      CHARACTER*80      	OROOT                  	! Output dataset root
+      CHARACTER*132     	ONAME                  	! Output file name
+      CHARACTER*40      	UNITS                  	! Model X axis units
 
-      CHARACTER*80      MODEL                  ! Background model file
-      CHARACTER*80      OROOT                  ! Output dataset root
-      CHARACTER*132     ONAME                  ! Output file name
+      DOUBLE PRECISION  	AREA                   	! Total image area
+      DOUBLE PRECISION  	EU, ED                 	! Upper and lower indices
+      DOUBLE PRECISION  	SB                     	! Break flux for Log NS
+      DOUBLE PRECISION  	SMIN,SMAX              	! Bounds for valid fluxes
+      DOUBLE PRECISION  	SNORM                  	! Flux at normalisation
+      DOUBLE PRECISION		SPOINT(2)		! Default pointing
 
-      DOUBLE PRECISION  AREA                   ! Total image area
-      DOUBLE PRECISION  EU, ED                 ! Upper and lower indices
-      DOUBLE PRECISION  SB                     ! Break flux for Log NS
-      DOUBLE PRECISION  SMIN,SMAX              ! Bounds for valid fluxes
-      DOUBLE PRECISION  SNORM                  ! Flux at normalisation
-
-      REAL              FSIZE                  ! Size of field
-      REAL              MTOT                   ! Total valid data in model
-      REAL              NSNORM                 ! # source >= SNORM in AREA
-      REAL              PSIZE                  ! Pixel size - quantum of lists
-      REAL              SPOS(MAXSRC*2)         ! Source positions
+      REAL              	FSIZE                  	! Size of field
+      REAL              	MTOT                   	! Total valid data in model
+      REAL              	NSNORM                 	! # source >= SNORM in AREA
+      REAL              	PSIZE                  	! Pixel size - quantum of lists
+      REAL              	SPOS(MAXSRC*2)         	! Source positions
       REAL			TEFF			! Model exposure time
-      REAL              TOR                    ! Radian conversion factor
-      REAL              WIDS(MAXSRC)           ! Source widths
-      REAL              XPOS(MAXSRC),YPOS(MAXSRC)
-      REAL              XBASE, XSCALE          ! Model X axis
-      REAL              YBASE, YSCALE          ! Model Y axis
+      REAL              	TOR                    	! Radian conversion factor
+      REAL              	WIDS(MAXSRC)           	! Source widths
+      REAL              	XPOS(MAXSRC),YPOS(MAXSRC)
+      REAL              	XBASE, XSCALE          ! Model X axis
+      REAL              	YBASE, YSCALE          	! Model Y axis
 
-      INTEGER           ACTSRC                 ! Actual number of sources
-      INTEGER           ACTWID                 ! Actual number of widths given
-      INTEGER           DIMS(DAT__MXDIM)       ! Bgnd dimensions
-      INTEGER           FFILE                  ! Index of first file
-      INTEGER           IFILE                  ! Loop over files
-      INTEGER           IM_AR                  ! Image area description
-      INTEGER           ISRC                   ! Loop over sources
-      INTEGER           IWID                   ! Loop over widths
+      INTEGER           	ACTSRC                 	! Actual # sources
+      INTEGER           	ACTWID                 	! Actual number of widths given
+      INTEGER           	DIMS(ADI__MXDIM)       	! Bgnd dimensions
+      INTEGER           	FFILE                  	! Index of first file
+      INTEGER			FOFID			! 1st output dataset id
+      INTEGER           	IFILE                  	! Loop over files
+      INTEGER           	ISRC                   	! Loop over sources
+      INTEGER           	IWID                   	! Loop over widths
       INTEGER           LNPTR                  ! Workspace for Log NS routine
       INTEGER           LNSRC                  ! # sources in last image
-      INTEGER           MBDA                   ! Model BDA identifier
-      INTEGER           MDPTR                  ! Model data ptr
+      INTEGER           	MDPTR                  	! Model data ptr
+      INTEGER			MFID			! Model dataset
       INTEGER           MIPTR                  ! Model probability index ptr
+      INTEGER			MPSF			! Model psf handle
       INTEGER           MQNDIM                 ! Model quality dimensionality
-      INTEGER           MQDIMS(DAT__MXDIM)     ! Model quality dimensions
-      INTEGER           MQPTR                  ! Model quality ptr
-      INTEGER           NPT                    ! No. of points in position lists
-      INTEGER           NBACK                  ! No. of background counts
-      INTEGER           NDIM                   ! Bgnd dimensionality
-      INTEGER           NELM                   ! Bgnd elements
-      INTEGER           NFILE                  ! # files to create
+      INTEGER           	MQDIMS(ADI__MXDIM)     	! Model quality dims
+      INTEGER           	MQPTR                  	! Model quality ptr
+      INTEGER           	NPT                    	! # points in position lists
+      INTEGER           	NBACK                  	! # background counts
+      INTEGER           	NDIM                   	! Bgnd dimensionality
+      INTEGER           	NELM                   	! Bgnd elements
+      INTEGER           	NFILE                  	! # files to create
       INTEGER           NOUT                   ! # events outside field ranges
-      INTEGER           NSRC                   ! # sources in image
-      INTEGER           NVAL                   ! # values in model axis
-      INTEGER           ODPTR                  ! Output data array
+      INTEGER           	NSRC                   	! # sources in image
+      INTEGER           	NVAL                   	! # values in model axis
+      INTEGER           	ODPTR                  	! Output data array
+      INTEGER			OFID			! Output dataset id
       INTEGER           ONBACK                 ! Requested # background counts
       INTEGER           OSCOUNT(MAXSRC)        ! Requested # of source counts
-      INTEGER           PDPTR                  ! Psf data ptr
+      INTEGER           	PDPTR                  	! Psf data ptr
       INTEGER           PIN                    ! Length of psf prob index
-      INTEGER           PIPTR                  ! Psf prob index ptr
-      INTEGER           PSLOT                  ! PSF system slot
+      INTEGER           	PIPTR                  	! Psf prob index ptr
+      INTEGER			PIXID, PRJID, SYSID	! World coordinates
+      INTEGER           	PSLOT                  	! PSF system slot
       INTEGER           PSW                    ! Psf access width in pixels
       INTEGER           PSW2                   ! Psf model width in pixels
-      INTEGER           OBDA                   ! Output BDA identifier
-      INTEGER           ODIMS(DAT__MXDIM)      ! Output dimensions
-      INTEGER           ONDIM                  ! Output dimensionality
-      INTEGER           SCOUNT(MAXSRC)         ! Actual # of source counts
-      INTEGER           SEED                   ! Random number seed
+      INTEGER           	ODIMS(ADI__MXDIM)      	! Output dimensions
+      INTEGER           	OFID                   	! Output file id
+      INTEGER           	ONDIM                  	! Output dimensionality
+      INTEGER           	SCOUNT(MAXSRC)         	! Actual source counts
+      INTEGER           	SEED                   	! Random number seed
+      INTEGER			TIMID			! Timing info
 
-      LOGICAL           ANYBAD                 ! Any bad model points?
+      LOGICAL           	ANYBAD                 	! Any bad model points?
       LOGICAL			ECORR			! Model is corrected?
-      LOGICAL           LOGNS                  ! Work in Log NS mode for sources
-      LOGICAL           MOK                    ! Using a model?
-      LOGICAL           MORE_OK                ! MORE box present in model?
-      LOGICAL           OK                     ! Validity check
-      LOGICAL           PDEV                   ! Poisson deviate
-      LOGICAL           SEED_GIVEN             ! Seed supplied?
+      LOGICAL           	LOGNS                  	! Work in Log NS mode?
+      LOGICAL           	MOK                    	! Using a model?
+      LOGICAL           	OK                     	! Validity check
+      LOGICAL           	PDEV                   	! Poisson deviate
+      LOGICAL           	SEED_GIVEN             	! Seed supplied?
 *
 *    Version id :
 *
       CHARACTER*30      VERSION
-        PARAMETER       ( VERSION = 'IMSIM Version 1.8-1' )
+        PARAMETER       ( VERSION = 'IMSIM Version 1.8-2' )
+*
+*    Local Data:
+*
+      DATA		SPOINT/0D0,0D0/
 *-
 
 *    Check status
@@ -179,9 +181,12 @@
 
 *    Initialise Asterix
       CALL AST_INIT()
-      CALL PSF_INIT( STATUS )
-      CALL AXA_INIT()
       LNSRC = 0
+
+*    No astrometry by default
+      PIXID = ADI__NULLID
+      PRJID = ADI__NULLID
+      SYSID = ADI__NULLID
 
 *    Get number of files
       CALL USI_GET0I( 'NFILE', NFILE, STATUS )
@@ -209,11 +214,10 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Try to open it
-        CALL HDS_OPEN( MODEL, 'READ', MLOC, STATUS )
-        CALL BDA_FIND( MLOC, MBDA, STATUS )
+        CALL ADI_FOPEN( MODEL, '*', 'READ', MFID, STATUS )
 
 *      Check dimensions and map
-        CALL BDA_CHKDATA( MLOC, OK, NDIM, DIMS,STATUS )
+        CALL BDI_CHKDATA( MFID, OK, NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Check dimensionality
@@ -221,23 +225,23 @@
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Invalid model data', STATUS )
         ELSE IF ( NDIM .NE. 2 ) THEN
-          CALL ERR_REP( ' ', 'Background must be 2D', STATUS )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Background must be 2D', STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Map model array
         NELM = DIMS(1)*DIMS(2)
-        CALL BDA_MAPDATA( MLOC, 'READ', MDPTR, STATUS )
+        CALL BDI_MAPDATA( MFID, 'READ', MDPTR, STATUS )
 
 *      Quality present?
-        CALL BDA_CHKQUAL( MLOC, OK, MQNDIM, MQDIMS, STATUS )
+        CALL BDI_CHKQUAL( MFID, OK, MQNDIM, MQDIMS, STATUS )
         IF ( OK ) THEN
-          CALL BDA_MAPLQUAL( MLOC, 'READ', ANYBAD, MQPTR, STATUS )
+          CALL BDI_MAPLQUAL( MFID, 'READ', ANYBAD, MQPTR, STATUS )
           IF ( ANYBAD ) THEN
             CALL MSG_PRNT( 'Using model quality array...' )
           ELSE
-            CALL BDA_UNMAPLQUAL( MLOC, STATUS )
+            CALL BDI_UNMAPLQUAL( MFID, STATUS )
           END IF
         END IF
 
@@ -248,19 +252,35 @@
         CALL SIM_MNORM( NELM, %VAL(MDPTR), ANYBAD, %VAL(MQPTR),
      :                              %VAL(MIPTR), MTOT, STATUS )
 
+*      Load astrometry & timing
+        CALL TCI_GETID( MFID, TIMID, STATUS )
+        CALL WCI_GETIDS( MFID, PIXID, PRJID, SYSID, STATUS )
+
 *      Was model exposure corrected?
-        CALL PRO_GET( MLOC, 'CORRECTED.EXPOSURE', ECORR, STATUS )
+        CALL PRF_GET( MFID, 'CORRECTED.EXPOSURE', ECORR, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           IF ( ECORR ) THEN
-            CALL BDA_LOCHEAD( MLOC, HLOC, STATUS )
-            CALL CMP_GET0R( HLOC, 'EFF_EXPOSURE', TEFF, STATUS )
+            CALL ADI_CGET0R( TIMID, 'EffExposure', TEFF, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
               CALL ERR_ANNUL( STATUS )
-              CALL CMP_GET0R( HLOC, 'EXPOSURE_TIME', TEFF, STATUS )
+              CALL ADI_CGET0R( TIMID, 'Exposure', TEFF, STATUS )
+              IF ( STATUS .NE. SAI__OK ) THEN
+                CALL ERR_ANNUL( STATUS )
+                TEFF = 1.0
+              END IF
             END IF
-            CALL MSG_SETR( 'TEFF', TEFF )
-            CALL MSG_PRNT( 'Model is exposure corrected, scaling up'/
-     :                             /' by exposure of ^TEFF seconds' )
+            IF ( TEFF .EQ. 1.0 ) THEN
+              CALL MSG_SETR( 'TEFF', TEFF )
+              CALL MSG_PRNT( 'Model is exposure corrected, scaling up'/
+     :                               /' by exposure of ^TEFF seconds' )
+            ELSE
+              CALL MSG_PRNT( 'No exposure time in model, assuming '/
+     :                                  /'an exposure of 1 second' )
+            END IF
+          ELSE
+            TEFF = 1.0
+            CALL MSG_PRNT( 'No exposure time in model, assuming '/
+     :                                /'an exposure of 1 second' )
           END IF
         ELSE
           CALL ERR_ANNUL( STATUS )
@@ -272,15 +292,21 @@
         CALL MSG_SETR( 'C', MTOT )
         CALL MSG_PRNT( 'Model contains ^C counts' )
 
-*      Get axis details
-        CALL AXA_FIND( MLOC, IM_AR, STATUS )
+*      Introduce to psf system
+        CALL PSF_INTRO( MFID, MPSF, STATUS )
 
-        CALL BDA_GETAXVAL( MLOC, 1, XBASE, XSCALE, NVAL, STATUS )
-        CALL BDA_GETAXVAL( MLOC, 2, YBASE, YSCALE, NVAL, STATUS )
-        CALL BDA_GETAXUNITS( MLOC, 1, UNITS, STATUS )
+*      Get axis details
+        CALL BDI_GETAXVAL( MFID, 1, XBASE, XSCALE, NVAL, STATUS )
+        CALL BDI_GETAXVAL( MFID, 2, YBASE, YSCALE, NVAL, STATUS )
+        CALL BDI_GETAXUNITS( MFID, 1, UNITS, STATUS )
+
+*      Output dimensions
+        ONDIM = NDIM
+        ODIMS(1) = DIMS(1)
+        ODIMS(2) = DIMS(2)
 
 *      Unmap model values
-        CALL BDA_UNMAP( MLOC, STATUS )
+        CALL BDI_UNMAP( MFID, STATUS )
         PSIZE = ABS(XSCALE)
         MOK = .TRUE.
 
@@ -299,15 +325,16 @@
         YBASE = -FSIZE/2.0 + YSCALE / 2.0
 
 *      Grab an area descriptor
-        CALL AXA_GETAR( IM_AR, STATUS )
-        CALL AXA_PUTAXVAL( IM_AR, 1, XBASE, XSCALE,
-     :                                  NINT(FSIZE/PSIZE), STATUS )
-        CALL AXA_PUTAXVAL( IM_AR, 2, YBASE, YSCALE,
-     :                                  NINT(FSIZE/PSIZE), STATUS )
-
+        ODIMS(1) = NINT(FSIZE/PSIZE)
+        ODIMS(2) = NINT(FSIZE/PSIZE)
+        ONDIM = 2
         UNITS = 'arcmin'
-        CALL AXA_PUTAXTXT( IM_AR, 1, 'X position', UNITS, STATUS )
-        CALL AXA_PUTAXTXT( IM_AR, 2, 'Y position', UNITS, STATUS )
+
+*      Invent some WCS stuff
+        CALL WCI_NEWPRJ( 'TAN', 0, 0.0, SPOINT, 180D0, PRJID, STATUS )
+        CALL WCI_NEWSYS( 'FK5', 2000.0, 2000D0, SYSID, STATUS )
+	call adi_print( prjid, status )
+	call adi_print( sysid, status )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -321,8 +348,9 @@
         CALL ERR_ANNUL( STATUS )
         ONBACK = 0
       ELSE IF ( ( ONBACK .LT. 0 ) .AND. ( STATUS .EQ. SAI__OK ) ) THEN
-        CALL MSG_PRNT( '! Number of counts must be positive' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Number of counts must be positive',
+     :                STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -370,8 +398,8 @@
 
 *    No sources and background
       IF ( ( NSRC .EQ. 0 ) .AND. ( ONBACK .EQ. 0 ) ) THEN
-        CALL MSG_PRNT( '! No sources and no background' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'No sources and no background', STATUS )
         GOTO 99
       END IF
 
@@ -433,9 +461,6 @@
 
       END IF
 
-*    Dataset dimensions
-      CALL AXA_GETDIMS( IM_AR, ONDIM, ODIMS, STATUS )
-
 *    Find image area in square degrees
       AREA = ODIMS(1)*ODIMS(2)*(PSIZE*TOR*MATH__RTOD)**2
 
@@ -462,9 +487,8 @@
         END IF
 
 *      Open file
-        CALL HDS_NEW( ONAME(:CHR_LEN(ONAME)), 'BINDS', 'BINDS', 0, 0,
-     :                                                 OLOC, STATUS )
-        CALL BDA_FIND( OLOC, OBDA, STATUS )
+        CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', ADI__NULLID,
+     :                   OFID, STATUS )
 
 *      Get fluxes in Log NS mode
         IF ( LOGNS ) THEN
@@ -502,61 +526,60 @@
         IF ( IFILE .EQ. 1 ) THEN
 
 *        Commit the axis description to BDA structures
-          CALL AXA_GENAXES( OLOC, IM_AR, STATUS )
+          IF ( MOK ) THEN
+            CALL BDI_COPAXES( MFID, OFID, STATUS )
+          ELSE
+            CALL BDI_CREAXES( OFID, ONDIM, STATUS )
+            CALL BDI_CREAXVAL( OFID, 1, .TRUE., ODIMS(1), STATUS )
+            CALL BDI_CREAXVAL( OFID, 2, .TRUE., ODIMS(2), STATUS )
+            CALL BDI_PUTAXVAL( OFID, 1, XBASE, XSCALE, ODIMS(1),
+     :                         STATUS )
+            CALL BDI_PUTAXVAL( OFID, 2, YBASE, YSCALE, ODIMS(2),
+     :                         STATUS )
+            CALL BDI_PUTAXTEXT( OFID, 1, 'X position', UNITS, STATUS )
+            CALL BDI_PUTAXTEXT( OFID, 2, 'Y position', UNITS, STATUS )
+          END IF
 
 *        Create the data
-          CALL BDA_CREDATA_INT( OBDA, ONDIM, ODIMS, STATUS )
+          CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
 
-*        Get MORE box from model if present
-          MORE_OK = .FALSE.
-
-*        Otherwise create dummy MORE structures to stop irritating messages
-*        from future s/w
-          IF ( .NOT. MORE_OK ) THEN
-            CALL BDA_CREHEAD_INT( OBDA, STATUS )
-            CALL BDA_LOCHEAD_INT( OBDA, HLOC, STATUS )
-            CALL HDX_PUTD( HLOC, 'AXIS_RA', 1, 0.0D0, STATUS )
-            CALL HDX_PUTD( HLOC, 'AXIS_DEC', 1, 0.0D0, STATUS )
-            CALL HDX_PUTD( HLOC, 'FIELD_RA', 1, 0.0D0, STATUS )
-            CALL HDX_PUTD( HLOC, 'FIELD_DEC', 1, 0.0D0, STATUS )
-            CALL HDX_PUTD( HLOC, 'POSITION_ANGLE', 1, 0.0D0, STATUS )
-          END IF
-          CALL DAT_FIND( OLOC, 'MORE', MORELOC, STATUS )
+*        Write astrometry
+          CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
 
 *        Write data units
-          CALL BDA_PUTUNITS_INT( OBDA, 'counts', STATUS )
+          CALL BDI_PUTUNITS( OFID, 'counts', STATUS )
 
 *        Create structures to hold simulation parameters
-          CALL DAT_NEW( MORELOC, 'SIM_DATA', 'EXTENSION', 0, 0, STATUS )
-          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
-          CALL DAT_NEW0I( SIMLOC, 'SEED', STATUS )
-          CALL DAT_NEW0I( SIMLOC, 'BCOUNT', STATUS )
-          IF ( NSRC .GT. 0 ) THEN
-            CALL DAT_NEW1I( SIMLOC, 'SCOUNT', NSRC, STATUS )
-          END IF
+C          CALL DAT_NEW( MORELOC, 'SIM_DATA', 'EXTENSION', 0, 0, STATUS )
+C          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
+C          CALL DAT_NEW0I( SIMLOC, 'SEED', STATUS )
+C          CALL DAT_NEW0I( SIMLOC, 'BCOUNT', STATUS )
+C          IF ( NSRC .GT. 0 ) THEN
+C            CALL DAT_NEW1I( SIMLOC, 'SCOUNT', NSRC, STATUS )
+C          END IF
 
 *        Associate psf if first time through
           IF ( NSRC .GT. 0 ) THEN
-            CALL PSF_ASSOCO( OLOC, PSLOT, STATUS )
+            CALL PSF_TASSOCO( OFID, PSLOT, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 99
           END IF
 
 *        Make a copy for copying purposes
-          FOLOC = OLOC
+          FOFID = OFID
 
         ELSE
 
 *        Copy everything from first dataset
-          CALL HDX_COPY( FOLOC, OLOC, STATUS )
+          CALL ADI_FCOPY( FOFID, OFID, STATUS )
 
 *        Locate MORE and SIM_DATA
-          CALL DAT_FIND( OLOC, 'MORE', MORELOC, STATUS )
-          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
+C          CALL DAT_FIND( OLOC, 'MORE', MORELOC, STATUS )
+C          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
 
         END IF
 
 *      Map output data
-        CALL BDA_MAPDATA_INT( OBDA, 'WRITE', ODPTR, STATUS )
+        CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
         CALL ARR_INIT1R( 0.0, ODIMS(1)*ODIMS(2), %VAL(ODPTR), STATUS )
 
 *      Dump counts to user
@@ -579,7 +602,8 @@
         END IF
 
 *      Create image
-        CALL IMSIM_INT( SIMLOC, IM_AR, PSLOT, SEED,
+        CALL IMSIM_INT( OFID, PSLOT, SEED,
+     :                  XBASE, XSCALE, YBASE, YSCALE,
      :                  NSRC, SCOUNT, WIDS, NBACK, MOK, %VAL(MIPTR),
      :                  XSCALE*TOR, YSCALE*TOR, TOR,
      :                  ODIMS(1), ODIMS(2), %VAL(ODPTR), IFILE, PSW2,
@@ -587,14 +611,14 @@
      :                  XPOS, YPOS, NOUT, STATUS )
 
 *      Always unmap data and release from BDA
-        CALL DAT_ANNUL( MORELOC, STATUS )
-        CALL DAT_ANNUL( SIMLOC, STATUS )
-	CALL BDA_UNMAPDATA_INT( OBDA, STATUS )
-        CALL BDA_RELEASE_INT( OBDA, STATUS )
+C        CALL DAT_ANNUL( MORELOC, STATUS )
+C        CALL DAT_ANNUL( SIMLOC, STATUS )
+	CALL BDI_UNMAPDATA( OFID, STATUS )
+        CALL BDI_RELEASE( OFID, STATUS )
 
 *      Close if not first file
         IF ( (IFILE.GT.1) .OR. (IFILE.EQ.NFILE) ) THEN
-          CALL HDS_CLOSE( OLOC, STATUS )
+          CALL ADI_FCLOSE( OFID, STATUS )
         END IF
 
 *      Store no of sources
@@ -604,12 +628,11 @@
 
 *    Free model
       IF ( MOK ) THEN
-        CALL BDA_RELEASE( MLOC, STATUS )
+        CALL BDI_RELEASE( MFID, STATUS )
       END IF
 
 *    Tidy up
  99   CALL PSF_CLOSE( STATUS )
-      CALL AXA_CLOSE()
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -617,7 +640,8 @@
 
 
 *+  IMSIM_INT - Creates the dummy data set
-      SUBROUTINE IMSIM_INT( SIMLOC, ARID, PSFH, ISEED,
+      SUBROUTINE IMSIM_INT( OFID, PSFH, ISEED,
+     :                      XBASE, XSCALE, YBASE, YSCALE,
      :                      NSRC, SCOUNT, WID, NMOD, MOK, MPI, DX, DY,
      :                      TOR, NX, NY, ODAT, IFILE, PW, PD, PIN, PI,
      :                      SX, SY, NOUT, STATUS )
@@ -647,7 +671,6 @@
 *    Global Constants:
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Status:
@@ -656,10 +679,11 @@
 *
 *    Import:
 *
-      CHARACTER*(DAT__SZLOC)  SIMLOC              ! Output dataset SIM_DATA box
-      INTEGER                 ARID                ! AXA area description
+      INTEGER			OFID			! Output dataset
       INTEGER                 PSFH                ! PSF system handle
       INTEGER                 PW                  ! Psf width in pixels
+      REAL			XBASE, XSCALE, YBASE, YSCALE
+
       REAL                    PD(-PW:PW,-PW:PW,*) ! Psf data
       INTEGER                 PIN                 ! Psf index size (PW*2+1)^2+1
       REAL                    PI(PIN,*)           ! Psf index data
@@ -711,11 +735,11 @@
       TPW = PW*2+1
 
 *    Write simulation parameters
-      CALL CMP_PUT0I( SIMLOC, 'SEED', ISEED, STATUS )
-      CALL CMP_PUT0I( SIMLOC, 'BCOUNT', NMOD, STATUS )
-      IF ( NSRC .GT. 0 ) THEN
-        CALL CMP_PUT1I( SIMLOC, 'SCOUNT', NSRC, SCOUNT, STATUS )
-      END IF
+C      CALL CMP_PUT0I( SIMLOC, 'SEED', ISEED, STATUS )
+C      CALL CMP_PUT0I( SIMLOC, 'BCOUNT', NMOD, STATUS )
+C      IF ( NSRC .GT. 0 ) THEN
+C        CALL CMP_PUT1I( SIMLOC, 'SCOUNT', NSRC, SCOUNT, STATUS )
+C      END IF
 
 *    Jump over this bit if no source
       IF ( NSRC .EQ. 0 ) GOTO 50
@@ -726,12 +750,14 @@
 *      Only need first psf if psf constant
         DO ISRC = 1, NSRC
 
-*        Find offset in fractional from pixel centre to psf centre
-          CALL AXA_A2P( ARID, 1, SX(ISRC), PCX(ISRC), STATUS )
-          CALL AXA_A2P( ARID, 2, SY(ISRC), PCY(ISRC), STATUS )
-          CALL AXA_P2A( ARID, 1, PCX(ISRC), PCA, STATUS )
+*        X offset from pixel centre to psf centre
+          PCX(ISRC) = NINT(( SX(ISRC) - XBASE ) / XSCALE) + 1
+          PCA = ( REAL(PCX(ISRC))-1.0 ) * XSCALE + XBASE
           QX(ISRC) = (PCA-SX(ISRC))*TOR
-          CALL AXA_P2A( ARID, 2, PCY(ISRC), PCA, STATUS )
+
+*        Y offset from pixel centre to psf centre
+          PCY(ISRC) = NINT(( SY(ISRC) - YBASE ) / YSCALE) + 1
+          PCA = ( REAL(PCY(ISRC))-1.0 ) * YSCALE + YBASE
           QY(ISRC) = (PCA-SY(ISRC))*TOR
 
 *        Evaluate psf into subsection of psf array. PW covers the
@@ -808,7 +834,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -922,7 +947,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
