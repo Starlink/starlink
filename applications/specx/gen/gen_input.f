@@ -1,7 +1,10 @@
 *  History:
 *     16 Nov 1993 (hme):
 *        Replace backslash in string constants with CHAR(92).
-*-----------------------------------------------------------------------
+*     31 July 2000 (ajc):
+*        Re-write illegal concatenation
+*        Change TYPE * to PRINT *
+*        Unused GEN_DELIM
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_INPUT (LEVEL, PROMPT, CHAX, ISTR, JDEF)
@@ -46,12 +49,13 @@ C   Each call to GETCH retrieves the contents of one item of terminal input.
       INTEGER*4 IERR
       INTEGER*4 NCH
       INTEGER*4 LUN
+      INTEGER   IDL
       CHARACTER ID*80
       CHARACTER STRING*256
+      CHARACTER PSTRING*512
 
 *     Functions
 
-      INTEGER   GEN_DELIM
       INTEGER*4 GEN_ILEN
       INTEGER*4 GEN_ICHTOT
       INTEGER*4 STACK_POINTER
@@ -61,7 +65,6 @@ C   Each call to GETCH retrieves the contents of one item of terminal input.
       INCLUDE  'CLI_STACK.INC'
 
 *  OK? Go...
-
       ISPMAX = ISP
       EMPTY  = .TRUE.
       QUERY  = .FALSE.
@@ -79,19 +82,19 @@ C  If CLI line not empty read from CLI line.
 *       Read from the command line and update the pointer to after the
 *       terminating delimiter sequence
 
-D       Type *,'Calling GETIT3 with string = ',cliline(iclist:iclifin)
-D       Type *,'stack pars iclist, iclifin, icli(1,isp), icli(2,isp)'
-D       Type *,            iclist, iclifin, icli(1,isp), icli(2,isp)
+D       Print *,'Calling GETIT3 with string = ',cliline(iclist:iclifin)
+D       Print *,'stack pars iclist, iclifin, icli(1,isp), icli(2,isp)'
+D       Print *,            iclist, iclifin, icli(1,isp), icli(2,isp)
 
         CALL GEN_GETIT3 (CLILINE(ICLIST:ICLIFIN),
      &                   LEVEL, IST, IFIN, INEXT, IERR)
 
-D       Type *,'Returned from GETIT3 with string = ',
+D       Print *,'Returned from GETIT3 with string = ',
 D    &          cliline(iclist+ist-1:iclist+ifin-1)
-D       Type *,'ist, ifin, inext = ', ist, ifin, inext
+D       Print *,'ist, ifin, inext = ', ist, ifin, inext
 
         ICLI(1,ISP) = IBEG + INEXT - 1
-D       Type *,'icli(1,isp) updated: ', icli(1,isp)
+D       Print *,'icli(1,isp) updated: ', icli(1,isp)
 
 *       Error in getting next string
         IF (IERR.EQ.1 .OR. IERR.GT.2) THEN
@@ -118,7 +121,7 @@ D       Type *,'icli(1,isp) updated: ', icli(1,isp)
      &            .OR. STRING(1:2).EQ.'^D'
      &            .OR. STRING(1:2).EQ.'^d') THEN
               JDEF = 2
-D             TYPE *, '<<EOF implied>>'
+D             PRINT *, '<<EOF implied>>'
               GO TO 200
             END IF
           ELSE
@@ -174,6 +177,7 @@ C  Need more data? ( EMPTY must still be TRUE if IERR=2 )
 
 *       ... prompt with modified string, to show that it is "immediate" mode
         ELSE
+
           JDEF = -1
           IF (ISPMAX.NE.0)   THEN
             INQUIRE (UNIT=ICLI(3,ISPMAX), NAME=ID)
@@ -189,12 +193,18 @@ C  Need more data? ( EMPTY must still be TRUE if IERR=2 )
 *         there is already more stuff there to cover subsequent questions.
 
           DO WHILE(JDEF.LT.0)
+            IDL = GEN_ILEN(ID)
             IF (PROMPT(1:1).NE.'"')  THEN
-              CALL GEN_GETMORE (ID(:GEN_ILEN(ID)+1)//PROMPT,
-     &                          STRING, JDEF)
+              PSTRING = ID(:IDL+1)
+              PSTRING(IDL+2:) = PROMPT
+              CALL GEN_GETMORE (PSTRING, STRING, JDEF)
             ELSE
-              CALL GEN_GETMORE (PROMPT(:1)//''' '//ID(:GEN_ILEN(ID))
-     &                          //''',/'//PROMPT(2:), STRING, JDEF)
+              PSTRING = PROMPT(:1)
+              PSTRING(2:3) = ''' '
+              PSTRING(4:) = ID(:IDL)
+              PSTRING(IDL+4:) = ''',/'
+              PSTRING(IDL+6:) = PROMPT(2:)
+              CALL GEN_GETMORE (PSTRING, STRING, JDEF)
             END IF
           END DO
 
@@ -231,8 +241,8 @@ C  Before return jump back to top of stack
       LUN = ICLI(3,ISP)
       CALL SET_LUN_IN (LUN)
 
-D     TYPE *,'-- gen_input --'
-D     TYPE *,'   chax, istr, jdef: ', chax, istr, jdef
+D     PRINT *,'-- gen_input --'
+D     PRINT *,'   chax, istr, jdef: ', chax, istr, jdef
 
       RETURN
       END

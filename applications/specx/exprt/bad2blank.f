@@ -1,5 +1,11 @@
 *-----------------------------------------------------------------------
-*   History:  12/29/95  Created (Remo Tilanus, JACH, Hawaii)
+*   History:
+*      12/29/95  Created (Remo Tilanus, JACH, Hawaii)
+*      8/05/00  (ajc):
+*         Port to Linux
+*         Replace 'TYPE *' with 'PRINT *'
+*         Remove inaccessible error handling
+*                
 *
 *-----------------------------------------------------------------------
 
@@ -65,27 +71,21 @@
                             ! maps RBLANK on valid pixels the data is
                             ! no good anyway.
 
-D      TYPE *, 'Min map: ', DMIN, '   Max map: ', DMAX
-D      TYPE *, 'Rblank: ', RBLANK
+D      PRINT *, 'Min map: ', DMIN, '   Max map: ', DMAX
+D      PRINT *, 'Rblank: ', RBLANK
 
       IF (NBAD .NE. 0) THEN
          DO I=1,NELM
          IF ( (ABS(DATA(I)-BADPIX_VAL) .LT. 0.0001) .OR.
      &        (ABS(DATA(I)) .LT. DLIM))  DATA(I) = RBLANK
          END DO
-         TYPE *, 'Flagged ',NBAD,' undefined pixels'
+         PRINT *, 'Flagged ',NBAD,' undefined pixels'
       END IF
 
       
 
       RETURN
 
-*     Error handling
-
-   99 CONTINUE
-      IFAIL = -1
-
-      RETURN
       END
 
 *-----------------------------------------------------------------------

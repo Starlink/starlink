@@ -3,6 +3,12 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
+*        Trap expected IERR=1 return from GEN_OPERATOR so
+*          GEN_EVAL_ALL can drop through on bad given IERR
+*        Report "unevaluable" if expression fails
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_eval_ae (string, type, value, ierr)
@@ -34,8 +40,8 @@
 
 *  Ok, go...
 
-D     Type *,'-- gen_eval_ae --'
-D     Type *,'  input string =', string(:60)
+D     Print *,'-- gen_eval_ae --'
+D     Print *,'  input string =', string(:60)
 
 *     Type of output data requested?
 
@@ -59,8 +65,8 @@ D     Type *,'  input string =', string(:60)
 
       CALL strip_string (string, c1, c2)
 
-D     Type *,'Stripped string: ', string(c1:c2)
-D     Type *,'String length = ', c2-c1+1
+D     Print *,'Stripped string: ', string(c1:c2)
+D     Print *,'String length = ', c2-c1+1
 
 *     Actual parsing and evaluation of string - note that the process
 *     continues until the string is exhausted, as indicated by a return
@@ -70,39 +76,47 @@ D     Type *,'String length = ', c2-c1+1
 
       ierr = 0
 
-D     Type *, 'got past ierr ='
-D     Type *, 'string(c1:c2) = ', string(c1:c2)
-D     Type *, 'length c2-c1+1 = ', c2-c1+1
-D     Type *, 'next, ierr = ', next, ierr
+D     Print *, 'got past ierr ='
+D     Print *, 'string(c1:c2) = ', string(c1:c2)
+D     Print *, 'length c2-c1+1 = ', c2-c1+1
+D     Print *, 'next, ierr = ', next, ierr
 
       CALL gen_factor (string(c1:c2), c2-c1+1, next, ierr)
       DO WHILE (ierr.eq.0)
         CALL gen_operator (string(c1:c2), c2-c1+1, next, ierr)
+        IF ( ierr.eq.1 ) THEN
+           ierr = 0
+           GOTO 10
+        END IF
         CALL gen_factor   (string(c1:c2), c2-c1+1, next, ierr)
       END DO
 
-      IF (ierr.eq.5) RETURN      ! undefined symbol in GEN_FACTOR
+10    CONTINUE
 
-D     TYPE *,'-- gen_eval_ae --'
-D     TYPE *,'   error return from loop: ', ierr
+D     PRINT *,'-- gen_eval_ae --'
+D     PRINT *,'   error return from loop: ', ierr
 
-D     TYPE *,'   final call to eval_all: lev =', lev
+D     PRINT *,'   final call to eval_all: lev =', lev
 
       CALL gen_eval_all (ierr)
-      IF (ierr.ne.0) RETURN
+      IF (ierr.ne.0) THEN  ! error evaluating ae
+!         PRINT *, '-- gen_eval_ae --'
+!         PRINT *, '   expression "', STRING(C1:C2), '" not evaluable'
+         RETURN
+      END IF
 
 *     Return final value to return address in desired type - give it 
 *     its own type and return that if no specific type demanded
 
-      READ (opnd_type(1)(2:gen_ilen(opnd_type(1))), '(I)') nbytes
+      READ (opnd_type(1)(2:gen_ilen(opnd_type(1))), '(I3)') nbytes
 
       IF (type.eq.' ') THEN
         type = opnd_type(1)
       ELSE
-        READ (type(2:gen_ilen(type)), '(I)') nbytes2
+        READ (type(2:gen_ilen(type)), '(I3)') nbytes2
       END IF
 
-D     TYPE *,'   calling gen_cvt_type with out_type = ', opnd_type(1)
+D     PRINT *,'   calling gen_cvt_type with out_type = ', opnd_type(1)
       CALL gen_cvt_type (wksp(1), opnd_type(1), nbytes,
      &                   value,   type,         nbytes2, ierr)
 

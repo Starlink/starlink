@@ -1,3 +1,6 @@
+*  History:
+*     28 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       BLOCK DATA INIGEN_UNITS
@@ -73,8 +76,8 @@
 
       IF (UOPENED) THEN
         STATUS = 1
-        TYPE *, ' -- ugetlun --'
-        TYPE *, '    bad status in UGETLUN = ', STATUS,
+        PRINT *, ' -- ugetlun --'
+        PRINT *, '    bad status in UGETLUN = ', STATUS,
      &              'No unit available'
       END IF
 
@@ -122,12 +125,12 @@
       END IF
 
       IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ufreelun --'
-        TYPE *, '    bad status in UFREELUN = ', STATUS
+        PRINT *, ' -- ufreelun --'
+        PRINT *, '    bad status in UFREELUN = ', STATUS
         IF (STATUS.eq.1) THEN
-          TYPE *, '    File still open on unit'
+          PRINT *, '    File still open on unit'
         ELSE IF (STATUS.eq.2) THEN
-          TYPE *, '    Unit not allocated by UGETLUN'
+          PRINT *, '    Unit not allocated by UGETLUN'
         END IF
       END IF
 
@@ -154,15 +157,15 @@
 
 *  Ok, go...
 
-C     TYPE *, ' --- uucase ---'
-C     TYPE *, '     input string  = ', string(:GEN_ILEN(STRING))
+C     PRINT *, ' --- uucase ---'
+C     PRINT *, '     input string  = ', string(:GEN_ILEN(STRING))
 
       DO I = 1, LEN (STRING)
         ICH = ICHAR (STRING(I:I))
         IF (ICH.ge.097 .AND. ICH.le.122) STRING(I:I) = CHAR (ICH-32)
       END DO
  
-C     TYPE *, '     output string = ', string(:GEN_ILEN(STRING))
+C     PRINT *, '     output string = ', string(:GEN_ILEN(STRING))
 
 
       RETURN
@@ -188,15 +191,15 @@ C     TYPE *, '     output string = ', string(:GEN_ILEN(STRING))
 
 *  Ok, go...
 
-C     TYPE *, ' --- ulcase ---'
-C     TYPE *, '     input string  = ', string(:GEN_ILEN(STRING))
+C     PRINT *, ' --- ulcase ---'
+C     PRINT *, '     input string  = ', string(:GEN_ILEN(STRING))
 
       DO I = 1, LEN (STRING)
         ICH = ICHAR (STRING(I:I))
         IF (ICH.ge.065 .AND. ICH.le.90) STRING(I:I) = CHAR (ICH+32)
       END DO
  
-C     TYPE *, '     output string = ', string(:GEN_ILEN(STRING))
+C     PRINT *, '     output string = ', string(:GEN_ILEN(STRING))
 
 
       RETURN

@@ -3,6 +3,11 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      6 Jun 2000 (ajc):
+*        Replace 'Type *' with 'PRINT *'
+*        Don't split string constant across lines
+*        Unused VTOT
+*        Initialise ISB so Linux behaves the same as other platforms
 *-----------------------------------------------------------------------
 
       SUBROUTINE CHANGE_SIDEBAND (XSCALE, BUF, IFAIL)
@@ -34,7 +39,6 @@
       INTEGER   ISTAT
       INTEGER   JFCEN_TEMP(8)
 *      REAL      DF
-      REAL      VTOT
       CHARACTER VFRAME*4
       CHARACTER VDEF*3
 
@@ -45,6 +49,8 @@
       DOUBLE PRECISION   FCEN_T
 
 *  Ok, go...
+
+      ISB = 0
 
 *     If the Lo frequency is not set in the scan header, read IF and
 *     sideband from the terminal.
@@ -98,22 +104,22 @@ D    &       VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
 *       (value for display comes for free, but is not used...)
 
         CALL SETXFREST (IQCEN, NQ, JFCEN, JFREST, FCEN, FROBS, FRDIS)
-D       TYPE *, 'Rest freq used for observation, = ', FROBS
+D       PRINT *, 'Rest freq used for observation, = ', FROBS
 
 *       Convert header centre frequency JFCEN to telluric value,
 *       returned in FCEN_T (GHz).
 
         CALL SETXFTCEN (JFCEN(NQ), VFRAME, VDEF,
      &                  VTE, VES, VSL, VLSR, FCEN_T)
-D       TYPE *, 'Telluric centre frequency = ', FCEN_T, ' GHz'
+D       PRINT *, 'Telluric centre frequency = ', FCEN_T, ' GHz'
 
 *       Correct the telluric frequency to other sideband
 
         IF (USE_LO) THEN
-D         TYPE *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
+D         PRINT *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
           DF = + 2.D3 * (LOFREQ(NQ)-FCEN_T)
-          WRITE (6, '('' Sector '',I2,'': First I.F. = '',
-     &                   F9.6, '' GHz'')') NQ, DF/2.D3
+          WRITE (6, '('' Sector '',I2,'': First I.F. = '','//
+     &                   'F9.6, '' GHz'')') NQ, DF/2.D3
         ELSE
           DF = - 2.D3 * DFLOAT(ISB) * FIRST_IF
         END IF
@@ -128,7 +134,7 @@ D         TYPE *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
 *       (cf routine SETXFREQ, with ABS_FREQ = .T. and REST_REL = .T.)
 
         JFCEN_TEMP(NQ) = 1.D6 * (FROBS + DF/1000.D0)
-D       TYPE *, 'Observation frame centre freq = ',
+D       PRINT *, 'Observation frame centre freq = ',
 D    &           JFCEN(NQ)/1.D6, ' GHz'
 
 *       Correct the frequency increment (*-1)
@@ -146,12 +152,12 @@ D    &           JFCEN(NQ)/1.D6, ' GHz'
 
 *     Warning message
 
-      TYPE *
-      TYPE *, ' --- Header entries changed to other sideband ---'
-      TYPE *, '     Note that f_rest still refers to frequency  '
-      TYPE *, '     used as reference in velocity transformation:'
-      TYPE *, '     You should not normally need to change this.'
-      TYPE *
+      PRINT *
+      PRINT *, ' --- Header entries changed to other sideband ---'
+      PRINT *, '     Note that f_rest still refers to frequency  '
+      PRINT *, '     used as reference in velocity transformation:'
+      PRINT *, '     You should not normally need to change this.'
+      PRINT *
 
       FREEX         = .TRUE.
       ISETSC        = .TRUE.

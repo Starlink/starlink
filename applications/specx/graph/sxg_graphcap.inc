@@ -9,20 +9,7 @@
 
       INTEGER      NDEVS
 
-      STRUCTURE /GCAPS/
-        INTEGER   DEV_NO
-        CHARACTER PROMPT*16
-        CHARACTER DEVNAME*16
-        LOGICAL   TERM
-        LOGICAL   DUAL
-        LOGICAL   COLOUR
-        LOGICAL   HARD
-        CHARACTER FILE*80
-      END STRUCTURE
-
-      RECORD /GCAPS/ DEVICE
-
-      COMMON /SXG_GRAPHCAP/ DEVICE(MAXDEVS), NDEVS
+      COMMON /SXG_GRAPHCAP/ NDEVS
       SAVE   /SXG_GRAPHCAP/
 
 *-----------------------------------------------------------------------

@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
       SUBROUTINE CALC_POSOFF (RAM, DECM, RA, DEC, DRA1, DDEC1,
      &                        RAOFF, DECOFF)
 
@@ -30,11 +34,11 @@
 
 *  Ok, go...
 
-D     TYPE *, 'calc-posoff: RA', RA
-D     TYPE *, 'calc-posoff: DEC', DEC
-D     TYPE *, 'calc-posoff: RAM', RAM
-D     TYPE *, 'calc-posoff: DECM', DECM
-D     TYPE *, 'calc-posoff: DRA1, DDEC1: ', DRA1, DDEC1
+D     PRINT *, 'calc-posoff: RA', RA
+D     PRINT *, 'calc-posoff: DEC', DEC
+D     PRINT *, 'calc-posoff: RAM', RAM
+D     PRINT *, 'calc-posoff: DECM', DECM
+D     PRINT *, 'calc-posoff: DRA1, DDEC1: ', DRA1, DDEC1
 
 *     First convert the scan position using standard utilities
 
@@ -57,8 +61,8 @@ C     Now find total offset of current spectrum in arcsecond
       RAOFF  = (648000.D0/DPI) * COS (APDECM) * (APRAS-APRAM) + DRA1
       DECOFF = (648000.D0/DPI) * (APDECS-APDECM) + DDEC1
 
-D     TYPE *, ' -- calc_posoff --'
-D     TYPE *, '    Total RA, Dec offsets (arcsec): ',RAOFF,DECOFF
+D     PRINT *, ' -- calc_posoff --'
+D     PRINT *, '    Total RA, Dec offsets (arcsec): ',RAOFF,DECOFF
 
       RETURN
       END

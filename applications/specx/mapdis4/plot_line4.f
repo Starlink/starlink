@@ -1,3 +1,8 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Test ISTAT .NE. 0
+*        Unused ILEN, INAME, NC, IFILE, IOSTAT, IZARR
 C-----------------------------------------------------------------------
 
       SUBROUTINE PLOT_LINE4 (IFAIL)
@@ -24,8 +29,6 @@ C-----------------------------------------------------------------------
 *     Functions
 
       INTEGER   IFREEVM
-      INTEGER   ILEN
-      INTEGER   LNAME
       LOGICAL   SXGCOLOROK
       LOGICAL   SXGGREYOK
 
@@ -36,16 +39,13 @@ C-----------------------------------------------------------------------
       LOGICAL   CONTOURS
       LOGICAL   GREYSCALE
       LOGICAL   FIRST
-      INTEGER   I,  J,  K,  NC  ! General counters
+      INTEGER   I,  J,  K ! General counters
       INTEGER   IERR
-      INTEGER   IFILE
       INTEGER   IMAP
       INTEGER   IMX, IMY
-      INTEGER   IOSTAT
       INTEGER   IPTR(6)
       INTEGER   IPTR_MAP
       INTEGER   ISTAT
-      INTEGER   IZARR
       INTEGER   K1, K2
       INTEGER   LOCATION
       INTEGER   NBYTES
@@ -82,7 +82,7 @@ C-----------------------------------------------------------------------
       CONTOURS  = .NOT.(PLOTGREY.AND..NOT.OVERCONT)
       IF (PLOTGREY .AND..NOT. SXGGREYOK()) THEN
         CALL SXGTIDLE
-        TYPE *,'Sorry, greyscaling not available!'
+        PRINT *,'Sorry, greyscaling not available!'
         GREYSCALE = .FALSE.
       ELSE
         GREYSCALE = PLOTGREY
@@ -92,14 +92,14 @@ C-----------------------------------------------------------------------
 *     Map image file to memory
 
       CALL MAPIMAGE ('mapplane.tmp', IPTR_MAP, NMAPL, IMX, IMY, ISTAT)
-      IF (ISTAT) THEN
+      IF (ISTAT .NE. 0) THEN
         IFAIL = 67
         RETURN
       END IF
 
-      Type *,'--- Plot_line_pars ---'
-      Type *,'    Number of maps in file = ', NMAPL
-      Type *,'    Each map has size', IMX, ' by', IMY
+      PRINT *,'--- Plot_line_pars ---'
+      PRINT *,'    Number of maps in file = ', NMAPL
+      PRINT *,'    Each map has size', IMX, ' by', IMY
 
 *     How many maps to plot (and where are they?)
 
@@ -118,7 +118,7 @@ C-----------------------------------------------------------------------
       NBYTES  = 4*IMX*IMY
       DO I = 1, NMAPL
         IPTR(I) = IPTR_MAP +  (I-1)*NBYTES
-*       TYPE *, 'Map #/Memory address = ', I, IPTR(I)
+*       PRINT *, 'Map #/Memory address = ', I, IPTR(I)
       END DO
 
 *     Copy the default plot values to arrays in /PLOT2D/ as initial values
@@ -137,7 +137,7 @@ C-----------------------------------------------------------------------
 
       CALL ALLOCATE_DEVICE (IDEV, IFAIL)
       IF (IFAIL.NE.0) THEN
-        Type *,'Trouble allocating plot device!'
+        PRINT *,'Trouble allocating plot device!'
         GO TO 998
       END IF
 
@@ -161,8 +161,8 @@ C-----------------------------------------------------------------------
       DX = ABS (AXLENX / NXMAP)
       DY = ABS (AXLENY / NYMAP)
 
-D     Type *,'Map area tesselated',NXMAP,' by',NYMAP
-D     Type *,'Windows are ',DX,' by',DY,' mm'
+D     PRINT *,'Map area tesselated',NXMAP,' by',NYMAP
+D     PRINT *,'Windows are ',DX,' by',DY,' mm'
 
       PLOTLIMS(1) = XMARGIN
       PLOTLIMS(2) = XMARGIN + AXLENX
@@ -224,12 +224,12 @@ D     Type *,'Windows are ',DX,' by',DY,' mm'
 
 *         Minimum and maximum on map
 
-*         TYPE *, 'Address of current map = ', LOCATION
+*         PRINT *, 'Address of current map = ', LOCATION
           CALL MAP_MAXMIN (%VAL(LOCATION), NAXX, NAXY, XLIM, YLIM,
      &                     BADPIX_VAL, ZMIN, ZMAX)
           IF (ZMAX.LT.ZMIN) THEN
             CALL SXGTIDLE
-            TYPE *,'No good data points on map!'
+            PRINT *,'No good data points on map!'
             IFAIL = 64
             GO TO 998
           END IF
@@ -261,7 +261,7 @@ D     Type *,'Windows are ',DX,' by',DY,' mm'
 
             IF (K2.LT.K1) THEN
               CALL SXGTIDLE
-              TYPE *,'Map all one value'
+              PRINT *,'Map all one value'
               IFAIL = 18
               GO TO 998
             END IF
@@ -299,8 +299,8 @@ D     Type *,'Windows are ',DX,' by',DY,' mm'
           CALL SXGLTYPE     (0)
           CALL SXGVWINDOW   (XL, XL+DX, YL, YL+DY)
           CALL SXGLIMITS    (XLIM(1), XLIM(2), YLIM(1), YLIM(2))
-*         TYPE *, 'Address of current map = ', LOCATION
-*         TYPE *, 'Map size (x,y) = ', NAXX, NAXY
+*         PRINT *, 'Address of current map = ', LOCATION
+*         PRINT *, 'Map size (x,y) = ', NAXX, NAXY
           CALL DRAW_MAP     (ZC(K1), NZ, %VAL(LOCATION), NAXX, NAXY,
      &                       CBEG(1), CEND(1), CEND(2), CBEG(2),
      &                       NAX(1)-1, NAX(2)-1, LXPIX, LYPIX,
@@ -400,8 +400,8 @@ D     Type *,'Windows are ',DX,' by',DY,' mm'
 
       ISTAT = IFREEVM (IPTR)
       IF (ISTAT.ne.0) THEN
-        TYPE *, '--- plot_line4 ---'
-        TYPE *, '    error freeing virtual memory: ', ISTAT
+        PRINT *, '--- plot_line4 ---'
+        PRINT *, '    error freeing virtual memory: ', ISTAT
       END IF
 
       RETURN

@@ -46,6 +46,8 @@
 *        Modify map format to improve speed.
 *        Use large POSN array instead of NSPEC NDF entries.
 *        Add blank spectrum prototype header at this stage
+*     21 Sep 2000 (ajc)
+*        Unused I, J, TNDF, DATPTR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,12 +71,10 @@
       INTEGER IFAIL              ! Global status
 
 *  Local Variables:
-      INTEGER I, J, K            ! Temporary integers
+      INTEGER K                  ! Temporary integer
       INTEGER STATUS             ! Starlink status
-      INTEGER TNDF               ! Temporary NDF identifier
       INTEGER NELM               ! Size of mapped array
       INTEGER NPT                ! Initial size of array (NPTS1)
-      INTEGER DATPTR             ! Pointer to mapped array
       INTEGER ONE( 2 )           ! Itself
       INTEGER DIM( 2 )           ! Index dimensions
       INTEGER MPLACE             ! NDF placeholder of map file

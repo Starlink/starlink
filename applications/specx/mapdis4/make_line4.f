@@ -2,6 +2,9 @@
 *     31 Jan 1994 (hme):
 *        Fix the INQUIRE statement. Remove second declaration of IFILE.
 *        Disuse <> in formats.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused LNAME, MAP_USED, IOPEN, K, IERR, IMAP, MAPLOC, NDATA
 *-----------------------------------------------------------------------
 
       SUBROUTINE MAKE_LINE4 (BUF1, BUF2, IFAIL)
@@ -33,27 +36,20 @@
       INTEGER*4 IGETLUN
       INTEGER*4 IFREELUN
       INTEGER*4 GEN_ILEN
-      INTEGER*4 LNAME
 
 *     Other parameters
 
-      LOGICAL*4 MAP_USED
       LOGICAL*4 IEXIST
-      LOGICAL*4 IOPEN
       LOGICAL*4 INTERP
-      INTEGER*4 I,  J,  K,  N
-      INTEGER*4 IERR
+      INTEGER*4 I,  J,  N
       INTEGER*4 IFILE
-      INTEGER*4 IMAP
       INTEGER*4 IOSTAT
       INTEGER*4 IPTR(6)
       INTEGER*4 IPTR_MAP
       INTEGER*4 ISTAT
       INTEGER*4 IXN, IXU
       INTEGER*4 LOCATION
-      INTEGER*4 MAPLOC
       INTEGER*4 NBYTES
-      INTEGER*4 NDATA
       INTEGER*4 SAVLINK(3)
       REAL*4    TEMP(2)
       CHARACTER XTITLE*10, XUNITS*6, PROMPT*256
@@ -143,7 +139,7 @@
       NBYTES = 4*NAX(1)*NAX(2)
       ISTAT= IGETVM (6*NBYTES, .TRUE., 'MAKE_LINE4', IPTR_MAP)
       IF (ISTAT.ne.0) THEN
-        TYPE *,'Trouble getting virtual memory for map arrays'
+        PRINT *,'Trouble getting virtual memory for map arrays'
         IFAIL = 51
         GO TO 999
       END IF
@@ -225,12 +221,12 @@
      &       IOSTAT =  ISTAT)
 
       IF (ISTAT.NE.0) THEN
-        TYPE *, ' --- make_line4 ---'
-        TYPE *, '     error opening mapplane.tmp'
+        PRINT *, ' --- make_line4 ---'
+        PRINT *, '     error opening mapplane.tmp'
         CALL GEN_ERMSG (ISTAT)
         IFAIL = 18
       ELSE
-*       TYPE *, 'Writing file from address ', IPTR_MAP
+*       PRINT *, 'Writing file from address ', IPTR_MAP
         WRITE (IFILE) NMAPS, NAXX, NAXY
         CALL VWRITE (IFILE, NMAPS*NAXX*NAXY, %VAL(IPTR_MAP), ISTAT)
       END IF
@@ -243,11 +239,11 @@
   999 CONTINUE
 
 *     TMEM  = IPTR_MAP
-*     TYPE *, 'TMEM = ', TMEM
+*     PRINT *, 'TMEM = ', TMEM
 
       ISTAT = IFREEVM (IPTR_MAP) 
       IF (ISTAT .ne. 0) THEN
-        TYPE *,'Trouble freeing virtual memory for map'
+        PRINT *,'Trouble freeing virtual memory for map'
         IFAIL = 51
       END IF
 

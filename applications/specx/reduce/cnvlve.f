@@ -2,6 +2,10 @@
 
       SUBROUTINE CNVLVE (NQ,XSCALE,BUF,IFAIL)
 
+C   History:
+C       6-JUN-2000 (AJC):
+C         Replace 'TYPE *' with 'PRINT *'
+
       DIMENSION XSCALE(1),BUF(1),CFUN(256)
       LOGICAL   DOQUAD
 
@@ -19,7 +23,8 @@
      &                 ANC,'F5.2',ANC,JDEF)
       PNC=ANC/XFAC(NQ)
       IF(PNC.GT.256) THEN
-        TYPE *,'** Too many points in convolving array, reduce width **'
+        PRINT *,
+     :    '** Too many points in convolving array, reduce width **'
         IFAIL=16
         RETURN
       END IF

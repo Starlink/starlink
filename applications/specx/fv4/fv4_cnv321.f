@@ -191,6 +191,7 @@
          IFAIL = 10
          GO TO 500
       END IF
+
       CALL FV4_OPF321( UNIT, FILE1, IFAIL )
       IF ( IFAIL .NE. 0 ) THEN
          WRITE( *, * ) 'Failed to open input file, IOSTAT =', IFAIL
@@ -637,6 +638,7 @@
 *     This cell is TLOC(J+1), the next cell is TLOC(2-J), either is
 *     TLOC(1) or TLOC(2). TLOC(3) is used temporarily to locate a
 *     component to be copied.
+
          CALL DAT_CELL( SPXLOC, 1, ISCAN+1, TLOC(2-J), STATUS )
          CALL DAT_FIND( TLOC(J+1), 'DATA_ARRAY', TLOC(3), STATUS )
          CALL DAT_COPY( TLOC(3), TLOC(2-J), 'DATA_ARRAY', STATUS )

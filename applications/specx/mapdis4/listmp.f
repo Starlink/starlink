@@ -10,6 +10,9 @@
 *        Put IOSTAT=IERR in all WRITE statements to allow for overflows
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Unused GEN_ILEN, I, STATUS
 C-----------------------------------------------------------------------
 
       SUBROUTINE LISTMP (IFAIL)
@@ -35,14 +38,10 @@ C    the sky and in the file.
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
 
-*     Functions:
-
-      INTEGER  GEN_ILEN
-
 *     Local variables:
 
       LOGICAL   DETAILS
-      INTEGER   I,   J
+      INTEGER   J
       INTEGER   IERR
       INTEGER   IIN, JIN
       INTEGER   IPOS
@@ -53,7 +52,6 @@ C    the sky and in the file.
       INTEGER   RSCAN(2), IDUM     ! Scan sequence boundaries
       REAL      RPOS(4), RDUM      ! Offset boundaries
       REAL      R2,  D2
-      CHARACTER STATUS*7
       CHARACTER RASTRING*12, DECSTRING*12
 
 *  Ok, go...
@@ -179,19 +177,19 @@ C   Search INDEX area and output relevant data if scan present
       CALL POP
       RETURN
 
- 1000 FORMAT(1X'( 'I5','I5' ) '6X'Spectrum # 'I5 )
+ 1000 FORMAT(1X,'( ',I5,',',I5,' ) ',6X,'Spectrum # ',I5 )
  1010 FORMAT(1X,'Contents of map file ',A)
  1012 FORMAT(1X,'File name: ',A,/
      &       1X,'Owner:     ',A,/)
- 1020 FORMAT(/1X'R.A. 'I3' cells @ 'F5.1' arcsec'
-     &       /1X'Dec. 'I3' cells @ 'F5.1' arcsec')
- 1021 FORMAT(/1X'X-axis 'I3' cells @ 'F5.1' arsec'
-     &       /1X'Y-axis 'I3' cells @ 'F5.1' arsec')
- 1025 FORMAT(/1X'Position angle of map y-axis is 'F6.1' deg. E of N')
- 1030 FORMAT( 1X,I4' blocks reserved for INDEX area')
+ 1020 FORMAT(/1X,'R.A. ',I3,' cells @ ',F5.1,' arcsec'
+     &       /1X,'Dec. ',I3,' cells @ ',F5.1,' arcsec')
+ 1021 FORMAT(/1X,'X-axis ',I3,' cells @ ',F5.1,' arsec'
+     &       /1X,'Y-axis ',I3,' cells @ ',F5.1,' arsec')
+ 1025 FORMAT(/1X,'Position angle of map y-axis is ',F6.1,' deg. E of N')
+ 1030 FORMAT( 1X,I4,' blocks reserved for INDEX area')
  1032 FORMAT(/1X,'No entries in map')
- 1033 FORMAT(/1X,I4' spectrum positions used in map file')
- 1035 FORMAT( 1X,I4' blocks per entry in map'//)
+ 1033 FORMAT(/1X,I4,' spectrum positions used in map file')
+ 1035 FORMAT( 1X,I4,' blocks per entry in map'//)
  1040 FORMAT(1X,'Prototype spectrum header')
 
       END

@@ -5,6 +5,11 @@ C-----------------------------------------------------------------------
 C   Routine to translate spectrum sideways within the quadrant,
 C   amending DFCEN appropriately.
 
+C   History:
+C      20-SEP-2000 (AJC):
+C         Unused UNEQUAL
+C-
+
       IMPLICIT   NONE
 
 C     Formal parameters:
@@ -33,7 +38,6 @@ C     Local variables
       INTEGER    NST
       REAL       XMID
       REAL       XPT
-      LOGICAL    UNEQUAL
       CHARACTER  DEFAULT_FORMAT*8
 
 C     Ok, go...

@@ -3,6 +3,9 @@
 *        Replace STR$TRIM with CHR_LEN.
 *     15 Jan 1994 (rp):
 *        Eliminate CHR_ calls, replace with U... where appropriate
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused ILS
 *-----------------------------------------------------------------------
 
       SUBROUTINE EXTMAP (IFAIL)
@@ -24,7 +27,6 @@ C  have to convert R.A. and Dec. if map position angle .ne. 0 degrees.
 
 *     Local variables:
 
-      INTEGER   ILS
       INTEGER   IPOS
       INTEGER   ISTAT
       REAL      OFFSET(2)
@@ -63,7 +65,7 @@ C  have to convert R.A. and Dec. if map position angle .ne. 0 degrees.
           SP    = SIN (POS_ANGLE/57.29578)
           X1OFF = OFFSET(1)*CP - OFFSET(2)*SP
           X2OFF = OFFSET(1)*SP + OFFSET(2)*CP
-          Type *,'Offsets in map coordinates: ',X1OFF, X2OFF
+          PRINT *,'Offsets in map coordinates: ',X1OFF, X2OFF
         END IF
         
       END IF

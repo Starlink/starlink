@@ -1,3 +1,4 @@
+
 *  History:
 *     19 Nov 1993 (hme):
 *        Disuse SPECX_CTRLC error handler.
@@ -12,7 +13,9 @@
 *        Declare array sizes using parameters from SPECX_PARS
 *     05 Jun 1996 (timj)
 *        Tidy up DOUBLE PREC and REALS - segments with Sun compilers
-*
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Remove escapes from WRITE statement
 C-----------------------------------------------------------------------
 
       SUBROUTINE SETXNEW (XSCALE, ISTAT)
@@ -152,14 +155,13 @@ C            FCEN(NQ)       =  Alternative rest freq supplied by S-L-R-F (GHz)
 C            JFINC(NQ)      =  Fixed channel separation in telescope frame (Hz)
 
       ELSE IF (NXS.EQ.2 .OR. NXS.EQ.3)   THEN
-
 C       First evaluate radial velocities etc if not available in header:
 
         IF (VSL.eq.0.0 .and. VES.eq.0.0 .and. VTE.eq.0.0) THEN
           CALL SETXASTRO   (ITIME, IDATE, ALAT,  ALONG,  TIMCOR, IUTFLG,
      &                      DEC,   RA,    VSL,   VES,    VTE,    ISTAT)
           IF (ISTAT.NE.0) THEN
-            TYPE *,' --- setx --- problem with astrometry'
+            PRINT *,' --- setx --- problem with astrometry'
             RETURN
           END IF
         END IF
@@ -208,8 +210,8 @@ C         and a (possibly) different value to use for *display*. Complicated
 C         dependence on header variables.
 
           CALL SETXFREST (IQCEN, NQ, JFCEN, JFREST, FCEN, FROBS, FRDIS)
-D         TYPE *, 'Rest freq, observed, = ', FROBS
-D         TYPE *, 'Rest freq, display, =  ', FRDIS
+D         PRINT *, 'Rest freq, observed, = ', FROBS
+D         PRINT *, 'Rest freq, display, =  ', FRDIS
 
 C         Convert header centre frequency JFCEN to telluric value,
 C         returned in FCEN_T (GHz). (Uses the LO and IF frequencies
@@ -222,7 +224,7 @@ C         if they are available in the header)
             FCEN_T  = LOFREQ(NQ) + IFFREQ(NQ)
           END IF
 
-D         TYPE *, 'Telluric center frequency = ', FCEN_T
+D         PRINT *, 'Telluric center frequency = ', FCEN_T
 
           IF (IFFREQ(NQ).NE.0.D0) THEN
             OSCFREQ = FCEN_T - IFFREQ(NQ)
@@ -259,7 +261,7 @@ C----------------
           ELSE IF (NXS .EQ. 3) THEN
             CALL SETXVEL (XSCALE8(NOFF), NPTS(NQ), VDEF2, FRDIS,
      &                    XFAC8(NQ), ISTAT)
-D           TYPE *, 'NQ, XFAC8 this quadrant = ', NQ, XFAC8(NQ)
+D           PRINT *, 'NQ, XFAC8 this quadrant = ', NQ, XFAC8(NQ)
           END IF
 
         END DO
@@ -362,7 +364,7 @@ C----------------
       DOUBLE PRECISION   TIMCOR
       DOUBLE PRECISION   RA
       DOUBLE PRECISION   DEC
-      LOGICAL            IUTFLG
+      BYTE               IUTFLG
       REAL               VSL,  VES,  VTE
       INTEGER            ISTAT
 
@@ -390,20 +392,20 @@ C       Astronomical positions (RA, Dec, HA)
       APRA =  SNGL(RA*PI/180.D0)              ! ..... and RA in true radians
       HA   = MOD (SNGL(XLST*PI/12. - DBLE(APRA)), SNGL(2.D0*PI)) ! yields HA in radians
 
-D     type *, '--- setx ---'
-D     type *, '     apra (radians):   ', apra
-D     type *, '     apdec (radians):  ', apdec
-D     type *, '     lst (hours):      ', xlst
-D     type *, '     ha (radians):     ', ha
+D     PRINT *, '--- setx ---'
+D     PRINT *, '     apra (radians):   ', apra
+D     PRINT *, '     apdec (radians):  ', apdec
+D     PRINT *, '     lst (hours):      ', xlst
+D     PRINT *, '     ha (radians):     ', ha
 
 C     Astronomical radial velocities (sun-lsr, earth-sun, tel-earth)
 
       CALL ASTRO_VELS  (DATJUL, APRA, APDEC, ALAT, HA, VSL, VES, VTE)
 
-D     type *, '     vsl(km/s)         ', vsl
-D     type *, '     ves(km/s)         ', ves
-D     type *, '     vte(km/s)         ', vte
-D     type *, '     vsl+ves+vte(km/s) ', vsl+ves+vte
+D     PRINT *, '     vsl(km/s)         ', vsl
+D     PRINT *, '     ves(km/s)         ', ves
+D     PRINT *, '     vte(km/s)         ', vte
+D     PRINT *, '     vsl+ves+vte(km/s) ', vsl+ves+vte
 
       RETURN
       END
@@ -444,12 +446,12 @@ D     type *, '     vsl+ves+vte(km/s) ', vsl+ves+vte
 
       IF (FCORRECT) THEN
         CALL SETXFRQFIX (N, XSCALE8, NF, FRQCOEFF)
-        TYPE *, ' -- AOS frequency scale linearization applied --'
+        PRINT *, ' -- AOS frequency scale linearization applied --'
       END IF
 
-D     TYPE *, ' -- setxinitx --'
-D     TYPE *, '    XSCALE values - beg, middle and end...'
-D     TYPE *, XSCALE(1), 0.5*(XSCALE(N/2)+XSCALE(N+1-N/2)), XSCALE(N)
+D     PRINT *, ' -- setxinitx --'
+D     PRINT *, '    XSCALE values - beg, middle and end...'
+D     PRINT *, XSCALE(1), 0.5*(XSCALE(N/2)+XSCALE(N+1-N/2)), XSCALE(N)
 
       RETURN
       END 
@@ -539,18 +541,18 @@ C      INTEGER          I
         NCEN = IQCEN
       END IF
 
-D     TYPE *, '-- setxfrest --'
-D     TYPE *, '   centre quadrant = ', NCEN
-D     TYPE *, '   fcen array = ', (fcen(i),i=1,8)
+D     PRINT *, '-- setxfrest --'
+D     PRINT *, '   centre quadrant = ', NCEN
+D     PRINT *, '   fcen array = ', (fcen(i),i=1,8)
 
 *     Set rest frequency assumed to have been applied in observation
 
       IF (JFREST(NCEN).NE.0) THEN
         FROBS = 1.D-6 * DFLOAT(JFREST(NCEN))
-D       TYPE *, '   obs freq from jfrest = ', FROBS
+D       PRINT *, '   obs freq from jfrest = ', FROBS
       ELSE
         FROBS = 1.D-6 * DFLOAT(JFCEN(NCEN))
-D       TYPE *, '   obs freq from jfcen  = ', FROBS
+D       PRINT *, '   obs freq from jfcen  = ', FROBS
       END IF
 
       
@@ -564,13 +566,13 @@ D       TYPE *, '   obs freq from jfcen  = ', FROBS
         WRITE (6,*)
         WRITE (6,*) 'Warning ** Rest frequency set using values'//
      &              ' from SET-LINE-REST-FREQ.'
-        WRITE (6,*) 'Do S-L-R-F\0.\ to use defaults from header'
+        WRITE (6,*) 'Do S-L-R-F to use defaults from header'
         WRITE (6,*)
       ELSE
         FRDIS = FROBS
       END IF
 
-D     TYPE *, '   dis frequency = ', FROBS
+D     PRINT *, '   dis frequency = ', FROBS
 
       RETURN
       END
@@ -610,9 +612,9 @@ D     TYPE *, '   dis frequency = ', FROBS
       CALL UUCASE (VVFRAME)
       CALL UUCASE (VVDEF)
 
-D     TYPE *, ' -- setxftcen --'
-D     TYPE *, '    given velocity frame = ', VVFRAME
-D     TYPE *, '    velocity definition =  ', VVDEF
+D     PRINT *, ' -- setxftcen --'
+D     PRINT *, '    given velocity frame = ', VVFRAME
+D     PRINT *, '    velocity definition =  ', VVDEF
 
 *     First find velocity of frame with respect to the telescope
 
@@ -625,11 +627,11 @@ D     TYPE *, '    velocity definition =  ', VVDEF
       ELSE IF (VVFRAME.EQ.'LSR') THEN
         VEL = VRAD + VTE + VES + VSL
       ELSE
-        TYPE *, 'Unknown velocity frame: ', VVFRAME
+        PRINT *, 'Unknown velocity frame: ', VVFRAME
         VEL = 0.0
       END IF
  
-D     TYPE *, '    velocity frame/tel  =  ', VEL
+D     PRINT *, '    velocity frame/tel  =  ', VEL
 
 *     Now apply appropriate doppler correction
 
@@ -652,12 +654,11 @@ D     TYPE *, '    velocity frame/tel  =  ', VEL
 *     Missing or incorrect velocity definition...
 
       ELSE
-        TYPE *, 'Unknown velocity correction type: ', VVDEF
-        TYPE *, '... Using "RADIO" velocity definition'
+        PRINT *, 'Unknown velocity correction type: ', VVDEF
+        PRINT *, '... Using "RADIO" velocity definition'
         FCEN_T = 1.D-6*DFLOAT(JFCEN) * (1.D0 - DBLE(VEL)/VC)
 
       END IF
-
 
       RETURN
       END
@@ -713,8 +714,8 @@ C     the sum in a recoverable way.
 
 *     First find velocity of frame with respect to the telescope
 
-D     TYPE *, ' -- setxdopp --'
-D     TYPE *, '    velocity definition = ', VVDEF
+D      PRINT *, ' -- setxdopp --'
+D      PRINT *, '    velocity definition = ', VVDEF
 
       IF (VVFRAME.EQ.'TELL') THEN
         VEL = VRAD
@@ -725,11 +726,11 @@ D     TYPE *, '    velocity definition = ', VVDEF
       ELSE IF (VVFRAME.EQ.'LSR') THEN
         VEL = VRAD + VTE + VES + VSL
       ELSE
-        TYPE *, 'Unknown velocity frame: ', VVFRAME
+        PRINT *, 'Unknown velocity frame: ', VVFRAME
         VEL = 0.0
       END IF
  
-D     TYPE *, '    Velocity of frame = ', VEL
+D      PRINT *, '    Velocity of frame = ', VEL
 
 *     Calculate appropriate doppler correction (depending on definitions)
 
@@ -740,13 +741,13 @@ D     TYPE *, '    Velocity of frame = ', VEL
       ELSE IF (VVDEF.EQ.'REL') THEN
         DOPPFAC = SQRT ((1.D0-VEL/VC)/(1.D0+DBLE(VEL)/VC))
       ELSE
-        TYPE *,'Unknown velocity correction type: ', VVDEF
+        PRINT *,'Unknown velocity correction type: ', VVDEF
         DOPPFAC = (1.D0 - DBLE(VEL)/VC)
       END IF
 
-D     TYPE *, '    doppler factor = ', DOPPFAC
-D     TYPE *, '    sector center freq (GHz)  = ', FCEN_T
-D     TYPE *, '    reference rest freq (GHz) = ', FREST
+D      PRINT *, '    doppler factor = ', DOPPFAC
+D      PRINT *, '    sector center freq (GHz)  = ', FCEN_T
+D      PRINT *, '    reference rest freq (GHz) = ', FREST
 
 *     ... and apply to the XSCALE array
 *     (retain in the form of offsets, but now from display rest frequency)
@@ -756,14 +757,14 @@ D     TYPE *, '    reference rest freq (GHz) = ', FREST
 *     originally at the rest frequency in the source frame will end up back
 *     there in the display despite transforming to and from telluric frame.
 
-D     TYPE *, '    first and last channels:', xscale8(1), xscale8(n)
+D      PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
 
       DO I = 1, N
         OBS_FREQ  = FCEN_T + XSCALE8(I)*1.D-3
         XSCALE8(I) = 1000.D0* (OBS_FREQ/DOPPFAC - FREST)
       END DO
 
-D     TYPE *, '    first and last channels:', xscale8(1), xscale8(n)
+D      PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
 
       RETURN
       END 
@@ -825,9 +826,9 @@ C      REAL              XMID
             XSCALE8(I) = XSCALE8(I) - 1000.D0 * (REF_FREQ - FREST)
           END DO
 
-          TYPE *, ' -- setxfreq --'
-          TYPE *, '    frequencies are relative to reference-freq!'
-          TYPE *, '    current reference freq (GHz) = ', REF_FREQ
+          PRINT *, ' -- setxfreq --'
+          PRINT *, '    frequencies are relative to reference-freq!'
+          PRINT *, '    current reference freq (GHz) = ', REF_FREQ
 
         ELSE
 
@@ -884,8 +885,8 @@ C      REAL              XMID
 
       FRESTM = 1.0D3 * FREST
 
-D     TYPE *, ' -- setxvel --'
-D     TYPE *, '    first and last channels: ', xscale8(1), xscale8(n)
+D     PRINT *, ' -- setxvel --'
+D     PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
 
       IF (VVDEF.EQ.'RAD') THEN
         DO I = 1, N
@@ -909,13 +910,13 @@ D     TYPE *, '    first and last channels: ', xscale8(1), xscale8(n)
         RETURN
       END IF
 
-D     TYPE *, '    first and last channels: ', xscale8(1), xscale8(n)
+D     PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
 
 *     Finally, produce an estimate of the average velocity increment
 
       IF (N.GT.1) THEN
         XFAC8 = (XSCALE8(N)-XSCALE8(1)) / DFLOAT(N-1)
-D       TYPE *, '    estimate of XFAC = ', xfac8
+D       PRINT *, '    estimate of XFAC = ', xfac8
       END IF
 
       RETURN

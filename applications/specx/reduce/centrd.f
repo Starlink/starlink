@@ -4,6 +4,11 @@
 
 C   Routine to calculate centroid of area of a line profile
 
+C   History:
+C      6-JUN-2000 (AJC):
+C        Missing commas in FORMAT
+C        Initialise FRAC so Linux behaves the same as other platforms
+
       IMPLICIT  NONE
 
 *     Formal parameters
@@ -37,6 +42,8 @@ C   Routine to calculate centroid of area of a line profile
       REAL      XTRANS
 
 *  Ok, go...
+
+      FRAC = 0.0
 
       NST = NTOT(NQ-1)+1
       CALL SETXNEW (XSCALE, IFAIL)
@@ -74,7 +81,7 @@ C   Routine to calculate centroid of area of a line profile
       END IF
       RETURN
 
- 1000 FORMAT(/'  Quadrant 'I1' : Centroid is at 'F7.2,1X,A6)
+ 1000 FORMAT(/'  Quadrant ',I1,' : Centroid is at ',F7.2,1X,A6)
 
       END
 

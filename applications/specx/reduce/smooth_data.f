@@ -2,6 +2,10 @@ C-----------------------------------------------------------------------
 
       SUBROUTINE SMOOTH_DATA (NQ, BUF, NMAX, IFAIL)
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Replace 'Type *' with 'PRINT *'
+
       LOGICAL   DOQUAD
       REAL*4    BUF(*)
       REAL*4    CFUN(256)
@@ -26,7 +30,7 @@ C-----------------------------------------------------------------------
           NPTS1=NPTS(NQQ)-2*(ISMTH/2)
           IF(NPTS1.LE.0)   THEN
             IFAIL=5
-            TYPE *,'Warning, Insufficient points in quadrant',NQ
+            PRINT *,'Warning, Insufficient points in quadrant',NQ
           ELSE
             CALL CONVOL(CFUN,ISMTH,BUF,NQQ)
           END IF

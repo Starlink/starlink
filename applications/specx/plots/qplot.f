@@ -1,7 +1,8 @@
 C History:
 C   01-Aug-1995 (rpt):
 C    ICOLOR support added.
-C
+C   20-Sep-2000 (ajc):
+C    Unused STRING
 C-----------------------------------------------------------------------
 
       SUBROUTINE QPLOT (XSCALE, IWEIGHT, LCOLOR, IFAIL)
@@ -25,7 +26,6 @@ C     Local variables:
 
       INTEGER   ITIP
       LOGICAL   TOPSCAL
-      CHARACTER STRING*80
 
 C  Ok, go...
 

@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      7 Jun 2000 (ajc):
+*        Use C structure for port to Linux
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_INQSYMB1 (TABLE, LTAB, INSYMBOL, SYM_INDEX,
@@ -10,11 +12,9 @@
 
       IMPLICIT NONE
 
-      INTEGER*4 MAX_TABLE
-      PARAMETER (MAX_TABLE=512)
-
 *  Formal parameters
 
+      INTEGER TABLE
       INTEGER*4 LTAB
       CHARACTER INSYMBOL*(*)
       INTEGER*4 SYM_INDEX
@@ -24,19 +24,10 @@
       LOGICAL*4 READONLY
       INTEGER*4 IERR          ! = 1, symbol not found
 
-      STRUCTURE /SYMBOL/
-        CHARACTER*16 NAME
-        CHARACTER*4  TYPE
-        INTEGER*4    LENGTH 
-        INTEGER*4    ADDRESS
-      END STRUCTURE
-
-      RECORD /SYMBOL/ TABLE(MAX_TABLE)
-
 *  Hash table
 
       INTEGER*4           ENTRY
-      COMMON /HASH_TABLE/ ENTRY
+      COMMON /HASH_TABLE/ ENTRY   ! Now a dummy
 
 *  Functions
 
@@ -53,11 +44,14 @@
 
       IF (GEN_HASHSRCH (SYMBOL(INDEX(SYMBOL,'*')+1:),
      &                  503, ENTRY, I) .NE. -1) THEN
+
         SYM_INDEX = I
-        TYPE      = TABLE(SYM_INDEX).TYPE
-        LENGTH    = TABLE(SYM_INDEX).LENGTH
-        ADDRESS   = TABLE(SYM_INDEX).ADDRESS
-        READONLY  = TABLE(SYM_INDEX).NAME(1:1) .EQ. '*'
+        CALL GEN_INQSYMTYP( SYM_INDEX, TYPE, IERR )
+        CALL GEN_INQSYMLEN( SYM_INDEX, LENGTH, IERR )
+        CALL GEN_INQSYMADDR( SYM_INDEX, ADDRESS, IERR )
+        CALL GEN_INQSYMNAM( SYM_INDEX, SYMBOL, IERR )
+        READONLY  = SYMBOL(1:1) .EQ. '*'
+
       ELSE
         SYM_INDEX = 0
       END IF

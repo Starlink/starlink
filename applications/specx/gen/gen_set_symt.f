@@ -1,3 +1,6 @@
+* History:
+*    7 Jun 2000 (ajc):
+*      Now using C structures for tables - initialised elsewhere
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_SET_SYMT (SYMTAB_ADDRESS, NENTRY_ADDRESS)
@@ -10,14 +13,14 @@
       INTEGER*4 NENTRY_ADDRESS
 
 *     Hash table
-
-      STRUCTURE /HASH_TAB/
-        CHARACTER NAME*16
-        INTEGER*4 HASHVAL
-      END STRUCTURE
-
-      RECORD /HASH_TAB/   ENTRY(0:502)
-      COMMON /HASH_TABLE/ ENTRY
+!
+!      STRUCTURE /HASH_TAB/
+!        CHARACTER NAME*16
+!        INTEGER*4 HASHVAL
+!      END STRUCTURE
+!
+!      RECORD /HASH_TAB/   ENTRY(0:502)
+!      COMMON /HASH_TABLE/ ENTRY
 
 *     Include files
 
@@ -25,7 +28,7 @@
 
 *     Local variables
 
-      INTEGER*4 I
+!      INTEGER*4 I
 
 *     Check that variables are initialized
 
@@ -38,11 +41,11 @@
       SYMTAB_INSTALLED = .TRUE.
 
 *     Initialize the hash table
-
-      DO I = 0, 502
-        ENTRY(I).NAME    = ' '
-        ENTRY(I).HASHVAL = 0
-      END DO
+!     C table is initialised automatically
+!      DO I = 0, 502
+!        ENTRY(I).NAME    = ' '
+!        ENTRY(I).HASHVAL = 0
+!      END DO
 
       RETURN
       END

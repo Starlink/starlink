@@ -3,6 +3,10 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*     28 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Type disagreement - assume logical and integer are interchangeable
+*        Unused ERROR1, ERROR2
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_cvt_type (input,  intype,  nb_in,
@@ -26,7 +30,6 @@
       CHARACTER null_str*128
       PARAMETER (null_str = ' ')
 
-      INTEGER*4 error1, error2
       CHARACTER type1*4, type2*4
 
       LOGICAL*4 logical
@@ -45,40 +48,42 @@
       type2 = outtype
       CALL uucase (type2)
 
-D     TYPE *, 'converting from ',type1,' to ',type2
+D     PRINT *, 'converting from ',type1,' to ',type2
 
       IF (type1.eq.type2) THEN
-D       TYPE *, 'No conversion necessary - copy', nb_in, ' bytes'
+D       PRINT *, 'No conversion necessary - copy', nb_in, ' bytes'
         CALL xcopy (nb_in, input, output)
 
       ELSE IF (type1(1:1).eq.'C' .AND. type2(1:1).eq.'C') THEN
-D       TYPE *, 'String types - copy', MIN(nb_in,nb_out), ' bytes'
+D       PRINT *, 'String types - copy', MIN(nb_in,nb_out), ' bytes'
         CALL xcopy (nb_out, %REF(null_str), output)
         CALL xcopy (MIN(nb_in,nb_out), input, output)
 
       ELSE 
 
         CALL xcopy (nb_in, input, logical)
-D       TYPE *, 'Conversion IS necessary'
+D       PRINT *, 'Conversion IS necessary'
 
         IF (type1 .eq. 'L4') THEN
-D         TYPE *,'Input type is L4'
-          IF (type2 .eq. 'I4') THEN
-            integer = logical
-          ELSE IF (type2 .eq. 'R4') THEN
-             real    = logical
+D         PRINT *,'Input type is L4'
+!          IF (type2 .eq. 'I4') THEN
+!            integer = logical
+!          ELSE IF (type2 .eq. 'R4') THEN
+          IF (type2 .eq. 'R4') THEN
+             real    = integer
           ELSE IF (type2 .eq. 'R8') THEN
-             double  = logical
+             double  = integer
           ELSE
              ierr = 2
           END IF
 
         ELSE IF (type1 .eq. 'I4') THEN
-D         TYPE *,'Input type is I4'
-          IF (type2 .eq. 'L4') THEN
-            logical = integer
-          ELSE IF (type2 .eq. 'R4') THEN
-D           TYPE *,'Output type is R4'
+D         PRINT *,'Input type is I4'
+!          IF (type2 .eq. 'L4') THEN
+!            logical = integer
+!          ELSE IF (type2 .eq. 'R4') THEN
+          IF (type2 .eq. 'R4') THEN
+D           PRINT *,'Output type is R4'
             real    = integer
           ELSE IF (type2 .eq. 'R8') THEN
             double  = integer
@@ -87,10 +92,11 @@ D           TYPE *,'Output type is R4'
           END IF
 
         ELSE IF (type1 .eq. 'R4') THEN
-D         TYPE *,'Input type is R4'
-          IF (type2 .eq. 'L4') THEN
-            logical = real
-          ELSE IF (type2 .eq. 'I4') THEN
+D         PRINT *,'Input type is R4'
+!          IF (type2 .eq. 'L4') THEN
+!            logical = real
+!          ELSE IF (type2 .eq. 'I4') THEN
+          IF (type2 .eq. 'I4') THEN
             integer = real
           ELSE IF (type2 .eq. 'R8') THEN
             double  = real
@@ -99,10 +105,11 @@ D         TYPE *,'Input type is R4'
           END IF
 
         ELSE IF (type1 .eq. 'R8') THEN
-D         TYPE *,'Input type is R8'
-          IF (type2 .eq. 'L4') THEN
-            logical = double
-          ELSE IF (type2 .eq. 'I4') THEN
+D         PRINT *,'Input type is R8'
+!          IF (type2 .eq. 'L4') THEN
+!            logical = double
+!          ELSE IF (type2 .eq. 'I4') THEN
+          IF (type2 .eq. 'I4') THEN
             integer = double
           ELSE IF (type2 .eq. 'R4') THEN
             real    = double
@@ -117,8 +124,8 @@ D         TYPE *,'Input type is R8'
         IF (ierr.eq.0) THEN
           CALL xcopy (nb_out, logical, output)
         ELSE
-          TYPE *, '-- gen_cvt_type --'
-          TYPE *, '   one or both types unknown'
+          PRINT *, '-- gen_cvt_type --'
+          PRINT *, '   one or both types unknown'
         END IF
 
       END IF

@@ -23,17 +23,22 @@
 *        and OPEN_SPECX_MAP returned with an error before even trying to
 *        open the file. Now MAP_OPEN is reset to false here before a
 *        call to OPEN_SPECX_MAP is made.
+*      8 May 2000 (ajc):
+*        Replace 'TYPE *' with 'PRINT *'
+*        Add INCLUDE 'MAPS'
+*        Unused STRING
 *-----------------------------------------------------------------------
 
       SUBROUTINE INIT_SPECX (IFAIL)
 
       INCLUDE 'COMMAND_TABLE'
       INCLUDE 'FLAGCOMM'
+      INCLUDE 'MAPS'
       INCLUDE 'MAPTITLES'
 
       LOGICAL   NO_DUMP, NEW_DUMP, NO_MAP, NEW_MAP
       LOGICAL   USE_OLD_MAP
-      CHARACTER STRING*20, MAPNAME*72
+      CHARACTER MAPNAME*72
 
       INTEGER   GEN_ILEN
       INTEGER   STATUS
@@ -49,7 +54,7 @@ C  Initialize variables according to site-wide initialization file
 C  Check for command line qualifiers
 
       MAPNAME = ' '
-      Type *
+      PRINT *
       CALL QUALIFIERS (NO_DUMP, NEW_DUMP, NAMEFD,
      &                 NO_MAP,  NEW_MAP,  MAPNAME)
 
@@ -66,7 +71,7 @@ C  Re-open any SPECX data files
 
       IF (.NOT.NO_DUMP) THEN
         IF (.NOT.NEW_DUMP) NAMEFD = 'SPECX_DUMP'
-        Type *, 'Starting from dump file ', NAMEFD
+        PRINT *, 'Starting from dump file ', NAMEFD
         CALL RDUMP (NAMEFD,IFAIL)
         IF (IFAIL.EQ.43) THEN
           IFAIL = 0
@@ -85,11 +90,11 @@ C  must reset MAP_OPEN to false.
         MAP_OPEN = .FALSE.
         
         IF (USE_OLD_MAP) THEN
-          Type *, 'Attempting to open previous map...'
+          PRINT *, 'Attempting to open previous map...'
           CALL OPEN_SPECX_MAP (IFAIL)
           IF (IFAIL.NE.0)  THEN
             IFAIL = 0
-            TYPE *, 'Failed to open map!'
+            PRINT *, 'Failed to open map!'
           END IF
         END IF
       END IF
@@ -101,12 +106,12 @@ C  Open the map file and load the data cube
           MAPNAME = MAPNAME(:GEN_ILEN(MAPNAME))//'_map.sdf'
         END IF
 
-        Type *,'Attempting to open specified map ',MAPNAME
+        PRINT *,'Attempting to open specified map ',MAPNAME
         NAMEMP = MAPNAME
         CALL OPEN_SPECX_MAP (IFAIL)
         IF (IFAIL.NE.0)  THEN
           IFAIL = 0
-          TYPE *, 'Failed to open map!'
+          PRINT *, 'Failed to open map!'
         END IF
 
       END IF

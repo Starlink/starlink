@@ -4,6 +4,11 @@
 *     17 Dec 1993 (hme):
 *        In order to adapt to new STACKCOMM/PROTOTYPE, no longer use
 *        TSYS as start of scan header, since it isn't any more.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Correct type LOGICAL from INTEGER of IGETVM IFREEVM
+*        Default DO_ROTATE to .FALSE.
+*        Don't split strings across lines
 C-----------------------------------------------------------------------
 
       SUBROUTINE ROTATE_CUBE (IFAIL)
@@ -28,8 +33,8 @@ C     Include files:
 
 C     Functions:
 
-      LOGICAL*4 IGETVM
-      LOGICAL*4 IFREEVM
+      INTEGER*4 IGETVM
+      INTEGER*4 IFREEVM
 
 C     Local variables:
 
@@ -55,7 +60,8 @@ C     Check that there is a cube loaded
 C     Check that map is not both rotated and interpolated
 
       IF (MAP_INTERPOLATED .and. MAP_ROTATED) THEN
-        TYPE *, ' -- rotate_map -- Map is both rotated and interpolated'
+        PRINT *,
+     &   ' -- rotate_map -- Map is both rotated and interpolated'
         IFAIL = 72
         RETURN
       END IF
@@ -63,7 +69,7 @@ C     Check that map is not both rotated and interpolated
 C     ... find out the rotation angle required
 
       CALL GEN_YESNO ('Rotate coordinate frame in plane of sky?',
-     &                 DO_ROTATE, DO_ROTATE, ISTAT)
+     &                 .FALSE., DO_ROTATE, ISTAT)
       IF (DO_ROTATE) THEN
         CALL GEN_GETR4('P.A. of plot Y-axis wrt map cell Y-axis (deg)?',
      &                  THETA, 'F6.1', THETA, ISTAT)
@@ -76,10 +82,10 @@ C     that was performed previously by setting theta to zero.
 
 C     Sort out titles for X- and Y-axes
 
-D     TYPE *, ' -- rotate_cube --'
-D     TYPE *, '    DO_ROTATE = ', DO_ROTATE
-D     TYPE *, '    THETA     = ', THETA
-D     TYPE *, '    POS_ANGLE = ', POS_ANGLE
+D     PRINT *, ' -- rotate_cube --'
+D     PRINT *, '    DO_ROTATE = ', DO_ROTATE
+D     PRINT *, '    THETA     = ', THETA
+D     PRINT *, '    POS_ANGLE = ', POS_ANGLE
 
       CALL SET_MAPTITLE (DO_ROTATE, THETA, POS_ANGLE)
 
@@ -98,7 +104,7 @@ C     Equally check that we asked for a real change (no need to do
 C     anything if angle is same as before);
 
       IF (DO_ROTATE.AND.THETA.EQ.MAP_ANGLE.AND.MAP_ROTATED) THEN
-        TYPE *, '-- rotate_map -- Rotated cube still loaded: no change'
+        PRINT *, '-- rotate_map -- Rotated cube still loaded: no change'
         RETURN
       END IF
 
@@ -123,7 +129,8 @@ C  for the updated INDEX array
 
       ISTAT = IGETVM (8*NPTS1, .TRUE., 'ROTATE_CUBE', IPTR_BUF)
       IF (ISTAT .ne. 0) THEN
-        Type *,'Error getting virtual memory for work arrays for ROTATE'
+        PRINT *,
+     &   'Error getting virtual memory for work arrays for ROTATE'
         IFAIL = 51
         GO TO 99
       END IF
@@ -150,15 +157,16 @@ C  Rotate map
       MAP_ROTATED     = .TRUE.
       MAP_ANGLE       =  THETA
 
-      WRITE (6, '('' Rotated cube now loaded - Theta = '',
-     &             F7.2, '' deg.'')') THETA
+      WRITE (6,
+     &  '('' Rotated cube now loaded - Theta = '', F7.2, '' deg.'')')
+     &  THETA
 
    99 CONTINUE
 
       ISTAT = IFREEVM (IPTR_BUF)
       IF (ISTAT .ne. 0) THEN
         IFAIL = 51
-        Type *,'Trouble freeing virtual memory for workspace in ROTATE'
+        PRINT *,'Trouble freeing virtual memory for workspace in ROTATE'
       END IF
 
       RETURN

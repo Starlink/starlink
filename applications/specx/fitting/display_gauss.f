@@ -1,6 +1,8 @@
 *  History:
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*     20 Sep 2000 (ajc):
+*        Missing comma in FORMAT
 C-----------------------------------------------------------------------
 
       SUBROUTINE DISPLAY_GAUSS (IFAIL)
@@ -52,7 +54,7 @@ C     Functions
 
  1080 FORMAT(/1X,T20,'Parameters of current gaussian model'/)
  1090 FORMAT(18X,'N       Amp.        Width (',A,
-     &           ')    Pos''n ('A,')')
+     &           ')    Pos''n (',A,')')
  1100 FORMAT(17X,I2,4X,F7.3,9X,F6.2,8X,F9.2)
  1110 FORMAT(17X,I2,4X,F7.3,7X,F9.5,6X,F12.5)
 

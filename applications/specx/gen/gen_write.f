@@ -1,6 +1,8 @@
 *  History:
 *     18 Nov 1993 (hme):
 *        Avoid the call that uses %DESCR. Instead return IERR=8.
+*     13 Oct 2000 (ajc):
+*        Initialise LS to declared length of OUTSTRING not used length.
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_WRITE (STRING, OUTBYTE, LOUT, IERR)
@@ -24,15 +26,12 @@
       INTEGER   LS
       CHARACTER OUTSTRING*256       ! Temporary string
 
-*     Functions:
-
-      INTEGER   GEN_ILEN
-
 *  Ok, go...
 
       IERR = 0
 
-      LS = GEN_ILEN (OUTSTRING)
+      LS = LEN (OUTSTRING)
+
       CALL GEN_ENCODE (STRING, OUTSTRING, LS, IERR)
       IF (IERR.NE.0) RETURN
 

@@ -1,4 +1,7 @@
-
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused GEN_IENDCH
 C-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_GETSTR (PROMPT, SDEF, FDEF, STRING, JDEF)
@@ -40,7 +43,6 @@ C   of the default value.
       LOGICAL   GEN_GETSTR2
       LOGICAL   GEN_ALPHANUM
       INTEGER   GEN_ILEN
-      INTEGER   GEN_IENDCH
 
 *     Go...
 
@@ -55,43 +57,43 @@ C     a string expression.
       STRING   = ' '
       EVALUATE = .FALSE.
 
-D     TYPE *, '-- gen_getstr --'
-D     TYPE *, '   passed string is ', STR(:ILS)
+D     PRINT *, '-- gen_getstr --'
+D     PRINT *, '   passed string is ', STR(:ILS)
 
       IF (JDEF.EQ.1) THEN
-D       TYPE *, '   JDEF = 1; accepting default'
+D       PRINT *, '   JDEF = 1; accepting default'
         STRING = STR(:ILS) // ' '
       ELSE IF (JDEF.EQ.2) THEN
-D       TYPE *, '   JDEF = 2; return with ^Z set'
+D       PRINT *, '   JDEF = 2; return with ^Z set'
         CONTINUE
       ELSE IF (STRING_TEST(STR, LS, IERR)) THEN
-D       TYPE *, '   Good hollerith string; accept it'
+D       PRINT *, '   Good hollerith string; accept it'
         STRING = STR(:LS) // ' '
       ELSE IF (GEN_ALPHANUM (STR(:ILS))) THEN
-D       TYPE *, '   String is alphanumeric; test for string-symbol'
+D       PRINT *, '   String is alphanumeric; test for string-symbol'
         CALL GEN_INQSYMB (STR(:ILS), SYM_INDEX, TYPE, LENGTH,
      &                    ADDRESS, READONLY, IERR) 
         IF (SYM_INDEX.EQ.0 .OR. TYPE(1:1).NE.'C') THEN
-D         TYPE *, '   String not a string-symbol name; use as is'
+D         PRINT *, '   String not a string-symbol name; use as is'
           STRING = STR(:ILS) // ' '
         ELSE
-D         TYPE *, '   String is a string-symbol name; evaluate'
+D         PRINT *, '   String is a string-symbol name; evaluate'
           EVALUATE = .TRUE.
         END IF
       ELSE
-D       TYPE *, '   String is an expression? - evaluate it'
+D       PRINT *, '   String is an expression? - evaluate it'
         EVALUATE = .TRUE.
       END IF
 
       IF (EVALUATE) THEN
-D       TYPE *, '   Treat string as expression: evaluate'
+D       PRINT *, '   Treat string as expression: evaluate'
         WRITE             (TYPE, '(''C'',I3.3)') LEN (STRING)
         CALL GEN_EVAL_AE  (STR(:ILS), TYPE, %REF(STRING), IERR)
       END IF
 
-D     TYPE *, '   nominal string length = ', LEN(STRING)
-D     TYPE *, '   returned string = ', STRING
-D     TYPE *, '   returned length = ', GEN_ILEN(STRING)
+D     PRINT *, '   nominal string length = ', LEN(STRING)
+D     PRINT *, '   returned string = ', STRING
+D     PRINT *, '   returned length = ', GEN_ILEN(STRING)
 
       RETURN
       END

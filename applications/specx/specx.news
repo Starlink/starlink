@@ -1,7 +1,46 @@
-1 SPECX - Millimetre-wave Spectral data reduction - v6.7-7
+1 SPECX -  Millimetre-wave Spectral data reduction
+                                                    Expires: ????.??.??
 
- SPECX version 6.7-7 is now available. This release contains minor patches 
- and an updated SUN/17 document.
+ SPECX v6.7-12 is now available.  This is a purely cosmentic change to 
+ an initialisation script which now anounces how to SPECX after the
+ initialisation process.
+
+
+ Details of changes in previous versions:
+
+2 v6.7-11
+
+ Fixes a bug which leads to problems for data with large redshifts.
+
+2 v6.7-10
+
+ Corrects a non-standard FORMAT statement, which caused a crash, in
+ SET_WEIGHTS.F.
+  
+2 v6.7-9
+
+ Corrects a bug in writing the current mapplane to a FITS file, which caused
+ memory allocation error on Linux.
+
+2 v6.7-8
+
+ This is the first production release for Linux. Structure handling has
+ been re-written in C and the code made more compliant with the Fortran
+ standard in order to achieve this.
+
+ "Native" PGPLOT is used instead of "Starlink" (GKS) PGPLOT so there is some
+ difference from previous versions in graphics device naming and behaviour.
+
+ A bug which may have resulted in incorrect times being computed when writing
+ FITS files has been corrected.  Some messages have been changed to avoid
+ VMSisms.
+
+ SUN/17 has been updated.
+
+
+2 v6.7-7
+
+ This release contains minor patches and an updated SUN/17 document.
 
  Changes in this release are:
 
@@ -13,3 +52,5 @@
     value due to a loss of  precision.
 
   o Fix problem reading old GSD files that did not know about rastering.
+
+

@@ -8,15 +8,21 @@
 *     01 Feb 1995 (rpt)
 *        Changed code to use get_aline.c to provide command-line
 *        editing etc.with UNIX version.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Set ILIN=0 if line is blank
+*        Unused ILS
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_GETLINE (STRING,PROMPT,JDEF)
 
 *   Routine to get a line from the terminal, assuming that it may consist
 *   of several lines with continuation marks ('-') as the last character.
+*   If the first character is ! or * the line is treated as a comment and
+*   ignored.
 
       LOGICAL*4 COMMENT, CONTINUATION, BLANK
-      INTEGER*4 GEN_ILEN, ILEN, ITRM, ILS
+      INTEGER*4 GEN_ILEN, ILEN, ITRM
       CHARACTER ALINE*132,STRING*(*),PROMPT*(*)
  
       INTEGER*4 GET_ALINE
@@ -67,6 +73,7 @@
 
           IF (ALINE.EQ.' ') THEN
             BLANK  = .TRUE.
+            ILIN = 0
 
           ELSE
             BLANK  = .FALSE.
@@ -89,7 +96,6 @@
 
         CONTINUATION = .FALSE.
         IF (ILIN.NE.0)   THEN
-
           IF (ISTR.NE.0) STRING(ISTR:ISTR) = ' '        ! Must be on ctn'n line
           STRING (ISTR+1:ISTR+ILIN-I+1) = ALINE(I:ILIN) ! Add the new line
           ISTR = ISTR + (ILIN-I+1)                      ! Increment its length
@@ -103,7 +109,7 @@
       END DO
       IF (GEN_ILEN (STRING).EQ.0)   JDEF = 1
 
-D     type *, ' gen_getline --> ', string(:istr)
+D     print *, ' gen_getline --> ', string(:istr)
 
       RETURN
 

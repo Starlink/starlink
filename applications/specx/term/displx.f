@@ -1,3 +1,6 @@
+*  History:
+*     20 Sep 2000 (ajc):
+*        Missing commas in FORMAT
 C-------------------------------------------------------------------------
 
       SUBROUTINE DISPLX (XSCALE, IFAIL)
@@ -63,7 +66,7 @@ C   Routine to list relevant data about XSCALE for each unmasked quadrant
  1000 FORMAT ('  Quad.   Centre freq.   Increment',
      &        '                  Start        End'      /
      &        '             (GHz)         (MHz)  ',
-     &        ' (',A6,')     ('A6')       ('A6')'    /1X,67('-')/)
+     &        ' (',A6,')     (',A6,')       (',A6,')'    /1X,67('-')/)
 
  1001 FORMAT (  T5,I1,    T11,F11.6, T27,F9.4,
      &          T37,F9.4, T48,F10.4, T61,F10.4)

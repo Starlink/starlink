@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE SETRANGE2D (N, X, Y, BAD, XL, XH, EXPAND, NINTS,
@@ -73,7 +76,7 @@
 
       ELSE
         ERR = 35
-        Type *,'Error in SETRANGE2D - Range = 0'
+        PRINT *,'Error in SETRANGE2D - Range = 0'
         GO TO 99
       END IF
 

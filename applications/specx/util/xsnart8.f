@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       DOUBLE PRECISION FUNCTION XSNART8 (X, V, NX, IFAIL)
@@ -45,8 +48,8 @@ C     XL and XR represent these channel values.
 
       XL = X(1)  - 0.505*( X(2) -X(1)    )
       XR = X(NX) + 0.505*( X(NX)-X(NX-1) )
-D     type *, ' -- xsnart8 --'
-D     type *, '  left and right limits: ', xl, xr
+D     PRINT *, ' -- xsnart8 --'
+D     PRINT *, '  left and right limits: ', xl, xr
 
 *     test that input value, V, lies in range of axis...
 
@@ -75,9 +78,9 @@ D     type *, '  left and right limits: ', xl, xr
 
       DX = XRR - XLL
 
-D     type *, '  first guess channel: ', n1
-D     type *, '  channel boundaries xll and xrr: ', xll, xrr
-D     type *, '  channel increment dx: ', dx
+D     PRINT *, '  first guess channel: ', n1
+D     PRINT *, '  channel boundaries xll and xrr: ', xll, xrr
+D     PRINT *, '  channel increment dx: ', dx
 
 *     If V lies outside edges of current channel, iterate until
 *       we know location to within one channel
@@ -91,7 +94,7 @@ D     type *, '  channel increment dx: ', dx
         END IF
 
         IF (N1 .GE. NX .OR. N1. LT. 0) THEN
-          TYPE *, ' -- XSNART8 -- Program error; iterated out of range'
+          PRINT *, ' -- XSNART8 -- Program error; iterated out of range'
           IFAIL = 26
           RETURN
         ELSE IF (N1 .EQ. 0) THEN
@@ -107,9 +110,9 @@ D     type *, '  channel increment dx: ', dx
 
         DX  = XRR - XLL
 
-D       type *, '  next guess channel: ', n1
-D       type *, '  channel boundaries xll and xrr: ', xll, xrr
-D       type *, '  channel increment dx: ', dx
+D       PRINT *, '  next guess channel: ', n1
+D       PRINT *, '  channel boundaries xll and xrr: ', xll, xrr
+D       PRINT *, '  channel increment dx: ', dx
 
       END DO
 
@@ -123,7 +126,7 @@ D       type *, '  channel increment dx: ', dx
         XSNART8 = FLOAT(N1) + (V-X(N1))/DX
       END IF
 
-D     type *, '  final value: ', xsnart8
+D     PRINT *, '  final value: ', xsnart8
 
       RETURN
       END

@@ -2,6 +2,8 @@
 *     17 Dec 1993 (hme):
 *        In order to adapt to new STACKCOMM/PROTOTYPE, no longer use
 *        TSYS as start of scan header, since it isn't any more.
+*     21 Sep 2000 (ajc):
+*        Unused I
 *-----------------------------------------------------------------------
 
       SUBROUTINE SHOW_STORE (ILOUT, IFAIL)
@@ -24,7 +26,7 @@
 
 *     Local variables:
 
-      INTEGER*4   I, J
+      INTEGER*4   J
       INTEGER*4   IPTR
       INTEGER*4   ISTAT
 

@@ -12,6 +12,9 @@
 *        with the DUMP common block.
 *     09 Jan 1994 (rp):
 *        Replace PSX_ routines with UGETTIM, UGETDAT
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused NTICKS
 C---------------------------------------------------------------------------
 
       SUBROUTINE WDUMP (NAMEFD, IERR)
@@ -31,7 +34,6 @@ C   a permanent disc file.
       REAL*8    R8FLG
 
       INTEGER   STATUS
-      INTEGER   NTICKS
       CHARACTER*32 CDATIM
 
 C   Data defined in INCLUDE files
@@ -78,7 +80,7 @@ C   Main stack space
      &      FORM   = 'UNFORMATTED',
      &      IOSTAT =  ERRCODE)
       IF (ERRCODE.NE.0) THEN
-        TYPE *,'Trouble opening dump file'
+        PRINT *,'Trouble opening dump file'
         CALL GEN_ERMSG (ERRCODE)
         IERR=10
         GO TO 99

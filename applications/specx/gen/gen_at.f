@@ -4,6 +4,10 @@
 *        Replace CALL CLOSE with CLOSE.
 *     09 Jan 1994 (rp):
 *        Replace FIO_ routines with UGET/UFREE
+*     28 July 2000 (ajc):
+*        Remove CARRIAGECONTROL and READONLY from OPEN
+*        Change TYPE * to PRINT *
+*        Unused GEN_ILEN
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_AT(FILENAM,IERR)
@@ -11,7 +15,6 @@
 *     Indirect command file processor for SPECX
 
       CHARACTER FILENAM*(*)
-      INTEGER*4 GEN_ILEN
 
       INCLUDE 'CLI_STACK.INC'
 
@@ -25,12 +28,12 @@
       CALL UGETLUN (LUN, STATUS)
       IF (STATUS.NE.0) GO TO 100
 
-      OPEN (LUN, FILE=FILENAM, STATUS='OLD', READONLY,
+      OPEN (LUN, FILE=FILENAM, STATUS='OLD',
      &     ACCESS='SEQUENTIAL', FORM='FORMATTED',
-     &     CARRIAGECONTROL='LIST', IOSTAT=IERR, ERR=100)
+     &     IOSTAT=IERR, ERR=100)
 
   100 IF(IERR.NE.0)   THEN
-        TYPE *,'Trouble opening @ file ',FILENAM
+        PRINT *,'Trouble opening @ file ',FILENAM
         CALL GEN_ERMSG    (IERR)
         CLOSE             (LUN)
         CALL UFREELUN (LUN, STATUS)
@@ -45,11 +48,11 @@
 
       CALL SET_LUN_IN (LUN)
 
-D     type *,'-------------------'
-D     type *,'Stack pointer incremented ',ISP
-D     type *,'..new input unit ',LUN,' new string pos''n',ICLI(1,ISP)
-D     type *,'..new length of CLI ',ICLI(2,ISP)
-D     type *,'-------------------'
+D     print *,'-------------------'
+D     print *,'Stack pointer incremented ',ISP
+D     print *,'..new input unit ',LUN,' new string pos''n',ICLI(1,ISP)
+D     print *,'..new length of CLI ',ICLI(2,ISP)
+D     print *,'-------------------'
 
       RETURN
       END

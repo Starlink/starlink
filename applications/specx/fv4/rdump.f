@@ -13,6 +13,8 @@
 *        and restart HDS.
 *     21 Dec 1993 (hme):
 *        Also end and begin NDF.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C------------------------------------------------------------------------
 
       SUBROUTINE RDUMP (NAMEFD,IERR)
@@ -86,7 +88,7 @@ C  Ok, go...
      &      FORM   = 'UNFORMATTED',
      &      IOSTAT =  ERRCODE)
       IF (ERRCODE.NE.0)  THEN
-        TYPE *,'Trouble opening dump file'
+        PRINT *,'Trouble opening dump file'
         CALL GEN_ERMSG (ERRCODE)
         IERR=10
         GO TO 99

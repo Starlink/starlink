@@ -21,7 +21,7 @@ PKG = specx
 # Compiler definitions
 
 FC     = f77
-FFLAGS = -g -C
+FFLAGS = -g -fno-second-underscore
 CFLAGS = -I${STAR_INC}
 LINK   = ln -s
 
@@ -33,22 +33,27 @@ INSTOPTS = -g jcmtsw
 
 # Specx libraries
 
-#SPXLIBS = -L../astro -lastro -L../command -lcommand -L../exprt -lexprt \
-#-L../external -lexternal -L../fitting -lfitting -L../fv4 -lfv4 \
-#-L../gen -lgen -L../graph -Lgraph -L../mapdis4 -lmapdis4 -L../mv4 -lmv4 \
-#-L../plots -lplots -L../reduce -lreduce -L../scl -lscl -L../tek -ltek \
-#-L../term -lterm -L../util -lutil -L../vms -lvms
+SPXLIBS = -L../astro -lastro -L../command -lcommand -L../exprt -lexprt \
+-L../external -lexternal -L../fitting -lfitting -L../fv4 -lfv4 \
+-L../gen -lgen -L../graph -Lgraph -L../mapdis4 -lmapdis4 -L../mv4 -lmv4 \
+-L../plots -lplots -L../reduce -lreduce -L../scl -lscl -L../tek -ltek \
+-L../term -lterm -L../util -lutil -L../vms -lvms
 
-SPXLIBS = ../command/libcommand.a ../exprt/libexprt.a \
+SPXLIBS= ../command/libcommand.a ../exprt/libexprt.a \
 ../external/libexternal.a \
 ../reduce/libreduce.a ../scl/libscl.a ../fitting/libfitting.a \
 ../plots/libplots.a ../term/libterm.a ../mapdis4/libmapdis4.a \
 ../tek/libtek.a ../plots/libplots.a ../mapdis4/libmapdis4.a ../mv4/libmv4.a \
 ../fv4/libfv4.a ../util/libutil.a ../graph/libgraph.a ../astro/libastro.a \
-../gen/libgen.a ../vms/libvms.a ../gsd/libgsd.a \
+../gen/libgen.a ../vms/libvms.a \
 ../getaline/libgetaline.a
 
-EXTLIBS = -L${STAR_LIB} `./specx_link` -lreadline
+#SPXLIBS= -L. -lgen -lscl -lastro -lcommand -lexprt -lexternal -lfitting \
+#	-lfv4 -lgraph -lmapdis4 -lmv4 -lplots -lreduce -ltek -lterm -lutil \
+#	-lvms
+
+FIGLIBS = -L/star/sources/figaro -lfit -ltio -lgen -lich
+EXTLIBS = ${FIGLIBS} -L${STAR_LIB} `./specx_link` -lreadline -lncurses
 HEXTLIBS = -L${STAR_LIB} `./specx_help_link`
 
 # Source code
@@ -85,7 +90,7 @@ HOBJS = ${HELPSOURCE:.c=.o}
 	${FC} ${FFLAGS} -c $<
 
 $(PKG): ${OBJS}
-	${FC} ${CFLAGS} ${SPXLIBS} ${EXTLIBS} ${OBJS} -o $@
+	${FC} ${OBJS} -o $@ ${SPXLIBS} ${EXTLIBS}
 
 $(PKG)_help: ${HOBJS}
 	${FC} ${CFLAGS} ${HOBJS} ${HEXTLIBS} -o $@

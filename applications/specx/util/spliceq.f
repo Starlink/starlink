@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused I
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPLICEQ (NQUAD, NQ, NREP, BUF, MAXDAT,
@@ -27,7 +31,6 @@
 
 *     Local variables
 
-      INTEGER    I
       INTEGER    IPTR
       INTEGER    ISTAT
       INTEGER    N
@@ -42,7 +45,7 @@
 
       NCHAN = NTOT(NQUAD) - NPTS(NQ) + NREP
       IF (NCHAN .gt. MAXDAT) THEN
-        TYPE *, ' -- SpliceQ --  No room on stack for lengthened array'
+        PRINT *, ' -- SpliceQ --  No room on stack for lengthened array'
         IFAIL = 18
         RETURN
       END IF
@@ -52,7 +55,7 @@
       NBYTES = 4*NCHAN
       ISTAT = IGETVM (NBYTES, .TRUE., 'SPLICEQ', IPTR)
       IF (ISTAT .ne. 0) THEN
-        TYPE *, ' -- SpliceQ -- error in UGETVM'
+        PRINT *, ' -- SpliceQ -- error in UGETVM'
         IFAIL = 18
       END IF
 
@@ -86,7 +89,7 @@
 
       ISTAT = IFREEVM (IPTR)
       IF (ISTAT .ne. 0) THEN
-        TYPE *, ' -- SpliceQ -- error in UFREEVM'
+        PRINT *, ' -- SpliceQ -- error in UFREEVM'
         IFAIL = 18
       END IF
 

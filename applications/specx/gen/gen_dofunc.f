@@ -1,3 +1,8 @@
+*  History:
+*     31 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
+*        Unused FUNCTION
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_dofunc (opnd_addr1, opnd_type1,
@@ -21,7 +26,7 @@
       INTEGER*4 iresult
       REAL*4    arg
       REAL*4    result
-      CHARACTER function*4
+D      CHARACTER function*4
 
       EQUIVALENCE (result, iresult)
 
@@ -35,7 +40,7 @@
 
 *     First get the argument in REAL type
 
-      READ (opnd_type2(2:gen_ilen(opnd_type2)), '(I)') nbytes
+      READ (opnd_type2(2:gen_ilen(opnd_type2)), '(I3)') nbytes
       CALL gen_cvt_type (%val(opnd_addr2), opnd_type2, nbytes, 
      &                    arg,            'R4',        4,       ierr)
 
@@ -46,8 +51,8 @@
       negative = (arg.lt.0.0)
       zero     = (arg.eq.0.0)
 
-D     TYPE *, '-- gen_dofunc --'
-D     TYPE *, '   evaluation of function ', function
+D     PRINT *, '-- gen_dofunc --'
+D     PRINT *, '   evaluation of function ', function
 
       IF (fnc_index .eq. 1) THEN
         IF (positive) THEN
@@ -123,8 +128,8 @@ D     TYPE *, '   evaluation of function ', function
 
 *     error return
 
-   99 TYPE *, '-- gen_dofunc --'
-      TYPE *, '   argument not in domain of function'
+   99 PRINT *, '-- gen_dofunc --'
+      PRINT *, '   argument not in domain of function'
 
       RETURN
       END

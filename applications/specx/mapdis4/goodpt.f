@@ -3,6 +3,8 @@
 *        Change common name from GOODPT to GOOD_PT. Same in a number of
 *        other source files in this directory. The same change will be
 *        necessary in ../export.export_map.f and ../export/specx_wrfitsmap.f.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C--------------------------------------------------------------
 
       LOGICAL FUNCTION GOODPT (INDEX,IX,IY,TEST)
@@ -53,7 +55,7 @@ C  Then check INDEX over range of R.A. and Dec. indices
         END DO
       END DO
 
-D     TYPE *, ' -- goodpt --; ix, iy, goodpt = ', ix, iy, goodpt
+D     PRINT *, ' -- goodpt --; ix, iy, goodpt = ', ix, iy, goodpt
       RETURN
       END
 

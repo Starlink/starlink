@@ -5,7 +5,15 @@ C-----------------------------------------------------------------------
 C  Routine to set one or more (sequential) channels in one or more
 C  quadrants to given value.
 
+C  History:
+C     6-JUN-2000
+C       Declare external function INQUAD LOGICAL
+
       DIMENSION IC(2)
+
+      EXTERNAL INQUAD
+      LOGICAL INQUAD
+
       LOGICAL   OUTRNGE,DOQUAD
 
       INCLUDE        'STACKCOMM'

@@ -1,94 +1,408 @@
+! SPECX demonstration
+!  The commands are all shown as you would type them if you don't want to
+!  be prompted. Thus the 'SET-DUMP Y' shown below is the same as typing
+!  'SET-DUMP' and responding 'Y' to the ensuing prompt.
+! Uses gwm as terminal device - for use with native PGPLOT
+!
 ! Must have X terminal
-! Must have VAX binary file scan_0043.dat, copy it from /star/bin/specx
-! Must have VAX binary file l483core.dat,  copy it from /star/bin/specx
-! Must have VAX binary file l483cmap.map,  copy it from /star/bin/specx
-
+! Must have binary file obs_das_0011.dat,  copy it from /star/bin/specx
+! Must have binary file l483core.dat,  copy it from /star/bin/specx
+! Must have binary file l483cmap.map,  copy it from /star/bin/specx
+!
+! This script may be changed to an interactive demonstration by using
+! alternative commands included here as comment lines starting !*.
+! Many SPECX commands behave differently in interactive mode - the User's
+! Manual gives details for each command.
+!
+! In interactive mode interactive graphics is used - when the cursor appears,
+! pressing the H key will bring up a menu.
+! ----------------------------------------------------------------------------
+!
+print '** SET INITIAL CONDITIONS'
+!
+! Command SET-DUMP controls whether or not the current state
+! of SPECX is saved after successful completion of each command,
+! macro or command-file. You are strongly advised to keep this set,
+! as you can then restart after a crash from exactly where you were.
 SET-DUMP Y
+!
+! Another important command is SET-QUADRANT-DISPLAY. 
+! This not only controls the display (in plots, listings etc) of
+! the various quadrants of the spectrum, but also to some extent
+! controls the processing. The basic rule is that if the header
+! parameter IQCEN is set then operations which can work on only
+! one quadrant will work on that one, otherwise if only one quadrant
+! is enabled (unmasked) then it will work on that one, and otherwise
+! the program will prompt. It is usually best to leave all quadrants
+! unmasked.
+!
 SET-QUADRANT-DISPLAY 1 1 1 1 1 1 1 1
+!
+! SET-X-SCALE enables you to control the ordinate of plots; array index,
+! frequency, velocity, or user-chosen units. 
+! This particular command sets the ordinate to be velocity. Note the use 
+! of \ to separate responses to consecutive prompts.
+!
 SET-X-SCALE 3\N
+!
+! Set the velocity frame of the plot to be GEOcentric.
+!
 SET-VEL-FRAME Y\GEO\RAD\0
+!
+! Set up the plot to do autoscaling to make life easy.
+! Notice at this point that SPECX recognises the input command by a minimum
+! matching procedure. This means that you can get away with typing the 
+! shortest string that is not ambiguous. If SPECX can't tell which command
+! you mean then it will says so, and list the possible alternatives.
+! In the following case, the full command to set the scale of the plot is 
+! 'SET-PLOT-SCALES' but SPECX will accept S-P-SC.
+!
 S-P-SC Y Y
+!
+! Ask for axes and spectrum header information to be plotted and 3mm high 
+! characters to be used. You can speed up interactive work a great deal by
+! using this command to turn off the plotting of axes and text.
+!
 SET-PLOT-PARAMETERS Y\Y\3
-SET-TERMINAL-DEVICE xw \
+!
+! The following section demonstrates the use of some baseline and line fitting
+! applications. To do this it uses data on L483 stored in the GSD file 
+! obs_das_011.dat
+!
+! Firstly, set up for the plots....
+!
+!    set the terminal device to whatever you're using
+!*SET-TERMINAL-DEVICE ?\?
+SET-TERMINAL-DEVICE gwm\\
+!
+!    set the hardcopy device
+!*SET-HARDCOPY-DEVICE ?
 SET-HARDCOPY-DEVICE ps_l
+!
+!    select the terminal for plotting
+!
 SET-PLOT-DEVICE T
+!
+! Set to non-interactive mode. An alternative to the explicit command would
+! be to set the relevant SPECX flag, in this case by typing 'INTERACTIVE=F'
+!*SET-INTERACTIVE Y
 SET-INTERACTIVE N
-
+!
+! Define the header of the GSD files to be obs_das_
+!
 SET-GSD-FILENAME obs_das_
+!
+! Summarize the contents of the GSD file obs_das_11
+!
+print '** Summarize scan 11'
 INDEX-GSD-FILES 11
+!
+! Read into the X-register the spectrum at offset 0,0 in GSD file obs_das_11
+!
+print '** READ GSD DATA'
 READ-GSD-DATA 11\\0 0
+!
+! Merge quadrants, with truncation to remove noise-spikes
+!
+print '** DAS-MERGE'
 das-merge \\\\
+!
+! Exchange the spectra in the X and Y registers
+!
+print '** X-Y INTERCHANGE'
 XY-INTERCHANGE
+!
+! Display the x-axis data of the spectrum that has been read in. Then
+! extract quadrant 2 for further operation (this quadrant has a line in it).
+!
+print '** SHOW-X-SCALE'
 SHOW-X-SCALE
+!
+print '** EXTRACT-QUADRANT'
 EXTRACT-QUADRANT 2
+!
+! Plot the current spectrum line weight 1 colour green
+!
+print '** NEW PLOT 1 3'
 NEW-PLOT 1 3
-
+!
+! Create an HDS-based SPECX data file l483core.sdf by converting an old-style
+! VAX file - first remove any existing HDS-based file
+!
+print '** CONVERT VAX data file l483core.dat to l483core.sdf'
 $rm l483core.sdf
 CONVERT-VAX-FILE l483core.dat
+!
+! Open the data file just created
+!
+print '** OPEN-FILE l483core'
 OPEN-FILE l483core
+!
+! READ scan 15 from the (first) file
+print '** READ SPECTRUM'
 READ-SPECTRUM 1 15
+!
+! Display the current stack contents
+!
+print '** SHOW STACK'
 SHOW-STACK
-
+!
+! Display the x-axis data of the spectrum that has been read in. Then
+! extract quadrant 2 for further operation (this quadrant has a line in it).
+!
+print '** SHOW X SCALE'
 SHOW-X-SCALE
+!
+! Now remove a linear baseline - we need two baseline regions for this.
+!
+! A baseline fitting region is chosen by marking the left and right
+! boundaries using the L and R keys, and then using the A key to
+! accept the region (L and R keys may be used repeatedly until you
+! are happy with the result and press A - use D to see the current region).
+! 
+! When the plot is drawn and the cursor appears, delineate
+! (L and R) and then accept (A) one region at each end of the
+! spectrum. Once you have accepted two regions, control will
+! revert to the keyboard.
+!
+! when you are presented with the cursor, it may be convenient
+! to type (C) to clear the alpha page. (H) will give you a complete
+! list of available options. 
+!
+! The plot will be in histogram form and the default line weight will be the
+! thinnest (and fastest plotting). Note that the LINE_WEIGHT flag determines
+! the line thickness of the axes and labels but that of the plotted graph
+! is prompted for by NEW-PLOT.
+!
 LINE_WEIGHT=1
 HISTOGRAM=T
+!
+print '** REMOVE-LINEAR-BASELINE'
 REMOVE-LINEAR-BASELINE\-20 0\25 39
+!
+! We will store the spectrum in register number 1 so that we can use it 
+! again later, and then start a new plot with the result of the above operation.
+!
+print '** STORE-SPECTRUM'
 STORE-SPECTRUM 1
+!
+! Plot line weight 1, colour red.
+!
+print '** NEW-PLOT in red'
 NEW-PLOT 1 2
+!
+! In interactive mode, type E to finish with this plot.
+!
+! Now we will fit a single gaussian component. 
+! Some control parameters are set before typing the command, to define 
+! details of the fitting procedure.
+!
+! In interactive mode, once the spectrum has been plotted, you first set up
+! the regions of the spectrum that are to be used in the fit using the cursor.
+! You can use up to 8 baseline regions but I suggest you use only one to start
+! with. Type A to accept the region as before, then type E or Q to finish with
+! the plot. The numbers that follow the FIT-GAUSSIAN-MODEL command are a first
+! guess for the line parameters (amplitude, line width, centre). The ^Z on the
+! command line signals the end of the sequence of lines that the procedure
+! should fit.
+!
+print '** FIT-GAUSSIAN-MODEL'
 FIT_TOL=0.05
 MAX_ITS=20
 FIT_DEBUG=-1
 FIT-GAUSSIAN-MODEL\0,25\^d\5 4 16\^Z
+!
+! The bottom of the stack now contains the fitted baseline, while the
+! spectrum is in the Y-register. 
+!
+! Plot the fit on the same axes as the original data. Plot it as a line plot
+! rather than a histogram, superimposed on the first plot.
+!
+print '** OVERLAY-SPECTRUM in green'
 HISTOGRAM=F
 OVERLAY-SPECTRUM 1 3
+!
+! Then subtract the fit from the data and plot it as a histogram, offset 
+! for clarity.
+!
+print '** SUBTRACT-SPECTRA'
 SUBTRACT-SPECTRA
+!
+print '** OFSET-SPECTRUM'
 OFFSET-SPECTRUM -1.5
+!
+print '** OVERLAY-SPECTRUM in blue'
 HISTOGRAM=T
 OVERLAY-SPECTRUM 1 4
-
+!
+! As a last demonstration, try fitting two components, and then plot
+! the sum of components, and each individually. We will build up a
+! plot-file for the printer, but view it on the terminal before
+! actually printing it. In this case we will use a line-weight of 2 to
+! give a thicker line on the hardcopy.
+!
+! First set plot device to be the hardcopy device.
+! 
+! *****   Note that after this point the commands will be abbreviated.
+!
+print '** SET-PLOT-DEVICE'
 S-P-D H
+!
+! Recall the original spectrum stored in register 1 and plot it.
+!
+print '** REC-SPEC'
 REC-SPEC 1
+!
+print '** NEW-PLOT in green'
 LINE_WEIGHT=2
+!
+! Plot line weight 2, colour green
+!
 NEW-PLOT 2 3
+!
+! Because we are not using the terminal to plot, we cannot run
+! fit-gaussian-baseline interactively. So we use "set-interactive"
+! to turn interactive mode off. We will then be prompted with
+! our previous fitting region as the default. Initial guesses as to
+! the parameters of the two lines are then input.
+!
+print '** SET-INTER'
 SET-INTER N
+!
+! Fit the two baselines
+!
+print '** FIT-GUASSIAN-MODEL'
 FIT-G-MODEL \\^Z\4 2 12\6 3 16\^Z
+!
+! Plot the combined fit as a line plot
+!
+print '** OVERLAY-SPECTRUM in blue'
 HISTOGRAM=F
 OV-S 2 4
+!
+! Calculate the first fitted component and put it in the X register of the stack
+!
+print '** CALC-GUASSSIAN-MODEL for first component'
 CALC-G-MODEL 1\^Z
+!
+! and plot it
+!
+print '** OVERLAY-SPECTRUM in light blue'
 OV-S 2 5
+!
+! Do the same for the second component
+!
+print '** CALC-GUASSSIAN-MODEL for second component'
 CALC-G-MODEL 2\^Z
+print '** OVERLAY-SPECTRUM in cyan'
 OV-S 2 6
+!
+! we now have a plot file with spectrum, fit, and individual components
+! view it on the terminal before plotting it on the printer
+!
+print '** SEE-PLOT of spectrum, fit and components'
 SEE-PLOT T
+!
+! now close the plot file
+!
 CLOSE-PLOT
-
+!
+! and return to normal interactive mode of operation.
+!
+print '** Return to normal mode of operation'
 S-P-D T
+!
+!*S-INT Y
 S-INT N
+!
+! The following section describes the construction and display of a map
+! datacube.
+!
+print 'Construct and display a map'
+!
+! First create the map file. The parameters that follow the command give 
+! the title of the map and the spatial sampling that will be used. An error 
+! will be reported if the file already exists, so we delete any existing file.
+!
+print '** RM 1483core_map.sdf'
 $rm l483core_map.sdf
-
+!
+print '** Create map file l483core_map.sdf'
 OPEN-MAP-FILE l483core\y\L483core\starlink\\10 10\0.0\17 9\65
+!
+print '** LOOP READ_SPECTRUM and ADD-TO-MAP'
 DO I 1 72
    READ-SPECTRUM 1 I
    ADD-TO-MAP
 ENDDO
+!
+! list the characteristics of the map file
+!
+print '** LIST-MAP'
 LIST-MAP N
+!
+! Define the boundaries of the data cube
+!
+print '** SET-MAP-SCALES'
 SET-MAP-SCALES R D\80 -80\-50 50
-SET-MAP-PARAM Y\Y\Y\2 2\Y\19\0 1 2
+!
+! Define the output method for the map. 
+!
+print '** SET-MAP-PARAMS''
+SET-MAP-PARAM Y\Y\Y\2 2\Y\19\0 1 2\\
+!
+! Plot the total emission between 0 and 40kms-1; the line is at about 17kms-1.
+! Type Q to get rid of the cursor and continue. Use thin plotting line for 
+! speed.
+!
+print '** CONTOUR-MAP between 0 and 40kms-1'
 LINE_WEIGHT=1
 CONTOUR-MAP 0 40\N
+!
+! Now plot the map as a greyscale image. First set the greyscale to be used,
+! then plot the image. Use thicker line again.
+!
+print '** SET-GREYSCALE'
 LINE_WEIGHT=2
 SET-GREYSCALE Y\Y\4
+!
+print '** GREYSCALE-MAP between 0 and 40kms-1'
 GREYSCALE-MAP 0 40\N
+!
+! Now extract a spectrum from the 0,0 offset position in the map and plot it.
+!
+print '** Extract a spectrum using GET-SPEC-F-MAP'
 GET-SPEC-F-MAP \0 0
+!
+print '** NEW-PLOT in blue'
 HISTOGRAM=T
 LINE_WEIGHT=1
 SCAN_TITLE='Another test'
+!
+! Plot line weight 1, colour blue
+!
 NEW-PLOT 1 4
+!
+! Finally, plot all the spectra in the map.
+! Note that the limits of the region plotted are as set using
+! SET-MAP-SCALES. Use thin plotting line to show detail.
+!
+print '** Plot all the spectra in the map using GRID-SPECTRA'
 LINE_WEIGHT=1
 GRID-SPECTRA 0 20\-2 6\N
+!
+print '** CLOSE-MAP'
 CLOSE-MAP
-
+!
 $rm l483cmap_map.sdf
+print '** CONVERT-VAX-MAP l483cmap.map to l483cmap_map.sdf'
 CONVERT-VAX-MAP l483cmap
+!
+print '** OPEN-MAP-FILE'
 OPEN-MAP-FILE l483cmap
+!
+print '** CONTOUR-MAP'
 CONTOUR-MAP 0 40\N
+!
+print '** CLOSE-MAP'
 CLOSE-MAP

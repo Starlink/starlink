@@ -1,3 +1,7 @@
+* History:
+*    20-SEP-2000 (AJC):
+*       Declare P, IPTS dimension 2, not 1
+*       Declare XSCALE assumed size
 C--------------------------------------------------------------------------
 
       SUBROUTINE PPAIR(P,IPTS,NCH,XSCALE,IFAIL)
@@ -5,8 +9,8 @@ C--------------------------------------------------------------------------
 C   Routine to get ordered pair of data points in P corresponding to 
 C   points in IPTS(1) and IPTS(2)
 
-      REAL*4  P(1),XSCALE(1)
-      INTEGER IPTS(1)
+      REAL*4  P(2),XSCALE(*)
+      INTEGER IPTS(2)
 
       IFAIL=0
 

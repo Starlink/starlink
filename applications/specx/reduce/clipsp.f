@@ -1,3 +1,6 @@
+C  History:
+C     19 Sept 2000 (ajc)
+C        Declare CLIPVAL (removed from FLAGCOMM)
 C-----------------------------------------------------------------------
 
       SUBROUTINE CLIPSP (IFAIL)
@@ -23,6 +26,7 @@ C  Routine to clip high points and set to bad channel value:
       INTEGER         ISTAT
       INTEGER         NCLIP
       INTEGER         NQ
+      REAL            CLIPVAL
 
 *  Ok, go...
 

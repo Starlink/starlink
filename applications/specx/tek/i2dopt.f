@@ -13,6 +13,9 @@
 *        Change CHR_UCASE to UUCASE
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Don't split strings across lines
 C-----------------------------------------------------------------------
 
       INTEGER FUNCTION I2DOPT (MAP, VALOPT, REPEAT, CONTOURS,
@@ -155,21 +158,21 @@ C  Decode X and Y positions to plot co-ordinates and confirm
         IF (XBOUNDS) THEN
           WRITE (TXTLIN, '(''Cursor outside of map area!'')')
           CALL IPUT_SCREEN (TXTLIN, 1, 1, 0)
-*         TYPE *,TXTLIN
+*         PRINT *,TXTLIN
           CALL ISET_CURSOR (23, 1)
 
         ELSE
 
           CALL MAP_LOCATE (MAP, NMAP, X, Y, IM, IN, Z)
-          WRITE (TXTLIN,'(A4''=''F7.2,3X,A4''=''F7.2,3X,
-     &                    '':  MAP-VALUE=''F8.2)', IOSTAT=IERR)
-     &           MAPTIT(LINK(1))(:4),X, MAPTIT(LINK(2))(:4),Y,Z
+          WRITE (TXTLIN,
+     &      '(A4''=''F7.2,3X,A4''=''F7.2,3X,'':  MAP-VALUE=''F8.2)',
+     $      IOSTAT=IERR) MAPTIT(LINK(1))(:4),X, MAPTIT(LINK(2))(:4),Y,Z
           CALL IPUT_SCREEN (TXTLIN, 1, 1, 0)
-*         TYPE *,TXTLIN
+*         PRINT *,TXTLIN
         END IF
 
         CALL IPUT_SCREEN ('GIN character '//ICH2//' ',1,60,2)
-*       TYPE *,'GIN character '//ICH2//' '
+*       PRINT *,'GIN character '//ICH2//' '
         CALL ISET_CURSOR (23, 1)
 
 C  Convert lower case letters to upper case
@@ -181,7 +184,7 @@ C  Then decode options
 
         IF (INDEX(VALOPT,ICH2).EQ.0) THEN
           CALL IPUT_SCREEN('Invalid character '//ICH2,1,60,2)
-*         TYPE *,'Invalid character '//ICH2
+*         PRINT *,'Invalid character '//ICH2
 
         ELSE IF (CHR.EQ.END) THEN
           I2DOPT = 2
@@ -274,14 +277,14 @@ C  Then decode options
             END IF
             IF (IFAIL.EQ.0) THEN
               CALL IPUT_SCREEN ('Spectrum fetched ', 2, 60, 2)
-*             TYPE *,'Spectrum fetched '
+*             PRINT *,'Spectrum fetched '
             ELSE
               CALL IPUT_SCREEN ('No data nearby!  ', 2, 60, 2)
-*             TYPE *,'No data nearby!  '
+*             PRINT *,'No data nearby!  '
             END IF
           ELSE
             CALL IPUT_SCREEN ('Not a spatial map', 2, 60, 2)
-*           TYPE *,'Not a spatial map'
+*           PRINT *,'Not a spatial map'
           END IF
 
           CALL SXGTTGRAPH
@@ -319,11 +322,11 @@ C  Then decode options
           CALL MAP_MAXMIN (MAP, NAXX, NAXY, XLIM, YLIM,
      &                     BADPIX_VAL, AMAPMIN, AMAPMAX)
           CALL SXGTIDLE
-          WRITE (TXTLIN,'(''Map minimum: '', F8.3, 3X,
-     &                    ''Map maximum: '', F8.3)',
-     &                      IOSTAT=IERR) AMAPMIN, AMAPMAX
+          WRITE (TXTLIN,
+     &       '(''Map minimum: '', F8.3, 3X,''Map maximum: '', F8.3)',
+     &       IOSTAT=IERR) AMAPMIN, AMAPMAX
           CALL IPUT_SCREEN (TXTLIN, 2, 1, 0)
-*         TYPE *,TXTLIN
+*         PRINT *,TXTLIN
           CALL SXGTTGRAPH
 
         ELSE IF (CHR.EQ.INTEG) THEN
@@ -331,14 +334,15 @@ C  Then decode options
           CALL MAP_INTEG (MAP, NAXX, NAXY, P, Q, SIGMA, GOODBOX)
           IF (GOODBOX) THEN
             LU = GEN_ILEN(AXTIT(3))
-            WRITE (TXTLIN,'(''Integrated intensity in box: '', F10.1,
-     &                      '' K.'',A,''.arcsec**2'')',
-     &                         IOSTAT=IERR) SIGMA, AXTIT(3)(:LU)
+            WRITE (TXTLIN,
+     &        '(''Integrated intensity in box: '', F10.1,'//
+     &        ''' K.'',A,''.arcsec**2'')', IOSTAT=IERR) 
+     &        SIGMA, AXTIT(3)(:LU)
           ELSE
             WRITE (TXTLIN,'(''Undefined data in box!'')')
           END IF
           CALL IPUT_SCREEN (TXTLIN, 2, 1, 0)
-*         TYPE *,TXTLIN
+*         PRINT *,TXTLIN
           CALL SXGTTGRAPH
           P(1) = XLIM(1)
           P(2) = XLIM(2)

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE MAP_MAXMIN (MAP, IX, IY, P, Q, BADVAL,
@@ -26,8 +29,8 @@
      &             BADVAL,  AMAPMIN, AMAPMAX)
 
 *     call sxgtidle
-*     type *,'-- MAP_MAXMIN --'
-*     type *,'Minimum and maximum on map:', amapmin, amapmax
+*     print *,'-- MAP_MAXMIN --'
+*     print *,'Minimum and maximum on map:', amapmin, amapmax
 *     call sxgttgraph
 
       RETURN
@@ -62,11 +65,11 @@
 
 *  Ok, go...
 
-*     TYPE *, ' -- maxmap --'
-*     TYPE *, '    Map size (x & y) = ', ix, iy
-*     TYPE *, '    Submap area: x   = ', ix1, ix2
-*     TYPE *, '    Submap area: y   = ', iy1, iy2
-*     TYPE *, '    Bad value        = ', badval
+D     PRINT *, ' -- maxmap --'
+D     PRINT *, '    Map size (x & y) = ', ix, iy
+D     PRINT *, '    Submap area: x   = ', ix1, ix2
+D     PRINT *, '    Submap area: y   = ', iy1, iy2
+D     PRINT *, '    Bad value        = ', badval
 
       MMIN = +1.e10
       MMAX = -1.e10
@@ -81,7 +84,7 @@
         END DO
       END DO
 
-*     TYPE *, '    Max and min      = ', mmin, mmax
+*     PRINT *, '    Max and min      = ', mmin, mmax
 
       RETURN
       END

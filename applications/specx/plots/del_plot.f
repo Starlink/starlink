@@ -6,6 +6,9 @@
 *        Disuse SPECXDIR, use current working directory instead.
 *     09 Jan 1994 (rp):
 *        Replace FIO_{G|P}UNIT with I{GET|FREE}LUN
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Change DISP= to STATUS= in CLOSE
 C-----------------------------------------------------------------------
 
       SUBROUTINE DEL_PLOT (FILNAM)
@@ -35,12 +38,12 @@ C-----------------------------------------------------------------------
      &        IOSTAT=STATUS, ERR=100)
       END IF
 
-      CLOSE (PLOT_UNIT, DISP='DELETE')
+      CLOSE (PLOT_UNIT, STATUS='DELETE')
 *     CALL FIO_PUNIT (PLOT_UNIT, STATUS)
       STATUS = IFREELUN (PLOT_UNIT)
 
   100 IF(STATUS.NE.0) THEN
-        TYPE *,'DEL_PLOT Error:'
+        PRINT *,'DEL_PLOT Error:'
         CALL GEN_ERMSG (STATUS)
       END IF
 

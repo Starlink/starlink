@@ -1,3 +1,7 @@
+*  History:
+*     31 July 2000 (ajc):
+*        Remove hexadecimal constants
+*        Unused TEST
 *----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_DIGITS (STRING, IDIGITS)
@@ -11,7 +15,6 @@
 
       INTEGER*4 IST,ILS
       INTEGER*4 GEN_ILEN
-      CHARACTER TEST*1
       INTEGER*4 ITEST
 
 *  Ok? Go..
@@ -23,7 +26,7 @@
       IF (ILS.GE.IST) THEN
         DO WHILE (GEN_DIGITS .AND. IST.LE.ILS)
           ITEST = ICHAR(STRING(IST:IST))
-          IF (ITEST.LT.'30'X .OR. '39'X.LT.ITEST) GEN_DIGITS = .FALSE.
+          IF (ITEST.LT.48 .OR. 57.LT.ITEST) GEN_DIGITS = .FALSE.
           IST = IST+1
         END DO
           IDIGITS = IST - 1

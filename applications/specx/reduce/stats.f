@@ -7,6 +7,13 @@ C part of the spectrum and then using the integration time to calculate
 C and effective noise temperature for the receiver on the basis that the
 C final spectrum is the sum or difference of an on- and an off- beam.
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Replace 'Type *' with 'PRINT *'
+C       Missing comas in FORMAT
+C       Initialise and SAVE NEWTEMP
+C       Avoid uninitialised II
+
       IMPLICIT  NONE
 
 *     Formal parameters
@@ -38,9 +45,13 @@ C final spectrum is the sum or difference of an on- and an off- beam.
       REAL      TINT
       REAL      TSYS_EFF
 
+      SAVE      NEWTEMP
+
 *     Functions
 
       INTEGER   NTOT
+
+      DATA      NEWTEMP/.FALSE./
 
 *  Ok, go...
 
@@ -70,8 +81,8 @@ C final spectrum is the sum or difference of an on- and an off- beam.
       DO NP = 1,NFSSPX
         DO I = IFSSP(2*NP-1),IFSSP(2*NP)
           IF (I.GE.1  .AND. I.LE.NPTS(NQ)) THEN
+            II = NTOT(NQ-1) + I
             IF (DATA(II).NE.BADPIX_VAL) THEN
-              II    = NTOT(NQ-1) + I
               N     = N + 1
               SUM   = SUM   + DATA(II)
               SUMSQ = SUMSQ + DATA(II)**2
@@ -81,7 +92,7 @@ C final spectrum is the sum or difference of an on- and an off- beam.
       END DO
 
       IF (N.EQ.0) THEN
-        Type *,'No points in range'
+        PRINT *,'No points in range'
         RETURN
       END IF
 
@@ -89,13 +100,13 @@ C final spectrum is the sum or difference of an on- and an off- beam.
         FSS_AV  = SUM/N
         FSS_VAR = (SUMSQ*N - SUM**2)/FLOAT(N*(N-1))
       ELSE
-        Type *,'Too few points to compute statistics: quitting now!'
+        PRINT *,'Too few points to compute statistics: quitting now!'
         GO TO 999
       END IF
 
       IF (FSS_VAR.LE.0.0) THEN
-        Type *,'Variance negative!'
-        Type *,'SUM, SUMSQ',SUM,SUMSQ
+        PRINT *,'Variance negative!'
+        PRINT *,'SUM, SUMSQ',SUM,SUMSQ
         GO TO 999
       ELSE
         FSS_SD = SQRT (FSS_VAR)
@@ -124,9 +135,10 @@ C final spectrum is the sum or difference of an on- and an off- beam.
       CALL POP
       RETURN
 
-  980 FORMAT (1X,'Quadrant: ',I1,'  Mean = 'F8.3' Std Deviation = 'F8.3)
-  990 FORMAT (1X,'Integration time    = 'F10.3' seconds'/
-     &        1X,'Observing bandwidth = 'F9.4' MHz'/
-     &        1X,'Effective switched Tsys   = 'F10.2' Kelvins')
+  980 FORMAT
+     &  (1X,'Quadrant: ',I1,'  Mean = ',F8.3,' Std Deviation = ',F8.3)
+  990 FORMAT (1X,'Integration time    = ',F10.3,' seconds'/
+     &        1X,'Observing bandwidth = ',F9.4,' MHz'/
+     &        1X,'Effective switched Tsys   = ',F10.2,' Kelvins')
 
       END

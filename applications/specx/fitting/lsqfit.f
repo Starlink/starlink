@@ -1,3 +1,6 @@
+C History:
+C    21-SEP-2000 (AJC):
+C       Unused ISD
 C-------------------------------------------------------------------------
 
       SUBROUTINE LSQFIT (NQ, XSCALE, BUF, IFAIL)
@@ -42,7 +45,6 @@ C     Local variables
       REAL      SD(11,11)
       REAL      T(23)
       REAL      S(23)
-      INTEGER   ISD(11,11)
 
       REAL      PI    /3.14157/
 
@@ -76,7 +78,7 @@ C   Determine order of polynomial to be fitted
       CALL GEN_GETI4('Order of polynomial to be fitted?',NT,
      &               'I2',NT,JDEF)
       IF(NT.GT.10)   THEN
-        TYPE *,'*** Maximum order is 10 at the moment! ***'
+        PRINT *,'*** Maximum order is 10 at the moment! ***'
         IFAIL=16
         CALL POP
         RETURN

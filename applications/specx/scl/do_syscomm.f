@@ -11,6 +11,10 @@
 *        Replace CHR_UCASE with UUCASE
 *     07 Feb 1994 (hme):
 *        Call PARSEAT before GEN_AT to translate environment variables.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused LS, TCHAR, STRING_TEST
+*        Correct error number 101 to 100 for WRITE
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION DO_SYSCOMM (PROCEDURE, COMMAND, EXECUTE, IERR)
@@ -29,10 +33,8 @@
       INTEGER   ILS
       INTEGER   ISP
       INTEGER   LOUT
-      INTEGER   LS
       LOGICAL   TEST
       LOGICAL   READONLY
-      CHARACTER TCHAR*1
       CHARACTER SYMBOL*64
       CHARACTER INSTRING*64
       CHARACTER STRING*256
@@ -75,7 +77,7 @@
 
       LOGICAL   PUSH_IFSTACK
       LOGICAL   PULL_IFSTACK
-      LOGICAL   STRING_TEST
+*      LOGICAL   STRING_TEST
       INTEGER   STACK_POINTER
       INTEGER   GEN_ILEN
       LOGICAL*4 SCL_DO
@@ -84,7 +86,7 @@
 *     EXTERNAL TRAPC
 * --------------------
      
-D     TYPE *, '-- do_syscomm --   ierr=', ierr
+D      PRINT *, '-- do_syscomm --   ierr=', ierr
 
       DO_SYSCOMM = .TRUE.
       IF (IERR.NE.0) RETURN
@@ -108,7 +110,7 @@ D     TYPE *, '-- do_syscomm --   ierr=', ierr
 
         IF (.NOT.EXECUTE) THEN
           IF_SKIP = IF_SKIP + 1
-D         TYPE *,' IF nesting increased -- ', IF_SKIP
+D         PRINT *,' IF nesting increased -- ', IF_SKIP
           RETURN
         END IF
 
@@ -140,7 +142,7 @@ D         TYPE *,' IF nesting increased -- ', IF_SKIP
 *       current IF block, otherwise wait for the next test.
 
         CALL GEN_GETSTR2 (3, ' ', ' ', ' ', STRING, ISTAT)
-D       Type *, 'Expression to test: ', STRING(:50)
+D       Print *, 'Expression to test: ', STRING(:50)
         CALL GEN_EVAL_AE (STRING, 'L4', DO_TO_ELSEIF, ISTAT)
 
         EXECUTE = DO_TO_ELSEIF
@@ -177,7 +179,7 @@ D       Type *, 'Expression to test: ', STRING(:50)
 
         ELSE
         CALL GEN_GETSTR2 (3, ' ', ' ', ' ', STRING, ISTAT)
-D       Type *, 'Expression to test: ', STRING(:50)
+D       Print *, 'Expression to test: ', STRING(:50)
         CALL GEN_EVAL_AE (STRING, 'L4', DO_TO_ELSEIF, ISTAT)
         END IF
 
@@ -238,7 +240,7 @@ D       Type *, 'Expression to test: ', STRING(:50)
 
         IF (IF_SKIP.GT.0) THEN
           IF_SKIP = IF_SKIP - 1
-D         TYPE *,' IF nesting decreased -- ', IF_SKIP
+D         PRINT *,' IF nesting decreased -- ', IF_SKIP
           RETURN
         END IF
 
@@ -273,7 +275,7 @@ D         TYPE *,' IF nesting decreased -- ', IF_SKIP
 *   we are in the middle of an un-executed IF block. If so just return
 *   (checking also that we are somewhere inside an IF block at all).
 
-D     TYPE *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
+D     PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
       IF (IF_LEVEL.NE.0 .AND. .NOT.DO_TO_ELSEIF) RETURN
 
 *   So now we can check if it was something more mundane,
@@ -353,7 +355,7 @@ D     TYPE *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
             IERR = 98                   ! Must be a string variable
           END IF
         ELSE IF (SYM_INDEX.EQ.0) THEN
-          IERR = 101                    ! Symbol not found
+          IERR = 100                    ! Symbol not found
         ELSE IF (READONLY) THEN
           IERR = 102                    ! Variable is readonly
         END IF
@@ -418,13 +420,13 @@ D     TYPE *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
         CALL GEN_INQSYMB (SYMBOL, SYM_INDEX, TYPE, LENGTH,
      &                    ADDR, READONLY, ISTAT)
 
-*       TYPE *, '--- ask ---'
-*       TYPE *, '    prompt    = ', prompt
-*       TYPE *, '    variable  = ', symbol
-*       TYPE *, '    sym_index = ', sym_index
-*       TYPE *, '    address   = ', addr
-*       TYPE *, '    type      = ', type
-*       TYPE *, '    length    = ', length
+*       PRINT *, '--- ask ---'
+*       PRINT *, '    prompt    = ', prompt
+*       PRINT *, '    variable  = ', symbol
+*       PRINT *, '    sym_index = ', sym_index
+*       PRINT *, '    address   = ', addr
+*       PRINT *, '    type      = ', type
+*       PRINT *, '    length    = ', length
 
         IF (SYM_INDEX.NE.0 .AND. .NOT.READONLY) THEN
 
@@ -534,7 +536,6 @@ D     TYPE *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
         CALL GEN_GETSTR2 (1, 'Variable name?', ' ', ' ', SYMBOL, ISTAT)
         CALL GEN_GETSTR2 (3, 'Value or expression?', ' ', ' ', STRING,
      &                    ISTAT)
-
         IF (ISTAT.EQ.0) THEN
 
           ILS    = GEN_ILEN (STRING)
@@ -547,6 +548,9 @@ D     TYPE *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
 
           CALL SPECX_SET_VALUE (SYMBOL(:GEN_ILEN(SYMBOL)),
      &                          STRING(:ILS), IERR)
+*       To retain previous behaviour now that SPECX_SET_VALUE correctly
+*       returns IERR - prevents SPECX error message
+!          IERR = 0
         ELSE
           IERR = 18
         END IF

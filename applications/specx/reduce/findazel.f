@@ -5,6 +5,11 @@
 *  Routine to calculate and print zenith distance at which current
 *  spectrum was observed.
 
+*  History:
+*     20-SEP-2000 (AJC):
+*        Unused DECRAD, RARAD
+*-
+
       IMPLICIT  NONE
 
 *     Formal parameter(s):
@@ -18,7 +23,6 @@
 
 *     Local variables
 
-      REAL               DECRAD, RARAD
       DOUBLE PRECISION   HOUR_ANGLE
       DOUBLE PRECISION   UTD, JULIAN_DATE, SIDEREAL_TIME
 

@@ -2,6 +2,8 @@
 *     25 Nov 1993 (hme):
 *        Declare GEN_DIGITS and GEN_INTEGER as logical rather than
 *        integer.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_FLOATING (STRING, IDIGITS, FDIGITS)
@@ -51,8 +53,8 @@
         END IF
       END IF
 
-D     TYPE *, ' -- gen_floating --'
-D     TYPE *, '    idigits, fdigits = ', idigits, fdigits
+D     PRINT *, ' -- gen_floating --'
+D     PRINT *, '    idigits, fdigits = ', idigits, fdigits
 
       RETURN
       END

@@ -3,13 +3,16 @@
 *        Replace LIB${GET|FREE}_LUN with FIO_{G|P}UNIT.
 *     09 Jan 1994 (rp):
 *        Replace FIO_ routines with UGET/UFREE
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused GEN_ILEN
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_UNWIND(ICLOSE)
 
 C   Routine to unwind the stack when an @file is exhausted
 
-      INTEGER*4 GEN_ILEN, GEN_ICHTOT
+      INTEGER*4 GEN_ICHTOT
 
       INTEGER STATUS
 
@@ -32,11 +35,11 @@ C   Routine to unwind the stack when an @file is exhausted
       LUN = ICLI(3,ISP)
       CALL SET_LUN_IN (LUN)
 
-D     type *,'---------------------'
-D     type *,'Stack unwound, new stack pointer ',isp
-D     type *,' new LUN_IN ', icli(3,isp)
-D     type *,'...new length of CLI ',ICLI(2,ISP)
-D     type *,'---------------------'
+D     print *,'---------------------'
+D     print *,'Stack unwound, new stack pointer ',isp
+D     print *,' new LUN_IN ', icli(3,isp)
+D     print *,'...new length of CLI ',ICLI(2,ISP)
+D     print *,'---------------------'
 
       RETURN
       END

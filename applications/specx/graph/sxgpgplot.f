@@ -1,3 +1,20 @@
+* History:
+*    25-JUL-2000 (AJC)
+*       Handle DEVICES structure in C
+*       Replace TYPE * with PRINT *
+*       Re-write illegal concatenation
+*       Remove CARRIAGECONTROL from OPEN
+*       Use format I3 to read type size
+*       Use format L1 to read logical elements
+*       Unused in SXGDEVICE: ISTAT, TT_ERROR
+*              in SXGCURSOR: ISTAT, IOSTAT, XSIZE, YSIZE
+*              in SXGXLABEL: GEN_ILEN
+*              in SXGXLABEL2: GEN_ILEN
+*              in SXGYLABEL: GEN_ILEN
+*              in SXGCONTOUR: ITEMP
+*              in SXGCONB: ITEMP
+*              in SXGPLOTID: NTICKS
+*       Don't write "hardcopy file closed" if it isn't
 *-----------------------------------------------------------------------
 
       SUBROUTINE SXGINIT
@@ -26,6 +43,17 @@
 
       CHARACTER LINE*80
       CHARACTER GRAPHCAP_FILE*80
+      CHARACTER FORMAT*8
+
+*  Values read from file
+      INTEGER   FDEV_NO
+      LOGICAL   FTERM
+      LOGICAL   FDUAL
+      LOGICAL   FCOLOUR
+      LOGICAL   FHARD
+      CHARACTER FPROMPT*16
+      CHARACTER FDEVNAME*16
+      CHARACTER FFILE*80
 
 *     Functions
 
@@ -33,14 +61,14 @@
 
 *  Ok, go...
 
-      TYPE *, 'Graphics initialized to use PGPLOT'
+      PRINT *, 'Graphics initialized to use PGPLOT'
 
 *     Translate graphcap file name
 
       CALL UTRNLOG ('SXG_GRAPHCAP', GRAPHCAP_FILE, STATUS)
       IF (STATUS.ne.0) THEN
-        TYPE *, '--- sxginit ---'
-        TYPE *, '    No translation for logical name "SXG_GRAPHCAP"!'
+        PRINT *, '--- sxginit ---'
+        PRINT *, '    No translation for logical name "SXG_GRAPHCAP"!'
         RETURN
       ELSE
         LENSG = GEN_ILEN (GRAPHCAP_FILE)
@@ -50,9 +78,9 @@
 
       CALL UGETLUN (LUN, IOSTAT)
       OPEN (LUN, FILE=GRAPHCAP_FILE(:LENSG), STATUS='OLD',
-     &      FORM = 'FORMATTED',  CARRIAGECONTROL='LIST', IOSTAT=IOSTAT)
+     &      FORM = 'FORMATTED',  IOSTAT=IOSTAT)
       IF (IOSTAT.NE.0) THEN
-        TYPE *, 'Error reading GRAPHCAP'
+        PRINT *, 'Error reading GRAPHCAP'
         GO TO 99
       END IF
 
@@ -61,8 +89,9 @@
       ID = 0
 
       DO WHILE (.TRUE.)
-        READ (LUN, '(A)', END=10, IOSTAT=IOSTAT) LINE
 
+        READ (LUN, '(A)', END=10, IOSTAT=IOSTAT) LINE
+        if ( iostat .ne. 0 ) goto 10
 *       Check not a comment line
 
         IF (LINE(1:1).NE.'#' .and. LINE(1:1).NE.'!'
@@ -80,39 +109,45 @@
           ICHAR = 1
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          READ (LINE(IST:IFIN),'(I)',IOSTAT=IOSTAT) DEVICE(ID).DEV_NO
-D         TYPE *, 'Device # ', DEVICE(ID).DEV_NO
+* Construct FORMAT for reading symbol device number
+          WRITE( FORMAT, '(''(I'', I3, '')'')' ) IFIN-IST+1
+* and read it
+          READ (LINE(IST:IFIN),FORMAT,IOSTAT=IOSTAT) FDEV_NO
+D         PRINT *, 'Device # ', FDEV_NO, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          DEVICE(ID).PROMPT = LINE(IST:IFIN)
-D         TYPE *, 'Specx name', DEVICE(ID).PROMPT
+          FPROMPT = LINE(IST:IFIN)
+D         PRINT *, 'Specx name', FPROMPT, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          DEVICE(ID).DEVNAME = LINE(IST:IFIN)
-D         TYPE *, 'Device name', DEVICE(ID).DEVNAME
+          FDEVNAME = LINE(IST:IFIN)
+D         PRINT *, 'Device name', FDEVNAME, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          READ (LINE(IST:IFIN),'(L)',IOSTAT=IOSTAT) DEVICE(ID).TERM
-D         TYPE *, 'Terminal? ', DEVICE(ID).TERM
+          READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FTERM
+D         PRINT *, 'Terminal? ', FTERM, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          READ (LINE(IST:IFIN),'(L)',IOSTAT=IOSTAT) DEVICE(ID).DUAL
-D         TYPE *, 'Dual screen? ', DEVICE(ID).DUAL
+          READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FDUAL
+D         PRINT *, 'Dual screen? ', FDUAL, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          READ (LINE(IST:IFIN),'(L)',IOSTAT=IOSTAT) DEVICE(ID).COLOUR
-D         TYPE *, 'Colour?      ', DEVICE(ID).COLOUR
+          READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FCOLOUR
+D         PRINT *, 'Colour?      ', FCOLOUR, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          READ (LINE(IST:IFIN),'(L)',IOSTAT=IOSTAT) DEVICE(ID).HARD
-D         TYPE *, 'Hardcopy? ', DEVICE(ID).HARD
+          READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FHARD
+D         PRINT *, 'Hardcopy? ', FHARD, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
-          DEVICE(ID).FILE = ' '
+          FFILE = ' '
           IF (IERR.EQ.0) THEN
-            DEVICE(ID).FILE = LINE(IST:IFIN)
-D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
+            FFILE = LINE(IST:IFIN)
+D           PRINT *, 'Output file = ', FFILE(:IFIN-IST+1)
           END IF
+
+          CALL SXG_WRDEV( ID, FDEV_NO, FDEVNAME, FPROMPT, FTERM, FDUAL,
+     :       FCOLOUR, FHARD, FFILE, IERR )
 
         END IF
 
@@ -128,7 +163,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
 
 *     Report status
 
-      TYPE *, 'Successfully read GRAPHCAP: ', NDEVS, ' devices present'
+      PRINT *, 'Successfully read GRAPHCAP: ', NDEVS, ' devices present'
 
 *     Initialize other variables
 
@@ -169,6 +204,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
 *     Functions
 
       INTEGER    GEN_ILEN
+      LOGICAL    SXG_INQTERM
 
 *     Local variables
 
@@ -181,10 +217,10 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       INTEGER    ISTAT
       INTEGER    LP
       INTEGER    LT
+      CHARACTER*16 DPROMPT
       CHARACTER  PROMPT*512
 
 *  Ok, go...
-
       IERR  = 0
       LT    = GEN_ILEN (TERMDEV)
 
@@ -197,11 +233,12 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       DEVKNT = 0
 
       DO IDEV = 1, NDEVS
-        IF (DEVICE(IDEV).TERM) THEN
+        IF (SXG_INQTERM(IDEV)) THEN
           DEVKNT = DEVKNT + 1
           IOK    = IOK  + 1
-          LP     = GEN_ILEN (DEVICE(IDEV).PROMPT)
-          PROMPT(IP:IP+17) = DEVICE(IDEV).PROMPT(:LP) // ', '
+          CALL SXG_GTPR( IDEV, DPROMPT, IERR )
+          LP     = GEN_ILEN (DPROMPT)
+          PROMPT(IP:IP+17) = DPROMPT(:LP) // ', '
           IP = IP + 18
           IF (IOK.EQ.4) THEN
             PROMPT (IP:IP+3) = '''/'' '
@@ -216,7 +253,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
         COMMA = IP - 2 - (16-LP)
         PROMPT(COMMA:COMMA) = ' '
       ELSE
-        TYPE *, 'No terminals available!'
+        PRINT *, 'No terminals available!'
         GO TO 99
       END IF
 
@@ -233,9 +270,10 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       IOK = 0
       LT  = GEN_ILEN (TERMDEV)
       DO IDEV = 1, NDEVS
-        IF (DEVICE(IDEV).TERM) THEN
-          IF (LT .LE. GEN_ILEN(DEVICE(IDEV).PROMPT)) THEN
-            IF (TERMDEV(:LT) .EQ. DEVICE(IDEV).PROMPT(:LT)) THEN
+        IF (SXG_INQTERM(IDEV)) THEN
+          CALL SXG_GTPR( IDEV, DPROMPT, IERR )
+          IF (LT .LE. GEN_ILEN(DPROMPT)) THEN
+            IF (TERMDEV(:LT) .EQ. DPROMPT(:LT)) THEN
               IOK  = IOK + 1
               JDEV = IDEV
             END IF
@@ -244,21 +282,22 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       END DO
 
       IF (IOK.EQ.1) THEN
-        TERMDEV = DEVICE(JDEV).PROMPT
+        CALL SXG_GTPR( JDEV, TERMDEV, IERR )
       ELSE IF (IOK.GT.1) THEN
-        TYPE *, 'Ambiguous device!'
+        PRINT *, 'Ambiguous device!'
         GO TO 99
       ELSE
-        TYPE *, 'No such device!'
+        PRINT *, 'No such device!'
         GO TO 99
       END IF
 
 *     Also request device name (for if not default)
 
-      CALL GEN_GETSTR  (TERMDEV(:GEN_ILEN(TERMDEV))//
-     &                  ' device? (e.g TXA0) '//
-     &                  'if not plotting on this terminal',
-     &                   ' ', ' ', TTNN, ISTAT)
+      LT = GEN_ILEN(TERMDEV)
+      PROMPT = TERMDEV(:LT)
+      PROMPT(LT+1:) =
+     & ' device? (e.g TXA0) if not plotting on this terminal'
+      CALL GEN_GETSTR  ( PROMPT, ' ', ' ', TTNN, ISTAT)
 
       RETURN
 
@@ -273,7 +312,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
 
       SUBROUTINE SXGPRINTDEV (PRINTDEV, PORTRAIT, IERR)
 
-*  Routine to set up SPECX for new graphics terminal
+*  Routine to set up SPECX for new graphics hardcopy device
 
       IMPLICIT   NONE
 
@@ -292,6 +331,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
 *     Functions
 
       INTEGER    GEN_ILEN
+      LOGICAL    SXG_INQHARD
 
 *     Local variables
 
@@ -304,6 +344,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       INTEGER    ISTAT
       INTEGER    LP
       INTEGER    LT
+      CHARACTER*16 DPROMPT
       CHARACTER  PROMPT*512
 
 *  Ok, go...
@@ -320,11 +361,12 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       DEVKNT = 0
 
       DO IDEV = 1, NDEVS
-        IF (DEVICE(IDEV).HARD) THEN
+        IF (SXG_INQHARD(IDEV)) THEN
           DEVKNT = DEVKNT + 1
           IOK    = IOK  + 1
-          LP = GEN_ILEN (DEVICE(IDEV).PROMPT)
-          PROMPT(IP:IP+17) = DEVICE(IDEV).PROMPT(:LP) // ', '
+          CALL SXG_GTPR( IDEV, DPROMPT, IERR )
+          LP = GEN_ILEN (DPROMPT)
+          PROMPT(IP:IP+17) = DPROMPT(:LP) // ', '
           IP = IP + 18
           IF (IOK.EQ.4) THEN
             PROMPT (IP:IP+3) = '''/'' '
@@ -339,7 +381,7 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
         COMMA = IP - 2 - (16-LP)
         PROMPT(COMMA:COMMA) = ' '
       ELSE
-        TYPE *, 'No printers available!'
+        PRINT *, 'No printers available!'
         GO TO 99
       END IF
 
@@ -356,9 +398,10 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       IOK = 0
       LT  = GEN_ILEN (PRINTDEV)
       DO IDEV = 1, NDEVS
-        IF (DEVICE(IDEV).HARD) THEN
-          IF (LT .LE. GEN_ILEN(DEVICE(IDEV).PROMPT)) THEN
-            IF (PRINTDEV(:LT) .EQ. DEVICE(IDEV).PROMPT(:LT)) THEN
+        IF (SXG_INQHARD(IDEV)) THEN
+          CALL SXG_GTPR(IDEV, DPROMPT, IERR )
+          IF (LT .LE. GEN_ILEN(DPROMPT)) THEN
+            IF (PRINTDEV(:LT) .EQ. DPROMPT(:LT)) THEN
               IOK  = IOK + 1
               JDEV = IDEV
             END IF
@@ -367,12 +410,12 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
       END DO
 
       IF (IOK.EQ.1) THEN
-        PRINTDEV = DEVICE(JDEV).PROMPT
+        CALL SXG_GTPR( JDEV, PRINTDEV, IERR )
       ELSE IF (IOK.GT.1) THEN
-        TYPE *, 'Ambiguous device!'
+        PRINT *, 'Ambiguous device!'
         GO TO 99
       ELSE
-        TYPE *, 'No such device!'
+        PRINT *, 'No such device!'
         GO TO 99
       END IF
 
@@ -407,21 +450,22 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
 
 *     Local variables:
 
-      CHARACTER DEVNAME*16
+      CHARACTER*16 DEVNAME
+      CHARACTER*16 DPROMPT
       INTEGER   I
       INTEGER   ID
       INTEGER   IP
-      INTEGER   ISTAT
       INTEGER   IDOUT
       INTEGER   LOUT
       INTEGER   IPG
-      LOGICAL   TT_ERROR
       REAL      X1, X2, Y1, Y2
+      CHARACTER*256 FSTRING
 
 *     Functions:
 
       INTEGER   GEN_ILEN
       INTEGER   PGBEGIN
+      INTEGER   SXG_INQDEVNO
 
 *  Ok, go...
 
@@ -429,23 +473,19 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
 *     the current value (IDEV)
 
       DO I = 1, NDEVS
-        IP = GEN_ILEN(DEVICE(I).PROMPT)
-        IF (DEVICE(I).PROMPT(:IP) .EQ. DNAME(:IP)) THEN
+        CALL SXG_GTPR( I, DPROMPT, IERR )
+        IP = GEN_ILEN(DPROMPT)
+        IF (DPROMPT(:IP) .EQ. DNAME(:IP)) THEN
           ID = I
         END IF
       END DO
 
-      IF (DEVINIT .AND. DEVICE(ID).DEV_NO.NE.IDEV) CALL SXGDEVEND
+      IF (DEVINIT .AND. SXG_INQDEVNO(ID).NE.IDEV) CALL SXGDEVEND
 
-      IDEV     = DEVICE(ID).DEV_NO
-      ITERM    = DEVICE(ID).TERM
-      DUAL     = DEVICE(ID).DUAL
-      COLOUR   = DEVICE(ID).COLOUR
-      HARDCOPY = DEVICE(ID).HARD
-      DEVNAME  = DEVICE(ID).DEVNAME
-      OUTFILE  = DEVICE(ID).FILE
+      CALL SXG_GTDEV( ID, IDEV, DEVNAME, DPROMPT, ITERM, DUAL, COLOUR,
+     :  HARDCOPY, OUTFILE, IERR )
 
-      IF (OUTFILE .EQ. ' ') OUTFILE = 'SPECXDIR:SPECX_PGPLOT.PS'
+!      IF (OUTFILE .EQ. ' ') OUTFILE = 'SPECXDIR:SPECX_PGPLOT.PS'
 
 *     Device already open?
 
@@ -472,7 +512,9 @@ D           TYPE *, 'Output file = ', DEVICE(ID).FILE(:IFIN-IST+1)
           IDOUT = GEN_ILEN(DEVNAME)
           IF (FNAME.NE.' ') THEN
             LOUT = GEN_ILEN(FNAME)
-            IPG  = PGBEGIN (0, FNAME(:LOUT)//DEVNAME(:IDOUT),1,1)
+            FSTRING = FNAME(:LOUT)
+            FSTRING(LOUT+1:) = DEVNAME(:IDOUT)
+            IPG  = PGBEGIN (0, FSTRING(:LOUT+IDOUT),1,1)
             WRITE (6,*) 'Graphics output assigned to ',FNAME
           ELSE
 *           CALL GET_JPITERM (FNAME)
@@ -529,15 +571,15 @@ C     Initialize virtual co-ordinates to mm
 
       CALL PGWINDOW (0.0, XSIZED, 0.0, YSIZED)
 
-      type *, '-- sxgdevice --', devname,' ', 
+      print *, '-- sxgdevice -- ', devname,' ', 
      :         outfile(:gen_ilen(outfile))
-D      type *, '   idev     = ', idev
-D      type *, '   iterm    = ', iterm
-D      type *, '   dual     = ', dual
-D      type *, '   colour   = ', colour
-D      type *, '   hardcopy = ', hardcopy
-D      type *, '   devname  = ', devname
-D      type *, '   outfile  = ', outfile(:gen_ilen(outfile))
+D      print *, '   idev     = ', idev
+D      print *, '   iterm    = ', iterm
+D      print *, '   dual     = ', dual
+D      print *, '   colour   = ', colour
+D      print *, '   hardcopy = ', hardcopy
+D      print *, '   devname  = ', devname
+D      print *, '   outfile  = ', outfile(:gen_ilen(outfile))
 
       RETURN
       END
@@ -571,14 +613,16 @@ D      type *, '   outfile  = ', outfile(:gen_ilen(outfile))
 *  run command files to print out any intermediate files, or inform user
 *  where output file is
 
-        LF = GEN_ILEN (OUTFILE)
-        TYPE *, 'Hardcopy file closed - output in file:  ', OUTFILE(:LF)
 
 *  close down the terminal, tell VT240/330 to go back to VT mode
 
         IF (ITERM) THEN
           CALL TTGO220
           CALL TTCLOSE
+        ELSE
+          LF = GEN_ILEN (OUTFILE)
+          PRINT *,
+     &     'Hardcopy file closed - output in file:  ', OUTFILE(:LF)
         END IF
       END IF
 
@@ -700,10 +744,7 @@ C     Include files
 C     Local variables
 
       CHARACTER CKEY*1
-      INTEGER   ISTAT
-      INTEGER   IOSTAT
       REAL      U, V
-      REAL      XSIZE, YSIZE               ! Display dimensions in mm
 
       INTEGER   SXGCTRLC
       PARAMETER (SXGCTRLC='08008003'X)
@@ -1057,10 +1098,6 @@ C     Convert cursor positions to millimetres
 
       INCLUDE  'SXGPGPLOT.INC'
 
-*     Functions:
-
-      INTEGER GEN_ILEN
-
 *  Ok, go...
 
       CALL PGLABEL (LABEL, ' ', ' ')
@@ -1084,10 +1121,6 @@ C     Convert cursor positions to millimetres
 
       INCLUDE  'SXGPGPLOT.INC'
 
-*     Functions:
-
-      INTEGER GEN_ILEN
-
 *  Ok, go...
 
 C     CALL PGLABEL (LABEL, ' ', ' ')
@@ -1110,10 +1143,6 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
 *     Include files:
 
       INCLUDE  'SXGPGPLOT.INC'
-
-*     Functions:
-
-      INTEGER GEN_ILEN
 
 *  Ok, go...
 
@@ -1463,7 +1492,6 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
 
       REAL     TR(6)
       REAL     DX, DY
-      INTEGER  ITEMP
 
 *  Ok, go...
 
@@ -1513,7 +1541,6 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
 
       REAL     TR(6)
       REAL     DX, DY
-      INTEGER  ITEMP
 
 *  Ok, go...
 
@@ -1610,10 +1637,11 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
 
 *     Local variables:
 
-      CHARACTER CTIME*24
-      CHARACTER BLANK*1     /' '   /
-      INTEGER NTICKS
+*      INTEGER NTICKS
       INTEGER STATUS
+      INTEGER L1, L2
+      CHARACTER CTIME*24
+      CHARACTER*256 TSTRING
 
 *  Ok, go...
 
@@ -1623,8 +1651,13 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
       CALL UGETDATTIM (CTIME,  STATUS)
 
       CALL PGSCH   (EXPAND*0.6)
-      CALL PGMTEXT ('t', +0.2, 1.0, 1.0,
-     &              STRING1//BLANK//STRING2//BLANK//CTIME)
+      L1 = LEN( STRING1 )
+      L2 = LEN( STRING2 )
+      TSTRING = STRING1
+      TSTRING(L1+2:) = STRING2(:L2)
+      TSTRING(L1+L2+3:) = CTIME
+      
+      CALL PGMTEXT ('t', +0.2, 1.0, 1.0, TSTRING(:L1+L2+2+24) )
       CALL PGSCH   (EXPAND)
 
       RETURN
@@ -1714,7 +1747,7 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
 
 *  Ok, go...
 
-*     TYPE *, '-- sxgscr -- set col ',IC, ' to ', cr, cg, cb
+*     PRINT *, '-- sxgscr -- set col ',IC, ' to ', cr, cg, cb
       CALL PGSCR (IC, CR, CG, CB)
 
       RED(IC)   = CR

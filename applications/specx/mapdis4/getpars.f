@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused I, II, LOCATION, IPOS
 *-----------------------------------------------------------------------
 
       SUBROUTINE GETPARS (XSCALE, BUF,   VMAP1,  VMAP2, VMAP3, VMAP4,
@@ -39,13 +43,10 @@
 
       LOGICAL   GOT_DATA
 
-      INTEGER   I, II
       INTEGER   J, JJ
       INTEGER   K, KK
       INTEGER   L
 
-      INTEGER   LOCATION
-      INTEGER   IPOS
       INTEGER   IDEP
 
       REAL      CMAX
@@ -74,7 +75,7 @@
       CALL SETXNEW (XSCALE, IFAIL)
       IF (IFAIL.ne.0) RETURN
 
-D     TYPE *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
+D     PRINT *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
 
 *     Get the data sequentially from the file and deposit into the 2-D array.
 
@@ -140,7 +141,7 @@ D     TYPE *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
             VMAP6(IDEP) = WIDTH
 
           ELSE
-D           TYPE *,'Bad pixel: (J,K) = ', J, K
+D           PRINT *,'Bad pixel: (J,K) = ', J, K
             VMAP1(IDEP) = BADPIX_VAL
             VMAP2(IDEP) = BADPIX_VAL
             VMAP3(IDEP) = BADPIX_VAL

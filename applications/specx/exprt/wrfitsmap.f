@@ -1,5 +1,11 @@
 *-----------------------------------------------------------------------
 *   History:  02/09/95  Created from SPECX_WRFITSCUBE.FOR  (RP)
+*              8/05/00  Correct use of STATUS after MAPIMAGE (AJC)
+*             18/09/00  Define and use TRUBYT to pass to ASTRO_TIMES (AJC)
+*                       Unused I, DECRAD, RARAD, ISB, DMS_TO_RAD
+*              2/05/01  Remove diagnostic print
+*                       Test ISTAT not STATUS after MAPIMAGE (AJC)
+*                       Initialise STATUS
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_WRFITSMAP (IFAIL)
@@ -85,18 +91,15 @@
 
 *     Local and intermediate variables
 
-      INTEGER            I
       CHARACTER          ERROR*64
 
       LOGICAL            AUTO_CENTRE
       INTEGER            MIDX,   MIDY
-      REAL               DECRAD, RARAD
       REAL               DXC,    DYC
       REAL               XMID,   YMID
 
       LOGICAL            NSVEL
       INTEGER            NBLANK
-      INTEGER            ISB
       REAL               VLSR_0
       REAL               FMID
       REAL               RBLANK
@@ -116,11 +119,15 @@
 *     SPECX functions
 
       INTEGER   IFREEVM
-      REAL      DMS_TO_RAD
+
+*     TRUE value to pass as IUTFLG to ASTRO_TIMES
+      BYTE                TRUBYT
+      DATA TRUBYT/1/
 
 *  Ok, go...
 
       IFAIL = 0
+      STATUS = 0
 
 *     Check FITS output file open
 
@@ -132,7 +139,7 @@
 *     Map the map into virtual memory
 
       CALL MAPIMAGE ('mapplane.tmp', IPTR, NMAP, IMX, IMY, ISTAT) 
-      IF (STATUS) THEN
+      IF (ISTAT.NE.0) THEN
         IFAIL = 67
         RETURN
       END IF
@@ -230,7 +237,7 @@
       CALL UGETDATE        (WRDATE,        STATUS)
       CALL UGETTIME        (WRTIME,        STATUS)
 *      CALL DATE_CVT        (WRDATE,        WRITE_DATE)
-      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, .TRUE.,
+      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, TRUBYT,
      &                  DTEMP, DTEMP, WR_JULIAN_DATE)
       CALL CVT_TO_DATE_OBS( SPECXJD_TO_MJD(WR_JULIAN_DATE), WRITE_DATE)
 

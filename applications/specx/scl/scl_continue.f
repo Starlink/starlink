@@ -5,6 +5,8 @@
 *        Hard code the error messages and severities for each error
 *        code, instead of reading from an unformatted file.
 *        Change the A<IM> descriptor to A with default width.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       LOGICAL*4 FUNCTION SCL_CONTINUE ()
@@ -68,8 +70,8 @@ C  the result fine SPXDEF.UNF into SYS_SPECX:
 
       LUN = 6
 
-D     TYPE *, '--- errmess ---'
-D     TYPE *, '    error # = ', IERR
+D     PRINT *, '--- errmess ---'
+D     PRINT *, '    error # = ', IERR
        
       IF ( IERR .EQ.  1 ) THEN
          ISEV = 3
@@ -407,6 +409,7 @@ D     TYPE *, '    error # = ', IERR
       END IF
 
       IM = GEN_ILEN (MESS)
+
       WRITE (LUN, '('' -- SPECX#'', I3.3, '' -'', A1, ''- '','
      &        //  'A, '' --'')') IERR, SCHAR(ISEV:ISEV), MESS(:IM)
 

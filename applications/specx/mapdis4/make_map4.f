@@ -5,6 +5,9 @@
 *        OPENUF changed to OPEN
 *     31 Jan 1994 (hme):
 *        Fix the INQUIRE statement.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused REPEAT, IOPEN, I, J, LUN, IERR, LOCATION
 C---------------------------------------------------------------------------
 
       SUBROUTINE MAKE_MAP4 (BUF, XSCALE, IFAIL)
@@ -38,19 +41,16 @@ C     Functions
 
 C     Local variables
 
-      LOGICAL   REPEAT
       LOGICAL   IEXIST
-      LOGICAL   IOPEN
       LOGICAL   INTERP
       LOGICAL   PUSHED
 
+*      INTEGER   I
       INTEGER   IX, IY, IZ
-      INTEGER   I, J
-      INTEGER   LUN, IFILE
-      INTEGER   IERR, IOSTAT
+      INTEGER   IFILE
+      INTEGER   IOSTAT
       INTEGER   IPTR
       INTEGER   ISTAT
-      INTEGER   LOCATION
       REAL      TWID(3)
       REAL      TEXT(3)
 
@@ -92,9 +92,10 @@ C  Set range of integration for Z-coordinate and evaluate all limits
       INDEX_PTR = CURRENT_INDEX_ADDRESS
       CALL PLOT2D_RANGE (QBEG, QEND, PBEG, PEND, IX, IY, IZ)
 
-*     TYPE '('' initial axis limits: ''/ 3(1X, I1, 2(2X,F10.4)/))',
+      
+*     PRINT '('' initial axis limits: ''/ 3(1X, I1, 2(2X,F10.4)/))',
 *    &     (I, QBEG(I),  QEND(I),I=1,3)
-*     TYPE '('' final axis limits:   ''/ 3(1X, I1, 2(2X,F10.4)/))',
+*     PRINT '('' final axis limits:   ''/ 3(1X, I1, 2(2X,F10.4)/))',
 *    &     (I, PBEG(I),  PEND(I),I=1,3)
 
 C  Given the final ranges of each axis, find windowing function 
@@ -107,8 +108,8 @@ C  so don't now need to get them explicitly).
         GO TO 998
       END IF
 
-*     TYPE *,'-- Make Map --'
-*     TYPE *,'     Raw 2D map has size ',NAX(IX),NAX(IY)
+*     PRINT *,'-- Make Map --'
+*     PRINT *,'     Raw 2D map has size ',NAX(IX),NAX(IY)
 
       IF (NAX(IX).LE.1 .OR. NAX(IY).LE.1) THEN
         IFAIL = 49
@@ -119,7 +120,7 @@ C  Get virtual memory for map: Note change to ADAM type status return
 
       ISTAT = IGETVM (4*NAX(IX)*NAX(IY), .TRUE., 'MAKE_MAP4', IPTR)
       IF (ISTAT .ne. 0) THEN
-        TYPE *,'Trouble getting virtual memory for map array'
+        PRINT *,'Trouble getting virtual memory for map array'
         IFAIL = 51
         GO TO 999
       END IF
@@ -156,7 +157,7 @@ C  Interpolate and/or smooth map as necessary
       END IF
 
       IF (INTERP.OR. SMOOTH) THEN
-*       TYPE *, 'Interpolating 2-D map'
+*       PRINT *, 'Interpolating 2-D map'
         CALL INTERPOLATE_MAP (NMAPS, NAXX, NAXY, IPTR,
      &                        ABS(PFAC(IX)), ABS(PFAC(IY)), INTERP,
      &                        TWID(IX), TEXT(IX), TWID(IY), TEXT(IY),
@@ -192,8 +193,8 @@ C     Write map to a file
      &       IOSTAT =  ISTAT)
 
       IF (ISTAT.NE.0) THEN
-        TYPE *, ' --- make_map4 ---'
-        TYPE *, '     error opening mapplane.tmp'
+        PRINT *, ' --- make_map4 ---'
+        PRINT *, '     error opening mapplane.tmp'
         CALL GEN_ERMSG (ISTAT)
         IFAIL = 18
       ELSE
@@ -210,7 +211,7 @@ C   Release virtual memory
 
       ISTAT = IFREEVM (IPTR)
       IF (ISTAT.ne.0) THEN
-        TYPE *,'Trouble freeing virtual memory for map'
+        PRINT *,'Trouble freeing virtual memory for map'
         IFAIL = 51
       END IF
 

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_GSD_LOCATE (DXY, INDEX_LIST, NO_SCANS, IERR)
@@ -38,7 +41,7 @@ C   grid IS: Use absolute nearness of 1.E-3 for safety)
 
       EPS = 1.e-3
 
-D     Type *,'Requested (X,Y) offsets: ', DXY(1), DXY(2)
+D     Print *,'Requested (X,Y) offsets: ', DXY(1), DXY(2)
 
       IF (IXNP*IYNP.EQ.1) THEN
         INDEX_LIST(1) = 1
@@ -51,14 +54,14 @@ D     Type *,'Requested (X,Y) offsets: ', DXY(1), DXY(2)
 
         DO J = 1, NGSDSPEC
 
-D         Type *,'J, PHIST(J) X&Y: ', J, PHIST(1,J), PHIST(2,J)
+D         Print *,'J, PHIST(J) X&Y: ', J, PHIST(1,J), PHIST(2,J)
 
           IF (       ABS (PHIST(1,J)-DXY(1)) .LE. EPS
      &         .AND. ABS (PHIST(2,J)-DXY(2)) .LE. EPS) THEN
             POINT_FOUND          = .TRUE.
             NO_SCANS             = NO_SCANS + 1
             INDEX_LIST(NO_SCANS) = J
-D           TYPE *,'Point found - index =',J
+D           PRINT *,'Point found - index =',J
           END IF
         END DO
 

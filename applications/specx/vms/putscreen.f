@@ -1,6 +1,7 @@
 *     06 Jan 1994 (rp):
 *         make UNIX version by commenting out VMS-specific calls
-*
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE IPUT_SCREEN (LINE,ROW,COLUMN,TYPE)

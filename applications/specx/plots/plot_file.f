@@ -10,7 +10,8 @@
 *        Replace FIO_{G|P}UNIT with I{GET|FREE}LUN
 *     01-Aug-1995 (rpt):
 *        ICOLOR support added.
-*
+*     20-Sep-2000 (ajc):
+*        Unused ID, VELOFF
 *-----------------------------------------------------------------------
 
       SUBROUTINE PLOT_FILE (XSCALE, DATA, IERR)
@@ -40,7 +41,6 @@ C  Local variables
       INTEGER   ERRCODE, IERR1
       INTEGER   I
       INTEGER   IAXIS
-      INTEGER   ID
       INTEGER   ITIP1, IPEN1, IWEIGHT
       INTEGER   NQ, J
       INTEGER   NDAT
@@ -74,7 +74,6 @@ C   Common blocks
       INTEGER   NMASK2
       INTEGER   MASK2(NQMAX)
       REAL      XFAC2(NQMAX)
-      REAL      VELOFF
       CHARACTER XTITLE2*80, YTITLE2*34
       COMMON    /FREQ2/  NPTS2,  NQUAD2,  MASK2, XFAC2,
      &                   NMASK2, XTITLE2, YTITLE2

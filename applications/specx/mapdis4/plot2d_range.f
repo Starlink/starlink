@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE to PRINT 
+*        Missing commas in format
 *-----------------------------------------------------------------------
 
       SUBROUTINE PLOT2D_RANGE (QBEG, QEND, PBEG, PEND, IX, IY, IZ)
@@ -50,7 +54,7 @@ C  Sort out limits for R.A./X axis of data
           PEND(1) = CELL_XSIZE * (0.5*(MSTEP+1) - I_MAX)
         END IF
 
-        TYPE '(1X, A11,'' scaled from ''F8.3'' to ''F8.3)',
+        PRINT '(1X, A11,'' scaled from '',F8.3,'' to '',F8.3)',
      &             MAPTIT(1), PBEG(1), PEND(1)
 
       ELSE IF (QBEG(1).EQ.QEND(1)) THEN
@@ -75,7 +79,7 @@ C  Limits for Dec./Y axis of data
           PEND(2) = CELL_YSIZE * (0.5*(NSTEP+1) - J_MAX)
         END IF
 
-        TYPE '(1X, A11, '' scaled from ''F8.3'' to ''F8.3)',
+        PRINT '(1X, A11, '' scaled from '',F8.3,'' to '',F8.3)',
      &             MAPTIT(2), PBEG(2), PEND(2)
 
       ELSE IF (QBEG(2).EQ.QEND(2)) THEN

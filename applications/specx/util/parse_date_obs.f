@@ -33,6 +33,8 @@
 *  History:
 *     6 Jan 2000 (TIMJ)
 *        Original version
+*    21 Sep 2000 (AJC)
+*        Unused IFAIL
 
 *  Notes:
 *     Guesses at the format of the DATE-OBS string from its length.
@@ -69,7 +71,6 @@
       INTEGER DD                ! Day number
       INTEGER FS                ! Fraction of second
       INTEGER HH                ! Number of hours
-      INTEGER IFAIL             ! Status from read
       INTEGER ILEN              ! Length of DATE-OBS
       INTEGER MIN               ! Number of minutes
       INTEGER MM                ! Month number

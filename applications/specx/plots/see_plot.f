@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused INEW, IANS
 C-----------------------------------------------------------------------------
 
       SUBROUTINE SEE_PLOT (XSCALE, BUF, IFAIL)
@@ -11,10 +15,9 @@ C  Send (unclosed) plot to nominated device
       INTEGER    IFAIL
 
       LOGICAL    REPEAT,SEE_TERMINAL
-      INTEGER    IOLD, INEW, IVT
+      INTEGER    IOLD, IVT
       INTEGER    IDEV1
       REAL       BOX(4)
-      CHARACTER  IANS*1
 
       INCLUDE   'FLAGCOMM'
       INCLUDE   'NOKEEP'
@@ -32,7 +35,7 @@ C  Determine the plot device for quick look
       CALL ASK_PLOT_DEVICE (IOLD, IDEV1, SEE_TERMINAL)
 
       IF (IDEV1.LE.0) THEN
-        TYPE *,'Unknown plot device - abandoning'
+        PRINT *,'Unknown plot device - abandoning'
         RETURN
       END IF
 

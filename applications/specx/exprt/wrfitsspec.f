@@ -1,3 +1,6 @@
+*   History:  18/09/00  Define and use TRUBYT to pass to ASTRO_TIMES (AJC)
+*                       Unused I, ISB, DECRAD, RARAD, DEC_TO_RAD
+*              3/05/01  Initialise STATUS  (AJC)
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_WRFITSSPEC (IFAIL)
@@ -69,17 +72,14 @@
 
 *     Local and intermediate variables
 
-      INTEGER            I
       CHARACTER          ERROR*64
       INTEGER            NBLANK
-      INTEGER            ISB
       LOGICAL            NSVEL
       CHARACTER          WRDATE*9
       CHARACTER          WRTIME*8
       CHARACTER          VELCODE*8
       CHARACTER          VFRAME*4         ! 'TELL', 'HELI', 'GEO' or 'LSR'
       CHARACTER          VDEF*3           ! 'OPT', 'RAD', or 'REL'
-      REAL               DECRAD, RARAD
       REAL               VLSR_0
       REAL               RBLANK
 
@@ -90,13 +90,14 @@
       DOUBLE PRECISION   WR_JULIAN_DATE
       DOUBLE PRECISION   DPI  /3.141592654/
 
-*     SPECX functions
-
-      REAL      DMS_TO_RAD
+*     TRUE value to pass as IUTFLG to ASTRO_TIMES
+      BYTE                TRUBYT
+      DATA TRUBYT/1/
 
 *  Ok, go...
 
       IFAIL = 0
+      STATUS = 0
 
 *     Check FITS output file open
 
@@ -150,7 +151,7 @@
       CALL UGETDATE        (WRDATE,        STATUS)
       CALL UGETTIME        (WRTIME,        STATUS)
 *      CALL DATE_CVT        (WRDATE,        WRITE_DATE)
-      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, .TRUE.,
+      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, TRUBYT,
      &                  DTEMP, DTEMP, WR_JULIAN_DATE)
       CALL CVT_TO_DATE_OBS( SPECXJD_TO_MJD(WR_JULIAN_DATE), WRITE_DATE)
 

@@ -1,6 +1,9 @@
+*  Version for Solaris
 *  History:
 *     19 Nov 1993 (hme):
 *        Realise COMND as a call to SYSTEM.
+*     24 Jul 2000 (ajc)::
+*        WFILE,RFILE use REC= not 'rec
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
 C                    [PADMAN.SPECX]NDLIB.FOR
@@ -36,6 +39,7 @@ C       Use SH for Sun systems (SYSTEM for Alpha) - 10 times faster
       CHARACTER COM*(*)
       INTEGER ISTATUS
       INTEGER SH 
+C      INTEGER SYSTEM
 
       ISTATUS = SH(COM)    ! SH is far faster than SYSTEM
 
@@ -59,7 +63,7 @@ C   Shared access not implemented in this version, ISHARE ignored.
       INTEGER*2 IADD(1)
 
       IPOS=IREC+1
-      READ(LUN'IPOS) (IADD(I),I=1,IRECL)
+      READ(LUN, REC=IPOS) (IADD(I),I=1,IRECL)
 
       RETURN
       END
@@ -77,7 +81,7 @@ C   Shared access not implemented in this version, ISHARE ignored.
       INTEGER*2 IADD(1)
 
       IPOS=IREC+1
-      WRITE(LUN'IPOS) (IADD(I),I=1,IRECL)
+      WRITE(LUN,REC=IPOS) (IADD(I),I=1,IRECL)
 
       RETURN
       END

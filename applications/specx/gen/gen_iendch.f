@@ -1,4 +1,6 @@
-
+*  History:
+*     31 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C--------------------------------------------------------------------------
 
       INTEGER*4 FUNCTION GEN_IENDCH (STRING)
@@ -15,7 +17,7 @@ C   hollerith string as enclosed in quotation marks.
       GEN_IENDCH = 1
       ILS        = GEN_ILEN (STRING)
       IF (ILS.LE.1)   THEN
-        Type *,'Insufficient data in line - abandoning string'
+        Print *,'Insufficient data in line - abandoning string'
         RETURN
       END IF
       GEN_IENDCH = 2

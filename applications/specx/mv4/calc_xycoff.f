@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
       SUBROUTINE CALC_XYCOFF (X_OFFSET, Y_OFFSET,
      &                        CELL_XSIZE, CELL_YSIZE,
      &                        MSTEP, NSTEP, XCELL, YCELL,
@@ -28,12 +32,12 @@
 *  Ok, go...
 
       IFAIL = 0
-D     TYPE *, ' -- calc_xycoff2 --'
+D     PRINT *, ' -- calc_xycoff2 --'
 
 *     Check that we won't end up with a divide by zero...
 
       IF (CELL_XSIZE.EQ.0.0 .OR. CELL_YSIZE.EQ.0.0) THEN
-        TYPE *, '    One or more map cell dimensions are zero!'
+        PRINT *, '    One or more map cell dimensions are zero!'
         IFAIL = 35
         RETURN
       END IF
@@ -45,7 +49,7 @@ D     TYPE *, ' -- calc_xycoff2 --'
 
       IF (EVEN) THEN
         IXOFF2 = 2*NINT (XOFF - SIGN(XOFF,0.5)) + NINT (SIGN(XOFF,1.0))
-D       TYPE *, '    map has even number of pixels in X'
+D       PRINT *, '    map has even number of pixels in X'
       ELSE
         IXOFF2 = 2*NINT (XOFF)
       END IF
@@ -57,7 +61,7 @@ D       TYPE *, '    map has even number of pixels in X'
 
       IF (EVEN) THEN
         IYOFF2 = 2*NINT (YOFF - SIGN(YOFF,0.5)) + NINT (SIGN(YOFF,1.0))
-D       TYPE *, '    map has even number of pixels in Y'
+D       PRINT *, '    map has even number of pixels in Y'
       ELSE
         IYOFF2 = 2*NINT (YOFF)
       END IF
@@ -65,7 +69,7 @@ D       TYPE *, '    map has even number of pixels in Y'
       XCELL = FLOAT(IXOFF2)/2.
       YCELL = FLOAT(IYOFF2)/2.
 
-D     TYPE *, '    Cell X, Y offsets (cells): ', XCELL, YCELL
+D     PRINT *, '    Cell X, Y offsets (cells): ', XCELL, YCELL
 
       RETURN
       END

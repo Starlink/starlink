@@ -3,6 +3,10 @@
 *        Change terminal output "^z" or "CTRL(Z)" to EOF.
 *     20 jul 1995 (rpt)
 *        BUG: PROMPT array size needs to be larger than 256. Fixed.
+*     20 Sep 2000 (ajc):
+*        Don't split strings acroos lines
+*        Unused IANS
+*        Missing commas in FORMAT
 C------------------------------------------------------------------------------
 
       SUBROUTINE ENTER_GAUSS (IFAIL)
@@ -11,7 +15,7 @@ C   This subroutine accepts definitions of an arbitrary number of gaussian
 C   line profiles (up to 10) in terms of their amplitude, width and position.
 
       REAL*4    INPUT(3)
-      CHARACTER FORMAT*32, IANS*1, PROMPT*512, XTITLE*6
+      CHARACTER FORMAT*32, PROMPT*512, XTITLE*6
 
       INCLUDE 'FLAGCOMM'
 
@@ -33,10 +37,10 @@ C   and find estimates of parameters ( amp,width,pos'n)
         WRITE (PROMPT, 1035, IOSTAT=IERR) (PARAM(J),J=1,3)
       END IF
       PROMPT =
-     &'"/'' Estimates of Amp.,Width(FWHM) and Pos''''n for each line''/
-     &   '' Line at a time, EOF to finish''//
-     &   '' Current units are '//XTITLE//'''//''Line  1: '
-     &   //PROMPT(1:GEN_ILEN(PROMPT))
+     &'"/'' Estimates of Amp.,Width(FWHM) and Pos''''n for each line''/'
+     &//'   '' Line at a time, EOF to finish''//'
+     &//'   '' Current units are '//XTITLE//'''//''Line  1: '
+     &//PROMPT(1:GEN_ILEN(PROMPT))
       FORMAT = ' '
 
       DO NG = 1,10
@@ -78,7 +82,7 @@ C   and find estimates of parameters ( amp,width,pos'n)
 
       RETURN
 
- 1035 FORMAT('['F6.1,1X,F4.1,1X,F7.1'] ''"')
+ 1035 FORMAT('[',F6.1,1X,F4.1,1X,F7.1,'] ''"')
  1040 FORMAT(' *** Reached maximum of 10 lines ***')
 
       END

@@ -1,6 +1,8 @@
 C History:
 C   01-Aug-1995 (rpt):
 C    ICOLOR support added.
+C   20-Sep-2000 (ajc):
+C    Unused GEN_ILEN
 C
 C-----------------------------------------------------------------------
 
@@ -50,10 +52,6 @@ C     Local variables
 
       INTEGER     I
       REAL        STT1
-
-C     Functions
-
-      INTEGER     GEN_ILEN
 
 C  Ok, go...
 

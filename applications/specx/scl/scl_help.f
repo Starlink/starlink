@@ -8,6 +8,8 @@
 *        Replace CHR_UCASE with UUCASE
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*      6 Jun 2000 (ajc):
+*        Replace 'type *' with 'PRINT *'
 C-------------------------------------------------------------------------
 
       SUBROUTINE HELP (ILOUT)
@@ -26,9 +28,9 @@ C  (system) command is not checked
       ILC  = LEN (COMMS(1))
       COM1 = ' '
 
-      TYPE *, 'This command prints out all built-in commands which'
-      TYPE *, 'have any "word" starting with the string you quote.'
-      TYPE *, 'Examine your own symbols using SHOW-SYMBOLS at >>prompt'
+      PRINT *, 'This command prints out all built-in commands which'
+      PRINT *, 'have any "word" starting with the string you quote.'
+      PRINT *, 'Examine your own symbols using SHOW-SYMBOLS at >>prompt'
 
    50 CONTINUE
 

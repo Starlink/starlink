@@ -5,7 +5,11 @@ C-----------------------------------------------------------------------
 C   Routine to invert a complete spectrum, so that both data and
 C   quadrant header variables need to be reversed.
 
-      INTEGER*4 JTEMP
+C   History:
+C      20-SEP-2000 (AJC):
+C         Unused JTEMP
+C-
+
       INCLUDE 'STACKCOMM'
 
       CALL SWAP_ARR (4, DATA,   NTOT(NQUAD))

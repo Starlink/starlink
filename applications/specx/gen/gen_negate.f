@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      1 Aug 2000 (ajc):
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_negate (value, type, ierr)
@@ -34,7 +36,7 @@
 
       type2 = type
       CALL uucase (type2)
-      READ (type2(2:gen_ilen(type2)), '(I)') nb
+      READ (type2(2:gen_ilen(type2)), '(I3)') nb
 
       IF (type2.eq.'L4') THEN
         value = NOT (value)

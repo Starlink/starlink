@@ -2,6 +2,9 @@
 *     31 Jan 1994 (hme):
 *        Remove second declarations of IFAIL, AX1REQ, AX2REQ. The latter
 *        two are REAL*4 in PLOT2D.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused FILESIZE, SAVMAP, IEXIST, IGETVM
 C-----------------------------------------------------------------------
 
       SUBROUTINE CONTOUR_MAP4 (IFAIL)
@@ -27,7 +30,6 @@ C-----------------------------------------------------------------------
 
 *     Local variables:
 
-      INTEGER   FILESIZE
       INTEGER   IERR
       INTEGER   IMX, IMY
       INTEGER   IPTR
@@ -38,8 +40,6 @@ C-----------------------------------------------------------------------
       INTEGER   NZ
 
       LOGICAL   REPEAT
-      LOGICAL   SAVMAP
-      LOGICAL   IEXIST
       LOGICAL   CONTOURS
       LOGICAL   GREYSCALE
       LOGICAL   FIRST
@@ -63,7 +63,6 @@ C-----------------------------------------------------------------------
 
 *     Functions
 
-      INTEGER   IGETVM
       INTEGER   IFREEVM
 
 *  Ok, go...
@@ -86,7 +85,7 @@ C   Greyscale?
 
       CONTOURS  = PLOTCONT .OR. OVERCONT
       IF (PLOTGREY .AND..NOT. SXGGREYOK()) THEN
-        TYPE *,'Sorry, greyscaling not available!'
+        PRINT *,'Sorry, greyscaling not available!'
         GREYSCALE = .FALSE.
       ELSE
         GREYSCALE = PLOTGREY
@@ -125,8 +124,8 @@ C  Minimum and maximum on map
 
       CALL MAP_MAXMIN (%VAL(IPTR), NAXX, NAXY, XLIM, YLIM,
      &                 BADPIX_VAL, ZMIN, ZMAX)
-D     TYPE *, ' -- contour_map --'
-D     TYPE *, '    Min and Max on map = ', ZMIN, ZMAX
+      PRINT *, ' -- contour_map --'
+      PRINT *, '    Min and Max on map = ', ZMIN, ZMAX
 
       ARRMIN = ZMIN
       ARRMAX = ZMAX
@@ -189,8 +188,8 @@ C   Release virtual memory
   999 CONTINUE
       ISTAT = IFREEVM (IPTR)
       IF (ISTAT.NE.0) THEN
-        TYPE *, '--- contour_map4 ---'
-        TYPE *, '    error freeing virtual memory: ', ISTAT
+        PRINT *, '--- contour_map4 ---'
+        PRINT *, '    error freeing virtual memory: ', ISTAT
       END IF
 
       RETURN

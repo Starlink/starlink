@@ -4,6 +4,8 @@
 *        DAT_PAR as well.
 *     10 Dec 1993 (hme):
 *        Change terminal output "^z" or "CTRL(Z)" to EOF.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE GETFIL (IACCES, IFILE, IFAIL)
@@ -46,9 +48,9 @@ C  Ok, go...
       IFAIL = 0
 
       NF    = NFILE (IFILE, IACCES)
-D     TYPE *, ' -- getfil --'
+D     PRINT *, ' -- getfil --'
 D     TYPE '(4X,I2, '' files with access '', A1)', NF, IACCES
-D     TYPE *, '    Proc-mode = ', PROC_MODE
+D     PRINT *, '    Proc-mode = ', PROC_MODE
 
       IF(NF.LE.0)   THEN
         IFAIL = 1
@@ -65,8 +67,8 @@ D     TYPE *, '    Proc-mode = ', PROC_MODE
    10   CALL GEN_GETI4 ('File number? (EOF to list)',
      &                    IFILE, FORMAT, IFILE, JDEF)
 
-D       TYPE *, '    gen_geti4 return: ifile = ', ifile
-D       TYPE *, '    gen_geti4 return: jdef  = ', jdef
+D       PRINT *, '    gen_geti4 return: ifile = ', ifile
+D       PRINT *, '    gen_geti4 return: jdef  = ', jdef
 
         IF (JDEF.EQ.2 .AND. PROC_MODE.EQ.3) THEN
           CALL LSTFIL

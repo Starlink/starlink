@@ -53,6 +53,8 @@
 *        Forgot to allow writing last plus one spectrum.
 *     10 Oct 1995 (timj):
 *        Map format 4.2
+*     21 Sep 2000 (ajc):
+*        Unused TNDF, DATPTR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,8 +80,6 @@
 
 *  Local Variables:
       INTEGER STATUS             ! Starlink status
-      INTEGER TNDF               ! Temporary NDF identifier
-      INTEGER DATPTR             ! Pointer to mapped spectrum
       INTEGER K                  ! Temporary integer
 *.
 

@@ -4,6 +4,12 @@ C-------------------------------------------------------------------------
 
 C   Routine to open a GSD file containing a generalized observation
 
+C History:
+C    8-May-2000 (ajc):
+C      Port to Linux
+C      Replace TYPE with PRINT
+C      Unused IEXIST, IOPEN
+C-
       IMPLICIT  NONE
 
       INTEGER   ADAM__OK
@@ -13,7 +19,6 @@ C   Routine to open a GSD file containing a generalized observation
       INTEGER   IERR
       INTEGER   STATUS
       INTEGER   GEN_ILEN
-      LOGICAL   IEXIST, IOPEN
       CHARACTER OLDFILE*80
       CHARACTER *80 STOREFILE
 
@@ -42,7 +47,7 @@ C  Open the GSD file
       OLDFILE = FILENAME
 
       IF (FILENAME.eq.STOREFILE .and. GSD_OPEN) THEN
-        TYPE *, 'GSD file already open!'
+        PRINT *, 'GSD file already open!'
       ELSE
 
          IF (GSD_OPEN) THEN

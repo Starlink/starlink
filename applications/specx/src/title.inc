@@ -1,8 +1,9 @@
-      TYPE *,'           --------------------------------------------'
-      TYPE *,'             Specx v6.7-7 (Unix) ---- 15 May 2000'
-      TYPE *,'                  Copyright (C)  R.Padman & PPARC'
-      TYPE *,'            Acknowledgements to Horst Meyerdierks (PPARC)'
-      TYPE *,'                 Remo Tilanus & Tim Jenness (JACH)'
-      TYPE *,'           --------------------------------------------'
-      TYPE *
+      PRINT *,'           --------------------------------------------'
+      PRINT *,'             Specx v6.7-11 (Unix) ----  8 March 2002'
+      PRINT *,'                  Copyright (C)  R.Padman & PPARC'
+      PRINT *,
+     +  '            Acknowledgements to Horst Meyerdierks (PPARC)'
+      PRINT *,'                 Remo Tilanus & Tim Jenness (JACH)'
+      PRINT *,'           --------------------------------------------'
+      PRINT *
 

@@ -31,6 +31,7 @@
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     timj: Tim Jenness (JAC, Hilo)
 *     rpt: Remo Tilanus (JAC, Hilo)
+*     ajc: Alan Chipperfield (Starlink,RAL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,9 @@
 *        Make compatible with MJD-OBS and Y2K compliant DATE-OBS
 *        Initialise ITITLE/IDATE/ITIME so that do not contain leftovers
 *        from earlier stack entry.
+*      8 May 2000 (ajc):
+*        Port to Linux
+*        Replace 'TYPE *' with 'PRINT *'
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,11 +215,11 @@
          HPTR = HPTR + 80
  1    CONTINUE
       IF ( NPIX .GT. LSTK-128 ) THEN
-         TYPE *, ' spectrum longer than stack position -- aborting'
+         PRINT *, ' spectrum longer than stack position -- aborting'
          IFAIL = 18
          GO TO 500
       ELSE IF ( NNE1 .GT. 1 ) THEN
-         TYPE *, ' FITS file contains >1 dimensional data -- aborting' 
+         PRINT *, ' FITS file contains >1 dimensional data -- aborting' 
          IFAIL = 18
          GO TO 500
       END IF

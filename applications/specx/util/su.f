@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE SU (NQD, IFAIL)
@@ -60,7 +63,7 @@ C   Check that there are the same number of quadrants in both spectra
 
           ELSE 
             IFAIL=17
-            TYPE *,'Problems in quadrant ',NQ
+            PRINT *,'Problems in quadrant ',NQ
           END IF
 
         END IF

@@ -1,6 +1,10 @@
 *  History:
 *     19 Nov 1993 (hme):
 *        TABs removed.
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Change TYPE * to PRINT *
+*        Unused IFORM, FORMAT, IANS, PROMPT
 C------------------------------------------------------------------------------
 
       SUBROUTINE LINFIT (NQ, XSCALE, BUF, IFAIL)
@@ -63,15 +67,11 @@ C
       INTEGER   NST
       INTEGER   NCH
       INTEGER   NCONST
-      INTEGER   IFORM(50)
       INTEGER   ICON(30)
       INTEGER   ISTAT
       LOGICAL   PUSHED
       REAL      ASUMSQ
       REAL*8    SUMSQ
-      CHARACTER FORMAT*32
-      CHARACTER IANS*1
-      CHARACTER PROMPT*256
       CHARACTER XTITLE*6
 
 *     Functions
@@ -156,7 +156,7 @@ C         get residuals, so *NCH instead of *N
       NBA = 4*NCH*NPARAM
       ISTAT = IGETVM (NBA, .TRUE., 'LINFIT', IAPTR)
       IF (ISTAT .ne. 0) THEN
-        TYPE *,'Trouble getting virtual memory for A array'
+        PRINT *,'Trouble getting virtual memory for A array'
         IFAIL = 51
         GO TO 999
       END IF
@@ -164,7 +164,7 @@ C         get residuals, so *NCH instead of *N
       NBW = 4*NPARAM*(NPARAM+5)
       ISTAT = IGETVM (NBW, .TRUE., 'LINFIT', IWPTR)
       IF (ISTAT .ne. 0) THEN
-        Type *,'Trouble getting virtual memory for W array'
+        PRINT *,'Trouble getting virtual memory for W array'
         IFAIL = 51
         GO TO 999
       END IF
@@ -209,8 +209,8 @@ C   Calculate least square baseline
       IF (NBA .ne. 0) THEN
         ISTAT = IFREEVM (IAPTR)
         IF (ISTAT .ne. 0) THEN
-          TYPE *, 'Trouble freeing workspace array A virtual memory'
-          TYPE *, 'NBA, IAPTR = ', NBA, IAPTR
+          PRINT *, 'Trouble freeing workspace array A virtual memory'
+          PRINT *, 'NBA, IAPTR = ', NBA, IAPTR
           IFAIL = 51
         END IF
       END IF
@@ -218,8 +218,8 @@ C   Calculate least square baseline
       IF (NBW .ne. 0) THEN
         ISTAT =  IFREEVM (IWPTR)
         IF (ISTAT .ne. 0) THEN
-          TYPE *, 'Trouble freeing workspace array W virtual memory'
-          TYPE *, 'NBW, IWPTR = ', NBW, IWPTR
+          PRINT *, 'Trouble freeing workspace array W virtual memory'
+          PRINT *, 'NBW, IWPTR = ', NBW, IWPTR
           IFAIL = 51
         END IF
       END IF
@@ -228,7 +228,7 @@ C   Calculate least square baseline
 
  1060 FORMAT(10X,'*** FAILED TO CONVERGE - IER=',I2,'***'//)
  1070 FORMAT(//10X,'No of Iterations =',I6,10X,'Final SUMSQ =',E11.4)
- 1120 FORMAT(' Too many free parameters; NPARAM='I2' and limit of 30')
+ 1120 FORMAT(' Too many free parameters; NPARAM=',I2,' and limit of 30')
 
       END
 

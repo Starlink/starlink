@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       LOGICAL*4 FUNCTION GEN_PARSENAME (STRING, ST, IST, IFIN, NUMERIC,
@@ -58,7 +60,7 @@
       FUNCTION      = .FALSE.
       LBRACKET      = .FALSE.
 
-D     TYPE *, '-- gen_parsename --'
+D     PRINT *, '-- gen_parsename --'
 
 *  Suppress leading blanks.
 
@@ -67,7 +69,7 @@ D     TYPE *, '-- gen_parsename --'
         NEXT = NEXT + 1
       END DO       
 
-D     TYPE *, '    blanks suppressed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
+D     PRINT *, '    blanks suppressed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 
 *  If this now takes us past the end of the string then string is empty
 
@@ -93,7 +95,8 @@ D     TYPE *, '    blanks suppressed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 
       IST = NEXT
 
-D     TYPE *, '    unary ops done, IST, NEXT, IFIN = ', IST,NEXT,IFIN
+
+D     PRINT *, '    unary ops done, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 
 *  Parse on a character by character basis. Rules are to keep going
 *  until a character is found which is:
@@ -112,13 +115,13 @@ D     TYPE *, '    unary ops done, IST, NEXT, IFIN = ', IST,NEXT,IFIN
       NUMERIC  = (CHAR.GE.'0' .AND. CHAR.LE.'9') .OR. (CHAR.EQ.'.')
       LBRACKET = (CHAR.EQ.'(')
       
-D     TYPE *, '    1st char parsed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
-D     TYPE *, '    STRCONST, NUMERIC, LBRACKET ',
+D     PRINT *, '    1st char parsed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
+D     PRINT *, '    STRCONST, NUMERIC, LBRACKET ',
 D    &             strconst, numeric, lbracket
 
       IF (LBRACKET) THEN
         ST = NEXT
-D       TYPE *, '    left bracket found - returning...'
+D       PRINT *, '    left bracket found - returning...'
         RETURN
       END IF
 
@@ -139,7 +142,7 @@ D       TYPE *, '    left bracket found - returning...'
             NEXT = NEXT + 1
             CONTINUE = .FALSE.
           END IF
-D         Type *, '    next = ', next
+D         Print *, '    next = ', next
         END DO
 
       ELSE
@@ -166,7 +169,7 @@ D         Type *, '    next = ', next
 
       IFIN = NEXT - 1
 
-D     TYPE *, '    string parsed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
+D     PRINT *, '    string parsed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 
 *     Check that we got something
 
@@ -181,17 +184,17 @@ D     TYPE *, '    string parsed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
         NEXT = NEXT + 1
       END DO
 
-D     TYPE *, '    advance next ch, IST, NEXT, IFIN = ', IST,NEXT,IFIN
+D     PRINT *, '    advance next ch, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 
 *     If not end of string, check if next character is left bracket
 *     -- if it is then set the function flag (but might be an array too)
 
       IF (NEXT.GT.ILS) THEN
-D       TYPE *,'    end of string - returning...'
+D       PRINT *,'    end of string - returning...'
         RETURN
       ELSE IF (STRING(NEXT:NEXT).EQ.'(') THEN
         FUNCTION = .TRUE.
-D       TYPE *,'    function or array argument - returning...'
+D       PRINT *,'    function or array argument - returning...'
       END IF
 
       RETURN

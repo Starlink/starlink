@@ -1,0 +1,74 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
+
+      SUBROUTINE UOPENUF (UNIT, FILENAME, STATUS, RECLW, READONLY, IERR)
+
+*     Routine to open an unformatted direct access file. Need to 
+*     wrap up the OPEN statement this way because Suns do not obey
+*     the FORTRAN 77 standard for the OPEN statement.
+
+      IMPLICIT   NONE
+
+*     Formal parameters:
+
+      INTEGER    UNIT              ! Logical unit number
+      CHARACTER  FILENAME*(*)      ! Filename
+      CHARACTER  STATUS*(*)        ! Status (Old/New/Scratch/Unknown)
+      INTEGER    RECLW             ! Record length in 4-byte words
+      LOGICAL    READONLY          ! OPEN with READONLY flag if true
+      INTEGER    IERR              ! Status return
+
+*     Local variables:
+
+      INTEGER    RECL              ! Record length in compiler units
+
+      INTEGER    BYTEPRU           ! # of bytes per record unit
+      PARAMETER (BYTEPRU=4)        ! 4 for VAX, MIPS, ALPHA, Linux, 1 for SUN
+      
+*  Ok, go...
+
+      IERR = 0
+
+      RECL = RECLW*4 / BYTEPRU
+
+*     PRINT *, ' --- openuf ---'
+*     PRINT *, '     attempting to open file ', FILENAME
+*     PRINT *, '     requested status = ', STATUS
+
+      IF (READONLY) THEN
+        OPEN (UNIT    =  UNIT,
+     &        FILE    =  FILENAME,
+     &        STATUS  =  STATUS,
+     &        RECL    =  RECL,
+     &        FORM    = 'UNFORMATTED',
+     &        ACCESS  = 'DIRECT',
+     &        IOSTAT  =  IERR,
+     &        READONLY)
+
+      ELSE
+        OPEN (UNIT    =  UNIT,
+     &        FILE    =  FILENAME,
+     &        STATUS  =  STATUS,
+     &        RECL    =  RECL,
+     &        FORM    = 'UNFORMATTED',
+     &        ACCESS  = 'DIRECT',
+     &        IOSTAT  =  IERR)
+
+      END IF
+
+      IF (IERR.GT.1) THEN
+        PRINT *, ' --- openuf ---'
+        PRINT *, '     error in OPEN: FORTRAN i/o error # ', IERR
+      END IF
+
+      RETURN
+      END
+
+*-----------------------------------------------------------------------
+
+
+
+
+

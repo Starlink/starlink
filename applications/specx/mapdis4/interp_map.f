@@ -1,6 +1,9 @@
 *  History:
 *     14 Dec 1993 (hme):
 *        Do not mix up INTEGER and LOGICAL w.r.t. I{GET|FREE}VM.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused J
 *-----------------------------------------------------------------------
 
       SUBROUTINE INTERPOLATE_MAP (NMAP, NAXX, NAXY, IPTR,
@@ -47,7 +50,7 @@
 
 *     Local variables:
 
-      INTEGER   I, J
+      INTEGER   I
       INTEGER   ISTAT
       INTEGER   IOFF, IOFF1
       INTEGER   NAXX1, NAXY1
@@ -65,10 +68,10 @@
 
 *     Diagnostics
 
-*     TYPE *, ' --- interpolate_map ---'
-*     TYPE *, '     map size in (x,y) = ', NAXX, NAXY
-*     TYPE *, '     number of maps    = ', NMAP
-*     TYPE *, '     memory/map (bytes)= ', MAPSIZEIN
+*     PRINT *, ' --- interpolate_map ---'
+*     PRINT *, '     map size in (x,y) = ', NAXX, NAXY
+*     PRINT *, '     number of maps    = ', NMAP
+*     PRINT *, '     memory/map (bytes)= ', MAPSIZEIN
 
 *     If map is to be interpolated do that first...
 *     Get some new virtual memory, and interpolate each map
@@ -78,11 +81,11 @@
         ISTAT = IGETVM (NMAP*MAPSIZEIN, .TRUE.,
      &                 'INTERPOLATE_MAP', IPTR2)
         IF (ISTAT.ne.0) THEN
-          TYPE *,'Trouble getting virtual memory for interpolated map'
+          PRINT *,'Trouble getting virtual memory for interpolated map'
           IFAIL = 51
           GO TO 999
         ELSE
-*         TYPE *,'Got ', NMAP*MAPSIZEIN, ' bytes for interpolated map'
+*         PRINT *,'Got ', NMAP*MAPSIZEIN, ' bytes for interpolated map'
         END IF
 
         DO I = 1, NMAP
@@ -97,11 +100,11 @@
 
         ISTAT = IFREEVM (IPTR)
         IF (ISTAT.ne.0) THEN
-          TYPE *,'Trouble freeing VM for original map array'
+          PRINT *,'Trouble freeing VM for original map array'
           IFAIL = 51
           GO TO 999
         ELSE
-*         TYPE *,'.. and released ', NMAP*MAPSIZEIN, ' bytes'
+*         PRINT *,'.. and released ', NMAP*MAPSIZEIN, ' bytes'
         END IF
 
         IPTR   = IPTR2
@@ -122,11 +125,11 @@
         ISTAT = IGETVM (NMAP*MAPSIZEOUT, .TRUE., 
      &                 'INTERPOLATE_MAP', IPTR2)
         IF (ISTAT.ne.0) THEN
-          TYPE *,'Trouble getting virtual memory for smoothed maps'
+          PRINT *,'Trouble getting virtual memory for smoothed maps'
           IFAIL = 51
           GO TO 999
         ELSE
-*         TYPE *, 'Got ', NMAP*MAPSIZEOUT, ' bytes for smoothed maps'
+*         PRINT *, 'Got ', NMAP*MAPSIZEOUT, ' bytes for smoothed maps'
         END IF
 
         DO I = 1, NMAP
@@ -140,20 +143,20 @@
 
         ISTAT = IFREEVM (IPTR)
         IF (ISTAT.ne.0) THEN
-          TYPE *,'Trouble freeing VM for unsmoothed map array'
+          PRINT *,'Trouble freeing VM for unsmoothed map array'
           IFAIL = 51
           GO TO 999
         ELSE
-*         TYPE *, '... released ', NMAP*MAPSIZEIN, ' bytes for old maps'
+*         PRINT *, '... released ', NMAP*MAPSIZEIN, ' bytes for old maps'
         END IF
 
         IPTR   = IPTR2
 
       END IF
 
-*     TYPE *, '     map size out (x,y)= ', NAXX, NAXY
-*     TYPE *, '     memory/map (bytes)= ', MAPSIZEOUT
-*     TYPE *, '     memory address    = ', IPTR2
+*     PRINT *, '     map size out (x,y)= ', NAXX, NAXY
+*     PRINT *, '     memory/map (bytes)= ', MAPSIZEOUT
+*     PRINT *, '     memory address    = ', IPTR2
 
       RETURN
 

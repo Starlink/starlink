@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused K, II1, II2, JJ1, JJ2, X, Y
 *-----------------------------------------------------------------------
 
       SUBROUTINE INTERPARR (A1, M1, N1, A2, M2, N2, BADPIX, 
@@ -36,10 +40,8 @@ C   Miscellaneous variables
       LOGICAL   INTERP
       LOGICAL   GXMINUS, GXPLUS
       LOGICAL   GYMINUS, GYPLUS
-      INTEGER   I,J,K,M,N         ! Counters for output array
+      INTEGER   I,J,M,N           ! Counters for output array
       INTEGER   II, JJ            ! More counters for input array.
-      INTEGER   II1, II2          ! Left and right boundaries of original cell
-      INTEGER   JJ1, JJ2          ! Bottom and top boundaries of original cell
       INTEGER   IXMAX, IYMAX      ! Extent of interpolating function in pixels
       INTEGER   MMIN, MMAX        ! Interpolation limits in X (pixels)
       INTEGER   NMIN, NMAX        ! Interpolation limits in Y (pixels)
@@ -48,7 +50,6 @@ C   Miscellaneous variables
       REAL      SIGMA_W           ! Sum of weights
       REAL      WEIGHT(0:IWMAX,0:IWMAX) ! Value of beam at point
       REAL      VAL
-      REAL      X, Y
       REAL      XRAD, YRAD
 
 C  OK, go...
@@ -59,18 +60,18 @@ C     Find interpolation factors
 
       INX   = (M2-1)/(M1-1)
       INY   = (N2-1)/(N1-1)
-D     TYPE *, 'Interpolating factors: INX, INY = ', INX, INY
+D     PRINT *, 'Interpolating factors: INX, INY = ', INX, INY
 
 C     How far to interpolate?
 
       IXMAX = (WMAXX/CELLX)*INX
       IYMAX = (WMAXY/CELLY)*INY
-D     TYPE *, 'Interp func. radii: IXMAX,IYMAX = ', IXMAX, IYMAX
+D     PRINT *, 'Interp func. radii: IXMAX,IYMAX = ', IXMAX, IYMAX
 
 C   Check that weights array is small enough
 
       IF (IXMAX.GT.IWMAX .OR. IYMAX.GT.IWMAX) THEN
-        TYPE *,'Maximum radius of interp''g function exceeded'
+        PRINT *,'Maximum radius of interp''g function exceeded'
         IFAIL = 18
         RETURN
       END IF
@@ -114,11 +115,11 @@ C     Set up the weights array (to save working out lots of trig functions later
       END DO
 
 D     IF (IXMAX.LE.10) THEN
-D       Type *
-D       Type *,'Weights array:'
+D       PRINT *
+D       PRINT *,'Weights array:'
 D       Type '(<IXMAX+1>(2X,F9.5))',((WEIGHT(I,J),I=0,IXMAX),J=0,IYMAX)
 D     ELSE
-D       Type *,'Weights array: too big to type out!'
+D       PRINT *,'Weights array: too big to type out!'
 D     END IF
 
 C     Then do the interpolation: M & N are indices in output array.

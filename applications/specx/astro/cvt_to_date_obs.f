@@ -23,10 +23,13 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Alan Chipperfield (Starlink, RAL)
 
 *  History:
 *     06-Jan-2000 (TIMJ):
 *        First version
+*     20-Sep-2000 (AJC):
+*        Don't split strings across lines
 
 *  Notes:
 *     The format used for the DATE-OBS keyword depends on the value of the
@@ -90,8 +93,8 @@
          CALL SLA_DD2TF(3, FD, SIGN, IHMSF)
 
 *     Insert the values into the string
-         WRITE (DATE_OBS, '(I4.4,''-'',I2.2,''-'',I2.2,''T'',
-     :        I2.2,'':'',I2.2,'':'',I2.2,''.'',I3.3,''Z'')')
+         WRITE (DATE_OBS, '(I4.4,''-'',I2.2,''-'',I2.2,''T'','//
+     :        'I2.2,'':'',I2.2,'':'',I2.2,''.'',I3.3,''Z'')')
      :        YY, MM, DD, IHMSF(1), IHMSF(2), IHMSF(3), IHMSF(4)
 
 

@@ -11,12 +11,17 @@
 *        names for them. Update names according to GKS 7.4.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE, ULCASE
+*     26 Jul 2000 (ajc):
+*        Use structure in C
+*        Replace TYPE by PRINT
 C-----------------------------------------------------------------------
 C  STARLINK PGPLOT version (REVAD::JFL) 12th March
 
       SUBROUTINE GETDEV (TERMDEV, PRINTDEV, IANS, DEVICE_NO)
 
       IMPLICIT  NONE
+
+      INCLUDE  'SXG_GRAPHCAP.INC'
 
 C   Routine to get the current plot device of the general type (terminal,
 C   hardcopy or null) given by IANS
@@ -25,20 +30,25 @@ C   hardcopy or null) given by IANS
       CHARACTER PRINTDEV*(*)
       CHARACTER IANS*(*)
       INTEGER   DEVICE_NO
+
       INTEGER   I
-
-      INCLUDE  'SXG_GRAPHCAP.INC'
-
       INTEGER   IP
+      INTEGER   IERR
 
+      CHARACTER*16 DPROMPT
+
+* External routines:
       INTEGER   GEN_ILEN
+      INTEGER   SXG_INQDEVNO
+      LOGICAL   SXG_INQTERM
+      LOGICAL   SXG_INQHARD
 
 C  Ok, go...
 
-D     type *, '-- getdev --'
-D     type *, '   ians     = ', ians
-D     type *, '   termdev  = ', termdev
-D     type *, '   printdev = ', printdev
+D     print *, '-- getdev --'
+D     print *, '   ians     = ', ians
+D     print *, '   termdev  = ', termdev
+D     print *, '   printdev = ', printdev
 
       DEVICE_NO = -1
 
@@ -46,20 +56,22 @@ D     type *, '   printdev = ', printdev
 
       IF (IANS(1:1).EQ.'T') THEN
         DO I = 1, NDEVS
-          IP = GEN_ILEN(DEVICE(I).PROMPT)
-          IF (DEVICE(I).TERM) THEN
-            IF (DEVICE(I).PROMPT(:IP) .EQ. TERMDEV(:IP)) THEN
-              DEVICE_NO = DEVICE(I).DEV_NO
+          CALL SXG_GTPR( I, DPROMPT, IERR )
+          IP = GEN_ILEN(DPROMPT)
+          IF (SXG_INQTERM(I)) THEN
+            IF (DPROMPT(:IP) .EQ. TERMDEV(:IP)) THEN
+              DEVICE_NO = SXG_INQDEVNO(I)
             END IF
           END IF
         END DO
 
       ELSE IF (IANS(1:1).EQ.'H') THEN
         DO I = 1, NDEVS
-          IP = GEN_ILEN(DEVICE(I).PROMPT)
-          IF (DEVICE(I).HARD) THEN
-            IF (DEVICE(I).PROMPT(:IP) .EQ. PRINTDEV(:IP)) THEN
-              DEVICE_NO = DEVICE(I).DEV_NO
+          CALL SXG_GTPR( I, DPROMPT, IERR )
+          IP = GEN_ILEN(DPROMPT)
+          IF (SXG_INQHARD(I)) THEN
+            IF (DPROMPT(:IP) .EQ. PRINTDEV(:IP)) THEN
+              DEVICE_NO = SXG_INQDEVNO(I)
             END IF
           END IF
         END DO
@@ -68,10 +80,10 @@ D     type *, '   printdev = ', printdev
         DEVICE_NO = 0
       END IF
 
-D     type *, '   device #   = ', device_no
+D     print *, '   device #   = ', device_no
 
       IF (DEVICE_NO.LT.0) THEN
-        TYPE *, 'Device not known to SXGPGPLOT!'
+        PRINT *, 'Device not known to SXGPGPLOT!'
       END IF
 
       RETURN

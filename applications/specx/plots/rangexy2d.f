@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C--------------------------------------------------------------------------
 
       SUBROUTINE RANGEXY2D (X, XL, XH, BUF, NQUAD, BLIM, ULIM, NINTS,
@@ -68,7 +71,7 @@ C       ... and deduce more sensible scaling
 
       ELSE
         IERR = 35
-        Type *,'Error in RANGEXY - Range = 0'
+        PRINT *,'Error in RANGEXY - Range = 0'
       END IF
 
       RETURN

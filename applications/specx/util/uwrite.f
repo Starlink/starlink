@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Specify record number standardly
 *-----------------------------------------------------------------------
 
       SUBROUTINE UWRITE (LUN,RECORD,IREC,IRECL,IERR)
@@ -9,7 +12,7 @@ C   from array IADD.
       BYTE RECORD(*)
 
       IPOS = IREC
-      WRITE(LUN'IPOS, IOSTAT=IERR) (RECORD(I),I=1,IRECL)
+      WRITE(LUN, REC=IPOS, IOSTAT=IERR) (RECORD(I),I=1,IRECL)
 
       RETURN
       END

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       LOGICAL*4 FUNCTION PUSH_IFSTACK (ISP)
@@ -19,8 +22,8 @@
 
 * Ok, go..
 
-D     Type *,'-- push_ifstack --'
-D     Type *,'   initial IF_COUNT = ', IF_COUNT
+D     Print *,'-- push_ifstack --'
+D     Print *,'   initial IF_COUNT = ', IF_COUNT
 
       IF_COUNT = IF_COUNT + 1
 
@@ -34,7 +37,7 @@ D     Type *,'   initial IF_COUNT = ', IF_COUNT
 
       PUSH_IFSTACK = .TRUE.
 
-D     Type *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
+D     Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
       RETURN
       END
@@ -60,8 +63,8 @@ D     Type *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
 *  Ok, go..
 
-D     Type *,'-- pull_ifstack --'
-D     Type *,'   initial IF_COUNT = ', IF_COUNT
+D     Print *,'-- pull_ifstack --'
+D     Print *,'   initial IF_COUNT = ', IF_COUNT
 
       IF_COUNT = IF_COUNT - 1
 
@@ -79,7 +82,7 @@ D     Type *,'   initial IF_COUNT = ', IF_COUNT
 
       PULL_IFSTACK = .TRUE.
 
-D     Type *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
+D     Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
       RETURN
       END
@@ -107,7 +110,7 @@ D     Type *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
       IF_COUNT = 0
 
-D     Type *,'IF stack initialized: IF level = ', IF_COUNT
+D     Print *,'IF stack initialized: IF level = ', IF_COUNT
 
       IF_LEVEL = 0
       IF_SKIP  = 0

@@ -41,10 +41,16 @@
  *       Review with look at new subpar_trmsz. No curses.
  *    16 Aug 1993 (hme):
  *       Back from Figaro to Specdre.
+ *     1 Aug 2000 (ajc):
+ *       Further revison to use termios as subpar_trmsz
  *-
  */
 
-#include <sys/termio.h>
+#include <termios.h>
+#ifndef TIOCGWINSZ
+#include <sys/ioctl.h>
+#endif
+#include <unistd.h>
 #include "f77.h"
 
 #define SAI__ERROR 148013867
@@ -71,7 +77,7 @@ F77_SUBROUTINE(spaef)( INTEGER(page), INTEGER(width), INTEGER(status) )
 
 /* Do the job.
  */
-   if ( ioctl( 1, TIOCGWINSZ, &s ) )
+   if ( ioctl( STDOUT_FILENO, TIOCGWINSZ, (char *)&s ) < 0)
    {  *status = SAI__ERROR;
    }
    else

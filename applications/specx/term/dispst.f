@@ -1,3 +1,8 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Don't split strings across lines
+*        Unused GEN_ILEN
 C-----------------------------------------------------------------------
 
       SUBROUTINE DISPST (NSHOW, STACK_DATA, BUF)
@@ -25,17 +30,14 @@ C     Include files:
       INCLUDE 'SPECX_PARS'
       INCLUDE 'STAKPAR'
 
-C     Functions:
-      INTEGER  GEN_ILEN
-
       DATA NAME/'X','Y','Z'/
 
 C  Ok, go...
 
       IF (STACK_DATA) THEN
         WRITE (6,*)
-        WRITE (6,'('' ('',I2,'' stack positions, length '',
-     &             I4'' points)'')') JSTK,LSTK-LHEAD
+        WRITE (6,'('' ('',I2,'' stack positions, length '','//
+     &             'I4'' points)'')') JSTK,LSTK-LHEAD
         WRITE (6,'('' (Y-register data starts at STACK(''I4''))''/)')
      &             IDAT2
         WRITE (6,*)
@@ -63,7 +65,7 @@ C  Ok, go...
       JTOP = J1
       RETURN
 
- 1000 FORMAT(/' Stack posn'4X'Scan no'4X'Title')
+ 1000 FORMAT(/' Stack posn',4X,'Scan no',4X,'Title')
  1002 FORMAT(I4)
  1003 FORMAT(I2)
  1004 FORMAT(4X,A2,9X,A4,6X,A26)

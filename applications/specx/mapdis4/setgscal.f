@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE SETGSCAL (ZMIN, ZMAX, GRLIMITS)
@@ -31,11 +34,11 @@
       MAPLIMITS(2) = GRLIMITS(2)
 
 
-D     TYPE *, ' -- setgscal --'
-D     TYPE *, '    Autogrey flag = ',       AUTOGREY
-D     TYPE *, '    Array min and max:    ', ZMIN, ZMAX
-D     TYPE *, '    Manual limits:        ', GREYLIM
-D     TYPE *, '    Greyscale limits set: ', GRLIMITS
+D     PRINT *, ' -- setgscal --'
+D     PRINT *, '    Autogrey flag = ',       AUTOGREY
+D     PRINT *, '    Array min and max:    ', ZMIN, ZMAX
+D     PRINT *, '    Manual limits:        ', GREYLIM
+D     PRINT *, '    Greyscale limits set: ', GRLIMITS
 
       RETURN
       END

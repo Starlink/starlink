@@ -5,6 +5,10 @@
 *     06 Jan 1994 (rp):
 *        Put IOSTAT=IERR in all relevant WRITEs to compensate for loss
 *        of error handler.
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*     07 Mar 2002 (rpt):
+*        Change test USB/LSB to look at sign iffreq
 C-----------------------------------------------------------------------
       
       SUBROUTINE PRSCAN (ICHAN, ILEN)
@@ -76,7 +80,7 @@ C  Short header info only
         WRITE  (ICHAN, 15, IOSTAT=IERR) RASTRING, DECSTRING,
      &                                  DRA,      DDEC
    15   FORMAT (1X,'Map centre: R.A.',A12,'  Dec. ',A12,/,
-     &            '     Offset (R.A.,Dec.):  ('F7.1,2X,F7.1') arcsec.')
+     &          '     Offset (R.A.,Dec.):  (',F7.1,2X,F7.1,') arcsec.')
         NLINE = NLINE + 2
       END IF
 
@@ -85,11 +89,12 @@ C  Remaining details if ILEN=1
       IF (ILEN.EQ.1) THEN
         XNTT = FLOAT(INTT)/1000.
         SB = 'USB'
-        IF (JFCEN(1)/1E+06 .LT. LOFREQ(1)) SB = 'LSB'
+C        IF (JFCEN(1)/1E+06 .LT. LOFREQ(1)) SB = 'LSB'
+        IF (IFFREQ(1) .LT. 0) SB = 'LSB'
         WRITE  (ICHAN, 20, IOSTAT=IERR) XNTT, AZ, EL, VLSR, SB
-   20   FORMAT (1X,'Integration Period : 'F8.2'sec'/
+   20   FORMAT (1X,'Integration Period : ',F8.2,'sec'/
      &          1X,'Azimuth ', F8.2, '  Elevation ',F8.2,' Degrees'/
-     &          1X,'Vrad : 'F7.1'Km/s  ',A3,/)
+     &          1X,'Vrad : ',F7.1,'Km/s  ',A3,/)
         NLINE = NLINE + 4
 
         CALL VELDECODE (LSRFLG,VFRAME,VDEF)

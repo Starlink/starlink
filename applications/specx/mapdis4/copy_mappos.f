@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused J
 *----------------------------------------------------------------------
 
       SUBROUTINE COPY_MAPPOS (RA, DEC, RAM, DECM, MAP_RA, MAP_DEC)
@@ -16,7 +20,6 @@
 
 *     Local parameters
 
-      INTEGER J
       LOGICAL MCZERO
 
 *  Ok, go...
@@ -26,17 +29,17 @@
       IF (RAM.ne.0.D0 .or. DECM.ne.0.D0) MCZERO = .FALSE.
 
       IF (MCZERO) THEN
-D       TYPE *, ' Map centre zero; use prototype header'
+D       PRINT *, ' Map centre zero; use prototype header'
         MAP_RA  = RA
         MAP_DEC = DEC
       ELSE
-D       TYPE *, ' Using map centre in map header'
+D       PRINT *, ' Using map centre in map header'
         MAP_RA  = RAM
         MAP_DEC = DECM
       END IF
 
-D     TYPE *, ' R.A. = ', MAP_RA
-D     TYPE *, ' Dec. = ', MAP_DEC
+D     PRINT *, ' R.A. = ', MAP_RA
+D     PRINT *, ' Dec. = ', MAP_DEC
 
       RETURN
       END

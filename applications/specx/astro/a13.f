@@ -1,6 +1,8 @@
 *  History:
 *     22 Nov 1993 (hme):
 *        Remove TABs.
+*     21 Sep 2000 (ajc):
+*        Unused TSQ, TCB
 C------------------------------------------------------------------------------
 
       SUBROUTINE A13(DATJUL,A1,A2,A3)
@@ -15,7 +17,7 @@ C     A3  : MEAN ANOMALY (L-GAMMA) I.E., THETA OF ORBIT
 C
 C     RED IS A ROUTINE TO REDUCE ANGLES TO .LT. 360 DEG.
 C
-      REAL*8  DATJUL,CSAR,T,TSQ,TCB,B1,B2,B3,RED
+      REAL*8  DATJUL,CSAR,T,B1,B2,B3,RED
 
       DATA CSAR/4.8481368111D-06/
 

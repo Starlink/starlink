@@ -36,7 +36,7 @@ INSTOPTS = -g jcmtsw
 FSOURCES= getdev.f sxgpgplot.f ttsub.f
 
 
-CSOURCES = 
+CSOURCES = sxg1pgplot.c
 
 # These are the external include files
 # They will be deleted by make clean (they are soft links).

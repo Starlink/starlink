@@ -30,6 +30,8 @@
 *  History:
 *     10 May 1995 (rpt): 
 *        Original version.
+*     21 Sep 2000 (ajc):
+*        Unused ISCAN, JDEF, LENGTH, NTICKS, TLOC
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,13 +60,8 @@
       INTEGER IFAIL              ! Global status
 
 *  Local Variables:
-      INTEGER ISCAN              ! Loop index
       INTEGER NDIM               ! Temporary integer
-      INTEGER JDEF               ! Returned by GEN_*
-      INTEGER LENGTH             ! 1/2 for short/long format
-      INTEGER NTICKS             ! Current date and time
       INTEGER STATUS             ! Starlink status
-      CHARACTER * ( DAT__SZLOC ) TLOC( 3 ) ! HDS locators
 
 *.
 

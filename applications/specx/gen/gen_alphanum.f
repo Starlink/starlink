@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Eliminate CHR_UCASE
+*     28 July 2000 (ajc):
+*        Remove hexadecimal constants
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_ALPHANUM (STRING)
@@ -31,11 +33,11 @@
         DO WHILE (GEN_ALPHANUM .AND. IST.LE.ILS)
           ITEST = ICHAR(STRING(IST:IST))
           IF (.NOT.(
-     &                 ITEST.EQ.'2E'X                          ! Decimal point
-     &            .OR. ITEST.EQ.'5F'X                          ! Underscore
-     &            .OR. '30'X.LE.ITEST .AND. ITEST.LE.'39'X     ! Numeral 0..9
-     &            .OR. '41'X.LE.ITEST .AND. ITEST.LE.'5A'X     ! Capital letter
-     &            .OR. '61'X.LE.ITEST .AND. ITEST.LE.'7A'X     ! Small letter
+     &                 ITEST.EQ.46                          ! Decimal point
+     &            .OR. ITEST.EQ.95                          ! Underscore
+     &            .OR. 48.LE.ITEST .AND. ITEST.LE.57        ! Numeral 0..9
+     &            .OR. 65.LE.ITEST .AND. ITEST.LE.90        ! Capital letter
+     &            .OR. 97.LE.ITEST .AND. ITEST.LE.122      ! Small letter
      &       )) THEN
             GEN_ALPHANUM = .FALSE.
           ELSE

@@ -15,6 +15,8 @@
 *        Increase size of GSDNAME to 32 (from 16)
 *     5  Mar 1997 (timj)
 *        Add new symbol MAPLIMITS to return actual limits used for greyscale
+*     20 Sep 2000 (ajc)
+*        Unused ierr in DEFINE_USER_TABLE
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_INIT_TABLE
@@ -333,7 +335,6 @@
 
 *     Local variables
 
-      INTEGER   IERR
       INTEGER   ISTAT
 
 *     Functions:

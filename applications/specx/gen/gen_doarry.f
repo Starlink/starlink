@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_doarry (opnd_addr1, opnd_type1,
@@ -29,19 +33,19 @@
 *     Only arrays implemented at present.
 *     First get the array index in integer type:
 
-      READ (opnd_type1(2:gen_ilen(opnd_type1)), '(I)') nbytes
+      READ (opnd_type1(2:gen_ilen(opnd_type1)), '(I3)') nbytes
       CALL gen_cvt_type (%val(opnd_addr2), opnd_type2, nbytes,
      &                    arg,            'I4',        4,      ierr)
 
 *     Determine the length of individual array element
 
-      READ (opnd_type1(2:gen_ilen(opnd_type1)), '(I)') nbytes
-D     Type *,'     offset in bytes =', nbytes*(arg-1)
+      READ (opnd_type1(2:gen_ilen(opnd_type1)), '(I3)') nbytes
+D     Print *,'     offset in bytes =', nbytes*(arg-1)
 
 *     Offset the address to the desired one:
 
       address = address + nbytes*(arg-1)
-D     Type *,'     new address ', address
+D     Print *,'     new address ', address
 
 *     copy value from this address to reserved part of workspace
 

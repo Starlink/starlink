@@ -1,3 +1,8 @@
+*  History:
+*     31 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
+*        Report "invalid operand"
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_factor (string, ils, next, ierr)
@@ -64,7 +69,7 @@
 
 *  Ok, go..
 
-D     Type *, '-- gen_factor --'
+D     Print *, '-- gen_factor --'
 
       st   = next
 
@@ -73,33 +78,41 @@ D     Type *, '-- gen_factor --'
 
     1 CONTINUE
 
+*     Find the start of the first factor - stacking if ( found and 
+*     ignoring space
       DO WHILE (string(st:st).eq.'(' .AND. st.le.ils)
-D       Type *,'   "(" found = pushing stack...'
+D       Print *,'   "(" found = pushing stack...'
         lev = lev + 1
         st  = st  + 1
-D       Type *,'    level no', lev
+D       Print *,'    level no', lev
         DO WHILE (string(st:st).eq.' ' .AND. st.le.ils)
           st = st + 1
         END DO
       END DO
 
       IF (st.gt.ils) THEN
+*     We have run out of string and not found the start
+*     PARSENAME drops through if IERR.NE.0 so rely on later error check
+*     and benefit from the error report there
         ierr = 1
-        RETURN
       END IF
 
 *     Parse off the next item
 
       CALL gen_parsename (string, st, ist, iend, numeric, strconst,
      &                    uminus, lbracket, funct, next, ierr)
-D     Type *, '     parsed factor: ', string(ist:iend)
+D     Print *, '     parsed factor: ', string(ist:iend)
 
-      IF (ierr.ne.0) RETURN
+      IF (ierr.ne.0) THEN
+            PRINT *, '-- gen_factor --'
+            PRINT *, '   Invalid operand "',string(st:),'"'
+            RETURN
+      END IF
 
 *     If unary-minus flag set then push unary minus operator (%) on opr stack
 
       IF (uminus) THEN
-D       Type *, '     Unary minus flag set - pushing operator stack...'
+D       Print *, '     Unary minus flag set - pushing operator stack...'
         nopr(lev)   = nopr(lev) + 1
         ntopr       = ntopr     + 1
         oper(ntopr) = '%'
@@ -109,7 +122,7 @@ D       Type *, '     Unary minus flag set - pushing operator stack...'
 *     If operand of any unary operator is bracketed then push stack...
 
       IF (lbracket) THEN
-*       TYPE *, '    left bracket returned, starting again...'
+*       PRINT *, '    left bracket returned, starting again...'
         GO TO 1
       END IF
 
@@ -129,7 +142,7 @@ D       Type *, '     Unary minus flag set - pushing operator stack...'
           WRITE (form(2:lf), '(I2.2)') idig
           ierr = gen_readnum (string(ist:iend), type, form, ivalue)
           address = %loc(ivalue)
-D         Type *,'     integer value read'
+D         Print *,'     integer value read'
         ELSE IF (gen_floating (string(ist:iend), idig, fdig)) THEN
           type   = 'R4'
           form   = 'F'
@@ -137,7 +150,7 @@ D         Type *,'     integer value read'
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
           address = %loc(rvalue)
-D         Type *,'     real*4 value read'
+D         Print *,'     real*4 value read'
         ELSE IF (gen_eformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R4'
           form   = 'E'
@@ -145,7 +158,7 @@ D         Type *,'     real*4 value read'
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
           address = %loc(rvalue)
-D         Type *,'     real*4 value read'
+D         Print *,'     real*4 value read'
         ELSE IF (gen_dformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R8'
           form   = 'E'
@@ -153,16 +166,16 @@ D         Type *,'     real*4 value read'
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, dvalue)
           address = %loc(dvalue)
-D         Type *,'     real*8 value read'
+D         Print *,'     real*8 value read'
         END IF
 
       ELSE IF (strconst) THEN
         CALL gen_hdnorm (string(ist:iend), string(ist:iend), ls, ierr)
         WRITE (type, '(''C'',I3.3)') ls
         address = %loc(string(ist:ist))
-D       Type *,'     string constant read: length =', ls
-D       Type *,'     variable type = ', TYPE
-D       Type *,'     ', string(ist:ist+ls-1)
+D       Print *,'     string constant read: length =', ls
+D       Print *,'     variable type = ', TYPE
+D       Print *,'     ', string(ist:ist+ls-1)
 
       ELSE
         fnc_index = 0
@@ -180,8 +193,8 @@ D       Type *,'     ', string(ist:ist+ls-1)
           CALL gen_inqsymb (string(ist:iend), sym_index, type, length,
      &                      address, readonly, ierr)
           IF (sym_index.eq.0) THEN
-            TYPE *, '-- gen_factor --'
-            TYPE *, '   symbol "',string(ist:iend),'" not defined!'
+            PRINT *, '-- gen_factor --'
+            PRINT *, '   symbol "',string(ist:iend),'" not defined!'
             ierr = 5
             RETURN
           ELSE
@@ -190,7 +203,7 @@ D       Type *,'     ', string(ist:ist+ls-1)
         END IF
 
         IF (funct) THEN
-D         Type *,'    symbol -- has an argument -- pushing all stacks'
+D         Print *,'    symbol -- has an argument -- pushing all stacks'
 *         Push symbol on symbol stack
           nsymb = nsymb + 1
           sym_address(nsymb) = address
@@ -208,7 +221,7 @@ D         Type *,'    symbol -- has an argument -- pushing all stacks'
 *     space from the workspace array, and if not a delayed operand
 *     copy value to workspace
 
-      READ (type(2:gen_ilen(type)), '(I)') nbytes
+      READ (type(2:gen_ilen(type)), '(I3)') nbytes
       IF (.not.funct) CALL xcopy (nbytes,%val(address),wksp(next_ws))
 
 *     Update the operand stack
@@ -220,17 +233,17 @@ D         Type *,'    symbol -- has an argument -- pushing all stacks'
 
 *     Update the workspace pointer (note: allocate 8 bytes min for 64-bit AXP)
 
-D     TYPE *, '     updating next_ws, from ', next_ws
-D     TYPE *, '     (using nbytes = ', nbytes, ')'
+D     PRINT *, '     updating next_ws, from ', next_ws
+D     PRINT *, '     (using nbytes = ', nbytes, ')'
       next_ws = next_ws + 2*((nbytes-1)/8 + 1)
-D     TYPE *, '     to next_ws = ', next_ws
+D     PRINT *, '     to next_ws = ', next_ws
 
-D     Type *, '     ---------------------------'
-D     Type *, '        Operand stack summary'
-D     Type *, '      # operands: ', ntopnd
-D     Type *, '      last operand; type: ', type,' @ ',opnd_addr(ntopnd)
-D     Type *, '      next available workspace @ word ', next_ws
-D     Type *, '     ---------------------------'
+D     Print *, '     ---------------------------'
+D     Print *, '        Operand stack summary'
+D     Print *, '      # operands: ', ntopnd
+D     Print *, '      last operand; type: ', type,' @ ',opnd_addr(ntopnd)
+D     Print *, '      next available workspace @ word ', next_ws
+D     Print *, '     ---------------------------'
 
       IF (funct) THEN
         st = next

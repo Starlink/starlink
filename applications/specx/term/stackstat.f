@@ -1,6 +1,8 @@
 *  History:
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*     20 Sep 2000 (ajc):
+*        Don't split strings across lines
 C-----------------------------------------------------------------------
 
       SUBROUTINE STACKSTAT (LSCAN, TITLE)
@@ -18,8 +20,9 @@ C  Ok, go..
 
       IF (LSCAN .GE. 0) THEN
         ILT = GEN_ILEN (TITLE)
-        WRITE (ILOUT,'('' X-register now contains scan '',I4.1,'': '',
-     &         A)') LSCAN, TITLE
+        WRITE (ILOUT,
+     &    '('' X-register now contains scan '',I4.1,'': '',A)')
+     &    LSCAN, TITLE
       ELSE
         WRITE (ILOUT,*)'X-register is empty'
       END IF

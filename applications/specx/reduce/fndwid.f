@@ -4,6 +4,10 @@ C-----------------------------------------------------------------------
 
 *  Routine to evaluate equivalent width of a line
 
+C   History:
+C      6-JUN-2000 (AJC):
+C        Missing comma in FORMAT
+
       IMPLICIT   NONE
 
 *     Formal parameters
@@ -88,8 +92,8 @@ C-----------------------------------------------------------------------
       XWHM   = AINTEG / VALMAX
 
       WRITE(ILOUT,1000) NQ, XWHM, XAXIS_UNITS
- 1000 FORMAT(/' Quadrant 'I2'  Equivalent line width '
-     &       F7.2' 'A6)
+ 1000 FORMAT(/' Quadrant ',I2,'  Equivalent line width ',
+     &       F7.2,' ',A6)
 
       RETURN
       END

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------
 
       SUBROUTINE READ_GSD (IERR)
@@ -189,9 +192,9 @@ C  Local variables
       INTEGER*4 FIRST,LAST
       CHARACTER LINE*80
 
-*     Type *,'NO_SCANS: ',NO_SCANS
-*     Type *,'SCAN_LIST'
-*     Type *,(SCAN_LIST(J),J=1,NO_SCANS)
+*     Print *,'NO_SCANS: ',NO_SCANS
+*     Print *,'SCAN_LIST'
+*     Print *,(SCAN_LIST(J),J=1,NO_SCANS)
 
       PROMPT = '"'' There are multiple scans at this position'',/,'
       DO I = 1, ((NO_SCANS -1)/12)+1

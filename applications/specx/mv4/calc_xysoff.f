@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
       SUBROUTINE CALC_XYSOFF (RAOFF,    DECOFF,   POS_ANGLE,
      &                        X_OFFSET, Y_OFFSET, IFAIL)
 
@@ -19,13 +23,13 @@
 *  Ok, go...
 
       IFAIL = 0
-D     TYPE *, ' -- calc_xysoff --'
+D     PRINT *, ' -- calc_xysoff --'
 
       ANGLE = 1.74533D-2 * POS_ANGLE
       X_OFFSET = (RAOFF*COS(ANGLE) - DECOFF*SIN(ANGLE))
       Y_OFFSET = (RAOFF*SIN(ANGLE) + DECOFF*COS(ANGLE))
 
-D     TYPE *, '    Total X, Y offsets (arcsecs): ',X_OFFSET,Y_OFFSET
+D     PRINT *, '    Total X, Y offsets (arcsecs): ',X_OFFSET,Y_OFFSET
 
       RETURN
       END

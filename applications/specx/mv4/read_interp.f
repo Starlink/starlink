@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
       SUBROUTINE READ_INTERP_DATA (NDATA, M, N, BUF1, BUF2, N1, N2,
      &           HIT_DATA, INTERP)
 
@@ -54,10 +58,10 @@
       GYPLUS  = .FALSE.
 
 *     IF (M.GE.32 .and. M.LE.45 .and. N.eq.52) THEN
-*       TYPE *
-*       TYPE *, 'M, N = ', M, N
-*       TYPE *, 'MMIN,  MMAX  = ', MMIN,  MMAX
-*       TYPE *, 'NMIN,  NMAX  = ', NMIN,  NMAX
+*       PRINT *
+*       PRINT *, 'M, N = ', M, N
+*       PRINT *, 'MMIN,  MMAX  = ', MMIN,  MMAX
+*       PRINT *, 'NMIN,  NMAX  = ', NMIN,  NMAX
 *     END IF
 
       DO J = NMIN, NMAX
@@ -68,7 +72,7 @@
           CALL XCOPY (4, %VAL(LOCATION), IJPOS)
 
 *         IF (M.GE.32 .and. M.LE.45 .and. N.eq.52) THEN
-*           TYPE *,'Index value for (i,j) = ',I,J,' =',IJPOS
+*           PRINT *,'Index value for (i,j) = ',I,J,' =',IJPOS
 *         END IF
 
           IF (IJPOS.GT.0) THEN
@@ -93,7 +97,7 @@
       END DO
 
 *     IF (M.GE.32 .and. M.LE.45 .and. N.eq.52) THEN
-*       TYPE *, 'GXM, GXP, GYM, GYP = ', GXMINUS,GXPLUS,GYMINUS,GYPLUS
+*       PRINT *, 'GXM, GXP, GYM, GYP = ', GXMINUS,GXPLUS,GYMINUS,GYPLUS
 *     END IF
 
       IF (      GXMINUS .AND. GXPLUS
@@ -102,7 +106,7 @@
         DO K = 1,NDATA
           BUF2(K) = BUF2(K)/SIGMA_W
         END DO
-*       TYPE *, 'Interp set for array element (m,n) =', M, N
+*       PRINT *, 'Interp set for array element (m,n) =', M, N
       END IF
 
       RETURN

@@ -1,3 +1,7 @@
+*  History:
+*      7 Jun 2000 (ajc):
+*        Use C structure for port to Linux
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_GETSYM1 (TABLE, LTAB, SYM_INDEX, IOFF, VALUE, IERR)
@@ -6,28 +10,20 @@
 
 *     Formal parameters
 
+      INTEGER TABLE           ! Dummy
       INTEGER*4 LTAB
       INTEGER*4 SYM_INDEX
       INTEGER*4 IOFF
       REAL*4    VALUE
       INTEGER*4 IERR          ! = 1, symbol not found
 
-      STRUCTURE /SYMBOL/
-        CHARACTER*16 NAME
-        CHARACTER*4  TYPE
-        INTEGER*4    LENGTH 
-        INTEGER*4    ADDRESS
-      END STRUCTURE
-
-      RECORD /SYMBOL/ TABLE(512)
-
 *     Other variables
 
-      INTEGER*4 I
       INTEGER*4 ILT
       INTEGER*4 NBYTES
       INTEGER*4 ADDRESS
-
+      CHARACTER*4  TYPE
+      
 *     Functions
 
       INTEGER*4 GEN_ILEN
@@ -41,9 +37,12 @@
         RETURN
       END IF
 
-      ILT = GEN_ILEN (TABLE(SYM_INDEX).TYPE)
-      READ (TABLE(SYM_INDEX).TYPE(2:ILT), '(I)') NBYTES
-      ADDRESS = TABLE(SYM_INDEX).ADDRESS + (IOFF-1)*NBYTES
+      CALL GEN_INQSYMTYP( SYM_INDEX, TYPE, IERR )
+      CALL GEN_INQSYMADDR( SYM_INDEX, ADDRESS, IERR )
+
+      ILT = GEN_ILEN (TYPE)
+      READ (TYPE(2:ILT), '(I3)') NBYTES
+      ADDRESS = ADDRESS + (IOFF-1)*NBYTES
 
       CALL XCOPY (NBYTES, %VAL(ADDRESS), VALUE)
 

@@ -2,6 +2,7 @@ C                     FLAGCOMM.INC
 C                     ------------
 C     4 November 1996 (Tim Jenness) - Expanded GSDNAME to 32 characters
 C                                     and reduced CHFLGD to 100
+C     19 September 2000 (Alan Chipperfield) - removed unused CLIPVAL
 C
 C     This is the include file for the /FLAGS/ common blocks.
 C     Contains (128+128+128+128+32) I*4 words
@@ -93,7 +94,7 @@ C
                                               ! maps in velocity dimension
       REAL*4    VFNMAX                        ! Max offset to convolve vel to.
       REAL*4    C5START, C5ROTAT, C5EXP       ! For colour 5 spiral.
-      REAL*4    CLIPLIM(2), CLIPVAL           ! For CLIP-SPECTRUM
+      REAL*4    CLIPLIM(2)                    ! For CLIP-SPECTRUM
       REAL*4    TMAX, VMAX                    ! For FIND-MAX
       REAL*4    TOTINT                        ! For FIND-INT-INT
       REAL*4    MAPLIMITS(2)                  ! Greyscale max and min actually used

@@ -1,5 +1,7 @@
 *     14 Dec 1993 (hme):
 *        Attempt to disuse IPUT_SCREEN, ISET_CURSOR.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------------
 
       SUBROUTINE LIST_2DHELP (VALOPT)
@@ -35,7 +37,7 @@ C   Routine to list valid options on character page on VT100 or equivalent
         IF (INDEX(VALOPT,ICH2).NE.0)   THEN
           J = J+1
 *          CALL IPUT_SCREEN (ICH2//' - '//VOPTS(I),J+2,60,2)
-          TYPE *,ICH2//' - '//VOPTS(I)
+          PRINT *,ICH2//' - '//VOPTS(I)
         END IF
       END DO
 

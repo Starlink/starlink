@@ -8,6 +8,17 @@
 *        Insert changes from V6.3
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Change TYPE * to PRINT *
+*        Remove CARRIAGECONTROL from OPEN statement
+*        Don't check specific "printer" filename.
+*        Replace DISP='PRINT/DELETE' by STATUS='KEEP' in CLOSE statement
+*         (was kept anyway)
+*        Don't split strings across lines
+*        Unused TEST, MFIL, NFILE, IFILE1, IFILE2, TEMPT, SUMST, APROMPT
+*        Make TIDY .FALSE. in SET_LIST_FILE for File output (prevents
+*         attempt to return LUN after error with file still open).
 C-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_SET
@@ -26,7 +37,7 @@ C  SET-PLOT-SCALES.
       INCLUDE   'STAKPAR'
       INCLUDE   'CUBE'
 
-      LOGICAL   DOQUAD,TEST
+      LOGICAL   DOQUAD
       LOGICAL*4 PRINT_OUTPUT
       LOGICAL*4 IEXIST, IOPENED
       INTEGER*4 ITEMP(3)
@@ -34,13 +45,10 @@ C  SET-PLOT-SCALES.
      &          YM(2),    PLEN(2),
      &          XLIMS(2),  YLIMS(2),
      &          TEMP(3)
-      CHARACTER MFIL*1,
-     &          PROGNAME*40,
-     &          NFILE*6,     IFILE1*6,    IFILE2*6,
-     &          MAPTIT(3)*11, TEMPT(2)*5,  AXTIT(3)*6,
-     &          SUMST(2)*1,
+      CHARACTER PROGNAME*40,
+     &          MAPTIT(3)*11, AXTIT(3)*6,
      &          IREP*1,      STRING*80,   PROMPT*256,
-     &          APROMPT*32,  FORMAT*16
+     &          FORMAT*16
       CHARACTER LISTDEV*1, PRINT_FILE*40
       CHARACTER GSDNAME_FORMAT*3
       CHARACTER BOUNDS(2)*10     /'left,right', 'top,bottom'/
@@ -77,7 +85,7 @@ C  integrated intensity
       PROMPT = ' '
       WRITE (PROMPT,1030) MAPTIT(LINK(3)), AXTIT(LINK(3)),
      &                   QBEG(LINK(3)), QEND(LINK(3))
- 1030 FORMAT (A4' range? ('A6') ['F9.4','F9.4'] ')
+ 1030 FORMAT (A4,' range? (',A6,') [',F9.4,',',F9.4,'] ')
       TEMP(1) = QBEG(LINK(3))
       TEMP(2) = QEND(LINK(3))
       CALL GEN_GETR4A (PROMPT, TEMP, 2, ' ', TEMP, JDEF)
@@ -85,8 +93,10 @@ C  integrated intensity
         QBEG(LINK(3)) = TEMP(1)
         QEND(LINK(3)) = TEMP(2)
       END IF
+
       CALL GEN_YESNO ('Integrated intensity? (rather than average)',
      &                ISUM, ISUM, JDEF)
+
       RETURN
 
 C----------------
@@ -124,11 +134,11 @@ C     Smoothing
       END IF
       IF (INTERP_X.GT.9) THEN
         INTERP_X = 9
-        TYPE *,'Maximum of 9 interstitial points in X!'
+        PRINT *,'Maximum of 9 interstitial points in X!'
       END IF
       IF (INTERP_Y.GT.9) THEN
         INTERP_Y = 9
-        TYPE *,'Maximum of 9 interstitial points in Y!'
+        PRINT *,'Maximum of 9 interstitial points in Y!'
       END IF
 
 C     Beam size
@@ -275,13 +285,13 @@ C----------------
       PROMPT=' '
       WRITE(PROMPT,2000) NXS
  2000 FORMAT(' [',I1,'] ''"')
-      CALL GEN_GETI4('"//'' Set units for X-scale:''/
-     1     '' Key:    1      Points scale''/
-     2     ''         2      Frequency scale''/
-     3     ''         3      Velocity scale''/
-     4     ''         4      User defined scale''//
-     5     ''    Current units are '//XAXIS_UNITS//'''///
-     6     ''    Key? '//PROMPT(:GEN_ILEN(PROMPT)),NXS,' ',NXS1,JDEF)
+      CALL GEN_GETI4('"//'' Set units for X-scale:''/'//
+     1'     '' Key:    1      Points scale''/'//
+     2'     ''         2      Frequency scale''/'//
+     3'     ''         3      Velocity scale''/'//
+     4'     ''         4      User defined scale''//'//
+     5'     ''    Current units are '//XAXIS_UNITS//'''///'//
+     6'     ''    Key? '//PROMPT(:GEN_ILEN(PROMPT)),NXS,' ',NXS1,JDEF)
 
       IF (JDEF.LT.0 .OR. JDEF.GT.2) THEN
         IERR3 = 38
@@ -447,11 +457,12 @@ C----------------
       PROMPT=' '
       WRITE(PROMPT,4200) MASK
  4200 FORMAT('[',8(I1,1X),'] ''"')
-      CALL GEN_GETI4A('"'' Define function to mask processing and '',/
-     &   '' display of individual quadrants:''/
-     &   '' MASK(n) = 1   Turns processing/display ON for quadrant n''/
-     &   ''         = 0   Turns quadrant OFF''///
-     &   ''$Type MASK '//PROMPT(:GEN_ILEN(PROMPT)),
+      CALL GEN_GETI4A(
+     &'"'' Define function to mask processing and '',/'//
+     &''' display of individual quadrants:''/'//
+     &''' MASK(n) = 1   Turns processing/display ON for quadrant n''/'//
+     &'''         = 0   Turns quadrant OFF''///'//
+     &'''$Type MASK '//PROMPT(:GEN_ILEN(PROMPT)),
      &   MASK,8,' ',MASK,JDEF)
       NMASK=0
       DO J=1,NQMAX
@@ -559,12 +570,9 @@ C----------------
       IERR13 = 0
 
       IF (LISTDEV .EQ. 'P') THEN
-        WRITE (PRINT_FILE, '(''FOR'',I3.3,''.DAT'')') ILOUT
-        LENP = GEN_ILEN (PRINT_FILE)
-        INQUIRE (FILE=PRINT_FILE, EXIST=IEXIST, OPENED=IOPENED)
-        IF (IEXIST .AND. IOPENED) THEN
-          CLOSE (ILOUT, IOSTAT=IERR, DISP='PRINT/DELETE')
-*         WRITE (6,*) 'Old output now being printed'
+        INQUIRE( ILOUT, EXIST=IEXIST, OPENED=IOPENED )
+        IF( IEXIST .AND. IOPENED ) THEN
+           CLOSE( ILOUT, STATUS='KEEP', IOSTAT=IERR )
         END IF
         ISTAT = IFREELUN (ILOUT)
 
@@ -572,9 +580,9 @@ C----------------
         LENP = GEN_ILEN (SAVE_FILE)
         INQUIRE (FILE=SAVE_FILE, EXIST=IEXIST, OPENED=IOPENED)
         IF (IEXIST .AND. IOPENED) THEN
-          CLOSE (ILOUT, IOSTAT=IERR)
-*         WRITE (6,'('' Your output is stored in file '',A<LENP>)')
-*    &           SAVE_FILE(1:LENP)
+          CLOSE (ILOUT, STATUS='KEEP', IOSTAT=IERR)
+*          WRITE (6,'('' Your output is stored in file '',A)')
+*     &           SAVE_FILE(1:LENP)
         END IF
         ISTAT = IFREELUN (ILOUT)
 
@@ -603,9 +611,9 @@ C----------------
         WRITE (FORMAT,'(''A'',I2.2)') GEN_ILEN(SAVE_FILE)
         CALL GEN_GETSTR ('Name of file?',
      &                    SAVE_FILE, FORMAT, SAVE_FILE, JDEF)
-        ISTAT = IGETLUN (ILOUT, 'specx_set', .TRUE.)
+        ISTAT = IGETLUN (ILOUT, 'specx_set', .FALSE.)
         OPEN (ILOUT, FILE=SAVE_FILE, STATUS='UNKNOWN',
-     &        ACCESS='APPEND',CARRIAGECONTROL='LIST',
+     &        ACCESS='APPEND',
      &        IOSTAT=IERR)
         PRINT_OUTPUT = .FALSE.
 
@@ -658,7 +666,7 @@ C----------------
       COSLAT=DCOS(ALAT*3.141592654D0/180.D0)
       RETURN
 
- 1013 FORMAT(' Third co-ordinate is 'A4,/)
+ 1013 FORMAT(' Third co-ordinate is ',A4,/)
  1024 FORMAT(2F20.0)
  1041 FORMAT(' WARNING...Too many contours, Set to 30')
  1042 FORMAT(' WARNING...Negative contour interval, set to 2K')

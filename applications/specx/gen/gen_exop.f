@@ -1,3 +1,7 @@
+*  History:
+*     31 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_EXOP (opd1, type1, nbytes1,
@@ -50,13 +54,13 @@
 
       IF (type1(1:1).EQ.'C' .OR. type2(1:1).EQ.'C') THEN
         IF (type1(1:1).EQ.type2(1:1)) THEN
-D         type *,'    calling gen_exops'
+D         print *,'    calling gen_exops'
           CALL gen_exops (opd1, type1, nbytes1,
      &                    opd2, type2, nbytes2, operator, ierr)
-D         type *,'Result of string expression:'
-D         type *,'    type is ', type1
+D         print *,'Result of string expression:'
+D         print *,'    type is ', type1
           call xcopy (4, opd1, tlog1)
-D         type *,'    logical value is ', tlog1
+D         print *,'    logical value is ', tlog1
           IF (ierr.NE.0) GO TO 99
           RETURN
         ELSE
@@ -87,8 +91,8 @@ D         type *,'    logical value is ', tlog1
       END IF
       CALL xcopy (nbytes2, opd2, temp2)
 
-D     Type *,' - operand types are ', types(itype1),'and',types(itype2)
-D     Type *,' - operator is "'//operator(1:2)//'"'
+D     Print *,' - operand types are ', types(itype1),'and',types(itype2)
+D     Print *,' - operator is "'//operator(1:2)//'"'
 
       IF (operator(1:1).EQ.'&' .OR. operator(1:1).EQ.'!') THEN
         IF (itype1.EQ.4 .AND. itype2.EQ.4) THEN
@@ -105,7 +109,7 @@ D     Type *,' - operator is "'//operator(1:2)//'"'
 
           itype = MAX (itype1, itype2)
           type  = types(itype)
-          READ (type(2:gen_ilen(type)), '(I)') nbytes
+          READ (type(2:gen_ilen(type)), '(I3)') nbytes
 
           IF (itype1.NE.itype) 
      &      CALL gen_cvt_type (temp1, type1, nbytes1,
@@ -129,7 +133,7 @@ D     Type *,' - operator is "'//operator(1:2)//'"'
 
           itype = MAX (itype1, itype2)
           type  = types(itype)
-          READ (type(2:gen_ilen(type)), '(I)') nbytes
+          READ (type(2:gen_ilen(type)), '(I3)') nbytes
 
           IF (itype1.NE.itype) 
      &        CALL gen_cvt_type (temp1, type1, nbytes1,
@@ -152,7 +156,7 @@ D     Type *,' - operator is "'//operator(1:2)//'"'
 
 *     Copy result back to OPD1 and update the operand type
 
-      READ (type(2:gen_ilen(type2)), '(I)', iostat=ierr) nbytes
+      READ (type(2:gen_ilen(type2)), '(I3)', iostat=ierr) nbytes
       IF (ierr.NE.0) THEN
         ierr = 9
         GO TO 99
@@ -163,23 +167,23 @@ D     Type *,' - operator is "'//operator(1:2)//'"'
       RETURN
 
    99 CONTINUE
-      TYPE *, '-- gen_exop --'
+      PRINT *, '-- gen_exop --'
       IF (ierr.EQ.1 .OR. ierr.EQ.2) THEN
-        TYPE *, '     unsupported type in gen_cvt_type'
+        PRINT *, '     unsupported type in gen_cvt_type'
       ELSE IF (ierr.EQ.3) THEN
-        TYPE *, '     unsupported operator: "'//OPERATOR(1:2)//'"'
+        PRINT *, '     unsupported operator: "'//OPERATOR(1:2)//'"'
       ELSE IF (ierr.EQ.4) THEN
-        TYPE *, '     attempt to divide by zero!'
+        PRINT *, '     attempt to divide by zero!'
       ELSE IF (ierr.eq.5) then
-        TYPE *, '     undefined exponentiation!'
+        PRINT *, '     undefined exponentiation!'
       ELSE IF (ierr.EQ.6) THEN
-        TYPE *, '     not a logical operand!'
+        PRINT *, '     not a logical operand!'
       ELSE IF (ierr.EQ.7) THEN
-        TYPE *, '     not an arithmetic operand!'
+        PRINT *, '     not an arithmetic operand!'
       ELSE IF (ierr.EQ.8) THEN
-        TYPE *, '     mixed string/other expression!'
+        PRINT *, '     mixed string/other expression!'
       ELSE IF (ierr.EQ.9) THEN
-        TYPE *, '     error reading operator type!'
+        PRINT *, '     error reading operator type!'
       END IF
 
       RETURN

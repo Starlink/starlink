@@ -1,4 +1,6 @@
-
+*     31 July 2000 (ajc):
+*        Re-write illegal concatenation
+*        Unused GEN_IENDCH
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_GETSTR2 (LV, PROMPT, SDEF,
@@ -33,12 +35,12 @@ C   As for GEN_GETSTR but has extra option of LEVEL in call
       INTEGER*4 ILSTR
       INTEGER*4 LCOPY
       CHARACTER DEFSTR*80
+      CHARACTER PSTRING*512
       CHARACTER STR*256
 
 *     Functions
 
       INTEGER*4 GEN_ILEN
-      INTEGER*4 GEN_IENDCH
 
       GEN_GETSTR2 = .TRUE.
 
@@ -63,8 +65,11 @@ C   As for GEN_GETSTR but has extra option of LEVEL in call
         WRITE (DEFSTR, STR) SDEF(:GEN_ILEN(SDEF))
         IDS = GEN_ILEN (DEFSTR)
         ILP = GEN_ILEN (PROMPT)
-        CALL GEN_INPUT (LV,
-     &                  PROMPT(:ILP)//' ['//DEFSTR(:IDS)//'] ',
+        PSTRING = PROMPT(:ILP)
+        PSTRING(ILP+1:) = ' ['
+        PSTRING(ILP+3:) = DEFSTR(:IDS)
+        PSTRING(ILP+IDS+4:) = '] '
+        CALL GEN_INPUT (LV, PSTRING,
      &                  STR, ILS, JDEF)
       END IF
 

@@ -37,6 +37,8 @@
 *        Added support FILHD
 *     19 Dec 1995 (timj):
 *        Removed question
+*     21 Sep 2000 (ajc):
+*        Unused JDEF
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,7 +76,6 @@
       INTEGER DPNTR              ! Array pointer
       INTEGER IQUAD              ! Provisional number of quadrants
       INTEGER STATUS             ! Starlink status
-      INTEGER JDEF               ! Returned by GEN_*
       CHARACTER * ( DAT__SZLOC ) CELLOC, XLOC, TLOC ! HDS locators
 
 *  Internal References:

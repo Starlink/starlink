@@ -3,6 +3,10 @@
 *        Attempt to disuse IPUT_SCREEN.
 *     10 Dec 1993 (hme):
 *        Change terminal output "^z" or "CTRL(Z)" to EOF.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Don't split strings across lines
+*        Unused XBUF
 C-----------------------------------------------------------------------
 
       SUBROUTINE GETPTS (IPTS, NMIN, NMAX, NOLD, NR,
@@ -31,7 +35,7 @@ C                    IFAIL   -   SPECX error return
       LOGICAL   ITERM
       LOGICAL   OFFER
       INTEGER   TPAIR
-      REAL*4    P(2), Q(2), XBUF(4200)
+      REAL*4    P(2), Q(2)
       CHARACTER PROMPT*30, FORMAT*20
 
       INCLUDE   'FLAGCOMM'
@@ -43,7 +47,6 @@ C                    IFAIL   -   SPECX error return
       IFAIL = 0
 
 C   Put up plot if plot device is terminal.
-
       WRITE (ILOUT, *) NOLD, ' baseline regions currently defined'
 
       ITERM = (TERMINAL .AND. INTERACTIVE)
@@ -75,7 +78,7 @@ C   Set up prompt ( first point pair only )
       ELSE IF (IFAIL.NE.0) THEN
         OFFER = .FALSE.
 *       CALL IPUT_SCREEN ('**Invalid default interval**', 1, 1, 2)
-        TYPE *,'**Invalid default interval**'
+        PRINT *,'**Invalid default interval**'
       ELSE 
         IF (.NOT.ITERM) THEN
           WRITE(PROMPT, '(''[''F8.2'',''F8.2''] ''''"'')',IOSTAT=IERR) P
@@ -90,9 +93,9 @@ C   Set up prompt ( first point pair only )
         JDEF = TPAIR (XSCALE, BUF, NCH, OFFER, P, Q)
       ELSE
         CALL GEN_GETR4A(
-     &       '"'' Type intervals, one at a time, EOF to finish''/
-     &         '' Current units are '//XAXIS_UNITS//'''//
-     &         '' # '//PROMPT(1:GEN_ILEN(PROMPT)), P, 2, ' ', P, JDEF)
+     &       '"'' Type intervals, one at a time, EOF to finish''/'//
+     &        ''' Current units are '//XAXIS_UNITS//'''//'//
+     &        ''' # '//PROMPT(1:GEN_ILEN(PROMPT)), P, 2, ' ', P, JDEF)
       END IF
 
 C   Then get remaining point pairs from terminal or cursor
@@ -105,7 +108,7 @@ C-------------------------
         IF (JDEF.EQ.2) THEN
           IF (N.LT.NMIN) THEN
 *            CALL IPUT_SCREEN ('**Insufficient baseline regions**',1,1,2)
-            TYPE *,'**Insufficient baseline regions**'
+            PRINT *,'**Insufficient baseline regions**'
             JDEF=-1
           ELSE 
             DONE=.TRUE.
@@ -122,7 +125,7 @@ C   If defaults exist then use them.
 C   ..... no defaults set up => error
           ELSE 
 *           CALL IPUT_SCREEN ('** No default interval setup **',1,1,2)
-            TYPE *,'** No default interval setup **'
+            PRINT *,'** No default interval setup **'
           END IF
 
 C-------------------------------------
@@ -140,7 +143,7 @@ C-------------------------
           CALL NTRANS (XSCALE, NCH, P(1), P(2), XFAC1, I1, I2, IFAIL)
           IF (IFAIL.NE.0)   THEN
 *           CALL IPUT_SCREEN ('** Error in interval **', 1, 1, 2)
-            TYPE *,'** Error in interval **'
+            PRINT *,'** Error in interval **'
           END IF
 
           IPTS(2*N+1) = I1

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE SETPIX (PBEG, PEND, CELL_SIZE, NSTEPS,
@@ -27,7 +30,7 @@
 
 *  Ok, go...
 
-D     Type *, ' -- setpix --'
+D     Print *, ' -- setpix --'
 
 *     Map axes are implicit arrays with zero at (N+1)/2 points and
 *     CELL_SIZE arcseconds per point from here. Normalize input
@@ -38,7 +41,7 @@ D     Type *, ' -- setpix --'
       X1   = PBEG/CELL_SIZE + PMID
       X2   = PEND/CELL_SIZE + PMID
 
-D     Type *, '    begin and end at map-pts ', X1, X2
+D     Print *, '    begin and end at map-pts ', X1, X2
 
 *     Now find included pixels. First included pixel is integer 
 *     greater than the smaller of X1 & X2, last pixel is integer
@@ -47,11 +50,11 @@ D     Type *, '    begin and end at map-pts ', X1, X2
       IL = NINT (MIN (X1,X2) + 0.49999)
       IR = NINT (MAX (X1,X2) - 0.49999)
 
-D     Type *, '    limiting included pixels ', IL, IR
+D     Print *, '    limiting included pixels ', IL, IR
 
       NI = IR - IL + 1
 
-D     Type *, '    total number of pixels remaining = ', NI
+D     Print *, '    total number of pixels remaining = ', NI
 
 *     Flip IL & IR if input variables in "wrong" order
 
@@ -62,7 +65,7 @@ D     Type *, '    total number of pixels remaining = ', NI
       PL = CELL_SIZE * (FLOAT(IL) - PMID)
       PR = CELL_SIZE * (FLOAT(IR) - PMID)
 
-D     Type *, '    limiting values in array are ', PL, PR
+D     Print *, '    limiting values in array are ', PL, PR
 
       RETURN
       END

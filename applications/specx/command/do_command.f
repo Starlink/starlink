@@ -71,7 +71,12 @@
 *        Add WRITE-FITS-CUBE
 *     13 Dec 1995 (tj)
 *        Add READ-GSD-RASTER
-*
+*      8 May 2000 (ajc)
+*        Port to Unix
+*        Replace 'TYPE *' with 'PRINT *'
+*        Add , to some FORMAT statements
+*        Additional LOGDUM argument for DASMERGE
+*        Declare EXTERNAL MERGE
 C-----------------------------------------------------------------------
 
       LOGICAL FUNCTION DO_COMMAND (PROCEDURE, COMMAND, IFAIL)
@@ -113,7 +118,7 @@ C-----------------------------------------------------------------------
 
 * Used by DAS-MERGE
       INTEGER   NDROP   ! dummy
-      LOGICAL   LOGDUM, LOGDUM2  ! dummy
+      LOGICAL   LOGDUM  ! dummy
 *------------
       LOGICAL   DUMP_OK
       LOGICAL   SXGGREYOK
@@ -129,14 +134,21 @@ C-----------------------------------------------------------------------
       INTEGER   ISLCT1Q
       INTEGER   NTOT
 
+*     External subroutine
+      EXTERNAL  MERGE
+
 *  Ok, go...
+
+      DO_COMMAND = .FALSE.
 
       IF (IFAIL.NE.81) RETURN
 
       IFAIL      = 0
       DO_COMMAND = .TRUE.
       DUMP_OK    = .FALSE.
-
+      do ilc=1,lspmax
+       xscale(ilc) = 0.0
+      enddo
       ILC=MIN0(LEN(COMMAND),24)
 
 C                  *********************************************
@@ -189,7 +201,7 @@ C---------------
         CALL GEN_GETSTR('Dump file name?',NAMEFD,'A',NAMEFD,JDEF)
         CALL WDUMP(NAMEFD,IFAIL)
         IF(IFAIL.EQ.0)   WRITE(6,3040) NAMEFD
- 3040   FORMAT(' Common blocks dumped onto: 'A)
+ 3040   FORMAT(' Common blocks dumped onto: ',A)
 
 C---------------
 C  EXTERNAL-1 ( through 10 ) : User defined external functions.
@@ -685,7 +697,7 @@ C---------------
 
       ELSE IF (COMMAND.EQ.'SHOW-STACK')  THEN
         WRITE (6,1810) JTOP
- 1810   FORMAT(' Number of stack positions in use is 'I2)
+ 1810   FORMAT(' Number of stack positions in use is ',I2)
         CALL DISPST (JSTK, .TRUE., BUF)
 
 C---------------
@@ -1260,7 +1272,7 @@ C-----------------------
  
       ELSE IF(COMMAND.EQ.'DAS-MERGE')  THEN
         IF((ICHECK(1,IFAIL).NE.1).OR.NQUAD.LT.2) RETURN
-        CALL DASMERGE(NDROP, LOGDUM, LOGDUM2, IFAIL)
+        CALL DASMERGE(NDROP, LOGDUM, LOGDUM, IFAIL)
         DUMP_OK = .TRUE.
 
 
@@ -1359,7 +1371,7 @@ C  READ-GSD-MAP: Read all spectra from GSD file into SPECX map file
 C------------------
 
       ELSE IF (COMMAND.EQ.'READ-GSD-MAP') THEN
-        TYPE *, 'Command READ-GSD-MAP not supported in Unix SPECX'
+        PRINT *, 'Command READ-GSD-MAP not supported in Unix SPECX'
         IFAIL = 18
 
 C-----------------------
@@ -1442,7 +1454,7 @@ C-----------------------
           CALL SET_GREYSCALE (IFAIL)
           DUMP_OK = .TRUE.
         ELSE
-          TYPE *,'Greyscaling not available for this graphics package'
+          PRINT *,'Greyscaling not available for this graphics package'
         END IF
 
 C-----------------------
@@ -1485,7 +1497,7 @@ C-----------------------
           CALL MAKE_MAP4 (BUF, XSCALE, IFAIL)
           IF (IFAIL.EQ.0) CALL CONTOUR_MAP4 (IFAIL)
         ELSE
-          TYPE *,'Greyscaling not available for this graphics package'
+          PRINT *,'Greyscaling not available for this graphics package'
         END IF
 
 C-----------------------
@@ -1571,9 +1583,9 @@ C-----------------------
      &    .AND. .NOT.PROCEDURE) THEN      ! Not in a procedure, command file etc
         CALL WDUMP('SPECX_DUMP',ISTAT)
         IF (ISTAT.NE.0) THEN
-          TYPE *,'Trouble dumping current status'
+          PRINT *,'Trouble dumping current status'
         ELSE
-          TYPE *,'..'
+          PRINT *,'..'
         END IF
       END IF
 

@@ -1,4 +1,6 @@
-
+* History:
+*    21 Sep 2000 (ajc):
+*       Unused CONTINUE, CHAR
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_parseflt (string, ils, next)
@@ -12,9 +14,6 @@
       INTEGER*4 next
 
 *     Local variables:
-
-      LOGICAL*4 continue
-      CHARACTER char*1
 
 *  Ok, go..
 

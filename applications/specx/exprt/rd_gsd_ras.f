@@ -10,6 +10,7 @@ C  22-NOV-1991 REVAD::JFL - modified to handle GSD V5.1 format
 C  07-OCT-1995 Rachael@mrao - keep file open until new one needed.
 C  13-DEC-1995 Timj@jach    - read all scans in at once.
 C   4-JUN-1997 RPT@jach     - updated for DASMERGE wideband mode
+C  20-SEP-2000 AJC@ral      - unused SCAN_LIST, NO_SCANS, DXY, DXYS, PROMPT
 
       IMPLICIT  NONE
 
@@ -28,13 +29,8 @@ C      INTEGER*4 OUTFILE
       INTEGER   JDEF             ! GENLIB thing
 
       INTEGER*4 INDEX
-      INTEGER*4 SCAN_LIST(64)
       INTEGER*4 ISTAT
-      INTEGER*4 NO_SCANS
       INTEGER*4 OLDSCAN
-      REAL*4    DXY(2)
-      REAL*4    DXYS(2)
-      CHARACTER PROMPT*256
       LOGICAL   ADJQUAD           ! Adjust quadrant DC offsets
       LOGICAL   DOMERGE           ! Do the das-merge
       LOGICAL   WIDEBAND          ! Wideband mode?
@@ -178,6 +174,7 @@ C  Read data according to GSD version
          END IF
 
 C Do das-merge if required
+
          IF (DOMERGE) CALL DODASMERGE(NDROP, ADJQUAD, WIDEBAND, IFAIL)
 
 C Write spectrum to waiting Specx data-file

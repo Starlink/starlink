@@ -1,6 +1,9 @@
 *-----------------------------------------------------------------------
 *   History:  02/09/95  Created from SPECX_WRFITSMAP.FOR  (RP)
-*
+*             18/09/00  Define and use TRUBYT to pass to ASTRO_TIMES (AJC)
+*                       Unused ISTAT, IMAG_CHAN, DECRAD, RARAD, ISB,
+*                         IFREVM, DMS_TO_RAD
+*              3/05/01  Initialise STATUS (AJC)
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_WRFITSCUBE (IFAIL)
@@ -78,8 +81,6 @@
 
 *     Map handling
 
-      INTEGER            ISTAT
-      INTEGER            IMAG_CHAN
       INTEGER            IPTR
 
 *     Local and intermediate variables
@@ -88,12 +89,10 @@
       CHARACTER          ERROR*64
 
       LOGICAL            AUTO_CENTRE
-      REAL               DECRAD, RARAD
       REAL               DXC,    DYC
       REAL               XMID,   YMID
 
       LOGICAL            NSVEL
-      INTEGER            ISB
       INTEGER            NBLANK
       REAL               VLSR_0
       REAL               RBLANK
@@ -111,14 +110,14 @@
       DOUBLE PRECISION   DPI  /3.141592654/
       DOUBLE PRECISION   WR_JULIAN_DATE
 
-*     SPECX functions
-
-      INTEGER   IFREEVM
-      REAL      DMS_TO_RAD
+*     TRUE value to pass as IUTFLG to ASTRO_TIMES
+      BYTE                TRUBYT
+      DATA TRUBYT/1/
 
 *  Ok, go...
 
       IFAIL = 0
+      STATUS = 0
 
 *     Check there is at least one spectrum in the cube
 
@@ -224,7 +223,7 @@
       CALL UGETDATE        (WRDATE,        STATUS)
       CALL UGETTIME        (WRTIME,        STATUS)
 *      CALL DATE_CVT        (WRDATE,        WRITE_DATE)
-      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, .TRUE.,
+      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, TRUBYT,
      &                  DTEMP, DTEMP, WR_JULIAN_DATE)
       CALL CVT_TO_DATE_OBS( SPECXJD_TO_MJD(WR_JULIAN_DATE), WRITE_DATE)
 

@@ -1327,8 +1327,8 @@ OBS_<backend_name>_ - e.g. a typical scan is OBS_KENT_0123.DAT
 1 Information         
 2 HELP
 
-The command you are now using. Interfaces to the VMS help utilities to
-read information from the help file SPECX.HLB, which is accessed via 
+The command you are now using. Interfaces to the Starlink help utilities
+read information from the help file specx.shl, which is accessed via 
 the logical name SPECX_HELP.
 
 2 SHOW-COMMANDS
@@ -1341,13 +1341,8 @@ OPEN-FITS-OUTPUT-FILE, etc.
 
 2 SHOW-NEWS
 
-The news file is updated each time a significant change is made to the 
-program. It is a text file which is added to at the start, so that it 
-is only necessary to read until you get to the stuff you had seen 
-before - then you can exit. This command allows you to read the file 
-from the beginning from within SPECX. If you want hardcopy of the 
-complete file then from DCL send the command $PRINT SPECXNEWS.LIS, and
-you should have the whole thing.
+This enters the help system at the topic NEWS.  Sub-topics may be displayed
+in the normal way.
 
 1 Initialization      
 2 INITIALIZE-PARAMETERS
@@ -1730,6 +1725,52 @@ New commands:
    READ-GSD-RASTER (under test: directly reads all subscans
       from GSD file into a SPECX file with an optional DAS-MERGE
       along the way. Much faster than SPECX do-loop)
+
+2 V6.7-7
+
+ SPECX version 6.7-7 is now available. This release contains minor patches 
+ and an updated SUN/17 document.
+
+ Changes in this release are:
+
+  o Add wideband support to DAS-MERGE command
+
+  o FITS DATE header is now Y2K compliant
+
+  o Fix problem translating some dates from the GSD header 
+    value due to a loss of  precision.
+
+  o Fix problem reading old GSD files that did not know about rastering.
+
+2 V6.7-8
+
+ This version will also compile and run under Linux, courtesy of Starlink.
+ Structure handling has been re-written in C and the code made more compliant
+ with the Fortran standard in order to achieve this.
+
+ "Native" PGPLOT is used instead of "Starlink" (GKS) PGPLOT so there is
+ some difference from previous versions in graphics device naming and
+ behaviour.
+
+ A bug which may have resulted in incorrect times being computed when
+ writing FITS files has been corrected.  Some messages have been changed
+ to avoid VMSisms.
+
+ SUN/17 has been updated.
+
+2 V6.7-9
+
+ Corrects a bug in writing the current mapplane to a FITS file, which caused
+ memory allocation error on Linux.
+ 
+2 V6.7-10
+
+ Replaces a non-standard PRINT statement which caused int-map to crash on
+ Linux. 
+
+2 V6.7-11
+
+ Fixes a bug which leads to problems for data with large redshifts.
 
 1 Specx_file_formats  
 Specx 6.7 introduced version 4.2 of data formats for spectra and for

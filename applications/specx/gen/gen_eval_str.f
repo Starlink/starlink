@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_eval_str (string1, string2, ierr)
@@ -32,8 +36,8 @@
 
 *  Ok, go...
 
-D     Type *,'-- gen_eval_str --'
-D     Type *,'  input string  = ', string1(:60)
+D     Print *,'-- gen_eval_str --'
+D     Print *,'  input string  = ', string1(:60)
 
       ierr = 0
       ils  = len (string2)
@@ -55,11 +59,11 @@ D     Type *,'  input string  = ', string1(:60)
         string2 = string1 // ' '
         ierr    = 0
       ELSE
-        READ (type(2:gen_ilen(type)), '(I)') nbytes
+        READ (type(2:gen_ilen(type)), '(I3)') nbytes
         CALL xcopy (MIN (nbytes,ils), %val(address), %ref(string2))
       END IF
 
-D     Type *,'  return string = ', string2(:60)
+D     Print *,'  return string = ', string2(:60)
 
       RETURN
       END

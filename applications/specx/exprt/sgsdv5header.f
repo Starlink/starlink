@@ -10,6 +10,11 @@ C   JFL 22-NOV-1991   Version brought back from visit to Dwingeloo, unchanged
 C                     I think.
 C   RMP 18-Nov-1991   Put V4 integration time code into V5.
 C   RPT 30-jan-1997   Correct integration time for on-the-fly maps.
+C   AJC  8-may-2000   Port to Linux
+C                     Replace TYPE with PRINT
+C                     IXN undefined
+C                     Unused I, J, ACTDIMS
+C-
 
       IMPLICIT  NONE
 
@@ -19,8 +24,6 @@ C   RPT 30-jan-1997   Correct integration time for on-the-fly maps.
       PARAMETER (ADAM__OK=0)
 
       LOGICAL   ARRAY
-      INTEGER*4 I
-      INTEGER*4 J
       INTEGER*4 LVAL
       INTEGER*4 NO
       INTEGER*4 STATUS
@@ -31,7 +34,6 @@ C   RPT 30-jan-1997   Correct integration time for on-the-fly maps.
 
       CHARACTER*20 DIMNAMES(2)
       CHARACTER*20 DIMUNITS(2)
-      INTEGER*4    ACTDIMS
       INTEGER*4    DIMVALS (2)
       INTEGER*4    ACTVALS
       
@@ -312,7 +314,8 @@ C     is observed at the "off" position, but that C3SRT will be
 C     the total "on" for the complete row.
 C
       IF ( IFLY .NE. 0 ) THEN
-        INT_TIME = 4.D0 / (1.D0 + 1.D0/SQRT(1.D0*IXNP)) * INT_TIME / IXNP
+        INT_TIME =
+     &    4.D0 / (1.D0 + 1.D0/SQRT(1.D0*IXNP)) * INT_TIME / IXNP
       END IF
 
 C     ...# phases per cycle
@@ -398,7 +401,7 @@ C        change find of 'C3NRC' to 'C3NRS' here! (RMP)
 C  Standard return
 
    99 IF (STATUS.NE.ADAM__OK) THEN
-        type '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
+        PRINT '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
         IERR = 36
       END IF
 

@@ -37,6 +37,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     ajc: Alan Chipperfield (RAL, Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,8 @@
 *        Original version.
 *     07 Dec 1993 (hme):
 *        Take care that DAT__FILPR cannot be used.
+*     08 Aug 2000 (ajc):
+*        Default NEW to .FALSE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,7 +184,7 @@
 *        Ask if a new file to be created.
             WRITE( *, * ) 'Data file ', FILE(:CHR_LEN(FILE)),
      :         ' does not exist.'
-            CALL GEN_YESNO( 'Create a new file?', NEW, NEW, JDEF )
+            CALL GEN_YESNO( 'Create a new file?', .FALSE., NEW, JDEF )
 
 *        If new file desired.
             IF ( NEW ) THEN

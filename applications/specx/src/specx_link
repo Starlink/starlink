@@ -1,9 +1,12 @@
 
 #  N.B. the previous line should be blank.
 #+
+#  History:
+#     19-Sep-2000 (AJC)::
+#        Add GSD
 #-
-   echo `pgp_link` `fio_link` `psx_link` `chr_link` \
-      `hlp_link` -ltermcap `ndf_link` `gsd_link`  `sla_link` \
+   echo `gsd_link` `pgplot_link` `fio_link` `psx_link` `chr_link` \
+      `hlp_link`  `ndf_link` `gsd_link` \
       | awk 'BEGIN{RS=" ";FS="\n"}
           {f[i++]=$1}
           END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

@@ -5,6 +5,10 @@ C-----------------------------------------------------------------------
 C  Subroutine to average Kitt Peak data in the two polarizations and
 C  reset to a single filterbank with half the number of channels.
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Replace 'Type *' with 'PRINT *'
+
       IMPLICIT   NONE
 
 C     Formal parameters
@@ -43,7 +47,7 @@ C     Formal parameters
           NP1 = NPTS(NQ)
           IF (MOD(NP1,2).NE.0) THEN
             IFAIL = 34
-            TYPE *, 'Odd number of points in quadrant', NQ
+            PRINT *, 'Odd number of points in quadrant', NQ
           ELSE
 
 C           Average two polarizations.

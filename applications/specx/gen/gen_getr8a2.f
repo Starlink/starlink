@@ -3,6 +3,10 @@
 *        Disuse OUTERR_HANDLER error handler.
 *     31 Jan 1994 (hme):
 *        Remove second declaration of IERR.
+*     31 July 2000 (ajc):
+*        Re-write illegal concatenation
+*        Change TYPE * to PRINT *
+*        Unused IT
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_GETR8A2 (PROMPT, R8DEF, NSIZ,
@@ -34,7 +38,6 @@ C   of the default value.
       INTEGER*4 IERR
       INTEGER*4 ILP
       INTEGER*4 ILS
-      INTEGER*4 IT
       INTEGER*4 ITS
       INTEGER*4 ILT
       INTEGER*4 INEXT
@@ -44,6 +47,7 @@ C   of the default value.
       CHARACTER DEFSTR*32
       CHARACTER STRING*64
       CHARACTER TSTRING*80
+      CHARACTER PSTRING*80
 
 *     Functions
 
@@ -70,8 +74,11 @@ C   of the default value.
         WRITE (DEFSTR, STRING, IOSTAT=IERR) R8DEF
         IDS = GEN_ILEN (DEFSTR)
         ILP = GEN_ILEN (PROMPT)
-        CALL GEN_INPUT (LEVEL,
-     &                  PROMPT(:ILP)//' ['//DEFSTR(:IDS)//'] ',
+        PSTRING = PROMPT(:ILP)
+        PSTRING(ILP+1:) = ' ['
+        PSTRING(ILP+3:) = DEFSTR(:IDS)
+        PSTRING(ILP+IDS+4:) = '] '
+        CALL GEN_INPUT (LEVEL, PSTRING,
      &                  TSTRING, ILT, JDEF)
         IF (JDEF.NE.0)  RETURN
       END IF
@@ -104,7 +111,7 @@ C  Then read those items that are given
 C   Error handling
 
    10 IF (IERR.NE.0)   THEN
-        TYPE *,'Sorry - I couldn''t understand that'
+        PRINT *,'Sorry - I couldn''t understand that'
         JDEF = -1
       END IF
 

@@ -5,7 +5,13 @@ C-----------------------------------------------------------------------
 C  Program to average data in to bins of width NBIN starting at
 C  channel NSTART and amend DFCEN and DFINC appropriately
 
-      IMPLICIT  NONE
+C   History:
+C       6-JUN-2000 (AJC):
+C         Replace 'Type *' with 'PRINT *'
+C         Unused DFCEN, DFINC
+C-
+
+            IMPLICIT  NONE
 
 *     Formal parameters
 
@@ -31,8 +37,6 @@ C  channel NSTART and amend DFCEN and DFINC appropriately
       INTEGER   NBPTS1
       REAL      CEN
       REAL      OLDCEN
-      REAL*8    DFCEN
-      REAL*8    DFINC
 
 *     Functions
 
@@ -45,7 +49,7 @@ C  channel NSTART and amend DFCEN and DFINC appropriately
 
       IF (NBIN.LT.1) THEN
         IFAIL = 16
-        TYPE *, '-- Bin data -- Cannot bin with N =', NBIN,' points!'
+        PRINT *, '-- Bin data -- Cannot bin with N =', NBIN,' points!'
         RETURN
       END IF
 
@@ -57,7 +61,7 @@ C  channel NSTART and amend DFCEN and DFINC appropriately
 
           IF (NPTS(NQ).LE.1) THEN
             IFAIL = 18
-            TYPE *, '-- Bin data -- Cannot bin 1-channel data'
+            PRINT *, '-- Bin data -- Cannot bin 1-channel data'
             RETURN
           END IF
 

@@ -9,6 +9,9 @@
 *        Replace FIO_{G|P}UNIT with U{GET|FREE}LUN
 *     15 Jan 1994 (rp):
 *        Add initialization for LUN table
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Add space after "allocated from"s
 C--------------------------------------------------------------------
 C
 C           LUN_HNDL
@@ -58,7 +61,7 @@ C     Try for an allocation of a logical unit
 C     Error handling
 
       IF (IGETLUN.NE.0) THEN
-        TYPE *,'*** LUN allocation failed - '
+        PRINT *,'*** LUN allocation failed - '
         CALL LUN_DIAG
 
       ELSE
@@ -71,7 +74,7 @@ C    Enter the allocation in the LUN_table
         END DO
 
         IF (J.gt.MAXENT) THEN
-          TYPE *,'*** LUN_table error - no room for entry'
+          PRINT *,'*** LUN_table error - no room for entry'
         ELSE
           UNIT_NUMBER(J)     = LUN
           CALLING_ROUTINE(J) = ROUTINE
@@ -118,7 +121,7 @@ C     Look up entry in LUN_table
       END DO
 
       IF (J.GT.MAXENT) THEN
-        TYPE *,'*** LUN_table error - can''t find entry'
+        PRINT *,'*** LUN_table error - can''t find entry'
         GO TO 99
       ELSE
         INQUIRE (UNIT=UNIT_NUMBER(J), OPENED=IOPEN)
@@ -134,9 +137,9 @@ C  Try to free the logical unit number
 C  Error handling
 
         IF (IFREELUN.NE.0) THEN
-          TYPE *,'*** LUN deallocation failed - '
-          TYPE *,'Unit number ',UNIT_NUMBER(J),
-     &           ' allocated from',CALLING_ROUTINE(J)
+          PRINT *,'*** LUN deallocation failed - '
+          PRINT *,'Unit number ',UNIT_NUMBER(J),
+     &           ' allocated from ',CALLING_ROUTINE(J)
         END IF
 
 C  Remove the allocation from the LUN_table
@@ -146,9 +149,9 @@ C  Remove the allocation from the LUN_table
         LUN_TIDY(J)        = .FALSE.
 
       ELSE
-        TYPE *,'*** LUN deallocation failed -'
-        TYPE *,'file still open on this unit'
-        TYPE *,'Unit number ',UNIT_NUMBER(J),' allocated from',
+        PRINT *,'*** LUN deallocation failed -'
+        PRINT *,'file still open on this unit'
+        PRINT *,'Unit number ',UNIT_NUMBER(J),' allocated from ',
      &         CALLING_ROUTINE(J)
       END IF
   
@@ -180,8 +183,8 @@ C  Ok, go...
 
       DO J= 1, MAXENT
         IF (UNIT_NUMBER(J).ne.0 .and. LUN_TIDY(J)) THEN
-          TYPE *,'TIDYLUN freeing logical unit number',UNIT_NUMBER(J)
-          TYPE *,'...allocated from ',CALLING_ROUTINE(J)
+          PRINT *,'TIDYLUN freeing logical unit number',UNIT_NUMBER(J)
+          PRINT *,'...allocated from ',CALLING_ROUTINE(J)
           ISTAT = IFREELUN (UNIT_NUMBER(J))
         END IF
       END DO
@@ -207,10 +210,10 @@ C     Local variables:
 
 C  Ok, go...
 
-      TYPE *,'Unit number, status, calling routine'
+      PRINT *,'Unit number, status, calling routine'
       DO J = 1, MAXENT
         IF (UNIT_NUMBER(J).NE.0) THEN
-          TYPE '(1X,I4,3X,L1,3X,A24)', 
+          PRINT '(1X,I4,3X,L1,3X,A24)', 
      &            UNIT_NUMBER(J), LUN_TIDY(J), CALLING_ROUTINE(J)
         END IF
       END DO

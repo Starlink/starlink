@@ -14,20 +14,24 @@ CP = cp
 
 # Variables sent to recursive makefiles
 STAR_INC = /star/include
-CFLAGS = -I${STAR_INC}
+DEFS= -DVOID_SIGHANDLER -DHAVE_ALLOCA -DHAVE_ALLOCA_H -DUSGr4 \
+      -DUSG -DHAVE_STRING_H -DHAVE_VARARGS_H -DHAVE_SYS_PTEM_H \
+      -DHAVE_SYS_STREAM_H -DHAVE_UNISTD_H -DHAVE_STDLIB_H
+
+CFLAGS= -I${STAR_INC} ${DEFS}
 
 # For Solaris
-FFLAGS = -g -C
-FCPPFLAGS = -DUSESH -DSUN4
+#FFLAGS = -g -C
+#FCPPFLAGS = -DUSESH -DSUN4
 
 # For Linux
-#FFLAGS = -g -C -fno-second-underscore
-#FCPPFLAGS = -DUSESH
+FFLAGS = -g -fno-second-underscore
+FCPPFLAGS = -DLINUX
 
 # This is the list of sub-directories to loop over
 
 SUBDIRS = astro command inc exprt external fitting fv4 gen graph \
-mapdis4 mv4 plots reduce scl tek term util vms comfiles getaline
+mapdis4 mv4 plots reduce scl tek term util vms comfiles
 
 # This is the files required to complete specx_source.tar
 # for the Starlink distribution
@@ -88,9 +92,12 @@ all:
 	for i in $(SUBDIRS) ;\
 	do \
 	(cd $$i ; echo "making" all "in $(CURRENT_DIR)/$$i..."; \
-	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FLAGS=$(FLAGS)' \
+	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FFLAGS=$(FFLAGS)' \
 	 'CFLAGS=$(CFLAGS)' 'FCPPFLAGS=$(FCPPFLAGS)' all); \
-	done
+	done; \
+	(cd src; \
+	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FFLAGS=$(FFLAGS)' \
+	 'CFLAGS=$(CFLAGS)' 'FCPPFLAGS=$(FCPPFLAGS)' all);
 
 # The export target creates the tar files necessary for 
 # the Starlink distribution and copies them to the starlink

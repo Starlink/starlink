@@ -3,6 +3,8 @@
 *        In order to adapt to the new STACKCOMM, do not use TSYS in
 *        EQUIVALENCE, since it is no longer at the beginning of the
 *        common block.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE PUSH
@@ -14,8 +16,8 @@ C-----------------------------------------------------------------------
 
       EQUIVALENCE (STACK(1),SCAN_HEADER(1))
 
-*     Type *,'-- Push --'
-*     Type *,'  XCLEAR, JTOP: ',XCLEAR,JTOP
+*     Print *,'-- Push --'
+*     Print *,'  XCLEAR, JTOP: ',XCLEAR,JTOP
 
       IF (JTOP.EQ.0) RETURN
 

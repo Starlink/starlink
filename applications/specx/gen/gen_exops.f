@@ -1,6 +1,8 @@
 *  History:
 *     16 Nov 1993 (hme):
 *        Replace STR$UPCASE with CHR_UCASE.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_exops (opd1, type1, len1,
@@ -31,26 +33,26 @@
 
       ierr = 0
 
-D     type *, ' --- gen_exops ---'
-D     type *, '     passed operator = ', operator
+D     print *, ' --- gen_exops ---'
+D     print *, '     passed operator = ', operator
 
       IF (operator.EQ.'= ') THEN
         result = gen_sequal (opd1, len1, opd2, len2)
         CALL xcopy (4, result, opd1)
         type1 = 'L4'
-D       type *,'equality test? ', result
+D       print *,'equality test? ', result
 
       ELSE IF (operator.EQ.'<>' .OR. operator.EQ.'><' ) THEN
         result = .NOT. gen_sequal (opd1, len1, opd2, len2)
         CALL xcopy (4, result, opd1)
         type1 = 'L4'
-D       type *,'equality test? ', result
+D       print *,'equality test? ', result
 
       ELSE IF (operator(1:1).EQ.'+') THEN
         CALL xcopy (len2, opd2, opd1(len1+1))
         WRITE (type1(2:), '(I3.3)') len1+len2
 
-D       type *,'resulting string has type ', type1
+D       print *,'resulting string has type ', type1
 
       ELSE
         ierr = 3

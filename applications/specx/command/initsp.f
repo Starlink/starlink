@@ -28,6 +28,15 @@
 *     24 Apr 1994 (rp)
 *        Remove 'DAT_PAR' for non-Unix version -- put in 'FILES'
 *        Add INCLUDE for command table
+*      8 May 2000 (ajc)
+*        Port to Unix
+*        Replace 'TYPE *' with 'PRINT *'
+*        Set FILELUNS= 0 not .FALSE.
+*        Add INCLUDE SPECX_FITS
+*        Remove declaration of NFILE*6 and IFILE1*6
+*        Initialise SHOW_BEAM and DMS
+*        Remove CARRIAGECONTROL and READONLY from OPEN
+*        Unused NFILE, IFILE1
 C-----------------------------------------------------------------------
 
       SUBROUTINE INITSP
@@ -43,6 +52,7 @@ C   Routine to initialize all flags and constants used in SPECX.
       INCLUDE        'MAPTITLES'
       INCLUDE        'NOKEEP'
       INCLUDE        'PLOT2D'
+      INCLUDE        'SPECX_FITS'
       INCLUDE        'SPECX_PARS'
       INCLUDE        'STACKCOMM'
       INCLUDE        'STAKPAR'
@@ -65,7 +75,6 @@ C     INCLUDE        'SAE_FIX'
      &                 INTERACTIVE, TERMDEV, PRINTDEV,
      &                 GSDNAME
 
-      CHARACTER  NFILE*6,IFILE1*6
       CHARACTER  FILENAME*255
       INTEGER    STATUS
 
@@ -134,6 +143,7 @@ C  Versatek, Anadex, VT240 and Tektronix plot parameters
       ERASE_PLOT    = .TRUE.
       SHOW_HEADER   = .TRUE.
       SHOW_2DHEAD   = .TRUE.
+      SHOW_BEAM     = .FALSE.
 
 C  Printer output file
 
@@ -152,7 +162,7 @@ C  Scan transfer
       DO J = 1, MAX_DFILES
         FILNAMS(J)   = ' '
         ACCESS(J)    = ' '
-        FILELUNS(J)  = .FALSE.
+        FILELUNS(J)  = 0
       END DO
 
 C  1-D plots
@@ -166,6 +176,7 @@ C  Maps
 
       NAMEMP  = ' '
       CHANGE_PLOT = .FALSE.
+      DMS = .FALSE.
 
       LINK(1) = 1
       LINK(2) = 2
@@ -243,11 +254,11 @@ C   using NAMELIST directed read
 
       STATUS = IGETLUN (LUN, 'Initsp', .TRUE.)
       OPEN (LUN, FILE=FILENAME, STATUS='OLD', ACCESS='SEQUENTIAL',
-     &      CARRIAGECONTROL='FORTRAN', READONLY, IOSTAT=IERR)
+     &      IOSTAT=IERR)
       IF (IERR.NE.0) THEN
-        TYPE *, 'Error in NAMELIST directed read: '
-        TYPE *, 'Logical name was SPECX_INIT'
-        TYPE *, 'Filename was ', FILENAME
+        PRINT *, 'Error in NAMELIST directed read: '
+        PRINT *, 'Logical name was SPECX_INIT'
+        PRINT *, 'Filename was ', FILENAME
         STOP 'Exiting...'
       END IF
 

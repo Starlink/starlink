@@ -2,6 +2,9 @@
 *     09 Feb 1993
 *        Add a doulbe alias for VLSR_0 to fix call to SETXDOPP and
 *        SETXVEL. Also declare DV and DF double for similar reasons.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused ISB, VTOT
 *-----------------------------------------------------------------------
 
       SUBROUTINE CALC_IMAGE (NQ, LOFREQ, IFFREQ, JFCEN, JFREST, JFINC,
@@ -42,10 +45,7 @@
       LOGICAL   USE_VELS
 
       INTEGER   IERR
-      INTEGER   ISB
       INTEGER   ISTAT
-
-      REAL      VTOT
 
       CHARACTER VFRAME*4
       CHARACTER VDEF*3
@@ -77,31 +77,31 @@
 *     Choose a value of rest frequency applicable to the *observation*.
 *     (value for display comes for free, but is not used...)
 
-D     TYPE *, '-- calc_image --'
-D     TYPE *, '   input value of IQCEN  = ', IQCEN
-D     TYPE *, '   input value of FCEN   = ', FCEN
-D     TYPE *, '   input value of JFCEN  = ', JFCEN
-D     TYPE *, '   input value of JFREST = ', JFREST
-D     TYPE *, '   header value of LOFREQ(1) = ', LOFREQ(NQ)
-D     TYPE *, '   header value of IFFREQ(1) = ', IFFREQ(NQ)
+D     PRINT *, '-- calc_image --'
+D     PRINT *, '   input value of IQCEN  = ', IQCEN
+D     PRINT *, '   input value of FCEN   = ', FCEN
+D     PRINT *, '   input value of JFCEN  = ', JFCEN
+D     PRINT *, '   input value of JFREST = ', JFREST
+D     PRINT *, '   header value of LOFREQ(1) = ', LOFREQ(NQ)
+D     PRINT *, '   header value of IFFREQ(1) = ', IFFREQ(NQ)
 
       CALL SETXFREST (IQCEN, NQ, JFCEN, JFREST, FCEN, FROBS, FRDIS)
 
-D     TYPE *, '   rest freq used for observation, = ', FROBS
+D     PRINT *, '   rest freq used for observation, = ', FROBS
 
 *     Convert header centre frequency JFCEN to telluric value,
 *     returned in FCEN_T (GHz).
 
       USE_LOIF = (LOFREQ(NQ) .NE. 0.D0)
-D     TYPE *, '   use_loif = ', use_loif
+D     PRINT *, '   use_loif = ', use_loif
 
       IF (USE_LOIF) THEN
         FCEN_T = LOFREQ(NQ) + IFFREQ(NQ)
-D       TYPE *, '   telluric centre freq from LO and IF = ', FCEN_T
+D       PRINT *, '   telluric centre freq from LO and IF = ', FCEN_T
       ELSE
         CALL SETXFTCEN (JFCEN(NQ), VFRAME, VDEF,
      &                  VTE, VES, VSL, VLSR, FCEN_T)
-D     TYPE *, '   telluric centre freq from vels = ', FCEN_T
+D     PRINT *, '   telluric centre freq from vels = ', FCEN_T
       END IF
 
 *     Calculate LSR velocity (radio def'n) of centre channel while
@@ -129,13 +129,13 @@ D     TYPE *, '   telluric centre freq from vels = ', FCEN_T
 
       CALL SETXDOPP   (DF, 1, VFRAME, VDEF,
      &                 VTE, VES, VSL, VLSR, FCEN_T, FROBS)
-D     TYPE *, '   corrected frequency offset (MHz) (~2*i.f.) = ', DF
+D     PRINT *, '   corrected frequency offset (MHz) (~2*i.f.) = ', DF
 
 *     Now calculate image_frequency in *source* frame
 *     (cf routine SETXFREQ, with ABS_FREQ = .T. and REST_REL = .T.)
 
       IMAGE_FREQ = 1.D9 * (FROBS + DF/1000.)
-D     TYPE *, '   final image frequency (Hz) = ', image_freq
+D     PRINT *, '   final image frequency (Hz) = ', image_freq
 
       RETURN
       END

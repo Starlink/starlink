@@ -4,6 +4,8 @@
 *        element of a BYTE array, and usually not aligned to be treated
 *        as INTEGER (never mind getting the correct information into the
 *        correct byte).
+*     13 Oct 2000 (ajc):
+*        Report invalid operator
 *-----------------------------------------------------------------------
 
       LOGICAL*4 FUNCTION GEN_PARSEOP (STRING, ST, IST, IFIN,
@@ -131,6 +133,8 @@
 
       IFIN = NEXT - 1
       IF (IFIN.LT.IST) THEN
+        PRINT *, '-- gen_parseop --'
+        PRINT *, '   Invalid operator "',string(ist:next),'"'
         IERR = 3
         GO TO 99
       END IF

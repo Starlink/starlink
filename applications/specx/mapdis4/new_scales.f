@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C------------------------------------------------------------------------------
 
       SUBROUTINE NEW_SCALES (A, P, Q)
@@ -12,12 +15,12 @@ C   Subroutine to set new limits for current plot.
       INCLUDE  'FLAGCOMM'
 
 D     CALL SXGTIDLE
-D     Type *,'Old values of plot box:'
-D     Type *,'X: ',XLIM
-D     Type *,'Y: ',YLIM
-D     Type *,'Values of PQ box:'
-D     Type *,'P: ',P
-D     Type *,'Q: ',Q
+D     Print *,'Old values of plot box:'
+D     Print *,'X: ',XLIM
+D     Print *,'Y: ',YLIM
+D     Print *,'Values of PQ box:'
+D     Print *,'P: ',P
+D     Print *,'Q: ',Q
 D     CALL SXGTTGRAPH
 
       XINVERT = .FALSE.
@@ -78,9 +81,9 @@ C  Which way round should things be?
       IF (YMOD)    CALL AUTORANGE (YLIM(1), YLIM(2), NQINT)
 
 D     CALL SXGTIDLE
-D     Type *,'New values of plot box:'
-D     Type *,'X: ',XLIM
-D     Type *,'Y: ',YLIM
+D     Print *,'New values of plot box:'
+D     Print *,'X: ',XLIM
+D     Print *,'Y: ',YLIM
 D     CALL SXGTTGRAPH
 
 C  Reset the axis lengths: If AX2LEN = 0 then we had automatic selection of
@@ -94,12 +97,12 @@ C  (Later mod: preset aspect ratio for AX1LEN = 0. also)
      &                       PLOTLIMS(1)+5., PLOTLIMS(3)+8.)
 
 D     CALL SXGTIDLE
-D     TYPE *, ' -- new_scales --'
-D     TYPE *, '    Returned from SET-DISPLAY-SIZE'
-D     TYPE *, '                    a(1),   a(2)   = ', a(1),   a(2)
-D     TYPE *, '                    dxlim,  dylim  = ',
+D     PRINT *, ' -- new_scales --'
+D     PRINT *, '    Returned from SET-DISPLAY-SIZE'
+D     PRINT *, '                    a(1),   a(2)   = ', a(1),   a(2)
+D     PRINT *, '                    dxlim,  dylim  = ',
 D    &                      abs(xlim(2)-xlim(1)), abs(ylim(2)-ylim(1))
-D     TYPE *, 'Axis lengths reset: axlenx, axleny = ', axlenx, axleny
+D     PRINT *, 'Axis lengths reset: axlenx, axleny = ', axlenx, axleny
 D     CALL SXGTTGRAPH
       
       CHANGE_PLOT = .TRUE. 

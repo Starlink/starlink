@@ -5,6 +5,8 @@
 *        Replace CHR_UCASE with UUCASE
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*     21 Sep 2000 (ajc):
+*        Unused I, IREP, STRING, FORMAT
 *-----------------------------------------------------------------------
 
       SUBROUTINE SET_MAPSCALE (IFAIL)
@@ -24,7 +26,7 @@
 
 *     Local variables
 
-      INTEGER   I, J, K
+      INTEGER   J, K
       INTEGER   IAP
       INTEGER   ILXU
       INTEGER   ISTAT
@@ -33,9 +35,7 @@
       REAL*4    TEMP(3)
 
       CHARACTER MAPTIT(3)*11, TEMPT(2)*5,  AXTIT(3)*6,
-     &          SUMST(2)*1,
-     &          IREP*1,      STRING*80,   PROMPT*256,
-     &          APROMPT*32,  FORMAT*16
+     &          SUMST(2)*1, PROMPT*256, APROMPT*32
       CHARACTER BOUNDS(2)*10     /'left,right', 'top,bottom'/
 
 *     Other common blocks

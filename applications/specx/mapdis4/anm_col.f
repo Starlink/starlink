@@ -5,7 +5,9 @@
 *        Use uppercase for include file specs.
 *     24 Jun 1998 (bly):
 *        Modified ANMSCR to cater for 1-256 cols in GKS/PGPLOT
-*----6-----------------------------------------------------------------*-------
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
       subroutine wrap(r,g,b)
 
 * wrap up a colour table entry WRAP times
@@ -19,7 +21,7 @@
       g=amod(nwrap*g,1.0)
       b=amod(nwrap*b,1.0)
 
-*     type *, '-- wrap -- (r,g,b) = ', r, g, b
+*     print *, '-- wrap -- (r,g,b) = ', r, g, b
 
       end
 *----6-----------------------------------------------------------------*-------
@@ -49,7 +51,7 @@
       vmax   =  xmax
       logcol = .not. logcol
 
-*     type *, '"logcol" flag = ', logcol
+*     print *, '"logcol" flag = ', logcol
 
       end
 *----6-----------------------------------------------------------------*-------
@@ -73,7 +75,7 @@
       integer i
       real*4    r,g,b
 
-*     type *, '-- anmscr -- i,r,g,b = ', i, r, g, b
+*     print *, '-- anmscr -- i,r,g,b = ', i, r, g, b
 *     if (i.le.255 .and. i.ge.0) then
       if (i.le.256 .and. i.ge.0) then
         col_red(i)=r
@@ -94,7 +96,7 @@
       integer i
  
       call sxgqcol (colmin, colmax) 
-*     type *, '-- set_colours --- min and max colours...',
+*     print *, '-- set_colours --- min and max colours...',
 *    &           colmin, colmax
 
       call coltab(col_num)
@@ -136,7 +138,7 @@
       include 'FLAGCOMM'
 
       call sxgqcol (colmin, colmax)
-*     type *, '-- coltab --  setting colours ', colmin, ' to ', colmax
+*     print *, '-- coltab --  setting colours ', colmin, ' to ', colmax
 
       if (i.eq.1) call colour1(colmin,colmax)
       if (i.eq.2) call colour2(colmin,colmax)

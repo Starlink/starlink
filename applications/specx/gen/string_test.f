@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       LOGICAL*4 FUNCTION STRING_TEST (STRING, LS, ISTAT)
@@ -41,8 +44,8 @@
 
       STRING_TEST = .TRUE.
       IF (STRING(IEND:IEND).NE.'''') THEN
-        TYPE *, '-- string_test --'
-        TYPE *, '  Badly formed string ', STRING(IST:)
+        PRINT *, '-- string_test --'
+        PRINT *, '  Badly formed string ', STRING(IST:)
         ISTAT = 1
       END IF
 

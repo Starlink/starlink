@@ -1,3 +1,7 @@
+C History:
+C     8-May-2000 (ajc):
+C       Port to Linux
+C       Replace 'TYPE *' with 'PRINT *'
 C-----------------------------------------------------------------
 
       SUBROUTINE INDEX_GSD (IERR)
@@ -30,14 +34,15 @@ C  Routine to produce summary listing of GSD Scan files
           ELSE IF ((VERSION-4.9999) .LT. 0.01) THEN
             CALL SPECX_GSD_V5_HEADER (IERR)
           ELSE
-            TYPE *, 'File header version = ', VERSION, ' (read as V5.0)'
+            PRINT *,
+     &        'File header version = ', VERSION, ' (read as V5.0)'
             CALL SPECX_GSD_V5_HEADER (IERR)
           END IF
 
           IF (IERR.NE.0) THEN
-            TYPE *, ' -- index_gsd -- Failed to read GSD file header'
-            TYPE *, '    Scan number:  ', I
-            TYPE *, '    Error number: ', IERR
+            PRINT *, ' -- index_gsd -- Failed to read GSD file header'
+            PRINT *, '    Scan number:  ', I
+            PRINT *, '    Error number: ', IERR
           ELSE
             CALL SPECX_GSD_LIST   (IERR)
           END IF
@@ -45,7 +50,7 @@ C  Routine to produce summary listing of GSD Scan files
           CALL SPECX_GSD_CLOSE  (IERR)
           IF (IERR.NE.0) GO TO 99
         ELSE
-          TYPE *, 'Error opening GSD scan ', I
+          PRINT *, 'Error opening GSD scan ', I
           IERR = 0
         END IF
       END DO

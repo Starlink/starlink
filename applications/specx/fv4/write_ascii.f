@@ -4,6 +4,8 @@
 *        This file exists twice.
 *     02 Jan 1994 (rp):
 *        Use function calls to IGETLUN, IFREELUN
+*     20 July 2000 (ajc):
+*        Remove CARRIAGECONTROL from OPEN
 C-----------------------------------------------------------------------
 
       SUBROUTINE WRITE_ASCII_DATA (XSCALE, IFAIL)
@@ -49,8 +51,7 @@ C-----------------------------------------------------------------------
 *  Open the output file
 
       ISTAT = IGETLUN (LUN, 'write_ascii_data', .TRUE.)
-      OPEN (LUN, FILE=FILENAME, ACCESS='SEQUENTIAL', STATUS='NEW',
-     &      CARRIAGECONTROL='LIST')
+      OPEN (LUN, FILE=FILENAME, ACCESS='SEQUENTIAL', STATUS='NEW' )
 
 *  Write the header information
 
@@ -73,7 +74,7 @@ C-----------------------------------------------------------------------
           DO I = 1, NPTS(NQ)
             NLINE = NLINE+1
             WRITE  (LUN, 100) NLINE, I, XSCALE(NOFF+I), DATA(NOFF+I)
-  100       FORMAT (1X,I4,5X,I4,5X,F12.5,5X,E12.5)
+  100       FORMAT (1X,I4,5X,I4,5X,F9.2,5X,E12.5)
           END DO
         END IF
       END DO

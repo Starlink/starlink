@@ -1,3 +1,8 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
+*        Unused LS
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_decode (intype, instring, retval, istat)
@@ -17,7 +22,7 @@
 
       INTEGER   ierr
       INTEGER   idig, fdig, edig
-      INTEGER   lf, ll, ls, lt
+      INTEGER   lf, ll, lt
       INTEGER   nb
       INTEGER   nbytes
       CHARACTER type*4
@@ -45,7 +50,7 @@
 
 *  Ok, go..
 
-D     Type *, '-- gen_decode --'
+D     Print *, '-- gen_decode --'
 
 *     Either get the value directly (numeric string) or translate symbol.
 *     If result not delayed then value is returned into workspace array
@@ -55,7 +60,7 @@ D     Type *, '-- gen_decode --'
 
       lt = gen_ilen (intype)
       CALL uucase (intype(1:lt))
-      READ (intype(2:lt), '(I)', IOSTAT=ierr, ERR=99) nbytes
+      READ (intype(2:lt), '(I3)', IOSTAT=ierr, ERR=99) nbytes
       IF (intype(:1).ne.'C') THEN
 
         lf = LEN (form)
@@ -65,42 +70,42 @@ D     Type *, '-- gen_decode --'
           form   = 'I'
           WRITE (form(2:lf), '(I2.2)') idig
           ierr = gen_readnum (instring, type, form, ivalue)
-D         Type *,'     integer value read'
+D         Print *,'     integer value read'
         ELSE IF (gen_floating (instring, idig, fdig)) THEN
           type   = 'R4'
           form   = 'F'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1, 
      &                                             MAX (0, fdig)
           ierr = gen_readnum (instring, type, form, rvalue)
-D         Type *,'     real*4 value read'
+D         Print *,'     real*4 value read'
         ELSE IF (gen_eformat (instring, idig, fdig, edig)) THEN
           type   = 'R4'
           form   = 'E'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (instring, type, form, rvalue)
-D         Type *,'     real*4 value read'
+D         Print *,'     real*4 value read'
         ELSE IF (gen_dformat (instring, idig, fdig, edig)) THEN
           type   = 'R8'
           form   = 'E'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (instring, type, form, dvalue)
-D         Type *,'     real*8 value read'
+D         Print *,'     real*8 value read'
         ELSE IF (intype(:1) .eq. 'L') THEN
           type   = 'L4'
           form   = 'L'
           ll     = gen_ilen (instring)
-D         Type *,'     length of input string = ', ll
+D         Print *,'     length of input string = ', ll
           WRITE (form(2:lf), '(I2.2)') ll
-D         Type *,'     reading ',instring(:24),' with form = ', form
+D         Print *,'     reading ',instring(:24),' with form = ', form
           ierr = gen_readnum (instring, type, form, lvalue)
-D         Type *,'     logical value read'
+D         Print *,'     logical value read'
 
         END IF
 
         lt = gen_ilen (type)
-        READ (type(2:lt), '(I)', IOSTAT=ierr, ERR=99) nb
+        READ (type(2:lt), '(I3)', IOSTAT=ierr, ERR=99) nb
         CALL gen_cvt_type (ivalue, type,   nb,
      &                     retval, intype, nbytes, istat)
 

@@ -1,4 +1,6 @@
-
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
         
       SUBROUTINE REFRESH_CLI(STRING)
@@ -14,7 +16,7 @@ C   Routine to fill an empty command line with the contents of STRING
       ICLIST           = GEN_ICHTOT (ISP-1)+1
       CLILINE(ICLIST:) = ' '
 
-D     type *,'Refresh_CLI...New starting position is ',ICLIST
+D     print *,'Refresh_CLI...New starting position is ',ICLIST
 
       IF (ISTR.NE.0) THEN
         CLILINE(ICLIST:) = STRING(:ISTR)//' '

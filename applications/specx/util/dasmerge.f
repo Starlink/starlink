@@ -11,7 +11,7 @@
 *     FORTRAN 77 (Sun)
 *
 * Invocation:
-*     CALL DASMERGE( IFAIL )
+*     CALL DASMERGE( NDROP, ADJQUAD, WIDEBAND, IFAIL )
 *
 * Description:
 *     This is just Remo's dasmerge.spx command implemented in FORTRAN
@@ -75,7 +75,6 @@
 
 
 
-
       IF (NQUAD .GT. 1) THEN
 
          FINC = ABS(JFINC(1))
@@ -101,8 +100,8 @@
      +        NUSE,'I4',NUSE,JDEF)
          CALL GEN_YESNO ('Adjust any DC offset quadrants? ', .FALSE.,
      +        ADJQUAD, JDEF)
-         CALL GEN_YESNO ('Wideband mode (also merge Y spectrum)? ', .FALSE.,
-     +        WIDEBAND, JDEF)
+         CALL GEN_YESNO ('Wideband mode (also merge Y spectrum)? ',
+     +        .FALSE., WIDEBAND, JDEF)
 
 C         print *,'NUSE = ',NUSE
 C         IF (ADJQUAD) print *,'ADJ quad is true'
@@ -201,6 +200,7 @@ C Now finally concatinate X and Y and do a final merge
 
          CALL CONCATSP(IFAIL)
          CALL MERGE(XSCALE,IFAIL)
+
       ENDIF
 
       END

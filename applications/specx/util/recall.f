@@ -3,6 +3,8 @@
 *        In order to adapt to the new STACKCOMM, do not use TSYS in
 *        EQUIVALENCE, since it is no longer at the beginning of the
 *        common block.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE RECALL (IREG)
@@ -17,7 +19,7 @@ C   Retrieves contents of storage register(IREG) and places in stack.
       EQUIVALENCE (STACK(1),SCAN_HEADER(1))
 
       IF(IREG.GT.5.OR.IREG.LT.1) THEN
-        TYPE *,'*** Illegal register: 1 .LE. IREG .LE. 5 ***'
+        PRINT *,'*** Illegal register: 1 .LE. IREG .LE. 5 ***'
         RETURN
       END IF
 

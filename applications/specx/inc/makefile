@@ -60,7 +60,7 @@ OBJS = ${FSOURCES:.f=.o} ${FCPPSOURCES:.F=.o} ${CSOURCES:.c=.o}
 .f.o:
 	${FC} ${FFLAGS} -c $<
 
-all: lib${LIB}.a
+all:
 
 # Remove intermediates
 clean:	

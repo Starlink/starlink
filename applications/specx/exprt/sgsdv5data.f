@@ -9,6 +9,14 @@ C   inputs measured and output frequency resolution.
 
 C   22-NOV-1991: REVAD::JFL Original version.
 C   18-Nov-1991: JCMT::RMP  Incorporate Rachaels latest fixes (to IDRA)
+C   08-MAY-2000 AJC
+C      Port to Linux
+C      Replace TYPE with PRINT
+C      Don't split strings across lines
+C      Unused NO_QUADS, NQ, NSEG
+C      Initialised CONNECTED to .FALSE. and NIF to 0 (so Linux behaves
+C       the same as other platforms)
+C-
 
       IMPLICIT  NONE
 
@@ -41,10 +49,7 @@ C   Formal parameters
       INTEGER*4 KNT
       INTEGER*4 LVAL
       INTEGER*4 NBYTES
-      INTEGER*4 NO_QUADS
-      INTEGER*4 NQ
       INTEGER*4 NS
-      INTEGER*4 NSEG
       INTEGER*4 QUAD
       INTEGER*4 STATUS
       REAL*4    X2Y_RAD
@@ -81,6 +86,8 @@ C   Formal parameters
 
       IERR = 0
       STATUS = ADAM__OK
+      CONNECTED = .FALSE.
+      NIF = 0
 
 D     WRITE (ILOUT,*) '-- SPECX_GSD_V5_DATA --'
 D     WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
@@ -226,10 +233,10 @@ D     WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
 D     WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
       X_OFFSET = X_OFFSET * DX
       Y_OFFSET = Y_OFFSET * DY
-      WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,
-     &               '') arcsec'')')  x_offset, y_offset
-      WRITE (ILOUT,'(10X,''rotation angles: x2y = '',F6.1,
-     &               '' deg.; v2y = '',F6.1,'' deg.'')') X2Y, V2Y
+      WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,'//
+     &               ''') arcsec'')')  x_offset, y_offset
+      WRITE (ILOUT,'(10X,''rotation angles: x2y = '',F6.1,'//
+     &               ''' deg.; v2y = '',F6.1,'' deg.'')') X2Y, V2Y
 
 C    ..then convert to R.A. and Dec. offsets
 
@@ -240,8 +247,8 @@ C    ..then convert to R.A. and Dec. offsets
      &          + SIN (V2Y_RAD)           * Y_OFFSET
       DDEC    =   COS (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + COS (V2Y_RAD)           * Y_OFFSET
-      WRITE (ILOUT,'(10X,''(r,d) offset = ('',F6.1,'','',F6.1,
-     &               '') arcsec'')')  dra, ddec
+      WRITE (ILOUT,'(10X,''(r,d) offset = ('',F6.1,'','',F6.1,'//
+     &               ''') arcsec'')')  dra, ddec
 
 C  Fix up integration time for last spectrum
 
@@ -260,7 +267,6 @@ C  Fix up integration time for last spectrum
 
 *  see if this quadrant was connected to the current IF input and has matching
 *  frequency resolution
-
             IF (NO_IF_PER_BES .EQ. 1) THEN
                IF ((BES_CONN(QUAD) .EQ. IFIN(1,NS)) .AND.
      :             (FR_TEMP(QUAD) .EQ. RESIN(NS)))  THEN
@@ -409,7 +415,7 @@ C     Print out a picture of the stack with new spectra showing...
 C  Standard return
 
    99 IF (STATUS.NE.ADAM__OK) THEN
-        TYPE '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
+        PRINT '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
       END IF
 
       END

@@ -1,5 +1,6 @@
-
-*-----------------------------------------------------------------------
+*  History:
+*     31 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_GETIT3 (STRING, LEVEL, IST, IFIN, ICHAR, IERR)
@@ -63,8 +64,8 @@ C   comma, comma/blank sequence and pure blank sequence are all also valid.
       IST   = 1
       IFIN  = 1
 
-*     Type *,'Entry to GENLIB: input string below'
-*     Type *, string
+*     Print *,'Entry to GENLIB: input string below'
+*     Print *, string
 
 C  Suppress leading blanks.
 
@@ -76,7 +77,7 @@ C  If this now takes us past the end of the string then string is empty
 
       IF (ICHAR.GT.ILS) THEN
         IERR = 2
-*       Type *, '--getit3-- empty string'
+*       Print *, '--getit3-- empty string'
         RETURN
       END IF
 
@@ -87,8 +88,8 @@ C  At level 5 we just want the whole string
       IF (LEVEL.EQ.5) THEN
         IFIN  = ILS
         ICHAR = IFIN + 1
-*       Type *, '--getit3-- level 5 request'
-*       Type *, '  returned item: ', string(ist:ifin)
+*       Print *, '--getit3-- level 5 request'
+*       Print *, '  returned item: ', string(ist:ifin)
         RETURN
       END IF
 
@@ -125,7 +126,7 @@ C     Case 2; other character, look for next delimiter to finish
 C           Need to skip to end of hollerith string
             IL = GEN_IENDCH (STRING(J:))
             IF (IL.LE.2) THEN
-              Type *,'Missing '' in GETIT3 - abandoning'
+              Print *,'Missing '' in GETIT3 - abandoning'
               IERR = 4
               RETURN
             END IF
@@ -134,7 +135,7 @@ C           Need to skip to end of hollerith string
           ELSE IF (CHAR.EQ.LBKT) THEN          ! No, expression or list
             CALL GET_SUBEXPR (STRING(J:), I1, IL, IERR)
             IF (IERR.NE.0) THEN
-              Type *,'Missing parenthesis in GETIT3 - abandoning'
+              Print *,'Missing parenthesis in GETIT3 - abandoning'
               IERR = 5
               RETURN
             END IF
@@ -159,8 +160,8 @@ C           Need to skip to end of hollerith string
 
       END IF
 
-D     Type *, '--getit3--'
-D     Type *, '  returned item: ', string(ist:ifin)
+D     Print *, '--getit3--'
+D     Print *, '  returned item: ', string(ist:ifin)
 
       RETURN
       END

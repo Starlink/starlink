@@ -1,6 +1,8 @@
 *  History:
 *     22 Nov 1993 (hme):
 *        Remove TABs.
+*     20 Sep 2000 (ajc):
+*        unused GEN_ILEN
 *-----------------------------------------------------------------------
 
       SUBROUTINE WRITE_GILDAS (IERR)
@@ -26,10 +28,6 @@
       LOGICAL   GDF_ERROR
       INTEGER   ISTAT
       CHARACTER TITLE*80
-
-*     Functions:
-
-      INTEGER   GEN_ILEN
 
 *  Ok? go...
 

@@ -8,6 +8,9 @@
 *     15 Jun 1995 (rp)
 *        Update to increase number of channels if necessary to cover full
 *        width of original spectrum.
+*      6 Jun 2000 (ajc):
+*        Replace 'type *' with 'PRINT *'
+*        Unused IERR, NEWCH
 C------------------------------------------------------------------
 
       SUBROUTINE REGRID (NQ, XSCALE, BUF, IFAIL)
@@ -36,7 +39,6 @@ C     Local variables
 
       LOGICAL   FCSAVE
       INTEGER   I
-      INTEGER   IERR
       INTEGER   ISTAT
       INTEGER   JMID
       INTEGER   NBOT
@@ -55,7 +57,6 @@ C     Local variables
       REAL*8    XMID_NEW
       REAL*8    XFACOLD
       REAL*8    XFAC8(8)
-      CHARACTER NEWCH*1
 
 C     Functions:
 
@@ -134,11 +135,11 @@ C     for any other value...
       CALL GEN_GETI4 ('Number of output channels? ',
      &                 NOUT,  'I5',  NOUT,  ISTAT)
 
-D     TYPE *, ' -- regrid --'
-D     TYPE *, '    First and last XSCALE values: ',
+D     PRINT *, ' -- regrid --'
+D     PRINT *, '    First and last XSCALE values: ',
 D    &             XSCALE(1), XSCALE(NPTS(NQ))
-D     TYPE *, '    JFINC, XFACOLD, XFAC8(NQ), GRIDN, GRIDNN'
-D     TYPE *, '    ', JFINC(NQ), XFACOLD, XFAC8(NQ), GRIDN, GRIDNN
+D     PRINT *, '    JFINC, XFACOLD, XFAC8(NQ), GRIDN, GRIDNN'
+D     PRINT *, '    ', JFINC(NQ), XFACOLD, XFAC8(NQ), GRIDN, GRIDNN
 
       GRIDN = GRIDNN
 
@@ -155,14 +156,14 @@ C     (Squeeze up data if we have empty spaces, expand it otherwise)
 C     Update frequency interval
 
       JFINC(NQ)   = JFINC(NQ)*(GRIDN/XFACOLD)
-D     TYPE *, '    Final JFINC = ', JFINC(NQ)
+D     PRINT *, '    Final JFINC = ', JFINC(NQ)
 
 C     Since the centre freq etc may have shifted, fix up header parameters
 C     Give channel shift in units of new channels.
 
       CHAN_SHIFT = (XMID_NEW - XMID)/GRIDN
 
-      TYPE *, 'Shift of ', CHAN_SHIFT, ' channels: fixup headers'
+      PRINT *, 'Shift of ', CHAN_SHIFT, ' channels: fixup headers'
 
       CALL LSRCOR (LSRFLG, VSL,   VES,     VTE,    VLSR,
      &             IDATE,  ITIME, IUTFLG,  RA,     DEC,
@@ -181,7 +182,7 @@ C     -----------
 C     Error return
 
    99 CONTINUE
-      TYPE *,'Current X-data may have been corrupted!'
+      PRINT *,'Current X-data may have been corrupted!'
       RETURN
 
       END

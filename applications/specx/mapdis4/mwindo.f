@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE MWINDO (SCALE, NPTS, IFAIL)
@@ -40,7 +43,6 @@ C  same order as data coming from map file).
       INTEGER    I
       INTEGER    NX
       INTEGER    N1, N2
-
       REAL       EPS
       REAL       X1, X2
 
@@ -54,25 +56,26 @@ C  same order as data coming from map file).
 C  SETMAX is a function equivalent to SETX to SET Map AXes - generates a
 C  SCALE array containing all values from start to end.
 
-D     Type *,'--MWINDO--'
+D     PRINT *,'--MWINDO--'
       DO I = 1,3
+
         IF (I.EQ.1) THEN
           CALL SETMAX (SCALE, MSTEP, CELL_XSIZE)
           NX = MSTEP
-D         Type *,'R.A. calculation'
+D         PRINT *,'R.A. calculation'
         ELSE IF (I.EQ.2) THEN
           CALL SETMAX (SCALE, NSTEP, CELL_YSIZE)
           NX = NSTEP
-D         Type *,'Dec. calculation'
+D         PRINT *,'Dec. calculation'
         ELSE
           CALL SETXNEW (SCALE, IFAIL)
           PFAC(3) = XFAC(1)
           NX = NPTS
-D         Type *,'Vel. calculation'
+D         PRINT *,'Vel. calculation'
         END IF
 
         IF (IFAIL.NE.0) THEN
-          TYPE *,' --- mwindo ---  error in spectral-axis calculation'
+          PRINT *,' --- mwindo ---  error in spectral-axis calculation'
           RETURN
         END IF
 
@@ -87,14 +90,14 @@ D         Type *,'Vel. calculation'
         CBEG(I) = X1
         CEND(I) = X2
 
-D       Type *,'MWINDO - calculation for axis ',I
-D       Type *,'  plimits return status = ', IFAIL
-D       Type *,'  Range:     ', PBEG(I),PEND(I)
-D       Type *,'  Intervals: ', N1,N2
-D       Type *,'  Fractions: ', PF1(I),PF2(I)
-D       Type *,'  Pixel vals:', CBEG(I),CEND(I)
-D       Type *,'  #pixels:   ', NAX(I)
-D       Type *,'  Offset:    ', IOFF(I)
+D       PRINT *,'MWINDO - calculation for axis ',I
+D       PRINT *,'  plimits return status = ', IFAIL
+D       PRINT *,'  Range:     ', PBEG(I),PEND(I)
+D       PRINT *,'  Intervals: ', N1,N2
+D       PRINT *,'  Fractions: ', PF1(I),PF2(I)
+D       PRINT *,'  Pixel vals:', CBEG(I),CEND(I)
+D       PRINT *,'  #pixels:   ', NAX(I)
+D       PRINT *,'  Offset:    ', IOFF(I)
 
       END DO
 
@@ -143,13 +146,13 @@ C     it is actually IN the array or not.
 
       X1 = XLOCATE (X, N, DX, V1, IFAIL)
       IF (IFAIL.NE.0) THEN
-D        Type *,'Problem locating first value in range'
+D        PRINT *,'Problem locating first value in range'
         IFAIL = 0
       END IF
 
       X2 = XLOCATE (X, N, DX, V2, IFAIL)
       IF (IFAIL.NE.0) THEN
-D       Type *,'Problem locating second value in range'
+D       PRINT *,'Problem locating second value in range'
         IFAIL = 0
       END IF
 
@@ -210,7 +213,6 @@ C   x-value XBAR.  Derived from XSNART
       INTEGER IFAIL
 
 *  Ok, go...
-
       XLOCATE = 1.0
 
       IF (DX.EQ.0.0) THEN
@@ -224,10 +226,10 @@ C   x-value XBAR.  Derived from XSNART
         IFAIL  = 26
       END IF
 
-D     Type *,'-- XLOCATE --'
-D     Type *,'n, dx, xbar: ', n, dx, xbar
-D     Type *,'x: ',xscale(1),' ... ',xscale(n)
-D     Type *,'xlocate: ', xlocate
+D     PRINT *,'-- XLOCATE --'
+D     PRINT *,'n, dx, xbar: ', n, dx, xbar
+D     PRINT *,'x: ',xscale(1),' ... ',xscale(n)
+D     PRINT *,'xlocate: ', xlocate
 
       RETURN
       END

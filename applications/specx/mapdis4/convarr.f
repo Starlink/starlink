@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused K
 *-----------------------------------------------------------------------
 
       SUBROUTINE CONVARR (A1, M1, N1, A2, M2, N2, BADPIX, IFAIL)
@@ -26,7 +30,7 @@ C   Parameters:
 C   Miscellaneous variables
 
       LOGICAL*4 INTERP
-      INTEGER*4 I,J,K,M,N         ! Counters for output array
+      INTEGER*4 I,J,M,N         ! Counters for output array
       INTEGER*4 II, JJ            ! More counters for input array.
       INTEGER*4 II1, II2          ! Left and right boundaries of original cell
       INTEGER*4 JJ1, JJ2          ! Bottom and top boundaries of original cell
@@ -49,18 +53,18 @@ C     Find interpolation factors
 
       INX   = (M2-1)/(M1-1)
       INY   = (N2-1)/(N1-1)
-D     TYPE *, 'Interpolating factors: INX, INY = ', INX, INY
+D     PRINT *, 'Interpolating factors: INX, INY = ', INX, INY
 
 C     How far to interpolate?
 
       IXMAX = 2*INX
       IYMAX = 2*INY
-D     TYPE *, 'Interp func. radii: IXMAX,IYMAX = ', IXMAX, IYMAX
+D     PRINT *, 'Interp func. radii: IXMAX,IYMAX = ', IXMAX, IYMAX
 
 C   Check that weights array is small enough
 
       IF (IXMAX.GT.IWMAX .OR. IYMAX.GT.IWMAX) THEN
-        TYPE *,'Maximum radius of interp''g function exceeded'
+        PRINT *,'Maximum radius of interp''g function exceeded'
         IFAIL = 18
         RETURN
       END IF
@@ -90,11 +94,11 @@ C     Set up the weights array (to save working out lots of trig functions later
       END DO
 
 D     IF (IXMAX.LE.10) THEN
-D       Type *
-D       Type *,'Weights array:'
+D       PRINT *
+D       PRINT *,'Weights array:'
 D       Type '(<IXMAX+1>(2X,F9.5))',((WEIGHT(I,J),I=0,IXMAX),J=0,IYMAX)
 D     ELSE
-D       Type *,'Weights array: too big to type out!'
+D       PRINT *,'Weights array: too big to type out!'
 D     END IF
 
 C     Then do the interpolation: M & N are indices in output array.

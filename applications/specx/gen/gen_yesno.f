@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      1 Aug 2000 (ajc):
+*        Re-write illegal concatenation
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_YESNO(PROMPT,DEFAULT,TEST,IERR)
@@ -18,6 +20,7 @@ C  otherwise.
       LOGICAL   DEFAULT,TEST
 
       INTEGER*4 GEN_ILEN
+      CHARACTER*80 PSTRING
 
 * Ok, go..
 
@@ -26,7 +29,9 @@ C  otherwise.
       IF (DEFAULT) CHDEF = 'Y'
 
       LP = GEN_ILEN (PROMPT)
-      CALL GEN_GETSTR2 (1, PROMPT(:LP)//' (Y/N)', CHDEF, 'A1', CH, IERR)
+      PSTRING = PROMPT(:LP)
+      PSTRING(LP+1:) = ' (Y/N)'
+      CALL GEN_GETSTR2 (1, PSTRING, CHDEF, 'A1', CH, IERR)
       IF (IERR.LT.0)  RETURN
 
       CALL UUCASE (CH)

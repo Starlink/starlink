@@ -4,7 +4,10 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Eliminate call to CHR_UCASE
-
+*      1 Aug 2000 (ajc):
+*        Missing commas in FORMAT
+*        Change TYPE * to PRINT *
+*        Unused in SCL_PREPARSE: J
 *-----------------------------------------------------------------------
 
       SUBROUTINE SCL_PREPARSE (STRING, COMMAND, ERROR)
@@ -31,7 +34,7 @@
 
 *     Local variables
 
-      INTEGER*4 I, J, ILS
+      INTEGER*4 I, ILS
       CHARACTER BL*1        /' '/
 
       INTEGER*4 IST
@@ -53,7 +56,7 @@
 
 *  Debug output
 
-D     TYPE *,'input string  --> ', string(i:60)
+D     PRINT *,'input string  --> ', string(i:60)
 
 *  Parse:
 
@@ -82,7 +85,7 @@ D     TYPE *,'input string  --> ', string(i:60)
 
         CALL SCL_PARSE (STRING, I, IST, IEND, NEXT, IERR)
 
-D       Type *,'Parsed command: ', string(ist:iend)
+D       Print *,'Parsed command: ', string(ist:iend)
 
         IF (STRING(NEXT:NEXT+1) .EQ. ':=') THEN
           COMMAND = ':='
@@ -111,8 +114,8 @@ D       Type *,'Parsed command: ', string(ist:iend)
 
 *  Debug output
 
-D     TYPE *,'output command --> ', command
-D     TYPE *,'output string  --> ', string(:60)
+D     PRINT *,'output command --> ', command
+D     PRINT *,'output string  --> ', string(:60)
 
       RETURN
       END
@@ -160,8 +163,8 @@ D     TYPE *,'output string  --> ', string(:60)
       IST  = ST
       IFIN = ST
 
-D     Type *,'-- scl_parse --'
-D     Type *,'   input string: ', string(st:ils)
+D     Print *,'-- scl_parse --'
+D     Print *,'   input string: ', string(st:ils)
 
 *  Suppress leading blanks.
 

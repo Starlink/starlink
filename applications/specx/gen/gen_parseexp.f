@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*     21 Sep 2000 (ajc):
+*        Unused CONTINUE
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_parseexp (string, ils, next)
@@ -17,7 +19,6 @@
 
 *     Local variables:
 
-      LOGICAL*4 continue
       CHARACTER char*1
 
 *  Ok, go..

@@ -25,6 +25,7 @@
 *  Authors:
 *     rp: Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     ajc: Alan Chipperfield (Starlink, RAL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,9 @@
 *        If the map file cannot be opened for another reason than that
 *        it does not exist, then set returned IFAIL to 10 rather than
 *        leaving it at some NDF or HDS error code.
+*     16 Oct 2000 (ajc):
+*        NDF_OPEN may return DAT__FILNF OR NDF__FILNF depending upon
+*         whether or not on-the-fly NDF conversion is enabled 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -55,6 +59,7 @@
 
 *  Global Constants:
       INCLUDE  'DAT_ERR'
+      INCLUDE  'NDF_ERR'
 
 *  Global Variables:
       INCLUDE  'FLAGCOMM'
@@ -105,10 +110,12 @@
 *  If that fails, ask user and try to create a new file.
 *  Try the new file only if the old one did not exist. OPEN_SPECX_MAP
 *  may return because the file existed but is protected.
-      IF ( IFAIL .EQ. DAT__FILNF ) THEN
+      IF ( ( IFAIL .EQ. DAT__FILNF ) .OR.
+     :     ( IFAIL .EQ. NDF__FILNF ) ) THEN
          IFAIL = 0
          CALL GEN_YESNO( 'Map file does not exist: open a new one?',
      :      .FALSE., OPEN_IT, JDEF )
+
          IF ( OPEN_IT ) CALL CREATE_SPECX_MAP (IFAIL)
       ELSE IF ( IFAIL .NE. 0 ) THEN
          IFAIL = 10

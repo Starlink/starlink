@@ -1,7 +1,9 @@
-C History:
-C   01-Aug-1995 (rpt):
-C    ICOLOR support added.
-C
+*  History:
+*     01-Aug-1995 (rpt):
+*       ICOLOR support added.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Declare RANGE external for Linux
 C-----------------------------------------------------------------------
 
       SUBROUTINE DRAW_PLOT (IAXIS, DATA, XSCALE, XW1, YW1,
@@ -25,6 +27,8 @@ C                      if ICOLOR is negative, its absolute
 C                      value is the start color of a color
 C                      cycle over quadrants
 C       BADPIX_VAL : Magic value for plots.
+
+      EXTERNAL RANGE
 
       INTEGER   IAXIS
       REAL      DATA(*)
@@ -124,7 +128,7 @@ C     Do plots,each quadrant.....
       DO NQ = 1,NQUAD
         IF (MASK(NQ).NE.0)   THEN
 
-*          TYPE *, 'Quadrant # = ', NQ
+*          PRINT *, 'Quadrant # = ', NQ
 
 C         Find first good point in data
 
@@ -146,7 +150,7 @@ C         histogram if wanted, and plot
 
             NPPTS = I2+1-I1
 
-*           TYPE *, 'Data stretch: ', I1, ' to ', I2, 
+*           PRINT *, 'Data stretch: ', I1, ' to ', I2, 
 *    &              '(length=', NPPTS, ')'
 
 C           Copy data (with window that preserves magic values)
@@ -163,7 +167,7 @@ C           Copy data (with window that preserves magic values)
 
               IF (ITIP.NE.0)   THEN
                 IF (NPPTS.GT.2048)   THEN
-                  TYPE *,'***  Too many points for histogram ***'
+                  PRINT *,'***  Too many points for histogram ***'
                 ELSE
                   CALL MKHIS (XPLOT, YPLOT, NPPTS, XFAC(NQ))
                 END IF
@@ -171,7 +175,7 @@ C           Copy data (with window that preserves magic values)
 
 C             Plot and go back for more
  
-*             TYPE *, 'Final value of NPPTS = ', NPPTS
+*             PRINT *, 'Final value of NPPTS = ', NPPTS
 
               CALL SXGCONNECT (XPLOT, YPLOT, NPPTS)
             END IF

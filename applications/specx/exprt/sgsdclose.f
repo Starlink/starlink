@@ -4,6 +4,11 @@ C-----------------------------------------------------------------
 
 C   Routine to open a GSD file containing a generalized observation
 
+C History:
+C    8-May-2000 (ajc):
+C      Port to Linux
+C      Replace 'TYPE *" with 'PRINT *'
+C-
       IMPLICIT  NONE
 
       INTEGER*4 ADAM__OK
@@ -21,7 +26,7 @@ C  Close the GSD file
       CALL GSD_CLOSE (IFD, STATUS)
       GSD_OPEN = .FALSE.
       IF (STATUS.NE.ADAM__OK) THEN
-        type *,'Error closing GSD file - status',status
+        PRINT *,'Error closing GSD file - status',status
         IERR = 10
         GO TO 99
       END IF
@@ -29,7 +34,7 @@ C  Close the GSD file
 C  Standard return
 
    99 IF (STATUS.NE.ADAM__OK) THEN
-        type '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
+        PRINT '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
       END IF
 
       RETURN

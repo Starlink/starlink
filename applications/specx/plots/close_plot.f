@@ -5,6 +5,8 @@
 *        Replace FIO_PUNIT with IFREELUN
 *     15 Jan 1994 (rp):
 *        Parameterize array sizes from SPECX_PARS
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE CLOSE_PLOT (JPLOT, IPSEQ, IDEV)
@@ -36,7 +38,7 @@ C  If device is not a terminal, then plot the file on chosen device
 
       IF (IDEV.GE.20) THEN
 
-        TYPE *,'Disposing of existing plot file...'
+        PRINT *,'Disposing of existing plot file...'
 
 C       Initialize plot device and plot
 

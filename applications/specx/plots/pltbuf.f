@@ -14,6 +14,14 @@
 *        Rationalize LCOLOR/ICOLOR and include files, test ICOLOR in range
 *     07-Oct-1995 (rp):
 *        Modify Y-axis autoscaling to exclude out-of-X-range values.
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Change TYPE * to PRINT *
+*        Invalid X specifier
+*        Unused in PLTBUF: VELDAT, IFREELUN
+*               in PLTHEAD: I
+*     07 Mar 2002 (rpt):
+*        Change test USB/LSB to look at sign iffreq
 C-------------------------------------------------------------------------
 
       SUBROUTINE PLTBUF (XSCALE, IFAIL)
@@ -45,7 +53,6 @@ C     Local variables:
       INTEGER   ISTAT
       INTEGER   IERR
       INTEGER   IWEIGHT
-      INTEGER   VELDAT
       INTEGER   ILYN, ILYU
       INTEGER   STATUS
       LOGICAL   ICONT
@@ -61,7 +68,6 @@ C     Functions:
 
       INTEGER    GEN_ILEN
       INTEGER    IGETLUN
-      INTEGER    IFREELUN
 
 C  Ok, go...
 
@@ -73,7 +79,7 @@ C     Set plot parameters (line weight, title, histogram or no...)
       CALL GEN_GETI4 ('Color for plot [1-15]?',
      &                 ICOLOR, 'I3', ICOLOR, ISTAT)
       IF (ABS(ICOLOR).lt.1 .or. ABS(ICOLOR).gt.15) THEN
-        TYPE *, 'Colour must be in range [1--15]; using 1'
+        PRINT *, 'Colour must be in range [1--15]; using 1'
         ICOLOR = 1
       END IF
 
@@ -109,7 +115,7 @@ C   Open the plot file
       IF(IERR.NE.0)   THEN
         CALL GEN_ERMSG (IERR)
         IFAIL = 40
-        TYPE *,'Error opening plot file: file=', filnam
+        PRINT *,'Error opening plot file: file=', filnam
         RETURN
       END IF
 
@@ -128,9 +134,9 @@ C   X- and Y-axis labelling
       ILYU    = GEN_ILEN (YAXIS_UNITS)
       YTITLE  = YAXIS_NAME(:ILYN) // '  (' // YAXIS_UNITS(:ILYU) // ')'
 
-D     TYPE *, ' -- pltbuf --'
-D     TYPE *, '    xtitle = ', xtitle
-D     TYPE *, '    ytitle = ', ytitle
+D     PRINT *, ' -- pltbuf --'
+D     PRINT *, '    xtitle = ', xtitle
+D     PRINT *, '    ytitle = ', ytitle
 
 C   Set up plot limits
 
@@ -202,7 +208,6 @@ C   Write the plot description and first set of XY pairs to the file
 
 *     Local variables
 
-      INTEGER*4 I
       INTEGER*4 IERR
       INTEGER*4 NQ
       REAL*4    XCEN
@@ -230,16 +235,17 @@ C   Write the plot description and first set of XY pairs to the file
       WRITE  (PLOT_HEADER, 15, IOSTAT=IERR) RASTRING, DECSTRING,
      &                                      DRA, DDEC
    15 FORMAT ('Map centre: ',A12,' ',A12,'; ',
-     &            'Offset(R,D): ('F8.1,X,F8.1') arcsec')
+     &            'Offset(R,D): (',F8.1,1X,F8.1,') arcsec')
       WRITE  (PLOT_UNIT) PLOT_HEADER
 
       XNTT = FLOAT(INTT)/1000.
       SB = 'USB'
-      IF (JFCEN(1)/1E+06 .LT. LOFREQ(1)) SB = 'LSB'
+C      IF (JFCEN(1)/1E+06 .LT. LOFREQ(1)) SB = 'LSB'
+      IF (IFFREQ(1) .LT. 0) SB = 'LSB'
       WRITE  (PLOT_HEADER, 20, IOSTAT=IERR) XNTT, EL, VLSR, SB
-   20 FORMAT ('Int''n time: 'F8.2' sec; ',
-     &        'Elevation: 'F4.1' deg; ',
-     &        'Vlsr: 'F7.1' km/s  ',A3)
+   20 FORMAT ('Int''n time: ',F8.2,' sec; ',
+     &        'Elevation: ',F4.1,' deg; ',
+     &        'Vlsr: ',F7.1,' km/s  ',A3)
       WRITE  (PLOT_UNIT) PLOT_HEADER
 
       WRITE  (PLOT_HEADER, 30)

@@ -10,6 +10,12 @@ C   quadrant is specified by the GSD array C3BESSPEC.
 C   22-NOV-1991 REVAD::JFL Original version.
 C   18-NOV-1991 JCMT::RMP  Incorporate Rachael's latest mods (to IDRA)
 C   04-AUG-1992 JCMT::CJM  Minor mod to get round problem of missing C10LO
+C   08-MAY-2000 AJC
+C      Port to Linux
+C      Replace TYPE with PRINT
+C      Don't split strings across lines
+C      Unused NO_QUADS, NQ, NSEG, JJ, BES_CONN, CSTART, CEND, CDIMVAL
+C-
 
       IMPLICIT  NONE
 
@@ -42,10 +48,7 @@ C   Formal parameters
       INTEGER*4 KNT
       INTEGER*4 LVAL
       INTEGER*4 NBYTES
-      INTEGER*4 NO_QUADS
-      INTEGER*4 NQ
       INTEGER*4 NS
-      INTEGER*4 NSEG
       INTEGER*4 QUAD
       INTEGER*4 STATUS
       REAL*4    X2Y_RAD
@@ -66,16 +69,11 @@ C   Formal parameters
 
       INTEGER*4 IND_GSD(GSD__SZINDEX)
       INTEGER*4 IND_BESSPEC(GSD__SZINDEX)
-      INTEGER*4 JJ
       INTEGER*4 NSPEC
       INTEGER*4 NO_BE_O_CH
-      INTEGER*4 BES_CONN (32)
       INTEGER*4 BES_SPECTRUM (16)
       INTEGER*4 NO_BES_O_CH (16)
       INTEGER*4 SUBSYS (16)
-      INTEGER*4 CSTART (2)
-      INTEGER*4 CEND (2)
-      INTEGER*4 CDIMVAL (2)
       INTEGER*4 ACTVALS (2)
 
       IERR = 0
@@ -183,10 +181,10 @@ D     WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
 D     WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
       X_OFFSET = X_OFFSET * DX
       Y_OFFSET = Y_OFFSET * DY
-      WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,
-     &               '') arcsec'')')  x_offset, y_offset
-      WRITE (ILOUT,'(10X,''rotation angles: x2y = '',F6.1,
-     &               '' deg.; v2y = '',F6.1,'' deg.'')') X2Y, V2Y
+      WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,'//
+     &               ''') arcsec'')')  x_offset, y_offset
+      WRITE (ILOUT,'(10X,''rotation angles: x2y = '',F6.1,'//
+     &               ''' deg.; v2y = '',F6.1,'' deg.'')') X2Y, V2Y
 
 C    ..then convert to R.A. and Dec. offsets
 
@@ -196,8 +194,8 @@ C    ..then convert to R.A. and Dec. offsets
      &          + SIN (V2Y_RAD)           * Y_OFFSET
       DDEC    =   COS (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + COS (V2Y_RAD)           * Y_OFFSET
-      WRITE (ILOUT,'(10X,''(r,d) offset = ('',F6.1,'','',F6.1,
-     &               '') arcsec'')')  DRA, DDEC
+      WRITE (ILOUT,'(10X,''(r,d) offset = ('',F6.1,'','',F6.1,'//
+     &               ''') arcsec'')')  DRA, DDEC
 
 C  Fix up integration time for last spectrum
 
@@ -362,7 +360,7 @@ C     Print out a picture of the stack with new spectra showing...
 C     Standard return
 
    99 IF (STATUS.NE.ADAM__OK) THEN
-        TYPE '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
+        PRINT '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
       END IF
 
       END

@@ -19,6 +19,16 @@
 *     argument SIGCODE whether Specx is just starting up (zero), or is
 *     recovering from a signal (non-zero).
 
+*  Notes:
+*     1. The VMS system for printer output has never worked on Unix. It
+*        relied on the non-standard CLOSE parameter 'DISP='PRINT/DELETE'
+*        but the CLOSE was never invoked anyway because the default output
+*        filename had not been changed in the code for Unix.  Therefore 
+*        the system has been changed in V6.7-8.  Printer output will now
+*        be written to the default output filename (fort.nn on current
+*        patforms) and kept when the output is closed.  A second 
+*        SET-LIST-FILE P command could result in the file being overwritten.
+
 *  Usage:
 *     specx [ { -nm | -m <mapfile> } ] [ { -nd | -d <dumpfile> } ]
 
@@ -32,6 +42,7 @@
 *     rp:  Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     rpt: Remo Tilanus (JAC, Hilo)
+*     ajc: Alan Chipperfield (RAL, Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +101,16 @@
 *     06 Oct 1995 (hme):
 *        In order to make work the re-entry into this routine after an
 *        interrupt, add a SAVE statement.
+*      1 Aug 2000 (ajc):
+*        Remove HASH_TAB structure
+*        Change TYPE * to PRINT *
+*        ANM_COLS Colors 257 from 256 
+*        Unused IDUM, LASTCL, GEN_LINENO
+*        Change DISP= to STATUS= in CLOSE
+*        Remove attempt to print printer output after every command.
+*      9 May 2001 (ajc)
+*        Remove unused IEXIST, FOPEN, ASCII_LUN
+*-----------------------------------------------------------------------
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,7 +216,7 @@
             CHARACTER * (    8 ) CMC00C
             CHARACTER * (   24 ) CMC00D
             CHARACTER * (   43 ) CMC00E
-         COMMON / ANM_COLS / CMI001,    CMR001(3*256), CMR002, CMI002(2)
+         COMMON / ANM_COLS / CMI001,    CMR001(3*257), CMR002, CMI002(2)
          COMMON / CHANMAP /  CMI003(3), CMR003(2)
          COMMON / CLI /      CMI004,    CMI005(1:4,0:MAXSTACK), CMC001
          COMMON / COLFIVE /  CMR004(3)
@@ -211,12 +232,12 @@
          COMMON / GEN_SYMBOLS / CMI00E(2), CML002
          COMMON / GFUNC /    CMR006(2*LSPMAX), CMI00F(2)
          COMMON / GOOD_PT /  CML003(3)
-         STRUCTURE / HASH_TAB /
-            CHARACTER NAME * 16
-            INTEGER   HASHVAL
-         END STRUCTURE
-         RECORD / HASH_TAB /   ENTRY(0:502)
-         COMMON / HASH_TABLE / ENTRY
+!         STRUCTURE / HASH_TAB /
+!            CHARACTER NAME * 16
+!            INTEGER   HASHVAL
+!         END STRUCTURE
+!         RECORD / HASH_TAB /   ENTRY(0:502)
+!         COMMON / HASH_TABLE / ENTRY
          COMMON / IF /       CMI010(2), CML004(2)
          COMMON / LABELMAP / CMR007(4), CMC007
          COMMON / LINFT /    CMI011(2), CMR008(60)
@@ -252,11 +273,11 @@
       INTEGER SIGCODE
 
 *  Local Variables:
-      LOGICAL   IEXIST, FOPEN, LSTAT
+      LOGICAL   LSTAT
       LOGICAL   PROCEDURE
       LOGICAL   TRAN_SYMBOL
       LOGICAL   EXECUTE
-      INTEGER   I, IDUM
+      INTEGER   I
       INTEGER   IERR
       INTEGER   ISTAT
       INTEGER   ILS
@@ -266,9 +287,8 @@
       CHARACTER COMX*24
       CHARACTER CNAME*24
       CHARACTER CSTRING*64
-      CHARACTER ASCII_LUN*3
       CHARACTER STRING*256
-      CHARACTER LASTCL*256
+*D     CHARACTER LASTCL*256
       CHARACTER FLNAM*256
 
 *  Internal References:
@@ -276,7 +296,7 @@
       LOGICAL   DO_COMMAND
       LOGICAL   SCL_CONTINUE
       INTEGER   GEN_ILEN
-      INTEGER   GEN_LINENO
+*D     INTEGER   GEN_LINENO
       INTEGER   STACK_POINTER
 
 *  Keep all variable values between calls to this routine.
@@ -320,7 +340,7 @@
  50   SIGCODE = 0                          ! reset UNIX exception code
       STRING = ' '
       CALL GEN_GETSTR2( 5, '>> ', ' ', ' ', BUFFER, ISTAT )
-*D    TYPE *,'Complete line got --> ', BUFFER(:60)
+*D    PRINT *,'Complete line got --> ', BUFFER(:60)
       ILB = GEN_ILEN (BUFFER)
 
 *  ...Error?  Try again
@@ -340,9 +360,9 @@
 *  be done without GOTOs, but it would not make it any clearer!
       IBPTR = 1
  55   IF ( IBPTR .GT. ILB ) GO TO 50
-*D    TYPE *,'Coming back for more input (label 55)'
-*D    TYPE *,'Active part of buffer (ibptr:ilb) ', ibptr, ':', ilb
-*D    TYPE *,'Buffer string is --> ', buffer(ibptr:ilb)
+*D    PRINT *,'Coming back for more input (label 55)'
+*D    PRINT *,'Active part of buffer (ibptr:ilb) ', ibptr, ':', ilb
+*D    PRINT *,'Buffer string is --> ', buffer(ibptr:ilb)
       CALL GEN_GETIT3( BUFFER(IBPTR:ILB), 3, I1B, I2B, INB, IERR )
       IF ( IERR .NE. 0 ) GO TO 50
 
@@ -350,7 +370,7 @@
 *  any subsequent call.
       STRING = BUFFER(IBPTR+I1B-1:IBPTR+I2B-1)//' '
       IBPTR  = IBPTR + INB - 1
-*D    Type *,'Line #', GEN_LINENO(), '  ', STRING(:60)
+*D    Print *,'Line #', GEN_LINENO(), '  ', STRING(:60)
 
 *  Preprocess (convert $, @, =, := and xxxx: commands to standard format -
 *  i.e. <operator> [<operand1>.....]
@@ -358,7 +378,7 @@
       CALL SCL_PREPARSE( STRING, COMX, IERR )
       IF ( COMX .EQ. ' ') GO TO 55
       CALL UUCASE( COMX )
-*D    type *,'current command    --> ', comx
+*D    print *,'current command    --> ', comx
 
 *  Get rid of any garbage remaining in the input buffer from executing the
 *  last command. Then put the unused part of the command line, if any, into
@@ -368,11 +388,11 @@
 *  the symbols, *without* any easy way to test for such violations.
       ILS = GEN_ILEN( STRING )
       IF ( ILS .NE. 0 ) THEN
-*D       type *,'reinserting string --> ', string(:ils)
+*D       print *,'reinserting string --> ', string(:ils)
          CALL INS_CLI_ITEM( STRING(:ILS) )
       END IF
 *D    call get_cl (lastcl, stack_pointer())
-*D    type *,'gen cli line now   --> ', lastcl(:gen_ilen(lastcl))
+*D    print *,'gen cli line now   --> ', lastcl(:gen_ilen(lastcl))
 
 *  Search for the current command in the command table. If it is a predefined
 *  command carry on, otherwise substitute its equivalence string into the 
@@ -397,7 +417,7 @@
             LCS = GEN_ILEN(CSTRING)
             LCX = GEN_ILEN(COMX)
             IF ( LCS .NE. LCX .OR. CSTRING(:LCS) .NE. COMX(:LCS) ) THEN
-*D             type *,'symbol translation --> ', symbols(i-nfunc)(:lcs)
+*D             print *,'symbol translation --> ', symbols(i-nfunc)(:lcs)
                IF ( CSTRING(LCS:LCS) .EQ. ';' ) LCS = LCS - 1
                BUFFER = SYMBOLS(I-NFUNC)(:LCS) // ';' //
      :            BUFFER(IBPTR:ILB)
@@ -480,19 +500,12 @@
          WRITE( *, * ) 'Command or @file abandoned by ^C'
          GO TO 90
       ELSE
-*        TYPE *
+*        PRINT *
       END IF
 
 *  Print printer output for this macro (not if we are in a DO loop)
 
- 90   IF ( ENDDO ) THEN
-        WRITE( ASCII_LUN, '(I3.3)' ) ILOUT2
-        INQUIRE( FILE= 'FOR' // ASCII_LUN // '.DAT',
-     &           EXIST=IEXIST, OPENED=FOPEN )
-        IF ( IEXIST .AND. FOPEN .AND. PRINT_OUTPUT ) THEN
-          CLOSE( ILOUT2, DISP='PRINT/DELETE' )
-        END IF
-      END IF
+ 90   CONTINUE
 
       ERROR = 0
       GO TO 55

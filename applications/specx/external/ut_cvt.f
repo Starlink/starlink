@@ -1,3 +1,6 @@
+C  History:
+C     20 SEP 2000 (AJC):
+C        Unused RARAD, DECRAD
 *-----------------------------------------------------------------------
 
       SUBROUTINE EXTRNL2 (ERROR)
@@ -23,7 +26,6 @@
       REAL*4    HOUR_ANGLE
       REAL*8    AZ8,   EL8
       REAL*8    L2,    B2
-      REAL*8    RARAD, DECRAD
       REAL*8    UTD, JULIAN_DATE, SIDEREAL_TIME
       REAL*8    PI /3.141592654D0/
 

@@ -5,6 +5,10 @@
 C  routine to evaluate integrated intensity in appropriate units
 C  (data assumed calibrated in Kelvin ) between two arbitrary limits
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Missing comma in FORMAT
+
       IMPLICIT        NONE
 
 *     formal parameters:
@@ -76,7 +80,7 @@ C   Give in terms of current X-units
   999 ISTAT = IFREEVM (IPTR)
       RETURN
 
- 1000 FORMAT(' Integrated intensity is 'F7.2' Kelvin-'A6)
+ 1000 FORMAT(' Integrated intensity is ',F7.2,' Kelvin-',A6)
 
       END
 

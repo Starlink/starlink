@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused SAVE_AUTO, K, NPAG, NMAX, NMIN
 *---------------------------------------------------------------------------
 
       SUBROUTINE PLOT_CHAN4 (IFAIL)
@@ -25,21 +29,18 @@
 
       LOGICAL   REPEAT
       LOGICAL   SOME_PLOT
-      LOGICAL   SAVE_AUTO
       LOGICAL   GREYSCALE
       LOGICAL   CONTOURS
       LOGICAL   FIRST
       LOGICAL   SXGGREYOK
       LOGICAL   SXGCOLOROK
-      INTEGER   I,  J,  K
+      INTEGER   I,  J
       INTEGER   IX, IY, IZ
       INTEGER   ISTAT
       INTEGER   IMX,         IMY
       INTEGER   IPTR,        IPTR_MAP
       INTEGER   LOCATION
       INTEGER   NCONT1,      NCONT2
-      INTEGER   NPAG
-      INTEGER   NMAX,        NMIN
       INTEGER   NV,   NW,    NZ
       REAL      ARRMIN, ARRMAX
       REAL      DEVLIMS(2)
@@ -82,9 +83,9 @@
         RETURN
       END IF
 
-      TYPE *, ' --- Plot_chan4 ---'
-      TYPE *, '     Number of maps in file = ', NMAPS
-      TYPE *, '     Image map size',IMX,' by',IMY
+      PRINT *, ' --- Plot_chan4 ---'
+      PRINT *, '     Number of maps in file = ', NMAPS
+      PRINT *, '     Image map size',IMX,' by',IMY
 
 *     Set up these indices for general use (describe which axis is which)
 
@@ -139,7 +140,7 @@ C   Initialize graphics package now so that SET_DISPLAY_SIZE can work
 
       CALL ALLOCATE_DEVICE (IDEV,IFAIL)
       IF (IFAIL.NE.0) THEN
-        TYPE *,'Trouble allocating plot device'
+        PRINT *,'Trouble allocating plot device'
         GO TO 998
       END IF
 
@@ -185,8 +186,8 @@ C  ...and size of individual maps
       DX = ABS (AXLENX / NXMAP)
       DY = ABS (AXLENY / NYMAP)
 
-*     Type *,'Map area tesselated',NXMAP,' by',NYMAP
-*     Type *,'Windows are ',DX,' by',DY,' mm'
+*     PRINT *,'Map area tesselated',NXMAP,' by',NYMAP
+*     PRINT *,'Windows are ',DX,' by',DY,' mm'
 
       PLOTLIMS(1) = XMARGIN
       PLOTLIMS(2) = XMARGIN + AXLENX
@@ -197,7 +198,7 @@ C   Greyscale or contours?
 
       CONTOURS  = .NOT.(PLOTGREY.AND..NOT.OVERCONT)
       IF (PLOTGREY .AND..NOT. SXGGREYOK()) THEN
-        TYPE *,'Sorry, greyscaling not available!'
+        PRINT *,'Sorry, greyscaling not available!'
         GREYSCALE = .FALSE.
       ELSE
         GREYSCALE = PLOTGREY
@@ -337,8 +338,8 @@ C   Close the map file
 
       ISTAT = IFREEVM (IPTR_MAP)
       IF (ISTAT .ne. 0) THEN
-        TYPE *, '--- plot_chan4 ---'
-        TYPE *, '    error freeing virtual memory: ', ISTAT
+        PRINT *, '--- plot_chan4 ---'
+        PRINT *, '    error freeing virtual memory: ', ISTAT
       END IF
 
       RETURN
@@ -372,9 +373,9 @@ C   Close the map file
 
 *  Ok, go...
 
-D     type *, ' -- paneltess --'
-D     type *, '    plot surface area (x*y) = ', xsiz, ysiz
-D     type *, '    tesselate with ', n, ' panels, aspect ratio ', ratio
+D     PRINT *, ' -- paneltess --'
+D     PRINT *, '    plot surface area (x*y) = ', xsiz, ysiz
+D     PRINT *, '    tesselate with ', n, ' panels, aspect ratio ', ratio
 
       maxarea = 0.0
 
@@ -384,7 +385,7 @@ D     type *, '    tesselate with ', n, ' panels, aspect ratio ', ratio
         scal = min (xsiz/float(nx), (ysiz/ratio)/float(ny))
         area = n * ratio * scal**2
 
-D       type *, 'nx, ny, scal, area: ', nx, ny, scal, area
+D       print *, 'nx, ny, scal, area: ', nx, ny, scal, area
 
         if (area .gt. maxarea) then
           nxmax   = nx
@@ -393,8 +394,8 @@ D       type *, 'nx, ny, scal, area: ', nx, ny, scal, area
         end if
       end do
 
-D     type *, 'final values of nx, ny = ', nxmax, nymax
-D     type *, 'fractional area used = ', maxarea/(xsiz*ysiz)
+D     print *, 'final values of nx, ny = ', nxmax, nymax
+D     print *, 'fractional area used = ', maxarea/(xsiz*ysiz)
 
       return
       end

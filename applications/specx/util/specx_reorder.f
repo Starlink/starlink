@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 *------------------------------------------------------------------------
 
       SUBROUTINE SPECX_REORDER (N, ISOURCE)
@@ -36,7 +39,7 @@ C  DATA array with variable sized quadrants catered for.
 
 *  Ok, go...
 
-D     TYPE '('' # of sectors, sort array = '',I4.1,8I3.1)',
+D     PRINT '('' # of sectors, sort array = '',I4.1,8I3.1)',
 D    &          N, (ISOURCE(K),K=1,N)
 
 C     First reorder data array
@@ -46,9 +49,9 @@ C     Get virtual memory and take copy of data
 
       ISTAT = IGETVM (4*NTOTAL, .TRUE., 'SPECX_REORDER', IPTR)
       IF (ISTAT .ne. 0) THEN
-        TYPE *, 'Trouble getting virtual memory for reordering:'
-        TYPE *, ' ---', 4*NTOTAL, ' bytes requested'
-        TYPE *, ' --- reordering not done'
+        PRINT *, 'Trouble getting virtual memory for reordering:'
+        PRINT *, ' ---', 4*NTOTAL, ' bytes requested'
+        PRINT *, ' --- reordering not done'
         RETURN
       END IF
 
@@ -70,7 +73,7 @@ C        find start, end and length of target section
 
 C        copy target section into output array
 
-D        TYPE *, 'Copy of array segment from: start, end, length = ',
+D        PRINT *, 'Copy of array segment from: start, end, length = ',
 D    &            DSTART, DEND, LENTGT
 
          CALL XCOPY (4*LENTGT, %VAL(IPTR+ 4*DSTART), DATA(OFFSET))
@@ -93,7 +96,7 @@ C     What will happen to IQCEN?
 
 C     Then rearrange quadrant dependent parameters
 
-D     TYPE *, 'Sort of header variables: NQ = 1 to ', N-1
+D     PRINT *, 'Sort of header variables: NQ = 1 to ', N-1
 
       DO NQ = 1, N-1
 

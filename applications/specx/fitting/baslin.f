@@ -1,7 +1,9 @@
 *  History:
 *     19 Nov 1993 (hme):
 *        TABs removed.
-C-----------------------------------------------------------------------
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
 
       SUBROUTINE BASLIN (BUF, DATA, NBPTS, IBLRPT, BADVAL, IERR)
 
@@ -50,7 +52,7 @@ C-----------------------------------------------------------------------
         YLOW = YLOW/FLOAT(NI)  
         XLOW = FLOAT(L1) + 0.5*FLOAT(L2-L1)
       ELSE
-        TYPE *, '-- basfit --   No good points in first interval'
+        PRINT *, '-- basfit --   No good points in first interval'
         IERR = 9
         RETURN
       END IF
@@ -66,7 +68,7 @@ C-----------------------------------------------------------------------
         YHIGH = YHIGH/FLOAT(NI)
         XHIGH = FLOAT(L3) + 0.5*FLOAT(L4-L3)
       ELSE
-        TYPE *, '-- basfit --   No good points in second interval'
+        PRINT *, '-- basfit --   No good points in second interval'
         IERR = 9
         RETURN
       END IF
@@ -76,7 +78,7 @@ C-----------------------------------------------------------------------
       IF (DX.NE.0) THEN
         GRAD = DY/DX
       ELSE
-        Type *,'Range zero - can''t do it'
+        PRINT*,'Range zero - can''t do it'
         IERR = 9
         RETURN
       END IF

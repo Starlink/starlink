@@ -1,3 +1,6 @@
+* History:
+*    21 Sep 2000 (ajc):
+*       Unused NYR
 *-----------------------------------------------------------------------
 
       SUBROUTINE UTCALC2 (JDAT, JTIM, IUTFLG, TIMCOR, UTY, UTD)
@@ -24,7 +27,6 @@
       INTEGER          I
       INTEGER          NDAY
       INTEGER          MON
-      INTEGER          NYR
       INTEGER          NLEAP
 
       INTEGER  LMON(12)    /31,28,31,30,31,30,31,31,30,31,30,31/

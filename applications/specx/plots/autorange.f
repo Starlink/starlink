@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C---------------------------------------------------------------------------
 
       SUBROUTINE AUTORANGE (START,END,NINTS)
@@ -36,7 +39,7 @@ C   Include a useful statement function
       RANGE = END1 - START1
 
       IF(RANGE.EQ.0.d0) THEN
-        TYPE *,'Something wrong with auto-scaling, range is 0?'
+        PRINT *,'Something wrong with auto-scaling, range is 0?'
         RANGE=1
       END IF
       LOGDR = LOC(DLOG10(DABS(RANGE))) 
@@ -55,7 +58,7 @@ C   Make sure there are between 5 and 10 intervals.
       START  = DR*NSTART
       END    = DR*NEND
 
-*     Type *,'Scaling axis: start, end, #ints =', start, end, nints
+*     PRINT *,'Scaling axis: start, end, #ints =', start, end, nints
 
       NINTS  =  ABS (NEND-NSTART)
 

@@ -8,6 +8,10 @@
 *  so call the GEN_COMACH to do the minimum matching. If that fails there must
 *  be an error!
 
+*  History:
+*     6-JUN-2000 (AJC):
+*       Replace 'Type *' with 'PRINT *'
+
       IMPLICIT  NONE
 
 *     Formal parameters:
@@ -33,7 +37,7 @@
       IF (HASH.LT.0) THEN
         IERR = 81
       ELSE
-D       TYPE *,'Command located in hash table @ ', ICOM
+D       PRINT *,'Command located in hash table @ ', ICOM
       END IF
 
       RETURN
@@ -69,8 +73,8 @@ D       TYPE *,'Command located in hash table @ ', ICOM
       DO J = 1, NFUNC
         HASH = SCL_HASHINSERT (COMMS(J), J, M_CTAB, TABLE)
         IF (HASH.LT.0) THEN
-          TYPE *, '-- scl_maketable --'
-          TYPE *, '   Error inserting ', COMMS(J),' in hash table'
+          PRINT *, '-- scl_maketable --'
+          PRINT *, '   Error inserting ', COMMS(J),' in hash table'
         END IF
       END DO
 
@@ -106,7 +110,7 @@ D       TYPE *,'Command located in hash table @ ', ICOM
       COUNTER        = 1
       SCL_HASHINSERT = GEN_HASH (SYMBOL, M)
 
-D     Type *,'Symbol ', symbol,' hashed to ', scl_hashinsert
+D     PRINT *,'Symbol ', symbol,' hashed to ', scl_hashinsert
 
       DONE = .FALSE.
 
@@ -124,8 +128,8 @@ D     Type *,'Symbol ', symbol,' hashed to ', scl_hashinsert
         TABLE(SCL_HASHINSERT) = VALUE
       ELSE
         SCL_HASHINSERT = -1
-        TYPE *,'-- SCL_hashinsert --'
-        TYPE *,'Hash table full!'
+        PRINT *,'-- SCL_hashinsert --'
+        PRINT *,'Hash table full!'
       END IF
 
       RETURN
@@ -162,7 +166,7 @@ D     Type *,'Symbol ', symbol,' hashed to ', scl_hashinsert
       COUNT          = 1
       SCL_HASHSEARCH = GEN_HASH (SYMBOL, M)
 
-D     TYPE *, 'Command ', SYMBOL, ' hashed to', SCL_HASHSEARCH
+D     PRINT *, 'Command ', SYMBOL, ' hashed to', SCL_HASHSEARCH
 
       DONE  = .FALSE.
       FOUND = .FALSE.
@@ -170,8 +174,8 @@ D     TYPE *, 'Command ', SYMBOL, ' hashed to', SCL_HASHSEARCH
       DO WHILE (.NOT.DONE .AND. COUNT.LE.M)
         ISYM = TABLE(SCL_HASHSEARCH)
 
-D       TYPE *,'  -- table entry = ', ISYM
-D       TYPE *,'  -- corresponding command is ', COMMS(ISYM)
+D       PRINT *,'  -- table entry = ', ISYM
+D       PRINT *,'  -- corresponding command is ', COMMS(ISYM)
 
         IF (ISYM.EQ.0) THEN                             ! Empty position
           DONE = .TRUE.
@@ -190,8 +194,8 @@ D       TYPE *,'  -- corresponding command is ', COMMS(ISYM)
 
       IF (.NOT. FOUND) THEN
         SCL_HASHSEARCH = -1
-D       TYPE *,'-- SCL_hashsearch --'
-D       TYPE *,'Symbol not defined'
+D       PRINT *,'-- SCL_hashsearch --'
+D       PRINT *,'Symbol not defined'
       END IF
 
       RETURN
@@ -229,8 +233,8 @@ D       TYPE *,'Symbol not defined'
         SCL_HASHDELETE = .TRUE.
       ELSE
         SCL_HASHDELETE = .FALSE.
-        TYPE *,'-- SCL_hashdelete --'
-        TYPE *,'Symbol not defined'
+        PRINT *,'-- SCL_hashdelete --'
+        PRINT *,'Symbol not defined'
       END IF
 
       RETURN

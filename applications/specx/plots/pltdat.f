@@ -1,6 +1,8 @@
 *    History:
 *     01-Aug-1995 (rpt):
 *        ICOLOR support added.
+*     20-Sep-2000 (ajc):
+*        Unused GEN_ILEN
 *-----------------------------------------------------------------------
 
       SUBROUTINE PLTDAT (NPTS, NQUAD, ITIP, IWEIGHT, LCOLOR,
@@ -46,7 +48,6 @@ C     Local variables
 
 C     Functions
 
-      INTEGER   GEN_ILEN
       INTEGER   NTOT
 
 

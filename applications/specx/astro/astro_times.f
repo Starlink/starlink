@@ -1,3 +1,8 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*     18 Sep 2000 (ajc):
+*        Change IUTFLG LOGICAL to BYTE
 *-----------------------------------------------------------------------
 
       SUBROUTINE ASTRO_TIMES (TIME, DATE, ALONG, TIMCOR, IUTFLG,
@@ -14,7 +19,7 @@
       CHARACTER         DATE*9        ! input date dd-mon-yy
       DOUBLE PRECISION  ALONG         ! input longitude of observation
       DOUBLE PRECISION  TIMCOR        ! input time correction local -> UT (hrs)
-      LOGICAL           IUTFLG        ! input flag to indicate data in UT already
+      BYTE IUTFLG                     ! input flag to indicate data in UT already
       DOUBLE PRECISION  UTD           ! output UT, days
       DOUBLE PRECISION  LST           ! output sidereal time, hours
       DOUBLE PRECISION  JULIAN_DATE   ! output julian date, days
@@ -40,10 +45,10 @@
       CALL UTCALC2 (JDATE, JTIME, IUTFLG, TIMCOR, UTY, UTD)
       JULIAN_DATE = DFLOAT (JULDA(UTY)) - 0.5D0 + UTD
 
-D     type *, '     jdate ', jdate
-D     type *, '     jtime ', jtime
-D     type *, '     uty   ', uty
-D     type *, '     utd   ', utd
+D     print *, '     jdate ', jdate
+D     print *, '     jtime ', jtime
+D     print *, '     uty   ', uty
+D     print *, '     utd   ', utd
 
 *     Calculate LST
 

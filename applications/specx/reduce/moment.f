@@ -2,6 +2,10 @@
 
       SUBROUTINE MOMENT (NQ, XSCALE, IFAIL)
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Missing comma in FORMAT
+
       IMPLICIT  NONE
 
 *     Formal parameters
@@ -86,8 +90,8 @@ C       Repeat for second interval
       NXSFM = NXS
       RETURN
 
- 4143 FORMAT(/' For range ('F6.1','F6.1')')
- 4144 FORMAT(1H ,T30,F8.2' KELVIN*('A6')**'I1)
+ 4143 FORMAT(/' For range (',F6.1,',',F6.1,')')
+ 4144 FORMAT(1H ,T30,F8.2,' KELVIN*(',A6,')**',I1)
 
       END
 

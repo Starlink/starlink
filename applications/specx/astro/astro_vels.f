@@ -1,10 +1,20 @@
 *  History:
 *     22 Nov 1993 (hme):
 *        Remove TABs.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*     18 Sept 2000 (ajc):
+*        SAVE ECCENT, EPSLON, SINEPS, COSEPS required for Linux
+*        Unused COSLAT
 C-----------------------------------------------------------------------
 
       SUBROUTINE ASTRO_VELS (DATJUL, APRA, APDEC, ALAT ,HA,
      &                       VSL, VES, VTE)
+
+      IMPLICIT NONE
+      REAL E, VXSUN, VYSUN, VZSUN, EQOLD, A1, A2, A3, A, B, C,
+     :     EPSLON, EQ, SINEPS, COSEPS, VSUN, COSDEL, COSFAC,
+     :     VXEARTH, VYEARTH, VZEARTH, SUNLON, ECCENT
 
 C   Program to work out velocity of point on earth w.r.t the local
 C   standard of rest.  Takes account of basic solar motion,
@@ -24,7 +34,6 @@ C   Formal parameters:
 C   Local variables:
 
       DOUBLE PRECISION   T
-      DOUBLE PRECISION   COSLAT
       DOUBLE PRECISION   RED
       DOUBLE PRECISION   PREMAT(3,3)
       DOUBLE PRECISION   RAAPX, DCAPX
@@ -39,6 +48,8 @@ C   Functions:
       COMMON /SUN/ VXSUN,VYSUN,VZSUN,A,B,C
 
       DATA EQOLD/0.0/
+
+      SAVE ECCENT, EPSLON, SINEPS, COSEPS
 
 C *** Set up statement functions
 
@@ -57,7 +68,6 @@ C (3) : EPS - calculates obliquity of earths orbit
      &         *4.8481368111D-06
 
 C *** Calculate current epoch from Julian date
-
       T     = DATJUL/36525.0D0
       EQ    = 1950.0 + SNGL((DATJUL-18262.423D0) / 365.24219D0)
       IF (ABS(EQ-EQOLD).LE.0.25)   GO TO 30
@@ -115,11 +125,11 @@ C *** Calculate radial component of rotation velocity of earth
 
       VTE = 0.465*SIN(HA)*COSDEL*COS(ALAT)
 
-D     TYPE *, ' -- astro_vels --'
-D     TYPE *, '     V(sun-lsr)   = ', VSL
-D     TYPE *, '     V(earth-sun) = ', VES
-D     TYPE *, '     V(tel-earth) = ', VTE
-D     TYPE *, '     (total vel)  = ', VTE + VES + VSL
+D     PRINT *, ' -- astro_vels --'
+D     PRINT *, '     V(sun-lsr)   = ', VSL
+D     PRINT *, '     V(earth-sun) = ', VES
+D     PRINT *, '     V(tel-earth) = ', VTE
+D     PRINT *, '     (total vel)  = ', VTE + VES + VSL
 
       RETURN
       END

@@ -7,6 +7,9 @@
 *        Re-order IODATA common block to avoid alignment problems.
 *     15 Jan 1994 (rp):
 *        Change CHR_UCASE to UUCASE
+*      6 Jun 2000 (ajc):
+*        Replace 'type *' with 'PRINT *'
+*        Unused AMBIGUOUS, NAME2
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_CRSYMBOL (NAME, VALUE, IERR)
@@ -36,7 +39,6 @@
 *  Local variables
 
       LOGICAL*4 POSN_FREE
-      LOGICAL*4 AMBIGUOUS
       INTEGER*4 FREE
       INTEGER*4 HASH
       INTEGER*4 I
@@ -47,7 +49,7 @@
       INTEGER*4 LVALUE
       INTEGER*4 MATCH
       INTEGER*4 SZENTRY
-      CHARACTER NAME1*(LNAMES), NAME2*(LNAMES)
+      CHARACTER NAME1*(LNAMES)
 
 *  Make sure table initialized
 
@@ -62,7 +64,7 @@
       FREE      = 0
       POSN_FREE = .FALSE.
 
-D     TYPE *, NAME, ' := ', VALUE
+D     PRINT *, NAME, ' := ', VALUE
 
 *  Look for match with existing symbols:
 
@@ -86,7 +88,7 @@ D     TYPE *, NAME, ' := ', VALUE
 
         IF (.NOT.POSN_FREE) THEN
           IERR = 2
-          TYPE *,'Command table full!'
+          PRINT *,'Command table full!'
 
         ELSE    ! i.e. free space, and no match
           IF (LVALUE.GT.0) THEN
@@ -101,13 +103,13 @@ D     TYPE *, NAME, ' := ', VALUE
             INEW          = NFUNC + FREE
             COMMS(INEW)   = NAME(1:SZENTRY)
             SYMBOLS(FREE) = VALUE(ISS:MIN(LSYMBOL,LVALUE))
-*           TYPE *,'New symbol ',COMMS(INEW)(:SZENTRY), ' defined'
+*           PRINT *,'New symbol ',COMMS(INEW)(:SZENTRY), ' defined'
             STMAX = MAX (FREE, STMAX)
             HASH = SCL_HASHINSERT (COMMS(INEW), INEW, M_CTAB, TABLE)
             IERR = 0
 
           ELSE
-            TYPE *,'Attempt to delete non-existent symbol!'
+            PRINT *,'Attempt to delete non-existent symbol!'
             IERR = 3
           END IF
         END IF
@@ -123,20 +125,20 @@ D     TYPE *, NAME, ' := ', VALUE
           IF (LVALUE.EQ.0) THEN
             IF (SCL_HASHDELETE (COMMS(MATCH), M_CTAB,
      &                          TABLE, COMMS, HASH)) THEN
-              TYPE *,'Symbol ',COMMS(MATCH)(:LMATCH),' deleted'
+              PRINT *,'Symbol ',COMMS(MATCH)(:LMATCH),' deleted'
               COMMS(MATCH)         = ' '
               SYMBOLS(MATCH-NFUNC) = ' '
               IF (MATCH.EQ.NFUNC+STMAX) STMAX = STMAX-1
             ELSE
-              TYPE *,'Failed to delete symbol from hash table'
+              PRINT *,'Failed to delete symbol from hash table'
             END IF
           ELSE
             SYMBOLS(MATCH-NFUNC) = VALUE(1:MIN(LSYMBOL,LVALUE))
-            TYPE *,'Symbol ',COMMS(MATCH)(:LMATCH),' redefined'
+            PRINT *,'Symbol ',COMMS(MATCH)(:LMATCH),' redefined'
           END IF
 
         ELSE
-          Type *,'Attempt to delete/redefine built in command'
+          PRINT *,'Attempt to delete/redefine built in command'
         END IF
 
       END IF
@@ -202,13 +204,13 @@ D     TYPE *, NAME, ' := ', VALUE
 
       LSTR  = MAX (1, MIN (LNAME, LNAMES))
 
-*     Type *,'Searching for match for symbol ',NAME
-*     Type *,'(total symbol length =',LNAME,') characters'
+*     PRINT *,'Searching for match for symbol ',NAME
+*     PRINT *,'(total symbol length =',LNAME,') characters'
 
       NMATCH = 0
 
 *     IF (LNAME.EQ.0) THEN
-*       Type *,'Highest entry in symbol table =',STMAX
+*       PRINT *,'Highest entry in symbol table =',STMAX
 *     END IF
 
       IF (LNAME.EQ.0) THEN
@@ -238,7 +240,7 @@ D     TYPE *, NAME, ' := ', VALUE
       END IF
 
       IF (NMATCH.EQ.0) THEN
-        TYPE *,'Symbol not found'
+        PRINT *,'Symbol not found'
       END IF
 
       RETURN

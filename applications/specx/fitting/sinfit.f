@@ -10,6 +10,11 @@
 *        Make array sizes depend of SPECX_PARS where sensible
 *     20 jul 1995 (rpt)
 *        BUG: PROMPT array size needs to be larger than 256. Fixed.
+*     20 July 2000 (ajc):
+*        Insert miising commas in formats
+*        Change TYPE * to PRINT *
+*        Don't split string constant across lines
+*        Unused IFORM, K, IANS
 C-----------------------------------------------------------------------------
 
       SUBROUTINE SINFIT (NQ, XSCALE, BUF, IFAIL)
@@ -41,7 +46,6 @@ C     Global variables:
 C     Local variables:
 
       INTEGER   ICON(30)
-      INTEGER   IFORM(50)
       INTEGER   IERX
       INTEGER   ITS
       INTEGER   NCONST
@@ -49,7 +53,7 @@ C     Local variables:
       REAL*8    SUMSQ
 
 
-      INTEGER   I, J, K
+      INTEGER   I, J
       INTEGER   IAPTR
       INTEGER   IWPTR
       INTEGER   IERR
@@ -75,7 +79,6 @@ C     Local variables:
       LOGICAL   PUSHED
 
       CHARACTER FORMAT*32
-      CHARACTER IANS*1
       CHARACTER PROMPT*512
       CHARACTER XTITLE*6
 
@@ -145,13 +148,13 @@ C   Also find estimates of parameters ( coefficients of x**n )
       NP          = 0
       IF (NXS.EQ.NXOLD .AND. NPOLD.NE.0) THEN
         WRITE (PROMPT, 1035, IOSTAT=IERR) PPAR(1)
- 1035   FORMAT ('['E9.2'] ''"')
+ 1035   FORMAT ('[',E9.2,'] ','"')
       END IF
       PROMPT=
-     &'"/'' Estimate of polynomial coefficients for x**n''/
-     &   '' One at a time, EOF to finish''//
-     &   '' Current units are '//XTITLE//'''//''# (x** 0) '
-     &   //PROMPT(1:GEN_ILEN(PROMPT))
+     &'"/'' Estimate of polynomial coefficients for x**n''/'//
+     &'  '' One at a time, EOF to finish''//'//
+     &'  '' Current units are '//XTITLE//'''//''# (x** 0) '//
+     &   PROMPT(1:GEN_ILEN(PROMPT))
       FORMAT = ' '
       DO 110 NP = 1, 30
   105   CALL GEN_GETR4 (PROMPT, PPAR(NP), FORMAT, PPAR(NP), JDEF)
@@ -191,12 +194,12 @@ C   and get initial estimates of amplitude and phase
       PROMPT(1:2) = '''"'
       IF (NXS.EQ.NXOLD .AND. NSOLD.NE.0) THEN
         WRITE (PROMPT, 1036) (SPAR(J),J=1,2)
- 1036   FORMAT('['F6.1,1X,F5.1'] ''"')
+ 1036   FORMAT('[',F6.1,1X,F5.1,'] ','"')
       END IF
       PROMPT = 
-     &'"/'' Estimates of Amplitude and phase for each harmonic''/
-     &   '' Term at a time, EOF to finish''//
-     &   '' Current units are '//XTITLE//'''//''# '
+     &'"/'' Estimates of Amplitude and phase for each harmonic''/'//
+     &'  '' Term at a time, EOF to finish''//'//
+     &'  '' Current units are '//XTITLE//'''//''# '
      &   //PROMPT(1:GEN_ILEN(PROMPT))
       FORMAT = ' '
       DO 125 NS = 1, NLIM
@@ -263,7 +266,7 @@ C   Copy appropriate points to XSC
       END DO
 
       IF (N.EQ.0) THEN
-        TYPE *, 'No data points selected!'
+        PRINT *, 'No data points selected!'
         CALL POP
         IFAIL = 5
         GO TO 999
@@ -280,12 +283,12 @@ C   Set up other parameters for LMM2
       IERX = IER + 100*NCONST
       ITS  = MAXITS
 
-*     TYPE *, ' -- sinfit --'
-*     TYPE *, '    NCONST = ', NCONST
-*     TYPE *, '    ITS    = ', ITS
-*     TYPE *, '    NPARAM = ', NPARAM
-*     TYPE *, '    ILOUT  = ', ILOUT
-*     TYPE *, '    TOL    = ', TOL
+*     PRINT *, ' -- sinfit --'
+*     PRINT *, '    NCONST = ', NCONST
+*     PRINT *, '    ITS    = ', ITS
+*     PRINT *, '    NPARAM = ', NPARAM
+*     PRINT *, '    ILOUT  = ', ILOUT
+*     PRINT *, '    TOL    = ', TOL
 
 C   Calculate required workspace and get some virtual memory
 
@@ -293,7 +296,7 @@ C   Calculate required workspace and get some virtual memory
       NBA = 4*NCH*NPARAM
       ISTAT = IGETVM (NBA, .TRUE., 'SINFIT', IAPTR)
       IF (ISTAT .ne. 0) THEN
-        TYPE *,'Trouble getting virtual memory for A array'
+        PRINT *,'Trouble getting virtual memory for A array'
         IFAIL = 51
         GO TO 999
       END IF
@@ -301,7 +304,7 @@ C   Calculate required workspace and get some virtual memory
       NBW= 4 * (NPARAM*(NPARAM+5) + NCONST)
       ISTAT = IGETVM (NBW, .TRUE., 'SINFIT', IWPTR)
       IF (ISTAT .ne. 0) THEN
-        Type *,'Trouble getting virtual memory for W array'
+        PRINT *,'Trouble getting virtual memory for W array'
         IFAIL=51
         GO TO 999
       END IF
@@ -382,8 +385,8 @@ C     Standard and error return
       IF (NBA .ne. 0) THEN
         ISTAT = IFREEVM (IAPTR)
         IF (ISTAT .ne. 0) THEN
-          Type *,'Trouble freeing workspace array A virtual memory'
-          Type *,'NBA,IAPTR',NBA,IAPTR
+          PRINT *,'Trouble freeing workspace array A virtual memory'
+          PRINT *,'NBA,IAPTR',NBA,IAPTR
           IFAIL = 51
         END IF
       END IF
@@ -391,8 +394,8 @@ C     Standard and error return
       IF (NBW .ne. 0)THEN
         ISTAT = IFREEVM (IWPTR)
         IF (ISTAT .ne. 0) THEN
-          Type *,'Trouble freeing workspace array W virtual memory'
-          Type *,'NBW,IWPTR',NBW,IWPTR
+          PRINT *,'Trouble freeing workspace array W virtual memory'
+          PRINT *,'NBW,IWPTR',NBW,IWPTR
           IFAIL = 51
         END IF
       END IF
@@ -405,8 +408,8 @@ C     Standard and error return
  1080 FORMAT(/1X,T20,'Parameters of Least-Square Baseline')
  1090 FORMAT(1X,T18,'Polynomial terms - Coefficients of X**n')
  1100 FORMAT(27X,I2,4X,F6.2)
- 1110 FORMAT('0',T20,'Fundamental period is 'G11.4' 'A6)
- 1120 FORMAT('0'T20,'Harmonic  Amplitude    Phase('A6')')
+ 1110 FORMAT('0',T20,'Fundamental period is ',G11.4,' ',A6)
+ 1120 FORMAT('0',T20,'Harmonic  Amplitude    Phase(',A6,')')
  1130 FORMAT(23X,I2,5X,F6.2,8X,F6.2)
  1150 FORMAT(' Too many free parameters; limit of 30')
 

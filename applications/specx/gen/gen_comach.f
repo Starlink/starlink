@@ -3,6 +3,9 @@
 *        Remove TABs.
 *     31 Jan 1994 (hme):
 *        Disuse <> in formats.
+*     28 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Unused GEN_ILEN
 C-----------------------------------------------------------------------
 
       SUBROUTINE GEN_COMACH (NCOM,NFUNC,COMMS,COM,IERR,IPRMAT,IPRERR)
@@ -13,7 +16,7 @@ C   match the matching string index is returned in NCOM, otherwise
 C   NCOM is set to zero.
 
       LOGICAL*4 EXACT
-      INTEGER*4 GEN_ILEN, GEN_KNTWRD
+      INTEGER*4 GEN_KNTWRD
       CHARACTER COMMS(1)*(*),COM*(*),COMX*40
 
       ILC    = MIN (LEN(COMMS(1)),LEN(COM))
@@ -61,7 +64,7 @@ C   NCOM is set to zero.
       IF (NCOM.NE.0) COM(:ILC) = COMMS(NCOM)(:ILC)
       RETURN
 
- 1020 FORMAT(' 'A)
+ 1020 FORMAT(' ',A)
  1030 FORMAT(' *** COMMAND NOT FOUND ***',/)
  1040 FORMAT(' *** AMBIGUOUS ***',/)
 

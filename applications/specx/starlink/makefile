@@ -128,8 +128,6 @@
 #
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
-#     Copyright (C) 1999-2000 Particle Physics and Astronomy Research Council.
-#     All Rights Reserved.
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink, RAL)
@@ -137,7 +135,6 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
-#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -229,15 +226,30 @@
 #        Modified specx_link to use pgp_link for Starlink PGPLOT rather 
 #           than pgplot_link for Native PGPLOT.  
 #        Changed link libs order to make it work under Digital Unix.
-#     29-DEC-1999 (TIMJ):
-#        Add support for .F files via FCPPFLAGS
-#        Add new files for v6.7-6
 #     10-JAN-2000 (BLY): Version 6.7-6.
 #        Added Y2K fixes from Tim Jenness.
 #        Added new SUN/17 + hypertext.
 #        Added SPECX manual (MUD/70).
-#     17-MAY-2000 (TIMJ):
-#        Merge back with starlink version of makefile
+#      8-MAY-2000 (AJC):
+#        Version 6.7-8
+#        Unix port etc.
+#        Add SPECX_FITS for initsp
+#        Add MAPS for init_specx
+#        Use separate GSD
+#        Add NDF_ERR for mapopen
+#        Use copy and link installation for documentation
+#     28-NOV-2000 (AJC):
+#        Avoid tar file dependence on source files.
+#      3-MAY-2001 (AJC)
+#        Version 6.7-9
+#        Remove hardwired /star/lib
+#        Correct test instructions
+#     13-SEP-2001 (AJC):
+#        Add ' to CLOSE-MAP line of test: target
+#      4-FEB-2002 (AJC):
+#        Version 6.7-10
+#      8-MAR-2002 (AJC):
+#        Version 6.7-11
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -358,7 +370,6 @@ CC = c89
 CFLAGS = -O 
 FC = fort77
 FFLAGS = -O
-FCPPFLAGS = ' '
 
 #  Command for forming a link to a file.
 
@@ -390,11 +401,11 @@ LDFLAG2 =
 
 #  Linker command to link C main programs with Fortran subroutines and
 #  libraries (and C functions).
-
+ 
 CFLINK = $(FC) -O
-
+ 
 #  Extra link libraries for CFLINK.
-
+ 
 CFLIBS =
 
 #  Location of FIGARO libraries.
@@ -431,7 +442,7 @@ PKG_LINK = SPECX
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 6.7-6
+PKG_VERS = 6.7-12
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -470,7 +481,7 @@ STARTUP_SCRIPT = specxstart
 
 #  Link script.  This script does not form part of the package but is 
 #  required for building it.  It will not be installed.
-
+ 
 LINK_SCRIPT = $(PKG_NAME)_link
 
 #  List of private include files.  These are include files
@@ -503,14 +514,14 @@ I_SUB4 =
 
 I_SUB5 = 
 
-I_SUB6 = cli_stack.inc eval_ae4.inc gen_symbols.inc logical_units.inc
+I_SUB6 = cli_stack.inc eval_ae4.inc gen_symbols.inc logical_units.inc symbols.h
 
 I_SUB7 = 
 
-I_SUB8 = sxg_graphcap.inc sxgpgplot.inc
+I_SUB8 = sxg_graphcap.inc sxgpgplot.inc sxg_graphcap.h
 
-I_SUB9 = gsd_pars.inc \
-         gsd.h gsd2_alpha_OSF1.h gsd2_sun4_Solaris.h gsd1.h gsd2_sun4.h
+#I_SUB9 = gsd_pars.inc \
+#         gsd.h gsd2_alpha_OSF1.h gsd2_sun4_Solaris.h gsd1.h gsd2_sun4.h
 
 I_SUB10 = anm_col.inc anm_logcol.inc
 
@@ -583,7 +594,7 @@ PI_SUB18 =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = DAT_PAR DAT_ERR SAE_PAR PRM_PAR NDF_PAR f77.h
+EXTERNAL_INCLUDES = DAT_PAR DAT_ERR SAE_PAR PRM_PAR NDF_PAR NDF_ERR f77.h
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -596,7 +607,7 @@ F_ROUTINES = $(F_SUB1) $(F_SUB2) $(F_SUB3) $(F_SUB4) $(F_SUB5) \
              $(F_SUB19) $(F_SUB20) \
              $(EXE_SOURCES_F)
 
-F_SUB1 = a13.f astro_times.f astro_vels.f cuv.f cvt_to_date_obs.f \
+F_SUB1 = a13.f astro_times.f astro_vels.f cuv.f  cvt_to_date_obs.f \
          date_cvt.f dattim_from_mjd.f decdat.f dectim.f deg_to_dms.f deg_to_string.f \
          dms_to_rad.f dms_to_string.f hadec_to_azel.f hours_to_str.f julda.f \
          lostim2.f pre.f radec_to_l2b2.f red.f specxjd_to_mjd.f \
@@ -631,8 +642,8 @@ F_SUB6 = cli_empty.f gen_alphanum.f gen_at.f gen_comach.f gen_cvt_type.f \
          gen_get_luns.f gen_geti4.f gen_geti4a.f gen_geti4a2.f gen_getit3.f \
          gen_getit4.f gen_getline.f gen_getmore.f gen_getr4.f gen_getr4a.f \
          gen_getr4a2.f gen_getr8.f gen_getr8a.f gen_getr8a2.f gen_getstr.f \
-         gen_getstr2.f gen_getsym1.f gen_getwrd.f gen_hash.f gen_hashdel.f \
-         gen_hashins.f gen_hashsrch.f gen_hdnorm.f gen_ichtot.f gen_iendch.f \
+         gen_getstr2.f gen_getsym1.f gen_getwrd.f gen_hash.f \
+         gen_hdnorm.f gen_ichtot.f gen_iendch.f \
          gen_ilen.f gen_input.f gen_inqfunc.f gen_inqsymb.f gen_inqsymb1.f \
          gen_integer.f gen_jline.f gen_jnloff.f gen_jnlon.f gen_kntwrd.f \
          gen_lineno.f gen_make_var.f gen_makesym1.f gen_makesymb.f \
@@ -719,12 +730,12 @@ F_SUB18 = \
    pda_dsort.f pda_xermsg.f
 
 F_SUB19 = \
-   qualifiers.f sysdep.f \
-   parseat.f \
+   qualifiers_unix.f sysdep.f \
+   parseat_unix.f \
    vms_help.f spack.f spacl.f spaeg.f \
    putscreen.f vms_date.f
 
-F_SUB20 = do_command.f initsp.f init_specx.f specx_initab.f
+F_SUB20 = do_command.f init_specx.f initsp.f specx_initab.f
 
 #  List of Fortran BLOCK DATA routines.
 
@@ -819,60 +830,11 @@ PF_SUB16 =
 
 PF_SUB17 =
 
-PF_SUB18 = 
+PF_SUB18 = ndlib.f
 
-PF_SUB19 = 
+PF_SUB19 = openuf.f welcome_unix.f
 
-PF_SUB20 =
-
-# Fortran preprocessor routines required for building the package. This
-# is just a list of all the .F source files
-
-FCPP_ROUTINES = $(FCPP_SUB1) $(FCPP_SUB2) $(FCPP_SUB3) $(FCPP_SUB4) \
-$(FCPP_SUB5) $(FCPP_SUB6) $(FCPP_SUB7) $(FCPP_SUB8) $(FCPP_SUB9) \
-$(FCPP_SUB10) $(FCPP_SUB11) $(FCPP_SUB12) $(FCPP_SUB13) $(FCPP_SUB14) \
-$(FCPP_SUB15) $(FCPP_SUB16) $(FCPP_SUB17) $(FCPP_SUB18) $(FCPP_SUB19) \
-$(FCPP_SUB20)
-
-FCPP_SUB1 =
-
-FCPP_SUB2 =
-
-FCPP_SUB3 =
-
-FCPP_SUB4 =
-
-FCPP_SUB5 =
-
-FCPP_SUB6 =
-
-FCPP_SUB7 =
-
-FCPP_SUB8 =
-
-FCPP_SUB9 =
-
-FCPP_SUB10 =
-
-FCPP_SUB11 =
-
-FCPP_SUB12 =
-
-FCPP_SUB13 =
-
-FCPP_SUB14 =
-
-FCPP_SUB15 =
-
-FCPP_SUB16 =
-
-FCPP_SUB17 =
-
-FCPP_SUB18 = ndlib.F
-
-FCPP_SUB19 = openuf.F welcome.F
-
-FCPP_SUB20 =
+PF_SUB20 = 
 
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
@@ -893,13 +855,15 @@ C_SUB4 =
 
 C_SUB5 =
 
-C_SUB6 =
+C_SUB6 = hash.c gen_makesym2.c 
 
 C_SUB7 = empty.c empty2.c get_aline.c
 
-C_SUB8 =
+C_SUB8 = sxg1pgplot.c
 
-C_SUB9 = 
+#C_SUB9 = gsd1_getval.c gsd2_copya.c gsdGet0x.c gsdOpenRead.c gsd1_rddata.c \
+#         gsd2_nativx.c gsdGet1x.c gsd_f77.c gsd1_rdfildsc.c gsdClose.c \
+#         gsdInqSize.c gsd1_rdhead.c gsdFind.c gsdItem.c
 
 #C_SUB9 = gsd1_getval.c gsdGet0x.c gsdOpenRead.c gsd1_rddata.c \
 #         gsdGet1x.c gsd_f77.c gsd1_rdfildsc.c gsdClose.c \
@@ -992,7 +956,7 @@ $(PKG_NAME).news
 #  Use only .o, .c, .f, .shl and .hlp suffix rules.
 
 .SUFFIXES:
-.SUFFIXES: .o .c .f .shl .hlp .F
+.SUFFIXES: .o .c .f .shl .hlp
 
 #  List of files which must be built from the source files before the
 #  package can be installed for use.  This should comprise all the files
@@ -1036,7 +1000,7 @@ L_SUB7 =
 
 L_SUB8 = SXGPGPLOT.INC SXG_GRAPHCAP.INC
 
-L_SUB9 = gsd2.h GSDPARS
+#L_SUB9 = gsd2.h GSDPARS
 
 L_SUB10 = ANM_COL.INC ANM_LOGCOL.INC
 
@@ -1066,6 +1030,7 @@ $(PKG_LINK)_ERR:   $(PKG_NAME)_err;               $(LINK) $? $@
 $(PKG_LINK)_PAR:   $(PKG_NAME)_par;               $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
+NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
 f77.h:     $(STAR_INC)/f77.h;     $(LINK) $? $@
 
 #  Links for include files in specx_inc.tar
@@ -1124,7 +1089,7 @@ SXG_GRAPHCAP.INC:  sxg_graphcap.inc;  $(LINK) $? $@
 
 #  Links for include files in specx_gsd.tar
 
-gsd2.h:            gsd2_$(SYSTEM).h;  $(LINK) $? $@
+#gsd2.h:            gsd2_$(SYSTEM).h;  $(LINK) $? $@
 
 #  Links for include files in specx_mapdis4.tar
 
@@ -1169,102 +1134,102 @@ $(I_SUBB):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1) $(FCPP_SUB1):
+$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1):
 	$(TAR_OUT) $(PKG_NAME)_astro.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2) $(FCPP_SUB2):
+$(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2):
 	$(TAR_OUT) $(PKG_NAME)_exprt.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB3) $(I_SUB3) $(B_SUB3) $(C_SUB3) $(FCPP_SUB3):
+$(F_SUB3) $(I_SUB3) $(B_SUB3) $(C_SUB3):
 	$(TAR_OUT) $(PKG_NAME)_external.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB4) $(I_SUB4) $(B_SUB4) $(C_SUB4) $(FCPP_SUB4):
+$(F_SUB4) $(I_SUB4) $(B_SUB4) $(C_SUB4):
 	$(TAR_OUT) $(PKG_NAME)_fitting.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB5) $(I_SUB5) $(B_SUB5) $(C_SUB5) $(FCPP_SUB5):
+$(F_SUB5) $(I_SUB5) $(B_SUB5) $(C_SUB5):
 	$(TAR_OUT) $(PKG_NAME)_fv4.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB6) $(I_SUB6) $(B_SUB6) $(C_SUB6) $(FCPP_SUB6):
+$(F_SUB6) $(I_SUB6) $(B_SUB6) $(C_SUB6):
 	$(TAR_OUT) $(PKG_NAME)_gen.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB7) $(I_SUB7) $(B_SUB7) $(C_SUB7) $(FCPP_SUB7):
+$(F_SUB7) $(I_SUB7) $(B_SUB7) $(C_SUB7):
 	$(TAR_OUT) $(PKG_NAME)_getaline.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB8) $(I_SUB8) $(B_SUB8) $(C_SUB8) $(FCPP_SUB8):
+$(F_SUB8) $(I_SUB8) $(B_SUB8) $(C_SUB8):
 	$(TAR_OUT) $(PKG_NAME)_graph.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB9) $(I_SUB9) $(B_SUB9) $(C_SUB9) $(FCPP_SUB9):
-	$(TAR_OUT) $(PKG_NAME)_gsd.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
+#$(F_SUB9) $(I_SUB9) $(B_SUB9) $(C_SUB9):
+#	$(TAR_OUT) $(PKG_NAME)_gsd.tar $@
+#	@ if test -f $@; then :;\
+#           else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB10) $(I_SUB10) $(B_SUB10) $(C_SUB10) $(FCPP_SUB10):
+$(F_SUB10) $(I_SUB10) $(B_SUB10) $(C_SUB10):
 	$(TAR_OUT) $(PKG_NAME)_mapdis4.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB11) $(I_SUB11) $(B_SUB11) $(C_SUB11) $(FCPP_SUB11):
+$(F_SUB11) $(I_SUB11) $(B_SUB11) $(C_SUB11):
 	$(TAR_OUT) $(PKG_NAME)_mv4.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB12) $(I_SUB12) $(B_SUB12) $(C_SUB12) $(FCPP_SUB12):
+$(F_SUB12) $(I_SUB12) $(B_SUB12) $(C_SUB12):
 	$(TAR_OUT) $(PKG_NAME)_plots.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB13) $(I_SUB13) $(B_SUB13) $(C_SUB13) $(FCPP_SUB13):
+$(F_SUB13) $(I_SUB13) $(B_SUB13) $(C_SUB13):
 	$(TAR_OUT) $(PKG_NAME)_readline.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB14) $(I_SUB14) $(B_SUB14) $(C_SUB14) $(FCPP_SUB14):
+$(F_SUB14) $(I_SUB14) $(B_SUB14) $(C_SUB14):
 	$(TAR_OUT) $(PKG_NAME)_reduce.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB15) $(I_SUB15) $(B_SUB15) $(C_SUB15) $(FCPP_SUB15):
+$(F_SUB15) $(I_SUB15) $(B_SUB15) $(C_SUB15):
 	$(TAR_OUT) $(PKG_NAME)_scl.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB16) $(I_SUB16) $(B_SUB16) $(C_SUB16) $(FCPP_SUB16):
+$(F_SUB16) $(I_SUB16) $(B_SUB16) $(C_SUB16):
 	$(TAR_OUT) $(PKG_NAME)_tek.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB17) $(I_SUB17) $(B_SUB17) $(C_SUB17) $(FCPP_SUB17):
+$(F_SUB17) $(I_SUB17) $(B_SUB17) $(C_SUB17):
 	$(TAR_OUT) $(PKG_NAME)_term.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB18) $(I_SUB18) $(B_SUB18) $(C_SUB18) $(FCPP_SUB18):
+$(F_SUB18) $(I_SUB18) $(B_SUB18) $(C_SUB18):
 	$(TAR_OUT) $(PKG_NAME)_util.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB19) $(I_SUB19) $(B_SUB19) $(C_SUB19) $(FCPP_SUB19):
+$(F_SUB19) $(I_SUB19) $(B_SUB19) $(C_SUB19):
 	$(TAR_OUT) $(PKG_NAME)_vms.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB20) $(I_SUB20) $(B_SUB20) $(C_SUB20) $(FCPP_SUB20):
+$(F_SUB20) $(I_SUB20) $(B_SUB20) $(C_SUB20):
 	$(TAR_OUT) $(PKG_NAME)_command.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1324,11 +1289,11 @@ $(PF_SUB8) dummy_target8:
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
 	mv $@_$(SOURCE_VARIANT) $@
 
-$(PF_SUB9) dummy_target9:
-	$(TAR_OUT) $(PKG_NAME)_gsd.tar $@_$(SOURCE_VARIANT)
-	@ if test -f $@_$(SOURCE_VARIANT); then :;\
-           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
-	mv $@_$(SOURCE_VARIANT) $@
+#$(PF_SUB9) dummy_target9:
+#	$(TAR_OUT) $(PKG_NAME)_gsd.tar $@_$(SOURCE_VARIANT)
+#	@ if test -f $@_$(SOURCE_VARIANT); then :;\
+#           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
+#	mv $@_$(SOURCE_VARIANT) $@
 
 $(PF_SUB10) dummy_target10:
 	$(TAR_OUT) $(PKG_NAME)_mapdis4.tar $@_$(SOURCE_VARIANT)
@@ -1396,7 +1361,6 @@ $(PF_SUB20) dummy_target20:
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
 	mv $@_$(SOURCE_VARIANT) $@
 
-
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
@@ -1407,65 +1371,45 @@ OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(O_SUB3) $(O_SUB4) $(O_SUB5) \
                $(O_SUB19) $(O_SUB20) \
                $(EXE_1_OBJECT) $(EXE_2_OBJECT)
 
-O_SUB1 = $(B_SUB1:.f=.o) $(F_SUB1:.f=.o) $(C_SUB1:.c=.o) $(PF_SUB1:.f=.o) \
-$(FCPP_SUB1:.F=.o)
+O_SUB1 = $(B_SUB1:.f=.o) $(F_SUB1:.f=.o) $(C_SUB1:.c=.o) $(PF_SUB1:.f=.o) 
 
-O_SUB2 = $(B_SUB2:.f=.o) $(F_SUB2:.f=.o) $(C_SUB2:.c=.o) $(PF_SUB2:.f=.o) \
-$(FCPP_SUB2:.F=.o)
+O_SUB2 = $(B_SUB2:.f=.o) $(F_SUB2:.f=.o) $(C_SUB2:.c=.o) $(PF_SUB2:.f=.o)
 
-O_SUB3 = $(B_SUB3:.f=.o) $(F_SUB3:.f=.o) $(C_SUB3:.c=.o) $(PF_SUB3:.f=.o) \
-$(FCPP_SUB3:.F=.o)
+O_SUB3 = $(B_SUB3:.f=.o) $(F_SUB3:.f=.o) $(C_SUB3:.c=.o) $(PF_SUB3:.f=.o)
 
-O_SUB4 = $(B_SUB4:.f=.o) $(F_SUB4:.f=.o) $(C_SUB4:.c=.o) $(PF_SUB4:.f=.o) \
-$(FCPP_SUB4:.F=.o)
+O_SUB4 = $(B_SUB4:.f=.o) $(F_SUB4:.f=.o) $(C_SUB4:.c=.o) $(PF_SUB4:.f=.o)
 
-O_SUB5 = $(B_SUB5:.f=.o) $(F_SUB5:.f=.o) $(C_SUB5:.c=.o) $(PF_SUB5:.f=.o) \
-$(FCPP_SUB5:.F=.o)
+O_SUB5 = $(B_SUB5:.f=.o) $(F_SUB5:.f=.o) $(C_SUB5:.c=.o) $(PF_SUB5:.f=.o)
 
-O_SUB6 = $(B_SUB6:.f=.o) $(F_SUB6:.f=.o) $(C_SUB6:.c=.o) $(PF_SUB6:.f=.o) \
-$(FCPP_SUB6:.F=.o)
+O_SUB6 = $(B_SUB6:.f=.o) $(F_SUB6:.f=.o) $(C_SUB6:.c=.o) $(PF_SUB6:.f=.o)
 
-O_SUB7 = $(B_SUB7:.f=.o) $(F_SUB7:.f=.o) $(C_SUB7:.c=.o) $(PF_SUB7:.f=.o) \
-$(FCPP_SUB7:.F=.o)
+O_SUB7 = $(B_SUB7:.f=.o) $(F_SUB7:.f=.o) $(C_SUB7:.c=.o) $(PF_SUB7:.f=.o)
 
-O_SUB8 = $(B_SUB8:.f=.o) $(F_SUB8:.f=.o) $(C_SUB8:.c=.o) $(PF_SUB8:.f=.o) \
-$(FCPP_SUB8:.F=.o)
+O_SUB8 = $(B_SUB8:.f=.o) $(F_SUB8:.f=.o) $(C_SUB8:.c=.o) $(PF_SUB8:.f=.o)
 
-O_SUB9 = $(B_SUB9:.f=.o) $(F_SUB9:.f=.o) $(C_SUB9:.c=.o) $(PF_SUB9:.f=.o) \
-$(FCPP_SUB9:.F=.o)
+O_SUB9 = $(B_SUB9:.f=.o) $(F_SUB9:.f=.o) $(C_SUB9:.c=.o) $(PF_SUB9:.f=.o)
 
-O_SUB10 = $(B_SUB10:.f=.o) $(F_SUB10:.f=.o) $(C_SUB10:.c=.o) \
-$(PF_SUB10:.f=.o) $(FCPP_SUB10:.F=.o)
+O_SUB10 = $(B_SUB10:.f=.o) $(F_SUB10:.f=.o) $(C_SUB10:.c=.o) $(PF_SUB10:.f=.o)
 
-O_SUB11 = $(B_SUB11:.f=.o) $(F_SUB11:.f=.o) $(C_SUB11:.c=.o) \
-$(PF_SUB11:.f=.o) $(FCPP_SUB11:.F=.o)
+O_SUB11 = $(B_SUB11:.f=.o) $(F_SUB11:.f=.o) $(C_SUB11:.c=.o) $(PF_SUB11:.f=.o)
 
-O_SUB12 = $(B_SUB12:.f=.o) $(F_SUB12:.f=.o) $(C_SUB12:.c=.o) \
-$(PF_SUB12:.f=.o) $(FCPP_SUB12:.F=.o)
+O_SUB12 = $(B_SUB12:.f=.o) $(F_SUB12:.f=.o) $(C_SUB12:.c=.o) $(PF_SUB12:.f=.o)
 
-O_SUB13 = $(B_SUB13:.f=.o) $(F_SUB13:.f=.o) $(C_SUB13:.c=.o) \
-$(PF_SUB13:.f=.o) $(FCPP_SUB13:.F=.o)
+O_SUB13 = $(B_SUB13:.f=.o) $(F_SUB13:.f=.o) $(C_SUB13:.c=.o) $(PF_SUB13:.f=.o)
 
-O_SUB14 = $(B_SUB14:.f=.o) $(F_SUB14:.f=.o) $(C_SUB14:.c=.o) \
-$(PF_SUB14:.f=.o) $(FCPP_SUB14:.F=.o)
+O_SUB14 = $(B_SUB14:.f=.o) $(F_SUB14:.f=.o) $(C_SUB14:.c=.o) $(PF_SUB14:.f=.o)
 
-O_SUB15 = $(B_SUB15:.f=.o) $(F_SUB15:.f=.o) $(C_SUB15:.c=.o) \
-$(PF_SUB15:.f=.o) $(FCPP_SUB15:.F=.o)
+O_SUB15 = $(B_SUB15:.f=.o) $(F_SUB15:.f=.o) $(C_SUB15:.c=.o) $(PF_SUB15:.f=.o)
 
-O_SUB16 = $(B_SUB16:.f=.o) $(F_SUB16:.f=.o) $(C_SUB16:.c=.o) \
-$(PF_SUB16:.f=.o) $(FCPP_SUB16:.F=.o)
+O_SUB16 = $(B_SUB16:.f=.o) $(F_SUB16:.f=.o) $(C_SUB16:.c=.o) $(PF_SUB16:.f=.o)
 
-O_SUB17 = $(B_SUB17:.f=.o) $(F_SUB17:.f=.o) $(C_SUB17:.c=.o) \
-$(PF_SUB17:.f=.o) $(FCPP_SUB17:.F=.o)
+O_SUB17 = $(B_SUB17:.f=.o) $(F_SUB17:.f=.o) $(C_SUB17:.c=.o) $(PF_SUB17:.f=.o)
 
-O_SUB18 = $(B_SUB18:.f=.o) $(F_SUB18:.f=.o) $(C_SUB18:.c=.o) \
-	$(PF_SUB18:.f=.o) $(FCPP_SUB18:.F=.o)
+O_SUB18 = $(B_SUB18:.f=.o) $(F_SUB18:.f=.o) $(C_SUB18:.c=.o) $(PF_SUB18:.f=.o)
 
-O_SUB19 = $(B_SUB19:.f=.o) $(F_SUB19:.f=.o) $(C_SUB19:.c=.o) \
-	$(PF_SUB19:.f=.o) $(FCPP_SUB19:.F=.o)
+O_SUB19 = $(B_SUB19:.f=.o) $(F_SUB19:.f=.o) $(C_SUB19:.c=.o) $(PF_SUB19:.f=.o)
 
-O_SUB20 = $(B_SUB20:.f=.o) $(F_SUB20:.f=.o) $(C_SUB20:.c=.o) \
-	$(PF_SUB20:.f=.o) $(FCPP_SUB20:.F=.o)
+O_SUB20 = $(B_SUB20:.f=.o) $(F_SUB20:.f=.o) $(C_SUB20:.c=.o) $(PF_SUB20:.f=.o)
 
 EXE_1_OBJECT = $(EXE_1_SOURCE_F:.f=.o) $(EXE_1_SOURCE_C:.c=.o)
 
@@ -1475,8 +1419,6 @@ EXE_2_OBJECT = $(EXE_2_SOURCE_F:.f=.o) $(EXE_2_SOURCE_C:.c=.o)
 	$(CC) $(CFLAGS) -c $<
 .f.o:
 	$(FC) $(FFLAGS) -c $<
-.F.o:
-	$(FC) $(FFLAGS) $(FCPPFLAGS) -c $<
 
 #  List of object library files to be built and rules for building
 #  them.
@@ -1519,9 +1461,9 @@ libgraph.a: $(O_SUB8)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
-libgsd.a: $(O_SUB9)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
+#libgsd.a: $(O_SUB9)
+#	$(AR_IN) $@ $?
+#	$(RANLIB) $@
 
 libmapdis4.a: $(O_SUB10)
 	$(AR_IN) $@ $?
@@ -1600,7 +1542,7 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
-INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
+# INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
 
 #  List of directories actually used for installation (selected from
 #  those above) and rules to create them.
@@ -1722,7 +1664,6 @@ build:
 	@ echo '   CFLAGS  : $(CFLAGS)'       >>$(DATE_STAMP)
 	@ echo '   FC      : $(FC)'           >>$(DATE_STAMP)
 	@ echo '   FFLAGS  : $(FFLAGS)'       >>$(DATE_STAMP)
-	@ echo '   FCPPFLAGS: $(FCPPFLAGS)'   >>$(DATE_STAMP)
 	@ echo '   LINK    : $(LINK)'         >>$(DATE_STAMP)
 	@ echo '   RANLIB  : $(RANLIB)'       >>$(DATE_STAMP)
 	@ echo '   SOURCE_VARIANT: $(SOURCE_VARIANT)' \
@@ -1852,6 +1793,8 @@ install:
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_DOCS)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -1860,6 +1803,8 @@ install:
            if test -n "$$f"; then \
               $(TAR_IN) - $$f | ( cd $(INSTALL_DOCS) ; $(TAR_OUT) - ) ;\
               chmod 644 $(INSTALL_DOCS)/$$f/* ;\
+              rm -rf $$f;\
+              $(LINK) $(INSTALL_DOCS)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -1989,12 +1934,19 @@ do_deinstall:
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+              chmod 644 $$f; rm -f $$f;\
+              chmod 644 $(INSTALL_DOCS)/$$f;\
+              cp -p $(INSTALL_DOCS)/$$f .;\
               rm -f $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
+
 #  Deinstall the documentation figures.
 	- for f in $(FIGURES) ""; do \
            if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
+              chmod 644 $$f; rm -f $$f;\
+              chmod 744 $(INSTALL_DOCS)/$$f;\
+              ( cd $(INSTALL_DOCS) ; $(TAR_IN) - $$f ) | $(TAR_OUT) -  ;\
               rm -rf $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
@@ -2043,9 +1995,6 @@ test:
            echo;\
         elif $(MAKE) do_test; then\
            echo;\
-           echo \
-           '*** Installation test for the $(PACK_NAME) package has been run';\
-           echo;\
         else \
            echo;\
            echo \
@@ -2063,25 +2012,29 @@ do_test:
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
 	@ echo
-	@ echo '$(PACK_NAME) does not have a make driven installation test'
+	@ echo '$(PACK_NAME) does not have a make-driven installation test'
 	@ echo
-	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
-	@ echo 'thus (% is the shell prompt):'
+	@ echo \
+           'To test $(PACK_NAME), you should run the demonstration script thus'
+	@ echo '(% is the shell prompt):'
 	@ echo
+	@ echo ' % setenv SYS_SPECX $(INSTALL)/bin/specx'
 	@ echo ' % cd /empty_directory'
-	@ echo ' % source /star/etc/cshrc'
-	@ echo ' % xdisplay'
-	@ echo ' % $(PKG_NAME)start'
 	@ echo ' % cp $$SYS_SPECX/l483core.dat .'
 	@ echo ' % cp $$SYS_SPECX/l483cmap.map .'
 	@ echo ' % cp $$SYS_SPECX/scan_0043.dat .'
+	@ echo ' % cp $$SYS_SPECX/obs_das_0011.dat .'
+	@ echo ' % source $$SYS_SPECX/specxstart'
 	@ echo ' % specx'
 	@ echo ' >> @ $$SYS_SPECX/test'
-	@ echo ' >> exit'
-	@ echo ' % rm *'
-	@ echo
+	@ echo ' ...'
+	@ echo ' ** EXTRACT-QUADRANT'
 	@ echo \
-'The output expected from the test script is in $$SYS_SPECX/test.log.'
+          ' -- SPECX#008 -E- Not enough spectra in stack for this command --'
+	@ echo ' >> @ $$SYS_SPECX/test'
+	@ echo ' ...'
+	@ echo ' ** CLOSE-MAP'
+	@ echo ' >> exit'
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
@@ -2193,7 +2146,7 @@ clean:
 	@- rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) \
               $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
-	@- rm -f $(F_ROUTINES) $(FCPP_ROUTINES) 1>/dev/null 2>/dev/null
+	@- rm -f $(F_ROUTINES) 1>/dev/null 2>/dev/null
 	@- rm -f $(OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
@@ -2216,6 +2169,185 @@ unbuild: clean
 strip:
 	strip $(EXECUTABLES)
 	@ echo '*** Executables stripped'
+
+#  archive: produce the source tar files
+#  -------------------------------------
+
+#  First, some rules for extracting the platform specific files
+
+$(PF_SUB18:.f=.f_alpha_OSF1) $(PF_SUB18:.f=.f_sun4_Solaris) \
+$(PF_SUB18:.f=.f_ix86_Linux):
+	$(TAR_OUT) $(PKG_NAME)_util.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(PF_SUB19:.f=.f_alpha_OSF1) $(PF_SUB19:.f=.f_sun4_Solaris) \
+$(PF_SUB19:.f=.f_ix86_Linux):
+	$(TAR_OUT) $(PKG_NAME)_vms.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+#  Now the main archive target.
+#  To avoid specifying that the tar files depend on their content files,
+#  and thus forcing all their contents to be extracted whenever
+#  anything (e.g. an export) depends on the tar files, we make use of some
+#  flag files (suffix .tarf) which are set to have the same modification time
+#  as the associated tar file. We then make target archive1, which depends on
+#  these flag files, which in turn depend upon the associated tar content
+#  files. If flag file and (by inference) the tar file are out of date, we
+#  re-create the tar file.
+#  The effect of this is that 'make archive', ensures that all the tar
+#  content files for all the tar files are present but only re-creates those
+#  tar files whose content files have been updated.
+ 
+archive: 
+	touch -r $(PKG_NAME)_source.tar $(PKG_NAME)_source.tarf
+	touch -r $(PKG_NAME)_astro.tar $(PKG_NAME)_astro.tarf
+	touch -r $(PKG_NAME)_exprt.tar $(PKG_NAME)_exprt.tarf
+	touch -r $(PKG_NAME)_external.tar $(PKG_NAME)_external.tarf
+	touch -r $(PKG_NAME)_fitting.tar $(PKG_NAME)_fitting.tarf
+	touch -r $(PKG_NAME)_fv4.tar $(PKG_NAME)_fv4.tarf
+	touch -r $(PKG_NAME)_gen.tar $(PKG_NAME)_gen.tarf
+	touch -r $(PKG_NAME)_getaline.tar $(PKG_NAME)_getaline.tarf
+	touch -r $(PKG_NAME)_graph.tar $(PKG_NAME)_graph.tarf
+	touch -r $(PKG_NAME)_mapdis4.tar $(PKG_NAME)_mapdis4.tarf
+	touch -r $(PKG_NAME)_mv4.tar $(PKG_NAME)_mv4.tarf
+	touch -r $(PKG_NAME)_plots.tar $(PKG_NAME)_plots.tarf
+	touch -r $(PKG_NAME)_readline.tar $(PKG_NAME)_readline.tarf
+	touch -r $(PKG_NAME)_reduce.tar $(PKG_NAME)_reduce.tarf
+	touch -r $(PKG_NAME)_scl.tar $(PKG_NAME)_scl.tarf
+	touch -r $(PKG_NAME)_tek.tar $(PKG_NAME)_tek.tarf
+	touch -r $(PKG_NAME)_term.tar $(PKG_NAME)_term.tarf
+	touch -r $(PKG_NAME)_util.tar $(PKG_NAME)_util.tarf
+	touch -r $(PKG_NAME)_vms.tar $(PKG_NAME)_vms.tarf
+	touch -r $(PKG_NAME)_command.tar $(PKG_NAME)_command.tarf
+	touch -r $(PKG_NAME)_inc.tar $(PKG_NAME)_inc.tarf
+	touch -r $(PKG_NAME)_comfiles.tar $(PKG_NAME)_comfiles.tarf
+	@ if $(MAKE) archive1; then\
+           echo;\
+           echo \
+           '*** Archive for the $(PACK_NAME) package complete';\
+           echo;\
+        else \
+           echo;\
+           echo \
+           '*** Archive for the $(PACK_NAME) package failed';\
+           echo;\
+           exit 1;\
+        fi
+
+archive1: $(PKG_NAME)_source.tarf \
+   $(PKG_NAME)_astro.tarf $(PKG_NAME)_exprt.tarf $(PKG_NAME)_external.tarf \
+   $(PKG_NAME)_fitting.tarf $(PKG_NAME)_fv4.tarf $(PKG_NAME)_gen.tarf \
+   $(PKG_NAME)_getaline.tarf $(PKG_NAME)_graph.tarf \
+   $(PKG_NAME)_mapdis4.tarf $(PKG_NAME)_mv4.tarf $(PKG_NAME)_plots.tarf \
+   $(PKG_NAME)_readline.tarf $(PKG_NAME)_reduce.tarf $(PKG_NAME)_scl.tarf \
+   $(PKG_NAME)_tek.tarf $(PKG_NAME)_term.tarf $(PKG_NAME)_util.tarf \
+   $(PKG_NAME)_vms.tarf $(PKG_NAME)_command.tarf \
+   $(PKG_NAME)_inc.tarf $(PKG_NAME)_comfiles.tarf
+
+
+$(PKG_NAME)_source.tarf: $(LINK_SCRIPT) $(EXE_SOURCES_F) $(EXE_SOURCES_C) \
+                        $(I_SUBB) \
+                        $(HELP_SOURCES) $(STARTUP_SCRIPT) $(DATA_FILES)
+	$(TAR_IN) $(PKG_NAME)_source.tar $(LINK_SCRIPT) $(EXE_SOURCES_F) \
+                        $(EXE_SOURCES_C) $(I_SUBB) \
+                        $(HELP_SOURCES) $(STARTUP_SCRIPT) $(DATA_FILES)
+
+$(PKG_NAME)_comfiles.tarf: $(PUBLIC_SCRIPTS)
+	$(TAR_IN) $(PKG_NAME)_comfiles.tar $(PUBLIC_SCRIPTS)
+
+$(PKG_NAME)_inc.tarf: $(I_SUBA)
+	$(TAR_IN) $(PKG_NAME)_inc.tar $(I_SUBA)
+
+$(PKG_NAME)_astro.tarf: $(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1)
+	$(TAR_IN) $(PKG_NAME)_astro.tar $(F_SUB1) $(I_SUB1) \
+           $(B_SUB1) $(C_SUB1)
+
+$(PKG_NAME)_exprt.tarf: $(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2)
+	$(TAR_IN) $(PKG_NAME)_exprt.tar $(F_SUB2) $(I_SUB2) \
+                        $(B_SUB2) $(C_SUB2)
+
+$(PKG_NAME)_external.tarf: $(F_SUB3) $(I_SUB3) $(B_SUB3) $(C_SUB3)
+	$(TAR_IN) $(PKG_NAME)_external.tar $(F_SUB3) $(I_SUB3) \
+                        $(B_SUB3) $(C_SUB3)
+
+$(PKG_NAME)_fitting.tarf: $(F_SUB4) $(I_SUB4) $(B_SUB4) $(C_SUB4)
+	$(TAR_IN) $(PKG_NAME)_fitting.tar $(F_SUB4) $(I_SUB4) \
+                        $(B_SUB4) $(C_SUB4)
+
+$(PKG_NAME)_fv4.tarf: $(F_SUB5) $(I_SUB5) $(B_SUB5) $(C_SUB5)
+	$(TAR_IN) $(PKG_NAME)_fv4.tar $(F_SUB5) $(I_SUB5) \
+                        $(B_SUB5) $(C_SUB5)
+
+$(PKG_NAME)_gen.tarf: $(F_SUB6) $(I_SUB6) $(B_SUB6) $(C_SUB6)
+	$(TAR_IN) $(PKG_NAME)_gen.tar $(F_SUB6) $(I_SUB6) \
+                        $(B_SUB6) $(C_SUB6)
+
+$(PKG_NAME)_getaline.tarf: $(F_SUB7) $(I_SUB7) $(B_SUB7) $(C_SUB7)
+	$(TAR_IN) $(PKG_NAME)_getaline.tar $(F_SUB7) $(I_SUB7) \
+                        $(B_SUB7) $(C_SUB7)
+
+$(PKG_NAME)_graph.tarf: $(F_SUB8) $(I_SUB8) $(B_SUB8) $(C_SUB8)
+	$(TAR_IN) $(PKG_NAME)_graph.tar $(F_SUB8) $(I_SUB8) \
+                        $(B_SUB8) $(C_SUB8)
+
+#$(PKG_NAME)_gsd.tarf: $(F_SUB9) $(I_SUB9) $(B_SUB9) $(C_SUB9)
+#	$(TAR_IN) $(PKG_NAME)_gsd.tar $(F_SUB9) $(I_SUB9) \
+#                        $(B_SUB9) $(C_SUB9)
+
+$(PKG_NAME)_mapdis4.tarf: $(F_SUB10) $(I_SUB10) $(B_SUB10) $(C_SUB10)
+	$(TAR_IN) $(PKG_NAME)_mapdis4.tar $(F_SUB10) \
+                        $(I_SUB10) $(B_SUB10) $(C_SUB10)
+
+$(PKG_NAME)_mv4.tarf: $(F_SUB11) $(I_SUB11) $(B_SUB11) $(C_SUB11)
+	$(TAR_IN) $(PKG_NAME)_mv4.tar $(F_SUB11) $(I_SUB11) \
+                        $(B_SUB11) $(C_SUB11)
+
+$(PKG_NAME)_plots.tarf: $(F_SUB12) $(I_SUB12) $(B_SUB12) $(C_SUB12)
+	$(TAR_IN) $(PKG_NAME)_plots.tar $(F_SUB12) $(I_SUB12) \
+                        $(B_SUB12) $(C_SUB12)
+
+$(PKG_NAME)_readline.tarf: $(F_SUB13) $(I_SUB13) $(B_SUB13) \
+                          $(C_SUB13)
+	$(TAR_IN) $(PKG_NAME)_readline.tar $(F_SUB13) $(I_SUB13) \
+                        $(B_SUB13) $(C_SUB13)
+
+$(PKG_NAME)_reduce.tarf: $(F_SUB14) $(I_SUB14) $(B_SUB14) $(C_SUB14)
+	$(TAR_IN) $(PKG_NAME)_reduce.tar $(F_SUB14) $(I_SUB14) \
+                        $(B_SUB14) $(C_SUB14)
+
+$(PKG_NAME)_scl.tarf: $(F_SUB15) $(I_SUB15) $(B_SUB15) $(C_SUB15)
+	$(TAR_IN) $(PKG_NAME)_scl.tar $(F_SUB15) $(I_SUB15) \
+                        $(B_SUB15) $(C_SUB15)
+
+$(PKG_NAME)_tek.tarf: $(F_SUB16) $(I_SUB16) $(B_SUB16) $(C_SUB16)
+	$(TAR_IN) $(PKG_NAME)_tek.tar $(F_SUB16) $(I_SUB16) \
+                        $(B_SUB16) $(C_SUB16)
+
+$(PKG_NAME)_term.tarf: $(F_SUB17) $(I_SUB17) $(B_SUB17) $(C_SUB17)
+	$(TAR_IN) $(PKG_NAME)_term.tar $(F_SUB17) $(I_SUB17) \
+                        $(B_SUB17) $(C_SUB17)
+
+$(PKG_NAME)_util.tarf: $(F_SUB18) $(I_SUB18) $(B_SUB18) $(C_SUB18) \
+           $(PF_SUB18:.f=.f_alpha_OSF1) $(PF_SUB18:.f=.f_sun4_Solaris) \
+           $(PF_SUB18:.f=.f_ix86_Linux)
+	$(TAR_IN) $(PKG_NAME)_util.tar $(F_SUB18) $(I_SUB18) \
+           $(B_SUB18) $(C_SUB18) \
+           $(PF_SUB18:.f=.f_alpha_OSF1) $(PF_SUB18:.f=.f_sun4_Solaris \
+           $(PF_SUB18:.f=.f_ix86_Linux
+
+$(PKG_NAME)_vms.tarf: $(F_SUB19) $(I_SUB19) $(B_SUB19) $(C_SUB19) \
+           $(PF_SUB19:.f=.f_alpha_OSF1) $(PF_SUB19:.f=.f_sun4_Solaris) \
+           $(PF_SUB19:.f=.f_ix86_Linux)
+	$(TAR_IN) $(PKG_NAME)_vms.tar $(F_SUB19) $(I_SUB19) \
+           $(B_SUB19) $(C_SUB19) \
+           $(PF_SUB19:.f=.f_alpha_OSF1) $(PF_SUB19:.f=.f_sun4_Solaris) \
+           $(PF_SUB19:.f=.f_ix86_Linux)
+
+$(PKG_NAME)_command.tarf: $(F_SUB20) $(I_SUB20) $(B_SUB20) $(C_SUB20)
+	$(TAR_IN) $(PKG_NAME)_command.tar $(F_SUB20) $(I_SUB20) \
+           $(B_SUB20) $(C_SUB20)
 
 #-------------------------------------------------------------------------------
 
@@ -2356,6 +2488,8 @@ ins_cli_item.o: CLI_STACK.INC
 refresh_cli.o: CLI_STACK.INC
 reset_stk_pt.o: CLI_STACK.INC
 stack_pointer.o: CLI_STACK.INC
+hash.o: f77.h symbols.h
+gen_makesym2.o: f77.h symbols.h
 
 #  Dependencies for getaline -- none
    
@@ -2363,32 +2497,33 @@ stack_pointer.o: CLI_STACK.INC
 
 getdev.o: SXG_GRAPHCAP.INC
 sxgpgplot.o: SXGPGPLOT.INC SXG_GRAPHCAP.INC SXGPGPLOT.INC SXG_GRAPHCAP.INC SXGPGPLOT.INC SXG_GRAPHCAP.INC
+sxg1pgplot.o: f77.h sxg_graphcap.h
 ttsub.o: SXGPGPLOT.INC
    
 #  Dependencies for gsd
 
-gsd1_getval.o: gsd1.h
-gsd1_rddata.o: gsd1.h
-gsd1_rdfildsc.o: gsd1.h
-gsd1_rdhead.o: gsd1.h
-gsd2_copya.o: gsd1.h
-gsd2_copya.o: gsd2.h
-gsd2_nativx.o: gsd2.h
-gsdClose.o: gsd1.h
-gsdClose.o: gsd.h
-gsdFind.o: gsd1.h
-gsdFind.o: gsd.h
-gsdGet0x.o: gsd1.h
-gsdGet0x.o: gsd.h
-gsdGet1x.o: gsd1.h
-gsdGet1x.o: gsd.h
-gsdInqSize.o: gsd1.h
-gsdInqSize.o: gsd.h
-gsdItem.o: gsd1.h
-gsdItem.o: gsd.h
-gsdOpenRead.o: gsd1.h
-gsdOpenRead.o: gsd.h
-gsd_f77.o: gsd.h
+#gsd1_getval.o: gsd1.h
+#gsd1_rddata.o: gsd1.h
+#gsd1_rdfildsc.o: gsd1.h
+#gsd1_rdhead.o: gsd1.h
+#gsd2_copya.o: gsd1.h
+#gsd2_copya.o: gsd2.h
+#gsd2_nativx.o: gsd2.h
+#gsdClose.o: gsd1.h
+#gsdClose.o: gsd.h
+#gsdFind.o: gsd1.h
+#gsdFind.o: gsd.h
+#gsdGet0x.o: gsd1.h
+#gsdGet0x.o: gsd.h
+#gsdGet1x.o: gsd1.h
+#gsdGet1x.o: gsd.h
+#gsdInqSize.o: gsd1.h
+#gsdInqSize.o: gsd.h
+#gsdItem.o: gsd1.h
+#gsdItem.o: gsd.h
+#gsdOpenRead.o: gsd1.h
+#gsdOpenRead.o: gsd.h
+#gsd_f77.o: gsd.h
    
 #  Dependencies for mapdis4
 
@@ -2434,7 +2569,7 @@ fromap.o: FLAGCOMM MAPHD
 get_spectrum.o: CUBE FLAGCOMM MAPHD MAPS PLOT2D STACKCOMM STAKPAR
 index_subs.o: MAPHD
 interp_cube.o: CUBE FLAGCOMM MAPHD MAPS PLOT2D PROTOTYPE WEIGHTS
-mapopen.o: DAT_ERR FLAGCOMM MAPHD MAPS
+mapopen.o: DAT_ERR NDF_ERR FLAGCOMM MAPHD MAPS
 mv4_41to42.o: DAT_ERR DAT_PAR NDF_PAR SAE_PAR
 mv4_cnv321.o: DAT_ERR DAT_PAR FLAGCOMM MAPHD MAPV4 PRM_PAR SAE_PAR STACKCOMM
 mv4_headrd.o: DAT_PAR MAPHD MAPV4 SAE_PAR
@@ -2603,14 +2738,13 @@ spack.o: SAE_PAR
 spacl.o: SAE_PAR
 spaeg.o: SAE_PAR
 vms_help.o: SAE_PAR
-vms_date.o: SAE_PAR
-sysdep.o: SAE_PAR
-
+   
 #  Dependencies for command
 
 do_command.o: FLAGCOMM MAPS SPECX_PARS STACKCOMM STAKPAR
-init_specx.o: COMMAND_TABLE FLAGCOMM MAPTITLES
-initsp.o: COMMAND_TABLE CUBE DAT_PAR FILES FLAGCOMM IODATA MAPS MAPTITLES NEWXY NOKEEP PLOT2D SPECX_PARS STACKCOMM STAKPAR
+init_specx.o: COMMAND_TABLE FLAGCOMM MAPS MAPTITLES
+initsp.o: COMMAND_TABLE CUBE DAT_PAR FILES FLAGCOMM IODATA MAPS MAPTITLES \
+          NEWXY NOKEEP PLOT2D SPECX_FITS SPECX_PARS STACKCOMM STAKPAR
 specx_initab.o: CUBE ERRORS FILHD FLAGCOMM GSD_VAR MAPHD MAPS STACKCOMM
 
 

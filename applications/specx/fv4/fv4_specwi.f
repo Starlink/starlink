@@ -32,6 +32,8 @@
 *        Original version.
 *     10 May 1995 (rpt): 
 *        Added support for ISEQ and FILHD
+*     21 Sep 2000 (ajc):
+*        Unused NDIM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,7 +59,6 @@
       INTEGER IFAIL              ! Global status
 
 *  Local Variables:
-      INTEGER NDIM               ! Temporary integer
       INTEGER IFILE              ! Internal file number
       INTEGER ICELL              ! Cell number ISCAN-IREC1+1
       INTEGER STATUS             ! Starlink status

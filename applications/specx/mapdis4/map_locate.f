@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE MAP_LOCATE (MAP, NMAP, X, Y, M, N, Z)
@@ -14,22 +17,22 @@ D     CALL SXGTIDLE
       DX = (CEND(IX)-CBEG(IX))/FLOAT(NAXX-1)
       DY = (CBEG(IY)-CEND(IY))/FLOAT(NAXY-1)
 
-D     Type *,'IX,IY',IX,IY
-D     Type *,'DX,XY',DX,DY
+D     Print *,'IX,IY',IX,IY
+D     Print *,'DX,XY',DX,DY
 
       M  = NINT((X-CBEG(IX))/DX+1.0)
       N  = NINT((Y-CEND(IY))/DY+1.0)
 
-D     Type *,'Raw indices (M,N,NMAP):    ',M,N,NMAP
+D     Print *,'Raw indices (M,N,NMAP):    ',M,N,NMAP
 
       M  = MAX (MIN (M,NAXX), 1)
       N  = MAX (MIN (N,NAXY), 1)
 
-D     Type *,'Limited indices (M,N,NMAP):',M,N,NMAP
+D     Print *,'Limited indices (M,N,NMAP):',M,N,NMAP
 
       Z = MAP(M, N, NMAP)
 
-D     Type *,'Z-value: ',Z
+D     Print *,'Z-value: ',Z
 
 D     CALL SXGTTGRAPH
 

@@ -3,6 +3,10 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      3 Aug 2000 (ajc):
+*        Use format I3 to read type size
+*        and construct format to read array size
+*        Unused LENGTH, SYM_INDEX, SYM_TYPE, SYM_LENGTH, SYM_ADDR
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_MAKE_VAR (STRING, INTYPE, IERR)
@@ -33,14 +37,9 @@
       INTEGER*4 LBRACKET
       INTEGER*4 RBRACKET
       CHARACTER TYPE*4
-      CHARACTER LENGTH*3
-
-      INTEGER*4 SYM_INDEX
-      CHARACTER SYM_TYPE*4
-      INTEGER*4 SYM_LENGTH
-      INTEGER*4 SYM_ADDR
 
       CHARACTER NAME*16
+      CHARACTER FORMAT*8
       INTEGER*4 ARRAY_LENGTH
 
 *     Functions
@@ -66,7 +65,7 @@
       ELSE IF (TYPE(1:2).EQ.'L4') THEN
         NBYTES = 4
       ELSE IF (TYPE(1:1).EQ.'C') THEN
-        READ (TYPE(2:ILT), '(I)', IOSTAT=ERROR) NBYTES
+        READ (TYPE(2:ILT), '(I3)', IOSTAT=ERROR) NBYTES
         IF (ERROR.NE.0) THEN
           IERR = 5
           GO TO 99
@@ -94,7 +93,8 @@
       IF (LBRACKET.NE.0) THEN
         RBRACKET = INDEX (NAME, ')')
         IF (RBRACKET.EQ.0) RBRACKET = LEN(NAME)
-        READ (NAME(LBRACKET+1:RBRACKET-1), '(I)') ARRAY_LENGTH
+        WRITE( FORMAT, '(''(I'', I3, '')'')' ) RBRACKET - LBRACKET -1
+        READ (NAME(LBRACKET+1:RBRACKET-1), FORMAT) ARRAY_LENGTH
       ELSE
         LBRACKET = LEN(NAME) + 1
       END IF

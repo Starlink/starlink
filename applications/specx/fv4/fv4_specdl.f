@@ -36,6 +36,8 @@
 *        Original version.
 *     10 May 1995 (rpt):
 *        Added support FILHD
+*     21 Sep 2000 (ajc):
+*        Unused NDIM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,7 +66,7 @@
       INTEGER IFILE              ! Internal number for this file
       INTEGER LSCAN              ! Scan number in header
       INTEGER LIST( 2 )          ! First and last scan to delete
-      INTEGER NDIM, NELM         ! Temporary integer
+      INTEGER NELM               ! Temporary integer
       INTEGER STATUS             ! Starlink status
       CHARACTER * ( DAT__SZLOC ) TLOC( 4 ) ! HDS locators
 

@@ -6,6 +6,8 @@
 *        Change name from TOMAP to ADDMAP and simplify a little. Use
 *        MV4_ routines to write spectrum and map header. Write index at
 *        this level instead of leaving it to the caller.
+*     21 Sep 2000 (ajc):
+*        Unused ISTAT, IST2, J, INDEX2, NBYTES_INDEX
 *-----------------------------------------------------------------------
 
       SUBROUTINE ADDMAP2 (IDUP, XCELL, YCELL,
@@ -35,14 +37,10 @@ C   appropriately.
 
 *     Local variables:
 
-      LOGICAL   ISTAT
       INTEGER   NSP
       INTEGER   IIN,    JIN
       INTEGER   INS
-      INTEGER   IST2
-      INTEGER   J
       INTEGER   LOCATION
-      INTEGER   INDEX2, NBYTES_INDEX2
       INTEGER   IROFF2  ! Data x-location relative to map-centre (half-pixels)
       INTEGER   IDOFF2  ! Data y-location relative to map-centre (half-pixels)
 

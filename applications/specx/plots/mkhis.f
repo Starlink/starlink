@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C----------------------------------------------------------------------------
 
       SUBROUTINE MKHIS (X, Y, N, XFAC)
@@ -23,8 +26,8 @@ C     Local variables:
 C  Ok, go...
 
 D     CALL SXGTIDLE
-D     TYPE *, ' -- mkhis --'
-D     TYPE *, '    input # points = ', N
+D     PRINT *, ' -- mkhis --'
+D     PRINT *, '    input # points = ', N
 
       XLEFT = X(N) + 0.5*XFAC
 
@@ -46,7 +49,7 @@ D     TYPE *, '    input # points = ', N
 
       N = 2*N
 
-D     TYPE *, '    output # points = ', N
+D     PRINT *, '    output # points = ', N
 D     CALL SXGTTGRAPH
 
       RETURN

@@ -1,6 +1,9 @@
 *  History:
 *     31 Jan 1994 (hme):
 *        Fix the INQUIRE statement.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused IOPEN, J, IERR, MAPLOC, LOCATION
 *---------------------------------------------------------------------------
 
       SUBROUTINE MAKE_CHAN4 (BUF, XSCALE, IFAIL)
@@ -30,14 +33,13 @@
 *     Local variables:
 
       LOGICAL   PUSHED
-      LOGICAL   IOPEN,  IEXIST
+      LOGICAL   IEXIST
       LOGICAL   INTERP
-      INTEGER   I,      J
+      INTEGER   I
       INTEGER   IFILE
-      INTEGER   ISTAT,  IERR
+      INTEGER   ISTAT
       INTEGER   IPTR,   IPTR_MAP
       INTEGER   IX,     IY,      IZ
-      INTEGER   MAPLOC, LOCATION
       REAL      TWID(3),    TEXT(3)
 
 *     Misc common blocks
@@ -97,7 +99,7 @@
       ZWID  = ABS(ZWID)
 
       IF (ZWID.EQ.0.0) THEN
-        Type *,'Cannot make channel maps with zero channel width!'
+        PRINT *,'Cannot make channel maps with zero channel width!'
         IFAIL = 16
         RETURN
       END IF
@@ -114,7 +116,7 @@
         GO TO 1000
       END IF
 
-D     TYPE *,'Channel maps have size ',NAX(IX),NAX(IY)
+D     PRINT *,'Channel maps have size ',NAX(IX),NAX(IY)
 
       IF (NAX(IX).LE.1 .OR. NAX(IY).LE.1) THEN
         IFAIL = 49
@@ -147,15 +149,15 @@ D     TYPE *,'Channel maps have size ',NAX(IX),NAX(IY)
       ISTAT = IGETVM (NMAP_CM*4*NAXX*NAXY, .TRUE.,
      &               'MAKE_CHAN4', IPTR_MAP)
       IF (ISTAT.ne.0) THEN
-        TYPE *, 'Trouble getting virtual memory for map arrays'
-        TYPE *, ' -- FORTRAN i/o status return = ', ISTAT
+        PRINT *, 'Trouble getting virtual memory for map arrays'
+        PRINT *, ' -- FORTRAN i/o status return = ', ISTAT
         IFAIL = 51
         GO TO 999
       END IF
 
 *     Iterate over channels
 
-      TYPE *,'Generating maps from cube - please be patient!'
+      PRINT *,'Generating maps from cube - please be patient!'
 
       DO I = 1, NMAP_CM
 
@@ -241,8 +243,8 @@ C     Write map to a file
      &       IOSTAT =  ISTAT)
 
       IF (ISTAT.NE.0) THEN
-        TYPE *, ' --- make_chan4 ---'
-        TYPE *, '     error opening mapplane.tmp'
+        PRINT *, ' --- make_chan4 ---'
+        PRINT *, '     error opening mapplane.tmp'
         IFAIL = 18
       ELSE
         WRITE (IFILE) NMAPS, NAXX, NAXY
@@ -252,7 +254,7 @@ C     Write map to a file
       CLOSE (IFILE, IOSTAT=ISTAT)
       ISTAT = IFREELUN (IFILE)
 
-      TYPE *,'Maps now generated, going to contour them...'
+      PRINT *,'Maps now generated, going to contour them...'
 
 C   Release virtual memory
 
@@ -260,7 +262,7 @@ C   Release virtual memory
 
       ISTAT = IFREEVM (IPTR_MAP)
       IF (ISTAT .ne. 0) THEN
-        TYPE *,'Trouble freeing virtual memory for map'
+        PRINT *,'Trouble freeing virtual memory for map'
         IFAIL = 51
       END IF
 

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE SET_DISPLAY_SIZE (AX1LEN, AX2LEN, XDIM, YDIM,
@@ -48,12 +51,12 @@
 
       END IF
 
-D     type *
-D     type *, '-- set_display_size --'
-D     type *, '   requested (x,y)     = ', ax1len, ax2len
-D     type *, '   natural sizes (x,y) = ', xaxlen, yaxlen
-D     type *, '   output sizes (x,y)  = ', axlenx, axleny
-D     type *
+D     print *
+D     print *, '-- set_display_size --'
+D     print *, '   requested (x,y)     = ', ax1len, ax2len
+D     print *, '   natural sizes (x,y) = ', xaxlen, yaxlen
+D     print *, '   output sizes (x,y)  = ', axlenx, axleny
+D     print *
 
       RETURN
       END

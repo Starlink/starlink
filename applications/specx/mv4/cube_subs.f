@@ -1,3 +1,8 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused in RELEASE_NEW_CUBE: IFAIL
+*-----------------------------------------------------------------------
       SUBROUTINE MAKE_CUBE2 (NCUBE, NINDEX, CUBE_ADDRESS,
      &                                      INDEX_ADDRESS, IFAIL)
 
@@ -29,24 +34,27 @@
 *     Create virtual memory (use LIB$ routines rather than IGET/IFREE so
 *     that cube is not deleted by ^C)
 
-      Type *,NCUBE,' bytes required for data cube'
+      PRINT *,NCUBE,' bytes required for data cube'
 
-D     TYPE *, ' -- make_cube2 --'
+D     PRINT *, ' -- make_cube2 --'
 
       ISTAT = IGETVM (NCUBE, .FALSE., 'MAKE_CUBE2', CUBE_ADDRESS)
 
-D     TYPE *, '    Got ', NCUBE, ' bytes of VM for cube @ ',CUBE_ADDRESS
+D     PRINT *,
+D    &'    Got ', NCUBE, ' bytes of VM for cube @ ',CUBE_ADDRESS
       IF (ISTAT.NE.0) THEN
-        TYPE *,' -- make_cube2 -- Failed to get virtual memory for cube'
+        PRINT *,
+     &  ' -- make_cube2 -- Failed to get virtual memory for cube'
         IFAIL = 51
         GO TO 99
       END IF
 
       ISTAT = IGETVM (NINDEX, .FALSE., 'MAKE_CUBE2', INDEX_ADDRESS)
 
-D     TYPE *,'    Got ',NINDEX,' bytes of VM for index @ ',INDEX_ADDRESS
+D     PRINT *,
+D    &'    Got ',NINDEX,' bytes of VM for index @ ',INDEX_ADDRESS
       IF (ISTAT.NE.0) THEN
-        TYPE *,' -- make_cube2 -- Failed to get v. memory for index'
+        PRINT *,' -- make_cube2 -- Failed to get v. memory for index'
         IFAIL = 51
         GO TO 99
       END IF
@@ -59,12 +67,12 @@ D     TYPE *,'    Got ',NINDEX,' bytes of VM for index @ ',INDEX_ADDRESS
    99 CONTINUE
       ISTAT = IFREEVM (CUBE_ADDRESS)
       IF (ISTAT.NE.0) THEN
-        TYPE *, ' -- make_cube2 (error) -- didn''t release cube VM'
+        PRINT *, ' -- make_cube2 (error) -- didn''t release cube VM'
       END IF
 
       ISTAT = IFREEVM (INDEX_ADDRESS)
       IF (ISTAT.NE.0) THEN
-        TYPE *, ' -- make_cube2 (error) -- didn''t release index VM'
+        PRINT *, ' -- make_cube2 (error) -- didn''t release index VM'
       END IF
 
       RETURN
@@ -89,7 +97,6 @@ C  to mark the cube as non-existent.
 
 *     Local variables:
 
-      INTEGER    IFAIL
       INTEGER    ISTAT
 
 *     Functions:
@@ -98,22 +105,23 @@ C  to mark the cube as non-existent.
 
 *  Ok, go...
 
-D     TYPE *, ' -- Release new cube --'
+D     PRINT *, ' -- Release new cube --'
 
       IF (NEW_CUBE_LOADED .AND. NCUBE.NE.0) THEN
 
-D       TYPE *, '    Releasing ', NCUBE, ' bytes of index @ ',
+D       PRINT *, '    Releasing ', NCUBE, ' bytes of index @ ',
 D    &               CURRENT_CUBE_ADDRESS
         ISTAT = IFREEVM (CURRENT_CUBE_ADDRESS)
         IF (ISTAT.NE.0) THEN
-          TYPE *, '    Error releasing VM for new cube, ISTAT = ',ISTAT
+          PRINT *, '    Error releasing VM for new cube, ISTAT = ',ISTAT
         END IF
 
-D       TYPE *, '    Releasing ',NINDEX,' bytes of index@ ',
+D       PRINT *, '    Releasing ',NINDEX,' bytes of index@ ',
 D    &               CURRENT_INDEX_ADDRESS
         ISTAT = IFREEVM (CURRENT_INDEX_ADDRESS)
         IF (ISTAT.NE.0) THEN
-          TYPE *, '    Error releasing VM for new index, ISTAT = ',ISTAT
+          PRINT *,
+     &    '    Error releasing VM for new index, ISTAT = ',ISTAT
         END IF
 
       END IF

@@ -2,6 +2,8 @@
 *     22 Nov 1993 (hme):
 *        Remove TABs. Remove redundant () in WRITE with implied DO. Add
 *        commas after X format specifiers in statement 1000.
+*      6 Jun 2000 (ajc):
+*        Missing commas in FORMAT
 *-----------------------------------------------------------------------
 
       SUBROUTINE SKEW (NQ, XSCALE, BUF, IFAIL)
@@ -117,10 +119,10 @@
      &              SKWNSS, BETA1, AKURT, BETA2
       NXSSK = NXS
 
- 1000 FORMAT(' Moments of line profile;'3(/,1X,'Mu('I1') :'
-     $ F8.1' K-'A6'('I1')'),/,1X,'Skewness :',F7.2,5X,'Beta1 :',
-     $ F8.3,/,1X,'Kurtosis :',F7.2,5X,'Beta2 :'F8.3)
- 1001 FORMAT(' Integrated profile :'F6.1' K-'A6,/,' Mean position :'
+ 1000 FORMAT(' Moments of line profile;',3(/,1X,'Mu(',I1,') :',
+     $ F8.1,' K-',A6,'(',I1,')'),/,1X,'Skewness :',F7.2,5X,'Beta1 :',
+     $ F8.3,/,1X,'Kurtosis :',F7.2,5X,'Beta2 :',F8.3)
+ 1001 FORMAT(' Integrated profile :',F6.1,' K-',A6,/,' Mean position :',
      $ F5.1,1X,A6,/)
 
       RETURN

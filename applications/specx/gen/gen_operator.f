@@ -1,4 +1,9 @@
-
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change PRINT * to PRINT *
+*        Unused J
+*        Catch IERR=2 from GEN_PARSEOP and replace by IERR=1
+*         (end of line)
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_operator (string, ils, next, ierr)
@@ -24,7 +29,7 @@
 
 *     Local variables:
 
-      INTEGER*4 j
+D      INTEGER*4 j
       INTEGER*4 st, ist, iend
       LOGICAL*4 rbracket
 
@@ -34,7 +39,7 @@
 
 *  Ok, go..
 
-D     Type *, '-- gen_operator --'
+D     Print *, '-- gen_operator --'
 
       st   = next
 
@@ -55,27 +60,31 @@ D     Type *, '-- gen_operator --'
      &                    rbracket, next,ierr)
 
         IF (ierr.eq.0) THEN
-D         TYPE *, '    Parseop returned operator ', string(ist:iend)
+D         PRINT *, '    Parseop returned operator ', string(ist:iend)
+        ELSE IF ( ierr.eq.2 ) THEN
+          ierr = 1
+          RETURN
+
         END IF
 
         IF (rbracket) THEN
-D         Type *,'   ")" found: evaluate anything left at level', lev
+D         Print *,'   ")" found: evaluate anything left at level', lev
           CALL gen_eval_all (ierr)
           IF (ierr.ne.0) RETURN
           lev = lev - 1
-D         Type *,'    ...and pop stack, level =', lev
+D         Print *,'    ...and pop stack, level =', lev
           st  = next
         END IF
 
       END DO
 
-D     Type *, '     ---------------------------'
-D     Type *, '        Operator stack summary'
-D     Type *, '      total # operators: ', ntopr
-D     Type *, '      operators: ', (oper(j),' ',j=1,ntopr)
-D     Type *, '      priorities: ', (prio(j), j=1,ntopr)
-D     Type *, '      at this level:',(oper(j),j=ntopr-nopr(lev)+1,ntopr)
-D     Type *, '     ---------------------------'
+D     Print *, '     ---------------------------'
+D     Print *, '        Operator stack summary'
+D     Print *, '      total # operators: ', ntopr
+D     Print *, '      operators: ', (oper(j),' ',j=1,ntopr)
+D     Print *, '      priorities: ', (prio(j), j=1,ntopr)
+D     Print *, '      at this level:',(oper(j),j=ntopr-nopr(lev)+1,ntopr)
+D     Print *, '     ---------------------------'
 
       IF (ierr.eq.0) THEN         ! operator got.
 
@@ -96,7 +105,7 @@ D     Type *, '     ---------------------------'
           nopr(lev)  = nopr(lev)  - 1
           ntopr      = ntopr      - 1
 
-D         TYPE *,'    total # operators decremented by 1, now', ntopr
+D         PRINT *,'    total # operators decremented by 1, now', ntopr
 
         END DO
 

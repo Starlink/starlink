@@ -44,11 +44,11 @@
 #        alpha_OSF1
 #           DEC Alpha machines running OSF1
 #
+#        ix86_Linux
+#           Intel PC machines running Linux
+#
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
-#
-#        ix86_Linux
-#           Intel x86 processor running Linux (not for specx)
 #
 #     In addition, the following systems have been supported at some
 #     time in the past.  This script contains the macro definitions 
@@ -149,10 +149,6 @@
 #           (These include only the most common extensions, such as
 #           long names, end of line comments, include files, etc.)
 #
-#        FCPPFLAGS ()
-#           Defines to be used for *.F fortran files (ie those sent
-#           to the C pre-processor before compilation.
-#
 #        FFLAGS (-O)
 #           The Fortran compiler options to be used.
 #
@@ -218,8 +214,6 @@
 #
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
-#     Copyright (C) 1999 Particle Physics and Astronomy Research Council.
-#     All Rights Reserved.
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink, RAL)
@@ -227,7 +221,6 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
-#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -253,8 +246,8 @@
 #        Added CFLINK and CFLIBS for linking C main programs with Fortran
 #        subroutines (main task).  To be used instead of ELINK and LDFLAG1,
 #        LDFLAG2 so that static/dynamic linking can used.
-#     29-DEC-1999 (TIMJ):
-#        Add FCPPFLAGS. Add linux
+#      8-MAY-2000 (AJC):
+#        Add Linux definitions
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -271,7 +264,6 @@
       export DEFS
       export FC
       export FFLAGS
-      export FCPPFLAGS
       export LINK
       export LDFLAG1
       export LDFLAG2
@@ -307,7 +299,6 @@
                     -DHAVE_LIMITS_H -DHAVE_STDLIB_H'
                FC='f77'
                FFLAGS='-O -extend_source'
-               FCPPFLAGS=' '
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -364,7 +355,6 @@
                     -DHAVE_SYS_STREAM_H -DHAVE_UNISTD_H -DHAVE_STDLIB_H'
                FC='f77'
                FFLAGS='-O -e'
-               FCPPFLAGS='-DUSESH -DSUN4'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
@@ -373,22 +363,24 @@
 
 #  PC systems:
 #  ==========
-#  Intel PC running Linux. (note that Specx does not support this yet)
+#  Intel PC running Linux.
 #  ----------------------
             ix86_Linux)
                AR_IN='ar r'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-I$(STAR_INC) -O $(DEFS)'
+               DEFS='-DVOID_SIGHANDLER -DHAVE_ALLOCA -DHAVE_ALLOCA_H -DUSGr4 \
+                    -DUSG -DHAVE_STRING_H -DHAVE_VARARGS_H -DHAVE_SYS_PTEM_H \
+                    -DHAVE_SYS_STREAM_H -DHAVE_UNISTD_H -DHAVE_STDLIB_H'
                FC='g77'
+#               FC='f95'
                FFLAGS='-fno-second-underscore -O'
-               FCPPFLAGS="-D$SYSTEM -DUSESH"
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
-
 
 #  Issue a warning if SYSTEM is not recognised.
             *)

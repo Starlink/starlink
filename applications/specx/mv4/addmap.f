@@ -5,6 +5,11 @@
 *     13 Aug 1994 (hme):
 *        Use MV4_PROTWR instead of discarded WRITE_PROT_HEADER.
 *        Replace TOMAP with ADDMAP2. Leave writing the index to ADDMAP2.
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Change TYPE * to PRINT *
+*        Unused REPLACE, I, NSP, IREP, STATUS, STRING
+*        Initialise PUSHED to FALSE
 C--------------------------------------------------------------
 
       SUBROUTINE ADDMAP (NQ, IFAIL)
@@ -30,11 +35,9 @@ C   current spectrum is left in the stack in unaltered state
 
 *     Local variables:
 
-      LOGICAL          REPLACE
       LOGICAL          PUSHED
 
-      INTEGER          I
-      INTEGER          NSP,    IDUP
+      INTEGER          IDUP
 
       REAL             DMISS
       REAL             DELX,     DELY
@@ -43,14 +46,12 @@ C   current spectrum is left in the stack in unaltered state
       REAL             XCELL,    YCELL
       REAL             X_OFFSET, Y_OFFSET
 
-      CHARACTER        IREP*1
-      CHARACTER        STATUS*7
       CHARACTER        RASTRING*12, DECSTRING*12
-      CHARACTER        STRING*80
 
 *  Ok, go...
 
       IFAIL = 0
+      PUSHED = .FALSE.
 
 C     Check that a map is open
 
@@ -125,15 +126,15 @@ C       Calculate true map centre (get from scan header if necessary)
      &                  RAOFF, DECOFF)
       CALL CALC_XYSOFF (RAOFF, DECOFF, POS_ANGLE,
      &                  X_OFFSET, Y_OFFSET, IFAIL)
-D     TYPE *, '(R,D) offsets (arcsec): ', RAOFF,    DECOFF
-D     TYPE *, '(X,Y) offsets (arcsec): ', X_OFFSET, Y_OFFSET
+D     PRINT *, '(R,D) offsets (arcsec): ', RAOFF,    DECOFF
+D     PRINT *, '(X,Y) offsets (arcsec): ', X_OFFSET, Y_OFFSET
       IF (IFAIL.NE.0) GO TO 99
 
 *     Find coordinates of nearest cell to data point
 
       CALL CALC_XYCOFF (X_OFFSET, Y_OFFSET, CELL_XSIZE, CELL_YSIZE,
      &                  MSTEP, NSTEP, XCELL, YCELL, IFAIL)
-D     TYPE *, 'Nearest cell to data point: ', XCELL, YCELL
+D     PRINT *, 'Nearest cell to data point: ', XCELL, YCELL
       IF (IFAIL.NE.0) GO TO 99
 
 *     Check that scan is "close enough" to a data pixel centre. DMISS
@@ -146,7 +147,7 @@ D     TYPE *, 'Nearest cell to data point: ', XCELL, YCELL
       DELY   = Y_OFFSET - YCELL*CELL_YSIZE
       DMISS  = SQRT ((DELX/CELL_XSIZE)**2 + (DELY/CELL_YSIZE)**2)
 
-D     TYPE *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
+D     PRINT *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
 
       IF (DMISS .GT. MAP_TOL) THEN
         IFAIL = 70
@@ -190,7 +191,7 @@ D     TYPE *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
       CALL RELEASE_NEW_CUBE
       RETURN
 
- 1025 FORMAT (' Spectrum placed in cell ('I5','I5') ')
+ 1025 FORMAT (' Spectrum placed in cell (',I5,',',I5,') ')
  1030 FORMAT ('  -- position is ', F5.1, ' arcsec in X and ',
      &          F5.1, ' arcsec  in Y from pixel centre')
 

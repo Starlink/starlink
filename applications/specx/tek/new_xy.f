@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE NEW_XY (P, Q, OLD_LIMITS)
@@ -25,12 +28,12 @@ C   in header records in plot file.
       END IF
 
 D     CALL SXGTIDLE()
-D     TYPE *,'Hard plot x-limits:',XST,XEND
-D     TYPE *,'Current x-limits:  ',XST1,XEND1
-D     TYPE *,'Requested x-limits:',P(1),P(2)
-D     TYPE *,'Hard plot y-limits:',YST,YEND
-D     TYPE *,'Current y-limits:  ',YST1,YEND1
-D     TYPE *,'Requested y-limits:',Q(1),Q(2)
+D     PRINT *,'Hard plot x-limits:',XST,XEND
+D     PRINT *,'Current x-limits:  ',XST1,XEND1
+D     PRINT *,'Requested x-limits:',P(1),P(2)
+D     PRINT *,'Hard plot y-limits:',YST,YEND
+D     PRINT *,'Current y-limits:  ',YST1,YEND1
+D     PRINT *,'Requested y-limits:',Q(1),Q(2)
 
       IF (OLD_LIMITS) THEN
         IF (P(1).GE.MIN(XST1,XEND1) .AND. P(1).LE.MAX(XST1,XEND1))
@@ -51,8 +54,8 @@ D     TYPE *,'Requested y-limits:',Q(1),Q(2)
       CALL AUTORANGE (XXST, XXEND, NX)
       CALL AUTORANGE (YYST, YYEND, NY)
 
-D     TYPE *,'Revised x-limits:  ',XXST,XXEND
-D     TYPE *,'Revised y-limits:  ',YYST,YYEND
+D     PRINT *,'Revised x-limits:  ',XXST,XXEND
+D     PRINT *,'Revised y-limits:  ',YYST,YYEND
 
       CHANGE_SCALES = .TRUE.
 

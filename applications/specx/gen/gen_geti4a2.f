@@ -3,6 +3,9 @@
 *        Disuse OUTERR_HANDLER error handler.
 *     31 Jan 1994 (hme):
 *        Remove second declaration of IERR.
+*     31 July 2000 (ajc):
+*        Re-write illegal concatenation
+*        Unused IT
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_GETI4A2 (PROMPT, I4DEF, NSIZ,
@@ -34,7 +37,6 @@ C   of the default value.
       INTEGER*4 IERR
       INTEGER*4 ILP
       INTEGER*4 ILS
-      INTEGER*4 IT
       INTEGER*4 ITS
       INTEGER*4 ILT
       INTEGER*4 INEXT
@@ -44,6 +46,7 @@ C   of the default value.
       CHARACTER DEFSTR*32
       CHARACTER STRING*64
       CHARACTER TSTRING*80
+      CHARACTER PSTRING*80
 
 *     Functions
 
@@ -70,8 +73,11 @@ C   of the default value.
         WRITE (DEFSTR, STRING, IOSTAT=IERR) I4DEF
         IDS = GEN_ILEN (DEFSTR)
         ILP = GEN_ILEN (PROMPT)
-        CALL GEN_INPUT (LEVEL,
-     &                  PROMPT(:ILP)//' ['//DEFSTR(:IDS)//'] ',
+        PSTRING = PROMPT(:ILP)
+        PSTRING(ILP+1:) = ' ['
+        PSTRING(ILP+3:) = DEFSTR(:IDS)
+        PSTRING(ILP+IDS+4:) = '] '        
+        CALL GEN_INPUT (LEVEL, PSTRING,
      &                  TSTRING, ILT, JDEF)
         IF (JDEF.NE.0)  RETURN
       END IF

@@ -1,4 +1,8 @@
-
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused VALUE
+*        Drop through on bad given IERR to avoid crashes
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_eval_all (ierr)
@@ -10,7 +14,6 @@
 
 *     Formal parameters:
 
-      INTEGER*4 value
       INTEGER*4 ierr
 
 *     Operand and operator stacks
@@ -21,18 +24,18 @@
 
 *  Ok, go..
 
-      ierr = 0
+      if ( ierr .ne. 0 ) return
 
-D     Type *, '-- gen_eval_all --'
-D     TYPE *, '   lev, nopr(lev), ntopr =', lev, nopr(lev), ntopr
+D     Print *, '-- gen_eval_all --'
+D     PRINT *, '   lev, nopr(lev), ntopr =', lev, nopr(lev), ntopr
 
       DO WHILE (nopr(lev).gt.0)
-D       TYPE *, 'calling do_op for operator ', oper(ntopr)
+D       PRINT *, 'calling do_op for operator ', oper(ntopr)
         CALL gen_do_op (oper(ntopr), ierr)
         IF (ierr.ne.0) RETURN
         nopr(lev)  = nopr(lev)  - 1
         ntopr      = ntopr      - 1
-D       TYPE *, 'do_op completed, new value of ntopr =', ntopr
+D       PRINT *, 'do_op completed, new value of ntopr =', ntopr
       END DO
 
       RETURN

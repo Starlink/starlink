@@ -11,6 +11,12 @@
 *        Change TEMP to temp for consistency with normal useage
 *     19 Feb 1997 (timj):
 *        Change output format to allow >10000 for do loop indices
+*      6 Jun 2000 (ajc):
+*        Replace 'type *' with 'PRINT *'
+*        Remove unsupported CARRIAGECONTROL from OPEN
+*        Change DISP= to STATUS= in CLOSE
+*        Unused in SCL_DO: GEN_IENDCH, J, IDIFF
+*        Unused in SCL_ENDDO: IERR
 *-----------------------------------------------------------------------
 
       LOGICAL*4 FUNCTION SCL_DO (IERR)
@@ -36,14 +42,12 @@
       INTEGER   IFREELUN
       INTEGER   GEN_ILEN
       INTEGER   GEN_LINENO
-      INTEGER   GEN_IENDCH
       INTEGER   STACK_POINTER
 
 *  Local variables:
 
       LOGICAL   READONLY
-      INTEGER   I, J
-      INTEGER   IDIFF
+      INTEGER   I
       INTEGER   DO_PARS(3)
       INTEGER   ISP
       INTEGER   ISTAT
@@ -95,8 +99,8 @@
         IF (NVALS.LT.3) DO_PARS(3) = SIGN (1, DO_PARS(2) - DO_PARS(1))
       END IF
 
-D     Type *,'-- DO --'
-D     Type *,'Index range'
+D     PRINT *,'-- DO --'
+D     PRINT *,'Index range'
 D     Type '((1X,I4,'' to '',I4 '' by '',I4))', (DO_PARS(I),I=1,3)
 
 *  Find out what to DO, if DOing from command level
@@ -112,7 +116,7 @@ D     Type '((1X,I4,'' to '',I4 '' by '',I4))', (DO_PARS(I),I=1,3)
         END IF
 
         OPEN (DO_FILE, FILE='temp.spx', STATUS='UNKNOWN',
-     &        ACCESS='SEQUENTIAL', CARRIAGECONTROL='LIST', IOSTAT=ISTAT)
+     &        ACCESS='SEQUENTIAL', IOSTAT=ISTAT)
         IF (ISTAT.NE.0) THEN
           CLOSE (DO_FILE, IOSTAT=ISTAT)
           ISTAT = IFREELUN (DO_FILE)
@@ -120,12 +124,12 @@ D     Type '((1X,I4,'' to '',I4 '' by '',I4))', (DO_PARS(I),I=1,3)
           RETURN
         END IF
 
-D       Type *,' Writing temp.spx: n1,n2,n3:',(do_pars(i),i=1,3)
+D       PRINT *,' Writing temp.spx: n1,n2,n3:',(do_pars(i),i=1,3)
 
         WRITE (DO_FILE, '('' do '', A16, 3(1X,I6))')
      &         SYMBOL, (DO_PARS(I),I=1,3)
 
-        TYPE *,'Enter commands to do, line at a time, EOF to finish'
+        PRINT *,'Enter commands to do, line at a time, EOF to finish'
 
         ISTAT = 0
         DO WHILE (ISTAT.NE.2)
@@ -139,8 +143,8 @@ D       Type *,' Writing temp.spx: n1,n2,n3:',(do_pars(i),i=1,3)
 
             TBUFFER = '@temp;' // BUFFER (IBPTR:MAXLB)   ! (IBPTR:MAXLB) // ' '
             BUFFER  =  TBUFFER
-D           TYPE *, 'Contents of buffer...'
-D           TYPE *,  BUFFER
+D           PRINT *, 'Contents of buffer...'
+D           PRINT *,  BUFFER
 
             ILB    = 6 + (ILB-IBPTR+1)
             IBPTR  = 1
@@ -179,8 +183,8 @@ D           TYPE *,  BUFFER
 
       END IF
 
-D     Type *, '-- scl_do --     do variable = ', dovals(1,do_depth)
-D     Type *, '                 do depth = ', do_depth
+D     PRINT *, '-- scl_do --     do variable = ', dovals(1,do_depth)
+D     PRINT *, '                 do depth = ', do_depth
 
       RETURN
 
@@ -231,7 +235,6 @@ D     Type *, '                 do depth = ', do_depth
 
 *  Local variables
 
-      INTEGER*4 IERR
       INTEGER*4 ISP
       INTEGER*4 INCRT
       INTEGER*4 IVAL
@@ -246,10 +249,10 @@ D     Type *, '                 do depth = ', do_depth
       CALL XCOPY (4, %VAL(ADDRESS(DO_DEPTH)), IVAL)
       LIMIT = DOVALS(2,DO_DEPTH)
       INCRT = DOVALS(3,DO_DEPTH)
-D     Type *, '-- scl_enddo --  current do variable = ', ival
-D     Type *, '                 limit/increment     = ', limit,incrt
+D     PRINT *, '-- scl_enddo --  current do variable = ', ival
+D     PRINT *, '                 limit/increment     = ', limit,incrt
       IVAL  = IVAL + INCRT
-D     Type *, '                 updated do variable = ', ival
+D     PRINT *, '                 updated do variable = ', ival
 
       IF (      INCRT.GT.0 .AND. IVAL.LE.LIMIT
      &     .OR. INCRT.LT.0 .AND. IVAL.GE.LIMIT ) THEN
@@ -257,7 +260,7 @@ D     Type *, '                 updated do variable = ', ival
 *       Update the DO variable
         CALL XCOPY (4, IVAL, %VAL(ADDRESS(DO_DEPTH)))
         CALL XCOPY (4, %VAL(ADDRESS(DO_DEPTH)), IVAL)
-D     Type *, '                 test put do variable = ', ival
+D     PRINT *, '                 test put do variable = ', ival
 
 *       Rewind the file the appropriate number of records
 
@@ -269,7 +272,7 @@ D     Type *, '                 test put do variable = ', ival
         DO_DEPTH = DO_DEPTH - 1
       END IF
 
-D     Type *, '                 do depth = ', do_depth
+D     PRINT *, '                 do depth = ', do_depth
 
       RETURN
       END
@@ -306,7 +309,7 @@ D     Type *, '                 do depth = ', do_depth
 *     Currently editing temp.spx file for DO? If so, close it:
 
       IF (DO_FILE.NE.0) THEN
-        CLOSE (DO_FILE, DISP='DELETE', IOSTAT=IERR)
+        CLOSE (DO_FILE, STATUS='DELETE', IOSTAT=IERR)
         IF (IERR.EQ.0) THEN
           ISTAT = IFREELUN (DO_FILE)
           DO_FILE = 0
@@ -334,7 +337,7 @@ D     Type *, '                 do depth = ', do_depth
       DO WHILE (IF_LEVEL.GT.ISP .AND. STATUS)
         STATUS  = PULL_IFSTACK (IF_LEVEL)
         IF_SKIP = 0
-D       TYPE *, '-- scl_unwind -- if_level: ', if_level
+D       PRINT *, '-- scl_unwind -- if_level: ', if_level
       END DO
 
       DO_TO_ELSEIF   = .TRUE.

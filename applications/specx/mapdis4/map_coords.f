@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE MAP_COORDS (DMS, LABEL, IX, IY, XLIM, YLIM,
@@ -104,11 +107,11 @@ C     ... Or, label true RA and Dec
         END IF
         LYT = GEN_ILEN (LABELY)
 
-D       TYPE *, 'Offset for absolute positions:'
-D       TYPE *, '     RDCENX = ', RDCENX
-D       TYPE *, '     RDCENY = ', RDCENY
-D       TYPE *, '     MAPRA  = ', MAP_RA
-D       TYPE *, '     MAPDEC = ', MAP_DEC
+D       PRINT *, 'Offset for absolute positions:'
+D       PRINT *, '     RDCENX = ', RDCENX
+D       PRINT *, '     RDCENY = ', RDCENY
+D       PRINT *, '     MAPRA  = ', MAP_RA
+D       PRINT *, '     MAPDEC = ', MAP_DEC
 
         CALL SXGLIMITS   (XRDL, XRDH, YRDL, YRDH)
         IF (LABEL) THEN

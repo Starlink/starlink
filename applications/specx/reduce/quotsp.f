@@ -4,6 +4,11 @@ C-----------------------------------------------------------------------
 
 C   Forms quotient of spectra in X and Y positions in stack
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Replace 'Type *' with 'PRINT *'
+C       Missing comma in FORMAT
+
       IMPLICIT  NONE
 
 C     Formal parameters
@@ -48,7 +53,7 @@ C     Checks
         IF (DOQUAD(NQ))   THEN
           IF (NPTS2(NQ).NE.NPTS(NQ))   THEN
             IERR = 17
-            TYPE *,'Warning, # points different in quadrant', NQ
+            PRINT *,'Warning, # points different in quadrant', NQ
           ELSE
             IZERO = 0
             N1 = NTOT(NQ-1) + 1
@@ -63,7 +68,7 @@ C           Check for zeros in denominator spectrum
 
             IF (IZERO.NE.0) THEN
               WRITE  (6,5000) IZERO
- 5000         FORMAT (' Warning ,'I4
+ 5000         FORMAT (' Warning ,',I4,
      &                ' points in denominator spectrum = 0.0')
             END IF
 
@@ -89,7 +94,7 @@ C           form quotient
       IF (IERR.EQ.0)   THEN
         CALL POP
       ELSE
-        TYPE *,'Stack unchanged, X & Y may be damaged'
+        PRINT *,'Stack unchanged, X & Y may be damaged'
       END IF
 
       RETURN

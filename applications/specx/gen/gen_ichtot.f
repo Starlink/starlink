@@ -1,4 +1,6 @@
-
+* History:
+*    21 Sep 2000 (ajc)
+*       Unused GEN_ILEN
 *-----------------------------------------------------------------------
 
       INTEGER FUNCTION GEN_ICHTOT(LEV)
@@ -6,8 +8,6 @@
 C  Routine to calculate amount of CLILINE taken up by command levels
 C  up to and including LEV.
 C  Note, first level is LEV=0, and need to allow for LEV=-1
-
-      INTEGER*4 GEN_ILEN
 
       INCLUDE 'CLI_STACK.INC'
 

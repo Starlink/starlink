@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE VELENCODE (VFRAME, VDEF, LSRFLG)
@@ -39,9 +41,9 @@
       VFRAMET = VFRAME(1:4)
       CALL UUCASE (VFRAMET)
 
-D     TYPE *, ' -- velencode --'
-D     TYPE *, '    vel frame = ', VFRAMET
-D     TYPE *, '    vel law   = ', VDEFT
+D     PRINT *, ' -- velencode --'
+D     PRINT *, '    vel frame = ', VFRAMET
+D     PRINT *, '    vel law   = ', VDEFT
 
       I = 1
       DO WHILE (I.LE.3 .AND. VDEFT.NE.VDEFS(I))
@@ -60,7 +62,7 @@ D     TYPE *, '    vel law   = ', VDEFT
 
       LSRFLG = 16*(I-1) + (J-1)
 
-D     TYPE *, '    output value of LSRFLG', LSRFLG
+D     PRINT *, '    output value of LSRFLG', LSRFLG
 
       RETURN
       END

@@ -14,6 +14,11 @@
 *        Remove initialization of PRINT_OUTPUT; done in SCL_MAIN anyway
 *     15 Jan 1994 (rp):
 *        Change CHR_UCASE to UUCASE
+*      7 Jun 2000 (ajc):
+*        Use C structure in specx_show_table1 for port to Linux
+*        Change TYPE * to PRINT *
+*        Unused in SPECX_MAKE_VAR: LENGTH, SYM_INDEX/TYPE/LENGTH/ADDR
+*               in SPECX_SET_VALUE: ISTAT
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_MAKE_VAR (STRING, INTYPE, IERR)
@@ -49,12 +54,6 @@
       INTEGER*4 LBRACKET
       INTEGER*4 RBRACKET
       CHARACTER TYPE*4
-      CHARACTER LENGTH*3
-
-      INTEGER*4 SYM_INDEX
-      CHARACTER SYM_TYPE*4
-      INTEGER*4 SYM_LENGTH
-      INTEGER*4 SYM_ADDR
 
       CHARACTER NAME*16
       INTEGER*4 ARRAY_LENGTH
@@ -138,7 +137,7 @@
 *     --------------
 
    99 CONTINUE
-
+      
       IF (IERR.EQ.1) THEN
         IERR = 104                ! variable table full
       ELSE IF (IERR.EQ.2) THEN
@@ -190,7 +189,6 @@
 *  Ok, go...
 
 *     Search for wildcards:
-
       IF (INDEX (SYMBOL, '*') .ne. 0) THEN
         CALL SPECX_SHOW_TABLE1 (%VAL(SYMTAB_ADDRESS), L_SYMTAB,
      &                          SYMBOL, ILOUT2)
@@ -205,7 +203,7 @@
           WRITE (ILOUT2, '(5X,A16,1X,A4,1X,I4.1,6X)', IOSTAT=IERR) 
      &                   SYMBOL, SYM_TYPE, SYM_LEN
         ELSE
-          TYPE *, 'Symbol name "', SYMBOL(:ILS), '" not found.'
+          PRINT *, 'Symbol name "', SYMBOL(:ILS), '" not found.'
         END IF
       END IF
 
@@ -220,15 +218,8 @@
 
 *     Formal parameters
 
-      STRUCTURE /SYMBOL/
-        CHARACTER*16 NAME
-        CHARACTER*4  TYPE
-        INTEGER*4    LENGTH 
-        INTEGER*4    ADDRESS
-      END STRUCTURE
-
       INTEGER*4 NO_ENTRIES         ! Number of entries made in table to date
-      RECORD /SYMBOL/ TABLE(NO_ENTRIES)
+      INTEGER TABLE    !Dummy
 
       CHARACTER       TSYMBOL*(*)
       INTEGER*4       ILOUT
@@ -237,9 +228,14 @@
       INTEGER*4 IERR
       LOGICAL*4 MATCH_OK
 
+      CHARACTER*16 NAME
+      CHARACTER*4  TYPE
+      INTEGER*4    LENGTH 
+      INTEGER*4    ADDRESS
+
 *  ok, go..
 
-      IF (NO_ENTRIES.le.0) THEN
+      IF (NO_ENTRIES.LE.0) THEN
         WRITE (ILOUT, *) 'No entries in symbol table yet!'
         RETURN
       END IF
@@ -249,12 +245,13 @@
 
       DO I = 1, NO_ENTRIES
 
-        CALL SCL_MATCH_WILD (TABLE(I).NAME, TSYMBOL, MATCH_OK)
+        CALL GEN_INQSYMENT( I, NAME, TYPE, LENGTH, ADDRESS, IERR )
+        CALL SCL_MATCH_WILD (NAME, TSYMBOL, MATCH_OK)
         IF (MATCH_OK)
      &    WRITE (ILOUT, '(5X,A16,1X,A4,1X,I4.1,6X)', IOSTAT=IERR) 
-     &           TABLE(I).NAME,
-     &           TABLE(I).TYPE,
-     &           TABLE(I).LENGTH
+     &           NAME,
+     &           TYPE,
+     &           LENGTH
 
       END DO
 
@@ -295,7 +292,6 @@
       INTEGER*4 SYM_ADDR
       INTEGER*4 NBYTES
       INTEGER*4 IERR
-      INTEGER*4 ISTAT
       INTEGER*4 ILS
       INTEGER*4 ICH1, ICH2
       INTEGER*4 IOFF
@@ -306,10 +302,10 @@
 
       IFAIL = 0
 
-*     Type *,'-- specx_set_value --'
-*     Type *,'  Symbol and string lengths:', LEN(SYMBOL), LEN(STRING)
-*     Type *,'  Symbol name:   ', SYMBOL
-*     Type *,'  String value:  ', STRING
+*     PRINT *,'-- specx_set_value --'
+*     PRINT *,'  Symbol and string lengths:', LEN(SYMBOL), LEN(STRING)
+*     PRINT *,'  Symbol name:   ', SYMBOL
+*     PRINT *,'  String value:  ', STRING
 
       ILS = INDEX (SYMBOL,'(') - 1
       IF (ILS.EQ.-1) ILS = LEN(SYMBOL)
@@ -318,43 +314,42 @@
      &                  SYM_LEN, SYM_ADDR, READONLY, IERR)
 
       IF (SYM_INDEX.EQ.0) THEN
-        Type *, 'Variable "', SYMBOL(:ILS), '" not defined'
+        PRINT *, 'Variable "', SYMBOL(:ILS), '" not defined'
         IFAIL = 100
         RETURN
       END IF
 
       IF (READONLY) THEN
-        Type *, 'Variable "', SYMBOL(:ILS), '" is readonly'
+        PRINT *, 'Variable "', SYMBOL(:ILS), '" is readonly'
         IFAIL = 102
         RETURN
       END IF
 
       TYPE = SYM_TYPE(1:1)
       READ (SYM_TYPE(2:), *) NBYTES
-
-*     Type *,'  Symbol type:   ', TYPE
-*     Type *,'  # of bytes:    ', NBYTES
+*     PRINT *,'  Symbol type:   ', TYPE
+*     PRINT *,'  # of bytes:    ', NBYTES
 
       IF (TYPE.EQ.'C') THEN
         CVALUE = ' '
       END IF
 
       CALL GEN_EVAL_AE (STRING, SYM_TYPE, LVALUE, IERR)
-
       IF (IERR.NE.0) THEN
-        IF (IERR.EQ.1) THEN
-          IERR = 85
-        ELSE IF (IERR.EQ.2) THEN
-          IERR = 95
-        ELSE IF (IERR.EQ.3) THEN
-          IERR = 107
-        ELSE IF (IERR.EQ.4) THEN
-          IERR = 108
-        ELSE IF (IERR.EQ.5) THEN
-          IERR = 100
-        ELSE IF (IERR.EQ.6) THEN
-          IERR = 100
-        END IF
+!        IF (IERR.EQ.1) THEN
+!          IFAIL = 85
+!        ELSE IF (IERR.EQ.2) THEN
+!          IFAIL = 95
+!        ELSE IF (IERR.EQ.3) THEN
+!          IFAIL = 103
+!        ELSE IF (IERR.EQ.4) THEN
+!          IFAIL = 108
+!        ELSE IF (IERR.EQ.5) THEN
+!          IFAIL = 100
+!        ELSE IF (IERR.EQ.6) THEN
+!          IFAIL = 100
+!        END IF
+        IFAIL = 103
         RETURN
       END IF
 
@@ -364,21 +359,22 @@
       IF (IERR.NE.0) RETURN
 
       IF (ICH1.GT.0 .AND. ICH2.GE.ICH1) THEN
+
         CALL GEN_EVAL_AE (SYMBOL(ICH1:ICH2), 'I4', IOFF, IERR)
 
         IF (IERR.NE.0) THEN
           IF (IERR.EQ.1) THEN
-            IERR = 85
+            IFAIL = 85
           ELSE IF (IERR.EQ.2) THEN
-            IERR = 95
+            IFAIL = 95
           ELSE IF (IERR.EQ.3) THEN
-            IERR = 107
+            IFAIL = 107
           ELSE IF (IERR.EQ.4) THEN
-            IERR = 108
+            IFAIL = 108
           ELSE IF (IERR.EQ.5) THEN
-            IERR = 100
+            IFAIL = 100
           ELSE IF (IERR.EQ.6) THEN
-            IERR = 100
+            IFAIL = 100
           END IF
           RETURN
         END IF
@@ -390,6 +386,7 @@
       END IF
 
 *     IF (TYPE.NE.'C') THEN
+
         CALL GEN_SETSYM1 (%VAL(SYMTAB_PTR), L_SYMTAB,
      &                    SYM_INDEX, IOFF, LVALUE, IERR)
 *     ELSE

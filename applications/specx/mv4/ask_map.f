@@ -1,3 +1,8 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused I, RASTR, DECSTR
+*-----------------------------------------------------------------------
       SUBROUTINE ASK_MAP (MAP_ID, MAP_OWNER_NAME,
      &                    CELL_XSIZE, CELL_YSIZE,
      &                    POS_ANGLE, MSTEP, NSTEP,
@@ -23,9 +28,7 @@
       LOGICAL   AUTO_CENTRE
       REAL      CELL_SIZE(2)           ! X & Y size of pixels (arcseconds)
       INTEGER   NCELLS(2)              ! No of cells on X and Y axes
-      INTEGER   I
       INTEGER   ISTAT
-      CHARACTER RASTR*20,  DECSTR*20
 
 *  Ok, go...
 
@@ -53,7 +56,7 @@
   101 CALL GEN_GETR4A ('x (R.A.) & y (Dec) cell sizes? (arcsec)',
      &                 CELL_SIZE, 2, 'F5.1,1X,F5.1', CELL_SIZE, ISTAT)
       IF (CELL_SIZE(1).LE.0.0 .OR. CELL_SIZE(2).LE.0.0) THEN
-         TYPE *,'Cell dimensions must be positive!'
+         PRINT *,'Cell dimensions must be positive!'
          GO TO 101
       END IF
       CELL_XSIZE = CELL_SIZE(1)
@@ -67,27 +70,27 @@
       MSTEP = NCELLS(1)
       NSTEP = NCELLS(2)
       IF (2*(MSTEP/2).EQ.MSTEP .OR. 2*(NSTEP/2).EQ.NSTEP) THEN
-        TYPE *,'Number of cells must be odd!'
+        PRINT *,'Number of cells must be odd!'
         GO TO 100
       ELSE IF (MSTEP.LE.0 .OR. NSTEP.LE.0) THEN
-        TYPE *,'Number of cells must be positive!'
+        PRINT *,'Number of cells must be positive!'
         GO TO 100
       END IF
 
   102 CALL GEN_GETI4 ('Number of spectral channels in map?',
      &                 NPTS1, ' ', NPTS1, ISTAT)
       IF (NPTS1.LE.0) THEN
-        TYPE *, 'Number of channels must be positive!'
+        PRINT *, 'Number of channels must be positive!'
         GO TO 102
       END IF
 
       IF (AUTO_CENTRE) THEN
-        TYPE *
-        TYPE *,'Map centre (i.e. pos''n corresponding to centre pixel)'
-        TYPE *,'will be the map centre of first spectrum ADDed to the'
-        TYPE *,'map after it is created. Use ED-S-H on first spectrum'
-        TYPE *,'if you want to force some other map centre.'
-        TYPE *
+        PRINT *
+        PRINT *,'Map centre (i.e. pos''n corresponding to centre pixel)'
+        PRINT *,'will be the map centre of first spectrum ADDed to the'
+        PRINT *,'map after it is created. Use ED-S-H on first spectrum'
+        PRINT *,'if you want to force some other map centre.'
+        PRINT *
       END IF
 
       RETURN

@@ -5,6 +5,10 @@ C-----------------------------------------------------------------------
 C   Routine to drop unequal numbers of points from the ends of each
 C   quadrant of data. Useful if excess noise in correlator data e.g.
    
+C   History:
+C      6-JUN-2000 (AJC):
+C        Replace 'TYPE *' with 'PRINT *'
+
       IMPLICIT  NONE
 
 *     Formal parameters
@@ -33,7 +37,7 @@ C   quadrant of data. Useful if excess noise in correlator data e.g.
 
       IFAIL = 0
 
-      TYPE *,          'Delete channels from ends of quadrant(s)'
+      PRINT *,          'Delete channels from ends of quadrant(s)'
       CALL GEN_GETI4A ('No of points to remove? (low and high)',
      &                  IDC, 2, '2(I4,1X)', IDC, JDEF)
 
@@ -45,7 +49,7 @@ C   quadrant of data. Useful if excess noise in correlator data e.g.
 
           IF ((IDC1+IDC2) .GE. NPTS(N))   THEN
             IFAIL = 5
-            TYPE *,'Warning, not enough points in quadrant', N
+            PRINT *,'Warning, not enough points in quadrant', N
 
           ELSE
             NPTSNEW(N)  = NPTS(N)-IDC1-IDC2

@@ -22,9 +22,13 @@ PKG = specx
 
 FC     = f77
 FFLAGS = -g -C
-FCPPFLAGS = -DSUN4 -DUSESH
+# FCPPFLAGS = -DSUN4 -DUSESH
 CFLAGS = -I${STAR_INC}
 LINK   = ln -s
+
+# Linux
+FCPPFLAGS = -DLINUX
+FFLAGS = -g
 
 # install
 

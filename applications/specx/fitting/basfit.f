@@ -1,4 +1,7 @@
-C-----------------------------------------------------------------------
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*-----------------------------------------------------------------------
 
       SUBROUTINE BASFIT (NQ, XSCALE, BUF, IFAIL)
 
@@ -29,7 +32,7 @@ C-----------------------------------------------------------------------
 
 *  Ok, go...
 
-      TYPE *, 'Doing R-L-B for quadrant/sub-band # ', NQ
+      PRINT *, 'Doing R-L-B for quadrant/sub-band # ', NQ
 
       CALL SETXNEW (XSCALE, IFAIL)
       IF (IFAIL.NE.0) RETURN

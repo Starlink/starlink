@@ -1,6 +1,9 @@
 *    History:
 *     01-Aug-1995 (rpt):
 *        ICOLOR support added.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused PLOTS, DOQUAD
 C-----------------------------------------------------------------------
 
       SUBROUTINE PLOTXY (XSCALE, BUF, NCH, IFAIL)
@@ -18,7 +21,6 @@ C     Formal parameters:
 
 C     Local variables:
       REAL      A0, A1
-      REAL      PLOTS(11)
       REAL      XW1       /25.0/
       REAL      YW1       /50.0/
       REAL      YMARGIN   /70./
@@ -53,7 +55,6 @@ C     Include files:
       EQUIVALENCE      (PLOTS1,XLEN1)
 
 C     Functions:
-      LOGICAL  DOQUAD
       INTEGER  GEN_ILEN
 
 C  Ok, go...
@@ -98,14 +99,14 @@ C   else change axes if change in effect
           IF (FREEX) CALL SETRANGE (NCH, XSCALE, XST1, XEND1, NINTSX1,
      &                              1.0, BADPIX_VAL, IFAIL)
           IF (IFAIL.NE.0) THEN
-            TYPE *, 'Error setting X-scale automatically'
+            PRINT *, 'Error setting X-scale automatically'
             RETURN
           END IF
 
           IF (FREEY) CALL SETRANGE2D (NCH, XSCALE, BUF, BADPIX_VAL,
      &               XST1, XEND1, 1.3, NINTSY1, YST1, YEND1, IFAIL)
           IF (IFAIL.NE.0) THEN
-            TYPE *, 'Error setting Y-scale automatically'
+            PRINT *, 'Error setting Y-scale automatically'
             RETURN
           END IF
         END IF

@@ -1,4 +1,6 @@
-
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE GET_SUBEXPR (STRING, ICH1, ICH2, IERR)
@@ -60,8 +62,8 @@
    99 ICH2 = ICH2 - 1
 
       IF (NEST.NE.0) THEN
-        TYPE *, '-- get_subexpr --'
-        TYPE *, '   Mismatched parentheses: ', STRING(:ILS)
+        PRINT *, '-- get_subexpr --'
+        PRINT *, '   Mismatched parentheses: ', STRING(:ILS)
         ICH2 = 0
         IERR = 100
       END IF

@@ -13,6 +13,9 @@
 *        Put back calls to nnn_SCREEN etc (which are now dummies)
 *     15 Jan 1994 (rp):
 *        Change CHR_UCASE to UUCASE
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused CHKBOX
 C-----------------------------------------------------------------------
 
       INTEGER FUNCTION IVTOPT(IDEV, VALOPT, P, Q, REPEAT)
@@ -22,7 +25,7 @@ C   NCAR type plot
 
       PARAMETER       (NOPTS=15)
 
-      LOGICAL         CHKBOX,REPEAT,FIRST_BOX
+      LOGICAL         REPEAT,FIRST_BOX
       INTEGER*4       VCHAR
       REAL*4          P(2),Q(2),Q2(2)
       CHARACTER       TXTLIN*32,CHR*1,VALOPT*(*),ICH2*2
@@ -75,15 +78,15 @@ C  Read cursor position and write character to screen
        CALL CONFIRM(CHR,ICH2)
        CALL IERASE_LINE(1,1)
        CALL IPUT_SCREEN('GIN character '//ICH2,1,61,2)
-*      TYPE *,'GIN character '//ICH2
+*      PRINT *,'GIN character '//ICH2
 
 C  Decode X-position and Y-position to plot co-ordinates and confirm
 
 *      CALL SXGTIDLE
-*      Type *,'X and Y values (mm) ',XPOS,YPOS
-*      Type *,'XST1, XEND1         ',XST1,XEND1
-*      Type *,'YST1, YEND1         ',YST1,YEND1
-*      Type *,'XLEN1,YLEN1         ',XLEN1,YLEN1
+*      Print *,'X and Y values (mm) ',XPOS,YPOS
+*      Print *,'XST1, XEND1         ',XST1,XEND1
+*      Print *,'YST1, YEND1         ',YST1,YEND1
+*      Print *,'XLEN1,YLEN1         ',XLEN1,YLEN1
 *      CALL SXGTTGRAPH
 
        X=XST1+(XPOS-25.)*(XEND1-XST1)/XLEN1
@@ -91,7 +94,7 @@ C  Decode X-position and Y-position to plot co-ordinates and confirm
        WRITE (TXTLIN,'(''X=''F10.4,1X,''Y=''F10.3)', IOSTAT=IERR) X, Y
        CALL IPUT_SCREEN(TXTLIN(:25),2,55,0)
        CALL ISET_CURSOR(23,1)
-*      TYPE *,TXTLIN(:25)
+*      PRINT *,TXTLIN(:25)
 
 C  Convert lower case letters to upper case
        CALL UUCASE(CHR)
@@ -100,7 +103,7 @@ C  Convert lower case letters to upper case
 C  Then decode options
        IF (INDEX(VALOPT,ICH2).EQ.0) THEN
          CALL IPUT_SCREEN('Invalid character '//ICH2,1,1,2)
-*        TYPE *,'Invalid character '//ICH2
+*        PRINT *,'Invalid character '//ICH2
 
        ELSE IF (CHR.EQ.END) THEN
          IVTOPT=2

@@ -34,6 +34,8 @@
 *        Original version.
 *     10 May 1995 (rpt): 
 *        Added support for ISEQ and FILHD
+*     20 July 2000 (ajc):
+*        Correct extra-long line CALL FV4_SPECIX
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -191,7 +193,8 @@
          CALL DAT_ANNUL( TLOC(2), STATUS )
 
 *     Get and write header information.
-         CALL FV4_SPECIX( TLOC(3), ISCAN, RPOS, LENGTH, ILOUT, IFAIL, STATUS )
+         CALL FV4_SPECIX( TLOC(3), ISCAN, RPOS, LENGTH, ILOUT, IFAIL,
+     &     STATUS )
          CALL DAT_ANNUL( TLOC(3), STATUS )
          IF ( IFAIL .NE. 0 ) GO TO 500
  1001 CONTINUE

@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE ASK_INTERP (IFAIL)
@@ -28,7 +31,7 @@ C-----------------------------------------------------------------------
 *     Can't do it if cube is already both interpolated and rotated
 
       IF (MAP_INTERPOLATED .AND. MAP_ROTATED) THEN
-        TYPE *, ' -- ask_interp -- Map is already both interpolated'//
+        PRINT *, ' -- ask_interp -- Map is already both interpolated'//
      &                           ' and rotated!'
         IFAIL = 72
         RETURN
@@ -52,9 +55,9 @@ C-----------------------------------------------------------------------
      &    (VWIDHM.EQ.0.0 .OR. VFNMAX.EQ.0.0)) THEN
         IF (MAP_INTERPOLATED) THEN
           CALL RELEASE_NEW_CUBE
-          TYPE *, 'Interpolated cube deleted, reset to original'
+          PRINT *, 'Interpolated cube deleted, reset to original'
         ELSE
-          TYPE *, 'Interpolation on demand has been switched off'
+          PRINT *, 'Interpolation on demand has been switched off'
           INTERP_WAIT = .FALSE.
         END IF
 

@@ -8,7 +8,10 @@
 *     01 Feb 1995 (rpt):
 *        Changed code to decode PROMPT into a new prompt string SPROMPT
 *        for use by GET_LINE, rather than writing PROMPT to the temrinal
-*
+*     31 July 2000 (ajc):
+*        Re-write illegal concatenation
+*        Correct LUNOUT to LUN_OUT (add IMPLICIT NONE and define various
+*        other variables)
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_PUTPMT(PROMPT,IERR, SPROMPT)
@@ -28,22 +31,26 @@ C
 C   Note that this does NOT affect the use of constant character expressions
 C   in straightforward calls with single line prompts.
 
+      IMPLICIT NONE
+
       CHARACTER PROMPT*(*), SPROMPT*(*), TPROMPT*255
       CHARACTER BLANK*1      /' '/
       CHARACTER QUOT*1       /'"'/
+      CHARACTER*512 PSTRING
 
       INCLUDE  'LOGICAL_UNITS.INC'
 
       INTEGER*4 GEN_ILEN
       INTEGER*4 GEN_IENDCH
+      INTEGER*4 IERR
+      INTEGER*4 ILS, JLS
+      INTEGER*4 I
 
 *  Ok..go
-
       IERR = 0
       IF (LUN_OUT_SET.EQ.0) LUN_OUT = 6
 
 *     Need to establish length and then remove hollerith characters if there
-
       ILS = GEN_ILEN (PROMPT)
       IF (PROMPT(1:1).EQ.'''' .AND. PROMPT(ILS:ILS).EQ.'''') THEN
         IF (GEN_IENDCH (PROMPT).EQ.ILS) THEN
@@ -66,10 +73,14 @@ C   in straightforward calls with single line prompts.
           IF (PROMPT(I:I).EQ.'/') JLS = I
           I = I - 1
         ENDDO
-        WRITE (LUNOUT,
-     1         '(1X,'//PROMPT(2:JLS)//',$)', ERR=100, IOSTAT=IERR)
-        WRITE (TPROMPT,
-     1         '('//PROMPT(JLS+1:ILS-1)//')', ERR=100, IOSTAT=IERR) 
+        PSTRING(1:4) = '(1X,'
+        PSTRING(5:) = PROMPT(2:JLS)
+        PSTRING(JLS+4:) = ',$)'
+        WRITE (LUN_OUT, PSTRING(1:JLS+6), ERR=100, IOSTAT=IERR)
+        PSTRING(1:1) = '('
+        PSTRING(2:) = PROMPT(JLS+1:ILS-1)
+        PSTRING(ILS-JLS+1:) = ')'
+        WRITE (TPROMPT, PSTRING(1:ILS-JLS+2), ERR=100, IOSTAT=IERR) 
         ILS = GEN_ILEN (TPROMPT)
         JLS = 1
         DO WHILE (TPROMPT(JLS:JLS) .EQ. ' ' .AND. JLS .LT. ILS) 

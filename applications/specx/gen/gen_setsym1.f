@@ -1,3 +1,8 @@
+*  History:
+*      7 Jun 2000 (ajc):
+*        Use C structure for port to Linux
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_SETSYM1 (TABLE, LTAB, SYM_INDEX, IOFF, VALUE, IERR)
@@ -6,29 +11,20 @@
 
 *     Formal parameters
 
+      INTEGER TABLE           ! Dummy
       INTEGER*4 LTAB
       INTEGER*4 SYM_INDEX
       INTEGER*4 IOFF
       REAL*4    VALUE
       INTEGER*4 IERR
 
-      STRUCTURE /SYMBOL/
-        CHARACTER*16 NAME
-        CHARACTER*4  TYPE
-        INTEGER*4    LENGTH 
-        INTEGER*4    ADDRESS
-      END STRUCTURE
-
-      INTEGER*4 MAX_TABLE
-      PARAMETER (MAX_TABLE=512)
-
-      RECORD /SYMBOL/ TABLE(MAX_TABLE)
-
 *     Other variables
 
       INTEGER*4 ADDRESS
       INTEGER*4 ILT
       INTEGER*4 NBYTES
+
+      CHARACTER*4  TYPE
 
 *     Functions
 
@@ -38,17 +34,20 @@
 
       IERR = 0
 
-*     Type *,'-- gen_setsym1 --'
-*     Type *,'  (real) value =', VALUE
+*     PRINT *,'-- gen_setsym1 --'
+*     PRINT *,'  (real) value =', VALUE
 
-      ILT = GEN_ILEN (TABLE(SYM_INDEX).TYPE)
-      READ (TABLE(SYM_INDEX).TYPE(2:ILT), '(I)') NBYTES
-      ADDRESS = TABLE(SYM_INDEX).ADDRESS + (IOFF-1)*NBYTES
+      CALL GEN_INQSYMTYP( SYM_INDEX, TYPE, IERR )
+      CALL GEN_INQSYMADDR( SYM_INDEX, ADDRESS, IERR )
 
-*     Type *,'  Entry # =', NSYMB
-*     Type *,'  Length  =', NBYTES
-*     Type *,'  Array element # =  ', IOFF
-*     Type *,'  Writing to address ', ADDRESS
+      ILT = GEN_ILEN (TYPE)
+      READ (TYPE(2:ILT), '(I3)') NBYTES
+      ADDRESS = ADDRESS + (IOFF-1)*NBYTES
+
+*     PRINT *,'  Entry # =', NSYMB
+*     PRINT *,'  Length  =', NBYTES
+*     PRINT *,'  Array element # =  ', IOFF
+*     PRINT *,'  Writing to address ', ADDRESS
 
       CALL XCOPY ( NBYTES, VALUE, %VAL(ADDRESS) )
 

@@ -1,3 +1,8 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*     18 Sep 2000 (ajc)
+*        Change IUTFLG to BYTE
 C-----------------------------------------------------------------------
 
       SUBROUTINE LSRCOR (LSRFLG, VSL,   VES,     VTE,    VLSR,
@@ -25,7 +30,7 @@ C  update the IF rather than the centre frequency (or better, as well as).
       REAL      VLSR
       CHARACTER DATE*9
       CHARACTER TIME*8
-      LOGICAL   IUTFLG
+      BYTE      IUTFLG
       REAL*8    RA
       REAL*8    DEC
       INTEGER   JFREST
@@ -72,22 +77,22 @@ C  update the IF rather than the centre frequency (or better, as well as).
 *     (value for display comes for free, but is not used...)
 
       CALL SETXFREST (1, 1, JFCEN, JFREST, FCEN, FROBS, FRDIS)
-D     TYPE *, ' -- lsrcor --'
-D     TYPE *, '    Rest freq, observed, = ', FROBS
+D     PRINT *, ' -- lsrcor --'
+D     PRINT *, '    Rest freq, observed, = ', FROBS
 
 *     Convert header centre frequency JFCEN to telluric value,
 *     returned in FCEN_T (GHz).
 
       CALL SETXFTCEN (JFCEN, VFRAME, VDEF,
      &                VTE, VES, VSL, VLSR, FCEN_T)
-D     TYPE *, '    Telluric centre frequency = ', FCEN_T, ' GHz'
+D     PRINT *, '    Telluric centre frequency = ', FCEN_T, ' GHz'
 
 *     Calculate desired offset in telluric frequency; just multiply number
 *     of channels by (telluric) channel width. Result in MHz.
 
       DFTELL = 1.0D-6 * CHAN_SHIFT * DFLOAT(JFINC)
       DF     = DFTELL
-D     TYPE *, '    Telluric frequency shift of scan centre = ',
+D     PRINT *, '    Telluric frequency shift of scan centre = ',
 D    &             DF, ' MHz'
 
 *     Correct to offset frequency in *source* frame using appropriate 
@@ -95,13 +100,13 @@ D    &             DF, ' MHz'
 
       CALL SETXDOPP   (DF, 1, VFRAME, VDEF,
      &                 VTE, VES, VSL, VLSR, FCEN_T, FROBS)
-D     TYPE *, '    Telluric centre freq = ', FCEN_T, ' GHz'
+D     PRINT *, '    Telluric centre freq = ', FCEN_T, ' GHz'
 
 *     Final step is to calculate total frequency and amend JFCEN accordingly.
 *     (cf routine SETXFREQ, with ABS_FREQ = .T. and REST_REL = .T.)
 
       JFCEN = 1.D6 * (FROBS + DF/1000.)
-D     Type *, '    Doppler corrected centre frequency = ', JFCEN, ' kHz'
+D     Print *, '    Doppler corrected centre frequency = ', JFCEN, ' kHz'
 
 *     If LO and Intermediate frequencies are set, then amend IF also
 *     to reflect shift in channels. Required shift was saved in DFTELL

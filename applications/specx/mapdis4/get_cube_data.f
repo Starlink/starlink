@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE GET_CUBE_DATA (J, K, LSPEC, BUF2, INTERP,
@@ -24,8 +27,8 @@
 
 *     Ok, go...
 
-D     TYPE *, ' -- get_cube_data --'
-D     TYPE *, '    j, k = ', j, k
+D     PRINT *, ' -- get_cube_data --'
+D     PRINT *, '    j, k = ', j, k
 
       SUCCESS = .FALSE.
 

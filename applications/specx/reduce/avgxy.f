@@ -6,6 +6,12 @@ C   Routine to average spectra in X and Y arrays, weighting for integration
 C   time and system temperature if applicable, and resetting system temperature
 C   to effective average TSYS for the total integration time.
 
+C   History:
+C       6-JUN-2000 (AJC):
+C         Replace 'Type *' with 'PRINT *'
+C         Unused WEIGHT1
+C-
+
       IMPLICIT  NONE
 
 C   Formal parameter
@@ -22,7 +28,7 @@ C   Local variables
       INTEGER*4 I,       NQ
       INTEGER*4 INTTM1,  INTTM2
       REAL*4    TSYS1,   TSYS2
-      REAL*4    WEIGHT1, WEIGHT2
+      REAL*4    WEIGHT2
       REAL*4    TSYSX(NQMAX)
       REAL*4    TEMP(NQMAX)
 
@@ -56,7 +62,7 @@ C   Swap X and Y data arrays and weight the other also
           TSYS2 = TSYS(NQ)
           WRITE (ILOUT,*) 'Averaging quadrant: ',NQ
           IF (TSYS1*TSYS2.EQ.0.) THEN
-            Type *,'One or both system temperatures zero: no weighting'
+            PRINT *,'One or both system temperatures zero: no weighting'
             WEIGHT2 = 1.0
           ELSE
             WEIGHT2 = (TSYS1/TSYS2)**2
@@ -90,5 +96,3 @@ C   Add data and divide by total integration time
 
       RETURN
       END
-
-

@@ -28,6 +28,8 @@
 *  History:
 *     18 Dec 1995 (timj): 
 *        Original version.
+*     21 Sep 2000 (ajc):
+*        Unused NFIL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -255,17 +257,17 @@ C      INTEGER IFAIL              ! Specx error status
 
 * Local variables
       INTEGER STATUS             ! Starlink status
-      INTEGER I, J, NFIL
+      INTEGER I, J
       INTEGER FFINC( NQMAX )     ! Frequency increment
       INTEGER FOUND              ! Number of spectra to merge (not inc deleted spectra)
       INTEGER LSCAN
       INTEGER NELM, NDIM, NQUAD
       INTEGER NPTS( NQMAX )
       INTEGER FFREST( NQMAX )
-      INTEGER LLSSRR( 4 )
       INTEGER FINISH( 2 ), START( 2 )
       INTEGER CNT, IMINONE
       INTEGER FILEA
+      REAL    LLSSRR( 4 )
       REAL    DPOS ( 2 )
       DOUBLE PRECISION RADEC( 2 )
       CHARACTER * ( DAT__SZLOC ) TLOC    ! An HDS locator

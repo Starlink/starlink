@@ -1,4 +1,7 @@
-
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused CLIPTR, NIT, IERR, GEN_ILEN
 *-----------------------------------------------------------------------
 
       SUBROUTINE INS_CLI_ITEM (ITEM)
@@ -25,15 +28,11 @@
       INTEGER*4 LITEM
       INTEGER*4 ICLIST
       INTEGER*4 ICLIFIN
-      INTEGER*4 CLIPTR
-      INTEGER*4 NIT
-      INTEGER*4 IERR
       INTEGER*4 IST, IFIN
       CHARACTER BLANK*1     /' '/
 
 *  Functions etc
 
-      INTEGER*4 GEN_ILEN
       INTEGER*4 GEN_ICHTOT
 
 *  OK. So do it. Basically what we need to do is to find where in the CLILINE
@@ -50,8 +49,8 @@
       IST     = ICLI (1,ISP)
       IFIN    = ICLI (2,ISP)
 
-D     Type *, 'Original CLILINE for this stack level:'
-D     Type *,  CLILINE(ICLIST:ICLIFIN)
+D     Print *, 'Original CLILINE for this stack level:'
+D     Print *,  CLILINE(ICLIST:ICLIFIN)
 
 *  Then make the substitution: Note that length of new string is
 *  equal to length of original string, less the characters removed,
@@ -70,8 +69,8 @@ D     Type *,  CLILINE(ICLIST:ICLIFIN)
       ICLI(1,ISP) = 1
       ICLI(2,ISP) = ICLIFIN + 1 - ICLIST
 
-D     Type *,'Updated CLILINE for this stack level:'
-D     Type *, CLILINE(ICLIST:ICLIFIN)
+D     Print *,'Updated CLILINE for this stack level:'
+D     Print *, CLILINE(ICLIST:ICLIFIN)
 
       RETURN
       END

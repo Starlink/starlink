@@ -3,6 +3,8 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------------
 C
       SUBROUTINE ASK_PLOT_DEVICE (IOLD, INEW, TERM)
@@ -66,12 +68,12 @@ C generate new plot device from answer
 
       TERM = IANS.EQ.'T'
 
-*     type *
-*     type *, '-- ask_plot_device --'
-*     type *, '    default device number: ', iold
-*     type *, '    final device number:   ', inew
-*     if (term) type *, '    device is a terminal.'
-*     type *
+*     print *
+*     print *, '-- ask_plot_device --'
+*     print *, '    default device number: ', iold
+*     print *, '    final device number:   ', inew
+*     if (term) print *, '    device is a terminal.'
+*     print *
 
       RETURN
       END

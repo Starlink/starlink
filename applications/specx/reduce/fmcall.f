@@ -5,6 +5,10 @@ C-----------------------------------------------------------------------
 C   Routine to find and print maximum value in each unmasked quadrant.
 C   Calls the routine FINDMX to calculate maximum of each array
 
+C   History:
+C      6-JUN-2000 (AJC):
+C        Missing comma in FORMAT
+
       IMPLICIT  NONE
 
 *     formal parameters:
@@ -53,7 +57,7 @@ C   Calls the routine FINDMX to calculate maximum of each array
 
       RETURN
 
- 1910 FORMAT(' Quadrant ',I2.1,':  data maximum is 'G11.4' at ',
+ 1910 FORMAT(' Quadrant ',I2.1,':  data maximum is ',G11.4,' at ',
      &       F9.2,A6)
 
       END

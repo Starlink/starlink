@@ -5,6 +5,12 @@ C-----------------------------------------------------------------------
 C   Routine to read header from open GSD file containing a 
 C   generalized observation.
 C   RPT 30-jan-1997   Correct integration time for on-the-fly maps.
+C   AJC  8-may-2000   Port to Linux
+C                     Replace TYPE with PRINT
+C                     IXN undefined
+C                     Unused I, J, LVAL, ACTDIMS 
+C                     Initialise PRESEPT88
+C-
 
       IMPLICIT  NONE
 
@@ -14,9 +20,6 @@ C   RPT 30-jan-1997   Correct integration time for on-the-fly maps.
       PARAMETER (ADAM__OK=0)
 
       LOGICAL   ARRAY
-      INTEGER*4 I
-      INTEGER*4 J
-      INTEGER*4 LVAL
       INTEGER*4 NO
       INTEGER*4 STATUS
       CHARACTER TYPE*1
@@ -26,7 +29,6 @@ C   RPT 30-jan-1997   Correct integration time for on-the-fly maps.
 
       CHARACTER*20 DIMNAMES(2)
       CHARACTER*20 DIMUNITS(2)
-      INTEGER*4    ACTDIMS
       INTEGER*4    DIMVALS (2)
       INTEGER*4    ACTVALS
       
@@ -187,6 +189,7 @@ D     WRITE (ILOUT,*) 'Increments in x & y positive?: ',xpos, ypos
 *  the headers should be translated. At the moment try looking for a scan
 *  parameter which was not there in the early form - CELL_V2Y
 
+      PRESEPT88 = .FALSE.
       CALL GSD_FIND  (IFD, 'CELL_V2Y',
      &                NO, UNITS, TYPE, ARRAY, IND_V2Y, STATUS)
       IF (STATUS.NE.ADAM__OK) THEN
@@ -302,7 +305,8 @@ C     is observed at the "off" position, but that C3SRT will be
 C     the total "on" for the complete row.
 C
       IF ( IFLY .NE. 0 ) THEN
-        INT_TIME = 4.D0 / (1.D0 + 1.D0/SQRT(1.D0*IXNP)) * INT_TIME / IXNP
+        INT_TIME =
+     &    4.D0 / (1.D0 + 1.D0/SQRT(1.D0*IXNP)) * INT_TIME / IXNP
       END IF
 
 C     ...# phases per cycle
@@ -396,7 +400,7 @@ D       WRITE (ILOUT,*) 'nrf,nrc,lspc',nrf,nrc,lspc
 C  Standard return
 
    99 IF (STATUS.NE.ADAM__OK) THEN
-        type '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
+        PRINT '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
         IERR = 36
       END IF
 

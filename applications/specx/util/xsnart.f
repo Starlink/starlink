@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       REAL FUNCTION XSNART (X, V, NX, IFAIL)
@@ -38,8 +41,8 @@ C       to NX (right edge of channel NX), limits XL to XR
 
       XL = X(1)  - 0.5*( X(2) -X(1)    )
       XR = X(NX) + 0.5*( X(NX)-X(NX-1) )
-D     type *, ' -- xsnart --'
-D     type *, '  left and right limits: ', xl, xr
+D     print *, ' -- xsnart --'
+D     print *, '  left and right limits: ', xl, xr
 
 *     test that value lies in range of axis...
 
@@ -66,9 +69,9 @@ D     type *, '  left and right limits: ', xl, xr
 
       DX = XRR - XLL
 
-D     type *, '  first guess channel: ', n1
-D     type *, '  channel boundaries xll and xrr: ', xll, xrr
-D     type *, '  channel increment dx: ', dx
+D     print *, '  first guess channel: ', n1
+D     print *, '  channel boundaries xll and xrr: ', xll, xrr
+D     print *, '  channel increment dx: ', dx
 
 *     iterate until we know location to within one channel
 
@@ -89,16 +92,16 @@ D     type *, '  channel increment dx: ', dx
 
         DX  = XRR - XLL
 
-D       type *, '  next guess channel: ', n1
-D       type *, '  channel boundaries xll and xrr: ', xll, xrr
-D       type *, '  channel increment dx: ', dx
+D       print *, '  next guess channel: ', n1
+D       print *, '  channel boundaries xll and xrr: ', xll, xrr
+D       print *, '  channel increment dx: ', dx
 
       END DO
 
 *     final interpolation 
 
       XSNART = N1 + (V-X(N1))/DX
-D     type *, '  final value: ', xsnart
+D     print *, '  final value: ', xsnart
 
       RETURN
       END

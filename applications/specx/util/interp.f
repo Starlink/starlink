@@ -1,3 +1,6 @@
+* History:
+*    20-SEP-2000 (AJC):
+*       Declare BUF assumed size array
 C---------------------------------------------------------------------
 
       REAL FUNCTION INTERP(BUF,Z,N)
@@ -10,7 +13,7 @@ C   If x is on the first interval...uses Newton fwd difference formula.
 C
 C   If x is on the last interval...uses Gregory-Newton bwd difference formula
 
-      REAL*4 BUF(1)
+      REAL*4 BUF(*)
 
       IF(Z.LT.1.)   Z=1.0
       IF(Z.GT.FLOAT(N))   Z=FLOAT(N)

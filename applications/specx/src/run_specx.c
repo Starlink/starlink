@@ -9,10 +9,7 @@
  *    ANSI C
 
  * Description:
- *    This function sets up handlers for
- floating point exception (SIGFPE),
- access violatyions (SIGSEGV), and interupt (SIGINT) signals,
- *    and then 
+ *    This function sets up handlers for most signals and then
  *    activates the main Specx Fortran subroutine. The signal handling is 
  *    done is C because there seems to be no way of doing a long jump in 
  *    fortran (i.e. a GOTO from one subroutine back to a place in a higher 
@@ -35,6 +32,7 @@
  * Authors:
  *    dsb: David Berry (STARLINK)
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    ajc: Alan Chipperfield (RAL, Starlink)
  *    {enter_new_authors_here}
 
  * History:
@@ -42,6 +40,8 @@
  *       Original version.
  *    05 Oct 1995 (hme):
  *       Copied and adapted from Dipso for use in Specx.
+ *    02 Aug 2000 (ajc):
+ *       Don't use SIGSYS and SIGEMT if not defined (on Linux)
  *    {enter_changes_here}
 
  * Bugs:
@@ -62,7 +62,7 @@
 
 #elif defined( alpha_OSF1 ) || defined( mips )
 
-#define main MAIN__   
+#define main MAIN__
 void for_rtl_init_( int*, char **);
 int for_rtl_finish_( void );
 
@@ -72,6 +72,9 @@ int for_rtl_finish_( void );
 #include <floatingpoint.h>
 #define main MAIN_
 
+#elif defined( linux )
+
+#define main MAIN__
 
 
 #endif
@@ -89,7 +92,7 @@ extern F77_SUBROUTINE(hds_stop)( INTEGER(status) );
 jmp_buf here;      
 
 /*  Entry Point: */
-void main( int argc, char *argv[])
+int main( int argc, char *argv[])
 {
 
 /*  Local Variables: */
@@ -99,7 +102,8 @@ void main( int argc, char *argv[])
 /*  Initialise the fortran run-time-library data structures (OSF + mips). */
 
 #if defined( alpha_OSF1 ) || defined( mips )
-      for_rtl_init_( &argc, argv );
+/*      for_rtl_init_( &argc, argv );*/
+      for_rtl_init_( argc, argv );
 
 
 /*  Initialise the fortran run-time-library data structures (sun). */
@@ -167,10 +171,13 @@ void main( int argc, char *argv[])
       sigaction( SIGFPE,   &act, &oact );
       sigaction( SIGBUS,   &act, &oact );
       sigaction( SIGSEGV,  &act, &oact );
+#ifdef SIGSYS
       sigaction( SIGSYS,   &act, &oact );
-
+#endif
       act.sa_handler = hand2;
+#ifdef SIGEMT
       sigaction( SIGEMT,   &act, &oact );
+#endif
       sigaction( SIGKILL,  &act, &oact );
       sigaction( SIGPIPE,  &act, &oact );
       sigaction( SIGALRM,  &act, &oact );

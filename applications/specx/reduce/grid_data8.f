@@ -9,6 +9,12 @@ C  gridding interval GRIDN.
 C  On return NBOT and NTOP contain first and last channels of DATA which
 C  contain useful data (can be used to drop channels if necessary).
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Replace 'TYPE *' with 'PRINT *'
+C       Unused XTRANS8
+C-
+
       IMPLICIT  NONE
 
 C     Formal parameters:
@@ -38,18 +44,17 @@ C     Local variables:
  
 C     Functions
 
-      REAL*8    XTRANS8
       REAL*8    XSNART8
 
 C  Ok, go..
 
       IERR  = 0
 
-D     TYPE *, ' -- grid_data8 --'
-D     TYPE *, '    ndat, nout  = ', NDAT, NOUT
-D     TYPE *, '    gridn, xmid = ', GRIDN, XMID
-C     TYPE *, '    current x-scale array ='
-C     TYPE *,      (XSCALE(J),J=1,NDAT)
+D     PRINT *, ' -- grid_data8 --'
+D     PRINT *, '    ndat, nout  = ', NDAT, NOUT
+D     PRINT *, '    gridn, xmid = ', GRIDN, XMID
+C     PRINT *, '    current x-scale array ='
+C     PRINT *,      (XSCALE(J),J=1,NDAT)
 
 C     Find the centre channel and initialize
 
@@ -127,7 +132,7 @@ C         Write new value into current output point.
   
 C     Regridded array is complete:
 
-      Type *,'First and last useful channels in input:',NBOT,NTOP
+      PRINT *,'First and last useful channels in input:',NBOT,NTOP
 
       RETURN
       END

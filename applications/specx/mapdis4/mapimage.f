@@ -42,8 +42,8 @@
      &      ACCESS = 'SEQUENTIAL',
      &      IOSTAT =  IOSTAT)
       IF (IOSTAT.NE.0) THEN
-        TYPE *, ' --- mapimage ---'
-        TYPE *, '     failed to open file ', filename
+        PRINT *, ' --- mapimage ---'
+        PRINT *, '     failed to open file ', filename
         ISTAT = IOSTAT
         RETURN
       END IF
@@ -51,9 +51,9 @@
 *     Read the basic header
 
       READ (UNIT, ERR=999) NMAPS, IMX, IMY
-D     TYPE *, '--- mapimage ---'
-D     TYPE *, '    file contains (# of maps) ', nmaps
-D     TYPE *, '    each has size (x by y) = ', imx, imy
+D     PRINT *, '--- mapimage ---'
+D     PRINT *, '    file contains (# of maps) ', nmaps
+D     PRINT *, '    each has size (x by y) = ', imx, imy
 
 *     Get virtual memory for the data array
 
@@ -61,11 +61,11 @@ D     TYPE *, '    each has size (x by y) = ', imx, imy
 
       ISTAT  = IGETVM (NBYTES, .TRUE., 'MAP_IMAGE', IPTR)
       IF (ISTAT.NE.0) THEN
-        TYPE *, '--- mapimage ---'
-        TYPE *, '    IGETVM return status = ', ISTAT
+        PRINT *, '--- mapimage ---'
+        PRINT *, '    IGETVM return status = ', ISTAT
         RETURN
       ELSE
-D       TYPE *, '    virtual memory got (bytes)  = ', NBYTES
+D       PRINT *, '    virtual memory got (bytes)  = ', NBYTES
       END IF
 
 *     Read the data into the image array
@@ -101,8 +101,8 @@ D       TYPE *, '    virtual memory got (bytes)  = ', NBYTES
 
       WRITE (UNIT, IOSTAT=ISTAT) DATA
       IF (ISTAT.NE.0) THEN
-        TYPE *, '--- vwrite ---'
-        TYPE *, '    FORTRAN i/o error # ', ISTAT
+        PRINT *, '--- vwrite ---'
+        PRINT *, '    FORTRAN i/o error # ', ISTAT
       END IF
 
       RETURN
@@ -128,8 +128,8 @@ D       TYPE *, '    virtual memory got (bytes)  = ', NBYTES
 
       READ (UNIT, IOSTAT=ISTAT) DATA
       IF (ISTAT.NE.0) THEN
-        TYPE *, '--- vread ---'
-        TYPE *, '    FORTRAN i/o error # ', ISTAT
+        PRINT *, '--- vread ---'
+        PRINT *, '    FORTRAN i/o error # ', ISTAT
       END IF
 
       RETURN

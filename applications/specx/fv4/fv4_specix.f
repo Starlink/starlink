@@ -54,6 +54,8 @@
 *        Original version.
 *     10 May 1995 (rpt): 
 *        Added support for ISEQ
+*     21 Sep 2000 (ajc):
+*        Unused IMODE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,7 +92,6 @@
       INTEGER JFCEN( NQMAX )
       INTEGER JFINC( NQMAX )
       INTEGER INTT
-      INTEGER IMODE
       REAL AZEL( 2 )
       REAL DPOS( 2 )
       DOUBLE PRECISION RADEC( 2 )

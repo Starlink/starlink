@@ -3,6 +3,10 @@
 *        Disuse OUTERR_HANDLER error handler.
 *     31 Jan 1994 (hme):
 *        Remove second declaration of IERR.
+*     31 July 2000 (ajc):
+*        Re-write illegal concatenation
+*        Change TYPE * to PRINT *
+*        Unused IT
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_GETR4A2 (PROMPT, R4DEF, NSIZ,
@@ -34,7 +38,6 @@ C   of the default value.
       INTEGER*4 IERR
       INTEGER*4 ILP
       INTEGER*4 ILS
-      INTEGER*4 IT
       INTEGER*4 ITS
       INTEGER*4 ILT
       INTEGER*4 INEXT
@@ -44,6 +47,7 @@ C   of the default value.
       CHARACTER DEFSTR*32
       CHARACTER STRING*64
       CHARACTER TSTRING*80
+      CHARACTER PSTRING*80
 
 *     Functions
 
@@ -70,8 +74,11 @@ C   of the default value.
         WRITE (DEFSTR, STRING, IOSTAT=IERR) R4DEF
         IDS = GEN_ILEN (DEFSTR)
         ILP = GEN_ILEN (PROMPT)
-        CALL GEN_INPUT (LEVEL,
-     &                  PROMPT(:ILP)//' ['//DEFSTR(:IDS)//'] ',
+        PSTRING = PROMPT(:ILP)
+        PSTRING(ILP+1:) = ' ['
+        PSTRING(ILP+3:) = DEFSTR(:IDS)
+        PSTRING(ILP+IDS+4:) = '] '
+        CALL GEN_INPUT (LEVEL, PSTRING,
      &                  TSTRING, ILT, JDEF)
         IF (JDEF.NE.0)  RETURN
       END IF
@@ -86,9 +93,9 @@ C  Then read those items that are given
       INEXT = 1
       DO WHILE (N.LT.NSIZ .AND. INEXT.GT.IFIN)
         CALL GEN_GETIT3 (TSTRING(ITS:ILS), 1, IST, IFIN, INEXT, IERR)
-D       type *,'Parsed string: ', tstring(its:ils)
-D       type *,' n, ist, ifin, inext, ierr'
-D       type *,  n, ist, ifin, inext, ierr
+D       print *,'Parsed string: ', tstring(its:ils)
+D       print *,' n, ist, ifin, inext, ierr'
+D       print *,  n, ist, ifin, inext, ierr
         IF (IERR.EQ.0) THEN
           N = N + 1
           IF (      TSTRING(ITS+IST-1:ITS+IFIN-1).NE.'#'
@@ -107,7 +114,7 @@ D       type *,  n, ist, ifin, inext, ierr
 C   Error handling
 
    10 IF (IERR.NE.0)   THEN
-        TYPE *,'Sorry - I couldn''t understand that'
+        PRINT *,'Sorry - I couldn''t understand that'
         JDEF = -1
       END IF
 

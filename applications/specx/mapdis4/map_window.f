@@ -1,6 +1,8 @@
 *     01 Jan 1994 (rp):
 *        name of common block GOODPT apparently changed to GOOD_PT.
 *        -- assume to avoid conflict with routine name; duplicate change here
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE MAP_WINDOW (SCALE, NPTS2, IFAIL)
@@ -39,46 +41,46 @@ C  same order as data coming from map file).
 C     SETMAX is a function equivalent to SETX to SET Map AXes - generates a
 C     SCALE array containing all values from start to end.
 
-*     Type *, ' -- map_window --'
+*     PRINT *, ' -- map_window --'
 
-*     Type *, '    R.A. calculation'
+*     PRINT *, '    R.A. calculation'
       CALL SETMAX (SCALE, MSTEP, CELL_XSIZE)
       CALL SPECX_AXIDEF (1, SCALE, MSTEP, -CELL_XSIZE,
      &                   PBEG(1), PEND(1), IFAIL)
       IF (IFAIL.NE.0) THEN
-        TYPE *, ' -- map_window --'
-        TYPE *, '    Error setting windowing for R.A./X-axis'
-        TYPE *, '    Requested window from ', PBEG(1), ' to ', PEND(1)
-        TYPE *, '    Map extent in this axis is ', SCALE(1), ' to ',
+        PRINT *, ' -- map_window --'
+        PRINT *, '    Error setting windowing for R.A./X-axis'
+        PRINT *, '    Requested window from ', PBEG(1), ' to ', PEND(1)
+        PRINT *, '    Map extent in this axis is ', SCALE(1), ' to ',
      &               SCALE(MSTEP)
         GO TO 999
       END IF
 
-*     Type *, '    Dec. calculation'
+*     PRINT *, '    Dec. calculation'
       CALL SETMAX (SCALE, NSTEP, CELL_YSIZE)
       CALL SPECX_AXIDEF (2, SCALE, NSTEP, -CELL_YSIZE,
      &                   PBEG(2), PEND(2), IFAIL)
       IF (IFAIL.NE.0) THEN
-        TYPE *, ' -- map_window --'
-        TYPE *, '    Error setting windowing for Dec./Y-axis'
-        TYPE *, '    Requested window from ', PBEG(2), ' to ', PEND(2)
-        TYPE *, '    Map extent in this axis is ', SCALE(1), ' to ',
+        PRINT *, ' -- map_window --'
+        PRINT *, '    Error setting windowing for Dec./Y-axis'
+        PRINT *, '    Requested window from ', PBEG(2), ' to ', PEND(2)
+        PRINT *, '    Map extent in this axis is ', SCALE(1), ' to ',
      &               SCALE(NSTEP)
         GO TO 999
       END IF
 
-*     Type *, '    Vel. calculation'
+*     PRINT *, '    Vel. calculation'
       CALL SETXNEW (SCALE, IFAIL)
-*     Type *, '    # points in X-array = ', npts2
-*     Type *, '    channel width       = ', xfac(1)
+*     PRINT *, '    # points in X-array = ', npts2
+*     PRINT *, '    channel width       = ', xfac(1)
 
       CALL SPECX_AXIDEF (3, SCALE, NPTS2, XFAC(1),
      &                   PBEG(3), PEND(3), IFAIL)
       IF (IFAIL.NE.0) THEN
-        TYPE *, ' -- map_window --'
-        TYPE *, '    Error setting windowing for Freq/Vel/etc scale'
-        TYPE *, '    Requested window from ', PBEG(3), ' to ', PEND(3)
-        TYPE *, '    Map extent in this axis is ', SCALE(1), ' to ',
+        PRINT *, ' -- map_window --'
+        PRINT *, '    Error setting windowing for Freq/Vel/etc scale'
+        PRINT *, '    Requested window from ', PBEG(3), ' to ', PEND(3)
+        PRINT *, '    Map extent in this axis is ', SCALE(1), ' to ',
      &               SCALE(NPTS2)
         GO TO 999
       END IF
@@ -133,15 +135,15 @@ C     SCALE array containing all values from start to end.
       CBEG(I) = X1
       CEND(I) = X2
 
-*     Type *, ' -- specx_axidef --'
-*     Type *, '    calculation for axis ', I
-*     Type *, '    plimits return status = ', IFAIL
-*     Type *, '    Range:     ', PBEG,PEND
-*     Type *, '    Intervals: ', N1,N2
-*     Type *, '    Fractions: ', PF1(I),PF2(I)
-*     Type *, '    Pixel vals:', CBEG(I),CEND(I)
-*     Type *, '    #pixels:   ', NAX(I)
-*     Type *, '    Offset:    ', IOFF(I)
+*     PRINT *, ' -- specx_axidef --'
+*     PRINT *, '    calculation for axis ', I
+*     PRINT *, '    plimits return status = ', IFAIL
+*     PRINT *, '    Range:     ', PBEG,PEND
+*     PRINT *, '    Intervals: ', N1,N2
+*     PRINT *, '    Fractions: ', PF1(I),PF2(I)
+*     PRINT *, '    Pixel vals:', CBEG(I),CEND(I)
+*     PRINT *, '    #pixels:   ', NAX(I)
+*     PRINT *, '    Offset:    ', IOFF(I)
 
    99 CONTINUE
 

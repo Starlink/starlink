@@ -6,7 +6,10 @@ C   Routine to select data for specified spectrum (# in file) and
 C   place in SPECX stack for processing
 
 C   RMP 18 Nov 1991 - put in Rachael's latest mods to John's code
-
+C   AJC  8 May 2000 - Port to Unix
+C                     Replace TYPE with PRINT
+C                     Don't split string constants across lines
+C                     Unused I
       IMPLICIT  NONE
 
 C   Formal parameters
@@ -30,7 +33,6 @@ C   Formal parameters
       INTEGER*4 DIMVAL_DATA(3)
       INTEGER*4 IENDS(3)
 
-      INTEGER*4 I
       INTEGER*4 IPTR
       INTEGER*4 ISOURCE(NQMAX)
       INTEGER*4 J
@@ -127,10 +129,10 @@ D     WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
 D     WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
       X_OFFSET = X_OFFSET * DX
       Y_OFFSET = Y_OFFSET * DY
-      WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,
-     &               '') arcsec'')')  x_offset, y_offset
-      WRITE (ILOUT,'(10X,''rotation angles: x2y = '',F6.1,
-     &               '' deg.; v2y = '',F6.1,'' deg.'')') X2Y, V2Y
+      WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,'//
+     &               ''') arcsec'')')  x_offset, y_offset
+      WRITE (ILOUT,'(10X,''rotation angles: x2y = '',F6.1,'//
+     &               ''' deg.; v2y = '',F6.1,'' deg.'')') X2Y, V2Y
 
 C    ..then convert to R.A. and Dec. offsets
 
@@ -140,8 +142,8 @@ C    ..then convert to R.A. and Dec. offsets
      &          + SIN (V2Y_RAD)           * Y_OFFSET
       DDEC    =   COS (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + COS (V2Y_RAD)           * Y_OFFSET
-      WRITE (ILOUT,'(10X,''(r,d) offset = ('',F6.1,'','',F6.1,
-     &               '') arcsec'')')  dra, ddec
+      WRITE (ILOUT,'(10X,''(r,d) offset = ('',F6.1,'','',F6.1,'//
+     &               ''') arcsec'')')  dra, ddec
 
 C  Fix up integration time for last spectrum
 
@@ -262,7 +264,7 @@ C     Print out a picture of the stack with new spectra showing...
 C  Standard return
 
    99 IF (STATUS.NE.ADAM__OK) THEN
-        TYPE '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
+        PRINT '('' Status'',2X,I10,4X,''($'',Z8.8,'')'')', status,status
       END IF
 
 *     WRITE (ILOUT,1000) ITITLE, NQUAD

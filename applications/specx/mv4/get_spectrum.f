@@ -4,6 +4,9 @@
 *        TSYS as start of scan header, since it isn't any more.
 *     4 March 1997 (timj):
 *        Set LSCAN to be non-zero to protect scans written to files
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused MCEN, I, NBYTES, APDEC, STATUS
 C-----------------------------------------------------------------------
 
       SUBROUTINE GET_SPECTRUM (X, Y, POS, IFAIL)
@@ -35,30 +38,25 @@ C  offsets.
 
 *     Other variables
 
-      LOGICAL   MCEN
-      INTEGER   I
       INTEGER*4 IX,IY,IZ          ! Link array elements
       INTEGER*4 IFRAC
       INTEGER*4 IPOS              ! Position in map file of required data
       INTEGER*4 LOCATION
-      INTEGER*4 NBYTES            ! # of bytes of virtual memory for INDEX
       INTEGER*4 M, N              ! X and Y offsets (Cells) from start of map
       INTEGER*4 MNPOS
       INTEGER*4 MNOFFSET          ! Offset in bytes into cube
       INTEGER*4 NDATA             ! Number of bytes in the data array
       INTEGER*4 XOFF2, YOFF2      ! (~Double the) X and Y offsets (cells)
-      REAL*4    APDEC             ! Map centre declination in radians.
       REAL*4    FRAC
       REAL*4    XOFF, YOFF        ! Offsets in cells
       REAL*4    CP, SP
-      CHARACTER STATUS*16
 
       IX = LINK(1)
       IY = LINK(2)
       IZ = LINK(3)
 
-D     Type *,'-- Get_spectrum --'
-D     Type *,'Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
+D     Print *,'-- Get_spectrum --'
+D     Print *,'Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
 
 *     Make room on the stack for the new spectrum
 
@@ -69,14 +67,14 @@ D     Type *,'Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
       IF (JTOP.EQ.0) JTOP = 1
       XCLEAR = .FALSE.
 
-D     TYPE *, ' -- get_spectrum --'
-D     TYPE *, '    Stack pushed --'
-D     TYPE *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
+D     PRINT *, ' -- get_spectrum --'
+D     PRINT *, '    Stack pushed --'
+D     PRINT *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
 
 *     Work out offsets in cells if position
 *     in file is not known.
 
-D     TYPE *, '    X, Y, POS: ', X, Y, POS
+D     PRINT *, '    X, Y, POS: ', X, Y, POS
 
       IPOS = POS
       IF (IPOS.EQ.0) THEN
@@ -84,7 +82,7 @@ D     TYPE *, '    X, Y, POS: ', X, Y, POS
         XOFF = X/CELL_XSIZE
         YOFF = Y/CELL_YSIZE
 
-D       TYPE *, '    XOFF, YOFF =', XOFF, YOFF
+D       PRINT *, '    XOFF, YOFF =', XOFF, YOFF
 
 *       Locate appropriate bin on map
 *       Both coordinates run + to - (i.e. map starts at top left = NE)
@@ -99,7 +97,7 @@ D       TYPE *, '    XOFF, YOFF =', XOFF, YOFF
         IFRAC = NINT (FRAC)
         YOFF2 = 2 * NINT (YOFF+FRAC*0.5) - IFRAC
 
-D       TYPE *, '    IPOS = 0, M,N =', M, N
+D       PRINT *, '    IPOS = 0, M,N =', M, N
 
       END IF
 
@@ -129,8 +127,8 @@ D       TYPE *, '    IPOS = 0, M,N =', M, N
         LOCATION = INDEX_ADDRESS + MNOFFSET
         CALL XCOPY (4, %VAL(LOCATION), MNPOS)
 
-D       TYPE *, '    M,N,NDATA;',  M, N, NDATA
-D       TYPE *, '    MNPOS; ', MNPOS
+D       PRINT *, '    M,N,NDATA;',  M, N, NDATA
+D       PRINT *, '    MNPOS; ', MNPOS
 
         IF (MNPOS.GE.0) THEN
           LOCATION = CUBE_ADDRESS + MNOFFSET*NPTS(1)
@@ -173,8 +171,8 @@ D       TYPE *, '    MNPOS; ', MNPOS
         CALL POP
       END IF
 
-D     TYPE *, '    Before return: IFAIL = ', IFAIL
-D     TYPE *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
+D     PRINT *, '    Before return: IFAIL = ', IFAIL
+D     PRINT *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
 
       RETURN
       END

@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C--------------------------------------------------------------------------
 
       SUBROUTINE SETRANGE (NCH, BUF, BLIM, ULIM, NINTS,
@@ -52,7 +55,7 @@ C       ... and deduce more sensible scaling
 
       ELSE
         IERR = 35
-        Type *,'Error in SETRANGE - Range = 0'
+        PRINT *,'Error in SETRANGE - Range = 0'
       END IF
 
       RETURN

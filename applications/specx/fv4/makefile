@@ -21,7 +21,7 @@ PKG = specx
 # Compiler definitions
 
 FC     = f77
-FFLAGS = -g -C -e
+FFLAGS = -g
 CFLAGS = 
 LINK   = ln -s
 

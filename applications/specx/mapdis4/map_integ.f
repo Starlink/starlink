@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE MAP_INTEG (MAP, IX, IY, P, Q, SIGMA, GOODBOX)
@@ -41,8 +44,8 @@
 *  Convert to Jy if possible?
 
 D     call sxgtidle
-D     type *,'-- MAP_INTEG --'
-D     type *,'Integrated intensity:',SIGMA
+D     print *,'-- MAP_INTEG --'
+D     print *,'Integrated intensity:',SIGMA
 D     call sxgttgraph
 
       RETURN
@@ -116,8 +119,8 @@ D     call sxgttgraph
      &              IX1, IX2, FX1, FX2, XN1, XN2, IERR)
 
 D     call sxgtidle
-D     type *,'-- SUBMAP --'
-D     type *,'Error return from x-axis sums: ',ierr
+D     print *,'-- SUBMAP --'
+D     print *,'Error return from x-axis sums: ',ierr
 
 *  Y-axis: Note that since the map was inverted for MONGO we need to
 *          measure the scale backwards!
@@ -132,17 +135,17 @@ D     type *,'Error return from x-axis sums: ',ierr
       CALL PLIMITS (SCALE, NAXY, -DY, Q(1), Q(2),
      &              IY1, IY2, FY1, FY2, YN1, YN2, IERR)
 
-D     type *,'Error return from y-axis sums: ',ierr
+D     print *,'Error return from y-axis sums: ',ierr
 
-D     type *,'x-cell size:   ',dx
-D     type *,'input x-values:',P
-D     type *,'x-cell limits:',ix1,ix2
-D     type *,'x-cell values:',xn1,xn2
+D     print *,'x-cell size:   ',dx
+D     print *,'input x-values:',P
+D     print *,'x-cell limits:',ix1,ix2
+D     print *,'x-cell values:',xn1,xn2
 
-D     type *,'y-cell size:   ',dy
-D     type *,'input y-values:',Q
-D     type *,'y-cell limits:',iy1,iy2
-D     type *,'y-cell values:',yn1,yn2
+D     print *,'y-cell size:   ',dy
+D     print *,'input y-values:',Q
+D     print *,'y-cell limits:',iy1,iy2
+D     print *,'y-cell values:',yn1,yn2
 
 D     call ttgraph
 
@@ -193,9 +196,9 @@ D     call ttgraph
       J2 = (IY2+LXPIX-2)/(LYPIX-1)
  
 D     call sxgtidle
-D     type *,'-- CHKMAP --'
-D     type *,'Enclosed data points x-limits:',i1,i2
-D     type *,'Enclosed data points y-limits:',j1,j2
+D     print *,'-- CHKMAP --'
+D     print *,'Enclosed data points x-limits:',i1,i2
+D     print *,'Enclosed data points y-limits:',j1,j2
 D     call sxgttgraph
 
 *  If box is not bounded by actual known pixels, then expand check
@@ -211,8 +214,8 @@ D     call sxgttgraph
       IF ( IY2 .GT. ((J2-1)*(LYPIX-1)+1) ) J2 = J2 + 1
 
 D     call sxgtidle
-D     type *,'Final data points x-limits:',i1,i2
-D     type *,'Final data points y-limits:',j1,j2
+D     print *,'Final data points x-limits:',i1,i2
+D     print *,'Final data points y-limits:',j1,j2
 D     call sxgttgraph
 
 *  For all "true" points within the box, check that data were ACTUALLY
@@ -260,9 +263,9 @@ D     call sxgttgraph
       END DO
 
 D     call sxgtidle
-D     type *,'-- SUMMAP --'
-D     type *,'Sum of points:',sigma
-D     type *,'  # of points:',ndat
+D     print *,'-- SUMMAP --'
+D     print *,'Sum of points:',sigma
+D     print *,'  # of points:',ndat
 D     call sxgttgraph
 
       SIGMA = SIGMA / FLOAT(NDAT)

@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused SIGN
 *-----------------------------------------------------------------------
 
       SUBROUTINE MAKE_XTITLE (XTITLE)
@@ -29,7 +33,6 @@
       INTEGER     VELDAT
       CHARACTER   OFFSETV*20
       CHARACTER   NULL10*10   /' '/
-      CHARACTER   SIGN*1
       CHARACTER   VELOCITY_REF*12
       CHARACTER   VELOCITY_DEF*12
       CHARACTER   VREF(4)*12   /'Telluric    ', 'LSR         ',
@@ -100,13 +103,13 @@
      &          ' Def''n)'
       END IF
 
-D     TYPE *, ' -- make_xtitle --'
-D     TYPE *, '    VELOCITY_REF : ', VELOCITY_REF
-D     TYPE *, '    XAXIS_NAME   : ', XAXIS_NAME(:IXN)
-D     TYPE *, '    OFFSETV      : ', OFFSETV(IL1:ILV)
-D     TYPE *, '    XAXIS_UNITS  : ', XAXIS_UNITS(:IXU)
-D     TYPE *, '    VELOCITY_DEF : ', VELOCITY_DEF(:ILD)
-D     TYPE *, '    New X-axis title is: ', XTITLE
+D     PRINT *, ' -- make_xtitle --'
+D     PRINT *, '    VELOCITY_REF : ', VELOCITY_REF
+D     PRINT *, '    XAXIS_NAME   : ', XAXIS_NAME(:IXN)
+D     PRINT *, '    OFFSETV      : ', OFFSETV(IL1:ILV)
+D     PRINT *, '    XAXIS_UNITS  : ', XAXIS_UNITS(:IXU)
+D     PRINT *, '    VELOCITY_DEF : ', VELOCITY_DEF(:ILD)
+D     PRINT *, '    New X-axis title is: ', XTITLE
 
       RETURN
       END

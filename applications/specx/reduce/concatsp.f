@@ -5,6 +5,10 @@
 *   Routine to concatenate spectra in X and Y into one (quadrants not
 *   merged however)
 
+*   History:
+*      6-JUN-2000 (AJC):
+*        Replace 'TYPE *' with 'PRINT *'
+
       IMPLICIT    NONE
 
 *     Formal parameters:
@@ -47,21 +51,21 @@
 *     Check VLSR the same
 
       IF (VLSR .ne. VLSR2) THEN
-        TYPE *, 'Can''t CONCAT; different values of VLSR'
-        TYPE *, '... Failing; will report unknown error.'
+        PRINT *, 'Can''t CONCAT; different values of VLSR'
+        PRINT *, '... Failing; will report unknown error.'
         IFAIL = 18
         GO TO 999
       END IF
 
-      Type *, 'Number of quadrants in X-scan = ', NQUAD
-      Type *, 'Number of quadrants in Y-scan = ', NQUAD2
+      PRINT *, 'Number of quadrants in X-scan = ', NQUAD
+      PRINT *, 'Number of quadrants in Y-scan = ', NQUAD2
 
 *     New data size:
 
       NQTOT   = NQUAD + NQUAD2
       NDATTOT = NTOT(NQUAD) + NTOT2(NQUAD2) 
 
-      Type *, 'Total quadrants in final spectrum = ', NQTOT
+      PRINT *, 'Total quadrants in final spectrum = ', NQTOT
 
       IF (NQTOT .gt. NQMAX) THEN
         IFAIL = 113

@@ -9,6 +9,10 @@ C  gridding interval GRIDN.
 C  On return NBOT and NTOP contain first and last channels of DATA which
 C  contain useful data (can be used to drop channels if necessary).
 
+C  History:
+C     6-JUN-2000 (AJC):
+C       Replace 'type *' with 'PRINT *'
+
       IMPLICIT  NONE
 
 C     Formal parameters:
@@ -46,11 +50,11 @@ C  Ok, go..
 
       IERR  = 0
 
-D     TYPE *, ' -- grid_data --'
-D     TYPE *, '    ndat, nout  = ', NDAT, NOUT
-D     TYPE *, '    gridn, xmid = ', GRIDN, XMID
-D     TYPE *, '    current xscale array:'
-D     TYPE *,      (XSCALE(J),J=1,NDAT)
+D     PRINT *, ' -- grid_data --'
+D     PRINT *, '    ndat, nout  = ', NDAT, NOUT
+D     PRINT *, '    gridn, xmid = ', GRIDN, XMID
+D     PRINT *, '    current xscale array:'
+D     PRINT *,      (XSCALE(J),J=1,NDAT)
 
 C     Find the centre channel and initialize
 
@@ -138,7 +142,7 @@ C     into original data array
         DATA(J) = WORK(J)
       END DO
 
-      Type *,'First and last useful channels in input:',NBOT,NTOP
+      PRINT *,'First and last useful channels in input:',NBOT,NTOP
 
       RETURN
       END

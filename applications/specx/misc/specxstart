@@ -97,3 +97,10 @@
 #
    setenv SXG_GRAPHCAP $SYS_SPECX/graphcap.txt
 
+#
+#  Announce the availibility of the SPECX environment and how to start it.
+#
+   echo The SPECX environment variables have been initialised
+   echo Please type \"specx\" to run up SPECX
+
+#.

@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE VELDECODE (LSRFLG, VFRAME, VDEF)
@@ -29,10 +32,10 @@
       VDEF   = VDEFS(IVDEF+1)
       VFRAME = VFRAMES(IVFRAME+1)
 
-D     TYPE *, ' -- veldecode --'
-D     TYPE *, '    input value of LSRFLG', LSRFLG
-D     TYPE *, '    vel frame = ', VFRAME
-D     TYPE *, '    vel law   = ', VDEF
+D     PRINT *, ' -- veldecode --'
+D     PRINT *, '    input value of LSRFLG', LSRFLG
+D     PRINT *, '    vel frame = ', VFRAME
+D     PRINT *, '    vel law   = ', VDEF
 
       RETURN
       END

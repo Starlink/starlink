@@ -13,6 +13,8 @@
 *     15 Jan 1994 (rp):
 *        Initialize VM table in BLOCK DATA routine INITVMTAB
 *        Use include file for table
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C--------------------------------------------------------------------
 C
 C           VM_HNDL
@@ -61,9 +63,9 @@ C     Try for an allocation of virtual memory
 
       NBYTES1 = NBYTES
 
-*     TYPE *, ' -- igetvm --'
-*     TYPE *, '    called from ', NAME
-*     TYPE *, '    trying to get (# bytes) = ', NBYTES1
+*     PRINT *, ' -- igetvm --'
+*     PRINT *, '    called from ', NAME
+*     PRINT *, '    trying to get (# bytes) = ', NBYTES1
 
       CALL UGETVM (NBYTES1, IPTR, STATUS)
       IGETVM = STATUS
@@ -71,11 +73,11 @@ C     Try for an allocation of virtual memory
 C     Error handling
 
       IF (IGETVM.NE.0) THEN
-        TYPE *, '*** VM allocation failed - '
+        PRINT *, '*** VM allocation failed - '
 
       ELSE
-*       TYPE *, '     Virtual memory allocated:'
-*       TYPE *, '     # of bytes requested/allocated = ',
+*       PRINT *, '     Virtual memory allocated:'
+*       PRINT *, '     # of bytes requested/allocated = ',
 *    &                NBYTES, NBYTES1
 
 C  Enter the allocation in the VM_table
@@ -85,7 +87,7 @@ C  Enter the allocation in the VM_table
           J = J + 1
         END DO
         IF (J.GT.MAXENT) THEN
-          TYPE *,'*** VM_table error - no room for entry'
+          PRINT *,'*** VM_table error - no room for entry'
         ELSE
           VM_BYTES(J) = NBYTES1
           VM_PTR(J)   = IPTR
@@ -130,7 +132,7 @@ C     Look up entry in VM_table
         J = J + 1
       END DO
       IF (J.GT.MAXENT) THEN
-        TYPE *,'*** VM_table error - can''t find entry'
+        PRINT *,'*** VM_table error - can''t find entry'
       END IF
 
 C     Try to free the allocation of virtual memory
@@ -142,7 +144,7 @@ C     Try to free the allocation of virtual memory
 C     Error handling
 
       IF (IFREEVM.NE.0) THEN
-        TYPE *,'*** VM deallocation failed - '
+        PRINT *,'*** VM deallocation failed - '
 
       ELSE
 
@@ -183,7 +185,7 @@ C  Ok, go...
 
       DO J = 1, MAXENT
         IF (VM_BYTES(J).ne.0 .and. VM_TIDY(J)) THEN
-          TYPE *,'TIDYVM releasing virtual memory..',
+          PRINT *,'TIDYVM releasing virtual memory..',
      &            VM_BYTES(J), 'bytes'
           ISTAT = IFREEVM (VM_PTR(J))
         END IF
@@ -210,10 +212,10 @@ C     Define the virtual memory table
 
 C  Ok, go...
 
-      TYPE *,'Address, # of bytes, status and routine name'
+      PRINT *,'Address, # of bytes, status and routine name'
       DO J = 1, MAXENT
         IF (VM_PTR(J) .ne. 0) THEN
-          TYPE 1000, VM_PTR(J), VM_BYTES(J), VM_TIDY(J), VM_NAME(J)
+          PRINT 1000, VM_PTR(J), VM_BYTES(J), VM_TIDY(J), VM_NAME(J)
         END IF
       END DO
 

@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused JDEF
 C-----------------------------------------------------------------------------
 C
       SUBROUTINE SET_PLOT_DEVICE (IERR)
@@ -24,7 +28,7 @@ C
 C "native" MONGO version.
 
       LOGICAL*1 TT_ERROR
-      INTEGER*4 IOLD, INEW, IERR, JDEF
+      INTEGER*4 IOLD, INEW, IERR
 
       INCLUDE   'FLAGCOMM'
 
@@ -40,7 +44,7 @@ C "native" MONGO version.
       CALL ASK_PLOT_DEVICE (IOLD, INEW, TERMINAL)
       IDEV = INEW
 
-      type *, 'new plot device has SPECX internal #', inew
+      PRINT *, 'new plot device has SPECX internal #', inew
 
       RETURN
       END

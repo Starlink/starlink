@@ -1,4 +1,8 @@
-
+C  History:
+C      8-May-2000 
+C        Replace 'Type *' with 'PRINT *'
+C        Unused in EXTRNL10: IPOS
+C        Unused in GET_NEWSPEC PDIFFS, MCEN, I, NBYTES, APDEC, STATUS
 *-----------------------------------------------------------------------
 
       SUBROUTINE EXTRNL10 (IFAIL)
@@ -6,6 +10,7 @@
 C  Routine to get nominated spectrum from the current map.
 C  Positions passed to GET_SPECTRUM are in the map coordinate frame - therefore
 C  have to convert R.A. and Dec. if map position angle .ne. 0 degrees.
+C-
 
       IMPLICIT  NONE
 
@@ -20,7 +25,6 @@ C  have to convert R.A. and Dec. if map position angle .ne. 0 degrees.
 *     Local variables:
 
       INTEGER   ILS
-      INTEGER   IPOS
       INTEGER   ISTAT
       REAL      OFFSET(2)
       REAL      X1OFF, X2OFF
@@ -54,7 +58,7 @@ C  have to convert R.A. and Dec. if map position angle .ne. 0 degrees.
         SP    = SIN (POS_ANGLE/57.29578)
         X1OFF = OFFSET(1)*CP - OFFSET(2)*SP
         X2OFF = OFFSET(1)*SP + OFFSET(2)*CP
-        Type *,'Offsets in map coordinates: ',X1OFF, X2OFF
+        PRINT *,'Offsets in map coordinates: ',X1OFF, X2OFF
       END IF
         
       CALL GET_NEWSPEC (X1OFF, X2OFF, IFAIL)
@@ -89,29 +93,20 @@ C     Include files
       INCLUDE 'STAKPAR'
       INCLUDE 'STACKCOMM'
 
-C     Functions
-
-      REAL*4    PDIFFS            ! Difference of two RA or Dec positions
-
 C     Other variables
 
-      LOGICAL   MCEN
-      INTEGER   I
       INTEGER*4 IX,IY,IZ          ! Link array elements
       INTEGER*4 IFRAC
       INTEGER*4 IPOS              ! Position in map file of required data
       INTEGER*4 LOCATION
-      INTEGER*4 NBYTES            ! # of bytes of virtual memory for INDEX
       INTEGER*4 M, N              ! X and Y offsets (Cells) from start of map
       INTEGER*4 MNPOS
       INTEGER*4 MNOFFSET          ! Offset in bytes into cube
       INTEGER*4 NDATA             ! Number of bytes in the data array
       INTEGER*4 XOFF2, YOFF2      ! (~Double the) X and Y offsets (cells)
-      REAL*4    APDEC             ! Map centre declination in radians.
       REAL*4    FRAC
       REAL*4    XOFF, YOFF        ! Offsets in cells
       REAL*4    CP, SP
-      CHARACTER STATUS*16
 
       IX = LINK(1)
       IY = LINK(2)

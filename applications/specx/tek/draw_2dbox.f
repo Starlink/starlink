@@ -1,3 +1,6 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------------
 
       SUBROUTINE DRAW_2DBOX (P,Q)
@@ -8,9 +11,9 @@ C   arrays P (X) and Q (Y)
       REAL*4    P(2),Q(2)
 
 *     CALL SXGTIDLE
-*     Type *,'Box coordinates:'
-*     Type *,'P: ',P
-*     Type *,'Q: ',Q
+*     Print *,'Box coordinates:'
+*     Print *,'P: ',P
+*     Print *,'Q: ',Q
 *     CALL SXGTTGRAPH
 
       CALL SXGLTYPE    (0)

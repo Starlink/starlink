@@ -128,6 +128,9 @@
 *        the application level.
 *     12 Jul 1995 (hme):
 *        On advice from Starlink, use ERR_REP instead of MSG_OUT.
+*     20 July 2000 (ajc):
+*        Avoid concatenation of string arguments
+*-----------------------------------------------------------------------
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,8 +154,13 @@
       STATUS = 1
 
 *  Report the error.
-      CALL MSG_SETC( 'PDA_XERMSG',
-     :   LIBRAR // '/' // SUBROU // ': ' // MESSG )
+      CALL MSG_SETC( 'PDA_XERMSG', LIBRAR )
+      CALL MSG_SETC( 'PDA_XERMSG', '/' )
+      CALL MSG_SETC( 'PDA_XERMSG', SUBROU )
+      CALL MSG_SETC( 'PDA_XERMSG', ':' )
+      CALL MSG_SETC( 'PDA_XERMSG', ' ' )
+      CALL MSG_SETC( 'PDA_XERMSG', MESSG )
+
       CALL ERR_REP( 'PDA_XERMSG', '^PDA_XERMSG', STATUS )
 
 *  Return.

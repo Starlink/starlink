@@ -11,6 +11,8 @@
 *        Disuse <> in formats.
 *     24 Apr 1994 (rp):
 *        Change COMMON blocks to include files
+*     28 Sep 2000 (ajc):
+*        SAVE IZ
 C-----------------------------------------------------------------------
 
       SUBROUTINE LABEL_MAP
@@ -73,6 +75,7 @@ C  map itself.
       CHARACTER IPROC*10
       COMMON /LABEL__MAP/ YLABEL, XSIZED, YSIZED, IPROC
       SAVE   /LABEL__MAP/
+      SAVE   IZ
 
 *     Functions
 

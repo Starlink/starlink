@@ -1,3 +1,6 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       FUNCTION ISLCTQ (NQ, IFAIL)
@@ -30,7 +33,7 @@ C  No quadrants unmasked - use value of IQCEN (whether zero or not)
 
       ELSE IF (NMSK.EQ.0)   THEN  
         NQ = IQCEN
-        TYPE *,'No unmasked quadrants ..Used centre quadrant ',NQ
+        PRINT *,'No unmasked quadrants ..Used centre quadrant ',NQ
 
 C  Only one quadrant unmasked - find out which and use it.
 

@@ -5,6 +5,8 @@
 *        declared and equivalenced ISTACK, when SCAN_HEADER is declared
 *        in STACKCOMM. Also do not use TSYS in EQUIVALENCE, since it is
 *        no longer at the beginning of the common block.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE POP
@@ -14,8 +16,8 @@ C-----------------------------------------------------------------------
       REAL*4      STACK(1)
       EQUIVALENCE (STACK(1),SCAN_HEADER(1))
 
-*     Type *,'-- Pop --'
-*     Type *,'   XCLEAR, JTOP: ',XCLEAR,JTOP
+*     Print *,'-- Pop --'
+*     Print *,'   XCLEAR, JTOP: ',XCLEAR,JTOP
 
 C  Copy the spectra from higher positions to lower...
 
@@ -40,7 +42,7 @@ C  Set all scan numbers negative for unfilled positions
         SCAN_HEADER((I-1)*LSTK+110) = -1
       END DO
 
-*     type *,'   on exit... ',XCLEAR, JTOP
+*     print *,'   on exit... ',XCLEAR, JTOP
 
       RETURN
       END

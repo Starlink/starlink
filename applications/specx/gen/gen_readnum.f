@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
 *-----------------------------------------------------------------------
 
       INTEGER*4 FUNCTION GEN_READNUM (STRING, TYPE, FORM, VALUE)
@@ -34,8 +38,8 @@
 
       GEN_READNUM = 0
 
-D     Type *, ' --- gen_readnum ---'
-D     Type *, '     input format = ', form
+D     Print *, ' --- gen_readnum ---'
+D     Print *, '     input format = ', form
 
       ILF   = GEN_ILEN (FORM)
       ILS   = GEN_ILEN (STRING)
@@ -43,24 +47,24 @@ D     Type *, '     input format = ', form
 
       IF (TYPE.EQ.'L4') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) LOGICAL
-D       TYPE *, ' Just read logical*4 = ', LOGICAL
+D       PRINT *, ' Just read logical*4 = ', LOGICAL
       ELSE IF (TYPE.EQ.'I4') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) INTEGER
-D       TYPE *, ' Just read integer*4 = ', INTEGER
+D       PRINT *, ' Just read integer*4 = ', INTEGER
       ELSE IF (TYPE.EQ.'R4') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) REAL
-D       TYPE *, ' Just read real*4 = ', REAL
+D       PRINT *, ' Just read real*4 = ', REAL
       ELSE IF (TYPE.EQ.'R8') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) DOUBLE
-D       TYPE *, ' Just read real*8 = ', DOUBLE
+D       PRINT *, ' Just read real*8 = ', DOUBLE
       END IF
 
       IF (IERR.NE.0) GO TO 99
 
-      READ (TYPE(2:GEN_ILEN(TYPE)), '(I)', IOSTAT=IERR) NBYTES
+      READ (TYPE(2:GEN_ILEN(TYPE)), '(I3)', IOSTAT=IERR) NBYTES
       IF (IERR.NE.0) GO TO 99
       CALL XCOPY (NBYTES, LOGICAL, VALUE)
-D     TYPE *, ' Just copied ', NBYTES, ' bytes to VALUE'
+D     PRINT *, ' Just copied ', NBYTES, ' bytes to VALUE'
 
       RETURN
 
@@ -68,7 +72,7 @@ D     TYPE *, ' Just copied ', NBYTES, ' bytes to VALUE'
 
    99 CONTINUE
       IF (IERR.NE.0) THEN
-        TYPE *,'-- gen_readnum --'
+        PRINT *,'-- gen_readnum --'
         CALL GEN_ERMSG(IERR)
         GEN_READNUM = 10
       END IF

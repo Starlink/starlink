@@ -4,6 +4,10 @@
 *        TSYS as start of scan header, since it isn't any more.
 *     01 Jan 1994 (rp):
 *        Replace with new version from VAX SPECX V6.3, make change as above
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Default PLOT_INTERP to .FALSE.
+*        Unused DELMAP, K
 C--------------------------------------------------------------
 
       SUBROUTINE GRID_MAP (BUF, XSCALE, IFAIL)
@@ -35,13 +39,12 @@ C   DEF-MAP and SET-MAP-SCALES
 
 *     Local variables
 
-      LOGICAL   DELMAP
       LOGICAL   PLOT_INTERP
       LOGICAL   INTERP
       LOGICAL   STATUS
       LOGICAL   PUSHED
 
-      INTEGER   I,  J, K
+      INTEGER   I,  J
       INTEGER   IL, IR
       INTEGER   JT, JB
       INTEGER   II, JJ
@@ -116,7 +119,7 @@ C  Save the existing LINK array and set to 1,2,3 for these maps
      &                  TLIM, 2, 'F9.3'',''F9.3', TLIM, ISTAT)
       
       CALL GEN_YESNO ('Also plot interpolated spectra?',
-     &                 PLOT_INTERP, PLOT_INTERP, ISTAT)
+     &                 .FALSE., PLOT_INTERP, ISTAT)
       
 *     Make sure this routine uses uninterpolated, unrotated map (if
 *     interpolated spectra are required they are interpolated on demand).
@@ -173,15 +176,15 @@ D    &     (I, PBEG(I),  PEND(I),I=1,3)
 
 *     Debug info
 
-D     TYPE *, ' -- grid_map --'
-D     TYPE *, '    nax(1),  nax(2)  = ', nax(1), nax(2)
-D     TYPE *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
+D     PRINT *, ' -- grid_map --'
+D     PRINT *, '    nax(1),  nax(2)  = ', nax(1), nax(2)
+D     PRINT *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
 
 *     Initialize plot device (needed for SET_DISPLAY_SIZE to work)
 
       CALL ALLOCATE_DEVICE (IDEV,IFAIL)
       IF (IFAIL.NE.0) THEN
-        Type *,'Device not available?'
+        PRINT *,'Device not available?'
         GO TO 99
       END IF
 

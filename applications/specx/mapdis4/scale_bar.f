@@ -2,6 +2,9 @@
 *     10 Feb 1994 (hme):
 *        Fix calls to SXGTICKSIZE: All arguments must be REAL, they were
 *        integer constants.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused GREYRANGE
 *-----------------------------------------------------------------------
 
       SUBROUTINE SCALE_BAR (GREYLIMS, PLOTLIMS, DEVLIMS, NX, NY, IFAIL)
@@ -22,7 +25,6 @@
 
       INTEGER   I
       LOGICAL   ABOVE
-      REAL      GREYRANGE
       REAL      XLEN, YLEN
       REAL      XMID, YMID
       REAL      SCALE (512)
@@ -33,11 +35,11 @@
 
 *     Type out input stuff:
 
-*     TYPE *, ' -- scale_bar --'
-*     TYPE *, '    greyscale limits: ', GREYLIMS
-*     TYPE *, '    plot limits:      ', PLOTLIMS
-*     TYPE *, '    device size:      ', DEVLIMS
-*     TYPE *, '    nx and ny:        ', NX, NY
+*     PRINT *, ' -- scale_bar --'
+*     PRINT *, '    greyscale limits: ', GREYLIMS
+*     PRINT *, '    plot limits:      ', PLOTLIMS
+*     PRINT *, '    device size:      ', DEVLIMS
+*     PRINT *, '    nx and ny:        ', NX, NY
 
 *     Decide whether to put scale bar above plot or to right: depends on
 *     useage of plot area: put scale bar where there is most absolute room

@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Unused ISTAT, II, STRING
 C-----------------------------------------------------------------------
 
       SUBROUTINE GETMAP2 (BUF1, BUF2, INTERP, VMAP, IFAIL)
@@ -32,17 +36,16 @@ C  from 3-d file to a 2-d array.
 
       BYTE      FBYTE     /.FALSE./
       LOGICAL   GOT_DATA
-      INTEGER   ISTAT(3), IFAC(3)
+      INTEGER   IFAC(3)
       INTEGER   IX, IY, IZ
       INTEGER   I,  J,  K,  L
-      INTEGER   II, JJ, KK, LL
+      INTEGER   JJ, KK, LL
       INTEGER   IDEP
       INTEGER   NZ
       INTEGER   NOTJ
       REAL      AV
       REAL      FX, FY, FZ
       REAL      FAC
-      CHARACTER STRING*80
 
 *  Ok, go...
 
@@ -59,14 +62,14 @@ C  from 3-d file to a 2-d array.
         RETURN
       END IF
 
-D     Type *, ' -- getmap2 --'
-D     Type *, '    NAX: ',NAX
-D     Type *, '    LINK:',LINK
-D     Type *, '    IOFF:',IOFF
-D     Type *, '    PFAC:',PFAC
-D     Type *, '    PF1: ',PF1
-D     Type *, '    PF2: ',PF2
-D     Type *, '    Invert_axis:',INVERT_AXIS
+D      PRINT *, ' -- getmap2 --'
+D      PRINT *, '    NAX: ',NAX
+D      PRINT *, '    LINK:',LINK
+D      PRINT *, '    IOFF:',IOFF
+D      PRINT *, '    PFAC:',PFAC
+D      PRINT *, '    PF1: ',PF1
+D      PRINT *, '    PF2: ',PF2
+D      PRINT *, '    Invert_axis:',INVERT_AXIS
 
 C  Then write data to 2-D array, transposing if necessary. First
 C  work out factors for indexing to output array (VMAP)
@@ -106,17 +109,17 @@ C         is given as NOTJ
         END IF
       END DO
 
-D     TYPE *, '    IX, IY, IZ = ', IX, IY, IZ
+D     PRINT *, '    IX, IY, IZ = ', IX, IY, IZ
 D     IF (.NOT. INTERP) THEN
-D       TYPE *, '    Getting raw data from cube'
-D       TYPE *, '    INDEX @ address: ', INDEX_PTR
+D       PRINT *, '    Getting raw data from cube'
+D       PRINT *, '    INDEX @ address: ', INDEX_PTR
 D     END IF
 
 C  Now fetch data (using the windows) and rewrite to VMAP using indexing
 C  worked out above. This also allows for binning across dimension (3).
 
       IF (     ABS(IFAC(1)).GT.100000 .OR. ABS(IFAC(2)).GT.100000
-     &    .OR. ABS(IFAC(3)).GT.100000) Type *, 'IFAC undefined!'
+     &    .OR. ABS(IFAC(3)).GT.100000) PRINT *, 'IFAC undefined!'
 
 C  Need to zero data before use, as we will sum into the output array.
 
@@ -203,11 +206,11 @@ C pixel in 3rd axis; if averaging divide by number of pixels added together.
         FAC = 1.0
       END IF
 
-D     Type *, '    IZ:  ',IZ
-D     Type *, '    NAX: ',NAX(IZ)
-D     Type *, '    PF1: ',PF1(IZ),' PF2: ',PF2(IZ)
-D     Type *, '    AV:  ',AV
-D     Type *, '    Fac: ',FAC
+D     PRINT *, '    IZ:  ',IZ
+D     PRINT *, '    NAX: ',NAX(IZ)
+D     PRINT *, '    PF1: ',PF1(IZ),' PF2: ',PF2(IZ)
+D     PRINT *, '    AV:  ',AV
+D     PRINT *, '    Fac: ',FAC
 
 C     (also at this step work out if pixels of map are OK - mark bad otherwise)
 

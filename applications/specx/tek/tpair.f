@@ -1,3 +1,6 @@
+* History:
+*    21 Sep 2000 (ajc):
+*       Unused XLIMS
 C--------------------------------------------------------------------------
 
       INTEGER FUNCTION TPAIR (XSCALE, DATA, NCH, OFFER, P, Q)
@@ -10,7 +13,7 @@ C--------------------------------------------------------------------------
       LOGICAL   FIRST_BOX/.TRUE./
       REAL*4    XSCALE(*), DATA(*)
       REAL*4    P(2), PNEW(2), Q(2), QNEW(2)
-      REAL*4    XLIMS(2), YLIMS(2)
+      REAL*4    YLIMS(2)
       CHARACTER VALOPT*28
 
       VALOPT='^M L R T B N A E Q C D H ? S'

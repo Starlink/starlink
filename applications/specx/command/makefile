@@ -101,6 +101,8 @@ PLOT2D:        $(SPX_INC)/plot2d.inc;     $(LINK) $? $@
 SPECX_PARS:    $(SPX_INC)/specx_pars.inc; $(LINK) $? $@
 STACKCOMM:     $(SPX_INC)/stackcomm.inc;  $(LINK) $? $@
 STAKPAR:       $(SPX_INC)/stakpar.inc;    $(LINK) $? $@
+SPECX_FITS:    ${SPX_INC}/specx_fits.inc; $(LINK) $? $@
+
 
 #  Include file dependencies.
 #  ==========================
@@ -111,7 +113,7 @@ STAKPAR:       $(SPX_INC)/stakpar.inc;    $(LINK) $? $@
 do_command.o: STACKCOMM SPECX_PARS MAPS STAKPAR FLAGCOMM
 initsp.o: DAT_PAR \
    CUBE FILES FLAGCOMM NEWXY MAPS PLOT2D SPECX_PARS STACKCOMM STAKPAR \
-   COMMAND_TABLE IODATA MAPTITLES NOKEEP
+   COMMAND_TABLE IODATA MAPTITLES NOKEEP SPECX_FITS
 init_specx.o: FLAGCOMM COMMAND_TABLE MAPTITLES
 specx_initab.o: \
    STACKCOMM FILHD FLAGCOMM GSD_VAR CUBE MAPHD MAPS ERRORS

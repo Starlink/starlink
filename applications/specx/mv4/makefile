@@ -111,7 +111,7 @@ DAT_PAR:       $(STAR_INC)/dat_par;   $(LINK) $? $@
 PRM_PAR:       $(STAR_INC)/prm_par;   $(LINK) $? $@
 SAE_PAR:       $(STAR_INC)/sae_par;   $(LINK) $? $@
 NDF_PAR:       $(STAR_INC)/ndf_par;   $(LINK) $? $@
-
+NDF_ERR:       $(STAR_INC)/ndf_err;   $(LINK) $? $@
 
 #  Include file dependencies.
 #  ==========================
@@ -131,7 +131,7 @@ fromap.o: MAPHD FLAGCOMM
 get_spectrum.o: FLAGCOMM MAPHD CUBE MAPS PLOT2D STAKPAR STACKCOMM
 index_subs.o: MAPHD
 interp_cube.o: CUBE FLAGCOMM MAPS MAPHD PROTOTYPE PLOT2D WEIGHTS
-mapopen.o: MAPHD MAPS FLAGCOMM DAT_ERR
+mapopen.o: MAPHD MAPS FLAGCOMM DAT_ERR NDF_ERR
 open_map.o: CUBE MAPHD MAPS PROTOTYPE FLAGCOMM
 read_interp.o: CUBE MAPS MAPHD WEIGHTS
 rotate_cube.o: CUBE MAPHD MAPS STACKCOMM FLAGCOMM

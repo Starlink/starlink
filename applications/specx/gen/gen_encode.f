@@ -1,3 +1,10 @@
+*  History:
+*     31 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Use format I3 to read type size
+*        Unused I, J, ICH1, ICH2, LUN, READONLY, SYM_INDEX, LENGTH, ADDRESS
+*        Change error message to "-- gen_encode --" (was gen_sprint)
+*        Remove "unevuable" error message - now in GEN_EVAL_AE
 *-----------------------------------------------------------------------
 
 
@@ -29,22 +36,16 @@
 
       INTEGER*4 ISTAT
       INTEGER*4 ILS
-      INTEGER*4 I, J, L
-      INTEGER*4 ICH1, ICH2
+      INTEGER*4 L
       INTEGER*4 IST, IEND, INEXT
       INTEGER*4 LS
       INTEGER*4 LFORM
       INTEGER*4 START
-      INTEGER*4 LUN
       INTEGER*4 ICOLON
       CHARACTER FORMAT*15
 
-      LOGICAL*4 READONLY
-      INTEGER*4 SYM_INDEX
       CHARACTER TYPE*4
       INTEGER*4 NBYTES
-      INTEGER*4 LENGTH
-      INTEGER*4 ADDRESS
 
 *     Functions
 
@@ -79,7 +80,7 @@
         IEND  = START + IEND  - 1
         START = START + INEXT - 1
 
-D       TYPE *,'Next item: ', STRING(IST:IEND)
+D       PRINT *,'Next item: ', STRING(IST:IEND)
 
 *       Search for hollerith delimiters and throw out if they exist
 *       -- implies this must be a string item though.
@@ -87,8 +88,8 @@ D       TYPE *,'Next item: ', STRING(IST:IEND)
         IF (STRING(IST:IST).EQ.'''' .AND. STRING(IEND:IEND).EQ.'''')THEN
           CALL GEN_HDNORM (STRING(IST:IEND), STRING(IST:IEND), LS ,IERR)
           IEND = LS + IST - 1
-D         Type *, 'Bit of string we want', ist, ' to', iend
-D         Type *, 'Quoted string: ', string(ist:iend)
+D         Print *, 'Bit of string we want', ist, ' to', iend
+D         Print *, 'Quoted string: ', string(ist:iend)
 
           OUT_LINE (L:L+IEND-IST) = STRING(IST:IEND)
           L = L + LS - 1
@@ -110,21 +111,20 @@ D         Type *, 'Quoted string: ', string(ist:iend)
 *         then evaluate the expression and print it with its own type
 
           TYPE = ' '
-D         TYPE *,' calling gen_eval_ae on string --> ', string(ist:iend)
+D         PRINT *,' calling gen_eval_ae on string --> ', string(ist:iend)
           CALL GEN_EVAL_AE (STRING(IST:IEND), TYPE, LVALUE, IERR)
-
           IF (IERR .EQ. 0) THEN
-            READ (TYPE(2:GEN_ILEN(TYPE)), '(I)', IOSTAT=IERR) NBYTES
+            READ (TYPE(2:GEN_ILEN(TYPE)), '(I3)', IOSTAT=IERR) NBYTES
             IF (IERR.NE.0) THEN
-              TYPE *, '-- gen_sprint --'
-              TYPE *, '   internal problems - report to RP'
+              PRINT *, '-- gen_encode --'
+              PRINT *, '   internal problems - report to RP'
               IERR = -1
               RETURN
             END IF
           ELSE
-            TYPE *, '-- gen_sprint --'
-            TYPE *, '   expression "', STRING(IST:IEND),
-     &              '" not evaluable'
+!            PRINT *, '-- gen_encode --'
+!            PRINT *, '   expression "', STRING(IST:IEND),
+!     &              '" not evaluable'
             RETURN
           END IF
 
@@ -160,11 +160,11 @@ D         TYPE *,' calling gen_eval_ae on string --> ', string(ist:iend)
               OUT_LINE (L:MIN(L+NBYTES-1,LOUT)) = CVALUE(:NBYTES)
             END IF
           ELSE
-            Type *,'Unknown symbol type: ', TYPE
+            Print *,'Unknown symbol type: ', TYPE
           END IF
 
           IF (ISTAT.NE.0) THEN
-            TYPE *, '-- gen_sprint --'
+            PRINT *, '-- gen_encode --'
             CALL GEN_ERMSG (ISTAT)
           END IF
 

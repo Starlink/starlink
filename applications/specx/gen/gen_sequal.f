@@ -1,3 +1,7 @@
+*  History:
+*      1 Aug 2000 (ajc):
+*        Replace hexadecimal constants
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_SEQUAL (STRING1, L1, STRING2, L2)
@@ -16,7 +20,7 @@
       INTEGER    I
       INTEGER    L11, L22
 
-      BYTE       BLANK /'20'X/
+      BYTE       BLANK /32/
       BYTE       CHAR1
       BYTE       CHAR2
 
@@ -36,7 +40,7 @@
         L22 = L22 - 1
       END DO
 
-D     TYPE *, 'Input strings have lengths: ', L11, L22
+D     PRINT *, 'Input strings have lengths: ', L11, L22
 
 *     If strings are not same length, equality not satisfied
 
@@ -47,8 +51,8 @@ D     TYPE *, 'Input strings have lengths: ', L11, L22
       DO I = 1, L11
         CHAR1 = STRING1(I)
         CHAR2 = STRING2(I)
-        IF (CHAR1.GE.'61'X .and. CHAR1.LE.'7A'X) CHAR1 = CHAR1-'20'X
-        IF (CHAR2.GE.'61'X .and. CHAR2.LE.'7A'X) CHAR2 = CHAR2-'20'X
+        IF (CHAR1.GE.97 .and. CHAR1.LE.122) CHAR1 = CHAR1-32
+        IF (CHAR2.GE.97 .and. CHAR2.LE.122) CHAR2 = CHAR2-32
         IF (CHAR1.NE.CHAR2) RETURN
       END DO
 

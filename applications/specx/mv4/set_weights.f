@@ -1,6 +1,10 @@
 *  History:
 *     28 Jan 1994 (hme):
 *        Remove the desparate TYPE* statements.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*      4 Feb 2002 (ajc):
+*        Replace non-standard PRINT statement using DO loop
 *-----------------------------------------------------------------------
 
       SUBROUTINE SET_INTERP_WEIGHTS (FWHM, WMAX, IFAIL)
@@ -61,14 +65,16 @@ C     Set up the weights array (to save working out lots of exponentials later
           WEIGHT(I,J) = EXP (-((I**2/XRAD**2)+(J**2/YRAD**2)))
         END DO
       END DO
-
+      
       IF (IXMAX.LT.10 .AND. IYMAX.LT.10) THEN
-        Type *
-        Type *, 'Weights array:'
-        Type '(<IXMAX+1>(2X,F9.5))',((WEIGHT(I,J),I=0,IXMAX),J=0,IYMAX)
+        PRINT *
+        PRINT *, 'Weights array:'
+        DO J = 0, IYMAX
+           PRINT '(10(2X,F9.5))',(WEIGHT(I,J),I=0,IXMAX)
+        END DO
       ELSE
-        Type *
-        Type *, 'Weights array too big to type!'
+        PRINT *
+        PRINT *, 'Weights array too big to type!'
       END IF
 
       RETURN

@@ -1,3 +1,7 @@
+*  History:
+*     20 July 2000 (ajc):
+*        Missing commas in FORMAT
+*        Don't split strings across lines
 C-----------------------------------------------------------------------
 
       SUBROUTINE DSTACK
@@ -18,8 +22,8 @@ C  Ok, go...
 
       PROMPT=' '
       WRITE(PROMPT,'(''['',I4,''] ''''"'')') LDAT
-    5 CALL GEN_GETI4('"'' Enter new stack parameters''//
-     &           ''$Maximum number of data points? '//
+    5 CALL GEN_GETI4('"'' Enter new stack parameters''//'//
+     &           '''$Maximum number of data points? '//
      &           PROMPT(:GEN_ILEN(PROMPT)),LDAT,' ',LSTK2,JDEF)
       IF (LSTK2.NE.LDAT)   ICHNGE=1
       LSTK = LSTK2 + LHEAD
@@ -42,7 +46,7 @@ C  Ok, go...
 
       RETURN
 
-   30 FORMAT(' *** Insufficient room - max levels = 'I3 '***')
+   30 FORMAT(' *** Insufficient room - max levels = ',I3, '***')
 
       END
 

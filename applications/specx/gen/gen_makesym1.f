@@ -3,6 +3,9 @@
 *        Replace STR$UPCASE with CHR_UCASE.
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
+*      7 Jun 2000 (ajc):
+*        Use C structure for port to Linux
+*        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_MAKESYM1 (TABLE, NO_ENTRIES,
@@ -13,17 +16,10 @@
       INTEGER*4 MAX_TABLE
       PARAMETER (MAX_TABLE=512)
 
-      STRUCTURE /SYMBOL/
-        CHARACTER*16 NAME
-        CHARACTER*4  TYPE
-        INTEGER*4    LENGTH 
-        INTEGER*4    ADDRESS
-      END STRUCTURE
-
 *     Formal parameters
 
+      INTEGER TABLE                        ! Dummy
       INTEGER*4 NO_ENTRIES                 ! Updated on return
-      RECORD /SYMBOL/ TABLE(MAX_TABLE)     ! The table
       CHARACTER SYMBOL*(*)                 ! Symbol name
       CHARACTER INTYPE*(*)                 ! Symbol type
       INTEGER*4 LENGTH                     ! Array length
@@ -63,7 +59,7 @@
       IERR = 0
       IF (NO_ENTRIES .EQ. MAX_TABLE) THEN
         IERR = 1
-        TYPE *, 'Variable table full'
+        PRINT *, 'Variable table full'
         RETURN
       END IF
 
@@ -75,13 +71,13 @@
 *     Check that symbol is not a number!
 
       IF (GEN_EFORMAT(SYMBOL, IDIGITS, FDIGITS, EDIGITS)) THEN
-        TYPE *,'Symbol name is a valid numerical value!'
+        PRINT *,'Symbol name is a valid numerical value!'
         IERR = 2
         RETURN
       END IF
 
       IF (GEN_DFORMAT (SYMBOL, IDIGITS, FDIGITS, EDIGITS)) THEN
-        TYPE *,'Symbol name is a valid numerical value!'
+        PRINT *,'Symbol name is a valid numerical value!'
         IERR = 2
         RETURN
       END IF
@@ -92,15 +88,13 @@
      &                   SYM_TYPE, SYM_SIZE, SYM_ADDR, READONLY, IERR)
 
       IF (SYM_INDEX.NE.0) THEN
-*       TYPE *,'Symbol already defined!'
+*       PRINT *,'Symbol already defined!'
         IERR = 3
         RETURN
       END IF
 
-      TABLE(NO_ENTRIES+1).NAME    = NAME
-      TABLE(NO_ENTRIES+1).TYPE    = TYPE
-      TABLE(NO_ENTRIES+1).LENGTH  = LENGTH
-      TABLE(NO_ENTRIES+1).ADDRESS = ADDRESS
+      CALL GEN_MAKESYM2( NO_ENTRIES+1, NAME, TYPE, LENGTH, ADDRESS,
+     :  IERR )
 
       NO_ENTRIES = NO_ENTRIES + 1
 
@@ -109,11 +103,11 @@
       N = GEN_HASHINS (NAME(INDEX(NAME,'*')+1:), 503,
      &                 ENTRY, NO_ENTRIES) 
       IF (N .EQ. -1) THEN
-        TYPE *,'-- gen_makesym1 --'
-        TYPE *,'   hash table full'
+        PRINT *,'-- gen_makesym1 --'
+        PRINT *,'   hash table full'
         IERR = 4
       ELSE
-D       TYPE *,'New entry at position ', N, ' in hash table'
+D       PRINT *,'New entry at position ', N, ' in hash table'
       END IF
 
       RETURN

@@ -21,8 +21,8 @@ PKG = specx
 # Compiler definitions
 
 FC     = f77
-FFLAGS = -g -C
-CFLAGS = 
+FFLAGS = -g
+CFLAGS = -I$(STAR_INC)
 LINK   = ln -s
 
 # install
@@ -44,7 +44,6 @@ gen_geti4a2.f gen_getit3.f gen_getit4.f gen_getline.f \
 gen_getmore.f gen_getr4.f gen_getr4a.f gen_getr4a2.f \
 gen_getr8.f gen_getr8a.f gen_getr8a2.f gen_getstr.f \
 gen_getstr2.f gen_getsym1.f gen_getwrd.f gen_hash.f \
-gen_hashdel.f gen_hashins.f gen_hashsrch.f \
 gen_hdnorm.f gen_ichtot.f gen_iendch.f gen_ilen.f \
 gen_input.f gen_inqfunc.f gen_inqsymb.f gen_inqsymb1.f \
 gen_integer.f gen_jline.f gen_jnloff.f gen_jnlon.f \
@@ -60,10 +59,10 @@ get_subexpr.f ins_cli_item.f refresh_cli.f \
 reset_stk_pt.f stack_pointer.f string_test.f \
 strip_string.f symtab_init.f usubs.f xcopy.f
 
-CSOURCES = 
+CSOURCES = gen_makesym2.c hash.c
 
 # These are the external include files
-EXTERNAL_INCLUDES = 
+EXTERNAL_INCLUDES =
 
 # These are the actual private include files that are archived.
 # Upper case versions are removed with 'make clean'

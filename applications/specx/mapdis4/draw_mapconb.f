@@ -1,6 +1,8 @@
 *  History:
 *     14 Dec 1993 (hme):
 *        Do not mix up INTEGER and LOGICAL w.r.t. I{GET|FREE}VM.
+*      1 Aug 2000 (ajc):
+*        Change TYPE * to PRINT *
 C-----------------------------------------------------------------------
 
       SUBROUTINE DRAW_MAP (ZC, NZ, MAP, NAXX, NAXY, XM1, XM2, YM1, YM2,
@@ -34,13 +36,13 @@ C  Formal parameters:
 C  Other declarations
 
 *     CALL SXGTIDLE
-*     Type *,'X-limits:',XM1,XM2
-*     Type *,'Y-limits:',YM1,YM2
-*     Type *,'NAXX, NAXY',NAXX,NAXY
-*     Type *,'NXCELL,NYCELL',NXCELL,NYCELL
-*     Type *,'NX, NY',NX, NY
-*     Type *,'Badpixel value (in DRAW_MAP): ', BADPIX_VAL
-*     Type *,'Contour line types, +/0/- ',LTPOS, LTZ, LTNEG
+*     Print *,'X-limits:',XM1,XM2
+*     Print *,'Y-limits:',YM1,YM2
+*     Print *,'NAXX, NAXY',NAXX,NAXY
+*     Print *,'NXCELL,NYCELL',NXCELL,NYCELL
+*     Print *,'NX, NY',NX, NY
+*     Print *,'Badpixel value (in DRAW_MAP): ', BADPIX_VAL
+*     Print *,'Contour line types, +/0/- ',LTPOS, LTZ, LTNEG
 *     CALL SXGTTGRAPH
 
       IF (PLOTGREY) THEN

@@ -1,6 +1,11 @@
 *  History:
 *     31 Jan 1994 (hme):
 *        Remove second declaration of NMAPS, which is INTEGER*4 in PLOT2D.
+*     20 July 2000 (ajc):
+*        Change TYPE * to PRINT *
+*        Test ISTAT .NE. 0
+*        Unused in EXPORT_MAP4: IZ, IGETVM
+*               in MAP_ASCIIWR: I1, I2, J1, J2
 C-----------------------------------------------------------------------
 
       SUBROUTINE EXPORT_MAP4 (IFAIL)
@@ -20,7 +25,7 @@ C-----------------------------------------------------------------------
       INTEGER   IMX, IMY
       INTEGER   IPTR
       INTEGER   ISTAT
-      INTEGER   IX, IY, IZ
+      INTEGER   IX, IY
       INTEGER   LUN
 
       REAL      P(2), Q(2)
@@ -32,7 +37,6 @@ C-----------------------------------------------------------------------
 
 *     Functions:
 
-      INTEGER   IGETVM
       INTEGER   IFREEVM
       INTEGER   IGETLUN
       INTEGER   IFREELUN
@@ -42,15 +46,15 @@ C-----------------------------------------------------------------------
       IFAIL = 0
 
       CALL MAPIMAGE ('mapplane.tmp', IPTR, NMAPS, IMX, IMY, ISTAT)
-      IF (ISTAT) THEN
+      IF (ISTAT .NE. 0) THEN
         IFAIL = 67
         RETURN
       END IF
 
-      type *,'--- Export_map4 ---'
-      type *,'    Virtual address IPTR =       ', IPTR
-      type *,'    Number of maps in file =     ', NMAPS
-      type *,'    Map array size - IMX * IMY   ', IMX, IMY
+      PRINT *,'--- Export_map4 ---'
+      PRINT *,'    Virtual address IPTR =       ', IPTR
+      PRINT *,'    Number of maps in file =     ', NMAPS
+      PRINT *,'    Map array size - IMX * IMY   ', IMX, IMY
 
 *     Select the bit of the map we need
 
@@ -85,9 +89,9 @@ C-----------------------------------------------------------------------
   999 CONTINUE
 
       ISTAT = IFREEVM (IPTR)
-      IF (ISTAT.NE.0) THEN
-        TYPE *, '--- Export_map4 ---'
-        TYPE *, '    error freeing virtual memory: ', ISTAT
+      IF (ISTAT .NE. 0) THEN
+        PRINT *, '--- Export_map4 ---'
+        PRINT *, '    error freeing virtual memory: ', ISTAT
       END IF
 
       RETURN
@@ -117,7 +121,6 @@ C-----------------------------------------------------------------------
 *     Local variables
 
       INTEGER   I,J
-      INTEGER   I1, I2, J1, J2
       INTEGER   II, JJ, JG
       REAL      DX, DY
       REAL      XPOS, YPOS, DATA
@@ -138,8 +141,8 @@ C-----------------------------------------------------------------------
       DX = (P(2) - P(1)) / NXCELL
       DY = (Q(1) - Q(2)) / NYCELL
 
-      Type *,'--- MAP_ASCIIWR ---'
-      Type *,'    Pixel sizes: ', DX, DY
+      PRINT *,'--- MAP_ASCIIWR ---'
+      PRINT *,'    Pixel sizes: ', DX, DY
 
       DO J = 1, (IY-1)/(LYPIX-1) + 1
 

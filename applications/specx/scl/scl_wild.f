@@ -1,6 +1,17 @@
 *-----------------------------------------------------------------------
 
       SUBROUTINE SCL_MATCH_WILD (TABLE, TSYMBOL, MATCH_OK)
+*  Description:
+*     Return MATCH_OK = .TRUE. if string TSYMBOL matches string TABLE;
+*     .FALSE. otherwise. TSYMBOL may contain * to match zero or more
+*     characters of TABLE
+
+*  History:
+*     20-SEP-2000 (AJC):
+*        Unused J, END
+*        Set LSTR before it's used
+*        Handle no wildcard case
+*-
 
       IMPLICIT  NONE
 
@@ -12,9 +23,8 @@
 
 *     Local variables:
 
-      INTEGER   J
       INTEGER   STAR,    OLDSTAR
-      INTEGER   START,   NEXT,    END
+      INTEGER   START,   NEXT
       INTEGER   LSUB,    LVAR,    LSTR
       CHARACTER SUBSTRING*32
  
@@ -25,6 +35,7 @@
 *  Ok, go...
 
       LVAR = GEN_ILEN (TSYMBOL)
+      LSTR = GEN_ILEN (TABLE)
 
       MATCH_OK = .TRUE.
 
@@ -39,6 +50,8 @@
 *     Move on start position in current name to immediately after match
 
       STAR = INDEX (TSYMBOL, '*')
+      IF ( STAR .EQ. 0 ) STAR = LVAR + 1
+
       IF (STAR.NE.1) THEN
         LSUB = STAR - 1
         MATCH_OK = START+LSUB-1.le.LSTR  .and.
@@ -46,7 +59,6 @@
         START = START + LSUB
       END IF
 
-      LSTR = GEN_ILEN (TABLE)
       DO WHILE (MATCH_OK .and. STAR.LT.LVAR)
 
 *       Now we can guarantee that we are working from the wildcard and only
@@ -55,13 +67,11 @@
 
         OLDSTAR = STAR
         STAR    = INDEX (TSYMBOL(STAR+1:), '*')
-
         IF (STAR.EQ.0) THEN
           STAR = LVAR+1
         ELSE
           STAR = STAR + OLDSTAR
         END IF
- 
         LSUB = STAR - OLDSTAR - 1
 
 *       Check that there is a further substring; in the case of a final
