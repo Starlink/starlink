@@ -54,24 +54,24 @@ document accompanied by the <code/%tth:/ pragmas recognised by <code/tth/.
 </codeprologue>
 <codebody>
 (define (get-maths #!optional (nd (current-node)))
-  (let ((rde (document-element nd)))
-  (make entity
-    system-id: ($maths-extfile$ #t)
-    (make formatting-instruction data: 
+  (let* ((rde (document-element nd))
+	 (mathels (node-list-filter-by-gi (descendants rde)
+					  (maths-element-list))))
+    (if (node-list-empty? mathels)
+	(empty-sosofo)
+	(make entity
+	  system-id: ($maths-extfile$ #t)
+	  (make formatting-instruction data: 
 "\\documentclass{article}
 \\setcounter{secnumdepth}{0}
 \\begin{document}
 %%tth:\\begin{html}&lt;!doctype TTH-EQLIST public '-//Starlink//DTD tth equation list//EN'>\\end{html}
 ")
-    (with-mode get-maths-mode (process-node-list
-			       (node-list-filter-by-gi (descendants rde)
-						       (maths-element-list))))
-    (make formatting-instruction data:
-	  "\\end{document}
+	  (with-mode get-maths-mode (process-node-list mathels))
+	  (make formatting-instruction data:
+		"\\end{document}
 ")
-    )))
-</codebody>
-</func>
+	  ))))
 
 <misccode>
 <description>Define the <code/get-maths-mode/ mode, which need only be defined
