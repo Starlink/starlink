@@ -9013,6 +9013,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewerWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TablesListComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatListener.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatUtils.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatViewWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/UpDownButton.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
@@ -9100,6 +9101,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/picture.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/redo3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/selrows3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/sigma0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/spoints5.gif
