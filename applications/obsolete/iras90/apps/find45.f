@@ -102,7 +102,7 @@
       INCLUDE 'PAR_ERR'          ! Parameter errors
       INCLUDE 'FIO_PAR'          ! FIO constants
       INCLUDE 'FIO_ERR'          ! FIO errors
-      INCLUDE '/star/include/psx_err'          ! PSX errors
+      INCLUDE 'PSX_ERR'          ! PSX errors
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD

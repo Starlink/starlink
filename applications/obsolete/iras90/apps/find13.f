@@ -108,7 +108,7 @@
       INCLUDE 'ERR_PAR'          ! Error reporting constants
       INCLUDE 'ERR_ERR'          ! Error reporting errors
       INCLUDE 'PAR_ERR'          ! Parameter errors
-      INCLUDE '/star/include/chr_err'          ! CHR routine errors
+      INCLUDE 'CHR_ERR'          ! CHR routine errors
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD

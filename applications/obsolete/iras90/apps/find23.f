@@ -101,7 +101,7 @@
       INCLUDE 'PAR_ERR'          ! Parameter errors
       INCLUDE 'DAT_PAR'          ! Data system constants
       INCLUDE 'DAT_ERR'          ! Data system errors
-      INCLUDE '/star/include/cmp_err'          ! CMP errors
+      INCLUDE 'CMP_ERR'          ! CMP errors
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD      
