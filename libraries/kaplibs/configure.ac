@@ -15,6 +15,9 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl    Look for tcl/tk system
+STAR_PATH_TCLTK(8.2, [tk])
+
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
@@ -36,6 +39,7 @@ AC_CONFIG_SUBDIRS(aif fts ira irq ctg lpg kpg kgs kapgrf)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([kaplibs_link_adam],[chmod +x kaplibs_link_adam])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
