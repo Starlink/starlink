@@ -136,14 +136,14 @@
 
 *  Local Variables:
       CHARACTER CC*1             ! Next character from ELEM
-      DOUBLE PRECISION DWCS      ! DOUBLE equivalence to variable JWCS
+      DOUBLE PRECISION DAST      ! DOUBLE equivalence to variable JAST
       INTEGER IOPND0             ! Top of operand stack on entry
       INTEGER J                  ! Index into WCSDAT array
-      INTEGER JWCS(2)            ! AST FrameSet pointer equivalence
+      INTEGER JAST(2)            ! AST FrameSet pointer equivalence
 
-*  Make DWCS and JWCS share the same memory so that we can interpret
+*  Make DAST and JAST share the same memory so that we can interpret
 *  the real operand value as an integer identifier.
-      EQUIVALENCE ( JWCS, DWCS )
+      EQUIVALENCE ( JAST, DAST )
 
 *  Ensure that the local variable IOPND0 is saved between invocations 
 *  of this routine.
@@ -287,9 +287,24 @@
      :                       IPOPND, STATUS )
 
 *  Also store WCS Information in the operand stack. First deal with
-*  linear Mappings... store the transformation coefficients.
+*  linear Mappings... 
             IF( IWCS .EQ. AST__NULL ) THEN
+
+*  Store a flag value (1.0) to indicate that the mapping is linear.
                CALL ARD1_STORD( 1.0D0, SZOPND, IOPND, IPOPND, STATUS )
+
+*  Store a pointer to the user coordinate Frame. In order to store an
+*  integer AST pointer on the DOUBLE PRECISION operands stack, we make the
+*  double precision DAST use the same memory as the two element integer
+*  array JAST (using a Fortran EQUIVALENCE statement at the top of the
+*  module). We then put the AST pointer value into the first element of
+*  the integer array, and store the equivalent double precision value on
+*  the stack.
+               JAST( 1 ) = AST_CLONE( CFRM, STATUS )
+               CALL AST_EXPORT( JAST( 1 ), STATUS )
+               CALL ARD1_STORD( DAST, SZOPND, IOPND, IPOPND, STATUS )
+
+*  Now store the transformation coefficients.
                DO J = 1, NDIM*( NDIM + 1 )               
                   CALL ARD1_STORD( WCSDAT( J ), SZOPND, IOPND, IPOPND, 
      :                             STATUS )
@@ -299,17 +314,9 @@
 *  user distance per pixel.
             ELSE
                CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, STATUS )
-
-*  In order to store an integer AST pointer on the DOUBLE PRECISION
-*  operands stack, we make the double precision DWCS use the same memory as 
-*  the two element integer array JWCS (using a Fortran EQUIVALENCE statement
-*  at the top of the module). We then put the AST pointer value into the
-*  first element of the integer array, and store the equivalent double
-*  precision value on the stack.
-               JWCS( 1 ) = AST_CLONE( IWCS, STATUS )
-               CALL ARD1_STORD( DWCS, SZOPND, IOPND, IPOPND, STATUS )
-
-*  Now store the user distance per pixel.
+               JAST( 1 ) = AST_CLONE( IWCS, STATUS )
+               CALL AST_EXPORT( JAST( 1 ), STATUS )
+               CALL ARD1_STORD( DAST, SZOPND, IOPND, IPOPND, STATUS )
                CALL ARD1_STORD( WCSDAT( 1 ), SZOPND, IOPND, IPOPND, 
      :                          STATUS )
 

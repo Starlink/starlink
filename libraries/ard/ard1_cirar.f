@@ -5,7 +5,7 @@
 *     ARD1_CIRAR
 
 *  Purpose:
-*     Assemble argument list for a BOX keyword
+*     Assemble argument list for a CIRCLE keyword
 
 *  Language:
 *     Starlink Fortran 77
@@ -102,7 +102,7 @@
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
 *  If another argument is obtained, which axis will it refer to?
-         AXIS = MOD( NARG, NDIM ) + 1
+         AXIS = NARG + 1
 
 *  The last argument is a radius, measured on axis 1 unless the Frame is
 *  a SkyFrame, in which case it is measured on the latitude axis.

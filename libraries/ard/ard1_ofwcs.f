@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_OFWCS( NDIM, PAR, UWCS, STATUS )
+      SUBROUTINE ARD1_OFWCS( AWCS, PAR, UWCS, STATUS )
 *+
 *  Name:
 *     ARD1_OFWCS
@@ -10,15 +10,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_OFWCS( NDIM, PAR, UWCS, STATUS )
+*     CALL ARD1_OFWCS( AWCS, PAR, UWCS, STATUS )
 
 *  Description:
 *     This routine creates a new user FrameSet (UWCS) from the 
 *     supplied parameters.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
-*        The number of axes.
+*     AWCS = INTEGER (Given)
+*        The application FrameSet.
 *     PAR( * ) = DOUBLE PRECISION (Given)
 *        The statement parameters.
 *     UWCS = INTEGER (Given)
@@ -47,10 +47,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_CONST'        ! ARD provate constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants 
+      INCLUDE 'ARD_CONST'        ! ARD private constants 
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER AWCS
       DOUBLE PRECISION PAR( * )
 
 *  Arguments Returned:
@@ -71,11 +72,26 @@
       INTEGER IFRM                       ! Index of ARDAPP Frame
       INTEGER FR                         ! Pointer to a Frame
       INTEGER M1                         ! WinMap
+      INTEGER NDIM               ! No. of axes in user coords
 
 *.
 
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check the Curent Frame in the application FrameSet has domain ARDAPP.
+      IF( AST_GETC( AWCS, 'DOMAIN', STATUS ) .NE. 'ARDAPP' ) THEN
+         STATUS = ARD__INTER
+         CALL MSG_SETC( 'D', AST_GETC( AWCS, 'DOMAIN', STATUS ) )
+         CALL ERR_REP( 'ARD1_OFWCS_ERR1', 'ARD1_OFWCS: Current Frame '//
+     :                 'in supplied application FrameSet has Domain '//
+     :                 '''^D''. This should be ''ARDAPP'' '//
+     :                 '(programming error).', STATUS )
+         GO TO 999
+      END IF
+
+*  Save the number of axes in the current Frame
+      NDIM = AST_GETI( AWCS, 'NAXES', STATUS )
 
 *  Locate a Frame in the current User FrameSet with Domain ARDAPP.
       IFRM = AST__NOFRAME
@@ -95,7 +111,7 @@
 *  Frames connected by a UnitMap.
       IF( IFRM .EQ. AST__NOFRAME ) THEN
          CALL AST_ANNUL( UWCS, STATUS )
-         CALL ARD1_COWCS( NDIM, AST__BAD, UWCS, STATUS )
+         CALL ARD1_COWCS( AWCS, AST__BAD, UWCS, STATUS )
          IFRM = AST_GETI( UWCS, 'BASE', STATUS )
       END IF 
 
@@ -113,6 +129,9 @@
 
 *  Remap the ARDAPP Frame.
       CALL AST_REMAPFRAME( UWCS, IFRM, M1, STATUS )
+
+*  Arrive here if an error occurs.
+ 999  CONTINUE
 
 *  Annull AST objects.
       CALL AST_ANNUL( M1, STATUS )

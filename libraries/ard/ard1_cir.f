@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_CIR( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, 
-     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     PAR, FRM, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
      :                     STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_CIR( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, B,
-*                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+*     CALL ARD1_CIR( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, FRM,
+*                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
 *     The array B is initialised by setting all values within the
@@ -47,6 +47,8 @@
 *        Pn = ...
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
 *        The region parameters.
+*     FRM = INTEGER (Given)
+*        A pointer to the user coordinate Frame.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( NDIM ) = INTEGER (Given and Returned)
@@ -103,6 +105,7 @@
       INTEGER NPAR
       DOUBLE PRECISION D( * )
       DOUBLE PRECISION PAR( NPAR )
+      INTEGER FRM
 
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
@@ -117,9 +120,6 @@
 *  Local Variables:
       INTEGER
      :        I                  ! Loop count
-
-      DOUBLE PRECISION 
-     :        LPAR( 2*ARD__MXDIM ) ! Box parameters
 
 *.
 
@@ -143,28 +143,15 @@
       CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, 0, LBINTB,
      :                 UBINTB, B, STATUS )
 
-*  Create a local copy of the supplied region parameters, excluding 
-*  the last parameter which is the circle radius in user coords.
-      DO I = 1, NPAR - 1
-         LPAR( I ) = PAR( I )
-      END DO
-
-*  Append extra parameters (equal to the diameter) to the local copy so
-*  that the entire set of local parameters describes a box which just
-*  encompasses the circle.
-      DO I = NPAR, NPAR + NDIM - 1 
-         LPAR( I ) = 2*PAR( NPAR )
-      END DO
-
-*  Use these local parameters to find the bounds of the new interior
-*  bounding box.
-      CALL ARD1_BXFND( NDIM, LBND, UBND, NDIM*2, D, LPAR,
+*  Find the bounds of the interior bounding box which just encompasses
+*  the circle.
+      CALL ARD1_CRFND( FRM, NDIM, LBND, UBND, NDIM*2, D, PAR,
      :                 LBINTB, UBINTB, STATUS )
 
 *  Call a routine to assign an interior value to every pixel inside
 *  the interior bounding box which is also inside the specified user
 *  circle.
-      CALL ARD1_BXCIR( NDIM, LBND, UBND, MSKSIZ, RINDEX, LBINTB,
+      CALL ARD1_BXCIR( FRM, NDIM, LBND, UBND, MSKSIZ, RINDEX, LBINTB,
      :                 UBINTB, NPAR, D, PAR, B, STATUS )
 
 *  If the interior bounding box is null, return the usual value

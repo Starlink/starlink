@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL ARD1_LKR( INDEX1, NDIM, LBND, UBND, MSKSIZ, MASK, OPNSIZ,
-*                    IOPND,LEX0, UEX0, LIN0, UIN0, OPRNDS, IPB, LBEXTB,
+*                    IOPND, LEX0, UEX0, LIN0, UIN0, OPRNDS, IPB, LBEXTB,
 *                    UBEXTB, LBINTB, UBINTB, LOADED, RINDEX, STATUS )
 
 *  Description:
@@ -41,8 +41,10 @@
 *     depend on direction, but a lower limit is all that is needed.
 *
 *     If the element with index 4+NPAR is non-zero, then the pixel -> user 
-*     Mapping is linear. The following NDIM*(NDIM+1) elements give the 
-*     coefficients of the pixel->user linear mapping:
+*     Mapping is linear. The following element contains the DOUBLE PRECISION 
+*     equivalence of an INTEGER value representing an AST Frame pointer.
+*     This is the user coordinate Frame. The following NDIM*(NDIM+1) elements 
+*     give the coefficients of the pixel->user linear mapping:
 *
 *        U1 = C0 + C1*P1 + C2*P2 + ...  + Cn*Pn
 *        U2 = Cn+1 + Cn+2*P1 + Cn+3*P2 + ...  + C2n+1*Pn
@@ -177,9 +179,9 @@
 *  Local Variables:
       INTEGER
      :        I,                 ! Dimension counter
+     :        IAST(2),           ! AST Frame or FrameSet pointer
      :        ICOEFF,            ! Index of first linear coefficient
      :        IPAR,              ! Index of first region parameters 
-     :        IWCS(2),           ! AST FrameSet pointer
      :        LASTOP,            ! Index of last used operand value
      :        NPAR,              ! No. of region parameters
      :        TYPE               ! Integer code for region type
@@ -190,12 +192,12 @@
 
       DOUBLE PRECISION 
      :        DPP,               ! Distance per pixel
-     :        DWCS,              ! DOUBLE equivalence to variable IWCS.
+     :        DAST,              ! DOUBLE equivalence to variable IAST.
      :        PAR( 16 )          ! Array to use if fewer than 16 parameters
 
-*  Make DWCS and IWCS share the same memory so that we can interpret
+*  Make DAST and IAST share the same memory so that we can interpret
 *  the real operand value as an integer identifier.
-      EQUIVALENCE ( IWCS, DWCS )
+      EQUIVALENCE ( IAST, DAST )
 
 *.
 
@@ -210,24 +212,29 @@
 *  index to use for this keyword region.
       RINDEX = NINT( OPRNDS( IOPND + 1 ) ) + INDEX1 - 1
 
-*  Save the number of parameters describibg the region
+*  Save the number of parameters describing the region
       NPAR = NINT( OPRNDS( IOPND + 2 ) )
 
 *  Save the index of the first region parameter.
       IPAR = IOPND + 3
 
-*  See if the pixel->user mapping is linear. If not, extact the AST
+*  See if the pixel->user mapping is linear. If not, extract the AST
 *  FrameSet pointer. At the same time, note the number of region
 *  parameters and the index of the first region parameter.
       IF( OPRNDS( IOPND + 3 + NPAR ) .EQ. 0.0 ) THEN
          LINEAR = .FALSE.
-         DWCS = OPRNDS( IOPND + 4 + NPAR )
+         DAST = OPRNDS( IOPND + 4 + NPAR )
          DPP = OPRNDS( IOPND + 5 + NPAR )
          LASTOP = IOPND + 5 + NPAR
+
+*  If the mapping is linear, extract the AST Frame pointer (the user
+*  coord Frame), and note the starting index of the coefficients of the 
+*  mapping.
       ELSE
          LINEAR = .TRUE.
-         ICOEFF = IOPND + 4 + NPAR
-         LASTOP = IOPND + 3 + NPAR + NDIM*( NDIM + 1 ) 
+         DAST = OPRNDS( IOPND + 4 + NPAR )
+         ICOEFF = IOPND + 5 + NPAR
+         LASTOP = IOPND + 4 + NPAR + NDIM*( NDIM + 1 ) 
       END IF
 
 *  Report an error if there are insufficient values in OPRNDS.
@@ -281,7 +288,7 @@
 *  the mapping is linear or not. First deal with linear Mappings.
       ELSE IF( LINEAR ) THEN 
          CALL ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                  OPRNDS( IPAR ), OPRNDS( ICOEFF ), 
+     :                  OPRNDS( IPAR ), OPRNDS( ICOEFF ), IAST( 1 ),
      :                  %VAL( IPB ), LBEXTB, UBEXTB, LBINTB, UBINTB, 
      :                  STATUS )
 
@@ -289,7 +296,7 @@
 *  16 parameters.
       ELSE IF( NPAR .GE. 16 ) THEN
          CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                   OPRNDS( IPAR ), IWCS(1), DPP, IPB, LBEXTB, 
+     :                   OPRNDS( IPAR ), IAST(1), DPP, IPB, LBEXTB, 
      :                   UBEXTB, LBINTB, UBINTB, STATUS )
 
       ELSE
@@ -297,7 +304,7 @@
             PAR( I ) = OPRNDS( IPAR + I - 1 )
          END DO
          CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                   PAR, IWCS(1), DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
+     :                   PAR, IAST(1), DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
      :                   UBINTB, STATUS )
 
       END IF

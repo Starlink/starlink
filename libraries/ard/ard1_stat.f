@@ -276,19 +276,19 @@
 *  If it is a COEFFS statement, create a new UWCS from the coefficients.
          ELSE IF( TYPE .EQ. ARD__COE ) THEN
             IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
-            CALL ARD1_COWCS( NDIM, STARGS, UWCS, STATUS )
+            CALL ARD1_COWCS( AWCS, STARGS, UWCS, STATUS )
 
 *  If it is an OFFSET statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__OFF ) THEN
-            CALL ARD1_OFWCS( NDIM, STARGS, UWCS, STATUS )
+            CALL ARD1_OFWCS( AWCS, STARGS, UWCS, STATUS )
 
 *  If it is a SCALE statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__SCA ) THEN
-            CALL ARD1_SCWCS( NDIM, STARGS, UWCS, STATUS )
+            CALL ARD1_SCWCS( AWCS, STARGS, UWCS, STATUS )
 
 *  If it is a TWIST statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__TWI ) THEN
-            CALL ARD1_TWWCS( NDIM, STARGS, UWCS, STATUS )
+            CALL ARD1_TWWCS( AWCS, STARGS, UWCS, STATUS )
 
 *  If it is a STRETCH statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__STR ) THEN

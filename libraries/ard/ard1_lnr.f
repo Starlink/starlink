@@ -1,6 +1,6 @@
       SUBROUTINE ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
-     :                     PAR, C, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
-     :                     STATUS )
+     :                     PAR, C, FRM, B, LBEXTB, UBEXTB, LBINTB, 
+     :                     UBINTB, STATUS )
 *+
 *  Name:
 *     ARD1_LNR
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
-*                    PAR, C, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
+*                    PAR, C, FRM, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
 *                    STATUS )
 
 *  Description:
@@ -48,6 +48,8 @@
 *        U2 = Cn+1 + Cn+2*P1 + Cn+3*P2 + ...  + C2n+1*Pn
 *        ...
 *        UN = ...
+*     FRM = INTEGER (Given)
+*        Pointer to the user coord Frame.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The returned array.
 *     LBEXTB( NDIM ) = INTEGER (Given and Returned)
@@ -110,6 +112,7 @@
       INTEGER NPAR
       DOUBLE PRECISION PAR( NPAR )
       DOUBLE PRECISION C( * )
+      INTEGER FRM
 
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
@@ -127,6 +130,8 @@
 
       DOUBLE PRECISION 
      :        D( ARD__MXDIM*(ARD__MXDIM + 1 ) ) ! User->pixel coeffs
+      integer i
+
 *.
 
 *  Check inherited global status
@@ -138,7 +143,7 @@
 *  Initialise a flag to indicate that the correct number of parameters
 *  are available.
       BADPAR = .FALSE.
-
+ 
 *  Call a separate suboutine to handle each type of region.
 *  POINT and PIXEL keywords...
       IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX ) THEN
@@ -213,7 +218,7 @@
 *  ROTBOX keywords...
       ELSE IF( TYPE .EQ. ARD__ROT ) THEN
          IF( NPAR .GT. 0  ) THEN
-            CALL ARD1_ROT( RINDEX, LBND( 1 ), UBND( 1 ), LBND( 2 ),
+            CALL ARD1_ROT( FRM, RINDEX, LBND( 1 ), UBND( 1 ), LBND( 2 ),
      :                     UBND( 2 ), NPAR, D, PAR, B,
      :                     LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
          ELSE
@@ -224,7 +229,7 @@
       ELSE IF( TYPE .EQ. ARD__CIR ) THEN
          IF( NPAR .GT. 0  ) THEN
             CALL ARD1_CIR( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR,
-     :                     D, PAR, B, LBEXTB, UBEXTB,
+     :                     D, PAR, FRM, B, LBEXTB, UBEXTB,
      :                     LBINTB, UBINTB, STATUS )
          ELSE
             BADPAR = .TRUE.
@@ -233,7 +238,7 @@
 *  ELLIPSE keywords...
       ELSE IF( TYPE .EQ. ARD__ELL ) THEN
          IF( NPAR .GT. 0  ) THEN
-            CALL ARD1_ELL( RINDEX, LBND( 1 ), UBND( 1 ), LBND( 2 ),
+            CALL ARD1_ELL( FRM, RINDEX, LBND( 1 ), UBND( 1 ), LBND( 2 ),
      :                     UBND( 2 ), NPAR, D, PAR, B,
      :                     LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
          ELSE

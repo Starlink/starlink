@@ -1,6 +1,6 @@
-      SUBROUTINE ARD1_ROT( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR,
-     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
-     :                     STATUS )
+      SUBROUTINE ARD1_ROT( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2, 
+     :                     NPAR, D, PAR, B, LBEXTB, UBEXTB, LBINTB,
+     :                     UBINTB, STATUS )
 *+
 *  Name:
 *     ARD1_ROT
@@ -12,15 +12,21 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ROT( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, B, 
-*                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+*     CALL ARD1_ROT( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR,
+*                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
 *     The supplied parameters are modified so that they look the same
 *     as those for a POLYGON region. ARD1_POL is then called to load the
 *     region.
+*
+*     A polygon vertex is put at the middle of each side in case we are 
+*     dealing with spherical coords, in which case a polygon edge greater 
+*     than 180 arc-degrees could cause problems.
 
 *  Arguments:
+*     FRM = INTEGER (Given)
+*        A pointer to the user coord Frame.
 *     RINDEX = INTEGER (Given)
 *        The value to use to represent interior points.
 *     LBND1 = INTEGER (Given)
@@ -84,8 +90,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Arguments Given:
+      INTEGER FRM
       INTEGER RINDEX
       INTEGER LBND1
       INTEGER UBND1
@@ -107,9 +115,14 @@
 
 *  Local Variables:
       DOUBLE PRECISION 
-     :    COST,                  ! COS of the rotation angle
-     :    LPAR( 8 ),             ! Local parameters
-     :    SINT                   ! SIN of the rotation angle
+     :    HL,                    ! Half the requested box length
+     :    HW,                    ! Half the requested box width
+     :    LPAR( 16 ),            ! Local parameters
+     :    P0( 2 ),               ! The box centre
+     :    PA0,                   ! Requested angle as a position angle
+     :    PA1,                   ! The position angle at the end
+     :    PA2                    ! The position angle at the end
+
 *.
 
 *  Check inherited global status.
@@ -125,29 +138,45 @@
          GO TO 999
       END IF
 
-*  Save commonly used values.
-      SINT = SIN( PAR( 5 ) * ARD__DTOR )
-      COST = COS( PAR( 5 ) * ARD__DTOR )
+*  Offset away from the centre point along the first edge, at the
+*  requested angle, going half the box length. Using AST caters for both 
+*  Cartesian and spherical user coords. Store points in the LPAR 
+*  array, in a suitable order to make the points a continuous curve.
+      PA0 = ( 90.0 - PAR( 5 ) )*ARD__DTOR 
+      HL = 0.5*PAR( 3 )
+      HW = 0.5*PAR( 4 )
+      P0( 1 ) = PAR( 1 )
+      P0( 2 ) = PAR( 2 )
 
-*  Set up the user coordinates of the first corner of the box.
-      LPAR( 1 ) = 0.5*( -PAR( 3 )*COST + PAR( 4 )*SINT ) + PAR( 1 )
-      LPAR( 2 ) = 0.5*( -PAR( 4 )*COST - PAR( 3 )*SINT ) + PAR( 2 )
+      PA1 = AST_OFFSET2( FRM, P0, PA0, HL, LPAR, STATUS )
 
-*  Now do the same with the second corner.
-      LPAR( 3 ) = 0.5*( -PAR( 3 )*COST - PAR( 4 )*SINT ) + PAR( 1 )
-      LPAR( 4 ) = 0.5*( PAR( 4 )*COST - PAR( 3 )*SINT ) + PAR( 2 )
+*  Now turn to the left by 90 degrees and offset up by half the box height. 
+      PA1 = PA1 - ARD__PIBY2
+      PA2 = AST_OFFSET2( FRM, LPAR, PA1, HW, LPAR( 3 ), STATUS )
 
-*  And the third.
-      LPAR( 5 ) = 0.5*( PAR( 3 )*COST - PAR( 4 )*SINT ) + PAR( 1 )
-      LPAR( 6 ) = 0.5*( PAR( 4 )*COST + PAR( 3 )*SINT ) + PAR( 2 )
+*  Now offset down by half the box height. 
+      PA2 = AST_OFFSET2( FRM, LPAR, PA1, -HW, LPAR( 15 ), STATUS )
 
-*  And the fourth.
-      LPAR( 7 ) = 0.5*( PAR( 3 )*COST + PAR( 4 )*SINT ) + PAR( 1 )
-      LPAR( 8 ) = 0.5*( -PAR( 4 )*COST + PAR( 3 )*SINT ) + PAR( 2 )
+*  Now offset up and down by half the box height, starting at the box
+*  centre.
+      PA1 = PA0 - ARD__PIBY2
+      PA2 = AST_OFFSET2( FRM, PAR, PA1, HW, LPAR( 5 ), STATUS )
+      PA2 = AST_OFFSET2( FRM, PAR, PA1, -HW, LPAR( 13 ), STATUS )
+
+*  Offset away from the centre point along the first edge, away from the
+*  requested angle, going half the box length.
+      PA1 = AST_OFFSET2( FRM, PAR, PA0, -HL, LPAR( 9 ), STATUS )
+
+*  Now turn to the left by 90 degrees and offset up by half the box height. 
+      PA1 = PA1 - ARD__PIBY2
+      PA2 = AST_OFFSET2( FRM, LPAR( 9 ), PA1, HW, LPAR( 7 ), STATUS )
+
+*  Now offset down by half the box height. 
+      PA2 = AST_OFFSET2( FRM, LPAR( 9 ), PA1, -HW, LPAR( 11 ), STATUS )
 
 *  The parameters are now in the same format as those for a POLYGON region.
 *  Call the subroutine used to load a POLYGON region.
-      CALL ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, 8,
+      CALL ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, 16,
      :               D, LPAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :               STATUS )
 

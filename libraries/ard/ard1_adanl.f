@@ -149,6 +149,7 @@
      : WCSDAT( ARD__MXDIM*( ARD__MXDIM + 1 ) )
 
       INTEGER
+     : CFRM,                     ! Pointer to current Frame (i.e. user coords) 
      : I,                        ! Index of next character 
      : IELEM,                    ! Index of next GRP element
      : IEXPR,                    ! Next free entry in expression array
@@ -225,12 +226,14 @@
 *  Create a default user FrameSet in which application coords and user
 *  coords are connected by a UnitMap.
       UWCS = AST__NULL
-      CALL ARD1_COWCS( AST_GETI( AWCS, 'NAXES', STATUS ), AST__BAD, 
-     :                 UWCS, STATUS )
+      CALL ARD1_COWCS( AWCS, AST__BAD, UWCS, STATUS )
 
 *  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
       CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT, 
      :                 STATUS )
+
+*  Get a pointer to the current Frame.
+      CFRM = AST_GETFRAME( UWCS, AST__CURRENT, STATUS )
 
 *  Initialise a flag to show that no INPUT keywords have yet been found.
       INP = .FALSE.
@@ -295,7 +298,7 @@
 *  GRP element into the returned operand array.
          ELSE IF( KEYW ) THEN
             CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
-     :                      UWCS, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
+     :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
      :                      KEYW, STATUS )
 
 *  If we are in the middle of processing a statement field, obtain any 
@@ -306,6 +309,10 @@
             CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, 
      :                      NEEDIM, NARG, I, UWCS, MAP, STAT, IWCS, 
      :                      WCSDAT, STATUS )
+
+*  Update the current Frame pointer.
+            CALL AST_ANNUL( CFRM, STATUS )
+            CFRM = AST_GETFRAME( UWCS, AST__CURRENT, STATUS )
 
 *  If we are ready to start a new field...
          ELSE

@@ -1,4 +1,5 @@
-      SUBROUTINE ARD1_LINMP( MAP, DLBND, DUBND, LINEAR, WCSDAT, STATUS )
+      SUBROUTINE ARD1_LINMP( MAP, FRM, DLBND, DUBND, LINEAR, WCSDAT, 
+     :                       STATUS )
 *+
 *  Name:
 *     ARD1_LINMP
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_LINMP( MAP, DLBND, DUBND, LINEAR, WCSDAT, STATUS )
+*     CALL ARD1_LINMP( MAP, FRM, DLBND, DUBND, LINEAR, WCSDAT, STATUS )
 
 *  Description:
 *     This routine checks to see if the supplied Mapping is linear,
@@ -32,6 +33,8 @@
 *  Arguments:
 *     MAP = INTEGER (Given)
 *        A pointer to the Mapping to be checked.
+*     FRM = INTEGER (Given)
+*        A pointer to the Frame corresponding to the Mapping output axes.
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of the input domain.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
@@ -73,6 +76,7 @@
 
 *  Arguments Given:
       INTEGER MAP
+      INTEGER FRM
       DOUBLE PRECISION DLBND( * )
       DOUBLE PRECISION DUBND( * )
 
@@ -88,6 +92,8 @@
       PARAMETER ( EPS = 0.05D0 ) 
 
 *  Local Variables:
+      DOUBLE PRECISION A( ARD__MXDIM ) ! Start position
+      DOUBLE PRECISION B( ARD__MXDIM ) ! End position
       DOUBLE PRECISION IN( ARD__MXDIM + 3, ARD__MXDIM ) ! Input positions
       DOUBLE PRECISION ORIG( ARD__MXDIM )               ! Transformed origin
       DOUBLE PRECISION OUT( ARD__MXDIM + 3, ARD__MXDIM )! Output positions
@@ -142,6 +148,17 @@
          CALL AST_TRANN( MAP, NIN + 3, NIN, ARD__MXDIM + 3, IN, .TRUE.,
      :                   NOUT, ARD__MXDIM + 3, OUT, STATUS )
 
+*  Normalize the positions.
+         DO I = 1, NIN + 3
+            DO J = 1, NOUT
+               A( J ) = OUT( I, J )
+            END DO
+            CALL AST_NORM( FRM, A, STATUS )
+            DO J = 1, NOUT
+               OUT( I, J ) = A( J )
+            END DO
+         END DO
+
 *  Find the squared distance between the transformed second and third extra 
 *  points. This is used as the upper limit on the squared distance
 *  between two points if the two points are to be considered coincident.
@@ -150,8 +167,8 @@
          DO I = 1, NOUT
             IF( OUT( NIN + 2, I ) .NE. AST__BAD .AND.
      :          OUT( NIN + 3, I ) .NE. AST__BAD ) THEN
-               SUMSQ = SUMSQ + ( OUT( NIN + 2, I ) + 
-     :                           OUT( NIN + 3, I ) )**2   
+               A( I ) = OUT( NIN + 2, I ) 
+               B( I ) = OUT( NIN + 3, I ) 
             ELSE    
                MORE = .TRUE.
                GO TO 10   
@@ -160,9 +177,12 @@
 
  10      CONTINUE
 
+         IF( .NOT. MORE ) THEN
+            SUMSQ = AST_DISTANCE( FRM, A, B, STATUS )**2
+
 *  If the test point could not be transformed, choose another test point 
 *  at random. Abort if more than 100 test points fail.
-         IF( MORE ) THEN 
+         ELSE
             IF( NTEST .GT. 100 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__NOTST
                CALL ERR_REP( 'ARD1_LINMP_ERR1', 'Cannot find any '//

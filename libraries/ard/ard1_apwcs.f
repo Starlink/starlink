@@ -198,10 +198,13 @@
 
       END IF
 
-*  Create a Frame representing ARD application coords.
-      F1 = AST_FRAME( AST_GETI( AWCS, 'NAXES', STATUS ), 
-     :                'DOMAIN=ARDAPP,Title=ARD application coordinates', 
-     :                STATUS )
+*  Create a Frame representing ARD application coords. Base this on a
+*  copy of the current Frame in order to inherit the correct class of Frame.
+      F1 = AST_COPY( AST_GETFRAME( AWCS, AST__CURRENT, STATUS ), 
+     :               STATUS )
+      CALL AST_SETC( F1, 'DOMAIN', 'ARDAPP', STATUS )
+      CALL AST_SETC( F1, 'TITLE', 'ARD application coordinates', 
+     :               STATUS )
 
 *  Add this Frame into the returned FrameSet.
       CALL AST_ADDFRAME( AWCS, AST__CURRENT, M3, F1, STATUS ) 

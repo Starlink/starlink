@@ -18,16 +18,14 @@
 *     UWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the user. This should at 
 *        least have a Frame with Domain ARDAPP referring to "Application 
-*        co-ordinates" (as defined by the TRCOEF argument of ARD_WORK). The 
-*        current Frame in this FrameSet should refer to "User co-ordinates" 
-*        (i.e. the coord system in which positions are supplied in the ARD 
-*        description).
+*        co-ordinates". The current Frame in this FrameSet should refer to 
+*        "User co-ordinates" (i.e. the coord system in which positions are 
+*        supplied in the ARD description).
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
 *        should have a Base Frame with Domain PIXEL referring to pixel
 *        coords within the pixel mask and another Frame with Domain 
-*        ARDAPP referring to "Application co-ordinates" (as defined by
-*        the TRCOEF argument of ARD_WORK).
+*        ARDAPP referring to "Application co-ordinates".
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
@@ -114,7 +112,8 @@
      :                    STATUS )
 
 *  See if it is linear. 
-      CALL ARD1_LINMP( MAP, DLBND, DUBND, LINEAR, WCSDAT, STATUS )
+      CALL ARD1_LINMP( MAP, AST_GETFRAME( UWCS, AST__CURRENT, STATUS ),
+     :                 DLBND, DUBND, LINEAR, WCSDAT, STATUS )
 
 *  If so, annul the FrameSet.
       IF( LINEAR ) CALL AST_ANNUL( IWCS, STATUS )

@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_BXCIR( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX,
+      SUBROUTINE ARD1_BXCIR( FRM, NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX,
      :                       UBOX, NPAR, D, PAR, B, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BXCIR( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
+*     CALL ARD1_BXCIR( FRM, NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
 *                      NPAR, D, PAR, B, STATUS )
 
 *  Description:
@@ -24,6 +24,8 @@
 *     found. The algorithm works in any number of dimensions.
 
 *  Arguments:
+*     FRM = INTEGER (Given)
+*        Pointer to the user coord Frame.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the array.
 *     LBND( NDIM ) = INTEGER (Given)
@@ -84,8 +86,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ARD_CONST'        ! ARD private constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Arguments Given:
+      INTEGER FRM 
       INTEGER NDIM
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
@@ -229,10 +233,7 @@
             CALL ARD1_LTRAN( NDIM, C, 1, PCO, UCO, STATUS )
 
 *  Find the square of the distance of this pixel from the circle centre.
-            R2 = 0.0
-            DO I = 1, NDIM
-               R2 = R2 + ( UCO( I ) - PAR( I ) )**2
-            END DO
+            R2 = AST_DISTANCE( FRM, PAR, UCO, STATUS )**2
 
 *  If the pixel is inside the user box, assign the value to the
 *  current pixel, and update the returned box.

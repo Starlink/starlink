@@ -1,6 +1,6 @@
-      SUBROUTINE ARD1_ELL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR,
-     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
-     :                     STATUS )
+      SUBROUTINE ARD1_ELL( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2,
+     :                     NPAR, D, PAR, B, LBEXTB, UBEXTB, LBINTB, 
+     :                     UBINTB, STATUS )
 *+
 *  Name:
 *     ARD1_ELL
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ELL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, 
+*     CALL ARD1_ELL( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, 
 *                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -27,6 +27,8 @@
 *     user +Y).
 
 *  Arguments:
+*     FRM = INTEGER (Given)
+*        A pointer to the user cordinate Frame.
 *     RINDEX = INTEGER (Given)
 *        The value to use to represent interior points.
 *     LBND1 = INTEGER (Given)
@@ -91,8 +93,10 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Arguments Given:
+      INTEGER FRM
       INTEGER RINDEX
       INTEGER LBND1
       INTEGER UBND1
@@ -120,8 +124,12 @@
      :  ANG2,                    ! An angle 
      :  BB1,                     ! Second ellipse axis projected on Xp
      :  BB2,                     ! Second ellipse axis projected on Yp
-     :  SINA,                    ! Sine of supplied orientation
      :  COSA,                    ! Cosine of supplied orientation
+     :  COSP,                    ! Cosine of central latitude
+     :  D2,                      ! Modified coefficient
+     :  D5,                      ! Modified coefficient
+     :  P( 2 ),                  ! Test point
+     :  SINA,                    ! Sine of supplied orientation
      :  T,                       ! Temporary real storage.
      :  X0,                      ! X pixel co-ordinate at ellipse centre
      :  X1                       ! X pixel coord at lower intersection
@@ -181,6 +189,23 @@
       X0 = D( 1 ) + D( 2 )*PAR( 1 ) + D( 3 )*PAR( 2 )
       Y0 = D( 4 ) + D( 5 )*PAR( 1 ) + D( 6 )*PAR( 2 )
 
+*  If the user coord Frame is a SkyFrame, we have to take account of the 
+*  fact that the longitude axis is on a different scale to the latitude axis. 
+*  Since the user->pixel mapping is linear, we can assume that the scales
+*  of the two axes are effectively constant over the mask. This constant is 
+*  given by cos(latitude). Modify the D( 2 ) and D( 5 ) terms to describe
+*  a coord system in which the first axis is on the same scale as the
+*  second axis.
+      D2 = D( 2 )
+      D5 = D( 5 )
+      IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
+         COSP = COS( PAR( 2 ) )
+         IF( COSP .NE. 0.0 ) THEN 
+            D2 = D( 2 )/COSP
+            D5 = D( 5 )/COSP
+         END IF
+      END IF
+
 *  Store the sine and cosine of the orientation of the ellipse in user 
 *  co-ordinates.
       SINA = SIN( PAR( 5 )*ARD__DTOR )
@@ -188,12 +213,12 @@
 
 *  Find the half-ranges of pixel co-ordinates encompassed by the
 *  ellipse.
-      AA1 = PAR( 3 )*( D( 2 )*COSA + D( 3 )*SINA )
-      BB1 = PAR( 4 )*( D( 3 )*COSA - D( 2 )*SINA )
+      AA1 = PAR( 3 )*( D2*COSA + D( 3 )*SINA )
+      BB1 = PAR( 4 )*( D( 3 )*COSA - D2*SINA )
       XRANGE = SQRT( MAX( 0.0D0, AA1**2 + BB1**2 ) )
 
-      AA2 = PAR( 3 )*( D( 5 )*COSA + D( 6 )*SINA )
-      BB2 = PAR( 4 )*( D( 6 )*COSA - D( 5 )*SINA )
+      AA2 = PAR( 3 )*( D5*COSA + D( 6 )*SINA )
+      BB2 = PAR( 4 )*( D( 6 )*COSA - D5*SINA )
       YRANGE = SQRT( MAX( 0.0D0, AA2**2 + BB2**2 ) )
 
 *  Abort if the ellipse is actually a line.
