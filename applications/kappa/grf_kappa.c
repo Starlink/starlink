@@ -830,7 +830,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 */
 
    int ival;
-   float rval, x1, x2, y1, y2, sz;
+   float rval, x1, x2, y1, y2, sz, dx, dy, deflw;
    static float origsize=-1.0;
 
 /* If required retrieve the current line style, and set a new line style. */
