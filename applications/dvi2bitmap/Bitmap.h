@@ -58,6 +58,7 @@ class Bitmap {
     int *boundingBox ()
 	{ BB[0]=bbL; BB[1]=bbT; BB[2]=bbR; BB[3]=bbB; return &BB[0]; }
     static void verbosity (const verbosities level) { verbosity_ = level; }
+    static void logBitmapInfo (bool b) { logBitmapInfo_ = b; };
 
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
@@ -94,6 +95,8 @@ class Bitmap {
     Byte max_colour_;		// ==> max colour index (must fit into
 				// a Byte)
     static verbosities verbosity_;
+
+    static bool logBitmapInfo_;
 };
 
 #endif //#ifndef BITMAP_HEADER_READ

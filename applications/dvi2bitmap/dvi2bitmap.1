@@ -9,7 +9,7 @@ dvi2bitmap
     [\-P[BbTt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
     [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
     [\-R[fb] int,int,int]
-    [\-nqV] [\-Q[fFt]] [\-p num] [\-l num] [\-pp ranges]
+    [\-nqV] [\-Q[fFtb]] [\-p num] [\-l num] [\-pp ranges]
     dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -244,7 +244,13 @@ Quiet mode -- suppress some chatter.
 Silent mode -- do not display warnings or errors.
 .TP
 .I "\-Q..."
-Query various things.  The available possibilities are
+Query various things.  The available possibilities are as
+follows.  Each of these lines is printed on a line by itself, prefixed
+by the option letters and a space, so that, for example, each of the
+lines produced by the
+.I "\-QF"
+option would start
+.I "QF cmbx10 110 ..."
 .TP
 .I "\-Qf"
 Show missing fonts.
@@ -265,6 +271,10 @@ except that found fonts are also listed, prefixed by a % character.
 List the output image formats which the program can generate, on
 stdout, separated by whitespace.  The first output format is the default.
 The program then exits.
+.TP
+.I "\-Qb"
+Prints on stdout a line for each bitmap it generates, giving the
+filename, horizontal size, and vertical size, in pixels.
 .TP
 .I "\-r resolution"
 Specifies the output resolution, in pixels-per-inch.  This is used

@@ -110,7 +110,7 @@ make things a little clearer.</update>
 dvi2bitmap 
     [-f font-path] [-r resolution] [-m magnification] [-P[BbTt]]
     [-s scalefactor] [-t pbm|gif|xbm] [-o output] [-b(h|w) size]
-    [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFt]]
+    [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFtb]]
     [-R[fb] int,int,int]
     [-p num] [-l num] [-pp ranges]
     dvi-file
@@ -300,7 +300,11 @@ when making such transparent PNGs.  I'd welcome advice on this point.
 <dd>Silent mode -- suppress warnings and errors as well.
 
 <dt><code/-Q...>
-<dd>Query various things.  The available possibilities are
+<dd>Query various things.  The available possibilities are as
+follows.  Each of these lines is printed on a line by itself, prefixed
+by the option letters and a space, so that, for example, each of the
+lines produced by the <code/-QF> option would start <code/QF cmbx10
+110 ...>.
   <dl>
   <dt><code>-Qf</code>
   <dd>Show missing fonts.
@@ -320,6 +324,11 @@ when making such transparent PNGs.  I'd welcome advice on this point.
   <dd>List the output image formats which the program can generate, on
   stdout, separated by whitespace.  The first output format is the default.
   The program then exits.
+
+  <dt><code/-Qb>
+  <dd>Prints on stdout a line for each bitmap it generates, giving the
+  filename, horizontal size, and vertical size, in pixels.
+
   </dl>
 
 <dt><code/-r resolution>

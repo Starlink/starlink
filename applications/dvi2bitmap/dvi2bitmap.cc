@@ -312,11 +312,14 @@ int main (int argc, char **argv)
 		      case 'f':		// show missing fonts
 			show_font_list = 1;
 			break;
+
 		      case 'F':	// show all fonts
 			show_font_list = 2;
 			break;
+
 		      case 't':	// show file types
 			{
+			    cout << "Qt ";
 			    const char *ft
 				= BitmapImage::defaultBitmapImageFormat();
 			    cout << ft;
@@ -330,6 +333,11 @@ int main (int argc, char **argv)
 			    process_options_only = true;
 			    break;
 			}
+
+		      case 'b':	// show bitmap info
+			Bitmap::logBitmapInfo (true);
+			break;
+
 		      default:
 			Usage();
 			break;
@@ -480,7 +488,9 @@ int main (int argc, char **argv)
 		if (show_font_list > 1 || !f->loaded())
 		{
 		    if (f->loaded()) // show_font_list is >1
-			cout << "% ";
+			cout << "QF ";
+		    else
+			cout << "Qf ";
 		    // write out font name, dpi, base-dpi, mag and MF mode
 		    cout << f->name() << ' '
 			 << f->dpiBase() << ' '

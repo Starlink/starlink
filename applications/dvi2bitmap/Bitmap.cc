@@ -40,6 +40,7 @@ bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 Bitmap::BitmapColour Bitmap::def_fg_ = {  0,   0,   0};
 Bitmap::BitmapColour Bitmap::def_bg_ = {255, 255, 255};
 bool Bitmap::def_customRGB_ = false;
+bool Bitmap::logBitmapInfo_ = false;
 
 
 
@@ -507,6 +508,10 @@ void Bitmap::write (const string filename, const string format)
 	//cerr << "file extension="<<fileext<<": new file="<<outfilename<<'\n';
     }
     bi->write (outfilename);
+
+    if (logBitmapInfo_)
+	cout << "Qb " << outfilename << ' ' << hsize << ' ' << vsize << '\n';
+
     delete bi;
 }
 
