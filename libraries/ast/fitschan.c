@@ -506,6 +506,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        axis value as the test for linearity.
 *        - Modify RoundFString to avoid writing beyond the end of the
 *        supplied buffer if the supplied string contains a long list of 9's.
+*     11-MAR-2004 (DSB):
+*        - Modified SpecTrans to check all axis descriptions for keywords
+*        to be translated.
+
 *class--
 */
 
@@ -19747,6 +19751,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
    char prj[6];                   /* Projection string */
    char s;                        /* Co-ordinate version character */
+   char ss;                       /* Co-ordinate version character */
    double cdelti;                 /* CDELT for longitude axis */
    double cdeltj;                 /* CDELT for latitude axis */
    double cosrota;                /* Cos( CROTA ) */
@@ -19798,355 +19803,97 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-/* Find the number of axes by finding the highest axis number in any 
-   CRPIXi keyword name. Return if there are no axes. */
-   if( !astKeyFields( this, "CRPIX%d", 1, &naxis, lbnd ) ) return NULL;
-
 /* Create the returned FitsChan. */
    ret = astFitsChan( NULL, NULL, "" );
+
+/* Loop round all axis descriptions, starting with primary (' '). */
+   for( s = 'A' - 1; s <= 'Z' && astOK; s++ ){      
+      if( s == 'A' - 1 ) s = ' ';
+
+/* Find the number of axes by finding the highest axis number in any 
+   CRPIXi keyword name. Pass on if there are no axes for this axis
+   description. */
+      if( s != ' ' ) {
+         sprintf( keyname, "CRPIX%%d%c", s );
+      } else {
+         strcpy( keyname, "CRPIX%d" );
+      }
+      if( !astKeyFields( this, keyname, 1, &naxis, lbnd ) ) continue;
 
 /* Find the longitude and latitude axes by examining the CTYPE values.
    They are marked as read. Such markings are only provisional, and they
    can be read again any number of times until the current astRead
    operation is completed. Also note the projection type. */
-   j = 0;
-   axlon = -1;
-   axlat = -1;
-   while( j < naxis && astOK ){
-      if( GetValue2( ret, this, FormatKey( "CTYPE", j + 1, -1, ' ' ),
-                    AST__STRING, (void *) &cval, 0, method, 
-                    class ) ){
-         if( !strncmp( cval, "RA--", 4 ) ||
-             !strncmp( cval + 1, "LON", 3 ) ||
-             !strncmp( cval + 2, "LN", 2 ) ) {
-            axlon = j;
-            strncpy( prj, cval + 4, 4 );
-            strncpy( lontype, cval, 10 );
-            prj[ 4 ] = 0;
-
-         } else if( !strncmp( cval, "DEC-", 4 ) ||
-             !strncmp( cval + 1, "LAT", 3 ) ||
-             !strncmp( cval + 2, "LT", 2 ) ) {
-            axlat = j;
-            strncpy( prj, cval + 4, 4 );
-            strncpy( lattype, cval, 10 );
-            prj[ 4 ] = 0;
+      j = 0;
+      axlon = -1;
+      axlat = -1;
+      while( j < naxis && astOK ){
+         if( GetValue2( ret, this, FormatKey( "CTYPE", j + 1, -1, s ),
+                       AST__STRING, (void *) &cval, 0, method, 
+                       class ) ){
+            if( !strncmp( cval, "RA--", 4 ) ||
+                !strncmp( cval + 1, "LON", 3 ) ||
+                !strncmp( cval + 2, "LN", 2 ) ) {
+               axlon = j;
+               strncpy( prj, cval + 4, 4 );
+               strncpy( lontype, cval, 10 );
+               prj[ 4 ] = 0;
+   
+            } else if( !strncmp( cval, "DEC-", 4 ) ||
+                !strncmp( cval + 1, "LAT", 3 ) ||
+                !strncmp( cval + 2, "LT", 2 ) ) {
+               axlat = j;
+               strncpy( prj, cval + 4, 4 );
+               strncpy( lattype, cval, 10 );
+               prj[ 4 ] = 0;
+            }
+           j++;
+         } else {
+            break;
          }
-        j++;
-      } else {
-         break;
       }
-   }
 
 /* RADECSYS keywords 
    ----------------- */
-   if( GetValue2( ret, this, "RADECSYS", AST__STRING, (void *) &cval, 0, method, 
-                 class ) ){
-      if( encoding == FITSPC_ENCODING || encoding == FITSIRAF_ENCODING ){
-         SetValue( ret, "RADESYS", (void *) &cval, AST__STRING, 
-                   CardComm( this ) );
-      }
-   }
+      if( s == ' ' ) {
+         if( GetValue2( ret, this, "RADECSYS", AST__STRING, (void *) &cval, 0, method, 
+                       class ) ){
+            if( encoding == FITSPC_ENCODING || encoding == FITSIRAF_ENCODING ){
+               SetValue( ret, "RADESYS", (void *) &cval, AST__STRING, 
+                         CardComm( this ) );
+            }
+         }
 
 /* LONGPOLE keywords 
    ----------------- */
-   if( GetValue2( ret, this, "LONGPOLE", AST__FLOAT, (void *) &dval, 0, method, 
-                 class ) ){
-      if( encoding == FITSPC_ENCODING || encoding == FITSIRAF_ENCODING ){
-         SetValue( ret, "LONPOLE", (void *) &dval, AST__FLOAT, 
-                   CardComm( this ) );
+         if( GetValue2( ret, this, "LONGPOLE", AST__FLOAT, (void *) &dval, 0, method, 
+                       class ) ){
+            if( encoding == FITSPC_ENCODING || encoding == FITSIRAF_ENCODING ){
+               SetValue( ret, "LONPOLE", (void *) &dval, AST__FLOAT, 
+                         CardComm( this ) );
+            }
+         }
       }
-   }
 
 /* Zero CDELT values.
    ----------------- */
+
 /* Check there are some CDELT keywords... */
-   if( astKeyFields( this, "CDELT%d", 0, NULL, NULL ) ){
+      if( s != ' ' ) {
+         sprintf( keyname, "CDELT%%d%c", s );
+      } else {
+         strcpy( keyname, "CDELT%d" );
+      }
+      if( astKeyFields( this, keyname, 0, NULL, NULL ) ){
 
 /* Do each row in the matrix. */
-      for( j = 0; j < naxis; j++ ){
+         for( j = 0; j < naxis; j++ ){
 
 /* Get the CDELT value for this row. */
-         GetValue2( ret, this, FormatKey( "CDELT", j + 1, -1, ' ' ), AST__FLOAT,
-                      (void *) &cdeltj, 0, method, class );
+            GetValue2( ret, this, FormatKey( "CDELT", j + 1, -1, s ), AST__FLOAT,
+                       (void *) &cdeltj, 0, method, class );
 
 /* If CDELT is zero, use 1.0E-6 of the corresponding CRVAL value 
-   instead, or 1.0 if CRVAL is zero. Otherwise, the zeros could cause the 
-   matrix to be non-invertable. The Mapping could then not be simplified 
-   or used by a Plot. CDELT values of zero are usually used to indicate 
-   "redundant" axes. For instance, a 2D image may be stored as a 3D cube  
-   with a single plane with the "redundant" 3rd axis used to specify the 
-   wavelength of the filter. The actual value used for CDELT shouldn't 
-   matter since the axis only spans a single pixel anyway. */
-         if( cdeltj == 0.0 ){
-            GetValue2( ret, this, FormatKey( "CRVAL", j + 1, -1, ' ' ), AST__FLOAT, 
-                      (void *) &dval, 1, method, class );
-            cdeltj = 1.0E-6*dval;
-            if( cdeltj == 0.0 ) cdeltj = 1.0;
-            SetValue( ret, FormatKey( "CRVAL", j + 1, -1, ' ' ), (void *) &cdeltj, 
-                      AST__FLOAT, NULL );
-         }
-      }
-   }
-
-/* Following conversions produce PCi_j keywords. Only do them if there
-   are currently no PCi_j keywords in the header. */
-   if( astKeyFields( this, "PC%d_%d", 0, NULL, NULL ) == 0 ){
-
-/* CDjjjiii 
-   -------- */
-      if( astKeyFields( this, "CD%3d%3d", 0, NULL, NULL ) ){
-
-/* Do each row in the matrix. */
-         for( j = 0; j < naxis; j++ ){
-
-/* Do each column in the matrix. */
-            for( i = 0; i < naxis; i++ ){
-
-/* Get the CDjjjiii matrix element */
-               sprintf( keyname, "CD%.3d%.3d", j + 1, i + 1 );
-               if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                             method, class ) ){
-
-/* If found, save it with name PCj_i */
-                  if( encoding == FITSIRAF_ENCODING ){
-                     SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
-                               (void *) &dval, AST__FLOAT, NULL );
-                  }
-               }
-            }
-         }
-      }
-
-/* CDj_i 
-   ---- */
-      if( astKeyFields( this, "CD%d_%d", 0, NULL, NULL ) ){
-
-/* Do each row in the matrix. */
-         for( j = 0; j < naxis; j++ ){
- 
-/* Do each column in the matrix. */
-            for( i = 0; i < naxis; i++ ){
-
-/* Get the CDj_i matrix element (note default value for all CD elements
-   is zero (even diagonal elements!). */
-               sprintf( keyname, "CD%d_%d", j + 1, i + 1 );
-               if( !GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                               method, class ) ){
-                  dval = 0.0;
-               }
-
-/* Save it with name PCj_i */
-               SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
-                         (void *) &dval, AST__FLOAT, NULL );
-            }
-         }
-      }
-
-/* PCjjjiii and CROTAi keywords 
-   ---------------------------- */
-
-/* Check there are some CDELT keywords... */
-      if( astKeyFields( this, "CDELT%d", 0, NULL, NULL ) ){
-
-/* See if there is a CROTA keyword. Try to read values for both axes
-   since they are sometimes both included. This ensures they will not be
-   included in the output when the FitsChan is deleted. Read the latitude
-   axis second in order to give it priority in cases where both are
-   present. */
-         crota = AST__BAD;
-         GetValue2( ret, this, FormatKey( "CROTA", axlon + 1, -1, ' ' ), 
-                    AST__FLOAT, (void *) &crota, 0, method, class );
-         GetValue2( ret, this, FormatKey( "CROTA", axlat + 1, -1, ' ' ), 
-                    AST__FLOAT, (void *) &crota, 0, method, class );
-
-/* If there are any PCjjjiii keywords, rename them as PCj_i. */
-         if( astKeyFields( this, "PC%3d%3d", 0, NULL, NULL ) ){
-
-/* Do each row in the matrix. */
-            for( j = 0; j < naxis; j++ ){
-
-/* Do each column in the matrix. */
-               for( i = 0; i < naxis; i++ ){
-
-/* Get the PCiiijjj matrix element */
-                  sprintf( keyname, "PC%.3d%.3d", j + 1, i + 1 );
-                  if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                                method, class ) ){
-                  } else if( i == j ) {
-                     dval = 1.0;
-                  } else {
-                     dval = 0.0;
-                  }
-
-/* Store it as PCi_j */
-                  SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
-                            (void *) &dval, AST__FLOAT, NULL );
-               }
-            }
-
-/* If there is a CROTA value and no PCjjjii keywords, create a PCj_i
-   matrix from the CROTA values. We need to have latitude and longitude 
-   axes for this.  */
-         } else if( axlat != -1 && axlon != -1 && crota != AST__BAD ){
-
-/* Get the sin and cos of CROTA */
-            cosrota = cos( crota*AST__DD2R );
-            sinrota = sin( crota*AST__DD2R );
-
-/* Get the CDELT values for the longitude and latitude axes. */
-            if( GetValue2( ret, this, FormatKey( "CDELT", axlat + 1, -1, ' ' ),
-                          AST__FLOAT, (void *) &cdeltj, 1, method, 
-                          class ) && 
-                GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, ' ' ),
-                          AST__FLOAT, (void *) &cdelti, 1, method, 
-                          class ) ){
-
-/* Save the ratio, needed below. */
-               lambda = cdeltj/cdelti;
-
-/* Save a corresponding set of PCi_j keywords in the FitsChan. First do
-   the diagonal terms. */
-               for( i = 0; i < naxis; i++ ){
-                  if( i == axlat ) {
-                     dval = cosrota;
-                  } else if( i == axlon ) {
-                     dval = cosrota;
-                  } else {
-                     dval = 1.0;
-                  }
-
-                  SetValue( ret, FormatKey( "PC", i + 1, i + 1, ' ' ),
-                            (void *) &dval, AST__FLOAT, NULL );
-               }
-
-/* Now do the non-zero off-diagonal terms. */
-               dval = sinrota/lambda;
-               SetValue( ret, FormatKey( "PC", axlat + 1, axlon + 1, ' ' ),
-                         (void *) &dval, AST__FLOAT, NULL );
- 
-               dval = -sinrota*lambda;
-               SetValue( ret, FormatKey( "PC", axlon + 1, axlat + 1, ' ' ),
-                         (void *) &dval, AST__FLOAT, NULL );
-            }
-         }
-      }
-   }
-
-/* PROJP keywords
-   -------------- */
-   if( astKeyFields( this, "PROJP%d", 1, ubnd, lbnd ) && 
-       !astKeyFields( this, "PV%d_%d", 2, ubnd, lbnd ) && axlat != -1 ){
-      for( i = lbnd[ 0 ]; i <= ubnd[ 0 ]; i++ ){
-         if( GetValue2( ret, this, FormatKey( "PROJP", i, -1, ' ' ), 
-                       AST__FLOAT, (void *) &dval, 0, method, class ) &&
-             ( encoding == FITSPC_ENCODING || 
-               encoding == FITSIRAF_ENCODING ) ){
-            SetValue( ret, FormatKey( "PV", axlat + 1, i, ' ' ),
-                      (void *) &dval, AST__FLOAT, CardComm( this ) );
-         }
-      }
-   }
-   
-/* CmVALi keywords 
-   --------------- */
-   if( astKeyFields( this, "C%1dVAL%d", 2, ubnd, lbnd ) ){
-      s = 'A';
-      for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
-         for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
-            sprintf( keyname, "C%dVAL%d", m, i );
-            if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                          method, class ) && 
-                ( encoding == FITSPC_ENCODING || 
-                  encoding == FITSIRAF_ENCODING ) ){
-               sprintf( keyname, "CRVAL%d%c", i, s );
-               SetValue( ret, keyname, (void *) &dval, AST__FLOAT,
-                         CardComm( this ) );
-            }
-         }
-         s++;
-      }
-   }
-
-/* CmPIXi keywords 
-   --------------- */
-   if( astKeyFields( this, "C%1dPIX%d", 2, ubnd, lbnd ) ){
-      s = 'A';
-      for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
-         for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
-            sprintf( keyname, "C%dPIX%d", m, i );
-            if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                          method, class ) && 
-                ( encoding == FITSPC_ENCODING || 
-                  encoding == FITSIRAF_ENCODING ) ){
-               sprintf( keyname, "CRPIX%d%c", i, s );
-               SetValue( ret, keyname, (void *) &dval, AST__FLOAT,
-                         CardComm( this ) );
-            }
-         }
-         s++;
-      }
-   }
-
-/* CmYPEi keywords 
-   --------------- */
-   if( astKeyFields( this, "C%1dYPE%d", 2, ubnd, lbnd ) ){
-      s = 'A';
-      for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
-         for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
-            sprintf( keyname, "C%dYPE%d", m, i );
-            if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, 
-                          method, class ) && 
-                ( encoding == FITSPC_ENCODING || 
-                  encoding == FITSIRAF_ENCODING ) ){
-               sprintf( keyname, "CTYPE%d%c", i, s );
-               SetValue( ret, keyname, (void *) &cval, AST__STRING,
-                         CardComm( this ) );
-            }
-         }
-         s++;
-      }
-   }
-
-/* CmNITi keywords 
-   --------------- */
-   if( astKeyFields( this, "C%1dNIT%d", 2, ubnd, lbnd ) ){
-      s = 'A';
-      for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
-         for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
-            sprintf( keyname, "C%dNIT%d", m, i );
-            if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, 
-                          method, class ) && 
-                ( encoding == FITSPC_ENCODING || 
-                  encoding == FITSIRAF_ENCODING ) ){
-               sprintf( keyname, "CUNIT%d%c", i, s );
-               SetValue( ret, keyname, (void *) &cval, AST__STRING,
-                         CardComm( this ) );
-            }
-         }
-         s++;
-      }
-   }
-
-
-/* CmELTi keywords 
-   --------------- */
-   if( astKeyFields( this, "C%1dELT%d", 2, ubnd, lbnd ) ){
-      s = 'A';
-      for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
-
-/* Create a PCj_is matrix by copying the PCjjjiii values and rename CmELTi as
-   CDELTis. */
-
-/* Do each row in the matrix. */
-         for( j = 0; j < naxis; j++ ){
-
-/* Get the CDELT value for this row. Report an error if not present. */
-            sprintf( keyname, "C%dELT%d", m, j + 1 );
-            GetValue2( ret, this, keyname, AST__FLOAT, (void *) &cdeltj, 1, 
-                      method, class );
-
-/* If CDELT is zero, use one hundredth of the corresponding CRVAL value 
    instead, or 1.0 if CRVAL is zero. Otherwise, the zeros could cause the 
    matrix to be non-invertable. The Mapping could then not be simplified 
    or used by a Plot. CDELT values of zero are usually used to indicate 
@@ -20157,349 +19904,659 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
             if( cdeltj == 0.0 ){
                GetValue2( ret, this, FormatKey( "CRVAL", j + 1, -1, s ), AST__FLOAT, 
                          (void *) &dval, 1, method, class );
-               cdeltj = 0.01*dval;
+               cdeltj = 1.0E-6*dval;
                if( cdeltj == 0.0 ) cdeltj = 1.0;
-            }
-
-/* Save it as CDELTis */
-            sprintf( keyname, "CDELT%d%c", i, s );
-            SetValue( ret, keyname, (void *) &cdeltj, AST__FLOAT,
-                      CardComm( this ) );
-
-/* Do each column in the matrix. */
-            for( i = 0; i < naxis; i++ ){
-
-/* Get the PCiiijjj matrix element */
-               sprintf( keyname, "PC%.3d%.3d", j + 1, i + 1 );
-               if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                             method, class ) ){
-               } else if( i == j ) {
-                  dval = 1.0;
-               } else {
-                  dval = 0.0;
-               }
-
-/* Store it as PCi_js. */
-               SetValue( ret, FormatKey( "PC", j + 1, i + 1, s ),
-                         (void *) &dval, AST__FLOAT, NULL );
+               SetValue( ret, FormatKey( "CRVAL", j + 1, -1, s ), (void *) &cdeltj, 
+                         AST__FLOAT, NULL );
             }
          }
-         s++;
       }
-   }
+
+/* Following conversions produce PCi_j keywords. Only do them if there
+   are currently no PCi_j keywords in the header. */
+      if( s != ' ' ) {
+         sprintf( keyname, "PC%%d_%%d%c", s );
+      } else {
+         strcpy( keyname, "PC%d_%d" );
+      }
+      if( astKeyFields( this, keyname, 0, NULL, NULL ) == 0 ){
+
+/* CDjjjiii 
+   -------- */
+         if( s == ' ' && astKeyFields( this, "CD%3d%3d", 0, NULL, NULL ) ){
+
+/* Do each row in the matrix. */
+            for( j = 0; j < naxis; j++ ){
+
+/* Do each column in the matrix. */
+               for( i = 0; i < naxis; i++ ){
+
+/* Get the CDjjjiii matrix element */
+                  sprintf( keyname, "CD%.3d%.3d", j + 1, i + 1 );
+                  if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                                method, class ) ){
+
+/* If found, save it with name PCj_i */
+                     if( encoding == FITSIRAF_ENCODING ){
+                        SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
+                                  (void *) &dval, AST__FLOAT, NULL );
+                     }
+                  }
+               }
+            }
+         }
+
+/* CDj_i 
+   ---- */
+         if( s != ' ' ) {
+            sprintf( keyname, "CD%%d_%%d%c", s );
+         } else {
+            strcpy( keyname, "CD%d_%d" );
+         }
+         if( astKeyFields( this, keyname, 0, NULL, NULL ) ){
+
+/* Do each row in the matrix. */
+            for( j = 0; j < naxis; j++ ){
+ 
+/* Do each column in the matrix. */
+               for( i = 0; i < naxis; i++ ){
+ 
+/* Get the CDj_i matrix element (note default value for all CD elements
+   is zero (even diagonal elements!). */
+                  if( !GetValue2( ret, this, FormatKey( "CD", j + 1, i + 1, s ),
+                                  AST__FLOAT, (void *) &dval, 0, method, class ) ){
+                     dval = 0.0;
+                  }
+
+/* Save it with name PCj_i. Default values of 1.0 for CDELT is ok so we
+   do not add CDELT values.  */
+                  SetValue( ret, FormatKey( "PC", j + 1, i + 1, s ),
+                            (void *) &dval, AST__FLOAT, NULL );
+               }
+            }
+         }
+
+/* PCjjjiii and CROTAi keywords 
+   ---------------------------- */
+
+/* Check there are some CDELT keywords... */
+         if( s != ' ' ) {
+            sprintf( keyname, "CDELT%%d%c", s );
+         } else {
+            strcpy( keyname, "CDELT%d" );
+         }
+         if( astKeyFields( this, keyname, 0, NULL, NULL ) ){
+
+/* See if there is a CROTA keyword. Try to read values for both axes
+   since they are sometimes both included. This ensures they will not be
+   included in the output when the FitsChan is deleted. Read the latitude
+   axis second in order to give it priority in cases where both are
+   present. */
+            crota = AST__BAD;
+            GetValue2( ret, this, FormatKey( "CROTA", axlon + 1, -1, s ), 
+                       AST__FLOAT, (void *) &crota, 0, method, class );
+            GetValue2( ret, this, FormatKey( "CROTA", axlat + 1, -1, s ), 
+                       AST__FLOAT, (void *) &crota, 0, method, class );
+
+/* If there are any PCjjjiii keywords, rename them as PCj_i. */
+            if( s == ' ' && astKeyFields( this, "PC%3d%3d", 0, NULL, NULL ) ){
+
+/* Do each row in the matrix. */
+               for( j = 0; j < naxis; j++ ){
+
+/* Do each column in the matrix. */
+                  for( i = 0; i < naxis; i++ ){
+
+/* Get the PCiiijjj matrix element */
+                     sprintf( keyname, "PC%.3d%.3d", j + 1, i + 1 );
+                     if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                                   method, class ) ){
+                     } else if( i == j ) {
+                        dval = 1.0;
+                     } else {
+                        dval = 0.0;
+                     }
+
+/* Store it as PCi_j */
+                     SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
+                               (void *) &dval, AST__FLOAT, NULL );
+                  }
+               }
+
+/* If there is a CROTA value and no PCjjjii keywords, create a PCj_i
+   matrix from the CROTA values. We need to have latitude and longitude 
+   axes for this.  */
+            } else if( s == ' ' && axlat != -1 && axlon != -1 && crota != AST__BAD ){
+
+/* Get the sin and cos of CROTA */
+               cosrota = cos( crota*AST__DD2R );
+               sinrota = sin( crota*AST__DD2R );
+
+/* Get the CDELT values for the longitude and latitude axes. */
+               if( GetValue2( ret, this, FormatKey( "CDELT", axlat + 1, -1, ' ' ),
+                             AST__FLOAT, (void *) &cdeltj, 1, method, 
+                             class ) && 
+                   GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, ' ' ),
+                             AST__FLOAT, (void *) &cdelti, 1, method, 
+                             class ) ){
+
+/* Save the ratio, needed below. */
+                  lambda = cdeltj/cdelti;
+
+/* Save a corresponding set of PCi_j keywords in the FitsChan. First do
+   the diagonal terms. */
+                  for( i = 0; i < naxis; i++ ){
+                     if( i == axlat ) {
+                        dval = cosrota;
+                     } else if( i == axlon ) {
+                        dval = cosrota;
+                     } else {
+                        dval = 1.0;
+                     }
+   
+                     SetValue( ret, FormatKey( "PC", i + 1, i + 1, ' ' ),
+                               (void *) &dval, AST__FLOAT, NULL );
+                  }
+
+/* Now do the non-zero off-diagonal terms. */
+                  dval = sinrota/lambda;
+                  SetValue( ret, FormatKey( "PC", axlat + 1, axlon + 1, ' ' ),
+                            (void *) &dval, AST__FLOAT, NULL );
+    
+                  dval = -sinrota*lambda;
+                  SetValue( ret, FormatKey( "PC", axlon + 1, axlat + 1, ' ' ),
+                            (void *) &dval, AST__FLOAT, NULL );
+               }
+            }
+         }
+      }
+
+/* Conversion of old PROJP, etc, is done once on the "primary" pass. */
+      if( s == ' ' ) {
+
+/* PROJP keywords
+   -------------- */
+         if( astKeyFields( this, "PROJP%d", 1, ubnd, lbnd ) && 
+             !astKeyFields( this, "PV%d_%d", 2, ubnd, lbnd ) && axlat != -1 ){
+            for( i = lbnd[ 0 ]; i <= ubnd[ 0 ]; i++ ){
+               if( GetValue2( ret, this, FormatKey( "PROJP", i, -1, ' ' ), 
+                             AST__FLOAT, (void *) &dval, 0, method, class ) &&
+                   ( encoding == FITSPC_ENCODING || 
+                     encoding == FITSIRAF_ENCODING ) ){
+                  SetValue( ret, FormatKey( "PV", axlat + 1, i, ' ' ),
+                            (void *) &dval, AST__FLOAT, CardComm( this ) );
+               }
+            }
+         }
+   
+/* CmVALi keywords 
+   --------------- */
+         if( astKeyFields( this, "C%1dVAL%d", 2, ubnd, lbnd ) ){
+            ss = 'A';
+            for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
+               for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
+                  sprintf( keyname, "C%dVAL%d", m, i );
+                  if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                                method, class ) && 
+                      ( encoding == FITSPC_ENCODING || 
+                        encoding == FITSIRAF_ENCODING ) ){
+                     sprintf( keyname, "CRVAL%d%c", i, ss );
+                     SetValue( ret, keyname, (void *) &dval, AST__FLOAT,
+                               CardComm( this ) );
+                  }
+               }
+               ss++;
+            }
+         }
+
+/* CmPIXi keywords 
+   --------------- */
+         if( astKeyFields( this, "C%1dPIX%d", 2, ubnd, lbnd ) ){
+            ss = 'A';
+            for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
+               for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
+                  sprintf( keyname, "C%dPIX%d", m, i );
+                  if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                                method, class ) && 
+                      ( encoding == FITSPC_ENCODING || 
+                        encoding == FITSIRAF_ENCODING ) ){
+                     sprintf( keyname, "CRPIX%d%c", i, ss );
+                     SetValue( ret, keyname, (void *) &dval, AST__FLOAT,
+                               CardComm( this ) );
+                  }
+               }
+               ss++;
+            }
+         }
+
+/* CmYPEi keywords 
+   --------------- */
+         if( astKeyFields( this, "C%1dYPE%d", 2, ubnd, lbnd ) ){
+            ss = 'A';
+            for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
+               for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
+                  sprintf( keyname, "C%dYPE%d", m, i );
+                  if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, 
+                                method, class ) && 
+                      ( encoding == FITSPC_ENCODING || 
+                        encoding == FITSIRAF_ENCODING ) ){
+                     sprintf( keyname, "CTYPE%d%c", i, ss );
+                     SetValue( ret, keyname, (void *) &cval, AST__STRING,
+                               CardComm( this ) );
+                  }
+               }
+               ss++;
+            }
+         }
+
+/* CmNITi keywords 
+   --------------- */
+         if( astKeyFields( this, "C%1dNIT%d", 2, ubnd, lbnd ) ){
+            ss = 'A';
+            for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
+               for( i = lbnd[ 1 ]; i <= ubnd[ 1 ]; i++ ){
+                  sprintf( keyname, "C%dNIT%d", m, i );
+                  if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, 
+                                method, class ) && 
+                      ( encoding == FITSPC_ENCODING || 
+                        encoding == FITSIRAF_ENCODING ) ){
+                     sprintf( keyname, "CUNIT%d%c", i, ss );
+                     SetValue( ret, keyname, (void *) &cval, AST__STRING,
+                               CardComm( this ) );
+                  }
+               }
+               ss++;
+            }
+         }
+
+
+/* CmELTi keywords 
+   --------------- */
+         if( astKeyFields( this, "C%1dELT%d", 2, ubnd, lbnd ) ){
+            ss = 'A';
+            for( m = lbnd[ 0 ]; m <= ubnd[ 0 ]; m++ ){
+
+/* Create a PCj_is matrix by copying the PCjjjiii values and rename CmELTi as
+   CDELTis. */
+
+/* Do each row in the matrix. */
+               for( j = 0; j < naxis; j++ ){
+
+/* Get the CDELT value for this row. Report an error if not present. */
+                  sprintf( keyname, "C%dELT%d", m, j + 1 );
+                  GetValue2( ret, this, keyname, AST__FLOAT, (void *) &cdeltj, 1, 
+                             method, class );
+
+/* If CDELT is zero, use one hundredth of the corresponding CRVAL value 
+   instead, or 1.0 if CRVAL is zero. Otherwise, the zeros could cause the 
+   matrix to be non-invertable. The Mapping could then not be simplified 
+   or used by a Plot. CDELT values of zero are usually used to indicate 
+   "redundant" axes. For instance, a 2D image may be stored as a 3D cube  
+   with a single plane with the "redundant" 3rd axis used to specify the 
+   wavelength of the filter. The actual value used for CDELT shouldn't 
+   matter since the axis only spans a single pixel anyway. */
+                  if( cdeltj == 0.0 ){
+                     GetValue2( ret, this, FormatKey( "CRVAL", j + 1, -1, ss ), AST__FLOAT, 
+                               (void *) &dval, 1, method, class );
+                     cdeltj = 0.01*dval;
+                     if( cdeltj == 0.0 ) cdeltj = 1.0;
+                  }
+
+/* Save it as CDELTis */
+                  sprintf( keyname, "CDELT%d%c", i, ss );
+                  SetValue( ret, keyname, (void *) &cdeltj, AST__FLOAT,
+                            CardComm( this ) );
+
+/* Do each column in the matrix. */
+                  for( i = 0; i < naxis; i++ ){
+
+/* Get the PCiiijjj matrix element */
+                     sprintf( keyname, "PC%.3d%.3d", j + 1, i + 1 );
+                     if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                                   method, class ) ){
+                     } else if( i == j ) {
+                        dval = 1.0;
+                     } else {
+                        dval = 0.0;
+                     }
+
+/* Store it as PCi_js. */
+                     SetValue( ret, FormatKey( "PC", j + 1, i + 1, ss ),
+                               (void *) &dval, AST__FLOAT, NULL );
+                  }
+               }
+               ss++;
+            }
+         }
 
 /* EPOCH keywords
    ------------ */
 /* Get any EPOCH card, marking it as read. */
-   if( GetValue2( ret, this, "EPOCH", AST__FLOAT, (void *) &dval, 0, method, 
-                    class ) ){
+         if( GetValue2( ret, this, "EPOCH", AST__FLOAT, (void *) &dval, 0, method, 
+                          class ) ){
 
 /* Convert values of zero to B1950. */
-      if( dval == 0.0 ) dval = 1950.0;
+            if( dval == 0.0 ) dval = 1950.0;
 
 /* Save a new EQUINOX card in the FitsChan, so long as there is not
    already one there. */
-      if( !GetValue2( ret, this, "EQUINOX", AST__STRING, (void *) &cval, 0, 
-                      method, class ) ){
-         SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
-                   "Reference equinox" );
-      }
-   }
+            if( !GetValue2( ret, this, "EQUINOX", AST__STRING, (void *) &cval, 0, 
+                            method, class ) ){
+               SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
+                         "Reference equinox" );
+            }
+         }
 
 /* String EQUINOX values 
    --------------------- 
    If found, EQUINOX will be used in favour of any EPOCH value found
    above. */
-   if( GetValue2( ret, this, "EQUINOX", AST__STRING, (void *) &cval, 0, method, 
-                 class ) ){
+         if( GetValue2( ret, this, "EQUINOX", AST__STRING, (void *) &cval, 0, method, 
+                        class ) ){
 
 /* Note the first character. */
-      bj = cval[ 0 ];      
+            bj = cval[ 0 ];      
 
 /* If it is "B" or "J", read a floating value from the rest */
-      if( bj == 'B' || bj == 'J' ) {
-         if( 1 == astSscanf( cval + 1, " %lf ", &dval ) ){
+            if( bj == 'B' || bj == 'J' ) {
+               if( 1 == astSscanf( cval + 1, " %lf ", &dval ) ){
 
 /* If it is a Besselian epoch, convert to Julian. */
-            if( bj == 'B' ) dval = slaEpj( slaEpb2d( dval ) );
+                  if( bj == 'B' ) dval = slaEpj( slaEpb2d( dval ) );
 
 /* Replace the original EQUINOX card. */
-            SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
-                      CardComm( this ) );
-         }
-      }
-   } 
+                  SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
+                            CardComm( this ) );
+               }
+            }
+         } 
 
 /* EQUINOX = 0.0 keywords
    ---------------------- */
-   if( GetValue2( ret, this, "EQUINOX", AST__FLOAT, (void *) &dval, 0, method, 
-                 class ) ){
-      if( dval == 0.0 ){
-         dval = 1950.0;
-         SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
-                   CardComm( this ) );
+         if( GetValue2( ret, this, "EQUINOX", AST__FLOAT, (void *) &dval, 0, method, 
+                       class ) ){
+            if( dval == 0.0 ){
+               dval = 1950.0;
+               SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
+                         CardComm( this ) );
+            }
+         }
       }
-   }
 
 /* DATE-OBS keywords
    ---------------- */
 /* Read any DATE-OBS card. This prevents it being written out when the
    FitsChan is deleted.  */
-   if( GetValue2( ret, this, "DATE-OBS", AST__STRING, (void *) &cval, 0, method, 
+      if( s != ' ' ) {
+         sprintf( keyname, "DATE-OBS%c", s );
+      } else {
+         strcpy( keyname, "DATE-OBS" );
+      }
+      if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method, 
                     class ) ){
 
 /* Ignore DATE-OBS values if the header contains an MJD-OBS value */
-      if( !GetValue2( ret, this, "MJD-OBS", AST__FLOAT, (void *) &dval, 0, 
-                     method, class ) ){
+         if( s != ' ' ) {
+            sprintf( keyname, "MJD-OBS%c", s );
+         } else {
+            strcpy( keyname, "MJD-OBS" );
+         }
+         if( !GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                        method, class ) ){
 
 /* Get the corresponding mjd-obs value, checking that DATE-OBS is valid. */
-         dval = DateObs( cval );
-         if( dval != AST__BAD ){
-            SetValue( ret, "MJD-OBS", (void *) &dval, AST__FLOAT, 
-                      "Date of observation" );
+            dval = DateObs( cval );
+            if( dval != AST__BAD ){
+               SetValue( ret, keyname, (void *) &dval, AST__FLOAT, 
+                         "Date of observation" );
+            }
          }
       }
-   }
 
 /* AIPS "NCP" projections 
    --------------------- */
 
 /* Compare the projection type with "-NCP" */
-   if( !Ustrcmp( prj, "-NCP" ) ) {
+      if( !Ustrcmp( prj, "-NCP" ) ) {
 
 /* Get the latitude reference value, and take is cot. */
-      GetValue2( ret, this, FormatKey( "CRVAL", axlat + 1, -1, ' ' ),
-                AST__FLOAT, (void *) &dval, 1, method, class );
-
-      dval = sin( dval*AST__DD2R );
-      if( dval != 0.0 ) {
-         dval = cos( dval*AST__DD2R )/dval;
+         GetValue2( ret, this, FormatKey( "CRVAL", axlat + 1, -1, s ),
+                   AST__FLOAT, (void *) &dval, 1, method, class );
+   
+         dval = sin( dval*AST__DD2R );
+         if( dval != 0.0 ) {
+            dval = cos( dval*AST__DD2R )/dval;
 
 /* Replace NCP with SIN in the CTYPE values. */
-         strcpy( lontype + 4, "-SIN" );
-         cval = lontype;
-         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
-                   (void *) &cval, AST__STRING, NULL );
-         strcpy( lattype + 4, "-SIN" );
-         cval = lattype;
-         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
-                   (void *) &cval, AST__STRING, NULL );
+            strcpy( lontype + 4, "-SIN" );
+            cval = lontype;
+            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s ),
+                      (void *) &cval, AST__STRING, NULL );
+            strcpy( lattype + 4, "-SIN" );
+            cval = lattype;
+            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s ),
+                      (void *) &cval, AST__STRING, NULL );
 
 /* Store the new projection parameters using names suitable to the
    encoding. */
-         if( encoding == FITSWCS_ENCODING ){
-            SetValue( ret, FormatKey( "PV", axlat + 1, 2, ' ' ),
-                      (void *) &dval, AST__FLOAT, NULL );
-            dval = 0.0;
-            SetValue( ret, FormatKey( "PV", axlat + 1, 1, ' ' ),
-                      (void *) &dval, AST__FLOAT, NULL );
-         } else {
-            SetValue( ret, FormatKey( "PROJP", 2, -1, ' ' ),
-                      (void *) &dval, AST__FLOAT, NULL );
-            dval = 0.0;
-            SetValue( ret, FormatKey( "PROJP", 1, -1, ' ' ),
-                      (void *) &dval, AST__FLOAT, NULL );
+            if( encoding == FITSWCS_ENCODING ){
+               SetValue( ret, FormatKey( "PV", axlat + 1, 2, s ),
+                         (void *) &dval, AST__FLOAT, NULL );
+               dval = 0.0;
+               SetValue( ret, FormatKey( "PV", axlat + 1, 1, s ),
+                         (void *) &dval, AST__FLOAT, NULL );
+            } else {
+               SetValue( ret, FormatKey( "PROJP", 2, -1, s ),
+                         (void *) &dval, AST__FLOAT, NULL );
+               dval = 0.0;
+               SetValue( ret, FormatKey( "PROJP", 1, -1, s ),
+                         (void *) &dval, AST__FLOAT, NULL );
+            }
          }
       }
-   }
 
 /* Rename "QV" TAN projection parameters as "PV"
    and change "-TAN" to "-TPN".
    -------------------------------------------- */
-   if( !Ustrcmp( prj, "-TAN" ) ){
+      if( !Ustrcmp( prj, "-TAN" ) ){
 
 /* Rewind the FitsChan. */
-      astClearCard( this );
+         astClearCard( this );
 
 /* Search the FitsChan for QV cards. */
-      while( FindKeyCard( this, "QV%d_%d%0c", method, class ) && astOK ) {
+         if( s != ' ' ) {
+            sprintf( keyname, "QV%%d_%%d%c", s );
+         } else {
+            strcpy( keyname, "QV%d_%d" );
+         }
+         while( FindKeyCard( this, keyname, method, class ) && astOK ) {
 
 /* If not already done, replace TAN with TPN in the CTYPE values. */
-         if( !Ustrcmp( prj, "-TAN" ) ){
-            strcpy( prj, "-TPN" );
-            strcpy( lontype + 4, "-TPN" );
-            cval = lontype;
-            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
-                      (void *) &cval, AST__STRING, NULL );
-            strcpy( lattype + 4, "-TPN" );
-            cval = lattype;
-            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
-                      (void *) &cval, AST__STRING, NULL );
-         }
+            if( !Ustrcmp( prj, "-TAN" ) ){
+               strcpy( prj, "-TPN" );
+               strcpy( lontype + 4, "-TPN" );
+               cval = lontype;
+               SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s ),
+                         (void *) &cval, AST__STRING, NULL );
+               strcpy( lattype + 4, "-TPN" );
+               cval = lattype;
+               SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s ),
+                         (void *) &cval, AST__STRING, NULL );
+            }
 
 /* Indicate that the QV card has been consumed. */
-         MarkCard( this );
+            MarkCard( this );
 
 /* Get the keyword name and change it from QV to PV. */
-         strcpy( keyname, CardName( this ) );
-         keyname[ 0 ] ='P';
+            strcpy( keyname, CardName( this ) );
+            keyname[ 0 ] ='P';
 
 /* Store the new PV card. */
-         SetValue( ret, keyname, CardData( this, &size ), AST__FLOAT, 
-                   CardComm( this ) );
+            SetValue( ret, keyname, CardData( this, &size ), AST__FLOAT, 
+                      CardComm( this ) );
 
 /* Move on to the next card. */
-         MoveCard( this, 1, method, class );
+            MoveCard( this, 1, method, class );
 
+         }
       }
-   }
 
 
 /* IRAF "ZPX" projections 
    --------------------- */
-   if( !Ustrcmp( prj, "-ZPX" ) ) {
+      if( s == ' ' && !Ustrcmp( prj, "-ZPX" ) ) {
 
 /* Replace ZPX with ZPN in the CTYPE values. */
-      strcpy( lontype + 4, "-ZPN" );
-      cval = lontype;
-      SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
-                (void *) &cval, AST__STRING, NULL );
-
-      strcpy( lattype + 4, "-ZPN" );
-      cval = lattype;
-      SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
-                (void *) &cval, AST__STRING, NULL );
+         strcpy( lontype + 4, "-ZPN" );
+         cval = lontype;
+         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
+                   (void *) &cval, AST__STRING, NULL );
+   
+         strcpy( lattype + 4, "-ZPN" );
+         cval = lattype;
+         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
+                   (void *) &cval, AST__STRING, NULL );
 
 /* Check latitude then longitude axes */
-      for( i = 0; i < 2; i++ ){
-         iaxis = i ? axlat : axlon;
+         for( i = 0; i < 2; i++ ){
+            iaxis = i ? axlat : axlon;
 
 /* Rewind the FitsChan. */
-         astClearCard( this );
+            astClearCard( this );
 
 /* Concatenate all the IRAF "WAT" keywords together for this axis. These 
    keywords are marked as having been used, so that they are not written 
    out when the FitsChan is deleted. */
-         watmem = NULL;
-         watlen = 1;
-         j = 1;
-         sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-         while( FindKeyCard( this, keyname, method, class ) && astOK ) {
-            wat = (char *) CardData( this, &size );
-            watmem = (char *) astRealloc( (void *) watmem, 
-                                          watlen - 1 + size );
-            if( watmem ) {
-               strcpy( watmem + watlen - 1, wat );
-               watlen += size - 1;
-               MarkCard( this );
-               MoveCard( this, 1, method, class );
-               j++;
-               sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-            } else {
-               break;
-            }
-         }
-
-/* Search the total WAT string for any projp terms. */
-         if( watmem ){
-            for( iproj = 0; iproj < 10 && astOK; iproj++ ) {
-               sprintf( format, "projp%d=", iproj );
-               start = strstr( watmem, format );
-               if( start ) {
-                  sprintf( format, "projp%d=%%lf", iproj );
-                  if( astSscanf( start, format, &projp ) ){
-                     SetValue( ret, FormatKey( "PV", axlat + 1, iproj, ' ' ),
-                               (void *) &projp, AST__FLOAT, 
-                               "ZPN projection parameter" );
-                  }
+            watmem = NULL;
+            watlen = 1;
+            j = 1;
+            sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+            while( FindKeyCard( this, keyname, method, class ) && astOK ) {
+               wat = (char *) CardData( this, &size );
+               watmem = (char *) astRealloc( (void *) watmem, 
+                                             watlen - 1 + size );
+               if( watmem ) {
+                  strcpy( watmem + watlen - 1, wat );
+                  watlen += size - 1;
+                  MarkCard( this );
+                  MoveCard( this, 1, method, class );
+                  j++;
+                  sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+               } else {
+                  break;
                }
             }
 
+/* Search the total WAT string for any projp terms. */
+            if( watmem ){
+               for( iproj = 0; iproj < 10 && astOK; iproj++ ) {
+                  sprintf( format, "projp%d=", iproj );
+                  start = strstr( watmem, format );
+                  if( start ) {
+                     sprintf( format, "projp%d=%%lf", iproj );
+                     if( astSscanf( start, format, &projp ) ){
+                        SetValue( ret, FormatKey( "PV", axlat + 1, iproj, ' ' ),
+                                  (void *) &projp, AST__FLOAT, 
+                                  "ZPN projection parameter" );
+                     }
+                  }
+               }
+
 /* See if the WAT string contains any lngcor or latcor terms. If so, add
    warning keywords to the FitsChan. */
-            if( ( strstr( watmem, "lngcor" ) || 
-                  strstr( watmem, "latcor" ) ) ){
-               Warn( this, "zpn", "This FITS header includes, or was "
-                     "derived from, a ZPN projection which requires "
-                     "unsupported IRAF-specific corrections (lngcor "
-                     "and/or latcor). The WCS information may therefore "
-                     "be incorrect.", method, class );
-            }
+               if( ( strstr( watmem, "lngcor" ) || 
+                     strstr( watmem, "latcor" ) ) ){
+                  Warn( this, "zpn", "This FITS header includes, or was "
+                        "derived from, a ZPN projection which requires "
+                        "unsupported IRAF-specific corrections (lngcor "
+                        "and/or latcor). The WCS information may therefore "
+                        "be incorrect.", method, class );
+               }
       
 /*  Release the memory used to hold the concatenated WAT keywords. */
-            watmem = (char *) astFree( (void *) watmem );
+               watmem = (char *) astFree( (void *) watmem );
+            }
          }
-      }
 
 /* IRAF "TNX" projections 
    --------------------- */
-   } else if( !Ustrcmp( prj, "-TNX" ) ) {
+      } else if( s == ' ' && !Ustrcmp( prj, "-TNX" ) ) {
 
 /* Replace TNX with TAN in the CTYPE values. */
-      strcpy( lontype + 4, "-TAN" );
-      cval = lontype;
-      SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
-                (void *) &cval, AST__STRING, NULL );
-
-      strcpy( lattype + 4, "-TAN" );
-      cval = lattype;
-      SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
-                (void *) &cval, AST__STRING, NULL );
+         strcpy( lontype + 4, "-TAN" );
+         cval = lontype;
+         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
+                   (void *) &cval, AST__STRING, NULL );
+   
+         strcpy( lattype + 4, "-TAN" );
+         cval = lattype;
+         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
+                   (void *) &cval, AST__STRING, NULL );
 
 /* Check latitude then longitude axes */
-      for( i = 0; i < 2; i++ ){
-         iaxis = i ? axlat : axlon;
+         for( i = 0; i < 2; i++ ){
+            iaxis = i ? axlat : axlon;
 
 /* Assume the TNX axis can be represented in FITS-WCS. */
-         ok = 1;
+            ok = 1;
 
 /* Rewind the FitsChan. */
-         astClearCard( this );
+            astClearCard( this );
 
 /* Concatenate all the IRAF "WAT" keywords together for this axis. These 
    keywords are marked as having been used, so that they are not written 
    out when the FitsChan is deleted. */
-         watmem = NULL;
-         watlen = 1;
-         j = 1;
-         sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-         while( FindKeyCard( this, keyname, method, class ) && astOK ) {
-            wat = (char *) CardData( this, &size );
-            watmem = (char *) astRealloc( (void *) watmem, 
-                                          watlen - 1 + size );
-            if( watmem ) {
-               strcpy( watmem + watlen - 1, wat );
-               watlen += size - 1;
-               MarkCard( this );
-               MoveCard( this, 1, method, class );
-               j++;
-               sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-            } else {
-               break;
+            watmem = NULL;
+            watlen = 1;
+            j = 1;
+            sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+            while( FindKeyCard( this, keyname, method, class ) && astOK ) {
+               wat = (char *) CardData( this, &size );
+               watmem = (char *) astRealloc( (void *) watmem, 
+                                             watlen - 1 + size );
+               if( watmem ) {
+                  strcpy( watmem + watlen - 1, wat );
+                  watlen += size - 1;
+                  MarkCard( this );
+                  MoveCard( this, 1, method, class );
+                  j++;
+                  sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+               } else {
+                  break;
+               }
             }
-         }
 
 /* Search the total WAT string for any lngcor or latcor terms. */
-         if( watmem ){
-            start = strstr( watmem, "cor = \"" );
+            if( watmem ){
+               start = strstr( watmem, "cor = \"" );
 
 /* If found, extract the numerical values which follow. */
-            if( start ) {
-               start = strstr( start, "\"" ) + 1;
-               j = 0;
-               nch = 0;
-               porder = -1;
-               while( ok && 1 == astSscanf( start, " %lf %n", (double *) &dval, &nch ) ){
+               if( start ) {
+                  start = strstr( start, "\"" ) + 1;
+                  j = 0;
+                  nch = 0;
+                  porder = -1;
+                  while( ok && 1 == astSscanf( start, " %lf %n", (double *) &dval, &nch ) ){
 
 /* The first value gives the correction surface type. We can only handle 
    type 3 (simple polynonial). */
-                  if( j == 0 ){
-                     if( dval != 3.0 ) ok = 0;
+                     if( j == 0 ){
+                        if( dval != 3.0 ) ok = 0;
                   
 /* The second and third numbers gives the orders of the polynomial in X
    and Y. We can only handle cases in which the orders are the same on
    both axes, and greater than 0 and less than 9. Store a pointer to the
    first TAN projection parameter index to use. */
-                  } else if( j == 1 ){
-                     porder = dval - 1;
-                  } else if( j == 2 ){
-                     if( dval - 1 != porder || dval < 0 || dval > 7 ) ok = 0;
-                     mp = (i?b:a) + abskip[ porder ];
+                     } else if( j == 1 ){
+                        porder = dval - 1;
+                     } else if( j == 2 ){
+                        if( dval - 1 != porder || dval < 0 || dval > 7 ) ok = 0;
+                        mp = (i?b:a) + abskip[ porder ];
 
 /* The fourth number defines the type of cross-terms. We can only handle
    type 2 (half-cross terms). */
-                  } else if( j == 3 ){
-                     if( dval != 2.0 ) ok = 0;
+                     } else if( j == 3 ){
+                        if( dval != 2.0 ) ok = 0;
 
 /* The next 4 numbers describe the region of validity of the fits in
    xi and eta space, e.g. ximin, ximax, etamin, etamax. We skip over these
@@ -20507,74 +20564,87 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    validity. */
                   
 /* The remaining terms are the coefficients of the polynomial terms. */
-                  } else if( j > 7 ){
+                     } else if( j > 7 ){
 
 /* Find the index of the corresponding PV keyword. */
-                     m = *(mp++);
+                        m = *(mp++);
 
 /* TNX polynomials provide a "correction* to be added to the supplied X and 
    Y values. Therefore increase the linear co-efficients by 1 on both
    axes. */
-                     if( m == 1 ) dval += 1.0; 
+                        if( m == 1 ) dval += 1.0; 
 
 /* Store the PV value */
-                     SetValue( ret, FormatKey( "PV", iaxis + 1, m, ' ' ),
-                               (void *) &dval, AST__FLOAT, 
-                               "TAN projection parameter" );
+                        SetValue( ret, FormatKey( "PV", iaxis + 1, m, ' ' ),
+                                  (void *) &dval, AST__FLOAT, 
+                                  "TAN projection parameter" );
+                     }
+
+                     start += nch;
+                     nch = 0;
+                     j++;
                   }
 
-                  start += nch;
-                  nch = 0;
-                  j++;
-               }
-
 /* Check that all the required co-efficients were found */
-               if( porder == -1 || j != 8 + nab[ porder ] ) ok = 0;
-            }
+                  if( porder == -1 || j != 8 + nab[ porder ] ) ok = 0;
+               }
 
 /* If the TNX cannot be represented in FITS-WCS (within our restrictions), add
    warning keywords to the FitsChan. */
-            if( !ok ){
-               Warn( this, "tnx", "This FITS header includes, or was "
-                     "derived from, a TNX projection which requires "
-                     "unsupported IRAF-specific corrections. The WCS "
-                     "information may therefore be incorrect.", method, class );
-            }
+               if( !ok ){
+                  Warn( this, "tnx", "This FITS header includes, or was "
+                        "derived from, a TNX projection which requires "
+                        "unsupported IRAF-specific corrections. The WCS "
+                        "information may therefore be incorrect.", method, class );
+               }
    
 /*  Release the memory used to hold the concatenated WAT keywords. */
-            watmem = (char *) astFree( (void *) watmem );
+               watmem = (char *) astFree( (void *) watmem );
+            }
          }
       }
-   }
 
 /* Replace RESTFREQ by RESTFRQ. 
    ---------------------------- */
 /* Get any RESTFREQ card, marking it as read. */
-   if( GetValue2( ret, this, "RESTFREQ", AST__FLOAT, (void *) &dval, 0, method, 
-                    class ) ){
+      if( s != ' ' ) {
+         sprintf( keyname, "RESTFREQ%c", s );
+      } else {
+         strcpy( keyname, "RESTFREQ" );
+      }
+      if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, method, 
+                     class ) ){
 
 /* Look for "MHz" and "GHz" within the comment. If found scale the value
    into Hz. */
-      comm = CardComm( this );
-      if( strstr( comm, "GHz" ) ) {
-         dval *= 1.0E9;
-         comm = "[Hz] Rest Frequency";
-      } else if( strstr( comm, "MHz" ) ) {
-         dval *= 1.0E6;
-         comm = "[Hz] Rest Frequency";
-      }
+         comm = CardComm( this );
+         if( strstr( comm, "GHz" ) ) {
+            dval *= 1.0E9;
+            comm = "[Hz] Rest Frequency";
+         } else if( strstr( comm, "MHz" ) ) {
+            dval *= 1.0E6;
+            comm = "[Hz] Rest Frequency";
+         }
 
 /* Save a new RESTFRQ card in the FitsChan, so long as there is not
    already one there. */
-      if( !GetValue2( ret, this, "RESTFRQ", AST__STRING, (void *) &cval, 0, 
-                      method, class ) ){
-         SetValue( ret, "RESTFRQ", (void *) &dval, AST__FLOAT, comm );
+         if( s != ' ' ) {
+            sprintf( keyname, "RESTFRQ%c", s );
+         } else {
+            strcpy( keyname, "RESTFRQ" );
+         }
+         if( !GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, 
+                         method, class ) ){
+            SetValue( ret, keyname, (void *) &dval, AST__FLOAT, comm );
+         }
       }
+
+      if( s == ' ' ) s = 'A' - 1;
    }
 
 /* IRAF mini-WCS keywords
    ---------------------- */
-/* Rewind the FItsChan to search from the first card. */
+/* Rewind the FitsChan to search from the first card. */
    astClearCard( this );
 
 /* Search forward through until all cards have been checked. */
@@ -20587,12 +20657,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
           Match( CardName( this ), "LTV%d", 0, NULL, &m, method, class ) ||
           Match( CardName( this ), "WSV%d_LEN", 0, NULL, &m, method, class ) ||
           Match( CardName( this ), "WSV%d_%d", 0, NULL, &m, method, class ) ){
-         MarkCard( this );
+          MarkCard( this );
       }
 
 /* Now move the current card on to the next card. */
       MoveCard( this, 1, method, class );
-
    }
 
 /* Delete the returned FitsChan if it is empty. */

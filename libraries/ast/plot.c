@@ -484,6 +484,13 @@ f     - Title: The Plot title drawn using AST_GRID
 *        repeatedly with the same gap size.
 *        - Modify AxPlot/Map1 so that the axis curve is sampled logarithmically 
 *        if the corresponding axis is mapped logarithmically.
+*     10-MAR-2004 (DSB):
+*        - Modified Typical to give less weight to vaalues close to the
+*        edges of the range covered by the plotting area.
+*        - Increased minimum angle between curve and edge required to
+*        create an edge label from 3 degs to 5 degs.
+*        - Modified PlotLabels to ignore duplicate adjacent labels which
+*        determining overlap of labels.
 *class--
 */
 
@@ -9652,8 +9659,8 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    AstFrame *frame;       /* Pointer to current Frame */
    CurveData *cdt;        /* Pointer to the CurveData for the next tick */
    LabelList *labellist;  /* Pointer to a ingle list of labels to be plotted */
-   LabelList *llist[2];   /* Pointers to both lists of labels to be plotted */
    LabelList *ll;         /* Pointer to next label to be plotted */
+   LabelList *llist[2];   /* Pointers to both lists of labels to be plotted */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    const char *just[ 2 ]; /* Justification string */
    const char *text;      /* Pointer to label text */
@@ -9676,12 +9683,14 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    int edgelabs;          /* Can edge labels be produced? */
    int esc;               /* INterpret escape sequences? */
    int gelid;             /* ID for next graphical element to be drawn */
-   int naxlab;            /* Number of edge labels */
+   int ii;                /* Index into existing labels */
    int maxlab;            /* Number of distinct edge labels */
+   int medge[2];          /* No. of distinct edge labels for each axis */
+   int naxlab;            /* Number of edge labels */
    int near;              /* Draw a label on the near edge? */
    int nedge[2];          /* No. of edge labels for each axis */
-   int medge[2];          /* No. of distinct edge labels for each axis */
    int ok;                /* Can the current tick mark be labelled on the edge? */
+   int textfound;         /* Label text has already been used? */
    int tick;              /* Tick index */
 
 /* Check the global status. */
@@ -9872,13 +9881,13 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 
 /* A label can be produced on the near edge of the plotting zone if the 
    current break occurs on, or close to, the edge, and the curve is not 
-   nearly parallel to the axis. */
+   nearly parallel to the axis (limit is 5 degs). */
             near = ( ( edgeax == 0 && 
                        fabs( (double) *ybrk - edgeval ) < tol &&
-                       fabs( (double) *vybrk ) > 0.05 ) || 
+                       fabs( (double) *vybrk ) > 0.09 ) || 
                      ( edgeax == 1 && 
                        fabs( (double) *xbrk - edgeval ) < tol &&
-                       fabs( (double) *vxbrk ) > 0.05 ) );
+                       fabs( (double) *vxbrk ) > 0.09 ) );
 
 /* Get the label text. */
             if( info->labels ) {
@@ -9910,7 +9919,17 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
                (labellist + naxlab)->upy = 1.0;
                (labellist + naxlab)->val = (info->ticks)[ tick ];
                naxlab++;
-               ok = 1;
+
+/* If this label has not already been included in the label list, indicate
+   that we have found another usable label. */
+               textfound = 0;
+               for( ii = 0; ii < naxlab-1; ii++ ) { 
+                  if( !strcmp( text, (labellist + ii)->text ) ) {
+                     textfound = 1;
+                     break;
+                  }
+               }
+               if( !textfound ) ok = 1;
 
             }
 
@@ -9950,7 +9969,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    and where the labels would be drawn. We now take the decision as to
    whether there are enough of these labels to make edge labelling
    feasable. If so, we carry on and draw the labels. There need to be 
-   at least 3 labels on each axis for linear tick spaciong and 2 for log 
+   at least 3 labels on each axis for linear tick spacing and 2 for log 
    tick spacing...
    ================================================================= */   
    if( astOK && medge[ 0 ] > ( astGetLogTicks( this, 0 ) ? 1 : 2 )
@@ -19323,18 +19342,11 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 /* Transform the Base Frame positions back into the Current Frame. */
    (void) astTransform( map, pset2, 1, pset1 );
 
-
-
 /* If good, store these values back in the supplied array. */
    if( astOK ) {
       a = ptr1[ axis ];
       for( i = 0; i < nv; i++){
-
-/*       newval = *(a++);
-         if( newval != AST__BAD ) vals[ i ] = newval; */
-
          vals[ i ] = *(a++);
-
       }
    }
 
@@ -19650,12 +19662,13 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    LabelList *llhi;       /* Pointer to higher neighbouring label structure */
    LabelList *lllo;       /* Pointer to lower neighbouring label structure */
    char *text;            /* Pointer to label text */
+   const char *latext;    /* Axis label at previous label */
    const char *texthi;    /* Pointer to text abbreviated with higher neighbour */
    const char *textlo;    /* Pointer to text abbreviated with lower neighbour */
-   float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
-   float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
    float tolx;            /* Min allowed X interval between labels */
    float toly;            /* Min allowed Y interval between labels */
+   float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
+   float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
    int dp;                /* Number of decimal places */
    int found;             /* Non-zero digit found? */
    int hilen;             /* Length of texthi */
@@ -19667,6 +19680,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    int mxdp;              /* Maximum number of decimal places */
    int nbox;              /* The number of boinding boxes supplied */
    int nexti;             /* Index of next label to retain */
+   int nleft;             /* No. of labels left */
    int nz;                /* Number of trailing zeros in this label */
    int nzmax;             /* Max. number of trailing zeros */
    int odd;               /* DO we have a strange axis? */
@@ -19688,12 +19702,13 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 /* Ensure the labels are sorted into increasing index order. */
    qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
 
-/* For some reason, it seems that the same label can sometimes be included
-   more than once in the supplied list (at the same (x,y) position). Purge 
-   duplicate labels by setting their priority to -1. Initialise the
-   priority of the remaining labels to zero. */
-   tolx = 0.001*fabs( this->xhi - this->xlo );
-   toly = 0.001*fabs( this->yhi - this->ylo );
+/* Complex curves can have multiple edge crossings very close together.
+   This means that the same label can sometimes be included more than once 
+   in the supplied list at the same (x,y) position. Purge duplicate labels 
+   by setting their priority to -1. Initialise the priority of the remaining 
+   labels to zero. */
+   tolx = 0.02*fabs( this->xhi - this->xlo );
+   toly = 0.02*fabs( this->yhi - this->ylo );
    ll = list;
    ll->priority = 0;
    ll->saved_prio = 0;
@@ -19921,35 +19936,48 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
 /* Find the bounding box of the root label and add it to the list of bounding 
    boxes. */
+      nleft = 1;
       ll = list + root;
       olap = Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
                       ll->just, (float) ll->upx, (float) ll->upy, box, 
                       method, class );
 
 /* Now look for labels which would overlap. First, check labels above the root 
-   label. */
+   label. Do not count overlaps where the two abbreviated labels have the same text. */
       ll = list + root;
+      latext = ll->atext;
       for( i = root + 1; i < nlab; i++ ) {
          ll++;
          if( ll->priority >= 0 ) {
-            if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
+            if( strcmp( ll->atext, latext ) ) {
+               if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
                          ll->just, (float) ll->upx, (float) ll->upy, box, 
                          method, class ) ){
-               olap++;
+                  olap++;
+               } else {
+                  nleft++;
+               }
             }
+            latext = ll->atext;
          }
       }
 
 /* Now check the labels below the root label. */
       ll = list + root;
+      latext = ll->atext;
       for( i = root - 1; i >= 0; i-- ) {
          ll--;
          if( ll->priority >= 0 ) {
-            if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
-                         ll->just, (float) ll->upx, (float) ll->upy, box, 
-                         method, class ) ){
-               olap++;
+            if( strcmp( ll->atext, latext ) ) {
+               if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
+                            ll->just, (float) ll->upx, (float) ll->upy, box, 
+                            method, class ) ){
+                  olap++;
+               } else {
+                  nleft++;
+               }
             }
+            latext = ll->atext;
          }
       }
 
@@ -19957,13 +19985,14 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    since it is probably caused by the crossing of the two axes. */
       if( axis == 1 && olap == 1 ) olap = 0;
 
-/* If we are now only plotting every 3rd label, and there are still
-   overlapping labels, then we must have a very odd axis (such as 
-   logarithmically spaced ticks on a linearly mapped axis). In this case,
-   we will re-instate the orignal label priorities and then leave this
-   loop so that we attempt to plot all labels. Also retain original
-   priorities if the axis is mapped logarithmically onto the screen. */
-      if( olap && ( jgap == 3 || astGetLogPlot( this, axis ) ) ){
+/* If we are now only plotting every 3rd label, or if there are less than
+   3 labels left, and there are still overlapping labels, then we must have 
+   a very odd axis (such as logarithmically spaced ticks on a linearly mapped 
+   axis). In this case, we will re-instate the orignal label priorities and 
+   then leave this loop so that we attempt to plot all labels. Also retain 
+   original priorities if the axis is mapped logarithmically onto the 
+   screen. */
+      if( olap && ( jgap == 3 || nleft < 3 || astGetLogPlot( this, axis ) ) ){
          jgap = 0;
          odd = 1;
       } else { 
@@ -24077,19 +24106,24 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
 
 /* Local Variables: */
    double *a;             /* Pointer to next value */
+   double cnt;            /* Modified count */
    double delta;          /* Bin size */
    double maxval;         /* Maximum supplied value */
    double mean;           /* Mean supplied value */
    double minval;         /* Minimum supplied value */
    double result;         /* The returned value. */
+   double w0;             /* Rate of increase of weight with dist from edge */
+   double w1;             /* Weight for left edge */
+   double w2;             /* Weight for right edge */
+   double w;              /* Weight for this bin */
    int *hist;             /* Pointer to first cell of histogram array */
    int i;                 /* Loop count */
    int ibin;              /* Bin index */
    int maxcnt;            /* Maximum no. of values in any bin */
-   int nc;                /* Total number of points in histogram */
    int nbin;              /* No. of bins in histogram */
+   int nc;                /* Total number of points in histogram */
    int ngood;             /* No. of good values supplied */
- 
+
 /* Initialise. */
    result = AST__BAD;
 
@@ -24153,19 +24187,34 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
 
             mean /= ngood;
 
-/* Find the bin with the highest count. If there is more than one bin
-   with the same highest count, choose the one which is closest to the
+/* We tend to prefer not to use reference values which are very close the
+   the limits since they can give problems with regard to normalization
+   (rounding errors can knock them over the edge), so we modify the counts 
+   in each bin of the histogram to reduce the impact of bins near the edge.
+
+Find the bin with the highest modified count. If there is more than one bin
+   with the highest modified count, choose the one which is closest to the
    mean data value found above. */
             maxcnt = 0;
+            w0 = nbin/2;
             for( i = 0; i < nbin; i++ ) {
-               if( hist[ i ] > maxcnt ) {
-                  maxcnt = hist[ i ];
+
+               cnt = hist[ i ];
+               if( nbin > 4 ) {
+                  w1 = i*w0;
+                  w2 = ( nbin - 1 - i )*w0;
+                  w = ( w1 < w2 ) ? w1 :w2;               
+                  if( w < 1.0 ) cnt *= w;
+               }
+
+               if( cnt > maxcnt ) {
+                  maxcnt = cnt;
                   ibin = i;
 
-               } else if( hist[ i ] == maxcnt ) {
+               } else if( cnt == maxcnt ) {
                   if( fabs( minval + ( i - 0.5 )*delta - mean ) <
                       fabs( minval + ( ibin - 0.5 )*delta - mean ) ) {
-                     maxcnt = hist[ i ];
+                     maxcnt = cnt;
                      ibin = i;
                   }            
                }
