@@ -33,16 +33,24 @@
 *
 *    History :
 *
-*     22 Apr 94           Created from SLIMSAM Version 19 (GKS)
-*      3 May 94 : V10     Unix version using Double precision FFT as thats the
-*                         only NAG library available
-*      3 May 94 : V11     Use alternative NAG routine with no silly limit on
-*                         sizes which have large prime factors
-*     10 Jun 94 : V1.8-0  Imported into Asterix - cut workspace requirements
-*                         drastically. (DJA)
-*     29 Nov 94 : V1.8-1  Fixed memory corruption bug (DJA)
-*     20 Mar 95 : V1.8-2  Trap case where dataset1==2 (DJA)
-*     10 Nov 95 : V2.0-0  ADI port (DJA)
+*     22 Apr 1994 V1 (GKS):
+*        Created from SLIMSAM Version 19
+*      3 May 1994 V10 (GKS):
+*        Unix version using Double precision FFT as thats the
+*        only NAG library available
+*      3 May 1994 V11 (GKS):
+*        Use alternative NAG routine with no silly limit on
+*        sizes which have large prime factors
+*     10 Jun 1994 V1.8-0 (DJA):
+*        Imported into Asterix - cut workspace requirements drastically
+*     29 Nov 1994 V1.8-1 (DJA):
+*        Fixed memory corruption bug
+*     20 Mar 1995 V1.8-2 (DJA):
+*        Trap case where dataset1==2
+*     10 Nov 1995 V2.0-0 (DJA):
+*        ADI port
+*     19 Apr 1996 V2.0-1 (DJA):
+*        Now uses PDA library rather than NAG
 *
 *    Type Definitions :
 *
@@ -91,8 +99,6 @@
       INTEGER WPTR_YI                  ! Pointer to work area
       INTEGER WPTR_ZR                  ! Pointer to work area
       INTEGER WPTR_ZI                  ! Pointer to work area
-      INTEGER WPTR_TM                  ! Pointer to work area TRIGM
-      INTEGER WPTR_TN                  ! Pointer to work area TRIGN
       INTEGER WPTR_S                   ! Pointer to main work area
 
       INTEGER 			DPTR_1			! First dataset's data
@@ -104,6 +110,7 @@
       INTEGER			OFID			! Output dataset
       INTEGER 			ONDIM                  	! Output dimensionality
       INTEGER 			SIZE			! Size of work arrays
+      INTEGER			WPTR_PDA	    	! PDA workspace
 
       LOGICAL 			CYCLIC			! Cyclic mode?
       LOGICAL 			DC_RESTORE		! Restore DC level?
@@ -114,7 +121,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'IXCONV Version 2.0-0' )
+        PARAMETER 		( VERSION = 'IXCONV Version 2.0-1' )
 *-
 
 *  Version announcement
@@ -248,19 +255,18 @@
       SPARR(2) = YSCALE
       CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
 
-*    Size of scratch arrays
+*  Size of scratch arrays
       SIZE = M3*N3
 
-*    Are the datasets the same?
+*  Are the datasets the same?
       SAME = (DPTR_1.EQ.DPTR_2)
 
-*    Copy X to (centre of) X_Real, removing average; zero X_imaginary
+*  Copy X to (centre of) X_Real, removing average; zero X_imaginary
       CALL DYN_MAPD( 2, ODIMS, WPTR_XR, STATUS )
       CALL IXCONV_COPY2( DIMS1(1), DIMS1(2), %VAL(DPTR_1), M3, N3,
      :                   %VAL(WPTR_XR), AVX, STATUS )
-c      CALL BDI_UNMAPDATA( IFID1, STATUS )
 
-*    Fill X_Imaginary array with zeroes
+*  Fill X_Imaginary array with zeroes
       CALL DYN_MAPD( 2, ODIMS, WPTR_XI, STATUS )
       CALL ARR_INIT1D( 0.0D0, M3*N3, %VAL(WPTR_XI), STATUS )
 
@@ -279,27 +285,16 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
       CALL DYN_MAPD( 2, ODIMS, WPTR_YI, STATUS )
       CALL ARR_INIT1D( 0.0D0, M3*N3, %VAL(WPTR_YI), STATUS )
 
-*  Trigm
-      CALL DYN_MAPD( 1, 2*M3, WPTR_TM, STATUS )
-
-*  Trign
-      CALL DYN_MAPD( 1, 2*N3, WPTR_TN, STATUS )
-
 *  Work
       CALL DYN_MAPD( 1, 2*M3*N3, WPTR_S, STATUS )
 
+*  Workspace
+      CALL DYN_MAPD( 1, 6*MAX(N3,N3)+15, WPTR_PDA, STATUS )
+
 *  Do FFT on X array
       CALL MSG_PRNT( 'Transforming first input...' )
-      IFAIL=0
-      CALL C06FUF( M3, N3, %VAL(WPTR_XR), %VAL(WPTR_XI), 'I',
-     :             %VAL(WPTR_TM), %VAL(WPTR_TN), %VAL(WPTR_S), IFAIL )
-      IF ( IFAIL .NE. 0 ) THEN
-        CALL MSG_SETI( 'IFAIL', IFAIL )
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Error ^IFAIL in NAG routine C06FUF',
-     :                STATUS )
-        GOTO 99
-      END IF
+      CALL PDA_DNFFTF( 2, ODIMS, %VAL(WPTR_XR), %VAL(WPTR_XI),
+     :                 %VAL(WPTR_PDA), STATUS )
 
 *  Do FFT on Y array
       CALL MSG_PRNT( 'Transforming second input...' )
@@ -307,15 +302,8 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
         CALL ARR_COP1D( M3*N3, %VAL(WPTR_XR), %VAL(WPTR_YR), STATUS )
         CALL ARR_COP1D( M3*N3, %VAL(WPTR_XI), %VAL(WPTR_YI), STATUS )
       ELSE
-        CALL C06FUF( M3, N3, %VAL(WPTR_YR), %VAL(WPTR_YI), 'S',
-     :             %VAL(WPTR_TM), %VAL(WPTR_TN), %VAL(WPTR_S), IFAIL )
-        IF ( IFAIL .NE. 0 ) THEN
-          CALL MSG_SETI( 'IFAIL', IFAIL )
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Error ^IFAIL in NAG routine C06FUF',
-     :                  STATUS )
-          GOTO 99
-        END IF
+        CALL PDA_DNFFTF( 2, ODIMS, %VAL(WPTR_YR), %VAL(WPTR_YI),
+     :                   %VAL(WPTR_PDA), STATUS )
       END IF
 
 *  Perform convolution. We write our output into the WPTR_S array which is
@@ -340,19 +328,10 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
 
 *  Tranform to create output
       CALL MSG_PRNT( 'Untransforming...' )
-      CALL C06FUF( M3, N3, %VAL(WPTR_ZR), %VAL(WPTR_ZI), 'S',
-     :             %VAL(WPTR_TM), %VAL(WPTR_TN), %VAL(WPTR_S), IFAIL )
-      IF ( IFAIL .NE. 0 ) THEN
-        CALL MSG_SETI( 'IFAIL', IFAIL )
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Error ^IFAIL in NAG routine C06FUF',
-     :                STATUS )
-        GOTO 99
-      END IF
+      CALL PDA_DNFFTB( 2, ODIMS, %VAL(WPTR_ZR), %VAL(WPTR_ZI),
+     :                   %VAL(WPTR_PDA), STATUS )
 
 *  Unmap workspace (everything except WPTR_ZR)
-      CALL DYN_UNMAP( WPTR_TM, STATUS )
-      CALL DYN_UNMAP( WPTR_TN, STATUS )
       CALL DYN_UNMAP( WPTR_S, STATUS )
       CALL DYN_UNMAP( WPTR_ZI, STATUS )
 
@@ -567,3 +546,14 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
 	END DO
 
         END
+
+
+	subroutine printit(m,n,tm,tn)
+	integer m,n,i,j
+	real*8 tm(m,n), tn(m,n)
+	do j = 1, n
+	  do i = 1, m
+	   print *,i,j,tm(i,j), tn(i,j)
+	  end do
+	end do
+	end
