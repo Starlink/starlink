@@ -644,7 +644,7 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
             nitem = va_arg(ap,int);
 	    asp_arg = va_arg(ap,ADIobj *);
             while ( nitem-- ) {
-	      adix_print( stream, asp_arg++, 1, ADI__true, status );
+	      adix_print( stream, *asp_arg++, 1, ADI__true, status );
               if ( nitem ) {
                 fct = ',';
 	        ADIstrmPutInt( dev, &fct, 1, status );

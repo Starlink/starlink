@@ -4704,7 +4704,8 @@ void adix_gthmth( ADIobj gen, int narg, ADIobj args[], int nmform,
 	}
     }
   else
-    adic_setecs( ADI__NOMTH, "No methods matching signature ^SIG", status );
+    adic_setecs( ADI__NOMTH, "No methods matching signature (%L)",
+                 status, narg, args );
   }
 
 
