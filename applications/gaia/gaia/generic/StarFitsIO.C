@@ -227,7 +227,7 @@ int StarFitsIO::wcsinit()
                                mergedHeader_.size() ) );
       return wcs_.status();
    }
-   wcs_ = WCS(new StarWCS( (const char *)header_.ptr(), header_.size() ) );
+   wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.size() ) );
    return wcs_.status();
 }
 
