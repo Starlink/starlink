@@ -218,6 +218,9 @@ class StarRtdImage : public Skycat {
    //  Evaluate command from remote client.
    int remoteTclCmd( int argc, char* argv[] );
 
+   //  Get global statistics for a list of objects.
+   int globalstatsCmd( int argc, char *argv[] );
+
   protected:
 
    //  Pointer to structure that holds the image configuration options.
@@ -321,7 +324,7 @@ class StarRtdImage : public Skycat {
 
    //  Get list of NDF properties.
    int ndfCmdList( int argc, char *argv[], NDFIO *ndf );
-
+   
   private:
 
    // Copy constructor -- not defined.

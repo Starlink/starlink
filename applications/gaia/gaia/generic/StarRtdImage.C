@@ -132,6 +132,9 @@
 //     16-MAR-2000 (PWD):
 //        Override "remotetcl" command. This adds error status return
 //        if command fails.
+//     27-MAR-2000 (PWD):
+//        Added globalstats command. Performs same job as statistics
+//        command except on a list of X,Y positions.
 //-
 
 #include <string.h>
@@ -207,6 +210,7 @@ public:
    { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
    { "fullname",      &StarRtdImage::fullNameCmd,     0, 0 },
    { "gband",         &StarRtdImage::gbandCmd,        6, 6 },
+   { "globalstats",   &StarRtdImage::globalstatsCmd,  2, 2 },
    { "hdu",           &StarRtdImage::hduCmd,          0, 6 },
    { "isfits",        &StarRtdImage::isfitsCmd,       0, 0 },
    { "origin",        &StarRtdImage::originCmd,       2, 2 },
@@ -345,7 +349,7 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp, char *name, int argc,
 //     Nothing.
 //
 //-
-StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname, 
+StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
                            int argc, char** argv,
                            Tk_ImageMaster master, const char* imageType,
                            Tk_ConfigSpec* specs, RtdImageOptions* options)
@@ -358,7 +362,7 @@ StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
 #ifdef _DEBUG_
    cout << "Created StarRtdImage object " << endl;
 #endif
-   
+
    // Define the TCL interpreter for any AST errors.
    errTcl_Init( interp );
 
@@ -499,7 +503,7 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
    return makeImage( imio );
 }
 
-//+ 
+//+
 //  StarRtdImage::makeImage
 //
 //  Make a new image from the given ImageIO object and return a
@@ -532,7 +536,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
          return (ImageData*)NULL;
       imio.wcs(wcs);  // this sets the WCS object to use for this image
    }
-   
+
    return ImageData::makeImage(name(), imio, verbose());
 }
 
@@ -559,12 +563,12 @@ int StarRtdImage::loadFile()
    if ( origset_ ) {
       origset_ = (AstFrameSet *) astAnnul( origset_ );
    }
-   
+
    //  -file may have been set to "", clear current image and just return.
    if (strlen(file()) == 0) {
       return clearCmd(0, NULL);
    }
-   
+
    //  If we have an existing image then release it.
    if ( image_ ) {
       image_->saveParams(p);
@@ -572,7 +576,7 @@ int StarRtdImage::loadFile()
       image_ = (ImageData *) NULL;
       updateViews();
    }
-   
+
    //  Check that the image exists and parse it.
    char *name;
    char *slice;
@@ -583,10 +587,10 @@ int StarRtdImage::loadFile()
       if ( path ) delete path;
       return error( file(), " is not an image" );
    }
-   
+
    //  Create the image.
    ImageData* image = getStarImage( name, slice, path );
-   
+
    //  Release resources and return an error if image couldn't be
    //  created for some reason.
    delete name;
@@ -595,13 +599,13 @@ int StarRtdImage::loadFile()
    if (! image ) {
       return TCL_ERROR;
    }
-   
+
    //  Store image reference.
    image_ = image;
-   
+
    //  Restore transformations.
    image_->restoreParams(p, !autoSetCutLevels_);
-   
+
    //  Initialise the new image.
    return initNewImage();
 }
@@ -631,7 +635,7 @@ int StarRtdImage::isCelestial() {
    return wcsp->isCelestial();
 }
 
-//+ 
+//+
 //   StarRtdImage::dumpCmd
 //
 //   Dump the displayed image to a file. This overrides the method
@@ -789,7 +793,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
           return error( "information: WCS could only be saved"
                         " as an AST native representation");
         } else if ( !saved ) {
-          return error( "Failed to save WCS information");
+          return error( "failed to save WCS information");
         }
       }
       return TCL_OK;
@@ -840,14 +844,14 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
                   reset++;
                }
                break;
-               
+
             case GAIA_OPTION(displaymode):
             case GAIA_OPTION(shm_header):
             case GAIA_OPTION(shm_data):
                if (initialized_)
                   reset++;
                break;
-               
+
             case GAIA_OPTION(fitWidth):
             case GAIA_OPTION(fitHeight):
                if (initialized_) {
@@ -857,14 +861,14 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
                   reset++;
                }
                break;
-               
+
             case GAIA_OPTION(file):
                status = loadFile();
                break;
          }
       }
    }
-   
+
    if ( reset ) {
       return resetImage();
    }
@@ -898,19 +902,19 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
    if ( !image_ ) {
       return TCL_OK;
    }
-   
+
    // Check number of arguments.
    if ( argc != 2 ) {
       set_result( "number of arguments wrong, require 2: command qualifiers" );
       return TCL_ERROR;
    }
-   
+
    // Now check for its existence and invoke it.
   for ( unsigned int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_)
            ; i++ ) {
      StarRtdForeignCmds *t = &foreigncmds_[i];
     if ( strcmp( t->name, argv[0] ) == 0 ) {
-       
+
        //  Matched a command so construct the image information and
        //  invoke it.
        StarImageInfo *info = new StarImageInfo;
@@ -959,7 +963,7 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
        }
     }
   }
-  
+
   // Foreign command not found.
   return error( "unknown foreign command");
 }
@@ -2006,7 +2010,7 @@ int StarRtdImage::astassignCmd( int argc, char *argv[] )
                      ": unknown WCS source, should be 'image' or 'local'");
     }
   }
-  
+
   //  Decode the parameters which should be the transformation
   //  coefficients.
   double tr[6];
@@ -2015,7 +2019,7 @@ int StarRtdImage::astassignCmd( int argc, char *argv[] )
         return error( argv[i], " is not a number" );
      }
   }
-  
+
   //  Now set the transform.
   if ( ! addLinear( AST__BASE, newset_, tr ) ) {
      return error( "failed to add linear transform to WCS");
@@ -2985,7 +2989,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
    //  To do this we reproduce the algorithm of image->getSpectrum.
    int i = 0;
    if ( y1 == y0 ) {
-      
+
       //  Horizontal line (modified to run the direction as supplied).
       if ( x0 < x1 ) {
          for ( int x = x0; x <= x1; x++ ) {
@@ -3022,7 +3026,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
             xyvalues[i*2+1] = y;
             i++;
          }
-         
+
          //  The data values are also reversed in this case.
          int j = numValues - 1;
          for ( i = 0; i < numValues/2; i++ ) {
@@ -3031,12 +3035,12 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
          }
       }
    } else {
-      
+
       // sloped line
       // use Bresenham midpoint line scan-conversion algorithm
       // see: Computer Graphics Princ. a. Pract., 2nd Ed., p. 78
       // also see x11r5/mit/server/ddx/cfb/cfbline.c, cfbbres.c
-      
+
       int x = x0;
       int y = y0;
       int e, e1, e2, e3;        // bresenham error and increments
@@ -3045,7 +3049,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
       int ady = y1 - y0;
       int signdx = 1;           // sign of dx and dy
       int signdy = 1;
-      
+
       if (adx < 0) {
          adx = -adx;
          signdx = -1;
@@ -3054,12 +3058,12 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
          ady = -ady;
          signdy = -1;
       }
-      
+
       // start pixel
       xyvalues[i*2] = x;
       xyvalues[i*2+1] = y;
       i++;
-      
+
       if (adx > ady) {
          // X major axis;
          e1 = ady << 1;
@@ -3098,7 +3102,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
          }
       }
    }
-   
+
    //  Strip out any blank values, if needed. Do this now to preserve
    //  X-Y correspondence. The replacement value is 0.0, which is as
    //  unlikely to occur as any other value and will still look odd
@@ -3115,7 +3119,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
             //  blank segment with the mean of the end points.
             if ( ivvalues[i*2+1] != blank ) {
                inblank = 0;
-               
+
                //  Trap start of line was blank.
                if ( start == -1 ) {
                   fill = ivvalues[i*2+1];
@@ -3129,18 +3133,18 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
                }
             }
          } else if ( ivvalues[i*2+1] == blank ) {
-            
+
             //  Start of blank region.
             inblank = 1;
             start = i - 1;
-            
+
             //  Trap end of line is only blank.
             if ( i == numValues - 1 ) {
                ivvalues[i*2+1] = ivvalues[(i-1)*2+1] ;
             }
          }
       }
-      
+
       //  If still inblank at end of line use start value, unless this
       //  is also blank, in which case use 0.
       if ( inblank ) {
@@ -3157,7 +3161,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
          }
       }
    }
-   
+
    //  Convert the index/value and x/y pairs into Blt vectors.
    if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
                         ivvalues, argv[7], argv[8]) != TCL_OK) {
@@ -3173,7 +3177,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
    }
    delete xyvalues;
    delete ivvalues;
-   
+
    return set_result(numValues);
 }
 
@@ -3804,22 +3808,22 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
    if ( ! image_ ) {
       return TCL_OK;
    }
-   
+
    //  Check that we have a known data representation.
    ImageIO imio = image_->image();
    if ( ! imio.rep() ) {
-      return error( "Unknown data representation, "
+      return error( "unknown data representation, "
                     "\"hdu\" command only available for FITS and NDF" );
    }
    if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
         strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
       return fitsHduCmd( imio, argc, argv );
-      
+
    } else if ( strcmp(imio.rep()->classname(), "NDFIO" ) == 0 ) {
       return ndfHduCmd( imio, argc, argv );
-      
+
    } else {
-      return error( "Unknown data format, "
+      return error( "unknown data format, "
                     "\"hdu\" command only available for FITS and NDF" );
    }
 }
@@ -3932,22 +3936,22 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
 
   // <path> hdu headings ?$number?  Table command not implemented
   if ( strcmp(argv[0], "headings") == 0 ) {
-     return error( "Table commands not supported for NDFs" );
+     return error( "table commands not supported for NDFs" );
   }
 
   // <path> hdu get ?number? ?$filename? ?$entry?"
   if ( strcmp(argv[0], "get") == 0 ) {
-     return error( "Table commands not supported for NDFs" );
+     return error( "table commands not supported for NDFs" );
   }
 
   // <path> hdu create $type $extname $headings $tform $data
   if (strcmp(argv[0], "create") == 0) {
-     return error( "Table commands not supported for NDFs" );
+     return error( "table commands not supported for NDFs" );
   }
 
   // <path> hdu delete $number
   if ( strcmp(argv[0], "delete" ) == 0 ) {
-     return error( "Table commands not supported for NDFs" );
+     return error( "table commands not supported for NDFs" );
   }
 
   // <path> hdu list
@@ -4088,7 +4092,7 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
     //  Get the image, should be named as second argument.
     StarRtdImage *rtdimage = (StarRtdImage *) getView( argv[1] );
     if ( rtdimage == (StarRtdImage *) NULL ) {
-      return error( "Cannot access main image" );
+      return error( "cannot access main image" );
     }
     ImageData *rtdimagedata = rtdimage->image();
 
@@ -4722,7 +4726,7 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
       //  Get "HDU" number and construct the fullname.
       NDFIO *ndf = (NDFIO *) imio.rep();
       int nndf = ndf->getNDFNum();
-      
+
       //  Need NDF path
       char ndfpath[80], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
       ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
@@ -4746,11 +4750,11 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
       if ( slice ) delete slice;
       if ( path ) delete path;
    } else {
-      
+
       //  FITS file, just need the name and the HDU number (if any).
       FitsIO *fits = (FitsIO *) imio.rep();
       int hdu = fits->getHDUNum();
-      if ( hdu == 1 ) { 
+      if ( hdu == 1 ) {
          set_result( file() );
       } else {
          char buffer[1024];
@@ -4780,7 +4784,7 @@ int StarRtdImage::isfitsCmd( int argc, char *argv[] )
    } else if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
       isfits = 0;
    } else {
-      return error( "Unknown data format" );
+      return error( "unknown data format" );
    }
    return set_result( isfits );
 }
@@ -4809,14 +4813,14 @@ int StarRtdImage::remoteCmd( int argc, char *argv[] )
    if ( Tcl_GetInt(interp_, argv[0], &port) == TCL_ERROR ) {
       return TCL_ERROR;
    }
-   
+
    //  Delete existing remote object.
    if ( remote_ ) {
       delete remote_;
    }
 
 
-   //  Create control object with the given port (if 0 the port number 
+   //  Create control object with the given port (if 0 the port number
    //  is available as remote_->port().
    remote_ = new GaiaRtdRemote( this, port );
    if ( remote_ ) {
@@ -4841,7 +4845,7 @@ int StarRtdImage::readonlyCmd( int argc, char *argv[] )
    int isndf = 0;
    NDFIO *ndf;
    ImageIO imio = image_->image();
-   
+
    //  Inquire image readonly status.
    if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
       ndf = (NDFIO *) imio.rep();
@@ -4873,14 +4877,15 @@ int StarRtdImage::readonlyCmd( int argc, char *argv[] )
    return set_result( value );
 }
 
-//
+//+
 //  StarRtdImage::remoteTclCmd
 //
+//  Purpose:
 //     Override the "remotetcl" subcommand to evaluate a Tcl command
 //     in the RTD Tcl interpreter. Returns TCL_ERROR if eval fails.
 //
 //     usage: $image remotetcl $command
-//
+//-
 int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
 {
    if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
@@ -4891,3 +4896,128 @@ int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
    }
 }
 
+//+
+//  StarRtdImage::globalstatsCmd
+//
+//  Purpose:
+//     Calculate global statistics for a list of object positions
+//     using the IQE routine of RTD.
+//
+//  Description:
+//     This command accepts a list of positions and a related size
+//     parameter. The size parameter determines the region about each
+//     position that will be used in the IQE parameter estimation (IQE 
+//     fits a 2D gaussian, i.e.:
+//
+//        {x1 y1 x2 y2 ...} box_size
+//
+//  Return: 
+//     The return from this routine is a list consisting of the
+//     following mean values:
+//
+//        fwhmX          = FWHM in X
+//        rangeFwhmX     = Range in fwhmX
+//        fwhmY          = FWHM in Y
+//        rangeFwhmY     = Range in fwhmY
+//        angle          = angle of major axis, degrees, along X
+//        objectPeak     = peak value of object above background
+//        meanBackground = mean background level
+//        nused          = number of positions used
+//
+//     These are for use in estimating seeing and focus parameters
+//     across a whole image, rather than just for one object.
+//
+//-
+int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
+{
+  if ( !image_ ) {
+    return error( "no image loaded" );
+  }
+
+  //  Get the size of the region to use around each object.
+  int size = 5;
+  if ( Tcl_GetInt( interp_, argv[1], &size ) != TCL_OK ) {
+    return error( argv[1], "is not a valid size" );
+  }
+  
+  //  Split the input list of positions into individual X and Y's.
+  char **listArgv;
+  int listArgc = 0;
+  if ( Tcl_SplitList( interp_, argv[0], &listArgc, &listArgv ) != TCL_OK ) {
+    return error( "failed to interpret X Y positions list" );
+  }
+  if ( listArgc <= 1 ) {
+    return error( "must supply pairs of object positions" );
+  }
+
+  //  Now attempt to translate all values into doubles.
+  int npoints = listArgc/2;
+  double *x = new double[npoints];
+  double *y = new double[npoints];
+  int i, j;
+  for ( i = 0, j = 0; i < listArgc; i += 2, j++ ) {
+    if ( Tcl_GetDouble( interp_, listArgv[i], &x[j] ) != TCL_OK ||
+         Tcl_GetDouble( interp_, listArgv[i+1], &y[j] ) != TCL_OK ) {
+      delete [] x;
+      delete [] y;
+      Tcl_Free( (char *) listArgv );
+      return error( listArgv[i], " is not a number" );
+    }
+  }
+
+  //  Variables for sums and final results.
+  double meanX = 0.0;
+  double meanY = 0.0;
+  double minFwhmX = DBL_MAX, maxFwhmX = -DBL_MAX;
+  double minFwhmY = DBL_MAX, maxFwhmY = -DBL_MIN;
+  double fwhmX = 0.0, sumFwhmX = 0.0;
+  double fwhmY = 0.0, sumFwhmY = 0.0;
+  double angle = 0.0, sumAngle = 0.0; 
+  double objectPeak = 0.0, sumObjectPeak = 0.0;
+  double meanBackground = 0.0, sumMeanBackground = 0.0;
+  
+  //  And get the image statistics sums.
+  int ncount = 0;
+  double newx, newy;
+  double hw = 0.5 * (double) size;
+  for ( i = 0; i < npoints; i++ ) {
+    newx = x[i] - hw;
+    newy = y[i] - hw;
+
+    if ( image_->getStatistics( newx, newy, size, size, meanX, meanY,
+                                fwhmX, fwhmY, angle, objectPeak,
+                                meanBackground ) == 0 ) {
+      ncount++;
+      sumFwhmX += fwhmX;
+      sumFwhmY += fwhmY;
+      sumAngle += angle;
+      sumObjectPeak += objectPeak;
+      sumMeanBackground += meanBackground;
+      minFwhmX = min( minFwhmX, fwhmX );
+      maxFwhmX = max( maxFwhmX, fwhmX );
+      minFwhmY = min( minFwhmY, fwhmY );
+      maxFwhmY = max( maxFwhmY, fwhmY );
+    }
+  }
+
+  //  Construct return;
+  if ( ncount == 0 ) {
+    delete [] x;
+    delete [] y;
+    Tcl_Free( (char *) listArgv );
+    return error( "failed to get statistics for any objects" );
+  }
+  char result[TCL_DOUBLE_SPACE*5 + 6];
+  sprintf( result, "%f %f %f %f %f %f %f %d",
+           sumFwhmX / (double) ncount,
+           (maxFwhmX - minFwhmX),
+           sumFwhmY / (double) ncount,
+           (maxFwhmY - minFwhmY),
+           sumAngle / (double) ncount,
+           sumObjectPeak / (double) ncount,
+           sumMeanBackground / (double) ncount,
+           ncount );
+           
+  set_result( result );
+  return TCL_OK;
+}
