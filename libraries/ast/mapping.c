@@ -87,6 +87,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     16-AUG-1999 (RFWS):
 *        Fixed bug in SpecialBounds - wrong number of coordinates being used
 *        when checking for bad output coordinate values.
+*     17-AUG-1999 (RFWS):
+*        Improved the convergence security of MapBox (return to older but
+*        less efficient setting).
 *class--
 */
 
@@ -802,7 +805,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 /* Local Constants: */
    const double default_acc = 3.0e-5; /* Default convergence accuracy */
    const int maxiter = 10000;    /* Maximum number of iterations */
-   const int minsame = 3;        /* Minimum no. consistent extrema required */
+   const int minsame = 5;        /* Minimum no. consistent extrema required */
    const int nbatch = 32;        /* No. function samples obtained per batch */
 
 /* Local Variables: */
