@@ -22,7 +22,7 @@ f+
 \newcommand{\stardocnumber}    {210.4}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {4th June 1999}
+\newcommand{\stardocdate}      {8th June 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -16748,17 +16748,17 @@ to -0.0001.
 \item A bug has been fixed which could cause a FitsChan to lose the
 comment associated with a string value in a FITS header.
 
-\item A bug has been fixed which could cause a program to crash if
-FrameSets were nested inside each other (for example, if one FrameSet
-had another FrameSet added to it for use as a Frame or Mapping). The
-problem could only occur if the nested structure was loaded from a data
-c+
-file (using astRead).
-c-
-f+
-file (using AST\_READ).
-f-
-
+%\item A bug has been fixed which could cause a program to crash if
+%FrameSets were nested inside each other (for example, if one FrameSet
+%had another FrameSet added to it for use as a Frame or Mapping). The
+%problem could only occur if the nested structure was loaded from a data
+%c+
+%file (using astRead).
+%c-
+%f+
+%file (using AST\_READ).
+%f-
+%
 \item Further improvements have been made to the simplification of
 compound Mappings, including fixes for several bugs which could cause
 indefinite looping or unwanted error messages.
