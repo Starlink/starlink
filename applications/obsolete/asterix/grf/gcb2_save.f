@@ -235,47 +235,48 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			GCBHDU			! GCB hdu identifier
-      INTEGER			OLDSIZ			! Existing GCB size
+      INTEGER			GCBDAT			! GCB hdu data id
+      INTEGER			GCBHDU			! GCB hdu id
+
+      LOGICAL			DIDCRE			! Did we create the GCB?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Does GCB extension already exist?
-      CALL ADI2_FNDHDU( FID, 'GCB', GCBHDU, STATUS )
+*  Locate GCB extension data
+      CALL ADI2_CFIND( FID, 'GCB', '@', ' ', .TRUE., .FALSE.,
+     :                 'BYTE', 1, NBYTE, DIDCRE, GCBDAT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*    Get existing size
-        CALL ADI2_HGKYI( GCBHDU, 'NAXIS1', OLDSIZ, STATUS )
+*    Write data to the cache object
+        CALL ADI_CPUT( GCBDAT, 'Value', 'BYTE', 1, NBYTE,
+     :                 %VAL(GCBPTR), STATUS )
 
-*    If different change size of HDU
-        IF ( OLDSIZ .NE. NBYTE ) THEN
-          CALL ADI2_CHGIMG( GCBHDU, NBYTE-OLDSIZ, 1, NBYTE, STATUS )
+*    Release the cache
+        CALL ADI_ERASE( GCBDAT, STATUS )
+
+*    Write some keywords if we created the GCB
+        IF ( DIDCRE ) THEN
+
+*      Locate the HDU
+          CALL ADI2_FNDHDU( FID, 'GCB', .FALSE., GCBHDU, STATUS )
+
+*      Write GCB keywords
+          CALL ADI2_HPKYC( GCBHDU, 'CONTENT', 'GRAFIX CONTROL',
+     :                      'Contents of extension', STATUS )
+          CALL ADI2_HPKYR( GCBHDU, 'GCBVERSN', G_VERSION,
+     :                      'Version of GCB description', STATUS )
+          CALL ADI2_HPKYC( GCBHDU, 'EXTNAME', 'GCB',
+     :              'Extension contains ASTERIX graphics attributes',
+     :                    STATUS )
+
+*      Release the GCB hdu
+          CALL ADI_ERASE( GCBHDU, STATUS )
+
         END IF
 
-      ELSE
-
-*    Clear status
-        CALL ERR_ANNUL( STATUS )
-
-*    Define new extension
-        CALL ADI2_CREIMG( FID, 'GCB', 1, NBYTE, 'BYTE',
-     :                    GCBHDU, STATUS )
-
-*    Write some keywords
-        CALL ADI2_HPKYC( GCBHDU, 'CONTENT', 'GRAFIX CONTROL',
-     :                    'Contents of extension', STATUS )
-        CALL ADI2_HPKYR( GCBHDU, 'GCBVERSN', G_VERSION,
-     :                    'Version of GCB description', STATUS )
-
       END IF
-
-*  Write the data to the HDU
-      CALL ADI2_PUTIMGB( GCBHDU, 1, NBYTE, %VAL(GCBPTR), STATUS )
-
-*  Release the GCB hdu
-      CALL ADI_ERASE( GCBHDU, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN

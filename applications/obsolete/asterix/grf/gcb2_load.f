@@ -106,35 +106,33 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			GCBHDU			! ASTERIX GCB hdu
+      INTEGER			GCBDAT			! ASTERIX GCB hdu data
       INTEGER			GCBPTR			! Workspace GCB
       INTEGER			NBYTE			! Length of GCB
+
+      LOGICAL			DIDCRE			! Did we create data?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the GCB hdu
-      CALL ADI2_FNDHDU( ARGS(1), 'GCB', GCBHDU, STATUS )
+*  Locate the GCB hdu data
+      CALL ADI2_CFIND( ARGS(1), 'GCB', '@', ' ', .FALSE., .FALSE.,
+     :                 'BYTE', 0, 0, DIDCRE, GCBDAT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*    Get dimensions of data in HDU
-        CALL ADI2_HGKYI( GCBHDU, 'NAXIS1', NBYTE, STATUS )
+*    Map the HDU data
+        CALL ADI2_DCOP_IN( GCBDAT, GCBPTR, NBYTE, STATUS )
 
 *    If no error, attempt to load data
         IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Map some workspace
-          CALL DYN_MAPB( 1, NBYTE, GCBPTR, STATUS )
-
-*      Load the image data
-          CALL ADI2_GETIMGB( GCBHDU, 1, NBYTE, %VAL(GCBPTR), STATUS )
-
 *      Unpack it
           CALL GCB_LOAD_SUB( %VAL(GCBPTR), %VAL(G_MEMPTR), STATUS )
 
-*      Free workspace
-          CALL DYN_UNMAP( GCBPTR, STATUS )
+*      Free the HDU data - it would be nicer if this was wrapped up
+          CALL ADI_CUNMAP( GCBDAT, 'Value', GCBPTR, STATUS )
+          CALL ADI_ERASE( GCBDAT, STATUS )
 
         END IF
 
