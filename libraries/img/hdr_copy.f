@@ -12,7 +12,7 @@
 *  Invocation:
 *     CALL HDR_COPY( PARAM1, XNAME1, PARAM2, XNAME2, STATUS )
 
-*  Description: 
+*  Description:
 *     This routine copies a compatible source of header information
 *     from one image to another. FITS headers may only be copied to
 *     FITS headers, other sources may be copied without restriction.
@@ -23,30 +23,32 @@
 *        header information (case insensitive).
 *     XNAME1 = CHARACTER * ( * ) (Given)
 *        The name of the extension to be copied ('FITS' or ' ' for FITS).
-*     N = INTEGER (Given)
-*        The index of the item.
-*     ITEM = CHARACTER * ( * ) (Returned)
-*        The name of the extension item (blank when no item with the
-*        given index exists).
+*     PARAM2 = CHARACTER * ( * ) (Given)
+*        Parameter name of the image that you want to copy a header
+*        source into (case insensitive).
+*     XNAME2 = CHARACTER * ( * ) (Given)
+*        The name of the destination header source ('FITS' or ' ' for
+*        FITS, must be FITS if XNAME1 is FITS).
 *     STATUS = INTEGER (Given and Returned)
-*        The global status.
+*        The global status. If a header source or destination is FITS
+*        and the other isn't then IMG__BDEXT will be returned.
 
 *  Notes:
-*     -  The order in which header item names are returned may change if
-*     the extension is modified (by deletion or by writing).
+*     - Modified FITS headers associated with the input source
+*       will copied to the new image.
 *
-*     -  The header item name will be returned in a hierarchical format
-*     if necessary.
+*     - This routine may be used to copy the same header source (from a
+*       single input image, to more than one image at a time by using
+*       multiple parameter names for PARAM2. Multiple parameter names are
+*       provided as a comma separated list (i.e. 'OUT1,OUT2,OUT3').
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     9-SEP-1994 (PDRAPER):
+*     23-OCT-2000 (PDRAPER):
 *        Original version.
-*     15-NOV-1994 (PDRAPER):
-*        Now accesses NDF if not already done.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -55,101 +57,174 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ parameters
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ parameters
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'NDF_PAR'         ! NDF parmeters
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+
+*  Global Variables:
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
+*        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
+*           NDF identifiers
 
 *  Arguments Given:
-      CHARACTER * ( * ) PARAM
-      CHARACTER * ( * ) XNAME
-      INTEGER N
-
-*  Arguments Returned:
-      CHARACTER * ( * ) ITEM
+      CHARACTER * ( * ) PARAM1
+      CHARACTER * ( * ) XNAME1
+      CHARACTER * ( * ) PARAM2
+      CHARACTER * ( * ) XNAME2
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
       EXTERNAL CHR_SIMLR
       LOGICAL CHR_SIMLR          ! Strings are the same apart from case
 
 *  Local Variables:
-      CHARACTER * ( IMG__SZPAR ) VPAR ! Validated parameter name
-      CHARACTER * ( DAT__SZNAM ) EXNAM ! Extension name
-      INTEGER ESLOT              ! Extension slot number
-      INTEGER SLOT               ! Parameter slot number
-      LOGICAL WASNEW             ! Dummy
+      CHARACTER * ( DAT__SZNAM ) EXNAM1 ! Extension name
+      CHARACTER * ( DAT__SZNAM ) EXNAM2 ! Extension name
+      INTEGER ESLOT1            ! Extension slot number
+      INTEGER ESLOT2            ! Extension slot number
+      INTEGER SLOT1             ! Parameter slot number
+      INTEGER SLOT2             ! Parameter slot number
+      LOGICAL WASNEW            ! TRUE when parameter not previously seen
+      LOGICAL CANMOD            ! NDF can be modified
+      INTEGER F                 ! First character position
+      INTEGER I1                ! Position of start of field
+      INTEGER I2                ! Position of end of field
+      INTEGER L                 ! Last character positiong
+      INTEGER NPAR              ! Number of parameters
+      CHARACTER * ( IMG__SZPAR ) VPAR2 ! Validated parameter name
+
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check N is sensible.
-      IF ( N .GT. 0 .AND. PARAM .NE. ' ' ) THEN
+*  Initialise parameter count.
+      NPAR = 0
 
-*  Get a local copy of the extension name. If this is ' ' then assume
-*  the user meant 'FITS'
-         IF ( XNAME .EQ. ' ' ) THEN
-            EXNAM = 'FITS'
-         ELSE
-            EXNAM = XNAME
-            CALL CHR_UCASE( EXNAM )
+*  Get a local copy of the extension names. If any of these are ' ' then
+*  assume the user meant 'FITS'
+      IF ( XNAME1 .EQ. ' ' ) THEN
+         EXNAM1 = 'FITS'
+      ELSE
+         EXNAM1 = XNAME1
+         CALL CHR_UCASE( EXNAM1 )
+      END IF
+      IF ( XNAME2 .EQ. ' ' ) THEN
+         EXNAM2 = 'FITS'
+      ELSE
+         EXNAM2 = XNAME2
+         CALL CHR_UCASE( EXNAM2 )
+      END IF
+      
+*  The source and destination must both be FITS, if either is FITS.
+      IF ( EXNAM1 .EQ. 'FITS' .OR. EXNAM2 .EQ. 'FITS' ) THEN
+         IF ( EXNAM1 .NE. EXNAM2 ) THEN
+            STATUS = IMG__BDEXT
+            CALL ERR_REP( 'HDR_NAME_BAD', 'The source and '//
+     :                  'destination header names must both '//
+     :                  'be FITS or neither should be FITS', STATUS )
+            GO TO 99
          END IF
+      END IF
+
+*  Initialise the character pointer to the start of the header
+*  destination parameter list. Then loop to extract each element from
+*  the list. 
+      I1 = 1
+ 1    CONTINUE                  ! Start of "DO WHILE" loop
+      IF ( (STATUS .EQ. SAI__OK) .AND. (I1 .LE. LEN( PARAM2 )) ) THEN
+
+*  Find the final character of the next element in the parameter list
+*  (the last character before a comma or end of string).
+         I2 = INDEX( PARAM2( I1 : ), ',' )
+         IF ( I2 .EQ. 0 ) THEN
+            I2 = LEN( PARAM2 )
+         ELSE
+            I2 = I2 + I1 - 2
+         END IF
+         IF ( I2 .GE. I1 ) THEN
+
+*  Locate the first and last non-blank characters in the element,
+*  checking that it is not entirely blank.
+            CALL CHR_FANDL( PARAM2( I1 : I2 ), F, L )
+            IF ( L .GE. F ) THEN
+               F = F + I1 - 1
+               L = L + I1 - 1
+
+*  Increment the parameter count.
+               NPAR = NPAR + 1
 
 *  Validate the parameter and its slot number.
-         CALL IMG1_VPAR( PARAM, VPAR, STATUS )
-         CALL IMG1_GTSLT( VPAR, .TRUE., SLOT, WASNEW, STATUS )
-         IF ( STATUS .EQ. SAI__OK ) THEN
+               CALL IMG1_VPAR( PARAM2( F: L ), VPAR2, STATUS )
+               CALL IMG1_GTSLT( VPAR2, .TRUE., SLOT2, WASNEW, STATUS )
+               IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a new parameter slot was allocated then we need to access an NDF.
-*  The NDF data is not mapped in this case for efficiency reasons.
-            IF ( WASNEW ) CALL IMG1_ASSOC( VPAR, 'READ', SLOT, STATUS )
-            IF ( STATUS .EQ. SAI__OK ) THEN
+*  The NDF data is not mapped in this case for efficiency
+*  reasons. Access using UPDATE as we need to write the header source.
+                  IF ( WASNEW ) CALL IMG1_ASSOC( VPAR2, 'UPDATE', SLOT2, 
+     :                                           STATUS )
+                  IF ( STATUS .EQ. SAI__OK ) THEN 
 
-*  Clear the item string.
-               ITEM = ' '
+*  Check that WRITE access can be used on this extension.
+                     CALL NDF_ISACC( PCB_INDF( SLOT2 ), 'WRITE', CANMOD,
+     :                               STATUS )
+                     IF ( CANMOD ) THEN 
 
-*  Initialise IMG to read the extension (if not already doing so).
-               CALL IMG1_EXINI( SLOT, EXNAM, .FALSE., ESLOT, STATUS )
+*  Initialise IMG to write to the extension (if not already doing so).
+                        CALL IMG1_EXINI( SLOT2, EXNAM2, .TRUE., ESLOT2,
+     :                                   STATUS )
 
 *  Now branch according to the "type" of extension which we are dealing
-*  with. FITS requires its own methods.
-               IF ( EXNAM .EQ. 'FITS' ) THEN
+*  with. FITS and "normal" extensions require their own methods.
+                        IF ( EXNAM2 .EQ. 'FITS' ) THEN
 
-*  Need to extract the required item from the FITS character array.
-                  CALL IMG1_NFT( SLOT, N, ITEM, STATUS )
-               ELSE
+*  Need to write/rewrite the FITS extension.
+                           CALL IMG1_REPFT( SLOT1, SLOT2, STATUS )
+                        ELSE
 
-*  Initialise the extension by formimg a trace if necessary.
-                  CALL IMG1_TRACE( SLOT, ESLOT, STATUS )
+*  Need to copy HDS to HDS extension.
+                           CALL IMG1_REPEX( SLOT1, ESLOT1, SLOT2,
+     :                                      ESLOT2, STATUS )
+                        END IF
+                     ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
 
-*  Need to locate the named item (which may be hierarchical).
-                  CALL IMG1_NEX( SLOT, ESLOT, N, ITEM, STATUS )
+*  Cannot write to this NDF's extension.
+                        STATUS = IMG__NOACC
+                        CALL NDF_MSG( 'NDF', PCB_INDF( SLOT2 ) )
+                        CALL MSG_SETC( 'EXNAM', EXNAM2 )
+                        CALL ERR_REP( ' ', 'Cannot copy headers ' //
+     :                       'to the ''^EXNAM'' extension of ' //
+     :                       'the image ''^NDF'' (write access is ' //
+     :                       'not allowed).', STATUS )
+                     END IF
+                  END IF
                END IF
             END IF
          END IF
-      ELSE
 
-*  Bad value for N  or not parameter name.
-         IF ( N .LE. 0 ) THEN
-            STATUS = IMG__BDBND
-            CALL MSG_SETI( 'N', N )
-            CALL ERR_REP( 'HDR_NAME_BADN', 'Bad index value ''^N''. ' //
-     :           'Must be greater than zero (possible programming ' //
-     :           'error).', STATUS )
-         ELSE
+*  Increment the character pointer to the start of the next element in
+*  the parameter list and return to process the next element.
+         I1 = I2 + 2
+         GO TO 1
+      END IF
 
-*  Blank parameter name.
-            STATUS = IMG__PARIN
-            CALL ERR_REP( 'HDR_NAME_NOPAR',
-     :           'No parameter name specified (possible ' //
-     :           'programming error).', STATUS )
-         END IF
+*  If no error has occurred, but no non-blank parameter names have been
+*  processed, then report an error.
+ 99   CONTINUE
+      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NPAR .EQ. 0 ) ) THEN
+         STATUS = IMG__PARIN
+         CALL ERR_REP( 'HDR_COPY_NOPAR',
+     :        'No parameter name specified (possible ' //
+     :        'programming error).', STATUS )
       END IF
       END
 * $Id$
