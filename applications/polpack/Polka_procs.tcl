@@ -21,7 +21,8 @@
 #     3-NOV-1998 (DSB):
 #        LoadTask now writes error messages to the terminal screen as well
 #        as a Tk window. DrawGwm modified to use KAPPA V0.13 version of
-#        DISPLAY. 
+#        DISPLAY. Procedure TranImage modified to propgate WCS from input
+#        to output. POLPACK:SEGMENT replaced by KAPPA:SEGMENT.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -11476,11 +11477,9 @@ proc Segment {indata outdata image obj} {
 # area.
    set maskarea [UniqueFile]
 
-# Run SEGMENT to extract the mask area into a temporary image.  NB,
-# until KAPPA:SEGMENT is available under Linux, and allows multiple
-# polygons to be specified on the command line, use POLPACK:SEGMENT instead.
+# Run SEGMENT to extract the mask area into a temporary image.  
    if { $outdata == "" } { set outdata "!" }
-   if { ![Obey polpack segment "cosys=world in1=$indata in2=$outdata mode=file out=$maskarea $polys"] } {
+   if { ![Obey kappa segment "cosys=world in1=$indata in2=$outdata mode=file out=$maskarea $polys"] } {
       set maskarea ""
    }
 
@@ -13430,7 +13429,19 @@ proc TranImage {data map trandata section fittype} {
          set ok [Obey ccdpack tranndf "inext=no logto=neither method=$method out=$trandata in=$data $shape transform=$trn"] 
          catch "exec ls -al ${trandata}*"
 
+# Modify the WCS information in the mapped image (if the mapping is not a
+# unit mapping) to take account of the transformation. This can be omitted 
+# when CCDPACK:TRANNDF is modified to propagate the NDF WCS component.
+         if { $ok && $map != "ref" } {
+            set coeffs "\[[lindex $map 0]"
+            for {set i 1} {$i < 6} {incr i} {
+               append coeffs ",[lindex $map $i]"
+            }
+            append coeffs "\]"
 
+            set ok [Obey ndfpack wcscopy "ndf=$trandata like=$data \
+                                          tr=$coeffs confirm=no"] 
+         }
 
 # Delete the TRANSFORM structure.
          HdsDel $trn
