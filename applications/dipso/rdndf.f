@@ -1,4 +1,4 @@
-      SUBROUTINE RDNDF( COMM, INDF, WORV, TITLE, STATUS )
+      SUBROUTINE RDNDF( COMM, INDF, USYS, UUNIT, WORV, TITLE, STATUS )
 *+
 *  Name:
 *     RDNDF
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL RDNDF( COMM, INDF, WORV, TITLE, STATUS )
+*     CALL RDNDF( COMM, INDF, USYS, UUNIT, WORV, TITLE, STATUS )
 
 *  Description:
 *     If the supplied NDF has more than 1 significant pixel axis, an error 
@@ -58,6 +58,14 @@
 *        The DIPSO command which invoked this routine.
 *     INDF = INTEGER (Given)
 *        An identifier for the NDF to be read.
+*     USYS = CHARACTER * ( * ) (Given)
+*        The System in which the X axis is supplied within the NDF. If
+*        blank, an attempt is made to guess the system from the
+*        attributes of the NDFs WCS FrameSet.
+*     UUNIT = CHARACTER * ( * ) (Given)
+*        The Unit in which the X axis is supplied within the NDF. If
+*        blank, an attempt is made to guess the unit from the
+*        attributes of the NDFs WCS FrameSet.
 *     WORV = REAL (Returned)
 *        The WORV value.
 *     TITLE = CHARACTER * ( * ) (Returned)
@@ -129,6 +137,8 @@
 *  Arguments Given:
       CHARACTER COMM*(*)
       INTEGER INDF
+      CHARACTER USYS*(*)
+      CHARACTER UUNIT*(*)
 
 *  Arguments Returned:
       REAL WORV
@@ -472,6 +482,11 @@
                MAP = DEFMAP
                UNIT = DEFUNI
             END IF
+
+*  If the user specified a system and/or unit, use them.
+            IF( USYS .NE. ' ' ) CALL AST_SETC( SFRM, 'SYSTEM', USYS,
+     :                                         STATUS )
+            IF( UUNIT .NE. ' ' ) UNIT = UUNIT;
 
 *  Attempt to set the axis unit. If an error occurs, annul it and clear
 *  the Unit attribute.

@@ -4,11 +4,11 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory} {Starlink User Note}
 \newcommand{\stardocinitials} {SUN}
-\newcommand{\stardocsource} {sun50.23}
-\newcommand{\stardocnumber} {50.23}
+\newcommand{\stardocsource} {sun50.24}
+\newcommand{\stardocnumber} {50.24}
 \newcommand{\stardocauthors} {I D Howarth, J Murray, D Mills \& D S Berry}
-\newcommand{\stardocdate} {28th November 2002}
-\newcommand{\stardoctitle} {DIPSO (V3.5-6) --- A friendly spectrum analysis
+\newcommand{\stardocdate} {18th February 2003}
+\newcommand{\stardoctitle} {DIPSO (V3.6) --- A friendly spectrum analysis
 program}
 %------------------------------------------------------------------------------
 
@@ -2688,12 +2688,31 @@ or an STL table (see \xref{SUN/190}{sun190}{} ). The names of the columns
 holding the X and Y values are given by ``xcol'' and ``ycol''. A full list 
 of available column names is displayed if an unknown column name is supplied.
 
-\dipcom{READ}{file name or NDF name}{Reads data from a disk file to the current arrays (see {\tt{WRITE}})} 
-Reads a disk file which has been written with \htmlref{{\tt{WRITE}}}{COM:WRITE}.  This and \htmlref{{\tt{RESTORE}}}{COM:RESTORE}  are the
+\dipcom{READ}{file [sys] [unit]}{Reads data from a disk file to the current arrays (see {\tt{WRITE}})} 
+Reads a disk file which has been written with 
+\htmlref{{\tt{WRITE}}}{COM:WRITE}.  This and \htmlref{{\tt{RESTORE}}}{COM:RESTORE}  
+are the
 only input modes that preserve ALL the information associated with a DIPSO
 data set, and are the recommended options. The disk data can be in either NDF or
 ``native DIPSO'' format, depending on the flag established by the \htmlref{{\tt{USENDF}}}{COM:USENDF} 
 command. When specifying an NDF, do not include any file type.
+
+If the specified NDF was not created by DIPSO, then an attempt will be
+made to create appropriate X values based on the WCS component in the
+NDF (or the FITS header cards in the FITS extension if there is no WCS
+component). The second and third command parameters, ``sys'' and ``unit'',
+may be used to indicate the spectral system and units in use within the NDF
+(these are only used if the system and units are not clearly specified in
+the NDF). The system value supplied must be a standard FITS-WCS value such as 
+``FREQ'', ``WAVE'', ``VRAD'', ``VOPT'', etc. Likewise, the unit should be
+a standard FITS-WCS such as ``m'', ``nm'', ``Angstrom'', ``Hz'', ``GHz'',
+``m/s'', ``km/s'', etc. The spectral axis values within the NDF will be
+converted automatically from their original system to either wavelength in 
+Angstroms or optical velocity in km/s for storage in the DIPSO X array. The 
+original system and unit adopted for the NDF during this conversion are 
+reported. If the user does not specify a system and/or unit, then a
+default of ``wavelength in metres'' will be adopted unless the contents
+of the NDF suggest some other default.
 
 \dipcom{RECA}{[/all] [string or integer]}{Recalls a previous command or prompt response}
 Recalls a previous command line or prompt response, putting it into the
@@ -3429,6 +3448,22 @@ open files which contain any lower case letters in their file name.
 \begin{itemize}
 \item A bug has been fixed which caused the ISATM command to be unable to
 find entries in the ATOMIC.DAT file when being run under Linux.
+\end{itemize}
+
+\subsection{Changes introduced by DIPSO V3.6}
+\begin{itemize}
+\item The {\tt READ} command has been modified so that it will attempt to
+read spectral axis information from the WCS component of an NDF if the NDF
+was not created by DIPSO. If the NDF has no WCS component, the spectral
+axis information will be read from the FITS header cards in the NDF FITS
+extension (if any). Details of the spectral axis are displayed.
+\item The {\tt WRITE} command has been modified so that it will add a WCS
+component to the output NDF describing the spectral axis. This allows it
+to be used by other Starlink applications such as SPLAT, KAPPA, etc.
+\item The {\tt ELFRESTC} command has been changed so that it no longer 
+converts the supplied file name to upper case before being used to access
+the file. The previous behaviour resulted in open failure for file names 
+containing lower case letters.
 \end{itemize}
 
 \subsection{Changes introduced by DIPSO V3.5}
