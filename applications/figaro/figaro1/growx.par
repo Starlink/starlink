@@ -1,6 +1,0 @@
-spectrum,f,a,,,,"(SPectrum) Spectrum to be \"grown\" into image"
-image,f,a,,,,"(IMage) Image to grow spectrum into"
-ystart,r,a,,,,"(YStart) First cross-section to copy spectrum into"
-yend,r,a,,,,"(YEnd) Last cross-section to copy spectrum into"
-new,b,a,n,,,"(NEw) Force creation of a new image?"
-ysize,r,a,,,,"(YSIze) Y-dimension of new image"
