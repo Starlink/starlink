@@ -27,6 +27,8 @@ my $checkoutdir = '.';
 # Prototypes
 sub sendmail(%);
 sub Usage();
+sub escape_html($);
+
 
 # ======================================================================
 # Define classes CVSLog, CVSLogRevision and CVSLogEntry
@@ -110,9 +112,10 @@ sub Usage();
         }
 
         $l = <$fh>;                 # second line
-        if ($l =~ /^date: *([0-9 :+-]*); *author: *([a-zA-Z0-9]*)/) {
+        if ($l =~ /^date: *([0-9 :+-]*); *author: *([^;]*); *state: *([^;]*)/) {
             $entry->{date} = $1;
             $entry->{author} = $2;
+            $entry->{state} = $3;
         } else {
             printf STDERR "Can't parse log entry <%s>\n", $l;
             return undef;
@@ -143,6 +146,11 @@ sub Usage();
     sub date {
         my $self = shift;
         return $self->{date} || '';
+    }
+
+    sub state {
+        my $self = shift;
+        return $self->{state} || '';
     }
 
     sub revision {
@@ -425,11 +433,12 @@ foreach my $e ($cvslog->get_entries) {
 
         foreach my $revent ($e->revisions()) {
             printf(HTML
-                   "<div class='onerevision'>\n<p>%s, %s (%s)</p>\n<pre>\n%s</pre>\n</div>\n",
+                   "<div class='onerevision'>\n<p>%s, %s (%s)%s</p>\n<pre>\n%s</pre>\n</div>\n",
                    $revent->revision,
                    $revent->author,
                    $revent->date,
-                   $revent->message);
+                   ($revent->state ne 'Exp' ? " (<strong>".$revent->state."</strong>)" : ''),
+                   escape_html($revent->message));
         }
     }
 
@@ -505,12 +514,23 @@ sub sendmail(%) {
     return $status;
 }
 
+# Given a string, do HTML escapes of <, >, and &
+sub escape_html ($) {
+    my $s = shift;
+    $s =~ s/&/&amp;/g;
+    $s =~ s/</&lt;/g;
+    $s =~ s/>/&gt;/g;
+    return $s;
+}
+
+
 sub Usage() {
     printf STDERR <<"EOD";
 Usage: $0 [options] [startdate [enddate]]
 Arguments:
     startdate, enddate: start and end of interval, format 'yyyy-mm-dd hh:mm'
     or other CVS-style time specs.
+
 Options:
     -c path         path to a current checkout
                     (default: $checkoutdir)
@@ -526,5 +546,5 @@ Environment:
     MAILHOST        SMTP server to use to send report mail message
                     (default: $mailhost)
 EOD
-exit 1;
+    exit 1;
 }
