@@ -8305,6 +8305,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataAccess.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataImpl.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDims.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/TXTSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/TableColumnChooser.java
@@ -9153,6 +9154,7 @@ cvs checkout: Updating java/source/topcat/src/testcases/uk
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat
+U java/source/topcat/src/testcases/uk/ac/starlink/topcat/DemoTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/DocTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/HelpTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/LinkChecker.java
