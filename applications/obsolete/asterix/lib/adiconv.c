@@ -728,14 +728,14 @@ void ADIcnvInit( ADIstatus status )
     {ub, r, ADIcnvUBR },
     { b, r, ADIcnvBR },
     {uw, r, ADIcnvUWR },
-    { w, r, ADIcnvIR },
+    { w, r, ADIcnvWR },
     { i, r, ADIcnvIR },
     { d, r, ADIcnvDR },
 
     {ub, d, ADIcnvUBD },
     { b, d, ADIcnvBD },
     {uw, d, ADIcnvUWD },
-    { w, d, ADIcnvID },
+    { w, d, ADIcnvWD },
     { i, d, ADIcnvID },
     { r, d, ADIcnvRD },
 
