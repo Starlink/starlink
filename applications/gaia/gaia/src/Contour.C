@@ -496,11 +496,11 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
       }
       
       //  Draw the geodesic.
-#if !defined( AST_MAJOR_VERS) || ((AST_MAJOR_VERS>=1) && (AST_MINOR_VERS<7))
-      astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
-#else
+//#if !defined( AST_MAJOR_VERS) || ((AST_MAJOR_VERS>=1) && (AST_MINOR_VERS<7))
+//      astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
+//#else
       astPolyCurve( plot, npts, 2, MAXPTS, (const double *) xydata );
-#endif
+//#endif
    } else {
       
       //  Draw straight-lines (graphics surface wise) at the resolution
