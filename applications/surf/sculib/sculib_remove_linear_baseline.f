@@ -190,6 +190,20 @@
      :     A_PTR, A_END, STATUS)
 
 
+*     Fill the output array with the values from the input array.
+*     This allows us to have some values set even if the points are not
+*     good and a basline can not be fitted
+*     Its open to debate whether we should initially fill the output
+*     arrays with BAD.
+      
+      DO BOL = 1, N_BOL
+         DO POS = 1, N_POS
+            OUT_DATA(BOL,POS) = IN_DATA(BOL,POS)
+            OUT_QUALITY(BOL, POS) = IN_QUALITY(BOL, POS)
+            OUT_VARIANCE(BOL, POS) = IN_VARIANCE(BOL,POS)
+         END DO
+      END DO
+
 *     First need to select a scan
 
       DO MEASUREMENT = 1, N_MEASUREMENTS
@@ -296,12 +310,12 @@
 *     containing pixel distance (X pixel values relative to start of scan)
 *     Simply need to fit this with a least squares polynomial fit.
 *     Use first order polynomial.
-*     If we have no data then skip this bolometer
+*     If we have no data then skip this bolometer. 
 *     Cant have more than NSCRATCH points - if we do then we will have been
-*     in trouble anyway as the VEC_ITOD lines (above) would cause a segmentation
-*     fault.
-*     Probably should make sure we have at least 2 points over which to calculate the
-*     baseline.
+*     in trouble anyway as the VEC_ITOD lines (above) would cause 
+*     a segmentation fault.
+*     Probably should make sure we have at least 2 points over which to
+*     calculate the baseline.
 
                         IF (COUNT .GT. 1 .AND. COUNT .LE. NSCRATCH) THEN 
 
