@@ -1,3 +1,8 @@
+1 SPECX - v6.8-3
+
+ - Fix rddualgsd and rdwidesp macros
+ - Fix "random" bug in file creation on linux
+
 1 SPECX - v6.8-2
 
  Fixes a problem introduced in v6.8-1 that prevents specx from creating

@@ -1,3 +1,15 @@
+2003-12-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* specx.news: Release v6.8-3
+
+	* comfiles/rdwidesp.spx: Reintegrate fixes for wideband mode from
+	Remo.
+
+	* comfiles/rddualgsd.spx: Reintegrate fixes for wideband
+	mode from Remo.
+
+	* comfiles/tofits.spx: Reintegrate fixes from Remo.
+
 2003-12-04  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* fv4/fv4_filini.f (FV4_FILINI): Use CMP_PUT1R rather than
