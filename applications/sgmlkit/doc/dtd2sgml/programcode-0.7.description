@@ -12,7 +12,7 @@
 
 
 <element gi="angle" status="beta">
-<p>See <elemref gi="angle" dtd="sundtd"/></p>
+<p>See <elemxref gi="angle" dtd="sundtd"/></p>
 <!--splice:angle-->
 </element>
 
@@ -30,7 +30,7 @@ arguments.  In this case, there should be no <elemref gi="parameter"/> content.
 </element>
 
 <element gi="attribution" status="beta">
-<p>See <elemref gi="attribution" dtd="sundtd"/>
+<p>See <elemxref gi="attribution" dtd="sundtd"/>
 </p>
 <!--splice:attribution-->
 </element>
@@ -111,7 +111,7 @@ list the section of the standard where the code was defined.
 </element>
 
 <element gi="blockquote" status="beta">
-<p>See <elemref gi="blockquote" dtd="sundtd"/>
+<p>See <elemxref gi="blockquote" dtd="sundtd"/>
 </p>
 <!--splice:blockquote-->
 </element>
@@ -139,13 +139,13 @@ and a four-digit year.
 </element>
 
 <element gi="cite" status="beta">
-<p>See <elemref gi="cite" dtd="sundtd"/>
+<p>See <elemxref gi="cite" dtd="sundtd"/>
 </p>
 <!--splice:cite-->
 </element>
 
 <element gi="code" status="beta">
-<p>See <elemref gi="code" dtd="sundtd"/>
+<p>See <elemxref gi="code" dtd="sundtd"/>
 </p>
 <!--splice:code-->
 </element>
@@ -226,7 +226,7 @@ semantics to this element.  It maps this element to the
 </element>
 
 <element gi="colspec" status="beta">
-<p>See <elemref gi="colspec" dtd="sundtd"/>
+<p>See <elemxref gi="colspec" dtd="sundtd"/>
 </p>
 <!--splice:colspec-->
 </element>
@@ -246,13 +246,13 @@ optional <elemref gi="purpose"/> element.
 </element>
 
 <element gi="dd" status="beta">
-<p>See <elemref gi="dd" dtd="sundtd"/>
+<p>See <elemxref gi="dd" dtd="sundtd"/>
 </p>
 <!--splice:dd-->
 </element>
 
 <element gi="dl" status="beta">
-<p>See <elemref gi="dl" dtd="sundtd"/>
+<p>See <elemxref gi="dl" dtd="sundtd"/>
 </p>
 <!--splice:dl-->
 </element>
@@ -265,24 +265,24 @@ or one of the <elemref gi="codegroup"/> or <elemref gi="codereference"/> blocks.
 </element>
 
 <element gi="docxref" status="experimental">
-<p>See <elemref gi="docxref" dtd="sundtd"/></p>
+<p>See <elemxref gi="docxref" dtd="sundtd"/></p>
 <!--splice:docxref-->
 </element>
 
 <element gi="dt" status="beta">
-<p>See <elemref gi="dt" dtd="sundtd"/>
+<p>See <elemxref gi="dt" dtd="sundtd"/>
 </p>
 <!--splice:dt-->
 </element>
 
 <element gi="em" status="beta">
-<p>See <elemref gi="em" dtd="sundtd"/>
+<p>See <elemxref gi="em" dtd="sundtd"/>
 </p>
 <!--splice:em-->
 </element>
 
 <element gi="entry" status="beta">
-<p>See <elemref gi="entry" dtd="sundtd"/>
+<p>See <elemxref gi="entry" dtd="sundtd"/>
 </p>
 <!--splice:entry-->
 </element>
@@ -301,7 +301,7 @@ element.
 </element>
 
 <element gi="foreign" status="beta">
-<p>See <elemref gi="foreign" dtd="sundtd"/>
+<p>See <elemxref gi="foreign" dtd="sundtd"/>
 </p>
 <!--splice:blockquote-->
 </element>
@@ -337,55 +337,55 @@ here).
 </element>
 
 <element gi="kbd" status="beta">
-<p>See <elemref gi="kbd" dtd="sundtd"/>
+<p>See <elemxref gi="kbd" dtd="sundtd"/>
 </p>
 <!--splice:kbd-->
 </element>
 
 <element gi="li" status="beta">
-<p>See <elemref gi="li" dtd="sundtd"/>
+<p>See <elemxref gi="li" dtd="sundtd"/>
 </p>
 <!--splice:li-->
 </element>
 
 <element gi="line" status="beta">
-<p>See <elemref gi="line" dtd="sundtd"/>
+<p>See <elemxref gi="line" dtd="sundtd"/>
 </p>
 <!--splice:line-->
 </element>
 
 <element gi="linespecific" status="beta">
-<p>See <elemref gi="linespecific" dtd="sundtd"/>
+<p>See <elemxref gi="linespecific" dtd="sundtd"/>
 </p>
 <!--splice:linespecific-->
 </element>
 
 <element gi="m" status="beta">
-<p>See <elemref gi="m" dtd="sundtd"/>
+<p>See <elemxref gi="m" dtd="sundtd"/>
 </p>
 <!--splice:m-->
 </element>
 
 <element gi="meqnarray" status="beta">
-<p>See <elemref gi="meqnarray" dtd="sundtd"/>
+<p>See <elemxref gi="meqnarray" dtd="sundtd"/>
 </p>
 <!--splice:meqnarray-->
 </element>
 
 <element gi="mequation" status="beta">
-<p>See <elemref gi="mequation" dtd="sundtd"/>
+<p>See <elemxref gi="mequation" dtd="sundtd"/>
 </p>
 <!--splice:mequation-->
 </element>
 
 <element gi="mlabel" status="beta">
-<p>See <elemref gi="mlabel" dtd="sundtd"/>
+<p>See <elemxref gi="mlabel" dtd="sundtd"/>
 </p>
 <!--splice:mlabel-->
 </element>
 
 <element gi="mline" status="beta">
-<p>See <elemref gi="mline" dtd="sundtd"/>
+<p>See <elemxref gi="mline" dtd="sundtd"/>
 </p>
 <!--splice:mline-->
 </element>
@@ -397,7 +397,7 @@ here).
 </element>
 
 <element gi="ol" status="beta">
-<p>See <elemref gi="ol" dtd="sundtd"/>
+<p>See <elemxref gi="ol" dtd="sundtd"/>
 </p>
 <!--splice:ol-->
 </element>
@@ -427,7 +427,7 @@ headings in this context.
 </element>
 
 <element gi="p" status="beta">
-<p>See <elemref gi="p" dtd="sundtd"/>
+<p>See <elemxref gi="p" dtd="sundtd"/>
 </p>
 <!--splice:p-->
 </element>
@@ -566,19 +566,19 @@ where only a brief function description is required.
 </element>
 
 <element gi="px" status="beta">
-<p>See <elemref gi="px" dtd="sundtd"/>
+<p>See <elemxref gi="px" dtd="sundtd"/>
 </p>
 <!--splice:px-->
 </element>
 
 <element gi="quote" status="beta">
-<p>See <elemref gi="quote" dtd="sundtd"/>
+<p>See <elemxref gi="quote" dtd="sundtd"/>
 </p>
 <!--splice:quote-->
 </element>
 
 <element gi="ref" status="experimental">
-<p>See <elemref gi="ref" dtd="sundtd"/></p>
+<p>See <elemxref gi="ref" dtd="sundtd"/></p>
 <!--splice:ref-->
 </element>
 
@@ -600,14 +600,26 @@ attribute none should be present.
 <p>The documentation for a single routine.  Most of the element
 content of this element is optional, so it can be used equally well
 to document code which does not have things like parameters,
-returnvalues, and the like.
+returnvalues, and the like.</p>
+<attribute name="id">
+<p>An ID for this element, which can be referred to using the 
+<elemxref gi='coderef' dtd='sundtd'/> element, via the 
+<elemxref gi='codecollection' dtd='sundtd'/> element in the Starlink
+General DTD.
 </p>
+</attribute>
 <!--splice:routine-->
 </element>
 
 <element gi="routinename" status="beta">
-<p>The name of the routine being documented.
+<p>The name of the routine being documented.</p>
+<attribute name="id">
+<p>An ID for this element, which can be referred to using the
+<elemxref gi='coderef' dtd='sundtd'/> element, via the
+<elemxref gi='codecollection' dtd='sundtd'/> element in the Starlink
+General DTD.
 </p>
+</attribute>
 <!--splice:routinename-->
 </element>
 
@@ -618,7 +630,7 @@ returnvalues, and the like.
 </element>
 
 <element gi="row" status="beta">
-<p>See <elemref gi="row" dtd="sundtd"/>
+<p>See <elemxref gi="row" dtd="sundtd"/>
 </p>
 <!--splice:row-->
 </element>
@@ -680,31 +692,31 @@ Graphics (GRPL).
 </element>
 
 <element gi="strong" status="beta">
-<p>See <elemref gi="strong" dtd="sundtd"/>
+<p>See <elemxref gi="strong" dtd="sundtd"/>
 </p>
 <!--splice:strong-->
 </element>
 
 <element gi="tabular" status="beta">
-<p>See <elemref gi="tabular" dtd="sundtd"/>
+<p>See <elemxref gi="tabular" dtd="sundtd"/>
 </p>
 <!--splice:tabular-->
 </element>
 
 <element gi="tbody" status="beta">
-<p>See <elemref gi="tbody" dtd="sundtd"/>
+<p>See <elemxref gi="tbody" dtd="sundtd"/>
 </p>
 <!--splice:tbody-->
 </element>
 
 <element gi="tgroup" status="beta">
-<p>See <elemref gi="tgroup" dtd="sundtd"/>
+<p>See <elemxref gi="tgroup" dtd="sundtd"/>
 </p>
 <!--splice:tgroup-->
 </element>
 
 <element gi="thead" status="beta">
-<p>See <elemref gi="thead" dtd="sundtd"/>
+<p>See <elemxref gi="thead" dtd="sundtd"/>
 </p>
 <!--splice:thead-->
 </element>
@@ -722,13 +734,13 @@ Graphics (GRPL).
 </element>
 
 <element gi="ul" status="beta">
-<p>See <elemref gi="ul" dtd="sundtd"/>
+<p>See <elemxref gi="ul" dtd="sundtd"/>
 </p>
 <!--splice:ul-->
 </element>
 
 <element gi="url" status="beta">
-<p>See <elemref gi="url" dtd="sundtd"/>
+<p>See <elemxref gi="url" dtd="sundtd"/>
 </p>
 <!--splice:url-->
 </element>
@@ -758,13 +770,13 @@ long as the keywords you invent are prefixed with `general: ...'.
 </element>
 
 <element gi="verbatim" status="beta">
-<p>See <elemref gi="verbatim" dtd="sundtd"/>
+<p>See <elemxref gi="verbatim" dtd="sundtd"/>
 </p>
 <!--splice:verbatim-->
 </element>
 
 <element gi="webref" status="beta">
-<p>See <elemref gi="webref" dtd="sundtd"/>
+<p>See <elemxref gi="webref" dtd="sundtd"/>
 </p>
 <!--splice:webref-->
 </element>

@@ -266,7 +266,9 @@ must be marked up in a DTD which is a client of the programcode
 architecture.  This will typically, but not necessarily, be a suitable
 source code file.
 </p>
-<p>See the documentation which covers this topic for further details.</p>
+<p>For an example of use, see the documentation for the <elemref
+gi='coderef'/> element.</p>
+<p>See also the general documentation for this topic.</p>
 <attribute name="doc">
 <p>A document which is marked up in a DTD which is a client of the
 Starlink programcode architecture.</p>
@@ -287,7 +289,22 @@ a <elemref gi="coderef"/> element.</p>
 <element gi="coderef" status="alpha">
 <p>This element makes a link to a routine referred to within a
 <elemref gi="codecollection"/> element.  That element makes a
-reference to a document which is marked up using the programcode DTD.</p>
+reference to a document which is marked up using the programcode DTD.
+<example><![CDATA[
+<!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN 0.7//EN" [
+  <!ENTITY testprog SYSTEM "test2.sgml" SUBDOC>
+]>
+...
+<p>Here is some text.  It refers to 
+<coderef collection=cc1 id=tryxxx>the tryxxx function</coderef>
+
+<sect id=two export>Routines
+<routinelist>
+<codecollection doc="testprog" id=cc1>
+]]></example>
+The <elemref self="self" gi='coderef'/> element refers to an ID attached
+to an element in the programcode document (which will be either a
+routine or a routinename element).</p>
 <attribute name="collection">
 <p>The ID which you have assigned to a <elemref
 gi="codecollection"/>.</p>
@@ -1621,3 +1638,9 @@ Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 <!--splice:webref-->
 </element>
 </dtddescription>
+
+<!--
+Local Variables:
+mode: sgml
+End:
+-->

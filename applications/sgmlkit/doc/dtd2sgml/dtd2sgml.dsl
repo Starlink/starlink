@@ -181,20 +181,24 @@
     (empty-sosofo)))
 (element elemref
   (let* ((gi (attribute-string (normalize "gi") (current-node)))
-	 (self (attribute-string (normalize "self") (current-node)))
-	 (xrefdtd-ent (attribute-string (normalize "dtd") (current-node)))
-	 ;; Get document-element of the target document, if it exists
-	 (xrefdtd-de (and xrefdtd-ent
-			  (document-element-from-entity xrefdtd-ent)))
-	 ;(xrefdtd-gi (and xrefdtd-ent	; false if not present
-		;	  (entity-text xrefdtd-ent)))
-	 )
+	 (self (attribute-string (normalize "self") (current-node))))
     (if gi
 	(if self
 	    (literal gi)
 	    (make empty-element gi: "ref"
-		  attributes: `(("id" ,(xref-id gi xrefdtd-de))
+		  attributes: `(("id" ,(xref-id gi))
 				("text" ,gi))))
+	(error "elemref: required gi attribute missing"))))
+(element elemxref
+  (let* ((gi (attribute-string (normalize "gi") (current-node)))
+	 (xrefdtd-ent (attribute-string (normalize "dtd") (current-node)))
+	 ;; Get document-element of the target document, if it exists
+	 (xrefdtd-de (and xrefdtd-ent
+			  (document-element-from-entity xrefdtd-ent))))
+    (if gi
+	(make empty-element gi: "ref"
+	      attributes: `(("id" ,(xref-id gi xrefdtd-de))
+			    ("text" ,gi)))
 	(error "elemref: required gi attribute missing"))))
 (element example
   (make sequence

@@ -15,9 +15,10 @@
 <!ELEMENT dtddescription	(dtdsummary, element+, commentary*)>
 <!ELEMENT element		(p+, attribute*, commentary*)>
 <!ELEMENT attribute		(p+)>
-<!ELEMENT p			(#PCDATA | elemref | example | code 
-					| em | url | webref)*>
+<!ELEMENT p			(#PCDATA | elemref | elemxref | example 
+					| code | em | url | webref)*>
 <!ELEMENT elemref		EMPTY>
+<!ELEMENT elemxref		EMPTY>
 <!ELEMENT example		(#PCDATA)>
 <!ELEMENT code			(#PCDATA)>
 <!ELEMENT em			(#PCDATA)>
@@ -82,26 +83,36 @@
 		name		 attribute name
 	-->
 
+<!-- Reference to an element in this DTD -->
 <!ATTLIST elemref
 	gi
 		IDREF #REQUIRED
-	dtd
-		ENTITY #IMPLIED
 	self
 		(self)	#IMPLIED
 	>
 	<!-- attributes:
-		gi		GI of element we're referring to
-
-		dtd		entity referring to the DTD which we're
-				cross-referencing.  At present, this is
-				rather informal: it's just a CDATA entity which
-				is used to name the target top-level element.
+		gi		GI of element in this DTD which we
+				want to refer to.
 
 		self		if present, then we're referring to the same
 				element we're documenting.  Format the
 				element name as usual, but don't
 				include	any sort of link.
+	-->
+<!-- Cross reference to element in another DTD -->
+<!ATTLIST elemxref
+	gi
+		CDATA #REQUIRED
+	dtd
+		ENTITY #REQUIRED
+	>
+	<!-- attributes:
+		gi		GI of element in another DTD which we
+				want to refer to.
+
+		dtd		entity referring to the DTD which we're
+				cross-referencing.  This is an entity
+				declared as a SUBDOC.
 	-->
 
 <!ATTLIST webref
