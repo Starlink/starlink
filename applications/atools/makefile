@@ -588,7 +588,7 @@ DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
-AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 CNF_PAR:   $(STAR_INC)/cnf_par;   $(LINK) $? $@
 
