@@ -25,26 +25,18 @@
 *     average value for each jiggle and then subtracts this off the
 *     jiggle. Each jiggle is analysed in turn. The average value can be
 *     calculated in two ways: either MEDIAN or MEAN.
-*
-*     A simple despiking algorithm is also included: 
-*     - Each bolometer is analysed independently, a mean and standard 
-*       deviation are calculated, any points greater than NSIGMA sigma 
-*       from the mean are treated as spikes and removed. Note that for mapping 
-*       this despiking algorithm is only useful for very weak
-*       sources; bright sources will be removed (since a bolometer
-*       jiggles on and off bright sources). Photometry observations
-*       do not suffer from this problem as the bolometers are always on 
-*       source.
 
 *  Usage:
 *     remsky in out
 
 *  ADAM Parameters:
+*     ADD = LOGICAL (Read)
+*        If true the mean of the `sky' level that was removed from every 
+*        frame is added back onto the data after sky removal. This step should
+*        make sure that flux is not removed from the data.
 *     BOLOMETERS = CHAR (Read)
 *        List of sky bolometers (either by number in the data file, or
 *        by id (eg H7,G3))
-*     DESPIKE = LOGICAL (Read)
-*        Answering yes to this will initiate the simple despiking routine.
 *     IN = NDF (Read)
 *        This is the name of the input demodulated data file
 *     ITER_SIGMA = REAL (Read)
@@ -66,10 +58,6 @@
 *                   mean.
 *     MSG_FILTER = CHAR (Read)
 *        Message output level. Default is NORM
-*     NSIGMA = DOUBLE (Read)
-*        Number of sigma beyond which data are thought to be spikes. This
-*        is used for the despiking algorithm and is only used if DESPIKE
-*        is true.
 *     OUT = NDF (Write)
 *        Output data file
 
@@ -85,18 +73,11 @@
 *       SCUOVER to overlay the bolometer positions on a NAsmyth regridded
 *       image (since NA shows the signal measured by each bolometer
 *       throughout the observation without source rotation).
-*     - The despiking routine is very primitive and should not be used
-*       with jiggle map data of bright sources. It can be used
-*       on PHOTOM data since the jiggle pattern never moves off source
-*       (although SIGCLIP is probably more effective).
 
 *  Implementation status:
-*     The despiking routine sets QUALITY bit 5 to bad. It does not affect
-*     the data. The effects of despiking can be removed by using the 
-*     Kappa task SETBB to unset quality bit 5.
 
 *  Related Applications:
-*     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER, SIGCLIP;
+*     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER;
 *     KAPPA: SETBB
  
 *  Authors:
@@ -106,6 +87,10 @@
 *  History :
 *     3 Nov 1996: TIMJ
 *        Original version
+*     $Log$
+*     Revision 1.10  1997/11/04 23:28:10  timj
+*     Remove clipping.
+*
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -127,7 +112,6 @@
       INTEGER STATUS
 
 *  External references :
-      BYTE    SCULIB_BITON              ! Turn on skybit
 
 *  Local Constants :
       INTEGER          MAX__BOL                  ! max number of bolometers
@@ -138,29 +122,30 @@
       PARAMETER (TSKNAME = 'REMSKY')
 
 *  Local variables :
+      LOGICAL          ADD_BACK         ! Add on the mean sky level
       INTEGER          B                ! Loop counter
       INTEGER          BB               ! Loop counter
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
       INTEGER          BOL              ! Loop counter
+      INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! A/D numbers of bolometers measured in
+                                        ! input file
+      INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! channel numbers of bolometers
+                                        ! measured in input file
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU3 Nasmyth coord of bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU4 Nasmyth coord of bolometers
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! bolometer types
-      INTEGER          BOL_PTR          ! Pointer to single bolometer
-      INTEGER          BOL_PTR_END      ! Pointer to end single bolometer
-      INTEGER          BOL_QPTR         ! Pointer to single bolometer quality
-      INTEGER          BOL_QPTR_END     ! Pointer to end single bol quality
-
       CHARACTER*15     CENTRE_COORDS    ! coord system of telescope centre
       REAL             CENTRE_DU3       ! dU3 Nasmyth coord of point on focal
                                         ! plane that defines telescope axis
       REAL             CENTRE_DU4       ! dU4 Nasmyth coord of point on focal
                                         ! plane that defines telescope axis
       INTEGER          DIM (MAXDIM)     ! the dimensions of an array
-      LOGICAL          DOCLIP           ! Clip over bolometers
       REAL             ITERCLIP         ! Number of bols to drop from mean
       LOGICAL          EXTINCTION       ! .TRUE. if EXTINCTION has been run
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
@@ -168,12 +153,6 @@
       CHARACTER*132    FNAME            ! Input filename
       INTEGER          I                ! DO loop variable
       INTEGER          INDF             ! NDF identifier of input file
-      INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! A/D numbers of bolometers measured in
-                                        ! input file
-      INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! channel numbers of bolometers
-                                        ! measured in input file
       INTEGER          IN_DATA_PTR      ! pointer to data array of input file
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                         ! locator to FITS extension in input
@@ -202,7 +181,6 @@
       CHARACTER * (10) MODE             ! Method of sky removal
       INTEGER          NDIM             ! the number of dimensions in an array
       INTEGER          NREC             ! number of history records in file
-      DOUBLE PRECISION NSIGMA           ! clipping level
       INTEGER          N_BEAMS          ! number of beams for which data have
                                         ! been reduced
       INTEGER          N_BOLS           ! number of bolometers measured in
@@ -478,7 +456,7 @@
      :              STATUS)
  
 *  search for the bolometer in the index
- 
+
                IF (STATUS .EQ. SAI__OK) THEN
  
                   DO BB = 1, N_BOLS
@@ -500,6 +478,17 @@
             END IF
          END DO
 
+*     Raise an error if no bolometers are present
+
+         IF (N_GOODBOLS .LE. 0) THEN
+
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP(' ', '^TASK: None of the selected bolometers'//
+     :           ' were present in the data',
+     :           STATUS)
+
+         END IF
 
 * Which mode of sky removal
          CALL PAR_CHOIC('MODE', 'MEAN','MEAN,MEDIAN', .TRUE., MODE,
@@ -513,10 +502,10 @@
 
       END IF
 
-*  Remove spikes from each bolometer?
-      CALL PAR_GET0L('DESPIKE', DOCLIP, STATUS)
-*  How many sigma?
-      IF (DOCLIP) CALL PAR_GET0D('NSIGMA', NSIGMA, STATUS)
+*     Find out if we want to add back the constant offset
+
+      CALL PAR_GET0L('ADD', ADD_BACK, STATUS)
+
 
 *  Go through the data and remove sky
 
@@ -554,50 +543,11 @@
      :        OUT_VARIANCE_PTR, ITEMP, STATUS)
 
          IF (N_BOLS .GT. 1) THEN
-            CALL SCULIB_REM_SKY(MODE, N_BOLS, N_POS, 
+            CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, 
      :           %val(OUT_DATA_PTR),
      :           %val(OUT_VARIANCE_PTR), 
      :           %val(OUT_QUALITY_PTR),
      :           ITERCLIP, N_GOODBOLS, SKYBOLS, BADBIT, STATUS)
-         END IF
-
-         IF (DOCLIP) THEN
-*  Initalise Pointers
-            IF (STATUS .EQ. SAI__OK) THEN
-               BOL_PTR = 0
-               BOL_PTR_END = 0
-               BOL_QPTR = 0
-               BOL_QPTR_END = 0
-            END IF
-
-*  Grab some scratch data
-            CALL SCULIB_MALLOC(N_POS * VAL__NBR, BOL_PTR,
-     :           BOL_PTR_END, STATUS)
-            CALL SCULIB_MALLOC(N_POS * VAL__NBUB, BOL_QPTR,
-     :           BOL_QPTR_END, STATUS)
-
-            DO I = 1, N_BOLS
-
-               CALL SCULIB_EXTRACT_BOL(I, N_BOLS, N_POS, 
-     :              %val(OUT_DATA_PTR), 
-     :              %val(OUT_QUALITY_PTR),
-     :              %val(BOL_PTR), %val(BOL_QPTR), STATUS)
-
-*  Despike
-               CALL SCULIB_CLIP_BOL(N_POS, %val(BOL_PTR),
-     :              %val(BOL_QPTR), NSIGMA, BADBIT, STATUS)
-
-               CALL SCULIB_INSERT_BOL(I, N_BOLS, N_POS, %val(BOL_PTR), 
-     :              %val(BOL_QPTR), %val(OUT_DATA_PTR),
-     :              %val(OUT_QUALITY_PTR), STATUS)
-
-            END DO
-
-*     Tidy up
-            BADBIT = SCULIB_BITON(BADBIT, 4)
-            CALL SCULIB_FREE('BOLDATA', BOL_PTR, BOL_PTR_END, STATUS)
-            CALL SCULIB_FREE('BOLQDATA', BOL_QPTR, BOL_QPTR_END, STATUS)
-         
          END IF
 
 *  unmap the main data array
