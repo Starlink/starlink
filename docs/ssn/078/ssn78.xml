@@ -4886,14 +4886,15 @@ STAR_MANIFEST_INSTALL_COMMAND = cd unix; \
                 <code>LDADD</code> variables must be a list of extra
                 objects to add to a program, or extra libraries,
                 specified through <code>-l</code> and <code>-L</code>
-                flags.  In Starlink <code>automake</code>, you can also
-                specify extra libraries using the standard Starlink
-                <code>*_link</code> and <code>*_link_adam</code>
-                commands.  You can add tokens matching
-                <code>`*_link`</code> or <code>`*_link_adam`</code> to
-                the <code>LDADD</code> variable, or either of these
-                preceded by exactly <code>$(srcdir)/</code>, which you
-                may need to do only in the case of test code.</p>
+                flags.  In Starlink <code>automake</code>, you can
+                also specify extra libraries using the standard
+                Starlink <code>*_link</code> and
+                <code>*_link_adam</code> commands.  You can add to the
+                <code>LDADD</code> variable tokens matching
+                <code>`*_link`</code> or <code>`*_link_adam`</code>,
+                with possible script options, or either of these preceded by
+                exactly <code>$(srcdir)/</code>, which you would need to
+                do only in the case of test code.</p>
             </li>
 
             <li>
