@@ -25,6 +25,10 @@
 *     average value for each jiggle and then subtracts this off the
 *     jiggle. Each jiggle is analysed in turn. The average value can be
 *     calculated in two ways: either MEDIAN or MEAN.
+*
+*     After the calculation, the mean value removed from each jiggle is
+*     added back onto the data -- this should protect against removing
+*     flux from the data.
 
 *  Usage:
 *     remsky in out
@@ -43,8 +47,20 @@
 *            [all,-r4,-r1,h8]  would select all the bolometers then
 *                              remove bolometers from rings 4 and 1
 *                              and add h8.
+*            [17,18,19,20]     Bolometers 17, 18, 19 and 20
+*            [h6,h7,h8,h9]     Bolometers H6, H7, H8, H9 
+*            [all]             Whole array 
+*            [r0]              Ring zero (central pixel)
+*            [r0,-19]          No bolometers (bol 19 of LONG is R0/H7)
+*            [h7,r1]           inner ring and H7
+*            [r1,-h8]          inner ring without H8
+*            [r1,-18]          inner ring without bolometer 18
+*            [all,-r1,-h7]     all pixels except the inner ring and H7
+*            [all,-r3,g1]      all pixels except ring 3 but with
+*                                    G1 (which happens to be in r3)
+*            [all,-r1,-r2,-r3,-r4,-r5]        Selects the central pixel 
 *     IN = NDF (Read)
-*        This is the name of the input demodulated data file
+*        This is the name of the input demodulated data file.
 *     ITER_SIGMA = REAL (Read)
 *        When using MEAN to calculate the average, this is the sigma clipping
 *        level used. This is an iterative value - points will be removed
@@ -73,7 +89,16 @@
 *     remsky ndf sky_removed bolometers='[g1,g2,g3,g4,g5]' mode=median \
 *        Use the median of bolometers g1,g2,g3,g4,g5 (not necessarily 
 *        the best choice) to calculate the sky signal and write the
-*        output to sky_removed.sdf. No despiking is to be used.
+*        output to sky_removed.sdf.
+*     remsky o12_lon_ext bolometers=[all] mode=median \
+*        Use the median of all the bolometers for each jiggle and write the
+*        output to the default output file (e.g. o12_lon_sky).
+*     remsky o25_sho_ext bolometers=[r5] mode=mean iter_sigma=4 \
+*        Use the outer ring of the short-wave array as the sky bolometers.
+*        Calculate the sky contribution by using a clipped mean of each 
+*        jiggle and remove any points from the
+*        calculation of the mean that are more than 4 sigma from the mean.
+*        Write the output to the default output file.
 
 *  Notes:
 *     - Source rotation is not accounted for so use only those bolometers
@@ -81,12 +106,14 @@
 *       SCUOVER to overlay the bolometer positions on a NAsmyth regridded
 *       image (since NA shows the signal measured by each bolometer
 *       throughout the observation without source rotation).
+*     - For weak sources (ie sources that are not obvious in a single
+*       integration) it is probably sufficient to choose BOLOMETERS=[all] and
+*       MODE=median.
 
 *  Implementation status:
 
 *  Related Applications:
 *     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER;
-*     KAPPA: SETBB
  
 *  Authors:
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -96,6 +123,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.13  1997/11/27 20:08:12  timj
+*     Update documentation
+*
 *     Revision 1.12  1997/11/06 23:19:16  timj
 *     Add the verbose suffix option.
 *
