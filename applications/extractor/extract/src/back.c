@@ -6,10 +6,15 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN, IAP & Leiden observatory
+*                       P.W.DRAPER, Starlink & Durham University
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	09/07/98
+*	Last modify:	09/07/98 (EB):
+*                       15/12/98 (PWD):
+*                          Added changes to deal with -BIG values in
+*                          images (Starlink BAD pixels are less than
+*                          this value).
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -41,6 +46,9 @@ void	makeback(picstruct *field)
 		lastbite, w,bw,bwx, bh, nx,ny,nb, x,y,h, offset, nlevels,
 		lflag;
    float	*sig, qscale, cste;
+
+   int          empty, full;
+   double       mean, sigma;
 
   w = field->width;
   bw = field->backw;
@@ -127,9 +135,13 @@ void	makeback(picstruct *field)
           {
           for (x=bwx; x--;)
             {
-            bin = (int)(*(buft++)/qscale + cste);
-            if (bin>=0 && bin<nlevels)
-              (*(histo+bin))++;
+              if ( *buft > -BIG ) {  
+                bin = (int)(*(buft++)/qscale + cste);
+                if (bin>=0 && bin<nlevels)
+                  (*(histo+bin))++;
+              } else {
+                buft++;
+              }
             }
           buft += offset;
           }
@@ -222,16 +234,20 @@ void	makeback(picstruct *field)
             {
             for (x=bwx; x--;)
               {
-              bin = (int)(*(buft++)/qscale + cste);
-              if (bin>=0 && bin<nlevels)
-                (*(histo+bin))++;
+                if ( *buft > -BIG ) {
+                  bin = (int)(*(buft++)/qscale + cste);
+                  if (bin>=0 && bin<nlevels)
+                    (*(histo+bin))++;
+                } else {
+                  buft++;
+                }
               }
             buft += offset;
             }
           }
         }
       }
-      
+
     bm = backmesh;
     for (m=0; m<nx; m++, bm++)
       {
@@ -241,6 +257,47 @@ void	makeback(picstruct *field)
       }
     }
 
+
+  /*  Check if any sigmas are zero, this means an empty bin which we 
+      will fill with the mean mean and sigma */
+  empty = 0;
+  for (j = 0; j < ny; j++ ) {
+    for (m = 0; m < nx; m++, bm++ ) {
+      k = m + nx * j;
+      if ( *(sig+k) == 0.0 ) empty++;
+    }
+  }
+  if ( empty != 0 ) {
+
+    /*  First get existing mean of means */
+    mean = 0.0;
+    sigma = 0.0;
+    full = 0;
+    for (j = 0; j < ny; j++ ) {
+      for (m = 0; m < nx; m++, bm++ ) {
+        k = m + nx * j;
+        if ( *(sig+k) != 0.0 ) {
+          mean += *(field->back+k);
+          sigma += *(sig+k);
+          full++;
+        }
+      }
+    }
+    mean /= (double) ( nx * ny - empty );
+    sigma /= (double)( nx * ny - empty );
+    
+    /*  Now set empty bins to this value */
+    for (j = 0; j < ny; j++ ) {
+      for (m = 0; m < nx; m++, bm++ ) {
+        k = m + nx * j;
+        if ( *(sig+k) == 0.0 ) {
+          *(field->back+k) = mean;
+          *(sig+k) = sigma;
+        }
+      }
+    }
+  }
+  
 /* Free memory */
   free(buf);
   free(backmesh);
@@ -283,6 +340,8 @@ void	backstat(backstruct *backmesh, PIXTYPE *buf, size_t bufsize,
    double	pix, sig, mean, sigma, step;
    PIXTYPE	*buft, *bufpos, lcut, hcut;
 
+   int bad;
+
   h = bufsize/w;
   bm = backmesh;
   offset = w - bw;
@@ -297,49 +356,67 @@ void	backstat(backstruct *backmesh, PIXTYPE *buf, size_t bufsize,
       offset = w-bw;
       }
     buft = bufpos;
-    for (y=h; y--;)
-      {
-      for (x=bw; x--;)
-        {
-        mean += (pix = *(buft++));
-        sigma += pix*pix;
-        }
-      buft += offset;
-      }
-    npix = bw*h;
-    mean /= (double)npix;
-    sigma = (sig = sigma/npix - mean*mean)>0.0? sqrt(sig):0.0;
-    lcut = bm->lcut = (PIXTYPE)(mean - 2.0*sigma);
-    hcut = bm->hcut = (PIXTYPE)(mean + 2.0*sigma);
-    mean = sigma = 0.0;
     npix = 0;
-    buft = bufpos;
     for (y=h; y--;)
       {
       for (x=bw; x--;)
         {
-        pix = *(buft++);
-        if (pix>=lcut && pix<=hcut)
-          {
-          mean += pix;
-          sigma += pix*pix;
-          npix++;
+          if ( *buft > -BIG ) {
+            mean += (pix = *(buft++));
+            sigma += pix*pix;
+            npix++;
+          } else {
+            buft++;
           }
         }
       buft += offset;
       }
-    bm->npix = npix;
-    mean /= (double)npix;
-    sig = sigma/npix - mean*mean;
-    sigma = sig>0.0 ? sqrt(sig):0.0;
-    bm->mean = mean;
-    bm->sigma = sigma;
+    /* npix = bw*h; */
+    if ( npix > 0 ) 
+      {
+        mean /= (double)npix;
+        sigma = (sig = sigma/npix - mean*mean)>0.0? sqrt(sig):0.0;
+        lcut = bm->lcut = (PIXTYPE)(mean - 2.0*sigma);
+        hcut = bm->hcut = (PIXTYPE)(mean + 2.0*sigma);
+        mean = sigma = 0.0;
+        npix = 0;
+        buft = bufpos;
+        for (y=h; y--;)
+          {
+            for (x=bw; x--;)
+              {
+                if ( *buft > -BIG ) {
+                  pix = *(buft++);
+                  if (pix>=lcut && pix<=hcut)
+                    {
+                      mean += pix;
+                      sigma += pix*pix;
+                      npix++;
+                    }
+                } else {
+                  buft++;
+                }
+              }
+            buft += offset;
+          }
+        bm->npix = npix;
+        mean /= (double)npix;
+        sig = sigma/npix - mean*mean;
+        sigma = sig>0.0 ? sqrt(sig):0.0;
+        bm->mean = mean;
+        bm->sigma = sigma;
+      } 
+    else 
+      {
+        bm->npix = 0;
+        bm->mean = 0.0;
+        bm->sigma = 0.0;
+      }
     if ((bm->nlevels = (int)(step*npix+1)) > QUANTIF_NMAXLEVELS)
       bm->nlevels = QUANTIF_NMAXLEVELS;
     bm->qscale = sigma>0.0? 2*QUANTIF_NSIGMA*sigma/bm->nlevels : 1.0;
     bm->qzero = mean - QUANTIF_NSIGMA*sigma;
     }
-
   return;
   }
 
@@ -486,7 +563,6 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
                        :bkg->qzero+mea*bkg->qscale;
 
   *sigma = sig*bkg->qscale;
-
 
   return *mean;
   }
