@@ -71,15 +71,6 @@
 <!ENTITY partype.ref		STARTTAG "type"	>
 <!ENTITY pardesc.ref		STARTTAG "description">
 
-<!ENTITY % Additional.Char.Ents
-	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX"
-	>
-<!ENTITY % ISOents
-	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"
-	>
-%Additional.Char.Ents;
-%ISOents;
-
 
 <!SHORTREF	generalmap	"&#RS;*+"	startprologue.ref
 						>
@@ -93,6 +84,12 @@
 				'"'		quot
 				"~"		nbsp
 				>
+
+<!USEMAP	generalmap	programcode	>
+<!USEMAP	prologuemap	routine		>
+<!USEMAP	textmap		
+		(p | px | title | tabular | routinename | author)
+		>
 
 <!--
   Now some tricksier stuff for documenting routine parameters.
@@ -119,29 +116,30 @@
       Blah = float
       This is a variable
 
-  Note that this scheme means that we can't have `textmap' enabled
+  Note that it is not a shortcut to have `textmap' enabled
   within element <name>, because within the <name> enclosed by
   <parameter> we need `=' to be a shortref for partype.ref (which maps
   to <type>).  We can't reasonably have `=' included in `textmap', as
   this would cause chaos whenever anyone used an `=' sign in normal
-  text.  If we could have different maps for `name inside parameter'
-  and `name everywhere else', there would be no problem; but we can't,
-  so there.  We could get round this by having <parameter> consist of
-  elements (parametername, type, description).
+  text (which someone _will_ do).  If we could have different maps for
+  `name inside parameter' and `name everywhere else', there would be
+  no problem; but we can't, so there.  Because it is enabled within
+  <parameter>, `parametermap' is inherited by <name> elements within that.
 
 -->
 <!SHORTREF	parametermap	"="		partype.ref
 				"&#RS;*"	nullentity.ref
+				"--"		endash
+				"_"		underscore
+				'"'		quot
+				"~"		nbsp
 				>
 <!SHORTREF	partypemap	"&#RE;"		pardesc.ref
 				":"		pardesc.ref
 						>
-
-<!USEMAP	generalmap	programcode	>
-<!USEMAP	prologuemap	routine		>
 <!USEMAP	parametermap	parameter	>
 <!USEMAP	partypemap	type		>
-<!USEMAP	textmap		(p | px | title | tabular)>
+
 
 
 
