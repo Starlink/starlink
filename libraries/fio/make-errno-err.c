@@ -1,7 +1,7 @@
 /*
  *+
  *  Name:
- *    make-errno-par
+ *    make-errno-err
 
  *  Type of module:
  *     C source
@@ -17,7 +17,7 @@
 
  *  Usage:
  *
- *       ./make-errno-par
+ *       ./make-errno-err
 
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -26,6 +26,8 @@
  *  History:
  *     21-Jul-2004 (TIMJ):
  *        Original version
+ *     2-Sep-2004 (TIMJ):
+ *        Fix some warnings.
 
  *-
  */
@@ -35,6 +37,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #if HAVE_ERRNO_H
 # include <errno.h>
@@ -67,9 +70,9 @@ int main (int argc, char ** argv) {
   /* Open the output file */
   OutputFile = fopen(INCLUDE_FILE,"w");
   if (!OutputFile) {
-    fprintf(stderr,"%: can't open file %s for output\n",
+    fprintf(stderr,"%s: can't open file %s for output\n",
 	    progname, INCLUDE_FILE);
-    exit(1);
+    return EXIT_FAILURE;
   }
     
   /* Start writing the include file. Begin with the header */
@@ -1116,7 +1119,7 @@ grep define /usr/include/asm/errno.h | awk '{print "add_line(OutputFile, \""$2"\
 	/* Tidy up */
 	fclose(OutputFile);
 
-        exit(0);
+        return EXIT_SUCCESS;
 }
 
 /* Insert code for a specific errno constant */
