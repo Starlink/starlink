@@ -3,7 +3,7 @@
 .SUFFIXES : .ifl .ifc
 
 # Version string
-PKG_VERS = "'1.4-2JAC'"
+PKG_VERS = "'1.5-0JACtest'"
 
 # Location of libsculib.a
 SCULIB   = ../sculib
@@ -175,7 +175,7 @@ surf_despike.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
 surf_extflat.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
 surf_extinction.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_flatfield.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
-surf_grid_calcsky.o: DAT_PAR MSG_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_grid_calcsky.o: DAT_PAR MSG_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR NDF_PAR
 surf_grid_despike.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
 surf_make_weight.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR PAR_ERR PRM_PAR
 surf_mon.o: PAR_PAR SAE_PAR

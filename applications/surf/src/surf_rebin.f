@@ -241,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.70  1999/07/17 02:56:39  timj
+*     Further refinement of the sky removal using model.
+*
 *     Revision 1.69  1999/07/15 20:27:38  timj
 *     First stab at improving external model input
 *
@@ -801,53 +804,61 @@ c
 *  centre RA and Dec.
 
          HAVE_MODEL = .FALSE.
-         CALL NDF_ASSOC ('MODEL', 'READ', IMNDF, STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
-            HAVE_MODEL = .TRUE.             
+            CALL NDF_ASSOC ('MODEL', 'READ', IMNDF, STATUS)
+
+*     Check for NULL response (ie no model)
+            IF (STATUS .EQ. SAI__OK) THEN
+               HAVE_MODEL = .TRUE.             
 
 *  read FITS header
-            CALL NDF_XLOC (IMNDF, 'FITS', 'READ', M_FITSX_LOC,
-     :           STATUS)
-            CALL DAT_SIZE (M_FITSX_LOC, ITEMP, STATUS)
-            IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
-               IF (STATUS .EQ. SAI__OK) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC ('TASK', TSKNAME)
-                  CALL ERR_REP (' ', '^TASK: model file '//
-     :                 'contains too many FITS items', STATUS)
+               CALL NDF_XLOC (IMNDF, 'FITS', 'READ', M_FITSX_LOC,
+     :              STATUS)
+               CALL DAT_SIZE (M_FITSX_LOC, ITEMP, STATUS)
+               IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     STATUS = SAI__ERROR
+                     CALL MSG_SETC ('TASK', TSKNAME)
+                     CALL ERR_REP (' ', '^TASK: model file '//
+     :                    'contains too many FITS items', STATUS)
+                  END IF
                END IF
-            END IF
-
-            CALL DAT_GET1C (M_FITSX_LOC, SCUBA__MAX_FITS, MODEL_FITS,
-     :           N_M_FITS, STATUS)
-            CALL DAT_ANNUL (M_FITSX_LOC, STATUS)
+               
+               CALL DAT_GET1C (M_FITSX_LOC, SCUBA__MAX_FITS, MODEL_FITS,
+     :              N_M_FITS, STATUS)
+               CALL DAT_ANNUL (M_FITSX_LOC, STATUS)
 
 *     read centre coords, long and lat centre of model map
 *     Eventually we should be able to read full WCS info from header
 *     and convert to JCMT coordinate frames -- would put it in a
 *     subroutine of course...
 
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_M_FITS,
-     :           MODEL_FITS, 'SCUPROJ', OUT_COORDS, STATUS)
-            print *, 'cproj ', out_coords
-            CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
-     :           MODEL_FITS, 'LONG', MODEL_RA_CEN, STATUS)
-            CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
-     :           MODEL_FITS, 'LAT', MODEL_DEC_CEN, STATUS)
-            print *, model_ra_cen, model_dec_cen 
+               CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_M_FITS,
+     :              MODEL_FITS, 'SCUPROJ', OUT_COORDS, STATUS)
+               print *, 'cproj ', out_coords
+               CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
+     :              MODEL_FITS, 'LONG', MODEL_RA_CEN, STATUS)
+               CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
+     :              MODEL_FITS, 'LAT', MODEL_DEC_CEN, STATUS)
+               print *, model_ra_cen, model_dec_cen 
+
+*     NOTE: The model file is kept open until after the despiking.
+            
+            ELSE IF (STATUS .EQ. PAR__NULL) THEN
+
+*     A null response indicates no model but we have to reset the status
+               CALL ERR_ANNUL( STATUS )
+
+            END IF
+            
          END IF
 
-*  close the model file
-         CALL NDF_ANNUL (IMNDF, STATUS)
-
       ELSE
-
 *     Regridding
          CALL PAR_CHOIC('REBIN_METHOD', 'Linear', 
      :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3,Median', 
      :        .TRUE.,METHOD, STATUS)
-
-
+         
       END IF
 
 *     get the output coordinate system and set the default centre of the
@@ -1229,6 +1240,7 @@ c
                OUT_LONG = MODEL_RA_CEN
                OUT_LAT  = MODEL_DEC_CEN
             END IF
+            print *,'OUTLONG OUTLAT', OUT_LONG, OUT_LAT
 
 *     calculate the apparent RA,Dec of the selected output centre
 *     (Hopefully this will provide the same values for OUT_RA_CEN
@@ -1522,9 +1534,13 @@ c
 
 *     Calculate the sky contribution
          CALL SURF_GRID_CALCSKY(TSKNAME, FILE, N_PTS, N_POS, N_BOL,
-     :        WAVELENGTH, DIAMETER, BOX_SIZE, BOL_RA_PTR, BOL_DEC_PTR, 
-     :        IN_DATA_PTR, IN_QUALITY_PTR, SKY_PTR, SKY_VPTR, QBITS,
-     :        STATUS)
+     :        WAVELENGTH, DIAMETER, IMNDF, N_M_FITS, MODEL_FITS,  
+     :        CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR, 
+     :        BOL_DEC_PTR,  IN_DATA_PTR, IN_QUALITY_PTR, 
+     :        SKY_PTR, SKY_VPTR, QBITS, STATUS)
+
+*  close the model file
+         IF (IMNDF .NE. NDF__NOID) CALL NDF_ANNUL (IMNDF, STATUS)
 
 *     Open the input NDFs and create a new SKY NDF in the
 *     REDS extension of each

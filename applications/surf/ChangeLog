@@ -1,3 +1,31 @@
+1999-07-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_remove_dc_from_exp.f
+	(SURFLIB_REMOVE_DC_FROM_EXP):  Check that the DCVALUE is good
+	before subtracting it.
+
+	* surflib/surflib_remove_dc_via_sect.f
+	(SURFLIB_REMOVE_DC_VIA_SECT): Remove debug print statements.
+	(SURFLIB_REMOVE_DC_VIA_SECT): Check that the DCVALUE is good
+	before subtracting it.
+
+1999-07-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_rebin.f (SURF_REBIN): Improve the sky
+	model input code to make it more flexible.
+
+	* src/surf_grid_calcsky.f (SURF_GRID_CALCSKY): Improve the sky
+	model input code to make it more flexible.
+
+	* surflib/surflib_rem_grid.f (SURFLIB_REM_GRID): Check for bad
+	values in the index array
+
+	* surflib/surflib_fill_grid.f (SURFLIB_FILL_GRID): Check for bad
+	values in the index array
+
+	* surflib/surflib_histogram_grid.f (SURFLIB_HISTOGRAM_GRID): Check 
+	for bad values in the index array.
+
 1999-07-14  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* surflib/surflib_remove_ip.f (SURFLIB_REMOVE_IP): Protect
