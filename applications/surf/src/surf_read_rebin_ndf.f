@@ -156,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.26  2005/03/19 01:41:02  timj
+*     Propogate focal station from app level to calc_bol_coords
+*
 *     Revision 1.25  2005/03/18 06:27:33  timj
 *     initialise some variables
 *
@@ -315,9 +318,11 @@
                                        ! pointer to variance array in input file
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
+      CHARACTER*10     FOCAL_STATION   ! Where is the instrument located?
       INTEGER          I               ! DO loop index
       INTEGER          IERR            ! Position of error from VEC_
       INTEGER          INTEGRATION     ! integration index in DO loop
+      CHARACTER*20     INSTRUMENT      ! Name of instrument
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       DOUBLE PRECISION IN_DEC_CEN      ! apparent Dec of input file map centre
@@ -422,6 +427,7 @@
       LOGICAL          STATE           ! Is an NDF component there or not
       CHARACTER*80     STEMP           ! scratch string
       LOGICAL          SWITCH_EXPECTED ! Should the section include SWITCH(NO)
+      CHARACTER*20     TELESCOPE       ! Name of telescope
       LOGICAL          THERE           ! Is a component present
       INTEGER          TNDF(2)         ! Temporary NDF identifiers
       INTEGER          UBND(MAX_DIM)   ! Upper bounds of NDF section
@@ -666,6 +672,16 @@
             END IF
          END IF
       END IF
+
+*     Get telescope and instrument information...
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'INSTRUME', INSTRUMENT, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'TELESCOP', TELESCOPE, STATUS)
+
+*     ...And calculate the focal station
+      CALL SURFLIB_GET_FOCAL_STATION( TELESCOPE, INSTRUMENT,
+     :     SUB_INSTRUMENT, FOCAL_STATION, STATUS )
 
 *     coords of telescope centre
 
@@ -1152,7 +1168,7 @@
      :        IN_ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
-     :        IN_RA_CEN, IN_DEC_CEN,
+     :        FOCAL_STATION, IN_RA_CEN, IN_DEC_CEN,
      :        %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
      :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
      :        MJD_STANDARD,

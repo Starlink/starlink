@@ -1,4 +1,21 @@
+2005-03-18  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* surflib/surflib_get_focal_station.f (SURFLIB_GET_FOCAL_STATION):
+	Create new routine for determing the focal station of the instrument.
+
+	* surflib/surflib_plot_grid.f (SURFLIB_PLOT_GRID): Use KAPLIBS for
+	plotting.
+
+	* src/surf_grid_despike.f (SURF_GRID_DESPIKE): Use KAPLIBS for
+	plotting (if requested).
+
+2005-03-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_decode_remsky_string.f
+	(SURFLIB_DECODE_REMSKY_STRING): Add THUMPER support
+
+	* src/surf_remsky.f (SURF_REMSKY): Add THUMPER support
+	
 2004-08-31  Tim Jenness  <timj@jach.hawaii.edu>
 	
 	* Use CNF_PVAL throughout. Needed for 64bit.

@@ -78,6 +78,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.11  2005/03/19 01:41:02  timj
+*     Propogate focal station from app level to calc_bol_coords
+*
 *     Revision 1.10  2004/09/08 02:03:34  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -125,6 +128,9 @@
 *     - An array containing the fast axis angle is also written
 *       to the REDS extension (FAST_AXIS). The size of this array
 *       matches the number of sub-instruments in the file.
+*     - The focal station of the instrument (THUMPER, SCUBA etc) is not
+*       taken into account when calculting the elevation of the individual
+*       pixels. The effect of array rotation on the elevation component is tiny. 
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -766,6 +772,8 @@
 
 
 *     Process each of the data points and remove the IP
+*     Assume a Left Nasmyth since it makes no difference to the IP
+*     calculation since the array size is much smaller than the elevation effect
 
       CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAM, N_BOLS,
      :     N_POS, 1, N_SWITCHES, N_EXPOSURES, 
@@ -777,7 +785,7 @@
      :     ROTATION, SAMPLE_MODE,
      :     SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
      :     JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
-     :     RA_CENTRE, DEC_CENTRE,
+     :     'LNASMYTH', RA_CENTRE, DEC_CENTRE,
      :     %VAL(CNF_PVAL(RA1_PTR)), %VAL(CNF_PVAL(RA2_PTR)),
      :     %VAL(CNF_PVAL(DEC1_PTR)), %VAL(CNF_PVAL(DEC2_PTR)), UT1, UT1,
      :     MJD1, LONG_RAD, LAT_RAD, MJD2, LONG2_RAD, LAT2_RAD,

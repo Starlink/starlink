@@ -5,7 +5,7 @@
      :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
      :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
      :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
+     :     JIGGLE_P_SWITCH, FOCAL_STATION, RA_CEN, DEC_CEN,
      :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
      :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
      :     LOCAL_COORDS, MAP_X, MAP_Y,
@@ -32,7 +32,7 @@
 *    :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
 *    :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
 *    :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-*    :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
+*    :     JIGGLE_P_SWITCH, FOCAL_STATION, RA_CEN, DEC_CEN,
 *    :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
 *    :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
 *    :     LOCAL_COORDS, MAP_X, MAP_Y,
@@ -137,6 +137,8 @@
 *        Y jiggle offsets (arcsec)
 *     JIGGLE_P_SWITCH = _INTEGER
 *        Number of jiggles per switch
+*     FOCAL_STATION = _CHAR (Given)
+*        Focal station for the instrument. RNASMYTH, LNASMYTH or CASS
 *     RA_CEN = _DOUBLE (Given)
 *        apparent RA of output map centre (radians). Used mainly for JIGGLE
 *        but also for scan/map data pre Dec 1997
@@ -276,11 +278,14 @@
 *  Copyright:
 *     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
-
+*
 *  History:
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.16  2005/03/19 01:41:03  timj
+*     Propogate focal station from app level to calc_bol_coords
+*
 *     Revision 1.15  2004/09/01 01:02:48  timj
 *     mark SLA_DRANRM as external
 *
@@ -386,6 +391,7 @@
       CHARACTER*(*)    FITS(N_FITS)
       DOUBLE PRECISION FIRST_LST
       REAL             FIRST_TAU
+      CHARACTER*(*)    FOCAL_STATION
       DOUBLE PRECISION IN_ROTATION
       DOUBLE PRECISION IN_UT1
       INTEGER          JIGGLE_COUNT
@@ -758,7 +764,7 @@
 *     observation - use CALC_BOL_COORDS since that already calculates
 *     par_angle
 
-         CALL SCULIB_CALC_BOL_COORDS('AZ', RA_CEN, DEC_CEN,
+         CALL SCULIB_CALC_BOL_COORDS('AZ', FOCAL_STATION,RA_CEN,DEC_CEN,
      :        LST_STRT(1,1,1,1), LAT_OBS, 'AZ', 0.0, 0.0, 0.0D0,
      :        0, 0, 0.0D0, 0.0, 0.0, 0, 0, 0, 0, 0, 0.0, 0.0,
      :        0.0, 0.0, 0.0D0, 0.0D0, ELEVATION, PAR_ANGLE, STATUS)
@@ -1216,7 +1222,8 @@
                         ELEVATION = VAL__BADD
                         PAR_ANGLE = VAL__BADD
 
-                        CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
+                        CALL SCULIB_CALC_BOL_COORDS (OUTCRDS,
+     :                       FOCAL_STATION,
      :                       NEW_ARRAY_RA, NEW_ARRAY_DEC, LST, 
      :                       LAT_OBS, OFFSET_COORDS, OFFSET_X, 
      :                       OFFSET_Y, IN_ROTATION, N_POINT,

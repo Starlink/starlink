@@ -67,6 +67,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  2005/03/19 01:41:02  timj
+*     Propogate focal station from app level to calc_bol_coords
+*
 *     Revision 1.3  2004/09/08 02:03:34  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -378,7 +381,8 @@
       U4_OFF = 70.0
 
 *     First calculate the position for the incorrect time
-      CALL SCULIB_CALC_BOL_COORDS( 'RA', RA_CEN, DEC_CEN,
+*     Focal station is not relevant for this usage of calc_bol_coords
+      CALL SCULIB_CALC_BOL_COORDS( 'RA', 'LNASMYTH',RA_CEN, DEC_CEN,
      :     LST, LAT_OBS, 'NA', 0.0, 0.0,
      :     IN_ROTATION, 0, 0, DTEMP, RTEMP, RTEMP, 1, 1,
      :     1, 1, 1, U3_OFF, U4_OFF, 0.0, 0.0, XPOS, YPOS, DTEMP,
@@ -387,7 +391,7 @@
 *     Now calculate the position when compensating for the clock error
       LST = LST + CLOCK_ERR
 
-      CALL SCULIB_CALC_BOL_COORDS( 'RA', RA_CEN, DEC_CEN,
+      CALL SCULIB_CALC_BOL_COORDS( 'RA', 'LNASMYTH',RA_CEN, DEC_CEN,
      :     LST, LAT_OBS, 'NA', 0.0, 0.0,
      :     IN_ROTATION, 0, 0, DTEMP, RTEMP, RTEMP, 1, 1,
      :     1, 1, 1, U3_OFF, U4_OFF, 0.0, 0.0, XPOS(2),YPOS(2), DTEMP,

@@ -111,6 +111,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.21  2005/03/19 01:41:02  timj
+*     Propogate focal station from app level to calc_bol_coords
+*
 *     Revision 1.20  2004/11/18 20:40:10  timj
 *     CNF_PVAL brackets were in the wrong place
 *
@@ -229,6 +232,7 @@
                                        ! array of FITS keywords
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
+      CHARACTER*10     FOCAL_STATION   ! Where is the instrument located?
       INTEGER          FSET            ! AST_FRAMESET object for 2D AXIS frame
       LOGICAL          GOTLOC          ! A locator to the NDF has been
                                        ! obtained?
@@ -238,6 +242,7 @@
       INTEGER          I               ! DO loop index
       INTEGER          IAXFRM          ! Index of AXIS domain in AST frameset
       INTEGER          IERR            ! Position of error from VEC_
+      CHARACTER*20     INSTRUMENT       ! Name of instrument
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       DOUBLE PRECISION IN_DEC_CEN      ! apparent Dec of input file map centre
@@ -340,6 +345,7 @@
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
+      LOGICAL          PLOTNAME        ! Plot the name of the bolometer 
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                        ! azimuth pointing corrections (radians)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
@@ -372,7 +378,8 @@
       INTEGER          START_INT       ! First integration
       INTEGER          START_MEAS      ! First measurement
       CHARACTER*80     STEMP           ! scratch string
-      LOGICAL          PLOTNAME        ! Plot the name of the bolometer 
+      CHARACTER*20     SUB_INSTRUMENT  ! Sub-instrument name
+      CHARACTER*20     TELESCOPE       ! Name of telescope
       DOUBLE PRECISION XTEMP(2)        ! X pos of first two bols
       DOUBLE PRECISION YTEMP(2)        ! Y pos of first two bols
 
@@ -651,6 +658,20 @@
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
+
+*     Telescope and instrument name and sub-instrument name
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'INSTRUME', INSTRUMENT, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'TELESCOP', TELESCOPE, STATUS)
+
+*     We know there can only be one sub instrument and that it is
+*     in the BOL_TYPE array
+      SUB_INSTRUMENT = BOL_TYPE( BOL_CHAN(1), BOL_ADC(1) )
+
+*     And calculate the focal station
+      CALL SURFLIB_GET_FOCAL_STATION( TELESCOPE, INSTRUMENT,
+     :     SUB_INSTRUMENT, FOCAL_STATION, STATUS )
       
 *     coords of telescope centre
 
@@ -906,7 +927,7 @@
      :     IN_ROTATION, SAMPLE_MODE,
      :     SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
      :     JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
-     :     IN_RA_CEN, IN_DEC_CEN,
+     :     FOCAL_STATION, IN_RA_CEN, IN_DEC_CEN,
      :     %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
      :     %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
      :     MJD_STANDARD,

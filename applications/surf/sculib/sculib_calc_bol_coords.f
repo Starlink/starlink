@@ -1,8 +1,9 @@
-      SUBROUTINE SCULIB_CALC_BOL_COORDS (OUT_COORDS, RA_CENTRE,
-     :  DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y,
-     :  ROTATION, N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
-     :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
-     :  U4_CENTRE, X_BOL, Y_BOL, ELEVATION, PAR_ANGLE, STATUS)
+      SUBROUTINE SCULIB_CALC_BOL_COORDS (OUT_COORDS, FOCAL_STATION,
+     :     RA_CENTRE, DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X,
+     :     OFFSET_Y,ROTATION, N_POINT, MAX_POINT, POINT_LST, POINT_DAZ,
+     :     POINT_DEL, NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, 
+     :     U3, U4, U3_CENTRE, U4_CENTRE, X_BOL, Y_BOL,
+     :     ELEVATION, PAR_ANGLE, STATUS)
 *+
 *  Name:
 *     SCULIB_CALC_BOL_COORDS
@@ -17,8 +18,8 @@
 *     SCULIB subroutine
  
 *  Invocation:
-*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS,RA_CENTRE, DEC_CENTRE, LST,
-*    :  LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
+*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS,FOCAL_STATION,RA_CENTRE, 
+*    :  DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
 *    :  N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
 *    :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
 *    :  U4_CENTRE, X_BOL, Y_BOL, ELEVATION, PAR_ANGLE, STATUS)
@@ -26,6 +27,8 @@
 *  Arguments:
 *     OUT_COORDS = CHARACTER * (*) (Given)
 *          Output coordinate system (NA, AZ, RA)
+*     FOCAL_STATION = CHARACTER * (*) (Given)
+*          Location of the instrument in the focal plane. LNASMYTH, RNASMYTH or CASS
 *     RA_CENTRE              = DOUBLE PRECISION (Given)
 *        the apparent RA of the `centre' (radians)
 *     DEC_CENTRE             = DOUBLE PRECISION (Given)
@@ -121,7 +124,7 @@
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 
 *  Copyright:
-*     Copyright (C) 1995-2002 Particle Physics and Astronomy
+*     Copyright (C) 1995-2005 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
@@ -146,6 +149,7 @@
       INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
+      CHARACTER *(*)   FOCAL_STATION
       INTEGER          MAX_POINT
       INTEGER          NUM_CHAN
       INTEGER          NUM_ADC

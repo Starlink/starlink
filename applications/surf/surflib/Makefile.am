@@ -14,4 +14,5 @@ surflib_rem_timeseries.f surflib_median_regrid.f		    \
 surflib_calc_chopped_image.f surflib_read_ipfile.f		    \
 surflib_fill_wplate.f surflib_process_bols.f surflib_remove_ip.f    \
 surflib_calc_polpack_angrot.f surflib_fill_polpack_angles.f	    \
-surflib_trim_image.f surflib_remove_dc_via_sect.f
+surflib_trim_image.f surflib_remove_dc_via_sect.f                   \
+surflib_get_focal_station.f

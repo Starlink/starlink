@@ -145,6 +145,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.36  2005/03/19 01:41:02  timj
+*     Propogate focal station from app level to calc_bol_coords
+*
 *     Revision 1.35  2005/03/18 06:26:32  timj
 *     + Initialise some variables
 *
@@ -211,8 +214,10 @@
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       CHARACTER*132    FNAME            ! Input filename
+      CHARACTER*10     FOCAL_STATION    ! Where is the instrument located?
       INTEGER          I                ! DO loop variable
       INTEGER          INDF             ! NDF identifier of input file
+      CHARACTER*20     INSTRUMENT       ! Name of instrument
       INTEGER          IN_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
                                         ! input file
@@ -353,6 +358,7 @@
                                         ! wavelengths of observation
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       REAL             TAUZ             ! Tau read from FITS header
+      CHARACTER*20     TELESCOPE        ! Name of telescope
       LOGICAL          THERE            ! Is an extension there?
       INTEGER          UBND (MAXDIM)    ! upper bounds of array
       DOUBLE PRECISION UT1              ! UT1 of start of observation expressed
@@ -734,6 +740,17 @@
       CALL SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, 'SUB_INSTRUMENT',
      :     N_SUB, SUB_POINTER, WAVE, SUB_REQUIRED, STEMP, STATUS)
 
+*  find the focal station. First need the TELESCOP and INSTRUME as well
+*  as subinstrument
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'TELESCOP',
+     :     TELESCOPE, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'INSTRUME',
+     :     INSTRUMENT, STATUS)
+
+      CALL SURFLIB_GET_FOCAL_STATION( TELESCOPE, INSTRUMENT,
+     :     SUB_REQUIRED, FOCAL_STATION, STATUS )
+
 *  for a PHOTOM observation read the PHOT_BB array and check its dimensions
 
       IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
@@ -1067,7 +1084,7 @@
      :        ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
-     :        RA_CENTRE, DEC_CENTRE,
+     :        FOCAL_STATION, RA_CENTRE, DEC_CENTRE,
      :        %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
      :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
      :        UT1, UT1,
