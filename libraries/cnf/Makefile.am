@@ -23,11 +23,11 @@ C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
     cnfImprta.c cnfImprtap.c cnfLenc.c cnfLenf.c \
     cnfMem.c oldnames.c
 
-# f77.h is a duplicate of cnf.h, maintained as such because old software
-# (actually including some of the code in this library -- that should
-# probably be fixed!) uses it under its old name.
-f77.h: cnf.h
-	$(LN_S) cnf.h f77.h
+# cnf.h is the old name for f77.h.  cnf.h is now deprecated, but we
+# should continue to install it for the sake of old code.  See f77.h
+# for some history, and sun209.tex for the current recommendations.
+cnf.h: f77.h
+	$(LN_S) f77.h cnf.h
 
 # CNF_PAR.F requires defintions from config.h.
 # The following deals with case-insensitive filesystems, on which
@@ -44,9 +44,7 @@ CNF_PAR: CNF_PAR.processed
 	grep '^ .*[^ ]' CNF_PAR.processed >>CNF_PAR.tmp \
 	    && mv CNF_PAR.tmp CNF_PAR
 
-BUILT_SOURCES = f77.h
-
-CLEANFILES = f77.h CNF_PAR CNF_PAR.processed CNF_PAR.tmp
+CLEANFILES = cnf.h CNF_PAR CNF_PAR.processed CNF_PAR.tmp
 
 # Testing
 

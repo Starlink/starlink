@@ -10,7 +10,7 @@ dnl   Require automake-1.6 at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
-AC_CONFIG_SRCDIR([cnf.h])
+AC_CONFIG_SRCDIR([f77.h])
 
 dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
@@ -33,7 +33,7 @@ dnl   Check if BSD bcopy function is available, if not should use memmove.
 AC_CHECK_FUNCS(memmove bcopy)
 
 dnl   Need to know the size of a pointer for CNF_PVAL
-dnl   (see CNF_PAR.fpp and Makefile.am)
+dnl   (see CNF_PAR.F and Makefile.am)
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(uint32_t)
 
