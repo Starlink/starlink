@@ -107,7 +107,8 @@
 
   28th April 2004
 
-  You can now view image slices of a cube.
+  You can now view image slices of a cube and collapse a range
+  of slices into a single image.
 
   A print of the "whole image" now works when repeated.
 
@@ -123,3 +124,7 @@
 
   Contouring toolbox bug fixed. If you entered an incorrect NDF name for the 
   second image, the error was never recovered and GAIA had to be restarted.
+
+  Fixed problem with coordinate readout coupling when more than one interactive
+  slice or XY profile is being used.
+
