@@ -306,12 +306,18 @@
 <!ENTITY starlink.decl 
 	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
 	>
+<!ENTITY xml.decl
+	PUBLIC "-//Starlink//TEXT XML Declaration//EN"
+	>
 ]]>
 <!ENTITY starlink.decl 
 	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
 	"starlink.decl"
 	>
-
+<!ENTITY xml.decl
+	PUBLIC "-//Starlink//TEXT XML Declaration//EN"
+	"xml.decl"
+	>
 
 <!--========== Entities for special symbols ==========-->
 <!-- There's a feature here I don't understand.  I had thought that the
