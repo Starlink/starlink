@@ -5621,11 +5621,17 @@ f        An array
 *        and 3 outputs the linear approximation to the forward transformation 
 *        is:
 *
-*           X_out = result[0] + result[3]*X_in + result[4]*Y_in 
+c           X_out = result[0] + result[3]*X_in + result[4]*Y_in 
+f           X_out = result(1) + result(4)*X_in + result(5)*Y_in 
 *
-*           Y_out = result[1] + result[5]*X_in + result[6]*Y_in 
+c           Y_out = result[1] + result[5]*X_in + result[6]*Y_in 
+f           Y_out = result(2) + result(6)*X_in + result(7)*Y_in 
 *
-*           Z_out = result[2] + result[7]*X_in + result[8]*Y_in
+c           Z_out = result[2] + result[7]*X_in + result[8]*Y_in
+f           Z_out = result(3) + result(8)*X_in + result(9)*Y_in
+*
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Returned Value:
 c     astLinearApprox()
@@ -5634,8 +5640,6 @@ f     AST_LINEARAPPOX = LOGICAL
 c        a non-zero value is returned. Otherwise zero is returned 
 f        .TRUE is returned. Otherwise .FALSE. is returned
 *        and the fit co-efficients are set to AST__BAD.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
 
 *  Notes:
 *     - This function fits the Mapping's forward transformation. To fit
