@@ -79,16 +79,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'EDI_CMN'
-*       EDI_INIT = LOGICAL (returned)
-*         EDI system is initialised?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			EDI1_ALTLEN
       EXTERNAL			EDI1_CREAT
       EXTERNAL			EDI1_LUPDT
@@ -108,7 +106,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If not already initialised
-      IF ( .NOT. EDI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( EDI__PKG ) ) THEN
 
 *    Requires the data models package
         CALL ADI_REQPKG( 'dsmodels', STATUS )
@@ -137,7 +135,7 @@
      :                               EDI2_UNMAP, DID, STATUS )
 
 *    Mark as initialised
-        EDI_INIT = .TRUE.
+        CALL AST_SPKGI( EDI__PKG )
 
       END IF
 
