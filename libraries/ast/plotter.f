@@ -136,7 +136,7 @@
             CALL PGWNAD( 0.0, 1.0, 0.0, 1.0 )
 
 *
-* Create the Plot. The pixel coordinates box (0,0) to (NAXIS1,NAXIS2) is 
+* Create the Plot. The pixel coordinates box is 
 * mapped onto a window which is 10% smaller than the full PGPLOT window. 
 * This gives some space for things like tick marks with negative length 
 * (which stick outside the pixel cooridnates box).
@@ -151,7 +151,7 @@
             GBOX(2) = GBOX(2) + 0.05*RANGE
             GBOX(4) = GBOX(4) - 0.05*RANGE
 
-            ASP = REAL( NAXIS2 )/REAL( NAXIS1 )
+            ASP = REAL( PBOX(4) )/REAL( PBOX(1) )
             IF( ASP .GT. 1.0 ) THEN
                DELTA = ( ASP - 1.0 )*( GBOX(3) - GBOX(1) )/( 2.0*ASP )
                GBOX(3) = GBOX(3) - DELTA
