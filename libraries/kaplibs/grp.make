@@ -3,10 +3,14 @@
 EXCLUDE = ctg_test.f lpg_test.f
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = kaplibs_source ira_source
+TAR_FILES_A = kaplibs_source ira_source aif_source
 
 # The contents of the ira_source.tar file:
 KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err
+
+# The contents of the aif_source.tar file:
+AIF_SOURCE = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
+aif_ptfnm.f aif_temp.f
 
 # The contents of the ira_source.tar file:
 IRA_SOURCE = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
@@ -28,11 +32,13 @@ UNIX_OTHERS = makefile mk sun238.tex kaplibs.news KAPLIBS_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) 
+UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) \
+$(AIF_SOURCE)
 
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
-kaplibs.news ira_source.tar ctg_source.tar lpg_source.tar KAPLIBS_CONDITIONS
+kaplibs.news ira_source.tar aif_source.tar ctg_source.tar lpg_source.tar \
+KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.
 $(action)

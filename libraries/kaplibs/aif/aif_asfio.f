@@ -2,9 +2,14 @@
 
       SUBROUTINE AIF_ASFIO ( PNFILE, ACMODE, FORM, RECSZ, FD, OPEN,
      :                       STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     AIF_ANTMP
+
+*  Purpose:
+*     Opens a sequential file via a parameter
+
+*  Description :
 *     This routine opens a sequential file via FIO_ASSOC.  Up to four
 *     attempts may be made to open the file.  If a null response is
 *     supplied the file is not opened, and the flag returned indicates

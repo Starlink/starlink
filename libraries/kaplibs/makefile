@@ -424,7 +424,7 @@ LIB_VERS = 1.1
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-ira_source.tar ctg_source.tar lpg_source.tar
+ira_source.tar aif_source.tar ctg_source.tar lpg_source.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -472,6 +472,10 @@ EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines, which are treated separately).
 
+AIF_F_ROUTINES = \
+aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
+aif_ptfnm.f aif_temp.f 
+
 IRA_F_ROUTINES = \
 ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
 ira1_asset.f ira1_check.f ira1_chprj.f ira1_chscs.f ira1_decod.f \
@@ -493,7 +497,8 @@ LPG_F_ROUTINES = lpg_again.f lpg_catcreat.f lpg_prop.f lpg_test.f lpg1_ptpar.f \
 lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
 lpg_state.f
 
-F_ROUTINES = $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) $(LPG_F_ROUTINES)
+F_ROUTINES = $(AIF_F_ROUTINES) $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) \
+             $(LPG_F_ROUTINES)
 
 #  List of Fortran BLOCK DATA routines.
 
@@ -607,6 +612,11 @@ $(LPG_PRIVATE_INCLUDES) $(LPG_F_ROUTINES) $(LPG_C_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in lpg_source.tar; exit 1; fi
 
+$(AIF_F_ROUTINES):
+	$(TAR_OUT) aif_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in aif_source.tar; exit 1; fi
+
 $(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
@@ -628,6 +638,8 @@ $(PLATFORM_F) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
+AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
+
 IRA_OBJECT_FILES = $(IRA_BLOCK_DATA:.f=.o) $(IRA_F_ROUTINES:.f=.o) \
                   $(IRA_PLATFORM_F:.f=.o) $(IRA_C_ROUTINES:.c=.o)
 
@@ -637,7 +649,8 @@ CTG_OBJECT_FILES = $(CTG_F_ROUTINES:.f=.o) \
 LPG_OBJECT_FILES = $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
 
-OBJECT_FILES = $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) $(LPG_OBJECT_FILES)
+OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
+               $(LPG_OBJECT_FILES)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -647,7 +660,11 @@ OBJECT_FILES = $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) $(LPG_OBJECT_FILES)
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libira.a libctg.a liblpg.a
+OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a
+
+libaif.a: $(AIF_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
 
 libira.a: $(IRA_OBJECT_FILES)
 	$(AR_IN) $@ $?
@@ -1322,6 +1339,13 @@ unbuild: clean
 #  files).  These are normally generated automatically from the source
 #  files.
 
+aif_antmp.o:	 SAE_PAR DAT_PAR
+aif_asfio.o:	 SAE_PAR PAR_ERR
+aif_flnam.o:	 SAE_PAR
+aif_getvm.o:	 SAE_PAR DAT_PAR
+aif_opfio.o:	 SAE_PAR PAR_ERR
+aif_ptfnm.o:	 SAE_PAR
+aif_temp.o:	 SAE_PAR DAT_PAR
 ctg1_appen.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
 ctg1_asexp.o:	 SAE_PAR CTG_CONST CTG_ERR GRP_PAR
 ctg1_catch.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
