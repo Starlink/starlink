@@ -535,7 +535,7 @@ fts1_scofb.f fts1_sctab.f fts1_sdscf.f fts1_skip.f fts1_tread.f \
 fts1_ukeyc.f fts1_ukeyd.f fts1_ukeyi.f fts1_ukeyl.f fts1_ukeyr.f \
 fts1_vhead.f fts1_wcsax.f fts1_wcsdf.f fts1_wcsim.f fts1_wcsut.f \
 fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
-fts1_chvai.f fts1_chvaub.f fts1_chvaw.f 
+fts1_chvai.f fts1_chvaub.f fts1_chvaw.f fts1_astwn.f
 
 IRA_F_ROUTINES = \
 ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
@@ -2551,6 +2551,7 @@ fitstext.o:	 SAE_PAR DAT_PAR FIO_ERR
 fitsurface.o:	 SAE_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR
 flip.o:	         SAE_PAR NDF_PAR
 fourier.o:	 SAE_PAR PAR_PAR PAR_ERR NDF_PAR NDF_ERR PRM_PAR MSG_PAR
+fts1_astwn.o:	 SAE_PAR AST_PAR 
 fts1_axis.o:	 SAE_PAR DAT_PAR PRM_PAR
 fts1_chvai.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 fts1_chvaub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT

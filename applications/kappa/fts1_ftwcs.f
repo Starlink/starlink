@@ -83,6 +83,9 @@
 *     9-DEC-1998 (DSB):
 *        Included FITS-IRAF encoding. Do not flush errors reported within
 *        this routine. The caller now has responsibility for this.
+*     16-DEC-1999 (DSB):
+*        Added call to FTS1_ASTWN to report warning messages stored in the
+*        FitsChan by AST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -197,6 +200,9 @@
 
 *  Now import any WCS information from the FitsChan into the NDF.
       CALL FTS1_WCSIM( FC, INDF, NENCOD, ENCODS, STATUS )
+
+*  Report any warnings stored in the FitsChan by AST.
+      CALL FTS1_ASTWN( FC, INDF, STATUS )
 
 *  Jump to here if an error occurs. 
   999 CONTINUE

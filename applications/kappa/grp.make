@@ -32,7 +32,7 @@ aif_ptfnm.f aif_temp.f
 
 # The contents of the fts_sub.tar file:
 FTS_SUB = fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \
-fts1_dread.f fts1_dtype.f fts1_edfex.f fts1_edkey.f fts1_evkey.f \
+fts1_astwn.f fts1_dread.f fts1_dtype.f fts1_edfex.f fts1_edkey.f fts1_evkey.f \
 fts1_frmt.f fts1_gkeyc.f fts1_gkeyd.f fts1_gkeyi.f fts1_gkeyl.f \
 fts1_gkeyr.f fts1_gparm.f fts1_hdlog.f fts1_i2vxd.f fts1_i2vxr.f \
 fts1_inkey.f fts1_iskey.f fts1_lokey.f fts1_mandh.f fts1_ndf.f \
