@@ -62,7 +62,7 @@
 	CALL ERR_ANNUL( STATUS )
 	GOTO 99
       END IF
-      CALL BDI_GETSHP( FID, 2, DIMS, NDIM, STATUS )
+      CALL BDI_GETSHP( FID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( NDIM .NE. 2 ) GOTO 99
 
 *  Look for spectral axis
