@@ -77,7 +77,6 @@
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
-      BYTE             BTEMP           !scratch BYTE
       REAL             CENTRE_DU3      ! dU3 Nasmyth coordinate of point on
                                        ! focal plane that defines telescope axis
       REAL             CENTRE_DU4      ! dU4 Nasmyth coordinate of point on
@@ -96,8 +95,6 @@
       DOUBLE PRECISION DTEMP1          ! scratch double
       INTEGER          DUMMY_VARIANCE_PTR(MAX_FILE) ! Pointer to dummy variance
       INTEGER          DUMMY_ENDVAR_PTR(MAX_FILE) ! Pointer to end of dummy var
-      INTEGER          DUMMY_QUALITY_PTR(MAX_FILE)  ! Pointer to dummy quality
-      INTEGER          DUMMY_ENDQUAL_PTR(MAX_FILE) ! Pointer to end of quality
       INTEGER          EXPOSURE        ! exposure index in DO loop
       INTEGER          EXP_END         ! end index of data for an exposure
       DOUBLE PRECISION EXP_LST         ! sidereal time at which exposure
@@ -112,7 +109,6 @@
                                        ! names of input files read
       INTEGER          FILE_DATA_PTR   ! pointer to main data array in input
                                        ! file
-      INTEGER          FILE_QUALITY_PTR! pointer to quality array in input file
       INTEGER          FILE_VARIANCE_PTR
                                        ! pointer to variance array in input file
       CHARACTER*80     FITS (SCUBA__MAX_FITS) 
@@ -130,9 +126,6 @@
       INTEGER          IM              ! month in which observation started
       INTEGER          IMIN            ! minute at which observation started
       INTEGER          INTEGRATION     ! integration index in DO loop
-      INTEGER          INT_QUALITY (SCUBA__MAX_INT)
-                                       ! array specifying which integrations
-                                       ! from an input file are to be used
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       INTEGER          IN_DATA_END (MAX_FILE)
@@ -170,12 +163,6 @@
                                        ! was at IN_LAT2,IN_LONG2 for PLANET
                                        ! centre coordinate system
       INTEGER          IN_NDF          ! NDF index of input file
-      INTEGER          IN_QUALITY_END (MAX_FILE)
-                                       ! pointer to end of scratch space
-                                       ! holding quality from input files
-      INTEGER          IN_QUALITY_PTR (MAX_FILE)
-                                       ! pointer to scratch space holding
-                                       ! data quality from input files
       DOUBLE PRECISION IN_RA_CEN       ! apparent RA of input file map centre
                                        ! (radians)
       INTEGER          IN_RA_STRT_ARY  ! array identifier to .SCUCD.RA_STRT
@@ -338,7 +325,6 @@
 
       DO I = 1, MAX_FILE
          DUMMY_VARIANCE_PTR(I) = 0
-         DUMMY_QUALITY_PTR(I) = 0
       END DO
 
 *  start up the NDF system and read in the input demodulated files
@@ -379,6 +365,9 @@
          END IF
 
          IF (READING) THEN
+
+* Make sure automatic BAD value processing is performed
+            CALL NDF_SQMF(.TRUE., IN_NDF, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -731,31 +720,8 @@
                CALL SCULIB_VFILLR(ITEMP, RTEMP,
      :              %VAL(DUMMY_VARIANCE_PTR(FILE)))
                FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR(FILE)
-            END IF
+            END IF               
  
-               
-           CALL NDF_STATE(IN_NDF, 'QUALITY', STATE, STATUS)
-
-            IF (STATE) THEN
-                CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ',
-     :              FILE_QUALITY_PTR, ITEMP, STATUS)
-
-            ELSE
-               CALL MSG_OUT(' ','WARNING! REDS_BESSEL_REBIN: '//
-     :              'Quality array is missing. Unflagging all data',
-     :              STATUS)
-               CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBUB,
-     :              DUMMY_QUALITY_PTR(FILE), DUMMY_ENDQUAL_PTR(FILE),
-     :              STATUS)
-               ITEMP = DIM(1) * DIM(2)
-               BTEMP = 0
-               CALL SCULIB_CFILLB(ITEMP, BTEMP,
-     :              %VAL(DUMMY_QUALITY_PTR(FILE)))
-               FILE_QUALITY_PTR = DUMMY_QUALITY_PTR(FILE)
-            END IF
- 
-               
-
             IF (STATUS .EQ. SAI__OK) THEN
                IF ((NDIM .NE. 2)    .OR.
      :             (DIM(1) .LT. 1)  .OR.
@@ -881,23 +847,6 @@
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
 
-*  search for an integration quality array in the REDS extension, if present
-*  copy it in
-
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL DAT_FIND (IN_REDSX_LOC, 'INT_QUALITY', IN_LOC,
-     :           STATUS)
-               IF (STATUS .NE. SAI__OK) THEN
-                  CALL ERR_ANNUL (STATUS)
-                  DO I = 1, N_INTEGRATIONS
-                     INT_QUALITY (I) = 0
-                  END DO
-               ELSE
-                  CALL DAT_GET1I (IN_LOC, N_INTEGRATIONS, INT_QUALITY,
-     :              ITEMP, STATUS)
-                  CALL DAT_ANNUL (IN_LOC, STATUS)
-               END IF
-            END IF
 
 *  get the bolometer description arrays
 
@@ -1250,8 +1199,6 @@
      :        IN_DATA_PTR(FILE), IN_DATA_END(FILE), STATUS)
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBR,
      :        IN_VARIANCE_PTR(FILE), IN_VARIANCE_END(FILE), STATUS)
-            CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBUB,
-     :        IN_QUALITY_PTR(FILE), IN_QUALITY_END(FILE), STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
                CALL SCULIB_COPYR (N_POS(FILE) * N_BOL(FILE), 
@@ -1260,9 +1207,6 @@
                CALL SCULIB_COPYR (N_POS(FILE) * N_BOL(FILE),
      :           %val(FILE_VARIANCE_PTR),
      :           %val(IN_VARIANCE_PTR(FILE)))
-               CALL SCULIB_COPYB (N_POS(FILE) * N_BOL(FILE),
-     :           %val(FILE_QUALITY_PTR),
-     :           %val(IN_QUALITY_PTR(FILE)))
             END IF
 
 *  calculate position of each bolometer at each measurement
@@ -1388,15 +1332,6 @@
      :                          %val(BOL_DEC_PTR(FILE) +
      :                          DATA_OFFSET * VAL__NBD),
      :                          IN_UT1, MJD_STANDARD, STATUS)
-                           END IF
-
-*  if the INT_QUALITY array signifies that data for this integration is to
-*  be ignored then set the data quality bad
-
-                           IF (INT_QUALITY(INTEGRATION) .NE. 0) THEN
-                              CALL SCULIB_CFILLB (N_BOL(FILE), 1,
-     :                          %val(IN_QUALITY_PTR(FILE) +
-     :                          DATA_OFFSET * VAL__NBUB))
                            END IF
 
                         END DO
@@ -1634,6 +1569,7 @@
       UBND (1) = NX_OUT
       UBND (2) = NY_OUT
       CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, OUT_NDF, STATUS)
+      CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
 
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE/ZERO', 
      :  OUT_DATA_PTR, ITEMP, STATUS)
@@ -1687,7 +1623,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
             CALL SCULIB_BESSEL_REGRID_2 (%val(IN_DATA_PTR(I)),
-     :        %val(IN_VARIANCE_PTR(I)), %val(IN_QUALITY_PTR(I)),
+     :        %val(IN_VARIANCE_PTR(I)),
      :        WEIGHT(I), %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)),
      :        N_BOL(I) * N_POS(I), OUT_PIXEL, NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR),
@@ -1811,8 +1747,6 @@
      :        IN_DATA_END(I), STATUS)
          CALL SCULIB_FREE ('IN_VARIANCE', IN_VARIANCE_PTR(I),
      :        IN_VARIANCE_END(I), STATUS)
-         CALL SCULIB_FREE ('IN_QUALITY', IN_QUALITY_PTR(I),
-     :        IN_QUALITY_END(I), STATUS)
          CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR(I),
      :        BOL_RA_END(I), STATUS)
          CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR(I),
@@ -1820,8 +1754,6 @@
 
          CALL SCULIB_FREE ('DUMMY_VAR', DUMMY_VARIANCE_PTR(I),
      :        DUMMY_ENDVAR_PTR(I), STATUS)
-         CALL SCULIB_FREE ('DUMMY_QUAL', DUMMY_QUALITY_PTR(I),
-     :        DUMMY_ENDQUAL_PTR(I), STATUS)
 
 
       END DO
