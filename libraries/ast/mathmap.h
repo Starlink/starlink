@@ -19,15 +19,9 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The MathMap class implements Mappings that perform permutation
-*     of the order of coordinate values, possibly also accompanied by
-*     changes in the number of coordinates (between input and output).
-*
-*     In addition to permuting the coordinate order, coordinates may
-*     also be assigned constant values which are unrelated to other
-*     coordinate values.  This facility is useful when the number of
-*     coordinates is being increased, as it allows fixed values to be
-*     assigned to the new coordinates.
+*     The MathMap class implements Mappings that are specified symbolically
+*     by a series of arithmetic expressions that relate output variables
+*     to input variables (and vice versa).
 
 *  Inheritance:
 *     The MathMap class inherits from the Mapping class.
@@ -36,18 +30,63 @@
 *     None.
 
 *  New Attributes Defined:
-*     None.
+*     Seed
+*        Random number seed.
+*     SimpFI
+*        Forward-inverse MathMap pairs simplify?
+*     SimpIF
+*        Inverse-forward MathMap pairs simplify?
 
 *  Methods Over-Ridden:
 *     Public:
 *        None.
 *
 *     Protected:
+*        astClearAttrib
+*           Clear an attribute value for a Frame.
+*        astGetAttrib
+*           Get an attribute value for a Frame.
+*        astMapMerge
+*           Simplify a sequence of Mappings containing a MathMap.
+*        astSetAttrib
+*           Set an attribute value for a Frame.
+*        astTestAttrib
+*           Test if an attribute value has been set for a Frame.
 *        astTransform
 *           Transform a set of points.
 
 *  New Methods Defined:
-*     None.
+*     Public:
+*        None.
+*
+*     Protected:
+*        astClearSeed
+*           Clear the Seed attribute for a MathMap.
+*        astClearSimpFI
+*           Clear the SimpFI attribute for a MathMap.
+*        astClearSimpIF
+*           Clear the SimpIF attribute for a MathMap.
+*        astGetSeed
+*           Get the value of the Seed attribute for a MathMap.
+*        astGetSimpFI
+*           Get the value of the SimpFI attribute for a MathMap.
+*        astGetSimpIF
+*           Get the value of the SimpIF attribute for a MathMap.
+*        astSetSeed
+*           Set the value of the Seed attribute for a MathMap.
+*        astSetSimpFI
+*           Set the value of the SimpFI attribute for a MathMap.
+*        astSetSimpIF
+*           Set the value of the SimpIF attribute for a MathMap.
+*        astTestSeed
+*           Test whether a value has been set for the Seed attribute of a
+*           MathMap.
+*        astTestSimpFI
+*           Test whether a value has been set for the SimpFI attribute of a
+*           MathMap.
+*        astTestSimpIF
+*           Test whether a value has been set for the SimpIF attribute of a
+*           MathMap.
 
 *  Other Class Functions:
 *     Public:
@@ -91,10 +130,8 @@
 *     RFWS: R.F. Warren-Smith (Starlink)
 
 *  History:
-*     29-FEB-1996 (RFWS):
+*     3-SEP-1999 (RFWS):
 *        Original version.
-*     26-SEP-1996 (RFWS):
-*        Added external interface and I/O facilities.
 *-
 */
 
@@ -105,8 +142,8 @@
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 
 #if defined(astCLASS)            /* Protected */
-#include "pointset.h"            /* Sets of points/coordinates */
 #include "channel.h"             /* I/O channels */
+#include "pointset.h"            /* Sets of points/coordinates */
 #endif
 
 /* C header files. */
@@ -115,8 +152,32 @@
 #include <stddef.h>
 #endif
 
+/* Macros. */
+/* ======= */
+/* This value defines the size of an internal table in the AstMathMap
+   data type. Since it will be publicly accessible (but of no external
+   use), we give it an obscure name. */
+#define AST_MATHMAP_RAND_CONTEXT_NTAB_ (32)
+
 /* Type Definitions. */
 /* ================= */
+/* Random number generator context. */
+/* -------------------------------- */
+/* This structure holds the context for the random number generator
+   used by each MathMap. This ensures that the random number sequences
+   used by different MathMaps are independent, and can be independently
+   controlled by setting/clearing their Seed attributes. Random numbers
+   are produced by combining the output of two internal generators. */
+typedef struct AstMathMapRandContext_ {
+   long int rand1;               /* State of first internal generator */
+   long int rand2;               /* State of second internal generator */
+   long int random_int;          /* Last random integer produced */
+   long int table[ AST_MATHMAP_RAND_CONTEXT_NTAB_ ]; /* Shuffle table */
+   int active;                   /* Generator has been initialised? */
+   int seed;                     /* Seed to be used during initialisation */
+   int seed_set;                 /* Seed value set via "Seed" attribute? */
+} AstMathMapRandContext_;
+
 /* MathMap structure. */
 /* ------------------ */
 /* This structure contains all information that is unique to each
@@ -127,18 +188,19 @@ typedef struct AstMathMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   char **fwdfun;
-   char **invfun;
-   int **fwdcode;
-   int **invcode;
-   double **fwdcon;
-   double **invcon;
-   int fwdstack;
-   int invstack;
-   int nfwd;
-   int ninv;
-   int simp_fi;
-   int simp_if;
+   AstMathMapRandContext_ rcontext; /* Random number generator context */
+   char **fwdfun;                /* Array of forward functions */
+   char **invfun;                /* Array of inverse functions */
+   double **fwdcon;              /* Array of constants for forward functions */
+   double **invcon;              /* Array of constants for inverse functions */
+   int **fwdcode;                /* Array of opcodes for forward functions */
+   int **invcode;                /* Array of opcodes for inverse functions */
+   int fwdstack;                 /* Stack size required by forward functions */
+   int invstack;                 /* Stack size required by inverse functions */
+   int nfwd;                     /* Number of forward functiins */
+   int ninv;                     /* Number of inverse functions */
+   int simp_fi;                  /* Forward-inverse MathMap pairs simplify? */
+   int simp_if;                  /* Inverse-forward MathMap pairs simplify? */
 } AstMathMap;
 
 /* Virtual function table. */
@@ -155,12 +217,16 @@ typedef struct AstMathMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   int (* GetSeed)( AstMathMap * );
    int (* GetSimpFI)( AstMathMap * );
    int (* GetSimpIF)( AstMathMap * );
+   int (* TestSeed)( AstMathMap * );
    int (* TestSimpFI)( AstMathMap * );
    int (* TestSimpIF)( AstMathMap * );
+   void (* ClearSeed)( AstMathMap * );
    void (* ClearSimpFI)( AstMathMap * );
    void (* ClearSimpIF)( AstMathMap * );
+   void (* SetSeed)( AstMathMap *, int );
    void (* SetSimpFI)( AstMathMap *, int );
    void (* SetSimpIF)( AstMathMap *, int );
 } AstMathMapVtab;
@@ -175,10 +241,10 @@ astPROTO_ISA(MathMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstMathMap *astMathMap_( int, int, const char *[], const char *[],
+AstMathMap *astMathMap_( int, int, int, const char *[], int, const char *[],
                          const char *, ... );
 #else
-AstMathMap *astMathMapId_( int, int, const char *[], const char *[],
+AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[],
                            const char *options, ... );
 #endif
 
@@ -187,7 +253,7 @@ AstMathMap *astMathMapId_( int, int, const char *[], const char *[],
 /* Initialiser. */
 AstMathMap *astInitMathMap_( void *, size_t, int, AstMathMapVtab *,
                              const char *, int, int,
-                             const char *[], const char *[] );
+                             int, const char *[], int, const char *[] );
 
 /* Loader. */
 AstMathMap *astLoadMathMap_( void *, size_t, int, AstMathMapVtab *,
@@ -197,12 +263,16 @@ AstMathMap *astLoadMathMap_( void *, size_t, int, AstMathMapVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(astCLASS)            /* Protected */
+int astGetSeed_( AstMathMap * );
 int astGetSimpFI_( AstMathMap * );
 int astGetSimpIF_( AstMathMap * );
+int astTestSeed_( AstMathMap * );
 int astTestSimpFI_( AstMathMap * );
 int astTestSimpIF_( AstMathMap * );
+void astClearSeed_( AstMathMap * );
 void astClearSimpFI_( AstMathMap * );
 void astClearSimpIF_( AstMathMap * );
+void astSetSeed_( AstMathMap *, int );
 void astSetSimpFI_( AstMathMap *, int );
 void astSetSimpIF_( AstMathMap *, int );
 #endif
@@ -236,8 +306,8 @@ void astSetSimpIF_( AstMathMap *, int );
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-#define astInitMathMap(mem,size,init,vtab,name,nin,nout,fwd,inv) \
-astINVOKE(O,astInitMathMap_(mem,size,init,vtab,name,nin,nout,fwd,inv))
+#define astInitMathMap(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv) \
+astINVOKE(O,astInitMathMap_(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv))
 
 /* Loader. */
 #define astLoadMathMap(mem,size,init,vtab,name,channel) \
@@ -250,18 +320,26 @@ astINVOKE(O,astLoadMathMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
    before use. This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 #if defined(astCLASS)            /* Protected */
+#define astClearSeed(this) \
+astINVOKE(V,astClearSeed_(astCheckMathMap(this)))
 #define astClearSimpFI(this) \
 astINVOKE(V,astClearSimpFI_(astCheckMathMap(this)))
 #define astClearSimpIF(this) \
 astINVOKE(V,astClearSimpIF_(astCheckMathMap(this)))
+#define astGetSeed(this) \
+astINVOKE(V,astGetSeed_(astCheckMathMap(this)))
 #define astGetSimpFI(this) \
 astINVOKE(V,astGetSimpFI_(astCheckMathMap(this)))
 #define astGetSimpIF(this) \
 astINVOKE(V,astGetSimpIF_(astCheckMathMap(this)))
+#define astSetSeed(this,value) \
+astINVOKE(V,astSetSeed_(astCheckMathMap(this),value))
 #define astSetSimpFI(this,value) \
 astINVOKE(V,astSetSimpFI_(astCheckMathMap(this),value))
 #define astSetSimpIF(this,value) \
 astINVOKE(V,astSetSimpIF_(astCheckMathMap(this),value))
+#define astTestSeed(this) \
+astINVOKE(V,astTestSeed_(astCheckMathMap(this)))
 #define astTestSimpFI(this) \
 astINVOKE(V,astTestSimpFI_(astCheckMathMap(this)))
 #define astTestSimpIF(this) \
