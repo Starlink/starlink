@@ -4,7 +4,7 @@
 *     LOOK
 
 *  Purpose:
-*     List pixel values in an NDF.
+*     List pixel values in a 2-dimensional NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,12 +16,12 @@
 *     CALL LOOK( STATUS )
 
 *  Description:
-*     This application lists pixel values within a rectangular region of
+*     This application lists pixel values within a region of
 *     a 2D NDF. The listing may be displayed on the screen and logged in
-*     a text file (see parameters QUIET and LOGFILE). The rectangular region 
-*     to be listed can be specified either by giving its centre and size 
-*     (see parameters CENTRE and SIZE), or its corners (see parameters LBOUND 
-*     and UBOUND). The top-right pixel value is also written to an output 
+*     a text file (see parameters QUIET and LOGFILE). The region 
+*     to be listed can be specified either by giving its centre and size or
+*     its corners, or by giving an ARD description for the region (see
+*     parameter MODE). The top-right pixel value is also written to an output 
 *     parameter (VALUE). The listing may be produced in several different
 *     formats (see parameter FORMAT), and the format of each individual
 *     displayed data value can be controlled using parameter STYLE.
@@ -39,18 +39,18 @@
 *        sign, in which case further prompts for ARDDESC are made until
 *        a value is supplied which does not end with a minus sign. All
 *        the supplied values are then concatenated together (after removal 
-*        of the trailing minus signs).
+*        of the trailing minus signs). Only acessed if MODE is "ARD".
 *     ARDFILE = FILENAME (Read)
 *        The name of an existing text file containing an ARD description
-*        for the parts of the image to be listed. 
+*        for the parts of the image to be listed. Only acessed if MODE is 
+*        "ARDFile".
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the data pixel at the centre of the area to
 *        be displayed, in the current co-ordinate Frame of the NDF (supplying 
 *        a colon ":" will display details of the current co-ordinate Frame). 
 *        The position should be supplied as a list of formatted axis values 
-*        separated by spaces or commas. See also parameter USEAXIS.  A
-*        null (!) value causes the displayed area to be determined using
-*        parameters LBOUND and UBOUND.
+*        separated by spaces or commas. See also parameter USEAXIS. Only 
+*        acessed if MODE is "Centre".
 *     COMP = LITERAL (Read)
 *        The NDF array component to be displayed.  It may be "Data",
 *        "Quality", "Variance", or "Error" (where "Error" is an
@@ -95,8 +95,7 @@
 *        co-ordinate Frame). The position should be supplied as a list of 
 *        formatted axis values separated by spaces or commas. See also 
 *        parameter USEAXIS.  A null (!) value causes the bottom-left corner
-*        of the supplied NDF to be used. The value is ignored unless a null 
-*        value is supplied for parameter CENTRE or SIZE.
+*        of the supplied NDF to be used. Only acessed if MODE is "Bounds".
 *     LOGFILE = FILENAME (Write)
 *        The name of the text file in which the textual output may be stored. 
 *        See MAXLEN. A null string (!) means that no file is created.  [!]
@@ -130,9 +129,8 @@
 *     SIZE( 2 ) = _INTEGER (Read)
 *        The dimensions of the rectangular area to be displayed, in pixels.
 *        If a single value is given, it is used for both axes. The area
-*        is centred on the position specified by parameter CENTRE. A null 
-*        (!) value for SIZE causes the displayed area to be determined using 
-*        parameters LBOUND and UBOUND. [7]
+*        is centred on the position specified by parameter CENTRE. 
+*        Only acessed if MODE is "Centre". [7]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the format to use 
 *        for individual data values.
@@ -166,8 +164,7 @@
 *        co-ordinate Frame). The position should be supplied as a list of 
 *        formatted axis values separated by spaces or commas. See also 
 *        parameter USEAXIS.  A null (!) value causes the top right corner
-*        of the supplied NDF to be used. The value is ignored unless a null 
-*        value is supplied for parameter CENTRE or SIZE.
+*        of the supplied NDF to be used. Only acessed if MODE is "Bounds".
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of the 
 *        NDF has more than 2 axes. A group of two strings should be
@@ -181,7 +178,7 @@
 *        are used. [!]
 *     VALUE = _DOUBLE (Write)
 *        An output parameter to which is written the data value at the 
-*        top-right pixel in the displayed region.
+*        top-right pixel in the displayed rectangle.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -193,32 +190,38 @@
 *        -22:41:12 (this assumes that the current co-ordinate Frame in
 *        the NDF is an RA/DEC Frame). The listing is written to the text 
 *        file "log" but is not displayed on the screen.
-*     look ngc6872 centre=\! lbound="189 207" ubound="203 241" values.dat 
-*        Lists the pixel values in an NDF called ngc6872, within a
-*        rectangular region from pixel (189,207) to (203,241) (this
+*     look m57 mode=bo lbound="18 20" ubound="203 241"
+*        Lists the pixel values in an NDF called m57, within a
+*        rectangular region from pixel (18,20) to (203,241) (this
 *        assumes that the current co-ordinate Frame in the NDF is pixel
-*        co-ordinates). The listing is displayed on the screen and written 
-*        to the text file "values.dat".
-*     look ngc6872 centre="10 11" size=1 quiet 
+*        co-ordinates). The listing is displayed on the screen only.
+*     look ngc6872 "10 11" 1 quiet 
 *        Stores the value of pixel (10,11) in output parameter VALUE, but
 *        does not display it on the screen or store it in a log file. This
 *        assumes that the current co-ordinate Frame in the NDF is pixel
 *        co-ordinates. 
+*     look ngc6872 mode=ard arddesc="circle(1:27:23,-22:41:12,0:0:10)"
+*        Lists the pixel values within a circle of radius 10 ard-seconds,
+*        centred on RA=1:27:23 DEC=-22:41:12. This assumes that the 
+*        current co-ordinate Frame in the NDF is an RA/DEC Frame.
+*     look ngc6872 mode=ardfile ardfile=central.ard
+*        Lists the pixel values specified by the ARD description stored
+*        in the text file "central.dat".
 
 *  Notes:
 *     -  The co-ordinate system in which positions are given within ARD
-*        descriptions should be indicated by including suitable
-*        COFRAME or WCS statements within the description (see SUN/183).
-*        For instance, starting the description with the text
-*        "COFRAME(PIXEL)" will indicate that positions are specified in
-*        pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
-*        indicate that positions are specified in RA/DEC (FK5,J2000). If
-*        no such statements are included, then it is assumed that
-*        positions are given within the current co-ordinate system of the
-*        input NDF.
+*     descriptions can be indicated by including suitable
+*     COFRAME or WCS statements within the description (see SUN/183).
+*     For instance, starting the description with the text
+*     "COFRAME(PIXEL)" will indicate that positions are specified in
+*     pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
+*     indicate that positions are specified in RA/DEC (FK5,J2000). If
+*     no such statements are included, then it is assumed that
+*     positions are given within the current co-ordinate system of the
+*     input NDF.
 
 *  Related Applications:
-*     KAPPA: TRANDAT.
+*     KAPPA: TRANDAT, ARDGEN, ARDMASK, ARDPLOT.
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, QUALITY and 
