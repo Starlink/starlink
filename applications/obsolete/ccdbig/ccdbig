@@ -69,7 +69,7 @@
       # Do we want to normalize the frames for scale and zero factors?
             set normalise = TRUE
 
-      # Data type (_REAL, _WORD, _DOUBLE are sensible)
+      # Data type (_WORD, _INTEGER, _REAL or _DOUBLE)
             set datatype = _REAL
 
       # List of image sizes for frames (pixels along a side)
@@ -292,23 +292,6 @@
                bias=$biasframe \
      	       accept
 #           end ccdbgen
-
-#  Change the data type if required.
-#    Find out the current data type.
-            ndftrace data1 quiet
-            set type = `parget type ndftrace`
-
-#    If it's not what we want then change it for all frames.
-            if ( "$type" != "$datatype" ) then
-               echo " "
-               log_start settype
-               foreach file ( data?.sdf bias?.sdf ff?.sdf )
-                  set ndf = $file:r
-                  echo "  Changing DATA element of NDF $ndf to type $datatype"
-                  settype $ndf $datatype
-               end
-               echo " "
-            endif
 
 #  If display capability is enabled then display one DATA frame.
             if ( "$device" != "NONE" ) then
