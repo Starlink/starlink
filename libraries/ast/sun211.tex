@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {11th November 1999}
+\newcommand{\stardocdate}      {17th December 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -19458,11 +19458,29 @@ Object            - Base class for all AST Objects
          current Frames will be stored.
 
       }
-      When writing a FrameSet using the FITS-IRAF encoding, axis
-      rotations are specified by a matrix of FITS keywords of the form
-      {\tt{"}}CDi\_j{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits. The alternative
-      form {\tt{"}}CDiiijjj{\tt{"}}, which is also in use, is recognised when
-      reading an Object, but is never written.
+      Note that this encoding is provided mainly as an interim measure to
+      provide a more stable alternative to the FITS-WCS encoding until the
+      FITS standard for encoding WCS information is finalised.  The name
+      {\tt{"}}FITS-IRAF{\tt{"}} indicates the general keyword conventions used and does
+      not imply that this encoding will necessarily support all features of
+      the WCS scheme used by IRAF software. Nevertheless, an attempt has
+      been made to support a few such features where they are known to be
+      used by important sources of data.
+
+      When writing a FrameSet using the FITS-IRAF encoding, axis rotations
+      are specified by a matrix of FITS keywords of the form {\tt{"}}CDi\_j{\tt{"}}, where
+      {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits. The alternative form {\tt{"}}CDiiijjj{\tt{"}}, which
+      is also in use, is recognised when reading an Object, but is never
+      written.
+
+      In addition, the experimental IRAF {\tt{"}}ZPX{\tt{"}} sky projection will be
+      accepted when reading, but will never be written (the corresponding
+      FITS {\tt{"}}ZPN{\tt{"}} projection being used instead). However, longitude and
+      latitude correction surfaces used by this {\tt{"}}ZPX{\tt{"}} projection (appearing
+      as {\tt{"}}lngcor{\tt{"}} or {\tt{"}}latcor{\tt{"}} terms in the IRAF-specific {\tt{"}}WAT{\tt{"}} keywords) are
+      not supported. If these are encountered while reading from a FitsChan,
+      they are ignored and a warning message is added to the contents of the
+      FitsChan as a set of cards using the keyword {\tt{"}}ASTWARN{\tt{"}}.
 
       You should not normally attempt to mix the FITS-IRAF and
       FITS-WCS encodings within the same FitsChan, since there is a
@@ -24458,6 +24476,29 @@ suppressed on one axis only by setting the length to zero.
 plotting of numerical labels on coordinate axes, no longer has any
 effect on whether labelling of a coordinate grid is interior or
 exterior (as controlled by the \htmlref{Labelling}{Labelling} attribute).
+
+\item The \htmlref{FitsChan}{FitsChan} class now provides some support for the
+IRAF-specific ``ZPX'' sky projection, which is converted transparently
+into the equivalent FITS ``ZPN'' projection (see the description of the
+\htmlref{Encoding}{Encoding} attribute for details).
+
+\item The FitsChan class now recognises the coordinate system ``ICRS''
+(International Celestial Reference \htmlref{System}{System}) as equivalent to
+``FK5''. This is an interim measure and full support for the
+(exceedingly small) difference between ICRS and FK5 will be added at a
+future release.
+
+Note that ``ICRS'' is not yet recognised as a coordinate system by other
+classes such as \htmlref{SkyFrame}{SkyFrame}, so this change only facilitates the
+importation of foreign data.
+
+\item A bug in the FitsChan class has been fixed which could result in
+longitude values being incorrect by 180 degrees when using cylindrical
+sky projections, such as the FITS ``CAR'' projection.
+
+\item A bug in the FitsChan class has been fixed which could result in
+the FITS sky projection parameters ProjP(0) to ProjP(9) being
+incorrectly named PROJP1 to PROJP10 when written out as FITS cards.
 
 \item Some minor memory leaks have been fixed.
 
