@@ -272,6 +272,17 @@ astEnd()
     astEnd;
   )
 
+# No need to make this private but we need to make sure
+# this is called from within a mutex (so a callback is okay)
+# Call is as _OK. but without changing the current status integer
+
+bool
+ast_OK()
+ CODE:
+   RETVAL = astVersion;
+ OUTPUT:
+  RETVAL
+
 int
 astVersion()
  CODE:
