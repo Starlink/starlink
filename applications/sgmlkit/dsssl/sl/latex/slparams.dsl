@@ -121,20 +121,34 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
      there's no newline between `\end' and `{Verbatimlines}'.  Also
      note that putting this inside, for example, {quote} stuffs things
      up, because {quote} is implemented as a trivlist, which plays
-     merry hell with any indents inside {Verbatimlines}. -->
+     merry hell with any indents inside {Verbatimlines}. 
+
+     The Verbatimlines* environment differs by ignoring leading spaces.
+     -->
 <!--
 \\def\\my@centrecr{\\ifhmode\\unskip\\else\\hbox{}\\fi \\vskip-\\parskip}
 -->
 \\def\\my@centrecr{\\ifhmode\\unskip \\vskip-\\parskip\\else\\relax\\fi}
+<!-- \SpaceSpaceSkip skips by \fontdimen2 (interword space) in the
+     current font, which will typically be \verbatim@font
+     -->
+\\def\\SpaceSpaceSkip{\\hskip \\fontdimen2\\font}
+<!-- Reasonable default for active space -->
+{\\obeyspaces\\global\\let =\\space}
+\\def\\Verbatimlines{\\let\\SpaceSkip\\SpaceSpaceSkip\\Verbatim@lines}
+\\@namedef{Verbatimlines*}{\\let\\SpaceSkip\\space\\Verbatim@lines}
+<!-- Careful: no stray spaces or line ends in the following definition -->
 {\\catcode`\\^^M=\\active %
-\\gdef\\Verbatimlines{\\par%
-  \\catcode`\\^^M=\\active \\let^^M\\my@centrecr %
-  \\@rightskip\\@flushglue \\rightskip\\@rightskip %
-  \\leftskip 4em %
-  \\parindent\\z@ %
-  \\verbatim@font %
-  }}
+\\obeyspaces%
+\\gdef\\Verbatim@lines{\\par%
+\\obeyspaces\\let =\\SpaceSkip%
+\\catcode`\\^^M=\\active\\let^^M\\my@centrecr%
+\\@rightskip=\\@flushglue\\rightskip=\\@rightskip%
+\\leftskip=4em%
+\\parindent\\z@%
+\\verbatim@font}}
 \\let\\endVerbatimlines=\\relax
+\\@namedef{endVerbatimlines*}{\\endVerbatimlines}
 <!-- I may make \DTitem more sophisticated about linebreaking -->
 \\def\\DTitem#1{\\item[#1]}
 <!-- Title page. 
@@ -233,6 +247,9 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 \\def\\CharRangle{\\texttt{\\char\"3E}}
 \\def\\CharVbar{\\texttt{\\char\"7C}}
 \\def\\Eqnref#1{Eqn.~(#1)}
+<!-- \TabMod is a dimension used when formatting tables.  
+     See latex/sltables.dsl -->
+\\newdimen\\TabMod
 <!-- Angle formatting macros.  See slmisc.dsl -->
 \\def\\hmsangle#1{#1^{\\rm h}}
 \\def\\hmsminutes#1{\\,#1^{\\rm m}}
