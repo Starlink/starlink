@@ -72,10 +72,10 @@
       CALL USI_GET0L('EDIT',EDIT,STATUS)
 
 *    Get dataset
-      IF (EDIT) THEN
-        CALL USI_TASSOCI('INP', '*', 'UPDATE', FID, STATUS )
+      IF ( EDIT ) THEN
+        CALL USI_ASSOC('INP', 'BinDS|EventDS', 'UPDATE', FID, STATUS )
       ELSE
-        CALL USI_TASSOCI('INP', '*', 'READ', FID, STATUS )
+        CALL USI_ASSOC('INP', 'BinDS|EventDS', 'READ', FID, STATUS )
       ENDIF
 
 *    Get output channel
