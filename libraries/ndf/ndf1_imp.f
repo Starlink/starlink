@@ -39,6 +39,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,14 @@
 *        Changed way in which DCB slot number is retained when the slot
 *        is annulled (use of TEMP variable) to avoid an optimisation bug
 *        that appeared in the OSF1 compiler (new version).
+*     9-FEB-2005 (DSB):
+*        If the data object already has an entry in the DCB, and that
+*        entry is associated with a foreign file, then do not let the new
+*        DCB entry have update access if the original does not. Without
+*        this, the old DCB entry is promoted to UPDATE access, with the
+*        result that an attempt is made to delete the foreign file when
+*        the reference count for the DCB falls to zero. See similar
+*        restriction on access in NDF1_OPFOR.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -229,6 +238,21 @@
             IF ( DUPE ) THEN
                CALL NDF1_DD( IDCB, STATUS )
                CALL NDF1_DD( IDCBT, STATUS )
+
+*  If the existing DCB entry is associated with an existing foreign file,
+*  we want to respect the access available to that foreign file. So
+*  if the new NDF object is open for UPDATE access (either because it
+*  must later be deleted or because it resides in a temporary file
+*  which was previously opened with this access mode) then the DCB
+*  access mode entry will reflect this. If UPDATE access to the
+*  object's contents is not available through the existing DCB entry, then 
+*  modify the new DCB entry, since it will otherwise cause the NDF's 
+*  contents to be written back to the foreign file (with format conversion) 
+*  when it is released.
+               IF( DCB_FOREX( IDCBT ) .AND. 
+     :             DCB_MOD( IDCBT ) .EQ. 'READ' ) THEN
+                  DCB_MOD( IDCB ) = 'READ'
+               END IF
 
 *  If quality or variance array information is available for the
 *  original DCB entry, then ensure that it is also available for the

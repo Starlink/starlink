@@ -56,6 +56,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,11 @@
 *        Removed code to set message tokens explicitly.
 *     17-JUL-2000 (DSB):
 *        Allow for foreign extension specifiers in FORFIL.
+*     11-MAR-2004 (PWD):
+*        Changed EMS_MLOAD call to EMS_EXPND. This removes the
+*        limitation on buffer size.
+*     9-FEB-2005 (DSB):
+*        Modified to use NDF1_CVCMD to get the conversion command.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,17 +99,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
-      INCLUDE 'NDF_FCB'          ! NDF_ Format Conversion Block
-*        FCB_FMT = CHARACTER * ( 2 * NDF__SZFMT ) (Read)
-*           Foreign format list string.
-*        FCB_FMT1( 2 * NDF__MXFMT ) = INTEGER (Read)
-*           Character positions of start of each foreign format name.
-*        FCB_FMT2( 2 * NDF__MXFMT ) = INTEGER (Read)
-*           Character positions of end of each foreign format name.
-
       INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
 *        TCB_SHCVT = LOGICAL (Read)
 *           Whether to display information about data conversion
@@ -126,8 +123,6 @@
       CHARACTER * ( DAT__SZLOC ) TOPLOC ! Top level locator
       CHARACTER * ( NDF__SZCVT ) CMD ! Buffer for raw command text
       CHARACTER * ( NDF__SZCVT ) CVT ! Translated command text
-      INTEGER F1                 ! First format name character position
-      INTEGER F2                 ! Last format name character position
       INTEGER LCMD               ! Length of blank command text
       INTEGER LCVT               ! Length of converted text
       LOGICAL DEF                ! Environment variable defined?
@@ -140,67 +135,16 @@
 *  Ensure that the TCB is initialised.
       CALL NDF1_INTCB( STATUS )
 
-*  Obtain the character positions of the foreign format name in the FCB
-*  format list string.
-      F1 = FCB_FMT1( IFMT )
-      F2 = FCB_FMT2( IFMT )
-
 *  Attempt to translate the appropriate environment variable to obtain
 *  the conversion command.
-      IF ( FROM ) THEN
-         CALL NDF1_GTENV( 'NDF_FROM_' // FCB_FMT( F1 : F2 ), DEF,
-     :                    CMD, LCMD, STATUS )
-      ELSE
-         CALL NDF1_GTENV( 'NDF_TO_' // FCB_FMT( F1 : F2 ), DEF,
-     :                    CMD, LCMD, STATUS )
-      END IF
-
-*  If no command was defined (or it was blank), then we must report an
-*  error.
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         IF ( LCMD .EQ. 0 ) THEN
-
-*  Set STATUS and define the required message tokens.
-            STATUS = NDF__NOCVT
-            CALL MSG_SETC( 'FILE', FORFIL )
-            CALL MSG_SETC( 'FMT', FCB_FMT( F1 : F2 ) )
-            IF ( NDFLOC .EQ. DAT__ROOT ) THEN
-               CALL MSG_SETC( 'NDF', NDFNAM )
-            ELSE
-               CALL DAT_MSG( 'NDF', NDFLOC )
-               IF ( NDFNAM .NE. ' ' ) THEN
-                  CALL MSG_SETC( 'NDF', '.' )
-                  CALL MSG_SETC( 'NDF', NDFNAM )
-               END IF
-            END IF
-
-*  Adapt the error message to the direction of format conversion.
-            IF ( FROM ) THEN
-               CALL ERR_REP( 'NDF1_CVFOR_CMD1',
-     :              'Unable to convert the ^FMT format ' //
-     :              'file ''^FILE'' to NDF format in the object ^NDF.',
-     :              STATUS )
-               CALL MSG_RENEW
-               CALL ERR_REP( 'NDF1_CVFOR_CMD2',
-     :              'The NDF_FROM_^FMT environment variable does ' //
-     :              'not contain a suitable conversion command.',
-     :              STATUS )
-            ELSE
-               CALL ERR_REP( 'NDF1_CVFOR_CMD3',
-     :              'Unable to convert the NDF format object ^NDF ' //
-     :              'to ^FMT format in the file ''^FILE''.',
-     :              STATUS )
-               CALL MSG_RENEW
-               CALL ERR_REP( 'NDF1_CVFOR_CMD4',
-     :              'The NDF_TO_^FMT environment variable does not ' //
-     :              'contain a suitable conversion command.',
-     :              STATUS )
-            END IF
+      CALL NDF1_CVCMD( FORFIL, IFMT, NDFLOC, NDFNAM, FROM, .TRUE., 
+     :                 DEF, CMD, LCMD, STATUS )
 
 *  If a valid conversion command was obtained, and we are converting to
 *  a foreign file format, then export any NDF extension information
 *  before performing the conversion.
-         ELSE
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         IF( LCMD .GT. 0 ) THEN
             IF ( .NOT. FROM ) THEN
                CALL NDF1_XTFOR( FORFIL, IFMT, NDFLOC, NDFNAM, .FALSE.,
      :                          STATUS )
@@ -216,7 +160,7 @@
 *  Substitute these token values into the blank command, returning the
 *  resulting conversion command and its length. Use a low-level (EMS)
 *  routine to ensure the message text supplied is used without change.
-               CALL EMS_MLOAD( ' ', CMD( : LCMD ), CVT, LCVT, STATUS )
+               CALL EMS_EXPND( CMD( : LCMD ), CVT, LCVT, STATUS )
                LCVT = MAX( 1, LCVT )
 
 *  If required, report details of the conversion being performed.

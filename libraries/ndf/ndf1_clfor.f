@@ -69,6 +69,9 @@
 *        Improved error handling.
 *     17-JUL-2000 (DSB):
 *        Allow for foreign extension specifiers in DCB_FORFL.
+*     9-FEB-2005 (DSB):
+*        Check that conversion command exists before deleting the foreign
+*        format file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -135,11 +138,14 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( NDF__SZCVT ) CMD ! Buffer for raw command text
       INTEGER DELFMT             ! Format code for deletion operations
       INTEGER F1                 ! First format name character position
       INTEGER F2                 ! Last format name character position
       INTEGER IFMT               ! FCB foreign format code
+      INTEGER LCMD               ! Length of blank command text
       LOGICAL CVT                ! Convert data format?
+      LOGICAL DEF                ! Environment variable defined?
       LOGICAL DELFOR             ! Delete associated foreign file?
       LOGICAL POST               ! Post-processing required?
       LOGICAL SAVE               ! Save NDF object (else delete it)?
@@ -231,40 +237,51 @@
             CALL ERR_MARK
          END IF
 
-*  If conversion to a foreign file format is required, then first
-*  delete any existing version of the file.
+*  If conversion to a foreign file format is required...
          IF ( CVT ) THEN
-            CALL NDF1_DLFOR( DCB_FORFL( IDCB ), DELFMT, STATUS )
+
+*  Check that a conversion command is available. An error is reported if not.
+            CALL NDF1_CVCMD( DCB_FORFL( IDCB ), IFMT, DCB_LOC( IDCB ), 
+     :                       ' ', .FALSE., .TRUE., DEF, CMD, LCMD, 
+     :                       STATUS )
+
+*  If conversion to a foreign file format is required, and a conversion
+*  command is available, then first delete any existing version of the file.
+            IF( STATUS .EQ. SAI__OK .AND. LCMD .GT. 0 ) THEN
+               CALL NDF1_DLFOR( DCB_FORFL( IDCB ), DELFMT, STATUS )
 
 *  Convert the NDF to the foreign file format.
-            CALL ERR_BEGIN( STATUS )
-            CALL NDF1_CVFOR( DCB_FORFL( IDCB ), IFMT, DCB_LOC( IDCB ),
-     :                       ' ', .FALSE., STATUS )
+               CALL ERR_BEGIN( STATUS )
+               CALL NDF1_CVFOR( DCB_FORFL( IDCB ), IFMT, 
+     :                          DCB_LOC( IDCB ), ' ', .FALSE., 
+     :                          STATUS )
 
 *  If this appears to have succeeded, then check that the foreign file
 *  now exists. If not, then something has gone wrong with the
 *  conversion process, so report an error.
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL NDF1_FILEX( DCB_FORFL( IDCB ), ' ', .FALSE., THERE,
-     :                          STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  IF ( .NOT. THERE ) THEN
-                     STATUS = NDF__CVTER
-                     CALL DAT_MSG( 'NDF', DCB_LOC( IDCB ) )
-                     F1 = FCB_FMT1( IFMT )
-                     F2 = FCB_FMT2( IFMT )
-                     CALL MSG_SETC( 'FMT', FCB_FMT( F1 : F2 ) )
-                     CALL MSG_SETC( 'FOR', DCB_FORFL( IDCB ) )
-                     CALL ERR_REP( 'NDF1_CLFOR_CVT1',
-     :                    'Error converting the NDF object ^NDF to ' //
-     :                    '^FMT format in the file ''^FOR''.', STATUS )
-                     CALL MSG_RENEW
-                     CALL ERR_REP( 'NDF_CLFOR_CVT2',
-     :                    'The ^FMT file was not created.', STATUS )
+                  CALL NDF1_FILEX( DCB_FORFL( IDCB ), ' ', .FALSE., 
+     :                             THERE, STATUS )
+                  IF ( STATUS .EQ. SAI__OK ) THEN
+                     IF ( .NOT. THERE ) THEN
+                        STATUS = NDF__CVTER
+                        CALL DAT_MSG( 'NDF', DCB_LOC( IDCB ) )
+                        F1 = FCB_FMT1( IFMT )
+                        F2 = FCB_FMT2( IFMT )
+                        CALL MSG_SETC( 'FMT', FCB_FMT( F1 : F2 ) )
+                        CALL MSG_SETC( 'FOR', DCB_FORFL( IDCB ) )
+                        CALL ERR_REP( 'NDF1_CLFOR_CVT1',
+     :                       'Error converting the NDF object ^NDF ' //
+     :                       'to ^FMT format in the file ''^FOR''.',
+     :                       STATUS )
+                        CALL MSG_RENEW
+                        CALL ERR_REP( 'NDF_CLFOR_CVT2',
+     :                       'The ^FMT file was not created.', STATUS )
+                     END IF
                   END IF
                END IF
+               CALL ERR_END( STATUS )
             END IF
-            CALL ERR_END( STATUS )
          END IF
 
 *  If the NDF is being retained, then simply annul its DCB locator.
