@@ -10,7 +10,7 @@
 	-- Star2HTML -->
   <!entity sgmlsystem.eps system 'SGMLsystem.eps' ndata eps>
   <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif89a>
-  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.4.sgmltext'>
+  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.5.sgmltext'>
   <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.sgmltext'>
   <!entity % Feature.Routinelist 'include'>
   <!entity rsqbrack ']'	-- needed in order to describe marked sections -->
@@ -76,6 +76,8 @@ Rather rushed distribution, containing implementations of changes to
 Programcode DTD and implementations of those in the down-converters.
 Time for few documentation updates.
 </distribution>
+
+<change date="23-SEP-1999" versionid="post-v0-5">Misc. clarifications.</change>
 
 </history>
 
@@ -1202,6 +1204,8 @@ detail on cross-referencing.
 <subsect id=str.backmatter export>Backmatter -- notes and bibliography
 <update versionid="post-0.2">
 Removed mention of the deleted backmatter content elements</update>
+<update versionid="post-v0-5">Emphasised that notes will not appear
+unless backmatter element is present</update>
 
 <p>The
 <ref id='el.sun.backmatter' text='backmatter'> element
@@ -1237,7 +1241,9 @@ further details.
 <p>You can include notes in your document with the note element.
 At present, the notes are presented as footnotes in
 the paper version of your document and collected together as endnotes
-in the online version.
+in the online version.  Note that since the notes are collected within
+the backmatter element, the notes <em/will not be printed/ unless
+a backmatter element is present.
 
 <p>Although the indexing support is defined in the DTD, there is not
 yet any application support for it.  It is likely to use the
