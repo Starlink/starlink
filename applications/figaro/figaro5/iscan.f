@@ -84,7 +84,7 @@
       integer ixstart,npts
       integer len1
       include 'SAE_PAR'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       status = SAI__OK
       label='channel direction cut'

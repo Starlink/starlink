@@ -79,7 +79,7 @@
       logical hex,par_qnum,qstat
       include 'PRM_PAR'
       include 'SAE_PAR'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       equivalence (dynamic_mem,dynamic_chars)
       data nums/'1','2','3','4','5','6','7','8','9'/
 

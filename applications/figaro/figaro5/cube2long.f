@@ -39,7 +39,7 @@
       character*72 output
       include 'PRM_PAR'
       include 'SAE_PAR'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 
       status = SAI__OK
       call dsa_open(status)

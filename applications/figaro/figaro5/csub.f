@@ -51,7 +51,7 @@
       character*14 chars
       include 'PRM_PAR'
       include 'SAE_PAR'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       status = SAI__OK
       mord=max_ord

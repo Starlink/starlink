@@ -42,7 +42,7 @@
       integer dims(2),ndim,nelm
       include 'PRM_PAR'
       include 'SAE_PAR'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       mord=max_ord
       status = SAI__OK

@@ -298,7 +298,7 @@
       character dynamic_chars
       integer pstat
 *
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       equivalence (dynamic_mem,dynamic_chars)
 *
 * ------------------------------------------------------------------

@@ -225,7 +225,7 @@
 * FIGARO VM handling and Mapping
 
       integer dyn_element
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       include 'SAE_PAR'
       include 'PRM_PAR'
 

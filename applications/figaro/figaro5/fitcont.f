@@ -113,7 +113,7 @@
 
       include 'SAE_PAR'
       include 'PRM_PAR'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       batch = par_batch()
       labelx='channels'

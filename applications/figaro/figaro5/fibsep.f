@@ -69,7 +69,7 @@
       real low,high,dummy1,dummy2
       integer iwork,lu
       character chars*64,ffile*72
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *
 *     Initial values
 *

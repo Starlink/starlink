@@ -68,7 +68,7 @@
       integer status,nx,ny,iptr,xptr,dims(2)
       real value
       integer wptr,dyn_element,slot
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       status = SAI__OK
       call dsa_open(status)
       call dsa_output('data','image',' ',0,0,status)

@@ -74,7 +74,7 @@
       integer slot,dyn_element
       logical hard,par_batch,batch
       integer ixstart
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
 *
 *   Get name of input file

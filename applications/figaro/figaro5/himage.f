@@ -98,7 +98,7 @@
       integer temp,dyn_element,slot
       character object*64,pltdev*40
       external par_wruser
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 *
 *     Initial values
 *

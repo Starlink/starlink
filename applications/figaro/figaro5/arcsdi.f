@@ -170,7 +170,7 @@
       include 'PRM_PAR'
       include 'bytesdef'
       character dynamic_chars
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       equivalence (dynamic_mem,dynamic_chars)
 *
 * include menus

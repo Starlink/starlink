@@ -32,7 +32,7 @@
       include 'SAE_PAR'
       include 'arc_dims'
       integer specdim,dims(2)
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       integer flagptr,d_s2ptr,slot,dyn_element
       logical nocube
 *
