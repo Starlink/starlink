@@ -136,18 +136,18 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 	$(MKTCLAPP) -header > gaia_stcl.h
 	$(MKTCLAPP) -f gaia_stcl.mta > gaia_stcl.c
 
-#  Link wish. Note we need proj.o and wcstrig.o from AST extracting to 
-#  ensure that these are used in preference to the versions in Skycat.
+#  Link wish. Note we remove proj.o from Skycat to ensure that the AST
+#  version is used (this is also very different and the linker
+#  complains object size changes). Note we did remove wcstrig.o as
+#  well, but the names of these routines no longer clash.
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
-	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
+	ar d $(LIBDIR)/libskycat.a proj.o
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
-	       proj.o wcstrig.o $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB)  \
-	       $(LDFLAG1) $(ADDLIBS) $(AST_LIBS) $(RTD_LIB) $(ASTROTCL_LIB) \
-	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) \
-	       $(AST_LIBS) $(TCLUTIL_LIB) $(ADAM_LIBS) $(TCLTKLIBS) \
-	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
-	$(RM) proj.o wcstrig.o
+	   $(LDFLAG1) $(ADDLIBS) $(AST_LIBS) \
+	   $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
+	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
+	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
