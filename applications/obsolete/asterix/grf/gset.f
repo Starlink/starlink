@@ -729,6 +729,7 @@
             CALL GCB_CAN('XLABEL_BOLD',STATUS)
             CALL GCB_CAN('XLABEL_SIZE',STATUS)
             CALL GCB_CAN('XLABEL_FONT',STATUS)
+            CALL GCB_CAN('XLABEL_COLOUR',STATUS)
           ENDIF
 *  specific to y-axis
           IF (Y) THEN
@@ -737,6 +738,7 @@
             CALL GCB_CAN('YLABEL_BOLD',STATUS)
             CALL GCB_CAN('YLABEL_SIZE',STATUS)
             CALL GCB_CAN('YLABEL_FONT',STATUS)
+            CALL GCB_CAN('YLABEL_COLOUR',STATUS)
           ENDIF
 
           CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
@@ -777,8 +779,9 @@
       INTEGER ISEL,GFID
       INTEGER FONT
       INTEGER BOLD
+      INTEGER COLOUR
       LOGICAL SUPPRESS
-      LOGICAL SETT,SETF,SETS,SETB,SETO
+      LOGICAL SETT,SETF,SETS,SETB,SETO,SETC
 *-
 
       SETT=.TRUE.
@@ -786,6 +789,7 @@
       SETS=.TRUE.
       SETB=.TRUE.
       SETO=.TRUE.
+      SETC=.TRUE.
 
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -800,6 +804,7 @@
           SETS=.FALSE.
           SETB=.FALSE.
           SETO=.FALSE.
+          SETC=.FALSE.
 
         ELSE
 
@@ -811,6 +816,8 @@
           CALL GSET_GET0R( 'SIZE', SETS, SIZE, STATUS )
 
           CALL GSET_GET0I( 'BOLD', SETB, BOLD, STATUS )
+
+          CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
 
           CALL GSET_GET0R( 'OFFSET', SETO, OFFSET, STATUS )
 
@@ -843,6 +850,9 @@
             IF (SETF) THEN
               CALL GCB_SETI('XLABEL_FONT',FONT,STATUS)
             ENDIF
+            IF (SETC) THEN
+              CALL GCB_SETI('XLABEL_COLOUR',COLOUR,STATUS)
+            ENDIF
           ENDIF
 *  specific to y-axis
           IF (Y) THEN
@@ -860,6 +870,9 @@
             ENDIF
             IF (SETF) THEN
               CALL GCB_SETI('YLABEL_FONT',FONT,STATUS)
+            ENDIF
+            IF (SETC) THEN
+              CALL GCB_SETI('YLABEL_COLOUR',COLOUR,STATUS)
             ENDIF
           ENDIF
 
