@@ -84,7 +84,8 @@
       INTEGER                   HDUID, BCOL
 
 *  Arguments Returned:
-      INTEGER			DIMS, TYP
+      INTEGER			DIMS
+      CHARACTER*(*)		TYP
 
 *  Status:
       INTEGER 			STATUS             	! Global status
