@@ -73,6 +73,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.10  1997/04/15 18:30:30  timj
+*     Remove debugging print statement.
+*
 *     Revision 1.9  1997/04/03 20:13:31  timj
 *     Add SCULIB_GET_SUB_INST and SCULIB_GET_DEM_PNTR.
 *     Write both output files inside a loop to reduce amount of repeating code.
@@ -480,14 +483,12 @@ c
          EL = (REAL(PI)/2.0) - END_EL * DEG2RAD
          CALL SCULIB_AIRMASS (EL, AIRMASS_END, STATUS)
 
-         print *,'Start:End :: ',AIRMASS_START, AIRMASS_END
-
          AIRSTEP = (AIRMASS_END - AIRMASS_START) / 
      :        REAL(N_MEASUREMENTS - 1)
          DO I = 1, N_MEASUREMENTS
             AIRMASS(I) = AIRMASS_START + AIRSTEP * REAL(I-1)
  
-*  Calculate the variance Delta A = (TAN / SIN) Delta EL
+*  Calculate the error Delta A = (TAN / SIN) Delta EL
 *     TAN = 1/SQRT((AIR-1)(AIR+1))
             AIRMASS_VAR(I) = 2.0 * ARCSEC * AIRMASS(I) / ! 2 arcsec error
      :           SQRT((AIRMASS(I)-1) * (AIRMASS(I)+1))
