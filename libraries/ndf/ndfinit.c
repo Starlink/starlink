@@ -59,6 +59,10 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     - If these arguments are not available, then an "argc" value of
 *     zero should be given (whereupon the "argv" value will be
 *     ignored).
+*     - Additional initialisations of the Fortran Runtime may be 
+*     required for this to work correctly. The STAR_INITIALISE_FORTRAN
+*     macro of the Starlink Build System will do this work, otherwise
+*     you need to arrange this for yourself.
 *-
 */
    
