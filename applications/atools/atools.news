@@ -1,6 +1,6 @@
 1 ATOOLS
 
- Version 1.2 of ATOOLS is now available. It is fully documented in SUN/???.
+ Version 1.3 of ATOOLS is now available. It is fully documented in SUN/???.
 
  ATOOLS is a package of applications which manipulate descriptions
  of coordinate frames, mappings, etc, in the form of AST Objects (see
@@ -10,6 +10,8 @@
 
   Changes in this release:
 
-  - astfindframe has an extra output parameter called IFRAME 
-  to which is written the index of the closest matching Frame 
-  in the TARGET, or zero if no matching Frame is found.
+  - Command asttrann added. It transforms N-dimensional positions stored 
+    within the DATA array of a 2-dimensional NDF (the array is interpreted 
+    as a table with columns representing axes and rows representing
+    positions). A standard catalogue-based interface may also be added at 
+    some point in the future if it prooves necessary.
