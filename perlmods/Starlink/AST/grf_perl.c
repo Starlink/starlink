@@ -307,6 +307,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
   SV * external;
   int retval;
 
+  printf("grf_perl.c: Got %d marks\n",n);
   if (n == 0 ) return 1;
 
   if (!astOK) return 0;

@@ -2142,7 +2142,7 @@ astMark(this, type, ...)
   SV * arg = ST(0);
  CODE:
   /* First make sure we have some arguments */
-  if (items > argoff ) {
+    if (items > argoff ) {
     /* Number of dimensions should be just the number of stack items */
     ncoords = items - argoff;
 
@@ -2198,6 +2198,7 @@ astMark(this, type, ...)
     }
     
     /* Now call the AST routine */
+    printf("AST.xs: Got %d marks\n", nmarks);
     PLOTCALL( arg,
        astMark( this, nmarks, ncoords, nmarks, cin, type );
     )
