@@ -1617,6 +1617,9 @@ c        ENDIF
         ELSEIF (INDEX(CMD,'EXP').NE.0) THEN
           MODE='EXP'
           MERGE=.FALSE.
+        ELSEIF (INDEX(CMD,'IMP').NE.0) THEN
+          MODE='IMP'
+          MERGE=.FALSE.
         ELSEIF (INDEX(CMD,'CON').NE.0) THEN
           MODE='IMP'
           MERGE=.FALSE.
