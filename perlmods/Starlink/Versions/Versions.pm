@@ -61,7 +61,7 @@ use File::Spec;         # For catfile()
 		'Funcs' => [ @EXPORT_OK ],
 		);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers 
@@ -316,6 +316,8 @@ string literal:
     ...
   }
 
+but this has been deprecated for v5.8.
+
 =cut
 
 sub starversion_lt ($$) {
@@ -344,6 +346,8 @@ string literal:
   if ( starversion('prog') le v0.15.2 ) {
     ...
   }
+
+but this has been deprecated for v5.8.
 
 =cut
 
@@ -374,6 +378,8 @@ string literal:
     ...
   }
 
+but this has been deprecated for v5.8.
+
 =cut
 
 sub starversion_eq ($$) {
@@ -403,6 +409,8 @@ string literal:
     ...
   }
 
+but this has been deprecated for v5.8.
+
 =cut
 
 sub starversion_gt ($$) {
@@ -425,12 +433,14 @@ installed package is newer than or is the requested version.
 The version string format is described in the description of
 C<starversion_cmp>
 
-In perl 5.6.0 this command can be implemented directing using a
+In perl 5.6.0 this command can be implemented directly using a
 string literal:
 
   if ( starversion('prog') ge v0.15.2 ) {
     ...
   }
+
+but this has been deprecated for v5.8.
 
 =cut
 
@@ -508,6 +518,38 @@ sub _get_app_datestamp_dir ($) {
   return undef;
 }
 
+=item B<_get_app_manifest_dir>
+
+Return the location of the manifests directory, given a Starlink
+application name.
+
+ $dir = _get_app_manifest_dir( 'prog' );
+
+This is simply assumed to be C<$PROG_DIR/../../manifests>. Returns
+C<undef> if C<_get_app_dir> returns undef. Does not check that the
+directory exists.
+
+If the supplied application directory ends in C<bin> it is assumed
+that the dates directory is in C<$PROG_DIR/../manifest>. This is the
+case for hdstrace.
+
+=cut
+
+sub _get_app_manifest_dir ($) {
+  my $appdir = _get_app_dir( $_[0] );
+  if (defined $appdir) {
+    # special case bin dirs
+    if ($appdir =~ /bin$/) {
+      return File::Spec->catdir($appdir,
+				File::Spec->updir, 'manifests');
+    } else {
+      return File::Spec->catdir($appdir, File::Spec->updir, 
+				File::Spec->updir, 'manifests');
+    }
+  }
+  return undef;
+}
+
 =item B<_get_standard_datestamp_dir>
 
 Return the standard location of the date stamp directory.
@@ -524,6 +566,24 @@ be C</star/dates>.
 
 sub _get_standard_datestamp_dir () {
   return File::Spec->catdir( $StarConfig{'Star'} , "dates" );
+}
+
+=item B<_get_standard_manifest_dir>
+
+Return the standard location of the manifest directory.
+This will use the location of the actual Starlink system (as 
+supplied by C<Starlink::Config>) rather than the location
+of the application that is currently specified by C<PROG_DIR>.
+
+ $dir = _get_standard_manifest_dir;
+
+This should be used as a last resort. Usually this would 
+be C</star/manifests>.
+
+=cut
+
+sub _get_standard_manifest_dir () {
+  return File::Spec->catdir( $StarConfig{'Star'} , "manifests" );
 }
 
 
@@ -548,6 +608,25 @@ sub _get_datestamp_file ($$) {
   my $app = lc($_[1]);
   $app = 'starX' if $app eq 'starx';
   return File::Spec->catfile($_[0], $app.'_datestamp');
+}
+
+=item B<_get_manifest_file>
+
+Return the manifest file associated with the supplied application
+and directory.
+
+ $file = _get_manifest_file( $dir, 'prog' );
+
+The directory is usually obtained via the C<_get_standard_manifest_dir>
+or C<_get_app_manifest_dir> routines.
+
+Does not check to see if the file exists.
+
+=cut
+
+sub _get_manifest_file ($$) {
+  my $app = lc($_[1]);
+  return File::Spec->catfile($_[0], $app);
 }
 
 
@@ -619,6 +698,41 @@ sub _read_datestamp_file ($) {
   return (undef, undef, undef);
 }
 
+=item B<_read_manifest_file>
+
+Given a manifest file, return the major, minor and pathlevel
+numbers from it.
+
+ ($major, $minor, $patchlevel) = _read_manifest_file( $file );
+
+Relies on this file containing a version string that can be parsed
+by C<_parse_version_string> in a E<lt>versionE<gt> element in the XML.
+
+Returns C<undef> on error.
+
+=cut
+
+sub _read_manifest_file ($) {
+  my $file = shift;
+  print "Opening manifest file $file\n" if $DEBUG;
+  my $sym = gensym;
+  open( $sym, "< $file" ) || return (undef, undef, undef);
+
+  while (<$sym>) {
+    if (/^<version>/i) {
+      print "FOUND in manifest: $_\n" if $DEBUG;
+      my (@version) = _parse_version_string($_);
+      # Return immediately, the file will be closed automatically
+      # but close it anyway for clarity
+      if (defined $version[0]) {
+	close($sym);
+	return (@version);
+      }
+    }
+  }
+  return (undef, undef, undef);
+}
+
 
 =item B<_get_version_from_datestamp>
 
@@ -650,6 +764,38 @@ sub _get_version_from_datestamp ($$) {
 
   # Return the version number
   return &_read_datestamp_file($file);
+}
+
+=item B<_get_version_from_manifest>
+
+Retrieve a version number from a manifest file.
+
+ ($major, $minor, $patchlevel) = 
+        _get_version_from_manifest($useenv, 'prog');
+
+The first argument is a flag describing which datestamp
+file to use. If this flag is true, the manifest file
+is derived from the PROG_DIR environment variable. If it
+is false the manifest file is derived from the installed
+Starlink directory.
+
+Returns C<undef> on error.
+
+=cut
+
+sub _get_version_from_manifest ($$) {
+  my $dir;
+  if ($_[0]) {
+    $dir = _get_app_manifest_dir($_[1]);
+  } else {
+    $dir = _get_standard_manifest_dir;
+  }
+  # Get the filename
+  print "Using manifest dir = $dir\n" if $DEBUG;
+  my $file = _get_manifest_file($dir, $_[1]);
+
+  # Return the version number
+  return &_read_manifest_file($file);
 }
 
 =item B<_get_version_from_appdir>
@@ -723,9 +869,18 @@ sub _get_version ($) {
     @version = _get_version_from_datestamp( 1, $app )
       unless defined $version[0];
 
+    # Now try a manifest file
+    @version = _get_version_from_manifest( 1, $app )
+      unless defined $version[0];
+
+
   } else {
     # Okay, no PROG_DIR defined so look in /star (or wherever)
     @version = _get_version_from_datestamp( 0, $app );
+
+    # now try manifest
+    @version = _get_version_from_manifest( 0, $app ) 
+      unless defined $version[0];
   }
 
   # If we have something we need to cache, cache it
@@ -754,9 +909,9 @@ sub _get_version ($) {
 
 =head1 NOTES
 
-Can be used to determine any Starlink product that installs a datestamp
-file. For example, it can be used to determine library versions as well
-as applications.
+Can be used to determine any Starlink product that installs a
+datestamp file or a manifest file. For example, it can be used to
+determine library versions as well as applications.
 
 =head1 AUTHOR
 
