@@ -555,6 +555,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     15-JUNE-2004 (DSB):
 *        - Ensure out-of-bounds longitude CRPIX values for CAR
 *        projections are wrapped back into bounds.
+*     21-JUNE-2004 (DSB):
+*        - Ensure primary MJD-OBS value is used when reading foreign FITS
+*        headers.
 *class--
 */
 
@@ -24260,40 +24263,42 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
          }
       }
 
-/* Date of observation */
-      val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) {
-         SetValue( this, FormatKey( "MJD-OBS", -1, -1, s ),
-                   &val, AST__FLOAT, "Modified Julian Date of observation" );
+/* Date of observation (only allowed for primary axis descriptions). */
+      if( s == ' ' ) {
+         val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+         if( val != AST__BAD ) {
+            SetValue( this, FormatKey( "MJD-OBS", -1, -1, s ),
+                      &val, AST__FLOAT, "Modified Julian Date of observation" );
 
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-         slaCaldj( 99, 1, 1, &mjd99, &jj );
-         if( val < mjd99 ) {
-   
-            slaDjcal( 0, val, iymdf, &jj );
-            sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
-                     iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
-   
-         } else {
-   
-            slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-            slaDd2tf( 3, fd, sign, ihmsf );
-            sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
-                     iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
-                     ihmsf[2], ihmsf[3] ); 
-         }
+            slaCaldj( 99, 1, 1, &mjd99, &jj );
+            if( val < mjd99 ) {
+      
+               slaDjcal( 0, val, iymdf, &jj );
+               sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
+                        iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
+      
+            } else {
+      
+               slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+               slaDd2tf( 3, fd, sign, ihmsf );
+               sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
+                        iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
+                        ihmsf[2], ihmsf[3] ); 
+            }
 
 /* Now store the formatted string in the FitsChan. */
-         cval = combuf;
-         SetValue( this, "DATE-OBS", (void *) &cval, AST__STRING,
-                   "Date of observation" );
-      }
+            cval = combuf;
+            SetValue( this, "DATE-OBS", (void *) &cval, AST__STRING,
+                      "Date of observation" );
+         }
 
-      val = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, "MJD-AVG", &val, AST__FLOAT, 
-                                      "Average Modified Julian Date of observation" );
+         val = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
+         if( val != AST__BAD ) SetValue( this, "MJD-AVG", &val, AST__FLOAT, 
+                                         "Average Modified Julian Date of observation" );
+      }
 
 /* Projection parameters */
       maxm = GetMaxJM( &(store->pv), s );
@@ -26077,16 +26082,19 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
       eqmjd = AST__BAD;
    }
 
-/* Get the MJD-OBS value. If it is missing, use the equinox, and issue a
-   warning. */    
+/* Get the MJD-OBS value. If it is missing, use the primary value. If
+   that is also missing, use the equinox, and issue a warning. */    
    mjdobs = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
    if( mjdobs == AST__BAD ) {
-      mjdobs = eqmjd;
-      if( mjdobs != AST__BAD ) {
-         sprintf( buf, "The original FITS header did not specify the "
-                  "date of observation. A default value of %c%.8g was "
-                  "assumed.", bj, equinox );
-         Warn( this, "nomjd-obs", buf, method, class );
+      mjdobs = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, method, class );
+      if( mjdobs == AST__BAD ) {
+         mjdobs = eqmjd;
+         if( mjdobs != AST__BAD ) {
+            sprintf( buf, "The original FITS header did not specify the "
+                     "date of observation. A default value of %c%.8g was "
+                     "assumed.", bj, equinox );
+            Warn( this, "nomjd-obs", buf, method, class );
+         }
       }
    }
 
