@@ -125,6 +125,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
+      INCLUDE 'PAR_ERR'        ! PAR__ error definitions
       INCLUDE 'MSG_PAR'        ! MSG__ definitions
       INCLUDE 'PRM_PAR'        ! VAL__ definitions
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
