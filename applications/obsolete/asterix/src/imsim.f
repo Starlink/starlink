@@ -473,7 +473,7 @@
         END IF
 
 *      Open file
-        CALL BDI_NEW( 'XYimage', 2, DIMS, 'REAL', BID, STATUS )
+        CALL BDI_NEW( 'XYimage', ONDIM, ODIMS, 'REAL', BID, STATUS )
         CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', BID,
      :                   OFID, STATUS )
 
