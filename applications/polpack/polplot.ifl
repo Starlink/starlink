@@ -28,9 +28,9 @@ interface POLPLOT
 
    parameter      ANGROT         
       type        '_REAL'
-      prompt      'Angle by which to rotate the vectors (in degrees)'
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
+      prompt      'Orientation of reference direction'
+      vpath       'DYNAMIC,DEFAULT'
+      ppath       'DYNAMIC,DEFAULT'
       helpkey     '*'
       default     0.0
    endparameter
