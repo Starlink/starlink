@@ -1,0 +1,209 @@
+      action findoff {
+#+
+#  Name:
+#     FINDOFF.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-SEP-1992 (PDRAPER):
+#     	 Original version.
+#     29-SEP-1992 (PDRAPER):
+#     	 Now FINDOFF.
+#     09-FEB-1998 (MBT):
+#        Added USEWCS.
+#     30-MAR-1999 (MBT):
+#        Added MAXDISP.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_further_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter inlist {
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {Names of position lists}
+            helpkey *
+          }
+
+         parameter error {
+            position 2
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {Error in positions}
+            helpkey *
+          }
+
+         parameter outlist {
+            position 3
+            type LITERAL
+            access WRITE
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Names for output position lists}
+            helpkey *
+          }
+
+         parameter ndfnames {
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_ndfnam
+            default TRUE
+            prompt {Position list names in NDF extensions}
+            helpkey *
+          }
+
+         parameter fast {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Perform FAST algorithm}
+            helpkey *
+          }
+
+         parameter failsafe {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Perform SLOW algorithm if FAST fails}
+            helpkey *
+          }
+
+         parameter namelist {
+            type LITERAL
+            access WRITE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FINDOFF.LIS
+            prompt {Name of output filenames listing}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter complete {
+            type _DOUBLE
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.5D0
+            prompt {Minimum completeness level}
+            helpkey *
+          }
+
+         parameter usecomp {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use completeness as weight}
+            helpkey *
+          }
+
+         parameter usewcs {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use NDF World Coordinate System extension if it exists}
+            helpkey *
+          }
+
+         parameter restrict {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Restrict possible matches to apparently overlapping zones}
+            helpkey *
+          }
+
+         parameter maxdisp {
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Maximum displacement relative to initial positioning}
+            helpkey *
+          }
+
+         parameter minsep {
+            type _DOUBLE
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default 5.0
+            prompt {Minimum distance between positions}
+            helpkey *
+          }
+
+         parameter minmatch {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Minimum number of positions required for match}
+            helpkey *
+          }
+
+         parameter override {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Continue if solution is incomplete}
+            helpkey *
+          }
+
+      }
+# $Id$

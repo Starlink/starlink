@@ -1,0 +1,144 @@
+      action flatcor {
+#+
+#  Name:
+#     FLATCOR.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-MAY-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and helpkey info.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter.
+#     6-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_further_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter in {
+                       # Input NDF
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {List of input NDFs}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output NDF
+            position 2
+            type LITERAL
+            access WRITE
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {List of output NDFs}
+            helpkey *
+          }
+
+         parameter flat {
+                         # Flatfield NDF
+            position 3
+            type LITERAL
+            access READ
+            vpath PROMPT GLOBAL CURRENT
+            ppath GLOBAL CURRENT
+            association <-global.ccdpack_flat
+            prompt {Flatfield NDF}
+            helpkey *
+          }
+
+         parameter keepin {
+                           # Controls whether input NDFs are
+				 # deleted
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Do not delete input NDFs}
+            helpkey *
+          }
+
+         parameter preserve {
+                             # Whether to preserve input data type
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_preser
+            default TRUE
+            prompt {Do you want to preserve the input type}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for the output NDF
+            type LITERAL
+            access READ
+            vpath DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default {Output from FLATCOR}
+            prompt {Title for the output NDF}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # Log file name
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter setsat {
+                           # Whether saturation has occurred
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Has saturated data been set to a non-BAD value}
+            helpkey *
+          }
+
+         parameter saturation {
+                               # Saturation value
+            type _DOUBLE
+            access READ
+            vpath CURRENT PROMPT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0D6
+            prompt {Saturation value}
+            helpkey *
+          }
+      }
+# $Id$

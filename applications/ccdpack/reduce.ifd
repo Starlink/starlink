@@ -1,0 +1,775 @@
+      action reduce {
+#+
+#  Name:
+#     REDUCE.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-JUN-1997 (PDRAPER):
+#     	 Original version.
+#     6-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+         helplib {$CCDPACK_HELP}
+
+         parameter choice {
+            type _CHAR
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default VIEW
+            prompt {Continue or Select or View a file}
+            helpkey *
+          }
+
+         parameter clear {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Clear existing global parameters}
+            helpkey *
+          }
+
+         parameter index {
+            type _INTEGER
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Index of file}
+            helpkey *
+          }
+
+         parameter known {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Inspect the known detectors}
+            helpkey *
+          }
+
+         parameter manual {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Will you set frame types yourself}
+            helpkey *
+          }
+
+         parameter restore {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want to use a restoration file}
+            helpkey *
+          }
+
+         parameter restorefile {
+            type _CHAR
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default CCDPACK_SETUP.DAT
+            prompt {Name of restoration file}
+            helpkey *
+          }
+
+         parameter setgeom {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to define your CCD geometry}
+            helpkey *
+          }
+
+         parameter table {
+            type _CHAR
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default import.tab
+            prompt {Import control table}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter continue {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+          }
+
+         parameter in {
+                       # List of Input NDFs
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {List of input NDFs}
+            helpkey *
+          }
+
+#  These are IMPORTs parameters
+
+         parameter debias {
+                           # Type of debiassing to perform
+            type _INTEGER
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Debiassing method}
+            helpkey IMPORT PARAMETERS DEBIAS
+          }
+
+         parameter interp {
+                           # Type of interpolation performed
+            type _INTEGER
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Interpolation method}
+            helpkey IMPORT PARAMETERS INTERP
+          }
+
+         parameter spacesave {
+                              # How to save disk space
+            type LITERAL
+            access READ
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default none
+            prompt {Save disk space (none,some,lots)}
+            helpkey IMPORT PARAMETERS SPACESAVE
+          }
+
+
+#  These are CCDSETUP's parameters.
+
+         helplib {$CCDPACK_HELP}
+
+         parameter adc {
+                        # The analogue to digital conversion
+                                 # factor
+            type _DOUBLE
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default !
+            prompt {Number of electrons per ADU}
+            association <->global.ccdpack_adc
+            helpkey *
+          }
+
+         parameter bounds {
+                           # Pixel indices of bias strips
+            type _INTEGER
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            prompt {Pixel indices of bias strips (in pairs)}
+            size *
+            association <->global.ccdpack_bounds
+            default !
+            helpkey *
+          }
+
+         parameter rnoise {
+                           # The readout noise
+            type _DOUBLE
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default !
+            prompt {Readout noise (ADUs)}
+            association <->global.ccdpack_rnoise
+            helpkey *
+          }
+
+         parameter mask {
+                         # Mask NDF
+            type LITERAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default !
+            prompt {Mask data file}
+            association <->global.ccdpack_mask
+            helpkey *
+          }
+
+# Full name of the mask NDF. Used to write out to global file.
+         parameter maskname {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            association ->global.ccdpack_mask
+            default 0.0
+          }
+
+         parameter direction {
+                              # Readout direction
+            type LITERAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default !
+            prompt {Readout direction (X or Y)}
+            association <->global.ccdpack_direct
+            helpkey *
+          }
+
+         parameter deferred {
+                             # Deferred charge value
+            type _DOUBLE
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default !
+            prompt {Deferred charge (ADUs)}
+            association <->global.ccdpack_defer
+            helpkey *
+          }
+
+         parameter extent {
+                           # Extent of useful CCD area
+            type _INTEGER
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            prompt {Useful CCD region (xmin,xmax,ymin,ymax)}
+            size *
+            default !
+            association <->global.ccdpack_extent
+            helpkey *
+          }
+
+         parameter preserve {
+                             # Whether to preserve input data type
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default TRUE
+            association <->global.ccdpack_preser
+            prompt {Do you want to preserve your input data types}
+            helpkey *
+          }
+
+         parameter genvar {
+                           # Whether to generate variances or not
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default TRUE
+            association <->global.ccdpack_genvar
+            prompt {Do you want to generate variance estimates}
+            helpkey *
+          }
+
+         parameter ndfnames {
+                             # Whether positions list are associated
+				 # with NDFs
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default TRUE
+            prompt {Associate position lists with NDF names}
+            association <->global.ccdpack_ndfnam
+          }
+
+         parameter save {
+                         # Whether to save CCD parameters or not
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Save CCD parameters for future restoration}
+            helpkey *
+          }
+
+         parameter savefile {
+                             # Name of the file to save parameters
+            type LITERAL
+            access WRITE
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default CCDPACK_SETUP.DAT
+            prompt {File to store CCD parameters}
+            helpkey *
+          }
+
+         parameter saturate {
+                             # Look for saturated values
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default FALSE
+            prompt {Look for saturated pixels}
+            association <->global.ccdpack_satur
+          }
+
+         parameter biasvalue {
+                              # Bias zero point value
+            type _DOUBLE
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default !
+            prompt {Nominal bias value (ADUs)}
+            association <-global.ccdpack_biasval
+            helpkey *
+          }
+
+         parameter saturation {
+                               # The saturation value.
+            type _DOUBLE
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default 1.0D6
+            prompt {Saturation value}
+            association <->global.ccdpack_satval
+          }
+
+         parameter setsat {
+                           # Whether to set saturated pixels to
+				 # the saturation value or not.
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default FALSE
+            prompt {Set saturated pixels to saturation value}
+            association <->global.ccdpack_setsat
+          }
+
+#  Present parameters
+
+         parameter simple {
+                           # Whether input NDF names specified in
+				 # one.
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do input NDFs already have frame types}
+            helpkey *
+          }
+
+         parameter multientry {
+                               # Whether input group also has NDF
+				 # types and factors.
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Does input list contain frame types and factors}
+            helpkey *
+          }
+
+         parameter modify {
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Modify existing extension items}
+            helpkey *
+          }
+
+         parameter bias {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Bias frame names}
+            helpkey *
+          }
+
+         parameter target {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Target frame names}
+            helpkey *
+          }
+
+         parameter dark {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Dark frame names}
+            helpkey *
+          }
+
+         parameter flash {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Pre-flash frame names}
+            helpkey *
+          }
+
+         parameter flat {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Flatfield names}
+            helpkey *
+          }
+
+         parameter masterbias {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Name of master bias}
+            helpkey *
+          }
+
+         parameter masterdark {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Name of master dark}
+            helpkey *
+          }
+
+         parameter masterflash {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Name of master flash}
+            helpkey *
+          }
+
+         parameter masterflat {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT CURRENT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Master flatfield names}
+            helpkey *
+          }
+
+         parameter adddark {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            default FALSE
+            prompt {Add dark exposure times to NDFs}
+            helpkey *
+          }
+
+         parameter addflash {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            default FALSE
+            prompt {Add pre-flash exposure times to NDFs}
+            helpkey *
+          }
+
+         parameter ftype {
+                          # Frame type parameter
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath DYNAMIC CURRENT
+            prompt {Frame type}
+            helpkey *
+          }
+
+         parameter filter {
+                           # Frame type parameter
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath DYNAMIC CURRENT
+            prompt {Filter type}
+            helpkey *
+          }
+
+         parameter darktime {
+                             # Frame dark time
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Dark count exposure time}
+            helpkey *
+          }
+
+         parameter flashtime {
+                              # Frame pre-flash exposure time
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Pre-flash exposure time}
+            helpkey *
+          }
+
+         parameter onefilter {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Use one filter type}
+            helpkey *
+          }
+
+         parameter onedarktime {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Use one dark count exposure time}
+            helpkey *
+          }
+
+         parameter oneflashtime {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Use one pre-flash exposure time}
+            helpkey *
+          }
+
+         parameter zeroed {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Does the MASTER_BIAS frame have a mean of zero}
+            helpkey *
+          }
+
+         parameter masters {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Do you have some master calibration frames}
+            helpkey *
+          }
+
+#  Import parameters
+
+         parameter namelist {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {Input NDF name list}
+          }
+
+#  Schedule parameters
+
+         parameter script {
+                           # Reduction script name
+            type LITERAL
+            access READ
+            vpath PROMPT DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            default schedule
+            prompt {Name of output script}
+            helpkey *
+          }
+
+         parameter stype {
+                          # Reduction script type
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default csh
+            prompt {Type of output script}
+            helpkey *
+          }
+
+         parameter exelogfile {
+                               # logfile name if executing now.
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default schedule.log
+            prompt {Name of output script}
+            helpkey *
+          }
+
+         parameter execute {
+                            # Whether to execute the command
+				 # procedure or not.
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Execute the command procedure}
+            helpkey *
+          }
+
+         parameter irflats {
+                            # Flatfields may be TARGETS!
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Using TARGETS as possible flatfields}
+            helpkey *
+          }
+     
+         parameter debiasext {
+                              # modification applied to NDF names
+				 # output from DEBIAS
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default -db
+            prompt {Extension of names output from DEBIAS}
+            helpkey *
+          }
+
+         parameter darkext {
+                            # modification applied to NDF names
+				 # output from CALCOR dark.
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default -dk
+            prompt {Extension of names output after dark correction}
+            helpkey *
+          }
+
+         parameter flashext {
+                             # modification applied to NDF names
+				 # output from CALCOR flash.
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default -fls
+            prompt {Extension of names output after flash correction}
+            helpkey *
+          }
+
+         parameter flatext {
+                            # modification applied to NDF names
+				 # output from FLATCOR.
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default -flt
+            prompt {Extension of names output after flatfielding}
+            helpkey *
+          }
+
+#  CCDclear parameters
+
+         parameter byname {
+                           # Mode of operation
+            position 1
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Clear parameters by specific name}
+            helpkey *
+          }
+
+         parameter names {
+                          # Name of parameters to clear
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Parameter names}
+            helpkey *
+          }
+
+      }
+# $Id$

@@ -1,0 +1,64 @@
+      action ccdhelp {
+#+
+#  Name:
+#     CCDHELP.IFD
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-NOV-1986 (MJC):
+#	 Original version.
+#     19-AUG-1992 (MJC):
+#     	 Added prologue, and access to help library.
+#     5-JAN-1993 (PDRAPER):
+#        Rename CCDHELP.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_further_changes_here}
+
+#-
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+          }
+
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+          }
+      }
+# $Id$

@@ -1,0 +1,72 @@
+      action ccdclear {
+#+
+#  Name:
+#     CCDCLEAR.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     5-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter byname {
+                           # Mode of operation
+            position 1
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Clear parameters by specific name}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The CCDPACK log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            prompt {Name of CCDPACK logfile}
+            association <-global.ccdpack_logfile
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter names {
+                          # Name of parameters to clear
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Parameter names}
+            helpkey *
+          }
+
+      }
+# $Id$

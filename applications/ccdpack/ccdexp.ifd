@@ -1,0 +1,44 @@
+      action ccdexp {
+#+
+#  Name:
+#     CCDEXP.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_further_changes_here}
+
+         helplib {$CCDPACK_HELP}
+
+         parameter in {
+                       # NDF to be modified
+            position 1
+            type NDF
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            prompt {Image data}
+            helpkey *
+          }
+
+         parameter table {
+                          # Keyword translation table
+            position 2
+            type FILENAME
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {FITS keyword translation table}
+            helpkey *
+          }
+
+      }
+# $Id$

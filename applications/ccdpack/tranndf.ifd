@@ -1,0 +1,166 @@
+      action tranndf {
+#+
+#  Name:
+#     TRANNDF.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 March 16 (MJC):
+#     	 Original version.
+#     1993 March 25 (MJC):
+#     	 Added LCOORD, UCOORD, LBOUND, and UBOUND. Revised SHAPE.
+#	 Removed SAME.
+#     18-JUN-1993 (PDRAPER):
+#     	 Changed to TRANNDF.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_further_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter conserve {
+                             # Conserve flux
+            type _LOGICAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Conserve flux?}
+            helpkey *
+            default TRUE
+          }
+
+         parameter in {
+                       # Input NDF
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {List of NDFs}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output NDF
+            position 2
+            type LITERAL
+            access WRITE
+            vpath PROMPt CURRENT
+            ppath CURRENT
+            association ->global.data_array
+            prompt {Output NDF}
+            helpkey *
+          }
+
+         parameter method {
+                           # Resampling method
+            position 3
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Re-sampling method}
+            helpkey *
+            default Nearest
+          }
+
+         parameter shape {
+                          # How to shape output NDFs
+            type LITERAL
+            access UPDATE
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            default AUTO
+            prompt {Method used to get bounds of output NDFs}
+            helpkey *
+          }
+
+         parameter inext {
+                          # Get transformation structures from NDFs
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Locate transform structure in NDF extensions}
+            helpkey *
+          }
+
+         parameter lbound {
+                           # Lower bounds of output NDFs
+            type _DOUBLE
+            vpath PROMPT DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            prompt {Lower bounds of the output NDFs}
+            dynamic yes
+            size *
+            helpkey *
+          }
+
+         parameter ubound {
+                           # Upper bound of output NDFs
+            type _DOUBLE
+            vpath PROMPT DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            prompt {Upper bounds of the output NDFs}
+            dynamic yes
+            size *
+            helpkey *
+          }
+
+         parameter transform {
+                              # Transformation structure
+            access READ
+            type TRN
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Transformation structure}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for the output NDF
+            type LITERAL
+            access READ
+            vpath DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default {Output from TRANNDF}
+            prompt {Title for the output NDFs}
+            helpkey *
+          }
+
+      }
+# $Id$

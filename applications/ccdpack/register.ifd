@@ -1,0 +1,729 @@
+      action register {
+#+
+#  Name:
+#     REGISTER.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     16-FEB-1999 (MBT):
+#        Added OUTFORMAT.
+#     16-APR-1999 (MBT):
+#        Added OUTDOMAIN.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter inlist {
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {Names of position list files}
+            helpkey *
+          }
+
+         parameter fittype {
+                            # Fittype parameter
+            position 2
+            type _INTEGER
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 5
+            range 1 6
+            prompt {Type of fit to be performed (1-6)}
+            helpkey *
+          }
+
+         parameter outdomain {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default CCD_REG
+            prompt {Name of registration frame domain}
+            helpkey *
+          }
+
+         parameter refpos {
+            position 3
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Position of reference set}
+            helpkey *
+          }
+
+         parameter outref {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Name of extended reference set}
+            default !
+            helpkey *
+          }
+
+         parameter placein {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default NDF
+            prompt {Store transformation structures in}
+            helpkey *
+          }
+
+         parameter outformat {
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default WCS
+            prompt {How transformation is written to output NDF}
+            helpkey *
+          }
+
+         parameter toler {
+            type _DOUBLE
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.001D0
+            prompt {Convergence tolerance}
+            helpkey *
+          }
+
+         parameter ndfnames {
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_ndfnam
+            prompt {Position list names in NDF extensions}
+            default TRUE
+            helpkey *
+          }
+
+         parameter in {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {List of NDFs to contain transforms}
+            helpkey *
+          }
+
+         parameter trfile {
+            type TRFILE
+            access WRITE
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Name of container file to store transforms}
+            helpkey *
+          }
+
+         parameter xfor {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Forward X transformation}
+            helpkey *
+          }
+
+         parameter xinv {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Inverse X transformation}
+            helpkey *
+          }
+
+         parameter yfor {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Forward Y transformation}
+            helpkey *
+          }
+
+         parameter yinv {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Inverse Y transformation}
+            helpkey *
+          }
+
+         parameter full {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Perform a full transformation}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter classify {
+                             # Add a classification structure
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Add classifications}
+            helpkey *
+          }
+
+         parameter class {
+                          # Classifications
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter fa {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fb {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fc {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fd {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fe {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter ff {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fg {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fh {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fi {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fj {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fk {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fl {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fm {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fn {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fo {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fp {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fq {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fr {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fs {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter ft {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fu {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fv {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fw {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fx {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fy {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+         parameter fz {
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey REGISTER parameters FA-FZ
+          }
+
+
+         parameter pa {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pb {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pc {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pd {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pe {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pf {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pg {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter ph {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pi {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pj {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pk {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pl {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pm {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pn {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter po {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pp {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pq {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pr {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter ps {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pt {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pu {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pv {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pw {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter px {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter py {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+         parameter pz {
+            type _DOUBLE
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0d0
+            prompt {Initial guess at parameter value}
+            helpkey REGISTER parameters PA-PZ
+          }
+
+      }
+# $Id$

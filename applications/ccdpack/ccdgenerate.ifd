@@ -1,0 +1,111 @@
+      action ccdgenerate {
+#+
+#  Name:
+#     CCDGENERATE.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     16-FEB-1999 (MBT):
+#        Replaced UBNDS and LBNDS by ANGLES and ORIGINS.
+#     26-APR-1999 (MBT):
+#        Added REDUCED parameter.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+
+         parameter file {
+                         # Name of input list
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {List containing object positions etc.}
+          }
+
+         parameter nseq {
+                         # Number of test sequences to create
+            position 2
+            type _INTEGER
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 5
+            range 1 26
+            prompt {How many data sequences do you want}
+          }
+
+         parameter angles {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Angle of each output sequence (degrees anticlockwise)}
+            size *
+            default 0D0
+          }
+
+         parameter origins {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Origin of each output sequence (X,Y,...)}
+            size *
+          }
+
+         parameter pixels {
+            type _INTEGER
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Size in pixels for the output NDFs (X,Y)}
+            size *
+          }
+
+         parameter reduced {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Reduced data, or unreduced with bias and flats?}
+            default FALSE
+          }
+
+         parameter type {
+            type _CHAR
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default .sdf
+            prompt {Output data type}
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+          }
+      }
+# $Id$

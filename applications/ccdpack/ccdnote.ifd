@@ -1,0 +1,59 @@
+      action ccdnote {
+#+
+#  Name:
+#     CCDNOTE.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter note {
+                         # Note to enter into log file.
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+      }
+# $Id$

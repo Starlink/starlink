@@ -1,0 +1,247 @@
+      action makebias {
+#+
+#  Name:
+#     MAKEBIAS.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-3-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and help library specifications.
+#     20-AUG-1991 (PDRAPER):
+#     	 Added GENVAR parameter.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN, USEEXT already present.
+#     6-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_further_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter in {
+                       # Input NDF 1
+            position 1
+            type LITERAL
+                        # string of NDFs
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {List of input NDFs}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output NDF may use IRG type expressions
+            position 2
+            type LITERAL
+            access READ
+            vpath PROMPT {CURRENT }
+            ppath CURRENT
+            prompt {Output NDF}
+            association ->global.ccdpack_bias
+            helpkey *
+          }
+
+         parameter rnoise {
+                           # Readout Noise (ADU)
+            position 3
+            type _DOUBLE
+            access READ
+            vpath PROMPT GLOBAL DYNAMIC CURRENT DEFAULT
+            ppath GLOBAL DYNAMIC CURRENT DEFAULT
+            dynamic yes
+            default 0.0
+            prompt {Readout noise (ADUs)}
+            association <-global.ccdpack_rnoise
+            helpkey *
+          }
+
+         parameter method {
+                           # Combination method
+            position 4
+            type LITERAL
+            access UPDATE
+                         # written to by AIF_CHOIC routine
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default MEDIAN
+            prompt {Data combination method}
+            helpkey *
+          }
+
+         parameter genvar {
+                           # Controls whether variances are
+				 # generated
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_genvar
+            default FALSE
+            prompt {Do you want to generate a variance component}
+            helpkey *
+          }
+
+         parameter useext {
+                           # Controls whether extension is used
+				 # for getting values.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_useext
+            default FALSE
+            prompt {Use NDF extension information}
+            helpkey *
+          }
+
+         parameter keepin {
+                           # Controls whether input NDFs are
+				 # deleted
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Do not delete input NDFs}
+            helpkey *
+          }
+
+         parameter alpha {
+                          # Trimming fraction
+            type _REAL
+            access READ
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 0.2
+            prompt {Trim fraction }
+            helpkey *
+          }
+
+         parameter sigmas {
+                           # Number of sigmas for clipping (MODE + SIGMA)
+            type _REAL
+            access READ
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 4.0
+            prompt {Clipping limit (standard deviations)}
+            helpkey *
+          }
+
+         parameter niter {
+                          # Number of refining iterations (MODE)
+            type _INTEGER
+            access READ
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 7
+            prompt {Number of clipping iterations}
+            helpkey *
+          }
+
+         parameter min {
+                        # Minimum value in combination
+            type _REAL
+            access READ
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default -100.0
+            prompt {Minimum allowed value}
+            helpkey *
+          }
+
+         parameter max {
+                        # Minimum value in combination
+            type _REAL
+            access READ
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 100.0
+            prompt {Maximum allowed value}
+            helpkey *
+          }
+
+         parameter zero {
+                         # Zero output array
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT {PROMPT }
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Make average of output data zero}
+            helpkey *
+          }
+
+         parameter minpix {
+                           # Minimum number of contributing pixels 
+            type _INTEGER
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT PROMPT
+            ppath CURRENT DYNAMIC DEFAULT
+            default 1
+            prompt {Minimum number of contributing pixels per output pixel}
+            helpkey *
+          }
+
+         parameter preserve {
+                             # Preserve the input data type
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            default TRUE
+            association <-global.ccdpack_preser
+            prompt {Preserve input NDF data type}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for the output NDF
+            type LITERAL
+            access READ
+            vpath DEFAULT {PROMPT }
+            ppath CURRENT DEFAULT
+            default {Output from MAKEBIAS}
+            prompt {Title for the output NDF}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            association <-global.ccdpack_logfile
+            helpkey *
+          }
+
+      }
+# $Id$
+

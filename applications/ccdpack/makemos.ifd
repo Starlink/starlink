@@ -1,0 +1,316 @@
+      action makemos {
+#+
+#  Name:
+#     MAKEMOS.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-FEB-1992 (RFWS):
+#        Original version.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter alpha {
+                          # Trimming fraction
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.2
+            prompt {Trimming fraction}
+            helpkey *
+          }
+
+         parameter cmpvar {
+                           # Use variance during inter-comparison?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use variance during inter-comparison?}
+            helpkey *
+          }
+
+         parameter genvar {
+                           # Generate output variance information?
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            default TRUE
+            prompt {Generate output variance information?}
+            helpkey *
+          }
+
+         parameter in {
+                       # List of input NDFs
+            position 1
+            type _CHAR
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {List of input NDFs}
+            helpkey *
+          }
+
+         parameter listin {
+                           # List input NDFs?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {List input NDF names?}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            default CCDPACK.LOG
+            prompt {Logfile name}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            default BOTH
+            prompt {Write output to (Logfile,Terminal,Neither,Both)}
+            helpkey *
+          }
+
+         parameter max {
+                        # Maximum value for data combination
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum data value}
+            helpkey *
+          }
+
+         parameter maxit {
+                          # Maximum number of inter-comparison iterations
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 20
+            prompt {Maximum number of inter-comparison iterations}
+            helpkey *
+          }
+
+         parameter method {
+                           # Data combination method
+            type LITERAL
+            access UPDATE
+                         # Written to by AIF_CHOIC routine (naughty)
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default MEDIAN
+            prompt {Data combination method}
+            helpkey *
+          }
+
+         parameter min {
+                        # Minimum value for data combination
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum data value}
+            helpkey *
+          }
+
+         parameter modify {
+                           # Modify input NDFs?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Modify input NDFs?}
+            helpkey *
+          }
+
+         parameter niter {
+                          # Number of mode refining iterations
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 7
+            prompt {Number of mode refining iterations}
+            helpkey *
+          }
+  
+         parameter out {
+                        # Output mosaic NDF
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->global.data_array
+            prompt {Output mosaic NDF}
+            helpkey *
+          }
+
+         parameter optov {
+                          # Optimum number of overlaps per NDF
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Optimum number of overlaps per NDF}
+            helpkey *
+          }
+
+         parameter preserve {
+                             # Preserve input data type?
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_preser
+            default TRUE
+            prompt {Preserve input data type?}
+            helpkey *
+          }
+
+         parameter ref {
+                        # Reference NDF
+            type _CHAR
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Reference NDF}
+            helpkey *
+          }
+
+         parameter scale {
+                          # Adjust scale-factors?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Adjust scale-factors?}
+            helpkey *
+          }
+
+         parameter sigmas {
+                           # Number of standard deviations for clipping
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 4.0
+            prompt {Clipping limit (standard deviations)}
+            helpkey *
+          }
+  
+         parameter skysup {
+                           # Sky noise suppression factor
+            type _REAL
+            access READ
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default 10.0
+            prompt {Sky noise suppression factor}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for output mosaic NDF
+            type LITERAL
+            access READ
+            vpath DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default {Output from MAKEMOS}
+            prompt {Title for output mosaic}
+            helpkey *
+          }
+
+         parameter tols {
+                         # Scale-factor accuracy tolerance
+            type _REAL
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default 0.001
+            prompt {Fractional scale-factor tolerance}
+            helpkey *
+          }
+
+         parameter tolz {
+                         # Zero-point accuracy tolerance
+            type _REAL
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default 0.05
+            prompt {Zero-point tolerance}
+            helpkey *
+          }
+
+         parameter usevar {
+                           # Use variance during data combination?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use variance during data combination?}
+            helpkey *
+          }
+
+         parameter weights {
+                            # Weighting factors for input NDFs
+            type _REAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            size *
+            prompt {NDF weighting factors}
+            helpkey *
+          }
+
+         parameter zero {
+                         # Adjust zero-points?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Adjust zero-points?}
+            helpkey *
+          }
+
+      }
+# $Id$

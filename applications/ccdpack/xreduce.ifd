@@ -1,0 +1,21 @@
+      action xreduce {
+#+
+#  Name:
+#     XREDUCE.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-MAY-1999 (MBT):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+      }
+# $Id$

@@ -1,0 +1,137 @@
+      action plotlist {
+#+
+#  Name:
+#     PLOTLIST.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-SEP-1992 (PDRAPER):
+#     	 Original version.
+#     7-MAY-1999 (MBT):
+#        Generated IFD file from IFL file.
+#     {enter_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter inlist {
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {Input list}
+            helpkey *
+          }
+
+         parameter ndfnames {
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_ndfnam
+            default TRUE
+            prompt {Position list names in NDF extensions}
+            helpkey *
+          }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter msize {
+            type _REAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 2.5
+            prompt {Marker size (multiple of default)}
+            helpkey *
+          }
+
+         parameter mtype {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 2
+                     # plus sign
+            prompt {Marker type (0-31) -ve uses ids}
+            helpkey *
+          }
+
+         parameter palnum {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 3
+                     # Green
+            prompt {Pen number}
+            helpkey *
+          }
+
+         parameter thick {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+                     # Green
+            prompt {Thickness of markers}
+            helpkey *
+          }
+
+         parameter clear {
+            access READ
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Clear display device}
+            helpkey *
+          }
+
+         parameter device {
+            position 2
+            access READ
+            vpath GLOBAL CURRENT PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.GRAPHICS_DEVICE
+            default xwindows
+            ptype DEVICE
+            prompt {Name of device}
+            helpkey *
+          }
+
+      }
+# $Id$
