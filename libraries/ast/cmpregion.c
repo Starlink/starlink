@@ -119,9 +119,12 @@ static int (* parent_testunc)( AstRegion * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_equal)( AstObject *, AstObject * );
-static int (* parent_getclosed)( AstRegion * );
-static int (* parent_getmeshsize)( AstRegion * );
-static double (* parent_getfillfactor)( AstRegion * );
+static void (* parent_setclosed)( AstRegion *, int );
+static void (* parent_setmeshsize)( AstRegion *, int );
+static void (* parent_setfillfactor)( AstRegion *, double );
+static void (* parent_clearclosed)( AstRegion * );
+static void (* parent_clearmeshsize)( AstRegion * );
+static void (* parent_clearfillfactor)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -137,11 +140,8 @@ static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *GetUnc( AstRegion *, int );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char * );
-static double GetFillFactor( AstRegion * );
 static int Equal( AstObject *, AstObject * );
 static int GetBounded( AstRegion * );
-static int GetClosed( AstRegion * );
-static int GetMeshSize( AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
 static int TestUnc( AstRegion * );
 static void ClearUnc( AstRegion * );
@@ -151,6 +151,13 @@ static void Dump( AstObject *, AstChannel * );
 static void GetRegions( AstCmpRegion *, AstRegion **, AstRegion **, int *, int *, int *);
 static void RegBaseBox( AstRegion *, double *, double * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static void SetFillFactor( AstRegion *, double );
+static void SetClosed( AstRegion *, int );
+static void SetMeshSize( AstRegion *, int );
+static void ClearFillFactor( AstRegion * );
+static void ClearClosed( AstRegion * );
+static void ClearMeshSize( AstRegion * );
+
 
 /* Member functions. */
 /* ================= */
@@ -283,17 +290,17 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /*
 *  Name:
-*     MAKE_GET
+*     MAKE_SET
 
 *  Purpose:
-*     Define a function to get an attribute value for a CmpRegion.
+*     Define a function to set an attribute value for a CmpRegion.
 
 *  Type:
 *     Private macro.
 
 *  Synopsis:
 *     #include "cmpregion.h"
-*     MAKE_GET(attribute,lattribute,def,type)
+*     MAKE_SET(attribute,lattribute,type)
 
 *  Class Membership:
 *     Defined by the CmpRegion class.
@@ -302,56 +309,108 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *     This macro expands to an implementation of a private member function
 *     of the form:
 *
-*        static <type> Get<Attribute>( AstRegion *this )
+*        static void Set<Attribute>( AstRegion *this, <Type> value )
 *
-*     that gets the value of a specified Region attribute providing a
-*     default value from the first component Region.
+*     that sets the value of a specified Region attribute in the parent
+*     Region structure and also in the component Regions.
 
 *  Parameters:
 *     attribute
 *        Name of the attribute, as it appears in the function name.
 *     lattribute
 *        Name of the attribute, all in lower case.
-*     def
-*        Value to return in event of an error.
 *     type
 *        The C type of the attribute.
 */
 
 /* Define the macro. */
-#define MAKE_GET(attribute,lattribute,def,type) \
-static type Get##attribute( AstRegion *this_region ) { \
+#define MAKE_SET(attribute,lattribute,type) \
+static void Set##attribute( AstRegion *this_region, type value ) { \
 \
 /* Local Variables: */ \
    AstCmpRegion *this;         /* Pointer to the CmpRegion structure */ \
-   type result;                /* Value to return */ \
 \
 /* Check the global error status. */ \
-   if ( !astOK ) return def; \
+   if ( !astOK ) return; \
 \
-/* Test the attribute. If set use the parent method to get the value. */ \
-   if( astTest##attribute( this_region ) ){ \
-      result = (*parent_get##lattribute)( this_region); \
+/* Use the parent method to set the value in the parent Region structure. */ \
+   (*parent_set##lattribute)( this_region, value ); \
 \
-/* Otherwise, get the value from the first component Region and use it as \
-   the default for the CmpRegion. */ \
-   } else { \
-      this = (AstCmpRegion *) this_region; \
-      result = astGet##attribute( this->region1 ); \
-   } \
-\
-/* Return the result. */ \
-   return result; \
+/* Also set the value in the two component Regions. */ \
+   this = (AstCmpRegion *) this_region; \
+   astSet##attribute( this->region1, value ); \
+   astSet##attribute( this->region2, value ); \
 }
 
 /* Use the above macro to create accessors for the MeshSize, Closed and
    FillFactor attributes. */
-MAKE_GET(FillFactor,fillfactor,0.0,double)
-MAKE_GET(MeshSize,meshsize,0,int)
-MAKE_GET(Closed,closed,0,int)
+MAKE_SET(FillFactor,fillfactor,double)
+MAKE_SET(MeshSize,meshsize,int)
+MAKE_SET(Closed,closed,int)
 
 /* Undefine the macro. */
-#undef MAKE_GET
+#undef MAKE_SET
+
+/*
+*  Name:
+*     MAKE_CLEAR
+
+*  Purpose:
+*     Define a function to clear an attribute value for a CmpRegion.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     MAKE_CLEAR(attribute,lattribute)
+
+*  Class Membership:
+*     Defined by the CmpRegion class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function
+*     of the form:
+*
+*        static void Clear<Attribute>( AstRegion *this )
+*
+*     that sets the value of a specified Region attribute in the parent
+*     Region structure and also in the component Regions.
+
+*  Parameters:
+*     attribute
+*        Name of the attribute, as it appears in the function name.
+*     lattribute
+*        Name of the attribute, all in lower case.
+*/
+
+/* Define the macro. */
+#define MAKE_CLEAR(attribute,lattribute) \
+static void Clear##attribute( AstRegion *this_region ) { \
+\
+/* Local Variables: */ \
+   AstCmpRegion *this;         /* Pointer to the CmpRegion structure */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Use the parent method to clear the value in the parent Region structure. */ \
+   (*parent_clear##lattribute)( this_region ); \
+\
+/* Also clear the value in the two component Regions. */ \
+   this = (AstCmpRegion *) this_region; \
+   astClear##attribute( this->region1 ); \
+   astClear##attribute( this->region2 ); \
+}
+
+/* Use the above macro to create accessors for the MeshSize, Closed and
+   FillFactor attributes. */
+MAKE_CLEAR(FillFactor,fillfactor)
+MAKE_CLEAR(MeshSize,meshsize)
+MAKE_CLEAR(Closed,closed)
+
+/* Undefine the macro. */
+#undef MAKE_CLEAR
 
 static int GetBounded( AstRegion *this_region ) {
 /*
@@ -801,14 +860,23 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name ) {
    parent_equal = object->Equal;
    object->Equal = Equal;
 
-   parent_getclosed = region->GetClosed;
-   region->GetClosed = GetClosed;
+   parent_clearclosed = region->ClearClosed;
+   region->ClearClosed = ClearClosed;
 
-   parent_getmeshsize = region->GetMeshSize;
-   region->GetMeshSize = GetMeshSize;
+   parent_clearmeshsize = region->ClearMeshSize;
+   region->ClearMeshSize = ClearMeshSize;
 
-   parent_getfillfactor = region->GetFillFactor;
-   region->GetFillFactor = GetFillFactor;
+   parent_clearfillfactor = region->ClearFillFactor;
+   region->ClearFillFactor = ClearFillFactor;
+
+   parent_setclosed = region->SetClosed;
+   region->SetClosed = SetClosed;
+
+   parent_setmeshsize = region->SetMeshSize;
+   region->SetMeshSize = SetMeshSize;
+
+   parent_setfillfactor = region->SetFillFactor;
+   region->SetFillFactor = SetFillFactor;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -2702,6 +2770,18 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
       map = astGetMapping( reg2->frameset, AST__BASE, AST__CURRENT );
       if( astIsAUnitMap( map ) ) astSetRegionFS( reg2, 0 );
       map = astAnnul( map );
+
+/* Copy attribute values from the first component Region to the parent
+   Region. */
+      if( astTestFillFactor( new->region1 ) ) {
+         astSetFillFactor( new,  astGetFillFactor( new->region1 ) );
+      }
+      if( astTestMeshSize( new->region1 ) ) {
+         astSetMeshSize( new,  astGetMeshSize( new->region1 ) );
+      }
+      if( astTestClosed( new->region1 ) ) {
+         astSetClosed( new,  astGetClosed( new->region1 ) );
+      }
 
 /* If an error occurred, clean up by annulling the Region pointers and
    deleting the new object. */
