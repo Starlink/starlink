@@ -64,7 +64,7 @@ echo SCUBA_PREFIX set to $utdate
 set dname = `domainname`
 
 if ($dname == 'JAC.jcmt') then
-  setenv DATADIR /jcmtdata/raw/scuba/$utdate
+  setenv DATADIR /jcmtdata/raw/scuba/${utdate}/dem
 else if ($dname == 'JAC.Hilo') then
 
   # Hilo is a bit more complicated since now we need to
@@ -171,6 +171,9 @@ exit
 
 *  History:
 *    $Log$
+*    Revision 1.8  2002/08/13 06:40:33  timj
+*    switch datadir to add dem
+*
 *    Revision 1.7  2002/08/02 01:19:16  frossie
 *    Look at /jcmtdata at the summit
 *
