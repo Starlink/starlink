@@ -24,7 +24,7 @@ KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn
 
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
-kpg1_mixv.gdr
+kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr
 
 KPG_NONGEN = bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f chvalb.f chvali.f \
@@ -111,8 +111,7 @@ kpg1_rmapub.f kpg1_rmapuw.f kpg1_rmapw.f kpg1_satkc.f kpg1_satkd.f \
 kpg1_sclof.f kpg1_scrsz.f kpg1_sdimp.f kpg1_secsh.f \
 kpg1_seed.f kpg1_sgdim.f kpg1_sgdig.f kpg1_slice.f \
 kpg1_sqsud.f kpg1_sqsui.f kpg1_sqsur.f kpg1_ssazd.f kpg1_ssazr.f \
-kpg1_sscof.f kpg1_stdsd.f kpg1_stdsr.f \
-kpg1_stfld.f kpg1_stflr.f kpg1_storb.f kpg1_stord.f kpg1_stori.f \
+kpg1_sscof.f kpg1_storb.f kpg1_stord.f kpg1_stori.f \
 kpg1_storr.f kpg1_storub.f kpg1_storuw.f kpg1_storw.f kpg1_tdlib.f \
 kpg1_tdlid.f kpg1_tdlii.f kpg1_tdlir.f kpg1_tdliub.f kpg1_tdliuw.f \
 kpg1_tdliw.f kpg1_trald.f kpg1_tralr.f \
