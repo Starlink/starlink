@@ -16,6 +16,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -30,6 +31,8 @@
 #        Now does above properly.
 #     20-JAN-1998 (PDRAPER):
 #        Fixed problem with device=! not being accepted on OSF1.
+#     17-FEB-1999 (MBT):
+#        Modified for use with WCS-aware CCDPACK tasks.
 #     {enter_further_changes_here}
 #-
 #
@@ -87,7 +90,8 @@
          gdset $device \\
          gdclear \\
          paldef \\
-         palentry colour=white palnum=0 \\
+      else
+         kappa
       endif
 
 #  Try to locate the ARD file which goes with the test. If this is 
@@ -159,11 +163,12 @@
       echo " "
       ccdgenerate \
          nseq=4 \
-	 file=ccdtest_obj.dat \
-         ubnds='[128,128,166,128,128,201,166,201]' \
-	 lbnds='[1,1,39,1,1,74,39,74]' \
+         file=ccdtest_obj.dat \
          type=$exten \
-	 accept
+         pixels='[128,128]' \
+         origins='[1,1,39,1,1,74,39,74]' \
+         angles='[0,-30,0,0]' \
+         accept
 #     end ccdgenerate
 
 #  If display capability is enabled then display the data frames.
@@ -188,6 +193,7 @@
         display \
            in=data1 \
            mode=percentiles \
+           style="'colour(numlab)=red,grid=1,colour(grid)=black'" \
            percentiles='[2,98]' \
            accept
 #       end display
@@ -348,6 +354,7 @@
 	 out='*|debias|reduced|' \
 	 accept
 #     end flatcor
+
       if ( "$device" != "NONE" ) then
          echo " "
          echo "  Displaying flatfielded target frames."
@@ -473,6 +480,8 @@
       findoff \
          inlist='reduced_data?' \
 	 ndfnames=true \
+         usewcs=true \
+         restrict=true \
 	 outlist='*.off' \
 	 accept
 #     end findoff
@@ -528,11 +537,26 @@
       echo "  transformation types. It also writes the information into the"
       echo "  NDFs so that other routines may use it."
       echo " "
+      rm -f ccdexercise.ast
       register \
          inlist='reduced_data?' \
-	 fittype=1 \
+	 fittype=2 \
 	 accept
 #     end register
+
+#  Export the registration information to an AST file.
+      echo " "
+      echo "  Write World Coordinate System information about the alignment"
+      echo "  of these frames to an external file 'ccdexercise.ast' as a"
+      echo "  record of their mutual alignment."
+      echo " "
+      astexp \
+         in='reduced_data?' \
+         astfile=ccdexercise.ast \
+         fitsid=ISEQ \
+         outdomain=matched \
+         accept
+#     end astexp
 
 #  Resample the data.
       echo " "
@@ -543,11 +567,19 @@
       echo "  exposure time) into a single frame which shows the complete"
       echo "  data coverage for the target area."
       echo " "
-      tranndf \
+# Until TRANNDF is rewritten to be WCS-aware, we use WCSALIGN to do more
+# or less the same job.
+#       tranndf \
+#          in='reduced_data?' \
+#          out='*|reduced|resamp|' \
+#          accept
+# #     end tranndf
+      wcsalign \
          in='reduced_data?' \
-	 out='*|reduced|resamp|' \
-	 accept
-#     end tranndf
+         out='*|reduced|resamp|' \
+         lbnd=\! \
+         accept
+#     end wcsalign
 
 #  Normalise it.
       echo " "
