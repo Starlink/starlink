@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS, 
-     :                       IGRP2, LBNDO, UBNDO, STATUS )
+     :                       IGRP2, IMGID, LBNDO, UBNDO, STATUS )
 *+
 *  Name:
 *     POL1_SNGHD
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, EPS, IGRP2, LBNDO,
-*                      UBNDO, STATUS )
+*     CALL POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, EPS, IGRP2, IMGID,
+*                      LBNDO, UBNDO, STATUS )
 
 *  Description:
 *     This routine gets the POLPACK extension items required to calculate
@@ -48,6 +48,8 @@
 *        string "DEFAULT" is used if no analyser identifier is supplied for
 *        an NDF. Each unique identifier is included only once in the
 *        returned group.
+*     IMGID( NNDF ) = CHARACTER * ( * ) (Returned)
+*        An array holding the image identifiers found in the supplied NDFs. 
 *     LBNDO( 3 ) = INTEGER (Returned)
 *        The lower bounds required for the output NDF so that it encompasses 
 *        the area of overlap between the input images. 
@@ -92,6 +94,7 @@
       REAL T( NNDF )
       REAL EPS( NNDF )
       INTEGER IGRP2
+      CHARACTER IMGID( NNDF )*(*)
       INTEGER LBNDO( 3 )
       INTEGER UBNDO( 3 )
 
@@ -267,6 +270,20 @@
 
 *  Convert the effective analyser angle from degrees to radians.
          PHI( I ) = PHI( I )*DTOR         
+
+*  Get the image identifier.
+         CALL DAT_THERE( XLOC, 'IMGID', THERE, STATUS )
+         IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'NDF', INDF )
+            CALL ERR_REP( 'POL1_SNGHD_ERR3', 'The POLPACK '//
+     :                    'extension in the input image ''^NDF'' '//
+     :                    'does not contain an IMGID value.', 
+     :                    STATUS )
+            GO TO 999
+         ELSE
+            CALL CMP_GET0C( XLOC, 'IMGID', IMGID( I ), STATUS ) 
+         END IF
 
 *  Annul the locator to the POLPACK extension.
          CALL DAT_ANNUL( XLOC, STATUS )

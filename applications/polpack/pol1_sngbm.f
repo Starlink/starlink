@@ -22,9 +22,9 @@
 *     IVAR = INTEGER (Given)
 *        If greater than zero, output variances are requried and an error
 *        will be reported if variances cannot be created. If less than zero
-*        then output variances are not required, and any input variances
-*        will be ignored. If zero, then output variances will be created
-*        if and only if all the input NDFs have variances.
+*        then output variances are not required. If zero, then output 
+*        variances will be created if possible, but no error is reported
+*        otherwise.
 *     ILEVEL = INTEGER (Given)
 *        The amount of information to display on the screen; 0 for none;
 *        1 for some; 2 for lots.
@@ -80,6 +80,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      INTEGER IMGID_LEN
+      PARAMETER( IMGID_LEN = 80 )! Maximum length of an image identifier
+
 *  Local Variables:
       CHARACTER XLOC*(DAT__SZLOC)! POLPACK extension locator
       INTEGER I                  ! Index of current input NDF
@@ -90,6 +94,7 @@
       INTEGER INDFO              ! NDF identifier for the output NDF
       INTEGER IPAID              ! Pointer to analyser indices
       INTEGER IPEPS              ! Pointer to analyser efficiency factors
+      INTEGER IPIMI              ! Pointer to image identifier strings
       INTEGER IPPHI              ! Pointer to effective analyser angles
       INTEGER IPT                ! Pointer to analyser transmission factors
       INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
@@ -107,6 +112,7 @@
 *  Initialise resource pointers and identifiers.
       IPPHI = 0
       IPAID = 0
+      IPIMI = 0
       IPT = 0
       IPEPS = 0
       IGRP2 = GRP__NOID      
@@ -126,6 +132,7 @@
       CALL PSX_CALLOC( NNDF, '_INTEGER', IPAID, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPT, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPEPS, STATUS )
+      CALL PSX_CALLOC( NNDF*IMGID_LEN, '_CHAR', IPIMI, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999     
@@ -134,8 +141,8 @@
 *  the output NDF, and a flag indicating if output variances can be
 *  created.
       CALL POL1_SNGHD( IGRP1, NNDF, VAR, %VAL( IPPHI ), %VAL( IPAID ), 
-     :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, LBNDO, UBNDO, 
-     :                 STATUS )
+     :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, %VAL( IPIMI ),
+     :                 LBNDO, UBNDO, STATUS, %VAL( IMGID_LEN ) )
 
 *  Report an error if output variances were requested but cannot be
 *  created.
@@ -225,7 +232,8 @@
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, VAR, %VAL( IPPHI ), %VAL( IPAID ), 
      :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, INDFO, INDFC, 
-     :                 NITER, NSIGMA, ILEVEL, STATUS )
+     :                 NITER, NSIGMA, ILEVEL, %VAL( IPIMI ), STATUS,
+     :                 %VAL( IMGID_LEN ) )
 
 *  Tidy up.
 *  ========
@@ -237,6 +245,7 @@
       IF( IPAID .NE. 0 ) CALL PSX_FREE( IPAID, STATUS )
       IF( IPT .NE. 0 ) CALL PSX_FREE( IPT, STATUS )
       IF( IPEPS .NE. 0 ) CALL PSX_FREE( IPEPS, STATUS )
+      IF( IPIMI .NE. 0 ) CALL PSX_FREE( IPIMI, STATUS )
 
 *  Delete the group holding analyser identifiers.
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )

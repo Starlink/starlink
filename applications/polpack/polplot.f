@@ -350,6 +350,10 @@
 *     9-NOV-1998 (DSB):
 *        Modified to bring the handling of WCS and graphics into line with
 *        KAPPA V0.13.
+*     17-FEB-1999 (DSB):
+*        Changed the estimation of the "typical" magnitude to be the 90%
+*        percentile value. This is used as the default for the VSCALE
+*        parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -379,6 +383,9 @@
       REAL  DTOR                 ! Degrees to radians conversion factor
       PARAMETER ( DTOR = 1.7453293E-2 )
 
+      INTEGER NBIN               ! No. of bins in histogram used to
+      PARAMETER( NBIN = 1000 )   ! find typical magnitude value
+
       REAL  NVEC0                ! Default no. of vectors along short
       PARAMETER ( NVEC0 = 15.0 ) ! axis
 
@@ -391,19 +398,9 @@
       CHARACTER UNITS2*( CUNITS )! Units of the data
       DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
-      DOUBLE PRECISION DMAX      ! Max. value of pixels in array
-      DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
-      DOUBLE PRECISION DMIN      ! Min. value of pixels in array
-      DOUBLE PRECISION DMINC     ! Min. pixel value after clipping
       DOUBLE PRECISION DX        ! Extension of X axis
       DOUBLE PRECISION DY        ! Extension of Y axis
       DOUBLE PRECISION LBND      ! Lower axis bound
-      DOUBLE PRECISION MEAN      ! Mean of pixels in array
-      DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
-      DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
-      DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
-      DOUBLE PRECISION SUM       ! Sum of pixels in array
-      DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
       DOUBLE PRECISION UBND      ! Upper axis bound
       INTEGER CI                 ! CAT catalogue identifier
       INTEGER FRM                ! Frame pointer
@@ -417,10 +414,6 @@
       INTEGER I                  ! Loop count
       INTEGER ICAT               ! Index of (X,Y) Frame in IWCS and IPLOT
       INTEGER IFRM               ! Frame index
-      INTEGER IMAX               ! Vector index of max. pixel
-      INTEGER IMAXC              ! Vector index of max. clipped pixel
-      INTEGER IMIN               ! Vector index of min. pixel
-      INTEGER IMINC              ! Vector index of min. clipped pixel
       INTEGER IPANG              ! Pointer to array holding vector angles
       INTEGER IPICD              ! AGI id. for DATA picture
       INTEGER IPICF              ! AGI id. for new FRAME picture
@@ -453,6 +446,7 @@
       LOGICAL AXES               ! Annotated axes to be drawn?
       LOGICAL F1, F2, F3         ! Were explicit text heights set?
       LOGICAL KEY                ! A key to vector scale to be plotted?
+      LOGICAL HINIT              ! Initialise histogram?
       LOGICAL NEGATE             ! Negate supplied angles?
       LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
@@ -464,9 +458,12 @@
       REAL BHI( 2 )              ! Upper bounds of plotting space
       REAL CLIP( 4 )             ! Array of clipping limits
       REAL DEFSCA                ! Default value for VSCALE
+      REAL DMAX                  ! Highest value in histogram
+      REAL DMIN                  ! Lowest value in histogram
       REAL DSCALE                ! Vector scale, viz. data units per pixel
       REAL DUMMY                 ! Unused argument
       REAL HGT                   ! Character height scale factor
+      REAL HIST( NBIN )          ! Histogram array 
       REAL KEYOFF                ! Offset to top of key 
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Margins round DATA picture
@@ -647,32 +644,22 @@
 
 *  Find a representative data value.
 *  =================================
-*  Obtain a "typical" data value from the magnitude column. This will be
-*  used to define the default vector scaling. First, compute the
-*  statistics. Remove abberant values by sigma clipping 4 times.
-      CALL KPG1_STATR( ( NIN .LT. NVEC ), NIN, %VAL( IPMAG ), 4, 
-     :                 CLIP, NGOOD, IMIN, DMIN, IMAX, DMAX, SUM, MEAN, 
-     :                 STDEV, NGOODC, IMINC, DMINC, IMAXC, DMAXC, SUMC, 
-     :                 MEANC, STDEVC, STATUS )
+*  Find the approximate 90% percentile of the magnitude values.
+      DMAX = 0.0
+      DMIN = 0.0 
+      HINIT = .TRUE.
+      CALL POL1_HIST( NIN, %VAL( IPMAG ), 0.9, NBIN, HIST, DMIN, DMAX, 
+     :                HINIT, TYPDAT, STATUS )
 
-*  Report an error if all data values are effectively zero.
-      IF ( ABS( DMAX ) .LE. VAL__SMLR .AND.
-     :     ABS( DMIN ) .LE. VAL__SMLR .AND.
-     :     STATUS .EQ. SAI__OK ) THEN 
-         CALL CAT_TIQAC( GIMAG, 'NAME', NAME, STATUS )
+      IF( TYPDAT .EQ. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'NAME', NAME )
-         CALL ERR_REP( 'POLPLOT_3', 'All magnitude values are zero '//
-     :                 'in column ^NAME.', STATUS )
-         GO TO 999
-      END IF
+         CALL ERR_REP( 'POLPLOT_3a', 'All vector magnitudes are bad.',
+     :                 STATUS )
 
-*  Calculate the "typical value". This is the mean value after clipping,
-*  plus one standard deviation.
-      IF ( MEANC .NE. VAL__BADD .AND. STDEVC .NE. VAL__BADD ) THEN
-         TYPDAT = MEANC + STDEVC
-      ELSE
-         TYPDAT = MEAN
+      ELSE IF( TYPDAT .EQ. 0.0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'POLPLOT_3b', 'All vector magnitudes are zero.',
+     :                 STATUS )
       END IF
 
 *  Prepare to produce graphics using AST and PGPLOT.
@@ -880,7 +867,7 @@
       CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
       CALL PAR_GET0R( 'VSCALE', VSCALE, STATUS )
       VSCALE = ABS( VSCALE )
-      IF ( VSCALE .LE. VAL__SMLR ) VSCALE = DEFSCA
+      IF ( VSCALE .LE. VAL__SMLR ) VSCALE = VAL__SMLR
 
 *  Convert VSCALE so that it gives data units per unit distance in the
 *  graphics world coordinate system, rather than data units per centimetre.

@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGRJ( ITER, NAME, ILEVEL, NSIGMA, VAR, EL, 
+      SUBROUTINE POL1_SNGRJ( ITER, IMGID, ILEVEL, NSIGMA, VAR, EL, 
      :                       DIN, VIN, PHI, T, EPS, DOUT, ALLOK, 
      :                       DCOPY, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGRJ( ITER, NAME, ILEVEL, NSIGMA, VAR, EL, DIN, VIN, PHI, 
+*     CALL POL1_SNGRJ( ITER, IMGID, ILEVEL, NSIGMA, VAR, EL, DIN, VIN, PHI, 
 *                      T, EPS, DOUT, ALLOK, DCOPY, STATUS )
 
 *  Description:
@@ -25,8 +25,8 @@
 *  Arguments:
 *     ITER = INTEGER (Given)
 *        The index of the current rejection iteration.
-*     NAME = CHARACTER * ( * ) (Given)
-*        The name of the NDF.
+*     IMGID = CHARACTER * ( * ) (Given)
+*        The image identifier.
 *     ILEVEL = INTEGER (Given)
 *        If 2 or more; the number of pixels rejected from the NDF is
 *        reported.
@@ -90,7 +90,7 @@
 
 *  Arguments Given:
       INTEGER ITER
-      CHARACTER NAME*(*)
+      CHARACTER IMGID*(*)
       INTEGER ILEVEL
       REAL NSIGMA
       LOGICAL VAR
@@ -113,7 +113,6 @@
 
 *  Local Variables:
       INTEGER I                  ! Element index
-      INTEGER IAT                ! Index of end of directtory path (unix)
       INTEGER NGOOD              ! No. of good pixels remaining
       INTEGER NREJ               ! No. of pixels rejected this iteration
       INTEGER NRES               ! No. of valid residuals
@@ -241,17 +240,10 @@
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( ILEVEL .GT. 1 ) THEN
-
-            CALL NDG1_LASTO( NAME, '/', IAT, STATUS )
-            IF( IAT .EQ. 0 ) THEN
-               CALL MSG_SETC( 'NDF', NAME )
-            ELSE
-               CALL MSG_SETC( 'NDF', NAME( IAT + 1 : ) )
-            ENDIF
-
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_SETI( 'NREJ', NREJ )
             CALL MSG_SETI( 'NGOOD', NGOOD )
+            CALL MSG_SETC( 'NDF', IMGID )
 
             CALL MSG_OUT( 'POL1_SNGRJ_MSG1', '   Iter: ^ITER  '//
      :                    'Rejected: ^NREJ  Remaining: ^NGOOD -- '//
@@ -259,13 +251,7 @@
 
 *  If required, warn the user if no good pixels remain in this NDF.
          ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
-            CALL NDG1_LASTO( NAME, '/', IAT, STATUS )
-            IF( IAT .EQ. 0 ) THEN
-               CALL MSG_SETC( 'NDF', NAME )
-            ELSE
-               CALL MSG_SETC( 'NDF', NAME( IAT + 1 : ) )
-            ENDIF
-
+            CALL MSG_SETC( 'NDF', IMGID )
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUT( 'POL1_SNGRJ_MSG1', '   WARNING: No usable '//
      :                    'pixels remain in ''^NDF'' after ^ITER '//

@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS, 
      :                       IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
-     :                       STATUS )
+     :                       IMGID, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS, IGRP2, INDFO, 
-*                      INDFC, NITER, NSIGMA, ILEVEL, STATUS )
+*                      INDFC, NITER, NSIGMA, ILEVEL, IMGID, STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -78,6 +78,8 @@
 *        The information level. Zero produces no screen output; 1 gives
 *        brief details of each iteration; 2 gives full details of each
 *        iteration.
+*     IMGID( NNDF ) = CHARACTER * ( * ) (Given)
+*        Image identifiers for the input NDFs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -119,6 +121,7 @@
       INTEGER NITER
       REAL NSIGMA
       INTEGER ILEVEL
+      CHARACTER IMGID( NNDF )*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -278,7 +281,7 @@
 *  are too large.
          ELSE
             CALL GRP_GET( IGRP1, I, 1, NAME, STATUS ) 
-            CALL POL1_SNGRJ( ITER, NAME, ILEVEL, NSIGMA, VAR, EL, 
+            CALL POL1_SNGRJ( ITER, IMGID( I ), ILEVEL, NSIGMA, VAR, EL, 
      :                       %VAL( IPDIN ), %VAL( IPVIN ), PHI( I ), 
      :                       T( I ), EPS( I ), %VAL( IPDOUT ), ALLOK,
      :                       %VAL( IPDCUT ), STATUS )

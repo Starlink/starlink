@@ -446,10 +446,9 @@
          CALL DAT_ANNUL( POLLOC, STATUS )
          CALL DAT_ANNUL( FITLOC, STATUS )
 
-*  If an error occurred, flush the error, delete any POLPACK extension, and 
+*  If an error occurred, delete any POLPACK extension, and 
 *  continue to process the next NDF.
          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_FLUSH( STATUS )
             CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
 
 *  Otherwise, add the name of the NDF to the group of successfully
@@ -458,10 +457,14 @@
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
          END IF
 
-         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
-
 *  Release the NDF.
          CALL NDF_ANNUL( INDF, STATUS )
+
+*  Flush any error.
+         IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
+
+*  Space the screen output.
+         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
 
  100  CONTINUE
 
