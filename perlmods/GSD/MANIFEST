@@ -11,9 +11,12 @@ t/gsd.t
 t/obs_das_0141.dat
 t/object.t
 t/tie.t
+t/pdl.t
 gsdprint
 typemap
 PDL/Makefile.PL
-PDL/README
 PDL/GSD.pm
+PDL/IO/GSD.pm
+PDL/IO/Makefile.PL
+PDL/IO/README
 ChangeLog
