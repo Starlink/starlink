@@ -433,7 +433,7 @@ c        IGEND(1) = 4
         CALL USI_GET0C( 'ANC', ANCTYP, STATUS )
         CALL CHR_UCASE( ANCTYP )
         IF ( STR_ABBREV( ANCTYP, 'HELP' ) ) THEN
-          WRITE (*,'(A)') ''
+          WRITE (*,'(A)') ' '
           WRITE (*,'(A)') 'The following options are possible:-'
           WRITE (*,'(A)') '  NONE - No ancillary file, ' //
      :                    'area contained in AREASCAL, ' //
@@ -442,7 +442,7 @@ c        IGEND(1) = 4
      :                    'AREASCAL=1, respone matrix absolute'
           WRITE (*,'(A)') '  REL - Ancillary file set to 1, ' //
      :                    'AREASCAL=1, reponse matrix normalised'
-          WRITE (*,'(A)') ''
+          WRITE (*,'(A)') ' '
           CALL USI_CANCL( 'ANC', STATUS )
         ELSE IF ( STR_ABBREV( ANCTYP, 'NONE' ) ) THEN
           OK = .TRUE.
@@ -974,18 +974,18 @@ c        IGEND(1) = 4
 *+
 *-
 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          			! SAE constants
+
 * Import:
       INTEGER			LUN, ARF, NE
       REAL			EBND(*), AREA
 
 * Status:
       INTEGER			STATUS
-
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          			! SAE constants
 
 *  External References:
       EXTERNAL			CHR_LEN
@@ -1186,7 +1186,6 @@ c        IGEND(1) = 4
       INTEGER			LASTR			!
       INTEGER			LC			! Last channel bin
       INTEGER			LE			! Last energy bin
-      INTEGER			LUN			! Logical unit
       INTEGER			MAX_NGRP		! Max value of N_GRP
       INTEGER			MAX_SMAT		! Max width of matrix
       INTEGER			NDIG			!
@@ -1534,7 +1533,7 @@ c        IGEND(1) = 4
       INTEGER			RMFID			!
 
 *  Status:
-      INTEGER                   STATUS, FSTAT           ! Global status
+      INTEGER                   STATUS		        ! Global status
 
 * External references:
       EXTERNAL			CHR_LEN
@@ -1551,7 +1550,6 @@ c        IGEND(1) = 4
       INTEGER			CBPTR			! Channel energies
       INTEGER			FSTAT			! FITSIO status
       INTEGER			I			!
-      INTEGER			LUN			! Logical unit
       INTEGER			NCHAN			! Number of channels
       INTEGER			BWIDTH			! Width of binary table in bytes
       INTEGER			HDUTYPE
