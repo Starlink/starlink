@@ -33,7 +33,8 @@ $result = GetOptions("help"    => \$h,
 		     "change_flat" => \$modify,
 		     "notau"   => \$notau,
 		     "tau=f"   => \$tauz,
-		     "sub=s"   => \$subinst
+		     "sub=s"   => \$subinst,
+                     "noflat"  => \$noflat
 );
 
 $h = 1 unless $result == 1;  # Print help info if unknown option
@@ -54,6 +55,7 @@ Options:
           \t not the same as using MSG_FILTER=quiet which hides messages
           \t from the tasks)
    -change_flat\t Run the change_flatfield task
+   -noflat\t Do not run FLATFIELD
    -remsky\t Run remsky
    -rebin\t Regrid the data
    -sub s\t Select a specific sub-instrument (else selects all)
@@ -195,24 +197,28 @@ if ($modify) {
 ########################################################################
 # Flatfield
 
+unless ($noflat) {
 
-$outflat = $in."_flat";
+  $outflat = $in."_flat";
 
-undef $modpars;
-foreach $par ('MSG_FILTER') {
-  $modpars = $modpars." $par=".$params{$par}
-  if ($params{$par} =~ /./);
+  undef $modpars;
+  foreach $par ('MSG_FILTER') {
+    $modpars = $modpars." $par=".$params{$par}
+    if ($params{$par} =~ /./);
+  }
+
+  # Note I use IN= so that $in is allowed to be just a number
+
+  $exstat = system("$root/flatfield IN=$in $modpars OUT=$outflat");
+  die "FLATFIELD finished abnormally...stopping (status = $exstat)\n"
+    if ($exstat != 0);
+
+  (-e "$outflat.sdf") || 
+    die "FLATFIELD finished abnormally...stopping ($outflat.sdf was not created)\n";
+
+} else {
+  $outflat = $in;
 }
-
-# Note I use IN= so that $in is allowed to be just a number
-
-$exstat = system("$root/flatfield IN=$in $modpars OUT=$outflat");
-die "FLATFIELD finished abnormally...stopping (status = $exstat)\n"
-  if ($exstat != 0);
-
-(-e "$outflat.sdf") || 
-  die "FLATFIELD finished abnormally...stopping ($outflat.sdf was not created)\n";
-
 
 ########################################################################
 # Before EXTINCTION can be run I need to find out some stuff about the 
