@@ -106,7 +106,6 @@
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       CHARACTER * ( GRP__SZNAM ) SNAME ! Value of Set NAME characteristic
 
-      
 *.
 
 *  Initialise error returned values.
@@ -131,6 +130,9 @@
 
 *  Get the NDF's Set characteristics.
          CALL CCD1_SETRD( INDF, AST__NULL, SNAME, SINDEX, JFRM, STATUS )
+
+*  Annul the NDF identifier.
+         CALL NDF_ANNUL( INDF, STATUS )
 
 *  Construct the appropriate key.
          KEYVAL = ' '
