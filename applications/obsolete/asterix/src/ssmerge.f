@@ -136,7 +136,7 @@
      :                        'RA', 'DEC',    'ERRORS',
      :                        'FLUX', 'CFLUX', 'EXTEN',
      :                        'SIGNIF','BACK','ENCPSF',
-     :                        'DELTA_C','PPROB','EXT_SIG'/
+     :                        'DELTA_C','PPROB','EXSIG'/
 *
 *    Version id :
 *
