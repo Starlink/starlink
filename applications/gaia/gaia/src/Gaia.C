@@ -166,7 +166,6 @@ package provide Iwidgets $iwidgets_version
       return TCL_ERROR;
     }
 
-
     //  Set up the namespaces used by the itcl/itk classes.
     if (Tcl_Eval(interp,
 #if (TCL_MAJOR_VERSION >= 8)

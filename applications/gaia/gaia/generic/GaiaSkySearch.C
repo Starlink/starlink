@@ -188,9 +188,11 @@ GaiaSkySearch::GaiaSkySearch( Tcl_Interp *interp,
 //
 //  Destructor -
 //
-//
 GaiaSkySearch::~GaiaSkySearch()
 {
+  if ( cat_ ) {
+    delete cat_;
+  }
 }
 
 //

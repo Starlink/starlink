@@ -126,6 +126,12 @@ GaiaLocalCatalog::~GaiaLocalCatalog()
     entry_->url( realname_ );
     free( realname_ );
   }
+
+  //  Destroy the conversion object.
+  if ( convertTable_[0] != '\0' ) { 
+    Tcl_VarEval( interp_, \
+                 "catch {delete object ", convertTable_, "}", (char *) NULL);
+  }
 }
 
 //
@@ -252,7 +258,6 @@ int GaiaLocalCatalog::is_foreign( const char *name )
 //
 int GaiaLocalCatalog::convertTo( int now )
 {
-  
   //  If realname_ is defined then attempt to convert it into a tab
   //  table.
   if ( realname_ ) {
@@ -308,23 +313,31 @@ int GaiaLocalCatalog::convertFrom( int now )
 //  Check for and start the conversion [incr Tcl] class that controls
 //  the conversion process.
 //
-int GaiaLocalCatalog::startConvert() {
-
+int GaiaLocalCatalog::startConvert() 
+{
   //  Use a [incr Tcl] class GaiaConvertTable to control the
   //  conversion process. This controls the external filters and
   //  executes the conversion command. If a GaiaConvertTable object
-  //  doesn't exist yet, then create one.
+  //  doesn't exist yet, then create one. Catch name with the namespace 
+  //  that is current and record for future use.
   char buf[256];
   if ( convertTable_[0] != '\0' ) {
     sprintf( buf, "info exists %s", convertTable_ );
     if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
       convertTable_[0] = '\0';
+    } else {
+      if ( strcmp( interp_->result, "0" ) == 0 ) { 
+        convertTable_[0] = '\0';
+      }
     }
   }
   if ( convertTable_[0] == '\0' ) {
     if ( Tcl_Eval( interp_, "GaiaConvertTable #auto" ) != TCL_OK ) {
       return 0;
     } else {
+      if ( Tcl_VarEval( interp_, "code ", interp_->result, (char *) NULL ) != TCL_OK ) {
+        return 0;
+      }
       (void) strncpy( convertTable_, interp_->result, NAMELEN - 1 );
     }
   }
@@ -361,15 +374,27 @@ void GaiaLocalCatalog::dispose()
 int GaiaLocalCatalog::readTemp()
 {
   if ( filename_ && access( filename_, F_OK ) == 0 ) {
+
+    //  Mmap the file and enter into a TabTable.
     Mem m( filename_ );
     if ( m.status() != 0 ) {
       return TCL_ERROR;
     }
-    if ( info_.init( (char *)m.ptr() ) != 0 ) {
-      return TCL_ERROR;
+
+    //  Make a null terminated copy, which will be managed by info_.
+    int size = m.size() + 1;
+    char* data = (char *) malloc( size );
+    if ( ! data ) {
+      return fmt_error("cannot allocate %d bytes for %s", size, filename_);
     }
+    strncpy( data, (char*) m.ptr(), size-1 );
+    data[ size-1 ] = '\0';
+    if (info_.init(data, 0, 1) != 0) {
+        return TCL_ERROR;
+    }
+
     //  This will extract any catalog config info from the file's header
-    info_.entry( entry_, (char *)m.ptr() );
+    info_.entry( entry_, data );
 
     //  Record modification date at this read.
     tempstamp_ = modDate( filename_ );
