@@ -1,5 +1,5 @@
-*+  SSO_CHKFLDERR - Check existance of field error
-      SUBROUTINE SSO_CHKFLDERR( LOC, FLD, OK, STATUS )
+*+  SSI_CHKFLDERR - Check existance of field error
+      SUBROUTINE SSI_CHKFLDERR( ID, FLD, OK, STATUS )
 *    Description :
 *
 *     Check presence an old format SSDS field error. Assumes presence of
@@ -40,35 +40,14 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)       FLOC          ! Field structure
+      INTEGER ID
 *-
 
-*    Status ok?
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*      Field exists?
-        CALL SSO_CHKFLD( LOC, FLD, OK, STATUS )
-        IF ( OK ) THEN
-
-*        Locate field
-          CALL SSO_LOCFLD( LOC, FLD, FLOC, STATUS )
-
-*        Does error exist?
-          CALL HDX_OK( FLOC, 'ERROR', OK, STATUS )
-
-*        Free locator
-          CALL DAT_ANNUL( FLOC, STATUS )
-
-        ELSE
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Field '//FLD//' does not exist', STATUS )
-        END IF
-
-*      Tidy up
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_CHKFLDERR', STATUS )
-        END IF
-
-      END IF
-
+      IF(STATUS.EQ.SAI__OK) THEN
+        CALL ADI1_GETLOC(LOC,ID,STATUS)
+        CALL SSO_CHKFLDERR( ID, FLD, OK, STATUS )
+        IF ( STATUS.NE.SAI__OK ) THEN
+          CALL AST_REXIT( 'SSI_CHKFLDERR', STATUS )
+        ENDIF
+      ENDIF
       END
