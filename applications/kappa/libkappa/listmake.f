@@ -53,6 +53,33 @@
 *     listmake outcat [ndf] [mode] [file] 
 
 *  ADAM Parameters:
+*     CATFRAME = LITERAL (Read)
+*        A string determining the co-ordinate Frame in which positions are 
+*        to be stored in the output catalogue associated with parameter
+*        OUTCAT. The string supplied for CATFRAME can be one of the 
+*        following:
+*
+*        - A Domain name such as SKY, AXIS, PIXEL, etc. 
+*
+*        - An integer value giving the index of the required Frame.
+*
+*        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*        EQUAT(J2000) (see SUN/163).
+*
+*        If a null (!) value is supplied, the positions will be stored 
+*        in a SKY Frame, if a SKY Frame is available within the input 
+*        catalogue. Otherwise, they will be stored in PIXEL co-ordinates, 
+*        if a PIXEL Frame is available within the input catalogue. 
+*        Otherwise, they are stored in the base Frame of the supplied 
+*        WCS information. [!]
+*     CATEPOCH = DOUBLE PRECISION (Read)
+*        The epoch at which the sky positions stored in the output
+*        catalogue were determined. It will only be accessed if an epoch
+*        value is needed to qualify the co-ordinate Frame specified by 
+*        COLFRAME. If required, it should be given as a decimal years 
+*        value, with or without decimal places ("1996.8" for example). 
+*        Such values are interpreted as a Besselian epoch if less than 
+*        1984.0 and as a Julian epoch otherwise. 
 *     DESCRIBE = LOGICAL (Read)
 *        If TRUE, a detailed description of the co-ordinate Frame in which 
 *        positions are required will be displayed before the positions
@@ -74,11 +101,11 @@
 *        for a single position, separated by white space. Only accessed if
 *        parameter MODE is given the value "File".
 *     FRAME = LITERAL (Read)
-*        Specifies the co-ordinate Frame of the positions supplied using parameter 
-*        POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string 
-*        such as EQUAT(J2000) is supplied (see SUN/163), then the positions 
-*        are assumed to be 2-dimensional celestial co-ordinates in the
-*        specified system. Otherwise, the given string is used as a Domain 
+*        Specifies the co-ordinate Frame of the positions supplied using 
+*        parameter POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) 
+*        string such as EQUAT(J2000) is supplied (see SUN/163), then the 
+*        positions are assumed to be 2-dimensional celestial co-ordinates in 
+*        the specified system. Otherwise, the given string is used as a Domain 
 *        name without
 *        any interpretation. Any string may be supplied, but normally one
 *        of the standard Domain names such as GRID, PIXEL, GRAPHICS, etc,
@@ -118,7 +145,8 @@
 *        FRAME is stored in the output positions list, and supplied
 *        positions are assumed to be in the same Frame. [!]
 *     OUTCAT = FILENAME (Write)
-*        The catalogue holding the output positions list. 
+*        The catalogue holding the output positions list. Se also
+*        parameter CATFRAME.
 *     POSITION = LITERAL (Read)
 *        The co-ordinates of a single position to be stored in the output
 *        positions list. Supplying ":" will display details of the co-ordinate
@@ -151,13 +179,15 @@
 *        slowly with time, introducing fictitious proper motions. The 
 *        positions are supplied hours and degrees values in reponse to 
 *        repeated prompts for parameter POSITIONS.
-*     listmake outlist ndf=allsky mode=file file=stars
+*     listmake outlist ndf=allsky mode=file file=stars catframe=gal
 *        This creates a FITS binary catalogue called outlist.FIT containing a 
 *        list of positions, together with descriptions of all the co-ordinate 
 *        Frames contained in the NDF allsky. The positions are supplied
 *        as co-ordinates within the current co-ordinate Frame of the NDF.
 *        Application WCSFRAME can be used to find out what this Frame is.
-*        The positions are supplied in a text file called stars. 
+*        The positions are supplied in a text file called stars. The
+*        positions are transformed into galactic co-ordinates before being
+*        stored in the output.
 *     listmake out.txt incat=old.fit frame=gal
 *        This creates an STL format catalogue stored in a text file called 
 *        out.txt containing a list of positions, together with a description 
@@ -209,6 +239,8 @@
 *        Original version.
 *     3-SEP-1999 (DSB):
 *        Added NULL argument to KPG1_GTPOS call.
+*     13-DEC-2001 (DSB):
+*        Added parameters CATFRAME and CATEPOCH.
 *     {enter_further_changes_here}
 
 *  Bugs:

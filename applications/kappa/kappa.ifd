@@ -3139,6 +3139,22 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter catframe {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Output catalogue coordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter catepoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Output catalogue epoch}
+            helpkey *
+         }
+
          parameter close {
             type _LOGICAL
             prompt {Are polygons to be closed?}
@@ -6967,6 +6983,22 @@ package kappa {
          alias {cent(roid)}
 
          helplib {$KAPPA_HELP}
+
+         parameter catframe {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Output catalogue coordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter catepoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Output catalogue epoch}
+            helpkey *
+         }
 
          parameter centre {
             access WRITE
@@ -15411,6 +15443,22 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter catframe {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Output catalogue coordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter catepoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Output catalogue epoch}
+            helpkey *
+         }
+
          parameter describe {
             type _LOGICAL
             prompt {Is the co-ordinate Frame to be described?}
@@ -15513,6 +15561,22 @@ iraf! {
       action listshow {
 
          helplib {$KAPPA_HELP}
+
+         parameter catframe {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Output catalogue coordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter catepoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Output catalogue epoch}
+            helpkey *
+         }
 
          parameter close {
             type _LOGICAL
@@ -15721,6 +15785,22 @@ iraf! {
       action profile {
 
          helplib {$KAPPA_HELP}
+
+         parameter catframe {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Output catalogue coordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter catepoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Output catalogue epoch}
+            helpkey *
+         }
 
          parameter finish {
             position 4

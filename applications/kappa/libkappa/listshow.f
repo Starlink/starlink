@@ -49,6 +49,24 @@
 *     listshow incat [frame] [first] [last] [plot] [device]
 
 *  ADAM Parameters:
+*     CATFRAME = LITERAL (Read)
+*        A string determining the co-ordinate Frame in which positions are 
+*        to be stored in the output catalogue associated with parameter
+*        OUTCAT. See parameter FRAME for a description of the allowed
+*        values for this parameter. If a null (!) value is supplied, the
+*        positions will be stored in a SKY Frame, if a SKY Frame is 
+*        available within the input catalogue. Otherwise, they will be 
+*        stored in PIXEL co-ordinates, if a PIXEL Frame is available
+*        within the input catalogue. Otherwise, they are stored in the
+*        Frame used to specify positions within the input catalogue. [!]
+*     CATEPOCH = DOUBLE PRECISION (Read)
+*        The epoch at which the sky positions stored in the output
+*        catalogue were determined. It will only be accessed if an epoch
+*        value is needed to qualify the co-ordinate Frame specified by 
+*        COLFRAME. If required, it should be given as a decimal years 
+*        value, with or without decimal places ("1996.8" for example). 
+*        Such values are interpreted as a Besselian epoch if less than 
+*        1984.0 and as a Julian epoch otherwise. 
 *     CLOSE = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Poly". If TRUE, polgons will be closed by joining 
@@ -159,8 +177,9 @@
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected.
 *     OUTCAT = FILENAME (Write)
-*        The output catalogue in which to store the selected positions. If a 
-*        null value is supplied, no output catalogue is produced. [!]
+*        The output catalogue in which to store the selected positions. 
+*        If a null value is supplied, no output catalogue is produced. See
+*        parameter COLFRAME. [!]
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the positions on the
 *        graphics device specified by parameter DEVICE. The appearance of 
@@ -280,6 +299,11 @@
 *        This displays the pixel co-ordinates of all the positions
 *        stored in the FITS binary catalogue stars.fit. They are all written 
 *        to the output parameter POSNS as well as to the screen.
+*     listshow star outcat=star-gal catframe=gal quiet
+*        This copies a position list from catalogue "star" to a new
+*        catalogue called "star-gal". The positions are stored in galactic 
+*        co-ordinates in the output catalogue. Nothing is displayed on
+*        the screen.
 *     listshow stars.fit equat(J2010) first=3 last=3 quiet
 *        This extracts position 3 from the catalogue stars.fit transforming
 *        it into FK5 equatorial RA/DEC co-ordinates (referenced to the
@@ -321,6 +345,8 @@
 *        Display the alignment Frame even if QUIET is TRUE.
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM.
+*     13-DEC-2001 (DSB):
+*        Added parameters CATFRAME and CATEPOCH.
 *     {enter_further_changes_here}
 
 *  Bugs:

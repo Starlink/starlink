@@ -43,6 +43,33 @@
 *     cursor [mode] [name] [outcat] [device]
 
 *  ADAM Parameters:
+*     CATFRAME = LITERAL (Read)
+*        A string determining the co-ordinate Frame in which positions are 
+*        to be stored in the output catalogue associated with parameter
+*        OUTCAT. The string supplied for CATFRAME can be one of the 
+*        following:
+*
+*        - A Domain name such as SKY, AXIS, PIXEL, etc. 
+*
+*        - An integer value giving the index of the required Frame.
+*
+*        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*        EQUAT(J2000) (see SUN/163).
+*
+*        If a null (!) value is supplied, the positions will be stored 
+*        in a SKY Frame, if a SKY Frame is available within the input 
+*        catalogue. Otherwise, they will be stored in PIXEL co-ordinates, 
+*        if a PIXEL Frame is available within the input catalogue. 
+*        Otherwise, they are stored in the base Frame of the supplied 
+*        WCS information. [!]
+*     CATEPOCH = DOUBLE PRECISION (Read)
+*        The epoch at which the sky positions stored in the output
+*        catalogue were determined. It will only be accessed if an epoch
+*        value is needed to qualify the co-ordinate Frame specified by 
+*        COLFRAME. If required, it should be given as a decimal years 
+*        value, with or without decimal places ("1996.8" for example). 
+*        Such values are interpreted as a Besselian epoch if less than 
+*        1984.0 and as a Julian epoch otherwise. 
 *     CLOSE = _LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Poly". If TRUE, polygons will be closed by joining 
@@ -173,7 +200,8 @@
 *        binary table. If a file type of .txt is given, then the catalogue 
 *        is stored in a text file in "Small Text List" (STL) format. If no 
 *        file type is given, then ".fit" is assumed. If a null value is 
-*        supplied, no output positions list is produced. [!]
+*        supplied, no output positions list is produced. See also
+*        parameter CATFRAME. [!]
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the selected positions 
 *        which have valid co-ordinates.  The appearance of these graphics
@@ -281,6 +309,11 @@
 *        current graphics device by use of the cursor. Positions are
 *        reported in pixel co-ordinates if available, and in the current 
 *        co-ordinate Frame of the picture otherwise. 
+*     cursor frame=pixel outcat=a catframe=gal
+*        Like the previous example, except that, in addition to being
+*        displayed on the screen, the positions are transformed into 
+*        galactic co-ordinates and stored in FITS binary table called 
+*        "a.FIT", together with any associated WCS information.
 *     cursor frame=equat(J2010)
 *        This obtains co-ordinates within any visible picture for the
 *        current graphics device by use of the cursor. Positions are
@@ -293,7 +326,7 @@
 *        Frames are described as they are used. Each selected point is
 *        marked with PGPLOT marker 3 (an asterisk). The markers are 
 *        red and are twice the default size.
-*     cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice
+*     cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice 
 *        Exactly two positions are obtained within the current picture, 
 *        and are joined with a straight line. The positions are written to 
 *        a FITS binary catalogue called slice.FIT but are not displayed on 
@@ -407,7 +440,9 @@
 *        Add TOKEN arg in call to KPG1_ASFRM.
 *     15-FEB-2000 (DSB):
 *        KPG1_PGCUR argument list changed.
-*     {enter_further_changes_here}
+*     13-DEC-2001 (DSB):
+*        Added parameters CATFRAME and CATEPOCH.
+**     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}

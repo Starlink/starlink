@@ -57,6 +57,33 @@
 *     centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
 
 *  ADAM Parameters:
+*     CATFRAME = LITERAL (Read)
+*        A string determining the co-ordinate Frame in which positions are 
+*        to be stored in the output catalogue associated with parameter
+*        OUTCAT. The string supplied for CATFRAME can be one of the 
+*        following:
+*
+*        - A Domain name such as SKY, AXIS, PIXEL, etc. 
+*
+*        - An integer value giving the index of the required Frame.
+*
+*        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*        EQUAT(J2000) (see SUN/163).
+*
+*        If a null (!) value is supplied, the positions will be stored 
+*        in a SKY Frame, if a SKY Frame is available within the input 
+*        catalogue. Otherwise, they will be stored in PIXEL co-ordinates, 
+*        if a PIXEL Frame is available within the input catalogue. 
+*        Otherwise, they are stored in the base Frame of the supplied 
+*        WCS information. [!]
+*     CATEPOCH = DOUBLE PRECISION (Read)
+*        The epoch at which the sky positions stored in the output
+*        catalogue were determined. It will only be accessed if an epoch
+*        value is needed to qualify the co-ordinate Frame specified by 
+*        COLFRAME. If required, it should be given as a decimal years 
+*        value, with or without decimal places ("1996.8" for example). 
+*        Such values are interpreted as a Besselian epoch if less than 
+*        1984.0 and as a Julian epoch otherwise. 
 *     CENTRE  = LITERAL (Write)
 *        The formatted co-ordinates of the last centroid position, in
 *        the current Frame of the NDF.  
@@ -166,7 +193,7 @@
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the centroided positions. 
 *        If a null value (!) is supplied, no output catalogue is produced.
-*        [!]
+*        See also parameter CATFRAME. [!]
 *     PLOTSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
 *        drawing the graphics markers specified by parameter MARK. 
@@ -249,10 +276,11 @@
 *        the current co-ordinate Frame.  A log of the input parameter
 *        values, initial and centroid positions is written to the text
 *        file centroids.log.
-*     centroid cluster mode=cat incat=a outcat=b 
+*     centroid cluster mode=cat incat=a outcat=b catframe=ecl
 *        This example reads the initial guess positions from the
 *        positions list in file a.FIT, and writes the accurate centroid
-*        positions to positions list file b.FIT. The input file may, for
+*        positions to positions list file b.FIT, storing the output 
+*        positions in ecliptic co-ordinates. The input file may, for
 *        instance, have been created using the application CURSOR.
 
 *  Notes:
@@ -319,6 +347,8 @@
 *        Report an error if an even value is supplied for SEARCH.
 *     25-JUN-1999 (DSB):
 *        Many major changes to make use of AST/PGPLOT.
+*     13-DEC-2001 (DSB):
+*        Added parameters CATFRAME and CATEPOCH.
 *     {enter_further_changes_here}
 
 *  Bugs:

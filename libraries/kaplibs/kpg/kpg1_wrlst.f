@@ -134,35 +134,43 @@
          GO TO 999
       END IF
 
-*  Allow the user to select an alternative base Frame. First note the
-*  original base and current Frames.
-      IBASE = AST_GETI( IWCS, 'BASE', STATUS )
-      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+*  If the input FrameSet has more than 1 Frame, allow the user to select an alternative 
+*  base Frame. 
+      IF( AST_GETI( IWCS, 'NFRAME', STATUS ) .GT. 1 ) THEN
+
+*  Note the original base and current Frames.
+         IBASE = AST_GETI( IWCS, 'BASE', STATUS )
+         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Make the default Frame the current Frame. If a SKY Frame is available,
 *  use it, otherwise if a PIXEL Frame is available, use it, otherwise use
 *  the current Base Frame.
-      CALL KPG1_ASFFR( IWCS, 'SKY', IDEF,STATUS )
-      IF( IDEF .EQ. AST__NOFRAME ) THEN
-         CALL KPG1_ASFFR( IWCS, 'PIXEL', IDEF,STATUS )
-         IF( IDEF .EQ. AST__NOFRAME ) IDEF = IBASE
-      END IF         
-      CALL AST_SETI( IWCS, 'CURRENT', IDEF, STATUS )
+         CALL KPG1_ASFFR( IWCS, 'SKY', IDEF,STATUS )
+         IF( IDEF .EQ. AST__NOFRAME ) THEN
+            CALL KPG1_ASFFR( IWCS, 'PIXEL', IDEF,STATUS )
+            IF( IDEF .EQ. AST__NOFRAME ) IDEF = IBASE
+         END IF         
+         CALL AST_SETI( IWCS, 'CURRENT', IDEF, STATUS )
 
 *  Allow the user to change the current FRAME.
-      CALL MSG_SETC( 'A', 'catalogue' )
-      CALL KPG1_ASFRM( 'CATFRAME', 'CATEPOCH', IWCS, 'PIXEL', 'AXIS', 
-     :                 .TRUE., '^A', STATUS )
+         CALL MSG_SETC( 'A', 'catalogue' )
+         CALL KPG1_ASFRM( 'CATFRAME', 'CATEPOCH', IWCS, 'PIXEL', 'AXIS', 
+     :                    .TRUE., '^A', STATUS )
 
 *  Set the base Frame equal to the new current Frame, and then re-instate 
 *  the original current Frame.
-      CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', STATUS ),
-     :               STATUS )
-      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+         CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', STATUS ),
+     :                  STATUS )
+         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
 *  Get the simplified Mapping from the supplied Frame to the Base Frame.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, AST__BASE, 
-     :                                    STATUS ), STATUS )
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, AST__BASE, 
+     :                                       STATUS ), STATUS )
+ 
+*  Use a UnitMap if there is only 1 Frame in the FrameSet.
+      ELSE
+         MAP = AST_UNITMAP( AST_GETI( IWCS, 'NIN', STATUS ), STATUS )
+      END IF
 
 *  If the forward transformation is not defined, store the positions in
 *  the Frame in which they were supplied. The associated FrameSet contains
