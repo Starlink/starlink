@@ -103,6 +103,12 @@
 *        This value is used to qualify sky coordinate systems that are
 *        notionally based on the ecliptic (the plane of the Earth's
 *        orbit around the Sun) and/or the Earth's equator.
+*     LatAxis (integer)
+*        A read-only attribute giving the index of the latitude axis, 
+*        taking account of any current axis permutation.
+*     LonAxis (integer)
+*        A read-only attribute giving the index of the longitude axis, 
+*        taking account of any current axis permutation.
 *     Projection (string)
 *        This attribute contains a human-readable description of the
 *        type of sky projection used when a SkyFrame is attached to a
@@ -140,6 +146,8 @@
 *           Galactic coordinates (IAU 1958).
 *        "SUPERGALACTIC"
 *           De Vaucouleurs Supergalactic coordinates.
+*        "UNKNOWN"
+*           An unknown spherical coordinate system.
 
 *  Methods Over-Ridden:
 *     Public:
@@ -277,6 +285,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     4-MAR-1996 (RFWS):
@@ -289,6 +298,9 @@
 *        Added Projection attribute.
 *     26-FEB-1998 (RFWS):
 *        Over-ride the astUnformat method.
+*     3-APR-2001 (DSB):
+*        Added "Unknown" option for the System attribute. Added read-only
+*        attributes LatAxis and LonAxis.
 *-
 */
 
@@ -339,6 +351,8 @@ typedef struct AstSkyFrameVtab {
    double (* GetEpoch)( AstSkyFrame * );
    double (* GetEquinox)( AstSkyFrame * );
    int (* GetAsTime)( AstSkyFrame *, int );
+   int (* GetLatAxis)( AstSkyFrame * );
+   int (* GetLonAxis)( AstSkyFrame * );
    int (* TestAsTime)( AstSkyFrame *, int );
    int (* TestEpoch)( AstSkyFrame * );
    int (* TestEquinox)( AstSkyFrame * );
@@ -390,6 +404,8 @@ const char *astGetProjection_( AstSkyFrame * );
 double astGetEpoch_( AstSkyFrame * );
 double astGetEquinox_( AstSkyFrame * );
 int astGetAsTime_( AstSkyFrame *, int );
+int astGetLatAxis_( AstSkyFrame * );
+int astGetLonAxis_( AstSkyFrame * );
 int astTestAsTime_( AstSkyFrame *, int );
 int astTestEpoch_( AstSkyFrame * );
 int astTestEquinox_( AstSkyFrame * );
@@ -473,6 +489,10 @@ astINVOKE(V,astGetAsTime_(astCheckSkyFrame(this),axis))
 astINVOKE(V,astGetEpoch_(astCheckSkyFrame(this)))
 #define astGetEquinox(this) \
 astINVOKE(V,astGetEquinox_(astCheckSkyFrame(this)))
+#define astGetLatAxis(this) \
+astINVOKE(V,astGetLatAxis_(astCheckSkyFrame(this)))
+#define astGetLonAxis(this) \
+astINVOKE(V,astGetLonAxis_(astCheckSkyFrame(this)))
 #define astGetProjection(this) \
 astINVOKE(V,astGetProjection_(astCheckSkyFrame(this)))
 #define astGetSystem(this) \
