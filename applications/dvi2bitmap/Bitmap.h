@@ -114,12 +114,31 @@ class Bitmap {
     /**
      * Sets whether bitmap information is logged.  If logging is
      * enabled, then the details of the bitmaps are sent to the
-     * <code>stdout</code> prefixed by <code>Qbitmapts</code>.
+     * <code>stdout</code> prefixed by the given string.
      *
-     * @param b if true, then bitmap activity is logged
+     * @param prefix if non-null, then bitmap activity is logged on
+     * stdout with this prefix; if null, such logging is turned off
      */
-    static void logBitmapInfo (bool b) { logBitmapInfo_ = b; };
+    static void logBitmapInfo (const char *prefix) {
+        logBitmapPrefix_ = prefix;
+    };
 
+    /**
+     * Represents a location within the bitmap.  Coordinates
+     * <code>x</code> and <code>y</code> are relative to the top-left
+     * corner of the bitmap, with the pixel in the top-left corner
+     * having coordinates (0,0).
+     *
+     * <p>See {@link #mark} and {@link #getMark}.
+     */
+    class BitmapMark {
+    public:
+        double x, y;
+    };
+    void mark(const double x, const double y);
+    BitmapMark* getMark();
+
+    /** Iterator class */
     class const_iterator 
     {
     public:
@@ -147,47 +166,55 @@ class Bitmap {
     void normalizeBB_(int& l, int& r, int& t, int& b);
     void usesBitmapArea_(const int ulx, const int uly,
 			 const int lrx, const int lry);
-    // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
+    /** pointer to bitmap.  Pixel (x,y) is at B[y*W + x]; */
     Byte *B;
-    // width and height of bitmap
+    /** width and height of bitmap */
     int W, H;
-    // Maximum height and width
+    /** Maximum height and width */
     int maxW_, maxH_;
-    // is the bitmap to be expandable?
+    /** is the bitmap to be expandable? */
     bool isExpandable_;
-    // bounding box - bbL and bbT are the leftmost and topmost
-    // blackened pixels, bbR and bbB are one more than the rightmost
-    // and lowest blackened pixels.  Until a call to freeze(), bb? may
-    // go outside the canvas (ie, may be negative or greater than W or
-    // H); afterwards they are bounded by 0..W and 0..H.  These
-    // remain the edges of the blackened pixels even after cropping,
-    // and so it is the responsibiligy of the boundingBox() method to
-    // take cropping into account.
+    /** bounding box.  bbL and bbT are the leftmost and topmost
+     * blackened pixels, bbR and bbB are one more than the rightmost
+     * and lowest blackened pixels.  Until a call to freeze(), bb? may
+     * go outside the canvas (ie, may be negative or greater than W or
+     * H); afterwards they are bounded by 0..W and 0..H.  These
+     * remain the edges of the blackened pixels even after cropping,
+     * and so it is the responsibiligy of the boundingBox() method to
+     * take cropping into account.
+     */
     int bbL, bbR, bbT, bbB;
-    int BB[4];			// holds return values for boundingBox()
+    /** holds return values for boundingBox() */
+    int BB[4];
+    /** Flag is set true when the bitmap is frozen */
     bool frozen_;
-    // cropX is the value of bbX when the crop() method was called
+    /** cropX is the value of bbX when the crop() method was called */
     int cropL, cropR, cropT, cropB;
+    /** Flag is set true when the bitmap is frozen */
     bool cropped_;
-    // When cropping, set margins.  Indexed by enumerator Bitmap::Margin.
+    /** Location of mark */
+    BitmapMark* mark_;
+    /** When cropping, set margins.  Indexed by enumerator Bitmap::Margin. */
     static int  cropMarginDefault[4];
     int  cropMargin[4];
     static bool cropMarginAbsDefault[4];
     bool cropMarginAbs[4];
-    bool transparent_;		// make bg transparent if poss.
-    //Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
+    /** If true, make background transparent if possible */
+    bool transparent_;
     BitmapColour fg_, bg_;
-    bool customRGB_;		// have custom colours been set?
-    //static Byte def_fg_red_, def_fg_green_, def_fg_blue_,
-    //def_bg_red_, def_bg_green_, def_bg_blue_;
+    /** If true, custom colours have been set */
+    bool customRGB_;
+    /** Default background colours */
     static BitmapColour def_fg_, def_bg_;
     static bool def_customRGB_;
-    int bpp_;			// bits-per-pixel
-    Byte max_colour_;		// ==> max colour index (must fit into
-				// a Byte)
+    /** bits-per-pixel */
+    int bpp_;
+    /** Maximum colour index (must fit into a Byte) */
+    Byte max_colour_;
+    /** The reporting verbosity level */
     static verbosities verbosity_;
-
-    static bool logBitmapInfo_;
+    /** The prefix when reporting bitmap information.  Set to zero to suppress */
+    static const char* logBitmapPrefix_;
 };
 
 #endif //#ifndef BITMAP_HEADER_READ
