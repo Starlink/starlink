@@ -107,7 +107,7 @@ cat >&3 <<\_STARCONF3_EOD
 # Configuration
 buildsupport=@prefix@
 buildsupportbin=@bindir@
-buildsupportdata=@datadir@
+buildsupportdata=@pkgdatadir@
 ln_s="@LN_S@"
 versionint="@PACKAGE_VERSIONINT@"
 version="@PACKAGE_VERSION@"

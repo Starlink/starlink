@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 bin_SCRIPTS = starconf starconf-validate starconf-finder
-data_DATA = \
+pkgdata_DATA = \
 	componentinfo.dtd \
 	template-Makefile.am \
 	template-configure.ac \
@@ -49,7 +49,7 @@ starconf: make-starconf \
 # make-starconf.in
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
-	-e 's,@datadir\@,$(datadir),g' \
+	-e 's,@pkgdatadir\@,$(pkgdatadir),g' \
 	-e 's,@prefix\@,$(prefix),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
 	-e 's,@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g' \

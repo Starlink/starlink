@@ -50,14 +50,13 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES = starconf.m4 bootstrap.installed java/Makefile \
 	starconf-finder starconf-validate
-am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)
+am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
-dataDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(data_DATA)
-INSTALL_STARDATA = $(INSTALL_DATA)
+pkgdataDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(pkgdata_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -130,7 +129,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 bin_SCRIPTS = starconf starconf-validate starconf-finder
-data_DATA = \
+pkgdata_DATA = \
 	componentinfo.dtd \
 	template-Makefile.am \
 	template-configure.ac \
@@ -157,7 +156,7 @@ CLEANFILES = starconf make-starconf starconf.m4
 # make-starconf.in
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
-	-e 's,@datadir\@,$(datadir),g' \
+	-e 's,@pkgdatadir\@,$(pkgdatadir),g' \
 	-e 's,@prefix\@,$(prefix),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
 	-e 's,@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g' \
@@ -234,25 +233,25 @@ uninstall-binSCRIPTS:
 	  rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
 uninstall-info-am:
-install-dataDATA: $(data_DATA)
+install-pkgdataDATA: $(pkgdata_DATA)
 	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(datadir)
-	@list='$(data_DATA)'; for p in $$list; do \
+	$(mkdir_p) $(DESTDIR)$(pkgdatadir)
+	@list='$(pkgdata_DATA)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f"; \
-	  $(dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f; \
+	  echo " $(pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f"; \
+	  $(pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f; \
 	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(datadir)/$$f" >>$$MANIFEST_FILE; \
+	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >>$$MANIFEST_FILE; \
 	  else :; fi; \
 	done
 
-uninstall-dataDATA:
+uninstall-pkgdataDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(data_DATA)'; for p in $$list; do \
+	@list='$(pkgdata_DATA)'; for p in $$list; do \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(datadir)/$$f"; \
-	  rm -f $(DESTDIR)$(datadir)/$$f; \
+	  echo " rm -f $(DESTDIR)$(pkgdatadir)/$$f"; \
+	  rm -f $(DESTDIR)$(pkgdatadir)/$$f; \
 	done
 tags: TAGS
 TAGS:
@@ -414,7 +413,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(SCRIPTS) $(DATA)
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)
+	$(mkdir_p) $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir)
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -459,7 +458,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-dataDATA
+install-data-am: install-pkgdataDATA
 
 install-exec-am: install-binSCRIPTS install-exec-local
 
@@ -487,20 +486,21 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA \
-	uninstall-info-am
+uninstall-am: uninstall-binSCRIPTS uninstall-info-am \
+	uninstall-pkgdataDATA
 
 .PHONY: all all-am am--refresh check check-am clean clean-generic dist \
 	dist-all dist-bzip2 dist-gzip dist-shar dist-tarZ dist-zip \
 	distcheck distclean distclean-generic distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binSCRIPTS install-data \
-	install-data-am install-dataDATA install-exec install-exec-am \
+	install-data-am install-exec install-exec-am \
 	install-exec-local install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic pdf pdf-am ps ps-am uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-dataDATA uninstall-info-am
+	install-pkgdataDATA install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am uninstall \
+	uninstall-am uninstall-binSCRIPTS uninstall-info-am \
+	uninstall-pkgdataDATA
 
 
 # Include (possibly) required files in the starconf script.
