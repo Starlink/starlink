@@ -56,6 +56,7 @@
 *     replace "x" in the routine name by R or D respectively.  The scale
 *     and offset, and the bounds returned by the routine must have
 *     the data type specified.
+*     -  This routine assumes monotonic axes.
 
 *  [optional_subroutine_items]...
 *  Authors:
@@ -126,21 +127,18 @@
 
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Obtain the significant dimensions and bounds of the NDF.  The
-*    lower bound is needed to compute the linear offset between world
-*    and data co-ordinates.  The scale only needs the number of pixels
-*    which is derived by mapping the axis.
-
+*  Obtain the significant dimensions and bounds of the NDF.  The lower
+*  bound is needed to compute the linear offset between world and data
+*  co-ordinates.  The scale only needs the number of pixels which is
+*  derived by mapping the axis.
       CALL KPG1_SGDIM( NDF, NDIM, SGDIM, STATUS )
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
-*    Assume that the data co-ordinates are linear and all have the
-*    identity transformation, i.e. unit scale factor and zero offset.
-
+*  Assume that the data co-ordinates are linear and all have the
+*  identity transformation, i.e. unit scale factor and zero offset.
       LINEAR = .TRUE.
       IDENTY = .TRUE.
 
@@ -150,69 +148,59 @@
          ATYPE = '_REAL'
       END IF
 
-*    Loop for each axis dimension.
-
+*  Loop for each axis dimension.
       DO  I = 1, NDIM
 
-*       Map the axis centres for the dimension.
-
+*  Map the axis centres for the dimension.
          CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), ATYPE, 'READ',
      :                  AXPNTR, AEL, STATUS )
 
-*       Find the range of the axis co-ordinates and whether or
-*       not the axis is linear.
-
+*  Find the range of the axis co-ordinates and whether or not the axis
+*  is linear.
          CALL KPG1_AXLI<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
-     :                    DAUBND( I ), AXLIN( I ), STATUS )
+     :                      DAUBND( I ), AXLIN( I ), STATUS )
 
-*       Let the application complete without an error if the
-*       world co-ordinates are non-linear, but issue a warning.
-
+*  Let the application complete without an error if the world
+*  co-ordinates are non-linear, but issue a warning.
          IF ( .NOT. AXLIN( I ) ) THEN
             CALL MSG_SETI( 'IAXIS', I )
             CALL MSG_OUT( 'NONLINEAR',
      :        'Axis ^IAXIS is non-linear or reversed.  Data '/
-     :        /'co-ordinates along any plot axis and in the database '/
-     :        /'will be wrong.', STATUS )
+     :        /'co-ordinates along any plot axis and in the '/
+     :        /'database will be wrong.', STATUS )
 
-*          Cannot store a non-linear transformation.
-
+*  Cannot store a non-linear transformation.
             LINEAR = .FALSE.
          ELSE
 
-*          Determine the scale and offset of the transformation 
-*          between world and data co-ordinates.
-
+*  Determine the scale and offset of the transformation between world
+*  and data co-ordinates.
             SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) /
      :                   NUM_ITO<T>( AEL - 1 )
             OFFSET( I ) = DALBND( I ) - SCALE( I ) *
      :                    ( NUM_ITO<T>( LBND( SGDIM( I ) ) ) - 0.5 )
 
-*          Correct the lower and upper bounds data co-ordinates.
-*          Current values are for the array-element centres, whereas the
-*          co-ordinates at the sides are required. Thus apply half-pixel
-*          corrections.
-
+*  Correct the lower and upper bounds data co-ordinates.  Current
+*  values are for the array-element centres, whereas the co-ordinates
+*  at the sides are required.  Thus apply half-pixel corrections.
             DAUBND( I ) = DAUBND( I ) + 0.5 * SCALE( I )
             DALBND( I ) = DALBND( I ) - 0.5 * SCALE( I )
       
-*          Determine whether the two co-ordinate systems are
-*          identical.
-
+*  Determine whether the two co-ordinate systems are identical.
             IDENTY = IDENTY .AND. (
      :               ABS( SCALE( I ) - 1<CONST> ) .LT. VAL__EPS<T> .AND.
      :               ABS( OFFSET( I ) - 0<CONST> ) .LT. VAL__EPS<T> )
+
+*  End of check for linear axis.
          END IF
 
-*       Unmap the axis co-ordinates.
-
+*  Unmap the axis co-ordinates.
          CALL NDF_AUNMP( NDF, 'Centre', SGDIM( I ), STATUS )
 
       END DO
 
-*    If the linear axes have identical co-ordinate systems the returned
-*    flag is made false.
-
+*  If the linear axes have identical co-ordinate systems the returned
+*  flag is made false.
       LINEAR = LINEAR .AND. .NOT. IDENTY
 
       END
