@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_SCUCAT (STATUS)
+      SUBROUTINE SURF_SCUCAT (STATUS)
 *+
 *  Name:
 *     SCUCAT
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_SCUCAT( STATUS )
+*     CALL SURF_SCUCAT( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -86,6 +86,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.19  1997/06/13 00:10:44  timj
+*     Use SURF_PAR and change name
+*
 *     Revision 1.18  1997/06/13 00:09:58  timj
 *     Now read NDFs as well.
 *     Close each file after writing instead of keeping NDF identifier.
@@ -165,7 +168,7 @@ c
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'DAT_PAR'          ! Data-system constants
-      INCLUDE 'REDS_SYS'         ! SCUBA constants
+      INCLUDE 'SURF_PAR'         ! SCUBA constants
 
 *     Status:
       INTEGER STATUS
