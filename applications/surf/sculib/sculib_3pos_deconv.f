@@ -105,7 +105,7 @@
       INTEGER EXPOSURE                         ! exposure number of scan
       INTEGER INTEGRATION                      ! integration number of scan
       INTEGER MEASUREMENT                      ! measurement number of scan
-      INTEGER NORM                             ! normalisation factor
+      REAL    NORM                             ! normalisation factor
       INTEGER N_CONV                           ! number of points in convolution
                                                ! function
       INTEGER N_SCAN                           ! number of points in scan
