@@ -1,72 +1,158 @@
-*+  BINSUBSET - Subsets a DATA_ARRAY subclass object
-      SUBROUTINE BINSUBSET(STATUS)
-*
-*    Description :
-*
+      SUBROUTINE BINSUBSET( STATUS )
+*+
+*  Name:
+*     BINSUBSET
+
+*  Purpose:
+*     Subsets a binned dataset or array
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL BINSUBSET( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     A binned dataset is reduced according to user specified
 *     ranges on its axis and/or data values.
 *       If KEEP = .TRUE. then data .GE. lower axis bound and .LT. upper axis bound are included.
 *        EXCEPTION - if upper axis bound = highest axis value; .LE. upper axis bound are included.
 *       If KEEP = .FALSE. then data .LT. lower axis bound .OR. .GT. opper axis bound are included.
-*
-*    Parameters :
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Jim Peden (BHVAD::JCMP)
-*
-*    History :
-*
-*     29 Jun 84 : Original (BHVAD::JCMP)
-*     21 Nov 85 : V0.4-1 Rewrite with more facilities (BHVAD::JCMP)
-*     28 Nov 85 : V0.4-2 Some minor mods (BHVAD::JCMP)
-*     17 Dec 85 : V0.4-3 ADAM version (BHVAD::JCMP)
-*     26 Sep 86 : V0.5-1 DTA__MXRANG changed (BHVAD::JCMP)
-*      1 Oct 86 : V0.5-2 Bug fix? now handles 2D datasets! (BHVAD::JCMP)
-*     29 Oct 87 : V0.6-1 Improved use of HISTORY etc (BHVAD::ADM)
-*     24 Nov 87 : V0.6-2 Modified to ROSAT BINSUBSET specs.
-*     28 Jun 88 : V1.0-1 ASTERIX88 [BHVAD::ADM]
-*      1 Dec 88 : ASTERIX88 conversion done properly (PLA)
-*     25 Sep 89 : V1.0-2 Now handles decreasing axis values (RJV)
-*     10 Dec 89 : V1.0-3 Primitive now spelt correctly! No longer
-*                        prompts for axis numbers if 1D (DJA)
-*     19 Jan 90 : V1.0-4 Bug fix and efficiency improvements
-*                        remove selection on data value (RJV)
-*                        add slicing as an option
-*      6 Jun 90 : V1.0-5 Option to select ranges by index number (RJV)
-*      4 Jul 90 : V1.2-0 Range selection now works on bin centres, and not
-*                        bin bounds (DJA)
-*     27 Mar 91 : V1.4-0 Handles primitive inputs (DJA)
-*      7 Jun 91 : V1.5-1 History improved. Bug dealing with structured
-*                        objects without axes fixed. (DJA)
-*     20 Oct 92 : V1.7-0 Proofed against failure to map output (DJA)
-*     19 Nov 92 : V1.7-1 Changed arguments to AXIS_VAL2PIX (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     25 Apr 95 : V1.8-1 New data interfaces (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Usage:
+*     binsubset {parameter_usage}
+
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     Should update sort information
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     binsubset, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     JCMP: Jim Peden (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     29 Jun 1984 V0.4-0 (JCMP):
+*        Original version
+*     21 Nov 1985 V0.4-1 (JCMP)
+*        Rewrite with more facilities
+*     28 Nov 1985 V0.4-2 (JCMP)
+*        Some minor mods
+*     17 Dec 1985 V0.4-3 (JCMP)
+*        ADAM version
+*     26 Sep 1986 V0.5-1 (JCMP)
+*        DTA__MXRANG changed
+*      1 Oct 1986 V0.5-2 (JCMP)
+*        Bug fix? now handles 2D datasets!
+*     29 Oct 1987 V0.6-1 (ADM)
+*        Improved use of HISTORY etc
+*     24 Nov 1987 V0.6-2 (ADM):
+*        Modified to ROSAT BINSUBSET specs.
+*     28 Jun 1988 V1.0-1 (ADM):
+*        ASTERIX88 version
+*     25 Sep 1989 V1.0-2 (RJV):
+*        Now handles decreasing axis values
+*     10 Dec 1989 V1.0-3 (DJA):
+*        Primitive now spelt correctly! No longer
+*        prompts for axis numbers if 1D
+*     19 Jan 1990 V1.0-4 (RJV):
+*        Bug fix and efficiency improvements. Remove selection on data value
+*        add slicing as an option
+*      6 Jun 1990 V1.0-5 (RJV):
+*        Option to select ranges by index number
+*      4 Jul 1990 V1.2-0 (DJA):
+*        Range selection now works on bin centres, and not bin bounds
+*     27 Mar 1991 V1.4-0 (DJA):
+*        Handles primitive inputs
+*      7 Jun 1991 V1.5-1 (DJA):
+*        History improved. Bug dealing with structured objects without axes fixed
+*     20 Oct 1992 V1.7-0 (DJA):
+*        Proofed against failure to map output
+*     19 Nov 1992 V1.7-1 (DJA):
+*        Changed arguments to AXIS_VAL2PIX
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     10 Dec 1995 V2.0-0 (DJA):
+*        ADI port. Simplify logic by not treating regular axis arrays
+*        explicitly (as they are expanded on output anyhow)
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local parameters :
-*
-      INTEGER                DTA__MXRANG        ! max no. permissible ranges
-        PARAMETER           (DTA__MXRANG = 20)
-      INTEGER                MX__HTEXT
-        PARAMETER           (MX__HTEXT = ADI__MXDIM)
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER                   DTA__MXRANG        ! max no. permissible ranges
+        PARAMETER               ( DTA__MXRANG = 20 )
+      INTEGER                   MX__HTEXT
+        PARAMETER               ( MX__HTEXT = ADI__MXDIM )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'BINSUBSET Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*80           TEXTI(4)           ! Input file spec
       CHARACTER*132          HTEXT(MX__HTEXT)   ! History text
       CHARACTER*80           AXUNT(ADI__MXDIM)  ! Units for each axis
@@ -113,44 +199,39 @@
       INTEGER                SELAX(ADI__MXDIM)
       INTEGER                TLEN               ! Text length
 
-      BYTE                   MASK               ! Quality mask
-
       LOGICAL                INPRIM             ! Input object is primitive
       LOGICAL                WIDOK(ADI__MXDIM)  ! Width component od axes ok?
-      LOGICAL                IUNIF(ADI__MXDIM)  ! Uniform widths? - input
-      LOGICAL                OUNIF(ADI__MXDIM)  ! Uniform widths? - output
       LOGICAL                OK                 ! object is ok
       LOGICAL                KEEP(ADI__MXDIM)   ! Are ranges those to keep?
       LOGICAL                KEEPDATA
       LOGICAL 		     SLICE
       LOGICAL                INDEX              ! select by index
-      LOGICAL                IREG(ADI__MXDIM)   ! input axis regularly spaced?
-      LOGICAL                OREG(ADI__MXDIM)   ! output axis regularly spaced?
       LOGICAL                QUALOK             ! Input QUALITY OK?
       LOGICAL                VAROK              ! Input VARIANCE OK?
       LOGICAL                NORM               ! Axes normalised?
       LOGICAL                SEL(ADI__MXDIM)    ! Has axis been selected on?
-*
-*    Version :
-*
-      CHARACTER*(25)         VERSION
-        PARAMETER            ( VERSION = 'BINSUBSET Version 1.8-1' )
-*-
+*.
 
-*    Version
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise ASTERIX
       CALL AST_INIT()
+
       HU = 0
 
-*    Obtain identifiers to input and output objects
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ',IFID, OFID, STATUS )
+*  Get file names
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get DATA_ARRAY
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
+*  Get status and size of primary data
+      CALL ADI_DERVD( IFID, 'Array', PRIM, STATUS )
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF (.NOT. OK) THEN
         CALL MSG_PRNT('AST_ERR: Invalid data')
         STATUS = SAI__ERROR
@@ -162,7 +243,7 @@
         INDEX = .TRUE.
       END IF
 
-*    Define axis ranges
+*  Define axis ranges
       NELM = 1
       DO I = 1, ADI__MXDIM
         SEL(I) = .FALSE.
@@ -176,24 +257,24 @@
         NELM = NELM * DIMS(I)
       END DO
 
-* see if selected ranges to be kept or discarded
+*  See if selected ranges to be kept or discarded
       CALL USI_GET0L( 'KEEP', KEEPDATA, STATUS )
 
-* see if slicing required
+*  See if slicing required
       CALL USI_GET0L( 'SLICE', SLICE, STATUS )
 
-* see if selecting by index number
+*  See if selecting by index number
       IF ( .NOT. INPRIM ) CALL USI_GET0L('INDEX',INDEX,STATUS)
 
-*    Display axis labels, and get min & max values
+*  Display axis labels, and get min & max values
       CALL BINSUBSET_DISPAX( IFID, INPRIM, NDIM, DIMS, AXUNT, AXLO,
-     :                               AXHI, IREG, DIR, NAX, STATUS )
+     :                                     AXHI, DIR, NAX, STATUS )
       INDEX = ( INDEX .OR. ( NAX .EQ. 0 ) )
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Choose axes to select on unless 1D
+*  Choose axes to select on unless 1D
       IF ( NDIM .EQ. 1 ) THEN
         SELAX(1) = 1
         NSEL = 1
@@ -282,17 +363,17 @@
      :                                                         STATUS)
       END IF
 
-*    Set up and map temp. logical array
+*  Set up and map temp. logical array
       CALL DYN_MAPL( NDIM, DIMS, TPTR, STATUS )
       CALL ARR_INIT1L( (.NOT. KEEPDATA), NELM, %VAL(TPTR), STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Find out which elements are to be written to the output
-      CALL BINSUBSET_SETSEL (DIMS(1),DIMS(2),DIMS(3),DIMS(4),
+*  Find out which elements are to be written to the output
+      CALL BINSUBSET_SETSEL( DIMS(1),DIMS(2),DIMS(3),DIMS(4),
      :                       DIMS(5),DIMS(6),DIMS(7),NRANGE,AXRANGE,
      :                                     KEEPDATA,%VAL(TPTR),STATUS)
 
-*    Find dimensions of output dataset
+*  Find dimensions of output dataset
       ONDIM = 0
       DO I = 1, NDIM
 
@@ -351,149 +432,88 @@
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*  case of total reduction to one bin
+*  Case of total reduction to one bin
       IF (ONDIM .EQ. 0) THEN
         ONDIM    = 1
         ODIMS(1) = 1
         PARENT(1) = 1
       END IF
 
-*    Create output dataset
-      CALL BDI_CREDATA (OFID, ONDIM, ODIMS, STATUS)
-      CALL BDI_MAPDATA (IFID, 'READ', IDPTR, STATUS)
-      CALL BDI_MAPDATA (OFID, 'WRITE', ODPTR, STATUS)
+*  Create output file
+      CALL BDI_LINK( 'BinDS', ONDIM, ODIMS, 'REAL', OFID, STATUS )
+
+*  Create output dataset
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Copy other stuff
-      CALL BDI_COPTEXT(IFID,OFID,STATUS)
+*  Copy other stuff
+      CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
 
-      CALL BDI_CHKVAR (IFID, VAROK, NDIM, DIMS, STATUS)
-
-*  variance
+*  Variance
+      CALL BDI_CHK( IFID, 'Variance', VAROK, STATUS )
       IF ( VAROK ) THEN
-        CALL BDI_MAPVAR (IFID, 'READ', IVPTR,  STATUS)
-        CALL BDI_CREVAR (OFID, ONDIM, ODIMS,   STATUS)
-        CALL BDI_MAPVAR (OFID, 'WRITE', OVPTR, STATUS)
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
       END IF
 
-* quality
-      CALL BDI_CHKQUAL (IFID, QUALOK, NDIM, DIMS, STATUS)
+*  Quality
+      CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
       IF ( QUALOK ) THEN
-        CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
-        CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
-        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
-        CALL BDI_GETMASK( IFID, MASK, STATUS )
-        CALL BDI_PUTMASK( OFID, MASK, STATUS )
+        CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_COPY( IFID, 'QualityMask', OFID, ' ', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Write output DATA, VARIANCE, & QUALITY
+*  Write output DATA, VARIANCE, & QUALITY
       CALL BINSUBSET_SEL (NELM, %VAL(IDPTR),%VAL(IVPTR),%VAL(IQPTR),
      :              %VAL(TPTR),VAROK,QUALOK,%VAL(ODPTR),%VAL(OVPTR),
      :                                          %VAL(OQPTR),STATUS )
 
-*    Finished with logical array
+*  Finished with logical array
       CALL DYN_UNMAP( TPTR, STATUS )
 
-*    Do rest of tidying up
-      CALL BDI_UNMAPDATA( IFID, STATUS )
-      CALL BDI_UNMAPDATA( OFID, STATUS )
-      IF ( VAROK ) THEN
-        CALL BDI_UNMAPVAR( IFID, STATUS )
-        CALL BDI_UNMAPVAR( OFID, STATUS )
-      END IF
-      IF ( QUALOK ) THEN
-        CALL BDI_UNMAPQUAL( IFID, STATUS )
-        CALL BDI_UNMAPQUAL( OFID, STATUS )
-      END IF
-
-*  now deal with axes
+*  Now deal with axes
       IF ( ( NAX .GT. 0 ) .AND. .NOT. INPRIM ) THEN
 
-        CALL BDI_CREAXES( OFID, ONDIM, STATUS )
+*    Loop over input axes
+        DO I = 1, ONDIM
 
-        DO I=1,ONDIM
-*    get parent axis
+*      Get parent axis
           J = PARENT(I)
 
-*    if unchanged then just copy
-          IF (.NOT.SEL(J)) THEN
+*      If unchanged then just copy
+          IF ( .NOT. SEL(J) ) THEN
 
-            CALL BDI_COPAXIS(IFID,OFID,J,I,STATUS)
+            CALL BDI_AXCOPY( IFID, J, ' ', OFID, I, STATUS )
 
           ELSE
 
-*    see if change needed to regularity of axis
+*        See if width component needed
+            CALL BDI_AXCHK( IFID, J, 'Width', WIDOK(J), STATUS )
 
-*    if parent axis is fragmented then must become irregular
-            IF (NRANGE(J).GT.1.AND.KEEP(J)) THEN
-              OREG(I) = .FALSE.
-*    if specified range discarded - can only stay regular if at end
-            ELSEIF (IREG(J).AND..NOT.KEEP(J)) THEN
-              IF (NRANGE(J).EQ.1.AND.AXRANGE(1,1,J).NE.1.AND.
-     :                           AXRANGE(2,1,J).NE.DIMS(J)) THEN
-                OREG(I)=.FALSE.
-              ELSEIF(NRANGE(J).EQ.2.AND.AXRANGE(1,1,J).NE.1.AND.
-     :                              AXRANGE(2,2,J).NE.DIMS(J)) THEN
-                OREG(I)=.FALSE.
-              END IF
-
-            ELSE
-              OREG(I)=IREG(J)
+*        Map axis values
+            CALL BDI_AXMAPR( IFID, J, 'Data', 'READ', IAXPTR(J),
+     :                       STATUS )
+            CALL BDI_AXMAPR( OFID, I, 'Data', 'WRITE', OAXPTR(I),
+     :                       STATUS )
+            IF ( WIDOK(J) ) THEN
+              CALL BDI_AXMAPR( IFID, J, 'Width', 'READ', IWPTR(J),
+     :                         STATUS )
+              CALL BDI_AXMAPR( OFID, I, 'Width', 'WRITE', OWPTR(I),
+     :                         STATUS )
             END IF
 
-*   create axis value component
-            CALL BDI_CREAXVAL (OFID, I, OREG(I), ODIMS(I), STATUS)
-
-*    see if width component needed
-            CALL BDI_CHKAXWID (IFID, J, WIDOK(J), IUNIF(J), SIZ, STATUS)
-            OUNIF(I)=(IUNIF(J).AND.OREG(I))
-            IF (WIDOK(J)) THEN
-              CALL BDI_CREAXWID (OFID, I, OUNIF(I), ODIMS(I), STATUS)
-            END IF
-
-            IF (OREG(I)) THEN
-
-*    calculated new base value and write to output
-              CALL BDI_GETAXVAL (IFID, J, BASE, SCALE, SIZ, STATUS)
-*    case of single chunk being taken out
-              IF (KEEP(J)) THEN
-                BASE=BASE+(AXRANGE(1,1,J)-1)*SCALE
-*    case of chunk being discarded from beginning
-              ELSEIF (.NOT.KEEP(J).AND.AXRANGE(1,1,J).EQ.1) THEN
-                  BASE=BASE+AXRANGE(2,1,J)*SCALE
-              END IF
-
-              CALL BDI_PUTAXVAL (OFID, I, BASE, SCALE, ODIMS(I), STATUS)
-
-*    write width component if required
-              IF (WIDOK(J).AND.OUNIF(I)) THEN
-                CALL BDI_GETAXWID (IFID, J, WID, STATUS)
-                CALL BDI_PUTAXWID (OFID, I, WID, STATUS)
-              END IF
-
-*    irregular axis
-            ELSE
-*          Map axis values
-              CALL BDI_MAPAXVAL (IFID, 'READ', J, IAXPTR(J), STATUS)
-              CALL BDI_MAPAXVAL (OFID, 'WRITE', I, OAXPTR(I), STATUS)
-              IF (WIDOK(J)) THEN
-                CALL BDI_MAPAXWID(IFID,'READ',J,IWPTR(J),STATUS)
-                CALL BDI_MAPAXWID(OFID,'WRITE',I,OWPTR(I),STATUS)
-              END IF
-
-               CALL BINSUBSET_AXCOP(DIMS(J),NRANGE(J),AXRANGE(1,1,J),
+*        Copy axis data and widths
+            CALL BINSUBSET_AXCOP(DIMS(J),NRANGE(J),AXRANGE(1,1,J),
      :                         KEEP(J),%VAL(IAXPTR(J)),%VAL(IWPTR(J)),
      :                         WIDOK(J),%VAL(OAXPTR(I)), %VAL(OWPTR(I)),
      :                                                           STATUS)
 
-            END IF
-
 *        Copy labels etc.
-            CALL BDI_COPAXTEXT(IFID,OFID,J,I,STATUS)
-
-            CALL BDI_GETAXNORM( IFID, J, NORM, STATUS )
-            CALL BDI_PUTAXNORM( OFID, I, NORM, STATUS )
+            CALL BDI_AXCOPY( IFID, J, 'Label,Units,Normalised',
+     :                       OFID, I, STATUS )
 
           END IF
 
@@ -501,20 +521,18 @@
 
       END IF
 
-*    History component
+*  History component
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( INLINES, TEXTI, STATUS )
       CALL HSI_PTXT( OFID, INLINES, TEXTI, STATUS )
       CALL HSI_PTXT( OFID, HU, HTEXT, STATUS )
 
-*    Copy all ancilliary stuff
-      CALL BDI_COPMORE(IFID,OFID,STATUS)
+*  Copy all ancilliary stuff
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
-*    Clean up
- 99   CALL BDI_RELEASE(OFID,STATUS)
-      CALL BDI_RELEASE(IFID,STATUS)
-      CALL AST_CLOSE()
+*  Clean up
+ 99   CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END
@@ -523,7 +541,7 @@
 
 *+  BINSUBSET_DISPAX - Display axes
       SUBROUTINE BINSUBSET_DISPAX( FID, PRIM, NDIM, DIMS, AXUNT, AXLO,
-     :                                   AXHI, REG, DIR, NAX, STATUS )
+     :                                        AXHI, DIR, NAX, STATUS )
 *
 *    Description :
 *
@@ -551,20 +569,15 @@
       REAL                   AXLO(*)            ! low value  for each axis
       REAL                   AXHI(*)            ! high value for each axis
       REAL                   DIR(*)             ! axis direction indicator
-      LOGICAL                REG(*)             ! Is axis regularly spaced?
       INTEGER                NAX                ! Number of axes
 *    Status :
       INTEGER STATUS
-*    Local variables :
-      CHARACTER*(80)         AXLAB              ! axis labels
-
-      REAL                   BASE, SCALE
+<*    Local variables :
+      CHARACTER*80 		AXLAB              	! axis labels
 
       INTEGER			AXPTR			! Ptr to axis values
       INTEGER                	I                  	! loop variable
       INTEGER                	SIZ                	! dummy
-
-      LOGICAL                	OK
 *-
 
 *    Status check
@@ -586,23 +599,16 @@
         CALL MSG_PRNT ('The axes present are:')
 
         DO I = 1, NDIM
-          CALL BDI_GETAXLABEL( FID, I, AXLAB,    STATUS )
-          CALL BDI_GETAXUNITS( FID, I, AXUNT(I), STATUS )
-          CALL MSG_SETI ('I', I)
-          CALL MSG_SETC ('NAME', AXLAB)
-          CALL MSG_PRNT (' ^I ^NAME')
-          CALL BDI_CHKAXVAL ( FID, I, OK, REG(I), SIZ, STATUS)
+          CALL BDI_AXGET0C( FID, I, 'Label', AXLAB, STATUS )
+          CALL BDI_AXGET0C( FID, I, 'Units', AXUNT(I), STATUS )
+          CALL MSG_SETI( 'I', I )
+          CALL MSG_SETC( 'NAME', AXLAB )
+          CALL MSG_PRNT( ' ^I ^NAME' )
+          CALL BDI_AXCHK( FID, I, 'Data', OK, STATUS )
 
-          IF (REG(I)) THEN
-            CALL BDI_GETAXVAL ( FID, I, BASE, SCALE, SIZ, STATUS)
-            AXLO(I) = BASE
-            AXHI(I) = BASE + (SIZ - 1) * SCALE
-
-          ELSE
-            CALL BDI_MAPAXVAL( FID, 'READ', I, AXPTR, STATUS )
-            CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
-            CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
-          END IF
+          CALL BDI_MAPAXVAL( FID, 'READ', I, AXPTR, STATUS )
+          CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
+          CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
 
 *    set direction indicator for axis
           IF (AXHI(I).GT.AXLO(I)) THEN
