@@ -73,8 +73,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     4 Jan 1995 (DJA):
+*      4 Jan 1995 (DJA):
 *        Original version.
+*     21 Feb 1996 (DJA):
+*        Removed SIND, COSD etc for Linux port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -87,6 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          	! Standard SAE constants
+      INCLUDE 'MATH_PAR'          	! ASTERIX MATH constants
       INCLUDE 'WCI_PAR'          	! ASTERIX WCI constants
 
 *  Global Variables:
@@ -95,11 +98,10 @@
 *         WCI class definitions loaded?
 
 *  Arguments Given:
-      CHARACTER*(*)		NAME			! Name of projection
-      INTEGER			NPAR			! # control params
-      REAL			PARAM(*)		! Control parameters
-      DOUBLE PRECISION		SPOINT(2)		! Special point
-      DOUBLE PRECISION		LPOLE			! Longitude of pole
+      CHARACTER*(*)		NAME
+      INTEGER			NPAR
+      REAL			PARAM(*)
+      DOUBLE PRECISION		SPOINT(2), LPOLE
 
 *  Arguments Returned:
       INTEGER			ID
@@ -162,10 +164,11 @@
         DP = SPOINT(2)
 
       ELSE
-        DP = ACOSD( SIND(SPOINT(2))/COSD(LPOLE))
-        SAP = SIND(LPOLE) / COSD(SPOINT(2))
-        CAP = - TAND(DP) * TAND(SPOINT(2))
-        AP = SPOINT(1) - ATAN2D(SAP,CAP)
+        DP = ACOS( SIN(SPOINT(2)*MATH__DDTOR) /
+     :             COS(LPOLE*MATH__DDTOR)) * MATH__DRTOD
+        SAP = SIN(LPOLE*MATH__DDTOR) / COS(SPOINT(2)*MATH__DDTOR)
+        CAP = - TAN(DP*MATH__DDTOR) * TAN(SPOINT(2)*MATH__DDTOR)
+        AP = SPOINT(1) - ATAN2(SAP,CAP) * MATH__DRTOD
         IF (DP.GT.90D0) DP = -90D0 + (DP-90D0)
         IF (DP.LT.-90D0) DP = 90D0 - (-DP-90D0)
 

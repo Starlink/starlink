@@ -132,7 +132,7 @@
       SUBROUTINE WCI_UNPROJ1( RTN, STD, PRJID, RPH, STATUS )
 *+
 *  Name:
-*     WCI_PROJ1
+*     WCI_UNPROJ1
 
 *  Purpose:
 *     Unproject native system to relative physicals coords, internal routine
