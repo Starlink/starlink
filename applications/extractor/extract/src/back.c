@@ -260,9 +260,9 @@ void	makeback(picstruct *field)
 /* Compute 2nd derivatives along the y-direction */
   if (field->flags^WEIGHT_FIELD)
     {
-    NFPRINTF(OUTPUT, "Computing backgound d-map");
+    NFPRINTF(OUTPUT, "Computing background d-map");
     field->dback = makebackspline(field, field->back);
-    NFPRINTF(OUTPUT, "Computing backgound-noise d-map");
+    NFPRINTF(OUTPUT, "Computing background-noise d-map");
     field->dsigma = makebackspline(field, field->sigma);
     }
 
