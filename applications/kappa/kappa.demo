@@ -34,7 +34,7 @@
 # which you can refer to the monolith when issuing an "Obey" command within 
 # a demo script. <file> is the file spec for the executable monolith
 # binary. Note, all the KAPPA monoliths are loaded automatically and so
-# do not need to be inclued in the package command. The <text> associated
+# do not need to be included in the package command. The <text> associated
 # with the "info" command should give a brief description of the package,
 # such as is contained in the document abstract.
 #
@@ -52,17 +52,25 @@
 #
 # Each "env" command declares an environment variable which is to be 
 # recognised within the body of any "command" commands (see below). For
-# instance the line you must include the line "env KAPPA_DIR" at the start 
+# instance you must include the line "env KAPPA_DIR" at the start 
 # of the demo body if any of the commands within the demo refer to 
 # "$KAPPA_DIR/"
 # 
 # Each "step" command defines a sequence of commands, commentary, etc, for 
 # part of the demo (the entire demo can be contained in a single step if
-# desired). The body of a "step" command can contain zero, one, or more of 
+# desired - but beware of the "rendevouz file lost" problem in StarTcl)). 
+# At the end of each step, the Adam message system is reset in
+# order to prevent problems in StarTcl which cause monoliths to die at
+# random moments (resulting in "rendevouz file lost" messages). This
+# involves deleting all parameter defaults files, killing and reloading
+# all monoliths, stopping and starting StarTcl, and clearing the screen.
+#
+# The body of a "step" command can contain zero, one, or more of 
 # any of the following commands, in any order:
 #
 #    demo <name> {
 #       step {
+#          head <text>
 #          pause <time>
 #          text <text>
 #          command {body}
@@ -88,6 +96,10 @@
 # area (there is no scroll bar for the commentary area since the demo is 
 # supposed to be usable without any user interaction).
 #
+# The "head" command sets the text to be displayed as a "headline" above
+# the main commentary area. This should be a descrition of the current
+# step.
+#
 # The body of the "command" command is any Tcl command to be executed.
 # Typically this will invoke a command from the package being demonstrated, 
 # using the Tcl command:
@@ -111,7 +123,7 @@
 # insensitive, except for showme document names), and "text" by the text 
 # to be tagged. The angle brackets delimit the scope of the tag. Tags can 
 # be nested, with inner tags over-riding outer tags if necessary. The 
-# following predefined tags should always be used to tag all occurences of 
+# following predefined tags should always be used to tag all occurrences of 
 # the associated objects:
 #
 #    ATTR    - AST attribute names, values or settings
@@ -165,7 +177,7 @@
 # defined at the same or lower levels.
 #
 # If the same tag is used by Link commands at the same level, the text
-# associated with the last one within the suppied file (or files) is used.
+# associated with the last one within the supplied file (or files) is used.
 
 
 #  Describe the package. Note, the PKG_VERS string is replaced by
@@ -178,7 +190,7 @@ package {
    url "http://www.ast.man.ac.uk/~dsb/kappa/kappa.html"
    sun "sun95"
 
-   info "<pack KAPPA> is a package comprised of about 180 general-purpose
+   info "<pack KAPPA> is a package comprising about 180 general-purpose
    commands for astronomical image processing and data visualisation. It
    is developed and maintained by the UK Starlink project. It is intended
    to work in conjunction with Starlink's other various specialised
@@ -193,9 +205,245 @@ package {
 
 } 
 
+# *.
+demo kappa {
+
+   info "This demonstration gives a general introduction to some of the
+   main features of the <emph Starlink> <PACK KAPPA> package. See 
+   <doc SUN/95> for a complete description."
+
+   env KAPPA_DIR
+
+   step {
+      command {Obey kapview display "in=$KAPPA_DIR/logo
+lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^$KAPPA_DIR/sty0 accept"}
+
+      text "KAPPA is a package of about 180 general-purpose commands for
+      astronomical image processing and data visualisation. It is
+      developed and maintained by the UK Starlink project (see <URL
+      http://www.starlink.rl.ac.uk/>)."
+
+      pause 8
+      head "Current topic: Control and execution of KAPPA commands"
+
+      text "KAPPA is command-line driven. Commands can either be issued
+      directly from the Unix C-shell or from the IRAF cl. The following
+      C-shell command, for instance, displays an image of M57, making 10%
+      of the pixels black and 5% white: \n\n	% <command display>
+      <command in=$KAPPA_DIR/m57 mode=perc percentiles=\\[10,95\\]>\n"
+
+      pause 10
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview lutable "mapping=linear coltab=external lut=$KAPPA_DIR/warm_lut"}
+      command {Obey kapview display "in=$KAPPA_DIR/m57 style=def lut=\! mode=perc percentiles=\[5,95\] accept"}
+
+      pause 10
+
+   }
+
+#  Data formats used by KAPPA
+#  --------------------------
+   step {
+      head "Current topic: Data formats used by KAPPA"
+      text ""
+      command {Obey kapview gdclear ""}
+      command {Obey kapview picdef "mode=tl fraction=0.94 outline=no"}
+      command {Obey kapview mlinplot "ndf=$KAPPA_DIR/m31 lnindx='90,110,130,150,170,190,210' style='title=Data traces along the indicated lines in an image of M31' space=free offset=\[0,8000,16000,24000,32000,40000,48000\]"}
+      command {exec echo "1 90" > stardemo.tmp}
+      command {exec echo "1 110" >> stardemo.tmp}
+      command {exec echo "1 130" >> stardemo.tmp}
+      command {exec echo "1 150" >> stardemo.tmp}
+      command {exec echo "1 170" >> stardemo.tmp}
+      command {exec echo "1 190" >> stardemo.tmp}
+      command {exec echo "1 210" >> stardemo.tmp}
+      command {Obey kappa listmake "mode=file file=stardemo.tmp frame=pixel dim=2 outcat=stardemo"}
+      command {exec rm -f stardemo.tmp}
+      command {Obey kapview picdef "mode=br fraction=0.15 aspect=1 outline=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31 clear=no mode=perc percentiles=\[10,99\] axes=no border=yes accept"}
+
+# LISTSHOW: For some unknown reason, DAT_CLONE reports an "invalid locator" 
+# error within PAR_PUT0I for output parameter DIM unless a value is assigned 
+# to DIM. This does not happen from ICL or Unix shells.
+      command {Obey kappa listshow "incat=./stardemo plot=hline quiet=no dim=2 accept"}
+      command {exec rm -f stardemo.FIT}
+
+      text "KAPPA can access data in several common astronomical formats.
+      It does this by converting data to and from a \"native\" format
+      which is used internally by KAPPA (the Starlink <pack NDF> data
+      format - see <htx:sun33 Starlink User Note/33> ). To use this
+      <onthefly \"on-the-fly\" format conversion> you must start up the
+      Starlink <htx:sun55 CONVERT> package before starting KAPPA (this is
+      not necessary if your data is already in NDF format)."
+
+      pause 24
+
+      text "The native NDF data format used by KAPPA includes provision for 
+      storing variances with the data, bad pixel and data quality masking,
+      automatic history recording and WCS processing. KAPPA supports all
+      these features."
+
+      pause 15
+
+   }
+
+#  A tour of the main classes of commands in KAPPA
+#  ------------------------------------------------
+  step {
+      head "Current topic: A tour of the main classes of commands in KAPPA"
+      command {Obey kapview display "in=$KAPPA_DIR/logo lut=$KAPPA_DIR/logo_lut key=no axes=yes border=0 mode=scale style=^$KAPPA_DIR/sty0 accept"}
+
+      text "And now, a skim through the main classes of commands available in KAPPA..."
+
+      pause 4
+
+      text "<emph Data Display:> Simple display of 2D arrays, control of
+      the colour table (using pseudo-colour visuals), hardcopy, contours,
+      vector plots, scatter plots, histograms of data values, line plots
+      of 1D data."
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview scatter "in1=$KAPPA_DIR/m31 in2=$KAPPA_DIR/m31_issa_12a compress=3"}
+
+      pause 7
+
+
+      text "<emph Display Control:> Many commands to allow the screen to
+      be divided into sub-areas (called \"pictures\") in various ways,
+      and to direct output from any graphics command to a particular
+      picture. The appearance of line graphics, annotated axes, <for etc>
+      can be controlled in detail."
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview picdef "mode=arr outline=no xpic=2 ypic=2 prefix=a"}
+      command {Obey kapview scatter "in1=$KAPPA_DIR/m31 in2=$KAPPA_DIR/m31_issa_12a compress=10 style=^$KAPPA_DIR/sty1"}
+      command {Obey kapview picsel "label=a2"}
+      command {Obey kapview scatter "in1=$KAPPA_DIR/m31 in2=$KAPPA_DIR/m31_issa_12a compress=10 style=^$KAPPA_DIR/sty2 marker=2"}
+      command {Obey kapview picsel "label=a3"}
+      command {Obey kappa histogram "in=$KAPPA_DIR/m31 range='per,1,99' numbin=30 style='label(1)=Normalized data value,Title=Histogram plot (White is DSS - Red is IRAS)'"}
+      command {Obey kappa histogram "in=$KAPPA_DIR/m31_issa_12a range='964.2183,23729.57' axes=no clear=no numbin=30 style='colour=red,style=4,width=2'"}
+      command {Obey kapview picsel "label=a4"}
+      command {Obey kapview display "in=$KAPPA_DIR/m57 mode=per percentiles=\[1,99\] lut=$KAPPA_DIR/warm_lut style='border=0,labelling=interior,edge(2)=right,labelat(1)=0.5762495,labelat(2)=4.9463,drawtitle=0,textlabgap=-0.06'"}
+
+      pause 7
+
+      command {Obey kapview  picdef "mode=cc fraction=0.7 outline=no"}
+      command {Obey kapview gdclear "current=yes"}
+      command {Obey kapview display "in=$KAPPA_DIR/cobe style=def accept"}
+      command {Obey kapview gdstate "outline=yes"}
+
+      pause 4
+   }
+
+   step {
+      text "<emph Position Lists:> Lists of positions can be stored
+      within FITS binary tables. These can be examined, created in
+      several ways (using a cursor, entering values at the keyboard,
+      finding object centroids, <for etc>). They can plotted over other
+      graphics with automatic alignment."
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview  picdef "mode=bl fraction=\[0.4,1\] aspect=\! outline=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/ccdframec mode=per percentiles=\[1,99\] lut=$KAPPA_DIR/grey_lut style=def margin=\!"}
+      pause 3
+      command {Obey kappa listshow "incat=$KAPPA_DIR/ccdframec.FIT plot=mark marker=3 label=t style='colour(mark)=green,size(mark)=2,width(mark)=2,colour(numlab)=cyan,numlabgap=0.03'"}
+      pause 7
+
+      text "<emph Data Analysis:> Statistics of the pixel values in
+      selected regions may be found. A model of the Point Spread Function
+      may be determined by fitting a selection of star images. Object
+      centroids may be found. Individual pixel values me be inspected and
+      changed. Linear scaling between data values in different images may
+      be determined. Arrays may be compared using the Kolmogorov-Smirnov
+      test."
+
+      command {Obey kapview picdef "mode=br fraction=\[0.6,1\] aspect=\! outline=no"}
+      command {Obey kappa psf "in=$KAPPA_DIR/ccdframec incat=$KAPPA_DIR/ccdframec.FIT"}
+      pause 16
+
+
+      text "<emph Data Combination:> Data arrays can be combined using
+      arbitrary algebraic expressions, including scalar parameters,
+      common mathematical functions, <for etc>. Images can be \"pasted\"
+      on top of each other, allowing selected regions to be transparent."
+
+      pause 10
+
+      text "<emph Geometrical Transformations:> Data arrays can be
+      compressed or expanded using simple linear transformation or more
+      complex non-linear algebraic transformations. WCS information can
+      be used to align images automatically. Arrays may be compressed
+      along one axis to produce (for instance) a 2D image from a 3D cube."
+
+      command {Obey kapview gdclear "current=yes"}
+      command {exec cp $KAPPA_DIR/ccdframec.sdf ./}
+      command {Obey ndfpack wcsadd "ndf=./ccdframec frame=pixel domain=oldpixel"}
+      command {Obey kappa rotate "angle=30 in=./ccdframec out=./a"}
+      command {Obey kapview palentry "palnum=14 colour=indianred4"}
+      command {Obey kapview display "in=./a margin=\! style=^$KAPPA_DIR/sty3 badcol=indianred4 accept"}
+      command {exec rm -f a.sdf ccdframec.sdf}
+      pause 12
+
+      text "<emph Data Filtering:> Images may be smoothed using a
+      Gaussian or square filter, a weighted median filter, or an
+      arbitrary PSF supplied in another image. Image deconvolution is
+      available using a variety of algorithms (MaxEnt, Lucy, Wiener). An
+      efficient Fourier transform application is included. Small features
+      may be removed automatically from smooth images."
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview picdef "mode=arr outline=no xpic=2 ypic=1 prefix=a"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31_issa_12 mode=per percentiles=\[1,99\] lut=$KAPPA_DIR/grey_lut axes=yes style='^$KAPPA_DIR/sty0,drawtitle=1,colour(title)=cyan,colour(border)=blue,size=1.5,title=12 micron IRAS Sky Survey Atlas image'"}
+      command {Obey kappa fourier "in=$KAPPA_DIR/m31_issa_12 hermout=\! powerout=pw phaseout=ph"}
+      command {Obey kapview picsel "label=a2"}
+      command {Obey kapview display "in=./pw mode=per percentiles=\[1,99\] style='^$KAPPA_DIR/sty0,drawtitle=1,colour(title)=cyan,colour(border)=blue,size=1.5,title=Fourier transform power of IRAS image'"}
+      command {exec rm -f ph.sdf pw.sdf}
+      pause 15
+
+      text "<emph FITS Facilities:> FITS headers may imported, examined,
+      edited, and created. WCS information can be read from and written
+      to FITS headers using any of the popular encoding schemes (G&C,
+      IRAF, DSS, <for etc>). FITS files may be read or written (using
+      suitable plug-in data readers such as provided by <htx:sun55
+      CONVERT>)."
+
+      command {Obey ndfpack fitslist "in=$KAPPA_DIR/m31"}
+      alpha on
+      pause 12
+
+      text "<emph NDF Facilities:> All the main attributes of data files
+      in the the native NDF format can be controlled and examined.
+      Variance arrays, Axis arrays, <for etc> can be created, data
+      processing history can be examined and modified."
+
+      command {Obey ndfpack ndftrace "ndf=$KAPPA_DIR/m31"}
+      pause 10
+
+      text "<emph Image Generation:> Artificial images can be created
+      using any general algebraic expression. Noise (Gaussian or Poisson)
+      may be added. Regions of missing data in real images may be filled
+      in by a automatically created smoothly varying function. Polynomial
+      or spline surfaces may be fitted to selected areas in real images
+      and then used to create artificial images representing the fit."
+
+      pause 1
+      alpha off
+   }
+
+#  A new step is needed here (???) otherwise, the AGA database is not cleared properly.
+   step {
+      command {Obey kapview gdclear ""}
+      command {Obey kappa maths "exp='sin(XA*XB*0.005)/(XA*XA+XB*XB)' type=_real lbound=\[-100,-100\] ubound=\[100,100\] out=a"}
+      command {Obey kapview display "in=./a mode=per percentiles=\[1,99\] style='title=SIN( X*Y*0.005 )/( X*X + Y*Y )'"}
+      command {exec rm -f ./a.sdf}
+      pause 15
+
+   }
+}
+
 # Globally available linked texts.
 
-      link CONVERT "Data stored in the <emph Starlink> NDF format is
+      link onthefly "Data stored in the <emph Starlink> NDF format is
       processed directly by <pack KAPPA>, but data stored in many other
       common astronomical data formats (<pack FITS, IRAF, DST>, <for
       etc.>) can also be processed using a transparent '<emph
@@ -213,4 +461,4 @@ package {
       for handling co-ordinate information, <for etc>. Other data formats
       may not always be able to represent the full NDF structure, and
       this should be born in mind when using <pack KAPPA> to process
-      <emph foreign> (<for i.e.> nonNDF) data files." 
+      <emph foreign> (<for i.e.> non-NDF) data files." 

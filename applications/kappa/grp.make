@@ -37,7 +37,7 @@ ira_err kpg_ast kpg_par grf.h kappa_style.def tkast.tcl \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
 stardemo_procs.tcl adamMessageRelay adamtask.tcl dialog.tcl kappa.demo \
-v0.14-5.demo v0.15-9.demo v0.16.demo
+v0.14-5.demo v0.15-9.demo v0.16.demo sty0 sty1 sty2 sty3 
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -312,7 +312,7 @@ ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf ccdframec.sdf comwest.sdf \
 spectrum.sdf m31.sdf iras.sdf grey_lut.sdf m31_issa_100.sdf \
 m31_issa_12.sdf m31_issa_25.sdf m31_issa_60.sdf m57.sdf logo.sdf \
 logo_lut.sdf warm_lut.sdf m31_arm.FIT scupol_i.sdf scupol_p.sdf \
-scupol_ang.sdf
+scupol_ang.sdf m31_issa_12a.sdf cobe.sdf ccdframec.FIT
 
 # The contents of the kappa_ifls.tar file:
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl collapse.ifl \

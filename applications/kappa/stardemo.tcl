@@ -8,7 +8,7 @@
 #
 #  Invocation:
 #     stardemo.tcl [demo] [-dir <demo_dir>] [-(no)paging] [-(no)loop]
-#                         [-(no)net] [-debug]
+#                         [-(no)net] [-debug] [-log]
 #
 #  Command Line Arguments:
 #     demo: An optional name of a demonstration to be selected and run
@@ -37,6 +37,9 @@
 #
 #     -debug: If specified, messages are displayed on standard output
 #     giving various diagnostics. This is intended to help debug demo scripts.
+#
+#     -log: If specified, all the atask commands are recorded in a file
+#     called stardemo.log in the current directory.
 #
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -165,6 +168,12 @@
 
       } elseif { $arg == "-nonet" } {
          set NET 0
+
+      } elseif { $arg == "-log" } {
+         set LOGFILE_ID [open stardemo.log w]
+
+      } elseif { $arg == "-nolog" } {
+         set LOGFILE_ID ""
 
       } elseif { $autorun == "" } {
          set autorun $arg
@@ -705,8 +714,6 @@ display will not."
 
 # Set up bindings which cause ResumeDemo to be called when any key is pressed.
    bind . <Key> ResumeDemo
-
-   set LOGFILE_ID [open stardemo.log w]
 
 # If an "auto-run" demo was specified on the commadn line, check it is
 # available within the list of loaded demos.
