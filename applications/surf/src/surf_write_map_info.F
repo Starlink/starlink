@@ -75,11 +75,11 @@
       INCLUDE 'REDS_SYS'         ! REDS constants
 
 *  Arguments Given:
+      INTEGER          NFILE
       CHARACTER*40     FILENAME (NFILE)
       INTEGER          I_CENTRE
       INTEGER          J_CENTRE
       DOUBLE PRECISION MJD_STANDARD
-      INTEGER          NFILE
       INTEGER          NX_OUT
       INTEGER          NY_OUT
       CHARACTER * (*)  OUT_COORDS
@@ -106,6 +106,7 @@
       INTEGER          I        ! Counter
       INTEGER          ID       ! day of an input observation
       INTEGER          IM       ! month in which observation started
+      CHARACTER*(DAT__SZLOC) IMAGE_LOC ! locator of IMAGE_INFO in output file
       CHARACTER*40     INSTRUMENT ! FITS instrument entry
       INTEGER          ITEMP    ! Temporary variable
       INTEGER          IY       ! year in which input observation started
@@ -230,13 +231,41 @@
                   CTYPE2 = 'GLAT-TAN'
                END IF
 
+*     Create the IRAS extension
                CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,
      :              OUT_XLOC, STATUS)
                NP = 8
+
+*     Create the ASTROMETRY extension
                CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, 
      :              OUT_NDF, ITEMP, STATUS)
 
                CALL IRA_CLOSE (STATUS)
+
+*     Create the IMAGE_INFO extension to fool IRAS90 software
+               CALL DAT_NEW(OUT_XLOC, 'IMAGE_INFO', 'IMAGE_INFO',
+     :              0,0,STATUS)
+
+               CALL DAT_FIND(OUT_XLOC, 'IMAGE_INFO', IMAGE_LOC,
+     :              STATUS)
+
+               CALL DAT_NEW(IMAGE_LOC, 'INSTRUMENT', '_CHAR*6',
+     :              0,0,STATUS)
+               CALL CMP_PUT0C(IMAGE_LOC, 'INSTRUMENT', 'SURVEY',
+     :              STATUS)
+
+               CALL DAT_NEW(IMAGE_LOC, 'BAND', '_INTEGER',
+     :              0,0,STATUS)
+               CALL CMP_PUT0I(IMAGE_LOC, 'BAND', 1,
+     :              STATUS)
+
+               CALL DAT_NEW(IMAGE_LOC, 'TYPE', '_CHAR*8',
+     :              0,0,STATUS)
+               CALL CMP_PUT0C(IMAGE_LOC, 'TYPE', 'UNKNOWN',
+     :              STATUS)
+
+               CALL DAT_ANNUL(IMAGE_LOC, STATUS)
+
                CALL DAT_ANNUL(OUT_XLOC, STATUS)
 
             END IF
