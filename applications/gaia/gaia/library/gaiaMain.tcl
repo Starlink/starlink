@@ -33,6 +33,7 @@
 global env
 
 #.
+puts "$env(GAIA_DIR), $env(GAIA_LIBRARY)"
 
 #  Withdraw the . window as this cannot be controlled as a metawidget.
 wm withdraw .

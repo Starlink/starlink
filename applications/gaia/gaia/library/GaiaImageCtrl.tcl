@@ -284,7 +284,8 @@ class gaia::GaiaImageCtrl {
    #  ability to deal with a list of possible file extensions and a
    #  possible image slice to this method.
    method open {{dir "."} {pattern "*.*"}} {
-      set file [filename_dialog $dir $pattern $w_ $itk_option(-file_types)]
+       
+      set file [get_file_ $dir $pattern $itk_option(-file_types)]
 
       #  Deal with any slice information.
       set image $file
@@ -322,9 +323,9 @@ class gaia::GaiaImageCtrl {
       #  save it as a fits file. NDFs may be saved as other formats.
       set exten [file extension $itk_option(-file)]
       if {  $exten == ".fit" || $exten == ".fits" } {
-         set file [filename_dialog $dir $pattern $w_ {{any * } {FITS *.fits} {FIT *.fit}}]
+         set file [get_file_ $dir $pattern {{any * } {FITS *.fits} {FIT *.fit}}]
       } else {
-         set file [filename_dialog $dir $pattern $w_ $itk_option(-file_types)]
+         set file [get_file_ $dir $pattern $itk_option(-file_types)]
       }
       if {"$file" != ""} {
          if {[file isfile $file]} {
@@ -351,6 +352,19 @@ class gaia::GaiaImageCtrl {
             warning_dialog $msg
          }
       }
+   }
+
+   #  Get filename using fileselection dialog. This is created once and
+   #  retains the current name and filters when repeatably accessed.
+   protected method get_file_ {dir pattern types} {
+       if { ! [winfo exists $fileselect_] } {
+	   set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
+				-transient 1 -withdraw 1 -filter_types $types]
+	   wm transient $fileselect_ [winfo toplevel $w_]
+       }
+       if {[$fileselect_ activate]} {
+	   return [$fileselect_ get]
+       }
    }
 
    #  Set the cut levels.
@@ -398,12 +412,21 @@ class gaia::GaiaImageCtrl {
          set image [string range $image 0 $i1]
       }
       if {[file exists $image] || "$itk_option(-file)" == "-"} {
+         set old_width [$image_ width]
+         set old_height [$image_ height]
          busy {
+            set center_ok_ 0
             if {[catch {$image_ config -file $itk_option(-file) \
                            -component $itk_option(-component)} msg]} {
                error_dialog $msg $w_
                clear
             }
+            set center_ok_ 1
+         }
+         #  Center if image has changed size.
+         if { $old_width != [$image_ width] || 
+              $old_height != [$image_ height] } {
+            center
          }
          set w [$image_ dispwidth]
          set h [$image_ dispheight]
@@ -477,7 +500,16 @@ class gaia::GaiaImageCtrl {
          -justify center \
          -text $about_skycat
       $w_.about activate
-    }
+   }
+
+   #  Center the image in the canvas window. Override to switch off
+   #  when attempting to load a new image (preserves scroll position,
+   #  which is often what is really required).
+   method center {} {
+      if { $center_ok_ } { 
+         RtdImage::center
+      }
+   }
 
    #  Configuration options.
    #  ======================
@@ -503,7 +535,7 @@ class gaia::GaiaImageCtrl {
       }
       set $itk_option(-temporary) 0
    }
-   itk_option define -file_change_cmd file_change_cmd File_change_cmd {}
+   itk_option define -file_change_cmd file_change_cmd File_Change_Cmd {}
 
    #  Debugging flag.
    itk_option define -debug debug Debug 0
@@ -517,11 +549,11 @@ class gaia::GaiaImageCtrl {
    itk_option define -temporary teMpoRaRy TeMpoRaRy 0
 
    #  Names and extensions of known data types.
-   itk_option define -file_types file_types File_types \
+   itk_option define -file_types file_types File_Types \
       {{any *} {ndf *.sdf} {fits *.fit*}}
 
    #  Whether up, down, left and right arrows warp the cursor.
-   itk_option define -with_warp with_warp With_warp 1
+   itk_option define -with_warp with_warp With_Warp 1
 
    #  Protected variables:
    #  ====================
@@ -534,5 +566,16 @@ class gaia::GaiaImageCtrl {
 
    #  Name of toplevel window (recorded for times when not otherwise available).
    protected variable top_ {}
+
+   #  Control use of center method by sub-classes.
+   protected variable center_ok_ 1
+
+   #  Common variables:
+   #  =================
+
+   #  Name of fileselection dialog window. Shared between all instances.
+   common fileselect_ .imagectrlfs
 }
+
+
 

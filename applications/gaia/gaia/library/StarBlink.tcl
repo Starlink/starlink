@@ -230,8 +230,8 @@ class gaia::StarBlink {
 
       #  Label for identifying the current clone.
       itk_component add Name {
-         LabelMessage $itk_component(Iframe).name \
-            -text {Clone:} -value {}
+         LabelValue $itk_component(Iframe).name \
+            -text {Image:} -value {} -valuewidth 30 -justify right
       }
 
       #  Offset of clone's lower corner.
@@ -353,13 +353,14 @@ class gaia::StarBlink {
          set canvas_($n_) [$itk_component(image$n_) get_canvas]
          set image_($n_) [$itk_component(image$n_) get_image]
          set target_($n_) [$w get_image]
+	 set names_($n_) [$w cget -file]
 
          regsub {\.rtd} [winfo toplevel $w] {} clone_num_($n_)
          set clones_($n_) $w
          set canvas $canvas_($n_)
 
 	 $menu add checkbutton \
-            -label "[$w cget -file] ($clone_num_($n_))" \
+            -label "$names_($n_)($clone_num_($n_))" \
             -variable [scope view_($this,$n_)] \
             -onvalue 1 \
             -offvalue 0 \
@@ -397,10 +398,14 @@ class gaia::StarBlink {
       }
       set top_ [expr $n_ -1]
       set_mobile
-
-      #  Finally describe the current image in info section.
+       
+      #  Describe the current image in info section.
       update
       top_clone_
+
+      #  Modify the scrollbar positions to reflect the image position 
+      #  of the first clone.
+      init_scroll_
    }
 
    #  Move the views up the display stack.
@@ -498,8 +503,8 @@ class gaia::StarBlink {
    #  Set the top clone information.
    private method top_clone_ {} {
 
-      #  Clone number.
-      $itk_component(Name) configure -value $clone_num_($top_)
+      #  Clone filename and number.
+      $itk_component(Name) configure -value "$names_($top_) ($clone_num_($top_))"
 
       #  Image offset.
       set imageId [$itk_component(image$top_) get_imageId]
@@ -588,6 +593,22 @@ class gaia::StarBlink {
       }
    }
 
+   #  Modify the first image scroll to reflect the relative positioning 
+   #  of the first clone.
+   protected method init_scroll_ {} {
+       if { [info exists clones_(1)] } { 
+	   set canvas [[$clones_(1) get_image] get_canvas]
+	   lassign [$canvas xview] xleft xright
+	   lassign [$canvas yview] yleft yright
+           if { $xleft != 0.0 } {
+	       hscroll moveto $xleft; #$canvas_(1) xview moveto $xleft
+	   }
+	   if { $yleft != 0.0 } {
+	       vscroll moveto $yleft; #$canvas_(1) yview moveto $yleft
+	   }
+       } 
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -623,6 +644,7 @@ class gaia::StarBlink {
    protected variable image_
    protected variable target_
    protected variable update_pending_ 0
+   protected variable names_
 
    #  Common variables: (shared by all instances)
    #  -----------------

@@ -11,9 +11,14 @@ proc filename_dialog {{dir "."} {filter "*"} {parent ""} {types ""}} {
     set w .fs
     if {![winfo exists $w]} {
 	FileSelect $w -dir $dir -filter $filter -transient 1 \
-           -withdraw 1 -filter_types $types
+	    -withdraw 1 -filter_types $types
+	
     } else {
-	$w config -filter $filter -filter_types $types
+	#  Only reconfigure if default types are changed.
+	set curtypes [$w cget -filter_types]
+	if { "$curtypes" != "$types" } {
+	    $w config -filter $filter -filter_types $types
+	}
     }
     if {"$parent" != ""} {
 	wm transient $w [winfo toplevel $parent]
@@ -22,7 +27,6 @@ proc filename_dialog {{dir "."} {filter "*"} {parent ""} {types ""}} {
         return [$w get]
     }
 }
-
 
 # error message routine with exit button
 

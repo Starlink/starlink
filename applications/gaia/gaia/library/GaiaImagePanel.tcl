@@ -31,6 +31,8 @@
 #  History:
 #     26-SEP-1997 (PDRAPER):
 #        Original version
+#     3-FEB-1999 (PDRAPER):
+#        Added quick selections for color and itt tables.
 #     {enter_changes_here}
 
 #-
@@ -72,46 +74,49 @@ class gaia::GaiaImagePanel {
       #  Add a series of buttons to set the cut levels.
       if {$itk_option(-showcut) } {
          itk_component add autocut {
-            frame $w_.autocut
+            LabelCommandMenu $itk_component(lrframe).autocut \
+               -text "Auto Cut:" \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont)
          }
-         itk_component add autolabel {
-            label $itk_component(autocut).label -text "Auto Cut:" \
-               -font $itk_option(-labelfont)
+         foreach value {100 99.5 99 98 95 90 80 70 60 50} {
+            $itk_component(autocut) add \
+               -label "$value%" \
+               -command [code $this set_percent_level $value] \
          }
-         pack $itk_component(autolabel) -side left
-         itk_component add autotablef {
-            frame $itk_component(autocut).table
+
+         #  Select a colour table.
+         itk_component add autocolor {
+            LabelCommandMenu $itk_component(lrframe).autocolor \
+               -text "Color Map:" \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont)
          }
-         itk_component add a90 {
-            button $itk_component(autotablef).a90 -text "90%" -width 1 \
-               -command [code $this set_percent_level 90] \
-               -font $itk_option(-valuefont)
+         foreach {name value} \
+            {default real greyscale ramp color rainbow3 heat heat} {
+            $itk_component(autocolor) add \
+               -label "$name" \
+               -command [code $this set_colormap_ $value] \
          }
-         itk_component add a95 {
-            button $itk_component(autotablef).a95 -text "95%" -width 1 \
-               -command [code $this set_percent_level 95] \
-               -font $itk_option(-valuefont)
+
+         #  Select an ITT table.
+         itk_component add autoitt {
+            LabelCommandMenu $itk_component(lrframe).autoitt \
+               -text "Intensity Map:" \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont)
          }
-         itk_component add a98 {
-            button $itk_component(autotablef).a98 -text "98%" -width 1 \
-               -command [code $this set_percent_level 98] \
-               -font $itk_option(-valuefont)
+         foreach {name value} \
+            {default ramp {hist equalize} equa log log {negative ramp} neg} {
+            $itk_component(autoitt) add \
+               -label "$name" \
+               -command [code $this set_ittmap_ $value] \
          }
-         itk_component add a99 {
-            button $itk_component(autotablef).a99 -text "99%" -width 1 \
-               -command [code $this set_percent_level 99] \
-               -font $itk_option(-valuefont)
-         }
-         blt::table $itk_component(autotablef) \
-            $itk_component(a90)   0,0 \
-            $itk_component(a95)   0,1 \
-            $itk_component(a98)   1,0 \
-            $itk_component(a99)   1,1
-         
-         pack $itk_component(autotablef)
-         pack $itk_component(autocut) \
-            -anchor ne -padx 1m -pady 1m -fill x -in $itk_component(lrframe)
+         pack $itk_component(autocut) -side top -fill x
+         pack $itk_component(autocolor) -side top -fill x
+         pack $itk_component(autoitt) -side top -fill x
       }
+
       #  The RtdImage code sets this array for us to speed up the panel
       #  update by using the -textvariable option
       set var $image_
@@ -314,7 +319,8 @@ class gaia::GaiaImagePanel {
          
          add_short_help $itk_component(low) {Image low cut value, type return after editing value}
          add_short_help $itk_component(high) {Image high cut value, type return after editing value}
-         add_short_help $itk_component(autocut) {Set the image cut levels using a percentile cut}
+         add_short_help $itk_component(autocut) \
+            {Quick settings for image cuts, colormaps and intensity transfer tables}
       }
       
       #  Image transformation controls.
@@ -343,6 +349,18 @@ class gaia::GaiaImagePanel {
       $itk_component(low) config -value $low
       $itk_component(high) config -value $high
       catch {[$itk_option(-image) component cut] update_graph}
+   }
+
+   #  Set the colormap
+   protected method set_colormap_ {map} {
+      global gaia_library
+      $image_ cmap file $gaia_library/colormaps/$map.lasc
+   }
+
+   #  Set the ITT map.
+   protected method set_ittmap_ {map} {
+      global gaia_library
+      $image_ itt file $gaia_library/colormaps/$map.iasc
    }
 
    #  Update the display with the current image values (overriden for

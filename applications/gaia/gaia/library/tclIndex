@@ -129,4 +129,5 @@ set auto_index(::util::TopLevelWidget) [list source [file join $dir TopLevelWidg
 set auto_index(::util::TopLevelWidget::set_command) [list source [file join $dir TopLevelWidget.tcl]]
 set auto_index(::util::TopLevelWidget::start) [list source [file join $dir TopLevelWidget.tcl]]
 set auto_index(::util::TopLevelWidget::start_err_) [list source [file join $dir TopLevelWidget.tcl]]
+set auto_index(::util::LabelCommandMenu) [list source [file join $dir LabelCommandMenu.tcl]]
 set auto_index(::add_graphics_features) [list source [file join $dir graphics_features.tcl]]

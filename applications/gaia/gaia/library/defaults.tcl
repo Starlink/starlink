@@ -96,6 +96,10 @@ proc gaia::setXdefaults {} {
     option add *LabelEntry.anchor w
     option add *LabelFileChooser.anchor w
 
+    option add *LabelCommandMenu.anchor w
+    option add *LabelCommandMenu.relief groove
+    option add *LabelCommandMenu.indicatorOn 1
+
     option add *LabelEntryMenu.anchor w
     option add *LabelEntryMenu.buttonrelief raised
     option add *LabelEntryMenu.indicatorOn 1

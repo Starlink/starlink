@@ -70,8 +70,29 @@ if { $argc >= 1 } {
    exit
 }
 
+#  Define a useful procedure for handling image names with slices.
+proc fileName {image} {
+
+   # Return the proper filename of an image and any slice information.
+   set i1 [string last {(} $image]
+   set i2  [string last {)} $image]
+   if { $i1 > -1 && $i2 > -1 } {
+      set slice [string range $image $i1 $i2]
+      incr i1 -1
+      set image [string range $image 0 $i1]
+   } else {
+      set slice ""
+   }
+   set image2 "$image"
+   if { [file extension $image] == "" } {
+      set image "${image}.sdf"
+   }
+   return [list $image $slice]
+}
+
 #  See if the file exists and it so transform into an absolute name
 #  (GAIA may not be running in this directory).
+lassign [fileName $image] image slice
 if { ! [file readable $image] } { 
    puts stderr "Cannot read image: $image"
    exit 1
@@ -107,7 +128,7 @@ proc connect_to_gaia {} {
          if {[catch {socket $host $port} msg]} {
             set needed 1
          } else {
-            puts stderr "Connected to GAIA..."
+            #puts stderr "Connected to GAIA..."
             fconfigure $msg -buffering line
             return $msg
          }
@@ -118,7 +139,7 @@ proc connect_to_gaia {} {
       if { $needed && $tries == 0 } {
          puts stderr "Failed to connect to GAIA, starting new instance..."
          exec $env(GAIA_DIR)/gaia.sh &
-         # exec $env(GAIA_DIR)/tgaia &
+         #exec $env(GAIA_DIR)/tgaia &
       }
 
       #  Now either wait and try again or give up if waited too long.

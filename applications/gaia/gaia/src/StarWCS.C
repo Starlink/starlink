@@ -136,7 +136,7 @@ StarWCS::StarWCS(const char* header)
       fitschan = (AstFitsChan *) astAnnul( fitschan );
       if ( fitsset == AST__NULL ) {
         astClearStatus;
-        print_error( "Failed to read World Coordinate System from FITS headers \n" );
+        // print_error( "Failed to read World Coordinate System from FITS headers" );
       } else {
 
         // FITS headers may have more than two dimensions. In this
@@ -146,7 +146,7 @@ StarWCS::StarWCS(const char* header)
         if ( !make2D() ) {
           astClearStatus;
           wcs_ = (AstFrameSet *) astAnnul( wcs_ );
-          print_error( "Failed to read a 2D World Coordinate System from FITS headers \n");
+          print_error( "Failed to read a 2D World Coordinate System from FITS headers");
         } else {
 
           // Set the equinox value and string.
@@ -198,7 +198,7 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
       astClearStatus;
       wcs_ = (AstFrameSet *) astAnnul( wcs_ );
       wcs_ = astcopy;
-      error( "Failed to read a 2D World Coordinate System from FITS headers \n");
+      error( "Failed to read a 2D World Coordinate System from FITS headers");
       return 0;
     } else {
       // Set the equinox value and string.
