@@ -1,2 +1,0 @@
-#!/bin/sh
-grep -h '^C%' ../src/pg*.f > ./pgbind_prototypes
