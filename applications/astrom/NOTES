@@ -28,10 +28,45 @@ following commands (and you need a reasonably recent version of
 autoconf or else you get an error like `autoconf: configure.in: No
 such file or directory')
 
-    autoconf
+    make -f makefile.in configure
     ./configure
+    latex sun5;bibtex sun5;latex sun5;bibtex sun5;latex sun5
     make export_source
 
-(in fact you need to `latex sun5;bibtex sun5;latex sun5;bibtex
-sun5;latex sun5') in order to include the bibliography correctly, but
-I haven't tried to automate that in the makefile)
+
+
+2003 May 5
+----------
+
+More faffing around.  It's now essentially completely configured by
+autoconf, and that seems successful.  HOWEVER, it's not distributed in
+a form which allows you to do just `./configure;make' as is common.
+This is because the Starlink makefile conventions are nuts! (yes, I
+know I knew that already).  The obvious thing to do is simply to add
+{makefile.in,configure,config} to the top-level tarball.  That nearly
+works, but it turns into a real mess pretty promptly, because it has
+to either completely ignore all of the functional defines in the
+makefile (because all of the things that they refer to are put in the
+_source.tar file), or else you have to completely redesign the
+makefile.  It's all because of the ludicrous $(PKG_NAME)_source.tar
+intermediate stage, which requires all sorts of pussyfooting around
+(because this is both a generated file -- things are put into it
+within the makefile -- and a source file -- things are taken out of it
+after distribution).  A crude way of dealing with this is simply to
+add to SOURCE_FILES both the config and t directories, as well as the
+list of dependencies which are on $(PKG_NAME)_source.tar, and comment
+out every target which involves _source.tar.  That _almost_ works, but
+GNU make thereafter insists on trying to build `astrom' (a script)
+from astrom.o, and thence from astrom.f, and I can't work out how to
+tell it that's not what I want it to do.
+
+There are therefore two things to do here: first is to rationalise the
+makefile, and I hope I'll do that when I come to investigate that
+whole business for all the classic applications (it might be
+automatable, but probably won't be uncontentious); the second is to
+lose the astrom script, and have astrom.f being invoked directly
+(that's almost there -- all the script does is add `input=' and
+`report=' to the first two arguments which don't have `=' signs in
+them).
+
+Sigh....
