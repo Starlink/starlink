@@ -1,0 +1,11 @@
+
+# Really should be using autoconf so that we do not have
+# to answer the question concerning RECLEN (or use FIO)
+# Should hard-wire in the name of the input/output files
+# so we can run from the binary
+./nso2b <<EOF
+O
+nso.asc
+nso.cat
+EOF
+

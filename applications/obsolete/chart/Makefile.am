@@ -42,7 +42,9 @@ crepar_SOURCES = crepar.f
 crepar_LDADD = libchart/libchart.la `err_link`
 
 #  Install data files into etc
-staretc_DATA = chartpar.dat nsoref.txt starnames.lis
+staretc_DATA = chartpar.dat nsoref.txt starnames.lis \
+	astrom84.cat nso.cat csi79.cat
+
 
 
 #  Create the direct access data file.
@@ -65,6 +67,21 @@ chartpar_test.dat: chartpar_test.ascii crepar
 	rm fort.1
 
 
+# Create the binary catalogues [start from gzipped ascii version]
+nso.cat:  nso.asc.gz nso2b
+	gunzip -c nso.asc.gz > nso.asc
+	./make_nso
+	-rm -f nso.asc
+
+csi79.cat: csi79.asc.gz csi2b
+	gunzip -c csi79.asc.gz > csi79.asc
+	./make_csi
+	-rm -f csi79.asc
+
+astrom84.cat: astrom84.asc.gz ast2b
+	gunzip -c astrom84.asc.gz > astrom84.asc
+	./make_astrom
+	-rm -f astrom84.asc
 
 # The chart_params script needs to have installation locations edited into it
 # Can not be done during configure since @bindir@ gets converted
