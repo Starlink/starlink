@@ -431,7 +431,7 @@ itcl::class gaia::Gaia {
       set index [$m index "Clear"]
       insert_menuitem $m $index command "Startup options..." \
          {Set startup-level configuration options} \
-         -command [code $this make_toolbox startup]
+         -command [code $this make_toolbox startup 0 1]
 
       set index [$m index "Print..."]
       catch {$m delete "Print..."}
