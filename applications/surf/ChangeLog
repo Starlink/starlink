@@ -1,10 +1,26 @@
+2000-09-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	----------->>>>>>>>>>>> SURF 1.6-2 <<<<<<<<<<<-----------
+	
+	* src/surf_scuphot.f: Fix SEGV with POLPHOT data 
+
+2000-08-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_grid_calcsky.f (SURF_GRID_CALCSKY): Check that NMAX is
+	greater than 0
+
 2000-08-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	----------->>>>>>>>>>>> SURF 1.6-1 <<<<<<<<<<<-----------
 
 	* surflib/surflib_median_regrid.f (SURFLIB_MEDIAN_REGRID):
 	Initialise some pointers that were previously missed.
 
+	
 2000-07-05  Tim Jenness  <timj@jach.hawaii.edu>
 
+	----------->>>>>>>>>>>> SURF 1.6-0 <<<<<<<<<<<-----------
+	
 	* surflib/surflib_calc_polpack_angrot.f
 	(SURFLIB_CALC_POLPACK_ANGROT): Check SCULIB_FIND_INT return values
 
