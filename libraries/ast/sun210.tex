@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {16th September 1999}
+\newcommand{\stardocdate}      {29th September 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -584,6 +584,10 @@ coordinate spaces---{\em{i.e.}}\ map projections (the \htmlref{DssMap}{DssMap} a
 and \htmlref{ZoomMap}{ZoomMap}).
 
 \item Lookup tables (the \htmlref{LutMap}{LutMap}).
+
+\item General-purpose transformations expressed using arithmetic
+operations and function invocations similar to those available in
+Fortran (the \htmlref{MathMap}{MathMap}).
 
 \item Transformations for internal use within a program, based on
 private transformation routines which you write yourself in Fortran
@@ -2702,6 +2706,8 @@ as a whole and some of the sub-classes it contains:
       CmpMap
       DssMap
       IntraMap
+      LutMap
+      MathMap
       MatrixMap
       PermMap
       SlaMap
@@ -9832,6 +9838,7 @@ Object            - Base class for all AST Objects
          SkyFrame - Celestial coordinate system description
       IntraMap    - Map points using a private transformation function
       LutMap      - Transform 1-dimensional coordinates using a lookup table
+      MathMap     - Transform coordinates using mathematical expressions
       MatrixMap   - Map positions by multiplying them by a matrix
       PcdMap      - Apply 2-dimensional pincushion/barrel distortion
       PermMap     - Coordinate permutation Mapping
@@ -23813,6 +23820,11 @@ access to IntraMap attributes.
 class. This allows the transformation routines used by IntraMaps to
 adapt to produce the required transformation on a per-IntraMap basis
 (\secref{ss:intraflag}).
+
+\item A new \htmlref{MathMap}{MathMap} class has been introduced. This is a form of
+\htmlref{Mapping}{Mapping} that allows you to define coordinate transformations in a
+flexible and transportable way using arithmetic operations and
+mathematical functions similar to those provided in Fortran.
 
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
