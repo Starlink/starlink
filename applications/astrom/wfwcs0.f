@@ -143,7 +143,7 @@
 *   \xi=Q(r)x, \eta=Q(r)y.  The parameter q in this program
 *   has units rad^{-2} (I'm pretty sure), but since the FITS 
 *   files work in degrees, we need to convert it to deg^{-2}.
-      WRITE (WRKSTR,'("Projection geometry: ",A)') KPROJ
+      WRITE (WRKSTR,'("ASTROM projection: ",A)') KPROJ
       CALL FTPCOM (FTUNIT, WRKSTR, FTSTAT)
       DISTORD2 = DISTOR*(D2R**2)
       WRITE (WRKSTR, '("ASTROM q=",F10.4,"rad**-2 = ",
