@@ -395,6 +395,17 @@ void Bitmap::write (const string filename, const string format)
     int hsize = (cropped_ ? cropR-cropL : W);
     int vsize = (cropped_ ? cropB-cropT : H);
     BitmapImage *bi = BitmapImage::newBitmapImage(format, hsize, vsize, bpp_);
+    if (bi == 0)		// invalid format
+    {
+	if (verbosity_ >= normal)
+	    cerr << "Bitmap: can't create image with format "
+		 << format << "\n";
+	bi = BitmapImage::newBitmapImage
+	    (BitmapImage::defaultBitmapImageFormat, hsize, vsize, bpp_);
+	if (bi == 0)
+	    throw BitmapError
+		("Bitmap: can't create image with default format");
+    }
     if (cropped_)
 	for (int row=cropT; row<cropB; row++)
 	    bi->setBitmapRow(&B[row*W+cropL]);
