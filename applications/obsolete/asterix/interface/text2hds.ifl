@@ -2,7 +2,7 @@ INTERFACE TEXT2HDS
 
   PARAMETER 'INFILE'
     POSITION 1
-    TYPE    '_CHAR'
+    TYPE    'LITERAL'
     PROMPT  'Name of input text file'
     PPATH   'CURRENT'
     VPATH   'PROMPT'
@@ -11,7 +11,7 @@ INTERFACE TEXT2HDS
 
   PARAMETER OUTFILE
     POSITION 2
-    TYPE    '_UNIV'
+    TYPE    'LITERAL'
     PROMPT  'Name of output HDS file'
     PPATH   'CURRENT'
     VPATH   'PROMPT'

@@ -27,6 +27,7 @@
 *      7 Nov 93 : V1.7-0 Uses FIO to do all i/o (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     30 Jul 95 : V1.8-1 Use new history routines (DJA)
+*     25 Aug 95 : V1.8-2 Use ADI top create event datasets (DJA)
 *
 *    Type definitions :
 *
@@ -34,8 +35,8 @@
 *
 *    Global constants :
 *
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE '/star/include/sae_par'
+      INCLUDE '/star/include/dat_par'
 *
 *    Status :
 *
@@ -56,30 +57,31 @@
       CHARACTER*80 TEXT
       CHARACTER*40 NULL                        ! Null string
       CHARACTER*(DAT__SZLOC) LOCO
-      CHARACTER*(DAT__SZLOC) LOCL
       CHARACTER*(DAT__SZLOC) LOCT(MAXCOL)      ! Locators to HDS arrays
-      CHARACTER*11 UNITS(MAXCOL)                   ! Units of lists
+      CHARACTER*11 		UNITS(MAXCOL)           ! Units of lists
       CHARACTER*(DAT__SZTYP) TYPE(MAXCOL)
 
-      INTEGER 			IFD		! FIO descriptor of input file
-      INTEGER 			DFD		! FIO descriptor of dscf file
+      REAL 			RMIN,RMAX		! List min and max
 
-      INTEGER NCOLS,NROWS
-      INTEGER TPNTR(MAXCOL)                    ! Pointers to output arrays
-      INTEGER LP,IVAL
-      INTEGER NREAD                            ! Number of lines in file
+      INTEGER 			DFD			! FIO dscf descriptor
+      INTEGER 			IFD			! FIO input descriptor
+      INTEGER			LID(MAXCOL)		! List identifiers
+      INTEGER			OFID, OFILID		! Output identifiers
+
+      INTEGER 			NCOLS,NROWS
+      INTEGER 			TPNTR(MAXCOL)           ! Pointers to o/p arrays
+      INTEGER 			LP,IVAL
+      INTEGER 			NREAD                   ! # lines in file
       LOGICAL SCAR                             ! Is SCAR descriptor file ready ?
       LOGICAL EVENT                            ! Event dataset output format ?
       INTEGER STPOS(MAXCOL)                    ! Start position of each field
       INTEGER LENGTH(MAXCOL)                   ! Length of each field in file
-      INTEGER			OFID			!
 
-      REAL RMIN,RMAX
 *    Local data :
       DATA NULL/'                                        '/
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-1')
+      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-2')
 *-
 
       CALL AST_INIT(STATUS)
@@ -97,7 +99,7 @@
       IF ( SCAR ) THEN
         CALL USI_GET0C( 'DSCFILE', DFILE, STATUS )
       END IF
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Open input file
       CALL FIO_OPEN( INAME, 'READ', 'LIST', 0, IFD, STATUS )
@@ -106,67 +108,84 @@
       IF ( SCAR ) THEN
         CALL FIO_OPEN( DFILE, 'READ', 'LIST', 0, DFD, STATUS )
       END IF
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
+
+*    Ask if an event dataset is wanted rather than a list of HDS arrays.
+      CALL USI_GET0L( 'EVENT', EVENT, STATUS )
 
 *    Open output file
-      CALL USI_TASSOCO( 'OUTFILE', 'EventDS', OFID, STATUS )
-      CALL ADI1_GETLOC( OFID, LOCO, STATUS )
+      IF ( EVENT ) THEN
+        CALL ADI_NEW0( 'EventDS', OFID, STATUS )
+        CALL USI_CREAT( 'OUTFILE', OFID, OFILID, STATUS )
+      ELSE
+        CALL USI_TASSOCO( 'OUTFILE', 'EventDS', OFID, STATUS )
+        CALL ADI1_GETLOC( OFID, LOCO, STATUS )
+      END IF
 
-*    Get a description of the file either from the user or from the SCAR
-*    descriptor file
+*  Get a description of the file either from the user or from the SCAR
+*  descriptor file
       IF ( SCAR ) THEN
         CALL TEXT2HDS_DSCFREAD( DFD, MAXCOL, NCOLS, NROWS, CNAME,
      :                       UNITS, STPOS, LENGTH, TYPE, STATUS )
+
       ELSE
 
-*      Get the number of text columns from the user
-        NCOLS=0
+*    Get the number of text columns from the user
+        NCOLS = 0
         CALL USI_GET0I( 'NCOLS', NCOLS, STATUS )
         IF ( NCOLS .GT. MAXCOL ) THEN
           CALL MSG_SETI('MAXCOL', MAXCOL)
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', '* Can''t handle more than ^MAXCOL '/
      :                    /'columns *', STATUS )
-          GOTO 999
+          GOTO 99
         END IF
 
-*      Get the upper limit on the number of lines of text in the file
+*    Get the upper limit on the number of lines of text in the file
         CALL USI_GET0I( 'NROWS', NROWS, STATUS )
-        IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 99
 
-*      Get list names from environment
-        DO LP=1,NCOLS
+*    Get list names from environment
+        DO LP = 1, NCOLS
           TYPE(LP) = '_REAL'
           CALL CHR_ITOC( LP, STRING, IVAL )
           CALL USI_GET0C( 'CNAME'//STRING(1:IVAL), CNAME(LP), STATUS )
         END DO
-        IF ( STATUS .NE. SAI__OK ) GOTO 999
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       END IF
 
-*    Ask if an event dataset is wanted rather than a list of HDS arrays.
-      CALL USI_GET0L( 'EVENT', EVENT, STATUS )
-
-*    Create output arrays and map them
+*  Create output arrays and map them
       IF ( EVENT ) THEN
 
-*      Create lists in output file
-        DO LP=1,NCOLS
-          CALL LIST_CREMAP( LOCO, CNAME(LP)(1:CHR_LEN(CNAME(LP))),
-     :           TYPE(LP),NROWS,.FALSE.,0.0,SCAR,UNITS(LP),0.0,0.0,
-     :           TPNTR(LP), LOCT(LP), STATUS )
+*    Set maximum number of events
+        CALL ADI_CPUT0I( OFID, 'NEVENT', NROWS, STATUS )
+
+*    Create lists in output file
+        DO LP = 1, NCOLS
+          IF ( TYPE(LP) .EQ. '_DOUBLE' ) THEN
+            CALL EDI_CREL0D( OFID, CNAME(LP), .FALSE.,
+     :                   0.0, 0.0, 0.0, UNITS(LP), LID(LP), STATUS )
+          ELSE IF ( TYPE(LP) .EQ. '_REAL' ) THEN
+            CALL EDI_CREL0R( OFID, CNAME(LP), .FALSE.,
+     :                   0.0, 0.0, 0.0, UNITS(LP), LID(LP), STATUS )
+          ELSE
+            CALL EDI_CREL0I( OFID, CNAME(LP), .FALSE.,
+     :                   0.0, 0.0, 0.0, UNITS(LP), LID(LP), STATUS )
+          END IF
+          CALL EDI_CREAT( OFID, LID(LP), STATUS )
+          CALL EDI_MAPR( OFID, CNAME(LP), 'WRITE', 0, 0, TPNTR(LP),
+     :                   STATUS )
         END DO
 
       ELSE
 
-*      Create arrays in output file
+*    Create arrays in output file
         DO LP = 1, NCOLS
-          CALL DAT_NEW( LOCO, CNAME(LP)(1:CHR_LEN(CNAME(LP))),
-     :                            TYPE(LP), 1, NROWS, STATUS )
-          CALL DAT_FIND( LOCO, CNAME(LP)(1:CHR_LEN(CNAME(LP))),
-     :                                       LOCT(LP), STATUS )
-          CALL DAT_MAP( LOCT(LP), TYPE(LP), 'WRITE', 1, NROWS,
-     :                                     TPNTR(LP), STATUS )
+          CALL DAT_NEW( LOCO, CNAME(LP), TYPE(LP), 1, NROWS, STATUS )
+          CALL DAT_FIND( LOCO, CNAME(LP), LOCT(LP), STATUS )
+          CALL DAT_MAPV( LOCT(LP), TYPE(LP), 'WRITE',
+     :                                TPNTR(LP), NROWS, STATUS )
          END DO
 
       END IF
@@ -174,7 +193,7 @@
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Error creating arrays in output file',
      :                STATUS )
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Read input file into output arrays
@@ -186,43 +205,53 @@
      :                     STATUS )
       END IF
 
-*    If an EVENT dataset has been produced find the min and max
+*  If an EVENT dataset has been produced find the min and max
       IF ( EVENT ) THEN
-        DO LP=1,NCOLS
+
+*    Unmap the mapped lists, and write field extrema
+        DO LP = 1, NCOLS
+
+*      Get min and max
           CALL ARR_RANG1R( NREAD, %VAL(TPNTR(LP)), RMIN, RMAX, STATUS )
-          CALL DAT_FIND( LOCO, CNAME(LP)(1:CHR_LEN(CNAME(LP))),
-     :                                           LOCL, STATUS )
-          CALL LIST_PFLDR( LOCL, RMIN, RMAX, STATUS )
-          CALL DAT_ANNUL( LOCL, STATUS )
+          CALL ADI_CPUT0R( LID(LP), 'Min', RMIN, STATUS )
+          CALL ADI_CPUT0R( LID(LP), 'Max', RMAX, STATUS )
+
+*      Unmap the list
+          CALL EDI_UNMAP( OFID, CNAME(LP), STATUS )
+
+*      Update the list attributes
+          CALL EDI_LUPDT( OFID, LID(LP), 'Min,Max', STATUS )
+
         END DO
-      END IF
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', 'Error writing min and max list values',
-     :                STATUS )
-        GOTO 999
+
+*    Adjust list lengths
+        CALL EDI_ALTLEN( OFID, NREAD, STATUS )
+
+      ELSE
+        DO LP = 1, NCOLS
+          CALL DAT_UNMAP( LOCT(LP), STATUS )
+          IF ( NREAD .LT. NROWS ) THEN
+            CALL DAT_ALTER( LOCT(LP), 1, NREAD, STATUS )
+          END IF
+          CALL DAT_ANNUL( LOCT(LP), STATUS )
+        END DO
+
       END IF
 
-*    Produce a history record
+*  Produce a history record
       CALL HSI_ADD( OFID, VERSION, STATUS )
       TEXT = 'Produced from '//INAME
       CALL HSI_PTXT( OFID, 1, TEXT, STATUS )
 
-*    Unmap all arrays and adjust length if necessary
- 999  DO LP = 1, NCOLS
-        CALL DAT_UNMAP( LOCT(LP), STATUS )
-        IF ( NREAD .LT. NROWS ) THEN
-          CALL DAT_ALTER( LOCT(LP), 1, NREAD, STATUS )
-        END IF
-        CALL DAT_ANNUL( LOCT(LP), STATUS )
-      END DO
-
-*    Close the input files
+*  Close the input files
       CALL FIO_CLOSE( IFD, STATUS )
       IF ( SCAR ) THEN
         CALL FIO_CLOSE( DFD, STATUS )
       END IF
 
-      CALL AST_CLOSE( STATUS )
+*  Tidy up
+ 99   CALL AST_CLOSE( )
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -236,8 +265,8 @@
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'FIO_ERR'
+      INCLUDE '/star/include/sae_par'
+      INCLUDE '/star/include/fio_err'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -346,8 +375,8 @@
 *
 *    Global constants :
 *
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'FIO_ERR'
+      INCLUDE '/star/include/sae_par'
+      INCLUDE '/star/include/fio_err'
 *
 *    Import :
 *
@@ -514,9 +543,9 @@
 *     29-Jun-1990   original (LTVAD::RDS)
 *    Type definitions :
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'FIO_ERR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE '/star/include/sae_par'
+      INCLUDE '/star/include/fio_err'
+      INCLUDE '/star/include/dat_par'
 *    Import :
       INTEGER DFD                         ! FIO descriptor of DSCF file
       INTEGER MAXCOL                      ! Maxnumber of columns allowed
