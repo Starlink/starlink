@@ -476,7 +476,7 @@ body gaia::GaiaHyperHelp::back {} {
 body gaia::GaiaHyperHelp::search {} {
    file delete $_tmpfile
    catch {
-      exec findme -q -warn -html -f -m \
+      exec findme -q -warn -html -f -m -s \
          [$itk_component(searchtext) get] > $_tmpfile
    }
    incr _history_ndx
