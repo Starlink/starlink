@@ -16,17 +16,17 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.8}
-\newcommand{\stardocauthors}   {Peter W. Draper \& Norman Gray}
-\newcommand{\stardocdate}      {16 October 2000}
+\newcommand{\stardocnumber}    {214.9}
+\newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
+\newcommand{\stardocdate}      {6 April 2001}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.5}
+\newcommand{\stardocversion}   {2.6}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
-tool. It provides the usual facilities of image display tools, plus
-more astronomically useful ones such as aperture \& optimal
+tool for astronomy. It provides the usual facilities of image display
+tools, plus more astronomically useful ones such as aperture \& optimal
 photometry, contouring, source detection, surface photometry,
 arbitrary region analysis, celestial coordinate readout, calibration
 and modification, grid overlays, blink comparison, defect patching and
@@ -289,9 +289,9 @@ other programs.  At present extensions are provided that cover the
 astronomically interesting areas of aperture \& optimal photometry,
 automatic source detection, surface photometry, contouring, arbitrary
 region analysis, celestial coordinate readout, calibration and
-modification, grid overlays, blink comparison, image defect patching
-and the ability to connect to resources available in on-line (WWW)
-catalogues and archives.
+modification, grid overlays, blink comparison, image defect patching, 
+polarization vector plotting and the ability to connect to resources
+available in on-line (WWW) catalogues and archives.
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
@@ -361,8 +361,17 @@ for querying on-line resources (catalogues of images and data). Each
 of these areas is described very briefly in the next sections. As with
 most graphical tools, probably the best way to find out about GAIA is
 to explore it interactively. For specific windows (those which are
-more GAIA than SkyCat) help is available on-line; many windows also
+more GAIA than SkyCat) help is available on-line (look for a ``Help''
+menu in the upper right of a window); many windows also
 feature short one-line help descriptions of their controls.
+
+Windows that provide a limited range of controls for somekind of
+focussed task are called `toolboxes'. In general what they do should
+be obvious or they are really front-ends for other software
+packages. Good examples of this latter type are the photometry and
+object detection toolboxes. When such a toolbox is used the
+documentation for the command-line tools is the primary source for
+finding out what is going on under the bonnet.
 
 \subsection{\xlabel{image_display_capabilities}Image display capabilities}
 GAIA provides the following normal ``image display tool'' features:
@@ -436,6 +445,14 @@ astronomical work with images:
  or the overlay of contours derived from other images. The images are
  aligned using sky coordinates, if available. Control over individual
  line colours and thicknesses is provided.
+
+\item Polarization vector plotting and manipulation. This provides the
+ abilitity to display vector maps produced by the POLPACK
+ (\xref{SUN/223}{sun223}{}) package. It also allows you to select
+ sub-sets of vectors, either by algebraic expressions or by rectangular
+ regions. Selected parts can be removed or saved to new catalogues. New
+ vector maps can be created by binning vectors and reports of the
+ properties of selections can be displayed.
 
 \item Blink comparison. All the displayed images can be animated
   (as quickly as your hardware/CPU combination allow), or
@@ -572,12 +589,40 @@ All other file extensions are assumed to indicate a TST (the preferred
 extensions for these are \mytt{.tab} or \mytt{.TAB}).
 
 \subsubsection{Using your own local catalogues}
-A useful feature of local catalogues is that you can create your own
-and use GAIA to plot and manipulate them.
+If you have a simple text file containing columns of positions then
+the most straight-forward way to plot them in GAIA is by using the
+`Select Positions...' toolbox. This accepts (as do the various
+astrometry toolboxes) a file containing the following values:
+\begin{quote}
+\begin{verbatim}
+ID  RA  DEC  X  Y
+\end{verbatim}
+\end{quote}
+in that order, \textit{e.g.}
+\begin{quote}
+\begin{verbatim}
+1   00:19:49.47   00:07:25.9   854    50
+2   00:20:06.71   00:06:05.3   240   244
+3   00:19:47.54   00:04:23.2   925   484
+4   00:19:58.07   00:04:49.1   549   424
+5   00:19:48.69   00:06:59.0   882   114
+\end{verbatim}
+\end{quote}
+The columns should be space separated and the celestial coordinates
+should be in decimal degrees, or as shown above. More complex files
+can be imported into this toolbox using its `Import text file...'
+option (this allows fixed column widths or other separators). If you
+need to import such a file into a catalogue window, (this is the sort
+of window that queries to on-line catalogues are shown in, and provide
+extra facilities like applying intensity cuts etc.) then use the
+`Import plain text file...' toolbox from the `Positions...' menu.
 
-For instance if you wanted to plot position vectors as correctly
-orientated lines over an image you would need a tab table that
-contained the following sort of information:
+You can also create your own local catalogues in TST format. This
+allows you to describe how to plot the catalogue. For instance if you
+wanted to plot position vectors as correctly orientated lines over an
+image you would need a tab table that contained the following sort of
+information (again note that the \mytt{<TAB>} string should be replace
+by a single tab character):
 \begin{quote}
 \begin{verbatim}
 # File created by: pwd on June 15, 1999 at 10:24:04
@@ -586,10 +631,10 @@ x_col: 1
 y_col: 2
 symbol: {ID LENGTH ANGLE} {line {} {} {$ANGLE+27.0} {} {}} {{$LENGTH*0.1} {}}
 #
-ID      XPOS      YPOS     LENGTH    ANGLE
---      --        ---      ------    -----
-ID#1    206.000   189.000  6.32528   104.816
-ID#2    209.000   189.000  5.86891   109.238
+ID <TAB>    XPOS    <TAB> YPOS    <TAB> LENGTH   <TAB>  ANGLE
+--          ----          ---           ------          -----
+ID#1 <TAB>  206.000 <TAB> 189.000 <TAB> 6.32528  <TAB>  104.816
+ID#2 <TAB>  209.000 <TAB> 189.000 <TAB> 5.86891  <TAB>  109.238
 \end{verbatim}
 \end{quote}
 The \mytt{x\_col} and \mytt{y\_col} parameters indicate the columns of
@@ -617,7 +662,7 @@ symbols you should consult the ESO document
 \htmladdnormallinkfoot{``Astronomical Catalog Library''.}
 {http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}
 
-\mybold{FITS tables:} much of the above also applies to FITS tables
+\subsubsection{FITS tables} Much of the above also applies to FITS tables
 that GAIA will read, \textit{i.e.} FITS keywords with the names
 \mytt{X\_COL}, \mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
 correctly. Special parameter names that are longer than 8 characters
@@ -940,7 +985,7 @@ This is a minor update to GAIA with the following fixes:
 
 \end{itemize}
 
-\subsection{This release - 2.5}
+\subsection{Release - 2.5}
   This release includes two new toolboxes, various significant
   improvements and some bug fixes.
 
@@ -996,6 +1041,81 @@ This is a minor update to GAIA with the following fixes:
     \item The precision shown for the RA and DEC fields in the main
     window has been restored to show 0.1 arcsec resolution.
   \end{itemize}
+
+\subsection{This release - 2.6} 
+  Release 2.6 includes a new toolbox and various enhancements.
+
+  The new toolbox displays maps of polarization vectors as produced by
+  the Starlink POLPACK package (\xref{SUN/223}{sun223}{}). It also
+  provides manipulation facilities for selecting map sub-sets and
+  allows the map to be re-binned.
+
+  Additional minor changes are:
+  \begin{itemize}
+     \item You can now choose the secondary coordinate system that GAIA
+       displays in the `RA' and `Dec' coordinate readouts. This is
+       useful when your images have more than one coordinate system that
+       you'd like to view (by default NDFs have `PIXEL' and `AXIS', as
+       well as others such as celestial coordinates, FITS files may have
+       similar arrangements in the future). As a consequence of these
+       changes the `PIXEL' system is now removed from the celestial
+       coordinates and grid overlay toolboxes.
+
+     \item FITS file with more than one period in their names can now be
+       displayed by GAIA. However, some toolboxes are effectively
+       disabled by this as it breaks the \xref{NDF}{sun33}{} library
+       naming conventions for foreign data formats.
+
+     \item The contour toolbox now has new options to use a single colour
+       and/or width for all lines.
+
+     \item The contour toolbox now has new option for adding customised
+       colours (RGB/CMY/HSV or standard X11) to its drop-down lists.
+
+     \item You can now get a copy of the colour ramp, annotated with
+       levels, for inclusion in diagrams.
+
+     \item Importing plain text files of values is now also available as an
+       option for normal catalogue windows (previous this option just
+       imported files into the positions toolbox). This allows files
+       that have space, comma, semi-colon and tab separated fields to be
+       read, as well as files with fixed-width columns.
+
+     \item The conflict with the \xref{CURSA}{sun190}{} setup for the
+       \verb+SKYCAT_CONFIG+ environment variable is now resolved by ignoring
+       \verb+SKYCAT_CONFIG+. This was causing GAIA to lock up when used behind 
+       web proxy that had not been configured.
+
+     \item The UKSTU plate library has been removed from the default
+       catalogue list. This facility is no longer unavailable.
+
+     \item The \verb+failed to register the shmem:// driver+ warning message
+       should now be silent.
+
+     \item The pan window should now work with very thin images (1 pixel wide).
+
+     \item The `autocut' mechanism has been modified to not use the
+       DATAMIN and DATAMAX keywords (which are often not the minimum and
+       maximum data values in an image) and a bug effecting its
+       operation when scaled images were abutted to the top-edge of the
+       display has been fixed.
+
+       There have been many complaints that autocuts do not work as
+       expected, one reason for this is that the cuts are determined
+       by using a sub-sample of the part of the image data that you
+       can see, rather than the whole image. One effect of this is
+       that percentile cuts will correctly produce different high and
+       low levels depending on what part of an image you're looking
+       at.
+
+     \item All image access (that is NDFs and FITS files) is now
+       performed using file mapping. A consequence of this is that 
+       GAIA will now display images up to 2Gb in size on machines with
+       more modest physical memory allocations (a 256Mb Linux PC will
+       display such images comfortably). Note that if you attempt this
+       you will still require a system whose virtual memory size is
+       bigger than 2Gb.
+\end{itemize}
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 

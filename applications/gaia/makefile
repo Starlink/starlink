@@ -527,7 +527,7 @@ GAIA_LIB_FILES =  \
    GaiaPositions.hlp GaiaSearch.hlp GaiaSextractor.hlp GaiaTextImport.hlp \
    GaiaXYProfile.hlp StarBlink.hlp GaiaPolarimetry.hlp \
    skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
-   adamMessageRelay
+   adamMessageRelay displaycat
 
 GAIA_BIN_FILES = \
  gaia_swish gaia_stcl gaiaMon gaiaMon.ifc ardstat.ifc autocrop.ifc \
@@ -553,7 +553,8 @@ $(SKYCAT_FILES): $(TCL_FILES)
 RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer gaiaMon
 
 #  Names of scripts that will need 755 protections.
-RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay
+RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
+                  displaycat
 
 ################################################################################
 #-------------------------------------------------------------------------------

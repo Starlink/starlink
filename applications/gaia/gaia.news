@@ -1,62 +1,78 @@
-1 Update to GAIA
+1 GAIA Polarimetry Plotting Toolbox and Updates
 
-  A new release of GAIA, v2.5, is now available. This release includes
-  two new toolboxes, various significant improvements and some bug
-  fixes.
+  A new release of GAIA, v2.6, is now available. This release includes
+  a new toolbox and various enhancements.
 
-  The first new toolbox provides the long awaited ability to identify
-  and record image positions interactively. It also allows the import
-  of coordinates stored in text files (of various formats) and their
-  transformation to the celestial coordinate system of the displayed
-  image (for instance this allows you to read FK4 positions and
-  correctly position these over an image with an FK5 astrometry). Each
-  position can also be labelled and cumulative image properties
-  (including seeing) are calculated.
-
-  The second toolbox displays the mean X and Y profiles of a
-  rectangular region. If the rectangle is moved the profiles will
-  update in real time. This is useful for detecting background trends
-  and binning up linear features.
-
-  A further major change is the addition of support for displaying
-  multiple extension FITS files (MEFs). It is now possible to examine
-  images and catalogues stored in these files. A similar feature has
-  also been introduced for NDFs that are stored in the same container
-  file.
+  The new toolbox displays maps of polarization vectors as produced by
+  the Starlink POLPACK package (SUN/223). It also provides
+  manipulation facilities for selecting map sub-sets and allows the
+  map to be re-binned.
 
   Additional minor changes are:
 
-     - The SExtractor toolbox has been updated to work with the latest
-     version of EXTRACTOR and SExtractor (see SUN/226).
+     - You can now choose the secondary coordinate system that GAIA
+       displays in the "RA" and "Dec" coordinate readouts. This is
+       useful when your images have more than one coordinate system that
+       you'd like to view (by default NDFs have "PIXEL" and "AXIS", as
+       well as others such as celestial coordinates, FITS files may have
+       similar arrangements in the future). As a consequence of these
+       changes the "PIXEL" system is now removed from the celestial
+       coordinates and grid overlay toolboxes.
 
-     - The SExtractor toolbox no longer requires that you press
-     <Return> to update any text fields (this seemed to cause a lot of
-     confusion).
+     - FITS file with more than one period in their names can now be
+       displayed by GAIA. However, some toolboxes are effectively
+       disabled by this as it breaks the NDF library naming conventions
+       for foreign data formats.
 
-     - A new command-line option -quiet_exit has been introduced. This
-     can make GAIA ask before exiting the main window. The default
-     remains to not ask.
+     - The contour toolbox now has new options to use a single colour
+       and/or width for all lines.
 
-     - The file selection dialog now attempts to preserve the last
-     filter pattern.
+     - The contour toolbox now has new option for adding customised
+       colours (RGB/CMY/HSV or standard X11) to its drop-down lists.
 
-     - GAIA should now work correctly with X servers whose default
-     visual doesn't match the requested visual.
+     - You can now get a copy of the colour ramp, annotated with
+       levels, for inclusion in diagrams.
 
-     - A bug in the aperture photometry toolbox that caused some
-     detached sky regions to randomly move has been fixed.
- 
-     - Broken image headers that do not have an equinox value are no
-     longer shown as having a default value. Problems with the
-     equinox, epoch and coordinate system can now be viewed.
+     - Importing plain text files of values is now also available as an
+       option for normal catalogue windows (previous this option just
+       imported files into the positions toolbox). This allows files
+       that have space, comma, semi-colon and tab separated fields to be
+       read, as well as files with fixed-width columns.
 
-     - Catalogue windows now have the option to interpret X and Y
-     coordinates as NDF pixel coordinates (useful for plotting
-     POLPACK results). 
+     - The conflict with the CURSA setup for the SKYCAT_CONFIG
+       environment variable is now resolved by ignoring
+       SKYCAT_CONFIG. This was causing GAIA to lock up when used behind 
+       web proxy that had not been configured.
 
-     - The precision shown for the RA and DEC fields in the main
-     window has been restored to show 0.1 arcsec resolution.
+     - The UKSTU plate library has been removed from the default
+       catalogue list. This facility is no longer unavailable.
 
+     - The "failed to register the shmem:// driver" warning message
+       should now be silent.
+
+     - The pan window should now work with very thin images (1 pixel wide).
+
+     - The "autocut" mechanism has been modified to not use the
+       DATAMIN and DATAMAX keywords (which are often not the minimum and
+       maximum data values in an image) and a bug effecting its
+       operation when scaled images were abutted to the top-edge of the
+       display has been fixed.
+
+       There have been many complaints that autocuts do not work as
+       expected, one reason for this is that the cuts are determined
+       by using a sub-sample of the part of the image data that you
+       can see, rather than the whole image. One effect of this is
+       that percentile cuts will correctly produce different high and
+       low levels depending on what part of an image you're looking
+       at.
+
+     - All image access (that is NDFs and FITS files) is now
+       performed using file mapping. A consequence of this is that 
+       GAIA will now display images up to 2Gb in size on machines with
+       more modest physical memory allocations (a 256Mb Linux PC will
+       display such images comfortably). Note that if you attempt this
+       you will still require a system whose virtual memory size is
+       bigger than 2Gb.
 
   To try out GAIA for yourself type the following command:
 
@@ -68,34 +84,7 @@
 
       gaia@star.rl.ac.uk
 
-  Peter W. Draper (P.W.Draper@durham.ac.uk)
+  Peter W. Draper (P.W.Draper@durham.ac.uk) and 
+  David S. Berry (dsb@ast.man.ac.uk, Polarimetry toolbox)
 
-  16th October 2000.
-
-
-  2.5-3, SKYCAT_CONFIG from CURSA now ignored. Stops lock up when 
-         behind web proxy.
-
-
-  2.5-3, UKSTU plate library removed from the default catalogue list.
-         (waiting for SSS configuration changes)
-
-
-  2.6-0  Facilities for selected the secndary coordinate system are now 
-         available. The "pixel" system from the celestial coordinate system
-         toolbox is now removed.
-
-         cfitsio: failed to regsiter the shmem:// driver message
-         should be fixed.
-
-         Pan window should now work with very thin images (1 pixel wide).
-
-         FITS file with more than one period in name can now be displayed
-         by GAIA. However, some toolboxes are effectively disabled by this.
-
-         Autocuts modified to not use the DATAMIN and DATAMAX keywords
-         and to fix a bug when scaling zoomed images abutted to the top-edge.
-
-         Contour toolbox now has new options to use a single colour and/or
-         width for all lines.
-
+  6th April 2001.

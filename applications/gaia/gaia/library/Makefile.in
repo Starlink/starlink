@@ -55,7 +55,8 @@ FILES        = \
  skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
  adamtask.tcl
 
-PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay
+PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
+               displaycat 
 srcdir	     = @srcdir@
 
 all:
