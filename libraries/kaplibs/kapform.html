@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Specify search criteria</title>
+<script src="kaplibs.js" language="javascript"></script>
+<script src="search.js" language="javascript"></script>
+</head>
+
+<body onLoad="document.forms[0].PHRASE.focus();">
+<form onSubmit="return false;">
+<table>
+
+<tr><td></td></tr>
+<tr>
+	<td><font size="+1"><strong>Search for:</strong></font></td>
+	<td>
+	   <input type="text" name="PHRASE" size="20" maxlength="60" onClick="go();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	   <input name="GO" value="Go" type="button" onClick="go();">
+	</td>
+</tr>
+
+<tr><td></td></tr>
+<tr>
+	<td><font size="+1"><strong>Matching:</strong></font></td>
+	<td>
+	    <input type="radio" name="MATCH" value="ANY" checked> &nbsp; Any sub-strings
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	    <input type="radio" name="MATCH" value="WHOLE"> &nbsp; Whole words only
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	    <input type="radio" name="MATCH" value="EXACT"> &nbsp; The exact phrase
+	</td>
+</tr>
+
+<tr><td></td></tr>
+<tr>
+	<td><font size="+1"><strong>Within the:</strong></font></td>
+	<td>
+	   <input type="checkbox" name="WHAT" value="name"> &nbsp; Name
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	   <input type="checkbox" name="WHAT" value="purpose" checked> &nbsp; Purpose<br>
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	   <input type="checkbox" name="WHAT" value="description"> &nbsp; Description<br>
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	   <input type="checkbox" name="WHAT" value="ANAM"> &nbsp; Argument names<br>
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	   <input type="checkbox" name="WHAT" value="ADES"> &nbsp; Argument descriptions<br>
+	</td>
+</tr>
+
+<tr><td></td></tr>
+<tr>
+	<td><strong><strong>Of:</strong></strong></td>
+	<td>
+	   <input type="radio" name="DOMAIN" value="ALL" checked> &nbsp; All KAPLIBS routines
+ 	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+           <input type="radio" name="DOMAIN" value="SEL"> &nbsp; All currently displayed routines
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+           <input type="radio" name="DOMAIN" value="UNSEL"> &nbsp; All routines except those currently displayed
+	</td>
+</tr>
+
+<tr><td></td></tr>
+<tr>
+	<td><strong><font size="+1">And:</font></strong></td>
+	<td>
+	   <input type="radio" name="METHOD" value="REPLACE" checked> &nbsp; Replace displayed results with new results
+
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+           <input type="radio" name="METHOD" value="REMOVE"> &nbsp; Remove new results from displayed results
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td>
+           <input type="radio" name="METHOD" value="ADD"> &nbsp; Add new results to displayed results
+	</td>
+</tr>
+</table>
+
+
+</form>
+</body>
+</html>
