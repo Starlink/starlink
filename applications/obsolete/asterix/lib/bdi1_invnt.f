@@ -1,17 +1,18 @@
       SUBROUTINE BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE,
-     :                       ITID, NELM, WBPTR, STATUS )
+     :                       ITID, NDIM, DIMS, WBPTR, STATUS )
 *+
 *  Name:
 *     BDI1_INVNT
 
 *  Purpose:
-*     Invent BinDS data and store in the appropriate member
+*     Invent BinDS data and store in an ADI object
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE, ITID, NELM, WBPTR, STATUS )
+*     CALL BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE, ITID, NDIM, DIMS,
+*                      WBPTR, STATUS )
 
 *  Description:
 *     Services BDI map requests for HDS files. The BDI system ensures that
@@ -40,8 +41,10 @@
 *        The access mode
 *     ITID = INTEGER (returned)
 *        Identifier to the invented item
-*     NELM = INTEGER (returned)
-*        Number of data elements invented
+*     NDIM = INTEGER (returned)
+*        Dimensionality of invented data
+*     DIMS[] = INTEGER (returned)
+*        Dimensions of invented data
 *     WBPTR = INTEGER (returned)
 *        Address of WriteBack function
 *     STATUS = INTEGER (given and returned)
@@ -116,15 +119,16 @@
       CHARACTER*(*)		ITEM,MODE,TYPE
 
 *  Arguments Returned:
-      INTEGER                   ITID, NELM, WBPTR
+      INTEGER                   ITID, NDIM, DIMS(*), WBPTR
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			BDI1_INVNT_WBER
-      EXTERNAL			BDI1_INVNT_WBLQ
-      EXTERNAL			BDI1_INVNT_WBWID
+      EXTERNAL			BDI1_WBBND
+      EXTERNAL			BDI1_WBERR
+      EXTERNAL			BDI1_WBLQ
+      EXTERNAL			BDI1_WBWID
       EXTERNAL			UTIL_PLOC
         INTEGER			UTIL_PLOC
 
@@ -132,10 +136,11 @@
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
       CHARACTER*(DAT__SZLOC)	QLOC			! Quality array
       CHARACTER*(DAT__SZLOC)	MLOC			! Quality mask
+      CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
 
-      INTEGER			NDIM, DIMS(ADI__MXDIM)	! Dataset shape
-      INTEGER			PSID			! Private item storage
-      INTEGER			PTR			! Mapped data address
+      INTEGER			NELM			! # invented elements
+      INTEGER			PSID, WPSID		! Private item storage
+      INTEGER			PTR, PTR2		! Mapped data address
       INTEGER			TNDIM, TDIMS(ADI__MXDIM)! Temp dims
       INTEGER			WPTR			! Workspace
 
@@ -185,7 +190,7 @@
 
 *    Set the WriteBack function
         IF ( .NOT. RMODE ) THEN
-          WBPTR = UTIL_PLOC( BDI1_INVNT_WBWID )
+          WBPTR = UTIL_PLOC( BDI1_WBWID )
         END IF
 
 *  Logical quality
@@ -250,7 +255,7 @@
 
 *    Set the WriteBack function
         IF ( .NOT. RMODE ) THEN
-          WBPTR = UTIL_PLOC( BDI1_INVNT_WBLQ )
+          WBPTR = UTIL_PLOC( BDI1_WBLQ )
         END IF
 
 *  Masked quality
@@ -349,11 +354,69 @@
           CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
 
 *      Set the WriteBack function
-          WBPTR = UTIL_PLOC( BDI1_INVNT_WBER )
+          WBPTR = UTIL_PLOC( BDI1_WBERR )
 
 *      Release storage
           CALL ADI_ERASE( PSID, STATUS )
 
+        END IF
+
+*  Axis bounds?
+      ELSE IF ( (ITEM(1:5).EQ.'Axis_') .AND.
+     :          (ITEM(8:).EQ.'Bounds') ) THEN
+
+*    Locate the data
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
+     :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 59
+
+*    Private storage for axis data
+        CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
+     :                    STATUS )
+
+*    Map it
+        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', NDIM, DIMS, PSID, PTR,
+     :                    NELM, STATUS )
+
+*    Widths present?
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
+     :                   .FALSE., WLOC, NDIM, DIMS, STATUS )
+        IF ( WLOC .NE. DAT__NOLOC ) THEN
+
+          CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Width', .TRUE., WPSID,
+     :                      STATUS )
+
+          CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', NDIM, DIMS, WPSID,
+     :                      PTR2, NELM, STATUS )
+
+        ELSE
+          PTR2 = 0
+        END IF
+
+*    Bounds are a 2 x N array where N is the length of the axis data array
+        NDIM = 2
+        DIMS(2) = DIMS(1)
+        DIMS(1) = 2
+
+*    Create invented object and map
+        CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
+        CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
+
+*    Convert to bounds
+        CALL BDI1_INVNT_VW2B( DIMS(1), %VAL(PTR), (PTR2.NE.0),
+     :                        %VAL(PTR2), %VAL(WPTR), STATUS )
+
+*    Free mapped file data and mapped item
+        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+        CALL ADI_UNMAP( ITID, WPTR, STATUS )
+        IF ( PTR2 .NE. 0 ) THEN
+          CALL BDI1_UNMAP_INT( BDID, HFID, WPSID, STATUS )
+          CALL DAT_ANNUL( WLOC, STATUS )
+        END IF
+
+*    Set the WriteBack function
+        IF ( .NOT. RMODE ) THEN
+          WBPTR = UTIL_PLOC( BDI1_WBBND )
         END IF
 
 *  Axis low or high widths?
@@ -436,6 +499,123 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_INVNT', STATUS )
+
+      END
+
+
+
+      SUBROUTINE BDI1_INVNT_VW2B( N, CEN, WOK, WID, BNDS, STATUS )
+*+
+*  Name:
+*     BDI1_INVNT_VW2B
+
+*  Purpose:
+*     Invent axis bounds from centres and optionally widths
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_INVNT_VW2B( N, CEN, WOK, WID, BNDS, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     N = INTEGER (given)
+*        Number of axis centres/widths/bound pairs
+*     CEN[*] = REAL (given)
+*        Axis values
+*     WOK = LOGICAL (given)
+*        Widths present?
+*     WID[*] = REAL (given)
+*        Axis widths
+*     BNDS[2,N] = REAL (returned)
+*        Axis bounds
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   N
+      LOGICAL			WOK
+      REAL			CEN(*), WID(*)
+
+*  Arguments Returned:
+      REAL			BNDS(2,*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      REAL			DIR			! Sign of axis increase
+
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Widths present?
+      IF ( WOK ) THEN
+
+*    Establish direction
+        DIR = (CEN(N)-CEN(1))/ABS(CEN(N)-CEN(1))
+
+        DO I = 1, N
+          HWID = WID(I)*DIR/2.0
+          BNDS(1,I) = CEN(I) - HWID
+          BNDS(2,I) = CEN(I) + HWID
+        END DO
+
+      ELSE
+
+*    First bound pair
+        BNDS(1,1) = CEN(1) - (CEN(2)-CEN(1))/2.0
+        BNDS(2,1) = (CEN(1)+CEN(2))/2.0
+
+*    Intermediate ones
+        DO I = 2, N-1
+          BNDS(1,I) = BNDS(2,I-1)
+          BNDS(2,I) = (CEN(I)+CEN(I+1))/2.0
+        ENDDO
+
+*    Last bound pair
+        BNDS(1,N) = BNDS(2,N-1)
+        BNDS(2,N) = CEN(N) + (CEN(N)-CEN(N-1))/2.0
+
+      END IF
 
       END
 
@@ -1018,570 +1198,6 @@
           ERR(I) = 0.0D0
         END IF
       END DO
-
-      END
-
-
-
-      SUBROUTINE BDI1_INVNT_WBER( BDID, HFID, PSID, STATUS )
-*+
-*  Name:
-*     BDI1_INVNT_WBER
-
-*  Purpose:
-*     Write back invented errors to the file variance component
-
-*  Language:
-*     Starlink Fortran
-
-*  Invocation:
-*     CALL BDI1_INVNT_WBER( BDID, PSID, STATUS )
-
-*  Description:
-*     The data are squared in situ and written directly to the VARIANCE
-*     component of the dataset.
-
-*  Arguments:
-*     BDID = INTEGER (given)
-*        The ADI identifier of the BinDS (or BinDS derived) object
-*     HFID = INTEGER (given)
-*        The ADI identifier of the HDS file object
-*     PSID = INTEGER (given)
-*        The ADI identifier of the item private storage
-*     STATUS = INTEGER (given and returned)
-*        The global status.
-
-*  Examples:
-*     {routine_example_text}
-*        {routine_example_description}
-
-*  Pitfalls:
-*     {pitfall_description}...
-
-*  Notes:
-*     {routine_notes}...
-
-*  Prior Requirements:
-*     {routine_prior_requirements}...
-
-*  Side Effects:
-*     {routine_side_effects}...
-
-*  Algorithm:
-*     {algorithm_description}...
-
-*  Accuracy:
-*     {routine_accuracy}
-
-*  Timing:
-*     {routine_timing}
-
-*  External Routines Used:
-*     {name_of_facility_or_package}:
-*        {routine_used}...
-
-*  Implementation Deficiencies:
-*     {routine_deficiencies}...
-
-*  References:
-*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
-
-*  Keywords:
-*     package:bdi, usage:private
-
-*  Copyright:
-*     Copyright (C) University of Birmingham, 1995
-
-*  Authors:
-*     DJA: David J. Allan (Jet-X, University of Birmingham)
-*     {enter_new_authors_here}
-
-*  History:
-*     9 Aug 1995 (DJA):
-*        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
-
-*  Arguments Given:
-      INTEGER                   BDID, HFID, PSID
-
-*  Status:
-      INTEGER 			STATUS             	! Global status
-
-*  Local Variables:
-      CHARACTER*6		TYPE			! Mapping type
-      CHARACTER*(DAT__SZLOC)	VLOC			! VARIANCE locator
-
-      INTEGER			IERR, NERR		! VEC_ error info
-      INTEGER			N			! # mapped elements
-      INTEGER			NDIM, DIMS(DAT__MXDIM)	! VARIANCE shape
-      INTEGER			PTR			! Mapped data address
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Extract the mapped type, data address and number of elements
-      CALL ADI_CGET0C( PSID, 'Type', TYPE, STATUS )
-      CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
-      CALL ADI_CGET0I( PSID, 'Nelm', N, STATUS )
-
-*  Square the data
-      IF ( TYPE .EQ. 'REAL' ) THEN
-        CALL VEC_MULR( .FALSE., N, %VAL(PTR), %VAL(PTR), %VAL(PTR),
-     :                 IERR, NERR, STATUS )
-      ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
-        CALL VEC_MULD( .FALSE., N, %VAL(PTR), %VAL(PTR), %VAL(PTR),
-     :                 IERR, NERR, STATUS )
-      END IF
-
-*  Locate the VARIANCE component
-      CALL BDI1_CFIND( BDID, HFID, 'Variance', .TRUE., VLOC, STATUS )
-
-*  Get dimensions of VARIANCE
-      CALL BDI_GETSHP( BDID, DAT__MXDIM, DIMS, NDIM, STATUS )
-
-*  Write array back to VARIANCE
-      CALL DAT_PUT( VLOC, '_'//TYPE, NDIM, DIMS, %VAL(PTR), STATUS )
-
-*  Release VARIANCE array
-      CALL DAT_ANNUL( VLOC, STATUS )
-
-      END
-
-
-
-      SUBROUTINE BDI1_INVNT_WBWID( BDID, HFID, PSID, STATUS )
-*+
-*  Name:
-*     BDI1_INVNT_WBWID
-
-*  Purpose:
-*     Write back invented axis widths to the file axis width component
-
-*  Language:
-*     Starlink Fortran
-
-*  Invocation:
-*     CALL BDI1_INVNT_WBWID( BDID, PSID, STATUS )
-
-*  Description:
-*     The data are written to the axis width component, overwriting any
-*     existing data.
-
-*  Arguments:
-*     BDID = INTEGER (given)
-*        The ADI identifier of the BinDS (or BinDS derived) object
-*     HFID = INTEGER (given)
-*        The ADI identifier of the HDS file object
-*     PSID = INTEGER (given)
-*        The ADI identifier of the item private storage
-*     STATUS = INTEGER (given and returned)
-*        The global status.
-
-*  Examples:
-*     {routine_example_text}
-*        {routine_example_description}
-
-*  Pitfalls:
-*     {pitfall_description}...
-
-*  Notes:
-*     {routine_notes}...
-
-*  Prior Requirements:
-*     {routine_prior_requirements}...
-
-*  Side Effects:
-*     {routine_side_effects}...
-
-*  Algorithm:
-*     {algorithm_description}...
-
-*  Accuracy:
-*     {routine_accuracy}
-
-*  Timing:
-*     {routine_timing}
-
-*  External Routines Used:
-*     {name_of_facility_or_package}:
-*        {routine_used}...
-
-*  Implementation Deficiencies:
-*     {routine_deficiencies}...
-
-*  References:
-*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
-
-*  Keywords:
-*     package:bdi, usage:private
-
-*  Copyright:
-*     Copyright (C) University of Birmingham, 1995
-
-*  Authors:
-*     DJA: David J. Allan (Jet-X, University of Birmingham)
-*     {enter_new_authors_here}
-
-*  History:
-*     9 Aug 1995 (DJA):
-*        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
-
-*  Arguments Given:
-      INTEGER                   BDID, HFID, PSID
-
-*  Status:
-      INTEGER 			STATUS             	! Global status
-
-*  Local Variables:
-      CHARACTER*20		ITEM			! Item name
-      CHARACTER*6		TYPE			! Mapping type
-      CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
-
-      INTEGER			N			! # mapped elements
-      INTEGER			PTR			! Mapped data address
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Get item name
-      CALL ADI_NAME( PSID, ITEM, STATUS )
-
-*  Extract the mapped type, data address and number of elements
-      CALL ADI_CGET0C( PSID, 'Type', TYPE, STATUS )
-      CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
-      CALL ADI_CGET0I( PSID, 'Nelm', N, STATUS )
-
-*  Locate the width component
-      CALL BDI1_CFIND( BDID, HFID, ITEM, .TRUE., WLOC, STATUS )
-
-*  Write array back to file
-      CALL DAT_PUT( WLOC, '_'//TYPE, 1, N, %VAL(PTR), STATUS )
-
-*  Release widths array
-      CALL DAT_ANNUL( WLOC, STATUS )
-
-      END
-
-
-
-      SUBROUTINE BDI1_INVNT_WBLQ( BDID, HFID, PSID, STATUS )
-*+
-*  Name:
-*     BDI1_INVNT_WBLQ
-
-*  Purpose:
-*     Write back invented logical quality to the file quality component
-
-*  Language:
-*     Starlink Fortran
-
-*  Invocation:
-*     CALL BDI1_INVNT_WBLQ( BDID, HFID, PSID, STATUS )
-
-*  Description:
-*     Writes logical quality to a dataset. If no quality already exists
-*     then QUAL__BAD is written to each pixel with bad (= false) logical
-*     quality. If quality does already exist then only those pixels
-*     which have become bad have their quality values changed.
-
-*  Arguments:
-*     BDID = INTEGER (given)
-*        The ADI identifier of the BinDS (or BinDS derived) object
-*     HFID = INTEGER (given)
-*        The ADI identifier of the HDS file object
-*     PSID = INTEGER (given)
-*        The ADI identifier of the item private storage
-*     STATUS = INTEGER (given and returned)
-*        The global status.
-
-*  Examples:
-*     {routine_example_text}
-*        {routine_example_description}
-
-*  Pitfalls:
-*     {pitfall_description}...
-
-*  Notes:
-*     {routine_notes}...
-
-*  Prior Requirements:
-*     {routine_prior_requirements}...
-
-*  Side Effects:
-*     {routine_side_effects}...
-
-*  Algorithm:
-*     {algorithm_description}...
-
-*  Accuracy:
-*     {routine_accuracy}
-
-*  Timing:
-*     {routine_timing}
-
-*  External Routines Used:
-*     {name_of_facility_or_package}:
-*        {routine_used}...
-
-*  Implementation Deficiencies:
-*     {routine_deficiencies}...
-
-*  References:
-*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
-
-*  Keywords:
-*     package:bdi, usage:private
-
-*  Copyright:
-*     Copyright (C) University of Birmingham, 1995
-
-*  Authors:
-*     DJA: David J. Allan (Jet-X, University of Birmingham)
-*     {enter_new_authors_here}
-
-*  History:
-*     9 Aug 1995 (DJA):
-*        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'QUAL_PAR'
-
-*  Arguments Given:
-      INTEGER                   BDID, HFID, PSID
-
-*  Status:
-      INTEGER 			STATUS             	! Global status
-
-*  Local Variables:
-      CHARACTER*(DAT__SZLOC)	MLOC			! QualityMask locator
-      CHARACTER*(DAT__SZLOC)	QLOC			! Quality locator
-
-      INTEGER			N			! # mapped elements
-      INTEGER			NDIM, DIMS(DAT__MXDIM)	! QUALITY shape
-      INTEGER			PTR			! Mapped data address
-      INTEGER			QPTR			! Mapped quality
-
-      LOGICAL			EXISTS			! Quality exists?
-      LOGICAL			OK			! Object is ok?
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Extract the mapped type, data address and number of elements
-      CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
-      CALL ADI_CGET0I( PSID, 'Nelm', N, STATUS )
-
-*  Get dimensions of QUALITY
-      CALL BDI_GETSHP( BDID, DAT__MXDIM, DIMS, NDIM, STATUS )
-
-*  Locate the Quality item. If it doesn't already exist create and
-*  initialise to good quality.
-      CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC, STATUS )
-      IF ( QLOC .EQ. DAT__NOLOC ) THEN
-
-*    Create new quality array
-        CALL BDI1_CFIND( BDID, HFID, 'Quality', .TRUE., QLOC, STATUS )
-        CALL DAT_MAP( QLOC, '_UBYTE', 'WRITE', NDIM, DIMS, QPTR,
-     :                STATUS )
-        EXISTS = .FALSE.
-
-*  Already exists
-      ELSE
-        CALL DAT_MAP( QLOC, '_UBYTE', 'UPDATE', NDIM, DIMS, QPTR,
-     :                STATUS )
-        EXISTS = .TRUE.
-
-      END IF
-
-*  Get the quality mask, creating if not already there
-      CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .TRUE., MLOC, STATUS )
-      CALL DAT_STATE( MLOC, OK, STATUS )
-      IF ( .NOT. OK ) THEN
-        CALL DAT_PUT( MLOC, '_UBYTE', 0, 0, QUAL__MASK, STATUS )
-      END IF
-
-*  Convert logical quality to byte quality
-      CALL BDI1_INVNT_WBLQ_INT( N, %VAL(PTR), (.NOT.EXISTS), %VAL(QPTR),
-     :                          STATUS )
-
-*  Release QUALITY array
-      CALL DAT_UNMAP( QLOC, STATUS )
-      CALL DAT_ANNUL( QLOC, STATUS )
-      CALL DAT_ANNUL( MLOC, STATUS )
-
-      END
-
-
-
-      SUBROUTINE BDI1_INVNT_WBLQ_INT( N, LVAL, NEW, BVAL, STATUS )
-*+
-*  Name:
-*     BDI1_INVNT_WBLQ_INT
-
-*  Purpose:
-*     Convert logical quality to byte values
-
-*  Language:
-*     Starlink Fortran
-
-*  Invocation:
-*     CALL BDI1_INVNT_WBLQ_INT( N, LVAL, NEW, BVAL, STATUS )
-
-*  Description:
-*     Creates byte quality from logical quality
-
-*  Arguments:
-*     N = INTEGER (given)
-*        Number of values to copy
-*     LVAL[] = LOGICAL (given)
-*        Logical values, true if pixel is good
-*     NEW = LOGICAL (given)
-*        The byte values are new
-*     BVAL[] = BYTE (given and returned)
-*        Byte values
-*     STATUS = INTEGER (given and returned)
-*        The global status.
-
-*  Examples:
-*     {routine_example_text}
-*        {routine_example_description}
-
-*  Pitfalls:
-*     {pitfall_description}...
-
-*  Notes:
-*     {routine_notes}...
-
-*  Prior Requirements:
-*     {routine_prior_requirements}...
-
-*  Side Effects:
-*     {routine_side_effects}...
-
-*  Algorithm:
-*     {algorithm_description}...
-
-*  Accuracy:
-*     {routine_accuracy}
-
-*  Timing:
-*     {routine_timing}
-
-*  External Routines Used:
-*     {name_of_facility_or_package}:
-*        {routine_used}...
-
-*  Implementation Deficiencies:
-*     {routine_deficiencies}...
-
-*  References:
-*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
-
-*  Keywords:
-*     package:bdi, usage:private
-
-*  Copyright:
-*     Copyright (C) University of Birmingham, 1995
-
-*  Authors:
-*     DJA: David J. Allan (Jet-X, University of Birmingham)
-*     {enter_new_authors_here}
-
-*  History:
-*     9 Aug 1995 (DJA):
-*        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'QUAL_PAR'
-
-*  Arguments Given:
-      INTEGER                   N
-      LOGICAL			NEW, LVAL(*)
-
-*  Arguments Returned:
-      BYTE			BVAL(*)
-
-*  Status:
-      INTEGER 			STATUS             	! Global status
-
-*  External References:
-      EXTERNAL			BIT_ORUB
-        BYTE			BIT_ORUB
-
-*  Local Variables:
-      INTEGER			I			! Loop over values
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  New quality array?
-      IF ( NEW ) THEN
-        DO I = 1, N
-          IF ( LVAL(I) ) THEN
-            BVAL(I) = QUAL__GOOD
-          ELSE
-            BVAL(I) = QUAL__BAD
-          END IF
-        END DO
-      ELSE
-        DO I = 1, N
-          IF ( LVAL(I) ) THEN
-            BVAL(I) = QUAL__GOOD
-          ELSE
-            BVAL(I) = BIT_ORUB(BVAL(I),QUAL__BAD)
-          END IF
-        END DO
-      END IF
 
       END
 
