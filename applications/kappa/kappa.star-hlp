@@ -6678,7 +6678,7 @@ Description:
    on the current image-display device. The minimum and maximum data
    values to be displayed can be selected in several ways (see
    parameter MODE). Data values outside these limits are displayed
-   with the colour of the nearest limit. A colour ramp showing the
+   with the colour of the nearest limit. A key showing the
    relationship between colour and data value can be displayed (see
    parameter KEY).
 
@@ -6811,17 +6811,18 @@ IN = NDF (Read)
 3 KEY
 KEY = _LOGICAL (Read)
    TRUE if a key to the colour table is to be produced to the right
-   of the display. This takes the form of a colour ramp, annotated
-   with data value. The appearance of this key can be controlled using
-   parameter KEYSTYLE, and its horizontal position can be controlled
-   using parameter KEYPOS. If the key is required in a different
-   location, set KEY=NO and use application LUTVIEW after
-   displaying the image. [TRUE]
+   of the display. This can take the form of a colour ramp, a
+   coloured histogram of pen indices, or graphs of RGB intensities,
+   all annotated with data value. The form and appearance of this key
+   can be controlled using parameter KEYSTYLE, and its horizontal
+   position can be controlled using parameter KEYPOS. If the key is
+   required in a different location, set KEY=NO and use application
+   LUTVIEW after displaying the image. [TRUE]
 3 KEYPOS
 KEYPOS = _REAL (Read)
    A value giving the gap between the right hand edge of the display
    and the left hand edge of the key, given as a fraction of the
-   width of the current picture. If a key is produced, then the 
+   width of the current picture. If a key is produced, then the
    right hand margin specified by parameter MARGIN is ignored, and
    the value supplied for KEYPOS is used instead. [current value]
 3 KEYSTYLE
@@ -6851,7 +6852,18 @@ KEYSTYLE = GROUP (Read)
 
    Axis 1 is always the "data value" axis. So for instance, to set
    the label for the data value axis, assign a value to "Label(1)"
-   in the supplied style. [current value]
+   in the supplied style.
+
+   To get a ramp key (the default), specify "form=ramp". To
+   get a histogram key (a coloured histogram of pen indices),
+   specify "form=histogram". To get a graph key (three curves of
+   RGB intensities), specify "form=graph". If a histogram key
+   is produced, the population axis can be either logarithmic or
+   linear. To get a logarithmic population axis, specify "logpop=1".
+   To get a linear population axis, specify "logpop=0" (the default).
+   To annotate the long axis with pen numbers instead of pixel value,
+   specify "pennums=1" (the default, "pennums=0", shows pixel
+   values). [current value]
 3 LOW
 LOW = _DOUBLE (Read)
    The data value corresponding to the lowest pen in the colour
@@ -7203,6 +7215,13 @@ DSB: David S. Berry (STARLINK)
 
  18-OCT-1999 (DSB):
     Added parameters KEY, KEYPOS and KEYSTYLE.
+
+ 26-OCT-1999 (DSB):
+    Made MARGIN give margins as fraction of current picture instead
+    of DATA picture.
+
+ 23-OCT-2001 (DSB):
+    Changed to remove limit on size of colour table.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
@@ -7215,7 +7234,6 @@ DSB: David S. Berry (STARLINK)
    images.  However, when there is no scaling only integer data will
    not be type converted, but this is not expensive for the expected
    byte-type data.
-
 1 DIV
 Divides one NDF data structure by another.
 

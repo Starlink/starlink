@@ -17660,10 +17660,9 @@ default value.
       on the current image-display device. The minimum and maximum data
       values to be displayed can be selected in several ways (see
       parameter MODE). Data values outside these limits are displayed
-      with the colour of the nearest limit. A colour ramp showing the 
+      with the colour of the nearest limit. A key showing the
       relationship between colour and data value can be displayed (see
       parameter KEY).
-
 
       Annotated axes or a simple border can be drawn around the image (see
       parameters AXES and BORDER). The appearance of these may be controlled
@@ -17682,16 +17681,10 @@ default value.
    }
    \sstusage{
       display in [comp] clear [device] mode [centre] [xmagn] [ymagn]
-         [out] 
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                    low=? high=? \\  
-                    percentiles=? \\
-                    sigmas=? 
-                   \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small mode}
+         [out] \{ low=? high=?
+               \{ percentiles=?
+               \{ sigmas=?
+               mode
    }
    \sstparameters{
       \sstsubsection{
@@ -17702,13 +17695,13 @@ default value.
          of the supplied NDF - which may be changed using application WCSFRAME
          (see also parameter USEAXIS). The width of the margins left for
          the annotation may be controlled using parameter MARGIN. The
-         appearance of the axes (colours, fonts, \emph{etc}) can be controlled
-         using the STYLE parameter. {\tt [current value]}
+         appearance of the axes (colours, fonts, etc) can be controlled
+         using the STYLE parameter. [current value]
       }
       \sstsubsection{
          BADCOL = LITERAL (Read)
       }{
-         The colour with which to mark any bad (\emph{i.e.} missing) pixels in the
+         The colour with which to mark any bad (i.e. missing) pixels in the
          display.  There are a number of options described below:
 
          \sstitemlist{
@@ -17730,7 +17723,7 @@ default value.
          }
          If the colour is to remain unaltered as the lookup table is
          manipulated choose an integer between 0 and 15, or a named
-         colour.  The suggested default is the current value. {\tt [current value]}
+         colour.  The suggested default is the current value. [current value]
       }
       \sstsubsection{
          BORDER = \_LOGICAL (Read)
@@ -17745,8 +17738,8 @@ default value.
          current co-ordinate Frame had been pixel co-ordinates, then a
          simple box would have been drawn containing the whole image.
          This is because every pixel has a defined position in pixel
-         co-ordinates. The appearance of the border (colour, width, \emph{etc})
-         can be controlled using parameter BORSTYLE. {\tt [current value]}
+         co-ordinates. The appearance of the border (colour, width, etc)
+         can be controlled using parameter BORSTYLE. [current value]
       }
       \sstsubsection{
          BORSTYLE = GROUP (Read)
@@ -17772,7 +17765,7 @@ default value.
          defaulted if a null value (!) is supplied. See section {\tt "}Plotting
          Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
-         reported). {\tt [current value]}
+         reported). [current value]
       }
       \sstsubsection{
          CENTRE = LITERAL (Read)
@@ -17782,13 +17775,13 @@ default value.
          a colon {\tt "}:{\tt "} will display details of the current co-ordinate Frame).
          The position should be supplied as a list of formatted axis values
          separated by spaces or commas. See also parameter USEAXIS.  A
-         null (!) value causes the centre of the image to be used. {\tt [!]}
+         null (!) value causes the centre of the image to be used. [!]
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
       }{
          TRUE if the current picture is to be cleared before the image is
-         displayed. {\tt [current value]}
+         displayed. [current value]
       }
       \sstsubsection{
          COMP = LITERAL (Read)
@@ -17798,14 +17791,14 @@ default value.
          alternative to {\tt "}Variance{\tt "} and causes the square root of the
          variance values to be displayed).  If {\tt "}Quality{\tt "} is specified,
          then the quality values are treated as numerical values (in
-         the range 0 to 255). {\tt ["Data"]}
+         the range 0 to 255). [{\tt "}Data{\tt "}]
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The name of the graphics device used to display the image.
          The device must have at least 24 colour indices or greyscale
-         intensities. {\tt [current image-display device]}
+         intensities. [current image-display device]
       }
       \sstsubsection{
          FILL = \_LOGICAL (Read)
@@ -17814,7 +17807,7 @@ default value.
          the current picture in both directions. This can be useful when
          displaying images with markedly different dimensions, such as
          two-dimensional spectra. The dynamic default is TRUE if the array
-         being displayed is 1-dimensional, and FALSE otherwise. {\tt []}
+         being displayed is 1-dimensional, and FALSE otherwise. []
       }
       \sstsubsection{
          HIGH = \_DOUBLE (Read)
@@ -17837,21 +17830,22 @@ default value.
          KEY = \_LOGICAL (Read)
       }{
          TRUE if a key to the colour table is to be produced to the right
-         of the display. This takes the form of a colour ramp, annotated
-         with data value. The appearance of this key can be controlled using
-         parameter KEYSTYLE, and its horizontal position can be controlled 
-         using parameter KEYPOS. If the key is required in a different
-         location, set KEY=NO and use application LUTVIEW after
-         displaying the image. {\tt [TRUE] }
+         of the display. This can take the form of a colour ramp, a
+         coloured histogram of pen indices, or graphs of RGB intensities,
+         all annotated with data value. The form and appearance of this key
+         can be controlled using parameter KEYSTYLE, and its horizontal
+         position can be controlled using parameter KEYPOS. If the key is
+         required in a different location, set KEY=NO and use application
+         LUTVIEW after displaying the image. [TRUE]
       }
       \sstsubsection{
          KEYPOS = \_REAL (Read)
       }{
          A value giving the gap between the right hand edge of the display
          and the left hand edge of the key, given as a fraction of the
-         width of the current picture. If a key is produced, then the 
+         width of the current picture. If a key is produced, then the
          right hand margin specified by parameter MARGIN is ignored, and
-         the value supplied for KEYPOS is used instead. {\tt [current value]}
+         the value supplied for KEYPOS is used instead. [current value]
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
@@ -17879,9 +17873,20 @@ default value.
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
-         Axis 1 is always the {\tt "}data value{\tt "} axis. So for instance, 
-         to set the label for the data value axis, assign a value to 
-         {\tt "Label(1)"} in the supplied style. {\tt [current value]}
+         Axis 1 is always the {\tt "}data value{\tt "} axis. So for instance, to set
+         the label for the data value axis, assign a value to {\tt "}Label(1){\tt "}
+         in the supplied style.
+
+         To get a ramp key (the default), specify {\tt "}form=ramp{\tt "}. To
+         get a histogram key (a coloured histogram of pen indices),
+         specify {\tt "}form=histogram{\tt "}. To get a graph key (three curves of
+         RGB intensities), specify {\tt "}form=graph{\tt "}. If a histogram key
+         is produced, the population axis can be either logarithmic or
+         linear. To get a logarithmic population axis, specify {\tt "}logpop=1{\tt "}.
+         To get a linear population axis, specify {\tt "}logpop=0{\tt "} (the default).
+         To annotate the long axis with pen numbers instead of pixel value,
+         specify {\tt "}pennums=1{\tt "} (the default, {\tt "}pennums=0{\tt "}, shows pixel
+         values). [current value]
       }
       \sstsubsection{
          LOW = \_DOUBLE (Read)
@@ -17903,7 +17908,7 @@ default value.
          table.  The purpose of this parameter is to provide a means of
          controlling the appearance of the image on certain devices,
          such as colour printers, that do not have a dynamic colour
-         table (\emph{i.e.} the colour table is reset when the device is
+         table (i.e. the colour table is reset when the device is
          opened).  If used with dynamic devices (such as X-windows),
          the new colour table remains after this application has
          completed. A null value (! ) causes the existing colour table to
@@ -17914,14 +17919,14 @@ default value.
          compress or expand the colour table if the second dimension is
          different from the number of unreserved colour indices is
          controlled by parameter NN.  Also the LUT{\tt '}s values must lie in
-         the range 0.0--1.0. {\tt [!]}
+         the range 0.0--1.0. [!]
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave around the image for axis
          annotations, given as fractions of the corresponding dimension
-         of the DATA picture. The actual margins used may be increased to
+         of the current picture. The actual margins used may be increased to
          preserve the aspect ratio of the data. Four values may be given, in
          the order - bottom, right, top, left. If less than four values are
          given, extra values are used equal to the first supplied value. If
@@ -17929,7 +17934,7 @@ default value.
          If a null (!) value is supplied, the value used is (for all edges);
          0.15 if annotated axes are being produced; 0.04, if a simple border
          is being produced; and 0.0 if neither border nor axes are being
-         produced. {\tt [current value]}
+         produced. [current value]
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -17978,30 +17983,30 @@ default value.
          edges and is better for lookup tables with blocks of colour.
          If NN is FALSE linear interpolation is used, and this is
          suitable for smoothly varying colour tables.  NN is ignored
-         unless LUT is not null. {\tt [FALSE]}
+         unless LUT is not null. [FALSE]
       }
       \sstsubsection{
          NUMBIN  =  \_INTEGER (Read)
       }{
          The number of histogram bins used to compute percentiles for
-         scaling. (Percentiles mode) {\tt [2048]}
+         scaling. (Percentiles mode) [2048]
       }
       \sstsubsection{
          OUT = NDF (Write)
       }{
          A scaled copy of the displayed section of the image. Values in
          this output image are integer colour indices shifted to exclude
-         the indices reserved for the palette (\emph{i.e.} the value zero refers
+         the indices reserved for the palette (i.e. the value zero refers
          to the first colour index following the palette). The output NDF
          is intended to be used as the input data in conjunction with
          SCALE=FALSE. If a null value (!) is supplied, no output NDF will
-         be created.  This parameter is not accessed when SCALE=FALSE. {\tt [!]}
+         be created.  This parameter is not accessed when SCALE=FALSE. [!]
       }
       \sstsubsection{
          PERCENTILES( 2 ) = \_REAL (Read)
       }{
          The percentiles that define the scaling limits. For example,
-         {\tt [25,75]} would scale between the quartile values. (Percentile
+         [25,75] would scale between the quartile values. (Percentile
          mode)
       }
       \sstsubsection{
@@ -18016,13 +18021,13 @@ default value.
       }{
          If TRUE the input data is to be scaled according to the value of
          parameter MODE.  If it is FALSE, MODE is ignored, and the input
-         data is displayed as is (\emph{i.e.} the data values are simply converted
+         data is displayed as is (i.e. the data values are simply converted
          to integer type and used as indices into the colour table). A value
          of zero refers to the first pen following the palette. A FALSE
          value is intended to be used with data previously scaled by this
          or similar applications which have already performed the required
          scaling (see parameter OUT). It provides the quickest method of
-         image display within this application. {\tt [TRUE]}
+         image display within this application. [TRUE]
       }
       \sstsubsection{
          SCALOW = \_DOUBLE (Write)
@@ -18037,9 +18042,9 @@ default value.
       }{
          The standard-deviation bounds that define the scaling limits.
          To obtain values either side of the mean both a negative and
-         a positive value are required.  Thus {\tt [-2,3]} would scale
+         a positive value are required.  Thus [-2,3] would scale
          between the mean minus two and the mean plus three standard
-         deviations.  {\tt [3,-2]} would give the negative of that.
+         deviations.  [3,-2] would give the negative of that.
       }
       \sstsubsection{
          STYLE = GROUP (Read)
@@ -18065,7 +18070,7 @@ default value.
          defaulted if a null value (!) is supplied. See section {\tt "}Plotting
          Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
-         reported). {\tt [current value]}
+         reported). [current value]
       }
       \sstsubsection{
          USEAXIS = GROUP (Read)
@@ -18079,7 +18084,7 @@ default value.
          by its symbol string. A list of acceptable values is displayed if an
          illegal value is supplied. If a null (!) value is supplied, the axes
          with the same indices as the 2 used pixel axes within the NDF
-         are used. {\tt [!]}
+         are used. [!]
       }
       \sstsubsection{
          XMAGN = \_REAL (Read)
@@ -18090,7 +18095,7 @@ default value.
          A value larger than 1.0 makes each data pixel wider. If this
          results in the image being wider than the available space then
          the the image will be clipped to display fewer pixels. See also
-         parameters YMAGN, CENTRE and FILL. {\tt [1.0]}
+         parameters YMAGN, CENTRE and FILL. [1.0]
       }
       \sstsubsection{
          YMAGN = \_REAL (Read)
@@ -18102,7 +18107,7 @@ default value.
          results in the image being taller than the available space then
          the image will be clipped to display fewer pixels. See also
          parameters XMAGN, CENTRE and FILL. If a null (!) value is supplied,
-         the value used is the value supplied for XMAGN. {\tt [!]}
+         the value used is the value supplied for XMAGN. [!]
       }
    }
    \sstexamples{
@@ -18120,7 +18125,7 @@ default value.
          device.  There is no scaling of the data; instead the modulus
          of each pixel with respect to the number of colour-table
          indices is shown.  No annotated axes are drawn, but a blue border
-         is drawn around the image using PGPLOT line style number 2 (\emph{i.e.}
+         is drawn around the image using PGPLOT line style number 2 (i.e.
          dashed lines).
       }
       \sstexamplesubsection{
@@ -27916,20 +27921,26 @@ plot (10k).
    Draws a colour-table key
 }{
    \sstdescription{
-      This application displays a ramp of colours on the specified image
-      display device using the whole of the current colour table (excluding
-      the low 16 pens which are reserved for axis annotation, \emph{etc}). By
-      default, numerical values are displayed along the long edge of the
-      ramp. The values corresponding to the maximum and minimum colour
+      This application displays a key to the current colour table on the
+      specified image display device using the whole of the current colour
+      table (excluding the low 16 pens which are reserved for axis
+      annotation, \emph{etc}). The key can either be a simple rectangular block
+      of colour which ramps through the colour table, a histogram-style
+      key in which the width of the block reflects the number of pixels
+      allocated to each colour index, or a set of RGB intensity curves.
+      The choice is made using the STYLE parameter.
+
+      By default, numerical data values are displayed along the long edge of
+      the key. The values corresponding to the maximum and minimum colour
       index are supplied using parameters HIGH and LOW. Intermediate colour
       indices are labelled with values which are linearly interpolated
       between these two extreme values.
 
-      The rectangular area in which the ramp (plus annotations) is drawn
+      The rectangular area in which the key (plus annotations) is drawn
       may be specified either using a graphics cursor, or by specifying the
       co-ordinates of two corners using parameters LBOUND and UBOUND.
-      Additionally, there is an option to make the ramp fill the current
-      picture. See parameter MODE. The ramp may be constrained to the
+      Additionally, there is an option to make the key fill the current
+      picture. See parameter MODE. The key may be constrained to the
       current picture using parameter CURPIC.
 
       The appearance of the annotation my be controlled in detail using
@@ -27939,6 +27950,17 @@ plot (10k).
       lutview [mode] [low] [high] [curpic] [device]
    }
    \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The component (within the NDF given by parameter NDF) which is
+         currently displayed.  It may be {\tt "}Data{\tt "}, {\tt "}Quality{\tt "}, {\tt "}Variance{\tt "}, or
+         {\tt "}Error{\tt "} (where {\tt "}Error{\tt "} is an alternative to {\tt "}Variance{\tt "} and causes
+         the square root of the variance values to be used).  If {\tt "}Quality{\tt "} is
+         specified, then the quality values are treated as numerical values (in
+         the range 0 to 255). The dynamic default is obtained from global
+         parameter COMP which is set by applications such as KAPPA:DISPLAY. {\tt []}
+      }
       \sstsubsection{
          CURPIC = \_LOGICAL (Read)
       }{
@@ -27994,7 +28016,8 @@ plot (10k).
       }{
          The value corresponding to the maximum colour index.  It is
          used to calculate the annotation scale for the key.  If it
-         is null (!) the maximum colour index is used.
+         is null (!) the maximum colour index is used, and histogram
+         style keys are not available.
          {\tt [Current display linear-scaling maximum]}
       }
       \sstsubsection{
@@ -28013,7 +28036,8 @@ plot (10k).
       }{
          The value corresponding to the minimum colour index.  It is
          used to calculate the annotation scale for the key.  If it
-         is null (!) the minimum colour index is used.
+         is null (!) the minimum colour index is used, and histogram
+         style keys are not available.
          {\tt [Current display linear-scaling minimum]}
       }
       \sstsubsection{
@@ -28064,6 +28088,18 @@ plot (10k).
          {\tt ["Cursor"]}
       }
       \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         The NDF defining the image values to be used if a
+         histogram-style key is requested. This should normally be the
+         NDF currently displayed in the most recently created DATA picture.
+         If a value is supplied on the command line for this parameter it
+         will be used. Otherwise, the NDF to used is found by
+         interrogating the graphics database (which contains references to
+         displayed images). If no reference NDF can be obtained from the
+         graphics database, the user will be prompted for a value.
+      }
+      \sstsubsection{
          NN = \_LOGICAL (Read)
       }{
          If NN is TRUE, the input lookup table is mapped to the colour
@@ -28102,7 +28138,18 @@ plot (10k).
          Axis 1 is always the {\tt "}data value{\tt "} axis, whether it is displayed
          horizontally or vertically. So for instance, to set the label
          for the data value axis, assign a value to {\tt "}Label(1){\tt "} in the
-         supplied style. {\tt [current value]}
+         supplied style.
+
+         To get a ramp key (the default), specify {\tt "}form=ramp{\tt "}. To
+         get a histogram key (a coloured histogram of pen indices),
+         specify {\tt "}form=histogram{\tt "}. To get a graph key (three curves of
+         RGB intensities), specify {\tt "}form=graph{\tt "}. If a histogram key
+         is produced, the population axis can be either logarithmic or
+         linear. To get a logarithmic population axis, specify {\tt "}logpop=1{\tt "}.
+         To get a linear population axis, specify {\tt "}logpop=0{\tt "} (the default).
+         To annotate the long axis with pen numbers instead of pixel value,
+         specify {\tt "}pennums=1{\tt "} (the default, {\tt "}pennums=0{\tt "}, shows pixel
+         values). {\tt [current value]}
       }
       \sstsubsection{
          UBOUND = LITERAL (Read)
@@ -28122,6 +28169,21 @@ plot (10k).
       }{
          Draws an annotated colour table at a position selected via
          the cursor on the current image-display device.
+      }
+      \sstexamplesubsection{
+         lutview style={\tt '}form=hist,logpop=1{\tt '}
+      }{
+         As above, but the key has the form of a coloured histogram of
+         the pen numbers in the most recently displayed image. The second
+         axis display the logarithm (base 10) of the bin population.
+      }
+      \sstexamplesubsection{
+         lutview style={\tt '}form=graph,pennums=1{\tt '}
+      }{
+         The key is drawn as a set of three (or one if a monochrome
+         colour table is in use) curves indicating the red, green and
+         blue intensity for each pen. The first axis is annotated with
+         pen numbers instead of data values.
       }
       \sstexamplesubsection{
          lutview style={\tt "}{\tt '}edge(1)=right,label(1)=Data value in m31{\tt '}{\tt "}
@@ -44796,6 +44858,14 @@ The following applications have been modified:
          LOGICAL parameters.
       \end{itemize}
 
+   \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{}
+      \begin{itemize}
+         \item The colour table key can optionally now take the form of 
+         coloured histogram of pen numbers, or graphs of RGB intensity 
+         against data value. These new facilities are controlled using 
+         the KEYSTYLE parameter.
+      \end{itemize}
+
    \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
       \begin{itemize}
          \item A new parameter called ESTIMATOR has been added. It allows
@@ -44820,6 +44890,14 @@ The following applications have been modified:
          new output parameter, VALUE.
       \end{itemize}
        
+   \item [\htmlref{LUTVIEW}{LUTVIEW}] \mbox{}
+      \begin{itemize}
+         \item In addition to a colour ramp, LUTVIEW can now produce keys
+          in the form of a coloured histogram of pen numbers, or graphs
+          of RGB intensity against data value. These new facilities are
+          controlled using the STYLE parameter.
+      \end{itemize}
+
    \item [\htmlref{NORMALIZE}{NROMALIZE}] \mbox{}
       \begin{itemize}
          \item The MINPIX parameter now has a default of 2, making it
