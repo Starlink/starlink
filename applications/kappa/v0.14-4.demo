@@ -1,0 +1,444 @@
+# Allow 3 seconds to read each line of text (assuming a maximum line length 
+# of 68 characters), or 3 words per second. 
+
+demo v0.14-4 {
+
+   info "This demonstration gives a brief outline of some of the main
+   changes which have occurred within the <PACK KAPPA> package between
+   version 0.13-7 and 0.14-4. See the '<htx:sun95|se_changes <emph
+   Release Notes>>' section of <doc SUN/95> for a complete list."
+
+   env KAPPA_DIR
+
+   step {
+
+#  >>>>>>>>>>>>>>> The start of the demo
+
+      command {Obey kapview picdef "mode=bl fraction=0.6 outline=no"}
+      command {Obey kappa histogram "in=$KAPPA_DIR/m31 numbin=200 accept"}
+      command {Obey kapview picdef "mode=tr fraction=\[0.7,0.8\] outline=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31 clear=no mode=scale key style=def accept"}
+
+      text "This demonstration describes <pack KAPPA> V0.14-4, released
+      on the Spring 2000 <emph Starlink> CD. It highlights some of the
+      main changes introduced since version 0.13-7 of <pack KAPPA>.
+      Complete details of all changes are available
+      <htx:sun95|se_changes here>."
+
+      pause 15
+
+      text "<apps Several graphics applications> have been updated to
+      make use of a flexible method for controlling the appearance of the
+      plot. This is achieved through a new <param <style STYLE>>
+      parameter, which replaces several parameters used previously to
+      control the appeance of the plot.\n\n<emph NOTE, YOU WILL NEED TO
+     CHANGE ANY SCRIPTS WHICH MADE USE OF THESE OLD PARAMETERS. THE
+      'Release Notes' SECTION IN <doc SUN/95> CONTAINS DETAILS OF HOW TO
+      DO THIS.>\n\n"
+
+      pause 21
+
+      text "Displayed above is a DSS image of m31 produced by <pack
+      KAPPA> command <command display>, and a histogram of the same data
+      values produced by <pack KAPPA> command <command histogram>. Both
+      commands used the default <pack KAPPA> <style plotting style>. The
+      next plot shows the result of changing the plotting style used by
+      <command histogram> in order to: 1) place tick marks on the outside
+      of the axes, 2) put the tick marks only on the labelled edges
+      (bottom and left), 3) suppress the display of a title, 4) increase
+      the gap between labels on the vertical axis, and 5) make the
+      histogram curve thicker."
+
+      pause 30
+
+      command {Obey kapview gdclear ""}
+      command {Obey kappa histogram "in=$KAPPA_DIR/m31 style='majticklen=-0.02,minticklen=-0.01,tickall=0,numlabgap=0.04,drawtitle=0,width(curve)=3,gap(2)=2000' accept"}
+      command {Obey kapview piclist "name=data picnum=last"}
+      command {Obey kapview piclabel "label=hist"}
+
+      text "This change of plotting style was accomplished by using the
+      following attribute settings:\n\n	<attr majticklen=-0.02,
+      gap(2)=2000, width(curve)=3, minticklen=-0.01, tickall=0,
+      numlabgap=0.04, drawtitle=0>\n\nSuch settings can either be
+      assigned directly to the <param <style STYLE>> parameter, or stored
+      in a text file, with the name of the text file then being assigned
+      to the <param STYLE> parameter. There are many other plotting
+      attributes in addition to the ones used above."
+
+      pause 23
+
+      text "Another feature of the <apps converted graphics applications>
+      is that the plots they produced can be stacked on top of one
+      another, with alignment occurring automatically. To illustrate
+      this, let's look at a histogram of a small region of the m31 image,
+      overlaying it on the above histogram which includes the entire
+      image. The new curve will be drawn in red, and the selected region of
+      the image will be shown in the top right corner"
+
+      pause 17
+
+      command {exec echo "50 50" > stardemo.tmp}
+      command {exec echo "150 150" >> stardemo.tmp}
+      command {Obey kappa listmake "mode=file file=stardemo.tmp frame=pixel dim=2 outcat=stardemo"}
+      command {exec rm -f stardemo.tmp}
+      command {Obey kapview picdef "mode=tr fraction=0.25 outline=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31 clear=no mode=scale key=no axes=no accept"}
+      command {Obey kappa listshow "plot=box accept"}
+      command {exec rm -f stardemo.FIT}
+      command {Obey kapview picsel "label=hist"}
+      command {Obey kappa histogram {in=$KAPPA_DIR/m31(50:150,50:150) style='colour(curve)=red,width(curve)=3' axes=no clear=no accept}}
+
+      text "To perform this overlap, <command histogram> was run with the
+      following parameter settings:\n\n	<command histogram> <command
+      style='colour(curve)=red,width(curve)=3' axes=no clear=no>\n\n"
+
+      pause 10
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview display "in=$KAPPA_DIR/m31 key axes clear accept"}
+
+      text "A new feature in the <command display> command is the ability
+      to produce an annotated colour ramp to the right of the image. This
+      can act as a key to the displayed data values, and is selected
+      using the new <param KEY> parameter. The appearance of the
+      annotation, border, <for etc.>, can be controlled using the new
+      <param KEYSTYLE> parameter. The next screen shows a different key
+      style, created using the following <param KEYSTYLE> value:\n\n
+      	<attr border=0, majticklen=0, minticklen=0, textlab(1)=1,
+      colour=white, size=0.7, edge(1)=right>\n"
+
+      pause 25
+
+      command {Obey kapview display "keystyle='border=0,majticklen=0,minticklen=0,textlab(1)=1,colour=white,size=0.7,edge(1)=r' accept"}
+
+      text "The <command lutview> command can also be used to add a
+      colour ramp to an existing plot. It allows the position, size and
+      orientation of the colour ramp to be selected using the graphics
+      cursor. In <pack KAPPA> V0.14-4, <command lutview> also has a
+      <param <style STYLE>> parameter and so can create annotation
+      similar to that produced by <command display>."
+
+      pause 17
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview picdef "mode=tl fraction=0.94 outline=no"}
+      command {Obey kapview mlinplot "ndf=$KAPPA_DIR/m31 lnindx='90,110,130,150,170,190,210' space=free offset=\[0,8000,16000,24000,32000,40000,48000\]"}
+
+      command {exec echo "1 90" > stardemo.tmp}
+      command {exec echo "1 110" >> stardemo.tmp}
+      command {exec echo "1 130" >> stardemo.tmp}
+      command {exec echo "1 150" >> stardemo.tmp}
+      command {exec echo "1 170" >> stardemo.tmp}
+      command {exec echo "1 190" >> stardemo.tmp}
+      command {exec echo "1 210" >> stardemo.tmp}
+      command {Obey kappa listmake "mode=file file=stardemo.tmp frame=pixel dim=2 outcat=stardemo"}
+      command {exec rm -f stardemo.tmp}
+      command {Obey kapview picdef "mode=br fraction=0.15 aspect=1 outline=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31 clear=no mode=scale key=no axes=no accept"}
+
+# LISTSHOW: For some unknown reason, DAT_CLONE reports an "invalid locator" 
+# error within PAR_PUT0I for output parameter DIM unless a value is assigned 
+# to DIM. This does not happen from ICL or Unix shells.
+      command {Obey kappa listshow "incat=stardemo plot=hline quiet=no dim=2 accept"}
+
+      command {exec rm -f stardemo.FIT}
+
+      text "Another application which has been updated is the <command
+      mlinplot> command, which produces multiple line plots from a
+      specified set of rows or columns in an image. The above plot shows
+      the data values in 7 rows of the m31 image, identified in the image
+      at the bottom right corner. Each curve is labelled with its row
+      number in red near the left edge of the plot, and the corresponding
+      zero points are indicated by the red markers at the right edge of
+      the plot. The offsets for the curves are also listed as a table to
+      the right of the plot. Suitable offsets can be calculated
+      automatically, or a set of user-supplied offsets can be used"
+
+      pause 30
+
+      text "The bottom edge is labelled with RA in the above plot. You
+      can attempt to use any of the axes from the <CURFRM <emph current
+      co-ordinate Frame>> of the image, although an error will be
+      reported if the selected axis is not monotonic along the specified
+      curves."
+
+      pause 15
+
+      command {Obey kapview gdclear ""}
+      command {exec cp -f $KAPPA_DIR/m31.sdf ./}
+      command {Obey ndfpack setvar "ndf=m31 variance=200*data"}
+      command {Obey ndfpack wcsframe "ndf=m31 frame=galactic accept"}
+
+# Parameters MODE, KEY and CLEAR need to be set because otherwise
+# DAT_CLONE reports a "invalid locator" error while the PAR routine is
+# being called to access the parameter.  WHY DOES IT DO THIS?
+      command {Obey kapview mlinplot "ndf=m31 lnindx='90,110,130,150,170,190,210' space=free offset=\[0,8000,16000,24000,32000,40000,48000\] useaxis=l mode=line key=y clear=y style='colour(textlab)=white' errbar=t freq=10 sigma=1"}
+
+      text "For instance, to have the bottom edge labelled in galactic
+      longitude as shown above, first change the current co-ordinate
+      Frame of the NDF to 'Galactic', using <command wcsframe>, and then
+      run <command mlinplot> again, specifying axis 'l' (galactic
+      longitude):\n\n <command wcsframe> <command frame=galactic>\n
+      <command mlinplot> <command m31 lnindx='90,110,130,150,170,190,210'
+      useaxis=l errbar=y sigma=1 freq=10>\n\nThis also shows 3 new
+      parameters being used to plot 1 sigma error bars every tenth pixel,
+      based on the NDFs <mlvar variance information>."
+
+      pause 20
+
+      command {exec echo "colour=red" > mlfile }
+      command {exec echo "colour=blue" >> mlfile }
+      command {exec echo "colour=green" >> mlfile }
+      command {exec echo "colour=white,style(curve)=4" >> mlfile }
+      command {exec echo "colour=red,width(curve)=3" >> mlfile }
+      command {exec echo "colour=blue,width(curve)=3" >> mlfile }
+      command {exec echo "colour=green,width(curve)=3" >> mlfile }
+
+      command {Obey ndfpack wcsframe "ndf=m31 frame=pixel"}
+      command {Obey kapview mlinplot "ndf=m31 lnindx='90,110,130,150,170,190,210' space=free offset=\[0,8000,16000,24000,32000,40000,48000\] useaxis=1 pens=^mlfile errbar=no"}
+
+      command {exec rm -f mlfile}
+
+      text "To have the bottom edge labelled in pixel co-ordinates as
+      shown above, first change the current co-ordinate Frame of the NDF
+      to 'Pixel', using <command wcsframe>, and then run <command
+      mlinplot> again:\n\n <command wcsframe> <command frame=pixel>\n
+      <command mlinplot> <command m31 pens=^mlfile
+      lnindx='90,110,130,150,170,190,210'>\n\nThis also shows the new
+      <param PENS> parameters being used to set the appearance of each
+      curve according to the contents of the text file <file <mlfile
+      mlfile>>."
+
+      pause 17 
+      text "Please wait while the next display is created..."
+
+      command {exec echo "18:53:41.1 33:03:05" > stardemo.tmp}
+      command {exec echo "-5:06:13.3 33:01:57" >> stardemo.tmp}
+      command {exec echo "-5:06:18.6 33:00:52" >> stardemo.tmp}
+      command {exec echo "-5:06:22.4 33:01:55" >> stardemo.tmp}
+      command {exec echo "-5:06:20.5 33:01:36" >> stardemo.tmp}
+      command {exec echo "-5:06:18.1 33:01:57" >> stardemo.tmp}
+      command {exec echo "-5:06:18.8 33:02:01" >> stardemo.tmp}
+      command {exec echo "-5:06:19.3 33:03:06" >> stardemo.tmp}
+      command {exec echo "-5:06:19.3 33:01:41" >> stardemo.tmp}
+      command {Obey kappa listmake "mode=file file=stardemo.tmp ndf=$KAPPA_DIR/m57 outcat=stardemo"}
+      command {exec rm -f stardemo.tmp}
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview picdef "mode=array xpic=2 ypic=1 prefix=a outline=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/m57 clear=yes mode=perc percentiles=\[5,99.5\] axes=yes style='textlabgap(2)=0.02,colour(textlab)=white' key=no accept"}
+      command {Obey kappa listshow "incat=stardemo plot=mark style='colour=red,size=0.5'"}
+      command {Obey kapview picsel "label=a2"}
+      command {Obey kappa psf "in=$KAPPA_DIR/m57 incat=stardemo ybot=0 ytop=1.3"}
+
+      text "The <command psf> command finds a mean radial star profile,
+      given the approximate positions of several stars within an image.
+      If the image contains RA/DEC information (or any of several other
+      common celestial co-ordinate Frames) then <command psf> can now
+      directly determine the seeing in units of arc-seconds, instead of
+      pixels.\n\nThe right hand plot above is the mean radial star
+      profile found by <command psf> using the stars indicated by red
+      crosses in the left hand image of M57..."
+
+      pause 26
+
+      alpha on
+      text "... and above is the screen output generated by <command psf>."
+      pause 10
+      alpha off
+      text "Please wait while the next display is created..."
+      command {exec rm -f stardemo.FIT}
+      command {Obey kapview gdclear ""}
+
+      command {exec echo "colour(textlab)=white" > stardemo.tmp}
+      command {exec echo "title=A scatter plot produced by KAPPA scatter" >> stardemo.tmp}
+      command {Obey kapview scatter "in1=$KAPPA_DIR/m31_issa_100 in2=$KAPPA_DIR/m31_issa_60 perc1=\[50,99.95\] perc2=\[50,99.95\] style=^stardemo.tmp"} 
+      command {exec rm -f stardemo.tmp}
+
+      text "A new application called <command scatter> has been added
+      which will display a simple scatter plot between two aligned
+      n-dimensional NDFs. The data can be compressed first to reduce the
+      number of points in the plot.\n\nThe above plot shows IRAS 100
+      micron and 60 micron data for M31."
+
+      pause 12
+
+      text "Please wait while the next display is created..."
+      command {Obey kapview gdclear ""}
+      command {Obey kapview colcomp "inr=$KAPPA_DIR/m31_issa_100 ing=$KAPPA_DIR/m31_issa_60 inb=$KAPPA_DIR/m31_issa_25 percentiles=\[50,99.95\] out=stardemo1 lut=stardemo2"} 
+      command {Obey kapview display "in=stardemo1 clear=yes scale=no lut=stardemo2 axes nokey style='colour(textlab)=white,title=A colour composite image produced by KAPPA colcomp'"} 
+      command {exec rm -f stardemo1.sdf stardemo2.sdf}
+
+      text "Another new application is <command colcomp>, which combines
+      1, 2 or 3 NDFs into a colour composite image. The output image is
+      available either in the form of two NDFs (one containing an image
+      of colour indices and the other containing a colour table) for use
+      with <pack KAPPA> <command display>, or as a PPM file which can be
+      converted into other common image formats (GIF, JPEG, <for etc>).
+      The NDF form has the advantage that WCS information is retained, as
+      shown above.\n\nThe above display shows a colour composite NDF
+      created by combining IRAS images of M31 at 100 microns (red), 60
+      microns (green) and 25 microns (blue). The median data values in
+      the images were scaled to zero colour intensity, and the maximum
+      data values were scaled to maximum colour intensity."
+
+      pause 28
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview lutable "mapping=linear coltab=grey"}
+
+      text "A new global feature in <pack KAPPA> is the facility for
+      re-running <pack KAPPA> application automatically to perform some
+      operation on a group of NDFs. The facilities are described full in
+      section '<htx:sun95|se_multinvoc <emph Processing Groups of Data
+      Files>>' of <doc SUN/95>. As an example, you could use the
+      following command to add 1.0 to all the images in your current
+      directory:\n\n <command cadd> <command in=\"*\" scalar=1.0
+      out=\"*_c\">\n\nThe input and output NDFs can be specified is
+      several ways. In this example, the input NDFs are specified using a
+      wild-card file template, and each output image is written to an NDF
+      with the same name as the corresponding input NDF, but with the
+      string \"<file _c>\" appended to the end."
+
+      pause 20
+
+      alpha on
+
+      command {Obey kappa stats "ndf=\"$KAPPA_DIR/m31,$KAPPA_DIR/iras\""}
+
+      text "Here is another example which uses <command stats> to
+      display pixel statistics for the two images in <file m31.sdf>
+      and <file iras.sdf>. The command syntax is:\n\n <command stats>
+      <command \"m31,iras\">\n\nThe text output from the command is
+      displayed above."
+
+      pause 15
+
+      command {Obey kapview gdclear ""}
+
+      alpha off
+
+      text "As another example, the following command uses <command
+      display> to display a series of images one after the other. The
+      names of the images are stored in the text file <stardemotmp
+      stardemo.tmp>, and are in fact just a series of different sections
+      from the same m31 image. The result is an apparent zoom into the
+      centre of the image:\n\n <command display in=^stardemo.tmp mode=scale
+      low=3600 high=11800>"
+
+      pause 15
+
+      command {exec echo "m31(150~300,150~300)" > stardemo.tmp}
+      command {exec echo "m31(150~280,150~280)" >> stardemo.tmp}
+      command {exec echo "m31(150~260,150~260)" >> stardemo.tmp}
+      command {exec echo "m31(150~240,150~240)" >> stardemo.tmp}
+      command {exec echo "m31(150~220,150~220)" >> stardemo.tmp}
+      command {exec echo "m31(150~200,150~200)" >> stardemo.tmp}
+      command {exec echo "m31(150~180,150~180)" >> stardemo.tmp}
+      command {exec echo "m31(150~160,150~160)" >> stardemo.tmp}
+      command {exec echo "m31(150~140,150~140)" >> stardemo.tmp}
+      command {exec echo "m31(150~120,150~120)" >> stardemo.tmp}
+      command {exec echo "m31(150~100,150~100)" >> stardemo.tmp}
+      command {exec echo "m31(150~80,150~80)" >> stardemo.tmp}
+      command {exec echo "m31(150~60,150~60)" >> stardemo.tmp}
+      command {exec echo "m31(150~40,150~40)" >> stardemo.tmp}
+
+      command {Obey kapview picdef "mode=cc fraction=0.8 outline=no"}
+      command {Obey kapview display "in=^stardemo.tmp scale=yes mode=scale key=no axes=no high=11800 low=3600 lut=$KAPPA_DIR/grey_lut accept"}
+      command {exec rm -f stardemo.tmp}
+
+      pause 4
+
+
+
+
+#  >>>>>>>>>>>>>>> The end of the demo
+
+#  Text follows for links referred to within this step...
+      link mlvar "An NDF can contain an array of variance values (one for
+      every pixel). In this case, since the original DSS image had no
+      associated variance information, artificial variances equal to 200
+      times the corresponding pixel value have been stored in the NDF
+      using <pack KAPPA> command <command setvar>."
+
+      link mlfile "The user can supply the definitions of the pen to be
+      used for each curve directly using parameter PEN, or indirectly by
+      first storing the pen definitions within a text file, and then just
+      supplying the name of the file. In this example the file <file
+      myfile> contains: <attr \n\n colour=red\n colour=blue\n
+      colour=green\n colour=white,style(curve)=4\n
+      colour=red,width(curve)=3\n colour=blue,width(curve)=3\n
+      colour=green,width(curve)=3\n>\nThese set the colour for all seven
+      curves (plus associated markers and labels), sets the style of the
+      middle curve to dotted, and sets the line thickness for the last
+      three curves to be three times the normal value."
+
+      link apps "<pack KAPPA> V0.14-4 introduces <param <style
+      STYLE>> parameters to the following applications:\n\n
+                          	- <command centroid>\n
+                          	- <command drawsig>\n
+                          	- <command histogram>\n
+                             	- <command lutview>\n
+                              	- <command mlinplot>\n
+                        	- <command normalize>\n
+                          	- <command psf>\n
+                             	- <command vecplot>"
+
+      link stardemotmp "The stardemo.tmp file contains the group of
+      images to be displayed. In this particular case, the images are all
+      sections from the same m31 image, specified by centre and size:\n\n
+      <file m31(150~300,150~300)\n m31(150~280,150~280)\n
+      m31(150~260,150~260)\n m31(150~240,150~240)\n
+      m31(150~220,150~220)\n m31(150~200,150~200)\n
+      m31(150~180,150~180)\n m31(150~160,150~160)\n
+      m31(150~140,150~140)\n m31(150~120,150~120)\n
+      m31(150~100,150~100)\n m31(150~80,150~80)\n m31(150~60,150~60)\n
+      m31(150~40,150~40)\n >"
+
+   }
+
+#  Text follows for links referred to anywhere within this demonstartion...
+
+   link curfrm "In additon to the data array, an NDF can contain various
+   items of information describing itself. In particular, it can contain
+   information describing the known co-ordinate systems (known as
+   co-ordinate '<emph Frames>') which can be used to describe a position
+   within the data array. There can potentially be several such
+   co-ordinate Frames, describing, for instance, focal plane co-ordinates
+   in millimetres, pixel co-ordinates, celestial co-ordinates, <emph
+   etc>.\n\nThe user nominates one of these Frames as the <emph current
+   Frame> for the NDF, and this Frame is subsequently used by all
+   applications when getting image positions <emph from> the user, or
+   reporting image positions <emph to> the user. The current Frame of an
+   NDF can be changed at any time using the <command WCSFRAME>
+   command.\n\nMore details are available in the '<htx:sun95|se_wcsuse
+   <emph Using World Co-ordinate Systems>>' section of <doc SUN/95>."
+
+
+
+   link style "Applications within <pack KAPPA> which produce line
+   graphics are being updated to include one or more <param STYLE>
+   parameters. These parameters allow the appearance of specified parts
+   of the plot to be controlled in much greater detail than before. For
+   instance, colour, line width, line style, font and character size can
+   be set independantly for things like the tick marks, numerical axis
+   labels, textual axis labels, the plot border, <for etc>. In addition,
+   certain aspects of the design of the plot can be controlled using
+   <param STYLE> parameters, for instance, whether to draw a reticule
+   over the plot, whether to label the axes around the edge of the plot
+   or through the interior of the plot, whether to put edge labels on the
+   left, right, bottom or top, <for etc>.\n\nA plotting style is
+   specified as a set of <command name=value> strings, where <command
+   name> is the name of a plotting attribute, and <command value> is the
+   value to assign to the plotting attribute. A group of such attribute
+   settings can be supplied directly for a <param STYLE> parameter.
+   Alternatively, the name of a text file containing the attribute
+   settings can be supplied for the <param STYLE> parameter.\n\nPlotting
+   attributes which are not specified default to the values included in
+   various <emph defaults> files. Each application can either have its
+   own set of defaults or can use a general package-wide set of defaults.
+   <pack KAPPA> comes with a set of such defaults files ready made, but
+   users can choose to over-ride these with their own defaults
+   files.\n\nFull details of the available plotting attributes, and the
+   management of plotting style is available <htx:sun95|se_style here>."
+} 
