@@ -49,8 +49,8 @@
 #
 # The starconf.status file that results from the above gymnastics
 # contains configuration files that are required for the build, but
-# since it is checked in, it should not contain any configuration
-# paths.  Therefore after it unpacks the files, starconf.status
+# since it is checked in, it MUST NOT CONTAIN ANY CONFIGURATION
+# PATHS.  Therefore after it unpacks the files, starconf.status
 # configures the unpacked files by substituting variables indicated by
 # !!variable_name!!, using values which are edited in to the installed
 # starconf script when it is configured prior to its installation, and
@@ -110,18 +110,22 @@ buildsupportbin=@bindir@
 buildsupportdata=@datadir@
 ln_s="@LN_S@"
 versionint="@PACKAGE_VERSIONINT@"
-version="@PACKAGE_VERSION"
+version="@PACKAGE_VERSION@"
+finder=@bindir@/starconf-finder
 
-# Default all the variables which are to be substituted into !!variable!!  It would
-# probably be desirable to grep the input files for !!...!! variables, but that
-# doesn't seem necessary at the moment (and would add complication).
+# Default all the variables which are to be substituted into !!variable!!
+# It would probably be desirable to grep the input files for !!...!!
+# variables, but that doesn't seem necessary at the moment
+# (and would add complication).
 #
-# The set of variables here should all be listed in Makefile.am
+# The set of variables here should all be listed in the `edit' command
+# within starconf's Makefile.am
 allconfsubs=" STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX "
-STARCONF_DEFAULT_STARLINK=@STARCONF_DEFAULT_STARLINK@
-STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@
+: ${STARCONF_DEFAULT_STARLINK=@STARCONF_DEFAULT_STARLINK@}
+: ${STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@}
 
-showvars="$allconfsubs buildsupport buildsupportbin buildsupportdata version versionint "
+showvars=" buildsupport buildsupportbin buildsupportdata finder version versionint "
+allshowvars="$allconfsubs $showvars "
 
 if test $# -gt 0; then
     case $1 in
@@ -130,12 +134,12 @@ if test $# -gt 0; then
         while test $# -gt 0
         do
             if test "$1" = "--all"; then
-                for v in $showvars
+                for v in $allshowvars
                 do
                     eval echo "$v="'${'$v'}'
                 done
             else
-                expr "x$showvars" : "x.* $1 " >/dev/null ||
+                expr "x$allshowvars" : "x.* $1 " >/dev/null ||
                     { echo "Unrecognised variable $1" >&2; exit 1; }
                 eval echo '${'$1'}'
             fi
@@ -144,7 +148,7 @@ if test $# -gt 0; then
         exit 0
         ;;
     --version)
-        echo "starconf @PACKAGE_VERSION@: configure Starlink build directories"
+        echo "starconf @PACKAGE_VERSION@"
         exit 0
         ;;
     --help)
@@ -154,7 +158,7 @@ if test $# -gt 0; then
         echo "        Configure directory"
         echo "    $0 --show [--all | variable ...]"
         echo "        List configuration information:"
-        echo "        [$showvars]"
+        echo "        [variables:$allshowvars]"
         echo "    $0 [--help | --version]"
         echo "        Show help/version"
         exit 0
@@ -278,8 +282,11 @@ cat >&4 <<EOF
 # where VARIABLE is one of the variables
 #     $allconfsubs
 # This substitutes instances of !!variable!! in the file(s) below,
-# when they are unpacked.  The variable may be specified on the command line
-# as shown, and is also defaulted from the environment.
+# when they are unpacked.  The variables may be specified on the command line
+# as shown, or else they are defaulted from the environment.
+#
+# This file has no explicit configuration paths in it, and it should be checked
+# into CVS.
 #
 # Re-run this file to regenerate the files listed below:
 EOF
@@ -290,21 +297,130 @@ echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
 echo 'done'                                                              >&3
 echo 'echo "" >&4'                                                       >&3
 
-echo 'echo "allconfsubs=\"$allconfsubs\"" >&4'                           >&3
-echo 'echo ": \${STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK}" >&4'>&3
-echo 'echo ": \${STARCONF_DEFAULT_PREFIX=$STARCONF_DEFAULT_PREFIX}" >&4' >&3
-
 cat >&3 <<\_STARCONF3_EOD
+
+# Pass allconfsubs and showvars into the starconf.status script
+echo "allconfsubs=\"$allconfsubs\"" >&4
+echo "showvars=\"$showvars\"" >&4
+
+# Write local configuration information into ./starconf.status.local
+exec 5>./starconf.status.local
+echo "# Cache of starconf configuration variables"                       >&5
+echo "# Query these with './starconf.status --show varname...',"         >&5
+echo "# NOT by grepping or sourcing this file."                          >&5
+echo "# See './starconf.status --help' for details."                     >&5
+# Following can be overridden by the environment or command line
+for v in $allconfsubs
+do
+    eval echo ': \${'$v='${'$v'}}'                                       >&5
+done
+# Following cannot be overridden, and are for display only
+for v in $showvars
+do
+    eval echo "starconf_$v="'${'$v'}'                                    >&5
+done
+exec 5>&-
+
+echo ""                                                                  >&4
+echo "# showonevar var [prefix] shows one variable, with optional prefix">&4
+echo "showonevar () {"                                                   >&4
+echo "    case \"\$1\" in"                                               >&4
+for v in $allconfsubs
+do
+    echo "    $v) echo \$2\$$v ;;"                                       >&4
+done
+for v in $showvars
+do
+    echo "    $v) echo \$2\$starconf_$v ;;"                              >&4
+done
+echo "    *) { echo \"Unrecognised variable \$1\" >&2; exit 1; } ;;"     >&4
+echo "    esac"                                                          >&4
+echo "}"                                                                 >&4
+
 cat >&4 <<\_STARCONF4_EOD
+
+# Read settings in from ./starconf.status.local if that file exists
+test -r ./starconf.status.local && . ./starconf.status.local
+# Each of the $allconfsubs variables _must_ have a value;
+# the following are last-ditch defaults.
+: ${STARCONF_DEFAULT_STARLINK=/star}
+: ${STARCONF_DEFAULT_PREFIX=/star}
+
+if test $# -gt 0 -a `expr x$1 : x-` -gt 0; then
+    case $1 in
+    --show)
+        shift
+        while test $# -gt 0
+        do
+            if test "$1" = "--all"; then
+                for v in $allconfsubs $showvars
+                do
+                    showonevar $v "$v="
+                done
+            else
+                showonevar $1
+            fi
+            shift
+        done
+        exit 0
+        ;;
+    --version)
+        echo "starconf @PACKAGE_VERSION@"
+        exit 0
+        ;;
+    --help)
+        echo "starconf.status: configure one Starlink build directory"
+        echo "Usage:"
+        echo "    $0 [variable=value]..."
+        echo "        Reconfigure directory, optionally changing one of"
+        echo "        the 'sticky variables'"
+        echo "    $0 --show [--all | variable ...]"
+        echo "        List configuration information:"
+        echo "        [Sticky variables:$allconfsubs]"
+        echo "        [Fixed variables: $showvars]"
+        echo "    $0 [--help | --version]"
+        echo "        Show help/version"
+        exit 0
+        ;;
+    *)
+        echo "$0: unrecognised option.  $0 --help for usage"
+        exit 1
+        ;;
+    esac
+fi
+
 while test $# -gt 0
 do
-    # Don't bother testing whether the set variable is in $allconfsubs -- requires
-    # too much expr|sed magic if you want to be truly portable
+    # Check that the argument is just 'variable=value'
     expr "x$1" : 'x[a-zA-Z0-9_]*=[^ ]*$' >/dev/null || \
-        { echo "Usage: $0 [variable=value...]"; exit 1; }
+        { echo "Usage: $0 [variable=value...]" >&2; exit 1; }
+    # Extract the variable name, and check it's in $allconfsubs
+    # (we can't portably do this in one expr -- see autoconf 'limitations'
+    # notes).
+    varname=`expr x$1 : 'x\(.*\)='`
+    expr "x$allconfsubs" : "x.*$varname" >/dev/null || \
+        { echo "$0: $varname is not a sticky variable" >&2; exit 1; }
     eval "$1"
     shift
 done
+
+# Write the values back out to starconf.status.local, since they will
+# have changed if they were set in the environment, or on the command line.
+exec 5>./starconf.status.local
+echo "# Cache of starconf configuration variables"                       >&5
+echo "# Query these with './starconf.status --show varname...',"         >&5
+echo "# NOT by grepping or sourcing this file."                          >&5
+echo "# See './starconf.status --help' for details."                     >&5
+for v in $allconfsubs
+do
+    eval echo ': \${'$v='${'$v'}}'                                       >&5
+done
+for v in $showvars
+do
+    # NB: following line is different from version above
+    eval echo "starconf_$v="'${'starconf_$v'}'                           >&5
+done
+exec 5>&-
 
 sedsubsts='sed '
 for x in $allconfsubs
@@ -389,15 +505,19 @@ if test -n "$allm4"; then
 fi
 exit 0
 _STARCONF4_EOD
+
 # Close the starconf.status file
 exec 4>&-
 # ...and make it executable
 chmod +x starconf.status
+
 # Finally, exec the new script
 exec ./starconf.status
-_STARCONF3_EOD
 
-echo "exit 0" >&3
+# Shouldn't get here!
+echo "starconf failed to exec ./starconf.status !!!" >&2
+exit 1
+_STARCONF3_EOD
 
 # Close FD 3; the starconf file
 exec 3>&-
