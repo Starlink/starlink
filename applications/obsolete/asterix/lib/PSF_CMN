@@ -66,14 +66,15 @@
      :                                PSF_LMAX)
       INTEGER                   L_MOD_H(PSF_NMAX, 	! Psf hint routines
      :                                PSF_LMAX)
-      INTEGER                   L_MOD_PFL(PSF_NMAX, 	! Psf profile routines
-     :                                PSF_LMAX)
       INTEGER                   L_MOD_C(PSF_NMAX, 	! Psf closure routines
      :                                PSF_LMAX)
       INTEGER                   L_NLEN(PSF_LMAX)  	! Library name lengths
       INTEGER                   L_NMOD(PSF_LMAX)  	! No of modules in library
       INTEGER                   L_HAN(PSF_LMAX)   	! Library handle
       INTEGER                   L_NLIB			! Number of active libraries
+
+*   Psf list
+      INTEGER			P_PLIST			! ADI structure
 
 *    Psf instance data
       LOGICAL                   P_USED(PSF_NMAX)  	! Slot in use
@@ -110,6 +111,6 @@
      :            L_MOD_PFL, L_MOD_C, L_MOD_H,
      :          P_USED, P_LIBID, P_MODID, P_EOK, 	! Psf instances
      :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
-     :            P_FID, P_PSID,
+     :            P_FID, P_PSID, P_PLIST,
      :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
      :          PSFAUTO,PSFLIBINIT,PSFINIT			! System initialised flag
