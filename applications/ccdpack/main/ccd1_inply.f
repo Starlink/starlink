@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_INPLY( VERTX, VERTY, NVERT, INPX, INPY, NINP, 
-     :                       OUTPX, OUTPY, IND, NOUTP, STATUS )
+     :                       INSIDE, STATUS )
 *+
 *  Name:
 *     CCD1_INPLY
@@ -12,16 +12,17 @@
 
 *  Invocation:
 *     CALL CCD1_INPLY( VERTX, VERTY, NVERT, INPX, INPY, NINP, 
-*                      OUTPX, OUTPY, IND, NOUTP, STATUS )
+*                      INSIDE, STATUS )
 
 *  Description:
 *     This routine takes an input array of two-dimensional points, and
-*     returns only those which fall within a specified polygon to an
-*     output array.  Points on the edges or vertices are considered 
-*     to be within the polygon for the purpose of this test.  It also 
-*     returns an array which maps the index numbers of the output 
-*     points to those of the input ones, so that it is possible to 
-*     keep track of which have been selected and which rejected.
+*     marks those which fall within a specified polygon.  For each
+*     point which falls inside the polygon, it sets to TRUE the
+*     corresponding element of an array of flags.  It does not touch
+*     elements corresponding to points which do not fall inside the
+*     polygon, so that successive calls of the routine result in a
+*     boolean OR-like semantics, allowing inclusion in any one of a 
+*     group of polygons to be tested.
 *
 *     The vertices of the polygon must be supplied in clockwise or
 *     anticlockwise order.  The first vertex may optionally be repeated
@@ -40,16 +41,10 @@
 *        Y coordinates of input list of points.
 *     NINP = INTEGER (Given) 
 *        Number of points in input list.
-*     OUTPX( NINP ) = DOUBLE PRECISION (Returned)
-*        X coordinates of output list, i.e. points from input list which 
-*        were found to be within the polygon.
-*     OUTPY( NINP ) = DOUBLE PRECISION (Returned)
-*        Y coordinates of output list, i.e. points from input list which 
-*        were found to be within the polygon.
-*     IND( NINP ) = INTEGER (Returned)
-*        Index from input list of each point in output list.
-*     NOUTP = INTEGER (Returned)
-*        Number of points in output list.
+*     INSIDE( NINP ) = LOGICAL (Given and Returned)
+*        An array of flags; if the point ( INPX( I ), INPY( I ) ) is 
+*        within the polygon specified by VERTX and VERTY then INSIDE( I )
+*        will be set TRUE.
 *     STATUS = INTEGER (Given and returned)
 *        The global status.
 
@@ -63,6 +58,9 @@
 *  History:
 *     8-FEB-1999 (MBT):
 *        Original version.
+*     20-FEB-2001 (MBT):
+*        Modified to set a logical array instead of producing an output
+*        list of points.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,14 +79,11 @@
       DOUBLE PRECISION VERTX( NVERT )
       DOUBLE PRECISION VERTY( NVERT )
       INTEGER NINP
-
-*  Arguments Returned:
       DOUBLE PRECISION INPX( NINP )
       DOUBLE PRECISION INPY( NINP )
-      DOUBLE PRECISION OUTPX( NINP )
-      DOUBLE PRECISION OUTPY( NINP )
-      INTEGER IND( NINP )
-      INTEGER NOUTP
+
+*  Arguments Given and Returned:
+      LOGICAL INSIDE( NINP )
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -102,9 +97,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise number of returned (included) points.
-      NOUTP = 0
-
 *  Go through list of input points.
       DO 1 I = 1, NINP
 
@@ -112,13 +104,8 @@
          CALL CCD1_PNPLY( INPX( I ), INPY( I ), VERTX, VERTY, NVERT,
      :                    INOUT, STATUS )
 
-*  If inside, copy point to output list.
-         IF ( INOUT .GE. 0 ) THEN
-            NOUTP = NOUTP + 1
-            OUTPX( NOUTP ) = INPX( I )
-            OUTPY( NOUTP ) = INPY( I )
-            IND( NOUTP ) = I
-         END IF
+*  Update the flag array accordingly.
+         IF ( INOUT .GE. 0 ) INSIDE( I ) = .TRUE.
  1    CONTINUE
 
       END
