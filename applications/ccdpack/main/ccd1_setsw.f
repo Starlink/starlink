@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_SETSW( NDFGRP, NNDF, USESET, ISET, NSET, NAMGRP,
-     :                       STATUS )
+     :                       MAPSET, STATUS )
 *+
 *  Name:
 *     CCD1_SETSW
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCD1_SETSW( NDFGRP, NNDF, USESET, ISET, NSET, NAMGRP,
-*                      STATUS )
+*                      MAPSET, STATUS )
 
 *  Description:
 *     This routine returns information about how a group of NDFs is 
@@ -56,6 +56,13 @@
 *        NDF name will be used instead.  This group is created by
 *        this routine and should be annulled by the calling routine.
 *        If USESET is false this will be returned equal to GRP__NOID.
+*     MAPSET( NNDF ) = INTEGER (Returned)
+*        If USESET is true, the first NSUP elements returned are 
+*        AST pointers to mappings from the CCD_SET-domain frame to the
+*        Current frame of the WCS component of NDFs in the corresponding
+*        Set.  If there is no consistent mapping for the Set,
+*        AST__NULL is returned.  This array is required as workspace.
+*        Only returned if USEWCS is true.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -89,12 +96,13 @@
       INTEGER NDFGRP
       INTEGER NNDF
 
-*  Arugments Given and Returned:
+*  Arguments Given and Returned:
       LOGICAL USESET
       
 *  Arguments Returned:
       INTEGER ISET( * )
       INTEGER NSET
+      INTEGER MAPSET( * )
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -120,11 +128,17 @@
       INTEGER JSET              ! Frame index of CCD_SET-domain frame
       INTEGER MAP1              ! AST pointer to mapping
       INTEGER MAP2              ! AST pointer to mapping
-      INTEGER MAPSET( NNDF )    ! AST pointer to CCD_SET->Current mapping
+      INTEGER MAPS              ! AST pointer to Set mapping
       INTEGER NAMGRP            ! GRP identifier for group of Set names
+      INTEGER NIN               ! Number of members in the Set
       INTEGER SINDEX            ! Set Index attribute
+      DOUBLE PRECISION DIFF     ! Difference bewtween points
+      DOUBLE PRECISION PSIZE    ! Size of a pixel in CCD_SET coords
+      DOUBLE PRECISION XP( 2 )  ! Input transform X coordinates
+      DOUBLE PRECISION XQ( 2 )  ! Output transform X coordinates
+      DOUBLE PRECISION YP( 2 )  ! Input transform Y coordinates
+      DOUBLE PRECISION YQ( 2 )  ! Output transform Y coordinates
       LOGICAL DIFDMN            ! True if different domains have been used
-      LOGICAL OK                ! CCD_SET and Current frames consistent?
 
 *.
 
@@ -190,10 +204,10 @@
 *  If this is a Set member, store a mapping from CCD_SET frame to
 *  the Current.  Otherwise store a null value.
             IF ( SNAME .EQ. ' ' ) THEN
-               MAPSET( I ) = AST__NULL
+               MAPS = AST__NULL
             ELSE
                MAP1 = AST_GETMAPPING( IWCS, JSET, AST__CURRENT, STATUS )
-               MAPSET( I ) = AST_SIMPLIFY( MAP1, STATUS )
+               MAPS = AST_SIMPLIFY( MAP1, STATUS )
             END IF
 
 *  If it is a Set member and not the first encountered in that Set,
@@ -203,27 +217,57 @@
 *  current -> CCD_SET mapping of the other, and seeing if they
 *  cancel out to form a UnitMap.
             IF ( SNAME .NE. ' ' .AND. IGOT .GT. 0 ) THEN
+               IF ( MAPSET( IGOT ) .NE. AST__NULL ) THEN
 
 *  Combine the two mappings back to back.
-               CALL AST_INVERT( MAPSET( I ), STATUS )
-               MAP1 = AST_CMPMAP( MAPSET( I ), MAPSET( IGOT ), .TRUE.,
-     :                            ' ', STATUS )
-               MAP2 = AST_SIMPLIFY( MAP1, STATUS )
+                  CALL AST_INVERT( MAPS, STATUS )
+                  MAP1 = AST_CMPMAP( MAPS, MAPSET( IGOT ), .TRUE., ' ',
+     :                               STATUS )
+                  MAP2 = AST_SIMPLIFY( MAP1, STATUS )
 
-*  Check for UnitMap status.
-               OK = AST_ISAUNITMAP( MAP2, STATUS )
+*  Check to see whether this is a UnitMap.
+                  IF ( .NOT. AST_ISAUNITMAP( MAP2, STATUS ) ) THEN
+
+*  It's not actually a UnitMap; is it very nearly a unit mapping?
+*  First find the size of an NDF pixel in the CCD_SET frame.
+                     CALL CCD1_PSIZE( IWCS, JSET, PSIZE, STATUS )
+
+*  Now transform two points near the origin using the maybe-unit mapping.
+*  It's just possible that this region of the coordinate space is 
+*  illegal, in which case we'll get a spurious pass, but this seems
+*  very unlikely.
+                     XP( 1 ) = 0D0
+                     XP( 2 ) = PSIZE
+                     YP( 1 ) = 0D0
+                     YP( 2 ) = PSIZE
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        CALL ERR_MARK()
+                        CALL AST_TRAN2( MAP2, 2, XP, YP, .TRUE., XQ, YQ,
+     :                                  STATUS )
+
+*  See how far it falls from its original position.
+                        IF ( STATUS .EQ. SAI__OK ) THEN
+                           DIFF = SQRT( ( XQ( 1 ) - XP( 1 ) ) ** 2 +
+     :                                  ( YQ( 1 ) - YP( 1 ) ) ** 2 +
+     :                                  ( XQ( 2 ) - XP( 2 ) ) ** 2 +
+     :                                  ( YQ( 2 ) - YP( 2 ) ) ** 2 )
+                        ELSE
+                           DIFF = 0D0
+                           CALL ERR_ANNUL( STATUS )
+                        END IF
+                        CALL ERR_RLSE()
+                     END IF
+
+*  If it's further away than very close, log this as an inconsistent Set.
+                     IF ( DIFF .GT. PSIZE * 1D-6 ) THEN
+                        MAPSET( IGOT ) = AST__NULL
+                     END IF
+                  END IF
 
 *  Tidy up.
-               CALL AST_INVERT( MAPSET( I ), STATUS )
-
-*  Warn the user if there is a problem.
-               IF ( .NOT. OK ) THEN
-                  CALL CCD1_MSG( ' ', ' ', STATUS )
-                  CALL CCD1_MSG( ' ', '  ** Warning: Current'//
-     :' coordinates are not consistent with Set alignment.', STATUS )
-                  CALL CCD1_MSG( ' ', '  **          This will'//
-     :' almost certainly result in errors.', STATUS )
-                  CALL CCD1_MSG( ' ', ' ', STATUS )
+                  CALL AST_INVERT( MAPS, STATUS )
+                  CALL AST_ANNUL( MAP1, STATUS )
+                  CALL AST_ANNUL( MAP2, STATUS )
                END IF
             END IF
 
@@ -237,6 +281,7 @@
             ELSE
                NSET = NSET + 1
                CALL GRP_PUT( NAMGRP, 1, SNAME, NSET, STATUS )
+               MAPSET( NSET ) = MAPS
                ISET( I ) = NSET
             END IF
 
@@ -294,17 +339,30 @@
          CALL MSG_SETC( 'TYP', 'NDFs' )
       END IF
       CALL CCD1_MSG( ' ', '    Input ^TYP:', STATUS )
-      CALL CCD1_MSG( ' ', '    ------------', STATUS )
+      CALL CCD1_MSG( ' ', '    -----------', STATUS )
       DO I = 1, NSET
+         IF ( USESET ) CALL CCD1_MSG( ' ', ' ', STATUS )
+         NIN = 0
          CALL MSG_SETI( 'N', I )
          CALL MSG_LOAD( ' ', '  ^N)', LINE, IAT, STATUS )
          DO J = 1, NNDF
             IF ( ISET( J ) .EQ. I ) THEN
+               NIN = NIN + 1
                CALL GRP_GET( NDFGRP, J, 1, LINE( IAT + 2: ), STATUS )
                CALL CCD1_MSG( ' ', LINE, STATUS )
                LINE = ' '
             END IF
          END DO
+
+*  If the CCD_SET->Current mappings have been inconsistent, warn
+*  the user of this fact.
+         IF ( NIN .GT. 1 .AND. MAPSET( I ) .EQ. AST__NULL ) THEN
+            CALL MSG_SETI( 'I', I )
+            CALL CCD1_MSG( ' ', '  ** Warning: No consistent'//
+     :' CCD_SET -> Current coordinate mapping in Set ^I.', STATUS )
+            CALL CCD1_MSG( ' ', '  **          This will'//
+     :' almost certainly result in errors.', STATUS )
+         END IF
       END DO
 
       END
