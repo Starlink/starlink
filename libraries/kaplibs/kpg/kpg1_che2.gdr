@@ -84,7 +84,9 @@
 *     1997 July 31 (MJC):
 *        Corrected a couple of error messages and tests.  Made more
 *        efficient for a constant (zero-order) fit.
-*     {enter_changes_here}
+*     1997 August 21 (MJC):
+*        Fixed bug in evaluating linear case.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -254,7 +256,7 @@
             IOFFCC = ( I - 1 ) * ( YDEG + 1 )
             DP2 = 0<CONST>
             DP1 = 0<CONST>
-            IF ( YDEG .GT. 1 ) THEN
+            IF ( YDEG .GE. 1 ) THEN
                DO ORDER = YDEG + 1, 2, -1
                   D = DP1
                   DP1 = YN2 * DP1 - DP2 + CC( IOFFCC + ORDER )
@@ -289,7 +291,7 @@
 *  greater than NCOEF the value is zero.
                DP2 = 0<CONST>
                DP1 = 0<CONST>
-               IF ( XDEG .GT. 1 ) THEN
+               IF ( XDEG .GE. 1 ) THEN
                   DO ORDER = XDEG + 1, 2, -1
                      D = DP1
                      DP1 = XN2 * DP1 - DP2 + WORK( ORDER )
