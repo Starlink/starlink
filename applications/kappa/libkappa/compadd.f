@@ -185,6 +185,8 @@
 *        workspace.
 *     27-FEB-1998 (DSB):
 *        Type of local variable AXWT corrected from INTEGER to LOGICAL.
+*     10-JUN-1998 (DSB):
+*        Propagate WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,6 +213,10 @@
      :  ITYPE * ( NDF__SZTYP ),! Numeric type for processing
      :  TYPE * ( NDF__SZTYP )  ! Data type of an array component
 
+      DOUBLE PRECISION
+     :  MATRIX( NDF__MXDIM, NDF__MXDIM ),! Matrix component of linear mapping
+     :  OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
+
       INTEGER
      :  ACTVAL,                ! Actual number of compression factors
      :  ACOMPR( 2 ),           ! 1-d compression for axis (2nd factor
@@ -226,7 +232,7 @@
                                ! workspace
      :  ELWS2,                 ! Number of elements in counting
                                ! workspace
-     :  I,                     ! Loop counter for the dimensions
+     :  I, J,                  ! Loop counters for the dimensions
      :  IAXIS,                 ! Loop counter for the axis-array
                                ! components
      :  IDIMS( NDF__MXDIM ),   ! Dimensions of input NDF
@@ -238,7 +244,8 @@
      :  NDFO,                  ! Identifier to the output NDF
      :  NDFS,                  ! Identifier to the section of the input
                                ! NDF
-     :  NDIM,                  ! Dimensionality of the NDF
+     :  NDIM,                  ! Padded dimensionality of the NDF
+     :  NDIMI,                 ! Actual dimensionality of the NDF
      :  NLIM,                  ! Minimum number of elements in input
                                ! addition box to form good output value
      :  ODIMS( NDF__MXDIM ),   ! Dimensions of output array
@@ -280,6 +287,7 @@
 
 *  The subroutines require that there must be at least two dimensions
 *  in the arrays, but higher ones may be dummies.
+      NDIMI = NDIM
       NDIM = MAX( NDIM, 2 )
 
 *  Obtain the compression factors.
@@ -665,6 +673,24 @@
             END IF
          END DO
       END IF
+
+*  Propagate the WCS component, incorporating a linear mapping between
+*  pixel coordinates. This mapping is described by a matrix and an offset
+*  vector. Set these up. The matrix is diagonal, with the reciprocals of
+*  the compression factors on the diagonal, and the offset is zero.
+      DO J = 1, NDIMI
+         OFFSET( J ) = 0.0
+
+         DO I = 1, NDIMI
+            MATRIX( I, J ) = 0.0
+         END DO
+
+         MATRIX( J, J ) = 1.0D0/DBLE( COMPRS( J ) )
+
+      END DO
+
+*  Propagate the WCS component.
+      CALL KPG1_ASPRP( NDIMI, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
 *  Tidy the counting workspace.
       CALL PSX_FREE( WPNTR1, STATUS )
