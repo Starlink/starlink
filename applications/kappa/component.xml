@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kappa">
-  <version>1.4</version>
+  <version>1.4-1</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -14,7 +14,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -8,6 +8,9 @@ bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
 bindatadir = $(bindir)
 bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
 
+include_MESSAGES = kap_err.h KAP_ERR
+BUILT_SOURCES = $(include_MESSAGES)
+
 LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la `$(srcdir)/kappa_nogks_link_adam`
 
 bin_MONOLITHS = kappa_mon kapview_mon ndfpack_mon

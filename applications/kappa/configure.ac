@@ -44,6 +44,10 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun95 sun221)
 
+dnl    There is a .msg file in this directory, and this adds Makefile
+dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
+dnl    which correspond to it.
+STAR_MESSGEN(kap_err.msg)
 
 AC_CONFIG_FILES([Makefile component.xml 
     kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd

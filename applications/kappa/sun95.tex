@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.30}
 \newcommand{\stardocnumber}    {95.30}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {11th November 2004}
+\newcommand{\stardocdate}      {12th November 2004}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.4-1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -42270,6 +42270,16 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    }
    \sstparameters{
       \sstsubsection{
+         ABORT = \_LOGICAL (Read)
+      }{
+         This controls what happens if an error occurs whilst processing
+         one of the input NDFs. If a false value is supplied for ABORT, 
+         then the error message will be displayed, but the application will
+         attempt to process any remaining input NDFs. If a true value is 
+         supplied for ABORT, then the error message will be displayed, and 
+         the application will abort. {\tt [NO]}
+      }
+      \sstsubsection{
          ACC = \_REAL (Read)
       }{
          The positional accuracy required, as a a number of pixels.  For
@@ -42305,6 +42315,20 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          sign {\tt "-"}, then the user is re-prompted for further input until
          a value is given which does not end with a minus sign.  All the
          NDFs given in this way are concatenated into a single group.
+      }
+      \sstsubsection{
+         INSITU = \_LOGICAL (Read)
+      }{
+         If INSITU is set to a true value, then no output NDFs are created. 
+         Instead, the pixel origin of each input NDF is modified in order
+         to align the input NDFs with the reference NDF (which is a much
+         faster operation than a full resampling). This can only be done 
+         if the mapping from input pixel co-ordinates to reference pixel
+         co-ordinates is a simple integer pixel shift of origin. If this is 
+         not the case an error will be reported when the input is processed 
+         (what happens then is controlled by the ABORT parameter). Also, 
+         in-situ alignment is only possible if null values are supplied for 
+         LBND and UBND. {\tt [NO]}
       }
       \sstsubsection{
          LBND() = \_INTEGER (Read)
@@ -42427,6 +42451,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          sign {\tt "-"}, then the user is re-prompted for further input until
          a value is given which does not end with a minus sign.  All the
          NDFs given in this way are concatenated into a single group.
+ 
+         This parameter is only accessed if the INSITU parameter is given
+         a false value.
       }
       \sstsubsection{
          PARAMS( 2 ) = \_DOUBLE (Read)
@@ -48381,6 +48408,11 @@ current WCS co-ordinate system rather than AXIS co-ordinates.
 
 \item The \htmlref{PIXDUPE}{PIXDUPE} application now has a facility for
 applying a mask to each block of output pixels.
+
+\item The \htmlref{WCSALIGN}{WCSALIGN} application now has a facility for
+aligning the input NDFs in-situ if possible (that is, if the alignment
+Mapping is a simple shift of origin). The new parameters are INSITU and
+ABORT.
 
 \end{itemize}
 

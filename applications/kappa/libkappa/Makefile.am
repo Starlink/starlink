@@ -22,6 +22,11 @@ F3_ROUTINES = kaphelp.f
 
 F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 
+wcsalign.f: KAP_ERR
+
+KAP_ERR: ../KAP_ERR
+	$(LN_S) ../KAP_ERR ./KAP_ERR
+
 # Create help for this library
 kapmon.hlp: $(F_ROUTINES)
 	cat $(F_ROUTINES) > all.f

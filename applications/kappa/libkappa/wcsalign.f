@@ -55,6 +55,13 @@
 *     wcsalign in out lbnd ubnd ref 
 
 *  ADAM Parameters:
+*     ABORT = _LOGICAL (Read)
+*        This controls what happens if an error occurs whilst processing
+*        one of the input NDFs. If a false value is supplied for ABORT, 
+*        then the error message will be displayed, but the application will
+*        attempt to process any remaining input NDFs. If a true value is 
+*        supplied for ABORT, then the error message will be displayed, and 
+*        the application will abort. [NO]
 *     ACC = _REAL (Read)
 *        The positional accuracy required, as a a number of pixels. For
 *        highly non-linear projections, a recursive algorithm is used in
@@ -81,6 +88,17 @@
 *        sign "-", then the user is re-prompted for further input until
 *        a value is given which does not end with a minus sign. All the
 *        NDFs given in this way are concatenated into a single group.
+*     INSITU = _LOGICAL (Read)
+*        If INSITU is set to a true value, then no output NDFs are created. 
+*        Instead, the pixel origin of each input NDF is modified in order
+*        to align the input NDFs with the reference NDF (which is a much
+*        faster operation than a full resampling). This can only be done 
+*        if the mapping from input pixel co-ordinates to reference pixel
+*        co-ordinates is a simple integer pixel shift of origin. If this is 
+*        not the case an error will be reported when the input is processed 
+*        (what happens then is controlled by the ABORT parameter). Also, 
+*        in-situ alignment is only possible if null values are supplied for 
+*        LBND and UBND. [NO]
 *     LBND() = _INTEGER (Read)
 *        An array of values giving the lower pixel index bound on each axis 
 *        for the output NDFs. The number of values supplied should equal
@@ -174,6 +192,9 @@
 *        sign "-", then the user is re-prompted for further input until
 *        a value is given which does not end with a minus sign. All the
 *        NDFs given in this way are concatenated into a single group.
+*
+*        This parameter is only accessed if the INSITU parameter is given
+*        a false value.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, and SincGauss
@@ -265,6 +286,8 @@
 *        argument to .false.
 *     31-OCT-2002 (DSB):
 *        Make N-dimensional.
+*     12-NOV-2004 (DSB):
+*        Add INSITU and ABORT parameters.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -282,12 +305,14 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'KAP_ERR'          ! KAPPA error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER METHOD*13           ! Interpolation method to use.
+      CHARACTER MODE*6           ! Access mode for input NDFs
       CHARACTER NDFNAM*(GRP__SZNAM) ! The name of an NDF.
       DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to AST_RESAMPLE<x>
       INTEGER I                  ! Index into input and output groups
@@ -297,16 +322,24 @@
       INTEGER INDF2              ! NDF id. for the output NDF
       INTEGER INDFR              ! NDF id. for the reference NDF
       INTEGER IWCSR              ! WCS FrameSet for reference NDF
+      INTEGER J                  ! Axis index
       INTEGER LBND( NDF__MXDIM ) ! Indices of lower left corner of outputs
+      INTEGER LBNDR( NDF__MXDIM )! Lower pixel bounds of reference NDF
+      INTEGER MAP                ! AST id for (pix_in -> pix_out) Mapping
+      INTEGER MAP4               ! AST id for (grid_in -> pix_in) Mapping
       INTEGER MAXPIX             ! Initial scale size in pixels
       INTEGER METHOD_CODE        ! Integer corresponding to interp. method 
       INTEGER NDIMR              ! Number of pixel axes in reference NDF
       INTEGER NPAR               ! No. of required interpolation parameters
+      INTEGER ORIGIN( NDF__MXDIM )! New pixel origin
+      INTEGER SHIFT( NDF__MXDIM )! Pixel axis shifts 
       INTEGER SIZE               ! Total size of the input group
       INTEGER SIZEO              ! Total size of the output group
-      INTEGER LBNDR( NDF__MXDIM )! Lower pixel bounds of reference NDF
-      INTEGER UBNDR( NDF__MXDIM )! Upper pixel bounds of reference NDF
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper right corner of outputs
+      INTEGER UBNDR( NDF__MXDIM )! Upper pixel bounds of reference NDF
+      LOGICAL ABORT              ! Abort upon first error?
+      LOGICAL AUTOBN             ! Determine output bounds automatically?
+      LOGICAL INSITU             ! Modify input NDFs in-situ?
       REAL ERRLIM                ! Positional accuracy in pixels
 *.
 
@@ -361,13 +394,45 @@
             LBND( I ) = VAL__BADI
             UBND( I ) = VAL__BADI
          END DO
+         AUTOBN = .TRUE.
+      ELSE
+         AUTOBN = .FALSE.
+      END IF
+
+*  If the alignment involves a simple shift of origin, there is the
+*  option to just change the origin of the input NDF rather than creating
+*  a whole new output NDF. This can only be done if null values were
+*  supplied for the bounds parameters.
+      CALL PAR_GET0L( 'INSITU', INSITU, STATUS )
+      IF( INSITU .AND. .NOT. AUTOBN .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'WCSALIGN_ERR1', 'Cannot perform alignment '//
+     :                 'in-situ because the output image bounds have '//
+     :                 'been specified explicitly.', STATUS )
+      END IF
+
+*  In-situ alignment requires update access to the input NDFs.
+      IF( INSITU ) THEN
+         MODE = 'UPDATE'
+      ELSE
+         MODE = 'READ'
       END IF
 
 *  Get a group containing the names of the output NDFs.  Base
 *  modification elements on the group containing the input NDFs.
-      CALL KPG1_WGNDF( 'OUT', IGRP1, SIZE, SIZE,
-     :                 '  Give more NDFs...',
-     :                  IGRP2, SIZEO, STATUS )
+*  Do not do this if alignment is being performed in situ.
+      IF( INSITU ) THEN
+         IGRP2 = GRP__NOID
+      ELSE 
+         CALL KPG1_WGNDF( 'OUT', IGRP1, SIZE, SIZE,
+     :                    '  Give more NDFs...',
+     :                     IGRP2, SIZEO, STATUS )
+      END IF
+
+*  See if the application should abort if any input NDF cannot be
+*  processed.Otherwise, the error is annulled and the application continues
+*  to process remaining inputs. 
+      CALL PAR_GET0L( 'ABORT', ABORT, STATUS )
 
 *  Get the interpolation method to be used.
       CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,Sinc,'//
@@ -441,45 +506,99 @@
          CALL MSG_BLANK( STATUS )
 
 *  Get an NDF identifier for the input NDF.
-         CALL NDG_NDFAS( IGRP1, I, 'READ', INDF1, STATUS )
+         CALL NDG_NDFAS( IGRP1, I, MODE, INDF1, STATUS )
 
 *  Tell the user which input NDF is currently being procesed.
          CALL NDF_MSG( 'NDF', INDF1 )
          CALL MSG_OUT( 'WCSALIGN_MSG7', '  Processing ^NDF...', STATUS )
 
+*  Find the Mapping from input pixel co-ordinates to reference (i.e.
+*  output) pixel co-ordinates. This also determines if the Mapping is a
+*  simple integer pixel shift of origin. If it is, it returns the new pixel 
+*  origin in ORIGIN.
+         CALL KPS1_WALA7( INDF1, IWCSR, MAP, MAP4, ORIGIN, STATUS )
+
+*  If the input pixel->output pixel Mapping is a shift of origin, we do
+*  not need to do a full resampling. However,if the output bounds have
+*  been specified explcitly, then we cannotm simply shift the input pixel
+*  origin. 
+         IF( ORIGIN( 1 ) .NE. AST__BAD .AND. AUTOBN ) THEN
+
+*  If the alignment is being performed in-situ, get a clone of the input
+*  NDF identifier. Otherwise take a copy of the input NDF.
+            IF( INSITU ) THEN
+               CALL NDF_CLONE( INDF1, INDF2, STATUS )
+            ELSE
+               CALL NDG_NDFCO( INDF1, IGRP2, I, INDF2, STATUS )
+            END IF
+
+*  Determine the pixel shifts to apply to INDF2.
+            CALL NDF_BOUND( INDF2, NDIMR, LBND, UBND, NDIMR, STATUS )
+            DO J = 1, NDIMR
+               SHIFT( J ) = ORIGIN( J ) - LBND( J )
+            END DO
+
+*  Apply the shifts.
+            CALL NDF_SHIFT( NDIMR, SHIFT, INDF2, STATUS )
+
+*  If the input pixel->output pixel Mapping is not just a shift of origin, 
+*  we do a full resampling. We cannot do this if "in-situ" alignment was
+*  requested. 
+         ELSE IF( .NOT. INSITU ) THEN
+
 *  Create the output NDF by propagation from the input NDF. The default
 *  components HISTORY, TITLE, LABEL and all extensions are propagated,
 *  together with the UNITS component. The NDF is initially created with
 *  the same bounds as the input NDF.
-         CALL NDG_NDFPR( INDF1, 'UNITS', IGRP2, I, INDF2, STATUS )
+            CALL NDG_NDFPR( INDF1, 'UNITS', IGRP2, I, INDF2, STATUS )
 
 *  Process this pair of input and output NDFs.
-         CALL KPS1_WALA0( NDIMR, INDF1, INDF2, IWCSR, METHOD_CODE, 
-     :                    PARAMS, LBND, UBND, ERRLIM, MAXPIX, STATUS )
+            CALL KPS1_WALA0( NDIMR, INDF1, INDF2, MAP, MAP4, IWCSR, 
+     :                       METHOD_CODE, PARAMS, LBND, UBND, ERRLIM, 
+     :                       MAXPIX, STATUS )
+
+*  Report an error if in-situ alignment was requested but the Mapping is
+*  not a shift of origin.
+         ELSE
+            STATUS = KAP__WALA0
+            CALL ERR_REP( 'WCSALIGN_ERR2', 'Cannot perform alignment '//
+     :                    'in-situ because the Mapping is not a '//
+     :                    'simple shift of origin.', STATUS )
+         END IF
 
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete any output NDF, otherwise just 
 *  annul its identifier.
-         IF( STATUS .NE. SAI__OK ) THEN
+         IF( STATUS .NE. SAI__OK .AND. .NOT. INSITU ) THEN
             CALL NDF_DELET( INDF2, STATUS )
          ELSE
             CALL NDF_ANNUL( INDF2, STATUS )
          END IF
 
 *  If an error occurred processing the current input NDF...
-         IF( STATUS .NE. SAI__OK ) THEN
+         IF( STATUS .NE. SAI__OK  ) THEN
+
+*  If the user has opted to abort processing if an error occurs,abort.
+            IF( ABORT ) GO TO 999 
 
 *  Flush the error.
             CALL ERR_FLUSH( STATUS )
 
 *  Give a warning telling the user that no output NDF will be created 
 *  for the current input NDF.
-            CALL GRP_GET( IGRP2, I, 1, NDFNAM, STATUS )
-            CALL MSG_SETC( 'NDF', NDFNAM )
-            CALL MSG_OUT( 'WCSALIGN_MSG8', '  WARNING: ^NDF cannot be'//
-     :                    ' produced', STATUS )
+            IF( INSITU ) THEN
+               CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS )
+               CALL MSG_SETC( 'NDF', NDFNAM )
+               CALL MSG_OUT( 'WCSALIGN_MSG8', '  WARNING: Input ^NDF'//
+     :                       ' cannot be aligned', STATUS )
+            ELSE
+               CALL GRP_GET( IGRP2, I, 1, NDFNAM, STATUS )
+               CALL MSG_SETC( 'NDF', NDFNAM )
+               CALL MSG_OUT( 'WCSALIGN_MSG9', '  WARNING: Output ^NDF'//
+     :                       ' cannot be produced', STATUS )
+            END IF
          END IF
 
 *  Process the next input NDF.
@@ -497,7 +616,7 @@
 
 *  Delete all groups.
       CALL GRP_DELET( IGRP1, STATUS )
-      CALL GRP_DELET( IGRP2, STATUS )
+      IF( .NOT. INSITU ) CALL GRP_DELET( IGRP2, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

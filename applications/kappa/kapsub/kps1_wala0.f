@@ -1,5 +1,6 @@
-      SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, IWCSR, METHOD, PARAMS, 
-     :                       XY1, XY2, ERRLIM, MAXPIX, STATUS )
+      SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, 
+     :                       METHOD, PARAMS, XY1, XY2, ERRLIM, MAXPIX, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_WALA0
@@ -11,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, IWCSR, METHOD, PARAMS, XY1, XY2, 
-*                      ERRLIM, MAXPIX, STATUS )
+*     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, METHOD, 
+*                      PARAMS, XY1, XY2, ERRLIM, MAXPIX, STATUS )
 
 *  Description:
 *     This routine first finds the Mapping from the input pixel
@@ -35,6 +36,12 @@
 *        Identifier for the input NDF.
 *     INDF2 = INTEGER (Given)
 *        Identifier for the output NDF.
+*     MAP = INTEGER (Given)
+*        AST pointer to the Mapping from input pixel coords to reference
+*        pixel coords.
+*     MAP4 = INTEGER (Given)
+*        AST pointer to the Mapping from input grid coords to input
+*        pixel coords.
 *     IWCSR = INTEGER (Given)
 *        AST pointer for the WCS FrameSet from the reference NDF.
 *     METHOD = INTEGER (Given)
@@ -105,6 +112,8 @@
       INTEGER NDIM2
       INTEGER INDF1 
       INTEGER INDF2
+      INTEGER MAP
+      INTEGER MAP4
       INTEGER IWCSR
       INTEGER METHOD
       DOUBLE PRECISION PARAMS( 2 )
@@ -149,10 +158,8 @@
       INTEGER LBND2( NDF__MXDIM )         ! Lower bounds of output NDF
       INTEGER LGRID1( NDF__MXDIM )        ! Lower bounds of input grid co-ords
       INTEGER LGRID2( NDF__MXDIM )        ! Lower bounds of output grid co-ords
-      INTEGER MAP                ! AST Mapping (i/p PIXEL -> ref. PIXEL)
       INTEGER MAP2               ! AST Mapping (o/p PIXEL -> o/p GRID)
       INTEGER MAP3               ! AST Mapping (ref. GRID -> o/p GRID)
-      INTEGER MAP4               ! AST Mapping (i/p GRID -> i/p PIXEL)
       INTEGER MAP5               ! AST Mapping (i/p GRID -> o/p GRID)
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER NDIM1              ! No. of pixel axes in input NDF
@@ -173,52 +180,16 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Find the Mapping from input pixel co-ordinates to reference (i.e.
-*  output) pixel co-ordinates.
-*  =================================================================
-
 *  Get the pixel bounds of the input NDF.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS ) 
+
+*  Get the number of pixel axes in the input NDF (may not be the same as the
+*  number in the output NDF).
+      NDIM1 = AST_GETI( MAP, 'Nin', STATUS )
 
 *  Find the index of the PIXEL Frame in the reference NDF.
       CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIXR, STATUS )
 
-*  Get the WCS FrameSet from the input NDF. 
-      CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
-
-*  Get the number of pixel axes in the input NDF (may not be the same as the
-*  number in the output NDF).
-      NDIM1 = AST_GETI( IWCS1, 'Nin', STATUS )
-
-*  Find the index of the PIXEL Frame in the input NDF.
-      CALL KPG1_ASFFR( IWCS1, 'PIXEL', IPIX1, STATUS )
-
-*  Get the Mapping from the input GRID Frame to the input PIXEL Frame
-      MAP4 = AST_GETMAPPING( IWCS1, AST__BASE, IPIX1, STATUS )
-
-*  Save the number of Frames in the input WCS FrameSet.
-      NFRM = AST_GETI( IWCS1, 'NFRAME', STATUS )
-
-*  Store the list of preferences for the alignment Frame Domain (current
-*  FRAME in the input NDF, followed by PIXEL). KPG1_ASMRG always uses the 
-*  Domain of the second FrameSet (IWCSR) first, so we do not need to include 
-*  it in this list.
-      DOMLST = ' '
-      IAT = 0
-      CALL CHR_APPND( AST_GETC( IWCS1, 'DOMAIN', STATUS ), DOMLST, IAT )
-      CALL CHR_APPND( ',PIXEL', DOMLST, IAT )
-
-*  Merge the reference WCS FrameSet into this NDFs WCS FrameSet, aligning
-*  them in a suitable Frame (the current Frame of IWCSR by preference, or 
-*  the first possible domain in the above list otherwise).
-      CALL KPG1_ASMRG( IWCS1, IWCSR, DOMLST( : IAT ), .FALSE., 4, 
-     :                 STATUS )
-
-*  Get the simplified Mapping from input pixel Frame to reference (i.e.
-*  output) pixel Frame.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS1, IPIX1, IPIXR + NFRM, 
-     :                                    STATUS ), STATUS )
-      
 *  Set the bounds of the output NDF.
 *  =================================
 

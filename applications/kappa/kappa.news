@@ -1,9 +1,13 @@
-1 KAPPA_Version_1.4
+1 KAPPA_Version_1.4-1
 
    A new release of KAPPA (v1.4-1) has been made. The main changes are:
 
    o  The PIXDUPE application now has a facility for applying a mask to 
    each block of output pixels.
+
+   o  The WCSALIGN application now has a facility for aligning the input NDFs 
+   in-situ if possible (that is, if the alignment Mapping is a simple shift 
+   of origin). The new parameters are INSITU and ABORT.
 
  For complete details of all changes, see the "Release Notes" appendix in
  SUN/95.
