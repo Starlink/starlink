@@ -67,8 +67,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2 Feb 1995 (DJA):
+*      2 Feb 1995 (DJA):
 *        Original version.
+*     21 Sep 1995 (DJA):
+*        Use DAT_ANNUL instead of deprecated HDS_CLOSE
 *     {enter_changes_here}
 
 *  Bugs:
@@ -106,8 +108,11 @@
 *  Extract locator
       CALL ADI1_GETLOC( FID, LOC, STATUS )
 
-*  Close the file
-      CALL HDS_CLOSE( LOC, STATUS )
+*  Close the file. LOC should be the only primary locator associated with
+*  the file if it has only been opened once, in which case the file is
+*  closed. If the file is open more than once this decreases the reference
+*  count by one
+      CALL DAT_ANNUL( LOC, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_FCLOSE', STATUS )

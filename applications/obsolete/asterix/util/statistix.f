@@ -1,8 +1,25 @@
-*+  STATISTIX - Calculates statistics for an N dimensional data object
       SUBROUTINE STATISTIX( STATUS )
-*
-*   Description :
-*
+*+
+*  Name:
+*     STATISTIX
+
+*  Purpose:
+*     Calculates statistics for an N dimensional data object
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL STATISTIX( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     The double precision NAg routine G01AAF is used to calculate the mean,
 *     standard deviation, coefficients of skewness and kurtosis, and the
 *     maximum and minimum values of an N dimensional primitive data object, or
@@ -17,77 +34,139 @@
 *
 *         b) If input is an NDF, then may select to use the
 *            VARIANCE , &/or QUALITY components, if present.
-*
-*    Parameters :
-*
-*     INP         = UNIV(R)
-*                   Input data object
-*     WEIGHT      = _LOGICAL(R)
-*                   Asks if data errors are to be used
-*     QUALITY     = _LOGICAL(R)
-*                   Asks if data quality is to be used
-*     LOOP        = _LOGICAL(R)
-*                   Loop over rejecting high sigma points
-*     SIMPLE      = _LOGICAL(R)
-*                   Don't calculate kurtosis and skewness
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Phillip Andrews (BHVAD::PLA)
-*     David Allan (BHVAD::DJA)
-*     Simon Duck (BHVAD::SRD)
-*
-*    History :
-*
-*     10 Oct 88 : V1.0-1 Extra parameter added to select looping mode
-*     24 Aug 89 : V1.0-2 Structure definitions removed to STATISTIX_STR.
-*                        Alterations to enable compilation under Fortran
-*                        V5.2 - removal of structure references in array
-*                        declarations (DJA)
-*     16 Feb 90 : V1.2-0 Extensive bug fixes and code tidying. Checks
-*                        for zero variance values on structured input.
-*                        Redundant code removed. (DJA)
-*      1 Mar 90 : V1.2-1 Removed where chisquare was calculated  on 2nd and
-*                        subsequent iterations when no variance present. (DJA)
-*     28 Mar 90 : V1.2-2 Now uses BDA_MAPTVAR to map variance to double
-*                        precision directly (DJA)
-*      6 Jul 90 : V1.2-3 Prints out one decimal place in numbers (DJA)
-*     24 Jul 90 : V1.2-4 Calculates equivalent normal Z (SRD)
-*     16 Jan 91 : V1.3-0 Bug fixed in QUAL,NOVAR case (DJA)
-*     25 Jul 91 : V1.5-0 And another in the QUAL and VAR case (DJA)
-*     23 Apr 92 : V1.6-0 SIMPLE option removes skewness and kurtosis
-*                        calculation and is 3 times faster (DJA)
-*     10 Jul 92 : V1.6-1 Prints pixel indices of min and max pixels (DJA)
-*     15 Sep 92 : V1.6-2 Warns if using slice. Bug fix printing min/max
-*                        positions. Traps huge weights. (DJA)
-*      4 May 94 : V1.7-0 Updated i/o to AIO (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     12 Jan 95 : V1.8-1 Updated data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Usage:
+*     statistix {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input data object
+*     WEIGHT = LOGICAL (read)
+*        Asks if data errors are to be used
+*     QUALITY = LOGICAL (read)
+*        Asks if data quality is to be used
+*     LOOP = LOGICAL (read)
+*        Loop over rejecting high sigma points
+*     SIMPLE = LOGICAL (read)
+*        Don't calculate kurtosis and skewness
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     statistix, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     PLA: Phil Andrews (ROSAT, University of Birmingham)
+*     SRD: Simon Duck (ROSAT, University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     10 Oct 1988 V1.0-1 (PLA):
+*        Extra parameter added to select looping mode
+*     24 Aug 1989 V1.0-2 (DJA):
+*        Structure definitions removed to STATISTIX_STR. Alterations to
+*        enable compilation under Fortran V5.2 - removal of structure
+*        structure references in array declarations
+*     16 Feb 1990 V1.2-0 (DJA):
+*        Extensive bug fixes and code tidying. Checks for zero variance
+*        values on structured input. Redundant code removed.
+*      1 Mar 1990 V1.2-1 (DJA):
+*        Removed where chisquare was calculated on 2nd and subsequent
+*        iterations when no variance present
+*     28 Mar 1990 V1.2-2 (DJA):
+*        Now uses BDA_MAPTVAR to map variance to double
+*        precision directly
+*      6 Jul 1990 V1.2-3 (DJA):
+*        Prints out one decimal place in numbers
+*     24 Jul 1990 V1.2-4 (SRD):
+*        Calculates equivalent normal Z
+*     16 Jan 1991 V1.3-0 (DJA):
+*        Bug fixed in QUAL,NOVAR case
+*     25 Jul 1991 V1.5-0 (DJA):
+*        And another in the QUAL and VAR case
+*     23 Apr 1992 V1.6-0 (DJA):
+*        SIMPLE option removes skewness and kurtosis
+*        calculation and is 3 times faster
+*     10 Jul 1992 V1.6-1 (DJA):
+*        Prints pixel indices of min and max pixels
+*     15 Sep 1992 V1.6-2 (DJA):
+*        Warns if using slice. Bug fix printing min/max
+*        positions. Traps huge weights.
+*      4 May 1994 V1.7-0 (DJA):
+*        Updated i/o to AIO (DJA)
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     12 Jan 1995 V1.8-1 (DJA):
+*        Updated data interface
+*     30 Aug 1995 V2.0-0 (DJA):
+*        Full ADI port.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
-*
-*    Status :
-*
-      INTEGER                STATUS
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'STATISTIX Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*150          PATH               ! HDS path to input object
       CHARACTER*150          INPUTFILE          ! Name of input container file
 
-      INTEGER                DIMS(ADI__MXDIM)   ! Input dimensions
-      INTEGER                TDIMS(ADI__MXDIM)  ! Auxilliary input dimensions
+      INTEGER			DIMS(ADI__MXDIM)   	! Input dimensions
 
       INTEGER                	AXPTR(ADI__MXDIM)  	! Axis data ptr's
       INTEGER                	IDPTR              	! Data array ptr
@@ -96,142 +175,132 @@
       INTEGER                	IVPTR              	! Data variance ptr
       INTEGER                	IAX                	! Loop over axes
       INTEGER                	NDIM               	! Input dimensionality
-      INTEGER                NELM               ! Total number of data elements
+      INTEGER                	NELM               	! Total # data values
       INTEGER                NUMLEVELS          ! Number of levels in HDS path.
       INTEGER                	OCH                	! Output channel
       INTEGER                OUTWIDTH           ! 80 if terminal,132 otherwise.
-      INTEGER                	TNDIM              	! Aux dimensionality
       INTEGER                	WPTR               	! Weights array ptr
 
-      LOGICAL                BADQUAL            ! Any of quality flags set?
       LOGICAL                DATAOK, VAROK      ! Various input
       LOGICAL                QUALOK, AXOK       ! objects there?
       LOGICAL                LOOP               ! Loop with sigma rejection?
       LOGICAL                SIMPLE             ! Simple mode
-*
-*    Version id :
-*
-      CHARACTER*25           VERSION
-        PARAMETER            ( VERSION = 'STATISTIX Version 1.8-1' )
-*-
+*.
 
-*    Check status
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version anouncement
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Start ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Obtain name of data file, and get an identifier to it
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+*  Obtain name of data file, and get an identifier to it
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       CALL ADI_FTRACE( IFID, NUMLEVELS, PATH, INPUTFILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Report object name
+*  Report object name
       CALL USI_SHOW( 'Input {INP}', STATUS )
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Determine output device.
+*  Determine output device.
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
       IF ( OUTWIDTH .EQ. 132 ) THEN
         CALL AIO_WRITE( OCH, 'Statistics of '//INPUTFILE, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
       END IF
 
-*    Simple mode?
+*  Simple mode?
       CALL USI_GET0L( 'SIMPLE', SIMPLE, STATUS )
 
-*    Look for components.
-      CALL BDI_CHKDATA( IFID, DATAOK, NDIM, DIMS, STATUS )
+*  Get shape of input data
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
+*  Look for components.
+      CALL BDI_CHK( IFID, 'Data', DATAOK, STATUS )
+
+*  Can't do much if no data!
       IF ( DATAOK ) THEN
 
-        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
-
-*      Look for quality - ask user if present
-        CALL BDI_CHKQUAL( IFID, QUALOK, TNDIM, TDIMS, STATUS )
+*    Look for quality - ask user if present
+        CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
         IF ( QUALOK ) THEN
           CALL USI_GET0L( 'QUALITY', QUALOK, STATUS )
         END IF
 
-*      Look for variance - ask user if present
-        CALL BDI_CHKVAR( IFID, VAROK, TNDIM, TDIMS, STATUS )
+*    Look for variance - ask user if present
+        CALL BDI_CHK( IFID, 'Variance', VAROK, STATUS )
         IF ( VAROK ) THEN
           CALL USI_GET0L( 'WEIGHT', VAROK, STATUS)
         END IF
 
-*      Check axis values
-        DO IAX = 1, NDIM
-          CALL BDI_CHKAXIS( IFID, IAX, AXOK, STATUS )
+*    Check that all the axis values are present
+        AXOK = .TRUE.
+        IAX = 1
+        DO WHILE ( AXOK .AND. (IAX.LE.NDIM) )
+          CALL BDI_AXCHK( IFID, IAX, 'Data', AXOK, STATUS )
+          IAX = IAX + 1
         END DO
 
-*      Map the axis values
+*    Map the axis values
         IF ( AXOK ) THEN
           DO IAX = 1, NDIM
-            CALL BDI_MAPAXVAL( IFID, 'READ', IAX, AXPTR(IAX), STATUS )
+            CALL BDI_AXMAPR( IFID, IAX, 'Data', 'READ',
+     :                       AXPTR(IAX), STATUS )
           END DO
         END IF
 
       ELSE
-
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Unable to find numeric data in input',
      :                                                    STATUS )
 
       END IF
 
-*    Find out if looping is required
+*  Find out if looping is required
       CALL USI_GET0L( 'LOOP', LOOP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map data as _DOUBLE
-      CALL BDI_MAPTDATA( IFID, '_DOUBLE', 'READ', IDPTR, STATUS )
+*  Map data
+      CALL BDI_MAPD( IFID, 'Data', 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Unable to map input data', STATUS )
         GOTO 99
       END IF
 
-*    Obtain dynamic memory for weight array
+*  Obtain dynamic memory for weight array
       CALL DYN_MAPD( 1, NELM, WPTR, STATUS )
 
-*    Map variance
+*  Map variance
       IF ( VAROK ) THEN
-        CALL BDI_MAPTVAR( IFID, '_DOUBLE', 'READ', IVPTR, STATUS )
+        CALL BDI_MAPD( IFID, 'Variance', 'READ', IVPTR, STATUS )
       END IF
 
-*    Map QUALITY as a logical array.
+*  Map QUALITY as a logical array.
       IF ( QUALOK ) THEN
-        CALL BDI_MAPLQUAL (IFID, 'READ', BADQUAL, IQPTR, STATUS )
-        IF ( .NOT. BADQUAL ) THEN
-          CALL BDI_UNMAPLQUAL( IFID, STATUS )
-          QUALOK = .FALSE.
-        END IF
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
       END IF
 
-*    Pad extra dimensions to 7D
+*  Pad extra dimensions to 7D
       CALL AR7_PAD( NDIM, DIMS, STATUS )
 
-*    Do the statistics
+*  Do the statistics
       CALL STATISTIX_INT( NELM, %VAL(IDPTR), %VAL(WPTR), VAROK,
      :                  %VAL(IVPTR), QUALOK, %VAL(IQPTR), NDIM,
      :           DIMS, AXOK, AXPTR, SIMPLE, OCH, LOOP, STATUS )
 
-*    Annul PAR__NULL in loop mode
+*  Annul PAR__NULL in loop mode
       IF ( LOOP .AND. (STATUS.EQ.PAR__NULL) ) THEN
         CALL ERR_ANNUL( STATUS )
       END IF
 
-*    Close output channel
+*  Close output channel
       CALL AIO_CANCL( 'DEV', STATUS )
 
-*    Release dataset
-      CALL BDI_RELEASE( IFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
