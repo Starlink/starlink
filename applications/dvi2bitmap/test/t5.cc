@@ -202,7 +202,7 @@ int main (int argc, char** argv)
 
 	int bw = NBITMAPCOLS;
 	int bh = NBITMAPROWS;
-	Bitmap *b = new Bitmap(bw, bh, 1);
+	Bitmap *b = new Bitmap(bw, bh, 1, false);
 	b->rule(5, 5, 10, 2);
 	b->rule(-2, 11, 5, 3);	// partly off the bitmap, to bottom-left
 	b->rule(18, 2, 5, 3);	// ...to top-right
@@ -264,7 +264,7 @@ int main (int argc, char** argv)
 	CHECKBB("large",3,12);
 	compareBitmaps(b, pictureLarge, 40, 15);
 
-	b->reset();
+	b->clear();
 	b->rule(3,5,5,2);
 	b->freeze();
 	bb = b->boundingBox();
