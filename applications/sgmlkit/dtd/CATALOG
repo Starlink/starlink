@@ -29,6 +29,7 @@ public "-//Starlink//DTD Fortran Source Code 0.1//EN"	"fortrancode-0.1.dtd"
 public "-//Starlink//DTD Fortran Source Code 0.2//EN"	"fortrancode-0.2.dtd"
 public "-//Starlink//DTD DSSSL Source Code 0.2//EN"	"dssslcode-0.2.dtd"
 
+public "-//Starlink//DTD tth equation list//EN"		"tth-equations.dtd"
 
 
 	-- ISO latin 1 entity set for HTML and LaTeX -- 
@@ -36,10 +37,17 @@ PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"
 						ISOent/ISOlat1-html.ent
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"  
 						ISOent/ISOlat1-latex.ent
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"    
+						ISOent/ISOlat1.sdata
 PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//ENT"    
 						ISOent/ISOlat1-ent.ent
 
-public "-//Starlink//ENTITIES Character entity collections//EN" entities.sgml
+public "-//Starlink//ENTITIES Additional entities//EN//HTML" 
+						entities-html.sdata
+public "-//Starlink//ENTITIES Additional entities//EN//LATEX" 
+						entities-latex.sdata
+public "-//Starlink//ENTITIES Additional entities//EN//PLAIN" 
+						entities-plain.sdata
 
 	-- DSSSL DTDs, added from Jade1.1.1 --
 PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" "dsssl/fot.dtd"
