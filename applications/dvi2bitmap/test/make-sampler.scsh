@@ -1,0 +1,75 @@
+#! /usr/local/bin/scsh -s
+!#
+
+(define cmd+args (command-line))
+
+(define dvifile "modetest.dvi")
+(define outroot "modetest-sampler")
+(define comment "")
+(define verbosity "normal")
+
+(for-each (lambda (arg)
+            (if-match (regexp-search (rx (: bos
+                                            "-"
+                                            (submatch alphabetic)
+                                            (submatch (* graphic))))
+                                     arg)
+                      (whole-opt optchar optarg)
+                      (cond
+                        ((and (equal? optchar "o")
+                              (> (string-length optarg) 0))
+                         (set! outroot optarg))
+                        ((and (equal? optchar "c")
+                              (> (string-length optarg) 0))
+                         (set! comment optarg))
+                        ((equal? optchar "q")
+                         (set! verbosity "quiet"))
+
+                        (else
+                         (error (format #f "Unrecognised option ~A" arg))))
+                      (set! dvifile arg)))
+          (cdr cmd+args))
+
+
+(if (not (file-exists? dvifile))
+    (error (format #f "Can't find file ~A" dvifile)))
+
+(define sampler-port (open-output-file (string-append outroot ".html")))
+
+(format sampler-port "<html><head><title>dvi2bitmap sampler</title></head>~%<body>~%")
+(if (> (string-length comment) 0)
+    (format sampler-port "<p>~A</p>~%" comment))
+(format sampler-port "<p>Command line: <code>dvi2bitmap --output-type=png</code> &lt;arguments&gt; <code>~A</code></p>~%" dvifile)
+(format sampler-port "<table border=1><tr><th>Arguments</th><th>Result</th></tr>~%")
+
+(define idx 0)
+(for-each (lambda (arglist)
+            (let* ((fn (format #f "~A-~A.png" outroot idx))
+                   (opopt (format #f "--output=~A" fn)))
+              (set! idx (+ idx 1))
+              (run ,(append `("dvi2bitmap"
+                              ,(string-append "--verbose=" verbosity)
+                              "--output-type=png"
+                              ,opopt)
+                           arglist
+                           (list dvifile)))
+              (format sampler-port
+                      "<tr><td>~A</td><td><img src='~A'/></td></tr>~%"
+                      (string-join arglist) fn)))
+          '(()
+            ("--magnification=2" "--scaledown=2")
+            ("--magnification=3" "--scaledown=3")
+            ("--magnification=4" "--scaledown=4")
+            ("--font-mode=ncd" "--resolution=95")
+            ("--magnification=2" "--scale=2" "--font-mode=ncd" "--resolution=95")
+            ("--font-mode=nec" "--resolution=180")
+            ("--scale=2" "--font-mode=nec" "--resolution=180")
+            ("--magnification=2" "--scale=4" "--font-mode=nec" "--resolution=180")
+            ))
+
+(format sampler-port "</table></body></html>~%")
+
+
+;;; Local Variables:
+;;; mode: scheme
+;;; End:

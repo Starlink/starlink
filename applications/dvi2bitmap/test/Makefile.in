@@ -82,6 +82,23 @@ magtest.dvi: magtest.tex
 modetest.dvi: modetest.tex
 	latex modetest
 
+modetest-maths.dvi: modetest-maths.tex
+	latex modetest-maths
+
+modetest-maths-concmath.dvi: modetest-maths.tex
+	ln -s modetest-maths.tex modetest-maths-concmath.tex
+	latex '\def\optionswitch{1}\input modetest-maths-concmath.tex '
+	rm modetest-maths-concmath.tex
+
+%-sampler.html: %.dvi
+	./make-sampler.scsh -o$(@:.html=) $<
+
+sampler: sampler.html modetest-sampler.html modetest-maths-sampler.html modetest-maths-concmath-sampler.html
+	test -d sampler || mkdir sampler
+	mv modetest-sampler.html modetest-maths-sampler.html modetest-maths-concmath-sampler.html sampler
+	mv modetest*.png sampler
+	cp sampler.html sampler
+
 clean:
 	rm -f *~ *.o *.lo *.test *.stderr
 	rm -Rf .libs
