@@ -1,6 +1,6 @@
-mode_,s,h,,,,"Which option is required ?"
+mode_,s,h,"Cursor",,,"Which option is required ?"
 fraction,struct,h,,,,"Linear fractions of the picture to form the new picture"
-0.5
+
 xpic,i,a,,,,"Number of pictures per line of the array"
 ypic,i,a,,,,"Number of pictures per column of the array"
 lbound,struct,a,,,,"Lower bound"
@@ -14,3 +14,5 @@ fill,r,h,1.0,,,"Linear filling factor"
 labelno,i,h,1,,,"Label number of the bottom-left picture in the array"
 outline,b,h,y,,,"Mark the new picture with a box?"
 prefix,s,a,INDEF,,,"Label prefix. Type ! to prevent labelling"
+size,struct,h,,,,"Dimensions of the new picture in centimetres"
+INDEF

@@ -1,16 +1,20 @@
 in,f,a,,,,"Image to be fitted"
 out,f,a,,,,"Fitted image"
 auto,b,h,y,,,"Automatic evaluation?"
-bindim,i,h,,,,"Dimensions of the bins used to estimate the local background"
+bindim,struct,h,,,,"Dimensions of the bins used to estimate the local background"
+INDEF
 clip,struct,h,,,,"Clipping standard deviations during binning"
 2 3
 estimator,s,h,"MODE",,,"Estimator for the binning"
 evaluate,s,h,"INTERPOLATE",,,"Method of evaluation of the fitted output array"
-fitclip,r,h,INDEF,,,"Clipping rms errors for the fitted bins"
+fitclip,struct,h,,,,"Clipping rms errors for the fitted bins"
+INDEF
 fittype,s,h,"SPLINE",,,"Fitting method"
 logfile,f,h,!,,,"Filename to store fitting results"
-knots,i,h,4,,,"Number of interior knots (1-11)"
-order,i,h,3,,,"Orders of the polynomials along each direction"
+knots,struct,h,,,,"Number of interior knots (1-11)"
+4
+order,struct,h,,,,"Orders of the polynomials along each direction"
+3
 thrhi,r,h,INDEF,,,"Upper threshold cutoff before binning"
 thrlo,r,h,INDEF,,,"Lower threshold cutoff before binning"
 title,s,h,INDEF,,,"Title for surface fit"

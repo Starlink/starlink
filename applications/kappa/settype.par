@@ -1,5 +1,5 @@
 ndf,f,a,,,,"Data structure"
 type,s,a,,,,"New numeric type"
-complex,b,h,,,,"NDF to hold complex values?"
+complex,b,h,INDEF,,,"NDF to hold complex values?"
 data,b,h,y,,,"Set a new type for the data component?"
 variance,b,h,y,,,"Set a new type for the variance component?"

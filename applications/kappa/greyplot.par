@@ -14,7 +14,7 @@ badcol,s,h,"MIN",,,"Colour of bad pixels"
 cosys,s,a,"Data",,,"*! Co-ordinate system"
 fill,b,h,n,,,"Fill the plotting area?"
 font,s,h,"GKS",,,"Fount type?"
-full,b,h,n,,,"Is the full greyscale to be used?"
+full,b,h,INDEF,,,"Is the full greyscale to be used?"
 majtic,struct,h,,,,"Give the parameter controlling the numbers of major ticks for the x and y axes"
 3. 3.
 mintic,struct,h,,,,"Give the numbers of minor tick marks between major ticks for x and y axes"

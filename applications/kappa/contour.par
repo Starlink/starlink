@@ -18,7 +18,7 @@ keystyle,s,h,INDEF,,,"Plotting style for the key"
 length,struct,h,,,,""
 
 margin,struct,h,,,,"Widths of margins around DATA picture"
-
+INDEF
 number,struct,h,,,,""
 
 penrot,b,h,n,,,"Is the graphics pen to be cycled through 3 colours?"

@@ -9,6 +9,8 @@ dtype,s,h,"_REAL",,,"Type of the data values"
 title,s,h,"KAPPA - Trandat",,,"Title for output NDF"
 auto,b,h,n,,,"Automatic calculation of co-ordinates?"
 bad,b,h,y,,,"Initialise array with bad pixels?"
-lbound,i,h,,,,"Pixel lower bounds of the output NDF"
+lbound,struct,h,,,,"Pixel lower bounds of the output NDF"
+INDEF
 quantum,i,h,2048,,,"Work array increment"
-shape,i,a,,,,"Shape of the output NDF"
+shape,struct,a,,,,"Shape of the output NDF"
+

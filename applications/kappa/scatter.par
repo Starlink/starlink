@@ -4,9 +4,11 @@ comp1,s,h,"Data",,,"Component to display on horizontal axis"
 comp2,s,h,"Data",,,"Component to display on vertical axis"
 device,f,a,,,,"*! Name of graphics device"
 axes,b,h,y,,,"Produce annotated axes?"
-clear,b,h,,,,"Should graphics workstation be cleared?"
-compress,i,h,1,,,"Compression factors"
-margin,r,h,0.18,,,"Widths of margins around DATA picture"
+clear,b,h,y,,,"Should graphics workstation be cleared?"
+compress,struct,h,,,,"Compression factors"
+1
+margin,struct,h,,,,"Widths of margins around DATA picture"
+INDEF
 marker,i,h,1,,,"PGPLOT marker type"
 perc1,struct,h,,,,"Percentile range for horizontal axis"
 (5 95)
