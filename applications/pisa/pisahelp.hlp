@@ -10,13 +10,13 @@
 
 1  Changes_this_release
 
-    PISA no longer relies on any NAG routines. This changes the 
-    applications PISAGEN, ADDNOISE, PISAKNN and PISAFIT. There 
-    should be no significant effects due to these changes. NAG 
-    removal has been performed to allow PISA to run on Linux based PCs.
+ This is a minor upgrade to PISA with the following changes:
 
-    SUN/109 has been changed to show the formulae involved in the
-    calculation of the image moments and ellipticity.
+    SUN/109 has been changed to show the correct formulae
+    for the calculation of the semi-major and semi-minor axes of the
+    object ellipse (these were incorrectly shown as $a$ and $b$,
+    rather than $a^{2}$ and $b^{2}$). Formulae have also been added 
+    showing how to calculate these values out to the detection isophote.
 
 1 ADDNOISE
 Adds noise to model data.

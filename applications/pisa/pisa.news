@@ -2,15 +2,17 @@
 
  This is a minor upgrade to PISA with the following changes:
 
-    PISA no longer relies on any NAG routines. This changes the 
-    applications PISAGEN, ADDNOISE, PISAKNN and PISAFIT. There 
-    should be no significant effects due to these changes. NAG 
-    removal has been performed to allow PISA to run on Linux based PCs.
+    SUN/109 has been changed to show the correct formulae
+    for the calculation of the semi-major and semi-minor axes of the
+    object ellipse (these were incorrectly shown as $a$ and $b$,
+    rather than $a^{2}$ and $b^{2}$). Formulae have also been added 
+    showing how to calculate these values out to the detection isophote.
 
-    SUN/109 has been changed to show the formulae involved in the
-    calculation of the image moments and ellipticity.
+ PISA is documented in SUN/109 which you can view on-line with the 
+ 
+    % showme sun109
 
- PISA is documented in SUN/109 or try the pisawww command (X display required).
+ command.
 
- Peter Draper (P.W.Draper@durham.ac.uk)
+ Peter Draper (P.W.Draper@durham.ac.uk)         11th June 1998
 
