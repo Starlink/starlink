@@ -1,3 +1,19 @@
+1999-09-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/sculog: Major rewrite to sort by ut date and data directory.
+
+1999-09-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/sculog: Add support for POLMAP/POLPHOT in
+	mapsum/jigsum. Use fits_read_header. Rewrite modes for RASTMAP,JIGGMAP.
+
+1999-08-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* BOLOCAM: Make snapshot of SURF system.	
+	
+	* src/surf_grid_calcsky.f (SURF_GRID_CALCSKY): Fix memory leak
+	problems when using a model.
+
 1999-08-11  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_reduce_switch.f (SURF_REDUCE_SWITCH): Use
