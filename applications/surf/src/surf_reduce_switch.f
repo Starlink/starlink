@@ -38,7 +38,8 @@
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
 *     OUT = NDF (Read)
-*        The name of the file to contain the output data.
+*        The name of the file to contain the output data. The default
+*        value is constructed from the run number.
 *     SPIKE_LEVEL = INTEGER (Read)
 *        Number of spikes tolerated before marking data point bad.
 *        The default is that the sample should be marked bad if the 
@@ -126,6 +127,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.25  1997/09/03 23:57:01  timj
+*     Supply a default for 'OUT'
+*
 *     Revision 1.24  1997/07/19 02:43:16  timj
 *     Add header information to describe $SCUBA_PREFIX.
 *
@@ -244,6 +248,7 @@ c
                                         ! dU4 Nasmyth coord of bolometers
       LOGICAL      CALIBRATOR          ! .TRUE. if internal calibrator was ON
       CHARACTER*15 CHOP_FUNCTION       ! type of chop used
+      CHARACTER*10 CTEMP               ! Scratch string
       CHARACTER*20 DATA_KEPT           ! types of data stored in file
       INTEGER      DEMOD_CALIBRATOR_END
                                        ! pointer to end of scratch calibrator
@@ -305,6 +310,7 @@ c
       INTEGER      N_SWITCH_POS        ! the number of positions in a switch
       CHARACTER*30 OBJECT              ! name of object observed
       CHARACTER*15 OBSERVING_MODE      ! type of observation
+      CHARACTER*132 OUTFILE            ! Name of default output name
       INTEGER      OUT_A_PTR           ! Pointer to AXIS
       INTEGER      OUT_NDF             ! NDF identifier of output file
       INTEGER      OUT_DAT_PTR         ! Pntr to data in output file
@@ -717,6 +723,17 @@ c
 *     copy only the necessary size
 
       CALL NDF_SECT(IN_NDF, NDIM, LBND, UBND, SECNDF, STATUS)
+
+*     Generate a default output filename
+*     Takes the form of 'o'//RUN_NUMBER
+
+      OUTFILE = 'o'
+      CALL CHR_ITOC( RUN_NUMBER, CTEMP, ITEMP)
+      ITEMP = 1
+      CALL CHR_APPND( CTEMP, OUTFILE, ITEMP)
+
+      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
+      
 
 *     Propogate the section to the output
 
