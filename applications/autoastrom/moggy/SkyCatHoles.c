@@ -58,7 +58,6 @@
 #ifndef NEEDGLSFUNCS
 #define NEEDGLSFUNCS 0
 #endif
-#define NEEDGLSFUNCS 0
 
 #if NEEDGLSFUNCS
 /* (1) Remap glsfwd and glsref to newer sflfwd and sflrev */
