@@ -25,10 +25,12 @@ AC_SUBST(itcl_subdirs)
 
 dnl    To configure iTcl, run ./configure in the subdirectories.
 (
-    for f in itcl itk iwidgets2.2.0 iwidgets3.0.0
+    for d in $itcl_subdirs
     do
-       echo ./configure --prefix=$prefix --cache-file=config.cache
-       ./configure --prefix=$prefix --cache-file=config.cache
+       ( cd $d; \
+         echo; \
+         ./configure --prefix=$prefix --cache-file=config.cache; \
+         ./configure --prefix=$prefix --cache-file=config.cache )
     done
 )
 
