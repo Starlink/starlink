@@ -37,6 +37,7 @@ starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 prohlp=	@PROHLP@
 
 atools.hlp: $(atools_mon_TASKS:=.f) history.help atools.star-hlp
+	PATH=$(PATH):$(STARLINK)/bin/sst; \
 	for f in $(atools_mon_TASKS:=.f); do \
 	   $(prohlp) in=$${f} out=$${f}.help ;\
 	done
