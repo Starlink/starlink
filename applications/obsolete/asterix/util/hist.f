@@ -74,7 +74,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     HIST Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hist.html
+*     HSI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
 *     package:hist, usage:public, history, display

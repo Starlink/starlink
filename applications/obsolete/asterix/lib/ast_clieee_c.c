@@ -52,7 +52,7 @@
 *     {routine_machine_specifics}...
 
 *  References:
-*     ast Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/ast.html
+*     ast Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/ast.html
 
 *  Keywords:
 *     package:ast, usage:public

@@ -56,7 +56,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     BDI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/bdi.html
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
 
 *  Keywords:
 *     package:bdi, usage:public

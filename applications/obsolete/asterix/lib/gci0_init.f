@@ -58,7 +58,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     GCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/gci.html
+*     GCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/gci.html
 
 *  Keywords:
 *     package:gci, usage:private

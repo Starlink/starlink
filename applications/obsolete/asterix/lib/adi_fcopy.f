@@ -62,13 +62,13 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
 *     package:adi, usage:public
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)

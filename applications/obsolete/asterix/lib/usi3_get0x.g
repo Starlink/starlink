@@ -58,7 +58,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     USI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/usi.html
+*     USI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/usi.html
 
 *  Keywords:
 *     package:usi, usage:private

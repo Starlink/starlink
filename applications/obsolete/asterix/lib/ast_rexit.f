@@ -55,7 +55,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     AST Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/ast.html
+*     AST Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/ast.html
 
 *  Keywords:
 *     package:ast, usage:public

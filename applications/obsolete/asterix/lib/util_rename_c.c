@@ -61,7 +61,7 @@
 *     {routine_machine_specifics}...
 
 *  References:
-*     util Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/util.html
+*     util Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/util.html
 
 *  Keywords:
 *     package:util, usage:public

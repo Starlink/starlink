@@ -54,7 +54,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     SSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/ssi.html
+*     SSI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/ssi.html
 
 *  Keywords:
 *     package:ssi, usage:public

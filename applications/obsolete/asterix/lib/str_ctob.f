@@ -59,7 +59,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     STR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/str.html
+*     STR Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/str.html
 
 *  Keywords:
 *     package:str, usage:public, string conversion, bit operations
