@@ -96,7 +96,7 @@ interface UNF2NDF
       vpath       'DYNAMIC'
       ppath       'CURRENT,DYNAMIC'
       default     'R'
-      prompt      'Interim data type required'
+      prompt      'NDF data type required'
       helpkey     '*'
    endparameter
 
