@@ -4,7 +4,8 @@
 *     PICTRANS
 
 *  Purpose:
-*     Transforms co-ordinates between the current and BASE pictures.
+*     Transform a graphics position from one picture co-ordinate Frame to 
+*     another.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,316 +21,284 @@
 *        The global status.
 
 *  Description:
-*     This application converts a position's co-ordinates from the
-*     current picture to their equivalent in the BASE picture, or
-*     vice versa.
+*     This application transforms a position on a graphics device from one 
+*     co-ordinate Frame to another. The input and output Frames may be chosen 
+*     freely from the Frames available in the WCS information stored with
+*     the current picture in the AGI graphics database. The transformed 
+*     position is formatted for display and written to the screen and 
+*     also to an output parameter.
 
 *  Usage:
-*     pictrans inxy [outx] [outy] [bound]
+*     pictrans posin framein [frameout] [device]
 
 *  ADAM Parameters:
 *     BOUND = _LOGICAL (Write)
-*        BOUND is TRUE when the transformed co-ordinates lie within the
-*        bounds of their associated picture.  
-*     COSYS = LITERAL (Read)
-*        The co-ordinate system to be used.  This can be either "World"
-*        or "Data".  "World" makes the application convert between the
-*        world co-ordinates of the position in the two pictures.  World
-*        co-ordinates that relate to a location in a data array will be
-*        in array pixels.  For COSYS = "Data" the conversion is between
-*        data co-ordinates, stored via a transformation.  The BASE
-*        picture will not normally have data co-ordinates, so the value
-*        of COSYS usually selects in which co-ordinate system positions
-*        in the current picture are specified.
-*
-*        Data co-ordinates are arbitrary but most often they will be a
-*        linear or logarithmic transformation of the world
-*        co-ordinates.  For example, the x co-ordinate of a spectrum
-*        would be given in pixels if COSYS = "World", but if COSYS =
-*        "Data" the x co-ordinate could be in wavelength units, such as
-*        Angstroms.  If the database does not have a world-to-data
-*        transformation for a given picture, the value of this
-*        parameter is ignored for that picture, and supplied or
-*        computed positions in that picture will be in world
-*        co-ordinates.  [Current co-ordinate system]
+*        BOUND is TRUE when the supplied point lies within the bounds of 
+*        the current picture.
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation. [The current graphics device]
-*     INXY( 2 ) = _DOUBLE (Read)
-*        The x-y co-ordinates to be transformed.  These need not lie
-*        within the physical bounds of their associated picture.  The
-*        suggested value is the current value.
-*     OUTX = _DOUBLE (Write)
-*        The transformed x co-ordinate.
-*     OUTY = _DOUBLE (Write)
-*        The transformed y co-ordinate.
-*     TOBASE = _LOGICAL (Read)
-*        This decides the direction of the transformation.  If TOBASE
-*        is TRUE, the conversion is from the current to the BASE
-*        picture.  If TOBASE is FALSE, BASE-picture co-ordinates are
-*        converted to a position within the current picture.
-*        The suggested value is the current value.  [TRUE]
+*     EPOCHIN = _DOUBLE (Read)
+*        If a "Sky Co-ordinate System" specification is supplied (using 
+*        parameter FRAMEIN) for a celestial co-ordinate system, then an epoch 
+*        value is needed to qualify it. This is the epoch at which the 
+*        supplied sky position was determined. It should be given as a 
+*        decimal years value, with or without decimal places  ("1996.8" for 
+*        example). Such values are interpreted as a Besselian epoch if less 
+*        than 1984.0 and as a Julian epoch otherwise. 
+*     EPOCHOUT = _DOUBLE (Read)
+*        If a "Sky Co-ordinate System" specification is supplied (using 
+*        parameter FRAMEOUT) for a celestial co-ordinate system, then an epoch 
+*        value is needed to qualify it. This is the epoch at which the 
+*        transformed sky position is required. It should be given as a 
+*        decimal years value, with or without decimal places  ("1996.8" for 
+*        example). Such values are interpreted as a Besselian epoch if less 
+*        than 1984.0 and as a Julian epoch otherwise. 
+*     FRAMEIN = LITERAL (Read)
+*        A string specifying the co-ordinate Frame in which the input
+*        position is supplied (see parameter POSIN). The string can be 
+*        one of the following:
+*
+*        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC, 
+*        BASEPIC, etc. 
+*
+*        - An integer value giving the index of the required Frame within
+*        the WCS component.
+*
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
+*        section "Sky Co-ordinate Systems" in SUN/95).
+*
+*        If a null parameter value is supplied, then the current Frame in 
+*        the current picture is used. [!]
+*     FRAMEOUT = LITERAL (Read)
+*        A string specifying the co-ordinate Frame in which the transformed
+*        position is required. If a null parameter value is supplied, then 
+*        the current Frame in the picture is used. The string can be one of the 
+*        following:
+*
+*        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC, 
+*        BASEPIC, etc. 
+*
+*        - An integer value giving the index of the required Frame within
+*        the WCS component.
+*
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
+*        section "Sky Co-ordinate Systems" in SUN/95). 
+*
+*        If a null parameter value is supplied, then the BASEPIC Frame is 
+*        used. ["BASEPIC"]
+*     POSIN = LITERAL (Read)
+*        The co-ordinates of the position to be transformed, in the 
+*        co-ordinate Frame specified by parameter FRAMEIN (supplying 
+*        a colon ":" will display details of the required co-ordinate Frame). 
+*        The position should be supplied as a list of formatted axis values 
+*        separated by spaces or commas. 
+*     POSOUT = LITERAL (Write)
+*        The formatted co-ordinates of the transformed position, in the 
+*        co-ordinate Frame specified by parameter FRAMEOUT. The position
+*        will be stored as a list of formatted axis values separated by 
+*        spaces. 
+*     QUIET = _LOGICAL (Read)
+*        If TRUE, the transformed position is not written to the screen
+*        (it is still written to the output parameter OUTPOS). [FALSE]
 
 *  Examples:
-*     pictrans [100.3,-20.1] outx=(dx) outy=(dy) cosys=w
-*        This converts the position (100.3,-20.1), in world co-ordinates
-*        of the current picture of the current graphics device, to the
-*        world co-ordinates of that point in the BASE picture.  The base
-*        co-ordinates are written to ICL variables DX and DY (as well as
-*        the application's parameter file).
-*     pictrans [-1.e4,2.56] outy=(dy) device=xwindows
-*        This converts the position (-10000.0,2.56), in the current
-*        picture of the xwindows device, to the co-ordinates of that
-*        point in the BASE picture.  All positions use the current
-*        co-ordinate system.  The base y co-ordinate is written to ICL
-*        variable DY.
-*     pictrans [0.314,0.137] (dx) (dy) (within) cosys=d notobase 
-*        This converts the position (0.314,0.137), in the data
-*        co-ordinates of the BASE picture of the current graphics
-*        device, to the data co-ordinates of that point in the current
-*        picture.  The transformed co-ordinates are written to ICL
-*        variables DX and DY.  ICL variable WITHIN contains a flag
-*        to indicate whether or not the point lies within the current
-*        picture.
+*     pictrans "100.3,-20.1" framein=pixel
+*        This converts the position (100.3,-20.1), in pixel co-ordinates
+*        within the current picture of the current graphics device, to the
+*        BASEPIC co-ordinates of that point in the BASE picture.  
+*     pictrans "100.3,-20.1" framein=pixel frameout=graphics
+*        This converts the position (100.3,-20.1), in pixel co-ordinates
+*        within the current picture of the current graphics device, to the
+*        GRAPHICS co-ordinates of that point (i.e. millimetres from the
+*        bottom left corner of the graphics device).
+*     pictrans "10 10" framein=graphics frameout=basepic
+*        This converts the position (10 10), in graphics co-ordinates
+*        (i.e. the point which is 10mm above and to the right of the
+*        lower left corner of the graphics device), into BASEPIC
+*        co-ordinates.
 
-*  Implementation Deficiencies:
-*     -  Does use an array for the output co-ordinates.  (This is
-*     because ICL does not support arrays yet.)
-*     [routine_deficiencies]...
+*   Notes:
+*     -  BASEPIC co-ordinates locate a position within the entire graphics 
+*     device. The bottom left corner of the device screen has BASEPIC 
+*     co-ordinates of (0,0). The shorter dimension of the screen has 
+*     length 1.0, and the other axis has a length greater than 1.0. 
+*
+*     -  GRAPHICS co-ordinates also span the entire graphics device but
+*     are measured in millimetres from the bottom left corner.
+*
+*     -  CURPIC co-ordinates locate a point within the current picture. The 
+*     bottom left corner of the current picture has CURPIC co-ordinates of 
+*     (0,0). The shorter dimension of the current picture has length 1.0, and 
+*     the other axis has a length greater than 1.0. 
 
 *  Related Applications:
 *     KAPPA: GDSTATE, PICIN, PICXY.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1993 August 19 (MJC):
 *        Original version.
+*     24-SEP-2001 (DSB):
+*        Converted to AST/PGPLOT.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE              ! no default typing allowed
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Status:
-      INTEGER STATUS             ! Global status
-
-*  Local Constants:
-      INTEGER NDIM               ! Number of dimensions in a picture
-      PARAMETER ( NDIM = 2 )
+      INTEGER STATUS
 
 *  Local Variables:
-      LOGICAL BOUND              ! True if the output co-ordinate lies
-                                 ! within the output picture's bounds
-      CHARACTER * ( 6 ) COSYS    ! Co-ordinate system
-      LOGICAL DEVCAN             ! True if device parameter is to be
-                                 ! cancelled
-      DOUBLE PRECISION INXY( NDIM ) ! Input co-ordinates
-      DOUBLE PRECISION OUTXY( NDIM ) ! Output co-ordinates
-      INTEGER PICID              ! Current (input) picture identifier
-      INTEGER PICIDB             ! BASE picture identifier
-      LOGICAL TOBASE             ! True when the conversion is from the
-                                 ! current to the BASE picture
-      LOGICAL WORLD              ! True when the co-ordinate system is
-                                 ! world
-      DOUBLE PRECISION WX        ! Input picture's x world co-ordinate
-      REAL WXO                   ! Output picture's x world co-ordinate
-      DOUBLE PRECISION WY        ! Input picture's y world co-ordinate
-      REAL WYO                   ! Output picture's y world co-ordinate
-      REAL XL                    ! X lower bound world co-ordinate of
-                                 ! current picture
-      REAL XLB                   ! X lower bound world co-ordinate of
-                                 ! BASE picture
-      REAL XU                    ! X upper bound world co-ordinate of
-                                 ! current picture
-      REAL XUB                   ! X upper bound world co-ordinate of
-                                 ! current picture
-      REAL YL                    ! Y lower bound world co-ordinate of
-                                 ! current picture
-      REAL YLB                   ! Y lower bound world co-ordinate of
-                                 ! BASE picture
-      REAL YU                    ! Y upper bound world co-ordinate of
-                                 ! current picture
-      REAL YUB                   ! Y upper bound world co-ordinate of
-                                 ! current picture
-      INTEGER ZONID              ! SGS zone identifier of the current
-                                 ! picture
-      INTEGER ZONIDB             ! SGS zone identifier of the base
-                                 ! picture
+      CHARACTER TEXT*128         ! Formatted text
+      DOUBLE PRECISION CURPIC( 2 ) ! CURPIC position
+      DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input position
+      DOUBLE PRECISION POSOUT( NDF__MXDIM )! Output position
+      INTEGER FRMIN              ! Pointer to requested input Frame
+      INTEGER FRMOUT             ! Pointer to requested output Frame
+      INTEGER IAT                ! No. of characters in the TEXT variable
+      INTEGER ICUR               ! Index of CURPIC Frame
+      INTEGER IFRMIN             ! Index of input Frame
+      INTEGER IPIC               ! AGI identifier for current picture
+      INTEGER IPLOT              ! AST pointer for the Plot
+      INTEGER MAP                ! Point er to AST Mapping
+      INTEGER NIN                ! No. of input axes
+      INTEGER NOUT               ! No. of output axes
+      LOGICAL BOUND              ! Point is within the picture's bounds
+      LOGICAL QUIET              ! Suppress screen output?
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Assume that the device name is not to be cancelled.
-      DEVCAN = .FALSE.
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
-*  Get the input parameters.
-*  =========================
+*  Associate image display and start database activity.  
+      CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC, STATUS )
 
-*  Get the type of co-ordinates to convert.
-      CALL PAR_CHOIC( 'COSYS', 'Data', 'Data,World', .FALSE., COSYS,
+*  Set the PGPLOT viewport to match this picture, and get an AST Plot for
+*  the picture.
+      CALL KPG1_GDGET( IPIC, AST__NULL, .FALSE., IPLOT, STATUS )
+
+*  Set the current Frame to be the required input Frame specified by 
+*  parameter FRAMEIN. If "WORLD" co-ordinates are requested, use AGI_WORLD. 
+*  If "DATA" co-ordinates are requested, use "AGI_DATA".
+      CALL MSG_SETC( 'PIC', 'picture' )
+      CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IPLOT, 'AGI_WORLD', 
+     :                 'AGI_DATA', .TRUE., '^PIC', STATUS )
+
+*  Get a pointer to the input Frame.
+      FRMIN = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
+
+*  Get the index of the input Frame.
+      IFRMIN = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
+*  Get the number of input axes.
+      NIN = AST_GETI( FRMIN, 'NAXES', STATUS )
+
+*  Get the input position. Do not supply a dynamic default.
+      POSIN( 1 ) = AST__BAD
+      CALL KPG1_GTPOS( 'POSIN', FRMIN, .FALSE., POSIN, 0.0D0, STATUS )
+
+*  Set the current Frame to be the required output Frame specified by 
+*  parameter FRAMEOUT. 
+      CALL MSG_SETC( 'PIC', 'picture' )
+      CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IPLOT, 'AGI_WORLD', 
+     :                 'AGI_DATA', .TRUE., '^PIC', STATUS )
+
+*  Get a pointer to the output Frame.
+      FRMOUT = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
+
+*  Get the number of output axes.
+      NOUT = AST_GETI( FRMOUT, 'NAXES', STATUS )
+
+*  Get the Mapping from input to output Frame.
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, IFRMIN, AST__CURRENT, 
+     :                                    STATUS ), STATUS )
+
+*  Transform the input position into the output Frame.
+      CALL AST_TRANN( MAP, 1, NIN, 1, POSIN, .TRUE., NOUT, 1, POSOUT, 
      :                STATUS )
-      WORLD = COSYS .EQ. 'WORLD'
 
-*  Determine the sense of the conversion.
-      CALL PAR_GET0L( 'TOBASE', TOBASE, STATUS )
+*  See if the results are to be displayed on the screen.
+      CALL PAR_GET0l( 'QUIET', QUIET, STATUS )
+      IF( .NOT. QUIET ) THEN
 
-*  Get the input co-ordinates.
-      CALL PAR_EXACD( 'INXY', NDIM, INXY, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*  If so, format the input position including axis symbols.
+         TEXT = ' '
+         IAT =  0
+         
+         CALL KPG1_ASPTP( FRMIN, NIN, POSIN, .TRUE., '  ', TEXT, IAT, 
+     :                    STATUS )
 
-*  Start the graphics system.
-*  ==========================
+*  Add "  -->  " to the displayed text.
+         CALL CHR_APPND( '  -->', TEXT, IAT )
+         IAT = IAT + 2
 
-*  Get the graphics device, and open SGS.  Get an SGS zone.
-      CALL AGS_ASSOC( 'DEVICE', 'READ', ' ', PICID, ZONID, STATUS )
+*  Format the transformed position, including axis symbols.
+         CALL KPG1_ASPTP( FRMOUT, NOUT, POSOUT, .TRUE., '  ', TEXT, IAT, 
+     :                    STATUS )
 
-*  Obtain the limits of the world co-ordinates in the current picture.
-      CALL AGI_IWOCO( XL, XU, YL, YU, STATUS )
-
-*  Get the BASE picture.
-*  =====================
-
-*  Inquire the BASE picture for the current workstation.
-      CALL AGI_IBASE( PICIDB, STATUS )
-
-*  Select this as the current picture.
-      CALL AGI_SELP( PICIDB, STATUS )
-
-*  Create a new SGS zone from the BASE picture.
-      CALL AGS_NZONE( ZONIDB, STATUS )
-
-*  Obtain the limits of the world co-ordinates in the BASE picture.
-      CALL AGI_IWOCO( XLB, XUB, YLB, YUB, STATUS )
-
-*  Restore the current picture and zone.
-      CALL AGI_SELP( PICID, STATUS )
-      CALL SGS_SELZ( ZONID, STATUS )
-
-*  If there was a problem with the graphics device (e.g. not available),
-*  flag not to cancel the device, and leave the application.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         DEVCAN = .TRUE.
-         GOTO 980
-      END IF
-
-*  Perform a conversion from the current to the BASE picture.
-*  ==========================================================
-      IF ( TOBASE ) THEN
-
-*  Obtain the world co-ordinates of the input position.
-         IF ( WORLD ) THEN
-            WX = INXY( 1 )
-            WY = INXY( 2 )
-
-*  Convert the data co-ordinates in the current picture to world
-*  co-ordinates.
-         ELSE
-            CALL AGI_TDDTW( -1, 1, INXY( 1 ), INXY( 2 ), WX, WY,
-     :                      STATUS )
-         END IF
-
-*  Transform world co-ordinates from the current to the BASE picture.
-         CALL SGS_TPZ( ZONID, REAL( WX ), REAL( WY ), ZONIDB, WXO, WYO,
-     :                 STATUS )
-
-*  Check whether or not the output point lies within the bounds of the
-*  BASE picture.  This might not strictly be correct at the boundaries
-*  due to the type conversion.
-         BOUND = WXO .GE. XLB .AND. WXO .LE. XUB .AND.
-     :           WYO .GE. YLB .AND. WYO .LE. YUB
-
-*  Obtain the data co-ordinates of the output position.
-         IF ( WORLD ) THEN
-            OUTXY( 1 ) = DBLE( WXO )
-            OUTXY( 2 ) = DBLE( WYO )
-
-*  Convert the output world co-ordinates in the BASE picture to data
-*  co-ordinates.
-         ELSE
-            CALL AGI_TWTDD( PICIDB, 1, DBLE( WXO ), DBLE( WYO ),
-     :                      OUTXY( 1 ), OUTXY( 2 ), STATUS )
-         END IF
-
-*  Perform a conversion from the base to the current picture.
-*  ==========================================================
-      ELSE
-
-*  Obtain the world co-ordinates of the input position.
-         IF ( WORLD ) THEN
-            WX = INXY( 1 )
-            WY = INXY( 2 )
-
-*  Convert the data co-ordinates in the BASE picture to world
-*  co-ordinates.
-         ELSE
-            CALL AGI_TDDTW( PICIDB, 1, INXY( 1 ), INXY( 2 ), WX, WY,
-     :                      STATUS )
-         END IF
-
-*  Transform world co-ordinates from the base to the current picture.
-         CALL SGS_TPZ( ZONIDB, REAL( WX ), REAL( WY ), ZONID, WXO, WYO,
-     :                 STATUS )
-
-*  Check whether or not the output point lies within the bounds of the
-*  current picture.  This might not strictly be correct at the
-*  boundaries due to the type conversion.
-         BOUND = WXO .GE. XL .AND. WXO .LE. XU .AND.
-     :           WYO .GE. YL .AND. WYO .LE. YU
-
-*  Obtain the data co-ordinates of the output position.
-         IF ( WORLD ) THEN
-            OUTXY( 1 ) = DBLE( WXO )
-            OUTXY( 2 ) = DBLE( WYO )
-
-*  Convert the output world co-ordinates in the current picture to data
-*  co-ordinates.
-         ELSE
-            CALL AGI_TWTDD( -1, 1, DBLE( WXO ), DBLE( WYO ), OUTXY( 1 ),
-     :                      OUTXY( 2 ), STATUS )
-         END IF
+*  Display the text, between blank lines.
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC( 'TEXT', TEXT )
+         CALL MSG_OUT( 'PICTRANS_MSG', '  ^TEXT', STATUS )
+         CALL MSG_BLANK( STATUS )
 
       END IF
 
-*  Write the results to output parameters.
-*  =======================================
+*  Format the transformed position again, this time without axis symbols.
+      TEXT = ' '
+      IAT = 0
+      CALL KPG1_ASPTP( FRMOUT, NOUT, POSOUT, .FALSE., '  ', TEXT, IAT, 
+     :                 STATUS )
 
-*  Output the co-ordinates.  In time these should be merged into an
-*  array, hence the use of an array variable.
-      CALL PAR_PUT0D( 'OUTX', OUTXY( 1 ), STATUS )
-      CALL PAR_PUT0D( 'OUTY', OUTXY( 2 ), STATUS )
+*  Write this text to the output parameter.
+      CALL PAR_PUT0C( 'POSOUT', TEXT( : IAT ), STATUS )
 
+*  Now get the index of the CURPIC Frame in the Plot.
+      CALL KPG1_ASFFR( IPLOT, 'CURPIC', ICUR, STATUS )
+
+*  Get the Mapping from input to CURPIC Frame.
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, IFRMIN, ICUR, 
+     :                                    STATUS ), STATUS )
+
+*  Transform the input position into the CURPIC Frame.
+      CALL AST_TRANN( MAP, 1, NIN, 1, POSIN, .TRUE., 2, 1, CURPIC, 
+     :                STATUS )
+
+*  If the CURPIC value on both axes is within the range [0,1] the point
+*  is inside the current picture.
+      BOUND = CURPIC( 1 ) .GE. 0.0 .AND. CURPIC( 1 ) .LE. 1.0 .AND.
+     :        CURPIC( 2 ) .GE. 0.0 .AND. CURPIC( 2 ) .LE. 1.0 
+  
 *  Output the bound check.
       CALL PAR_PUT0L( 'BOUND', BOUND, STATUS )
 
-*  AGI closedown sequence.
-*  =======================
+*  Close down the database and device. 
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
-  980 CONTINUE
-
-*  Deactivate SGS and close the workstation.
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
-
-*  Come here for any errors that occurred before the graphics device
-*  was opened.
-
-  999 CONTINUE
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'PICTRANS_ERR',
-     :     'PICTRANS: Unable to convert co-ordinates between the '/
-     :     /'current and BASE pictures.', STATUS )
+         CALL ERR_REP( 'PICTRANS_ERR', 'PICTRANS: Failed to transform'//
+     :                 ' a position between two picture co-ordinate '//
+     :                 'Frames.', STATUS )
       END IF
 
       END
