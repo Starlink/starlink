@@ -141,7 +141,7 @@
           ELSE
 
 *        Map the axis values
-            CALL BDI_AXMAPR( IFID(I), 1, 'Data', APTR, STATUS )
+            CALL BDI_AXMAPR( IFID(I), 1, 'Data', 'READ', APTR, STATUS )
             CALL ARR_CHKREG( %VAL(APTR), DIMS(1,I), REG, BASE, SCALE(I),
      :                       STATUS )
 
