@@ -12235,8 +12235,8 @@ iraf! {
             type _INTEGER
             access READ
             vpath DEFAULT
-            ppath DYNAMIC DEFAULT
-            default !
+            ppath CURRENT DEFAULT
+            default 2
             prompt {Minimum number of good pixels in a bin}
             helpkey *
           }

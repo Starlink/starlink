@@ -30647,8 +30647,7 @@ plot (9k).
       }{
          The minimum number of good pixels required in a bin before it
          contributes to the fitted line.  It must be in the range 1 to
-         the number of pixels per bin. If a null (!) value is supplied,
-         the value used is the number of pixels per bin. {\tt [!]}
+         the number of pixels per bin. {\tt [2]}
       }
       \sstsubsection{
          NBIN = \_INTEGER (Read)
@@ -44130,13 +44129,13 @@ The following new commands have been added:
        FrameSet so that they refer to the correct pixel axes.
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V.18\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V0.18\label{se:changes}}
 
 \subsection{Removed Commands}
 The following obsolete commands have been removed from KAPPA -
 alternatives are indicate below. Many of these commands have been
 archived in a new package called KAPRH in order to satisfy any occasional
-need that may occur for them (see SUN/xxx).
+need that may occur for them (see SUN/239).
 \begin{description}
 \item [CONTOVER] Use \htmlref{CONTOUR}{CONTOUR} instead setting parameter
 CLEAR to ``N''.
@@ -44163,13 +44162,19 @@ The following applications have been modified:
                added in the future.
       \end{itemize}
 
+   \item [\htmlref{NORMALIZE}{NROMALIZE}] \mbox{}
+      \begin{itemize}
+         \item The MINPIX parameter now has a default of 2, making it
+          much less likely that bins will be rejected from the fit.
+      \end{itemize}
+
    \item [\htmlref{PSF}{PSF}] \mbox{}
       \begin{itemize}
          \item A new parameter called PROFOUT has been added. It which allows 
          the displayed profile to be saved in a 1-dimensional NDF.
       \end{itemize}
 
-   \item [\htmlref{PSF}{PSF}] \mbox{}
+   \item [\htmlref{THRESH}{THRESH] \mbox{}
       \begin{itemize}
          \item A bug has been fixed which could cause bad values in the output
          to be treated as good values.

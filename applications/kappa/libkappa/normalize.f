@@ -97,8 +97,7 @@
 *     MINPIX = _INTEGER (Read)
 *        The minimum number of good pixels required in a bin before it
 *        contributes to the fitted line.  It must be in the range 1 to
-*        the number of pixels per bin. If a null (!) value is supplied, 
-*        the value used is the number of pixels per bin. [!]
+*        the number of pixels per bin. [2]
 *     NBIN = _INTEGER (Read)
 *        The number of bins to use when binning the scatter plot prior
 *        to fitting a straight line, in the range 2 to 10000. [50]
@@ -299,6 +298,8 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     15-AUG-2001 (DSB):
+*        Changed default for MINPIX to [2].
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -479,9 +480,8 @@
       CALL PAR_GDR0I( 'NITER', 2, 0, 100, .TRUE., NITER, STATUS )
       CALL PAR_GDR0R( 'NSIGMA', 3.0, 0.1, 1.0E6, .TRUE., NSIGMA,
      :                STATUS )
-      DEFMIN = MAX( 1, NELS / NBIN )
-      CALL PAR_GDR0I( 'MINPIX', DEFMIN, 1, MIN( DEFMIN, NELS / NBIN ),
-     :                .TRUE., MINPIX, STATUS )
+      CALL PAR_GDR0I( 'MINPIX', 2, 1, NELS / NBIN, .TRUE., MINPIX, 
+     :                STATUS )
 
 *  Get temporary workspace for use in KPS1_NMPLT, and map it.
       CALL PSX_CALLOC( NBIN, '_INTEGER', PNTW1, STATUS )
