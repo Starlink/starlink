@@ -125,10 +125,13 @@
 
 #  Set the given index to the unused state.  If it was the highest used
 #  index, set the next value to the one after the new highest.
+#  Otherwise, set the next value to the one we've just unused.
          if { ! [ catch { unset used($index) } ] } {
             set highest [ eval max 0 [ array names used ] ]
             if { $index > $highest } {
                set value [ expr $highest + 1 ]
+            } else {
+               set value $index
             }
          }
       }
