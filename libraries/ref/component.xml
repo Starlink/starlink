@@ -15,7 +15,7 @@
   which have been referenced in this way.
     </p></abstract>
   <dependencies >
-    <build>sae</build><link>hds</link><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>hds</build><link>hds</link><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
