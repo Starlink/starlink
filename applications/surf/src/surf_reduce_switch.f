@@ -40,6 +40,9 @@
 *        Number of spikes tolerated before marking data point bad.
 *        The default is that the sample should be marked bad if the transputers
 *        detected any spikes during a 1 second sample.
+*     SWITCH = _INTEGER (Read)
+*        Parameter to indicate which switch to extract. A value of 0 means
+*        that all switches should be reduced. Default is 0.
 *     USE_CALIBRATOR = _LOGICAL (Read)
 *        Yes, if you want the data for each bolometer measurement
 *        divided by the corresponding internal calibrator signal.
@@ -112,6 +115,10 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.16  1997/04/30 02:24:02  timj
+*     Add range checking for 'SWITCH' parameter.
+*     Add MSG_OUTIF.
+*
 *     Revision 1.15  1997/04/24 02:22:35  timj
 *     Add ability to select an individual switch via the SWITCH parameter.
 *
@@ -153,6 +160,7 @@ c
       INCLUDE 'DAT_PAR'                ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx
       INCLUDE 'NDF_PAR'                ! for NDF__NOID
+      INCLUDE 'MSG_PAR'                ! MSG__ constants
       INCLUDE 'REDS_SYS'               ! REDS constants
 *    Import :
 *    Import-Export :
@@ -282,6 +290,9 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
 *  start up the NDF system and read in the demodulated data file
 
       CALL NDF_BEGIN
@@ -312,7 +323,7 @@ c
         IF (TRYING) THEN
             CALL ERR_ANNUL(STATUS)
             CALL MSG_SETC('TASK', TSKNAME)
-            CALL MSG_OUT(' ','^TASK: Failed to'//
+            CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: Failed to'//
      :           ' find requested file in CWD and DATADIR',
      :           STATUS)
             CALL PAR_CANCL('IN', STATUS)
@@ -354,8 +365,9 @@ c
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation '//
-     :  'of object ^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation '//
+     :     'of object ^OBJECT', STATUS)
 
       IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
          STATUS = SAI__ERROR
@@ -538,9 +550,10 @@ c
 
       IF (.NOT. ABORTED) THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUT (' ', '^PKG: file contains data for ^N_S '//
-     :     'switch(es) in ^N_E exposure(s) in ^N_I integration(s) '//
-     :     'in ^N_M measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: file contains data for ^N_S '//
+     :        'switch(es) in ^N_E exposure(s) in ^N_I integration(s) '//
+     :        'in ^N_M measurement(s)', STATUS)
       ELSE
        
 *  get the exposure, integration, measurement numbers at which the 
@@ -554,15 +567,17 @@ c
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUT (' ', '^PKG: the observation should have '//
-     :     'had ^N_S switch(es) in ^N_E exposure(s) in ^N_I '//
-     :     'integration(s) in ^N_M measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: the observation should have '//
+     :        'had ^N_S switch(es) in ^N_E exposure(s) in ^N_I '//
+     :        'integration(s) in ^N_M measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUT (' ', ' - However, the observation was '//
-     :     'ABORTED during exposure ^N_E of integration ^N_I '//
-     :     'of measurement ^N_M', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        ' - However, the observation was '//
+     :        'ABORTED during exposure ^N_E of integration ^N_I '//
+     :        'of measurement ^N_M', STATUS)
 
       END IF 
 
@@ -578,8 +593,13 @@ c
 *     3:  Select 3rd switch
 
       SWITCH = 0
-      CALL PAR_DEF0I('SWITCH', 0, STATUS)
-      CALL PAR_GET0I('SWITCH', SWITCH, STATUS)
+
+      IF (N_SWITCHES .GT. 1) THEN
+         CALL PAR_DEF0I('SWITCH', SWITCH, STATUS)
+         CALL PAR_MINI('SWITCH', SWITCH, STATUS)
+         CALL PAR_MAXI('SWITCH', N_SWITCHES, STATUS)
+         CALL PAR_GET0I('SWITCH', SWITCH, STATUS)
+      END IF
 
 *  get some scratch memory and copy the different sections of the data array
 *  into it
@@ -668,9 +688,10 @@ c
                      CALL MSG_SETI ('I', INTEGRATION)
                      CALL MSG_SETI ('M', MEASUREMENT)
                      CALL MSG_SETC('PKG', PACKAGE)
-                     CALL MSG_OUT (' ', '^PKG: no data for '//
-     :                 'switch 1 in exp ^E, int ^I, meas ^M',
-     :                 STATUS)
+                     CALL MSG_OUTIF (MSG__NORM,' ', 
+     :                    '^PKG: no data for '//
+     :                    'switch 1 in exp ^E, int ^I, meas ^M',
+     :                    STATUS)
                      MISSING_SWITCH = .TRUE.
                   END IF
 
@@ -686,9 +707,10 @@ c
                         CALL MSG_SETI ('I', INTEGRATION)
                         CALL MSG_SETI ('M', MEASUREMENT)
                         CALL MSG_SETC('PKG', PACKAGE)
-                        CALL MSG_OUT (' ', 'PKG: no data for '//
-     :                    'switch 2 in exp ^E, int ^I, meas ^M',
-     :                    STATUS)
+                        CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :                       'PKG: no data for '//
+     :                       'switch 2 in exp ^E, int ^I, meas ^M',
+     :                       STATUS)
                         MISSING_SWITCH = .TRUE.
                      END IF
                   ELSE
@@ -707,9 +729,10 @@ c
                         CALL MSG_SETI ('I', INTEGRATION)
                         CALL MSG_SETI ('M', MEASUREMENT)
                         CALL MSG_SETC('PKG', PACKAGE)
-                        CALL MSG_OUT (' ', '^PKG: no data for '//
-     :                    'switch 3 in exp ^E, int ^I, meas ^M',
-     :                    STATUS)
+                        CALL MSG_OUTIF (MSG__NORM,' ', 
+     :                       '^PKG: no data for '//
+     :                       'switch 3 in exp ^E, int ^I, meas ^M',
+     :                       STATUS)
                         MISSING_SWITCH = .TRUE.
                      END IF
                   ELSE
