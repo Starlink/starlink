@@ -395,9 +395,7 @@
 * Bugs :
 *     <description of any "bugs" which have not been fixed>
 * Author: Jeremy Ashley 1993-sept
-*         Richard Beard (University of Birmingham)
-* History:
-*         14 May 1997: Handle GTIs as DOUBLE (RB)
+* History :
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -502,9 +500,7 @@
 * Bugs :
 *     <description of any "bugs" which have not been fixed>
 * Author: Jeremy Ashley 1993-sept
-*         Richard Beard (University of Birmingham)
-* History:
-*         14 May 1997: Handle GTIs as DOUBLE (RB)
+* History :
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -646,9 +642,7 @@
 *    Bugs :
 *    Authors :
 *     Jeremy Ashley (LTVAD::JKA)
-*     Richard Beard (Birmingham, RB)
 *    History :
-*     9 Apr 1997: Table 102 -> 100 and shuffle others (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -862,10 +856,8 @@
 * Bugs :
 * Authors :
 *     Richard Saxton
-*     Richard Beard (University of Birmingham)
 * History :
 *     12-Aug-1992   Original
-*     14 May 1997   Fource calculations to DP (RB)
 * Type Definitions :
       IMPLICIT NONE
 * Global constants :
@@ -1230,10 +1222,8 @@
 *     <description of any "bugs" which have not been fixed >
 *    Authors :
 *     Jeremy Ashley
-*     Richard Beard (University of Birmingham)
 *    History :
 *     23-Sep-1993   - Converted from old FX_RDHDR
-*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1384,10 +1374,8 @@ C - CHECK NUMBER OF TIME RANGES DOESN'T EXCEED MAXIMUM
 *     <description of any "bugs" which have not been fixed >
 *    Authors :
 *     Jeremy Ashley
-*     Richard Beard (University of Birmingham)
 *    History :
 *     29-Sep-1993   - J.ASHLEY
-*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1862,10 +1850,8 @@ C -   CHECK STATUS
 *     <description of any "bugs" which have not been fixed >
 *    Authors :
 *     Jeremy Ashley
-*     Richard Beard (University of Birmingham)
 *    History :
 *     23-Sep-1993   - Converted from old FX_RDHDR
-*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1962,10 +1948,8 @@ C - CONVERT TIME FORMATS
 *     formats - 25th October 1993 (JKA)
 *    Authors :
 *     Jeremy Ashley
-*     Richard Beard (University of Birmingham)
 *    History :
 *     29-Sep-1993   - J.ASHLEY
-*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -2320,12 +2304,13 @@ C - CONVERT TIME FORMATS
 *    Local variables :
       CHARACTER*20 EXT                            ! File extension name
       CHARACTER*80 DNAME                    ! Names of files
-      REAL STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
-      REAL XWIDTH,YWIDTH,TWIDTH,EWIDTH,PWIDTH     ! Binwidth of each axis
+      DOUBLE PRECISION STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
+      REAL XWIDTH,YWIDTH,EWIDTH,PWIDTH     ! Binwidth of each axis
+      DOUBLE PRECISION TWIDTH
       REAL BXWIDTH,BYWIDTH                        ! Binwidth in backgnd box
       REAL XDWID,YDWID                            ! Width of detector axes
       REAL ELAWID,ELBWID                          ! Binwidth of elliptic axes
-      REAL T1,T2                                  ! Lower and upper limits of
+      DOUBLE PRECISION T1,T2                      ! Lower and upper limits of
 *                                                 ! a time bin
       INTEGER NBAD                                ! Number of bad time ranges
       INTEGER TLP,LP1,LP2,LP3,LP4,LP6,LP7,INLP,LP
@@ -2359,7 +2344,7 @@ C - CONVERT TIME FORMATS
 *
       XDWID = (SRT.MAX_XD - SRT.MIN_XD + 1) / REAL(SDIM3)
       YDWID = (SRT.MAX_YD - SRT.MIN_YD + 1) / REAL(SDIM4)
-      TWIDTH = (SRT.MAX_T(SRT.NTIME) - SRT.MIN_T(1)) / REAL(SDIM5)
+      TWIDTH = (SRT.MAX_T(SRT.NTIME) - SRT.MIN_T(1)) / DOUBLE(SDIM5)
       PWIDTH = (SRT.MAX_PH - SRT.MIN_PH + 1) / REAL(SDIM6)
       EWIDTH = (SRT.MAX_EN - SRT.MIN_EN + 1) / REAL(SDIM7)
 *
@@ -2588,8 +2573,9 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INTEGER BDIM1, BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7
       LOGICAL QCHECK                    ! Check quality of each event
       INTEGER MAXBAD,NBAD               ! Dimension & NUMBER of bad arrays
-      REAL STBAD(MAXBAD),ENBAD(MAXBAD)  ! Start & End times of bad data
-      REAL XWIDTH,YWIDTH,TWIDTH,PWIDTH,EWIDTH     ! Bin widths of axes
+      DOUBLE PRECISION STBAD(MAXBAD),ENBAD(MAXBAD)  ! Start & End times of bad data
+      REAL XWIDTH,YWIDTH,PWIDTH,EWIDTH     ! Bin widths of axes
+      DOUBLE PRECISION TWIDTH
       REAL XDWID,YDWID                  ! Bin widths of detector axes
       REAL BXWIDTH, BYWIDTH             ! Width of bckgnd im pixels
       INTEGER NRBIN                     ! Number of output radial bins
@@ -3064,7 +3050,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &              BEVE_XD, BEVE_YD, BEVE_T, BEVE_P, BEVE_E, TOTEV_SRC,
      &              TOTEV_BCK, QCHECK, MAXBAD, NBAD, STBAD, ENBAD,
      &              BADEV)
-*    Description :
+DOUBLE PRECISION Description :
 *    History :
 *     date:  original (LTVAD::RDS)
 *    Type definitions :

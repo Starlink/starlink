@@ -74,7 +74,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Status :
@@ -149,7 +149,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTCORR Version 2.2-0')
+      PARAMETER (VERSION = 'XRTCORR Version rb test')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
@@ -633,8 +633,8 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTSRT'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /CORR/ HEAD                 !Source file header info
@@ -705,7 +705,7 @@
          ENDIF
 *
 *     Put SASS selection times into one array
-         CALL XRT_LIVEWIND(RAWHD.NTRANGE, RAWHD.TSTART,
+         CALL XRT_LIVEWIND(RAWHD.NTRANGE, RAWHD.D0TSTART,
      &                                 RAWHD.TEND, %val(SPTR))
 *
 *     Put user selection times into one array
@@ -765,8 +765,8 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTSRT'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
@@ -823,7 +823,7 @@ D            WRITE(3,*)EXPOS(TLP)
          CALL DAT_SIZE(TLOC, NTIMES, STATUS)
 *
 *   Map the time array
-         CALL DAT_MAPR(TLOC, 'READ', 1, NTIMES, EV_TPNTR, STATUS)
+         CALL DAT_MAPD(TLOC, 'READ', 1, NTIMES, EV_TPNTR, STATUS)
 *
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping eventrate TIME array')
@@ -912,12 +912,12 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'               !Quality values
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD               !Header structure for input file
 *
       INTEGER NTIMES                   !Number of eventrate records
-      REAL EVTIM(NTIMES)               !Times of event rates
+      DOUBLE PRECISION EVTIM(NTIMES)   !Times of event rates
       REAL A1LL(NTIMES)                !Eventrates
       REAL AXE(NTIMES)                 !Eventrates
       REAL AEXE(NTIMES)                !Eventrates
@@ -944,7 +944,7 @@ D            WRITE(3,*)EXPOS(TLP)
       REAL A1LL_AV,AXE_AV,AEXE_AV              ! Average events per time bin
       REAL FLIVE,FLIVE1,FLIVE2
       REAL DTOT
-      REAL ETIM                                ! S/C time in U.T.
+      DOUIBLE PRECISION ETIM                   ! S/C time in U.T.
 *    Local data :
 *-
       IF (STATUS .NE. SAI__OK) RETURN
@@ -966,7 +966,7 @@ D            WRITE(3,*)EXPOS(TLP)
      &       ETIM .LE. HEAD.TMAX(HEAD.NTRANGE)) THEN
 *
 *      Calculate time axis bin number
-            TBIN = INT( (ETIM - HEAD.TMIN(1)) / HEAD.TSCALE(1) + 1.0 )
+            TBIN = INT( (ETIM - HEAD.TMIN(1)) / HEAD.TSCALE(1) + 1.0D0 )
             TBIN = MIN(TBIN, NT)
 *
 *      Add up eventrates for this time bin
@@ -1059,8 +1059,8 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTSRT'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
@@ -1116,7 +1116,7 @@ D            WRITE(3,*)EXPOS(TLP)
          CALL DAT_SIZE(TLOC, NTIMES, STATUS)
 *
 *   Map the time array
-         CALL DAT_MAPR(TLOC, 'READ', 1, NTIMES, T_PNTR, STATUS)
+         CALL DAT_MAPD(TLOC, 'READ', 1, NTIMES, T_PNTR, STATUS)
 *
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping eventrate TIME array')
@@ -1125,6 +1125,11 @@ D            WRITE(3,*)EXPOS(TLP)
 *   Map the eventrates
          CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','PS_VALID',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, PSLOC, STATUS)
+         IF (STATUS .NE. SAI__OK) THEN
+           STATUS = SAI__OK
+           CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','ACCEPTED',COL,STATUS)
+           CALL DAT_FIND(ERLOC, COL, PSLOC, STATUS)
+         END IF
          CALL DAT_MAPR(PSLOC, 'READ', 1, NTIMES, PS_PNTR, STATUS)
 *
 *
@@ -1187,12 +1192,12 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'               !Quality values
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD               !Header structure for input file
 *
       INTEGER NTIMES                   !Number of eventrate records
-      REAL EVTIM(NTIMES)               !Times of event rates
+      DOUBLE PRECISION(NTIMES)         !Times of event rates
       REAL RATE(NTIMES)                !Eventrates
       INTEGER NT                       !Number of time bins in input file
       BYTE QUAL(NT)                    !Quality of each time bin
@@ -1234,7 +1239,7 @@ D            WRITE(3,*)EXPOS(TLP)
      &       ETIM .LE. HEAD.TMAX(HEAD.NTRANGE)) THEN
 *
 *      Calculate time axis bin number
-            TBIN = INT( (ETIM - HEAD.TMIN(1)) / HEAD.TSCALE(1) + 1.0 )
+            TBIN = INT( (ETIM - HEAD.TMIN(1)) / HEAD.TSCALE(1) + 1.0D0 )
             TBIN = MIN(TBIN, NT)
 *
 *      Add up eventrates for this time bin
@@ -1403,7 +1408,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Structure definitions
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -1525,7 +1530,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Import :
       INTEGER			IFID			! Input file id
 *    Import-Export :
@@ -2044,7 +2049,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Import :
       INTEGER			IFID			! input file id
 *    Import-Export :
@@ -2152,7 +2157,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD                   ! Header structure
       CHARACTER*(DAT__SZLOC) ELOC          ! Locator to eff. area file
@@ -2356,7 +2361,7 @@ C
       INCLUDE 'DAT_PAR'
 *
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
 *    Status :
       INTEGER STATUS
 *    Import :

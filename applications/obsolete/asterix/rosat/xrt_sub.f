@@ -247,7 +247,7 @@
         IMPLICIT NONE
 
 *  Global constants :
-        INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Global variables :
 *  Import :
         REAL XC,YC,RAD
@@ -676,7 +676,7 @@
       REAL RP1,RP2                ! Radii to interpolate between
       INTEGER ELP,FLP             ! Fraction loop and Energy loop variables
 *    Local data :
-      INCLUDE 'INC_GETPSF_DATA'   ! Includes the data values for
+      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_GETPSF_DATA'   ! Includes the data values for
 *                                 ! ENERGY,FRAC,TELRAD and DETRAD
 *                                 ! and the constants MAXENG and MAXFRAC
 *-
@@ -923,13 +923,13 @@ C         ENDIF
          CALL CMP_SIZE(CLOC, 'START', HEAD.NTRANGE, STATUS)
 *
          IF (HEAD.NTRANGE .GT. 1) THEN
-            CALL CMP_GET1R(CLOC, 'START', MAXtRNG, HEAD.TMIN,
+            CALL CMP_GET1D(CLOC, 'START', MAXtRNG, HEAD.TMIN,
      &                                     HEAD.NTRANGE, STATUS)
-            CALL CMP_GET1R(CLOC, 'STOP', MAXtRNG, HEAD.TMAX,
+            CALL CMP_GET1D(CLOC, 'STOP', MAXtRNG, HEAD.TMAX,
      &                                     HEAD.NTRANGE, STATUS)
          ELSE
-            CALL CMP_GET0R(CLOC, 'START', HEAD.TMIN(1), STATUS)
-            CALL CMP_GET0R(CLOC, 'STOP', HEAD.TMAX(1), STATUS)
+            CALL CMP_GET0D(CLOC, 'START', HEAD.TMIN(1), STATUS)
+            CALL CMP_GET0D(CLOC, 'STOP', HEAD.TMAX(1), STATUS)
          ENDIF
 *
          CALL DAT_ANNUL(CLOC, STATUS)
@@ -1321,13 +1321,11 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
         IF (SNAME.EQ.'SPACE') THEN
 
-	print *,'space'
           CALL XRT_GETSEL_ARD(SIID,HEAD,STATUS)
 
         ELSEIF (SNAME.EQ.'TIME') THEN
-	print *,'time'
 
-          CALL XRT_GETSEL_RANGE(SIID,HEAD.NTRANGE,HEAD.TMIN,HEAD.TMAX,
+          CALL XRT_GETSEL_RANGED(SIID,HEAD.NTRANGE,HEAD.TMIN,HEAD.TMAX,
      :                                                         STATUS)
           IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error accessing time range'/
@@ -1337,7 +1335,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
         ELSEIF (SNAME.EQ.'ENERGY') THEN
 
-          CALL XRT_GETSEL_RANGE(SIID,HEAD.NPRANGE,HEAD.PMIN,HEAD.PMAX,
+          CALL XRT_GETSEL_RANGER(SIID,HEAD.NPRANGE,HEAD.PMIN,HEAD.PMAX,
      :                                                         STATUS)
 
           IF (STATUS .NE. SAI__OK) THEN
@@ -1349,7 +1347,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
         ELSEIF (SNAME.EQ.'PH_CHANNEL') THEN
 
-          CALL XRT_GETSEL_RANGE(SIID,
+          CALL XRT_GETSEL_RANGER(SIID,
      :                  HEAD.NUPRANGE,HEAD.UPMIN,HEAD.UPMAX,STATUS)
 
           IF (STATUS .NE. SAI__OK) THEN
@@ -1385,9 +1383,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       END
 
 
-
 *+
-      SUBROUTINE XRT_GETSEL_RANGE(SIID,NRANGE,START,STOP,STATUS)
+      SUBROUTINE XRT_GETSEL_RANGER(SIID,NRANGE,START,STOP,STATUS)
 
       IMPLICIT NONE
 
@@ -1428,7 +1425,55 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL ADI_CUNMAP( SIID, 'STOP', EPTR, STATUS )
 
       IF (STATUS.NE.SAI__OK) THEN
-        CALL ERR_REP(' ','from XRT_GETSEL_RANGE',STATUS)
+        CALL ERR_REP(' ','from XRT_GETSEL_RANGER',STATUS)
+      ENDIF
+
+      END
+
+
+*+
+      SUBROUTINE XRT_GETSEL_RANGED(SIID,NRANGE,START,STOP,STATUS)
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+
+      INTEGER SIID
+      INTEGER NRANGE
+      DOUBLE PRECISION START(*)
+      DOUBLE PRECISION STOP(*)
+
+      INTEGER STATUS
+
+      INTEGER BPTR,EPTR
+      INTEGER I
+*-
+
+      IF (STATUS.NE.SAI__OK) RETURN
+
+* How many pairs?
+      CALL ADI_CSIZE( SIID, 'START', NRANGE, STATUS )
+
+* Map the data
+      CALL ADI_CMAPD( SIID, 'START', 'READ', BPTR, STATUS )
+      CALL ADI_CMAPD( SIID, 'STOP', 'READ', EPTR, STATUS )
+
+* Loop over pairs
+      DO I = 1, NRANGE
+
+* Get these values
+        CALL ARR_ELEM1D( BPTR, NRANGE, I, START(I), STATUS )
+        CALL ARR_ELEM1D( EPTR, NRANGE, I, STOP(I), STATUS )
+
+      ENDDO
+
+* Release range pairs data
+      CALL ADI_CUNMAP( SIID, 'START', BPTR, STATUS )
+      CALL ADI_CUNMAP( SIID, 'STOP', EPTR, STATUS )
+
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL ERR_REP(' ','from XRT_GETSEL_RANGED',STATUS)
       ENDIF
 
       END
@@ -2880,7 +2925,7 @@ C ---
         ENDIF
 *
 * Calculate the conversion factor between spacecraft time and UT
-        HEAD.SCCONV = (END_MJD - HEAD.BASE_MJD) * 86400. /
+        HEAD.SCCONV = (END_MJD - HEAD.BASE_MJD) * 86400.0D0 /
      &                            (SC_END - HEAD.BASE_SCTIME)
 * Create array of small map start positions
         XSIZE = HEAD.IFDSZX / REAL(HEAD.ISMNUX)
