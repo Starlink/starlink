@@ -9,6 +9,12 @@
 # are built; if not, they must be configured already.
 
 
+CONFIG_CPT=test -f config.status \
+  || ./configure >configure-output.log 2>configure-output.log.err \
+  || { cat configure-output.log.err; false; }
+MAKE_CPT=(make && make install) >make.log 2>make.log.err \
+  || { cat make.log.err; false; }
+
 $(MANIFEST)/agi: \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
@@ -28,7 +34,7 @@ $(MANIFEST)/agi: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd libraries/agi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ard: \
 		$(MANIFEST)/ast \
@@ -38,7 +44,10 @@ $(MANIFEST)/ard: \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
+		$(MANIFEST)/one \
+		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
@@ -46,7 +55,7 @@ $(MANIFEST)/ard: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd libraries/ard \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ary: \
 		$(MANIFEST)/chr \
@@ -58,7 +67,7 @@ $(MANIFEST)/ary: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/ary \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ast: \
 		$(MANIFEST)/htx \
@@ -67,14 +76,14 @@ $(MANIFEST)/ast: \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html
 	cd libraries/ast \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/astrom: \
 		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd applications/astrom \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/atools: \
 		$(MANIFEST)/agi \
@@ -120,7 +129,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/atools \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component autoconf is a buildsupport component
 $(MANIFEST)/autoconf:
@@ -135,7 +144,7 @@ $(MANIFEST)/autoconf:
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
 	    fi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component automake is a buildsupport component
 $(MANIFEST)/automake: \
@@ -152,7 +161,7 @@ $(MANIFEST)/automake: \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
 	    fi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/cat: \
 		$(MANIFEST)/ast \
@@ -171,7 +180,7 @@ $(MANIFEST)/cat: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd libraries/cat \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component ccdpack has configure dependencies on { itcl tcl tk },
 # which must be built before this component is configured.
@@ -219,12 +228,12 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/tk \
 		$(MANIFEST)/trn
 	cd applications/ccdpack \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/cfitsio: \
 		$(MANIFEST)/star2html
 	cd thirdparty/heasarc/cfitsio \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component chart is OBSOLETE -- do not build
 $(MANIFEST)/chart: \
@@ -243,7 +252,7 @@ $(MANIFEST)/chart: \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/star2html
 	cd applications/obsolete/chart \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/chr: \
 		$(MANIFEST)/cnf \
@@ -251,18 +260,18 @@ $(MANIFEST)/chr: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/chr \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/cnf: \
 		$(MANIFEST)/star2html
 	cd libraries/cnf \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/coco: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd applications/coco \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/convert: \
 		$(MANIFEST)/agi \
@@ -295,7 +304,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/convert \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/cursa: \
 		$(MANIFEST)/ary \
@@ -324,7 +333,7 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/cursa \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/daophot: \
 		$(MANIFEST)/agi \
@@ -350,58 +359,27 @@ $(MANIFEST)/daophot: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/daophot \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/datacube: \
-		$(MANIFEST)/agi \
-		$(MANIFEST)/ard \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
-		$(MANIFEST)/cat \
-		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
-		$(MANIFEST)/convert \
 		$(MANIFEST)/ems \
-		$(MANIFEST)/figaro \
-		$(MANIFEST)/fio \
-		$(MANIFEST)/generic \
-		$(MANIFEST)/gks \
-		$(MANIFEST)/gns \
-		$(MANIFEST)/graphpar \
-		$(MANIFEST)/grp \
-		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
-		$(MANIFEST)/idi \
-		$(MANIFEST)/ifd \
-		$(MANIFEST)/kaplibs \
-		$(MANIFEST)/kappa \
-		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
-		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
-		$(MANIFEST)/ndg \
-		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
-		$(MANIFEST)/pda \
-		$(MANIFEST)/pgp \
-		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
-		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sgs \
-		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
-		$(MANIFEST)/snx \
-		$(MANIFEST)/starx \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk \
-		$(MANIFEST)/trn
+		$(MANIFEST)/star2html
 	cd applications/datacube \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/dipso: \
 		$(MANIFEST)/agi \
@@ -427,6 +405,7 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
@@ -443,17 +422,17 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/dipso \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/docfind: \
 		$(MANIFEST)/info \
 		$(MANIFEST)/star2html
 	cd applications/docfind \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/dvi2bitmap:
 	cd applications/dvi2bitmap \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/echomop: \
 		$(MANIFEST)/agi \
@@ -498,7 +477,7 @@ $(MANIFEST)/echomop: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/echomop \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/echwind: \
 		$(MANIFEST)/cnf \
@@ -508,13 +487,13 @@ $(MANIFEST)/echwind: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/echwind \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component email is OBSOLETE -- do not build
 $(MANIFEST)/email: \
 		$(MANIFEST)/star2html
 	cd applications/obsolete/email \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ems: \
 		$(MANIFEST)/cnf \
@@ -522,7 +501,7 @@ $(MANIFEST)/ems: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/ems \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/esp: \
 		$(MANIFEST)/agi \
@@ -559,7 +538,7 @@ $(MANIFEST)/esp: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/esp \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/extractor: \
 		$(MANIFEST)/ary \
@@ -576,7 +555,7 @@ $(MANIFEST)/extractor: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/extractor \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/extreme: \
 		$(MANIFEST)/chr \
@@ -594,7 +573,7 @@ $(MANIFEST)/extreme: \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html
 	cd applications/extreme \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/figaro: \
 		$(MANIFEST)/agi \
@@ -613,6 +592,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
@@ -623,7 +603,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/figaro \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/findcoords: \
 		$(MANIFEST)/ary \
@@ -653,7 +633,7 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/findcoords \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/fio: \
 		$(MANIFEST)/chr \
@@ -669,7 +649,7 @@ $(MANIFEST)/fio: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/fio \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/gaia: \
 		$(MANIFEST)/ard \
@@ -697,14 +677,14 @@ $(MANIFEST)/gaia: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/gaia \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/generic: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/generic \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/gks: \
 		$(MANIFEST)/cnf \
@@ -714,7 +694,7 @@ $(MANIFEST)/gks: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/gks \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/gns: \
 		$(MANIFEST)/chr \
@@ -727,7 +707,7 @@ $(MANIFEST)/gns: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/gns \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/graphpar: \
 		$(MANIFEST)/chr \
@@ -748,7 +728,7 @@ $(MANIFEST)/graphpar: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd libraries/graphpar \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/grp: \
 		$(MANIFEST)/chr \
@@ -756,14 +736,17 @@ $(MANIFEST)/grp: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
+		$(MANIFEST)/one \
+		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/grp \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/gsd: \
 		$(MANIFEST)/cnf \
@@ -771,7 +754,7 @@ $(MANIFEST)/gsd: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/gsd \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/gwm: \
 		$(MANIFEST)/cnf \
@@ -780,7 +763,7 @@ $(MANIFEST)/gwm: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/gwm \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/hds: \
 		$(MANIFEST)/cnf \
@@ -789,7 +772,7 @@ $(MANIFEST)/hds: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/hds \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/hdstools: \
 		$(MANIFEST)/chr \
@@ -809,7 +792,7 @@ $(MANIFEST)/hdstools: \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html
 	cd applications/hdstools \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/hdstrace: \
 		$(MANIFEST)/chr \
@@ -826,23 +809,23 @@ $(MANIFEST)/hdstrace: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/hdstrace \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/hlp: \
 		$(MANIFEST)/star2html
 	cd libraries/hlp \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/htx: \
 		$(MANIFEST)/star2html
 	cd applications/htx \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/icl: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/star2html
 	cd applications/icl \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/idi: \
 		$(MANIFEST)/chr \
@@ -862,12 +845,12 @@ $(MANIFEST)/idi: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd libraries/idi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ifd: \
 		$(MANIFEST)/star2html
 	cd applications/ifd \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/img: \
 		$(MANIFEST)/ary \
@@ -889,16 +872,16 @@ $(MANIFEST)/img: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd libraries/img \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/info:
 	cd etc/info \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/init: \
 		$(MANIFEST)/hlp
 	cd etc/init \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component iras90 is OBSOLETE -- do not build
 $(MANIFEST)/iras90: \
@@ -920,6 +903,7 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -931,7 +915,7 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/obsolete/iras90 \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component ircamdr is OBSOLETE -- do not build
 $(MANIFEST)/ircamdr: \
@@ -958,24 +942,26 @@ $(MANIFEST)/ircamdr: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd applications/obsolete/ircamdr \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component itcl is a configure dependency, so is configurable in place.
 $(MANIFEST)/itcl: \
 		$(MANIFEST)/tcl \
 		$(MANIFEST)/tk
 	cd thirdparty/tclsys/itcl \
-	    && test -f config.status || ./configure >configure-output.log \
-	    && make>make.log && make install>>make.log
+	  && $(CONFIG_CPT) \
+	  && $(MAKE_CPT)
 
+# Component jpeg is a configure dependency, so is configurable in place.
 $(MANIFEST)/jpeg:
 	cd thirdparty/ijg/jpeg \
-	    && make>make.log && make install>>make.log
+	  && $(CONFIG_CPT) \
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/jpl: \
 		$(MANIFEST)/star2html
 	cd libraries/jpl \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/agi \
@@ -1000,6 +986,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -1012,7 +999,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd libraries/kaplibs \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/kappa: \
 		$(MANIFEST)/agi \
@@ -1062,7 +1049,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/tk \
 		$(MANIFEST)/trn
 	cd applications/kappa \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/kaprh: \
 		$(MANIFEST)/agi \
@@ -1108,7 +1095,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/kaprh \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component libtool is a buildsupport component
 $(MANIFEST)/libtool:
@@ -1123,7 +1110,7 @@ $(MANIFEST)/libtool:
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
 	    fi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component m4 is a buildsupport component
 $(MANIFEST)/m4:
@@ -1138,7 +1125,7 @@ $(MANIFEST)/m4:
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
 	    fi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/mag: \
 		$(MANIFEST)/chr \
@@ -1154,7 +1141,7 @@ $(MANIFEST)/mag: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/mag \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/mers: \
 		$(MANIFEST)/cnf \
@@ -1164,12 +1151,12 @@ $(MANIFEST)/mers: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/mers \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/messgen: \
 		$(MANIFEST)/star2html
 	cd applications/messgen \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/nbs: \
 		$(MANIFEST)/cnf \
@@ -1178,7 +1165,7 @@ $(MANIFEST)/nbs: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/nbs \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ncar: \
 		$(MANIFEST)/cnf \
@@ -1188,7 +1175,7 @@ $(MANIFEST)/ncar: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd thirdparty/knoxville/ncar \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ndf: \
 		$(MANIFEST)/ary \
@@ -1204,7 +1191,7 @@ $(MANIFEST)/ndf: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd libraries/ndf \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ndg: \
 		$(MANIFEST)/ary \
@@ -1217,6 +1204,7 @@ $(MANIFEST)/ndg: \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -1225,12 +1213,12 @@ $(MANIFEST)/ndg: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd libraries/ndg \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/news: \
 		$(MANIFEST)/star2html
 	cd applications/news \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/one: \
 		$(MANIFEST)/chr \
@@ -1240,7 +1228,7 @@ $(MANIFEST)/one: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/one \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/par: \
 		$(MANIFEST)/chr \
@@ -1255,7 +1243,7 @@ $(MANIFEST)/par: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/par \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/pcs: \
 		$(MANIFEST)/chr \
@@ -1268,13 +1256,13 @@ $(MANIFEST)/pcs: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pcs \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/pda: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pda \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/pgp: \
 		$(MANIFEST)/cnf \
@@ -1285,7 +1273,7 @@ $(MANIFEST)/pgp: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pgp \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/pgplot: \
 		$(MANIFEST)/cnf \
@@ -1293,7 +1281,7 @@ $(MANIFEST)/pgplot: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/sae
 	cd thirdparty/caltech/pgplot \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/photom: \
 		$(MANIFEST)/agi \
@@ -1313,6 +1301,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pgp \
@@ -1324,7 +1313,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/photom \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/pisa: \
 		$(MANIFEST)/agi \
@@ -1361,7 +1350,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/pisa \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/polpack: \
 		$(MANIFEST)/agi \
@@ -1406,7 +1395,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
 	cd applications/polpack \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/pongo: \
 		$(MANIFEST)/agi \
@@ -1430,54 +1419,54 @@ $(MANIFEST)/pongo: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
 	cd applications/pongo \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/prm: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/prm \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/psmerge: \
 		$(MANIFEST)/star2html
 	cd applications/psmerge \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/psx: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/psx \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ref: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/ref \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/rv: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd applications/rv \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/sae: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/star2html
 	cd libraries/sae \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/scb: \
 		$(MANIFEST)/star2html
 	cd applications/scb \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/sgmlkit:
 	cd applications/sgmlkit \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/sgs: \
 		$(MANIFEST)/chr \
@@ -1491,7 +1480,7 @@ $(MANIFEST)/sgs: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/sgs \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/shl: \
 		$(MANIFEST)/chr \
@@ -1507,12 +1496,12 @@ $(MANIFEST)/shl: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae
 	cd libraries/shl \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/sla: \
 		$(MANIFEST)/star2html
 	cd libraries/sla \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/snx: \
 		$(MANIFEST)/chr \
@@ -1527,17 +1516,17 @@ $(MANIFEST)/snx: \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/star2html
 	cd libraries/snx \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/spt: \
 		$(MANIFEST)/star2html
 	cd applications/spt \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/ssn78: \
 		$(MANIFEST)/sgmlkit
 	cd docs/ssn/078 \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/sst: \
 		$(MANIFEST)/chr \
@@ -1554,11 +1543,11 @@ $(MANIFEST)/sst: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/sst \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/star2html:
 	cd applications/star2html \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component starconf is a buildsupport component
 $(MANIFEST)/starconf: \
@@ -1576,8 +1565,10 @@ $(MANIFEST)/starconf: \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
 	    fi \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
+# Component startcl has configure dependencies on { jpeg tcl tk },
+# which must be built before this component is configured.
 $(MANIFEST)/startcl: \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
@@ -1585,36 +1576,33 @@ $(MANIFEST)/startcl: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
-		$(MANIFEST)/jpeg \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/nbs \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/starx
 	cd applications/startcl \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/starx: \
 		$(MANIFEST)/star2html
 	cd applications/starx \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 # Component tcl is a configure dependency, so is configurable in place.
 $(MANIFEST)/tcl:
 	cd thirdparty/tclsys/tcl \
-	    && test -f config.status || ./configure >configure-output.log \
-	    && make>make.log && make install>>make.log
+	  && $(CONFIG_CPT) \
+	  && $(MAKE_CPT)
 
 # Component tk is a configure dependency, so is configurable in place.
 $(MANIFEST)/tk: \
 		$(MANIFEST)/tcl
 	cd thirdparty/tclsys/tk \
-	    && test -f config.status || ./configure >configure-output.log \
-	    && make>make.log && make install>>make.log
+	  && $(CONFIG_CPT) \
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/trn: \
 		$(MANIFEST)/chr \
@@ -1628,12 +1616,12 @@ $(MANIFEST)/trn: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/trn \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 $(MANIFEST)/xdisplay: \
 		$(MANIFEST)/star2html
 	cd applications/xdisplay \
-	    && make>make.log && make install>>make.log
+	  && $(MAKE_CPT)
 
 
 # Buildsupport tools -- building and cleaning
@@ -1653,5 +1641,6 @@ clean-buildsupport:
 # Run 'make configure-deps' to make these components before ./configure
 configure-deps: \
 		$(MANIFEST)/itcl \
+		$(MANIFEST)/jpeg \
 		$(MANIFEST)/tcl \
 		$(MANIFEST)/tk

@@ -239,18 +239,16 @@ okbook (SC/16), a small number of applications used for AXIS and  WCS
 manipulation, and a collection of example shell and IDL scripts for IFS data
 cube manipulation. </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ndf</build><build>kappa</build><build>figaro</build><build>convert</build>
+    <build>pcs</build><build>ndf</build><build>par</build><build>sae</build><link>mers</link><link>pcs</link><use>kappa</use><use>figaro</use><use>convert</use><sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
     </person>
   </developers>
-  -->
-  <!-- <documentation></documentation> -->
+  <documentation> sun237 sc16</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -1366,7 +1364,7 @@ UNIX).
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>ems</build><build>gwm</build><build>mers</build><build>nbs</build><build>jpeg</build><build>pcs</build><build>sae</build><build>starx</build><build>tcl</build><build>tk</build><sourceset>star2html</sourceset>
+    <build>ems</build><build>gwm</build><build>mers</build><build>nbs</build><build>pcs</build><build>sae</build><build>starx</build><configure>jpeg</configure><configure>tcl</configure><configure>tk</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1596,7 +1594,7 @@ UNIX).
 </component>
 
 <component id="ast">
-  <version>3.5-2</version>
+  <version>3.5-5</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -1897,7 +1895,7 @@ No longer under active control.
       file. It also allows the creation of groups in which each element
       is a modified version of an element in another group.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>pcs</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>one</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
