@@ -111,7 +111,8 @@ dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with
 dnl   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
 dnl   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
 dnl   This is defined by default when the compiler is invoked with
-dnl   '-std strict_ansi', but that is a little harder to arrange in here.
+dnl   '-std strict_ansi', but that's more drastic than we want to
+dnl   have on by default.
 dnl
 dnl   I don't quite know how, but AC_CANONICAL_HOST appears to be
 dnl   invoked implicitly somewhere above this: if I include it here I
@@ -199,12 +200,15 @@ if test $my_cv_ctype_in_std = yes; then
         are in the std namespace])
 fi
 
-dnl  Some C++ compilers seem to have snprintf in std::, some in the global
-dnl  namespace, and some just don't care....
+dnl  The C++ <cstdio> definition does _not_ list snprintf as one of
+dnl  the members, though it is listed in the definition of <stdio.h>
+dnl  in the C standard.  So different compilers seem to have different
+dnl  ideas of where it should be.  Find out.
 AC_CACHE_CHECK([where snprintf is],
    [my_cv_snprintfns],
    [my_cv_snprintfns=
     AC_TRY_COMPILE([
+#include <iostream>
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #else
@@ -214,6 +218,7 @@ AC_CACHE_CHECK([where snprintf is],
 	[char s[1]; int x = std::snprintf(s, 1, "");],
 	 my_cv_snprintfns=std,
 	[AC_TRY_COMPILE([
+#include <iostream>
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #else
@@ -223,6 +228,7 @@ AC_CACHE_CHECK([where snprintf is],
 	    [char s[1]; int x = ::snprintf(s, 1, "");],
 	     my_cv_snprintfns=global,
 	    [AC_TRY_COMPILE([
+#include <iostream>
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #else
@@ -236,7 +242,7 @@ case $my_cv_snprintfns in
   std)    nscode=3 ;;
   global) nscode=2 ;;
   nons)   nscode=1 ;;
-  *)      nscode=0 ;;
+  *)      nscode=0 ;; # this case shouldn't really happen
 esac
 AC_DEFINE_UNQUOTED(SNPRINTF_NAMESPACE, $nscode,
   [Define to 3 if snprintf is in the std:: namespace; to 2 if it is in
