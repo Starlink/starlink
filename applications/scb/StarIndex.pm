@@ -127,9 +127,7 @@ use Fcntl;
 #  others tend to have a limit of around 1024 bytes, which can cause 
 #  writes to fail.  Then set $Dbmtype to the type of access actually used.
 
-BEGIN {
-   @AnyDBM_File::ISA = qw/GDBM_File DB_File NDBM_File SDBM_File ODBM_File/;
-}
+BEGIN { @AnyDBM_File::ISA = qw/DB_File GDBM_File NDBM_File SDBM_File/ }
 use AnyDBM_File;
 my $Dbmtype = $AnyDBM_File::ISA[0];
 
@@ -597,6 +595,7 @@ sub put {
       return 0;
    }
    else {
+      (tied %$rlocate)->sync() if ($Dbmtype eq 'DB_File');
       return 1;
    }
 
