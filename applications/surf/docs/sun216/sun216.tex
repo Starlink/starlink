@@ -14,7 +14,7 @@
 %     Tim Jenness (JACH)
 %
 %  Copyright:
-%     Copyright (C) 1997,1998,1999 Particle Physics and Astronomy
+%     Copyright (C) 1997,1998,1999,2000,2000,2003 Particle Physics and Astronomy
 %     Research Council. All Rights Reserved.
 %
 %  History:
@@ -26,6 +26,12 @@
 %        Add GUARD parameter to REBIN derivatives 
 %     1999 November (TIMJ)
 %        Add SCUBA2MEM. Update for V1.5
+%     2000 July 10 (TIMJ)
+%        Release V1.6: SCUOVER is now AST aware. Add citation recommendation.
+%        Add SCUCLKERR and SCUSETENV.
+%     2003 Apr 03 (TIMJ)
+%        Tweaks for 1.6-11 release. Update references and recommended
+%        citations. Remove statement about SURF being in constant development.
 %     {Add further history here}
 %
 % -
@@ -42,10 +48,10 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {216.7}
+\newcommand{\stardocnumber}    {216.8}
 \newcommand{\stardocauthors}   {T. Jenness, J.~F. Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {6 July 2000}
+\newcommand{\stardocdate}      {3 April 2003}
 \newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
 \newcommand{\stardocversion}   {1.6}
 \newcommand{\stardocmanual}    {User's manual}
@@ -2286,7 +2292,8 @@ integrations can be turned off (using \chgqual\ and SCUBA sections -- \rebin\
 can be used to test a section before committing the change), different sky
 bolometers chosen or new pointing corrections added. Once complete the data
 can be calibrated -- planet fluxes can be obtained using the \textsc{Fluxes}
-package and work is progressing on a list of secondary calibrators.
+package and work is progressing on a list of secondary calibrators
+(see e.g. \cite{SECCAL}).
 
 
 \subsubsection{Rebinning multiple datasets}
@@ -3002,7 +3009,25 @@ Jenness~T., Lightfoot~J.F., 2000, Starlink User Note 216, Starlink
 Project, CLRC
 \end{quote}
 
-The recommended reference for the sky removal algorithm is:
+although an alternative \textit{more recognizable} reference to SCUBA data processing
+can be found at:
+
+\begin{quote}
+Jenness~T., Lightfoot~J.F., 1998, ``\textit{Reducing SCUBA Data at the James
+  Clerk Maxwell Telescope}'', in
+\textit{Astronomical Data Analysis Software and Systems VII}, ASP Conf. Ser.,
+\textbf{145}, 216
+\end{quote}
+
+The recommended reference for the sky removal algorithm is now:
+
+\begin{quote}
+Archibald~E.N., Jenness~T., Holland~W.S., Coulson~I.M., Jessop~N.E.,
+Stevens~J.A., Robson~E.I., Tilanus~R.P.J., Duncan~W.D., Lightfoot~J.F., 2002,
+\textit{MNRAS}, \textbf{336}, 1 
+\end{quote}
+
+and this supercedes the original paper:
 
 \begin{quote}
 Jenness~T., Lightfoot~J.~F., Holland~W.~S., 1998, 
@@ -3017,8 +3042,8 @@ as implemented in SURF is:
 \begin{quote}
 Jenness~T., Holland~W.~S., Chapin~E., Lightfoot~J.F., Duncan~W.~D., 2000,
 \textit{``Dual-beam rastering and deconvolution techniques for SCUBA''}, in
-\textit{Astronomical Data Analysis Software and Systems X}, ASP Conf. Ser., in
-press.
+\textit{Astronomical Data Analysis Software and Systems X}, ASP Conf. Ser.,
+\textbf{216}, 559
 \end{quote}
 
 The recommended reference for the ORAC-DR SCUBA data reduction pipeline is:
@@ -3032,10 +3057,11 @@ Systems VIII}, ASP Conf.\ Ser., \textbf{172}, 171
 
 \section{\xlabel{future}Future Work\label{future}}
 
-The \scusoft\ software is in constant development at the
-Joint Astronomy Centre. New features are added regularly and new releases
-will be announced on the JCMT software web pages and through Starlink.
-Upgrades currently on the work list are:
+The \scusoft\ software is now in maintenance mode at the Joint Astronomy
+Centre. Bugs are fixed but new features are only added if there is a strong
+demand. New releases will be announced on the JCMT software web pages and
+through Starlink.  Upgrades currently on the work list but which may not be
+completed due to other developments at the JAC are:
 
 \begin{itemize}
 
@@ -3053,6 +3079,60 @@ in SSN/72 \cite{ssn72}.
 
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
+
+\subsection{Changes in Version 1.6-11}
+
+\begin{itemize}
+\item Now includes a new version of the \scunoise\ application.
+\item  A small error was found and fixed in the equation used by
+  \remip. Essentially the flux at all waveplate angles should have been
+  reduced by a further small (constant) fraction determined by the
+  level of instrumental polarization at the observing wavelength. The
+  net result is that source polarizations will have been very slightly
+  underestimated. For example, a source polarization of 1.00\% at 850
+  microns should in fact have been 1.01\% and a source polarization of
+  1.00\% at 450 microns should have been 1.03\%. This effect is smaller
+  than measurement errors unless the source polarization exceeds $\approx$
+  10\%.
+\item A bug was fixed to allow 256 maps to be coadded in \rebin. (previously
+  the limit was 256 but another limit was reached after 173 maps).
+
+\end{itemize}
+
+\subsection{Changes in Version 1.6-10}
+
+\begin{itemize}
+\item Fix problem in \bolrebin\ on linux (unintialized pointer).
+\item Fix \remip\ problem with aborted polarimeter observations.
+\end{itemize}
+
+\subsection{Changes in Version 1.6-9}
+
+\begin{itemize}
+\item Fix more problems with \scubamem\ when using SC (EKH) scanning.
+\item Correctly rebin photometry observations taken with AZ jiggling.
+    [previously AZ offsets were simply ignored unless pointing
+     corrections were being applied].
+\end{itemize}
+
+\subsection{Changes in Version 1.6-8}
+
+\begin{itemize}
+\item New version of the mapping cookbook (\xref{SC/11}{sc11}{}) now includes
+  scan mapping.
+\item Update \remdbm\ to support \Kappa\ V0.18.
+\item Use \xref{KAPLIBS}{sun238}{} rather than private copies of \Kappa\ routines.
+\end{itemize}
+
+\subsection{Changes in Version 1.6-7}
+
+This is a bug fix release ov V1.6:
+
+\begin{itemize}
+\item Add support for raster skydips.
+\item Minor fixes for \scubamem\ with EKH scanning.
+\item Don't calculate clock correction when using AZ.
+\end{itemize}
 
 \subsection{Changes in Version 1.6}
 
@@ -3517,7 +3597,8 @@ vapour present in the atmosphere. For a tau, $\tau$ at a given airmass, $A$,
 the attenuation due to the atmosphere is given as e$^{-A \tau}$. Note that tau
 is wavelength dependent and that the value quoted by the 
 \htmladdnormallink{Caltech Submillimetre Observatory}{http://www.cco.caltech.edu/\~{}cso/} (CSO) is the $\tau$ at 225~GHz and will therefore be different at
-the other wavelengths used by SCUBA (see e.g.\ \cite{SR94} for details on the
+the other wavelengths used by SCUBA (see \cite{ENA} for details of the
+variation with SCUBA filters; or \cite{SR94} for details on the
 variation seen with UKT14).
 
 \end{description}
@@ -3605,8 +3686,8 @@ Rees~P.~C.~T., Chipperfield~A.~J., 1995, {\it MERS (MSG and ERR) -- Message
 and Error Reporting Systems}, \xref{Starlink User Note 104}{sun104}{}
 
 \bibitem{WCS}
-Greisen~E.~W., Calabretta~M., 1996, {\it Representations of celestial
-coordinates in FITS}, {\it A\&A}, in prep.
+Greisen~E.~W., Calabretta~M., 2002, {\it Representations of celestial
+coordinates in FITS}, {\it A\&A}, \textbf{395}, 1077 
 
 \bibitem{ast}
 Warren-Smith~R.~F., Berry~D.~S., 1998, \textit{AST -- A Library for Handling
@@ -3625,6 +3706,11 @@ Terrett~D.~L., 1993, {\it PSMERGE -- Encapsulated Postscript handling utility},
 Berry~D.~S., Gong~W., Parsons~D.~C., 1995, {\it IRAS90 --- IRAS Survey and PO
 Data Analysis Package -- Reference Guide}, \xref{Starlink User Note
 163}{sun163}{} 
+
+\bibitem{SECCAL}
+Jenness~T., Stevens~J.A., Archibald~E.N., Economou~F., Jessop~N.E.,
+Robson~E.I., \textit{MNRAS}, \textbf{336}, 14
+
 
 \bibitem{figaro}
 Shortridge~K., Meyerdierks~H.~M., Currie~M.~J., Clayton~M., 
@@ -3655,6 +3741,12 @@ Berry~D.~S., Gledhill~T.~M., 1999,
 \bibitem{ssn72}
 Jenness~T., Lightfoot~J.~F., 1999, {\it The SURF Programming Interface},
 \xref{Starlink System Note 72}{ssn72}{}
+
+\bibitem{ENA}
+Archibald~E.N., Jenness~T., Holland~W.S., Coulson~I.M., Jessop~N.E.,
+Stevens~J.A., Robson~E.I., Tilanus~R.P.J., Duncan~W.D., Lightfoot~J.F., 2002,
+\textit{MNRAS}, \textbf{336}, 1 
+
 
 \bibitem{SR94}
 Stevens~J.~A.,  Robson~E.~I.,  1994, {\it  MNRAS}, {\bf 270}, L75
@@ -4359,7 +4451,7 @@ The \scusoft\ routines are described in the following pages:
       \sstexamplesubsection{
          bolrebin noloop ref=test.bat
       }{
-	Rebin each bolometer using the data specified in the file test.bat.
+        Rebin each bolometer using the data specified in the file test.bat.
       }
    }
    \sstnotes{
@@ -5155,29 +5247,29 @@ Astrometry information is stored in the WCS component and not
         be prompted. Default is FALSE.
       }
       \sstsubsection{
-	 DEVICE = DEVICE (Read)
+         DEVICE = DEVICE (Read)
       }{
-	The device on which to display the binned data. Can be null (!)
+        The device on which to display the binned data. Can be null (!)
       }
       \sstsubsection{
-	 DMODE = CHAR (Given)
+         DMODE = CHAR (Given)
       }{
-	For display purposes the points in each cell are plotted
-	sequentially on a 1-dimensional plot. This parameter governs
-	the way in which the cells are extracted from the grid.
-	Allowed values are:
+        For display purposes the points in each cell are plotted
+        sequentially on a 1-dimensional plot. This parameter governs
+        the way in which the cells are extracted from the grid.
+        Allowed values are:
 
-	\begin{itemize}
-	\item SPIRAL: A Spiral outwards from the reference pixel
-	\item XLINEAR: unfold each X strip in turn for each Y    
-	\item YLINEAR:  unfold each Y strip in turn for each X    
-	\item DIAG1:    diagonal strips starting at position (1,1)
-	\item DIAG2:   diagonal strips starting at positions (nx,1)
-	\end{itemize}
+        \begin{itemize}
+        \item SPIRAL: A Spiral outwards from the reference pixel
+        \item XLINEAR: unfold each X strip in turn for each Y    
+        \item YLINEAR:  unfold each Y strip in turn for each X    
+        \item DIAG1:    diagonal strips starting at position (1,1)
+        \item DIAG2:   diagonal strips starting at positions (nx,1)
+        \end{itemize}
 
         This parameter is also required if SMODE is not equal to
-	'NONE' since the smoothing depends on the order that the points
-	are extracted from the grid.
+        'NONE' since the smoothing depends on the order that the points
+        are extracted from the grid.
       }
       \sstsubsection{
          IN = CHAR (Read)
@@ -5198,19 +5290,19 @@ Astrometry information is stored in the WCS component and not
       }{
          Message filter level. Allowed values are QUIET, NORM and VERB.
          Default is NORM. In VERBOSE mode the positions 
-	 of detected spikes are listed.
+         of detected spikes are listed.
       }
       \sstsubsection{
-	 NSIGMA = REAL (Read)
+         NSIGMA = REAL (Read)
       }{
          The sigma clipping level used for despiking each cell.
       }
       \sstsubsection{
-	 SMODE = CHAR (Given)
+         SMODE = CHAR (Given)
       }{
- 	This parameter controls the mode used for smoothing of the clipping
-	envelope. If smoothing is selected, the extraction mode (DMODE) is used
-	to determine the pixels that are adjacent to each other.
+        This parameter controls the mode used for smoothing of the clipping
+        envelope. If smoothing is selected, the extraction mode (DMODE) is used
+        to determine the pixels that are adjacent to each other.
 
         Allowed modes are:
 
@@ -5284,15 +5376,15 @@ Astrometry information is stored in the WCS component and not
       \sstsubsection{
          XRANGE = INTEGER (Read)
       }{
-	 The X-range of the plot. This parameter loops indefinitely until
-	 a null response is provided (!).
+         The X-range of the plot. This parameter loops indefinitely until
+         a null response is provided (!).
       }
    }
    \sstexamples{
       \sstexamplesubsection{
          despike out\_coords=RJ smode=none device=! 
       }{
-	Despike the maps by placing points onto an RJ grid.
+        Despike the maps by placing points onto an RJ grid.
         Do not plot the data points before despiking and do not smooth
         the clipping envelope.
         You will be asked for input datasets until a null
@@ -5301,14 +5393,14 @@ Astrometry information is stored in the WCS component and not
       \sstexamplesubsection{
          despike device=! out\_coords=RB smode=hann dmode=sp nsigma=4.0
       }{
-	Despike on a RB grid with hanning smoothing. Use a 4.0 sigma clip 
-	and do not display. Note that the smoothing uses the spiral mode
-	for grid unwinding.
+        Despike on a RB grid with hanning smoothing. Use a 4.0 sigma clip 
+        and do not display. Note that the smoothing uses the spiral mode
+        for grid unwinding.
       }
       \sstexamplesubsection{
-	despike device=xwindows dmode=x nsigma=3.0
+        despike device=xwindows dmode=x nsigma=3.0
       }{
-	Unwind with XLINEAR mode and display the data before despiking.
+        Unwind with XLINEAR mode and display the data before despiking.
       }
       \sstexamplesubsection{
          despike noloop accept ref=test.bat
@@ -5379,10 +5471,10 @@ Astrometry information is stored in the WCS component and not
       First, for each bolometer used a pass is made through each
       scan calculating for each point:-
 
-	\[
+        \[
         \mathrm{diff}(i) = \mathrm{point}(i) - 
-	     \frac{\mathrm{point}(i-1) + \mathrm{point}(i+1)}{2.0}
-	\]
+             \frac{\mathrm{point}(i-1) + \mathrm{point}(i+1)}{2.0}
+        \]
 
       Values of `diff()' for the first and last points in the scan
       are calculated in a similar way but subtracting the mean of points 2 and
@@ -5505,7 +5597,7 @@ Astrometry information is stored in the WCS component and not
       The menu consists of:
 
 \begin{center}
-\begin{tabular}{ll}	
+\begin{tabular}{ll}     
 \        [M. H]                & Redisplay menu\\   
 \        [Q]                   &Quit\\
 \        [N]                   &Next bolometer\\
@@ -5646,8 +5738,8 @@ proceeding.
          FIRST\_TAU = REAL (Read)
       }{
          The zenith sky opacity before the observation. The default value
-	 is the zenith tau value accepted by the on-line system before the
-	 observation.
+         is the zenith tau value accepted by the on-line system before the
+         observation.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -5672,7 +5764,7 @@ proceeding.
       }{
          The local sidereal time at which SECOND\_TAU was
          the zenith sky opacity, in hh mm ss.ss format. The default value
-	 is that of FIRST\_LST (usually the case for a constant tau).
+         is that of FIRST\_LST (usually the case for a constant tau).
          If this value is less than FIRST\_LST it is assumed you
          are referring to the following day.
       }
@@ -5680,7 +5772,7 @@ proceeding.
          SECOND\_TAU = REAL (Read)
       }{
          The zenith sky opacity after the observation. The default value is
- 	 that of FIRST\_TAU.
+         that of FIRST\_TAU.
       }
       \sstsubsection{
          SUB\_INSTRUMENT = CHAR (Read)
@@ -6265,7 +6357,7 @@ proceeding.
       \sstexamplesubsection{
          intrebin noloop ref=test.bat
       }{
-	Rebin each integration using the data specified in the file test.bat.
+        Rebin each integration using the data specified in the file test.bat.
       }
    }
    \sstnotes{
@@ -6779,7 +6871,7 @@ Astrometry information is stored in the WCS component and not
       The menu items are:
 
 \begin{center}
-\begin{tabular}{ll}	
+\begin{tabular}{ll}     
 \        [M. H]                & Redisplay menu\\   
 \        [Q]                   &Quit\\
 \        [N]                   &Next bolometer\\
@@ -7729,7 +7821,7 @@ can be the number of the observation rather than the full filename.
       This task calculates and removes the instrumental polarisation
       signal from SCUBA polarimeter data.
 
-      For a percentage instrumental polarisation $P_I(e)$ at angle $\theta(e)$
+      For a fractional instrumental polarisation $P_I(e)$ at angle $\theta(e)$
       and elevation $e$ (the instrumental polarisation is elevation dependent) 
       the correction to the measured flux at waveplate angle $W$ is:
 
@@ -7743,9 +7835,10 @@ can be the number of the observation rather than the full filename.
       polarisation that is valid for IPs of a few percent:
 
       \begin{equation}
-          S_{Actual} \approx \frac{S_{Measured}}{1 + P_I(e) \cos(4W - 2\theta(e))}
+          S_{Actual} \approx S_{Measured} * (1 - P_I(e) (1 + \cos(4W -
+          2\theta(e) ) ) )
       \end{equation}
-
+      where we have made the approximation that $S_{Mean} \approx S_{Measured}$.
    }
    \sstusage{
       remip in ipfile out
@@ -7836,10 +7929,10 @@ can be the number of the observation rather than the full filename.
    }
    \sstparameters{
       \sstsubsection{
-	 ADD = LOGICAL (Read)
+         ADD = LOGICAL (Read)
       }{
-	 This parameter governs whether the average value removed
-	 from the data should be added back after sky removal.
+         This parameter governs whether the average value removed
+         from the data should be added back after sky removal.
          The default is
         for ADD to be true for MAPs and false for other modes (the assumption
         being that sky bolometers in PHOTOM observations are guaranteed to
@@ -7930,8 +8023,8 @@ would leave you with bolometer H7.
       }{
          Message output level. Allowed values are QUIET, NORM and VERB.
          Default is NORM. In VERBOSE mode a list of 
-	 the selected bolometers is returned along with the value of the 
-	 sky offset removed for each jiggle.
+         the selected bolometers is returned along with the value of the 
+         sky offset removed for each jiggle.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -7952,12 +8045,12 @@ would leave you with bolometer H7.
      }{
         Use the median of all the bolometers for each jiggle and write the
         output to the default output file (e.g.\ o12\_lon\_sky).
-     }	
+     }  
      \sstexamplesubsection{
         remsky o25\_sho\_ext bolometers=[r5] mode=mean iter\_sigma=4
 $\backslash$
      }{
-	Use the outer ring of the short-wave array as the sky bolometers.
+        Use the outer ring of the short-wave array as the sky bolometers.
         Calculate the sky contribution by using a clipped mean of each jiggle and remove any points from the
         calculation of the mean that are more than 4 sigma from the mean.
         Write the output to the default output file.
@@ -7975,7 +8068,7 @@ $\backslash$
            throughout the observation without source rotation).
 
          \sstitem
-	  For weak sources (ie sources that are not obvious in a single
+          For weak sources (ie sources that are not obvious in a single
 integration) it is probably sufficient to choose BOLOMETERS=[all] and
 MODE=median.
  
@@ -8074,7 +8167,7 @@ MODE=median.
       The menu items are:
 
 \begin{center}
-\begin{tabular}{ll}	
+\begin{tabular}{ll}     
 \        [M. H]                & Redisplay menu\\   
 \        [Q]                   &Quit\\
 \        [N]                   &Next bolometer(s)\\
@@ -8140,12 +8233,12 @@ menu.
       \sstexamplesubsection{
          rlinplot -f o39\_lon\_ext -l 5
       }{
-  	Plot 5 bolometers at a time.
+        Plot 5 bolometers at a time.
       }
       \sstexamplesubsection{
          rlinplot -f o39\_lon\_ext 6 5 8 20
       }{
-  	Plot bolometers 5 6 8 and 20.
+        Plot bolometers 5 6 8 and 20.
       }
    }
    \sstnotes{
@@ -8567,7 +8660,7 @@ menu.
       \sstexamplesubsection{
          scucat outfile in=$^\wedge$input.lis noloop method=catall
       }{
-	 This will copy all the data contained in the files listed in
+         This will copy all the data contained in the files listed in
          \texttt{input.lis} and write it to a file called 
          \texttt{outfile.sdf}.
       }
@@ -9553,7 +9646,7 @@ menu.
          ANALYSIS = CHAR (Read)
       }{
          The method used to determine the peak for each integration.  
-  	 Either average or parabola.
+         Either average or parabola.
          Parabola is not recommended at this time. Alternatively, all the
          samples can be propagated without processing (`samples') -- 
          this will give the same result for the signal as `average' 
@@ -9593,7 +9686,7 @@ menu.
       \sstexamplesubsection{
          scuphot o56\_lon\_ext average o56\_lon\_pht !
       }{
-	Process o56\_lon\_ext by averaging integrations. Do not write
+        Process o56\_lon\_ext by averaging integrations. Do not write
         a text file containing the results.
       }
    }
@@ -9675,7 +9768,7 @@ menu.
       For each mode the menu items are a subset of:
 
 \begin{center}
-\begin{tabular}{ll}	
+\begin{tabular}{ll}     
 \        [M. H]                & Redisplay menu\\   
 \        [Q]                   &Quit\\
 \        [N]                   &Next bolometer\\
@@ -9971,7 +10064,7 @@ the files produced with SCUBA\_SUFFIX=long):
          Command line options can be abbreviated.
 
          \sstitem
-	 Skydip observations are recognised.
+         Skydip observations are recognised.
 
          \sstitem
          Options that take values can be used either as `$-$flag option' or
@@ -10159,7 +10252,7 @@ the files produced with SCUBA\_SUFFIX=long):
          The name of the skydip data file, or, if SCUBA\_PREFIX is set,
          the number of the observation (raw demodulated data only).
          The input data file can be the output from \resw\ or the 
-	 raw skydip data.
+         raw skydip data.
          Can be located in \$DATADIR. The filename
          will be requested if not specified on the command line. %%%$%%%
 
@@ -10381,7 +10474,7 @@ the files produced with SCUBA\_SUFFIX=long):
          The name of the skydip data file, or, if SCUBA\_PREFIX is set,
          the number of the observation (raw demodulated data only).
          The input data file can be the output from \resw\ or the 
-	 raw skydip data. The file can be located in \$DATADIR.   %%%%$
+         raw skydip data. The file can be located in \$DATADIR.   %%%%$
       }
       \sstsubsection{
          B\_ERR = REAL (Write)
@@ -10392,7 +10485,7 @@ the files produced with SCUBA\_SUFFIX=long):
          B\_FIT = REAL (Write)
       }{
          The fitted value of the B parameter (Filter transmission).
-	 Set to bad if the fit has failed.
+         Set to bad if the fit has failed.
       }
       \sstsubsection{
          B\_VAL = REAL (Read)
@@ -11206,20 +11299,20 @@ the bin order used by the plotting task becomes 28, 20, 21, 29, 37, 36, 35,
 27 etc. This means that data from the centre of the array is displayed before
 the (sparse) data at the edges of the array.
 
-	\item XLINEAR: unfold each X strip in turn for each Y. In this case
+        \item XLINEAR: unfold each X strip in turn for each Y. In this case
 the bin order becomes 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, etc. A source in
 the centre of the array will be displayed in the middle of the default range
 provided. 
 
-	\item YLINEAR:  unfold each Y strip in turn for each X. In this case
+        \item YLINEAR:  unfold each Y strip in turn for each X. In this case
 the bin order becomes 1, 9, 17, 25, 33, 41, 49, 2, 10 etc.    
 
-	\item DIAG1:    diagonal strips starting at position (1,1). The bin
+        \item DIAG1:    diagonal strips starting at position (1,1). The bin
 order in the example becomes 1, 2, 9, 3, 10, 17, 4, 11, 18, 25, 5 etc.
 
-	\item DIAG2:   diagonal strips starting at positions (nx,1). The bin 
+        \item DIAG2:   diagonal strips starting at positions (nx,1). The bin 
 order in the example becomes 8, 7, 16, 6, 15, 24, 5, etc.
-	
+        
 \end{itemize}
 
 In general this means that in the case where the source lies in the centre of
