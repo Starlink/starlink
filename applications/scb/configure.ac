@@ -27,14 +27,36 @@ dnl    it by hand. SCB also prefers byacc on Cygwin.
 AC_PATH_PROGS(YACC, [byacc yacc])
 
 dnl    Locate lex, and customise it to use a local skel flag if it's flex.
-dnl    If not, audibly deprecate for distribution, since lex-generated
-dnl    C may not be portable.
+dnl    Check that we can in fact use the local skel file (this doesn't
+dnl    work with versions of flex much after 2.5.4), and fall back to
+dnl    plain "flex" if not.  This will cause a slight decrease in scb's
+dnl    performance.
+dnl
+dnl    If flex is not available, and we have to use plain lex instead,
+dnl    warn against distributing any generates source code, since
+dnl    lex-generated C may not be portable.
 AM_PROG_LEX
 if test $LEX = "flex"
 then
-   LEX="$LEX -Sflex.skl"
+   for cmd in "$LEX -Sflex.skl" "$LEX" lex FAIL
+   do
+      echo "%%" | $cmd >/dev/null 2>/dev/null && break
+   done
+   rm -f lex.yy.c
+   if test "$cmd" = FAIL
+   then
+      AC_MSG_ERROR([Unable to run lex ($LEX)])
+   else
+      LEX=$cmd
+   fi
+fi
+dnl Did we start, or have we ended up, with a non-flex lexer?
+if expr "$LEX" : flex >/dev/null
+then
+   : OK
 else
-   AC_MSG_WARN([Do NOT distribute source code created by the "$LEX$" command.])
+   AC_MSG_WARN([lex command is: $LEX])
+   AC_MSG_WARN([Do NOT distribute source code created by this command.])
    AC_MSG_WARN([Only code produced by the flex command is recommended])
    AC_MSG_WARN([for distribution.])
 fi
