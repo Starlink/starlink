@@ -183,6 +183,8 @@
 *        ADI port
 *     17 Apr 1996 V2.0-1 (DJA):
 *        New minimisation control
+*     13 May 1996 V2.0-2 (DJA):
+*        Ensure tieing takes place for MAX=0
 *     {enter_changes_here}
 
 *  Bugs:
@@ -212,7 +214,7 @@
 	PARAMETER 		( OPCHAN = 6 )		! messages ( <1 for no messages)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SFIT Version V2.0-1' )
+        PARAMETER		( VERSION = 'SFIT Version V2.0-2' )
 
 *  Local Variables:
       RECORD /DATASET/    	OBDAT(NDSMAX)		! Observed datasets
@@ -320,6 +322,7 @@
       IF ( NITMAX .EQ. 0 ) THEN
 
 *    Evaluate the statistic
+        CALL FIT_APPTIE( MODEL, .FALSE, PARAM, LB, UB, STATUS )
         CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARAM, FSTAT,
      :                    FIT_PREDDAT, PREDDAT, STAT, STATUS )
 

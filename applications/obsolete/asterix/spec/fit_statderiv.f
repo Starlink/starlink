@@ -35,7 +35,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -82,15 +81,15 @@
       INTEGER             J			! Parameter index
 *-
 
-*    Status check
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialisation
+*  Initialisation
       DO J = 1, NPAR
 	PARCAL(J) = PARAM(J)
       END DO
 
-*    Check that derivative can be calculated - else error condition
+*  Check that derivative can be calculated - else error condition
       IF ( (DELTAP.LE.0.0) .OR. (LB(PARNO).GE.UB(PARNO)) )THEN
 	STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Unable to calculate statistic derivative',
@@ -98,7 +97,7 @@
 	GOTO 9000
       END IF
 
-*    Ensure param increments don't cross bounds
+*  Ensure param increments don't cross bounds
       IF ( PARAM(PARNO)+DELTAP .LE. UB(PARNO) ) THEN
 	DPUP = DELTAP
       ELSE
@@ -110,25 +109,25 @@
 	DPDOWN = PARAM(PARNO)-LB(PARNO)
       END IF
 
-*    Calculate statistic at +ve and -ve deviates in parameter PARNO
+*  Calculate statistic at +ve and -ve deviates in parameter PARNO
       PARCAL(PARNO) = PARAM(PARNO) + DPUP
       IF ( MODEL.NTIE .GT. 0 ) THEN
-        CALL FIT_APPTIE( PARCAL, .FALSE., PARCAL, LB, UB, STATUS )
+        CALL FIT_APPTIE( MODEL, .FALSE., PARCAL, LB, UB, STATUS )
       END IF
       CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARCAL, FSTAT, PREDICTOR,
      :                                         PREDDAT, STATUP, STATUS )
       PARCAL(PARNO) = PARAM(PARNO) - DPDOWN
       IF ( MODEL.NTIE .GT. 0 ) THEN
-        CALL FIT_APPTIE( PARCAL, .FALSE., PARCAL, LB, UB, STATUS )
+        CALL FIT_APPTIE( MODEL, .FALSE., PARCAL, LB, UB, STATUS )
       END IF
       CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARCAL, FSTAT, PREDICTOR,
      :                                       PREDDAT, STATDOWN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
-*    Form difference approximation to derivative
+*  Form difference approximation to derivative
       DERIV = (STATUP-STATDOWN)/(DBLE(DPUP)+DBLE(DPDOWN))
 
-*    Exit
+*  Exit
  9000 IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_STATDERIV', STATUS )
       END IF
