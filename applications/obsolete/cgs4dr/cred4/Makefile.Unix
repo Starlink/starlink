@@ -14,8 +14,8 @@ OBJS	= $(strip $(patsubst ../%.f,    %.o, $(SRCS.f)))
 PROD  = cred4
 PROD += $(patsubst ../%.ifl, %.ifc, $(wildcard ../*.ifl))
 
-# Things defined by the PROCS macro are installed in $(INSTALL_PROC)
-PROCS = $(patsubst ../%, %, $(wildcard ../*.icl))
+# Things defined by the SCRIPTS macro are installed in $(INSTALL_PROC)
+SCRIPTS = $(patsubst ../%, %, $(wildcard ../*.icl))
 
 # This defines the objects to include in any library that is built.
 # By default, the library isn't installed. To install it you must
@@ -30,4 +30,5 @@ cred4: cred4.o libcred4.a
           -ldsa -lfig -lpar -lich -ldta -lgen \
           -L$(STAR_LIB) `psx_link_adam` `nbs_link_adam` \
           `fio_link_adam` `prm_link_adam` `cnf_link_adam` $(LDFLAGS)
+	$(STRIP) $@
 

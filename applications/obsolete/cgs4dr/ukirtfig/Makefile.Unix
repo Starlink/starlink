@@ -14,8 +14,8 @@ OBJS	= $(strip $(patsubst ../%.f,    %.o, $(SRCS.f)))
 PROD  = ukirtfig datasort
 PROD += $(patsubst ../%.ifl, %.ifc, $(wildcard ../*.ifl))
 
-# Things defined by the PROCS macro are installed in $(INSTALL_PROC)
-PROCS = $(patsubst ../%, %, $(wildcard ../*.icl))
+# Things defined by the SCRIPTS macro are installed in $(INSTALL_PROC)
+SCRIPTS = $(patsubst ../%, %, $(wildcard ../*.icl))
 
 # This defines the objects to include in any library that is built.
 # By default, the library isn't installed. To install it you must
@@ -28,9 +28,11 @@ include $(APPLIC_TOP)/config/RULES.Build
 ukirtfig: ukirtfig.o libukirtfig.a
 	$(ALINK) ukirtfig.o -o $@ libukirtfig.a \
           -L$(FIG_LIB) -lfig -ldsa -lpar -ldta -lich -lgen -ljty \
-          -L$(STAR_LIB) `prm_link_adam` `sla_link_adam` `fio_link_adam` $(LDFLAGS)
+          -L$(STAR_LIB) `prm_link_adam` `sla_link_adam` `fio_link_adam` $(LDFLAGS)	
+	$(STRIP) $@
 
 datasort: datasort.o
 	$(FC) $(FFLAGS) $? -o datasort
+	$(STRIP) datasort
 
 
