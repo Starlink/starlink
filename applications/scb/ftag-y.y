@@ -502,16 +502,16 @@ token_brac
       strcpy( string, name );
 
 /* Overwrite the bare vname at the end with the tag. */
-      sprintf( string + (int) (vname - name), "<a %s=\"%s_\">%s</a>",
+      sprintf( string + (int) (vname - name), "<a %s='%s_'>%s</a>",
                attrib, rname, vname );
 
 /* If it's a generic function, add all the tags for the specific ones. */
       if ( genpos != NULL ) {
          l = strlen( string );
          for ( i = 0; *( gencode[ i ] ) != '\0'; i++ ) {
-            sprintf( string + l, "<a name=\"%s", rname );
+            sprintf( string + l, "<a name='%s", rname );
             l += ( genpos - rname ) + 9;
-            sprintf( string + l, "%s%s_\"></a>", gencode[ i ], genpos + 9 );
+            sprintf( string + l, "%s%s_'></a>", gencode[ i ], genpos + 9 );
             l += strlen( genpos ) - 9 + strlen( gencode[ i ] ) + 7;
          }
       }
@@ -545,7 +545,7 @@ token_brac
 */
 
 /* Local variables. */
-      char *string, *rname;
+      char *string, *rname, *rns;
       int leng, nleng, i;
 
 /* Get the stripped value of the name. */
@@ -561,9 +561,14 @@ token_brac
       string[ i ] = '\0';
 
 /* Write start tag, contents and the remainder. */
-      sprintf( string + i, "<a %s=\"INCLUDE-%s\">%s", attrib, rname, name + i );
+      sprintf( string + i, "<a %s='INCLUDE-%s'>%s", attrib, rname, name + i );
+      rns = string + i + strlen( attrib ) + 5;
       i += strcspn( name + i, "'" );
       sprintf( string + leng - strlen( name ) - 5 + i, "</a>%s", name + i );
+
+/* Uppercase the attribute value. */
+      for ( ; *rns != '>'; rns++ )
+         *rns = toupper( *rns );
 
 /* Return. */
       return( string );
@@ -596,7 +601,7 @@ token_brac
          "read", "write", "backspace", "close", "open", "endfile", "format", 
          "inquire", "while", "print", "return",
          "int", "ifix", "idint", "real", "float", "sngl", 
-         "dble", "cmplx", "ichar", "", "char", "aint", "dint", "anint", 
+         "dble", "cmplx", "ichar", "char", "aint", "dint", "anint", 
          "dnint", "nint", "idnint", "abs", "iabs", "dabs", "cabs", "mod", 
          "amod", "dmod", "sign", "isign", "dsign", "dim", "idim", "ddim",
          "dprod", "max", "max0", "amax1", "dmax1", "amax0", "max1", "min",

@@ -70,9 +70,9 @@ IDENT			{L}({L}|{D})*
 
 %%
 
-^#include{S}\"			{ include(); }
-^#define{S}/{IDENT}{S}\(	{ define(); }
-^#				{ cpp(); }
+^#[ \t]*include[ \t]*\"			{ include(); }
+^#[ \t]*define[ \t]*/{IDENT}{S}\(	{ define(); }
+^#					{ cpp(); }
 
 "/*"				{ comment(); }
 "//"				{ cpluspluscomm(); }
@@ -343,7 +343,7 @@ extern int yyleng;
       sappend( yytext );
 
 /* Add start of tag. */
-      sappend( "<a name='INCLUDE-" );
+      sappend( "<a href='INCLUDE-" );
 
 /* Add the name of the included file to attribute value. */
       p1 = preleng;
