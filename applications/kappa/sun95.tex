@@ -270,12 +270,12 @@
 \newcommand{\EXTRACTORref}{\xref{{\footnotesize EXTRACTOR}}{sun226}{}}
 \newcommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
 \newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
-\newcommand{\FITSref}{\htmladdnormallink{FITS}{http://www.gsfc.nasa.gov/astro/fits/fits\_{}home.html}}
+\newcommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
 \newcommand{\GAIA}{{\footnotesize GAIA}\normalsize}
 \newcommand{\GAIAref}{\xref{GAIA}{sun214}{}}
 \newcommand{\GWM}{{\footnotesize GWM}\normalsize}
 \newcommand{\GWMref}{\xref{GWM}{sun130}{}}
-\newcommand{\HDSref}{\xref{HDS}{sun92}{}}
+\newcommand{\HDSref}{\xref{HDS}{sun92}{}~}
 \newcommand{\HDSTRACEref}{\xref{{\footnotesize HDSTRACE}}{sun102}{}}
 \newcommand{\ICL}{{\footnotesize ICL}\normalsize}
 \newcommand{\ICLref}{\xref{{\footnotesize ICL}}{sg5}{}}
@@ -287,7 +287,7 @@
 \newcommand{\KAPLIBS}{{\footnotesize KAPLIBS}\normalsize}
 \newcommand{\KAPPA}{{\footnotesize KAPPA}\normalsize}
 \newcommand{\KAPRHref}{\xref{{\footnotesize KAPRH}}{sun239}{}}
-\newcommand{\NDFref}[1]{\htmlref{#1}{ap:NDFformat}}
+\newcommand{\NDFref}[1]{\htmlref{#1}{ap:NDFformat}~}
 \newcommand{\NDFextref}[1]{\xref{#1}{sun33}{}}
 \newcommand{\NDFPACK}{{\footnotesize NDFPACK}\normalsize}
 \newcommand{\PDAref}{\xref{PDA}{sun194}{}}
@@ -934,7 +934,7 @@ packages use a common infrastructure library.
 
 An important part of the rationalisation is that applications are
 unified by sharing the same basic data structure---the
-\NDFref{NDF}~ (Extensible \textit{n}-dimensional Data Format).  This contains
+\NDFref{NDF} (Extensible \textit{n}-dimensional Data Format).  This contains
 an \textit{n}-dimensional data array that can store most astronomical data such
 as spectra, images and spectral-line data cubes.  The NDF may also
 contain information like a title, axis labels and units, error and
@@ -4881,7 +4881,7 @@ output data structures (the vast majority).
 
 \subsection{Looking at the Data Structures}
 
-You can look at a summary of an \NDFref{NDF}~ structure using the task
+You can look at a summary of an \NDFref{NDF} structure using the task
 \htmlref{NDFTRACE}{NDFTRACE}, and obtain the values of NDF extension
 components with the {\tt \htmlref{setext}{SETEXT} option=get} command.
 \HDSTRACEref\ \latexonly{(SUN/102)} can be used to look at array values and
@@ -9399,7 +9399,7 @@ outside some specified range.
 
 \subsection{\xlabel{se_qualitymask}Quality Masking\label{se:qualitymask}}
 
-All the \NDFref{NDF}~ tasks in \KAPPA\ use quality yet there is
+All the \NDFref{NDF} tasks in \KAPPA\ use quality yet there is
 no obvious sign in individual applications how particular values of
 \htmlref{quality}{se:masking} are selected.  What gives?  The meanings
 attached to the quality bits will inevitably be quite specific for
@@ -10007,7 +10007,7 @@ undefine {\tt KAPPA\_LOOP\_DISABLE}. In C-shell:
 \KAPPA\ utilises general data structures within an
 \HDSref\ container file, with file extension {\tt .sdf}.  Most of
 the examples in this documentation processing is performed on data in
-this \NDFref{NDF}~ format generated from within \KAPPA.
+this \NDFref{NDF} format generated from within \KAPPA.
 Generally, you will already have data in `foreign' formats, that is
 formats other than the Starlink standard, particularly in the
 \FITSref\ (Flexible Image Transport System),
@@ -11022,7 +11022,7 @@ the context of the error.
 The remainder of the section describes some difficulties you may encounter
 and how to overcome them.  Please suggest additions to this compilation.
 
-\subsection{No Match, Badly placed ( )'s}
+\subsection{No Match}
 
 When running \KAPPA\ from the UNIX shell, your command fails with a 
 ``No Match'' error message.   This means you have forgotten to protect
@@ -11034,19 +11034,8 @@ examples.
 
 \small
 \begin{verbatim}
-     $ ndftrace ccd\?_ff
-     $ stats \*118_"[b-d]?"
-\end{verbatim}
-\normalsize
-
-Likewise the ``badly placed ()'s means you have forgotten to escape the
-parentheses in an \htmlref{NDF section}{se:ndfsect} in the UNIX shell.
-The solution is the same.
-
-\small
-\begin{verbatim}
-     $ display comwest\(30:99,~80\)
-     $ linplot spectrum"(5087.0~30)"
+     % ndftrace ccd\?_ff
+     % stats \*118_"[b-d]?"
 \end{verbatim}
 \normalsize
 
@@ -11115,15 +11104,15 @@ accidentally try to access a huge amount of memory.  If you cannot
 accommodate your large datasets this way, you should fragment your
 data array, and process the pieces separately.
 
-After receiving this error message in an \ICLref\ session you may
+After receiving this error message in an \ICLref\normalsize session you may
 need to delete the scratch file by hand.  The file is called {\tt
 txxx.sdf}, where {\tt xxxx} is a process identifier.  A normal exit
-from \ICL\ will delete the work-space container file.
+from \ICL\normalsize will delete the work-space container file.
 
 \subsection{\xlabel{se_probwrongNDF}Application Automatically Picks up the
 Wrong NDF\label{se:probwrongNDF}}
 
-Some applications read the name of the \NDFref{NDF}~ used to create a plot or
+Some applications read the name of the \NDFref{NDF} used to create a plot or
 image from the graphics database in order to save typing.  Once in a
 while you'll say ``that's not the one I wanted''.  This is because 
 \AGIref\ finds the last {\tt DATA} picture situated within the current picture.
@@ -11178,14 +11167,17 @@ the whole NDF.
 
 \subsection{Badly placed ()'s}
 This means that you have forgotten to `escape' parentheses, probably when
-defining an NDF section.  Try inserting a backslash before each
-parenthesis.
+defining an \htmlref{NDF section}{se:ndfsect} in the UNIX shell.
+Try inserting a backslash before each parenthesis or enclosing all the
+special characters inside {\tt " "} quotes.
 
 \small
 \begin{verbatim}
      % stats myndf\(100:200,\)
+     % linplot spectrum"(5087.0~30)"
 \end{verbatim}
 \normalsize
+
 
 \subsection{Attempt to use 'positional' parameter value ({\tt{x}}) in an 
 unallocated position}
@@ -11385,11 +11377,11 @@ traces the {\tt GLOBALS} file, the application you were running when the
 weird error occurred (here \htmlref{ARDMASK}{ARDMASK}), and the
 graphics database for machine {\tt cacvad}.  Once you have identified
 the problem file, delete it.  If that proves to be the globals file,
-you might want to retain the output from \HDSTRACEref , so that you can
+you might want to retain the output from \HDSTRACEref\normalsize, so that you can
 restore their former values.  Deleting the graphics database is
 something you should do regularly, so that's not a problem.
 
-If you have been running \KAPPA\ from \ICLref , you will need
+If you have been running \KAPPA\ from \ICLref\normalsize, you will need
 to check of the integrity of the monolith parameter file, instead
 the individual parameter file.  It will be one of these depending
 on the type of task that failed: graphics, NDF components, or
@@ -11442,7 +11434,7 @@ Here is a worked example.  Suppose that you have
 \htmlref{\_REAL}{ap:HDStypes}-type datasets for which you want to
 compute statistics including the skewness and kurtosis.  One way is to
 modify STATS.  First to save typing define environment variables, say
-{\tt STAR} and {\tt KAPPA} and{\tt KAPLIBS} to point to where the
+{\tt STAR} and {\tt KAPPA} and {\tt KAPLIBS} to point to where the
 Starlink software, \KAPPA\ and \KAPLIBS\  source is stored.  Next
 we extract the source files to change.
 
@@ -11618,7 +11610,7 @@ code (which eventually became included in \KAPPA\ after
 reworking).  Mark Taylor and Rodney Warren-Smith both re-wrote some of the old 
 IMAGE applications to use the NDF\_ library. Rodney also supplied several other
 programmes, especially ones that now form the basis of \NDFPACK.  Other
-contributions have come from Alasdair Allen, Steven Beard,
+contributions have come from Alasdair Allan, Steven Beard,
 Wei Gong, Rhys Morris, Jo Murray, Grant Privett, and Richard Saxton.  The
 original \KAPPA\ was derived from Mark McCaughrean's
 {\footnotesize RAPI2D} and Ken Hartley's {\footnotesize ASPIC Kernel},
@@ -11652,13 +11644,13 @@ the UK Starlink Project: KAPPA,... Starlink is run by CCLRC on behalf of PPARC. 
 \end{htmlonly}
 
 \menuitem{ADD}{
- Adds two NDF data structures.}
+ Adds two \NDFref{NDF} data structures.}
 \menuitem{APERADD}{
  Derives statistics of pixels within a  specified aperture of an NDF.}
 \menuitem{ARDGEN}{
  Creates a text file describing selected regions of an image.}
 \menuitem{ARDMASK}{
- Uses an ARD file to set some pixels of an NDF to be bad.}
+ Uses an \ARDref ~file to set some pixels of an NDF to be bad.}
 \menuitem{ARDPLOT}{
  Plots the boundaries of regions described in an ARD file over an existing
 picture.}
@@ -11953,7 +11945,7 @@ picture.}
 \menuitem{SETAXIS}{
  Sets values for an axis array component within an NDF data structure.}
 \menuitem{SETBAD}{
- Sets new bad-pixel flag values for an NDF.}
+ Sets new \htmlref{bad-pixel flag}{apndf:quality} values for an NDF.}
 \menuitem{SETBB}{
  Sets a new value for the quality bad-bits mask of an NDF.}
 \menuitem{SETBOUND}{
@@ -12112,7 +12104,7 @@ functions as follows.
 \classitem{GDNAMES}
  Shows which graphics devices are available.
 \classitem{GDSET}
- Selects a current graphics device.
+ Selects a \htmlref{current graphics device}{se:devglobal}.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -12406,7 +12398,7 @@ functions as follows.
 \classitem{REMQUAL}
  Removes named qualities stored in an NDF Quality component.
 \classitem{SETBAD}
- Sets new bad-pixel flag values for an NDF.
+ Sets new \htmlref{bad-pixel flag}{apndf:quality} values for an NDF.
 \classitem{SETBB}
  Sets a new value for the quality bad-bits mask of an NDF.
 \classitem{SETBOUND}
@@ -12810,7 +12802,7 @@ default value.
    Adds two NDF data structures
 }{
    \sstdescription{
-      The routine adds two \NDFref{NDF}~ data structures pixel-by-pixel to produce
+      The routine adds two \NDFref{NDF} data structures pixel-by-pixel to produce
       a new NDF.
    }
    \sstusage{
@@ -12900,7 +12892,7 @@ KAPPA: \htmlref{CADD}{CADD},
 }{
    \sstdescription{
       This routine displays statistics for pixels that lie within a
-      specified aperture of an NDF.  The aperture can either be circular
+      specified aperture of an \NDFref{NDF}.  The aperture can either be circular
       (specified by parameters CENTRE and DIAM), or arbitrary (specified
       by parameter ARDFILE).  If the aperture is specified using parameters
       CENTRE and DIAM, then it must be either 1 or 2 dimensional.
@@ -12960,11 +12952,11 @@ KAPPA: \htmlref{CADD}{CADD},
          ({\tt{!}}) value is supplied then the aperture is assumed to be circular
          with centre and diameter given by parameters CENTRE and DIAM.  ARD
          files can be created either `by hand' using an editor, or using a
-         specialist application such as KAPPA:ARDGEN.
+         specialist application such as \htmlref{ARDGEN}{ARDGEN}.
 
          The co-ordinate system in which positions within the ARD file are
          given should be indicated by including suitable COFRAME or WCS
-         statements within the file (see SUN/183), but will default to
+         statements within the file (see \xref{SUN/183}{sun183}{}), but will default to
          pixel co-ordinates in the absence of any such statements.  For
          instance, starting the file with a line containing the text
          {\tt "COFRAME(SKY,System=FK5)"} would indicate that positions are
@@ -13122,7 +13114,7 @@ KAPPA: \htmlref{CADD}{CADD},
       ASCII-region-definition Descriptors:
    }{
       The ARD file may be created by ARDGEN or written manually.  In the
-      latter case consult \xref{SUN/183}{sun183}{} for full details of the ARD
+      latter case consult \xref{SUN/183}{sun183}{} ~for full details of the ARD
       descriptors and syntax; however, much may be learnt from looking
       at the ARD files created by ARDGEN and the ARDGEN documentation.
       There is also a \hyperref{summary with examples}{in Section~}{}{se:ardwork}.
@@ -13166,7 +13158,8 @@ KAPPA: \htmlref{STATS}{STATS},
       image using a cursor, and then storing a description of the
       selected regions in a text file in the form of an `ARD
       Description' (see \xref{SUN/183}{sun183}{}).  This text file may subsequently be
-      used in conjunction with packages such as CCDPACK or ESP.
+      used in conjunction with packages such as \CCDPACKref\normalsize ~or 
+      \ESPref\normalsize.
 
       The application initially obtains a value for the SHAPE parameter
       and then allows you to identify either one or many regions of the
@@ -13230,7 +13223,7 @@ KAPPA: \htmlref{STATS}{STATS},
          (see parameter OPTION).
       }
       \sstsubsection{
-         OPERATOR = LITERAL (Read)
+         OPERATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The operator to use when combining two regions into a single
          region.  The pixels included in the resulting region depend on
@@ -13353,8 +13346,9 @@ KAPPA: \htmlref{STATS}{STATS},
          when there is only one item.)  The numbers need not be in
          ascending order.
 
-         If you wish to delete or draw all the regions enter the wildcard $*$.
-         5-$*$ will delete or draw from 5 to the last region.
+         If you wish to delete or draw all the regions enter the
+         wildcard {\tt $*$}.  For instance, {\tt 5-$*$} will delete or draw
+         from 5 to the last region.
       }
       \sstsubsection{
          SHAPE = LITERAL (Read)
@@ -13432,7 +13426,7 @@ KAPPA: \htmlref{STATS}{STATS},
       }{
          This example allows you to create a text file ({\tt extract.txt})
          describing a single circular region of the image displayed on
-         the current graphics device.  The application immediately exits
+         the \htmlref{current graphics device}{se:devglobal}.  The application immediately exits
          after the region has been identified.  This example may be
          useful in scripts or command procedures since there is no
          prompting.
@@ -13522,7 +13516,7 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
    Uses an ARD file to set some pixels of an NDF to be bad
 }{
    \sstdescription{
-      This task allows regions of an \NDFref{NDF's} to be masked, so
+      This task allows regions of an \NDFref{NDF} to be masked, so
       that they can (for instance) be excluded from subsequent data
       processing.  ARD (ASCII Region Definition) descriptions
       (\xref{SUN/183}{sun183}{}) stored in
@@ -13727,7 +13721,8 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          ardplot bulge
       }{
          Draws an outline around all the regions included in the ardfile
-         named {\tt bulge}.  The outline is drawn on the current graphics device
+         named {\tt bulge}.  The outline is drawn on the
+         \htmlref{current graphics device}{se:devglobal}
          and is drawn in alignment with the previous picture.
       }
    }
@@ -13735,13 +13730,13 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
       \sstitemlist{
 
          \sstitem
-         A DATA picture must already exist on the selected graphics
+         A \htmlref{DATA picture}{se:agiaction} must already exist on the selected graphics
          device before running this command.  An error will be reported if no
          DATA picture can be found.
 
          \sstitem
-         The application stores a new DATA picture in the graphics
-         database.  On exit the current database picture for the chosen
+         The application stores a new DATA picture in the \htmlref{graphics
+         database}{se:agitate}.  On exit the current database picture for the chosen
          device reverts to the input picture.
       }
    }
@@ -13759,13 +13754,13 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
    Expands spaced axes in an NDF into the primitive form
 }{
    \sstdescription{
-      This application routine converts {\it in situ\/} an \NDFref{NDF's} axis centres
+      This application routine converts \emph{in situ} an \NDFref{NDF's} axis centres
       in the `spaced' form into `simple' form.  Applications using the
       NDF\_ library, such as \KAPPA, are not currently capable
       of supporting spaced arrays, but there are packages that produce NDF
       files with this form of axis, notably {\footnotesize ASTERIX}.
       This application provides a temporary method of allowing
-      \KAPPA\ {\it et al.}\ to handle these NDF datasets.
+      \KAPPA\ ~{\it et al.}\ to handle these NDF datasets.
    }
    \sstusage{
       axconv ndf
@@ -13805,7 +13800,7 @@ KAPPA: \htmlref{SETAXIS}{SETAXIS}.
 }{
    \sstdescription{
       This routine sets a new value for a label component of an
-      existing \NDFref{NDF}~ \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in update
+      existing \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in update
       mode and any pre-existing label component is over-written with a
       new value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
       LABEL parameter, then the NDF's axis label component will be
@@ -13878,7 +13873,7 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
 }{
    \sstdescription{
       This routine sets a new value for a units component of an
-      existing \NDFref{NDF}~ \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in update
+      existing \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in update
       mode and any pre-existing units component is over-written with a
       new value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
       UNITS parameter, then the NDF's axis units component will be
@@ -13958,7 +13953,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       methods of smoothing an image and is often useful as a
       general-purpose smoothing algorithm when the exact form of the
       smoothing point-spread function is not important.  The image is
-      held in an \NDFref{NDF}~ data structure.
+      held in an \NDFref{NDF} data structure.
    }
    \sstusage{
       block in out box [estimator]
@@ -13976,7 +13971,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          necessary.
       }
       \sstsubsection{
-         ESTIMATOR = LITERAL (Read)
+         ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method to use for estimating the output pixel values.  It can
          be either {\tt "Mean"} or {\tt "Median"}. {\tt ["Mean"]}
@@ -14106,14 +14101,15 @@ KAPPA: \htmlref{CONVOLVE}{CONVOLVE},
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
          and propagates all \htmlref{extensions}{apndf:extensions}.  In addition, if the mean
- estimator is used, the \htmlref{VARIANCE}{apndf:variance}~ component is also processed.
+         estimator is used, the \htmlref{VARIANCE}{apndf:variance}~ component is also processed.
          If the median estimator is used, then the output NDF will have
          no \htmlref{VARIANCE}{apndf:variance}~ component, even if there is a VARIANCE component
          in the input NDF.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
-         The bad-pixel flag is also written for the data and variance arrays. 
+         The \htmlref{bad-pixel flag}{setbad:badpixelflag} is also written for the data and variance arrays. 
+
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
          is performed using single-precision floating point, or double
@@ -14331,7 +14327,8 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstexamplesubsection{
          calc "sind(pa/fa)$*$fa" fa="log(abs(pb$+$pc))" pa=2.0e-4 pb=-1 pc=\$x
       }{
-         This evaluates sind(0.0002/log(abs(\\textit{x}-$1)))$*$log(abs(\\textit{x}-$1)) where
+         This evaluates
+sind(0.0002/log(abs(\${\tt{x}}$-$1)))$*$log(abs(\${\tt{x}}$-$1)) where
          {\tt \$x} is the value of the shell variable x.
       }
       \sstexamplesubsection{
@@ -14395,8 +14392,8 @@ KAPPA: \htmlref{MATHS}{MATHS}.
       polarisation described by four intensity arrays analysed at 0\dgs,
       45\dgs, 90\dgs, and 135\dgs\ to a reference direction.  Variance
       values are
-      stored in the output \NDFref{NDFs} if all the input NDFs have variances and
-      you give a {\tt TRUE} value for parameter VARIANCE.
+      stored in the output \NDFref{NDFs}~ if all the input NDFs have variances and
+      you give a {\tt TRUE}~ value for parameter VARIANCE.
 
       By default, three output NDFs are created holding percentage
       polarisation, polarisation angle and total intensity.  However,
@@ -14541,10 +14538,12 @@ KAPPA: \htmlref{MATHS}{MATHS}.
       \sstitemlist{
 
          \sstitem
-         A bad value will appear in the output data and variance arrays when any of the four input data values is bad, or if the total
-         intensity in the pixel is not positive.  The output variance
+         A \htmlref{bad value}{se:badmasking} will appear in the output data
+         and variance arrays when any of the four input data values is bad, or if 
+         the total intensity in the pixel is not positive.  The output variance
          values are also undefined when any of the four input variances is
-         bad or negative, or any computed variance is not positive, or the percentage polarisation is not positive.
+         bad or negative, or any computed variance is not positive, or the
+         percentage polarisation is not positive.
 
          \sstitem
          If the four input NDFs have different pixel-index bounds, then
@@ -14556,9 +14555,9 @@ KAPPA: \htmlref{MATHS}{MATHS}.
          formation of the polarisation parameters.
 
          \sstitem
-         The output NDFs obtain their \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}~ information, and
-         TITLE from the IN1 NDF.  The following labels and units are also
-         assigned:
+         The output NDFs obtain their \htmlref{QUALITY}{apndf:quality},
+         \htmlref{AXIS}{apndf:axis}~ information, and \htmlref{TITLE}{apndf:title} from
+         the IN1 NDF.  The following labels and units are also assigned:
 
          \begin{tabular}[h]{lll}
             I &  {\tt "Total Intensity"} &       UNITS of IN1 \\
@@ -14604,7 +14603,7 @@ KAPPA: \htmlref{VECPLOT}{VECPLOT};
    Divides an NDF by a scalar
 }{
    \sstdescription{
-      This application divides each pixel of an \NDFref{NDF}~ by a scalar
+      This application divides each pixel of an \NDFref{NDF} by a scalar
       (constant) value to produce a new NDF.
    }
    \sstusage{
@@ -14687,7 +14686,7 @@ KAPPA: \htmlref{ADD}{ADD},
    Finds the centroids of star-like features in an NDF
 }{
    \sstdescription{
-      This routine takes an \NDFref{NDF}~ and returns the co-ordinates of the
+      This routine takes an \NDFref{NDF} and returns the co-ordinates of the
       centroids of features in its data array given approximate initial
       co-ordinates.  A feature is a set of connected pixels which are
       above or below the surrounding background region.  For example, a
@@ -14889,8 +14888,8 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
-         The mode in which the initial co-ordinates are to be obtained.  The
-         supplied string can be one of the following:
+         The \htmlref{mode}{se:interaction} in which the initial co-ordinates 
+         are to be obtained.  The   supplied string can be one of the following:
 
          \sstitemlist{
 
@@ -15041,7 +15040,7 @@ KAPPA: \htmlref{ADD}{ADD},
          centroid cluster cu
       }{
          This finds the centroids in the NDF called cluster via the
-         graphics cursor on the current graphics device.
+         graphics cursor on the \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          centroid cluster cu search=21 mark=ce plotstyle='colour=red'
@@ -15158,7 +15157,7 @@ KAPPA: \htmlref{PSF}{PSF},
    Concatenates a series of vectorized NDFs
 }{
    \sstdescription{
-      This application concatenates a series of \NDFref{NDFs}, in the order
+      This application concatenates a series of \NDFref{NDFs} in the order
       supplied and treated as vectors, to form a one-dimensional output
       NDF.  The dimensions of the NDFs may be different, and indeed so
       may their dimensionalities.
@@ -15241,7 +15240,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
    Replaces the values of selected pixels in an NDF
 }{
    \sstdescription{
-      This application replaces selected elements of an \NDFref{NDF}~ array
+      This application replaces selected elements of an \NDFref{NDF} array
       component with specified values.  The task loops until there are
       no more elements to change, indicated by a null value in response
       to a prompt.  For non-interactive processing, supply the value of
@@ -15375,7 +15374,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    Multiplies an NDF by a scalar
 }{
    \sstdescription{
-      This application multiplies each pixel of an \NDFref{NDF}~ by a scalar
+      This application multiplies each pixel of an \NDFref{NDF} by a scalar
       (constant) value to produce a new NDF.
    }
    \sstusage{
@@ -15500,7 +15499,7 @@ KAPPA: \htmlref{ADD}{ADD},
    }
    \sstparameters{
       \sstsubsection{
-         BADCOL = LITERAL (Read)
+         BADCOL = \htmlref{LITERAL} (Read)
       }{
          The colour with which to mark any bad (\emph{i.e.} missing) pixels in the
          display.  There are a number of options described below.
@@ -15660,7 +15659,7 @@ KAPPA: \htmlref{ADD}{ADD},
          Combines the 3 NDFs m31\_r, m31\_g, and m31\_b to create a colour
          composite image stored in NDF m31\_col.  A colour look up table is
          also created and stored in NDF m31\_lut.  It is assumed that the
-         output image will be displayed on the current graphics device.
+         output image will be displayed on the \htmlref{current graphics device}{se:devglobal}.
          The created colour composite image should be displayed using the
          command:
 
@@ -15722,7 +15721,7 @@ XV; PBMPLUS; NETPBM.
          supported.
 
          \sstitem
-         Only data of type \_REAL can be processed directly.  Data of other
+         Only data of type \htmlref{\_REAL}{ap:HDStypes} can be processed directly.  Data of other
          types will be converted to \_REAL before being processed.
       }
    }
@@ -15767,7 +15766,7 @@ XV; PBMPLUS; NETPBM.
          be used.
       }
       \sstsubsection{
-         ESTIMATOR = LITERAL (Read)
+         ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method to use for estimating the output pixel values.  It
          can be either {\tt "Mean"}, {\tt "WMean"}, {\tt "Mode"}  or 
@@ -15943,7 +15942,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
    Reduces the size of an NDF by adding values in rectangular boxes
 }{
    \sstdescription{
-      This application takes an \NDFref{NDF}~ data structure and reduces it in
+      This application takes an \NDFref{NDF} data structure and reduces it in
       size by integer factors along each dimension.  The compression
       is achieved by adding the values of the input NDF within
       non-overlapping `rectangular' boxes whose dimensions are the
@@ -15956,7 +15955,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
    }
    \sstparameters{
       \sstsubsection{
-         ALIGN = LITERAL (Read)
+         ALIGN = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          This parameter controls the placement of the compression boxes
          within the input NDF (also see parameter TRIM).  It can take any
@@ -16101,7 +16100,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          components.
       }
       \sstexamplesubsection{
-         compave cosmos profile [10000,1] wlim=0 align=first trim=no
+         compadd cosmos profile [10000,1] wlim=0 align=first trim=no
       }{
          This compresses the two-dimensional NDF called cosmos to produce a
          one-dimensional NDF called profile.  This is done using a
@@ -16201,7 +16200,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    boxes
 }{
    \sstdescription{
-      This application takes an \NDFref{NDF}~ data structure and reduces it in
+      This application takes an \NDFref{NDF} data structure and reduces it in
       size by integer factors along each dimension.  The compression
       is achieved by averaging the input NDF within non-overlapping
       `rectangular' boxes whose dimensions are the compression factors.
@@ -16214,7 +16213,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    }
    \sstparameters{
       \sstsubsection{
-         ALIGN = LITERAL (Read)
+         ALIGN = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          This parameter controls the placement of the compression boxes
          within the input NDF (also see parameter TRIM).  It can take any
@@ -16449,7 +16448,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    Reduces the size of an NDF by picking equally spaced pixels
 }{
    \sstdescription{
-      This application takes an \NDFref{NDF}~ data structure and reduces it in
+      This application takes an \NDFref{NDF} data structure and reduces it in
       size by integer factors along each dimension.  The input NDF is
       sampled at these constant compression factors or intervals along
       each dimension, starting from a defined origin, to form an output
@@ -16531,9 +16530,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          The compression is centred on the origin of the pixel co-ordinate
-         Frame.  That is, if a position has a value p(i) on the i'th pixel
-         co-ordinate axis of the input NDF, then it will have position
-         p(i)/COMPRESS(i) on the corresponding axis of the output NDF.  The
+         Frame.  That is, if a position has a value p(\textit{i}) on
+         the \textit{i}'th pixel co-ordinate axis of the input NDF, then 
+         it will have position p(\textit{i})/COMPRESS(\textit{i}) on the
+         corresponding axis of the output NDF.  The
          pixel index bounds of the output NDF are chosen accordingly.
       }
    }
@@ -16574,14 +16574,14 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    Contours a two-dimensional NDF
 }{
    \sstdescription{
-      This application produces a contour map of a two-dimensional \NDFref{NDF}~ on
-      the current graphics device, with single-pixel resolution.  Contour
+      This application produces a contour map of a two-dimensional \NDFref{NDF} on
+      the \htmlref{current graphics device}{se:devglobal}, with single-pixel resolution.  Contour
       levels can be chosen automatically in various ways, or specified
       explicitly (see parameter MODE).  In addition, this application can
       also draw an outline around either the whole data array, or around
       the good pixels in the data array (set MODE to {\tt "Bounds"} or {\tt "Good"}).
 
-      The plot is produced within the current graphics database picture,
+      The plot is produced within the \htmlref{current graphics database picture}{se:agitate},
       and may be aligned with an existing DATA picture if the existing
       picture contains suitable \htmlref{co-ordinate Frame}{se:domains}\  information (see
       parameter CLEAR).
@@ -16974,7 +16974,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          contour taurus1(100:199,150:269,4)
       }{
          Contours a two-dimensional section of the three-dimensional NDF called
-         taurus1 on the current graphics device.  The section extends from
+         taurus1 on the \htmlref{current graphics device}{se:devglobal}.  The section extends from
          pixel (100,150,4) to pixel (199,269,4).
       }
       \sstexamplesubsection{
@@ -17097,7 +17097,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
    Convolves a pair of one- or two-dimensional NDFs together
 }{
    \sstdescription{
-      This application smooths a one- or two-dimensional \NDFref{NDF}~ using a
+      This application smooths a one- or two-dimensional \NDFref{NDF} using a
       Point-Spread Function given by a second NDF.  The output NDF is
       normalised to the same mean data value as the input NDF,
       and is the same size as the input NDF.
@@ -17257,8 +17257,8 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    Copies bad pixels from one NDF file to another
 }{
    \sstdescription{
-      This application copies bad pixels from one \NDFref{NDF}~ file to another.  It
-      takes in two NDFs (parameters IN and REF), and creates a third
+      This application copies \htmlref{bad pixels}{se:masking}~ from one \NDFref{NDF} file
+      to another.  It takes in two NDFs (parameters IN and REF), and creates a third
       (parameter OUT) which is a copy of IN, except that any pixel which
       is set bad in the DATA array of REF, is also set bad in the DATA
       and \htmlref{VARIANCE}{apndf:variance}~ (if available) arrays in OUT.
@@ -17338,7 +17338,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
    Generates a test two-dimensional NDF with a selection of several forms
 }{
    \sstdescription{
-      This application creates a two-dimensional output \NDFref{NDF}~ containing
+      This application creates a two-dimensional output \NDFref{NDF} containing
       artificial data of various forms (see parameter MODE).  The output
       NDF can, optionally, have a Variance component describing the noise
       in the Data array (see parameter VARIANCE), and additionally a
@@ -17382,7 +17382,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
          left, 3 is bottom to top, and 4 is top to bottom. (RA mode)
       }
       \sstsubsection{
-         DISTRIB = \_CHAR (Read)
+         DISTRIB = LITERAL (Read)
       }{
          Radial distribution of the Gaussians to be used (GS mode).
          Alternatives weightings are:
@@ -17562,7 +17562,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
       \sstitemlist{
 
          \sstitem
-         The Data and Variance components of the output NDF have a numerical
+         The Data and \htmlref{Variance components}{apndf:variance} of the output NDF have a numerical
          type of {\tt "\_REAL"} (single-precision floating point).
 
          \sstitem
@@ -17578,7 +17578,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
 }{
    \sstdescription{
       The routine subtracts a scalar (\emph{i.e.} constant) value from each
-      pixel of an \NDFref{NDF's} data array to produce a new NDF data structure.
+      pixel of an \NDFref{NDF's}  data array to produce a new NDF data structure.
    }
    \sstusage{
       csub in scalar out
@@ -17758,7 +17758,7 @@ KAPPA: \htmlref{ADD}{ADD},
          to be reported.  When a data array is displayed by an application
          such as DISPLAY, CONTOUR the \htmlref{WCS}{apndf:wcs} information describing the co-ordinate
          systems known to the data array are stored with the DATA picture
-         in the graphics database.  This application can report positions in
+         in the \htmlref{graphics database}{se:agitate}.  This application can report positions in
          any of the co-ordinate Frames stored with each picture.  The
          string supplied for FRAME can be one of the following:
 
@@ -18056,7 +18056,7 @@ KAPPA: \htmlref{ADD}{ADD},
          cursor frame=pixel
       }{
          This obtains co-ordinates within any visible picture for the
-         current graphics device by use of the cursor.  Positions are
+         \htmlref{current graphics device}{se:devglobal} by use of the cursor.  Positions are
          reported in pixel co-ordinates if available, and in the current
          co-ordinate Frame of the picture otherwise.
       }
@@ -18091,7 +18091,7 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          Exactly two positions are obtained within the current picture,
          and are joined with a straight line.  The positions are written to
-         a FITS binary catalogue called slice.FIT but are not displayed on
+         a FITS binary catalogue called {\tt slice.FIT} but are not displayed on
          the screen.  The catalogue may be used to communicate the positions
          to later applications (LISTSHOW, PROFILE, \emph{etc.}).
       }
@@ -18166,8 +18166,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
    Displays a one- or two-dimensional NDF
 }{
    \sstdescription{
-      This application displays a one- or two-dimensional \NDFref{NDF}~ as an image
-      on the current graphics device.  The minimum and maximum data
+      This application displays a one- or two-dimensional \NDFref{NDF} as an image
+      on the \htmlref{current graphics device}{se:devglobal}.  The minimum and maximum data
       values to be displayed can be selected in several ways (see
       parameter MODE).  Data values outside these limits are displayed
       with the colour of the nearest limit.  A key showing the
@@ -18183,7 +18183,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       the colour table when opened (such as PostScript files), this may
       be the only way of controlling the colour table.
 
-      The image is produced within the current graphics database picture
+      The image is produced within the \htmlref{current graphics database picture}{se:agitate}
       The co-ordinates at the centre of the image, and the scale of the
       image can be controlled using parameters CENTRE, XMAGN and YMAGN.  Only
       the parts of the image that lie within the current picture are visible;
@@ -18726,7 +18726,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          The data type of the output NDF depends on the number of colour
          indices: \_UBYTE for no more than 256, \_UWORD for 257 to 65535,
          and \_INTEGER otherwise.  The output NDF will not contain any
-         extensions, \htmlref{UNITS}{apndf:units}, \htmlref{QUALITY}{apndf:quality}, and \htmlref{VARIANCE}{apndf:variance}; but \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, WCS and
+         extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, WCS and
          AXIS information are propagated from the input NDF.  The output
          NDF does not become the new current data array.  It is a Simple
          NDF (because the \htmlref{bad-pixel flag}{setbad:badpixelflag} is set to false in order to
@@ -18774,7 +18774,7 @@ plot (101k).
    Divides one NDF data structure by another
 }{
    \sstdescription{
-      The routine divides one \NDFref{NDF}~ data structure by another
+      The routine divides one \NDFref{NDF} data structure by another
       pixel-by-pixel to produce a new NDF.
    }
    \sstusage{
@@ -18868,7 +18868,7 @@ KAPPA: \htmlref{ADD}{ADD},
 }{
    \sstdescription{
       This application draws a pair of arrows on top of a previously displayed
-      DATA picture which indicate the directions of the labelled axes in the
+      \htmlref{DATA picture}{se:agiaction}~ which indicate the directions of the labelled axes in the
       underlying picture, at the position specified by parameter ORIGIN.  For
       instance, if the underlying picture has axes labelled with celestial
       co-ordinates, then the arrows will by default indicate the directions
@@ -18951,7 +18951,7 @@ KAPPA: \htmlref{ADD}{ADD},
          required.   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         OFRAME = LITERAL (Read)
+         OFRAME = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          Specifies the \htmlref{co-ordinate Frame}{se:domains}\  in which the position of the arrows
          will be supplied (see parameter ORIGIN).  The following Frames will
@@ -19129,7 +19129,8 @@ KAPPA: \htmlref{ADD}{ADD},
 }{
    \sstdescription{
       This routine draws straight lines on an existing plot stored in
-      the graphics database, such as produced by LINPLOT or HISTOGRAM.
+      the \htmlref{graphics database}{se:agitate}, such as produced by 
+      LINPLOT or HISTOGRAM.
       The lines are located at arbitrary multiples of the standard
       deviation (NSIGMA) either side of the mean of a given dataset.
       The default dataset is the one used to draw the existing plot.
@@ -19168,7 +19169,7 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          COMP = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
-         The name of the \NDFref{NDF}~ array component from which to derive the
+         The name of the \NDFref{NDF} array component from which to derive the
          mean and standard deviation used to draw the lines: {\tt "Data"},
          {\tt "Error"}, {\tt "Quality"} or {\tt "Variance"} (where {\tt "Error"} is the
          alternative to {\tt "Variance"} and causes the square root of the
@@ -19248,7 +19249,7 @@ KAPPA: \htmlref{ADD}{ADD},
          drawsig nsigma=3 style='style=1'
       }{
          This draws solid horizontal lines on the last DATA picture on
-         the current graphics device located at plus and minus 3
+         the \htmlref{current graphics device}{se:devglobal} located at plus and minus 3
          standard deviations about the mean.  The statistics come from
          the data array used to draw the DATA picture.
       }
@@ -19322,7 +19323,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
      This application will bin the input image into elliptical annuli,
      or into a ``fan'' of adjacent sectors, centred on a specified
      position.  The typical data values in each bin are found (see
-     parameter ESTIMATOR), and stored in a one-dimensional \NDFref{NDF}~ which 
+     parameter ESTIMATOR), and stored in a one-dimensional \NDFref{NDF} which 
      can be examined using \htmlref{LINPLOT}{LINPLOT}, \htmlref{LOOK}{LOOK}, 
      \emph{etc}.  A two-dimensional mask 
      image can optionally be produced indicating which bin each input 
@@ -19376,7 +19377,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
       }
 
       \sstsubsection{
-         ESTIMATOR = LITERAL (Read)
+         ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
         The method to use for estimating the output pixel values.  It
         can be either ``Mean'' or ``Weighted Mean''.  If the weighted mean
@@ -19622,7 +19623,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
    Removes pixels with large errors from an NDF
 }{
    \sstdescription{
-      This application produces a copy of the input \NDFref{NDF}~ in which pixels
+      This application produces a copy of the input \NDFref{NDF} in which pixels
       with errors greater than a specified limit are set invalid in
       both DATA and \htmlref{VARIANCE}{apndf:variance}~ components.  The error limit may be
       specified as the maximum acceptable standard deviation (or
@@ -19639,11 +19640,6 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
          component.
       }
       \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         The output NDF.
-      }
-      \sstsubsection{
          LIMIT = \_DOUBLE (Read)
       }{
          Either the maximum acceptable standard deviation or variance
@@ -19657,6 +19653,11 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
          interpreted: {\tt "Sigma"} for a standard deviation, {\tt "Variance"}
          for variance, or {\tt "SNR"} for minimum signal-to-noise ratio.
          {\tt ["Sigma"]}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
       }
    }
    \sstexamples{
@@ -19729,7 +19730,7 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
 }{
    \sstdescription{
       This routine takes the base-10 exponential of each
-      pixel of a \NDFref{NDF}~ to produce a new NDF data structure.
+      pixel of a \NDFref{NDF} to produce a new NDF data structure.
 
       This command is a synonym for {\tt expon base=10D0}.
    }
@@ -19809,7 +19810,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
 }{
    \sstdescription{
       This routine takes the natural exponential of each
-      pixel of a \NDFref{NDF}~ to produce a new NDF data structure.
+      pixel of a \NDFref{NDF} to produce a new NDF data structure.
 
       This command is a synonym for {\tt expon base=natural}.
    }
@@ -19890,7 +19891,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
 }{
    \sstdescription{
       This routine takes the exponential to a specified base of each
-      pixel of a \NDFref{NDF}~ to produce a new NDF data structure.
+      pixel of a \NDFref{NDF} to produce a new NDF data structure.
    }
    \sstusage{
       expon in out base
@@ -19973,8 +19974,8 @@ KAPPA: \htmlref{LOG10}{LOG10},
    Removes defects from a substantially flat one- or two-dimensional NDF
 }{
    \sstdescription{
-      This application cleans a one- or two-dimensional \NDFref{NDF}~ by removing defects smaller
-      than a specified size.  The defects are flagged with the bad
+      This application cleans a one- or two-dimensional \NDFref{NDF} by removing defects smaller
+      than a specified size.  The defects are \htmlref{flagged}{se:masking}~ with the bad
       value.  The defects are found by looking for pixels that deviate
       from the image's smoothed version by more than an arbitrary
       number of standard deviations from the local mean, and that lie
@@ -20148,7 +20149,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    Removes regions of bad values from a two-dimensional NDF
 }{
    \sstdescription{
-      This application replaces bad values in a two-dimensional \NDFref{NDF}~ with
+      This application replaces bad values in a two-dimensional \NDFref{NDF} with
       a smooth function which matches the surrounding data.  It can fill
       arbitrarily shaped regions of bad values within images.
 
@@ -20204,7 +20205,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The initial scale length in pixels to be used in the first
          iteration.  For maximum efficiency, it should normally have a
          value about half the `size' of the largest invalid region to
-         be replaced.  (See \htmlref{{\tt{"}}Notes{\tt{"}}}{notes:fillbad} section for more details.)
+         be replaced.  (See \htmlref{{\tt{"}}Notes{\tt{"}}}{notes:fillbad}~ section
+         for more details.)
          {\tt [5.0]}
       }
       \sstsubsection{
@@ -20305,6 +20307,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          in blocks ({\it cf.}\ parameter MEMORY).  However, this may not give as
          good results as processing the array in full, especially when the
          bad-pixel regions span blocks. 
+
          \sstitem
          The value of the parameter SIZE is not critical and the
          default value will normally prove effective.  It primarily
@@ -20324,6 +20327,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          An error results if the input NDF has no bad values to replace. 
+
          \sstitem
          The progress of the iterations is reported.
       }
@@ -20334,7 +20338,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       The time taken increases in proportion to the value of NITER.
       Adjusting the SIZE parameter to correspond to the largest regions
       of bad values will reduce the processing time.  See the 
-      \htmlref{{\tt{"}}Notes{\tt{"}}}{notes:fillbad} section.
+      \htmlref{{\tt{"}}Notes{\tt{"}}}{notes:fillbad}~ section.
    }
    \sstdiytopic{
       Related Applications:
@@ -20377,13 +20381,14 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    Reads a FITS disc file composed of simple, group or table objects
 }{
    \sstdescription{
-      This application reads selected disc-FITS files.  The files may
+      This application reads selected disc-\FITSref\ ~files.  The files may
       be Basic (simple) FITS, and/or have TABLE extensions (Harten
       {\it et al.}\ 1988).
 
       The programme reads a simple or a random-groups-format FITS file
       (Wells {\it et al.}\ 1981; Greisen \& Harten 1981), and writes the
-      data into an \NDFref{NDF}, and the headers into the NDF's FITS extension.
+      data into an \NDFref{NDF}, and the headers into the NDF's 
+      \htmlref{FITS extension}{se:fitsairlock}.
       Table-format files (Grosb{\o}l {\it et al.}\ 1988) are read, and the
       application creates two files: a text formatted table/catalogue
       and a FACTS description file (as used by SCAR) based upon the FITS
@@ -20447,7 +20452,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          {\tt "dscf"} prefix.
       }
       \sstsubsection{
-         ENCODINGS = LITERAL (Read)
+         ENCODINGS = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          Determines which FITS keywords should be used to define the
          world co-ordinate systems to be stored in the NDF's \htmlref{WCS}{apndf:wcs}
@@ -20658,16 +20663,17 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
             IEEE floating point is supported.
 
             \sstitem
-            If BUNIT is present its value will appear as the NDF's units
-            component.
+            If BUNIT is present its value will appear as the NDF's 
+            \htmlref{units component}{apndf:units}.
 
             \sstitem
-            If OBJECT is present its value will appear as the NDF's title
-            component.
+            If OBJECT is present its value will appear as the NDF's
+            \htmlref{title component}{apndf:units}.
 
             \sstitem
             If the BLANK item is present in the header, undefined pixels
-            are converted from the BLANK value to Starlink-standard bad value during data conversion.
+            are converted from the BLANK value to Starlink-standard 
+            \htmlref{bad value}{se:masking} during data conversion.
 
             \sstitem
             An \htmlref{AXIS}{apndf:axis}~ component will be stored in the NDF if the CRVAL\textit{n}
@@ -20706,7 +20712,8 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
 }{
    \sstdescription{
       This procedure allows you to use your favourite editor to
-      modify the FITS headers stored in an \NDFref{NDF's} FITS extension.
+      modify the \FITSref\ ~headers stored in an \NDFref{NDF's}  
+      \htmlref{FITS extension}{se:fitsairlock}.
       There is limited validation of the FITS headers after editing.
       A FITS extension is created if the NDF does not already have 
       one.
@@ -20759,7 +20766,7 @@ KAPPA: \htmlref{FITSMOD}{FITSMOD},
 }{
    \sstdescription{
       This application reports whether or not a keyword exists in an \NDFref{NDF's}
-      FITS extension.
+      \htmlref{FITS extension}{se:fitsairlock}.
 
       It is a synonym for {\tt fitsmod edit=exist mode=interface}.
    }
@@ -20773,7 +20780,7 @@ KAPPA: \htmlref{FITSMOD}{FITSMOD},
          The name of the keyword whose existence in the FITS extension
          is to be tested.  A name may be compound to handle hierarchical
          keywords, and it has the form keyword1.keyword2.keyword3
-         {\em etc.}\  The maximum number of keywords per FITS card is 20.
+         {\em etc.}\  The maximum number of keywords per \FITSref\ ~card is 20.
          Each keyword must be no longer than 8 characters, and be a
          valid FITS keyword comprising only alphanumeric characters,
          hyphen, and underscore.  Any lowercase letters are converted to
@@ -20828,9 +20835,9 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
 }{
    \sstdescription{
       This application places the values of components of an \NDFref{NDF}
-      extension into the FITS extension within the same NDF.  This
+      extension into the \htmlref{FITS extension}{se:fitsairlock}~ within the same NDF.  This
       operation is needed if auxiliary data are to appear in the header
-      of a FITS file converted from the NDF.  The list of extension
+      of a \FITSref\ ~file converted from the NDF.  The list of extension
       components whose values are to be copied, their corresponding
       FITS keyword names, optional FITS inline comments, and the
       location of the new FITS header are specified in a \emph{keyword
@@ -20917,7 +20924,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          \sstitem
          Field 1:
             The name of the input extension component whose value is to be
-            copied to the FITS extension.  For example, {\tt CCDPACK.FILTER}
+            copied to the \htmlref{FITS extension}{se:fitsairlock}.  For example, {\tt CCDPACK.FILTER}
             would copy the value of the component called FILTER in the
             extension called CCDPACK; and \linebreak
             {\tt IRAS90.ASTROMETRY.EQUINOX} would
@@ -21003,7 +21010,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    \sstdescription{
       This procedure lists to standard output the headers of the primary
       header and data unit, and any extensions present that are
-      contained within a set of input FITS files, or a range of
+      contained within a set of input \FITSref\ ~files, or a range of
       specified files on a tape.
    }
    \sstusage{
@@ -21112,12 +21119,12 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    Imports FITS information into an NDF extension
 }{
    \sstdescription{
-      This application extracts the values of FITS keywords from a FITS
-      extension in an \NDFref{NDF}~ and uses them to construct another NDF
+      This application extracts the values of \FITSref\ ~keywords from a 
+      \htmlref{FITS extension}{se:fitsairlock}~ in an \NDFref{NDF} and uses them to construct another NDF
       extension.  The list of new extension components required, their
       data types and the names of the FITS keywords from which to
       derive their values are specified in a \emph{keyword translation
-      table} held in a separate text file.
+      table}~ held in a separate text file.
    }
    \sstusage{
       fitsimp ndf table xname xtype
@@ -21139,7 +21146,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          XNAME = LITERAL (Read)
       }{
          The name of the NDF extension which is to receive the values
-         read from the FITS extension.  If this extension does not
+         read from the FITS extension .  If this extension does not
          already exist, then it will be created.  Otherwise, it should
          be a scalar structure extension within which new components
          may be created (existing components of the same name will be
@@ -21150,7 +21157,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       \sstsubsection{
          XTYPE = LITERAL (Read)
       }{
-         The HDS data type of the output extension.  This value will
+         The \htmlref{HDS data type}{ap:HDStypes}~ of the output extension.  This value will
          only be required if the extension does not initially exist and
          must be created.  New extensions will be created as scalar
          structures.
@@ -21232,13 +21239,13 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
    Reads a FITS tape composed of simple, group or table files
 }{
    \sstdescription{
-      This application reads selected files from a FITS tape.  The
+      This application reads selected files from a \FITSref\ ~tape.  The
       files may be Basic (simple) FITS, and/or have TABLE extensions
       (Harten {\it et al.}\ 1988).
 
       The programme reads a simple or a random-groups-format FITS file
       (Wells {\it et al.}\ 1981; Greisen \& Harten 1981), and writes the
-      data into an \NDFref{NDF}, and the headers into the NDF's FITS extension.
+      data into an \NDFref{NDF}, and the headers into the NDF's \htmlref{FITS extension}{se:fitsairlock}.
       Table-format files (Grosb{\o}l {\it et al.}\ 1988) are read, and the
       application creates two files: a text formatted table/catalogue
       and a FACTS description file (as used by SCAR) based upon the FITS
@@ -21303,7 +21310,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          {\tt "dscf"} prefix.
       }
       \sstsubsection{
-         ENCODINGS = LITERAL (Read)
+         ENCODINGS = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          Determines which FITS keywords should be used to define the
          world co-ordinate systems to be stored in the NDF's \htmlref{WCS}{apndf:wcs}
@@ -21392,8 +21399,8 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          unnecessary when there only one item.)  For efficiency reasons
          it is sensible to give the file numbers in ascending order.
 
-         If you wish to extract all the files enter the wildcard $*$.
-         5-$*$ will read from 5 to the last file.  The processing will
+         If you wish to extract all the files enter the wildcard {\tt $*$}.
+         {\tt 5-$*$} will read from 5 to the last file.  The processing will
          continue until the end of the tape is reached; no error
          will result from this.
       }
@@ -21443,7 +21450,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          current list has been exhausted.
       }
       \sstsubsection{
-         MT = \htmlref{DEVICE}{se:selgradev} (Read)
+         MT = \htmlref{DEVICE}{se:readfitstape} (Read)
       }{
          Tape deck containing the data, usually an explicit device,
          though it can be a pre-assigned environment variable.
@@ -21552,12 +21559,12 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
             IEEE floating point is supported.
 
             \sstitem
-            If BUNIT is present its value will appear as the NDF's units
-            component.
+            If BUNIT is present its value will appear as the NDF's 
+            \htmlref{units component}{apndf:units}.
 
             \sstitem
-            If OBJECT is present its value will appear as the NDF's title
-            component.
+            If OBJECT is present its value will appear as the NDF's 
+            \htmlref{title component}{apndf:title}.
 
             \sstitem
             If the BLANK item is present in the header, undefined pixels
@@ -21600,8 +21607,8 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
    Lists the FITS extension of an NDF
 }{
    \sstdescription{
-      This application lists the FITS header stored in an \NDFref{NDF}~ FITS
-      extension.  The list may either be reported directly to you,
+      This application lists the \FITSref\ ~header stored in an \NDFref{NDF} 
+      \htmlref{FITS extension}{se:fitsairlock}.  The list may either be reported directly to you,
       or written to a text file.
    }
    \sstusage{
@@ -21657,7 +21664,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    Edits an NDF FITS extension via a text file or parameters
 }{
    \sstdescription{
-      This application edits the FITS extension of an \NDFref{NDF}~ file in a
+      This application edits the \htmlref{FITS extension}{se:fitsairlock} ~of
+      an \NDFref{NDF} file in a
       variety of ways.  It permits insersion of new keywords, including
       comment lines; revision of existing keyword, values, and inline
       comments; relocation of keywords; deletion of keywords; printing
@@ -21977,7 +21985,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       Timing
    }{
       Approximately proportional to the number of FITS keywords to be
-      edited.  {\tt "Update"} and {\tt "Write"} edits require the most time.
+      edited.  {\tt "Update"} and {\tt "Write"}~ edits require the most time.
    }
    \sstdiytopic{
       File Format
@@ -22250,8 +22258,9 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    Creates an NDF FITS extension from a text file
 }{
    \sstdescription{
-      This application takes a version of a FITS header stored in a
-      text file, and inserts it into the FITS extension of an \NDFref{NDF}.  The
+      This application takes a version of a \FITSref\ ~header stored in a
+      text file, and inserts it into the \htmlref{FITS
+      extension}{se:fitsairlock}~ of an \NDFref{NDF}.  The
       header is not copied verbatim as some validation of the headers
       as legal FITS occurs.  An existing FITS extension is removed.
    }
@@ -22339,10 +22348,10 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
 }{
    \sstdescription{
       This task fits a surface to a two-dimensional data array stored
-      array within an \NDFref{NDF}~ data structure.  At present it only
+      array within an \NDFref{NDF} data structure.  At present it only
       permits a fit with a polynomial, and the coefficients of that
       surface are stored in a POLYNOMIAL structure (\xref{SGP/38}{sgp38}{}) as an
-      extension to that NDF.
+      \htmlref{extension}{se:ndfext}~ to that NDF.
 
       Unlike SURFIT, neither does it bin the data nor does it reject
       outliers.
@@ -22527,8 +22536,8 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
    Reports the value of a keyword in the FITS extension.
 }{
    \sstdescription{
-      This application reports the value of a keyword in an \NDFref{NDF's} FITS
-      extension.
+      This application reports the value of a keyword in an \NDFref{NDF's} 
+      \htmlref{FITS extension}{se:fitsairlock}.
 
       It is a synonym for {\tt fitsmod edit=print mode=interface}.
    }
@@ -22542,7 +22551,7 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
          The name of an existing keyword in the FITS extension whose value
          is to be reported.  A name may be compound to handle hierarchical
          keywords, and it has the form keyword1.keyword2.keyword3
-         {\em etc.}\  The maximum number of keywords per FITS card is 20.
+         {\em etc.}\  The maximum number of keywords per \FITSref\ ~card is 20.
          Each keyword must be no longer than 8 characters, and be a
          valid FITS keyword comprising only alphanumeric characters,
          hyphen, and underscore.  Any lowercase letters are converted to
@@ -22596,10 +22605,10 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    Writes a new keyword to the FITS extension
 }{
    \sstdescription{
-      This application writes a new keyword in an \NDFref{NDF's} FITS extension
-      given a value and an optional inline comment.  It allows the
-      location of the new keyword to be specified.  The FITS extension
-      is created if it does not exist.
+      This application writes a new keyword in an \NDFref{NDF's} 
+      \htmlref{FITS extension}{se:fitsairlock}~ given a value and an optional
+      inline comment.  It allows the location of the new keyword to be 
+      specified.  The FITS extension is created if it does not exist.
 
       It is a synonym for {\tt fitsmod edit=write mode=interface position=!}.
    }
@@ -22771,7 +22780,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    Reverses an NDF's pixels along a specified dimension
 }{
    \sstdescription{
-      This application reverses the order of an \NDFref{NDF's} pixels along a
+      This application reverses the order of an \NDFref{NDF's}  pixels along a
       specified dimension, leaving all other aspects of the data
       structure unchanged.
    }
@@ -22884,7 +22893,8 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
       combination of these may also be produced.  The inverse procedure
       accepts any of these NDFs and produces a purely real output NDF.
 
-      Any bad pixels in the input NDF may be replaced by a constant value.
+      Any \htmlref{bad pixels}{se:masking}~ in the input NDF may be replaced
+      by a constant value.
       Input NDFs need neither be square, nor be a power of 2 in size in
       either dimension; their shape is arbitrary.
 
@@ -23129,7 +23139,7 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
       \sstitemlist{
 
          \sstitem
-         See the NAG documentation, Chapter C06, and/or \KAPPA\ routine
+         See the NAG documentation, Chapter C06, and/or \KAPLIBS\ routine
          {\tt kpg1\_hmltx.gen} for more details of Hermitian Fourier transforms.
        }
    }
@@ -23152,7 +23162,7 @@ $\lsk$2CMPLX.
          \sstitem
          \htmlref{AXIS}{apndf:axis}, \htmlref{VARIANCE}{apndf:variance}~ and \htmlref{QUALITY}{apndf:quality}~ are not propagated from the input to
          output NDFs, but the \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}~ components and all
-         extensions are.  Arithmetic is performed using single- or
+         \htmlref{extensions}{se:ndfext} are.  Arithmetic is performed using single- or
          double-precision floating point, as appropriate for the type of
          the data array.
       }
@@ -23167,7 +23177,7 @@ $\lsk$2CMPLX.
       This application applies a symmetrical filter to a one- or
       two-dimensional image so as to convolve it with a Gaussian point
       spread function (PSF) of specified width, or widths and
-      orientation.  The image is held in an \NDFref{NDF}~ data structure.
+      orientation.  The image is held in an \NDFref{NDF} data structure.
    }
    \sstusage{
       gausmooth in out fwhm
@@ -23353,7 +23363,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
-         supported.  The bad-pixel flag is also written for the data and variance arrays.
+         supported.  The \htmlref{bad-pixel flag}{setbad:badpixelflag} is also written for the data and variance arrays.
 
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
@@ -23395,7 +23405,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstexamplesubsection{
          gdclear
       }{
-         Clears the current graphics device and purges its graphics-database 
+         Clears the \htmlref{current graphics device}{se:devglobal} and purges its graphics-database 
          entries.
       }
       \sstexamplesubsection{
@@ -23425,7 +23435,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
    \sstdescription{
       The routine displays a list of the graphics devices available and
       the names (both traditional Starlink GNS names and the equivalent
-      \PGPLOT\  names) which identify them.  Each name is accompanied by a
+      \PGPLOT\  ~names) which identify them.  Each name is accompanied by a
       brief descriptive comment.
    }
    \sstusage{
@@ -23439,7 +23449,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
    Selects a current graphics device
 }{
    \sstdescription{
-      This application selects a current graphics device.  This
+      This application selects a \htmlref{current graphics device}{se:devglobal}.  This
       device will be used for all applications requiring an
       graphics device until changed explicitly.
    }
@@ -23470,7 +23480,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
    \sstdescription{
       This application displays information about the current graphics
       database picture on a graphics device, including the extreme axis
-      values in any requested \htmlref{co-ordinate Frame}{se:domains}\  (see parameter FRAME).
+      values in any requested \htmlref{co-ordinate Frame}{se:domains}\ ~(see parameter FRAME).
       Information is written to various output parameters for use by
       other applications, and is also written to the screen by default
       (see parameter REPORT).  An outline may be drawn around the current
@@ -23650,7 +23660,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
       \sstexamplesubsection{
          gdstate
       }{
-         Shows the status of the current graphics device.  The bounds of
+         Shows the status of the \htmlref{current graphics device}{se:devglobal}.  The bounds of
          the picture are displayed in the current co-ordinate Frame of
          the picture.
       }
@@ -23880,7 +23890,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          supported.
 
          \sstitem
-         Only single and double precision floating point data can be
+         Only single- and double-precision floating-point data can be
          processed directly.  All integer data will be converted to floating
          point before being processed.
       }
@@ -23893,7 +23903,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    Displays the values of the KAPPA global parameters
 }{
    \sstdescription{
-      This procedure lists the meanings and values of the \KAPPA\ global
+      This procedure lists the meanings and values of the \KAPPA\ ~global
       parameters.  If a global parameter does not have a value, the
       string {\tt "<undefined>"} is substituted where the value would have been
       written.
@@ -24193,7 +24203,7 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
 }{
    \sstdescription{
       This application computes and displays simple ordered statistics
-      for the pixels in an \NDFref{NDF's} data, quality, error, or variance
+      for the pixels in an \NDFref{NDF's}  data, quality, error, or variance
       array.  The statistics available are:
 
       \sstitemlist{
@@ -24448,7 +24458,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
    Performs an histogram equalisation on an NDF
 }{
    \sstdescription{
-      This application transforms an \NDFref{NDF}~ via histogram equalisation.
+      This application transforms an \NDFref{NDF} via histogram equalisation.
       Histogram equalisation is an image-processing technique in which
       the distribution (between limits) of data values in the input
       array is adjusted so that in the output array there are
@@ -24553,7 +24563,7 @@ scaling limits are used for both images.
    Computes an histogram of an NDF's values
 }{
    \sstdescription{
-      This application derives histogram information for an \NDFref{NDF}~ array
+      This application derives histogram information for an \NDFref{NDF} array
       between specified limits.  The histogram is reported, and may
       optionally be written to a text log file, and/or plotted
       graphically.
@@ -25924,7 +25934,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          linplot map(,100)
       }{
          Plots data values versus position for row 100 in the two-dimensional
-         NDF called map on the current graphics device.
+         NDF called map on the \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          linplot spectrum(1:500) device=ps\_l
@@ -26067,7 +26077,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
       binary format or the \emph{Small Text List}~ (\STLref) format
       defined by \CURSA.
 
-      If an \NDFref{NDF}~ is specified using parameter NDF, then the positions should
+      If an \NDFref{NDF} is specified using parameter NDF, then the positions should
       be given in the current co-ordinate Frame of the NDF.  Information
       describing the co-ordinate Frames available within the NDF will be
       copied to the output positions list.  Subsequent applications can
@@ -26757,7 +26767,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
 }{
    \sstdescription{
       This routine takes the base-10 logarithm of each
-      pixel of a \NDFref{NDF}~ to produce a new NDF data structure.
+      pixel of a \NDFref{NDF} to produce a new NDF data structure.
 
       This command is a synonym for {\tt logar base=10D0}.
    }
@@ -26837,7 +26847,7 @@ KAPPA: \htmlref{LOGAR}{LOGAR},
 }{
    \sstdescription{
       This routine takes the logarithm to a specified base of each
-      pixel of a \NDFref{NDF}~ to produce a new NDF data structure.
+      pixel of a \NDFref{NDF} to produce a new NDF data structure.
    }
    \sstusage{
       logar in out base
@@ -26920,7 +26930,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
 }{
    \sstdescription{
       This routine takes the natural logarithm of each
-      pixel of a \NDFref{NDF}~ to produce a new NDF data structure.
+      pixel of a \NDFref{NDF} to produce a new NDF data structure.
 
       This command is a synonym for {\tt logar base=natural}.
    }
@@ -27667,7 +27677,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       This application allows manipulation of the colour table of an
       graphics device provided some data are, according to the
       graphics database, already displayed upon the device.  A
-      two-dimensional data array, stored in the input \NDFref{NDF}~ structure, may
+      two-dimensional data array, stored in the input \NDFref{NDF} structure, may
       be nominated to assist in defining the colour table via an histogram
       equalisation.  There are two stages to the running of this
       application.
@@ -27804,7 +27814,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       \sstexamplesubsection{
          lutable lo co
       }{
-         Changes the colour table on the current graphics device
+         Changes the colour table on the \htmlref{current graphics device}{se:devglobal}
          to a series of coloured blocks whose size increase
          logarithmically with the table index number.
       }
@@ -27872,7 +27882,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 }{
    \sstdescription{
       This procedure loads the {\it BGYRW\/} lookup table with linear scaling
-      into the current graphics device.  It is a continuous LUT
+      into the \htmlref{current graphics device}{se:devglobal}.  It is a continuous LUT
       starting with blue, followed by green, yellow, red and a splash of
       white.
    }
@@ -27917,7 +27927,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current graphics device
+      prompted for the DEVICE parameter if the \htmlref{current graphics device}{se:devglobal}
       is not suitable or not available.
    }
 }
@@ -27928,7 +27938,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 }{
    \sstdescription{
       This procedure loads the {\it cold\/} lookup table with linear scaling
-      into the current graphics device.  It is a continuous LUT
+      into the \htmlref{current graphics device}{se:devglobal}.  It is a continuous LUT
       going from black to white, passing through cold shades of pale blue
       and grey.
    }
@@ -27958,7 +27968,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 }{
    \sstdescription{
       This procedure loads a lookup table that gives a contour-plot
-      appearance into the current graphics device.  The lookup table
+      appearance into the \htmlref{current graphics device}{se:devglobal}.  The lookup table
       is mainly black with a set of white stripes and it is loaded with
       linear scaling.
    }
@@ -28014,7 +28024,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          LUT = NDF (Read)
       }{
          Name of an exiting colour table to be edited.  This should be an
-         \NDFref{NDF}~ containing an array of red, green and blue intensities.  The
+         \NDFref{NDF} containing an array of red, green and blue intensities.  The
          NDF must be two-dimensional, the first dimension being 3, and the
          second being arbitrary.  The method used to compress or expand the
          colour table if the second dimension is different from the number
@@ -28049,7 +28059,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       This procedure loads the standard false-colour lookup table with
-      linear scaling into the current graphics device.
+      linear scaling into the \htmlref{current graphics device}{se:devglobal}.
    }
    \sstusage{
       lutfc
@@ -28077,7 +28087,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       Procedure for loading the standard greyscale lookup table into
-      the current graphics device with linear scaling.
+      the \htmlref{current graphics device}{se:devglobal} with linear scaling.
    }
    \sstusage{
       lutgrey
@@ -28104,7 +28114,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       This procedure loads the {\it heat} lookup table with linear scaling
-      into the current graphics device.
+      into the \htmlref{current graphics device}{se:devglobal}.
    }
    \sstusage{
       lutheat
@@ -28132,7 +28142,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       This procedure loads the default {\it Ikon\/} lookup table with linear
-      scaling into the current graphics device.
+      scaling into the \htmlref{current graphics device}{se:devglobal}.
    }
    \sstusage{
       lutikon
@@ -28166,7 +28176,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       Procedure for loading the standard greyscale lookup table into
-      the current graphics device with negative linear scaling.
+      the \htmlref{current graphics device}{se:devglobal} with negative linear scaling.
    }
    \sstusage{
       lutneg
@@ -28193,7 +28203,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       This procedure loads the coloured-ramps lookup table with linear
-      scaling into the current graphics device.
+      scaling into the \htmlref{current graphics device}{se:devglobal}.
    }
    \sstusage{
       lutramps
@@ -28219,8 +28229,8 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
    Loads an graphics device lookup table from an NDF
 }{
    \sstdescription{
-      This application reads a lookup table stored in an \NDFref{NDF}~ with
-      the standard format, and loads it into the current graphics device
+      This application reads a lookup table stored in an \NDFref{NDF} with
+      the standard format, and loads it into the \htmlref{current graphics device}{se:devglobal}
       device.
    }
    \sstusage{
@@ -28267,7 +28277,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 }{
    \sstdescription{
       This routine saves the colour table of a nominated graphics device to
-      an \NDFref{NDF}~ LUT file and/or a text file.
+      an \NDFref{NDF} LUT file and/or a text file.
    }
    \sstusage{
       lutsave lut [device]
@@ -28341,7 +28351,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 }{
    \sstdescription{
       This procedure loads an optical-spectrum-like lookup table with linear
-      scaling into the current graphics device.
+      scaling into the \htmlref{current graphics device}{se:devglobal}.
    }
    \sstusage{
       lutspec
@@ -28535,7 +28545,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
       \sstsubsection{
          NDF = NDF (Read)
       }{
-         The \NDFref{NDF}~ defining the image values to be used if a
+         The \NDFref{NDF} defining the image values to be used if a
          histogram-style key is requested.  This should normally be the
          NDF currently displayed in the most recently created DATA picture.
          If a value is supplied on the command line for this parameter it
@@ -28614,7 +28624,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          lutview
       }{
          Draws an annotated colour table at a position selected via
-         the cursor on the current graphics device.
+         the cursor on the \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          lutview style='form=hist,logpop=1'
@@ -28692,7 +28702,7 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 }{
    \sstdescription{
       This procedure loads the {\it warm\/} lookup table with linear scaling
-      into the current graphics device.  It is a continuous LUT
+      into the \htmlref{current graphics device}{se:devglobal}.  It is a continuous LUT
       going from black to white, passing through warm shades of yellow
       and brown.
    }
@@ -28721,7 +28731,7 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 }{
    \sstdescription{
       This procedure loads a pseudo-contour lookup table with linear
-      scaling into the current graphics device.  The lookup table
+      scaling into the \htmlref{current graphics device}{se:devglobal}.  The lookup table
       is mainly black with a set of white stripes.
    }
    \sstusage{
@@ -28750,7 +28760,7 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 }{
    \sstdescription{
       The coefficients describing a two-dimensional polynomial surface
-      are read from a SURFACEFIT extension in an \NDFref{NDF}~ (written by
+      are read from a SURFACEFIT extension in an \NDFref{NDF} (written by
       FITSURFACE), and are used to create a two-dimensional surface of
       specified size and extent.  The surface is written to a new NDF.
 
@@ -29077,7 +29087,7 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
 }{
    \sstdescription{
       This application allows arithmetic and mathematical functions to
-      be applied pixel-by-pixel to a number of \NDFref{NDF}~ data structures and
+      be applied pixel-by-pixel to a number of \NDFref{NDF} data structures and
       constants so as to produce a new NDF.  The operations to be
       performed are specified using a Fortran-like mathematical
       expression.  Up to 26 each input NDF data and variance arrays, 26
@@ -30720,7 +30730,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          mlinplot rcw3\_b1 reset $\backslash$
       }{
          Plot the first five rows of the two-dimensional NDF file,
-         rcw3\_b1 on the current graphics device.  The lines are offset
+         rcw3\_b1 on the \htmlref{current graphics device}{se:devglobal}.  The lines are offset
          such that the averages of the rows are evenly separated in the
          direction of the vertical axis.
       }
@@ -31054,7 +31064,7 @@ plot (9k).
    Multiplies two NDF data structures
 }{
    \sstdescription{
-      The routine multiplies two \NDFref{NDF}~ data structures pixel-by-pixel to
+      The routine multiplies two \NDFref{NDF} data structures pixel-by-pixel to
       produce a new NDF.
    }
    \sstusage{
@@ -31200,7 +31210,7 @@ KAPPA: \htmlref{ADD}{ADD},
    Copies an NDF (or NDF section) to a new location
 }{
    \sstdescription{
-      This application copies an \NDFref{NDF}~ to a new location.  By supplying an
+      This application copies an \NDFref{NDF} to a new location.  By supplying an
       NDF section as input it may be used to extract a subset, or to
       change the size or dimensionality of an NDF.  A second NDF may
       also be supplied to act as a shape template, and hence to define
@@ -31354,7 +31364,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
    Displays the attributes of an NDF data structure
 }{
    \sstdescription{
-      This routine displays the attributes of an \NDFref{NDF}~ data structure
+      This routine displays the attributes of an \NDFref{NDF} data structure
       including:
 
       \sstitemlist{
@@ -31687,10 +31697,10 @@ KAPPA: \htmlref{FITSLIST}{FITSLIST},
 \sstroutine{
    NOGLOBALS
 }{
-   Resets the \KAPPA\ global parameters
+   Resets the KAPPA global parameters
 }{
    \sstdescription{
-      This application resets the \KAPPA\ global parameters, and so makes
+      This application resets the \KAPPA\normalsize global parameters, and so makes
       their values undefined.
    }
    \sstusage{
@@ -31705,7 +31715,7 @@ KAPPA: \htmlref{FITSLIST}{FITSLIST},
 }{
    \sstdescription{
       This function replaces the standard `magic value' assigned to bad
-      pixels in an \NDFref{NDF}~ with an alternative value, or with random
+      pixels in an \NDFref{NDF} with an alternative value, or with random
       samples taken from a Normal distribution.  Input pixels which do
       not have the magic value are left unchanged.  The number of
       replacements is reported.  NOMAGIC's applications include the
@@ -31875,7 +31885,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    and zero-point difference
 }{
    \sstdescription{
-      This application compares the data values in one \NDFref{NDF}~ against the
+      This application compares the data values in one \NDFref{NDF} against the
       corresponding values in the other NDF.  A least-squares
       straight-line is then fitted to the relationship between the two
       sets of data values in order to determine the relative scale
@@ -32122,7 +32132,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          normalize cl123a cl123b cl123c
       }{
          This normalises NDF cl123a to the NDF cl123b.  A plot of the
-         fit is made on the current graphics device, and the resulting
+         fit is made on the \htmlref{current graphics device}{se:devglobal}, and the resulting
          normalisation scale and offset are written only to the
          {\tt normalize.sdf} parameter file (as in the all the examples below
          except where noted).  The NDF cl123c is the normalised version
@@ -32224,7 +32234,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 }{
    \sstdescription{
       This routine counts and reports the number of elements of an
-      array within an input \NDFref{NDF}~ structure that have a value or absolute
+      array within an input \NDFref{NDF} structure that have a value or absolute
       value greater or less than a specified threshold.  This statistic
       is also shown as a percentage of the total number of array
       elements.
@@ -32338,8 +32348,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    Draws an outline of a two-dimensional NDF
 }{
    \sstdescription{
-      This application draws an outline of a two-dimensional \NDFref{NDF}~ on
-      the current graphics device, aligning it with any existing plot. 
+      This application draws an outline of a two-dimensional \NDFref{NDF} on
+      the \htmlref{current graphics device}{se:devglobal}, aligning it with any existing plot. 
 
       Annotated axes can be produced (see parameter AXES), and the appearance
       of the axes and curve can be controlled in detail (see parameter STYLE). 
@@ -32567,7 +32577,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK}.
 }{
    \sstdescription{
       This application loads the standard palette of colours to fill
-      the portion of the current graphics device's colour table which is
+      the portion of the \htmlref{current graphics device's}{se:devglobal} colour table which is
       reserved for the palette.  The palette comprises 16 colours and
       is intended to provide coloured annotations, borders, axes,
       graphs \emph{etc.} that are unaffected by changes to the lookup table
@@ -32628,7 +32638,7 @@ KAPPA: \htmlref{PALENTRY}{PALENTRY},
 }{
    \sstdescription{
       This application obtains a colour and enters it into the palette
-      portion of the current graphics device's colour table.  The palette
+      portion of the \htmlref{current graphics device's}{se:devglobal} colour table.  The palette
       comprises up to 16 colours and is intended to provide coloured
       annotations, borders, axes, graphs \emph{etc.} that are unaffected by
       changes to the lookup table used for images.
@@ -32717,7 +32727,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
    \sstdescription{
       This application reads a palette of colours from an \NDFref{NDF}, stored as
       red, green and blue intensities, to fill the portion of
-      the current graphics device's colour table which is reserved for
+      the \htmlref{current graphics device's}{se:devglobal} colour table which is reserved for
       the palette.  The palette comprises 16 colours and is intended
       to provide coloured annotations, borders, axes, graphs \emph{etc.} that
       are unaffected by changes to the lookup table used for images.
@@ -33165,7 +33175,7 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
       \sstexamplesubsection{
          picbase
       }{
-         This selects the BASE picture for the current graphics device.
+         This selects the BASE picture for the \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          picbase device=x2w
@@ -33238,7 +33248,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       \sstexamplesubsection{
          piccur
       }{
-         This selects a picture on the current graphics device by use of
+         This selects a picture on the \htmlref{current graphics device}{se:devglobal} by use of
          the cursor.  The picture containing the last-selected point becomes
          the current picture.
       }
@@ -33507,7 +33517,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          picdef tr
       }{
          Creates a new FRAME picture in the top-right quarter of the
-         full display area on the current graphics device, and an
+         full display area on the \htmlref{current graphics device}{se:devglobal}, and an
          outline is drawn around the new picture.  This picture becomes
          the current picture.
       }
@@ -33677,7 +33687,7 @@ KAPPA: \htmlref{PICENTIRE}{PICENTIRE},
          picentire
       }{
          This selects the first unobscured and unobscuring FRAME
-         picture for the current graphics device.
+         picture for the \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          picentire xwindows
@@ -33855,7 +33865,7 @@ KAPPA: \htmlref{PICBASE}{PICBASE},
          picgrid 3 2
       }{
          Creates six new equally sized and abutting FRAME pictures within the
-         full display area of the current graphics device.  All the
+         full display area of the \htmlref{current graphics device}{se:devglobal}.  All the
          pictures are outlined.  They have labels 1, 2, 3, 4, 5, and 6.
          The bottom-left picture (1) becomes the current picture.
       }
@@ -34031,7 +34041,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          picin
       }{
          This reports the attributes of the last DATA picture within
-         the current picture for the current graphics device.  The bounds
+         the current picture for the \htmlref{current graphics device}{se:devglobal}.  The bounds
          of the picture in its current co-ordinate Frame are reported.
       }
       \sstexamplesubsection{
@@ -34107,7 +34117,7 @@ KAPPA: \htmlref{GDSTATE}{GDSTATE},
       \sstexamplesubsection{
          piclabel GALAXY
       }{
-         This makes the current picture of the current graphics device
+         This makes the current picture of the \htmlref{current graphics device}{se:devglobal}
          have a label of {\tt "GALAXY"}.
       }
       \sstexamplesubsection{
@@ -34235,7 +34245,7 @@ KAPPA: \htmlref{PICBASE}{PICBASE},
          piclist
       }{
          This reports all the pictures in the graphics database for the
-         current graphics device.
+         \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          piclist device=ps\_l
@@ -34327,7 +34337,7 @@ KAPPA: \htmlref{PICBASE}{PICBASE},
          picsel GALAXY
       }{
          This makes the picture labelled {\tt "GALAXY"} the current picture on
-         the current graphics device.  Should there be no picture of
+         the \htmlref{current graphics device}{se:devglobal}.  Should there be no picture of
          this name, the current picture is unchanged.
       }
       \sstexamplesubsection{
@@ -34483,7 +34493,7 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
          pictrans "100.3,-20.1" framein=pixel
       }{
          This converts the position (100.3,~$-$20.1), in pixel co-ordinates
-         within the current picture of the current graphics device, to the
+         within the current picture of the \htmlref{current graphics device}{se:devglobal}, to the
          BASEPIC co-ordinates of that point in the BASE picture.
       }
       \sstexamplesubsection{
@@ -34563,7 +34573,7 @@ KAPPA: \htmlref{GDSTATE}{GDSTATE},
          picvis
       }{
          This selects the first unobscured FRAME picture for the
-         current graphics device.
+         \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          picvis xwindows
@@ -34688,7 +34698,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
    Expands an NDF by pixel duplication
 }{
    \sstdescription{
-      This routine expands the size of an \NDFref{NDF}~ structure by duplicating
+      This routine expands the size of an \NDFref{NDF} structure by duplicating
       each input pixel a specified number of times along each
       dimension, to create a new NDF structure.
    }
@@ -34861,7 +34871,7 @@ KAPPA: \htmlref{ADD}{ADD},
    Creates a one-dimensional profile through an \textit{n}-dimensional NDF
 }{
    \sstdescription{
-      This application samples an \textit{n}-dimensional \NDFref{NDF}~ at a set of positions,
+      This application samples an \textit{n}-dimensional \NDFref{NDF} at a set of positions,
       producing a one-dimensional output NDF containing the sample values.
       Nearest neighbour interpolation is used.
 
@@ -35142,7 +35152,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
       An optional plot of the mean profile and the fitted function may
       be produced.  The two-dimensional point-spread function may be stored 
-      in an \NDFref{NDF}~ for later use, as may the one-dimensional fitted profile.
+      in an \NDFref{NDF} for later use, as may the one-dimensional fitted profile.
    }
    \sstusage{
       psf in incat [device] [out] [cut] [range] [isize] [poscols]
@@ -35448,7 +35458,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          Derives the mean point-spread function for the stars images
          in the NDF called ngc6405i that are situated near the
          co-ordinates given in the positions list {\tt starlist.FIT}.  A
-         plot of the profile is drawn on the current graphics device.
+         plot of the profile is drawn on the \htmlref{current graphics device}{se:devglobal}.
       }
       \sstexamplesubsection{
          psf ngc6405i starlist device=!
@@ -35567,7 +35577,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    Set selected NDF pixels bad on the basis of Quality
 }{
    \sstdescription{
-      This routine produces a copy of an input \NDFref{NDF}~ in which selected pixels
+      This routine produces a copy of an input \NDFref{NDF} in which selected pixels
       are set bad.  The selection is based on the values in the Quality
       component of the input NDF; any pixel which holds a set of qualities
       satisfying the quality expression given for parameter QEXP is set bad
@@ -36118,7 +36128,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
 }{
    \sstdescription{
       This routine removes selected quality name definitions from an
-      \NDFref{NDF}~ (see task SETQUAL).  All quality names information may
+      \NDFref{NDF} (see task SETQUAL).  All quality names information may
       be removed by specifying a quality name of {\tt "ANY"}.
    }
    \sstusage{
@@ -36170,7 +36180,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
    Reshapes an NDF, treating its arrays as vectors
 }{
    \sstdescription{
-      This application reshapes an \NDFref{NDF}~ to create another NDF by copying
+      This application reshapes an \NDFref{NDF} to create another NDF by copying
       array values.  The array components in the input NDF are treated
       as vectors.  Each output array is filled in order with values from
       the input vector, until it is full or the input vector is
@@ -36268,7 +36278,7 @@ KAPPA: \htmlref{CHAIN}{CHAIN},
 }{
    \sstdescription{
       The routine adds a scalar (\emph{i.e.} constant) value to each pixel of
-      an \NDFref{NDF's} data array within a sub-section to produce a new NDF
+      an \NDFref{NDF's}  data array within a sub-section to produce a new NDF
       data structure.
    }
    \sstusage{
@@ -36381,7 +36391,7 @@ KAPPA: \htmlref{CADD}{CADD},
    Rotates a two-dimensional NDF about its centre through any angle
 }{
    \sstdescription{
-      This routine rotates a two-dimensional array stored in an \NDFref{NDF}~ data
+      This routine rotates a two-dimensional array stored in an \NDFref{NDF} data
       structure by an arbitrary angle.  The rotation angle can be chosen
       automatically to make north vertical in the output NDF (see parameter
       ANGLE).  The origin of the rotation is around the point (0,~0) in pixel
@@ -36569,7 +36579,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
 }{
    \sstdescription{
       This application displays a two-dimensional plot in which the
-      horizontal axis corresponds to the data value in the \NDFref{NDF}~ given
+      horizontal axis corresponds to the data value in the \NDFref{NDF} given
       by parameter IN1, and the vertical axis corresponds to the data
       value in the NDF given by parameter IN2.  Optionally, the variance,
       standard deviation or quality may be used instead of the data value for
@@ -36814,7 +36824,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
 }{
    \sstdescription{
       This routine copies one or more polygonal segments from the first
-      input \NDFref{NDF}~ (parameter IN1), and pastes them into the second input NDF
+      input \NDFref{NDF} (parameter IN1), and pastes them into the second input NDF
       (parameter IN2) at the same pixel co-ordinates.  The resulting mosaic
       is stored in the output NDF (see OUT).  Either input NDF may be
       supplied as null ({\tt{!}}) in which case the corresponding areas of the
@@ -37202,7 +37212,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 }{
    \sstdescription{
       This routine modifies the values of an axis array component or
-      system within an \NDFref{NDF}~ data structure.  There are a number of
+      system within an \NDFref{NDF} data structure.  There are a number of
       options (see parameter MODE).  They permit the deletion of the
       axis system, or an individual variance or width component; the
       replacement of one or more individual values; assignment of the
@@ -37479,11 +37489,11 @@ KAPPA: \htmlref{AXCONV}{AXCONV},
 \sstroutine{
    SETBAD
 }{
-   Sets new bad-pixel flag values for an NDF
+   Sets new \htmlref{bad-pixel flag}{apndf:quality} values for an NDF
 }{
    \sstdescription{
       This application sets new logical values for the bad-pixel flags
-      associated with an \NDFref{NDF's} data and/or variance arrays.  It may
+      associated with an \NDFref{NDF's}  data and/or variance arrays.  It may
       either be used to test whether bad pixels are actually present in
       these arrays and to set their bad-pixel flags accordingly, or to
       set explicit {\tt TRUE} or {\tt FALSE} values for these flags.
@@ -37604,12 +37614,13 @@ KAPPA: \htmlref{AXCONV}{AXCONV},
          {\tt FALSE} if they do not.
       }
    }
+   \label{setbad:badpixelflag}
    \sstdiytopic{
       Bad-Pixel Flag Values
    }{
-      If a bad-pixel flag is {\tt TRUE}, it indicates that the associated NDF
-      array may contain the special `bad' value and that affected
-      pixels are to be regarded as invalid.  Subsequent applications
+      If a \htmlref{bad-pixel flag}{apndf:quality}~ is {\tt TRUE}, it indicates
+      that the associated NDF array may contain the special `bad' value and 
+      that affected pixels are to be regarded as invalid.  Subsequent applications
       will need to check for such pixels and, if found, take account of
       them.
 
@@ -37880,7 +37891,7 @@ KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
    Manipulates the contents of a specified NDF extension
 }{
    \sstdescription{
-      This task enables the contents of a specified \NDFref{NDF}~ extension to be
+      This task enables the contents of a specified \NDFref{NDF} extension to be
       edited.  It can create a new extension or delete an existing one,
       can create new scalar components within an extension, or modify
       or display the values of existing scalar components within the
@@ -38013,7 +38024,7 @@ KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
       \sstexamplesubsection{
          setext hh50 fits delete noloop
       }{
-         This deletes the FITS extension in the NDF called hh50.
+         This deletes the \htmlref{FITS extension}{se:fitsairlock} in the NDF called hh50.
       }
       \sstexamplesubsection{
          setext myndf select xtype=mytype noloop
@@ -38079,7 +38090,7 @@ KAPPA: \htmlref{FITSIMP}{FITSIMP},
 }{
    \sstdescription{
       This routine sets a new value for the label component of an
-      existing \NDFref{NDF}~ data structure.  The NDF is accessed in update mode
+      existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
       and any pre-existing label is over-written with a new value.
       Alternatively, if a `null' value ({\tt{!}}) is given for the LABEL
       parameter, then the NDF's label will be erased.
@@ -38141,7 +38152,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 }{
    \sstdescription{
       This application flags all pixels that have a defined value in an
-      \NDFref{NDF}~ with the standard bad (`magic') value.  Other values are
+      \NDFref{NDF} with the standard bad (`magic') value.  Other values are
       unchanged.  The number of replacements is reported.  SETMAGIC's
       applications include the import of data from software that has a
       different magic value.
@@ -38258,7 +38269,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 }{
    \sstdescription{
       This routine sets a new value for one or all the normalisation
-      flags in an \NDFref{NDF}~ \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in
+      flags in an \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in
       update mode.  This flag determines how the NDF's data and
       variance arrays behave when the associated axis information is
       modified.
@@ -38346,7 +38357,7 @@ KAPPA: \htmlref{SETAXIS}{SETAXIS}.
    Sets a new pixel origin for an NDF
 }{
    \sstdescription{
-      This application sets a new pixel origin value for an \NDFref{NDF}~ data
+      This application sets a new pixel origin value for an \NDFref{NDF} data
       structure.  The NDF is accessed in update mode and the indices of
       the first pixel (the NDF's lower pixel-index bounds) are set to
       specified integer values, which may be positive or negative.  No
@@ -38980,7 +38991,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
 }{
    \sstdescription{
       This routine sets a new value for the title component of an
-      existing \NDFref{NDF}~ data structure.  The NDF is accessed in update mode
+      existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
       and any pre-existing title is over-written with a new value.
       Alternatively, if a `null' value ({\tt{!}}) is given for the TITLE
       parameter, then the NDF's title will be erased.
@@ -39040,7 +39051,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
 }{
    \sstdescription{
       This application allows the numeric type of the data and variance
-      components of an \NDFref{NDF}~ to be changed.  The NDF is accessed in update
+      components of an \NDFref{NDF} to be changed.  The NDF is accessed in update
       mode and the values stored in these components are converted
       in situ to the new type.  No other attributes of the NDF are
       changed.
@@ -39136,7 +39147,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
 }{
    \sstdescription{
       This routine sets a new value for the \htmlref{units component}{apndf:units}~ of an
-      existing \NDFref{NDF}~ data structure.  The NDF is accessed in update mode
+      existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
       and any pre-existing units component is over-written with a new
       value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
       UNITS parameter, then the NDF's units component will be erased.
@@ -39313,7 +39324,7 @@ KAPPA: \htmlref{ERRCLIP}{ERRCLIP};
    Enhances edges in a two-dimensional NDF using a shadow effect
 }{
    \sstdescription{
-      This routine enhances a two-dimensional \NDFref{NDF}~ by creating a
+      This routine enhances a two-dimensional \NDFref{NDF} by creating a
       bas-relief or shadow effect, that causes features in an array to
       appear as though they have been illuminated from the side by some
       imaginary light source.  The enhancement is useful in locating
@@ -39408,7 +39419,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
 }{
    \sstdescription{
       This routine displays a list of all the quality names currently
-      defined within a supplied \NDFref{NDF}~ (see task SETQUAL).  The descriptive
+      defined within a supplied \NDFref{NDF} (see task SETQUAL).  The descriptive
       comments which were stored with the quality names when they were
       originally defined are also displayed.  An option exists for also
       displaying the number of pixels which hold each quality.
@@ -39455,7 +39466,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
    Realigns an NDF using a translation
 }{
    \sstdescription{
-      The pixels of an \NDFref{NDF}~ are shifted by a given number of pixels along
+      The pixels of an \NDFref{NDF} are shifted by a given number of pixels along
       each pixel axis.  The shift need not be an integer number of pixels,
       and pixel interpolation will be performed if necessary using the
       scheme selected by parameter METHOD.  The shifts to use are specified
@@ -39640,7 +39651,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
    Squashes or stretches an NDF
 }{
    \sstdescription{
-      An output \NDFref{NDF}~ is produced by squashing or stretching an input
+      An output \NDFref{NDF} is produced by squashing or stretching an input
       NDF along one or more of its dimensions.  The shape of the
       output NDF can be specified in one of two ways, according to
       the value of the MODE parameter; either a distortion factor
@@ -40077,7 +40088,7 @@ KAPPA: \htmlref{HISTAT}{HISTAT},
    Subtracts one NDF data structure from another
 }{
    \sstdescription{
-      The routine subtracts one \NDFref{NDF}~ data structure from another
+      The routine subtracts one \NDFref{NDF} data structure from another
       pixel-by-pixel to produce a new NDF.
    }
    \sstusage{
@@ -40167,7 +40178,7 @@ KAPPA: \htmlref{ADD}{ADD},
 }{
    \sstdescription{
       This application changes all pixels that have a defined value in
-      an \NDFref{NDF}~ with an alternate value.  Other values are unchanged.  The
+      an \NDFref{NDF} with an alternate value.  Other values are unchanged.  The
       number of replacements is reported.
    }
    \sstusage{
@@ -40543,7 +40554,7 @@ right.
    with specified constant values
 }{
    \sstdescription{
-      This application creates an output \NDFref{NDF}~ by copying values from an
+      This application creates an output \NDFref{NDF} by copying values from an
       input NDF, replacing all values within given data ranges by
       a user-specified constant or by the bad value. Upper and lower
       thresholds are supplied using parameters THRLO and THRHI.
@@ -41126,7 +41137,7 @@ KAPPA: \htmlref{ADD}{ADD},
       parameter ANGROT.  Each vector may be represented either by an
       arrow or by a simple line, as selected by parameter ARROW.
 
-      The plot is produced within the current graphics database picture,
+      The plot is produced within the \htmlref{current graphics database picture}{se:agitate},
       and may be aligned with an existing DATA picture if the existing
       picture contains suitable \htmlref{co-ordinate Frame}{se:domains}\  information (see
       parameter CLEAR).
@@ -41402,7 +41413,7 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstexamplesubsection{
          vecplot polint polang
       }{
-         Produces a vector map on the current graphics device with
+         Produces a vector map on the \htmlref{current graphics device}{se:devglobal} with
          vector magnitude taken from the NDF called polint and vector
          orientation taken from NDF polang.  All other settings are
          defaulted, so for example about 20 vectors are displayed along
@@ -41485,7 +41496,7 @@ plot (7k).
    \sstdescription{
       This application can be used to create a new AST Mapping and
       optionally use the Mapping to add a new \htmlref{co-ordinate Frame}{se:domains}\  into
-      the \htmlref{WCS}{apndf:wcs} component of an \NDFref{NDF}~ (see parameter NDF).  An output text file
+      the \htmlref{WCS}{apndf:wcs} component of an \NDFref{NDF} (see parameter NDF).  An output text file
       may also be created holding a textual representation of the
       Mapping for future use by other applications such as REGRID (see
       parameter MAPOUT).  A number of different types of Mapping can be
@@ -42235,7 +42246,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 }{
    \sstdescription{
       This application can be used to manage the values of attributes
-      associated with the current \htmlref{co-ordinate Frame}{se:domains}\  of an \NDFref{NDF}~ (title, axis
+      associated with the current \htmlref{co-ordinate Frame}{se:domains}\  of an \NDFref{NDF} (title, axis
       labels, axis units, \emph{etc.}).
 
       Each attribute has a name, a value, and a state.  This application
@@ -42463,7 +42474,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 }{
    \sstdescription{
       This application copies the \htmlref{WCS}{apndf:wcs} component from one 
-      \NDFref{NDF}~ to another, optionally modifying it to take account of a linear
+      \NDFref{NDF} to another, optionally modifying it to take account of a linear
       mapping between the pixel co-ordinates in the two NDFs.  It can be
       used, for instance, to rectify the loss of WCS information produced
       by older applications which do not propagate the WCS component.
@@ -42635,7 +42646,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 }{
    \sstdescription{
       This application displays the current \htmlref{co-ordinate Frame}{se:domains}\  associated
-      with an \NDFref{NDF}~ and then allows the user to specify a new Frame.  The
+      with an \NDFref{NDF} and then allows the user to specify a new Frame.  The
       current co-ordinate Frame determines the co-ordinate system in
       which positions within the NDF will be expressed when communicating
       with the user.
@@ -42845,7 +42856,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    \sstdescription{
       This application allows you to examine \htmlref{WCS}{apndf:wcs} 
       information (represented by an AST Object) stored in a
-      specified \NDFref{NDF}~ or \HDSref\ object, or a catalogue.  The structure can be
+      specified \NDFref{NDF} or \HDSref\ object, or a catalogue.  The structure can be
       dumped to a text file, or a Graphical User Interface can be used
       to navigate through the structure (see parameter LOGFILE).  A new
       FrameSet can also be stored in the WCS component of an NDF (see
@@ -42969,7 +42980,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    Transform a position from one NDF co-ordinate Frame to another
 }{
    \sstdescription{
-      This application transforms a position from one \NDFref{NDF}~ \htmlref{co-ordinate Frame}{se:domains}\ 
+      This application transforms a position from one \NDFref{NDF} \htmlref{co-ordinate Frame}{se:domains}\ 
       to another.  The input and output Frames may be chosen freely from the
       Frames available in the \htmlref{WCS}{apndf:wcs} component of the supplied NDF.  The
       transformed position is formatted for display and written to the screen
@@ -43176,7 +43187,7 @@ KAPPA: \htmlref{LISTMAKE}{LISTMAKE},
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The input \NDFref{NDF}~ containing the observed data.  This image may
+         The input \NDFref{NDF} containing the observed data.  This image may
          contain bad values, in which case the bad values will be
          replaced by zero before applying the filter.  The resulting
          filtered image is normalised by dividing each pixel value by
@@ -43678,7 +43689,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          Assuming the current value of parameter MODE is {\tt "Cursor"}, this
          will copy the NDF associated with the last DATA picture to an
          NDF called cleaned, interactively replacing areas using the
-         current graphics device.  Linear interpolation is used to obtain
+         \htmlref{current graphics device}{se:devglobal}.  Linear interpolation is used to obtain
          the replacement values.  A record of the areas replaced will be
          stored in a text file named {\tt fudge.dat}.
       }
@@ -44673,7 +44684,7 @@ from a set of standard items and extensions (see \xref{SUN/33}{sun33}{}).
 Only the main data array must be present; all the other items are optional.
 
 {\tt \$KAPPA\_DIR/example.sdf} is an NDF which contains all the standard 
-NDF components, except a WCS component and a FITS extension; it also has 
+NDF components, except a WCS component and a \htmlref{FITS extension}{se:fitsairlock}; it also has 
 a FIGARO extension.
 The structure of the file (as revealed by
 {\tt \%~hdstrace \$KAPPA\_DIR/example}) is shown below.  The layout is
@@ -44843,7 +44854,8 @@ non-standard items.  These auxiliary data could be information about
 the original observing setup, such as the airmass during the
 observation or the temperature of the detector; they may be
 calibration data or results produced during processing of the data
-array, {\it{e.g.}}\ spectral-line fits. {\tt example.sdf} began life as
+array, {\it{e.g.}}\ spectral-line fits. The extensions are located
+within the MORE top-level component.  {\tt example.sdf} began life as
 a \Figaroref\ file.  It was converted to an NDF using the command
 \xref{DST2NDF}{sun55}{DST2NDF}\latexonly{ (see SUN/55)}.  It contains
 values for the airmass and exposure time associated with the
@@ -45001,7 +45013,7 @@ The following commands used to be part of \KAPPA\ but have now been
     bug fixes in AGI can be applied without relinking \KAPPA.
  
   \item  Applications using axis data will now detect if the axis centres
-    are not monotonic, and then take appropriate action, {\it{e.g.}}
+    are not monotonic, and then take appropriate action, \emph{e.g.}
     DISPLAY would use world co-ordinates for axes, and NDFTRACE
     would flag the axis as being non-monotonic.
 
@@ -45039,7 +45051,7 @@ is needed urgently.
 
 \subsection{Modified applications}
 \begin{itemize}
-  \item  CLEANER writes the bad-pixel flag.
+  \item  CLEANER writes the \htmlref{bad-pixel flag}{apndf:quality}.
 
   \item  \htmlref{CONTOUR}{CONTOUR}, \htmlref{DISPLAY}{DISPLAY},
     \htmlref{GREYPLOT}{GREYPLOT}, \htmlref{TURBOCONT}{TURBOCONT}
@@ -45139,7 +45151,7 @@ and hypertext.
   \item  An improved algorithm is used to test whether axes are linear
     or not.
 
-  \item  The bad-pixel flag is now updated throughout \KAPPA.
+  \item  The \htmlref{bad-pixel flag}{setbad:badpixelflag} is now updated throughout \KAPPA.
     Previously, it had been commented out so that it would not cause
     problems with the IMAGE-format tasks.
 
@@ -45198,7 +45210,7 @@ and hypertext.
     surrounding data.
 
   \item [\htmlref{FITSEXP}{FITSEXP}]  Moves ancillary data within an
-    NDF from arbitrary extensions to the FITS extension.  It uses a
+    NDF from arbitrary extensions to the \htmlref{FITS extension}{se:fitsairlock}.  It uses a
     keyword translation table held in a text file.
 
   \item [\htmlref{FITSTEXT}{FITSTEXT}]  Creates an NDF FITS extension
@@ -45349,7 +45361,7 @@ and hypertext.
 
 \subsection{New procedures}
 \begin{description}
-  \item [\htmlref{FITSEDIT}{FITSEDIT}]  Edits the FITS extension of an
+  \item [\htmlref{FITSEDIT}{FITSEDIT}]  Edits the \htmlref{FITS extension}{se:fitsairlock} of an
     NDF.  You can use your favourite editor to modify the FITS headers
     in a NDF's \htmlref{FITS extension}{se:fitsairlock}.  There is
     limited validation of the edited headers.
@@ -45469,9 +45481,9 @@ the NDF\_ library feature much-improved documentation.
   \item  \htmlref{HISTOGRAM}{HISTOGRAM} has been converted to NDF\_.  It
     supports all NDF array components, and operates on NDFs of
     arbitrary dimensionality.  The histogram may be saved to an NDF
-    (with the bad-pixel flag set to {\tt FALSE}); and/or plotted, with
-    several parameters available for controlling the appearance of the
-    graphics.
+    (with the \htmlref{bad-pixel flag}{setbad:bad-pixelflag} set to 
+    {\tt FALSE}); and/or plotted, with several parameters available for
+    controlling the appearance of the graphics.
 
   \item  In \htmlref{INSPECT}{INSPECT} the defaults for parameters
     HISTOGRAM and SLICE have changed to null, meaning do not produce
@@ -45621,7 +45633,7 @@ withdrawn, two to enable \KAPPA\ to be NAG-free.
      expected to be used in conjunction with LINPLOT or HISTOGRAM.
 
   \item [\htmlref{FITSMOD}{FITSMOD}]  
-     Edits an NDF FITS extension via a text file or parameters.  This
+     Edits an NDF \htmlref{FITS extension}{se:fitsairlock} via a text file or parameters.  This
      allows you to manipulate ancillary data not in a special extension.
 
   \item [\htmlref{KSTEST}{KSTEST}]
@@ -45801,7 +45813,7 @@ THRESH to be ignored when using a \_DOUBLE data array.
 if all the variances are bad or zero.  Also added protection against
 division by zero which occurred if the variance array contained any isolated 
 zeros.
-  \item \htmlref{FITSEDIT}{FITSEDIT} now creates a new FITS extension if
+  \item \htmlref{FITSEDIT}{FITSEDIT} now creates a new \htmlref{FITS extension}{se:fitsairlock} if
 the specified NDF does not already contain a FITS extension.
   \item \htmlref{FITSIN}{FITSIN} now creates an NDF \htmlref{WCS}{apndf:wcs} component (if
 possible) storing a description of any world co-ordinate systems defined
@@ -45848,7 +45860,7 @@ WCS component.  If no WCS component is present within an NDF, applications
 which read the WCS component will attempt to find suitable WCS information 
 in one of two other sources.  First, any IRAS90 astrometry structure 
 contained within an NDF extension will be used.  If no such structure can 
-be found, any FITS header cards in the FITS extension will be used.
+be found, any FITS header cards in the \htmlref{FITS extension}{se:fitsairlock} will be used.
 Applications which write WCS information to an NDF will always write it
 in the form of a WCS component.
 
@@ -45858,7 +45870,7 @@ previously had many parameters to control the appearance of the plot
 parameter instead.  The value supplied for a STYLE parameter should be a
 group of {\em plotting attributes}.  Defaults for unspecified plotting
 attributes are read from text files within {\tt \$KAPPA\_DIR} (\emph{e.g.}
-\verb+$KAPPA_DIR/kappa\_style.def+}.  Alternative defaults files may be specified 
+\verb+$KAPPA_DIR/kappa_style.def+.  Alternative defaults files may be specified 
 by setting environment variables (\emph{e.g.} {\tt KAPPA\_STYLE}) to hold 
 the name of the defaults file to use.
 
@@ -46183,7 +46195,7 @@ section \ref{se:style} the use of graphical style parameters.
             \item This now displays the available WCS information within
                   an NDF.  If a WCS component is not present within the 
                   NDF, then it will display WCS information derived from
-                  an IRAS90 astrometry structure or FITS extension (if
+                  an IRAS90 astrometry structure or \htmlref{FITS extension}{se:fitsairlock} (if
                   possible) as described earlier.
 
             \item The following new parameters have been added: CURRENT, FDIM,
@@ -46237,7 +46249,7 @@ section \ref{se:style} the use of graphical style parameters.
          of the \htmlref{co-ordinate Frame}{se:domains}\ s described within the catalogue.  It can also
          write the selected positions to a new
          positions list.  The positions are displayed on the screen, and
-         can also be marked on the current graphics device in a variety
+         can also be marked on the \htmlref{current graphics device}{se:devglobal} in a variety
          of ways.
 
    \item [\htmlref{PROFILE}{PROFILE}] -- Produces a one-dimensional NDF
@@ -48044,7 +48056,7 @@ functions as follows.
 \item {\large\bf Preparation for output}
 \begin{description}
 \classitem{FITSEDIT}
- Edits the FITS extension of an NDF.
+ Edits the \htmlref{FITS extension}{se:fitsairlock} of an NDF.
 \classitem{FITSEXP}
  Exports NDF-extension information into an NDF FITS extension.
 \classitem{FITSMOD}
@@ -48087,7 +48099,7 @@ functions as follows.
 \classitem{GDNAMES}
  Shows which graphics devices are available.
 \classitem{GDSET}
- Selects a current graphics device.
+ Selects a \htmlref{current graphics device}{se:devglobal}.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -48379,7 +48391,7 @@ functions as follows.
 \classitem{REMQUAL}
  Removes named qualities stored in an NDF Quality component.
 \classitem{SETBAD}
- Sets new bad-pixel flag values for an NDF.
+ Sets new \htmlref{bad-pixel flag}{apndf:quality} values for an NDF.
 \classitem{SETBB}
  Sets a new value for the quality bad-bits mask of an NDF.
 \classitem{SETBOUND}
@@ -48426,7 +48438,7 @@ functions as follows.
 \item {\large\bf NDF extensions}
 \begin{description}
 \classitem{FITSEDIT}
- Edits the FITS extension of an NDF.
+ Edits the \htmlref{FITS extension}{se:fitsairlock} of an NDF.
 \classitem{FITSEXIST}
  Inquires whether or not a keyword exists in a FITS extension.
 \classitem{FITSEXP}
@@ -48634,7 +48646,7 @@ functions as follows.
 \classitem{GLOBALS}
  Displays the values of the \KAPPA\ global parameters.
 \classitem{FITSEXIST}
- Inquires whether or not a keyword exists in a FITS extension.
+ Inquires whether or not a keyword exists in a \htmlref{FITS extension}{se:fitsairlock}.
 \classitem{FITSLIST}
  Lists the FITS extension of an NDF.
 \classitem{FITSVAL}
