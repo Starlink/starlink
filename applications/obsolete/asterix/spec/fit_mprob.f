@@ -180,7 +180,7 @@
 *
       DOUBLE PRECISION		ELPF			! < log d! >
       DOUBLE PRECISION		ELPF2			! < log d! ^ 2 >
-      DOUBLE PRECISION		EDLPF			! < d log d! >
+      DOUBLE PRECISION		EPLPF			! < d log d! >
       DOUBLE PRECISION		LP			! Log predicted data
 
       INTEGER			I			! Loop over data
