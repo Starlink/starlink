@@ -354,6 +354,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        encodings to be non-contiguous.
 *        - Corrected ComBlock to correctly remove AST comment blocks in
 *        native encoded fitschans.
+*     14-AUG-2001 (DSB:
+*        - Modified FixUsed so that it it does not set the current card
+*        back to the start of file if the last card in the FitsChan is 
+*        deleted.
 *class--
 */
 
@@ -7550,10 +7554,13 @@ static void FixUsed( AstFitsChan *this, int used, int remove,
 
 /* If required, delete the card. The next card is made current. If we are
    about to delete the original current card, we need to update the
-   pointer to the card to be made current at the end of this function. */
+   pointer to the card to be made current at the end of this function.
+   If we end up back at the head of the chain, indicate that we have
+   reached the end of file by setting card0 NULL.  */
          if( remove ) {
             if( card0 == this->card && card0 ) {
                card0 = ( (FitsCard *) this->card )->next;
+               if( (void *) card0 == this->head ) card0 = NULL;
             }
             DeleteCard( this, method, class );
 
