@@ -1,61 +1,5 @@
-*+  FIT_TCREGRIDAX - Create a dataset axis structure from grid axis blocks
-      SUBROUTINE FIT_TCREGRIDAX( LOC, NAX, GAX, STATUS )
-*
-*    Description :
-*
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      2 Jul 92 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'FIT_PAR'
-*
-*    Structure definitions :
-*
-      INCLUDE 'FIT_STRUC'
-*
-*    Import :
-*
-      INTEGER			ID			!
-      INTEGER                  NAX                     ! Number of grid axes
-      RECORD /GRID_AXIS/       GAX(NAX)                ! Grid axis block
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Output dataset
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Get locator
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
-
-      CALL FIT_CREGRIDAX( LOC, NAX, GAX, STATUS )
-
-*    Tidy up
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'FIT_CREGRIDAX', STATUS )
-      END IF
-
-      END
-
-
 *+  FIT_CREGRIDAX - Create a dataset axis structure from grid axis blocks
-      SUBROUTINE FIT_CREGRIDAX( LOC, NAX, GAX, STATUS )
+      SUBROUTINE FIT_CREGRIDAX( FID, NAX, GAX, STATUS )
 *
 *    Description :
 *
@@ -66,6 +10,7 @@
 *    History :
 *
 *      2 Jul 92 : Original (DJA)
+*     24 Apr 95 : Updated to use BDI_ (DJA)
 *
 *    Type definitions :
 *
@@ -83,9 +28,9 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Output dataset
-      INTEGER                  NAX                     ! Number of grid axes
-      RECORD /GRID_AXIS/       GAX(NAX)                ! Grid axis block
+      INTEGER			FID			! Dataset id
+      INTEGER                   NAX                     ! Number of grid axes
+      RECORD /GRID_AXIS/        GAX(NAX)                ! Grid axis block
 *
 *    Status :
 *
@@ -93,29 +38,25 @@
 *
 *    Local variables :
 *
-      REAL                     AVAL                    ! Axis value
-      REAL                     AWID                    ! Axis width
+      REAL                      AVAL                    ! Axis value
+      REAL                      AWID                    ! Axis width
 
-      INTEGER                  BDA                     ! BDA identifier
-      INTEGER                  IAX                     ! Loop over axes
-      INTEGER                  IBIN                    ! Loop over axis values
-      INTEGER                  LNAX                    ! Number of existing axes
-      INTEGER                  PTR                     ! Ptr to axis data
-      INTEGER                  WPTR                    ! Ptr to axis widths
+      INTEGER                   IAX                     ! Loop over axes
+      INTEGER                   IBIN                    ! Loop over axis values
+      INTEGER                   LNAX                    ! Number of existing axes
+      INTEGER                   PTR                     ! Ptr to axis data
+      INTEGER                   WPTR                    ! Ptr to axis widths
 
-      LOGICAL                  REG                     ! Regular NDF axis?
+      LOGICAL                   REG                     ! Regular NDF axis?
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get BDA identifier
-      CALL BDA_FIND( LOC, BDA, STATUS )
-
 *    Create axes
-      CALL BDA_CHKAXES_INT( BDA, LNAX, STATUS )
+      CALL BDI_CHKAXES( FID, LNAX, STATUS )
       IF ( LNAX .NE. NAX ) THEN
-        CALL BDA_CREAXES_INT( BDA, NAX, STATUS )
+        CALL BDI_CREAXES( FID, NAX, STATUS )
       END IF
 
 *    Loop over axes
@@ -125,21 +66,20 @@
         REG = ( GAX(IAX).REGULAR .AND. .NOT. GAX(IAX).LOGARITHMIC )
 
 *      Create structure
-        CALL BDA_CREAXVAL_INT( BDA, IAX, REG, GAX(IAX).NVAL, STATUS )
+        CALL BDI_CREAXVAL( FID, IAX, REG, GAX(IAX).NVAL, STATUS )
 
 *      Write parameters
         IF ( REG ) THEN
-          CALL BDA_PUTAXVAL_INT( BDA, IAX, GAX(IAX).BASE,
+          CALL BDI_PUTAXVAL( FID, IAX, GAX(IAX).BASE,
      :            GAX(IAX).SCALE, GAX(IAX).NVAL, STATUS )
         ELSE
 
 *        Create widths structure
-          CALL BDA_CREAXWID_INT( BDA, IAX, .FALSE., GAX(IAX).NVAL,
-     :                                                    STATUS )
+          CALL BDI_CREAXWID( FID, IAX, .FALSE., GAX(IAX).NVAL, STATUS )
 
 *        Map axis arrays
-          CALL BDA_MAPAXVAL_INT( BDA, 'WRITE', IAX, PTR, STATUS )
-          CALL BDA_MAPAXWID_INT( BDA, 'WRITE', IAX, WPTR, STATUS )
+          CALL BDI_MAPAXVAL( FID, 'WRITE', IAX, PTR, STATUS )
+          CALL BDI_MAPAXWID( FID, 'WRITE', IAX, WPTR, STATUS )
 
 *        Find axis values and widths and store in axis arrays
           DO IBIN = 1, GAX(IAX).NVAL
@@ -151,8 +91,8 @@
           END DO
 
 *        Unmap axis data
-          CALL BDA_UNMAPAXVAL_INT( BDA, IAX, STATUS )
-          CALL BDA_UNMAPAXWID_INT( BDA, IAX, STATUS )
+          CALL BDI_UNMAPAXVAL( FID, IAX, STATUS )
+          CALL BDI_UNMAPAXWID( FID, IAX, STATUS )
 
         END IF
 
@@ -160,7 +100,7 @@
 
 *    Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from FIT_CREGRIDAX', STATUS )
+        CALL AST_REXIT( 'FIT_CREGRIDAX', STATUS )
       END IF
 
       END
