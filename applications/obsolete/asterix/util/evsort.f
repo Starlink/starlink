@@ -29,6 +29,7 @@
 *
 *     11 May 93 : V1.7-0  Original (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     14 Aug 95 : V1.8-1  Started ADI conversion (DJA)
 *
 *    Type Definitions :
 *
@@ -59,6 +60,7 @@
       CHARACTER*80           TXT(MXLIN)         ! History text
 
       INTEGER                I                  ! Loop counters
+      INTEGER			IFID			! Input dataset
       INTEGER                LLENGTH            ! List length
       INTEGER                IPTR, OPTR         ! Input and output list data
       INTEGER                IDPTR              ! Sort index
@@ -66,6 +68,7 @@
       INTEGER                NLIN               ! Number of text lines used
       INTEGER                NLIST              ! Number of lists in input
       INTEGER                NVAL               ! Number of values mapped
+      INTEGER			OFID			! Output dataset
 
       LOGICAL                INPRIM             ! Is input primitive?
       LOGICAL                ASCEND             ! Sort in ascending order?
@@ -73,7 +76,7 @@
 *    Local constants :
 *
       CHARACTER*(30)         VERSION            ! version id
-        PARAMETER           (VERSION = 'EVSORT Version 1.8-0')
+        PARAMETER           (VERSION = 'EVSORT Version 1.8-1')
 *-
 
 *    Version anouncement
@@ -83,14 +86,10 @@
       CALL AST_INIT()
 
 *    Obtain data objects
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, INPRIM,
-     :                                                  STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-      IF ( INPRIM ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Input is NOT an event dataset', STATUS )
-      END IF
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'EVDS', OFID, STATUS )
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Find all lists in the object
@@ -129,7 +128,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy input to output
-      CALL HDX_COPY( ILOC, OLOC, STATUS )
+      CALL ADI_FCOPY( IFID, OFID, STATUS )
 
 *    Map input list
       CALL LIST_MAPV( ILOC, SLIST, '_DOUBLE', 'READ', IPTR, NVAL,
@@ -172,7 +171,7 @@
       CALL DYN_UNMAP( IDPTR, STATUS )
 
 *    Write history
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       TXT(1) = 'Input evds {INP}'
       TXT(2) = 'Sorted by list '//SLIST
       IF ( ASCEND ) THEN
@@ -182,7 +181,7 @@
       END IF
       NLIN = MXLIN
       CALL USI_TEXT( 3, TXT, NLIN, STATUS )
-      CALL HIST_PTXT( OLOC, NLIN, TXT, STATUS )
+      CALL HSI_PTXT( OFID, NLIN, TXT, STATUS )
 
 *    Exit
  99   CALL AST_CLOSE()
