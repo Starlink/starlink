@@ -42,7 +42,7 @@ use strict;
 # Starlink data type conversion
 use vars qw/%pdltypes %startypes $ndf_loaded $VERSION $EXTNAME/;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # Set PDL -> Starlink data types
 %pdltypes = ("$PDL_B"  => "_BYTE",
@@ -243,7 +243,7 @@ sub PDL::wndf {  # Write a PDL to an NDF format file
 
   barf 'Usage: wndf($pdl,$file)' if $#_!=1;
 
-  my ($indf, $place, $status, $place, $outndf);
+  my ($indf, $place, $status, $outndf);
   my (@lbnd, @ubnd);
 
   my ($pdl, $outfile) = @_;
@@ -413,7 +413,7 @@ sub rdata {
 
   return $status if $status != &NDF::SAI__OK;
 
-  my ($maxdims, @dim, $ndim, @dim, @comps, $dcomp, $tcomp, $exist);
+  my ($maxdims, $ndim, @dim, @comps, $dcomp, $tcomp, $exist);
   my ($type, $data_pntr, $el, $temppdl, $nbytes, $badbit, $dref);
 
   ####################################################################
@@ -518,7 +518,7 @@ sub raxes {
   return $status if $status != &NDF::SAI__OK;
 
   my ($there, $naxis, @dims, $axcomp, $exist, $axtype, $axpntr, $el);
-  my ($nbytes, $entry, $value, $temppdl, $tcomp, $daxref, $dref);
+  my ($nbytes, $temppdl, $tcomp, $daxref, $dref);
   my ($axhdr, $ndims);
 
   # Read in axis information
@@ -549,6 +549,7 @@ sub raxes {
 
 	# Set up new PDL for axis info if map was okay
 	if ($status == &NDF::SAI__OK) {
+	  print "Number of elements: $el\n" if $PDL::verbose;
 	  $$header{Axis}[$naxis] = $class->new;
 	  $temppdl = $$header{Axis}[$naxis];
 	  $temppdl->set_datatype($startypes{$axtype});
@@ -572,7 +573,7 @@ sub raxes {
 	  ndf_astat($indf, $tcomp, $naxis+1, $exist, $status);
 
 	  if ($exist && ($status == &NDF::SAI__OK)) {
-	    print "Reading Axis $naxis errors...\n";
+	    print "Reading Axis $naxis errors...\n" if $PDL::verbose;
 	    ndf_atype($indf, $tcomp, $naxis+1, $axtype, $status);
 
 	    ndf_amap($indf, $axcomp, $naxis+1, $axtype, 'READ', $axpntr,
@@ -599,11 +600,12 @@ sub raxes {
 	  }
 
 	  # Get label and units
-	  for $entry ('Units', 'Label') {
+	  for my $entry ('Units', 'Label') {
 	    ndf_astat($indf, $entry, $naxis+1, $exist, $status);
 	    if ($exist) {
+	      my $value = '';
 	      ndf_acget($indf,$entry, $naxis+1, $value, $status);
-	      $$axhdr{"$entry"} = $value;
+	      $axhdr->{"$entry"} = $value;
 	    }
 	  }
 	}
@@ -977,15 +979,16 @@ sub wdata {
   if (exists $hdr{Axis}) {
      # Check that we have an array
      if (ref($hdr{Axis}) eq 'ARRAY') {
-
        # Now loop over axes
-       for (my $i = 0; $i <= $#{$hdr{Axis}}; $i++) {
+       for my $i (0..$#{$hdr{Axis}} ) {
+	 # Loop unless status is bad
+	 last unless $status == &NDF::SAI__OK;
 
-         my $axis = ${$hdr{Axis}}[$i];
+	 # Extract the ith axis PDL from the array
+         my $axis = $hdr{Axis}->[$i];
 
          # If we have a PDL
          if (UNIVERSAL::isa($axis, 'PDL')) {
-
             # We now want to copy the data and if necessary the
             # Error array. Since there are only two I will do it the
             # long way by explcitly storing data and then error
@@ -999,21 +1002,21 @@ sub wdata {
                    $el, $status);
 
             # Check that we have the correct number of entries
-            if ($axis->nelem == $el) {
-
-              print "Mapping axis " , $i+1 , "\n"  if $PDL::verbose;
-
+	    my $nelem = $axis->nelem;
+            if ($el == $nelem) {
+	      print "Mapping axis " , $i+1 , "\n"  if $PDL::verbose;
+	    
               # Number of bytes per entry
               $nbytes = PDL::Core::howbig($axis->get_datatype) * $el;
-
+	    
               # Copy to disk
-              string2mem(${$axis->get_dataref}, $nbytes, $axpntr)
+              string2mem( $ { $axis->get_dataref }, $nbytes, $axpntr)
                  if ($status == &NDF::SAI__OK);
 
             } else {
               carp "Axis ",$i+1 .
                    " is the wrong size ($el values required but got ".
-                   $axis->nelem . ")- ignoring";
+                   $nelem . ")- ignoring";
             }
             # Unmap
             ndf_aunmp($outndf, '*', $i+1, $status);
@@ -1021,17 +1024,18 @@ sub wdata {
             # Errors
             my $axhdr = $axis->gethdr; # Retrieve and check header
             if (ref($axhdr) eq 'HASH') {
-              %axhdr = %$hdr;
+              %axhdr = %$axhdr;
             } else {
               %axhdr = ();
             }
 
+	    # Look for an Errors component in the header hash
             if (exists $axhdr{Errors}) {
-               my $axis = $axhdr{Errors};
-               if (UNIVERSAL::isa($axis, 'PDL')) {
+               my $axerr = $axhdr{Errors};
+               if (UNIVERSAL::isa($axerr, 'PDL')) {
 
                  # Set data type
-                 $axtype = $pdltypes{$axis->get_datatype};
+                 $axtype = $pdltypes{$axerr->get_datatype};
                  ndf_astyp($axtype, $outndf, 'Variance', $i+1, $status);
 
                  # Okay we can now map this pdl
@@ -1039,21 +1043,23 @@ sub wdata {
                    $axpntr, $el, $status);
 
                  # Check that we have the correct number of entries
-                 if ($axis->nelem == $el) {
+		 my $nelem = $axerr->nelem;
+		 print "Nelem: $nelem and $el\n";
+                 if ($nelem == $el) {
                    print "Mapping errors for axis " . $i+1 . "\n"
                      if $PDL::verbose;
 
                    # Number of bytes per entry
-                   $nbytes = PDL::Core::howbig($axis->get_datatype) * $el;
+                   $nbytes = PDL::Core::howbig($axerr->get_datatype) * $el;
 
                    # Copy to disk
-                   string2mem(${$axis->get_dataref}, $nbytes, $axpntr)
+                   string2mem($ {$axerr->get_dataref}, $nbytes, $axpntr)
                      if ($status == &NDF::SAI__OK);
 
                  } else {
                     carp "Error PDL for Axis ",$i+1,
                        " is the wrong size ($el values required but got ".
-                        $axis->nelem . ")- ignoring";
+                        $axerr->nelem . ")- ignoring";
                  }
                  # Unmap
                  ndf_aunmp($outndf, '*', $i+1, $status);
@@ -1096,7 +1102,7 @@ sub whdr {
 
   my ($outndf, $pdl, $status) = @_;
 
-  my ($key, %header, @fitsdim, $fitsloc, $value);
+  my (%header, @fitsdim, $fitsloc, $value);
   my (%unused, @fits, $hashref, $hdr);
 
   # Return if bad status
@@ -1117,14 +1123,14 @@ sub whdr {
   %unused = ();
   @fits = ();
 
-  foreach $key (sort keys %header) {
+  foreach my $key (sort keys %header) {
 
     next if $key eq '_COMMENTS';
 
     if ($key =~ /^TITLE$|^UNITS$|^LABEL$/i) {
       # This is not extension info
       ndf_cput($header{$key}, $outndf, $key, $status)
-        if length($header{$key} > 0);
+        if length($header{$key}) > 0;
     }
 
     # Only write scalars
@@ -1170,8 +1176,6 @@ sub whdr {
 # This is extended  by any '.' in the key.
 
 sub whash {
-
-  no strict "refs";
 
   my ($hash, $outndf, $hashname, $stypes, $status) = @_;
 
@@ -1237,8 +1241,8 @@ sub whash {
 
       # Find list of structures
       $structs = join(".", @structures);
-      $structs = 'PERLDL' unless ($structs =~ /./);
-      $stypes = 'PERLDL_HDR' unless ($stypes =~ /./);
+      $structs = 'PERLDL' unless (defined $structs && $structs =~ /./);
+      $stypes = 'PERLDL_HDR' unless (defined $stypes && $stypes =~ /./);
 
       $loc = mkstruct($outndf, $structs, $stypes, $status);
       undef $stypes;
@@ -1274,7 +1278,8 @@ sub whash {
       if (ref($header{"$key"}) eq 'PDL') {
         my $pdl = $header{"$key"};
         @bounds = $pdl->dims;
-        dat_new($loc, $comp, $type, $#bounds+1, @bounds, $status);
+	my $n = $#bounds + 1;
+        dat_new($loc, $comp, $type, $n, \@bounds, $status);
         $nbytes = PDL::Core::howbig($pdl->get_datatype) *
             $pdl->nelem;
         cmp_mapv($loc, $comp, $type, 'WRITE', $pntr, $el, $status);
@@ -1286,12 +1291,23 @@ sub whash {
       # SCALARS
       ref($header{"$key"}) || do {
 
-        if ($type =~ /_CHAR/) {
+        if ($type =~ /^_CHAR/) {
           $length = length($header{"$key"});
           dat_new0c($loc, $comp, $length, $status);
           cmp_put0c($loc, $comp, $header{"$key"}, $status)
             if $length > 0;
+	} elsif ($type =~ /^_LOG/) {
+	  # In this case, add a check for FALSE or TRUE as strings
+	  dat_new0l($loc, $comp, $status);
+	  my $value = $header{$key};
+	  if ($value eq 'FALSE') {
+	    $value = 0;
+	  } elsif ($value eq 'TRUE') {
+	    $value = 1;
+	  }
+	  cmp_put0l($loc, $comp, $value, $status);
         } else {
+	  no strict "refs"; # Turn off strict
           $which = lc(substr($type, 1,1));
           &{"dat_new0$which"}($loc, $comp, $status);
           &{"cmp_put0$which"}($loc, $comp, $header{"$key"}, $status);
