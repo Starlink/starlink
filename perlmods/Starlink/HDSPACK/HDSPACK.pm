@@ -287,6 +287,7 @@ sub copobj {
     return $status;
   }
 
+  print "# -> copobj: $source -> $target\n" if $DEBUG;
 
   # First remove the final target name -- we don't want a locator
   # to that since we are putting our copied object there
@@ -404,6 +405,8 @@ sub setobj {
     return $status;
   }
 
+  print "# -> setobj: $object\n" if $DEBUG;
+
   # Find the HDS locator referenced
   my @srclocs;
   ($status, @srclocs) = retrieve_locs($object, 'UPDATE', $status)
@@ -463,10 +466,11 @@ sub setobj {
 	     $status);
     }
 
-    # Then write the data
-#    dat_put( $srclocs[-1], $type, )
-
-
+    # Must free the locators
+    # Annul all the locators in reverse order
+    foreach my $loc (reverse(@srclocs) ) {
+      dat_annul($loc, $status);
+    }
 
   }
 
@@ -504,6 +508,8 @@ sub delobj {
     err_rep('NOSOURCE','Starlink::HDSPACK::delobj - no object defined', $status);
     return $status;
   }
+
+  print "# -> delobj: $object\n" if $DEBUG;
 
   # Chop off the last component
   ($object, my $delname) = _split_path( $object );
@@ -625,6 +631,8 @@ sub creobj {
     return $status;
   }
 
+  print "# -> creobj: $object\n";
+
   # The dims array must be turned into an array
   # We use a separate ndims variable to indicate scalars
   # (indicated by single value of 0 in the array or empty array)
@@ -658,7 +666,7 @@ sub creobj {
 
   # Free up the locators
   foreach my $loc ($nloc, reverse(@locs)) {
-    next unless defined $nloc;
+    next unless defined $loc;
     dat_annul($loc, $status);
   }
 
