@@ -1,0 +1,553 @@
+package hdstools {
+   version @PACKAGE_VERSION@
+   prefix hdt
+   executable hdstools {
+      action hcopy {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            prompt {Object to copy}
+            help "Full specification of input object eg. file.next.object"
+            helpkey *
+          }
+
+         parameter out {
+            type _CHAR
+            position 2
+            prompt {Object to copy to}
+            help "Full name of output object"
+            helpkey *
+          }
+
+      }
+      action hcreate {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            prompt {Object name}
+            help "Full path name of new object to be created"
+            helpkey *
+            association ->GLOBAL.HDSOBJ
+          }
+
+         parameter type {
+            type _CHAR
+            position 2
+            prompt {Object type}
+            help "Type of data object to be created eg _REAL, SPECTRUM etc"
+            helpkey *
+          }
+
+         parameter dims {
+            position 3
+            type _INTEGER
+            vpath DEFAULT
+            default 0
+            prompt {Dimensions}
+            help "Dimensions of object - 0 for scalar -  128,128 for 2-D etc"
+            helpkey *
+          }
+
+      }
+      action hdelete {
+
+         helplib {HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            prompt {Object to be deleted}
+            help "Name of object to be deleted e.g. top.next.bottom"
+          }
+
+      }
+      action hdir {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            ppath GLOBAL
+            prompt {Object name}
+            help "Full name of object whose components are to be listed"
+            helpkey *
+            association <->GLOBAL.HDSOBJ
+          }
+
+         parameter dev {
+            position 2
+            type _CHAR
+            vpath default
+            default TERMINAL
+            prompt {Output to}
+            help "Valid responses : TERMINAL(default),PRINTER,OLDFILE,NEWFILE or filename"
+            helpkey *
+          }
+
+      }
+      action hdisplay {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            ppath GLOBAL
+            prompt {Object name}
+            help "Full path name of object to be displayed"
+            helpkey *
+            association <->GLOBAL.HDSOBJ
+          }
+
+         parameter dev {
+            position 2
+            type _CHAR
+            vpath default
+            default TERMINAL
+            prompt {Output to}
+            help "Valid responses are :TERMINAL(default),PRINTER,OLDFILE,NEWFILE or filename"
+            helpkey *
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath DEFAULT
+            default !
+            prompt {Output width}
+            help "Allows you to overide default width of 80 for a terminal"
+            helpkey *
+          }
+
+         parameter slice {
+            type _CHAR
+            vpath DEFAULT
+            default *
+            prompt {Slice}
+            help "Should have format: i1:i2,j1:j2"
+            helpkey *
+          }
+
+         parameter fmt {
+            type _CHAR
+            vpath default
+            default !
+            prompt {Output format}
+            help "FORTRAN format code eg F10.5"
+            helpkey *
+          }
+
+      }
+      action hfill {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            ppath GLOBAL
+            prompt {Object name}
+            help "Full path name of object to be filled with specified value"
+            helpkey *
+            association <->GLOBAL.HDSOBJ
+          }
+
+         parameter value {
+            type UNIV
+            position 2
+            prompt {Value}
+            help "Value with which object is to be filled"
+            helpkey *
+          }
+
+      }
+      action hget {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            position 1
+            type UNIV
+            vpath PROMPT
+            ppath GLOBAL
+            prompt {Object name}
+            help "Full path name of object to be displayed"
+            helpkey *
+            association <->GLOBAL.HDSOBJ
+          }
+
+         parameter item {
+            position 2
+            type _CHAR
+            default VALUE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {ATTRIBUTE}
+            help "Enter one of PRIM, STRUC, NDIM, DIMS, NELM, TYP, VAL, MIN or MAX"
+            helpkey *
+          }
+
+         parameter attr {
+            type _CHAR
+            position 3
+            vpath INTERNAL NOPROMPT
+            helpkey *
+          }
+
+         parameter index {
+            type _INTEGER
+            position 4
+            vpath INTERNAL NOPROMPT
+            helpkey *
+          }
+
+         parameter echo {
+            type _LOGICAL
+            default TRUE
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            prompt {Echo attribute value to console?}
+            help "Useful in scripts"
+            helpkey *
+          }
+
+         parameter version {
+            type _LOGICAL
+            default FALSE
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            prompt {Output version number?}
+            help "Useful in scripts"
+            helpkey *
+          }
+
+      }
+      action hhelp {
+# ADAM Interface file
+         helplib {$HDSTOOLS_HELP}
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+            helpkey *
+          }
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+            helpkey *
+          }
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+            helpkey *
+          }
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+            helpkey *
+          }
+      }
+      action hmodify {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            ppath GLOBAL
+            prompt {Object name}
+            help "Full path name of object to be modified"
+            helpkey *
+            association <->GLOBAL.HDSOBJ
+          }
+
+         parameter val {
+            type UNIV
+            position 2
+            prompt {New values}
+            help "Values to be assigned to object"
+            helpkey *
+          }
+
+      }
+      action hread {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter file {
+            position 1
+            type _CHAR
+            prompt {Filename}
+            help "Name of the file from which the data values are to be read"
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type UNIV
+            ppath GLOBAL
+            association <->GLOBAL.HDSOBJ
+            prompt {Object name}
+            help "Name of data object into which the data values are to be written"
+            helpkey *
+          }
+
+         parameter binary {
+            type _LOGICAL
+            vpath DEFAULT
+            default FALSE
+            prompt {Is file a binary file}
+            help "Is it a FORTRAN unformatted file"
+            helpkey *
+          }
+
+      }
+      action hrename {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            prompt {Old name}
+            help "Full path name of object to be renamed e.g. TOP.NEXT.BOTTOM"
+            helpkey *
+          }
+
+         parameter to {
+            type _CHAR
+            position 2
+            prompt {New name}
+            help "New name of object - not whole path name"
+            helpkey *
+          }
+
+      }
+      action hreset {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            prompt {Object to be reset}
+            help "Object will be given a null value but not deleted"
+            helpkey *
+          }
+
+      }
+      action hreshape {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            ppath GLOBAL
+            association <->GLOBAL.HDSOBJ
+            prompt {Object name}
+            help "Name of object to be reshaped e.g. TOP.DATA_ARRAY"
+            helpkey *
+          }
+
+         parameter dims {
+            type _INTEGER
+            position 2
+            prompt {New dimensions}
+            help "eg [256 256 5] - number of dimensions must be the same"
+            helpkey *
+          }
+
+      }
+      action hretype {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            type UNIV
+            position 1
+            ppath GLOBAL
+            association <->GLOBAL.HDSOBJ
+            prompt {Object name}
+            help "Name of object to be retyped e.g. TOP.NEXT.BOTTOM"
+            helpkey *
+          }
+
+         parameter type {
+            type _CHAR
+            position 2
+            prompt {New type}
+            help "New type of object eg _INTEGER"
+            helpkey *
+          }
+
+      }
+      action htab {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp1 {
+            type UNIV
+            position 1
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.HDSOBJ
+            prompt {Object 1}
+            help "Full name of vector object to be included in table"
+            helpkey *
+          }
+
+         parameter inp2 {
+            type UNIV
+            position 2
+            vpath DEFAULT
+            default !
+            prompt {Object 2}
+            help "Full name of vector object to be included in table"
+            helpkey *
+          }
+
+         parameter inp3 {
+            type UNIV
+            position 3
+            vpath DEFAULT
+            default !
+            prompt {Object 3}
+            help "Full name of vector object to be included in table"
+            helpkey *
+          }
+
+         parameter inp4 {
+            type UNIV
+            position 4
+            vpath DEFAULT
+            default !
+            prompt {Object 4}
+            help "Full name of vector object to be included in table"
+            helpkey *
+          }
+
+         parameter inp5 {
+            type UNIV
+            position 5
+            vpath DEFAULT
+            default !
+            prompt {Object 5}
+            help "Full name of vector object to be included in table"
+            helpkey *
+          }
+
+         parameter inp6 {
+            type UNIV
+            position 6
+            vpath DEFAULT
+            default !
+            prompt {Object 6}
+            help "Full name of vector object to be included in table"
+            helpkey *
+          }
+
+         parameter dev {
+            type _CHAR
+            vpath DEFAULT
+            default TERMINAL
+            prompt {Output to}
+            help "T)erminal P)rinter O)ldfile N)ewfile or filename"
+            helpkey *
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath DEFAULT
+            default !
+            prompt {Output page width}
+            help "Overides default of 80 for terminal or 132 for everything else"
+            helpkey *
+          }
+
+         parameter slice {
+            type _CHAR
+            vpath DEFAULT
+            default *
+            prompt {Slice}
+            help "Specification of slice of vectors to be output eg 10:20 "
+            helpkey *
+          }
+
+      }
+      action hwrite {
+
+         helplib {$HDSTOOLS_HELP}
+
+         parameter inp {
+            position 1
+            type UNIV
+            ppath GLOBAL
+            association <->GLOBAL.HDSOBJ
+            prompt {Object name}
+            help "Name of data object from which the data values are to be read"
+            helpkey *
+          }
+
+         parameter file {
+            position 2
+            type _CHAR
+            prompt {Filename}
+            help "Name of the ASCII file into which the data values are to be written"
+            helpkey *
+          }
+
+         parameter binary {
+            type _LOGICAL
+            vpath DEFAULT
+            default FALSE
+            prompt {Is output file to be binary}
+            help "ie. is it to be a FORTRAN unformatted file - default is formatted"
+            helpkey *
+          }
+
+         parameter fmt {
+            type _CHAR
+            vpath DEFAULT
+            default !
+            prompt {Output format}
+            help "FORTRAN format string eg F10.5"
+            helpkey *
+          }
+
+      }
+   }
+
+   icl {defhelp hdstools $HDSTOOLS_HELP 0}
+
+   display {
+
+     HDSTOOLS commands are now available -- (Version @PACKAGE_VERSION@)
+
+     Type hhelp for help on HDSTOOLS commands.
+
+   }
+
+
+}
