@@ -3,4 +3,5 @@
  V3.5-5 (19-SEP-2001) 
     DIPSO V3.5-5 has been released. This includes a fix for a bug which
     caused the ISATM command to be unable to find entries in the ATOMIC.DAT
-    file when being run under Linux.
+    file when being run under Linux, together with fixes for other bugs
+    in the FTRANS, CDRAW and ISCALC commands.
