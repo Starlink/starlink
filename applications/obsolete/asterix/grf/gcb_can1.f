@@ -127,11 +127,11 @@
 *      Cancel it
           CALL GCB_CAN_SUB( %VAL(G_MEMPTR), DISP, SIZ, STATUS )
 
-*      Advance iterator to next item
-          CALL UDI0_ADVITI( NAMES, C1, C2, INAME, STATUS )
-
 *    Next vector element
         END DO
+
+*    Advance iterator to next item
+        CALL UDI0_ADVITI( NAMES, C1, C2, INAME, STATUS )
 
 *  Next name
       END DO
