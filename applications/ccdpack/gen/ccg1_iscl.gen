@@ -1,0 +1,170 @@
+      SUBROUTINE CCG1_ISCL<T>( IDIM1, IDIM2, INARR, LOWER, UPPER, 
+     :                         LOWLIM, UPPLIM, BADVAL, ODIM1, ODIM2,
+     :                         OFF1, OFF2, OUTARR, STATUS )
+*+
+*  Name:
+*     CCG1_ISCL<T>
+
+*  Purpose:
+*     Scale image between limits.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation
+*     CALL CCG1_ISCL<T>( IDIM1, IDIM2, INARR, LOWER, UPPER,
+*                        LOWLIM, UPPLIM, BADVAL, ODIM1, ODIM2,
+*                        OFF1, OFF2, OUTARR, STATUS )
+
+*  Description:
+*     The input 2-d array is scaled between lower and upper limits such
+*     that the lower limit and all values below it are set to a minimum
+*     value, the upper limit and all values above are set to a maximum
+*     value, and all valid values in between are assigned values using
+*     linear interpolation between the limits.
+*
+*     The scaled values are written, perhaps offset, into an integer
+*     output array which may be of a different shape.
+
+*  Arguments:
+*     IDIM1 = INTEGER (Given)
+*        The first dimension of the 2-d arrays.
+*     IDIM2 = INTEGER (Given)
+*        The second dimension of the 2-d arrays.
+*     INARR( IDIM1, IDIM2 ) = <COMM> (Given)
+*        The original, unscaled image data.
+*     LOWER = DOUBLE PRECISION (Given)
+*        The data value that specifies the lower image-scaling limit.
+*     UPPER = DOUBLE PRECISION (Given)
+*        The data value that specifies the upper image-scaling limit.
+*     LOWLIM = INTEGER (Given)
+*        The lowest value to appear in the scaled array for good input
+*        data.
+*     UPPLIM = INTEGER (Given)
+*        The highest value to appear in the scaled array for good input
+*        data.
+*     BADVAL = INTEGER (Given)
+*        The value to be assigned to bad pixels in the scaled array.
+*     ODIM1 = INTEGER (Given)
+*        The first dimension of the output array.
+*     ODIM2 = INTEGER (Given)
+*        The second dimension of the output array.
+*     OFF1 = INTEGER (Given)
+*        The X offset of the input array in the output one.  If they
+*        are congruent then OFF1 should be 0.
+*     OFF2 = INTEGER (Given)
+*        The Y offset of the input array in the output one.  If they
+*        are congruent then OFF2 should be 0.
+*     OUTARR( ODIM1, ODIM2 ) = INTEGER (Returned)
+*         The scaled version of the image.
+*     STATUS = INTEGER (Given)
+*         Value of the status on entering this subroutine.
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-MAR-2001 (MBT):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Status:
+      INTEGER STATUS
+
+*  Arguments Given:
+      INTEGER IDIM1
+      INTEGER IDIM2
+      <TYPE> INARR( IDIM1, IDIM2 )
+      DOUBLE PRECISION LOWER
+      DOUBLE PRECISION UPPER
+      INTEGER LOWLIM
+      INTEGER UPPLIM
+      INTEGER BADVAL
+      INTEGER ODIM1
+      INTEGER ODIM2
+      INTEGER OFF1
+      INTEGER OFF2
+
+*  Arguments Returned:
+      INTEGER OUTARR( ODIM1, ODIM2 )
+
+*  Local Variables:
+      INTEGER I                ! Loop counter
+      INTEGER IO               ! Offset loop counter
+      INTEGER J                ! Loop counter
+      INTEGER JO               ! Offset loop counter
+      DOUBLE PRECISION DVAL    ! Value on the input grid as a double
+      DOUBLE PRECISION SCALE   ! Scaling factor
+      <TYPE> TVAL              ! Value on the input grid as a <COMM>
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEC_<T>'    ! NUM declarations for functions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'NUM_DEF_<T>'    ! NUM definitions for functions
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that the limits are valid.
+      IF ( LOWER .GE. UPPER ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCG1_ISCL<T>_BADLIM',
+     :                  'Maximum must be greater than minimum', STATUS )
+         GO TO 99
+      END IF
+
+*  Check that we are not going to write outside the bounds of the 
+*  output array.
+      IF ( OFF1 .LT. 0 .OR. OFF1 + IDIM1 .GT. ODIM1 .OR.
+     :     OFF2 .LT. 0 .OR. OFF2 + IDIM2 .GT. ODIM2 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCG1_ISCL<T>_BADSHAPE',
+     :   'Input array will not fit in output array', STATUS )
+         GO TO 99
+      END IF
+
+*  Get the scaling factor.
+      SCALE = ( UPPLIM - LOWLIM ) / ( UPPER - LOWER )
+
+*  Work through the array scaling each value and pasting it in at the
+*  right place if it is not bad.
+      DO J = 1, IDIM2
+         JO = J + OFF2
+         DO I = 1, IDIM1
+            IO = I + OFF1
+            TVAL = INARR( I, J )
+            IF ( TVAL .NE. VAL__BAD<T> ) THEN
+               DVAL = NUM_<T>TOD( TVAL )
+               IF ( DVAL .LE. LOWER ) THEN
+                  OUTARR( IO, JO ) = LOWLIM
+               ELSE IF ( DVAL .GT. UPPER ) THEN
+                  OUTARR( IO, JO ) = UPPLIM
+               ELSE
+                  OUTARR( IO, JO ) = LOWLIM 
+     :                             + NINT( ( DVAL - LOWER ) * SCALE )
+               END IF
+            END IF
+         END DO
+      END DO
+
+*  Error exit label.
+ 99   CONTINUE
+
+      END
+* $Id$
