@@ -22,6 +22,10 @@
 *        None.
 *
 *     Protected:
+*        astChrMatch
+*           Case-insensitive string comparison.
+*        astChrMatchN
+*           Case-insensitive string comparison of an most N characters.
 *        astFree
 *           Free previously allocated memory.
 *        astGrow
@@ -69,6 +73,8 @@
 *        Added explicit arguments to function macros.
 *     29-JAN-2002 (DSB):
 *        Added astChrLen and astSscanf.
+*     15-NOV-2002 (DSB):
+*        Added astChrMatch astChrMatchN.
 *-
 */
 
@@ -83,6 +89,8 @@
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
+int astChrMatch_( const char *, const char * );
+int astChrMatchN_( const char *, const char *, size_t );
 char **astStringArray_( const char *, int, int );
 char *astString_( const char *, int );
 int astSscanf_( const char *str, const char *format, ...);
@@ -101,6 +109,8 @@ void *astStore_( void *, const void *, size_t );
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
+#define astChrMatch(str1,str2) astChrMatch_(str1,str2)
+#define astChrMatchN(str1,str2,n) astChrMatchN_(str1,str2,n)
 #define astFree(ptr) astFree_(ptr)
 #define astGrow(ptr,n,size) astGrow_(ptr,n,size)
 #define astMalloc(size) astMalloc_(size)

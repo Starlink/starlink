@@ -107,6 +107,8 @@
 *     16-SEP-1999 (RFWS):
 *        Added the IntraFlag attribute and added a Mapping pointer as a new
 *        first argument to transformation functions.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitIntraMapVtab method.
 *-
 */
 
@@ -192,8 +194,11 @@ AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... );
 AstIntraMap *astInitIntraMap_( void *, size_t, int, AstIntraMapVtab *,
                                const char *, const char *, int, int );
 
+/* Vtab initialiser. */
+void astInitIntraMapVtab_( AstIntraMapVtab *, const char * );
+
 /* Loader. */
-AstIntraMap *astLoadIntraMap_( void *, size_t, int, AstIntraMapVtab *,
+AstIntraMap *astLoadIntraMap_( void *, size_t, AstIntraMapVtab *,
                                const char *, AstChannel * );
 #endif
 
@@ -243,9 +248,11 @@ void astIntraRegFor_( const char *, int, int, void (*)( AstMapping *, int, int, 
 #define astInitIntraMap(mem,size,init,vtab,name,fname,nin,nout) \
 astINVOKE(O,astInitIntraMap_(mem,size,init,vtab,name,fname,nin,nout))
 
+/* Vtab Initialiser. */
+#define astInitIntraMapVtab(vtab,name) astINVOKE(V,astInitIntraMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadIntraMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadIntraMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadIntraMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadIntraMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

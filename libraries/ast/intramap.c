@@ -65,6 +65,9 @@ f     The IntraMap class does not define any new routines beyond those
 *     20-JUN-2001 (DSB):
 *        Add an "astClone" call to prevent the pointer for "this" being 
 *        annulled at the end of the Transform method.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitIntraMapVtab
+*        method.
 *class--
 */
 
@@ -162,7 +165,6 @@ static void ClearIntraFlag( AstIntraMap * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstIntraMapVtab * );
 static void IntraReg( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
 static void SetAttrib( AstObject *, const char * );
 static void SetIntraFlag( AstIntraMap *, const char * );
@@ -395,23 +397,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    return result;
 }
 
-static void InitVtab( AstIntraMapVtab *vtab ) {
+void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitIntraMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for an IntraMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "intramap.h"
-*     void InitVtab( AstIntraMapVtab *vtab )
+*     void astInitIntraMapVtab( AstIntraMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     IntraMap member function.
+*     IntraMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -420,7 +423,14 @@ static void InitVtab( AstIntraMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -429,6 +439,10 @@ static void InitVtab( AstIntraMapVtab *vtab ) {
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAIntraMap) to determine if an object belongs
@@ -2281,6 +2295,9 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitIntraMapVtab( vtab, name );
+
 /* Clean (and validate) the transformation function name supplied. */
    clname = CleanName( fname, "astIntraMap" );
 
@@ -2329,14 +2346,11 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
    validity of "nin" and "nout"). Specify whether the forward and
    inverse transformations are defined. */
          } else {
-            new = (AstIntraMap *) astInitMapping( mem, size, init,
+            new = (AstIntraMap *) astInitMapping( mem, size, 0,
                      (AstMappingVtab *) vtab, name, nin, nout,
                      ( ( tran_data[ ifun ].flags & AST__NOFWD ) == 0 ),
                      ( ( tran_data[ ifun ].flags & AST__NOINV ) == 0 ) );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-            if ( init ) InitVtab( vtab );
             if ( astOK ) {
 
 /* Initialise the IntraMap data. */
@@ -2358,7 +2372,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
+AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
                                AstIntraMapVtab *vtab, const char *name,
                                AstChannel *channel ) {
 /*
@@ -2374,7 +2388,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "intramap.h"
-*     AstIntraMap *astLoadIntraMap( void *mem, size_t size, int init,
+*     AstIntraMap *astLoadIntraMap( void *mem, size_t size,
 *                                    AstIntraMapVtab *vtab, const char *name,
 *                                    AstChannel *channel )
 
@@ -2391,6 +2405,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for an IntraMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -2409,14 +2424,6 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstIntraMap) is used instead.
-*     init
-*        A boolean flag indicating if the IntraMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the IntraMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new IntraMap. If this is NULL, a pointer
@@ -2464,26 +2471,23 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstIntraMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "IntraMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitIntraMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built IntraMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

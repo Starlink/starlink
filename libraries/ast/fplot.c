@@ -56,6 +56,8 @@
 *        astGrfPush and EXTERNAL grf functions.
 *     14-AUG-2002 (DSB):
 *        Added AST_BOUNDINGBOX.
+*     8-JAN-2003 (DSB):
+*        Include "string.h".
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -68,6 +70,7 @@
                                     within pgqtxt and pgptxt. */
 /* Header files. */
 /* ============= */
+#include "string.h"              
 #include "ast_err.h"             /* AST error codes */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */

@@ -417,13 +417,16 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *          projection. It is now represented using the AST-specific TPN
 *          projection (until such time as FITS-WCS paper IV is finished).
 *        - Remove trailing "Z" from DATE-OBS values created by astWrite.
-*      14-NOV-2002 (DSB):
+*     14-NOV-2002 (DSB):
 *        - WcsWithWcs: Corrected to ignore longitude axis returned by
 *        astPrimaryFrame since it does not take into account any axis
 *        permutation.
-*      26-NOV-2002 (DSB):
+*     26-NOV-2002 (DSB):
 *        - SpecTrans: Corrected no. of characters copied from CTYPE to PRJ,
 *        (from 5 to 4), and terminate PRJ correctly. 
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitFitsChanVtab
+*        method.
 *class--
 */
 
@@ -442,10 +445,6 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 /* Macros which return the maximum and minimum of two values. */
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro which returns the nearest integer to a given floating point 
-   value. */
-#define NINT(x) (int)((x)+((x)>0.0)?0.5:-0.5)
 
 /* Macro which takes a pointer to a FitsCard and returns non-zero if the 
    card has been used and so should be ignored. */
@@ -844,7 +843,6 @@ static void FixUsed( AstFitsChan *, int, int, const char *, const char * );
 static void FormatCard( AstFitsChan *, char *, const char * );
 static FitsStore *FreeStore( FitsStore * );
 static void GetNextData( AstChannel *, int, char **, char ** );
-static void InitVtab( AstFitsChanVtab * );
 static void InsCard( AstFitsChan *, int, const char *, int, void *, const char *, const char *, const char * );
 static void MakeBanner( const char *, const char *, const char *, char [ FITSCARDLEN - FITSNAMLEN + 1 ] );
 static void MakeIndentedComment( int, char, const char *, const char *, char [ FITSCARDLEN - FITSNAMLEN + 1] );
@@ -9365,23 +9363,24 @@ static int GetValue( AstFitsChan *this, char *keyname, int type,
 
 }
 
-static void InitVtab( AstFitsChanVtab *vtab ) {
+void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitFitsChanVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a FitsChan.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     void InitVtab( AstFitsChanVtab *vtab )
+*     void astInitFitsChanVtab( AstFitsChanVtab *vtab, const char *name )
 
 *  Class Membership:
-*     FitsChan member function.
+*     FitsChan vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -9390,7 +9389,14 @@ static void InitVtab( AstFitsChanVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -9399,6 +9405,10 @@ static void InitVtab( AstFitsChanVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitChannelVtab( (AstChannelVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAFitsChan) to determine if an object belongs
@@ -13504,18 +13514,18 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
              !strncmp( cval + 2, "LN", 2 ) ) {
             axlon = j;
             strncpy( prj, cval + 4, 4 );
-            prj[ 4 ] = 0;
             strncpy( lontype, cval, 10 );
+            prj[ 4 ] = 0;
 
          } else if( !strncmp( cval, "DEC-", 4 ) ||
              !strncmp( cval + 1, "LAT", 3 ) ||
              !strncmp( cval + 2, "LT", 2 ) ) {
             axlat = j;
             strncpy( prj, cval + 4, 4 );
-            prj[ 4 ] = 0;
             strncpy( lattype, cval, 10 );
+            prj[ 4 ] = 0;
          }
-         j++;
+        j++;
       } else {
          break;
       }
@@ -18758,12 +18768,12 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
          astPrimaryFrame( phyfrm, axlon, (AstFrame **) &skyfrm, &skylonaxis );
 
 /* Note, the axis index returned in skylonaxis above, is the *un-permuted*
-   logitude axis index within skyfrm (i.e it will always be zero), but
-   skyfrm itself retains any axis permutation which is present within the
-   phyfrm frame. So skylonaxis cannot reliably be used to access the
-   longitude axis within skyfrm. For this reason, ignore skylonaxis, and
-   get the indices of the longitude and latitude axes directly using the 
-   LatAxis and LonAxis attributes of the skyframe. */
+   logitude axis index within skyfrm (i.e it will always be zero), but skyfrm 
+   itself retains any axis permutation which is present within the
+   phyfrm frame. So skylonaxis cannot reliably be used to access the longitude 
+   axis within skyfrm. For this reason, ignore skylonaxis, and get the
+   indices of the longitude and latitude axes directly using the LatAxis
+   and LonAxis attributes of the skyframe. */
          skylonaxis = astGetLonAxis( skyfrm );
          skylataxis = astGetLatAxis( skyfrm );
 
@@ -22106,15 +22116,16 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitFitsChanVtab( vtab, name );
+
 /* Initialise a Channel structure (the parent class) as the first
    component within the FitsChan structure, allocating memory if
    necessary. */
-   new = (AstFitsChan *) astInitChannel( mem, size, init,
+   new = (AstFitsChan *) astInitChannel( mem, size, 0,
                                          (AstChannelVtab *) vtab, name,
                                          NULL, NULL );
 
-/* If necessary, initialise the virtual function table. */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the FitsChan data. */
@@ -22150,7 +22161,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
    return new;
 }
 
-AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
+AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
                                AstFitsChanVtab *vtab, const char *name,
                                AstChannel *channel ) {
 /*
@@ -22166,7 +22177,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     AstFitsChan *astLoadFitsChan( void *mem, size_t size, int init,
+*     AstFitsChan *astLoadFitsChan( void *mem, size_t size,
 *                                   AstFitsChanVtab *vtab, const char *name,
 *                                   AstChannel *channel )
 
@@ -22183,6 +22194,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a FitsChan at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -22201,14 +22213,6 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstFitsChan) is used instead.
-*     init
-*        A boolean flag indicating if the FitsChan's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the FitsChan class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new FitsChan. If this is NULL, a pointer
@@ -22260,26 +22264,23 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstFitsChan );
-      init = !class_init;
       vtab = &class_vtab;
       name = "FitsChan";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitFitsChanVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built FitsChan. */
-   new = astLoadChannel( mem, size, init, (AstChannelVtab *) vtab, name,
+   new = astLoadChannel( mem, size, (AstChannelVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

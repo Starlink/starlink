@@ -153,6 +153,8 @@
 *           Pack an int into a pointer.
 *        astInitObject
 *           Initialise an Object.
+*        astInitObjectVtab
+*           Initialise the virtual function table for the Object class.
 *        astLoadObject
 *           Load an Object.
 *        astMakeId
@@ -243,6 +245,8 @@
 *        Made the astAnnulId function accessible to protected code.
 *     3-APR-2001 (DSB):
 *        Added Ident attribute.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitObjectVtab method.
 *--
 */
 
@@ -1046,6 +1050,7 @@ int astTest##attribute##_( Ast##class *this ) { \
 
 /* Type Definitions. */
 /* ================= */
+
 /* Object structure. */
 /* ----------------- */
 /* This structure contains all information that is unique to each object in
@@ -1132,8 +1137,11 @@ astPROTO_ISA(Object)             /* Test class membership */
 AstObject *astInitObject_( void *, size_t, int, AstObjectVtab *,
                            const char * );
 
+/* Vtab Initialiser. */
+void astInitObjectVtab_( AstObjectVtab *, const char * );
+
 /* Loader. */
-AstObject *astLoadObject_( void *, size_t, int, AstObjectVtab *,
+AstObject *astLoadObject_( void *, size_t, AstObjectVtab *,
                            const char *, AstChannel *channel );
 #endif
 
@@ -1225,9 +1233,12 @@ void astVSet_( AstObject *, const char *, va_list );
 #define astInitObject(mem,size,init,vtab,name) \
 astINVOKE(O,astInitObject_(mem,size,init,vtab,name))
 
+/* Vtab Initialiser. */
+#define astInitObjectVtab(vtab,name) astINVOKE(V,astInitObjectVtab_(vtab,name))
+
 /* Loader. */
-#define astLoadObject(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadObject_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadObject(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to other class functions. */

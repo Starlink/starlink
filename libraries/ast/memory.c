@@ -38,6 +38,9 @@
 *        Added astChrLen and astSscanf.
 *     15-FEB-2002 (DSB):
 *        Removed use of non-ANSI vsscanf from astSscanf.
+*     15-NOV-2002 (DSB):
+*        Moved ChrMatch from SkyFrame (etc) to here. Included stdio.h and
+*        ctype.h.
 */
 
 /* Module Macros. */
@@ -63,10 +66,12 @@
 
 /* C header files. */
 /* --------------- */
+#include <ctype.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 /* Module Type Definitions. */
 /* ======================== */
@@ -87,6 +92,143 @@ static unsigned long Magic( void *ptr, size_t size );
 
 /* Function implementations. */
 /* ========================= */
+int astChrMatch_( const char *str1, const char *str2 ) {
+/*
+*+
+*  Name:
+*     astChrMatch
+
+*  Purpose:
+*     Case insensitive string comparison.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astChrMatch( const char *str1, const char *str2 )
+
+*  Description:
+*     This function compares two null terminated strings for equality,
+*     discounting differences in case and any trailing white space in either
+*     string.
+
+*  Parameters:
+*     str1
+*        Pointer to the first string.
+*     str2
+*        Pointer to the second string.
+
+*  Returned Value:
+*     Non-zero if the two strings match, otherwise zero.
+
+*  Notes:
+*     -  A value of zero is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   int match;                    /* Strings match? */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise. */
+   match = 1;
+
+/* Loop to compare characters in the two strings until a mis-match occurs or
+   we reach the end of the longer string. */
+   while ( match && ( *str1 || *str2 ) ) {
+
+/* Two characters match if (a) we are at the end of one string and the other
+   string contains white space or (b) both strings contain the same character
+   when converted to lower case. */
+      match = ( !*str1 && isspace( *str2 ) ) ||
+              ( !*str2 && isspace( *str1 ) ) ||
+              ( tolower( *str1 ) == tolower( *str2 ) );
+
+/* Step through each string a character at a time until its end is reached. */
+      if ( *str1 ) str1++;
+      if ( *str2 ) str2++;
+   }
+
+/* Return the result. */
+   return match;
+}
+
+int astChrMatchN_( const char *str1, const char *str2, size_t n ) {
+/*
+*+
+*  Name:
+*     astChrMatchN
+
+*  Purpose:
+*     Case insensitive string comparison of at most N characters
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astChrMatchN( const char *str1, const char *str2, size_t n )
+
+*  Description:
+*     This function compares two null terminated strings for equality,
+*     discounting differences in case and any trailing white space in either
+*     string. No more than "n" characters are compared.
+
+*  Parameters:
+*     str1
+*        Pointer to the first string.
+*     str2
+*        Pointer to the second string.
+*     n
+*        Maximum number of characters to compare.
+
+*  Returned Value:
+*     Non-zero if the two strings match, otherwise zero.
+
+*  Notes:
+*     -  A value of zero is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   int match;                    /* Strings match? */
+   int nc;                       /* Number of characters compared so far */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise. */
+   match = 1;
+
+/* So far we have compared zero characters */
+   nc = 0;
+
+/* Loop to compare characters in the two strings until a mis-match occurs or
+   we reach the end of the longer string, or we reach the specified
+   maximum number of characters. */
+   while ( match && ( *str1 || *str2 ) && nc++ < n ) {
+
+/* Two characters match if (a) we are at the end of one string and the other
+   string contains white space or (b) both strings contain the same character
+   when converted to lower case. */
+      match = ( !*str1 && isspace( *str2 ) ) ||
+              ( !*str2 && isspace( *str1 ) ) ||
+              ( tolower( *str1 ) == tolower( *str2 ) );
+
+/* Step through each string a character at a time until its end is reached. */
+      if ( *str1 ) str1++;
+      if ( *str2 ) str2++;
+   }
+
+/* Return the result. */
+   return match;
+}
+
 void *astFree_( void *ptr ) {
 /*
 *+
@@ -1046,7 +1188,6 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    char *c;                 /* Pointer to the next character to check */
    char *newfor;            /* Pointer to modified format string */
    const char *d;           /* Pointer to the next character to check */
-   int again;               /* Remove another space before the %n? */
    int iptr;                /* Index into ptr array */
    int lfor;                /* No. of characters in format string */
    int lstr;                /* No. of characters in scanned string */

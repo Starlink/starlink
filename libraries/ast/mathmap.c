@@ -56,6 +56,9 @@ f     The MathMap class does not define any new routines beyond those
 *  History:
 *     3-SEP-1999 (RFWS):
 *        Original version.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitMathMapVtab
+*        method.
 *class--
 */
 
@@ -478,7 +481,6 @@ static void EvaluateFunction( Rcontext *, int, const double **, const int *, con
 static void EvaluationSort( const double [], int, int [], int **, int * );
 static void ExtractExpressions( const char *, const char *, int, const char *[], int, char *** );
 static void ExtractVariables( const char *, const char *, int, const char *[], int, int, int, int, int, char *** );
-static void InitVtab( AstMathMapVtab * );
 static void ParseConstant( const char *, const char *, const char *, int, int *, double * );
 static void ParseName( const char *, int, int * );
 static void ParseVariable( const char *, const char *, const char *, int, int, const char *[], int *, int * );
@@ -3178,23 +3180,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
-static void InitVtab( AstMathMapVtab *vtab ) {
+void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitMathMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a MathMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void InitVtab( AstMathMapVtab *vtab )
+*     void astInitMathMapVtab( AstMathMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     MathMap member function.
+*     MathMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -3203,7 +3206,14 @@ static void InitVtab( AstMathMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -3212,6 +3222,10 @@ static void InitVtab( AstMathMapVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAMathMap) to determine if an object belongs
@@ -6513,6 +6527,9 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return new;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitMathMapVtab( vtab, name );
+
 /* Check the numbers of input and output variables for validity,
    reporting an error if necessary. */
    if ( nin < 1 ) {
@@ -6568,15 +6585,12 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
    component within the MathMap structure, allocating memory if
    necessary. Specify that the Mapping should be defined in the required
    directions. */
-      new = (AstMathMap *) astInitMapping( mem, size, init,
+      new = (AstMathMap *) astInitMapping( mem, size, 0,
                                            (AstMappingVtab *) vtab, name,
                                            nin, nout,
                                            ( fwdcode != NULL ),
                                            ( invcode != NULL ) );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
 
 /* If an error has occurred, free all the memory which may have been
    allocated by the cleaning and compilation steps above. */
@@ -6623,7 +6637,7 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
+AstMathMap *astLoadMathMap_( void *mem, size_t size,
                              AstMathMapVtab *vtab, const char *name,
                              AstChannel *channel ) {
 /*
@@ -6639,7 +6653,7 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     AstMathMap *astLoadMathMap( void *mem, size_t size, int init,
+*     AstMathMap *astLoadMathMap( void *mem, size_t size,
 *                                 AstMathMapVtab *vtab, const char *name,
 *                                 AstChannel *channel )
 
@@ -6656,6 +6670,7 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a MathMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -6674,14 +6689,6 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstMathMap) is used instead.
-*     init
-*        A boolean flag indicating if the MathMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the MathMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new MathMap. If this is NULL, a pointer
@@ -6729,26 +6736,23 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstMathMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "MathMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitMathMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built MathMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

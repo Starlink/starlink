@@ -61,6 +61,8 @@
 *           Validate class membership.
 *        astInitLutMap
 *           Initialise a LutMap.
+*        astInitLutMapVtab
+*           Initialise the virtual function table for the LutMap class.
 *        astLoadLutMap
 *           Load a LutMap.
 
@@ -93,6 +95,8 @@
 *  History:
 *     8-JUL-1997 (RFWS):
 *        Original version.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitLutMapVtab method.
 *-
 */
 
@@ -172,8 +176,11 @@ AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ...
 /* Initialiser. */
 AstLutMap *astInitLutMap_( void *, size_t, int, AstLutMapVtab *, const char *, int, const double *, double, double );
 
+/* Vtab initialiser. */
+void astInitLutMapVtab_( AstLutMapVtab *, const char * );
+
 /* Loader. */
-AstLutMap *astLoadLutMap_( void *, size_t, int, AstLutMapVtab *, const char *, AstChannel * );
+AstLutMap *astLoadLutMap_( void *, size_t, AstLutMapVtab *, const char *, AstChannel * );
 #endif
 
 /* Prototypes for member functions. */
@@ -212,9 +219,11 @@ AstLutMap *astLoadLutMap_( void *, size_t, int, AstLutMapVtab *, const char *, A
 astInitLutMap(mem,size,init,vtab,name,nlut,lut,start,inc) \
 astINVOKE(O,astInitLutMap_(mem,size,init,vtab,name,nlut,lut,start,inc))
 
+/* Vtab Initialiser. */
+#define astInitLutMapVtab(vtab,name) astINVOKE(V,astInitLutMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadLutMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadLutMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadLutMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

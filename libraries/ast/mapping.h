@@ -161,6 +161,8 @@
 *           Validate class membership.
 *        astInitMapping
 *           Initialise a Mapping.
+*        astInitMappingVtab
+*           Initialise the virtual function table for the Mapping class.
 *        astLoadMapping
 *           Load a Mapping.
 
@@ -239,7 +241,8 @@
 *     9-JAN-2001 (DSB):
 *        Changed in and out arguments for TranN from type "double (*)[]"
 *        to "double *".
-*        
+*     8-JAN-2003 (DSB):
+*        Added protected astInitMappingVtab method.
 *--
 */
 
@@ -377,8 +380,11 @@ astPROTO_ISA(Mapping)            /* Test class membership */
 AstMapping *astInitMapping_( void *, size_t, int, AstMappingVtab *,
                              const char *, int, int, int, int );
 
+/* Vtab initialiser. */
+void astInitMappingVtab_( AstMappingVtab *, const char * );
+
 /* Loader. */
-AstMapping *astLoadMapping_( void *, size_t, int, AstMappingVtab *,
+AstMapping *astLoadMapping_( void *, size_t, AstMappingVtab *,
                              const char *, AstChannel *channel );
 #endif
 
@@ -458,9 +464,11 @@ void astSetReport_( AstMapping *, int );
 #define astInitMapping(mem,size,init,vtab,name,nin,nout,tran_forward,tran_inverse) \
 astINVOKE(O,astInitMapping_(mem,size,init,vtab,name,nin,nout,tran_forward,tran_inverse))
 
+/* Vtab Initialiser. */
+#define astInitMappingVtab(vtab,name) astINVOKE(V,astInitMappingVtab_(vtab,name))
 /* Loader. */
-#define astLoadMapping(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadMapping_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadMapping(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadMapping_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to member functions. */

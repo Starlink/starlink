@@ -103,6 +103,13 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 *     28-SEP-2001 (DSB):
 *        Modified VSet to ensure a non-null string always follows the equal 
 *        sign in the attribute setting passed to SetAttrib.
+*     27-NOV-2002 (DSB):
+*        Modified astShow to use astWrite instead of astDump, so that 
+*        invocations of astShow will be included in the count of the 
+*        number of invocations of astWrite returned by astWriteInvocations.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitObjectVtab
+*        method.
 *class--
 */
 
@@ -2083,7 +2090,7 @@ f        This routine applies to all Objects.
    channel = astChannel( NULL, NULL, "" );
 
 /* Write the Object to the Channel. */
-   astDump( this, channel );
+   astWrite( channel, this );
 
 /* Annul the Channel pointer. */
    channel = astAnnul( channel );
@@ -2835,6 +2842,83 @@ f     - A value of .FALSE. will be returned if this function should fail
    return valid;
 }
 
+void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
+/*
+*+
+*  Name:
+*     astInitObjectVtab
+
+*  Purpose:
+*     Initialise a virtual function table for a Object.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void astInitObjectVtab( AstObjectVtab *vtab, const char *name )
+
+*  Class Membership:
+*     Object vtab initialiser.
+
+*  Description:
+*     This function initialises the component of a virtual function
+*     table which is used by the Object class.
+
+*  Parameters:
+*     vtab
+*        Pointer to the virtual function table.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
+*/
+
+/* Local Variables: */
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* Store pointers to the member functions (implemented here) that provide
+   virtual methods for this class. */
+   vtab->Clear = Clear;
+   vtab->ClearAttrib = ClearAttrib;
+   vtab->ClearID = ClearID;
+   vtab->ClearIdent = ClearIdent;
+   vtab->Dump = Dump;
+   vtab->GetAttrib = GetAttrib;
+   vtab->GetID = GetID;
+   vtab->GetIdent = GetIdent;
+   vtab->SetAttrib = SetAttrib;
+   vtab->SetID = SetID;
+   vtab->SetIdent = SetIdent;
+   vtab->Show = Show;
+   vtab->TestAttrib = TestAttrib;
+   vtab->TestID = TestID;
+   vtab->TestIdent = TestIdent;
+   vtab->VSet = VSet;
+
+/* Store the pointer to the class name. */
+   vtab->class = name;
+
+/* Initialise the count of active objects and the number of destructors,
+   copy constructors and dump functions. */
+   vtab->nobject = 0;
+   vtab->ndelete = 0;
+   vtab->ncopy = 0;
+   vtab->ndump = 0;
+
+/* Initialise the arrays of destructor, copy constructor and dump
+   function pointers. */
+   vtab->delete = NULL;
+   vtab->copy = NULL;
+   vtab->dump = NULL;
+   vtab->dump_class = NULL;
+   vtab->dump_comment = NULL;
+}
+
 AstObject *astInitObject_( void *mem, size_t size, int init,
                            AstObjectVtab *vtab, const char *name ) {
 /*
@@ -2924,45 +3008,8 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 /* If necessary, initialise the virtual function table. */
 /* ---------------------------------------------------- */
-      if ( init ) {
-
-/* Store pointers to the member functions (implemented here) that provide
-   virtual methods for this class. */
-         vtab->Clear = Clear;
-         vtab->ClearAttrib = ClearAttrib;
-         vtab->ClearID = ClearID;
-         vtab->ClearIdent = ClearIdent;
-         vtab->Dump = Dump;
-         vtab->GetAttrib = GetAttrib;
-         vtab->GetID = GetID;
-         vtab->GetIdent = GetIdent;
-         vtab->SetAttrib = SetAttrib;
-         vtab->SetID = SetID;
-         vtab->SetIdent = SetIdent;
-         vtab->Show = Show;
-         vtab->TestAttrib = TestAttrib;
-         vtab->TestID = TestID;
-         vtab->TestIdent = TestIdent;
-         vtab->VSet = VSet;
-
-/* Store the pointer to the class name. */
-         vtab->class = name;
-
-/* Initialise the count of active objects and the number of destructors,
-   copy constructors and dump functions. */
-         vtab->nobject = 0;
-         vtab->ndelete = 0;
-         vtab->ncopy = 0;
-         vtab->ndump = 0;
-
-/* Initialise the arrays of destructor, copy constructor and dump
-   function pointers. */
-         vtab->delete = NULL;
-         vtab->copy = NULL;
-         vtab->dump = NULL;
-         vtab->dump_class = NULL;
-         vtab->dump_comment = NULL;
-      }
+      if ( init ) astInitObjectVtab( vtab, name );
+      if( astOK ) {
 
 /* Initialise the Object data. */
 /* --------------------------- */
@@ -2974,23 +3021,24 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
    a pointer to the virtual function table obtained from a structure
    that hasn't yet been validated as an Object. This minimises the
    risk of a memory access violation. */
-      new->check = Magic( new, size );
+         new->check = Magic( new, size );
 
 /* Associate the Object with its virtual function table. */
-      new->vtab = vtab;
+         new->vtab = vtab;
 
 /* Store the Object size and note if its memory was dynamically allocated. */
-      new->size = size;
-      new->dynamic = dynamic;
+         new->size = size;
+         new->dynamic = dynamic;
 
 /* Initialise the reference count (of Object pointers in use). */
-      new->ref_count = 1;
+         new->ref_count = 1;
 
 /* Initialise the ID string. */
-      new->id = NULL;
+         new->id = NULL;
 
 /* Increment the count of active Objects in the virtual function table. */
-      new->vtab->nobject++;
+         new->vtab->nobject++;
+      }
 
 /* If an error occurred, clean up by deleting the new Object. */
       if ( !astOK ) new = astDelete( new );
@@ -3000,7 +3048,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
    return new;
 }
 
-AstObject *astLoadObject_( void *mem, size_t size, int init,
+AstObject *astLoadObject_( void *mem, size_t size, 
                            AstObjectVtab *vtab, const char *name,
                            AstChannel *channel ) {
 /*
@@ -3016,7 +3064,7 @@ AstObject *astLoadObject_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *astLoadObject( void *mem, size_t size, int init,
+*     AstObject *astLoadObject( void *mem, size_t size, 
 *                               AstObjectVtab *vtab, const char *name,
 *                               AstChannel *channel )
 
@@ -3048,14 +3096,6 @@ AstObject *astLoadObject_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstObject) is used instead.
-*     init
-*        A boolean flag indicating if the Object's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the Object class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new Object. If this is NULL, a pointer to
@@ -3095,21 +3135,20 @@ AstObject *astLoadObject_( void *mem, size_t size, int init,
    initialising it and its virtual function table. */
    if ( !vtab ) {
       size = sizeof( AstObject );
-      init = !class_init;
       vtab = &class_vtab;
       name = "Object";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitObjectVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* There is no parent class to load, so simply initialise a new Object
-   structure as if a new Object were being created from scratch. This
-   will initialise the virtual function table as well if required. */
-   new = astInitObject( mem, size, init, vtab, name );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
+   structure as if a new Object were being created from scratch. */
+   new = astInitObject( mem, size, 0, vtab, name );
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

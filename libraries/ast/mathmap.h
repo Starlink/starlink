@@ -100,6 +100,8 @@
 *           Validate class membership.
 *        astInitMathMap
 *           Initialise a MathMap.
+*        astInitMathMapVtab
+*           Initialise the virtual function table for the MathMap class.
 *        astLoadMathMap
 *           Load a MathMap.
 
@@ -132,6 +134,8 @@
 *  History:
 *     3-SEP-1999 (RFWS):
 *        Original version.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitMathMapVtab method.
 *-
 */
 
@@ -255,8 +259,11 @@ AstMathMap *astInitMathMap_( void *, size_t, int, AstMathMapVtab *,
                              const char *, int, int,
                              int, const char *[], int, const char *[] );
 
+/* Vtab initialiser. */
+void astInitMathMapVtab_( AstMathMapVtab *, const char * );
+
 /* Loader. */
-AstMathMap *astLoadMathMap_( void *, size_t, int, AstMathMapVtab *,
+AstMathMap *astLoadMathMap_( void *, size_t, AstMathMapVtab *,
                              const char *, AstChannel * );
 #endif
 
@@ -309,9 +316,11 @@ void astSetSimpIF_( AstMathMap *, int );
 #define astInitMathMap(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv) \
 astINVOKE(O,astInitMathMap_(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv))
 
+/* Vtab Initialiser. */
+#define astInitMathMapVtab(vtab,name) astINVOKE(V,astInitMathMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadMathMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadMathMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadMathMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadMathMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

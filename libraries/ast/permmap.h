@@ -61,6 +61,8 @@
 *           Validate class membership.
 *        astInitPermMap
 *           Initialise a PermMap.
+*        astInitPermMapVtab
+*           Initialise the virtual function table for the PermMap class.
 *        astLoadPermMap
 *           Load a PermMap.
 
@@ -95,6 +97,9 @@
 *        Original version.
 *     26-SEP-1996 (RFWS):
 *        Added external interface and I/O facilities.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitPermMapVtab
+*        method.
 *-
 */
 
@@ -175,8 +180,11 @@ AstPermMap *astInitPermMap_( void *, size_t, int, AstPermMapVtab *,
                              const char *, int, const int [], int,
                              const int [], const double [] );
 
+/* Vtab initialiser. */
+void astInitPermMapVtab_( AstPermMapVtab *, const char * );
+
 /* Loader. */
-AstPermMap *astLoadPermMap_( void *, size_t, int, AstPermMapVtab *,
+AstPermMap *astLoadPermMap_( void *, size_t, AstPermMapVtab *,
                              const char *, AstChannel * );
 #endif
 
@@ -216,9 +224,11 @@ AstPermMap *astLoadPermMap_( void *, size_t, int, AstPermMapVtab *,
 #define astInitPermMap(mem,size,init,vtab,name,nin,inperm,nout,outperm,constant) \
 astINVOKE(O,astInitPermMap_(mem,size,init,vtab,name,nin,inperm,nout,outperm,constant))
 
+/* Vtab Initialiser. */
+#define astInitPermMapVtab(vtab,name) astINVOKE(V,astInitPermMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadPermMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadPermMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadPermMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

@@ -102,6 +102,8 @@
 *           Validate class membership.
 *        astInitPcdMap
 *           Initialise a PcdMap.
+*        astInitPcdMapVtab
+*           Initialise the virtual function table for the PcdMap class.
 *        astLoadPcdMap
 *           Load a PcdMap.
 
@@ -126,7 +128,7 @@
 *        provided for external calls to the AST library.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)
@@ -134,6 +136,8 @@
 *  History:
 *     18-MAY-1999 (DSB):
 *        Original version.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitPcdMapVtab method.
 *-
 */
 
@@ -215,8 +219,11 @@ AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
 AstPcdMap *astInitPcdMap_( void *, size_t, int, AstPcdMapVtab *,
                            const char *, double, const double [2] );
 
+/* Vtab initialiser. */
+void astInitPcdMapVtab_( AstPcdMapVtab *, const char * );
+
 /* Loader. */
-AstPcdMap *astLoadPcdMap_( void *, size_t, int, AstPcdMapVtab *,
+AstPcdMap *astLoadPcdMap_( void *, size_t, AstPcdMapVtab *,
                            const char *, AstChannel * );
 #endif
 
@@ -265,9 +272,11 @@ void astSetPcdCen_( AstPcdMap *, int, double );
 #define astInitPcdMap(mem,size,init,vtab,name,disco,pcdcen) \
 astINVOKE(O,astInitPcdMap_(mem,size,init,vtab,name,disco,pcdcen))
 
+/* Vtab Initialiser. */
+#define astInitPcdMapVtab(vtab,name) astINVOKE(V,astInitPcdMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadPcdMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadPcdMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadPcdMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadPcdMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

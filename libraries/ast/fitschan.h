@@ -163,6 +163,8 @@
 *           Validate class membership.
 *        astInitFitsChan
 *           Initialise a FitsChan.
+*        astInitFitsChanVtab
+*           Initialise the virtual function table for the FitsChan class.
 *        astLoadFitsChan
 *           Load a FitsChan.
 
@@ -230,6 +232,8 @@
 *        Added AllWarnings attribute.
 *     20-FEB-2002 (DSB):
 *        Added CarLin attribute.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitFitsChanVtab method.
 *-
 */
 
@@ -387,10 +391,13 @@ AstFitsChan *astInitFitsChan_( void *, size_t, int, AstFitsChanVtab *,
                                void (*)( const char * ),
                                void (*)( void (*)( const char * ), const char * ) );
 
+/* Vtab initialiser. */
+void astInitFitsChanVtab_( AstFitsChanVtab *, const char * );
+
 
 
 /* Loader. */
-AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
+AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
                                const char *, AstChannel * );
 #endif
 
@@ -492,9 +499,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
 #define astInitFitsChan(mem,size,init,vtab,name,source,sourcewrap,sink,sinkwrap) \
 astINVOKE(O,astInitFitsChan_(mem,size,init,vtab,name,source,sourcewrap,sink,sinkwrap))
 
+/* Vtab Initialiser. */
+#define astInitFitsChanVtab(vtab,name) astINVOKE(V,astInitFitsChanVtab_(vtab,name))
 /* Loader. */
-#define astLoadFitsChan(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadFitsChan_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadFitsChan(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadFitsChan_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

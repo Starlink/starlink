@@ -77,6 +77,8 @@
 *           Validate class membership.
 *        astInitMatrixMap
 *           Initialise a MatrixMap.
+*        astInitMatrixMapVtab
+*           Initialise the virtual function table for the MatrixMap class.
 *        astLoadMatrixMap
 *           Load a MatrixMap.
 
@@ -117,6 +119,8 @@
 *        External interface and I/O added. Public method names shortened.
 *     3-JUN-1997 (DSB):
 *        astMtrMult and astMtrRot made protected instead of public.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitMatrixMapVtab method.
 *-
 */
 
@@ -195,8 +199,11 @@ AstMatrixMap *astMatrixMapId_( int, int, int, const double[], const char *, ... 
 AstMatrixMap *astInitMatrixMap_( void *, size_t, int, AstMatrixMapVtab *,
                                  const char *, int, int, int, const double[] );
 
+/* Vtab initialiser. */
+void astInitMatrixMapVtab_( AstMatrixMapVtab *, const char * );
+
 /* Loader. */
-AstMatrixMap *astLoadMatrixMap_( void *, size_t, int, AstMatrixMapVtab *,
+AstMatrixMap *astLoadMatrixMap_( void *, size_t, AstMatrixMapVtab *,
                                  const char *, AstChannel * );
 #endif
 
@@ -239,9 +246,11 @@ AstMatrixMap *astMtrMult_( AstMatrixMap *, AstMatrixMap * );
 #define astInitMatrixMap(mem,size,init,vtab,name,nin,nout,form,matrix) \
 astINVOKE(O,astInitMatrixMap_(mem,size,init,vtab,name,nin,nout,form,matrix))
 
+/* Vtab Initialiser. */
+#define astInitMatrixMapVtab(vtab,name) astINVOKE(V,astInitMatrixMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadMatrixMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadMatrixMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadMatrixMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadMatrixMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */
