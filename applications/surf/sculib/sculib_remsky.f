@@ -58,6 +58,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.5  1998/02/16 06:16:30  timj
+*     Calculate the sky noise
+*
 *     Revision 1.4  1997/11/30 23:40:03  timj
 *     Write a message even if we are not adding on the constant offset.
 *
@@ -105,23 +108,33 @@
 *  Local Variables:
       DOUBLE PRECISION BACKGROUND  ! Sky background level
       INTEGER BOL                  ! Loop counter
+      BYTE    BTEMP                ! Temporary byte
+      INTEGER DQ_PTR               ! Dummy quality array
+      INTEGER DQ_PTR_END           ! End of dummy quality
       INTEGER I                    ! Loop counter
+      INTEGER IERR                 ! For VEC_
       INTEGER GOOD                 ! Number of good data points
       REAL    ERRMEAN              ! Error in mean of SKY_DATA
+      REAL    LCLIP                ! Local value for CLIP
       DOUBLE PRECISION MEAN        ! Mean of sky values
       DOUBLE PRECISION MEAN_LEVEL  ! Mean level removed from data
       DOUBLE PRECISION MEDIAN      ! Median of sky values
+      INTEGER NERR                 ! For VEC_
       INTEGER NLOOPS               ! Number of times a sky level was removed
       INTEGER N_GOOD               ! Number of good data points in SKY
-      DOUBLE PRECISION RUNNING_TOTAL ! Total level removed
       INTEGER SKY                  ! Loop counter for SKY bolometers
       REAL    SKYVAR               ! Variance on sky background
       REAL    SKY_DATA(MAX__BOL)   ! Sky data for each jiggle
+      INTEGER SKY_PTR_END          ! End of SKY_PTR
+      INTEGER SKY_PTR              ! Array of sky values (REAL)
       BYTE    SKY_QUAL(MAX__BOL)   ! Sky quality (1)
       DOUBLE PRECISION STDEV       ! Standard deviation
       DOUBLE PRECISION SUM         ! Sum of data
       DOUBLE PRECISION SUMSQ       ! Sum of squares data
       REAL    QSORT(MAX__BOL)      ! Scratch sort array
+      INTEGER QS_PTR               ! Another sort array
+      INTEGER QS_PTR_END           ! End of QS_PTR 
+
 *    External functions:
       INCLUDE 'NDF_FUNC'
 *.
@@ -140,8 +153,14 @@
 *     Keep track of the levels removed and the number of times 
 *     this occurred so that we can add the level back on at the end
 
-      RUNNING_TOTAL = 0.0
-      NLOOPS = 0
+*     Need to get some memory for this (store as DOUBLE PRECISION)
+
+      SKY_PTR = 0
+      SKY_PTR_END = 0
+      CALL SCULIB_MALLOC(N_POS * VAL__NBR, SKY_PTR, SKY_PTR_END,
+     :     STATUS)
+
+      NLOOPS = 0 
 
 *     Loop over all data
       DO I = 1, N_POS
@@ -206,12 +225,15 @@
                         SCUVAR(BOL, I) = SCUVAR(BOL, I) + SKYVAR
                      END IF
 
-*     Store the level
-                     RUNNING_TOTAL = RUNNING_TOTAL + BACKGROUND
-                     NLOOPS = NLOOPS + 1
-
                   END IF
                END DO
+
+*     Store the level
+               CALL VEC_DTOR(.FALSE., 1, BACKGROUND,
+     :              %VAL(SKY_PTR + (NLOOPS * VAL__NBR)), IERR,
+     :              NERR, STATUS)
+               NLOOPS = NLOOPS + 1
+                     
             END IF
          ELSE
 
@@ -223,16 +245,48 @@
 
       END DO
 
+*     Calculate the statistics of the sky noise
+
+*     Set up the scratch arrays
+      DQ_PTR = 0
+      DQ_PTR_END = 0
+      QS_PTR = 0
+      QS_PTR_END = 0
+
+      CALL SCULIB_MALLOC(NLOOPS * VAL__NBUB, DQ_PTR, DQ_PTR_END,
+     :     STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         BTEMP = 0
+         CALL SCULIB_CFILLB(NLOOPS, BTEMP, %VAL(DQ_PTR))
+      END IF
+      CALL SCULIB_MALLOC(NLOOPS * VAL__NBR, QS_PTR, QS_PTR_END,
+     :     STATUS)
+      LCLIP = -1.0
+
+      CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(SKY_PTR), %VAL(DQ_PTR), 
+     :     BADBIT, GOOD, MEAN_LEVEL, MEDIAN, SUM, SUMSQ, STDEV, 
+     :     %VAL(QS_PTR), STATUS)
+
+
+*     Free the memory
+      CALL SCULIB_FREE('SKY_ARRAY', SKY_PTR, SKY_PTR_END, STATUS)
+      CALL SCULIB_FREE('DUMMY_SQUAL', DQ_PTR, DQ_PTR_END, STATUS)
+      CALL SCULIB_FREE('SKY_SORTED', QS_PTR, QS_PTR_END, STATUS)
+
+*     Print out the sky noise value
+      CALL MSG_SETI('NGOOD', GOOD)
+      CALL MSG_SETR('NOISE',SNGL(STDEV))
+      CALL MSG_OUTIF(MSG__NORM, ' ','Sky noise: ^NOISE (^NGOOD points)',
+     :     STATUS)
+
+
 *     Now add the background level back on if requested
 
-      IF (ADD_BACK .AND. (NLOOPS .GT. 0) .AND. STATUS .EQ. SAI__OK) THEN
+      IF (ADD_BACK .AND. (NLOOPS .GT. 0) .AND. STATUS .EQ. SAI__OK
+     :     .AND. MEAN_LEVEL .NE. VAL__BADD) THEN
 
-*     Find the mean level that was removed
-
-         MEAN_LEVEL = RUNNING_TOTAL / NLOOPS
-
-*     Add it back on (ignore the slight change in variance associated
-*     with the fact that the MEAN_LEVEL has an error on it)
+*     Add the mean back on (ignore the slight change in variance associated
+*     with the fact that the MEAN has an error on it)
 
          CALL SCULIB_ADDCAR(N_POS * N_BOLS, SCUDATA, 
      :        SNGL(MEAN_LEVEL), SCUDATA)
