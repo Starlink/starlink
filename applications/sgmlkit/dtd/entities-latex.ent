@@ -6,28 +6,37 @@
   CDATA entities, because then the replacement text is carefully
   escaped by the back-end.
 
+  The existence of these entities is largely demanded by the LaTeX
+  Jade back-end.  The entities which expand to \Char... are problematically
+  escaped by the back-end, because they're escaped to \charnn.  This
+  number nn is the correct one, but produces the wrong glyph when it
+  appears in a roman font.  The back-end has to take care of defining
+  the commands \Char... appropriately, with suitable font-switching.
+
   $Id$
 -->
 
-<!ENTITY copy   SDATA "\copyright{}"	-- copyright sign	-->
-<!ENTITY amp    SDATA "\&"		-- ampersand		-->
-<!ENTITY gt     SDATA ">"		-- greater than		-->
-<!ENTITY lt     SDATA "<"		-- less than		-->
-<![ IGNORE [
-<!ENTITY quot   SDATA '\dquote{}'	-- double quote		-->
+<!ENTITY copy   	SDATA "\copyright{}"	-- copyright sign	-->
+<!ENTITY amp   		SDATA "\&"		-- ampersand		-->
+<!ENTITY gt     	SDATA "\CharRangle{}"	-- greater than		-->
+<!ENTITY lt     	SDATA "\CharLangle{}"	-- less than		-->
+<![ INCLUDE [
+<!ENTITY quot   	SDATA '\CharDquote{}'	-- double quote		-->
 ]]>
-<!ENTITY quot   SDATA '"'		-- double quote		-->
-<!ENTITY nbsp   SDATA "~"		-- non breaking space	-->
-<!ENTITY hash	SDATA "\#"		-- hash sign		-->
-<!ENTITY pounds	SDATA "{\normalfont\pounds{}}" -- pound sign	-->
-<!ENTITY dollar SDATA "\$"		-- dollar sign		-->
-<!ENTITY ellip  SDATA "\dots{}"		-- ellipses		-->
-<!ENTITY emdash SDATA "---"		-- em dash 		-->
-<!ENTITY endash SDATA "--"		-- en dash		-->
-<!ENTITY percent SDATA "\%"		-- percent sign		-->
-<!ENTITY deg    SDATA "\ensuremath{{}^\circ}"	-- degree	-->
-<!ENTITY dot	SDATA ".{}"		-- non-sentence-ending period -->
-<!ENTITY tilde	CDATA "~"		-- tilde		-->
-<!ENTITY underscore SDATA "\Underscore{}" -- underscore		-->
-<!ENTITY latex  SDATA "\LaTeX{}"	-- might as well...	-->
-<!ENTITY tex	SDATA "\TeX{}"		-- might as well...	-->
+<!ENTITY quot   	SDATA '"'		-- double quote		-->
+<!ENTITY nbsp   	SDATA "~"		-- non breaking space	-->
+<!ENTITY hash		SDATA "\#"		-- hash sign		-->
+<!ENTITY pounds		SDATA "{\normalfont\pounds{}}" -- pound sign	-->
+<!ENTITY dollar 	SDATA "\$"		-- dollar sign		-->
+<!ENTITY ellip  	SDATA "\dots{}"		-- ellipses		-->
+<!ENTITY emdash 	SDATA "---"		-- em dash 		-->
+<!ENTITY endash 	SDATA "--"		-- en dash		-->
+<!ENTITY percent 	SDATA "\%"		-- percent sign		-->
+<!ENTITY deg    	SDATA "\ensuremath{{}^\circ}"	-- degree	-->
+<!ENTITY dot		SDATA ".{}"		-- non-sentence-ending period -->
+<!ENTITY tilde		CDATA "~"		-- tilde		-->
+<!ENTITY underscore	SDATA "\CharUnderscore{}" -- underscore		-->
+<!ENTITY backslash	SDATA "\CharBackslash{}" -- backslash	-->
+<!ENTITY verticalbar	SDATA "\CharVbar{}"	-- vertical bar -->
+<!ENTITY latex  	SDATA "\LaTeX{}"	-- might as well...	-->
+<!ENTITY tex		SDATA "\TeX{}"		-- might as well...	-->
