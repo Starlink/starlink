@@ -203,6 +203,9 @@
 *        Mark the new soruce
             CALL IBGND_MARK( I_BGM_NSRC, STATUS )
 
+*        Update display
+            CALL IBGND_TOPSRC( I_BGM_TSRC, STATUS )
+
 *      Set the top source to display
           ELSE IF ( CMD .EQ. 'TOPSRC' ) THEN
 
@@ -238,8 +241,13 @@
 
 *      Delete a source
           ELSE IF ( CMD .EQ. 'DELSRC' ) THEN
+
+*        Delete selected source
             CALL USI_GET0I( 'ISRC', ISRC, STATUS )
             CALL IBGND_DELSRC( ISRC, STATUS )
+
+*        Update display
+            CALL IBGND_TOPSRC( I_BGM_TSRC, STATUS )
 
 *      Display model
           ELSE IF ( CMD .EQ. 'DISP' ) THEN
