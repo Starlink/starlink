@@ -519,7 +519,7 @@
 *  Any silly variances
       IF ( NNEGV .GT. 0 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
-        CALL MSG_SETI( 'NB', NBIGW )
+        CALL MSG_SETI( 'NB', NNEGV )
         CALL AIO_WRITE( OCH, ' ^NB '//OBJ//' excluded as variances'/
      :                  /' zero or negative', STATUS )
         CALL AIO_BLNK( OCH, STATUS )
