@@ -114,6 +114,8 @@
 
 *  Local Variables:
       INTEGER ILBND( 2 )         ! Lower bounds of input array
+      INTEGER IPIV               ! Pointer to dummy input variance array
+      INTEGER IPOV               ! Pointer to dummy output variance array
       INTEGER IPTEMP             ! Pointer to temporary array space
       INTEGER IUBND( 2 )         ! Upper bounds of input array
       INTEGER MAXPIX             ! Initial adaptive scale size for AST_RESAMPLE
@@ -121,20 +123,6 @@
       INTEGER OLBND( 2 )         ! Lower bounds of output array
       INTEGER OUBND( 2 )         ! Upper bounds of output array
       INTEGER RFLAGS             ! Flags to pass to AST_RESAMPLE
-      INTEGER * 1 DUMIB          ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 1 DUMOB          ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 1 DUMIUB         ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 1 DUMOUB         ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 2 DUMIW          ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 2 DUMOW          ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 2 DUMIUW         ! Dummy array to pass to AST_RESAMPLE
-      INTEGER * 2 DUMOUW         ! Dummy array to pass to AST_RESAMPLE
-      INTEGER DUMII              ! Dummy array to pass to AST_RESAMPLE
-      INTEGER DUMOI              ! Dummy array to pass to AST_RESAMPLE
-      REAL DUMIR                 ! Dummy array to pass to AST_RESAMPLE
-      REAL DUMOR                 ! Dummy array to pass to AST_RESAMPLE
-      DOUBLE PRECISION DUMID     ! Dummy array to pass to AST_RESAMPLE
-      DOUBLE PRECISION DUMOD     ! Dummy array to pass to AST_RESAMPLE
       DOUBLE PRECISION DUMPAR    ! Dummy array to pass to AST_RESAMPLE
       DOUBLE PRECISION TOL       ! Pixel tolerance for resampling
       LOGICAL BADTMP             ! Are there bad values in the resampled array?
@@ -158,6 +146,12 @@
      :                FLOAT( OYDIM ) / FLOAT( IYDIM ) )
       MAXPIX = IXDIM + IYDIM
 
+*  Get dummy workspace for unused input and output variance arrays.  This
+*  is probably not necessary, but an over-zealous runtime system might
+*  not like passing invalid memory references.
+      CALL CCD1_MALL( 1, ITYPE, IPIV, STATUS )
+      CALL CCD1_MALL( 1, ITYPE, IPOV, STATUS )
+
 *  Get workspace for intermediate image (of type ITYPE).
       CALL CCD1_MALL( OXDIM * OYDIM, ITYPE, IPTEMP, STATUS )
 
@@ -166,55 +160,54 @@
 *  as the names of the routines.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          NBAD = AST_RESAMPLEB( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         DUMIB, AST__NEAREST, AST_NULL, DUMPAR,
-     :                         RFLAGS, TOL, MAXPIX, VAL__BADB, 2, 
-     :                         OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), DUMOB, STATUS )
+     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADB,
+     :                         2, OLBND, OUBND, OLBND, OUBND,
+     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          NBAD = AST_RESAMPLEUB( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                          DUMIUB, AST__NEAREST, AST_NULL, DUMPAR,
-     :                          RFLAGS, TOL, MAXPIX, VAL__BADUB, 2, 
-     :                          OLBND, OUBND, OLBND, OUBND, 
-     :                          %VAL( IPTEMP ), DUMOUB, STATUS )
+     :                          %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                          DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADUB,
+     :                          2, OLBND, OUBND, OLBND, OUBND,
+     :                          %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          NBAD = AST_RESAMPLEW( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         DUMIW, AST__NEAREST, AST_NULL, DUMPAR,
-     :                         RFLAGS, TOL, MAXPIX, VAL__BADW, 2,
-     :                         OLBND, OUBND, OLBND, OUBND, 
-     :                         %VAL( IPTEMP ), DUMOW, STATUS )
+     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADW,
+     :                         2, OLBND, OUBND, OLBND, OUBND,
+     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          NBAD = AST_RESAMPLEUW( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                          DUMIUW, AST__NEAREST, AST_NULL, DUMPAR,
-     :                          RFLAGS, TOL, MAXPIX, VAL__BADUW, 2,
-     :                          OLBND, OUBND, OLBND, OUBND, 
-     :                          %VAL( IPTEMP ), DUMOUW, STATUS )
+     :                          %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                          DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADUW,
+     :                          2, OLBND, OUBND, OLBND, OUBND,
+     :                          %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          NBAD = AST_RESAMPLEI( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         DUMII, AST__NEAREST, AST_NULL, DUMPAR,
-     :                         RFLAGS, TOL, MAXPIX, VAL__BADI, 2,
-     :                         OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), DUMOI, STATUS )
+     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADI,
+     :                         2, OLBND, OUBND, OLBND, OUBND,
+     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          NBAD = AST_RESAMPLER( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         DUMIR, AST__NEAREST, AST_NULL, DUMPAR,
-     :                         RFLAGS, TOL, MAXPIX, VAL__BADR, 2,
-     :                         OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), DUMOR, STATUS )
+     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADR,
+     :                         2, OLBND, OUBND, OLBND, OUBND,
+     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          NBAD = AST_RESAMPLED( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         DUMID, AST__NEAREST, AST_NULL, DUMPAR,
-     :                         RFLAGS, TOL, MAXPIX, VAL__BADD, 2,
-     :                         OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), DUMOD, STATUS )
+     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
+     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADD,
+     :                         2, OLBND, OUBND, OLBND, OUBND,
+     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       END IF
-
 
 *  And finally rescale it.
       BADTMP = NBAD .GT. 0
@@ -257,6 +250,8 @@
 
 *  Release the temporary workspace.
       CALL CCD1_MFREE( IPTEMP, STATUS )
+      CALL CCD1_MFREE( IPIV, STATUS )
+      CALL CCD1_MFREE( IPOV, STATUS )
 
       END
 * $Id$
