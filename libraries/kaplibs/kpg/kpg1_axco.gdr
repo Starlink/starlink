@@ -153,9 +153,10 @@
 
 *  The sign of ITH indicates the direction of increasing values. A
 *  negative ITH means that the values decrease as pixel index increases.
-*  Derive the index of the lower element nearest to the value.
+*  Derive the index of the lower element nearest to the value.  Note
+*  a shift of origin (equal to LBND-1) is also applied.
             IF ( ITH .GT. 0 ) THEN
-               LB = ITH + LBND
+               LB = ITH + LBND - 2
             ELSE
                LB = -ITH + LBND - 1
             END IF
