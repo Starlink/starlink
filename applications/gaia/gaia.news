@@ -19,6 +19,11 @@
      been upgraded to accept RA and Dec values with space separations.
      Note that in general you should use colons as the separators.
 
+   - The image print window has been modified to swap the page width
+     and length values when changing between landscape and portrait
+     formats. This should make better use of the full page by default.
+     
+   
   To try out GAIA for yourself type the following command:
 
       %  gaia [image_file]
