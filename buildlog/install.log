@@ -916,7 +916,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Jan 23, 2005 5:20:15 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Jan 24, 2005 5:20:21 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] INFO: java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:146)
@@ -942,7 +942,7 @@ docs:
   [javadoc] 	at java.lang.System.loadLibrary(System.java:832)
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:111)
   [javadoc] 	... 16 more
-  [javadoc] Jan 23, 2005 5:20:15 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Jan 24, 2005 5:20:21 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST load failed - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -960,4 +960,4 @@ BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:216: The following error occurred while executing this line:
 /apps/cvsbuild/java/source/topcat/build.xml:1146: Fatal error during transformation
 
-Total time: 3 minutes 54 seconds
+Total time: 3 minutes 50 seconds
