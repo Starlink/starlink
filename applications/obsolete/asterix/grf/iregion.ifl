@@ -104,5 +104,38 @@ interface IREGION
     type '_CHAR'
     prompt 'ARD file name'
   endparameter
+  PARAMETER ROOTNAME
+    TYPE    '_CHAR'
+    PROMPT  'Rootname of calibration files'
+    PPATH   'CURRENT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+  PARAMETER ATTFIL
+    TYPE    '_CHAR'
+    PROMPT  'Name of attitude file'
+    PPATH   'DEFAULT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+  PARAMETER AUTO
+    TYPE    '_LOGICAL'
+    PROMPT  'Run in automatic mode'
+    DEFAULT  T
+    HELP 'AUTO uses the the attitude file  -  non-AUTO uses cursor'
+  ENDPARAMETER
+  PARAMETER EXTRA
+    TYPE    '_REAL'
+    PROMPT  'Extra width to give ring and spokes'
+    PPATH   'DEFAULT'
+    VPATH   'DEFAULT'
+    DEFAULT  0.0
+    HELP 'To widen ring a bit -  enter in degrees, roughly ~0.01'
+  ENDPARAMETER
+  PARAMETER TIMRANGE
+    TYPE    '_CHAR'
+    PROMPT  'Time ranges'
+    PPATH   'DYNAMIC,CURRENT,DEFAULT'
+    HELP    'e.g. 130.6:140.7 or M47890.4:M47891.0 or TIMES.DAT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
 endinterface
 
