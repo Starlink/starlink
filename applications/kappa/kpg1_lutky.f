@@ -110,7 +110,7 @@
 
 *  Local Constants:
       REAL ASPNOM                ! Nominal aspect ratio for the colour ramp
-      PARAMETER ( ASPNOM = 10.0 )
+      PARAMETER ( ASPNOM = 12.0 )
 
 *  Local Variables:
       CHARACTER EDGE1*6          ! Default edge for data value labels
