@@ -594,7 +594,7 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
  ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
- ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f \
+ ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f pda_dgeir.f pda_sdddot.f \
  pda_drnor.f nag1_szprd.f nag1_szslv.f nag1_szlsf.f nag1_szlsm.f \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f
@@ -687,7 +687,7 @@ REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 NAGTASKS = nagmakemos
-SCRTASKS = reduce ccdalign runxreduce
+SCRTASKS = reduce ccdalign xreduce
 
 #  Monolith routine source names.
 
@@ -2436,7 +2436,7 @@ present.o: CCD1_PAR IRG_FAC PAR_ERR SAE_PAR
 pthlpo.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 reduce.o: MSG_PAR PRM_PAR PSX_ERR SAE_PAR
 register.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
-runxreduce.o: SAE_PAR
+xreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
