@@ -100,6 +100,10 @@
 *     1997 March 21 (TIMJ)
 *        Original version
 *     $Log$
+*     Revision 1.7  2000/06/16 01:26:30  timj
+*     - Correct for new format SCULIB_GET_MJD
+*     - Correct < to .LT. typo
+*
 *     Revision 1.6  2000/05/11 20:00:06  timj
 *     Add support for defaulting temperature values intelligently.
 *     Uses TARRAY parameter
@@ -184,6 +188,7 @@
       INTEGER N_SUB              ! Number of sub instruments. Equivalent to
                                  ! N_BOLS
       INTEGER POS                ! Postion in output array
+      REAL    RTEMP              ! Scratch real
       INTEGER START              ! Start of loop for T_COLD
       CHARACTER*(80) STEMP       ! Temporary string
       CHARACTER*15 SUB_INSTRUMENT (SCUBA__MAX_SUB)
@@ -271,10 +276,11 @@
 *     Read the hot load temperature from the FITS data and then
 *     get the required value from the parameter.
 *     Before 19980204 (MJD = 50848) we have to use T_AMB instead.
-*     Get the MJD
-      CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, EPOCH, STATUS)
+*     Get the MJD (don't bother about the startup time correction)
+      CALL SCULIB_GET_MJD(N_FITS, FITS, -1.0D0, MJD, EPOCH, RTEMP, 
+     :     STATUS)
 
-      IF (MJD < 50848.0D0 .AND. INSTRUMENT .EQ. 'SCUBA') THEN
+      IF (MJD .LT. 50848.0D0 .AND. INSTRUMENT .EQ. 'SCUBA') THEN
          CALL MSG_OUTIF(MSG__NORM, ' ', ' Skydip taken before '//
      :        '19980204. Using T_AMB rather than T_HOT as default.', 
      :        STATUS)
