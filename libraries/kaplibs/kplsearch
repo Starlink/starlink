@@ -248,6 +248,7 @@ proc search {test words} {
    if { $prefs == "" } { 
       set routines [array names purpose]
    } else {
+      set routines ""
       foreach rout [array names purpose] {
          foreach pref $prefs { 
             if { [string match "$pref*" $rout] } {
