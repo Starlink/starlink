@@ -1075,14 +1075,14 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 940
       
 *  Map the Data array to force them into existance
-      CALL NDF_MAP( OUTNDF, 'Data', '_REAL', 'WRITE', 
+      CALL NDF_MAP( OUTNDF, 'Data', '_REAL', 'WRITE/BAD', 
      :              ODAT, NPXOUT, STATUS )
 
 *  Variances are currently not propogated, so there is no point
 *  in wasting disk space with the varaince array for the output
 *  image
 *     
-*      CALL NDF_MAP( OUTNDF, 'Variance', '_REAL', 'WRITE', 
+*      CALL NDF_MAP( OUTNDF, 'Variance', '_REAL', 'WRITE/BAD', 
 *     :              OVAR, NPXOUT, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 940      
