@@ -223,6 +223,8 @@ c     RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
 c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
       INTEGER			IMOD
 
+      CHARACTER*6		STYLE
+
       DOUBLE PRECISION 		STAT			! Fit statistic
       DOUBLE PRECISION 		FPROB			! Fit probability
       DOUBLE PRECISION 		LNDFAC
@@ -258,7 +260,6 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
       LOGICAL 			NOFREE			! No parameters free
       LOGICAL 			ER			! Parameter error calculation required?
       LOGICAL 			OP			! Printout required?
-      LOGICAL			THERE
 *.
 
 *  Check inherited global status.
@@ -375,11 +376,11 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
       IF ( NOFREE ) THEN
 	ER = .FALSE.
       ELSE
-	CALL ADI_THERE( MCTRL, 'Style', THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-	  CALL USI_GET0L('ERR',ER,STATUS)
-        ELSE
+	CALL ADI_CGET0C( MCTRL, 'Style', STYLE, STATUS )
+        IF ( STYLE .EQ. 'GENALG' ) THEN
           ER = .FALSE.
+        ELSE
+	  CALL USI_GET0L('ERR',ER,STATUS)
         END IF
       END IF
 
