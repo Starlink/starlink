@@ -175,7 +175,8 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 17 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 22 source files to /apps/cvsbuild/java/source/util/build/classes
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/util/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
@@ -189,6 +190,8 @@ javadocs:
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.util...
+  [javadoc] Loading source files for package uk.ac.starlink.util.gui...
+  [javadoc] Loading source files for package uk.ac.starlink.util.images...
   [javadoc] Constructing Javadoc information...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
