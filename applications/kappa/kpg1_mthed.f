@@ -1,0 +1,364 @@
+      SUBROUTINE KPG1_MTHED( BAD, EL, N, DAT, VFLAG, VAR, IMAP, QUICK,
+     :                         MXBAT, WRK, RES, VRES, BADDR, BADVR,
+     :                         STATUS )
+*+
+*  Name:
+*     KPG1_MTHEx
+ 
+*  Purpose:
+*     Evaluate a mathematical expression for a set of data and variance
+*     arrays.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_MTHEx( BAD, EL, N, DAT, VFLAG, VAR, IMAP, QUICK,
+*                      MXBAT, WRK, RES, VRES, BADDR, BADVR, STATUS )
+ 
+*  Description:
+*     The routine evaluates a general mathematical expression giving
+*     the values in an output data array in terms of values in a set of
+*     input data arrays, each of the same size. The expression to be
+*     evaluated is specified by means of a mapping identifier obtained
+*     from the TRANSFORM system (see SUN/61). A set of input variance
+*     arrays is also supplied, and this routine uses these to obtain
+*     estimates of the variance in the evaluated results. These output
+*     variance estimates are obtained numerically by perturbing the
+*     input data values by appropriate amounts.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for bad values in the input
+*        data or variance arrays.
+*     EL = INTEGER (Given)
+*        Number of elements in each input data array.
+*     N = INTEGER (Given)
+*        Number of input data arrays.
+*     DAT( EL, N ) = ? (Given)
+*        Array containing each separate input data array stored in a
+*        separate row.
+*     VFLAG( N ) = LOGICAL (Given)
+*        A set of logical flags indicating which of the input data
+*        arrays stored in the DAT array have associated variance values
+*        (stored in the VAR array). If the VFLAG value for a data array
+*        is .TRUE., then variance values exist, otherwise there is no
+*        associated variance array so a variance of zero will be
+*        assumed.
+*     VAR( EL, * ) = ? (Given)
+*        Array containing variance estimates for the input data arrays.
+*        These values are stored in the rows of this array in the same
+*        order as the associated data values, but the total number of
+*        rows may be smaller than N due to the absence of values for
+*        those data arrays with a VFLAG value of .FALSE..  The declared
+*        second dimension size of the VAR array must be at least equal
+*        to the number of .TRUE. values in the VFLAG array.
+*     IMAP = INTEGER (Given)
+*        A TRANSFORM system identifier for an {N-->1} compiled mapping
+*        which defines the mathematical expression to be evaluated.
+*     QUICK = LOGICAL (Given)
+*        If this argument is set to .TRUE., then output variance
+*        estimates will be made by perturbing each input data array in
+*        turn, but in the positive direction only. If it is set to
+*        .FALSE., then each input data array will be perturbed in both
+*        directions and the maximum resulting output perturbation will
+*        be used to estimate the output variance. The former approach
+*        has the advantage of speed, but the latter gives more accurate
+*        results, especially for highly non-linear functions.
+*     MXBAT = INTEGER (Given)
+*        A positive integer defining the size of workspace supplied.
+*        The input data arrays will be processed in "batches", each of
+*        which does not contain more than this number of elements. If
+*        this value is too low, then excessive time will be spent in
+*        looping and subroutine calls. If it is too high, then
+*        excessive page faulting may occur. A value of about 256 is
+*        normally adequate.
+*     WRK( MXBAT * ( N + 3 ) ) = ? (Returned)
+*        This array must be supplied as workspace.
+*     RES( EL ) = ? (Returned)
+*        The output data array, containing the results of evaluating the
+*        mathematical expression.
+*     VRES( EL ) = ? (Returned)
+*        The output variance estimates to accompany the results held in
+*        the RES array.
+*     BADDR = LOGICAL (Returned)
+*        Whether the returned array of results (RES) may contain bad
+*        values.
+*     BADVR = LOGICAL (Returned)
+*        Whether the returned array of variance estimates (VRES) may
+*        contain bad values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There is a routine for processing both real and double
+*     precision data; replace "x" in the routine name by R or D as
+*     appropriate.  The data types of the DAT, VAR, WRK, RES and RESV
+*     arrays should match the routine used.
+*     -  The algorithm used to estimate the output variance is
+*     general-purpose and will cope with any reasonable mathematical
+*     expression.  However, note that it is likely to be less efficient
+*     than an algorithm written especially to estimate the variance for
+*     any particular expression whose form is known in advance.
+ 
+*  Timing:
+*     The time taken is approximately proportional to (i) N+1, where N
+*     is the number of input data arrays which have associated variance
+*     values, (ii) the size of each array and (iii) the time taken to
+*     evaluate the mathematical expression for each array element. In
+*     general, this last value will also tend to increase in
+*     approximate proportion to the number of input data arrays.
+ 
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     26-JUN-1990 (RFWS):
+*        Original version.
+*     27-JUN-1990 (RFWS):
+*        Converted to a generic routine and added the VFLAG argument.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER EL
+      INTEGER N
+      DOUBLE PRECISION DAT( EL, N )
+      LOGICAL VFLAG( N )
+      DOUBLE PRECISION VAR( EL, * )
+      INTEGER IMAP
+      LOGICAL QUICK
+      INTEGER MXBAT
+ 
+*  Arguments Returned:
+      DOUBLE PRECISION WRK( MXBAT, N + 3 )
+      DOUBLE PRECISION RES( EL )
+      DOUBLE PRECISION VRES( EL )
+      LOGICAL BADDR
+      LOGICAL BADVR
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      DOUBLE PRECISION DL                  ! Lower output perturbation
+      DOUBLE PRECISION DU                  ! Upper output perturbation
+      INTEGER I                  ! Loop counter for input array pixels
+      INTEGER IEND               ! Index of last pixel in batch
+      INTEGER IERR               ! Workspace row holding error estimate
+      INTEGER IIN                ! Loop counter for input data arrays
+      INTEGER IMINUS             ! Workspace row for lower output result
+      INTEGER IPLUS              ! Workspace row for upper output result
+      INTEGER ISTART             ! Index of first pixel in batch
+      INTEGER IVAR               ! Row counter for accessing VAR array
+      INTEGER IWRK               ! Index to pixels in workspace array
+      LOGICAL LBAD               ! Local bad pixel flag
+ 
+*.
+ 
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Initialise pointers to the final 3 rows of the workspace array.
+      IERR = N + 1
+      IPLUS = N + 2
+      IMINUS = N + 3
+ 
+*  Initialise the bad pixel flags for the output arrays.
+      BADDR = .FALSE.
+      BADVR = .FALSE.
+ 
+*  Loop through all the pixels to be processed in "batches", each of
+*  which does not contain more than MXBAT pixels.
+      DO 10 ISTART = 1, EL, MXBAT
+ 
+*  Obtain the indices of the first and last pixels in each batch.
+         IEND = MIN( ISTART + MXBAT - 1, EL )
+ 
+*  For each input data array, copy the values of pixels lying within
+*  the current batch into successive rows of the workspace array WRK.
+         DO 2 IIN = 1, N
+            DO 1 I = ISTART, IEND
+               WRK( I - ISTART + 1, IIN ) = DAT( I, IIN )
+1           CONTINUE
+2        CONTINUE
+ 
+*  Apply the mapping to these pixel values, putting the result into the
+*  appropriate elements of the output data array.
+         CALL TRN_TRND( BAD, MXBAT, N, ( IEND - ISTART + 1 ), WRK,
+     :                    IMAP, MXBAT, 1, RES( ISTART ), STATUS )
+ 
+*  Loop through the results just obtained. If any bad output data
+*  values have been generated, then note this fact and set the
+*  corresponding output variance value to be bad as well.
+         DO 3 I = ISTART, IEND
+            IF ( RES( I ) .EQ. VAL__BADD ) THEN
+               BADDR = .TRUE.
+               VRES( I ) = VAL__BADD
+ 
+*  Otherwise, initialise the output variance value to zero.
+            ELSE
+               VRES( I ) = 0.0D0
+            END IF
+3        CONTINUE
+ 
+*  Loop to perturb each input data array to determine the effect on the
+*  output value (the results of this process applied to each input data
+*  array in turn will be combined to estimate the output variance).
+         IVAR = 0
+         DO 9 IIN = 1, N
+ 
+*  Don't bother to consider those data arrays which do not have
+*  associated variance values (we assume their variance is zero).
+            IF ( VFLAG( IIN ) ) THEN
+ 
+*  Increment the row counter for accessing the VAR array.
+               IVAR = IVAR + 1
+ 
+*  Consider only those pixels lying within the current batch and
+*  determine the work array index for each of these pixels.
+               LBAD = .FALSE.
+               DO 4 I = ISTART, IEND
+                  IWRK = I - ISTART + 1
+ 
+*  If the output variance is bad, or the input variance is negative or
+*  bad, then it will not be possible to estimate the variance for this
+*  pixel. Put bad values into those work array elements which will be
+*  used for this purpose and note that bad values are present.
+                  IF ( ( VRES( I ) .EQ. VAL__BADD ) .OR.
+     :                 ( VAR( I, IVAR ) .LT. 0.0D0 ) .OR.
+     :                 ( VAR( I, IVAR ) .EQ. VAL__BADD ) ) THEN
+                     WRK( IWRK, IERR ) = VAL__BADD
+                     WRK( IWRK, IIN ) = VAL__BADD
+                     LBAD = .TRUE.
+ 
+*  If a variance estimate can be made, then store the square root of
+*  the input variance in the work array as an input error estimate and
+*  perturb the input data value by this amount.
+                  ELSE
+                     WRK( IWRK, IERR ) = SQRT( VAR( I, IVAR ) )
+                     WRK( IWRK, IIN ) = WRK( IWRK, IIN ) +
+     :                                  WRK( IWRK, IERR )
+                  END IF
+4              CONTINUE
+ 
+*  Apply the transformation to the resulting set of perturbed input
+*  data, storing the results in the IPLUS row of the work array.
+               CALL TRN_TRND( ( BAD .OR. LBAD ), MXBAT, N,
+     :                          ( IEND - ISTART + 1 ), WRK, IMAP,
+     :                          MXBAT, 1, WRK( 1, IPLUS ), STATUS )
+ 
+*  If a "quick" variance estimate is required, then all the necessary
+*  information is now available for the results of perturbing the
+*  current input data array.  Loop through all the pixels in the
+*  current batch to increment the output variance estimates.
+               IF ( QUICK ) THEN
+                  DO 5 I = ISTART, IEND
+                     IWRK = I - ISTART + 1
+ 
+*  If bad pixels have been generated as a result of transforming the
+*  perturbed input data, then no output variance estimate will be
+*  possible for these pixels, so set the output variance value to be
+*  bad and note that these bad values are present.
+                     IF ( WRK( IWRK, IPLUS ) .EQ. VAL__BADD ) THEN
+                        VRES( I ) = VAL__BADD
+                        BADVR = .TRUE.
+ 
+*  Otherwise, increment the output variance estimate by adding the
+*  squared perturbation of the result.
+                     ELSE
+                        VRES( I ) = VRES( I ) + ( WRK( IWRK, IPLUS ) -
+     :                                            RES( I ) ) ** 2
+                     END IF
+5                 CONTINUE
+ 
+*  If a "comprehensive" variance estimate is required, then a second
+*  perturbation will be applied to the input data array in the opposite
+*  direction, and the maximum resulting output perturbation will be
+*  used to estimate the output variance.  Loop through each pixel in
+*  the current batch to re-perturb the input data.
+               ELSE
+                  LBAD = .FALSE.
+                  DO 6 I = ISTART, IEND
+                     IWRK = I - ISTART + 1
+ 
+*  If the input error estimate is bad, then no variance estimate will
+*  be possible for this pixel, so set a bad value for the perturbed
+*  input value and note that bad values are present.
+                     IF ( WRK( IWRK, IERR ) .EQ. VAL__BADD ) THEN
+                        WRK( IWRK, IIN ) = VAL__BADD
+                        LBAD = .TRUE.
+ 
+*  Otherwise, store a new perturbed input value, this time subtracting
+*  the input error estimate from the original (unperturbed) input data.
+                     ELSE
+                        WRK( IWRK, IIN ) = DAT( I, IIN ) -
+     :                                     WRK( IWRK, IERR )
+                     END IF
+6                 CONTINUE
+ 
+*  Apply the transformation to the new set of perturbed input data,
+*  storing the result in the IMINUS row of the work array.
+                  CALL TRN_TRND( ( BAD .OR. LBAD ), MXBAT, N,
+     :                             ( IEND - ISTART + 1 ), WRK, IMAP,
+     :                             MXBAT, 1, WRK( 1, IMINUS ), STATUS )
+ 
+*  Loop through each pixel in the current batch to evaluate the output
+*  variance increment resulting from the latest input perturbations.
+                  DO 7 I = ISTART, IEND
+                     IWRK = I - ISTART + 1
+ 
+*  If either perturbed result is bad, then no variance estimate is
+*  possible for this pixel, so set the output variance value to be bad
+*  and note that bad values are present.
+                     IF ( ( WRK( IWRK, IPLUS ) .EQ. VAL__BADD ) .OR.
+     :                    ( WRK( IWRK, IMINUS ) .EQ. VAL__BADD ) )
+     :                    THEN
+                        VRES( I ) = VAL__BADD
+                        BADVR = .TRUE.
+ 
+*  Otherwise, obtain the absolute values of the output perturbations
+*  caused by the two input perturbations applied.
+                     ELSE
+                        DU = WRK( IWRK, IPLUS ) - RES( I )
+                        IF ( DU .LT. 0.0D0 ) DU = - DU
+                        DL = RES( I ) - WRK( IWRK, IMINUS )
+                        IF ( DL .LT. 0.0D0 ) DL = - DL
+ 
+*  Use the larger of these two output perturbations to update the output
+*  variance estimate.
+                        IF ( DU .GT. DL ) THEN
+                           VRES( I ) = VRES( I ) + DU * DU
+                        ELSE
+                           VRES( I ) = VRES( I ) + DL * DL
+                        END IF
+                     END IF
+7                 CONTINUE
+               END IF
+ 
+*  If this is not the final input data array to be perturbed, then
+*  replace the perturbed values with the original data before returning
+*  to perturb the next input array.
+               IF ( IIN .LT. N ) THEN
+                  DO 8 I = ISTART, IEND
+                     WRK( I - ISTART + 1, IIN ) = DAT( I, IIN )
+8                 CONTINUE
+               END IF
+            END IF
+9        CONTINUE
+10    CONTINUE
+ 
+      END

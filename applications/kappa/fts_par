@@ -1,0 +1,17 @@
+*
+* Constants used in FITS package.
+*
+
+      INTEGER FTS__NREKY      ! Number of reserved keyword.
+      PARAMETER ( FTS__NREKY = 16 )
+
+      CHARACTER * ( 8 ) FTS__REKEY( FTS__NREKY )
+      INTEGER FTS__RKLEN( FTS__NREKY )
+                              ! Reserved keywords and their lengths
+      DATA FTS__REKEY/ 'SIMPLE', 'BITPIX', 'NAXIS', 'NAXIS1', 'NAXIS2',
+     :                 'NAXIS3', 'NAXIS4', 'NAXIS5', 'NAXIS6', 'NAXIS7',
+     :                 'EXTEND', 'PCOUNT', 'GCOUNT', 'XTENSION', 'END',
+     :                 'BLOCKED' /
+
+      DATA FTS__RKLEN/ 6, 6, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 3, 7 /
+      

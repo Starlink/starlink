@@ -1,0 +1,346 @@
+      SUBROUTINE KPG1_BMEDD( BAD, SAMBAD, VAR, NX, NY, IN, HX, HY,
+     :                        NLIM, OUT, BADOUT, WORK1, WORK2, STATUS )
+*+
+* Name:
+*     KPG1_BMEDx
+ 
+*  Purpose:
+*     Smooths the input array using a block median filter.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_BMEDx( BAD, SAMBAD, VAR, NX, NY, IN, HX, HY, NLIM,
+*                      OUT, BADOUT, WORK1, WORK2, STATUS )
+ 
+*  Description:
+*     The input array is filtered by replacing every pixel with the
+*     median of the pixel values contained in a rectangular region
+*     centred on the required output pixel.  If the box is so large in
+*     either dimension that an entire line or column is included for
+*     all output pixels, then the output values will be the same and so
+*     can be copied rather than re-calculated.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether or not it is necessary to check for bad pixels in the
+*        input image.
+*     SAMBAD = LOGICAL (Given)
+*        If a .TRUE. value is given for this argument, then bad input
+*        pixels will be propagated to the output image unchanged (a
+*        smoothed output value will be calculated for all other
+*        pixels).  If a .FALSE. value is given, then the NLIM argument
+*        determines whether an output pixel is good or bad.  The value
+*        of SAMBAD is not relevant if BAD is .FALSE..
+*     VAR = LOGICAL (Given)
+*        Indicates if the input image holds data values or variance
+*        values.  This argument is currently ignored (input values are
+*        assumed to be data values).
+*     NX = INTEGER (Given)
+*        The first dimension of the input and output images.
+*     NY = INTEGER (Given)
+*        The second dimension of the input and output images.
+*     IN( NX, NY ) = ? (Given)
+*        The input image.
+*     HX = INTEGER (Given)
+*        The half-width of the filter block along the first dimension,
+*        in pixels.
+*     HY = INTEGER (Given)
+*        The half-width of the filter block along the second dimension,
+*        in pixels.
+*     NLIM = INTEGER (Given)
+*        Minimum number of good pixels which must be present in the
+*        smoothing box in order to calculate a smoothed output pixel.
+*        If this minimum number is not satisfied, then a bad output
+*        pixel will result.  A value between 1 and the total number of
+*        pixels in the smoothing box should be supplied.
+*     OUT( NX, NY ) = ? (Returned)
+*        The output image.
+*     BADOUT = LOGICAL (Returned)
+*        Whether bad pixels are present in the output image.
+*     WORK1( * ) = ? (Returned)
+*        Work space.  It should have at least (2*HX+1)*(2*HY+1)
+*        elements.
+*     WORK2( * ) = INTEGER (Returned)
+*        Work space.  It should have at least (2*HX+1)*(2*HY+1)
+*        elements.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There is a routine for processing single- and double-precision
+*     arrays; replace "x" in the routine name by R or D as appropriate.
+*     The data type of the IN, OUT, and WORK1 arguments must match the
+*     routine used.
+ 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     20-DEC-1994 (DSB):
+*        Original version.
+*     1995 March 22 (MJC):
+*        Made generic, corrected typo's, removed long lines, used
+*        modern-style variable declarations.
+*     16-JUN-1995 (DSB):
+*        Modified to avoid re-calculating output median values when the
+*        the input filter box has not changed position or size.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL SAMBAD
+      LOGICAL VAR
+      INTEGER NX
+      INTEGER NY
+      DOUBLE PRECISION IN( NX, NY )
+      INTEGER HX
+      INTEGER HY
+      INTEGER NLIM
+ 
+*  Arguments Returned:
+      DOUBLE PRECISION OUT( NX, NY )
+      LOGICAL BADOUT
+      DOUBLE PRECISION WORK1( * )
+      INTEGER WORK2( * )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      DOUBLE PRECISION DUMMY              ! Un-used dummy argument
+      INTEGER I, J               ! Output pixel indices
+      INTEGER II, JJ             ! Input pixel indices
+      REAL INVAL                 ! Input data value
+      INTEGER ILO, IHI           ! Filter box x bounds
+      INTEGER ILOL, IHIL         ! X bounds for previous output column
+      INTEGER JLO, JHI           ! Filter box y bounds
+      INTEGER JLOL, JHIL         ! Y bounds for previous output line
+      INTEGER N                  ! No. of elements in filter box
+      DOUBLE PRECISION MIDPER             ! Central percentile, i.e. median
+ 
+*.
+ 
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Set up the constant.
+      MIDPER = 1.0D0 / 2.0D0
+ 
+*  Initialise the BADOUT flag to indicate that no bad values have yet
+*  been put in the output image.
+      BADOUT = .FALSE.
+ 
+*  Initialise the y bounds of the filter box used to create the
+*  `previous' output line.
+      JLOL = VAL__BADI
+      JHIL = VAL__BADI
+ 
+*  First deal with cases where bad pixels may be present in the input
+*  image.
+      IF ( BAD ) THEN
+ 
+*  Loop round each row of the output image.
+         DO J = 1, NY
+ 
+*  Form the upper and lower Y bounds of the input block.  Limit them to
+*  the edges of the input image.
+            JLO = MAX( 1, J - HY )
+            JHI = MIN( NY, J + HY )
+ 
+*  If both bounds are the same as last time, then the current output
+*  row will be identical to the previous output row.  Save time by
+*  copying it rather than re-calculating it.
+            IF ( JLO .EQ. JLOL .AND. JHI .EQ. JHIL ) THEN
+ 
+               DO I = 1, NX
+                  OUT( I, J ) = OUT( I, J - 1 )
+               END DO
+ 
+*  If the current output row is based on different input pixels to the
+*  previous row, calculate the output row.
+            ELSE
+ 
+*  Initialise the x bounds of the filter box used to create the
+*  `previous' output column.
+               ILOL = VAL__BADI
+               IHIL = VAL__BADI
+ 
+*  Loop round each column in the current row of the output image.
+               DO I = 1, NX
+ 
+*  Form the upper and lower x bounds of the input block.  Limit them to
+*  the edges of the input image.
+                  ILO = MAX( 1, I - HX )
+                  IHI = MIN( NX, I + HX )
+ 
+*  If both bounds are the same as last time, then the current output
+*  value will be identical to the previous output value.  Save time by
+*  copying it rather than re-calculating it.
+                  IF ( ILO .EQ. ILOL .AND. IHI .EQ. IHIL ) THEN
+                     OUT( I, J ) = OUT( I - 1, J )
+ 
+*  If the current output value is based on different input pixels to the
+*  previous value, calculate the output value from scratch.
+                  ELSE
+ 
+*  If the input pixel is bad and SAMBAD is .TRUE., then the output
+*  pixel will also be bad.
+                     IF ( SAMBAD .AND.
+     :                    IN( I, J ) .EQ. VAL__BADD ) THEN
+                        OUT( I, J ) = VAL__BADD
+                        BADOUT = .TRUE.
+ 
+*  Otherwise, copy the good data values from the area of the input
+*  image covered by the current filter block to the WORK1 array, and
+*  set up points for these values in the WORK2 array.
+                     ELSE
+                        N = 0
+ 
+                        DO JJ = JLO, JHI
+                           DO II = ILO, IHI
+ 
+                              INVAL = IN( II, JJ )
+ 
+                              IF ( INVAL .NE. VAL__BADD ) THEN
+                                 N = N + 1
+                                 WORK1( N ) = INVAL
+                                 WORK2( N ) = N
+                              END IF
+ 
+                           END DO
+                        END DO
+ 
+*  Find the median of the data in the work array and store it in the
+*  output image.  If SAMBAD is .FALSE., the NLIM criterion has to be
+*  met.
+                        IF ( SAMBAD .OR. N .GE. NLIM ) THEN
+                           CALL KPG1_QNTLD( .FALSE., .TRUE., MIDPER,
+     :                                        N, WORK1, DUMMY, WORK2,
+     :                                        OUT( I, J ), STATUS )
+ 
+*  Otherwise, store a bad value in the output image.
+                        ELSE
+                           OUT( I, J ) = VAL__BADD
+                           BADOUT = .TRUE.
+                        END IF
+ 
+                     END IF
+ 
+                  END IF
+ 
+*  Save the filter-box y bounds used to create this output row.
+                  ILOL = ILO
+                  IHIL = IHI
+ 
+               END DO
+ 
+            END IF
+ 
+*  Save the filter-box y bounds used to create this output row.
+            JLOL = JLO
+            JHIL = JHI
+ 
+         END DO
+ 
+*  Now deal with cases where there are no bad values in the input
+*  image.
+      ELSE
+ 
+*  Loop round each row of the output image.
+         DO J = 1, NY
+ 
+*  Form the upper and lower y bounds of the input block.  Limit them to
+*  the edges of the input image.
+            JLO = MAX( 1, J - HY )
+            JHI = MIN( NY, J + HY )
+ 
+*  If both bounds are the same as last time, then the current output
+*  row will be identical to the previous output row.  Save time by
+*  copying it rather than re-calculating it.
+            IF ( JLO .EQ. JLOL .AND. JHI .EQ. JHIL ) THEN
+ 
+               DO I = 1, NX
+                  OUT( I, J ) = OUT( I, J - 1 )
+               END DO
+ 
+*  If the current output row is based on different input pixels to the
+*  previous row, calculate the output row.
+            ELSE
+ 
+*  Initialise the x bounds of the filter box used to create the
+*  `previous' output column.
+               ILOL = VAL__BADI
+               IHIL = VAL__BADI
+ 
+*  Loop round each column in the current row of the output image.
+               DO I = 1, NX
+ 
+*  Form the upper and lower x bounds of the input block.  Limit them to
+*  the edges of the input image.
+                  ILO = MAX( 1, I - HX )
+                  IHI = MIN( NX, I + HX )
+ 
+*  If both bounds are the same as last time, then the current output value
+*  will be identical to the previous output value. Save time by copying it
+*  rather than re-calculating it.
+                  IF( ILO .EQ. ILOL .AND. IHI .EQ. IHIL ) THEN
+                     OUT( I, J ) = OUT( I - 1, J )
+ 
+*  If the current output value is based on different input pixels to the
+*  previous value, calculate the output value from scratch.
+                  ELSE
+ 
+*  Copy the good data values from the area of the input image
+*  covered by the current filter block to the WORK1 array, and set up
+*  points for these values in the WORK2 array.
+                     N = 0
+ 
+                     DO JJ = JLO, JHI
+                        DO II = ILO, IHI
+                           N = N + 1
+                           WORK1( N ) = IN( II, JJ )
+                           WORK2( N ) = N
+                        END DO
+                     END DO
+ 
+*  Find the median of the data in the work array and store it in the
+*  output image.
+                     CALL KPG1_QNTLD( .FALSE., .TRUE., MIDPER, N,
+     :                                  WORK1, DUMMY, WORK2,
+     :                                  OUT( I, J ), STATUS )
+ 
+                  END IF
+ 
+*  Save the filter-box x bounds used to create this output row.
+                  ILOL = ILO
+                  IHIL = IHI
+ 
+               END DO
+ 
+            END IF
+ 
+*  Save the filter-box y bounds used to create this output row.
+            JLOL = JLO
+            JHIL = JHI
+ 
+         END DO
+ 
+      END IF
+ 
+      END

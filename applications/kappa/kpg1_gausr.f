@@ -1,0 +1,317 @@
+      SUBROUTINE KPG1_GAUSR( SIGMA, IBOX, SAMBAD, WLIM, NX, NY, BAD,
+     :                         VAR, A, B, BADOUT, WEIGHT, AMAR, WMAR,
+     :                         STATUS )
+*+
+*  Name:
+*     KPG1_GAUSx
+ 
+*  Purpose:
+*     Smooth a 2-dimensional array using a symmetrical Gaussian PSF.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation
+*     CALL KPG1_GAUSx( SIGMA, IBOX, SAMBAD, WLIM, NX, NY, BAD,
+*                      VAR, A, B, BADOUT, WEIGHT, AMAR, WMAR, STATUS )
+ 
+*  Description:
+*     The routine smooths the array A using a symmetrical Gaussian
+*     point spread function and returns the result in the array B.
+ 
+*  Arguments:
+*     SIGMA = REAL (Given)
+*        Standard deviation of the Gaussian to be used for smoothing.
+*     IBOX = INTEGER (Given)
+*        Half-size, in pixels, of the box over which the Gaussian
+*        smoothing profile will be applied (the actual box used has an
+*        edge which is 2*IBOX+1 pixels long). This defines the region
+*        within which the point spread function is non-zero.
+*     SAMBAD = LOGICAL (Given)
+*        If a .TRUE. value is given, then any "bad" pixels in the input
+*        array A will be propagated to the output array B (output
+*        values will be calculated for all other output pixels). If a
+*        .FALSE. value is given, then the WLIM argument is used to
+*        determine which output pixels will be bad (if any). This
+*        argument is not relevant if BAD is .FALSE..
+*     WLIM = ? (Given)
+*        The minimum weighting that can be used to compute a smoothed
+*        output pixel if SAMBAD is .FALSE..  Any output pixels falling
+*        short of the specified weight will be set to the bad value
+*        (invalid pixels carry no weight, others have Gaussian weights
+*        about the central pixel).  The value must be greater than 0.0
+*        and should be less than or equal to 1.0. This argument is not
+*        used if SAMBAD is .TRUE. or if BAD is .FALSE..
+*     NX = INTEGER (Given)
+*        First dimension of the 2-d array A.
+*     NY = INTEGER (Given)
+*        Second dimension of the 2-d array A.
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for bad pixels in the input
+*        array A.
+*     VAR = LOGICAL (Given)
+*        If a .FALSE. value is given for this argument, then smoothing
+*        will be performed as if the array supplied (A) is an array of
+*        data and the PSF will be used directly as specified. If a
+*        .TRUE. value is given, then smoothing will be applied as if
+*        the array is an array of variance values associated with an
+*        array of data; in this case, the effective PSF will be reduced
+*        in width by a factor 2 and the mean output values will be
+*        reduced to reflect the variance-reducing effect of smoothing.
+*     A( NX, NY ) = ? (Given)
+*        Array containing the input image to be smoothed.
+*     BADOUT = LOGICAL (Returned)
+*        Whether there are bad pixel values in the output array.
+*     WEIGHT( 2 * IBOX + 1 ) = ? (Returned)
+*        Workspace for the Gaussian weighting function.
+*     AMAR( NX ) = ? (Returned)
+*        Workspace for the weighted sum of array values.
+*     WMAR( NX ) = ? (Returned)
+*        Workspace for the sum of pixel weights.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     There are routines for processing double precision and real data.
+*     Replace "x" in the routine name by D or R as appropriate. The
+*     data types of the WLIM, A, B, WEIGHT, AMAR, and WMAR arguments
+*     must match the routine used.
+ 
+*  Authors:
+*     BDK: B.D.Kelly (ROE)
+*     DB: Dave Baines (ROE)
+*     MJC: Malcolm Currie (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     5-AUG-1981 (BDK):
+*        Original version.
+*     21-NOV-1983 (DB):
+*        Conversion to SSE.
+*     17-FEB-1984 (DB):
+*        Documentation brought up to standard.
+*     11-SEP-1986 (MJC):
+*        Renamed routine name from RAPGAU. Renamed parameters section
+*        to arguments, removed unused argument, RBUF - formerly 6th,
+*        added invalid-pixel handling, which necessitated two
+*        additional arguments (WLIMIT - 3rd and WMAR - 9th) and tidied.
+*     13-FEB-1988 (MJC):
+*        Removed zero thresholding.
+*     17-AUG-1989 (MJC):
+*        Passed array dimensions as separate variables.
+*     14-SEP-1990 (RFWS):
+*        Complete re-write, removing the rolling buffer (unnecessary)
+*        and converting to generic code. Added the SAMBAD, BAD and
+*        BADOUT arguments and changed to process from one array to
+*        another, rather than updating the input array. Most variables
+*        re-named.  Prologue layout upgraded.
+*     24-SEP-1990 (RFWS):
+*        Added the VAR argument to enable the routine to smooth arrays
+*        of variance values.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+ 
+*  Arguments Given:
+      REAL SIGMA
+      INTEGER IBOX
+      LOGICAL SAMBAD
+      REAL WLIM
+      INTEGER NX
+      INTEGER NY
+      LOGICAL BAD
+      LOGICAL VAR
+      REAL A( NX, NY )
+ 
+*  Arguments Returned:
+      REAL B( NX, NY )
+      LOGICAL BADOUT
+      REAL WEIGHT( -IBOX : IBOX )
+      REAL AMAR( NX )
+      REAL WMAR( NX )
+ 
+*  Status:
+      INTEGER STATUS
+ 
+*  Local Variables:
+      REAL DENOM               ! Denominator for result calculation
+      REAL OFFS                ! Offset from Gaussian centre
+      REAL SUM                 ! Sum of weighted array values
+      REAL WSUM                ! Sum of weights
+      REAL WT1                 ! Pixel weight
+      REAL WT2                 ! Weight for summing pixels
+      INTEGER IIX                ! Loop counter for summing over pixels
+      INTEGER IIY                ! Loop counter for summing over lines
+      INTEGER ILINE              ! Contributing line number
+      INTEGER IPIX               ! Contributing pixel number
+      INTEGER IX                 ! First array index
+      INTEGER IY                 ! Second array index
+ 
+*.
+ 
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Initialise.
+      BADOUT = .FALSE.
+ 
+*  Calculate the Gaussian weighting function and store it in the WEIGHT
+*  array. Find the sum of the weights.
+      WSUM = 0.0E0
+      DO 1 IX = -IBOX, IBOX
+         OFFS = IX
+         WEIGHT( IX ) = EXP( ( -0.5 * OFFS ** 2 ) / ( SIGMA ** 2 ) )
+         WSUM = WSUM + WEIGHT( IX )
+ 1    CONTINUE
+ 
+*  Normalize the weights to a sum of unity.
+      DO 2 IX = -IBOX, IBOX
+         WEIGHT( IX ) = WEIGHT( IX ) / WSUM
+ 2    CONTINUE
+ 
+*  Loop to process each output image line.
+*  ======================================
+      DO 9 IY = 1, NY
+ 
+*  Initialize the work arrays to hold sums for smoothing this line.
+         DO 3 IX = 1, NX
+            AMAR( IX ) = 0.0E0
+            IF ( BAD ) WMAR( IX ) = 0.0E0
+ 3       CONTINUE
+ 
+*  Loop through all the input lines which may contribute to the current
+*  output line and find the Gaussian weight with which the input line
+*  contributes. Also form the square of this weight if smoothing a
+*  variance array.
+         DO 6 IIY = IY - IBOX, IY + IBOX
+            WT1 = WEIGHT( IIY - IY )
+            IF ( VAR ) THEN
+               WT2 = WT1 * WT1
+            ELSE
+               WT2 = WT1
+            END IF
+ 
+*  Find the contributing input line, allowing for the edges of the
+*  input array.
+            IF ( IIY .LT. 1 ) THEN
+               ILINE = 1
+            ELSE IF ( IIY .GT. NY ) THEN
+               ILINE = NY
+            ELSE
+               ILINE = IIY
+            END IF
+ 
+*  If bad pixels may be present, then test for them, adding good pixels
+*  into the array of sums for the current output line with the
+*  appropriate weight.
+            IF ( BAD ) THEN
+               DO 4 IX = 1, NX
+                   IF ( A( IX, ILINE ) .NE. VAL__BADR ) THEN
+                     AMAR( IX ) = AMAR( IX ) + WT2 * A( IX, ILINE )
+                     WMAR( IX ) = WMAR( IX ) + WT1
+                  END IF
+ 4             CONTINUE
+ 
+*  If there are no bad pixels present, then there is no need to test
+*  for them and no need to generate the sum of the good pixel weights
+*  (WMAR), since this will always be unity.
+            ELSE
+               DO 5 IX = 1, NX
+                  AMAR( IX ) = AMAR( IX ) + WT2 * A( IX, ILINE )
+ 5             CONTINUE
+            END IF
+ 6       CONTINUE
+ 
+*  Smooth the accumulated sums in the line direction.
+*  =================================================
+*  Loop through each pixel in the output line.
+         DO 8 IX = 1, NX
+ 
+*  Initialise sums and loop to consider each element in the workspace
+*  arrays which may contribute to the current output pixel.
+            SUM = 0.0E0
+            WSUM = 0.0E0
+            DO 7 IIX = IX - IBOX, IX + IBOX
+ 
+*  Find the contributing array element, allowing for the array bounds.
+               IF ( IIX .LT. 1 ) THEN
+                  IPIX = 1
+               ELSE IF ( IIX .GT. NX ) THEN
+                  IPIX = NX
+               ELSE
+                  IPIX = IIX
+               END IF
+ 
+*  Obtain the weight with which the pixel contributes. Also form the
+*  square of this weight if smoothing variance values.
+               WT1 = WEIGHT( IIX - IX )
+               IF ( VAR ) THEN
+                  WT2 = WT1 * WT1
+               ELSE
+                  WT2 = WT1
+               END IF
+ 
+*  Form sums for calculating the smoothed pixel value, using the
+*  appropriate weight.
+               SUM = SUM + WT2 * AMAR( IPIX )
+               IF ( BAD ) WSUM = WSUM + WT1 * WMAR( IPIX )
+ 7          CONTINUE
+ 
+*  If smoothing data values, the weighted sum of pixels SUM must be
+*  divided by the sum of the weights WSUM to obtain the smoothed output
+*  values. If smoothing variance values, SUM is the sum of (pixels *
+*  weight**2) and must be divided by the (sum of weights)**2. Form the
+*  appropriate denominator for this calculation.
+            IF ( VAR ) THEN
+               DENOM = WSUM * WSUM
+            ELSE
+               DENOM = WSUM
+            END IF
+ 
+*  Calculate the smoothed output pixel value.
+*  =========================================
+*  This is valid if there are no bad pixels present (note the sum of
+*  weights is unity in this case).
+            IF ( .NOT. BAD ) THEN
+               B( IX, IY ) = SUM
+ 
+*  It is also valid if SAMBAD is .TRUE. and the corresponding input
+*  pixel is not bad.
+            ELSE IF ( SAMBAD ) THEN
+               IF ( A( IX, IY ) .NE. VAL__BADR ) THEN
+                  B( IX, IY ) = SUM / DENOM
+ 
+*  It is bad if SAMBAD is .TRUE. and the corresponding input pixel is
+*  bad. Note that bad output pixels are present.
+               ELSE
+                  B( IX, IY ) = VAL__BADR
+                  BADOUT = .TRUE.
+               END IF
+ 
+*  It is valid if SAMBAD is .FALSE. and the WLIM criterion is met.
+            ELSE
+               IF ( WSUM .GE. WLIM ) THEN
+                  B( IX, IY ) = SUM / DENOM
+ 
+*  It is bad if the WLIM criterion is not met. Note that bad output
+*  pixels are present.
+               ELSE
+                  B( IX, IY ) = VAL__BADR
+                  BADOUT = .TRUE.
+               END IF
+            END IF
+ 8       CONTINUE
+ 9    CONTINUE
+ 
+      END

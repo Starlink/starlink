@@ -1,0 +1,287 @@
+      SUBROUTINE KPG1_CMPKI( NDIM, DIMS, INARR, COMPRS, OFFSET,
+     :                         OUTARR, STATUS )
+*+
+*  Name:
+*     KPG1_CMPKx
+ 
+*  Purpose:
+*     Compresses an n-dimensional array by picking value at equally
+*     spaced intervals.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_CMPKx( NDIM, DIMS, INARR, COMPRS, OFFSET, OUTARR,
+*                      STATUS )
+ 
+*  Description:
+*     This routine compresses an n-dimensional array by integer factors
+*     along each dimension by selecting the array values at equal
+*     intervals along each dimension.  The intervals may be different
+*     in each dimension.  The starting point may be defined.  Bad
+*     values will just be copied like any other array value.
+ 
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The dimensionality of the n-dimensional array.
+*     DIMS( NDIM ) = INTEGER (Given)
+*        The dimensions of the input n-dimensional array.
+*     INARR( * ) = ? (Given)
+*        The input n-dimensional data array.
+*     COMPRS( NDIM ) = REAL (Given)
+*        The factors along each dimension by which the input array is
+*        compressed to form the output array.
+*     OFFSET( NDIM ) = REAL (Given)
+*        The pixel indices of the first input-array element that is to
+*        be put into the output array.  Subsequent selections are
+*        COMPRS pixels along, so these can be regarded as offsets of the
+*        selections.  The Ith offset must lie in the range 1 to
+*        COMPRS( I ).
+*     OUTARR( * ) = ? (Write)
+*        The compressed n-dimensional array.  Its dimension I must be
+*        given by ( DIMS( I ) - OFFSET( I ) ) / COMPRS( I ) + 1.
+*     STATUS  =  INTEGER (Given and Returned).
+*        Global status value
+ 
+*  Notes:
+*     -  There is a routine for the all numeric data types: replace "x"
+*     in the routine name by B, D, I, R, UB, UW, or W as appropriate.
+*     The input and output data arrays must have the data type
+*     specified.
+ 
+*  Algorithm:
+*     -  Validate the dimensionality and compression factors.  Find the
+*     total number of elements in the output array, and the effective
+*     dimensions of the input array.  Constrain the offsets to be within
+*     range. Initialise the trailing edges of the first box.
+*     -  Compute the strides of each dimension, the padding in the input
+*     vector index (pointer) to reached the end of a dimension and the
+*     jump to move one interval in the next higher dimension.
+*     Initialise a pointer to the first selected element within the
+*     input array.
+*     -  Loop until all the selected input values are copied to
+*     the output array.  The first dimension is computed in a loop
+*     without conditional statements for efficiency incrementing the
+*     input and output pointers.  For higher dimensions increment
+*     the trailing edge of the box.  If it extends beyond the size
+*     of the array along the dimension, reset the trailing edge of the
+*     lower dimension, and continue until a dimension is found that
+*     does not extend beyond its size.  At this point move the pointer
+*     of the input array to the next selected pixel by applying the
+*     padding plus the jump.
+ 
+*  Authors:
+*     MJC: Malcolm J. Currie  (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     1991 November 26 (MJC):
+*        Original version.
+*     {enter_changes_here}
+ 
+*  Bugs:
+*     {note_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT  NONE             ! no implicit typing allowed
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'NDF_PAR'          ! NDF constants
+ 
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      INTEGER INARR( * )
+      INTEGER COMPRS( NDIM )
+      INTEGER OFFSET( NDIM )
+ 
+*  Arguments Returned:
+      INTEGER OUTARR( * )
+ 
+*  Status:
+      INTEGER STATUS
+ 
+*  Local Variables:
+      INTEGER EDIMS( NDF__MXDIM ) ! Effective dimensions of input array
+      INTEGER EL                 ! Number of elements in output array
+      LOGICAL END                ! New box has been found or there are
+                                 ! no more boxes to select from
+      INTEGER FINISH( NDF__MXDIM ) ! Indices of far edge of current
+                                 ! search box
+      INTEGER I                  ! Counter
+      INTEGER J                  ! Counter
+      INTEGER JUMP( NDF__MXDIM ) ! Pixel-index jump to next selected pixel
+                                 ! (excluding dimension 1)
+      INTEGER K                  ! Pixel index in the output array
+      INTEGER M                  ! Pixel index in the input array
+      INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of the output array
+      INTEGER ORIGIN( NDF__MXDIM ) ! Origin selection of the input array
+      INTEGER PAD( NDF__MXDIM )  ! Vector pixel-index jump to the end of
+                                 ! the current dimension
+      INTEGER STRID( NDF__MXDIM ) ! Dimension strides for search region
+ 
+*.
+ 
+*  Check the inherited status on entry.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Check the dimensionality.
+      IF ( NDIM .LT. 1 .OR. NDIM .GT. NDF__MXDIM ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NDIM', NDIM )
+         CALL ERR_REP( 'KPG1_CMPKx_INVDIM',
+     :     'Unable to compress an array with dimensionality of '/
+     :     /'of ^NDIM. (Programming error.)', STATUS )
+         GOTO 999
+      END IF
+ 
+*  Validate the compressions factors, checking them all before exiting
+*  if an error is encountered.
+      DO I = 1, NDIM
+         IF ( COMPRS( I ) .LT. 1 .OR. COMPRS( I ) .GT. DIMS( I ) ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'C', COMPRS( I ) )
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETI( 'DIMS', DIMS( I ) )
+            IF ( COMPRS( I ) .GT. DIMS( I ) ) THEN
+               CALL ERR_REP( 'KPG1_CMPKx_INVCMP',
+     :           'Unable to compress an array since the compression '/
+     :           /'factor (^C) along dimension ^I is greater than the '/
+     :           /'array dimension (^DIMS). (Programming error.)',
+     :           STATUS )
+            ELSE
+               CALL ERR_REP( 'KPG1_CMPKx_INVCMP2',
+     :           'Unable to compress an array since the compression '/
+     :           /'factor (^C) along dimension ^I is non-positive. '/
+     :           /'(Programming error.)', STATUS )
+            END IF
+         END IF
+      END DO
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+ 
+*  Constrain the offsets.
+      DO  I = 1, NDIM
+         ORIGIN( I ) = MIN( MAX( 1, OFFSET( I ) ), COMPRS( I ) )
+      END DO
+ 
+*  Compute the output array's dimensions and total number of pixels.
+*  Also find the effective dimensions of the input array.
+      EL = 1
+      DO  I = 1, NDIM
+         ODIMS( I ) = ( DIMS( I ) - ORIGIN ( I ) ) / COMPRS( I ) + 1
+         EL = EL * ODIMS( I )
+         EDIMS( I ) = ODIMS( I ) * COMPRS( I )
+      END DO
+ 
+*  Work out the trailing edges of the current square/cube/hypercube to
+*  select from.  Since there is a loop without conditionals for the
+*  first dimension, there is no need for a trailing edge to be
+*  computed.
+      DO  I = 2, NDIM
+         FINISH( I ) = COMPRS( I )
+      END DO
+ 
+*  Compute the strides.
+*  ====================
+ 
+*  Initialise the stride of dimension number 1 for the data and output
+*  array objects. (The stride for a dimension is the amount by which
+*  the vectorised array index increases when the n-dimensional array
+*  index for that dimension increases by 1.)
+      STRID( 1 ) = 1
+ 
+*  Calculate the stride for each remaining dimension.
+      DO  I = 2, NDIM
+         STRID( I ) = STRID( I - 1 ) * DIMS( I - 1 )
+      END DO
+ 
+*  Find the padding in the vector pixel index to move from the input
+*  array's last selected element along a dimension to complete the
+*  dimension.
+      DO  I = 1, NDIM
+         PAD( I ) = ( DIMS( I ) - EDIMS( I ) - ORIGIN( I ) +
+     :              COMPRS( I ) ) * STRID( I )
+      END DO
+ 
+*  Compute the jump in the input array's vector index from the end of a
+*  dimension to the next selected element, skipping one interval along
+*  the next higher dimension and applying the origins of the lower
+*  dimensions.
+      DO  I = 2, NDIM
+         JUMP( I ) = STRID( I ) * ( COMPRS( I ) - 1 )
+         DO J = 1, I - 1
+            JUMP( I ) = JUMP( I ) + ORIGIN( J ) * STRID( J )
+         END DO
+      END DO
+ 
+*  Loop for every output pixel.
+*  ============================
+ 
+*  Find the vectorised pixel index of the first element to be copied.
+*  Shift it back one interval, since it will be incremented within the
+*  loop to true origin.
+      M = 1
+      DO I = 1, NDIM
+         M = M + ( ORIGIN( I ) - 1 ) * STRID( I )
+      END DO
+      M = M - COMPRS( 1 )
+ 
+      K = 0
+      DO WHILE ( K .LT. EL )
+ 
+*  Increment the summation box through the array.
+*  ==============================================
+ 
+*  For efficiency reasons process the whole of the first dimension.
+*  Increment the pixel indices of the input and output arrays.
+         DO I = COMPRS( 1 ), EDIMS( 1 ), COMPRS( 1 )
+            K = K + 1
+            M = M + COMPRS( 1 )
+            OUTARR( K ) = INARR( M )
+         END DO
+ 
+*  Higher dimensions require a more complicated procedure to compute
+*  the pointer to the input array.
+         IF ( NDIM .GT. 1. .AND. K .LT. EL ) THEN
+            END = .FALSE.
+            J = 2
+            DO WHILE ( .NOT. END )
+ 
+*  Shift the box along the current dimension.
+               FINISH( J ) = FINISH( J ) + COMPRS( J )
+ 
+*  Has it gone beyond the current effective dimension?
+               IF ( FINISH( J ) .GT. EDIMS( J ) ) THEN
+ 
+*  It has therefore go to the next higher dimension.  There must be one
+*  since there are output elements to be computed.
+                  J = J + 1
+ 
+*  Reset the lower dimension's box back to its start position.
+                  FINISH( J - 1 ) = COMPRS( J - 1 )
+               ELSE
+ 
+*  Shift the input array's pixel index to the next element.  First skip
+*  to the last element in this and all lower dimensions.  Then jump to
+*  the next element to be selected.  Note that the loop for the first
+*  dimension increments the pixel index so subtract one first-dimension
+*  interval.
+                  DO I = 1, J - 1
+                     M = M + PAD( I )
+                  END DO
+                  M = M + JUMP( J ) - COMPRS( 1 )
+ 
+*  The next pixel index has been located successfully so exit the loop.
+                  END = .TRUE.
+               END IF
+            END DO
+         END IF
+      END DO
+ 
+  999 CONTINUE
+ 
+      END

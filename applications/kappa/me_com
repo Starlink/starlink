@@ -1,0 +1,93 @@
+*  Purpose:
+*     Declares common blocks and parameters required by MEMSYS3
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     24-SEP-1990 (DSB):
+*        Original version.
+*     27-MAR-1995 (DSB):
+*        Size of internal storage reduced from 2000000 to 500000, 
+*        because external storage can now be used.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Global Constants:
+      INTEGER  ME_MEM   ! Size of internal storage (in reals).
+      PARAMETER ( ME_MEM = 500000 )
+
+      INTEGER  ME_SIZ   ! Size of arrays in common block /MECOML/
+      PARAMETER ( ME_SIZ = 8 )
+
+
+*  Common block /MECOMP/
+*
+*        ME_NJ = INTEGER 
+*           Number of buffers per internal "image".
+*        ME_NJ = INTEGER 
+*           Number of elements per internal "image" buffer.
+*        ME_NK = INTEGER
+*           Number of buffers per internal "data set".
+*        ME_MK = INTEGER
+*           Number of elements per internal "data set" buffer.
+*        ME_KA( 40 ) = INTEGER
+*           Pointers away from internal storage for each file. If set to
+*           zero then the corresponding file is stored internally.
+*        ME_KB( 40 ) = INTEGER
+*           Base address of the internal buffer for each file.
+*        ME_OUT = INTEGER
+*           Fortran I/O unit number for MEMSYS3 diagnostics.
+*        ME_KC( 40 ) = INTEGER
+*           Current read/write pointers within internal buffers.
+*        ME_KD( 40 ) = INTEGER
+*           Current read/write pointers within external storage.
+*        ME_L0 = INTEGER
+*           A value controlling diagnostic actions.
+*        ME_L1 = INTEGER
+*           A value controlling level of diagnostic information.
+*        ME_M0 = INTEGER
+*           Selects CLASSIC/HISTORIC mode.
+*        ME_M1 = INTEGER
+*           Selects how default model is specified.
+*        ME_M2 = INTEGER
+*           Selects how accuracies are specified.
+*        ME_M3 = INTEGER
+*           Selects non-linear data option.
+*        ME_NTR = INTEGER
+*           The number of calls currently made to OPUS or TROPUS.
+
+      INTEGER         ME_NJ, ME_MJ, ME_NK, ME_MK, ME_KA( 40 ),
+     :                ME_KB( 40 ), ME_OUT, ME_KC( 40 ), ME_KD( 40 ),
+     :                ME_L0, ME_L1, ME_M0, ME_M1, ME_M2, ME_M3, ME_NTR
+
+      COMMON /MECOMP/ ME_NJ, ME_MJ, ME_NK, ME_MK, ME_KA, ME_KB, ME_KC,
+     :                ME_KD, ME_OUT, ME_L0, ME_L1, ME_M0, ME_M1, ME_M2,
+     :                ME_M3, ME_NTR
+
+
+
+
+*  Common block /MECOMS/
+*
+*        ME_ST( ME_MEM ) = REAL
+*           Array to hold all internal files, both images and data sets.
+
+      REAL            ME_ST( ME_MEM )
+
+      COMMON /MECOMS/ ME_ST
+
+
+
+
+*  Common block /MECOML/
+*           Used internally within MEMSYS3
+
+      INTEGER            ME_NTB
+      DOUBLE PRECISION   ME_XTB( ME_SIZ ), ME_YTB( ME_SIZ ), 
+     :                   ME_VTB( ME_SIZ )
+
+      COMMON /MECOML/ ME_XTB, ME_YTB, ME_VTB, ME_NTB

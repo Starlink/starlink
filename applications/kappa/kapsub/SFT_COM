@@ -1,0 +1,53 @@
+*+
+*  Purpose:
+*     Define the common blocks used by the SETSKY application.
+*
+*  Prior Requirements:
+*     IRA_PAR must be included before this file.
+*
+*-
+
+*  Global Variables:
+      CHARACTER * ( IRA__SZSCS ) SCSC ! The sky co-ordinate system to
+                                 !  use
+      CHARACTER * ( IRA__SZPRJ ) PRJECC ! The projection in use
+
+
+      DOUBLE PRECISION EPOCHC    ! The epoch of the observations
+      DOUBLE PRECISION PC( 8 )   ! The initial guess astrometry
+                                 ! parameter values, including any fixed
+                                 ! values supplied by the user
+
+      INTEGER          IPWA      ! Pointer to work space for sky
+                                 ! longitude values
+      INTEGER          IPWB      ! Pointer to work space for sky
+                                 ! latitude values
+      INTEGER          IPWX      ! Pointer to work space for supplied
+                                 ! image X values
+      INTEGER          IPWY      ! Pointer to work space for supplied
+                                 ! image Y values
+      INTEGER          IPWXO     ! Pointer to work space for temporary
+                                 ! image X values
+      INTEGER          IPWYO     ! Pointer to work space for temporary
+                                 ! image Y values
+      INTEGER          ISTAT     ! Local status value
+      INTEGER          NPOSC     ! No. of supplied sky positions
+      LOGICAL          ORIENTC   ! Was the orientation of the image
+                                 ! fixed by the user?
+      LOGICAL          PSIZEC    ! Were the pixel dimensions fixed by
+                                 ! the user?
+      LOGICAL          REFIMC    ! Were the ref. position image co-ords
+                                 ! fixed?
+      LOGICAL          REFSKC    ! Were the ref. position sky co-ords
+                                 ! fixed?
+      LOGICAL          TILTC     ! Was the tilt of the celestial sphere
+                                 ! prior to projection fixed by the
+                                 ! user?
+
+
+      COMMON /SF1_COM/ SCSC, PRJECC
+      COMMON /SF2_COM/ EPOCHC, PC
+      COMMON /SF3_COM/ IPWA, IPWB, IPWX, IPWY, IPWXO, IPWYO, ISTAT,
+     :                 NPOSC, ORIENTC, PSIZEC, TILTC, REFIMC, REFSKC
+
+

@@ -1,0 +1,351 @@
+      SUBROUTINE KPG1_HMLTD( M, N, IN1, IN2, OUT, STATUS )
+*+
+*  Name:
+*     KPG1_HMLTx
+ 
+*  Purpose:
+*     Multiply two Hermitian images.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_HMLTx( M, N, IN1, IN2, OUT, STATUS )
+ 
+*  Description:
+*     Each input Hermitian image represents a COMPLEX image in which
+*     certain symmetries exist.  These symmetries allow all the
+*     information stored in the COMPLEX image to be compressed into a
+*     single REAL image.  This routine effectively unpacks the two REAL
+*     images given as input into two COMPLEX images, multiplies them
+*     together pixel-by-pixel to produce another COMPLEX image, and
+*     then packs the COMPLEX image back into a single Hermitian REAL
+*     image.  In fact it is not necessary to do the actual unpacking
+*     and packing of these Hermitian images; this algorithm generates
+*     the output Hermitian image directly and thus saves time.
+*
+*     See the Notes for more details of Hermitian images and how they
+*     are multiplied.
+*
+*  Arguments:
+*     M = INTEGER (Given)
+*        Number of columns.
+*     N = INTEGER (Given)
+*        Number of rows.
+*     IN1( N, M ) = ? (Given)
+*        The first input Hermitian image.
+*     IN2( N, M ) = ? (Given)
+*        The second input Hermitian image.
+*     OUT( N, M ) = ? (Returned)
+*        The product of the two input images, in Hermitian form.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There is a routine for processing single- and double-precision
+*     arrays; replace "x" in the routine name by R or D as appropriate.
+*     The data type of the IN1, IN2, and OUT arguments must match the
+*     routine used.
+*     - Fourier transforms supplied in Hermitian form can be thought of
+*     as being derived as follows (see the NAG manual, introduction to
+*     Chapter C06 for more information on the storage of Hermitian
+*     FFTs):
+*
+*     1) Take the one-dimensional FFT of each row of the original image.
+*     2) Stack all these one-dimensional FFTs into a pair of
+*        2-dimensional images the same size as the original image. One
+*        2-dimensional image ("A") holds the real part and the other
+*        ("B") holds the imaginary part.  Each row of image A will have
+*        symmetry such that A(J,row) = A(M-J,row) (J goes from 0 to
+*        M-1), while each row of image B will have symmetry such that
+*        B(J,row) = -B(M-J,row).
+*     3) Take the one-dimensional FFT of each column of image A.
+*     4) Stack all these one-dimensional FFTs into a pair of 2D images,
+*        image AA holds the real part of each FFT, and image BA holds
+*        the imaginary part.  Each column of AA will have symmetry such
+*        that AA(column,K) = AA(column,N-K) (K goes from 0 to N-1),
+*        each column of BA will have symmetry such that BA(column,K) =
+*        -BA(column,N-K).
+*     5) Take the one-dimensional FFT of each column of image B.
+*     6) Stack all these one-dimensional FFTs into a pair of
+*        2-dimensional images, image AB holds the real part of each
+*        FFT, and image BB holds the imaginary part.  Each column of AB
+*        will have symmetry such that AB(column,K) = AB(column,N-K) (K
+*        goes from 0 to N), each column of BB will have symmetry such
+*        that BB(column,K) = -BB(column,N-K).
+*     7) The resulting four images all have either positive or negative
+*        symmetry in both axes.  The Hermitian FFT images supplied to
+*        this routine are made up of one quadrant from each image.  The
+*        bottom-left quadrant is taken from AA, the bottom-right
+*        quadrant is taken from AB, the top-left quadrant is taken from
+*        BA and the top-right quadrant is taken from BB.
+*
+*     The product of two Hermitian FFTs is itself Hermitian and so can
+*     be described in a similar manner.  If the first input FFT
+*     corresponds to the four images AA1, AB1, BA1 and BB1, and the
+*     second input FFT corresponds to the four images AA2, AB2, BA2,
+*     BB2, then the output is described by the four images AA, AB, BA
+*     and BB where:
+*
+*     AA =  AA1*AA2 + BB1*BB2 - BA1*BA2 - AB1*AB2
+*     BB =  AA1*BB2 + BB1*AA2 + BA1*AB2 + AB1*BA2
+*     BA =  BA1*AA2 - AB1*BB2 + AA1*BA2 - BB1*AB2
+*     AB = -BA1*BB2 + AB1*AA2 + AA1*AB2 - BB1*BA1
+ 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     27-SEP-1990 (DSB):
+*        Original version.
+*     27-FEB-1991 (DSB):
+*        Change name from HMLTR to KPG1_HMLTR
+*     16-FEB-1995 (DSB):
+*        Argument list re-order to put M and N infront of IN1 and IN2.
+*        Arrays now supplied normally rather than transposed.
+*     1995 March 22 (MJC):
+*        Made generic, corrected typo's, removed long lines and tabs,
+*        and used modern-style variable declaraations, and moved the
+*        background information to the Notes.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+ 
+*  Arguments Given:
+      INTEGER M
+      INTEGER N
+      DOUBLE PRECISION IN1( M, N )
+      DOUBLE PRECISION IN2( M, N )
+ 
+*  Arguments Returned:
+      DOUBLE PRECISION OUT( M, N )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      DOUBLE PRECISION AA1                ! AA1 image value
+      DOUBLE PRECISION AA2                ! AA2 image value
+      INTEGER AALIN              ! Line number in AA corresponding to
+                                 ! current pixel
+      INTEGER AAPIX              ! Pixel number in AA corresponding to
+                                 ! current pixel
+      DOUBLE PRECISION AB1                ! AB1 image value
+      DOUBLE PRECISION AB2                ! AB2 image value
+      INTEGER ABLIN              ! Line number in AB corresponding to
+                                 ! current pixel
+      INTEGER ABPIX              ! Pixel number in AB corresponding to
+                                 ! current pixel
+      DOUBLE PRECISION BA1                ! BA1 image value
+      DOUBLE PRECISION BA2                ! BA2 image value
+      INTEGER BALIN              ! Line number in BA corresponding to
+                                 ! current pixel
+      INTEGER BAPIX              ! Pixel number in BA corresponding to
+                                 ! current pixel
+      DOUBLE PRECISION BB1                ! BB1 image value
+      DOUBLE PRECISION BB2                ! BB2 image value
+      INTEGER BBLIN              ! Line number in BB corresponding to
+                                 ! current pixel
+      INTEGER BBPIX              ! Pixel number in BB corresponding to
+                                 ! current pixel
+      INTEGER J                  ! Offset from bottom left corner along
+                                 ! the first dimension of the input
+                                 ! frames
+      INTEGER JLIM               ! Upper limit of J in the bottom-left
+                                 ! quadrant
+      INTEGER K                  ! Offset from bottom-left corner along
+                                 ! the second dimension of the input
+                                 ! frames
+      INTEGER KLIM               ! Upper limit of K in the bottom-left
+                                 ! quadrant
+      LOGICAL MEVEN              ! True if M is even
+      LOGICAL NEVEN              ! True if N is even
+ 
+*.
+ 
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Set up the limits of the bottom-left quadrant (AA).
+      IF ( MOD( N, 2 ) .EQ. 0 ) THEN
+         NEVEN = .TRUE.
+         KLIM = N / 2 - 1
+      ELSE
+         NEVEN = .FALSE.
+         KLIM = N / 2
+      END IF
+ 
+      IF ( MOD( M, 2 ) .EQ. 0 ) THEN
+         MEVEN = .TRUE.
+         JLIM = M / 2 - 1
+      ELSE
+         MEVEN = .FALSE.
+         JLIM = M / 2
+      END IF
+ 
+*  Deal with the bottom-left pixel, for which K=0 and J=0.  All terms
+*  containing imaginary components (e.g. BA, AB, BB ) are zero at the
+*  bottom-left pixel.
+      OUT( 1, 1 ) = IN1( 1, 1 ) * IN2( 1, 1 )
+ 
+*  Now do the J=0 column for which all AB and BB terms are zero (in both
+*  input images and in the output image).
+      AAPIX = 1
+      BAPIX = 1
+ 
+      DO K = 1, KLIM
+ 
+         AALIN = K + 1
+         BALIN = N - K + 1
+ 
+         AA1 = IN1( AAPIX, AALIN )
+         AA2 = IN2( AAPIX, AALIN )
+         BA1 = IN1( BAPIX, BALIN )
+         BA2 = IN2( BAPIX, BALIN )
+ 
+         OUT( AAPIX, AALIN ) = AA1*AA2 - BA1*BA2
+         OUT( BAPIX, BALIN ) = BA1*AA2 + AA1*BA2
+ 
+      END DO
+ 
+      IF ( NEVEN ) OUT( 1, KLIM + 2 ) = IN1( 1, KLIM + 2 ) *
+     :                                  IN2( 1, KLIM + 2 )
+ 
+*  Now do the K=0 row for which all BA and BB terms are zero (in both
+*  input images and in the output image).
+      AALIN = 1
+      ABLIN = 1
+ 
+      DO J = 1, JLIM
+ 
+         AAPIX = J + 1
+         ABPIX = M - J + 1
+ 
+         AA1 = IN1( AAPIX, AALIN )
+         AA2 = IN2( AAPIX, AALIN )
+         AB1 = IN1( ABPIX, ABLIN )
+         AB2 = IN2( ABPIX, ABLIN )
+ 
+         OUT( AAPIX, AALIN ) = AA1*AA2 - AB1*AB2
+         OUT( ABPIX, ABLIN ) = AB1*AA2 + AA1*AB2
+ 
+      END DO
+ 
+      IF ( MEVEN ) OUT( JLIM + 2, 1 ) = IN1( JLIM + 2, 1 ) *
+     :                                  IN2( JLIM + 2, 1 )
+ 
+*  Now loop round the rest of the bottom left (AA) quadrant, finding
+*  the co-ordinates of the corresponding pixels in the other quadrants.
+*  Note, pixel co-ordinates start at 1 whereas J and K start at 0.
+      DO K = 1, KLIM
+         AALIN = K + 1
+         BBLIN = N - K + 1
+         ABLIN = AALIN
+         BALIN = BBLIN
+ 
+         DO J = 1, JLIM
+ 
+            AAPIX = J + 1
+            BBPIX = M - J + 1
+            ABPIX = BBPIX
+            BAPIX = AAPIX
+ 
+*  Save the values in scalar variables to make the calculations faster.
+            AA1 = IN1( AAPIX, AALIN )
+            AA2 = IN2( AAPIX, AALIN )
+ 
+            BB1 = IN1( BBPIX, BBLIN )
+            BB2 = IN2( BBPIX, BBLIN )
+ 
+            AB1 = IN1( ABPIX, ABLIN )
+            AB2 = IN2( ABPIX, ABLIN )
+ 
+            BA1 = IN1( BAPIX, BALIN )
+            BA2 = IN2( BAPIX, BALIN )
+ 
+*  Calculate the values of the four quadrants in the output image.
+            OUT( AAPIX, AALIN ) =   AA1*AA2 + BB1*BB2
+     :                            - BA1*BA2 - AB1*AB2
+            OUT( BBPIX, BBLIN ) =   AA1*BB2 + BB1*AA2
+     :                            + BA1*AB2 + AB1*BA2
+            OUT( ABPIX, ABLIN ) = - BA1*BB2 + AB1*AA2
+     :                            + AA1*AB2 - BB1*BA2
+            OUT( BAPIX, BALIN ) =   BA1*AA2 - AB1*BB2
+     :                            + AA1*BA2 - BB1*AB2
+ 
+         END DO
+ 
+*  If M is even there will be an extra column to do.
+         IF ( MEVEN ) THEN
+ 
+            AAPIX = JLIM + 2
+            BAPIX = AAPIX
+ 
+            AA1 = IN1( AAPIX, AALIN )
+            AA2 = IN2( AAPIX, AALIN )
+ 
+            BA1 = IN1( BAPIX, BALIN )
+            BA2 = IN2( BAPIX, BALIN )
+ 
+            OUT( AAPIX, AALIN ) =  AA1*AA2 - BA1*BA2
+            OUT( BAPIX, BALIN ) =  BA1*AA2 + AA1*BA2
+ 
+         END IF
+ 
+      END DO
+ 
+*  If N is even there will be an extra row to do.
+      IF ( NEVEN ) THEN
+         AALIN = KLIM + 2
+         ABLIN = AALIN
+ 
+         DO J = 1, JLIM
+ 
+            AAPIX = J + 1
+            BBPIX = M - J + 1
+            ABPIX = BBPIX
+            BAPIX = AAPIX
+ 
+            AA1 = IN1( AAPIX, AALIN )
+            AA2 = IN2( AAPIX, AALIN )
+ 
+            BB1 = 0
+            BB2 = 0
+ 
+            AB1 = IN1( ABPIX, ABLIN )
+            AB2 = IN2( ABPIX, ABLIN )
+ 
+            BA1 = 0
+            BA2 = 0
+ 
+            OUT( AAPIX, AALIN ) =  AA1*AA2 - AB1*AB2
+            OUT( ABPIX, ABLIN ) =  AB1*AA2 + AA1*AB2
+ 
+         END DO
+ 
+         IF ( MEVEN ) THEN
+ 
+            AAPIX = JLIM + 2
+ 
+            AA1 = IN1( AAPIX, AALIN )
+            AA2 = IN2( AAPIX, AALIN )
+ 
+            OUT( AAPIX, AALIN ) =  AA1*AA2
+ 
+         END IF
+ 
+      END IF
+ 
+*  Finish
+      END

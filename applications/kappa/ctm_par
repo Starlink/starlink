@@ -1,0 +1,59 @@
+************************************************************************
+*                              BEGIN                                   *
+*                                                                      *
+*                     CTM__ Constant Definitions                       *
+*                     --------------------------                       *
+*                                                                      *
+*                              BEGIN                                   *
+************************************************************************
+*
+*    Authors :
+*     (MJC): Malcolm J. Currie (STARLINK)
+*
+*    History :
+*     1991 April 10 (MJC):
+*        Original version.
+*     1991 July 18 (MJC):
+*        Added CTM__NAMED.
+*     1992 March 27 (MJC):
+*        Increased CTM__NAMED for MIT colour set.
+*
+
+
+
+****************************************************
+*   Number of reserved pens for annotations etc.   *
+****************************************************
+
+
+      INTEGER CTM__RSVPN
+      PARAMETER ( CTM__RSVPN = 16 )
+
+
+************************************************************
+*   Maximum number of unreserved pens in a colour table.   *
+************************************************************
+
+
+      INTEGER CTM__MXPEN
+      PARAMETER ( CTM__MXPEN = 256 - CTM__RSVPN )
+
+
+****************************************************
+*   Maximum number of predefined, named colours.   *
+****************************************************
+
+
+      INTEGER CTM__NAMED
+      PARAMETER ( CTM__NAMED = 456 )
+
+
+
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*                  CTM__ Public Constant Definitions                   *
+*                  ---------------------------------                   *
+*                                                                      *
+*                               END                                    *
+************************************************************************
