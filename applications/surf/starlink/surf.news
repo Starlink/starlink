@@ -74,6 +74,9 @@ Changes_to_existing_tasks
   - REBIN: The output file is now propagated from the input when
            processing a single file (keeps history intact)
 
+  - INTREBIN: Waveplate position and sky rotation angle are now
+        written to the fits headers for polarimetry observations.
+
   - EXTINCTION: Can process FAST_AXIS polarimetry information correctly
 
   - SKYDIP: Add preliminary support for RASTER mode (not yet stable)
