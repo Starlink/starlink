@@ -9,8 +9,10 @@ AC_CONFIG_SRCDIR(ssn78.xml)
 
 STAR_DEFAULTS(docs-only)
 
-AC_PATH_PROGS(JADE, [jade openjade], jade)
-AC_PATH_PROGS(SGMLNORM, [sgmlnorm osgmlnorm], sgmlnorm)
+dnl AC_PATH_PROGS(JADE, [jade openjade], jade)
+dnl AC_PATH_PROGS(SGMLNORM, [sgmlnorm osgmlnorm], sgmlnorm)
+STAR_XML_DOCUMENTATION(ssn78)
+LATEX2DVI='$$LATEX $$1; makeindex $$1; $$LATEX $$1'
 AC_PATH_PROGS(METAPOST, [mp mpost])
 
 dnl  The default here isn't terribly reliable, since it relies on
