@@ -1962,6 +1962,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+	print *,'region type = ',i_reg_type
+
+
 *  Region definition exists?
       REGEX = (I_REG_TYPE .NE. 'NONE')
 
@@ -1971,6 +1974,7 @@
 
 *  Otherwise must test each pixel
       ELSE
+	print *,'Using quality'
 
 *    Loop over whole image
         DO J = 1, NY
@@ -1994,6 +1998,7 @@
         END DO
 
       END IF
+	call flush(6)
 
 *  Force pixels inside source circles to bad
       DO S = 1, I_BGM_NSRC
