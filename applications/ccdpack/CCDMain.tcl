@@ -359,6 +359,7 @@
    $Menubar sethelp all ccdpack CCDMainMenu
    $Config sethelp all ccdpack CCDMainConfiguration
    $Import sethelp all ccdpack CCDMainDataImport
+   $Sethead sethelp all ccdpack CCDMainSets
    $Run sethelp all ccdpack CCDMainReduction
    $Names sethelp ccdpack CCDMainNames
    $Control sethelp all ccdpack CCDMainKnownData
