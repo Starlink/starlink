@@ -148,7 +148,8 @@
       CALL ADI_CGET0I( ID, 'Lun', LUN, STATUS )
 
 *  Move to start of file?
-      IF ( (UIHDU.EQ.1) .OR. (LHDU .EQ. 'PRIMARY') ) THEN
+      IF ( (UIHDU.EQ.1) .OR.
+     :     ((UIHDU.EQ.0).AND.(LHDU .EQ. 'PRIMARY')) ) THEN
 
 *    Move to first HDU
         CALL ADI2_MVAHDU( ID, LUN, 1, HDUTYP, STATUS )
