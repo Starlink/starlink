@@ -95,6 +95,9 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL                  GCB0_BLK                ! Ensures inclusion
+
 *  Local Variables:
       INTEGER                   RESID                   ! Ignored return data
 *.
