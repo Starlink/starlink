@@ -136,6 +136,7 @@
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'MSG_PAR'                 ! MSG constants
 
 *  Status :
       INTEGER STATUS
@@ -328,6 +329,9 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
 *  start up the NDF system and read in the demodulated data file
 
       CALL NDF_BEGIN
@@ -371,8 +375,9 @@
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation '//
-     :  'with ^SAMPLE sampling of object ^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation '//
+     :     'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
 *  get the number of history records present in the file
 
@@ -546,9 +551,10 @@
 
       IF (.NOT. ABORTED) THEN
          CALL MSG_SETC ('PKG', PACKAGE)
-         CALL MSG_OUT (' ', '^PKG: file contains data for ^N_E '//
-     :     'exposure(s) in ^N_I integration(s) in '//
-     :     '^N_M measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: file contains data for ^N_E '//
+     :        'exposure(s) in ^N_I integration(s) in '//
+     :        '^N_M measurement(s)', STATUS)
       ELSE
 
 *  get the exposure, integration, measurement numbers at which the abort
@@ -562,15 +568,17 @@
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
          CALL MSG_SETC ('PKG', PACKAGE)
-         CALL MSG_OUT (' ', '^PKG: the observation should have '//
-     :     'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
-     :     'measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: the observation should have '//
+     :        'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
+     :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUT (' ', ' - However, the observation was '//
-     :     'ABORTED during exposure ^N_E of integration ^N_I '//
-     :     'of measurement ^N_M', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        ' - However, the observation was '//
+     :        'ABORTED during exposure ^N_E of integration ^N_I '//
+     :        'of measurement ^N_M', STATUS)
       END IF
 
 *  calculate the apparent RA and Dec of the object for the time of the
@@ -624,8 +632,9 @@
       END DO
       CALL MSG_SETC ('END_LST', STEMP)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: observation started at sidereal '//
-     :  'time ^START_LST and ended at ^END_LST', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: observation started at sidereal '//
+     :     'time ^START_LST and ended at ^END_LST', STATUS)
 
 *  find and report the sub instruments used and filters for this observation
 

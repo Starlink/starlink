@@ -119,6 +119,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.12  1997/04/30 02:39:39  timj
+*     Add MSG_OUTIF
+*
 *     Revision 1.11  1997/04/14 23:58:07  timj
 *     Add more checks for zero jiggle offsets.
 *
@@ -166,6 +169,7 @@ c
 *    Global constants :
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'DAT_PAR'                ! Data-system constants
+      INCLUDE 'MSG_PAR'                ! Add MSG__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'REDS_SYS'               ! REDS constants
@@ -409,6 +413,9 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
 *  start up the NDF system and read in the input demodulated file
 
       CALL NDF_BEGIN
@@ -502,7 +509,7 @@ c
 
             IF (.NOT. EXTINCTION) THEN
                CALL MSG_SETC('TASK', TSKNAME)
-               CALL MSG_OUT (' ', '^TASK: Warning the '//
+               CALL MSG_OUTIF (MSG__QUIET, ' ', '^TASK: Warning the '//
      :              'input data has not been corrected for extinction',
      :              STATUS)
             END IF
@@ -523,8 +530,9 @@ c
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a PHOTOM observation '//
-     :  'of ^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a PHOTOM observation '//
+     :     'of ^OBJECT', STATUS)
 
 *  get the sub-instrument and filter used 
 
@@ -623,9 +631,10 @@ c
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
       CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: file contains data for ^N_E '//
-     :  'exposure(s) in ^N_I integrations(s) in ^N_M '//
-     :  'measurement(s)', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: file contains data for ^N_E '//
+     :     'exposure(s) in ^N_I integrations(s) in ^N_M '//
+     :     'measurement(s)', STATUS)
 
 *  get the target indices of the bolometers in the data array
 
@@ -699,7 +708,8 @@ c
             END DO
 
             CALL MSG_SETC('PKG', PACKAGE)
-            CALL MSG_OUT (' ', '^PKG: No jiggle pattern was used. '//
+            CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :           '^PKG: No jiggle pattern was used. '//
      :           'No images will be stored', STATUS)
             WRITEMAP = .FALSE.
 
@@ -717,7 +727,8 @@ c
             END DO
             
             CALL MSG_SETC('PKG', PACKAGE)
-            CALL MSG_OUT (' ', '^PKG: the jiggle pattern does '//
+            CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :           '^PKG: the jiggle pattern does '//
      :           'not fit a rectangular mesh, strip images will be '//
      :           'stored', STATUS)
          ELSE
