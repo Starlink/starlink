@@ -54,7 +54,7 @@ while (<>) {
     if (/^ *$/) {
 	last;
     } elsif (/^(to|cc|bcc): *(.*)$/i) {
-	push (@toaddresses, split(/,/, $2));
+	push (@toaddresses, split(/ *, */, $2));
     } elsif (/^From: *(.*)$/) {
 	$fromline = $1;
 	if ($fromline =~ /^(.*)<([^>]+)>(.*)$/) {
@@ -117,11 +117,14 @@ while ($#toaddresses >= 0) {
     }
     if ($targetaddr =~ /^$addressroot\+([a-zA-Z0-9-]+)@/) {
 	push (@destfiles, "$1");
+    } elsif ($targetaddr =~ /^$addressroot/) {
+	push (@destfiles, "general-comments");
     }
     #print "addr=$addr --> $targetaddr\n";
 }
 if ($#destfiles < 0) {
-    push (@destfiles, "unknown");
+    # Can't think of where else to put it: just bung it in general-comments
+    push (@destfiles, "general-comments");
 }
 #print "destfiles=@destfiles\n";
 
@@ -130,8 +133,8 @@ if ($#destfiles < 0) {
 # which will probably _not_ have permission to create files in
 # the target directory.  This might very well fail, therefore, unless
 # the directory is created appropriately beforehand.
-(-d $addressroot) ||
-    mkdir ($addressroot, 0755) ||
+(-d "$dir/$addressroot") ||
+    mkdir ("$dir/$addressroot", 0755) ||
     die "Can't create directory $addressroot\n";
 
 # Dump the headers and body to each of the files in the array @destfiles
