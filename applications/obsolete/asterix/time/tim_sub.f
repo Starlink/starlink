@@ -8,7 +8,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -23,8 +22,6 @@
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
-
-
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from ',STATUS)
@@ -37,7 +34,7 @@
 
 
 
-      SUBROUTINE  TIM_CHECK(LOC,STATUS)
+      SUBROUTINE  TIM_CHECK(FID,STATUS)
 *    Description :
 *    Authors :
 *      BHVAD::RJV
@@ -46,12 +43,12 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER FID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -59,7 +56,7 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER NDIM,DIMS(DAT__MXDIM),NVAL
+      INTEGER NDIM,DIMS(ADI__MXDIM),NVAL
       LOGICAL DOK,VOK,QOK,AOK,WOK
 *-
       DOK=.FALSE.
@@ -67,7 +64,8 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  check main data array
-        CALL BDA_CHKDATA(LOC,DOK,NDIM,DIMS,STATUS)
+        CALL BDI_CHK( FID, 'Data', DOK, STATUS )
+        CALL BDI_GETSHP( FID, ADI__MXDIM, DIMS, NDIM, STATUS )
         IF (.NOT.DOK) THEN
           CALL MSG_PRNT('AST_ERR: invalid data')
           STATUS=SAI__ERROR
@@ -80,51 +78,24 @@
 
 *  check axis values and width
         IF (STATUS.EQ.SAI__OK) THEN
-          CALL BDA_CHKAXVAL(LOC,1,AOK,T_REG,NVAL,STATUS)
+          CALL BDI_AXCHK( FID, 1, 'Data', AOK, STATUS )
+          T_REG = .FALSE.
           IF (.NOT.AOK) THEN
             CALL MSG_PRNT('AST_ERR: no axis values present')
             STATUS=SAI__ERROR
-          ELSEIF (NVAL.NE.T_NVAL) THEN
-            CALL MSG_PRNT('AST_ERR: number of axis values different '
-     :                      //'from data')
-            STATUS=SAI__ERROR
           ENDIF
-          CALL BDA_CHKAXWID(LOC,1,WOK,T_UNIF,NVAL,STATUS)
+          CALL BDI_AXCHK( FID, 1, 'Width', WOK, STATUS )
+          T_UNIF = .FALSE.
         ENDIF
-
 
 *  check variance
-        IF (STATUS.EQ.SAI__OK) THEN
-          CALL BDA_CHKVAR(LOC,VOK,NDIM,DIMS,STATUS)
-          IF (VOK.AND.NDIM.EQ.1.AND.DIMS(1).EQ.T_NVAL) THEN
-            T_VOK=.TRUE.
-          ELSEIF (VOK.AND.(NDIM.NE.1.OR.DIMS(1).NE.T_NVAL)) THEN
-            CALL MSG_PRNT('AST_ERR: variance has different dimensions '
-     :                            //' to data')
-            STATUS=SAI__ERROR
-          ELSEIF (.NOT.VOK) THEN
-            T_VOK=.FALSE.
-          ENDIF
-        ENDIF
+        CALL BDI_CHK( FID, 'Variance', T_VOK, STATUS )
 
 *  check QUALITY
-        IF (STATUS.EQ.SAI__OK) THEN
-          CALL BDA_CHKQUAL(LOC,QOK,NDIM,DIMS,STATUS)
-          IF (QOK.AND.NDIM.EQ.1.AND.DIMS(1).EQ.T_NVAL) THEN
-            T_QOK=.TRUE.
-          ELSEIF (QOK.AND.(NDIM.NE.1.OR.DIMS(1).NE.T_NVAL)) THEN
-            CALL MSG_PRNT('AST_ERR: QUALITY has different dimensions '
-     :                            //' to data')
-            STATUS=SAI__ERROR
-          ELSEIF (.NOT.QOK) THEN
-            T_QOK=.FALSE.
-          ENDIF
-        ENDIF
-
-
+        CALL BDI_CHK( FID, 'Quality', T_QOK, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_CHECK',STATUS)
+          CALL AST_REXIT( 'TIM_CHECK',STATUS)
         ENDIF
 
       ENDIF
@@ -133,7 +104,7 @@
       END
 
 
-      SUBROUTINE  TIM_MAP(LOC,STATUS)
+      SUBROUTINE  TIM_MAP(FID,STATUS)
 *    Description :
 *    Authors :
 *      BHVAD::RJV
@@ -142,13 +113,12 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER			FID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -156,9 +126,8 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) HLOC
       INTEGER DPTR,VPTR,APTR,WPTR,QPTR
-      INTEGER NVAL
+      INTEGER NVAL,TIMID,IDUM
       INTEGER BASEMJD,BASEUTC
       LOGICAL OK,HOK
 *-
@@ -168,85 +137,68 @@
 *  make dynamic copies
 
 *  data
-        CALL BDA_MAPDATA(LOC,'R',DPTR,STATUS)
         CALL DYN_MAPR(1,T_NVAL,T_DPTR,STATUS)
-        CALL ARR_COP1R(T_NVAL,%VAL(DPTR),%VAL(T_DPTR),STATUS)
-        CALL BDA_UNMAPDATA(LOC,STATUS)
-        CALL BDA_GETTITLE(LOC,T_TITLE,STATUS)
-        CALL BDA_GETLABEL(LOC,T_LABEL,STATUS)
-        CALL BDA_GETUNITS(LOC,T_UNITS,STATUS)
+        CALL BDI_GET1R( FID, 'Data', T_NVAL, %VAL(T_DPTR), IDUM, STATUS )
+        CALL BDI_GET0C( FID, 'Title', T_TITLE,STATUS)
+        CALL BDI_GET0C( FID ,'Label',T_LABEL,STATUS)
+        CALL BDI_GET0C( FID,'Units',T_UNITS,STATUS)
+
 *  axis values
-        IF (T_REG) THEN
-          CALL BDA_GETAXVAL(LOC,1,T_ABASE,T_ASCALE,NVAL,STATUS)
-        ENDIF
-        CALL BDA_MAPAXVAL(LOC,'R',1,APTR,STATUS)
         CALL DYN_MAPR(1,T_NVAL,T_APTR,STATUS)
-        CALL ARR_COP1R(T_NVAL,%VAL(APTR),%VAL(T_APTR),STATUS)
-        CALL BDA_UNMAPAXVAL(LOC,1,STATUS)
+        CALL BDI_AXGET1R( FID, 1, 'Data', T_NVAL, %VAL(T_APTR),
+     :                    IDUM, STATUS )
+        CALL ARR_CHKREG( %VAL(T_APTR), T_NVAL, T_REG, T_ABASE, T_ASCALE,
+     :                   STATUS )
+
 *  axis widths
-        IF (T_UNIF) THEN
-          CALL BDA_GETAXWID(LOC,1,T_AWIDTH,STATUS)
-        ENDIF
-        CALL BDA_MAPAXWID(LOC,'R',1,WPTR,STATUS)
         CALL DYN_MAPR(1,T_NVAL,T_WPTR,STATUS)
+        CALL BDI_AXGET1R( FID, 1, 'WIDTH', T_NVAL, %VAL(T_WPTR),
+     :                    IDUM, STATUS )
         CALL ARR_COP1R(T_NVAL,%VAL(WPTR),%VAL(T_WPTR),STATUS)
-        CALL BDA_UNMAPAXWID(LOC,1,STATUS)
+
 *  axis ancilliaries
-        CALL BDA_GETAXNORM(LOC,1,T_NORM,STATUS)
-        CALL BDA_GETAXLABEL(LOC,1,T_ALABEL,STATUS)
-        CALL BDA_GETAXUNITS(LOC,1,T_AUNITS,STATUS)
+        CALL BDI_AXGET0L(FID,1,'Normalised',T_NORM,STATUS)
+        CALL BDI_AXGET0C(FID,1,'Label',T_ALABEL,STATUS)
+        CALL BDI_AXGET0C(FID,1,'Units',T_AUNITS,STATUS)
 *  variance
         CALL DYN_MAPR(1,T_NVAL,T_VPTR,STATUS)
         IF (.NOT.T_VOK) THEN
           CALL ARR_COP1R(T_NVAL,%VAL(T_DPTR),%VAL(T_VPTR),STATUS)
         ELSE
-          CALL BDA_MAPVAR(LOC,'R',VPTR,STATUS)
-          CALL ARR_COP1R(T_NVAL,%VAL(VPTR),%VAL(T_VPTR),STATUS)
-          CALL BDA_UNMAPVAR(LOC,STATUS)
+          CALL BDI_GET1R( FID, 'Variance', T_NVAL, %VAL(T_VPTR),
+     :                    IDUM, STATUS )
         ENDIF
 *  QUALITY
         CALL DYN_MAPB(1,T_NVAL,T_QPTR,STATUS)
-        IF (T_QOK) THEN
-          CALL BDA_MAPQUAL(LOC,'R',QPTR,STATUS)
-          CALL ARR_COP1B(T_NVAL,%VAL(QPTR),%VAL(T_QPTR),STATUS)
-          CALL BDA_UNMAPQUAL(LOC,STATUS)
-          CALL BDA_GETMASK(LOC,T_MASK,STATUS)
+        IF ( T_QOK ) THEN
+          CALL BDI_GET( FID, 'Quality', 'UBYTE', 1, T_NVAL, %VAL(T_QPTR),
+     :                    IDUM, STATUS )
+          CALL BDI_GET( FID, 'QualityMask', 'UBYTE', 0, 0, T_MASK,
+     :                  IDUM, STATUS )
         ELSE
           CALL ARR_INIT1B(QUAL__GOOD,T_NVAL,%VAL(T_QPTR),STATUS)
           T_MASK=QUAL__MASK
         ENDIF
 
 *  Header
-        CALL BDA_CHKHEAD(LOC,HOK,STATUS)
-        IF (HOK) THEN
-          CALL BDA_LOCHEAD(LOC,HLOC,STATUS)
-          CALL HDX_OK(HLOC,'BASE_MJD',OK,STATUS)
-          IF (OK) THEN
-            CALL CMP_GET0I(HLOC,'BASE_MJD',BASEMJD,STATUS)
+        CALL TCI_GETID( FID, TIMID, STATUS )
+        IF ( (TIMID.NE.ADI__NULLID) .AND. (STATUS .EQ.SAI__OK) ) THEN
+          CALL ADI_THERE( TIMID, 'MJDObs', OK, STATUS )
+          IF ( OK ) THEN
+            CALL ADI_CGET0D( TIMID, 'MJDObs', T_BASEMJD, STATUS )
           ELSE
             CALL MSG_PRNT(
      :       '*** BASE_MJD not present - using 0 ***')
-            BASEMJD=0
+            T_BASEMJD = 0.0D0
           ENDIF
-          CALL HDX_OK(HLOC,'BASE_UTC',OK,STATUS)
-          IF (OK) THEN
-            CALL CMP_GET0I(HLOC,'BASE_UTC',BASEUTC,STATUS)
-          ELSE
-            CALL MSG_PRNT(
-     :       '*** BASE_UTC not present - using 0 ***')
-            BASEUTC=0
-          ENDIF
-
-          T_BASEMJD=DBLE(BASEMJD)+DBLE(BASEUTC)/86400.0D0
-
         ELSE
           CALL MSG_PRNT(
      :      '*** no Header information - setting Base MJD to 0.0 ***')
           T_BASEMJD=0.0D0
-        ENDIF
+        END IF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_MAP',STATUS)
+          CALL AST_REXIT( 'TIM_MAP',STATUS)
         ENDIF
 
       ENDIF
@@ -264,7 +216,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
@@ -337,7 +288,7 @@
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_CHOP',STATUS)
+          CALL AST_REXIT('TIM_CHOP',STATUS)
         ENDIF
 
       ENDIF
@@ -355,7 +306,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -387,7 +337,7 @@
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_NOCHOP',STATUS)
+          CALL AST_REXIT( 'TIM_NOCHOP',STATUS)
         ENDIF
 
       ENDIF
@@ -406,7 +356,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -471,7 +420,7 @@
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_SCALE',STATUS)
+          CALL AST_REXIT('TIM_SCALE',STATUS)
         ENDIF
 
       ENDIF
@@ -491,7 +440,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -526,8 +474,7 @@
             CALL GCB_SETC('XAXIS_OPT','BNTS',STATUS)
             CALL GCB_SETC('YAXIS_OPT','BNTS',STATUS)
             CALL GFX_AXES(STATUS)
-            CALL GCB_CANC('XAXIS_OPT',STATUS)
-            CALL GCB_CANC('YAXIS_OPT',STATUS)
+            CALL GCB_CAN('XAXIS_OPT,YAXIS_OPT',STATUS)
 
             IF (POLY) THEN
               CALL GFX_POLYQ(
@@ -580,7 +527,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -642,7 +588,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
@@ -705,7 +650,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -774,7 +718,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -807,15 +750,14 @@
 
 
 
-      SUBROUTINE TIM_SAVEALL(LOC,STATUS)
+      SUBROUTINE TIM_SAVEALL(FID,STATUS)
 
       IMPLICIT NONE
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER			FID
 *  Export :
 *  Status :
       INTEGER STATUS
@@ -823,92 +765,79 @@
       INCLUDE 'TIM_CMN'
 *  Local constants :
 *  Local variables :
-      INTEGER ID
+      INTEGER TID
       INTEGER DPTR,VPTR,QPTR,APTR,WPTR
 *-
-      IF (STATUS.EQ.SAI__OK) THEN
 
-*  swap locator for BDA identifier
-        CALL BDA_FIND(LOC,ID,STATUS)
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Create interface object
+      CALL BDI_NEW( 'TimeSeries', 1, T_NVAL, 'REAL', TID, STATUS )
+      CALL ADI_SETLNK( TID, FID, STATUS )
+      FID = TID
 
 *  text
-        CALL BDA_PUTTITLE_INT(ID,T_TITLE,STATUS)
-        CALL BDA_PUTLABEL_INT(ID,T_LABEL,STATUS)
-        CALL BDA_PUTUNITS_INT(ID,T_UNITS,STATUS)
+      CALL BDI_PUT0C( FID, 'Title', T_TITLE,STATUS)
+      CALL BDI_PUT0C( FID, 'Label', T_LABEL,STATUS)
+      CALL BDI_PUT0C( FID, 'Units', T_UNITS,STATUS)
 
-*  copy data
-        CALL BDA_CREDATA_INT(ID,1,T_NVAL,STATUS)
-        CALL BDA_MAPDATA_INT(ID,'W',DPTR,STATUS)
-        CALL ARR_COP1R(T_NVAL,%VAL(T_DPTR),%VAL(DPTR),STATUS)
-        CALL BDA_UNMAPDATA_INT(ID,STATUS)
+*  Write data
+      CALL BDI_PUT1R( FID, 'Data', T_NVAL, %VAL(T_DPTR), STATUS )
 
-*  variance
-        IF (T_VOK) THEN
-          CALL BDA_CREVAR_INT(ID,1,T_NVAL,STATUS)
-          CALL BDA_MAPVAR_INT(ID,'W',VPTR,STATUS)
-          CALL ARR_COP1R(T_NVAL,%VAL(T_VPTR),%VAL(VPTR),STATUS)
-          CALL BDA_UNMAPVAR_INT(ID,STATUS)
-        ENDIF
+*  Write variance
+      IF (T_VOK) THEN
+        CALL BDI_PUT1R( FID, 'Variance', T_NVAL, %VAL(T_VPTR), STATUS )
+      END IF
 
 *  quality
-        IF (T_QOK) THEN
-          CALL BDA_CREQUAL_INT(ID,1,T_NVAL,STATUS)
-          CALL BDA_MAPQUAL_INT(ID,'W',QPTR,STATUS)
-          CALL ARR_COP1B(T_NVAL,%VAL(T_QPTR),%VAL(QPTR),STATUS)
-          CALL BDA_UNMAPQUAL_INT(ID,STATUS)
-          CALL BDA_PUTMASK_INT(ID,T_MASK,STATUS)
-        ENDIF
-
-*  axis values
-        IF (T_REG) THEN
-          CALL BDA_PUTAXVAL_INT(ID,1,T_ABASE,T_ASCALE,T_NVAL,STATUS)
-        ELSE
-          CALL BDA_CREAXVAL_INT(ID,1,.FALSE.,T_NVAL,STATUS)
-          CALL BDA_MAPAXVAL_INT(ID,'W',1,APTR,STATUS)
-          CALL ARR_COP1R(T_NVAL,%VAL(T_APTR),%VAL(APTR),STATUS)
-          CALL BDA_UNMAPAXVAL_INT(ID,1,STATUS)
-        ENDIF
-
-*  axis widths
-        IF (T_UNIF) THEN
-          CALL BDA_PUTAXWID_INT(ID,1,T_AWIDTH,STATUS)
-        ELSE
-          CALL BDA_CREAXWID_INT(ID,1,.FALSE.,T_NVAL,STATUS)
-          CALL BDA_MAPAXWID_INT(ID,'W',1,WPTR,STATUS)
-          CALL ARR_COP1R(T_NVAL,%VAL(T_WPTR),%VAL(WPTR),STATUS)
-          CALL BDA_UNMAPAXWID_INT(ID,1,STATUS)
-        ENDIF
-
-*  axis ancilliary stuff
-        CALL BDA_PUTAXNORM_INT(ID,1,T_NORM,STATUS)
-        CALL BDA_PUTAXLABEL_INT(ID,1,T_ALABEL,STATUS)
-        CALL BDA_PUTAXUNITS_INT(ID,1,T_AUNITS,STATUS)
-
-*  copy ancilliary stuff from input
-        CALL BDA_COPMORE(T_LOC,LOC,STATUS)
-
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_SAVEALL',STATUS)
-        ENDIF
-
+      IF (T_QOK) THEN
+        CALL BDI_PUT( FID, 'Quality', 'UBYTE', 1, T_NVAL,
+     :                %VAL(T_QPTR), STATUS )
+        CALL BDI_PUT( FID, 'QualityMask', 0, 0, T_MASK, STATUS )
       ENDIF
 
+*  axis values
+      IF (T_REG) THEN
+        SPARR(1) = T_ABASE
+        SPARR(2) = T_ASCALE
+        CALL BDI_AXPUT1R( FID, 1, 'SpacedData', 2, SPARR, STATUS )
+      ELSE
+        CALL BDI_AXPUT1R( FID, 1, 'Data', T_NVAL, %VAL(T_APTR), STATUS )
+      END IF
 
+*  axis widths
+      IF (T_UNIF) THEN
+        CALL BDI_AXPUT0R( FID, 1, 'ScalarWidth', T_AWIDTH, STATUS )
+      ELSE
+        CALL BDI_AXPUT1R( FID, 1, 'Width', T_NVAL, %VAL(T_WPTR),
+     :                    STATUS )
+      ENDIF
+
+*  Axis ancilliary stuff
+      CALL BDI_AXPUT0L(FID,1,'Normalised', T_NORM,STATUS)
+      CALL BDI_AXPUT0C(FID,1,'Label',T_ALABEL,STATUS)
+      CALL BDI_AXPUT0C(FID,1,'Units',T_AUNITS,STATUS)
+
+*  Copy ancilliary stuff from input
+      CALL UDI_COPANC(T_FID,'grf',LOC,STATUS)
+
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL AST_REXIT('TIM_SAVEALL',STATUS)
+      ENDIF
 
       END
 
 
 
-      SUBROUTINE TIM_SAVESEG(ISEG,LOC,STATUS)
+      SUBROUTINE TIM_SAVESEG(ISEG,FID,STATUS)
 
       IMPLICIT NONE
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
-      INTEGER ISEG
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER ISEG,FID
 *  Export :
 *  Status :
       INTEGER STATUS
@@ -917,86 +846,74 @@
 *  Local constants :
 *  Local variables :
       REAL BASE
-      INTEGER ID
       INTEGER DPTR,VPTR,QPTR,APTR,WPTR
       INTEGER NVAL
       INTEGER I1,I2
 *-
-      IF (STATUS.EQ.SAI__OK) THEN
 
-        I1=T_SECTPIX(1,ISEG)
-        I2=T_SECTPIX(2,ISEG)
-        NVAL=I2-I1+1
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  swap locator for BDA identifier
-        CALL BDA_FIND(LOC,ID,STATUS)
+      I1 = T_SECTPIX(1,ISEG)
+      I2 = T_SECTPIX(2,ISEG)
+      NVAL = I2-I1+1
+
+*  Create interface object
+      CALL BDI_NEW( 'TimeSeries', 1, NVAL, 'REAL', TID, STATUS )
+      CALL ADI_SETLNK( TID, FID, STATUS )
+      FID = TID
 
 *  text
-        CALL BDA_PUTTITLE_INT(ID,T_TITLE,STATUS)
-        CALL BDA_PUTLABEL_INT(ID,T_LABEL,STATUS)
-        CALL BDA_PUTUNITS_INT(ID,T_UNITS,STATUS)
+      CALL BDI_PUT0C( FID, 'Title', T_TITLE,STATUS)
+      CALL BDI_PUT0C( FID, 'Label', T_LABEL,STATUS)
+      CALL BDI_PUT0C( FID, 'Units', T_UNITS,STATUS)
 
 *  create data array
-        CALL BDA_CREDATA_INT(ID,1,NVAL,STATUS)
-        CALL BDA_MAPDATA_INT(ID,'W',DPTR,STATUS)
+      CALL BDI_MAPR( FID, 'Data', 'WRITE', DPTR, STATUS )
 
 *  variance
-        IF (T_VOK) THEN
-          CALL BDA_CREVAR_INT(ID,1,NVAL,STATUS)
-          CALL BDA_MAPVAR_INT(ID,'W',VPTR,STATUS)
-        ENDIF
+      IF (T_VOK) THEN
+        CALL BDI_MAPR( FID, 'Variance', 'WRITE', VPTR, STATUS )
+      ENDIF
 
 *  quality
-        IF (T_QOK) THEN
-          CALL BDA_CREQUAL_INT(ID,1,T_NVAL,STATUS)
-          CALL BDA_MAPQUAL_INT(ID,'W',QPTR,STATUS)
-          CALL BDA_PUTMASK_INT(ID,T_MASK,STATUS)
-        ENDIF
+      IF (T_QOK) THEN
+        CALL BDI_MAP( FID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
+        CALL BDI_PUT( FID, 'QualityMask', 0, 0, T_MASK, STATUS )
+      ENDIF
 
 *  axis values
-        IF (T_REG) THEN
-          CALL ARR_ELEM1R(T_APTR,T_NVAL,I1,BASE,STATUS)
-          CALL BDA_PUTAXVAL_INT(ID,1,BASE,T_ASCALE,NVAL,STATUS)
-        ELSE
-          CALL BDA_CREAXVAL_INT(ID,1,.FALSE.,T_NVAL,STATUS)
-          CALL BDA_MAPAXVAL_INT(ID,'W',1,APTR,STATUS)
-        ENDIF
+      IF ( T_REG ) THEN
+        CALL ARR_ELEM1R(T_APTR,T_NVAL,I1,SPARR(1),STATUS)
+        SPARR(2) = T_ASCALE
+        CALL BDI_AXPUT1R( FID, 1, 'SpacedData', 2, SPARR, STATUS )
+      ELSE
+        CALL BDI_AXMAPR( FID, 1, 'Data', 'WRITE', APTR, STATUS )
+      ENDIF
 
 *  axis widths
-        IF (T_UNIF) THEN
-          CALL BDA_PUTAXWID_INT(ID,1,T_AWIDTH,STATUS)
-        ELSE
-          CALL BDA_CREAXWID_INT(ID,1,.FALSE.,NVAL,STATUS)
-          CALL BDA_MAPAXWID_INT(ID,'W',1,WPTR,STATUS)
-        ENDIF
+      IF (T_UNIF) THEN
+        CALL BDI_AXPUT0R( FID, 1, 'ScalarWidth', T_AWIDTH, STATUS )
+      ELSE
+        CALL BDI_AXMAPR( FID, 1, 'Width', 'WRITE', WPTR, STATUS )
+      ENDIF
 
-*  axis ancilliary stuff
-        CALL BDA_PUTAXNORM_INT(ID,1,T_NORM,STATUS)
-        CALL BDA_PUTAXLABEL_INT(ID,1,T_ALABEL,STATUS)
-        CALL BDA_PUTAXUNITS_INT(ID,1,T_AUNITS,STATUS)
+*  Axis ancilliary stuff
+      CALL BDI_AXPUT0L(FID,1,'Normalised', T_NORM,STATUS)
+      CALL BDI_AXPUT0C(FID,1,'Label',T_ALABEL,STATUS)
+      CALL BDI_AXPUT0C(FID,1,'Units',T_AUNITS,STATUS)
 
-*  copy ancilliary stuff from input
-        CALL BDA_COPMORE(T_LOC,LOC,STATUS)
+*  Copy ancilliary stuff from input
+      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
 
-        CALL TIM_SAVESEG_COP(I1,NVAL,%VAL(T_DPTR),%VAL(T_VPTR),
+      CALL TIM_SAVESEG_COP(I1,NVAL,%VAL(T_DPTR),%VAL(T_VPTR),
      :                  %VAL(T_QPTR),%VAL(T_APTR),%VAL(T_WPTR),
      :                  %VAL(DPTR),%VAL(VPTR),%VAL(QPTR),
      :                  %VAL(APTR),%VAL(WPTR),STATUS)
 
-        CALL BDA_UNMAPDATA_INT(ID,STATUS)
-        CALL BDA_UNMAPVAR_INT(ID,STATUS)
-        CALL BDA_UNMAPQUAL_INT(ID,STATUS)
-        CALL BDA_UNMAPAXVAL_INT(ID,1,STATUS)
-        CALL BDA_UNMAPAXWID_INT(ID,1,STATUS)
-
-
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_SAVESEG',STATUS)
-        ENDIF
-
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL AST_REXIT('TIM_SAVESEG',STATUS)
       ENDIF
-
-
 
       END
 
@@ -1010,7 +927,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
@@ -1044,7 +960,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_SAVESEG_COP',STATUS)
+          CALL AST_REXIT('TIM_SAVESEG_COP',STATUS)
         ENDIF
 
       ENDIF
@@ -1053,7 +969,7 @@
       END
 
 
-      SUBROUTINE  TIM_SAVEMULT(LOC,STATUS)
+      SUBROUTINE  TIM_SAVEMULT(OFID,STATUS)
 *    Description :
 *    Authors :
 *      BHVAD::RJV
@@ -1062,12 +978,11 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER			OFID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -1077,56 +992,51 @@
       REAL BOT,TOP
       PARAMETER (BOT=0.1,TOP=0.98)
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEG
-      INTEGER IGRAF
+      INTEGER ISEG,GFID,MGID,IGRAF
 *-
 
-      IF (STATUS.EQ.SAI__OK) THEN
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-        CALL GMD_CREMULT(LOC,T_NSEL,STATUS)
-        IGRAF=0
-        DO ISEG=1,T_MAXSECT
-          IF (T_SEL(ISEG)) THEN
-            IGRAF=IGRAF+1
-            CALL GMD_LOCNDF(LOC,IGRAF,GLOC,STATUS)
-            CALL TIM_SAVESEG(ISEG,GLOC,STATUS)
+      CALL ADI_NEW0( 'MultiGraph', MGID, STATUS )
+      CALL ADI_SETLNK( MGID, OFID, STATUS )
+      OFID = MGID
 
-            CALL GCB_SETR('POS_X1',T_SECTNDC(1,ISEG),STATUS)
-            CALL GCB_SETR('POS_X2',T_SECTNDC(2,ISEG),STATUS)
-            CALL GCB_SETR('POS_Y1',BOT,STATUS)
-            CALL GCB_SETR('POS_Y2',TOP,STATUS)
-            CALL GCB_SETR('XAXIS_LO',T_SECTXAX(1,ISEG),STATUS)
-            CALL GCB_SETR('XAXIS_HI',T_SECTXAX(2,ISEG),STATUS)
-            CALL GCB_SETR('YAXIS_LO',T_YMIN,STATUS)
-            CALL GCB_SETR('YAXIS_HI',T_YMAX,STATUS)
-            CALL GCB_SETC('XAXIS_OPT','BNTS',STATUS)
-            CALL GCB_SETC('YAXIS_OPT','BNTS',STATUS)
-            IF (IGRAF.GT.1) THEN
-              CALL GCB_SETC('YLABEL_TEXT',' ',STATUS)
-            ENDIF
+      CALL GMI_CREMULT( OFID, T_NSEL, STATUS )
+      IGRAF=0
+      DO ISEG=1,T_MAXSECT
+        IF (T_SEL(ISEG)) THEN
+          IGRAF=IGRAF+1
+          CALL GMI_LOCNDF( OFID, IGRAF, '*', GFID, STATUS )
+          CALL TIM_SAVESEG(ISEG,GFID,STATUS)
 
-            CALL GCB_SAVE(GLOC,STATUS)
-
-            CALL GCB_CANR('POS_X1',STATUS)
-            CALL GCB_CANR('POS_X2',STATUS)
-            CALL GCB_CANR('XAXIS_LO',STATUS)
-            CALL GCB_CANR('XAXIS_HI',STATUS)
-            CALL GCB_CANR('YAXIS_LO',STATUS)
-            CALL GCB_CANR('YAXIS_HI',STATUS)
-            CALL GCB_CANC('XAXIS_OPT',STATUS)
-            CALL GCB_CANC('YAXIS_OPT',STATUS)
-
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
+          CALL GCB_SETR('POS_X1',T_SECTNDC(1,ISEG),STATUS)
+          CALL GCB_SETR('POS_X2',T_SECTNDC(2,ISEG),STATUS)
+          CALL GCB_SETR('POS_Y1',BOT,STATUS)
+          CALL GCB_SETR('POS_Y2',TOP,STATUS)
+          CALL GCB_SETR('XAXIS_LO',T_SECTXAX(1,ISEG),STATUS)
+          CALL GCB_SETR('XAXIS_HI',T_SECTXAX(2,ISEG),STATUS)
+          CALL GCB_SETR('YAXIS_LO',T_YMIN,STATUS)
+          CALL GCB_SETR('YAXIS_HI',T_YMAX,STATUS)
+          CALL GCB_SETC('XAXIS_OPT','BNTS',STATUS)
+          CALL GCB_SETC('YAXIS_OPT','BNTS',STATUS)
+          IF (IGRAF.GT.1) THEN
+            CALL GCB_SETC('YLABEL_TEXT',' ',STATUS)
           ENDIF
-        ENDDO
 
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from TIM_SAVEMULT',STATUS)
+          CALL GCB_FSAVE(GFID,STATUS)
+
+          CALL GCB_CAN('POS_X1,POS_X2',STATUS)
+          CALL GCB_CAN('XAXIS_LO,XAXIS_HI,YAXIS_LO,YAXIS_HI',STATUS)
+          CALL GCB_CAN('XAXIS_OPT,YAXIS_OPT',STATUS)
+
+          CALL ADI_ERASE(GFID,STATUS)
+
         ENDIF
+      END DO
 
-      ENDIF
-
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL AST_REXIT('TIM_SAVEMULT',STATUS)
+      END IF
 
       END
