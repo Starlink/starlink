@@ -101,7 +101,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*02              LITEM                   ! Local item name
+      CHARACTER*20              LITEM                   ! Local item name
 
       INTEGER                   C1, C2                  ! Character pointers
       INTEGER                   IITEM                   ! Item counter
