@@ -1,0 +1,123 @@
+\documentclass[a4paper]{article}
+
+\def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
+\RCS$Revision$
+
+\title{Data models in the VO: how do they make code better?}
+\author{Norman Gray\thanks{Starlink/University of Glasgow},
+        David L Giaretta\thanks{Starlink/RAL},
+        David Berry\thanks{Starlink/University of Central Lancashire},\\
+        Malcolm Currie\thanks{Starlink/RAL}, 
+        Mark Taylor\thanks{Starlink/University of Bristol}}
+\date{ADASS XIII, session O6; 2003 October 14, v\RCSRevision}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Data Models exist in people's heads. Data modelling consists of making
+these explicit on paper, so that (a) we can discover if there is more
+than one important model, and (b) we can develop using the model which
+has the best impedance match with the community being targeted. Thus
+modelling is not just about communications -- about bits (or angle
+brackets!) on the wire -- but is a software quality and usability
+issue.
+
+We contend that there is in fact more than one model relevant to the
+VO, and that while the VOTable model is an excellent and valuable fit
+to the archivists' model of data, it may be a poor match for many
+users or (which is much the same thing) for the software written to
+service the sort of end-user astronomical applications which the VO
+targets.
+
+Modelling work in other areas shows the importance of abstraction in
+the concrete goal of freeing software design from the particulars of
+any single implementation. This is extremely important for the VO
+because it allows us, and the software we write, to deal with the
+essentials of the data rather than the superficial aspects of a
+particular format such as XML or FITS. We discuss the work that we and
+others have been doing within this context; with this in mind, we will
+also review some of the various modelling languages available, such as
+XSchemas, UML, OMG MDA, HUTN, RDF, and Topic Maps.
+\end{abstract}
+
+
+
+\section{Language, models and usability}
+
+In linguistics, the well-known Sapir-Whorf hypothesis states that the
+way we conceive of the world depends on the language we use to
+describe it.  Or more compactly, we can only think what we can
+say.
+
+This matters to us, since when we create software systems, we are
+often creating a `language' -- in a user-interface, an API or a
+protocol -- which users must employ to interact with an underlying
+system, be it an application, a library, or a remote service (here and
+below, we use the term `users' to apply both to astronomers using a
+mouse and programmers using an API or protocol).  If there is a good
+three-way match between the concepts in the user's head, the concepts
+implied by the language, and the concepts implicit in (some aspect of)
+the system's actual design, then the user's interactions with the
+system will be straightforward and largely error-free.  If there is a
+mismatch, they will not.  This is not just a matter of user-interface
+design; if the `user' is a programmer working with an API or a
+protocol, then this three-way match will help them write correct code
+faster, and produce an application which will in turn be usable by its
+eventual audience.
+
+We can all think of systems which fail to exhibit this full match, but
+in some cases, surely a mismatch is inevitable.  After all, a star and
+a database record surely have nothing in common except a tendency to
+generate entropy.  This is why we need a data model.
+
+A data model is the set of primitive concepts that we hope the user
+thinks with, the language expresses, and the underlying system
+implements; it is the rendezvous which helps the system as a whole
+hang together.  If the model is made explicit during the development
+process, then it can itself be examined, criticised, and checked for
+consistency with itself and with the external system it is
+supposed to model, whether that is, say, CDS or `a quantity'.  Once
+the model is itself part of the language of development, we can think
+with it, and talk about it, rather than merely mumble.
+
+This immediately prompts the question of just how we make the model
+explicit.  There are several obvious answers to this, of which the
+most currently fashionable will be XSchema, UML, and `a Java
+class library'.  The problem with each of these is that they each come with
+far too much baggage.  This is another aspect of the Sapir-Whorf
+hypothesis: we have a tendency to see the world in terms of the
+structure of the language we use to describe it.  That means that if
+we use XSchemas to model the world, we will discover that the world is
+made of things enclosing other things, and if we use an O-O language,
+the world turns out to have methods.  That is, our choice of modelling
+language biases our model to have certain features, irrespective of
+whether these features are present in the system being modelled.
+
+A separate problem is to start thinking about syntactical or
+presentational details too early.  If we retrofit a data model too
+late, it will end up being a poor model of the world, but an excellent
+model of our syntax.
+% During the UCD modelling effort, we found ourselves asking questions
+% which purported to be about astronomy, but which were really about
+% underscores.
+
+There are two strategies to deal with this.  The first is to embrace
+the problem, acknowledge that our choice of language is not neutral,
+and make sure that choice is a good one.  The second is to choose a
+more primitive modelling language, which will push fewer things into
+the model.  We will return to this question in section~\ref{s:techniques}.
+
+
+
+\section{Different models for the same data}
+
+What happens if two constituencies want different views of the same
+data?  Is that wrong?
+
+\section{Modelling techniques\label{s:techniques}}
+
+Acronym panic!
+
+\end{document}
+
