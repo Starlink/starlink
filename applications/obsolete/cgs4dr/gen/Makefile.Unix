@@ -13,8 +13,8 @@ OBJS	= $(strip $(patsubst ../%.f,    %.o, $(SRCS.f)))
 # Things define with the PROD macro are installed in $(INSTALL_BIN)
 PROD  = $(patsubst ../%.ifl, %.ifc, $(wildcard ../*.ifl))
 
-# Things defined by the PROCS macro are installed in $(INSTALL_PROC)
-PROCS = $(patsubst ../%, %, $(wildcard ../*.icl))
+# Things defined by the SCRIPTS macro are installed in $(INSTALL_PROC)
+SCRIPTS = $(patsubst ../%, %, $(wildcard ../*.icl))
 
 # This defines the objects to include in any library that is built.
 # By default, the library isn't installed. To install it you must
