@@ -5140,7 +5140,7 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
    double *newdec = new double[npoints];
 
    //  Now do the transformation.
-   astTran2( wcs, npoints, oldra, olddec, 1, newra, newdec );
+   astTran2( wcs, npoints, oldra, olddec, 0, newra, newdec );
    if ( !astOK ) {
       astClearStatus;
       Tcl_Free( (char *) listArgv );
@@ -5151,15 +5151,27 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
       return error( "failed to transform positions" );
    }
    
-   //  Construct a return list of the values.
+   //  Construct a return list of the values. Note we want the
+   //  formatting to match the base frame (where we're going).
+   int base = astGetI( wcs, "Base" );
+   int current = astGetI( wcs, "Current" );
+   astSetI( wcs, "Current", base );
+   astSetI( wcs, "Base", current );
+   double point[2];
    for (i = 0; i < npoints; i++) {
 
-      //  Format the ra,dec position arguments in H:M:S.
-      const char *ra_buf = astFormat( wcs, 1, newra[i] );
-      const char *dec_buf = astFormat( wcs, 2, newdec[i] );
+      //  Normalize and format the ra,dec position arguments using the 
+      //  base frame default formatting.
+      point[0] = newra[i];
+      point[1] = newdec[i];
+      astNorm( wcs, point );
+      const char *ra_buf = astFormat( wcs, 1, point[0] );
+      const char *dec_buf = astFormat( wcs, 2, point[1] );
       Tcl_AppendElement( interp_, (char *)ra_buf );
       Tcl_AppendElement( interp_, (char *)dec_buf );
    }
+   astSetI( wcs, "Current", current );
+   astSetI( wcs, "Base", base );
 
    //  Release memory.
    Tcl_Free( (char *) listArgv );

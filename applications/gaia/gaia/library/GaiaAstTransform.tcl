@@ -7,12 +7,15 @@
 
 #  Purpose:
 #     Transforms a set of RA/Dec positions from a specified celestial
-#     coordinate system to that of a displayed rtdimage. This class is
-#     intended for use in transforming input coordinates (say from
-#     external catalogue or text files) to the same celestial coordinates
-#     as the image.
+#     coordinate system to that of a displayed rtdimage. 
 
 #  Description:
+#     This toolbox provides the ability to transform a set of sky
+#     coordinates (the coordinate system being specified using a
+#     system, epoch and equinox) to that of a displayed image.  This
+#     class is intended for use in transforming input coordinates (say
+#     from external catalogue or text files) to the same celestial
+#     coordinates as the image.
 
 #  Invocations:
 #
@@ -100,11 +103,27 @@ itcl::class gaia::GaiaAstTransform {
       #  Markers menu
       set Markers [add_menubutton Markers]
 
-      #  Add the table for displaying the reference coordinate
+      #  Add a table for displaying the reference coordinates. These
+      #  are not modified and are transformed to show in the second
+      #  table. Note we only use id, ra and dec.
+      itk_component add reftable {
+         TableList $w_.reftable \
+            -title "Reference positions (table coordinates)" \
+             -hscroll 1 \
+             -selectmode extended \
+             -exportselection 0 \
+             -headings {id ra dec} \
+             -width 40
+      }
+      add_short_help $itk_component(reftable) \
+         {Reference positions on sky}
+
+      #  Add the table for displaying the transformed coordinates
       #  positions. Most of the controls are disabled and only the
       #  Marker menu is used in this case.
-      itk_component add table {
-         GaiaPosTable $w_.table \
+      itk_component add trantable {
+         GaiaPosTable $w_.trantable \
+            -title "Transformed positions (image coordinates)" \
             -editmenu {} \
             -markmenu $Markers \
             -rtdimage $itk_option(-rtdimage) \
@@ -113,8 +132,8 @@ itcl::class gaia::GaiaAstTransform {
             -editcontrols 0 \
             -mcolour red
       }
-      add_short_help $itk_component(table) \
-         {Reference sky positions and their current X,Y projections}
+      add_short_help $itk_component(trantable) \
+         {Transformed positions and associated X,Y (reset to update)}
 
       #  There are only three elements that can be controlled: epoch,
       #  equinox and system. Each of these defaults to the string
@@ -123,7 +142,7 @@ itcl::class gaia::GaiaAstTransform {
       #  is appended with the string showing the actual value, when a
       #  system is selected.
       itk_component add rule {
-         LabelRule $w_.rule -text "Table celestial coordinate system:"
+         LabelRule $w_.rule -text "Reference celestial coordinate system:"
       }
 
       #  System.
@@ -135,7 +154,7 @@ itcl::class gaia::GaiaAstTransform {
                -valuewidth 18
       }
       add_short_help $itk_component(System) \
-	    {New celestial coordinate system}
+	    {Coordinate system of table sky positions}
       foreach {system needepoch needequinox} $systemattrib_ {
          $itk_component(System) add \
 	       -command [code $this set_system_ system $system $needepoch $needequinox] \
@@ -222,10 +241,12 @@ itcl::class gaia::GaiaAstTransform {
 	       -command [code $this reset_]
       }
       add_short_help $itk_component(reset) \
-	    {Reset window to defaults}
+	    {Reset system, equinox and epoch to defaults}
 
       #  Pack window.
-      pack $itk_component(table) -side top -fill both -expand 1 \
+      pack $itk_component(reftable) -side top -fill both -expand 1 \
+         -ipadx 1m -ipady 1m
+      pack $itk_component(trantable) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 1m
       pack $itk_component(rule) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(System) -side top -ipadx 1m -ipady 1m -anchor w
@@ -250,22 +271,30 @@ itcl::class gaia::GaiaAstTransform {
    #  Close window accepting changes.
    public method accept {} {
       wm withdraw $w_
-      $itk_component(table) undraw
+      $itk_component(trantable) undraw
       set accepted_ 1
    }
 
    #  Close window cancelling changes.
    public method cancel {} {
       wm withdraw $w_
-      $itk_component(table) undraw
+      $itk_component(trantable) undraw
       set accepted_ 0
    }
 
    #  Copy coordinates from an existing instance of a GaiaPosTable.
+   #  Note this object is also used to reset coordinates.
    public method grab {table} {
-      set contents [$table get_contents]
-      $itk_component(table) clear_table
-      eval $itk_component(table) set_contents [$table get_contents]
+      $itk_component(reftable) clear
+      $itk_component(trantable) clear_table
+      foreach line [$table get_contents] {
+         lassign $line id ra dec x y
+         $itk_component(reftable) append_row "$id $ra $dec"
+         $itk_component(trantable) append_row $line
+      }
+      $itk_component(reftable) new_info
+      $itk_component(trantable) new_info
+      $itk_component(trantable) redraw
    }
 
    #  Activate (i.e. wait for user to request interface to complete).
@@ -278,9 +307,9 @@ itcl::class gaia::GaiaAstTransform {
       return $accepted_
    }
 
-   #  Return the contents of the table.
+   #  Return the contents of the transformed table.
    public method get_contents {} {
-      return [$itk_component(table) get_contents]
+      return [$itk_component(trantable) get_contents]
    }
 
    #  Test the transformation by applying it and viewing the new X and
@@ -304,38 +333,46 @@ itcl::class gaia::GaiaAstTransform {
             #  Create AstFrameSet that describes the mapping from this
             #  SkyFrame to that of the image.
 	    $itk_option(-rtdimage) astsystem image $options 1
-	    $itk_option(-rtdimage) astwrite local
 
             #  Use the local transformation to transform the table
             #  positions to the image celestial coordinates.
             set coords ""
-            set content [$itk_component(table) get_contents]
-            set nrows [$itk_component(table) total_rows]
+            set content [$itk_component(reftable) get_contents]
+            set nrows [$itk_component(reftable) total_rows]
             for { set i 0 } { $i < $nrows } { incr i } {
-               lassign [lindex $content $i] id ra dec x y
+               lassign [lindex $content $i] id ra dec
                append coords "$ra $dec "
             }
-            puts "coords = $coords"
             set result [$itk_option(-rtdimage) asttran2 local $coords]
-               puts ""
-            puts "result = $result"
             set newcon ""
             set i 0
             if { $result != {} } {
-               $itk_component(table) clear_table
+               $itk_component(trantable) clear_table
                foreach {ra dec} $result {
-                  lassign [lindex $content $i] id oldra olddec x y
-                  puts "id = $id, x = $x, y = $y"
-                  lappend newcon [list $id $ra $dec $x $y]
+                  lassign [lindex $content $i] id oldra olddec
+                  lappend newcon [list $id $ra $dec 0 0]
                   incr i
                }
-               puts ""
-               puts "newcon = $newcon"
-               eval $itk_component(table) set_contents $newcon
-               $itk_component(table) update_x_and_y
+               eval $itk_component(trantable) set_contents $newcon
+               $itk_component(trantable) update_x_and_y
             }
+         } else {
+
+            #  Options set to "default", so need to unset transformed
+            #  positions.
+            reset_trantable_
          }
       }
+   }
+
+   #  Reset trantable to echo reference positions.
+   protected method reset_trantable_ {} {
+      $itk_component(trantable) clear_table
+      foreach line [$itk_component(reftable) get_contents] {
+         $itk_component(trantable) append_row "$line 0 0"
+      }
+      $itk_component(trantable) new_info
+      $itk_component(trantable) update_x_and_y
    }
 
    #  Set the value of system and configure epoch and equinox as needed.
@@ -382,6 +419,18 @@ itcl::class gaia::GaiaAstTransform {
 	    "default ($system_defaults_($system_(system),epoch))"
       $itk_component(Equinox).mb.m entryconfigure 0 -label \
 	    "default ($system_defaults_($system_(system),equinox))"
+   }
+
+   #  Reset controls and transformed positions.
+   protected method reset_ {} {
+      $itk_component(System) configure -value "default"
+      set system_(system) default
+      $itk_component(Epoch) configure -value "default"
+      set system_(epoch) default
+      $itk_component(Equinox) configure -value "default"
+      set system_(equinox) default
+      set_system_ system default 1 1
+      reset_trantable_
    }
 
    #  Configuration options: (public variables)

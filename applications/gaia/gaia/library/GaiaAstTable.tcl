@@ -125,7 +125,7 @@ itcl::class gaia::GaiaAstTable {
        #  fixed headings).
        itk_component add table {
           TableList $w_.table \
-             -title "Reference positions" \
+             -title $itk_option(-title) \
              -hscroll 1 \
              -selectmode $selectmode_ \
              -exportselection $exportselection_ \
@@ -297,6 +297,14 @@ itcl::class gaia::GaiaAstTable {
       $itk_component(table) append_rows $args
       redraw
    }
+
+   #  Append a new row to the table. Call new_info when completed.
+   public method append_row {row} {
+      $itk_component(table) append_row $row
+   }
+   public method new_info {} {
+      $itk_component(table) new_info
+   } 
 
    #  Grab a catalogue of objects from an AstroCat window.
    public method grab {} {
@@ -829,14 +837,14 @@ itcl::class gaia::GaiaAstTable {
    #  Create the menu item needed to control the appearance
    #  of the markers.
    protected method make_markers_menu_ {m} {
-      
+
       #  Add the menus
       foreach {label name} {Type type Size size Width width \
                                {Outline colour} outline {Fill colour} \
                                fill {Fill stipple} stipple} {
          $m add cascade -label $label -menu [menu $m.$name]
       }
-      
+
       #  Add the known types.
       foreach {name bitmap} $marker_types_ {
          $m.type add radiobutton \
@@ -845,7 +853,7 @@ itcl::class gaia::GaiaAstTable {
             -command [code $this configure -mtype $name] \
             -variable [scope values_($this,mtype)]
       }
-      
+
       #  Width menu
       foreach i {1 2 3 4} {
          $m.width add radiobutton \
@@ -854,7 +862,7 @@ itcl::class gaia::GaiaAstTable {
             -variable [scope values_($this,mwidth)] \
             -command [code $this configure -mwidth $i]
       }
-      
+
       #  Size menu
       foreach i {3 5 7 9 11 15 21 31} {
          $m.size add radiobutton \
@@ -863,7 +871,7 @@ itcl::class gaia::GaiaAstTable {
             -variable [scope values_($this,msize)] \
             -command [code $this configure -msize $i]
       }
-      
+
       #  Outline  menu
       foreach i $itk_option(-colors) {
          $m.outline add radiobutton \
@@ -872,7 +880,7 @@ itcl::class gaia::GaiaAstTable {
             -variable [scope values_($this,mcolour)] \
             -background $i
       }
-      
+
       #  Fill menu
       $m.fill add radiobutton \
          -value {} \
@@ -886,7 +894,7 @@ itcl::class gaia::GaiaAstTable {
             -variable [scope values_($this,mfill)] \
             -background $i
       }
-      
+
       # Stipple  menu
       for {set i 0} {$i < 16} {incr i} {
          set bitmap pat$i
@@ -896,12 +904,12 @@ itcl::class gaia::GaiaAstTable {
             -variable [scope values_($this,mstipple)] \
             -command [code $this configure -mstipple pat$i]
       }
-      
+
       #  Redraw and clear graphics.
       $m add separator
       $m add command -label "Clear" -command [code $this clear_marks]
       $m add command -label "Redraw" -command [code $this redraw]
-      
+
       #  Add short help texts for menu items
       $top_ add_menu_short_help $m Type {Set the marker shape}
       $top_ add_menu_short_help $m Size {Set the marker size}
@@ -912,7 +920,7 @@ itcl::class gaia::GaiaAstTable {
       $top_ add_menu_short_help $m Clear {Clear all markers}
       $top_ add_menu_short_help $m Redraw {Redraw all markers}
    }
-   
+
    #  Clear the graphics markers from canvas.
    public method clear_marks {} {
       $itk_option(-canvas) delete ${this}_mark
@@ -1170,6 +1178,9 @@ itcl::class gaia::GaiaAstTable {
 
    #  Configuration options
    #  =====================
+
+   #  Title for table.
+   itk_option define -title title Title {Reference positions}
 
    #  Width of the table (in characters).
    itk_option define -width width Width 40
