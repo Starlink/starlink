@@ -13,6 +13,9 @@ h = 10bp;
 u = 4bp;
 gap = 1/2u;
 frac = 1/3;
+pair origin;
+
+origin = ( 30, 30 );
 
 color boxinside;
 boxinside = 1/1024[white,black];
@@ -62,7 +65,7 @@ forsuffixes t = allboxes:
 endfor;
 
 
-( 1, 1 ) = (xpart findobj.w, ypart makemos.s );
+(xpart findobj.w, ypart makemos.s ) = origin;
 
 findobj.c - findoff.c = (-1w, 4h);
 pairndf.c - register.c = (0, 10h);
@@ -73,10 +76,10 @@ z1 - z2 = (0, 9h);
 
 wcsreg.c = 1/2[z1, z2] - (6w, 0);
 astexp.c = z2 + (9w, 0);
-drizzle.c - tranndf.c = (10w, 0);
 
-1/2[tranndf.c, drizzle.c] = z2 - (0, 5h) 
-                          = makemos.c + (0, 5h);
+drizzle.c - makemos.c = (10w, 0);
+1/2[drizzle.c, makemos.c] = z2 - (0, 9h);
+tranndf.c = ( .6[x2, xpart makemos.c], 1/2[y2, ypart makemos.c] );
 
 forsuffixes t=findobj, pairndf, ccdalign, wcsedit, astimp:
    pair t.desc;
@@ -142,8 +145,7 @@ drawoptions();
 
 bendo( z2, dot2.out, tranndf.c, bpath tranndf );
 bendo( z2, dot2.out, drizzle.c, bpath drizzle );
-bendy( tranndf.c, bpath tranndf, makemos.c, bpath makemos );
-bendy( drizzle.c, bpath drizzle, makemos.c, bpath makemos );
+bendo( tranndf.c, bpath tranndf, makemos.c, bpath makemos );
 
 
 forsuffixes t = allboxes:
@@ -165,9 +167,12 @@ path ccd[]a, ccd[]b, ccd[]c;
 pair ccd[]a.orig, ccd[]b.orig, ccd[]c.orig;
 pair ccd[]orig;
 pair squodge;
+pair origin;
 color grey[],yellow;
 
 save gap, u;
+
+origin = ( 30, 30 );
 
 u := 80bp;
 long = 2 short = 2u;
@@ -198,8 +203,8 @@ c.orig = b.orig - (0,short+gap);
 
 forsuffixes t=1,2:
    forsuffixes s=a,b,c:
-      ccd.t.s = s rotated ccd.t.dir shifted ccd.t.orig;
-      ccd.t.s.orig = s.orig rotated ccd.t.dir shifted ccd.t.orig;
+      ccd.t.s = s rotated ccd.t.dir shifted ccd.t.orig shifted origin;
+      ccd.t.s.orig = s.orig rotated ccd.t.dir shifted ccd.t.orig shifted origin;
    endfor;
 endfor;
 
@@ -247,3 +252,4 @@ endfig;
 
 end
 
+% $Id$
