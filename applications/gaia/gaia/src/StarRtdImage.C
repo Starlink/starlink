@@ -3656,9 +3656,5 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
 #ifdef _DEBUG_
   cout << "Called StarRtdImage::hduCmd" << endl;
 #endif
-
-  if ( !image_ ) {
-    return TCL_OK;
-  }
   return error( "Sorry the HDU commands are not available" );
 }
