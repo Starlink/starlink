@@ -33,9 +33,7 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
    USA.  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #ifndef HAVE_GETOPT_LONG
 
@@ -86,9 +84,6 @@
 # define _NO_PROTO
 #endif
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
 
 #if !defined __STDC__ || !__STDC__
 /* This is a separate conditional since some stdc systems
@@ -579,6 +574,7 @@ _getopt_initialize (argc, argv, optstring)
    If LONG_ONLY is nonzero, '-' as well as '--' can introduce
    long-named options.  */
 
+#if 0
 int
 _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
      int argc;
@@ -587,6 +583,14 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
      const struct option *longopts;
      int *longind;
      int long_only;
+#endif
+int
+_getopt_internal (int argc,
+	char *const *argv,
+	const char *optstring,
+	const struct option *longopts,
+	int *longind,
+	int long_only)
 {
   optarg = NULL;
 
@@ -1083,6 +1087,9 @@ getopt (argc, argv, optstring)
 #define NULL 0
 #endif
 
+/* K&R declarations!?  C'mon... */
+/* Just say no to all this gymnastics */
+#if 0
 int
 getopt_long (argc, argv, options, long_options, opt_index)
      int argc;
@@ -1090,6 +1097,12 @@ getopt_long (argc, argv, options, long_options, opt_index)
      const char *options;
      const struct option *long_options;
      int *opt_index;
+#endif
+int getopt_long (int argc,
+	char *const *argv,
+	const char *options,
+	const struct option *long_options,
+	int *opt_index)
 {
   return _getopt_internal (argc, argv, options, long_options, opt_index, 0);
 }
@@ -1099,6 +1112,7 @@ getopt_long (argc, argv, options, long_options, opt_index)
    but does match a short option, it is parsed as a short option
    instead.  */
 
+#if 0
 int
 getopt_long_only (argc, argv, options, long_options, opt_index)
      int argc;
@@ -1106,6 +1120,13 @@ getopt_long_only (argc, argv, options, long_options, opt_index)
      const char *options;
      const struct option *long_options;
      int *opt_index;
+#endif
+int
+getopt_long_only (int argc,
+	char *const *argv,
+	const char *options,
+	const struct option *long_options,
+	int *opt_index)
 {
   return _getopt_internal (argc, argv, options, long_options, opt_index, 1);
 }
