@@ -43,7 +43,7 @@ FSOURCES= reds.f reds_wtfn_rebin.f reds_crosstalk.f reds_extinction.f \
 
 IFL=    reds.ifl extinction.ifl modify.ifl reduce_switch.ifl flatfield.ifl \
 	rebin.ifl scucat.ifl kstest.ifl scuphot.ifl skydip.ifl drawsig.ifl \
-	scuhelp.ifl remsky.ifl
+	scuhelp.ifl remsky.ifl scuover.ifl
 
 OBJS = ${FSOURCES:.f=.o}
 IFC  = ${IFL:.ifl=.ifc}
