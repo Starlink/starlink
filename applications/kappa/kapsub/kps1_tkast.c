@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include "ast.h"
 #include "f77.h"
 #include "sae_par.h"
@@ -74,6 +76,8 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *     4-OCT-2004 (DSB):
 *        Renamed from kpg1_tkast to kps1_tkast and moved from kaplibs to
 *        kappa.
+*     4-OCT-2004 (TIMJ):
+*        Fix compiler warnings
 *     {enter_changes_here}
 
 *  Bugs:
@@ -86,15 +90,10 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
    GENPTR_INTEGER(FULL)
    GENPTR_INTEGER(STATUS)
 
-   AstObject *obj;
    AstChannel *chan;
    Tcl_Interp *interp = NULL;
    char fname[ 255 ];
    char script[1024];
-   int i;
-   int j;
-   int n;                      
-   int size;
    int ifd;
 
 #if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
