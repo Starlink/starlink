@@ -1583,6 +1583,7 @@ C  GET UT in an array
      
       SUBROUTINE TB350(RJD,TBAR,STATUS)
      
+*     14 Jul04        : TIMJ - RJD is MJD
 *     26 Apr01        : TIMJ - Extend model for until 2011 using
 *                              numbers posted on Wright's web page
 *                              http://www.astro.ucla.edu/~wright/old_mars.txt
@@ -1624,6 +1625,7 @@ C  GET UT in an array
       REAL*8 DAT1I,DAT1I1,RJD,TBAR,TB1I,TB1I1,
      :     TB1AR(100),TBWRIGHT(326)
       INTEGER I,IERR
+      REAL*8 JD
      
 *   Data:
       DATA TB1AR/ 213.07, 215.42, 215.25, 213.54, 211.09, 210.47,
@@ -1690,14 +1692,16 @@ C  GET UT in an array
 		   
 *  Status:     
       INTEGER STATUS                  ! Global status
- 
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN   
 
-*   Interpolate to get M.350.TB for RJD
+*   Convert to JD
+      JD = RJD + 2400000.5
+
+*   Interpolate to get M.350.TB for JD
      
-      I = DINT((RJD - 2442760.5D0)/40.0D0) + 1
+      I = DINT((JD - 2442760.5D0)/40.0D0) + 1
       DAT1I = 2442760.5D0 + ((I-1) * 40.0D0)
       DAT1I1 = DAT1I + 40.0D0
       IERR=0
@@ -1727,7 +1731,7 @@ C  GET UT in an array
 *     Do linear interpolation between two points.
 
       IF (IERR .EQ. 0) THEN
-         TBAR = TB1I + (TB1I1-TB1I)*(RJD-DAT1I)/(DAT1I1-DAT1I)
+         TBAR = TB1I + (TB1I1-TB1I)*(JD-DAT1I)/(DAT1I1-DAT1I)
       ELSE
          TBAR = 0.0
       END IF
