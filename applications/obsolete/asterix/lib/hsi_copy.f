@@ -73,6 +73,8 @@
 *        Original version.
 *     14 Mar 1995 (DJA):
 *        Now works using ADI method.
+*     19 Feb 1996 (DJA):
+*        Failure to find copy method is no longer fatal
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,6 +87,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
+      INCLUDE 'ADI_ERR'
 
 *  Global Variables:
       INCLUDE 'HSI_CMN'                 		! HSI common block
@@ -116,8 +119,11 @@
       CALL ADI_GETFILE( IFID, IFFID, STATUS )
       CALL ADI_GETFILE( OFID, OFFID, STATUS )
 
-*  Invoke the CopyHistory method
+*  Invoke the CopyHistory method. Don't worry if we don't know how to copy
       CALL ADI_EXEC2( 'CopyHistory', IFFID, OFFID, OARG, STATUS )
+      IF ( STATUS .EQ. ADI__NOMTH ) THEN
+        CALL ERR_ANNUL( STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_COPY', STATUS )
