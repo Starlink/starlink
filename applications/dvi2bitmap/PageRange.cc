@@ -25,14 +25,12 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include "PageRange.h"
 #include <iostream>
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdlib>
 #include <cctype>
 #else

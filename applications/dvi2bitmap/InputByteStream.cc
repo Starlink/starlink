@@ -25,9 +25,7 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include "InputByteStream.h"
 
@@ -36,7 +34,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>		// for strerror
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cerrno>
 #else
@@ -44,7 +42,7 @@
 #include <errno.h>
 #endif
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::sprintf;
 #endif

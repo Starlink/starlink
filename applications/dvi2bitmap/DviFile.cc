@@ -29,11 +29,9 @@
 #include <iostream>
 #include <assert.h>
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 #endif
 
@@ -583,10 +581,6 @@ int DviFile::charWidth_ (int charno)
     return static_cast<int>(current_font_->glyph(charno)->tfmWidth()
 			    * current_font_->magnification()
 			    * dviu_per_pt_);
-#if 0
-    return static_cast<int>(floor(current_font_->glyph(charno)->tfmWidth()
-				  * dviu_per_pt_));
-#endif
 }
 
 // Return escapement of character, in pixel units

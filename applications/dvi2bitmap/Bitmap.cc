@@ -30,11 +30,9 @@
 #include <string>
 #include <assert.h>
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
@@ -46,7 +44,7 @@
 #include <limits.h>
 #endif
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::cout;
 using std::cerr;
 #endif

@@ -25,9 +25,7 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <iostream>		// for debugging code, written to cerr
 #include <fstream>
@@ -35,7 +33,7 @@
 //#include <unistd.h>
 #include <vector>
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstring>
 #include <cmath>
 #else
@@ -43,7 +41,7 @@
 #include <math.h>
 #endif
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::endl;
 using std::ends;
@@ -59,7 +57,7 @@ using std::ios;
 #include "PkFont.h"
 #include "Util.h"
 #include "stringstream.h"
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
 #include "kpathsea.h"
 #endif
 
@@ -95,7 +93,7 @@ unsigned int PkFont::fontSearchStrategies_ =
 #ifdef FONT_SEARCH_SCRIPT
 	| fontSearchStrategyCommand_
 #endif
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
 	| fontSearchStrategyKpse_
 #endif
 	;
@@ -109,7 +107,7 @@ string PkFont::fontSearchCommand_ = "";
 
 
 
-#if defined(FONT_GEN_TEMPLATE)
+#ifdef FONT_GEN_TEMPLATE
 bool PkFont::makeMissingFonts_ = true;
 #else
 bool PkFont::makeMissingFonts_ = false;
@@ -232,7 +230,7 @@ PkFont::~PkFont()
 void PkFont::verbosity (const verbosities level)
 {
     verbosity_ = level;
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
     kpathsea::verbosity (level);
 #endif
 }
@@ -298,7 +296,7 @@ bool PkFont::find_font (string& path)
 	}
     }
     
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
     if (! got_it
 	&& (fontSearchStrategies_ & fontSearchStrategyKpse_))
     {
@@ -1074,7 +1072,7 @@ string PkFont::fontgenCommand (void)
 {
     string rval;
 
-#if defined(FONT_GEN_TEMPLATE)
+#ifdef FONT_GEN_TEMPLATE
     try
     {
 	rval = substitute_font_string (FONT_GEN_TEMPLATE,

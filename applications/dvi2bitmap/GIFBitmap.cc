@@ -32,21 +32,19 @@
 ** CompuServe Incorporated.
 */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 // Minimally converted to a C++ class
 #include "Bitmap.h"		// for BitmapError exception class
 #include "GIFBitmap.h"
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cmath>
 #else
 #include <math.h>		// for floor() and ceil() in iround
 #endif
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::fopen;
 using std::fwrite;
 using std::fputc;

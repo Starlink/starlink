@@ -25,19 +25,17 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 // Put the entire module inside #if ENABLE_KPATHSEA.
 // We _shouldn't_ be compiling this is that's false, but we obviously are,
 // if we get here, so make it a no-op.
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
 
 #define NULL 0
 #include <iostream>		// for cerr
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdlib>
 #else
 #include <stdlib.h>

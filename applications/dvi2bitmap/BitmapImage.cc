@@ -29,18 +29,14 @@
 // share things like isTransparent_ and the foreground and background
 // colours.
 
-//#include <iostream>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <string>
 #include "BitmapImage.h"
-#if ENABLE_PNG
+#ifdef ENABLE_PNG
 #include "PNGBitmap.h"
 #endif
-#if ENABLE_GIF
+#ifdef ENABLE_GIF
 #include "GIFBitmap.h"
 #endif
 #include "XBMBitmap.h"
@@ -55,10 +51,10 @@ const string *BitmapImage::furtherinfo = 0;
 // Compile a list of bitmap formats.  First member of this list is the
 // default.
 const char *BitmapImage::formats[] = {
-#if ENABLE_PNG
+#ifdef ENABLE_PNG
     "png",
 #endif
-#if ENABLE_GIF
+#ifdef ENABLE_GIF
     "gif",
 #endif
     "xbm",
@@ -97,12 +93,12 @@ BitmapImage *BitmapImage::newBitmapImage
     if (! supportedBitmapImage (format))
 	return 0;
 
-#if ENABLE_PNG
+#ifdef ENABLE_PNG
     if (format == "png")
 	return new PNGBitmap (w, h, bpp);
 #endif
 
-#if ENABLE_GIF
+#ifdef ENABLE_GIF
     if (format == "gif")
 	return new GIFBitmap (w, h, bpp);
 #endif

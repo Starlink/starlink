@@ -27,9 +27,7 @@
 #ifndef STRINGSTREAM_H_LOADED
 #define STRINGSTREAM_H_LOADED 1
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #ifdef HAVE_SSTREAM
 
@@ -38,7 +36,7 @@
 #define SS_C_STR(s) (s).str().c_str()
 #define SS_STRING(s) (s).str()
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::ostringstream;
 #endif
 
@@ -50,7 +48,7 @@ using std::ostringstream;
 /* Add the end-of-string to the stringbuf and convert it to a string */
 #define SS_STRING(s) ((s)<<ends,string((s).str()))
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::ostrstream;
 #endif
 

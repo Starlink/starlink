@@ -25,13 +25,11 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <iostream>
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cctype>
 #else
@@ -39,7 +37,7 @@
 #include <ctype.h>
 #endif
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::ostream;
 using std::ends;
 using std::endl;
@@ -63,7 +61,7 @@ string Util::runCommandPipe (string cmd)
 {
     string response;
 
-#if HAVE_POPEN
+#ifdef HAVE_POPEN
     FILE *PIN = popen (cmd.c_str(), "r");
 
     if (PIN == NULL)

@@ -25,16 +25,14 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include "Bitmap.h"
 #include "XBMBitmap.h"
 
 //#include <iostream>		// debug code writes to cerr
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cctype>
 #else

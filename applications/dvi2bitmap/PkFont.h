@@ -28,9 +28,7 @@
 #ifndef PK_FONT_HEADER_READ
 #define PK_FONT_HEADER_READ 1
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <string>
 // We only need to include <ostream> here, but <iostream> is on more machines

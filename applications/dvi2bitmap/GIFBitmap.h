@@ -29,7 +29,7 @@
 #define GIFBITMAP_HEADER_READ 1
 
 #include "BitmapImage.h"
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #else
 #include <stdio.h>

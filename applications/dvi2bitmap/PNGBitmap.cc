@@ -25,14 +25,14 @@
 //    $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
+
+#include <iostream>             // debug code writes to cerr
 
 #include <time.h>
 #include <assert.h>
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cmath>		// for floor()
 #else
 #include <math.h>		// for floor()
@@ -41,12 +41,13 @@
 #include "Bitmap.h"		// for BitmapError exception class
 #include "PNGBitmap.h"
 
-#if HAVE_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
+#ifdef HAVE_CSTD_INCLUDE        // ie, there _is_ a <cstdio>
 using std::fopen;
-//using std::fwrite;
-//using std::fputc;
 using std::fclose;
-//using std::fflush;
+#endif
+
+#ifdef HAVE_STD_NAMESPACE
+using std::cerr;
 #endif
 
 // The PNG calls below have been written to be general, rather than
@@ -405,23 +406,6 @@ void PNGBitmap::write (const string filename)
     }
     for (int r=0; r<h_; r++)
 	rows[r] = &bitmap_[r*w_];
-
-
-#if 0
-    cerr << "row 5:\n";
-    int rowcount = 0;
-    for (int p=0; p<w_; p++)
-    {
-	cerr << static_cast<int>(bitmap_[5*w_+p]) << '\t';
-	if (++rowcount >= 0)
-	{
-	    cerr << '\n';
-	    rowcount = 0;
-	}
-    }
-    cerr << '\n';
-#endif
-
 
     png_write_image (png_ptr_, const_cast<Byte**>(rows));
 

@@ -30,7 +30,8 @@
 
 /* Define as 1 if you DO have <cstdio> headers.  Otherwise, we use
    <stdio.h> rather than standard <cstdio> */
-#define HAVE_CSTD_INCLUDE 0
+#undef HAVE_CSTD_INCLUDE
+/*#define HAVE_CSTD_INCLUDE 0*/
 
 /* Related: define as 1 if you have standard functions in the std
  * namespace; that is, if you need `using namespace std' in order to
@@ -38,7 +39,8 @@
  * dump everything into the global namespace; this is not as elegant as
  * I'd like, but it'll do for now.
  */
-#define HAVE_STD_NAMESPACE 0
+#undef HAVE_STD_NAMESPACE
+/* #define HAVE_STD_NAMESPACE 0 */
 
 /* Define as 1 if you have <assert.h> and <sstream> (as opposed to
  * older <strstream>), and so on
@@ -55,13 +57,17 @@
  */
 #undef HAVE_GETOPT
 #undef HAVE_DECL_GETOPT
+#undef HAVE_DECL_GETSUBOPT
 #undef HAVE_GETOPT_LONG
+#undef HAVE_GETSUBOPT
 
 /* Define as 1 if you want to enable generation of PNGs */
-#define ENABLE_PNG 0
+#undef ENABLE_PNG
+/* #define ENABLE_PNG 0 */
 
 /* Define as 1 if you want to enable generation of GIFs */
-#define ENABLE_GIF 0
+#undef ENABLE_GIF
+/* #define ENABLE_GIF 0 */
 
 /* Define filesystem and search path separator.  The default slash and
  * colon are for unix, but DOS uses backslash and semicolon.
@@ -82,7 +88,8 @@
  * library when they work their magic, but that's entirely separate,
  * and controlled only by ENABLE_FONT_GEN.
  */
-#define ENABLE_KPATHSEA 0
+#undef ENABLE_KPATHSEA
+/* #define ENABLE_KPATHSEA 0 */
 
 /* Several strings below are in the format of a `font string
  * template'.  This is a printf-like string which has %? specifiers
