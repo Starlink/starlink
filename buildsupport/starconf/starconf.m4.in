@@ -191,10 +191,6 @@ STAR_DEPENDENCIES_CHILDREN=''
 AC_SUBST(STAR_DEPENDENCIES_ATTRIBUTES)
 AC_SUBST(STAR_DEPENDENCIES_CHILDREN)
 
-# List of message files.  Used to signal to automake.
-STAR_MESSGEN_SOURCES=
-AC_SUBST(STAR_MESSGEN_SOURCES)
-
 # List of documentation.  See [STAR_LATEX_DOCUMENTATION].
 # STAR_DOCUMENTATION is a list of document codes,
 STAR_DOCUMENTATION=
@@ -272,59 +268,41 @@ test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 
 
 
-# STAR_MESSGEN(msgfile-list)
-# --------------------------
+# STAR_MESSGEN([msgfile-list])
+# ----------------------------
 #
 # Handle generating message, error, and facility files.
 #
-# The argument is a space-separated list of files, each of which has a
-# set of message declarations in it, in the format prescribed by the
-# messgen utility.  There is no default, though the usual name for
-# this file is ${PACKAGE}_err.msg.  The macro may be called more than
-# once if you have more than one .msg file in the directory.
+# Declare that we will need to use the messgen utility.  This macro
+# does not by itself cause the messgen rules to be included in the
+# makefile -- that is done by automake, when it sees a
+# 'include_MESSAGES' or 'noinst_MESSAGES' variable.
 #
-# This adds Makefile rules to create the appropriate _err, _ERR,
-# _err.h and fac_nnn_err files, and handles installing the latter file
-# to the help directory, and including it in the distribution.
+# The optional argument is a space-separated list of files, each of
+# which has a set of message declarations in it, in the format
+# prescribed by the messgen utility.  If this is present, then the
+# named files are declared as pre-distribution files (the macro calls
+# STAR_PREDIST_SOURCES on them), and so the resulting configure script
+# should expect not to find them in an unpacked distribution.  This is
+# useful as documentation or as a shortcut for calling the latter
+# macro, but recall that it is the presence of the automake
+# 'include_MESSAGES' variable which does the work.
 #
-# The files which this generates should be declared as sources in
-# the Makefile.am if they are to be used in code, or are to be
-# installed.  If they are used in building the package, you will
-# probably need to declare them additionally as `BUILT_SOURCES'.  The
-# package also implicitly declares a `sourceset' dependency on the
+# The macro may be called more than once if you have more than one
+# .msg file in the directory.
+#
+# The files listed in the '_MESSAGES' variable will often have to be 
+# declared as `BUILT_SOURCES'.  
+#
+# The macro also implicitly declares a `sourceset' dependency on the
 # messgen package.
-#
-# This macro also declares that the .msg files are pre-distribution
-# files (it calls STAR_PREDIST_SOURECS) on them, and so the resulting
-# configure script should expect not to find them in an unpacked
-# distribution.
-#
-# This macro leaves the discovered facility code in the shell variable
-# star_facilitycode (this corresponds to the last message file, if there
-# is more than one), from where it may be scavenged by the calling
-# configure script.  No component should _need_ to use this number -- it
-# is present for historical reasons, and is potentially useful if a
-# component needs an integer which is guaranteed unique to that component.
-#
-# Note that this macro determines the facility code when configure is
-# being generated (as opposed to when it is being run on the build
-# machine), since the .msg file will typically not be distributed, and
-# thus not available when ./configure is run)
 AC_DEFUN([STAR_MESSGEN],
-         [#
-          m4_ifval([$1], [], [AC_FATAL([$0: called with no message file])])dnl
-          $_star_docs_only &&
-              AC_MSG_ERROR([STAR[]_MESSGEN in docs-only directory])
-          AC_FOREACH([MsgFileName], [$1],
-                     [m4_define([MsgFacCode],
-                                m4_normalize(esyscmd([sed -n '/\.FACILITY/{s/.*, *\([0-9]*\).*/\1/p;q;}' ]MsgFileName)))dnl
-                      STAR_HELP_FILES([fac_]MsgFacCode[_err])dnl
-                      _STAR_EXTRA_DIST([fac_]MsgFacCode[_err])dnl
-                      star_facilitycode=MsgFacCode
-                     ])
-          STAR_DECLARE_DEPENDENCIES([sourceset], [messgen])
-          STAR_PREDIST_SOURCES($1)
-          STAR_CHECK_PROGS(messgen)
+   [#
+    $_star_docs_only &&
+        AC_MSG_ERROR([STAR[]_MESSGEN in docs-only directory])
+    STAR_DECLARE_DEPENDENCIES([sourceset], [messgen])
+    m4_ifval([$1], [STAR_PREDIST_SOURCES($1)])
+    STAR_CHECK_PROGS(messgen)
 ])# STAR_MESSGEN
 
 
@@ -687,30 +665,33 @@ dnl  and Fink on OSX
 # @STAR[]2HTML@, and so if you _do_ use it, you will have to make that
 # available, either through [STAR_CHECK_PROGS(star2html)] or otherwise.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
-         [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-          STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
-          m4_ifval([$2],
-                   [dnl non-empty second argument -- just add to variable
-                    if $_star_build_docs; then
-                        _STAR_EXTRA_DIST($2)
-                        STAR_DOCS_FILES($2)
-                    else
-                        AC_MSG_WARN([not installing docs $1])
-                    fi
-                    ],
-                   [dnl second arg empty -- use defaults
-                    if $_star_build_docs; then
-                        for d in $1
-                        do
-                            _STAR_EXTRA_DIST($d.tex $d.ps $d.htx_tar)
-                            STAR_DOCS_FILES($d.tex $d.ps $d.htx_tar)
-                        done
-                    else
-                        AC_MSG_WARN([not installing docs $1])
-                    fi
-                    STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
-                    STAR_CHECK_PROGS([star2html])
-                   ])dnl
+   [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
+    STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
+    m4_ifval([$2],
+       [dnl non-empty second argument -- just add to variable
+        if $_star_build_docs; then
+            _STAR_EXTRA_DIST($2)
+            STAR@&t@_LATEX_DOCUMENTATION="$2"
+        else
+            AC_MSG_WARN([not installing docs $1])
+        fi
+        ],
+       [dnl second arg empty -- use defaults
+        if $_star_build_docs; then
+            _star_tmp=
+            for d in $1
+            do
+                _STAR_EXTRA_DIST($d.tex $d.ps $d.htx_tar)
+                _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
+            done
+            STAR@&t@_LATEX_DOCUMENTATION="$_star_tmp"
+        else
+            AC_MSG_WARN([not installing docs $1])
+        fi
+        STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
+        STAR_CHECK_PROGS([star2html])
+       ])
+    AC_SUBST([STAR@&t@_LATEX_DOCUMENTATION])dnl
 ])# STAR_LATEX_DOCUMENTATION
 
 
@@ -1126,20 +1107,12 @@ AC_DEFUN([_STAR_UPCASE],
 # the directory STAR_[DIR-TYPE]_DIR.  This works by defining and
 # AC_SUBSTing the variables `starX_DATA for X=dir-type (eg, `stardocs_DATA').
 #
-# The variables starXdir (for X in the list above) are defined in
-# STAR_DEFAULTS, and the prefixes starX are added to the legal 'DATA'
-# prefixes in automake:handle_data.
+# This is now obsolete -- components should use star<dir-type>_DATA in
+# the Makefile.am file instead.
 AC_DEFUN([_STAR_EXTRADIR_COMMON],
-         [m4_ifval([$1], [], [AC_FATAL([$0: must have two args])])dnl
-          m4_ifval([$2], [], [AC_FATAL([$0: must have two args])])dnl
-          m4_if(m4_bregexp([$1],
-                           [^\(docs\|etc\|help\|examples\)$]),
-                [0],
-                [],
-                [AC_FATAL([$0: unrecognised type $1])])dnl
-          AC_SUBST(star$1_DATA)dnl
-          star$1_DATA="[$]star$1_DATA $2"
-])# _STAR_EXTRADIR_COMMON
+   [AC_MSG_WARN([Macro STAR_$1_FILES($2) is obsolete -- use star$1_DATA in Makefile.am instead])
+    AC_MSG_WARN([For STAR@&t@_LATEX_DOCUMENTATION, use stardocs_DATA=@STAR@&t@_LATEX_DOCUMENTATION@ instead])]
+)# _STAR_EXTRADIR_COMMON
 
 
 # _STAR_EXTRA_DIST(filelist)
