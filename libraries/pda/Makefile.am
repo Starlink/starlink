@@ -66,7 +66,7 @@ pda_dist.f pda_dpssf4.f pda_drot.f pda_fprota.f pda_lmdif1.f	       \
 pda_passb2.f pda_qrupdd.f pda_ranmar.f pda_sclmld.f pda_daxpy.f	       \
 pda_dcftf1.f pda_dmout.f pda_dpssf5.f pda_drotg.f pda_fpsurf.f	       \
 pda_lmpar.f pda_passb3.f pda_qsad.f pda_resltd.f pda_secfcd.f	       \
-pda_d1mach.f pda_i1mach.f
+pda_d1mach.f pda_i1mach.f pda_drann.f
 
 # Testing
 
