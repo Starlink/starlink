@@ -189,7 +189,7 @@
         PARAMETER		( ICLS = 'BinDS|Array|Scalar' )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ARITHMETIC Version 2.2-0' )
+        PARAMETER		( VERSION = 'ARITHMETIC Version 2.2-1' )
 
 *  Local Variables:
       CHARACTER              	OPER             	! Operation
