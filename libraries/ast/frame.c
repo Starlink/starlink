@@ -8368,7 +8368,7 @@ static int SubFrame( AstFrame *target, AstFrame *template,
    now modify the Mapping to take account of any differences in the Units
    attributes of the target and results Frames. */
          if( template && astGetActiveUnit( template ) &&
-                         astGetActiveUnit( result ) ) {
+                         astGetActiveUnit( *result ) ) {
 
 /* Loop round the axes of the results Frame, accumulating a parallel CmpMap
    ("umap") in which each Mapping is the 1-D Mapping which transforms the
