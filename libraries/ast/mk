@@ -215,6 +215,7 @@
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink)
+#     DSB: David S. Berry (Starlink)
 #
 #  History:
 #     11-JUN-1996 (RFWS):
@@ -225,6 +226,8 @@
 #        Change to using egcs as the C compiler on Linux.
 #     15-JUN-1999 (RFWS):
 #        Use -lg2c on Lunix (instead of -lf2c).
+#     4-SEP-2001 (DSB):
+#        Change back to using gcc as the C compiler on Linux.
 #-
 
 #  Export "local" definitions to the environment for use by make.
@@ -293,7 +296,7 @@
             ix86_Linux)
                AR_IN='ar r'
                BLD_SHR='f() { ld -shared -soname $$1 -o $$1 $$2;}; f'
-	       CC='egcs'
+	       CC='gcc'
                CFLAGS='-ansi -O2 -fPIC'
                FC='g77'
 	       FFLAGS='-fno-second-underscore -O2 -fPIC'
