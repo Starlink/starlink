@@ -140,6 +140,14 @@ SPACE			[ \t]*
 {C}{N}{F}"_"{P}{V}{A}{L}		{ count(); return( CNF_PVAL ); }
 {I}{O}{S}{T}{A}{T}			{ count(); return( IOSTAT ); }
 
+{I}{A}{B}{S}				{ count(); return( IABS ); }
+{I}{S}{I}{G}{N}				{ count(); return( ISIGN ); }
+{I}{D}{I}{M}				{ count(); return( IDIM ); }
+{M}{A}{X}0				{ count(); return( MAX0 ); }
+{A}{M}{A}{X}0				{ count(); return( AMAX0 ); }
+{M}{I}{N}0				{ count(); return( MIN0 ); }
+{A}{M}{I}{N}0				{ count(); return( AMIN0 ); }
+
 {DIGIT}+				{ count(); return( INTEGER_CONSTANT ); }
 \'(''|[^'\n]|{CONT})*\'			{ count(); return( STRING_CONSTANT ); }
 

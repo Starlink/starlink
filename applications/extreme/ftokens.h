@@ -39,4 +39,12 @@
 #define EQUIVALENCE 300
 #define IOSTAT 301
 
+#define IABS 400
+#define IDIM 401
+#define ISIGN 402
+#define MAX0 403
+#define AMAX0 404
+#define MIN0 405
+#define AMIN0 406
+
 /* $Id$ */
