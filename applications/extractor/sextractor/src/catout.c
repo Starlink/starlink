@@ -18,6 +18,7 @@
 *                                 closed.
 *                       20/03/00: (PWD):
 *                                 Added initialisation of obj.rad FLAGs.
+*                       08/01/03: Fixed a double free of pointer.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -450,9 +451,6 @@ void	endcat()
       fprintf(ascfile, skycattail); /*PWD: modification here*/
       if (!prefs.pipe_flag)
         fclose(ascfile);
-      objtab->key = NULL;
-      objtab->nkey = 0;
-      free_tab(objtab);
       break;
 
     case FITS_LDAC:
