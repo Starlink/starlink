@@ -1,7 +1,7 @@
 Interface FOLDBIN
    Parameter    INP
       position    1
-      type        'univ'
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<->GLOBAL.BINDS'
       prompt      'Enter name of input file'
@@ -10,7 +10,7 @@ Interface FOLDBIN
 
    Parameter    OUT
       position    2
-      type        'univ'
+      type        'LITERAL'
       PPATH       'CURRENT'
       association '->GLOBAL.BINDS'
       prompt      'Enter name of output file'
