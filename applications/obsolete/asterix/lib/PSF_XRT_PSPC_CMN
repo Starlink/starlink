@@ -1,17 +1,6 @@
 *+  PSF_XRT_PSPC_CMN - Common block definition for XRT PSF
 *-
 
-      INTEGER        PSF_PSPC__VARG			! XRT PSPC psf forms
-        PARAMETER    ( PSF_PSPC__VARG = 1 )
-      INTEGER        PSF_PSPC__ONAX3
-        PARAMETER    ( PSF_PSPC__ONAX3 = 2 )
-      INTEGER        PSF_PSPC__ONAX2
-        PARAMETER    ( PSF_PSPC__ONAX2 = 3 )
-      INTEGER        PSF_PSPC__VARP
-        PARAMETER    ( PSF_PSPC__VARP = 4 )
-
-      LOGICAL                 RX_INIT 			! System initialised
-
       LOGICAL                 RX_CB_OPEN
       INTEGER			RX_CB_ID		! Cube identifier
       INTEGER                 RX_CB_PPTR, RX_CB_RPTR    ! Ptr to cube fields
@@ -21,7 +10,7 @@
       REAL                    RX_CB_OBASE, RX_CB_OSCALE ! Off-axis axis pars
       REAL                    RX_CB_RPMIN               ! Minimum radius > 0
 
-      COMMON /PSF_XRT_CMN/    RX_INIT, RX_CB_OPEN,
+      COMMON /PSF_XRT_CMN/    RX_CB_OPEN,
      :                        RX_CB_PPTR, RX_CB_RPTR, RX_CB_NRBIN,
      :                        RX_CB_NEBIN, RX_CB_NOBIN, RX_CB_EAPTR,
      :                        RX_CB_EWPTR, RX_CB_OBASE, RX_CB_OSCALE,
