@@ -3,11 +3,31 @@
 #
 #  Written by mbt on Fri Mar 23 15:33:48 GMT 2001
 #
-_INTEGER DATASEC<X1>
-_INTEGER DATASEC<X2>
-_INTEGER DATASEC<Y1>
-_INTEGER DATASEC<Y2>
-BOUNDS.START1 DATASEC<X1>
-BOUNDS.END1 DATASEC<X2>
-BOUNDS.START2 DATASEC<Y1>
-BOUNDS.END2 DATASEC<Y2>
+#  This table converts the standard DATASEC FITS header card, which 
+#  describes the usable data area of a CCD data array, into the 
+#  corresponding EXTENT item in the CCDPACK extension of an NDF.
+#
+#  For instance the following FITS header card:
+#
+#     DATASEC = '[11:100,11:100]'
+#
+#  would be converted using this table into the following NDF extension
+#  items:
+#
+#     MORE           <EXT>           {structure}
+#        CCDPACK        <CCDPACK_EXT>   {structure}
+#           EXTENT         <CCDPACK_XITEM>   {structure}
+#              MINX           <_INTEGER>      11
+#              MAXX           <_INTEGER>      100
+#              MINY           <_INTEGER>      11
+#              MAXY           <_INTEGER>      100
+
+
+_INTEGER   DATASEC<X1>
+_INTEGER   DATASEC<X2>
+_INTEGER   DATASEC<Y1>
+_INTEGER   DATASEC<Y2>
+EXTENT.MINX  DATASEC<X1>
+EXTENT.MAXX  DATASEC<X2>
+EXTENT.MINY  DATASEC<Y1>
+EXTENT.MAXY  DATASEC<Y2>
