@@ -34,24 +34,25 @@ dnl    XXX This is very probably redundant.  This check is also now done
 dnl    within STAR_DEFAULTS
 AC_CHECK_LIB(cc_dynamic, restFP)
 
-dnl dependances on starlink packages, depends on kappa, figaro and convert
-dnl for the scripts in th epacage to work, so may as well declare them as
-dnl dependancies for build.
-STAR_DECLARE_DEPENDENCIES(build, [ndf kappa figaro convert])
+dnl    Dependences on starlink packages: depends on kappa, figaro and
+dnl    convert for the scripts in the package to work, so these must
+dnl    be declared as `use' dependencies.
+STAR_DECLARE_DEPENDENCIES(build, [ndf par sae])
+STAR_DECLARE_DEPENDENCIES(link,  [mers pcs])
+STAR_DECLARE_DEPENDENCIES(use,   [kappa figaro convert])
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl    We have a SUN document, we should probably tell people its there
-dnl STAR_LATEX_DOCUMENTATION()
-dnl STAR_DOCS_FILES()
+STAR_LATEX_DOCUMENTATION(sun237/ sc16/)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml datacube.csh datacube.icl
-    demo/Makefile demo/datacube_demo.csh
-    help/Makefile subs/Makefile tasks/Makefile])
+    help/Makefile subs/Makefile tasks/Makefile
+    sun237/Makefile sc16/Makefile
+    demo/Makefile demo/datacube_demo.csh])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
