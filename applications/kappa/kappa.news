@@ -30,10 +30,10 @@
 
    Other changes include:
 
-     - A new applications SCATTER to perform simple scatter plots of the
+     - A new application SCATTER to perform simple scatter plots of the
      values in two NDFs.
 
-     - A new applications VERSION which checks the version number of the
+     - A new application KAPVERSION which checks the version number of the
      installed package.
 
      - DISPLAY now has a KEY parameter which causes a colour ramp to be
