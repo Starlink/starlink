@@ -14,6 +14,11 @@ sun242.tar-htx: sun242.xml #ReleaseNotes
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --html --tarball=$@ sun242.xml
 
+sun242.tar-htxsingle: sun242.xml #ReleaseNotes
+	BIBINPUTS=$$PWD \
+		$(SGML2DOCS) --htmlsingle --packagedir sun242.htxsingle \
+		--tarball=$@ sun242.xml
+
 sun242.tar-tex: sun242.xml #ReleaseNotes
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --latex --tarball=$@ sun242.xml

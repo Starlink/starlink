@@ -9,6 +9,52 @@
 	<!ENTITY ddash '--'>
 		<!-- so I can use this in CODE els without it
 		     being recognised as a shortref -->
+
+	<!ENTITY sun5
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/5//EN"
+			""
+			NDATA XML>
+		<!-- ASTROM documentation -->
+	<!ENTITY sun55
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/55//EN"
+			""
+			NDATA XML>
+		<!-- CONVERT documentation -->
+	<!ENTITY sun95
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/95//EN"
+			""
+			NDATA XML>
+		<!-- KAPPA -->
+	<!ENTITY sun139
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/139//EN"
+			""
+			NDATA XML>
+		<!-- CCDPACK -->
+	<!ENTITY sun211
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/211//EN"
+			""
+			NDATA XML>
+		<!-- AST -->
+	<!ENTITY sun214
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/214//EN"
+			""
+			NDATA XML>
+		<!-- GAIA -->
+	<!ENTITY sun226
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/226//EN"
+			""
+			NDATA XML>
+		<!-- SExtractor -->
+	<!ENTITY sun228
+		PUBLIC	"-//Starlink//DOCUMENT Summary SUN/228//EN"
+			""
+			NDATA XML>
+		<!-- StarPerl -->
+	<!ENTITY mud165
+		PUBLIC	"-//Starlink//DOCUMENT Summary MUD/165//EN"
+			"file:/star/docs/mud165.ps"
+			NDATA XML>
+		<!-- Extractor documentation -->
 ]>
 
 <!-- $Id$ -->
@@ -36,6 +82,9 @@
       </distribution>
       <distribution string="v0-5-2" date="08-Apr-2003" author="ng">
         <px>Bugfix release</px>
+      </distribution>
+      <distribution string="v0-5-8" date="25-aug-2003" author="ng">
+        <px>Stability improvements; extra options; enhanced documentation.</px>
       </distribution>
     </history>
   </docinfo>
@@ -114,10 +163,20 @@
 	<verbatim>autoastrom [options...] &lt;NDF&gt;</verbatim></p>
       
       <p>The options available are described in <ref id="tab.opts"/>.
-	String or integer values can be specified in the form <code>&ddash;catalogue
-	  usno@eso</code> or <code>&ddash;catalogue=usno@eso</code>;
-	booleans can be specified as either <code>&ddash;insert</code>
-	(meaning true) or <code>&ddash;noinsert</code> (false).</p>
+        String or integer values are given in the form
+        <code>&ddash;catalogue=usno@eso</code>; those marked
+        <code>switch</code>, such as <code>&ddash;insert</code>, can be
+        specified as either <code>&ddash;insert</code> (meaning true) or
+        <code>&ddash;noinsert</code> (false).</p>
+
+      <p>Those options which take values can have those
+        values specified as either <code>--option=value</code> or
+        <code>--option value</code>.  The latter form is rather
+        unfortunate (but currently unavoidable), since it means that if
+        you <em>forget</em> to give a value, it gobbles the next
+        option on the line as its value.  The options of type
+        <code>switch</code> below take no value; <em>all</em> of the
+        others do.</p>
 
       <table id="tab.opts">
 	<caption>
@@ -135,87 +194,91 @@
 	    </thead>
 	    <tbody>
 	      <row>
-		<entry><ref id="opt.catalogue">&ddash;catalogue</ref></entry>
+		<entry><ref id="opt.catalogue"><code>&ddash;catalogue</code></ref></entry>
 		<entry>string</entry>
 		<entry>SkyCat name of online catalogue to use</entry>
 	      </row>
-<!--
 	      <row>
-		<entry><ref id="opt.ccdcat">&ddash;ccdcat</ref></entry>
+		<entry><ref id="opt.ccdcatalogue"><code>&ddash;ccdcatalogue</code></ref></entry>
 		<entry>string</entry>
 		<entry>CCD catalogue</entry>
 	      </row>
--->
 	      <row>
-		<entry><ref id="opt.defects">&ddash;defects</ref></entry>
+		<entry><ref id="opt.defects"><code>&ddash;defects</code></ref></entry>
 		<entry>string</entry>
 		<entry>Remove CCD defects</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.help">&ddash;help</ref></entry>
-		<entry></entry>
+		<entry><ref id="opt.help"><code>&ddash;help</code></ref></entry>
+		<entry>switch</entry>
 		<entry>Print usage information and exit</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.insert">&ddash;insert</ref></entry>
-		<entry>boolean</entry>
+		<entry><ref id="opt.insert"><code>&ddash;insert</code></ref></entry>
+		<entry>switch</entry>
 		<entry>insert WCS info into NDF at end?</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.keepfits">&ddash;keepfits</ref></entry>
+		<entry><ref id="opt.keepfits"><code>&ddash;keepfits</code></ref></entry>
 		<entry>string</entry>
 		<entry>retain WCS in this file (default if empty)</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.keeptemps">&ddash;keeptemps</ref></entry>
-		<entry>boolean</entry>
+		<entry><ref id="opt.keeptemps"><code>&ddash;keeptemps</code></ref></entry>
+		<entry>switch</entry>
 		<entry>keep temporary files?</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.match">&ddash;match</ref></entry>
+		<entry><ref id="opt.match"><code>&ddash;match</code></ref></entry>
 		<entry>string</entry>
 		<entry>choose matching algorithm</entry>
 	      </row>
+              <row>
+                <entry><ref
+                    id="opt.matchcatalogue"><code>&ddash;matchcatalogue</code></ref></entry>
+                <entry>string</entry>
+                <entry>dump catalogue of matches to this file</entry>
+              </row>
 	      <row>
-		<entry><ref id="opt.maxobj">&ddash;maxobj</ref></entry>
+		<entry><ref id="opt.maxobj"><code>&ddash;maxobj</code></ref></entry>
 		<entry>integer</entry>
 		<entry>maximum number of objects to process</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.messages">&ddash;messages</ref></entry>
-		<entry>boolean</entry>
+		<entry><ref id="opt.messages"><code>&ddash;messages</code></ref></entry>
+		<entry>switch</entry>
 		<entry>show messages from monoliths?</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.obsdata">&ddash;obsdata</ref></entry>
+		<entry><ref id="opt.obsdata"><code>&ddash;obsdata</code></ref></entry>
 		<entry>string</entry>
 		<entry>provide observation information, including WCS
 		  information</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.skycatconfig">&ddash;skycatconfig</ref></entry>
+		<entry><ref id="opt.skycatconfig"><code>&ddash;skycatconfig</code></ref></entry>
 		<entry>string</entry>
 		<entry>SkyCat configuration file</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.temp">&ddash;temp</ref></entry>
+		<entry><ref id="opt.temp"><code>&ddash;temp</code></ref></entry>
 		<entry>string</entry>
 		<entry>name of temporary directory</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.timeout">&ddash;timeout</ref></entry>
+		<entry><ref id="opt.timeout"><code>&ddash;timeout</code></ref></entry>
 		<entry>integer</entry>
 		<entry>monolith timeout</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.verbose">&ddash;verbose</ref></entry>
-		<entry>boolean</entry>
+		<entry><ref id="opt.verbose"><code>&ddash;verbose</code></ref></entry>
+		<entry>switch</entry>
 		<entry>verbosity</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.version">&ddash;version</ref></entry>
-		<entry>boolean</entry>
-		<entry>if true, print version number and exit</entry>
+		<entry><ref id="opt.version"><code>&ddash;version</code></ref></entry>
+		<entry>switch</entry>
+		<entry>print version number and exit</entry>
 	      </row>
 	    </tbody>
 	  </tgroup>
@@ -232,15 +295,44 @@
 	  component in the NDF, or with a FITS (NDF-) extension, or with
 	  approximate astrometry given on the command line.  By
 	  default, &autoastrom; searches for a WCS component, then a
-	  FITS extension, and fails if it finds neither.</p>
+	  FITS extension, and fails if it finds neither.  Because
+          &autoastrom; ultimately sits on top of the AST library, it
+          is able to make sense of a large variety of embedded FITS
+          information, and get its initial astrometry from such
+          pointing information.</p>
 
-	<p>You control this process using the <ref id="opt.obsdata">obsdata
-	    option</ref>.</p>
+	<p>You control this process using the <ref
+            id="opt.obsdata"><code>&ddash;obsdata</code> option</ref>.</p>
 
 	<p>If you wish to insert an initial approximate WCS component
 	  in the NDF, you can best do this using GAIA.</p>
 
-	<p>XXX Discuss how accurate this initial calibration has to be.</p>
+        <p>The initial calibration does not have to be particularly
+          accurate; it need only be accurate enough that &autoastrom; is
+          able to make a query to a catalogue server that will return a
+          set of catalogue objects that has a substantial overlap with
+          the imaged area of sky.  The query covers the region of sky
+          which maps to the four corners of the image, based on the
+          initial astrometry, plus a small extra margin.</p>
+
+        <p>The default image scale is 1 arcsec per pixel.  You will
+          need to specify the scale if the actual scale is significantly
+          different from this, as errors in this scale result in
+          substantial errors in the patch of sky requested from the
+          server.  It is better to choose too small a scale than too
+          large -- that way, the area which &autoastrom; searches for
+          will tend to lie within the observed area, rather than
+          greatly overlap it.</p>
+
+        <p>&autoastrom; assumes that north is along
+          the <m>y</m>-axis.  The matching algorithms are generally
+          insensitive to this angle.  However, the only case where you need
+          to specify this is if the CCD is significantly longer than
+          it is wide, since in this case a wrong orientation would
+          cause &autoastrom; to search for a patch of sky which was a
+          different shape from the patch covered by the CCD.
+          Similarly, you should specify any image inversion if you
+          know it, but it is not always necessary.</p>
       </subsect>
 
       <subsect id="usage.results" export="export">
@@ -254,11 +346,36 @@
 	  both, either, or even choose neither and throw the results
 	  away (strange person!).</p>
 
-	<p>XXX Discussion of the various FITS standards,
-	<citation>nost-100-2</citation>, <citation>fitswcs1</citation>
-	and <citation>fitswcs2</citation>, possibly including pointers
-	to the FITS handbook.  Mention importing FITS WCS information
-	into AST.</p>
+        <p>The FITS files which &autoastrom; produces are in fact
+          generated by &astrom;.  As discussed in <docxref doc="sun5"
+            loc="output_wcs"/>, these employ a slight extension to the
+          FITS-WCS standards, since they necessarily include distortion
+          information which has been deferred until paper~III, which is
+          still at present (August 2003) in draft.  Nonetheless, they
+          are perfectly conformant.  If, however, &autoastrom; had to be
+          configured with support for an <em>old</em> version of
+          <docxref doc="sun211">AST</docxref>, then it might have had to
+          generate FITS headers which conformed to the drafts of
+          paper~II, and thus do not conform to the final version --
+          such FITS files should not be used outside of this
+          application, and it would be best to update your version of
+          AST to a current one, and reinstall &autoastrom;.</p>
+
+        <p>The calculated astrometry is inserted into the input NDF
+          unless you suppress it with the <code>&ddash;noinsert</code>
+          option.  If you need to insert this by hand, into this or
+          another NDF, you can do so with KAPPA's <docxref doc="sun95"
+            loc="WCSCOPY">wcscopy</docxref> command (you may need to
+          initialise the <docxref doc="sun55">CONVERT</docxref>
+          package, so that the conversions between FITS and NDF will happen
+          automatically).</p>
+
+	<p>For further details, see the FITS standard
+          <citation>nost-100-2</citation>, and the two published
+          FITS-WCS papers, <citation>fitswcs1</citation> and
+          <citation>fitswcs2</citation>; the web pages which cover the
+          FITS-WCS process are at
+          <url>http://www.cv.nrao.edu/fits/documents/wcs/wcs.html</url>.</p>
       </subsect>
 
       <subsect id="usage.proxy" export="export">
@@ -292,6 +409,27 @@
 	  <title>Options</title>
 	</subhead>
 
+        <p>The options are either switches, or have a string or
+          integer argument.</p>
+
+        <p>The verbosity option is an example of a
+          switch: it can be given as <code>&ddash;verbose</code> to make
+          the program verbose, or <code>&ddash;noverbose</code> to make
+          it quiet.</p>
+
+        <p>Some options take suboptions.  For example, the
+          <code>&ddash;obsdata</code> option might be given as
+          <verbatim>&ddash;obsdata=ra=12:34:56,dec=-10:0:0</verbatim>
+          where the
+          comma-separated list of suboptions is given as the
+          <code>&ddash;obsdata</code> option argument.</p>
+
+        <p>There are no
+          optional arguments: if an option is documented as having an
+          argument (that is, if it is not a switch), an argument must be
+          provided.  The defaults documented below apply only if the
+          option is <em>not</em> supplied.</p>
+
 	<subsubsect id="opt.catalogue">
 	  <subhead>
 	    <title>--catalogue</title>
@@ -305,38 +443,66 @@
 	  `<code>short_name</code>' entries in the file are the
 	  allowable values of this option.</p>
 
-	  <p>Default (presently): `usno@eso'</p>
+	  <p>Type: string; default (presently): `usno@eso'</p>
 	</subsubsect>
 
-<!--  This option is for testing/debugging only
-	<subsubsect id="opt.ccdcat">
+	<subsubsect id="opt.ccdcatalogue">
 	  <subhead>
-	    <title>ccdcat</title>
+	    <title>--ccdcatalogue</title>
 	  </subhead>
 
-	  <p>This indicates a pre-existing catalogue of objects in the
-	    CCD frame.  This is a catalogue in the format required by
-	    CCDPACK's &findoff; application, with extra fields.  That
-	    is, there must be five columns: an integer identifier, the 
-	    X and Y pixel positions of an object, the integer
-	    identifier <em>repeated</em> and some measure of the flux
-	    due to the object.  The objects must be in decreasing
-	    order of the flux (the units don't matter: this is purely
-	    for sorting purposes).</p>
+	  <p>Specifies a pre-existing catalogue of objects in the CCD
+	  frame.  The format is that produced as output by SExtractor
+	  when <code>CATALOG_TYPE</code> is set to
+	  <code>ASCII_HEAD</code>.  The file starts with a sequence of
+	  lines of the form
+            <verbatim>
+              # &lt;colnum> &lt;colname> &lt;optional comment>
+            </verbatim>
+            The <em>colnum</em> numbers run from 1 to the number of
+            columns; the <em>colname</em> is one of a set of column
+            named defined in the <code>sextractor</code>
+            documentation; and <em>optional comment</em> is some
+            (ignored) annotation.  The data immediately follows, in
+            rows with the given number of columns in them.  In each of
+            these rows, any text following a <code>#</code> is
+            ignored, and may be used for other annotation.</p>
 
-	  <p>If this catalogue does not exist, it will be generated
-	    from the image in the NDF using the SExtractor application;
-	    this option is present (a) so that you can provide a
-	    catalogue of objects by some other means if you wish, and
-	    (b) because this extraction step is one of the more
-	    time-consuming steps in the astrometry process, and so
-	    allowing the catalogue to be specified can speed things up
-	    in the case where you are analysing an image several
-	    times.</p>
+          <p>You control which columns SExtractor
+            generates by specifying them in the SExtractor
+            <code>.param</code> file.  The catalogue must have all of
+            the fields
+<code>NUMBER</code>,
+<code>FLUX_ISO</code>,
+<code>X_IMAGE</code>,
+<code>Y_IMAGE</code>,
+<code>A_IMAGE</code>,
+<code>B_IMAGE</code>,
+<code>X2_IMAGE</code>,
+<code>Y2_IMAGE</code>,
+<code>ERRX2_IMAGE</code>,
+<code>ERRY2_IMAGE</code>,
+<code>ISOAREA_IMAGE</code>,
+of which
+<code>X2_IMAGE</code>, 
+<code>Y2_IMAGE</code>,
+<code>A_IMAGE</code>,
+<code>B_IMAGE</code>,
+<code>ERRX2_IMAGE</code>,
+<code>ERRY2_IMAGE</code>
+            are not generated by default.</p>
 
-	  <p>Default: absent</p>
+          <p>For further details about SExtractor, and details of
+            these required columns, see <ref
+              id="helpers"/></p>
+
+          <p>If you include the option <code>&ddash;keeptemps</code>
+            to avoid deleting the temporary work directory, you will
+            be able to scavenge the extractor output from there if
+            this is useful to you.</p>
+
+	  <p>Type: string; default: none</p>
 	</subsubsect>
--->
 
 	<subsubsect id="opt.defects">
 	  <subhead>
@@ -345,34 +511,95 @@
 
 	  <p>If this option is present, then when the application
 	    extracts the list of objects from the CCD, it will try to
-	    remove CCD blemishes.</p>
+	    remove CCD blemishes.  The algorithm is currently rather
+            crude, and will likely change in future.</p>
 
 	  <p>Some of the `objects' detected by
 	    EXTRACTOR are in fact CCD defects, or readout errors, or the
 	    like.  These are very bright, so they can confuse a matching
 	    program which examines only or preferentially the brightest
-	    objects.  However these are either very small or, if they're
-	    defects such as a line, extremely elliptical, with
-	    ellipticities around 10.  If the option is present then
-	    any object which has too small an area or too large an
-	    ellipticity is ignored.</p>
+	    objects.</p>
 
-	  <p>The option may be followed by a list of comma-separated
-	    keyword-value pairs, such as
-	    <code>--defects=area=50,ellipticity=3</code>, to set the
-	    thresholds.  The default minimum area is 100 pixels, and
-	    the default maximum ellipticity is 3.5.</p>
+          <p>By default, &autoastrom; will warn of the existence of
+            anything it thinks is a defect, based on a plausible
+            heuristic, and you can control this using this option.
+            The options takes a list of keywords, which it processes
+            as shown in <ref id="tab.defects"/>.</p>
 
-	  <p>This option is not typically necessary when used with the
+          <table id="tab.defects">
+            <caption>
+              <px>Keywords for <code>--defects</code> option</px>
+            </caption>
+            <tabular>
+              <tgroup cols="2">
+                <colspec colnum="2" colwidth="1.5*"/>
+                <thead>
+                  <row>
+                    <entry>Keyword</entry>
+                    <entry>Description</entry>
+                  </row>
+                </thead>
+                <tbody>
+                  <row>
+                    <entry>ignore</entry>
+                    <entry>Completely ignore defects.</entry>
+                  </row>
+                  <row>
+                    <entry>warn</entry>
+                    <entry>Warn about possible defects, but do nothing
+                    further.  This is the default.</entry>
+                  </row>
+                  <row>
+                    <entry>remove</entry>
+                    <entry>Remove any suspected defects from the
+                      catalogue of CCD objects.</entry>
+                  </row>
+                  <row>
+                    <entry>badness</entry>
+                    <entry>Provide the
+                      threshold for defect removal and warnings.  Any
+                      objects with a badness greater than the value
+                      specified here are noted or removed.  The
+                      default threshold is 1.</entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </tabular>
+          </table>
+
+          <p>The heuristic works by assigning a `badness' to each
+            object on the CCD.  Objects with a position variance,
+            <m>\langle x^2 \rangle</m>
+            or
+            <m>\langle y^2 \rangle</m>,
+            smaller than one pixel, and objects whose flux density
+            (counts/pixel) is significantly higher than the average,
+            are given high scores.  One can observe that line and
+            point defects score high with this, with a badness greater
+            than 1, but this is not completely reliable.</p>
+
+          <p>We can afford a few uncaught defects, and we can afford
+            to discard a few real, but very small, sources, since the match
+            algorithms will generally simply ignore these.  What we need
+            to avoid is a CCD catalogue which is dominated by bright
+            sources which have no counterpart on the sky.</p>
+
+	  <p>We emphasise that this defect-removal algorithm is not
+            particularly sophisticated -- if the object-extraction is
+            producing spurious objects, you may need to mask the defects
+            out by hand, using GAIA or similar.</p>
+
+          <p>If you have any observations on the reliability, or
+            indeed usefulness, of this option, the author would be
+            interested to receive them.</p>
+
+	  <p>This option is not always necessary when used with the
 	    default FINDOFF matching algorithm, but it is vital when
 	    used with the `match' matching algorithm
 	    (see <ref id="opt.match"/>), since that algorithm uses only the
 	      brightest objects detected.</p>
 
-	  <p>This defect-removal algorithm is not particularly
-	    sophisticated -- if the object-extraction is producing
-	    spurious objects, you may need to mask the defects out
-	    using GAIA or similar.</p>
+          <p>Type: string; default: <code>&ddash;defects=warn</code></p>
 
 	</subsubsect>
 
@@ -382,6 +609,8 @@
 	  </subhead>
 
 	  <p>Print usage information, and defaults, and exit.</p>
+
+          <p>Type: switch; default: false.</p>
 	</subsubsect>
 
 	<subsubsect id="opt.insert">
@@ -390,13 +619,14 @@
 	  </subhead>
 
 	  <p>If true, the final fit to the astrometry is inserted into
-	    the input NDF as an AST WCS component.  If false
-	    (<code>--noinsert</code>), the insertion is not done, so
-	    presumably you have decided to handle the WCS information in
-	    a different way, and have set the <ref id="opt.keepfits">--keepfits
-	      option</ref> to retain the WCS information.</p>
+            the input NDF as an AST WCS component.  If false
+            (<code>--noinsert</code>), the insertion is not done, so
+            presumably you have decided to handle the WCS information in
+            a different way, and have set the <code><ref
+                id="opt.keepfits">--keepfits</ref></code> option to retain
+            the WCS information.</p>
 
-	  <p>Default: true</p>
+	  <p>Type: switch; default: true.</p>
 	</subsubsect>
 
 	<subsubsect id="opt.keepfits">
@@ -410,7 +640,7 @@
 	    additionally, you can save this 
 	    information as a FITS-WCS file, named by this option.</p>
 
-	  <p>Default: absent</p>
+	  <p>Type: switch; default: false.</p>
 	</subsubsect>
 
 	<subsubsect id="opt.keeptemps">
@@ -429,7 +659,7 @@
 	    directory which is reported during the script's
 	    execution.</p>
 
-	  <p>Default: true (but this <em>will</em> change)</p>
+	  <p>Type: switch; default: true (but this <em>will</em> change)</p>
 	</subsubsect>
 
 	<subsubsect id="opt.match">
@@ -438,16 +668,45 @@
 	  </subhead>
 
 	  <p>Specifies an alternative matching algorithm.  The default
-	    algorithm is `findoff', which is part of CCDPACK.  This does
+            algorithm is `match', which is an implementation of the
+            FOCAS matching algorithm <citation>valdes95</citation> by
+            Michael W Richmond <citation>match-home</citation>.  A
+            version of this is distributed with &autoastrom;, but it
+            should be compatible with any later version.</p>
+
+          <p>Alternatively, you can use the `findoff' application,
+            which is part of CCDPACK.  This does
 	    work, but is rather slow, and is completely thrown by a CCD
 	    image with unequal X and Y scales, making it essentially
 	    unusable if the image NDF does not have some astrometry
 	    already, or if you try to specify a position with
-	    <code>--obsdata</code> (see <ref id="opt.obsdata"/>).</p>
+	    <code>--obsdata</code> (see <ref id="opt.obsdata"/>).
+            Since it has different characteristics, though, it may
+            work in some circumstances where `match' does not.  Again,
+            the author of &autoastrom; would welcome feedback on this
+            point.</p>
 
-	  <p>&autoastrom; has support for plugins which provide
-	    alternative matching algorithms.  See <ref id="plugins"/>.</p>
+	  <p>&autoastrom; supports `match' through the more general
+            plugin mechanism described in <ref id="plugins"/>.</p>
+
+          <p>Type: string; default: `match'.</p>
 	</subsubsect>
+
+        <subsubsect id="opt.matchcatalogue">
+          <subhead>
+            <title>--matchcatalogue</title>
+          </subhead>
+
+          <p>Specifies a file which receives a dump of the set of
+            positions matched by the matching process.  The file is
+            formatted like a <code>sextractor</code> output file, with
+            five columns, containing (1) running object number, (2 and
+            3) RA and Dec of the source on the sky, and (4 and 5)
+            <em>x</em> and <em>y</em> positions of the source on the
+            CCD.</p>
+
+          <p>Type: string; default: absent -- no file written by default</p>
+        </subsubsect>
 
 	<subsubsect id="opt.maxobj">
 	  <subhead>
@@ -458,7 +717,7 @@
 	    server.  The default is generous, and it's unlikely you'd
 	    need to change this.</p>
 
-	  <p>Default: 500</p>
+	  <p>Type: integer; default: 500</p>
 	</subsubsect>
 
 	<subsubsect id="opt.messages">
@@ -471,7 +730,7 @@
 	    be reassuring, but if you don't like the chatter, they can 
 	    be suppressed with <code>--nomessages</code>.</p>
 
-	  <p>Default: true</p>
+	  <p>Type: switch; default: true</p>
 	</subsubsect>
 
 	<subsubsect id="opt.obsdata">
@@ -505,29 +764,53 @@
             This value indicates the centre of the CCD even when this
             is not the centre of distortion, which would be the case
             when, for example, the CCD represents an off-centre
-            section of a Schmidt plate.  To supply this as a backup,
-            in case there is no astrometry elsewhere, you could write
+            section of a Schmidt plate.
+          </p>
+
+          <p>The program will take its astrometry from only one of the
+            possible sources (see <code>source</code> below) -- so that
+            it will not, for example, take a position from the
+            <code>obsdata</code> option and a plate scale from the
+            file's own astrometry.  By default, a position given here
+            overrides any other WCS information; thus to supply a
+            position as a backup, in case there is <em>no</em>
+            astrometry elsewhere, you could write
 	    <verbatim>
 	      --obsdata=source=AST:FITS:USER,ra=14:24:00,dec=-12.34
 	    </verbatim>
-	    The available astrometry keywords are
+	    The available astrometry keywords are in <ref
+              id="tab.obsdata"/>.</p>
+
+          <table id="tab.obsdata">
+            <caption>
+              <px>Keywords for the <code>--obsdata</code> option.</px>
+            </caption>
 	    <tabular>
 	      <tgroup cols="2">
+                <colspec colnum="2" colwidth="1.5*"/>
+                <thead>
+                  <row>
+                    <entry>Keyword</entry>
+                    <entry>Description</entry>
+                  </row>
+                </thead>
 		<tbody>
 		  <row>
 		    <entry>source</entry>
-		    <entry>This is a colon-separated list of sources
-		      of WCS information.  The values may be `AST',
-		      indicating that the information should come from 
-		      the AST WCS component of the NDF, or `FITS',
-		      indicating that it should come from any FITS
-		      extension there, or `USER', indicating that the
-		      following obsdata keywords should be used.  The
-		      default is `<code>source=USER:AST:FITS</code>'.
-		      The keywords are not case-sensitive.
-		      If the program gets through this list without
-		      finding any WCS information, it exits with an
-		      error.</entry>
+                    <entry>This is a
+                      colon-separated list of sources of WCS
+                      information.  The values may be `AST', indicating
+                      that the information should come from the AST WCS
+                      component of the NDF, or `FITS', indicating that
+                      it should come from any FITS extension there, or
+                      `USER', indicating that the following
+                      <code>obsdata</code> keywords should be used.  The
+                      default is <code>source=USER:AST:FITS</code>, so
+                      that any WCS information given in the
+                      <code>obsdata</code> keyword has precedence.  The
+                      keywords are not case-sensitive.  If the program
+                      gets through this list without finding any WCS
+                      information, it exits with an error.</entry>
 		  </row>
 		  <row>
 		    <entry>ra</entry>
@@ -542,7 +825,7 @@
 		      degrees.  Required.</entry>
 		  </row>
 		  <row>
-		    <entry>pa</entry>
+		    <entry>angle</entry>
 		    <entry>Position angle of the pixel grid.  This is
 		      the rotation, in
 		      degrees anti-clockwise, of the declination or
@@ -557,13 +840,19 @@
 		  </row>
 		  <row>
 		    <entry>invert</entry>
-		    <entry>If true (ie, non-zero), the axes are
-		      inverted.  Default: 0.</entry>
+		    <entry>If true (that is, specified as
+                      <code>invert=1</code> or just
+                      <code>invert</code>), the axes are inverted;
+                      otherwise (<code>invert=0</code> or
+                      <code>noinvert</code>) the axes are unflipped.
+                      Default: 0.</entry>
 		  </row>
 		</tbody>
 	      </tgroup>
 	    </tabular>
-	    The position angle is the same as the AIPS
+          </table>
+
+          <p>The position angle is the same as the AIPS
 	    <code>CROTA2</code> convention.  Specifically (and by
 	    definition), these definitions map to 
 	    the <code>CDn_n</code> conventions of
@@ -583,18 +872,30 @@
 
 	  <p>Additionally, there are keywords which specify observation 
 	    data: time, station coordinates, meteorological data and
-	    colour.  For fuller details on these, see the &astrom;
-	    documentation, SUN/5.  In the specifications below,
-	    <code>i</code> represents an integer, <code>r</code> a
-	    real, optional entries are in <code>[...]</code>, and the
-	    separator <code>:</code> may be either a colon or
-	    whitespace.  Note that the <code>source</code> keyword
+	    colour.  These are described in <ref id="tab.datetime"/>.
+            For fuller details on these, see the &astrom;
+	    documentation, SUN/5.  Note that the <code>source</code> keyword
 	    discussed above
 	    does not affect the priority of these keywords: if they
 	    are specified, they override any values obtained from the
-	    NDF or its FITS extensions.
-	    <tabular>
+	    NDF or its FITS extensions.</p>
+
+          <table id="tab.datetime">
+            <caption><px>Observation data keywords.  In these specifications,
+                <code>i</code> represents an integer, <code>r</code> a
+                real, optional entries are in <code>[...]</code>, and the
+                separator <code>:</code> may be either a colon or
+                whitespace.  </px>
+            </caption>
+            <tabular>
 	      <tgroup cols="2">
+                <colspec colnum="2" colwidth="1.5*"/>
+                <thead>
+                  <row>
+                    <entry>Keyword</entry>
+                    <entry>Description</entry>
+                  </row>
+                </thead>
 		<tbody>
 		  <row>
 		    <entry>time</entry>
@@ -631,7 +932,9 @@
 		</tbody>
 	      </tgroup>
 	    </tabular>
-	  </p>
+          </table>
+
+          <p>Type: string; defaults: see above.</p>
 
 	</subsubsect>
 
@@ -650,7 +953,7 @@
 	      url="http://archive.eso.org/skycat/skycat-faq.html"
 	      >SkyCat FAQ</webref>.</p>
 
-	  <p>Default: absent</p>
+	  <p>Type: string; default: built-in defaults</p>
 	</subsubsect>
 
 	<subsubsect id="opt.temp">
@@ -672,7 +975,7 @@
 	    primarily a debugging facility, is subtle, and its use is
 	    discouraged.</p>
 
-	  <p>Default: absent</p>
+	  <p>Type: string; default: generated</p>
 	</subsubsect>
 
 	<subsubsect id="opt.timeout">
@@ -689,7 +992,7 @@
 	    finished, and produces a rather messy error message.  In
 	    this circumstance, you can increase the timeout here.</p>
 
-	  <p>Default: 180</p>
+	  <p>Type: integer; default: 180</p>
 	</subsubsect>
 
 	<subsubsect id="opt.verbose">
@@ -697,10 +1000,12 @@
 	    <title>--verbose</title>
 	  </subhead>
 
-	  <p>If true, the script produces a good deal of chatter to
-	    the standard error; if false, this is suppressed.</p>
+	  <p>If present, the
+            script produces a good deal of chatter to the standard
+            error; if false (<code>&ddash;noverbose</code>), this is
+            suppressed.</p>
 
-	  <p>Default: false</p>
+	  <p>Type: switch; default: false</p>
 	</subsubsect>
 
 	<subsubsect id="opt.version">
@@ -708,12 +1013,11 @@
 	    <title>--version</title>
 	  </subhead>
 
-	  <p>If true, write the version number to the standard output
-	    and exit; if false, don't.</p>
+	  <p>If present, write the version number to the standard
+            output and exit.</p>
 
-	  <p>Default: false.</p>
+	  <p>Type: switch; default: false.</p>
 	</subsubsect>
-
 
       </subsect>
 
@@ -750,20 +1054,22 @@
 
       <p>The script uses other Starlink software tools.  Although the
 	use of these tools should be transparent, it might be of use
-	to have some indication of sources of further detail.</p>
-
+	to have some indication of sources of further detail.  All of
+        these tools should be up-to-date if you are using a Starlink
+        Summer 2003 distribution or later.</p>
 
       <p>The script is largely a wrapper for &astrom;.  This is
-	documented fully in SUN/5.</p>
+	documented fully in <docxref doc="sun5"/>.</p>
 
       <p>The pattern matching facilities which the script depends on
 	come from the &findoff; application within CCDPACK.  There are
-	further details in SUN/139.  Need version 4.0-1 or
-	better (the program searches for this in
+	further details in <docxref doc="sun139"/>.  You need version
+        4.0-1 at least, and the program does, of course, respect any
+        setting of the environment variable
 	<code>CCDPACK_DIR</code>).</p>
 
       <p>The WCS information is largely handled by ATOOLS.  This does
-	not have a SUN yet.   Need ATOOLS 1.3 or better
+	not have a SUN yet.   You need ATOOLS 1.3 or better
 	(<code>ATOOLS_DIR</code>).</p>
 
       <p>&autoastrom; requires AST 1.8-1 or better to build.  Depending
@@ -774,31 +1080,33 @@
 	time (see <ref id="build"/>), to tell the build script where
 	to find it.</p>
 
-      <p>It also needs StarPerl (see SUN/228).</p>
+      <p>It also needs StarPerl (see <docxref doc="sun228"/>).</p>
 
       <!--
       <p>NDFPACK and KAPPA: Ref to KAPPA docs.</p>
       -->
 
       <p>The concepts underlying WCS, and its interaction with
-	FITS-WCS, are described in the AST documentation.  See SUN/210
-	and 211.</p>
+	FITS-WCS, are described in the AST documentation.  See
+        <docxref doc="sun211"/>.</p>
 
       <p>Extraction of the object catalogues from the CCD is done by
 	Extractor, which is the Starlink version of Emmanuel Bertin's
-	SExtractor.  Extractor is documented in SUN/226.  The original
-	SExtractor source is available at
-	<url>http://www.tass-survey.org/tass/software/software.html#sextract</url>,
-	and the documentation is available at Starlink sites as MUD/165
-	(Postscript only).</p>
+	SExtractor.  Extractor is documented in <docxref
+          doc="sun226"/>.  See also the
+        SExtractor manual <docxref doc="mud165"/>, the home of
+        SExtractor on the web <citation>sextractor-web</citation>, the
+        distribution location <citation>sextractor-ftp</citation> and the
+        original SExtractor article
+        <citation>sextractor-article</citation>.</p>
 
       <p>If you need to supply the initial astrometry which this
-	script requires, you can do that using GAIA.  This is
-	documented in SUN/214, but it's very easy to use, and you
-	might be best to simply start it up (give the command
-	<code>gaia image_name</code>, presuming you have already done
-	the initialisation to use Starlink software) and experiment.
-	<!-- Give some help with this. --></p>
+      script requires, you can do that using GAIA.  This is documented
+      in <docxref doc="sun214"/>, but it's very easy to use, and you
+      might be best to simply start it up (give the command <code>gaia
+      image_name</code>, presuming you have already done the
+      initialisation to use Starlink software) and experiment.
+        <!-- Is it necessary to give some help with this? --></p>
 
       <subsect id="environment" export="export">
 	<subhead>
@@ -842,20 +1150,16 @@
 	  reference to that subroutine to the
 	  appropriate member of the hash <code>%helpers</code>.</p>
 
-	<p>&autoastrom; comes with a single plugin, to use the
-	  <code>match</code> application for object matching, rather
-	  than CCDPACK's `findoff'.  To use this, specify `match' as the
-	  argument to the `match' option, as <code>--match=match</code>
-	  (see <ref id="opt.match"/>).  The plugin checks at runtime to
-	    see if the <code>match</code> application is present in the
-	  directory pointed to by <code>AUTOASTROM_DIR</code>, and the
-	  plugin will not be installed if the application is not found.
-	  To install the application, download it from the
-	  <code>match</code> home page at
-	  <url>http://acd188a-005.rit.edu/match/</url> and install it in
-	  the directory pointed to by <code>AUTOASTROM_DIR</code>.
-	  &autoastrom; has been tested with match versions 0.3 and
-	  0.4.</p>
+	<p>&autoastrom; comes with a single plugin, to use Michael W
+          Richmond's <code>match</code> application for object matching.
+          To use this, specify `match' as the argument to the `match'
+          option, as <code>--match=match</code> (see <ref
+            id="opt.match"/>).  The plugin checks at runtime to see if the
+          <code>match</code> application is present in the directory
+          pointed to by <code>AUTOASTROM_DIR</code>, and the plugin will
+          not be installed if the application is not found.
+          &autoastrom; has been tested with match versions 0.3, 0.4 and
+          0.7.</p>
 
 	<p>If you wish to add further plugins, see the documentation
 	  for the function <code>match_positions</code>.  That is
@@ -872,15 +1176,9 @@
 	<title>Future developments</title>
       </subhead>
 
-      <p>Very soon, it will be possible to specify the initial
-	estimate astronmetry on the command-line, rather than by
-	using GAIA to create WCS information within the NDF.  As an
-	alternative route, the application will be modified to attempt 
-	to find such astrometry within any FITS headers attached to
-	the image.</p>
-
-      <p>As a longer-term goal, it might be possible to automate even
-	this, if there is some reasonable way of estimating
+      <p>As a longer-term goal, it <em>might</em> be possible to
+        automate even the discovery of the initial pointing, if there
+        is some reasonable way of estimating 
 	plate-centre and plate-scale information <foreign>ex
 	  nihil</foreign>, from the pattern of objects in the plate.</p>
 
@@ -960,7 +1258,7 @@
 </sun>
 
 <!-- Local Variables: -->
-<!-- mode: sgml -->
+<!-- mode: xml -->
 <!-- sgml-indent-data: t -->
 <!-- sgml-indent-step: 2 -->
 <!-- End: -->

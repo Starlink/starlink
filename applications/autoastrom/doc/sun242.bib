@@ -1,10 +1,35 @@
+@string{aa="Astron.\ Astrophys."}
+@string{aas="Astron.\ Astrophys.\ Suppl.\ Ser."}
+@string{pasp="Publications of the Astronomical Society of the Pacific"}
+
 @webpage{fits-y2k,
 title="Year-2000 DATExxxx Agreement",
 url="ftp://nssdc.gsfc.nasa.gov/pub/fits/year2000_announcement.txt",
 }
 
+@Webpage{sextractor-ftp,
+  url =          {ftp://ftp.iap.fr/pub/from_users/bertin/sextractor/},
+  title =        {SExtractor distribution},
+  author =       {Emmanuel Bertin},
+  year =         2001,
+  lastchecked =  {15 August 2003}
+}
 
+@Webpage{sextractor-web,
+  url =          {http://www.tass-survey.org/tass/software/software.html#sextract},
+  title =        {SExtractor program},
+  author =       {Emmanuel Bertin},
+  lastchecked =  {15 August 2003}
+}
 
+@Article{sextractor-article,
+  author =       {Emmanuel Bertin},
+  title =        {SExtractor: Software for Source Extraction},
+  journal =      aas,
+  year =         1996,
+  volume =       117,
+  pages =        393
+}
 
 @article{nost-100-2,
     author = {{Hanisch}, R.~J. and {Farris}, A. and {Greisen},
@@ -12,7 +37,7 @@ url="ftp://nssdc.gsfc.nasa.gov/pub/fits/year2000_announcement.txt",
                   B.~M. and {Teuben}, P.~J. and {Thompson}, R.~W. and
                   {Warnock}, A.},
     title = "Definition of the Flexible Image Transport System {(FITS)}",
-    journal = {Astronomy and Astrophysics},
+    journal = aa,
     year = 2001,
     month = sep,
     volume = 376,
@@ -21,22 +46,25 @@ url="ftp://nssdc.gsfc.nasa.gov/pub/fits/year2000_announcement.txt",
     adsnote = {Provided by the NASA Astrophysics Data System}
 }
 
-
-@Misc{fitswcs1,
+@article{fitswcs1,
   author = 	 {Eric W Greisen and Mark Calabretta},
   title = 	 {Representations of World Coordinates in {FITS}
                   {(``Paper~I'')}},
-  year = 	 1999,
-  note =	 {Draft},
-  url =		 {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+  journal =      aa,
+  year = 	 2002,
+  volume =       {395},
+  pages =        {1061-1075},
+  url =	         {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
 }
 
-@Misc{fitswcs2,
+@article{fitswcs2,
   author = 	 {Mark Calabretta and Eric W Greisen},
   title = 	 {Representations of Celestial Coordinates in {FITS}
                   {(``Paper~II'')}},
-  year = 	 1999,
-  note =	 {Draft},
+  journal =      aa,
+  year = 	 2002,
+  volume =       {395},
+  pages =        {1077-1122},
   url =		 {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
 }
 
@@ -49,4 +77,26 @@ url="ftp://nssdc.gsfc.nasa.gov/pub/fits/year2000_announcement.txt",
   url =		 {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
 }
 
+
+
+@Webpage{match-home,
+  url =          {http://stupendous.rit.edu/richmond/},
+  title =        {Matching lists of stars},
+  author =       {Michael W. Richmond},
+  year =         2003,
+  lastchecked =  {August 2003},
+  note =         {URL sometimes quoted as http://acd188a-005.rit.edu/match/}
+}
+
+@Article{valdes95,
+  author =       {Valdes, Francisco G. and Campusano, Luis E. and
+                  Velasquez, Juan D. and Stetson, Peter B.},
+  title =        {{FOCAS} Automatic Catalog Matching Algorithms},
+  journal =      pasp,
+  year =         1995,
+  volume =       107,
+  pages =        1119,
+  month =        nov,
+  url =          {http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1995PASP..107.1119V&db_key=AST&high=39463d35aa24090}
+}
 
