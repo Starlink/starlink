@@ -35,7 +35,7 @@ $Id$
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
 ;; document.  We have to do it rather more by hand, therefore.
-;; Don't yet support the IDS attribute.
+;; Don't yet support the `includeonly' attribute.
 (element codecollection
   (make sequence
     ($latex-section$ "section" children: #f) ;don't process children
@@ -135,6 +135,23 @@ $Id$
 					  (trim-data (element-with-id auth-id))
 					  ", "
 					  (format-date date-str))))
+	(process-children))))
+  (element routine
+    (let* ((rp (select-elements (children (current-node)) 'routineprologue))
+	   (rn (and (not (node-list-empty? rp))
+		    (select-elements (children rp) 'routinename)))
+	   (id (or (attribute-string (normalize "id") (current-node))
+		   (attribute-string (normalize "id") rn))))
+      (make sequence
+	(make command name: "subsection"
+	      (if id
+		  (make empty-command name: "label"
+			parameters: `(,(string-append "R" id)))
+		  (empty-sosofo))
+	      (if (node-list-empty? rn)
+		  (literal "Anonymous routine")
+		  (with-mode routine-ref-get-reference
+		    (process-node-list rn))))
 	(process-children))))
   (element routineopener
     (empty-sosofo))
@@ -325,3 +342,33 @@ $Id$
   (element name
     (process-children)))
 
+(element coderef
+  (let* ((cc (node-list-or-false
+	      (element-with-id (attribute-string (normalize "collection")))))
+	 (ccdoc (and cc
+		     (document-element-from-entity
+		      (attribute-string (normalize "doc") cc))))
+	 (target (and ccdoc
+		      (node-list-or-false
+		       (element-with-id (attribute-string (normalize "id"))
+					ccdoc))))
+	 (targetroutine (and target
+			     (if (equal? (gi target) (normalize "routine"))
+				 target
+				 (ancestor (normalize "routine")
+					   target)))))
+    (make sequence
+      (process-children)
+      (if targetroutine
+	  (make sequence
+	    (literal " (p.")
+	    (make empty-command name: "pageref"
+		  parameters: `(,(string-append
+				  "R"
+				  (attribute-string (normalize "id")))))
+	    (literal ")")
+	    (empty-sosofo))
+	  (error (string-append "Can't find one of collection "
+			      (attribute-string (normalize "collection"))
+			      " or routine "
+			      (attribute-string (normalize "id"))))))))
