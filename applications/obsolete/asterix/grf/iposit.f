@@ -9,6 +9,7 @@
 *     22 Oct 90: V1.2-1 positions in various frames (RJV)
 *      1 Jul 93: V1.2-2 GTR used (RJV)
 *      7 Apr 95: V1.8-0 list entry and selection (RJV)
+*     20 NOV 95: V2.0-0 GUI version (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -22,12 +23,14 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
+      CHARACTER*20 OPTION
+      INTEGER OID,NB
       LOGICAL ENTER,SEL,SHOW
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IPOSIT Version 1.8-0')
+      PARAMETER (VERSION='IPOSIT Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -39,32 +42,47 @@
         CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
 
-*  see if dealing with multiple positions
-        CALL USI_GET0L('ENTER',ENTER,STATUS)
-        IF (ENTER) THEN
-
-          CALL IPOSIT_ENTER(STATUS)
-
-        ELSEIF (I_NPOS.GT.0) THEN
-          CALL USI_GET0L('SHOW',SHOW,STATUS)
-          IF (SHOW) THEN
-
-            CALL IPOSIT_SHOW(STATUS)
-
-          ELSE
-            CALL USI_GET0L('SEL',SEL,STATUS)
-            IF (SEL) THEN
-
-              CALL IPOSIT_SELECT(STATUS)
-
-            ENDIF
+*  being run from a GUI - find out which mode
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
+          CALL NBS_GET_CVALUE(OID,0,OPTION,NB,STATUS)
+          IF (OPTION.EQ.'TRACK') THEN
+            CALL IPOSIT_GUI(STATUS)
           ENDIF
+        ELSE
+          OPTION=' '
         ENDIF
 
-*  single position mode
-        IF (.NOT.(ENTER.OR.SHOW.OR.SEL)) THEN
+        IF (OPTION.NE.'TRACK') THEN
 
-          CALL IPOSIT_SINGLE(STATUS)
+*  see if dealing with multiple positions
+          CALL USI_GET0L('ENTER',ENTER,STATUS)
+          IF (ENTER) THEN
+
+            CALL IPOSIT_ENTER(STATUS)
+
+          ELSEIF (I_NPOS.GT.0) THEN
+            CALL USI_GET0L('SHOW',SHOW,STATUS)
+            IF (SHOW) THEN
+
+              CALL IPOSIT_SHOW(STATUS)
+
+            ELSE
+              CALL USI_GET0L('SEL',SEL,STATUS)
+              IF (SEL) THEN
+
+                CALL IPOSIT_SELECT(STATUS)
+
+              ENDIF
+            ENDIF
+          ENDIF
+
+*  single position mode
+          IF (.NOT.(ENTER.OR.SHOW.OR.SEL)) THEN
+
+            CALL IPOSIT_SINGLE(STATUS)
+
+          ENDIF
 
         ENDIF
 
@@ -74,7 +92,6 @@
       CALL USI_CLOSE()
 
       END
-
 
 
 *+  IPOSIT_SINGLE - set current position to given single position
@@ -517,6 +534,124 @@
 
         RADEC=(NDIGIT.GE.4.AND.NDOT.LE.2.AND.NMINUS.LE.1.AND.
      :                       (NDIGIT+NDOT+NMINUS+NDELIM).EQ.L)
+
+      ENDIF
+
+      END
+
+
+
+
+*+  IPOSIT_GUI
+      SUBROUTINE IPOSIT_GUI(STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local Constants :
+*    Local variables :
+      REAL XP,YP
+      CHARACTER*8 NAME
+      CHARACTER*8 STRING
+      CHARACTER*10 FMT
+      CHARACTER*12 OPTIONS
+      CHARACTER*12 RAS,DECS
+      BYTE Q
+      INTEGER IXP,IYP,IXPMAX,IYPMAX
+      INTEGER IX,IY
+      INTEGER I,J,II,JJ
+      INTEGER I1,I2,J1,J2
+      INTEGER ISTAT
+      INTEGER XPID,YPID,XPMID,YPMID,DID(NX,NY),FID,OID,XID,YID
+      INTEGER RAID,DECID
+      INTEGER FLAG
+      INTEGER ISCALE
+      INTEGER NB
+      REAL XP1,XP2,YP1,YP2
+      REAL XW,YW
+      REAL XW1,XW2,YW1,YW2
+      REAL SCVAL,VAL,VAL2
+      REAL XC,YC,DX,DY
+      REAL XSCALE,YSCALE
+      DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
+      LOGICAL VAR,ERR,SIGNIF,QUAL
+*    Global Variables :
+      INCLUDE 'IMG_CMN'
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  locate noticeboard items
+        CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XP',XPID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'RA',RAID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'DEC',DECID,STATUS)
+        NAME='DATA'
+        CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
+
+*  get device size
+        CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,NB,STATUS)
+        CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,NB,STATUS)
+
+*  get plot window parameters
+        CALL PGQVP(3,XP1,XP2,YP1,YP2)
+        CALL PGQWIN(XW1,XW2,YW1,YW2)
+
+        XSCALE=(XW2-XW1)/(XP2-XP1)
+        YSCALE=(YW2-YW1)/(YP2-YP1)
+
+        FLAG=0
+        DO WHILE (FLAG.EQ.0)
+
+*  get current cursor position in device coords
+          CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
+          CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
+          IYP=IYPMAX-IYP
+
+*  convert to world coords
+          XW=XW1+(REAL(IXP)-XP1)*XSCALE
+          YW=YW1+(REAL(IYP)-YP1)*YSCALE
+
+*  convert to other frames
+          CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
+          CALL IMG_WORLDTOCEL(XW,YW,RA,DEC,STATUS)
+          CALL CONV_DEGHMS(REAL(RA),RAS)
+          CALL CONV_DEGDMS(REAL(DEC),DECS)
+          CALL IMG_WORLDTOECL(XW,YW,ELON,ELAT,STATUS)
+          CALL IMG_WORLDTOGAL(XW,YW,GLON,GLAT,STATUS)
+
+
+          CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
+          CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
+          CALL NBS_PUT_CVALUE(RAID,0,RAS,STATUS)
+          CALL NBS_PUT_CVALUE(DECID,0,DECS,STATUS)
+          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+
+        ENDDO
+
+        IF (FLAG.EQ.1) THEN
+          CALL IMG_SETPOS(XW,YW,STATUS)
+        ENDIF
+
 
       ENDIF
 
