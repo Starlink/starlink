@@ -13,8 +13,10 @@
  
 *  Description:
 *     This file contains definitions of the public global constants used
-*     by the GSD_ system.
- 
+*     by the GSD_ system. PRM_PAR must be included by the calling program
+*     before including this file. [this is for backwards compatibility
+*     reasons since you can't include the same include file twice]
+
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     RPT: Remo Tilanus (JAC)
@@ -22,7 +24,7 @@
 
 *  History:
 *     13-MAR-2004 (TIMJ):
-*        Add standard prologue. Now force include of PRM_PAR.
+*        Add standard prologue.
 
 *  Copyright: 
 *     Copyright (C) 1994-1999,2004 Particle Physics and Astronomy
@@ -31,7 +33,6 @@
 *-
 
 *  External Constants:
-      INCLUDE 'PRM_PAR'
 
 * 
 *  Parameter definitions for the GSD system
