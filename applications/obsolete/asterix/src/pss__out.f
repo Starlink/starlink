@@ -1,5 +1,5 @@
 *+  PSS_OUT_CLOSE - Close output SSDS
-      SUBROUTINE PSS_OUT_CLOSE( IFILE, SLOC, STATUS )
+      SUBROUTINE PSS_OUT_CLOSE( IFILE, SID, STATUS )
 *
 *    Description :
 *
@@ -39,15 +39,15 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Close the file
-      CALL SSO_RELEASE( SLOC, STATUS )
+      CALL SSI_RELEASE( SID, STATUS )
 
 *    MULTI mode?
       IF ( CP_MULTI ) THEN
         IF ( IFILE .GT. 1 ) THEN
-          CALL HDS_CLOSE( SLOC, STATUS )
+          CALL ADI_FCLOSE( SID, STATUS )
         END IF
       ELSE
-        CALL USI_ANNUL( SLOC, STATUS )
+        CALL USI_TANNUL( SID, STATUS )
       END IF
 
       END
@@ -90,7 +90,7 @@
 *
 *    Export :
 *
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SSDS dataset
+      INTEGER			SID			! SSDS dataset
 *
 *    Functions :
 *
@@ -119,24 +119,24 @@
         IF ( MU_SSDS .GT. ' ' ) THEN
           SSDS = MU_SSDS
         ELSE
-          SSDS = MU_IMG(:CHR_LEN(MU_IMG))//'_SS'
+          SSDS = MU_IMG(:CHR_LEN(MU_IMG))//'_ss'
         END IF
 
 *      Create output
-        CALL HDS_NEW( SSDS, 'DATASET', 'SSDS', 0, 0, SLOC, STATUS )
+        CALL ADI_FCREAT( SSDS, 'SSDS', SID, STATUS )
 
       ELSE
 
 *      Get name of user's output file
-        CALL USI_ASSOCO( 'RESULTS', 'SSDS', SLOC, STATUS )
+        CALL USI_TASSOCO( 'RESULTS', 'SSDS', SID, STATUS )
 
       END IF
 
 *    Book-keeping structure
-      CALL SSO_CREBOOK( SLOC, 1, STATUS )
+      CALL SSI_CREBOOK( SID, 1, STATUS )
 
 *    Version number
-      CALL SSO_PUTPAR0C( SLOC, 1, 'CREATOR', 30, PSS__VERSION, STATUS )
+      CALL SSI_PUTPAR0C( SID, 1, 'CREATOR', 30, PSS__VERSION, STATUS )
 
 *   Write parameters varying on IFILE
 
@@ -145,21 +145,20 @@
       CALL PSX_CTIME( NTICKS, PT, STATUS )
  10   FORMAT( A2, '-', A3, '-', A2, ' ', A8 )
       WRITE( STIME, 10 ) PT(9:10), PT(5:7), PT(23:24), PT(12:19)
-      CALL SSO_PUTPAR0C( SLOC, 1, 'CREATED', 20, STIME, STATUS )
+      CALL SSI_PUTPAR0C( SID, 1, 'CREATED', 20, STIME, STATUS )
 
 *    Copy input MORE box
-      CALL DAT_PRIM( IM_LOC, PRIM, STATUS )
-      IF ( .NOT. PRIM ) THEN
-        CALL DAT_THERE( IM_LOC, 'MORE', THERE, STATUS )
-        IF ( THERE ) THEN
-          CALL DAT_FIND( IM_LOC, 'MORE', MLOC, STATUS )
-          CALL SSO_PUTPARS( SLOC, 1, 'MORE', MLOC, STATUS )
-          CALL DAT_ANNUL( MLOC, STATUS )
-        END IF
-      END IF
+c      IF ( .NOT. IM_PRIM ) THEN
+c        CALL DAT_THERE( IM_LOC, 'MORE', THERE, STATUS )
+c        IF ( THERE ) THEN
+c          CALL DAT_FIND( IM_LOC, 'MORE', MLOC, STATUS )
+c          CALL SSO_PUTPARS( SLOC, 1, 'MORE', MLOC, STATUS )
+c          CALL DAT_ANNUL( MLOC, STATUS )
+c        END IF
+c      END IF
 
 *    File searched
-      CALL SSO_PUTPAR0C( SLOC, 1, 'SEARCHED', 132, IM_FILE(:
+      CALL SSI_PUTPAR0C( SID, 1, 'SEARCHED', 132, IM_FILE(:
      :                           CHR_LEN(IM_FILE)), STATUS )
 
       END
@@ -204,7 +203,6 @@
 *
 *    Local variables :
 *
-      CHARACTER                SLOC*(DAT__SZLOC)       ! Source sub'd dataset
       CHARACTER*80             HTEXT(5)                ! History text
 
       REAL                     FC(2)                   ! Source -> pixel vector
@@ -213,16 +211,16 @@
       INTEGER                  HLINES                  ! History text used
       INTEGER                  I                       ! Loop over sources
       INTEGER                  IAX                     ! Loop over axes
-      INTEGER                  SBDA                    ! BAD identifier
       INTEGER                  SDPTR                   ! Subtracted data
       INTEGER                  SC(2)                   ! Source centre pixel
+      INTEGER			SID			! ADI identifier
 *-
 
 *    Check status
       IF ( ( STATUS .EQ. SAI__OK ) .AND. CP_OPT ) THEN
 
 *      Associate dataset
-        CALL USI_ASSOCO( 'SSUB', 'BINDS', SLOC, STATUS )
+        CALL USI_TASSOCO( 'SSUB', 'BINDS', SID, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           CALL MSG_PRNT( 'Creating source subtracted image...' )
         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -236,16 +234,13 @@
           GOTO 99
         END IF
 
-*      Instroduce to BDA system
-        CALL BDA_FIND( SLOC, SBDA, STATUS )
-
 *      Copy input dataset
-	CALL BDA_COPDATA_INT( IM_BDA, SBDA, STATUS )
-	CALL BDA_COPTEXT_INT( IM_BDA, SBDA, STATUS )
-	CALL BDA_COPAXES_INT( IM_BDA, SBDA, STATUS )
+	CALL BDI_COPDATA( IM_ID, SID, STATUS )
+	CALL BDI_COPTEXT( IM_ID, SID, STATUS )
+	CALL BDI_COPAXES( IM_ID, SID, STATUS )
 
 *      Map data to subtract sources
-	CALL BDA_MAPDATA_INT( SBDA, 'UPDATE', SDPTR, STATUS )
+	CALL BDI_MAPDATA( SID, 'UPDATE', SDPTR, STATUS )
 	IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Loop over sources
@@ -306,20 +301,20 @@
 	END IF
 
 *      Copy MORE box
-	CALL BDA_COPMORE_INT( IM_BDA, SBDA, STATUS )
+	CALL BDI_COPMORE( IM_ID, SID, STATUS )
 
 *      Create some HISTORY
-	CALL HIST_COPY( IM_LOC, SLOC, STATUS )
-	CALL HIST_ADD( SLOC, PSS__VERSION, STATUS )
+	CALL HSI_COPY( IM_ID, SID, STATUS )
+	CALL HSI_ADD( SID, PSS__VERSION, STATUS )
 
 *      Bit more information
 	HTEXT(1) = 'Input dataset {INP}'
 	HLINES = 5
 	CALL USI_TEXT( 1, HTEXT, HLINES, STATUS )
-	CALL HIST_PTXT( SLOC, HLINES, HTEXT, STATUS )
+	CALL HSI_PTXT( SLID, HLINES, HTEXT, STATUS )
 
 *      Release the dataset
-	CALL BDA_RELEASE_INT( SBDA, STATUS )
+	CALL BDI_RELEASE( SID, STATUS )
 	CALL USI_CANCL( 'SSUB', STATUS )
 
 *      Tidy up
