@@ -77,3 +77,16 @@
   image coordinate offsets. All images can now be viewed together or
   one-by-one as before. Images should now always scroll and the "Refresh"
   button has been removed.
+
+  Byte images are changed so FITS BITPIX=8 are correctly interpreted
+  as unsigned byte, not signed byte.
+
+  Effects the XY profile and Contouring toolboxes.
+
+  An attempt to clear any old WCS information from a saved image is now made.
+
+  New "gaiadispmany" command to load a list of images into GAIA from the
+  command-line.
+
+
+  Experimental tabbed interface.

@@ -399,7 +399,7 @@ PKG_LINK =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.6-13
+PKG_VERS = 2.7-0
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -417,7 +417,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_skycat.tar \
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh .gaFilters
+PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh gaiadispmany.csh .gaFilters
 
 #  List of IRAF script files. These will be installed in
 #  $(INSTALL_BIN_IRAF). This also includes any other miscellaneous
@@ -541,7 +541,8 @@ LICENCE = COPYING README TODO $(PACK_NAME)_CONDITIONS
 
 GAIA_LIB_FILES =  \
    skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
-   gaiaremote.sh adamMessageRelay displaycat gaiacut zoomcutandflip
+   gaiaremote.sh adamMessageRelay displaycat gaiacut zoomcutandflip \
+   gaiadispmany.csh
 
 GAIA_BIN_FILES = \
  gaia_swish gaia_stcl gaiaMon gaiaMon.ifc ardstat.ifc autocrop.ifc \
@@ -568,7 +569,7 @@ RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer \
 #  Names of scripts that will need 755 protections.
 RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
                   displaycat gaiacut zoomcutandflip gaiawcs2tab \
-                  pix2wcs wcs2pix
+                  pix2wcs wcs2pix gaiadispmany.sh
 
 ################################################################################
 #-------------------------------------------------------------------------------
