@@ -1,7 +1,18 @@
+#+
+# $CGS4DR_CONFIGS/cgs4dr.xopts 
+# 17-Jul-1996: Original (Phil Daly, pnd@jach.hawaii.edu)
+#-
+#
+# Some variables used by the code (NB: use full file spec!)
 PrintCommand "/usr/bin/lp -c"
 PrintOption "file"
 PrintFile ""
+#
+# Generic catch-all 
 xforeground black
+#xbackground wheat
+#
+# Buttons
 xButton.background pink
 xButton.foreground black
 xButton.activeBackground palegreen
@@ -9,6 +20,8 @@ xButton.activeForeground red
 xButton.relief raised
 xButton.width 15
 xButton.font -adobe-helvetica-bold-r-normal--*-140-*
+#
+# Checkbuttons
 xCheckbutton.background wheat
 xCheckbutton.foreground black
 xCheckbutton.activeBackground yellow
@@ -16,10 +29,14 @@ xCheckbutton.activeForeground blue
 xCheckbutton.relief flat
 xCheckbutton.width 15
 xCheckbutton.font -adobe-helvetica-bold-r-normal--*-140-*
+#
+# Dialogue boxes
 xDialog.background wheat
 xDialog.foreground black
 xDialog.relief flat
 xDialog.width 60
+#
+# Radiobuttons
 xRadiobutton.background wheat
 xRadiobutton.foreground black
 xRadiobutton.activeBackground yellow
@@ -27,6 +44,8 @@ xRadiobutton.activeForeground blue
 xRadiobutton.font -adobe-helvetica-bold-r-normal--*-140-*
 xRadiobutton.relief flat
 xRadiobutton.width 15
+#
+# Entry widgets
 xEntry.background snow
 xEntry.foreground black
 xEntry.activeBackground yellow
@@ -34,40 +53,60 @@ xEntry.activeForeground blue
 xEntry.font -adobe-helvetica-medium-o-normal--*-140-*
 xEntry.relief sunken
 xEntry.width 10
+#
+# File widgets
 xFile.height 10
+#
+# Frame Widgets
 xFrame.background wheat
+#
+# Labels
 xLabel.foreground black
 xLabel.background wheat
 xLabel.activeBackground wheat
 xLabel.activeForeground black
 xLabel.font -adobe-helvetica-bold-r-normal--*-140-*
 xLabel.relief flat
+#
+# Listboxes
 xListbox.background wheat
 xListbox.foreground black
 xListbox.font -adobe-helvetica-bold-r-normal--*-140-*
 xListbox.selectBackground palegreen
 xListbox.selectForeground blue
+#
+# Menus
 xMenu.background wheat
 xMenu.foreground black
 xMenu.activeBackground palegreen
 xMenu.activeForeground blue
 xMenu.font -adobe-helvetica-bold-r-normal--*-140-*
+#
+# Menubars
 xMenubar.background wheat
 xMenubar.foreground black
 xMenubar.activeBackground palegreen
 xMenubar.activeForeground blue
 xMenubar.font -adobe-helvetica-bold-r-normal--*-140-*
+#
+# Menubuttons
 xMenubutton.background wheat
 xMenubutton.foreground black
 xMenubutton.activeBackground palegreen
 xMenubutton.activeForeground blue
 xMenubutton.font -adobe-helvetica-bold-r-normal--*-140-*
+#
+# Scrollbars
 xScrollbar.background khaki
 xScrollbar.foreground yellow
 xScrollbar.activeBackground palegreen
 xScrollbar.activeForeground yellow
 xScrollbar.width 12
+#
+# Textpanes
 xText.background snow
 xText.foreground black
+xText.selectBackground palegreen
+xText.selectForeground blue
 xText.font -b&h-lucidatypewriter-medium-r-*-*-*-120-*
 xText.height 25
