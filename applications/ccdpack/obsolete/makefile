@@ -678,7 +678,7 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
- ccg1_kthx.gen ccg1_asli.gen
+ ccg1_kthx.gen ccg1_asli.gen ccg1_odiz.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
