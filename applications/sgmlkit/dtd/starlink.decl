@@ -76,13 +76,22 @@ SYNTAX
                   NAMECASE GENERAL NO
                            ENTITY  NO
          DELIM    GENERAL  SGMLREF
-                  -- NET hack, to make empty entities <name/> --
+                  -- The XML NET hack, to make empty entities <name/> --
                   NESTC "/"
                   NET ">"
                   SHORTREF SGMLREF
+		-- The standard deprecates (13.4.6.2) the use of
+                   shortrefs longer than a single character, "unless
+                  the string is a common keyboarding convention or
+                  coding sequence", which I claim these are, for
+                  Starlink. --
 		"&#RS;*+"
 		"&#RS;*-"
 		"&#RS;*"
+		"&#RS;#+"
+		"&#RS;#-"
+		"&#RS;#!"
+		"&#RS;#"
 		"---"
          NAMES    SGMLREF
          QUANTITY SGMLREF

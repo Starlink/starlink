@@ -1,0 +1,93 @@
+<![ IGNORE [
+  DTD for documenting scripts.
+
+  Calls general programcode DTD (qv).  This covers Perl and both sh
+  and csh scripts.  It could also cover other scripts such as awk or
+  sed, in which case the `script' notation in programcode.dtd should
+  be used.  The shortrefs in this DTD rely on "&#RS;#+", "...#-" and
+  "...#" being defined as shortref strings in the declaration.
+
+  Invoke with
+
+    <!DOCTYPE programcode 
+	PUBLIC "-//Starlink//DTD Script Source Code 0.7//EN">
+
+  Author: 
+    NG: Norman Gray (Glasgow)
+
+  History: May 2000 (NG):
+    Original version
+
+  Copyright 2000, Particle Physics and Astronomy Research Council.
+
+  $Id$
+]]>
+
+<!ENTITY % DTD.Version "DTD Starlink Scriptcode 0.7">
+
+<!--============================== Notation ==============================
+  The Fortran notation is declared in the PROGRAMCODE DTD which this
+  INCLUDEs at the end.
+-->
+<!ENTITY % language.attr	-- language attribute declaration --
+	 "language NOTATION (perl | shell | script) #REQUIRED">
+
+<!--============================== Architectures ==============================
+
+  Declare the PROGRAMCODE DTD to be an architecture.
+
+  This doesn't have a huge impact, but as well as being The Right HyTime
+  Thing To Do, it allows us to impose the PROGRAMCODE structure even
+  on (admittedly rare) files which do whizzy things in their internal
+  DTD subset.
+-->
+<?IS10744 ArcBase programcode>
+<!NOTATION 
+	programcode
+		-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744 --
+	SYSTEM ''>
+<!ENTITY % generalcode.dtd
+	PUBLIC "-//Starlink//DTD Program Source Code 0.7//EN">
+<!ATTLIST #NOTATION programcode
+	ArcFormA
+		NAME #FIXED programcode
+	ArcDTD
+		CDATA "%generalcode.dtd"
+	ArcDocF
+		CDATA #FIXED programcode
+	>
+
+
+<!--============================== Maps ==============================
+
+  Set up maps, to make typing prologues easier.
+
+  Collect a suitable set of starttag and cdata entities.
+
+  First, arrange that ^#+ and ^#- begin and end the prologue, and that
+  ^# is IGNOREd while within the prologue.
+-->
+<!ENTITY startprologue.ref	STARTTAG "routineprologue">
+<!ENTITY endprologue.ref	STARTTAG "codebody">
+<!ENTITY codeopener.ref		STARTTAG "codeopener">
+<!ENTITY nullentity.ref		CDATA "">
+
+<!SHORTREF	generalmap	"&#RS;#+"	startprologue.ref
+						>
+<!SHORTREF	prologuemap	"&#RS;#-"	endprologue.ref
+				"&#RS;#!"	codeopener.ref
+				"&#RS;#"	nullentity.ref
+						>
+
+<!USEMAP	generalmap	programcode	>
+<!USEMAP	prologuemap	routine		>
+
+
+
+<!--============================== DTD Body ==============================
+
+  Finally, INCLUDE the text of the general DTD
+-->
+%generalcode.dtd;

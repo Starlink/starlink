@@ -137,6 +137,18 @@
                          Programming languages - C//EN"
 	>
 
+<!NOTATION perl		PUBLIC
+			"+//IDN www.perl.org//NOTATION Perl Scripting language//EN"
+	>
+
+<!NOTATION shell	PUBLIC
+			"-//Starlink//NOTATION Shell script - sh or csh//EN"
+	>
+
+<!NOTATION script	PUBLIC
+			"-//Starlink//NOTATION Other language script//EN"
+	>
+
 <!--==================== Element structure ====================-->
 <!ELEMENT programcode	O O (docblock, routine*, (codegroup | codereference)*)
 		-- Document element -->
@@ -433,11 +445,6 @@
      appropriate to let the AUTHORREF element have some content, so
      that a suitable note can go in the source-code file, to make it
      more nearly standalone.  -->
-<![ IGNORE [
-<!ELEMENT authorlist	- O ((author+ | authorref+), otherauthors?)>
-<!ELEMENT otherauthors	- O (author+ | authorref+)
-				-- other authors who have contributed -->
-]]>
 <!ELEMENT authorlist	- O (author+, otherauthors?)>
 <!ELEMENT otherauthors	- O (author+)
 				-- other authors who have contributed -->
@@ -452,9 +459,6 @@
 <!ELEMENT authornote	- O (%paralist;)
 				-- Other information/notes about this
 				   author -->
-<![ IGNORE [
-<!ELEMENT authorref	- O (#PCDATA)>
-]]>
 <!ELEMENT change	- O (%paralist;)>
 <!ELEMENT parameter	- O (name, type, description)>
 <!ELEMENT type		- O (#PCDATA)>
@@ -494,23 +498,6 @@
 		#IMPLIED
 	-- etc... add further author details --
 	>
-<![ IGNORE [
-<!ATTLIST authorref
-	id		-- refer to author --
-		IDREF
-		#REQUIRED
-	note		-- Author ref's content can be any
-			   note giving further information.
-			   For example, ISO10179 was listed as
-			   an `author' of some of the routines
-			   in the DSSSL stylesheet, and the
-			   authorref note attribute was used to list
-			   the section where the code was
-			   listed there. --
-		CDATA
-		#IMPLIED
-	>
-]]>
 <!ATTLIST change
 	author		-- who made this mod? --
 		CDATA

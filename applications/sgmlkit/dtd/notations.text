@@ -11,6 +11,9 @@
   the FOSI PUBLIC "-//Starlink//DTD Notation Declarations//EN".  See
   the main DTD for discussion.
 
+  Language notations are not defined here, but instead in the body of
+  the programcode DTD.
+
   TeX and LaTeX notations defined using the ISBN prefix, as defined in
   ISO/IEC 9070:1991, `Information Technology - SGML support facilities
   - Registration procedures for public text owner identifiers'
