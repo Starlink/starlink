@@ -102,6 +102,8 @@
 *        ADI port
 *      4 Jan 1996 V2.0-1 (DJA):
 *        Use USI_NAMES for history update
+*      5 Mar 1996 V2.0-2 (DJA):
+*        Added support for Grouping item
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,13 +127,13 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AXORDER Version V2.0-1' )
+        PARAMETER		( VERSION = 'AXORDER Version V2.0-2' )
 
 *  Local Variables:
       CHARACTER*80              HTXT			! History text
 
       INTEGER                   DIMS(ADI__MXDIM)  	! Input dimensions
-      INTEGER                   IDPTR,IVPTR,IQPTR 	! Input data pointers
+      INTEGER                   IDPTR,IGPTR,IVPTR,IQPTR ! Input data pointers
       INTEGER                   ODIMS(ADI__MXDIM) 	! Output dimensions
       INTEGER                   SELAX(ADI__MXDIM) 	! New axis order
       INTEGER                   I                 	! Loop over dimensions
@@ -140,13 +142,13 @@
       INTEGER			IFILES			! USI input files list
       INTEGER                   IWPTR             	! Input axis widths
       INTEGER                   NDIM              	! Dimensionality
-      INTEGER                   ODPTR,OVPTR,OQPTR 	! Output data pointers
+      INTEGER                   ODPTR,OGPTR,OVPTR,OQPTR ! Output data pointers
       INTEGER			OFID			! Output dataset id
       INTEGER                   OWPTR             	! Output axis widths
       INTEGER                   NSEL              	! # axes specified
 
       LOGICAL                   IWOK              	! Input widths ok?
-      LOGICAL                   OK, VOK, QOK      	! Input objects ok?
+      LOGICAL                   OK, GOK, VOK, QOK      	! Input objects ok?
       LOGICAL                   SPEC(ADI__MXDIM)  	! Axis specified in output?
       LOGICAL                   SWAP_1D           	! Special 1D swap?
 *.
@@ -187,6 +189,12 @@
       CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
       IF ( VOK ) THEN
         CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
+      END IF
+
+*  Grouping
+      CALL BDI_CHK( IFID, 'Grouping', GOK, STATUS )
+      IF ( GOK ) THEN
+        CALL BDI_MAPI( IFID, 'Grouping', 'READ', IGPTR, STATUS )
       END IF
 
 *  Quality
@@ -333,6 +341,9 @@
         IF ( VOK ) THEN
           CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
         END IF
+        IF ( GOK ) THEN
+          CALL BDI_MAPI( OFID, 'Grouping', 'WRITE', OGPTR, STATUS )
+        END IF
         IF ( QOK ) THEN
           CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
         END IF
@@ -351,6 +362,10 @@
         IF ( VOK ) THEN
           CALL AR7_AXSWAP_R( DIMS, %VAL(IVPTR), SELAX, ODIMS,
      :                                  %VAL(OVPTR), STATUS )
+        END IF
+        IF ( GOK ) THEN
+          CALL AR7_AXSWAP_I( DIMS, %VAL(IGPTR), SELAX, ODIMS,
+     :                                  %VAL(OGPTR), STATUS )
         END IF
         IF ( QOK ) THEN
           CALL AR7_AXSWAP_B( DIMS, %VAL(IQPTR), SELAX, ODIMS,
