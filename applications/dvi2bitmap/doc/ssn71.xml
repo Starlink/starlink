@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ssn PUBLIC
               "-//Starlink//DTD Starlink SSN 0.7 (XML)//EN"
-              "ssn-xml-0.7.dtd" [
+              "dtd/ssn-xml-0.7.dtd" [
   <!ENTITY releasenotes SYSTEM "ReleaseNotes">
   <!ENTITY version-number SYSTEM "../VERSION">
   <!--ENTITY ddash CDATA "-x-" -->
@@ -19,7 +19,7 @@
       </author>
     </authorlist>
     <manualtype type="users"></manualtype>
-    <softwareversion>0.13b1</softwareversion>
+    <softwareversion>&version-number;</softwareversion>
     <docnumber documenttype="ssn">71</docnumber>
     <history>
       <version number="0" date="14-JUN-1999" author="ng"><px>Initial
@@ -131,7 +131,7 @@
         <url>http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/</url>.
       </p>
 
-      <p>This document matches version 0.13b1 of the program (you can
+      <p>This document matches version &version-number; of the program (you can
         see what version you have with the command <kbd>dvi2bitmap
           -V</kbd>).  This should currently be regarded as beta
         software.</p>
