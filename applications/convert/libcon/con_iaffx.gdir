@@ -1,4 +1,4 @@
-      SUBROUTINE CON_IAFF<T>( FD, EL, SKIP, A, STATUS )
+      SUBROUTINE CON_IAFF<T>( FD, EL, SKIP, RECLEN, A, STATUS )
 *+
 *  Name:
 *     CON_IAFFx
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_IAFFx( FD, EL, SKIP, A, STATUS )
+*     CALL CON_IAFFx( FD, EL, SKIP, RECLEN, A, STATUS )
 
 *  Description:
 *     This routine reads a numeric array in character form from an
@@ -25,6 +25,9 @@
 *        Number of array elements to process.
 *     SKIP = INTEGER (Given)
 *        Number of records to be skipped before reading the array.
+*     RECLEN = INTEGER (Given)
+*        Maximum length of of record.  It must be in the range 1 to
+*        32766.
 *     A( EL ) = ? (Returned)
 *        Output numeric array.
 *     STATUS = INTEGER (Given and Returned)
@@ -47,7 +50,10 @@
 *  History:
 *     1992 September 18 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 December 2 (MJC):
+*        Pass an additional argument to set the maximum buffer for
+*        efficiency when processing short records.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -65,6 +71,7 @@
       INTEGER FD
       INTEGER EL
       INTEGER SKIP
+      INTEGER RECLEN
 
 *  Arguments Returned:
       <TYPE> A( EL )
@@ -76,9 +83,15 @@
       INTEGER CHR_LEN            ! Length of a character string
                                  ! excluding trailing blanks
 
+*  Local Constants:
+      INTEGER MAXLEN             ! Maximum length records that can be
+                                 ! processed
+      PARAMETER ( MAXLEN = 32766 )
+
 *  Local Variables:
-      CHARACTER * ( 32766 ) BUFFER ! Buffer for input records.
+      CHARACTER * ( MAXLEN ) BUFFER ! Buffer for input records.
       INTEGER I                  ! Loop counter for file records
+      INTEGER MAXREC             ! Effective maximum record length
       INTEGER NC                 ! Number of characters in value
 
 *  Internal References:
@@ -90,11 +103,14 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Set the effective maximum record length.
+      MAXREC = MIN( MAX( 1, RECLEN ), MAXLEN )
+
 *  Skip records.
 *  =============
       IF ( SKIP .GT. 0 ) THEN
          DO  I = 1, SKIP
-            CALL FIO_READ( FD, BUFFER, NC, STATUS )
+            CALL FIO_READ( FD, BUFFER( :MAXREC ), NC, STATUS )
          END DO
       END IF
 
@@ -105,6 +121,6 @@
 *  types use a single conversion-to-character routine in these
 *  subroutines, and hence there are no versions for the other integer
 *  data types.
-      CALL CON_TRND<T>( FD, EL, A, STATUS )
+      CALL CON_TRND<T>( FD, EL, MAXREC, A, STATUS )
 
       END
