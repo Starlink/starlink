@@ -383,7 +383,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 73 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 76 files to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -424,7 +424,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 85 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 86 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Mirage target: javadoc-sources
 
@@ -448,7 +448,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1219 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1227 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
@@ -580,7 +580,6 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -867,7 +866,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 29, 2003 4:22:46 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 30, 2003 4:22:51 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1348,7 +1347,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 71 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 74 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/lib/table
@@ -1372,7 +1371,6 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/ColumnData.java:86: warning - Tag @link: reference not found: storeValue
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
@@ -1382,7 +1380,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 9 warnings
+  [javadoc] 8 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/bin
@@ -1393,7 +1391,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
 [loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 94 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 97 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2701,8 +2699,8 @@ build_demo:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 84 source files to /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Compiling 85 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Note: /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ApplicationInvoker.java uses or overrides a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
@@ -2775,7 +2773,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/treeview
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 95 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 96 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/star/etc
      [echo] Executing Mirage target: install
 
@@ -4137,7 +4135,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectTextField.java:31: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/Utilities.java:66: warning - Tag @link: reference not found: getConfigDirectory
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/ColumnData.java:86: warning - Tag @link: reference not found: storeValue
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
@@ -4155,7 +4152,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 86 warnings
+  [javadoc] 85 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
@@ -4164,4 +4161,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 12 minutes 22 seconds
+Total time: 12 minutes 40 seconds

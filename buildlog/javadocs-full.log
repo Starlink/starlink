@@ -84,7 +84,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 73 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 76 files to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -125,7 +125,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 85 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 86 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Mirage target: javadoc-sources
 
@@ -426,7 +426,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectTextField.java:31: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/Utilities.java:66: warning - Tag @link: reference not found: getConfigDirectory
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/ColumnData.java:86: warning - Tag @link: reference not found: storeValue
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
@@ -444,7 +443,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 86 warnings
+  [javadoc] 85 warnings
 
 BUILD SUCCESSFUL
 Total time: 5 minutes 54 seconds

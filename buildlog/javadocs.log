@@ -504,7 +504,6 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/ColumnData.java:86: warning - Tag @link: reference not found: storeValue
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
@@ -514,7 +513,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 9 warnings
+  [javadoc] 8 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:
