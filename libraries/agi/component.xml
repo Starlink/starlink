@@ -10,7 +10,6 @@
   <dependencies >
     <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Nicholas Eaton</name>
@@ -23,11 +22,10 @@
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
     </person>
-
   </developers>
-  -->
-  <!-- <documentation> sun48</documentation> -->
+  <documentation> sun48</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

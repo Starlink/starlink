@@ -13,7 +13,7 @@ are retained within KAPRH to satisfy any occasional need there may be for
 them. 
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>kaplibs</build><build>hds</build><build>fio</build><build>gks</build><build>gns</build><build>idi</build><build>mers</build><build>ndf</build><build>prm</build><build>par</build><build>sae</build><build>trn</build><build>subpar</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>kaplibs</build><build>hds</build><build>fio</build><build>gks</build><build>gns</build><build>idi</build><build>mers</build><build>ndf</build><build>prm</build><build>par</build><build>sae</build><build>trn</build><build>subpar</build><build>shl</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

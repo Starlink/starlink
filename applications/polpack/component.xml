@@ -13,7 +13,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><build>kaplibs</build><build>ard</build><build>pgplot</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><build>kaplibs</build><build>ard</build><build>pgplot</build><build>shl</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
