@@ -391,9 +391,6 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      Visual *visual;
      int screenX1, screenY1, screenX2, screenY2;
  
-     fprintf( stderr, 
-              "Using the correct version of postscript printing commands");
-
      if (prepass) {
          return TCL_OK;
      }
