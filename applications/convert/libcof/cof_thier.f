@@ -145,8 +145,8 @@
 
 *  Trace through the primitive elements and create a FITS binary table
 *  for them.
-            CALL COF_H2BIN( LCELL( STK ), FUNIT, EXTLEV, ' ', WRITTN,
-     :                      STATUS )
+            CALL COF_H2BIN( LCELL( STK ), LVEC( STK ), FUNIT, EXTLEV,
+     :                      ' ', WRITTN, STATUS )
 
 *  Although some processing could be avoid if the structure does not
 *  contain any further structures, it is easier to follow if each is
