@@ -1,154 +1,148 @@
+      SUBROUTINE ADI2_IMGCNV ( CACHEID, PTR, DTYPE, STATUS )
+*+
+*  Name:
+*     ADI2_IMGCNV
 
-      SUBROUTINE ADI2_IMGCNV ( PTR, TYPE, DTYPE, NDIM, DIMS, STATUS )
+*  Purpose:
+*     Convert FITS file cache data to the correct type
 
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ADI2_IMGCNV ( CACHEID, PTR, DTYPE, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     CACHEID = INTEGER (given)
+*        FITS data object to map
+*     PTR = INTEGER (given and returned)
+*        Mapped data pointer
+*     DTYPE = CHARACTER*(*) (given)
+*        Required data type for final mapped data
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
+
+*  Keywords:
+*     package:adi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1997
+
+*  Authors:
+*     RB: Richard Beard (ROSAT, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      27 Jan 1997 (RB)
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			CACHEID
+      CHARACTER*(*)		DTYPE
+
+*  Arguments Returned:
       INTEGER			PTR
-      INTEGER			STATUS
-      INTEGER			NDIM, DIMS(*)
-      CHARACTER*(*)		TYPE, DTYPE
-      INTEGER			NELM
-      INTEGER			NID, NPTR
-c     CHARACTER*20		TEXT
-c     INTEGER			NDM, DM(7)
 
-      CALL ADI_NEW( DTYPE, NDIM, DIMS, NID, STATUS )
-      CALL ADI_MAP( NID, DTYPE, 'WRITE', NPTR, STATUS )
+*  Status:
+      INTEGER			STATUS
+
+*  Local Variables:
+      INTEGER			NDIM, DIMS(ADI__MXDIM)	! Data dimensions
+      CHARACTER*8		TYPE			! Initial data type
+      INTEGER			NELM			! Number of elements
+      INTEGER			NID, NPTR		! Holder for final data type
+*.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Do we need to bother?
+      CALL ADI_CGET0C( CACHEID, 'TYPE', TYPE, STATUS )
       IF ( TYPE .EQ. DTYPE ) GOTO 99
 
-*  Hard-coded image array - needs malloc-ing in future
+*  Create space for the final data type
+      CALL ADI_CGET1I( CACHEID, 'SHAPE', ADI__MXDIM, DIMS, NDIM,
+     :                 STATUS )
+      CALL ADI_NEW( DTYPE, NDIM, DIMS, NID, STATUS )
+      CALL ADI_MAP( NID, DTYPE, 'WRITE', NPTR, STATUS )
+
+*  Number of elements mapped
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
-      IF ( NELM .GT. 512*512 ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP ( 'ADI2_IMGCNV', 'Can''t cope with more than 512*512 elements', STATUS )
-      END IF
 
 *  Switch on the final data type
       IF ( DTYPE .EQ. 'REAL' ) THEN
-        CALL ADI2_IC2R( PTR, TYPE, NELM, STATUS )
+        CALL ADI2_IC2R( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
       ELSE IF ( DTYPE .EQ. 'DOUBLE' ) THEN
-        CALL ADI2_IC2D( PTR, TYPE, NELM, STATUS )
+        CALL ADI2_IC2D( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
+      ELSE IF ( DTYPE .EQ. 'INTEGER' ) THEN
+        CALL ADI2_IC2I( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
       ELSE
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'T', DTYPE )
-        CALL ERR_REP( 'ADI2_IMGCNV', 'Can''t cope with final data type ^T', STATUS )
+        CALL ERR_REP( 'ADI2_IMGCNV',
+     :                'Can''t cope with final data type ^T', STATUS )
       END IF
+
+*  Swap over the pointers
+      PTR = NPTR
+
+*  Remove the copied data
+c     CALL ADI_ERASE( NID, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'ADI2_IMGCNV', STATUS )
       END IF
-
-      END
-
-
-      SUBROUTINE ADI2_IC2R( PTR, TYPE, NELM, STATUS )
-
-      INTEGER			PTR
-      INTEGER			NELM
-      INTEGER			STATUS
-      CHARACTER*(*)		TYPE
-      REAL			DATA(512*512)
-
-      INTEGER			UTIL_PLOC
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Switch on initial data type
-      IF ( TYPE .EQ. 'WORD' ) THEN
-        CALL ADI2_ICW2R( %VAL(PTR), DATA(1:NELM), NELM, STATUS )
-      ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'T', TYPE )
-        CALL ERR_REP( 'ADI2_IC2R', 'Can''t cope with initial data type ^T', STATUS )
-      END IF
-
-*  Swap over the data pointers
-      PTR = UTIL_PLOC( DATA )
-
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'ADI2_IC2R', STATUS )
-      END IF
-
-      END
-
-
-      SUBROUTINE ADI2_ICW2R( DIN, DOUT, NELM, STATUS )
-
-      INTEGER*2			DIN(*)
-      REAL			DOUT(*)
-      INTEGER			NELM
-      INTEGER			STATUS
-      INTEGER			I
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Convert all the data
-      DO I = 1, NELM
-        DOUT(I) = REAL(DIN(I))
-      END DO
-
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'ADI2_ICW2R', STATUS )
-      END IF
-
-      END
-
-
-      SUBROUTINE ADI2_IC2D( PTR, TYPE, NELM, STATUS )
-
-      INTEGER			PTR
-      INTEGER			NELM
-      INTEGER			STATUS
-      CHARACTER*(*)		TYPE
-      DOUBLE PRECISION		DATA(512*512)
-
-      INTEGER			UTIL_PLOC
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Switch on initial data type
-      IF ( TYPE .EQ. 'WORD' ) THEN
-        CALL ADI2_ICW2D( %VAL(PTR), DATA(1:NELM), NELM, STATUS )
-      ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'T', TYPE )
-        CALL ERR_REP( 'ADI2_IC2D', 'Can''t cope with initial data type ^T', STATUS )
-      END IF
-
-*  Swap over the data pointers
-      PTR = UTIL_PLOC( DATA )
-
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'ADI2_IC2D', STATUS )
-      END IF
-
-      END
-
-
-      SUBROUTINE ADI2_ICW2D( DIN, DOUT, NELM, STATUS )
-
-      INTEGER*2			DIN(*)
-      DOUBLE PRECISION		DOUT(*)
-      INTEGER			NELM
-      INTEGER			STATUS
-      INTEGER			I
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Convert all the data
-      DO I = 1, NELM
-        DOUT(I) = DBLE(DIN(I))
-      END DO
 
       END
