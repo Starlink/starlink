@@ -249,7 +249,7 @@
 *     cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice
 *        Exactly two positions are obtained within the current picture, 
 *        and are joined with a straight line. The positions are written to 
-*        a FITS binary catalogue called slice.fit but are not displayed on 
+*        a FITS binary catalogue called slice.FIT but are not displayed on 
 *        the screen. The catalogue may be used to communicate the positions 
 *        to later applications (LISTSHOW, PROFILE, etc).
 *     cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"

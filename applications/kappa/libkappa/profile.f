@@ -125,7 +125,7 @@
 *        This example assumes that the current co-ordinate Frame in the NDF 
 *        my_data represents pixel co-ordinates. This can be ensured by
 *        issuing the command "wcsframe my_data pixel" before running
-*        profile. A FITS binary catalogue is created called samps.fit 
+*        profile. A FITS binary catalogue is created called samps.FIT 
 *        containing the positions of all samples in the profile, together with
 *        information describing all the co-ordinate Frames in which the
 *        positions of the samples are known. This file may be examined
@@ -137,14 +137,14 @@
 *        profile starting at RA=15:32:47 DEC=23:40:08, and ending at the same 
 *        RA and DEC=23:42:00. The number of points in the profile is 
 *        determined by the resolution of the data.
-*     profile allsky prof incat=prof_path npoint=200 geodesic outcat=aa
+*     profile allsky prof incat=prof_path npoint=200 geodesic outcat=aa.fit
 *        This examples creates a profile of the NDF allsky through a set of 
-*        points given in a FITS binary catalogue called prof_path.fit. Such 
+*        points given in a FITS binary catalogue called prof_path.FIT. Such 
 *        catalogues can be created (for example) using application CURSOR. 
 *        Each line segment is a geodesic curve. The profile is sampled at 200 
 *        points. The samples positions are written to the output positions 
 *        list aa.fit.
-*     profile allsky2 prof2 mode=point incat=aa 
+*     profile allsky2 prof2 mode=point incat=aa.fit
 *        This examples creates a profile of the NDF allsky2 containing
 *        samples at the positions given in the positions list aa.fit. Thus,
 *        the profiles created by this example and the previous example 
@@ -154,7 +154,7 @@
 *  Notes:
 *     -  This application uses the conventions of the CURSA package (SUN/190)
 *     for determining the formats of input and output positions list 
-*     catalogues. If a file type of .fits is given, then the catalogue is 
+*     catalogues. If a file type of .fit is given, then the catalogue is 
 *     assumed to be a FITS binary table. If a file type of .txt is given, 
 *     then the catalogue is assumed to be stored in a text file in "Small 
 *     Text List" (STL) format. If no file type is given, then ".fit" is 

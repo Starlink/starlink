@@ -135,7 +135,7 @@
 
 *  Examples:
 *     listmake newlist domain=pixel dim=2 
-*        This creates a FITS binary catalogue called newlist.fit containing a 
+*        This creates a FITS binary catalogue called newlist.FIT containing a 
 *        list of positions, together with a description of a single
 *        2-dimensional pixel co-ordinate Frame. The positions are supplied as 
 *        a set of space-separated pixel co-ordinates in response to repeated 
@@ -152,7 +152,7 @@
 *        positions are supplied hours and degrees values in reponse to 
 *        repeated prompts for parameter POSITIONS.
 *     listmake outlist ndf=allsky mode=file file=stars
-*        This creates a FITS binary catalogue called outlist.fit containing a 
+*        This creates a FITS binary catalogue called outlist.FIT containing a 
 *        list of positions, together with descriptions of all the co-ordinate 
 *        Frames contained in the NDF allsky. The positions are supplied
 *        as co-ordinates within the current co-ordinate Frame of the NDF.
@@ -173,7 +173,7 @@
 *        the current co-ordinate Frame of the NDF (if possible) before
 *        being stored in the output positions list. The new positons must
 *        also be supplied in the same Frame (using parameter POSITION).
-*     listmake profpos ndf=prof1 mode=pixel
+*     listmake profpos.fit ndf=prof1 mode=pixel
 *        This creates a positions list called profpos.fit containing the
 *        positions of all the pixel centres in the 1-dimensional NDF
 *        called prof. This could for instance be used as input to 
@@ -183,7 +183,7 @@
 *  Notes:
 *     -  This application uses the conventions of the CURSA package
 *     for determining the formats of input and output catalogues. If a file 
-*     type of .fits is given, then the catalogue is assumed to be a FITS 
+*     type of .fit is given, then the catalogue is assumed to be a FITS 
 *     binary table. If a file type of .txt is given, then the catalogue is 
 *     assumed to be stored in a text file in STL format. If no file type is 
 *     given, then ".fit" is assumed. 
