@@ -102,8 +102,7 @@ _star_build_docs=:
 AC_ARG_WITH(stardocs,
             AS_HELP_STRING([--without-stardocs],
                            [Do not install built documentation (default --with)]),
-            [echo "with-stardocs: <$withval>"
-             if test -z "$withval"; then
+            [if test -z "$withval"; then
                  _star_build_docs=: # default
              elif test "X$withval" = Xno; then
                  _star_build_docs=false
@@ -1142,8 +1141,10 @@ AC_DEFUN([_STAR_RESTFP_FIX],
         AC_REQUIRE([AC_PROG_FC])
         if expr $build_os : 'darwin7' >/dev/null; then
 dnl Only affects OSX/Darwin
-            if test "$GCC" = yes; then
-dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
+            # Following uses undocumented (but probably fairly stable)
+            # autoconf internal variable.
+            if test "$ac_cv_fc_compiler_gnu" = yes; then
+dnl The problem only affects g77/gcc, so we know we're dealing with these below
                 AC_LANG_PUSH(C)
                 rm -f conftest*
                 star_cv_restfp_fixup=unknown
@@ -1152,7 +1153,7 @@ dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
                   test $ac_status = 0
                 } &&
                 sed 's/_restFP/restFP/g' conftest.x>conftest.s &&
-                { AC_TRY_COMMAND($CC -c -o conftest.$objext conftest.s)
+                { AC_TRY_COMMAND($CC -c -o conftest.$ac_objext conftest.s)
                   test $ac_status = 0
                 } || star_cv_restfp_fixup=broken
                 AC_LANG_POP(C)
@@ -1160,7 +1161,7 @@ dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
                     AC_MSG_WARN([unable to assemble restFP test])
                 else
                     # Link this with the C compiler
-                    AC_TRY_COMMAND($CC -o conftest conftest.$ac_object)
+                    AC_TRY_COMMAND($CC -o conftest conftest.$ac_objext)
                     _s_cstatus=$ac_status
                     # Link this with the Fortran compiler
                     AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext)
@@ -1183,7 +1184,7 @@ dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
                 # will be unpredictable: 
                 # http://lists.apple.com/mhonarc/fortran-dev/msg00769.html
                 if test $star_cv_restfp_fixup = yes; then
-                    AC_TRY_COMMAND($FC -o conftest conftest.$objext -L/usr/lib -lgcc)
+                    AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext -L/usr/lib -lgcc)
                     if test $ac_status = 0; then
                         star_cv_restfp_fixup=lgcc
                     fi
@@ -1194,7 +1195,14 @@ dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
                     star_cv_restfp_fixup=broken
                 fi
                 rm -f conftest*
-            else # !gcc
+            elif test -z "$FC"; then
+                # not g77, and indeed no Fortran at all
+                star_cv_restfp_fixup=nofortran
+            else
+                # There is a Fortran, but it's not g77, so either there's no
+                # problem, or it's a mixed-compiler problem that's harder
+                # than we know how to deal with.  But presumably the user
+                # has worked this out.
                 star_cv_restfp_fixup=no
             fi
         else # !Darwin
@@ -1202,9 +1210,15 @@ dnl The problem only affects g77/gcc, so we know we're dealing with gcc below
         fi
         ])
    # Define FCLIBS, just as AC_FC_LIBRARY_LDFLAGS does
-   if test $star_cv_restfp_fixup = lgcc; then
+   case $star_cv_restfp_fixup in
+     lgcc)
        LIBS="$LIBS -L/usr/lib -lgcc"
-   fi
+       ;;
+     nofortran)
+       AC_MSG_NOTICE([No Fortran in path, so presumably no g77/gcc library problems])
+       ;;
+     *) ;;
+   esac
 ])# _STAR_RESTFP_FIX
 
 # Obsolete macros
