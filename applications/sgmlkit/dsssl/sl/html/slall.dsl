@@ -2,6 +2,8 @@
 ;; tidied up and made more modular, but that can wait until there's
 ;; more of it available.
 ;;
+;; Forget about sketchy, this particular file is a MESS!
+;;
 ;; Bits of this freely stolen from Norm Walsh's DocBook stylesheet.
 
 
@@ -161,7 +163,7 @@
 ;			    (if vers
 ;				(literal (string-append vers " / " date))
 ;				(literal date)))))
-	      (if %starlink-banner%
+	      (if (and %starlink-banner% (not suppress-banner))
 		  (make element gi: "TR"
 			(make element gi: "TD"
 			      attributes: (list (list "ALIGN" "CENTER")
@@ -401,6 +403,35 @@
 						     (current-node)))
 		      (list "title" (normalise-string (data (current-node)))))
     (process-children)))
+
+(element figure
+  (let ((kids (children (current-node))))
+  (make element gi: "div"
+	attributes: '(("ALIGN" "CENTER"))
+	(make sequence
+	  (process-node-list (select-elements kids 'figurecontent))
+	  (process-node-list (select-elements kids 'caption))))))
+
+(element caption
+  (make element gi: "p"
+	(make sequence
+	  (literal "Figure: ")
+	  (process-children))))
+
+(element figurecontent
+  (let* ((alt-text (attribute-string (normalize "alt")
+				     (current-node)))
+	 (image-ents (attribute-string (normalize "image")
+				       (current-node)))
+	 (best-ent (and image-ents
+			(get-sysid-by-notation image-ents '("JPEG" "GIF87A")))))
+    (if image-ents
+	(if best-ent
+	    (make empty-element gi: "img"
+		  attributes: (list (list "src" best-ent)
+				    (list "alt" alt-text)))
+	    (error "No suitable entity in figurecontent"))
+	(process-children))))
 
 ;; Lists
 

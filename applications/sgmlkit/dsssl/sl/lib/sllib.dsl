@@ -62,67 +62,6 @@ parent of the node.
 			 (loop (parent cur)
 			       (node-list cur result)))))
 		 nl))
-</codebody></func>
-
-<func>
-<name>document-element
-<description><p>
-Returns the document element of the document containing the given
-node.
-
-<p>Only the <code/SgmlDocument/ node class
-exibits a <code/DocumentElement/ property, so to find the document element
-we first have to find the grove root, which we do by examining the 
-<code/grove-root/ property of the current node.  The only node which doesn't
-have a <code/grove-root/ property (so that the <funcname/node-property/
-routine will correctly return <code/#f/ -- ie, it exhibits the property, but
-with the value <code/#f/) is the root node, but in that case,
-<funcname/current-node/ returns the grove root directly (this isn't clear
-from the standard -- see the discussion on `Finding the root element' in
-the dssslist archive at
-<url>http://www.mulberrytech.com/dsssl/dssslist/</url>).
-<p>The subsequent calls to <funcname/node-property/ default <code/#f/ if 
-the property is not exhibited by the node.  This catches the case where the
-grove root doesn't have any <code/document-element/ property, for example if
-the grove is malformed because it resulted from a call to <funcname/sgml-parse/
-with a non-existent file.
-<returnvalue type="singleton-node-list">The document element, or
-<code/#f/ if not found.
-<parameter optional default='(current-node)'>
-  <name>node
-  <type>node-list
-  <description>this node indicates the grove we want the document element
-  of.
-<codebody>
-(define (document-element #!optional (node (current-node)))
-  (let ((gr (node-property 'grove-root node)))
-    (if gr				; gr is the grove root
-	(node-property 'document-element gr default: #f)
-	;; else we're in the root rule now
-	(node-property 'document-element node default: #f))))
-</codebody>
-</func>
-
-<func>
-<routinename>document-element-from-entity
-<description>
-Return the document element of the document referred to by the
-entity string passed as argument.  
-Uses <funcname/sgml-parse/: see 10179, 10.1.7.
-<returnvalue type="node-list">Document element, or <code/#f/ on error.
-<parameter>
-  ent-name
-  <type>string
-  <description>string containing entity declared in current context
-
-<codebody>
-(define (document-element-from-entity str)
-  (let ((sysid (entity-generated-system-id str)))
-    (and sysid
-	 (document-element (sgml-parse sysid)))))
-</codebody>
-</func>
-
 
 <misccode>
 <description>The old favourites, beloved of Lisp folk

@@ -119,14 +119,30 @@
 		#fixed "docsumma"
 	>
 
-<!-- 
-  Define the TeX notation, using the ISBN prefix, as defined in
+<!--========== Notations ==========
+
+  TeX and LaTeX notations defined using the ISBN prefix, as defined in
   ISO/IEC 9070:1991, `Information Technology - SGML support facilities
   - Registration procedures for public text owner identifiers'
+
+  JPEG notation from the recommendations in ISO/IEC JTC1/WG4 N1958:
+  `Information Processing - Text and office systems - Using SGML
+  Public Identifiers for Specifying Data Notations'.  GIF, EPS and
+  linespecific notations from DocBook's dbnotn.mod module.
 -->
-<!notation tex   public "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
-<!notation latex public "+//ISBN 0-201-52983//NOTATION LaTeX: A
-  document preparation system//EN">
+<!notation tex   public 
+  "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
+<!notation latex public 
+  "+//ISBN 0-201-52983//NOTATION LaTeX: A document preparation system//EN">
+<!NOTATION JPEG     PUBLIC 
+  "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
+    Continuous-tone Still Images (JPEG)//EN">
+<!NOTATION EPS      PUBLIC
+  "+//ISBN 0-201-18127-4::Adobe//NOTATION PostScript Language Ref. Manual//EN">
+<!NOTATION GIF87a   PUBLIC
+  "-//CompuServe//NOTATION Graphics Interchange Format 87a//EN">
+<!notation linespecific system
+  "line ends and leading white space must be preserved in output">
 
 <!--========== Parameter entities for configuration ==========-->
 <!entity % DocClass "SUN">
@@ -640,7 +656,7 @@
 <!--
 <!entity % structuring	"blockquote | table | figure | dl | ul | ol">
 -->
-<!entity % structuring	"blockquote | dl | ul | ol">
+<!entity % structuring	"blockquote | figure | dl | ul | ol">
 
 <!entity % phrase	"%simplephrase | %references">
 <!--
@@ -1144,7 +1160,33 @@
 	src	cdata		#required
 	mime	cdata		#required
 	>
-
-
 ]]>
 
+<!--
+  The FIGURECONTENT element will either contain text of some sort (perhaps
+  verbatim text - amplify the %figurecontent.model), or, perhaps more
+  typically, will contain a list of entities, with associated notations.
+  The down-converter should scan this list, and incorporate that image format
+  which is most suitable.
+-->
+<!entity % figure.model '%update caption?, figurecontent'>
+<!entity % figurecontent.model 'px+'>
+<!element FIGURE - - (%figure.model)>
+<!element FIGURECONTENT - o (%figurecontent.model)>
+<!element CAPTION - o (px+)>
+<!attlist FIGURE
+	float		-- may it be unanchored from its position? --
+		(float|nofloat)
+		nofloat
+	id		-- anchor for reference to this figure --
+		id
+		#implied
+	>
+<!attlist FIGURECONTENT	
+	image		-- entity list for figure content --
+		entities
+		#conref
+	alt		-- descriptive alternative text --
+		cdata
+		#required
+	>

@@ -93,8 +93,16 @@ HyTime A.6.1, for example, or
 <argumentlist none>
 <codebody>
 (define stream-output #f)
-</codebody>
-</func>
+
+<func>
+<routinename>suppress-banner
+<description>If true, then suppress the production of the banner, even when
+  <code/%starlink-banner%/ is true.  Can be conveniently set using Jade, with
+  the option <code/-V suppress-banner/.
+<returnvalue>True if the banner is <em/not/ to be printed.
+<argumentlist none>
+<codebody>
+(define suppress-banner #f)
 
 <misccode>
 <description><p>The rest of the parameters in this group are
@@ -185,7 +193,7 @@ documentation
 
 
 ;; Return a sosofo which produces the Starlink/CCLRC/RAL/PPARC banner,
-;; or false if none is to be produced
+;; or false if none is to be produced.  See also (suppress-banner).
 (define %starlink-banner%
   (make sequence
     (make element gi: "A"
