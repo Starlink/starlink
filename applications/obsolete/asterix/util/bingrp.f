@@ -49,6 +49,10 @@
 *        X value of centre of polar
 *     YCENT = REAL (read)
 *        Y value of centre of polar
+*     REG = LOGICAL (read)
+*        Regular radial bins?
+*     RBNDS = CHAR (read)
+*        Radial bin boundaries
 *     RBIN = REAL (read)
 *        Size of radial bins
 *     NRAD = INTEGER (read)
@@ -73,18 +77,6 @@
 
 *  Side Effects:
 *     {routine_side_effects}...
-
-*  Algorithm:
-*     Check class of object
-*     Obtain user requirements
-*     Map input data
-*     Calculate number of polar bins
-*     Set up output object and map
-*     Rebin data into polar bins
-*     Convert to surface brightness
-*     Unmap data
-*     Update history
-*     Tidy up
 
 *  Accuracy:
 *     {routine_accuracy}
@@ -116,8 +108,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     26 Mar 1996 V2.0-1 (CJE):
+*     26 Mar 1996 V2.0-1 (DJA):
 *        Original Version
+*      2 Apr 1996 V2.0-2 (DJA):
+*        Added irregular bins
 *     {enter_changes_here}
 
 *  Bugs:
@@ -138,7 +132,9 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINGRP Version V2.0-0' )
+        PARAMETER		( VERSION = 'BINGRP Version V2.0-1' )
+      INTEGER			MXRNG
+        PARAMETER		( MXRNG = 100 )
 
 *  Local Variables:
       CHARACTER*40		AUNITS(ADI__MXDIM)	! Axis units
@@ -154,6 +150,7 @@
 							! polar region in pixels
       REAL          		PRBIN			! Radial bin size in pixels
       REAL 	   		RBIN			! Radial bin size in axis units
+      REAL			RBNDS(2*MXRNG)		! Radial boundaries
       REAL          		XCENT,YCENT		! Coords of centre of polar region in
 							! axis units
       REAL          		XLOW,XHIGH,         	! Max and min values of axes
@@ -182,6 +179,7 @@
       LOGICAL			CANCEL			! Cancel mode?
       LOGICAL       		OK			! Object is ok?
       LOGICAL			POLAR			! Polar mode?
+      LOGICAL			REG			! Regular radial bins?
       LOGICAL			UPDATE			! Update mode?
 *.
 
@@ -369,40 +367,61 @@
           PXCENT = (XCENT-AMIN(1)) / ASCALE(1) + 0.5
           PYCENT = (YCENT-AMIN(2)) / ASCALE(2) + 0.5
 
-*      Get radial and azimuthal binsizes
-          CALL USI_GET0R('RBIN',RBIN,STATUS)
-          CALL USI_GET0R('ABIN',ABIN, STATUS)
+*      Regular or irregular bins?
+          CALL USI_GET0L( 'REG', REG, STATUS )
           IF (STATUS .NE. SAI__OK) GOTO 99
+
+*      Regular? Use bin width and number
+          IF ( REG ) THEN
+
+*        Get radial bin width
+            CALL USI_GET0R( 'RBIN', RBIN, STATUS )
 
 *      Calculate number of output bins in each dimension
 *      Find closest border distance in axis units
-          DIST = MIN( (XHIGH-XCENT), (XCENT-XLOW), (YHIGH-YCENT),
+            DIST = MIN( (XHIGH-XCENT), (XCENT-XLOW), (YHIGH-YCENT),
      :                                              (YCENT-YLOW) )
-          NRBIN=INT(DIST/RBIN)
+            NRBIN=INT(DIST/RBIN)
 
-*      Only 1 radial bin
-          IF (NRBIN .LT. 1) THEN
-            NRBIN=1
-            RBIN=DIST/NRBIN
-          ELSE
-*   See if limit on radial extent
-            CALL USI_DEF0I('NRAD',NRBIN,STATUS)
-            CALL USI_GET0I('NRAD',NRAD,STATUS)
-            IF (NRAD.LT.NRBIN) THEN
-              NRBIN=NRAD
-            ELSE
+*        Only 1 radial bin
+            IF (NRBIN .LT. 1) THEN
+              NRBIN=1
               RBIN=DIST/NRBIN
+            ELSE
+*     See if limit on radial extent
+              CALL USI_DEF0I('NRAD',NRBIN,STATUS)
+              CALL USI_GET0I('NRAD',NRAD,STATUS)
+              IF (NRAD.LT.NRBIN) THEN
+                NRBIN=NRAD
+              ELSE
+                RBIN=DIST/NRBIN
+              ENDIF
             ENDIF
-          ENDIF
-          PRBIN=ABS(RBIN/ASCALE(1))
+            PRBIN=ABS(RBIN/ASCALE(1))
 
-*       Calc number of azimuthal bins
-          NABIN=NINT(360./ABIN)
+*      If irregular, get bounds
+          ELSE
+
+*        Find farthest border distance in axis units
+            DIST = MAX( (XHIGH-XCENT), (XCENT-XLOW), (YHIGH-YCENT),
+     :                                               (YCENT-YLOW) )
+
+*        Get ranges
+            CALL PRS_GETRANGES( 'RBNDS', MXRNG*2, 1, 0.0, DIST,
+     :                          RBNDS, NRBIN, STATUS )
+            NRBIN = NRBIN + 1
+
+          END IF
+          IF (STATUS .NE. SAI__OK) GOTO 99
+
+*      Calc number of azimuthal bins
+          CALL USI_GET0R('ABIN',ABIN, STATUS)
+          NABIN = NINT(360.0/ABIN)
           IF (NABIN .LT. 1) NABIN=1
-          ABIN=360./REAL(NABIN)
+          ABIN = 360.0/REAL(NABIN)
 
 *      Tell user the binning being used.
-          CALL MSG_SETI('NRBIN', NRBIN)
+          CALL MSG_SETI( 'NRBIN', NRBIN )
           IF ( NABIN .EQ. 1 ) THEN
             CALL MSG_PRNT( 'Grouping into ^NRBIN radial bins' )
           ELSE
@@ -423,8 +442,9 @@
           END IF
 
 *      Polar index the first slice
-          CALL IMG_POLIDX( DIMS(1), DIMS(2), PXCENT, PYCENT, PRBIN,
-     :                    AZANG, NRBIN, NABIN, %VAL(GPTR), STATUS )
+          CALL IMG_POLIDX( DIMS(1), DIMS(2), PXCENT, PYCENT, REG,
+     :                     PRBIN, RBNDS,
+     :                     AZANG, NRBIN, NABIN, %VAL(GPTR), STATUS )
 
 *    End of ARD/POLAR switch
         END IF
