@@ -58,4 +58,10 @@ interface IBGND
     vpath 'INTERNAL,NOPROMPT'
   endparameter
 
+  parameter OUT
+    type 'LITERAL'
+    prompt 'Output filename'
+    help 'The file in which the background model will be saved'
+  endparameter
+
 endinterface
