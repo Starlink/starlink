@@ -102,6 +102,7 @@
       EXTERNAL			GMI1_NEWLNK
       EXTERNAL			GMI1_SETLNK
 
+      EXTERNAL			UDI0_COPANC
       EXTERNAL			UDI1_COPANC
 
 *  Local Variables:
@@ -155,6 +156,8 @@
 *  Ancillary copying
       CALL ADI_DEFMTH( 'CopyAncillary(_,_HDSfile,_,_HDSfile,_CHAR)',
      :                 UDI1_COPANC, DID, STATUS )
+      CALL ADI_DEFMTH( 'CopyAncillary(_,_FITSfile,_,_HDSfile,_CHAR)',
+     :                 UDI0_COPANC, DID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_INIT', STATUS )

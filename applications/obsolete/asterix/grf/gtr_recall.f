@@ -15,7 +15,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GMD_PAR'
 *    Import :
       INTEGER PLOT
@@ -52,7 +51,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GTR_RECALL',STATUS)
+          CALL AST_REXIT('GTR_RECALL',STATUS)
         ENDIF
 
       ENDIF

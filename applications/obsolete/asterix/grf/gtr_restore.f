@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GMD_PAR'
 *    Import :
 *    Import-export :
@@ -63,7 +62,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GTR_RESTORE',STATUS)
+          CALL AST_REXIT('GTR_RESTORE',STATUS)
         ENDIF
 
       ENDIF

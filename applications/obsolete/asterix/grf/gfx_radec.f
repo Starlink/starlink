@@ -1,5 +1,5 @@
 *+  GFX_RADEC - plot RADEC axes
-      SUBROUTINE GFX_RADEC(UNITS,RA,DEC,ROLL,STATUS)
+      SUBROUTINE GFX_RADEC(PIXID,PRJID,SYSID,STATUS)
 
 *    Description :
 *    Parameters :
@@ -14,23 +14,19 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *    Import :
-      CHARACTER*(*) UNITS
-      DOUBLE PRECISION RA,DEC,ROLL
-*    Import-export :
-*    Export :
+      INTEGER			PIXID,PRJID,SYSID
 *    Status :
       INTEGER STATUS
 *    Local Constants :
       REAL DEGTOMIN,SECTOMIN
       PARAMETER (DEGTOMIN=60.0,SECTOMIN=1.0/60.0)
-      DOUBLE PRECISION DEGTORAD
-      PARAMETER (DEGTORAD=3.14159265358979D0/180.0D0)
 *    Local variables :
       CHARACTER RALBL*25,DECLBL*25
       CHARACTER*20 XOPT,YOPT
       DOUBLE PRECISION DECRAD
+      DOUBLE PRECISION RA,DEC,SPOINT(2),ROLL,UCONV(2)
       REAL RA1,RA2,DEC1,DEC2
       REAL RARAN,DECRAN
       REAL X1,X2,Y1,Y2
@@ -44,7 +40,7 @@
       INTEGER WID
       INTEGER FONT
       INTEGER BOLD
-      INTEGER COL
+      INTEGER COL,DUM
       INTEGER DIV,XDIV,YDIV
       INTEGER DUMMY
       LOGICAL XSEC,YSEC
@@ -52,6 +48,12 @@
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
+
+*  Extract info from ADI objects
+        CALL ADI_CGET0D( PIXID, 'ROTATION', ROLL, STATUS )
+        CALL ADI_CGET1D( PRJID, 'SPOINT', 2, SPOINT, DUM, STATUS )
+        RA = SPOINT(1)
+        DEC = SPOINT(2)
 
 *  check for suitable orientation and latitude
         IF (ROLL.NE.0.0D0) THEN
@@ -62,20 +64,13 @@
           CALL MSG_PRNT('         RA/DEC axes not possible')
         ELSE
 
-          DECRAD=DEC*DEGTORAD
+          DECRAD=DEC*MATH__DDTOR
           COSDEC=REAL(COS(DECRAD))
 
-*  get axis unit conversion factor to arcmin
-          CALL CHR_UCASE(UNITS)
-          IF (INDEX(UNITS,'DEG').GT.0) THEN
-            CONV=DEGTOMIN
-          ELSEIF (INDEX(UNITS,'MIN').GT.0) THEN
-            CONV=1.0
-          ELSEIF (INDEX(UNITS,'SEC').GT.0) THEN
-            CONV=SECTOMIN
-          ELSE
-            CONV=1.0
-          ENDIF
+*      Get axis unit conversion factor to arcmin. ADI stores conversion to
+*      radians
+          CALL ADI_CGET1D( PIXID, 'UCONV', 2, UCONV, DUM, STATUS )
+          CONV = UCONV(1)*MATH__DRTOD*60.0
 
 *  find range of RA/DEC in minutes
           CALL PGQWIN(X1,X2,Y1,Y2)
@@ -278,8 +273,6 @@
             ENDIF
             POS=POS+YTICK
           ENDDO
-
-
 
 *  restore transformations
           CALL PGWINDOW(X1,X2,Y1,Y2)

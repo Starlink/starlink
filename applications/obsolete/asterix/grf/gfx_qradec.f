@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       LOGICAL RADEC
 *    Import-export :
@@ -34,7 +33,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_QRADEC',STATUS)
+          CALL AST_REXIT('GFX_QRADEC',STATUS)
         ENDIF
       ENDIF
       END
