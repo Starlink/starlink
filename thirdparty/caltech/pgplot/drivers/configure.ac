@@ -29,6 +29,7 @@ AC_C_BIGENDIAN
 AC_HEADER_STDC
 AC_PATH_XTRA
 
+
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
@@ -36,13 +37,23 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 AC_CONFIG_SUBDIRS([xathena xtk xmotif])
 
 dnl   These are the driver files that will actually be built.
-dnl   The intention is for autoconf to generate this list automatically.
-dnl   For now we kluge and hardwire the driver list. Remove items that should
-dnl   not be built.
+dnl   In true autoconf style, we do not attempt to generate this list
+dnl   automatically (see the automake manual's FAQ for justification).
+dnl
+dnl   The common_built_drivers are common to the standard set and the
+dnl   Starlink set.
 
-BUILT_DRIVERS="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo pndriv.lo tkdriv.lo xadriv.lo xwdriv.lo"
+common_built_drivers="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo tkdriv.lo xadriv.lo"
 
-STAR_BUILT_DRIVERS="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo pndriv.lo tkdriv.lo xadriv.lo star_xwdriv.lo gwmdriv.lo"
+dnl   Add the png driver if the PNG header and library are available.
+AC_CHECK_HEADER(png.h,
+                AC_CHECK_LIB(png, png_info_init,
+                             [BUILT_DRIVERS="$BUILT_DRIVERS pndriv.lo"],
+                             [AC_MSG_WARN(PNG libraries not found)],
+                             [-lz]))
+
+BUILT_DRIVERS="$common_built_drivers xwdriv.lo"
+STAR_BUILT_DRIVERS="$common_built_drivers star_xwdriv.lo gwmdriv.lo"
 
 AC_SUBST(BUILT_DRIVERS)
 AC_SUBST(STAR_BUILT_DRIVERS)
