@@ -1,5 +1,5 @@
  
- SPECX Millimetre-wave Spectral data reduction v6.7-5.
+ SPECX Millimetre-wave Spectral data reduction v6.7-6.
  ====================================================
 
    Welcome to the Unix port of Specx.  It is important to read the
