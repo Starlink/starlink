@@ -1,3 +1,33 @@
+<subsect id=rn-0.12b1 export>Release 0.12b1
+
+<p>New and changed functionality:
+<ul>
+  <li>Input files are now mapped (using mmap(2)) if that functionality
+  is available, and if they're determined to be seekable (ie, not a
+  pipe).  This should increase the speed of access to large DVI files
+  (but this probably wasn't a huge bottleneck before).</li>
+
+  <li>Modified DviFile::currH and currV so that they now report
+  positions in multiple more useful units.  Enhanced library
+  documentation.</li>
+
+  <li>Added dvireport.cc program to report the contents of DVI files
+  (in a different way from the dv2dt suite), which also acts as an
+  example of the use of the library.</li>
+
+  <li>Modify <code>--output</code> so that if there is no `%'
+  character in the `pattern', <code>dvi2bitmap</code> takes this to be
+  the name of the one output file; omitting the `%' was previously an
+  error.</li>
+
+  <li>Added `mark' special; the format of the
+  <code>--query=bitmaps</code> output has been consequently slightly
+  enhanced.</li>
+
+  <li>Fixed bug which meant DviFile could search for PK files in
+  demented sizes (non-initialised variable...)</li>
+</ul>
+
 <subsect id=rn-0.11 export>Release 0.11
 
 <p>Bugfixes: correct semantics of DviFile::getEndOfPage, so that
