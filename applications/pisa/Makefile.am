@@ -84,3 +84,4 @@ dist_pkgdata_DATA = pisa.news
 
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES) sun109fig.ps
+
