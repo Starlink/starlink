@@ -213,7 +213,6 @@
       REAL			RVALUE			!
 
       INTEGER			FSTAT			! FITSIO status
-      INTEGER			HID			! HDU object
       INTEGER			IKEY			! Loop over keys
       INTEGER			IVALUE			! Keyword value
       INTEGER			KID			! Keyword object
