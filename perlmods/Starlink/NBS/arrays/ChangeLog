@@ -1,0 +1,5 @@
+Mon Jul 21 17:50:15 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* arrays.c: Removed the foo reference in unpack1D. (Caused bus
+	error when not equal to 'f'
+
