@@ -23,7 +23,7 @@ kpg1_hsta.gen kpg1_hstf.gen kpg1_thrs.gen kpg1_bl1d.gen kpg1_stat.gen \
 kpg1_trig.gen kpg1_pow.gen kpg1_medu.gen
 
 # Non-generic source files needed for kpg_source.tar:
-KPG_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
+KPG_NONGEN = bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f \
 chvalr.f chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f \
 cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f elnmbr.f \

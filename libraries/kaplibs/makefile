@@ -1589,9 +1589,6 @@ unbuild: clean
 #  files).  These are normally generated automatically from the source
 #  files.
 
-agchax.o:	 IRM_COM
-agchcu.o:	 SAE_PAR IRM_COM
-agchil.o:	 IRM_COM
 aif_antmp.o:	 SAE_PAR DAT_PAR
 aif_asfio.o:	 SAE_PAR PAR_ERR
 aif_flnam.o:	 SAE_PAR
