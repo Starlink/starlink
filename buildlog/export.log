@@ -842,9 +842,8 @@ dist:
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/splat-2.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.0.tar
-     [gzip] Building: /apps/cvsbuild/export/splat-2.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/splat-2.0.tar.bz2
+ /apps/cvsbuild/starjava/bin/ant: line 239: 18985 Killed                  "$JAVACMD" $ANT_OPTS -classpath "$LOCALCLASSPATH" -Dant.home="${ANT_HOME}" org.apache.tools.ant.Main $ANT_ARGS "$@"
+r.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.0.tar
      [echo] Executing Mirage target: export
 
