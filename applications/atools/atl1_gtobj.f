@@ -84,10 +84,9 @@
 *  Attempt to access the parameter as an NDF.
       CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
 
-*  If succesful, get the WCS FrameSet from it, and annul the NDF identifier.
+*  If succesful, get the WCS FrameSet from it.
       IF( INDF .NE. NDF__NOID ) THEN
          CALL KPG1_GTWCS( INDF, IAST, STATUS )
-         CALL NDF_ANNUL( INDF, STATUS )
 
 *  Tell the user where the object came from. 
          IF( IAST .NE. AST__NULL ) THEN
@@ -96,13 +95,16 @@
      :                    STATUS )
          END IF
 
+*  Annul the NDF identifer.
+         CALL NDF_ANNUL( INDF, STATUS )
+
 *  If it was not an NDF...
       ELSE
 
 *  Obtain a GRP group containing text from which an Object is to be read.
          CALL ATL1_GTGRP( PARAM, IGRP, STATUS )
 
-*  Tried to read an object form the group.
+*  Tried to read an object from the group.
          CALL ATL1_RDGRP( IGRP, IAST, STATUS )
 
 *  Delete the group.

@@ -85,13 +85,13 @@
 *  Report an error if no Object was written.      
       IF( STATUS .EQ. SAI__OK .AND. NOBJ .EQ. 0 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'P', PARAM )
+         CALL MSG_SETC( 'F', FNAME )
          CALL ERR_REP( 'ATL1_CREAT_ERR1', 'Failed to write an AST '//
-     :                 'Object to file ''$^P''.', STATUS )
+     :                 'Object to file ''^F''.', STATUS )
 
       ELSE
          CALL MSG_SETC( 'F', FNAME )
-         CALL MSG_OUT( ' ', 'AST data written to text file ''^F''.', 
+         CALL MSG_OUT( ' ', '   AST data written to text file ''^F''.', 
      :                 STATUS )
       END IF
 

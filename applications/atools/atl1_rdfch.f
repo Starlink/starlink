@@ -29,6 +29,8 @@
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     4-FEB-2003 (DSB):
+*        Fixed bug which caused last line in FITS header to be ignored.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,16 +136,10 @@
 
 *  If any elements remain to be read, get the next element from the group,
 *  and increment the index of the next element to be read from the group. 
-*  If this is not the last element in the group, return a function value of 
-*  one.
       IF( NEXT .LE. SIZE ) THEN 
          CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS ) 
-
-         IF( NEXT .LT. SIZE ) THEN
-            NEXT = NEXT + 1
-            ATL1_SRC2 = 1
-         END IF
-
+         NEXT = NEXT + 1
+         ATL1_SRC2 = 1
       END IF
 
       END
