@@ -705,7 +705,7 @@
          ENDIF
 *
 *     Put SASS selection times into one array
-         CALL XRT_LIVEWIND(RAWHD.NTRANGE, RAWHD.D0TSTART,
+         CALL XRT_LIVEWIND(RAWHD.NTRANGE, RAWHD.TSTART,
      &                                 RAWHD.TEND, %val(SPTR))
 *
 *     Put user selection times into one array
@@ -944,7 +944,7 @@ D            WRITE(3,*)EXPOS(TLP)
       REAL A1LL_AV,AXE_AV,AEXE_AV              ! Average events per time bin
       REAL FLIVE,FLIVE1,FLIVE2
       REAL DTOT
-      DOUIBLE PRECISION ETIM                   ! S/C time in U.T.
+      DOUBLE PRECISION ETIM                    ! S/C time in U.T.
 *    Local data :
 *-
       IF (STATUS .NE. SAI__OK) RETURN
@@ -1197,7 +1197,7 @@ D            WRITE(3,*)EXPOS(TLP)
       RECORD /CORR/ HEAD               !Header structure for input file
 *
       INTEGER NTIMES                   !Number of eventrate records
-      DOUBLE PRECISION(NTIMES)         !Times of event rates
+      DOUBLE PRECISION EVTIM(NTIMES)   !Times of event rates
       REAL RATE(NTIMES)                !Eventrates
       INTEGER NT                       !Number of time bins in input file
       BYTE QUAL(NT)                    !Quality of each time bin
