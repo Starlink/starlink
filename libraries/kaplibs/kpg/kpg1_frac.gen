@@ -248,8 +248,8 @@
       ELSE
 
 *  The extreme values must not exceed the integer dynamic range.
-         IF ( VAL_<T>TOI( .FALSE., MAXV, STATUS ) .GT. VAL__MAXI .OR. 
-     :        VAL_<T>TOI( .FALSE., MINV, STATUS ) .LT. VAL__MINI ) THEN
+         IF ( MAXV .GT. NUM_ITO<T>( VAL__MAXI ) .OR. 
+     :        MINV .LT. NUM_ITO<T>( VAL__MINI ) ) THEN
             INTVAL = .FALSE.
          ELSE
 
