@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    11/02/2000
+*       Last modify:    08/02/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -331,3 +331,13 @@ EB      03/02/2000      makeback()      Risk of segmentation fault with huge wei
 EB      11/02/2000      computeautoflux()
                                         Wrong version of photom.c in release V2.1.5
                                         fixed.
+
+EB      14/10/2000      newfield()      RMS_FIELD now properly taken into account.
+                        prefs.h         BACK_FILTERSIZE upper limit pushed to 11.
+
+EB      04/02/2001      backhisto()
+                        backstat()      Fixed two huge bugs in the MAP_WEIGHT
+                                        calibration.
+
+EB      08/02/2001      makeback()      Fixed a small bug in large-image mode.
+                        clean()         Fixed CLEANing bug for hollow objects.

@@ -46,7 +46,7 @@ picstruct	*newweight(char *filename, picstruct *reffield,
 
     case WEIGHT_FROMRMSMAP:
       wfield = newfield(filename, RMS_FIELD);
-      if((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
+      if ((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
         error(EXIT_FAILURE,
 	"*Error*: measured frame and weight map have different sizes","");
       wfield->sigfac = 1.0;
@@ -54,14 +54,14 @@ picstruct	*newweight(char *filename, picstruct *reffield,
 
     case WEIGHT_FROMVARMAP:
       wfield = newfield(filename, VAR_FIELD);
-      if((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
+      if ((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
         error(EXIT_FAILURE,
 	"*Error*: measured frame and weight map have different sizes","");
       break;
 
     case WEIGHT_FROMWEIGHTMAP:
       wfield = newfield(filename, WEIGHT_FIELD);
-      if((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
+      if ((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
         error(EXIT_FAILURE,
 	"*Error*: measured frame and weight map have different sizes","");
       break;

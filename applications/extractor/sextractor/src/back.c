@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	03/02/2000
+*	Last modify:	07/02/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -200,13 +200,19 @@ void	makeback(picstruct *field, picstruct *wfield)
       QFSEEK(field->file, fcurpos2, SEEK_SET, field->filename);
       bm = backmesh;
       for (m=nx; m--; bm++)
-        QCALLOC(bm->histo, LONG, bm->nlevels);
+        if (bm->mean <= -BIG)
+          bm->histo=NULL;
+        else
+          QCALLOC(bm->histo, LONG, bm->nlevels);
       if (wfield)
         {
         QFSEEK(wfield->file, wfcurpos2, SEEK_SET, wfield->filename);
         wbm = wbackmesh;
         for (m=nx; m--; wbm++)
-          QCALLOC(wbm->histo, LONG, wbm->nlevels);
+          if (wbm->mean <= -BIG)
+            wbm->histo=NULL;
+          else
+            QCALLOC(wbm->histo, LONG, wbm->nlevels);
         }
 /*---- Build (progressively this time) the histograms */
       for(size=meshsize, bufsize2=bufsize; size>0; size -= bufsize2)
@@ -239,7 +245,6 @@ void	makeback(picstruct *field, picstruct *wfield)
         {
         k = m+nx*j;
         backguess(wbm, wfield->back+k, wfield->sigma+k);
-        free(wbm->histo);
         }
       }
     }
@@ -288,7 +293,6 @@ void	makeback(picstruct *field, picstruct *wfield)
       warning("Null or negative global weighting factor:","defaulted to 1");
       wfield->sigfac = 1.0;
       } 
-
     free(ratio);
     }
 
@@ -425,8 +429,8 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
         npix = ngood;
       wmean /= (double)npix;
       wsigma = (sig = wsigma/npix - wmean*wmean)>0.0? sqrt(sig):0.0;
-      wlcut = wbm->lcut = (PIXTYPE)(mean - 2.0*sigma);
-      whcut = wbm->hcut = (PIXTYPE)(mean + 2.0*sigma);
+      wlcut = wbm->lcut = (PIXTYPE)(wmean - 2.0*wsigma);
+      whcut = wbm->hcut = (PIXTYPE)(wmean + 2.0*wsigma);
       }
     mean /= (double)npix;
     sigma = (sig = sigma/npix - mean*mean)>0.0? sqrt(sig):0.0;
@@ -553,7 +557,7 @@ void	backhisto(backstruct *backmesh, backstruct *wbackmesh,
         for (x=bw; x--;)
           {
           bin = (int)(*(buft++)/qscale + cste);
-          if (wpix = *(wbuft++)<wthresh && bin<nlevels && bin>=0)
+          if ((wpix = *(wbuft++))<wthresh && bin<nlevels && bin>=0)
             {
             (*(histo+bin))++;
             bin = (int)(wpix/wqscale + wcste);
@@ -626,7 +630,6 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
 	((hihigh-histo)+0.5+((double)highsum-lowsum)/(2.0*(*hilow>*hihigh?
                                                 *hilow:*hihigh)))
        : 0.0;
-
     if (sum)
       {
       mea /= (double)sum;
@@ -637,7 +640,6 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
     hcut = (ftemp=med+3.0*sig)<nlevelsm1 ?(int)(ftemp>0.0?ftemp+0.5:ftemp-0.5)
 								: nlevelsm1;
     }
-
   *mean = fabs(sig)>0.0? (fabs(bkg->sigma/(sig*bkg->qscale)-1) < 0.0 ?
 			    bkg->qzero+mea*bkg->qscale
 			    :(fabs((mea-med)/sig)< 0.3 ?

@@ -9,7 +9,7 @@
 *
 *	Contents:	Command-line parsing.
 *
-*	Last modify:	15/05/98
+*	Last modify:	07/10/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -96,5 +96,5 @@ int	main(int argc, char *argv[])
   NFPRINTF(OUTPUT, "All done");
   NPRINTF(OUTPUT, "\n");
 
-  exit(EXIT_SUCCESS);
+  return EXIT_SUCCESS;
   }
