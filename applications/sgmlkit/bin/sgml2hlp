@@ -1,7 +1,7 @@
 #! /bin/sh
 
 #+
-#  <name>
+#  <routinename id=sgml2hlp>
 #     sgml2hlp
 #
 #  <moduletype>

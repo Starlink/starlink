@@ -17,7 +17,9 @@
 
 <authorlist>
 
-<author id=ng affiliation='Starlink, Glasgow' email='norman@astro.gla.ac.uk'>
+<author id=ng affiliation='Starlink, Glasgow'
+email='norman@astro.gla.ac.uk'
+webpage='http://www.astro.gla.ac.uk/users/norman/'>
 Norman Gray
 <author id=mbt affiliation='Starlink, Institute of Astronomy, Cambridge'
 	email='mbt@ast.cam.ac.uk'>

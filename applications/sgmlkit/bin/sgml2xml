@@ -16,30 +16,43 @@ RCSID="$Id$"
 #
 #  <description>
 #
-#    <p>Output to stdout.
+#    <p>Essentially a wrapper for <code/sx/, but since that doesn't
+#    rewrite the DTD subset, this script does that, trying to find
+#    XML-compatible ways of rewriting what it finds, and spitting out
+#    warnings whenever it sees anything it thinks is dodgy.
 #
-#    <p>No parsing of any declaration -- uses RCS only.
+#    <p>Output is to stdout.
 #
-#    <p>Limited error recovery (the input is supposed to be valid already),
+#    <p>Notes:
+#    <ul>
+#    * No parsing of any declaration -- uses RCS only.
+#
+#    * Limited error recovery (the input is supposed to be valid already),
 #    so most errors are fatal.
 #
-#    <p>Only processes entity declarations in subset -- element
+#    * Only processes entity declarations in subset -- element
 #    declarations, etc, are discarded with warnings.
 #
-#    <p>No automatic rewriting of public identifiers -- if the input
+#    * No automatic rewriting of public identifiers -- if the input
 #    document is a valid instance of the given DTD, the output document
 #    will be, also.
 #
-#    <p>Generates system identifiers for external entities which have only
+#    * Generates system identifiers for external entities which have only
 #    public ones.  At present, this generates a reference to the
 #    catalogue server -- should it try to do a catalogue lookup and
-#    replace it by what it finds there?
+#    replace it by what it finds there?  That starts to get
+#    complicated, and requires command-line queries of the catalogue,
+#    which either requires OpenSP, or that I resurrect my
+#    catalogue-parser.  XML's requirement for system identifiers is a pig.
 #
-#    <p>Entities which can't be easily translated are discarded with warnings.
+#    * Entities which can't be easily translated are discarded with warnings.
 #
-#    <p>It's not clear what one should do with SUBDOC entities.  This
+#    * It's not clear what one should do with SUBDOC entities.  This
 #    translates them to <code/NDATA XML/ entities, and warns that it's done
-#    this, but the referenced document might well be SGML rather than XML.
+#    this, but the referenced document might well be SGML rather than
+#    XML.
+#
+#    </ul>
 #
 #  <argumentlist>
 #    <parameter>arg1
@@ -52,7 +65,9 @@ RCSID="$Id$"
 #    --pubid public-identifier:
 #        Specify the public identifier which is to be used to identify
 #        the DTD in the output XML file.  If not specified, the public
-#        identifier in the input file is reused.
+#        identifier in the input file is reused, which will almost
+#        certainly be wrong, but should nonetheless give broadly sensible
+#        error messages when it's parsed, and do no harm if it's not.
 #
 #    --sysid system-identifier:
 #        Specify the system identifier which is to be used to identify
