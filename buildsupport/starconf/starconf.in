@@ -136,9 +136,9 @@ else
 fi
 
 # Make sure there's a link to the installed componentinfo.dtd.
-# 'test -e' returns false if the link exists but points to a non-existent
+# 'test -f' returns false if the link exists but points to a non-existent
 # file, so delete any link first.
-test -e componentinfo.dtd || {
+test -f componentinfo.dtd || {
     rm -f componentinfo.dtd
     $ln_s $buildsupportdata/componentinfo.dtd componentinfo.dtd
 }
@@ -254,7 +254,7 @@ chmod +x starconf.status
 #
 
 # -------------------- bootstrap --------------------
-if test -e bootstrap; then
+if test -f bootstrap; then
     # Extract the first word on the second line, and the value of rnum
     eval `sed -n -e '2s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\).*/original=\1; file_version=\2;/p' -e 3q bootstrap`
     if test "X$original" != Xoriginal; then

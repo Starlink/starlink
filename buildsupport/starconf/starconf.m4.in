@@ -316,7 +316,7 @@ AC_DEFUN([STAR_PREDIST_SOURCES],
 [m4_ifval([$1], [], [AC_FATAL([$0: called with no stamp file])])dnl
 for marker in $1
 do
-    if test -e $marker; then
+    if test -f $marker; then
         _star_predist_marker_present=true
         AC_MSG_NOTICE([found predist marker file $marker])
     else
@@ -955,7 +955,7 @@ else
     AC_MSG_RESULT([using $_star_tmp])
     for _t in $1
     do
-        if test -e $srcdir/$_t$_star_tmp; then
+        if test -f $srcdir/$_t$_star_tmp; then
             (cd $srcdir; rm -f $_t; $LN_S $_t$_star_tmp $_t)
         else
             AC_MSG_ERROR([platform $_star_tmp matched, but no file $_t$_star_tmp found])
