@@ -18,9 +18,14 @@
 
      Most of the existing CCDPACK applications have been modified to  
      be aware of this Set information, but will behave as previously 
-     on data which has not had Set headers explicitly added.  Some
-     of the existing applications remain to be upgraded for Set use;
-     this will be done for the next release.
+     on data which has not had Set headers explicitly added.  A new
+     test script has been added to show off the new capabilities:
+
+      - SETEXERCISE -- Tests CCDPACK Set functionality
+
+     Some work remains to be done in upgrading CCDPACK for Sets,
+     notably the XREDUCE GUI; this will be completed for the next 
+     release.
 
   Interactive registration programs
   ---------------------------------
@@ -74,4 +79,7 @@
         by the NAMELIST parameter.
 
       - TRANNDF will now (sensibly) refuse to resample into a SkyFrame.
+
+      - There is improved crossreferencing in SUN/139 from "See also"
+        sections in the task descriptions Appendix back to the main text.
 

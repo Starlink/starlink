@@ -120,13 +120,10 @@ EXTENT( 4 ) = _INTEGER (Read)
    by these values is drawn.  If TRIM is false, this parameter
    is ignored.
 
-   If USEEXT is set, then these values will be sought from the
-   .MORE.CCDPACK.EXTENT extension of each image; this will only
-   succeed if they have been placed there by running the IMPORT
-   or PRESENT programs.  If USEEXT is false or there is no
-   suitable CCDPACK extension then if global values for these
-   bounds have been set using CCDSETUP those values will be
-   used.  Otherwise, they may be given on the command line.
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.  If USESET is true
+   then a value specific to the Set Index of each image will
+   be sought.
 
 IN
 
@@ -337,9 +334,11 @@ USESET
 USESET = _LOGICAL (Read)
    If the pen colour is being rotated because PENROT is true,
    USESET determines whether a new colour is used for each
-   individual image or each Set.  This parameter is ignored if
-   PENROT is false, and has no effect if the input NDFs have
-   no Set header information.
+   individual image or each Set.  If TRIM is true, it allows 
+   Set-Index-specific values of the EXTENT parameter to be 
+   used.  This parameter is ignored if PENROT and TRIM are 
+   false, and has no effect if the input images have no Set header 
+   information.
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
@@ -435,8 +434,10 @@ Behaviour_of_Parameters
    Certain parameters (LOGTO, LOGFILE, USESET and EXTENT) have global
    values. These global values will always take precedence, except
    when an assignment is made on the command line, or in the case
-   of EXTENT, if USEEXT is true. Global values may be set and
-   reset using the CCDSETUP and CCDCLEAR commands.
+   of EXTENT, if USEEXT is true.  If USESET is true, a global value
+   for USEEXT corresponding to the Set Index of each image will be
+   sought.  Global values may be set and reset using the CCDSETUP 
+   and CCDCLEAR commands.
 
    The DEVICE parameter also has a global association. This is not
    controlled by the usual CCDPACK mechanisms, instead it works in

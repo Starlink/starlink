@@ -228,7 +228,9 @@ RNOISE = _DOUBLE (Read)
    will the value associated with this parameter be used.
 
    If a global value has been set up using CCDSETUP this value
-   will be used, and will be shown as the default.
+   will be used, and will be shown as the default.  If USESET
+   is true, a global value specific to each image's Set Index
+   value will be sought.
    [Dynamically derived value]
 
 SIGMAS
@@ -338,7 +340,9 @@ Behaviour_of_parameters
    have global values. These global values will always take
    precedence, except when an assignment is made on the command line.
    Global values may be set and reset using the CCDSETUP and
-   CCDCLEAR commands.
+   CCDCLEAR commands.  If USESET is true then a global value
+   of RNOISE specific to the Set Index of each image will be used
+   if one is available.
 
    The parameter RNOISE will not be used if the USEEXT parameter is
    set TRUE. In this case values will be obtained from the input images

@@ -207,6 +207,9 @@ programs.
 \newcommand{\routine}[1]{{\sc #1}}
 \newcommand{\xroutine}[1]{\htmlref{{\sc #1}}{#1}}
 
+% Reference to a section of this document.
+\newcommand{\secref}[2]{\latexhtml{Section \ref{#1}}{``\htmlref{#2}{#1}''}}
+
 % Latex only sections, subsections etc. Surround these with a latexonly
 % environment.
 \newcommand{\latexonlysection}[1]{\section{#1}}
@@ -931,7 +934,8 @@ start. Later sections are rather more technical or describe data
 registration and related topics and should really only be consulted
 when the need arises.
 
-\subsection{Using the CCDPACK data reduction GUI \xlabel{usingxreduce}}
+\subsection{Using the CCDPACK data reduction GUI 
+            \label{usingxreduce}\xlabel{usingxreduce}}
 
 If you are sitting at an X display then type the commands:
 \begin{myquote}
@@ -1293,7 +1297,7 @@ parameters with similar names.
 \item \text{SATURATION}: The saturated pixel count (ADUs).
 \end{itemize}
 
-\subsubsection{Scheduling a reduction}
+\subsubsection{\label{scheduling}Scheduling a reduction}
 After you've performed the first two tasks this part is easy. Just run the
 application \xroutine{SCHEDULE}:
 \begin{myquote}
@@ -1487,7 +1491,7 @@ data format doesn't support the storage of this information, or if
 disk space is tight (the addition of error components to your data
 will double the disk space needed).
 
-\subsubsection{\xlabel{debiassing}Step 3 - Debiassing}
+\subsubsection{\xlabel{debiassing}\label{debiassing}Step 3 - Debiassing}
 
 The next stage (or the first stage, if you're not using a master bias)
 is to debias all your data frames; flatfields, flash frames, dark
@@ -1498,7 +1502,7 @@ of a constant; this is well worth avoiding unless there's nothing else
 for it).
 Let's tackle these methods one at a time.
 
-\subsubsection{With a master bias}
+\subsubsection{\label{withbiasframes}With a master bias}
 
 If you have made a master bias frame using \xroutine{MAKEBIAS} then how you
 debias depends on how you made it.
@@ -1547,7 +1551,7 @@ each pixel, as is the RNOISE value.
 To avoid this just use GENVAR=FALSE and leave out the
 ADC and RNOISE parameters.
 
-\subsubsection{\xlabel{nobiasframes}Without a bias frame}
+\subsubsection{\xlabel{nobiasframes}\label{nobiasframes}Without a bias frame}
 
 Debiassing of CCD data can be performed reasonably well by the
 subtraction of values derived from the bias strips.
@@ -1593,7 +1597,7 @@ later).
 If you do this remember to debias all frames so that the zero point
 remains the same.
 
-\subsubsection{Other DEBIAS functions}
+\subsubsection{\label{otherdebias}Other DEBIAS functions}
 \xroutine{DEBIAS} is the most complex of the initial reduction programs and
 performs much more than just debiassing. Its other functions are:
 \begin{itemize}
@@ -1671,7 +1675,7 @@ values could be supplied on the command line, or in response to a
 prompt --- terminating a line with a `\text{-}' forces reprompting
 for another line of values.
 
-\subsubsection{\xlabel{flatfielding}Step 5 - Flatfielding}
+\subsubsection{\xlabel{flatfielding}\label{flatfielding}Step 5 - Flatfielding}
 
 The next stage in the instrumental correction of your data is to make
 a `flatfield'. A flatfield is probably best made from exposures of the
@@ -2064,7 +2068,7 @@ A copy of this file is available from
 
 
 
-\section{Registration and mosaicing\xlabel{mosaicing}}
+\section{Registration and mosaicing\label{mosaicing}\xlabel{mosaicing}}
 
 Multiple observations form the backbone of many astronomical programmes.
 Determining the registration (inter-dataset transformations) of the
@@ -2304,7 +2308,8 @@ transformation can be added using \xroutine{WCSEDIT} or \xroutine{ASTIMP},
 and the automated methods still used.
 
 
-\subsubsection{\xlabel{registration}Determining transformation parameters}
+\subsubsection{\xlabel{registration}\label{registration}Determining 
+               transformation parameters}
 
 The routine which determines the transformations between labelled
 position lists is called:
@@ -2357,7 +2362,8 @@ a solution which gives satisfactory values for the parameters.
 
 
 
-\subsubsection{\xlabel{automatedregistration}Automated registration}
+\subsubsection{\xlabel{automatedregistration}Automated registration
+               \label{automatedregistration}}
 
 If the coordinates of your images are just offset from each other 
 (related by a translation in X and Y)
@@ -2389,6 +2395,10 @@ demonstration script
 objects are
 then identified as groups of `connected' pixels. The groups of connected
 pixels are then centroided to give an accurate position.
+\routine{FINDOBJ} has a number of parameters which can be tweaked
+to identify a suitable group of objects from the data; 
+however if you can't make it work satisfactorily you could use
+the interactive program \xroutine{IDICURS} instead for this step.
 
 \routine{FINDOFF} is the crucial application in this sequence, it performs
 pattern-matching between all the object positions. It assesses the
@@ -2520,7 +2530,8 @@ Analysis Workshop.
 
 
 
-\subsubsection{\xlabel{semiautomated}Semi-automated registration}
+\subsubsection{\xlabel{semiautomated}\label{semiautomated}Semi-automated
+               registration}
 
 When datasets are offset in their Current attached coordinate system
 only by X and Y translations as above,
@@ -2585,7 +2596,8 @@ As with all graphically based interfaces it is difficult to
 describe the advantages and ease of use, it's best to try them out.
 
 
-\subsubsection{\xlabel{usinglineartransforms}General linear transformations}
+\subsubsection{\xlabel{usinglineartransforms}General linear transformations
+               \label{usinglineartransforms}}
 
 To align datasets that require more general linear transformations
 than a simple offset
@@ -3741,7 +3753,7 @@ which is around half an arcsecond, over the whole focal plane.
 \subsection{Schematic registration sequences}
 
 One outline for using the various applications is shown in 
-\hyperref{the following figure}{Figure }{}{registration}.
+\hyperref{the following figure}{Figure }{}{fig:registration}.
 This illustrates the ways to proceed if you are using the
 object matching methods (\S \ref{object_matching}) 
 for alignment --- if you are using coordinate system information
@@ -3749,7 +3761,7 @@ from other sources then the routines
 \xroutine{WCSEDIT}, \xroutine{WCSREG}, \xroutine{ASTIMP}
 will have a part to play as well.
 
-\myfig{sun139reg.eps}{}{reg.gif}{registration}
+\myfig{sun139reg.eps}{}{reg.gif}{fig:registration}
 {A schematic of some standard sequences of commands used to perform
 registration, resampling and mosaicing.}
 
@@ -3795,14 +3807,17 @@ which corresponds to the positioning of the chips on the
 focal plane of the instrument may be accurately known and not
 subject to change, and this must be communicated to the software
 which is attempting to align separate data frames using
-other methods such as object matching.
+other methods such as object matching; there's no point trying
+to identify matching features on 
+two frames which you know are glued next to each
+other on the focal plane.
 
 Both of these can be addressed to a large extent by careful use of the
 facilities of CCDPACK described so far, 
 but to make processing of this kind of
 data more painless, CCDPACK provides the concept of a Set of images.  
 The idea is that each exposure from a given instrument produces
-a single Set of data which may contain more than one frame.
+a single Set of data which can contain several frames.
 All Sets from a particular instrument will 
 consist of a fixed number of members:
 each member of a given Set will share the same Set Name attribute
@@ -3820,10 +3835,11 @@ The way this works is that
 a CCDPACK Set header is added to each file
 (in the .MORE.CCDPACK.SET extension of the NDF) which contains
 two items, the Set Name attribute (a string) and the Set Index
-attribute (a small positive integer).  Set alignment coordinates
+attribute (an integer, usually 1, 2, 3, \ldots).  Set alignment coordinates
 may also be added as an attached coordinate system,
 with the Domain name CCD\_SET,
-if a known alignment is to be associated with the Set.
+if a known alignment is to be associated with the Set
+(because you know how the chips are arranged on the focal plane).
 The Set itself does not exist as a separate file or other entity,
 so you never need to specify a Set as such when giving input
 parameters to CCDPACK programs, but when presented with a list
@@ -3868,7 +3884,7 @@ how to manipulate Set
 header information and how CCDPACK goes about using it.
 
 
-\subsection{Adding Set headers}
+\subsection{\xlabel{addsethead}\label{addsethead}Adding Set headers}
 
 To add Set header information you need to use the command
 \begin{itemize}
@@ -4200,7 +4216,7 @@ using \routine{MAKESET} or some other method,
 a warning will be issued, but
 the old one will be overwritten.
 
-\subsection{Examining Set headers}
+\subsection{\xlabel{showsethead}\label{showsethead}Examining Set headers}
 
 For the most part, once you have added Set headers to your image
 files using \routine{MAKESET} you will be able to let them 
@@ -4345,7 +4361,152 @@ selected like this:
 \end{myquote}
 
 
-\subsection{Set functionality in reduction tasks}
+\subsection{\label{setglobals}\xlabel{setglobals}Global parameters with Sets}
+
+Section \ref{configuration} explained how to set up global values for
+certain parameters such as the ADC factor and bias strip positions
+using the \xroutine{CCDSETUP} program; by doing this you can 
+set values specific to the data you are using.
+However, if you have data in Sets life becomes a bit more complicated:
+each chip will have a different ADC factor, so the value to use 
+will depend on which member of the Set is being processed.
+
+To cope with this, \routine{CCDSETUP} can be used to configure 
+different values for certain parameters according to Set Index value.
+The parameters which can vary with Set Index are:
+\begin{itemize}
+\item ADC
+\item BOUNDS
+\item DEFERRED
+\item DIRECTION
+\item EXTENT
+\item MASK
+\item RNOISE
+\item SATURATION
+\end{itemize}
+To set up one or more of these values to be specific to 
+certain Set Index values, run \routine{CCDSETUP} with the
+BYSET parameter true, and the INDEX parameter equal to the 
+Set Index to which the parameters apply.
+When USESET is true, CCDPACK programs which use these global 
+parameters will first look for a value specific to the Set Index
+of the frame being processed, and if there isn't one they will
+look for the unspecific global value (if there is no global 
+value at all they will use the current parameter value or ask
+you to enter it or use a default as usual).
+So, since many of the parameters will probably be the same for all
+the members of each Set, the easiest thing is to run CCDSETUP 
+for one of the chips (Set Index values), and then run it again 
+for the other ones
+just giving the values which are different for them.
+
+Here is an example. 
+Suppose that you have a group of images from a three-chip
+mosaic camera which all use the same global parameters, except that 
+the readout noise and ADC factor is different according to which
+chip each image comes from.
+You can configure the global variables like this:
+\begin{myquote}
+\begin{verbatim}
+% ccdsetup
+
+  Type "?" for help on any prompt.
+  Type "!" if you do not want to set a parameter.
+
+BYSET - Set up values specific to one Set Index? /NO/ > yes
+INDEX - Set Index values these parameters are specific to > 1
+RESTORE - Use a setup restoration file /NO/ > 
+LOGTO - Write log to (Logfile,Terminal,Neither,Both) /'Both'/ > 
+LOGFILE - logfile name /'CCDPACK.LOG'/ > 
+
+    CCDSETUP.............................
+    =====================================
+
+  Some values are specific to Set Index 1
+
+ADC - Number of electrons per ADU - Set Index 1 /!/ > 1.83
+EXTENT - Useful CCD region (xmin,xmax,ymin,ymax) - Set Index 1 /!/ > 13,1018,1,2
+048
+RNOISE - Readout noise (ADUs) - Set Index 1 /!/ > 8.5
+BOUNDS - Pixel indices of bias strips (in pairs) - Set Index 1 /!/ > 1,12,1019,1
+024
+DIRECTION - Readout direction (X or Y) - Set Index 1 /!/ > X
+DEFERRED - Deferred charge (ADUs) - Set Index 1 /!/ > 
+MASK - Mask data file - Set Index 1 /!/ >
+SATURATE - Look for saturated pixels /NO/ > 
+PRESERVE - Do you want to preserve your input data types /YES/ > 
+GENVAR - Do you want to generate variance estimates /YES/ > no
+NDFNAMES - Associate position lists with NDF names /YES/ > 
+USESET - Use CCDPACK Set headers if available /YES/ > 
+
+  Listing of the current CCDPACK global parameters (Set Index 1)
+
+  Global ADC factor                             : 1.83
+  Global output NDF extent (xmin:xmax,ymin:ymax): (13:1018,1:2048)
+  Global readout noise (ADUs)                   : 8.5
+  Global bias strip bounds                      : (1:12,1019:1024)
+  Global readout direction                      : X
+  Not looking for saturated pixels
+  Data types will be preserved
+  Variances will not be generated
+  Position lists will be associated with NDFs
+  CCDPACK Set header information will be used where available
+
+SAVE - Save CCD parameters for future restoration /NO/ > 
+\end{verbatim}
+\end{myquote}
+Having set up the values for Set Index 1, you can do the same for
+the other Set Index values, entering the changed values 
+explicitly and leaving the others to default to the ones
+you have just entered:
+\begin{myquote}
+\begin{verbatim}
+% ccdsetup index=2 adc=2.18 rnoise=6.0 accept
+% ccdsetup index=3 adc=1.95 rnoise=9.1 accept
+\end{verbatim}
+\end{myquote}
+You can then see the global configuration using the \xroutine{CCDSHOW}
+command:
+\begin{myquote}
+\begin{verbatim}
+% ccdshow
+
+    CCDSHOW
+    =======
+  Listing of the current CCDPACK global parameters:
+  Set Index-keyed values will be shown where available
+
+  Global ADC factor                             : 1.83
+                                       Set Index 1 : 1.83
+                                       Set Index 2 : 2.18
+                                       Set Index 3 : 1.95
+  Global output NDF extent (xmin:xmax,ymin:ymax): (13:1018,1:2048)
+  Global readout noise (ADUs)                   : 8.5
+                                       Set Index 1 : 8.5
+                                       Set Index 2 : 6
+                                       Set Index 3 : 9.1
+  Global bias strip bounds                      : (1:12,1019:1024)
+  Global readout direction                      : X
+  Not looking for saturated pixels
+  Data types will be preserved
+  Variances will not be generated
+  Position lists will be associated with NDFs
+  CCDPACK Set header information will be used if available
+\end{verbatim}
+\end{myquote}
+Note that Index-specific values are only shown where they were 
+assigned and are different; 
+in the other cases a common value will be shown, and used, 
+for all Set members.
+
+The Set Index values you should use depend on how you have used
+\xroutine{MAKESET} to add the Set headers; they will nearly
+always be $1, 2, 3,\ldots$ up to the number of members in 
+each Set, but if you are unsure you can use the \xroutine{SHOWSET}
+command to see the values they have.
+
+
+\subsection{Using Sets in reduction tasks}
 
 This section provides a brief explanation of what the CCDPACK
 reduction tasks 
@@ -4378,6 +4539,7 @@ Group them according to Set Index attribute
 \item
 For each Set Index value represented in the input files:
 \begin{itemize}
+\item Get values of any global parameters specific to this Set Index
 \item Combine the data from those of the input files with this Set Index
       to produce a calibration frame
 \item Write out the calibration frame with a suitable (new) Set Name
@@ -4402,6 +4564,7 @@ Group them according to Set Index attribute
 \item
 For each Set Index value represented in the input files:
 \begin{itemize}
+\item Get values of any global parameters specific to this Set Index
 \item Read in the calibration frame with the corresponding Set Index
       from the calibration file
 \item Go through all the input files with this Set Index, correct them
@@ -4447,7 +4610,20 @@ attribute they are assumed to come from the same chip,
 so you should not mix data from different types of Set in the same
 invocation of a CCDPACK reduction command.
 
-It's not necessary to understand the technicalities to use these programs,
+As explained in the previous section, certain parameters may need
+to be different for the different members of each Set (i.e.\ they
+are specific to a given Set Index).  If they have been configured
+globally using \routine{CCDSETUP} then the appropriate values
+will be used.  Otherwise, you may be prompted for them.  In this case
+you will be prompted for the value once for each Set Index
+represented in the input files.  Note that if you supply these 
+parameters on the command line or use the ACCEPT keyword without
+using \routine{CCDSETUP} to assign global values, they will
+take the same value for all the files.
+
+As with the other Set processing aspects, for the most part
+{\bf it's not necessary to understand the technicalities} 
+to use these programs,
 the upshot is that although multiple calibration frames,
 one for each chip, are constructed, they are all kept in a single file
 (an HDS container file),
@@ -4456,36 +4632,13 @@ to the correction programs.
 Both lots of programs will keep track of which frames have come
 from which chip and use them in the correct places.
 If you look at the output of the various calibration programs
-operating on data with Set headers the way the 
+operating on data with Set headers, the way the 
 above scheme works should be clear.  To see it in action, you can
 look at the log output of the 
 \text{setexercise} script (see section \ref{demos}).
 
-Note that there is currently no easy way to specify
-different values of the CCDPACK global data reduction parameters
-(RNOISE, ADC, EXTENT etc) for images from different chips 
-(i.e.\ with different Set Index values).
-One way to cope with this for now is to 
-use \xroutine{SHOWSET} to identify all the images with a given 
-Set Index and modify their CCDPACK headers to contain the correct
-value of the parameter in question.
-For example the following sequence could be used to assign different
-values of the RNOISE parameter to data files from different chips:
-\begin{myquote}
-\begin{verbatim}
-% showset in='*' pickindex=equal index=1 namelist=chip1.lis
-% showset in='*' pickindex=equal index=2 namelist=chip2.lis
-% present target='^chip1.lis' rnoise=1.400 accept
-% present target='^chip2.lis' rnoise=1.202 accept
-\end{verbatim}
-\end{myquote}
-In this case the USEEXT parameter of the relevant application 
-(\routine{DEBIAS}) will need to be set to true.
 
-A better mechanism for coping with this problem will 
-be introduced in the next release of CCDPACK.
-
-\subsection{Set functionality in registration tasks}
+\subsection{Using Sets in registration tasks}
 
 This section provides a brief explanation of what the CCDPACK
 registration tasks 
@@ -5888,6 +6041,12 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+      \secref{astfiles}{Re-use of coordinate system information with AST files},
+      \xroutine{ASTIMP}.
+   }
+   \sstdiytopic{
       AST file format:
    } {
          The AST file is designed to be written by ASTEXP and read by
@@ -6166,6 +6325,12 @@ The CCDPACK routine descriptions are contained in the following pages.
          the AST file \qt{instrum.ast}, writing the ID of each to the
          terminal only.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{astfiles}{Re-use of coordinate system information with AST files},
+      \xroutine{ASTEXP}.
    }
    \sstdiytopic{
       AST file format
@@ -6561,6 +6726,11 @@ The CCDPACK routine descriptions are contained in the following pages.
          frame.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{flashordark}{Flash or dark calibration}, \xroutine{MAKECAL}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -6937,6 +7107,13 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+      \secref{usinglineartransforms}{General linear transformations},
+      \xroutine{IDICURS}, 
+      \xroutine{PAIRNDF}.
+   }
+   \sstdiytopic{
       Behaviour of parameters
    }{
       All parameters retain their current value as default. The
@@ -7058,6 +7235,11 @@ The CCDPACK routine descriptions are contained in the following pages.
          parameters. The NAMES need only be unique amongst the
          possibilities so could have been abbreviated to \qt{a,r,di}.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \xroutine{CCDSETUP}, \xroutine{CCDSHOW}.
    }
    \sstdiytopic{
       Behaviour of parameters
@@ -7743,6 +7925,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+      \secref{backgroundprocessing}{Background processing}.
+   }
+   \sstdiytopic{
       Note
    }{
       \sstitemlist{
@@ -7954,6 +8141,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+     \secref{logsystem}{The CCDPACK logging system}.
+   }
+   \sstdiytopic{
       Behaviour of parameters
    } {
       The NOTE parameter has no default and retains no information
@@ -7997,7 +8189,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
       The routine also initialises the CCDPACK logging system.
 
-      All parameters may be returned as ! (the parameter-system null
+      All parameters may be supplied as ! (the parameter-system null
       value) this indicates that the current value is to be left
       unchanged if one exists (this will be shown as the default and
       can also be accepted by pressing return) or that a value is not
@@ -8005,12 +8197,24 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       assigned it will be defaulted or prompted as appropriate when
       other CCDPACK applications are run.
 
+      If you are using CCDPACK Sets, then some of the parameters 
+      describing device characteristics may differ according to
+      which member of each Set is being described.  By setting the
+      BYSET parameter to true, and supplying a value for the INDEX
+      parameter, you can indicate that the global values you supply 
+      apply to the members of each Set with that Set Index.  
+      In this case it will be necessary to run \routine{CCDSETUP} once
+      for each Set Index to be used (for instance, once for each
+      chip in a mosaic camera), giving a different INDEX value each
+      time.  This applies to the global parameters ADC, BOUNDS, 
+      DEFERRED, DIRECTION, EXTENT, MASK, RNOISE and SATURATION.
+
       The removal of global parameters is performed by the \xroutine{CCDCLEAR}
       application.
    }
    \sstusage{
-      ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
-               direction=? deferred=? extent=? preserve=? genvar=?
+      ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=? 
+               mask=?  direction=? deferred=? extent=? preserve=? genvar=?
                ndfnames=? useset=?
    }
    \sstparameters{
@@ -8046,6 +8250,19 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          the bias frame is to be directly subtracted from the data
          without offsetting.
          [!]
+      }
+      \sstsubsection{
+         BYSET = \_LOGICAL (Read)
+      } {
+         This parameter does not give the value of a global parameter
+         to be set up, but affects the behaviour of CCDSETUP.
+         If true, a value for the INDEX parameter will be solicited, 
+         and all the global values supplied will apply to 
+         the processing of images with that Set Index.  In this way,
+         you can provide different values of certain global parameters
+         for different members of each Set (e.g. images read from
+         different chips).
+         [FALSE]
       }
       \sstsubsection{
          \xlabel{CCDdeferred}
@@ -8092,6 +8309,15 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          Normally variances should be generated, even though disk and
          process-time savings can be made by their omission.
          [TRUE]
+      }
+      \sstsubsection{
+         INDEX = \_INTEGER (Read)
+      } {
+         This parameter does not give the value of a global parameter
+         to be set up, but affects the behaviour of CCDSETUP.
+         It indicates which Set Index value (i.e. which member of each
+         Set) the supplied values will apply to.  Only used if BYSET
+         is true.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read and Write)
@@ -8300,8 +8526,18 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          data formats) it may be more efficient to set this parameter
          false.  You should also set it false if you wanted CCDPACK
          programs to ignore existing Set information for some reason.
+
+         If BYSET is true, this parameter will default to true also.
          [TRUE]
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{configuration}{Package configuration},
+      \secref{setglobals}{Global parameters with Sets},
+      \xroutine{CCDSHOW}, 
+      \xroutine{CCDCLEAR}.
    }
    \sstnotes{
       \sstitemlist{
@@ -8353,6 +8589,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            LOGTO = BOTH  ! Log file information to\\
            LOGFILE = CCDPACK.LOG  ! Name of logfile
            \end{myquote}}
+          Note that if you are using CCDPACK Sets, you will need to use
+          a separate restoration file for each INDEX value.
       }
    }
    \sstdiytopic{
@@ -8361,10 +8599,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       All parameters values are obtained by prompting. The suggested
       values (defaults) are either the current global values, if they
       exist, or the application current values (from the last time that
-      the application was run). If the application has not been run
-      then the \qt{intrinsic} defaults are shown. The intrinsic defaults
-      may be obtained at any time (in the absence of global values) by
-      using the RESET keyword on the command line.
+      the application was run).  Global values corresponding to the 
+      INDEX parameter will be used as defaults if they exist.  If the 
+      application has not been run then the \qt{intrinsic} defaults are 
+      shown. The intrinsic defaults may be obtained at any time 
+      (in the absence of global values) by using the RESET keyword on
+      the command line.
    }
 }
 \sstroutine{CCDSHOW} {
@@ -8419,14 +8659,30 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          default is \qt{BOTH}.
          [BOTH]
       }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         This parameter determines whether values keyed by Set Index
+         are to be displayed.  If \xroutine{CCDSETUP} has been used to set up
+         different global parameter values for different members of
+         each Set, and this parameter is true, \routine{CCDSHOW} will display
+         the parameter values specific to each Set Index value
+         as well as the current unkeyed value.
+         [TRUE]
+      }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \xroutine{CCDSETUP}, \xroutine{CCDCLEAR}.
    }
    \sstdiytopic{
       Behaviour of parameters
    } {
-      The parameters (LOGTO and LOGFILE ) have global values. These
+      The parameters LOGTO, LOGFILE and USESET have global values. These
       global values will always take precedence, except when an
       assignment is made on the command line.  Global values may be set
-      using the \xroutine{CCDSETUP} command.
+      using the \routine{CCDSETUP} command.
    }
 }
 \sstroutine{DEBIAS} {
@@ -8483,7 +8739,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          will not be used.
 
          If a global value for this parameter has been set using
-         \xroutine{CCDSETUP} then this will be used.
+         \routine{CCDSETUP} then this will be used.  If USESET is true then a
+         value specific to the Set Index of each image will be sought.
          [1.0]
       }
       \sstsubsection{
@@ -8526,7 +8783,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          which includes any origin offsets within the input images.
 
          If global values for these bounds have been set using
-         \xroutine{CCDSETUP} then those values will be used.
+         \routine{CCDSETUP} then those values will be used.   If USESET is true
+         then a value specific to the Set Index of each image will
+         be sought.
       }
       \sstsubsection{
          BOXSIZE( 2 ) = \_INTEGER (Read)
@@ -8557,7 +8816,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          subtracted from the data.
 
          If a global value for this parameter has been set using
-         \xroutine{CCDSETUP} then this will be used.
+         \routine{CCDSETUP} then this will be used.    If USESET is true then a
+         value specific to the Set Index of each image will be sought.
          [0.0]
       }
       \sstsubsection{
@@ -8570,7 +8830,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          along the readout direction.
 
          If a global value for this parameter has been set using
-         \xroutine{CCDSETUP} then this will be used.
+         \routine{CCDSETUP} then this will be used.  If USESET is true then a
+         value specific to the Set Index of each image will be sought.
          [X]
       }
       \sstsubsection{
@@ -8603,7 +8864,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          flatfields whose normalisation could be adversely biased.
 
          If global values for these bounds have been set using
-         \xroutine{CCDSETUP} then those values will be used.
+         \routine{CCDSETUP} then those values will be used.  If USESET is true then a
+         value specific to the Set Index of each image will be sought.
       }
       \sstsubsection{
          FMODE = LITERAL (Read)
@@ -8738,7 +9000,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          that no mask is to be applied.
 
          If a global value for this parameter has been set using
-         \xroutine{CCDSETUP} then this will be used.
+         \routine{CCDSETUP} then this will be used.  If USESET is true then a
+         value specific to the Set Index of each image will be sought.
 
          The name of this file may be specified using indirection
          through a file.
@@ -8823,8 +9086,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          generated then the readout noise is included in the variance
          estimates.
 
-         If a global value has been set using \xroutine{CCDSETUP} then this will
-         be used.
+         If a global value has been set using \routine{CCDSETUP} then this will
+         be used.  If USESET is true then a value specific to the
+         Set Index of each image will be sought.
          [Dynamic default or 1.0]
       }
       \sstsubsection{
@@ -8839,6 +9103,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          SATURATION = \_DOUBLE (Read)
       } {
          The data saturation value. Only used if SATURATE is TRUE.
+
+         If a global value has been set using \routine{CCDSETUP} then this will
+         be used.   If USESET is true then a value specific to the
+         Set Index of each image will be sought.
          [1.0D6]
       }
       \sstsubsection{
@@ -9009,6 +9277,15 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          \qt{\_debias} string.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{debiassing}{Debiassing},
+      \secref{withbiasframes}{With a master bias},
+      \secref{nobiasframes}{Without a bias frame},
+      \secref{otherdebias}{Other DEBIAS functions},
+      \xroutine{MAKEBIAS}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -9120,7 +9397,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
       SATURATION, SETSAT and USESET) have global values. These global values
       will always take precedence, except when an assignment is made on
-      the command line.  In general global values may be set and reset
+      the command line.  If USESET is true, then global values of
+      some of thse parameters (ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT,
+      MASK, RNOISE, SATURATION) specific to the Set Index of each image
+      will be used if available.  In general global values may be set and reset
       using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands, however, the BIAS
       parameter may only be set by a run of the application \xroutine{MAKEBIAS}.
 
@@ -9139,14 +9419,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            NDF are set to ADUs or electrons depending on whether data
            expansion has occurred or not. Processing is supported for all
            HDS (non-complex) numeric types.
-
-        \sstitem
-        The MASK parameter, when it refers to an NDF, ought really to
-        be sensitive to Set header information if USESET is true.
-        This is currently not implemented because of difficulties
-        arising from the fact that MASK parameter can be interpreted
-        as an ARD file, an ARD description or an image according to
-        its value.
       }
    }
 }
@@ -9267,13 +9539,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          by these values is drawn.  If TRIM is false, this parameter
          is ignored.
 
-         If USEEXT is set, then these values will be sought from the
-         .MORE.CCDPACK.EXTENT extension of each NDF; this will only
-         succeed if they have been placed there by running the \xroutine{IMPORT}
-         or \xroutine{PRESENT} programs.  If USEEXT is false or there is no
-         suitable CCDPACK extension then if global values for these
-         bounds have been set using \xroutine{CCDSETUP} those values will be
-         used.  Otherwise, they may be given on the command line.
+         If a global value for this parameter has been set using
+         \routine{CCDSETUP} then that value will be used.  If USESET is true
+         then a value specific to the Set Index of each image will
+         be sought.
       }
       \sstsubsection{
          IN = LITERAL (Read)
@@ -9500,9 +9769,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          If the pen colour is being rotated because PENROT is true,
          USESET determines whether a new colour is used for each
-         individual image or each Set.  This parameter is ignored if
-         PENROT is false, and has no effect if the input images have
-         no Set header information.
+         individual image or each Set.  If TRIM is true, it allows
+         Set-Index-specific values of the EXTENT parameter to be
+         used.  This parameter is ignored if PENROT and TRIM are
+         false, and has no effect if the input images have no Set header
+         information.
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
@@ -9567,6 +9838,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          without an opaque background.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{view-align}{Viewing image alignment}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -9617,8 +9893,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       Certain parameters (LOGTO, LOGFILE, USESET and EXTENT) have global
       values. These global values will always take precedence, except
       when an assignment is made on the command line, or in the case
-      of EXTENT, if USEEXT is true. Global values may be set and
-      reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
+      of EXTENT, if USEEXT is true.   If USESET is true, a global value
+      for USEEXT corresponding to the Set Index of each image will be
+      sought.  Global values may be set and reset using the \xroutine{CCDSETUP}
+      and \xroutine{CCDCLEAR} commands.
 
       The DEVICE parameter also has a global association. This is not
       controlled by the usual CCDPACK mechanisms, instead it works in
@@ -9938,6 +10216,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          times larger than the output pixel and contains 16 output
          pixels.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{drizzling}{Combination by drizzling}.
    }
    \sstnotes{
       The file containing scale and zero-point corrections (see the
@@ -10611,6 +10894,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          background.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{automatedregistration}{Automated registration}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -11085,6 +11373,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          are used for matching.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{automatedregistration}{Automated registration}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -11447,6 +11740,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          same name as the corresponding input images, but with the
          characters \qt{\_flattened} appended to the filename.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{flatfielding}{Flatfielding}, 
+      \xroutine{MAKEFLAT}.
    }
    \sstnotes{
       \sstitemlist{
@@ -11823,6 +12122,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          lists will be written back into the same files.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \xroutine{CCDALIGN}, 
+      \xroutine{PAIRNDF}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -12011,7 +12316,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          processed using the import control table \$CCDPACK\_DIR/WHTSKY.DAT.
       }
    }
-
+   \sstdiytopic{
+      See also:
+   } {
+      \xroutine{PRESENT}.
+   }
    \sstdiytopic{Table Format \xlabel{TableFormat} } {
       The import control (translation) table is an ordinary text file
       which contains instructions on how to transfer FITS information
@@ -12433,7 +12742,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          will the value associated with this parameter be used.
 
          If a global value has been set up using \xroutine{CCDSETUP} this value
-         will be used, and will be shown as the default.
+         will be used, and will be shown as the default.  If USESET
+         is true, a global value specific to each image's Set Index 
+         value will be sought.
          [Dynamically derived value]
       }
       \sstsubsection{
@@ -12522,6 +12833,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          In this example all the images in the directory are used.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{masterbias}{Making a bias calibration frame},
+      \xroutine{DEBIAS}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -12560,7 +12877,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       have global values. These global values will always take
       precedence, except when an assignment is made on the command line.
       Global values may be set and reset using the \xroutine{CCDSETUP} and
-      \xroutine{CCDCLEAR} commands.
+      \xroutine{CCDCLEAR} commands.  If USESET is true then a global value
+      of RNOISE specific to the Set Index of each image will be used
+      if one is available.
 
       The parameter RNOISE will not be used if the USEEXT parameter is
       set TRUE. In this case values will be obtained from the input images
@@ -12886,6 +13205,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          associated correctly. Thus wildcards should not be used except
          when the input images have the same exposure times.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{flashordark}{Flash or dark calibration},
+      \xroutine{CALCOR}.
    }
    \sstdiytopic{
       Behaviour of parameters
@@ -13253,9 +13578,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
         gamma set so high and by performing only one iteration
         almost no bad data will be detected.
       }
-
-
-
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{flatfielding}{Flatfielding}, 
+      \xroutine{FLATCOR}.
    }
    \sstnotes{
       \sstitemlist{
@@ -13987,6 +14315,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+      \secref{mos_norm}{Mosaicing and normalisation}.
+   }
+   \sstdiytopic{
       Algorithms Used
    } {
       Some of the algorithms used by \routine{MAKEMOS} require a little
@@ -14537,6 +14870,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          same name but {\tt '}-s{\tt '} appended.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{addsethead}{Adding Set headers},
+      \xroutine{SHOWSET}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -14936,6 +15275,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          large display area.  During alignment, marked points will be
          shown as little pink circles.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{semiautomated}{Semi-automated registration},
+      \xroutine{CCDALIGN}, 
+      \xroutine{IDICURS}.
    }
    \sstnotes{
       \sstitemlist{
@@ -15860,6 +16206,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          in an automated reduction of spectral data.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{settingreductioninfo}{Setting reduction information}.
+   }
 }
 \sstroutine{REDUCE}{
    Automatic CCD data reduction facility (command-line version)
@@ -15899,6 +16250,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    }
    \sstusage{
       reduce
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \xroutine{XREDUCE}.
    }
    \sstnotes{
       Unknown detectors.
@@ -16395,6 +16751,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          Domain names CCD\_REG\_1, CCD\_REG\_2, ...
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{registration}{Determining transformation parameters}.
+   }
    \sstnotes{
       \sstitemlist{
 
@@ -16821,6 +17182,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          median stacking all the data frames.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{scheduling}{Scheduling a reduction}.
+   }
 }
 \sstroutine{SHOWSET}{
    Outputs image Set header information
@@ -17043,6 +17409,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          choosing only those which have a Set Index attribute value
          of 3.  There will be no output to the screen or log file.
       }
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{showsethead}{Examining Set headers}.
    }
    \sstdiytopic{
       Behaviour of Parameters
@@ -17879,6 +18250,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+      \secref{resampling}{Data resampling}.
+   }
+   \sstdiytopic{
       Behaviour of parameters
    }{
       Most parameters retain their current value as default. The
@@ -18273,6 +18649,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          Adds a frame giving a polar coordinate view of the PIXEL frame.
       }
    }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{wcsdirect}{Handling coordinate systems directly}.
+   }
    \sstnotes{
       This routine provides similar functionality to that provided by
       \xref{KAPPA}{sun95}{} applications 
@@ -18534,6 +18915,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
+      See also:
+   } {
+      \secref{wcscombine}{Combining coordinate systems}.
+   }
+   \sstdiytopic{
       Behaviour of parameters
    } {
       Most parameters retain their current value as default. The
@@ -18667,6 +19053,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
      to override any internal preferences, makes the focus follow the
      mouse and defines a local directory that contains setups and
      import tables.
+   }
+   \sstdiytopic{
+      See also:
+   } {
+      \secref{usingxreduce}{Using the CCDPACK data reduction GUI},
+      \xroutine{REDUCE}.
    }
 }
 
@@ -19433,7 +19825,7 @@ This is a major update to CCDPACK.
   for use with the IMPORT task.
 \end{itemize}
 
-\subsection{This release 4.0-0b}
+\subsection{This release 4.0-1b}
 
   This is a major update of CCDPACK; major new facilities have been
   added in these areas:
@@ -19453,8 +19845,13 @@ This is a major update to CCDPACK.
      Most of the existing CCDPACK applications have been modified to
      be aware of this Set information, but will behave as previously
      on data which has not had Set headers explicitly added.
-     Some work remains to be done in upgrading the data reduction
-     programs for Set use; this will be complete by the next release.
+     A new test script has been added to show off the new capabilities:
+     \begin{itemize}
+     \item SETEXERCISE -- Tests CCDPACK Set functionality
+     \end{itemize}
+     Some work remains to be done in upgrading CCDPACK for Sets,
+     notably the \xroutine{XREDUCE} GUI; this will be completed for the next
+     release.
 
   \item[{\bf Interactive registration programs:}]\mbox{}\\
      The following programs have been completely rewritten:
@@ -19517,6 +19914,13 @@ This is a major update to CCDPACK.
       \item
         \xroutine{TRANNDF} will now (sensibly) 
         refuse to resample into a SkyFrame.
+
+     \item
+        There is improved crossreferencing in \xref{SUN/139}{sun139}{}
+        from ``See also'' sections in the
+        \htmlref{task descriptions Appendix}{descriptions} 
+        back to the main text.
+
      \end{itemize}
 
   \end{description}

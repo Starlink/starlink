@@ -4,8 +4,8 @@ Sets the CCDPACK global parameters.
 
 Usage:
 
-   ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
-            direction=? deferred=? extent=? preserve=? genvar=?
+   ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=? 
+            mask=?  direction=? deferred=? extent=? preserve=? genvar=?
             ndfnames=? useset=?
 
 Description:
@@ -41,6 +41,18 @@ Description:
    to be assigned for this global parameter. If a value is not
    assigned it will be defaulted or prompted as appropriate when
    other CCDPACK applications are run.
+
+   If you are using CCDPACK Sets, then some of the parameters 
+   describing device characteristics may differ according to
+   which member of each Set is being described.  By setting the
+   BYSET parameter to true, and supplying a value for the INDEX
+   parameter, you can indicate that the global values you supply 
+   apply to the members of each Set with that Set Index.  
+   In this case it will be necessary to run CCDSETUP once
+   for each Set Index to be used (for instance, once for each
+   chip in a mosaic camera), giving a different INDEX value each
+   time.  This applies to the global parameters ADC, BOUNDS, 
+   DEFERRED, DIRECTION, EXTENT, MASK, RNOISE and SATURATION.
 
    The removal of global parameters is performed by the CCDCLEAR
    application.
@@ -80,7 +92,18 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read and Write)
    without offsetting.
    [!]
 
-DEFERRED
+BYSET
+
+BYSET = _LOGICAL (Read)
+   This parameter does not give the value of a global parameter
+   to be set up, but affects the behaviour of CCDSETUP.
+   If true, a value for the INDEX parameter will be solicited, 
+   and all the global values supplied will apply to 
+   the processing of images with that Set Index.  In this way,
+   you can provide different values of certain global parameters
+   for different members of each Set (e.g. images read from
+   different chips).
+   [FALSE]
 
 DEFERRED = _DOUBLE (Read and Write)
    The deferred charge value. Often known as the "fat" or "skinny"
@@ -122,6 +145,15 @@ GENVAR = _LOGICAL (Read and Write)
    Normally variances should be generated, even though disk and
    process-time savings can be made by their omission.
    [TRUE]
+
+INDEX
+
+INDEX = _INTEGER (Read)
+   This parameter does not give the value of a global parameter
+   to be set up, but affects the behaviour of CCDSETUP.
+   It indicates which Set Index value (i.e. which member of each
+   Set) the supplied values will apply to.  Only used if BYSET
+   is true.
 
 LOGFILE
 
@@ -316,6 +348,8 @@ USESET = _LOGICAL (Read)
    data formats) it may be more efficient to set this parameter
    false.  You should also set it false if you wanted CCDPACK 
    programs to ignore existing Set information for some reason.
+
+   If BYSET is true, this parameter will default to true also.
    [TRUE]
 
 Notes
@@ -365,15 +399,20 @@ Notes
      LOGTO = BOTH  ! Log file information to
      LOGFILE = CCDPACK.LOG  ! Name of logfile
 
+   Note that if you are using CCDPACK Sets, you will need to use
+   a separate restoration file for each INDEX value.
+
 Behaviour_of_parameters
 
    All parameters values are obtained by prompting. The suggested
    values (defaults) are either the current global values, if they
    exist, or the application current values (from the last time that
-   the application was run). If the application has not been run
-   then the "intrinsic" defaults are shown. The intrinsic defaults
-   may be obtained at any time (in the absence of global values) by
-   using the RESET keyword on the command line.
+   the application was run).  Global values corresponding to the 
+   INDEX parameter will be used as defaults if they exist.  If the 
+   application has not been run then the "intrinsic" defaults are 
+   shown. The intrinsic defaults may be obtained at any time 
+   (in the absence of global values) by using the RESET keyword on
+   the command line.
 
 Authors
 

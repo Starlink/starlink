@@ -58,7 +58,8 @@ ADC = _DOUBLE (Read)
    will not be used.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
    [1.0]
 
 BADBITS
@@ -101,7 +102,9 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    which includes any origin offsets within the input images.
 
    If global values for these bounds have been set using
-   CCDSETUP then those values will be used.
+   CCDSETUP then those values will be used.  If USESET is true
+   then a value specific to the Set Index of each image will
+   be sought.
 
 BOXSIZE
 
@@ -131,7 +134,8 @@ DEFERRED = _DOUBLE (Read)
    subtracted from the data.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
    [0.0]
 
 DIRECTION
@@ -144,7 +148,8 @@ DIRECTION = LITERAL (Read)
    along the readout direction.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
    [X]
 
 EXPAND
@@ -177,7 +182,8 @@ EXTENT(4) = _INTEGER (Read)
    flatfields whose normalisation could be adversely biased.
 
    If global values for these bounds have been set using
-   CCDSETUP then those values will be used.
+   CCDSETUP then those values will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
 
 FMODE
 
@@ -306,7 +312,8 @@ MASK = LITERAL (Read)
    that no mask is to be applied.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.   If USESET is true then a
+   value specific to the Set Index of each image will be sought.
 
    The name of this file may be specified using indirection
    through a file.
@@ -386,7 +393,8 @@ RNOISE = _DOUBLE (Read)
    estimates.
 
    If a global value has been set using CCDSETUP then this will
-   be used.
+   be used.   If USESET is true then a value specific to the 
+   Set Index of each image will be sought.
    [Dynamic default or 1.0]
 
 SATURATE
@@ -401,6 +409,10 @@ SATURATION
 
 SATURATION = _DOUBLE (Read)
    The data saturation value. Only used if SATURATE is TRUE.
+
+   If a global value has been set using CCDSETUP then this will
+   be used.   If USESET is true then a value specific to the 
+   Set Index of each image will be sought.
    [1.0D6]
 
 SETBAD
@@ -645,9 +657,13 @@ Behaviour_of_parameters
    EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
    SATURATION, SETSAT and USESET) have global values. These global values
    will always take precedence, except when an assignment is made on
-   the command line.  In general global values may be set and reset
-   using the CCDSETUP and CCDCLEAR commands, however, the BIAS
-   parameter may only be set by a run of the application MAKEBIAS.
+   the command line.  If USESET is true, then global values of some 
+   of these parameters (ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT,
+   MASK, RNOISE, SATURATION) specific to the Set Index of each image
+   will be used if available.  In general global values may be set 
+   and reset using the CCDSETUP and CCDCLEAR commands, however, 
+   the BIAS parameter may only be set by a run of the application 
+   MAKEBIAS.
 
    If the parameter USEEXT is TRUE then the following parameters
    are not used: ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT, RNOISE,
@@ -692,12 +708,5 @@ Implementation_Status
      NDF are set to ADUs or electrons depending on whether data
      expansion has occurred or not. Processing is supported for all
      HDS (non-complex) numeric types.
-
-   - The MASK parameter, when it refers to an NDF, ought really to
-     be sensitive to Set header information if USESET is true.
-     This is currently not implemented because of difficulties
-     arising from the fact that MASK parameter can be interpreted
-     as an ARD file, an ARD description or an image according to
-     its value.
 
 .endhelp

@@ -109,11 +109,6 @@ Behaviour_of_parameters
    assignment is made on the command line.  Global values may be set
    using the CCDSETUP command.
 
-Deficiencies
-
-   - Relies on subpar routine call to get global file. Uses direct
-     HDS calls to erase components.
-
 Authors
 
 PDRAPER: Peter Draper (STARLINK)

@@ -50,9 +50,20 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 
+USESET
+
+USESET = _LOGICAL (Read)
+   This parameter determines whether values keyed by Set Index
+   are to be displayed.  If CCDSETUP has been used to set up 
+   different global parameter values for different members of
+   each Set, and this parameter is true, CCDSHOW will display
+   the parameter values specific to each Set Index value
+   as well as the current unkeyed value.
+   [TRUE]
+
 Behaviour_of_parameters
 
-   The parameters (LOGTO and LOGFILE ) have global values. These
+   The parameters LOGTO, LOGFILE and USESET have global values. These
    global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    using the CCDSETUP command.

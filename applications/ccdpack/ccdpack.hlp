@@ -179,11 +179,16 @@
       - MAKESET  -- Writes Set header information to images
       - SHOWSET  -- Outputs image Set header information
 
-     Most of the existing CCDPACK applications have been modified to  
-     be aware of this Set information, but will behave as previously 
-     on data which has not had Set headers explicitly added.  Some
-     of the existing applications remain to be upgraded for Set use;
-     this will be done for the next release.
+     Most of the existing CCDPACK applications have been modified to
+     be aware of this Set information, but will behave as previously
+     on data which has not had Set headers explicitly added.  A new
+     test script has been added to show off the new capabilities:
+
+      - SETEXERCISE -- Tests CCDPACK Set functionality
+
+     Some work remains to be done in upgrading CCDPACK for Sets,
+     notably the XREDUCE GUI; this will be completed for the next 
+     release.
 
   Interactive registration programs
   ---------------------------------
@@ -237,6 +242,9 @@
         by the NAMELIST parameter.
 
       - TRANNDF will now (sensibly) refuse to resample into a SkyFrame.
+
+      - There is improved crossreferencing in SUN/139 from "See also"
+        sections in the task descriptions Appendix back to the main text.
 
 1 ASTEXP
 Exports coordinate system information from images
@@ -1530,9 +1538,6 @@ ccdclear byname names='"adc,rnoise,direc"'
    global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    using the CCDSETUP command.
-2 Deficiencies
-   - Relies on subpar routine call to get global file. Uses direct
-     HDS calls to erase components.
 2 Authors
 PDRAPER: Peter Draper (STARLINK)
 2 History
@@ -2253,8 +2258,8 @@ Sets the CCDPACK global parameters.
 
 Usage:
 
-   ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
-            direction=? deferred=? extent=? preserve=? genvar=?
+   ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=? 
+            mask=?  direction=? deferred=? extent=? preserve=? genvar=?
             ndfnames=? useset=?
 
 Description:
@@ -2291,6 +2296,18 @@ Description:
    assigned it will be defaulted or prompted as appropriate when
    other CCDPACK applications are run.
 
+   If you are using CCDPACK Sets, then some of the parameters 
+   describing device characteristics may differ according to
+   which member of each Set is being described.  By setting the
+   BYSET parameter to true, and supplying a value for the INDEX
+   parameter, you can indicate that the global values you supply 
+   apply to the members of each Set with that Set Index.  
+   In this case it will be necessary to run CCDSETUP once
+   for each Set Index to be used (for instance, once for each
+   chip in a mosaic camera), giving a different INDEX value each
+   time.  This applies to the global parameters ADC, BOUNDS, 
+   DEFERRED, DIRECTION, EXTENT, MASK, RNOISE and SATURATION.
+
    The removal of global parameters is performed by the CCDCLEAR
    application.
 2 Parameters
@@ -2322,6 +2339,17 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read and Write)
    the bias frame is to be directly subtracted from the data
    without offsetting.
    [!]
+3 BYSET
+BYSET = _LOGICAL (Read)
+   This parameter does not give the value of a global parameter
+   to be set up, but affects the behaviour of CCDSETUP.
+   If true, a value for the INDEX parameter will be solicited, 
+   and all the global values supplied will apply to 
+   the processing of images with that Set Index.  In this way,
+   you can provide different values of certain global parameters
+   for different members of each Set (e.g. images read from
+   different chips).
+   [FALSE]
 3 DEFERRED
 DEFERRED = _DOUBLE (Read and Write)
    The deferred charge value. Often known as the "fat" or "skinny"
@@ -2357,6 +2385,13 @@ GENVAR = _LOGICAL (Read and Write)
    Normally variances should be generated, even though disk and
    process-time savings can be made by their omission.
    [TRUE]
+3 INDEX
+INDEX = _INTEGER (Read)
+   This parameter does not give the value of a global parameter
+   to be set up, but affects the behaviour of CCDSETUP.
+   It indicates which Set Index value (i.e. which member of each
+   Set) the supplied values will apply to.  Only used if BYSET
+   is true.
 3 LOGFILE
 LOGFILE = FILENAME (Read and Write)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -2523,6 +2558,8 @@ USESET = _LOGICAL (Read)
    data formats) it may be more efficient to set this parameter
    false.  You should also set it false if you wanted CCDPACK 
    programs to ignore existing Set information for some reason.
+
+   If BYSET is true, this parameter will default to true also.
    [TRUE]
 2 Notes
 - Pixel indices. The bounds supplied to DEBIAS should be given as
@@ -2569,14 +2606,19 @@ USESET = _LOGICAL (Read)
      NDFNAMES = TRUE  ! Position lists associated with images
      LOGTO = BOTH  ! Log file information to
      LOGFILE = CCDPACK.LOG  ! Name of logfile
+
+   Note that if you are using CCDPACK Sets, you will need to use
+   a separate restoration file for each INDEX value.
 2 Behaviour_of_parameters
    All parameters values are obtained by prompting. The suggested
    values (defaults) are either the current global values, if they
    exist, or the application current values (from the last time that
-   the application was run). If the application has not been run
-   then the "intrinsic" defaults are shown. The intrinsic defaults
-   may be obtained at any time (in the absence of global values) by
-   using the RESET keyword on the command line.
+   the application was run).  Global values corresponding to the 
+   INDEX parameter will be used as defaults if they exist.  If the 
+   application has not been run then the "intrinsic" defaults are 
+   shown. The intrinsic defaults may be obtained at any time 
+   (in the absence of global values) by using the RESET keyword on
+   the command line.
 2 Authors
 PDRAPER: Peter Draper (STARLINK)
 2 History
@@ -2642,6 +2684,15 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+3 USESET
+USESET = _LOGICAL (Read)
+   This parameter determines whether values keyed by Set Index
+   are to be displayed.  If CCDSETUP has been used to set up
+   different global parameter values for different members of
+   each Set, and this parameter is true, CCDSHOW will display
+   the parameter values specific to each Set Index value
+   as well as the current unkeyed value.
+   [TRUE]
 2 Behaviour_of_parameters
    The parameters (LOGTO and LOGFILE ) have global values. These
    global values will always take precedence, except when an
@@ -2717,7 +2768,8 @@ ADC = _DOUBLE (Read)
    will not be used.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
    [1.0]
 3 BADBITS
 BADBITS = _INTEGER (Read)
@@ -2754,7 +2806,9 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    which includes any origin offsets within the input images.
 
    If global values for these bounds have been set using
-   CCDSETUP then those values will be used.
+   CCDSETUP then those values will be used.  If USESET is true
+   then a value specific to the Set Index of each image will
+   be sought.
 3 BOXSIZE
 BOXSIZE( 2 ) = _INTEGER (Read)
    The sizes of the sides of the box to be used when smoothing the
@@ -2778,7 +2832,8 @@ DEFERRED = _DOUBLE (Read)
    subtracted from the data.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
    [0.0]
 3 DIRECTION
 DIRECTION = LITERAL (Read)
@@ -2789,7 +2844,8 @@ DIRECTION = LITERAL (Read)
    along the readout direction.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
    [X]
 3 EXPAND
 EXPAND = _LOGICAL (Read)
@@ -2818,7 +2874,8 @@ EXTENT(4) = _INTEGER (Read)
    flatfields whose normalisation could be adversely biased.
 
    If global values for these bounds have been set using
-   CCDSETUP then those values will be used.
+   CCDSETUP then those values will be used.  If USESET is true then a
+   value specific to the Set Index of each image will be sought.
 3 FMODE
 FMODE = LITERAL (Read)
    The fit mode which will be used when interpolating bias values.
@@ -2929,7 +2986,8 @@ MASK = LITERAL (Read)
    that no mask is to be applied.
 
    If a global value for this parameter has been set using
-   CCDSETUP then this will be used.
+   CCDSETUP then this will be used.   If USESET is true then a
+   value specific to the Set Index of each image will be sought.
 
    The name of this file may be specified using indirection
    through a file.
@@ -2999,7 +3057,8 @@ RNOISE = _DOUBLE (Read)
    estimates.
 
    If a global value has been set using CCDSETUP then this will
-   be used.
+   be used.   If USESET is true then a value specific to the
+   Set Index of each image will be sought.
    [Dynamic default or 1.0]
 3 SATURATE
 SATURATE = _LOGICAL (Read)
@@ -3010,6 +3069,10 @@ SATURATE = _LOGICAL (Read)
 3 SATURATION
 SATURATION = _DOUBLE (Read)
    The data saturation value. Only used if SATURATE is TRUE.
+
+   If a global value has been set using CCDSETUP then this will
+   be used.   If USESET is true then a value specific to the
+   Set Index of each image will be sought.
    [1.0D6]
 3 SETBAD
 SETBAD = _LOGICAL (Read)
@@ -3228,9 +3291,13 @@ debias in='*' out='*_debias' bounds='[3,16,912,940]' adc=1 rnoise=4
    EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
    SATURATION, SETSAT and USESET) have global values. These global values
    will always take precedence, except when an assignment is made on
-   the command line.  In general global values may be set and reset
-   using the CCDSETUP and CCDCLEAR commands, however, the BIAS
-   parameter may only be set by a run of the application MAKEBIAS.
+   the command line.  If USESET is true, then global values of some 
+   of these parameters (ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT,
+   MASK, RNOISE, SATURATION) specific to the Set Index of each image
+   will be used if available.  In general global values may be set 
+   and reset using the CCDSETUP and CCDCLEAR commands, however, 
+   the BIAS parameter may only be set by a run of the application 
+   MAKEBIAS.
 
    If the parameter USEEXT is TRUE then the following parameters
    are not used: ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT, RNOISE,
@@ -3269,13 +3336,6 @@ PDRAPER: Peter Draper (STARLINK)
      NDF are set to ADUs or electrons depending on whether data
      expansion has occurred or not. Processing is supported for all
      HDS (non-complex) numeric types.
-
-   - The MASK parameter, when it refers to an NDF, ought really to
-     be sensitive to Set header information if USESET is true.
-     This is currently not implemented because of difficulties
-     arising from the fact that MASK parameter can be interpreted
-     as an ARD file, an ARD description or an image according to
-     its value.
 
 1 DRAWNDF
 Draws aligned images or outlines on a graphics display.
@@ -3388,13 +3448,10 @@ EXTENT( 4 ) = _INTEGER (Read)
    by these values is drawn.  If TRIM is false, this parameter
    is ignored.
 
-   If USEEXT is set, then these values will be sought from the
-   .MORE.CCDPACK.EXTENT extension of each image; this will only
-   succeed if they have been placed there by running the IMPORT
-   or PRESENT programs.  If USEEXT is false or there is no
-   suitable CCDPACK extension then if global values for these
-   bounds have been set using CCDSETUP those values will be
-   used.  Otherwise, they may be given on the command line.
+   If a global value for this parameter has been set using
+   CCDSETUP then that value will be used.  If USESET is true
+   then a value specific to the Set Index of each image will
+   be sought.
 3 IN
 IN = LITERAL (Read)
    A list of the images to be displayed.
@@ -3571,9 +3628,11 @@ USEEXT = _LOGICAL (Read)
 USESET = _LOGICAL (Read)
    If the pen colour is being rotated because PENROT is true,
    USESET determines whether a new colour is used for each
-   individual image or each Set.  This parameter is ignored if
-   PENROT is false, and has no effect if the input NDFs have
-   no Set header information.
+   individual image or each Set.  If TRIM is true, it allows
+   Set-Index-specific values of the EXTENT parameter to be
+   used.  This parameter is ignored if PENROT and TRIM are
+   false, and has no effect if the input images have no Set header
+   information.
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
@@ -3663,8 +3722,10 @@ drawndf "obs-[abc]" image lines labup labopaque=false
    Certain parameters (LOGTO, LOGFILE, USESET and EXTENT) have global
    values. These global values will always take precedence, except
    when an assignment is made on the command line, or in the case
-   of EXTENT, if USEEXT is true. Global values may be set and
-   reset using the CCDSETUP and CCDCLEAR commands.
+   of EXTENT, if USEEXT is true.  If USESET is true, a global value
+   for USEEXT corresponding to the Set Index of each image will be
+   sought.  Global values may be set and reset using the CCDSETUP
+   and CCDCLEAR commands.
 
    The DEVICE parameter also has a global association. This is not
    controlled by the usual CCDPACK mechanisms, instead it works in
@@ -6154,7 +6215,9 @@ RNOISE = _DOUBLE (Read)
    will the value associated with this parameter be used.
 
    If a global value has been set up using CCDSETUP this value
-   will be used, and will be shown as the default.
+   will be used, and will be shown as the default.  If USESET
+   is true, a global value specific to each image's Set Index 
+   value will be sought.
    [Dynamically derived value]
 3 SIGMAS
 SIGMAS = _REAL (Read)
@@ -6248,7 +6311,9 @@ makebias in='*' out=master_bias
    have global values. These global values will always take
    precedence, except when an assignment is made on the command line.
    Global values may be set and reset using the CCDSETUP and
-   CCDCLEAR commands.
+   CCDCLEAR commands.  If USESET is true then a global value
+   of RNOISE specific to the Set Index of each image will be used
+   if one is available.
 
    The parameter RNOISE will not be used if the USEEXT parameter is
    set TRUE. In this case values will be obtained from the input images
