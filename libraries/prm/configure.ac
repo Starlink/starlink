@@ -41,40 +41,9 @@ STAR_PLATFORM_SOURCES([num_han.c],
 AC_C_BIGENDIAN
 
 
-
-dnl  Determine the intrinsics available to the Fortran compiler.
-dnl
-dnl  This macro should go in autoconf/lib/autoconf/fortran.m4
-dnl
-dnl  I think it should be safe enough to give a real argument to each
-dnl  intrinsic below, and assign it to a real result -- that's more likely
-dnl  to cause run-time than compilation or link errors, which are what we
-dnl  care about here.
-dnl
-AC_DEFUN([AC_FC_HAS_INTRINSICS],
-         [AC_REQUIRE([AC_PROG_FC])
-          AC_LANG_PUSH([Fortran])
-          AC_FOREACH([IntrinsicName], m4_translit([$1], [a-z], [A-Z]),
-                     [AC_CACHE_CHECK([whether ${FC} supports intrinsic ]IntrinsicName,
-                                     [ac_cv_fc_has_]IntrinsicName,
-                                     [AC_LINK_IFELSE([AC_LANG_PROGRAM([],[
-      REAL X
-      X = IntrinsicName[(1.)]
-])],
-                                          ac_cv_fc_has_[]IntrinsicName=yes,
-                                          ac_cv_fc_has_[]IntrinsicName=no)])
-                      if test $ac_cv_fc_has_[]IntrinsicName = yes; then
-                          AC_DEFINE([HAVE_INTRINSIC_]IntrinsicName, 1,
-                                    [Define to 1 if the Fortran compiler supports intrinsic ]IntrinsicName)
-                      fi
-                     ])
-         AC_LANG_POP([Fortran])
-])# AC_FC_HAS_INTRINSICS
-
-
 dnl    Check for SIND as proxy for the other trig functions which take
 dnl    degree arguments, and IZEXT as proxy for related VMS intrinsics.
-AC_FC_HAS_INTRINSICS([izext nint anint sind])
+AC_FC_CHECK_INTRINSICS([izext nint anint sind])
 
 
 
