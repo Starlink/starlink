@@ -44,6 +44,8 @@ f     The TranMap class does not define any new routines beyond those
 *  History:
 *     10-FEB-2004 (DSB):
 *        Original version.
+*     19-JAN-2005 (DSB):
+*        Fix memory leak.
 *class--
 */
 
@@ -394,16 +396,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          (void) astAnnul( ( *map_list )[ where ] );
          ( *map_list )[ where ] = (AstMapping *) astTranMap( smap_f, smap_i, "" );
          result = where;
-         smap_f = astAnnul( smap_f );
-         smap_i = astAnnul( smap_i );
 
 /* Otherwise, if the both component Mappings are defined in both directions... */
       } else if( astGetTranForward( map1 ) && astGetTranInverse( map1 ) &&    
                  astGetTranForward( map2 ) && astGetTranInverse( map2 ) ) {
-
-/* Release resources. */
-         smap_f = astAnnul( smap_f );
-         smap_i = astAnnul( smap_i );
 
 /* Form a series CmpMap from the two component Mappings, with the second
    Mapping inverted. */
@@ -429,6 +425,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          smap = astAnnul( smap );
          cmap = astAnnul( cmap );
       }
+
+/* Release resources. */
+      smap_f = astAnnul( smap_f );
+      smap_i = astAnnul( smap_i );
    }
 
 /* Merge the TranMap with a neighbouring TranMap. */
