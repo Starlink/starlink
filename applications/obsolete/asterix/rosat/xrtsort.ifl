@@ -122,10 +122,9 @@
      PARAMETER RANGES
                TYPE    '_CHAR'
                PROMPT  'Property ranges to change (enter numbers)'
-               PPATH   'CURRENT,DEFAULT'
+               PPATH   'DEFAULT'
+               DEFAULT !
                HELP    'Enter 1 for x, 2 for y... Enter "!" to use ranges shown'
-               VPATH   'PROMPT'
-               DEFAULT  3
             ENDPARAMETER
 
      PARAMETER XSTART
