@@ -157,7 +157,8 @@
 *  External References:
       INTEGER KPG1_CEIL          ! Returns smallest integer >= X
       INTEGER KPG1_FLOOR         ! Returns largest integer <= X
-
+      INTEGER CHR_LEN            ! Used length of a string
+   
 *  Local Constants:
       INTEGER MAX_ID               
       PARAMETER ( MAX_ID = 11 )
@@ -483,16 +484,23 @@
          FRM = AST_FRAME( NDIMO, ' ', STATUS )
 
          CALL CAT_TIQAC( GI( X_ID ), 'NAME', NAME, STATUS )
-         CALL AST_SETC( FRM, 'Symbol(1)', NAME, STATUS )
-         CALL AST_SETC( FRM, 'Label(1)', NAME, STATUS )
+         CALL AST_SETC( FRM, 'Symbol(1)', NAME( : CHR_LEN( NAME ) ), 
+     :                  STATUS )
+         CALL AST_SETC( FRM, 'Label(1)', NAME( : CHR_LEN( NAME ) ), 
+     :                  STATUS )
 
          CALL CAT_TIQAC( GI( Y_ID ), 'NAME', NAME, STATUS )
-         CALL AST_SETC( FRM, 'Symbol(2)', NAME, STATUS )
-         CALL AST_SETC( FRM, 'Label(2)', NAME, STATUS )
+         CALL AST_SETC( FRM, 'Symbol(2)', NAME( : CHR_LEN( NAME ) ), 
+     :                  STATUS )
+         CALL AST_SETC( FRM, 'Label(2)', NAME( : CHR_LEN( NAME ) ), 
+     :                  STATUS )
 
          IF( SPEC ) THEN
             CALL CAT_TIQAC( GI( Z_ID ), 'NAME', NAME, STATUS )
-            CALL AST_SETC( FRM, 'Symbol(3)', NAME, STATUS )
+            CALL AST_SETC( FRM, 'Symbol(3)', NAME( : CHR_LEN( NAME ) ), 
+     :                  STATUS )
+            CALL AST_SETC( FRM, 'Label(3)', NAME( : CHR_LEN( NAME ) ), 
+     :                  STATUS )
          END IF
 
          IWCS =AST_FRAMESET( FRM, ' ', STATUS )

@@ -89,10 +89,12 @@
 
 *  External References:
       LOGICAL CHR_SIMLR
+      INTEGER CHR_LEN
 
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER CVAL*255         ! Textual attribute value
+      CHARACTER DEFDOM*30        ! Default Domain value
       CHARACTER NAME( NDF__MXDIM )*(CAT__SZCMP)! Axis name
       CHARACTER SYM*20           ! Symbol attribute value
       CHARACTER SYS*3            ! Ref. frame for RA/DEC values
@@ -110,6 +112,7 @@
       INTEGER IAT                ! No. of characters in string
       INTEGER ICURR              ! Original Current Frame index
       INTEGER J                  ! Axis index
+      INTEGER NMLEN( NDF__MXDIM )! Used length of column names
       INTEGER NUSED              ! Number or axes allocated so far
       INTEGER PERM( NDF__MXDIM ) ! Axis permutation array
       INTEGER RAAX               ! Index of catalogue RA axis
@@ -125,9 +128,15 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  We require columns with names given by GI.
+*  We require columns with names given by GI. Also form a default Domain
+*  value by concatentating the column names separated by minius signs.
+      DEFDOM = ' '
+      IAT = 0
       DO I = 1, NDIM      
          CALL CAT_TIQAC( GI( I ), 'NAME', NAME( I ), STATUS )
+         NMLEN( I ) = CHR_LEN( NAME( I ) )
+         CALL CHR_APPND( NAME( I ), DEFDOM, IAT )
+         IF( I .NE. NDIM ) CALL CHR_APPND( '-', DEFDOM, IAT )
       END DO
 
 *  Reset the pointer for the next item of textual information to be read
@@ -325,13 +334,15 @@
 
 *  Ensure that all the axes have the correct symbols, label and units
 *  attributes (these will already be OK if the axes belong to a SkyFrame).
+         
          DO I = 1, NDIM
             IF( I .NE. RAAX .AND. I .NE. DECAX ) THEN 
                ATTR = 'Symbol('
                IAT = 7
                CALL CHR_PUTI( I, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               CALL AST_SETC( FRM, ATTR( : IAT ), NAME( I ), STATUS )
+               CALL AST_SETC( FRM, ATTR( : IAT ), 
+     :                        NAME( I )( : NMLEN( I ) ), STATUS )
 
                TEXT = ' '
                CALL POL1_TIQAC( GI( I ), 'COMMENTS', TEXT, STATUS )
@@ -345,8 +356,8 @@
                IAT = 6
                CALL CHR_PUTI( I, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               CALL AST_SETC( FRM, ATTR( : IAT ), TEXT( : IAT ), 
-     :                        STATUS )
+               CALL AST_SETC( FRM, ATTR( : IAT ), 
+     :                        TEXT( : CHR_LEN( TEXT ) ), STATUS )
 
                TEXT = ' '
                CALL POL1_TIQAC( GI( I ), 'UNITS', TEXT, STATUS )
@@ -360,6 +371,12 @@
 
             END IF
          END DO
+
+*  If the Frame has no DOMAIN, use a default domain formed by
+*  concatenating the column names.
+         IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. ' ' ) THEN 
+            CALL AST_SETC( FRM, 'DOMAIN', DEFDOM, STATUS ) 
+         END IF
 
 *  Create the default FrameSet holding the above Frame.
          IWCS = AST_FRAMESET( FRM, ' ', STATUS )
