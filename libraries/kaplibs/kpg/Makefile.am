@@ -16,7 +16,7 @@ PRIVATE_INCLUDES = KPG_PAR
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
 kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
 
-F_ROUTINES = $(KPG_NONGEN) $($KPG_N_GEN:.gn=.f) $($KPG_DR_GEN:.gdr=.f) 
+F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) 
 
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_mixv.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn
@@ -159,9 +159,14 @@ kpg1_dnag2r.f  kpg1_dr2nag.f  kpg1_nag2r.f  kpg1_r2nag.f
 
 
 .gn.f:
-	$(GENERIC)  -t n $<
+	cp $< $(<:.gn=.gen)
+	$(GENERIC)  -t n $(<:.gn=.gen)
+	rm $(<:.gn=.gen)
+
 
 .gdr.f:
-	$(GENERIC)  -t dr $<
+	cp $< $(<:.gdr=.gen)
+	$(GENERIC)  -t dr $(<:.gdr=.gen)
+	rm $(<:.gdr=.gen)
 
 AM_FCFLAGS = -I../ctm -I../ira
