@@ -1,5 +1,5 @@
       SUBROUTINE FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
-     :                    NPAR, LB, UB, FROZEN, SSCALE,
+     :                    PRGRES, NPAR, LB, UB, FROZEN, SSCALE,
      :                    FSTAT, PREDICTOR, PREDDAT, PARAM, DPAR,
      :                    PEGGED, STAT, FINISHED, FITERR, STATUS )
 *+
@@ -13,10 +13,9 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN, NPAR, LB,
-*                   UB, FROZEN, SSCALE, FSTAT, PREDICTOR,
-*                   PREDDAT, PARAM, DPAR,PEGGED, STAT, FINISHED, FITERR,
-*                   STATUS )
+*     CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN, PRGRES, NPAR,
+*                   LB, UB, FROZEN, SSCALE, FSTAT, PREDICTOR, PREDDAT,
+*                   PARAM, DPAR,PEGGED, STAT, FINISHED, FITERR, STATUS )
 
 *  Description:
 *     Chooses one of a number of minimisation algorithms given the
@@ -36,6 +35,8 @@
 *        altered but its ADI data may be.
 *     OPCHAN = INTEGER (given)
 *        Output channel, or none if < 1
+*     PRGRES = LOGICAL (given)
+*        Issue progress reports and update model file?
 *     NPAR = INTEGER (given)
 *        Number of model parameters
 *     LB[NPAR] = REAL (given)
@@ -136,7 +137,7 @@
       RECORD /INSTR_RESP/ 	INSTR(NDS)
       RECORD /MODEL_SPEC/ 	MODEL
       REAL			LB(*), UB(*)
-      LOGICAL			FROZEN(*)
+      LOGICAL			PRGRES, FROZEN(*)
       EXTERNAL			PREDICTOR
 
 *  Arguments Given and Returned:
@@ -166,7 +167,7 @@
 
 *    CURFIT algorithm
 	CALL FIT_MIN1( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
-     :                 NPAR, LB, UB, FROZEN, SSCALE,
+     :                 PRGRES, NPAR, LB, UB, FROZEN, SSCALE,
      :                 FSTAT, PREDICTOR, PREDDAT, PARAM, DPAR,
      :                 PEGGED, STAT, FINISHED, FITERR, STATUS )
 

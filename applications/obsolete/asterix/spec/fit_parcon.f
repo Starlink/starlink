@@ -1,6 +1,6 @@
 *+  FIT_PARCON - Evaluates confidence intervals for some model parameters
-      SUBROUTINE FIT_PARCON( NDS, OBDAT, INSTR, MODEL, SOFF, OPCHAN,
-     :                       NEPAR, EPAR, NITMAX, MINSLO, NPAR, LB,
+      SUBROUTINE FIT_PARCON( NDS, OBDAT, INSTR, MODEL, MCTRL, SOFF,
+     :                       OPCHAN, NEPAR, EPAR, NPAR, LB,
      :                       UB, FROZEN, SSCALE, DPAR, FSTAT, PREDICTOR,
      :                       PREDDAT, STATMIN, PARAM, PEGGED, LE, UE,
      :                       PEGCODE, STATUS )
@@ -79,20 +79,33 @@
 *
 *    History :
 *
-*     24 Jul 87 : Original (BHVAD::TJP)
-*      6 Aug 87 : Sign flip for unavailable errors (TJP)
-*      9 Nov 87 : Bug in pegcode setting fixed (TJP)
-*     20 Jun 88 : New structures, global eliminated (TJP)
-*     26 Mar 92 : FIT_PREDDAT passed as external PREDICTOR (RJV)
-*     28 May 92 : Updated for maximum likelihood fitting. Error handling
-*                 corrected (DJA)
-*     15 Jun 92 : Added FSTAT and changed NDOF to SSCALE (DJA)
-*     25 Jun 92 : Error handling fixed (TJP)
-*     18 Aug 92 : Statistic now double precision (DJA)
-*     13 Jan 93 : NEPAR and EPAR arrays allows error calculation to be
-*                 restricted to specific parameters (DJA)
-*     19 May 94 : Updated to handle constrained fitting (DJA)
-*     12 Jan 95 : Fixed deleted line causing FFROZEN to be uninitialised (DJA)
+*     24 Jul 1987 (TJP):
+*        Original version
+*      6 Aug 1987 (TJP):
+*        Sign flip for unavailable errors
+*      9 Nov 1987 (TJP):
+*        Bug in pegcode setting fixed
+*     20 Jun 1988 (TJP):
+*        New structures, global eliminated
+*     26 Mar 1992 (RJV):
+*        FIT_PREDDAT passed as external PREDICTOR
+*     28 May 1992 (DJA):
+*        Updated for maximum likelihood fitting. Error handling corrected
+*     15 Jun 1992 (DJA):
+*        Added FSTAT and changed NDOF to SSCALE
+*     25 Jun 1992 (TJP):
+*        Error handling fixed
+*     18 Aug 1992 (DJA):
+*        Statistic now double precision
+*     13 Jan 1993 (DJA):
+*        NEPAR and EPAR arrays allows error calculation to be
+*        restricted to specific parameters
+*     19 May 1994 (DJA):
+*        Updated to handle constrained fitting
+*     12 Jan 1995 (DJA):
+*        Fixed deleted line causing FFROZEN to be uninitialised
+*     17 Apr 1996 (DJA):
+*        Use MCTRL object and generalised FIT_MIN
 *
 *    Type definitions :
 *
@@ -101,7 +114,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INCLUDE 'FIT_PAR'
 *
@@ -115,14 +127,12 @@
       RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
       RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
       RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER			MCTRL			!
       REAL                SOFF			! Stat offset for conf. limit
       INTEGER             OPCHAN		! Output channel for diagnostic
 	                                        ! messages ( <1 for no messages)
       INTEGER             NEPAR                 ! No of parameters for errors
       INTEGER             EPAR(NEPAR)           ! Parameter nos for errors
-      INTEGER             NITMAX		! Max. no of iterations for each fit
-      REAL                MINSLO		! Statistic slope threshold for
-					        ! termination in FIT_MIN
       INTEGER             NPAR			! No of parameters
       REAL                LB(NPAR)		! Parameter lower bounds
       REAL                UB(NPAR)		! Parameter upper bounds
@@ -163,22 +173,17 @@
       LOGICAL             FPEGGED(NPAMAX)	! Parameters pegged in fitting
       LOGICAL             FFROZEN(NPAMAX)	! Frozen flags for fitting
       LOGICAL             FINISHED		! Minimum found
-      LOGICAL             INITIALISE		! Initialise FIT_MIN?
       LOGICAL             LFROZEN(NPAMAX)	! Frozen flags with constraints
-*
-*    Local data :
-*
-      DATA                INITIALISE /.FALSE./
 *-
 
-*    Status check
+*  Check inherited global status
       IF ( STATUS.NE.SAI__OK ) RETURN
 
-*    Local frozen array
+*  Local frozen array
       CALL FIT1_LOCFRO( MODEL, NPAR, FROZEN, LFROZEN, STATUS )
 
-*    Initialise
-      NUNFROZEN=0
+*  Initialise
+      NUNFROZEN = 0
       DO J = 1, NPAR
 	FPEGGED(J) = PEGGED(J)
 	FROZEN(J) = LFROZEN(J)
@@ -187,7 +192,7 @@
 	FPAR(J) = PARAM(J)
       END DO
 
-*    Load the LEPAR array of parameters whose error are to be calculated
+*  Load the LEPAR array of parameters whose error are to be calculated
       IF ( NEPAR .EQ. NPAR ) THEN
         DO J = 1, NPAR
           LEPAR(J) = J
@@ -198,24 +203,24 @@
         END DO
       END IF
 
-*    Loop through parameters
+*  Loop through parameters
       DO EJ = 1, NEPAR
 
-*      Get parameter number for error
+*    Get parameter number for error
         J = LEPAR(EJ)
 
-*      Only errors for free and unconstrained parameters
+*    Only errors for free and unconstrained parameters
 	IF ( .NOT. LFROZEN(J) ) THEN
 
-*        Freeze parameter to test statistic at offsets
+*      Freeze parameter to test statistic at offsets
 	  FFROZEN(J) = .TRUE.
 
-*        Lower error
+*      Lower error
 	  IF ( OPCHAN .GT. 0 ) THEN
 	    WRITE(OPCHAN,*) '- Lower bound for parameter ',J
 	  END IF
 
-*        Check LE
+*      Check LE
 	  IF ( LE(J) .EQ. 0.0 ) THEN
 	    STATUS = SAI__ERROR
 	    CALL ERR_REP( ' ', 'Lower error of zero entered', STATUS )
@@ -225,7 +230,7 @@
 	  ENDIF
  100	  FPAR(J) = PARAM(J) - LE(J)
 
-*        Check against bound
+*      Check against bound
 	  IF ( PARAM(J) .EQ. LB(J) ) THEN
 	    LE(J) = -LE(J)		! No error available - flip sign to flag
 	    IF ( OPCHAN .GT. 0 ) THEN
@@ -234,32 +239,34 @@
 
 	  ELSE
 
-*          Check if on lower bound - if it is adjuts both the value and error
+*        Check if on lower bound - if it is adjuts both the value and error
 	    IF ( FPAR(J) .LT. LB(J) ) THEN
 	      FPAR(J) = LB(J)
 	      LE(J) = PARAM(J) - LB(J)
 	    END IF
 
-*          Ensure dependencies are up to date
+*        Ensure dependencies are up to date
             CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
             CALL FIT1_COPDEPL( MODEL, FFROZEN, STATUS )
 
-*          Get initial chi-squared value
+*        Get initial value of statistic
 	    CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, FPAR, FSTAT,
      :                         PREDICTOR, PREDDAT, STAT, STATUS )
 
-*          Catch case where there is only one parameter (no minimisation needed)
+*        Catch case where there is only one parameter (no minimisation needed)
 	    IF ( NUNFROZEN .EQ. 1 ) THEN
-	        IF(OPCHAN.GT.0)THEN
-	          WRITE(OPCHAN,*) '  No parameters to optimise'
-	        ENDIF
-	        GO TO 1000
+	      IF(OPCHAN.GT.0)THEN
+	        WRITE(OPCHAN,*) '  No parameters to optimise'
 	      ENDIF
+	      GOTO 1000
+	    END IF
+
 *        Find minimum
-	      INITIALISE=.TRUE.
-	      CALL FIT_MIN(NDS,OBDAT,INSTR,MODEL,0,NITMAX,NPAR,LB,UB,
-     :         FFROZEN,SSCALE,INITIALISE,MINSLO,FSTAT,PREDICTOR,PREDDAT,
-     :         FPAR,DPAR,FPEGGED,STAT,NIT,FINISHED,FITERR,STATUS)
+            CALL ADI_CPUT0I( MCTRL, 'Niter', 0, STATUS )
+	    CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
+     :                    NPAR, LB, UB, FFROZEN, SSCALE, FSTAT,
+     :                    PREDICTOR, PREDDAT, FPAR, DPAR, FPEGGED, STAT,
+     :                    FINISHED, FITERR, STATUS )
 	      IF(FITERR.NE.0)THEN
 	        CALL MSG_SETI('FERR',FITERR)
 	        CALL MSG_SETI('NPAR',J)
@@ -308,15 +315,15 @@ D	      print *,'new le: ',le(j)
 	      ENDDO
 	    ENDIF
 
-*        Upper error
+*      Upper error
 	  IF ( OPCHAN .GT. 0 ) THEN
 	    WRITE(OPCHAN,*) '- Upper bound for parameter ', J
 	  END IF
 
-*        Reset FPAR
+*      Reset FPAR
           CALL ARR_COP1R( NPAR, PARAM, FPAR, STATUS )
 
-*        Check UE
+*      Check UE
 	    IF(UE(J).EQ.0.0)THEN
 	      STATUS = SAI__ERROR
 	      CALL ERR_REP(' ', 'Upper error of zero entered', STATUS )
@@ -352,11 +359,13 @@ D	      print *,'new le: ',le(j)
 	        ENDIF
 	        GO TO 2000
 	      ENDIF
+
 *        Find minimum
-	      INITIALISE=.TRUE.
-	      CALL FIT_MIN(NDS,OBDAT,INSTR,MODEL,0,NITMAX,NPAR,LB,UB,
-     :         FFROZEN,SSCALE,INITIALISE,MINSLO,FSTAT,PREDICTOR,PREDDAT,
-     :         FPAR,DPAR,FPEGGED,STAT,NIT,FINISHED,FITERR,STATUS)
+              CALL ADI_CPUT0I( MCTRL, 'Niter', 0, STATUS )
+	      CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0,
+     :                      .FALSE., NPAR, LB, UB, FFROZEN, SSCALE,
+     :                      FSTAT, PREDICTOR, PREDDAT, FPAR, DPAR,
+     :                      FPEGGED, STAT, FINISHED, FITERR, STATUS )
 	      IF(FITERR.NE.0)THEN
 	        CALL MSG_SETI('FERR',FITERR)
 	        CALL MSG_SETI('NPAR',J)
@@ -417,21 +426,21 @@ D	      print *,'new le: ',le(j)
 	      ENDDO
 	    ENDIF
 
-*        Reset for next pass through loop
+*      Reset for next pass through loop
 	  FFROZEN(J) = FROZEN(J)
 	  FPAR(J) = PARAM(J)
 
-*      End of frozen check
+*    End of frozen check
 	END IF
 
-*    Next parameter whose error to be found
+*  Next parameter whose error to be found
       END DO
 
-*    Ensure dependent parameters are set up
+*  Ensure dependent parameters are set up
       CALL FIT1_COPDEP( MODEL, LE, STATUS )
       CALL FIT1_COPDEP( MODEL, UE, STATUS )
 
-*    Exit
+*  Exit
  9000 IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.USER__001) ) THEN
         CALL AST_REXIT( 'FIT_PARCON', STATUS )
       END IF
