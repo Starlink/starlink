@@ -25,35 +25,49 @@
 *     will show their relative positions in their current coordinates,
 *     and so can, for instance, be used to check that alignment looks
 *     sensible prior to resampling and combining into a mosaic.
+*     Depending on the CLEAR parameter it will either clear the 
+*     display device and set the plotting area to the right size to 
+*     fit in all the images, or leave the display intact and plot those
+*     parts of images which fit on the existing area.
+*
 *     Depending on the LINES and IMAGE parameters, an outline showing
 *     the extent of each NDF can be plotted, or the pixels of the NDF
-*     resampled into the given coordinates, or both.
+*     resampled into the given coordinate system, or both.
 *     Each outline indicates the extent of the data array of the 
 *     corresponding NDF, and is therefore basically rectangular
 *     in shape, though it may be distorted if the mapping
 *     between pixel and Current coordinates is nonlinear.  The origin
 *     (minimum X,Y pixel value) of each boundary can be marked and
 *     the image labelled with its name and/or index number.
+*     Optionally (according to the TRIM parameter), the display may 
+*     be restricted to the useful extent of the image, enabling 
+*     overscan regions or bias strips to be ignored.
 *
-*     If the IMAGE parameter is set, then the NDF's data can be seen 
-*     as well as its position.  The colour levels in this case are 
-*     determined by the PERCENTILES argument.  Overlapping images 
-*     will simply be drawn on top of each other (no averaging is
-*     performed).  For displaying a single image in its pixel coordinate
-*     system the KAPPA program DISPLAY, which has more display options,
-*     may be preferable.  Without this option the program does not 
-*     need to examine the pixel data at all, so it will run much faster.
+*     If the OUTLINES parameter is true, the position of each NDF's
+*     data array will be indicated by a (perhaps distorted) rectangle
+*     drawn on the device.  If the IMAGE parameter is true, then
+*     the image's pixels will be plotted as well as its position.
+*     The colour levels in this case are determined by the PERCENTILES
+*     argument applied separately to each plotted data set.  Overlapping
+*     images will simply be drawn on top of each other (no averaging is
+*     performed).  If the IMAGES parameter is false, the program does
+*     not need to examine the data pixels at all, so it will run
+*     much faster.
 *
 *     The results are only likely to be sensible if the Current 
 *     coordinate system of all the NDFs is one in which they are all
-*     registered.  If they do not all have the same current Domain
-*     name, a warning will be issued, but plotting will proceed.
+*     (more or less) aligned.  If the Current attached coordinate 
+*     systems of all do not all have the same Domain (name), a 
+*     warning will be issued, but plotting will proceed.
 *
 *     BOUNDS uses the AGI graphics database in a way which is 
-*     compatible with KAPPA applications; if the CLEAR parameter is set
-*     to false then it will attempt to align the boundary drawings with
-*     suitably registered graphics which are already on the graphics 
-*     device.  So, for instance, it is easy to overlay the outlines
+*     compatible with KAPPA applications; if the CLEAR parameter is 
+*     set to false (only possible when IMAGE is also false) then it 
+*     will attempt to align the plotted outlines with suitably
+*     registered graphics which are already on the graphics 
+*     device; in this case outlines or parts of outlines lying 
+*     outside the existing graphics window remain unplotted.  
+*     So, for instance, it is easy to overlay the outlines
 *     of a set of NDFs on a mosaic image which has been constructed 
 *     using those NDFs, or to see how an undisplayed set of NDFs 
 *     would map onto one already displayed, either by a previous 
@@ -61,7 +75,7 @@
 *     or CONTOUR.
 *
 *     This routine is designed for use on two-dimensional NDFs;
-*     if the NDFs presented have more than two dimensions, any extra
+*     if the NDFs presented have more than two dimensions, any higher
 *     ones will be ignored.
 
 *  Usage:
@@ -70,9 +84,9 @@
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
 *        True if labelled and annotated axes are to be drawn around the
-*        outlines, showing the common Current coordinate system of the
-*        NDFs.  The appearance of the axes can be controlled using the
-*        STYLE parameter.  This parameter has a dynamic default; it
+*        plotting surface, showing the common Current coordinate system
+*        of the images.  The appearance of the axes can be controlled
+*        using the STYLE parameter.  AXES has a dynamic default; it
 *        defaults to the same value as the CLEAR parameter.
 *        [dynamic]
 *     CLEAR = _LOGICAL (Read)
@@ -88,13 +102,33 @@
 *        aligned in any suitable domain, then BOUNDS will terminate
 *        with an error.  If CLEAR is set to FALSE, then there must
 *        already be a picture displayed on the graphics device.
+*
 *        The CLEAR parameter is ignored if IMAGE is true.
 *        [TRUE]
 *     DEVICE = DEVICE (Read)
 *        The name of the device on which to draw the outlines.
 *        [Current display device]
+*     EXTENT( 4 ) = _INTEGER (Read)
+*        The extent of the useful CCD area.  This should be given in
+*        pixel index values (see notes). The extent is restricted to
+*        that of the CCD frame, so no padding of the data can occur. If
+*        values outside of those permissable are given then they are
+*        modified to lie within the CCD frame. The values should be
+*        given in the order XMIN,XMAX,YMIN,YMAX.
+*
+*        If the TRIM parameter is set true, then only the area defined
+*        by these values is outlined or displayed.  If TRIM is false,
+*        this parameter is ignored.
+*
+*        If USEEXT is set, then these values will be sought from the
+*        .MORE.CCDPACK.EXTENT extension of each NDF; this will only
+*        succeed if they have been placed there by running the IMPORT
+*        or PRESENT programs.  If USEEXT is false or there is no
+*        suitable CCDPACK extension then if global values for these
+*        bounds have been set using CCDSETUP those values will be 
+*        used.  Otherwise, they may be given on the command line.
 *     IN = LITERAL (Read)
-*        A list of the NDFs whose boundaries are to be drawn.
+*        A list of the NDFs to be displayed.
 *     IMAGE = _LOGICAL (Read)
 *        If true, the pixels of the each image will be plotted as well
 *        as the outlines.  In this case the existing image is always
@@ -181,8 +215,9 @@
 *        default is "BOTH".
 *        [BOTH]
 *     ORIGIN = _LOGICAL (Read)
-*        If true, a marker is placed at the pixel coordinate origin
-*        of each NDF.
+*        If true, a marker is placed at the GRID coordinate origin
+*        of each NDF (the corner of the data region being considered
+*        which has the lowest X and Y pixel coordinates).
 *        [TRUE]
 *     PENROT = _LOGICAL (Read)
 *        If TRUE, each outline will be drawn with a different pen 
@@ -190,12 +225,17 @@
 *        [FALSE]
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
 *        If IMAGE is true, this gives the percentile limits between
-*        each image (not each Set) will be scaled when it is drawn.
+*        which each image will be scaled when it is drawn.
 *        Any pixels with a value lower than the first element
 *        will have the same colour, and any with a value 
 *        higher than the second will have the same colour.
 *        Must be in the range 0 <= PERCENTILES( 1 ) <= 
 *        PERCENTILES( 2 ) <= 100.
+*
+*        Note that the percentile levels are calculated separately for 
+*        each of the NDFs in the IN list, so that the brightest
+*        pixel in each NDF will be plotted in the same colour, even
+*        though their absolute values may be quite different.
 *        [2,98]
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style 
@@ -212,18 +252,34 @@
 *                                true, serves as starting value) [1]
 *           - size(strings)   -- font size of text labels [1]
 *           - colour(strings) -- colour of text labels [1]
+*           - colour(markers) -- colour of origin markers [1]
 *           - colour          -- colour of everything plotted
 *                                (including axes and axis labels) [1]
 *           - grid            -- whether to draw a grid (1=yes, 0=no) [0]
 *           - title           -- title to draw above the plot [coords title]
 *
 *        [""]
+*     TRIM = _LOGICAL (Read)
+*        If TRIM is true, then an attempt will be made to trim the data
+*        to its useful area only; this may be used to exclude non-image
+*        areas such as overscan regions.  See the EXTENT parameter for
+*        details of how the useful area is determined.
+*        [FALSE]
+*     USEEXT = _LOGICAL (Read)
+*        If USEEXT and TRIM are both TRUE, then the value of the EXTENT
+*        parameter will be sought from the CCDPACK extension of each
+*        NDF.  This method will only be successful if they have been
+*        put there using the IMPORT or PRESENT programs.
+*        [TRUE]
 *     USESET = _LOGICAL (Read)
 *        If the pen colour is being rotated because PENROT is true,
 *        USESET determines whether a new colour is used for each 
 *        individual NDF or each Set.  This parameter is ignored if
 *        PENROT is false, and has no effect if the input NDFs have
 *        no Set header information.
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *        [TRUE]
 
 *  Examples:
@@ -232,7 +288,7 @@
 *        labelled outlines of all the `reg-data*' NDFs, as well as
 *        axes showing the common coordinate system in which they
 *        all reside.  The plotting area will be made just large enough
-*        that all the boundaries fit in.  Prior to running this, the 
+*        that all the outlines fit in.  Prior to running this, the 
 *        Current attached coordinate system of all the reg-data* NDFs
 *        should be one in which they are all aligned.
 *
@@ -270,6 +326,35 @@
 *        each will be drawn upright in the middle of each one,
 *        without an opaque background.
 
+*  Notes:
+*     -  Resampling schemes:
+*        When the IMAGE parameter is true and image pixels are plotted,
+*        the image data has to be resampled into the Current coordinate
+*        system prior to being displayed on the graphics device.
+*        BOUNDS currently does this using a nearest-neighbour 
+*        resampling scheme if the display pixels are of comparable
+*        size or larger than the image pixels, and a block averaging
+*        scheme if they are much smaller (less than one third the size).
+*        Though slower, this latter scheme has the advantage of
+*        averaging out noisy data.
+*
+*     -  Pixel indices:
+*        The EXTENT values supplied should be given as pixel index values.
+*        These usually start at (1,1) for the pixel at the lower left
+*        hand corner of the data-array component (this may
+*        not be true if the NDFs have been sectioned, in which case the
+*        lower left hand pixel will have pixel indices equal to the data
+*        component origin values). Pixel indices are different from
+*        pixel coordinates in that they are non-continuous, i.e. can
+*        only have integer values, and start at 1,1 not 0,0. To change
+*        from pixel coordinates add 0.5 and round to the nearest integer.
+*
+*     -  Display:
+*        The IMAGE display mode is not particularly sophisticated.
+*        If you wish to view a single image in its pixel coordinate 
+*        system, you may find KAPPA's DISPLAY program more suitable.
+
+
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
@@ -281,14 +366,19 @@
 *     default behaviour of the application may be restored by using the
 *     RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO and LOGFILE) have global
+*     Certain parameters (LOGTO, LOGFILE, USESET and EXTENT) have global
 *     values. These global values will always take precedence, except
-*     when an assignment is made on the command line. Global values may
-*     be set and reset using the CCDSETUP and CCDCLEAR commands.
+*     when an assignment is made on the command line, or in the case
+*     of EXTENT, if USEEXT is true. Global values may be set and 
+*     reset using the CCDSETUP and CCDCLEAR commands.
 *
 *     The DEVICE parameter also has a global association. This is not
 *     controlled by the usual CCDPACK mechanisms, instead it works in
 *     co-operation with KAPPA (SUN/95) image display/control routines.
+*
+*     If the parameter USEEXT is true then the EXTENT parameter will
+*     be sought first from the input NDF extensions, and only got
+*     from its global or command-line value if it is not present there.
 
 *  Implementation Status:
 *     BOUNDS's communication with the AGI database is compatible with
@@ -351,8 +441,9 @@
       INTEGER GID                ! NDG group identifier for input NDFs
       INTEGER HICOL              ! Highest colour index available
       INTEGER I                  ! Loop variable
+      INTEGER ID                 ! NDF identifier
       INTEGER IGOT               ! Index of name found in a group
-      INTEGER INDF               ! NDF identifier
+      INTEGER INDFS( CCD1__MXNDF ) ! NDF identifiers
       INTEGER INIPEN             ! Initial pen index
       INTEGER IPDAT              ! Pointer to mapped data of NDF
       INTEGER IPEN               ! Current pen index
@@ -369,6 +460,8 @@
       INTEGER JSET               ! Set alignment frame index (dummy)
       INTEGER KEYGID             ! GRP identifier for Set Name attributes
       INTEGER LBGCOL             ! Label text background colour
+      INTEGER LBND( 2 )          ! Lower bounds of NDF
+      INTEGER LBNDS( 2 )         ! Lower bounds of NDF section
       INTEGER LMGID              ! Labelling mode option GRP identifier
       INTEGER LOCOL              ! Lowest colour index available
       INTEGER LW                 ! Normal plotting line width
@@ -391,12 +484,15 @@
       INTEGER SINDEX             ! Set Index attribute value (dummy)
       INTEGER STATE              ! Parameter state
       INTEGER STYLEN             ! Length of style element
+      INTEGER UBND( 2 )          ! Upper bounds of NDF
+      INTEGER UBNDS( 2 )         ! Upper bounds of NDF section
       INTEGER XIM                ! X dimension of image pixel array
       INTEGER YIM                ! Y dimension of image pixel array
       LOGICAL AXES               ! Draw axes?
       LOGICAL BAD                ! Might there be bad pixels in the NDF?
       LOGICAL CLEAR              ! Clear the graphics device before plotting?
       LOGICAL DIFERS             ! Not all the same domain?
+      LOGICAL EXTSEC             ! Dummy
       LOGICAL IMAGE              ! Draw pixels too?
       LOGICAL LABDOT             ! Use labelling ORIGIN option?
       LOGICAL LABIND             ! Use labelling INDEX option?
@@ -406,6 +502,9 @@
       LOGICAL LINES              ! Draw an outline?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
       LOGICAL NOINV              ! Has coordinate system been reflected?
+      LOGICAL SECTS              ! Have we actually trimmed to EXTENT?
+      LOGICAL TRIM               ! Trim data to EXTENT region?
+      LOGICAL USEEXT             ! Use EXTENT values from CCDPACK extension?
       LOGICAL USESET             ! Rotate pen styles by Set?
       REAL X1                    ! Lower X limit of plotting surface
       REAL X2                    ! Upper X limit of plotting surface
@@ -505,6 +604,14 @@
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, GID, NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
+*  See if we are only considering EXTENT-trimmed NDF sections.
+      CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
+      IF ( TRIM ) THEN
+         CALL PAR_GET0L( 'USEEXT', USEEXT, STATUS )
+      ELSE
+         USEEXT = .FALSE.
+      END IF
+
 *  See if we are plotting images, and if so get percentile scaling limits.
       CALL PAR_GET0L( 'IMAGE', IMAGE, STATUS )
       IF ( IMAGE ) THEN
@@ -593,13 +700,41 @@
 *  Determine whether we will draw axes.
       CALL PAR_GTD0L( 'AXES', CLEAR, .TRUE., AXES, STATUS )
 
-*  Initialise the global frameset with the Current frame of the 
-*  reference (first) NDF.  First get the NDF identifier.
-      CALL NDG_NDFAS( GID, 1, 'READ', INDF, STATUS )
+*  Get NDF identifiers for all the input NDFs.  If we are restricting
+*  display to the defined EXTENT of each NDF, then make sure that
+*  the identifiers only refer to an appropriate NDF section.
+      SECTS = .FALSE.
+      DO I = 1, NNDF
+         CALL NDG_NDFAS( GID, I, 'READ', ID, STATUS )
+         IF ( TRIM ) THEN 
+            CALL NDF_BOUND( ID, 2, LBND, UBND, NDIM, STATUS )
+            CALL CCD1_GTSEC( USEEXT, ID, LBND, UBND, LBNDS, UBNDS,
+     :                       EXTSEC, STATUS )
+            IF ( LBND( 1 ) .NE. LBNDS( 1 ) .OR. 
+     :           LBND( 2 ) .NE. LBNDS( 2 ) .OR.
+     :           UBND( 1 ) .NE. UBNDS( 1 ) .OR.
+     :           UBND( 2 ) .NE. UBNDS( 2 ) ) THEN
+               SECTS = .TRUE.
+               CALL NDF_SECT( ID, 2, LBNDS, UBNDS, INDFS( I ), STATUS )
+               CALL NDF_ANNUL( ID, STATUS )
+            ELSE
+               INDFS( I ) = ID
+            END IF
+         ELSE
+            INDFS( I ) = ID
+         END IF
+      END DO
 
-*  Get the WCS component of the reference NDF.
-      CALL CCD1_GTWCS( INDF, IWCS, STATUS )
-      CALL NDF_ANNUL( INDF, STATUS )
+*  Warn the user if we are only using sections (in at least some cases).
+      IF ( SECTS ) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '  NDFs were trimmed to EXTENT region.',
+     :                  STATUS )
+      END IF
+
+*  Initialise the global frameset with the Current frame of the 
+*  reference (first) NDF.  First get its WCS component.
+      CALL CCD1_GTWCS( INDFS( 1 ), IWCS, STATUS )
 
 *  Get the Current frame of the reference NDF, which we would like to 
 *  use to represent the common coordinate system.  Save its domain too.
@@ -646,11 +781,8 @@
 *  Get the NDF name.
          CALL GRP_GET( GID, I, 1, NDFNAM, STATUS )
 
-*  Get the NDF identifier.
-         CALL NDG_NDFAS( GID, I, 'READ', INDF, STATUS )
-
 *  Get the WCS component from the NDF.
-         CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+         CALL CCD1_GTWCS( INDFS( I ), IWCS, STATUS )
 
 *  Check that the Current frame has the right number of dimensions.
          NAXES = AST_GETI( IWCS, 'Naxes', STATUS )
@@ -692,7 +824,7 @@
          END IF
 
 *  Get the NDF extent in its Base (GRID-domain) frame.
-         CALL NDF_DIM( INDF, 2, DIMS( 1, I ), NDIM, STATUS )
+         CALL NDF_DIM( INDFS( I ), 2, DIMS( 1, I ), NDIM, STATUS )
 
 *  Output the name of the NDF and its Current frame domain to the user.
          BUFFER = ' '
@@ -720,7 +852,7 @@
          IF ( USESET ) THEN
 
 *  Read the Set header.
-            CALL CCD1_SETRD( INDF, AST__NULL, SNAME, SINDEX, JSET,
+            CALL CCD1_SETRD( INDFS( I ), AST__NULL, SNAME, SINDEX, JSET,
      :                       STATUS )
 
 *  See if we have encountered this Set Name before.  If not, add it to
@@ -734,9 +866,6 @@
 *  Record this Set Name's position in the group of encountered Names.
             ISET( I ) = IGOT
          END IF
-
-*  Release the NDF.
-         CALL NDF_ANNUL( INDF, STATUS )
       END DO
 
 *  Warn the user if not all the Current frames in the NDFs had the same
@@ -863,12 +992,11 @@
 *  that transferring it from the array to the plotting device will
 *  be efficient.
          CALL PGQVP( 3, X1, X2, Y1, Y2 )
-         XIM = INT( X2 - X1 )
-         YIM = INT( Y2 - Y1 )
+         XIM = INT( X2 - X1 + 1 )
+         YIM = INT( Y2 - Y1 + 1 )
          CALL CCD1_MALL( XIM * YIM, '_INTEGER', IPIM, STATUS )
 
 *  Prepare for filling the array.
-         CALL PGQWIN( X1, X2, Y1, Y2 )
          CALL PGQCIR( LOCOL, HICOL )
          BADCOL = 0
 
@@ -901,7 +1029,7 @@
             CALL AST_TRAN2( MAP, 2, PX, PY, .TRUE., QX, QY, STATUS )
             PSIZE = SQRT( ( QX( 2 ) - QX( 1 ) ) ** 2
      :                 + ( QY( 2 ) - QY( 1 ) ) ** 2 ) / SQRT( 2D0 )
-            IF ( PSIZE .LT. 0.3D0 ) THEN
+            IF ( PSIZE .LT. 0.333D0 ) THEN
                SCHEME = AST__BLOCKAVE
                INTPAR( 1 ) = ( 1D0 / PSIZE - 1D0 ) * 0.5D0
             ELSE
@@ -909,11 +1037,10 @@
             END IF
 
 *  Open the NDF and map its data.
-            CALL NDG_NDFAS( GID, I, 'READ', INDF, STATUS )
-            CALL NDF_TYPE( INDF, 'DATA', TYPE, STATUS )
-            CALL NDF_MAP( INDF, 'DATA', TYPE, 'READ', IPDAT, EL,
+            CALL NDF_TYPE( INDFS( I ), 'DATA', TYPE, STATUS )
+            CALL NDF_MAP( INDFS( I ), 'DATA', TYPE, 'READ', IPDAT, EL,
      :                    STATUS )
-            CALL NDF_BAD( INDF, 'DATA', .FALSE., BAD, STATUS )
+            CALL NDF_BAD( INDFS( I ), 'DATA', .FALSE., BAD, STATUS )
 
 *  Find the percentile values.
             CALL CCD1_FRA( TYPE, EL, IPDAT, 2, PERCNT, BAD,
@@ -924,12 +1051,10 @@
      :                       MAP, XIM, YIM, LIMITS( 1 ), LIMITS( 2 ),
      :                       LOCOL, HICOL, BADCOL, SCHEME, INTPAR, 
      :                       %VAL( IPIM ), STATUS )
-
-*  Release the NDF.
-            CALL NDF_ANNUL( INDF, STATUS )
          END DO
 
 *  Plot the array which now contains all the resampled images.
+         CALL PGQWIN( X1, X2, Y1, Y2 )
          CALL PGPIXL( %VAL( IPIM ), XIM, YIM, 1, XIM, 1, YIM,
      :                X1, X2, Y1, Y2 )
 

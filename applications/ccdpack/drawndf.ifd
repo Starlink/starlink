@@ -81,10 +81,11 @@
                            # Whether to use Set header information
             type _LOGICAL
             access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_useset
             default TRUE
-            prompt {Rotate pens by Set membership?}
+            prompt "Rotate pens by Set membership?[ccd_global]"
             helpkey *
          }
 
@@ -197,6 +198,38 @@
             ppath CURRENT DEFAULT
             default NN
             prompt {Label positioning (2 characters each Near Centre or Far)}
+            helpkey *
+         }
+
+
+         parameter trim {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Restrict to useful image area using EXTENT?}
+            helpkey *
+         }
+
+         parameter extent {
+            type _INTEGER
+            access READ
+            vpath GLOBAL CURRENT DYNAMIC PROMPT
+            ppath GLOBAL CURRENT DYNAMIC
+            association <-global.ccdpack_extent
+            size *
+            prompt "Useful CCD region (xmin,xmax,ymin,ymax)[ccd_global]"
+            helpkey *
+         }
+
+         parameter useext {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Use NDF extension information for EXTENT area?}
             helpkey *
          }
 
