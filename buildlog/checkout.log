@@ -9020,6 +9020,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/Points.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PtPlotSurface.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/ScatterPlot.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/SurfaceListener.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/XYStats.java
 cvs checkout: Updating java/source/topcat/src/resources
 cvs checkout: Updating java/source/topcat/src/resources/uk
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac

@@ -238,7 +238,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-1.0.zip
@@ -864,4 +863,4 @@ Xlib: No protocol specified
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1037: Fatal error during transformation
 
-Total time: 20 minutes 51 seconds
+Total time: 20 minutes 38 seconds
