@@ -140,10 +140,34 @@ if <code>docnumber</> isn't defined.
   document element.
 <codebody>
 (define (getdocdate #!optional (nd (current-node)))
+  (let ((rel (document-release-info)))
+    (if (or (car rel)
+	    (cadr rel)
+	    (cadddr rel))
+	(string-append (if (car rel)
+			   (format-date (car rel))
+			   "not released")
+		       ". "
+		       (if (cadddr rel)
+			   (string-append
+			    "Release "
+			    (cadddr rel)
+			    ". ")
+			   "")
+		       (if (cadr rel)
+			   (string-append
+			    "Last updated "
+			    (format-date (cadr rel)))
+			   ""))
+	"not released")))
+
+(define (x-getdocdate #!optional (nd (current-node)))
    (let ((rel (document-release-info)))
        (if (car rel)
            (format-date (car rel))
            "not released")))
+
+
 
 <routine>
 <routinename>getdocauthors
