@@ -76,11 +76,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     14 Aug 1995 (DJA):
 *        Original version.
+*     13 Aug 1997 (RB):
+*        Check that the VARIANT component exists.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -118,6 +121,7 @@
       INTEGER			NDIM			! Array dimensionality
 
       LOGICAL			PRIM			! Object is primitive?
+      LOGICAL			THERE			! Component exists?
 *.
 
 *  Check inherited global status.
@@ -143,7 +147,11 @@
       ELSE
 
 *    Get variant allowed under SGP/38
-        CALL CMP_GET0C( LOC, 'VARIANT', VARNT, STATUS )
+        IF DAT_THERE( LOC, 'VARIANT', THERE, STATUS ) THEN
+          CALL CMP_GET0C( LOC, 'VARIANT', VARNT, STATUS )
+        ELSE
+          VARNT = 'SIMPLE'
+        END IF
 
 *    Simple array variant?
         IF ( VARNT .EQ. 'SIMPLE' ) THEN
