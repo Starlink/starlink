@@ -36,6 +36,9 @@ Description:
    value in that pixel and noise is added on this basis. Note that
    the poissonian noise is pseudo gaussian and so the count levels in
    the frame need to be greater than 10.
+
+   Each time this program is started a different set of random
+   numbers should be generated.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
