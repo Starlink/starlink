@@ -63,11 +63,8 @@ F_ROUTINES_ADAM = \
         rio_cancl.f
 
 FPP_ROUTINES = \
-	fio1_open.fpp \
-	rio1_open.fpp
-
-fio1_open.f: fio1_open.fpp
-rio1_open.f: rio1_open.fpp
+	fio1_open.F \
+	rio1_open.F
 
 # Platform-specific Fortran routines.  See corresponding stanza in configure.ac
 PLATFORM_F = \
