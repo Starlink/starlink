@@ -62,6 +62,9 @@
 #     1997 August 1 (MJC):
 #        Removed KAPPA dependencies.  Reworded and reordered the
 #        description.  Added some comments.
+#     1997 October 3 (MJC):
+#        Improved the parameter handling to allow for no arguments, and
+#        to remove any .gif that may be present in the first argument.
 #     {note_further_changes_here}
 
 #  Bugs:
@@ -69,19 +72,31 @@
  
 #-
 
-# Find the required output filename
+# Check that a file name was given.
+if [ "$#" -eq 0 ]
+then
+   echo "!! GIF2NDF: no GIF name supplied"
+   echo "!  Usage: gif2ndf in [out]"
+   exit
+fi
+
+# Remove any .gif file extension.
+root=`echo $1 | sed 's#.gif##'`
+
+# Find the filename less any path.
+name=`basename $root`
+
+# Set required output file name.  Defaults to the input name.
+out=${2:-$name}
+
+# Convert the image removing temporary files at each stage.  The PMBPLUS
+# utilities giftopnm, ppmtopgm and pgmtofits must be available on your
+# path.
 #
-#     The PMBPLUS utilities giftopnm, ppmtopgm and pgmtofits must be
-#     available on your path.
-out=${2:-$1}
-name=`basename $1`
-
-# Convert the image removing temporary files at each stage.
-
 # Convert image from GIF format to FITS, flipping it from top to bottom.
 # The error output is written to temporary files.  Make the error look
 # as if it came from MSG.
-giftoppm $1.gif 2> convert_err1_$name.lis | \
+giftoppm ${root}.gif 2> convert_err1_$name.lis | \
 ppmtopgm 2> convert_err2_$name.lis | \
 pnmflip -topbottom 2> convert_err3_$name.lis | \
 pgmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
