@@ -1,8 +1,7 @@
 INTERFACE FREEZE
 
-   PARAMETER FIT_MOD
+   PARAMETER MODEL
       TYPE 'UNIV'
-      KEYWORD 'MODEL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -10,10 +9,9 @@ INTERFACE FREEZE
       HELP 'Data object containing fit model specification'
    ENDPARAMETER
 
-   PARAMETER PARAMS
+   PARAMETER PAR
       POSITION 1
       TYPE '_INTEGER'
-      KEYWORD 'PAR'
       PROMPT 'Parameter numbers'
       HELP 'Numbers of parameters to be frozen (in square brackets if >1)'
    ENDPARAMETER
@@ -21,7 +19,6 @@ INTERFACE FREEZE
    PARAMETER VALS
       POSITION 2
       TYPE '_REAL'
-      KEYWORD 'VALS'
       PROMPT 'Parameter values'
       VPATH 'DEFAULT'
       DEFAULT !
