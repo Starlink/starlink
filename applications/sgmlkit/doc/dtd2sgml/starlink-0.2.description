@@ -1,0 +1,577 @@
+<!doctype dtddescription system "dtddescription.dtd" [
+  <!entity slelems system "starlink-everything.dtdsummary" subdoc>
+]>
+<!-- $Id$ -->
+
+<!-- Fixed attributes not documented -->
+
+<dtddescription elementlist=slelems prefix='slgen'>
+
+<element gi='abstract'>
+<p>The abstract for the document
+
+<element gi='appendices'> 
+
+<p>The appendices element contains the
+appendices, with one <elemref gi=sect> for each appendix. These may be
+preceded by an optional <elemref gi=routinelist>, if the specific
+Starlink document type allows that element.  Note that material such
+as bibliography and indexes is in a separate <elemref gi=backmatter>
+element, and not an appendix.
+
+<element gi='attribution'>
+<p>The source of a quotation, either as free text or a <elemref
+gi=citation> element.
+
+<element gi='author'>
+<p>An author/editor of the current document.
+
+<attribute name='affiliation'>
+<p>The `home institution' of an author, such as `Starlink, University
+of Glasgow'.
+
+<attribute name='email'>
+<p>An email address for the author.
+
+<attribute name='id'>
+<p>An ID which may be used to refer to the author from within a
+<elemref gi=history> element, for example.
+
+<attribute name='role'>
+<p>The role this individual has played in the maintenance of this
+document, if it's different from the straightforward `author'.  For
+example, this might be `maintainer', `original version', and so on.
+
+<attribute name='webpage'>
+<p>A home page for the author, which might contain further contact details.
+
+<element gi='authorlist'>
+<p>The list of authors and editors who have contributed to a
+document.  If a document is passed on from one person to another, it
+might be appropriate for the original author to retain a credit for
+the document, by being listed as one of the <elemref gi=otherauthors>.
+
+<element gi='backmatter'>
+<p>Bundles together the various backmatter elements.
+
+<element gi='bibliography'>
+<p>If this element is present within the <elemref gi=backmatter>
+element, then a 
+bibliography will be included in the document.  The application will
+generate the bibliography itself -- it is not included within this
+element, which is empty.  
+
+<p>Bibliographic entries are included in the bibliography if they were
+referred to in the document using the <elemref gi=citation> element.
+
+<attribute name='all'>
+<p>If this attribute is present, then the complete bibliography will
+be included, rather than just those entries which were referred to by
+a <elemref gi=citation> element.
+
+<attribute name='bib'>
+<p>Names the bibliography which is to be searched for entries.
+<p>The transformation of this name into an actual bibliography file is
+in principle up to the application which processes the SGML file.  In
+the current application, however, this attribute names a BibTeX
+bib-file (without the .bib extension).
+
+<element gi='blockquote'>
+<p>A substantial quotation which will typically (but not, of course,
+necessarily) be set off from the text around it.
+
+<element gi='caption'>
+<p>Caption of a <elemref gi=figure> or <elemref gi=table>.
+
+<element gi='change'>
+<p>Records a change.  See <elemref gi=history>.
+
+<element gi='citation'>
+<p>Refers to an entry in the <elemref gi=bibliography> associated with
+this document.  In the current application, the content is interpreted
+as the key to an entry in a BibTeX database.
+<attribute name='noref'>
+<p>If this attribute is present, then the application should include a
+reference to this citation in the bibliography, but without 
+actually referring to the entry at this position in the text.
+
+<element gi='cite'>
+<p>Refer to a book or article, for example, by name.
+
+<element gi='code'>
+<p>Include `computer text'.  This does not do any escaping of the
+enclosed text: if there are any characters which might be special to
+the SGML parser, then they should be escaped either with an entity
+reference (that is, using an ampersand) or included in a cdata marked
+section.
+
+<p>Text which a user is to type should be marked up with the <elemref
+gi=kbd> element, and larger blocks of text should be marked up with
+<elemref gi=verbatim>.
+
+<element gi='codecollection'>
+<p>This element makes the link between the documentation and a
+collection of code documentation.  The document which this points to
+must be marked up in a DTD which is a client of the programcode
+architecture.  This will typically, but not necessarily, be a suitable
+source code file.
+
+<p>See the documentation which covers this topic for further details.
+<attribute name='doc'>
+<p>A document which is marked up in a DTD which is a client of the
+Starlink programcode architecture.
+<attribute name='ids'>
+<p>If present, this lists the elements within the target document
+which should be processed (not currently implemented).
+
+<element gi='colspec'>
+<p>The colspec element controls the layout of a column in a table (not
+implemented).
+
+<element gi='copyright'>
+<p>Specifies a copyright declaration for the document.
+
+<element gi='dd'>
+<p>`Description data' in a description list.
+
+<element gi='distribution'>
+<p>Records the distribution of a version of the document, or some
+other freezing of it.  The content is free-text
+notes on the distribution or the packaging.  See the description of
+<elemref gi=history> for an overview of the history element.
+<attribute name='string'>
+<p>Identifies the distribution.  This will
+typically be something like '1' or '2', but
+could be 'draft' or something
+descriptive.  It should be a single word.
+<attribute name='date'>
+<p>The date this distribution was
+made. Format: dd-MMM-yyyy.
+<attribute name='author'>
+<p>Whom the release is attributable to.  This
+links to one of the author elements.   If this attribute is omitted,
+it defaults to the content of the author attribute of the previous
+<elemref self gi='distribution'> element.
+<attribute name='versionid'>
+<p>An id to allow UPDATE elements to refer to a
+specific version.  It can be anything, but a
+sensible format is v10-5, for example (it can't
+start with a number)
+
+<element gi='dl'>
+<p>A description list, consisting of a number of pairs of a
+`description term', <elemref gi=dt>, and `description data', <elemref
+gi=dd>. Notionally, the <elemref gi=dd> is the definition of a term
+introduced by the <elemref gi=dt>, but the construction can
+legitimately be used a little more widely than this.
+
+<element gi='docbody'>
+<p>The document body, containing all the printable text of the document.
+
+<element gi='docdate'>
+<p>The document date.  The format is `dd-MMM-yyyy' -- a two-digit day
+of the month, the month as three uppercase letters (`JAN', `FEB', and
+so on), and a four-digit year.
+<p>This element will appear in the <elemref gi=docinfo> element of
+those DTDs which do not have a <elemref gi=history> element.
+
+<element gi='docinfo'>
+<p>The document metadata.
+
+<element gi='docnumber'>
+<p>The document number, as assigned by the Starlink librarian.
+<example>&lt;docnumber&gt;123</example>
+<example>&lt;docnumber unassigned&gt;</example>
+<attribute name='unassigned'>
+<p>If this attribute is present, then it records that the document
+number has not (yet?) been assigned by the Starlink librarian.
+
+<element gi='docxref'>
+<p>Make a cross-reference to another Starlink document.
+<example><![ cdata [
+<!doctype sun public "-//Starlink//DTD Starlink SUN//EN" [
+  <!entity otherdoc public "-//Starlink//DOCUMENT Summary SUN/123//EN" subdoc>
+]>
+...
+<p>See also the document <docxref doc=otherdoc>
+]]></example>
+
+<attribute name='doc'>
+<p>Indicates the document we wish to link to.  The value of this
+attribute is an entity (declared in the document declaration subset),
+which references another document.
+<attribute name='loc'>
+<p>Indicates a location within a document.  The value of the loc
+attribute is an ID reference within the target document.
+
+<element gi='draftnote'>
+<p>A note to be included in the text of the document.  It'll be
+formatted so that it stands out in some way.
+
+<element gi='dt'>
+<p>The `definition term' in a <elemref gi=dl> element.
+
+<element gi='editors'>
+<p>The list of people who have made adjustments to the document, which
+don't really count as authoring contributions.
+
+<element gi='em'>
+<p>Emphasised text.
+
+<element gi='entry'>
+<p>A single cell in a table row.
+
+<element gi='figure'>
+<p>A figure.  The content of the figure, in the <elemref
+gi=figurecontent> element, may be text or an image of some sort..  The
+application will generate a figure number, and attach it to the figure
+caption supplied.
+<attribute name='id'>
+<p>An ID which may be used to refer to this figure in references.
+<attribute name='export'>
+<p>If the export attribute is present, then it will be permitted for
+the ID to be referred to from outside this document.
+<attribute name='float'>
+<p>If the float attribute is present and has value `float', then the
+table may be moved to a more suitable place in the document.  If the
+attribute is missing or has the value `nofloat', then it is pinned to
+its current location in the document.
+
+<element gi='figurecontent'>
+<p>The actual content of the figure.  This may be paragraphs of text.
+If the image attribute is present, then the element is taken to be
+empty, and the entities referred to by that attribute are used for the
+figure content.
+<example><![ cdata [
+<!doctype sun public "-//Starlink//DTD Starlink SUN//EN" [
+  <!entity fig-eps system 'figure1.eps' ndata eps>
+  <!entity fig-gif system 'figure1.gif' ndata gif87a>
+]>
+...
+<figure>
+<caption>Figure caption</caption>
+<figurecontent alt=''>Here is a figure with some text in
+  it</figurecontent>
+</figure>
+<figure>
+<caption>Another figure</caption>
+<figurecontent alt='An interesting image' image='fig-eps fig-gif'>
+</figure>
+]]></example>
+<p>In this example, there is a text-only figure, followed by another
+figure.  The second figure includes an image.  The declaration subset
+declares two entities, one with `notation' <code/eps/ (indicating that the
+object <code/figure1.eps/ is an encapsulated postscript file), and one
+with notation <code/gif87a/ (indicating that <code/figure1.gif/ is a
+GIF image.  The processing application will select the most suitable
+image, based on these notations.  For example, an application
+producing text to be printed will likely choose the EPS file, and an
+application formatting text for on-line delivery will likely choose
+the GIF iamge.
+
+<attribute name='alt'>
+<p>An alternative text for the content, displayed if the figure
+content cannot be shown.  This is redundant (but still formally
+required) if the figure content is text, but extremely useful in an
+online presentation of an image, if the final reader of the text has
+not loaded images.
+<attribute name='image'>
+<p>A list of entities, giving alternative formats for the image to be
+displayed.  The entities must be declared in the document declaration
+subset, with appropriate notations. 
+<p>The currently available image notations are `jpeg', `eps' and `gif87a'.
+
+
+<element gi='history'>
+<p>This element records the history of the document.  It is 
+available in most of the Starlink DTDs, but not all, and when it is
+omitted, the <elemref gi=docdate> element is required instead.
+
+<p>The history of a document is composed of a sequence of versions,
+changes, and distributions.  A document has a version number of the
+form <code/docnumber.docversion-release/.  The document number is the
+number declared in the <elemref gi=docnumber> element, as assigned by
+the Starlink librarian.  The document version indicates which edit
+of the document this is -- a significant update to the document should
+be marked by incrementing the document version number.  The release
+information marks a more minor update to a document.
+
+<p>Each of the three elements has paragraph content, to record brief notes
+about the change or distribution.
+
+<p>A version of a document (marked by a <elemref gi=version> element
+in the history) is a significant release of a document, perhaps
+describing new functionality in a package.  The number attribute gives
+the version number to be attached to the document.
+
+<p>A distribution of a document (marked by a <elemref gi=distribution>
+element in the history) is a less significant update to a document,
+perhaps for distribution to readers for comments.  The <code/string/
+attribute is a label for the distribution, and could be something like
+`draft1' or `comments-13'.
+
+<p>Other changes to the document are labelled by a <elemref gi=change>
+element.  These record an edit of a document without a corresponding
+change to an version number.
+
+<p>The <elemref gi=distribution> and <elemref gi=change> elements have
+an optional <code/versionid/ attribute.  This allows you to specify a
+label for this edit.  Any <elemref gi=update> elements elsewhere in
+the text must attach themselves to one of these elements, using the
+<code/versionid/ attribute.
+<example><![ cdata [
+<author id=ng>Norman
+<editors>
+<author id=mb>Martin
+...
+<history>
+<version author=ng date='02-MAR-1999' number=0>Initial version
+<distribution author=ng date='03-MAR-1999' string='comments1'>Released
+  to programmers for comment.
+<change author=ng date='04-MAR-1999' versionid=alt99>Various tidyings
+<version author=mb date='05-MAR-1999' number=1>First public release
+...
+<p><update author=ng versionid=alt99>Corrected typos and reexpressed
+argument</update>In this section....
+]]></example>
+
+<element gi='index'>
+<p>The contents of the element are to be indexed.
+<attribute name='key'>
+<p>If this attribute is present, then the attribute value is used as
+the index key, rather than the element contents.
+
+<element gi='indexcontents'>
+<p>A placeholder for the index contents.  If this element is missing,
+then no index will be generated, even if there are <elemref gi=index>
+elements present elsewhere in the document.
+
+<element gi='kbd'>
+<p>Verbatim text, marked out as being for a user to type.
+
+<element gi='keyword'>
+<p>A keyword suitable for use when indexing this document.  There is
+not yet a list of preferred keywords.
+
+<element gi='li'>
+<p>An item in a list.
+
+<element gi='m'>
+<p>Inline maths.  Use LaTeX notation, as if you were writing inside a
+<code/$...$/ pair in a LaTeX document.
+
+<element gi='meqnarray'>
+<p>Displayed maths equation.  Use LaTeX notation, as if you were
+writing inside a <code/\\begin{eqnarray}...\\end{eqnarray}/ pair.
+
+<element gi='mequation'>
+<p>Displayed equation.  Use LaTeX notation, as if you were writing
+inside a <code/\\begin{equation}...\\end{equation/ pair in a LaTeX
+document.
+
+
+<element gi='note'>
+<p>A sidenote.  This will be displayed as either a footnote or an
+endnote, depending on the output format.
+
+<element gi='notecontents'>
+<p>A placeholder for the note contents.  If there are <elemref
+gi=note> elements elsewhere in the document, then this element should
+be present in the <elemref gi=backmatter> element, even if the
+application processes <elemref gi=note> elements by turning them into
+footnotes (as will likely be the case for formatting on paper).
+
+<element gi='ol'>
+<p>An ordered list.
+
+<element gi='otherauthors'>
+<p>This element contains a list of <elemref gi=author> elements, which
+give credit to individuals who have contributed to a document without
+being principal or current authors.  If part of a document has been
+included from someone else's document, or if a document has been
+handed over from one maintainer to another, then the appropriate
+author should be credited here.
+
+<element gi='p'>
+<p>A paragraph.  See also the <elemref gi=px> element.
+
+<element gi='px'>
+<p>A restricted paragraph.
+
+<p>In certain contexts, it is convenient to forbid from
+otherwise-unrestricted paragraph text.  The
+<elemref self gi=px> element has the same usage as <elemref gi=p>, but
+with a slightly restricted content model.
+
+<element gi='quote'>
+<p>A simple quotation, the in-line companion to the <elemref
+gi=blockquote> element.
+
+<element gi='ref'>
+<p>A reference to another point in the same document.  The element has
+no content -- the link text will, in general, be generated for you, based on
+the link target.  Any element which has an ID attribute may be linked
+to.  A small subtlety is that the link is to a complete ,em/element/ of the
+document, rather than a <em/point/ of the document.
+<attribute name='id'>
+<p>The ID of the element to link to.
+<attribute name='text'>
+<p>If present, the attribute's data is used to form the link text,
+rather than generating it based on the target.
+
+<element gi='routinelist'>
+<p>This element introduces the <elemref gi=codecollection> elements
+which link this document to the source code it explains.
+
+<element gi='row'>
+<p>A row of a <elemref gi='table'>
+
+<element gi='sect'>
+<p>This element <em/contains/ a section.
+
+<p>The content of this element starts with a <elemref gi=subhead>
+element, which in turn contains a <elemref gi=title> element, and the
+two are followed by the section content.  Note, however, that since 
+the <elemref gi=subhead> and <elemref gi=title> start and end tags are
+both omissable, you may omit both, and follow the <elemref self
+gi=sect> start tag with the section title.
+
+<p>That is, the structure is formally
+<example><![ cdata [
+<sect><subhead><title>Section title</title><subhead>
+<p>Section body</p>
+</sect>
+]]></example>
+but this may be abbreviated to just
+<example><![ cdata [
+<sect>Section title
+<p>Section body
+]]></example>
+The same is true for the 
+<elemref gi=subsect>
+<elemref gi=subsubsect>
+<elemref gi=subsubsubsect>
+elements.
+
+<p>Note that the <elemref self gi=sect> element contains the <elemref
+gi=subsect> element, but not the <elemref gi=subsubsect> element -- it
+is therefore impossible to break the sectioning structure.
+
+<attribute name='id'>
+<p>An ID for this section, to allow it to be referred to from elsewhere.
+<attribute name='export'>
+<p>If this attribute is present, then the SGML system will allow other
+documents to link to this section using this ID.  In other words, the
+presence of this attribute is a commitment to maintain this ID as a
+meaningful link target in future versions of this document.
+<p>You should include this attribute on all sections and subsections.
+This is enforced by the DTD for <elemref self gi=sect> and <elemref
+gi=subsect> elements.
+<attribute name='indexkey'>
+<p>If this attribute is present, then an index entry is made, pointing
+to this section, with the specified key.
+
+<element gi='strong'>
+<p>The marked up text is displayed with strong emphasis.  See also
+<elemref gi=em>.
+
+<element gi='subhead'>
+<p>See element <elemref gi=sect>
+<element gi='subsect'>
+<p>See element <elemref gi=sect>
+<element gi='subsubsect'>
+<p>See element <elemref gi=sect>
+<element gi='subsubsubsect'>
+<p>See element <elemref gi=sect>
+
+<element gi='sun'>
+<p>The top-level of the SUN document type.  Other document types such
+as SSNs, SGPs, etc, have corresponding top-level elements.
+
+<element gi='table'>
+<p>The Starlink General DTD incorporates the Oasis Exchange Table
+Model, which is a restricted, and hence portable, subset of the full
+CALS table model.  The model is documented at
+<code>http://www.oasis-open.org/html/techpubs.htm/a503.htm</code>.
+
+<p>At present, the Oasis table model is not fully supported by the
+Starlink SGML system.  
+All of the elements in the model are supported, but most of the 
+attributes are ignored.  You may mark up your document using all the
+features in the Oasis model.
+I will progressively add support for these attributes
+as time permits.
+
+<element gi='tbody'>
+<p>A table body.  This contains a series of table rows.
+
+<element gi='tgroup'>
+<p>This element is an enclosure for a table body (the <elemref
+gi=tbody> element), optionally preceded by a header (the <elemref
+gi=thead> element).  The number of columns in the table must be
+specified by this element.
+<attribute name='cols'>
+<p>The number of columns in the enclosed <elemref gi=thead> and
+<elemref gi=tbody> elements.
+
+<element gi='thead'>
+<p>Encloses one or more heading rows prefixed to a <elemref gi=tbody>.
+
+<element gi='title'>
+<p>This element may enclose either the document title, or a section
+title.  As explained in the documentation for the <elemref gi=sect>
+element, this element's start and end tags are usually omitted when
+specifying a section title.
+
+<element gi='ul'>
+<p>An unordered list.
+
+<element gi='update'>
+<p>When updates are made to a document, they should be noted by (at
+least) a <elemref gi=change> element in the <elemref gi=history>.
+When more, or more localised, detail is desired, an <elemref self
+gi=update> element can include notes within the text.  There may be
+one or more <elemref self gi=update> elements as the first children of
+those elements which include it as a child.
+
+<p>See the documentation of the <elemref gi=history> element for an example.
+
+<element gi='url'>
+<p>This element encloses a URL, which is displayed appropriately.  If
+the output medium permits it, the URL's text is made a link to the
+remote resource.  The difference between this element and the <elemref
+gi=webref> element is that in the case of the <elemref self gi=url>
+element, the link text is the URL itself.
+<attribute name='nolink'>
+<p>If present, then the URL is displayed without the URL text being
+made an active link.
+
+<element gi='verbatim'>
+<p>The enclosed text is displayed verbatim, specifically with
+linebreaks respected, and typically in a fixed-width font.  Note that
+the element's content is <em/not/ specially escaped.  If you wish to
+include text which is meaningful to the SGML parser, you should
+surround the text with a <code/CDATA/ marked section.
+
+<element gi='version'>
+<p>The version of the document.  See <elemref gi='history'> for an
+overview of the history element.
+<attribute name='date'>
+<p>When the version was released.
+<attribute name='author'>
+<p>Who approved the distribution.  This is an ID which appears in the
+list of authors.  This might in fact be a reference to an `editor' of
+the document (ie, an `author' listed in the <elemref gi=editors>
+element), rather than an author.
+<attribute name='number'>
+<p>The assigned version number.    This is not
+generated automatically, to allow the numbering to start other than at
+one, or to omit numbers for some reason, but the numbers should be
+allocated sequentially, unless there is a good reason to decide
+otherwise.
+
+<element gi='webref'>
+<p>Make a link to a resource on the web.  The element's content is
+used as the link text.  See also the <elemref gi=url> element.
+<attribute name='url'>
+<p>The URL of the resource to be linked to.
