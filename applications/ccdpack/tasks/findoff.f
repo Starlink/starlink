@@ -49,11 +49,10 @@
 *        this value the lower the quality of the match.
 *        [0.5]
 *     ERROR = _DOUBLE (Read)
-*        The error in the X and Y positions. This value is used to
-*        determine which positions match within an error box (SLOW) or
-*        as a bin size (FAST). An inaccurate value may result in 
-*        excessive false or null matches.  This value is in the Current 
-*        coordinate frame if USEWCS is true.
+*        The error, in pixels, in the X and Y positions. This value is 
+*        used to determine which positions match within an error box 
+*        (SLOW) or as a bin size (FAST). An inaccurate value may result 
+*        in excessive false or null matches.
 *        [1.0]
 *     FAILSAFE = _LOGICAL (Read)
 *        If FAST is TRUE then this parameter indicates whether the SLOW
@@ -105,7 +104,7 @@
 *        [BOTH]
 *     MAXDISP = _DOUBLE (Read)
 *        This parameter gives the maximum acceptable displacement
-*        between the original alignment of the NDFs and the
+*        (in pixels) between the original alignment of the NDFs and the
 *        alignment in which the objects are matched.  If frames have
 *        to be displaced more than this value to obtain a match, the
 *        match is rejected.  This will be of use when USEWCS is set 
@@ -114,8 +113,7 @@
 *        expected inaccuracy in that alignment.  If null, arbitrarily 
 *        large displacements are allowed, although note that a 
 *        similar restriction is effectively imposed by setting the
-*        RESTRICT parameter.  The value of this parameter is in the 
-*        units of the Current frame if USEWCS is true.
+*        RESTRICT parameter.
 *        [!]
 *     MINMATCH = _INTEGER (Read)
 *        This parameter specifies the minimum number of positions
@@ -129,10 +127,8 @@
 *     MINSEP = _DOUBLE (Read)
 *        Positions which are very close may cause false matches by being
 *        within the error box of other positions. The value of this
-*        parameter controls how close objects may be before they are
-*        both rejected (this occurs before pattern-matching).
-*        This value is in pixel coordinates, regardless of the value of
-*        USEWCS.
+*        parameter controls how close (in pixels) objects may be before 
+*        they are both rejected (this occurs before pattern-matching).
 *        [Dynamic -- 5.0*ERROR]
 *     NAMELIST = LITERAL (Read)
 *        The name of a file to contain the names of the output
@@ -362,11 +358,11 @@
 *        In this example the completeness factor is derived but not used
 *        to weight the edges of the spanning tree.
 *
-*     findoff error=0.002 minsep=0.008
-*        In this example very precise measurements (or small units)
-*        are being used. The intrinsic error in the measurements is
-*        around 0.002 and positions within a box 0.008 of each other are
-*        rejected.
+*     findoff error=8 minsep=100
+*        In this example very fuzzy measurements (or small pixels) are 
+*        being used.  The intrinsic error in the measurements is around
+*        8 pixels and positions within a box 100 pixels of each other
+*        are rejected.
 *
 *     findoff inlist='data*' outlist='*.off' restrict=true
 *        This form would be used if the NDFs 'data*' have WCS components
@@ -442,6 +438,9 @@
 *     20-MAY-1999 (MBT):
 *        Major changes to fix major misconceptions about the best way
 *        for it to work.
+*     28-OCT-1999 (MBT):
+*        Modified so that ERROR and MAXDISP are in units of pixels (not
+*        current coordinates).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -474,13 +473,16 @@
       CHARACTER * ( 4 ) METHOD  ! Last method attempted for object matching
       DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
       DOUBLE PRECISION BNDY( 4, CCD1__MXLIS ) ! Y coords of bounding boxes
-      DOUBLE PRECISION BNDXP( 4 ) ! Pixel domain X coords of bounding boxes
-      DOUBLE PRECISION BNDYP( 4 ) ! Pixel domain Y coords of bounding boxes
+      DOUBLE PRECISION XP( 4 )  ! Pixel domain dummy point X coordinates
+      DOUBLE PRECISION XQ( 2 )  ! Current frame dummy point X coordinates
+      DOUBLE PRECISION YP( 4 )  ! Pixel domain dummy point Y coordinates
+      DOUBLE PRECISION YQ( 2 )  ! Current frame dummy point Y coordinates
       DOUBLE PRECISION COMFAC   ! Completeness factor
       DOUBLE PRECISION ERROR    ! Error in input positions
       DOUBLE PRECISION MINSEP   ! Minimum input data separation
       DOUBLE PRECISION MAXDIS   ! Maximum displacement for matching
       DOUBLE PRECISION NEDFAC   ! Minimum completeness factor required
+      DOUBLE PRECISION PSIZE( CCD1__MXLIS ) ! Linear size of a pixel
       DOUBLE PRECISION XOFF( CCD1__MXLIC ) ! Determined X translation
       DOUBLE PRECISION XOFFN( CCD1__MXLIS ) ! Final X translation
       DOUBLE PRECISION YOFF( CCD1__MXLIC ) ! Determined Y translation
@@ -688,6 +690,8 @@
                MAP1 = AST_GETMAPPING( IWCS, JPIX, JCUR, STATUS )
                MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
 
+*  Get NDF bounding box in pixel coordinates.
+               CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
                IF ( RSTRCT ) THEN
 
 *  Get bounding box: BNDX and BNDY contain the X and Y pixel coordinates
@@ -696,23 +700,51 @@
 *  They must be listed in BNDX and BNDY in a clockwise, or anti-clockwise, 
 *  order.  They are modified here by the ERROR parameter so that pixels 
 *  outside the box by that distance are considered for matching.
-                  CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
-                  BNDXP( 1 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
-                  BNDXP( 2 ) = DBLE( UBND( 1 ) ) + ERROR
-                  BNDXP( 3 ) = DBLE( UBND( 1 ) ) + ERROR
-                  BNDXP( 4 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
-                  BNDYP( 1 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
-                  BNDYP( 2 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
-                  BNDYP( 3 ) = DBLE( UBND( 2 ) ) + ERROR
-                  BNDYP( 4 ) = DBLE( UBND( 2 ) ) + ERROR
+                  XP( 1 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
+                  XP( 2 ) = DBLE( UBND( 1 ) ) + ERROR
+                  XP( 3 ) = DBLE( UBND( 1 ) ) + ERROR
+                  XP( 4 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
+                  YP( 1 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
+                  YP( 2 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
+                  YP( 3 ) = DBLE( UBND( 2 ) ) + ERROR
+                  YP( 4 ) = DBLE( UBND( 2 ) ) + ERROR
 
 *  Convert the bounding box from pixel to current coordinates.
-                  CALL AST_TRAN2( MAPS( I ), 4, BNDXP, BNDYP, .TRUE.,
+                  CALL AST_TRAN2( MAPS( I ), 4, XP, YP, .TRUE.,
      :                            BNDX( 1, I ), BNDY( 1, I ), STATUS )
                END IF
 
+*  Work out the approximate linear size of a pixel.  This will
+*  be used to convert ERROR and MAXDISP from pixel coordinates to the
+*  coordinates of the frame in question.  It's approximate for two 
+*  reasons; it's an average of the X and Y linear sizes, and it's taken
+*  from the middle of the data region (it may in fact vary with position), 
+*  but these should both be acceptable in normal use.  It's also chosen
+*  arbitrarily from one or other of the NDFs in a pair being matched,
+*  but if they aren't of very similar scale they are not going to 
+*  match anyway.
+*  First get two points to convert.
+               XP( 1 ) = 0.5D0 * DBLE( LBND( 1 ) + UBND( 1 ) ) - 0.5D0
+               XP( 2 ) = XP( 1 ) + 1D0
+               YP( 1 ) = 0.5D0 * DBLE( LBND( 2 ) + UBND( 2 ) ) - 0.5D0
+               YP( 2 ) = YP( 1 ) + 1D0
+
+*  Convert the points from pixel to current coordinates.
+               CALL AST_TRAN2( MAPS( I ), 2, XP, YP, .TRUE., XQ, YQ,
+     :                         STATUS )
+
+*  Get the linear size of a pixel in current coordinates.
+               PSIZE( I ) = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2 + 
+     :                            ( YQ( 2 ) - YQ( 1 ) ) ** 2 ) 
+     :                                / SQRT( 2D0 )
+
 *  Release NDF.
                CALL NDF_ANNUL( IDIN, STATUS )
+            ELSE
+
+*  Not using WCS; set pixel size to unity, since the coordinates we will
+*  be using will be pixel coordinates.
+               PSIZE( I ) = 1D0
             END IF
 
 *  Write message about NDF name and domain.
@@ -757,18 +789,19 @@
 
 *  And the rest of the parameters.
       CALL MSG_SETD( 'ERROR', ERROR )
-      CALL CCD1_MSG( '  ', '  Error in positions: ^ERROR', STATUS )
+      CALL CCD1_MSG( '  ', '  Error in positions: ^ERROR pixels', 
+     :               STATUS )
       IF ( MAXDIS .NE. 0D0 ) THEN
          CALL MSG_SETD( 'MAXDIS', MAXDIS )
          CALL CCD1_MSG( ' ', 
-     :    '  Maximum displacement allowed: ^MAXDIS', STATUS )
+     :    '  Maximum displacement allowed: ^MAXDIS pixels', STATUS )
       ELSE
          CALL CCD1_MSG( ' ', 
      :    '  Arbitrarily large displacements allowed', STATUS )
       END IF
       CALL MSG_SETD( 'MINSEP', MINSEP )
       CALL CCD1_MSG( '  ',
-     : '  Minimum distance between positions: ^MINSEP', STATUS )
+     : '  Minimum distance between positions: ^MINSEP pixels', STATUS )
       CALL MSG_SETI( 'MINMAT', MINMAT )
       CALL CCD1_MSG( ' ', '  Minimum number of positions required'//
      : ' for positive match: ^MINMAT', STATUS )
@@ -1041,7 +1074,7 @@
 
 *  One or both lists have only one object.  Treat as a special case.
                METHOD = 'SNGL'
-               CALL CCD1_SNGL( MAXDIS,
+               CALL CCD1_SNGL( MAXDIS * PSIZE( I ),
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
      :                         %VAL( IPRBN1 ), NUMI1,
      :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
@@ -1065,7 +1098,7 @@
 *  Perform matching using histogram of X and Y offsets refined through
 *  iteration.
                METHOD = 'FAST'
-               CALL CCD1_STAO( ERROR, MAXDIS,
+               CALL CCD1_STAO( ERROR * PSIZE( I ), MAXDIS * PSIZE( I ), 
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ), 
      :                         %VAL( IPRBN1 ), NUMI1,
      :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
@@ -1102,8 +1135,8 @@
      :                                %VAL( IPX( J ) ),
      :                                %VAL( IPY( J ) ), NREC( J ),
      :                                NMAT( COUNT ), XOFF( COUNT ),
-     :                                YOFF( COUNT ), ERROR, COMFAC,
-     :                                STATUS )
+     :                                YOFF( COUNT ), ERROR * PSIZE( I ), 
+     :                                COMFAC, STATUS )
 
 *  Now check for minimum number match and completeness. Set failed if
 *  this match fails now.
@@ -1128,7 +1161,7 @@
      :                         STATUS )
                CALL CCD1_MALL( NREC( J ) + 2, '_INTEGER', IPWRK5, 
      :                         STATUS )
-               CALL CCD1_SOFF( ERROR, MAXDIS, 
+               CALL CCD1_SOFF( ERROR * PSIZE( I ), MAXDIS * PSIZE( I ), 
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
      :                         %VAL( IPRBN1 ), NUMI1,
      :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
@@ -1165,7 +1198,8 @@
      :                          NREC( I ), %VAL( IPX( J ) ), 
      :                          %VAL( IPY( J ) ), NREC( J ), 
      :                          NMAT( COUNT ), XOFF( COUNT ), 
-     :                          YOFF( COUNT ), ERROR, COMFAC, STATUS )
+     :                          YOFF( COUNT ), ERROR * PSIZE( I ), 
+     :                          COMFAC, STATUS )
             END IF
 
 *  Final check for ok match.
