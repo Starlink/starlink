@@ -134,11 +134,6 @@
         CALL CHR_ITOC( NHDU, STR, NDIG )
         CALL ADI_CPUT0C( ID, '.HDU_'//STR(:NDIG), HDU, STATUS )
 
-*    Ensure previous HDU's data areas are defined
-        IF ( NHDU .GT. 1 ) THEN
-          CALL ADI2_CHKPRV( FID, NHDU-1, .FALSE., STATUS )
-        END IF
-
 *    Mark HDU data area as undefined
         CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
         CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
