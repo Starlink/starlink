@@ -714,6 +714,8 @@
               IF ( OBDAT(NDS).GFLAG ) THEN
                 CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GWPTR,
      :                         STATUS )
+              ELSE
+                OBDAT(NDS).GWPTR = OBDAT(NDS).WPTR
               END IF
 	      IF (STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
@@ -723,7 +725,7 @@
 
 *        Enter weights (=inverse variances)
             IF ( WEIGHTS ) THEN
-	      CALL FIT_GETDAT_WTS(WEIGHTS,OBDAT(NDS).NDAT,
+	      CALL FIT_GETDAT_WTS(OBDAT(NDS).NDAT,
      :       %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
      :      %VAL(OBDAT(NDS).WPTR),NDUFVAR,STATUS)
             END IF
