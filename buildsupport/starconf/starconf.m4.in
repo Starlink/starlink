@@ -714,7 +714,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 ])# STAR_LATEX_DOCUMENTATION
 
 
-# STAR_CHECK_PROGS(progs-to-check-for, [package=''])
+# STAR_CHECK_PROGS(progs-to-check-for, [component=''])
 # --------------------------------------------------
 #
 # For each of the programs in PROGS-TO-CHECK-FOR, define a variable
@@ -727,7 +727,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # program outside of the set of alphanumerics and underscores are
 # normalised to underscores.
 #
-# The optional second argument gives the name of the package containing
+# The optional second argument gives the name of the component containing
 # the program in question.  Some packages install their binaries in
 # package-specific directories, and this argument allows this macro to
 # look there as well.
@@ -735,9 +735,16 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # For example:
 #     STAR_CHECK_PROGS(messgen)
 # would define the variable MESSGEN to have the full path to the
-# messgen application.
+# messgen application, and 
+#     STAR_CHECK_PROGS(prolat, sst)
+# would define the variable PROLAT to have the path to the prolat
+# application within the sst component.
 #
-# Calls AC_SUBST and AC_ARG_VAR on the generated variable name.
+# Calls AC_SUBST and AC_ARG_VAR on the generated variable name.  This
+# macro does _not_ automatically declares a configure dependency on any
+# component specified in the second argument.  These dependencies should
+# be kept to an absolute minimum, and therefore any such dependencies
+# must be declared obviously and explicitly, with rationale.
 #
 # The behaviour described below, for the result when the required program
 # is not found, is not final, and may change.  The documentation below is
@@ -923,9 +930,9 @@ AC_DEFUN([STAR_EXAMPLES_FILES],
 # ---------------------------------------------------
 #
 # Declare dependencies of this component.  The TYPE is one of
-# `sourceset', `build', `link', `use' or `test', and the DEPLIST is a space
-# separated list of component names, which this component depends on in
-# the given way.
+# `sourceset', `build', `link', `use', `test' or `configure', and the
+# DEPLIST is a space separated list of component names, which this
+# component depends on in the given way.
 #
 # -- Sourceset dependencies are those components which must be
 # installed in order to build the complete set of sources, either for
@@ -967,6 +974,9 @@ AC_DEFUN([STAR_EXAMPLES_FILES],
 # dependencies are declared, we take the test dependencies to be the
 # same as the use dependencies.
 #
+# -- Configure dependencies are those which must be satisfied before
+# this component can be successfully configured.
+#
 # The point of this is that different dependencies are required at
 # different times.  The set of dependencies in the master makefile is
 # composed of all the `sourceset' and `build' dependencies, but not
@@ -996,7 +1006,7 @@ AC_DEFUN([STAR_EXAMPLES_FILES],
 AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
          [m4_ifval([$1], [], [AC_FATAL([$0: no type given])])dnl
           m4_if(m4_bregexp([$1], 
-                           [^\(sourceset\|build\|link\|use\|test\)$]),
+                           [^\(sourceset\|build\|link\|use\|test\|configure\)$]),
                 [0],
                 [],
                 [AC_FATAL([$0: unrecognised dependency type: $1])])dnl
