@@ -64,7 +64,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
-      INCLUDE 'his_par'          ! HISTPEAK system variables
+      INCLUDE 'HIS_PAR'          ! HISTPEAK system variables
       INCLUDE 'NDF_PAR'          ! NDF public constants
 
 *  Arguments Given:

@@ -63,7 +63,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! PAR constants
@@ -483,7 +483,7 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'elp_par'               ! ELLPRO constants
+      INCLUDE 'ELP_PAR'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
          
@@ -947,7 +947,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       include 'PAR_ERR'
-      include 'gau_par'
+      include 'GAU_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -1397,7 +1397,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
           
 *  Status:     

@@ -50,7 +50,7 @@
 
 *   types and includes
       implicit none
-      include 'gau_par'
+      include 'GAU_PAR'
 
 *   arguments
       integer n, p, l, initdatasize

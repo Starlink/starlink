@@ -86,7 +86,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'cor_par'               ! CORR constants
+      INCLUDE 'COR_PAR'               ! CORR constants
                      
 *  Arguments Given:
       LOGICAL USEALL                  ! Is a high count cut out being 

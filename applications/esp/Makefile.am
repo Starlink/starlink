@@ -15,8 +15,8 @@ esp_mon_SOURCES = \
     $(TASK_SUBS) \
     $(COMMON_SUBS) \
     $(PSEUDOCOMMON_SUBS) \
-    $(MISC_SUBS) \
-    d1mach.fpp
+    $(MISC_SUBS)
+
 esp_mon_LDADD = `$(srcdir)/esp_link_adam`
 
 # Routines which are called by only one task or subroutine.  Although

@@ -153,7 +153,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
-      INCLUDE 'ske_par'               ! SKEW constants
+      INCLUDE 'SKE_PAR'               ! SKEW constants
                      
 *  Status:     
       INTEGER STATUS                  ! Global status

@@ -413,7 +413,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data
-      include 'gau_par'
+      include 'GAU_PAR'
 
 *  Status:
       INTEGER STATUS                  ! Global status

@@ -92,7 +92,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'sel_par'               ! SELFC constants
+      INCLUDE 'SEL_PAR'               ! SELFC constants
                      
 *  Arguments Given:
       LOGICAL USEALL                  ! Is a high count cut out being 

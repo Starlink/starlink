@@ -343,7 +343,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -488,7 +488,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -636,7 +636,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
 
 *  Status:
@@ -1190,7 +1190,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -1355,7 +1355,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -1609,7 +1609,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'FIO_ERR'               ! FIO error definitions
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Arguments Given:                              
       INTEGER COUNTR                  ! Number of pixels

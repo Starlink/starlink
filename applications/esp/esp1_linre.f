@@ -76,7 +76,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
                      
 *  Arguments Given:
       CHARACTER *(3) FTYPE            ! File header type
@@ -403,7 +403,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'his_par'               ! HISTPEAK system variables
+      INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
                      
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
@@ -526,7 +526,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'hsb_par'               ! HSUB system variables
+      INCLUDE 'HSB_PAR'               ! HSUB system variables
                      
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
@@ -651,7 +651,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'lob_par'               ! LOBACK system variables
+      INCLUDE 'LOB_PAR'               ! LOBACK system variables
                      
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
@@ -793,7 +793,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'sec_par'               ! SECTOR constants
+      INCLUDE 'SEC_PAR'               ! SECTOR constants
                      
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points

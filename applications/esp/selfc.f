@@ -141,7 +141,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
-      INCLUDE 'sel_par'               ! SELFC constants
+      INCLUDE 'SEL_PAR'               ! SELFC constants
                      
 *  Status:     
       INTEGER STATUS                  ! Global status

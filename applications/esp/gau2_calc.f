@@ -82,7 +82,7 @@
 
 *   type declarations
       implicit none
-      include 'gau_par'
+      include 'GAU_PAR'
 
 *   arguments
       integer n, p, l, gau2par(gau2len), nf

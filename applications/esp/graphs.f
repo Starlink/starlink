@@ -390,7 +390,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
 
 *  Arguments Given:         
       INTEGER POINTS                  ! The number of isophotes
@@ -481,7 +481,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
 
 *  Arguments Given:         
       INTEGER POINTS                  ! Total number of isophotes
@@ -624,7 +624,7 @@
       IMPLICIT NONE
                                                                         
 *  Global Constants:
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'FIO_ERR'               ! FIO error definitions
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
@@ -869,7 +869,7 @@
       IMPLICIT NONE
                                                                         
 *  Global Constants:
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'FIO_ERR'               ! FIO error definitions
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
@@ -1600,7 +1600,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
 
 *  Arguments Given:                              
       LOGICAL CURSOR                  ! Defines keyboard or cursor as input
@@ -1777,7 +1777,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
           
 *  Status:     

@@ -61,7 +61,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -169,7 +169,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elp_par'               ! ELLPRO constants
+      INCLUDE 'ELP_PAR'               ! ELLPRO constants
 
 *  Status:
       INTEGER STATUS                  ! Global status

@@ -64,7 +64,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'fas_par'               ! FASTMED constants
+      INCLUDE 'FAS_PAR'               ! FASTMED constants
                      
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the data array

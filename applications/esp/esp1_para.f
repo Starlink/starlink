@@ -68,7 +68,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'his_par'               ! HISTPEAK system variables
+      INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
                                                                       
 *  Arguments Given:
       INTEGER BARSIZ                  ! Size of the binning arrays used
@@ -269,7 +269,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'hsb_par'               ! HSUB system variables
+      INCLUDE 'HSB_PAR'               ! HSUB system variables
                                                                       
 *  Arguments Given:
       INTEGER BARSIZ                  ! Size of the binning arrays used
@@ -466,7 +466,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'lob_par'               ! LOBACK system variables
+      INCLUDE 'LOB_PAR'               ! LOBACK system variables
                                                                       
 *  Arguments Given:
       INTEGER BARSIZ                  ! Size of the binning arrays used

@@ -81,7 +81,7 @@
 
 *   types and includes
       implicit none
-      include 'gau_par'
+      include 'GAU_PAR'
       include 'PSX_ERR'
       include 'SAE_PAR'
 
@@ -174,7 +174,7 @@
 *-
 
       implicit none
-      include 'gau_par'
+      include 'GAU_PAR'
       include 'SAE_PAR'
 
 *   arguments

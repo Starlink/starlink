@@ -97,7 +97,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
-      INCLUDE 'top_par'               ! TOPPED constants
+      INCLUDE 'TOP_PAR'               ! TOPPED constants
                      
 *  Status:     
       INTEGER STATUS                  ! Global status

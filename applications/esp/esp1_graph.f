@@ -51,7 +51,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'NDF_PAR'               ! NDF constants
 
@@ -242,7 +242,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elp_par'               ! ELLPRO constants
+      INCLUDE 'ELP_PAR'               ! ELLPRO constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'NDF_PAR'               ! NDF constants
 
@@ -462,7 +462,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
 *  Arguments Given:                           
@@ -885,7 +885,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'his_par'               ! HISTPEAK system variables
+      INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
 
 *  Arguments Given:
       INTEGER BARSIZ                  ! Size of the binning arrays used
@@ -1112,7 +1112,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'sec_par'               ! SECTOR constants
+      INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
 *  Arguments Given:                              

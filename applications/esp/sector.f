@@ -340,7 +340,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'sec_par'               ! SECTOR constants  
+      INCLUDE 'SEC_PAR'               ! SECTOR constants  
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
                                            
 *  Status:     
@@ -780,7 +780,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'sec_par'               ! SECTOR constants
+      INCLUDE 'SEC_PAR'               ! SECTOR constants
 
 *  Arguments Given:                              
       REAL X1                         ! X co-ord of central point

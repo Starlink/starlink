@@ -97,7 +97,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'his_par'               ! HISTPEAK system constants
+      INCLUDE 'HIS_PAR'               ! HISTPEAK system constants
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
@@ -589,7 +589,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'hsb_par'               ! HSUB system constants
+      INCLUDE 'HSB_PAR'               ! HSUB system constants
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
@@ -1081,7 +1081,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'lob_par'               ! LOBACK system constants
+      INCLUDE 'LOB_PAR'               ! LOBACK system constants
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image

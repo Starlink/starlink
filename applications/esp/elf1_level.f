@@ -56,7 +56,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
 
 *  Status:
       INTEGER STATUS                  ! Global status

@@ -426,7 +426,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'MSG_PAR'               ! MSG constants
 
 *  Arguments Given:         
@@ -658,7 +658,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'lob_par'               ! LOBACK constants
+      INCLUDE 'LOB_PAR'               ! LOBACK constants
       INCLUDE 'MSG_PAR'               ! Parameter system constants
 
 *  Arguments Given:                              
@@ -905,7 +905,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'sec_par'               ! SECTOR variables
+      INCLUDE 'SEC_PAR'               ! SECTOR variables
       INCLUDE 'MSG_PAR'               ! Parameter system constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
 
@@ -1264,7 +1264,7 @@
                                                                         
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elp_par'               ! ELLPRO constants
+      INCLUDE 'ELP_PAR'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! Parameter system constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
       INCLUDE 'PAR_ERR'		      ! PAR system constants

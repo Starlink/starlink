@@ -66,7 +66,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
+      INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! PAR constants
@@ -535,7 +535,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'elp_par'               ! ELLPRO constants
+      INCLUDE 'ELP_PAR'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'               ! PAR constants
@@ -1054,7 +1054,7 @@ C      END IF
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! defines PAR__NULL
-      include 'gau_par'
+      include 'GAU_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -1601,7 +1601,7 @@ C      END IF
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'sec_par'               ! SECTOR constants
+      INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants   
 
 *  Status:     

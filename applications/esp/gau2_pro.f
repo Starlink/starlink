@@ -159,7 +159,7 @@
 
 *  Global Constants:
       include 'SAE_PAR'         ! Standard SAE constants
-      include 'gau_par'         ! gau2 parameters
+      include 'GAU_PAR'         ! gau2 parameters
 
 *   Status:
       INTEGER STATUS            ! Global status

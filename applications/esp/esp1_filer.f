@@ -440,7 +440,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'FIO_ERR'               ! FIO error definitions
-      INCLUDE 'gra_par'               ! GRAPHS constants
+      INCLUDE 'GRA_PAR'               ! GRAPHS constants
 
 *  Arguments Given:                              
       INTEGER FIOID                   ! FIO identifier for the input file
@@ -645,7 +645,7 @@
 *   Global constants
       include 'SAE_PAR'         ! Standard SAE constants
       include 'FIO_ERR'         ! FIO error definitions
-      include 'lob_par'         ! LOBACK constants
+      include 'LOB_PAR'         ! LOBACK constants
       include 'NDF_PAR'         ! NDF public constants
 
 *  Arguments Given:                              
@@ -788,7 +788,7 @@
 *  Global Constants:
       include 'SAE_PAR'         ! Standard SAE constants
       include 'FIO_ERR'         ! FIO error definitions
-      include 'elp_par'         ! ELLPRO constants
+      include 'ELP_PAR'         ! ELLPRO constants
       include 'NDF_PAR'         ! NDF public constants
 
 *  Arguments Given:                              

@@ -68,7 +68,7 @@
 *   type declarations
       implicit none
       include 'SAE_PAR'
-      include 'gau_par'
+      include 'GAU_PAR'
       
 *   arguments
       integer liv, lv, n, l, p

@@ -149,7 +149,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'lob_par'               ! LOBACK system variables
+      INCLUDE 'LOB_PAR'               ! LOBACK system variables
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -505,7 +505,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'FIO_ERR'               ! FIO error definitions
-      INCLUDE 'lob_par'               ! LOBACK constants
+      INCLUDE 'LOB_PAR'               ! LOBACK constants
 
 *  Arguments Given:                              
       INTEGER FIOID                   ! FIO identifier for the input file
@@ -817,7 +817,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'lob_par'               ! LOBACK system variables
+      INCLUDE 'LOB_PAR'               ! LOBACK system variables
                      
 *  Status:     
       INTEGER STATUS                  ! Global status

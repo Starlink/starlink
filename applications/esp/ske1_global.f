@@ -82,7 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'ske_par'               ! SKEW constants
+      INCLUDE 'SKE_PAR'               ! SKEW constants
                      
 *  Arguments Given:
       LOGICAL USEALL                  ! Is a high count cut out being 

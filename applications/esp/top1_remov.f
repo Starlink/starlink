@@ -64,7 +64,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'top_par'               ! TOPPED constants
+      INCLUDE 'TOP_PAR'               ! TOPPED constants
                      
 *  Arguments Given:
       LOGICAL NOISE                   ! Random noise instead of bad 

@@ -47,7 +47,7 @@
 *   Types
       implicit none
       include 'SAE_PAR'
-      include 'gau_par'
+      include 'GAU_PAR'
 
 *   Arguments
       integer n, liv, lv, p,l,status

@@ -183,7 +183,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'his_par'               ! HISTPEAK system variables
+      INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
       INCLUDE 'PAR_ERR'               ! Parameter system error constants
                      
 *  Status:     

@@ -48,7 +48,7 @@
 
 *   Types
       implicit none
-      include 'gau_par'
+      include 'GAU_PAR'
       include 'SAE_PAR'
       include 'PRM_PAR'         ! PRIMDAT primitive data constants
 

@@ -139,7 +139,7 @@
       include 'NDF_PAR'               ! NDF_ public constant
       include 'PRM_PAR'               ! PRIMDAT primitive data constants
       include 'PAR_ERR'               ! PAR constants
-      include 'hsb_par'               ! HSUB system variables
+      include 'HSB_PAR'               ! HSUB system variables
                      
 *  Status:     
       integer status                  ! Global status
@@ -447,7 +447,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'hsb_par'               ! HSUB system variables
+      INCLUDE 'HSB_PAR'               ! HSUB system variables
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
