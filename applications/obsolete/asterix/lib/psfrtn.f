@@ -2931,6 +2931,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			FID			! Dataset handle
       INTEGER			FSTAT			! i/o status code
       INTEGER                 	IAX			! Loop over axes
+      INTEGER			INST			! More instance data
       INTEGER                 	NELM 			! Number of elements mapped
       INTEGER			REVISION		! Creator revision no.
       INTEGER			RLIM			! Radial limit
@@ -2948,6 +2949,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Extract locator
       CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
+      CALL ADI_CGET0I( PSID, 'Instance', INST, STATUS )
       CALL ADI1_GETLOC( FID, LOC, STATUS )
 
 *  Does the dataset have an attached spatial response?
