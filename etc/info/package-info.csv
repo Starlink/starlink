@@ -75,7 +75,7 @@ ITCL	U	thirdparty
 IUEDR	U		Mark Taylor	CLRC		
 JCMTDR	J		Tim Jenness		Needs Figaro libs	
 JED	U		Brian McIlwrath			
-JNIAST	U	java	Mark Taylor	CLRC		
+JNIAST	S	java	Mark Taylor	CLRC		
 JNIHDS	S	java	Mark Taylor	CLRC		
 JPEG	U	yes				
 JPL	S	yes				
