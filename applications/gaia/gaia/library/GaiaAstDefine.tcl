@@ -803,12 +803,16 @@ itcl::class gaia::GaiaAstDefine {
    protected method wcs_convert_ {ctype value} {
       if { [regexp {([\+\-]*)(.*):(.*):(.*)} $value all sign hhdd mm ss] } {
 
-         #  Check hhdd and mm for leading 0. This chokes expr.
+         #  Check hhdd, mm and ss for leading 0. This chokes expr as
+         #  it is taken to mean an octal value.
          if { [string index $hhdd 0] == 0 && [string length $hhdd] > 1 } {
             set hhdd [string index $hhdd 1]
          }
          if { [string index $mm 0] == 0 && [string length $mm] > 1 } {
             set mm [string index $mm 1]
+         }
+         if { [string index $ss 0] == 0 && [string length $ss] > 1 } {
+            set ss [string index $ss 1]
          }
          set result [expr (($ss/60.0)+$mm)/60.0+$hhdd]
          if { $sign == "-" } {
