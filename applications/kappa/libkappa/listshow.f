@@ -132,7 +132,7 @@
 *        no file is created.  [!]
 *     MARKER = INTEGER (Read)
 *        This parameter is only accessed if parameter PLOT is set to
-*        "Chain" or "Mark". It specifies the symbol with which each
+*        "Chain" or "Mark". It specifies the type of marker with which each
 *        position should be marked, and should be given as an integer 
 *        PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot, 
 *        2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The 
@@ -160,7 +160,7 @@
 *
 *        - "None" -- No graphics are produced.
 *       
-*        - "Mark" -- Each position is marked by the symbol specified
+*        - "Mark" -- Each position is marked with a marker of type specified
 *        by parameter MARKER.
 *
 *        - "Poly" -- Causes each position to be joined by a line to the 
@@ -170,9 +170,9 @@
 *        parameter CLOSE).
 *
 *        - "Chain" -- This is a combination of "Mark" and "Poly". Each 
-*        position is marked by a symbol and joined by a line to the previous 
+*        position is marked by a marker and joined by a line to the previous 
 *        position. Parameters MARKER, GEODESIC and CLOSE are used to
-*        specify the symbols and lines to use.
+*        specify the markers and lines to use.
 *
 *        - "Box" -- A rectangular box with edges parallel to the edges of
 *        the graphics device is drawn between each pair of positions.
@@ -235,18 +235,36 @@
 *        same manner. Note, strings within text files can be separated by
 *        new lines as well as commas.
 *     STYLE = LITERAL (Read)
-*        The name of a text file containing a description of a plotting 
-*        style. It is used only to control the labels and format for the 
-*        displayed axis values, by specifying suitable values for Frame 
-*        attributes (eg  Digits(1), Digits(2), Symbol(1), Symbol(2), etc).
+*        A group of attribute settings describing the style to use when
+*        formatting the co-ordinate values displayed on the screen, and 
+*        when drawing the graphics specified by parameter PLOT. 
 *
-*        Each line in the file should contain a string of the form 
-*        <name>=<value>, in which <name> is the name of an attribute, 
-*        and <value> is the value to assign to the attribute. The file may 
-*        contain blank lines and comment lines starting with a hash (#) sign. 
-*        Default values will be used for any unspecified attributes. All
-*        attributes will be defaulted if a null value (!) is supplied.
-*        [Current value]
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        In addition to the attributes which control the appearance of
+*        the graphics (Colour, Font, etc), the following attributes may
+*        be set in order to control the appearance of the formatted axis 
+*        values reported on the screen: Format, Digits, Symbol, Unit. These
+*        may be suffixed with an axis number (eg "Digits(2)") to refer to 
+*        the values displayed for a specific axis. [current value]
 
 *  Examples:
 *     listshow stars pixel
@@ -265,8 +283,8 @@
 *        axis 2 values. These defaults are over-ridden if the attributes 
 *        Format(1) and/or Format(2) are assigned values in the description 
 *        of the current Frame stored in the positions list.
-*     listshow stars_2.txt plot=3 style="colour=red,size=2"
-*        This lists the positions in stars_2.txt on the screen in their 
+*     listshow s.txt plot=marker marker=3 style="colour(marker)=red,size=2"
+*        This lists the positions in s.txt on the screen in their 
 *        original co-ordinate Frame, and also marks them on the currently 
 *        selected graphics device using PGPLOT marker 3 (an asterisk). The 
 *        markers are red and are twice the default size. 
@@ -630,9 +648,7 @@
 *  Write the number of axes per position to DIM.
       CALL PAR_PUT0I( 'DIM', NRAX, STATUS )
 
-*  Set the Style of the FrameSet using the STYLE parameter. This is done so
-*  that the Format of each axis value (for instance) can be controlled 
-*  using STYLE.
+*  Set the Style of the FrameSet or Plot using the STYLE parameter. 
       CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IWCS, STATUS )
 
 *  See if Frame descriptions are required.
@@ -649,7 +665,7 @@
 *  Save the number of positions in the list.
       CALL GRP_GRPSZ( IGRP1, SIZE, STATUS )
 
-*  Produce any requestd scren output.
+*  Produce any requestd screen output.
       IF( .NOT. QUIET ) THEN
 
 *  If required, describe the co-ordinate Frame.
@@ -690,9 +706,6 @@
 
 *  Abort the graphics section if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 998
-
-*  Set the plotting style.
-         CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IWCS, STATUS )
 
 *  Produce the graphics.
          CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( IPW2 ), PLOT,
