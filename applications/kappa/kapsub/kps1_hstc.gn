@@ -1,0 +1,272 @@
+      SUBROUTINE KPS_$HSTC<T>( BAD, EL, ARRAY, LO, HI, LOWLIM, INVERT,
+     :                         HDIM1, HDIM2, MAXVAL, HIST, HSTARR,
+     :                         STATUS )
+*+
+*  Name:
+*     KPS_$HSTCx
+
+*  Purpose:
+*     Generates a histogram of an array in the form of a cell array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS_$HSTCx( BAD, EL, ARRAY, LO, HI, LOWLIM, INVERT, HDIM1,
+*                      HDIM2, MAXVAL, HIST, HSTARR, STATUS )
+
+*  Description:
+*     This subroutine generates an histogram of a 1-d array, between
+*     upper and lower limits.  The histogram is normalised at the
+*     most-populous bin to the height of an output rectangular cell
+*     array.  Each column of the cell array corresponds to a bin in the
+*     histogram; it takes the (colour-index) value corresponding to the
+*     bin number (above an offset of reserved colour-index values) up
+*     to the height of the bin, and is then filled with zeroes---the
+*     background colour index.  The cell array is then ready to be
+*     displayed.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If true there will be no checking for bad pixels.
+*     EL = INTEGER (Given)
+*        The number of elements in the array.
+*     ARRAY( EL ) = ? (Given)
+*        The array which is to be used to form the histogram.
+*     LO = ? (Given)
+*        The lower scaling limit, usually the lowest value to be
+*        included in the histogram.  The histogram is computed between
+*        the minimum of LO and HI, and their maximum.
+*     HI = ? (Given)
+*        The upper scaling limit, usually the highest value to be
+*        included in the histogram.  The histogram is computed between
+*        the minimum of LO and HI, and their maximum.
+*     LOWLIM = INTEGER (Given)
+*        The lowest value to appear in the scaled histogram cell array.
+*     INVERT = LOGICAL (Given)
+*        If true the histogram cell array is vertically inverted, i.e.
+*        it is filled from the top, thus when displayed via GKS and
+*        the bin number increase froms left in right in the x direction
+*        the number in a bin increases from bottom to the top.
+*     HDIM1 = INTEGER (Given)
+*        The first dimension of the 2-d array of the cell-array
+*        representation of the histogram.  Also the number of bins in
+*        the histogram.  LOWLIM + HDIM1 should be no more than the
+*        highest value to appear in the scaled histogram cell array.
+*     HDIM2 = INTEGER (Given)
+*        The second dimension of the 2-d array of the cell-array
+*        representation of the histogram.
+*     MAXVAL = INTEGER (Returned)
+*        The actual number of array elements in the most populous
+*        histogram bin.
+*     HIST( HDIM1 ) = INTEGER (Returned)
+*        The histogram normalised to HDIM2 in the most populous bin.
+*     HSTARR( HDIM1, HDIM2 ) = INTEGER (Returned)
+*        The array containing the histogram in a form that can readily
+*        be displayed as a cell array.  Each column is a histogram bin;
+*        it has the colour index corresponding to its value up to a
+*        height proportional to the number of data values, and set to
+*        the background colour above that.
+*     STATUS = INTEGER (Given & Returned)
+*        The interited status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     array and histogram limits supplied to the routine must have the
+*     data type specified.
+
+*  Algorithm:
+*     -  Determine the polarity of the scaling, the initial pen for the
+*     first histogram bin and the pen increment (+ or - one).  The
+*     range of used pens excludes the reserved ones.
+*     -  An histogram of the array is compiled, and then normalised
+*     so that the largest entry is HDIM2.
+*     -  The output array is set up such that it consists of a series
+*     of columns, each corresponding to a different pen, and whose
+*     length is given by the value of the histogram.  The remainder of
+*     the column is filled with the background pen.  The pens increment
+*     in sequence for each bin starting from the initial pen.
+
+*  Implementation Deficiencies:
+*     Histogram can look spiky because of integer rounding errors.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 May 13 (MJC):
+*       Original version.
+*     1991 June 27 (MJC):
+*        Added MAXVAL argument, and permitted negative scaling.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE            ! No implicit typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Standard SAE definitions
+      INCLUDE 'PRM_PAR'        ! Magic-value definitions
+
+*  Arguments Given:
+      LOGICAL
+     :  BAD,
+     :  INVERT
+
+      INTEGER
+     :  EL,
+     :  LOWLIM,
+     :  HDIM1, HDIM2
+
+      <TYPE>
+     :  HI, LO,
+     :  ARRAY( EL )
+
+*  Arguments Returned:
+      INTEGER
+     :  MAXVAL,
+     :  HIST( HDIM1 ),
+     :  HSTARR( HDIM1, HDIM2 )
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      INTEGER
+     :  I, J,                  ! General variables
+     :  PEN,                   ! Pen number to be given to a column
+                               ! of the output array
+     :  PENINC                 ! Pen increment
+
+      REAL
+     :  SCALE                  ! Maximum value of scaled histogram
+
+      <LTYPE>
+     :  HIGH,                  ! Sorted copy of the upper limit
+     :  LOW                    ! Sorted copy of the lower limit
+
+*.
+
+*    Check the inherited status.
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Note the polarity of the "high" and "low" values in case of
+*    negative scaling.  Find the initial pen number and polarity of
+*    the pen-number increment.
+
+      IF ( HI .LT. LO ) THEN
+         HIGH = LO
+         LOW = HI
+         PEN = LOWLIM + HDIM1
+         PENINC = -1
+      ELSE
+         LOW = LO
+         HIGH = HI
+         PEN = LOWLIM - 1
+         PENINC = 1
+      END IF
+
+*    Generate the histogram between those bounds.
+
+      CALL KPG_$GHST<T>( BAD, EL, ARRAY, HDIM1, HIGH, LOW, HIST,
+     :                   STATUS )
+
+*    Find the maximum value in the histogram.
+
+      MAXVAL = HIST( 1 )
+
+      DO  I = 1, HDIM1, 1
+         IF ( HIST( I ) .GT. MAXVAL ) MAXVAL = HIST( I )
+      END DO
+
+*    Normalise the histogram.
+*    ========================
+
+*    Define the scale factor so that all entries lie in the range 1 to
+*    HDIM2.
+
+      SCALE = REAL( HDIM2 - 1 ) / REAL( MAXVAL )
+
+*    Perform the scaling.
+
+      DO  I = 1, HDIM1, 1
+         HIST( I ) = INT( REAL( HIST( I ) ) * SCALE ) + 1
+      END DO
+
+*    Build the output cell array.
+*    ============================
+
+*    The way the array is built depends whether it is to be inverted or
+*    not.
+
+      IF ( INVERT ) THEN
+
+*       Loop for each bin in the histogram.
+
+         DO  I = 1, HDIM1, 1
+
+*          Define the pen number to be used, ignoring the reserved pens.
+
+            PEN = PEN + PENINC
+
+*          Build the output array from the normalised histogram where
+*          the bin is not empty, starting from the top.
+
+            IF ( HIST( I ) .NE. 0 ) THEN
+               DO  J = HDIM2, HDIM2 - HIST( I ) + 1, -1
+                  HSTARR( I, J ) = PEN
+               END DO
+            END IF
+
+*          For bins less than the maximum fill the cell array with the
+*          background colour index.
+
+            IF ( HIST( I ) .LT. HDIM2 ) THEN
+               DO  J = 1, HDIM2 - HIST( I ), 1
+                  HSTARR( I, J ) = 0.
+               END DO
+            END IF
+         END DO
+
+*    No inversion.
+
+      ELSE
+
+*       Loop for each bin in the histogram.
+
+         DO  I = 1, HDIM1, 1
+
+*          Define the pen number to be used, ignoring the reserved pens.
+
+            PEN = PEN + PENINC
+
+*          Build the output array from the normalised histogram where
+*          the bin is not empty.
+
+            IF ( HIST( I ) .NE. 0 ) THEN
+               DO  J = 1, HIST( I ), 1
+                  HSTARR( I, J ) = PEN
+               END DO
+            END IF
+
+*          For bins less than the maximum fill the cell array with the
+*          background colour index.
+
+            IF ( HIST( I ) .LT. HDIM2 ) THEN
+               DO  J = HIST( I ) + 1, HDIM2, 1
+                  HSTARR( I, J ) = 0.
+               END DO
+            END IF
+         END DO
+
+      END IF
+
+      END
+
