@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, IGRP2, INDFO, INDFC, NITER, NSIGMA, 
-     :                       ILEVEL, IMGID, STATUS )
+     :                       ILEVEL, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
-*                      IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, IMGID, 
+*                      IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
 *                      STATUS )
 
 *  Description:
@@ -26,9 +26,9 @@
 *     values for which the residual is greater than NSIGMA standard
 *     deviations, where the standard deviation is either the square root of
 *     the supplied input variance value if supplied, or the standard
-*     deviation of all residuals if no input variances were supplied).
-*     New I,Q,U values are then found excluding the rejected input values.
-*     This rejection process is repeated NITER times.
+*     deviation estimated from the residuals). New I,Q,U values are then 
+*     found excluding the rejected input values. This rejection process is 
+*     repeated NITER times.
 
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
@@ -99,8 +99,6 @@
 *        The information level. Zero produces no screen output; 1 gives
 *        brief details of each iteration; 2 gives full details of each
 *        iteration.
-*     IMGID( NNDF ) = CHARACTER * ( * ) (Given)
-*        Image identifiers for the input NDFs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -143,7 +141,6 @@
       INTEGER NITER
       REAL NSIGMA
       INTEGER ILEVEL
-      CHARACTER IMGID( NNDF )*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -180,6 +177,8 @@
       INTEGER UBND( 3 )          ! Upper bounds of output NDF
       LOGICAL FRDIN              ! Free the IPDIN pointer?
       LOGICAL FRVIN              ! Free the IPVIN pointer?
+
+      common /ssscom/ iter,dim1,dim2
 *.
 
 *  Check the inherited global status.
@@ -251,10 +250,11 @@
  10   CONTINUE
 
 *  Apply light spatial smoothing to the I,Q,U values calculated on the
-*  previous iteration. A 3x3 median box filter is used. The co-variance
-*  array is used as work space by this call.
+*  previous iteration. Each smoothed value is estimated by fitting a least
+*  squares quadratic surface to the data within a 5x5 fitting box.
       IF( ITER .GT. 0 ) CALL POL1_SNGSM( DIM1, DIM2, DIM3, 
-     :                                   %VAL( IPDOUT ), %VAL( IPCOUT ), 
+     :                                   %VAL( IPVOUT ), %VAL( IPDOUT ), 
+     :                                   %VAL( IPCOUT ), %VAL( IPCM1 ),
      :                                   STATUS )
 
 *  Calculate the effective intensities, transmittances, eficiciencies and
@@ -289,10 +289,11 @@
 
 *  Get pointers to the intensity values and associated variance values to
 *  use for this NDF. The co-variance array is used as work space here.
-         CALL POL1_SNGFL( IMGID( I ), INDFS, ITER, WSCH, ILEVEL, 
-     :                    T( I ), PHI( I ), EPS( I ), DIM1, DIM2, DIM3, 
-     :                    %VAL( IPDOUT ), %VAL( IPCOUT ), NSIGMA, IPDIN, 
-     :                    IPVIN, FRDIN, FRVIN, STATUS )
+         CALL POL1_SNGFL( INDFS, ITER, WSCH, ILEVEL, T( I ), 
+     :                    PHI( I ), EPS( I ), DIM1, DIM2, DIM3, 
+     :                    %VAL( IPDOUT ), %VAL( IPVOUT ), 
+     :                    %VAL( IPCOUT ), NSIGMA, IPDIN, IPVIN, FRDIN, 
+     :                    FRVIN, STATUS )
 
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999

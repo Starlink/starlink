@@ -36,11 +36,8 @@
 *        The number of rejection iterations to perform. [2]
 *     NSIGMA = _REAL (Read)
 *        The rejection threshold for aberant points, expressed as a
-*        multiple of the standard deviation of the supplied data value.
-*        If output variances are being created, then the standard deviation 
-*        used is the square root of the input variance. Otherwise, it is the
-*        standard deviation of the residuals taken over the entire input
-*        image. This parameter is not prompted for if NITER is zero. [3.0]
+*        multiple of the standard deviation of the intensity data.
+*        This parameter is not prompted for if NITER is zero. [3.0]
 *     OUT = NDF (Write)
 *        The output NDF holding the Stokes vector cube.
 *     TITLE = LITERAL (Read)
@@ -98,10 +95,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER IMGID_LEN
-      PARAMETER( IMGID_LEN = 80 )! Maximum length of an image identifier
-
 *  Local Variables:
       CHARACTER XLOC*(DAT__SZLOC)! POLPACK extension locator
       INTEGER I                  ! Index of current input NDF
@@ -112,7 +105,6 @@
       INTEGER INDFO              ! NDF identifier for the output NDF
       INTEGER IPAID              ! Pointer to analyser indices
       INTEGER IPEPS              ! Pointer to analyser efficiency factors
-      INTEGER IPIMI              ! Pointer to image identifier strings
       INTEGER IPPHI              ! Pointer to effective analyser angles
       INTEGER IPT                ! Pointer to analyser transmission factors
       INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
@@ -133,7 +125,6 @@
 *  Initialise resource pointers and identifiers.
       IPPHI = 0
       IPAID = 0
-      IPIMI = 0
       IPT = 0
       IPEPS = 0
       IGRP2 = GRP__NOID      
@@ -156,7 +147,6 @@
       CALL PSX_CALLOC( NNDF, '_INTEGER', IPAID, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPT, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPEPS, STATUS )
-      CALL PSX_CALLOC( NNDF*IMGID_LEN, '_CHAR', IPIMI, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999     
@@ -169,8 +159,8 @@
 *  the output NDF, and a flag indicating if input variances are available
 *  in all input NDFs.
       CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( IPPHI ), %VAL( IPAID ), 
-     :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, %VAL( IPIMI ),
-     :                 LBNDO, UBNDO, STATUS, %VAL( IMGID_LEN ) )
+     :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, LBNDO, UBNDO, 
+     :                 STATUS )
 
 *  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
@@ -292,8 +282,7 @@
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
-     :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
-     :                 %VAL( IPIMI ), STATUS, %VAL( IMGID_LEN ) )
+     :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, STATUS )
 
 *  Tidy up.
 *  ========
@@ -305,7 +294,6 @@
       IF( IPAID .NE. 0 ) CALL PSX_FREE( IPAID, STATUS )
       IF( IPT .NE. 0 ) CALL PSX_FREE( IPT, STATUS )
       IF( IPEPS .NE. 0 ) CALL PSX_FREE( IPEPS, STATUS )
-      IF( IPIMI .NE. 0 ) CALL PSX_FREE( IPIMI, STATUS )
 
 *  Delete the group holding analyser identifiers.
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )

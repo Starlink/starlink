@@ -1,6 +1,6 @@
-      SUBROUTINE POL1_SNGFL( IMGID, INDF, ITER, VSCH, ILEVEL, T, PHI,
-     :                       EPS, DIM1, DIM2, DIM3, STOKES, WORK, 
-     :                       NSIGMA, IPDIN, IPVIN, FRDIN, FRVIN, 
+      SUBROUTINE POL1_SNGFL( INDF, ITER, VSCH, ILEVEL, T, PHI,
+     :                       EPS, DIM1, DIM2, DIM3, STOKES, VSTOK, 
+     :                       WORK, NSIGMA, IPDIN, IPVIN, FRDIN, FRVIN, 
      :                       STATUS )
 *+
 *  Name:
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGFL( IMGID, INDF, ITER, VSCH, ILEVEL, T, PHI, EPS,
-*                      DIM1, DIM2, DIM3, STOKES, WORK, NSIGMA, IPDIN, 
+*     CALL POL1_SNGFL( INDF, ITER, VSCH, ILEVEL, T, PHI, EPS, 
+*                      DIM1, DIM2, DIM3, STOKES, VSTOK, WORK, NSIGMA, IPDIN, 
 *                      IPVIN, FRDIN, FRVIN, STATUS )
 
 *  Description:
@@ -22,8 +22,6 @@
 *     and associated variances to use for a given input intensity NDF.
 
 *  Arguments:
-*     IMGID = CHARACTER * ( * ) (Given)
-*        The image identifier associated with the NDF.
 *     INDF = INTEGER (Given)
 *        The input intensity NDF identifier.
 *     ITER = INTEGER (Given)
@@ -61,6 +59,8 @@
 *        No. of planes.
 *     STOKES( DIM1, DIM2, DIM3 ) = REAL (Given)
 *        The current (smoothed) estimate of the Stokes parameters.
+*     VSTOK( DIM1, DIM2, DIM3 ) = REAL (Given)
+*        The variances for the Stokes parameters.
 *     WORK( DIM1, DIM2 ) = REAL (Given)
 *        A work array.
 *     NSIGMA = REAL (Given)
@@ -105,7 +105,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER IMGID*(*)
       INTEGER INDF
       INTEGER ITER
       INTEGER VSCH
@@ -117,6 +116,7 @@
       INTEGER DIM2
       INTEGER DIM3
       REAL STOKES( DIM1, DIM2, DIM3 )
+      REAL VSTOK( DIM1, DIM2, DIM3 )
       REAL WORK( DIM1, DIM2 )
       REAL NSIGMA
 
@@ -129,19 +129,21 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER HW                 ! Half width of the box size
-      PARAMETER ( HW = 2 )
-
 *  Local Variables:
+      CHARACTER PATH*256         ! Full NDF path 
       INTEGER EL                 ! No. of pixels in one plane
+      INTEGER IAT                ! Index of basename 
       INTEGER IPD                ! Pointer to NDF DATA array
-      INTEGER IPW1               ! Pointer to real work space
-      INTEGER IPW2               ! Pointer to integer work space
       INTEGER NGOOD              ! No. of good pixels remaining
       INTEGER NREJ               ! No. of pixels rejected this iteration
-      LOGICAL BADOUT             ! Any bad output pixels?
+      INTEGER IPW1               ! Pointer to work array                
+      INTEGER IPW2               ! Pointer to work array                
+      INTEGER IPWGT              ! Pointer to squared residual weights array
+      INTEGER LPATH              ! Used length of PATH
       LOGICAL INVAR              ! Does the NDF have a VARIANCE component?
+      REAL DINMAX                ! Max input data value
+      REAL DINMIN                ! Min input data value
+      REAL NOISE                 ! Estimate of the backgroudn noise level
 *.
 
 *  Initialise the returned flags.
@@ -204,9 +206,12 @@
 
 *  Calculated the squared residuals between the NDF intensity values and
 *  the intensity values implied by the supplied Stokes vectors. These are
-*  stored in the array pointed to by IPDIN (temporarily).
-         CALL POL1_SNGSI( T, PHI, EPS, EL, STOKES, %VAL( IPD ), 
-     :                    %VAL( IPDIN ), STATUS )
+*  stored in the array pointed to by IPDIN (temporarily). This also
+*  returns the max and min NDF intensity values.
+         CALL PSX_CALLOC( EL, '_REAL', IPWGT, STATUS )
+         CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES, 
+     :                    VSTOK, %VAL( IPD ), %VAL( IPDIN ), WORK, 
+     :                    %VAL( IPWGT ), DINMAX, DINMIN, STATUS )
 
 *  We now need to get the variances for the input image. The scheme
 *  used to do this is selected by VSCH. If the input VARIANCE values 
@@ -215,10 +220,9 @@
             CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVIN, EL, 
      :                    STATUS )
 
-*  Otherwise, we estimate the variances by smoothing the image holding
-*  the squared residuals. If constant weights were requested, these
-*  estimates will be over-written by 1.0 before returning them. The
-*  variances here are only used to identify any aberant pixels.
+*  Otherwise, we estimate the variances. If constant weights were requested, 
+*  these estimates will be over-written by 1.0 before returning them. The
+*  variances here are then only used to identify any aberant pixels.
          ELSE      
 
 *  First allocate a variance array and indicate it is to be freed when no
@@ -226,20 +230,22 @@
             CALL PSX_CALLOC( EL, '_REAL', IPVIN, STATUS )
             FRVIN = .TRUE.
 
-*  Now smooth the squared residuals array, putting the results in the
-*  variance array just allocated. This is a 5x5 mean box-filter.
+*  Now calculate the variance estmates and store them in this array.
             CALL PSX_CALLOC( DIM1, '_REAL', IPW1, STATUS )
-            CALL PSX_CALLOC( DIM1, '_INTEGER', IPW2, STATUS )
+            CALL PSX_CALLOC( DIM1, '_REAL', IPW2, STATUS )
 
-            CALL POL1_BLOCR( .TRUE., .TRUE., .FALSE., DIM1, DIM2, 
-     :                       %VAL( IPDIN ), HW, HW, 1, %VAL( IPVIN ), 
-     :                       BADOUT, %VAL( IPW1 ), %VAL( IPW2 ), 
-     :                       STATUS )
+
+            CALL POL1_SNGVR( DIM1, DIM2, %VAL( IPDIN ), WORK, 
+     :                       %VAL( IPWGT ), DINMAX, DINMIN, 
+     :                       %VAL( IPVIN ), %VAL( IPW1 ), %VAL( IPW2 ), 
+     :                       NOISE, STATUS )
 
             CALL PSX_FREE( IPW1, STATUS )
             CALL PSX_FREE( IPW2, STATUS )
-
          END IF
+
+*  Free the array holding the squared residuals weights.
+         CALL PSX_FREE( IPWGT, STATUS )
 
 *  Reject aberant data values.
          CALL POL1_SNGRJ( NSIGMA, EL, %VAL( IPD ), %VAL( IPVIN ), 
@@ -250,23 +256,45 @@
             CALL POL1_FILLR( 1.0, EL, %VAL( IPVIN ), STATUS )
          END IF
 
+*  Get the ndf name, and find the end of the directory path (i.e. the
+*  final "\" ).
+         CALL NDF_MSG( 'NDF', INDF )
+         CALL MSG_LOAD( ' ', '^NDF', PATH, LPATH, STATUS )
+         CALL NDG1_LASTO( PATH( : LPATH ), '/', IAT, STATUS )
+
+*  Move on to point to the first character ni the ndf base name.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            IAT = IAT + 1
+         ELSE
+            IAT = 1
+         END IF
+             
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( ILEVEL .GT. 1 ) THEN
-            CALL MSG_SETC( 'NDF', IMGID )
+            CALL MSG_BLANK( STATUS )
+
+            CALL MSG_SETC( 'NDF', PATH( IAT : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
+            CALL MSG_OUT( 'POL1_SNGFL_MSG1', '   Iteration: ^ITER  --'//
+     :                    ' ''^NDF''', STATUS )
+
             CALL MSG_SETI( 'NREJ', NREJ )
             CALL MSG_SETI( 'NGOOD', NGOOD )
+            CALL MSG_OUT( 'POL1_SNGFL_MSG2', '      Pixels rejected: '//
+     :                    '^NREJ   Pixels remaining: ^NGOOD', STATUS )
 
-            CALL MSG_OUT( 'POL1_SNGFL_MSG1', '   Iter: ^ITER  '//
-     :                    'Rejected: ^NREJ  Remaining: ^NGOOD -- '//
-     :                    '''^NDF''', STATUS )
+            IF( FRVIN ) THEN
+               CALL MSG_SETR( 'NOISE', NOISE )
+               CALL MSG_OUT( 'POL1_SNGFL_MSG3', '      Background '//
+     :                       'noise estimate: ^NOISE', STATUS )
+            END IF
 
 *  If required, warn the user if no good pixels remain in this NDF.
          ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
-            CALL MSG_SETC( 'NDF', IMGID )
+            CALL MSG_SETC( 'NDF', PATH( IAT : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( 'POL1_SNGFL_MSG2', '   WARNING: No usable '//
+            CALL MSG_OUT( 'POL1_SNGFL_MSG4', '   WARNING: No usable '//
      :                    'pixels remain in ''^NDF'' after ^ITER '//
      :                    'rejection iterations.', STATUS )
          END IF

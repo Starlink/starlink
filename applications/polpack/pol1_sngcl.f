@@ -194,8 +194,14 @@
 
             ELSE
                VOUT( I, 1 ) = ( C6*C6 - C9*C5 )/DEN
+               IF( VOUT( I, 1 ) .LE. 0.0 ) VOUT( I, 1 ) = VAL__BADR
+
                VOUT( I, 2 ) = ( C3*C3 - C1*C9 )/DEN
+               IF( VOUT( I, 2 ) .LE. 0.0 ) VOUT( I, 2 ) = VAL__BADR
+
                VOUT( I, 3 ) = ( C2*C2 - C5*C1 )/DEN
+               IF( VOUT( I, 3 ) .LE. 0.0 ) VOUT( I, 3 ) = VAL__BADR
+
                COUT( I ) = ( C6*C1 - C2*C3 )/DEN
             END IF
 

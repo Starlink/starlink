@@ -87,8 +87,8 @@
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the maximum number of iterations to be used when 
 *        estimating input variances and rejecting aberrant input values. 
-*        It may be set to zero to prevent iterations and so speed up the 
-*        processing. [1]
+*        Each iteration is a computationally expensive process, and for
+*        this reason, the default value is zero. [0]
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the threshold at which to reject input data values. If
@@ -215,15 +215,18 @@
 *
 *        If the input intensity images do not contain usable variances,
 *        then estimates of these variances can be made from the spread of
-*        supplied data values. This is an iterative process. Initially,
-*        Stokes vectors are estimated assigning a uniform constant weight
-*        to all input data values. These Stokes vectors are smoothed
-*        by replacing each value by the mean of those in a 5 by 5 pixel 
-*        box centred on the value. The squared residuals are then found 
-*        between the supplied intensities and the intensities implied by
-*        these smoothed Stokes vectors. The variance at each input pixel is
-*        then assumed to be equal to the mean of the squared residuals 
-*        within a 5 by 5 pixel box centred on the input pixel.
+*        supplied data values. This is an expensive iterative process (see
+*        parameters NITER and WEIGHTS). Initially, Stokes vectors are 
+*        estimated assigning a uniform constant weight to all input data 
+*        values. The I, Q and U images are then smoothed by fitting a 
+*        quadratic surface to the data within a 7x7 box centred on each 
+*        pixel. The residuals are then found between the supplied intensities 
+*        and the intensities implied by these smoothed Stokes vectors. These 
+*        residuals are then high pass filtered to remove any zero point error 
+*        (for instance caused by errors in the sky subtraction). The squared 
+*        residuals are then smoothed using a 7x7 pixel mean box filter.
+*        These mean squared residuals are used as the variance estimates for
+*        the input intensity values.
 *        
 *        In order to provide some safe-guards against aberrant values in 
 *        the input images, input data values which are badly inconsistent 
@@ -232,7 +235,7 @@
 *        NSIGMA times the standard deviation expected for the pixel value.
 *        This standard deviation may be derived from the variances in the 
 *        input data file, or from the variances estimated from the spread
-*        of data values (see parameter WEIGHTS).
+*        of data values.
 *
 *        After rejecting such values, the algorithm goes on to re-calculate 
 *        the Stokes vectors excluding the rejected input values, weighting

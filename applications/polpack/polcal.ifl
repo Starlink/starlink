@@ -85,7 +85,7 @@ interface POLCAL
       access   READ
       vpath    'DEFAULT'
       ppath    'DEFAULT'
-      default  2
+      default  0
       prompt   'Maximum number of iterations in single-beam mode'
       helpkey  '*'
    endparameter
@@ -126,6 +126,16 @@ interface POLCAL
       ppath    'DEFAULT'
       default  10.0
       prompt   'Sky supression factor'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  1
+      prompt   'Correlation length of the noise, in pixels'
       helpkey  '*'
    endparameter
 

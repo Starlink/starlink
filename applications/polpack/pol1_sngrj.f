@@ -104,25 +104,27 @@
 *  Check each pixel. 
       DO I = 1, EL
 
-*  Check the supplied squared residual is valid.
-         IF( DOUT( I ) .NE. VAL__BADR ) THEN
- 
-*  Check the supplied variance is valid.
-            IF( VIN( I ) .NE. VAL__BADR ) THEN
+*  Check the supplied data value is valid.
+         IF( DIN( I ) .NE. VAL__BADR ) THEN
+
+*  Check the supplied squared residual and variance are valid.
+            IF( DOUT( I ) .NE. VAL__BADR .AND.
+     :          VIN( I ) .NE. VAL__BADR ) THEN
 
 *  Store bad value if the squared residual is too large. Otherwise, copy
 *  the supplied input data value.
-               IF( DOUT( I ) .GE. VIN( I )*VARFAC ) THEN
+               IF( DOUT( I ) .GT. VIN( I )*VARFAC ) THEN
                   DOUT( I ) = VAL__BADR
                   NREJ = NREJ + 1
                ELSE
                   DOUT( I ) = DIN( I )
-                  IF( DIN( I ) .NE. VAL__BADR ) NGOOD = NGOOD + 1
+                  NGOOD = NGOOD + 1
                END IF
 
-*  If the variance is not valid, store a bad output value.
+*  If the variance or residual is not valid, store a bad output value.
             ELSE
                DOUT( I ) = VAL__BADR 
+               NREJ = NREJ + 1
             END IF         
    
          END IF

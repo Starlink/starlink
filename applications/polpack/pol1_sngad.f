@@ -117,7 +117,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Element index
-      REAL COS2, SIN2, RCOS, RSIN, RT, R1, RC, RS ! Constant terms
+      DOUBLE PRECISION COS2, SIN2, RCOS, RSIN, RT, R1, RC, RS ! Constant terms
       REAL VARVAL                ! Variance value to use
 *.
 
@@ -125,11 +125,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Store some constants.
-      COS2 = COS( 2*PHI )
-      SIN2 = SIN( 2*PHI )
-      RCOS = EPS*COS2
-      RSIN = EPS*SIN2
-      RT = T*T
+      COS2 = COS( DBLE( 2*PHI ) )
+      SIN2 = SIN( DBLE( 2*PHI ) )
+      RCOS = DBLE( EPS )*COS2
+      RSIN = DBLE( EPS )*SIN2
+      RT = DBLE( T )**2
 
 *  Loop round every pixel.
       DO I = 1, EL
@@ -167,7 +167,7 @@
             CM2( I ) = CM2( I ) + RS
 
 *  Increase the count of input images contributing to this pixel.
-            COUNT( I ) = COUNT( I ) + 1.0
+            COUNT( I ) = COUNT( I ) + 1.0D0
 
          END IF
 
