@@ -9,7 +9,7 @@ require_ok("Starlink::AST::PGPLOT");
 
 # pgbegin( $unit, $file, $nxsub, $nysub );
 # pgenv( $xmin, $xmax, $ymin, $ymax, $axis_scaling, $axis_type );
-is( PGPLOT::pgbegin(0,"/xserve",1,1), 1, "Calling PGBEGIN()" );
+is( PGPLOT::pgbegin(0,"/xw",1,1), 1, "Calling PGBEGIN()" );
 PGPLOT::pgenv(0,10,0,10,0,0);
 
 my ( @x, @y );

@@ -32,7 +32,7 @@ isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 # Set up window
 # -------------
 
-is( PGPLOT::pgbegin(0,"/xserve",1,1), 1, "Result from the PGBEGIN() call" );
+is( PGPLOT::pgbegin(0,"/xw",1,1), 1, "Result from the PGBEGIN() call" );
 
 my $nx = $header->value("NAXIS1");
 my $ny = $header->value("NAXIS2");

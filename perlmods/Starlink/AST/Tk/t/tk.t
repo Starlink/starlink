@@ -54,6 +54,7 @@ sub create_window {
    $MW->title("Starlink::AST::Tk");   
    $MW->iconname("Starlink::AST::Tk");
    $MW->configure( -cursor => "tcross" );
+   $MW->after( 1000, sub { exit; } );
 
    # create the canvas widget
    my $canvas = $MW->Canvas( -width       => 640, 
