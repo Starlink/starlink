@@ -24,7 +24,7 @@
 *     This application can be used either to add a new co-ordinate
 *     Frame into the WCS component of an NDF using a specified Mapping, 
 *     or to store a specified Mapping in a text file for future use by
-*     other appalications (see parameter WRITEMAP). A number of different 
+*     other applications (see parameter WRITEMAP). A number of different 
 *     types of Mapping can be used (see parameter MAPTYPE).
 *     
 *     When adding a new Frame to a WCS component (WRITEMAP=FALSE), 
@@ -39,7 +39,7 @@
 *     WCSADD will only generate Mappings with the same number of 
 *     input and output axes; this number is determined by the number
 *     of axes in the basis Frame if WRITEMAP=FALSE or by the 
-*     NAXES paramter if WRITEMAP=TRUE.
+*     NAXES parameter if WRITEMAP=TRUE.
 
 *  Usage:
 *     wcsadd ndf frame domain maptype
