@@ -2311,10 +2311,7 @@ Directory /cvs/libraries/pcs/adam added to the repository
         <p>Get the complete set of source files, and check them in to
           the repository.  This means unpacking all the files in
           <code>adam_source.tar</code>, which you can find in
-          <code>/star/sources/pcs/adam</code> (as it happens).  Note,
-          however, that we <em>don't</em> add the <code>mk</code> script
-          or the old <code>makefile</code>, since we're about to make
-          both of these redundant.</p>
+          <code>/star/sources/pcs/adam</code> (as it happens).</p>
 
         <p>In this case, the <code>adam_source.tar</code> distribution
           tarball is a suitable set of sources.  This is not always
@@ -2329,6 +2326,19 @@ Directory /cvs/libraries/pcs/adam added to the repository
           repositories (in the CVS case, just place the new CVS tree in
           your target repository, and for RCS, use the <kbd>cvs
             import</kbd> command).</p>
+
+        <p>Add <em>all</em> of the source files, including files like
+          the <code>mk</code> script and the old <code>makefile</code>,
+          which we are about to remove.  Tag this initial import with a
+          tag <em>&lt;component&gt;</em><code>-initial-import</code>, so
+          that it is possible to recover this old-style distribution if
+          necessary.  As the previous paragraph points out, it is not
+          always completely clear what constitutes the old-style source
+          set: so don't do this step mechanically, use your judgement,
+          and above all avoid losing information.  Note also that some
+          of the infrastructure libraries were added before we settled
+          on this particular tagging practice, and so lack such an
+          initial tag.</p>
 
         <p>In this present case, the <code>adam_source.tar</code>
           file includes a Fortran include file containing error codes,
@@ -2361,24 +2371,30 @@ Directory /cvs/libraries/pcs/adam added to the repository
 
         <p>The file <code>adam_defns</code> is similar, but this is
           genuinely a source file, so we need do nothing more elaborate
-          than rename it to <code>ADAM_DEFNS</code> before checking it
-          in.  Many packages have one or two <code>xxx_par</code> files,
-          and these should be similarly renamed to <code>XXX_PAR</code>
-          before checking.  Also, CVS preserves access modes when it
+          than rename it to <code>ADAM_DEFNS</code>, then add it to the
+          repository and remove the original lowercased version.  Many
+          packages have one or two <code>xxx_par</code> files,
+          and these should be similarly renamed to <code>XXX_PAR</code>.
+          Also, CVS preserves access modes when it
           stores files, so we should make sure that the script
           <code>adam_link_adam</code> is executable <em>before</em>
           checking it in, and we need not bother to make it executable
           as part of the build process.
 <verbatim>
 % tar xf /star/sources/pcs/adam/adam_source.tar
-% mv adam_defns ADAM_DEFNS
 % chmod +x adam_link_adam
 % cremsg adam_err
-% cvs add *.f adam_link_adam adam_defns.h ADAM_DEFNS adam_err.msg
+% cvs add *.f mk makefile adam_link_adam adam_defns.h adam_defns adam_err.msg
 ...
-cvs server: scheduling file `ADAM_DEFNS' for addition
 cvs server: scheduling file `adam_err.msg' for addition
 cvs server: use 'cvs commit' to add these files permanently
+% cvs commit -m "Initial import"
+% cvs tag adam-initial-import
+% mv adam_defns ADAM_DEFNS
+% cvs remove adam_defns
+% cvs add ADAM_DEFNS
+% rm mk makefile
+% cvs remove mk makefile
           </verbatim>
         </p>
 
@@ -2391,11 +2407,14 @@ cvs server: use 'cvs commit' to add these files permanently
           you might also want to create a link to the DTD used for the
           <code>component.xml</code> file, which is in the same
           directory.  Edit these files as appropriate, using information
-          in the original Starlink makefile for guidance.  Then check
+          in the original Starlink makefile for guidance (so it's
+          useful to keep a copy of the original <code>makefile</code> handy,
+          rather than simply deleting it as illustrated above).  Then check
           them in.</p>
 
-        <p>What edits should you make?  The adam
-          <code>Makefile.am</code> file looks as follows:
+        <p>What edits should you make?</p>
+
+        <p>The adam <code>Makefile.am</code> file looks as follows:
           <verbatim>
 bin_SCRIPTS = adam_link_adam
 lib_LTLIBRARIES = libadam_adam.la
@@ -2456,8 +2475,10 @@ AC_OUTPUT
           and all the C <code>#include</code> directives is a good
           start.  For link dependencies, grepping for
           <code>CALL</code> lines is useful for Fortran, and grepping
-          for <code>= *\([A-Za-z][A-Za-z]*__*[A-Za-z][A-Za-z]*\)
-            *(.*</code> will probably be handy.  In fact, the script
+          for
+          <verbatim>
+= *\([A-Za-z][A-Za-z]*__*[A-Za-z][A-Za-z]*\) *(.*
+</verbatim> will probably be handy.  In fact, the script
           <verbatim>
 #! /bin/sh -
 sed -n \
@@ -2628,6 +2649,12 @@ test1_SOURCES = test1.f test1_wrap.c
 test1_wrap.c:
 	echo "int main() { exit (test1_()); }" >test1_wrap.c
 </verbatim></p>
+
+        <p>If the tests you add use components other than those
+          declared or implied as component dependencies (see <ref
+            id="macros-declare-dependencies"/>), then you should
+          declare the full set of test dependencies using
+          <code>STAR_DECLARE_DEPENDENCIES([test], [...])</code>.</p>
 
       </subsect>
 
@@ -2932,6 +2959,82 @@ M Makefile.dependencies
             case-insensitive filesystems (such as HFS+ on MacOS
             X).</p>
 
+          <p>The macro works out if the Fortran compiler discovered by
+            macro <code>AC_PROG_FC</code> has the requested set of
+            features.  If so, it arranges for the compilation to be done
+            `directly'; if not, it arranges for `indirect' compilation,
+            where the preprocessable Fortran code is converted to pure
+            Fortran code and only subsequently passed to the Fortran
+            compiler.</p>
+
+          <p>The configure variables which this macro sets, and which
+            are available for substitution, are as follows.
+            <dl>
+              <dt><code>FPP</code></dt>
+              <dd>
+                <p>The Fortran preprocessor which the macro decides is
+                suitable.</p>
+              </dd>
+
+              <dt><code>FPPFLAGS</code></dt>
+              <dd>
+                <p>The flags which will be given to the compiler (in
+                  direct mode) or preprocessor (in indirect mode).</p>
+              </dd>
+
+              <dt><code>FPP_SRC_EXT</code></dt>
+              <dd><p>This is the file extension (without a dot) of
+                  preprocessable Fortran files; by default this is
+                  `fpp', but `F' is also common.</p></dd>
+
+              <dt><code>FPP_COMPILE_EXT</code></dt>
+              <dd><p>This contains the file extension which the
+                  Fortran compiler will accept.  It is the same as
+                  <code>FPP_SRC_EXT</code> if the compiler itself can
+                  do preprocessing (`direct' compilation), or a dummy
+                  value (not .f, since that would conflict with the
+                  pre-existing rule for compiling Fortran) if it
+                  cannot, and the file must be preprocessed separately
+                  (`indirect').</p></dd>
+
+              <dt><code>FPP_PREPROCESS_EXT</code></dt>
+              <dd><p>The partner of FPP_COMPILE_EXT.  This is
+                  <code>FPP_SRC_EXT</code> for indirect compilation,
+                  or a dummy value for direct compilation, when the
+                  corresponding separate-processing generated rule
+                  should be ignored.</p></dd>
+
+              <dt><code>FPP_MAKE_FLAGS</code></dt>
+              <dd><p>This is used
+                  to pass flags to the <code><code>cpp</code> or
+                  <code>fpp</code> command if we compile directly, and
+                  leave them out otherwise.</p></dd>
+
+              <dt><code>FPP_OUTPUT</code></dt>
+              <dd><p>This is used to redirect FPP output to the .f
+                  file in those cases where FPP writes to stdout rather
+                  than to a file: it is either blank or something like
+                  <code>&gt;$@</code></p></dd>
+            </dl>
+            You do not generally need to know or care about the above
+            variables, since if you have any preprocessable source
+            files in your source set, then automake will insert
+            appropriate build rules in the generated
+            <code>Makefile.in</code> on your behalf.  If, however, you
+            need to run the preprocessor `by hand' for some reason,
+            then a suitable stanza in a <code>Makefile.am</code>
+            or <code>Makefile.in</code> would be:
+            <verbatim>
+file.f: file.$(FPP_SRC_EXT)
+        $(FPP) $(FPPFLAGS) $(CPPFLAGS) file.$(FPP_SRC_EXT) $(FPP_OUTPUT)
+</verbatim>
+            where we have ensured that the input file has the
+            extension <code>$(FPP_SRC_EXT)</code>.  You can
+            add extra options such as <code>-I.</code> if necessary
+            (automake puts these in the variable
+            <code>$(DEFAULT_INCLUDES)</code>).
+          </p>
+
           <p><strong>NOTE</strong>: There are some features of this
             macro support which are arguably bad autoconf style, and it
             is <em>very</em> likely that this macro will change.  The
@@ -3131,7 +3234,19 @@ M Makefile.dependencies
                   example a library which called another application
                   as part of its functionality would have only a use
                   dependency on the component which contained that
-                  application.</p>
+                  application.  If no use dependencies are declared,
+                  we take the use dependencies to be the same as the
+                  link dependencies.</p>
+              </li>
+              <li><p>Test dependencies are those which are required in
+                  order to run any regression tests which come with
+                  the component.  It's generally a good idea to avoid
+                  making this a larger set than the use dependencies,
+                  but sometimes this is unavoidable.  If no test
+                  dependencies are declared, we take the test
+                  dependencies to be the same as the use
+                  dependencies.  Note that the system does not
+                  currently make any use of this information.</p>
               </li>
             </ul></p>
 
