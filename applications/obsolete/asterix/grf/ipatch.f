@@ -297,11 +297,11 @@
                   PATCHED=.FALSE.
                 ENDIF
 
-                IF (PATCHED) THEN
-                  CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II,II,J,J,
-     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
-                ENDIF
+c                IF (PATCHED) THEN
+c                  CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II,II,J,J,
+c     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
+c     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
+c                ENDIF
 
               ENDDO
 
@@ -408,6 +408,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get source box for pasting
+        CALL MSG_BLNK()
         CALL MSG_PRNT('Select box to paste from...')
         CALL IMG_GETBOX('XC','YC','XWID','YWID',XC,YC,DX,DY,STATUS)
         CALL IMG_BOX(XC,YC,DX,DY,STATUS)
