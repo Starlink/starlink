@@ -82,6 +82,7 @@ LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
 #       Libraries required to link against Fortran source code
 #       using a C++ compiler.
 # ------------------------------------------------------------------------
+STARLINK = @STARLINK@
 F77_LIBS = @F77_LIBS@
 STAR_LIB = @STARLINK@/lib
 STAR_INC = @STARLINK@/include
