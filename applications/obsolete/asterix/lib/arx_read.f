@@ -79,7 +79,7 @@
             DO WHILE (CONT.AND.STATUS.EQ.SAI__OK)
               L=CHR_LEN(ARDIN)
               LC=ARDIN(L:L)
-              IF (LC.EQ.'-'.OR.LC.EQ.'~'.OR.LC.EQ.'\\') THEN
+              IF (LC.EQ.'-'.OR.LC.EQ.'~'.OR.LC.EQ.'\') THEN
                 CONT=.TRUE.
                 ARDIN(L:L)=' '
               ELSE
