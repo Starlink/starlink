@@ -29,6 +29,7 @@
 *
 *     Trevor Ponman (BHVAD::TJP)
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (RB)
 *
 *    History :
 *
@@ -43,6 +44,7 @@
 *     18 Aug 92 : Statistic now double precision (DJA)
 *     16 Dec 92 : Changed IFAIL value to allow trap to work (DJA)
 *     19 May 94 : Updated to handle parameter constraints (DJA)
+*     10 Mar 97 : Update NAG call F01AAF to multiple calls (RB)
 *
 *    Type definitions :
 *
@@ -108,6 +110,7 @@
       INTEGER             JP1,JP2		! Parameter indices
       INTEGER             NPFREE		! No of free (unfrozen+unpegged params
       INTEGER             LSSCALE		! SSCALE proofed against zero value
+      INTEGER             IPIV(NPAMAX)		! Workspace for LU factorising
 
       LOGICAL			LFROZEN(NPAMAX)		! Local frozen array
 *-
@@ -188,9 +191,6 @@
      :                  *PSCALE(JP2)/(LSSCALE*(DPDOWN(JP1)+DPUP(JP1)))
 	  IF ( K.NE.J ) ALPHA(K,J) = ALPHA(J,K)
 
-D	  PRINT *,'jp1,jp2,lchi,uchi,alpha:',jp1,jp2,
-D    :      lstatderiv,ustatderiv,alpha(j,k)
-
 *        Reset parameters
 	  LPAR(JP1) = PARAM(JP1)
 	  UPAR(JP1) = PARAM(JP1)
@@ -201,8 +201,13 @@ D    :      lstatderiv,ustatderiv,alpha(j,k)
 *    Invert alpha matrix to get parameter errors
       IFAIL=1
       IF ( NPFREE .GT. 0 ) THEN
-        CALL F01AAF( ALPHA, NPAMAX, NPFREE, ALPHAINV, NPAMAX,
-     :                                          WORK, IFAIL )
+c       CALL F01AAF( ALPHA, NPAMAX, NPFREE, ALPHAINV, NPAMAX,
+c    :                                          WORK, IFAIL )
+        CALL F07ADF( NPFREE, NPFREE, ALPHA, NPAMAX, IPIV, IFAIL )
+        CALL F06QFF( 'General', NPFREE, NPFREE, ALPHA, NPAMAX,
+     :                                          ALPHAINV, NPAMAX )
+        CALL F07AJF( NPFREE, ALPHAINV, NPAMAX, IPIV, WORK, NPAMAX,
+     :                                                     IFAIL )
       END IF
       IF ( IFAIL .EQ. 0 ) THEN
 	J = 1
