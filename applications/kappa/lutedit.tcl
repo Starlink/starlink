@@ -4120,7 +4120,6 @@ proc doResize {} {
       Obey kapview paldef "device=$DEVICE" 1
       Obey kapview gdclear "device=$DEVICE" 1
       Obey kapview gdset "device=$DEVICE" 1
-      Obey kapview idset "device=$DEVICE" 1
 
 #  Create the pictures to hold an image and a histogram-style key.
       Obey kapview picdef "current=no mode=cl fraction=\[0.4,1.0\] outline=no" 1
