@@ -1,5 +1,4 @@
 INTERFACE PSS
-
   PARAMETER INP
     POSITION    1
     TYPE        'UNIV'
