@@ -13988,7 +13988,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* See if the WAT string contains any lngcor or latcor terms. If so, add
    warning keywords to the FitsChan. */
             if( ( strstr( watmem, "lngcor" ) || 
-                  strstr( watmem, "lngcor" ) ) ){
+                  strstr( watmem, "latcor" ) ) ){
                Warn( this, "zpn", "This FITS header includes, or was "
                      "derived from, a ZPN projection which requires "
                      "unsupported IRAF-specific corrections (lngcor "
