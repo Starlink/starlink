@@ -92,8 +92,11 @@
 
 *  Local Variables:
       CHARACTER*132		CMT			! Keyword comment
+      CHARACTER*20		CLASS			! Keyword value class
       CHARACTER*132		CVALUE			! Keyword value
       CHARACTER*8		KEY			! Keyword name
+
+      DOUBLE PRECISION		DVALUE			! Keyword value
 
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU object
@@ -137,14 +140,20 @@
         CALL ADI_THERE( KID, '.COMMITTED', COMIT, STATUS )
         IF ( .NOT. COMIT ) THEN
           CALL ADI_NAME( KID, KEY, STATUS )
-          CALL ADI_GET0C( KID, CVALUE, STATUS )
           CALL ADI_THERE( KID, '.COMMENT', THERE, STATUS )
           IF ( THERE ) THEN
             CALL ADI_CGET0C( KID, '.COMMENT', CMT, STATUS )
           ELSE
             CALL ADI2_STDCMT( KEY, CMT, STATUS )
           END IF
-          CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
+          CALL ADI_CLASS( KID, TYPE, STATUS )
+          IF ( TYPE(1:1) .EQ. 'D' ) THEN
+            CALL ADI_GET0D( KID, DVALUE, STATUS )
+            CALL FTPKYD( LUN, KEY, DVALUE, CMT, FSTAT )
+          ELSE
+            CALL ADI_GET0C( KID, CVALUE, STATUS )
+            CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
+          END IF
           CALL ADI_CPUT0L( KID, '.COMMITTED', .TRUE., STATUS )
         END IF
         CALL ADI_ERASE( KID, STATUS )
