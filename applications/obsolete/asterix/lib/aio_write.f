@@ -73,7 +73,7 @@
 
 *    Switch on mode to write the text
       IF ( LID .EQ. AIO__M_CONSOLE ) THEN
-        CALL FIO_WRITE( 6, BUF(:BLEN), STATUS )
+        WRITE( 6, '(A)' ) BUF(:BLEN)
       ELSE
         CALL FIO_WRITE( AIO_FID, BUF(:BLEN), STATUS )
       END IF
