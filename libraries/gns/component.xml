@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gns">
+  <version>1.1-4</version>
+  <path>libraries/gns</path>
+  <description>Graphics Workstation Name Service</description>
+  <abstract><p> Almost any program that does any graphics requires the
+  user to identify which graphics device is to be used. When the
+  graphics package used by the program is GKS (SUN/83)---and for the
+  majority of Starlink software it is, at least indirectly---graphics
+  devices are identified by two integers, a `workstation type' and a
+  `connection identifier'. (`Workstation' is GKS terminology for a
+  graphics device of any description and this is the sense in which it
+  is used throughout this note.) No one can be expected to remember
+  the workstation types of all the devices supported by Starlink
+  (nearly 50 at present) so a library has been provided that
+  translates `friendly' and easy to remember names into their GKS
+  equivalents.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>psx</build><build>ems</build><build>chr</build><build>gks</build><build>gwm</build><link>psx</link><link>ems</link><link>chr</link><link>gks</link><link>gwm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+  </developers>
+  <documentation> sun57</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ndg">
+  <version>5.2-1</version>
+  <path>libraries/ndg</path>
+  <description>NDG - Routines for Accessing Groups of NDFs</description>
+  <abstract><p>NDG provides facilities for handling groups of NDFs.
+      Facilities are provided which allow an application to obtain a
+      group of NDFs using a single parameter prompt, and then allow the
+      application to obtain NDF identifiers for specific members of the group.
+      The syntax for specifying groups of NDFs is inherited from the GRP
+      library (see SUN/150).</p></abstract>
+  <dependencies >
+    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun2</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

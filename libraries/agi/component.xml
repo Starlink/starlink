@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="agi">
+  <version>2.1-1</version>
+  <path>libraries/agi</path>
+  <description>Applications Graphics Interface Library</description>
+  <abstract><p>AGI and AGP interface.</p></abstract>
+  <dependencies >
+    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+    <person>
+      <name>Brian McIlwrath</name>
+      <uname>bkm</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+
+  </developers>
+  -->
+  <!-- <documentation> sun48</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

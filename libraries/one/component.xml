@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="one">
+  <version>1.1-4</version>
+  <path>libraries/one</path>
+  <description>General purpose Starlink odds and ends functions</description>
+  <abstract><p> This library is a set of Fortran and C routines of a
+  general nature and usefulness, which are not suitable for inclusion
+  in other more focussed Starlink libraries.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>ems</build><build>chr</build><build>cnf</build><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Roy Platon</name>
+      <uname>rtp</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+    <person>
+      <name>Keith Shortridge</name>
+      <uname>ks</uname>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  <documentation> sun234</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
