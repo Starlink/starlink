@@ -13,6 +13,7 @@
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 95  Created
 # Peter Biereichel 22/07/97  Added statistics
+# Peter W. Draper  24/04/03  Added high-lighting for maximum and minimums
 
 itk::usual RtdImagePixTable {}
 
@@ -75,8 +76,9 @@ itcl::class rtd::RtdImagePixTable {
 	blt::table $f
 	set ncols $itk_option(-ncols)
 	set nrows $itk_option(-nrows)
-	for {set col 0} {$col <= $ncols} {incr col} {
-	    for {set row 0} {$row <= $nrows} {incr row} {
+        for {set col 0} {$col <= $ncols} {incr col} {
+            set trow $nrows
+            for {set row 0} {$row <= $nrows} {incr row} {
 		blt::table $f \
 		    [label $f.p$row,$col \
 			 -font $itk_option(-valuefont) \
@@ -84,7 +86,8 @@ itcl::class rtd::RtdImagePixTable {
 			 -relief groove \
 			 -width 6 \
 			 -textvariable ${var}($row,$col)] \
-		    $row,$col -fill both
+		    $trow,$col -fill both
+                incr trow -1
 	    }
 	}
 
@@ -96,6 +99,12 @@ itcl::class rtd::RtdImagePixTable {
 	    $f.p0,$col config -font $itk_option(-labelfont) -borderwidth 2 -relief raised
 	}
 	
+        # trace pixel showing maximum and minimum values
+        trace variable ${var}(PIXTAB_MAXX) w [code $this update_max_pixel_]
+        trace variable ${var}(PIXTAB_MAXY) w [code $this update_max_pixel_]
+        trace variable ${var}(PIXTAB_MINX) w [code $this update_min_pixel_]
+        trace variable ${var}(PIXTAB_MINY) w [code $this update_min_pixel_]
+
 	# 0,0 unused
 	$f.p0,0 config -relief flat -textvariable RtdPixTab(xy)
 	set RtdPixTab(xy) {Y\X}
@@ -106,6 +115,9 @@ itcl::class rtd::RtdImagePixTable {
 	$f.p$row,$col config -relief raised -foreground red
 	$f.p0,$col config -relief raised -foreground red
 	$f.p$row,0 config -relief raised -foreground red
+
+        # standard background colour
+        set bgcol_ [$f.p$row,$col cget -background]
 
 	blank_values
 	add_short_help $itk_component(tab) {Shows pixels around the last cursor position in the image}
@@ -154,6 +166,13 @@ itcl::class rtd::RtdImagePixTable {
 		incr row
 	    }
 	}
+
+        # Max and min match highlight colours as visual clue
+        $itk_component(pixtab_max) configure \
+           -foreground $itk_option(-maxhighlight)
+        $itk_component(pixtab_min) configure \
+           -foreground $itk_option(-minhighlight)
+
 	add_short_help $itk_component(pixtab_min) {Min: Shows the min value of the pixel table}
 	add_short_help $itk_component(pixtab_max) {Min: Shows the max value of the pixel table}
 	add_short_help $itk_component(pixtab_ave) {Min: Shows the average value of the pixel table}
@@ -161,8 +180,33 @@ itcl::class rtd::RtdImagePixTable {
 	add_short_help $itk_component(pixtab_n) {N: Shows the number of pixels in the pixel table}
     }
 
+    # set the background of one of the tabel cells
+    protected method set_cell_bg_colour_ {x y colour} {
+       catch {
+          $itk_component(tab).p${x},${y} configure -background $colour
+       }
+    }
 
-    
+    # update the cell coloured to show that it has the maximum value    
+    protected method update_max_pixel_ { args } {
+       set var $image_
+       global ::$var
+       set_cell_bg_colour_ $maxx_ $maxy_ $bgcol_
+       set maxx_ [set ${var}(PIXTAB_MAXX)]
+       set maxy_ [set ${var}(PIXTAB_MAXY)]
+       set_cell_bg_colour_ $maxx_ $maxy_ $itk_option(-maxhighlight)
+    }
+
+    # update the cell coloured to show that it has the minimum value    
+    protected method update_min_pixel_ { args } {
+       set var $image_
+       global ::$var
+       set_cell_bg_colour_ $minx_ $miny_ $bgcol_
+       set minx_ [set ${var}(PIXTAB_MINX)]
+       set miny_ [set ${var}(PIXTAB_MINY)]
+       set_cell_bg_colour_ $minx_ $miny_ $itk_option(-minhighlight)
+    }
+
     # make the button frame at the bottom of the window
 
     protected method make_buttons {} {
@@ -252,6 +296,9 @@ itcl::class rtd::RtdImagePixTable {
     itk_option define -labelwidth labelWidth LabelWidth 4
     itk_option define -valuewidth valueWidth ValueWidth 8
 
+    # maximum and minimum highlight colours
+    itk_option define -maxhighlight maxhighlight MaxHighlight lightblue
+    itk_option define -minhighlight minhighlight MinHighlight lightgreen
 
     # -- protected vars --
 
@@ -263,4 +310,13 @@ itcl::class rtd::RtdImagePixTable {
 
     # flag for "making statistics widget"
     protected variable making_stat_ 0
+
+    # indices of last cells to hold the maximum and minimum colours
+    protected variable maxx_ 1
+    protected variable maxy_ 1
+    protected variable minx_ 1
+    protected variable miny_ 1
+
+    # background colour of a cell that isn't highlighted
+    protected variable bgcol_ lightgrey
 }

@@ -57,6 +57,9 @@
  *                 30/05/01  Added "double" as a valid data type.
  * Allan Brighton  30/07/01  Fixed problem with X shared memory, ssh and X11 forwarding:
  *                           (X shm areas are not freed, so don't use them in this case)
+ * Peter W. Draper 28/04/03  Added PIXTAB_MINX, MAXX, MINY and MAXY to report
+ *                           the positions that the minimum and maximum values
+ *                           are found in a table of values.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $";
 
@@ -2803,6 +2806,7 @@ void RtdImage::processMotionEvent()
 	    int w = pixTabCols_+1;
 	    double d;
 	    double sum=0.0, sumsq=0.0, minv, maxv, rms, ave;
+            int maxx = 0, maxy = 0, minx = 0, miny = 0;
 	    int npix=0;
 	    image_->getValues(x, y, rx, ry, pixTab_, pixTabRows_, pixTabCols_);
 	    for(int j = 0; j <= pixTabRows_; j++) {
@@ -2813,16 +2817,24 @@ void RtdImage::processMotionEvent()
 			    sprintf(valueStr, "%g", d);	  // pix value
 			    // calculate statistics on pixels
 			    if (npix == 0) {
-				minv = d;
+                                minv = d;
 				maxv = d;
+                                maxx = minx = j;
+                                maxy = miny = i;
 			    }
 			    npix++;
 			    sum += d;
 			    sumsq += d * d;
-			    if (d < minv)
+			    if (d < minv) {
 				minv = d;
-			    if (d > maxv)
-				maxv = d;
+                                minx = j;
+                                miny = i;
+                            }
+			    if (d > maxv) {
+                                maxv = d;
+                                maxx = j;
+                                maxy = i;
+                            }
 			}
 			else
 			    sprintf(valueStr, "%.1f", d); // x,y index
@@ -2843,12 +2855,26 @@ void RtdImage::processMotionEvent()
 		Tcl_SetVar2(interp_, var, "PIXTAB_MAX", valueStr, TCL_GLOBAL_ONLY);
 		sprintf(valueStr, "%d", npix);	  // npix
 		Tcl_SetVar2(interp_, var, "PIXTAB_N", valueStr, TCL_GLOBAL_ONLY);
+
+		sprintf(valueStr, "%d", maxx);	  // maxx
+		Tcl_SetVar2(interp_, var, "PIXTAB_MAXX", valueStr, TCL_GLOBAL_ONLY);
+		sprintf(valueStr, "%d", maxy);	  // maxy
+		Tcl_SetVar2(interp_, var, "PIXTAB_MAXY", valueStr, TCL_GLOBAL_ONLY);
+
+		sprintf(valueStr, "%d", minx);	  // minx
+		Tcl_SetVar2(interp_, var, "PIXTAB_MINX", valueStr, TCL_GLOBAL_ONLY);
+		sprintf(valueStr, "%d", miny);	  // miny
+		Tcl_SetVar2(interp_, var, "PIXTAB_MINY", valueStr, TCL_GLOBAL_ONLY);
 	    }
 	    else {
 		Tcl_SetVar2(interp_, var, "PIXTAB_AVE", "\0", TCL_GLOBAL_ONLY);
 		Tcl_SetVar2(interp_, var, "PIXTAB_MIN", "\0", TCL_GLOBAL_ONLY);
 		Tcl_SetVar2(interp_, var, "PIXTAB_MAX", "\0", TCL_GLOBAL_ONLY);
 		Tcl_SetVar2(interp_, var, "PIXTAB_N", "\0", TCL_GLOBAL_ONLY);
+		Tcl_SetVar2(interp_, var, "PIXTAB_MAXX", "\0", TCL_GLOBAL_ONLY);
+		Tcl_SetVar2(interp_, var, "PIXTAB_MAXY", "\0", TCL_GLOBAL_ONLY);
+		Tcl_SetVar2(interp_, var, "PIXTAB_MINX", "\0", TCL_GLOBAL_ONLY);
+		Tcl_SetVar2(interp_, var, "PIXTAB_MINY", "\0", TCL_GLOBAL_ONLY);
 	    }
 	    if (npix > 1) {
 		rms = sqrt((sumsq - ((sum * sum) / npix)) / (npix -1));
