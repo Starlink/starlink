@@ -137,10 +137,10 @@
         CALL ADI_CPUT0C( DETID, 'Filter', FILTER, STATUS )
       END IF
       IF ( TARGET .GT. ' ' ) THEN
-        CALL ADI_CPUT0C( DETID, 'Target', DET, STATUS )
+        CALL ADI_CPUT0C( DETID, 'Target', TARGET, STATUS )
       END IF
       IF ( OBSRVR .GT. ' ' ) THEN
-        CALL ADI_CPUT0C( DETID, 'Observer', DET, STATUS )
+        CALL ADI_CPUT0C( DETID, 'Observer', OBSRVR, STATUS )
       END IF
 
 *  Report any errors
