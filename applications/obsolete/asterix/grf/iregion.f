@@ -393,8 +393,6 @@
 *    Function declarations :
       INTEGER CHR_LEN
 *    Local constants :
-      REAL RTOD
-      PARAMETER (RTOD=180.0/3.14159265)
 *    Local variables :
       CHARACTER*80 TEXT
       INTEGER L
@@ -426,7 +424,7 @@
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('MAJ',MAJOR)
         CALL MSG_SETR('MIN',MINOR)
-        ANGLE=ANGLE*RTOD*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE)
+        ANGLE=ANGLE*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE)
         CALL MSG_SETR('AN',ANGLE)
         CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^MAJ , ^MIN , ^AN ',
      :                                                    TEXT,L)

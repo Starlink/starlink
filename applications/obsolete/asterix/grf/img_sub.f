@@ -2785,8 +2785,6 @@ c      LOGICAL VOK,QOK
 *  Status :
         INTEGER STATUS
 *  Local constants :
-	REAL PI, DTOR
-	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *  Local variables :
       REAL XP,YP,XPC,YPC
       REAL AP,BP
@@ -2800,8 +2798,8 @@ c      LOGICAL VOK,QOK
 
         CALL PGUPDT(0)
 
-        SANG=SIN(ANGLE)
-        CANG=COS(ANGLE)
+        SANG=SIND(ANGLE)
+        CANG=COSD(ANGLE)
 
         CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
         AP=A/ABS(I_XSCALE)
@@ -3876,8 +3874,8 @@ c        REAL XX,XP,YP
         AP=MAJOR/ABS(I_XSCALE)
         BP=MINOR/ABS(I_XSCALE)
 
-        CANG=COS(ANGLE)
-        SANG=SIN(ANGLE)
+        CANG=COSD(ANGLE)
+        SANG=SIND(ANGLE)
 
         I1=INT(XPC)
         I2=NINT(XPC)
@@ -4237,6 +4235,9 @@ c        REAL XX,XP,YP
       INTEGER STATUS
 *  Functions :
       LOGICAL IMG_INBOUNDS
+*    Local constants :
+	REAL PI, DTOR
+	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *    Local variables :
       REAL DISP
       REAL ALPHA,THETA
@@ -4258,8 +4259,7 @@ c        REAL XX,XP,YP
 
 *  get distance to ellipse along same line
         THETA=ATAN2((YP-YPC),(XP-XPC))
-c        ALPHA=THETA-ANGLE
-        ALPHA=THETA
+        ALPHA=THETA-ANGLE
         XP=XPC + AP*COS(ALPHA)*COS(ANGLE) - BP*SIN(ALPHA)*SIN(ANGLE)
         YP=YPC + AP*COS(ALPHA)*SIN(ANGLE) + BP*SIN(ALPHA)*COS(ANGLE)
         RAD=SQRT((XP-XPC)**2 + (YP-YPC)**2)
@@ -4808,7 +4808,7 @@ c      REAL HWID
 *  calc angle
           CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
           CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
-          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))/DTOR
 
 
 *  keyboard mode
@@ -4820,7 +4820,6 @@ c      REAL HWID
           CALL USI_GET0R(PAR3,MAJOR,STATUS)
           CALL USI_GET0R(PAR4,MINOR,STATUS)
           CALL USI_GET0R(PAR5,ANGLE,STATUS)
-          ANGLE=ANGLE*DTOR
         ENDIF
 
 *  plot ellipse
