@@ -1516,6 +1516,7 @@
                                    || ndf->plotarray.iframe != iframe
                                    || ndf->plotarray.zoom != zoom ) {
          int i;
+         int ischeme;
          int xdim;
          int xbase;
          int xndf;
@@ -1523,6 +1524,8 @@
          int ydim;
          int yndf;
          int *old_status;
+         double factor;
+         double iparams[ 10 ];
          double lbox[ NDF__MXDIM ];
          double ubox[ NDF__MXDIM ];
          AstMapping *map;
@@ -1535,6 +1538,20 @@
          ybase = zoom * lbox[ 1 ] + 0.5 / zoom;
          xdim = zoom * ( ubox[ 0 ] - lbox[ 0 ] ) - 1;
          ydim = zoom * ( ubox[ 1 ] - lbox[ 1 ] ) - 1;
+
+/* Set the resampling scheme.  If we are resampling onto a much coarser
+   grid, then use a scheme which reblocks the data (averages over all pixels
+   of a square), otherwise just use a simple linear interpolation. 
+   The reblocking can be quite slow, but if the image is a bit noisy it
+   smooths it out quite significantly. */
+         factor = zoom * getpixelsize( ndf, iframe, status );
+         if ( factor > 0.35 ) {
+            ischeme = AST__LINEAR;
+         }
+         else {
+            ischeme = AST__UINTERP;
+            iparams[ 0 ] = floor( ( ( 1.0 / factor ) - 0.5 ) / 2.0 );
+         }
 
 /* If a previous plotarray exists but is the wrong size, we will need to
    deallocate that memory prior to allocating more. */
@@ -1582,7 +1599,8 @@
                                INTEGER_ARG(&xdim), INTEGER_ARG(&ydim),
                                DOUBLE_ARG(&loval), DOUBLE_ARG(&hival),
                                INTEGER_ARG(&locolour), INTEGER_ARG(&hicolour),
-                               INTEGER_ARG(&badcolour),
+                               INTEGER_ARG(&badcolour), INTEGER_ARG(&ischeme),
+                               DOUBLE_ARG(iparams),
                                INTEGER_ARG(ndf->plotarray.data),
                                INTEGER_ARG(status)
                                TRAIL_ARG(ftype) );

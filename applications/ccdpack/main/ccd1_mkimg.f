@@ -1,6 +1,6 @@
       SUBROUTINE CCD1_MKIMG( IPIN, ITYPE, IXDIM, IYDIM, IMAP, OXBASE,
      :                       OYBASE, OXDIM, OYDIM, ILO, IHI, OLO, OHI, 
-     :                       OBAD, OUT, STATUS )
+     :                       OBAD, INTSCH, INTPAR, OUT, STATUS )
 *+
 *  Name:
 *     CCD1_MKIMG
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL CCD1_MKIMG( IPIN, ITYPE, IXDIM, IYDIM, IMAP, OXBASE, OYBASE,
-*                      OXDIM, OYDIM, ILO, IHI, OLO, OHI, OBAD, OUT, 
-*                      STATUS )
+*                      OXDIM, OYDIM, ILO, IHI, OLO, OHI, OBAD, INTSCH,
+*                      INTPAR, OUT, STATUS )
 
 *  Description:
 *     This routine resamples and rescales an array of data into a
@@ -59,6 +59,16 @@
 *        data.
 *     OBAD = INTEGER (Given)
 *        The value to be assigned to bad pixels in the scaled array.
+*     INTSCH = INTEGER (Given)
+*        The INTERP parameter to be passed to the AST_RESAMPLE routine.
+*        This determines the subpixel resampling scheme.  If set to 
+*        AST__UINTERP then the resampling will be done using the 
+*        CCG1_IBLK<X> routines, which average over a cube in the input
+*        array.
+*     INTPAR( * ) = DOUBLE PRECISION (Given)
+*        The PARAMS vector to be passed to the AST_RESAMPLE routine.
+*        For certain values of INTSCH, it gives additional information
+*        about how the resampling is to be done.
 *     OUT( OXDIM, OYDIM ) = INTEGER (Returned)
 *        The output array. This should be integer and will contain on
 *        exit data in the range OLO to OHI.  The data will be
@@ -103,6 +113,8 @@
       INTEGER OLO
       INTEGER OHI
       INTEGER OBAD
+      INTEGER INTSCH
+      DOUBLE PRECISION INTPAR( * )
 
 *  Arguments Returned:
       INTEGER OUT( OXDIM, OYDIM )
@@ -123,9 +135,17 @@
       INTEGER OLBND( 2 )         ! Lower bounds of output array
       INTEGER OUBND( 2 )         ! Upper bounds of output array
       INTEGER RFLAGS             ! Flags to pass to AST_RESAMPLE
-      DOUBLE PRECISION DUMPAR    ! Dummy array to pass to AST_RESAMPLE
       DOUBLE PRECISION TOL       ! Pixel tolerance for resampling
       LOGICAL BADTMP             ! Are there bad values in the resampled array?
+
+*  Internal References:
+      EXTERNAL CCG1_IBLKB        ! Block averaging interpolation routine
+      EXTERNAL CCG1_IBLKUB       ! Block averaging interpolation routine
+      EXTERNAL CCG1_IBLKW        ! Block averaging interpolation routine
+      EXTERNAL CCG1_IBLKUW       ! Block averaging interpolation routine
+      EXTERNAL CCG1_IBLKI        ! Block averaging interpolation routine
+      EXTERNAL CCG1_IBLKR        ! Block averaging interpolation routine
+      EXTERNAL CCG1_IBLKD        ! Block averaging interpolation routine
 
 *.
 
@@ -160,50 +180,50 @@
 *  as the names of the routines.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          NBAD = AST_RESAMPLEB( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADB,
+     :                         %VAL( IPIV ), INTSCH, CCG1_IBLKB, 
+     :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADB,
      :                         2, OLBND, OUBND, OLBND, OUBND,
      :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          NBAD = AST_RESAMPLEUB( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                          %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                          DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADUB,
+     :                          %VAL( IPIV ), INTSCH, CCG1_IBLKUB, 
+     :                          INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADUB,
      :                          2, OLBND, OUBND, OLBND, OUBND,
      :                          %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          NBAD = AST_RESAMPLEW( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADW,
+     :                         %VAL( IPIV ), INTSCH, CCG1_IBLKW, 
+     :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADW,
      :                         2, OLBND, OUBND, OLBND, OUBND,
      :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          NBAD = AST_RESAMPLEUW( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                          %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                          DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADUW,
+     :                          %VAL( IPIV ), INTSCH, CCG1_IBLKUW, 
+     :                          INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADUW,
      :                          2, OLBND, OUBND, OLBND, OUBND,
      :                          %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          NBAD = AST_RESAMPLEI( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADI,
+     :                         %VAL( IPIV ), INTSCH, CCG1_IBLKI, 
+     :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADI,
      :                         2, OLBND, OUBND, OLBND, OUBND,
      :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          NBAD = AST_RESAMPLER( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADR,
+     :                         %VAL( IPIV ), INTSCH, CCG1_IBLKR, 
+     :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADR,
      :                         2, OLBND, OUBND, OLBND, OUBND,
      :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          NBAD = AST_RESAMPLED( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), AST__NEAREST, AST_NULL, 
-     :                         DUMPAR, RFLAGS, TOL, MAXPIX, VAL__BADD,
+     :                         %VAL( IPIV ), INTSCH, CCG1_IBLKD, 
+     :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADD,
      :                         2, OLBND, OUBND, OLBND, OUBND,
      :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
 
