@@ -185,7 +185,7 @@ class PkGlyph {
 
 class PkFont {
  public:
-    PkFont (unsigned int dvimag,
+    PkFont (double fontmag,
 	    unsigned int c,
 	    unsigned int s,
 	    unsigned int d,
@@ -313,7 +313,6 @@ class PkFont {
      * file preamble.
      * @return the design size in points.
      */
-    // design size, and horiz/vert pixels-per-point, in points.
     double designSize() const {	return preamble_.designSize; }
     /**
      * Obtains the number of horizontal pixels per point for this
@@ -359,10 +358,13 @@ class PkFont {
     InputByteStream *pkf_;
     bool font_loaded_;		/* font loaded successfully */
     struct {
-	unsigned int c, s, d;
-    } font_header_;		// this is the information retrieved
-				// from the font declaration
-    int dvimag_;		// DVI magnification reported by the file
+	unsigned int c;		/* font checksum */
+	unsigned int s;		/* fixed-point scale factor, in DVI units */
+	unsigned int d;		/* `design size', in DVI units */
+    } font_header_;		/* this is the information retrieved
+				   from the font declaration */
+    /*int dvimag_;		// DVI magnification reported by the file*/
+    double fontmag_;		/* Font magnification (1.0 = no mag) */
     struct {
 	unsigned int id, cs;
 	double designSize, hppp, vppp;
