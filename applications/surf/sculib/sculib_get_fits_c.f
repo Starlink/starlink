@@ -1,22 +1,36 @@
 *+  SCULIB_GET_FITS_C - get the value of specified FITS character keyword
       SUBROUTINE SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, NAME,
      :  VALUE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_GET_FITS_C
+
+*  Purpose:
+*     get the value of specified FITS character keyword
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, NAME,
+*     :  VALUE, STATUS)
+
+*  Description:
 *     This routine will get the value of a specified FITS character keyword
 *     held in the FITS extension of an NDF file. The FITS extension must
 *     have been read into the input array FITS before this routine is called.
 *        The routine assumes that each line in the FITS array will contain
 *     a string with format:-
-*      KEYWORD='VALUE'           / this is a comment
+*      KEYWORD= 'VALUE'           / this is a comment
+*     The string is extracted from between the quotes and the '/ is not
+*     required.
 *     It will search the input array for a line containing the required
 *     keyword and return VALUE. If the keyword is not found and error will
 *     be reported and bad status returned. If the keyword is found but the
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
-*    Invocation :
-*     CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, NAME, VALUE,
-*    :  STATUS)
-*    Parameters :
+
+*  Parameters:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
 *     N_FITS               = INTEGER (Given)
@@ -29,44 +43,61 @@
 *           the value of the FITS keyword
 *     STATUS               = INTEGER (Given and returned)
 *           global status 
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+*     T. Jenness (timj@jach.hawaii.edu)
+
+*  History:
 *     $Id$
-*     26-JUL-1995: original version.
-*    endhistory
-*    Type Definitions :
+*     $Log$
+*     Revision 1.2  1997/11/19 18:52:02  timj
+*     Decode string by searching for quotes instead of a '/'.
+*     This fixes a bug in the DRT that sometimes does not put on a comment if the
+*     string is too long.
+*
+*     26-JUL-1995 (jfl):
+*       original version.
+*
+*-
+
+*  Type Definitions :
       IMPLICIT NONE
-*    Global constants :
+*  Global constants :
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER MAX_FITS
       INTEGER N_FITS
       CHARACTER*(*) FITS (MAX_FITS)
       CHARACTER*(*) NAME
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       CHARACTER*(*) VALUE
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER      CHR_LEN             ! CHR used-string length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER      I                   ! DO loop index
       INTEGER      IPOS                ! position of = in string
-      INTEGER      JPOS                ! position of / in string
+      INTEGER      IPOSN               ! Generic position in string
+      INTEGER      JPOS                ! position of last quote in string
       CHARACTER*80 KEYNAME             ! name of FITS keyword in string
       INTEGER      LENGTH              ! length of a string
       LOGICAL      LOOPING             ! .TRUE. while looping
       CHARACTER*80 STEMP               ! scratch string
       CHARACTER*80 UNAME               ! upper case version of NAME
-*    Internal References :
-*    Local data :
+
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -81,7 +112,7 @@
          I = 0
          LOOPING = .TRUE.
 
-         DO WHILE (LOOPING)
+         DO WHILE (LOOPING .AND. (STATUS .EQ. SAI__OK))
             I = I + 1
 
 *  the FITS keyword name should be in first part of the string, immediately 
@@ -94,36 +125,76 @@
                CALL CHR_RMBLK (KEYNAME)
 
                IF (CHR_LEN(KEYNAME) .EQ. 0) THEN
-                  STATUS = SAI__ERROR
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     STATUS = SAI__ERROR
+                     CALL ERR_REP (' ', 
+     :                    'SCULIB_GET_FITS_C: error decoding -',
+     :                    STATUS)
+                     CALL MSG_SETC ('LINE', FITS(I))
+                     CALL ERR_REP (' ', '^LINE', STATUS)
+                     CALL ERR_REP(' ', 'No keyword in front of =',
+     :                    STATUS)
+                     CALL ERR_FLUSH(STATUS)
+                  END IF
                ELSE
                   IF (KEYNAME(:CHR_LEN(KEYNAME)) .EQ.
      :                UNAME(:CHR_LEN(UNAME)))    THEN
 
 *  OK, we've found the FITS keyword, the value should be between the = and
 *  a /
+*  In fact the value should be inside some quotes
+*     Change logic so that we only extract a string between 
+*     quotes and we do not care about a '/' (in case it is missing)
 
-                     JPOS = INDEX (FITS(I),'/')
+*     Look for a quote
+                     IPOSN = IPOS
+                     LENGTH = CHR_LEN(FITS(I))
 
-                     IF ((JPOS .EQ. 0)       .OR.
-     :                   (JPOS .EQ. IPOS+1)) THEN
-                        STATUS = SAI__ERROR
-                     ELSE
-                        STEMP = FITS(I) (IPOS+1:JPOS-1)
-                        CALL CHR_LDBLK (STEMP)
-                        LENGTH = CHR_LEN (STEMP)
+                     CALL CHR_FIND(FITS(I), '''', .TRUE., IPOSN)
 
-                        IF (LENGTH .EQ. 0) THEN
-                           STATUS = SAI__ERROR
-                        ELSE
-                           IF ((STEMP(1:1) .EQ. '''')           .AND.
-     :                         (STEMP(LENGTH:LENGTH) .EQ. '''') .AND.
-     :                         (LENGTH .GT. 1))                 THEN
-                              VALUE = STEMP (2:LENGTH-1)
+                     IF (IPOSN .LT. LENGTH) THEN
+
+                        IPOS = IPOSN
+                        IPOSN = IPOS + 1
+*     Look for the second quote
+
+                        CALL CHR_FIND(FITS(I), '''', .TRUE., IPOSN)
+
+                        IF (IPOSN .LE. LENGTH) THEN
+                           JPOS = IPOSN
+
+*     Everything looks okay so extract the string
+
+*     Check that there is something in the quotes
+                           IF (JPOS - IPOS .LE. 1) THEN
+
+                              VALUE = ' '
+                              
                            ELSE
-                              STATUS = SAI__ERROR
+
+                              STEMP = FITS(I)(IPOS+1:JPOS-1)
+                              CALL CHR_LDBLK(STEMP)
+                              VALUE = STEMP
+
                            END IF
+
+                        ELSE
+                           STATUS = SAI__ERROR
+
+                           CALL ERR_REP(' ', 'Could not find closing'//
+     :                          ' quote in FITS string', STATUS)
+
                         END IF
+                     
+                     ELSE
+
+                        STATUS = SAI__ERROR
+
+                        CALL ERR_REP(' ','Could not find a quoted '//
+     :                       'string in FITS entry', STATUS)
+
                      END IF
+
                   END IF
                END IF
             END IF
