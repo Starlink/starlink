@@ -1,0 +1,6 @@
+1998-06-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NBS.pm (NEXTKEY): Add ties to hash and scalar variables
+
+	* NBS.xs: Add noticeboard definition
+
