@@ -208,7 +208,6 @@
       INTEGER 			IN1_QPTR, IN2_QPTR, OUT_QPTR    ! Dataset quality pointers
       INTEGER 			IN1_VPTR, IN2_VPTR, OUT_VPTR    ! Dataset variance pointers
       INTEGER 			IN1_VNELM, IN2_VNELM, OUT_VNELM ! # elements in dataset variances
-      INTEGER 			NAX                     ! # axes present
       INTEGER 			NBAD                    ! # new bad points
       INTEGER			NHIN			! # i/p history lines
       INTEGER 			NIG                     ! # ignored points
@@ -619,7 +618,7 @@
           CALL BDI_COPY( TID, 'Title,Label,Units', OFID, ' ', STATUS )
 
 *      Copy axis data
-          DO I = 1, NDIM
+          DO I = 1, OUT_NDIM
             CALL BDI_AXCOPY( TID, I, ' ', OFID, I, STATUS )
           END DO
 
