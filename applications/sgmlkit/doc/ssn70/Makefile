@@ -14,18 +14,20 @@ ssn70.htx_tar: ssn70.sgml ReleaseNotes \
 		BSTINPUTS=$(TOP)/lib \
 		./tmp-sgml2docs --html --tarball=$@ ssn70.sgml
 
-ssn70.tex_tar: ssn70.sgml ReleaseNotes \
-		../dtd2sgml/sgmltext.stamp ../../misc/misc.stamp tmp-sgml2docs
-	SGML_CATALOG_FILES=$$PWD/../documents/CATALOG:$(TOP)/dtd/CATALOG \
-		BIBINPUTS=$$PWD \
-		BSTINPUTS=$(TOP)/lib \
-		./tmp-sgml2docs --latex --tarball=$@ ssn70.sgml
+# Doesn't work, unless you have a jade patched to include the latex output type
+#ssn70.tex_tar: ssn70.sgml ReleaseNotes \
+#		../dtd2sgml/sgmltext.stamp ../../misc/misc.stamp tmp-sgml2docs
+#	SGML_CATALOG_FILES=$$PWD/../documents/CATALOG:$(TOP)/dtd/CATALOG \
+#		BIBINPUTS=$$PWD \
+#		BSTINPUTS=$(TOP)/lib \
+#		./tmp-sgml2docs --latex --tarball=$@ ssn70.sgml
 
 ssn70.texml_tar: ssn70.sgml ReleaseNotes \
 		../dtd2sgml/sgmltext.stamp ../../misc/misc.stamp tmp-sgml2docs
 	SGML_CATALOG_FILES=$$PWD/../documents/CATALOG:$(TOP)/dtd/CATALOG \
 		BIBINPUTS=$$PWD \
 		BSTINPUTS=$(TOP)/lib \
+		TEXMLDIR=$(TOP)/lib/texml/bin \
 		./tmp-sgml2docs --texml --tarball=$@ ssn70.sgml
 
 ../../misc/misc.stamp:
