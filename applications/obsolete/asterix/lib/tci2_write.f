@@ -240,10 +240,11 @@
       CHARACTER*8		DSTR, TSTR		! Date and time strings
 
       DOUBLE PRECISION		MJD			!
+      DOUBLE PRECISION		OBLEN			!
 
       INTEGER			FID, TIMID		! Extracted arguments
 
-      LOGICAL			MOK			! Things present?
+      LOGICAL			LOK, MOK		! Things present?
 *.
 
 *  Check inherited global status.
@@ -264,6 +265,26 @@
      :                    'Date of data start', STATUS )
         CALL ADI2_PKEY0C( FID, HDUNAM, 'TIME-OBS', TSTR,
      :                    'Time of data start', STATUS )
+      END IF
+
+*  Observation length ok?
+      CALL ADI_THERE( TIMID, 'ObsLength', LOK, STATUS )
+      IF ( MOK .AND. LOK ) THEN
+
+*    Get length of observation
+        CALL ADI_CGET0D( TIMID, 'ObsLength', OBLEN, STATUS )
+
+*    Add to start time
+        MJD = MJD + OBLEN / 86400D0
+
+        CALL TCI_MJD2DT( MJD, DSTR, TSTR, STATUS )
+        CALL ADI2_PKEY0D( FID, HDUNAM, 'MJD-END', MJD,
+     :                    'MJD of the data end', STATUS )
+        CALL ADI2_PKEY0C( FID, HDUNAM, 'DATE-END', DSTR,
+     :                    'Date of data end', STATUS )
+        CALL ADI2_PKEY0C( FID, HDUNAM, 'TIME-END', TSTR,
+     :                    'Time of data end', STATUS )
+
       END IF
 
 *  Clock reference date/time
