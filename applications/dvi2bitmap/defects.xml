@@ -34,4 +34,17 @@ to hang.  Poking around with gdb suggests it's hanging somewhere in a
 library destructor, but this is still a little obscure.</p>
 </defect>
 
+<defect status="open" originator="Norman">
+<title>Spacing at small sizes</title>
+<p>Spacing in \scriptstyle is wrong.  If you write
+$x^{123}$ or ${\scriptstyle \cos x}$, the `123' and the `cos' are
+strung out from each other.  At first, I thought this was to do with
+the drift-checking, described in the DVI standard section 2.6.2,
+perhaps because maths fonts have several zero fontdimen parameters
+(see the TeXBook, appendix F) but it persists even when that's turned
+right off.  Also, it's actually wrong when using cmr7 (in my test
+files at least -- I haven't yet investigated with other small fonts),
+not in specifically maths fonts.  Most puzzling.</p>
+</defect>
+
 </defectslist>
