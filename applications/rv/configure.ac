@@ -19,6 +19,9 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_FPP
 
+dnl    Use libtool so that we get to use -rpath without pain
+AC_PROG_LIBTOOL
+
 AC_FC_OPEN_SPECIFIERS(readonly)
 
 dnl    Probably should look for any expectk in the PATH rather than
