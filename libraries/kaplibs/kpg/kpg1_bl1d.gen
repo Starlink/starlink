@@ -1,0 +1,138 @@
+      SUBROUTINE KPG1_BL1D<T>( N, IN, SIZE, OUT, STATUS )
+*+
+*  Name:
+*     KPG1_BL1Dx
+
+*  Purpose:
+*     Smooth a 1D vector using a block average filter.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_BL1Dx( N, IN, SIZE, OUT, STATUS )
+
+*  Description:
+*     This routine smooths a 1D vector using a block average filter.
+*     Output pixels are set bad if all input pixels in the block are
+*     bad, or if the output pixel is in the first or last half block.
+
+*  Arguments:
+*     N = INTEGER (Given)
+*        The number of elements of the array to be smoothed.
+*     IN( N ) = <TYPE> (Given)
+*        The input array.
+*     SIZE = INTEGER (Given)
+*        The size of the filter (in pixels).
+*     OUT( N ) = <TYPE> (Returned)
+*        The output array.
+*     STATUS = INTEGER (Given & Returned)
+*        Global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-SEP-2001 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE definitions
+      INCLUDE 'PRM_PAR'        ! VAL__ constants
+
+*  Arguments Given:
+      INTEGER N
+      <TYPE> IN( N )
+      INTEGER SIZE
+
+*  Arguments Returned:
+      <TYPE> OUT( N )
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      <LTYPE> V                ! An input value
+      DOUBLE PRECISION SUMV    ! Sum of input values
+      INTEGER DHI              ! Offset to far right cell
+      INTEGER DLO              ! Offset to far left cell
+      INTEGER I                ! Loop counter
+      INTEGER NV               ! Number of summed input values
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEC_<T>'    ! NUM declarations for functions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'NUM_DEF_<T>'    ! NUM definitions for functions
+
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Work out the offsets to the lower and upper pixels in each bin,
+*  relative to the "central" pixel.
+      DLO = ( SIZE - 1 )/2
+      DHI = SIZE/2
+
+*  Set the output pixels in the first half bin bad.
+      DO I = 1, DLO
+         OUT( I ) = VAL__BAD<T>
+      END DO
+
+*  Set the output pixels in the last half bin bad.
+      DO I = N - DHI + 1, N
+         OUT( I ) = VAL__BAD<T>
+      END DO
+
+*  Form the sum of the first bin.
+      SUMV = 0.0
+      NV = 0
+      DO I = 1, SIZE
+         IF( IN( I ) .NE. VAL__BAD<T> ) THEN
+            SUMV = SUMV + NUM_<T>TOD( IN( I ) )
+            NV = NV + 1
+         END IF
+      END DO
+
+*  Store the output value for the first bin.
+      IF( NV .GT. 0 ) THEN
+         OUT( DLO + 1 ) = NUM_DTO<T>( SUMV/NV )
+      ELSE
+         OUT( DLO + 1 ) = VAL__BAD<T>
+      END IF
+
+*  Do all remaining bins.
+      DO I = DLO + 2, N - DHI
+
+*  Subtract off the far left pixel in the old box.
+         V = IN( I - DLO - 1 )
+         IF( V .NE. VAL__BAD<T> ) THEN
+            SUMV = SUMV - NUM_<T>TOD( V )
+            NV = NV - 1
+         END IF
+
+*  Add on the far right pixel in the new box.
+         V = IN( I + DHI )
+         IF( V .NE. VAL__BAD<T> ) THEN
+            SUMV = SUMV + NUM_<T>TOD( V )
+            NV = NV + 1
+         END IF
+
+*  Store the output value.
+         IF( NV .GT. 0 ) THEN
+            OUT( I ) = NUM_DTO<T>( SUMV/NV )
+         ELSE
+            OUT( I ) = VAL__BAD<T>
+         END IF
+
+      END DO
+
+      END
