@@ -1,0 +1,122 @@
+## Allow 3 seconds to read each line of text (assuming a maximum line length 
+# of 68 characters), or 3 words per second. 
+
+demo v1.0 {
+
+   info "This demonstration highlights the main changes which have been
+   introduced into the <PACK KAPPA> package by version V1.0. See the
+   '<htx:sun95|se_changes <emph Release Notes>>' section of <doc SUN/95>
+   for a complete list."
+
+   env KAPPA_DIR
+
+   step {
+
+      command {exec echo "border=1" > nullstyle.tmp}
+      command {exec echo "DrawAxes=0" >> nullstyle.tmp}
+      command {exec echo "DrawTitle=0" >> nullstyle.tmp}
+      command {exec echo "Grid=0" >> nullstyle.tmp}
+      command {exec echo "NumLab=0" >> nullstyle.tmp}
+      command {exec echo "MajTickLen=0" >> nullstyle.tmp}
+      command {exec echo "MinTickLen=0" >> nullstyle.tmp}
+      command {exec echo "TextLab(2)=0" >> nullstyle.tmp}
+      command {exec echo "Label(1)=" >> nullstyle.tmp}
+      command {exec echo "LabelUnits=0" >> nullstyle.tmp}
+      command {exec echo "TextLabGap(1)=0.05" >> nullstyle.tmp}
+      command {exec echo "Size(TextLab)=8" >> nullstyle.tmp}
+      command {exec echo "Width(TextLab)=2" >> nullstyle.tmp}
+      command {exec echo "Colour(TextLab)=silver" >> nullstyle.tmp}
+      command {exec echo "Colour(Border)=black" >> nullstyle.tmp}
+
+      command {exec echo "^nullstyle.tmp" > stardemo.tmp}
+      command {exec echo "TextLabGap(1)=0.25" >> stardemo.tmp}
+      command {exec echo "Label(1)=Version 1.0   " >> stardemo.tmp}
+      
+      command {Obey kapview display "in=$KAPPA_DIR/logo lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^stardemo.tmp accept"}
+      command {exec rm -f stardemo.tmp}
+
+      text "This demonstration highlights the main changes which have
+      been introduced into the <PACK KAPPA> package by version V1.0. See
+      the '<htx:sun95|se_changes <emph Release Notes>>' section of <doc
+      SUN/95> for a complete list."
+
+      pause 8
+
+      text "Version 1.0 of KAPPA is an important release as it marks the
+      completion of several ongoing conversion processes within KAPPA."
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview picdef "mode=array xpic=2 ypic=2 outline=no prefix=a"}
+      command {exec echo "^nullstyle.tmp" > stardemo.tmp}
+      command {exec echo "Label(1)=M57" >> stardemo.tmp}
+      command {Obey kapview display "in=$KAPPA_DIR/m57(-228:120,225:515) lut=$KAPPA_DIR/cold_lut mode=scale low=879 high=5089 badcol=red style=^stardemo.tmp accept"}
+
+      pause 5
+
+      text "The few remaining applications which previously created output 
+      files in the old IMAGE format have been re-written to use the 
+      standard Starlink NDF format."
+
+      command {Obey kapview picsel "label=a2"}
+      command {Obey kappa laplace "in=$KAPPA_DIR/m57(-228:120,225:515) out=./temp accept"}
+      command {exec echo "^nullstyle.tmp" > stardemo.tmp}
+      command {exec echo "Label(1)=Output from the new LAPLACE" >> stardemo.tmp}
+      command {Obey kapview display "in=./temp mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/cold_lut style=^stardemo.tmp accept"}
+
+      pause 6
+
+      text "All applications are now 'WCS-aware' (except those for which
+      WCS is not relevant)."
+
+      command {Obey kapview picsel "label=a3"}
+      command {Obey kapview display "in=$KAPPA_DIR/m57(-228:120,225:515) mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/cold_lut style=def accept"}
+
+      pause 6
+
+      text "All graphics are now produced using native PGPLOT."
+
+      command {Obey kapview picsel "label=a4"}
+      command {exec cp $KAPPA_DIR/m57.sdf ./temp.sdf}
+      command {Obey ndfpack wcsframe "ndf=temp frame=pixel"}
+      command {Obey kapview display "in=temp(-228:120,225:515) mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/warm_lut style=def accept"}
+
+      text "Graphics applications are no longer restricted to 8-bit
+      displays, so you can now have different colour tables in one display."
+
+      pause 5
+
+      command {Obey kappa sqorst "in=$KAPPA_DIR/m57(-228:120,225:515) out=temp factors=\[1.5,1\]"}
+      command {Obey kapview picdef "mode=cc aspect=1.5 fraction=0.5"}
+      command {exec echo "^nullstyle.tmp" > stardemo.tmp}
+      command {exec echo "Label(1)=A stretch imaged created by the new SQORST" >> stardemo.tmp}
+      command {Obey kapview display "in=temp mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/heat_lut style=^stardemo.tmp accept"}
+
+      text "Use of the NDF Quality component has been simplified by the 
+      addition of four new applications; <COMMAND SETQUAL>, <COMMAND SHOWQUAL>, 
+      <COMMAND REMQUAL> and <COMMAND QUALTOBAD>."
+
+      pause 5
+
+      command {Obey kapview gdclear ""}
+      text "The old commands for creating and editing colour tables have
+      been replaced by a new command called LUTEDIT which has a graphical 
+      interface which allows colour tables to be manipulated in many ways."
+
+      pause 7
+
+      text "The LUTEDIT interface will now be started. This KAPPA demo will
+      pause until you close the LUTEDIT interface."
+
+      pause 4
+
+      command {exec $KAPPA_DIR/lutedit.tcl}
+
+
+
+      command {exec rm -f nullstyle.tmp}
+      command {exec rm -f stardemo.tmp}
+      command {exec rm -f temp.sdf}
+
+
+   }
+} 
