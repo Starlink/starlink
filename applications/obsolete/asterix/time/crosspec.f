@@ -124,7 +124,8 @@
         DO WHILE ( INPUT )
           INPUT = .FALSE.
 
-          CALL USI_IASSOC( 'INP', I, 'BinDS|Array', IFID(I), STATUS )
+          CALL USI_IASSOC( 'INP', I, 'BinDS|Array', 'READ',
+     :                     IFID(I), STATUS )
           IF (STATUS .NE. SAI__OK) GOTO 99
 
 *        Check not primitive
