@@ -1,7 +1,7 @@
 *+  SCULIB_FLATFIELD_DATA - flatfield the data in an array
       SUBROUTINE SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
      :  DATA, VARIANCE, QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, 
-     :  NUM_ADC, BOL_FLAT, BOL_QUALITY, BADBIT, STATUS)
+     :  NUM_ADC, BOL_FLAT, BOL_QUALITY, STATUS)
 *    Description :
 *     This routine multiplies the data in the input array by the flatfield
 *     values of the bolometers that took it. Output quality will be set
@@ -10,7 +10,7 @@
 *    Invocation :
 *     CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM, DATA, VARIANCE,
 *    :  QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, NUM_ADC, BOL_FLAT,
-*    :  BOL_QUALITY, BADBIT, STATUS)
+*    :  BOL_QUALITY, STATUS)
 *    Parameters :
 *     N_BOL                  = INTEGER (Given)
 *           number of bolometers measured
@@ -41,8 +41,6 @@
 *     BOL_QUALITY (NUM_CHAN, NUM_ADC)
 *                            = INTEGER (Given)
 *           quality on BOL_FLAT
-*     BADBIT                 = BYTE (Given)
-*         Bad bit mask
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -59,7 +57,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
-      BYTE    BADBIT
       INTEGER N_BOL
       INTEGER N_POS
       INTEGER N_BEAM
@@ -77,6 +74,7 @@
 *    Status :
       INTEGER STATUS
 *    External references :
+      BYTE SCULIB_BITON
 *    Global variables :
 *    Local Constants :
 *    Local variables :
@@ -87,8 +85,6 @@
       INTEGER POS                          ! measurement index in DO loop
 *    Internal References :
 *    Local data :
-*    Functions:
-      INCLUDE 'NDF_FUNC'
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -97,22 +93,21 @@
          DO POS = 1, N_POS
             DO BOL = 1, N_BOL
 
-*  multiply by the flatfield if the quality of the datum and flatfield are
-*  good, otherwise set output datum quality bad
+*  multiply by the flatfield if the quality of the flatfield is
+*  good, otherwise set output datum quality flatfield bit to bad
 
-               IF (NDF_QMASK(QUALITY(BOL,POS,BEAM), BADBIT)) THEN
-                  CHAN = BOL_CHAN (BOL)
-                  ADC = BOL_ADC (BOL)
+               CHAN = BOL_CHAN (BOL)
+               ADC = BOL_ADC (BOL)
 
-                  IF (BOL_QUALITY(CHAN,ADC) .EQ. 0) THEN
-                     DATA (BOL,POS,BEAM) = DATA (BOL,POS,BEAM) *
+               IF (BOL_QUALITY(CHAN,ADC) .EQ. 0) THEN
+                  DATA (BOL,POS,BEAM) = DATA (BOL,POS,BEAM) *
      :                 BOL_FLAT (CHAN,ADC)
-                     VARIANCE (BOL,POS,BEAM) = 
+                  VARIANCE (BOL,POS,BEAM) = 
      :                 VARIANCE (BOL,POS,BEAM) *
      :                 BOL_FLAT (CHAN,ADC)**2
-                  ELSE
-                     QUALITY (BOL,POS,BEAM) = 1
-                  END IF
+               ELSE
+                  QUALITY (BOL,POS,BEAM) = 
+     :                 SCULIB_BITON(QUALITY(BOL,POS,BEAM),1)
                END IF
 
 	    END DO
