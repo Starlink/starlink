@@ -1,0 +1,66 @@
+#+
+#  Name:
+#     kappa_display_keystyle.def
+
+#  Purpose:
+#     Default key style for KAPPA application DISPLAY.
+
+#  Description:
+#     This file specifies the plotting attributes to be used if the user
+#     does not give alternative values using the KEYSTYLE Parameter of 
+#     application DISPLAY. Axis 1 corresponds to the data value. Axis 2 
+#     is the other axis which has no physical significance. See 
+#     $KAPPA_DIR/kappa_style.def for more information on KAPPA style
+#     files.
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explcitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-NOV-1999 (DSB):
+#        Original version.
+#-
+
+#  The default title.
+      title=Colour table key
+
+#  Do not display the title by default.
+      drawtitle=0
+
+#  Include a textual label only on axis 1.
+      textlab(1)=1
+      textlab(2)=0
+
+#  Include numerical labels only on axis 1.
+      numlab(1)=1
+      numlab(2)=0
+
+#  Set colours for various elements of the plot.
+      colour(border)=blue
+      colour(grid)=green
+      colour(ticks)=green
+      colour(numlab)=cyan
+      colour(axes)=green
+
+#  Set the size of the text to use for numerical and textual axis labels.
+#  These are slightly smaller than the default sizes of 1.0.
+      size(numlab)=0.8
+      size(textlab)=0.9
+
+#  Set the gap between the first axis and the associated textual label. The 
+#  default is 0.01.
+      textlabgap(1)=0.04
+
+#  Make the ticks marks on axis 1 (both major and minor) longer.
+      majticklen(1)=0.08
+      minticklen(1)=0.04
+
+#  Suppress tick marks on axis 2.
+      majticklen(2)=0
+      minticklen(2)=0
