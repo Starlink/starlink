@@ -15,6 +15,7 @@
 *     18 May 90 : V1.2-0  Improved (SRD)
 *      8 Oct 92 : V1.7-0  Uses D.P. NAG for portability (DJA)
 *     20 Apr 95 : V1.8-0  Use new data interface (DJA)
+*     13 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -34,19 +35,17 @@
       REAL                   AREA          ! Area correction factor
       REAL                   PFUNC         ! Variability statistic
 
-      INTEGER                BDIMS(ADI__MXDIM)
       INTEGER			BFID			! Bgnd dataset id
       INTEGER                IACT, BACT    ! Area correction arrays
       INTEGER			IFID			! Source dataset id
       INTEGER                INDIM, BNDIM,LDIM! Input dimesnionalities
-      INTEGER                IDIMS(ADI__MXDIM)
-      INTEGER                NDIMS(ADI__MXDIM)
+      INTEGER                INELM,BNELM
+      INTEGER                NDIM
       INTEGER                IDPTR, BDPTR  ! Data pointers
       INTEGER                IVPTR, BVPTR  ! Variance pointers
       INTEGER                IQPTR,BQPTR   ! Quality pointers
       INTEGER                IWPTR         ! Axis widths pointer
       INTEGER                VALPTR
-      INTEGER                NELM          ! Length of time series
 
       LOGICAL                IOK, BOK      ! Datasets ok?
       LOGICAL                BAD
@@ -55,7 +54,7 @@
 *    Version id :
 *
       CHARACTER*30            VERSION
-         PARAMETER           (VERSION = 'VARTEST Version 1.8-0')
+         PARAMETER           (VERSION = 'VARTEST Version 2.0-0')
 *-
 
 *    Check status.
@@ -68,83 +67,65 @@
       CALL AST_INIT()
 
 *    Obtain data object name.
-      CALL USI_TASSOCI('INP', '*', 'READ', IFID, STATUS)
-      CALL USI_TASSOCI('BACK', '*', 'READ', BFID, STATUS)
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS)
+      CALL USI_ASSOC( 'BACK', 'BinDS', 'READ', BFID, STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map input data.
-      CALL BDI_CHKDATA(IFID, IOK, INDIM, IDIMS, STATUS)
-      CALL BDI_CHKDATA(BFID, BOK, BNDIM, BDIMS, STATUS)
-
+*  Map input data.
+      CALL BDI_CHK( IFID, 'Data', IOK, STATUS )
+      CALL BDI_CHK( BFID, 'Data', BOK, STATUS )
+      CALL BDI_GETSHP( IFID, 1, INELM, NDIM, STATUS )
+      CALL BDI_GETSHP( BFID, 1, BNELM, NDIM, STATUS )
       IF ( IOK .AND. BOK ) THEN
-        IF ( INDIM .NE. 1 ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Has to be 1D', STATUS )
-        ELSE IF ( IDIMS(1) .NE. BDIMS(1) ) THEN
+        IF ( INELM .NE. BNELM ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Background series must be same length'/
      :                                 /' as source series', STATUS )
         END IF
-        NELM = IDIMS(1)
+
       ELSE
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Input datasets invalid', STATUS )
+
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map data
-      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
-      CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
-      CALL BDI_MAPAXWID( IFID, 'READ', 1, IWPTR, STATUS )
-      CALL BDI_MAPDATA( BFID, 'READ', BDPTR, STATUS )
-      CALL BDI_MAPVAR( BFID, 'READ', BVPTR, STATUS )
+*  Map data
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
+      CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
+      CALL BDI_AXMAPR( IFID, 'Width', 'READ', IWPTR, STATUS )
+      CALL BDI_MAPR( BFID, 'Data', 'READ', BDPTR, STATUS )
+      CALL BDI_MAPR( BFID, 'Variance', 'READ', BVPTR, STATUS )
 
-*    Get relative area factor
+*  Get relative area factor
       CALL USI_GET0R( 'AREA', AREA, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map QUALITY as a logical.
-      BAD = .FALSE.
-      CALL BDI_CHKQUAL (IFID, IQUALOK, NDIMS, LDIM, STATUS)
-      IF (IQUALOK) THEN
-        CALL BDI_MAPLQUAL(IFID,'READ',BAD,IQPTR,STATUS)
-      ELSE
-        CALL DYN_MAPL(INDIM,IDIMS,IQPTR,STATUS)
-        CALL ARR_INIT1L(.TRUE.,IDIMS,%VAL(IQPTR),STATUS)
-      END IF
-      CALL BDI_CHKQUAL(BFID,BQUALOK,NDIMS,LDIM,STATUS)
-      IF(BQUALOK)THEN
-        CALL BDI_MAPLQUAL(BFID,'READ',BAD,BQPTR,STATUS)
-      ELSE
-        CALL DYN_MAPL(INDIM,IDIMS,BQPTR,STATUS)
-        CALL ARR_INIT1L(.TRUE.,IDIMS,%VAL(BQPTR),STATUS)
-      ENDIF
+*  Map QUALITY as a logical.
+      CALL BDI_MAPL( IFID, 'LogicalQuality', IQPTR, STATUS )
+      CALL BDI_MAPL( BFID, 'LogicalQuality', BQPTR, STATUS )
 
-*    Map memory for area correction factors
-      CALL DYN_MAPR( 1, NELM, IACT, STATUS )
-      CALL DYN_MAPR( 1, NELM, BACT, STATUS )
+*  Map memory for area correction factors
+      CALL DYN_MAPR( 1, INELM, IACT, STATUS )
+      CALL DYN_MAPR( 1, INELM, BACT, STATUS )
 
-*    Map memory for 'VAL' array
-      CALL DYN_MAPR(1,NELM,VALPTR,STATUS)
+*  Map memory for 'VAL' array
+      CALL DYN_MAPR(1,INELM,VALPTR,STATUS)
 
-*    Test for variability
-      CALL VARTEST_CALC( NELM, %VAL(IDPTR), %VAL(IVPTR), %VAL(IWPTR),
+*  Test for variability
+      CALL VARTEST_CALC( INELM, %VAL(IDPTR), %VAL(IVPTR), %VAL(IWPTR),
      :              %VAL(IACT), %VAL(BDPTR), %VAL(BVPTR), %VAL(BACT),
      :                  %VAL(IQPTR),%VAL(BQPTR),%VAL(VALPTR),AREA,
      :                                                PFUNC, STATUS )
 
-*    Write parameter to user and external
+*  Write parameter to user and external
       CALL MSG_SETR( 'STAT', PFUNC )
       CALL MSG_PRNT( 'Variability statistic ^STAT' )
       CALL USI_PUT0R( 'PFUNC', PFUNC, STATUS )
 
-*    Free dynamic memory
+*  Free dynamic memory
       CALL DYN_UNMAP( IACT, STATUS )
       CALL DYN_UNMAP( BACT, STATUS )
-
-*    Free datasets
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( BFID, STATUS )
 
 *   Exit
  99   CALL AST_CLOSE
@@ -181,8 +162,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
