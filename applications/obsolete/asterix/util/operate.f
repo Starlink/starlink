@@ -62,6 +62,7 @@
 *                         (DJA).
 *     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     28 Mar 95 : V1.8-1 Use new data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -70,7 +71,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *
@@ -84,27 +85,26 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC                     ! Input object
-      CHARACTER*(DAT__SZLOC) OLOC                     ! Output object
-      CHARACTER*200          FILE(4)                  ! Input file spec
-      CHARACTER*200          FILEO(4)                 ! Output file spec
-      CHARACTER*6            OPER                     ! Operator
-      CHARACTER*80           LABEL                    ! Data label
-      CHARACTER*80           STRING                   ! Temp. String
-      CHARACTER*80           TEXT(5)                  ! History text
+      CHARACTER*200          	FILE(4)               ! Input file spec
+      CHARACTER*200          	FILEO(4)              ! Output file spec
+      CHARACTER*6            	OPER                  ! Operator
+      CHARACTER*80           	LABEL                 ! Data label
+      CHARACTER*80           	STRING                ! Temp. String
 
-      DOUBLE PRECISION       EVALUE                   ! Manual error estimate
+      DOUBLE PRECISION       	EVALUE                ! Manual error estimate
 
-      INTEGER                DIMS(DAT__MXDIM)         ! Dimensions of data array
-      INTEGER                DPTR                     ! Output data array
+      INTEGER                	DIMS(ADI__MXDIM)      ! Dimensions of data array
+      INTEGER                	DPTR                  ! Output data array
+      INTEGER			IFID		      ! Input dataset id
       INTEGER                LEVELS                   ! Levels of input
       INTEGER                LEVELSO                  ! Levels of Output
       INTEGER                NDIM                     ! # dimensions
       INTEGER                NELM                     ! # input data values
-      INTEGER                QPTR                     ! Output quality
-      INTEGER                TDIMS(DAT__MXDIM)        ! Dimensions
-      INTEGER                TNDIM                    ! # dimensions
-      INTEGER                VPTR                     ! Output variance
+      INTEGER			OFID		      ! Output dataset id
+      INTEGER                	QPTR                  ! Output quality
+      INTEGER                	TDIMS(ADI__MXDIM)     ! Dimensions
+      INTEGER                	TNDIM                 ! # dimensions
+      INTEGER                	VPTR                  ! Output variance
 
       BYTE                   MASK                     ! Quality mask
 
@@ -118,7 +118,7 @@
 *    Version :
 *
       CHARACTER*26           VERSION
-         PARAMETER         ( VERSION = 'OPERATE Version 1.8-0' )
+        PARAMETER         ( VERSION = 'OPERATE Version 1.8-1' )
 *-
 
 *    Version
@@ -132,22 +132,23 @@
 
 *    Get input object
       IF ( OVER ) THEN
-        CALL USI_ASSOCI( 'INP', 'UPDATE', OLOC, PRIM, STATUS )
+        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', OFID, STATUS )
       ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'READ',ILOC, OLOC, PRIM, STATUS )
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
+        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+        CALL ADI_FCOPY( IFID, OFID, STATUS )
         CALL USI_NAMEO( LEVELSO, FILEO, STATUS )
       END IF
       CALL USI_NAMEI( LEVELS, FILE, STATUS )
+      CALL BDI_PRIM( OFID, PRIM, STATUS )
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map the data
-      CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
       IF ( OK ) THEN
-        CALL BDA_MAPTDATA( OLOC, '_DOUBLE', 'UPDATE', DPTR, STATUS )
+        CALL BDI_MAPTDATA( OFID, '_DOUBLE', 'UPDATE', DPTR, STATUS )
       ELSE
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid data', STATUS )
@@ -171,21 +172,21 @@
       ELSE
 
 *      Get error if present
-        CALL BDA_CHKVAR ( OLOC, ERR, TNDIM, TDIMS, STATUS )
+        CALL BDI_CHKVAR ( OFID, ERR, TNDIM, TDIMS, STATUS )
         IF ( ERR ) THEN
-          CALL BDA_MAPTVAR( OLOC, '_DOUBLE', 'UPDATE', VPTR, STATUS )
+          CALL BDI_MAPTVAR( OFID, '_DOUBLE', 'UPDATE', VPTR, STATUS )
         END IF
 
 *      And quality
-        CALL BDA_CHKQUAL( OLOC, QOK, TNDIM, TDIMS, STATUS )
+        CALL BDI_CHKQUAL( OFID, QOK, TNDIM, TDIMS, STATUS )
         IF ( QOK ) THEN
-          CALL BDA_MAPQUAL( OLOC, 'UPDATE', QPTR, STATUS )
-          CALL BDA_GETMASK( OLOC, MASK, STATUS )
+          CALL BDI_MAPQUAL( OFID, 'UPDATE', QPTR, STATUS )
+          CALL BDI_GETMASK( OFID, MASK, STATUS )
         ELSE
-          CALL BDA_CREQUAL( OLOC, NDIM, DIMS, STATUS )
-          CALL BDA_MAPQUAL( OLOC, 'WRITE', QPTR, STATUS )
+          CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
+          CALL BDI_MAPQUAL( OFID, 'WRITE', QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
-          CALL BDA_PUTMASK( OLOC, QUAL__MASK, STATUS )
+          CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
           MASK = QUAL__MASK
         END IF
 
@@ -261,27 +262,27 @@
 
 *    Amend data label if present
       IF ( .NOT. PRIM ) THEN
-        CALL BDA_GETLABEL( OLOC, LABEL, STATUS )
+        CALL BDI_GETLABEL( OFID, LABEL, STATUS )
         STRING = LABEL(1:CHR_LEN(LABEL))
         LABEL  = OPER(1:CHR_LEN(OPER))//' '//STRING
         STRING = ':'//LABEL(1:CHR_LEN(LABEL))//':'
-        CALL BDA_PUTLABEL( OLOC, STRING, STATUS )
+        CALL BDI_PUTLABEL( OFID, STRING, STATUS )
       END IF
 
 *    History
       IF ( .NOT. PRIM ) THEN
-        CALL HIST_ADD( OLOC, VERSION, STATUS )
-        CALL HIST_PTXT( OLOC, LEVELS, FILE, STATUS )
+        CALL HSI_ADD( OFID, VERSION, STATUS )
+        CALL HSI_PTXT( OFID, LEVELS, FILE, STATUS )
         IF ( .NOT. OVER ) THEN
-          CALL HIST_PTXT(OLOC,LEVELSO,FILEO,STATUS)
+          CALL HSI_PTXT(OFID,LEVELSO,FILEO,STATUS)
         END IF
-        TEXT(1) = 'Operator = '//OPER(:CHR_LEN(OPER))
-        CALL HIST_PTXT( OLOC, 1, TEXT, STATUS )
+        CALL HSI_PTXT( OFID, 1, 'Operator = '//OPER(:CHR_LEN(OPER)),
+     :                 STATUS )
       END IF
 
 *    Release output
-      IF ( .NOT. OVER ) CALL BDA_RELEASE( ILOC, STATUS )
-      CALL BDA_RELEASE( OLOC, STATUS )
+      IF ( .NOT. OVER ) CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
       IF ( PRIM .AND. ERR ) THEN
         CALL DYN_UNMAP( VPTR, STATUS )
       END IF
@@ -308,7 +309,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NDAT                     ! Number of data points
 *    Import-Export :
@@ -344,7 +344,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NDAT                     ! Number of data points
 *    Import-Export :
@@ -384,7 +383,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
@@ -487,7 +485,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
@@ -591,7 +588,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       LOGICAL                QOK                      ! Quality OK?
       LOGICAL                VAROK                    ! Variance OK?
@@ -696,7 +692,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
@@ -811,7 +806,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
