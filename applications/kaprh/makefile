@@ -448,7 +448,7 @@ F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
 
 KAPRH_F1_ROUTINES = crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f \
 mosaic.f quilt.f lutflip.f luthilite.f lutrot.f luttweak.f idinvisible.f \
-idpazo.f idinvisible.f idpazo.f
+idpazo.f 
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
