@@ -22,7 +22,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IWHOLE Version 1.2-0')
+      PARAMETER (VERSION='IWHOLE Version 2.1-0')
 *-
 
       CALL USI_INIT()

@@ -35,7 +35,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICONTOUR Version 1.7-5')
+      PARAMETER (VERSION = 'ICONTOUR Version 2.1-0')
 *-
       CALL USI_INIT()
 

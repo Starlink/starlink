@@ -29,7 +29,7 @@
 * Local data :
 * Version :
         CHARACTER*30 VERSION
-        PARAMETER (VERSION = 'INOISE Version 1.2-1')
+        PARAMETER (VERSION = 'INOISE Version 2.1-0')
 *
       CALL USI_INIT()
 

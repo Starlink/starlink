@@ -24,7 +24,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPLOT Version 1.7-1')
+      PARAMETER (VERSION = 'IPLOT Version 2.1-0')
 *-
       CALL USI_INIT()
 

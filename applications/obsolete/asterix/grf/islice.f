@@ -55,7 +55,7 @@
       LOGICAL PLOT
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISLICE Version 2.0-0')
+      PARAMETER (VERSION = 'ISLICE Version 2.1-0')
 *-
       CALL USI_INIT()
 

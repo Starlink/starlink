@@ -27,7 +27,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IEXCLUDE Version 1.8-1')
+      PARAMETER (VERSION = 'IEXCLUDE Version 2.1-0')
 *-
       CALL USI_INIT()
 

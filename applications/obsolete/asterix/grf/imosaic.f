@@ -310,7 +310,7 @@ c                              ! axis units
 *    Version id :
 *
       CHARACTER*30		VERSION
-        PARAMETER  		( VERSION = 'IMOSAIC version 2.0-0' )
+        PARAMETER  		( VERSION = 'IMOSAIC Version 2.1-0' )
 *-
 
 *    Show version number

@@ -33,7 +33,7 @@
       INTEGER FLAG
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IRADIAL Version 1.7-1')
+      PARAMETER (VERSION = 'IRADIAL Version 2.1-0')
 *-
       CALL USI_INIT()
 

@@ -28,7 +28,7 @@
       INTEGER NBIN
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IHIST Version 1.7-0')
+      PARAMETER (VERSION = 'IHIST Version 2.1-0')
 *-
       CALL USI_INIT()
 

@@ -42,7 +42,7 @@
 *                                        ! pixel and square axis unit
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IAZIMUTH Version 1.7-2')
+      PARAMETER (VERSION = 'IAZIMUTH Version 2.1-0')
 *-
       CALL MSG_PRNT(VERSION)
 

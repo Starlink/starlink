@@ -28,7 +28,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISCALE Version 1.7-2')
+      PARAMETER (VERSION = 'ISCALE Version 2.1-0')
 *-
       CALL USI_INIT()
 

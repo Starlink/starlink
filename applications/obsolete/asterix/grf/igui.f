@@ -24,7 +24,7 @@ c     INTEGER ID,SID,ITEMID
       INTEGER GCBID
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IGUI Version 1.8-0')
+      PARAMETER (VERSION = 'IGUI Version 2.1-0')
 *-
       CALL USI_INIT()
 

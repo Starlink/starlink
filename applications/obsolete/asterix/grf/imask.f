@@ -27,7 +27,7 @@
       LOGICAL TOGGLE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IMASK Version 1.7-1')
+      PARAMETER (VERSION = 'IMASK Version 2.1-0')
 *-
       CALL USI_INIT()
 

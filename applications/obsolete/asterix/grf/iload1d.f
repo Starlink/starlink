@@ -24,7 +24,7 @@
       LOGICAL GCB
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILOAD1D Version 2.0-0')
+      PARAMETER (VERSION = 'ILOAD1D Version 2.1-0')
 *-
       CALL USI_INIT()
 

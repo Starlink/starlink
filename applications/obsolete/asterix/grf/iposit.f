@@ -30,7 +30,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IPOSIT Version 2.0-2')
+      PARAMETER (VERSION='IPOSIT Version 2.1-0')
 *-
       CALL USI_INIT()
 

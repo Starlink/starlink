@@ -21,7 +21,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISURFACE Version 1.7-1')
+      PARAMETER (VERSION = 'ISURFACE Version 2.1-0')
 *-
       CALL USI_INIT()
 

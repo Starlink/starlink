@@ -24,7 +24,7 @@
       LOGICAL OFF
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IKEY Version 1.7-1')
+      PARAMETER (VERSION = 'IKEY Version 2.1-0')
 *-
       CALL USI_INIT()
 
