@@ -292,6 +292,7 @@
       LOGICAL GOTT               ! Was a T value given?
       LOGICAL GOTWPL             ! Was a WPLATE value given?
       LOGICAL QUIET              ! Run silently?
+      LOGICAL RDONLY             ! Read-only access required?
       REAL ANA                   ! The ANLANG value to store
       REAL ANG                   ! The ANGROT value to store
       REAL ANGROT                ! The supplied ANGROT value
@@ -339,6 +340,11 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Set a flag indicating that nothing is to be changed in the POLPACK
+*  extensions. Clear this flag if any parameter supplies a new value
+*  for an extension item.
+      RDONLY = .TRUE.
+
 *  Get the ANGROT value. Annul the error if a null (!) value was supplied,
 *  and set a flag indicating whether to store the ANGROT value.
       CALL PAR_GET0R( 'ANGROT', ANGROT, STATUS )
@@ -348,6 +354,7 @@
          GOTANG = .FALSE.
       ELSE
          GOTANG = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Abort if an error has occurred.
@@ -362,6 +369,7 @@
          GOTFIL = .FALSE.
       ELSE
          GOTFIL = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Abort if an error has occurred.
@@ -417,6 +425,7 @@
             END DO           
 
             GOTIMG = .TRUE.
+            RDONLY = .FALSE.
 
          END IF
       END IF
@@ -433,6 +442,7 @@
          GOTWPL = .FALSE.
       ELSE
          GOTWPL = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Get the ANLANG value. Annul the error if a null (!) value was supplied,
@@ -444,12 +454,13 @@
          GOTANA = .FALSE.
       ELSE
          GOTANA = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Report an error if both WPLATE and ANLANG were supplied.
       IF( GOTANA .AND. GOTWPL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLEXT_4', 'Values were supplied for both '//
+         CALL ERR_REP( 'POLEXT_3', 'Values were supplied for both '//
      :                 '%WPLATE and %ANLANG. Only one of these should'//
      :                 ' be supplied, depending on the type of '//
      :                 'polarimeter.', STATUS )
@@ -465,6 +476,7 @@
          GOTT = .FALSE.
       ELSE
          GOTT = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Get the EPS value. Annul the error if a null (!) value was supplied,
@@ -476,6 +488,7 @@
          GOTEPS = .FALSE.
       ELSE
          GOTEPS = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Get the RAY value. Annul the error if a null (!) value was supplied,
@@ -487,6 +500,7 @@
          GOTRAY = .FALSE.
       ELSE
          GOTRAY = .TRUE.
+         RDONLY = .FALSE.
       END IF
 
 *  Get the STOKES value. Annul the error if a null (!) value was supplied,
@@ -500,6 +514,7 @@
          GOTSTO = .TRUE.
          CALL CHR_RMBLK( STOKES )
          CALL CHR_UCASE( STOKES ) 
+         RDONLY = .FALSE.
       END IF
 
 *  Create a group to hold the names of the NDFs which were processed
@@ -528,7 +543,11 @@
          END IF
 
 *  Get the input NDF identifier
-         CALL NDG_NDFAS( IGRP1, INDX, 'UPDATE', INDF, STATUS )
+         IF( RDONLY ) THEN
+            CALL NDG_NDFAS( IGRP1, INDX, 'READ', INDF, STATUS )
+         ELSE
+            CALL NDG_NDFAS( IGRP1, INDX, 'UPDATE', INDF, STATUS )
+         END IF
 
 *  Get the NDFs WCS FrameSet.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
@@ -571,7 +590,17 @@
 *  The existing ANGROT value is obtained from the POLANAL WCS Frame.
             CALL POL1_GTANG( INDF, 0, IWCS, ANG, STATUS )
 
-*  Create the POLPACK extension if there isn't one.
+*  If there is no POLPACK extension, report an error if the extension
+*  is not being changed.
+         ELSE IF( RDONLY ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'POLEXT_4', 'No POLPACK extension found.',
+     :                       STATUS )
+            END IF
+
+*  If any new values have been supplied to be stored inthe extension,
+*  create an extension.
          ELSE
             CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC, 
      :                     STATUS )
