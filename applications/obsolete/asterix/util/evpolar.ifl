@@ -1,7 +1,7 @@
 Interface EVPOLAR
    Parameter INP
       position    1
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<-GLOBAL.EVDS'
       prompt      'Enter name of input dataset'

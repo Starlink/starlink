@@ -1,8 +1,25 @@
-*+  EVPOLAR - Bins 2 lists into a 1 or 2 dimensional object
       SUBROUTINE EVPOLAR( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     EVPOLAR
+
+*  Purpose:
+*     Bins 2 lists into a 1 or 2 dimensional object
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL EVPOLAR( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     A binned polar dataset is produced from 2 lists from the input dataset.
 *
 *     The azimuthal axis is always regularly spaced, and is specified by
@@ -19,106 +36,150 @@
 *     output DATA_ARRAY, and the corresponding element of the output QUALITY
 *     array is set to bad (i.e.1). If QKEEP is false, then all bad events are
 *     simply ignored, and no output QUALITY array is produced.
-*
-*    Parameters :
-*
-*     INP = UNIV(R)
+
+*  Usage:
+*     evpolar {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
 *        Name of input EVDS
-*     LISTS = CHAR(R)
+*     LISTS = CHAR (read)
 *        Index No(s) of input list(s)
-*     QVAL = INTEGER(R)
+*     QVAL = INTEGER (read)
 *        Event quality > QVAL = bad
-*     QKEEP = LOGICAL(R)
+*     QKEEP = LOGICAL (read)
 *        Produce output QUALITY array?
-*     REG = LOGICAL(R)
+*     REG = LOGICAL (read)
 *        Regular or irregular radial bins
-*     ABINSIZE = REAL(R)
+*     ABINSIZE = REAL (read)
 *        Azimuthal bin size
-*     RBINSIZE = REAL(R)
+*     RBINSIZE = REAL (read)
 *        Regular radial bin width
-*     RRANGE = CHAR(R)
+*     RRANGE = CHAR (read)
 *        Irregular bin bounds
-*     NAZ, NRAD = INTEGER(R)
+*     NAZ, NRAD = INTEGER (read)
 *        Numbers of bins
-*     NORMALISE = LOGICAL(R)
+*     NORMALISE = LOGICAL (read)
 *        Normalise output array
-*     OUT = UNIV(W)
+*     OUT = CHAR (read)
 *        Name of output dataset
-*
-*    Method :
-*
-*    Deficiencies :
-*
-*     Irregular bins must not overlap
-*
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan ( BHVAD::DJA )
-*
-*    History :
-*
-*     21 Feb 91 : V1.4-0 Original (DJA)
-*     11 Sep 93 : V1.7-0 EVPOLAR_CAREA renamed GEO_CAREA (DJA)
-*     25 Feb 94 : V1.7-1 Use BIT_ routines to do bit manipulations (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     21 Apr 95 : V1.8-1 Updated data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     evpolar, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     21 Feb 1991 V1.4-0 (DJA):
+*        Original version.
+*     11 Sep 1993 V1.7-0 (DJA):
+*        EVPOLAR_CAREA renamed GEO_CAREA
+*     25 Feb 1994 V1.7-1 (DJA):
+*        Use BIT_ routines to do bit manipulations
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     21 Apr 1995 V1.8-1 (DJA):
+*        Updated data interface
+*     18 Aug 1995 V2.0-0 (DJA):
+*        ADI port of event handling
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'LIST_PAR'
       INCLUDE 'QUAL_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Function calls :
-*
-      INTEGER                   CHR_LEN
-*
-*    Local Constants :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+      EXTERNAL                  CHR_SIMLR
+        LOGICAL			CHR_SIMLR
+
+*  Local Constants:
       INTEGER                   MXRANGE          ! 2 x max No of irregular bins
          PARAMETER             (MXRANGE = 1000)
       INTEGER                   MXTEXT
          PARAMETER             (MXTEXT = 7)
-*
-*    Local variables :
-*
-      CHARACTER*(DAT__SZLOC)    BLOC(2)          ! Lists to use in polar binning
-      CHARACTER*(DAT__SZNAM)    BNAME(2)         ! List names
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'EVPOLAR Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*20              BNAME(2)         ! List names
       CHARACTER*40              BUNIT(2)         ! List units
       CHARACTER*80              HTEXT(MXTEXT)    ! History text
-      CHARACTER*(DAT__SZLOC)    ILOC             ! Input event dataset
-      CHARACTER*(DAT__SZLOC)    LLOC(LIST__MXNL) ! Locator to lists in the evds
-      CHARACTER*(DAT__SZNAM)    LNAM(LIST__MXNL) ! Names of lists in the evds
       CHARACTER*40              ORUNIT           ! Output radial unit
-      CHARACTER*(DAT__SZLOC)    QLOC             ! Locator to input quality
       CHARACTER*80              TEXT             ! Temporary text string
 
       REAL                      ABINSIZE         ! Azimuthal bin size
       REAL                      LOX,HIX,LOY,HIY  ! Field min and max values
       REAL                      MAXR             ! Maximum radial distance
       REAL                      RANGE(MXRANGE)   ! Irregular bin ranges.
-      REAL                      RBINSIZE         ! Radial bin size
+      REAL                      RBINSZ         		! Radial bin size
       REAL                      X0, Y0           ! Centre of polar distribution
 
       INTEGER                   BADQUAL          ! Exclude events with quality
                                                  ! > this value.
-      INTEGER                   BPTR(2)          ! Binning list pointers
-      INTEGER                   I                ! Loop counters
+      INTEGER			BLID(2)			! List identifiers
+      INTEGER                   BPTR(2)          	! Binning list pointers
+      INTEGER                   I                	! Loop counter
       INTEGER			IFID			! Input dataset id
-      INTEGER                   INDEX(LIST__MXNL)! Index number of selected lists
+      INTEGER                   INDEX(2)		! Selected lists
       INTEGER                   INLIST           ! Number of lists in input EVDS
-      INTEGER                   IQPTR            ! Input quality data
+      INTEGER                   IQPTR            	! Input quality data
       INTEGER                   LEN              ! Length of TEMP
       INTEGER                   NAZ, NRAD        ! # azimuthal/radial bins
       INTEGER                   NDIM             ! Output dimensionality
@@ -139,133 +200,131 @@
                                                  ! quality array.
       LOGICAL                   QUALITY          ! Is QUALITY list present?
       LOGICAL                   REG              ! Allow irregular binning?
-      LOGICAL                   SAME             ! Two objects the same
-*
-*    Version id :
-*
-      CHARACTER*24              VERSION
-         PARAMETER              ( VERSION = 'EVPOLAR Version 1.8-1' )
-*-
+*.
 
-*    Version anouncement
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialize ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Get event dataset
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+*  Get event dataset
+      CALL USI_ASSOC( 'INP', 'EventDS', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Find all valid lists in INP. Display them to user.
+*  Find all valid lists in INP. Display them to user.
       CALL MSG_BLNK()
       CALL MSG_PRNT( 'The available lists are :' )
       CALL MSG_BLNK()
-      CALL LIST_FINDALLOK( ILOC, .TRUE., LLOC, LNAM, INLIST, NEV,
-     :                                                   STATUS )
+      CALL EDI_DISP( IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Select the lists
+*  Get number of events and lists
+      CALL EDI_GETNS( IFID, NEV, INLIST, STATUS )
+
+*  Select the lists
       CALL MSG_BLNK()
       CALL MSG_PRNT( 'Select two lists to bin using index'/
      :             /' numbers above, eg. 1 2. The direction' )
       CALL MSG_PRNT( 'of zero azimuth is that of increasing list'/
      :                                               /' 1 value.')
       CALL MSG_BLNK()
-      CALL PRS_GETLIST( 'LISTS', INLIST, INDEX, NINDEX, STATUS )
+      CALL EDI_SELCT( 'LISTS', INLIST, 2, 2, INDEX, NINDEX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check that at leaset one list has been selected
-      IF ( NINDEX .LT. 2 ) THEN
-        CALL MSG_PRNT( 'FATAL ERROR: EVPOLAR requires two lists' )
-        STATUS = SAI__ERROR
-      ELSE IF ( NINDEX .GT. 2 ) THEN
-        CALL MSG_PRNT( 'FATAL ERROR: Too many selections made' )
-        STATUS = SAI__ERROR
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Is there a quality list?
-      CALL LIST_OK( ILOC, 'QUALITY', QUALITY, STATUS )
+*  Is there a quality list?
+      CALL EDI_CHK( IFID, 'QUALITY', QUALITY, STATUS )
       IF ( QUALITY ) THEN
 
-*      Map it
-        CALL DAT_FIND( ILOC, 'QUALITY', QLOC, STATUS )
-        CALL BDA_MAPTDATA( QLOC, '_INTEGER', 'READ', IQPTR, STATUS )
+*    Map it
+        CALL EDI_MAPI( IFID, 'QUALITY', 'READ', 0, 0, IQPTR, STATUS )
 
-*      Get quality processing mode
+*    Get quality processing mode
         CALL USI_GET0I( 'QVAL',  BADQUAL, STATUS )
         CALL USI_GET0L( 'QKEEP', QKEEP, STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get info on selected lists
+*  Get info on selected lists
       DO I = 1, 2
 
 *      Make sure user didn't select quality
-        IF ( QUALITY ) THEN
-          CALL HDX_SAME( LLOC(INDEX(I)), QLOC, SAME, STATUS )
-          IF ( SAME ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'ERROR : Cannot bin using QUALITY list',
-     :                    STATUS )
-            GOTO 99
-          END IF
+C        IF ( QUALITY ) THEN
+C          CALL HDX_SAME( LLOC(INDEX(I)), QLOC, SAME, STATUS )
+C          IF ( SAME ) THEN
+C            STATUS = SAI__ERROR
+C            CALL ERR_REP( ' ', 'ERROR : Cannot bin using QUALITY list',
+C     :                    STATUS )
+C            GOTO 99
+C          END IF
+C        END IF
+
+*    Locate the list
+        CALL EDI_IDX( IFID, INDEX(I), BLID(I), STATUS )
+
+*    Get its name
+        CALL ADI_CGET0C( BLID(I), 'Name', BNAME(I), STATUS )
+
+*    Map it
+        CALL EDI_MAPR( IFID, BNAME(I), 'READ', 0, 0, BPTR(I), STATUS )
+
+*    Get units
+        CALL ADI_CGET0C( BLID(I), 'Units', BUNIT(I), STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          BUNIT(I) = ' '
         END IF
 
-*      Clone the list
-        CALL DAT_CLONE( LLOC(INDEX(I)), BLOC(I), STATUS )
-
-*      Map and get attributes
-        BNAME(I) = LNAM(INDEX(I))
-        CALL BDA_MAPDATA( BLOC(I), 'READ', BPTR(I), STATUS )
-        CALL BDA_GETUNITS( BLOC(I), BUNIT(I), STATUS )
-
       END DO
 
-*    Free original list locators
-      DO I = 1, INLIST
-        CALL DAT_ANNUL( LLOC(I), STATUS )
-      END DO
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+*  Get field extrema
+      CALL ADI_CGET0R( BLID(1), 'Min', LOX, STATUS )
+      CALL ADI_CGET0R( BLID(1), 'Max', HIX, STATUS )
+      CALL ADI_CGET0R( BLID(2), 'Min', LOY, STATUS )
+      CALL ADI_CGET0R( BLID(2), 'Max', HIY, STATUS )
 
-*    Get field minimum and maxiumum
-      CALL LIST_GFLDR( BLOC(1), LOX, HIX, STATUS )
-      CALL LIST_GFLDR( BLOC(2), LOY, HIY, STATUS )
-
-*    Decide on radial units
+*  Decide on radial units
       ORUNIT = BUNIT(1)
-      IF ( NDIM .EQ. 2 ) THEN
-        IF ( BUNIT(1)(:CHR_LEN(BUNIT(1))) .NE. BUNIT(2)
-     :                                 (:CHR_LEN(BUNIT(2))) ) THEN
-          CALL MSG_PRNT( 'WARNING : List units are different, '/
-     :                                /'output may be rubbish' )
-        END IF
+      IF ( .NOT. CHR_SIMLR( BUNIT(1), BUNIT(2) ) ) THEN
+        CALL MSG_PRNT( 'WARNING : List units are different, '/
+     :                              /'output may be rubbish' )
       END IF
 
-*    Get polar centre
+*  Announce axis ranges
+      CALL MSG_SETC( 'AX', BNAME(1) )
+      CALL MSG_SETR( 'LO', LOX )
+      CALL MSG_SETR( 'HI', HIX )
+      CALL MSG_PRNT( 'Axis ^AX ranges from ^LO to ^HI' )
+      CALL MSG_SETC( 'AX', BNAME(2) )
+      CALL MSG_SETR( 'LO', LOY )
+      CALL MSG_SETR( 'HI', HIY )
+      CALL MSG_PRNT( 'Axis ^AX ranges from ^LO to ^HI' )
+
+*  Get polar centre
       CALL USI_GET0R( 'X0', X0, STATUS )
       CALL USI_GET0R( 'Y0', Y0, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map workspace
+*  Map workspace
       CALL DYN_MAPR( 1, 2*NEV, WPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Find azimuth and radius for each bin
+*  Find azimuth and radius for each bin
       CALL EVPOLAR_RECPOL( NEV, X0, Y0, %VAL(BPTR(1)), %VAL(BPTR(2)),
      :                                     %VAL(WPTR), MAXR, STATUS )
 
-*    Get azimuthal bin size
+*  Get azimuthal bin size
       CALL USI_GET0R( 'ABINSIZE', ABINSIZE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       NAZ = 360.0 / ABINSIZE
       CALL MSG_SETI( 'NAZ', NAZ )
       CALL MSG_PRNT( 'There will be ^NAZ azimuthal bins in the output' )
 
-*    Inform user of maximum radius, and get radial bins
+*  Inform user of maximum radius, and get radial bins
       CALL USI_GET0L( 'REG', REG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL MSG_SETR( 'RMAX', MAXR )
@@ -281,21 +340,21 @@
       ELSE
 
 *      Get binsize
-        CALL USI_GET0R( 'RBINSIZE', RBINSIZE, STATUS )
+        CALL USI_GET0R( 'RBINSIZE', RBINSZ, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
-        IF ( RBINSIZE .LE. 0.0 ) THEN
+        IF ( RBINSZ .LE. 0.0 ) THEN
           CALL MSG_PRNT( 'ERROR : Zero or negative radial bin width' )
           STATUS = SAI__ERROR
         END IF
 
 *      Get number of radial bins
-        CALL USI_DEF0I( 'NRAD', MAX(1,NINT(MAXR/RBINSIZE)), STATUS )
+        CALL USI_DEF0I( 'NRAD', MAX(1,NINT(MAXR/RBINSZ)), STATUS )
         CALL USI_GET0I( 'NRAD', NRAD, STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Decide output dimensionality
+*  Decide output dimensionality
       IF ( ( NAZ .EQ. 1 ) .OR. ( NRAD .EQ. 1 ) ) THEN
         NDIM = 1
         ODIMS(1) = NRAD
@@ -305,18 +364,18 @@
         ODIMS(2) = NAZ
       END IF
 
-*    Create output dataset
+*  Create output dataset
       CALL USI_TASSOCO( 'OUT', 'POLAR', OFID, STATUS )
       CALL BDI_CREDATA( OFID, NDIM, ODIMS, STATUS )
       CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
-*    Create AXIS structure
+*  Create AXIS structure
       CALL BDI_CREAXES( OFID, NDIM, STATUS )
       CALL BDI_CREAXVAL( OFID, 1, REG, NRAD, STATUS )
       CALL BDI_CREAXWID( OFID, 1, REG, NRAD, STATUS )
       IF ( REG ) THEN
-        CALL BDI_PUTAXVAL( OFID, 1, 0.0, RBINSIZE, NRAD, STATUS )
-        CALL BDI_PUTAXWID( OFID, 1, RBINSIZE, STATUS )
+        CALL BDI_PUTAXVAL( OFID, 1, 0.0, RBINSZ, NRAD, STATUS )
+        CALL BDI_PUTAXWID( OFID, 1, RBINSZ, STATUS )
       ELSE
         CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, OAPTR, STATUS )
         CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, OWPTR, STATUS )
@@ -336,7 +395,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Initialise quality to data missing
+*  Initialise quality to data missing
       CALL ARR_SUMDIM( NDIM, ODIMS, ONELM )
       IF ( QUALITY .AND. QKEEP ) THEN
         CALL BDI_CREQUAL( OFID, NDIM, ODIMS, STATUS )
@@ -345,12 +404,12 @@
         CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
       END IF
 
-*    Zero bin counts
+*  Zero bin counts
       CALL ARR_INIT1R( 0.0, ONELM, %VAL(ODPTR), STATUS )
 
-*    Bin the events
+*  Bin the events
       IF ( REG ) THEN
-        CALL EVPOLAR_REGBIN( NAZ, NRAD, RBINSIZE, NEV, %VAL(WPTR),
+        CALL EVPOLAR_REGBIN( NAZ, NRAD, RBINSZ, NEV, %VAL(WPTR),
      :                       QUALITY, QKEEP, %VAL(IQPTR), BADQUAL,
      :                     %VAL(ODPTR), %VAL(OQPTR), NREJ, STATUS )
       ELSE
@@ -360,19 +419,19 @@
      :                      STATUS )
       END IF
 
-*    Inform of events binned
+*  Inform of events binned
       CALL MSG_SETI( 'BIN', NEV - NREJ )
       CALL MSG_SETI( 'NIN', NEV )
       CALL MSG_PRNT( '^BIN events were binned out of ^NIN input.' )
 
-*    Normalise
+*  Normalise
       NORMALISE = .FALSE.
       IF ( NINDEX .EQ. 2 ) THEN
         CALL USI_GET0L( 'NORM', NORMALISE, STATUS )
       END IF
       IF ( NORMALISE .AND. ( STATUS .EQ. SAI__OK ) ) THEN
         IF ( REG ) THEN
-          CALL EVPOLAR_REGNORM( NAZ, NRAD, RBINSIZE, X0, Y0, LOX, HIX,
+          CALL EVPOLAR_REGNORM( NAZ, NRAD, RBINSZ, X0, Y0, LOX, HIX,
      :                                 LOY, HIY, %VAL(ODPTR), STATUS )
         ELSE
           CALL EVPOLAR_IRREGNORM( NAZ, NRAD, RANGE, X0, Y0, LOX, HIX,
@@ -384,12 +443,12 @@
         CALL BDI_PUTAXNORM( OFID, 2, NORMALISE, STATUS )
       END IF
 
-*    Copy ancillary stuff
+*  Copy ancillary stuff
       CALL BDI_COPTEXT( IFID, OFID, STATUS )
       CALL BDI_COPMORE( IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Re-write data units
+*  Re-write data units
       IF ( NORMALISE ) THEN
         CALL MSG_SETC( 'UN', ORUNIT )
         CALL MSG_MAKE( 'count/^UN**2', TEXT, LEN )
@@ -398,14 +457,14 @@
         CALL BDI_PUTUNITS( OFID, 'count', STATUS )
       END IF
 
-*    Update history
+*  Update history
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
       NLINE = MXTEXT
-      HTEXT(1) = ' Input {INP}'
-      HTEXT(2) = ' Binned dataset created from the LISTs : '//BNAME(1)
-      HTEXT(3) = '                                         '//BNAME(2)
+      HTEXT(1) = 'Input {INP}'
+      HTEXT(2) = 'Binned dataset created from the LISTs : '//BNAME(1)
+      HTEXT(3) = '                                        '//BNAME(2)
       WRITE (HTEXT(4), '(12X,A,I,A)') 'Containing data on ',
      :                                             NEV, ' events.'
       IF ( QUALITY ) THEN
@@ -419,10 +478,16 @@
         CALL USI_TEXT( 4, HTEXT, NLINE, STATUS )
       END IF
 
-*    Write expanded text
+*  Write expanded text
       CALL HSI_PTXT( OFID, NLINE, HTEXT, STATUS )
 
-*    Tidy up
+*  Free the selected lists
+      DO I = 1, 2
+        CALL ADI_ERASE( BLID(I), STATUS )
+        CALL EDI_UNMAP( IFID, BNAME(I), STATUS )
+      END DO
+
+*  Tidy up
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
@@ -492,7 +557,7 @@
 
 
 *+  EVPOLAR_REGBIN - Regular bin polar binning
-      SUBROUTINE EVPOLAR_REGBIN( NAZ, NRAD, RBINSIZE, NEV, POL,
+      SUBROUTINE EVPOLAR_REGBIN( NAZ, NRAD, RBINSZ, NEV, POL,
      :              GOTQUAL, QKEEP, IQUAL, BADQUAL, DATA, QUAL,
      :              NREJ, STATUS )
 *
@@ -532,7 +597,7 @@
 *    Import :
 *
       INTEGER                          NAZ, NRAD      ! # azimuthal,radial bins
-      REAL                             RBINSIZE       ! Radial bin size
+      REAL                             RBINSZ       ! Radial bin size
       INTEGER                          NEV            ! Number of events
       REAL                             POL(2,NEV)     ! Polar coordinates
       LOGICAL                          GOTQUAL        ! Got input quality list?
@@ -564,7 +629,7 @@
         IF ( NAZ .EQ. 1 ) THEN
           IF ( GOTQUAL ) THEN
             DO I = 1, NEV
-              RBIN = INT( POL(1,I) / RBINSIZE ) + 1
+              RBIN = INT( POL(1,I) / RBINSZ ) + 1
               IF ( RBIN .GT. NRAD ) THEN
                 NREJ = NREJ + 1
               ELSE
@@ -580,7 +645,7 @@
             END DO
           ELSE
             DO I = 1, NEV
-              RBIN = INT( POL(1,I) / RBINSIZE ) + 1
+              RBIN = INT( POL(1,I) / RBINSZ ) + 1
               IF ( RBIN .GT. NRAD ) THEN
                 NREJ = NREJ + 1
               ELSE
@@ -595,7 +660,7 @@
           ABINSIZE = 360.0 / REAL(NAZ)
           IF ( GOTQUAL ) THEN
             DO I = 1, NEV
-              RBIN = INT( POL(1,I) / RBINSIZE ) + 1
+              RBIN = INT( POL(1,I) / RBINSZ ) + 1
               IF ( RBIN .GT. NRAD ) THEN
                 NREJ = NREJ + 1
               ELSE
@@ -612,7 +677,7 @@
             END DO
           ELSE
             DO I = 1, NEV
-              RBIN = INT( POL(1,I) / RBINSIZE ) + 1
+              RBIN = INT( POL(1,I) / RBINSZ ) + 1
               IF ( RBIN .GT. NRAD ) THEN
                 NREJ = NREJ + 1
               ELSE
@@ -770,7 +835,7 @@
 
 
 *+  EVPOLAR_REGNORM - Normalise data array
-      SUBROUTINE EVPOLAR_REGNORM( NAZ, NRAD, RBINSIZE, CX, CY, LOX,
+      SUBROUTINE EVPOLAR_REGNORM( NAZ, NRAD, RBINSZ, CX, CY, LOX,
      :                                HIX, LOY, HIY, DATA, STATUS )
 *
 *    Description :
@@ -796,7 +861,7 @@
 *    Import :
 *
       INTEGER                          NAZ, NRAD      ! # azimuthal,radial bins
-      REAL                             RBINSIZE       ! Radial bin size
+      REAL                             RBINSZ       ! Radial bin size
       REAL                             CX,CY          ! Centre of circle
       REAL                             LOX, HIX       ! Range of rectangle in X
       REAL                             LOY, HIY       ! Range of rectangle in Y
@@ -824,7 +889,7 @@
 *-
 
       IF ( STATUS .EQ. SAI__OK ) THEN
-        RAD = RBINSIZE
+        RAD = RBINSZ
         LAST_AREA = 0.0
         DO I = 1, NRAD
           THIS_AREA = GEO_CAREA(RAD,CX,CY,LOX,HIX,LOY,HIY)
@@ -832,7 +897,7 @@
           DO J = 1, NAZ
             DATA(I,J) = DATA(I,J) / FACTOR
           END DO
-          RAD = RAD + RBINSIZE
+          RAD = RAD + RBINSZ
           LAST_AREA = THIS_AREA
         END DO
       END IF
