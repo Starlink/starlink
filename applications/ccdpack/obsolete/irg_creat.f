@@ -242,6 +242,9 @@
             CALL IRG1_FSPEC( FSPEC0, ' ', 'TYPE', TYPE, STATUS )
             IF ( TYPE .NE. ' ' ) THEN 
                IAT = INDEX( NAME, TYPE )
+               IF ( IAT .EQ. 0 ) THEN 
+                  IAT = CHR_LEN( NAME )
+               END IF
             ELSE
                IAT = CHR_LEN( NAME )
             END IF
