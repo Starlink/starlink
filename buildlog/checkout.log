@@ -4086,6 +4086,24 @@ U java/source/axis/lib/axis/saaj.jar
 U java/source/axis/lib/axis/tt-bytecode.jar
 U java/source/axis/lib/axis/wsdl4j.LICENSE
 U java/source/axis/lib/axis/wsdl4j.jar
+cvs checkout: Updating java/source/axis/src
+cvs checkout: Updating java/source/axis/src/lib
+U java/source/axis/src/lib/axis-ant.jar
+U java/source/axis/src/lib/axis.jar
+U java/source/axis/src/lib/axis.war
+U java/source/axis/src/lib/commons-discovery.LICENSE
+U java/source/axis/src/lib/commons-discovery.jar
+U java/source/axis/src/lib/commons-logging.LICENSE
+U java/source/axis/src/lib/commons-logging.jar
+U java/source/axis/src/lib/jaxrpc.jar
+U java/source/axis/src/lib/log4j-1.2.4.LICENSE
+U java/source/axis/src/lib/log4j-1.2.4.jar
+U java/source/axis/src/lib/log4j-core.jar
+U java/source/axis/src/lib/log4j.properties
+U java/source/axis/src/lib/saaj.jar
+U java/source/axis/src/lib/tt-bytecode.jar
+U java/source/axis/src/lib/wsdl4j.LICENSE
+U java/source/axis/src/lib/wsdl4j.jar
 cvs checkout: Updating java/source/axis/webapps
 U java/source/axis/webapps/axis.war
 cvs checkout: Updating java/source/axis/webapps/axis
@@ -6289,6 +6307,13 @@ U java/source/jetty/lib/jetty/javax.xml.jaxp.jar
 U java/source/jetty/lib/jetty/org.apache.crimson.jar
 U java/source/jetty/lib/jetty/org.apache.jasper.jar
 U java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+cvs checkout: Updating java/source/jetty/src
+cvs checkout: Updating java/source/jetty/src/lib
+U java/source/jetty/src/lib/javax.servlet.jar
+U java/source/jetty/src/lib/javax.xml.jaxp.jar
+U java/source/jetty/src/lib/org.apache.crimson.jar
+U java/source/jetty/src/lib/org.apache.jasper.jar
+U java/source/jetty/src/lib/org.mortbay.jetty.jar
 cvs checkout: Updating java/source/jniast
 U java/source/jniast/.properties
 U java/source/jniast/README
@@ -7162,6 +7187,9 @@ cvs checkout: Updating java/source/junit/lib/junit
 U java/source/junit/lib/junit/junit.jar
 U java/source/junit/lib/junit/src.jar
 cvs checkout: Updating java/source/junit/src
+cvs checkout: Updating java/source/junit/src/lib
+U java/source/junit/src/lib/junit.jar
+U java/source/junit/src/lib/src.jar
 cvs checkout: Updating java/source/junit/src/testcases
 cvs checkout: Updating java/source/junit/src/testcases/samples
 U java/source/junit/src/testcases/samples/AllTests.java
