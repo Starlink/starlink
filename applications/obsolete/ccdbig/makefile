@@ -958,8 +958,8 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
-	rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
-              $(OBJECT_FILES) $(TASKSRC) $(SUBSRC)
+	rm -f $(INCLUDE_LINKS) $(IFC_FILES) $(OBJECT_FILES)
+	rm -f $(PRIVATE_INCLUDES) $(IFL_FILES) $(TASKSRC) $(SUBSRC)
 	@ echo
 	@ echo '*** intermediate files removed.'
 	@ echo
