@@ -55,6 +55,8 @@
 #        Rename USEGRD to GUARD
 #     1999 May 7 (TIMJ)
 #        Add TRIM
+#     1999 May 28
+#        Add REFPIX
 #     {enter_further_changes_here}
 
 #-
@@ -171,6 +173,14 @@
       PARAMETER SIZE
          TYPE '_INTEGER'
          PROMPT 'Number of pixels in output map (NX,NY)'
+         HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER REFPIX
+         TYPE '_INTEGER'
+         PROMPT 'Location of reference pixel in output map (X,Y)'
+         VPATH 'DYNAMIC,PROMPT'
+         PPATH 'DYNAMIC'
          HELPKEY '*'
       ENDPARAMETER
 
