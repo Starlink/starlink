@@ -30,11 +30,13 @@
 #        After a call to this method, the user may no longer interact 
 #        with the widget to add points etc.
 #
-#     loadndf slot ndf ?percs? ?maxcanv?
+#     loadndf slot ndf ?frame? ?percs? ?maxcanv?
 #        This method loads an NDF into the viewer.
 #           - slot     -- Either "A" or "B", to identify whether this is
 #                         the A or B NDF.
 #           - ndf      -- ndf object
+#           - frame    -- The frame into which to resample the NDF before
+#                         plotting.  If absent, the current frame is used.
 #           - percs    -- If present, this is a two-element list giving the 
 #                         percentile bounds between which the display of the
 #                         NDF should be made.  If absent, a default is used.
@@ -124,6 +126,7 @@
 #  testing for their non-existence before they have been set.
       foreach slot { A B } {
          set ndf($slot) ""
+         set wcsframe($slot) ""
          set ndfname($slot) ""
          set ndfshort($slot) ""
          set present($slot) 0
@@ -162,7 +165,8 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public method loadndf { slot ndfob { percs { 0 100 } } { maxcanv 0 } } {
+      public method loadndf { slot ndfob { frame CURRENT } { percs { 0 100 } } 
+                                                           { maxcanv 0 } } {
 #-----------------------------------------------------------------------
 
 #  Validate the slot identifier.
@@ -185,6 +189,7 @@
 
 #  Store the ndf object.
          set ndf($slot) $ndfob
+         set wcsframe($slot) $frame
 
 #  Validate and store the display percentiles.
          if { [ llength $percs ] != 2 } {
@@ -197,7 +202,7 @@
          regsub {.*[./]} $ndfname($slot) {} ndfshort($slot)
 
 #  Write info string substitution variables.
-         set infodata($slot,f) [ $ndf($slot) frameatt Domain CURRENT ]
+         set infodata($slot,f) [ $ndf($slot) frameatt Domain $wcsframe($slot) ]
          set infodata($slot,N) $ndfname($slot)
          set infodata($slot,n) $ndfshort($slot)
          set infodata($slot,h) [ expr [ lindex [ lindex $bounds 0 ] 1 ] - \
@@ -212,7 +217,7 @@
             [ expr [ lindex [ lindex $bounds 1 ] 1 ] ]
 
 #  Store coordinates of the bounding box in the frame we are using.
-         set bbox [ $ndf($slot) bbox CURRENT ]
+         set bbox [ $ndf($slot) bbox $wcsframe($slot) ]
          set xlo($slot) [ lindex [ lindex $bbox 0 ] 0 ]
          set xhi($slot) [ lindex [ lindex $bbox 0 ] 1 ]
          set ylo($slot) [ lindex [ lindex $bbox 1 ] 0 ]
@@ -229,8 +234,8 @@
          if { $present(A) && $present(B) } {
 
 #  Compare the pixel sizes of the two NDFs in their selected frames.
-            set pa [ $ndf(A) pixelsize CURRENT ]
-            set pb [ $ndf(B) pixelsize CURRENT ]
+            set pa [ $ndf(A) pixelsize $wcsframe(A) ]
+            set pb [ $ndf(B) pixelsize $wcsframe(B) ]
             if { [ max [ expr $pa / $pb ] [ expr $pb / $pa ] ] > 20 } {
                ccdputs -log "  There is a gross discrepancy in pixel sizes; "
                             "alignment will be difficult."
@@ -329,7 +334,7 @@
       public method maxcanvas {} {
 #-----------------------------------------------------------------------
          foreach slot { A B } {
-            set bb [ $ndf($slot) bbox CURRENT ]
+            set bb [ $ndf($slot) bbox $wcsframe($slot) ]
             set x($slot) [ expr [ lindex [ lindex $bb 0 ] 1 ] - \
                                 [ lindex [ lindex $bb 0 ] 0 ] ]
             set y($slot) [ expr [ lindex [ lindex $bb 1 ] 1 ] - \
@@ -372,7 +377,8 @@
          foreach p [ points ] {
             set pfrm [ list [ expr [ lindex $p 1 ] - $xoff($slot) ] \
                             [ expr [ lindex $p 2 ] - $yoff($slot) ] ]
-            set ppix [ lindex [ $ndf($slot) wcstran CURRENT $frame $pfrm ] 0 ]
+            set ppix [ lindex [ $ndf($slot) wcstran $wcsframe($slot) $frame \
+                                $pfrm ] 0 ]
             lappend rp [ list [ lindex $p 0 ] \
                               [ lindex $ppix 0 ] [ lindex $ppix 1 ] ]
          }
@@ -473,7 +479,7 @@
 #  the canvas.
          foreach slot { A B } {
             set vertices ""
-            foreach pt [ $ndf($slot) polygon CURRENT ] {
+            foreach pt [ $ndf($slot) polygon $wcsframe($slot) ] {
                set cpt [ view2canv [ expr $xoff($slot) + [ lindex $pt 0 ] ] \
                                    [ expr $yoff($slot) + [ lindex $pt 1 ] ] ]
                lappend vertices [ lindex $cpt 0 ] [ lindex $cpt 1 ]
@@ -487,9 +493,9 @@
             ndfdrawpair [ gwmname ]/GWM \
                $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ] \
                $zoomfactor \
-               $ndf(A) CURRENT $xoff(A) $yoff(A) \
+               $ndf(A) $wcsframe(A) $xoff(A) $yoff(A) \
                [ lindex $percentiles(A) 0 ] [ lindex $percentiles(A) 1 ] \
-               $ndf(B) CURRENT $xoff(B) $yoff(B) \
+               $ndf(B) $wcsframe(B) $xoff(B) $yoff(B) \
                [ lindex $percentiles(B) 0 ] [ lindex $percentiles(B) 1 ] \
          ]
          # $canvas create oval -5 -5 5 5 -fill yellow
@@ -642,6 +648,7 @@
       private variable ndfshort        ;# Short name of NDF
       private variable percentiles     ;# Display percentiles for NDF
       private variable present         ;# Is slot occupied by a valid NDF?
+      private variable wcsframe        ;# Frame into which NDF is resampled
       private variable xlo             ;# Lower X bounding box frame coordinate
       private variable xhi             ;# Upper X bounding box frame coordinate
       private variable xoff            ;# X origin frame coordinate offset

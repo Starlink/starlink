@@ -181,8 +181,8 @@
          raise $aligner
          set percA [ $chooser percentiles $iA ]
          set percB [ $chooser percentiles $iB ]
-         $aligner loadndf A $ndfs($iA) $percA $MAXCANV
-         $aligner loadndf B $ndfs($iB) $percB $MAXCANV
+         $aligner loadndf A $ndfs($iA) CURRENT $percA $MAXCANV
+         $aligner loadndf B $ndfs($iB) CURRENT $percB $MAXCANV
          $aligner activate
          tkwait variable alignstate
          set MAXCANV [ $aligner maxcanvas ]
