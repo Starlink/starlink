@@ -150,6 +150,7 @@
 *
 *        After this process, the NDFs can be presented to TRANNDF for
 *        resampling prior to making a mosaic.
+*
 *     wcsreg "obs1_*,obs2_*" outdomain=final 
 *            domains=[ccd_reg,inst_obs1,inst_obs2]
 *        NDFs with names starting 'obs1_' and 'obs2_' are aligned.
@@ -160,6 +161,17 @@
 *        instrument, and may have been added to the WCS component
 *        using the ASTIMP application.  The name FINAL is used for the
 *        new domain added to the WCS component.
+*    
+*     wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 [sky]
+*        Here wcsreg is being used with a somewhat different intent.
+*        The images named are already fully aligned in the 
+*        SKY frame, but executing this command has the effect of 
+*        aligning them in a new frame which is a copy of the pixel
+*        frame of 'skyfr2'.  Since this has units which are the size
+*        of pixels, the resulting image files are suitable for 
+*        resampling using TRANNDF.  This would not have been the case
+*        for the files initially, since the coordinates of SKY frames
+*        in units of radians.
 
 *  Behaviour of parameters:
 *     Most parameters retain their current value as default. The
