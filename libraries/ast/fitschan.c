@@ -211,6 +211,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     10-DEC-1997 (DSB):
 *        Bug fixed which caused the initial character designating the system 
 *        within CTYPE value (eg E in ELON, G in GLON, etc) to be omitted.
+*     1-JUN-1998 (DSB):
+*        CDELT values of zero are now replaced by a small non-zero value
+*        when creating the "pixel-to-relative physical" transformation
+*        matrix. Previously, zero CDELT values could cause the matrix to
+*        be non-invertable.
 *class--
 */
 
@@ -11930,8 +11935,24 @@ static AstMatrixMap *WcsMatrix( FitsStore *store, const char *method,
 /* Store the number of axes. */
    naxis = store->naxis;   
 
-/* Store a pointer to the CDELT values. */
-   dvals = store->cdelt;
+/* Take a copy of the CDELT values. */
+   dvals = (double *) astStore( NULL, store->cdelt, 
+                                sizeof( double )*(size_t)naxis );
+
+/* If any CDELT values are zero, use one hundredth of the corresponding
+   CRVAL value instead, or 1.0 if CRVAL is zero. Otherwise, the zeros
+   could cause the matrix to be non-invertable. The Mapping could then not
+   be simplified or used by a Plot. CDELT values of zero are usually used
+   to indicate "redundant" axes. For instance, a 2D image may be stored
+   as a 3D cube with a single plane with the "redundant" 3rd axis used 
+   to specify the wavelength of the filter. The actual value used for CDELT
+   shouldn't matter since the axis only spans a single pixel anyway. */
+   for( i = 1; i < naxis; i++ ){
+      if( dvals[ i ] == 0.0 ) {
+         dvals[ i ] = 0.01*(store->crval)[ i ];
+         if( dvals[ i ] == 0.0 ) dvals[ i ] = 1.0;
+      }
+   }
 
 /* First deal with cases where a "PC" matrix is available. */
    if( store->pc ){
@@ -12017,6 +12038,9 @@ static AstMatrixMap *WcsMatrix( FitsStore *store, const char *method,
    } else {
       new = astMatrixMap( naxis, naxis, 1, dvals, "" );
    }      
+
+/* Release the memory used to hold the CDELT values. */
+   dvals = (double *) astFree( (void *) dvals );
 
 /* If an error has occurred, attempt to annul the returned MatrixMap. */
    if( !astOK ) new = astAnnul( new );
