@@ -224,6 +224,7 @@
       LOGICAL MAKET              ! Angle output required?
       LOGICAL VAR                ! Output variances required?
       REAL NSIGMA                ! No. of sigmas to clip at
+      REAL TR2( 4 )              ! Coeffs. of mapping from cell indices to coordinates
       REAL WLIM                  ! Min. fraction of good input pixels per bin
       DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
 *.
@@ -561,8 +562,15 @@
 *  Calculate the output arrays.
 *  ============================
 
+*  Store the coefficients of the transformation between cell indices and
+*  cell centre (X,Y) coordinates 9for the catalogue).
+      TR2( 1 ) = 0.5 - REAL( LBND( 1 ) ) 
+      TR2( 2 ) = 1.0
+      TR2( 3 ) = 0.5 - REAL( LBND( 2 ) ) 
+      TR2( 4 ) = 1.0
+
 *  Call the routine to do the work.
-      CALL POL1_PLVEC( LBND, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 
+      CALL POL1_PLVEC( TR2, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 
      :                 %VAL( IPVBIN ), STOKES, DEBIAS, VAR, MAKEI, 
      :                 MAKEP, MAKET, MAKEIP, MAKECT, CI, %VAL( IPI ), 
      :                 %VAL( IPP ), %VAL( IPT ), %VAL( IPIP ), 

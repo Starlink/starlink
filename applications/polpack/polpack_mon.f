@@ -73,6 +73,9 @@
       IF ( NAME .EQ. 'DATAPIC' ) THEN
          CALL DATAPIC( STATUS )
 
+      ELSE IF ( NAME .EQ. 'POLBIN' ) THEN
+         CALL POLBIN( STATUS )
+
       ELSE IF ( NAME .EQ. 'POLCAL' ) THEN
          CALL POLCAL( STATUS )
 

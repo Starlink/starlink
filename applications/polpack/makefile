@@ -439,7 +439,8 @@ kpg1_odthr.f kpg1_odtrn.f kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f \
 kpg1_plot.f kpg1_prnth.f kpg1_rcatw.f kpg1_vect.f kpg1_wread.f \
 kpg1_wwrt.f kps1_vecky.f pol1_vecpl.f polplot.f kpg1_rdast.f kpg1_wrast.f \
 kpg1_short.f kpg1_isscs.f kpg1_h2ast.f kpg1_ast2h.f kpg1_chscs.f \
-kpg1_seteq.f kpg1_asget.f kpg1_wcatw.f
+kpg1_seteq.f kpg1_asget.f kpg1_wcatw.f pol1_squar.f pol1_clcnt.f \
+pol1_stk2.f pol1_setd.f polbin.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -478,7 +479,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 #  List of applications/tasks in monolith.
 
 TASKS = polhelp polmap polka datapic polcent segment polcal polimp \
-polexp polvec polplot
+polexp polvec polplot polbin
 
 #  Monolith routine source name.
 
@@ -495,7 +496,8 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 #  List of task interface files.
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polka.ifl \
-segment.ifl polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl
+segment.ifl polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl \
+polbin.ifl
 
 #  List of help library sources.
 
@@ -514,7 +516,8 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 LATEX_DOCS = polka.tex polmap.tex
 HYPERTEXT_DOCS = 
-HYPERTEXT_HELP = polka.htx polmap.htx
+#HYPERTEXT_HELP = polka.htx polmap.htx
+HYPERTEXT_HELP = 
 
 #  List of documentation files.
 
@@ -1681,6 +1684,11 @@ kpg1_chscs.o:	SAE_PAR DAT_PAR PRM_PAR
 kpg1_seteq.o:	SAE_PAR PRM_PAR
 kpg1_asget.o:	SAE_PAR NDF_PAR AST_PAR
 kpg1_wcatw.o:	AST_PAR CAT_PAR DAT_PAR GRP_PAR KPG_AST KPG_PAR SAE_PAR
+pol1_squar.o:	SAE_PAR PRM_PAR
+pol1_clcnt.o:	SAE_PAR PRM_PAR
+pol1_stk2.o:	SAE_PAR PRM_PAR
+pol1_setd.o:	SAE_PAR 
+polbin.o:	SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR
 #-------------------------------------------------------------------------------
 #
 #  End of makefile.

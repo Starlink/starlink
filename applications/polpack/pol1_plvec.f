@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_PLVEC( LBND, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
+      SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
      :                       STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, 
      :                       MAKEIP, MAKECT, CI, AI, AP, AT, AIP, AIV, 
      :                       APV, ATV, AIPV, STATUS )
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL POL1_PLVEC( LBND, NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
+*      CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
 *                       DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, MAKECT, 
 *                       CI, AI, AP, AT, AIP, AIV, APV, ATV, AIPV, STATUS )
 
@@ -22,8 +22,11 @@
 *     requested) variances for each pixel.
 
 *  Arguments:
-*     LBND( 2 ) = INTEGER (Given)
-*        The lower pixel bounds on the first two axes.
+*     TR( 4 ) = _REAL (Given)
+*        The coefficients of the transformation which converts cell indices
+*        into (X,Y) values to be stored in the catalogue (if required). 
+*           X = TR( 1 ) + TR( 2 )*REAL( IPIX )  ( IPIX = 1, NPIX )
+*           Y = TR( 3 ) + TR( 4 )*REAL( IROW )  ( IROW = 1, NROW )
 *     NPIX = INTEGER (Given)
 *        The number of pixels per row in STOKE and VSTOKE.
 *     NROW = INTEGER (Given)
@@ -100,7 +103,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
 
 *  Arguments Given:
-      INTEGER LBND( 2 )
+      REAL TR( 4 )
       INTEGER NPIX
       INTEGER NROW 
       INTEGER NPLANE
@@ -411,9 +414,9 @@
      :                            IP .NE. VAL__BADR ) ) THEN
 
 *  Store values for all the catalogue columns in the current row buffer.
-                  CALL CAT_PUT0R( XCAT, REAL( PIX - LBND( 1 ) ) + 0.5,
+                  CALL CAT_PUT0R( XCAT, TR( 1 ) + TR( 2 )*REAL( PIX ),
      :                            .FALSE., STATUS )
-                  CALL CAT_PUT0R( YCAT, REAL( ROW - LBND( 2 ) ) + 0.5,
+                  CALL CAT_PUT0R( YCAT, TR( 3 ) + TR( 4 )*REAL( ROW ),
      :                            .FALSE., STATUS )
                   CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                            STATUS )
@@ -621,9 +624,9 @@
      :                            IP .NE. VAL__BADR ) ) THEN
 
 *  Store values for all the catalogue columns in the current row buffer.
-                  CALL CAT_PUT0R( XCAT, REAL( PIX - LBND( 1 ) ) + 0.5,
+                  CALL CAT_PUT0R( XCAT, TR( 1 ) + TR( 2 )*REAL( PIX ),
      :                            .FALSE., STATUS )
-                  CALL CAT_PUT0R( YCAT, REAL( ROW - LBND( 2 ) ) + 0.5,
+                  CALL CAT_PUT0R( YCAT, TR( 3 ) + TR( 4 )*REAL( ROW ),
      :                            .FALSE., STATUS )
                   CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                            STATUS )
