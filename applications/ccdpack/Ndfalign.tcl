@@ -26,6 +26,9 @@
 #        have been passed to it.  This method should normally be called 
 #        only after a pair of images has been loaded in using loadndf.
 #
+#     clearpoints
+#        Removes all the points from the position lists and the canvas.
+#
 #     deactivate
 #        After a call to this method, the user may no longer interact 
 #        with the widget to add points etc.
@@ -63,19 +66,21 @@
 #        Returns a boolean value indicating whether the two images 
 #        have a non-empty overlap as currently offset.
 #
-#     pointsndf slot frame
+#     points slot frame
 #        This method returns the list of selected points of the image
 #        currently loaded into the indicated slot.  The points will be
-#        given in coordinates of the indicated frame.
-#        At any given time the method will return a list for both slots 
-#        representing the same set of points, but since the offsets of
-#        the two are different, the elements of the lists are different.
-#        The returned list has the same format as for the points method
-#        of the Gwmview class; one element for each marked point, each 
-#        element being of the form {index xpos ypos}.
+#        given in coordinates of the indicated frame.  Each element
+#        of the point list is of the form {index xpos ypos}.
 #           - slot     -- Either "A" or "B" to identify the image.
 #           - frame    -- Coordinate frame in which to return coords.
 #                         Numeric index, domain name, CURRENT or BASE.
+#
+#     refreshpoints
+#        Ensures that all the known points are drawn on the images.
+#
+#     removepoint ipoint
+#        Removes the point with the given index from the canvas and the
+#        list of known points.
 #
 #     Ndfalign also inherits all the public methods of Gwmview.
 
@@ -90,6 +95,16 @@
 #           - %f  -- Domain of WCS frame used
 #           - %p  -- Number of pixels ('X x Y' (single) or 'N pixels' (Set))
 #           - %b  -- Pixel bounds ('[X1:X2,Y1:Y2]' (single) or '' (Set))
+#
+#     markstyleA = string
+#        The value which indicates the style of marker drawn corresponding
+#        to features on the image in slot A.  See the Markstylecontrol
+#        widget for syntax.
+#
+#     markstyleB = string
+#        The value which indicates the style of marker drawn corresponding
+#        to features on the image in slot B.  See the Markstylecontrol
+#        widget for syntax.
 #
 #     title = string
 #        This gives a title to show in the title bar which the window
@@ -120,6 +135,10 @@
 #        Original version.
 #     8-MAR-2001 (MBT):
 #        Upgraded for use with Sets.
+#     19-JUL-2001 (MBT):
+#        Added centroidig, and moved position marking methods into 
+#        this widget from Gwmview (this widget gets two Markercontrol 
+#        widgets to do the work).
 
 #-
 
@@ -142,20 +161,48 @@
          set present($slot) 0
          set nndf($slot) 0
       }
+
+#  Set aliases for some widget components.
       set canvas [ canvas ]
+      set panel [ panel ]
+
+#  Add some groups to the control panel.
+      addgroup markers Markers
+
+#  Construct additional control widgets for marker selection.
+      set side(A) "left"
+      set side(B) "right"
+      foreach slot { A B } {
+         itk_component add markers$slot {
+            markercontrol $panel.mark$slot \
+               -canvas $canvas \
+               -view2canvcmd [ code $this view2canv ] \
+               -shownumcontrol 0 \
+               -value "" \
+               -valuevar markstyle$slot
+         }
+         set marklist($slot) $itk_component(markers$slot)
+         [ $marklist($slot) component markstylecontrol ] configure \
+            -balloonstr "Marker style for $side($slot) hand image"
+         addcontrol $marklist($slot) markers
+      }
+
+#  Rearrange the control groups on the control panel in a different order.
+      set grpwins {}
+      foreach group { zoom markers action } {
+         lappend grpwins [ groupwin $group ]
+      }
+      eval pack forget $grpwins
+      eval pack $grpwins -side left -fill y
 
 #  Split the info panel into two parts.
-      itk_component add infofrmA {
-         frame $itk_component(info).frmA 
-      }
-      itk_component add infoA {
-         label $itk_component(infofrmA).infoA
-      }
-      itk_component add infofrmB {
-         frame $itk_component(info).frmB
-      }
-      itk_component add infoB {
-         label $itk_component(infofrmB).infoB
+      foreach slot { A B } {
+         itk_component add infofrm$slot {
+            frame $itk_component(info).frm$slot 
+         }
+         itk_component add info$slot {
+            label $itk_component(infofrm$slot).info$slot
+         }
       }
       pack $itk_component(infofrmA) $itk_component(infofrmB) \
            -side left -fill x -expand 1
@@ -407,10 +454,10 @@
 
 
 #-----------------------------------------------------------------------
-      public method pointsndf { slot frame } {
+      public method points { slot frame } {
 #-----------------------------------------------------------------------
          set rp {}
-         foreach p [ points ] {
+         foreach p [ $marklist($slot) points ] {
             set pfrm [ list [ expr [ lindex $p 1 ] - $xoff($slot) ] \
                             [ expr [ lindex $p 2 ] - $yoff($slot) ] ]
             set ppix [ lindex [ $ndfset($slot) wcstran $wcsframe($slot) \
@@ -419,6 +466,33 @@
                               [ lindex $ppix 0 ] [ lindex $ppix 1 ] ]
          }
          return $rp
+      }
+
+
+#-----------------------------------------------------------------------
+      public method clearpoints {} {
+#-----------------------------------------------------------------------
+         foreach slot { A B } {
+            $marklist($slot) clearpoints
+         }
+      }
+
+
+#-----------------------------------------------------------------------
+      public method removepoint { ipoint } {
+#-----------------------------------------------------------------------
+         foreach slot { A B } {
+            $marklist($slot) removepoint $ipoint
+         }
+      }
+
+
+#-----------------------------------------------------------------------
+      public method refreshpoints {} {
+#-----------------------------------------------------------------------
+         foreach slot { A B } {
+            $marklist($slot) refreshpoints
+         }
       }
 
 
@@ -575,18 +649,43 @@
             }
          }
 
-#  If we are in the overlap region, add a point.
+#  If we are in the overlap region, try to add a point.
          if { $olap } {
             set viewpos [ canv2view $cx $cy ]
             set vx [ lindex $viewpos 0 ]
             set vy [ lindex $viewpos 1 ]
-            set ipoint [ addpoint $vx $vy ]
-            set tag mark$ipoint
-            $canvas bind $tag <Button-3> [ code $this removepoint $ipoint ]
-            $canvas bind $tag <Button-1> [ $canvas bind gwmitem <Button-1> ]
+
+#  Try to centroid it on both images.
+            set fail 0
+            foreach slot { A B } {
+               if { ! $fail } {
+                  set svx [ expr $vx - $xoff($slot) ]
+                  set svy [ expr $vy - $yoff($slot) ]
+                  set fail [ catch { $ndfset($slot) centroid $svx $svy \
+                                     $wcsframe($slot) $zoom } accpos($slot) ]
+               }
+            }
+
+#  If centroiding failed, just beep and forget it.
+            if { $fail } {
+               bell
+
+#  If centroiding was successful in both, add the points and bind actions.
+            } else {
+               foreach slot { A B } {
+                  set avx [ expr [ lindex $accpos($slot) 0 ] + $xoff($slot) ]
+                  set avy [ expr [ lindex $accpos($slot) 1 ] + $yoff($slot) ]
+                  set ipoint [ $marklist($slot) addpoint $avx $avy ]
+                  set tag [ $marklist($slot) gettag $ipoint ]
+                  $canvas bind $tag <Button-3> \
+                     [ code $this removepoint $ipoint ]
+                  $canvas bind $tag <Button-1> \
+                     [ $canvas bind gwmitem <Button-1> ]
+               }
+            }
 
 #  If we are not in an overlap and no points exist, start a drag sequence.
-         } elseif { [ llength [ points ] ] == 0 } {
+         } elseif { [ llength [ $marklist(A) points ] ] == 0 } {
             set inmotion $slot
             set xlast [ set xfirst $cx ]
             set ylast [ set yfirst $cy ]
@@ -677,6 +776,19 @@
       }
 
 
+#-----------------------------------------------------------------------
+      public variable markstyleA {} {
+#-----------------------------------------------------------------------
+      }
+         
+
+#-----------------------------------------------------------------------
+      public variable markstyleB {} {
+#-----------------------------------------------------------------------
+      }
+         
+
+
 ########################################################################
 #  Private variables.
 ########################################################################
@@ -687,6 +799,7 @@
 #  to which NDF they refer to.
       private variable infodata        ;# Array holding substitution strings
       private variable fullname        ;# Full name of NDF Set
+      private variable marklist        ;# Marker control widget
       private variable ndfset          ;# Tcl ndf object
       private variable nndf            ;# Number of member NDFs
       private variable percentiles     ;# Display percentiles for NDF
