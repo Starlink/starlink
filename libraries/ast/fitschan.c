@@ -26549,7 +26549,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 /* Extract the projection type as specified by the last 4 characters 
    in the CTYPE keyword value. This will be AST__WCSBAD for non-celestial
    axes. */
-         prj = astWcsPrjType( cval + 4 );
+         prj = ( strlen( cval ) > 4 ) ? astWcsPrjType( cval + 4 ) : AST__WCSBAD;
 
 /* If the projection type is "TPN" (an AST-specific code) convert it to
    standard FITS-WCS code "TAN" and change the prefix for projection 
