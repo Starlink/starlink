@@ -95,6 +95,8 @@
       PARAMETER ( AST__NEAREST = 1 )
       INTEGER AST__LINEAR
       PARAMETER ( AST__LINEAR = 2 )
+      INTEGER AST__SINC
+      PARAMETER ( AST__SINC = 3 )
 
 *  CmpMap class.
       INTEGER AST_CMPMAP

@@ -255,6 +255,10 @@
 #endif
 #define AST__NEAREST ( (void *) 1 ) /* Use pixel with nearest centre */
 #define AST__LINEAR ( (void *) 2 ) /* Simple linear interpolation */
+#define AST__SINC ( (void *) 3 ) /* Sinc interpolation */
+#define AST__SQRSINC ( (void *) 4 ) /* Squared sinc interpolation */
+#define AST__SINCSINC ( (void *) 4 ) /* sinc(x)sinc(x/2) interpolation */
+#define AST__GAUSINC ( (void *) 5 ) /* Gaussian * sinc interpolation */
 
 /* Type Definitions. */
 /* ================= */
