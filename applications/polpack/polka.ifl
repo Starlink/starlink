@@ -89,9 +89,9 @@ interface POLKA
       position 1
       type     NDF
       access   READ
-      vpath    'PROMPT '
-      ppath    'GLOBAL '
-      association <->GLOBAL.DATA_ARRAY
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
       prompt   'Input object frames'
       helpkey  '*'
    endparameter

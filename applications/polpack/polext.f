@@ -203,12 +203,14 @@
       IF( .NOT. QUIET ) THEN
          IF( NNDF .GT. 1 ) THEN
             CALL MSG_SETI( 'N', NNDF )
-            CALL MSG_OUT( ' ', '  ^N input images to process... ',
-     :                    STATUS )
+            CALL MSG_OUT( 'POLEXT_MSG1', '  ^N input images to '//
+     :                    'process... ', STATUS )
          ELSE IF( NNDF .EQ. 1 ) THEN
-            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+            CALL MSG_OUT( 'POLEXT_MSG2', '  1 input image to '//
+     :                    'process... ',STATUS )
          ELSE
-            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
+            CALL MSG_OUT( 'POLEXT_MSG3', '  NO input images to '//
+     :                    'process. ',STATUS )
             GO TO 999
          END IF
    
@@ -275,7 +277,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'ACTVAL', SIZE )
             CALL MSG_SETI( 'NVAL', NNDF )
-            CALL ERR_REP( 'POLEXT_3', 'Only ^ACTVAL values '//
+            CALL ERR_REP( 'POLEXT_1', 'Only ^ACTVAL values '//
      :                    'supplied for parameter %IMGID. ^NVAL are '//
      :                    'required.', STATUS )
 
@@ -287,7 +289,7 @@
                IF( IMG .EQ. ' ' ) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'ITH', I )      
-                  CALL ERR_REP( 'POLEXT_1', 'The ^ITH value supplied '//
+                  CALL ERR_REP( 'POLEXT_2', 'The ^ITH value supplied '//
      :                          'for parameter %IMGID is blank.', 
      :                          STATUS )
                   GO TO 999
@@ -302,7 +304,7 @@
                      CALL MSG_SETC( 'ITH', CHR_NTH( I ) )      
                      CALL MSG_SETI( 'JTH', J )      
                      CALL MSG_SETC( 'JTH', CHR_NTH( J ) )      
-                     CALL ERR_REP( 'POLEXT_1', 'The ^ITH and the '//
+                     CALL ERR_REP( 'POLEXT_3', 'The ^ITH and the '//
      :                             '^JTH values supplied for '//
      :                             'parameter %IMGID are equal '//
      :                             '("^ID").', STATUS )
@@ -349,8 +351,8 @@
 *  Write out name of this NDF.
          IF( .NOT. QUIET ) THEN
             CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
-            CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
-     :                    STATUS )
+            CALL MSG_OUT( 'POLEXT_MSG4', '  Processing '//
+     :                    '''^CURRENT_NDF''', STATUS )
          END IF
 
 *  Get the input NDF identifier
@@ -407,7 +409,7 @@
 
             IF( WPL .EQ. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'POLEXT_1', 'No WPLATE value supplied.',
+               CALL ERR_REP( 'POLEXT_4', 'No WPLATE value available.',
      :                       STATUS )
             END IF
 
@@ -433,8 +435,8 @@
 
 *  Tell the user if the extension is empty.
             IF( NCOMP .EQ. 0 ) THEN
-               CALL MSG_OUT( ' ', '   The POLPACK extension is empty',
-     :                       STATUS )
+               CALL MSG_OUT( 'POLEXT_MSG5', '   The POLPACK extension'//
+     :                       ' is empty.', STATUS )
            
 *  Otherwise, index through the structure's components, obtaining locators 
 *  and the required information.
@@ -465,7 +467,7 @@
                   END IF
 
 *  Display the output buffer.
-                  CALL MSG_OUT( ' ', BUF, STATUS )
+                  CALL MSG_OUT( 'POLEXT_MSG6', BUF, STATUS )
 
 *  Annul the component locator.
                   CALL DAT_ANNUL( CLOC, STATUS )
@@ -509,7 +511,7 @@
       CALL GRP_GRPSZ( IGRP2, NGOOD, STATUS )
       IF( NGOOD .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLEXT_ALLBAD', 'None of the input images '//
+         CALL ERR_REP( 'POLEXT_5', 'None of the input images '//
      :                 'were processed successfully.', STATUS )
       END IF
 
@@ -539,7 +541,7 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'POLEXT_ERR', 'POLEXT: Error examining or '//
+         CALL ERR_REP( 'POLEXT_6', 'POLEXT: Error examining or '//
      :                 'setting POLPACK extension values.', STATUS )
       END IF
 
