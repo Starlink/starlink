@@ -131,7 +131,7 @@
 *
 *  Get the sort control information from the user
       CALL XRTSORT_RANGESELECT(HEAD,SRT,BSRT,SDIM,BDIM,NRBIN,NAZBIN,
-     :                                                      STATUS)
+     :                                  MDIM,MRES,SMPTR,BMPTR,STATUS)
 
       CALL USI_TASSOCO('SRCFILE',SRT.DTYPE,SID,STATUS)
       CALL ADI1_GETLOC(SID,LOCS,STATUS)
@@ -142,11 +142,6 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*   Create spatial masks where needed
-      IF (SRT.IMAGE.OR.SRT.SHAPE.EQ.'I') THEN
-        CALL XRTSORT_CRE_MASK(HEAD,SRT,BSRT,SDIM,NRBIN,
-     :                      MDIM,MRES,SMPTR,BMPTR,STATUS)
-      ENDIF
 
 *  Sorting to a binned data set ?
       IF ( SRT.DTYPE .EQ. 'BinDS') THEN
@@ -1274,8 +1269,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
 
 *+XRTSORT_CRE_MASK - Create spatial mask
-      SUBROUTINE XRTSORT_CRE_MASK(HEAD, SRT, BSRT, SDIM, NRBIN,
-     &                             MDIM,MRES,SMPTR,BMPTR,STATUS )
+      SUBROUTINE XRTSORT_CRE_MASK(HEAD,SRT,RESFACT,MDIM,MRES,MPTR,
+     :                                                     STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -1291,50 +1286,23 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_SCFDEF/ SRT
-      RECORD /XRT_SCFDEF/ BSRT
       RECORD /XRT_HEAD/ HEAD
-*
-      INTEGER SDIM(7)                           ! Dimensions of binned axes
-      INTEGER NRBIN                             ! Number of radial bins
+      INTEGER RESFACT
 *    Import-Export :
 *    Export :
       INTEGER MDIM(2)				! Dimensions of mask
       REAL MRES					! Resolution of mask
-      INTEGER SMPTR,BMPTR			! Pointers to mask
+      INTEGER MPTR				! Pointers to mask
 *    Status :
       INTEGER STATUS
 *    Local variables :
       CHARACTER*40 UNITS(2)
       REAL BASE(2),SCALE(2)
-      REAL LOW,HIGH                             ! Range of each axis
-      REAL PTOD                                 ! Pixels to degrees conversion
 *-
-*   Check status - return if bad
-      IF (STATUS .NE. SAI__OK) RETURN
-*
-*  if output contains an image - create mask of same dimensions
-      IF (SRT.IMAGE) THEN
-        MDIM(1)=SDIM(1)
-        MDIM(2)=SDIM(2)
-        PTOD = HEAD.PIXEL/3600.
-        HIGH= - (SRT.MAX_X - HEAD.SKYCX) * PTOD
-        LOW = - (SRT.MIN_X - HEAD.SKYCX) * PTOD
-        SCALE(1)=(HIGH-LOW)/REAL(MDIM(1))
-        BASE(1)=LOW+SCALE(1)/2.0
-        SCALE(1)=(HIGH-LOW)/REAL(MDIM(1))
-        BASE(1)=LOW+SCALE(1)/2.0
-        IF (HEAD.YSTART.LT.0) THEN
-          HIGH= - (SRT.MIN_Y - HEAD.SKYCY) * PTOD
-          LOW = - (SRT.MAX_Y - HEAD.SKYCY) * PTOD
-        ELSE
-          LOW= (SRT.MIN_Y - HEAD.SKYCY) * PTOD
-          HIGH = (SRT.MAX_Y - HEAD.SKYCY) * PTOD
-        ENDIF
-        SCALE(2)=(HIGH-LOW)/REAL(MDIM(2))
-        BASE(2)=LOW+SCALE(2)/2.0
-      ELSE
-*  set resolution to 8 raw pixels to avoid gigantic array size
-        MRES=8.0
+      IF (STATUS .EQ. SAI__OK) THEN
+
+*  set resolution to factorof 8 raw pixels to avoid gigantic array size
+        MRES=REAL(RESFACT)*8.0
         IF (HEAD.ORIGIN.EQ.'MPE') THEN
           MDIM(1)=INT(ABS(HEAD.XEND-HEAD.XSTART)/MRES)
           MDIM(2)=INT(ABS(HEAD.YEND-HEAD.YSTART)/MRES)
@@ -1346,23 +1314,107 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         SCALE(2)=HEAD.PIXEL*MRES/3600.0
         BASE(1)=-MDIM(1)/2*SCALE(1)+SCALE(1)/2.0
         BASE(2)=-MDIM(2)/2*SCALE(2)+SCALE(2)/2.0
-      ENDIF
-      UNITS(1)='degrees'
-      UNITS(2)='degrees'
-*
-      CALL DYN_MAPI(2,MDIM,SMPTR,STATUS)
-      CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(SMPTR),STATUS)
-      IF (SRT.BCKGND) THEN
-        CALL DYN_MAPI(2,MDIM,BMPTR,STATUS)
-        CALL ARX_MASK(BSRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(BMPTR),
-     :                                                     STATUS)
+        UNITS(1)='degrees'
+        UNITS(2)='degrees'
+
+        CALL DYN_MAPI(2,MDIM,MPTR,STATUS)
+        CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(MPTR),STATUS)
+
+        IF (STATUS .NE. SAI__OK) THEN
+          CALL ERR_REP(' ',' from XRTSORT_CRE_MASK',STATUS)
+        ENDIF
+
       ENDIF
 
+      END
+
+
+*+XRTSORT_SCAN_MASK - Create spatial mask
+      SUBROUTINE XRTSORT_SCAN_MASK(HEAD,MDIM1,MDIM2,MASK,MRES,XC,YC,
+     :                                   XMIN,XMAX,YMIN,YMAX,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'INC_XRTHEAD'
+*    Structure definitions :
+*    Import :
+      RECORD /XRT_HEAD/ HEAD
+      INTEGER MDIM1,MDIM2			! Dimensions of mask
+      INTEGER MASK(MDIM1,MDIM2)
+      REAL MRES
+*    Import-Export :
+*    Export :
+      REAL XC,YC
+      REAL XMIN,XMAX
+      REAL YMIN,YMAX
+*    Status :
+      INTEGER STATUS
+*    Local variables :
+      REAL BASE(2)
+      REAL SCALE(2)
+      INTEGER I,J
+      INTEGER IMIN,IMAX
+      INTEGER JMIN,JMAX
+      INTEGER NPIX
+*-
+*   Check status - return if bad
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      SCALE(1)=-HEAD.PIXEL*MRES/3600.0
+      SCALE(2)=HEAD.PIXEL*MRES/3600.0
+      BASE(1)=-MDIM(1)/2*SCALE(1)+SCALE(1)/2.0
+      BASE(2)=-MDIM(2)/2*SCALE(2)+SCALE(2)/2.0
+
+
+      IMIN=MDIM1
+      IMAX=1
+      JMIN=MDIM2
+      JMAX=1
+      XTOT=0.0
+      YTOT=0.0
+      NPIX=0
+
+      DO J=1,MDIM2
+        DO I=1,MDIM1
+
+          IF (MASK(I,J).NE.0) THEN
+
+            IMIN=MIN(IMIN,I)
+            IMAX=MAX(IMAX,I)
+            JMIN=MIN(JMIN,J)
+            JMAX=MAX(JMAX,J)
+
+            XTOT=XTOT+BASE(1)+REAL(I-1)*SCALE(1)
+            YTOT=YTOT+BASE(2)+REAL(J-1)*SCALE(2)
+
+            NPIX=NPIX+1
+
+          ENDIF
+
+        ENDDO
+      ENDDO
+
+      XC=XTOT/REAL(NPIX)
+      YC=YTOT/REAL(NPIX)
+      XMIN=BASE(1)+REAL(IMIN-1)*SCALE(1)-0.5*SCALE(1)
+      XMAX=BASE(1)+REAL(IMAX-1)*SCALE(1)+0.5*SCALE(1)
+      YMIN=BASE(2)+REAL(JMIN-1)*SCALE(2)-0.5*SCALE(2)
+      XMAX=BASE(2)+REAL(JMAX-1)*SCALE(2)+0.5*SCALE(2)
+
+
       IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ',' from XRTSORT_CRE_MASK',STATUS)
+         CALL ERR_REP(' ',' from XRTSORT_SCAN_MASK',STATUS)
       ENDIF
 *
       END
+
 
 
 *+XRTSORT_PHOTONCNT   - Sorts XRT raw data into a binned data array
@@ -1433,8 +1485,8 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
       END
 
 *+XRTSORT_RANGESELECT	Obtains sorting options from the user
-      SUBROUTINE XRTSORT_RANGESELECT(HEAD, SRT, BSRT, SDIM, BDIM,
-     &                                    NRBIN, NAZBIN, STATUS)
+      SUBROUTINE XRTSORT_RANGESELECT(HEAD,SRT,BSRT,SDIM,BDIM,
+     &              NRBIN,NAZBIN,MDIM,MRES,SMPTR,BMPTR,STATUS)
 *
 * Description :
 *       Gets all sorting criteria from the user.
@@ -1508,9 +1560,10 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 * Export :
       INTEGER SDIM(8)                           ! Dimensions of source array
       INTEGER BDIM(8)                           ! Dimensions of bckgnd array
-      INTEGER MDIM(2)				! Dimensions of spatial masks
       INTEGER NRBIN                             ! Number of radial bins
       INTEGER NAZBIN                            ! Number of azimuthal bins
+      INTEGER MDIM(2)				! Dimensions of spatial masks
+      REAL MRES					! Mask resolution
       INTEGER SMPTR,BMPTR			! Pointers to spatial masks
 * Status :
       INTEGER STATUS
@@ -1526,6 +1579,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 * Local variables :
         CHARACTER*132 TIMSTRING       ! Time ranges
         CHARACTER*30 C1,C2            ! Default time range
+        CHARACTER CENTRE	      ! Option for region centre
         CHARACTER*10 RANGES,BIN_AXES  ! Axes codes for choosing range and data
         DOUBLE PRECISION RARAD        ! RA pointing direction in radians
         DOUBLE PRECISION DECRAD       ! DEC pointing direction in radians
@@ -1567,6 +1621,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         INTEGER ENBIN                 ! Bin width for energy axis
         INTEGER PHBIN                 ! Bin width for PHA channel axis
         INTEGER MFACT                 ! Y orientation factor (-1 or +1)
+        INTEGER RES		      ! Resolution factor
         LOGICAL ANNULAR		      ! Background is annular
         LOGICAL JUMPOUT
 * Function declarations :
@@ -1584,7 +1639,11 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 *-
 * Check status :
       IF (STATUS .NE. SAI__OK) RETURN
-*
+
+
+*  get ID for ARD description of sort region
+      CALL ARX_OPEN('WRITE',SRT.ARDID,STATUS)
+
 * Set a factor for dealing with different orientations of y-axes in raw data
       IF (HEAD.ORIGIN.EQ.'MPE') THEN
          MFACT = -1
@@ -1612,125 +1671,156 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 *
       CALL CONV_GENDMAT(RARAD, DECRAD, DROLL, CTOS)
 *
-      JUMPOUT = .FALSE.
-      DO WHILE (.NOT. JUMPOUT)
 *
 * Ask which properties will be used as binning axes in the output file.
-         IF (SRT.DTYPE.EQ.'BinDS')THEN
+      IF (SRT.DTYPE.EQ.'BinDS')THEN
 *
-            SRT.NAXES=0
+        SRT.NAXES=0
 *
-            CALL MSG_BLNK()
-            CALL MSG_PRNT('Binned dataset selection')
-            CALL MSG_PRNT('--------------------------')
-            CALL MSG_PRNT('1 - XPIX')
-            CALL MSG_PRNT('2 - YPIX')
-            CALL MSG_PRNT('3 - XDET')
-            CALL MSG_PRNT('4 - YDET')
-            CALL MSG_PRNT('5 - Time')
-            CALL MSG_PRNT('6 - PHA channel')
-            CALL MSG_PRNT('7 - Corrected PHA channel')
-            CALL MSG_PRNT('8 - Radial')
+        CALL MSG_BLNK()
+        CALL MSG_PRNT('Binned dataset selection')
+        CALL MSG_PRNT('--------------------------')
+        CALL MSG_PRNT('1 - XPIX')
+        CALL MSG_PRNT('2 - YPIX')
+        CALL MSG_PRNT('3 - XDET')
+        CALL MSG_PRNT('4 - YDET')
+        CALL MSG_PRNT('5 - Time')
+        CALL MSG_PRNT('6 - PHA channel')
+        CALL MSG_PRNT('7 - Corrected PHA channel')
+        CALL MSG_PRNT('8 - Radial')
 *
-            CALL USI_GET0C('BIN_AXES', BIN_AXES, STATUS)
+        CALL USI_GET0C('BIN_AXES', BIN_AXES, STATUS)
 *
-            IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 999
 *
-         ELSE
+      ELSE
 *
-            BIN_AXES='          '
+        BIN_AXES='          '
 *
-         ENDIF
+      ENDIF
 *
 *   Check that the axes chosen are consistent
-         IF ( INDEX( BIN_AXES, '8') .EQ. 0 .OR.
-     &          (INDEX( BIN_AXES, '1') .EQ. 0 .AND.
-     &                        INDEX( BIN_AXES, '2') .EQ. 0) ) THEN
+      IF ( INDEX( BIN_AXES, '8') .NE. 0 .AND.
+     &          (INDEX( BIN_AXES, '1') .NE. 0 .AND.
+     &                        INDEX( BIN_AXES, '2') .NE. 0) ) THEN
 *
-            JUMPOUT = .TRUE.
-         ELSE
-            CALL MSG_PRNT('You cant have a radial and spatial axis')
-            CALL USI_CANCL('BIN_AXES', STATUS)
-            GOTO 999
-         ENDIF
-*
-      ENDDO
-*
-* Get Source box information from the user
-      JUMPOUT=.FALSE.
-      DO WHILE (.NOT.JUMPOUT)
-*
-         CALL USI_GET0C('SHAPE', SRT.SHAPE, STATUS)
-         CALL CHR_UCASE(SRT.SHAPE)
-*
-         IF (STATUS .NE. SAI__OK) GOTO 999
-*
-	 IF (INDEX('RCAEI', SRT.SHAPE) .EQ. 0) THEN
-	    CALL USI_CANCL('SHAPE',STATUS)
-         ELSE
-	    JUMPOUT=.TRUE.
-         ENDIF
-*
-      ENDDO
-*
-*   Get centre of source box in RA and DEC degrees
+        CALL MSG_PRNT(
+     :         'AST_ERR: You cant have a radial and spatial axes')
+        STATUS=SAI__ERROR
+        GOTO 999
+      ENDIF
+
+* Get shape of sort area
+      CALL USI_GET0C('SHAPE', SRT.SHAPE, STATUS)
+      CALL CHR_UCASE(SRT.SHAPE)
+      IF (INDEX('RCAEI', SRT.SHAPE) .EQ. 0) THEN
+        CALL MSG_PRNT('AST_ERR: unknown shape')
+        STATUS=SAI__ERROR
+        GOTO 999
+      ENDIF
+
+*  ARD description
+      IF (SRT.SHAPE.EQ.'I') THEN
+
+*  get ARD file
+        CALL ARX_READ('ARD',SRT.ARDID,STATUS)
+
+*  Get resolution factor
+        CALL USI_GET0I('RES',RES,STATUS)
+        IF (RES.LT.1.OR.RES.GT.3) THEN
+          CALL MSG_PRNT('** Invalid resolution factor - using 2')
+          RES=2
+        ENDIF
+
+*  Create spatial mask
+        CALL MSG_PRNT('Creating spatial mask...')
+        CALL XRTSORT_CRE_MASK(HEAD,SRT,RES,MDIM,MRES,SMPTR,STATUS)
+        CALL MSG_PRNT('Done!')
+
+        CALL XRTSORT_SCAN_MASK(HEAD,MDIM(1),MDIM(2),%val(SMPTR),MRES,
+     :                                  XW,YW,XW1,XW2,YW1,YW2,STATUS)
+
+*   Get nominal centre of sort region in RA and DEC degrees
+        CALL MSG_PRNT('Specify nominal centre of region:-'
+        CALL MSG_PRNT('  1 Geometric centre')
+        CALL MSG_PRNT('  2 Median position')
+        CALL MSG_PRNT('  3 Optical axis')
+        CALL MSG_PRNT('  4 Other')
+        CALL USI_GET0C('CENTRE',CENTRE,STATUS)
+
+        IF (CENTRE.EQ.'1') THEN
+          CENTRE='MEAN'
+        ELSEIF (CENTRE.EQ.'2') THEN
+          CENTRE='MEDIAN'
+        ELSEIF (CENTRE.EQ.'3') THEN
+          CENTRE='AXIS'
+          SRT.FIELD_RA=HEAD.AXIS_RA
+          SRT.FIELD_DEC=HEAD.AXIS_DEC
+        ELSEIF (CENTRE.EQ.'4') THEN
+          CENTRE='USER'
+          CALL USI_GET0D('GRP_RA', SRT.FIELD_RA, STATUS)
+          CALL USI_GET0D('GRP_DEC', SRT.FIELD_DEC, STATUS)
+        ELSE
+          CALL MSG_PRNT('AST_ERR: invalid mode')
+          STATUS=SAI__ERROR
+          GOTO 999
+        ENDIF
+
+
+c        X_HWIDTH=NPIX(CBORDX)
+c        Y_HWIDTH=NPIX(CBORDY)
+        SRT.PHI=0.0
+        SRT.ELAMIN=0.0
+        SRT.ELBMIN=0.0
+c        SRT.ELAMAX=X_HWIDTH
+c        SRT.ELBMAX=Y_HWIDTH
+
+
+      ELSE
+
 *   Set centre of the field as default
-      CALL USI_DEF0D('GRP_RA', HEAD.AXIS_RA, STATUS)
-      CALL USI_DEF0D('GRP_DEC', HEAD.AXIS_DEC, STATUS)
-*
-      CALL USI_GET0D('GRP_RA', SRT.FIELD_RA, STATUS)
-      CALL USI_GET0D('GRP_DEC', SRT.FIELD_DEC, STATUS)
-*
+        CALL USI_DEF0D('GRP_RA', HEAD.AXIS_RA, STATUS)
+        CALL USI_DEF0D('GRP_DEC', HEAD.AXIS_DEC, STATUS)
+
+        CALL USI_GET0D('GRP_RA', SRT.FIELD_RA, STATUS)
+        CALL USI_GET0D('GRP_DEC', SRT.FIELD_DEC, STATUS)
+
+      ENDIF
+
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*   Calculate azimuth and elevation for the source box in raw pixels
+
+*  Calculate azimuth and elevation for the source box in raw pixels
       CALL CONV_CONA2V(REAL(SRT.FIELD_RA)*REAL(DTOR),
      &                           REAL(SRT.FIELD_DEC)*REAL(DTOR), VC)
-*
+
       DO J = 1,3
-         VS(J) = VC(1)*CTOS(1,J)+VC(2)*CTOS(2,J)+VC(3)*CTOS(3,J)
+        VS(J) = VC(1)*CTOS(1,J)+VC(2)*CTOS(2,J)+VC(3)*CTOS(3,J)
       END DO
-*
+
       SOURCE_X = NINT( -VS(3) / PTOR)
       SOURCE_Y = NINT( -VS(2) / PTOR) * MFACT
-*
-*    Add the sky pixel centre to the source centre
+
+*  Add the sky pixel centre to the source centre
       SOURCE_X = SOURCE_X + HEAD.SKYCX
       SOURCE_Y = SOURCE_Y + HEAD.SKYCY
-*
-*
-*   Get extent of area depending on shape
-*   Find the closest distance to each border
-      CBORDX=MIN( ABS(SOURCE_X-HEAD.XSTART), ABS(SOURCE_X-HEAD.XEND) )
+
+*  Find the closest distance to each border
+      CBORDX=MIN(ABS(SOURCE_X-HEAD.XSTART),ABS(SOURCE_X-HEAD.XEND))
      &                                   * PTOD * 2.0
-      CBORDY=MIN( ABS(SOURCE_Y-HEAD.YSTART), ABS(SOURCE_Y-HEAD.YEND) )
+      CBORDY=MIN(ABS(SOURCE_Y-HEAD.YSTART),ABS(SOURCE_Y-HEAD.YEND))
      &                                   * PTOD * 2.0
 
 *  get the centre in world (axis) coords.
       XW=-(SOURCE_X-HEAD.SKYCX)*PTOD
       YW=(SOURCE_Y-HEAD.SKYCY)*PTOD*MFACT
 
-*  get ID for ARD description of sort region
-      CALL ARX_OPEN('WRITE',SRT.ARDID,STATUS)
 
 
-*  Import region description (ARD)
-      IF (SRT.SHAPE .EQ. 'I') THEN
 
-*  get ARD file
-        CALL ARX_READ('ARD',SRT.ARDID,STATUS)
-
-        X_HWIDTH=NPIX(CBORDX)
-        Y_HWIDTH=NPIX(CBORDY)
-        SRT.PHI=0.0
-        SRT.ELAMIN=0.0
-        SRT.ELBMIN=0.0
-        SRT.ELAMAX=X_HWIDTH
-        SRT.ELBMAX=Y_HWIDTH
 
 
 *  Rectangle
-      ELSEIF (SRT.SHAPE .EQ. 'R') THEN
+      IF (SRT.SHAPE .EQ. 'R') THEN
 
 	 CALL USI_DEF0R('GRP_SWIDTH', CBORDX, STATUS)
 	 CALL USI_DEF0R('GRP_SHEIGHT', CBORDY, STATUS)
@@ -1970,29 +2060,17 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 *   Time:
       IF (INDEX(RANGES,'5') .NE. 0) THEN
 *
-         JUMPOUT = .FALSE.
-         DO WHILE (.NOT. JUMPOUT)
-*
 *      Time range may be input as either a string of start and stop
 *      times or a text file of times. The times may be expressed as offsets
 *      from time zero or as MJDs in which case they are prefixed wih an 'M'.
-            CALL USI_GET0C('TIMRANGE',TIMSTRING,STATUS)
+         CALL USI_GET0C('TIMRANGE',TIMSTRING,STATUS)
 *
 *      Decode the timestring into a sequence of start and stop times
-            CALL UTIL_TDECODE(TIMSTRING, HEAD.BASE_MJD, MXTIME,
+         CALL UTIL_TDECODE(TIMSTRING, HEAD.BASE_MJD, MXTIME,
      &                      SRT.NTIME, SRT.MIN_T, SRT.MAX_T, STATUS)
 *
-            IF (STATUS .NE. SAI__OK) GOTO 999
+         IF (STATUS .NE. SAI__OK) GOTO 999
 *
-C*      Make sure that there's only one time range if time is an axis
-C            IF (INDEX(BIN_AXES, '5') .NE. 0 .AND. SRT.NTIME .GT. 1) THEN
-C               CALL MSG_PRNT(' If time is used as an output axis it '/
-C     &                      /'may only have one time range')
-C               CALL USI_CANCL('TIMRANGE', STATUS)
-C            ELSE
-               JUMPOUT= .TRUE.
-C            ENDIF
-         ENDDO
 *
       ELSE
          SRT.NTIME=1
@@ -2689,6 +2767,9 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
       BSRT.IMAGE=(BSRT.DTYPE.EQ.'BinDS'.AND.
      &              BDIM(1).GT.1.AND.BDIM(2).GT.1)
+
+
+
 
 *
 999   CONTINUE
