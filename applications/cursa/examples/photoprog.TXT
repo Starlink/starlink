@@ -1,0 +1,21 @@
+!+
+! Example catalogue of photometric programme objects.
+!
+! Note that this table contains both the air mass and the observed
+! zenith distance.  The zenith distance is given in sexagesimal
+! degrees and minutes.
+!
+! A C Davenhall (Edinburgh) 12/10/97.
+!-
+
+C MINST   DOUBLE  1 EXFMT=F7.3    ! Instrumental magnitude.
+C AIRMASS DOUBLE  2 EXFMT=F7.3    ! Air mass.
+C ZENDIST DOUBLE  3 UNITS='RADIANS{DM}' TBLFMT=DEGREES ! Zenith distance.
+
+BEGINTABLE
+ 17.38  1.00   1:43
+ 17.03  1.24  36:06
+ 17.49  1.11  25:47
+ 17.87  1.04  15:28
+ 17.42  1.05  18:20
+ 17.26  1.91  58:27

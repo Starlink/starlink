@@ -1,0 +1,45 @@
+!+
+! STL catalogue showing examples of complex sexagesimal angle formats.
+!
+! A.C. Davenhall (Edinburgh) 4/8/98.
+!-
+
+C ANGLE1  DOUBLE   3  UNITS='RADIANS{DEGREES}'
+:  TBLFMT=DEGREES{A1,I2,1X,I2,1X,I2}
+
+C ANGLE2  DOUBLE  15  UNITS='RADIANS{DEGREES}'
+:  TBLFMT=DEGREES{A1,I2,I2,I2}
+
+C ANGLE3  DOUBLE  25  UNITS='RADIANS{BDMS.2}'
+:  TBLFMT=DEGREES{A1,I2,1X,I2,1X,F5.2}
+
+C ANGLE4  DOUBLE  40  UNITS='RADIANS{HM.1}'
+:  TBLFMT=HOURS{I2,1X,F4.1}
+
+C ANGLE5  DOUBLE  50  UNITS='RADIANS{D.2}'
+:  TBLFMT=DEGREES{F6.2,2X,A1}
+
+C ANGLE6  DOUBLE  61  UNITS='RADIANS{ARCMIN.1}'
+:  TBLFMT=ARCMIN{F6.1}
+
+D POSITION=CHARACTER  ! Table is fixed format.
+
+! Notes.
+! (1) The complex sexagesimal angle-formats can only be used in
+!     fixed-format STL tables.
+! (2) The last two rows of the table show various illegal cases
+!     which CURSA interprets as null values.
+
+!    ANGLE1    ANGLE2         ANGLE3    ANGLE4      ANGLE5  ANGLE6
+!        10        20        30        40        50        60
+! 3456789 123456789 123456789 123456789 123456789 123456789 123456789
+BEGINTABLE
+   30 30 30    303030    30 30 30.12    6 34.5    30.12  N    23.1
+  N30:25  0   N3025 0   N30 25  0.34    8 56.7   178.34       17.5
+  n 6 23,45   n 62345   n 6 23 45.45   14 02.0    45.45  +   -45.6
+  + 3  3  0   + 3 3 0   + 3  3  0.56    4 23.6    56.56      +23.4
+  -30 00 00   -300000   -30 00 00.67    5 45.2    40.67  -  -123.4
+  S25a57 00   S255700   S25 57 00.78   17 42.1    73.78  S    55.6
+  s40 00q37   s400037   s40 00 37.90   18 19.5   123.90  s    34.7
+  S25 67 00    256700    25 67 00.01    4 60.1   <null>        bad
+  S25 00 60    250060    25 00 60.12    1 60.0   <null>       55.x

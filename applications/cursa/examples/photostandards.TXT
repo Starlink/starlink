@@ -1,0 +1,32 @@
+!+
+! Example catalogue of photometric standards.
+!
+! These data were observed with the Jacobus Kapteyn Telescope
+! (JKT) on La Palma on 16/11/1993.  The catalogue magnitudes are in
+! the R band and the instrumental magnitudes approximate to this
+! system.  The data are provided courtesy of John Lucey (Durham).
+!
+! A C Davenhall (Edinburgh) 12/10/97.
+!-
+
+C NAME    CHAR*7  1  EXFMT=A7    ! Star name.
+C MCAT    DOUBLE  2  EXFMT=F7.3  ! Catalogue magnitude.
+C MINST   DOUBLE  3  EXFMT=F7.3  ! Instrumental magnitude.
+C AIRMASS DOUBLE  4  EXFMT=F7.3  ! Air mass.
+C INCL    LOGICAL 5  EXFMT=L5    ! 'Include in the fit' flags.
+
+BEGINTABLE
+113Z475  09.737  16.37  1.16  T
+110Z450  11.033  17.74  2.20  T
+114Z531  11.672  18.29  1.13  T
+113Z475  09.737  16.39  1.41  T
+114Z548  10.868  17.50  1.23  T
+ 94Z251  10.547  17.17  1.14  T
+ 93Z424  11.067  17.69  1.18  T
+ 95Z74   10.931  17.55  1.17  T
+ 96Z737  10.982  17.62  1.26  T
+ 97Z249  11.369  17.99  1.14  T
+ 94Z251  10.547  17.21  1.57  T
+ 95Z301  10.527  17.16  1.32  T
+ 99Z367  10.618  17.23  1.15  F
+ 96Z737  10.982  17.67  1.81  T

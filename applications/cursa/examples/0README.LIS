@@ -1,0 +1,87 @@
+                          CURSA Example Data Files
+                          ========================
+
+
+This directory contains example data and other files for the CURSA catalogue
+manipulation package.  CURSA is documented in SUN/190.  The files available
+are as follows.
+
+0README.LIS    - this file.
+
+
+Small text list (STL) format catalogues
+---------------------------------------
+
+simple.TXT     - a simple STL catalogue; this catalogue is a target list.
+complex.TXT    - } a more complicated STL catalogue.
+complex.dat      }
+
+angles.TXT     - an STL catalogue with complex sexagesimal angles.
+propmotn.TXT   - a target list including proper motions etc.
+kappa.TXT      - a KAPPA variant STL catalogue.
+scale.TXT      - an example of scaled columns.
+simple_radians.TXT    - an example of angles stored in radians.
+
+polygon.TXT           - example STL catalogue of polygon corners.
+
+photoprog.TXT         - example catalogue of photometric programme objects.
+photostandards.TXT    - example catalogue of photometric standards.
+
+pisaresults.TXT       - template STL for PISA results file.
+pisasizes.TXT         - template STL for PISA sizes file.
+
+
+catpair scripts
+---------------
+
+catpair_cart.script   - pairing using Cartesian coordinates.
+catpair_sphplr.script - pairing using spherical-polar coordinates.
+
+
+Example graphics translation files
+----------------------------------
+
+simple.grt     - a simple graphics translation file.
+complex.grt    - a more complicated graphics translation file.
+
+
+Graphics translation files for the default list of remote catalogues
+--------------------------------------------------------------------
+
+bd.grt          - Bonner Durchmusterung.
+gsc.grt         - Guide Star Catalog.
+iras_psc.grt    - IRAS Point Source Catalogue.
+ppm.grt         - Positions and Proper Motions (PPM) Catalogue.
+rc3.grt         - Third Reference Catalogue of Bright Galaxies.
+sao.grt         - SAO Catalog.
+scosmosbw.grt   - SuperCOSMOS surveys (black and white plot).
+scosmoscol.grt  - SuperCOSMOS surveys (colour plot).
+simbad.grt      - SIMBAD.
+usno.grt        - USNO PMM Catalogue.
+
+
+catremote remote catalogue access utility
+=========================================
+
+The use of catremote is described in SUN/190 and the utility is documented
+in full in SSN/76.
+
+catremote-setup.csh - example script to set up for running catremote.
+
+listavaildb.tcl  - example tcl script to list available databases.
+querycat.tcl     -    "     "    "    "  query a remote database.
+resolvename.tcl  -    "     "    "    "  find the coordinates of an object.
+
+UrlReader.java   - Java utility to retrieve the contents of a URL.
+
+
+
+Clive Davenhall,
+Original version:         11/11/97,
+Most recent modification:  25/5/01.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

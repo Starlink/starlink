@@ -1,0 +1,27 @@
+!+
+!  Simple example of a target list which includes columns of proper
+!  motion, parallax and radial velocity.
+!
+!  A C Davenhall (Edinburgh) 13/6/97.
+!-
+
+C  RA       DOUBLE  1    EXFMT=D15.7          ! Right Ascension.
+:    UNITS='RADIANS{HOURS}'     TBLFMT='HOURS'
+C  DEC     DOUBLE   2    EXFMT=D15.7          ! Declination.
+:    UNITS='RADIANS{DEGREES}'   TBLFMT='DEGREES'
+C  PMRA     DOUBLE  3                         ! Annual R.A. proper motion.
+:    UNITS='RADIANS{TIMESEC.5}' TBLFMT='TIMESEC'
+C  PMDE     DOUBLE  4                         ! Annual Dec. proper motion.
+:    UNITS='RADIANS{ARCSEC.4}'  TBLFMT='ARCSEC'
+C  PLX      DOUBLE  5                         ! Parallax.
+:    UNITS='RADIANS{ARCSEC.3}'  TBLFMT='ARCSEC'
+C  RV       DOUBLE  6    UNITS='Km/sec'       ! Radial velocity.
+
+P EQUINOX  CHAR*10  'J2000'
+P EPOCH    CHAR*10  'J1996.35'
+
+BEGINTABLE
+14:39:36.087  -60:50:07.14  -0.49486  +0.6960  0.752    0.0
+14:39:36.087  -60:50:07.14  -0.49486  +0.6960  0.752  -22.2
+08:45:56.023   30:34:15.43  +0.56853  +0.5342  0.302    0.0
+02:34:23.345   80:34:12.42  +0.00234  -0.0321  0.023  +23.7

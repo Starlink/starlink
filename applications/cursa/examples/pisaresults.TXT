@@ -1,0 +1,39 @@
+!+
+! STL for PISA results file.
+!
+! This STL header describes a PISA results file, containing
+! parameterised details for objects detected in a 2D image frame.
+!
+! See SUN/109 for further details of the PISA column definitions and
+! SUN/190 for further details of the STL format.
+!
+! A.C. Davenhall (Edinburgh) 2/7/97.
+!-
+
+C INDEX     INTEGER 1             ! Index number (running count).
+C XPOS      REAL    2 EXFMT=F9.3  ! Central X position (pixels).
+C YPOS      REAL    3 EXFMT=F9.3  ! Central Y position (pixels).
+C INTENSITY REAL    4 EXFMT=F9.0  ! Integrated intensity.
+C NPIX      INTEGER 5             ! Number of pixels above the threshold.
+C PEAK      REAL    6 EXFMT=F9.0  ! Peak intensity in one pixel.
+C ELLIPT    REAL    7 EXFMT=F6.3  ! Ellipticity.
+C ANGLE     REAL    8 EXFMT=F6.1  ! Orientation, anti-clockwise from y-axis.
+C SXX       REAL    9 EXFMT=E10.3 ! Second moment in X.
+C SYY       REAL   10 EXFMT=E10.3 ! Second moment in Y.
+C SXY       REAL   11 EXFMT=E10.3 ! Cross moment in X and Y.
+
+!
+! To access a given PISA results file either:
+!
+! (a) Change the following FILE specification by replacing pisafind.dat
+!     with the name of the required results file, as appropriate (but
+!     remember to leave the file name enclosed in single quotes,
+!
+! (b) or comment out or delete the FILE specification and un-comment the
+!     BEGINTABLE line and append the contents of the results file to follow
+!     this line.  Note that the table of results must follow the BEGINTABLE
+!     line immediately, without intervening blank lines.
+
+D FILE='pisafind.dat'
+ 
+!BEGINTABLE

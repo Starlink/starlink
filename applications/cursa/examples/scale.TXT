@@ -1,0 +1,18 @@
+!+
+! Example STL using scale factors and zero points.
+!
+! A C Davenhall (Edinburgh) 2/2/97.
+!-
+
+C X REAL 1  EXFMT=F6.1  SCALEF=-2.0           ! Scale factor only.
+C Y REAL 2  EXFMT=F6.1  SCALEF=2.0  ZEROP=5.0 ! Scale factor and zero point.
+C Z REAL 3  EXFMT=F6.1                        ! Unscaled.
+
+BEGINTABLE
+1.0 1.0 1.0
+2.0 2.0 2.0
+3.0 3.0 3.0
+4.0 4.0 4.0
+5.0 5.0 5.0
+6.0 6.0 6.0
+7.0 7.0 7.0

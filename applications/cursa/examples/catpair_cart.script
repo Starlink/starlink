@@ -1,0 +1,25 @@
+prim
+sec
+out
+C
+X
+Y
+X
+Y
+10.0
+C
+Y
+Y
+N
+X
+Y
+ROW
+END
+X > X_SEC
+Y > Y_SEC
+ROW > ROW_SEC
+END
+Y
+N
+N
+N

@@ -1,0 +1,30 @@
+!+
+! STL for PISA sizes file.
+!
+! This STL header describes a PISA sizes file, containing areal profiles
+! for objects detected in a 2D image frame.
+!
+! See SUN/109 for further details of the PISA column definitions and
+! SUN/190 for further details of the STL format.
+!
+! A.C. Davenhall (Edinburgh) 2/7/97.
+!-
+
+C INDEX INTEGER 1             ! Index number (running count).
+C A1[8] REAL    2 EXFMT=F10.0 ! Areal profiles (no. of pixels).
+
+!
+! To access a given PISA sizes file either:
+!
+! (a) Change the following FILE specification by replacing pisasize.dat
+!     with the name of the required results file, as appropriate (but
+!     remember to leave the file name enclosed in single quotes,
+!
+! (b) or comment out or delete the FILE specification and un-comment the
+!     BEGINTABLE line and append the contents of the sizes file to follow
+!     this line.  Note that the table of sizes must follow the BEGINTABLE
+!     line immediately, without intervening blank lines.
+
+D FILE='pisasize.dat'
+ 
+!BEGINTABLE

@@ -1,0 +1,15 @@
+!+
+! Example STL format catalogue of polygon corners.
+!
+! A C Davenhall (Edinburgh) 31/1/97.
+!-
+
+C X REAL 1
+C Y REAL 2
+
+BEGINTABLE
+ 35.0   23.0
+ 68.0  122.0
+159.0  143.0
+174.0   76.0
+105.0   68.0
