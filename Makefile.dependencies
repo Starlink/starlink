@@ -490,7 +490,7 @@ $(MANIFEST)/idi: \
 
 $(MANIFEST)/ifd: \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/tclsys
+		$(MANIFEST)/tcl
 	cd applications/ifd \
 	    && make>make.log && make install-manifest>>make.log
 
@@ -547,7 +547,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
-		$(MANIFEST)/tclsys
+		$(MANIFEST)/tcl
 	cd libraries/kaplibs \
 	    && make>make.log && make install-manifest>>make.log
 
@@ -984,7 +984,7 @@ $(MANIFEST)/startcl: \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/task \
-		$(MANIFEST)/tclsys
+		$(MANIFEST)/tcl
 	cd applications/startcl \
 	    && make>make.log && make install-manifest>>make.log
 
@@ -1031,7 +1031,7 @@ $(MANIFEST)/task: \
 	cd libraries/pcs/task \
 	    && make>make.log && make install-manifest>>make.log
 
-$(MANIFEST)/tclsys:
+$(MANIFEST)/tcl:
 	cd thirdparty/tclsys/tcl \
 	    && make>make.log && make install-manifest>>make.log
 
