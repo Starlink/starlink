@@ -83,6 +83,7 @@
 *                        global. (DJA)
 *      6 Aug 93 : V1.7-0 Changed ARR_ call (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     17 Oct 95 : V2.0-0 Full ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -91,7 +92,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -104,9 +104,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)  OLOC       ! Value object locator
-      CHARACTER*(DAT__SZLOC)  PLOC       ! Range object locator
-      CHARACTER*20            VARIANT    ! Variant of data array
       CHARACTER*40            TSTR       ! Temporary string
       CHARACTER RNGSTR*(SWTSZE*25)        ! Range global string
 
@@ -114,18 +111,17 @@
       LOGICAL		      PRIM2      ! Range_object primitive?
       LOGICAL                 OK         ! General validity test
 
-      INTEGER		      ACTVAL     ! Dummy required by USI_GET
-      INTEGER                 I,J        ! Loop counters
+      INTEGER		      	ACTVAL     		! Dummy for USI_GET
+      INTEGER                 	I,J        		! Loop counters
       INTEGER		      N          ! Number of values in array of results
-      INTEGER                 NDIM
-      INTEGER                 DIMS(DAT__MXDIM)
-      INTEGER		      VALVAL     ! Number of elements in Value_object
-      INTEGER		      VALPTR     ! Pointer to mapped Value_object
-      INTEGER		      RNGVAL     ! Number of elements in Range_object
+      INTEGER		      	VALVAL     ! # elements in Value_object
+      INTEGER		      	VALPTR     ! Pointer to mapped Value_object
+      INTEGER			RFID			! Range object id
+      INTEGER		      	RNGVAL     		! # elements in Range_object
       INTEGER		      RNGPTR     ! Pointer to mapped Range_object
       INTEGER                 RLEN,TLEN  ! Lengths of strings
+      INTEGER			VFID			! Value object id
 
-      REAL                    BASE,SCALE ! Spaced axis parameters
       REAL		      MINVAL     ! Minimum value of specified range
       REAL		      MAXVAL     ! Maximum value of specified range
       REAL		      RANGE(2)   ! Value of range max and min from parameter sysytem
@@ -136,82 +132,48 @@
 *    Version id :
 *
       CHARACTER*23	      VERSION    ! Version id
-	 PARAMETER            ( VERSION = 'SETRANGES Version 1.8-0')
+	 PARAMETER            ( VERSION = 'SETRANGES Version 2.0-0')
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version announcement
+*  Version announcement
       CALL MSG_PRNT( VERSION )
 
-*    Initialise Asterix
+*  Initialise Asterix
       CALL AST_INIT
 
-*    Get the value data object, check that it is primitive
-      CALL USI_ASSOCI( 'INPUT_VALUE', 'READ', OLOC, PRIM1, STATUS )
+*  Get the value data object, check that it is primitive
+      CALL USI_ASSOC( 'INPUT_VALUE', 'Array', 'READ', VFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      IF ( .NOT. PRIM1 ) THEN
+*  Get shape and whether ok
+      CALL BDI_CHK( VFID, 'Data', OK, STATUS )
+      IF ( OK ) THEN
+        CALL BDI_GETNEL( VFID, VALVAL, STATUS )
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'This is not a primitive object,'/
-     :                         /' please try again', STATUS )
-
-      ELSE
-        CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
-        IF ( OK ) THEN
-          CALL ARR_SUMDIM( NDIM, DIMS, VALVAL )
-        ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Numeric data object required', STATUS )
-        END IF
-        CALL BDA_MAPDATA( OLOC, 'READ', VALPTR, STATUS )
-
+        CALL ERR_REP( ' ', 'Numeric data object required', STATUS )
       END IF
+      CALL BDA_MAPR( VFID, 'Data', 'READ', VALPTR, STATUS )
 
-*    Now the range object - if not primitive then check for the case where
-*    we have a spaced data array.
-      CALL USI_ASSOCI( 'INPUT_RANGE', 'READ', PLOC, PRIM2, STATUS )
+*  Now the range object - if not primitive then check for the case where
+*  we have a spaced data array.
+      CALL USI_ASSOC( 'INPUT_RANGE', 'Array', 'READ', PFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      IF ( PRIM2 ) THEN
-        CALL DAT_MAPV( PLOC, '_REAL', 'READ', RNGPTR, RNGVAL, STATUS )
-
-      ELSE
-        CALL CMP_GET0C( PLOC, 'VARIANT', VARIANT, STATUS )
-        IF (( STATUS .EQ. SAI__OK ) .AND. (VARIANT(1:6)
-     :                                   .EQ.'SPACED')) THEN
-
-*        Look for SCALE, DIMENSION and BASE.
-          CALL CMP_GET0R( PLOC, 'SCALE', SCALE, STATUS )
-          CALL CMP_GET0R( PLOC, 'BASE', BASE, STATUS )
-          CALL CMP_GET0I( PLOC, 'DIMENSION', RNGVAL, STATUS )
-
-          IF ( STATUS .EQ. SAI__OK ) THEN
-
-*          We seem to have good spaced array axis components...
-*          Map some dynamic memory and fill it with axis data
-            CALL DYN_MAPR( 1, RNGVAL, RNGPTR, STATUS )
-            CALL ARR_REG1R( BASE, SCALE, RNGVAL, %VAL(RNGPTR), STATUS )
-
-          ELSE
-
-*          Right, give up...
-            CALL ERR_REP( ' ', 'Don''t recognise this kind'
-     :                         //' of data array', STATUS )
-
-          END IF
-
-        ELSE
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Not primitive array or'
-     :                    //' spaced array', STATUS )
-        END IF
-
+*  Get shape and whether ok
+      CALL BDI_CHK( PFID, 'Data', OK, STATUS )
+      IF ( OK ) THEN
+        CALL BDI_GETNEL( PFID, RNGVAL, STATUS )
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Numeric data object required', STATUS )
       END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      CALL BDA_MAPR( PFID, 'Data', 'READ', RNGPTR, STATUS )
 
-*    Check data objects have same shape
+*  Check data objects have same shape
       IF ( VALVAL .NE. RNGVAL ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Range and Value objects do not'/
@@ -219,16 +181,16 @@
         GOTO 99
       END IF
 
-*    Get maximum and minimun values of Value Obj and write to Screen
-*    to help user select required value_ranges
+*  Get maximum and minimun values of Value Obj and write to Screen
+*  to help user select required value_ranges
       CALL ARR_RANG1R( VALVAL, %VAL(VALPTR), VALMIN, VALMAX, STATUS )
       CALL MSG_SETR( 'VALMIN', VALMIN )
       CALL MSG_PRNT( 'Minimum value of Value object: ^VALMIN' )
       CALL MSG_SETR( 'VALMAX', VALMAX )
       CALL MSG_PRNT( 'Maximum value of Value object: ^VALMAX' )
 
-*    Get required ranges from parameter system and set values of MINVAL
-*    and MAXAVL
+*  Get required ranges from parameter system and set values of MINVAL
+*  and MAXAVL
       CALL USI_GET1R( 'LIMITS', 2, RANGE, ACTVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         GOTO 99
@@ -241,11 +203,11 @@
         END IF
       END IF
 
-*    Call subroutine to do the work
+*  Call subroutine to do the work
       CALL SETRANGES_OPERATION( VALVAL, %VAL(VALPTR), %VAL(RNGPTR),
      :                  MINVAL, MAXVAL, SWITCH, SWTSZE, N, STATUS )
 
-*    IF no values in required range then write message and exit
+*  IF no values in required range then write message and exit
       IF ( N .EQ. 0 ) THEN
         CALL MSG_PRNT( ' No elements of required range in'/
      :                                   /' Value_object' )
@@ -264,7 +226,7 @@
           RLEN = RLEN + TLEN
         END DO
 
-*      Put character equivalents of strings into parameter
+*    Put character equivalents of strings into parameter
         CALL USI_PUT0C( 'RANGES', RNGSTR(3:RLEN), STATUS )
 
       END IF
@@ -311,7 +273,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
