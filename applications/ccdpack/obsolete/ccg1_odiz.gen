@@ -119,7 +119,7 @@
 *  Correct for scale and zero point 
       IF ( GETS .AND. GETZ ) THEN
          SZDAT = REAL( SCALE ) * NUM_<T>TOR( IDAT( X, Y ) ) 
-            + REAL( ZERO )
+     :      + REAL( ZERO )
       ELSE IF ( GETS ) THEN
          SZDAT = REAL( SCALE ) * NUM_<T>TOR( IDAT( X, Y ) )
       ELSE IF ( GETZ ) THEN
