@@ -84,8 +84,7 @@ am__noinst_HEADERS_DIST = ltdl.h
 HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
-	$(EXTRA_DIST) 
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 am__remove_distdir = \
@@ -322,9 +321,9 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libltdl.la: $(libltdl_la_OBJECTS) $(libltdl_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libltdl_la_LDFLAGS) $(libltdl_la_OBJECTS) $(libltdl_la_LIBADD) $(LIBS)
+	$(LINK) -rpath $(libdir) $(libltdl_la_LDFLAGS) $(libltdl_la_OBJECTS) $(libltdl_la_LIBADD)  $(LIBS)
 libltdlc.la: $(libltdlc_la_OBJECTS) $(libltdlc_la_DEPENDENCIES) 
-	$(LINK)  $(libltdlc_la_LDFLAGS) $(libltdlc_la_OBJECTS) $(libltdlc_la_LIBADD) $(LIBS)
+	$(LINK)  $(libltdlc_la_LDFLAGS) $(libltdlc_la_OBJECTS) $(libltdlc_la_LIBADD)  $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
