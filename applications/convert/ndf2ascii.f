@@ -346,7 +346,7 @@
 
 *  Derive the recordlength in bytes, allowing for a space between each 
 *  value.
-         RECL = ( NCPVAL + 1 ) * NUMPRE
+         RECL = MAX( RECMIN, ( NCPVAL + 1 ) * NUMPRE )
       ELSE
 
 *  Obtain the maximum recordlength in bytes of the output (free-format)
