@@ -58,7 +58,7 @@ alias      restore  $JCMTDR_DIR/restore
 alias jcmt_restore  $JCMTDR_DIR/restore
 alias      ts2map   $JCMTDR_DIR/ts2map
 alias jcmt_ts2map   $JCMTDR_DIR/ts2map
-alias gsd_print     echo "Not part of JCMT-DR. Please use /star/Perl/bin/gsdprint'
+alias gsd_print     echo "Not part of JCMT-DR. Please use /star/Perl/bin/gsdprint"
 alias jcmt_help     $JCMTDR_DIR/jcmt_help
 #
 # Show that the JCMTDR commands are now available.
@@ -68,7 +68,8 @@ echo " ------------ Initialised for JCMTDR ------------"
 echo "           Version 1.2-2  20 March 2003"
 echo " "
 echo '         Type "jcmt_help jcmtdr" for help'
-echo '      or "showme sc1" or "showme sun192" for web documentation'
+echo '      or "showme sc1" or "showme sun192" for' 
+echo '                 web documentation'
 echo " "
 #
 # end
