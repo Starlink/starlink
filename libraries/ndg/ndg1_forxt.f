@@ -101,18 +101,20 @@
 *  Any NDF slice specification should have been removed from NAME prior 
 *  to calling this routine. Therefore, if there is a foreign extension
 *  specifier, the final non-blank character should be a "]".
-      IF( NAME( LN : LN ) .EQ. ']' ) THEN
+      IF( LN .GT. 0 ) THEN
+         IF( NAME( LN : LN ) .EQ. ']' ) THEN
 
 *  Find the preceeding opening bracket "[".
-         DO I = LN - 1, 1, -1
-            IF( NAME( I : I ) .EQ. '[' ) THEN
-               X1 = I
-               X2 = LN
-               GO TO 1
-            END IF               
-         END DO
- 1       CONTINUE
-
+            DO I = LN - 1, 1, -1
+               IF( NAME( I : I ) .EQ. '[' ) THEN
+                  X1 = I
+                  X2 = LN
+                  GO TO 1
+               END IF               
+            END DO
+ 1          CONTINUE
+      
+         END IF
       END IF
  
       END
