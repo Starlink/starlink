@@ -104,7 +104,6 @@
         PARAMETER		( APROPN = '.ASTERIX_LOC' )
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! Object locator
       CHARACTER*(DAT__SZLOC)	MLOC			! MORE box locator
 
       LOGICAL			THERE			! Property exists?

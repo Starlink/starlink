@@ -1,16 +1,16 @@
-      SUBROUTINE ADI1_LOCHEAD( ID, HLOC, STATUS )
+      SUBROUTINE ADI1_LOCHEAD( ID, CREATE, HLOC, STATUS )
 *+
 *  Name:
 *     ADI1_LOCHEAD
 
 *  Purpose:
-*     Locate ASTERIX header structure given HDS object
+*     Locate ASTERIX.HEADER structure given HDS object
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI1_LOCHEAD( ID, HLOC, STATUS )
+*     CALL ADI1_LOCHEAD( ID, CREATE, HLOC, STATUS )
 
 *  Description:
 *     Locate ASTERIX header structure given HDS object. The routine first
@@ -19,6 +19,8 @@
 *  Arguments:
 *     ID = INTEGER (given)
 *        ADI identifier referencing HDS object
+*     CREATE = LOGICAL (given)
+*        Create component if it doesn't exist?
 *     HLOC = CHARACTER*(DAT__SZLOC) (returned)
 *        Locate to HEADER object
 *     STATUS = INTEGER (given and returned)
@@ -113,7 +115,11 @@
       IF ( THERE ) THEN
         CALL ADI_CGET0C( ID, HPROPN, HLOC, STATUS )
       ELSE
-        CALL ADI1_LOCAST( ID, ALOC, STATUS )
+        CALL ADI1_LOCAST( ID, CREATE, ALOC, STATUS )
+        CALL DAT_THERE( ALOC, 'HEADER', THERE, STATUS )
+        IF ( CREATE .AND. .NOT. THERE ) THEN
+          CALL DAT_NEW( ALOC, 'HEADER', 'EXTENSION', 0, 0, STATUS )
+        END IF
         CALL DAT_FIND( ALOC, 'HEADER', HLOC, STATUS )
         CALL ADI_CPUT0C( ID, HPROPN, HLOC, STATUS )
       END IF
