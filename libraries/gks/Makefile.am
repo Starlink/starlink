@@ -3,7 +3,7 @@
 SUBDIRS = @subdirs@
 
 ## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
-bin_SCRIPTS = gks_link gks1_link_adam gks_link_adam
+bin_SCRIPTS = gks_link gks1_link_adam
 
 ## List libraries which are to be built, and installed in `lib'.  Note
 ## that the file extension is .la, not .a or .so.  This is the
