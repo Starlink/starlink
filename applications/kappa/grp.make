@@ -226,7 +226,7 @@ trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
 kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
-wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.f
+wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
