@@ -2357,9 +2357,13 @@ autoconf (GNU Autoconf) 2.59
 foo_TASKS =
 </verbatim>
           In this case, the only <code>.ifl</code> file is that for
-          the ATASK, and automake checks that this file does in fact
-          exist.  This is not a generated file, and should be checked
-          in and distributed.</p>
+          the ATASK, and automake checks that this file either exists
+          in the current directory (in which case the
+          <code>.ifl</code> file should be checked in and
+          distributed), or else it is explicitly listed in
+          <code>BUILT_SOURCES</code>, in the case where it is a
+          generated file; in this second case it is not enough that a
+          rule for the <code>.ifl</code> file exists.</p>
 
         <p>The <code>MONOLITH</code> primary allows the prefixes
           <code>bin</code>, <code>check</code> and
@@ -3268,6 +3272,8 @@ ChangeLog  changes  doc/     library/  mac/           tools/  win/
           <code>Makefile.am</code> and <code>configure.ac</code>
           files, but these are sufficiently special that it wouldn't
           help.</p>
+
+          <p>XXX This is out of date -- see tclsys for update</p>
 
           <p>The <code>configure.ac</code> should look like this:
 <verbatim>
@@ -4471,6 +4477,16 @@ file.f: file.$(FPP_SRC_EXT)
               </li>
             </ul>
           </p>
+
+          <p>This macro also sets the <code>prefix</code> shell
+            variable to its default value.  Standard autoconf
+            <code>./configure</code> scripts also do this, but at a
+            slightly later stage, which prevents the variable being
+            used safely within <code>configure.ac</code> scripts.
+            This is useful if you have to configure a thirdparty
+            package in a subdirectory, by calling its
+            <code>./configure</code> script with a suitable
+            <code>--prefix</code> option.</p>
 
         </subsect>
 
