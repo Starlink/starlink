@@ -1,6 +1,14 @@
+1999-12-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* gsd_f77.c: Fix prototype warning in gsdGet1b
+
+	* makefile: Create MkV makefile for Starlink
+	distribution. Includes the addition of gsd_link, gsd_dev, gsd_link_adam
+
 1999-12-15  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* gsd_print.f (GSD_PRINT): Add copyright statement
+	(GSD_PRINT): Use GSD_PARS rather than GSDPARS
 
 	* gsd_pars.inc: Add copyright statement
 
