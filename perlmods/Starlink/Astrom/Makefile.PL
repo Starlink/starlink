@@ -5,8 +5,8 @@ WriteMakefile(
               'NAME' => 'Starlink::Astrom',
               'VERSION_FROM' => 'Astrom.pm',
               'PREREQ_PM' => {
-                              'Starlink::AMS::Init' => 0,
-                              'Starlink::AMS::Task' => 0,
+                              'Starlink::AST' => 0,
+                              'Astro::FITS::Header::CFITSIO' => 0,
                               'Astro::Catalog' => 0,
                               'File::Spec' => 0,
                              },
