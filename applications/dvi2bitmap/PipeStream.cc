@@ -43,7 +43,12 @@
 #endif
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?
+#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
 #include <map>
 
 #ifdef HAVE_STD_NAMESPACE
@@ -105,11 +110,11 @@ PipeStream::PipeStream (string cmd, string envs)
     int fd[2];
 
     if (pipe(fd))
-	throw new DviError("runCommandPipe: failed to create pipe");
+	throw new DviError("PipeStream: failed to create pipe");
 
     pid_ = fork();
     if (pid_ < 0) {
-	throw new DviError("runCommandPipe: failed to fork");
+	throw new DviError("PipeStream: failed to fork");
     } else if (pid_ == 0) {
 	// ...in child.  We will write to the pipe, so immediately
 	// close the reading end
@@ -211,13 +216,65 @@ PipeStream::~PipeStream()
 }
 
 /**
- * Closes the stream, and reaps the process status.
+ * Closes the stream, and reaps the process status.  
+ *
+ * <p>If the process has not already terminated, this method attempts
+ * to kill it, by sending first HUP.  If the process appears reluctant to
+ * die, we abandon it, and do not reap its status.  If there is some
+ * reason why we can't reap the status -- because it has not died or
+ * for, say, some permissions reason -- we set the returned status to
+ * -1.
  */
 void PipeStream::close(void)
 {
-    cerr << "PipeStream::close..." << endl;
     if (pid_ > 0) {
-	waitpid(pid_, &pipe_status_, 0);
+	errno = 0;
+	if (kill(pid_, SIGHUP)) {
+	    // didn't work
+	    if (errno == ESRCH) {
+		// no such process -- already dead -- just reap
+		waitpid(pid_, &pipe_status_, 0);
+	    } else {
+		// something odd happened
+		if (getVerbosity() >= normal) {
+		    cerr << "PipeStream::close couldn't signal subprocess "
+			 << pid_ << " -- not reaping status" << endl;
+		}
+		pipe_status_ = -1;
+		// don't wait any more
+	    }
+	} else {
+	    // It worked; thus there was a process to signal to; wait
+	    // to check it's gone
+	    sleep(1);
+	    errno = 0;
+	    if (kill(pid_, SIGHUP)) {
+		if (errno == ESRCH) {
+		    // good -- no such process
+		    waitpid(pid_, &pipe_status_, 0);
+		} else {
+		    // ooops
+		    if (getVerbosity() >= normal)
+			cerr << "PipeStream::close: can't signal to process "
+			     << pid_
+			     << " -- not reaping status"
+			     << endl;
+		    pipe_status_ = -1;
+		}
+	    } else {
+		// Oh dear, we were able to signal to the process, so
+		// it's still there.  Abandon it, to avoid getting
+		// trapped waiting for it.  Could we try sending KILL
+		// to it?  Dangerous if it's ended up in
+		// uninterruptable sleep.
+		if (getVerbosity() >= normal)
+		    cerr << "PipeStream::close: process "
+			 << pid_
+			 << " hasn't died (quickly) -- not reaping status"
+			 << endl;
+		pipe_status_ = -1;
+	    }
+	}
 	pid_ = 0;
     }
     InputByteStream::close();
@@ -226,10 +283,11 @@ void PipeStream::close(void)
 /**
  * Returns the status of the command at the end of the pipe.  Since
  * this is only available after the command has run to completion,
- * this <em>closes</em> the stream, and waits until the command has
+ * this invokes {@link #close} on the stream, and waits until the command has
  * finished.  Thus, you should <em>not</em> call this until
  * <em>after</em> you have extracted all of the command's output that
- * you want.
+ * you want.  Note that the status could be inaccurate if
+ * <code>close</code> was unable to terminate the process.
  *
  * @return the exit status of the process.
  */
@@ -248,29 +306,46 @@ int PipeStream::getStatus(void)
  * <p>If the current platform cannot support pipes, then return
  * <code>InputByteStreamError</code> immediately.
  *
+ * @param allOfFile if true, then all of the file is read into the
+ * string; if false (the default), only the first line is returned,
+ * <em>not</em> including the newline or carriage-return which ends
+ * the line
+ *
+ * @param gobbleRest if true (the default) then gobble the rest of
+ * the file; has an effect only if <code>allOfFile</code> was false
+ *
  * @return the stream as a string
  * @throws InputByteStreamError if there is some problem reading the stream
  */
-string PipeStream::getResult(void)
+ string PipeStream::getResult(bool allOfFile, bool gobbleRest)
     throw (InputByteStreamError)
 {
     SSTREAM resp;
-    while (!eof())
-	resp << getByte();
+    if (allOfFile) {
+	for (Byte b=getByte(); !eof(); b=getByte())
+	    resp << b;
+    } else {
+	for (Byte b=getByte(); !(eof() || b=='\n' || b=='\r'); b=getByte())
+	    resp << b;
+	if (gobbleRest)
+	    while (!eof())
+		getByte();
+    }
 
     string response;
     int status = getStatus();
     if (WIFEXITED(status)) {
 	if (getVerbosity() > normal)
 	    cerr << "exit status=" << WEXITSTATUS(status) << endl;
-	if (WEXITSTATUS(status) != 0)
+	if (WEXITSTATUS(status) != 0 && getVerbosity() >= normal) {
 	    cerr << "Command <" << orig_command_
 		 << "> exited with non-zero status "
 		 << WEXITSTATUS(status) << endl;
+	}
 	response = SS_STRING(resp);
     } else if (WIFSIGNALED(status)) {
 	// if the command fails we may come here
-	if (getVerbosity() > normal)
+	if (getVerbosity() >= normal)
 	    cerr << "Signalled with signal number " << WTERMSIG(status)
 		 << (WCOREDUMP(status) ? " (coredump)" : " (no coredump)")
 		 << endl;
