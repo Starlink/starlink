@@ -199,7 +199,7 @@ public:
   // Return the value of an AST attribute of the main AstFrameSet.
   const char *astGetAttrib( char *attrib );
 
-  //  Return copy ofwarnings string.
+  //  Return copy of warnings string.
   const char *getWarning();
 
   //  Get a list of the domains available in the frameset.
@@ -207,8 +207,17 @@ public:
   
   //  Set an AST attribute.
   int astSetAttrib( const char *what, const char *value );
-};
 
+  //  Return a value formatted for the RA axis.
+  const char *formatRAValue( double value );
+
+  // Return a value formatted for the Dec axis.
+  const char *formatDecValue( double value );
+
+  // Return 1 if the RA and Dec axes are "swapped".
+  int swapped();
+
+};
 
 #endif /* _StarWCS_h_ */
 
