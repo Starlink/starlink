@@ -22,6 +22,7 @@
 #
 #  Authors:
 #     PDRAPER: P.W. Draper (STARLINK)
+#     MBT: M.B. Taylor (STARLINK)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -40,11 +41,16 @@
 #        Added changes to support foreign data access.
 #     16-JUN-1997 (PDRAPER):
 #        Replace reduce and ccdalign scripts by super-script equivalents.
+#     10-MAR-1999 (MBT):
+*        Added entries for ASTIMP and ASTEXP.
 #     {enter_changes_here}
 #
 #-
 #
 #   Define aliases for each application.
+#
+      alias astexp '$CCDPACK_DIR/astexp'
+      alias ccd_astexp '$CCDPACK_DIR/astexp'
 #
       alias astimp '$CCDPACK_DIR/astimp'
       alias ccd_astimp '$CCDPACK_DIR/astimp'
