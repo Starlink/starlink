@@ -821,6 +821,11 @@
             END IF
          END IF
 
+*  Release NDFs.
+         DO I = 1, NMEM
+            CALL NDF_ANNUL( INDF( I ), STATUS )
+         END DO
+
 *  Free memory.
          IF ( NPOSI .GT. 0 ) THEN
             CALL CCD1_MFREE( IPXI, STATUS )
