@@ -172,4 +172,4 @@ kpg1_pgsht.f kpg1_pacol.f
 	$(GENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
 
-AM_FCFLAGS = -I../ctm -I../ira
+AM_FCFLAGS = -I../ira

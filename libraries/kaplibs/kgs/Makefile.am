@@ -17,7 +17,7 @@ kpg1_palci.f kpg1_prcur.f \
 kpg1_qcol.f kpg1_qidat.f kpg1_qncol.f kpg1_qvid.f kpg1_sdtrn.f \
 kpg1_solin.f kpg1_zones.f kpg1_zopic.f ncraxs.f ncrbck.f ncropn.f
 
-AM_FCFLAGS = -I../ctm -I../ira
+AM_FCFLAGS = -I../kpg -I../ira
 
 
 
