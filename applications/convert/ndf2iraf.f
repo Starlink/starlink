@@ -49,7 +49,7 @@
 *        are any bad values present they are copied verbatim to the IRAF
 *        image.
 *     ndf2iraf qsospe qsospe fillbad=0
-*         Converts the NDF called QSOSPE to an IRAF image comprising the
+*         Converts the NDF called qsospe to an IRAF image comprising the
 *         pixel file qsospe.imh and the header file qsospe.pix.  Any bad
 *         values in the data array are replaced by zero.
 
@@ -57,7 +57,7 @@
 *     The rules for the conversion are as follows:
 *     -  The NDF data array is copied to the ".pix" file.
 *     -  The NDF title is written to the header object i_title in
-*     the ".imh" header file. There is a limit of twenty characters.
+*     the ".imh" header file.  There is a limit of twenty characters.
 *     -  If there is a FITS extension in the NDF, then the elements up
 *     to the first END keyword of this are added to the `user area' of
 *     the IRAF header file.
@@ -85,11 +85,7 @@
 *     system installed, or access to the object libraries required.
 
 *  Implementation Status:
-*     -  It is only available on VMS, SunOS, and Ultrix systems.  On
-*     Solaris 2.3 systems the version built on SunOS can be used in
-*     compatibility mode, but there is no guarantee that this will
-*     work for all NDFs.  At the time of writing there was no working
-*     IRAF imfort library available for Alpha/OSF1.
+*     -  It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 *     -  Only handles one-, two-, and three-dimensional NDFs.
 *     -  Of the NDF's array components only the data array may be
 *     copied.

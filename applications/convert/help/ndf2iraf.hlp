@@ -36,7 +36,7 @@ ndf2iraf abell119 a119
    image.
 
 ndf2iraf qsospe qsospe fillbad=0
-   Converts the NDF called QSOSPE to an IRAF image comprising the
+   Converts the NDF called qsospe to an IRAF image comprising the
    pixel file qsospe.imh and the header file qsospe.pix.  Any bad
    values in the data array are replaced by zero.
 2 Notes
@@ -45,7 +45,7 @@ The rules for the conversion are as follows:
 -  The NDF data array is copied to the ".pix" file.
 
 -  The NDF title is written to the header object i_title in
-the ".imh" header file. There is a limit of twenty characters.
+the ".imh" header file.  There is a limit of twenty characters.
 
 -  If there is a FITS extension in the NDF, then the elements up
 to the first END keyword of this are added to the `user area' of
@@ -71,6 +71,10 @@ NDF2IRAF.
 2 Prior_Requirements
    This routine can only be linked on a machine which has the IRAF
    system installed, or access to the object libraries required.
+2 External_Routines_Used
+   IRAF IMFORT subroutine library.
+2 References
+   IRAF IMFORT subroutine library manual.
 2 Keywords
    CONVERT, IRAF
 2 Authors
@@ -91,11 +95,7 @@ MJC: Malcolm J. Currie (STARLINK)
     allow conversion of cubes, and able to make a signed-word IRAF
     image.
 2 Implementation_Status
-   -  It is only available on VMS, SunOS, and Ultrix systems.  On
-   Solaris 2.3 systems the version built on SunOS can be used in
-   compatibility mode, but there is no guarantee that this will
-   work for all NDFs.  At the time of writing there was no working
-   IRAF imfort library available for Alpha/OSF1.
+   -  It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 
    -  Only handles one-, two-, and three-dimensional NDFs.
 

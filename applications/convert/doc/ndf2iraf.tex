@@ -22,7 +22,7 @@
          FILLBAD = \_REAL (Read)
       }{
          The value used to replace bad pixels in the NDF's data array
-         before it is copied to the IRAF file.  A null value ({\tt !}) means
+         before it is copied to the IRAF file.  A null value ({\tt{!}}) means
          no replacements are to be made.  This parameter is ignored if
          there are no bad values.  {\tt [!]}
       }
@@ -30,8 +30,8 @@
          OUT = LITERAL (Write)
       }{
          The name of the output IRAF image.  Two files are produced
-         with the same name but different extensions. The {\tt "}.pix{\tt "} file
-         contains the data array, and {\tt "}.imh{\tt "} is the associated header
+         with the same name but different extensions. The {\tt ".pix"} file
+         contains the data array, and {\tt ".imh"} is the associated header
          file that may contain a copy of the NDF's FITS extension.
          The suggested default is the current value.
       }
@@ -41,16 +41,16 @@
          ndf2iraf abell119 a119
       }{
          Converts an NDF called abell119 into the IRAF image comprising
-         the pixel file a119.pix and the header file a119.imh.  If there
-         are any bad values present they are copied verbatim to the IRAF
-         image.
+         the pixel file {\tt a119.pix} and the header file {\tt a119.imh}.  
+         If there are any bad values present they are copied verbatim to the
+         IRAF image.
       }
       \sstexamplesubsection{
          ndf2iraf qsospe qsospe fillbad=0
       }{
-         Converts the NDF called QSOSPE to an IRAF image comprising the
-         pixel file qsospe.imh and the header file qsospe.pix.  Any bad
-         values in the data array are replaced by zero.
+         Converts the NDF called qsospe to an IRAF image comprising the
+         pixel file {\tt qsospe.imh} and the header file {\tt qsospe.pix}.
+         Any bad values in the data array are replaced by zero.
       }
    }
    \sstnotes{
@@ -58,11 +58,11 @@
       \sstitemlist{
 
          \sstitem
-         The NDF data array is copied to the {\tt "}.pix{\tt "} file.
+         The NDF data array is copied to the {\tt ".pix"} file.
 
          \sstitem
          The NDF title is written to the header object i\_title in
-         the {\tt "}.imh{\tt "} header file. There is a limit of twenty
+         the {\tt ".imh"} header file.  There is a limit of twenty
          characters.
 
          \sstitem
@@ -82,17 +82,13 @@
    \sstdiytopic{
       Related Applications
    }{
-      CONVERT: IRAF2NDF.
+      \CONVERT: IRAF2NDF.
    }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         It is only available on VMS, SunOS, and Ultrix systems.  On
-         Solaris 2.3 systems the version built on SunOS can be used in
-         compatibility mode, but there is no guarantee that this will
-         work for all NDFs.  At the time of writing there was no working
-         IRAF imfort library available for Alpha/OSF1.
+         It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 
          \sstitem
          Only handles one-, two-, and three-dimensional NDFs.
@@ -117,3 +113,4 @@
       }
    }
 }
+
