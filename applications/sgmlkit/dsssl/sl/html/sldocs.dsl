@@ -48,8 +48,10 @@ These are the document element types.
 
 <codebody>
 
+;(element title
+;  (literal (normalise-string (data (current-node)))))
 (element title
-  (literal (normalise-string (data (current-node)))))
+  (process-children))
 
 (element authorlist
   (process-children))
@@ -100,10 +102,10 @@ are shown at the top of the document.
   (let* ((tsosofo (process-node-list (getdocinfo 'title)))
 	 (authors (children (getdocinfo 'authorlist)))
 	 (rel (document-release-info))
-	 ;(vers (car (cdr (cdr rel))))
-	 ;(date (format-date (car rel)))
 	 (vers (car (cdr (cdr (cdr rel)))))
-	 (date (format-date (car (cdr rel))))
+	 (reldate (if (car (cdr rel))
+		      (format-date (car (cdr rel)))
+		      "not released"))
 	 (docref (getdocnumber))
 	 (copyright (getdocinfo 'copyright))
 	 (coverimage (getdocinfo 'coverimage))
@@ -159,7 +161,7 @@ are shown at the top of the document.
 			    (make element gi: "EM"
 				      (literal "Release date")))
 		      (make element gi: "TD"
-			      (literal date))))
+			      (literal reldate))))
 	      (if (and %starlink-banner% (not suppress-banner))
 		  (make element gi: "TR"
 			(make element gi: "TD"
@@ -170,7 +172,8 @@ are shown at the top of the document.
 		  (empty-sosofo))))
       (if coverimage
 	  (make element gi: "table"
-		attributes: '(("width" "100%"))
+		attributes: '(("width" "100%")
+			      ("border" "1"))
 		(make element gi: "tr"
 		      (make element gi: "td"
 			    attributes: '(("align" "center"))
@@ -181,12 +184,13 @@ are shown at the top of the document.
 	  (make element gi: "p"
 		(process-node-list copyright))
 	  (empty-sosofo))
-      (if %link-extension-list%
+      (if (and %link-extension-list% (not suppress-printable))
 	  (make element gi: "p"
-		(literal "Printable version: ")
+		(literal "Printable version")
 		(apply sosofo-append
 		       (map (lambda (l)
 			      (make sequence
+				(literal " : ")
 				(make element gi: "a"
 				      attributes: (list (list "href"
 							      (string-append
@@ -194,27 +198,8 @@ are shown at the top of the document.
 							       "." (car l)))
 							(list "title"
 							      (cdr l)))
-				      (literal (cdr l)))
-				(literal " ")))
-			    %link-extension-list%))
-;		(let loop ((l %link-extension-list%)
-;			   (res (empty-sosofo))
-;			   (conn (empty-sosofo)))
-;		  (if (null? l)
-;		      res
-;		      (loop (cdr l)
-;			    (sosofo-append res
-;					   conn
-;					   (make element gi: "a" attributes:
-;						 (list (list "href"
-;							     (string-append
-;							      (file-name-root)
-;							      "." (caar l)))
-;						       (list "title"
-;							     (cdar l)))
-;						 (literal (cdar l))))
-;			    (literal ", "))))
-)
+				      (literal (cdr l)))))
+			    %link-extension-list%)))
 	  (empty-sosofo)))))
 
 (element abstract
