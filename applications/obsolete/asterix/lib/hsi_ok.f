@@ -84,6 +84,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
+*  Global Variables:
+      INCLUDE 'HSI_CMN'                                 ! HSI common block
+*       HSI_INIT = LOGICAL (given)
+*         HSI class definitions loaded?
+
 *  Arguments Given:
       INTEGER			IFID			! Input dataset
 
@@ -92,6 +97,9 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			OARG			! Method output value
 *.
 
 *  Check inherited global status.
