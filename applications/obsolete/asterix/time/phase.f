@@ -102,7 +102,7 @@
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_FLUSH( STATUS )
         CALL MSG_PRNT( 'Assuming time axis is axis number one' )
-        AXIS = 1
+        TAXIS = 1
       END IF
 
 *  Check time axis
