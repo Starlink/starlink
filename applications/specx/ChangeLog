@@ -1,10 +1,34 @@
+
+Fri Aug 29 09:51:18 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+	* exprt/sgsdv4header.f (SPECX_GSD_V4_HEADER): apparently V3 (and V4?)
+             do not have C3FLY, indicating on-the-fly rasters. The
+             integration time for on-the-fly rasters needs to be calculated
+             differently. If C3FLY is found, the routine uses it,
+             else it assumes non on-the-fly operation.
+
+Wed Aug 27 21:23:51 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+	* dasmerge.f (dasmerge): Added wideband mode as subroutine parameter
+
+
+Wed Aug 27 21:22:20 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+	* exprt/rd_gsd_ras.f (READ_GSD_RAS): adapted for new DASMERGE
+	wideband mode 
+
+
 2000-05-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* starlink/makefile: Merge diffs from /stardev version
 
 	* util/tran_date.f (TRAN_DATE): Fix problem with loss of precision 
 	when translating, for example, 1999.0722. Came out as 23-Jul-99
 
 2000-01-10  Tim Jenness  <timj@jach.hawaii.edu>
 
+	RELEASE V6.7-6 TO STARLINK
+	
 	* starlink/makefile (F_SUB1): move DECDAT from util to astro
 
 	* astro/decdat.f (DECDAT): Move from util to prevent looping
@@ -79,33 +103,55 @@
 	* src/makefile (distclean): Clean up specx and specx_help binaries
 
 1999-10-27  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
-
-        * tran_date.f (TRAN_DATE): Fix Y2K problem: use MOD i.s.o.
+       
+	* util/tran_date.f (TRAN_DATE): Fix Y2K problem: use MOD i.s.o.
                              subtracting 1900
 
-        * decdat.f (DECDAT): Fix Y2K problem: use window i.s.o.
+	* astro/decdat.f (DECDAT): Fix Y2K problem: use window i.s.o.
                              adding 1900
 	
 1999-05-25  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
 
-        * init.spx: added read-wide-sp as command
+	* init.spx: added read-wide-sp as command
 
-        * comfiles/rdwidesp.spx: installed new script
+	* comfiles/rdwidesp.spx: installed new script
 
 1999-05-04  Remo Tilanus  <rpt@menehune.JAC.Hilo>
 
-        * exprt/makefile: Add bswap.c and wbswap.c to CC routines.
+	* exprt/makefile: Add bswap.c and wbswap.c to CC routines.
 
-        * exprt/bswap.c: new byte swap routine for rdfitsspec.f. After
+	* exprt/bswap.c: new byte swap routine for rdfitsspec.f. After
              Figaro gen_bswap.c
 
-        * exprt/wbswap.c: -same- gen_wbwap.c
+	* exprt/wbswap.c: -same- gen_wbwap.c
 
-        * exprt/rdfitsspec.f (SPECX_RDFITSSPEC): 
+	* exprt/rdfitsspec.f (SPECX_RDFITSSPEC): 
              Since Figaro GEN routines for Byte-swap are now tied to
              host type, byte swap needs to be handled by local subs.
 
-        * exprt/open_fits.f (SPECX_OPEN_FITS):
+	* exprt/open_fits.f (SPECX_OPEN_FITS):
              Since Figaro GEN routines for Byte-swap are now tied to
              host type, byte swap can no longer be an option.
 	
+1998-07-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+        Fix for GKS graphics (not implemented but in test)
+	* mapdis4/anm_col.inc and sxgpgplot.inc must be changed to
+          0:256 since GKS returns colour indices to 256 
+          for postscript devices (and not 255).
+
+	* mapdis4/anm_col.f: also change anmscr in anm_col.f so that it
+	checks for 256 and not 255
+
+1998-02-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* mapdis4/label_map.f (LABEL_MAP): Change XSIZED/YSIZED to INTEGER 
+        and rename the LABELMAP common so that it does not clash with a
+        seemingly different LABELMAP in scl_main.f
+
+	* makefile: Change to point to /star/sources/figaro
+
+Wed Nov 25 22:50:55 1997 Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+ 
+	* init.spx (INIT.SPX): added read_dual_gsd to init.spx and the
+             comfile rddualgsd.spx to comfiles/
