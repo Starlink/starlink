@@ -159,7 +159,7 @@
         CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', OFID, STATUS )
       ELSE
         CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
-        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', 'READ', OFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
         CALL USI_SHOW( 'Output dataset {OUT}', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
