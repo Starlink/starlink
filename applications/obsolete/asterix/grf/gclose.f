@@ -24,9 +24,12 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'GCLOSE Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (G_OPEN) THEN
+        CALL GCB_ATTACH('GRAFIX',STATUS)
         IF (G_MULTI) THEN
           CALL HDS_CLOSE(G_MLOC,STATUS)
         ELSE
@@ -38,4 +41,8 @@
         CALL GCB_DETACH(STATUS)
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+
