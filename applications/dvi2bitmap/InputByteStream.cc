@@ -1,5 +1,5 @@
 //    This file is part of dvi2bitmap.
-//    Copyright 1999--2002, Council for the Central Laboratory of the Research Councils
+//    Copyright 1999--2004, Council for the Central Laboratory of the Research Councils
 //    
 //    This program is part of the Starlink Software Distribution: see
 //    http://www.starlink.ac.uk 
@@ -45,26 +45,32 @@
 #endif
 #include <unistd.h>
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
 #ifdef HAVE_SYS_STAT_H
-#include <sys/types.h>		// for stat
 #include <sys/stat.h>		// for stat
 #endif
 
 #ifdef HAVE_SYS_MMAN_H
-#include <sys/types.h>
 #include <sys/mman.h>
 #endif
 
-#ifdef HAVE_STD_NAMESPACE
-using std::cerr;
-using std::sprintf;
-using std::endl;
-#endif
+using STD::cerr;
+using STD::sprintf;
+using STD::endl;
 
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
 unsigned int InputByteStream::default_buffer_length_ = 0;
 
+/**
+ * No-argument constructor creates a new InputByteStream object, but
+ * does not associate it with any source of bytes.  To associate it
+ * with a source, use {@link #bindToFileDescriptor} or the
+ * convenience method {@link #openSourceSpec}.
+ */
 InputByteStream::InputByteStream()
     : eof_(true), fd_(-1), mappedfd_(-1), buf_(0)
 {
@@ -225,28 +231,32 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
     if (buflen_ == 0)
 	buflen_ = 1024;
 
-    bool mapTheFile = false;
-#ifdef HAVE_MMAP
-    if (isSeekable)
-	mapTheFile = true;
-#endif
-
     if (assertIsSeekable && !isSeekable)
 	throw InputByteStreamError
 		("File " + fname_ + " is not seekable, contrary to assertion");
 
-    if (mapTheFile) {
+#ifdef HAVE_MMAP
+    if (isSeekable) {
 
-#if !(defined(HAVE_MMAP) && defined(HAVE_SYS_STAT_H))
+#  if !defined(HAVE_SYS_STAT_H)
 	// we shouldn't have got here!
 	assert(false);
-#endif	/* ! (HAVE_MMAP && HAVE_SYS_STAT_H) */
+#  endif  /* !defined(HAVE_SYS_STAT_H) */
 
 	buflen_ = S.st_size;
+        errno = 0;
 	buf_ = reinterpret_cast<Byte*>(mmap(0, buflen_,
                                        PROT_READ, MAP_SHARED,
                                        fd_, 0));
-	if (buf_ == MAP_FAILED) {
+#  if defined(MAP_FAILED)
+	if (buf_ == static_cast<Byte*>(MAP_FAILED))
+#  else
+        // Some systems have mman.h, but don't declare the MAP_FAILED
+        // macro variable, though it's mandated by POSIX.  In this case,
+        // just rely on errno being set
+        if (errno)
+#  endif
+        {
 	    string errmsg = strerror(errno);
 	    throw InputByteStreamError
 		    ("Failed to map file " + fname_ + " (" + errmsg + ")");
@@ -275,14 +285,29 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
 	p_ = buf_;
 	eob_ = buf_ + buflen_;
 	
-    } else {
-
+    }
+    else
+#endif  /* HAVE_MMAP */ 
+    {
+        assert(buflen_ > 0);
 	buf_ = new Byte[buflen_];
 	if (fillBufferAndClose) {
 	    size_t real_length = certainly_read_(fd_, buf_, buflen_);
 	    p_ = buf_;
 	    eob_ = buf_ + real_length;
-	    close();
+            // Do not use close() here, since that also deallocates buf_,
+            // and sets eof_ true.
+            ::close(fd_);
+            fd_ = -1;
+            if (verbosity_ >= debug) {
+                cerr << "InputByteStream: read "
+                     << real_length << '/' << buflen_
+                     << " from fd: buf_ is non zero? "
+                     << (buf_ != 0 ? "yes" : "no")
+                     << "; actual length=" << (eob_-buf_)
+                     << ".  Closed: fd=" << fd_
+                     << endl;
+            }
 	} else {
 	    eob_ = p_ = buf_;
 	    assert(p_ == buf_);
@@ -290,13 +315,17 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
     }
 
     assert(buf_ <= p_ && p_ <= eob_);
+    // Since from the client's point of view we haven't read anything yet,
+    // we can't be at EOF.
+    assert(!eof_);
     
-    if (verbosity_ > normal)
+    if (verbosity_ >= debug)
 	cerr << "InputByteStream: reading from fd " << fileno
 	     << ", name=" << fname_
 	     << ", buffer length=" << buflen_
 	     << ", seekable=" << (isSeekable ? "yes" : "no")
 	     << ", mapped=" << (mappedfd_ >= 0 ? "yes" : "no")
+             << (fd_ < 0 ? " (read completed and fd closed)" : "")
 	     << endl;
 
     return true;
@@ -541,7 +570,7 @@ void InputByteStream::read_buf_()
     }
     eof_ = (bufcontents == 0);
     eob_ = buf_ + bufcontents;
-    if (verbosity_ > normal)
+    if (verbosity_ >= debug)
 	cerr << "InputByteStream::read_buf_: read "
 	     << bufcontents << '/' << buflen_ << " from fd " << fd_
 	     << "; eof=" << (eof_ ? "true" : "false")
@@ -617,7 +646,7 @@ void InputByteStream::bufferSeek(unsigned int offset)
 
     p_ = buf_ + offset;
     eof_ = (p_ == eob_);
-    if (verbosity_ > normal)
+    if (verbosity_ >= debug)
 	cerr << "bufferSeek to " << offset
 	     << "; eof=" << (eof_ ? "true" : "false")
 	     << ", p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_
@@ -638,7 +667,7 @@ void InputByteStream::reloadBuffer(void)
 				   // assertion in this method, but
 				   // if it is false, there's a
 				   // programming error somewhere
-    if (verbosity_ > normal)
+    if (verbosity_ >= debug)
 	cerr << "InputByteStream::reloadBuffer: p=buf+" << p_-buf_
 	     << " eob=buf+" << eob_-buf_
 	     << " eof=" << (eof_ ? "true" : "false")
@@ -658,8 +687,8 @@ void InputByteStream::close(void)
 	::close(fd_);
     fd_ = -1;
 
-    if (mappedfd_ >= 0) {
 #ifdef HAVE_MMAP
+    if (mappedfd_ >= 0) {
 	if (buf_ == 0)
 	    cerr << "InputByteStream::close: -- odd, already deallocated"
 		 << endl;
@@ -673,10 +702,8 @@ void InputByteStream::close(void)
 	}
 	::close(mappedfd_);
 	mappedfd_ = -1;
-#else
-	assert(false);
-#endif
     }
+#endif
 
     if (buf_ != 0) {
 	delete[] buf_;
