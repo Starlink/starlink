@@ -228,7 +228,7 @@
       IF ( GERR ) THEN
         CALL BDI_CHK( ID, 'Error', OK, STATUS )
         IF ( OK ) THEN
-          CALL BDI_GETR( ID, 'Error', 2, LMAXD, QUAL, DIMS, STATUS )
+          CALL BDI_GETR( ID, 'Error', 2, LMAXD, ERROR, DIMS, STATUS )
         ELSE
           DO J = 1, NY
             DO I = 1, NX

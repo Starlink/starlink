@@ -76,8 +76,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     5 Jan 1995 (DJA):
+*      5 Jan 1995 (DJA):
 *        Original version.
+*     21 Feb 1996 (DJA):
+*        Removed SIND and COSD for Linux port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,14 +92,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MATH_PAR'
 
 *  Arguments Given:
-      DOUBLE PRECISION		SLONG			! Special longitude
-      DOUBLE PRECISION		SLAT   			! Special latitude
-      DOUBLE PRECISION		PLONG			! Longitude of NSP
+      DOUBLE PRECISION		SLONG, SLAT, PLONG
 
 *  Arguments Returned:
-      DOUBLE PRECISION		MAT(3,3)		! Rotation matrix
+      DOUBLE PRECISION		MAT(3,3)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -112,12 +113,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Pre-compute trig functions
-      SIN_AL = SIND(SLONG)
-      COS_AL = COSD(SLONG)
-      SIN_DE = SIND(SLAT)
-      COS_DE = COSD(SLAT)
-      SIN_LP = SIND(PLONG)
-      COS_LP = COSD(PLONG)
+      SIN_AL = SIN(SLONG*MATH__DDTOR)
+      COS_AL = COS(SLONG*MATH__DDTOR)
+      SIN_DE = SIN(SLAT*MATH__DDTOR)
+      COS_DE = COS(SLAT*MATH__DDTOR)
+      SIN_LP = SIN(PLONG*MATH__DDTOR)
+      COS_LP = COS(PLONG*MATH__DDTOR)
 
 *  Generate the matrix
       MAT(1,1) = -SIN_AL*SIN_LP - COS_AL*COS_LP*SIN_DE
