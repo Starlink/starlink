@@ -50,11 +50,16 @@ depending on whether the element is to be chunked.
   <p>If this is present, and chunking has not been turned off
   completely, then the document <em/will/ be chunked, because it
   wouldn't make much sense otherwise.
+<parameter keyword default='#f'>force-chunk
+  <type>boolean
+  <description>If true, then treat the body as a chunk, even if it
+  wouldn't otherwise be taken to be one.
 <codebody>
-(define (html-document title-sosofo body-sosofo #!key (system-id #f))
+(define (html-document title-sosofo body-sosofo #!key (system-id #f)
+						      (force-chunk #f))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
 	 (doc-sosofo 
-	  (if (or (chunk?) is-de?)
+	  (if (or force-chunk (chunk?) is-de?)
 	      (make element gi: "HTML"
 		    (make element gi: "HEAD"
 			  (make element gi: "TITLE" title-sosofo)
