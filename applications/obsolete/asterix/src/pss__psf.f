@@ -221,6 +221,7 @@
 *
       CHARACTER*80		PDATA			! PSFPIX response
       CHARACTER*80     		TEXT                    ! Output data
+      CHARACTER*80		FORMAT, FORMAT2		! Format statment
 
       REAL             		MAXOFF                  ! Maximum off-axis angle
       REAL             		X0, Y0                  ! Image position
@@ -330,9 +331,10 @@
           CALL MSG_PRNT( 'Energy fraction    Off-axis angle' )
         END IF
         IF ( .NOT. PSF_CONSTANT ) THEN
-  2       FORMAT( 18X, <NIPOS>(I3,3X), 'arcmin' )
-          WRITE( TEXT, 2, IOSTAT=FSTAT ) (NINT(PSF_PPR(IPOS)*
-     :                         MATH__RTOD*60.0) ,IPOS=1,NIPOS)
+          WRITE( FORMAT, 2, IOSTAT=FSTAT ) NIPOS
+  2       FORMAT ( '(18X, ', I3, '(I3,3X), ''arcmin'')' )
+          WRITE( TEXT, FORMAT, IOSTAT=FSTAT ) (NINT(PSF_PPR(IPOS)*
+     :                             MATH__RTOD*60.0) ,IPOS=1,NIPOS)
           CALL MSG_PRNT( TEXT )
         END IF
         CALL MSG_PRNT( ' ' )
@@ -340,13 +342,16 @@
         DO ILEV = 1, NPSFLEV
 
 *        Check radius isn't an lower bound
-  5       FORMAT( 4X,I4,'%',8X,<NIPOS>(F4.1,2X),' pixels' )
- 15       FORMAT( 4X,I4,'%',8X,'> ',<NIPOS>(F5.1,2X),' pixels' )
+          WRITE ( FORMAT, 5, IOSTAT=FSTAT) NIPOS
+          WRITE ( FORMAT2, 15, IOSTAT=FSTAT) NIPOS
+  5       FORMAT( '(4X,I4,''%'',8X,', I3, '(F4.1,2X),'' pixels'')' )
+ 15       FORMAT( '(4X,I4,''%'',8X,', I3, '(F5.1,2X),'' pixels'')' )
+
           IF ( PSF_PIXL(ILEV,NIPOS) .GT. 0 ) THEN
-            WRITE( TEXT, 5, IOSTAT=FSTAT ) NINT(ELEVS(ILEV)*100.0),
+            WRITE( TEXT, FORMAT, IOSTAT=FSTAT ) NINT(ELEVS(ILEV)*100.0),
      :                     (ABS(PSF_PIXL(ILEV,IPOS)),IPOS=1,NIPOS)
           ELSE
-            WRITE( TEXT,15, IOSTAT=FSTAT ) NINT(ELEVS(ILEV)*100.0),
+            WRITE( TEXT, FORMAT2,IOSTAT=FSTAT ) NINT(ELEVS(ILEV)*100.0),
      :                     (ABS(PSF_PIXL(ILEV,IPOS)),IPOS=1,NIPOS)
           END IF
 

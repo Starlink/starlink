@@ -101,19 +101,19 @@
 
 *    Set up the cache control
       CACHE_CTRL = 0
-      CACHE_CTRL = (CACHE_CTRL.OR.DC_F_IMD )       ! Always need data
-      CACHE_CTRL = (CACHE_CTRL.OR.DC_F_PSF )       ! and psf
+      CACHE_CTRL = OR( CACHE_CTRL, DC_F_IMD )       ! Always need data
+      CACHE_CTRL = OR( CACHE_CTRL, DC_F_PSF )       ! and psf
       IF ( CP_CASH ) THEN
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_BGND )    !
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_LBGND )   !
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_PSF_SUM )
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_BGND )    !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_LBGND )   !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_PSF_SUM )
       ELSE
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_IMBV )    !
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_BGDV )    !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_IMBV )    !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_BGDV )    !
       END IF
       IF ( CP_RESCALE .OR. .NOT. CP_OPT ) THEN
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_BGND_SUM )
-        CACHE_CTRL = (CACHE_CTRL.OR.DC_F_IMD_SUM )
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_BGND_SUM )
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_IMD_SUM )
       END IF
 
 *    Run the statistic routine

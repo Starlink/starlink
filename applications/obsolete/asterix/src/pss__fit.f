@@ -102,7 +102,8 @@
 *
 *    Local variables :
 *
-      RECORD /MODEL_SPEC/      MODEL			! Dummy model record
+c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
+      INTEGER		       IMOD
 
       REAL                     DPAR(PSS__FITNPAR)      ! Parameter differences
       DOUBLE PRECISION         LASTMIN                 ! Best fit value
@@ -169,7 +170,8 @@
       GOOD_FIT = .FALSE.
 
 *  Set up a dummy MODEL structure
-      MODEL.NTIE = 0
+      IMOD = 1
+      MODEL_SPEC_NTIE(IMOD) = 0
 
 *  Restart and reset iteration counter
       ITER = 0
@@ -208,49 +210,49 @@
 
 *      Produce Stat(x,y) image?
         IF ( DI_CHI_V_XY ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, 0, 'xy', ' ', STATUS )
         END IF
 
 *      Produce Flux(x,y) image?
         IF ( DI_FLUX_V_XY ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, P__F, 'xy', ' ', STATUS )
         END IF
 
 *      Produce Stat(x) profile?
         IF ( DI_CHI_V_X ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, 0, 'x', 'y', STATUS )
         END IF
 
 *      Produce Flux(x) profile?
         IF ( DI_FLUX_V_X ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, P__F, 'x', 'y', STATUS )
         END IF
 
 *      Produce p(f) profile?
         IF ( DI_P_S_PROFILE ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, -1, 'f', 'xy', STATUS )
         END IF
 
 *      Produce p(x,y,s) cube?
         IF ( DI_P_XYS_CUBE ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, 0, 'xyf', ' ', STATUS )
         END IF
 
 *      Produce Stat(f) profile?
         IF ( DI_CHI_V_FLUX ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, 0, 'f', 'xy', STATUS )
         END IF
 
 *      Produce Stat(f,b) image?
         IF ( DI_CHI_V_F_B ) THEN
-          CALL PSS_FIT_GRID( PARAM, MODEL, LB, UB, FROZEN,
+          CALL PSS_FIT_GRID( PARAM, IMOD, LB, UB, FROZEN,
      :                ISTAT, PSCALE, 0, 'fb', 'xy', STATUS )
         END IF
 
@@ -260,9 +262,9 @@
       END IF
 
 *    Find optimum fit
-      CALL FIT_MIN( 1, FIT.DS, 0, MODEL, MCTRL, .FALSE., 0,
+      CALL FIT_MIN( 1, IMOD, MCTRL, .FALSE., 0,
      :              PSS__FITNPAR, LB, UB, FROZEN, PSCALE, ISTAT,
-     :              PSS_FIT_GENMODEL, FIT.PRED, PARAM, DPAR,
+     :              PSS_FIT_GENMODEL, PARAM, DPAR,
      :              PEGGED, STATMIN, FINISHED, FITERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__OK
@@ -290,9 +292,9 @@
       IF ( FRFLUX ) GOTO 89
 
 *    First guess at errors by inverting matrix
-      CALL FIT_PARERR( 1, FIT.DS, 0, MODEL, PSS__FITNPAR, PARAM, LB, UB,
+      CALL FIT_PARERR( 1, IMOD, PSS__FITNPAR, PARAM, LB, UB,
      :        DPAR, FROZEN, PEGGED, PSCALE, ISTAT, PSS_FIT_GENMODEL,
-     :               FIT.PRED, PERR, STATUS )
+     :        PERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         CALL MSG_SETI( 'N', GE_EXEC_NSRC )
@@ -325,9 +327,9 @@
           CALL FCI_RESET( MCTRL, STATUS )
 
 *      Next guess at flux errors
-          CALL FIT_PARCON( 1, FIT.DS, 0, MODEL, MCTRL, SOFF, 0, 1, P__F,
+          CALL FIT_PARCON( 1, IMOD, MCTRL, SOFF, 0, 1, P__F,
      :                     PSS__FITNPAR, LB, UB, FROZEN, PSCALE, DPAR,
-     :                     ISTAT, PSS_FIT_GENMODEL, FIT.PRED, STATMIN,
+     :                     ISTAT, PSS_FIT_GENMODEL, STATMIN,
      :                     PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
 
 *        Fit error?
@@ -398,10 +400,10 @@
           CALL FCI_RESET( MCTRL, STATUS )
 
 *        Next guess at confidence intervals
-          CALL FIT_PARCON( 1, FIT.DS, 0, MODEL, MCTRL, SOFF, 0, 2,
+          CALL FIT_PARCON( 1, IMOD, MCTRL, SOFF, 0, 2,
      :                     PPARS, PSS__FITNPAR, LB, UB, FROZEN,
      :                     PSCALE, DPAR, ISTAT, PSS_FIT_GENMODEL,
-     :     FIT.PRED, STATMIN, PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
+     :            STATMIN, PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
 
           IF ( STATUS .EQ. USER__001 ) THEN
             STATUS = SAI__OK
@@ -458,15 +460,15 @@
 
 *  Evaluate Cash statistic at zero flux
       PARAM(P__F) = 0.0
-      CALL FIT_STAT( 1, FIT.DS, 0, 0, PARAM, ISTAT,
-     :                 PSS_FIT_GENMODEL, FIT.PRED, STAT0, STATUS )
+      CALL FIT_STAT( 1, 0, PARAM, ISTAT,
+     :               PSS_FIT_GENMODEL, STAT0, STATUS )
 
 *  To get significance
       S_DSTAT(ID) = REAL(STAT0-STATMIN)
       S_SIG(ID) = PSS_CASH_SIG( S_DSTAT(ID) )
 
 *  Evaluate model once more
-      CALL PSS_FIT_GENMODEL( ISTAT, 1, FIT.DS, 0, FIT.PRED, 0,
+      CALL PSS_FIT_GENMODEL( ISTAT, 1, FIT_PRED, 0,
      :                              PGOOD, 1, DC_MOD, STATUS )
 
 *  Find error in significance
@@ -1027,17 +1029,19 @@
 
 *    First time through?
       IF ( FIRST ) THEN
-        CALL DYN_MAPR( 1, 2*PSS__CACHELEN, FIT.PRED.PREDPTR(1), STATUS )
-        CALL DYN_MAPR( 1, 2*PSS__CACHELEN, FIT.PRED.PREDPTR(2), STATUS )
-        FIT.PRED.PGDPTR(1) = FIT.PRED.PREDPTR(1)
-        FIT.PRED.PGDPTR(2) = FIT.PRED.PREDPTR(2)
-        CALL DYN_MAPR( 1, 2*P__E*PSS__CACHELEN, FIT.PRED.DFDPPTR,
-     :                                                   STATUS )
+        CALL DYN_MAPR( 1, 2*PSS__CACHELEN,
+     :                 PREDICTION_PREDPTR(FIT_PRED,1), STATUS )
+        CALL DYN_MAPR( 1, 2*PSS__CACHELEN,
+     :                 PREDICTION_PREDPTR(FIT_PRED,2), STATUS )
+        PREDICTION_PGDPTR(FIT_PRED,1) = PREDICTION_PREDPTR(FIT_PRED,1)
+        PREDICTION_PGDPTR(FIT_PRED,2) = PREDICTION_PREDPTR(FIT_PRED,2)
+        CALL DYN_MAPR( 1, 2*P__E*PSS__CACHELEN,
+     :                 PREDICTION_DFDPPTR(FIT_PRED), STATUS )
         FIRST = .FALSE.
       END IF
 
 *    Dataset block
-      FIT.DS.D_ID = IM_ID
+      DATASET_D_ID(FIT_DS) = IM_ID
 
 *    Set up flux parameter
       PARAM(P__F) = S_FLUX(ID)
@@ -1069,42 +1073,42 @@
       END DO
 
 *    Set up pointers into cache
-      FIT.DS.NDIM = 1
-      FIT.DS.NDAT = NDAT
-      FIT.DS.NGDAT = NDAT
-      FIT.DS.GFLAG = .FALSE.
-      FIT.DS.IDIM(1) = FIT.DS.NDAT
-      FIT.DS.DPTR = UTIL_PLOC( DC_IMD(DC_LO) )
-      FIT.DS.GDPTR = FIT.DS.DPTR
+      DATASET_NDIM(FIT_DS) = 1
+      DATASET_NDAT(FIT_DS) = NDAT
+      DATASET_NGDAT(FIT_DS) = NDAT
+      DATASET_GFLAG(FIT_DS) = .FALSE.
+      DATASET_IDIM(FIT_DS,1) = DATASET_NDAT(FIT_DS)
+      DATASET_DPTR(FIT_DS) = UTIL_PLOC( DC_IMD(DC_LO) )
+      DATASET_GDPTR(FIT_DS) = DATASET_DPTR(FIT_DS)
 
 *    Dataset quality if present
-      FIT.DS.QFLAG = BDS_QUAL_OK
+      DATASET_QFLAG(FIT_DS) = BDS_QUAL_OK
       IF ( BDS_QUAL_OK ) THEN
-        FIT.DS.QPTR = UTIL_PLOC( DC_Q(DC_LO) )
+        DATASET_QPTR(FIT_DS) = UTIL_PLOC( DC_Q(DC_LO) )
       ELSE
-        FIT.DS.QPTR = 0
+        DATASET_QPTR(FIT_DS) = 0
       END IF
-      FIT.DS.GQPTR = FIT.DS.QPTR
+      DATASET_GQPTR(FIT_DS) = DATASET_QPTR(FIT_DS)
 
       IF ( .NOT. CP_CASH ) THEN
-        FIT.DS.VPTR = UTIL_PLOC( DC_IMBV(DC_LO) )
-        FIT.DS.GWPTR = FIT.DS.VPTR
+        DATASET_VPTR(FIT_DS) = UTIL_PLOC( DC_IMBV(DC_LO) )
+        DATASET_GWPTR(FIT_DS) = DATASET_VPTR(FIT_DS)
       END IF
-      FIT.DS.BPTR = UTIL_PLOC( DC_BGND(DC_LO) )
-      FIT.DS.TEFF = 1.0
+      DATASET_BPTR(FIT_DS) = UTIL_PLOC( DC_BGND(DC_LO) )
+      DATASET_TEFF(FIT_DS) = 1.0
 
 *    Prediction block
-      FIT.PRED.CONVOLVE = .FALSE.
-      FIT.PRED.NMDIM = 1
+      PREDICTION_CONVOLVE(FIT_PRED) = .FALSE.
+      PREDICTION_NMDIM(FIT_PRED) = 1
       IF ( CP_CASH ) THEN
         STATID = FIT__LOGL
       ELSE
         STATID = FIT__CHISQ
       END IF
-      FIT.PRED.DPTR = UTIL_PLOC( DC_MOD(DC_LO) )
-      FIT.PRED.GDPTR = FIT.PRED.DPTR
-      FIT.PRED.IDIMM(1) = FIT.DS.NDAT
-      FIT.PRED.NMDAT = FIT.DS.NDAT
+      PREDICTION_DPTR(FIT_PRED) = UTIL_PLOC( DC_MOD(DC_LO) )
+      PREDICTION_GDPTR(FIT_PRED) = PREDICTION_DPTR(FIT_PRED)
+      PREDICTION_IDIMM(FIT_PRED,1) = DATASET_NDAT(FIT_DS)
+      PREDICTION_NMDAT(FIT_PRED) = DATASET_NDAT(FIT_DS)
 
 *    Cache the observed data
       DC_VOLATILE = .TRUE.
@@ -1217,8 +1221,8 @@
       END
 
 *+  PSS_FIT_GENMODEL - Produce predicted data given model parameters
-      SUBROUTINE PSS_FIT_GENMODEL( FSTAT, NDS, OBDAT, INSTR, PREDDAT,
-     :                                MODEL, PARAM, N, PRED, STATUS )
+      SUBROUTINE PSS_FIT_GENMODEL( FSTAT, NDS, IPRED, IMOD,
+     :                             PARAM, N, PRED, STATUS )
 *
 *    Description :
 *
@@ -1254,10 +1258,11 @@
 *
       INTEGER                 FSTAT                         ! Fit statistic
       INTEGER                 NDS                           ! # datasets
-      RECORD /DATASET/        OBDAT(NDS)                    ! Supplied by
-      RECORD /INSTR_RESP/     INSTR(NDS)                    ! fitting. Not
-      RECORD /MODEL_SPEC/     MODEL                         ! used here...
-      RECORD /PREDICTION/     PREDDAT                       ! Data predicted
+c     RECORD /DATASET/        OBDAT(NDS)                    ! Supplied by
+c     RECORD /INSTR_RESP/     INSTR(NDS)                    ! fitting. Not
+c     RECORD /MODEL_SPEC/     MODEL                         ! used here...
+c     RECORD /PREDICTION/     PREDDAT                       ! Data predicted
+      INTEGER		      IMOD, IPRED
       REAL                    PARAM(*)                      ! Fit parameters
       INTEGER                 N                             ! Dataset number
 *
@@ -1339,7 +1344,7 @@
       END
 
 *+  PSS_FIT_GRID - Construct a grid of GPAR against GVARS
-      SUBROUTINE PSS_FIT_GRID( PARAM, MODEL, IN_LB, IN_UB, IN_FRO,
+      SUBROUTINE PSS_FIT_GRID( PARAM, IMOD, IN_LB, IN_UB, IN_FRO,
      :                 ISTAT, PSCALE, GPAR, GVARS, FPARS, STATUS )
 *
 *    Description :
@@ -1379,7 +1384,8 @@
 *    Import :
 *
       REAL                     	PARAM(*)                ! Fit parameters
-      RECORD /MODEL_SPEC/       MODEL			! Fit model spec
+c     RECORD /MODEL_SPEC/       MODEL			! Fit model spec
+      INTEGER			IMOD
       LOGICAL                   IN_FRO(*)               !
       REAL                      IN_LB(*), IN_UB(*)      ! Parameter bounds
       INTEGER                   ISTAT                   ! Fit statistic
@@ -1406,7 +1412,8 @@
 *
 *    Local variables :
 *
-      RECORD /GRID_AXIS/       	GAX(MAXAX)              ! The grid axes
+c     RECORD /GRID_AXIS/       	GAX(MAXAX)              ! The grid axes
+      INTEGER			GAX
 
       CHARACTER*1              	EC                      ! Axis character code
       CHARACTER*30             	FNAME                   ! Filename of grid
@@ -1613,7 +1620,7 @@
 
 *    Create the grid axis
         CALL FIT_DEFREGRID( IP, DIM, .FALSE., BASE,
-     :                      SCALE, GAX(IAX), STATUS  )
+     :                      SCALE, IAX, STATUS  )
 
 *    Set this dimension
         DIMS(IAX) = DIM
@@ -1667,9 +1674,9 @@
       CALL FCI_CURFMC( PSS__FITMXIT, 0, 0.0, MCTRL, STATUS )
 
 *  Grid the statistic over the cube
-      CALL FIT_GRID( 1, FIT.DS, 0, MODEL, MCTRL, 0, NAX, GAX, 1, LGPAR,
+      CALL FIT_GRID( 1, IMOD, MCTRL, 0, NAX, GAX, 1, LGPAR,
      :               PSS__FITNPAR, LB, UB, FROZEN,
-     :               PSCALE, ISTAT, PSS_FIT_GENMODEL, FIT.PRED,
+     :               PSCALE, ISTAT, PSS_FIT_GENMODEL,
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
 
 *  Destroy minimisation control
