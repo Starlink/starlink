@@ -84,11 +84,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'HSI_CMN'                                 ! HSI common block
-*       HSI_INIT = LOGICAL (given)
-*         HSI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			IFID			! Dataset identifier
@@ -98,7 +94,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL                  HSI0_BLK                ! Ensures inclusion
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
 
 *  Local Variables:
       INTEGER			IARG(2)			! Method inputs
@@ -111,7 +108,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( HSI__PKG ) ) CALL HSI0_INIT( STATUS )
 
 *  Get base file object
       CALL ADI_GETFILE( IFID, IARG(1), STATUS )
