@@ -394,16 +394,16 @@ void PNGBitmap::write (const string filename)
     fclose (pngfile);
 }
 					    
-static void png_error_fn (png_structp png_ptr,
-			  png_const_charp error_msg)
+void PNGBitmap::png_error_fn (png_structp png_ptr,
+				     png_const_charp error_msg)
 {
     string err = "PNG error ";
     err.append(error_msg);
     throw BitmapError (err);
 }
 
-static void png_warning_fn (png_structp png_ptr,
-			    png_const_charp warning_msg)
+void PNGBitmap::png_warning_fn (png_structp png_ptr,
+				       png_const_charp warning_msg)
 {
     if (verbosity_ > quiet)
 	cerr << "PNG warning: " << warning_msg;

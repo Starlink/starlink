@@ -29,6 +29,10 @@ class PNGBitmap : public BitmapImage {
     static png_infop info_ptr_;
     static png_color* palettes_[];
     static png_byte* trans_[];
+    static void png_error_fn (png_structp png_ptr,
+			      png_const_charp error_msg);
+    static void png_warning_fn (png_structp png_ptr,
+				png_const_charp warning_msg);
 };
 
 
