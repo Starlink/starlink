@@ -14,7 +14,7 @@
 }
 \newcommand{\stardocabstract}  {
 CCDBIG is a small package to investigate 
-how {\CCDPref} behaves with large sets of data.
+how CCDPACK behaves with large sets of data.
 A typical data reduction sequence is performed for 
 various large frame sizes, and the resource 
 (memory and time) usage is logged. 
@@ -321,7 +321,6 @@ To run the script, the recommended procedure is
 to change to an empty directory, on a local disk with 
 ample free space, and then:
 \begin{quote}
-\verb"% setenv CCDBIG_DIR /star/bin/ccdpack" \\
 \verb"% cp $CCDBIG_DIR/ccdbig ." \\
 \hspace*{3em} (edit {\tt ccdbig} as required) \\
 \verb"% ./ccdbig"
@@ -339,25 +338,44 @@ is after the initial comment section, and looks like this:
 # Set up the parameters of the reduction sequences.
 # These can be changed to test behaviour of the programs under
 # different circumstances.
+# The defaults are sensible.  For all the Boolean variables, 
+# TRUE is a more resource-intensive option than FALSE.
 
       # Do we want variances calculated and propagated (TRUE or FALSE)?
             set variance = TRUE
 
-      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?
+      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?  
       # (else explicitly impose mask on data using ARDMASK).
             set keepard = TRUE
 
-      # Set list of image sizes of frames (pixels along a side)
-            set image_sizes = ( 1000 2000 3000 4000 5000 6000 )
+      # Do we want to use a bias frame? (TRUE or FALSE)?
+      # (else interpolate between bias strips)
+            set biasframe = TRUE
 
-      # Set list of object densities (objects per million pixels)
+      # Do we want to normalize the frames for scale and zero factors?
+            set normalise = TRUE
+
+      # Data type (_REAL, _WORD, _DOUBLE are sensible)
+            set datatype = _REAL
+
+      # List of image sizes for frames (pixels along a side)
+            set image_sizes = ( 1000 2000 3000 4000 )
+
+      # List of object densities (objects per million pixels).
+      # If this is set to ( 0 ) then min_objects will always be used.
             set object_densities = ( 50 )
+
+      # Minimum number of objects per frame (can override object_densities)
+            set min_objects = 300
+
+      # Graphic display device ("xwindows" is GWM window, "NONE" is none)
+            set device = NONE
 
       # Set logging interval (seconds)
             set interval = 15
 
       # Set filename for logging resource usage
-            set timelogfile = ccdbig_time.log
+            set reslogfile = ccdbig_res.log
 
 # End of parameter setup.
 ###################################################################
@@ -375,13 +393,36 @@ Setting to FALSE decreases memory, disk and CPU time usage.
 %
 \item {\tt keepard}:
 If set to TRUE then the information in the example ARD mask file
-{\tt ccdtest\_ard.dat} will be used by the 
+{\tt ccdtest.ard} will be used by the 
 {\CCDPref} applications where appropriate;
 this increases memory and CPU time usage, especially in \CCDPcmd{DEBIAS}.
 If FALSE, then the ARD mask will be applied explicitly 
 between stages of the reduction process 
-by the \KAPPAref\ application \KAPPAcmd{ARDMASK};
-this decreases the memory requirements of \CCDPcmd{DEBIAS}.
+by the \KAPPAref\ application \KAPPAcmd{ARDMASK}.
+%
+\item {\tt biasframe}:
+If set to TRUE then bias frames will be used to debias the images. 
+If FALSE, then the images will be debiassed using interpolation
+between the bias strips, which means that \CCDPcmd{MAKEBIAS}
+does not need to be run and the demands made by \CCDPcmd{DEBIAS}
+are reduced.
+%
+\item {\tt normalise}:
+Determines whether \CCDPcmd{MAKEMOS} performs 
+inter-frame normalisation before combining the images.
+This is a CPU-intensive step which
+is not necessary for the synthetic data used by CCDBIG;
+for real data it may or may not be.
+%
+\item {\tt datatype}:
+This determines the numeric type used to represent the
+DATA (and VARIANCE, if present) components of the NDFs.
+This choice is honoured by most parts of the reduction 
+process, but \CCDPcmd{MAKEFLAT} always generates a 
+master flat frame of type at least \_REAL.
+The smaller the type the less disk space and I/O resources
+will be required, but the effect on CPU time requirements
+is architecture-dependent.
 %
 \item {\tt image\_sizes}:
 The data reduction process is performed in turn on 
@@ -393,6 +434,20 @@ The number of objects generated in the test data can be altered
 with this value.  If more than one number is given,  more than one
 run will be performed at each frame size.
 %
+\item {\tt min\_objects}:
+The minimum number of objects (roughly) in a data frame.
+If too few objects are present then the registration process
+runs into trouble.
+If behaviour as a function of number of objects is not being assessed 
+(for most purposes the number of objects is not very important)
+then {\tt object\_densities} can be set to {\tt ( 0 )} and
+{\tt min\_objects} to some medium sized number for a fixed
+number of objects regardless of frame size.
+%
+\item {\tt device}:
+This is the graphics device for display.
+If set to {\tt NONE} no graphics display is attempted.
+%
 \item {\tt interval}:
 This determines how often the logging process examines the 
 application processes. 
@@ -402,10 +457,6 @@ but will place a heavier load on the system.
 \item {\tt timelogfile}:
 This is the name of the file to which the resource usage summary is logged.
 \end{itemize}
-
-When run the script will ask for a display device;
-by giving the response {\tt xwindows} progress
-can be monitored graphically in a \GWMref\ window.
 
 
 \subsection{Customising the script}
@@ -474,26 +525,33 @@ maximum resident (real memory) size of the process in kilobytes.
 A section of a log file could therefore look something like this:
 \begin{quote}
 \begin{verbatim}
-SunOS cass58 5.6 Generic sun4u sparc SUNW,Ultra-1
- 11:18am  up 6 day(s),  3:04,  3 users,  load average: 0.17, 0.09, 0.05
-Tue May 19 11:18:45 BST 1998
-21665   /data/cass58a/mbt/ccdbig
-Variance:  FALSE
-Keepard:   TRUE
+SunOS cass60 5.6 Generic_105181-04 sun4u sparc SUNW,Ultra-1
+  5:25pm  up 37 day(s), 9 hr(s),  3 users,  load average: 0.33, 0.46, 0.74
+Thu Jun 11 17:25:49 BST 1998
+3059    /data/cass60a/mbt/ccdbig
+Variance:           FALSE
+Keepard:            FALSE 
+Biasframe:          TRUE
+Normalisation:      TRUE
+Data type:          _REAL
 Logging interval:   15
 
 Pixels Objects     Command
-                              Elapsed(s)     CPU(s)     RSS(k)    Size(k)
-
-   4000   1800 ccdgenerate:          897        235     252000     257752
-   4000   1800    makebias:          119         72      66576      69312
-   4000   1800      debias:         2168        126     400216     444520
-   4000   1800    makeflat:          506        121     170656     173760
-   4000   1800     flatcor:          101         15     111064     173760
-   4000   1800     findobj:           34         23      60288      66400
-   4000   1800     tranndf:          371        306     154744     177544
-   4000   1800 makemosnorm:          914        824      88176      95640
-   4000   1800  makmoscomb:          124         14       5120      11456
+                            Elapsed(s)   CPU(s)   RSS(k)  Size(k) Diskfree(M)
+   3000   1012 ccdgenerate:        415      132   141456   149408         301
+   3000   1012     display:         18        2    16952    45976         301
+   3000   1012    makebias:         38       31    39120    42840         301
+   3000   1012      debias:        539       56   190384   211064         197
+   3000   1012     display:          1        0     3360     9336         197
+   3000   1012    makeflat:        163       63    97856   101632         140
+   3000   1012     ardmask:          6        3    94800   135424         140
+   3000   1012     flatcor:         37        7    89816   101616         140
+   3000   1012     findobj:          7        4    35608    42544         140
+   3000   1012    plotlist:          1        0     4296    11264         140
+   3000   1012     tranndf:        311      175    68608   105384         133
+   3000   1012 makemosnorm:        544      386    51464    59248         130
+   3000   1012  makmoscomb:         41        8     4816    12136         123
+   3000   1012     display:         27        2    19848    83848         123
 \end{verbatim}
 \end{quote}
 
