@@ -12,7 +12,7 @@
 
 #  Invocation:
 #     scb.pl [-html] [-exact] \
-#            [[name=]<name>] [[package=]<package>] [[mode=]<mode>]
+#            [[name=]<name>] [[package=]<package>] [[type=]func|file|regex]
 #
 #     Arguments may be supplied on the command line or in the QUERY_STRING
 #     environment variable as by CGI.
@@ -98,10 +98,9 @@
 
 #-
 
-#  Directory locations.
+#  Temporary directory location.
 
-$tmpbase = "/local/junk/scb";    # scratch directory
-$tmpdir = "$tmpbase/$$";
+$tmpdir = "$scb_tmpdir/$$";
 
 #  Name of this program.
 
@@ -113,7 +112,7 @@ $self =~ s%.*/%%;
 $scb = $self;
 $usage = "Usage: $self [-html] [-exact] \\\n"
        . "        " . ' ' x length ($self)
-       . "[[name=]<name>] [[package=]<package>] [[mode=]<mode>]\n";
+       . "[[name=]<name>] [[package=]<package>] [[type=]func|file|regex]\n";
 
 #  Required libraries.
 
@@ -151,7 +150,7 @@ if (exists $ENV{'SERVER_PROTOCOL'}) {
 
 #  Parse command line arguments.
 
-($rarg, $rflag, $rextra) = parse_args \@ARGV, qw/name package mode/;
+($rarg, $rflag, $rextra) = parse_args \@ARGV, qw/name package type/;
 die $usage if (@$rextra);
 
 #  Process flags.
@@ -996,8 +995,9 @@ sub get_module {
 #  Set up scratch directory.
 
    $tmpfiles = 1;
-   mkdir "$tmpdir", 0777;
-   chdir "$tmpdir"  or error "Failed to enter $tmpdir\n";
+   system (qw/mkdir -p -m 0777/, $tmpdir)
+      and die "Failed to create $tmpdir: $!\n";
+   pushd $tmpdir;
 
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
@@ -1029,6 +1029,7 @@ sub get_module {
 
 #  Tidy up.
 
+   popd;
    rmrf $tmpdir;
    $tmpfiles = 0;
 
@@ -1477,6 +1478,7 @@ sub tidyup {
 
 #-
 
+   chdir "/";
    rmrf $tmpdir if ($tmpfiles);
 }
 
@@ -1539,7 +1541,6 @@ sub error {
 #  Perform any necessary tidying operations.
 
    tidyup;
-
 
 #  Remove carriage returns from strings if they exist;
 
