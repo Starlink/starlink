@@ -240,6 +240,11 @@ give the commands
 % ./mk install
 </verbatim>
 
+<p>This build configures support for GIFs, but not for the
+<code/kpathsea/ library, since that requires an additional
+non-Starlink library which is not distributed with this package.  See
+the non-Starlink instructions, <ref id=install.nonstarlink>, for details.
+
 <subsect id=install.nonstarlink export>Non-starlink machines
 
 <p>If you are not on a Starlink node, then you should build and
@@ -262,9 +267,30 @@ or
 depending on your shell.
 
 <p>To install, just copy the executable dvi2bitmap wherever you want it
-to live.  The program generates XBM bitmaps by default.  
+to live.
 
-<p>If you want it to be able to generate GIFs, then give the configure
+<p>If you want to use the <code/kpathsea/ library, which means that
+the program finds font files using the same mechanism and the same
+configuration file as other &tex;ware then give the configure option
+<code/--with-kpathsea/, and make sure that the <code/kpathsea/ include
+files and library are somewhere the compiler will find them.  For this
+library to find its configuration files, you will either have to
+install the program where the rest of the &tex;ware lives (you can
+find this out with the command <kbd/which kpsewhich/), or tell it
+where the <code/kpathsea/ configuration files are by setting the
+environment variable <code/TEXMFCNF/ (use <kbd/kpsewhich cnf
+texmf.cnf/ to find the configuration file, and set the environment
+variable to the location of that file).  If you don't have the
+<code/kpathsea/ library available (I don't believe it's installed by
+the <code/TeXLive/ distribution, for example), then you can obtain a
+copy from <webref url='http://www.tug.org' >TUG</webref> or <webref
+url='http://www.tex.ac.uk' >CTAN</webref>, in <code
+fspath>/tex-archive/systems/web2c/</code> (it seems
+you can only get <code/kpathsea/ as part of the complete web2c
+distribution, and not as a standalone library).
+
+<p>The program generates XBM bitmaps by default.  
+If you want it to be able to generate GIFs, then give the configure
 option <code/--enable-gif/.  The GIF format is the copyright of
 CompuServe.  As far as I understand it, one does not need a licence
 from CompuServe if one is distributing non-commercial, not-for-profit
@@ -276,7 +302,8 @@ url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.
 >comp.graphics.misc FAQ</webref>
 
 <p>The program builds successfully on (at least) egcs-2.90, Sun Workshop
-C++ 5.0, and Alpha Digital C++ 6.0.  It should be written in
+C++ 5.0, and Alpha Digital C++ 6.0 (with an irrelevant warning in the
+latter case).  It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
 conformant as I think it is (in which case please tell me), (2) your
 compiler is not as conformant as you think it is (in which case please
