@@ -2,11 +2,12 @@
 // $Id$
 
 #include <cstring>
+#include <cmath>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
 
-// initialise class static variables
+// define class static variables
 bool PkRasterdata::debug_;
 bool PkFont::debug_;
 bool PkGlyph::debug_;
@@ -36,8 +37,9 @@ PkFont::PkFont(unsigned int dvimag,
 	font_header_.s = s;
 	font_header_.d = d;
 	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
-	cout << "Font scaling: " << dvimag << "/1000 * (" << s '/' << d
+	cout << "Font scaling: " << dvimag << "/1000 * (" << s << '/' << d
 	     << ")=" << fontscale_ << '\n';
+	cout << "DVI's font checksum=" << c << '\n';
 
 	quad_ = ((double)dvimag/1000.0) * d;
 	word_space_ = 0.2*quad_;
@@ -57,7 +59,8 @@ PkFont::~PkFont()
 void PkFont::read_font (InputByteStream& pkf)
 {
     // read the preamble, and check that the requested parameters match
-    if ((Byte preamble_opcode = pkf.getByte()) != 247)
+    Byte preamble_opcode = pkf.getByte();
+    if (preamble_opcode != 247)
 	throw DviError ("PK file doesn't start with preamble");
     if ((preamble_.id = pkf.getByte()) != 89)
 	throw DviError ("PK file has wrong ID byte");
@@ -66,15 +69,18 @@ void PkFont::read_font (InputByteStream& pkf)
     preamble_.comment = "";
     for (;comment_length > 0; comment_length--)
 	preamble_.comment += static_cast<char>(pkf.getByte());
-    preamble_.ds   = pkf.getUIU(4);
+    unsigned int i = pkf.getUIU(4);
+    preamble_.designSize = (double)i/two20_;
     preamble_.cs   = pkf.getUIU(4);
-    preamble_.hppp = pkf.getUIU(4);
-    preamble_.vppp = pkf.getUIU(4);
+    i = pkf.getUIU(4);
+    preamble_.hppp = (double)i/two16_;
+    i = pkf.getUIU(4);
+    preamble_.vppp = (double)i/two16_;
 
 
     if (debug_)
 	cerr << "PK file " << name_ << " '" << preamble_.comment << "\'\n"
-	     << "ds="  << preamble_.ds
+	     << "designSize="  << preamble_.designSize
 	     << " cs=" << preamble_.cs
 	     << " hppp=" << preamble_.hppp
 	     << " vppp=" << preamble_.vppp
@@ -120,7 +126,7 @@ void PkFont::read_font (InputByteStream& pkf)
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dx, g_dy, 
 						 g_w, g_h, g_hoffu, g_voffu,
-						 rd);
+						 rd, this);
 		    pkf.skip (packet_length);
 		}
 		else		// extended short form character preamble
@@ -148,7 +154,7 @@ void PkFont::read_font (InputByteStream& pkf)
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 						 g_w, g_h, g_hoff, g_voff,
-						 rd);
+						 rd, this);
 		    pkf.skip (packet_length);
 		}
 	    else		// short form character preamble
@@ -176,7 +182,7 @@ void PkFont::read_font (InputByteStream& pkf)
 					packet_length, g_w, g_h);
 		glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 					     g_w, g_h, g_hoff, g_voff,
-					     rd);
+					     rd, this);
 		pkf.skip(packet_length);
 	    }
 	    if (debug_)
@@ -237,12 +243,13 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int h,
 		 int hoff,
 		 int voff,
-		 PkRasterdata *rasterdata) 
+		 PkRasterdata *rasterdata,
+		 PkFont *f) 
     : cc_(cc), dm_(dm), w_(w), h_(h),
-      hoff_(hoff), voff_(voff), rasterdata_(rasterdata),
+      hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
       longform_(false), bitmap_(0) 
 {
-    tfmwidth_ = unpackTfmWidth (tfmwidth);
+    tfmwidth_ = tfmwidth/two20_ * f->designSize();
 };
 
 PkGlyph::PkGlyph(unsigned int cc,
@@ -253,12 +260,13 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int h,
 		 unsigned int hoff,
 		 unsigned int voff,
-		 PkRasterdata *rasterdata)
+		 PkRasterdata *rasterdata,
+		 PkFont *f)
     : cc_(cc), dx_(dx), dy_(dy), w_(w), h_(h),
-      hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata),
+      hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata), font_(f),
       longform_(true), bitmap_(0)
 {
-    tfmwidth_ = unpackTfmWidth (tfmwidth);
+    tfmwidth_ = tfmwidth/two20_ * f->designSize();
 };
 
 const Byte *PkGlyph::bitmap()
@@ -268,10 +276,20 @@ const Byte *PkGlyph::bitmap()
     return bitmap_;
 }
 
-// Convert a TFM width to DVI units
-int PkGlyph::unpackTfmWidth (unsigned int tfmwidth)
+int PkGlyph::hEscapement()
 {
-    return tfmwidth;		// this is WRONG!!!!
+    if (longform_)
+	return static_cast<int>(floor(dx_ / two16_ + 0.5));
+    else
+	return dm_;
+}
+
+int PkGlyph::vEscapement()
+{
+    if (longform_)
+	return (int)floor(dy_ / two16_ + 0.5);
+    else
+	return 0;
 }
 
 PkRasterdata::PkRasterdata(Byte opcode,

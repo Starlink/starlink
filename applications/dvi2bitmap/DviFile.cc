@@ -51,9 +51,13 @@ DviFileEvent *DviFile::getEvent()
     Byte opcode;
     int i1, i2;
 
-    // add in any pending update of the horizontal position
-    h_ += pending_hupdate_;
-    pending_hupdate_ = 0;
+    cerr << "getEvent\n";
+    // Add in any pending update of the horizontal position.
+    if (pending_hupdate_ != 0)
+    {
+	updateH_ (pending_hupdate_, pending_hhupdate_);
+	pending_hupdate_ = pending_hhupdate_ = 0;
+    }
 
     // When we start, assume the next character is an opcode
     while (! gotEvent)
@@ -64,7 +68,8 @@ DviFileEvent *DviFile::getEvent()
 	    cerr << 'O' << static_cast<int>(opcode) << '\n';
 	if (opcode <= 127)	// set character
 	{
-	    pending_hupdate_ += current_font_->glyph(opcode)->w();
+	    pending_hhupdate_ += current_font_->glyph(opcode)->hEscapement();
+	    pending_hupdate_ += charwidth_(opcode);
 	    gotEvent = new DviFileSetChar(opcode, this);
 	}
 	else if (opcode >= 171 && opcode <= 234)
@@ -81,22 +86,30 @@ DviFileEvent *DviFile::getEvent()
 	    {
 	      case 128:		// set1
 		charno = getSIU(1);
-		pending_hupdate_ += current_font_->glyph(opcode)->w();
+		pending_hhupdate_ +=
+		    current_font_->glyph(charno)->hEscapement();
+		pending_hupdate_ += charwidth_(charno);
 		gotEvent = new DviFileSetChar (opcode, this);
 		break;
 	      case 129:		// set2
 		charno = getSIU(2);
-		pending_hupdate_ += current_font_->glyph(opcode)->w();
+		pending_hhupdate_ +=
+		    current_font_->glyph(charno)->hEscapement();
+		pending_hupdate_ += charwidth_(charno);
 		gotEvent = new DviFileSetChar (opcode, this);
 		break;
 	      case 130:		// set3
 		charno = getSIU(3);
-		pending_hupdate_ += current_font_->glyph(opcode)->w();
+		pending_hhupdate_ +=
+		    current_font_->glyph(charno)->hEscapement();
+		pending_hupdate_ += charwidth_(charno);
 		gotEvent = new DviFileSetChar (opcode, this);
 		break;
 	      case 131:		// set4
 		charno = getSIS(4);
-		pending_hupdate_ += current_font_->glyph(opcode)->w();
+		pending_hhupdate_ +=
+		    current_font_->glyph(charno)->hEscapement();
+		pending_hupdate_ += charwidth_(charno);
 		gotEvent = new DviFileSetChar (opcode, this);
 		break;
 	      case 132:		// set_rule
@@ -185,104 +198,132 @@ DviFileEvent *DviFile::getEvent()
 		}
 		break;
 	      case 143:		// right1
-		h_ += getSIS(1);
+		//h_ += getSIS(1);
+		updateH_ (getSIS(1), 0);
 		break;
 	      case 144:		// right2
-		h_ += getSIS(2);
+		//h_ += getSIS(2);
+		updateH_ (getSIS(2), 0);
 		break;
 	      case 145:		// right3
-		h_ += getSIS(3);
+		//h_ += getSIS(3);
+		updateH_ (getSIS(3), 0);
 		break;
 	      case 146:		// right4
-		h_ += getSIS(4);
+		//h_ += getSIS(4);
+		updateH_ (getSIS(4), 0);
 		break;
 	      case 147:		// w0
-		h_ += w_;
+		//h_ += w_;
+		updateH_ (w_, 0);
 		break;
 	      case 148:		// w1
 		w_ = getSIS(1);
-		h_ += w_;
+		//h_ += w_;
+		updateH_ (w_, 0);
 		break;
 	      case 149:		// w2
 		w_ = getSIS(2);
-		h_ += w_;
+		//h_ += w_;
+		updateH_ (w_, 0);
 		break;
 	      case 150:		// w3
 		w_ = getSIS(3);
-		h_ += w_;
+		//h_ += w_;
+		updateH_ (w_, 0);
 		break;
 	      case 151:		// w4
 		w_ = getSIS(4);
-		h_ += w_;
+		//h_ += w_;
+		updateH_ (w_, 0);
 		break;
 	      case 152:		// x0
-		h_ += x_;
+		//h_ += x_;
+		updateH_ (x_, 0);
 		break;
 	      case 153:		// x1
 		x_ = getSIS(1);
-		h_ += x_;
+		//h_ += x_;
+		updateH_ (x_, 0);
 		break;
 	      case 154:		// x2
 		x_ = getSIS(2);
-		h_ += x_;
+		//h_ += x_;
+		updateH_ (x_, 0);
 		break;
 	      case 155:		// x3
 		x_ = getSIS(3);
-		h_ += x_;
+		//h_ += x_;
+		updateH_ (x_, 0);
 		break;
 	      case 156:		// x4
 		x_ = getSIS(4);
-		h_ += x_;
+		//h_ += x_;
+		updateH_ (x_, 0);
 		break;
 	      case 157:		// down1
-		v_ += getSIS(1);
+		//v_ += getSIS(1);
+		updateV_ (getSIS(1));
 		break;
 	      case 158:		// down2
-		v_ += getSIS(2);
+		//v_ += getSIS(2);
+		updateV_ (getSIS(2));
 		break;
 	      case 159:		// down3
-		v_ += getSIS(3);
+		//v_ += getSIS(3);
+		updateV_ (getSIS(3));
 		break;
 	      case 160:		// down4
-		v_ += getSIS(4);
+		//v_ += getSIS(4);
+		updateV_ (getSIS(4));
 		break;
 	      case 161:		// y0
-		v_ += y_;
+		//v_ += y_;
+		updateV_ (y_);
 		break;
 	      case 162:		// y1
 		y_ = getSIS(1);
-		v_ += y_;
+		//v_ += y_;
+		updateV_ (y_);
 		break;
 	      case 163:		// y2
 		y_ = getSIS(2);
-		v_ += y_;
+		//v_ += y_;
+		updateV_ (y_);
 		break;
 	      case 164:		// y3
 		y_ = getSIS(3);
-		v_ += y_;
+		//v_ += y_;
+		updateV_ (y_);
 		break;
 	      case 165:		// y4
 		y_ = getSIS(4);
-		v_ += y_;
+		//v_ += y_;
+		updateV_ (y_);
 		break;
 	      case 166:		// z0
-		v_ += z_;
+		//v_ += z_;
+		updateV_ (z_);
 		break;
 	      case 167:		// z1
 		z_ = getSIS(1);
-		v_ += z_;
+		//v_ += z_;
+		updateV_ (z_);
 		break;
 	      case 168:		// z2
 		z_ = getSIS(2);
-		v_ += z_;
+		//v_ += z_;
+		updateV_ (z_);
 		break;
 	      case 169:		// z3
 		z_ = getSIS(3);
-		v_ += z_;
+		//v_ += z_;
+		updateV_ (z_);
 		break;
 	      case 170:		// z4
 		z_ = getSIS(4);
-		v_ += z_;
+		//v_ += z_;
+		updateV_ (z_);
 		break;
 
 		// opcodes 171 to 234 are fnt_num_0 to fnt_num_63
@@ -497,23 +538,41 @@ bool DviFile::eof()
 int DviFile::pixel_round(int dp)
 {
     if (dp>0)
-	return  static_cast<int>(floor(dvi_to_device_ *   dp  + 0.5));
+	return  static_cast<int>(floor(px_per_dviu_ *   dp  + 0.5));
     else
-	return -static_cast<int>(floor(dvi_to_device_ * (-dp) + 0.5));
+	return -static_cast<int>(floor(px_per_dviu_ * (-dp) + 0.5));
 }
 
-// argument is in DVI units
-void DviFile::updateH (int x)
+// Return width of character in DVIUnits
+int DviFile::charwidth_ (int charno)
 {
-    if (   (x > 0 && x < current_font_->word_space())
-	|| (x < 0 && x > current_font_->back_space()))
-	hh_ += pixel_round(x);
+    return static_cast<int>(floor(current_font_->glyph(charno)->tfmWidth()
+				  * dviu_per_pt_));
+}
+
+
+// Update the horizontal position.  If hhup is non-zero, then the last thing
+// we did was set a character, and this was its width.  If it's zero, then
+// the last action was some other adjustment of the horizontal position,
+// so we need to update hh_ based on this.  See DVI standard, section 2.6.2
+// hup is in DVI units, hhup in pixels.
+void DviFile::updateH_ (int hup, int hhup)
+{
+    if (hhup == 0)
+    {
+	if (current_font_ != 0
+	    && (   (hup > 0 && hup < current_font_->wordSpace())
+		|| (hup < 0 && hup > current_font_->backSpace())))
+	    hh_ += pixel_round(hup);
+	else
+	    hh_ = pixel_round(h_ + hup);
+    }
     else
-	hh_ = pixel_round(h_ + x);
-    h_ += x;
+	hh_ += hhup;
+    h_ += hup;
 
     // check drift
-    int Kh = pixel_round(dvi_to_device_ * h_);
+    int Kh = pixel_round(h_);
     int dist = hh_ - Kh;
     int sdist = 1;
     if (dist < 0)
@@ -523,10 +582,19 @@ void DviFile::updateH (int x)
     }
     if (dist > max_drift_)
 	hh_ = Kh + sdist*max_drift_;
+
+    if (debug_)
+	cerr << "updateH_ ("
+	     << hup << ',' << hhup << ") -> ("
+	     << h_ << ',' << hh_ << ")\n";
 }
-void DviFile::updateV(int y)
+void DviFile::updateV_ (int y)
 {
-    int range = 0.8 * current_font_->quad();
+    double range;
+    if (current_font_ == 0)	// no quad defined
+	range = 0;
+    else
+	range = 0.8 * current_font_->quad();
     if (abs(y) < range)
 	vv_ += pixel_round(y);
     else
@@ -534,7 +602,7 @@ void DviFile::updateV(int y)
     v_ += y;
 
     // check drift
-    int Kv = pixel_round(dvi_to_device_ * v_);
+    int Kv = pixel_round(v_);
     int dist = vv_ - Kv;
     int sdist = 1;
     if (dist < 0)
@@ -576,7 +644,8 @@ void DviFile::read_postamble()
     unsigned int int4 = dvif_->getUIU(4); // final bop
     int4 = dvif_->getUIU(4);	// numerator
     int4 = dvif_->getUIU(4);	// denominator
-    int4 = dvif_->getUIU(4);	// mag
+    unsigned int dvimag = dvif_->getUIU(4);	// mag
+    postamble_.mag = dvimag;
     postamble_.l = dvif_->getUIU(4);    
     postamble_.u = dvif_->getUIU(4);    
     postamble_.s = dvif_->getUIU(2);    
@@ -612,7 +681,7 @@ void DviFile::read_postamble()
 		fontdir += static_cast<char>(getByte());
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(preamble_.mag, c, s, d, fontname);
+	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
 	    break;
 
 	  case 244:		// fnt_def2
@@ -629,7 +698,7 @@ void DviFile::read_postamble()
 		fontdir += static_cast<char>(getByte());
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
 	    break;
 
 	  case 245:		// fnt_def3
@@ -646,7 +715,7 @@ void DviFile::read_postamble()
 		fontdir += static_cast<char>(getByte());
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
 	    break;
 
 	  case 246:		// fnt_def4
@@ -663,7 +732,7 @@ void DviFile::read_postamble()
 		fontdir += static_cast<char>(getByte());
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
 	    break;
 
 	  case 249:		// post_post
@@ -702,11 +771,12 @@ void DviFile::process_preamble(DviFilePreamble& p)
     preamble_.num = p.num;
     preamble_.den = p.den;
     preamble_.mag = p.mag;
-    preamble_.comment = comment;
-    true_dvi_to_device_ = ((double)p.num/(double)p.den) * (7227e0 / 2.54e7);
-    dvi_to_device_ = true_dvi_to_device_ * (double)p.mag/1000.0;
-    tfm_conv_ = ((double)25400000/p.num) * (p.den/473628672) / 16.0;
-    cerr << "dvi_to_device_ = " << dvi_to_device_
+    preamble_.comment = p.comment;
+    true_dviu_per_pt_ = ((double)p.den/(double)p.num) * (2.54e7/7227e0);
+    dviu_per_pt_ = true_dviu_per_pt_ * (double)p.mag/1000.0;
+    px_per_dviu_ = ((double)p.num/(double)p.den) * (resolution_/254000e0);
+    cerr << "dviu_per_pt_ = " << dviu_per_pt_
+	 << " px_per_dviu_ = " << px_per_dviu_
 	 << " mag=" << p.mag
 	 << '\n';
 }
@@ -742,12 +812,12 @@ void DviFileSetChar::debug ()
 const
 {
     cerr << 'C' << static_cast<unsigned int>(charno) << "=\'"
-	 << static_cast<char>(charno) << "\' increase=" << increaseH << '\n';
+	 << static_cast<char>(charno) << "\'\n";
 }
 void DviFileSetRule::debug()
 const
 {
-    cerr << 'R' << a << 'x' << b << '\n';
+    cerr << 'R' << h << 'x' << w << '\n';
 }
 /*
 void DviFileFontDef::debug()
@@ -760,7 +830,7 @@ const
 void DviFileFontChange::debug()
 const
 {
-    cerr << 'f' << number << '\n';
+    cerr << 'f' << font->name() << '\n';
 }
 void DviFileSpecial::debug()
 const

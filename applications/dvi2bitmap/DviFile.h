@@ -30,16 +30,26 @@ private:
     string fileName_;
     // all dimensions within this class are in DVI units, except where stated.
     int h_, v_, w_, x_, y_, z_;
-    int pending_hupdate_;
+    int pending_hupdate_;	// in DVIUnits
+    int pending_hhupdate_;	// in device units
     int hh_, vv_;		// these are in device units
     PkFont *current_font_;
     InputByteStream *dvif_;
     // DVI units are defined by the numerator and denominator 
-    // specified in the DVI preamble.  DVI units must be multiplied by
+    // specified in the DVI preamble.
+    // 1dviu = 1/dviu_per_pt_ * 1pt <==> d/dviu = dviu_per_pt * d/pt
+    double true_dviu_per_pt_;	// 1dviu = 1/dviu_per_pt_ * 1pt
+    double dviu_per_pt_;	// ...including magnification
+    double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
+    // resolution is in pixels-per-inch
+    const double resolution_ = 72;
+
+    // DVI units must be multiplied by
     // this factor to convert them to device (ie, pixel) units.
     // true_dvi_to_device_ is dvi_to_device_ without the magnification
-    double dvi_to_device_;
-    double true_dvi_to_device_;
+    //double dvi_to_device_;
+    //double true_dvi_to_device_;
+
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output
     // change (for example if we produce oversize gifs, ready for shrinking).
@@ -47,12 +57,13 @@ private:
     // tfm_conv_ is the multiplier to convert TFM widths, found in the
     // PK files, to DVI units.  The only account of this I can find is
     // somewhat implicitly within Knuth's DVIType program
-    double tfm_conv_;
+    //double tfm_conv_;
+
     Byte getByte();
     signed int getSIU(int), getSIS(int);
     unsigned int getUIU(int);
     struct {
-	unsigned int l, u, s, t;
+	unsigned int mag, l, u, s, t;
     } postamble_;
     struct {
 	unsigned int i, num, den, mag;
@@ -62,9 +73,10 @@ private:
     void process_preamble(DviFilePreamble&);
     void check_duplicate_font(int);
     int pixel_round(int);
+    int charwidth_ (int charno);
     // updateH/V update the horizontal position	by an amount in DVI units
-    void updateH (int x);
-    void updateV (int y);
+    void updateH_ (int hup, int hhup);
+    void updateV_ (int y);
     struct PosState {
 	int h, v, w, x, y, z, hh, vv;
 	PosState(int h, int v, int w, int x, int y, int z, int hh, int vv)
