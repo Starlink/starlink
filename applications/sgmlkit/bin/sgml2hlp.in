@@ -58,11 +58,10 @@
 #     <change author=mbt date='5-APR-2000'>Initial version.
 #-
 
-: ${STARLINK_SGML_DIR=@STARLINK_SGML_DIR@}
-
 #  Set some file locations.
-     DECL=$STARLINK_SGML_DIR/dtd/starlink.decl
-     STYLESHEET=$STARLINK_SGML_DIR/dsssl/sl/hlp/slprogcode.dsl
+#    Location !!pkglibdir!! is inserted at build time
+     DECL=!!pkglibdir!!/dtd/starlink.decl
+     STYLESHEET=!!pkglibdir!!/dsssl/sl/hlp/slprogcode.dsl
 
 #  Set binary locations.
      JADE=@JADE@

@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#! @PERL@ -w
 
 $RCSID = '$Id$';
 
@@ -62,7 +62,7 @@ $RCSID = '$Id$';
 #  <author id=ng affiliation='Starlink, University of Glasgow'>Norman Gray
 #-
 
-$ident_string = "Starlink SGML system, release ((PKG_VERS))";
+$ident_string = "Starlink SGML system, release @PACKAGE_VERSION@";
 
 # Defaults
 $imgformat = 'png';

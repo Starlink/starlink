@@ -5,7 +5,7 @@
 #    conditions.
 
 RCSID='$Id$'
-ident_string='Starlink SGML Kit, release ((PKG_VERS))'
+ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 
 #+
 #  <routinename id=sgml2docs>
@@ -100,9 +100,7 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #       LaTeXed.  The page breaks between sections are suppressed.
 #       
 #  <diytopic>Environment
-#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</code> is
-#     properly set, pointing to the root of the Starlink SGML kit.  It
-#     also requires that <code>dvi2bitmap</code> is in the <code>PATH</code>  The
+#     <p>Requires that <code>dvi2bitmap</code> is in the <code>PATH</code>  The
 #     script is currently rather sensitive to the available version of
 #     <code>dvi2bitmap</code>, and does a rather cautious check.
 #
@@ -130,13 +128,12 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #      than defaulted) copyright statement.
 #-
 
-: ${STARLINK_SGML_DIR=@STARLINK_SGML_DIR@}
-
-LIBDIR=${STARLINK_SGML_DIR}/lib
-STARLINKDECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
-XMLDECL=${STARLINK_SGML_DIR}/dtd/xml.decl
-ICONTARBALL=${STARLINK_SGML_DIR}/lib/icons.tar
-STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
+# Location !!pkglibdir!! is inserted at build time
+LIBDIR=!!pkglibdir!!/lib
+STARLINKDECL=!!pkglibdir!!/dtd/starlink.decl
+XMLDECL=!!pkglibdir!!/dtd/xml.decl
+ICONTARBALL=!!pkglibdir!!/lib/icons.tar
+STYLESHEET=!!pkglibdir!!/dsssl/sl
 
 # Binaries
 # Allow the names of the jade and sgmlnorm binaries to be overridden
@@ -460,7 +457,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     if [ -r "$ROOT.htmlbib.aux" ]; then
 	$VERBOSE && echo "$PROGNAME:I: Backmatter..."
         # BSTINPUTS and BIBINPUTS set here
-        BSTINPUTS=$LIBDIR
+        BSTINPUTS=$LIBDIR:$BSTINPUTS
         BIBINPUTS=$SRCDIR:$BIBINPUTS
         $run $BIBTEX $ROOT.htmlbib
         $run $BIBTEX $ROOT.htmlbib
@@ -520,7 +517,7 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 
     # If there was no backmatter, then don't invoke BibTeX
     if [ -r $ROOT.latexbib.aux ]; then
-	BSTINPUTS=$LIBDIR $run $BIBTEX $ROOT.latexbib
+	BSTINPUTS=$LIBDIR:$BSTINPUTS $run $BIBTEX $ROOT.latexbib
     fi
 
     # Generate the final file
@@ -546,7 +543,7 @@ elif [ $TARGETFORMAT -eq 2 ]; then
 
     # If there was no backmatter, then don't invoke BibTeX
     if [ -r $ROOT.latexbib.aux ]; then
-	BSTINPUTS=$LIBDIR $run $BIBTEX $ROOT.latexbib
+	BSTINPUTS=$LIBDIR:$BSTINPUTS $run $BIBTEX $ROOT.latexbib
     fi
 
     # Generate the XML file

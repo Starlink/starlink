@@ -59,12 +59,9 @@
 JADE=@JADE@
 PERL=@PERL@
 PERLSGMLDIR=@PERLSGMLDIR@
-STARLINK_SGML_DIR=@STARLINK_SGML_DIR@
 
-DTDDIR=$(STARLINK_SGML_DIR)/dtd
-DECL=$(STARLINK_SGML_DIR)/dtd/xml.decl
-#DTDDIR=../../dtd
-#DECL=../../dtd/xml.decl
+DTDDIR=../../dtd
+DECL=../../dtd/xml.decl
 
 %.dtdsummary: $(DTDDIR)/%.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
@@ -114,16 +111,14 @@ starlink-0.7.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.7.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl \
-		$< >$@
+	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl $< >$@
 
 # No longer used (here for reference)
 starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.6.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl \
-		$< >$@
+	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl $< >$@
 
 
 clean:
