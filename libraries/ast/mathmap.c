@@ -1,9 +1,10 @@
 /* To do:
-      o Write astLoad and MapMerge functions.
       o Tidy everything up.
+      o Add attributes to support simplification and implement MapMerge.
       o Sort lists of opcodes, symbols, etc. and ensure that all functions
         are present.
       o Add >=, ==, etc. operators.
+      o Write user documentation.
       o Sort out how to implement x ? a : b efficiently (using a mask stack
         maybe?).
 */
@@ -2510,7 +2511,7 @@ AstMathMap *astMathMap_( int nin, int nout,
    return new;
 }
 
-AstMathMap *astMathMapID_( int nin, int nout,
+AstMathMap *astMathMapId_( int nin, int nout,
                            const char *fwd[], const char *inv[],
                            const char *options, ... ) {
 /*
@@ -2799,233 +2800,6 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
    return new;
 }
 
-/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
-
-static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
-                            const int *code, const double *con, int stacksize,
-                            double *out ) {
-
-   double **stack;
-   double *xv1;
-   double *xv2;
-   double *xv;
-   double *y;
-   double *yv;
-   double x1;
-   double x2;
-   double x;
-   int icode;
-   int icon;
-   int ivar;
-   int ncode;
-   int point;
-   int tos;
-   double *work;
-   int istk;
-   double value;
-   static int init = 0;
-   double pi;
-   static double d2r;
-   static double r2d;
-   double tmp;
-   int narg;
-   int iarg;
-   double abs1;
-   double abs2;
-
-   if ( !astOK ) return;
-   
-   if ( !init ) {
-      pi = acos( -1.0 );
-      r2d = 180.0 / pi;
-      d2r = pi / 180.0;
-      init = 1;
-   }
-
-   stack = astMalloc( sizeof( double * ) * (size_t) stacksize );
-   work = astMalloc( sizeof( double ) *
-                     (size_t) ( npoint * ( stacksize - 1 ) ) );
-   if ( astOK ) {
-      stack[ 0 ] = out;
-      for ( istk = 1; istk < stacksize; istk++ ) {
-         stack[ istk ] = work + ( istk - 1 ) * npoint;
-      }
-
-#define ARG_0(oper,setup,function) \
-   case oper: \
-      {setup;} \
-      yv = stack[ ++tos ]; \
-      for ( point = 0; point < npoint; point++ ) { \
-         y = yv + point; \
-         {function;} \
-      } \
-      break;
-
-#define ARG_1(oper,function) \
-   case oper: \
-      xv = stack[ tos ]; \
-      for ( point = 0; point < npoint; point++ ) { \
-         if ( ( x = xv[ point ] ) != AST__BAD ) { \
-            y = xv + point; \
-            {function;} \
-         } \
-      } \
-      break;
-
-#define DO_2(function) \
-      xv2 = stack[ tos-- ]; \
-      xv1 = stack[ tos ]; \
-      for ( point = 0; point < npoint; point++ ) { \
-         if ( ( x1 = xv1[ point ] ) != AST__BAD ) { \
-            y = xv1 + point; \
-            if ( ( x2 = xv2[ point ] ) != AST__BAD ) { \
-               {function;} \
-            } else { \
-               *y = AST__BAD; \
-            } \
-         } \
-      }
-
-#define ARG_2(oper,function) \
-   case oper: \
-      DO_2(function) \
-      break;
-
-#define ABS(x) ( ( (x) >= 0.0 ) ? (x) : -(x) )
-
-#define CATCH_MATHS_OVERFLOW(function) \
-   ( \
-      errno = 0, \
-      tmp = (function), \
-      ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ? AST__BAD : tmp \
-   )
-
-#define CATCH_MATHS_ERROR(function) \
-   ( \
-      errno = 0, \
-      tmp = (function), \
-      ( ( errno == EDOM ) || \
-        ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ) ? AST__BAD : tmp \
-   )
-
-#define SAFE_ADD(x1,x2) ( \
-   ( (x1) >= 0.0 ) ? ( \
-      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= (x2) ) ) ? ( \
-         (x1) + (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) : ( \
-      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= -(x2) ) ) ? ( \
-         (x1) + (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) \
-)
-
-#define SAFE_SUB(x1,x2) ( \
-   ( (x1) >= 0.0 ) ? ( \
-      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= -(x2) ) ) ? ( \
-         (x1) - (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) : ( \
-      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= (x2) ) ) ? ( \
-         (x1) - (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) \
-)
-
-#define SAFE_MULT(x1,x2) ( \
-   ( ( ( abs1 = ABS( (x1) ) ) <= 1.0 ) || \
-     ( ( abs2 = ABS( (x2) ) ) <= 1.0 ) || \
-     ( ( (DBL_MAX) / abs1 ) >= abs2 ) ) ? ( \
-      (x1) * (x2) \
-   ) : ( \
-      AST__BAD \
-   ) \
-)
-
-#define SAFE_DIV(x1,x2) ( \
-   ( ( (x2) != 0.0 ) && \
-     ( ( ( abs2 = ABS( (x2) ) ) >= 1.0 ) || \
-       ( ( (DBL_MAX) * abs2 ) >= ABS( (x1) ) ) ) ) ? ( \
-      (x1) / (x2) \
-   ) : ( \
-      AST__BAD \
-   ) \
-)
-
-      tos = -1;
-      icon = 0;
-      ncode = code[ 0 ];
-      for ( icode = 1; icode <= ncode; icode++ ) {
-         switch ( (Oper) code[ icode ] ) {
-            case OP_NULL: break;
-            ARG_0( OP_LDCON,  value = con[ icon++ ], *y = value )
-            ARG_0( OP_LDVAR,  ivar = (int) ( con[ icon++ ] + 0.5 ),
-                              *y = ptr_in[ ivar ][ point ] )
-            ARG_0( OP_LDBAD,  , *y = AST__BAD )
-            ARG_1( OP_NEG,    *y = -x )
-            ARG_1( OP_SQRT,   *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
-            ARG_1( OP_LOG,    *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
-            ARG_1( OP_LOG10,  *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
-            ARG_1( OP_EXP,    *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
-            ARG_1( OP_SIN,    *y = sin( x ) )
-            ARG_1( OP_COS,    *y = cos( x ) )
-            ARG_1( OP_TAN,    *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
-            ARG_1( OP_SIND,   *y = sin( x * d2r ) )
-            ARG_1( OP_COSD,   *y = cos( x * d2r ) )
-            ARG_1( OP_TAND,   *y = tan( x * d2r ) )
-            ARG_1( OP_ASIN,   *y = ( ABS( x ) <= 1.0 ) ? asin( x ) : AST__BAD )
-            ARG_1( OP_ACOS,   *y = ( ABS( x ) <= 1.0 ) ? acos( x ) : AST__BAD )
-            ARG_1( OP_ATAN,   *y = atan( x ) )
-            ARG_1( OP_ASIND,  *y = ( ABS( x ) <= 1.0 ) ? asin( x ) * r2d :
-                                                         AST__BAD )
-            ARG_1( OP_ACOSD,  *y = ( ABS( x ) <= 1.0 ) ? acos( x ) * r2d :
-                                                         AST__BAD )
-            ARG_1( OP_ATAND,  *y = atan( x ) * r2d )
-            ARG_1( OP_SINH,   *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
-            ARG_1( OP_COSH,   *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
-            ARG_1( OP_TANH,   *y = tanh( x ) )
-            ARG_1( OP_ABS,    *y = ABS( x ) )
-            ARG_1( OP_CEIL,   *y = ceil( x ) )
-            ARG_1( OP_FLOOR,  *y = floor( x ) )
-            ARG_1( OP_NINT,   *y = (int) ( ( x >= 0 ) ? x + 0.5 : x - 0.5 ) )
-            ARG_2( OP_ADD,    *y = SAFE_ADD( x1, x2 ) )
-            ARG_2( OP_SUB,    *y = SAFE_SUB( x1, x2 ) )
-            ARG_2( OP_MULT,   *y = SAFE_MULT( x1, x2 ) )
-            ARG_2( OP_DIV ,   *y = SAFE_DIV( x1, x2 ) )
-            ARG_2( OP_PWR,    *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_SIGN,   *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
-                                   x1 : -x1 )
-            ARG_2( OP_DIM,    *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
-            ARG_2( OP_MOD,    *y = ( x2 != 0.0 ) ? fmod( x1, x2 ) : AST__BAD )
-            ARG_2( OP_ATAN2,  *y = atan2( x1, x2 ) )
-            ARG_2( OP_ATAN2D, *y = atan2( x1, x2 ) * r2d )
-         case OP_MAX:
-            narg = (int) ( con[ icon++ ] + 0.5 );
-            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
-               DO_2( *y = ( x1 >= x2 ) ? x1 : x2 )
-            }
-            break;
-         case OP_MIN:
-            narg = (int) ( con[ icon++ ] + 0.5 );
-            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
-               DO_2( *y = ( x1 <= x2 ) ? x1 : x2 )
-            }
-            break;
-         }
-      }
-   }
-   work = astFree( work );
-   stack = astFree( stack );
-}
-
 AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
                              AstMathMapVtab *vtab, const char *name,
                              AstChannel *channel ) {
@@ -3171,36 +2945,42 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
       invert = astGetInvert( new );
       new->nfwd = invert ? astGetNin( new ) : astGetNout( new );
       new->ninv = invert ? astGetNout( new ) : astGetNin( new );
+      if ( astOK ) {
 
-/* Initialise the MathMap's transformation function array pointers. */
-      MALLOC_POINTER_ARRAY( new->fwdfun, char *, new->nfwd )
-      MALLOC_POINTER_ARRAY( new->invfun, char *, new->ninv )
+/* Allocate memory for the MathMap's transformation function arrays. */
+         MALLOC_POINTER_ARRAY( new->fwdfun, char *, new->nfwd )
+         MALLOC_POINTER_ARRAY( new->invfun, char *, new->ninv )
+         if ( astOK ) {
 
 /* Forward transformation functions. */
 /* --------------------------------- */
 /* Create a keyword for each forward transformation function and read
    the function's value as a string. */
-      for ( ifun = 0; ifun < new->nfwd; ifun++ ) {
-         (void) sprintf( key, "f%d", ifun + 1 );
-         new->fwdfun[ ifun ] = astReadString( channel, key, "" );
-      }
+            for ( ifun = 0; ifun < new->nfwd; ifun++ ) {
+               (void) sprintf( key, "f%d", ifun + 1 );
+               new->fwdfun[ ifun ] = astReadString( channel, key, "" );
+            }
 
 /* Inverse transformation functions. */
 /* --------------------------------- */
 /* Repeat this process for the inverse transformation functions. */
-      for ( ifun = 0; ifun < new->ninv; ifun++ ) {
-         (void) sprintf( key, "i%d", ifun + 1 );
-         new->invfun[ ifun ] = astReadString( channel, key, "" );
-      }
+            for ( ifun = 0; ifun < new->ninv; ifun++ ) {
+               (void) sprintf( key, "i%d", ifun + 1 );
+               new->invfun[ ifun ] = astReadString( channel, key, "" );
+            }
 
 /* Compile the MathMap's transformation functions. */
-      CompileMapping( new->ninv, new->nfwd,
-                      (const char **) new->fwdfun, (const char **) new->invfun,
-                      &new->fwdcode, &new->invcode, &new->fwdcon, &new->invcon,
-                      &new->fwdstack, &new->invstack );
+            CompileMapping( new->ninv, new->nfwd,
+                            (const char **) new->fwdfun,
+                            (const char **) new->invfun,
+                            &new->fwdcode, &new->invcode,
+                            &new->fwdcon, &new->invcon,
+                            &new->fwdstack, &new->invstack );
+         }
 
 /* If an error occurred, clean up by deleting the new MathMap. */
-      if ( !astOK ) new = astDelete( new );
+         if ( !astOK ) new = astDelete( new );
+      }
    }
 
 /* Return the new MathMap pointer. */
@@ -3210,27 +2990,339 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 #undef KEY_LEN
 }
 
-int main() {
-   AstMathMap *math, *math1;
+/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
 
-   const char *fwd[] = { "y = sign(99,-0)" };
+static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
+                            const int *code, const double *con, int stacksize,
+                            double *out ) {
 
-   const char *inv[] = { "x = y - 1" };
+/* Local Variables: */
+   double **stack;               /* Array of pointers to stack elements */
+   double *work;                 /* Pointer to stack workspace */
+   double *xv1;                  /* Pointer to first argument vector */
+   double *xv2;                  /* Pointer to second argument vector */
+   double *xv;                   /* Pointer to sole argument vector */
+   double *y;                    /* Pointer to result */
+   double *yv;                   /* Pointer to result vector */
+   double abs1;                  /* Absolute value (temporary variable) */
+   double abs2;                  /* Absolute value (temporary variable) */
+   double pi;                    /* Value of PI */
+   double tmp;                   /* Temporary variable for use in macros */
+   double value;                 /* Value to be assigned to stack vector */
+   double x1;                    /* First argument value */
+   double x2;                    /* Second argument value */
+   double x;                     /* Sole argument value */
+   int iarg;                     /* Loop counter for arguments */
+   int icode;                    /* Opcode value */
+   int icon;                     /* Counter for number of constants used */
+   int istk;                     /* Loop counter for stack elements */
+   int ivar;                     /* Input variable number */
+   int narg;                     /* Number of function arguments */
+   int ncode;                    /* Number of opcodes to process */
+   int point;                    /* Loop counter for stack vector elements */
+   int tos;                      /* Top of stack index */
+   static double d2r;            /* Degrees to radians conversion factor */
+   static double r2d;            /* Radians to degrees conversion factor */
+   static int init = 0;          /* Initialisation performed? */
 
-   math = astMathMap( 1, 1, fwd, inv, "Report=1" );
-   math1 = astCopy( math );
-   math = astAnnul( math );
-   astShow( math1 );
+/* Check the global error status. */
+   if ( !astOK ) return;
+   
+/* If this is the first invocation of this function, then initialise
+   the trigonometrical conversion factors. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      r2d = 180.0 / pi;
+      d2r = pi / 180.0;
 
-   {
-      double xin[] = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
-      double xout[ 10 ];
-      astSet( math1, "Report = 1" );
-      astTran1( math1, 10, xin, 1, xout );
-printf( "%.20g\n", DBL_MAX );
+/* Note that initialisation has been performed. */
+      init = 1;
    }
-   math1 = astAnnul( math1 );
 
+/* Allocate space for an array of pointers to elements of the
+   workspace stack (each stack element being an array of double). */
+   stack = astMalloc( sizeof( double * ) * (size_t) stacksize );
 
-   return 0;
+/* Allocate space for the stack itself. */
+   work = astMalloc( sizeof( double ) *
+                     (size_t) ( npoint * ( stacksize - 1 ) ) );
+
+/* If OK, then initialise the stack pointer array to identify the
+   start of each vector on the stack. The first element points at the
+   output array (in which the result will be accumulated), while other
+   elements point at successive vectors within the workspace allocated
+   above. */
+   if ( astOK ) {
+      stack[ 0 ] = out;
+      for ( istk = 1; istk < stacksize; istk++ ) {
+         stack[ istk ] = work + ( istk - 1 ) * npoint;
+      }
+
+/* We now define a set of macros for performing vector operations on
+   elements of the stack. Each is in the form of a "case" block for
+   execution in response to the apprpriate operation code (opcode). */
+
+/* Zero-argument operation. */
+/* ------------------------ */
+/* This macro performs a zero-argument operation, which results in the
+   insertion of a new vector on to the stack. */
+#define ARG_0(oper,setup,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Perform any required initialisation. */ \
+      {setup;} \
+\
+/* Increment the top of stack index and obtain a pointer to the new stack \
+   element (vector). */ \
+      yv = stack[ ++tos ]; \
+\
+/* Loop to access each vector element, obtaining a pointer to it. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         y = yv + point; \
+\
+/* Perform the processing, which results in assignment to this element. */ \
+         {function;} \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
+/* One-argument operation. */
+/* ----------------------- */
+/* This macro performs a one-argument operation, which processes the
+   top stack element without changing the stack size. */
+#define ARG_1(oper,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Obtain a pointer to the top stack element (vector). */ \
+      xv = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining its value and \
+   checking that it is not bad. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         if ( ( x = xv[ point ] ) != AST__BAD ) { \
+\
+/* Also obtain a pointer to the element. */ \
+            y = xv + point; \
+\
+/* Perform the processing, which uses the element's value and then \
+   assigns the result to this element. */ \
+            {function;} \
+         } \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
+/* Two-argument operation. */
+/* ----------------------- */
+/* This macro performs a two-argument operation, which processes the
+   top two stack elements and produces a single result, resulting in the
+   stack size decreasing by one. In this case, we first define a macro
+   without the "case" block statements present. */
+#define DO_ARG_2(function) \
+\
+/* Obtain pointers to the top two stack elements (vectors), decreasing \
+   the top of stack index by one. */ \
+      xv2 = stack[ tos-- ]; \
+      xv1 = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining the value of the \
+   first argument and checking that it is not bad. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         if ( ( x1 = xv1[ point ] ) != AST__BAD ) { \
+\
+/* Also obtain a pointer to the element which is to receive the \
+   result. */ \
+            y = xv1 + point; \
+\
+/* Obtain the value of the second argument, again checking that it is \
+   not bad. */ \
+            if ( ( x2 = xv2[ point ] ) != AST__BAD ) { \
+\
+/* Perform the processing, which uses the two argument values and then \
+   assigns the result to the appropriate top of stack element. */ \
+               {function;} \
+\
+/* If the second argument was bad, so is the result. */ \
+            } else { \
+               *y = AST__BAD; \
+            } \
+         } \
+      }
+
+/* This macro simply wraps the one above up in a "case" block. */
+#define ARG_2(oper,function) \
+   case oper: \
+      DO_ARG_2(function) \
+      break;
+
+/* We now define some macros for performing mathematical operations in
+   a "safe" way - i.e. trapping numerical problems such as overflow and
+   invalid arguments and translating them into the AST__BAD value. */
+
+/* Absolute value. */
+/* --------------- */
+/* This is just shorthand for a common operation. */
+#define ABS(x) ( ( (x) >= 0.0 ) ? (x) : -(x) )
+
+/* Trap maths overflow. */
+/* -------------------- */
+/* This macro calls a C maths library function and checks for overflow
+   in the result. */
+#define CATCH_MATHS_OVERFLOW(function) \
+   ( \
+\
+/* Clear the "errno" value. */ \
+      errno = 0, \
+\
+/* Evaluate the function. */ \
+      tmp = (function), \
+\
+/* Check if "errno" and the returned result indicate overflow and \
+   return the appropriate result. */ \
+      ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ? AST__BAD : tmp \
+   )
+
+#define CATCH_MATHS_ERROR(function) \
+   ( \
+      errno = 0, \
+      tmp = (function), \
+      ( ( errno == EDOM ) || \
+        ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ) ? AST__BAD : tmp \
+   )
+
+#define SAFE_ADD(x1,x2) ( \
+   ( (x1) >= 0.0 ) ? ( \
+      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= (x2) ) ) ? ( \
+         (x1) + (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+   ) : ( \
+      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= -(x2) ) ) ? ( \
+         (x1) + (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+   ) \
+)
+
+#define SAFE_SUB(x1,x2) ( \
+   ( (x1) >= 0.0 ) ? ( \
+      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= -(x2) ) ) ? ( \
+         (x1) - (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+   ) : ( \
+      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= (x2) ) ) ? ( \
+         (x1) - (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+   ) \
+)
+
+#define SAFE_MULT(x1,x2) ( \
+   ( ( ( abs1 = ABS( (x1) ) ) <= 1.0 ) || \
+     ( ( abs2 = ABS( (x2) ) ) <= 1.0 ) || \
+     ( ( (DBL_MAX) / abs1 ) >= abs2 ) ) ? ( \
+      (x1) * (x2) \
+   ) : ( \
+      AST__BAD \
+   ) \
+)
+
+#define SAFE_DIV(x1,x2) ( \
+   ( ( (x2) != 0.0 ) && \
+     ( ( ( abs2 = ABS( (x2) ) ) >= 1.0 ) || \
+       ( ( (DBL_MAX) * abs2 ) >= ABS( (x1) ) ) ) ) ? ( \
+      (x1) / (x2) \
+   ) : ( \
+      AST__BAD \
+   ) \
+)
+
+      tos = -1;
+      icon = 0;
+      ncode = code[ 0 ];
+      for ( icode = 1; icode <= ncode; icode++ ) {
+         switch ( (Oper) code[ icode ] ) {
+            case OP_NULL: break;
+            ARG_0( OP_LDCON,  value = con[ icon++ ], *y = value )
+            ARG_0( OP_LDVAR,  ivar = (int) ( con[ icon++ ] + 0.5 ),
+                              *y = ptr_in[ ivar ][ point ] )
+            ARG_0( OP_LDBAD,  , *y = AST__BAD )
+            ARG_1( OP_NEG,    *y = -x )
+            ARG_1( OP_SQRT,   *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
+            ARG_1( OP_LOG,    *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
+            ARG_1( OP_LOG10,  *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
+            ARG_1( OP_EXP,    *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
+            ARG_1( OP_SIN,    *y = sin( x ) )
+            ARG_1( OP_COS,    *y = cos( x ) )
+            ARG_1( OP_TAN,    *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
+            ARG_1( OP_SIND,   *y = sin( x * d2r ) )
+            ARG_1( OP_COSD,   *y = cos( x * d2r ) )
+            ARG_1( OP_TAND,   *y = tan( x * d2r ) )
+            ARG_1( OP_ASIN,   *y = ( ABS( x ) <= 1.0 ) ? asin( x ) : AST__BAD )
+            ARG_1( OP_ACOS,   *y = ( ABS( x ) <= 1.0 ) ? acos( x ) : AST__BAD )
+            ARG_1( OP_ATAN,   *y = atan( x ) )
+            ARG_1( OP_ASIND,  *y = ( ABS( x ) <= 1.0 ) ? asin( x ) * r2d :
+                                                         AST__BAD )
+            ARG_1( OP_ACOSD,  *y = ( ABS( x ) <= 1.0 ) ? acos( x ) * r2d :
+                                                         AST__BAD )
+            ARG_1( OP_ATAND,  *y = atan( x ) * r2d )
+            ARG_1( OP_SINH,   *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
+            ARG_1( OP_COSH,   *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
+            ARG_1( OP_TANH,   *y = tanh( x ) )
+            ARG_1( OP_ABS,    *y = ABS( x ) )
+            ARG_1( OP_CEIL,   *y = ceil( x ) )
+            ARG_1( OP_FLOOR,  *y = floor( x ) )
+            ARG_1( OP_NINT,   *y = (int) ( ( x >= 0 ) ? x + 0.5 : x - 0.5 ) )
+            ARG_2( OP_ADD,    *y = SAFE_ADD( x1, x2 ) )
+            ARG_2( OP_SUB,    *y = SAFE_SUB( x1, x2 ) )
+            ARG_2( OP_MULT,   *y = SAFE_MULT( x1, x2 ) )
+            ARG_2( OP_DIV ,   *y = SAFE_DIV( x1, x2 ) )
+            ARG_2( OP_PWR,    *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
+            ARG_2( OP_SIGN,   *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
+                                   x1 : -x1 )
+            ARG_2( OP_DIM,    *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
+            ARG_2( OP_MOD,    *y = ( x2 != 0.0 ) ? fmod( x1, x2 ) : AST__BAD )
+            ARG_2( OP_ATAN2,  *y = atan2( x1, x2 ) )
+            ARG_2( OP_ATAN2D, *y = atan2( x1, x2 ) * r2d )
+         case OP_MAX:
+            narg = (int) ( con[ icon++ ] + 0.5 );
+            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
+               DO_ARG_2( *y = ( x1 >= x2 ) ? x1 : x2 )
+            }
+            break;
+         case OP_MIN:
+            narg = (int) ( con[ icon++ ] + 0.5 );
+            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
+               DO_ARG_2( *y = ( x1 <= x2 ) ? x1 : x2 )
+            }
+            break;
+         }
+      }
+   }
+   work = astFree( work );
+   stack = astFree( stack );
+
+#undef ARG_0
+#undef ARG_1
+#undef DO_ARG_2
+#undef ARG_2
+#undef ABS
+#undef CATCH_MATHS_OVERFLOW
+#undef CATCH_MATHS_ERROR
+#undef SAFE_ADD
+#undef SAFE_SUB
+#undef SAFE_MULT
+#undef SAFE_DIV
 }
+

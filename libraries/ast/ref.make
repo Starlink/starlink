@@ -29,6 +29,7 @@ object.h \
       dssmap.h \
       intramap.h \
       lutmap.h \
+      mathmap.h \
       matrixmap.h \
       permmap.h \
       slamap.h \

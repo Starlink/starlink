@@ -11,6 +11,7 @@
 #include "loader.h"
 #include "lutmap.h"
 #include "mapping.h"
+#include "mathmap.h"
 #include "matrixmap.h"
 #include "object.h"
 #include "pcdmap.h"
@@ -66,6 +67,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(IntraMap);
    LOAD(LutMap);
    LOAD(Mapping);
+   LOAD(MathMap);
    LOAD(MatrixMap);
    LOAD(Object);
    LOAD(PcdMap);

@@ -374,9 +374,10 @@ MAIN_C_INCLUDES = \
 $(PKG_NAME)_err.h axis.h c2f77.h channel.h cmpframe.h \
 cmpmap.h dssmap.h error.h fitschan.h frame.h \
 frameset.h intramap.h loader.h lutmap.h mapping.h \
-matrixmap.h memory.h object.h pcdmap.h permmap.h \
-plot.h pointset.h skyaxis.h skyframe.h slamap.h \
-sphmap.h unitmap.h wcsmap.h winmap.h zoommap.h
+mathmap.h matrixmap.h memory.h object.h pcdmap.h \
+permmap.h plot.h pointset.h skyaxis.h skyframe.h \
+slamap.h sphmap.h unitmap.h wcsmap.h winmap.h \
+zoommap.h
 
 #  The following include files are associated with various externally
 #  supplied software items.
@@ -420,10 +421,10 @@ fintramap.c fitschan.c flutmap.c fmapping.c fmatrixmap.c \
 fobject.c fpcdmap.c fpermmap.c fplot.c frame.c \
 frameset.c fskyframe.c fslamap.c fsphmap.c funitmap.c \
 fwcsmap.c fwinmap.c fzoommap.c intramap.c loader.c \
-lutmap.c mapping.c matrixmap.c memory.c object.c \
-pcdmap.c permmap.c plot.c pointset.c skyaxis.c \
-skyframe.c slamap.c sphmap.c unitmap.c wcsmap.c \
-winmap.c zoommap.c
+lutmap.c mapping.c mathmap.c matrixmap.c memory.c \
+object.c pcdmap.c permmap.c plot.c pointset.c \
+skyaxis.c skyframe.c slamap.c sphmap.c unitmap.c \
+wcsmap.c winmap.c zoommap.c
 
 #  The default error reporting module.
 ERR_C_ROUTINES = err_null.c
