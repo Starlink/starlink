@@ -329,11 +329,11 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
     [javac] Compiling 177 source files to /apps/cvsbuild/java/source/splat/build/classes
-    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQueryBrowser.java:533: cannot resolve symbol
+    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQueryBrowser.java:712: cannot resolve symbol
     [javac] symbol  : method getStarTable ()
     [javac] location: class uk.ac.starlink.table.gui.StarJTable
-    [javac]                 starTable = table.getStarTable();
-    [javac]                                  ^
+    [javac]             StarTable starTable = table.getStarTable();
+    [javac]                                        ^
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
     [javac] 1 error

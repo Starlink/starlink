@@ -2149,14 +2149,14 @@ check_packages:
 
 build:
     [javac] Compiling 3 source files to /apps/cvsbuild/java/source/splat/build/classes
-    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQueryBrowser.java:533: cannot resolve symbol
+    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQueryBrowser.java:712: cannot resolve symbol
     [javac] symbol  : method getStarTable ()
     [javac] location: class uk.ac.starlink.table.gui.StarJTable
-    [javac]                 starTable = table.getStarTable();
-    [javac]                                  ^
+    [javac]             StarTable starTable = table.getStarTable();
+    [javac]                                        ^
     [javac] 1 error
 
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 27 seconds
+Total time: 3 minutes 32 seconds

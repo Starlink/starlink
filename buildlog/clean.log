@@ -169,7 +169,6 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/splat/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/splat/docs
      [echo] Executing Mirage target: clean
 
 clean:
