@@ -1,0 +1,200 @@
+//+
+//  Name:
+//     XYProfile
+
+//  Language:
+//     C++
+
+//  Purpose:
+//     Defines a class that returns the average data values along the
+//     X and Y directions of a region on an image.
+
+//  Description:
+//     This routine uses a reference to an ImageIO object to access
+//     data values in all the supported RTD formats. It uses this to
+//     create lists of the average data values in the X and Y
+//     directions of a given region of the image. These values are
+//     intended for use in spectrum-like plots that want to average
+//     over many data values.
+
+//  Authors:
+//     P.W. Draper (PWD)
+//
+//  Copyright:
+//     Copyright (C) 2000 Central Laboratory of the Research Councils
+//
+//  History:
+//     10-JUL-2000 (PWD):
+//        Original version.
+//     {enter_changes_here}
+//-
+
+#include <limits.h>
+#include <string.h>
+#include <stdlib.h>
+#include <string.h>
+#include <float.h>
+#include "define.h"
+#include "XYProfile.h"
+
+//
+//  Constructor, only imio reference is required.
+//
+XYProfile::XYProfile( const ImageIO imio )
+   : imageio_(imio),
+     x0_(0),
+     y0_(0),
+     x1_(0),
+     y1_(0),
+     swap_(0)
+{
+}
+
+//
+// Destructor
+//
+XYProfile::~XYProfile()
+{
+}
+
+//
+//   Set the limits of the region to be profiled.
+//
+void XYProfile::setRegion( const int x0, const int y0,
+                           const int x1, const int y1 )
+{
+    x0_ = x0;
+    y0_ = y0;
+    x1_ = x1;
+    y1_ = y1;
+}
+
+//
+//  Get the region that is to be profiled.
+//
+void XYProfile::getRegion( int& x0, int& y0, int& x1, int& y1 )
+{
+   x0 = x0_;
+   y0 = y0_;
+   x1 = x1_;
+   y1 = y1_;
+}
+
+//
+//  Create the profiles. X and Y profile indices and data values are
+//  returned in packed vectors. The number of values entered into the
+//  vectors is the result.
+//
+void XYProfile::extractProfiles( double *xVector, double *yVector, 
+                                 int numValues[2] )
+{
+
+    //  Get image data properties.
+    void *image = (void *) imageio_.dataPtr();
+    int nx = imageio_.width();
+    int ny = imageio_.height();
+    int type = imageio_.bitpix();
+    double bscale = imageio_.bscale();
+    double bzero = imageio_.bzero();
+
+    //  Make sure the part of the image to draw is sane, and change to 
+    //  array indices from image pixels.
+    int x0 = max( 1, min( x0_, x1_ ) ) - 1;
+    int y0 = max( 1, min( y0_, y1_ ) ) - 1;
+    int x1 = min( nx, max( x1_, x0_ ) ) - 1;
+    int y1 = min( ny, max( y1_, y0_ ) ) - 1;
+
+    //  Create the profiles. Call appropriate member for data format.
+    switch ( type ) {
+    case BYTE_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (char *) image, nx, ny, bscale, bzero, 
+                              x0, y0, x1, y1, xVector, yVector, numValues );
+        } else {
+            extractNativeImage( (char *) image, nx, ny, bscale, bzero,
+                                x0, y0, x1, y1, xVector, yVector, numValues );
+        }
+        break;
+    case X_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (unsigned char *) image, nx, ny, bscale, 
+                              bzero, x0, y0, x1, y1, xVector, yVector,
+                              numValues ); 
+        } else {
+            extractNativeImage( (unsigned char *) image, nx, ny,
+                                bscale, bzero, x0, y0,
+                                x1, y1, xVector, yVector, numValues );
+        }
+        break;
+    case USHORT_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (ushort *) image, nx, ny, bscale, bzero, 
+                              x0, y0, x1, y1, xVector, yVector, numValues );
+        } else {
+            extractNativeImage( (ushort *) image, nx, ny, bscale,
+                                bzero, x0, y0, x1, y1, xVector,
+                                yVector, numValues ); 
+        }
+        break;
+    case SHORT_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (short *) image, nx, ny, bscale, bzero, x0, y0,
+                              x1, y1, xVector, yVector, numValues );
+        } else {
+            extractNativeImage( (short *) image, nx, ny, bscale,
+                                bzero, x0, y0, x1, y1, xVector,
+                                yVector, numValues ); 
+        }
+        break;
+    case LONG_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (FITS_LONG *) image, nx, ny, bscale,
+                              bzero, x0, y0, x1, y1, xVector, yVector,
+                              numValues ); 
+        } else {
+            extractNativeImage( (FITS_LONG *) image, nx, ny, bscale,
+                                bzero, x0, y0, x1, y1, xVector,
+                                yVector, numValues ); 
+        }
+        break;
+    case FLOAT_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (float *) image, nx, ny, bscale, bzero, 
+                              x0, y0, x1, y1, xVector, yVector, numValues );
+        } else {
+            extractNativeImage( (float *) image, nx, ny, bscale,
+                                bzero, x0, y0, x1, y1, xVector,
+                                yVector, numValues ); 
+        }
+        break;
+    default:
+        numValues[0] = numValues[1] = 0;
+    }
+}
+
+//  Define members that are data type dependent. See
+//  XYProfileTemplates.C for which ones.
+
+#define DATA_TYPE char
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE unsigned char
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE short
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE unsigned short
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE FITS_LONG
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE float
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
