@@ -716,8 +716,28 @@
 *    Status :
 *    Function declarations :
 *    Local constants :
+      INTEGER NLINE
+      PARAMETER (NLINE=6)
 *    Local variables :
+      CHARACTER*79 TEXT(NLINE)
+     :/' CIRcle  - circular region     BOX     - box parallel to axes',
+     : ' POLygon - irregular polygon   SLICE   - rectangular slice',
+     : ' ANNulus - annular region      ELLipse - elliptical region',
+     : ' ARD     - ARD input           WHOle   - whole image',
+     : ' GTE     - pixels >= level     SHOw    - outline all regions',
+     : ' IMPort  - read region mask    EXPort  - output mask'/
+      INTEGER ILINE
 *-
 
+      CALL MSG_BLNK()
+      CALL MSG_PRNT('Valid modes are:')
+      CALL MSG_BLNK()
+      DO ILINE=1,NLINE
+        CALL MSG_PRNT(TEXT(ILINE))
+      ENDDO
+
+      CALL MSG_BLNK()
+      CALL MSG_PRNT('*** WARNING - ellipse doesn''t work yet!!')
+      CALL MSG_BLNK()
 
       END
