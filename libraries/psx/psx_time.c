@@ -38,6 +38,7 @@
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +46,8 @@
 *        Original version.
 *     27-JUN-1991 (PMA):
 *        Changed IMPORT and EXPORT macros to GENPTR.
+*     22-SEP-2004 (TIMJ):
+*        Add check for 32bit integer overflow in 2038
 *     {enter_changes_here}
 
 *  Bugs:
@@ -57,7 +60,8 @@
 /* Global Constants:							    */
 
 #include <time.h>		 /* Time constants and structures	    */
-#include "f77.h"		 /* C - FORTRAN interface		    */
+#include <limits.h>              /* int limit */
+#include "cnf.h"		 /* C - FORTRAN interface		    */
 #include "psx_err.h"		 /* PSX error codes			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
 #include "sae_par.h"		 /* ADAM constants			    */
@@ -76,15 +80,31 @@ F77_SUBROUTINE(psx_time)( INTEGER(nticks), INTEGER(status) )
    GENPTR_INTEGER(status)
 
 /* Local Variables:							    */
+   time_t t;         /* Local version of the time */
 
-   *nticks = time( NULL );
+   t = time( NULL );
 
 /* Check the value returned.						    */
 
-   if( *nticks == -1 )
+   if( t == -1 )
    {
       *status = PSX__NOTIM;
       psx1_rep_c( "PSX_TIME_NOTIM", "Could not get the time", status );
+   }
+
+   /* Copy to the fortran integer. Make sure it has not exceeded
+      the space since in some cases time_t can be 64bit */
+   if ( t > INT_MAX ) {
+     *status = PSX__NOTIM;
+     psx1_rep_c( "PSX_TIME_INTEXCEEDED", 
+		 "Time exceeds largest value that can be stored in a Fortran integer", 
+		 status );
+   }
+
+   if (*status == SAI__OK ) {
+     *nticks = (F77_INTEGER_TYPE)t;
+   } else {
+     *nticks = -1;
    }
 
 }
