@@ -79,11 +79,15 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-APR-1997 (PDRAPER):
 *        Original version.
+*     1-OCT-2004 (TIMJ):
+*        Use CNF_PVAL
+*        Fix IPX, IPY memory leak
 *     {enter_changes_here}
 
 *  Bugs:
@@ -98,6 +102,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'PONGO_PAR'       ! PONGO global constants
       INCLUDE 'PRM_PAR'         ! PRIMDAT global constants
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'PONGO_CMN'       ! PONGO global variables
@@ -115,7 +120,7 @@
       DOUBLE PRECISION DEC0     ! Projection centre
       DOUBLE PRECISION RA0      ! Projection centre
       INTEGER IPX               ! Pointer to X workspace
-      INTEGER IPY               ! Pointer to X workspace
+      INTEGER IPY               ! Pointer to Y workspace
       INTEGER PROJECTION        ! Projection type
       REAL XD( NDATMAX )        ! Real X data
       REAL YD( NDATMAX )        ! Real Y data
@@ -162,7 +167,10 @@
          CALL PSX_CALLOC( NDAT * 100, '_REAL', IPX, STATUS )
          CALL PSX_CALLOC( NDAT * 100, '_REAL', IPY, STATUS )
          CALL PON_DPOLY( PROJECTION, RA0, DEC0, NDAT, XDATA, YDATA,
-     :                   %VAL( IPX ), %VAL( IPY ), STATUS )
+     :                   %VAL( CNF_PVAL ( IPX ) ),
+     :                   %VAL( CNF_PVAL ( IPY ) ), STATUS )
+         CALL PSX_FREE( IPX, STATUS )
+         CALL PSX_FREE( IPY, STATUS )
       END IF
 
 *  Report a contextual error if needed.
