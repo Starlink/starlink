@@ -516,12 +516,12 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  directory for a sucessful built of GAIA.
 
 GAIA_LIB_FILES =  \
- Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
- GaiaArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
- StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
- StarAstSystem.hlp StarBlink.hlp GaiaPatch.hlp GaiaApPhotom.hlp \
- GaiaOptPhotom.hlp GaiaContour.hlp GaiaAstTransfer.hlp \
- GaiaEsp.hlp \
+ Catalogue.hlp Gaia.hlp GaiaApPhotom.hlp GaiaArd.hlp \
+ GaiaAstTransfer.hlp GaiaAstTransform.hlp GaiaContour.hlp GaiaEsp.hlp \
+ GaiaOptPhotom.hlp GaiaPatch.hlp GaiaPositions.hlp GaiaSearch.hlp \
+ GaiaSextractor.hlp GaiaTextImport.hlp StarAst.hlp StarAstCopy.hlp \
+ StarAstDefine.hlp StarAstGrid.hlp StarAstReference.hlp \
+ StarAstRefine.hlp StarAstSystem.hlp StarBlink.hlp \
  skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
  adamMessageRelay 
 
