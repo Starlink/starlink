@@ -70,11 +70,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     26 Jul 1995 (DJA):
 *        Original version.
+*     29 Jan 1997 (RB):
+*        Cope with a null GCB
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,7 +122,7 @@
 *  Locate the GCB hdu data
       CALL ADI2_CFIND( ARGS(1), 'GCB', '@', ' ', .FALSE., .FALSE.,
      :                 'BYTE', 0, 0, DIDCRE, GCBDAT, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK .AND. GCBDAT .NE. ADI__NULLID ) THEN
 
 *    Map the HDU data
         CALL ADI2_DCOP_IN( GCBDAT, GCBPTR, NBYTE, STATUS )
@@ -141,6 +144,9 @@
 *  If failed to load, clear the GCB
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
+        CALL GCB_CLEAR( STATUS )
+      END IF
+      IF (GCBDAT .EQ. ADI__NULLID ) THEN
         CALL GCB_CLEAR( STATUS )
       END IF
 
