@@ -39,20 +39,29 @@
 #
 #     Finally a list of packages, and tasks within each package,
 #     is written out to a second file ($taskfile).
-#     What constitutes a task is not well defined, but means something
+#     What constitutes a task is not well defined, but is something
 #     like the name of an executable or alias which can be typed from
 #     the user environment to do something useful in the package, and
 #     for which an identifiable piece of source code exists.
 #     As well as the method described above, some more poking around
 #     in $bindir (typically /star/bin) is done to try to locate more
-#     tasks.
+#     tasks.  The general philosophy for identifying tasks is to look
+#     everywhere which might give an indication of task names, and 
+#     store anything which looks as if it might be a task name in the 
+#     global hash of lists %tasks.  At the end of the indexing, each 
+#     task name candidate in %tasks for which a corresponding source 
+#     module (i.e one in the same package with the same, or nearly
+#     the same name) can be found is written out to the task list, 
+#     and the others are discarded.
 #
 #     Each line in the task file is of the format:
 #
 #           package: task1 task2 task3 ...
 #
 #     with each indexed package for which any entries appear in a 
-#     StarIndex object appearing exactly once.
+#     StarIndex object appearing exactly once.  Thus the tasks file
+#     is the record of all the packages which have been indexed as
+#     well as the record of all the task names.
 #     Although the task file is plain text, some of the lines may be 
 #     quite long.
 
@@ -157,9 +166,10 @@ else {
 }
 
 #  Write checked task names out to text file.
-#  Currently, a task is identified as the text of any entry in a .hlp file
-#  for which a module of the same name (possibly with appended underscore)
-#  exists in the same package.
+#  Currently, a task is identified as anything which has been identified
+#  as a candidate for taskhood by other routines (stored in global hash
+#  %tasks) for which a module of the same name (possibly with appended 
+#  underscore) exists in the same package.
 
 my ($line, $module);
 open TASKS, ">$taskfile" or error "Couldn't open $taskfile\n";
@@ -275,6 +285,21 @@ sub index_pack {
       error "Arguments must be package tar files or directories\n";
    }
 
+#  Index expected files sitting naked in source directory.  These may
+#  not have been picked up by the file indexing routine, since only
+#  files within tar files are indexed by filename (to avoid indexing
+#  many unwanted object files etc).
+
+   if (-d $pack_file) {
+      my ($file, @files);
+      pushd $pack_file;
+      foreach $file (glob "mk makefile *CONDITIONS *.news *.tex *.ps *.eps") {
+         push @files, $file if (-f $file);
+      }
+      index_files "$package#", @files;
+      popd;
+   }
+
 #  Look for task candidates in the $bindir/$package directory.
 
    my $file;
@@ -343,8 +368,8 @@ sub index_list {
 
    my ($file, $ext);
    foreach $file (@files) {
-      $file =~ /\.([^.]+)$/;
-      $ext = $1 || '';
+      $ext = '';
+      $ext = $1 if ($file =~ /\.([^.]+)$/);
       if (-d $file) {                    #  directory.
          index_dir "$path$file/", $file; 
       }
