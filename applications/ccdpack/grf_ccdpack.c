@@ -344,7 +344,7 @@ int astGText( const char *text, float x, float y, const char *just,
       if( beta < 0.0 ) upy = -upy;
 
 /* Get the angle between the text base-line and horizontal. */
-      angle = atan2( -(double) upx*alpha, (double) upy*beta )*R2D;
+      angle = atan2( -(double) upx*alpha, (double) upy*beta )*AST__DR2D;
 
 /* Get the fractional horizontal justification as needed by PGPLOT. */
       if( lj[ 1 ] == 'L' ) {
@@ -606,7 +606,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
       vy = -ux;
 
 /* Get the angle between the text base-line and horizontal. */
-      angle = atan2( (double) vy, (double) vx )*R2D;
+      angle = atan2( (double) vy, (double) vx )*AST__DR2D;
 
 /* Get the bounding box of the string drawn with its bottom left corner
    at the origin. */
