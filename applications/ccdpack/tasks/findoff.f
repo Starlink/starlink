@@ -162,6 +162,23 @@
 *        more likely scenario is that they have too few positions and
 *        have consequently been rejected.  
 *        [TRUE]
+*     RESTRICT = LOGICAL (Read)
+*        This parameter determines whether the mapping between coordinate
+*        systems of NDF pairs is used to restrict the choice of objects
+*        to match with each other.  If set TRUE, then only objects
+*        which would appear in the overlap of two frames if the
+*        mapping determined by the WCS components of each NDF pair 
+*        were accurate are tested for matching.  If it is set FALSE, then
+*        no such restriction is made.
+*
+*        This parameter should therefore be set TRUE if the translational
+*        part of the information about the coordinate frames in the 
+*        WCS components is fairly accurate (especially in the case that
+*        there are many objects and a small overlap), and FALSE if it 
+*        is not.
+*
+*        This parameter is ignored if USEWCS is FALSE.
+*        [FALSE]
 *     USECOM = LOGICAL (Read)
 *        This parameter specifies whether the completeness value will
 *        be used to weight the number of matches between a pair, when
@@ -169,6 +186,32 @@
 *        a completeness weight increases the chance of selecting high
 *        quality matches, but may reduce the chance of selecting matches
 *        with the highest counts in favour of those with lower counts.
+*        [TRUE]
+*     USEWCS = LOGICAL (Read)
+*        This parameter specifies whether the World Coordinate System
+*        information in the NDF should be used to make guesses about
+*        how to align the frames.  If set true, and if a mapping
+*        between the coordinates of each pair of NDFs can be found in 
+*        the domain of the Current coordinate frame of either of the pair
+*        then this mapping is applied before the match is attempted.
+*        Additionally, if the parameter RESTRICT is TRUE, the objects 
+*        chosen for matching up between each pair of images are only 
+*        those which would overlap in that pair if the WCS coordinate 
+*        information in both NDFs were accurate.  No other restriction 
+*        is made on the basis of this information however.  Since the
+*        algorithms rely on shifting images in the X and Y directions
+*        therefore, they will be capable of matching up objects even if 
+*        there is a significant (if RESTRICT is TRUE) or an arbitrarily
+*        large (if RESTRICT is FALSE) translational error in the 
+*        coordinate system of the chosen domain, but other large errors
+*        in the mapping (e.g. rotational alignment) will not be
+*        tolerated.
+*       
+*        If this parameter is set FALSE, then object matching proceeds
+*        on the assumption that the coordinate frames of all NDFs
+*        are the same apart from a translation.
+*
+*        This parameter is ignored if NDFNAMES is false.
 *        [TRUE]
 
 *  Notes:
@@ -263,12 +306,15 @@
 *  Examples:
 *     findoff inlist='*' error=1 outlist='*.off'
 *        In this example all the NDFs in the current directory are
-*        accessed and their associated position lists are used. The
-*        matched positions are named *.off. The method used is to try 
-*        the FAST algorithm, switching to SLOW if FAST fails. The
-*        completeness measure is used when forming the spanning tree.
-*        Matches with completenesses less than 0.5 and with less than
-*        three positions are rejected.
+*        accessed and their associated position lists are used.  
+*        Before object matching is attempted any transformations 
+*        implied by registering the images in the Current frames
+*        of the NDFs' WCS components are applied to the position list
+*        coordinates.  The matched positions are named *.off. The 
+*        method used is to try the FAST algorithm, switching to SLOW 
+*        if FAST fails. The completeness measure is used when forming 
+*        the spanning tree.  Matches with completenesses less than 
+*        0.5 and with less than three positions are rejected.
 *
 *     findoff fast nofailsafe
 *        In this example the only the FAST algorithm is used.
@@ -282,6 +328,18 @@
 *        are being used. The intrinsic error in the measurements is
 *        around 0.002 and positions within a box 0.008 of each other are
 *        rejected.
+*
+*     findoff inlist='data*' outlist='*.off' restrict=true
+*        This form would be used if the NDFs 'data*' have WCS components
+*        which are already approximately correct.  The Current domain 
+*        of each should be set to the domain in which they are all 
+*        (approximately) registered.  Setting the RESTRICT parameter
+*        then tells FINDOFF to consider only objects in the region which 
+*        the WCS components say ought to overlap between pairs of frames.
+*        This can save a lot of time if there are many objects and a 
+*        small overlap, but will result in failure of the program if 
+*        the WCS components are not translationally registered 
+*        reasonably well.
 
 *  Behaviour of parameters:
 *     Most parameters retain their current value as default. The
@@ -341,13 +399,21 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameterisations
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( 12 ) DOMAIN ! WCS domain used for provisional registration
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for reading in data
+      CHARACTER * ( CCD1__BLEN ) LINE1 ! Line buffer for writing out text
+      CHARACTER * ( CCD1__BLEN ) LINE2 ! Line buffer for writing out text
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
+      DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
+      DOUBLE PRECISION BNDY( 4, CCD1__MXLIS ) ! Y coords of bounding boxes
+      DOUBLE PRECISION CBNDX( 4 ) ! Converted X coords of list 2 bounding box
+      DOUBLE PRECISION CBNDY( 4 ) ! Converted Y coords of list 2 bounding box
       DOUBLE PRECISION COMFAC   ! Completeness factor
       DOUBLE PRECISION ERROR    ! Error in input positions
       DOUBLE PRECISION MINSEP   ! Minimum input data separation
@@ -356,12 +422,15 @@
       DOUBLE PRECISION XOFFN( CCD1__MXLIS ) ! Final X translation
       DOUBLE PRECISION YOFF( CCD1__MXLIC ) ! Determined Y translation
       DOUBLE PRECISION YOFFN( CCD1__MXLIS ) ! Final Y translation
+      INTEGER CNV               ! AST mapping between frames of compared lists
       INTEGER COUNT             ! Dummy loop counter
       INTEGER FDIN              ! Input FIO descriptor
       INTEGER FDOUT             ! Output FIO descriptor
       INTEGER FIOGR             ! Input IRH group identifier
+      INTEGER FRBASE            ! Base frame of WCS frameset
+      INTEGER FSCNV             ! AST pointer to framet containing mapping
       INTEGER I                 ! Loop variable
-      INTEGER IAT               ! Dummy 
+      INTEGER IAT               ! Position in CHR_ string
       INTEGER IDIN              ! NDF identifier
       INTEGER IPBEEN            ! Pointer to workspace
       INTEGER IPDAT             ! Pointer to input data
@@ -371,6 +440,8 @@
       INTEGER IPQUE             ! Pointer to workspace
       INTEGER IPRAN1            ! Pointer to sort ranks (w/s)
       INTEGER IPRAN2            ! Pointer to sort ranks (w/s)
+      INTEGER IPRBN1            ! Intermediate pointer to sort ranks
+      INTEGER IPRBN2            ! Intermediate pointer to sort ranks
       INTEGER IPSPAN            ! Pointer to graph (spanning)
       INTEGER IPSUB             ! Pointer to sub-graph (spanning)
       INTEGER IPWRK1            ! Workspace pointers
@@ -379,6 +450,12 @@
       INTEGER IPWRK4            ! Workspace pointers
       INTEGER IPWRK5            ! Workspace pointers
       INTEGER IPX( CCD1__MXLIS ) ! Pointer to out/input X positions
+      INTEGER IPXC2             ! Pointer to list 2 X coords in list 1 space
+      INTEGER IPXI1             ! Pointer to list 1 X coords in list 2 box
+      INTEGER IPXI2             ! Pointer to list 2 X coords in list 1 box
+      INTEGER IPYC2             ! Pointer to list 2 Y coords in list 1 space
+      INTEGER IPYI1             ! Pointer to list 1 Y coords in list 2 box
+      INTEGER IPYI2             ! Pointer to list 2 Y coords in list 1 box
       INTEGER IPXN              ! Pointer to input X positions
       INTEGER IPXO1( CCD1__MXLIC ) ! Pointer to output X positions
       INTEGER IPXO2( CCD1__MXLIC ) ! Pointer to output X positions
@@ -387,9 +464,15 @@
       INTEGER IPYO1( CCD1__MXLIC ) ! Pointer to output Y positions
       INTEGER IPYO2( CCD1__MXLIC ) ! Pointer to output Y positions
       INTEGER J                 ! Loop variable
+      INTEGER JBAS1             ! Index of Base frame in AST frameset 1
+      INTEGER JBAS2             ! Index of Base frame in AST frameset 2
+      INTEGER JCUR              ! Index of Current frame in AST frameset
+      INTEGER JPIX              ! Index of frame in Pixel domain
+      INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF 
       INTEGER LOOPS             ! Number of comparison loops
       INTEGER MINMAT            ! Minimum number of positions for match
       INTEGER NDFGR             ! Input NDF IRG group
+      INTEGER NDIM              ! Number of dimensions in NDF
       INTEGER NEDGES            ! Number of edges in graph
       INTEGER NEWED             ! Number of edges in spanning graph
       INTEGER NMAT( CCD1__MXLIC ) ! Number of matched positions
@@ -401,10 +484,14 @@
       INTEGER NREC( CCD1__MXLIS ) ! Number of records
       INTEGER NRECN             ! Current number of records 
       INTEGER NRET              ! Dummy variable
+      INTEGER NUMI1             ! Number of list 1 points in list 2 box
+      INTEGER NUMI2             ! Number of list 2 points in list 1 box
       INTEGER NVAL( CCD1__MXLIS ) ! Number of values per-record
       INTEGER OFFS( CCD1__MXLIS + 1 ) ! Offsets into extended lists
       INTEGER OUTGRP            ! Output IRH group identifier
       INTEGER TOTNOD            ! Total number of nodes in graph
+      INTEGER UBND( 2 )         ! Upper pixel-index bounds of NDF
+      INTEGER WCS( CCD1__MXLIS ) ! AST WCS pointers
       LOGICAL ALLOK             ! Trur no input positions removed in preselection phase
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
@@ -413,9 +500,12 @@
       LOGICAL FSAFE             ! True if n**4 method used if n**2 fails
       LOGICAL NDFS              ! True if position list names are stored in NDF extensions
       LOGICAL OK                ! Match is ok
+      LOGICAL RSTRCT            ! True if only objects in overlap considered
       LOGICAL USECOM            ! Use completeness measure as a weight
+      LOGICAL USEWCS            ! True if we will attempt to use WCS extension
       LOGICAL OVERRD            ! True if partial selection is allowed
       LOGICAL PAIRED( CCD1__MXNDF ) ! Whether list is paired with someone
+
 *.
 
 *  Check inherited global status.
@@ -423,6 +513,12 @@
 
 *  Start the CCDPACK logging system.
       CALL CCD1_START( 'FINDOFF', STATUS )
+
+*  Begin NDF context.
+      CALL NDF_BEGIN( STATUS )
+
+*  Begin AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Find out what is to be used for the source of the position list
 *  names. Are they stored in NDF extensions or will just straight list
@@ -469,6 +565,64 @@
       OVERRD = .FALSE.
       CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
 
+*  See if we should use WCS extension information in NDFs.
+      IF ( NDFS ) THEN
+         USEWCS = .TRUE.
+         CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
+      ELSE
+         USEWCS = .FALSE.
+      END IF
+
+*  See if we should use WCS information to restrict lists of objects
+*  to be matched.
+      RSTRCT = .FALSE.
+      IF ( USEWCS ) CALL PAR_GET0L( 'RESTRICT', RSTRCT, STATUS )
+
+*  Get World Coordinate System information from NDFs.  After this,
+*  the WCS array will contain a pointer to a valid WCS frameset for 
+*  each member of the group.
+      DO 12 I = 1, NOPEN
+         IF ( USEWCS ) THEN
+
+*  Get pointer to WCS frameset.
+            CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS )
+            CALL CCD1_GTWCS( IDIN, WCS( I ), STATUS )
+
+*  Set Base frame to what is now the Current frame, and Current 
+*  frame to a frame in the Pixel domain.  This has the effect that
+*  later calls to AST_CONVERT trying to find a mapping between pairs
+*  of WCS framesets, if one of the fields in the domainlist is empty,
+*  will convert between Pixel domains and via one or other of the 
+*  domains which were current as submitted to the application.
+*  This is the behaviour advertised.
+            JCUR = AST_GETI( WCS( I ), 'Current', STATUS )
+            CALL CCD1_FRDM( WCS( I ), 'Pixel', JPIX, STATUS )
+            CALL AST_SETI( WCS( I ), 'Base', JCUR, STATUS )
+
+*  Get bounding box: BNDX and BNDY contain the X and Y pixel coordinates
+*  of the corners of the NDF's DATA array, for the purpose of determining
+*  where overlaps are expected once WCS information has been obtained.  
+*  They must be listed in BNDX and BNDY in a clockwise, or anti-clockwise, 
+*  order.  They are modified here by the ERROR parameter so that pixels 
+*  outside the box by that distance are considered for matching.
+            IF ( RSTRCT ) THEN
+               CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
+               BNDX( 1, I ) = DBLE( LBND( 1 ) - 1 ) - ERROR
+               BNDX( 2, I ) = DBLE( UBND( 1 ) ) + ERROR
+               BNDX( 3, I ) = DBLE( UBND( 1 ) ) + ERROR
+               BNDX( 4, I ) = DBLE( LBND( 1 ) - 1 ) - ERROR
+               BNDY( 1, I ) = DBLE( LBND( 2 ) - 1 ) - ERROR
+               BNDY( 2, I ) = DBLE( LBND( 2 ) - 1 ) - ERROR
+               BNDY( 3, I ) = DBLE( UBND( 2 ) ) + ERROR
+               BNDY( 4, I ) = DBLE( UBND( 2 ) ) + ERROR
+            END IF
+
+         ELSE 
+            WCS( I ) = AST__NULL
+         END IF
+
+ 12   CONTINUE
+
 *  Output names of the positions lists and labels.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
@@ -514,12 +668,26 @@
       CALL MSG_SETD( 'COMPL', NEDFAC )
       CALL CCD1_MSG( ' ', '  Minimum completeness level'//
      : ' for positive match: ^COMPL', STATUS )
-      IF (  USECOM ) THEN
+      IF ( USECOM ) THEN
          CALL CCD1_MSG( ' ','  Completeness estimates will be used to'//
      :   ' weight connections', STATUS )
       ELSE
          CALL CCD1_MSG( ' ','  Completeness estimates will not be'//
      :   ' used to weight connections', STATUS )
+      END IF
+      IF ( USEWCS ) THEN
+         CALL CCD1_MSG( ' ', '  WCS information will be used for'//
+     :   ' provisional alignment', STATUS )
+      ELSE
+         CALL CCD1_MSG( ' ', '  WCS information will not be used for'//
+     :   ' provisional alignment', STATUS )
+      END IF
+      IF ( RSTRCT ) THEN 
+         CALL CCD1_MSG( ' ', '  Attempted matches will be'//
+     :   ' restricted to apparent overlap zones', STATUS )
+      ELSE 
+         CALL CCD1_MSG( ' ', '  All objects will be considered'//
+     :   ' for possible matches', STATUS )
       END IF
 
 *  What sort of comparison will be performed.
@@ -662,29 +830,24 @@
       CALL CCD1_MSG( ' ', '  No. of intercomparisons: ^LOOPS', STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Set header labels and offsets.
+*  Set and output header labels.
+      LINE1 = '    List  List  No. matches  Completeness  Status   '
+      LINE2 = '    ----  ----  -----------  ------------  ------   '
       IF ( FAST .AND. FSAFE ) THEN
-         CALL CCD1_MSG( ' ',
-     :'    List  List  No. of matches   Completeness    Status   '//
-     : 'Algorithm',
-     : STATUS )
-         CALL CCD1_MSG( ' ',
-     :'    ----  ----  --------------   ------------    ------   '//
-     : '---------',
-     : STATUS )
-      ELSE
-         CALL CCD1_MSG( ' ',
-     :'    List  List  No. of matches   Completeness    Status   ',
-     : STATUS )
-         CALL CCD1_MSG( ' ',
-     :'    ----  ----  --------------   ------------    ------   ',
-     : STATUS )
+         LINE1( 53: ) = 'Algorithm  '
+         LINE2( 53: ) = '---------  '
       END IF
-
+      IF ( USEWCS ) THEN
+         LINE1( 64: ) = 'WCS domain  '
+         LINE2( 64: ) = '----------  '
+      END IF
+      CALL CCD1_MSG( ' ', LINE1, STATUS )
+      CALL CCD1_MSG( ' ', LINE2, STATUS )
+         
 *  Loop comparing each list with all the lists which follow it.
       COUNT = 0 
       NMATCH = 0
-      DO 3 I = 1, NOPEN -1
+      DO 3 I = 1, NOPEN - 1
          DO 4 J = I + 1, NOPEN 
 
 *  Increment counters and set number of matched positions.
@@ -713,25 +876,147 @@
 *  And for remembering the original positions in input data sets.
             CALL CCD1_MALL( NREC( I ), '_INTEGER', IPRAN1, STATUS )
             CALL CCD1_MALL( NREC( J ), '_INTEGER', IPRAN2, STATUS )
+            CALL CCD1_MALL( NREC( I ), '_INTEGER', IPRBN1, STATUS )
+            CALL CCD1_MALL( NREC( J ), '_INTEGER', IPRBN2, STATUS )
 
-*  Generate the offset statistics.
+*  Check memory allocations succeeded.
             IF ( STATUS .NE. SAI__OK ) GO TO 99
             FAILED = .FALSE.
-            IF ( FAST ) THEN 
-            
+
+            IF ( USEWCS ) THEN
+
+*  Store the Base frame indices since the call to AST_CONVERT will 
+*  overwrite them.
+               JBAS1 = AST_GETI( WCS( I ), 'Base', STATUS )
+               JBAS2 = AST_GETI( WCS( J ), 'Base', STATUS )
+
+*  Try to obtain an AST mapping between coordinate systems (Current and
+*  Base frames have previously been set for each frameset so that an 
+*  empty domainlist achieves the desired effect).
+               FSCNV = AST_CONVERT( WCS( J ), WCS( I ), ' ', STATUS )
+               CNV = AST_GETMAPPING( FSCNV, AST__BASE, AST__CURRENT, 
+     :                               STATUS )
+               CALL AST_ANNUL( FSCNV, STATUS )
+
+*  Store the domain in which the alignment actually occurred.
+               FRBASE = AST_GETFRAME( WCS( I ), AST__BASE, STATUS )
+               DOMAIN = AST_GETC( FRBASE, 'Domain', STATUS )
+               CALL AST_ANNUL( FRBASE, STATUS ) 
+
+*  Restore the original Base frames to their former values.
+               CALL AST_SETI( WCS( I ), 'Base', JBAS1, STATUS )
+               CALL AST_SETI( WCS( J ), 'Base', JBAS2, STATUS )
+
+            ELSE
+               CNV = AST__NULL 
+            END IF
+
+*  Check whether mapping was obtained successfully.
+            IF ( CNV .EQ. AST__NULL ) THEN
+
+*  We are not making use of WCS information.  
+*  Set up arrays as if there is a unit mapping between the coordinate 
+*  systems of the two lists, with no bounding box restrictions.
+               IPXI1 = IPX( I )
+               IPYI1 = IPY( I )
+               IPXI2 = IPX( J )
+               IPYI2 = IPY( J ) 
+               IPXC2 = IPX( J )
+               IPYC2 = IPY( J )
+               NUMI1 = NREC( I )
+               NUMI2 = NREC( J )
+
+*  Fill sort lists with unit mapping (since they are mapping from one
+*  list to itself).
+               CALL CCD1_GISEQ( 1, 1, NUMI1, %VAL( IPRBN1 ), STATUS )
+               CALL CCD1_GISEQ( 1, 1, NUMI2, %VAL( IPRBN2 ), STATUS )
+
+            ELSE
+
+*  We are making use of WCS information.
+*  Allocate temporary workspace for all X and Y coordinates of points
+*  in list J, converted to the coordinate system of list I.
+               CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPXC2, STATUS )
+               CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPYC2, STATUS )
+
+*  Allocate space for X and Y coordinates of points in both lists, in
+*  the same coordinate system (that of list I), to contain only those
+*  points in the (WCS-estimated) overlap between the two sets.
+               CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXI1, STATUS )
+               CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYI1, STATUS )
+               CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPXI2, STATUS )
+               CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPYI2, STATUS )
+
+*  Check memory allocations succeeded.
+               IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Map positions in list J to coordinate system of list I.
+               CALL AST_TRAN2( CNV, NREC( J ), 
+     :                         %VAL( IPX( J ) ), %VAL( IPY( J ) ),
+     :                         .TRUE., %VAL( IPXC2 ), %VAL( IPYC2 ),
+     :                         STATUS )
+
+               IF ( RSTRCT ) THEN
+
+*  Map bounding box vertices applying to list J into coordinate system
+*  of list I.
+                  CALL AST_TRAN2( CNV, 4, BNDX( 1, J ), BNDY( 1, J ),
+     :                            .TRUE., CBNDX, CBNDY, STATUS )
+
+*  Select only points in list I which fall inside bounding box of list J.
+                  CALL CCD1_INPLY( CBNDX, CBNDY, 4,
+     :                             %VAL( IPX( I ) ), %VAL( IPY( I ) ),
+     :                             NREC( I ), %VAL( IPXI1 ), 
+     :                             %VAL( IPYI1 ), %VAL( IPRBN1 ), 
+     :                             NUMI1, STATUS )
+
+*  Select only points in list J which fall inside bounding box of list I.
+                  CALL CCD1_INPLY( BNDX( 1, I ), BNDY( 1, I ), 4,
+     :                             %VAL( IPXC2 ), %VAL( IPYC2 ),
+     :                             NREC( J ), %VAL( IPXI2 ), 
+     :                             %VAL( IPYI2 ), %VAL( IPRBN2 ), 
+     :                             NUMI2, STATUS )
+
+               ELSE
+
+*  No restrictions on which points to consider - copy all to the 
+*  arrays for matching.
+                  CALL CCG1_COPAD( NREC( I ), %VAL( IPX( I ) ), 
+     :                             %VAL( IPXI1 ), STATUS )
+                  CALL CCG1_COPAD( NREC( I ), %VAL( IPY( I ) ),
+     :                             %VAL( IPYI1 ), STATUS )
+                  CALL CCG1_COPAD( NREC( J ), %VAL( IPXC2 ), 
+     :                             %VAL( IPXI2 ), STATUS )
+                  CALL CCG1_COPAD( NREC( J ), %VAL( IPYC2 ),
+     :                             %VAL( IPYI2 ), STATUS )
+                  NUMI1 = NREC( I )
+                  NUMI2 = NREC( J )
+
+               END IF
+
+*  Check if we have enough points in each list to satisfy the matching
+*  criteria.
+               IF ( NUMI1 .LT. MINMAT .OR. NUMI2 .LT. MINMAT )
+     :            OK = .FALSE.
+
+            END IF
+
+*  Generate the offset statistics.
+            IF ( FAST .AND. OK ) THEN 
+
 *  Perform matching using histogram of X and Y offsets refined through
 *  iteration.
                CALL CCD1_STAO( ERROR,
-     :                         %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                         NREC( I ),
-     :                         %VAL( IPX( J ) ), %VAL( IPY( J ) ),
-     :                         NREC( J ),
+     :                         %VAL( IPXI1 ), %VAL( IPYI1 ), 
+     :                         %VAL( IPRBN1 ), NUMI1,
+     :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
+     :                         %VAL( IPRBN2 ), NUMI2,
      :                         %VAL( IPWRK1 ),
      :                         %VAL( IPXO1( COUNT ) ),
      :                         %VAL( IPYO1( COUNT ) ),
      :                         %VAL( IPXO2( COUNT ) ),
      :                         %VAL( IPYO2( COUNT ) ), NMAT( COUNT ),
-     :                         XOFF( COUNT ), YOFF( COUNT ), 
+     :                         XOFF( COUNT ), YOFF( COUNT ),
      :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ), STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
                
@@ -755,8 +1040,8 @@
 *  Now do the test.
                      CALL CCD1_OVCOM( %VAL( IPX( I ) ),
      :                                %VAL( IPY( I ) ), NREC( I ),
-     :                                %VAL( IPX( J ) ), 
-     :                                %VAL( IPY( J ) ), NREC( J ), 
+     :                                %VAL( IPXC2 ),
+     :                                %VAL( IPYC2 ), NREC( J ),
      :                                NMAT( COUNT ), XOFF( COUNT ),
      :                                YOFF( COUNT ), ERROR, COMFAC,
      :                                STATUS )
@@ -773,7 +1058,8 @@
                   
 *  Perform matching using the straight-forward distance comparisons
 *  if this is required.
-            IF ( .NOT. FAST .OR. ( FSAFE .AND. FAILED ) ) THEN 
+            IF ( ( .NOT. FAST .OR. ( FSAFE .AND. FAILED ) ) 
+     :         .AND. OK ) THEN 
             
 *  Get workspace and perform comparison.
                CALL CCD1_MALL( NPOSS, '_DOUBLE', IPWRK2, STATUS )
@@ -783,10 +1069,10 @@
                CALL CCD1_MALL( NREC( J ) + 2, '_INTEGER', IPWRK5, 
      :                         STATUS )
                CALL CCD1_SOFF( ERROR,
-     :                         %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                         NREC( I ),
-     :                         %VAL( IPX( J ) ), %VAL( IPY( J ) ),
-     :                         NREC( J ),
+     :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
+     :                         %VAL( IPRBN1 ), NUMI1,
+     :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
+     :                         %VAL( IPRBN2 ), NUMI2,
      :                         %VAL( IPWRK1 ), %VAL( IPWRK2 ),
      :                         %VAL( IPWRK3 ), %VAL( IPWRK4 ),
      :                         %VAL( IPWRK5 ),
@@ -795,8 +1081,7 @@
      :                         %VAL( IPXO2( COUNT ) ),
      :                         %VAL( IPYO2( COUNT ) ), NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ),
-     :                         STATUS )
+     :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ), STATUS )
                CALL CCD1_MFREE( IPWRK2, STATUS )
                CALL CCD1_MFREE( IPWRK3, STATUS )
                CALL CCD1_MFREE( IPWRK4, STATUS )
@@ -816,10 +1101,10 @@
             ELSE
 
 *  Now do the test.
-               CALL CCD1_OVCOM( %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                          NREC( I ), %VAL( IPX( J ) ),
-     :                          %VAL( IPY( J ) ), NREC( J ),
-     :                          NMAT( COUNT ), XOFF( COUNT ),
+               CALL CCD1_OVCOM( %VAL( IPX( I ) ), %VAL( IPY( I ) ), 
+     :                          NREC( I ), %VAL( IPXC2 ), 
+     :                          %VAL( IPYC2 ), NREC( J ), 
+     :                          NMAT( COUNT ), XOFF( COUNT ), 
      :                          YOFF( COUNT ), ERROR, COMFAC, STATUS )
             END IF
 
@@ -834,19 +1119,22 @@
 *  Write information about this loop.
             CALL CHR_ITOC( I, LINE( 6: ), IAT )
             CALL CHR_ITOC( J, LINE( 12: ), IAT )
-            CALL CHR_ITOC( NMAT( COUNT ), LINE( 22: ), IAT )
-            CALL CHR_RTOC( REAL( COMFAC ), LINE( 34: ), IAT )
+            CALL CHR_ITOC( NMAT( COUNT ), LINE( 19: ), IAT )
+            CALL CHR_RTOC( REAL( COMFAC ), LINE( 30: ), IAT )
             IF ( OK ) THEN
-                LINE( 49: ) = 'accepted'
+                LINE( 44: ) = 'accepted'
             ELSE
-                LINE( 49: ) = 'rejected'
+                LINE( 44: ) = 'rejected'
             END IF
             IF ( FAST .AND. FSAFE ) THEN
                IF ( FAILED ) THEN
-                  LINE( 62: ) = 'SLOW'
+                  LINE( 56: ) = 'SLOW'
                ELSE
-                  LINE( 62: ) = 'FAST'
+                  LINE( 56: ) = 'FAST'
                END IF
+            END IF
+            IF ( CNV .NE. AST__NULL ) THEN
+               LINE( 64: ) = DOMAIN
             END IF
 
 *  And write the line of information
@@ -866,6 +1154,33 @@
 *  If using completeness as a weight modify the number of matches.
                NMAT( COUNT ) = NINT( DBLE( NMAT( COUNT ) ) * COMFAC )
                NMAT( COUNT ) = MAX( 1, NMAT( COUNT ) )
+
+*  If using WCS information, construct list of matched positions in the
+*  original coordinate frame from the lists which are in transformed
+*  frames.  We use IPXC2 and IPYC2 as workspace and leave the result
+*  where the original values were, in IPXO2 and IPYO2.
+               IF ( CNV .NE. AST__NULL ) THEN
+                  CALL AST_TRAN2( CNV, NREC( J ), 
+     :                            %VAL( IPXO2( COUNT ) ),
+     :                            %VAL( IPYO2( COUNT ) ), .FALSE.,
+     :                            %VAL( IPXC2 ), %VAL( IPYC2 ), STATUS )
+                  CALL CCD1_MFREE( IPXO2( COUNT ), STATUS )
+                  CALL CCD1_MFREE( IPYO2( COUNT ), STATUS )
+                  IPXO2( COUNT ) = IPXC2
+                  IPYO2( COUNT ) = IPYC2
+               END IF
+
+            END IF
+
+*  Free resources used for handling WCS information.
+            CALL CCD1_MFREE( IPRBN1, STATUS )
+            CALL CCD1_MFREE( IPRBN2, STATUS )
+            IF ( CNV .NE. AST__NULL ) THEN
+               CALL AST_ANNUL( CNV, STATUS )
+               CALL CCD1_MFREE( IPXI1, STATUS )
+               CALL CCD1_MFREE( IPYI1, STATUS )
+               CALL CCD1_MFREE( IPXI2, STATUS )
+               CALL CCD1_MFREE( IPYI2, STATUS )
             END IF
 
 *  Now compare next set of positions.
@@ -874,6 +1189,12 @@
             CALL CCD1_MFREE( IPRAN2, STATUS )
  4       CONTINUE 
  3    CONTINUE    
+
+*  End AST context.
+      CALL AST_END( STATUS )
+
+*  End NDF context.
+      CALL NDF_END( STATUS )
                   
 *  Comment on the success or overwise of the intercomparisons. If no
 *  intercomparisons were successful set status and abort, otherwise, if
