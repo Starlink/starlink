@@ -149,7 +149,7 @@
         END DO
 
 *      Free device
-        CALL AIO_CANCL( 'DEVICE', STATUS )
+        CALL AIO_CANCL( 'DEV', STATUS )
 
       END IF
 

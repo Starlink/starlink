@@ -80,7 +80,7 @@
       OP = .FALSE.
 
 *    Create output text file?
-      CALL USI_GET0L( 'OUTPUT', OP, STATUS )
+      CALL USI_GET0L( 'OP', OP, STATUS )
       IF ( OP .AND. (STATUS .EQ. SAI__OK) ) THEN
 
 *      Append?

@@ -21,13 +21,13 @@
 *            lilelihood fit (else chi-squared)
 *     INP=UNIV(R)
 *            input data (either a single dataset or a file of references).
-*     REDSHIFT=REAL(R)
+*     Z=REAL(R)
 *            redshift of spectrum
 *     FIT_MOD=UNIV(R)
 *            data object containing model specification
-*     MAX_IT=INTEGER(R)
+*     MAX=INTEGER(R)
 *            max number of iterations to be performed
-*     MINSLOPE=REAL(R)
+*     MINS=REAL(R)
 *            minimum `reduced statistic' slope forcing continued iteration
 *     PARS=INTEGER(R)
 *            List of parameters for grid axes
@@ -43,7 +43,7 @@
 *            Values to be gridded
 *     SUBSTAT=LOGICAL(R)
 *            Subtract minimum value of statistic from grid
-*     UPDATE=LOGICAL(R)
+*     UP=LOGICAL(R)
 *            Update model with best fit in the grid?
 *     OUTROOT=CHAR(R)
 *            Root of output filenames in AUTO mode
