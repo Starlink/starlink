@@ -126,7 +126,7 @@
       CHARACTER*16		CMD			! Major mode
       CHARACTER*7		MODE			! Sampling mode
       CHARACTER*80		OFILE			! Output file name
-      CHARACTER*7		SUBMODE			! Sampling mode
+      CHARACTER*10		SUBMODE			! Sampling mode
 
       REAL			XPOS, YPOS, R		! Source position
 
