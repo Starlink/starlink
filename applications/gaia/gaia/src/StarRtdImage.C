@@ -166,6 +166,8 @@
 //     16-FEB-2004 (PWD):
 //        Added astalwaysmerge command. Controls whether primary headers are
 //        merged with extension before looking for a WCS.
+//     28-OCT-2004 (PWD):
+//        Added direct NDF access commands. These are used to access cubes. 
 //-
 
 #include "config.h"  //  From skycat util
@@ -279,7 +281,7 @@ public:
     { "globalstats",   &StarRtdImage::globalstatsCmd,   2, 2 },
     { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
     { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
-    { "ndf",           &StarRtdImage::ndfCmd,           1, 3 },
+    { "ndf",           &StarRtdImage::ndfCmd,           1, 6 },
     { "origin",        &StarRtdImage::originCmd,        2, 2 },
     { "percentiles",   &StarRtdImage::percentCmd,       1, 1 },
     { "plotgrid",      &StarRtdImage::plotgridCmd,      0, 2 },
@@ -938,7 +940,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             if ( argc == 2 ) {
                 if ( strcmp( argv[1], default_encoding ) != 0 &&
                      ( strncmp( argv[1], "FITS-", 5 ) == 0 &&
-                       ( strncmp( default_encoding, "FITS-", 5 ) != 0 ) || 
+                       ( strncmp( default_encoding, "FITS-", 5 ) != 0 ) ||
                        native )
                     ) {
                     astSet( chan, "Encoding=%s", argv[1] );
@@ -1471,6 +1473,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
             // Set all plot attributes to control the plot appearance.
             if ( listArgc > 0 ) {
                 char *string = NULL;
+                int failed = 0;
                 for ( int index = 0; index < listArgc; index++ ) {
                     string = listArgv[index];
 
@@ -1481,12 +1484,17 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                          string != gap2 ) {
                         astSet( plot, string );
                         if ( !astOK ) {
-                            (void) error( string, " is not a valid attribute "
-                                          "(check format)" );
-                            inerror = 1;
-                            break;
+                            cerr << "plot options:" << string << 
+                                " is not a valid attribute" << endl;
+                            failed++;
+                            //  Try to succeed by using any acceptable options.
+                            astClearStatus;
                         }
                     }
+                }
+                if ( failed == listArgc ) {
+                    inerror = 1;
+                    error( "Failed to set any plot attributes" );
                 }
             }
 
@@ -2567,8 +2575,8 @@ int StarRtdImage::astwcs2pixCmd( int argc, char *argv[] )
 //     needed then the third is not optional.
 //
 //  Result:
-//     RA and Dec either in degrees or formatted as the the related axes 
-//     (plus a trailing equinox). 
+//     RA and Dec either in degrees or formatted as the the related axes
+//     (plus a trailing equinox).
 //
 //  Notes:
 //     This provides some of the functionality of the convert command,
@@ -2694,7 +2702,7 @@ int StarRtdImage::astcur2pixCmd( int argc, char *argv[] )
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::astcur2pixCmd" << endl;
 #endif
- 
+
     //  Extract the input positions.
     double inx;
     double iny;
@@ -2715,7 +2723,7 @@ int StarRtdImage::astcur2pixCmd( int argc, char *argv[] )
     StarWCS* wcsp = getStarWCSPtr();
     double outx;
     double outy;
-    if ( wcsp->anyWcs2pix( inx, iny, notcelestial, outx, outy ) == 0 ) { 
+    if ( wcsp->anyWcs2pix( inx, iny, notcelestial, outx, outy ) == 0 ) {
 
         //  Set the result and return.
         set_result( outx, outy );
@@ -5992,7 +6000,7 @@ int StarRtdImage::astmilliCmd( int argc, char *argv[] )
 //   StarRtdImage::astcarlinCmd
 //
 //   Purpose:
-//      Set the value used for the CarLin attribute when reading 
+//      Set the value used for the CarLin attribute when reading
 //      the WCS from a FITS channel. The value should be 0 or 1.
 //-
 int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
@@ -6013,8 +6021,8 @@ int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
 //   StarRtdImage::astalwaysmergeCmd
 //
 //   Purpose:
-//      Set whether extension headers cards should be merge with 
-//      the ones from the primary HDU. True always merges the headers, 
+//      Set whether extension headers cards should be merge with
+//      the ones from the primary HDU. True always merges the headers,
 //      but false is just a suggestion.
 //-
 int StarRtdImage::astalwaysmergeCmd( int argc, char *argv[] )
@@ -6113,12 +6121,18 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
 //         open - open an NDF by name. The second argument is the name
 //                returns the NDF identifier if successful.
 //         close - close a previously opened NDF. Second argument is the NDF
-//                 identifier. 
+//                 identifier.
 //         query - make a query about an NDF. Second argument is the NDF
 //                 identifier and the third the query type. Currently only
 //                 "bounds" is supported. The result of this is a list of
 //                 pairs of lower and upper bounds.
-//
+//         coord - return the formatted coordinate of a position along a given
+//                 axis. Second argument is the NDF identifier, the third
+//                 the index of the axis, and the fourth a list of all the
+//                 pixel coordinates  needed to identify the coordinate (so
+//                 the list must have a number for each dimension of the NDF).
+//                 A boolean, optional, final argument can be used to switch
+//                 on trailing label and units strings to the value.
 //-
 int StarRtdImage::ndfCmd( int argc, char *argv[] )
 {
@@ -6151,23 +6165,85 @@ int StarRtdImage::ndfCmd( int argc, char *argv[] )
     }
     else if ( strcmp( "query", argv[0] ) == 0 ) {
         if ( Tcl_GetInt( interp_, argv[1], &ndfid ) == TCL_OK ) {
-            int lbnd[7];
-            int ubnd[7];
-            int ndim;
-            result = gaiaSimpleQueryBounds( ndfid, 7, lbnd, ubnd, 
-                                            &ndim, &error_mess );
-            if ( result == TCL_OK ) {
-                // Create the result list.
-                set_result( lbnd[0] );
-                append_element( ubnd[0] );
-                for ( int i = 1; i < ndim; i++ ) {
-                    append_element( lbnd[i] );
-                    append_element( ubnd[i] );
+            if ( strcmp( "bounds", argv[2] ) == 0 ) {
+                int lbnd[7];
+                int ubnd[7];
+                int ndim;
+                result = gaiaSimpleQueryBounds( ndfid, 7, lbnd, ubnd,
+                                                &ndim, &error_mess );
+                if ( result == TCL_OK ) {
+                    // Create the result list.
+                    set_result( lbnd[0] );
+                    append_element( ubnd[0] );
+                    for ( int i = 1; i < ndim; i++ ) {
+                        append_element( lbnd[i] );
+                        append_element( ubnd[i] );
+                    }
+                }
+                else {
+                    error( error_mess );
+                    free( error_mess );
+                }
+            }
+            else if ( strcmp( "coord", argv[2] ) == 0 ) { 
+                // Next arguments are the axis that the coordinate it required
+                // for followed by a list of all the pixel coordinates that
+                // specify the position.
+                int axis;
+                if ( ( Tcl_GetInt( interp_, argv[3], &axis ) == TCL_OK ) ) {
+                    char **listArgv;
+                    int ncoords;
+                    double coords[7];
+                    if ( Tcl_SplitList( interp_, argv[4], &ncoords,
+                                        &listArgv ) == TCL_OK ) {
+                        for ( int i = 0; i < ncoords; i++ ) {
+                            if ( Tcl_GetDouble( interp_, listArgv[i],
+                                                &coords[i] ) != TCL_OK ) {
+                                error( listArgv[i],
+                                       "is not a valid number" );
+                                result = TCL_ERROR;
+                                break;
+                            }
+                        }
+
+                        //  Optional sixth element is whether to append the
+                        //  label and units.
+                        int trailed = 0;
+                        if ( argc >= 6 ) {
+                            if ( *argv[5] == '1' ) {
+                                trailed = 1;
+                            }
+                        }
+
+                        if ( result != TCL_ERROR ) {
+                            char *coord;
+                            result = gaiaSimpleQueryCoord( ndfid, axis,
+                                                           coords, trailed, 
+                                                           ncoords,
+                                                           &coord,
+                                                           &error_mess );
+                            if ( result == TCL_OK ) {
+                                set_result( coord );
+                            }
+                            else {
+                                error( error_mess );
+                                free( error_mess );
+                            }
+                        }
+                    }
+                    else {
+                        result = TCL_ERROR;
+                        error( argv[4], " is not a list of pixel coordinates");
+                    }
+                }
+                else {
+                    result = TCL_ERROR;
+                    error( "ndf query axis not an integer" );
                 }
             }
             else {
-                error( error_mess );
-                free( error_mess );
+                result = TCL_ERROR;
+                error( argv[0], ":unknown ndf query subcommand" );
             }
         }
         else {

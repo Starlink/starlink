@@ -430,18 +430,14 @@ void StarWCS::setEquinox()
 
     //  Make sure equinox has a valid value.
     equinox_ = astGetD( wcs_, "Equinox" );
+    if ( ! astOK ) astClearStatus;
     const char *system = astGetC( wcs_, "System" );
-    int ok = 1;
-    if ( !astOK ) {
-        astClearStatus;
-        ok = 0;
-    }
-    else if ( system ) {
+    if ( astOK && system ) {
 
         //  Make sure system should have an equinox associated with it.
         if ( strncmp( "FK", system, 2 ) == 0 ||
              strcmp( "ECLIPTIC", system ) == 0 ) {
-
+            
             //  Get a string version of the equinox to display.
             if ( equinox_ == 2000.0 ) {
                 strcpy( equinoxStr_, "J2000" );
@@ -450,13 +446,12 @@ void StarWCS::setEquinox()
                 strcpy( equinoxStr_, "B1950" );
             } 
             else {
-                if ( ok ) {
-                    sprintf( equinoxStr_, "%g %s", equinox_, system );
-                    if ( ! astOK ) astClearStatus;
-                }
+                sprintf( equinoxStr_, "%g %s", equinox_, system );
+                if ( ! astOK ) astClearStatus;
             }
         }
     }
+    if ( ! astOK ) astClearStatus;
 
     //  Set the number of digits for displaying coordinates. This is
     //  done once here, rather than every time a coordinate is
@@ -464,12 +459,16 @@ void StarWCS::setEquinox()
     //  catalogues outputs, so we toggle that too for consistency.
     if ( extraPrecision_ ) {
         astSet( wcs_, "digits(%d) = 11", raIndex_ );
+        if ( ! astOK ) astClearStatus;
         astSet( wcs_, "digits(%d) = 11", decIndex_ );
+        if ( ! astOK ) astClearStatus;
         HMS::extra_precision = 1;
     }
     else {
         astSet( wcs_, "digits(%d) = 9", raIndex_ );
+        if ( ! astOK ) astClearStatus;
         astSet( wcs_, "digits(%d) = 9", decIndex_ );
+        if ( ! astOK ) astClearStatus;
         HMS::extra_precision = 0;
     }
 }

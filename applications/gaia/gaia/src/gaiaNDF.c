@@ -1709,3 +1709,118 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
     emsRlse();
     return 0;
 }
+
+/**
+ * Query the equivalent world coordinate of a pixel coordinate along the
+ * given axis. 
+ *
+ * Returns a formatted value pointed at by *coord that has the value (trailed
+ * by the axis units and label if requested). The position along the axis is
+ * identified using ncoords pixel coordinates, where ncoords must match the
+ * dimensionality of the NDF. The coordinate returned is matched to the
+ * requested axis by being the coordinate with the largest change wrt to a
+ * single pixel step. We need to use this logic as the relationship between
+ * the NDF axes and the world coordinates may not be straight-forward. Note
+ * that the value returned by the coord argument should be immediately copied.
+ */
+int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed, 
+                          int ncoords, char **coord, char **error_mess )
+{
+    AstFrameSet *frameSet = NULL;
+    char *domain;
+    char *units;
+    char *label;
+    static char buf[256];
+    double diff;
+    double tmp;
+    double out1[7];
+    double out2[7];
+    int base;
+    int current;
+    int caxis;
+    int i;
+    int pixel;
+    int status = SAI__OK;
+
+    emsMark();
+
+    ndfGtwcs( ndfid, &frameSet, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = errMessage( &status );
+        emsRlse();
+        *coord = NULL;
+        return 1;
+    }
+
+    //  Find the PIXEL domain.
+    base = astGetI( frameSet, "Base" );
+    current = astGetI( frameSet, "Current" );
+    pixel = 0;
+    for ( i = 1; i <= ncoords; i++ ) {
+        astSetI( frameSet, "Current", i );
+        domain = (char *)astGetC( frameSet, "Domain" );
+        if ( strcasecmp( domain, "PIXEL" ) == 0 ) {
+            pixel = i;
+            break;
+        }
+    }
+    astSetI( frameSet, "Current", current );
+    if ( pixel == 0 ) {
+        frameSet = (AstFrameSet *) astAnnul( frameSet );
+        *error_mess = "Cannot locate the PIXEL domain";
+        *coord = NULL;
+        emsRlse();
+        return 1;
+    }
+
+    //  This becomes the BASE frame.
+    astSetI( frameSet, "Base", pixel );
+
+    //  Transform the position from pixel coordinates to world coordinates for
+    //  this position, and a position one pixel offset along the given axis.
+    coords[axis-1] += 1.0;
+    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords, 1, out1  );
+    coords[axis-1] -= 1.0;
+    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords, 1, out2  );
+
+    //  Select the axis with the largest shift as equivalent in world
+    //  coordinates.
+    caxis = axis;
+    diff = 0.0;
+    for ( i = 0; i < ncoords; i++ ) {
+        tmp = fabs( out1[i] - out2[i] );
+        if ( tmp > diff ) {
+            caxis = i + 1;
+            diff = tmp;
+        }
+    }
+
+    //  Format the value along that axis.
+    *coord = (char *) astFormat( frameSet, caxis, out2[caxis - 1] );
+    if ( ! astOK ) {
+        astClearStatus;
+        *coord = NULL;
+        *error_mess = "Failed to convert pixel index to world coordinate";
+        astSetI( frameSet, "Base", base );
+        frameSet = (AstFrameSet *) astAnnul( frameSet );
+        errRlse();
+        return 1;
+    }
+
+    //  Add the axis units and label if requested.
+    if ( trailed ) {
+        sprintf( buf, "unit(%d)", caxis );
+        units = (char *) astGetC( frameSet, buf );
+        sprintf( buf, "label(%d)", caxis );
+        label = (char *) astGetC( frameSet, buf );
+        sprintf( buf, "%s %s (%s)", *coord, label, units );
+        *coord = buf;
+    }
+
+    //  Restore the base frame.
+    astSetI( frameSet, "Base", base );
+    frameSet = (AstFrameSet *) astAnnul( frameSet );
+    emsRlse();
+    return 0;
+}
+
