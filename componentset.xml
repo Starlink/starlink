@@ -82,7 +82,7 @@ high-level interface to the AST library.
     </p>
   </abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ard</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>grp</build><build>hds</build><build>idi</build><build>itcl</build><build>ndf</build><build>ndg</build><build>one</build><build>par</build><build>pcs</build><build>pgplot</build><build>prm</build><build>psx</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>agi</build><build option='link'>graphpar</build><build option='link'>img</build><build option='link'>pda</build><build option='link'>ref</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>startcl</build><configure>itcl</configure><configure>tcl</configure><configure>tk</configure><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ard</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>grp</build><build>hds</build><build>idi</build><build>ifd</build><build>itcl</build><build>ndf</build><build>ndg</build><build>one</build><build>par</build><build>pcs</build><build>pgplot</build><build>prm</build><build>psx</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>agi</build><build option='link'>graphpar</build><build option='link'>img</build><build option='link'>pda</build><build option='link'>ref</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>startcl</build><configure>itcl</configure><configure>tcl</configure><configure>tk</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -209,7 +209,7 @@ on-line catalogues via the Internet.
     which improves the accuracy of the photometry.</p>
   </abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>mers</build><build>pcs</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><build>gks</build><build>cnf</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>sae</build><build option='link'>mers</build><build option='link'>pcs</build><build option='link'>ndf</build><build option='link'>psx</build><build option='link'>chr</build><build option='link'>agi</build><build option='link'>gks</build><build option='link'>cnf</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person><name>Peter Stetson</name><role>Original author</role></person>
@@ -488,7 +488,7 @@ The programs it contains can be used to process a
 wide range of images and spectra.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>pda</build><build>agi</build><build>grp</build><build>ndf</build><build>fio</build><build>idi</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>pda</build><build option='link'>agi</build><build option='link'>grp</build><build option='link'>ndf</build><build option='link'>fio</build><build option='link'>idi</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -887,7 +887,7 @@ may be listed on a terminal or printer, or used to plot finding charts
 or perform astrometric reductions.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>chr</build><build>mers</build><build>sgs</build><build>gks</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>chr</build><build option='link'>mers</build><build option='link'>sgs</build><build option='link'>gks</build><build option='link'>ifd</build><build option='link'>graphpar</build><build option='link'>pda</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
