@@ -60,6 +60,9 @@
 *        external.
 *     10 May 1995:
 *        Added support for FILHD
+*     4 Dec 2003 (AJC/TIMJ)
+*        Use CMP_PUT1R rather than CMP_PUT1D (we were passing in a REAL
+*        to PUT1D rather than a REAL to PUT1R).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,7 +127,7 @@
       CALL DAT_NEW(    CELLOC, 'DATA_ARRAY', 'ARRAY', 0, 0, STATUS )
       CALL DAT_FIND(   CELLOC, 'DATA_ARRAY', TLOC, STATUS )
       CALL DAT_NEW(      TLOC, 'DATA',       '_REAL', 1, 1, STATUS )
-      CALL CMP_PUT1D(    TLOC, 'DATA', 1, 0., STATUS )
+      CALL CMP_PUT1R(    TLOC, 'DATA', 1, 0., STATUS )
       CALL NDF_IMPRT(  CELLOC, TNDF, STATUS )
       CALL DAT_ANNUL(    TLOC, STATUS )
       CALL DAT_ANNUL(  CELLOC, STATUS )

@@ -1,3 +1,8 @@
+2003-12-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* fv4/fv4_filini.f (FV4_FILINI): Use CMP_PUT1R rather than
+	CMP_PUT1D for putting the DATA initialisation value in place.
+	This was causing a problem on linux.
 
 2003-11-28  Tim Jenness  <timj@jach.hawaii.edu>
 
