@@ -22,6 +22,7 @@
 *     14 Jun 95 : Iteration scheme changed to stabilise expectation value
 *                 calculation, and Gaussian limit simplification added (DJA)
 *     13 Mar 97 : Correct NAG arguments (RB)
+*     22 Jun 87 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
 *
@@ -53,8 +54,8 @@
 *
 *    Function declarations :
 *
-c     DOUBLE PRECISION 		G01ECF
-c     DOUBLE PRECISION 		G01EAF
+      DOUBLE PRECISION 		PDA_CHISQD
+      DOUBLE PRECISION 		PDA_NORMAL
 *
 *
 *    Status :
@@ -69,7 +70,7 @@ c     DOUBLE PRECISION 		G01EAF
       DOUBLE PRECISION		LFPM			! Fit probability for
 							! model data
       INTEGER			N			! Loop over datasets
-      INTEGER			NAGSTAT			! NAG status
+      INTEGER			PDASTAT			! PDA status
 *-
 
 *    Status check
@@ -78,11 +79,9 @@ c     DOUBLE PRECISION 		G01EAF
 *    Chi-squared case
       IF ( FSTAT .EQ. FIT__CHISQ ) THEN
 
-*      Get probability from NAG routine
-        NAGSTAT = 0
-        FPROB = 0.0D0
-c       FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01ECF' )
+*      Get probability from PDA routine
+        PDASTAT = 0
+        FPROB = PDA_CHISQD( 'L', STATMIN, DBLE(SSCALE), PDASTAT )
 
 *    Likelihood
       ELSE IF ( FSTAT .EQ. FIT__LOGL ) THEN
@@ -104,11 +103,9 @@ c       FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
         END DO
 
 *      Fit probability given
-        NAGSTAT = 0
-        FPROB = 1.0D0
-c       FPROB = 1.0D0 - G01EAF( 'L', (LFPM-LFPD)/SQRT(LFPDV),
-c    :                          NAGSTAT )
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01EAF' )
+        PDASTAT = 0
+        FPROB = 1.0D0 - PDA_NORMAL( 'L', (LFPM-LFPD)/SQRT(LFPDV),
+     :                          PDASTAT )
 
 *    Programmer error
       ELSE

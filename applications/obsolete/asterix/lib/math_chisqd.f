@@ -5,7 +5,6 @@
 *
 *     Returns the deviate associated with the lower tail probability
 *     found by subtracting the given confidence level from unity.
-*     Accuracy for the G01FCF routine is quoted at 5 significant places.
 *
 *    Method :
 *    Deficiencies :
@@ -19,6 +18,7 @@
 *
 *     18 Jun 92 : Original (DJA)
 *     13 Mar 97 : Correct NAG arguments (RB)
+*     21 Jun 87 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -42,12 +42,12 @@
 *
 *    Function declarations :
 *
-c     DOUBLE PRECISION             G01FCF
+      DOUBLE PRECISION             PDA_CHIDEV
 *
 *    Local variables :
 *
       DOUBLE PRECISION             PROB           ! Probability
-      INTEGER                      IFAIL          ! NAG status
+      INTEGER                      IFAIL          ! PDA status
 *-
 
 *    Check status
@@ -58,8 +58,6 @@ c     DOUBLE PRECISION             G01FCF
 
 *    Get deviate
       IFAIL = 0
-      DEVIATE = 0.0
-c     DEVIATE = G01FCF( PROB, DBLE(NDOF), IFAIL )
-      CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01FCF' )
+      DEVIATE = PDA_CHIDEV( PROB, DBLE(NDOF), IFAIL )
 
       END
