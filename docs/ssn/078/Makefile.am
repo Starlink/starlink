@@ -24,12 +24,12 @@ PSTOIMG=@PSTOIMG@
 # SGML Kit, so that $STARLINK_SGML_DIR/bin/sgml2docs is the path to the 
 # sgml2docs application.  These will work with any version of Jade,
 # in particular with openjade.
-ssn78.htx_tar: ssn78.xml $(GIFFILES)
+ssn78.htx_tar: ssn78.xml $(PNGFILES)
 	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
 		SGML_CATALOG_FILES=$(STARLINK_SGML_DIR)/dtd/CATALOG-override \
 		$(SGML2DOCS) --html --tarball=$@ \
 		ssn78.xml
-ssn78-single.htx_tar: ssn78.xml $(GIFFILES)
+ssn78-single.htx_tar: ssn78.xml $(PNGFILES)
 	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
 		SGML_CATALOG_FILES=$(STARLINK_SGML_DIR)/dtd/CATALOG-override \
 		$(SGML2DOCS) --htmlsingle --tarball=$@ \
@@ -55,6 +55,7 @@ ssn78.texml: ssn78.texml_tar
 SUFFIXES = .eps .pdf .gif
 EPSFILES = ssn78-1.eps ssn78-2.eps ssn78-3.eps ssn78-4.eps
 PDFFILES = ssn78-1.pdf ssn78-2.pdf ssn78-3.pdf ssn78-4.pdf
+PNGFILES = ssn78-1.png ssn78-2.png ssn78-3.png ssn78-4.png
 GIFFILES = ssn78-1.gif ssn78-2.gif ssn78-3.gif ssn78-4.gif
 $(EPSFILES): ssn78.mp
 	@METAPOST@ ssn78.mp
