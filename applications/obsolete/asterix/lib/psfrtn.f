@@ -26,11 +26,14 @@
 *
 *    History :
 *
-*     10 Jul 89 : Original (DJA)
-*     19 Jul 90 : Copes with inequal spatial scaling. Some improvements to
-*                 normalisation (DJA)
-*      9 Mar 91 : Gaussian handled by MATH_INTGAU2D (DJA)
-*      2 Aug 93 : Added King profile option (DJA)
+*     10 Jul 1989 (DJA):
+*        Original version
+*     19 Jul 1990 (DJA):
+*        Copes with inequal spatial scaling. Some improvements to normalisation
+*      9 Mar 1991 (DJA):
+*        Gaussian handled by MATH_INTGAU2D
+*      2 Aug 1993 (DJA):
+*        Added King profile option
 *
 *    Type definitions :
 *
