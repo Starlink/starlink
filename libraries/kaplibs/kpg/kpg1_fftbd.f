@@ -53,6 +53,9 @@
 *        modern-style variable declarations.
 *     1995 September 7 (MJC):
 *        Used PDA_ prefix for FFTPACK routines.
+*     13-DEC-2003 (DSB):
+*        Use KPG1_DNAG2R in stead of PDA_DNAG2R. KPG1_DNAG2R uses workspace
+*        to achieve greater speed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,12 +83,17 @@
  
 *  Local Variables:
       INTEGER I                  ! Column counter
+      INTEGER IPW                ! Pointer to work space
       INTEGER IW                 ! Index into work array
       INTEGER J                  ! Row counter
 
 *.
 
 *  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Allocate work space for use in KPG1_R2NAG. Abort if failure.
+      CALL PSX_CALLOC( MAX( M, N ), '_DOUBLE', IPW, STATUS )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Copy the input array to the output array.
@@ -113,7 +121,7 @@
 
 *  Convert this column from NAG's Hermitian format to FFTPACK format,
 *  and then transform the copy of this column using an FFTPACK routine.
-         CALL PDA_DNAG2R( N, WORK( IW + 1 ) )
+         CALL KPG1_DNAG2R( N, WORK( IW + 1 ), %VAL( IPW ) )
          CALL PDA_DRFFTB( N, WORK( IW + 1 ), WORK )
 
 *  Copy the transformed column back to the output array.
@@ -129,8 +137,11 @@
 
 *  Transform each row of the output array. 
       DO J = 1, N
-         CALL PDA_DNAG2R( M, OUT( 1, J ) )
+         CALL KPG1_DNAG2R( M, OUT( 1, J ), %VAL( IPW ) )
          CALL PDA_DRFFTB( M, OUT( 1, J ), WORK )
       END DO
+
+*  Free work space 
+      CALL PSX_FREE( IPW, STATUS )
 
       END

@@ -51,6 +51,9 @@
 *        modern-style variable declarations.
 *     1995 September 7 (MJC):
 *        Used PDA_ prefix for FFTPACK routines.
+*     13-DEC-2003 (DSB):
+*        Use KPG1_R2NAG in stead of PDA_R2NAG. KPG1_R2NAG uses workspace
+*        to achieve greater speed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,11 +83,16 @@
 *  Local Variables:
       INTEGER I                  ! Column counter
       INTEGER IW                 ! Index into work array
+      INTEGER IPW                ! Pointer to work space
       INTEGER J                  ! Row counter
 
 *.
 
 *  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Allocate work space for use in KPG1_R2NAG. Abort if failure.
+      CALL PSX_CALLOC( MAX( M, N ), '_REAL', IPW, STATUS )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Copy the input array to the output array.
@@ -102,7 +110,7 @@
 *  the equivalent NAG format.
       DO J = 1, N
          CALL PDA_RFFTF( M, OUT( 1, J ), WORK )
-         CALL PDA_R2NAG( M, OUT( 1, J ) )
+         CALL KPG1_R2NAG( M, OUT( 1, J ), %VAL( IPW ) )
       END DO
 
 *  Re-initialise the work array to hold trig. functions used to form
@@ -123,7 +131,7 @@
 
 *  Transform the copy of this column.
          CALL PDA_RFFTF( N, WORK( IW + 1 ), WORK )
-         CALL PDA_R2NAG( N, WORK( IW + 1 ) )
+         CALL KPG1_R2NAG( N, WORK( IW + 1 ), %VAL( IPW ) )
 
 *  Copy the transformed column back to the output array.
          DO  J = 1, N
@@ -131,5 +139,8 @@
          END DO
 
       END DO
+
+*  Free work space 
+      CALL PSX_FREE( IPW, STATUS )
 
       END

@@ -6,8 +6,9 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like 
 applications (see SUN/238).
 
-Version 2.4. includes the following changes:
+Version 2.5. includes the following changes:
 
-   - The KPG1_WRLST routine now normalises the supplied positions (using
-   AST_NORM) before writing them to the output catalogue.
+   - The KPG1_FFT* routine have been made significantly faster. For
+   instance, they now take a tenth of the time to transform a 150000 long
+   array.
 

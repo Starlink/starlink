@@ -675,7 +675,8 @@ kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f \
 ncraxs.f ncrbck.f ncropn.f normal.f nxtnam.f powarr.f pthlpo.f \
 sread.f zero1d.f zero2d.f \
 kpg1_manib.f kpg1_manid.f kpg1_manii.f kpg1_manir.f kpg1_maniub.f \
-kpg1_maniuw.f kpg1_maniw.f kpg1_cpsty.f
+kpg1_maniuw.f kpg1_maniw.f kpg1_cpsty.f \
+kpg1_r2nag.f kpg1_dr2nag.f kpg1_nag2r.f kpg1_dnag2r.f
 
 CTG_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
@@ -799,8 +800,8 @@ GKS_PAR:   $(STAR_INC)/gks_par;   $(LINK) $? $@
 GNS_PAR:   $(STAR_INC)/gns_par;   $(LINK) $? $@
 IDI_ERR:   $(STAR_INC)/idi_err;   $(LINK) $? $@
 AGI_PAR:   $(STAR_INC)/agi_par;   $(LINK) $? $@
-AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
-AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
+AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
+AST_ERR:   $(INSTALL)/include/ast_err;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 CAT_ERR:   $(STAR_INC)/cat_err;   $(LINK) $? $@
 NDG_ERR:   $(STAR_INC)/ndg_err;   $(LINK) $? $@
@@ -2076,6 +2077,10 @@ kpg1_fftbd.o:	 SAE_PAR
 kpg1_fftbr.o:	 SAE_PAR
 kpg1_fftfd.o:	 SAE_PAR
 kpg1_fftfr.o:	 SAE_PAR
+kpg1_r2nag.o:	 SAE_PAR
+kpg1_dr2nag.o:	 SAE_PAR
+kpg1_nag2r.o:	 SAE_PAR
+kpg1_dnag2r.o:	 SAE_PAR
 kpg1_fhdat.o:	 SAE_PAR NDF_PAR
 kpg1_fillb.o:	 SAE_PAR
 kpg1_filld.o:	 SAE_PAR
