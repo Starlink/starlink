@@ -449,11 +449,27 @@ numerical types. The \emph{actual} routines names will not include the trailing
    When a search is succesfull, the matching routines are routines will
    appear at the right hand side of the pop-up window. These are the
    ``selected'' routines. You can click on a routine name to see the full
-   documentation in the main browser window. Subsequent searches can
-   optionally search the list of currently selected routines rather than
-   the entire list of all KAPLIBS routines. You can also search all
-   routines \emph{except} for those in the current selection. Choose
-   using the radio buttons to the right of the label ``Of:''.
+   documentation in the main browser window. Each routine has a
+   numerical ``relevance'' to your search string, indicated at the end of
+   the routine purpose. This relevance will depend on various things such
+   as:
+
+\begin{itemize}
+\item how many of the words in your search phrase were found
+\item how often they were found
+\item whether any sub-strings of one or more words were found (longer
+sub-phrase are deemed as more relevant).
+\end{itemize}
+
+   The results are order so that the most relevant matches are first.
+   Matches with the same relevance are order alphabetically by routine
+   name.   
+
+   Subsequent searches can optionally search the list of currently
+   selected routines rather than the entire list of all KAPLIBS routines.
+   You can also search all routines \emph{except} for those in the
+   current selection. Choose using the radio buttons to the right of the
+   label ``Of:''.
 
    The names of any routines matching your search can either be:
 
