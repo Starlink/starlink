@@ -1,4 +1,10 @@
-1 SPECX - Millimetre-wave Spectral data reduction - v6.8-4
+1 SPECX - Millimetre-wave Spectral data reduction - v6.8-5
+
+ - Change build system to use Gnu autoconf
+
+ - port to Mac OSX X
+
+1 SPECX - v6.8-4
 
  - Fix problem with DAS-MERGE command not accepting different
    answers to the quadrant adjustment and wideband mode (present

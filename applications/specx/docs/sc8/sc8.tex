@@ -1,4 +1,6 @@
-\documentstyle[11pt,epsf,rotate,twoside]{article}
+\documentclass[11pt,twoside]{article}
+\usepackage{graphicx}
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -235,10 +237,7 @@ found in the SPECX data reduction package.
 
 % ? Add picture here if required.
    \begin{center}
-   \leavevmode
-   \epsfysize=120mm
-   \rotate[r]{\epsffile{sc8_gray.ps}}
- 
+   \includegraphics[angle=-90,width=120mm]{sc8_gray.ps}
    \end{center}
 
 % ? End of picture
@@ -263,8 +262,7 @@ found in the SPECX data reduction package.
 
 % ? Add picture here if required.
    \begin{figure}[h]
-   \epsfysize=120mm
-   \rotate[r]{\epsfbox{sc8_gray.ps}}
+   \includegraphics[angle=-90,width=120mm]{sc8_gray.ps}
    \end{figure}
 % ? End of picture
 
@@ -1016,10 +1014,7 @@ your first spectrum.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfxsize=6.0in
-\epsffile{sc8_duffy.ps}
+\includegraphics[width=6.0in]{sc8_duffy.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5.5in}
@@ -1103,10 +1098,7 @@ Figure~\ref{fig:specx_plot}.
 %
 \begin{figure}[htb]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfysize=4in
-\rotate[r]{\epsffile{sc8_spectrum.ps}}
+\includegraphics[angle=-90,width=4in]{sc8_spectrum.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1306,9 +1298,7 @@ by spikes in the data (cf. Section~\ref{sec:spike-removal}).
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=3.3in
-\epsffile{sc8_smooth.ps}
+\includegraphics[height=3.3in]{sc8_smooth.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{4.5in}
@@ -1429,9 +1419,7 @@ Figure~\ref{fig:specx_rlb}. Remember, {\tt EOF} is \ctrld .
 %
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=3.5in
-\rotate[r]{\epsffile{sc8_rlb.ps}}
+\includegraphics[angle=-90,width=3.5in]{sc8_rlb.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1457,9 +1445,7 @@ is shown below in Figure~\ref{fig:specx_badbaseline}.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=3.2in
-\rotate[r]{\epsffile{sc8_badbaseline.ps}}
+\includegraphics[angle=-90,width=3.2in]{sc8_badbaseline.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1510,9 +1496,7 @@ on top of the original spectrum.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=3.2in
-\rotate[r]{\epsffile{sc8_fpb.ps}}
+\includegraphics[angle=-90,width=3.2in]{sc8_fpb.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1601,10 +1585,7 @@ Figure~\ref{fig:specx_fgm}.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfysize=3.2in
-\rotate[r]{\epsffile{sc8_cgm.ps}}
+\includegraphics[angle=-90,width=3.2in]{sc8_cgm.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1797,9 +1778,7 @@ something like the spectrum in Figure~\ref{fig:dm_dirty}.
 %
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfxsize=4.0in
-\epsffile{sc8_dm_dirty.ps}
+\includegraphics[width=4.0in]{sc8_dm_dirty.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1822,10 +1801,8 @@ Fig.~\ref{fig:before-das-merge}.
 \begin{figure}[ht]
 \begin{minipage}[t]{\textwidth}
 \begin{minipage}[b]{0.5\textwidth}
-\leavevmode
 \centering
-\epsfxsize=3.0in
-\epsffile{sc8_dm_orig.ps}
+\includegraphics[width=3.0in]{sc8_dm_orig.ps}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.45\textwidth}
@@ -1849,10 +1826,8 @@ for clarity the end result looks like that in Fig.~\ref{fig:after-das-merge}.
 \begin{figure}[ht]
 \begin{minipage}[t]{\textwidth}
 \begin{minipage}[b]{0.5\textwidth}
-\leavevmode
 \centering
-\epsfxsize=3.0in
-\epsffile{sc8_dm_drop.ps}
+\includegraphics[width=3.0in]{sc8_dm_drop.ps}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.45\textwidth}
@@ -1874,10 +1849,7 @@ instance is shown in Figure~\ref{fig:dm_dasmerge}.
 %
 \begin{figure}[htb]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfxsize=4.0in
-\epsffile{sc8_dm_dasmerge.ps}
+\includegraphics[width=4.0in]{sc8_dm_dasmerge.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1930,10 +1902,7 @@ use the default `{\tt{n}}' option.
 %
 \begin{figure}[ht]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfxsize=4.0in
-\epsffile{sc8_dasmerge_yn.ps}
+\includegraphics[width=4.0in]{sc8_dasmerge_yn.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -1955,10 +1924,7 @@ be small. See Figure~\ref{fig:merge_diffs}.
 %
 \begin{figure}[ht]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfxsize=4.0in
-\epsffile{sc8_merge_diffs.ps}
+\includegraphics[width=4.0in]{sc8_merge_diffs.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -2110,9 +2076,8 @@ procedure to do this (see later).
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=3.2in
-\rotate[r]{\epsffile[80 45 495 775]{sc8_concat.ps}}
+\includegraphics[angle=-90,width=3.2in]{sc8_concat.ps}
+%%\rotate[r]{\epsffile[80 45 495 775]{sc8_concat.ps}}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -2185,10 +2150,7 @@ example is given in Figure~\ref{fig:spikes}.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfysize=3.5in
-\rotate[r]{\epsffile{sc8_spiked.ps}}
+\includegraphics[angle=-90,width=3.5in]{sc8_spiked.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5.5in}
@@ -2218,10 +2180,7 @@ removed by using the spike-removal command:
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-%\epsfclipon
-\epsfysize=3.5in
-\rotate[r]{\epsffile{sc8_despiked.ps}}
+\includegraphics[angle=-90,width=3.5in]{sc8_despiked.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5.5in}
@@ -2550,10 +2509,9 @@ for the observation.
 \begin{figure}[ht]
 \begin{minipage}[t]{\textwidth}
 \begin{minipage}[b]{0.5\textwidth}
-\leavevmode
 \centering
-\epsfxsize=2.3in
-\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo-orig.ps}}
+\includegraphics[angle=-90,width=2.3in]{sc8_hdo-orig.ps}
+%%\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo-orig.ps}}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.45\textwidth}
@@ -2628,10 +2586,8 @@ result following in Fig.~\ref{fig:set-x-to-freq}:
 \begin{figure}[ht]
 \begin{minipage}[t]{\textwidth}
 \begin{minipage}[b]{0.5\textwidth}
-\leavevmode
+\includegraphics[angle=-90,width=2.3in]{sc8_hdo_freq.ps}
 \centering
-\epsfxsize=2.3in
-\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo_freq.ps}}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.45\textwidth}
@@ -2682,10 +2638,9 @@ narrower velocity range the plot looks like that in Fig.~\ref{fig:set-to-usb}:
 \begin{figure}[ht]
 \begin{minipage}[t]{\textwidth}
 \begin{minipage}[b]{0.5\textwidth}
-\leavevmode
 \centering
-\epsfxsize=2.3in
-\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo-usb.ps}}
+\includegraphics[angle=-90,width=2.3in]{sc8_hdo-usb.ps}
+%%\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo-usb.ps}}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.45\textwidth}
@@ -2743,12 +2698,11 @@ containing the other HDO line, again centered around 0 km/s:
 \begin{figure}[ht]
 \begin{minipage}[t]{\textwidth}
 \begin{minipage}[b]{0.5\textwidth}
-\leavevmode
 \centering
-\epsfxsize=2.3in
-\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo-lsb.ps}}
+\includegraphics[angle=-90,width=2.3in]{sc8_hdo-lsb.ps}
+%%\rotate[r]{\epsffile[0 0 565 770]{sc8_hdo-lsb.ps}}
 \end{minipage}
-\hfill
+%%\hfill
 \begin{minipage}[b]{0.45\textwidth}
 \caption[Part of the same in the LSB ]
 {\small{Figure~\ref{fig:set-x-orig} after changing to a frequency
@@ -2804,9 +2758,8 @@ The result of this procedure is shown in Figure~\ref{fig:s-l-r-f}.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=3.0in
-\rotate[r]{\epsffile[0 0 495 765]{sc8_s-l-r-f.ps}}
+\includegraphics[angle=-90,width=3.0in]{sc8_s-l-r-f.ps}
+%%\rotate[r]{\epsffile[0 0 495 765]{sc8_s-l-r-f.ps}}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5.5in}
@@ -2850,9 +2803,8 @@ divided by 2 to form the end result, as shown below schematically:
 
 \begin{figure}[ht]
 \centering
-\leavevmode
-\epsfxsize=4.5in
-\epsffile[52 512 531 721]{sc8_fsw-fig.ps}
+\includegraphics[width=4.5in]{sc8_fsw-fig.ps}
+%%\epsffile[52 512 531 721]{sc8_fsw-fig.ps}
 \vspace*{-0.5cm}
 % \begin{center}
 % \begin{minipage}[t]{5.5in}
@@ -2874,9 +2826,7 @@ Figure~\ref{fig:fsw_reduction}.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfxsize=3.5in
-\epsffile{sc8_fsw_reduction.ps}
+\includegraphics[width=3.5in]{sc8_fsw_reduction.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5.5in}
@@ -3305,9 +3255,7 @@ Dec. offset scaled from   24.000 to  -36.000
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=5in
-\rotate[r]{\epsffile{sc8_gr_sp.ps}}
+\includegraphics[angle=-90,width=5in]{sc8_gr_sp.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{4.5in}
@@ -3340,9 +3288,7 @@ Dec. offset scaled from   24.000 to  -36.000
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=4in
-\rotate[r]{\epsffile{sc8_cont.ps}}
+\includegraphics[angle=-90,width=4in]{sc8_cont.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}
@@ -3399,9 +3345,7 @@ The result is shown in Figure~\ref{fig:specx_gray}.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=5in
-\rotate[r]{\epsffile{sc8_gray.ps}}
+\includegraphics[angle=-90,width=5in]{sc8_gray.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{4in}
@@ -3466,9 +3410,7 @@ maps, four to a row.
 
 \begin{figure}[htb]
 \centering
-\leavevmode
-\epsfysize=5in
-\rotate[r]{\epsffile{sc8_chann.ps}}
+\includegraphics[angle=-90,width=5in]{sc8_chann.ps}
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5in}

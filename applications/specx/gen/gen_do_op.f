@@ -2,6 +2,8 @@
 *      1 Aug 2000 (ajc):
 *        Change TYPE * to PRINT *
 *        Use format I3 to read type size
+*      25 Jul 2004 (timj):
+*        Be consistent in capitalisation of include file
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_do_op (operator, ierr)
@@ -15,7 +17,7 @@
 
 *     Include files
 
-      INCLUDE 'eval_ae4.inc'
+      INCLUDE 'EVAL_AE4.INC'
 
 *     Local variables:
 

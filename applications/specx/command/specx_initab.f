@@ -17,6 +17,8 @@
 *        Add new symbol MAPLIMITS to return actual limits used for greyscale
 *     20 Sep 2000 (ajc)
 *        Unused ierr in DEFINE_USER_TABLE
+*     25 Jul 2004 (timj)
+*        Be consistent in use of GSD_VAR.INC vs GSD_VAR
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_INIT_TABLE
@@ -153,7 +155,7 @@
       INCLUDE 'CUBE'
       INCLUDE 'MAPHD'
       INCLUDE 'MAPS'
-      INCLUDE 'GSD_VAR'
+      INCLUDE 'GSD_VAR.INC'
       INCLUDE 'ERRORS'
 
 *     Brute force access to baseline fits

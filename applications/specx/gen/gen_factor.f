@@ -3,6 +3,8 @@
 *        Change TYPE * to PRINT *
 *        Use format I3 to read type size
 *        Report "invalid operand"
+*      25 Jul 2004 (timj):
+*        Be consistent in capitalisation of include file
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_factor (string, ils, next, ierr)
@@ -25,7 +27,7 @@
 
 *     Operand and operator stacks
 
-      INCLUDE  'eval_ae4.inc'
+      INCLUDE  'EVAL_AE4.INC'
 
 *     Local variables:
 

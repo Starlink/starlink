@@ -4,6 +4,8 @@
 *        Unused J
 *        Catch IERR=2 from GEN_PARSEOP and replace by IERR=1
 *         (end of line)
+*      25 Jul 2004 (timj):
+*        Be consistent in capitalisation of include file
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_operator (string, ils, next, ierr)
@@ -25,7 +27,7 @@
 
 *     Operand and operator stacks
 
-      INCLUDE  'eval_ae4.inc'
+      INCLUDE  'EVAL_AE4.INC'
 
 *     Local variables:
 

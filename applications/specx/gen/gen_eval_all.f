@@ -3,6 +3,8 @@
 *        Change TYPE * to PRINT *
 *        Unused VALUE
 *        Drop through on bad given IERR to avoid crashes
+*      25 Jul 2004 (timj):
+*        Be consistent in capitalisation of include file
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_eval_all (ierr)
@@ -18,7 +20,7 @@
 
 *     Operand and operator stacks
 
-      INCLUDE  'eval_ae4.inc'
+      INCLUDE  'EVAL_AE4.INC'
 
 *     Local variables:
 

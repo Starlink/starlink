@@ -9,6 +9,8 @@
 *        Trap expected IERR=1 return from GEN_OPERATOR so
 *          GEN_EVAL_ALL can drop through on bad given IERR
 *        Report "unevaluable" if expression fails
+*      25 Jul 2004 (timj):
+*        Be consistent in capitalisation of include file
 *-----------------------------------------------------------------------
 
       SUBROUTINE gen_eval_ae (string, type, value, ierr)
@@ -32,7 +34,7 @@
 
 *     Stack
 
-      INCLUDE  'eval_ae4.inc'
+      INCLUDE  'EVAL_AE4.INC'
 
 *     Functions
 
