@@ -22,6 +22,9 @@
  *                           ImageIORep.
  *                           Added WCS class, for optional World Coords
  *                           support.
+ * Peter W. Draper 04/02/00  Changed constness of write so that
+ *                           non-const member can be used within this
+ *                           member. 
  */
 
 
@@ -108,7 +111,7 @@ public:
     virtual int getFitsHeader(ostream& os) const = 0;
 
     // write the data to an image file 
-    virtual int write(const char *filename) const = 0;
+    virtual int write(const char *filename) = 0;
 
     // apply bzero and bscale to the value
     double scaleValue(double d) const {return bzero_+d*bscale_;}

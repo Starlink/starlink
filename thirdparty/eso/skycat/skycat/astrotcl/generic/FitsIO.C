@@ -15,6 +15,9 @@
  *                 12/03/98  Initialize WCS in constructor.
  * Peter W. Draper 26/01/00  Now adds SIMPLE=T when saving extensions. 
  *                           Made strftime call Y2K compliant.
+ * Peter W. Draper 04/02/00  Changed constness of write so that
+ *                           non-const member can be used within this
+ *                           member. 
  */
 
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.28 1999/10/25 11:42:03 abrighto Exp $";
@@ -640,7 +643,7 @@ void FitsIO::padFile(FILE* f, int size)
 /* 
  * write a fits file from the data and header, if present
  */
-int FitsIO::write(const char *filename) const
+int FitsIO::write(const char *filename)
 {
     char tmpfilename[1024];
     int istemp = 1;

@@ -15,6 +15,9 @@
  * Peter W. Draper 10/01/00  Added getFitsFile member to allow access
  *                           to fitsio file handle (used to access
  *                           HDUs in derived/related classes). 
+ * Peter W. Draper 04/02/00  Changed constness of write so that
+ *                           non-const member can be used within this
+ *                           member. 
  */
 
 #include <stdio.h>
@@ -40,7 +43,7 @@ private:
     // extend the size of the FITS header by one header block 
     int extendHeader();
 
-    static void* FitsIO::reallocFile(void* p, size_t newsize);
+    static void *reallocFile(void* p, size_t newsize);
 
 protected:   
     //  PWD: Move here so that derived classes can manipulate (needed to get
@@ -114,7 +117,7 @@ public:
     static FitsIO* read(const char* filename, int memOptions = 0);
 
     // write the data to a FITS file 
-    int write(const char *filename) const;
+    int write(const char *filename);
 
     // compress or decompress the given file and return the new filename
     // see comments in source file for details.
