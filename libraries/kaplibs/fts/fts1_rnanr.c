@@ -36,6 +36,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        Original version.
 *     1999 June 1 (TDCA):
 *        Modified to use finite() and isnan() functions.
+*     2004 September 2 (TIMJ):
+*        Use prm_par.h rather than hand-coded bad value
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -54,10 +57,7 @@
 # include <math.h>                     /* finite and isnan function declarations */
 # include "sae_par.h"                  /* Environment global constants */
 # include "f77.h"
-# include "float.h"                    /* Special floating-point constants */
-
-/*  Global Variables: */
-# define VAL__BADR -FLT_MAX      /* Undefined value */
+# include "prm_par.h"                  /* Bad value definition */
 
 F77_SUBROUTINE(fts1_rnanr)( INTEGER(el), REAL(buf), INTEGER(status) )
 
