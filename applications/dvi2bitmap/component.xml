@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="dvi2bitmap">
+  <version>0.13b1</version>
+  <path>applications/dvi2bitmap</path>
+  <description>Converts TeX DVI files to bitmaps</description>
+  <abstract><p>This application processes a DVI file produced by TeX,
+      converting each page to a single bitmap.  The conversion is done
+      directly, rather than through a chain of intermediate file formats,
+      making the process extremely fast.  It can produce output as
+      XBM, XPM, GIF and PNG files.
+    </p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>norman@astro.gla.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
