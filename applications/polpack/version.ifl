@@ -1,0 +1,20 @@
+interface VERSION
+   helplib '$POLPACK_HELP'
+   parameter COMPARE
+      position 1
+      type LITERAL
+      access 'READ'
+      vpath 'DEFAULT'
+      prompt 'The version string for comparison'
+      ppath 'CURRENT'
+      default !
+      helpkey '*'
+   endparameter
+   parameter RESULT
+      type _INTEGER
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0
+      helpkey '*'
+   endparameter
+endinterface
