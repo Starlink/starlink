@@ -1,8 +1,25 @@
-*+  OPERATE Operates (e.g. with LOG10) on a data array class object
       SUBROUTINE OPERATE( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     OPERATE
+
+*  Purpose:
+*     Applies a unary operator to the data in the input file
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL OPERATE( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Acts with an operator on a data array class object, and recalculates
 *     any errors using            sig[f(x)]=(df/dx)*sig[x] .
 *     (If in doubt about form of df/dx see CRC Maths Tables, classmark QA47)
@@ -17,74 +34,123 @@
 *     Code which must be changed when further operations are added is marked
 *     with "!!".
 *     Currently supported operations are: '-', LOG, LOG10, SQRT, EXP, 10**  !!
-*
-*    Parameters :
-*
-*     INP=UNIV(R)
-*         Input data object
-*     OUT=UNIV(U)
-*         Output data object
-*     ERR=UNIV(R)
-*          Error for primitive input
-*     OPER=CHAR(R)
-*         Operation to be performed
-*     OVER=LOGICAL(R)
-*          Overwrite existing file?
-*
-*    Method :
-*    Deficiencies :
-*
+
+*  Usage:
+*     operate {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input data object
+*     OUT = CHAR (read)
+*        Output data object
+*     ERR = CHAR (read)
+*        Error for primitive input
+*     OPER = CHAR (read)
+*        Operation to be performed
+*     OVER = LOGICAL (read)
+*        Overwrite existing file?
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
 *     Inadequate treatment of LOG errors for non-positive data
-*     Difficulties with overwriting primitives by structures and vice-versa
-*     -this is avoided by simply not allowing overwrites to be attempted when
-*      they are known to fail.
-*
-*    Bugs :
-*
-*    Authors :
-*
-*     Trevor Ponman  (BHVAD::TJP)
-*
-*    History :
-*
-*     13 Mar 86 : Original
-*      2 Mar 86 : Avoid enormous data error entries when taking logs (BHVAD::GKS)
-*      7 Mar 86 : More explosion proofing (BHVAD::GKS)
-*     25 Feb 87 : Add '-', LOG, EXP and 10**
-*                 Fix fault in LOG10 errors (BHVAD::ADM)
-*     10 Mar 87 : Adapted to handle primitive input/output (BHVAD::ADM)
-*     16 Mar 87 : Modified to handle problems overwriting existing objects
-*                    (BHVAD::ADM)
-*     27 Jun 88 : V1.0-1  ASTERIX88 (ADM)
-*     23 May 91 : V1.5-0  Code tidied (DJA)
-*     26 Jul 93 : V1.7-0  Use PRM constants for extreme data values. Fixed
-*                         fault in LOG10 errors (probably introduced 25/2/87!)
-*                         (DJA).
-*     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     28 Mar 95 : V1.8-1 Use new data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     operate, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Mar 1986 (TJP):
+*        Original version.
+*      2 Mar 1986 (GKS):
+*        Avoid enormous data error entries when taking logs
+*      7 Mar 1986 (GKS):
+*        More explosion proofing
+*     25 Feb 1987 (ADM):
+*        Add '-', LOG, EXP and 10**. Fix fault in LOG10 errors
+*     10 Mar 1987 (ADM):
+*        Adapted to handle primitive input/output
+*     16 Mar 1987 (ADM):
+*        Modified to handle problems overwriting existing objects
+*     27 Jun 1988 V1.0-1 (ADM):
+*        ASTERIX88 conversion
+*     23 May 1991 V1.5-0 (DJA):
+*        Code tidied
+*     26 Jul 1993 V1.7-0 (DJA):
+*        Use PRM constants for extreme data values. Fixed
+*        fault in LOG10 errors (probably introduced 25/2/87!)
+*     25 Feb 1994 V1.7-1 (DJA):
+*        Use BIT_ routines to do bit manipulations
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     28 Mar 1995 V1.8-1 (DJA):
+*        Use new data interface
+*     12 Sep 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    External references :
-*
-      INTEGER CHR_LEN
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'OPERATE Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*200          	FILE(4)               ! Input file spec
       CHARACTER*200          	FILEO(4)              ! Output file spec
       CHARACTER*6            	OPER                  ! Operator
@@ -93,76 +159,73 @@
 
       DOUBLE PRECISION       	EVALUE                ! Manual error estimate
 
-      INTEGER                	DIMS(ADI__MXDIM)      ! Dimensions of data array
       INTEGER                	DPTR                  ! Output data array
       INTEGER			IFID		      ! Input dataset id
-      INTEGER                LEVELS                   ! Levels of input
-      INTEGER                LEVELSO                  ! Levels of Output
-      INTEGER                NDIM                     ! # dimensions
-      INTEGER                NELM                     ! # input data values
+      INTEGER			IMASK			! Quality mask
+      INTEGER                   LEVELS                ! Levels of input
+      INTEGER                   LEVELSO               ! Levels of Output
+      INTEGER                   NELM                  ! # input data values
       INTEGER			OFID		      ! Output dataset id
       INTEGER                	QPTR                  ! Output quality
-      INTEGER                	TDIMS(ADI__MXDIM)     ! Dimensions
-      INTEGER                	TNDIM                 ! # dimensions
+      INTEGER                   SLEN                  ! Length of STRING
       INTEGER                	VPTR                  ! Output variance
 
-      BYTE                   MASK                     ! Quality mask
+      BYTE                      MASK                  ! Quality mask
 
-      LOGICAL                ERR                      ! Data errors present?
-      LOGICAL                INPUT                    ! Controls operator input
-      LOGICAL                OK                       ! Component present and defined?
-      LOGICAL                OVER                     ! Input object to be overwritten?
-      LOGICAL                PRIM                     ! Input is primitive?
-      LOGICAL                QOK                      ! QUALITY present?
-*
-*    Version :
-*
-      CHARACTER*26           VERSION
-        PARAMETER         ( VERSION = 'OPERATE Version 1.8-1' )
-*-
+      LOGICAL                   ERR                   ! Data errors present?
+      LOGICAL                   INPUT                 ! Controls operator input
+      LOGICAL                   OK                    ! Component present and defined?
+      LOGICAL                   OVER                  ! Input object to be overwritten?
+      LOGICAL                   PRIM                  ! Input is primitive?
+      LOGICAL                   QOK                   ! QUALITY present?
+*.
 
-*    Version
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
-      CALL AST_INIT
+*  Initialise ASTERIX
+      CALL AST_INIT()
 
-*    Check for overwriting
+*  Check for overwriting
       CALL USI_GET0L( 'OVER', OVER, STATUS )
 
-*    Get input object
+*  Get input object
       IF ( OVER ) THEN
-        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', OFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS|Array', 'UPDATE', OFID, STATUS )
       ELSE
-        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-        CALL ADI_FCOPY( IFID, OFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
         CALL USI_NAMEO( LEVELSO, FILEO, STATUS )
       END IF
       CALL USI_NAMEI( LEVELS, FILE, STATUS )
-      CALL BDI_PRIM( OFID, PRIM, STATUS )
 
-*    Check status
+*  Is input a structured data object?
+      CALL ADI_DERVD( OFID, 'BinDS', PRIM, STATUS )
+      PRIM = (.NOT. PRIM)
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map the data
-      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
-      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+*  Map the data
+      CALL BDI_CHK( OFID, 'Data', OK, STATUS )
+      CALL BDI_GETNEL( OFID, NELM, STATUS )
       IF ( OK ) THEN
-        CALL BDI_MAPTDATA( OFID, '_DOUBLE', 'UPDATE', DPTR, STATUS )
+        CALL BDI_MAPD( OFID, 'Data', 'UPDATE', DPTR, STATUS )
       ELSE
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid data', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    If input is primitive, get error estimate
+*  If input is primitive, get error estimate
       IF ( PRIM ) THEN
 
         CALL USI_GET0D( 'ERR', EVALUE, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           ERR = .TRUE.
           CALL DYN_MAPD( 1, NELM, VPTR, STATUS )
-          CALL ARR_INIT1R( EVALUE**2, NELM, %VAL(VPTR), STATUS )
+          CALL ARR_INIT1D( EVALUE**2, NELM, %VAL(VPTR), STATUS )
         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
           CALL ERR_ANNUL( STATUS )
           ERR = .FALSE.
@@ -171,23 +234,27 @@
 
       ELSE
 
-*      Get error if present
-        CALL BDI_CHKVAR ( OFID, ERR, TNDIM, TDIMS, STATUS )
+*    Get error if present
+        CALL BDI_CHK( OFID, 'Variance', ERR, STATUS )
         IF ( ERR ) THEN
-          CALL BDI_MAPTVAR( OFID, '_DOUBLE', 'UPDATE', VPTR, STATUS )
+          CALL BDI_MAPD( OFID, 'Variance', 'UPDATE', VPTR, STATUS )
         END IF
 
 *      And quality
-        CALL BDI_CHKQUAL( OFID, QOK, TNDIM, TDIMS, STATUS )
+        CALL BDI_CHK( OFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAPQUAL( OFID, 'UPDATE', QPTR, STATUS )
-          CALL BDI_GETMASK( OFID, MASK, STATUS )
+          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'UPDATE', QPTR,
+     :                  STATUS )
+          CALL BDI_GET0I( OFID, 'QualityMask', IMASK, STATUS )
+          MASK = IMASK
+
         ELSE
-          CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
-          CALL BDI_MAPQUAL( OFID, 'WRITE', QPTR, STATUS )
+          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', QPTR,
+     :                  STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
-          CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
           MASK = QUAL__MASK
+          IMASK = MASK
+          CALL BDI_PUT0I( OFID, 'QualityMask', MASK, STATUS )
         END IF
 
       END IF
@@ -196,9 +263,8 @@
       CALL MSG_SETI( 'NDAT', NELM )
       CALL MSG_PRNT( '^NDAT data points to be processed' )
 
-*    Get operation and check validity
+*  Get operation and check validity
       INPUT = .TRUE.
-
       DO WHILE ( INPUT )
         CALL USI_GET0C( 'OPER', OPER, STATUS )
         CALL CHR_UCASE( OPER )
@@ -227,11 +293,9 @@
 
         END IF
       END DO
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Perform the operations
+*  Perform the operations
       IF ( OPER(1:1) .EQ. '-' ) THEN
         CALL OPERATE_MINUS( NELM, %VAL(DPTR), STATUS )
 
@@ -260,34 +324,33 @@
 
       END IF
 
-*    Amend data label if present
+*  Amend data label if present
       IF ( .NOT. PRIM ) THEN
-        CALL BDI_GETLABEL( OFID, LABEL, STATUS )
-        STRING = LABEL(1:CHR_LEN(LABEL))
-        LABEL  = OPER(1:CHR_LEN(OPER))//' '//STRING
-        STRING = ':'//LABEL(1:CHR_LEN(LABEL))//':'
-        CALL BDI_PUTLABEL( OFID, STRING, STATUS )
+        CALL BDI_GET0C( OFID, 'Label', LABEL, STATUS )
+        IF ( LABEL .GT. ' ' ) THEN
+          CALL MSG_SETC( 'LAB', LABEL )
+          CALL MSG_SETC( 'OP', OPER )
+          CALL MSG_MAKE( '^OP( ^LAB )', STRING, SLEN )
+          CALL BDI_PUT0C( OFID, 'Label', STRING(:SLEN), STATUS )
+        END IF
       END IF
 
-*    History
+*  History
       IF ( .NOT. PRIM ) THEN
         CALL HSI_ADD( OFID, VERSION, STATUS )
         CALL HSI_PTXT( OFID, LEVELS, FILE, STATUS )
         IF ( .NOT. OVER ) THEN
           CALL HSI_PTXT(OFID,LEVELSO,FILEO,STATUS)
         END IF
-        CALL HSI_PTXT( OFID, 1, 'Operator = '//OPER(:CHR_LEN(OPER)),
-     :                 STATUS )
+        CALL HSI_PTXT( OFID, 1, 'Operator = '//OPER, STATUS )
       END IF
 
-*    Release output
-      IF ( .NOT. OVER ) CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( OFID, STATUS )
+*  Release dynamic output errors if used
       IF ( PRIM .AND. ERR ) THEN
         CALL DYN_UNMAP( VPTR, STATUS )
       END IF
 
-*    Tidy up and exit
+*  Tidy up and exit
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
