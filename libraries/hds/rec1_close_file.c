@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 /* VMS version include files:						    */
@@ -58,6 +62,7 @@
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    PWD: Peter W. Draper (STARLINK, Durham University)                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -71,9 +76,16 @@
 /*       Added a portable implementation.				    */
 /*    28-JUN-1991 (RFWS):						    */
 /*       Added function prototype for VMS system call.			    */
+/*    08-MAR-2005 (PWD):                                                    */
+/*       Added workaround for Linux NFS file mapping problems.              */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
+/*    - A call to fsync is made to workaround an issues with files mapped   */
+/*      over NFS for kernels 2.6.9 through 2.6.11. These are not updated    */
+/*      otherwise. Asynchronous calls to msync do not work, so the sync is  */
+/*      performed when the file is closed, rather than when each section is */
+/*      unmapped.                                                           */
 /*    {@note_any_bugs_here@}						    */
 
 /*-									    */
@@ -128,6 +140,16 @@
 /* Portable version:							    */
 /* ================							    */
 #else
+
+#if HAVE_FSYNC
+         if ( mode != 'R' ) 
+         {
+/* Make sure the date is synchronized to resolve a possible bug in Linux    */
+/* 2.6.9,10,11 that leaves NFS mapped files in a corrupted state.           */
+/* Ignore any errors.                                                        */
+             fsync( fileno( iochan ) );
+         }
+#endif
 
 /* Close the file, reporting any errors.				    */
          if ( fclose( iochan ) )
