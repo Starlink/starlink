@@ -82,14 +82,14 @@ package StarIndex;
 #        'package#' prefix.
 
 #  Implementation:
-#     As currently implemented this package uses the NDBM_File package,
-#     which is available on most Perl5/Unix platforms.  It could trivially
-#     be rewritten to use one of the other DBM-like packages for 
-#     reasons of portability or performance, although the different
-#     types do not yield binary-compatible index files.  As long as
-#     the same implementation of this package is used for writing and
-#     subsequently reading the same index files though there should be
-#     no problem.
+#     The hash is tied to a disk-based DBM file of some kind to implement
+#     the index.  Depending on the DBM library used, this sometimes 
+#     imposes some undesirable limits; in particular maximum size of
+#     key+value of one entry in the hash.  This module will use 
+#     GDBM_File or DB_File if they exist, which do not suffer from 
+#     these limits.  Otherwise it will fall back on one of the others
+#     (NDBM_File or SDBM_File - the latter guaranteed to exist), and
+#     large writes will fail.
 
 #  Arguments:
 
@@ -112,13 +112,27 @@ package StarIndex;
 
 #-
 
-use Scb qw/:DEFAULT error/;
-use Fcntl;
-use NDBM_File;
-
 #  Declare all variables explicitly.
 
 use strict 'vars';
+
+#  Required libraries.
+
+use Scb qw/:DEFAULT error/;
+use Fcntl;
+
+#  Manipulate the AnyDBM_File preference list of what database access to
+#  use - by default NDBM_File is first preference.  We prefer GDBM_File 
+#  and DB_File because they have no limits on key+value size, while the 
+#  others tend to have a limit of around 1024 bytes, which can cause 
+#  writes to fail.  Then set $Dbmtype to the type of access actually used.
+
+BEGIN {
+   @AnyDBM_File::ISA = qw/GDBM_File DB_File NDBM_File SDBM_File ODBM_File/;
+}
+use AnyDBM_File;
+my $Dbmtype = $AnyDBM_File::ISA[0];
+
 
 ########################################################################
 sub new {
@@ -173,17 +187,24 @@ sub new {
 
    my ($class, $indexfile, $access) = @_;
 
-#  Map requested access type to Fcntl type access mode.
+#  Set up mapping of requested access type to DBM access mode.  According
+#  to what type of DBM access we are using, the flags may be different.
 
-   my $fmode = { 'read'    => O_RDONLY,
-                 'update'  => O_RDWR | O_CREAT,
-                 'new'     => O_RDWR | O_CREAT | O_TRUNC
-                                                         }->{$access};
+   my %fmode = ($Dbmtype eq 'GDBM_File')
+      ?  
+         ( 'read'    => &GDBM_File::GDBM_READER(),
+           'update'  => &GDBM_File::GDBM_WRCREAT(),
+           'new'     => &GDBM_File::GDBM_NEWDB() )
+      :  
+         ( 'read'    => O_RDONLY,
+           'update'  => O_RDWR | O_CREAT,
+           'new'     => O_RDWR | O_CREAT | O_TRUNC )
+      ;
 
 #  Tie the StarIndex object, which is a hash, to the DBM file.
 
    my %locate;
-   unless (tie %locate, NDBM_File, $indexfile, $fmode, 0644) {
+   unless (tie %locate, AnyDBM_File, $indexfile, $fmode{$access}, 0644) {
 
 #     Set up default error message.
 
@@ -206,7 +227,7 @@ sub new {
 
 #        Index file does not already exist.
 
-         if (!($fmode & O_CREAT)) {
+         if ($access eq 'read') {
             $error = "DBM file '$indexfile' does not seem to exist";
          }
          elsif (!-w $indexdir) {
@@ -223,10 +244,10 @@ sub new {
          elsif (grep ((! -r), @indexfiles)) {
             $error = "DBM file '$indexfile' apparently not readable";
          }
-         elsif (($fmode & O_RDWR) && grep ((! -w), @indexfiles)) {
+         elsif (($access =~ 'update|new') && grep ((! -w), @indexfiles)) {
             $error = "DBM file '$indexfile' apparently not writable";
          }
-         elsif (($fmode & O_RDONLY) && grep ((-z), @indexfiles)) {
+         elsif ($access eq 'read' && grep ((-z), @indexfiles)) {
             $error = "DBM file '$indexfile' apparently empty";
          }
       }
@@ -265,9 +286,10 @@ sub finish {
 #     that updates have been flushed from memory to disk.  This method
 #     does not need to be called if the program is exited normally, but 
 #     in the event of an abnormal exit, some DBM libraries (e.g. GDBM
-#     in GDBM_FAST mode, and NDBM on Linux) will leave the DBM file 
-#     corrupted.  Thus it is a good idea to call it.  After this call
-#     the StarIndex object can no longer be used.
+#     in GDBM_FAST mode, and NDBM on Linux, which is effectively the
+#     same thing) will leave the DBM file corrupted.  Thus it is a good 
+#     idea to call it.  After this call the StarIndex object can no 
+#     longer be used.
 
 #  Arguments:
 
@@ -313,9 +335,10 @@ sub get {
 #     Perl 5
 
 #  Invocation:
-#     $location = $starindex->get($name);
-#     $location = $starindex->get($name, packpref => $package);
-#     $location = $starindex->get($name, packmust => $package);
+#     @locations = $starindex->get($name);
+#     $location  = $starindex->get($name);
+#     $location  = $starindex->get($name, packpref => $package);
+#     $location  = $starindex->get($name, packmust => $package);
 
 #  Description:
 #     Retrieves a value from a StarIndex object given the key and,
@@ -324,7 +347,8 @@ sub get {
 #     If only the name is supplied, then in array context a list of 
 #     the entries for that name in all packages is returned, and in 
 #     scalar context just one of them (effectively at random). 
-#     undef is returned if the key does not exist).
+#     A null value (undef or an empty list according to context) is 
+#     returned if the key does not exist.
 #
 #     If the 'packmust => $package' option is given, then if a value
 #     in the specified package exists for the specified key, it is
@@ -368,9 +392,13 @@ sub get {
    my ($rlocate, $name, %options) = @_;
 
 #  Get string containing locations in all packages for requested name,
-#  and turn it into a list of locations.
+#  and exit with a null value if there are no locations (probably
+#  because the key does not exist).
 
-   my $locations = $rlocate->{$name} || return undef;
+   my $locations = $rlocate->{$name} || return wantarray ? () : undef;
+
+#  Turn the string into a list of locations.
+
    my @locations = split ' ', $locations;
 
 #  If no package is specified, return a list of them all.
@@ -480,6 +508,10 @@ sub put {
 #     $location = string.
 #        Logical pathname of item's location.
 
+#  Return value:
+#     Returns true (1) if the write was a success or false (0) if it 
+#     failed.
+
 #  Notes:
 #     Depending on the implementation the of DBM library underlying 
 #     the Perl tie() function, writing records can generate an error
@@ -512,6 +544,7 @@ sub put {
 
    my ($rlocate, $name, $location) = @_;
 
+   my $newloc;
    if ($rlocate->{$name}) {
 
 #     Value for given name already exists: create hash %loc containing
@@ -527,7 +560,7 @@ sub put {
 #     If no location for this package exists, or if the new one is better
 #     than the old one, replace it in the index.  Otherwise leave the
 #     index entry as it is.
-#     A location is better than another if it is deeper nested in tar
+#     One location is better than another if it is deeper nested in tar
 #     files (since this gives a better indication of where it comes from
 #     in the package distribution) or if it is a plain fortran (.f) file
 #     rather than a generic fortran (.gen) file, since function names in
@@ -538,7 +571,7 @@ sub put {
           ($olev == $lev && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/)
          ) {
          $loc{$package} = $location;
-         $rlocate->{$name} = join ' ', values %loc;
+         $newloc = join ' ', values %loc;
       }
    }
    else {
@@ -546,7 +579,21 @@ sub put {
 #     No value for given name exists, new entry simply becomes the given 
 #     location.
 
-      $rlocate->{$name} = $location;
+      $newloc = $location;
+   }
+
+#  Attempt the write.
+
+   eval { $rlocate->{$name} = $newloc };
+
+#  Set return value appropriately, and return.
+
+   if ($@) {
+      (tied %$rlocate)->clearerr();
+      return 0;
+   }
+   else {
+      return 1;
    }
 
 }
