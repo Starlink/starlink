@@ -422,7 +422,7 @@ wrndf.f calpol.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
 ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
-ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
+ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f pol1_subst.f \
 pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
