@@ -180,7 +180,7 @@
 *        with the same indices as the 2 used pixel axes within the NDF
 *        are used. [!]
 *     VALUE = _DOUBLE (Write)
-*        An output parameter to wghich is written the data value at the 
+*        An output parameter to which is written the data value at the 
 *        top-right pixel in the displayed region.
 
 *  Arguments:
