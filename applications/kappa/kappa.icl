@@ -1,6 +1,6 @@
 { ICL initialisation for package KAPPA
 { Created automatically from kappa.ifd using ifd2star
-{ Thu Jul  1 10:33:30 BST 2004
+{ Thu Jul  1 11:41:21 BST 2004
 
 define mem2(d) $KAPPA_DIR/mem2d mem2d
 defhelp mem2d $KAPPA_HELP mem2d

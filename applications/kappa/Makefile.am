@@ -196,3 +196,18 @@ DYNSCRIPTS = kappa.csh kappa.icl
 
 $(IFL_FILES) $(DYNSCRIPTS): kappa.ifd
 	$(IFD2STAR) kappa
+
+
+# Fixup scripts with bin location
+# The scripts needs to have installation locations edited into them
+edit = sed \
+	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@VERSION\@,$(VERSION),g'
+
+multiplot.csh: multiplot.csh.in
+	-rm -f multiplot.csh.tmp multiplot.csh
+	$(edit) \
+	    -e 's,@edited_input\@,start: produced from multiplot.csh.in by Makefile.am,' \
+	    $(srcdir)/multiplot.csh.in > multiplot.csh.tmp
+	mv multiplot.csh.tmp multiplot.csh
+
