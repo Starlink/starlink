@@ -603,7 +603,8 @@
      :                         /DECSTR, STATUS )
 
 *    Create data, quality and axis
-        CALL BDI_PUT( SID, 'QualityMask', 'UBYTE', QUAL__MASK, STATUS )
+        CALL BDI_PUT( SID, 'QualityMask', 'UBYTE', 0, 0,
+     :                QUAL__MASK, STATUS )
 
 *    Map the 3 arrays
         CALL BDI_MAPR( SID, 'Data', 'WRITE', DPTR, STATUS )
@@ -1636,7 +1637,7 @@
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
 
 *  Write quality mask
-      CALL BDI_PUT( GID, 'QualityMask', 'UBYTE', GQMASK, STATUS )
+      CALL BDI_PUT( GID, 'QualityMask', 'UBYTE', 0, 0, GQMASK, STATUS )
 
 *  Convert to probability if needed
       IF ( GPAR .EQ. -1 ) THEN
