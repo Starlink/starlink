@@ -376,7 +376,8 @@ PKG_VERS = 0.6-1
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
-PUBLIC_SCRIPTS = sgml_set.sh sgml_set.csh
+#PUBLIC_SCRIPTS = sgml_set.sh sgml_set.csh
+PUBLIC_SCRIPTS=
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -428,14 +429,15 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 #
 # NOTE NOTE NOTE
 #
-# The INSTALL_BIN and INSTALL_LIB directories are deemed to be `owned'
+# The INSTALL_LIB directory is deemed to be `owned'
 # by this package. The deinstallation target below deinstalls things
-# by deleting the entire contents of these directories.
+# by deleting the entire contents of this directory.
 #
-# In the case of the INSTALL_BIN directory this is necessary since the
-# Jade installation procedure is sufficiently elaborate that it would
-# be complicated (and hence errorprone) to work out and record exactly
-# which files have been installed.  Similarly, there is a large number
+## In the case of the INSTALL_BIN directory this is necessary since the
+## Jade installation procedure is sufficiently elaborate that it would
+## be complicated (and hence errorprone) to work out and record exactly
+## which files have been installed.
+# Similarly, there is a large number
 # of files installed in INSTALL_LIB, so that working out what ones to
 # remove would be similarly complicated, and involve possibly
 # non-portable `find' magic.
@@ -661,18 +663,23 @@ install:
 		mv tmp.pl $$f; \
 		chmod 755 $$f; \
 	done
-#	# Install scripts, editing them as we go
-	for f in $(PUBLIC_SCRIPTS); do \
-		sed	-e 's#((STARLINK_SGML_DIR))#$(INSTALL_LIB)#'	\
-			-e 's#((SGML_BINDIR))#$(INSTALL_BIN)#'		\
-			-e 's#((PACK_NAME))#$(PACK_NAME)#'		\
-			-e 's#((PKG_VERS))#$(PKG_VERS)#'		\
-			$$f > $(INSTALL_BIN)/$$f ;			\
-	done		
+#	# Install scripts, editing any shell-scripts as we go
+	cd bin;								     \
+	    for f in *; do						     \
+		case $$f in						     \
+		    *sh)						     \
+			sed	-e 's#((STARLINK_SGML_DIR))#$(INSTALL_LIB)#' \
+				-e 's#((SGML_BINDIR))#$(INSTALL_BIN)#'	     \
+				-e 's#((PACK_NAME))#$(PACK_NAME)#'	     \
+				-e 's#((PKG_VERS))#$(PKG_VERS)#'	     \
+			$$f > $(INSTALL_BIN)/$$f ;			     \
+			;;						     \
+		    *) cp $$f $(INSTALL_BIN) ;;				     \
+		esac							     \
+	    done
 #	#
 #	# Warn folk not to install anything by hand into these dirs
-	echo "This directory is owned by the $(PACK_NAME) package.  If you install things here they will be overwritten or deleted." > $(INSTALL_BIN)/DO-NOT-INSTALL-HERE
-	cp $(INSTALL_BIN)/DO-NOT-INSTALL-HERE $(INSTALL_LIB)
+	echo "This directory is owned by the $(PACK_NAME) package.  If you install things here they will be overwritten or deleted." > $(INSTALL_LIB)/DO-NOT-INSTALL-HERE
 #	# Install documentation.
 	UNPACKDIR=`pwd`; \
 		test -r ssn70.tar-htx && \
@@ -741,7 +748,9 @@ do_deinstall:
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); fi
 #	# Delete all the files we installed in the .INSTALL target
 	rm -Rf $(INSTALL_LIB)
-	rm -Rf $(INSTALL_BIN)
+	for f in `cd bin; ls`; do \
+		rm -f $(INSTALL_BIN)/$$f; \
+	done
 #	# Remove the installed documentation
 	rm -Rf $(INSTALL_DOCS)/ssn70.htx
 	$(TAR_OUT) ssn70.tar-tex ssn70.latex/MANIFEST
