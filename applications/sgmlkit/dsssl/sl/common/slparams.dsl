@@ -93,12 +93,15 @@ be declared <em>somewhere</>: the default is declared in the General DTD.
 displayed, if present in the document, when routineprologues are
 formatted.  If "diytopic" is present in this list, it represents all
 the diytopic elements, which are formatted together.
+<p>Although one might expect the "purpose" element to appear here,
+it is normally displayed using formatting different to that of
+other elements in this list, so is best handled explicitly by 
+formatting routines.
 <returnvalue type='list of strings'>List of string names of element
 types.
 <codebody>
 (define %display-programcode-elements%
-  '("purpose"
-    "description"
+  '("description"
     "invocation"
     "argumentlist"			;shouldn't have both argumentlist
     "parameterlist"			;and parameterlist in same prologue
