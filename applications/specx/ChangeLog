@@ -1,3 +1,12 @@
+2000-08-23  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+	* tofits.spx: Added option to specify mixer name so that fits
+	              name will be different for different mixers.
+
+	* gsd2fits.spx: Major overhaul to propagate changes to open-fits
+	              and das-merge (wideband mode). In addition, implemented
+	              dual-mixer recognition. 
+	
 2000-05-18  Tim Jenness  <timj@jach.hawaii.edu>
 
         RELEASE V6.7-7 TO STARLINK
