@@ -55,6 +55,11 @@
 #     21-MAR-2001 (PWD):
 #        Changed set_maxobjs to return -1 when feature is not
 #        available (no search facilities).
+#     08-JAN-2001 (PWD):
+#        Added set_default_values override so that we have some
+#        control over the default number of objects that are searched
+#        for. Increased from 1000 to 20000. Images are getting bigger
+#        and deeper.
 #     {enter_further_changes_here}
 
 #-
@@ -255,5 +260,11 @@ itcl::class gaia::GaiaQuery {
       }
    }
 
+   # Set the default values for the form entries.
+   # Overridden to increase default number of objects from 1000 to
+   # 20000. 
+   public method set_default_values {} {
+      SkyQuery::set_default_values
+      set_maxobjs 20000
+   }
 }
-
