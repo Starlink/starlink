@@ -11,6 +11,7 @@
 *
 *      2 Jul 92 : Original (DJA)
 *     24 Apr 95 : Updated to use BDI_ (DJA)
+*     20 Nov 95 : Full ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -19,7 +20,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -38,67 +38,51 @@
 *
 *    Local variables :
 *
-      REAL                      AVAL                    ! Axis value
-      REAL                      AWID                    ! Axis width
+      REAL                      AVAL, AWID              ! Axis value & width
+      REAL			SPARR(2)		! Spaced array data
 
       INTEGER                   IAX                     ! Loop over axes
       INTEGER                   IBIN                    ! Loop over axis values
-      INTEGER                   LNAX                    ! Number of existing axes
       INTEGER                   PTR                     ! Ptr to axis data
       INTEGER                   WPTR                    ! Ptr to axis widths
-
-      LOGICAL                   REG                     ! Regular NDF axis?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Create axes
-      CALL BDI_CHKAXES( FID, LNAX, STATUS )
-      IF ( LNAX .NE. NAX ) THEN
-        CALL BDI_CREAXES( FID, NAX, STATUS )
-      END IF
-
-*    Loop over axes
+*  Loop over axes
       DO IAX = 1, NAX
 
-*      Regular NDF axis if regular non-logarithmic grid axis
-        REG = ( GAX(IAX).REGULAR .AND. .NOT. GAX(IAX).LOGARITHMIC )
+*    Write parameters
+        IF ( GAX(IAX).REGULAR .AND. .NOT. GAX(IAX).LOGARITHMIC ) THEN
+          SPARR(1) = GAX(IAX).BASE
+          SPARR(2) = GAX(IAX).SCALE
+          CALL BDI_AXPUT1R( FID, IAX, 'SpacedData', 2, SPARR, STATUS )
 
-*      Create structure
-        CALL BDI_CREAXVAL( FID, IAX, REG, GAX(IAX).NVAL, STATUS )
-
-*      Write parameters
-        IF ( REG ) THEN
-          CALL BDI_PUTAXVAL( FID, IAX, GAX(IAX).BASE,
-     :            GAX(IAX).SCALE, GAX(IAX).NVAL, STATUS )
         ELSE
 
-*        Create widths structure
-          CALL BDI_CREAXWID( FID, IAX, .FALSE., GAX(IAX).NVAL, STATUS )
+*      Map axis arrays
+          CALL BDI_AXMAPR( FID, IAX, 'Data', 'WRITE', PTR, STATUS )
+          CALL BDI_AXMAPR( FID, IAX, 'Width', 'WRITE', WPTR, STATUS )
 
-*        Map axis arrays
-          CALL BDI_MAPAXVAL( FID, 'WRITE', IAX, PTR, STATUS )
-          CALL BDI_MAPAXWID( FID, 'WRITE', IAX, WPTR, STATUS )
-
-*        Find axis values and widths and store in axis arrays
+*      Find axis values and widths and store in axis arrays
           DO IBIN = 1, GAX(IAX).NVAL
             CALL FIT_GRID_AXVAL( GAX(IAX), IBIN, AVAL, STATUS )
-            CALL ARR_COP1R( 1, AVAL, %VAL(PTR+(IBIN-1)*4), STATUS )
+            CALL ARR_SELEM( PTR, GAX(IAX).NVAL, IBIN, AVAL, STATUS )
             AWID = ( 10.0**(LOG10(AVAL)+GAX(IAX).SCALE/2.0) -
      :               10.0**(LOG10(AVAL)-GAX(IAX).SCALE/2.0) )
-            CALL ARR_COP1R( 1, AWID, %VAL(WPTR+(IBIN-1)*4), STATUS )
+            CALL ARR_SELEM( WPTR, GAX(IAX).NVAL, IBIN, AWID, STATUS )
           END DO
 
-*        Unmap axis data
-          CALL BDI_UNMAPAXVAL( FID, IAX, STATUS )
-          CALL BDI_UNMAPAXWID( FID, IAX, STATUS )
+*      Unmap axis data and widths
+          CALL BDI_AXUNMAP( FID, IAX, 'Data', PTR, STATUS )
+          CALL BDI_AXUNMAP( FID, IAX, 'Width', WPTR, STATUS )
 
         END IF
 
       END DO
 
-*    Tidy up
+*  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_CREGRIDAX', STATUS )
       END IF
