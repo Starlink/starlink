@@ -1,0 +1,55 @@
+## NDF2GASP - Converts a two-dimensional NDF into a GASP image.
+
+#+
+#  Name:
+#     NDF2GASP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-JAN-1993 (RAHM):
+#        Original version.
+#     1993 July 27 (MJC):
+#        Added help.  Renamed parameters to standard.  Made FILLBAD type
+#	 _INTEGER.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2GASP
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      IN            # Input image
+      position    1
+      type        NDF
+      prompt      'Input NDF image?'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT           # Output GASP image
+      position    2
+      type        LITERAL
+      prompt      'Output GASP image (.dat suffix not required)'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      helpkey     '*'
+   endparameter
+
+   parameter      FILLBAD       # Value to use when replacing bad pixels
+      type        '_INTEGER'
+      vpath       'DEFAULT,NOPROMPT'
+      default     -10000
+      helpkey     '*'
+   endparameter
+    
+endinterface
