@@ -11,9 +11,9 @@ use File::Spec;
 
 BEGIN {
  
- eval { use Graphics::PLPLOT };
+ eval { use Graphics::PLplot };
  if ( $@ ) {
-   plan skip_all => "Graphics::PLPLOT module not installed.";
+   plan skip_all => "Graphics::PLplot module not installed.";
    exit;
  } 
  

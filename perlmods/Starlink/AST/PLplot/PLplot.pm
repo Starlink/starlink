@@ -5,7 +5,7 @@ use vars qw/ $VERSION /;
 use constant R2D     => 57.29578;        # Radians to degrees factor
 use constant FLT_MAX => 3.40282347e+38;  # Maximum float on ix86 platform
 
-use Graphics::PLPLOT qw/:all/;
+use Graphics::PLplot qw/:all/;
 use Starlink::AST;
 use Carp;
 
