@@ -1,4 +1,4 @@
-#!PERL
+#!@PERL@
 #+
 #  Name:
 #     CATREMOTE
@@ -129,7 +129,7 @@
 #        Find all the objects in the USNO PMM which lie within ten minutes
 #        of arc of Right Ascension 12:15:00.0 (sexagesimal hours) and
 #        Declination 30:30:00.0 (sexagesimal degrees, both J2000).  The
-#        objects selected will be saved as a catalogue called 
+#        objects selected will be saved as a catalogue called
 #        usno_eso_121500_303000.tab created in your current directory.
 #        This catalogue will be written in the Tab-Separated Table (TST)
 #        format.
@@ -270,7 +270,7 @@
 #        file, or all the databases of a given type.
 
           if ($mode eq "list")
-          {  
+          {
 
 #
 #           Obtain the type of databases required.  Note that this value
@@ -284,7 +284,7 @@
              }
              $databaseType =~ s/^\s*//;
              $databaseType =~ s/\s*$//;
-          
+
              for ($loop = 0; $loop <= $numDatabases; $loop++)
              {  if ($databaseType eq "all")
                 {  $listThisDatabase = 1;
@@ -616,7 +616,7 @@ sub MakeRemQuery
          $query =~ s/%h/$side/;
 
 #
-#       Substitute any additional condition.  
+#       Substitute any additional condition.
 #
 #       The additional query is optional.  If present it can have
 #       one of three forms.  If the form is:
@@ -734,7 +734,7 @@ sub MakeRemQuery
 
 sub RetrieveTable
 {  if ($status == 0)
-   {  
+   {
 
 #
 #    Assemble the command to retrieve the configuration file and
@@ -806,7 +806,7 @@ sub RetrieveTable
       else
       {  $status = 1;
          $statusMessage = "inaccessible URL $query";
-      }   
+      }
    }
    $status;
 }
@@ -1364,7 +1364,7 @@ sub ObtainConfigFile
 
 sub RetrieveConfigFile
 {  if ($status == 0)
-   {  
+   {
 
 #
 #    Assemble the command to retrieve the configuration file and
@@ -1411,7 +1411,7 @@ sub RetrieveConfigFile
       else
       {  $status = 1;
          $statusMessage = "failed to access the configuration file.";
-      }   
+      }
    }
    $status;
 }
@@ -1452,7 +1452,7 @@ sub ReadConfigFile
       else
       {  $status = 1;
          $statusMessage = "failed to open the configuration file.";
-      }   
+      }
    }
    $status;
 }
@@ -1499,7 +1499,7 @@ sub ReadConfigFile
 
 sub ParseConfigFile
 {  if ($status == 0)
-   {  
+   {
 
 #
 #    Initialise the list of recognised-but-unused keywords from
@@ -1824,7 +1824,7 @@ sub ParseConfigFile
 #  running status.
 
 sub CheckKeyword
-{  
+{
 
 #  Initialise the check status to ok.
 
@@ -1832,7 +1832,7 @@ sub CheckKeyword
 
 #
 #  First check that at least one database is defined.
-   
+
     if ($numDatabases == -1)
     {  print "! Line $cfgline: keyword serv_type missing. \n";
 
