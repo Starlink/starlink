@@ -1,0 +1,62 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     kaprh_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against KAPRH
+
+#  Type of Module:
+#     Bourne-shell script.
+
+#  Description:
+#     This script lists the linking qualifiers for the non-KAPRH
+#     libraries used by KAPRH.  It should be invoked by those building
+#     KAPRH or other applications which use KAPRH libraries in order to
+#     generate the correct arguments for the compiler (or ld) command.
+#     The arguments generated are written to the standard output.
+
+#     The script contains an awk script to remove duplicate references
+#     that result from other linker `options' files.  The file is
+#     needed because there would be too many references before the awk
+#     script could reduce them.
+
+#  Invocation:
+#     The script is normally invoked as part of a makefile command to
+#     create a monolith in Starlink standard makefiles, thus:
+#
+#         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) `./kaprh_libs` \
+#             -L$(STAR_LIB) `./kaprh_link_adam`
+
+#  Copyright:
+#     Copyright (C) 2001 Rutherford Appleton Laboratory
+
+#  Authors:
+#     DSB:  David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     33-MAY-2001 3 (DSB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo `kaplibs_link_adam` \
+           `cat_link_adam` `snx_link_adam` `ncar_link_adam` \
+           `idi_link_adam` `sgs_link_adam` `ndg_link_adam` \
+           `gks_link_adam` `gwm_link_adam` `gns_link_adam` \
+           `ndf_link_adam` \
+           `agi_link_adam` `fio_link_adam` `ref_link_adam` \
+           `ard_link_adam` `grp_link_adam` `trn_link_adam` \
+           `prm_link_adam` `hlp_link` `mag_link_adam` \
+           `sla_link` `psx_link_adam` `pda_link_adam` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
