@@ -20,7 +20,7 @@ SUFFIXES = .o .c .gen .grd .glrdi .glrdic .gln .dgen .f .h
 
 #  Suffix rules.
 .gen.f:
-	$(GENERIC) -t n $< 
+	$(FGENERIC) -t n $< 
 
 .grd.f:
 	cp $< $(<:.grd=.gen)
