@@ -9,7 +9,7 @@
 *
 *	Contents:	Astrometrical stuff.
 *
-*	Last modify:	01/06/97
+*	Last modify:	24/01/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -32,7 +32,7 @@ typedef struct structastrom
   double	crval[2];		/* FITS CRVAL parameters */
   double	cdelt[2];		/* FITS CDELT parameters */
   double	crpix[2];		/* FITS CRPIX parameters */
-  double	projp[10];		/* FITS PROJP parameters */
+  double	projp[200];		/* FITS PROJP parameters */
   double	longpole,latpole;	/* FITS LONGPOLE and LATPOLE */
   double	pc[4];			/* FITS PC matrix */
   double	linmat[4];		/* Local linear mapping matrix */

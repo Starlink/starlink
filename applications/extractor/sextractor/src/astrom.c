@@ -5,20 +5,26 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Astrometrical computations.
 *
-*	Last modify:	05/04/99
+*	Last modify:	03/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdlib.h>
 
 #include 	"wcs/wcs.h"
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"astrom.h"
 
 
@@ -39,7 +45,7 @@ void	initastrom(picstruct *field)
   if (as->wcs_flag)
 /*-- ...Yes: launch the WCS stuff! */
     {
-    QMALLOC(as->lin, struct linprm, 1);
+    QCALLOC(as->lin, struct linprm, 1);
     QMALLOC(as->cel, struct celprm, 1);
     QMALLOC(as->prj, struct prjprm, 1);
     QMALLOC(as->lin->cdelt, double, 2);
@@ -64,7 +70,7 @@ void	initastrom(picstruct *field)
 
 /*-- prjprm structure */
     as->prj->r0 = 0.0;
-    for (l=0; l<10; l++)
+    for (l=0; l<200; l++)
       as->prj->p[l] = as->projp[l];
 
 /*-- Compute an "average linear matrix" (at field center) */

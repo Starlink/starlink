@@ -5,14 +5,18 @@
 *
 *	Part of:	A program using neural networks.
 *
-*	Author:		E.BERTIN, Institut d'Astrophysique de Paris.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	run only version of the neural network.
 *
-*	Last modify:	30/03/95
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,6 +25,7 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"neurro.h"
 
 brainstruct	*brain;

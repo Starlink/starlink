@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	global declarations.
 *
-*	Last modify:	25/05/99
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -18,8 +18,7 @@
 
 /*----------------------- miscellaneous variables ---------------------------*/
 
-sexcatstruct		cat;
-prefstruct		prefs;
+sexcatstruct		thecat;
 picstruct		thefield1,thefield2, thewfield1,thewfield2;
 objstruct		flagobj;
 obj2struct		flagobj2;
@@ -27,25 +26,25 @@ extern obj2struct	outobj2;
 static obj2struct	*obj2 = &outobj2;
 float			ctg[37], stg[37];
 char			gstr[MAXCHAR];
-static const char	notokstr[] = {" \t=,;\n\r\""};
 
 /*------------------------------- functions ---------------------------------*/
-extern void	analyse(picstruct *, picstruct *, int, objliststruct *),
+extern void	allocparcelout(void),
+		analyse(picstruct *, picstruct *, int, objliststruct *),
 		blankit(char *, int),
                 endcat(void),
+                reendcat(void),
                 closecheck(void),
 		copydata(picstruct *, int, int),
 		endfield(picstruct *),
 		endobject(picstruct *, picstruct *, picstruct *, picstruct *,
 			int, objliststruct *),
-		error(int, char *, char *),
 		examineiso(picstruct *, picstruct *, objstruct *,
 			pliststruct *),
-		fixexponent(char *),
 		flagcleancrowded(int, objliststruct *),
 		freeparcelout(void),
 		getnnw(void),
-		initcat(picstruct *),
+		initcat(void),
+		reinitcat(picstruct *),
 		initglob(void),
 		makeit(void),
 		mergeobject(objstruct *, objstruct *),
@@ -66,17 +65,14 @@ extern void	analyse(picstruct *, picstruct *, int, objliststruct *),
 		sexellips(PIXTYPE *bmp, int, int, double, double, double,
 			double, double, PIXTYPE, int),
 		sexmove(double, double),
-		swapbytes(void *, int, int),
 		updateparamflags(void),
 		useprefs(void),
-		warning(char *, char *),
 		writecat(int, objliststruct *);
 
 extern float	hmedian(float *, int);
 
 extern int	addobj(int, objliststruct *, objliststruct *),
 		belong(int, objliststruct *, int, objliststruct *),
-		cistrcmp(char *, char *, int),
 		gatherup(objliststruct *, objliststruct *),
 		parcelout(objliststruct *, objliststruct *);
 
@@ -85,5 +81,5 @@ extern void	*loadstrip(picstruct *, picstruct *);
 extern char	*readfitshead(FILE *, char *, int *);
 
 extern picstruct	*inheritfield(picstruct *infield, int flags),
-			*newfield(char *, int );
+			*newfield(char *, int , int);
 

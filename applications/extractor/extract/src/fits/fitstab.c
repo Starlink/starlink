@@ -9,10 +9,15 @@
 *
 *	Contents:	general functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	30/11/98
+*	Last modify:	29/06/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef	HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -90,7 +95,7 @@ NOTES	Only 1-segment tables are accepted. To copy multi-segment tables,
 	If a table with the same name and basic attributes already exists in
 	the destination catalog, then the new table is appended to it.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+VERSION	12/06/2001
  ***/
 int	add_tab(tabstruct *tab, catstruct *cat, int pos)
 
@@ -117,7 +122,10 @@ int	add_tab(tabstruct *tab, catstruct *cat, int pos)
     }
   else
     {
-    prevtab = pos_to_tab(cat, pos, 0)->prevtab;
+    if (prevtab = pos_to_tab(cat, pos, 0))
+      prevtab = prevtab->prevtab;
+    else
+      tab->nexttab = tab->prevtab = prevtab = tab;
     cat->ntab++;
     }
 
@@ -128,7 +136,7 @@ int	add_tab(tabstruct *tab, catstruct *cat, int pos)
   }
 
 
-/****** copy_tab ***************************************************************
+/****** copy_tab **************************************************************
 PROTO	int copy_tab(catstruct *catin, char *tabname, int seg,
 		catstruct *catout, int pos)
 PURPOSE	Copy a table from one catalog to another.
@@ -141,7 +149,7 @@ OUTPUT	RETURN_OK if everything went as expected, and RETURN_ERROR otherwise.
 NOTES	If a table with the same name and basic attributes already exists in
 	the destination catalog, then the original table is appended to it.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+VERSION	12/06/2001
  ***/
 int	copy_tab(catstruct *catin, char *tabname, int seg,
 		catstruct *catout, int pos)
@@ -156,9 +164,8 @@ int	copy_tab(catstruct *catin, char *tabname, int seg,
     return RETURN_ERROR;
 
   nseg = seg?1:tabin->nseg;
-
 /*Check if a similar table doesn't already exist in the dest. cat */
-  if ((outtab = name_to_tab(catout, tabname, 0)))
+  if (*tabname && (outtab = name_to_tab(catout, tabname, 0)))
     {
     if ((outtab->naxis != 2)
 	|| (outtab->bitpix!=8)
@@ -223,14 +230,80 @@ int	copy_tab(catstruct *catin, char *tabname, int seg,
 /*--if the table is new */
     {
     nexttab = pos_to_tab(catout, pos, 0);
-    outtab->prevtab = nexttab->prevtab;
-    nexttab->prevtab->nexttab = outtab;
+    if (!nexttab)
+      nexttab = catout->tab = tabout;
+    else
+      {
+      outtab->prevtab = nexttab->prevtab;
+      nexttab->prevtab->nexttab = outtab;
+      }
     }
 
   prevtab->nexttab = nexttab;
   nexttab->prevtab = prevtab;
 
   return RETURN_OK;
+  }
+
+
+/****** copy_tab_fromptr ******************************************************
+PROTO	void copy_tab_fromptr(tabstruct *tabin, catstruct *catout, int pos)
+PURPOSE	Copy a table from one catalog to another.
+INPUT	Pointer to the original catalog,
+	Pointer to the table,
+	Pointer to the destination catalog,
+	Position (1= first after the primary HDU, <=0 = at the end)
+OUTPUT	-.
+NOTES	-.
+AUTHOR	E. Bertin (IAP & Leiden observatory)
+VERSION	22/06/2001
+ ***/
+void	copy_tab_fromptr(tabstruct *tabin, catstruct *catout, int pos)
+
+  {
+   keystruct	*key;
+   tabstruct	*prevtab, *nexttab,*tabout;
+   int		j;
+
+  catout->ntab++;
+
+/* First, allocate memory and copy data */
+   QCALLOC(tabout, tabstruct, 1);
+   *tabout = *tabin;
+   if (tabin->naxis)
+     QMEMCPY(tabin->naxisn, tabout->naxisn, int, tabin->naxis);
+   if (tabin->headbuf)
+     QMEMCPY(tabin->headbuf, tabout->headbuf, char, tabin->headnblock*FBSIZE);
+   if (tabin->bodybuf)
+     QMEMCPY(tabin->bodybuf, tabout->bodybuf, char, tabin->tabsize);
+
+   key = tabin->key;
+   tabout->key = NULL;
+   tabout->nkey = 0;
+   for (j=tabin->nkey; j--;)
+     {
+     copy_key(tabin, key->name, tabout, 0);
+     key = key->nextkey;
+     }
+
+/* Then, update the links */
+   tabout->prevtab = NULL;
+   tabout->seg = 1;
+   tabin = tabin->nexttab;
+   prevtab = tabout;
+
+  if (!(nexttab = pos_to_tab(catout, pos, 0)))
+    nexttab = catout->tab = tabout;
+  else
+    {
+    tabout->prevtab = nexttab->prevtab;
+    nexttab->prevtab->nexttab = tabout;
+    }
+
+  prevtab->nexttab = nexttab;
+  nexttab->prevtab = prevtab;
+
+  return;
   }
 
 
@@ -245,20 +318,23 @@ OUTPUT	RETURN_OK if everything went as expected, and RETURN_ERROR otherwise
 NOTES	If a table with the same name and basic attributes already exists in
 	the destination catalog, then the original table is appended to it.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+VERSION	12/06/2001
  ***/
 int	copy_tabs(catstruct *catin, catstruct *catout)
 
   {
    tabstruct	*tab;
-   int		i, flag;
+   int		i, flag, ntab;
 
   if (!catin->tab)
     return RETURN_ERROR;
 
   tab = catin->tab->nexttab;	/* skip the primary header */
   flag = RETURN_OK;
-  for (i=catin->ntab-1; i--;)
+  ntab = catin->ntab-1;
+  if (!ntab)
+    ntab = 1;
+  for (i=ntab; i--;)
     {
     flag |= copy_tab(catin, tab->extname, 0, catout, 0);
     while (!(tab=tab->nexttab)->nseg);
@@ -267,6 +343,38 @@ int	copy_tabs(catstruct *catin, catstruct *catout)
   return flag;
   }
 
+
+/****** copy_tabs_blind *******************************************************
+PROTO	int copy_tabs(catstruct *catin, catstruct *catout)
+PURPOSE	Copy all tables from one catalog to another, without trying to append.
+INPUT	Pointer to the original catalog,
+	Pointer to the destination catalog,
+OUTPUT	RETURN_OK if everything went as expected, and RETURN_ERROR otherwise.
+NOTES	-.
+AUTHOR	E. Bertin (IAP & Leiden observatory)
+VERSION	07/05/2002
+ ***/
+int	copy_tabs_blind(catstruct *catin, catstruct *catout)
+
+  {
+   tabstruct	*tab;
+   int		i, ntab;
+
+  if (!catin->tab)
+    return RETURN_ERROR;
+
+  tab = catin->tab;	/* don't skip the primary header */
+  ntab = catin->ntab;
+  for (i=ntab; i--;)
+    {
+    copy_tab_fromptr(tab, catout, 0);
+    tab=tab->nexttab;
+    }
+
+  return RETURN_OK;
+  }
+
+
 /****** free_tab ***************************************************************
 PROTO	void free_tab(tabstruct *tab)
 PURPOSE	Free memory associated to a table pointer.
@@ -274,15 +382,15 @@ INPUT	Pointer to the table.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/02/96
+VERSION	28/02/2000
  ***/
 void	free_tab(tabstruct *tab)
 
   {
-
+  free_body(tab);
   free(tab->naxisn);
   free(tab->headbuf);
-  free(tab->bodybuf);
+  free(tab->compress_buf);
   remove_keys(tab);
   free(tab);
 
@@ -439,7 +547,7 @@ int	remove_tabs(catstruct *cat)
   }
 
 
-/****** update_tab *************************************************************
+/****** update_tab ************************************************************
 PROTO	int update_tab(tabstruct *tab)
 PURPOSE	Update a table according to what's in the keys.
 INPUT	Table structure.
@@ -498,7 +606,7 @@ int	update_tab(tabstruct *tab)
   }
 
 
-/****** name_to_tab ************************************************************
+/****** name_to_tab ***********************************************************
 PROTO	tabstruct *name_to_tab(catstruct *cat, char *tabname, int seg)
 PURPOSE	Name search of a table in a catalog.
 INPUT	Pointer to the catalog,
@@ -506,7 +614,7 @@ INPUT	Pointer to the catalog,
 	Table segment (0 = first).
 OUTPUT	The table pointer if the name was matched, and NULL otherwise.
 NOTES	-
-VERSION	25/04/97
+VERSION	12/06/2001
  ***/
 tabstruct	*name_to_tab(catstruct *cat, char *tabname, int seg)
 
@@ -514,7 +622,9 @@ tabstruct	*name_to_tab(catstruct *cat, char *tabname, int seg)
    tabstruct	*tab;
    int		i;
 
-  tab = cat->tab;
+  if (!(tab = cat->tab))
+    return NULL;
+
   for (i=cat->ntab; strcmp(tabname,tab->extname) && i--;)
     while (!(tab=tab->nexttab)->nseg);
 
@@ -594,7 +704,7 @@ INPUT	File pointer.
 OUTPUT	Table size (bytes)
 NOTES	-.
 AUTHOR	E.R. Deul (Leiden observatory)
-VERSION	??/??/96
+VERSION	05/06/200`
  ***/
 int tab_row_len(char *file, char *tabname)
 
@@ -609,7 +719,7 @@ int tab_row_len(char *file, char *tabname)
 	  free_tab(tab);
        }
        close_cat(tcat);
-       free_cat(tcat,1);
+       free_cat(&tcat,1);
     }
     return retcode;
 }

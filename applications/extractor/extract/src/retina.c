@@ -9,10 +9,15 @@
 *
 *	Contents:	functions dealing with retinal analysis of the data.
 *
-*	Last modify:	28/08/98
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -20,7 +25,7 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"fits/fitscat.h"
 #include	"bpro.h"
 #include	"image.h"
 #include	"retina.h"
@@ -92,7 +97,7 @@ retistruct	*getretina(char *filename)
   QMALLOC(retina->pix, float, retina->bpann->nn[0]);
 
   close_cat(fcat);
-  free_cat(fcat,1);
+  free_cat(&fcat,1);
 
   return retina;
   }

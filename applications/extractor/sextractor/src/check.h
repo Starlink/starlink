@@ -9,7 +9,7 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	05/09/97
+*	Last modify:	15/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -33,9 +33,11 @@ typedef struct structcheck
 
 /*------------------------------- functions ---------------------------------*/
 
-checkstruct	*initcheck(picstruct *, char *, checkenum);
+checkstruct	*initcheck(char *, checkenum, int next);
 
 void		addcheck(checkstruct *, float *, int,int, int,int, float),
 		blankcheck(checkstruct *, PIXTYPE *, int,int,int,int,PIXTYPE),
-		endcheck(picstruct *field, checkstruct *),
+		endcheck(checkstruct *),
+		reendcheck(picstruct *field, checkstruct *),
+		reinitcheck(picstruct *, checkstruct *),
 		writecheck(checkstruct *, PIXTYPE *, int);

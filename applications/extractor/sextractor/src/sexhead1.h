@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, DeNIS/LDAC.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	header (FITS format #1) and templates for catalog data.
 *
-*	Last modify:	24/10/97
+*	Last modify:	16/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -41,6 +41,12 @@ keystruct	headkey1[] = {
 	&ddummy, H_EXPO, T_DOUBLE, "%15G"},
   {"CROTA2", "CCW ANGLE FROM Y-IMAGE TO Y-WORLD",
 	&ddummy, H_EXPO, T_DOUBLE, "%15G"},
+  {"FITSFILE", "File name of the analysed image",
+	thecat.image_name, H_STRING, T_STRING, "%-18s"},
+  {"FITSEXT ", "FITS Extension number",
+	&thecat.currext, H_INT, T_LONG, "%3d"},
+  {"FITSNEXT", "Number of FITS image extensions in file",
+	&thecat.next, H_INT, T_LONG, "3d"},
   {"SEXIMASX", "IMAGE WIDTH (PIXELS)",
 	&thefield1.width, H_INT, T_LONG, "%10d"},
   {"SEXIMASY", "IMAGE HEIGHT (PIXELS)",
@@ -54,7 +60,7 @@ keystruct	headkey1[] = {
   {"SEXSFWHM", "SEEING FWHM (ARCSEC)",
 	&prefs.seeing_fwhm, H_EXPO, T_DOUBLE, "%12G"},
   {"SEXNNWF ", "CLASSIFICATION NNW FILENAME",
-	cat.nnw_name, H_STRING, T_STRING, "%18s"},
+	thecat.nnw_name, H_STRING, T_STRING, "%18s"},
   {"SEXGAIN ", "GAIN (IN E- PER ADU)",
 	&prefs.gain, H_EXPO, T_DOUBLE, "%7.3F"},
   {"SEXBKGND", "MEDIAN BACKGROUND (ADU)",
@@ -64,7 +70,7 @@ keystruct	headkey1[] = {
   {"SEXBKTHD", "EXTRACTION THRESHOLD (ADU)",
 	&thefield2.thresh, H_EXPO, T_FLOAT, "%12G"},
   {"SEXCONFF", "CONFIGURATION FILENAME",
-	cat.prefs_name, H_STRING, T_STRING, "%18s"},
+	thecat.prefs_name, H_STRING, T_STRING, "%18s"},
   {"SEXDETT ", "DETECTION TYPE",
 	"CCD", H_STRING, T_STRING, "%s"},
   {"SEXTHLDT", "THRESHOLD TYPE",
@@ -78,7 +84,7 @@ keystruct	headkey1[] = {
   {"SEXCONVN", "CONVOLUTION NORM. FLAG",
 	&prefs.filter_flag, H_BOOL, T_LONG, "%1s"},
   {"SEXCONVF", "CONVOLUTION FILENAME",
-	cat.filter_name, H_STRING, T_STRING, "%18s"},
+	thecat.filter_name, H_STRING, T_STRING, "%18s"},
   {"SEXDBLDN", "NUMBER OF SUB-THRESHOLDS",
 	&prefs.deblend_nthresh, H_INT, T_LONG, "%3d"},
   {"SEXDBLDC", "CONTRAST PARAMETER",
@@ -122,10 +128,10 @@ keystruct	headkey1[] = {
   {"SEXISAPR", "ISO-APER RATIO",
 	 &ddummy, H_FLOAT, T_DOUBLE, "%4.2f"},
   {"SEXNDET ", "NB OF DETECTIONS",
-	&cat.ndetect, H_INT, T_LONG, "%9d"},
+	&thecat.ndetect, H_INT, T_LONG, "%9d"},
   {"SEXNFIN ", "NB OF FINAL EXTRACTED OBJECTS",
-	&cat.ntotal, H_INT, T_LONG, "%9d"},
+	&thecat.ntotal, H_INT, T_LONG, "%9d"},
   {"SEXNPARA", "NB OF PARAMETERS PER OBJECT",
-	&cat.nparam, H_INT, T_LONG, "%3d"},
+	&thecat.nparam, H_INT, T_LONG, "%3d"},
   {""}};
 

@@ -5,14 +5,18 @@
 *
 *	Part of:	A program using neural networks.
 *
-*	Author:		E.BERTIN, Institut d'Astrophysique de Paris.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Implementation of Kohonen's Self Organizing Map (V3.0).
 *
-*	Last modify:	28/11/98
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,7 +25,8 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"fits/fitscat.h"
+#include	"prefs.h"
 #include	"som.h"
 
 /********************************* som_phot **********************************/
@@ -670,12 +675,13 @@ somstruct	*som_load(char *filename)
 
 /* But don't touch my arrays!! */
   blank_keys(tab);
-  free_cat(cat, 1);
+  free_cat(&cat, 1);
 
   return som;
 
 headerror:
   error(EXIT_FAILURE, "*Error*: Incorrect or obsolete SOM data in ", filename);
+  return NULL;
   }
 
 

@@ -9,10 +9,15 @@
 *
 *	Contents:	general functions for handling FITS file headers.
 *
-*	Last modify:	13/03/99
+*	Last modify:	19/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef	HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -20,7 +25,8 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-/******* get_head **************************************************************
+
+/******* get_head *************************************************************
 PROTO	int get_head(tabstruct *tab)
 PURPOSE	Read a FITS header.
 INPUT	Table structure.
@@ -73,21 +79,23 @@ int	get_head(tabstruct *tab)
   }
 
 
-/****** read_fitsbasic *********************************************************
+/****** read_fitsbasic ********************************************************
 PROTO	void readbasic_head(tabstruct *tab)
 PURPOSE	Read the current FITS header basic keywords.
 INPUT	pointer to catstruct.
 OUTPUT	-.
 NOTES	-.
-AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	08/02/96
+AUTHOR	E. Bertin (IAP)
+VERSION	29/06/2002
  ***/
 void	readbasic_head(tabstruct *tab)
 
   {
+   static char	str[80];
    catstruct	*cat;
    char		key[12];
-   int		i, tabsize;
+   int		i;
+   KINGSIZE_T	tabsize;
 
   if (!(cat = tab->cat))
     error(EXIT_FAILURE, "*Internal Error*: Table has no parent catalog","!");
@@ -136,13 +144,39 @@ void	readbasic_head(tabstruct *tab)
   tab->extname[0] = (char)'\0';
   fitsread(tab->headbuf, "EXTNAME ", tab->extname, H_STRING, T_STRING);
 
-  tab->tabsize = tab->bytepix*tab->gcount*(tab->pcount+tabsize);
+  tab->tabsize = tab->bytepix*tab->gcount*((size_t)tab->pcount+tabsize);
+
+/* Scaling parameters for basic FITS integer arrays */
+  tab->bscale = 1.0;
+  fitsread(tab->headbuf, "BSCALE ", &tab->bscale, H_FLOAT, T_DOUBLE);
+  tab->bzero = 0.0;
+  fitsread(tab->headbuf, "BZERO  ", &tab->bzero, H_FLOAT, T_DOUBLE);
+
+/* Custom basic FITS parameters */
+  tab->bitsgn = 1;
+  fitsread(tab->headbuf, "BITSGN  ", &tab->bitsgn, H_INT, T_LONG);
+
+  if (fitsread(tab->headbuf, "IMAGECOD", str, H_STRING, T_STRING)==RETURN_OK)
+    {
+    if (!strcmp(str, "NONE"))
+      tab->compress_type = COMPRESS_NONE;
+    else if (!strcmp(str, "BASEBYTE"))
+      tab->compress_type = COMPRESS_BASEBYTE;
+    else if (!strcmp(str, "PREV_PIX"))
+      tab->compress_type = COMPRESS_PREVPIX;
+    else
+      warning("Compression skipped: unknown IMAGECOD parameter:", str);
+    }
+
+/* Checksum */
+  if (fitsread(tab->headbuf, "DATASUM ", str, H_STRING, T_STRING)==RETURN_OK)
+    tab->bodysum = (unsigned int)atoi(str);
 
   return;
   }
 
 
-/******* readbintabparam_head **************************************************
+/******* readbintabparam_head *************************************************
 PROTO	int readbintabparam_head(tabstruct *tab)
 PURPOSE	Read the current FITS header parameters concerning the binary-table.
 INPUT	pointer to tabstruct.
@@ -271,22 +305,30 @@ int	readbintabparam_head(tabstruct *tab)
   }
 
 
-/****** update_head ************************************************************
+/****** update_head ***********************************************************
 PROTO	int update_head(tabstruct *tab)
 PURPOSE	Update a FITS header according to what's in the table.
 INPUT	Table structure.
 OUTPUT	RETURN_OK if tab is a binary table, or RETURN_ERROR otherwise.
 NOTES	The headbuf pointer in the tabstruct might be reallocated.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	12/05/97
+VERSION	19/12/2002
  ***/
 int	update_head(tabstruct *tab)
 
   {
    keystruct	*key;
    tabstruct	*ctab;
-   int		i,j,n, endpos, naxis1;
+   int		i,j,n,nk, naxis1;
    static char	strk[82], str[82];
+   char		*buf;
+
+/*Update EXTNAME, the table name */
+  if (*tab->extname)
+    {
+    addkeywordto_head(tab, "EXTNAME ", "EXTENSION NAME");
+    fitswrite(tab->headbuf, "EXTNAME ", tab->extname, H_STRING, T_STRING);
+    }
 
 /* If not a binary table, do only a few basic things */
   if ((tab->naxis != 2)
@@ -294,21 +336,14 @@ int	update_head(tabstruct *tab)
 	|| (tab->tfields == 0)
 	|| strncmp(tab->xtension, "BINTABLE", 8))
     {
-    fitsadd(tab->headbuf, "BITPIX  ", "BITS PER PIXEL");
+    addkeywordto_head(tab, "BITPIX  ", "BITS PER PIXEL");
     fitswrite(tab->headbuf, "BITPIX  ", &tab->bitpix, H_INT, T_LONG);
-    fitsadd(tab->headbuf,"NAXIS   ", "NUMBER OF AXES");
+    addkeywordto_head(tab, "NAXIS   ", "NUMBER OF AXES");
     fitswrite(tab->headbuf, "NAXIS   ", &tab->naxis, H_INT, T_LONG);
     for (i=0; i<tab->naxis; i++)
       {
       sprintf(strk, "NAXIS%-3d", i+1);
-      if (fitsfind(tab->headbuf, strk) == RETURN_ERROR
-	&& (fitsfind(tab->headbuf, "END     ")+1)*80 >= tab->headnblock*FBSIZE)
-        {
-        tab->headnblock++;
-        QREALLOC(tab->headbuf, char, tab->headnblock*FBSIZE);
-        memset(tab->headbuf + (tab->headnblock-1)*FBSIZE, ' ', FBSIZE);
-        }
-      fitsadd(tab->headbuf, strk, "NUMBER OF ELEMENTS ALONG THIS AXIS");
+      addkeywordto_head(tab, strk, "NUMBER OF ELEMENTS ALONG THIS AXIS");
       fitswrite(tab->headbuf, strk, &tab->naxisn[i], H_INT, T_LONG);
       }
     return RETURN_ERROR;
@@ -323,12 +358,6 @@ int	update_head(tabstruct *tab)
   fitsremove(tab->headbuf, "TDIM???");
   fitsremove(tab->headbuf, "TDISP???");
 
-/*Update EXTNAME, the table name */
-  if (*tab->extname)
-    {
-    fitsadd(tab->headbuf, "EXTNAME ", "TABLE NAME");
-    fitswrite(tab->headbuf, "EXTNAME ", tab->extname, H_STRING, T_STRING);
-    }
 
 /*Change NAXIS1 in order to take into account changes in width*/
   naxis1 = 0;
@@ -357,30 +386,15 @@ int	update_head(tabstruct *tab)
   if (!key)
     return RETURN_ERROR;
 
-  endpos = fitsfind(tab->headbuf, "END     ");
   if (tab->nkey>1000)
      warning("Too many output keys, trashing the ones bejond 999", "");
   for (i=0; i<MIN(999,tab->nkey); i++)
     {
-/*--Check that the new parameters will fit in the allocated memory space*/
-    endpos += 2;
-    if (*key->unit)
-      endpos++;
-    if (*key->printf)
-      endpos++;
-    if (key->naxis>1)
-      endpos++;
-    if (endpos >= (n=tab->headnblock)*(FBSIZE/80))
-      {
-      QREALLOC(tab->headbuf, char, (n+1)*FBSIZE);
-      memset(tab->headbuf + n*FBSIZE, ' ', FBSIZE);
-      tab->headnblock++;
-      }
     sprintf(strk, "TTYPE%-3d", i+1);
-    fitsadd(tab->headbuf, strk, key->comment);
+    addkeywordto_head(tab, strk, key->comment);
     fitswrite(tab->headbuf, strk, key->name, H_STRING, T_STRING);
     sprintf(strk, "TFORM%-3d", i+1);
-    fitsadd(tab->headbuf, strk, "");
+    addkeywordto_head(tab, strk, "");
     tformof(str, key->ttype, key->nbytes/t_size[key->ttype]);
     fitswrite(tab->headbuf, strk, str, H_STRING, T_STRING);
     if (key->naxis>1)
@@ -388,7 +402,7 @@ int	update_head(tabstruct *tab)
        char	*str2, *str2lim;
 
       sprintf(strk, "TDIM%-3d", i+1);
-      fitsadd(tab->headbuf, strk, "");
+      addkeywordto_head(tab, strk, "");
       sprintf(str, "(");
       str2 = str+1;
       str2lim = str+70;	/* Prevent an excessively large string */
@@ -403,22 +417,38 @@ int	update_head(tabstruct *tab)
     if (*key->unit)
       {
       sprintf(strk, "TUNIT%-3d", i+1);
-      fitsadd(tab->headbuf, strk, "");
+      addkeywordto_head(tab, strk, "");
       fitswrite(tab->headbuf, strk, key->unit, H_STRING, T_STRING);
       }
     if (*key->printf)
       {
       sprintf(strk, "TDISP%-3d", i+1);
-      fitsadd(tab->headbuf, strk, "");
+      addkeywordto_head(tab, strk, "");
       fitswrite(tab->headbuf, strk, printftotdisp(key->printf),
 	H_STRING, T_STRING);
       }
     key = key->nextkey;
     }
 
-/*Remove any memory allocated in excess (and correct headnblock by the way)*/
-  if ((n = endpos/(FBSIZE/80)+1) < tab->headnblock)
-    QREALLOC(tab->headbuf, char, (tab->headnblock = n)*FBSIZE);
+/*Finally re-compute CHECKSUM if present */
+  if (fitsfind(tab->headbuf, "CHECKSUM")==RETURN_OK)
+    {
+    unsigned int	sum;
+
+    if (tab->bodysum)
+      {
+      sprintf(str, "%u", tab->bodysum);
+      fitswrite(tab->headbuf, "DATASUM ", str, H_STRING, T_STRING);
+      }
+    sum = tab->bodysum;
+/*-- Now the header */
+    buf = tab->headbuf;
+    for (i=tab->headnblock; i--; buf+=FBSIZE)
+      sum = compute_blocksum(buf, sum);
+/*-- Complement to 1 */
+    encode_checksum(~sum, str);
+    fitswrite(tab->headbuf, "CHECKSUM", str, H_STRING, T_STRING);
+    }
 
 /*That may be enough for now; to be continued...*/
 
@@ -426,7 +456,57 @@ int	update_head(tabstruct *tab)
   }
 
 
-/****** addkeyto_head **********************************************************
+/****** prim_head *************************************************************
+PROTO	int prim_head(tabstruct *tab)
+PURPOSE	Update a FITS header to make it "primary" (not extension)
+INPUT	Table structure.
+OUTPUT	RETURN_OK if tab header was already primary, or RETURN_ERROR otherwise.
+NOTES	-.
+AUTHOR	E. Bertin (IAP & Leiden observatory)
+VERSION	08/05/2002
+ ***/
+int	prim_head(tabstruct *tab)
+
+  {
+  if (!tab->headbuf)
+    return RETURN_ERROR;
+  if (!strncmp(tab->headbuf, "XTENSION",8))
+      {
+      strncpy(tab->headbuf, "SIMPLE  =                    T  "
+	"/ This is a FITS file                            ", 80);
+      return RETURN_ERROR;
+      }
+  return RETURN_OK;
+  }
+
+
+/****** ext_head *************************************************************
+PROTO	int ext_head(tabstruct *tab)
+PURPOSE	Update a FITS header to make it "extension" (not primary)
+INPUT	Table structure.
+OUTPUT	RETURN_OK if tab header was already extension, or RETURN_ERROR
+	otherwise.
+NOTES	-.
+AUTHOR	E. Bertin (IAP & Leiden observatory)
+VERSION	08/05/2002
+ ***/
+int	ext_head(tabstruct *tab)
+
+  {
+  if (!tab->headbuf)
+    return RETURN_ERROR;
+  if (!strncmp(tab->headbuf, "SIMPLE  ",8))
+      {
+      strncpy(tab->headbuf, "XTENSION= 'IMAGE   '           "
+		"/ Image extension                                ", 80);
+      return RETURN_ERROR;
+      }
+
+  return RETURN_OK;
+  }
+
+
+/****** addkeyto_head *********************************************************
 PROTO	int addkeyto_head(tabstruct *tab, keystruct *key)
 PURPOSE	Add a keyword and its value to a table header.
 INPUT	Table structure,
@@ -435,14 +515,38 @@ OUTPUT	Line position in the FITS header.
 NOTES	The headbuf pointer in the tabstruct might be reallocated.
 	Pre-existing keywords are overwritten (but not their comments).
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	05/02/97
+VERSION	11/05/2002
  ***/
 int	addkeyto_head(tabstruct *tab, keystruct *key)
 
   {
    int	n;
 
-  if (fitsfind(tab->headbuf, key->name) == RETURN_ERROR
+  n = addkeywordto_head(tab, key->name, key->comment);
+  fitswrite(tab->headbuf, key->name, key->ptr, key->htype, key->ttype);
+
+  return n;
+  }
+
+
+/****** addkeyto_head *********************************************************
+PROTO	int addkeywordto_head(tabstruct *tab, char *keyword, char *comment)
+PURPOSE	Add a keyword and a comment to a table header.
+INPUT	Table structure,
+	String containing the keyword,
+	String containing the comment.
+OUTPUT	Line position in the FITS header.
+NOTES	The headbuf pointer in the tabstruct might be reallocated.
+	Pre-existing keywords are overwritten (but not their comments).
+AUTHOR	E. Bertin (IAP & Leiden observatory)
+VERSION	11/05/2002
+ ***/
+int	addkeywordto_head(tabstruct *tab, char *keyword, char *comment)
+
+  {
+   int	n;
+
+  if (fitsfind(tab->headbuf, keyword) == RETURN_ERROR
 	&& (fitsfind(tab->headbuf, "END     ")+1)*80 >= tab->headnblock*FBSIZE)
     {
     tab->headnblock++;
@@ -450,14 +554,13 @@ int	addkeyto_head(tabstruct *tab, keystruct *key)
     memset(tab->headbuf + (tab->headnblock-1)*FBSIZE, ' ', FBSIZE);
     }
 
-  n = fitsadd(tab->headbuf, key->name, key->comment);
-  fitswrite(tab->headbuf, key->name, key->ptr, key->htype, key->ttype);
+  n = fitsadd(tab->headbuf, keyword, comment);
 
   return n;
   }
 
 
-/****** tformof ****************************************************************
+/****** tformof ***************************************************************
 PROTO	int tformof(char *str, t_type ttype, int n)
 PURPOSE	Return the ``TFORM'' string corresponding to a t_type
 	and the number of elements.
@@ -497,7 +600,7 @@ int	tformof(char *str, t_type ttype, int n)
   }
 
 
-/****** tsizeof ****************************************************************
+/****** tsizeof ***************************************************************
 PROTO	int tsizeof(char *str)
 PURPOSE	Return the size of a binary-table field from its ``TFORM''.
 INPUT	TFORM string (see the FITS documentation).
@@ -530,14 +633,14 @@ int	tsizeof(char *str)
   }
 
 
-/****** ttypeof ****************************************************************
+/****** ttypeof ***************************************************************
 PROTO	t_type ttypeof(char *str)
 PURPOSE	Give the ``t_type'' of a binary-table field from its ``TFORM''.
 INPUT	TFORM string (see the FITS documentation).
 OUTPUT	size in bytes, or RETURN_ERROR if the TFORM is unknown.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/03/99
+VERSION	17/03/2002
  ***/
 t_type	ttypeof(char *str)
 
@@ -554,13 +657,13 @@ t_type	ttypeof(char *str)
     case 'E':				return	T_FLOAT;
     case 'D':				return	T_DOUBLE;
     case 'A':				return	T_STRING;
-    default:				return	RETURN_ERROR;
+    default:				return	(t_type)RETURN_ERROR;
     }
 
   }
 
 
-/****** tdisptoprintf **********************************************************
+/****** tdisptoprintf *********************************************************
 PROTO	char	*tdisptoprintf(char *tdisp)
 PURPOSE	Convert the ``TDISP'' FITS format to the printf() format.
 INPUT	TDISP format string (see the FITS documentation).
@@ -637,7 +740,7 @@ char	*tdisptoprintf(char *tdisp)
   }
 
 
-/****** printftotdisp **********************************************************
+/****** printftotdisp *********************************************************
 PROTO	char	*printftotdisp(char *tdisp)
 PURPOSE	Convert the printf() format to the ``TDISP'' FITS format.
 INPUT	printf() format string (see e.g.  K&R).

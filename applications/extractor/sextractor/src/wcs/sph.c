@@ -1,7 +1,7 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995, Mark Calabretta
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -86,10 +86,16 @@
 *                           0: Success.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: sph.c,v 2.1 1995/11/09 03:17:43 mcalabre Exp $
+*   $Id: sph.c,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
 *===========================================================================*/
 
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
+
+#include <math.h>
 #include "wcstrig.h"
+#include "sph.h"
 
 #ifndef __STDC__
 #ifndef const

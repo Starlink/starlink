@@ -5,14 +5,19 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP/Leiden.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	10/05/99
+*	Last modify:	15/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -20,7 +25,7 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"fits/fitscat.h"
 #include	"astrom.h"
 #include	"check.h"
 
@@ -135,25 +140,54 @@ void	blankcheck(checkstruct *check, PIXTYPE *mask, int w,int h,
 /*
 initialize check-image.
 */
-checkstruct	*initcheck(picstruct *field, char *filename,
-			checkenum check_type)
+checkstruct	*initcheck(char *filename, checkenum check_type, int next)
+
+  {
+   catstruct	*fitscat;
+   checkstruct	*check;
+
+  QCALLOC(check, checkstruct, 1);
+
+  strcpy(check->filename, filename);
+  check->type = check_type;
+
+  if (next>1)
+/*-- Create a "pure" primary HDU */
+    {
+    fitscat = new_cat(1);
+    init_cat(fitscat);
+    strcpy(fitscat->filename, filename);
+    fitsadd(fitscat->tab->headbuf, "NEXTEND ", "Number of extensions");
+    fitswrite(fitscat->tab->headbuf, "NEXTEND ", &next, H_INT, T_LONG);
+    if (open_cat(fitscat, WRITE_ONLY) != RETURN_OK)
+      error(EXIT_FAILURE,"*Error*: cannot open for writing ", filename);
+    save_tab(fitscat, fitscat->tab);
+    check->file = fitscat->file;
+    fitscat->file = NULL;
+    free_cat(&fitscat, 1);
+    }
+  else
+    if (!(check->file = fopen(check->filename, "wb")))
+      error(EXIT_FAILURE, "*Error*: Cannot open for output ", check->filename);
+
+  return check;
+  }
+
+
+/******************************** reinitcheck ********************************/
+/*
+initialize check-image (for subsequent writing).
+*/
+void	reinitcheck(picstruct *field, checkstruct *check)
 
   {
    astromstruct	*as;
-   checkstruct	*check;
    char		*buf;
    int		i, ival;
    size_t	padsize;
    double	dval;
    USHORT	*ptri;
    PIXTYPE	*ptrf;
-
-  QCALLOC(check, checkstruct, 1);
-
-  strcpy(check->filename, filename);
-  check->type = check_type;
-  if (!(check->file = fopen(check->filename, "wb")))
-    error(EXIT_FAILURE, "*Error*: Cannot open for output ", check->filename);
 
 /* Inherit the field FITS header */
   check->fitsheadsize = field->fitsheadsize;
@@ -164,11 +198,11 @@ checkstruct	*initcheck(picstruct *field, char *filename,
   dval = 1.0;fitswrite(check->fitshead, "BSCALE  ", &dval, H_FLOAT, T_DOUBLE);
   dval = 0.0;fitswrite(check->fitshead, "BZERO   ", &dval, H_FLOAT, T_DOUBLE);
   ival = 1;fitswrite(check->fitshead, "BITSGN  ", &ival, H_INT, T_LONG);
-  if (field->compress_type != COMPRESS_NONE)
+  if (field->compress_type != ICOMPRESS_NONE)
     fitswrite(check->fitshead, "IMAGECOD", "NONE", H_STRING, T_STRING);
   fitswrite(check->fitshead, "ORIGIN  ", BANNER, H_STRING, T_STRING);
 
-  switch(check_type)
+  switch(check->type)
     {
     case CHECK_IDENTICAL:
     case CHECK_BACKGROUND:
@@ -278,27 +312,24 @@ checkstruct	*initcheck(picstruct *field, char *filename,
       check->npix = check->width*check->height;
       QMALLOC(ptrf, PIXTYPE, check->npix);
       check->pix = (void *)ptrf;
-      if (check_type==CHECK_MINIBACKRMS)
+      if (check->type==CHECK_MINIBACKRMS)
         memcpy(check->pix, field->sigma, check->npix*sizeof(float));
       else
         memcpy(check->pix, field->back, check->npix*sizeof(float));
       QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
       free(check->fitshead);
-#     ifdef BSWAP
+      if (bswapflag)
         swapbytes(check->pix, sizeof(float), (int)check->npix);
-#     endif
       QFWRITE(check->pix,check->npix*sizeof(float),check->file,
 	check->filename);
 /*---- Put the buffer back to its original state */
-#     ifdef BSWAP
+      if (bswapflag)
         swapbytes(check->pix, sizeof(float), (int)check->npix);
-#     endif
       free(check->pix);
       QCALLOC(buf, char, FBSIZE);
       padsize = (FBSIZE -((check->npix*sizeof(PIXTYPE))%FBSIZE))% FBSIZE;
       if (padsize)
         QFWRITE (buf, padsize, check->file, check->filename);
-      fclose(check->file);
       free(buf);
       break;
 
@@ -320,8 +351,7 @@ checkstruct	*initcheck(picstruct *field, char *filename,
       error(EXIT_FAILURE, "*Internal Error* in ", "initcheck()!");
     }
 
-
-  return check;
+  return;
   }
 
 
@@ -349,24 +379,22 @@ void	writecheck(checkstruct *check, PIXTYPE *data, int w)
     data = check->line;
     }
 
-# ifdef BSWAP
-  swapbytes(data, sizeof(PIXTYPE), w);
-# endif
+  if (bswapflag)
+    swapbytes(data, sizeof(PIXTYPE), w);
   QFWRITE(data, w*sizeof(PIXTYPE), check->file, check->filename);
-# ifdef BSWAP
-/* Put the buffer back to its original state */
-  swapbytes(data, sizeof(PIXTYPE), w);
-# endif
+  if (bswapflag)
+/*-- Put the buffer back to its original state */
+    swapbytes(data, sizeof(PIXTYPE), w);
 
   return;
   }
 
 
-/********************************* endcheck **********************************/
+/********************************* reendcheck ********************************/
 /*
-close check-image.
+Finish current check-image.
 */
-void	endcheck(picstruct *field, checkstruct *check)
+void	reendcheck(picstruct *field, checkstruct *check)
   {
    char		*buf;
    size_t	padsize;
@@ -396,9 +424,8 @@ void	endcheck(picstruct *field, checkstruct *check)
     case CHECK_PCPROTOS:
     case CHECK_PCOPROTOS:
     case CHECK_ASSOC:
-#     ifdef BSWAP
-      swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
-#     endif
+      if (bswapflag)
+        swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
       QFWRITE(check->pix,check->npix*sizeof(PIXTYPE),
 		check->file,check->filename);
       free(check->pix);
@@ -406,9 +433,8 @@ void	endcheck(picstruct *field, checkstruct *check)
       break;
 
     case CHECK_SEGMENTATION:
-#     ifdef BSWAP
-      swapbytes(check->pix, sizeof(USHORT), (int)check->npix);
-#     endif
+      if (bswapflag)
+        swapbytes(check->pix, sizeof(USHORT), (int)check->npix);
       QFWRITE(check->pix,check->npix*sizeof(USHORT),
 		check->file,check->filename);
       free(check->pix);
@@ -429,9 +455,8 @@ void	endcheck(picstruct *field, checkstruct *check)
       }
 
     case CHECK_MAPSOM:
-#     ifdef BSWAP
-      swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
-#     endif
+      if (bswapflag)
+        swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
       QFWRITE(check->pix,check->npix*sizeof(PIXTYPE),
 		check->file,check->filename);
       free(check->pix);
@@ -445,8 +470,19 @@ void	endcheck(picstruct *field, checkstruct *check)
   QCALLOC(buf, char, FBSIZE);
   if (padsize)
     QFWRITE (buf, padsize, check->file, check->filename);
-  fclose(check->file);
   free(buf);
+
+  return;
+  }
+
+/********************************* endcheck **********************************/
+/*
+close check-image.
+*/
+void	endcheck(checkstruct *check)
+  {
+
+  fclose(check->file);
   free(check);
 
   return;

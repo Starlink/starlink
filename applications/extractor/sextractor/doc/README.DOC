@@ -3,6 +3,8 @@ is rather a ``proto-documentation''. Chapters are missing. The english
 is so-so. At least I tried to remove any obsolete information from V1.0.
 I will progressively upgrade the documentation during the coming months.
 In the meanwhile, you may still retrieve some basic information from the
-old documentation included in V1.0 archive.
+old documentation included in V1.0 archive:
+ftp://ftp/pub/from_users/bertin/sextractor/sex_1.0a.tar.gz
+The SExtractor handbook from Benne Holwerda is also included for convenience.
 
 					Emmanuel Bertin.

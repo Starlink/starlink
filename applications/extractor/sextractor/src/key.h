@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Keyword structure.
 *
-*	Last modify:	04/11/97
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -25,7 +25,7 @@ typedef struct
   {
   char		name[16];
   enum  {P_FLOAT, P_INT, P_STRING, P_BOOL, P_KEY, P_INTLIST, P_FLOATLIST,
-	P_KEYLIST, P_STRINGLIST} type;
+	P_BOOLLIST, P_KEYLIST, P_STRINGLIST} type;
   void		*ptr;			/* Pointer to the keyword value */
   int		imin, imax;		/* Range for int's */
   double	dmin, dmax;		/* Range for doubles */

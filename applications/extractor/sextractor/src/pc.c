@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Stuff related to Principal Component Analysis (PCA).
 *
-*	Last modify:	06/09/99
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,7 +25,8 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"check.h"
 #include	"image.h"
 #include	"poly.h"
@@ -174,6 +179,7 @@ pcstruct	*pc_load(catstruct *cat)
 
 headerror:
   error(EXIT_FAILURE, "*Error*: Incorrect or obsolete PC data in ", filename);
+  return NULL;
   }
 
 

@@ -9,10 +9,14 @@
 *
 *	Contents:	Functions related to the management of keys.
 *
-*	Last modify:	13/03/99
+*	Last modify:	13/06/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
 
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -193,7 +197,7 @@ OUTPUT	A pointer to the relevant key, or NULL if the desired key is not
 NOTES	If key->ptr is not NULL, the function doesn't do anything.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
         E.R. Deul (Sterrewacht Leiden) (Added open_cat error checking)
-VERSION	13/03/99
+VERSION	18/02/2000
  ***/
 keystruct *read_key(tabstruct *tab, char *keyname)
 
@@ -202,9 +206,7 @@ keystruct *read_key(tabstruct *tab, char *keyname)
    keystruct	*key;
    char		*buf, *ptr, *fptr,*fptr0;
    int		i,j, larray,narray,size;
-#ifdef BSWAP
    int		esize;
-#endif
 
   if (!(key = name_to_key(tab, keyname)))
     return NULL;
@@ -247,10 +249,11 @@ keystruct *read_key(tabstruct *tab, char *keyname)
     {
     QFREAD(buf, larray, cat->file, cat->filename);
     fptr = fptr0;
-#ifdef BSWAP
-    esize = t_size[key->ttype];
-    swapbytes(fptr0, esize, size/esize); 
-#endif
+    if (bswapflag)
+      {
+      esize = t_size[key->ttype];
+      swapbytes(fptr0, esize, size/esize); 
+      }
     for (j = size; j--;)
       *(ptr++) = *(fptr++);
     }
@@ -274,7 +277,7 @@ NOTES	The array of pointers pointed by keys is filled with pointers
 	A NULL keynames pointer means read ALL keys belonging to the table.
 	A NULL mask pointer means NO selection for reading.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/03/99
+VERSION	18/02/2000
  ***/
 void	read_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 		BYTE *mask)
@@ -285,9 +288,7 @@ void	read_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
    BYTE		*mask2;
    char		*buf, *ptr, *fptr;
    int		i,j,k,n, larray,narray, nb, kflag = 0, size;
-#ifdef BSWAP
    int		esize;
-#endif
 
 /*!! It is not necessarily the original table */
   tab = tab->key->tab;
@@ -377,10 +378,11 @@ void	read_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
           {
           fptr = buf+key->pos;
           ptr = (char *)key->ptr+n*(size=key->nbytes);
-#ifdef BSWAP
-          esize = t_size[key->ttype];
-          swapbytes(fptr, esize, size/esize); 
-#endif
+          if (bswapflag)
+            {
+            esize = t_size[key->ttype];
+            swapbytes(fptr, esize, size/esize); 
+            }
           for (k = size; k--;)
             *(ptr++) = *(fptr++);
           }
@@ -573,7 +575,7 @@ NOTES	This is approximately the same code as for read_keys.
 	A NULL keynames pointer means read ALL keys belonging to the table.
 	A NULL mask pointer means NO selection for reading.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/03/99
+VERSION	18/02/2000
  ***/
 void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 		BYTE *mask, FILE *stream,
@@ -799,9 +801,8 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
           ptr = memcpy(rfield, buf+key->pos, key->nbytes);
           esize = t_size[key->ttype];
           nelem = key->nbytes/esize;
-#ifdef  BSWAP
-          swapbytes(ptr, esize, nelem);
-#endif
+          if (bswapflag)
+            swapbytes(ptr, esize, nelem);
           switch(key->ttype)
             {
             case T_SHORT:

@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Fit the PSF to a detection.
 *
-*	Last modify:	12/11/99
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,7 +25,8 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"check.h"
 #include	"filter.h"
 #include	"image.h"
@@ -254,12 +259,13 @@ psfstruct	*psf_load(char *filename)
 /* But don't touch my arrays!! */
   blank_keys(tab);
 
-  free_cat(cat, 1);
+  free_cat(&cat, 1);
 
   return psf;
 
 headerror:
   error(EXIT_FAILURE, "*Error*: Incorrect or obsolete PSF data in ", filename);
+  return NULL;
   }
 
 

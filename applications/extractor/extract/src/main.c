@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Command-line parsing.
 *
-*	Last modify:	07/10/99
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<ctype.h>
 #include	<stdio.h>
@@ -21,32 +25,35 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 
 #define		SYNTAX \
-"sex <image_name> [-c <configuration_file>] [-<keyword> <value>]"
+EXECUTABLE " <image> [<image2>][-c <configuration_file>][-<keyword> <value>]\n" \
+"> or, to dump a default configuration file:\n" \
+"> " EXECUTABLE " -d \n"
+
+extern const char       notokstr[];
 
 /********************************** main ************************************/
 int	main(int argc, char *argv[])
 
   {
-   int		a, narg, nim;
+   int		a, narg, nim, opt;
    char		**argkey, **argval, *str;
 
   if (argc<2)
     {
-    fprintf(OUTPUT, "\n		%s  Version %s\n", BANNER, VERSION);
-    fprintf(OUTPUT, "\nby  %s\n", COPYRIGHT);
+    fprintf(OUTPUT, "\n         %s  Version %s (%s)\n", BANNER,MYVERSION,DATE);
+    fprintf(OUTPUT, "\nby %s\n", COPYRIGHT);
     fprintf(OUTPUT, "\nFor more information: %s\n", WEBSITE);
-    fprintf(OUTPUT, "Questions or suggestions? %s\n", MAILINGLIST);
+    fprintf(OUTPUT, "Questions or suggestions: %s\n", MAILINGLIST);
     fprintf(OUTPUT, "Mailing-list requests: %s\n", MAILINGLISTREQ);
     error(EXIT_SUCCESS, "SYNTAX: ", SYNTAX);
     }
-
   QMALLOC(argkey, char *, argc);
   QMALLOC(argval, char *, argc);
 
 /*default parameters */
-
   prefs.pipe_flag = 0;
   prefs.nimage_name = 1;
   prefs.image_name[0] = "image";
@@ -55,16 +62,35 @@ int	main(int argc, char *argv[])
 
   for (a=1; a<argc; a++)
     {
-    if (argv[a][0] == '-' && a<(argc-1))
+    if (*(argv[a]) == '-')
       {
-      if (strlen(argv[a])<3)
-        switch((int)tolower((int)argv[a][1]))
+      opt = (int)argv[a][1];
+      if (strlen(argv[a])<3 || opt == '-')
+        {
+        if (opt == '-')
+          opt = (int)tolower((int)argv[a][2]);
+        switch(opt)
           {
-/*-------- Config filename */
-          case 'c':	strcpy(prefs.prefs_name, argv[++a]);
-			break;
-          default:	error(EXIT_SUCCESS,"SYNTAX: ", SYNTAX);
+          case 'c':
+            if (a<(argc-1))
+              strcpy(prefs.prefs_name, argv[++a]);
+            break;
+          case 'd':
+            dumpprefs();
+            exit(EXIT_SUCCESS);
+            break;
+          case 'v':
+            fprintf(OUTPUT, "\n         %s  Version %s (%s)\n",
+			BANNER,MYVERSION,DATE);
+            fprintf(OUTPUT, "\nFor information, please contact: %s\n",
+			COPYRIGHT);
+            error(EXIT_SUCCESS, "SYNTAX: ", SYNTAX);
+            break;
+          case 'h':
+          default:
+            error(EXIT_SUCCESS,"SYNTAX: ", SYNTAX);
           }
+        }
       else
         {
 /*------ Config parameters */
@@ -98,3 +124,4 @@ int	main(int argc, char *argv[])
 
   return EXIT_SUCCESS;
   }
+

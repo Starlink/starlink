@@ -5,20 +5,25 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions dealing with the handling of pixel lists.
 *
-*	Last modify:	30/11/98
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<stdio.h>
 #include	<stdlib.h>
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"plist.h"
 
 

@@ -1,3 +1,9 @@
+May 03: 2.3
+	- Autoconf'ed package.
+	- Dumpable internal config file
+	- Large File Support
+	- Support for MEF files
+
 Feb 01: 2.2
 	- Mostly bug fixes and experimental stuff added
 

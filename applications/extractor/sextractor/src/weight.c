@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Handling of weight maps.
 *
-*	Last modify:	09/05/99
+*	Last modify:	14/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -29,7 +33,7 @@
 Load a weight map and initialize relevant parameters.
 */
 picstruct	*newweight(char *filename, picstruct *reffield,
-			weightenum wtype)
+			weightenum wtype, int nok)
 
   {
    picstruct	*wfield;
@@ -45,7 +49,7 @@ picstruct	*newweight(char *filename, picstruct *reffield,
       break;
 
     case WEIGHT_FROMRMSMAP:
-      wfield = newfield(filename, RMS_FIELD);
+      wfield = newfield(filename, RMS_FIELD, nok);
       if ((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
         error(EXIT_FAILURE,
 	"*Error*: measured frame and weight map have different sizes","");
@@ -53,14 +57,14 @@ picstruct	*newweight(char *filename, picstruct *reffield,
       break;
 
     case WEIGHT_FROMVARMAP:
-      wfield = newfield(filename, VAR_FIELD);
+      wfield = newfield(filename, VAR_FIELD, nok);
       if ((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
         error(EXIT_FAILURE,
 	"*Error*: measured frame and weight map have different sizes","");
       break;
 
     case WEIGHT_FROMWEIGHTMAP:
-      wfield = newfield(filename, WEIGHT_FIELD);
+      wfield = newfield(filename, WEIGHT_FIELD, nok);
       if ((wfield->width!=reffield->width)||(wfield->height!=reffield->height))
         error(EXIT_FAILURE,
 	"*Error*: measured frame and weight map have different sizes","");

@@ -1,7 +1,37 @@
-#ifndef PROJ
-#define PROJ
+/*=============================================================================
+*
+*   WCSLIB - an implementation of the FITS WCS proposal.
+*   Copyright (C) 1995-1999, Mark Calabretta
+*
+*   This library is free software; you can redistribute it and/or modify it
+*   under the terms of the GNU Library General Public License as published
+*   by the Free Software Foundation; either version 2 of the License, or (at
+*   your option) any later version.
+*
+*   This library is distributed in the hope that it will be useful, but
+*   WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library
+*   General Public License for more details.
+*
+*   You should have received a copy of the GNU Library General Public License
+*   along with this library; if not, write to the Free Software Foundation,
+*   Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*
+*   Correspondence concerning WCSLIB may be directed to:
+*      Internet email: mcalabre@atnf.csiro.au
+*      Postal address: Dr. Mark Calabretta,
+*                      Australia Telescope National Facility,
+*                      P.O. Box 76,
+*                      Epping, NSW, 2121,
+*                      AUSTRALIA
+*
+*   Author: Mark Calabretta, Australia Telescope National Facility
+*   IRAF's TNX added by E.Bertin 2000/03/28
+*   $Id: proj.h,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
+*===========================================================================*/
 
-#include "wcstrig.h"
+#ifndef WCSLIB_PROJ
+#define WCSLIB_PROJ
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,8 +41,12 @@ struct prjprm {
    int flag;
    int n;
    double r0;
-   double p[10];
+   double p[200];
    double w[10];
+   struct tnxaxis	*tnx_latcor;
+   struct tnxaxis	*tnx_lngcor;
+   struct poly		*inv_x;
+   struct poly		*inv_y;
 };
 
 #if __STDC__ || defined(__cplusplus)
@@ -91,6 +125,10 @@ struct prjprm {
    int tscset(struct prjprm *);
    int tscfwd(const double, const double, struct prjprm *, double *, double *);
    int tscrev(const double, const double, struct prjprm *, double *, double *);
+   int tnxset(struct prjprm *);
+   int tnxfwd(const double, const double, struct prjprm *, double *, double *);
+   int tnxrev(const double, const double, struct prjprm *, double *, double *);
+   int raw_to_pv(struct prjprm *, double, double, double *, double *);
 #else
    int azpset(), azpfwd(), azprev();
    int tanset(), tanfwd(), tanrev();
@@ -117,24 +155,17 @@ struct prjprm {
    int cscset(), cscfwd(), cscrev();
    int qscset(), qscfwd(), qscrev();
    int tscset(), tscfwd(), tscrev();
+   int tnxset(), tnxfwd(), tnxrev();
 #endif
-
+/*
 extern const char *prjset_errmsg[];
 extern const char *prjfwd_errmsg[];
 extern const char *prjrev_errmsg[];
-
-#ifndef	PI	/* EB 02/06/97 */
-#define PI 3.141592653589793238462643
-#endif		/* EB 02/06/97 */
-#define D2R PI/180.0
-#define R2D 180.0/PI
-#define SQRT2 1.4142135623730950488
-#define SQRT2INV 1.0/SQRT2
-
+*/
 #define PRJSET 137
 
 #ifdef __cplusplus
 };
 #endif
 
-#endif /* PROJ */
+#endif /* WCSLIB_PROJ */

@@ -9,10 +9,15 @@
 *
 *	Contents:	functions for handling FITS keywords.
 *
-*	Last modify:	30/09/99
+*	Last modify:	13/06/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -20,38 +25,62 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
+static char	histokeys[][12] = {"COMMENT ", "HISTORY ", "        ", ""};
+
 /****** fitsadd ***************************************************************
 PROTO	int fitsadd(char *fitsbuf, char *keyword, char *comment)
 PURPOSE	Write a FITS keyword in a fits header.
 INPUT	pointer to the FITS buffer,
 	name of the keyword to be created,
 	a comment to put beyond the slash, or next to a COMMENT or HISTORY.
-OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
+OUTPUT	line position or RETURN_ERROR if the keyword is invalid.
 NOTES	For all keywords except commentary ones (like COMMENT, HISTORY or
 	blank), it is checked that they do not exist already.
 	Enough memory should be provided for the FITS header to contain one
 	more line of 80 char.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/02/96
+VERSION	13/04/2002
  ***/
 int	fitsadd(char *fitsbuf, char *keyword, char *comment)
 
   {
-   static char	histokeys[][12] = {"COMMENT  ", "HISTORY ", "        ", ""};
    char    	*key_ptr;
-   static char	str[82];
-   int     	headpos, commentflag;
+   char		str[82];
+   int     	headpos, headpos2, commentflag,
+		i, n;
 
 
+  if (strcspn(keyword, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_"))
+    return RETURN_ERROR;
   commentflag = findkey(keyword, (char *)histokeys, 12)==RETURN_ERROR?0:1;
-  if (commentflag || (headpos = fitsfind(fitsbuf, keyword)) < 0)
+  if (commentflag || (headpos = fitsfind(fitsbuf, keyword))==RETURN_ERROR)
     {
-    headpos = fitsfind(fitsbuf, "END     ");
+    headpos2 = headpos = fitsfind(fitsbuf, "END     ");
+/*-- Special case of NAXIS parameters */
+    if (!strncmp(keyword, "NAXIS", 5) && keyword[5] && keyword[5] != ' ')
+      {
+      sscanf(keyword, "NAXIS%d", &n);
+/*---- Look for all previous NAXIS parameters */
+      for (i=n; i--;)
+        {
+        sprintf(str, "NAXIS%-3d", i);
+        headpos=fitsfind(fitsbuf, str);
+        if (headpos>0)
+          break;
+        }
+      if (headpos<0)
+/*---- Most likely keyword is NAXIS1 */
+        headpos=fitsfind(fitsbuf, "NAXIS   ");
+      if (headpos>0)
+        headpos++;
+      else
+        return RETURN_ERROR;
+      }
     key_ptr = fitsbuf+80*headpos;
-    memcpy(key_ptr+80, key_ptr, 80);
+    memmove(key_ptr+80, key_ptr, 80*(headpos2-headpos+1));
 
     if (commentflag)
-      sprintf(str, "%-8.8s%-72.72s",
+      sprintf(str, "%-8.8s %-71.71s",
 	keyword, comment?comment:" ");
     else
       sprintf(str, "%-8.8s=                      / %-47.47s",
@@ -131,7 +160,7 @@ NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory),
 	E.R. Deul
         E.R. Deul - Handling of NaN
-VERSION	15/09/97
+VERSION	07/08/2001
  ***/
 int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
 		t_type *ttype, char *comment)
@@ -140,6 +169,7 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
    char *fptr, *cptr;
    int	i;
 
+  *((char *)ptr) = 0;
 /*First, get the keyword*/
   memcpy(keyword, fitsline, 8);
   keyword[8] = 0;
@@ -152,8 +182,8 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
 	&& strncmp(keyword, "HIERARCH", 8)
 	&& strncmp(keyword, "        ", 8))
       return RETURN_ERROR;
-    memcpy(comment, fitsline+8, 72);
-    comment[72] = 0;
+    memcpy(comment, fitsline+9, 71);
+    comment[71] = 0;
     *htype = H_COMMENT;
     *ttype = T_STRING;
     return RETURN_OK;
@@ -166,7 +196,8 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
     for (fptr = fitsline + (i=11); i<80 && *fptr!=(char)'\''; i++)
       *cptr++ = *fptr++;
     *cptr = 0;
-    *htype = H_STRING;
+/*-- Check if there is a trailing space */
+    *htype = (cptr != ptr && *(cptr-1)==' ') ? H_STRINGS: H_STRING;
     *ttype = T_STRING;
     }
 /*Handle booleans*/
@@ -195,7 +226,7 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
          fixexponent(fitsline);
          *((double *)ptr) = atof(fitsline+10);
       }
-      *htype = H_FLOAT;
+      *htype = H_EXPO;
       *ttype = T_DOUBLE;
       }
     else
@@ -210,9 +241,16 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
 /*Store comment if it is found*/
   for (fptr = fitsline + (i=30); i<80; i++)
     if (*(fptr++) == (char)'/')
+      {
+      while (++i<80 && *fptr<=' ')
+        fptr++;
+      i--;
       while (++i<80)
-        *(comment++) = *(fptr++);
-
+        if (*fptr>= ' ')
+          *(comment++) = *(fptr++);
+         else
+           fptr++;
+      }
   *comment = 0;
 
   return RETURN_OK;
@@ -231,14 +269,14 @@ INPUT	pointer to the FITS buffer,
 OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	29/09/99
+VERSION	08/06/99
  ***/
 int	fitsread(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
 
   {
    int		i,pos;
-   static char	s[4], str[82];
+   char		s[4], str[82];
    char		*st, *st2;
 
   if ((pos = fitsfind(fitsbuf, keyword)) < 0)
@@ -280,6 +318,18 @@ int	fitsread(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 			  {
 			  *(st--) = (char)'\0';
 			  } while (st>(char *)ptr && (*st == (char)' '));
+			break;
+
+    case H_STRINGS:	st = ptr;
+			st2= str+10;
+			for (i=70; i-- && *(st2++)!=(char)'\'';);
+			while (i-->0)
+			  {
+			  if (*st2 == '\'' && *(++st2) != '\'')
+			    break;
+			  *(st++) = *(st2++);
+			  }
+			*st = (char)'\0';
 			break;
 
     case H_COMMENT:	strcpy(ptr,str+9);
@@ -343,18 +393,20 @@ OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 	The keyword must already exist in the buffer (use fitsadd()).
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	29/09/99
+VERSION	26/07/2000
  ***/
 int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
 
   {
    int		i, l, pos, posoff, flag;
-   static char	str[81],str2[81];
+   char		str[81],str2[81];
    char		*cstr, *cstr1,*cstr2,
 		c;
 
-  if ((pos = fitsfind(fitsbuf, keyword)) < 0)
+/* Ignore HISTORY and COMMENTS */
+  if (findkey(keyword, (char *)histokeys, 12)!=RETURN_ERROR
+	|| (pos = fitsfind(fitsbuf, keyword)) < 0)
     return RETURN_ERROR;
   posoff = 10;
   fitsbuf += 80*pos;
@@ -405,6 +457,20 @@ int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
                         *(++cstr) = (char)'\'';
                         if (i>9)
                           *(++cstr) = 0;
+			break;
+
+    case H_STRINGS:	/* Handle the famous quote */
+			cstr1 = (char *)ptr;
+			cstr2 = str2;
+			for (i=0; i<80; i++)
+			  if (!(c=*(cstr2++) = *(cstr1++)))
+			    break;
+			  else if (c == '\'')
+			    {
+			    *(cstr2++) = '\'';
+			    i++;
+			    }
+		        sprintf(str, "'%s'", str2);
 			break;
 
     case H_COMMENT:	sprintf(str, "%-70s", (char *)ptr);

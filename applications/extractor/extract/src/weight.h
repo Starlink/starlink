@@ -9,7 +9,7 @@
 *
 *	Contents:	Include file for weight.c.
 *
-*	Last modify:	27/04/99
+*	Last modify:	14/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -17,7 +17,7 @@
 /*---------------------------------- protos --------------------------------*/
 
 extern picstruct	*newweight(char *filename, picstruct *reffield,
-				weightenum wtype);
+				weightenum wtype, int nok);
 
 void			weight_to_var(picstruct *wfield, PIXTYPE *data,
 				int npix);

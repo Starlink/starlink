@@ -1,8 +1,48 @@
-Installing SExtractor is really easy:
-- Go to the source/ subdirectory
-- Type ``make'' and see if your machine type is listed.
-- If this is the case, you can start the compilation with
-  ``make SEXMACHINE=<machine_type>''
-- The compilation produces the SExtractor executable called ``sex''.
-  You may now copy it anywhere in your path and run it with
-  configuration files like those in the config/ subdirectory.
+Copyright 1994, 1995, 1996, 1999, 2000, 2001, 2002 Free Software
+Foundation, Inc.
+
+   This file is free documentation; the Free Software Foundation gives
+unlimited permission to copy, distribute and modify it.
+
+Basic Installation
+==================
+The simplest way to compile this package is:
+
+  1. `cd' to the directory containing the package's source code and type
+     `./configure' to configure the package for your system.
+  2. Type `make' to compile the package.
+  3. Type `make install' to install the programs and any data files and
+     documentation.
+
+Compilers and Options
+=====================
+
+   Some systems require unusual options for compilation or linking that
+the `configure' script does not know about.  Run `./configure --help'
+for details on some of the pertinent environment variables.
+
+   You can give `configure' initial values for variables by setting
+them in the environment.  You can do that on the command line like this:
+
+     ./configure CC=c89 CFLAGS=-O2 LIBS=-lposix
+
+
+Installation Names
+==================
+
+   By default, `make install' will install the package's files in
+`/usr/local/bin', `/usr/local/man', etc.  You can specify an
+installation prefix other than `/usr/local' by giving `configure' the
+option `--prefix=PATH'.
+
+   You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files.  If you
+give `configure' the option `--exec-prefix=PATH', the package will use
+PATH as the prefix for installing programs and libraries.
+Documentation and other data files will still use the regular prefix.
+
+   In addition, if you use an unusual directory layout you can give
+options like `--bindir=PATH' to specify different values for particular
+kinds of files.  Run `configure --help' for a list of the directories
+you can set and what kinds of files go in them.
+

@@ -1,7 +1,7 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -30,9 +30,14 @@
 *   The functions defined herein are trigonometric or inverse trigonometric
 *   functions which take or return angular arguments in decimal degrees.
 *
-*   $Id: wcstrig.c,v 2.1 1996/05/07 20:05:10 mcalabre Exp $
+*   $Id: wcstrig.c,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
 *---------------------------------------------------------------------------*/
 
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
+
+#include <math.h>
 #include "wcstrig.h"
 
 #ifndef PI	/* EB 02/06/97 */

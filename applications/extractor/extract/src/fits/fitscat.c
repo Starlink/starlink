@@ -5,17 +5,25 @@
 *
 *	Part of:	The LDAC Tools
 *
-*	Author:		E.BERTIN, DeNIS/LDAC
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	low-level functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	13/03/99
+*	Last modify:	14/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<sys/types.h>
+#include	<sys/stat.h>
+#include	<fcntl.h>
 #include	<time.h>
 
 #include	"fitscat_defs.h"
@@ -28,7 +36,7 @@ INPUT	Catalog structure,
 	output stream.
 OUTPUT	RETURN_OK if everything went as expected, RETURN_ERROR otherwise.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	20/03/96
+VERSION	19/03/2002
  ***/
 int	about_cat(catstruct *cat, FILE *stream)
 
@@ -68,7 +76,8 @@ int	about_cat(catstruct *cat, FILE *stream)
         fprintf(stream,
 	"	Number of data fields...%d\n", tab->tfields);
       fprintf(stream,
-	"	Body size:..............%d bytes\n", tab->tabsize);
+	"	Body size:..............%ld bytes\n",
+		(unsigned long)tab->tabsize);
       }
     fprintf(stream,"\n");
     while (!(tab=tab->nexttab)->nseg);
@@ -127,13 +136,12 @@ INPUT	catalog structure.
 OUTPUT	RETURN_OK if everything went as expected, RETURN_ERROR otherwise.
 NOTES	the file structure member is set to NULL;
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	20/03/96
+VERSION	22/06/2001
  ***/
 int	close_cat(catstruct *cat)
 
   {
-
-  if (fclose(cat->file))
+  if (cat->file && fclose(cat->file))
     {
     cat->file = NULL;
     return RETURN_ERROR;
@@ -146,31 +154,31 @@ int	close_cat(catstruct *cat)
 
 
 /****** free_cat ***************************************************************
-PROTO	void free_cat(catstruct *cat, int ncat)
+PROTO	void free_cat(catstruct **cat, int ncat)
 PURPOSE	Free all structures allocated for one or several FITS catalog.
 INPUT	Pointer to a catalog structure,
 	Number of catalogs.
 OUTPUT	-.
 NOTES	Unallocated pointers should have been put to NULL.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+VERSION	05/06/2001
  ***/
-void	free_cat(catstruct *cat, int ncat)
+void	free_cat(catstruct **cat, int ncat)
 
   {
-   catstruct	*thecat;
+   catstruct	**thecat;
    int		i;
 
 /*--free memory allocated within each catalog */
   thecat = cat;
   for (i=ncat; i--;)
     {
-    if (thecat->file)
-      close_cat(thecat);
-    remove_tabs(thecat++);
+    if ((*thecat)->file)
+      close_cat(*thecat);
+    remove_tabs(*(thecat++));
     }
 
-  free(cat);
+  free(*cat);
 
   return;
   }
@@ -185,7 +193,7 @@ INPUT	A pointer to both catalog structures.
 OUTPUT	RETURN_OK if at least one table was copied, RETURN_ERROR otherwise.
 NOTES	The output catalog should be ``cleaned'' before call.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/03/99
+VERSION	13/06/2002
  ***/
 int	inherit_cat(catstruct *catin, catstruct *catout)
 
@@ -203,12 +211,12 @@ int	inherit_cat(catstruct *catin, catstruct *catout)
     QCALLOC(tabout, tabstruct, 1);
     *tabout = *tabin;
     if (tabin->naxis)
-      QMEMCPY(tabin->naxisn, tabout->naxisn, int, tabin->naxis);
+      QMEMCPY(tabin->naxisn, tabout->naxisn, int, (size_t)tabin->naxis);
     if (tabin->headbuf)
       QMEMCPY(tabin->headbuf, tabout->headbuf, char,
 	tabin->headnblock*FBSIZE);
     if (tabin->bodybuf)
-      QMEMCPY(tabin->bodybuf, tabout->bodybuf, char, tabin->tabsize);
+      QMEMCPY(tabin->bodybuf, tabout->bodybuf, char, (size_t)tabin->tabsize);
     if (prevtabout)
       {
       tabout->prevtab = prevtabout;
@@ -241,16 +249,16 @@ INPUT	A pointer to the catalog structure.
 OUTPUT	RETURN_OK if everything went as expected, RETURN_ERROR otherwise.
 NOTES	The output catalog should be ``cleaned'' before call.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	19/08/96
+VERSION	28/05/2001
  ***/
 int	init_cat(catstruct *cat)
 
   {
    static char	bintabtemplate[][80] = {
-"SIMPLE  =                    T / LETS STAY SIMPLE",
+"SIMPLE  =                    T / This is a FITS file",
 "BITPIX  =                    8 / ",
 "NAXIS   =                    0 / ",
-"EXTEND  =                    T / MORE STUFF MAY FOLLOW",
+"EXTEND  =                    T / This file may contain FITS extensions",
 "END                            "};
    tabstruct	*tab;
    char		*buf;
@@ -276,7 +284,6 @@ int	init_cat(catstruct *cat)
   remove_tabs(cat);
   cat->tab = tab->prevtab = tab->nexttab = tab;
   cat->ntab = 1;
-  addhistoryto_cat(cat, "Catalog created");
 
   return RETURN_OK;
   }
@@ -290,7 +297,7 @@ INPUT	catalog structure.
 OUTPUT	RETURN_OK if at least one table was found, RETURN_ERROR otherwise.
 NOTES	Memory space for the array of fits structures is reallocated.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	20/03/96
+VERSION	14/12/2002
  ***/
 int	map_cat(catstruct *cat)
 
@@ -302,11 +309,12 @@ int	map_cat(catstruct *cat)
   prevtab = NULL;
   QCALLOC(tab, tabstruct, 1);
   tab->cat = cat;
+  QFTELL(cat->file, tab->headpos, cat->filename);
   for (ntab=0; !get_head(tab); ntab++)
     {
     readbasic_head(tab);
     readbintabparam_head(tab);
-    tab->bodypos = ftell(cat->file);
+    QFTELL(cat->file, tab->bodypos, cat->filename);
     tab->nseg = tab->seg = 1;
     if (tab->tabsize)
       QFSEEK(cat->file, PADTOTAL(tab->tabsize), SEEK_CUR, cat->filename);
@@ -320,6 +328,7 @@ int	map_cat(catstruct *cat)
     prevtab = tab;
     QCALLOC(tab, tabstruct, 1);
     tab->cat = cat;
+    QFTELL(cat->file, tab->headpos, cat->filename);
     }
 
   cat->ntab = ntab;
@@ -371,7 +380,7 @@ INPUT	catalog structure,
 OUTPUT	RETURN_OK if the cat is found, RETURN_ERROR otherwise.
 NOTES	If the file was already opened by this catalog, nothing is done.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	22/08/96
+VERSION	13/06/2002
  ***/
 int	open_cat(catstruct *cat, access_type at)
 

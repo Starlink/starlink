@@ -5,17 +5,21 @@
 *
 *	Part of:	Any back-propagation-ANN-oriented software
 *
-*	Author:		E.BERTIN, IAP/Leiden
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Routines for BP-neural network management ("read-only"
 *			mode).
 *
 *	Requirements:	The LDACTools.
 *
-*	Last modify:	21/12/96
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -24,7 +28,7 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"fits/fitscat.h"
 #include	"bpro.h"
 
 /******************************** play_bpann *********************************/

@@ -5,26 +5,30 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, DeNIS/LDAC.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	header structure and templates for catalog data.
 *
-*	Last modify:	25/05/99
+*	Last modify:	16/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 keystruct	headkey[] = {
   {"FITSFILE", "File name of the analysed image",
-	cat.image_name, H_STRING, T_STRING, "%-18s"},
+	thecat.image_name, H_STRING, T_STRING, "%-18s"},
+  {"FITSEXT ", "FITS Extension number",
+	&thecat.currext, H_INT, T_LONG, "%3d"},
+  {"FITSNEXT", "Number of FITS image extensions in file",
+	&thecat.next, H_INT, T_LONG, "3d"},
   {"SEXVERS ", "Extraction software",
-	cat.soft_name, H_STRING, T_STRING, "%-18s"},
+	thecat.soft_name, H_STRING, T_STRING, "%-18s"},
   {"SEXDATE ", "Extraction date",
-	cat.ext_date, H_STRING, T_STRING, "%-18s"},
+	thecat.ext_date, H_STRING, T_STRING, "%-18s"},
   {"SEXTIME ", "Extraction time",
-	cat.ext_time, H_STRING, T_STRING, "%-18s"},
+	thecat.ext_time, H_STRING, T_STRING, "%-18s"},
   {"SEXELAPS", "Elapsed time during extraction (s)",
-	&cat.ext_elapsed, H_FLOAT, T_DOUBLE, "%7.1f"},
+	&thecat.ext_elapsed, H_FLOAT, T_DOUBLE, "%7.1f"},
   {"SEXBKGND", "Median background level (ADU)",
 	&thefield1.backmean, H_EXPO, T_FLOAT, "%-13G"},
   {"SEXBKDEV", "Median background RMS (ADU)",
@@ -34,23 +38,23 @@ keystruct	headkey[] = {
   {"SEXATHLD", "Analysis threshold (ADU)",
 	&thefield1.thresh, H_EXPO, T_FLOAT, "%-15G"},
   {"SEXNDET ", "Number of raw detections",
-	&cat.ndetect, H_INT, T_LONG, "%9d"},
+	&thecat.ndetect, H_INT, T_LONG, "%9d"},
   {"SEXNFIN ", "Final number of extracted sources",
-	&cat.ntotal, H_INT, T_LONG, "%9d"},
+	&thecat.ntotal, H_INT, T_LONG, "%9d"},
   {"SEXNPARA", "Number of parameters per source",
-	&cat.nparam, H_INT, T_LONG, "%3d"},
+	&thecat.nparam, H_INT, T_LONG, "%3d"},
   {"SEXPXSCL", "Pixel scale used for measurements (arcsec)",
 	&thefield1.pixscale, H_EXPO, T_DOUBLE, "%-15G"},
   {"SEXSFWHM", "Source FWHM used for measurements (arcsec)",
 	&prefs.seeing_fwhm, H_EXPO, T_DOUBLE, "%-13G"},
   {"SEXNNWF ", "S/G classification NNW filename",
-	cat.nnw_name, H_STRING, T_STRING, "%-18s"},
+	thecat.nnw_name, H_STRING, T_STRING, "%-18s"},
   {"SEXGAIN ", "Gain used (e-/ADU)",
 	&prefs.gain, H_EXPO, T_DOUBLE, "%6.2f"},
   {"SEXFLTR ", "Detection filtering activated (flag)",
 	&prefs.filter_flag, H_BOOL, T_LONG, "%1s"},
   {"SEXFILTN", "Filter filename",
-	cat.filter_name, H_STRING, T_STRING, "%-18s"},
+	thecat.filter_name, H_STRING, T_STRING, "%-18s"},
 /*
   {"SEXDETT ", "Detection type",
 	&prefs.detect_type, H_STRING, T_STRING, "%-18s"},

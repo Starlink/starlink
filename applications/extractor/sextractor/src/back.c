@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	23/09/2001
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,6 +25,8 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"back.h"
 #include	"field.h"
 #include	"weight.h"
@@ -35,8 +41,9 @@ void	makeback(picstruct *field, picstruct *wfield)
   {
    backstruct	*backmesh,*wbackmesh, *bm,*wbm;
    PIXTYPE	*buf,*wbuf, *buft,*wbuft, *bufpos;
-   size_t	fcurpos,wfcurpos, wfcurpos2,fcurpos2, bufsize, bufsize2,
-		bufshift, size,meshsize,jumpsize;
+   OFF_T	fcurpos,wfcurpos, wfcurpos2,fcurpos2, bufshift, jumpsize;
+   size_t	bufsize, bufsize2,
+		size,meshsize;
    int		i,j,k,m,n, bin, step, nlines,
 		lastbite, w,bw,bwx, bh, nx,ny,nb, x,y,h, offset, nlevels,
 		lflag, nr;
@@ -62,22 +69,22 @@ void	makeback(picstruct *field, picstruct *wfield)
 
 /* Save current positions in files */
 
-  QFTELL(fcurpos, field->file, field->filename);
+  QFTELL(field->file, fcurpos, field->filename);
   if (wfield)
-    QFTELL(wfcurpos, wfield->file, wfield->filename);
+    QFTELL(wfield->file, wfcurpos, wfield->filename);
 
 /* Allocate a correct amount of memory to store pixels */
 
-  bufsize = (size_t)w*bh;
-  meshsize = bufsize;
+  bufsize = (OFF_T)w*bh;
+  meshsize = (size_t)bufsize;
   nlines = 0;
   if (bufsize > (size_t)BACK_BUFSIZE)
     {
     nlines = BACK_BUFSIZE/w;
     step = (field->backh-1)/nlines+1;
     bufsize = (size_t)(nlines = field->backh/step)*w;
-    bufshift = (step/2)*(size_t)w;
-    jumpsize = (step-1)*(size_t)w;
+    bufshift = (step/2)*(OFF_T)w;
+    jumpsize = (step-1)*(OFF_T)w;
     }
 
 /* Allocate some memory */
@@ -149,17 +156,17 @@ void	makeback(picstruct *field, picstruct *wfield)
     else
       {
 /*---- Image size too big, we have to skip a few data !*/
-      QFTELL(fcurpos2, field->file, field->filename);
+      QFTELL(field->file, fcurpos2, field->filename);
       if (wfield)
-        QFTELL(wfcurpos2, wfield->file, wfield->filename);
+        QFTELL(wfield->file, wfcurpos2, wfield->filename);
       if (j == ny-1 && (n=field->height%field->backh))
         {
         meshsize = n*(size_t)w;
         nlines = BACK_BUFSIZE/w;
         step = (n-1)/nlines+1;
         bufsize = (nlines = n/step)*(size_t)w;
-        bufshift = (step/2)*(size_t)w;
-        jumpsize = (step-1)*(size_t)w;
+        bufshift = (step/2)*(OFF_T)w;
+        jumpsize = (step-1)*(OFF_T)w;
         free(buf);
         QMALLOC(buf, PIXTYPE, bufsize);		/* pixel buffer */
         if (wfield)
@@ -170,20 +177,21 @@ void	makeback(picstruct *field, picstruct *wfield)
         }
 
 /*---- Read and skip, read and skip, etc... */
-      QFSEEK(field->file, bufshift*field->bytepix, SEEK_CUR, field->filename);
+      QFSEEK(field->file, bufshift*(OFF_T)field->bytepix, SEEK_CUR,
+		field->filename);
       buft = buf;
       for (i=nlines; i--; buft += w)
         {
         readdata(field, buft, w);
         if (i)
-          QFSEEK(field->file, jumpsize*field->bytepix, SEEK_CUR,
+          QFSEEK(field->file, jumpsize*(OFF_T)field->bytepix, SEEK_CUR,
 		field->filename);
         }
 
       if (wfield)
         {
 /*------ Read and skip, read and skip, etc... now on the weight-map */
-        QFSEEK(wfield->file,bufshift*wfield->bytepix, SEEK_CUR,
+        QFSEEK(wfield->file, bufshift*(OFF_T)wfield->bytepix, SEEK_CUR,
 		wfield->filename);
         wbuft = wbuf;
         for (i=nlines; i--; wbuft += w)
@@ -191,7 +199,7 @@ void	makeback(picstruct *field, picstruct *wfield)
           readdata(wfield, wbuft, w);
           weight_to_var(wfield, wbuft, w);
           if (i)
-            QFSEEK(wfield->file, jumpsize*wfield->bytepix, SEEK_CUR,
+            QFSEEK(wfield->file, jumpsize*(OFF_T)wfield->bytepix, SEEK_CUR,
 		wfield->filename);
           }
         }
@@ -245,6 +253,7 @@ void	makeback(picstruct *field, picstruct *wfield)
         {
         k = m+nx*j;
         backguess(wbm, wfield->back+k, wfield->sigma+k);
+        free(wbm->histo);
         }
       }
     }
@@ -608,6 +617,7 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
 
   sig = 10.0*nlevelsm1;
   sig1 = 1.0;
+  mea = 0.0;
   for (n=100; n-- && (sig>=0.1) && (fabs(sig/sig1-1.0)>EPS);)
     {
     sig1 = sig;
@@ -648,7 +658,6 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
                        :bkg->qzero+mea*bkg->qscale;
 
   *sigma = sig*bkg->qscale;
-
 
   return *mean;
   }

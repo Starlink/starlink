@@ -1,7 +1,7 @@
 /*=============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -138,8 +138,12 @@
 *   leak will result.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: lin.c,v 2.2 1996/05/24 07:25:36 mcalabre Exp $
+*   $Id: lin.c,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
 *===========================================================================*/
+
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
 
 #include <math.h>
 #include "lin.h"
@@ -164,8 +168,7 @@ const char *linrev_errmsg[] = {
 #ifdef __convexc__
 #include <stdlib.h>
 #else
-#include <stdlib.h>
-/*#include <malloc.h>*/
+#include <malloc.h>
 #endif
 
 int linset(lin)

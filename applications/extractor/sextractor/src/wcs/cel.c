@@ -1,7 +1,7 @@
 /*=============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -200,6 +200,7 @@
 *      ZPN: zenithal/azimuthal polynomial
 *      ZEA: zenithal/azimuthal equal area
 *      AIR: Airy
+*      TNX: IRAF's polynomial correction to TAN
 *
 *   Cylindricals:
 *      CYP: cylindrical perspective
@@ -231,16 +232,27 @@
 *      TSC: tangential spherical cube
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: cel.c,v 2.4 1996/09/10 06:31:35 mcalabre Exp $
+*   IRAF's TNX added by E.Bertin 2000/03/28
+*   Filtering of abs(phi)>180 and abs(theta)>90 added by E.Bertin 2000/11/11
+*   $Id: cel.c,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
 *===========================================================================*/
 
-#include "cel.h"
+#ifdef HAVE_CONFIG_H
+#include	"config.h"
+#endif
 
-int  npcode = 25;
-char pcodes[25][4] =
+#include <math.h>
+#include <string.h>
+#include "wcstrig.h"
+#include "cel.h"
+#include "sph.h"
+#include "tnx.h"
+
+int  npcode = 26;
+char pcodes[26][4] =
       {"AZP", "TAN", "SIN", "STG", "ARC", "ZPN", "ZEA", "AIR", "CYP", "CAR",
        "MER", "CEA", "COP", "COD", "COE", "COO", "BON", "PCO", "GLS", "PAR",
-       "AIT", "MOL", "CSC", "QSC", "TSC"};
+       "AIT", "MOL", "CSC", "QSC", "TSC", "TNX"};
 
 /* Map error number to error message for each function. */
 const char *celset_errmsg[] = {
@@ -375,6 +387,10 @@ struct prjprm *prj;
       cel->prjfwd = tscfwd;
       cel->prjrev = tscrev;
       theta0 = 0.0;
+   } else if (strcmp(pcode, "TNX") == 0) {
+      cel->prjfwd = tnxfwd;
+      cel->prjrev = tnxrev;
+      theta0 = 90.0;
    } else {
       /* Unrecognized projection code. */
       return 1;
@@ -559,6 +575,8 @@ double *lng, *lat;
    if (err = cel->prjrev(x, y, prj, phi, theta)) {
       return err == 1 ? 2 : 3;
    }
+   if (fabs(*phi)>180.0 || fabs(*theta)>90.0)
+     return 2;
 
    /* Compute native coordinates. */
    sphrev(*phi, *theta, cel->euler, lng, lat);
