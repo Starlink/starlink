@@ -2360,11 +2360,11 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Constants:
-      INTEGER			F_CONS
-        PARAMETER		( F_CONS = 1 )
+      INTEGER			F__CONS
+        PARAMETER		( F__CONS = 1 )
 
-      INTEGER			F_NONE
-        PARAMETER		( F_NONE = 2 )
+      INTEGER			F__NONE
+        PARAMETER		( F__NONE = 2 )
 
 *  Local Variables:
       REAL			MEAN			! Mean sample value
@@ -2373,6 +2373,7 @@
       REAL			XW1, XW2, YW1, YW2	! Worst positions
       REAL			XW, YW, R, Y2		! Pixel radius bits
 
+      INTEGER			FMODE			! Fitting mode
       INTEGER			I, J			! Loop over image
       INTEGER			ITEMID			! GUI noticeboard item
       INTEGER			MAXFR_X, MAXFR_Y	! Max position
@@ -2414,7 +2415,7 @@
 
           MEAN = 0.0
           NGS = 0
-          DO S = 1, NS
+          DO S = 1, I_BGM_NSAMP
             IF ( SAMNP(S) .GT. 1 ) THEN
               MEAN = MEAN + SAMM(S)
               NGS = NGS + 1
