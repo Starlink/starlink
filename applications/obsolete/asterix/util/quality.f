@@ -77,6 +77,7 @@
 *     31 Aug 94 : V1.8-2  Fixed another missing initialisation in ARD mode,
 *                         which stopped it working on UNIX (DJA)
 *     24 Nov 94 : V1.8-3  Now use USI for user interface (DJA)
+*      5 Dec 94 : V1.8-4  ARD and other modes no longer exclusive (DJA)
 *
 *    Type Definitions :
 *
@@ -176,7 +177,7 @@
 *    Version id :
 *
       CHARACTER*80           VERSION
-        PARAMETER            ( VERSION = 'QUALITY Version 1.8-2' )
+        PARAMETER            ( VERSION = 'QUALITY Version 1.8-4' )
 *-
 
 *    Version id
@@ -185,10 +186,31 @@
 *    Initialize
       CALL AST_INIT()
 
-      MODESET=.FALSE.
+*    Overwrite?
+      CALL USI_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
+
+*    Get input
+      IF ( OVERWRITE ) THEN
+        CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
+        OLOC = ILOC
+      ELSE
+        CALL USI_ASSOC2( 'INP', 'OUT', 'R', ILOC, OLOC, INPRIM, STATUS )
+        CALL HDX_COPY( ILOC, OLOC, STATUS )
+      END IF
+
+*    Check DATA
+      CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
+      IF (.NOT. OK) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Invalid dataset', STATUS )
+        GOTO 99
+      END IF
+
+*    Number of modified values
       NMOD = 0
 
 *    Obtain mode from user
+      MODESET=.FALSE.
       CALL USI_GET0L( 'SET', Q_SET, STATUS )
       MODESET = Q_SET
       IF (.NOT.MODESET) THEN
@@ -222,12 +244,9 @@
 *    Check that a mode has been selected
       IF ( .NOT. MODESET ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', '! No QUALITY operation selected', STATUS )
+        CALL ERR_REP( ' ', 'No QUALITY operation selected', STATUS )
         GOTO 99
       END IF
-
-*    Overwrite?
-      CALL USI_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
 
 *    If in SET mode see if selecting on magic values
       IF ( Q_SET ) THEN
@@ -239,9 +258,11 @@
 *    Not selecting on magic values, so see how selection to be made
       IF ( .NOT. MAGIC ) THEN
 
-*    Select pixels using a spatial descriptor file ?
+*      Select pixels using a spatial descriptor file ?
         CALL USI_GET0L( 'FSEL', FSEL, STATUS )
-        IF (.NOT. FSEL) THEN
+
+*      Only allow axis selection if more than 2 dimensions
+        IF ( (NDIM.GT.2) .OR. .NOT. FSEL ) THEN
           CALL USI_GET0L( 'AXSEL', AXSEL, STATUS )
         ELSE
           AXSEL = .FALSE.
@@ -254,15 +275,7 @@
         AXSEL = .FALSE.
         DATSEL = .FALSE.
         QSEL = .FALSE.
-      END IF
 
-*    Get input
-      IF ( OVERWRITE ) THEN
-        CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
-        OLOC = ILOC
-      ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'R', ILOC, OLOC, INPRIM, STATUS )
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
       END IF
 
 *    Check status
@@ -272,14 +285,6 @@
       IF ( INPRIM ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Input not a dataset!', STATUS )
-        GOTO 99
-      END IF
-
-*    Check DATA
-      CALL BDA_CHKDATA (OLOC, OK, NDIM, DIMS, STATUS)
-      IF (.NOT. OK) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', '! Invalid dataset', STATUS )
         GOTO 99
       END IF
 
@@ -332,14 +337,22 @@
         END IF
       END IF
 
-*    Get axis ranges
+*    Initialise selection array
+      CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
+      IF ( MAGIC ) THEN
+        NMOD = 0
+      ELSE
+        NMOD = NELM
+      END IF
+
+*    Select on axis values?
       IF ( AXSEL ) THEN
 
-        CALL ARR_INIT1L( .FALSE., NELM, %VAL(CPTR), STATUS )
-
+*      Display axes
         CALL QUALITY_DISPAX( OLOC, NDIM, DIMS, AXLABEL, AXLO, AXHI,
      :                                                DIR, STATUS )
 
+*      Construct allowed ranges
         DO I = 1, DAT__MXDIM
           NAXRANGES(I)  = 1
           AXRANGES(1,1,I) = AXLO(I)
@@ -349,7 +362,7 @@
           SEL(I) = .FALSE.
         END DO
 
-*  get axes to select on
+*      Get axes to select on
         IF ( NDIM .GT. 1 ) THEN
           CALL MSG_PRNT( ' ' )
           CALL PRS_GETLIST( 'SELAX', NDIM, AXES, NAXES, STATUS )
@@ -392,19 +405,22 @@
 *      Set up selection array
         CALL QUALITY_SETAXSEL(NDIM, DIMS, NAXRANGES, PIXRNG, %VAL(CPTR),
      :                                                    NMOD, STATUS )
-*
-*  use a spatial file (ARD file) to select pixels wanted ?
-      ELSEIF (FSEL) THEN
-*
-*  read some axis values
+
+*    Use a spatial file (ARD file) to select pixels wanted?
+      IF ( FSEL ) THEN
+
+*      Read some axis values
         CALL QUALITY_DISPAX( ILOC, NDIM, DIMS, AXLABEL, AXLO, AXHI,
      :                                                DIR, STATUS )
-*  read ARD file and set pixel values wanted
-        CALL QUALITY_SETFSEL(ILOC, NDIM, DIMS, AXLO, AXHI,
-     :                                NMOD, CPTR, STATUS )
 
-*  no axis selection - assume all wanted unless MAGIC mode
-      ELSE
+*      Read ARD file and set pixel values wanted
+        CALL QUALITY_SETFSEL( ILOC, NDIM, DIMS, AXLO, AXHI,
+     :                                 NMOD, CPTR, STATUS )
+
+      END IF
+
+*    No axis selection - assume all wanted unless MAGIC mode
+      IF ( .NOT. (FSEL.OR.AXSEL) ) THEN
         CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
         IF ( MAGIC ) THEN
           NMOD = 0
@@ -779,8 +795,11 @@
                             DO L = AXRANGE(1,K,2), AXRANGE(2,K,2)
                               DO M = 1, NRANGE(1)
                                 DO N = AXRANGE(1,M,1), AXRANGE(2,M,1)
-                                  SELECT(N,L,J,H,F,D,B) = .TRUE.
-                                  NMOD = NMOD + 1
+                                  IF ( .NOT. SELECT(N,L,J,H,F,D,B) )THEN
+                                    SELECT(N,L,J,H,F,D,B) = .TRUE.
+
+                                    NMOD = NMOD + 1
+                                  END IF
                                 END DO
                               END DO
                             END DO
@@ -1262,8 +1281,8 @@
 
 
 *+  QUALITY_SETFSEL - Reads a spatial descriptor file and sets a mask
-	SUBROUTINE QUALITY_SETFSEL(LOC, NDIM, DIM, AXLO, AXHI, NAREA,
-     :                             CPTR, STATUS )
+	SUBROUTINE QUALITY_SETFSEL( LOC, NDIM, DIM, AXLO, AXHI, NAREA,
+     :                              CPTR, STATUS )
 *    Description :
 *     Reads a description of a spatial region from a spatial file
 *     and sets a mask with the pixels defined in the file good and
@@ -1308,12 +1327,10 @@
       INTEGER MPNTR                           ! Pointer to image mask
       INTEGER MDIM(2)                         ! Dimensions of image mask
       INTEGER LP
-*    Local data :
-*    Version :
 *-
-*  get name of ARD file and open it
+
+*    Get name of ARD file and open it
       CALL USI_GET0C('ARDFILE',AFILE,STATUS)
-*
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Open the ARD file
@@ -1827,10 +1844,13 @@ c            WRITE(*,*)'All integers =',ALLINT
             DO LP1=1,DIM1
                LPVAL(1) = LP1
 *
-               MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) =
+               IF ( .NOT. MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) ) THEN
+                 MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) =
      :                   IMASK(LPVAL(IMAX1),LPVAL(IMAX2))
-               IF ( IMASK(LPVAL(IMAX1),LPVAL(IMAX2)) )
-     :                  NAREA = NAREA + 1
+                 IF ( IMASK(LPVAL(IMAX1),LPVAL(IMAX2)) ) THEN
+                   NAREA = NAREA + 1
+                 END IF
+               END IF
 *
             ENDDO
            ENDDO
