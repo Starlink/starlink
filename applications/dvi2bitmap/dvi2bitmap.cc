@@ -6,6 +6,7 @@
 // being defined wrongly (as void*), unless I define it to be zero here.
 #define NULL 0
 #include <iostream>
+#include <cstdlib>
 #include "dvi2bitmap.h"
 #include "DviFile.h"
 #include "PkFont.h"
@@ -15,22 +16,45 @@ char *progname;
 
 main (int argc, char **argv)
 {
-    progname = argv[0];
-    if (argc != 2)
-	Usage ();
+    string dviname;
 
     DviFile::debug(true);
     PkFont::debug(true);
     PkRasterdata::debug(false);
-    PkFont::setFontPath("/var/tmp/fonts/pk/ibmvga/public/cm/%F.110pk");
+    if (char *pkpath = getenv("DVI2BITMAP_PK_PATH"))
+	PkFont::setFontPath(pkpath);
 
-    string ifname = argv[1];
+    progname = argv[0];
+
+    for (argc--, argv++; argc>0; argc--, argv++)
+	if (**argv == '-')
+	    switch (*++*argv)
+	    {
+	      case 'f':
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		PkFont::setFontPath(*argv);
+		break;
+	      default:
+		Usage();
+	    }
+	else
+	{
+	    if (dviname.length() != 0)
+		Usage();
+	    dviname = *argv;
+	}
+
+    if (dviname.length() == 0)
+	Usage();
+
     try
     {
-	DviFile *dvif = new DviFile(ifname);
+	DviFile *dvif = new DviFile(dviname);
 	if (dvif->eof())
 	{
-	    cout << "Can't open file " << ifname << " to read\n";
+	    cout << "Can't open file " << dviname << " to read\n";
 	    std::exit(1);
 	}
 
@@ -83,6 +107,6 @@ main (int argc, char **argv)
 
 void Usage (void)
 {
-    cout << "Usage: " << progname << " dvifile" << '\n';
+    cout << "Usage: " << progname << " [-f PKpath ] dvifile" << '\n';
     exit (1);
 }
