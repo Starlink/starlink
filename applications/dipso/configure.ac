@@ -25,6 +25,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
+AC_FC_MAIN
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 AC_FC_LIBRARY_LDFLAGS
@@ -34,6 +35,8 @@ STAR_LATEX_DOCUMENTATION(sun50)
 
 dnl    Pick the best awk command, the _link script is quite demanding
 AC_PROG_AWK
+
+AC_CONFIG_HEADERS(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
