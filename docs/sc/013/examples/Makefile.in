@@ -26,7 +26,7 @@ ENABLENAN=@ENABLENAN@
 
 CFLAGS=-g $(DEFS)
 
-
+VERSION=$(shell cat ../VERSION)
 
 EXECS=timewaster fpdemo fpp dfpp mixed crash
 
@@ -103,12 +103,14 @@ sgmlexamples: $(EXAMPLES:=.sgml)
 # Tar up the current directory, folding in the version number stored
 # in file ../VERSION
 sc13-examples.tar: configure
-	DIRNAME=sc13.`cat ../VERSION`-examples; \
-		mkdir $$DIRNAME; \
-		for f in ../VERSION Makefile.in configure $(EXAMPLES) gausssine.dat; \
+	rm -f $@
+	DIRNAME=sc13.$(VERSION)-examples; \
+		if test -d $$DIRNAME; then rm $$DIRNAME/*; else mkdir $$DIRNAME; fi; \
+		ln ../VERSION $$DIRNAME/VERSION; \
+		for f in Makefile.in configure $(EXAMPLES) gausssine.dat; \
 			do ln $$f $$DIRNAME/$$f; \
 		done; \
-		sed 's/%%VERSION%%/'`cat ../VERSION`/ README.in >$$DIRNAME/README; \
+		sed s/%%VERSION%%/$(VERSION)/ README.in >$$DIRNAME/README; \
 		tar cf $$DIRNAME.tar $$DIRNAME; \
 		ln -s $$DIRNAME.tar $@; \
 		rm -Rf $$DIRNAME

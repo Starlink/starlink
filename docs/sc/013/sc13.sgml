@@ -131,8 +131,12 @@ comments from others.</px></change>
 <px>Update to IEEE trap details</px>
 </distribution>
 
-<distribution string="2-2" date="00-Dec-2001" author="ng" versionid="v2-2">
+<distribution string="2-2" date="01-Dec-2001" author="ng" versionid="v2-2">
 <px>Slight reworking after comments</px>
+</distribution>
+
+<distribution string="2-3" date="16-Jul-2002" author="ng" versionid="v2-3">
+<px>Minor edits -- typos and enhancements spotted now and again.</px>
 </distribution>
 
 </history>
@@ -723,6 +727,9 @@ standard for floating-point numbers.
 <update versionid="v2-1">
 <px>Added table of compilers and enabled IEEE traps</px>
 </update>
+<update versionid="v2-2">
+<px>Mention that x.ne.x is true when x is a NaN</px>
+</update>
 </subhead>
 
 <p>As well as defining the format in which normal floating-point numbers are
@@ -771,7 +778,9 @@ longword is <em>Not a Number</em>, usually represented by the string
 as <m>0/0</m> or <m>\log(-1)</m>.  NaNs have the properties that any
 operation which has a NaN as an operand has a NaN as its result; and
 any comparison on a NaN, such as <code><</code> or <code>==</code>,
-evaluates to False, including <code>NaN==NaN</code>.  Why would you
+evaluates to False, including <code>NaN==NaN</code>.  The only exception
+is that, when <code>x</code> is a NaN, then <code>x != x</code> is
+true.  Why would you
 want to use such a peculiar number?  Generally you don't, and its
 appearance in a calculation is an error, which is why processors can
 be set to dump core when a NaN or an Infinity is produced.  However,
@@ -1223,7 +1232,8 @@ The result of grafting a high-level abstraction onto portable
 assembler is a language with far more syntax than is healthy.  Do not
 feel you need to learn~C before C++-- they are closely enough related
 that the differences can be confusing.  My feeling, however, is that
-you should consider learning Java first if you have the time: there is
+you should consider learning <ref id="s.java">Java</ref>first if you
+have the time: there is
 relatively little that needs to be unlearned going from Java to~C++,
 and Java's simplicity makes it easier to come to grips with
 object-orientation, without drowning in a sea of punctuation.
@@ -1240,12 +1250,7 @@ the index is <em>dreadful</em>.
 on Alphas named <code/cxx>, and on Linux named both <code/c++> and
 <code/g++>.</p>
 
-<subsubsect id='s.otherlang'>Other languages
-
-<p>C and Fortran cover most of the bases for scientific computing, but
-there are one or two others which come in useful occasionally.
-
-<subsubsubsect>Java
+<subsubsect id="s.java">Java
 <update versionid=v1.1>Added a description of Java's model of
 compiling to interpreted bytecodes, to the extent that this relates to
 efficiency and speed.</update>
@@ -1253,19 +1258,25 @@ efficiency and speed.</update>
 <px>Pointed out that JITs make Java a candidate for high-end codes,
 pointing to the Java Grande Forum for details.</px>
 </update>
+<update versionid="v2-3">
+<px>Hoisted the Java section up a level, and added some remarks about
+efficiency and profiling.</px>
+</update>
 
-<p>Java was developed by Sun and at present (mid-2000) eclipsed only
+<p>Java was developed by Sun and at present (mid-2002) eclipsed only
 by XML as the current Big Thing.
 Source code is compiled to machine-independent bytecode, which is then
 either interpreted, or compiled to machine code on the fly, by a
-Java Virtual Machine on a particular platform.  The main interest to
+Java Virtual Machine (JVM) on a particular platform.  The main interest to
 astronomy might be in developing machine- and architecture-independent
 interfaces either to codes or archives.  It's also, I think, of use as
 a stepping-stone to C++, since its object-oriented features are less
 obscured by syntax than they are in C++.  A very good
 textbook, written (you won't be surprised to guess) by two of the
 language's authors, is <cite>The Java Programming Language</cite>
-<citation/arnold98>.  There are numerous resources 
+<citation/arnold98>; once you've mastered the basics, there's a good
+deal of helpful advice in <cite>Effective Java</cite>
+<citation/bloch01>.  There are numerous resources 
 at Sun's Java site at <url>http://java.sun.com</url>.
 
 <p>Java is a mixture of an interpreted and a compiled language.  Java
@@ -1291,10 +1302,39 @@ for resource-discovery, means that, possibly somewhat surprisingly,
 Java has been suggested as a suitable language for high-end codes.
 The <webref url="http://www.javagrande.org/" >Java Grande
 Forum</webref> is concerned with investigating and promoting
-developments in this area.
+developments in this area.</p>
 
-<p>Java is still developing.  At present (end-2001) Java~1.2.1 is
-long in the tooth but stable; version~1.3.1 is the current version.
+<p>Note that it is relatively easy to write slow Java (for example,
+adding Strings is a <em>lot</em> slower than using a StringBuffer;
+input and output streams are not (extensively) buffered, so if you
+have a lot of I/O, you would be well advised to use
+<code>Buffered{Input,Output}Stream</code> objects wrapping your
+I/O objects; small-object creation is extensively and
+increasingly optimised, but it's still not dirt-cheap, so look out for
+that in a small loop).  That means that using a profiler (see <ref
+id="s.profiling"/>) is
+particularly important.  However, with Java, that's easy, because
+there's one built in to the JVM.  Give the option
+<code>-Xrunhprof:help</code> to find out how to invoke it.  For
+example:
+<verbatim>
+java -Xrunhprof:cpu=samples,file=myprog.hprof myclass
+</verbatim>
+There's quite a lot of information in here (and the file format is
+under development), but as with all profilers, you'll see a list of
+the number of times various methods were called: the ones at the top
+of the list are the ones where the program spent most of its time, so
+work out why, and concentrate on making them faster.  Ignore the rest.</p>
+
+<p>Java is still developing.  At present (mid-2002) Java~1.3.1 is
+long in the tooth but stable.  Version~1.4 is in beta, and on the point 
+of being released properly; it includes a few changes to the language, 
+most noticeably the inclusion of an <code>assert</code> construct.
+
+<subsubsect id='s.otherlang'>Other languages
+
+<p>C and Fortran cover most of the bases for scientific computing, but
+there are one or two others which come in useful occasionally.
 
 <subsubsubsect id='s.sedawk'>awk and sed
 
@@ -2989,6 +3029,9 @@ resources.
 <px>Pointers to the LaTeX project, other tutorials, and the TeX FAQ.
 Some reorganisation.</px>
 </update>
+<update versionid="v2-3">
+<px>Added a reference to the Adam Lewenberg book pointers</px>
+</update>
 </subhead>
 
 <p>Starlink supports &latex; and &tex; users by maintaining and
@@ -3000,11 +3043,12 @@ particularly some of the relevant journal style files.  See the
 for details.
 
 <p><webref url="http://www.latex-project.org/" >&latex;</webref> is
-re-released every six months, notionally in June and December, with
+nominally (though not actually)
+re-released every six months, in June and December, with
 each release incorporating bugfixes, but no significant development.
 New features are being incorporated into &latex;3, which is a major
 upgrade, still being developed.  Versions more than a year old (that
-is, more than two releases ago) are deemed `obsolete', and bug reports
+is, more than two releases ago) are formally `obsolete', and bug reports
 won't be accepted for them.</p>
 
 <p>The current version of &latex; is also known as &latex;2e, to
@@ -3025,7 +3069,7 @@ unless some primitive publisher (which used to include MNRAS until
 rather recently) absolutely insists on it.</p>
 
 <p>Other &latex; resources you might want to examine are the <webref
-url='&ctan;/faq'>UK &tex FAQ</webref>, <webref
+url='&ctan;/faq'>UK &tex FAQ</webref> (this is <em>very</em> good), <webref
 url='http://wwwinfo.cern.ch/asdoc/textproc.html'>CERN's &tex
 pages</webref>, and the <webref
 url='&ctan;/tex-archive/help/Catalogue/catalogue.html'>catalogue</webref>
@@ -3033,14 +3077,22 @@ at <webref url="&ctan;">CTAN</webref> (the `Comprehensive &tex;
 Archive Network', hosted on three peer machines in the UK, Germany and
 the US, and mirrored worldwide; all &tex; is there).</p>
 
-<p>All this, of course, assumes that you're already a &latex; user.  If
-you're just starting with &latex;, then the canonical place to start
-is with Leslie Lamport's
-<cite>&latex;: a Document Preparation System, 2nd
-edition</cite> <cite/lamport>.  I think this is a good introduction,
-because it concentrates on the basics, and leaves the elaborate
-details to others.   If it's the elaborate details you
-want, then you'll need to supplement Lamport.  Two good books to
+<p>All this, of course, assumes that you're already a &latex; user.
+If you're just starting with &latex;, then the canonical place to
+start is with Leslie Lamport's <cite>&latex;: a Document Preparation
+System, 2nd edition</cite> <cite/lamport>.  I think this is a good
+introduction, because it concentrates on the basics, and leaves the
+elaborate details to others.  The bulk of the book is an accessible
+introduction to &latex; (and note that you are forbidden from asking
+&latex; questions unless you've already read chapter~2); appendix~C is
+a reference manual.</p>
+
+<p>If it's the elaborate details you
+want, then you'll need to supplement Lamport.  Victor Eijkhout's
+<webref url="http://www.eijkhout.net/tbt/">&tex; by Topic</webref> is
+well spoken-of, though I haven't examined it myself (the book is now out
+of print, but the author has made it available for free, for a donation).
+Two other good books to
 examine are <cite>A Guide to &latex;</cite>
 <citation/kopka>, and <cite>&latex; Line by Line</cite>
 <citation/diller>.  Both are substantially more advanced than Lamport,
@@ -3049,8 +3101,8 @@ to choose, I would go for Kopka and Daly over Diller, partly because
 they have produced a second edition covering &latex;2e, but also
 because Diller seems to try to pack in too much, including some
 material (such as the intricacies of maths typesetting) which, if
-you're going to learn, you should probably learn from Knuth's &tex;
-book.  Having said that, the advantage is a narrow one, and you'd be
+you're going to learn, you should probably learn from Knuth's &tex;book.
+Having said that, the advantage is a narrow one, and you'd be
 well-advised to choose based on whose writing style you prefer, and
 which one happens to be in the bookshop on the right day<note>It's
 unfortunate that neither book is much of an advert for &tex;'s
@@ -3065,12 +3117,16 @@ Mittelback and Samarin's <cite>The &latex;
 Companion</cite> <citation/goossens> is useful, but intended as a reference, not as an
 introduction.  For other print books, and details of these ones, see the
 &tex; FAQ's bibliography at 
-<url>&ctan;/cgi-bin/texfaq2html?label=books</url>.</p>
+<url>&ctan;/cgi-bin/texfaq2html?label=books</url>, and Adam
+Lewenberg's collection of <webref
+url="http://www.macrotex.net/texbooks/" >&tex; and &latex; print
+resources</webref>.</p>
 
-<p>There are a number of online tutorials.  Both the `<webref
-url="&ctan;/tex-archive/info/gentle/" >Gentle
-Introduction</webref>' and the `<webref
-url="&ctan;/tex-archive/info/lshort/english/" >Not so
+<p>There are a number of <webref
+url="http://www.tex.ac.uk/cgi-bin/texfaq2html?label=tutorials" >online
+tutorials</webref>.  Both the `<webref
+url="&ctan;/tex-archive/info/gentle/" >Gentle Introduction</webref>'
+and the `<webref url="&ctan;/tex-archive/info/lshort/english/" >Not so
 Short Introduction</webref>' are available at CTAN.</p>
 
 <!--XXX: possibly include pointers to
@@ -3097,6 +3153,11 @@ not where to start (and I speak as a lapsed &tex;ie who has spluttered
 furiously at Leslie Lamport's failure to impose a satisfactorily
 rigourous line on even such fundamental doctrinal matters as how the
 word `&latex;' is to be pronounced).</p>
+
+<p>You should be aware of <code>pdflatex</code>, which is a version of 
+&tex; which produces PDF files directly rather than DVI files (though
+note that versions before <code>1.0-prerelease</code> produce bad PDF
+which breaks Windows Acroread 5 at least).</p>
 
 <p>Starlink has produced several documents concerned with &latex;.
 The &latex; user's guide,
