@@ -86,7 +86,6 @@
 *    Authors :
 *     J.Lightfoot (JFL@ROE.AC.UK)
 *    History :
-*     $Id$
 *     23-MAR-1995: Original version
 *    endhistory
 *    Type Definitions :
@@ -151,7 +150,10 @@
 *  only calculate next iteration if lambda > 0, otherwise this routine
 *  will just calculate the error matrix
 
-         IF (LAMBDA .GT. 0.0D0) THEN
+         IF (LAMBDA .EQ. 0.0D0) THEN
+            LOOPING = .FALSE.
+         ELSE
+
             CALL SCULIB_FIT_MULT (N, ALPHA, BETA, DA, STATUS)
             CALL XISQ_ROUTINE (XISQ1, N, A, STATUS)
 
