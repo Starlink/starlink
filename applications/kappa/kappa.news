@@ -23,6 +23,10 @@
    parameters have been removed. Three new options have been added for 
    parameter OPTION: "Undo", "Draw", and "Style".
 
+   - A bug has been fixed in COLLAPSE which caused unnecessary memory to be
+   allocated when ESTIMATOR=MEAN, resulting in an error if insufficient
+   memory was available.
+
    - The PICIN and PICTRANS have been modified to use any WCS information
    associated with graphics pictures. Various parameters have been changed,
    removed or added.

@@ -79,6 +79,8 @@
 *     27-OCT-2000 (DSB):
 *        Modified to avoid re-ordering the data if it is already in the
 *        correct order (i.e. if the collapse axis is the last pixel axis).
+*     26-SEP-2001 (DSB):
+*        Do not allocate memory for a covariance array (IPCOV) if method=mean.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -279,7 +281,11 @@
       IF( VAR ) THEN
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN*( NLIN + 1 )/2 
-         CALL PSX_CALLOC( NLIN*NMAT, '_DOUBLE', IPCOV, STATUS )
+         IF( IMETH .NE. 2 ) THEN
+            CALL PSX_CALLOC( NLIN*NMAT, '_DOUBLE', IPCOV, STATUS )
+         ELSE
+            IPCOV = IPPP
+         END IF
   
 *  If the axis along which the input array was collapsed was not the last
 *  axis, we need to use the re-ordered data in the work arrays.
@@ -304,7 +310,7 @@
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
-         CALL PSX_FREE( IPCOV, STATUS )
+         IF( IMETH .NE. 2 ) CALL PSX_FREE( IPCOV, STATUS )
 
 *  Now deal with cases where input variances are not available. No output
 *  variances will be created.

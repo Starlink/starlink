@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.18}
 \newcommand{\stardocnumber}    {95.18}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {19 September 2001}
+\newcommand{\stardocdate}      {26th September 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.18}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -44440,6 +44440,13 @@ The following applications have been modified:
                assumed to be in the current Frame of the NDF. The ARD file 
                can contain COFRAME and WCS statements to indicate that
                positions are given in some other co-ordinate Frame.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item A bug has been fixed which caused unnecessary memory to be
+         allocated when ESTIMATOR=MEAN, resulting in an error if insufficient
+         memory was available.
       \end{itemize}
 
    \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
