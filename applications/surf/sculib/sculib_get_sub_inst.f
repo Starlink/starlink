@@ -20,15 +20,30 @@
 *     the user is given a choice.
 
 *  Arguments:
-
+*     PACKAGE = _CHAR (Given)
+*        Name of software package for informational message
+*     N_FITS = _INTEGER (Given)
+*        Number of FITS items
+*     FITS(N_FITS) = _CHAR*80 (Given & Returned)
+*        The FITS array
+*     PARAM = _CHAR (Given)
+*        Name of the ADAM parameter used to ask for sub instrument
+*     N_SUB = _INTEGER (Returned)
+*        Number of sub instruments in file
+*     SUB_POINTER = _INTEGER (Returned)
+*        Index of selected sub instrument
+*     WAVE = _REAL (Returned)
+*        Wavelength (microns) of selected sub instrument
+*     INST = _CHAR (Returned)
+*        Name of selected sub instrument
+*     FILT = _CHAR (Returned)
+*        Name of selected filter
 *     STATUS = _INTEGER (Given & Returned)
 *        Global status
 
-*  Prior Requirements:
-*     
-
 *  Notes:
-*     
+*     I actually need to include REDS_SYS (for SCUBA__MAX_SUB) but I am
+*     doing it by hand at the moment.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
