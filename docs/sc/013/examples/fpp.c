@@ -81,7 +81,7 @@ Float pinfinity (Float darg);		/* return +ve or -ve infinity */
 /* Functions which do the work of this demo program */
 char *pbits (unsigned int i, unsigned int n);
 int parse_int (const char *s, unsigned int i[NINTS]);
-Float reprint_number (char *s, Float farg);
+void reprint_number (char *s, Float farg);
 
 
 
@@ -251,9 +251,8 @@ int parse_int (const char *s, unsigned int i[1])
 /*
  * Convert string to number and display in various formats.
  * If s is NULL, then use the number farg instead.
- * Return number.
  */
-Float reprint_number (char *s, Float farg)
+void reprint_number (char *s, Float farg)
 {
     ieeefloat F;
     if (s == NULL)
@@ -325,7 +324,7 @@ int main (int argc, char **argv)
 	    (BIGENDIAN ? "big" : "little"));
 
     if (argc > 1)
-        (void) reprint_number (argv[1], 0);
+        reprint_number (argv[1], 0);
     else
     {
         char line[80];
@@ -334,20 +333,20 @@ int main (int argc, char **argv)
 		switch (line[1])
 		{
 		  case 'n':
-		    f = reprint_number (NULL, pnan(""));
+		    reprint_number (NULL, pnan(""));
 		    break;
 		  case 'i':
-		    f = reprint_number (NULL, pinfinity(+1.0));
+		    reprint_number (NULL, pinfinity(+1.0));
 		    break;
 		  case 'z':
-		    f = reprint_number (NULL, 0);
+		    reprint_number (NULL, 0);
 		    break;
 		  default:
 		    printf ("eh?\n");
 		    break;
 		}
 	    else
-		f = reprint_number (line, 0);
+		reprint_number (line, 0);
     }
     exit (0);
 }
