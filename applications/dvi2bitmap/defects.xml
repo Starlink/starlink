@@ -55,7 +55,7 @@ examination of the Sun and Compaq compilers.</p>
 </resolution>
 </defect>
 
-<defect status="open" originator="Norman">
+<defect status="closed" originator="Norman">
 <title>Spacing at small sizes</title>
 <p>Spacing in small fonts is wrong.  If you write $x^{123}$ or
 ${\scriptstyle \cos x}$, the `123' and the `cos' are strung out from
@@ -66,6 +66,13 @@ fontdimen parameters (see the TeXBook, appendix F) but it persists
 even when that's turned right off.  Also, it's actually wrong with a
 variety of small fonts, such as cmr7, not in specifically maths fonts.
 Most puzzling.</p>
+<resolution status="fixed" author="Norman" date="28-Jun-2000"
+	note="PkFont.h, revision 1.32">
+<p>Finally tracked this down to a bit of defensive programming in the
+definition of PkFont::designSize(), which was returning the correct
+answer at all times except during font-reading, when it always
+returned 10pt.</p>
+</resolution>
 </defect>
 
 </defectslist>
