@@ -33,6 +33,10 @@ Altered documentation of font-searching, to match new functionality.
 versionid="upd5">Assorted changes, to describe significant new functionality.
 </distribution>
 
+<change date="13-SEP-1999" author=ng versionid="post-upd5>
+Added page-selection features, and documented them.
+</change>
+
 </history>
 
 <copyright>
@@ -114,6 +118,9 @@ to support other models of use.
 
 <subsect id=usage.options export>Options
 <update versionid="upd5">Added documentation of -c and -C options</update>
+<update versionid="post-upd4">Added documentation of -p -l -pp
+options.  Note that the old -l and -L options have changed into the
+new -L and -LL options.</update>
 
 <p><dl>
 <dt><code>-bh size, -bw size</code>
