@@ -139,7 +139,7 @@
       IF( X1 .LE. X2 ) THEN
          STATUS = NDF__FATIN
          CALL MSG_SETC( 'ROUTINE', 'NDF1_DLFOR' )
-         CALL MSG_SETI( 'FILE', FILE )
+         CALL MSG_SETC( 'FILE', FILE )
          CALL ERR_REP( 'NDF1_DLFOR_FXS',
      :      'Routine ^ROUTINE called with an invalid FILE argument ' //
      :      'of ^FILE; this value should not include any foreign '//
