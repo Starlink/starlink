@@ -96,6 +96,8 @@
 
 *  Local Variables:
       CHARACTER*7		LTYPE			! Local copy of TYPE
+
+      INTEGER			FC			! First char of TYPE
 *.
 
 *  Check inherited global status.
