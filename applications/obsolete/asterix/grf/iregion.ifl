@@ -5,6 +5,14 @@ interface IREGION
     prompt 'Mode'
     help 'Type HELP for a full list'
   endparameter
+  parameter SUBMODE
+    position 2
+    type '_CHAR'
+    default 'ADD'
+    vpath 'DEFAULT'
+    prompt 'Sub-mode'
+    help 'Type HELP for a full list'
+  endparameter
   parameter EXC
     type '_LOGICAL'
     prompt 'Exclude this region'
