@@ -18,7 +18,6 @@
       global env
       global CCDdir
       global KAPdir
-      global Tickerbitmap
 
 #  Set the global variable which controls where to pickup source etc.
       if { [ info exists env(CCDPACK_DIR) ] } {
@@ -32,11 +31,6 @@
          set KAPdir $env(KAPPA_DIR)
       } else {
          set KAPdir /star/bin/kappa
-      }
-
-#  Set up bitmaps for the ticking clock animation.
-      foreach i { 1 2 3 4 5 6 7 8 } {
-         set Tickerbitmap($i) "$CCDdir/c$i.xbm"
       }
 
 #  Get ready to use ADAM tasks.
