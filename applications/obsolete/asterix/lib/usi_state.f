@@ -116,6 +116,6 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Invoke the STATE routine
-      CALL STATE_RTN( PAR, STATUS )
+      CALL STATE_RTN( PAR, STATE, STATUS )
 
       END
