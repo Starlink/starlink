@@ -79,13 +79,14 @@ dnl   Find working tools
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROG(PERL, perl)
+AC_PROG_AWK
 
 AC_PATH_PROG([JAVAC], [javac], [NOJAVAC])
 AC_ARG_VAR([JAVAC], [Location of java compiler])
 
 
 # Convert the version number in PACKAGE_VERSION into an integer
-PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
+PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | $AWK '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
 
