@@ -18,9 +18,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.4  1996/09/17 02:14:22  timj
-*     Add CONCAT
+*     Revision 1.5  1996/09/18 19:13:19  timj
+*     Add KSTEST, change CONCAT to SCUCAT
 *
+c Revision 1.4  1996/09/17  02:14:22  timj
+c Add CONCAT
+c
 c Revision 1.3  1996/09/16  20:27:18  timj
 c Change PHOTOM to SCUPHOT
 c
@@ -95,9 +98,13 @@ c
 
          CALL REDS_SKYDIP (STATUS)
 
-      ELSE IF (NAME .EQ. 'CONCAT') THEN
+      ELSE IF (NAME .EQ. 'SCUCAT') THEN
 
-         CALL REDS_CONCAT (STATUS)
+         CALL REDS_SCUCAT (STATUS)
+
+      ELSE IF (NAME .EQ. 'KSTEST') THEN
+
+         CALL REDS_KSTEST (STATUS)
 
       END IF
 
