@@ -12905,6 +12905,31 @@ default value.
             position. Parameters MARKER, GEODESIC and CLOSE are used to
             specify the symbols and lines to use.
 
+            \sstitem
+            {\tt "}Box{\tt "} -- A rectangular box with edges parallel to the 
+            edges of the graphics device is drawn with the specified position 
+            at one corner, and the previously specified position at the 
+            diagonally opposite corner.
+
+            \sstitem
+            {\tt "}Vline{\tt "} -- A vertial line is drawn through each 
+            specified position, extending the entire height of the selected 
+            picture.
+
+            \sstitem
+            {\tt "}Hline{\tt "} -- A horizontal line is drawn through each 
+            specified position, extending the entire width of the selected 
+            picture.
+
+            \sstitem
+            {\tt "}Cross{\tt "} -- A combination of {\tt "}Vline{\tt "} and 
+            {\tt "}Hline{\tt "}.
+
+            \sstitem
+            {\tt "}Text{\tt "} -- A text string is used to mark each position. 
+            The string is drawn horizontally and is centred on the specified 
+            position. The strings to use for each position are specified 
+            using parameter STRINGS.
          }
          [current value]
       }
@@ -12925,6 +12950,28 @@ default value.
          anyway (see parameter FRAME) then a value of FALSE is used for.
          SHOWPIXEL. [current value]
       }
+
+      \sstsubsection{
+         STRINGS = LITERAL (Read)
+      }{
+         A group of text strings which are used to mark the supplied positions 
+         if parameter PLOT is set to {\tt "}TEXT{\tt "}. The first string in the
+         group is used to mark the first position, the second string is
+         used to mark the second position, etc. If more positions are
+         given than there are strings in the group, then the extra
+         positions will be marked with an integer value indicating the
+         index within the list of supplied positions. If a null value (!)
+         is given for the parameter, then all positions will be marked
+         with integer indices, starting at 1.
+ 
+         A comma-separated list should be given in which each element is
+         either a marker string, or the name of a text file preceded by an 
+         up-arrow character {\tt "}$\wedge${\tt "}. Such text files should contain further 
+         comma-separated lists which will be read and interpreted in the 
+         same manner. Note, strings within text files can be separated by
+         new lines as well as commas.
+      }
+
       \sstsubsection{
          STYLE = LITERAL (Read)
       }{
@@ -13003,6 +13050,22 @@ default value.
          the current graphics device.  The style to use is read from
          text file mystyle, but is then modified so that 5 digits are used
          to format axis 1 values, and 7 to format axis 2 values.
+      }
+
+      \sstexamplesubsection{
+         cursor plot=box style={\tt "}width=3,colour=red{\tt "} maxpos=2 minpos=2 
+      }{
+         Exactly two positions must be given using the cursor, and a red box
+         is drawn joining the two positions. The lines making up the box
+         are three times the default width.
+      }
+
+      \sstexamplesubsection{
+         cursor plot=text style={\tt "}size=2,textbackcolour=clear{\tt "}
+      }{
+         Positions are marked using integer values, starting at 1 for the
+         first position. The text drawn is twice as large as normal, and
+         the background is not cleared before drawing the text.
       }
    }
    \sstnotes{
@@ -21548,6 +21611,32 @@ plot (10k).
             position. Parameters MARKER, GEODESIC and CLOSE are used to
             specify the symbols and lines to use.
 
+            \sstitem
+            {\tt "}Box{\tt "} -- A rectangular box with edges parallel to the 
+            edges of the graphics device is drawn with the specified position 
+            at one corner, and the previously specified position at the 
+            diagonally opposite corner.
+
+            \sstitem
+            {\tt "}Vline{\tt "} -- A vertial line is drawn through each 
+            specified position, extending the entire height of the selected 
+            picture.
+
+            \sstitem
+            {\tt "}Hline{\tt "} -- A horizontal line is drawn through each 
+            specified position, extending the entire width of the selected 
+            picture.
+
+            \sstitem
+            {\tt "}Cross{\tt "} -- A combination of {\tt "}Vline{\tt "} and 
+            {\tt "}Hline{\tt "}.
+
+            \sstitem
+            {\tt "}Text{\tt "} -- A text string is used to mark each position. 
+            The string is drawn horizontally and is centred on the specified 
+            position. The strings to use for each position are specified 
+            using parameter STRINGS.
+
          }
          Each position may also be labelled with its integer identifier value
          by giving a TRUE value for parameter LABEL. [None]
@@ -21574,6 +21663,28 @@ plot (10k).
          parameters and files are still created. The dynamic default is
          to run quietly if any graphics or labels are being plotted (see
          parameters PLOT and LABEL). []
+      }
+      \sstsubsection{
+         STRINGS = LITERAL (Read)
+      }{
+         A group of text strings which are used to mark the supplied positions 
+         if parameter PLOT is set to {\tt "}TEXT{\tt "}. The first string in the
+         group is used to mark the first position, the second string is
+         used to mark the second position, etc. If more positions are given 
+         than there are strings in the group, then the extra positions will 
+         be marked with an integer value indicating the index within the list 
+         of supplied positions (note, these integers may be different to the 
+         position identifiers in the supplied positions list - if you want to 
+         see the position identifiers, use parameter LABEL). If a null value 
+         (!) is given for the parameter, then all positions will be marked 
+         with integer indices, starting at 1.
+ 
+         A comma-separated list should be given in which each element is
+         either a marker string, or the name of a text file preceded by an 
+         up-arrow character {\tt "}$\wedge${\tt "}. Such text files should contain further 
+         comma-separated lists which will be read and interpreted in the 
+         same manner. Note, strings within text files can be separated by
+         new lines as well as commas.
       }
       \sstsubsection{
          STYLE = LITERAL (Read)
@@ -38445,7 +38556,7 @@ plotting application.
                   comment, name and label are displayed on a separate
                   line).
 
-            \item There are now more options for marking the positions
+            \item There are now many more options for marking the positions
                   on the screen. Detailed control over the appearance
                   of these graphics is provided through the new STYLE 
                   parameter.
@@ -38458,13 +38569,15 @@ plotting application.
 
             \item The following new parameters have been added: DESCRIBE,
                   EPOCH, FRAME, GEODESIC, INFO, LASTDIM, LASTPOS, MARKER,
-                  MAXPOS, MINPOS, OUTLIST, QUIET, SHOWPIXEL, STYLE.
+                  MAXPOS, MINPOS, OUTLIST, QUIET, SHOWPIXEL, STRINGS, STYLE.
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [PLOT] Option ``Cross'' has been withdrawn, and 
-                               the new options ``Mark'' and ``Chain''
-                               have been added.
+                  \item [PLOT] Option ``Cross'' has been changed (it now
+                               produces a full-screen cross-hair), and 
+                               the new options ``Mark'', ``Chain'', ``Box'',
+                               ``Vline'', ``Hline'' and ``Text'' have been 
+                               added.
                \end{description}
 
          \end{itemize}
