@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.9}
+\newcommand{\stardocnumber}    {214.10}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {13 September 2001}
+\newcommand{\stardocdate}      {4th September 2002}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.6}
@@ -875,73 +875,6 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
-\subsection{Release - 2.4}
-This is a minor release of GAIA that includes a new toolbox and some
-minor improvements/fixes.
-
-The new toolbox provides an interactive environment for doing the
-surface photometry of extended sources (\textit{i.e.} galaxies) and inspecting
-the results. It is based on the ESP (\xref{SUN/180}{sun180}{}) package
-commands ELLPRO and ELLFOU.
-
-This is a minor update to GAIA with the following fixes:
-\begin{itemize}
-\item It is expected that work to make the
-      \htmladdnormallinkfoot{LEDAS}{http://ledas-www.star.le.ac.uk/}
-      catalogues available should be completed by the time of this
-      release (these will appear in the ``Browse Catalog
-      Directories...'' item under the ``Data-Servers'' menu).
-
-\item A new configuration option \mytt{-focus\_follows\_mouse} has been
-      added. This follows complaints from users of Solaris CDE that
-      the window manager default configuration allows pop-up windows
-      to disappear (behind the main window) and sometime flash
-      uncontrollably. To stop this happening by default means that
-      everyone will now need to point at a text entry field and click
-      in it before changing the text and also click in the main window
-      before scrolling using the arrow keys. To restore the old
-      behaviour see
-      \hyperref{configuration options}{\S}{}{configuration_options}.
-
-\item A percentiles option has been added to automatic contour
-      generation.
-
-\item The ``automatic'' generation option now correctly uses the image
-      to be contoured not the displayed image.
-
-\item The measure band can now display pixels and non-celestial
-      coordinate system offsets.
-
-\item The SExtractor toolbox increment and decrement arrows now work
-      the ``obvious'' way around.
-
-\item Automatic NDF history recording should be working again.
-
-\item NDFs stored within container files are now supported.
-
-\item Floating point images of size $35,000*2,048$ pixels are now known to
-      display (if you have sufficient VM). Bigger images may also work.
-
-\item Pixel coordinates (which include the NDF origin) can now be
-      selected as the ``celestial'' coordinate system (see the
-      ``Celestial coordinates...'' toolbox)
-
-\item Blank pixels in unsigned word NDFs should be be handled
-      correctly.
-
-\item It should now be possible to plot POLPACK polarization data
-      again, although X and Y coordinates should still not include any
-      NDF origin offsets.
-
-\item The on-line help for the photometry toolbox is available
-      again.
-
-\item The ability to zoom around an object in the main display has
-      been added (this is controlled using Shift-1 and Shift-2 mouse
-      buttons).
-
-\end{itemize}
-
 \subsection{Release - 2.5}
   This release (which was only available from the Starlink Software
   Store) includes two new toolboxes, various significant improvements
@@ -1000,7 +933,7 @@ This is a minor update to GAIA with the following fixes:
     window has been restored to show 0.1 arcsec resolution.
   \end{itemize}
 
-\subsection{This release - 2.6} 
+\subsection{Release - 2.6} 
   Release 2.6 includes a new toolbox and various enhancements.
 
   The new toolbox displays maps of polarization vectors as produced by
@@ -1103,6 +1036,28 @@ This is a minor update to GAIA with the following fixes:
      \item The rendering of ellipses drawn as graphics overlays (such
        as those used to show object detections) has been improved,
        especially at low resolutions.
+\end{itemize}
+
+\subsection{This release - 2.6-8}
+
+This release contains a few updates. 
+\begin{itemize}
+   \item New X\_PIXEL and Y\_PIXEL parameters have been added to object
+     detection toolbox (these report pixel coordinates, i.e. include
+     any origin information).
+
+   \item Non-transient pop-up windows that grabbed the focus during their
+     creation (for instance the NDF chooser) have had their behaviour
+     modified to not grab the focus.
+
+   \item While processing FITS astrometries stored in NDFs a report to
+     the terminal about missing FITS keywords followed by a failure to
+     load the image (with a dialog message about `missing data
+     component') could occur. This problem is now fixed.
+
+   \item The astrometry fitting toolboxes (using reference positions) have
+     been upgraded to accept RA and Dec values with space separations.
+     Note that in general you should use colons as the separators.
 \end{itemize}
 
 \section{\xlabel{acknowledgements}Acknowledgements}

@@ -1,20 +1,23 @@
-1 GAIA minor update
+1 GAIA update
 
-  GAIA has been updated to add the new X_PIXEL and Y_PIXEL parameters
-  to the object detection toolbox.
+  This release contains a few updates. 
 
-  Some non-transient pop-up windows grabbed the focus during their
-  creation (for instance the NDF chooser). This behaviour has now
-  been fixed.
+   - New X_PIXEL and Y_PIXEL parameters have been added to object
+     detection toolbox (these report pixel coordinates, i.e. include
+     any origin information).
 
-  FITS astrometries stored in NDFs could result in a report to
-  the terminal about missing FITS keywords followed by a failure to
-  load the image (with a dialog message about "missing data
-  component"), this problem is now fixed.
+   - Non-transient pop-up windows that grabbed the focus during their
+     creation (for instance the NDF chooser) have had their behaviour
+     modified to not grab the focus.
 
-  The astrometry fitting toolboxes (using reference positions) have
-  been upgraded to accept RA and Dec values with space separations.
-  Note that in general you should use colons as the separators.
+   - While processing FITS astrometries stored in NDFs a report to
+     the terminal about missing FITS keywords followed by a failure to
+     load the image (with a dialog message about "missing data
+     component") could occur. This problem is now fixed.
+
+   - The astrometry fitting toolboxes (using reference positions) have
+     been upgraded to accept RA and Dec values with space separations.
+     Note that in general you should use colons as the separators.
 
   To try out GAIA for yourself type the following command:
 
