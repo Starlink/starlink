@@ -168,7 +168,7 @@
 *           Simple linear interpolation (astResample<X>).
 *        AST__NEAREST
 *           Use nearest pixel centre (astResample<X>)
-*        AST__UINTERP1, 2, 3 & 4
+*        AST__URESAMP1, 2, 3 & 4
 *           Flags reserved for user-defined purposes.
 *        AST__USEBAD
 *           Recognise bad pixels (astResample<X>)?
@@ -238,10 +238,10 @@
 /* These macros define flag values which may be passed to
    astResample<X> (via the "flags" argument) to control the resampling
    process. */
-#define AST__UINTERP1 (1)        /* Flags reserved for user-defined purposes */
-#define AST__UINTERP2 (2)
-#define AST__UINTERP3 (4)
-#define AST__UINTERP4 (8)
+#define AST__URESAMP1 (1)        /* Flags reserved for user-defined purposes */
+#define AST__URESAMP2 (2)
+#define AST__URESAMP3 (4)
+#define AST__URESAMP4 (8)
 #if defined(astFORTRAN77)        /* Only needed for Fortran interface */
 #define AST__USEVAR (16)         /* Use variance arrays? */
 #endif

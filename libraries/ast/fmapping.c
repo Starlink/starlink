@@ -67,13 +67,15 @@ static void (* ast_resample_FINTERP)();
    astResample<X>. */
 
 /* Define a macro which defines an interface function called
-   ast_resample_interp<X> for a specific data type.
+   ast_resample_uinterp<X> for a specific data type.
 
    The resulting function has a suitable interface to allow it to be
-   passed as an interpolation function to the C interface
-   (astResample<X>). In turn, it invokes the user-supplied FORTRAN 77
-   interpolation function, a pointer to which should previously have
-   been stored in the static variable "ast_resample_FINTERP". */
+   passed as an interpolation function to the C interface of
+   astResample<X> in the case where the "interp" parameter is set to
+   AST__UINTERP. In turn, it invokes the equivalent user-supplied
+   FORTRAN 77 interpolation function, a pointer to which should
+   previously have been stored in the static variable
+   "ast_resample_FINTERP". */
 #define MAKE_AST_RESAMPLE_UINTERP(X,Xtype,Ftype) \
 static void ast_resample_uinterp##X( int ndim, \
                                      const int lbnd[], const int ubnd[], \
@@ -116,6 +118,7 @@ static void ast_resample_uinterp##X( int ndim, \
 MAKE_AST_RESAMPLE_UINTERP(D,double,DOUBLE)
 MAKE_AST_RESAMPLE_UINTERP(F,float,REAL)
 MAKE_AST_RESAMPLE_UINTERP(I,int,INTEGER)
+MAKE_AST_RESAMPLE_UINTERP(UI,unsigned int,INTEGER)
 MAKE_AST_RESAMPLE_UINTERP(S,short int,WORD)
 MAKE_AST_RESAMPLE_UINTERP(US,unsigned short int,UWORD)
 MAKE_AST_RESAMPLE_UINTERP(B,signed char,BYTE)
@@ -123,6 +126,30 @@ MAKE_AST_RESAMPLE_UINTERP(UB,unsigned char,UBYTE)
 
 /* Undefine the macro. */
 #undef MAKE_AST_RESAMPLE_UINTERP
+
+/* Define a function called ast_resample_ukern1 which has a suitable
+   interface to allow it to be passed as an interpolation function to
+   the C interface of astResample<X> in the case where the "interp"
+   parameter is set to AST__UKERN1. In turn, it invokes the equivalent
+   user-supplied FORTRAN 77 interpolation function, a pointer to which
+   should previously have been stored in the static variable
+   "ast_resample_FINTERP". */
+static void ast_resample_ukern1( double offset, const double params[],
+                                 int flags, double *value ) {
+   DECLARE_INTEGER(STATUS);
+
+/* Obtain the C status and then invoke the FORTRAN 77 interpolation
+   function via the stored pointer. */
+   STATUS = astStatus;
+   ( *ast_resample_FINTERP )( DOUBLE_ARG(&offset),
+                              DOUBLE_ARRAY_ARG(params),
+                              INTEGER_ARG(&flags),
+                              DOUBLE_ARG(value),
+                              INTEGER_ARG(&STATUS) );
+
+/* Set the C status to the returned FORTRAN 77 status. */
+   astSetStatus( STATUS );
+}
 
 /* FORTRAN interface functions. */
 /* ============================ */
@@ -225,20 +252,27 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(OUT_VAR) \
    GENPTR_INTEGER(STATUS) \
 \
+   void (* finterp)(); \
    Xtype *out_var; \
    const Xtype *in_var; \
-   void (* finterp)(); \
    F77_INTEGER_TYPE RESULT; \
 \
    astAt( "AST_RESAMPLE"#F, NULL, 0 ); \
    astWatchSTATUS( \
 \
-/* If *INTERP is set to AST__UINTERP, store a pointer to the \
-   user-supplied FORTRAN 77 interpolation function and use the \
-   "ast_resample_uinterp<X>" C wrapper function to invoke it. */ \
+/* If *INTERP is set to a value that requires a user-supplied \
+   interpolation function, then store a pointer to the supplied \
+   FORTRAN 77 version of this routine and use the appropriate C \
+   wrapper function (defined above) to invoke it. */ \
       if ( *INTERP == AST__UINTERP ) { \
          ast_resample_FINTERP = FINTERP; \
          finterp = (void (*)()) ast_resample_uinterp##X; \
+      } else if ( *INTERP == AST__UKERN1 ) { \
+         ast_resample_FINTERP = FINTERP; \
+         finterp = (void (*)()) ast_resample_ukern1; \
+      } else { \
+         ast_resample_FINTERP = NULL; \
+         finterp = NULL; \
       } \
 \
 /* If the AST__USEVAR flag is set, use the input and output variance \
@@ -263,6 +297,7 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
 MAKE_AST_RESAMPLE(d,D,DOUBLE,D,double)
 MAKE_AST_RESAMPLE(r,R,REAL,F,float)
 MAKE_AST_RESAMPLE(i,I,INTEGER,I,int)
+MAKE_AST_RESAMPLE(ui,UI,INTEGER,UI,unsigned int)
 MAKE_AST_RESAMPLE(s,S,WORD,S,short int)
 MAKE_AST_RESAMPLE(us,US,UWORD,US,unsigned short int)
 MAKE_AST_RESAMPLE(w,W,WORD,S,short int)
