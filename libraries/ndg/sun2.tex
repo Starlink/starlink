@@ -1,0 +1,1545 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun2.1}
+\newcommand{\stardocnumber}    {2.1}
+\newcommand{\stardocauthors}   {D.S. Berry}
+\newcommand{\stardocdate}      {10th September 1999}
+\newcommand{\stardoctitle}     {NDG \\ [1ex]
+                                Routines for Accessing Groups of NDFs}
+\newcommand{\stardocversion}   {Version 4.0 (DRAFT)}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents.
+%  ================================
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
+  \label{stardoccontents}
+  \begin{rawhtml}
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+
+
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+
+This document describes the routines provided within the NDG subroutine 
+library for accessing groups of NDF data objects. 
+
+% ? End of document
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section {Introduction}
+
+If an application prompts the user for an NDF using the facilities of the NDF\_ 
+system (see SUN/33), the user may only reply with the name of a single NDF. Some
+applications allow many input NDFs to be specified and the need to
+type in every NDF name explicitly each time the program is run can become time
+consuming. The NDG package provides a means of giving the user the
+ability to specify a list (or ``Group'') of NDFs as a reply to a single prompt
+for an parameter. 
+
+The current version of NDG can process NDFs which are stored as
+components within an HDS container file, and can also process foreign
+data formats using the system described in SSN/20.
+
+
+\section {Interaction Between NDG and GRP}
+NDG uses the facilities of the GRP package and users of NDG should be familiar
+with the content of SUN/150 which describes the GRP package. Groups
+created by NDG routines shoudl be deleted when no longer needed using
+GRP\_DELET.
+
+\section {General overview of the NDG\_ system}
+As a broad outline, applications use the NDG\_ package as follows:
+
+\begin{enumerate}
+
+\item A call is made to NDG\_ASSOC which causes the user to be prompted for a
+single parameter. This parameter can be of any type. The
+user replies with a ``group expression'' (see SUN/150), which contains
+the names of a group of {\em existing} NDFs to be used as inputs by
+the application. For instance, the group expression may be 
+
+\begin{verbatim}
+     m51_b3s1_ds,m51_b3s2_ds,m51_b3s2?_ds,^files.lis
+\end{verbatim}
+
+This is a complicated example, probably more complicated than would be used in
+practice, but it highlights the facilities of the GRP and NDG packages, e.g.
+wild cards (``?'' or ``$*$''), lists of files, or indirection through 
+a text file (``\verb+^+''). 
+
+The NDG\_ASSOC routine produces a list of explicit NDF names, which are stored
+internally within the GRP system. 
+
+\item What happens next depends on the application, but a common example may be
+the initiation of a DO loop to loop through the input NDFs (NDG\_ASSOC returns
+the total number of NDF names in the group). 
+
+\item To access a particular NDF, the application calls routine NDG\_NDFAS
+supplying an index, $n$, within the group (i.e $n$ is an integer in the range 1
+to the group size returned by NDG\_ASSOC). NDG\_NDFAS returns an NDF identifier
+to the $n$th NDF in the group. This identifier can then be used to access the
+NDF in the normal manner using the NDF\_ routines (SUN 33). The identifier
+should be annulled when it is no longer needed using NDF\_ANNUL in the
+normal way.
+
+\item Once the application has finished processing the group of NDFs, it calls 
+GRP\_DELET which deletes the group, releasing all resources reserved by the group.
+
+\item Routine NDG\_ASSOC can also be used to append a list of NDF names 
+obtained from the environment, to a previously defined group.
+
+The routine NDG\_CREAT produces a group containing the names of 
+NDFs which are to be created by the application. The routine NDG\_NDFCR will 
+create a new NDF with a name given by a group member, and returns an NDF 
+identifier to it. Routine NDG\_NDFPR creates a new NDF by propagation from a 
+previously existing NDF, in a similar manner to the NDF routine NDF\_PROP (see 
+SUN/33).
+
+The names of output NDFs given by users usually relate to the input NDF names.
+When NDG\_CREAT is called, it creates a group of NDF names either by modifying
+all the names in a specified input group using a ``modification element'' (see
+SUN/150), or by getting a list of new names from the user. 
+
+\item Applications which produce a group of output NDFs could also produce a
+text file holding the names of the output NDFs. Such a file can be used
+as input to the next application, using the indirection facility. A text
+file listing of all the NDFs in a group can be produced by routine
+GRP\_LIST (or GRP\_LISTF).
+
+\end{enumerate}
+
+See the detailed descriptions of NDG\_ASSOC and NDG\_CREAT below for details 
+of the processing of existing and new NDF names.
+
+\appendix
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newcommand{\noteroutine}[2]{{\small \bf #1} \\
+                              \hspace*{3em} {\em #2} \\[1.5ex]}
+
+\begin{htmlonly}
+\renewcommand{\noteroutine}[3]{
+\begin{description}
+\item [{\small \bf {#1}{#2}}] 
+{\em #3}
+\end{description}
+}
+
+\end{htmlonly}
+
+\section {Routine descriptions}
+
+\subsection {Routine list}
+
+\noteroutine{NDG\_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )}{
+      Obtain an identifier for a single existing NDF using a specified
+      parameter.}
+\noteroutine{NDG\_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )}{
+      Store names of existing NDFs specified through the environment.}
+\noteroutine{NDG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME, STATUS )}{
+      Create a single new simple NDF using a specified parameter.}
+\noteroutine{NDG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )}{
+      Obtain the names of a group of NDF to be created from the
+      environment.}
+\noteroutine{NDG\_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, STATUS )}{
+      Create a single new primitive NDF using a specified parameter.}
+\noteroutine{NDG\_GTSUP( IGRP, I, FIELDS, STATUS )}{
+      Get supplemental information for an NDF.}
+\noteroutine{NDG\_NDFAS( IGRP, INDEX, MODE, INDF, STATUS )}{
+      Obtain an NDF identifier for an existing NDF.}
+\noteroutine{NDG\_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, STATUS )}{
+      Obtain an NDF identifier for a new primitive NDF.}
+\noteroutine{NDG\_NDFCR( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF, STATUS )}{
+      Obtain an NDF identifier for a new simple NDF.}
+\noteroutine{NDG\_NDFPR( INDF1, CLIST, IGRP, INDEX, INDF2, STATUS )}{
+      Obtain an NDF identifier for a new NDF created by propagation from 
+      an existing NDF.}
+\noteroutine{NDG\_PROP1( INDF1, CLIST, PARAM, INDF2, NAME, STATUS )}{
+      Create a single new NDF by propagation using a specified parameter.}
+\noteroutine{NDG\_PTSUP( IGRP, I, FIELDS, STATUS )}{
+      Store suplemental information for an NDF.}
+\noteroutine{NDG\_SETSZ( IGRP, SIZE, STATUS )}{
+      Reduces the size of an NDG group.}
+\subsection {Full Routine Specifications}
+\label {SEC:FULLSPEC}
+
+% +
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2HTML. The contents of this file should be included in the
+%     source prior to any statements that make use of the SST commands.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+% -
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\newfont{\ssttt}{cmtt10 scaled 1095}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
+%  \sstroutine.
+   \renewcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  \sstdescription
+   \renewcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstusage
+   \renewcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  \sstinvocation
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  \sstarguments
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstreturnedvalue
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstparameters
+   \renewcommand{\sstparameters}[1]{
+      \item[Parameters:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstexamples
+   \renewcommand{\sstexamples}[1]{
+      \item[Examples:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstsubsection
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  \sstexamplesubsection
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+
+%  \sstnotes
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstdiytopic
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
+
+%  \sstimplementationstatus
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+   }
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+% .
+% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+
+% Routine descriptions:
+% =====================
+\small
+
+\newpage
+\sstroutine{
+   NDG\_ASSO1
+}{
+   Obtain an identifier for a single existing NDF using a specified
+   parameter
+}{
+   \sstdescription{
+      This routine is equivalent to NDF\_ASSOC except that it allows the
+      NDF to be specified using a GRP group expression (for instance, its
+      name may be given within a text file, etc). The first NDF in the
+      group expression is returned. Any other names in the group
+      expression are ignored. Supplemental information describing the
+      separate fields in the NDF specification are also returned.
+   }
+   \sstinvocation{
+      CALL NDG\_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter.
+      }
+      \sstsubsection{
+         MODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Type of NDF access required: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or {\tt '}WRITE{\tt '}.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         FIELDS( 6 ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Each element contains the following on exit:
+
+         1) NDF slice specifications
+         2) HDS paths
+         3) File types
+         4) Base file names
+         5) Directory paths
+         6) Full NDF specification (this is the returned group - IGRP)
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_ASSOC
+}{
+   Store names of existing NDFs specified through the environment
+}{
+   \sstdescription{
+      A group expression is obtained from the environment using the
+      supplied parameter. The expression is parsed (using the
+      facilities of the GRP routine GRP\_GROUP, see SUN/150) to produce
+      a list of explicit names for existing NDFs which are appended to the
+      end of the supplied group (a new group is created if none is
+      supplied). If an error occurs while parsing the group expression, the
+      user is re-prompted for a new group expression. NDF identifiers for
+      particular members of the group can be obtained using NDG\_NDFAS.
+   }
+   \sstinvocation{
+      CALL NDG\_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The parameter with which to associate the group expression.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         The identifier of the group in which the NDF names are to be
+         stored. A new group is created if the supplied value is GRP\_\_NOID.
+         It should be deleted when no longer needed using GRP\_DELET.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The total number of NDF names in the returned group.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         If the group expression was terminated by the GRP {\tt "}flag
+         character{\tt "}, then FLAG is returned true. Otherwise it is
+         returned false. Returned .FALSE. if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Any file names containing wildcards are expanded into a list of NDF
+         names. The supplied strings are intepreted by a shell (/bin/tcsh if
+         it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
+         contain shell meta-characters (eg twiddle, \$HOME, even command
+         substitution and pipes - but pipe characters {\tt "}$|${\tt "} need to be escaped
+         using a backslash {\tt "}$\backslash${\tt "} to avoid them being interpreted as GRP
+         editing characters).
+
+         \sstitem
+         Each supplied name may include an HDS path. For instance,
+         {\tt "}/home/dsb/mydata.a.c(1).b{\tt "} refers to an NDF stored in component
+         {\tt "}a.c(1).b{\tt "} in the HDS container file /home/dsb/mydata.sdf. Note,
+         wild cards are not allowed within HDS component paths (i.e. they
+         are only allowed within the specification of the container file).
+
+         \sstitem
+         If an HDS object is specified which is not an NDF, then the
+         object will be searched for NDF components. This search is
+         recursive, in that any components of the specified object are also
+         searched. The supplied name will be expanded into a group of names,
+         one for each NDF found within the specified HDS object. Note, NDFs
+         are not themselves searched for other NDFs. That is, the expanded
+         group of names will not include any NDF which is contained within
+         another NDF (i.e. NDFs which are stored as an extension item of
+         another NDF are not included in the group). For instance, if the
+         string {\tt "}fred{\tt "} is given, the HDS file fred.sdf will be searched for
+         NDFs and the returned group will contain references for all NDFs
+         found within fred.sdf.
+
+         \sstitem
+         If the environment variable NDF\_FORMATS\_IN is defined (see
+         SSN/20) then all possible NDFs matching the supplied string are
+         included in the returned group. For instance, if the string {\tt "}fred{\tt "}
+         is supplied, then the returned group will contain references to all
+         files with basename fred which also have a file type specified in
+         NDF\_FORMATS\_IN. If a FITS file {\tt "}fred.fit{\tt "} exists, and HDS file
+         {\tt "}fred.sdf{\tt "} also exists (and contains an NDF), then supplying the
+         name {\tt "}fred{\tt "} will result in both being included in the returned
+         group. If the file {\tt "}fred.sdf{\tt "} contains a component called {\tt "}.fit{\tt "},
+         then this will be included in the returned group in place of
+         {\tt "}fred.sdf{\tt "}.
+
+         \sstitem
+         NDFs contained within HDS files are opened in order to ensure
+         that they are valid NDFs. The user is notified if there are no
+         valid NDFs matching a supplied name, and they are asked to supply
+         a replacement parameter value. No check is made that any foreign
+         data files contain valid NDFs since this would involve a potentially
+         expensive data conversion. So, for instance, {\tt "}$*$.fit{\tt "} could pick up
+         FITS catalogues as well as FITS images. If a foreign data file does
+         not contain a valid NDF, an error will be reported when the NDF is
+         accessed using NDG\_NDFAS.
+
+         \sstitem
+         Each element in the returned group contains a full specification
+         for an NDF. Several other groups are created by this routine, and
+         are associated with the returned group by means of a GRP {\tt "}owner-slave{\tt "}
+         relationship. These supplemental groups are automatically deleted
+         when the returned group is deleted using GRP\_DELET. The returned
+         group should not be altered using GRP directly because corresponding
+         changes may need to be made to the supplemental groups. Routines
+         NDG\_SETSZ, NDG\_GTSUP and NDG\_PTSUP are provided to manipulate the
+         entire chain of groups. The full chain (starting from the head) is
+         as follows:
+
+         \sstitem
+            NDF slice specifications
+
+         \sstitem
+            HDS paths
+
+         \sstitem
+            File types
+
+         \sstitem
+            Base file names
+
+         \sstitem
+            Directory paths
+
+         \sstitem
+            Full NDF specification (this is the returned group IGRP)
+
+         \sstitem
+         If an error is reported the group is returned unaltered. If
+         no group is supplied, an empty group is returned.
+
+         \sstitem
+         A null value (!) can be given for the parameter to indicate
+         that no more NDFs are to be specified. The corresponding error
+         is annulled before returning unless no NDFs have been added to
+         the group.
+
+         \sstitem
+         If the last character in the supplied group expression is
+         a colon (:), a list of the NDFs represented by the group
+         expression (minus the colon) is displayed, but none are
+         actually added to the group. The user is then re-prompted for
+         a new group expression.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_CREA1
+}{
+   Create a single new simple NDF using a specified parameter
+}{
+   \sstdescription{
+      This routine is equivalent to NDF\_CREAT except that it allows the
+      NDF to be specified using a GRP group expression (for instance, its
+      name may be given within a text file, etc). The first NDF in the
+      group expression is returned. Any other names in the group
+      expression are ignored. Any modification elements in the supplied
+      group expression will be treated literally.
+   }
+   \sstinvocation{
+      CALL NDG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter.
+      }
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Full data type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_DOUBLE{\tt '} or
+         {\tt '}COMPLEX\_REAL{\tt '}).
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of NDF dimensions.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         Lower pixel-index bounds of the NDF.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the NDF.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         File specification for the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_CREAT
+}{
+   Obtain the names of a group of NDF to be created from the
+   environment
+}{
+   \sstdescription{
+      A group expression is obtained from the environment using the
+      supplied parameter. The expression is parsed (using the
+      facilities of the GRP routine GRP\_GROUP, see SUN/150) to produce
+      a list of explicit NDF names. These names are appended
+      to the group identified by IGRP. The user is re-prompted if an
+      error occurs while parsing the group expression. If IGRP has the
+      value GRP\_\_NOID on entry, then a new group is created and IGRP is
+      returned holding the new group identifier.
+
+      If IGRP0 holds a valid group identifier on entry, then the group
+      identified by IGRP0 is used as the basis for any modification
+      element contained in the group expression obtained from the
+      environment. If IGRP0 holds an invalid identifier (such as
+      GRP\_\_NOID) on entry then modification elements are included
+      literally in the output group.
+   }
+   \sstinvocation{
+      CALL NDG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The parameter with which to associate the group.
+      }
+      \sstsubsection{
+         IGRP0 = INTEGER (Given)
+      }{
+         The GRP identifier for the group to be used as the basis for
+         any modification elements. If a valid GRP identifier is
+         supplied, and if the supplied group expression contains a
+         modification element, then:
+
+         \sstitemlist{
+
+            \sstitem
+            the basis token (an asterisk) is replaced by the file basename
+            associated with the corresponding element of the basis group (the
+            {\tt "}basis NDF{\tt "}).
+
+            \sstitem
+            if no directory specification is included in the group expression,
+            the directory specification associated with the basis NDF is used.
+
+            \sstitem
+            if no HDS component path is included in the group expression,
+            the HDS component path associated with the basis NDF (if any) is
+            used. Any required higher level HDS objects are created in the
+            output HDS file by copying the structure of the HDS file containing
+            the basis NDF. Thus if, the basis NDF is fred.a.b(2).c, and the
+            group expression is {\tt "}$*$\_a{\tt "}, then an HDS container file called
+            {\tt "}fred\_a.sdf{\tt "} is created by copying fred.sdf and then deleting all
+            NDFs from fred\_a.sdf (unless this has already been done while
+            creating a previous member of the returned group). Other non-NDF
+            components in fred\_a.sdf are retained. This ensures that all necessary
+            structure exists in fred\_a.sdf, so that the NDF fred\_a.a.b(2).c
+            can be created when necessary.
+
+         }
+         The supplied group will often be created by NDG\_ASSOC, but
+         groups created {\tt "}by hand{\tt "} using GRP directly can also be used
+         (i.e. without the supplemental groups created by NDG). In
+         this case, there are no defaults for directory path, file type,
+         or HDS component path, and the basis token ({\tt "}$*${\tt "}) in the group
+         expression represents the full basis file specification supplied
+         in IGRP0, not just the file basename.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         The GRP identifier for the group to which the supplied .sdf
+         files are to be appended.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The total number of file names in the returned group.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         If the group expression was terminated by the GRP {\tt "}flag{\tt "}
+         character, then FLAG is returned .TRUE. Otherwise it is
+         returned .FALSE. Returned .FALSE. if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If an error is reported the group is returned unaltered.
+
+         \sstitem
+         A null value (!) can be given for the parameter to indicate
+         that no more NDFs are to be specified. The corresponding error
+         is annulled before returning unless no NDFs have been added to
+         the group.
+
+         \sstitem
+         Explicit file types are included in all the elements of the returned
+         group. This is done because the name may be passed out to a script (eg
+         POLPACK:POLKA) which may change the value of NDF\_FORMATS\_OUT before
+         using the NDF name. If no file type is supplied in the group
+         expression, then the first file type listed in the current value of
+         the NDF\_FORMATS\_OUT environment variable (see SSN/20) is used. If
+         this is {\tt "}$*${\tt "} then the file type is copied from the corresponding input
+         file if a modification element was used to specify the output file
+         name (if the NDF was not specified by a modification element, the
+         second file type in NDF\_FORMATS\_OUT is used).
+
+         \sstitem
+         If the last character in the supplied group expression is
+         a colon (:), a list of the NDFs represented by the group
+         expression (minus the colon) is displayed, but none are
+         actually added to the group. The user is then re-prompted for
+         a new group expression.
+
+         \sstitem
+         The returned group has no associated groups holding supplemental
+         information (unlike the group returned by NDG\_ASSOC).
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_CREP1
+}{
+   Create a single new primitive NDF using a specified parameter
+}{
+   \sstdescription{
+      This routine is equivalent to NDF\_CREP except that it allows the
+      NDF to be specified using a GRP group expression (for instance, its
+      name may be given within a text file, etc). The first NDF in the
+      group expression is returned. Any other names in the group
+      expression are ignored. Any modification elements in the supplied
+      group expression will be treated literally.
+   }
+   \sstinvocation{
+      CALL NDG\_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter.
+      }
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_REAL{\tt '}). Note that
+         complex types are not permitted when creating a primitive NDF.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of NDF dimensions.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the NDF (the lower bound of each
+         dimension is taken to be 1).
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         File specification for the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_GTSUP
+}{
+   Get supplemental information for an NDF
+}{
+   \sstdescription{
+      Returns the supplemental information associated with a given entry
+      in an NDG group.
+   }
+   \sstinvocation{
+      CALL NDG\_GTSUP( IGRP, I, FIELDS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The NDG group as returned by NDG\_ASSOC, etc. This should be the last
+         group in a GRP owner-slave chain.
+      }
+      \sstsubsection{
+         I = INTEGER (Given)
+      }{
+         The index of the required entry.
+      }
+      \sstsubsection{
+         FIELDS( 6 ) = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The supplemental information associated with the entry specified
+         by I. Each element of the returned array contains the following:
+
+            1 - NDF slice specification (if any)
+            2 - HDS path (if any)
+            3 - File type
+            4 - Base file name
+            5 - Directory path
+            6 - Full NDF specification
+
+         This information is obtained from a set of groups associated with
+         the supplied group IGRP by means of a chain of GRP {\tt "}owner-slave{\tt "}
+         relationships. If any of these groups do not exist, the correponding
+         elements of the above array are returned blank. Note, element 6,
+         the full NDF specification, is obtained directly from the supplied
+         group IGRP.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_NDFAS
+}{
+   Obtain an NDF identifier for an existing NDF
+}{
+   \sstdescription{
+      The routine returns an NDF identifier for an existing NDF. The
+      name of the NDF is held at a given index within a given group.
+      It is equivalent to NDF\_ASSOC.
+   }
+   \sstinvocation{
+      CALL NDG\_NDFAS( IGRP, INDEX, MODE, INDF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for a group holding the names of NDFs. This
+         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         hand{\tt "} using GRP directly (i.e. without the supplemental groups
+         created by NDG\_ASSOC) can also be used.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index within the group at which the name of the NDF to be
+         accessed is stored.
+      }
+      \sstsubsection{
+         MODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Type of NDF access required: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or {\tt '}WRITE{\tt '}.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         NDF\_\_NOID will be returned for the INDF argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The NDF\_\_NOID
+         constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_NDFCP
+}{
+   Obtain an NDF identifier for a new primitive NDF
+}{
+   \sstdescription{
+      The routine returns an NDF identifier for a new primitive NDF created
+      with the specified attributes. The name of the new NDF is held
+      at a given index within a given group. It is equivalent to NDF\_CREP.
+   }
+   \sstinvocation{
+      CALL NDG\_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for a group holding the names of NDFs. This
+         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         hand{\tt "} using GRP directly (i.e. without the supplemental groups
+         created by NDG\_ASSOC) can also be used.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index within the group at which the name of the NDF to be
+         created is stored.
+      }
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_REAL{\tt '}). Note that
+         complex types are not permitted when creating a primitive NDF.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of NDF dimensions.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the NDF (the lower bound of each
+         dimension is taken to be 1).
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_NDFCR
+}{
+   Obtain an NDF identifier for a new simple NDF
+}{
+   \sstdescription{
+      The routine returns an NDF identifier for a new simple NDF created
+      with the specified attributes. The name of the new NDF is held
+      at a given index within a given group. It is equivalent to NDF\_CREAT.
+   }
+   \sstinvocation{
+      CALL NDG\_NDFCR( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for a group holding the names of NDFs. This
+         will often be creted using NDG\_CREAT, but groups created {\tt "}by
+         hand{\tt "} using GRP directly can also be used.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index within the group at which the name of the NDF to be
+         created is stored.
+      }
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Full data type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_DOUBLE{\tt '} or
+         {\tt '}COMPLEX\_REAL{\tt '}).
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of NDF dimensions.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         Lower pixel-index bounds of the NDF.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the NDF.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_NDFPR
+}{
+   Obtain an NDF identifier for a new NDF created by propagation from
+   an existing NDF
+}{
+   \sstdescription{
+      The routine returns an NDF identifier for a new NDF created by
+      propagation from an existing NDF. The name of the new NDF is held
+      at a given index within a given group. It is equivalent to NDF\_PROP.
+   }
+   \sstinvocation{
+      CALL NDG\_NDFPR( INDF1, CLIST, IGRP, INDEX, INDF2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         Identifier for an existing NDF (or NDF section) to act as a
+         template.
+      }
+      \sstsubsection{
+         CLIST = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comma-separated list of the NDF components which are to be
+         propagated to the new data structure. By default, the HISTORY,
+         LABEL and TITLE components and all extensions are propagated.
+         See below for further details.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for a group holding the names of NDFs. This
+         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         hand{\tt "} using GRP directly (i.e. without the supplemental groups
+         created by NDG\_ASSOC) can also be used.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index within the group at which the name of the NDF to be
+         accessed is stored.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Returned)
+      }{
+         Identifier for the new NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         NDF\_\_NOID will be returned for the INDF2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The NDF\_\_NOID
+         constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_PROP1
+}{
+   Create a single new NDF by propagation using a specified parameter
+}{
+   \sstdescription{
+      This routine is equivalent to NDF\_PROP except that it allows the
+      NDF to be specified using a GRP group expression (for instance, its
+      name may be given within a text file, etc). The first NDF in the
+      group expression is returned. Any other names in the group
+      expression are ignored. Modification elements use the name of the
+      supplied NDF as the basis name.
+   }
+   \sstinvocation{
+      CALL NDG\_PROP1( INDF1, CLIST, PARAM, INDF2, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         Identifier for an existing NDF (or NDF section) to act as a
+         template.
+      }
+      \sstsubsection{
+         CLIST = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comma-separated list of the NDF components which are to be
+         propagated to the new data structure. By default, the HISTORY,
+         LABEL and TITLE components and all extensions are propagated.
+         See the {\tt "}Component Propagation{\tt "} section for further details.
+      }
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter for the new NDF.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Returned)
+      }{
+         Identifier for the new NDF.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         File specification for the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_PTSUP
+}{
+   Store suplemental information for an NDF
+}{
+   \sstdescription{
+      Stores the supplied items of supplemental information for a given
+      entry in an NDG group. The GRP groups needed to store this
+      supplemental information are created if they do not already exist,
+      and associated with the supplied group by means of a chain of GRP
+      {\tt "}owner-slave{\tt "} relationships. They will be deleted automaticaly when
+      the supplied group is deleted using GRP\_DELET.
+   }
+   \sstinvocation{
+      CALL NDG\_PTSUP( IGRP, I, FIELDS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The NDG group as returned by NDG\_ASSOC, etc. This should be the last
+         group in a GRP owner-slave chain.
+      }
+      \sstsubsection{
+         I = INTEGER (Given)
+      }{
+         The index of the required entry.
+      }
+      \sstsubsection{
+         FIELDS( 6 ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The supplemental information to be stored with the entry specified
+         by I. Each element of the supplied array should contain the
+         following:
+            1 - NDF slice specification (if any)
+            2 - HDS path (if any)
+            3 - File type
+            4 - Base file name
+            5 - Directory path
+            6 - Full NDF specification
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_SETSZ
+}{
+   Reduces the size of an NDG group
+}{
+   \sstdescription{
+      This routine should be used instead of GRP\_SETSZ to set the size of
+      a group created by NDG. It sets the size of the supplied group, and
+      also sets the size of each of the aupplemental groups associated with
+      the supplied group.
+   }
+   \sstinvocation{
+      CALL NDG\_SETSZ( IGRP, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The NDG group as returned by NDG\_ASSOC, etc. This should be the last
+         group in a GRP owner-slave chain.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The new group size. Must be less than or equal to the size of the
+         smallest group in the chain.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\end{document}

@@ -1,0 +1,64 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ndg_dev
+
+#  Purpose:
+#     Create links to NDG include files.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script sets up (or removes) symbolic links in the current
+#     working directory which refer to NDG public include files. It
+#     exists to allow source code which contains references to the
+#     standard public NDG include files to be compiled without having
+#     to know where these files actually reside.
+
+#  Invocation:
+#     ndg_dev
+#        Sets up links for all ths NDG public include files.
+#     ndg_dev remove
+#        Removes the links previously set up.
+
+#  Notes:
+#     The pathname of the installation include directory (/star/include)
+#     must be edited into this script when it is installed.
+
+#  Copyright:
+#     Copyright (C) 1992 Science & Engineering Research Council
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-NOV-1993 (DSB):
+#     	 Original version (copied from equivalent NDF script written by RFWS).
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  If no parameters were given, then create the required links.
+      if test "$*" = ""; then
+         ln -s /star/include/ndg_err NDG_ERR
+
+#  If "remove" was the only parameter, then remove the links.
+      elif test "$*" = "remove"; then
+         rm NDG_ERR
+
+#  If the parameters were not recognised, then report an error.
+      else
+         echo "ndg_dev: invalid option \"$*\"" >&2
+         exit 1
+      fi
+
+#  End of script.
+      exit 0

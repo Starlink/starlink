@@ -1,0 +1,62 @@
+#!/bin/csh
+# Name:
+#    make_unix_release
+#
+# Purpose:
+#    Do unix specific bits required to make a release of lpg.
+#
+# Type of Module:
+#    Shell script
+#
+# Description:
+#    This command creates a compressed tar file containing a release of the 
+#    lpg package. It is called from within the make_release script. 
+#    
+# Invocation:
+#    make_unix_release
+#
+# Authors:
+#    DSB: David S. Berry (STARLINK)
+#    {enter_new_authors_here}
+#
+# History:
+#    14-SEP-1999 (DSB):
+#       Original version.
+#    {enter_changes_here}
+#
+# Bugs:
+#    {note_any_bugs_here}
+#-
+
+#  Ensure the sdt grp command is available.
+      source $SDT_DIR/startup.csh
+
+#  Store the name of the release directory, and go there.
+      set REL_DIR = ${TEMPDIR}/lpg_${SYSTEM}
+      cd ${REL_DIR}
+
+#  Generate the facility error file and the error include file.
+#      messgen -fe lpg_err.msg
+#      rm -f lpg_err.msg
+
+#  Copy the hypertext docs to the release directory.
+#      cp ${LPG_DEV}/../sun150.htx_tar ${REL_DIR}
+
+#  Ensure all files are accessable.
+      chmod 777 *
+
+#  Tar up the source files and then remove them.
+      tar -cvh -f ${TEMPDIR}/lpg_source.tar `grp unix_source` 
+      rm -f `grp unix_source`
+      mv ${TEMPDIR}/lpg_source.tar ${REL_DIR}
+
+#  Tar up all the release files (source and non-source), and then remove
+#  them.
+      tar -cvh -f ${TEMPDIR}/lpg.tar `grp unix_total` 
+      rm `grp unix_total` 
+      mv ${TEMPDIR}/lpg.tar ${REL_DIR}
+
+#  Compress it.
+      compress lpg.tar
+
+      exit

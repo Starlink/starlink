@@ -1,0 +1,20 @@
+!  UNIX private parameter values used in CTG.
+      INTEGER   CTG__SZFMT    ! Size of string holding NDF formats list
+      CHARACTER CTG__DEFTP*4  ! Default catalogue file type.
+      LOGICAL   CTG__UCASE    ! True if all file names are to be 
+                              ! converted to upper case.
+      CHARACTER CTG__WILD1*1  ! Single-character wildcard.
+      CHARACTER CTG__WILD2*1  ! Multi-character wildcard.
+      CHARACTER CTG__FMTIN*108! List of catalogue formats supported by CAT
+      CHARACTER CTG__FMTOUT*20! Default list of output catalogue formats 
+
+      PARAMETER (
+     :            CTG__SZFMT = 1024,
+     :            CTG__DEFTP = '.FIT',
+     :            CTG__UCASE = .false.,
+     :            CTG__WILD1 = '?',
+     :            CTG__WILD2 = '*',
+     :            CTG__FMTIN =  'FITS(.FIT ),FITS(.fit),FITS(.FITS),'//
+     :                       'FITS(.fits),FITS(.GSC),FITS(.gsc),'//
+     :                       'STL(.TXT),STL(.txt),STL(.Txt),HDS(.sdf)',
+     :            CTG__FMTOUT =  '*,FITS(.FIT )' )

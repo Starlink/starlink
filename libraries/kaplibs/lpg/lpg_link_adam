@@ -1,0 +1,3 @@
+echo -llpg_adam -llpg `grp_link_adam` `ndf_link_adam` `cat_link_adam` \
+     `ndg_link_adam` `ctg_link_adam` \
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

@@ -1,0 +1,2 @@
+echo -llpg `ndg_link` `ctg_link` `grp_link` `chr_link` `ndf_link` `cat_link` \
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
