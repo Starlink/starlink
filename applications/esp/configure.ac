@@ -12,7 +12,6 @@ STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
-AC_PROG_FPP
 dnl AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
