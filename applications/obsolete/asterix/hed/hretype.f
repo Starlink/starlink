@@ -14,9 +14,12 @@
 *             (BHVAD::RJV)
 *    History :
 *
-*     12 Jun 89 : V1.0-1 Now checks for primitive input  (RJV)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*
+*     12 Jun 1989 V1.0-1 (RJV):
+*        Now checks for primitive input
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     18 Jan 1996 V2.0-0 (DJA):
+*        New USI routine
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -29,10 +32,11 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRETYPE Version 1.8-0')
+      PARAMETER (VERSION='HRETYPE Version 2.0-0')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*(DAT__SZTYP) TYPE
+      INTEGER	FID
       LOGICAL STRUC
 *-
       CALL MSG_PRNT(VERSION)
@@ -40,7 +44,8 @@
 *    Start ASTERIX
       CALL AST_INIT()
 
-      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
+      CALL USI_ASSOC( 'INP', '*', 'UPDATE', FID, STATUS )
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
 
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -61,4 +66,3 @@
       CALL AST_ERR(STATUS)
 
       END
-
