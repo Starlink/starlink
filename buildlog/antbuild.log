@@ -19,78 +19,320 @@ build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build
     [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build/lib
-[javac.preset] Compiling 567 source files to /apps/cvsbuild/java/source/ant/build/classes
+[javac.preset] Compiling 586 source files to /apps/cvsbuild/java/source/ant/build/classes
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitResultFormatter.java:21: package junit.framework does not exist
+[javac.preset] import junit.framework.TestListener;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitResultFormatter.java:29: cannot resolve symbol
+[javac.preset] symbol  : class TestListener 
+[javac.preset] location: interface org.apache.tools.ant.taskdefs.optional.junit.JUnitResultFormatter
+[javac.preset] public interface JUnitResultFormatter extends TestListener {
+[javac.preset]                                               ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:25: package junit.framework does not exist
+[javac.preset] import junit.framework.AssertionFailedError;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:26: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:160: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     public void startTest(Test test) {
+[javac.preset]                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:166: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     public void endTest(Test test) {
+[javac.preset]                         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:174: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, Throwable t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:183: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:183: cannot resolve symbol
+[javac.preset] symbol  : class AssertionFailedError 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                                       ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:190: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     public void addError(Test test, Throwable error) {
+[javac.preset]                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:197: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     protected String formatTest(Test test) {
+[javac.preset]                                 ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/BriefJUnitResultFormatter.java:208: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter
+[javac.preset]     protected synchronized void formatError(String type, Test test,
+[javac.preset]                                                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.java:55: package junit.framework does not exist
+[javac.preset] import junit.framework.AssertionFailedError;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.java:56: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.java:57: package junit.framework does not exist
+[javac.preset] import junit.framework.TestResult;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:35: package junit.framework does not exist
+[javac.preset] import junit.framework.AssertionFailedError;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:36: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:37: package junit.framework does not exist
+[javac.preset] import junit.framework.TestListener;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:38: package junit.framework does not exist
+[javac.preset] import junit.framework.TestResult;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:39: package junit.framework does not exist
+[javac.preset] import junit.framework.TestSuite;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:64: cannot resolve symbol
+[javac.preset] symbol  : class TestListener 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset] public class JUnitTestRunner implements TestListener {
+[javac.preset]                                         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:89: cannot resolve symbol
+[javac.preset] symbol  : class TestResult 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     private TestResult res;
+[javac.preset]             ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:132: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     private Test suite = null;
+[javac.preset]             ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:336: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     public void startTest(Test t) {
+[javac.preset]                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:344: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     public void endTest(Test test) {
+[javac.preset]                         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:352: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     public void addFailure(Test test, Throwable t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:363: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:363: cannot resolve symbol
+[javac.preset] symbol  : class AssertionFailedError 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                                       ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:372: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]     public void addError(Test test, Throwable t) {
+[javac.preset]                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelper.java:21: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelper.java:22: package junit.framework does not exist
+[javac.preset] import junit.framework.TestCase;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelper.java:56: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitVersionHelper
+[javac.preset]     public static String getTestCaseName(Test t) {
+[javac.preset]                                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:26: package junit.framework does not exist
+[javac.preset] import junit.framework.AssertionFailedError;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:27: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:152: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     public void startTest(Test t) {
+[javac.preset]                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:162: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     public void endTest(Test test) {
+[javac.preset]                         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:186: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, Throwable t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:195: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:195: cannot resolve symbol
+[javac.preset] symbol  : class AssertionFailedError 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                                       ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:204: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     public void addError(Test test, Throwable t) {
+[javac.preset]                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/PlainJUnitResultFormatter.java:208: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter
+[javac.preset]     private void formatError(String type, Test test, Throwable t) {
+[javac.preset]                                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:23: package junit.framework does not exist
+[javac.preset] import junit.framework.AssertionFailedError;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:24: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:60: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter
+[javac.preset]     public void startTest(Test t) {
+[javac.preset]                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:65: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter
+[javac.preset]     public void endTest(Test test) {
+[javac.preset]                         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:70: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, Throwable t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:77: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:77: cannot resolve symbol
+[javac.preset] symbol  : class AssertionFailedError 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                                       ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/SummaryJUnitResultFormatter.java:83: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter
+[javac.preset]     public void addError(Test test, Throwable t) {
+[javac.preset]                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:30: package junit.framework does not exist
+[javac.preset] import junit.framework.AssertionFailedError;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:31: package junit.framework does not exist
+[javac.preset] import junit.framework.Test;
+[javac.preset]                        ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:156: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     public void startTest(Test t) {
+[javac.preset]                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:165: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     public void endTest(Test test) {
+[javac.preset]                         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:198: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, Throwable t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:207: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:207: cannot resolve symbol
+[javac.preset] symbol  : class AssertionFailedError 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     public void addFailure(Test test, AssertionFailedError t) {
+[javac.preset]                                       ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:216: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     public void addError(Test test, Throwable t) {
+[javac.preset]                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/XMLJUnitResultFormatter.java:220: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
+[javac.preset]     private void formatError(String type, Test test, Throwable t) {
+[javac.preset]                                           ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.java:1237: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTask
+[javac.preset]         Test t = new Test() {
+[javac.preset]         ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.java:1237: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTask
+[javac.preset]         Test t = new Test() {
+[javac.preset]                      ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.java:1244: cannot resolve symbol
+[javac.preset] symbol  : class AssertionFailedError 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTask
+[javac.preset]         formatter.addError(t, new AssertionFailedError("Timeout occurred"));
+[javac.preset]                                   ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:221: cannot resolve symbol
+[javac.preset] symbol  : class Test 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]                 suite = (Test) suiteMethod.invoke(null, new Class[0]);
+[javac.preset]                          ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:225: cannot resolve symbol
+[javac.preset] symbol  : class TestSuite 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]                 suite = new TestSuite(testClass);
+[javac.preset]                             ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:235: cannot resolve symbol
+[javac.preset] symbol  : class TestResult 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]         res = new TestResult();
+[javac.preset]                   ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:238: cannot resolve symbol
+[javac.preset] symbol  : class TestListener 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]             res.addListener((TestListener) formatters.elementAt(i));
+[javac.preset]                              ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitTestRunner.java:246: cannot resolve symbol
+[javac.preset] symbol  : class TestListener 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner
+[javac.preset]                 ((TestListener) formatters.elementAt(i)).addError(null,
+[javac.preset]                   ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelper.java:35: cannot resolve symbol
+[javac.preset] symbol  : class TestCase 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitVersionHelper
+[javac.preset]             testCaseName = TestCase.class.getMethod("getName", new Class[0]);
+[javac.preset]                            ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelper.java:39: cannot resolve symbol
+[javac.preset] symbol  : class TestCase 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitVersionHelper
+[javac.preset]                 testCaseName = TestCase.class.getMethod("name", new Class[0]);
+[javac.preset]                                ^
+[javac.preset] /apps/cvsbuild/java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelper.java:57: cannot resolve symbol
+[javac.preset] symbol  : class TestCase 
+[javac.preset] location: class org.apache.tools.ant.taskdefs.optional.junit.JUnitVersionHelper
+[javac.preset]         if (t instanceof TestCase && testCaseName != null) {
+[javac.preset]                          ^
 [javac.preset] Note: Some input files use or override a deprecated API.
 [javac.preset] Note: Recompile with -deprecation for details.
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/ant/build/classes
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/ant/build/classes
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/ant/build/classes/org/apache/tools/ant/taskdefs/optional/junit/xsl
+[javac.preset] 69 errors
 
-jars:
-     [copy] Copying 5 files to /apps/cvsbuild/java/source/ant/build
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/ant/build
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-launcher.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-bootstrap.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-nodeps.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-trax.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-xalan1.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-xalan1.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-xslp.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-xslp.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-resolver.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-resolver.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-junit.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-regexp.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-regexp.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-oro.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-oro.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-bcel.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-bcel.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-log4j.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-log4j.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-commons-logging.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-commons-logging.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-bsf.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-apache-bsf.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-stylebook.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-stylebook.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-javamail.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-javamail.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-icontract.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-icontract.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-netrexx.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-netrexx.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-commons-net.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-commons-net.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-starteam.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-starteam.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-vaj.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-vaj.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-antlr.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-antlr.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-jmf.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-jai.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-swing.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-jsch.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-jsch.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-jdepend.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-jdepend.jar
-      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/ant/build/lib/ant-weblogic.jar
-      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant-weblogic.jar
-     [copy] Copying 29 files to /apps/cvsbuild/java/source/ant/lib
+BUILD FAILED
+/apps/cvsbuild/java/source/ant/build.xml:187: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/ant/realbuild.xml:630: Compile failed; see the compiler error output for details.
 
-dist:
-
-install:
-    [mkdir] Created dir: /apps/cvsbuild/starjava/bin
-    [mkdir] Created dir: /apps/cvsbuild/starjava/lib
-    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/ant
-    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/ant
-     [copy] Copying 13 files to /apps/cvsbuild/starjava/bin
-     [copy] Copying 35 files to /apps/cvsbuild/starjava/lib
-     [copy] Copying 1320 files to /apps/cvsbuild/starjava/docs/ant
-     [copy] Copied 87 empty directories to 1 empty directory under /apps/cvsbuild/starjava/docs/ant
-
-BUILD SUCCESSFUL
-Total time: 40 seconds
+Total time: 13 seconds

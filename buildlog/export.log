@@ -20,124 +20,45 @@ jars:
 
 webstart:
 
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/junit-3.7.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/junit/junit-3.7.tar
-     [gzip] Building: /apps/cvsbuild/export/junit-3.7.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/junit-3.7.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/junit/junit-3.7.tar
-     [echo] Executing tamfits target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/tamfits-0.96a.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/tamfits/tamfits-0.96a.tar
-     [gzip] Building: /apps/cvsbuild/export/tamfits-0.96a.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/tamfits-0.96a.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/tamfits/tamfits-0.96a.tar
-     [echo] Executing axis target: export
-
-export:
-
-prepare:
-
-build:
-
-jars:
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
-
-webstart:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/axis-1.0b2.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/axis/axis-1.0b2.tar
-     [gzip] Building: /apps/cvsbuild/export/axis-1.0b2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/axis-1.0b2.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/axis/axis-1.0b2.tar
-     [echo] Executing Jetty target: export
-
-export:
-
-prepare:
-
-build:
-
-jars:
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.xml.jaxp.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.crimson.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
-
-webstart:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jetty-4.0.4.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
-     [gzip] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
-     [echo] Executing AGLIB target: export
-
-export:
-
-prepare:
-
-build:
-
-jars:
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-common-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-client-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-common-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-filestore-client-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-client-lite-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-common-SNAPSHOT.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
-
-webstart:
-
-dist:
-
-create_archives:
-
 BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:485: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/build.xml:132: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/aglib/build.xml:263: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/aglib/build.xml:319: /apps/cvsbuild/java/source/aglib/docs not found.
+/apps/cvsbuild/java/source/build.xml:120: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/junit/build.xml:247: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/junit/build.xml:201: Could not create task or type of type: jnlp.
 
-Total time: 3 minutes 6 seconds
+Ant could not find the task or a class this task relies upon.
+
+This is common and has a number of causes; the usual 
+solutions are to read the manual pages then download and
+install needed JAR files, or fix the build file: 
+ - You have misspelt 'jnlp'.
+   Fix: check your spelling.
+ - The task needs an external JAR file to execute
+     and this is not found at the right place in the classpath.
+   Fix: check the documentation for dependencies.
+   Fix: declare the task.
+ - The task is an Ant optional task and the JAR file and/or libraries
+     implementing the functionality were not found at the time you
+     yourself built your installation of Ant from the Ant sources.
+   Fix: Look in the ANT_HOME/lib for the 'ant-' JAR corresponding to the
+     task and make sure it contains more than merely a META-INF/MANIFEST.MF.
+     If all it contains is the manifest, then rebuild Ant with the needed
+     libraries present in ${ant.home}/lib/optional/ , or alternatively,
+     download a pre-built release version from apache.org
+ - The build file was written for a later version of Ant
+   Fix: upgrade to at least the latest release version of Ant
+ - The task is not an Ant core or optional task 
+     and needs to be declared using <taskdef>.
+ - You are attempting to use a task defined using 
+    <presetdef> or <macrodef> but have spelt wrong or not 
+   defined it at the point of use
+
+Remember that for JAR files to be visible to Ant tasks implemented
+in ANT_HOME/lib, the files must be in the same directory or on the
+classpath
+
+Please neither file bug reports on this problem, nor email the
+Ant mailing lists, until all of these causes have been explored,
+as this is not an Ant bug.
+
+Total time: 4 seconds
