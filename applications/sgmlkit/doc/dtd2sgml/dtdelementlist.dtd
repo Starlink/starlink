@@ -15,6 +15,7 @@
 <!attlist dtdelementlist 
   sysid cdata #required
   top cdata #required
+  description cdata #implied
   >
 <!attlist dtdelement gi id #required>
 <!attlist dtdattribute 
