@@ -33,7 +33,7 @@
 *     VAR = LOGICAL (Given)
 *        Process variances?
 *     METH = CHARACTER * ( * ) (Given)
-*        Estimator: 'MEAN', 'MODE' or 'MEDIAN'.
+*        Estimator: 'MEAN', 'WMEAN', 'MODE' or 'MEDIAN'.
 *     WLIM = REAL (Given)
 *        Fraction of pixels which must be good to create a good output
 *        pixel.
@@ -81,6 +81,9 @@
 *        correct order (i.e. if the collapse axis is the last pixel axis).
 *     26-SEP-2001 (DSB):
 *        Do not allocate memory for a covariance array (IPCOV) if method=mean.
+*     14-DEC-2001 (DSB):
+*        Renamed weighted mean method as WMEAN, and add unweighted method
+*        MEAN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,6 +159,9 @@
 
 *  Check the supplied METH value.
       IF( METH .EQ. 'MEAN' ) THEN
+         IMETH = 1
+
+      ELSE IF( METH .EQ. 'WMEAN' ) THEN
          IMETH = 2
 
       ELSE IF( METH .EQ. 'MEDIAN' ) THEN

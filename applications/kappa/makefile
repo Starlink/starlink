@@ -576,7 +576,8 @@ ccg1_tcd3d.f ccg1_tcr1r.f ccg1_tcr3r.f ccg1_tmd1d.f ccg1_tmd3d.f \
 ccg1_tmn2d.f ccg1_tmn2r.f ccg1_tmn3d.f ccg1_tmn3r.f ccg1_tmr1r.f \
 ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f ccg1_trm3d.f ccg1_trm3r.f \
 ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f ccg1_wmd3r.f ccg1_wtm2d.f \
-ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f
+ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f \
+ccg1_umr1r.f ccg1_umd1d.f
 
 KAPSUB_C_ROUTINES = kps1_luted.c
 
@@ -2251,6 +2252,8 @@ ccg1_mdr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_mdr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_med1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_med3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_umr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_umd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_mer1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_mer3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_mmd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT

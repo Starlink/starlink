@@ -52,7 +52,9 @@
 *        be used.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
-*        can be either "Mean", "Mode" or "Median". ["Mean"]
+*        can be either "Mean", "WMean", "Mode" or "Median". The "WMean"
+*        method is a weighted mean in wich each data value is weighted by
+*        the reciprocal of the associated variance. ["Mean"]
 *     HIGH = LITERAL (Read)
 *        A value for the axis specified by parameter AXIS. For example,
 *        if AXIS is 3 and the current Frame of the input NDF has axes
@@ -172,6 +174,9 @@
 *     27-OCT-2000 (DSB):
 *        Modified to avoid allocating unnecessary workspace if the last axis is being
 *        collapsed.
+*     14-DEC-2001 (DSB):
+*        Renamed wieghted mean estimator as "Wmean" and added new
+*        unweighted mean estimator "Mean".
 *     {enter_further_changes}
 
 *  Bugs:
@@ -654,8 +659,8 @@
       CALL NDF_PTWCS( IWCS, INDF2, STATUS )      
 
 *  Get the ESTIMATOR and WLIM parameters.
-      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Mode,Median', .FALSE.,
-     :                ESTIM, STATUS )
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,WMean,Mode,Median', 
+     :                .FALSE., ESTIM, STATUS )
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
 *  Allocate work space, unles the last axis is being collapsed (in which

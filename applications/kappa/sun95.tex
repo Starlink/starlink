@@ -14718,8 +14718,10 @@ default value.
          ESTIMATOR = LITERAL (Read)
       }{
          The method to use for estimating the output pixel values.  It
-         can be either {\tt "}Mean{\tt "}, {\tt "}Mode{\tt "}  or 
-         {\tt "}Median{\tt "}. {\tt [{\tt "}Mean{\tt "}]}
+         can be either {\tt "}Mean{\tt "}, {\tt "}WMean{\tt "}, {\tt "}Mode{\tt "}  or 
+         {\tt "}Median{\tt "}. The {\tt "}WMean{\tt "} method is a
+         weighted mean in which each data value is weighted by
+         the reciprocal of the associated variance. {\tt [{\tt "}Mean{\tt "}]}
       }
       \sstsubsection{
          HIGH = LITERAL (Read)
@@ -44008,6 +44010,14 @@ The following applications have been modified:
          variances and WCS. All parameters have been changed. The aperture can 
          now optionally be specified using an ARD file. Some ARD files
          allow N-dimensional NDFs to be processed.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item The ``Mean'' value for the ESTIMATOR parameter now produces
+               a simple unweighted mean. The new ``WMean'' estimator produces
+               the weighted mean which was previously produced by the
+               ``Mean'' estimator.
       \end{itemize}
 
    \item [\htmlref{GDSET}{GDSET}] \mbox{}
