@@ -18,6 +18,7 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      CHARACTER*132 FILE
       CHARACTER*(DAT__SZLOC) ILOC
       INTEGER FID
       LOGICAL PRIM
@@ -40,9 +41,8 @@
         CALL TIM_CHECK(ILOC,STATUS)
         CALL TIM_MAP(ILOC,STATUS)
 
-*  default to whole time series
+*  set to whole time series
         CALL TIM_NOCHOP(STATUS)
-        CALL TIM_SCALE(%VAL(T_APTR),%VAL(T_WPTR),STATUS)
 
       ENDIF
 
@@ -52,7 +52,7 @@
       CALL FIO_OPEN(FILE,'WRITE','NONE',0,FID,STATUS)
 
 *  do the business
-      CALL TONOFF_DOIT(%val(T_APTR),%val(I_WPTR),%val(T_QPTR),T_MASK,
+      CALL TONOFF_DOIT(%val(T_APTR),%val(T_WPTR),%val(T_QPTR),T_MASK,
      :                                                    FID,STATUS)
 
 *  close the file
@@ -99,7 +99,8 @@
       CHARACTER*40 BUFFER,UNITS
       DOUBLE PRECISION MJD1,MJD2,CONV
       INTEGER ISECT
-      INTEGER I
+      INTEGER I,J
+      LOGICAL FINI
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
