@@ -4049,6 +4049,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         IMPLICIT NONE
 
 *  Global constants :
+        INCLUDE 'DAT_PAR'
+        INCLUDE 'SAE_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
@@ -4299,6 +4301,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
       INCLUDE 'IMG_CMN'
 *
 *    Functions :
+      LOGICAL IMG_INBOUNDS
 *
 *
 *    Local Constants :
