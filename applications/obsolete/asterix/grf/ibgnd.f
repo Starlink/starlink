@@ -287,9 +287,12 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*79		TXT			! Output text buffer
+
       REAL			X, Y, R			! Source attrs
 
       INTEGER			I			! Loop over sources
+      INTEGER			ISTAT			! I/o status code
 *.
 
 *  Check inherited global status.
@@ -301,6 +304,8 @@
 
 *    Sources
         IF ( I_BGM_NSRC .GT. 0 ) THEN
+          CALL MSG_PRNT( '  Src      X          Y          R' )
+          CALL MSG_BLNK()
           DO I = 1, I_BGM_NSRC
             CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X,
      :                       STATUS )
@@ -308,11 +313,15 @@
      :                       STATUS )
             CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R,
      :                       STATUS )
-            PRINT *,X,Y,R
+            WRITE( TXT, '(2X,I3,3(2X,IPG12.5))', IOSTAT=ISTAT )
+     :                       I, X, Y, R
+            CALL MSG_PRNT( TXT )
+
           END DO
         ELSE
           CALL MSG_PRNT( '  No source candidates defined' )
         END IF
+        CALL MSG_BLNK()
 
 *    Sampling
 
@@ -453,8 +462,6 @@
      :                    Y, STATUS )
         CALL ARR_SELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I_BGM_NSRC,
      :                    R, STATUS )
-	print *,'Stored source ',x,y,r
-	call flush(6)
 
 *    Initialise the the background model quality array. This is ok for points
 *    inside the current region, and bad outside and for bad input pixels
@@ -781,14 +788,10 @@
         CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I_BGM_NSRC, S, Y, STATUS )
         CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I_BGM_NSRC, S, R, STATUS )
 
-	print *,'Getting source ',s,x,y,r
-	call flush(6)
-
 *    Convert position and radius to bounding rectangle
         CALL IMG_CIRCTOBOX( X, Y, R, I1, I2, J1, J2, STATUS )
-	print *,'Bounding box',i1,i2,j1,j2
-	call flush(6)
 
+*    Loop over bounding rectangle setting source areas to bad quality
         DO J = J1, J2
           DO I = I1, I2
 
@@ -1065,8 +1068,9 @@
 
 *  Compute the background surface
       IF ( SURF ) THEN
-        CALL IBGND_SURF_COMP( I_BGM_NSAMP, I_NX, I_NY, %VAL(I_DPTR),
-     :                      %VAL(I_BGM_QPTR), %VAL(I_BGM_SAMPTR(1)),
+        CALL IBGND_SURF_COMP( I_NX, I_NY, %VAL(I_DPTR),
+     :                      %VAL(I_BGM_QPTR), I_BGM_NSAMP,
+     :                      %VAL(I_BGM_SAMPTR(1)),
      :                      %VAL(I_BGM_SAMPTR(2)),
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      %VAL(I_BGM_DPTR),
