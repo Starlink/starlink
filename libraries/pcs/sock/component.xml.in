@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/sock</path>
+  <description>Provides a Unix-socket-based message transport system
+    for the MSP system</description>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly</name>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <notes><p>Described in SSN/29</p></notes>
+</component>
