@@ -16,7 +16,6 @@ using std::cerr;
 using std::cout;
 using std::exit;
 using std::endl;
-using std::ios_base;
 #endif
 
 
@@ -27,7 +26,7 @@ void reportRGB(char *spec)
     res = Util::parseRGB(rgb, spec);
     cout << spec;
     if (res)
-	cout << "-->" << ios_base::hex
+	cout << "-->"
 	     << (int)rgb.red << ' '
 	     << (int)rgb.green << ' '
 	     << (int)rgb.blue << endl;
