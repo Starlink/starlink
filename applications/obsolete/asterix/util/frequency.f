@@ -50,6 +50,8 @@
 *        Normalisation required (default=Y)
 *     OUT = CHAR (read)
 *        Output dataset
+*     USEGRP = LOGICAL (read)
+*        Use grouping information if present?
 
 *  Examples:
 *     {routine_example_text}
@@ -263,6 +265,14 @@
 *  Get number of input points
       CALL BDI_GETNEL( IFID, NELM, STATUS )
 
+*  Handle grouping
+      CALL UTIL_GRPR( IFID, 'USEGRP', IPTR, .FALSE., 0, DQL, QPTR,
+     :                GRPED, NELM, GDPTR, 0, GQPTR, STATUS )
+      IF ( GRPED ) THEN
+        IPTR = GDPTR
+        QPTR = GQPTR
+      END IF
+
 *  Get data range
       IF ( DQL ) THEN
 
@@ -277,14 +287,6 @@
 
       END IF
       MAXSIZ = DMAX - DMIN
-
-*  Handle grouping
-      CALL UTIL_GRPR( IFID, 'USEGRP', IPTR, .FALSE., 0, DQL, QPTR,
-     :                GRPED, NELM, GDPTR, 0, GQPTR, STATUS )
-      IF ( GRPED ) THEN
-        IPTR = GDPTR
-        QPTR = GQPTR
-      END IF
 
 *  Zero the BOUNDS array
       CALL ARR_INIT1R( 0.0, MXBIN, BOUNDS, STATUS )
