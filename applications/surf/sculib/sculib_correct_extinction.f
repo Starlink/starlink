@@ -1,7 +1,7 @@
 *+  SCULIB_CORRECT_EXTINCTION - correct bolometers for sky opacity
       SUBROUTINE SCULIB_CORRECT_EXTINCTION (SIZE_BOL, N_BOL, BOL_DATA,
-     :  BOL_VARIANCE, BOL_QUALITY, BOL_RA, BOL_DEC, LST, LAT_OBS,
-     :  TAUZ, BADBIT, STATUS)
+     :  BOL_VARIANCE, BOL_RA, BOL_DEC, LST, LAT_OBS,
+     :  TAUZ, STATUS)
 *    Description :
 *     This routine corrects bolometer data for the effect of sky opacity.
 *     It does this by calculating the airmass of the point that each
@@ -10,7 +10,7 @@
 *     ignored.
 *    Invocation :
 *     CALL SCULIB_CORRECT_EXTINCTION (SIZE_BOL, N_BOL, BOL_DATA,
-*    :  BOL_VARIANCE, BOL_QUALITY, BOL_RA, BOL_DEC, LST, LAT_OBS,
+*    :  BOL_VARIANCE, BOL_RA, BOL_DEC, LST, LAT_OBS,
 *    :  TAUZ, STATUS)
 *    Parameters :
 *     SIZE_BOL                       = INTEGER (Given)
@@ -21,8 +21,6 @@
 *           bolometer data
 *     BOL_VARIANCE (SIZE_BOL)        = REAL (Given and returned)
 *           variance on BOL_DATA
-*     BOL_QUALITY (SIZE_BOL)         = BYTE (Given)
-*           quality on BOL_DATA
 *     BOL_RA (SIZE_BOL)              = DOUBLE PRECISION (Given)
 *           apparent RA of bolometer (radians)
 *     BOL_DEC (SIZE_BOL)             = DOUBLE PRECISION (Given)
@@ -33,8 +31,6 @@
 *           latitude of observatory (radians)
 *     TAUZ                           = REAL (Given)
 *           the zenith sky opacity
-*     BADBIT                         = BYTE (Given)
-*           the bit mask
 *     STATUS                         = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -53,13 +49,11 @@
 *    Import :
       INTEGER          SIZE_BOL
       INTEGER          N_BOL
-      BYTE             BOL_QUALITY (SIZE_BOL)
       DOUBLE PRECISION BOL_RA (SIZE_BOL)
       DOUBLE PRECISION BOL_DEC (SIZE_BOL)
       DOUBLE PRECISION LST
       DOUBLE PRECISION LAT_OBS
       REAL             TAUZ
-      BYTE             BADBIT
 *    Import-Export :
       REAL             BOL_DATA (SIZE_BOL)
       REAL             BOL_VARIANCE (SIZE_BOL)
@@ -80,8 +74,6 @@
       DOUBLE PRECISION Z                     ! zenith disatance (radians)
 *    Internal References :
 *    Local data :
-*    Local function:
-      INCLUDE 'NDF_FUNC'                     ! Bit mask
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -89,26 +81,24 @@
       IF (N_BOL .GT. 0) THEN
 
          DO BOL = 1, N_BOL
-            IF (NDF_QMASK(BOL_QUALITY(BOL), BADBIT)) THEN
 
 *  calculate the zenith distance and airmass of the bolometer
 
-               HOUR_ANGLE = LST - BOL_RA (BOL)
-               SIN_E = SIN (LAT_OBS) * SIN (BOL_DEC(BOL)) +
+            HOUR_ANGLE = LST - BOL_RA (BOL)
+            SIN_E = SIN (LAT_OBS) * SIN (BOL_DEC(BOL)) +
      :           COS(LAT_OBS) * COS(BOL_DEC(BOL)) * COS(HOUR_ANGLE)
-               Z = PI/2.0D0 - ASIN(SIN_E)
+            Z = PI/2.0D0 - ASIN(SIN_E)
 
-               CALL SCULIB_AIRMASS (REAL(Z), AIRMASS, STATUS)
+            CALL SCULIB_AIRMASS (REAL(Z), AIRMASS, STATUS)
 
 *  and the correction for the extinction
-
-               CORRECTION = EXP (AIRMASS*TAUZ)
+            
+            CORRECTION = EXP (AIRMASS*TAUZ)
 
 *  correct the data
 
-               BOL_DATA(BOL) = BOL_DATA(BOL) * CORRECTION
-               BOL_VARIANCE(BOL) = BOL_VARIANCE(BOL) * CORRECTION**2
-            END IF
+            BOL_DATA(BOL) = BOL_DATA(BOL) * CORRECTION
+            BOL_VARIANCE(BOL) = BOL_VARIANCE(BOL) * CORRECTION**2
          END DO
 
       END IF
