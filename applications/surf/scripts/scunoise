@@ -1,0 +1,1564 @@
+#!/usr/local/bin/perl -s
+########################################################################
+####             J C M T   S O F T W A R E   G R O U P              ####
+#                -------------------------------------
+#
+#   Language:		PERL
+#
+#   Application:	scunoise
+#
+#   Purpose:
+#	Script to plot the Scuba noise files.
+#
+#   Internal Routines:
+#	function()	: This is the description of the internal fn.
+#
+#   Creation Date:      Feb 03, 1998
+#
+#   SCCS Data           : @(#)
+#       Module Name     : scunoise
+#       Version Number  : 1.0
+#       Release Number  : 1
+#       Last Updated    : 02/03/98
+#
+#   Programmer(s):      Remo Tilanus (JAC)
+#
+#   Comments:
+#
+#   Modification History:
+#       DD/MM/YY: INIT  Comments
+#       --------- ----  --------
+#			
+####                                                                ####
+########################################################################
+#
+
+#use strict;
+
+require 5.004;
+
+use English;
+use Tk;
+# use Tk::widgets qw/Dialog ErrorDialog/;
+use subs qw/inswt/;
+use vars qw/$MW $PW $OP $OM $CP $C $FONT $BW $BC $rf $mr $accept/;
+
+#---------------------------------------------------------------------------
+
+my ($prog, $rest) = reverse(split(/\//,"$0",2));
+my $version = "1.0";
+
+my($host, $domain);
+chomp(($host,$rest) = split(/\./,`uname -n`,2));
+chomp(($domain,$rest) = split(/\./,`domainname`,2));
+
+# Get arguments 
+($v) && do { &ver_text; exit; };
+
+# Debug output: 0 = none, 1 = little, 2 = lot?
+my $debug = 0;
+($d) && do { $debug = 1;};
+
+(($h) || $#ARGV >= 2) && do { &help_text; exit; };
+
+# Unix and Vax directories with noise files
+my $datadir = $ENV{'DATADIR'};
+$datadir = "'jac_default_directories'" if ($datadir eq "");
+
+# Scuba_prefix (obsdate)
+my ($us, $um, $uh, $md, $mo, $yy, $wd, $yd, $isdst) = gmtime(time);
+my $obsdate = $ENV{'SCUBA_PREFIX'};
+
+# If no Scuba prefix, try extract from DATADIR
+if ($datadir =~ !/jac_default/ && $obsdate eq "") {
+    $datadir =~ /\/(\d{8})\// && (($obsdate) = ($1));
+}
+
+# Still no luck: default to current date
+if ($datadir =~ /jac_default/ && $obsdate eq "") {
+    # Deal with the Y2K problem!
+    if ($yy >= 87) {
+	$obsdate = 10000*(1900+$yy)+100*($mo+1)+($md);
+    } else  {
+	$obsdate = 10000*(2000+$yy)+100*($mo+1)+($md);
+    }
+}
+
+# Array with location to search for noise file
+my @disk = ();
+my $idsk = -1;
+&set_disks;
+
+# Noise file variables:
+
+my $run = "";
+my $hst = "";
+my (@runlist, @noiseentry, %bol, %xybol, @pw_point, @bw_point);
+my ($source, %min, %max, $varinfo, $iteminfo);
+my ($cutoff, $cutoff_line);
+
+# Columns in file
+my @col = ( "Bolometer", "Chop", "Chop error", "Cal", "Cal error", "Quality" );
+
+# Widget colors and variables
+my ($wbg, $wfg, $bbg, $bfg, $tc, $fc, $pc, $qc, $cc, $bc, $dc);
+my ($listfont, $plotfont, $labelfont, $newplot, $op_message, %pinfo);
+my ($w_control, $w_obsdate, $w_chop, $w_choperr, $w_cal, $w_calerr);
+my $bwmode;
+
+# Canvas dimensions
+my $xplot   = 660;
+my $yplot   = 300;
+my $xleft   =  50;
+my $xright  = 610;
+my $ytop    =  50;  
+my $ybottom = 250;
+
+# Default plot variable (from @col) and Canvas message
+my $plotvar = 2;
+my $flatvar = undef;
+my $defmess = "Point to dot for info\nDouble-click for flat-field\nLeft button for area define";
+my $ffmode = "names";
+
+# Plot limits
+my ($xlo, $xhi, $ylo, $yhi, $xr, $yr, $xp, $yp);
+my ($alo, $ahi, $blo, $bhi);
+
+# Override defaults with command-line parameters!
+$obsdate = $ARGV[0] if ($#ARGV >= 0);
+$run     = $ARGV[1] if ($#ARGV > 0);
+
+&fill_bol;
+
+@noiseentry = ();
+%min = %max = ();
+%pinfo = ();
+$pinfo{'prcmd'} = 'lpr';
+$newplot = 1;
+$op_message = "";
+
+$xlo = $xhi = $ylo = $yhi = 0;
+$alo = $ahi = $blo = $bhi = "a";
+
+#-----------------------------A E S T H E T I C S----------------------------
+
+$FONT      = '-*-Helvetica-Medium-R-Normal--*-140-*-*-*-*-*-*';
+$listfont  = '-*-Courier-Medium-R-Normal--*-120-*-*-*-*-*-*';
+$plotfont  = '-*-Helvetica-Medium-R-Normal--*-180-*-*-*-*-*-*';
+$labelfont = '-*-Helvetica-Medium-R-Normal--*-140-*-*-*-*-*-*';
+
+# Some colours...
+
+$wbg = "#555555";
+$wfg = "#ffffff";
+$bbg = "#eeeeee";
+$bfg = "#000088";
+$tc =  'Brown';              # Text color
+$fc =  'Midnightblue';       # Frame color
+$pc =  'Skyblue2';           # Points color
+$qc =  'DarkOrange';         # Selected Point color
+$cc =  'Red';                # Aux. color
+$bc =  'PapayaWhip';         # Flat-field Bolometer color
+$dc =  'Gold';               #     ,,     noisy bol. color
+
+#----------------------------------------------------------------------------
+# Now open a Tk window
+
+#----------------------------------------------------------------------------
+# Now open a Tk window
+$MW = MainWindow->new;
+$MW->title('Scuba Noise Data');
+$MW->configure(
+	       -background=>$bbg,
+	       -foreground=>$bfg
+	       );
+
+# Open user input window if needed, else plot data.
+if ($obsdate eq "" or $run eq "") {
+    &obsdir_panel;
+} else { 
+
+    &plot_frame;
+    if ($op_message eq "") {
+	&getdata;
+	if ($op_message eq "") {
+	    &plot;
+	} else {
+	    &obsdir_panel;
+	}
+    } else {
+	&obsdir_panel;
+    }
+
+}
+
+#----------------------------------------------------------------------------
+# Start the event handler
+MainLoop;
+
+#----------------------------------------------------------------------------
+# Fill array disks with search locations for noise files.
+sub set_disks {
+
+  $idsk = -1;
+  @disk = ();
+
+  if ($datadir ne "'jac_default_directories'" && $datadir ne "") {
+    push(@disk,$datadir);
+    if ($datadir =~ /\/dem/) {
+      $ddir = $datadir;
+      $ddir =~ s/\/dem/\/ro/;
+      push(@disk,$ddir) if (-e "$ddir");
+    }
+  }
+
+  push(@disk,".");
+  if ($domain eq "jach") {
+    push(@disk,"/net/luu/scubadata/observe");
+    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
+    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+  } elsif ($domain eq "jcmt") {
+    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
+    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+    push(@disk,"/net/luu/scubadata/observe");
+  }
+
+  if ($debug) {
+    for ($i = 0 ; $i < $#disk; $i++) {
+      print "Location $i: $disk[$i]/.\n";
+    }
+  }
+
+}
+
+#----------------------------------------------------------------------------
+# Do the Directory and File
+sub obsdir_panel {
+
+    $mr = undef;
+
+    # Open new window for obsdir if plot_frame exists, else use frame.
+    if (defined $PW) {
+	$OP = $MW->Toplevel(
+			    -takefocus => 1
+			    );
+	$OP->title('Directory and File');
+    } else {
+	$OP = $MW->Frame(
+			    -takefocus => 1
+			    )->grid(qw/-sticky ew/);
+    }
+
+    # Message window: define here for accept but pack at bottom
+    $OM = $OP->Text(
+		       -wrap       => 'word',
+		       -relief     => 'flat',
+		       -foreground => 'Indianred',
+		       -height     => 4,
+		       -width      => 30,
+		       -takefocus  => 0,
+		       );
+
+    # Add frame for buttons
+    my $menubar = $OP->Frame(
+			     -background => $bbg
+			     );
+    $menubar->grid(qw/-sticky ew/);
+
+    # Exit
+    $menubar->Button(-text=>'    Exit    ',
+		     -relief=>'raised',
+		     -command=>sub{destroy $MW})
+                             ->grid(qw/-sticky e -row 1 -column 1 -ipadx 2/);
+
+    # Accept
+    $accept = $menubar->Button(-text=>'  Accept  ',
+		     -relief=>'raised',
+		     -command=>sub{
+			 if ($obsdate =~ /^\d/ && $run =~ /^[1-9]/) {
+			     $op_message = "";
+			     $OM->delete('1.0','end');
+			     &getdata; 
+			     &plot if ($op_message eq "");
+			 } else {
+			     $OM->delete('1.0','end');
+    $OM->insert('end',"Error: Obsdate and Run must be set before Accept!\n");
+			 }
+		     })->grid(qw/-sticky ns -row 1 -column 2 -ipadx 2/);
+
+    # Dismiss
+    my $dismiss = $menubar->Button(-text=>' Dismiss ',
+				   -relief=>'raised',
+				   -command=>sub{
+				     $w_obsdate->configure( -state => 'active')
+                                     if (defined $PW);
+				     destroy $OP; $OP = undef;})
+                              ->grid(qw/-sticky w -row 1 -column 3 -ipadx 2/);
+    $dismiss->configure( -state => 'disabled') unless (defined $PW);
+
+    # Open frame text
+    my $OT = $OP->Text(
+		       -wrap       => 'word',
+		       -relief     => 'flat',
+		       -foreground => 'midnightblue',
+                       -height     => 5,
+                       -width      => 30,
+		       -takefocus  => 0,
+		       )->grid(qw/-sticky nsew/);
+
+    $OT->insert('end',"First enter the directory and obs. date (YYYYMMDD), then ");
+    $OT->insert('end',"hit the scan button to find noise files or enter run nr directly.\n");
+
+    # Open frame for Inputs and Scan
+
+    # Datdir Entry
+    my $of = $OP->Frame(
+                        -borderwidth => 5,                
+			-takefocus => 1
+			)->grid(qw/-sticky nsew/);
+    my $de = $of->Entry(-relief => "sunken", -width => 32,
+			 -textvariable => \$datadir);
+    my $dl = $of->Label(-text => "Datadir:");
+    $dl->grid(qw/-sticky e -row 1 -column 1/);
+    $de->grid(qw/-sticky w -row 1 -column 2/);
+
+    # Obsdate Entry
+    my $oe = $of->Entry(-relief => "sunken", -width => 12,
+			 -textvariable => \$obsdate);
+    my $ol = $of->Label(-text => "Obsdate:");
+    $ol->grid(qw/-sticky e -row 2 -column 1/);
+    $oe->grid(qw/-sticky w -row 2 -column 2/);
+
+    # Scan button frame, but setup button after $mr to enable configure
+    my $bf = $OP->Frame()->grid(qw/-sticky nsew/);
+
+    # Run Menubutton and Entry
+    $rf = $OP->Frame(
+		     -borderwidth => 5
+		    )->grid(qw/-sticky nsew/);
+
+    my $re = $rf->Entry(-relief => "sunken", -width => 5,
+		     -textvariable => \$run);
+    $re->grid(qw/-sticky w -row 1 -column 2/);
+    &mk_runfield;
+
+    my $scan = $bf->Button(-text=>'Scan for Noise files',
+			   -relief=>'raised',
+		     -command=>sub{
+			 $OM->delete('1.0','end');
+                         $OM->insert('end',"Scanning...");
+                         &set_disks;
+			 &scandisk;
+			 &mk_runfield;
+		     })->pack();
+
+    # Finally pack message window at bottom
+    $OM->grid(qw/-sticky nsew/);
+    $OM->insert('end',"$op_message") unless ($op_message eq "");
+
+    $oe->bind('<Return>' => [$scan => 'invoke']);
+    $re->bind('<Return>' => [$accept => 'invoke']);
+
+#    $scan->configure( -state => 'disabled' ) if ($obsdate eq "");
+#
+#    $oe->bind('Any-Enter' =>
+#	      [sub{$scan->configure( -state => 'normal' );}]);
+#    $oe->bind('Any-Leave' => 
+#	      [sub{$scan->configure( -state => 'disabled' ) 
+#		       unless ($obsdate =~ /^\d/);}]);
+
+    # Find scans in case $obsdate specified upon entry but $run not.
+    if ($obsdate =~ /^\d/ && $run == 0 && $#runlist < 0) {
+	$scan->invoke;
+    }
+
+    # Disable main window control button
+    $w_obsdate->configure( -state => 'disabled') if (defined $PW);
+
+
+}
+
+#----------------------------------------------------------------------------
+# Create the Run field: text or button depending on number of run values.
+
+sub mk_runfield {
+
+  if (defined $mr) {
+    destroy $mr;
+    $mr = undef;
+  }
+  if ($#runlist > 0) {
+    $mr = $rf->Menubutton(
+			-text => 'Run', 
+			-relief => 'raised',
+			-state => 'disabled'
+			 );
+    $mr->configure(-state=> 'active');
+    my $i;
+    for ( $i = 0; $i <= $#runlist; $i++ ) {
+      my $irun = $runlist[$i];
+      $mr->command( -label => "$irun",
+		    -command =>sub{$run = $irun;
+                                   if (defined $OP) {
+                                       $accept->invoke;
+                                   } else {
+                                       &getdata; 
+                                       &plot if ($op_message eq "");
+                                   };
+                               });
+    }
+    $OM->delete('1.0','end');
+    $OM->insert('end',"Click 'RUN' to see list of noise files ");
+    $OM->insert('end',"found in $location.");
+  } else {
+    $mr = $rf->Label(-text => "Run: ");
+  }
+  $mr->grid(qw/-sticky e -row 1 -column 1/);
+}
+
+#----------------------------------------------------------------------------
+# Create a plot frame
+sub plot_frame {
+
+    # Delete Obsdate window/frame if it exists.
+    if (defined $OP) {
+       $OP->destroy;
+    }
+
+    # Create lot Canvas if it does not yet exist.
+    unless (defined $PW) {
+	$PW = $MW->Frame(
+			 -takefocus => 1
+			 )->grid(qw/-sticky nsew/);
+
+	# Create a cancas 
+	$C = $PW->Canvas(
+			 -relief => 'raised', 
+			 -width  => "$xplot", 
+			 -height => "$yplot",
+			 -cursor => 'top_left_arrow',
+			 );
+	$PW->Advertise('canvas' => $C);
+	$C->pack(-side => 'top', -fill => 'x');
+	
+	# Add "Chop Error" button on left below canvas
+	$w_choperr = $PW->Button(
+				    -text         => "$col[2]",
+				    -command      => sub{$plotvar=2;
+							 $newplot=1;
+				    $alo = $ahi = $blo = $bhi = "a";
+							 &plot}
+				    );
+	$PW->Advertise('Choperr_button' => $w_choperr);
+	$w_choperr->pack(-side=>'left');
+	
+	# Add "Chop" button on left below canvas
+	$w_chop = $PW->Button(
+				 -text         => "$col[1]",
+				 -command      => sub{$plotvar=1;
+						      $newplot=1;
+				 $alo = $ahi = $blo = $bhi = "a";
+						      &plot}
+				 );
+	$PW->Advertise('Chop_button' => $w_chop);
+	$w_chop->pack(-side=>'left');
+	
+	# Add "Cal" button on left below canvas
+	$w_cal = $PW->Button(
+				-text         => "$col[3]",
+				-command      => sub{$plotvar=3;
+						     $newplot=1;
+				$alo = $ahi = $blo = $bhi = "a";
+						     &plot}
+				);
+	$PW->Advertise('Cal_button' => $w_cal);
+	$w_cal->pack(-side=>'left');
+	
+	# Add "Cal error" button on left below canvas
+	$w_calerr = $PW->Button(
+				   -text         => "$col[4]",
+				   -command      => sub{$plotvar=4;
+							$newplot=1;
+				   $alo = $ahi = $blo = $bhi = "a";
+							&plot}
+				   );
+	$PW->Advertise('Calerr_button' => $w_calerr);
+	$w_calerr->pack(-side=>'left');
+	
+	# Add "Exit" button on right below canvas
+	my $w_exit = $PW->Button(
+				 -text         => 'Exit',
+				 -command      => sub{destroy $MW}
+				 );
+	$PW->Advertise('Exit_button' => $w_exit);
+	$w_exit->pack(-side=>'right');
+	
+	# Add "Control Panel" button on left below canvas
+	$w_control = $PW->Button(
+				    -text         => 'Control Panel',
+				    -command      => sub{&control_panel}
+				    );
+	$PW->Advertise('Control_button' => $w_control);
+	$w_control->pack(-side=>'right');
+	
+	# Add "Dir/File" button on left below canvas
+	$w_obsdate = $PW->Button(
+				   -text         => 'Dir&File',
+				   -command      => sub{&obsdir_panel}
+				   );
+	$PW->Advertise('Obsdate_button' => $w_obsdate);
+	$w_obsdate->pack(-side=>'right');
+	
+	# Add "Autoscale" button on left below canvas
+	my $w_autoscale = $PW->Button(
+				      -text         => "Autoscale",
+				      -command      => sub{$newplot=1;
+				      $alo = $ahi = $blo = $bhi = "a";
+							   &plot}
+				      );
+	$PW->Advertise('Autoscale_button' => $w_autoscale);
+	$w_autoscale->pack(-side=>'right');
+
+    }
+}
+
+#----------------------------------------------------------------------------
+# Do the Control Panel
+sub control_panel {
+
+    # Open new window for Control Panel
+    my $CP = $MW->Toplevel(
+	     -takefocus => 1
+			   );
+    $CP->title('Control Panel');
+
+    # Add frame for buttons
+    my $menubar = $CP->Frame(
+			     -background => $bbg
+			     );
+    $menubar->grid(qw/-sticky ew/);
+    $menubar->gridColumnconfigure(qw/0 -weight 1/);
+
+    # Dismiss
+    my $dismiss = $menubar->Button(-text=>'Dismiss',
+				 -relief=>'raised',
+	 			 -command=>sub{
+				   $w_control->configure( -state => 'active')
+				   if (defined $PW);
+				   destroy $CP})->pack(-side=>'right');
+
+    # Exit
+#    $menubar->Button(-text=>'Exit',
+#		     -relief=>'raised',
+#		     -command=>sub{destroy $MW})->pack(-side=>'right');
+
+    # Open frame for plot limit entries
+    my $CT = $CP->Text(
+		       -wrap       => 'word',
+		       -relief     => 'flat',
+		       -foreground => 'midnightblue',
+                       -height     => 3,
+                       -width      => 30,
+		       -takefocus  => 0,
+		       )->grid(qw/-sticky nsew/);
+
+    $CT->insert('end',"Bolometer: use names or numbers\n");
+    $CT->insert('end',"   (LW bolometers are  101-137)\n");
+    $CT->insert('end',"Autoscaling: set value to 'a'.\n");
+#    $CT->insert('end',
+#		"Specify a range from opposite limit as a negative value.\n");
+#    $CT->insert('end',
+#		"e.g. Xmin: -5   Xmax: 0 for 5 days before lastest data\n");
+
+    # Open frame for plot limit entries
+    my $CF = $CP->Frame(
+                        -borderwidth => 5,
+			-takefocus => 1
+			)->grid(qw/-sticky nsew/);
+
+    # X limits
+    my $ex1 = $CF->Entry(-relief => "sunken", -width => 6,
+			 -textvariable => \$alo);
+    my $lx1 = $CF->Label(-text => "Bolometer min:");
+    my $ex2 = $CF->Entry(-relief => "sunken", -width => 6,
+			 -textvariable => \$ahi);
+    my $lx2 = $CF->Label(-text => "max:");
+
+    # Y limits
+    my $ey1 = $CF->Entry(-relief => "sunken", -width => 6,
+			 -textvariable => \$blo);
+    my $ly1 = $CF->Label(-text => "Y-axis min:");
+    my $ey2 = $CF->Entry(-relief => "sunken", -width => 6,
+			 -textvariable => \$bhi);
+    my $ly2 = $CF->Label(-text => "max:");
+
+    $lx1->grid(qw/-sticky news -row 1 -column 1/);
+    $ex1->grid(qw/-sticky news -row 1 -column 2/);
+    $lx2->grid(qw/-sticky news -row 1 -column 3/);
+    $ex2->grid(qw/-sticky news -row 1 -column 4/);
+    $ly1->grid(qw/-sticky news -row 2 -column 1/);
+    $ey1->grid(qw/-sticky news -row 2 -column 2/);
+    $ly2->grid(qw/-sticky news -row 2 -column 3/);
+    $ey2->grid(qw/-sticky news -row 2 -column 4/);
+    $ex1->focus;
+
+    # Open frame for Replot and Print section
+    my $CB = $CP->Frame();
+
+    $CB->grid(qw/-sticky ew/);
+
+    # Replot button
+    $CB->Button(-text=>'Replot',
+		     -relief=>'raised',
+		     -command=>sub{$newplot=1; &plot})
+		                    ->grid(qw/-sticky w -row 1 -column 1/);
+
+    # Clear limits button
+    $CB->Button(-text=>'Clear limits',
+		     -relief=>'raised',
+		     -command=>sub{$alo=$ahi=$blo=$bhi='a';})
+		                    ->grid(qw/-sticky e -row 1 -column 2/);
+
+    # Print button with printer command
+    my $w_print = $CB->Button(
+        -text         => 'Print',
+        -command      => [\&area_save, $C, \%pinfo],
+    );
+    $CF->Advertise('PostScript_button' => $w_print);
+
+    my $w_prcmd = $CB->Entry(
+        -textvariable => \$pinfo{'prcmd'},
+    );
+    $CF->Advertise('entry' => $w_prcmd);
+    $w_print->grid(qw/-sticky w -row 2 -column 1/);
+    $w_prcmd->grid(qw/-sticky e -row 2 -column 2/);
+
+    $w_prcmd->bind('<Return>' => [$w_print => 'invoke']);
+
+    # Disable main window control button
+    $w_control->configure( -state => 'disabled') if (defined $PW);
+
+}
+
+#----------------------------------------------------------------------------
+sub getdata {
+
+    &getfile;
+    if ($op_message eq "") {
+	&rddata;
+    }
+
+}
+
+#----------------------------------------------------------------------------
+sub scandisk {
+
+    my ($i, $line, @files, $file, $rofile);
+    my $found = 0;
+    $idsk = -1;
+    $op_message = "";
+
+    ($obsdate =~ /^\d/)  or
+	die "Programming error obsdate not set! : $!\n";
+
+    # Possible locations of the data: first try $DATADIR if existing,
+    # then ./ followed by the 2 default locations at the JAC and the summit.
+
+    my ($j1, $j2, $j3) = "";
+    $i = 0;
+    while ($found == 0 && $i <= $#disk) {
+	@runlist = ();
+
+        if ($disk[$i] =~ /mwt/i && $domain eq "jach" && defined $OP) {
+            $OM->delete('1.0','end');
+	    $OM->insert('end',"Trying VAX disks at summit.\nBe patient for automount to complete...\n");
+            $OM->update('idletasks');
+        }
+        elsif ($disk[$i] =~ /luu/i && $domain eq "jcmt" && defined $OP) {
+            $OM->delete('1.0','end');
+	    $OM->insert('end',"Trying LUU disk at JAC.\nBe patient for automount to complete...\n");
+            $OM->update('idletasks');
+        }
+
+        $location = $disk[$i];
+        $location = "${location}/${obsdate}/ro" if ($location =~ /\/net/);
+
+	print "Trying directory '${location}/'..." if ($debug);
+	@files = ();
+        $op_message = "";
+	if (-e "${location}") {
+	    $found = 1;
+	    print "found\n" if ($debug);
+
+	    # Read directory
+	    opendir( DIR, "$location") or
+		do {$op_message = "Can't open directory $location! : $!"; };
+
+            my $odate = substr($obsdate,2,99);
+	    if ($op_message == "") {
+    	        push(@files,grep(/$odate/,grep(/^noise/i, readdir(DIR))));
+		closedir(DIR);
+	    }
+
+            print "Found " if ($debug);
+            print $#files+1 if ($debug);
+            print " noise files for ${odate}.\n" if ($debug);
+	    # if any noise files
+	    if ($op_message eq "" && $#files >= 0) {
+
+		# prompt used
+		print "Run numbers of noise files: " if ($debug);
+		foreach $file (@files) {
+		    ($j1, $j2, $j3) = split(/\_/,$file,3);
+		    ($j1, $j2) = split(/\./,$j3,2);
+		    push(@runlist,$j1);
+		    print " $j1" if ($debug);
+		}
+                print "\n" if ($debug);
+	    } else {
+	        $op_message = 
+		  "No noise files found for $obsdate at '${location}'.";
+                $found = 0;
+		$i++;
+	    }
+      
+	} else {
+	    print "not found\n" if ($debug);
+	    $i++;
+	}
+
+    }
+
+    $run == $runlist[0] if ($#runlist == 0);
+    @runlist = sort { $a <=> $b } @runlist if ($#runlist > 0);
+
+    if ($found) {
+	$idsk = $i;
+    } elsif ( $op_message eq "" ) {
+	$op_message = 
+	  "Error: can not find $obsdate noise files any location.";
+    }
+
+    if ($op_message ne "" && defined $OM) {
+            $OM->delete('1.0','end');
+	    $OM->insert('end',"$op_message");
+            $OM->update('idletasks');
+    }
+
+}
+
+#----------------------------------------------------------------------------
+sub getfile {
+
+    my ($i, $line, @files, $file, $rofile);
+    $op_message = "";
+
+    ($obsdate =~ /^\d/ && $run =~ /^[1-9]/)  or
+	die "Programming error obsdate not set! : $!\n";
+
+    # Construct the name of the noise file
+    $rofile = "noise_" . substr($obsdate,2,99) . "_" . $run . ".dat";
+
+    # Now this is a little bit naughty, if $run not in @runlist we
+    # assume that a disk scan is (still) required. Either scandisk has not
+    # happened or user want to force another disk location with e.g. a 
+    # newly created file. Normally the 'current' data directory should 
+    # only exist in one place, but...
+
+    my $rescan = 1;
+    my $found = 0;
+    foreach $i (@runlist) {
+	if ( $run == $i ) {
+            $rescan = 0;
+            $found = 1;
+            last;
+	}
+    }
+
+    if ($rescan) {
+
+	# Try find the name the noise file in one of the directories
+	# Try find the file local first
+	$i = 0;
+	while ($found == 0 && $i <= $#disk) {
+
+	    if ($disk[$i] =~ /mwt/i && $domain eq "jach" && defined $OP) {
+	      $OM->delete('1.0','end');
+	      $OM->insert('end',"Trying VAX disks at summit.\nBe patient for automount to complete...\n");
+	      $OM->update('idletasks');
+	    }
+	    elsif ($disk[$i] =~ /luu/i && $domain eq "jcmt" && defined $OP) {
+	      $OM->delete('1.0','end');
+	      $OM->insert('end',"Trying LUU disk at JAC.\nBe patient for automount to complete...\n");
+	      $OM->update('idletasks');
+	    }
+
+	    $location = $disk[$i];
+	    $location = "${location}/${obsdate}/ro" if ($location =~ /\/net/);
+
+	    print "Trying ${location}/$rofile...\n" if ($debug);
+	    if (-e "${location}/$rofile") {
+		print "found\n" if ($debug);
+		$found = 1;
+		last;
+	    } else {
+		print "not found\n"  if ($debug); 
+		$i++;
+	    }
+	}
+    }
+
+    if ($found) {
+	$idsk = $i if ($idsk < 0);
+    } else {
+	$op_message = 
+	    "Error: can not find noise_${obsdate}_${run}.dat anywhere";
+    }
+
+    if ($op_message ne "" && defined $OP) {
+            $OM->delete('1.0','end');
+	    $OM->insert('end',"$op_message");
+            $OM->update('idletasks');
+    }
+}
+
+#----------------------------------------------------------------------------
+sub rddata {
+
+    my ($i, $j, $line, $rofile);
+    my $found = 0;
+    $op_message = "";
+
+    $rofile = "noise_" . substr($obsdate,2,99) . "_" . $run . ".dat";
+
+    print "Reading $rofile...\n" if ($debug);
+
+    # Open the file and read
+    my @log = ();
+
+    open(NOISE,"< $location/$rofile")
+	or do { 
+	    $op_message =
+       "Error: could not open ${location}/${rofile}! : $!";
+	    if (defined $OM) {
+		$OM->delete('1.0','end');
+		$OM->insert('end',"$op_message");
+		$OM->update('idletasks');
+		$op_message = "";
+	    }
+	    return;
+	};
+
+    print "okay\n" if ($debug);
+
+    @log = <NOISE>; 
+    close(NOISE);
+
+    my @c = ();
+
+    for ( $j = 0; $j < 5; $j++ ) {
+	$min{"$col[$j]"} = 99999;
+	$max{"$col[$j]"} = -99999;
+    }
+
+    # Extract the information from the file.
+    @noiseentry = ();
+    $i = 0;
+    while ($i <= $#log) {
+
+	$line = $log[$i];
+
+	# Get the source
+	if ( $line =~ /^source/ ) {
+	    $line =~ s/^\s+//;
+	    $line =~ s/\s+/ /g;
+	    ($rest, $source) = split(/ /,$line,2);
+	    $i++;
+	    next;
+	} elsif ($line =~ /^! / && substr($line,2,5) ne 'NOISE') {
+	    $hst = substr($line,13,8);
+	    $i++;
+	    next;
+	}
+
+	# Skip the first header lines
+	unless ( $line =~ /^[A-I]\d/ ) {
+	    $i++;
+	    next;
+	}
+      
+	# Some messy stuff which probably can be done a lot better
+	# but don't mess with things that work
+	$line =~ s/^\s+//;
+	$line =~ s/\s+/ /g;
+	($c[0], $c[1], $c[2], $c[3], $c[4], $c[5], $rest) = split(/ /,$line,7);
+
+	print "$c[0] $c[1] $c[2] $c[3] $c[4] $c[5]\n" if ($debug > 1);
+
+	# Push onto hash array
+	my %ref = ();
+	for ( $j = 0; $j < 6; $j++) {
+	    $ref{"$col[$j]"}   = $c[$j];
+	}
+	$c[0] = $bol{"$c[0]"};
+	$ref{'bolnr'}     = $c[0];
+	push( @noiseentry, \%ref );
+	
+	# Minmax of values
+	if ( $c[5] == 0  ) {
+	    for ( $j = 0; $j < 5; $j++ ) {
+		$min{"$col[$j]"} = 
+		  (${c[$j]} < $min{"$col[$j]"} ? ${c[$j]} : $min{"$col[$j]"});
+        	$max{"$col[$j]"} = 
+	          (${c[$j]} > $max{"$col[$j]"} ? ${c[$j]} : $max{"$col[$j]"});
+	    }
+        }
+        $i++;
+    }
+
+    if ($debug) {
+	my ($mmin, $mmax);
+	for ( $j = 0; $j < 5; $j++ ) {
+	    $mmin = $min{"$col[$j]"};
+	    $mmax = $max{"$col[$j]"};
+	    print "${col[$j]}: from $mmin to $mmax\n";
+	}
+    }
+
+}
+
+#----------------------------------------------------------------------------
+sub plot {
+
+     # Create a  top-level window containing a canvas displaying a simple 
+     # graph.
+
+    my($i, $x, $y, $point, $xe, $ye, $val);
+
+    unless (defined $PW) {
+	&plot_frame;
+    }
+
+    $pinfo{'lastX'} = 0;
+    $pinfo{'lastY'} = 0;
+    $pinfo{'areaX2'} = -1;
+
+    # If a new plot needs to be made, set new boundaries
+    if ($newplot) {
+
+        # Delete any existing plot
+        if (defined $C) {
+	    $C->delete('all') ;
+	}
+
+        # Re-activate buttons
+	$w_choperr->configure( -state => 'active');
+	$w_chop->configure( -state => 'active');
+	$w_cal->configure( -state => 'active');
+	$w_calerr->configure( -state => 'active');
+
+	# Adopt scaling from control panel
+        $xlo = $alo;
+        $xlo = $bol{"\U$alo"} if ($alo =~ /^[a-zA-Z]\d/);
+	$xhi = $ahi; 
+	$xhi = $bol{"\U$ahi"} if ($ahi =~ /^[a-zA-Z]\d/);
+        $ylo = $blo;
+        $yhi = $bhi;
+
+        # Use auto-scaling if 0
+	$xlo = 0 if ($xlo =~ /^a/i);
+	$xhi = 140 if ($xhi =~ /^a/i);
+	$ylo = $min{"$col[$plotvar]"} if ($ylo =~ /^a/i);
+	$yhi = $max{"$col[$plotvar]"} if ($yhi =~ /^a/i);
+
+        if ($xlo > $xhi) {
+	  $val = $xhi;
+	  $xhi = $xlo;
+	  $xlo = $val;
+        }
+        if ($ylo > $yhi) {
+	  $val = $yhi;
+	  $yhi = $ylo;
+	  $ylo = $val;
+        }
+
+# Can not do: negative values allowed
+#        # Set range from opposite limit if value < 0.
+#	$xlo = 132+$xlo  if ($xlo < 0);
+#	$xhi = $xlo-$xhi if ($xhi < 0);
+#	$ylo = $max{"$col[$plotvar]"}+$ylo if ($ylo < 0);
+#	$yhi = $ylo-$yhi if ($yhi < 0);
+
+        # Round to integer
+	$ylo = int($ylo-0.5);
+	$yhi = int($yhi+0.5);
+    }
+
+    # Add some slop to both ends Y-axis
+    $xe = 0;
+    $ye = 0.05*($yhi-$ylo);
+
+    # Plot range 
+    $xhi = $xhi+$xe;
+    $xlo = $xlo-$xe;
+    $xr = ($xhi-$xlo);
+    $yhi = $yhi+$ye;
+    $ylo = $ylo-$ye;
+    $yr = ($yhi-$ylo);
+
+    print "X-axis: $xlo -- $xhi ($xr)\nY-axis: $ylo -- $yhi ($yr)\n" 
+      if ($debug);
+
+    if ($newplot){
+        # Title and plot variable source
+	$C->create('text', $xplot/2, $ytop-30, 
+		   -text => 'Scuba Noise Statistics', 
+		   -font => $plotfont, -fill => $tc);
+        $C->delete($varinfo) unless ($newplot) ;
+        $varinfo = $C->create('text', $xplot/2, $ytop-10, 
+			      -text => "$col[$plotvar]",
+			      -font => $plotfont, -fill => $tc);
+        # Display observation info: date, time, run and source
+	$C->create('text', $xleft, $ytop-30, 
+		   -text => "$obsdate", -anchor => 'w',
+		   -font => $plotfont, -fill => $tc);
+	$C->create('text', $xleft, $ytop-10, 
+		   -text => "$hst", -anchor => 'w',
+		   -font => $plotfont, -fill => $tc);
+	$C->create('text', 2*$xleft, $ybottom+35, 
+		   -text => "$run:$source", 
+		   -font => $plotfont, -fill => $tc);
+        # LW and SW section
+        if ($xlo <= 100 && $xhi >= 100) {
+	    $x = $xleft + (96.5 - $xlo) * ($xright-$xleft)/$xr;
+	    $C->create('line', $x, $ybottom,  $x, $ytop+5, -width => 1,
+		       -fill => $fc)
+		if ($x >= $xleft+10 && $x <= $xright-10 );
+	    $C->create('text', $x-15, $ytop+10, -text => "SW", 
+		       -anchor => 'center', 
+		       -font => $labelfont, -fill => $fc)
+		if ($x-15 >= $xleft+10 && $x-15 <= $xright-10 );
+	    $C->create('text', $x+15, $ytop+10, -text => "LW", 
+		       -anchor => 'center', 
+		       -font => $labelfont, -fill => $fc)
+		if ($x+15 >= $xleft+10 && $x+15 <= $xright-10 );
+	}
+        # X-axis + label
+	$C->create('line', $xleft, $ybottom, $xright, $ybottom, -width => 2, 
+		   -fill => $fc);
+	$C->create('text', $xplot/2, $ybottom+35, -text => "$col[0]", 
+		   -font => $plotfont, -fill => $tc);
+        # Y-axis + label
+	$C->create('line', $xleft,  $ytop,  $xleft, $ybottom, 
+		   -width => 2, -fill => $fc);
+	$C->create('text', $xleft-30, $ytop+18, -text => 'nV', 
+		   -font => $plotfont, -fill => $tc);
+        # X Tick marks
+        my $xtick = 14;
+	for($i = 0; $i <= $xtick; $i++) {
+	    $x = $xleft + ($i * ($xright-$xleft)/$xtick);
+	    $C->create('line', $x, $ybottom, $x, $ybottom+5, -width => 2, 
+		       -fill => $fc);
+	    $val = (($val=int($xlo+$i*$xr/$xtick)) >= 100 ? $val-100 : $val);
+	    $C->create('text', $x, $ybottom+4, 
+		       -text => "$val", -anchor => 'n',
+		       -font => $labelfont, -fill => $fc);
+	}
+        # Y Tick marks
+        my $ytick = 4;
+	for ($i = 0; $i <= $ytick; $i++) {
+	    $y =  $ybottom - ($i * ($ybottom-$ytop)/$ytick);
+	    $C->create('line', $xleft, $y, $xright, $y, -width => 1, 
+		       -fill => $tc)
+		unless ($i == 0 || $i == $ytick);
+	    $C->create('text', $xleft-4, $y, 
+		       -text => 0.1*int(10.0*($ylo+$i*$yr/$ytick)), 
+		       -anchor => 'e',
+		       -font => $labelfont, -fill => $fc);
+	} # forend
+    }
+    
+    # Help for user
+    $C->delete($iteminfo) unless ($newplot) ;
+    $iteminfo = $C->create('text', $xplot-125, 25, -text => "$defmess",
+			   -font => $listfont, -fill => $cc);
+
+    # Draw the lines if the ends are within the plot boundaries
+    my $np = $#noiseentry;
+    my $r = (($r = 1.5*140/$xr) < 2.5 ? 2.5 : $r);
+    $r = ($r > 6 ? 6 : $r);
+    my $ibol;
+    @pw_point = ();
+    for ($i = 0; $i <= $np; $i++) {
+	$x = $xleft  + (${$noiseentry[$i]}{'bolnr'}-$xlo) * 
+	    ($xright-$xleft)/$xr;
+	$y = $ybottom - (${$noiseentry[$i]}{"$col[$plotvar]"}-$ylo) *
+                         ($ybottom-$ytop)/$yr;
+        $pw_point[$i] = -1;
+        if ( $x  >= $xleft && $x  <= $xright && 
+	     $y  >= $ytop && $y  <= $ybottom ) {
+	  my $dtag = "d$i";
+	  $pw_point[$i] = 
+	      $C->create('oval', $x-$r, $y-$r, $x+$r, $y+$r, -width => 1, 
+			 -fill => $pc, -tags => "$dtag");
+	  if ($newplot) {
+	    $C->bind("$dtag", '<Any-Enter>' => [sub{item_on("$dtag")}]);
+	    $C->bind("$dtag", '<Any-Leave>' => [sub{item_off("$dtag")}]);
+	  }
+	}
+    }
+
+    if ($plotvar == 1) {
+      $w_chop->configure( -state => 'disabled');
+    } elsif ($plotvar == 2) {
+      $w_choperr->configure( -state => 'disabled');
+    } elsif ($plotvar == 3) {
+      $w_cal->configure( -state => 'disabled');
+    } elsif ($plotvar == 4) {
+      $w_calerr->configure( -state => 'disabled');
+    }
+
+    if ($newplot && $plotvar == 2) {
+       $y = $ybottom - (60-$ylo) * ($ybottom-$ytop)/$yr;
+       $cutoff_line = 
+       $C->create('line', $xleft, $y, $xright, $y, -width => 1, 
+		   -fill => $qc);
+    }
+
+    if (defined $cutoff_line && $flatvar eq $plotvar) {
+       $yp = $ybottom - ($cutoff-$ylo) * ($ybottom-$ytop)/$yr;
+       $cutoff_line = 
+       $C->create('line', $xleft, $yp, $xright, $yp, -width => 2, 
+		   -fill => $dc);
+    }
+
+    # Allow print area to be selected
+    if ($newplot) {
+      $C->Tk::bind('<1>' => [sub {area_down(@ARG)}, \%pinfo]);
+      $C->Tk::bind('<Double-1>' => [sub {show_lwsw(@ARG)}, \%pinfo]);
+      $C->Tk::bind('<B1-Motion>' => [sub {area_move(@ARG)}, \%pinfo]);
+      $C->Tk::bind('<2>' => [sub {area_release(@ARG)}, \%pinfo]);
+      $C->Tk::bind('<3>' => [sub {area_cancel(@ARG)}, \%pinfo]);
+    }
+
+} # end Plot
+
+
+#----------------------------------------------------------------------
+# Calculate cutoff and plot Flat-field
+sub show_lwsw {
+
+    my ($w, $pinfo) = @ARG;
+    my $e = $w->XEvent;
+    ($xp, $yp) = ($e->x, $e->y);
+
+    # Cutoff value and variable
+    $cutoff = int(($ybottom-$yp)*$yr/($ybottom-$ytop)+$ylo);
+    $flatvar = $plotvar;
+
+    # Make line on noise plot
+    $C->delete($cutoff_line) if (defined $BW);
+    $cutoff_line = 
+      $C->create('line', $xleft, $yp, $xright, $yp, -width => 2, 
+		   -fill => $dc);
+    &plot_lwsw
+}
+
+#----------------------------------------------------------------------
+# Flat-field.
+sub plot_lwsw {
+    
+    my $cbg = "LightCyan3";         # Canvas color
+    my $lgpltfont = '-*-Helvetica-Medium-R-Normal--*-180-*-*-*-*-*-*';
+    my $smpltfont = '-*-Helvetica-Medium-R-Normal--*-120-*-*-*-*-*-*';
+
+    # Canvas dimensions
+    my $lplot   = 740;
+    my $mplot   = 390;
+    my $lleft   =  10;
+    my $lright  = 710;
+    my $mtop    =  30;  
+    my $mbottom = 360;
+    
+    # Define alternative mode for Mode button
+    $newmode = ( $ffmode eq "names" ? "numbers" : "names" );
+
+    # Create a plot window for the flatfield.
+    unless (defined $BW) {
+      $BW = $MW->Toplevel(
+			  -takefocus => 1
+			 );
+      $BW->title('Scuba Flat-Field');
+    }
+
+    # Create a canvas 
+    if (defined $BC) {
+	    $BC->delete('all');
+    } else {
+      $BC = $BW->Canvas(
+			-relief => 'raised', 
+			-width  => "$lplot", 
+			-height => "$mplot",
+			-cursor => 'top_left_arrow',
+		       );
+      $BW->Advertise('canvas' => $BC);
+      $BC->pack(-side => 'top', -fill => 'x');
+    
+      # Add "Dismiss" button on right below canvas
+      my $bwdismiss = $BW->Button(
+				-text         => 'Dismiss',
+				-command      => sub{
+				  $C->delete($cutoff_line);
+				  destroy $BW; 
+				  $BW = $BC= $flatvar = undef}
+			       );
+      $BW->Advertise('Dismiss_button' => $bwdismiss);
+      $bwdismiss->pack(-side=>'right');
+
+      # Add "Mode" menubutton on right below canvas
+      $bwmode = $BW->Button(
+			     -text         => "$newmode",
+			     -command      => sub{
+			       $bwmode->configure(-text => "$ffmode");
+			       $ffmode = $newmode;
+			       &plot_lwsw;
+			     }
+			    );
+      $BW->Advertise('Mode_button' => $bwmode);
+      $bwmode->pack(-side=>'right');
+    }
+
+    # flatfield scaling
+    my $llo = -80.0;
+    my $lhi = 240.0;
+    my $mlo = -80.0;
+    my $mhi = 80.0;
+        
+    # Plot range 
+    my $lr = ($lhi-$llo);
+    my $mr = ($mhi-$mlo);
+    
+    # Title and arrays
+    $BC->create('text', $lplot/2-20, $mtop-5, 
+		-text => 'Bolometer Flat-Field', 
+		-font => $lgpltfont, -fill => $tc);
+    $BC->create('text', $lleft+30, $mtop+15, 
+		-text => "SW", -font => $lgpltfont, -fill => $tc);
+    $BC->create('text', $lright-20, $mtop+15, 
+		-text => "LW", -font => $lgpltfont, -fill => $tc);
+
+    # Draw the bolometers
+    my ($i, $x, $y, $r, $ibol, $val, $loff, $font, $color);
+    my $np = $#noiseentry;
+    @bw_point = ();
+    for ($i = 0; $i <= $np; $i++) {
+      
+      $val  = ${$noiseentry[$i]}{"$col[$flatvar]"};
+      $ibol = ${$noiseentry[$i]}{"$col[0]"};
+      my ($x,$y) = split(/ /,$xybol{"$ibol"},2);
+
+      $bw_point[$i] = -1;
+
+      if ($ibol =~ /^[G-I]\d/) {
+	$r = 26;
+	$loff = 0;
+	$font = $lgpltfont;
+      } else {
+	$r = 13;
+	$loff = 160;
+	$font = $smpltfont;
+      }
+
+      if ( $val < $cutoff) {
+	$color = $bc;
+      } else {
+	$color = $dc;
+      }
+
+      if ($ffmode eq "numbers") {
+          $ibol = ${$noiseentry[$i]}{'bolnr'};
+          $ibol -= 100 if ($ibol > 100);
+      }
+
+      # Need to go backwards in X to get 'normal' picture
+      $x = $lright  - ($x+$loff-$llo) * ($lright-$lleft)/$lr;
+      $y = $mbottom - ($y-$mlo) * ($mbottom-$mtop)/$mr;
+      if ( $x >= $lleft && $x <= $lright &&
+	   $y >= $mtop  && $y <= $mbottom ) {
+	my $dtag = "d$i";
+	$bw_point[$i] = 
+	    $BC->create('oval', $x-$r, $y-$r, $x+$r, $y+$r, -width => 1,
+			-fill => $color, -tags => "$dtag");
+	$BC->create('text', $x, $y, -text => "$ibol", 
+		    -font => $font, -fill => $cc, -tags => "$dtag");
+	$BC->bind("$dtag", '<Any-Enter>' => [sub{item_on("$dtag")}]);
+	$BC->bind("$dtag", '<Any-Leave>' => [sub{item_off("$dtag")}]);
+      }
+    }
+
+    $BC->create('text', $xleft+100, $mbottom, 
+		-text => "Gold: $col[$flatvar] >= $cutoff", 
+		-font => $lgpltfont, -fill => $tc);
+    $BC->create('text', $xleft+100, $mbottom+25, 
+		-text => "$run:$source",   
+                -font => $lgpltfont, -fill => $tc);
+    
+
+} # end plot_lwsw
+
+#----------------------------------------------------------------------------
+# Private methods.
+
+sub item_on {    
+    my $i   = substr("$ARG[0]",1,999);
+    my $cbol  = ${$noiseentry[$i]}{"$col[0]"};
+    my $ibol  = $bol{"$cbol"};
+    $ibol -= 100 if ($ibol > 100);
+    my $val = ${$noiseentry[$i]}{"$col[$plotvar]"};
+    $C->itemconfigure($pw_point[$i], -fill => $qc) if ($pw_point[$i] != -1);
+    if (defined $BW && $bw_point[$i] != -1) {
+       $BC->itemconfigure($bw_point[$i], -fill => $qc) 
+    };
+    $C->delete($iteminfo) if (defined $iteminfo);
+    $iteminfo = $C->create('text', $xplot-100, 15, 
+			   -text => "($cbol:$ibol, $val)",
+			   -font => $plotfont, -fill => $cc);
+  }
+
+sub item_off {
+    
+    my $i   = substr("$ARG[0]",1,999);
+    my $val = ${$noiseentry[$i]}{"$col[$plotvar]"};
+    $C->delete($iteminfo);
+    $C->itemconfigure($pw_point[$i], -fill => $pc) if ($pw_point[$i] != -1);
+    if (defined $BW && $bw_point[$i] != -1) {
+	my $val = ${$noiseentry[$i]}{"$col[$flatvar]"};
+	if ($val < $cutoff ) {
+	    $BC->itemconfigure($bw_point[$i], -fill => $bc) 
+       } else {
+	   $BC->itemconfigure($bw_point[$i], -fill => $dc) 
+       }
+    };
+#    $iteminfo = $C->create('text', $xplot-125, 25, -text => "$defmess",
+#			   -font => $listfont, -fill => $cc);
+
+  }
+
+sub area_down {
+
+    my($w, $pinfo) = @ARG;
+
+    $C->delete($iteminfo) if (defined $iteminfo);
+    $iteminfo = $C->create('text', $xplot-100, 22, -text =>
+       "Left:   Area define\nMiddle: Replot area\nRight:  Cancel",
+			   -font => $listfont, -fill => $cc);
+
+    my $e = $w->XEvent;
+    my($x, $y) = ($e->x, $e->y);
+    $pinfo->{'areaX1'} = $x;
+    $pinfo->{'areaY1'} = $y;
+    $pinfo->{'areaX2'} = -1;
+    $pinfo->{'areaY2'} = -1;
+    eval {local $SIG{'__DIE__'}; $w->delete('area');};
+
+} # end area_down
+
+sub area_move {
+
+    my($w, $pinfo) = @ARG;
+
+    my $e = $w->XEvent;
+    my($x, $y) = ($e->x, $e->y);
+    if($x != $pinfo->{'areaX1'} && $y != $pinfo->{'areaY1'}) {
+      eval {local $SIG{'__DIE__'}; $w->delete('area');};
+      $w->addtag('area','withtag',$w->create('rect',$pinfo->{'areaX1'},
+                                           $pinfo->{'areaY1'},$x,$y));
+      $pinfo->{'areaX2'} = $x;
+      $pinfo->{'areaY2'} = $y;
+    }
+
+} # end area_move
+
+sub area_release {
+
+    my($w, $pinfo) = @ARG;
+
+    $C->delete($iteminfo) if (defined $iteminfo);
+    $iteminfo = $C->create('text', $xplot-125, 25, -text => "$defmess",
+			   -font => $listfont, -fill => $cc);
+    if($pinfo->{'areaX1'} != $pinfo->{'areaX2'} && 
+       $pinfo->{'areaY1'} != $pinfo->{'areaY2'} &&
+       $pinfo->{'areaX2'} != -1 && $pinfo->{'areaY2'} != -1 ) {
+      $alo = ($pinfo->{'areaX1'}-$xleft)  *$xr/($xright-$xleft)+$xlo;
+      $blo = ($ybottom-$pinfo->{'areaY1'})*$yr/($ybottom-$ytop)+$ylo;
+      $ahi = ($pinfo->{'areaX2'}-$xleft)  *$xr/($xright-$xleft)+$xlo;
+      $bhi = ($ybottom-$pinfo->{'areaY2'})*$yr/($ybottom-$ytop)+$ylo;
+      $w->delete('area');
+      $newplot = 1;
+      &plot;
+                          
+    }
+
+} # end area_release
+
+sub area_cancel {
+
+    my($w, $pinfo) = @ARG;
+
+    $C->delete($iteminfo) if (defined $iteminfo);
+    $iteminfo = $C->create('text', $xplot-125, 25, -text => "$defmess",
+			   -font => $listfont, -fill => $cc);
+    $pinfo{'lastX'} = 0;
+    $pinfo{'lastY'} = 0;
+    $pinfo{'areaX1'} = -1;
+    $pinfo{'areaY1'} = -1;
+    $pinfo{'areaY2'} = -1;
+    $pinfo{'areaX2'} = -1;
+    $w->delete('area');
+                          
+} # end area_relase
+
+sub area_save {
+    
+    my($w, $pinfo) = @ARG;
+    
+    my($x1, $x2, $y1, $y2, $a);
+    
+    if($pinfo->{'areaX2'} != -1) {
+	($x1, $x2, $y1, $y2) = 
+	  @$pinfo{'areaX1', 'areaX2', 'areaY1', 'areaY2'}; # slice !
+	($x1, $x2) = @$pinfo{'areaX2', 'areaX1'} if $x2 <= $x1;
+	($y1, $y2) = @$pinfo{'areaY2', 'areaY1'} if $y2 <= $y1;
+	$a = $w->postscript('-x' => $x1, '-y' => $y1,
+			    -width => $x2 - $x1, -height => $y2 - $y1);
+    } else {
+	$a = $w->postscript;
+    }
+    
+    $SIG{'PIPE'} = sub {};
+    open(LPR, "| $pinfo->{'prcmd'}");
+    print LPR $a;
+    close(LPR);
+
+} # end area_save
+
+#----------------------------------------------------------------------
+# We write good unix utilities ergo the -v and -h flags work
+ 
+sub ver_text {
+
+    print "\n\t$prog --- version $version\n";
+    print "\tThis utility plots Scuba Noise files in a X-window\n";
+    print "\tContact Remo Tilanus (rpt\@jach.hawaii.edu) for more information\n\n";
+
+}
+ 
+sub help_text {
+
+    print "\n\tName: $prog - Plot Scuba Noise files\n\n";
+    print "\tVersion: $version\n\n";
+    print "\tUse:  $prog  [-v | -h | -d] [obsdate [runnr]]\n\n";
+    print "\t\t-h: \tthis help\n\n";
+    print "\t\t-v: \tversion\n\n";
+    print "\t\t-d: \tswitch on debug output\n\n\n";
+    print "\t\tobsdate:\tobservation directory/date e.g. 19980210\n\n";
+    print "\t\trunnr:\tscuba observation number of the noise measurement\n\n\n";
+    print "\tThe routine will try to locate the noise file at the JAC first,\n";
+    print "\tbut if it can not find the file, it wil look on the summit VAX disks.\n";
+    print "\tIf obsdate and/or runnr are omitted the user will be prompted\n";
+    print "\tIf obsdate and presented with a choice of run numbers.\n\n\n";
+}
+
+sub fill_bol {
+
+%bol = ('A1', 1, 'A2', 2, 'A3', 3, 'A4', 4, 'A5', 5, 'A6', 6,
+        'A7', 7, 'A8', 8, 'A9', 9, 'A10', 10, 'A11', 11, 'A12', 12,
+        'A13', 13, 'A14', 14, 'A15', 15, 'A16', 16, 'B1', 17, 'B2', 18,
+        'B3', 19, 'B4', 20, 'B5', 21, 'B6', 22, 'B7', 23, 'B8', 24,
+        'B9', 25, 'B10', 26, 'B11', 27, 'B12', 28, 'B13', 29, 'B14', 30,
+        'B15', 31, 'B16', 32, 'C1', 33, 'C2', 34, 'C3', 35, 'C4', 36,
+        'C5', 37, 'C6', 38, 'C7', 39, 'C8', 40, 'C9', 41, 'C10', 42,
+        'C11', 43, 'C12', 44, 'C13', 45, 'C14', 46, 'C15', 47, 'C16', 48,
+        'D1', 49, 'D2', 50, 'D3', 51, 'D4', 52, 'D5', 53, 'D6', 54,
+        'D7', 55, 'D8', 56, 'D9', 57, 'D10', 58, 'D11', 59, 'D12', 60,
+        'D13', 61, 'D14', 62, 'D15', 63, 'D16', 64, 'E1', 65, 'E2', 66,
+        'E3', 67, 'E4', 68, 'E5', 69, 'E6', 70, 'E7', 71, 'E8', 72,
+        'E9', 73, 'E10', 74, 'E11', 75, 'E12', 76, 'E13', 77, 'E14', 78,
+        'E15', 79, 'E16', 80, 'F1', 81, 'F2', 82, 'F3', 83, 'F4', 84,
+        'F5', 85, 'F6', 86, 'F7', 87, 'F8', 88, 'F9', 89, 'F10', 90,
+        'F11', 91,
+        'G1', 101, 'G2', 102, 'G3', 103, 'G4', 104, 'G7', 105, 'G8', 106, 
+        'G9', 107, 'G10',108, 'G11', 109, 'G13', 110, 'G14', 111, 
+        'G15', 112, 'G16', 113, 'H1', 114, 'H2', 115, 'H4', 116, 
+        'H5', 117, 'H6', 118, 'H7', 119, 'H8', 120, 'H9', 121, 
+        'H10', 122, 'H11', 123, 'H12', 124, 'H13', 125, 'H14', 126, 
+        'H15', 127, 'H16', 128, 'I1', 129, 'I2', 130, 'I3', 131,
+        'I4', 132, 'I5', 133, 'I6', 134, 'I7', 135, 'I8', 136, 'I9', 137);
+
+%xybol =  (
+     'A1', "0.5708E+02 -0.2814E+02", 'A2', "0.4590E+02 -0.3591E+02",
+     'A3', "0.3615E+02 -0.4146E+02", 'A4', "0.2464E+02 -0.4962E+02",
+     'A5', "0.1455E+02 -0.5628E+02", 'A6', "0.3620E+01 -0.6315E+02",
+     'A7', "0.5638E+02 -0.1661E+02", 'A8', "0.4508E+02 -0.2315E+02",
+     'A9', "0.3495E+02 -0.3012E+02", 'A10', "0.2240E+02 -0.3762E+02",
+     'A11', "0.1314E+02 -0.4396E+02", 'A12', "0.2812E+01 -0.5070E+02",
+     'A13', "-0.7590E+01 -0.5808E+02", 'A14', "0.5559E+02 -0.4683E+01",
+     'A15', "0.4502E+02 -0.1081E+02", 'A16', "0.3296E+02 -0.1807E+02",
+     'B1', "0.2224E+02 -0.2456E+02", 'B2', "0.1165E+02 -0.3120E+02",
+     'B3', "0.2000E+01 -0.3855E+02", 'B4', "-0.9089E+01 -0.4490E+02",
+     'B5', "-0.1951E+02 -0.5160E+02", 'B6', "0.5585E+02 0.7780E+01",
+     'B7', "0.4489E+02 0.9322E+00", 'B8', "0.3283E+02 -0.5420E+01",
+     'B9', "0.2169E+02 -0.1181E+02", 'B10', "0.1166E+02 -0.1921E+02",
+     'B11', "0.7480E+00 -0.2610E+02", 'B12', "-0.1013E+02 -0.3228E+02",
+     'B13', "-0.2043E+02 -0.3952E+02", 'B14', "-0.2907E+02 -0.4586E+02",
+     'B15', "0.5681E+02 0.2020E+02", 'B16', "0.4512E+02 0.1323E+02",
+     'C1', "0.3315E+02 0.7096E+01", 'C2', "0.2194E+02 0.7400E+00",
+     'C3', "0.1091E+02 -0.6110E+01", 'C4', "0.2756E+00 -0.1215E+02",
+     'C5', "-0.1075E+02 -0.1977E+02", 'C6', "-0.2075E+02 -0.2666E+02",
+     'C7', "-0.3146E+02 -0.3298E+02", 'C8', "-0.4124E+02 -0.4042E+02",
+     'C9', "0.5849E+02 0.3141E+02", 'C10', "0.4631E+02 0.2581E+02",
+     'C11', "0.3388E+02 0.2000E+02", 'C12', "0.2248E+02 0.1267E+02",
+     'C13', "0.1116E+02 0.6479E+01", 'C14', "0.0000E+00 0.0000E+00",
+     'C15', "-0.1116E+02 -0.6479E+01", 'C16', "-0.2215E+02 -0.1332E+02",
+     'D1', "-0.3139E+02 -0.2045E+02", 'D2', "-0.4220E+02 -0.2734E+02",
+     'D3', "-0.5298E+02 -0.3271E+02", 'D4', "0.4815E+02 0.3794E+02",
+     'D5', "0.3558E+02 0.3207E+02", 'D6', "0.2340E+02 0.2565E+02",
+     'D7', "0.1184E+02 0.1956E+02", 'D8', "0.1100E+01 0.1301E+02",
+     'D9', "-0.1030E+02 0.6303E+01", 'D10', "-0.2141E+02 -0.4385E+00",
+     'D11', "-0.3244E+02 -0.6844E+01", 'D12', "-0.4299E+02 -0.1380E+02",
+     'D13', "-0.5295E+02 -0.2078E+02", 'D14', "0.3682E+02 0.4498E+02",
+     'D15', "0.2543E+02 0.3744E+02", 'D16', "0.1301E+02 0.3179E+02",
+     'E1', "0.1499E+01 0.2630E+02", 'E2', "-0.9694E+01 0.1926E+02",
+     'E3', "-0.2096E+02 0.1302E+02", 'E4', "-0.3153E+02 0.6590E+01",
+     'E5', "-0.4362E+02 -0.8783E+00", 'E6', "-0.5395E+02 -0.7067E+01",
+     'E7', "0.2731E+02 0.5184E+02", 'E8', "0.1511E+02 0.4443E+02",
+     'E9', "0.3500E+01 0.3973E+02", 'E10', "-0.8784E+01 0.3302E+02",
+     'E11', "-0.1987E+02 0.2656E+02", 'E12', "-0.3045E+02 0.2024E+02",
+     'E13', "-0.4249E+02 0.1245E+02", 'E14', "-0.5245E+02 0.6274E+01",
+     'E15', "0.1652E+02 0.5893E+02", 'E16', "0.3524E+01 0.5163E+02",
+     'F1', "-0.7665E+01 0.4592E+02", 'F2', "-0.1817E+02 0.3963E+02",
+     'F3', "-0.3008E+02 0.3403E+02", 'F4', "-0.4123E+02 0.2619E+02",
+     'F5', "-0.5155E+02 0.2029E+02", 'F6', "0.6895E+01 0.6560E+02",
+     'F7', "-0.4842E+01 0.6013E+02", 'F8', "-0.1690E+02 0.5287E+02",
+     'F9', "-0.2931E+02 0.4752E+02", 'F10', "-0.4009E+02 0.3977E+02",
+     'F11', "-0.5045E+02 0.3338E+02", 'G1', "0.7830E+01 -0.7610E+02",
+     'G2', "0.2679E+02 -0.6138E+02", 'G3', "0.4785E+02 -0.4588E+02",
+     'G4', "0.7119E+02 -0.3377E+02", 
+     'G7', "-0.1777E+02 -0.6524E+02", 'G8', "0.2193E+01 -0.4958E+02",
+     'G9', "0.2291E+02 -0.3673E+02", 'G10', "0.4500E+02 -0.2298E+02",
+     'G11', "0.6850E+02 -0.1106E+02",
+     'G13', "-0.3950E+02 -0.5281E+02", 'G14', "-0.2157E+02 -0.3796E+02",
+     'G15', "0.5100E-01 -0.2533E+02", 'G16', "0.2174E+02 -0.1171E+02",
+     'H1', "0.4506E+02 0.1172E+01", 'H2', "0.6772E+02 0.1328E+02",
+     'H4', "-0.6336E+02 -0.3956E+02", 'H5', "-0.4256E+02 -0.2631E+02",
+     'H6', "-0.2200E+02 -0.1264E+02", 'H7', "0.0000E+00 0.0000E+00",
+     'H8', "0.2262E+02 0.1231E+02", 'H9', "0.4633E+02 0.2465E+02",
+     'H10', "0.7049E+02 0.3728E+02", 'H11', "-0.6490E+02 -0.1333E+02",
+     'H12', "-0.4228E+02 -0.4700E+00", 'H13', "-0.2029E+02 0.1298E+02",
+     'H14', "0.1250E+01 0.2529E+02", 'H15', "0.2519E+02 0.3783E+02",
+     'H16', "0.4965E+02 0.4959E+02", 'I1', "-0.6385E+02 0.1301E+02",
+     'I2', "-0.4057E+02 0.2669E+02", 'I3', "-0.1803E+02 0.3894E+02",
+     'I4', "0.5930E+01 0.5154E+02", 'I5', "0.2938E+02 0.6318E+02",
+     'I6', "-0.6020E+02 0.4057E+02", 'I7', "-0.3669E+02 0.5404E+02",
+     'I8', "-0.1578E+02 0.6389E+02", 'I9', "0.9047E+01 0.7776E+02");
+}
