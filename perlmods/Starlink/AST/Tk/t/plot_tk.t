@@ -10,8 +10,10 @@ require_ok("Starlink::AST::Tk");
 use File::Spec;
 
 my $zoom = 1;
-my $factor = 1.4;
-print "# zoom = $zoom, factor = $factor\n";
+my @factor;
+$factor[0] = 1.7;
+$factor[1] = 1.7;
+print "# zoom = $zoom, xfactor = $factor[0], yfactor = $factor[1]\n";
 
 BEGIN {
 
@@ -58,7 +60,7 @@ isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Create Tk test harness
 # ----------------------
-my $c = create_window( \@axes, $zoom, $factor );
+my $c = create_window( \@axes, $zoom, \@factor );
 
 # Handle data 
 # -----------
@@ -109,6 +111,32 @@ is( $status, 1, "Result from registering Tk with AST" );
 $plot->Set( Colour => 2, Width => 5 );
 $plot->Grid();
 
+# Switch to GRAPHICS frame for easy plotting
+
+my $ra1 = $wcsinfo->Unformat( 1, "0:40:00" );
+my $dec1 = $wcsinfo->Unformat( 1, "41:30:00" );
+my $ra2 = $wcsinfo->Unformat( 1, "0:44:00" );
+my $dec2 = $wcsinfo->Unformat( 1, "42:00:00" );
+
+print "\n# Current Frame " . $plot->Get( "Domain" ) . "\n";
+print "# Plotting at $ra1, $dec1\n";
+print "# Plotting at $ra2, $dec2\n";
+$plot->Mark( 24, [$ra1, $ra2], [$dec1, $dec2] );
+
+$plot->Set( Current => 1 );
+print "\n# Current Frame " . $plot->Get( "Domain" ) . "\n";
+#plot->Text("Test Text 1", [0.4,0.4],[0.0,1.0],"CC");
+#$plot->Set( Colour => 3  );
+#$plot->Text("Test Text 2", [0.5,0.5],[0.0,1.0],"CC");
+#$plot->Set( Colour => 4 );
+#$plot->Text("Test Text 3", [0.6,0.6],[0.0,1.0],"CC");
+
+#$plot->Set( Colour => 6, Width => 5 );
+$plot->Mark( 24, [0.6,0.5,0.4], [0.4, 0.3,0.3]  );
+
+#$plot->Set( Colour => 2, Width => 5 );
+#$plot->PolyCurve( [0.2,0.3,0.25], [0.8,0.5,0.5]);
+
 # Tk MainLoop
 # -----------
 print "# Entering MainLoop()\n";
@@ -134,8 +162,8 @@ sub create_window {
    $MW->after( 3000, sub { exit; } );
 
    # create the canvas widget
-   my $canvas = $MW->Canvas( -width       => $axes[0]*$zoom*$factor,
-                             -height      => $axes[1]*$zoom*$factor, 
+   my $canvas = $MW->Canvas( -width       => $axes[0]*$zoom*$$factor[0],
+                             -height      => $axes[1]*$zoom*$$factor[1], 
                              -background  => 'dark grey',
                              -borderwidth => 3 );
    $canvas->pack();
