@@ -15,4 +15,7 @@ Added 17/1/05:
 - Correct void * arithmetic in keymap.c
 - Integrate TimeFrame
 - Monitor progresss on FITS-WCS paper IV (and eventually paper V)
+- Write SOAP service to show off STC functionality
+- Move observer position attributes into Frame class
+
  
