@@ -16,6 +16,8 @@
 *     27 Apr 95 : V1.8-1 SPLIT option added (RJV)
 *     21 Sep 95 : V2.0-0 ADI port (DJA)
 *      1 Apr 96 : V2.0-1 Checks cached image for compatibility (RJV)
+*      5 Mar 97 : V2.0-2 Avoid PSF problem with null ID (RJV)
+*     13 Mar 97 : V2.0-3 Send success flag to GUI (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -66,8 +68,10 @@
 *  close previous image if loaded
         IF (I_OPEN) THEN
           NEW=.FALSE.
-          CALL PSF_RELEASE(I_PSF,STATUS)
-          I_PSF=0
+          IF (I_PSF.NE.0) THEN
+            CALL PSF_RELEASE(I_PSF,STATUS)
+            I_PSF=0
+          ENDIF
 
           CALL ADI_FCLOSE( I_FID, STATUS )
 
@@ -110,11 +114,15 @@
         IF (I_CUBE) THEN
           CALL MSG_PRNT('Loading image from cube....')
           CALL IMG_LOADCUBE(IFID,'SLICE',STATUS)
+          CALL IMG_SETWHOLE(STATUS)
+          CALL IMG_SETPOS(0.0,0.0,STATUS)
+          CALL IMG_MINMAX(STATUS)
         ELSE
           CALL MSG_PRNT('Loading image....')
           CALL IMG_LOAD(IFID,STATUS)
           CALL IMG_SETWHOLE(STATUS)
           CALL IMG_SETPOS(0.0,0.0,STATUS)
+          CALL IMG_MINMAX(STATUS)
         ENDIF
 
 *  check compatibility with image incache
@@ -220,6 +228,12 @@
         ENDIF
 
       ENDIF
+
+*  send success flag to GUI - flag will be set non-zero by GUI
+      IF (I_GUI) THEN
+        CALL IMG_NBPUT0I('FLAG',STATUS,STATUS)
+      ENDIF
+
 
       CALL USI_CLOSE()
 

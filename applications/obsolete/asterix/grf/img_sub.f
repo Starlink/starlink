@@ -2398,7 +2398,9 @@ c     LOGICAL UNIF,WOK
 *  Local constants :
 *  Local variables :
       CHARACTER*20 C1,C2
+      CHARACTER*12 OPTION
       REAL ZMIN,ZMAX,RANGE(2)
+      INTEGER FLAG
       INTEGER NR, NVAL
 c     INTEGER NDIM,DIMS(ADI__MXDIM),NWID
       INTEGER DPTR,VPTR,QPTR,ZPTR
@@ -2416,18 +2418,45 @@ c     LOGICAL UNIF,WOK
 
         NVAL=I_NX*I_NY
 
+*  if GUI then get slice from GUI
+        IF (I_GUI) THEN
+
+*  wait for OK signal
+          FLAG=0
+          DO WHILE (FLAG.EQ.0)
+            CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+          ENDDO
+
+*  how is slice specified
+          CALL IMG_NBGET0C('OPTIONS',OPTION,STATUS)
+          IF (OPTION.EQ.'WHOLE') THEN
+            I_IZ1=1
+            I_IZ2=I_NZ
+          ELSEIF (OPTION.EQ.'INDEX') THEN
+            CALL IMG_NBGET0I('PAR_I1',I_IZ1,STATUS)
+            CALL IMG_NBGET0I('PAR_I2',I_IZ2,STATUS)
+          ELSEIF (OPTION.EQ.'VALUE') THEN
+            CALL IMG_NBGET0R('PAR_R1',RANGE(1),STATUS)
+            CALL IMG_NBGET0R('PAR_R2',RANGE(2),STATUS)
+            CALL IMG_ZRANGE(RANGE(1),RANGE(2),%VAL(ZPTR),STATUS)
+          ENDIF
+
+*  otherwise get from parameter system
+        ELSE
+
 *  map z-axis
-        CALL BDI_AXMAPR( IFID, I_ZAX, 'Data', 'READ', ZPTR, STATUS )
-        CALL ARR_RANG1R(I_NZ,%VAL(ZPTR),ZMIN,ZMAX,STATUS)
-        CALL CHR_RTOC(ZMIN,C1,NC1)
-        CALL CHR_RTOC(ZMAX,C2,NC2)
-        CALL USI_DEF0C(PAR,C1(:NC1)//':'//C2(:NC2),STATUS)
-
+          CALL BDI_AXMAPR( IFID, I_ZAX, 'Data', 'READ', ZPTR, STATUS )
+          CALL ARR_RANG1R(I_NZ,%VAL(ZPTR),ZMIN,ZMAX,STATUS)
+          CALL CHR_RTOC(ZMIN,C1,NC1)
+          CALL CHR_RTOC(ZMAX,C2,NC2)
+          CALL USI_DEF0C(PAR,C1(:NC1)//':'//C2(:NC2),STATUS)
 *  get range of axis values for slice
-        CALL PRS_GETRANGES(PAR,2,1,ZMIN,ZMAX,RANGE,NR,STATUS)
-
+          CALL PRS_GETRANGES(PAR,2,1,ZMIN,ZMAX,RANGE,NR,STATUS)
 *  convert to range (inclusive) of indices
-        CALL IMG_ZRANGE(RANGE(1),RANGE(2),%VAL(ZPTR),STATUS)
+          CALL IMG_ZRANGE(RANGE(1),RANGE(2),%VAL(ZPTR),STATUS)
+
+        ENDIF
+
 
 *  map data and get axis values
         CALL BDI_MAPR(IFID,'Data','READ',DPTR,STATUS)
@@ -2471,8 +2500,6 @@ c     LOGICAL UNIF,WOK
           I_XWID=ABS(I_XSCALE)
           I_YWID=ABS(I_YSCALE)
 
-*  get min and max
-        CALL IMG_MINMAX(STATUS)
 
 *  set data slice
         I_IX1=1
@@ -2503,6 +2530,11 @@ c     LOGICAL UNIF,WOK
 
 *  get region mask
         CALL DYN_MAPB(1,NVAL,I_REG_PTR,STATUS)
+
+*  get min and max
+        CALL IMG_MINMAX(STATUS)
+
+
 
       ENDIF
 
