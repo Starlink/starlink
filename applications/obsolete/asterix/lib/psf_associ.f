@@ -90,7 +90,7 @@
 
 *      We have an internal routine to handle responses
         GOOD_PSF = .TRUE.
-        RNAME = 'PSF_RESPFILE'
+        RNAME = 'RESPFILE'
 
       ELSE
 
@@ -125,7 +125,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Good psf? Check that the routine exists
+*  Good psf? Check that the routine exists
       IF ( GOOD_PSF ) THEN
         CALL PSF_CHKLIBRTN( RNAME, TAG, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
