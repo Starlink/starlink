@@ -131,6 +131,10 @@ comments from others.</px></change>
 <px>Update to IEEE trap details</px>
 </distribution>
 
+<distribution string="2-2" date="00-Dec-2001" author="ng" versionid="v2-2">
+<px>Slight reworking after comments</px>
+</distribution>
+
 </history>
 
 <copyright>
@@ -2664,9 +2668,13 @@ for further details.</p>
 
 <subsect id='s.models' export>
 <subhead>
-<title>Stellar Atmospheres</title>
+<title>Astrophysical modelling codes</title>
 <update versionid="v2-0">
 <px>Expanded this section considerably, with several more links.</px>
+</update>
+<update versionid="v2-2">
+<px>Reworking of this section after comments from BS; added VALD and
+Dusty links.</px>
 </update>
 </subhead>
 
@@ -2677,25 +2685,23 @@ miscontextualised something, please do let me know.</p>
 
 <p>Stellar atmosphere codes:
 <ul>
-<li><p><webref url='http://ccp7.dur.ac.uk/'>CCP7</webref>
-is a 
-<webref url='http://www.dci.clrc.ac.uk/ListActivities.asp?Class=5;Classtype=21;'>Collaborative Computational
-Project</webref>,
-`concerned with the calculation of
-theoretical models suitable for the interpretation of stellar and
-interstellar spectra'.  As well as promoting the use of advanced
-computers in astronomy, it develops and maintains a library of
-stellar-atmosphere and spectroscopy codes.  <webref
-url="http://star.arm.ac.uk/~csj/">Simon Jeffery</webref> makes
-available a number of tools for stellar atmosphere calculations.</p></li>
+<li><p><webref url='http://ccp7.dur.ac.uk/'>CCP7</webref> was a
+<webref
+url='http://www.dci.clrc.ac.uk/ListActivities.asp?Class=5;Classtype=21;'
+>Collaborative Computational Project</webref>, `concerned with the
+calculation of theoretical models suitable for the interpretation of
+stellar and interstellar spectra'.  As well as promoting the use of
+advanced computers in astronomy, it developed a library of
+stellar-atmosphere and spectroscopy codes.  The project finished in
+April 2001, but the resources it produced are still useful.</p></li>
+
+<li><p><webref url="http://star.arm.ac.uk/~csj/">Simon
+Jeffery</webref> makes available a number of tools for stellar
+atmosphere calculations.</p></li>
 
 <li><p>At <webref url='http://kurucz.harvard.edu/'>Robert Kurucz's home
 page</webref> you can obtain copies of his ATLAS and other codes,
 along with grids of model atmospheres.</p></li>
-
-<li><p><webref url="http://www.pa.uky.edu/~gary/cloudy/">Cloudy and
-Associates</webref>: photoionization simulations by Gary
-Ferland.</p></li>
 
 <li><p><webref url="http://phoenix.physast.uga.edu/" >PHOENIX</webref>:
 state-of-the-art M-star model atmospheres.</p></li>
@@ -2703,12 +2709,11 @@ state-of-the-art M-star model atmospheres.</p></li>
 
 <p>Atomic and molecular data:
 <ul>
-<li><p>The 
-<webref url='http://vizier.u-strasbg.fr/OP.html'>Opacity Project</webref>
-is a collaborative project to produce the atomic data required for
-stellar envelope calculations.  The project makes the results
-generally available both through a database called `TOPbase', and by
-anonymous FTP.</p></li>
+<li><p>The <webref url='http://vizier.u-strasbg.fr/OP.html'>Opacity
+Project</webref> is a collaborative project to produce the atomic data
+required for stellar envelope calculations.  The project makes the
+results generally available both through a database called `TOPbase',
+and by anonymous FTP.</p></li>
 
 <li><p>Other opacity data is available from the 
 <webref url='http://www-phys.llnl.gov/V_Div/OPAL/'>OPAL code</webref>.  
@@ -2717,15 +2722,36 @@ requests for new tables to be generated.</p></li>
 
 <li><p>Atomic data at <webref
 url="http://www.pa.uky.edu/~verner/atom.html">Kentucky</webref> and
-<webref
-url="http://cfa-www.harvard.edu/amdata/ampdata/amdata.html"
+<webref url="http://cfa-www.harvard.edu/amdata/ampdata/amdata.html"
 >Harvard</webref></p></li>
 
-<li><p>
-<webref url='http://spec.jpl.nasa.gov/' >JPL Molecular
+<li><p><webref url='http://spec.jpl.nasa.gov/' >JPL Molecular
 Spectroscopy</webref></p></li>
-</ul>
 
+<li><p>The <webref url='http://www.astro.univie.ac.at/~vald/' >Vienna
+Atomic Line Database (VALD)</webref> is an excellent site with
+up-to-date atomic data needed for spectrum synthesis.</p>
+</li>
+
+</ul>
+</p>
+
+<p>Astronomical chemistry (loosely) -- dust, clouds and the
+interstellar medium:
+<ul>
+
+<li><p><webref
+url="http://www.pa.uky.edu/~gary/cloudy/">Cloudy</webref> is a
+arge-scale plasma simulation code that is widely used across the
+astronomical community as an aid in the interpretation of
+spectroscopic data.</p></li>
+
+<li>
+<p><webref url="http://www.pa.uky.edu/~moshe/dusty/" >DUSTY</webref>
+is a dust-shell modelling code, also originating at Kentucky.</p>
+</li>
+
+</ul></p>
 
 <p>A number of 
 <webref url='http://www.fges.demon.co.uk/cfd/CFD_codes.html'>CFD codes</webref>
@@ -2740,7 +2766,7 @@ much of the content of this section.
 
 <subsect id='s.lib' export>
 <subhead>
-<title>Libraries</title>
+<title>General-purpose and numerical libraries</title>
 <update versionid="v2-0">
 <px>Longer discussion of the GPL and other free licences.</px>
 </update>
@@ -3195,8 +3221,8 @@ added remarks about optimizing~C, and compiler switches.
 <li id=ta.sj>SJ: Simon Jeffery (<code/csj@star.arm.ac.uk>) added
 pointers to model atmosphere codes.</li>
 <li id=ta.jl><p>JL: Jon Lockley (<code>jjl@astro.soton.ac.uk</code>)</p></li>
-<li id=ta.as>AS: Anne Sansom (<code/a.e.sansom@uclan.ac.uk>).
-<li id=ta.bs>BS: Barry Smalley (<code/star@astro.keele.ac.uk>).
+<li id=ta.as>AS: Anne Sansom (<code/aesansom@uclan.ac.uk>).
+<li id=ta.bs>BS: Barry Smalley (<code/bs@astro.keele.ac.uk>).
 Pointers to model atmospheres.
 <li id=ta.mbt>MBT: Mark Taylor (<code/mbt@ast.cam.ac.uk>) made a number of
 points about my coverage of Fortran, and several insightful remarks
