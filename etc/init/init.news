@@ -3,6 +3,14 @@
  files required by users in order to use the USSC.
 
  History:
+    v1.1-26 6-JUL-2004 (TIMJ)
+       First autoconf version. Fixes required for logic involving
+       obsolete datestamp files and the fact that /star/share no longer
+       exists as a place for shared libraries.
+       Also need clarification of exec_prefix vs prefix since things like
+       staretcdir and starhelpdir are defined relative to $prefix and
+       not $exec_prefix
+
     v1.1-25 12-DEC-2003
        Fixed STARJAVA adding to path when /star/bin
        exists.

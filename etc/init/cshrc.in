@@ -1,26 +1,26 @@
 #!/bin/csh
 #+
 #  Date: 2003-MAY-23
-#  File: INSTALL_ETC/cshrc
-#  Version: PKG_VERS
+#  File: @staretc@/cshrc
+#  Version: @VERSION@
 #
 #  This file must be sourced before Starlink software can be used.
 #  This script contains alias definitions and hence must be sourced
 #  for each C-shell from which you wish to use Starlink software.
 #  This is most easily be done by adding the line:
 #   
-#     source INSTALL_ETC/cshrc
+#     source @staretc@/cshrc
 #
 #  to your .cshrc file.
 #-
 #  Define aliases
 #
 
-if ( -e INSTALL_BIN/news ) then
-   alias news INSTALL_BIN/news
+if ( -e @bindir@/news ) then
+   alias news @bindir@/news
 endif
-alias sman "man -P INSTALL_MAN"
-alias xdisplay 'setenv DISPLAY `INSTALL_ETC/xdisplay \!\!`;echo DISPLAY set to $DISPLAY'
+alias sman "man -P @mandir@"
+alias xdisplay 'setenv DISPLAY `@staretcdir@/xdisplay \!\!`;echo DISPLAY set to $DISPLAY'
 
 #
 # Option Set items 
@@ -30,494 +30,494 @@ alias xdisplay 'setenv DISPLAY `INSTALL_ETC/xdisplay \!\!`;echo DISPLAY set to $
 #   Asterix
 #
 
-if ( -e INSTALL_BIN/asterix/startup ) then
-   alias asterix source INSTALL_BIN/asterix/startup
-   alias asterixsetup source INSTALL_BIN/asterix/startup
-   alias aststart source INSTALL_BIN/asterix/startup
+if ( -e @bindir@/asterix/startup ) then
+   alias asterix source @bindir@/asterix/startup
+   alias asterixsetup source @bindir@/asterix/startup
+   alias aststart source @bindir@/asterix/startup
 else
-   alias asterix 'INSTALL_ETC/notinst asterix'
-   alias asterixsetup 'INSTALL_ETC/notinst asterixsetup'
-   alias aststart 'INSTALL_ETC/notinst aststart'
+   alias asterix '@staretcdir@/notinst asterix'
+   alias asterixsetup '@staretcdir@/notinst asterixsetup'
+   alias aststart '@staretcdir@/notinst aststart'
 endif
 
 #
 #  Atools
 #
 
-if ( -e INSTALL_BIN/atools/atools.csh ) then
+if ( -e @bindir@/atools/atools.csh ) then
    alias atools 'source ${ATOOLS_DIR}/atools.csh'
    alias atoolssetup 'source ${ATOOLS_DIR}/atools.csh'
 else
-   alias atools 'INSTALL_ETC/notinst atools'
-   alias atoolssetup 'INSTALL_ETC/notinst atoolssetup'
+   alias atools '@staretcdir@/notinst atools'
+   alias atoolssetup '@staretcdir@/notinst atoolssetup'
 endif
 
 #
 #  Autoastrom
 #
 
-if ( -e INSTALL_BIN/autoastrom/autoastrom ) then
+if ( -e @bindir@/autoastrom/autoastrom ) then
    alias autoastrom '${AUTOASTROM_DIR}/autoastrom'
    alias autoastromsetup '${AUTOASTROM_DIR}/autoastrom'
 else
-   alias autoastrom 'INSTALL_ETC/notinst autoastrom'
-   alias autoastromsetup 'INSTALL_ETC/notinst autoastromsetup'
+   alias autoastrom '@staretcdir@/notinst autoastrom'
+   alias autoastromsetup '@staretcdir@/notinst autoastromsetup'
 endif
 
 #
 #   Catpac
 #
 
-if ( -e INSTALL_BIN/catpac/catpac ) then
-   alias catpac source INSTALL_BIN/catpac/catpac
-   alias catpacsetup source INSTALL_BIN/catpac/catpac
-   alias catpacdemo source INSTALL_BIN/catpac/catpacdemo
+if ( -e @bindir@/catpac/catpac ) then
+   alias catpac source @bindir@/catpac/catpac
+   alias catpacsetup source @bindir@/catpac/catpac
+   alias catpacdemo source @bindir@/catpac/catpacdemo
 else
-   alias catpac 'INSTALL_ETC/notinst catpac'
-   alias catpacsetup 'INSTALL_ETC/notinst catpacsetup'
-   alias catpacdemo 'INSTALL_ETC/notinst catpacdemo'
+   alias catpac '@staretcdir@/notinst catpac'
+   alias catpacsetup '@staretcdir@/notinst catpacsetup'
+   alias catpacdemo '@staretcdir@/notinst catpacdemo'
 endif
 
 #
 #   CCDpack
 #
 
-if ( -e INSTALL_BIN/ccdpack/ccdpack.csh ) then
-   alias ccdpack source INSTALL_BIN/ccdpack/ccdpack.csh
-   alias ccdpacksetup source INSTALL_BIN/ccdpack/ccdpack.csh
+if ( -e @bindir@/ccdpack/ccdpack.csh ) then
+   alias ccdpack source @bindir@/ccdpack/ccdpack.csh
+   alias ccdpacksetup source @bindir@/ccdpack/ccdpack.csh
 else
-   alias ccdpack 'INSTALL_ETC/notinst ccdpack'
-   alias ccdpacksetup 'INSTALL_ETC/notinst ccdpacksetup'
+   alias ccdpack '@staretcdir@/notinst ccdpack'
+   alias ccdpacksetup '@staretcdir@/notinst ccdpacksetup'
 endif
 
 #
 #   Chart
 #
 
-if ( -e INSTALL_BIN/chart/chart_startup ) then
+if ( -e @bindir@/chart/chart_startup ) then
    alias chart \
-   'source INSTALL_BIN/chart/chart_startup; INSTALL_BIN/chart/chart_params \!\!'
+   'source @bindir@/chart/chart_startup; @bindir@/chart/chart_params \!\!'
 else
-   alias chart 'INSTALL_ETC/notinst chart'
+   alias chart '@staretcdir@/notinst chart'
 endif
 
 #
 #   Cgs4dr
 #
 
-if ( -e INSTALL_BIN/cgs4dr/cgs4dr ) then
-   alias cgs4dr      INSTALL_BIN/cgs4dr/cgs4dr
-   alias cgs4dr_demo INSTALL_BIN/cgs4dr/cgs4dr_demo
-   alias cgs4dr_icl  INSTALL_BIN/cgs4dr/cgs4dr_icl
-   alias cgs4dr_kill INSTALL_BIN/cgs4dr/cgs4dr_kill
-   alias cgs4dr_tcl  'INSTALL_BIN/cgs4dr/tcl/cgs4dr_tcl \!* &'
-   alias list_index  INSTALL_BIN/cgs4dr/list_index
+if ( -e @bindir@/cgs4dr/cgs4dr ) then
+   alias cgs4dr      @bindir@/cgs4dr/cgs4dr
+   alias cgs4dr_demo @bindir@/cgs4dr/cgs4dr_demo
+   alias cgs4dr_icl  @bindir@/cgs4dr/cgs4dr_icl
+   alias cgs4dr_kill @bindir@/cgs4dr/cgs4dr_kill
+   alias cgs4dr_tcl  '@bindir@/cgs4dr/tcl/cgs4dr_tcl \!* &'
+   alias list_index  @bindir@/cgs4dr/list_index
 else
-   alias cgs4dr      'INSTALL_ETC/notinst cgs4dr'
-   alias cgs4dr_demo 'INSTALL_ETC/notinst cgs4dr_demo'
-   alias cgs4dr_icl  'INSTALL_ETC/notinst cgs4dr_icl'
-   alias cgs4dr_kill 'INSTALL_ETC/notinst cgs4dr_kill'
-   alias cgs4dr_tcl  'INSTALL_ETC/notinst cgs4dr_tcl'
-   alias list_index  'INSTALL_ETC/notinst list_index'
+   alias cgs4dr      '@staretcdir@/notinst cgs4dr'
+   alias cgs4dr_demo '@staretcdir@/notinst cgs4dr_demo'
+   alias cgs4dr_icl  '@staretcdir@/notinst cgs4dr_icl'
+   alias cgs4dr_kill '@staretcdir@/notinst cgs4dr_kill'
+   alias cgs4dr_tcl  '@staretcdir@/notinst cgs4dr_tcl'
+   alias list_index  '@staretcdir@/notinst list_index'
 endif
  
 #
 #   Convert
 #
 
-if ( -e INSTALL_BIN/convert/convert.csh ) then
-   alias convert source INSTALL_BIN/convert/convert.csh
-   alias convertsetup source INSTALL_BIN/convert/convert.csh
+if ( -e @bindir@/convert/convert.csh ) then
+   alias convert source @bindir@/convert/convert.csh
+   alias convertsetup source @bindir@/convert/convert.csh
 else
-   alias convert 'INSTALL_ETC/notinst convert'
-   alias convertsetup 'INSTALL_ETC/notinst convertsetup'
+   alias convert '@staretcdir@/notinst convert'
+   alias convertsetup '@staretcdir@/notinst convertsetup'
 endif
 
 #
 #   Cursa
 #
 
-if ( -e INSTALL_BIN/cursa/cursa.csh ) then
-   alias cursa source INSTALL_BIN/cursa/cursa.csh
-   alias cursasetup source INSTALL_BIN/cursa/cursa.csh
+if ( -e @bindir@/cursa/cursa.csh ) then
+   alias cursa source @bindir@/cursa/cursa.csh
+   alias cursasetup source @bindir@/cursa/cursa.csh
 else
-   alias cursa 'INSTALL_ETC/notinst cursa'
-   alias cursasetup 'INSTALL_ETC/notinst cursasetup'
+   alias cursa '@staretcdir@/notinst cursa'
+   alias cursasetup '@staretcdir@/notinst cursasetup'
 endif
 
 #
 #   Daophot
 #
 
-if ( -e INSTALL_BIN/daophot/daophot.csh ) then
-   alias daostart source INSTALL_BIN/daophot/daophot.csh
-   alias daophot source INSTALL_BIN/daophot/daophot.csh
-   alias daophotsetup source INSTALL_BIN/daophot/daophot.csh
+if ( -e @bindir@/daophot/daophot.csh ) then
+   alias daostart source @bindir@/daophot/daophot.csh
+   alias daophot source @bindir@/daophot/daophot.csh
+   alias daophotsetup source @bindir@/daophot/daophot.csh
 else
-   alias daostart 'INSTALL_ETC/notinst daostart'
-   alias daophot 'INSTALL_ETC/notinst daophot'
-   alias daophotsetup 'INSTALL_ETC/notinst daophotsetup'
+   alias daostart '@staretcdir@/notinst daostart'
+   alias daophot '@staretcdir@/notinst daophot'
+   alias daophotsetup '@staretcdir@/notinst daophotsetup'
 endif
 
 #
 #   Datacube
 #
 
-if ( -e INSTALL_BIN/datacube/datacube.csh ) then
-   alias datacube source INSTALL_BIN/datacube/datacube.csh
-   alias datacubestart source INSTALL_BIN/datacube/datacube.csh
-   alias datacubesetup source INSTALL_BIN/datacube/datacube.csh
+if ( -e @bindir@/datacube/datacube.csh ) then
+   alias datacube source @bindir@/datacube/datacube.csh
+   alias datacubestart source @bindir@/datacube/datacube.csh
+   alias datacubesetup source @bindir@/datacube/datacube.csh
 else
-   alias datacube 'INSTALL_ETC/notinst datacube'
-   alias datacubesetup 'INSTALL_ETC/notinst datacubesetup'
-   alias datacubestart 'INSTALL_ETC/notinst datacubestart'
+   alias datacube '@staretcdir@/notinst datacube'
+   alias datacubesetup '@staretcdir@/notinst datacubesetup'
+   alias datacubestart '@staretcdir@/notinst datacubestart'
 endif
 
 #
 #   Dipso
 #
 
-if ( -e INSTALL_BIN/dipso/dipsosetup ) then
-   alias dipsosetup source INSTALL_BIN/dipso/dipsosetup
-   alias dipso source INSTALL_BIN/dipso/dipsosetup
+if ( -e @bindir@/dipso/dipsosetup ) then
+   alias dipsosetup source @bindir@/dipso/dipsosetup
+   alias dipso source @bindir@/dipso/dipsosetup
 else
-   alias dipsosetup 'INSTALL_ETC/notinst dipsosetup'
-   alias dipso 'INSTALL_ETC/notinst dipso'
+   alias dipsosetup '@staretcdir@/notinst dipsosetup'
+   alias dipso '@staretcdir@/notinst dipso'
 endif
 
 #
 #   Echomop
 #
 
-if ( -e INSTALL_BIN/echomop/echomop.csh ) then
-   alias echomopsetup source INSTALL_BIN/echomop/echomop.csh
-   alias echomop source INSTALL_BIN/echomop/echomop.csh
+if ( -e @bindir@/echomop/echomop.csh ) then
+   alias echomopsetup source @bindir@/echomop/echomop.csh
+   alias echomop source @bindir@/echomop/echomop.csh
 else
-   alias echomopsetup 'INSTALL_ETC/notinst echomopsetup'
-   alias echomop 'INSTALL_ETC/notinst echomop'
+   alias echomopsetup '@staretcdir@/notinst echomopsetup'
+   alias echomop '@staretcdir@/notinst echomop'
 endif
 
 #
 #   Echwind
 #
 
-if ( -e INSTALL_BIN/echwind/echwind.csh ) then
-   alias echwind INSTALL_BIN/echwind/echwind.csh
+if ( -e @bindir@/echwind/echwind.csh ) then
+   alias echwind @bindir@/echwind/echwind.csh
 else
-   alias echwind 'INSTALL_ETC/notinst echwind'
+   alias echwind '@staretcdir@/notinst echwind'
 endif
 
 #
 #   Esp
 #
  
-if ( -e INSTALL_BIN/esp/esp.csh ) then
-   alias espstart source INSTALL_BIN/esp/esp.csh
-   alias espsetup source INSTALL_BIN/esp/esp.csh
-   alias esp source INSTALL_BIN/esp/esp.csh
+if ( -e @bindir@/esp/esp.csh ) then
+   alias espstart source @bindir@/esp/esp.csh
+   alias espsetup source @bindir@/esp/esp.csh
+   alias esp source @bindir@/esp/esp.csh
 else
-   alias espstart 'INSTALL_ETC/notinst espstart'
-   alias espsetup 'INSTALL_ETC/notinst espsetup'
-   alias esp 'INSTALL_ETC/notinst esp'
+   alias espstart '@staretcdir@/notinst espstart'
+   alias espsetup '@staretcdir@/notinst espsetup'
+   alias esp '@staretcdir@/notinst esp'
 endif
 
 #
 #   Extractor
 #
 
-if ( -e INSTALL_BIN/extractor/extractor.csh ) then 
-   alias extractorsetup source INSTALL_BIN/extractor/extractor.csh
-   alias extractsetup source INSTALL_BIN/extractor/extractor.csh
-   alias extractor source INSTALL_BIN/extractor/extractor.csh
-   alias extract source INSTALL_BIN/extractor/extractor.csh
+if ( -e @bindir@/extractor/extractor.csh ) then 
+   alias extractorsetup source @bindir@/extractor/extractor.csh
+   alias extractsetup source @bindir@/extractor/extractor.csh
+   alias extractor source @bindir@/extractor/extractor.csh
+   alias extract source @bindir@/extractor/extractor.csh
 else
-   alias extractorsetup 'INSTALL_ETC/notinst extractorsetup'
-   alias extractsetup 'INSTALL_ETC/notinst extractsetup'
-   alias extractor 'INSTALL_ETC/notinst extractor'
-   alias extract 'INSTALL_ETC/notinst extract'
+   alias extractorsetup '@staretcdir@/notinst extractorsetup'
+   alias extractsetup '@staretcdir@/notinst extractsetup'
+   alias extractor '@staretcdir@/notinst extractor'
+   alias extract '@staretcdir@/notinst extract'
 endif
 
 #
 #   Figaro
 #   Includes startup for merged Specdre.
 
-if ( -e INSTALL_BIN/figaro/figaro.csh ) then
-   alias figaro source INSTALL_BIN/figaro/figaro.csh
-   alias figarosetup source INSTALL_BIN/figaro/figaro.csh
-   alias specdre source INSTALL_BIN/figaro/specdre.csh
-   alias specdresetup source INSTALL_BIN/figaro/specdre.csh
-   alias twodspec source INSTALL_BIN/figaro/twodspec.csh
-   alias twodspecsetup source INSTALL_BIN/figaro/twodspec.csh
+if ( -e @bindir@/figaro/figaro.csh ) then
+   alias figaro source @bindir@/figaro/figaro.csh
+   alias figarosetup source @bindir@/figaro/figaro.csh
+   alias specdre source @bindir@/figaro/specdre.csh
+   alias specdresetup source @bindir@/figaro/specdre.csh
+   alias twodspec source @bindir@/figaro/twodspec.csh
+   alias twodspecsetup source @bindir@/figaro/twodspec.csh
 else
-   alias figaro 'INSTALL_ETC/notinst figaro'
-   alias figarosetup 'INSTALL_ETC/notinst figarosetup'
-   alias specdre 'INSTALL_ETC/notinst specdre'
-   alias specdresetup 'INSTALL_ETC/notinst specdresetup'
-   alias twodspec 'INSTALL_ETC/notinst twodspec'
-   alias twodspecsetup 'INSTALL_ETC/notinst twodspecsetup'
+   alias figaro '@staretcdir@/notinst figaro'
+   alias figarosetup '@staretcdir@/notinst figarosetup'
+   alias specdre '@staretcdir@/notinst specdre'
+   alias specdresetup '@staretcdir@/notinst specdresetup'
+   alias twodspec '@staretcdir@/notinst twodspec'
+   alias twodspecsetup '@staretcdir@/notinst twodspecsetup'
 endif
 
 #
 #   Fluxes
 #
 
-if ( -e INSTALL_BIN/fluxes/fluxes ) then
-   alias fluxes INSTALL_BIN/fluxes/fluxes.csh
-   alias fluxnow INSTALL_BIN/fluxes/fluxnow.csh
+if ( -e @bindir@/fluxes/fluxes ) then
+   alias fluxes @bindir@/fluxes/fluxes.csh
+   alias fluxnow @bindir@/fluxes/fluxnow.csh
 else
-   alias fluxes 'INSTALL_ETC/notinst fluxes'
-   alias fluxnow 'INSTALL_ETC/notinst fluxnow'
+   alias fluxes '@staretcdir@/notinst fluxes'
+   alias fluxnow '@staretcdir@/notinst fluxnow'
 endif
 
 #
 #   Gaia
 #
 
-if ( -e INSTALL_BIN/gaia/gaia.csh ) then
+if ( -e @bindir@/gaia/gaia.csh ) then
    alias gaia '${GAIA_DIR}/gaia.csh'
    alias gaiadisp '${GAIA_DIR}/gaiadisp.csh'
 else
-   alias gaia 'INSTALL_ETC/notinst gaia'
-   alias gaiadisp 'INSTALL_ETC/notinst gaiadisp'
+   alias gaia '@staretcdir@/notinst gaia'
+   alias gaiadisp '@staretcdir@/notinst gaiadisp'
 endif
 
 #
 #   Hdstools
 #
 
-if ( -e INSTALL_BIN/hdstools/hdstools.csh ) then
+if ( -e @bindir@/hdstools/hdstools.csh ) then
    alias hdstools source '${HDSTOOLS_DIR}/hdstools.csh'
 else
-   alias hdstools 'INSTALL_ETC/notinst hdstools'
+   alias hdstools '@staretcdir@/notinst hdstools'
 endif
 
 #
 #   Iras90
 #
 
-if ( -e INSTALL_BIN/iras90/iras90 ) then
-   alias iras90 source INSTALL_BIN/iras90/iras90
-   alias iras90setup source INSTALL_BIN/iras90/iras90
+if ( -e @bindir@/iras90/iras90 ) then
+   alias iras90 source @bindir@/iras90/iras90
+   alias iras90setup source @bindir@/iras90/iras90
 else
-   alias iras90 'INSTALL_ETC/notinst iras90'
-   alias iras90setup 'INSTALL_ETC/notinst iras90setup'
+   alias iras90 '@staretcdir@/notinst iras90'
+   alias iras90setup '@staretcdir@/notinst iras90setup'
 endif
 
 #
 #   Ircamdr
 #
 
-if ( -e INSTALL_BIN/ircamdr/ircamdr ) then
-   alias ircamdr INSTALL_BIN/ircamdr/ircamdr
-   alias ircamdrstart INSTALL_BIN/ircamdr/ircamdr
+if ( -e @bindir@/ircamdr/ircamdr ) then
+   alias ircamdr @bindir@/ircamdr/ircamdr
+   alias ircamdrstart @bindir@/ircamdr/ircamdr
 else
-   alias ircamdr 'INSTALL_ETC/notinst ircamdr'
-   alias ircamdrstart 'INSTALL_ETC/notinst ircamdrstart'
+   alias ircamdr '@staretcdir@/notinst ircamdr'
+   alias ircamdrstart '@staretcdir@/notinst ircamdrstart'
 endif
 
 #
 #   Ircampack
 #
 
-if ( -e INSTALL_BIN/ircampack/ircampack.csh ) then
-   alias ircampack source INSTALL_BIN/ircampack/ircampack.csh
-   alias ircampacksetup source INSTALL_BIN/ircampack/ircampack.csh
+if ( -e @bindir@/ircampack/ircampack.csh ) then
+   alias ircampack source @bindir@/ircampack/ircampack.csh
+   alias ircampacksetup source @bindir@/ircampack/ircampack.csh
 else
-   alias ircampack 'INSTALL_ETC/notinst ircampack'
-   alias ircampacksetup 'INSTALL_ETC/notinst ircampacksetup'
+   alias ircampack '@staretcdir@/notinst ircampack'
+   alias ircampacksetup '@staretcdir@/notinst ircampacksetup'
 endif
 
 #
 #   Iuedr
 #
 
-if ( -e INSTALL_BIN/iuedr/iuedr3.csh ) then
-   alias iuedrstart source INSTALL_BIN/iuedr/iuedr3.csh
-   alias iuedr source INSTALL_BIN/iuedr/iuedr3.csh
-   alias iuedrsetup source INSTALL_BIN/iuedr/iuedr3.csh
+if ( -e @bindir@/iuedr/iuedr3.csh ) then
+   alias iuedrstart source @bindir@/iuedr/iuedr3.csh
+   alias iuedr source @bindir@/iuedr/iuedr3.csh
+   alias iuedrsetup source @bindir@/iuedr/iuedr3.csh
 else
-   alias iuedrstart 'INSTALL_ETC/notinst iuedrstart'
-   alias iuedr 'INSTALL_ETC/notinst iuedr'
-   alias iuedrsetup 'INSTALL_ETC/notinst iuedrsetup'
+   alias iuedrstart '@staretcdir@/notinst iuedrstart'
+   alias iuedr '@staretcdir@/notinst iuedr'
+   alias iuedrsetup '@staretcdir@/notinst iuedrsetup'
 endif
 
 #
 #   Jcmtdr
 #
  
-if ( -e INSTALL_BIN/jcmtdr/start ) then
+if ( -e @bindir@/jcmtdr/start ) then
    alias jcmtdr 'source $JCMTDR_DIR/start'
    alias jcmtdrsetup 'source $JCMTDR_DIR/start'
 else
-   alias jcmtdr 'INSTALL_ETC/notinst jcmtdr'
-   alias jcmtdrsetup 'INSTALL_ETC/notinst jcmtdrsetup'
+   alias jcmtdr '@staretcdir@/notinst jcmtdr'
+   alias jcmtdrsetup '@staretcdir@/notinst jcmtdrsetup'
 endif
 
 #
 #   Kappa
 #
 
-if ( -e INSTALL_BIN/kappa/kappa.csh ) then
-   alias kappa source INSTALL_BIN/kappa/kappa.csh
-   alias kappasetup source INSTALL_BIN/kappa/kappa.csh
+if ( -e @bindir@/kappa/kappa.csh ) then
+   alias kappa source @bindir@/kappa/kappa.csh
+   alias kappasetup source @bindir@/kappa/kappa.csh
 else
-   alias kappa 'INSTALL_ETC/notinst kappa'
-   alias kappasetup 'INSTALL_ETC/notinst kappasetup'
+   alias kappa '@staretcdir@/notinst kappa'
+   alias kappasetup '@staretcdir@/notinst kappasetup'
 endif
 
 #
 #   Kaprh
 #
 
-if ( -e INSTALL_BIN/kaprh/kaprh.csh ) then
-   alias kaprh source INSTALL_BIN/kaprh/kaprh.csh
-   alias kaprhsetup source INSTALL_BIN/kaprh/kaprh.csh
+if ( -e @bindir@/kaprh/kaprh.csh ) then
+   alias kaprh source @bindir@/kaprh/kaprh.csh
+   alias kaprhsetup source @bindir@/kaprh/kaprh.csh
 else
-   alias kaprh 'INSTALL_ETC/notinst kaprh'
-   alias kaprhsetup 'INSTALL_ETC/notinst kaprhsetup'
+   alias kaprh '@staretcdir@/notinst kaprh'
+   alias kaprhsetup '@staretcdir@/notinst kaprhsetup'
 endif
 
 #
 #   Naos
 #
  
-if ( -e INSTALL_BIN/naos/naos.csh ) then
-   alias naos 'source INSTALL_BIN/naos/naos.csh'
-   alias naossetup 'source INSTALL_BIN/naos/naos.csh'
+if ( -e @bindir@/naos/naos.csh ) then
+   alias naos 'source @bindir@/naos/naos.csh'
+   alias naossetup 'source @bindir@/naos/naos.csh'
 else
-   alias naos 'INSTALL_ETC/notinst naos'
-   alias naossetup 'INSTALL_ETC/notinst naossetup'
+   alias naos '@staretcdir@/notinst naos'
+   alias naossetup '@staretcdir@/notinst naossetup'
 endif
 
 #
 #   Ndprogs
 #
  
-if ( -e INSTALL_BIN/ndprogs/ndprogs.csh ) then
+if ( -e @bindir@/ndprogs/ndprogs.csh ) then
    alias ndprogs 'source $NDPROGS_DIR/ndprogs.csh'
    alias ndprogssetup 'source $NDPROGS_DIR/ndprogs.csh'
 else
-   alias ndprogs 'INSTALL_ETC/notinst ndprogs'
-   alias ndprogssetup 'INSTALL_ETC/notinst ndprogssetup'
+   alias ndprogs '@staretcdir@/notinst ndprogs'
+   alias ndprogssetup '@staretcdir@/notinst ndprogssetup'
 endif
  
 #
 #   Orac-dr
 #
 
-if ( ! -e INSTALL_BIN/oracdr/etc/cshrc ) then
-   alias oracdr_cgs4      'INSTALL_ETC/notinst oracdr_cgs4'
-   alias oracdr_gmos      'INSTALL_ETC/notinst oracdr_gmos'
-   alias oracdr_ircam     'INSTALL_ETC/notinst oracdr_ircam'
-   alias oracdr_ircam_old 'INSTALL_ETC/notinst oracdr_ircam_old'
-   alias oracdr_iris2     'INSTALL_ETC/notinst oracdr_iris2'
-   alias oracdr_michelle  'INSTALL_ETC/notinst oracdr_michelle'
-   alias oracdr_niri      'INSTALL_ETC/notinst oracdr_niri'
-   alias oracdr_scuba     'INSTALL_ETC/notinst oracdr_scuba'
-   alias oracdr_ufti      'INSTALL_ETC/notinst oracdr_ufti'
-   alias oracdr_ufti_old  'INSTALL_ETC/notinst oracdr_ufti_old'
-   alias oracdr_uist      'INSTALL_ETC/notinst oracdr_uist'
-   alias xoracdr          'INSTALL_ETC/notinst xoracdr'
+if ( ! -e @bindir@/oracdr/etc/cshrc ) then
+   alias oracdr_cgs4      '@staretcdir@/notinst oracdr_cgs4'
+   alias oracdr_gmos      '@staretcdir@/notinst oracdr_gmos'
+   alias oracdr_ircam     '@staretcdir@/notinst oracdr_ircam'
+   alias oracdr_ircam_old '@staretcdir@/notinst oracdr_ircam_old'
+   alias oracdr_iris2     '@staretcdir@/notinst oracdr_iris2'
+   alias oracdr_michelle  '@staretcdir@/notinst oracdr_michelle'
+   alias oracdr_niri      '@staretcdir@/notinst oracdr_niri'
+   alias oracdr_scuba     '@staretcdir@/notinst oracdr_scuba'
+   alias oracdr_ufti      '@staretcdir@/notinst oracdr_ufti'
+   alias oracdr_ufti_old  '@staretcdir@/notinst oracdr_ufti_old'
+   alias oracdr_uist      '@staretcdir@/notinst oracdr_uist'
+   alias xoracdr          '@staretcdir@/notinst xoracdr'
 else
-   source INSTALL_BIN/oracdr/etc/cshrc
+   source @bindir@/oracdr/etc/cshrc
 endif
 
 #
 #   Period
 #
 
-if (-e INSTALL_BIN/period/period_main ) then
-   alias period INSTALL_BIN/period/period_main
+if (-e @bindir@/period/period_main ) then
+   alias period @bindir@/period/period_main
 else
-   alias period 'INSTALL_ETC/notinst period'
+   alias period '@staretcdir@/notinst period'
 endif
 
 #
 #   Photom
 #
 
-if ( -e INSTALL_BIN/photom/photom_init ) then
-   alias photomstart source INSTALL_BIN/photom/photom_init
-   alias photom source INSTALL_BIN/photom/photom_init
-   alias photomsetup source INSTALL_BIN/photom/photom_init
+if ( -e @bindir@/photom/photom_init ) then
+   alias photomstart source @bindir@/photom/photom_init
+   alias photom source @bindir@/photom/photom_init
+   alias photomsetup source @bindir@/photom/photom_init
 else
-   alias photomstart 'INSTALL_ETC/notinst photomstart'
-   alias photom 'INSTALL_ETC/notinst photom'
-   alias photomsetup 'INSTALL_ETC/notinst photomsetup'
+   alias photomstart '@staretcdir@/notinst photomstart'
+   alias photom '@staretcdir@/notinst photom'
+   alias photomsetup '@staretcdir@/notinst photomsetup'
 endif
 
 #
 #   Pisa
 #
 
-if ( -e INSTALL_BIN/pisa/start ) then
-   alias pisasetup source INSTALL_BIN/pisa/start
-   alias pisa source INSTALL_BIN/pisa/start
+if ( -e @bindir@/pisa/start ) then
+   alias pisasetup source @bindir@/pisa/start
+   alias pisa source @bindir@/pisa/start
 else
-   alias pisasetup 'INSTALL_ETC/notinst pisasetup'
-   alias pisa 'INSTALL_ETC/notinst pisa'
+   alias pisasetup '@staretcdir@/notinst pisasetup'
+   alias pisa '@staretcdir@/notinst pisa'
 endif
 
 #
 #   Polmap
 #
 
-if ( -e INSTALL_BIN/polmap/polmap.csh ) then
-   alias polmapsetup source INSTALL_BIN/polmap/polmap.csh
-   alias polmap source INSTALL_BIN/polmap/polmap.csh
+if ( -e @bindir@/polmap/polmap.csh ) then
+   alias polmapsetup source @bindir@/polmap/polmap.csh
+   alias polmap source @bindir@/polmap/polmap.csh
 else
-   alias polmapsetup 'INSTALL_ETC/notinst polmapsetup'
-   alias polmap 'INSTALL_ETC/notinst polmap'
+   alias polmapsetup '@staretcdir@/notinst polmapsetup'
+   alias polmap '@staretcdir@/notinst polmap'
 endif
 
 #
 #   Polpack
 #
 
-if ( -e INSTALL_BIN/polpack/polpack.csh ) then
-   alias polpacksetup source INSTALL_BIN/polpack/polpack.csh
-   alias polpack source INSTALL_BIN/polpack/polpack.csh
+if ( -e @bindir@/polpack/polpack.csh ) then
+   alias polpacksetup source @bindir@/polpack/polpack.csh
+   alias polpack source @bindir@/polpack/polpack.csh
 else
-   alias polpacksetup 'INSTALL_ETC/notinst polpacksetup'
-   alias polpack 'INSTALL_ETC/notinst polpack'
+   alias polpacksetup '@staretcdir@/notinst polpacksetup'
+   alias polpack '@staretcdir@/notinst polpack'
 endif
 
 #
 #   Pongo
 #
 
-if ( -e INSTALL_BIN/pongo/pongo.icl ) then
+if ( -e @bindir@/pongo/pongo.icl ) then
    alias pongo 'icl $PONGO_BIN/pongo'
 else
-   alias pongo 'INSTALL_ETC/notinst pongo'
+   alias pongo '@staretcdir@/notinst pongo'
 endif
 
 #
 #   Repack
 #
 
-if ( -e INSTALL_BIN/repack/repack.csh ) then
-   alias repack source INSTALL_BIN/repack/repack.csh
-   alias re_start source INSTALL_BIN/repack/repack.csh
-   alias repacksetup source INSTALL_BIN/repack/repack.csh
+if ( -e @bindir@/repack/repack.csh ) then
+   alias repack source @bindir@/repack/repack.csh
+   alias re_start source @bindir@/repack/repack.csh
+   alias repacksetup source @bindir@/repack/repack.csh
 else
-   alias repack 'INSTALL_ETC/notinst repack'
-   alias re_start 'INSTALL_ETC/notinst re_start'
-   alias repacksetup 'INSTALL_ETC/notinst repacksetup'
+   alias repack '@staretcdir@/notinst repack'
+   alias re_start '@staretcdir@/notinst re_start'
+   alias repacksetup '@staretcdir@/notinst repacksetup'
 endif
 
 #
 #   Specx
 #
 
-if ( -e INSTALL_BIN/specx/specxstart ) then
+if ( -e @bindir@/specx/specxstart ) then
    alias specxsetup 'source $SYS_SPECX/specxstart'
    alias specxstart 'source $SYS_SPECX/specxstart'
    alias specx 'source $SYS_SPECX/specxstart'
 else
-   alias specxsetup 'INSTALL_ETC/notinst specxsetup'
-   alias specxstart 'INSTALL_ETC/notinst specxstart'
-   alias specx 'INSTALL_ETC/notinst specx'
+   alias specxsetup '@staretcdir@/notinst specxsetup'
+   alias specxstart '@staretcdir@/notinst specxstart'
+   alias specx '@staretcdir@/notinst specx'
 endif
 
 #
@@ -527,125 +527,125 @@ endif
 #
 #   Splat, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/splat/splat ) then
+ if ( -e @starjavadir@/bin/splat/splat ) then
    alias splat '$SPLAT_DIR/splat'
    alias splatdisp '$SPLAT_DIR/splatdisp'
    alias splatdispmany '$SPLAT_DIR/splatdispmany'
  else
-   alias splat 'INSTALL_ETC/notinst splat'
-   alias splatdisp 'INSTALL_ETC/notinst splatdisp'
-   alias splatdispmany 'INSTALL_ETC/notinst splatdispmany'
+   alias splat '@staretcdir@/notinst splat'
+   alias splatdisp '@staretcdir@/notinst splatdisp'
+   alias splatdispmany '@staretcdir@/notinst splatdispmany'
  endif
 
 
 #
 #   Frog, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/frog ) then
+ if ( -e @starjavadir@/bin/frog ) then
    alias frog '$FROG_DIR/runFROG'
  else
-   alias frog 'INSTALL_ETC/notinst frog'
+   alias frog '@staretcdir@/notinst frog'
  endif
 
 #
 #   Jsky, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/jsky ) then
+ if ( -e @starjavadir@/bin/jsky ) then
    alias jsky '$JSKY_DIR/runJSKYCAT'
  else
-   alias jsky 'INSTALL_ETC/notinst jsky'
+   alias jsky '@staretcdir@/notinst jsky'
  endif
 
 #
 #   Jsky, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/jsky ) then
+ if ( -e @starjavadir@/bin/jsky ) then
    alias jsky '$JSKY_DIR/runJSKYCAT'
  else
-   alias jsky 'INSTALL_ETC/notinst jsky'
+   alias jsky '@staretcdir@/notinst jsky'
  endif
 
 #
 #   ndtools, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/ndtools ) then
+ if ( -e @starjavadir@/bin/ndtools ) then
    alias ndtools '$NDTOOLS_DIR/ndtools'
  else
-   alias ndtools 'INSTALL_ETC/notinst ndtools'
+   alias ndtools '@staretcdir@/notinst ndtools'
  endif
 
 #
 #   Sog, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/sog ) then
+ if ( -e @starjavadir@/bin/sog ) then
    alias sog '$SOG_DIR/runSOG'
    alias photomws '$SOG_DIR/runPhotomWS'
    alias tcpmon '$SOG_DIR/runTcpmon'
  else
-   alias sog 'INSTALL_ETC/notinst sog'
-   alias photomws 'INSTALL_ETC/notinst photomws'
-   alias tcpmon 'INSTALL_ETC/notinst tcpmon'
+   alias sog '@staretcdir@/notinst sog'
+   alias photomws '@staretcdir@/notinst photomws'
+   alias tcpmon '@staretcdir@/notinst tcpmon'
  endif
 
 #
 #   soapserver, moved to StarJava - Spring 2003
 
- if ( -e INSTALL_STARJAVA/bin/soapserver ) then
+ if ( -e @starjavadir@/bin/soapserver ) then
    alias echoclient '$SOAPSERVER_DIR/runEchoClient.sh'
    alias echoserver '$SOAPSERVER_DIR/runEchoServer.sh'
  else
-   alias echoclient 'INSTALL_ETC/notinst echoclient'
-   alias echoserver 'INSTALL_ETC/notinst echoserver'
+   alias echoclient '@staretcdir@/notinst echoclient'
+   alias echoserver '@staretcdir@/notinst echoserver'
  endif
 
 #
 #   Starman
 #
 
-if ( -e INSTALL_BIN/starman/starman.csh ) then
-   alias starman source INSTALL_BIN/starman/starman.csh
-   alias starmansetup source INSTALL_BIN/starman/starman.csh
+if ( -e @bindir@/starman/starman.csh ) then
+   alias starman source @bindir@/starman/starman.csh
+   alias starmansetup source @bindir@/starman/starman.csh
 else
-   alias starman 'INSTALL_ETC/notinst starman'
-   alias starmansetup 'INSTALL_ETC/notinst starmansetup'
+   alias starman '@staretcdir@/notinst starman'
+   alias starmansetup '@staretcdir@/notinst starmansetup'
 endif
 
 #
 #   Surf
 #
 
-if ( -e INSTALL_BIN/surf/surf.csh ) then
-   alias surf source INSTALL_BIN/surf/surf.csh
-   alias surfsetup source INSTALL_BIN/surf/surf.csh
-   alias surfstart source INSTALL_BIN/surf/surf.csh
+if ( -e @bindir@/surf/surf.csh ) then
+   alias surf source @bindir@/surf/surf.csh
+   alias surfsetup source @bindir@/surf/surf.csh
+   alias surfstart source @bindir@/surf/surf.csh
 else
-   alias surf 'INSTALL_ETC/notinst surf'
-   alias surfsetup 'INSTALL_ETC/notinst surfsetup'
-   alias surfstart 'INSTALL_ETC/notinst surfstart'
+   alias surf '@staretcdir@/notinst surf'
+   alias surfsetup '@staretcdir@/notinst surfsetup'
+   alias surfstart '@staretcdir@/notinst surfstart'
 endif
 
 #
 #   Sx
 #
 
-if ( -e INSTALL_BIN/sx/dx.csh ) then
+if ( -e @bindir@/sx/dx.csh ) then
    alias dx tcsh -c '"source $SX_DIR/dx.csh"'
    alias sx tcsh -c '"source $SX_DIR/dx.csh"'
 else
-   alias dx 'INSTALL_ETC/notinst dx'
-   alias sx 'INSTALL_ETC/notinst sx'
+   alias dx '@staretcdir@/notinst dx'
+   alias sx '@staretcdir@/notinst sx'
 endif
 
 #
 #   Tsp
 #
 
-if ( -e INSTALL_BIN/tsp/tsp.csh ) then
-   alias tsp source INSTALL_BIN/tsp/tsp.csh
-   alias tspsetup source INSTALL_BIN/tsp/tsp.csh
+if ( -e @bindir@/tsp/tsp.csh ) then
+   alias tsp source @bindir@/tsp/tsp.csh
+   alias tspsetup source @bindir@/tsp/tsp.csh
 else
-   alias tsp 'INSTALL_ETC/notinst tsp'
-   alias tspsetup 'INSTALL_ETC/notinst tspsetup'
+   alias tsp '@staretcdir@/notinst tsp'
+   alias tspsetup '@staretcdir@/notinst tspsetup'
 endif
 
 #
@@ -656,30 +656,30 @@ endif
 #   Wfcpack
 #
 
-if ( -e INSTALL_BIN/wfcpack/wfcpack.csh) then
-   alias wfcpack source INSTALL_BIN/wfcpack/wfcpack.csh
-   alias wfcstart source INSTALL_BIN/wfcpack/wfcpack.csh
+if ( -e @bindir@/wfcpack/wfcpack.csh) then
+   alias wfcpack source @bindir@/wfcpack/wfcpack.csh
+   alias wfcstart source @bindir@/wfcpack/wfcpack.csh
 else
-   alias wfcpack 'INSTALL_ETC/notinst wfcpack'
-   alias wfcstart 'INSTALL_ETC/notinst wfcstart'
+   alias wfcpack '@staretcdir@/notinst wfcpack'
+   alias wfcstart '@staretcdir@/notinst wfcstart'
 endif
 
 #
 #   Xrt
 #
 
-if ( -e INSTALL_BIN/xrt/xrt.csh ) then
-   alias xrt source INSTALL_BIN/xrt/xrt.csh
+if ( -e @bindir@/xrt/xrt.csh ) then
+   alias xrt source @bindir@/xrt/xrt.csh
 else
-   alias xrt 'INSTALL_ETC/notinst xrt'
+   alias xrt '@staretcdir@/notinst xrt'
 endif
 
 #
 #   Run local Starlink cshrc script if it exists
 #
 
-if (-e INSTALL_ROOT/local/etc/cshrc ) then
-   source INSTALL_ROOT/local/etc/cshrc
+if (-e @exec_prefix@/local/etc/cshrc ) then
+   source @exec_prefix@/local/etc/cshrc
 endif
 
 #

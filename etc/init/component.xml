@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="init">
+  <version>1.1-26</version>
+  <path>etc/init</path>
+  <description>Starlink initialisation files</description>
+  <abstract>
+    <p>Initialisation files required for a Starlink install.
+    </p>
+  </abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Bly</name>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
