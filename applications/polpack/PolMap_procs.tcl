@@ -3026,10 +3026,12 @@ proc GwmCreate {frmname size colours gwmname} {
 
 # Create a GWM canvas items which fills the canvas. Return a null string
 # if this fails.
-   if { [catch {set gwm [$GWM_CAN create gwm 0 0 -height $size \
+   set er [catch {set gwm [$GWM_CAN create gwm 0 0 -height $size \
                                   -width $size -name $name \
-                                  -mincolours $colours -tags gwm]} mess] } {
-      set $f1 ""
+                                  -mincolours $colours -tags gwm]} mess]
+   if { $er } {
+      puts $mess
+      set f1 ""
 
 # If succesfull...
    } {
@@ -7572,14 +7574,18 @@ proc VectorMap {} {
 #    GWM_MY (Write)
 #       The Y scale factor for converting from canvas coordinates to NDF 
 #       pixel coordinates.
+#    GWM_SECTION (Read)
+#       The requested vector map section (eg "(10:200,23:68)" ).
 #    GWM_SIZE (Read)
 #       The size of the square GWM canvas item (in screen pixels).
 #-
+   global GWM_BACK
    global GWM_CX
    global GWM_CY
    global GWM_DEVICE
    global GWM_MX
    global GWM_MY
+   global GWM_SECTION
    global GWM_SIZE
    global GWM_DISPLAY_VDATA
    global VEC_CAT
@@ -7587,8 +7593,19 @@ proc VectorMap {} {
 # Tell the user what is happening.
    set told [SetInfo "Displaying the vector map. Please wait... " 0]
 
-# Create the parameter string for POLPLOT...
+# Initialise the parameter string for POLPLOT...
    set pars "cat=$VEC_CAT colmag=p colang=theta colx=x coly=y clear=no noaxes nokey"
+
+#  If there is a background image the vectors are displayed in alignment
+#  with the backgrounmd image. In this case the background image defines
+#  the area of the vector map which is to be displayed. If no background
+#  image is being displayed, then we need to determine explicitly the area 
+#  of the vector map which is to be displayed.
+   if { $GWM_BACK != "CONTOUR" && $GWM_BACK != "GREY" } {
+      set bnds [SecList $GWM_SECTION]
+      append pars " lbnd=\[[lindex $bnds 0],[lindex $bnds 2]\]"
+      append pars " ubnd=\[[lindex $bnds 1],[lindex $bnds 3]\]"
+   }
 
 # Display the vector map
    if { [Obey polpack polplot "$pars device=$GWM_DEVICE" ] } {
