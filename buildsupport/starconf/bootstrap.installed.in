@@ -1,4 +1,5 @@
 #! /bin/sh -
+# @configure_input@
 
 use_autoheader=false
 use_libtool=false
@@ -92,6 +93,18 @@ else
     exit 1
 fi
 
+# Bootstrap any child directories
+for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` ''
+do
+    if test -n "$d"; then
+        echo "Bootstrapping $d..."
+        (cd $d; ./bootstrap)
+    fi
+done
+
+# aclocal is about to be deprecated by the autoconf maintainers, and replaced
+# by autoreconf, which is already the preferred tool for updating the 
+# configuration.  I should switch to autoreconf.
 echorun aclocal
 
 # If there is an AC_CONFIG_HEADERS line in configure.ac, then we need
