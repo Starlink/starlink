@@ -39,6 +39,8 @@
 *                    local variables and unreachable statements.
 *     30/07/86  PJWR Changed file inclusion directives, logical unit numbers
 *                    and filenames for UNIX.
+*     15/07/92  DLT  Fixed setting of file record length for systems
+*                    with KRCBYT .ne. 1.
 *
 *  INCLUDE BLOCK
 *  -------------
@@ -128,7 +130,7 @@
       INTEGER    FNTMAX,   MAXICN,     NAMLEN,  MAXSTK
       PARAMETER (FNTMAX=50,MAXICN=5100,NAMLEN=6,MAXSTK=200)
       INTEGER    RECSIZ
-      PARAMETER (RECSIZ=512/KRCBYT)
+      PARAMETER (RECSIZ=512)
       CHARACTER *(*) TXTDBS
       CHARACTER *(*) HERSHY
       PARAMETER  (TXTDBS='gks.dbs',HERSHY='hershey.dat')
@@ -230,7 +232,7 @@
       READ(*,'(A)',END=9000) MODE
       IF ((MODE.EQ.'c').OR.(MODE.EQ.'C')) THEN
 *        Open the new random access data base.
-         CALL OPRADF (KTXDB, TXTDBS, RECSIZ, 'NEW')
+         CALL OPRADF (KTXDB, TXTDBS, RECSIZ/KRCBYT, 'NEW')
 *        create mode
 *        open up the hershey source (sequential file)
          CALL OPSADF(KHEDB, HERSHY, 'OLD')
@@ -389,7 +391,7 @@
       ELSE IF(MODE.EQ.'L'.OR.MODE.EQ.'l')THEN
 *     Else if List mode then....
 *        Open the old database to read from it
-         CALL OPRADF (KTXDB, TXTDBS, RECSIZ, 'OLD')
+         CALL OPRADF (KTXDB, TXTDBS, RECSIZ/KRCBYT, 'OLD')
 *        Listing from the created/old database.
          WRITE(*,*) 'Please enter the Output filename'
          READ(*,'(A)')LISTFN
@@ -788,7 +790,6 @@
                   ELSE
                      GOTO 180
                   ENDIF
-      STOP
   700 CONTINUE
       MORHER=.TRUE.
       GOTO 610
@@ -1096,8 +1097,8 @@
 *     Standard open statement
 *     N.B. Record length is measured in words with some compilers, and
 *     bytes with others.
-      OPEN (LUNNEW, FILE=NEWFIL, STATUS=STATE,
-     :      ACCESS='DIRECT', RECL=RECSIZ, FORM='UNFORMATTED',ERR=10)
+      OPEN (LUNNEW, FILE=NEWFIL, STATUS=STATE, ACCESS='DIRECT', 
+     :             RECL=RECSIZ, FORM='UNFORMATTED',ERR=10)
       RETURN
    10 CONTINUE
       WRITE(*,'('' Error in opening filename '',A)')NEWFIL
