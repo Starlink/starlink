@@ -219,6 +219,18 @@
      :                  RV, %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
      :                  STATUS )
 
+*  Report an error if the region contains no data.
+         IF( ( LBNDI( 1 ) .GT. UBNDI( 1 ) .OR.
+     :         LBNDI( 2 ) .GT. UBNDI( 2 ) ) .AND. 
+     :       STATUS .EQ. SAI__OK ) THEN 
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'NDF', INDF )
+            CALL ERR_REP( 'KPS1_LOOK1_ERR1', 'There is no overlap '//
+     :                    'between ''^NDF'' and the supplied ARD '//
+     :                    'description.', STATUS )
+            GO TO 999
+         END IF
+
 *  Convert the bounds into the GRID Frame of the NDF. Add a single pixel
 *  safety margin on.
          XP( 1 ) = DBLE( LBNDI( 1 ) - 2 )
@@ -276,6 +288,9 @@
      :                 %VAL( IPMASK ), ( VAL__MAXD - 1.0D0 ), 
      :                 RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), RUBND( 2 ), 
      :                 %VAL( IPIN ), %VAL( IPDAT ), STATUS )
+
+*  Tidy up.
+ 999  CONTINUE
 
 *  Free resources.
       CALL NDF_ANNUL( INDF2, STATUS )
