@@ -89,20 +89,12 @@
       PSPC=.NOT.HRI
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-*  Set the default for the detector response file
-      CALL XRT_CALDEF(CALDIR, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Warning: XRT cal directory not found')
-         CALL ERR_ANNUL(STATUS)
-      ENDIF
 
       IF (HRI) THEN
-        CALDIR = CALDIR(1:CHR_LEN(CALDIR)) // 'hri_drm'
+        CALL AST_PATH('AST_ETC','XRTCAL','hri_drm',CALDIR,L,STATUS)
       ELSE
-        CALDIR = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
+        CALL AST_PATH('AST_ETC','XRTCAL','drmpspc',CALDIR,L,STATUS)
       ENDIF
-      L=CHR_LEN(CALDIR)
       CALL USI_DEF0C('RESPFILE', CALDIR(:L), STATUS)
 *
 *   Get detector response matrix name

@@ -235,7 +235,7 @@
       CALL AST_PATH('AST_ETC','XRTCAL',' ',CALDIR,L,STATUS)
 *
 * Add the standard character on to the directory spec for this machine
-      CALDIR = CALDIR(1:L)//FIL_SEP_CH
+      CALDIR = CALDIR(1:L)//'/'
 *
       END
 
