@@ -100,9 +100,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Switch on initial data type
-      IF ( TYPE .EQ. 'BYTE' ) THEN
+      IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
         CALL ADI2_ICB2R( %VAL(PTR), DATA, NELM, STATUS )
-      ELSE IF ( TYPE .EQ. 'WORD' ) THEN
+      ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
         CALL ADI2_ICW2R( %VAL(PTR), DATA, NELM, STATUS )
       ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
         CALL ADI2_ICI2R( %VAL(PTR), DATA, NELM, STATUS )
@@ -326,9 +326,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Switch on initial data type
-      IF ( TYPE .EQ. 'BYTE' ) THEN
+      IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
         CALL ADI2_ICB2D( %VAL(PTR), DATA, NELM, STATUS )
-      ELSE IF ( TYPE .EQ. 'WORD' ) THEN
+      ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
         CALL ADI2_ICW2D( %VAL(PTR), DATA, NELM, STATUS )
       ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
         CALL ADI2_ICI2D( %VAL(PTR), DATA, NELM, STATUS )
@@ -552,9 +552,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Switch on initial data type
-      IF ( TYPE .EQ. 'BYTE' ) THEN
+      IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
         CALL ADI2_ICB2I( %VAL(PTR), DATA, NELM, STATUS )
-      ELSE IF ( TYPE .EQ. 'WORD' ) THEN
+      ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
         CALL ADI2_ICW2I( %VAL(PTR), DATA, NELM, STATUS )
       ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
         CALL ADI2_ICI2I( %VAL(PTR), DATA, NELM, STATUS )
@@ -778,9 +778,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Switch on initial data type
-      IF ( TYPE .EQ. 'BYTE' ) THEN
+      IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
         CALL ADI2_ICB2B( %VAL(PTR), DATA, NELM, STATUS )
-      ELSE IF ( TYPE .EQ. 'WORD' ) THEN
+      ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
         CALL ADI2_ICW2B( %VAL(PTR), DATA, NELM, STATUS )
       ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
         CALL ADI2_ICI2B( %VAL(PTR), DATA, NELM, STATUS )
@@ -890,6 +890,232 @@
 
       DOUBLE PRECISION		DIN(*)
       BYTE			DOUT(*)
+      INTEGER			NELM, STATUS, I
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert all the data
+      DO I = 1, NELM
+        DOUT(I) = ( DIN(I) )
+      END DO
+
+      END
+
+      SUBROUTINE ADI2_IC2L( PTR, TYPE, DATA, NELM, STATUS )
+*+
+*  Name:
+*     ADI2_IC2L
+
+*  Purpose:
+*     Convert FITS file cache data to type LOGICAL
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ADI2_IC2L( PTR, TYPE, DATA, NELM, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     PTR = INTEGER (given)
+*        Mapped data pointer
+*     TYPE = CHARACTER*(*) (given)
+*        Initial data type
+*     DATA = LOGICAL(*) (given and returned)
+*        Array for converted data of type LOGICAL
+*     NELM = INTEGER (given)
+*        Number of mapped elements
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
+
+*  Keywords:
+*     package:adi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1997
+
+*  Authors:
+*     RB: Richard Beard (ROSAT, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      27 Jan 1997 (RB)
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			PTR
+      CHARACTER*(*)		TYPE
+      INTEGER			NELM
+
+*  Arguments Returned:
+      LOGICAL			DATA(*)
+
+*  Status:
+      INTEGER			STATUS
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Switch on initial data type
+      IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
+        CALL ADI2_ICB2L( %VAL(PTR), DATA, NELM, STATUS )
+      ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
+        CALL ADI2_ICW2L( %VAL(PTR), DATA, NELM, STATUS )
+      ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
+        CALL ADI2_ICI2L( %VAL(PTR), DATA, NELM, STATUS )
+      ELSE IF ( TYPE .EQ. 'REAL' ) THEN
+        CALL ADI2_ICR2L( %VAL(PTR), DATA, NELM, STATUS )
+      ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+        CALL ADI2_ICD2L( %VAL(PTR), DATA, NELM, STATUS )
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'T', TYPE )
+        CALL ERR_REP( 'ADI2_IC2L',
+     :                'Can''t cope with initial data type ^T', STATUS )
+      END IF
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'ADI2_IC2L', STATUS )
+      END IF
+
+      END
+*
+* BYTE conversion
+*
+      SUBROUTINE ADI2_ICB2L( DIN, DOUT, NELM, STATUS )
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+      BYTE			DIN(*)
+      LOGICAL			DOUT(*)
+      INTEGER			NELM, STATUS, I
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert all the data
+      DO I = 1, NELM
+        DOUT(I) = ( DIN(I) )
+      END DO
+
+      END
+*
+* WORD conversion
+*
+      SUBROUTINE ADI2_ICW2L( DIN, DOUT, NELM, STATUS )
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+      INTEGER*2			DIN(*)
+      LOGICAL			DOUT(*)
+      INTEGER			NELM, STATUS, I
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert all the data
+      DO I = 1, NELM
+        DOUT(I) = ( DIN(I) )
+      END DO
+
+      END
+*
+* INTEGER conversion
+*
+      SUBROUTINE ADI2_ICI2L( DIN, DOUT, NELM, STATUS )
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+      INTEGER			DIN(*)
+      LOGICAL			DOUT(*)
+      INTEGER			NELM, STATUS, I
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert all the data
+      DO I = 1, NELM
+        DOUT(I) = ( DIN(I) )
+      END DO
+
+      END
+*
+* REAL conversion
+*
+      SUBROUTINE ADI2_ICR2L( DIN, DOUT, NELM, STATUS )
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+      REAL			DIN(*)
+      LOGICAL			DOUT(*)
+      INTEGER			NELM, STATUS, I
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert all the data
+      DO I = 1, NELM
+        DOUT(I) = ( DIN(I) )
+      END DO
+
+      END
+*
+* DOUBLE converrsion
+*
+      SUBROUTINE ADI2_ICD2L( DIN, DOUT, NELM, STATUS )
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+      DOUBLE PRECISION		DIN(*)
+      LOGICAL			DOUT(*)
       INTEGER			NELM, STATUS, I
 
 *  Check inherited global status.
