@@ -105,3 +105,98 @@ Here is a summary of the main modifications.
     contents of any axis Figaro extension.  If there is only one
     object in the Figaro extension, it is now copied to the DST.
 
+
+2 V0.5
+
+This the first release where CONVERT is available on UNIX platforms.
+There are four new commands.
+
+3 Global_changes
+
+  o  CONVERT is available on UNIX platforms SUN/SunOS, SUN/Solaris,
+     DEC/Ultrix, Alpha/OSF1 with the following exceptions:
+
+     - BDF2NDF and NDF2BDF are not available because the Interim
+       library is not being ported.
+
+     - DIPSO2NDF and NDF2DIPSO are not required because UNIX DIPSO
+       processes NDFs.
+
+     - IRAF2NDF and NDF2IRAF are currently not available under OSF/1
+       and Solaris, because at the time of development there were no
+       IRAF IMFORT libraries released for these platforms.
+
+  o  CONHELP runs an application on UNIX platforms and accesses a
+     portable-help library.
+
+  o  The documentation is revised to reflect the lowercase usage and
+     examples under UNIX.
+
+  o  Special handling of some pathological datafiles have been made,
+     mostly in BDF2NDF.
+
+
+3 New_applications
+
+There are four new applications.
+
+   GASP2NDF converts an image in GASP format to an NDF.
+   IRAF2NDF converts an IRAF image to an NDF.
+   IRCAM2NDF converts an IRCAM data file to a series of NDFs.
+   NDF2GASP converts a two-dimensional NDF into a GASP image.
+
+3 Extended_and_corrected_applications
+  
+Here is a summary of the main modifications.
+
+  o  BDF2NDF now ignores deleted descriptors rather than propagating
+     them to the NDF's FITS extension.
+
+  o  DST2NDF has a FORM parameter to select the NDF storage form of
+     the output NDF.  It defaults to the simple form.  Previously,
+     the quality and bad-pixel values decided.
+
+  o  DST2NDF permits the output NDF to be placed inside an arbitrary
+     HDS structure, rather than just being the sole top-level
+     structure in the HDS container file.
+
+  o  DST2NDF has had a number of bug fixes applied.  In V0.4 it was
+     possible for an axis data array to have the wrong number of
+     elements in certain circumstances; the FLAGGED value could have
+     been set incorrectly when the FITS structure preceeded the .Z
+     structure within the DST file.
+
+  o  DST2NDF and NDF2DST now handle quotes in FITS character values.
+
+  o  NDF2ASCII and NDF2UNF ensure that a SIMPLE card appears first in
+     the FITS header.
+
+  o  NDF2BDF has better handling of rotated axes.  These are restored
+     from the FITS extension, by overwriting the descriptors derived
+     from the NDF AXIS.  (An NDF AXIS does not support rotated axes,
+     so BDF2NDF makes a default axis with pixel co-ordinates.  A
+     subsequent invocation of the old NDF2BDF would lose the original
+     axis information from the destination NDF.  This change prevents
+     that hysteresis.)
+
+  o  NDF2BDF has had a number of bug fixes applied.  It is now not
+     possible to generate erroneous CRTYPEn and CTYPEn values, when
+     the NDF AXIS does not contain LABEL or UNITS.  The application
+     reprompts if an invalid Interim type is given.  Lowercase types
+     may now be entered.  An NDF with a FITS extension containing
+     only the mandatory BDF descriptors (NAXIS,NAXISn) will now
+     produce a valid IMAGE BDF, i.e. NAXIS, NAXISn derived from the
+     NDF's shape are no longer missing from the BDF descriptors.
+
+  o  NDF2DST has improved handling of FITS headers, particularly
+     character strings.  Duplicated keywords are ignored.  HISTORY
+     and COMMENT cards are processed correctly.
+
+  o  NDF2IRAF can now convert one- and three-dimensional NDFs.
+
+  o  NDF2IRAF has a FILLBAD parameter to allow NDF bad values to
+     be replaced.  FILLBAD defaults to null, meaning do not perform
+     bad-value substitution.
+
+  o  NDF2IRAF can produce a signed-word IRAF image.  The output data
+     type depends on the data type of the NDF's data array.
