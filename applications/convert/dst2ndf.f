@@ -152,6 +152,10 @@
 *        Moved special cases of .OBS.SECZ, .OBS.TIME, .Z.MAGFLAG,
 *        .Z.RANGE to the top-level Figaro extension as this is where
 *        DSA_ now expects to find them in an NDF.
+*     1992 September 28 (MJC):
+*        Obtained NDF by SUBPAR calls, not PAR so that the global value
+*        is not written in quotes, and thus may be accepted by other
+*        applications.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,22 +175,31 @@
       INTEGER CHR_LEN                ! Get effective length of string
 
 *  Local Variables:
+      INTEGER   IMCODE               ! ADAM internal parameter pointer
       INTEGER   NCF                  ! Length of the Figaro file name
       INTEGER   NCN                  ! Length of the NDF file name
-      CHARACTER NDFFIL*(80)          ! Name of output file
-      CHARACTER FIGFIL*(80)          ! Name of input file
+      CHARACTER NDFFIL * ( 80 )      ! Name of output file
+      CHARACTER FIGFIL * ( 80 )      ! Name of input file
 
 *.
 
 *   Check the inherited status.
-      IF (STATUS.NE.SAI__OK) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Get the input file name.
-      CALL PAR_GET0C ('IN', FIGFIL, STATUS)
+      CALL PAR_GET0C( 'IN', FIGFIL, STATUS )
 
-*   Get the output file name.
-      CALL PAR_GET0C ('OUT', NDFFIL, STATUS)
-      IF (STATUS .EQ. SAI__OK) THEN
+*   Get the output file name.  A simple PAR_GET0C call cannot be made
+*   because this will write a global value of the current NDF in
+*   quotes, rather than @ndfname as required.  Get the ADAM internal
+*   code that refers to the piece of parameter space associated with
+*   the output filename.
+      CALL SUBPAR_FINDPAR( 'OUT', IMCODE, STATUS )
+
+*   Get the file name associated with the ADAM internal pointer.
+      CALL SUBPAR_GETNAME( IMCODE, NDFFIL, STATUS )
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *   Add the appropriate extensions to the input and output files.
          NCF = CHR_LEN( FIGFIL ) 
@@ -195,7 +208,7 @@
          CALL CHR_APPND( '.SDF', NDFFIL, NCN )
 
 *   Call the conversion subroutine.
-         CALL CON_DST2N(FIGFIL ( :NCF ), NDFFIL ( :NCN ), STATUS)
+         CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), STATUS )
 
       END IF
       
