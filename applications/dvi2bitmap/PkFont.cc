@@ -101,6 +101,7 @@ PkFont::PkFont(unsigned int dvimag,
 	    if (makeMissingFonts_)
 	    {
 		string cmd;
+		int rval;
 
 		cmd = fontgenCommand();
 		if (verbosity_ >= normal)
@@ -109,12 +110,14 @@ PkFont::PkFont(unsigned int dvimag,
 		    throw InputByteStreamError
 			("can't generate fontgen command");
 
-		system(cmd.c_str());
+		rval = system(cmd.c_str());
+		if (rval != 0)
+		    throw InputByteStreamError ("unable to generate font");
 		// try again...
 		got_path = find_font (pk_file_path);
 		if (! got_path)
 		    throw InputByteStreamError
-			("tried but failed to make font");
+			("tried (apparently successfully) to create font, but couldn't find it afterwards. Do you need to set DVI2BITMAP_PK_PATH?");
 	    }
 	    else
 		throw InputByteStreamError
