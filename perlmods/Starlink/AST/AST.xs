@@ -213,11 +213,12 @@ void astThrowException ( int status, AV* errorstack ) {
 static char *sourceWrap( const char *(*source)() ) {
   dSP;
   SV * cb;
+  SV * myobject;
   SV * retsv;
   int count;
   STRLEN len;
   char * line;
-  char * retval;
+  char * retval = NULL;
 
   /* Return directly if ast status is set. */
   if ( !astOK ) return NULL;
@@ -226,8 +227,14 @@ static char *sourceWrap( const char *(*source)() ) {
     return NULL;
   }
 
-  /* Need to cast the source argument to a SV*  */
-  cb = (SV*) source;
+  /* Need to cast the source argument to a SV* and extract the callback from the object */
+  myobject = (SV*) source;
+  cb = getPerlObjectAttr( myobject, "_source" );
+  if (cb == NULL) {
+    astError( AST__INTER, "Callback in channel 'source' not defined!");
+    return NULL;
+  }
+  cb = SvRV( cb );
 
   /* call the callback with the supplied line */
   ENTER;
@@ -696,9 +703,16 @@ _new( class, sourcefunc, sinkfunc, options )
       setPerlObjectAttr( RETVAL, "_sink", newRV( SvRV(sinkfunc) ));
     }
 
-    /* Source functions are called immediately so we can simply
-       pass the CV directly to the constructor */
-    if (has_source) source = sourcefunc;
+    /* In some cases the source routine is called after this constructor
+       returns. We therefore need to store the source function in the object
+       as well. */
+    if (has_source) {
+      /* Store reference to object */
+      source = rv;
+      /* and store the actual sink callback in the object */
+      setPerlObjectAttr( RETVAL, "_source", newRV( SvRV(sourcefunc) ));
+    }
+
   }
 
   /* Need to use astChannelFor style interface so that we can register

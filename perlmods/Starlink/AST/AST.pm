@@ -10,7 +10,7 @@ require DynaLoader;
 use base qw| DynaLoader |;
 
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 bootstrap Starlink::AST $VERSION;
 
@@ -441,7 +441,10 @@ use base qw/ Starlink::AST::Frame /;
 package Starlink::AST::FrameSet;
 use base qw/ Starlink::AST::Frame /;
 
-sub FindFrame {
+# This routine used to be called FindFrame and clashed with the AST
+# native astFindFrame method. Renamed until we can work out what it
+# was meant to be used for.
+sub FindFrameByDomain {
   my $self = shift;
   my $string = shift;
   
