@@ -143,6 +143,10 @@ comments from others.</px></change>
 <px>Minor edits for clarity, and to restore missing references.</px>
 </distribution>
 
+<distribution string="2-5" date="01-Jan-0000" author="ng" versionid="v2-5">
+<px>Running edits</px>
+</distribution>
+
 </history>
 
 <copyright>
@@ -3049,6 +3053,9 @@ Some reorganisation.</px>
 <update versionid="v2-3">
 <px>Added a reference to the Adam Lewenberg book pointers</px>
 </update>
+<update versionid="v2-5">
+<px>Added a pointer to Peter Flynn's Beginner's LaTeX</px>
+</update>
 </subhead>
 
 <p>Starlink supports &latex; and &tex; users by maintaining and
@@ -3144,7 +3151,12 @@ url="http://www.tex.ac.uk/cgi-bin/texfaq2html?label=tutorials" >online
 tutorials</webref>.  Both the `<webref
 url="&ctan;/tex-archive/info/gentle/" >Gentle Introduction</webref>'
 and the `<webref url="&ctan;/tex-archive/info/lshort/english/" >Not so
-Short Introduction</webref>' are available at CTAN.</p>
+Short Introduction</webref>' are available at CTAN.  Peter Flynn's
+`<webref url="http://www.silmaril.ie/downloads/documents/beginlatex.pdf"
+>Beginner's &latex;</webref>' is well written and informative, and
+spends a good deal more time on the preliminary technicalities than
+others; but -- since it grew out of a two-day introduction to &latex;
+aimed primarily at humanities users -- it does not cover maths.</p>
 
 <!--XXX: possibly include pointers to
      http://www-h.eng.cam.ac.uk/help/tpl/textprocessing/
