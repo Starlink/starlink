@@ -1,7 +1,8 @@
       SUBROUTINE SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
      :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, 
-     :     WAVELENGTH, STATUS)
+     :     WAVELENGTH, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :     STATUS)
 *+
 *  Name:
 *     SURF_WRITE_MAP_INFO
@@ -13,7 +14,7 @@
 *     CALL SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
 *    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
 *    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT,
-*    :     STATUS )
+*    :     WRITE_CHOP, CHOP_PA, CHOP_THROW, STATUS )
 
 *  Description:
 *     This routine writes Axis and FITS information to a rebinned
@@ -49,6 +50,14 @@
 *        Size of output map in Y direction
 *     WAVELENGTH = REAL (Given)
 *        Wavelength of the map (microns)
+*     WRITE_CHOP = LOGICAL (Given)
+*        Write the CHOP information to the header
+*     CHOP_CRD = CHARACTER (Given)
+*        Chop coordinate frame
+*     CHOP_PA = REAL (Given)
+*        Chop position angle in degrees east of north
+*     CHOP_THROW = REAL (Given)
+*        Chop throw in arcsec
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -79,6 +88,9 @@
 
 *  Arguments Given:
       INTEGER          NFILE
+      CHARACTER*(*)    CHOP_CRD
+      REAL             CHOP_PA
+      REAL             CHOP_THROW
       CHARACTER*40     FILENAME (NFILE)
       INTEGER          I_CENTRE
       INTEGER          J_CENTRE
@@ -92,6 +104,7 @@
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
       REAL             WAVELENGTH
+      LOGICAL          WRITE_CHOP
 
 *  Status
       INTEGER STATUS
@@ -364,6 +377,20 @@
             CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :           'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system', 
      :           STATUS)
+
+*     Store the chop information
+
+            IF (WRITE_CHOP) THEN
+               CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CHOP_CRD',CHOP_CRD, 'Coordinate system of chop', 
+     :              STATUS)
+               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CHOP_PA', DBLE(CHOP_PA), 
+     :              'Position angle of chop', STATUS)
+               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CHOP_THR', DBLE(CHOP_THROW), 
+     :              'Size of chop throw (arcsec)', STATUS)
+            END IF
 
 *     Put in a DATE-OBS field, converting MJD to DATE
 
