@@ -2863,18 +2863,28 @@ c        INTEGER STATUS
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
-      CHARACTER*12 RAS,DECS
+      CHARACTER*12 RAS,DECS,PIXS
       DOUBLE PRECISION RA,DEC
+      INTEGER IX,IY
       INTEGER ID
+      INTEGER N
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL IMG_WORLDTOPIX(X,Y,I_XPIX,I_YPIX,STATUS)
         I_X=X
         I_Y=Y
+        IX=NINT(I_XPIX)
+        IY=NINT(I_YPIX)
+        CALL CHR_ITOC(IX,PIXS,N)
+        PIXS=PIXS(:N)//','
+        N=N+2
+        CALL CHR_ITOC(IY,PIXS(N:),N)
 
 *  being run from GUI so put on noticeboard
         IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'PIXEL',ID,STATUS)
+          CALL NBS_PUT_CVALUE(ID,0,PIXS,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'X',ID,STATUS)
           CALL NBS_PUT_VALUE(ID,0,VAL__NBR,X,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'Y',ID,STATUS)
