@@ -496,8 +496,12 @@ do
     fi
 done
 
+# Finally, do the link
 $verbose && echo $xlinkcmd
 eval $xlinkcmd
+
+# preserve the exit status of the link command
+linkstatus=$?
 
 if $includedebug
 then
@@ -509,4 +513,5 @@ else
     rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o
 fi
 
-exit 0
+# pass on the exit status of the link command
+exit $linkstatus
