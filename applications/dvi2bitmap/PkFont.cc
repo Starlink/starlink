@@ -100,31 +100,21 @@ PkFont::PkFont(unsigned int dvimag,
 #if defined(MKTEXPK) || defined(MAKETEXPK)
 	    if (makeMissingFonts_)
 	    {
-		SSTREAM cmd;
-#ifdef MKTEXPK
-		cmd << MKTEXPK
-		    << " --dpi " << dpi()
-		    << " --bdpi " << dpiBase()
-		    << " --mag " << dvimag_/1000.0
-		    << " --mfmode " << missingFontMode_
-		    << ' ' << name
-		    << '\0';
-#else
-		cmd << MAKETEXPK	<< ' '
-		    << name		<< ' '
-		    << dpi()		<< ' '
-		    << dpiBase()	<< ' '
-		    << dvimag_/1000.0	<< ' '
-		    << missingFontMode_
-		    << '\0';
-#endif
+		string cmd;
+
+		cmd = fontgenCommand();
 		if (verbosity_ >= normal)
-		    cerr << "mktexpk: " << cmd.str() << '\n';
-		system (C_STR(cmd));
+		    cerr << "mktexpk: " << cmd << '\n';
+		if (cmd.length() == 0)
+		    throw InputByteStreamError
+			("can't generate fontgen command");
+
+		system(cmd.c_str());
 		// try again...
 		got_path = find_font (pk_file_path);
 		if (! got_path)
-		    throw InputByteStreamError ("tried but failed to make font");
+		    throw InputByteStreamError
+			("tried but failed to make font");
 	    }
 	    else
 		throw InputByteStreamError
@@ -791,4 +781,29 @@ string_list break_path (string path)
 	    tmp += path[i];
     l.push_back(tmp);
     return l;
+}
+
+string PkFont::fontgenCommand (void)
+{
+    SSTREAM cmd;
+#if defined(MKTEXPK)
+    cmd << MKTEXPK
+	<< " --dpi " << dpi()
+	<< " --bdpi " << dpiBase()
+	<< " --mag " << dvimag_/1000.0
+	<< " --mfmode " << missingFontMode_
+	<< ' ' << name_
+	<< '\0';
+#elif defined(MAKETEXPK)
+    cmd << MAKETEXPK	<< ' '
+	<< name		<< ' '
+	<< dpi()	<< ' '
+	<< dpiBase()	<< ' '
+	<< dvimag_/1000.0	<< ' '
+	<< missingFontMode_
+	<< '\0';
+#else
+    cmd = "";
+#endif
+    return C_STR(cmd);
 }
