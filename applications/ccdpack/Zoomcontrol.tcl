@@ -81,9 +81,9 @@
             label $itk_component(control).zoomnum \
                   -width 3
          }
-         pack $itk_component(zoomin) \
+         pack $itk_component(zoomout) \
               $itk_component(zoom) \
-              $itk_component(zoomout) \
+              $itk_component(zoomin) \
               -side left
          pack $itk_component(control)
          eval itk_initialize $args
