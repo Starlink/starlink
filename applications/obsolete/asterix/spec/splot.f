@@ -86,6 +86,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     24 Apr 95 : V1.8-1 Updated input and model data interfaces. Use
 *                        ADI style response matrices (DJA)
+*      9 Aug 95 : V1.8-2 Model only plot has log y-axis by default (RJV)
 *
 *    Type definitions :
 	IMPLICIT NONE
@@ -162,7 +163,7 @@
         REAL EWID			! channel width for model plot
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION='SPLOT Version 1.8-1')
+	PARAMETER		(VERSION='SPLOT Version 1.8-2')
 *-
 
 * Announce version
@@ -2532,8 +2533,9 @@
 
       IF (LOGAX) THEN
         CALL GCB_SETL('XAXIS_LOG',.TRUE.,STATUS)
-        CALL GCB_SETL('YAXIS_LOG',.TRUE.,STATUS)
       ENDIF
+
+      CALL GCB_SETL('YAXIS_LOG',.TRUE.,STATUS)
 
 *  get axis limits for key
       CALL GFX_DEF1DWND(NCHAN,%val(MCXPTR),%val(MTDPTR),
