@@ -10,6 +10,7 @@
           New tasks:
              ASTEXP - Exports AST frameset information from NDFs to file
              ASTIMP - Imports AST frameset information from file to NDFs
+             WCSEDIT - Adds, removes, makes current frames in WCS component
              WCSREG - Aligns NDFs using multiple WCS component frames
           New script:
              WCSEXERCISE - test WCS-related functionality (not IRAF)
