@@ -131,8 +131,8 @@ The attributes added to the navigation footer table
 <routine>
 <routinename>suppress-banner
 <description>If true, then suppress the production of the banner, even when
-  <code/%starlink-banner%/ is true (this option can be conveniently set
-  using Jade, with the option <code/-V suppress-banner/).
+  <code/%starlink-banner%/ returns a non-trivial sosofo (this option can be
+  conveniently set using Jade, with the option <code/-V suppress-banner/).
 <returnvalue type=boolean>True if the banner is <em/not/ to be printed.
 <codebody>
 (define suppress-banner #f)
@@ -141,26 +141,25 @@ The attributes added to the navigation footer table
 <routinename>%starlink-banner%
 <description>
 Return a sosofo which produces the Starlink/CCLRC/RAL/PPARC banner,
-or false if none is to be produced.  See also (suppress-banner).
+or an empty-sosofo if none is to be produced.  See also (suppress-banner).
 <returnvalue type=sosofo>Banner
 <codebody>
-(define %starlink-banner%
+(define (%starlink-banner%)
   (make sequence
     (make element gi: "h3"
-       (make element gi: "a"
-             attributes: '(("href" "http://www.cclrc.ac.uk/"))
-          (literal "Central Laboratory of the Research Councils"))
-       (make empty-element gi: "br")
-       (make element gi: "a"
-             attributes: '(("href" "http://www.pparc.ac.uk/"))
-          (literal "Particle Physics ")
-          (make entity-ref name: "amp")
-          (literal " Astronomy Research Council")))
+	  (make element gi: "a"
+		attributes: '(("href" "http://www.cclrc.ac.uk/"))
+		(literal "Central Laboratory of the Research Councils"))
+	  (make empty-element gi: "br")
+	  (make element gi: "a"
+		attributes: '(("href" "http://www.pparc.ac.uk/"))
+		(literal "Particle Physics ")
+		(make entity-ref name: "amp")
+		(literal " Astronomy Research Council")))
     (make element gi: "h2"
-       (make element gi: "a"
-             attributes: '(("href" "http://star-www.rl.ac.uk/"))
-          (literal "Starlink Project")))
-    ))
+	  (make element gi: "a"
+		attributes: '(("href" "http://star-www.rl.ac.uk/"))
+		(literal "Starlink Project")))))
 
 <routine>
 <routinename>%starlink-document-server%

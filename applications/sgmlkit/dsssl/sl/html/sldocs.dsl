@@ -164,8 +164,8 @@ more-or-less as much like the existing star2html output as possible.
                 (getdocauthors)
                 (make empty-element gi: "br")
                 (literal (getdocdate))))
-         (if (and %starlink-banner% (not suppress-banner))
-             (make element gi: "p" %starlink-banner%)
+         (if (not suppress-banner)
+             (%starlink-banner%)
              (empty-sosofo))
          (if (not suppress-printable)
              (make element gi: "p"
