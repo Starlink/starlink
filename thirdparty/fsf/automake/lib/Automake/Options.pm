@@ -32,7 +32,7 @@ use vars qw (@ISA @EXPORT);
 	      unset_option unset_global_option
 	      process_option_list process_global_option_list
 	      set_strictness $strictness $strictness_name
-	      &FOREIGN &GNU &GNITS);
+	      &FOREIGN &STARTREE &GNU &GNITS);
 
 =head1 NAME
 
@@ -83,6 +83,8 @@ use vars '%_global_options';	# from AM_INIT_AUTOMAKE or the command line.
 
 =item FOREIGN
 
+=item STARTREE
+
 =item GNU
 
 =item GNITS
@@ -94,9 +96,10 @@ Strictness constants used as values for C<$strictness>.
 =cut
 
 # Constants to define the "strictness" level.
-use constant FOREIGN => 0;
-use constant GNU     => 1;
-use constant GNITS   => 2;
+use constant FOREIGN  => 0;
+use constant STARTREE => 1;
+use constant GNU      => 2;
+use constant GNITS    => 3;
 
 =head2 Variables
 
@@ -104,11 +107,11 @@ use constant GNITS   => 2;
 
 =item C<$strictness>
 
-The current stricness.  One of C<FOREIGN>, C<GNU>, or C<GNITS>.
+The current stricness.  One of C<FOREIGN>, C<STARTREE>, C<GNU>, or C<GNITS>.
 
 =item C<$strictness_name>
 
-The current stricness name.  One of C<'foreign'>, C<'gnu'>, or C<'gnits'>.
+The current stricness name.  One of C<'foreign'>, C<'startree'>, C<'gnu'>, or C<'gnits'>.
 
 =back
 
@@ -314,7 +317,7 @@ sub process_global_option_list ($@)
 =item C<set_strictness ($name)>
 
 Set the current strictness level.
-C<$name> should be one of C<'foreign'>, C<'gnu'>, or C<'gnits'>.
+C<$name> should be one of C<'foreign'>, C<'startree'>, C<'gnu'>, or C<'gnits'>.
 
 =cut
 
@@ -336,6 +339,10 @@ sub set_strictness ($)
   elsif ($strictness_name eq 'foreign')
     {
       $strictness = FOREIGN;
+    }
+  elsif ($strictness_name eq 'startree')
+    {
+      $strictness = STARTREE;
     }
   else
     {

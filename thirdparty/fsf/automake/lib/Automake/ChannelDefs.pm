@@ -365,6 +365,15 @@ sub set_strictness ($)
       # setup_channel 'portability', silent => 1;
       setup_channel 'gnu', silent => 1;
     }
+  elsif ($name eq 'startree')
+    {
+      # same as foreign
+      setup_channel 'error-gnu', silent => 1;
+      setup_channel 'error-gnu/warn', silent => 0, type => 'warning';
+      setup_channel 'error-gnits', silent => 1;
+      # setup_channel 'portability', silent => 1;
+      setup_channel 'gnu', silent => 1;
+    }
   else
     {
       prog_error "level `$name' not recognized\n";
