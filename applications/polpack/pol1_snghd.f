@@ -50,10 +50,10 @@
 *        returned group.
 *     LBNDO( 3 ) = INTEGER (Returned)
 *        The lower bounds required for the output NDF so that it encompasses 
-*        the area of overlap between the input images. 
+*        the entire area of all input images (i.e. padded, not trimmmed)
 *     UBNDO( 3 ) = INTEGER (Returned)
 *        The upper bounds required for the output NDF so that it encompasses 
-*        the area of overlap between the input images.
+*        the entire area of all input images (i.e. padded, not trimmmed)
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -67,6 +67,9 @@
 *  History:
 *     15-JAN-1999 (DSB):
 *        Original version.
+*     19-MAR-1999 (DSB):
+*        Modified to return output bounds which encompass the union of all
+*        input images, instead of the intersection.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -142,17 +145,17 @@
          CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
 
 *  Update the bounds of axes 1 and 2 of the output NDF so that it covers
-*  only the area spanned by all the input NDFs.
+*  the union of the areas spanned by all the input NDFs.
          IF( I .EQ. 1 ) THEN
             LBNDO( 1 ) = LBND( 1 )
             UBNDO( 1 ) = UBND( 1 )
             LBNDO( 2 ) = LBND( 2 )
             UBNDO( 2 ) = UBND( 2 )
          ELSE
-            LBNDO( 1 ) = MAX( LBND( 1 ), LBNDO( 1 ) )
-            UBNDO( 1 ) = MIN( UBND( 1 ), UBNDO( 1 ) )
-            LBNDO( 2 ) = MAX( LBND( 2 ), LBNDO( 2 ) )
-            UBNDO( 2 ) = MIN( UBND( 2 ), UBNDO( 2 ) )
+            LBNDO( 1 ) = MIN( LBND( 1 ), LBNDO( 1 ) )
+            UBNDO( 1 ) = MAX( UBND( 1 ), UBNDO( 1 ) )
+            LBNDO( 2 ) = MIN( LBND( 2 ), LBNDO( 2 ) )
+            UBNDO( 2 ) = MAX( UBND( 2 ), UBNDO( 2 ) )
          END IF
 
 *  If all the previous NDFs had defined VARIANCE components, see if the 
