@@ -156,6 +156,11 @@ print( ' (makeh):
 *-
 */
 
+/* This is AST version <VERSION_NUMBER>-<RELEASE_NUMBER>. */
+#define AST_MAJOR_VERS <MAJOR_VERSION_NUMBER>
+#define AST_MINOR_VERS <MINOR_VERSION_NUMBER>
+#define AST_RELEASE <RELEASE_NUMBER>
+
 ' );
 
 #  Open the scratch file created above and read it.
