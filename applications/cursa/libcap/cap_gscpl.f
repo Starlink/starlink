@@ -68,6 +68,7 @@
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'           ! CAT parametric constants.
       INCLUDE 'SGZ_PAR'           ! catview parametric constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 *  Global Variables:
       INCLUDE 'SGZ_CMN'           ! catview common block.
       INCLUDE 'SPLOT_CMN'         ! catview scatterplot common block.
@@ -153,7 +154,8 @@
                   YID = YID__SPLOT
 
                   CALL CAP_RDSCT (SI, XID, YID, ROWS, PTS,
-     :              %VAL(XPTR), %VAL(YPTR), NUMNUL, STATUS)
+     :              %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(YPTR)), 
+     :              NUMNUL, STATUS)
 
                   IF (NUMNUL .GT. 0) THEN
                      CALL MSG_SETI ('NUMNUL', NUMNUL)
@@ -201,10 +203,10 @@
 *                      Next determine the plotting range.
 
                         IF (AUTO__SPLOT) THEN
-                           CALL CAP_PRNG (PTS, %VAL(XPTR), XMIN, XMAX,
-     :                       STATUS)
-                           CALL CAP_PRNG (PTS, %VAL(YPTR), YMIN, YMAX,
-     :                       STATUS)
+                           CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(XPTR)), 
+     :                       XMIN, XMAX, STATUS)
+                           CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(YPTR)), 
+     :                       YMIN, YMAX, STATUS)
 
                            XRANGE = XMAX - XMIN
                            YRANGE = YMAX - YMIN
@@ -256,8 +258,9 @@
 *
 *                   Plot the selection.
 
-                     CALL CAP_PSCAT (PGSYMB, PGCOL, PTS, %VAL(XPTR),
-     :                 %VAL(YPTR), STATUS)
+                     CALL CAP_PSCAT (PGSYMB, PGCOL, PTS, 
+     :                 %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(YPTR)), 
+     :                 STATUS)
 
 *
 *                   If all is ok then copy the details of the points

@@ -82,6 +82,7 @@
       INCLUDE 'SAE_PAR'      ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'      ! CAT parametric constants.
       INCLUDE 'SGZ_PAR'      ! catview parametric constants.
+      INCLUDE 'CNF_PAR'      ! CNF functions
 *  Global Variables:
       INCLUDE 'SGZ_CMN'      ! catview common block.
 *  Arguments Given:
@@ -322,7 +323,8 @@ C    :           '! ',  i5, i5, i5, i5, i5)
                   IF (STYPI(CURCMP) .NE. CAT__TYPEC  .AND.
      :                STYPI(CURCMP) .NE. CAT__TYPEL) THEN
                      CALL CAP_GSTAR (SNNROW(CURCMP),
-     :                 %VAL(SCLPTR(CURCMP)), %VAL(WRKPTR),
+     :                 %VAL(CNF_PVAL(SCLPTR(CURCMP))), 
+     :                 %VAL(CNF_PVAL(WRKPTR)),
      :                 MINVL, MINVLN,   MAXVL, MAXVLN,   RANGE, RANGEN,
      :                 QUAR1, QUAR1N,   QUAR3, QUAR3N,   IQRNG, IQRNGN,
      :                 MEDN,  MEDNN,    MEAN, MEANN,     MODE, MODEN,

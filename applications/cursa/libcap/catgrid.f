@@ -142,6 +142,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'CAT_PAR'   ! CAT symbolic constants.
+      INCLUDE 'CNF_PAR'   ! CNF functions
 *  Status:
       INTEGER STATUS      ! Global status.
 *  External References:
@@ -312,7 +313,7 @@
 *                For each column find the range and compute the bin size.
 
                   DO CURCOL = 1, NDIM
-                     CALL CAP_PRNG (PTS, %VAL(COLPTR(CURCOL)),
+                     CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(COLPTR(CURCOL))),
      :                 MINVAL(CURCOL), MAXVAL, STATUS)
 
                      BINSIZ(CURCOL) = (MAXVAL - MINVAL(CURCOL) ) /
@@ -351,19 +352,23 @@
 
                      IF (NDIM .EQ. 1) THEN
                         CALL CAP_POPG1 (CNORML, MINVAL(1), BINSIZ(1),
-     :                    PTS, %VAL(COLPTR(1)), BINS(1), %VAL(GRDPTR),
+     :                    PTS, %VAL(CNF_PVAL(COLPTR(1))), BINS(1), 
+     :                    %VAL(CNF_PVAL(GRDPTR)),
      :                    STATUS)
                      ELSE IF (NDIM .EQ. 2) THEN
                         CALL CAP_POPG2 (CNORML, MINVAL(1), BINSIZ(1),
-     :                    MINVAL(2), BINSIZ(2), PTS, %VAL(COLPTR(1)),
-     :                    %VAL(COLPTR(2)), BINS(1), BINS(2), 
-     :                    %VAL(GRDPTR), STATUS)
+     :                    MINVAL(2), BINSIZ(2), PTS, 
+     :                    %VAL(CNF_PVAL(COLPTR(1))),
+     :                    %VAL(CNF_PVAL(COLPTR(2))), BINS(1), BINS(2), 
+     :                    %VAL(CNF_PVAL(GRDPTR)), STATUS)
                      ELSE IF (NDIM .EQ. 3) THEN
                         CALL CAP_POPG3 (CNORML, MINVAL(1), BINSIZ(1),
      :                    MINVAL(2), BINSIZ(2), MINVAL(3), BINSIZ(3),
-     :                    PTS, %VAL(COLPTR(1)), %VAL(COLPTR(2)),
-     :                    %VAL(COLPTR(3)), BINS(1), BINS(2), BINS(3),
-     :                    %VAL(GRDPTR), STATUS)
+     :                    PTS, %VAL(CNF_PVAL(COLPTR(1))), 
+     :                    %VAL(CNF_PVAL(COLPTR(2))),
+     :                    %VAL(CNF_PVAL(COLPTR(3))), 
+     :                    BINS(1), BINS(2), BINS(3),
+     :                    %VAL(CNF_PVAL(GRDPTR)), STATUS)
                      END IF
 
 *

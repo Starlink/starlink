@@ -99,6 +99,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'           ! External CAT constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 *  Arguments Given:
       INTEGER
      :  CI
@@ -256,8 +257,8 @@
                IF (REJCAT  .AND.  SI .NE. CAT__NOID  .AND.
      :             STATUS .EQ. SAI__OK) THEN
                   CALL CAT_TIQAI (SI, 'PTR', SELPTR, STATUS)
-                  CALL CAT_SLIST (NUMSEL, %VAL(SELPTR), CRIT, .TRUE.,
-     :              CI, DRJI, SIR, NUMREJ, STATUS)
+                  CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(SELPTR)), 
+     :              CRIT, .TRUE., CI, DRJI, SIR, NUMREJ, STATUS)
                ELSE
                   SIR = CAT__NOID
                   NUMREJ = 0

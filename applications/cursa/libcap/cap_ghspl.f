@@ -76,6 +76,7 @@
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'           ! CAT parametric constants.
       INCLUDE 'SGZ_PAR'           ! catview parametric constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 *  Global Variables:
       INCLUDE 'SGZ_CMN'           ! catview common block.
       INCLUDE 'SPLOT_CMN'         ! catview scatterplot common block.
@@ -169,8 +170,8 @@
 
                XID = XID__HIST
 
-               CALL CAP_RDCLR (SI, XID, ROWS, PTS, %VAL(XPTR), NUMNUL,
-     :           STATUS)
+               CALL CAP_RDCLR (SI, XID, ROWS, PTS, 
+     :           %VAL(CNF_PVAL(XPTR)), NUMNUL, STATUS)
 
                IF (STATUS .EQ. SAI__OK) THEN
 
@@ -178,7 +179,8 @@
 *                Determine the X range of the values to be histogrammed.
 
                   IF (AUTO__HIST) THEN
-                     CALL CAP_PRNG (PTS, %VAL(XPTR), XMIN, XMAX, STATUS)
+                     CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(XPTR)), XMIN, 
+     :                 XMAX, STATUS)
                   ELSE
                      XMIN = XMIN__HIST
                      XMAX = XMAX__HIST
@@ -221,8 +223,10 @@
 *                   Generate the histogram.
 
                      CALL CAP_GNHST (XMIN, XMAX, BINWD, NORM__HIST,
-     :                 PTS, %VAL(XPTR), BINS, %VAL(IHYPTR), %VAL(HXPTR),
-     :                 %VAL(HYPTR), YMIN, YMAX, NUMINC, NUMEXC, STATUS)
+     :                 PTS, %VAL(CNF_PVAL(XPTR)), BINS, 
+     :                 %VAL(CNF_PVAL(IHYPTR)), %VAL(CNF_PVAL(HXPTR)),
+     :                 %VAL(CNF_PVAL(HYPTR)), YMIN, YMAX, NUMINC, 
+     :                 NUMEXC, STATUS)
 
 *
 *                   Proceed if the histogram includes some points.
@@ -331,8 +335,11 @@
 *
 *                      Plot the histogram.
 
-                        CALL CAP_PHIST (PGCOL, BINS, %VAL(HXPTR),
-     :                    %VAL(HYPTR), WPTS, %VAL(WXPTR), %VAL(WYPTR),
+                        CALL CAP_PHIST (PGCOL, BINS, 
+     :                    %VAL(CNF_PVAL(HXPTR)),
+     :                    %VAL(CNF_PVAL(HYPTR)), WPTS, 
+     :                    %VAL(CNF_PVAL(WXPTR)), 
+     :                    %VAL(CNF_PVAL(WYPTR)),
      :                    STATUS)
 
 *

@@ -57,6 +57,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'           ! CAT parametric constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -108,7 +109,7 @@
 
                IF (STATUS .EQ. SAI__OK  .AND.  .NOT. NULFLG) THEN
                   CALL CAP_STAER (ROWS, PTS, CURVAL,
-     :              %VAL(COLPTR(CURCOL)), STATUS)
+     :              %VAL(CNF_PVAL(COLPTR(CURCOL))), STATUS)
                ELSE
                   BADROW = .TRUE.
                END IF

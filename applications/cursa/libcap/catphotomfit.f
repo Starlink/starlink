@@ -206,6 +206,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants.
       INCLUDE 'CAT_PAR'          ! Standard CAT constants.
+      INCLUDE 'CNF_PAR'          ! CNF functions
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -421,7 +422,8 @@ C           print2001, rows
 C2001       format(1x, 'rows: ', i5 )
 
             CALL CAP_RDTPH (CI, ROWS, EINCL, ECATMG, EINSMG, EAIRMS,
-     :        %VAL(INCPTR), %VAL(CMGPTR), %VAL(IMGPTR), %VAL(AIRPTR),
+     :        %VAL(CNF_PVAL(INCPTR)), %VAL(CNF_PVAL(CMGPTR)), 
+     :        %VAL(CNF_PVAL(IMGPTR)), %VAL(CNF_PVAL(AIRPTR)),
      :        STATUS)
 C           print2000, 'after reading in catalogue', status
 C2000       format(1x, a, 3X, 'status: ', I20)
@@ -431,7 +433,7 @@ C2000       format(1x, a, 3X, 'status: ', I20)
 *          zenith distance.
 
             IF (ZENDST) THEN
-               CALL CAP_AIRMS (ROWS, %VAL(AIRPTR), STATUS)
+               CALL CAP_AIRMS (ROWS, %VAL(CNF_PVAL(AIRPTR)), STATUS)
             END IF
 
 *
@@ -439,9 +441,10 @@ C2000       format(1x, a, 3X, 'status: ', I20)
 
             IF (NUMFIX .LT. 2) THEN
                CALL CAP_FITPH (ROWS, FZEROP, FATMOS,
-     :           %VAL(INCPTR), %VAL(CMGPTR), %VAL(IMGPTR), %VAL(AIRPTR),
-     :           INSCON, ZEROP, ATMOS, %VAL(WRKPTR), RNORM, NUMFIT,
-     :           STATUS)
+     :           %VAL(CNF_PVAL(INCPTR)), %VAL(CNF_PVAL(CMGPTR)), 
+     :           %VAL(CNF_PVAL(IMGPTR)), %VAL(CNF_PVAL(AIRPTR)),
+     :           INSCON, ZEROP, ATMOS, %VAL(CNF_PVAL(WRKPTR)), 
+     :           RNORM, NUMFIT, STATUS)
 C              print2000, 'after fit', status
             END IF
 
@@ -487,9 +490,11 @@ C              print2000, 'after fit', status
 *             If required then list the residuals.
 
                IF (RESID) THEN
-                  CALL CAP_RESPH (ROWS, CI, ENAME, %VAL(INCPTR),
-     :              %VAL(CMGPTR), %VAL(IMGPTR), %val(AIRPTR),
-     :              INSCON, ZEROP, ATMOS, %VAL(CLCPTR), %VAL(RSDPTR),
+                  CALL CAP_RESPH (ROWS, CI, ENAME, 
+     :              %VAL(CNF_PVAL(INCPTR)),
+     :              %VAL(CNF_PVAL(CMGPTR)), %VAL(CNF_PVAL(IMGPTR)), 
+     :              %VAL(CNF_PVAL(AIRPTR)), INSCON, ZEROP, ATMOS, 
+     :              %VAL(CNF_PVAL(CLCPTR)), %VAL(CNF_PVAL(RSDPTR)),
      :              STATUS)
 C                 print2000, 'after residuals', status
                END IF

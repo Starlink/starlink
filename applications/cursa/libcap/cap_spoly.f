@@ -95,6 +95,7 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -178,8 +179,8 @@
 *
 *       Read in the polygon corners.
 
-         CALL CAP_RDPLY (CIPOLY, XCRNRI, YCRNRI, CORNER, %VAL(XCRNPT),
-     :     %VAL(YCRNPT), STATUS)
+         CALL CAP_RDPLY (CIPOLY, XCRNRI, YCRNRI, CORNER, 
+     :     %VAL(CNF_PVAL(XCRNPT)), %VAL(CNF_PVAL(YCRNPT)), STATUS)
 
 *
 *       If a coordinate transformation is required then transform the
@@ -204,8 +205,9 @@ C           CALL CAP_????
 *
 *       Generate a list of the points which fall inside the polygon.
 
-         CALL CAP_PLYSL (CI, XCOLI, YCOLI, ROWS, CORNER, %VAL(XCRNPT),
-     :     %VAL(YCRNPT), NUMIN, %VAL(INPTR), STATUS)
+         CALL CAP_PLYSL (CI, XCOLI, YCOLI, ROWS, CORNER, 
+     :     %VAL(CNF_PVAL(XCRNPT)), %VAL(CNF_PVAL(YCRNPT)), 
+     :     NUMIN, %VAL(CNF_PVAL(INPTR)), STATUS)
 
 *
 *       If points outside the polygon are required then map the required
@@ -215,8 +217,9 @@ C           CALL CAP_????
             CALL CAP_CRTAR (ROWS, '_INTEGER', OUTPTR, STATUS)
             CALL CAP_CRTAR (ROWS, '_INTEGER', WRKPTR, STATUS)
 
-            CALL CAP_RJLST (NUMIN, %VAL(INPTR), ROWS, %VAL(WRKPTR),
-     :        NUMOUT, %VAL(OUTPTR), STATUS)
+            CALL CAP_RJLST (NUMIN, %VAL(CNF_PVAL(INPTR)), ROWS, 
+     :        %VAL(CNF_PVAL(WRKPTR)), NUMOUT, %VAL(CNF_PVAL(OUTPTR)), 
+     :        STATUS)
          END IF
 
 *
@@ -226,14 +229,14 @@ C           CALL CAP_????
             NUMSEL = NUMIN
             CRIT = 'Points inside polygon.'
 
-            CALL CAT_SLIST (NUMSEL, %VAL(INPTR), CRIT, REJCAT, CI,
-     :        SI, SIR, NUMREJ, STATUS)
+            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(INPTR)), CRIT, 
+     :        REJCAT, CI, SI, SIR, NUMREJ, STATUS)
          ELSE
             NUMSEL = NUMOUT
             CRIT = 'Points outside polygon.'
 
-            CALL CAT_SLIST (NUMSEL, %VAL(OUTPTR), CRIT, REJCAT, CI,
-     :        SI, SIR, NUMREJ, STATUS)
+            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(OUTPTR)), CRIT, 
+     :        REJCAT, CI, SI, SIR, NUMREJ, STATUS)
          END IF
 
 *

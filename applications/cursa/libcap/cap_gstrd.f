@@ -66,6 +66,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'           ! CAT parametric constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 *  Arguments Given:
       INTEGER
      :  SI,
@@ -119,7 +120,7 @@
                   IF (.NOT. NULFLG) THEN
                      COLNNR(CURCOL) = COLNNR(CURCOL) + 1
                      CALL CAP_STAED (ROWS, COLNNR(CURCOL), DVALUE,
-     :                 %VAL(COLPTR(CURCOL) ), STATUS)
+     :                 %VAL(CNF_PVAL(COLPTR(CURCOL))), STATUS)
                   END IF
 
                ELSE

@@ -69,6 +69,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'CAT_PAR'           ! CAT parametric constants.
+      INCLUDE 'CNF_PAR'           ! CNF functions
 C      INCLUDE 'CAT_ERR'           ! CAT error codes.
 C      INCLUDE 'SGZ_PAR'           ! StarGaze parametric constants.
 *  Global Variables:
@@ -122,7 +123,8 @@ C      INCLUDE 'SGZ_CMN'           ! StarGaze common block.
 *
 *          Create the list of row numbers to be selected.
 
-            CALL CAP_CRNSP (FREQ, NUMSEL, %VAL(LSTPTR), STATUS)
+            CALL CAP_CRNSP (FREQ, NUMSEL, %VAL(CNF_PVAL(LSTPTR)), 
+     :                      STATUS)
 
 *
 *          Assemble the selection criterion.
@@ -146,8 +148,8 @@ C      INCLUDE 'SGZ_CMN'           ! StarGaze common block.
 *
 *          Create the selection.
 
-            CALL CAT_SLIST (NUMSEL, %VAL(LSTPTR), CRIT, REJCAT, CI,
-     :        SI, SIR, NUMREJ, STATUS)
+            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(LSTPTR)), CRIT, 
+     :        REJCAT, CI, SI, SIR, NUMREJ, STATUS)
 
 *
 *          Release the workspace array.

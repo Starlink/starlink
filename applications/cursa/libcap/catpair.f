@@ -255,6 +255,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CAT_PAR'          ! CAT constants.
       INCLUDE 'CAT_ERR'          ! CAT error codes.
+      INCLUDE 'CNF_PAR'          ! CNF functions
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
@@ -609,20 +610,24 @@
 
                   CALL CAP_PAIR (CIP, PRMROW, PCRD1I, PCRD2I,
      :              CIS, SECROW, SCRD1I, SCRD2I, PDISTI, CRDTYP,
-     :              MULTP, MULTS, MAXROW, %VAL(WRKPTR),
-     :              NPAIR, %VAL(PRMPTR), %VAL(SECPTR),
-     :              %VAL(SPNPTR), %VAL(PMMPTR), %VAL(SMMPTR),
+     :              MULTP, MULTS, MAXROW, %VAL(CNF_PVAL(WRKPTR)),
+     :              NPAIR, %VAL(CNF_PVAL(PRMPTR)), 
+     :              %VAL(CNF_PVAL(SECPTR)), %VAL(CNF_PVAL(SPNPTR)), 
+     :              %VAL(CNF_PVAL(PMMPTR)), %VAL(CNF_PVAL(SMMPTR)),
      :              NPRNUL, NPMULT, NSMULT, STATUS)
 
 *
 *                Generate a list of objects corresponding to the type of
 *                pairing required.
 
-                  CALL CAP_PAIRT (SECROW, NPAIR, %VAL(PRMPTR), 
-     :              %VAL(SECPTR), %VAL(SPNPTR), %VAL(PMMPTR),
-     :              %VAL(SMMPTR), PRTYP, MAXROW, %VAL(WRKPTR), OPAIR,
-     :              %VAL(OPRPTR), %VAL(OSCPTR), 
-     :              %VAL(OSPPTR), %VAL(OPMPTR), %VAL(OSMPTR), STATUS)
+                  CALL CAP_PAIRT (SECROW, NPAIR, 
+     :              %VAL(CNF_PVAL(PRMPTR)), %VAL(CNF_PVAL(SECPTR)), 
+     :              %VAL(CNF_PVAL(SPNPTR)), %VAL(CNF_PVAL(PMMPTR)),
+     :              %VAL(CNF_PVAL(SMMPTR)), PRTYP, MAXROW, 
+     :              %VAL(CNF_PVAL(WRKPTR)), OPAIR,
+     :              %VAL(CNF_PVAL(OPRPTR)), %VAL(CNF_PVAL(OSCPTR)), 
+     :              %VAL(CNF_PVAL(OSPPTR)), %VAL(CNF_PVAL(OPMPTR)), 
+     :              %VAL(CNF_PVAL(OSMPTR)), STATUS)
 
 *
 *                Proceed if all ok.
@@ -686,8 +691,9 @@
 
                      CALL CAP_JTWRT (CIP, CIS, CIOUT, PCOLS, FIPRIM,
      :                 FIPOUT, SCOLS, FISEC, FISOUT, SEPNI, PMLTI,
-     :                 SMLTI, OPAIR, %VAL(OPRPTR), %VAL(OSCPTR),
-     :                 %VAL(OSPPTR), %VAL(OPMPTR), %VAL(OSMPTR),
+     :                 SMLTI, OPAIR, %VAL(CNF_PVAL(OPRPTR)), 
+     :                 %VAL(CNF_PVAL(OSCPTR)), %VAL(CNF_PVAL(OSPPTR)), 
+     :                 %VAL(CNF_PVAL(OPMPTR)), %VAL(CNF_PVAL(OSMPTR)),
      :                 STATUS)
 
                      IF (STATUS .EQ. SAI__OK) THEN
