@@ -5,13 +5,14 @@
    Converts a TIFF file into an NDF. 
 }{
    \sstdescription{
-      This Bourne shell script converts a 256 grey-level or b/w dithered
-      Tag Image File Format (TIFF) into a Starlink NDF image format file.
-      One or two-dimensional images can be handled.
-      The script uses various PBMPLUS utilities to produce a FITS file 
-      and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
-      final NDF. Error messages are converted into Starlink style (preceded
-      by !).
+      This Bourne-shell script converts a 256 grey-level or
+      black-and-white dithered Tag Image File Format (TIFF) into an
+      unsigned-byte NDF file.  It handles one- or two-dimensional
+      images.  The script uses various PBMPLUS utilities to produce a
+      FITS file, flipped top to bottom, and then
+      \htmlref{FITS2NDF}{FITS2NDF} to produce
+      the final NDF.  Error messages are converted into Starlink style
+      (preceded by {\tt !}).
    }
    \sstusage{
       tiff2ndf in [out]
@@ -49,10 +50,9 @@
       \sstitemlist{
          \sstitem
             This initial version of the script handles only greyscale
-            or b/w dithered images. Users are responsible for conversion
-            of their images to this format prior to use. This ensures that
-            the user is responsible for converting RGB values to brightness 
-            values.
+            or b/w dithered images.  You are responsible for conversion
+            of your images to this format prior to use, including 
+            the conversion of RGB values to brightness values.
          \sstitem
             Input image file names must have the extension {\tt .tif}.
          \sstitem
@@ -64,16 +64,6 @@
       Related Applications
    }{
       \CONVERT: NDF2TIFF.
-   }
-   \sstbugs{
-      At the time of writing, this utility does not work on alpha OSF/1
-      due to a problem with {\tt tifftopnm} in the standard release of 
-      PBMPLUS. OSF/1 users should use a copy of {\tt tifftopnm} obtained from 
-      Netpbm which is based on PBMPLUS but contains many improvements and
-      additions. A suitable version may be obtained via WWW at
-      \htmladdnormallink{{\tt http://www.astro.cf.ac.uk/pub/Grant.Privett/}}
-      {http://www.astro.cf.ac.uk/pub/Grant.Privett/}.
-      Alternatively, contact Grant Privett, {\tt gjp@astronomy.cardiff.ac.uk}.
    }
 }
 
