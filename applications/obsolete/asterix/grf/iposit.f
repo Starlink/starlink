@@ -10,6 +10,7 @@
 *      1 Jul 93: V1.2-2 GTR used (RJV)
 *      7 Apr 95: V1.8-0 list entry and selection (RJV)
 *     20 NOV 95: V2.0-0 GUI version (RJV)
+*      2 May 96: V2.0-1 improved GUI version (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -30,7 +31,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IPOSIT Version 2.0-0')
+      PARAMETER (VERSION='IPOSIT Version 2.0-1')
 *-
       CALL USI_INIT()
 
@@ -145,8 +146,12 @@
           ELSE
             I_FORM=.FALSE.
             IF (OPT(:5).EQ.'TRACK') THEN
-*  track position until signal received from GUI
-              FLAG=0
+              FLAG=1
+*  wait for signal to start tracking
+              DO WHILE (FLAG.NE.0)
+                CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+              ENDDO
+*  track position until further signal received from GUI
               DO WHILE (FLAG.EQ.0)
                 CALL IMG_NBGET0I('XP',IXP,STATUS)
                 CALL IMG_NBGET0I('YP',IYP,STATUS)
