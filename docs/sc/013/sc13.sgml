@@ -873,6 +873,12 @@ which includes several Fortran FAQs.
 its successor.  Although this project was named Fortran~8X, the work
 took long enough that the final standard was named Fortran~90.
 
+<p>The Fortran standard is maintained by ISO committee
+<webref url='http://www.nag.co.uk/sc22wg5/' >JTC1/SC22/WG5</webref>,
+and the current version of the standard is
+<webref url='http://www.nag.co.uk/sc22wg5/IS1539-1_1997.html' >ISO/IEC
+1539-1 : 1997</webref>. 
+
 <p>The main extensions of Fortran 90 over Fortran 77 are (quoting from
 the
 <webref
@@ -2620,8 +2626,8 @@ which one happens to be in the bookshop on the right day<note>It's
 unfortunate that neither book is much of an advert for &tex;'s
 potentially beautiful typesetting -- both seem to be produced using a
 practically unmodified &latex; <code>book</code> style.
-</note>
-.
+</note>.
+
 Both of the last two should be kept away from anyone not already convinced of
 &latex;'s virtues, since they both make &latex; seem much
 more forbidding than it actually is.
@@ -2642,6 +2648,11 @@ ultimately transforming it into PostScript.  You should also refer to
 Starlink</cite>, <docxref doc=sun199 text='SUN/199'>, <em>Star2HTML</em> and
 <docxref doc=sgp50 text='SGP/50'>, <cite>Starlink Document Styles</cite> are
 primarily intended for those writing Starlink documentation.
+
+<!-- FIXME: possibly include pointers to
+     http://www-h.eng.cam.ac.uk/help/tpl/textprocessing/
+     http://www.latex-project.org/
+     -->
 
 <p>If you prefer learning by example, take a look at the standard sample
 files, <code>small2e.tex</code> and <code>sample2e.tex</code>.  These will be
