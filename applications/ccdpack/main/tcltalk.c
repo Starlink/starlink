@@ -621,4 +621,44 @@
       }
    }
 
+
+   char *ccdTclGetC( ccdTcl_Interp *cinterp, char *script, int *status ) {
+/*
+*+
+*  Name:
+*     ccdTclGetC
+*
+*  Purpose:
+*     Evaluate a Tcl expression as a string value.
+*
+*  Arguments:
+*     cinterp = ccdTcl_Interp *
+*        The interpreter got from a previous ccdTclStart call.
+*     script = char *
+*        A pointer to the text of a Tcl expression to evaluate.
+*     status = int *
+*        The global status.
+*
+*  Return value:
+*     A pointer to the result of the expression.  If there was an error
+*     then status is set, and the return value will be to an empty string.
+*-
+*/
+
+/* Local variables. */
+      char *result = "";
+
+/* Check the inherited status. */
+      if ( *status != SAI__OK ) return;
+
+/* Evaluate the expression in the Tcl interpreter. */
+      result = ccdTclEval( cinterp, script, status );
+      if ( *status != SAI__OK ) {
+         result = "";
+      }
+
+/* Return the result. */
+      return result;
+   }
+
 /* $Id$ */

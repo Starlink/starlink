@@ -52,5 +52,6 @@
                     int *status );
    void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value, 
                     int *status );
+   char *ccdTclGetC( ccdTcl_Interp *cinterp, char *script, int *status );
 
 /* $Id$ */
