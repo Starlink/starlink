@@ -2001,7 +2001,7 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.otherauthors>otherauthors</ref>  - O (author+ | authorref+)>
 &lt;!ELEMENT <ref id=el.programcode.author>author</ref>        - O (name, authornote?)>
 &lt;!ELEMENT <ref id=el.programcode.authornote>authornote</ref>    - O (%paralist;)>
-&lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>
+<!--&lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>-->
 
 &lt;!ELEMENT <ref id=el.programcode.history>history</ref>       O O (change+)>
 &lt;!ELEMENT <ref id=el.programcode.change>change</ref>        - O (%paralist;)>
@@ -2044,7 +2044,7 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.authorlist>authorlist</ref>    O O ((author+ | authorref+), otherauthors?)>
 &lt;!ELEMENT <ref id=el.programcode.otherauthors>otherauthors</ref>  - O (author+ | authorref+)>
 &lt;!ELEMENT <ref id=el.programcode.author>author</ref>        - O (name, authornote?)>
-&lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>
+<!--&lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>-->
 &lt;!ELEMENT <ref id=el.programcode.authornote>authornote</ref>    - O (p+)>
 
 &lt;!ELEMENT <ref id=el.programcode.history>history</ref>       O O (change+)>
@@ -2251,9 +2251,21 @@ tabular)*>, or in other words, a sequence of paragraphs and tabular elements.
 &lt;!ELEMENT <ref id=el.programcode.otherauthors>otherauthors</ref>  - O (author+ | authorref+)>
 &lt;!ELEMENT <ref id=el.programcode.author>author</ref>        - O (name, authornote?)>
 &lt;!ELEMENT <ref id=el.programcode.authornote>authornote</ref>    - O (%paralist;)>
-&lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>
+<!--&lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>-->
 </verbatim>
 
+Each <code/author> element must be given an ID.  The down-converter
+which processes the document will assume that authors with the same ID
+are the same author, and will attempt to assemble a full set of
+information about that author (ie, email address, webpage) from the
+various available author elements with the same ID and, for example,
+assemble a list of all the authors represented in a collection of code
+at the top of a <ref id=el.sun.codecollection/codecollection>
+element.  You should probably try to make the information given in these
+scattered author elements consistent, although the down-converter
+won't impose this.
+
+<!--
 The distinction between the <code/author> and <code/authorref>
 elements is important.  The <code/author> element has a required ID
 attribute which can be used to refer to this author, and the
@@ -2265,6 +2277,7 @@ authorship information in each function, and this is done with the
 <code/authorref> element, which has a required ID attribute linking
 back to the <code/author> element presumably located in the document's
 initial <code/docblock> (see the example in <ref id=doccode.example/>).
+-->
 
 <p>
 <verbatim>
