@@ -2228,7 +2228,7 @@ AC_SUBST(libprm_a_la_version_info, 1:0:0)
 
       </subsect>
 
-      <subsect id="fortran" export="export" indexkey="fortran">
+      <subsect id="fortran" export="export" indexkey="Fortran">
         <subhead>
           <title>Preprocessable Fortran</title>
         </subhead>
@@ -2334,13 +2334,45 @@ AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
           extension for preprocessable Fortran: see <ref
           id="macro-ac-prog-fpp"/> for discussion.</p>
 
-        <p>In those cases where you wish the preprocessing step alone,
-          such as when you are generating a header file from a
-          template, for example, it is probably good practice to name
-          the input file with a <code>.fpp</code> extension, and
-          include the preprocessing line in the
-          <code>Makefile.am</code> explicitly.  There is an example of
-          this in the <code>prm</code> Makefile.</p>
+<p>In those cases where you wish the preprocessing step alone, such as
+when you are generating an include file from a template, you
+should name the input file with a <code>.F</code> extension
+also.  You will need to include a preprocessing rule in the makefile.
+The following idiom might be helpful:
+<verbatim>
+# Run a .F file through the fpp preprocessor, to produce a file with
+# no extension.
+# The following deals with case-insensitive filesystems, on which
+# foo.f and foo.F would be the same file.  FPP_OUTPUT is
+# either "" (in which case the preprocessor writes to foo.f, and
+# the filesystem is presumably case-sensitive) or ">$@".
+foo: foo.F
+        rm -f foo
+        $(FPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+           $(FPPFLAGS) $(CPPFLAGS) foo.F $(FPP_OUTPUT)
+        test -f foo || mv foo.f foo
+</verbatim>
+or the following, for a suffix rule
+<verbatim>
+SUFFIXES = .F
+.F:
+        rm -f $@
+        $(FPP) $(DEFAULT_INCLUDES) $(FPPFLAGS) $(CPPFLAGS) $&lt; $(FPP_OUTPUT)
+        test -f $@ || mv $(&lt;:.F=.f) $@
+ </verbatim>
+In this second example, in which we have elided the useful comment,
+we have declared the <code>.F</code> suffix (we wouldn't have to do
+this if there were `real' <code>.F</code> sources in this directory),
+and are using the <code>$&lt;</code> and <code>$@</code> magic
+variables.</p>
+
+<p>In second example, we elided most of the flag variables we included
+in the first one, since we probably don't need them.  In case of
+doubt, copy the <code>.F.f:</code> rule in one of the generated
+<code>Makefile.in</code> files.</p>
+
+<p>There is a more elaborate example of this in the
+<code>prm</code> component.</p>
 
       </subsect>
 
