@@ -144,8 +144,8 @@
       ELSE IF ( NAME .EQ. 'ASTSIMPLIFY' ) THEN
          CALL ASTSIMPLIFY( STATUS )
 
-      ELSE IF ( NAME .EQ. 'ASTTRAN2' ) THEN
-         CALL ASTTRAN2( STATUS )
+      ELSE IF ( NAME .EQ. 'ASTTRANN' ) THEN
+         CALL ASTTRANN( STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE
