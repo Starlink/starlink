@@ -630,7 +630,8 @@ D	    print *,'ldim,udim :',ldim,udim
      :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
               ELSE
 	        CALL ARR_SUM1R( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
-     :                          SSCALE, STATUS )
+     :                          RSUM, STATUS )
+                SSCALE = SSCALE + NINT(RSUM)
               END IF
             END IF
 
@@ -711,7 +712,8 @@ D	    print *,'ldim,udim :',ldim,udim
      :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
                 ELSE
 	          CALL ARR_SUM1R( OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).BPTR), SSCALE, STATUS )
+     :                      %VAL(OBDAT(NDS).BPTR), RSUM, STATUS )
+                  SSCALE = SSCALE + NINT(RSUM)
                 END IF
 
 *         No background data - set up array of zeros
