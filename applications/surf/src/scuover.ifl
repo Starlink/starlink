@@ -25,7 +25,7 @@
 
    INTERFACE SCUOVER
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
    parameter      COL         # Colour of graph lines
       type        'LITERAL'
