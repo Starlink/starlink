@@ -505,12 +505,12 @@
       INTEGER NX,NY
       PARAMETER (NX=9,NY=9)
 *    Local variables :
+      REAL X,Y
       REAL XP,YP
       CHARACTER*8 NAME
       CHARACTER*8 STRING
       CHARACTER*10 FMT
       CHARACTER*12 OPTIONS
-      CHARACTER*12 RAS,DECS
       BYTE Q
       INTEGER IXP,IYP,IXPMAX,IYPMAX
       INTEGER IX,IY
@@ -528,13 +528,15 @@
       REAL SCVAL,VAL,VAL2
       REAL XC,YC,DX,DY
       REAL XSCALE,YSCALE
-      DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
       LOGICAL VAR,ERR,SIGNIF,QUAL
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
+
+        X=I_X
+        Y=I_Y
 
 *  locate noticeboard items
         CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
@@ -608,13 +610,6 @@
           XW=XW1+(REAL(IXP)-XP1)*XSCALE
           YW=YW1+(REAL(IYP)-YP1)*YSCALE
 
-*  convert to other frames
-          CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
-          CALL IMG_WORLDTOCEL(XW,YW,RA,DEC,STATUS)
-          CALL CONV_DEGHMS(REAL(RA),RAS)
-          CALL CONV_DEGDMS(REAL(DEC),DECS)
-          CALL IMG_WORLDTOECL(XW,YW,ELON,ELAT,STATUS)
-          CALL IMG_WORLDTOGAL(XW,YW,GLON,GLAT,STATUS)
 
 *  get pixel numbers for box being inspected
           IX=INT(XP+0.5)
@@ -684,15 +679,11 @@
 
           ENDDO
 
-
-          CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
-          CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
-          CALL NBS_PUT_CVALUE(RAID,0,RAS,STATUS)
-          CALL NBS_PUT_CVALUE(DECID,0,DECS,STATUS)
-          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+          CALL IMG_SETPOS(XW,YW,STATUS)
 
         ENDDO
 
+        CALL IMG_SETPOS(X,Y,STATUS)
 
       ENDIF
 
