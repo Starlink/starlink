@@ -4046,17 +4046,16 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         PARAMETER              ( S1 = 2.1858,          ! in arcsec
 c     :                           S2 = 4.0419,
      :	                         S3 = 31.69 )
-      REAL                     NORM                    ! Normalisation
-        PARAMETER              ( NORM = 1.0 )
       REAL                     RTOS                    ! Radian to arcsec
         PARAMETER              ( RTOS = MATH__RTOD*3600.0 )
 *
 *    Local variables :
 *
       REAL                     LNORM                   ! Normalisation constant
+      REAL			NORM,N1
       REAL                     P_SCALE                 ! Scale size of psf
       REAL			ROFF 			! Off axis angle
-      REAL                     RPS                     ! Radius of sub-pix ^ 2
+      REAL                     RPS_R,RPS                     ! Radius of sub-pix ^ 2
       REAL                     S1_2, S2_2              !
       REAL                     SDX, SDY                ! Sub-pixel bin sizes
       REAL                     SUM                     ! Cumulative value
@@ -4091,6 +4090,14 @@ c     :                           S2 = 4.0419,
 
 *    Compute S2
       S2 = 3.3 + 0.019 * ROFF - 0.016 * ROFF**2 + 0.0044 * ROFF**3
+
+*    Compute the normalisation. This was found by integrating the
+*    above formulae out to a distance of 100 arcsec
+      N1 = 750.0 + 4.31818 * ROFF - 3.63636*ROFF**2 + ROFF**3
+      NORM = 10.6971 * MATH__PI +
+     :       6.96186E-6 * MATH__PI * N1*N1 -
+     :       6.96186E-6 * MATH__PI * N1*N1 /
+     :       EXP(5000.0/(S2*S2))
 
 *    A few variables to speed things up
       S1_2 = -0.5 / S1**2
@@ -4157,9 +4164,10 @@ c     :                           S2 = 4.0419,
 
 *            Radius of sub-pixel squared
               RPS = (XPS-X0)**2 + YPS2
+              RPS_R = SQRT(RPS)*RTOS
 
 *            Value of gaussian
-              SUM = SUM + HFUNC( RPS*RTOS*RTOS )
+              IF ( RPS_R .LE. 100.0) SUM=SUM+HFUNC( RPS*RTOS*RTOS )
 
 *            Next sub-pixel
               XPS = XPS + SDX
