@@ -30,10 +30,10 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION='IBOX Version 1.7-0')
 *-
+      CALL USI_INIT()
 
       CALL MSG_PRNT(VERSION)
 
-      CALL USI_INIT()
 
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
@@ -47,6 +47,7 @@
 *  get box position
         CALL IMG_GETBOX('XCENT','YCENT','XWID','YWID',XC,YC,DX,DY,
      :                                                      STATUS)
+	print *,'A'
 *  set region mask
         CALL IMG_SETWHOLE(STATUS)
         CALL IMG_SETBOX(XC,YC,DX,DY,STATUS)
