@@ -71,7 +71,9 @@
       CHARACTER RANAM*30         ! Column names for RA values
       CHARACTER TEXT*(MXCOL*(VAL__SZD+3)+5)  ! A text buffer
       CHARACTER WORDS(MXCOL)*(VAL__SZD+3) ! Words in a row of data 
+      INTEGER CNAMTY(MXCOL)      ! Column types in ref catalogue
       INTEGER COLID( MXCOL )     ! Output column ID for for each tcl col
+      INTEGER COLTYP( MXCOL )    ! Output column data type for for each tcl col
       INTEGER DECCOL             ! Zero based index of DEC column in Tcl file
       INTEGER DECGID             ! Column id for DEC col
       INTEGER GI( MXCOL )        ! Column identifier in ref catalogue
@@ -114,6 +116,7 @@
       DO L = 1, NCOLCI
          CALL CAT_TNDNT( CIOUT, CAT__FITYP, L, GI( L ), STATUS ) 
          CALL CAT_TIQAC( GI( L ), 'NAME', CNAMCI( L ), STATUS ) 
+         CALL CAT_TIQAI( GI( L ), 'DTYPE', CNAMTY( L ), STATUS ) 
       END DO
 
 *  Create a Tcl interpreter and execute the script in the supplied file.
@@ -164,6 +167,15 @@
             IF( CNAM( J ) .EQ. CNAMCI( L ) ) THEN
                JCOLCI( L ) = J 
                COLID( J ) = GI( L )
+               IF( CNAMTY( L ) .EQ. CAT__TYPEI ) THEN
+                  COLTYP( J ) = 0
+               ELSE IF( CNAMTY( L ) .EQ. CAT__TYPER ) THEN
+                  COLTYP( J ) = 1
+               ELSE IF( CNAMTY( L ) .EQ. CAT__TYPED ) THEN
+                  COLTYP( J ) = 2
+               ELSE 
+                  COLTYP( J ) = 3
+               END IF
             END IF
          END DO
 
@@ -252,7 +264,8 @@
       END IF
 
 *  Read the row/column data into the catalogue.
-      CALL POL1_RDTDT( FILE, NCOL, COLID, RAGID, DECGID, CIOUT, STATUS )
+      CALL POL1_RDTDT( FILE, NCOL, COLID, COLTYP, RAGID, DECGID, CIOUT, 
+     :                 STATUS )
 
 *  Arrive here if an error occurs.
  999  CONTINUE      

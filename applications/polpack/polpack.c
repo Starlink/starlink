@@ -34,6 +34,7 @@
 
 #define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
+#define CVAL_LENGTH 80   
 
 extern F77_SUBROUTINE(grp_grpsz)( INTEGER(igrp), INTEGER(size),
                                   INTEGER(status) );
@@ -1329,9 +1330,9 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 
 
 F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
-                            INTEGER_ARRAY(COLID), INTEGER(RAGID),
-                            INTEGER(DECGID), INTEGER(CIOUT), INTEGER(STATUS) 
-                            TRAIL(FILNAM) ){
+                            INTEGER_ARRAY(COLID), INTEGER_ARRAY(COLTYP), 
+                            INTEGER(RAGID), INTEGER(DECGID), INTEGER(CIOUT), 
+                            INTEGER(STATUS) TRAIL(FILNAM) ){
 /*
 *  Name:
 *     POL1_TDTDT
@@ -1355,6 +1356,9 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 *        column. Columns which are not required in the CAT catalogue
 *        should be assigned the value -1. All columns are assumed to be
 *        floating point. The precision of each is given by PREC.
+*     COLTYP( NCOL ) = INTEGER (Given)
+*        The data type for each column; 0 = integer, 1 = single precision, 
+*        2 = double precision, 3 = string.
 *     RAGID = INTEGER (Given)
 *        The CAT identifier for the RA column. Set to -1 if there is no
 *        RA column.
@@ -1384,6 +1388,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    GENPTR_CHARACTER(FILNAM)
    GENPTR_INTEGER(NCOL)
    GENPTR_INTEGER_ARRAY(COLID)
+   GENPTR_INTEGER_ARRAY(COLTYP)
    GENPTR_INTEGER(RAGID)
    GENPTR_INTEGER(DECGID)
    GENPTR_INTEGER(CIOUT)
@@ -1392,13 +1397,15 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 /* Local Variables: */
    DECLARE_LOGICAL(no);
    DECLARE_INTEGER(gid);
-   DECLARE_REAL(val);
+   DECLARE_INTEGER(ival);
+   DECLARE_REAL(rval);
    DECLARE_DOUBLE(dval);
+   DECLARE_CHARACTER(cval,CVAL_LENGTH);
    char mess[255];
    char *file;
-   int i, ok, n, use, nc, found;
+   int i, ok, n, use, nc, found, type;
    char buf[81];
-   char numbuf[81];
+   char txtbuf[81];
    char *p, *e, *q, *key, *pkey;
    FILE *fd;
 
@@ -1426,7 +1433,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
       e = buf + 81;
       p = e;
       ok = 0;
-      q = numbuf;
+      q = txtbuf;
       *q = 0;
       nc = 0;
       key = "set data_";
@@ -1476,7 +1483,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
                }
 
 /*  If we have not yet found the key string, loop round for a new buffer. 
-    Otherwise, indicate that we can now continue to read numerical values. */
+    Otherwise, indicate that we can now continue to read column values. */
                if( !found ){
                   continue;
                } else {
@@ -1488,38 +1495,71 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
             }
          } 
 
-/*  Count how many number characters there are at the start of the
+/*  Count how many usable characters there are at the start of the
     remaining part of the buffer. */
-         use = strspn( p, "0123456789.-+DEde" );
+         use = strcspn( p, " \\\n\"{}" );
    
-/*  If any, copy them to the number buffer. */
+/*  If any, copy them to the text buffer. */
          if( use ) {
             memcpy( q, p, use );
             p += use;
             q += use;
          }
    
-/*  If we are still within the buffer, store the number in the number
+/*  If we are still within the buffer, store the value in the text
     buffer in the current row buffer for the output catalogue. */
          if( *p ){
             *q = 0;
-            if( numbuf[0] ) {
+            if( txtbuf[0] ) {
                gid = COLID[nc];
+
+/* Check the column is required. */
                if( gid != -1 ) {
 
-/* Store most columns in single precision. */
-                  if( gid != *RAGID && gid != *DECGID ) {
-                     if( sscanf( numbuf, "%f", &val ) == 0 ) break;
-                     F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&val),
-                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+/* Get the column type; 0 = integer, 1 = single precision, 2 = double 
+   precision, 3 = string. */
+                  type = COLTYP[nc];
 
 /* Convert RA and DEC values from hours/degs to radians as required by the 
-   CAT library, and store in double precision. */
-                  } else {
-                     if( sscanf( numbuf, "%lf", &dval ) == 0 ) break;
-                     dval *= DTOR;
+   CAT library, and store in single or double precision. */
+                  if( gid == *RAGID || gid == *DECGID ) {
+                     if( type == 1 ) {  
+                        if( sscanf( txtbuf, "%lf", &dval ) == 0 ) break;
+                        dval *= DTOR;
+                        F77_CALL(cat_put0d)( INTEGER_ARG(&gid), DOUBLE_ARG(&dval),
+                                       LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+
+                     } else if( type == 2 ) {  
+                        if( sscanf( txtbuf, "%f", &rval ) == 0 ) break;
+                        rval *= DTOR;
+                        F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&rval),
+                                       LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                     }
+
+/* Write out integer column values. */
+                  } else if( type == 0 ) {
+                     if( sscanf( txtbuf, "%d", &ival ) == 0 ) break;
+                     F77_CALL(cat_put0i)( INTEGER_ARG(&gid), INTEGER_ARG(&ival),
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+
+/* Write out single precision column values. */
+                  } else if( type == 1 ) {
+                     if( sscanf( txtbuf, "%f", &rval ) == 0 ) break;
+                     F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&rval),
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+
+/* Write out double precision column values. */
+                  } else if( type == 2 ) {
+                     if( sscanf( txtbuf, "%lf", &dval ) == 0 ) break;
                      F77_CALL(cat_put0d)( INTEGER_ARG(&gid), DOUBLE_ARG(&dval),
                                     LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+
+/* Write out string column values. */
+                  } else {
+                     cnfExprt( txtbuf, cval, cval_length );
+                     F77_CALL(cat_put0c)( INTEGER_ARG(&gid), 
+                                       CHARACTER_ARG(cval), LOGICAL_ARG(&no), 
+                                       INTEGER_ARG(STATUS) TRAIL_ARG(cval) ); 
                   }
                   if( *STATUS != SAI__OK ) break;
                }
@@ -1533,10 +1573,10 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
                }
 
             }
-            q = numbuf;
+            q = txtbuf;
    
-/*  Skip fowward to the next number character */
-            p += strcspn( p, "0123456789.-+DEde" );
+/*  Skip forward to the next usable character */
+            p += strspn( p, " \\\n\"{}" );
    
          }
 
