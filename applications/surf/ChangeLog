@@ -1,3 +1,14 @@
+1999-07-14  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* src/surf_add_dbm.f (SURF_ADD_DBM): Support 3 beams
+
+	* surflib/surflib_calc_chopped_image.f (SURFLIB_CALC_CHOPPED_IMAGE): 
+	convert from surflib_calc_dual_beam so that it handles 3 beams.
+
+1999-07-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	Release SURF V1.4-2 to community (not Starlink)
+	
 1999-07-14  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_rebin.f (SURF_REBIN):  Pass LAT_OBS into
