@@ -1247,7 +1247,9 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
                   [{extern void f_setarg(int,char**); f_setarg(argc, argv);}])
         ;;
-      *) ;;
+      *) 
+        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])
+        ;;
     esac
 dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
 dnl                       $star_cv_initialise_fortran)
