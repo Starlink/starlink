@@ -43,7 +43,7 @@
 #include	<string.h>
 
 #include	"define.h"
-#include        "mydefs.h"
+/*#include        "mydefs.h"*/
 #include	"globals.h"
 #include	"prefs.h"
 #include	"fits/fitscat.h"

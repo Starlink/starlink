@@ -10,6 +10,9 @@
 *	Contents:	functions dealing with background computation.
 *
 *	Last modify:	02/04/2003
+*                       16/03/2004
+*                          (PWD): QFTELL and QFSEEK become NDFQFTELL 
+*                                 and NDFQFSEEK.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -69,9 +72,9 @@ void	makeback(picstruct *field, picstruct *wfield)
 
 /* Save current positions in files */
 
-  QFTELL(field->file, fcurpos, field->filename);
+  NDFQFTELL(field->file, fcurpos, field->filename);
   if (wfield)
-    QFTELL(wfield->file, wfcurpos, wfield->filename);
+    NDFQFTELL(wfield->file, wfcurpos, wfield->filename);
 
 /* Allocate a correct amount of memory to store pixels */
 
@@ -156,9 +159,9 @@ void	makeback(picstruct *field, picstruct *wfield)
     else
       {
 /*---- Image size too big, we have to skip a few data !*/
-      QFTELL(field->file, fcurpos2, field->filename);
+      NDFQFTELL(field->file, fcurpos2, field->filename);
       if (wfield)
-        QFTELL(wfield->file, wfcurpos2, wfield->filename);
+        NDFQFTELL(wfield->file, wfcurpos2, wfield->filename);
       if (j == ny-1 && (n=field->height%field->backh))
         {
         meshsize = n*(size_t)w;
@@ -177,35 +180,35 @@ void	makeback(picstruct *field, picstruct *wfield)
         }
 
 /*---- Read and skip, read and skip, etc... */
-      QFSEEK(field->file, bufshift*(OFF_T)field->bytepix, SEEK_CUR,
+      NDFQFSEEK(field->file, bufshift*(OFF_T)field->bytepix, SEEK_CUR,
 		field->filename);
       buft = buf;
       for (i=nlines; i--; buft += w)
         {
         readdata(field, buft, w);
         if (i)
-          QFSEEK(field->file, jumpsize*(OFF_T)field->bytepix, SEEK_CUR,
-		field->filename);
+          NDFQFSEEK(field->file, jumpsize*(OFF_T)field->bytepix, SEEK_CUR,
+                    field->filename);
         }
 
       if (wfield)
         {
 /*------ Read and skip, read and skip, etc... now on the weight-map */
-        QFSEEK(wfield->file, bufshift*(OFF_T)wfield->bytepix, SEEK_CUR,
-		wfield->filename);
+        NDFQFSEEK(wfield->file, bufshift*(OFF_T)wfield->bytepix, SEEK_CUR,
+                  wfield->filename);
         wbuft = wbuf;
         for (i=nlines; i--; wbuft += w)
           {
           readdata(wfield, wbuft, w);
           weight_to_var(wfield, wbuft, w);
           if (i)
-            QFSEEK(wfield->file, jumpsize*(OFF_T)wfield->bytepix, SEEK_CUR,
-		wfield->filename);
+              NDFQFSEEK(wfield->file, jumpsize*(OFF_T)wfield->bytepix, 
+                        SEEK_CUR, wfield->filename);
           }
         }
       backstat(backmesh, wbackmesh, buf, wbuf, bufsize, nx, w, bw,
 	wfield?wfield->weight_thresh:0.0);
-      QFSEEK(field->file, fcurpos2, SEEK_SET, field->filename);
+      NDFQFSEEK(field->file, fcurpos2, SEEK_SET, field->filename);
       bm = backmesh;
       for (m=nx; m--; bm++)
         if (bm->mean <= -BIG)
@@ -214,7 +217,7 @@ void	makeback(picstruct *field, picstruct *wfield)
           QCALLOC(bm->histo, LONG, bm->nlevels);
       if (wfield)
         {
-        QFSEEK(wfield->file, wfcurpos2, SEEK_SET, wfield->filename);
+        NDFQFSEEK(wfield->file, wfcurpos2, SEEK_SET, wfield->filename);
         wbm = wbackmesh;
         for (m=nx; m--; wbm++)
           if (wbm->mean <= -BIG)
@@ -268,9 +271,9 @@ void	makeback(picstruct *field, picstruct *wfield)
     }
 
 /* Go back to the original position */
-  QFSEEK(field->file, fcurpos, SEEK_SET, field->filename);
+  NDFQFSEEK(field->file, fcurpos, SEEK_SET, field->filename);
   if (wfield)
-    QFSEEK(wfield->file, wfcurpos, SEEK_SET, wfield->filename);
+    NDFQFSEEK(wfield->file, wfcurpos, SEEK_SET, wfield->filename);
 
 /* Median-filter and check suitability of the background map */
   NFPRINTF(OUTPUT, "Filtering background map(s)");

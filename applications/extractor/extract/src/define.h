@@ -25,6 +25,11 @@
 *                          Added NRAD define
 *	Last modify:	13/12/2002
 *                          (EB): 2.3
+*                       16/03/2004
+*                          (PWD): added NDFQFSEEK and NDFQFTELL. QFSEEK
+*                                 and QFTELL are used by catalogue handling
+*                                 now, so we need to differentiate.
+*                                 
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -170,7 +175,7 @@
 		if (fwrite(ptr, (size_t)(size), (size_t)1, afile)!=1) \
 		  error(EXIT_FAILURE, "*Error* while writing ", fname)
 
-/*#define	QFSEEK(afile, offset, pos, fname) \
+#define	QFSEEK(afile, offset, pos, fname) \
 		if (FSEEKO(afile, (offset), pos)) \
 		  error(EXIT_FAILURE,"*Error*: file positioning failed in ", \
 			fname)
@@ -179,13 +184,12 @@
 		if ((pos=FTELLO(afile))==-1) \
 		  error(EXIT_FAILURE,"*Error*: file position unknown in ", \
 			fname)
-*/
 
-#define	QFSEEK(afile, offset, pos, fname) \
-                afile = offset
+#define	NDFQFSEEK(afile, offset, pos, fname) \
+                  afile = offset
 
-#define	QFTELL(pos, afile, fname) \
-                pos = afile
+#define	NDFQFTELL(pos, afile, fname) \
+                  pos = afile
 
 #define	QCALLOC(ptr, typ, nel) \
 		{if (!(ptr = (typ *)calloc((size_t)(nel),sizeof(typ)))) \

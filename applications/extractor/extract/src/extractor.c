@@ -138,17 +138,18 @@
 #include        "par.h"
 #include        "ndf.h"
 #include        "prefs.h"
-#include        "preflist.h"
 
 /* Maximum number of NAME/VALUE pairs */
 #define MAXARGS 20
 /* Maximum length of a return parameter value (NAME/VALUE/IMAGE)*/
 #define VALUELEN 256
 
+extern const char       notokstr[];
+
 /* Global variables: */
 jmp_buf env;          /*  Program environment when setjmp called */
 
-void extractor( int *status ) {
+void real_extractor( int *status ) {
 
   /* Declarations */
   int keywords=0;          /*  Prompt for interactive parameters */
@@ -249,4 +250,16 @@ void extractor( int *status ) {
        files at this point.... */
     errStat( status );
   }
+}
+
+/* Atask wrapper */
+
+#include "f77.h"
+
+F77_SUBROUTINE(extractor)(INTEGER(fstatus)) {
+    int status;
+    F77_IMPORT_INTEGER(*fstatus,status);
+    real_extractor(&status);
+    F77_EXPORT_INTEGER(status,*fstatus);
+    return;
 }
