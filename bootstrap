@@ -1,9 +1,16 @@
 #! /bin/sh -
 # Top level bootstrap file.
-# This is not a starconf bootstrap file.
+# This is not a standard starconf bootstrap file.
 
-# starconf uses the value of STARCONF_DEFAULT_STARLINK
-# during its configuration
+# Starconf uses the value of STARCONF_DEFAULT_{PREFIX,STARLINK}
+# during its configuration.  We setthese here, unless they're set
+# in the environment.  Starconf's configure.ac sets these anyway, and
+# defaults them in a way which is similar or identical to what we do
+# here, however it makes sense to make this explicit.
+#
+# See starconf's configure.ac and starconf.m4.in for discussion of
+# these variables.  Command `starconf --show --all' shows the values
+# that starconf finally ends up with.
 if test "X$STARCONF_DEFAULT_STARLINK" = X; then
     for d in "$STARLINK" /star
     do
@@ -13,13 +20,26 @@ if test "X$STARCONF_DEFAULT_STARLINK" = X; then
         fi
     done
 fi
-export STARCONF_DEFAULT_STARLINK
-echo "Bootstrapping with STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK"
+if test "X$STARCONF_DEFAULT_PREFIX" = X; then
+    for d in "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /star
+    do
+        if test -n "$d"; then
+            STARCONF_DEFAULT_PREFIX=$d
+            break
+        fi
+    done
+fi
 
 # Makefile.dependencies uses BUILDSUPPORT_PREFIX to configure
 # the buildsupport tools
-BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_STARLINK/buildsupport
-echo "Bootstrapping with BUILDSUPPORT_PREFIX=$BUILDSUPPORT_PREFIX"
+BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_PREFIX/buildsupport
+
+# Let the user know what we've decided
+echo "Bootstrapping with"
+echo "    STARCONF_DEFAULT_STARLINK = $STARCONF_DEFAULT_STARLINK"
+echo "    STARCONF_DEFAULT_PREFIX   = $STARCONF_DEFAULT_PREFIX"
+echo "    BUILDSUPPORT_PREFIX       = $BUILDSUPPORT_PREFIX"
+
 
 # We invoke autoconf below, so must make sure it's on the path,
 # and this directory must be on the path before bootstrapping the 
@@ -27,34 +47,76 @@ echo "Bootstrapping with BUILDSUPPORT_PREFIX=$BUILDSUPPORT_PREFIX"
 PATH=$BUILDSUPPORT_PREFIX/bin:$PATH
 
 # Configure and build the bootstrap utilities.
-# We make a temporary makefile so that the following can run without
-# being configured.
+# We make a temporary makefile from Makefile.in, which can be used,
+# unconfigured, below.
 tempmakefile=Makefile.tmp
+rm -f $tempmakefile
+
+# Make sure that Makefile.dependencies is newer than Makefile.in -- if
+# not, then make tries to rebuild it, which fails at bootstrap time
+# because GenerateDependencies cannot be built yet (unconfigured)
+touch Makefile.dependencies
+
 sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 (
+
     MISSING_SUPPRESS_RUN=true
-    STAR_MANIFEST_DIR=$STARCONF_DEFAULT_STARLINK/manifests
-    export MISSING_SUPPRESS_RUN BUILDSUPPORT_PREFIX STAR_MANIFEST_DIR PATH
+    STAR_MANIFEST_DIR=$STARCONF_DEFAULT_PREFIX/manifests
+    # Export these to subprocesses.
+    # These are referred to in configure scripts
+    export STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX STAR_MANIFEST_DIR
+    # Referred to in (Starlink-specific) `missing' scripts
+    export MISSING_SUPPRESS_RUN
+    # Referred to in Makefile.dependencies for buildsupport tools
+    export BUILDSUPPORT_PREFIX
+    # The commands run within makefiles must use the correct buildsupport tools
+    export PATH
+
     echo "Bootstrapping buildsupport:"
     echo "    make -f $tempmakefile \\"
     echo "        prefix=$BUILDSUPPORT_PREFIX \\"
     echo "        MANIFEST=$STAR_MANIFEST_DIR \\"
     echo "        buildsupport"
+
     make -f $tempmakefile \
         prefix=$BUILDSUPPORT_PREFIX \
         MANIFEST=$STAR_MANIFEST_DIR \
         buildsupport
+
 ) || { echo "Failed to make buildsupport"; exit 1; }
 rm -f $tempmakefile
+
 
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
 
-if test -f configure; then
-    : OK
-else
-    echorun autoconf
-fi
+
+# Bootstrap any child directories (before running autoreconf).  Each
+# bootstrap file potentially calls autoreconf, and this can take a
+# while.  It's unnecessary, too, since we're about to call autoreconf
+# here, and that will work in all the children.  So set
+# STAR_SUPPRESS_AUTORECONF and export it: all the (standard, starconf)
+# bootstrap files are written so as to suppress their call of
+# autoreconf if that variable is true in the environment.
+STAR_SUPPRESS_AUTORECONF=true
+export STAR_SUPPRESS_AUTORECONF
+for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
+do
+    if test -n "$d" -a -d "$d"; then
+        echo "BOOTSTRAPPING $d..."
+        (cd $d; ./bootstrap)
+    fi
+done
+
+
+# NOW do the autoreconf in all the children
+# First, make sure that the config directory (referred to in configure.ac)
+# does exist
+test -d config || mkdir config
+
+# (Re)configure, installing missing files
+echorun autoreconf --install --symlink
+
 # The default prefix in this configure file MUST be consistent with
 # that in starconf.  The configure.ac has the default prefix set to
 # %%PREFIX%%, which is not a directory; therefore we must substitute
@@ -72,28 +134,14 @@ if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
 fi
 
 
-# Bootstrap any child directories.  Each bootstrap file potentially
-# calls autoreconf, and this can take a while.  It's unnecessary, too,
-# since we're about to call autoreconf here, and that will work in all
-# the children.  So set STAR_SUPPRESS_AUTORECONF and export it: all
-# the (standard) bootstrap files are written so as to suppress that
-# autoreconf run if that variable is true in the environment.
-STAR_SUPPRESS_AUTORECONF=true
-export STAR_SUPPRESS_AUTORECONF
-for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
+# Make sure that the config directory has its install-sh (I'm slightly
+# surprised that autoreconf doesn't add these -- ought I to be?).
+# Note that these copy the target file, not the link; copying the link doesn't
+# seem to be possible to do in a portable way (no big deal).
+for f in install-sh missing
 do
-    if test -n "$d" -a -d "$d"; then
-        echo "BOOTSTRAPPING $d..."
-        (cd $d; ./bootstrap)
-    fi
+    test -f config/$f || cp libraries/$f config
 done
 
-# NOW do the autoreconf in all the children
-echorun autoreconf
-if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
-    def=`starconf --show STARCONF_DEFAULT_PREFIX`
-    test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
-    echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
-fi
 
 exit 0
