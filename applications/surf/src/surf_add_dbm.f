@@ -20,13 +20,22 @@
 *        The global status
  
 *  Description:
-*     Create a dual beam map from a single beam input map.
-*     Simply finds the signal detected at each pixel by looking
-*     at the difference between the pixels nearest to each chop
-*     beam. This calculates a middle beam response. (ie the response
-*     at each pixel is the difference between the L and the R
-*     beams).
+*     Create a chopped image from a single beam input map.
+*     Can be used to create a dual-beam map (eg a simulated
+*     scan map image) or a triple-beam map (eg a simulated
+*     jiggle map image). 
+
+*     For dual-beam it simply finds the signal detected at each 
+*     pixel by looking at the difference between the pixels nearest 
+*     to each chop beam. This calculates a middle beam response. 
+*     (ie the response at each pixel is the difference between the 
+*     L and the R beams). 
 *
+*     For the triple-beam response the signal is the difference
+*     between the middle pixel and half the values measured
+*     in the negative beams. Set NBEAMS to 3 to use triple-beam
+*     response.
+
 *     This task can be used to generate test data for REMDBM.
 
 *  Usage:
@@ -42,6 +51,10 @@
 *     MSG_FILTER = CHAR (Read)
 *        Message filter level. Options are QUIET, NORMAL and
 *        VERBOSE. Default is NORM.
+*     NBEAMS = INTEGER (Read)
+*        When NBEAMS=2 a dual-beam response is calculated. When
+*        NBEAMS=3 a triple-beam response is calculated. Default 
+*        is 3.
 *     OUT = NDF (Write)
 *        Output Dual beam image. Default output name is input name
 *        plus _dbm_int(pa)_int(chop). 
@@ -57,10 +70,13 @@
 *        (if present).
 
 *  Examples:
-*     add_dbm gaussian 0 30 dbm_out
+*     add_dbm gaussian 0 30 dbm_out \
 *       Generate a dual beam image from the single beam 'gaussian'
 *       input NDF using a 30 pixel chop at 0 degrees. Write the
 *       resulting image to dbm_out.sdf.
+*     add_dbm image 90 45 3bm_out nbeams=3
+*       Generate a triple-beam image with throw 45 and position angle
+*       90 degrees.
 
 *  Notes:
 *     - The output images are compatible with REMDBM.
@@ -70,7 +86,9 @@
 *     - If a quality array is present in the input image it is used
 *       to generate a bad pixel mask in the output image and is removed.
 *     - Bad pixels in the input image are treated as zeroes for the
-*       dual beam calculation.
+*       dual beam calculation. For the triple beam calculation
+*       bad pixels are reatained when present in the middle beam
+*       but converted to zero in the other beams.
 
 *  Related Applications:
 *     SURF: REMDBM
@@ -80,6 +98,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.7  1999/07/14 21:53:55  timj
+*     Add triple beam support
+*
 *     Revision 1.6  1999/06/19 03:01:49  timj
 *     Minor doc patch
 *
@@ -139,6 +160,7 @@
       INTEGER IN_VARIANCE_PTR   ! Pointer to input variance
       INTEGER IPOSN             ! Position in string
       INTEGER ITEMP             ! Temporary integer
+      INTEGER NBEAMS            ! 2 or 3 beams
       INTEGER NDIM              ! Number of dimensions in NDF
       INTEGER N_FITS            ! Number of FITS keywords
       CHARACTER *132 OUTFILE    ! Output filename
@@ -151,9 +173,12 @@
       LOGICAL STATE             ! Is there a  variance array?
       CHARACTER * 80 STEMP      ! Scratch string
       CHARACTER * 15 SUFFIX_STRINGS(SCUBA__N_SUFFIX)
+      CHARACTER * 15 SUFFIX_STRINGS2(SCUBA__N_SUFFIX)
+      CHARACTER * 15 SUFFIX_STRINGS3(SCUBA__N_SUFFIX)
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'!_dbm','2','_dbm'/
+      DATA SUFFIX_STRINGS2 /'!_dbm','2','_dbm'/
+      DATA SUFFIX_STRINGS3 /'!_3bm','3','_3bm'/
 
 *.
 
@@ -182,6 +207,20 @@
          END IF
       END IF
 
+*     Get the beam number
+      CALL PAR_GDR0I('NBEAMS', 2, 2, 3, .TRUE., NBEAMS, STATUS)
+
+*     Select the suffix strings
+      IF (NBEAMS .EQ. 2) THEN
+         DO I = 1, SCUBA__N_SUFFIX
+            SUFFIX_STRINGS(I) = SUFFIX_STRINGS2(I)
+         END DO
+      ELSE
+         DO I = 1, SCUBA__N_SUFFIX
+            SUFFIX_STRINGS(I) = SUFFIX_STRINGS3(I)
+         END DO         
+      END IF
+
 *     Get the chop throw and position angle
 *     Doing a sanity check on the chop throw
       CALL PAR_GDR0R('CHOP', -1.0, 1.0, REAL(MAX(DIM(1),DIM(2))), 
@@ -205,6 +244,7 @@
          CALL CHR_APPND(STEMP, CSUFFIX, IPOSN)
       END IF
 
+*     Add the chop and pa to the suffices
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, SCUBA__N_SUFFIX
             IPOSN = CHR_LEN(SUFFIX_STRINGS(I))
@@ -250,8 +290,8 @@
       END IF
 
 *     Call the dual beam subroutine
-      CALL SURFLIB_CALC_DUAL_BEAM(CHOP_THROW, CHOP_PA, DIM(1), 
-     :     DIM(2), %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
+      CALL SURFLIB_CALC_CHOPPED_IMAGE(NBEAMS, CHOP_THROW, CHOP_PA, 
+     :     DIM(1), DIM(2), %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
      :     STATE, %VAL(IN_DATA_PTR), %VAL(OUT_VARIANCE_PTR), 
      :     STATUS)
 
