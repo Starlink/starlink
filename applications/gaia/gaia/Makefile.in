@@ -61,23 +61,23 @@ TCLTKLIBS = @ITK_LIB_SPEC@ \
             @TCL_LIB_SPEC@
 
 # Tclutil library
-TCLUTIL_LIB          = @TCLUTIL_LIB@
+TCLUTIL_LIB          = -ltclutil
 TCLUTIL_LIB_STATIC   = @TCLUTIL_LIB_STATIC@
 
 # Astrotcl library
-ASTROTCL_LIB         = @ASTROTCL_LIB@
+ASTROTCL_LIB         = -lastrotcl
 ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
 
 # Rtd library
-RTD_LIB              = @RTD_LIB@
+RTD_LIB              = -lrtd
 RTD_LIB_STATIC       = @RTD_LIB_STATIC@
 
 # Catalog library
-CAT_LIB              = @CAT_LIB@
+CAT_LIB              = -lcat
 CAT_LIB_STATIC       = @CAT_LIB_STATIC@
 
 # Skycat libraries
-SKYCAT_LIB	     = @SKYCAT_LIB@
+SKYCAT_LIB	     = -lskycat
 SKYCAT_LIB_STATIC    = @SKYCAT_LIB_STATIC@
 
 #  Local library.
@@ -90,7 +90,7 @@ SHLIB_SUFFIX=@SHLIB_SUFFIX@
 SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
 DL_LIBS=@DL_LIBS@
 LD_FLAGS=@LD_FLAGS@
-LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@ -L$(LIBDIR)
 LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
 
 # ------------------------------------------------------------------------
@@ -149,13 +149,15 @@ LN 	     = ln -s
 all: $(demo_wish) $(demo_tcl) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
 	$(asc2tab) $(tab2asc)
 
+#  Link wish. Note AST_LIBS go first as we need to use some routines
+#  from it in preference to those in Skycat (proj.o and wcstrig.o).
 $(demo_wish): normallib tkAppInit.o FORCE
 	@echo "linking \"$(demo_wish)\"..."
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
-	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) \
+	       $(AST_LIBS) $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB) \
 	       $(ADDLIBS) $(AST_LIBS) \
-	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
-	       $(TCLUTIL_LIB_STATIC) $(LOCAL_LIBRARY) $(ADDLIBS) \
+	       $(RTD_LIB) $(ASTROTCL_LIB) \
+	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
 
