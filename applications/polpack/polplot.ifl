@@ -19,7 +19,7 @@ interface POLPLOT
 
    helplib        'POLPACK_HELP:'
 
-   parameter      ANGROT         # Angle to add on to vector orientations
+   parameter      ANGROT         
       type        '_REAL'
       prompt      'Angle by which to rotate the vectors (in degrees)'
       vpath       'DEFAULT'
@@ -28,7 +28,7 @@ interface POLPLOT
       default     0.0
    endparameter
 
-   parameter      ARROW         # Size of arrow head.
+   parameter      ARROW         
       type        '_REAL'
       prompt      'Fractional size of arrow heads'
       vpath       'DEFAULT'
@@ -37,7 +37,7 @@ interface POLPLOT
       default     0.0
    endparameter
 
-   parameter      AXES           # Axes or no axes?
+   parameter      AXES           
       type        '_LOGICAL'
       prompt      'Are annotated axes to be drawn?'
       vpath       'DEFAULT'
@@ -53,7 +53,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      CLEAR          # Clear before plotting?
+   parameter      CLEAR          
       type        '_LOGICAL'
       vpath       'DEFAULT'
       prompt      'Is the current picture to be cleared before plotting?'
@@ -97,7 +97,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      COSYS          # Co-ordinate system
+   parameter      COSYS          
       type        'LITERAL'
       ppath       'DEFAULT'
       vpath       'DEFAULT'
@@ -106,7 +106,7 @@ interface POLPLOT
       default     !
    endparameter
 
-   parameter      DEVICE         # Graphics device
+   parameter      DEVICE         
       ptype       'DEVICE'
       vpath       'GLOBAL,PROMPT'
       ppath       'GLOBAL,CURRENT'
@@ -115,7 +115,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      FILL           # Fill the plotting region?
+   parameter      FILL           
       type        '_LOGICAL'
       prompt      'Fill the plotting area?'
       vpath       'DEFAULT'
@@ -123,7 +123,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      JUST           # Vector justification
+   parameter      JUST           
       type        'LITERAL'
       vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
@@ -133,7 +133,7 @@ interface POLPLOT
 #     in          'CENTRE', 'START', 'END'
    endparameter
 
-   parameter      KEY            # Plot a key?
+   parameter      KEY            
       type        '_LOGICAL'
       prompt      'Do you want a key showing the vector scale?'
       vpath       'DEFAULT'
@@ -142,7 +142,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      KEYPOS         # Horizontal and vertical position of key
+   parameter      KEYPOS         
       type        '_REAL'
       prompt      'Horizontal and vertical position of key'
       vpath       'DEFAULT'
@@ -151,7 +151,7 @@ interface POLPLOT
       default     0.15
    endparameter
 
-   parameter      KEYSTYLE       # Style for key
+   parameter      KEYSTYLE       
       type        'LITERAL'
       ppath       'DEFAULT'
       vpath       'DEFAULT'
@@ -160,7 +160,7 @@ interface POLPLOT
       default     !
    endparameter
 
-   parameter      KEYVEC         # Key vector magnitude
+   parameter      KEYVEC         
       type        '_REAL'
       prompt      'Key vector magnitude'
       vpath       'DYNAMIC'
@@ -168,7 +168,15 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      PXSIZE         # X size of plot
+   parameter      LBND
+      type        '_REAL'
+      prompt      'Co-ordinates at lower left corner of plotting area'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      PXSIZE         
       type        '_REAL'
       prompt      'Size of the plot in the x-direction in metres'
       vpath       'DYNAMIC'
@@ -176,7 +184,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      PYSIZE         # Y size of plot
+   parameter      PYSIZE         
       type        '_REAL'
       prompt      'Size of the plot in the y-direction in metres'
       vpath       'DYNAMIC'
@@ -184,7 +192,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      STYLE          # Plotting style
+   parameter      STYLE          
       type        'LITERAL'
       ppath       'DEFAULT'
       vpath       'DEFAULT'
@@ -193,7 +201,15 @@ interface POLPLOT
       default     !
    endparameter
 
-   parameter      VSCALE         # Vector scale, centimetres per data unit
+   parameter      UBND
+      type        '_REAL'
+      prompt      'Co-ordinates at upper right corner of plotting area'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      VSCALE         
       type        '_REAL'
       prompt      'Data value for a 1-centimetre vector'
       ppath       'DYNAMIC'

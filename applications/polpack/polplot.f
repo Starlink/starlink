@@ -172,6 +172,11 @@
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
 *        lengths in the plot. []
+*     LBND(2) = _REAL (Given)
+*        The coordinates to put at the lower left corner of the plotting 
+*        area, in the coordinates system specified by parameters COLX and
+*        COLY. The suggested value just encloses all the data in the supplied
+*        catalogue. []
 *     PXSIZE = _REAL (Read)
 *        The length (x axis) of the plot in metres. [Maximum that can
 *        fit in the current picture whilst preserving square pixels]
@@ -189,6 +194,11 @@
 *        in the supplied catalogue, or inherited from the previous 
 *        invocation of POLPLOT. See application SETSTYLE. A null (!) value 
 *        causes defaults to be used for all attributes. [!]
+*     UBND(2) = _REAL (Given)
+*        The coordinates to put at the top right corner of the plotting 
+*        area, in the coordinates system specified by parameters COLX and
+*        COLY. The suggested value just encloses all the data in the supplied
+*        catalogue. []
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
@@ -331,6 +341,8 @@
       REAL ANGFAC                ! NDF2 data to radians conversion factor
       REAL ANGROT                ! Angle to add on to NDF2 values
       REAL ASPECT                ! Aspect ratio for new DATA pictures
+      REAL BLO( 2 )              ! Lower bounds of plotting space
+      REAL BHI( 2 )              ! Upper bounds of plotting space
       REAL CLIP( 4 )             ! Array of clipping limits
       REAL DEFSCA                ! Default value for VSCALE
       REAL DSCALE                ! Vector scale, viz. data units per pixel
@@ -461,10 +473,22 @@
 *  Extend these values slightly at each border.
       DX = 0.005*( SXHI - SXLO )
       DY = 0.005*( SYHI - SYLO )
-      BOX( 1 ) = SXLO - DX
-      BOX( 3 ) = SXHI + DX
-      BOX( 2 ) = SYLO - DY
-      BOX( 4 ) = SYHI + DY
+      BLO( 1 ) = SXLO - DX
+      BLO( 2 ) = SYLO - DY
+      BHI( 3 ) = SXHI + DX
+      BHI( 4 ) = SYHI + DY
+
+*  Allow the user to over-ride these values. 
+      CALL PAR_GDR1R( 'LBND', 2, BLO, -VAL__MAXR, VAL__MAXR, .FALSE.,
+     :                BLO, STATUS )
+      CALL PAR_GDR1R( 'UBND', 2, BHI, -VAL__MAXR, VAL__MAXR, .FALSE.,
+     :                BHI, STATUS )
+
+*  Produce double precision versions of these for use with AST.
+      BOX( 1 ) = DBLE( BLO( 1 ) )
+      BOX( 2 ) = DBLE( BLO( 2 ) )
+      BOX( 3 ) = DBLE( BHI( 1 ) )
+      BOX( 4 ) = DBLE( BHI( 2 ) )
 
 *  Get the aspect ratio of the box (assuming equal scales on each axis).
       ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
