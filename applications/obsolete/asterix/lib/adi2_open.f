@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_OPEN( FSPEC, MODE, ID, STATUS )
+      SUBROUTINE ADI2_OPEN( FID, MID, ID, STATUS )
 *+
 *  Name:
 *     ADI2_OPEN
@@ -11,7 +11,7 @@
 *     Fortran
 
 *  Invocation:
-*     CALL ADI2_OPEN( FSPEC, MODE, ID, STATUS )
+*     CALL ADI2_OPEN( FID, MID, ID, STATUS )
 
 *  Description:
 *     Attempts to open the named file object as an FITS file. If successful
@@ -19,9 +19,9 @@
 *     list of the ID object.
 
 *  Arguments:
-*     FSPEC = CHAR (Given)
+*     FID = INTEGER (Given)
 *        Name of the object on which FITS access to be attempted
-*     MODE = CHAR (Given)
+*     MID = CHAR (Given)
 *        File access mode
 *     ID = INTEGER (Given)
 *        ADI identifier of FileHandle object
@@ -50,12 +50,6 @@
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
-
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
 
 *  References:
 *     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
@@ -96,8 +90,10 @@
 
 *  Local Variables:
       CHARACTER*132		ERRTEXT			! FITS error text
+      CHARACTER*200		FSPEC			! File name
       CHARACTER*20		HDUTYPE			! HDU type
       CHARACTER*80		KEYWRD			! Keyword name
+      CHARACTER*6		MODE			! Access mode
 
       INTEGER			BSIZE			! FITS block size
       INTEGER			FITSTAT			! FITS inherited status
@@ -109,6 +105,11 @@
 
 *    Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Extract name and access mode
+      CALL ADI_GET0C( FID, FSPEC, STATUS )
+      FLEN = CHR_LEN( FSPEC )
+      CALL ADI_GET0C( MID, MODE, STATUS )
 
 *    Parse the file name
       CALL ADI2_PARSE( FSPEC, LFILEC, HDU, KEYWRD, STATUS )
