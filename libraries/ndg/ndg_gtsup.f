@@ -49,6 +49,8 @@
 *  History:
 *     6-SEP-1999 (DSB):
 *        Original version.
+*     22-FEB-2001 (DSB):
+*        Changed ".EQ. GRP__NOID" to ".NE. GRP__NOID" through out. 
 *     {enter_further_changes_here}
 
 *-
@@ -94,35 +96,35 @@
 
 *  Get the owner of the supplied group.
       CALL GRP_OWN( IGRP, IGRPD, STATUS )
-      IF( IGRPD .EQ. GRP__NOID ) THEN
+      IF( IGRPD .NE. GRP__NOID ) THEN
 
 *  Get the directory path from this group.
          CALL GRP_GET( IGRPD, I, 1, FIELDS( 5 ), STATUS )
 
 *  Get the owner of this group.
          CALL GRP_OWN( IGRPD, IGRPB, STATUS )
-         IF( IGRPB .EQ. GRP__NOID ) THEN
+         IF( IGRPB .NE. GRP__NOID ) THEN
 
 *  Get the base file name from this group.
             CALL GRP_GET( IGRPB, I, 1, FIELDS( 4 ), STATUS )
 
 *  Get the owner of this group.
             CALL GRP_OWN( IGRPB, IGRPT, STATUS )
-            IF( IGRPT .EQ. GRP__NOID ) THEN
+            IF( IGRPT .NE. GRP__NOID ) THEN
 
 *  Get the file type from this group.
                CALL GRP_GET( IGRPT, I, 1, FIELDS( 3 ), STATUS )
 
 *  Get the owner of this group.
                CALL GRP_OWN( IGRPT, IGRPH, STATUS )
-               IF( IGRPH .EQ. GRP__NOID ) THEN
+               IF( IGRPH .NE. GRP__NOID ) THEN
 
 *  Get the HDS path from this group.
                   CALL GRP_GET( IGRPH, I, 1, FIELDS( 2 ), STATUS )
 
 *  Get the owner of this group.
                   CALL GRP_OWN( IGRPH, IGRPS, STATUS )
-                  IF( IGRPS .EQ. GRP__NOID ) THEN
+                  IF( IGRPS .NE. GRP__NOID ) THEN
 
 *  Get the NDF section from this group.
                      CALL GRP_GET( IGRPS, I, 1, FIELDS( 1 ), STATUS )
