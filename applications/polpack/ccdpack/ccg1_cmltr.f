@@ -47,11 +47,14 @@
  
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-APR-1991 (PDRAPER):
 *        Based on RFWSs KPG1_ routines.
+*     11-OCT-2004 (BRADC):
+*        No longer use NUM_CMN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,7 +70,7 @@
       INCLUDE 'PRM_PAR'          ! BAD data constants
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
+
 
 *  Arguments Given:
       LOGICAL BAD
@@ -83,6 +86,8 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
       REAL VAL_DTOR          ! Convert from double precision
@@ -131,7 +136,7 @@
 *  error flag and error count.
       ELSE
          CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NERR = 0
 
 *  No bad values present:
@@ -145,10 +150,10 @@
 *  Check for numerical errors (i.e. overflow). If present, then assign
 *  a bad value to the output array element and count the error. Reset
 *  the numerical error flag.
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   B( I ) = VAL__BADR
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 2           CONTINUE
 
@@ -165,10 +170,10 @@
 *  errors.
                ELSE
                   B( I ) = NUM_MULR( A( I ), RCON )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      B( I ) = VAL__BADR
                      NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
                END IF
 3           CONTINUE
