@@ -1600,7 +1600,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
             PARAMETER (TOL=1.0/3600)  ! Set tolerance to one arcsecond
 * Local variables :
         CHARACTER*132 TIMSTRING       ! Time ranges
-        CHARACTER*20 RAS,DECS	      ! RA/DEC in any format
+        CHARACTER*40 RAS,DECS	      ! RA/DEC in any format
         CHARACTER*30 C1,C2            ! Default time range
         CHARACTER CENTRE	      ! Option for region centre
         CHARACTER*10 RANGES,BIN_AXES  ! Axes codes for choosing range and data
