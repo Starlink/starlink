@@ -60,7 +60,6 @@
 
       INTEGER ARDID			 ! GRP id for ARD text
       INTEGER AUNIT                      ! Logical unit of ARD file
-      INTEGER OUNIT                      ! Logical unit of old ARD file
       INTEGER NLIST                      ! No. of arguments for a shape.
       INTEGER LP,NCHAR,NPTS,L            !
 
@@ -74,11 +73,6 @@
       REAL XCENT,YCENT                   ! Centre of a shape
       REAL IRAD                          ! Inner radius of an annulus
       REAL ORAD                          ! Outer radius of an annulus
-      REAL PHI                           ! Orientation of an ellipse, anti-
-*                                        ! clkwise from the X axis.
-      REAL SMINAX, SMAJAX                ! Semi-minor and major axes of ellipse
-      REAL XWIDTH,YWIDTH                 ! Width of each side in a box
-      REAL XEND1,XEND2,YEND1,YEND2       ! Ends of the line
       REAL LIST(MAXLST)                  ! Arguments for each command
 *.
 
