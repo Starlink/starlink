@@ -4093,6 +4093,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           BETA=ALPHA-ANGLE
           WIDTH=2.0*ABS(D*SIN(BETA))
 
+	print *,xwid,ywid,d,alpha/dtor,beta/dtor,width
+
 *  keyboard mode
         ELSE
           CALL PAR_DEF0R(PAR1,I_X,STATUS)
