@@ -562,9 +562,9 @@
 
 <!--========== Document body ==========-->
 <![ %Feature.Routinelist [
-  <!entity % body.content '(routinelist | (p | table | figure)*)'>
+  <!entity % body.content '%update (routinelist | (p | table | figure)*)'>
 ]]>
-<!entity % body.content '(p | table | figure)*'>
+<!entity % body.content '%update (p | table | figure)*'>
 
 <!--
   I'm don't think we need to have the bibliography, indexcontents
@@ -630,8 +630,7 @@
   disposable.
 -->
 <!entity % docbody.model 
-	       '%update
-		%req.abstract 
+	       '%req.abstract 
 		%body.content,
 		sect*,
 		appendices?,
@@ -642,13 +641,13 @@
 <!--========== Sectioning ==========-->
 
 <!--
-<!element PART          - o (subhead, %update %body.content, sect*)>
+<!element PART          - o (subhead, %body.content, sect*)>
 ...and add `part|' to the %section list
 -->
-<!element SECT          - o (subhead, %update %body.content, subsect*)>
-<!element SUBSECT       - o (subhead, %update %body.content, subsubsect*)>
-<!element SUBSUBSECT    - o (subhead, %update %body.content, subsubsubsect*)>
-<!element SUBSUBSUBSECT - o (subhead, %update %body.content)>
+<!element SECT          - o (subhead, %body.content, subsect*)>
+<!element SUBSECT       - o (subhead, %body.content, subsubsect*)>
+<!element SUBSUBSECT    - o (subhead, %body.content, subsubsubsect*)>
+<!element SUBSUBSUBSECT - o (subhead, %body.content)>
 
 <!element APPENDICES	- o (%appendix.content;)>
 
