@@ -90,7 +90,9 @@
 *  History:
 *     1997 March 25 (MJC):
 *        Original version based upon COF_WHEAD.
-*     {enter_changes_here}
+*     1997 November 14 (MJC):
+*        Filtered LBOUNDn keywords.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -184,6 +186,8 @@
 *    SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default values.
 *    BITPIX, NAXIS, NAXISn --- are derived directly from the NDF data
 *      array;
+*    LBOUNDn --- the pixel lower bounds of an NDF whose origin is
+*      not 1 along each axis.  (These are not part of the standard.)
 *    CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from the
 *      NDF axis structures if possible.  If no linear NDF axis
 *      structures are present, the values in the NDF FITS extension are
@@ -280,10 +284,10 @@
             VALUE = FITSTR( 11:SZFITS )
 
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn, and possibly CDELTn, CRVALn, CRPIXn, CRTYPEn, CTYPEn,
-*  CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and END as
-*  described above.  Note CROTAn are also excluded.  To avoid duplicate
-*  FITSIO banners these are also omitted.
+*  NAXISn, and possibly LBOUNDn, CDELTn, CRVALn, CRPIXn, CRTYPEn,
+*  CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and END
+*  as described above.  Note CROTAn are also excluded.  To avoid
+*  duplicate FITSIO banners these are also omitted.
 *
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This combines tests for the mandatory headers.
@@ -321,6 +325,7 @@
      :        ( KEYWRD .NE. 'BSCALE' ) .AND.
      :        ( KEYWRD .NE. 'BZERO' ) .AND.
      :        ( KEYWRD .NE. 'EXTNAME' ) .AND.
+     :        ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) .AND.
      :        ( KEYWRD( 1:7 ) .NE. 'HDUCLAS' ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CDELT' .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CRVAL' .OR. .NOT. AXIFND ) .AND.
