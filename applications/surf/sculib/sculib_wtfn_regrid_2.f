@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_BESSEL_REGRID_2 (IN_DATA, IN_VARIANCE,
      :  WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
      :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
-     :  CONV_WEIGHT, STATUS)
+     :  CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
 *+
 *  Name:
 *     SCULIB_BESSEL_REGRID_2
@@ -52,6 +52,11 @@
 *        the variance convolution sum for each output pixel.
 *     CONV_WEIGHT (NI,NJ)              = REAL (Given and returned)
 *        the convolution weight for each output pixel.
+*     WEIGHTSIZE                       = INTEGER (Given)
+*        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 1 for LINEAR)
+*     WTFN (SCUIP__RES1 * SCUIP__RES1 +   = REAL (Given)
+*     :     SCUIP__RES2 * (SCUIP__FILTRAD * SCUIP__FILTRAD))
+*        convolution weighting function
 *     STATUS                           = INTEGER (Given and Returned)
 *        The global status.
 *  Authors:
@@ -70,12 +75,14 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
+      INCLUDE 'REDS_SYS'
 
 *  Arguments Given:
       INTEGER NPIX
       REAL IN_DATA (NPIX)
       REAL IN_VARIANCE (NPIX)
       REAL WEIGHT
+      REAL WWEIGHT
       DOUBLE PRECISION X(NPIX)
       DOUBLE PRECISION Y(NPIX)
       REAL PIXSPACE
@@ -85,6 +92,9 @@
       INTEGER JCEN
       REAL TOTAL_WEIGHT (NI,NJ)
       REAL WAVELENGTH
+      INTEGER WEIGHTSIZE
+      REAL WTFN(SCUIP__RES1 * SCUIP__RES1 +
+     :     SCUIP__RES2 * (SCUIP__FILTRAD * SCUIP__FILTRAD))
 
 *  Arguments Returned:
       REAL CONV_DATA_SUM (NI, NJ)
@@ -94,28 +104,14 @@
 *  Status:
       INTEGER STATUS  
 
-*  External Functions:
-      REAL SCULIB_BESSJ1                         ! J1(x) Bessel function
 *  Local Constants:
-      REAL    DIAMETER                           ! diameter of JCMT mirror
-      PARAMETER (DIAMETER = 15.0)
-      INTEGER MAX_RES_ELEMENT                    ! radius of convolution
-      PARAMETER (MAX_RES_ELEMENT = 7)            ! function in resolution
-                                                 ! elements
-      REAL    PI                                 !
-      PARAMETER (PI = 3.14159265359)
-      INTEGER WTRESOL                            ! number of sub resolution
-      PARAMETER (WTRESOL = 200)                  ! element interpolations of 
-                                                 ! the weighting function
 
 *  Local Variables:
-      INTEGER I                                  ! loop counter
       INTEGER ICPIX                              ! index in convolution function
                                                  ! corresponding to RPIX
       INTEGER INEAR                              ! I index of output pixel 
                                                  ! nearest to input
       INTEGER IOUT                               ! I pixel index in output array
-      INTEGER ISTART                             !
       INTEGER JNEAR                              ! J index of output pixel
                                                  ! nearest to input
       INTEGER JOUT                               ! J pixel index in output array
@@ -130,49 +126,39 @@
       REAL    RTEMP                              ! scratch real
       REAL    WT                                 ! value of convolution 
                                                  ! function at output pixel
-      REAL    WTFN (MAX_RES_ELEMENT * WTRESOL)   ! convolution function
       REAL    XINC                               ! x-axis pixel increment
       REAL    XPIX                               ! x offset of output pixel
       REAL    YINC                               ! y-axis pixel increment
       REAL    YPIX                               ! y offset of output pixel
       
+      REAL FILTER1_SQ
+      INTEGER  FILTER_RAD_SQ
+      REAL SCALE
+      REAL SCALESQ
 *   local data
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
 
 *  set x and y axis pixel increments, x increases to left hence -ve.
 
       XINC = -PIXSPACE
       YINC = PIXSPACE
 
-*  Weighting function used is the function (I/I0 = 2*J1(x)/x), with
-*  a cosine apodization to zero over the last third of its extent.
-*  It is tabulated up to MAX_RES_ELEMENT resolution elements out at a 
-*  resolution of 1/WTRESOL of a resolution element. The angular size
-*  of a resolution element is WAVELENGTH / 2 * DIAMETER.
+* Some time saving squares
 
-*  ..basic function
-
-      WTFN(1) = 1.0
-      DO I = 2, MAX_RES_ELEMENT * WTRESOL
-         RTEMP = REAL(I-1) * PI / REAL(WTRESOL)
-         WTFN (I) = 2.0 * SCULIB_BESSJ1 (RTEMP, STATUS) / RTEMP
-      END DO
-
-*  ..apodization
-
-      ISTART = NINT (REAL(MAX_RES_ELEMENT * WTRESOL) * 0.66)
-      DO I = ISTART, MAX_RES_ELEMENT * WTRESOL
-         WTFN (I) = WTFN (I) *
-     :     COS (REAL(I-ISTART)*PI/
-     :     (2.0*REAL(MAX_RES_ELEMENT*WTRESOL-ISTART)))
-      END DO
+      FILTER1_SQ = SCUIP__RES1 * SCUIP__RES1
+      FILTER_RAD_SQ = WEIGHTSIZE * WEIGHTSIZE
 
 *  ..extent of convolution function in units of output pixels
 
       RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-      RTEMP = REAL (MAX_RES_ELEMENT) * RES_ELEMENT / PIXSPACE
+      SCALE = 1.0 / RES_ELEMENT
+
+      SCALESQ = SCALE * SCALE
+      
+      RTEMP = REAL(WEIGHTSIZE) * RES_ELEMENT / PIXSPACE
       PIX_RANGE = INT (RTEMP) + 1
 
 *  now do the convolution, looping over the input pixels
@@ -198,20 +184,25 @@
                   YPIX = REAL (JOUT-JCEN) * YINC
                   XPIX = REAL (IOUT-ICEN) * XINC
 
-*  distance between output and input pixels, in RES_ELEMENT units
+*  distance between output and input pixels, in SCALE LENGTHS**2 units
  
-                  RPIX = SQRT ((YPIX-REAL(Y(PIX)))**2 + 
-     :              (XPIX-REAL(X(PIX)))**2)
-                  RPIX = RPIX / RES_ELEMENT
+                  RPIX = (YPIX-REAL(Y(PIX)))**2 + 
+     :              (XPIX-REAL(X(PIX)))**2
 
-*  work out the appropriate value of the interpolation function
- 
-                  ICPIX = NINT (RPIX * WTRESOL) + 1
-                  IF ((ICPIX .GE. 1) .AND.
-     :                (ICPIX .LE. MAX_RES_ELEMENT*WTRESOL)) THEN
-                     WT = WTFN (ICPIX)
-                  ELSE
-                     WT = 0.0
+                  RPIX = RPIX * SCALESQ
+
+* Now work out which part of the weight function t ouse
+
+                  WT = 0.0
+                  IF (RPIX .LT. FILTER_RAD_SQ) THEN
+                     IF (RPIX .GT. 1.0) THEN
+                        ICPIX = NINT(FILTER1_SQ + (RPIX-1.0)
+     :                       * SCUIP__RES2)
+                     ELSE
+                        ICPIX = NINT(FILTER1_SQ * RPIX)
+                     ENDIF
+                     WT = WTFN(ICPIX+1)
+
                   END IF
 
 *  add into the convolution result and weight arrays unless TOTAL_WEIGHT
@@ -220,16 +211,17 @@
 *  associated with this input pixel.
 
                   IF (TOTAL_WEIGHT (IOUT,JOUT) .NE. 0.0) THEN
+
+                     WWEIGHT = WT * WEIGHT / TOTAL_WEIGHT (INEAR,JNEAR)
+
                      CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) + 
-     :                 WT * WEIGHT / TOTAL_WEIGHT (INEAR,JNEAR)
+     :                 WWEIGHT
                      CONV_DATA_SUM (IOUT,JOUT) = 
      :                 CONV_DATA_SUM (IOUT,JOUT) + 
-     :                 WT * IN_DATA(PIX) * WEIGHT / 
-     :                 TOTAL_WEIGHT (INEAR,JNEAR)
+     :                 WWEIGHT * IN_DATA(PIX)
                      CONV_VARIANCE_SUM (IOUT,JOUT) =
      :                 CONV_VARIANCE_SUM (IOUT,JOUT) +
-     :                 (WT * WEIGHT / TOTAL_WEIGHT(INEAR,JNEAR))**2 *
-     :                 IN_VARIANCE (PIX)
+     :                 (WWEIGHT)**2 * IN_VARIANCE (PIX)
                   END IF
 
                END DO
