@@ -74,4 +74,4 @@ kaprh.hlp: $(KAPRH_F_ROUTINES) kaprh_master.hlp
 	export PATH ; \
 	@PROHLP@ in=all.f out=all.hlp single=no
 	cat kaprh_master.hlp all.hlp > kaprh.hlp
-	-rm -f all.hlp
+	-rm -f all.hlp all.f

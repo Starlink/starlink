@@ -33,7 +33,7 @@ polpack.hlp: $(POLPACK_F1_ROUTINES) polpack_master.hlp
 	export PATH ; \
 	@PROHLP@ in=all.f out=all.hlp single=no
 	cat polpack_master.hlp all.hlp > polpack.hlp
-	-rm -f all.hlp
+	-rm -f all.hlp all.f
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
