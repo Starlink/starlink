@@ -341,7 +341,7 @@
 
       CALL NDF_ASSOC ('IN', 'READ', INDF, STATUS)
 
-* Get the bad bit mask
+* Read in badbit mask
       CALL NDF_BB(INDF, BADBIT, STATUS)
 
 *  get some general descriptive parameters of the observation
@@ -557,12 +557,15 @@
 *  map the various components of the data array and check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
+
+* Map QUALITY first to stop automatic masking
+      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
+     :  IN_QUALITY_PTR, ITEMP, STATUS)
+
       CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
      :  ITEMP, STATUS)
       CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
      :  ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
-     :  IN_QUALITY_PTR, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
@@ -1234,12 +1237,15 @@
       END IF
       CALL NDF_SBND (NDIM, LBND, UBND, OUTNDF, STATUS)
 
+      CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :  OUT_QUALITY_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE', 
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :  OUT_QUALITY_PTR, ITEMP, STATUS)
+
+* Bad bit mask
+      CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
 *  extract data for the required bolometers into the output data arrays
 
@@ -1416,8 +1422,7 @@
      :                    SCUBA__NUM_ADC * SCUBA__NUM_CHAN, N_BOL_OUT,
      :                    %val(OUT_DATA_PTR + DATA_OFFSET * VAL__NBR), 
      :                    %val(OUT_VARIANCE_PTR+DATA_OFFSET*VAL__NBR),
-     :                    %val(OUT_QUALITY_PTR +DATA_OFFSET*VAL__NBUB),
-     :                    BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ, BADBIT,
+     :                    BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
      :                    STATUS)
                      END DO
                   END DO
