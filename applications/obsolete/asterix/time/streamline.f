@@ -27,7 +27,7 @@
       CHARACTER*80 PTEXT(4)                     !History text
       LOGICAL LVAR                              !Is the variance array present
       INTEGER			IFID, OFID
-      INTEGER DPNTR,TPNTR,QPNTR,VPNTR           !Pointers to arrays.
+      INTEGER DPNTR,TPNTR,VPNTR           !Pointers to arrays.
       INTEGER NTOT                              !Total no. of data points
       INTEGER NGOOD                             !No. of good quality data points
       INTEGER NLINES                            !No of history list items
@@ -55,12 +55,12 @@
 *  Test that bad quality points were found
       IF (NTOT .EQ. NGOOD) THEN
          CALL MSG_PRNT('**No bad quality data points were found**')
-         GOTO 999
+         GOTO 99
       ENDIF
 
 *  Create output file
       CALL USI_TASSOCO('OUT', 'BINDS', OFID, STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Propogate from input...
       CALL BDI_COPMORE( IFID, OFID, STATUS )
