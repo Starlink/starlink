@@ -145,6 +145,8 @@
 *        Fixed indexing bug when evaluating the output variance.
 *        Protect against accessing COMPRS elements with index > 2, when
 *        NDIM is <3.
+*     21-JUN-2004 (DSB):
+*        Fix normalisation logic.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -476,8 +478,10 @@
 *  elements in the box.
             IF ( NUM( J ) .LT. NVAL ) THEN
                OUTARR( K ) = VAL__BADD
-            ELSE
+            ELSE IF( NORMAL ) THEN
                OUTARR( K ) = SUM( J ) / NUM_ITOD( NUM( J ) ) * NORM
+            ELSE
+               OUTARR( K ) = SUM( J ) 
             END IF
 
 *  If there were too few elements in the summation, set the output
@@ -486,8 +490,10 @@
             M = J + ODIMS( 1 )
             IF ( NUM( M ) .LT. NVAL ) THEN
                OUTVAR( K ) = VAL__BADD
-            ELSE
+            ELSE IF( NORMAL ) THEN
                OUTVAR( K ) = SUM( M ) / NUM_ITOD( NUM( M ) ) * NORM
+            ELSE
+               OUTVAR( K ) = SUM( M ) 
             END IF
          END DO
 
