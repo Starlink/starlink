@@ -182,14 +182,15 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SPLOT Version 2.2-0' )
+        PARAMETER		( VERSION = 'SPLOT Version 2.2-1' )
 
 *  Local Variables:
-      RECORD /DATASET/ 		OBDAT(NDSMAX)		! Observed datasets
-      RECORD /INSTR_RESP/ 	INSTR(NDSMAX)   	! Instrument responses
-      RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
-      RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
+c     RECORD /DATASET/ 		OBDAT(NDSMAX)		! Observed datasets
+c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX)   	! Instrument responses
+c     RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
+      INTEGER			IMOD, TMOD
 
       CHARACTER*80 		MODSPEC			! Model spec (for title)
       CHARACTER*80 		TITLE(2)		! Text specifying dataset and model
@@ -254,7 +255,9 @@
       CALL SPEC_INIT( STATUS )
 
 *  Set up genus in MODEL structure
-      MODEL.GENUS = 'SPEC'
+      IMOD = 1
+      TMOD = 2
+      MODEL_SPEC_GENUS(IMOD) = 'SPEC'
 
 *  Set plot mode flags in common
       CALL SPLOT_PLOTMODE( 'MODE', CHANGE, COMPLEX, STATUS )
@@ -271,18 +274,17 @@
 *    Get observed data and response
         CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
         CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', 1, .FALSE.,
-     :                   .FALSE., NDS, OBDAT,
-     :                   NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
-        NDMAX = OBDAT(1).NDAT
-        NFMAX = PREDDAT(1).NMDAT
+     :                   .FALSE., NDS, NGOOD, SSCALE, INSTR, STATUS )
+        NDMAX = DATASET_NDAT(1)
+        NFMAX = PREDICTION_NMDAT(1)
 
       END IF
 
 *  Get model specification
       CALL USI_ASSOC( 'MODEL', '*', 'READ', MFID, STATUS )
-      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE, FROZEN,
+      CALL FIT_MODGET( MFID, IMOD, NPAR, PARAM, LB, UB, LE, UE, FROZEN,
      :                 STATUS )
-      MODSPEC = MODEL.SPEC
+      MODSPEC = MODEL_SPEC_SPEC(IMOD)
 
 *  Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
@@ -296,12 +298,12 @@
       ELSE
 
 *    Apply red-shift and check data structures
-        CALL SFIT_PRECHK( NDS, Z, PREDDAT, STATUS )
+        CALL SFIT_PRECHK( NDS, Z, STATUS )
 
 *    Loop through input datasets to find maximum data and predicted data sizes
         DO N = 1, NDS
-          NDMAX = MAX(NDMAX,OBDAT(N).NDAT)
-          NFMAX = MAX(NFMAX,PREDDAT(N).NMDAT)
+          NDMAX = MAX(NDMAX,DATASET_NDAT(N))
+          NFMAX = MAX(NFMAX,PREDICTION_NMDAT(N))
         END DO
 
 *    Get dynamic storage
@@ -311,17 +313,17 @@
 
 *  Set up workspace for model stack
       IF ( MPLOT ) THEN
-        CALL DYN_MAPR(1,NCHAN*MAXSTACK,MODEL.STACKPTR,STATUS)
+        CALL DYN_MAPR(1,NCHAN*MAXSTACK,MODEL_SPEC_STACKPTR(IMOD),STATUS)
       ELSE
         NMAX = MAX(NDMAX,NFMAX)
-        CALL DYN_MAPR(1,NMAX*MAXSTACK,MODEL.STACKPTR,STATUS)
+        CALL DYN_MAPR(1,NMAX*MAXSTACK,MODEL_SPEC_STACKPTR(IMOD),STATUS)
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
       IF ( MPLOT ) THEN
 
 *    Break up model into additive components
-        CALL FIT_MSPECFLAT( MODEL, MAXCOMP, NTERM, TERMS, SIGNS,
+        CALL FIT_MSPECFLAT( IMOD, MAXCOMP, NTERM, TERMS, SIGNS,
      :                      STATUS )
 
 *    Dynamic storage
@@ -336,14 +338,14 @@
         DO ITERM = 1, NTERM
 
 *      Calculate values in a term
-          CALL FIT_MCALCTERM( MODEL, NTERM, TERMS, SIGNS, ITERM,
+          CALL FIT_MCALCTERM( IMOD, NTERM, TERMS, SIGNS, ITERM,
      :                        PARAM, 1, 1, NCHAN, NCHAN, NCHAN+1,
      :                        %VAL(ELPTR), %VAL(EUPTR),
-     :                        %VAL(MODEL.STACKPTR), TMODEL,
+     :                        %VAL(MODEL_SPEC_STACKPTR(IMOD)), TMOD,
      :                        %VAL(MCDPTR(ITERM)), STATUS )
 
 *      Store term model spec for labelling
-          COMPSPEC(ITERM) = TMODEL.SPEC
+          COMPSPEC(ITERM) = MODEL_SPEC_SPEC(TMOD)
 
 *      Normalise
           CALL SPLOT_DIVWID2( NCHAN, EWID, %VAL(MCDPTR(ITERM)), STATUS )
@@ -359,12 +361,12 @@
 
 *    Loop through input datasets getting predicted data values
         DO N = 1, NDS
-          CALL FIT_PREDDAT( 1, NDS, OBDAT, INSTR, PREDDAT, MODEL,
-     :                      PARAM, N, %VAL(PREDDAT(N).DPTR), STATUS )
+          CALL FIT_PREDDAT( 1, NDS, IMOD,
+     :                      PARAM, N, %VAL(PREDICTION_DPTR(N)), STATUS )
         END DO
 
 *    If no convolution is involved, plot mode 'P' is unavailable
-        IF ( PPLOT .AND. .NOT. (PREDDAT(1).CONVOLVE) ) THEN
+        IF ( PPLOT .AND. .NOT. (PREDICTION_CONVOLVE(1)) ) THEN
           CALL MSG_PRNT('No convolution available - '//
      :                         'cannot plot in photon space')
           PPLOT = .FALSE.
@@ -462,20 +464,20 @@
 	  YMAX = REAL(IUY)/NZY
 
 *      Number of values in model space, and address of model space data
-          NFIT = PREDDAT(N).NMDAT
-          IFPTR = PREDDAT(N).DPTR
+          NFIT = PREDICTION_NMDAT(N)
+          IFPTR = PREDICTION_DPTR(N)
 
 *      Number of values in channel space, and address of channel space data
-          DSID = OBDAT(N).D_ID
-          NVAL = OBDAT(N).NDAT
-          IDPTR = OBDAT(N).DPTR
+          DSID = DATASET_D_ID(N)
+          NVAL = DATASET_NDAT(N)
+          IDPTR = DATASET_DPTR(N)
 
 *      Number of spectral sets in data
-          NSET = OBDAT(N).SETINDEX
+          NSET = DATASET_SETINDEX(N)
 
 *      Quality and variance present in fit data?
-          QOK = ((OBDAT(N).QPTR).NE.0)
-          VOK = ((OBDAT(N).VPTR).NE.0)
+          QOK = ((DATASET_QPTR(N)).NE.0)
+          VOK = ((DATASET_VPTR(N)).NE.0)
 
 *      Spectral set?
           IF ( NSET .GT. 0 ) THEN
@@ -496,7 +498,7 @@
 
 *      Copy data variance if present
           IF ( VOK ) THEN
-            IVPTR = OBDAT(N).VPTR
+            IVPTR = DATASET_VPTR(N)
             CALL ARR_COP1R( NVAL, %VAL(IVPTR), %VAL(DVPTR), STATUS )
 
 *      If not present, use input data assuming Poisson statistics
@@ -511,8 +513,9 @@
           IF ( QOK ) THEN
             CALL BDI_MAPUB( DSID, 'Quality', 'READ', QPTR, STATUS )
             CALL DYN_MAPB( 1, NEL, DQPTR, STATUS )
-            CALL ARR_SLCOPB( OBDAT(N).NDIM, OBDAT(N).IDIM, %VAL(QPTR),
-     :                       LDIM, UDIM, %VAL(DQPTR), STATUS )
+            CALL ARR_SLCOPB( DATASET_NDIM(N), DATASET_IDIM(N),
+     :                       %VAL(QPTR), LDIM, UDIM, %VAL(DQPTR),
+     :                       STATUS )
             CALL BDI_GET0UB( DSID, 'QualityMask', MASK, STATUS )
           ELSE
             DQPTR = 0
@@ -523,10 +526,10 @@
           CALL BDI_AXMAPR( DSID, 1, 'Width', 'READ', DWPTR, STATUS )
 
 *      Set up data for plots
-          CALL SPLOT_GEN_SETUP( INSTR(N), PREDDAT(N), Z, STATUS )
+          CALL SPLOT_GEN_SETUP( N, N, Z, STATUS )
 
 *      Construct plot title
-          CALL SPLOT_TITLE( OBDAT(N).DATNAME, MODSPEC, TITLE )
+          CALL SPLOT_TITLE( DATASET_DATNAME(N), MODSPEC, TITLE )
 
 *      Progress report...
           IF ( SAVE ) THEN
@@ -595,7 +598,7 @@
       END IF
 
 *  Release model stack
-      CALL DYN_UNMAP( MODEL.STACKPTR, STATUS )
+      CALL DYN_UNMAP( MODEL_SPEC_STACKPTR(IMOD), STATUS )
 
 *  Release output
       IF ( SAVE ) THEN
@@ -1371,7 +1374,7 @@
 
 
 *+
-      SUBROUTINE SPLOT_GEN_SETUP(INSTR,PREDDAT,Z,STATUS)
+      SUBROUTINE SPLOT_GEN_SETUP(IRESP,IPRED,Z,STATUS)
 *    Description :
 *    Type definitions :
       IMPLICIT NONE
@@ -1383,8 +1386,9 @@
 *    Structure definitions :
        INCLUDE 'FIT_STRUC'
 *    Import :
-      RECORD /INSTR_RESP/ INSTR
-      RECORD /PREDICTION/ PREDDAT
+c     RECORD /INSTR_RESP/ INSTR
+c     RECORD /PREDICTION/ PREDDAT
+      INTEGER IRESP, IPRED
       REAL Z
 *    Import-Export :
 *    Export :
@@ -1412,9 +1416,9 @@
 *  Get fit data
       CALL ADI_CGET1R( INSTR.R_ID, 'Energy', NFIT, %val(PFXPTR),
      :                 NACT, STATUS )
-      CALL SPLOT_NORM( NFIT, %val(PREDDAT.MPTR),
-     :      %val(PREDDAT.MLBNDPTR),%val(PREDDAT.MUBNDPTR),Z,
-     :                                     %val(PFDPTR),STATUS)
+      CALL SPLOT_NORM( NFIT, %val(PREDICTION_MPTR(IPRED)),
+     :      %val(PREDICTION_MLBNDPTR(IPRED)),
+     :      %val(PREDICTION_MUBNDPTR(IPRED)),Z,%val(PFDPTR),STATUS)
 
 *     determine channel energies & widths
 
@@ -1445,12 +1449,13 @@
 *  problem for non-ASTERIX responses anyhow.
       IF ( .NOT. CBOUNDS ) THEN
 
-        CALL ADI_CSIZE( INSTR.R_ID, 'RMF', NRESP, STATUS )
-        CALL ADI_CMAPI( INSTR.R_ID, 'ChannelIndices', 'READ', CIPTR,
+        CALL ADI_CSIZE( INSTR_RESP_R_ID(IRESP), 'RMF', NRESP, STATUS )
+        CALL ADI_CMAPI( INSTR_RESP_R_ID(IRESP), 'ChannelIndices',
+     :                  'READ', CIPTR, STATUS )
+        CALL ADI_CMAPI( INSTR_RESP_R_ID(IRESP), 'EnergyIndices', 'READ',
+     :                  EIPTR, STATUS )
+        CALL ADI_CMAPR( INSTR_RESP_R_ID(IRESP), 'RMF', 'READ', RPTR,
      :                  STATUS )
-        CALL ADI_CMAPI( INSTR.R_ID, 'EnergyIndices', 'READ', EIPTR,
-     :                  STATUS )
-        CALL ADI_CMAPR( INSTR.R_ID, 'RMF', 'READ', RPTR, STATUS )
         CALL MSG_PRNT('Deriving channel energies & widths '
      :        //'from response matrix')
         CALL SPEC_CHEN( NVAL, NRESP, %VAL(CIPTR), %VAL(EIPTR),
