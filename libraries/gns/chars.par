@@ -1,0 +1,25 @@
+*+
+*   Symbolic names for the values of the enumerated type characteristics
+*-
+
+*   CLASS
+
+      INTEGER GRAOVE, IMADISM, IMAOVE, MATPRI, METINP, METOUT, PENPLO,
+     : TERMIN, WINDOW, WINDOV
+      PARAMETER (GRAOVE = 1, IMADISM = 2, IMAOVE = 3, MATPRI = 4, METINP
+     : = 5, METOUT = 6, PENPLO = 7, TERMIN = 8, WINDOW = 9, WINDOV = 10)
+
+*   OUTPUT
+
+      INTEGER DIRECT, FILE
+      PARAMETER (DIRECT = 1, FILE = 2)
+
+*   CLEAR
+
+      INTEGER SELECT
+      PARAMETER (SELECT = 1)
+
+*   OPEN
+
+      INTEGER NORST
+      PARAMETER (NORST = 1)

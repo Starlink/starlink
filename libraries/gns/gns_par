@@ -1,0 +1,44 @@
+*+
+*   Public constants for the GNS package
+*+
+
+*   Workstation names
+      INTEGER GNS__SZNAM
+      PARAMETER (GNS__SZNAM = 16)
+
+*   Workstation descriptions
+      INTEGER GNS__SZDES
+      PARAMETER (GNS__SZDES = 72)
+
+*   VMS terminal names
+      INTEGER GNS__SZTER
+      PARAMETER (GNS__SZTER = 9)
+
+*   VMS device or file names
+      INTEGER GNS__SZDEV
+      PARAMETER (GNS__SZDEV = 64)
+
+*   IDI device types
+      INTEGER GNS__SZTYP
+      PARAMETER (GNS__SZTYP = 3)
+
+*   VMS node names
+      INTEGER GNS__SZNOD
+      PARAMETER (GNS__SZNOD= 6)
+
+*   Erase text
+      INTEGER GNS__SZTXT
+      PARAMETER (GNS__SZTXT = 72)
+
+*   Characteristic keywords
+      INTEGER GNS__SZKEY
+      PARAMETER (GNS__SZKEY = 20)
+
+*   Error messages
+      INTEGER GNS__SZMSG
+      PARAMETER (GNS__SZMSG = 72)
+
+*   AGI names
+      INTEGER GNS__SZAGI
+      PARAMETER (GNS__SZAGI = 15)
+

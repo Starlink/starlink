@@ -1,0 +1,10 @@
+This release of gns correct a bug which caused an infinite loop if an 
+X-windows workstation was opened with a name of the form GKS_nn_mm.
+
+The workstation names and description files are now located by searching
+../etc relative to the directories on PATH.
+
+The documentation has been updated to remove references to VMS and a
+hypertext version created.
+
+The test/demo program had been renamed gnsrun_gks and no longer tests IDI.

@@ -1,0 +1,49 @@
+mfile_input/       10/ /Metafile input/
+cgm_input/         12/ /CGM input/
+UNIRAS_input/      15/ /UNIRAS metafile input/
+SUN_GKS_input/     16/ /SUN GKS metafile input/
+mfile_output/      50/ /Metafile output/
+cgm_output/        52/ /CGM output/
+tek_4010/         201/ /Tektronix 4010/
+tek_4014/         203/ /Tektronix 4010/
+tek_4107/         221/ /Tektronix 4107/
+calcomp_81_SA4    700/ /Calcomp 81 sheet A4/
+calcomp_81_SA3    701/ /Calcomp 81 sheet A3/
+calcomp_81_RA4    702/ /Calcomp 81 roll A4/
+calcomp_81_RA3    703/ /Calcomp 81 roll A3/
+calcomp_81_R      704/ /Calcomp 81 roll/
+cifer_2634/       800/ /Cifer 2634/
+cifer_t5/         801/ /Cifer T5/
+pericom_7800/     825/ /Pericom 7800/
+pericom_mg/       820/ /Pericom MG series and Graphpack/
+pericom_mg_ral/   821/ /Pericom MG (RAL mods)/
+graphon/          845/ /GraphOn 235/
+zeta_8/          1000/ /Zeta 8 pen plotter/
+zeta_8l/         1001/ /Zeta 8 pen plotter (long workstation)/
+printronix_fl/   1200/ /Printronix printer/
+printronix_s/    1201/ /Printronix printer (square workstation)/
+printronix_A4l/  1202/ /Printronix printer A4 landscape/
+printronix_fp/   1203/ /Printronix printer one page portrait/
+printronix_A4p/  1204/ /Printronix printer A4 portrait/
+canon_l/         2600/ /Canon laser printer (landscape)/
+canon_p/         2601/ /Canon laser printer (portrait)/
+canon_ltex/      2610/ /TeX landscape (Canon printer)/
+canon_ptex/      2611/ /TeX portrait (Canon printer)/
+ps_p/            2700/ /Postscript A4 portrait/
+ps_l/            2701/ /Postscript A4 landscape/
+epsf_p/          2702/ /Encapsulated postscript (portrait)/
+epsf_l/          2703/ /Encapsulated postscript (landscape)/
+pscol_p/         2720/ /Colour postscript A4 portrait/
+pscol_l/         2721/ /Colour postscript A4 landscape/
+epsfcol_p/       2722/ /Colour encapsulated postscript (portrait)/
+epsfcol_l/       2723/ /Colour encapsulated postscript (landscape)/
+regis/           1720/ /Regis monochrome terminal/
+regis_colour/    1721/ /Regis colour terminal/
+xwindows/        3800/xwindows/X-windows/ / 1/
+x2windows/       3801/xwindows2/X-windows/ / 2/
+x3windows/       3802/xwindows3/X-windows/ / 3/
+x4windows/       3803/xwindows4/X-windows/ / 4/
+xoverlay/        3805/xwindows/X-overlay/ / 1/
+x2overlay/       3806/xwindows2/X-overlay/ / 2/
+x3overlay/       3807/xwindows3/X-overlay/ / 3/
+x4overlay/       3808/xwindows4/X-overlay/ / 4/

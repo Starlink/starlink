@@ -1,0 +1,18 @@
+FACILITY GNS
+1,INWKID,Invalid workstation identifier
+2,WKNDEF,Workstation type not defined in database
+3,NOTINT,Not an interactive job
+4,NAMNR,Device name not recognized
+5,PKGNS,Package not supported
+6,DBINV,Database file has an invalid format
+7,DBOVF,Database file contains too many records
+8,DBOPE,Unable to open database file
+9,DBRDE,Error reading database file
+10,DBFME,Database format error
+11,UNKCHA,Unknown characteristic
+12,AMBNAM,Ambiguous workstation name
+13,VNSUP,Description file version not supported
+14,AGTND,AGI type not defined
+15,AGNNR,AGI name not recognised
+16,CIOVF,No more connection identifiers can be assigned
+17,NOVER,No overlay on the device

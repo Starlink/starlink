@@ -1,0 +1,111 @@
+*+
+*     Common block and parameter definitions for the Graphics Name
+*     Service (GNS) system.
+*-
+
+*--
+*  GKS
+*--
+*   Total number of workstation names supported
+      INTEGER MAXNAM
+      PARAMETER (MAXNAM = 100)
+
+*   Maximum number of connection identifiers available
+      INTEGER MAXIDS
+      PARAMETER (MAXIDS = 100)
+
+*   Workstation names
+      CHARACTER*(GNS__SZNAM) NAMES(MAXNAM)
+
+*   Workstation types
+      INTEGER ITYPES(MAXNAM)
+
+*   VMS device names
+      CHARACTER*(GNS__SZDEV) VMSNAM(MAXNAM)
+
+*   Descriptions
+      CHARACTER*(GNS__SZDES) WSDESC(MAXNAM)
+
+*   Actual length of description
+      INTEGER LDESC(MAXNAM)
+
+*   Sequence numbers
+      INTEGER ISEQNG(MAXNAM)
+
+*   Actual number of names defined
+      INTEGER NUMNAM
+
+*   Connection identifiers and associated devices
+      INTEGER ICOIDG(MAXIDS)
+      INTEGER IWKTYG(MAXIDS)
+      CHARACTER*(GNS__SZDEV) CDENAG(MAXIDS)
+
+*   Actual number of connection identifiers assigned
+      INTEGER NUMCOG
+
+*   Workstation description entry
+      INTEGER CLASS, OUTPUT, CLEAR, LERTXT, LDEFNA, IOPEN, AGITYG
+      REAL SCALE
+      CHARACTER*(GNS__SZTXT) ERTXT
+      CHARACTER*(GNS__SZDEV) DEFNAM
+
+*   Hash algorithm constants
+      INTEGER GHASH1, GHASH2
+
+*   Logical unit in use for workstation description file
+      INTEGER LUNGKS
+
+*--
+*  IDI
+*--
+*   Total number of workstation names supported
+      INTEGER MAXNAI
+      PARAMETER (MAXNAI = 100)
+
+*   Workstation names
+      CHARACTER*(GNS__SZNAM) NAMESI(MAXNAI)
+
+*   Workstation types
+      CHARACTER*(GNS__SZTYP) TYPESI(MAXNAI)
+
+*   VMS device names
+      CHARACTER*(GNS__SZDEV) VMSNAI(MAXNAI)
+
+*   Descriptions
+      CHARACTER*(GNS__SZDES) WSDESI(MAXNAI)
+
+*   Actual length of description
+      INTEGER LDESCI(MAXNAI)
+
+*   Sequence numbers
+      INTEGER ISEQNI(MAXNAI)
+
+*   Actual number of names defined
+      INTEGER NUMNAI
+
+*   Workstation description entry
+      INTEGER AGITYI
+
+*   Hash algorithm constants
+      INTEGER IHASH1, IHASH2
+
+*   Logical unit in use for workstation description file
+      INTEGER LUNIDI
+
+      COMMON/GNS_ICMN/ ITYPES, LDESC, ISEQNG, NUMNAM, ICOIDG, IWKTYG,
+     : NUMCOG, CLASS, OUTPUT, CLEAR, SCALE, LERTXT, LDEFNA, IOPEN,
+     : AGITYG, GHASH1, GHASH2, LUNGKS, LDESCI, ISEQNI, NUMNAI, AGITYI,
+     : IHASH1, IHASH2, LUNIDI
+      COMMON/GNS_CCMN/ NAMES, VMSNAM, WSDESC, CDENAG, ERTXT, DEFNAM,
+     : NAMESI, TYPESI, VMSNAI, WSDESI
+
+      SAVE /GNS_ICMN/, /GNS_CCMN/
+
+*   Starting point for searching for a logical unit to use
+      INTEGER LUNGNS
+      PARAMETER (LUNGNS = 23)
+
+*   Size of records in the workstation description file
+      INTEGER RECSIZ
+      PARAMETER (RECSIZ=16)
+
