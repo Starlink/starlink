@@ -315,10 +315,10 @@ o How to...:
   If you want the whole colour table to be grey, select the "Greyscale"
   colour system in the "Options" menu. If you only want selected pens to 
   be grey, choose the "HSV" colour system, then click on the "Saturation"
-  button at the bottom right of the editor, then select the pens to be
-  changed. Press the "Set Constant" entry in the "Edit" menu, and enter a
-  value of zero. If desired, re-select the RGB colour system in the
-  "Options" menu.
+  button at the bottom left of the editor, then select the pens to be
+  changed by clicking and dragging the vertical cursor bar in the editor. 
+  Press the "Set Constant" entry in the "Edit" menu, and enter a value of
+  zero. If desired, re-select the RGB colour system in the "Options" menu.
 
 
 >>> Increase the number of entries in the colour table:
