@@ -180,6 +180,7 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      INTEGER KPG1_CEIL          ! Returns smallest integer >= X
 
 *  Local Constants:
       INTEGER MAXID              ! Largest number of columns to read
@@ -506,9 +507,9 @@
          END IF
 
 *  Find the number of bins along each axis.
-         NXBIN = INT( ( SXHI - SXLO ) / BOX( 1 ) ) + 1
-         NYBIN = INT( ( SYHI - SYLO ) / BOX( 2 ) ) + 1
-         NZBIN = INT( ( SZHI - SZLO ) / BOX( 3 ) ) + 1
+         NXBIN = KPG1_CEIL( ( SXHI - SXLO ) / BOX( 1 ) ) 
+         NYBIN = KPG1_CEIL( ( SYHI - SYLO ) / BOX( 2 ) )
+         NZBIN = KPG1_CEIL( ( SZHI - SZLO ) / BOX( 3 ) )
 
 *  Find the total number of bins.
          NBIN = NXBIN*NYBIN*NZBIN
