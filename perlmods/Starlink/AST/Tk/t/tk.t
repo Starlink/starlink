@@ -29,10 +29,11 @@ is( Starlink::AST::Tk::_GMark( $e, \@x, \@y, 20 ), 1, "Calling _GMark()" );
 
 # _GAttrb
 my ( $status, $old_value ) = 
-  Starlink::AST::Tk::_GAttr( Starlink::AST::Grf::GRF__COLOUR(), 3, undef );
+  Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__COLOUR(), 3, 
+                             Starlink::AST::Grf::GRF__MARK() );
 
 is( $status, 1, "Calling _GAttr()" );
-is( $old_value, undef, "Checking old GRF__COLOUR value" );
+is( $old_value, Starlink::AST::AST__BAD(), "Checking old GRF__COLOUR value" );
 
 # _GFlush( $c );
 is( Starlink::AST::Tk::_GFlush( $e ), 1, "Calling _GFlush()" );

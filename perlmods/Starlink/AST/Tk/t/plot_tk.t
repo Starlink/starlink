@@ -76,6 +76,7 @@ $plot->Set( Colour => 2, Width => 5 );
 $plot->Grid();
 
 # enter Tk mainloop()
+print "# Entering MainLoop()\n";
 MainLoop();
 
 # Done!
@@ -92,7 +93,7 @@ sub create_window {
    $MW->title("Starlink::AST::Tk");   
    $MW->iconname("Starlink::AST::Tk");
    $MW->configure( -cursor => "tcross" );
-   $MW->after( 1000, sub { exit; } );
+   $MW->after( 3000, sub { exit; } );
 
    # create the canvas widget
    my $canvas = $MW->Canvas( -width       => 640, 
