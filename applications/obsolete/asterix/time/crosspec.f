@@ -40,6 +40,7 @@
 *      8 Oct 92 : V1.7-0 Converted to D.P. for UNIX port (DJA)
 *      6 Aug 93 : V1.7-1 MAP_MOV to ARR_COP translation (DJA)
 *     20 Apr 95 : V1.8-0 Updated data interface - use GMI_ to create o/p (DJA)
+*     13 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -60,48 +61,45 @@
 *
 *    Local variables :
 *
-      CHARACTER*80              UNITS          		! O/p (frequency) units
-      CHARACTER*80              UNITS1         		! Input 1 axis units
-      CHARACTER*80              UNITS2         		! Input 2 axis units
+      CHARACTER*80              OUNITS          	! O/p (frequency) units
+      CHARACTER*80		UNITS(2)              	! Input axis units
       CHARACTER*80              TEXT(20)       		! Text for history
-      CHARACTER*4               PAR            		! Parameter name
 
       REAL                      BANDWIDTH      ! Bandwidth of smoothing window
       REAL                      BASE           ! Base value of output axis
       REAL                      FRAC           ! Fraction of array to taper
                                               ! at each end
-      REAL                      SCALE          ! Scale of output axis
-      REAL                      SCALE1         ! Scale of ist input axis
-      REAL                      SCALE2         ! Scale of 2nd input axis
+      REAL                      SCALE          		! Scale of output axis
+      REAL                      SCALE(2)         	! Scale of input axes
+      REAL			SPARR(2)		! Spaced array data
 
       INTEGER                   CODAT          ! Pointer to output coherency data
       INTEGER			COFID			! Coherency object
       INTEGER                   COVAR          ! Ptr to coherency variance
       INTEGER			DIMS(ADI__MXDIM,2)	! Input dimensions
-      INTEGER                   DPTR1, DPTR2   ! pointers to input data arrays
+      INTEGER                   DPTR(2)   	! pointers to input data arrays
       INTEGER                   I              ! loop counter
       INTEGER			IFID(2)			! Input dataset ids
       INTEGER                   LEN            ! Length of an axis
       INTEGER                   LEN1, LEN2     ! length of input 1 & 2 units
       INTEGER                   LSHIFT         ! Alignment shift
-      INTEGER                   NDIM(2)        ! No of dimensions of input (n)
+      INTEGER			MOBJ			! MultiGraph object
+      INTEGER			NBAD			! # bad quality points
+      INTEGER                   NDIM			! I/p dimensionality
       INTEGER                   NLINES         ! Number of history text lines
-      INTEGER                   NPTS           ! No. of data points
-      INTEGER                   NTOT           ! No. of data after padding
+      INTEGER                   NPTS           		! # data points
+      INTEGER                   NTOT           		! # data after padding
       INTEGER                   NV             ! No. of elements in spectra
       INTEGER			OFID(2)			! Output dataset id
       INTEGER                   PHDAT          ! Pointer to output phase data
       INTEGER			PHFID			! Phase object
       INTEGER                   PHVAR          ! Ptr to phase variance
-      INTEGER                   QDIMS(ADI__MXDIM)
-      INTEGER                   QNDIM
-      INTEGER                   QPTR           ! Pointer to quality array
+      INTEGER                   QPTR           		! Pointer to quality array
       INTEGER                   SIGMA          ! Sigma width of Gaussian window
-      INTEGER                   TPTR           ! temporary pointer
-      INTEGER                   WRK1PTR        ! Pointer to work array
-      INTEGER                   WRK2PTR        ! Pointer to work array
+      INTEGER                   TPTR           		! Temporary pointer
+      INTEGER                   WRK1PTR        		! Pointer to work array
+      INTEGER                   WRK2PTR        		! Pointer to work array
 
-      LOGICAL                   BAD            ! True if any bad quality values
       LOGICAL                   TAPER          ! Apply taper to data?
       LOGICAL                   INPRIM(2)      ! Is input (n) primitive?
       LOGICAL                   INPUT          ! Continue to look for input?
@@ -111,7 +109,7 @@
 *    Version id :
 *
       CHARACTER*20		VERSION
-        PARAMETER               ( VERSION = 'CROSSPEC Version 1.8-0' )
+        PARAMETER               ( VERSION = 'CROSSPEC Version 2.0-0' )
 *-
 
 *    Version
@@ -124,98 +122,64 @@
 
         DO WHILE ( INPUT )
           INPUT = .FALSE.
-          WRITE (PAR, '(A3,I1)') 'INP', I
-          CALL USI_TASSOCI( PAR, '*', 'READ', IFID(I), STATUS)
+
+          CALL USI_IASSOC( 'INP', I, 'BinDS|Array', IFID(I), STATUS )
           IF (STATUS .NE. SAI__OK) GOTO 99
 
 *        Check not primitive
-          CALL BDI_PRIM( IFID(I), INPRIM(I), STATUS )
-          CALL BDI_CHKDATA (IFID(I), OK, NDIM(I), DIMS(1,I), STATUS)
+          CALL ADI_DERVD( IFID(I), 'Array', INPRIM(I), STATUS )
+          CALL BDI_CHK( IFID(I), 'Data', OK, STATUS )
+          CALL BDI_GETSHP( IFID(I), 1, DIMS(1,I), NDIM, STATUS )
+          IF (STATUS .NE. SAI__OK) GOTO 99
 
           IF (.NOT. OK) THEN
             CALL MSG_PRNT ('ERROR: Invalid input')
             INPUT = .TRUE.
 
-          ELSE IF (NDIM(I) .NE. 1) THEN
-            CALL MSG_PRNT ('ERROR: Dataset must be 1 dimensional')
-            INPUT = .TRUE.
-
           ELSE
-*          Check for regular spacing
-            CALL BDI_CHKAXVAL (IFID(I), 1, OK, REG, LEN, STATUS)
 
-            IF (OK) THEN
-              IF (.NOT. REG) THEN
-                STATUS = SAI__ERROR
-                CALL ERR_REP(' ', 'CROSSPEC only works for regularly '/
-     :                                         /'spaced data', STATUS )
+*        Map the axis values
+            CALL BDI_AXMAPR( IFID(I), 1, 'Data', APTR, STATUS )
+            CALL ARR_CHKREG( %VAL(APTR), DIMS(1,I), REG, BASE, SCALE(I),
+     :                       STATUS )
 
-              END IF
+*        Warn user about primitive input
+            IF ( INPRIM(I) ) THEN
+              CALL MSG_PRNT( 'Will assume primitive input data is '/
+     :                       /'regularly spaced' )
+            ELSE IF ( .NOT. REG ) THEN
+              CALL MSG_PRNT( 'WARNING : input axis appears to be '/
+     :         /'irregularly spaced - will use pixel numbers instead' )
+              BASE = 1.0
+              SCALE(I) = 1.0
             END IF
+
+*        Get axis units
+            CALL BDI_AXGET0C( IFID(I), 1, 'Units', UNITS(I), STATUS )
+            ULEN(I) = CHR_LEN( UNITS(I) )
+
           END IF
         END DO
       END DO
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Determine data spacing
-      SCALE1 = 1.0
-      LEN1   = 0
-
-      IF (INPRIM(1) .AND. INPRIM(2)) THEN
-        CALL MSG_PRNT ('Assuming unit spacing')
-
-      ELSE IF (.NOT. INPRIM(1) .AND. .NOT. INPRIM(2)) THEN
-        CALL BDI_GETAXVAL (IFID(1), 1, BASE, SCALE1, LEN, STATUS)
-        CALL BDI_GETAXVAL (IFID(2), 1, BASE, SCALE2, LEN, STATUS)
-
-        IF (SCALE1 .NE. SCALE2) THEN
-          CALL MSG_PRNT ('FATAL ERROR: The datasets have different '//
-     :                                                       'spacings')
-          STATUS = SAI__ERROR
-          GOTO 99
-
-        END IF
-        CALL BDI_GETAXUNITS (IFID(1), 1, UNITS1, STATUS)
-        CALL BDI_GETAXUNITS (IFID(2), 1, UNITS2, STATUS)
-        CALL CHR_UCASE( UNITS1 )
-        CALL CHR_UCASE( UNITS2 )
-        LEN1 = CHR_LEN( UNITS1 )
-        LEN2 = CHR_LEN( UNITS2 )
-
-        IF (LEN1 .GT. 0) THEN
-          UNITS = '('//UNITS1(1:LEN1)//')^-1)'
-
-          IF (LEN2 .GT. 0) THEN
-            IF (UNITS1(1:LEN1) .NE. UNITS2(1:LEN2)) THEN
-              CALL MSG_PRNT ('FATAL ERROR: Datasets have different axis'
-     :                                                       //' units')
-              STATUS = SAI__ERROR
-              GOTO 99
-
-            END IF
-          ELSE
-            CALL MSG_PRNT( 'WARNING: Datasets may have different axis'
-     :                                                     //' units')
-
-          END IF
-        ELSE IF (LEN2 .GT. 0) THEN
-          UNITS = '('//UNITS2(1:LEN2)//')^-1)'
-          LEN1  = LEN2
-
-        END IF
-      ELSE IF ( .NOT. INPRIM(1) ) THEN
-        CALL MSG_PRNT( 'Using axis spacing from first dataset' )
-        CALL BDI_GETAXVAL( IFID(1), 1, BASE, SCALE1, LEN, STATUS )
-
-      ELSE IF ( .NOT. INPRIM(2) ) THEN
-        CALL MSG_PRNT( 'Using axis spacing from second dataset' )
-        CALL BDI_GETAXVAL( IFID(2), 1, BASE, SCALE1, LEN, STATUS )
-
+*  Warn if axis scalings are different by more than 1 in 10^5
+      IF ( ABS(SCALE(1)-SCALE(2)) .GT. ABS(SCALE(1)*1.0E-5) ) THEN
+        CALL MSG_PRNT( 'WARNING : Axis pixel sizes appear to be'/
+     :                 /' different' )
       END IF
 
-*    If one array is larger than the other then truncate it
+*  Warn if axis units are different
+      IF ( .NOT. CHR_SIMLR( UNITS(1), UNITS(2) ) ) THEN
+        CALL MSG_PRNT( 'WARNING: Datasets have different axis units' )
+      END IF
+      IF ( ULEN(1) .GT. 0 ) THEN
+        OUNITS = '('//UNITS(1)(1:ULEN(1))//')^-1)'
+      ELSE IF ( ULEN(2) .GT. 0 ) THEN
+        OUNITS = '('//UNITS(2)(1:ULEN(2))//')^-1)'
+      END IF
+
+*  If one array is larger than the other then truncate it
       IF (DIMS(1,1) .GT. DIMS(1,2)) THEN
         CALL MSG_PRNT ('First dataset truncated to length of second')
         NPTS = DIMS(1,2)
@@ -231,113 +195,77 @@
       CALL MSG_SETI ('NDAT', NPTS)
       CALL MSG_PRNT ('Using ^NDAT data points')
 
-*    Check data quality
-      CALL BDI_CHKQUAL (IFID(1), OK, QNDIM, QDIMS, STATUS)
+*  Map data
+      DO I = 1, 2
 
-      IF (OK) THEN
-        CALL BDI_MAPLQUAL (IFID(1), 'READ', BAD, QPTR, STATUS)
+*    Map the data
+        CALL BDI_MAPD( IFID(I), 'Data', 'READ', DPTR(I), STATUS )
 
-        IF (BAD) THEN
-          CALL MSG_PRNT ('WARNING: First dataset contains bad quality '/
-     :                                                   /'data points')
+*    Warn if quality present as we can't use it
+        CALL BDI_CHK( IFID(I), 'Quality', OK, STATUS )
+        IF ( OK ) THEN
+          CALL BDI_MAPL( IFID(I), 'LogicalQuality', 'READ',
+     :                   QPTR, STATUS )
+          CALL ARR_NBAD( NPTS, %VAL(QPTR), NBAD, STATUS )
+          IF ( NBAD .GT. 0 ) THEN
+            CALL MSG_SETI( 'N', I )
+            CALL MSG_PRNT( 'WARNING: Dataset ^N contains bad quality '/
+     :                                                 /'data points' )
 
-        END IF
-        CALL BDI_UNMAPLQUAL (IFID(1), STATUS)
-
-      END IF
-
-      CALL BDI_CHKQUAL (IFID(2), OK, QNDIM, QDIMS, STATUS)
-
-      IF (OK) THEN
-        CALL BDI_MAPLQUAL (IFID(2), 'READ', BAD, QPTR, STATUS)
-
-        IF (BAD) THEN
-          CALL MSG_PRNT ('WARNING: Second dataset contains bad quality '
-     :                                                  //'data points')
+          END IF
+          CALL BDI_UNMAP( IFID(I), 'LogicalQuality', QPTR, STATUS )
 
         END IF
-        CALL BDI_UNMAPLQUAL (IFID(2), STATUS)
 
-      END IF
-
-*    Map data
-      CALL BDI_MAPTDATA( IFID(1), '_DOUBLE', 'READ', DPTR1, STATUS )
-      CALL BDI_MAPTDATA( IFID(2), '_DOUBLE', 'READ', DPTR2, STATUS )
+      END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    User input
-      CALL USI_TASSOCO( 'OUT', 'GRAFIX', OFID, STATUS )
+*  User input
+      CALL ADI_NEW0( 'MultiGraph', MOBJ, STATUS )
+      CALL USI_CREAT( 'OUT', MOBJ, OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Taper inputs?
       CALL USI_GET0L( 'TAPER', TAPER, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
       IF ( TAPER ) THEN
         CALL USI_GET0R( 'FRAC', FRAC, STATUS )
       END IF
 
-*    Taper data with cosine bell if required
+*  Taper data with cosine bell if required
       IF ( TAPER ) THEN
-
-*      Taper first input
-        CALL DYN_MAPD( 1, NPTS, TPTR, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-        CALL ARR_COP1D( NPTS, %VAL(DPTR1), %VAL(TPTR), STATUS )
-        DPTR1 = TPTR
-        CALL BDI_UNMAPDATA( IFID(1), STATUS )
-
-
-*      Taper second input
-        CALL DYN_MAPD( 1, NPTS, TPTR, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-        CALL ARR_COP1D( NPTS, %VAL(DPTR2), %VAL(TPTR), STATUS )
-        DPTR2 = TPTR
-        CALL BDI_UNMAPDATA( IFID(2), STATUS )
-
-*      Taper copied data
-        CALL ARR_TAPERD( NPTS, FRAC, %VAL(DPTR1), STATUS )
-        CALL ARR_TAPERD( NPTS, FRAC, %VAL(DPTR2), STATUS )
-
+        DO I = 1, 2
+          CALL DYN_MAPD( 1, NPTS, TPTR, STATUS )
+          CALL ARR_COP1D( NPTS, %VAL(DPTR(I)), %VAL(TPTR), STATUS )
+          DPTR(I) = TPTR
+          CALL ARR_TAPERD( NPTS, FRAC, %VAL(DPTR(I)), STATUS )
+        END DO
       END IF
 
-*    Pad data with zeroes if necessary (for fft)
+*  Pad data with zeroes if necessary (for fft)
       CALL UTIL_EXTEND( NPTS, NTOT )
       NV = (NTOT / 2) + 1
 
-*    Get output scale
-      SCALE = 1.0 / (REAL(NTOT) * SCALE1)
+*  Get output scale
+      SCALE = 1.0 / (REAL(NTOT) * SCALE(1))
 
-      IF (NTOT .GT. NPTS) THEN
-        CALL DYN_MAPD( 1, NTOT, TPTR, STATUS )
+*  Extend the data?
+      IF ( NTOT .GT. NPTS ) THEN
 
-*      Check status
+*    Extend each input
+        DO I = 1, 2
+          CALL DYN_MAPD( 1, NTOT, TPTR, STATUS )
+          CALL ARR_INIT1D( 0.0D0, NTOT, %VAL(TPTR), STATUS )
+          CALL ARR_COP1D( NPTS, %VAL(DPTR(I)), %VAL(TPTR), STATUS )
+          IF ( TAPER ) THEN
+            CALL DYN_UNMAP( DPTR(I), STATUS )
+          ELSE
+            CALL BDI_UNMAP( IFID(I), 'Data', DPTR(I), STATUS )
+          END IF
+          DPTR(I) = TPTR
+        END DO
         IF (STATUS .NE. SAI__OK) GOTO 99
 
-        CALL ARR_INIT1D( 0.0D0, NTOT, %VAL(TPTR), STATUS )
-        CALL ARR_COP1D( NPTS, %VAL(DPTR1), %VAL(TPTR), STATUS )
-        IF ( TAPER ) THEN
-          CALL DYN_UNMAP( DPTR1, STATUS )
-        ELSE
-          CALL BDI_UNMAPDATA( IFID(1), STATUS )
-        END IF
-        DPTR1 = TPTR
-        CALL DYN_MAPD( 1, NTOT, TPTR, STATUS )
-
-*      Check status
-        IF (STATUS .NE. SAI__OK) GOTO 99
-
-        CALL ARR_INIT1D( 0.0D0, NTOT, %VAL(TPTR), STATUS )
-        CALL ARR_COP1D( NPTS, %VAL(DPTR2), %VAL(TPTR), STATUS )
-
-        IF ( TAPER ) THEN
-          CALL DYN_UNMAP( DPTR2, STATUS )
-        ELSE
-          CALL BDI_UNMAPDATA( IFID(2), STATUS )
-        END IF
-        DPTR2 = TPTR
-
-*      Check status
-        IF (STATUS .NE. SAI__OK) GOTO 99
-
+*    Tell user about it
         CALL MSG_SETI( 'NTOT', NTOT )
         CALL MSG_PRNT( 'Inputs extended to ^NTOT elements for '//
      :                                           'transforming' )
@@ -347,13 +275,9 @@
       CALL MSG_SETI( 'NV', NV )
       CALL MSG_PRNT( 'There are ^NV output frequency bins.' )
 
+*  Control parameters
       CALL USI_GET0I( 'SHIFT', LSHIFT, STATUS )
-
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
       CALL USI_GET0I( 'SIGMA', SIGMA, STATUS)
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Create output Multi graph dataset. Need 2 graphs - one for Coherency
@@ -361,52 +285,52 @@
       CALL GMI_CREMULT( OFID, 2, STATUS )
       CALL GMI_LOCNDF( OFID, 1, '*', COFID, STATUS )
       CALL GMI_LOCNDF( OFID, 2, '*', PHFID, STATUS )
+      CALL BDI_LINK( 'BinDS', 1, NV, 'REAL', COFID, STATUS )
+      CALL BDI_LINK( 'BinDS', 1, NV, 'REAL', PHFID, STATUS )
 
-      CALL BDI_PUTTITLE   (COFID, 'Cross Spectrum',     STATUS )
-      CALL BDI_PUTLABEL   (COFID, 'Squared Coherency',  STATUS )
-      CALL BDI_CREBDS     (COFID, 1, NV, .TRUE., .TRUE.,
-     :                                         .FALSE., STATUS )
-      CALL BDI_MAPDATA    (COFID, 'WRITE', CODAT,       STATUS )
-      CALL BDI_PUTAXVAL   (COFID, 1, 0.0, SCALE, NV,    STATUS )
-      CALL BDI_PUTAXLABEL (COFID, 1, 'Frequency',       STATUS )
+      CALL BDI_PUT0C( COFID, 'Title', 'Cross Spectrum', STATUS )
+      CALL BDI_PUT0C( COFID, 'Label', 'Squared Coherency', STATUS )
+      CALL BDI_AXPUT0C( COFID, 1, 'Label', 'Frequency', STATUS )
 
-      CALL BDI_PUTTITLE   (PHFID, 'Cross Spectrum',     STATUS )
-      CALL BDI_PUTLABEL   (PHFID, 'Phase',              STATUS )
-      CALL BDI_CREBDS     (PHFID, 1, NV, .TRUE., .TRUE.,
-     :                                         .FALSE., STATUS )
-      CALL BDI_MAPDATA    (PHFID, 'WRITE', PHDAT,       STATUS )
-      CALL BDI_PUTAXVAL   (PHFID, 1, 0.0, SCALE, NV,    STATUS )
-      CALL BDI_PUTAXLABEL (PHFID, 1, 'Frequency',       STATUS )
+      CALL BDI_MAPR( COFID, 'Data', 'WRITE', CODAT, STATUS )
+      SPARR(1) = 0.0
+      SPARR(2) = SCALE
+      CALL BDI_AXPUT1R( COFID, 1, 'SpacedData', 2, SPARR, STATUS )
+
+      CALL BDI_PUT0C( PHFID, 'Title', 'Cross Spectrum', STATUS )
+      CALL BDI_PUT0C( PHFID, 'Label', 'Phase', STATUS )
+
+      CALL BDI_MAPR( PHFID, 'Data', 'WRITE', PHDAT, STATUS )
+      SPARR(1) = 0.0
+      SPARR(2) = SCALE
+      CALL BDI_AXPUT1R( PHFID, 1, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT0C( PHFID, 1, 'Label', 'Frequency', STATUS )
 
       IF ( LEN1 .GT. 0 ) THEN
-        CALL BDI_PUTAXUNITS( COFID, 1, UNITS, STATUS )
-        CALL BDI_PUTAXUNITS( PHFID, 1, UNITS, STATUS )
+        CALL BDI_AXPUT0C( COFID, 1, 'Units', OUNITS, STATUS )
+        CALL BDI_AXPUT0C( PHFID, 1, 'Units', OUNITS, STATUS )
       END IF
 
-*    Map work arrays for cross soectrum
+*  Map work arrays for cross spectrum
       CALL DYN_MAPR( 1, NV, WRK1PTR, STATUS )
       CALL DYN_MAPR( 1, NV, WRK2PTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Compute cross-spectrum
+*  Compute cross-spectrum
       CALL CROSSPEC_XS (NV, NTOT, LSHIFT, %VAL(DPTR1), %VAL(DPTR2),
      :            SIGMA, %VAL(WRK1PTR), %VAL(WRK2PTR), %VAL(CODAT),
      :                             %VAL(PHDAT), BANDWIDTH, STATUS )
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Calculate coherency & phase variances
-      CALL BDI_MAPVAR( COFID, 'WRITE', COVAR, STATUS )
-      CALL BDI_MAPVAR( PHFID, 'WRITE', PHVAR, STATUS )
-
-*    Check status
+*  Calculate coherency & phase variances
+      CALL BDI_MAPR( COFID, 'Variance', 'WRITE', COVAR, STATUS )
+      CALL BDI_MAPR( PHFID, 'Variance', 'WRITE', PHVAR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
       CALL CROSSPEC_VAR( NV, NPTS, NTOT, BANDWIDTH, FRAC, %VAL(CODAT),
      :                     %VAL(PHDAT), TAPER, %VAL(COVAR), %VAL(PHVAR))
 
-*    History
+*  History
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( NLINES, TEXT, STATUS )
       NLINES       = NLINES + 1
