@@ -1,0 +1,84 @@
+
+##testing make_pseudo_fits
+
+test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use NDF qw(fits_get_nth_item);
+
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(make_pseudo_fits);
+
+$NDFhash{dim1} = 256;
+$NDFhash{dim2} = 1024;
+
+my $pfits;
+
+@kvlist = (
+	   {
+	    'ra' => 210,
+	    'dec' => '45:0:0'
+	   },
+	   {
+	    'ra' => '12:0:0',
+	    'dec' => '90',	# should make LONPOLE 0
+	    'scale' => 2,
+	    'pa' => 45,
+	    'invert' => 0,	# keyword present with default value
+	   },
+	   {
+	    'ra' => '12:0:0',
+	    'dec' => '-12:0:0',
+	    'scale' => 0.5,
+	    'invert' => 1,	# L-H coordinate system
+	    'pa' => '270'	# large rotation
+	   },
+	   {
+	    'ra' => '17:27:10.94',
+	    'dec' => '74:31:58.00',
+	    'scale' => 0.33,
+	    'invert' => 1,
+	    'pa' => 88.7,
+	   },
+	   {
+	    'ra' => 210,
+	    'dec' => '91:0:0'	# error -- keyword out of range
+	   },
+#	   {
+#	    'ra' => 210,
+#	    'dec' => '91:0:0',
+#	    'wonky' => 99,	# error -- invalid keyword
+#	   },
+	  );
+
+foreach my $kv (@kvlist) {
+    foreach my $k (keys(%$kv)) {
+	print "$k=$kv->{$k}  ";
+    }
+    print "...\n";
+    $pfits = make_pseudo_fits (%{$kv}, %NDFhash);
+
+    if (defined($pfits)) {
+	foreach my $l (@$pfits) {
+	    print "$l\n";
+	}
+	for (my $i=0; $i<scalar(@$pfits); $i++) {
+	    my ($keyword, $value, $comment) = fits_get_nth_item (@$pfits, $i);
+	    if ($keyword eq 'COMMENT') {
+		printf ("COMMENT   $comment\n");
+	    } else {
+		printf ("%8s = %s\n", $keyword, $value);
+	    }
+	}
+    } else {
+	print "  ERROR generating FITS file\n";
+    }
+
+    print "\n\n";
+}
+
+exit 0;
+EOD;

@@ -1,0 +1,63 @@
+
+##testing ndf_info and Starlink::AMS::Task interactions
+
+# Test extracting information from NDF.  Test of ndf_info.
+
+test -n "$AUTOASTROM_DIR"	|| AUTOASTROM_DIR=..
+test -n "$KAPPA_DIR"		|| KAPPA_DIR=/star/bin/kappa
+test -n "$PERLBIN"		|| PERLBIN=/star/Perl/bin/perl
+
+TESTTEMPDIR="t5-temp-$$"
+mkdir $TESTTEMPDIR
+
+export AUTOASTROM_DIR KAPPA_DIR TESTTEMPDIR
+$PERLBIN <<'EOD'
+
+use strict;
+
+use Starlink::AMS::Init;
+use Starlink::AMS::Task;
+use Starlink::Versions;
+use NDF;
+
+use lib '..';
+use autoastrom;
+
+my %helpers = ( );
+
+my $ams = new Starlink::AMS::Init(1);
+$ams->timeout(180);
+$ams->messages(1);
+
+my $NDFPack = new Starlink::AMS::Task
+  ("ndfpack_mon_$$", "$ENV{KAPPA_DIR}/ndfpack_mon");
+$NDFPack->contactw || die "Error launching NDFPack - timeout";
+$helpers{ndfpack} = $NDFPack;
+
+my %obsdata = ();
+
+my $NDFinfo = ndf_info ("t5", \%helpers, \%obsdata, $ENV{TESTTEMPDIR});
+
+foreach my $k (sort (keys(%$NDFinfo))) {
+    my $reftype = ref($NDFinfo->{$k});
+    if ($reftype eq '') {
+	printf ("%s = %s\n", $k, $NDFinfo->{$k});
+    } else {
+	printf ("%s: ref to %s\n", $k, $reftype);
+	if ($reftype eq 'ARRAY') {
+	    foreach my $kk (@{$NDFinfo->{$k}}) {
+		printf (">> %s\n", $kk);
+	    }
+	}
+    }
+}
+
+exit 0;
+EOD
+#echo $?
+#perlrval=$?
+
+rm -Rf $TESTTEMPDIR
+
+#exit $perlrval
+exit 0
