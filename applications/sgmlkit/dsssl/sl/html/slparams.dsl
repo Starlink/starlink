@@ -53,7 +53,7 @@ stylesheet will be written to the file named by '%html-manifest%'.
 <argumentlist none>
 <codebody>
 (define %html-manifest%
-	#f; "HTML.manifest"
+	"HTML.manifest"
 	)
 
 <func>
