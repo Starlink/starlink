@@ -9,7 +9,8 @@
 *        9 JAN 91: V1.3-1 correction to bug that always took
 *                  current pos as centre of circle (RJV)
 *        1 Jul 93: V1.3-2 GTR used (RJV)
-*       23 Sep 94: V1.7-0 (RJV(
+*       23 Sep 94: V1.7-0 (RJV)
+*       18 Jan 96: V1.8-0 use IMG_GETCIRC (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -30,7 +31,7 @@
       INTEGER I,ITER
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICENTROID Version 1.7-0')
+      PARAMETER (VERSION = 'ICENTROID Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -45,32 +46,7 @@
 *  ensure transformations are correct
         CALL GTR_RESTORE(STATUS)
 
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
-*  get centre
-          CALL MSG_PRNT(' ')
-          CALL MSG_PRNT('Select centre...')
-          XC=I_X
-          YC=I_Y
-          CALL PGCURSE(XC,YC,CH)
-          CALL PGPOINT(1,XC,YC,2)
-
-*  get radius
-          CALL MSG_PRNT('Select radius...')
-          XR=XC
-          YR=YC
-          CALL PGCURSE(XR,YR,CH)
-          RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-
-*  keyboard mode
-        ELSE
-          CALL USI_DEF0R('X',I_X,STATUS)
-          CALL USI_GET0R('X',XC,STATUS)
-          CALL USI_DEF0R('Y',I_Y,STATUS)
-          CALL USI_GET0R('Y',YC,STATUS)
-          CALL USI_GET0R('RAD',RAD,STATUS)
-
-        ENDIF
+        CALL IMG_GETCIRC('X','Y',RAD',XC,YC,RAD,STATUS)
 
 *  plot initial circle
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
