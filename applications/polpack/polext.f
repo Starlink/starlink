@@ -372,7 +372,7 @@
 *  defaults first.
          STOKES = ' '
          ANG = 0.0
-         IMG = NDFNAM( LNDF - IDLEN + 1 : LNDF )
+         IMG = NDFNAM( MAX( 1, LNDF - IDLEN + 1 ) : LNDF )
          WPL = ' '
 
          IF( GOTPOL ) THEN
