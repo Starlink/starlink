@@ -158,6 +158,10 @@
 *        Moved special cases of .OBS.SECZ, .OBS.TIME, .Z.MAGFLAG,
 *        .Z.RANGE to the top-level Figaro extension as this is where
 *        DSA_ now expects to find them in an NDF.
+*     1992 September 28 (MJC):
+*        Corrected the closedown sequence of DTA-error reporting.
+*        Added message tokens for the filenames to clarify some error
+*        reports.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -280,19 +284,20 @@
 *.
 
 *   Return immediately on bad status
-      IF (STATUS .NE. SAI__OK) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Open the files.
 *   ===============
 
 *   Open the input file.
-      NSTR = CHR_LEN(FIGFIL)
-      CALL DTA_ASFNAM ('INPUT', FIGFIL(:NSTR), 'OLD', 0, FIGFIL, DSTAT)
+      NSTR = CHR_LEN( FIGFIL )
+      CALL DTA_ASFNAM( 'INPUT', FIGFIL(:NSTR), 'OLD', 0, FIGFIL, DSTAT )
       IF ((DSTAT .NE. 0) .AND. (DSTAT .NE. DTA_EXIST)) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP ('DST2NDF_FNF ', 'Unable to open input file', 
-     :                  STATUS)
-         GO TO 500
+         CALL MSG_SETC( 'FILNAM', FIGFIL )
+         CALL ERR_REP( 'DST2NDF_FNF',
+     :     'DST2NDF: Unable to open input file ^FILNAM.', STATUS )
+         GOTO 500
       END IF
       OBOPEN = .TRUE.
 
@@ -302,9 +307,10 @@
      :                 'NEW', 10, 'NDF', DSTAT)
       IF (DSTAT .NE. 0) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP ('DST2NDF_FNF', 'Unable to open output NDF', 
-     :                  STATUS)
-         GO TO 500
+         CALL MSG_SETC( 'FILNAM', NDFFIL )
+         CALL ERR_REP ('DST2NDF_FNF',
+     :     'DST2NDF: Unable to open output NDF ^FILNAM.', STATUS )
+         GOTO 500
       END IF
       OUOPEN = .TRUE.
 
@@ -1158,7 +1164,7 @@
                         CALL DTA_CRNAM (AXOUT, NAME2, 0, 0, 
      :                                 NAMOUT, DSTAT)
                         CALL DTA_WRVARC (NAMOUT, NDATA, STRING, DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 500
+                        IF (DSTAT .NE. 0) GOTO 400
 
 *                  Deal with non-standard axis components.
 *                  =======================================
@@ -1540,19 +1546,21 @@
 *   ======================
 
 *   Report any DTA errors.
-      IF (DSTAT .NE. 0) THEN
-         CALL DTA_ERROR (DSTAT, ERROR)
-         CALL MSG_OUT (' ', ERROR, STATUS)
+      IF ( DSTAT .NE. 0 ) THEN
+         IF ( STATUS .EQ. SAI__OK ) STATUS = DSTAT
+         CALL DTA_ERROR( DSTAT, ERROR )
+         CALL ERR_REP( 'CON_DST2N_DTAERR', ERROR, STATUS )
+         DSTAT = 0
       END IF
 
 *   Close down the input and output files.
-      IF (OUOPEN) CALL DTA_FCLOSE ('OUTPUT', DSTAT)
-      IF (OBOPEN) CALL DTA_FCLOSE ('INPUT', DSTAT)
+      IF ( OUOPEN ) CALL DTA_FCLOSE( 'OUTPUT', DSTAT )
+      IF ( OBOPEN ) CALL DTA_FCLOSE( 'INPUT', DSTAT )
 
       IF (DSTAT .NE. 0) THEN
-         CALL DTA_ERROR (DSTAT, ERROR)
-         CALL MSG_OUT (' ', ERROR, STATUS)
+         IF ( STATUS .EQ. SAI__OK ) STATUS = DSTAT
+         CALL DTA_ERROR( DSTAT, ERROR )
+         CALL ERR_REP ( 'CON_DST2N_DTAERR', ERROR, STATUS )
       END IF
-      STATUS = DSTAT
 
       END
