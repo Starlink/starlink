@@ -67,28 +67,28 @@ fails then undef is returned (which will not be an object reference).
 =cut
 
 # NEW - create a new instance of Starlink::AMS::Task
- 
+
 sub new {
- 
+
   my $proto = shift;
   my $class = ref($proto) || $proto;
- 
+
   my $task = {};  # Anon hash
- 
+
   $task->{Name} = undef;  # Name in AMS
   $task->{PID}  = undef;  # Process ID (object) of monolith
   $task->{Running} = 0;   # Is the monolith contactable
   $task->{TaskType} = 'A'; # Default to A-task
   $task->{Monolith} = undef; # Monolith name
   $task->{AdamDir} = undef; # Location of $ADAM_USER
- 
+
   # Bless task into class
   bless($task, $class);
- 
+
   # If we have arguments then we are trying to do a load
   # as well
-  if (@_) { 
-    my $status = $task->load(@_); 
+  if (@_) {
+    my $status = $task->load(@_);
     # If the load failed I think we should return undef rather
     # than an object
     if ($status != 0) {
@@ -96,11 +96,10 @@ sub new {
     }
 
   };
- 
- 
+
   return $task;
 }
- 
+
 
 # Methods to access the "instance" data
 #
@@ -118,7 +117,7 @@ new name exists in the messaging system).
   $name = $obj->name("name")
 
 =cut
- 
+
 sub name {
   my $self = shift;
   if (@_) { $self->{Name} = shift; }
@@ -135,13 +134,13 @@ the process associated with the monolith still exists.
   $proc = $obj->pid;
 
 =cut
- 
+
 sub pid {
   my $self = shift;
   if (@_) { $self->{PID} = shift; }
   return $self->{PID};
 }
- 
+
 # Not actually used
 
 sub running {
@@ -162,14 +161,14 @@ Should be either 'A' or 'I'.
 
 sub tasktype {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $type = uc(shift());
     croak "Adam task of type '$type' is not recognised"
       unless ($type eq 'A' || $type eq 'I');
-    $self->{TaskType} = $type; 
+    $self->{TaskType} = $type;
   }
   return $self->{TaskType};
-} 
+}
 
 
 =item monolith
@@ -185,7 +184,7 @@ sub monolith {
   my $self = shift;
   if (@_) { $self->{Monolith} = shift(); }
   return $self->{Monolith};
-} 
+}
 
 =item adamdir
 
@@ -246,7 +245,7 @@ sub DESTROY {
 
 
 # Methods to actually do things
- 
+
 # Load
 #   - Load a monolith and set up the name in the AMS
 
@@ -283,10 +282,10 @@ is not loaded.
 
 
 sub load {
- 
+
   my $self = shift;
   my $status = &Starlink::ADAM::SAI__OK;  # A good status
- 
+
   # First argument is the name of the system so set that in the object
   $self->name(shift);
 
@@ -295,7 +294,7 @@ sub load {
 
   # A further argument (optional) will be the monolith name
   # and optional hash.
-  if (@_) { 
+  if (@_) {
 
     # Set default behaviour of task
     $self->tasktype('A');
@@ -309,7 +308,7 @@ sub load {
     my @args = ();
 
     my $options = {};  # Options hash
-    
+
     if (ref($_[-1]) eq 'HASH') {
       # Okay so there is an options hash so use it
       $options = pop @_;
@@ -318,7 +317,7 @@ sub load {
       if (exists $options->{TASKTYPE}) {
 	$self->tasktype($options->{TASKTYPE});
       } else {
-	# Okay so TASKTYPE was not defined so we set it 
+	# Okay so TASKTYPE was not defined so we set it
 	# to our default value.
 	$options->{TASKTYPE} = $self->tasktype;
       }
@@ -328,8 +327,8 @@ sub load {
 	if exists $options->{MONOLITH};
 
       push(@args, $options); # Store the options
-      
-    } 
+
+    }
 
 
     # Check for any more arguments (the monolith name)
@@ -338,7 +337,7 @@ sub load {
 
       # If we can already talk to a monolith via this path then
       # we should not start a new monolith
- 
+
       unless ($self->contact) {
 
 	# Get the monolith name (if present)
@@ -349,20 +348,20 @@ sub load {
 	  # stored - eg by the MONOLITH options
 	  $self->monolith( $monolith )
 	    unless defined $self->monolith;
-	  
+
 	  # Store the monolith path and name on arg list
 	  unshift @args, $_[0];	
 	}
 
 	# Launch the monolith
 	my ($process, $status) = adamtask($self->name(), @args ); 
- 
+
 	# Store the PID object (may be undefined if not spawned by us)
 	# if good status?
 	$self->pid($process);
       }
 
-    } 
+    }
 
   } else {
     # Assume I-task behaviour if no arguments
@@ -386,9 +385,8 @@ Send an obey to a task and wait for a completion message
 
 =cut
 
- 
 sub obeyw {
- 
+
   my $self = shift;
   my $action = shift;    # This is the action (eg stats)
 
@@ -397,9 +395,9 @@ sub obeyw {
 
   # Now do the obeyw
   my $status = adamtask_obeyw($self->name(), $action, $parameters);
- 
+
 }
- 
+
 # GET
 #
 #  $value = $task->get(task, param)
@@ -423,19 +421,19 @@ the par_get routine from the perl NDF module is invoked.
 
 =cut
 
- 
+
 sub get {
- 
+
   my $self = shift;
 
   croak 'Usage: get(task, param)' unless scalar(@_) == 2;
 
   my $task  = shift;
   my $param = shift;
- 
+
   my @values = ();
   my $status = &Starlink::ADAM::SAI__OK;
- 
+
   # Now do the get
   if ($self->tasktype eq 'I') {
     # This is for an I-task
@@ -451,10 +449,10 @@ sub get {
     if ($value =~ /^\s*\[.*\]\s*$/) {
       # Remove the brackets
       $value =~ s/^\s*\[(.*)]\s*/$1/;
-    
+
       # Now split on comma
       @values = split(/,/, $value);
-    
+
     } else {
       push(@values, $value);
     }
@@ -472,7 +470,7 @@ sub get {
 
     # Use NDF - need to search in file $monolith for task 
     my $monolith = $self->monolith;
-    
+
     if (defined $monolith) {
 
       my $file = $monolith . ".$task";
@@ -516,7 +514,7 @@ sub get {
   }
 
 }
- 
+
 # SET
 #
 #  $task->set(param, value)
@@ -535,7 +533,7 @@ This routine has no effect in A-tasks.
 # with commas
 
 sub set {
- 
+
   my $self = shift;
 
   croak 'Usage: set(action, param, value)'
@@ -544,7 +542,7 @@ sub set {
   my $action = shift;
   my $param = shift;
   my $value = shift;
-  
+
   # Construct the adam parameter string from action and param
   my $string = $action .":$param";
 
@@ -559,9 +557,9 @@ sub set {
   }
 
   return $status;
- 
+
 }
- 
+
 # CONTROL
 #
 #  $task->control(type, dir)
@@ -577,20 +575,18 @@ Send control messages to a monolith.
 
 =cut
 
- 
- 
 sub control {
- 
+
   my $self = shift;
- 
+
   my $type = shift;
   my $dir  = shift;
- 
+
   my ($value, $status) = adamtask_control($self->name(), $type, $dir);
 
   return $value, $status;
 }
- 
+
 
 =item forget
 
@@ -603,15 +599,15 @@ This routine has no input arguments.
 =cut
 
 sub forget {
- 
+
   my $self = shift;
- 
+
   # Set the flag on the object so that it doesnt die on
   # undef
   $self->pid->kill_on_destroy(0);
- 
+
 }
- 
+
 
 =item contact
 
@@ -623,7 +619,7 @@ a zero if we cant.
 
 sub contact {
   my $self = shift;
- 
+
   # Try to talk to the monolith
   adam_path $self->name;
 }
@@ -633,13 +629,13 @@ sub contact {
 This method will not return unless the monolith can be contacted.
 It only returns with a timeout. Returns a '1' if we contacted okay
 and a '0' if we timed out. It will timeout if it takes longer than
-specified in Starlink::AMS::Init->timeout.
+specified in Starlink::AMS::Init-E<gt>timeout.
 
 =cut
 
 sub contactw {
  my $self = shift;
- 
+
  # Set the current time
  my $start = time();
 
@@ -652,20 +648,20 @@ sub contactw {
 
  # Check
  while (! $self->contact) {
-   if ((time() - $start) > $timeout) { 
+   if ((time() - $start) > $timeout) {
       print $stderr "Timed out whilst trying to contact monolith ".
-	$self->name."\n" 
+	$self->name."\n"
 	  unless $err_hide;
       return 0;
    }
    select undef,undef,undef, 0.2;
  }
- 
+
  # Must be okay
  return 1;
- 
+
 }
- 
+
 
 =back
 
@@ -700,5 +696,5 @@ and L<NDF>.
 
 
 
-1; 
- 
+1;
+
