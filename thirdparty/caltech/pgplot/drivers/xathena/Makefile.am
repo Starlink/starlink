@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LTLIBRARIES = libXaPgplot.la
+lib_LTLIBRARIES = libXaPgplot.la
 libXaPgplot_la_SOURCES = $(C_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
