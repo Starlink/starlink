@@ -1,4 +1,5 @@
-      SUBROUTINE ARD1_GTARG( ELEM, L, I, OK, MORE, VALUE, STATUS )
+      SUBROUTINE ARD1_GTARG( FRM, AXIS, ELEM, L, I, OK, MORE, VALUE, 
+     :                       STATUS )
 *+
 *  Name:
 *     ARD1_GTARG
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_GTARG( ELEM, L, I, OK, MORE, VALUE, STATUS )
+*     CALL ARD1_GTARG( FRM, AXIS, ELEM, L, I, OK, MORE, VALUE, STATUS )
 
 *  Description:
 *     If the next non-blank character in the element is a closing
@@ -22,6 +23,14 @@
 *     next character to be checked.
 
 *  Arguments:
+*     FRM = INTEGER (Given)
+*        An AST Frame. The AST_UNFORMAT method of this Frame is used to 
+*        obtained the numerical value from the formatted text string.
+*     AXIS = INTEGER (Given)
+*        The index of the Axis within FRM to which the next value relates.
+*        A value of 0 can be supplied to indicate that FRM should be
+*        ignored, in which case the value is assumed to be formatted
+*        as a simple floating point value.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
@@ -34,7 +43,7 @@
 *     MORE = LOGICAL (Returned)
 *        Returned .FALSE. if a closing parenthesis was found. .FALSE.
 *        otherwise.
-*     VALUE = REAL (Returned)
+*     VALUE = DOUBLE PRECISION (Returned)
 *        The argument value (undefined if OK is returned .FALSE.).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -46,6 +55,8 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -58,9 +69,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
+      INTEGER FRM
+      INTEGER AXIS
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -70,7 +84,7 @@
 *  Arguments Returned:
       LOGICAL OK
       LOGICAL MORE
-      REAL VALUE
+      DOUBLE PRECISION VALUE
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -80,6 +94,7 @@
      :  DELIM,                   ! Offset from I to the next delimiter
      :  END,                     ! Offset from I to end of argument
      :  J,                       ! Index of last character in argument
+     :  NC,                      ! Number of characters read
      :  PAREN                    ! Offset from I to next ")" character
 *.
 
@@ -153,8 +168,17 @@
 *  and if it is not blank...
                IF( ELEM( I : J ) .NE. ' ' ) THEN
 
-*  attempt to convert it to a numerical value.
-                  CALL CHR_CTOR( ELEM( I : J ), VALUE, STATUS )
+*  Attempt to convert it to a numerical value. If no AST Axis is
+*  specified...
+                  IF( AXIS .LT. 1 ) THEN                  
+                     CALL CHR_CTOD( ELEM( I : J ), VALUE, STATUS )
+
+*  Otherwise, use the Unformat method of the supplied Frame.
+                  ELSE
+                      NC = AST_UNFORMAT( FRM, AXIS, ELEM( I : J ), 
+     :                                   VALUE, STATUS )
+                      IF( NC .EQ. 0 ) STATUS = ARD__BADAR
+                  END IF
 
 *  Set the OK flag if a vlaue was obtained succesfully.
                   OK = ( STATUS .EQ. SAI__OK )

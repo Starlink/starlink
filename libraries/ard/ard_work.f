@@ -76,6 +76,9 @@
 *     equal to the symbolic value VAL__BADR, then a unit mapping is
 *     assumed (i.e. application co-ordinates are assumed to be the same
 *     as pixel co-ordinates). 
+*     -  Knowledge of how to convert other coordinate systems (RA/DEC for 
+*     instance) into pixel positions within the mask can be specified
+*     using routine ARD_WCS.
 *     -  VAL__BADR is defined in the PRIMDAT include file PRM_PAR
 *     (see SUN/39). 
 
@@ -86,6 +89,10 @@
 *  History:
 *     28-APR-1994 (DSB):
 *        Original version.
+*     5-JUN-2001 (DSB):
+*        Modified to use AST FrameSets instead of linear coeffs.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,6 +131,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      DOUBLE PRECISION 
+     :  DLBND( ARD__MXDIM ),     ! Lower bounds of pixel coords
+     :  DUBND( ARD__MXDIM )      ! Upper bounds of pixel coords
+
       INTEGER                    ! Pointers to...
      :  IPASTK,                  ! argument stack for conversion to r.p.
      :  IPEXP2,                  ! expanded algebraic ARD expression
@@ -138,6 +149,7 @@
      :  IPUSTI                   ! stack of int. box upper bounds
 
       INTEGER
+     :  AWCS,                    ! WCS Frameset supplied by application 
      :  I,                       ! Loop count
      :  INDEX1,                  ! Index for 1st keyword
      :  MSKSIZ,                  ! No. of pixels in mask
@@ -149,13 +161,13 @@
       LOGICAL
      :  INP                      ! INPUT keywords in ARD description?
 
-      REAL
-     :  LTRC( 0:ARD__MXDIM, ARD__MXDIM )! Local copy of TRCOEF
-
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Abort if an illegal number of dimensions has been supplied.
       IF( NDIM .LE. 0 .OR. NDIM .GT. ARD__MXDIM ) THEN
@@ -199,14 +211,14 @@
          INDEX1 = REGVAL
       END IF
 
-*  Take a copy of the supplied transformation co-efficients. If the
-*  first element is equal to VAL_BADR, then use a unit transformation
-*  instead.
-      IF( TRCOEF( 0, 1 ) .NE. VAL__BADR ) THEN
-         CALL ARD1_TRCOP( NDIM, TRCOEF, LTRC, STATUS )
-      ELSE
-         CALL ARD1_TRUNI( NDIM, LTRC, STATUS )
-      END IF
+*  Create an AST FrameSet describing the known coordinate Frames. This
+*  FrameSet will contain a Frame with Domain PIXEL referring to pixel
+*  coords within the pixel mask and another Frame with Domain ARDAPP 
+*  referring to "Application co-ordinates" (as defined by the TRCOEF 
+*  argument). It may also contain other Frames specified using the
+*  ARD_WCS routine. The PIXEL Frame will be the Base Frame. The current
+*  Frame will be the preferred user coordinate system.
+      CALL ARD1_APWCS( NDIM, TRCOEF, AWCS, STATUS )
 
 *  Get work space to hold the algebraic Boolean expression
 *  corresponding to the supplied ARD description, and an array of
@@ -215,7 +227,13 @@
       CALL PSX_CALLOC( SZEXPR, '_INTEGER', IPEXPR, STATUS )
 
       SZOPND = 200
-      CALL PSX_CALLOC( SZOPND, '_REAL', IPOPND, STATUS )
+      CALL PSX_CALLOC( SZOPND, '_DOUBLE PRECISION', IPOPND, STATUS )
+
+*  Store _DOUBLE versions of the mask pixel bounds.
+      DO I = 1, NDIM
+         DLBND( I ) = DBLE( LBND( I ) - 1 )
+         DUBND( I ) = DBLE( UBND( I ) )
+      END DO
 
 *  Create an algebraic Boolean expression in which operators and
 *  operands are represented by integer codes by analysing the ARD
@@ -224,8 +242,8 @@
 *  included in the ARD description. The returned expression corresponds
 *  to the ARD description as supplied (i.e. no implicit .OR.s are
 *  inserted).
-      CALL ARD1_ADANL( IGRP, NDIM, LTRC, IPEXPR, IPOPND, SZEXPR,
-     :                 SZOPND, INP, STATUS )
+      CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
+     :                 SZEXPR, SZOPND, INP, STATUS )
 
 *  Abort if an error has occured.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -324,6 +342,9 @@
       CALL PSX_FREE( IPEXP2, STATUS )
       CALL PSX_FREE( IPEXPR, STATUS )
       CALL PSX_FREE( IPOPND, STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  If an error has occured, give a context message.
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -101,17 +101,80 @@
 *  The number of arguments taken by each statement.
       INTEGER CMN_STARG( ARD__NSTAT )
 
+*  Information passed to the ARD routines which "draw" zero-volume
+*  regions, "fills" nonzero-volume regions.
+*  ===============================================================
+*  The MSKSIZ value passed to the ARD "drawing" routines.
+      INTEGER CMN_MSKSC 
+
+*  The RINDEX value passed to the ARD "drawing" routines.
+      INTEGER CMN_RNDXC 
+
+*  Pointer to the B array passed to the ARD "drawing" routines.
+      INTEGER CMN_IPBC
+
+*  Pointer to an array holding parameter values.
+      INTEGER CMN_IPPAR
+
+*  The lower bounds of the B array passed to the ARD "drawing" routines.
+      INTEGER CMN_LBNDC( 2 ) 
+
+*  The upper bounds of the B array passed to the ARD "drawing" routines.
+      INTEGER CMN_UBNDC( 2 ) 
+
+*  The lower bounds of the interior bounding box passed to the ARD 
+*  "drawing" routines.
+      INTEGER CMN_LBIBC( 2 ) 
+
+*  The upper bounds of the interior bounding box passed to the ARD 
+*  "drawing" routines.
+      INTEGER CMN_UBIBC( 2 ) 
+
+*  The region type.
+      INTEGER CMN_TYPEC 
+
+*  The number of region parameters supplied.
+      INTEGER CMN_NPARC
+
+*  A pointer to an AST Frame representign user coordinates.
+      INTEGER CMN_FRMC
+
+*  Should the service routine perform any required initialization?
+      LOGICAL CMN_INIT
+
+*  GRP identifier for group holding AST_ data.
+      INTEGER CMN_IGRP 
+
+*  Next element to use in group holding AST_ data.
+      INTEGER CMN_NXTLN 
+
 *  Misc.
 *  =====
-*  The co-efficients of the current mapping from pixel co-ordinates to
-*  user co-ordinates.
-      REAL CMN_INVRS( ARD__MXDIM*( ARD__MXDIM + 1 ) )
+*  A pointer to dynamic memory holding an expanable array of axis values.
+*  Zero if the list is currently not in use.
+      INTEGER CMN_PSET
+
+*  The number of dimensions for each point currently stored in CMN_PSET.
+      INTEGER CMN_PDIM
+
+*  The number of points currently stored in CMN_PSET.
+      INTEGER CMN_PSIZ
+
+*  The maximum number of points which can be stored in CMN_PSET.
+      INTEGER CMN_PMAX
+
+*  The application FrameSet supplied to ARD_WCS.
+      INTEGER CMN_AWCS
 
 *  Declare the common block /ARD_C1/, to hold non-character variables.
       COMMON /ARD_C1/ CMN_DSTK, CMN_KWLEN, CMN_NARG, CMN_OPCOD,
      :                CMN_OPL, CMN_OPLEN, CMN_OPR, CMN_OPS, CMN_PRL,
      :                CMN_PRR, CMN_STARG, CMN_STLEN, CMN_WRT, CMN_KWARG,
-     :                CMN_INVRS
+     :                CMN_PSET, CMN_PDIM, CMN_PSIZ, CMN_PMAX, CMN_IPBC,
+     :                CMN_LBNDC, CMN_UBNDC, CMN_LBIBC, CMN_UBIBC,
+     :                CMN_MSKSC, CMN_RNDXC, CMN_TYPEC, CMN_NPARC,
+     :                CMN_FRMC, CMN_IPPAR, CMN_INIT, CMN_IGRP,
+     :                CMN_NXTLN, CMN_AWCS
 
 *  Declare the common block /ARD_C2/, to hold character variables.
       COMMON /ARD_C2/ CMN_OPSYM, CMN_KWSYM, CMN_STSYM, CMN_INSTR
@@ -120,3 +183,5 @@
       SAVE /ARD_C1/, /ARD_C2/
 
 *.
+
+

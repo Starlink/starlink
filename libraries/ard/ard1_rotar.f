@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_ROTAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_ROTAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,25 +11,22 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ROTAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_ROTAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
-*     The pixel co-ordinates of the four corners of the rotated box are
-*     stored on the operand stack. They are in an order such that they
-*     can be considered to be a 4-vertex polygon.
+*     The supplied arguments are stored on the operand stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from supplied
-*        co-ordinates to pixel co-ordinates.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
-*        The index of the last character in ELEM to be checked.
+*        The index of the final character in ELEM to be checked.
 *     IPOPND = INTEGER (Given)
 *        The pointer to the array holding the operand stack.
 *     IOPND = INTEGER (Given and Returned)
@@ -55,6 +52,8 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -67,12 +66,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -88,17 +88,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER AXIS               ! Axis index
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL
-     : ARGS( ARD__MXDIM ),       ! A set of co-ordinates
-     : CORN( 2 ),                ! Corner co-ordinates
-     : SINT,                     ! SIN of the rotation angle
-     : COST,                     ! COS of the rotation angle
-     : VALUE                     ! The argument value
+      DOUBLE PRECISION VALUE     ! The argument value
 
-*  Ensure that the ARGS array is saved between invocations of this
-*  routine.
-      SAVE ARGS
+
 *.
 
 *  Check inherited global status.
@@ -107,8 +101,8 @@
 *  Report an error and abort if the dimensionality is not 2.
       IF( NDIM .NE. 2 ) THEN
          STATUS = ARD__NOT2D
-         CALL ERR_REP( 'ARD1_ROTAR_ERR1', 'ROTBOX keyword found in '//
-     :                 'non-2D ARD description.', STATUS )
+         CALL ERR_REP( 'ARD1_ROTAR_ERR1', 'ARD mask is not 2 '//
+     :                 'dimensional.', STATUS )
          GO TO 999
       END IF
 
@@ -116,59 +110,36 @@
 *  end of the element, or the end of the argument list is encountered.
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
-*  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+*  First argument refers to axis 1.
+         IF( NARG .EQ. 0 ) THEN
+            AXIS = 1
 
-*  If an argument was obtained, increment the number of arguments
-*  supplied by the user and store the new argument (so long as the array
-*  is not full).
-         IF( OK .AND. NARG .LT. 5 ) THEN
-            NARG = NARG + 1
-            ARGS( NARG ) = VALUE
+*  Second argument refers to axis 2.
+         ELSE IF( NARG .EQ. 1 ) THEN
+            AXIS = 2
 
-*  If all the arguments have been supplied...
-            IF( NARG .EQ. 5 ) THEN
-
-*  Save commonly used values.
-               SINT = SIN( ARGS( 5 ) * ARD__DTOR )
-               COST = COS( ARGS( 5 ) * ARD__DTOR )
-
-*  Set up the user coordinates of the first corner of the box.
-               CORN( 1 ) = 0.5*( -ARGS( 3 )*COST + ARGS( 4 )*SINT )
-     :                     + ARGS( 1 )
-               CORN( 2 ) = 0.5*( -ARGS( 4 )*COST - ARGS( 3 )*SINT )
-     :                     + ARGS( 2 )
-
-*  Transform the user co-ordinates into pixel co-ordinates, and store
-*  them on the operand stack.
-               CALL ARD1_STORP( NDIM, C, CORN, IPOPND, IOPND, SZOPND,
-     :                          STATUS )
-
-*  Now do the same with the second corner.
-               CORN( 1 ) = 0.5*( -ARGS( 3 )*COST - ARGS( 4 )*SINT )
-     :                     + ARGS( 1 )
-               CORN( 2 ) = 0.5*( ARGS( 4 )*COST - ARGS( 3 )*SINT )
-     :                     + ARGS( 2 )
-               CALL ARD1_STORP( NDIM, C, CORN, IPOPND, IOPND, SZOPND,
-     :                          STATUS )
-      
-*  Now do the same with the third corner.
-               CORN( 1 ) = 0.5*( ARGS( 3 )*COST - ARGS( 4 )*SINT )
-     :                     + ARGS( 1 )
-               CORN( 2 ) = 0.5*( ARGS( 4 )*COST + ARGS( 3 )*SINT )
-     :                     + ARGS( 2 )
-               CALL ARD1_STORP( NDIM, C, CORN, IPOPND, IOPND, SZOPND,
-     :                          STATUS )
-
-*  Now do the same with the fourth corner.
-               CORN( 1 ) = 0.5*( ARGS( 3 )*COST + ARGS( 4 )*SINT )
-     :                     + ARGS( 1 )
-               CORN( 2 ) = 0.5*( -ARGS( 4 )*COST + ARGS( 3 )*SINT )
-     :                     + ARGS( 2 )
-               CALL ARD1_STORP( NDIM, C, CORN, IPOPND, IOPND, SZOPND,
-     :                          STATUS )
-
+*  Third and fourth arguments, refer to axis 1 - unless the Frame is a
+*  SkyFrame in which case it refers to the latitude-like axis.
+         ELSE IF( NARG .LT. 4 ) THEN
+            IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+               AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
+            ELSE
+               AXIS = 1
             END IF
+
+*  Any other axes are interpreted as simple floating point values.
+         ELSE 
+            AXIS = 0
+         END IF
+
+*  Read the next argument.
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+     :                    STATUS )
+
+*  If an argument was obtained, store it on the operands stack.
+         IF( OK ) THEN
+            NARG = NARG + 1
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect.
@@ -176,7 +147,7 @@
  
             IF( NARG .NE. 5 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
-               CALL ERR_REP( 'ARD1_ROTAR_ERR', 'Incorrect number of '//
+               CALL ERR_REP( 'ARD1_ROTAR_ERR1', 'Incorrect number of '//
      :                       'arguments found.', STATUS )
             END IF
 
@@ -184,7 +155,6 @@
 
       END DO
 
-*  Jump to here if an error occurs.
  999  CONTINUE
 
       END

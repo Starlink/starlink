@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_BXFND( NDIM, LBND, UBND, NPAR, PAR, LBINTB,
+      SUBROUTINE ARD1_BXFND( NDIM, LBND, UBND, NPAR, D, PAR, LBINTB,
      :                       UBINTB, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BXFND( NDIM, LBND, UBND, NPAR, PAR, LBINTB, UBINTB,
+*     CALL ARD1_BXFND( NDIM, LBND, UBND, NPAR, D, PAR, LBINTB, UBINTB,
 *                      STATUS )
 
 *  Description:
@@ -29,10 +29,17 @@
 *        Upper bounds of mask.
 *     NPAR = INTEGER (Given)
 *        No. of values in PAR.
-*     PAR( NPAR ) = REAL (Given)
-*        Parameters; Coeffs of user coord.s to pixel coord.s
-*        transformation, followed by user coords of box centre,
-*        followed by length of each side of the box (in user coords).
+*     D( * ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. There should be
+*        NDIM*(NDIM+1) elements in the array. The mapping is:
+*
+*        P1 = D0 + D1*U1 + D2*U2 + ...  + Dn*Un
+*        P2 = Dn+1 + Dn+2*U1 + Dn+3*U2 + ...  + D2n+1*Un
+*        ...
+*        Pn = ...
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
+*        Parameters; user coords of box centre, followed by length of each 
+*        side of the box (in user coords).
 *     LBINTB( NDIM ) = INTEGER (Returned)
 *        The lower bounds of the internal bounding box.
 *     UBINTB( NDIM ) = INTEGER (Returned)
@@ -47,6 +54,8 @@
 *  History:
 *     30-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -67,7 +76,8 @@
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( * ) 
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Returned:
       INTEGER LBINTB( NDIM )
@@ -78,17 +88,15 @@
 
 *  Local Variables:
       INTEGER
-     :     CEN0,                 ! Offset to centre values
      :     I,                    ! Dimension counter
      :     IC,                   ! Corner counter
-     :     PINDEX,               ! Pixel index value
-     :     SIDE0                 ! Offset to side length values
+     :     PINDEX                ! Pixel index value
 
       LOGICAL
      :     UPPER( ARD__MXDIM ),  ! At upper bound?
      :     CARRY                 ! Carry forward?
 
-      REAL
+      DOUBLE PRECISION 
      :     PIXCO( ARD__MXDIM ),  ! Pixel coordinates for current corner
      :     USERCO( ARD__MXDIM )  ! User coordinates for current corner
 
@@ -96,11 +104,6 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Store the offsets (within PAR) to the centre co-ordinates, and
-*  to the side lengths.
-      CEN0 = NDIM*( 1 + NDIM )
-      SIDE0 = NDIM*( 2 + NDIM )
 
 *  Initialise the interior bounding box.
       DO I = 1, NDIM
@@ -113,19 +116,19 @@
 *  axes to their lower bounds.
       DO I = 1, NDIM      
          UPPER( I ) = .FALSE.
-         USERCO( I ) = PAR( CEN0 + I ) - 0.5*PAR( SIDE0 + I )
+         USERCO( I ) = PAR( I ) - 0.5*PAR( NDIM + I )
       END DO
 
 *  Loop round each of the corners.
       DO IC = 1, 2**NDIM
 
 *  Transform the current user position to pixel coordinates.
-         CALL ARD1_TRANS( NDIM, PAR, USERCO, PIXCO )
+         CALL ARD1_LTRAN( NDIM, D, 1, USERCO, PIXCO, STATUS )
 
 *  Convert the pixel co-ordinates to pixel indices and update the upper
 *  and lower bounds of the internal bounding box.
          DO I = 1, NDIM
-            PINDEX = REAL( INT( PIXCO( I ) ) )
+            PINDEX = DBLE( INT( PIXCO( I ) ) )
             IF( PINDEX .LT. PIXCO( I ) ) PINDEX = PINDEX + 1
 
             LBINTB( I ) = MIN( LBINTB( I ), PINDEX )
@@ -147,14 +150,14 @@
 *  add the carry onto the next bit.
             IF( UPPER( I ) ) THEN
                UPPER( I ) = .FALSE.
-               USERCO( I ) = PAR( CEN0 + I ) - 0.5*PAR( SIDE0 + I )
+               USERCO( I ) = PAR( I ) - 0.5*PAR( NDIM + I )
                I = I + 1
 
 *  If this "bit" is clear, set it, and store the upper bound. Indicate
 *  that no carry is required.
             ELSE
                UPPER( I ) = .TRUE.            
-               USERCO( I ) = PAR( CEN0 + I ) + 0.5*PAR( SIDE0 + I )
+               USERCO( I ) = PAR( I ) + 0.5*PAR( NDIM + I )
                CARRY = .FALSE.
 
             END IF

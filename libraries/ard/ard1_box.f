@@ -1,5 +1,6 @@
-      SUBROUTINE ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                     B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+      SUBROUTINE ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, 
+     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     STATUS )
 *+
 *  Name:
 *     ARD1_BOX
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR, B,
+*     CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, B,
 *                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -19,9 +20,7 @@
 *     supplied interior bounding box to the exterior value 0.
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
-*     supplied parameters. The supplied parameters are the
-*     co-efficients of the current transformation from user
-*     co-ordinates to pixel co-ordinates, followed by the supplied user
+*     supplied parameters. The supplied parameters are the supplied user
 *     co-ordinates of the box centre, followed by the lengths of the
 *     box sides in user co-ordinates.
 
@@ -38,7 +37,15 @@
 *        The total number of elements in the B array.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
-*     PAR( NPAR ) = REAL (Given)
+*     D( * ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. There should be
+*        NDIM*(NDIM+1) elements in the array. The mapping is:
+*
+*        P1 = D0 + D1*U1 + D2*U2 + ...  + Dn*Un
+*        P2 = Dn+1 + Dn+2*U1 + Dn+3*U2 + ...  + D2n+1*Un
+*        ...
+*        Pn = ...
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
 *        A list of pixel co-ordinates, in groups of NDIM. 
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
@@ -69,6 +76,8 @@
 *  History:
 *     30-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,7 +101,8 @@
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( * )
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
@@ -114,7 +124,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error if the number of supplied parameters is wrong.
-      IF( NPAR .NE. NDIM*( 3 + NDIM ) ) THEN
+      IF( NPAR .NE. 2*NDIM ) THEN
          STATUS = ARD__INTER
          CALL MSG_SETI( 'NP', NPAR )
          CALL MSG_SETI( 'ND', NDIM )
@@ -131,14 +141,14 @@
      :                 UBINTB, B, STATUS )
 
 *  Find the bounds of the new interior bounding box.
-      CALL ARD1_BXFND( NDIM, LBND, UBND, NPAR, PAR, LBINTB, UBINTB,
+      CALL ARD1_BXFND( NDIM, LBND, UBND, NPAR, D, PAR, LBINTB, UBINTB,
      :                 STATUS )
 
 *  Call a routine to assign an interior value to every pixel inside
 *  the interior bounding box which is also inside the specified user
 *  box.
       CALL ARD1_BXBOX( NDIM, LBND, UBND, MSKSIZ, RINDEX, LBINTB,
-     :                 UBINTB, NPAR, PAR, B, STATUS )
+     :                 UBINTB, NPAR, D, PAR, B, STATUS )
 
 *  If the interior bounding box is null, return the usual value
 *  (VAL__MINI for LBINTB( 1 ) ).

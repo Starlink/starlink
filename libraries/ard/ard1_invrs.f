@@ -24,9 +24,9 @@
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        No. of dimensions
-*     C( 0:NDIM, NDIM ) = REAL (Given)
+*     C( 0:NDIM, NDIM ) = DOUBLE PRECISION (Given)
 *        The supplied mapping.
-*     D( 0:NDIM, NDIM ) = REAL (Given)
+*     D( 0:NDIM, NDIM ) = DOUBLE PRECISION (Given)
 *        The inverse mapping.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -38,6 +38,8 @@
 *  History:
 *     16-MAY-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -55,10 +57,10 @@
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( 0:NDIM, NDIM )
+      DOUBLE PRECISION C( 0:NDIM, NDIM )
 
 *  Arguments Returned:
-      REAL D( 0:NDIM, NDIM )
+      DOUBLE PRECISION D( 0:NDIM, NDIM )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -89,7 +91,7 @@
       DO J = 1, NDIM
          RES( J ) = 1.0D0
          DO I = 1, NDIM
-            MAT( EL ) = DBLE( C( I, J ) )
+            MAT( EL ) = C( I, J )
             EL = EL + 1
          END DO
       END DO
@@ -114,12 +116,12 @@
          S = 0.0D0
 
          DO I = 1, NDIM
-            S = S + MAT( EL )*DBLE( C( 0, I ) )
-            D( I, J ) = REAL( MAT( EL ) )
+            S = S + MAT( EL )*C( 0, I )
+            D( I, J ) = MAT( EL )
             EL = EL + 1
          END DO      
 
-         D( 0, J ) = REAL( -S )
+         D( 0, J ) = -S
 
       END DO
 

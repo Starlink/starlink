@@ -70,6 +70,8 @@
 *  History:
 *     28-FEB-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:

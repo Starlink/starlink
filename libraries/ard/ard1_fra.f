@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_FRA( RINDEX, LBND1, UBND1, LBND2, UBND2, PAR, B,
-     :                     LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+      SUBROUTINE ARD1_FRA( RINDEX, LBND1, UBND1, LBND2, UBND2, D, PAR, 
+     :                     B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 *+
 *  Name:
 *     ARD1_FRA
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_FRA( RINDEX, LBND1, UBND1, LBND2, UBND2, PAR, B,
+*     CALL ARD1_FRA( RINDEX, LBND1, UBND1, LBND2, UBND2, D, PAR, B,
 *                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -20,7 +20,7 @@
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
 *     supplied parameter. The supplied parameter is the border width in
-*     pixels.
+*     user coords.
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -33,8 +33,12 @@
 *        The lower pixel index bounds of the B array on the second axis.
 *     UBND2 = INTEGER (Given)
 *        The upper pixel index bounds of the B array on the second axis.
-*     PAR = REAL (Given)
-*        The border width, in pixels.
+*     D( 6 ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. The mapping is:
+*        P1 = D0 + D1*U1 + D2*U2 
+*        P2 = D3 + D4*U1 + D5*U2 
+*     PAR = DOUBLE PRECISION (Given and Returned)
+*        The border width, supplied in user coords, returned in pixels.
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( 2 ) = INTEGER (Given and Returned)
@@ -64,6 +68,8 @@
 *  History:
 *     15-APR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -86,9 +92,10 @@
       INTEGER UBND1
       INTEGER LBND2
       INTEGER UBND2
-      REAL PAR
+      DOUBLE PRECISION D( 6 )
 
 *  Arguments Given and Returned:
+      DOUBLE PRECISION PAR
       INTEGER B( LBND1:UBND1, LBND2:UBND2 )
       INTEGER LBEXTB( 2 )
       INTEGER UBEXTB( 2 )
@@ -110,40 +117,81 @@
      :  MSKSIZ,                  ! No. of elements in mask
      :  UBND( 2 )                ! Mask upper bounds
 
-      REAL
+      DOUBLE PRECISION 
      :  T,                       ! Temporary real storage
      :  XHI,                     ! High bound of pixel x coord
      :  XLO,                     ! Low bound of pixel x coord
+     :  XSCA,                    ! X scale factor
      :  YHI,                     ! High bound of pixel y coord
-     :  YLO                      ! Low bound of pixel y coord
+     :  YLO,                     ! Low bound of pixel y coord
+     :  YSCA                     ! Y scale factor
   
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Calculate the X and Y scale factors between user co-ordinates and
+*  pixel co-ordinates.
+      XSCA = SQRT( D( 2 )**2 + D( 5 )**2 ) 
+      YSCA = SQRT( D( 3 )**2 + D( 6 )**2 ) 
+
+*  Report an error and abort if the two scale factors are not equal.
+      IF( ABS( XSCA - YSCA ) .GE. ABS( XSCA*VAL__EPSD ) .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
+         STATUS = ARD__SCALE
+         CALL ERR_REP( 'ARD1_FRA_ERR1', 'Current ARD user '//
+     :                 'co-ordinate system has different '//
+     :                 'scales in the X and Y directions.',
+     :                 STATUS )
+         CALL ERR_REP( 'ARD1_FRA_ERR2', 'Illegal FRAME keyword '//
+     :                 'found in ARD expression. FRAME keywords '//
+     :                 'can only be used if axis scales are equal.',
+     :                 STATUS )
+         GO TO 999
+      END IF
+
+*  Report an error and abort if the there is any shear.
+      IF( ABS( D( 5 )*D( 6 ) + D( 2 )*D( 3 ) ) .GE. 
+     :    ABS( D( 2 )*D( 3 )*VAL__EPSD ) .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
+         STATUS = ARD__SCALE
+         CALL ERR_REP( 'ARD1_FRA_ERR3', 'Current ARD user '//
+     :                 'co-ordinate system has sheared '//
+     :                 'axes.',
+     :                 STATUS )
+         CALL ERR_REP( 'ARD1_FRA_ERR4', 'Illegal FRAME keyword '//
+     :                 'found in ARD expression. FRAME keywords '//
+     :                 'can only be used if axis are not sheared.',
+     :                 STATUS )
+         GO TO 999
+      END IF
+
+*  Convert the supplied border width from user to pixel coords.
+      PAR = PAR*XSCA
+
 *  Find the pixel co-ordinate bounds at the frame edge.
-      XLO = REAL( LBND1 ) - 1.0 + PAR
-      XHI = REAL( UBND1 ) - PAR
-      YLO = REAL( LBND2 ) - 1.0 + PAR
-      YHI = REAL( UBND2 ) - PAR
+      XLO = DBLE( LBND1 ) - 1.0 + PAR
+      XHI = DBLE( UBND1 ) - PAR
+      YLO = DBLE( LBND2 ) - 1.0 + PAR
+      YHI = DBLE( UBND2 ) - PAR
 
 *  Convert these to pixel indices.
       T = XLO + 0.5
       IXLO = INT( T )
-      IF( T .GT. 0.0 .AND. REAL( IXLO ) .NE. T ) IXLO = IXLO + 1
+      IF( T .GT. 0.0 .AND. DBLE( IXLO ) .NE. T ) IXLO = IXLO + 1
 
       T = XHI + 0.5
       IXHI = INT( T )
-      IF( T .LT. 0.0 .AND. REAL( IXHI ) .NE. T ) IXHI = IXHI - 1
+      IF( T .LT. 0.0 .AND. DBLE( IXHI ) .NE. T ) IXHI = IXHI - 1
 
       T = YLO + 0.5
       IYLO = INT( T )
-      IF( T .GT. 0.0 .AND. REAL( IYLO ) .NE. T ) IYLO = IYLO + 1
+      IF( T .GT. 0.0 .AND. DBLE( IYLO ) .NE. T ) IYLO = IYLO + 1
 
       T = YHI + 0.5
       IYHI = INT( T )
-      IF( T .LT. 0.0 .AND. REAL( IYHI ) .NE. T ) IYHI = IYHI - 1
+      IF( T .LT. 0.0 .AND. DBLE( IYHI ) .NE. T ) IYHI = IYHI - 1
 
 *  Limit to the bounds of the array.
       IXLO = MAX( IXLO, LBND1 )
@@ -208,5 +256,7 @@
          LBEXTB( 1 ) = VAL__MINI
 
       END IF
+
+ 999  CONTINUE
 
       END

@@ -1,5 +1,6 @@
-      SUBROUTINE ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                     B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+      SUBROUTINE ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D,
+     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     STATUS )
 *+
 *  Name:
 *     ARD1_REC
@@ -11,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR, B,
-*                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+*     CALL ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, 
+*                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
 *     The supplied parameters are modified so that they look the same
@@ -32,8 +33,16 @@
 *        The total number of elements in the B array.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
-*     PAR( NPAR ) = REAL (Given)
-*        A list of pixel co-ordinates, in groups of NDIM. 
+*     D( * ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. There should be
+*        NDIM*(NDIM+1) elements in the array. The mapping is:
+*
+*        P1 = D0 + D1*U1 + D2*U2 + ...  + Dn*Un
+*        P2 = Dn+1 + Dn+2*U1 + Dn+3*U2 + ...  + D2n+1*Un
+*        ...
+*        Pn = ...
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
+*        A list of user co-ordinates, in groups of NDIM. 
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( NDIM ) = INTEGER (Given and Returned)
@@ -63,6 +72,8 @@
 *  History:
 *     30-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,7 +96,8 @@
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( * )
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
@@ -99,11 +111,10 @@
 
 *  Local Variables:
       INTEGER
-     :        I,                 ! Loop count
-     :        I0                 ! No. of transformation co-efficients
+     :        I                  ! Loop count
 
-      REAL
-     :        LPAR( ARD__MXDIM*( 3 + ARD__MXDIM ) )! Local parameters
+      DOUBLE PRECISION 
+     :        LPAR( ARD__MXDIM*2 )! Local parameters
 
 *.
 
@@ -111,7 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error if the number of supplied parameters is wrong.
-      IF( NPAR .NE. NDIM*( 3 + NDIM ) ) THEN
+      IF( NPAR .NE. 2*NDIM ) THEN
          STATUS = ARD__INTER
          CALL MSG_SETI( 'NP', NPAR )
          CALL MSG_SETI( 'ND', NDIM )
@@ -121,17 +132,8 @@
          GO TO 999
       END IF
 
-*  Store the number of transformation co-efficient.
-      I0 = NDIM*( 1 + NDIM )
-
-*  Copy the transformation co-efficients from the supplied parameter
-*  array to a local parameter array.
-      DO I = 1, I0
-         LPAR( I ) = PAR ( I )
-      END DO
-
 *  Loop round each dimension.
-      DO I = I0 + 1, I0 + NDIM
+      DO I = 1, NDIM
 
 *  Find the center of the box on this axis, and store in the local
 *  parameter array.
@@ -145,7 +147,7 @@
 
 *  The parameters are now in the same format as those for a BOX region.
 *  Call the subroutine used to load a BOX region.
-      CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, LPAR,
+      CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, LPAR,
      :               B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Jump here if an error occurs.

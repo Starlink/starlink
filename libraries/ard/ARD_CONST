@@ -165,7 +165,7 @@
 
 *  The number of statements recognised by ARD
       INTEGER ARD__NSTAT
-      PARAMETER ( ARD__NSTAT = 6 )
+      PARAMETER ( ARD__NSTAT = 8 )
 
 *  An integer value used to represent the DIMENSION statement
 *  internally.
@@ -197,6 +197,16 @@
       INTEGER ARD__STR
       PARAMETER ( ARD__STR = 6 )
 
+*  An integer value used to represent the WCS statement
+*  internally.
+      INTEGER ARD__WCS
+      PARAMETER ( ARD__WCS = 7 )
+
+*  An integer value used to represent the COFRAME statement
+*  internally.
+      INTEGER ARD__COF
+      PARAMETER ( ARD__COF = 8 )
+
 *  String lengths
 *  ===============
 
@@ -220,9 +230,24 @@
 *  Miscellaneous.
 *  =============
 
+*  Maximum number of continuation lines in an AST FrameSet supplied as part of 
+*  an ARD expression.
+      INTEGER ARD__MXACL
+      PARAMETER( ARD__MXACL = 5 )
+
 *  Factor for converting degrees to radians
       REAL ARD__DTOR
       PARAMETER ( ARD__DTOR = 1.7453293E-2 )
+
+*  Multiples of PI
+      DOUBLE PRECISION ARD__PI
+      PARAMETER( ARD__PI = 3.14159265358979323846264338327950288419717 )
+
+      DOUBLE PRECISION ARD__TWOPI
+      PARAMETER( ARD__TWOPI = 2*ARD__PI )
+
+      DOUBLE PRECISION ARD__PIBY2
+      PARAMETER( ARD__PIBY2 = 0.5*ARD__PI )
 
 *  The maximum number of dimensions which ARD can handle.
       INTEGER ARD__MXDIM

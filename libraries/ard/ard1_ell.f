@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_ELL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR,
-     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
 *+
 *  Name:
@@ -12,20 +12,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ELL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, PAR, B,
-*                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+*     CALL ARD1_ELL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, 
+*                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
 *     The array B is initialised by setting all values within the
 *     supplied interior bounding box to the exterior value 0.
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
-*     supplied parameters. The supplied parameters are the co-efficients
-*     of the 2-D linear transformation from user co-ordinates to pixel 
-*     co-ordinates, followed by the user co-ordinates of the ellipse 
-*     centre, the lengths of the two ellipse axes (in user co-
-*     ordinates), and the angle from the user X axis to the first 
-*     ellipse axis (in degrees, measured +ve from user +X to user +Y).
+*     supplied parameters. The supplied parameters are the user 
+*     co-ordinates of the ellipse centre, the lengths of the two ellipse 
+*     axes (in user co-ordinates), and the angle from the user X axis to 
+*     the first ellipse axis (in degrees, measured +ve from user +X to 
+*     user +Y).
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -40,7 +39,11 @@
 *        The upper pixel index bounds of the B array on the second axis.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
-*     PAR( NPAR ) = REAL (Given)
+*     D( 6 ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. The mapping is:
+*        P1 = D0 + D1*U1 + D2*U2 
+*        P2 = D3 + D4*U1 + D5*U2 
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
 *        Region parameters. 
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
 *        The array.
@@ -71,6 +74,8 @@
 *  History:
 *     11-APR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,7 +99,8 @@
       INTEGER LBND2
       INTEGER UBND2
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( 6 )
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
       INTEGER B( LBND1:UBND1, LBND2:UBND2 )
@@ -107,7 +113,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      REAL
+      DOUBLE PRECISION 
      :  AA1,                     ! First ellipse axis projected on Xp
      :  AA2,                     ! First ellipse axis projected on Yp
      :  ANG1,                    ! An angle 
@@ -136,6 +142,8 @@
      :  IY,                      ! Y pixel index of current row
      :  LBND( 2 ),               ! Mask lower bounds
      :  MSKSIZ,                  ! No. of elements in mask
+     :  RL,                      ! Real lower bound used on 2nd axis
+     :  RU,                      ! Real uper bound used on 2nd axis
      :  UBND( 2 )                ! Mask upper bounds
   
 *.
@@ -143,8 +151,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Report an error if less than 11 parameters have been supplied.
-      IF( NPAR .LT. 11 ) THEN
+*  Report an error if less than 5 parameters have been supplied.
+      IF( NPAR .LT. 5 ) THEN
          STATUS = ARD__INTER
          CALL MSG_SETI( 'NP', NPAR )
          CALL ERR_REP( 'ARD1_ELL_ERR1', 'Wrong no. of parameters '//
@@ -170,26 +178,26 @@
       UBINTB( 1 ) = VAL__MINI
 
 *  Find the pixel co-ordinates of the ellipse centre.
-      X0 = PAR( 1 ) + PAR( 2 )*PAR( 7 ) + PAR( 3 )*PAR( 8 )
-      Y0 = PAR( 4 ) + PAR( 5 )*PAR( 7 ) + PAR( 6 )*PAR( 8 )
+      X0 = D( 1 ) + D( 2 )*PAR( 1 ) + D( 3 )*PAR( 2 )
+      Y0 = D( 4 ) + D( 5 )*PAR( 1 ) + D( 6 )*PAR( 2 )
 
 *  Store the sine and cosine of the orientation of the ellipse in user 
 *  co-ordinates.
-      SINA = SIN( PAR( 11 )*ARD__DTOR )
-      COSA = COS( PAR( 11 )*ARD__DTOR )
+      SINA = SIN( PAR( 5 )*ARD__DTOR )
+      COSA = COS( PAR( 5 )*ARD__DTOR )
 
 *  Find the half-ranges of pixel co-ordinates encompassed by the
 *  ellipse.
-      AA1 = PAR( 9 )*( PAR( 2 )*COSA + PAR( 3 )*SINA )
-      BB1 = PAR( 10 )*( PAR( 3 )*COSA - PAR( 2 )*SINA )
-      XRANGE = SQRT( MAX( 0.0, AA1**2 + BB1**2 ) )
+      AA1 = PAR( 3 )*( D( 2 )*COSA + D( 3 )*SINA )
+      BB1 = PAR( 4 )*( D( 3 )*COSA - D( 2 )*SINA )
+      XRANGE = SQRT( MAX( 0.0D0, AA1**2 + BB1**2 ) )
 
-      AA2 = PAR( 9 )*( PAR( 5 )*COSA + PAR( 6 )*SINA )
-      BB2 = PAR( 10 )*( PAR( 6 )*COSA - PAR( 5 )*SINA )
-      YRANGE = SQRT( MAX( 0.0, AA2**2 + BB2**2 ) )
+      AA2 = PAR( 3 )*( D( 5 )*COSA + D( 6 )*SINA )
+      BB2 = PAR( 4 )*( D( 6 )*COSA - D( 5 )*SINA )
+      YRANGE = SQRT( MAX( 0.0D0, AA2**2 + BB2**2 ) )
 
 *  Abort if the ellipse is actually a line.
-      IF( XRANGE .LE. 0.0 .OR. YRANGE .LE. 0.0 ) THEN
+      IF( XRANGE .LE. 0.0D0 .OR. YRANGE .LE. 0.0D0 ) THEN
          STATUS = ARD__INTER
          CALL ERR_REP( 'ARD1_ELL_ERR2', 'Null ELLIPSE region '//
      :                 'encountered in ARD description.', STATUS )
@@ -212,12 +220,16 @@
       LBINTB( 2 ) = MAX( LBND2, LBINTB( 2 ) )
       UBINTB( 2 ) = MIN( UBND2, UBINTB( 2 ) )
 
+*  Initialize the real bounds used by the second axis.
+      RL = VAL__MAXI
+      RU = VAL__MINI
+
 *  Loop round the range of rows covered by the ellipse.
       DO IY = LBINTB( 2 ), UBINTB( 2 )
 
 *  Find the displacement from the ellipse centre to the centre of the 
 *  current row.
-         Y = REAL( IY ) - 0.5 - Y0
+         Y = DBLE( IY ) - 0.5 - Y0
 
 *  See if this row intersects the ellipse.
          IF( ABS( Y ) .LE. YRANGE ) THEN 
@@ -239,11 +251,11 @@
 *  bound and IX2 is the upper pixel index bound. 
             T = X1 + 0.5
             IX1 = INT( T )
-            IF( T .GT. 0.0 .AND. REAL( IX1 ) .NE. T ) IX1 = IX1 + 1
+            IF( T .GT. 0.0D0 .AND. DBLE( IX1 ) .NE. T ) IX1 = IX1 + 1
 
             T = X2 + 0.5
             IX2 = INT( T )
-            IF( T .LT. 0.0 .AND. REAL( IX2 ) .NE. T ) IX2 = IX2 - 1
+            IF( T .LT. 0.0D0 .AND. DBLE( IX2 ) .NE. T ) IX2 = IX2 - 1
 
 *  Limit them to the bounds of the mask.
             IX1 = MAX( IX1, LBND1 )
@@ -259,14 +271,22 @@
                B( IX, IY ) = RINDEX               
             END DO
 
+*  Update the bounds of the real bounding box on the second axis.
+            RL = MIN( RL, IY )
+            RU = MAX( RU, IY )
+
          END IF
 
       END DO
 
 *  If the interior bounding box is null, return the usual value
 *  (VAL__MINI for LBINTB( 1 ) ).
-      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR. 
-     :    LBINTB( 2 ) .GT. UBINTB( 2 ) ) LBINTB( 1 ) = VAL__MINI
+      IF( RL .EQ. VAL__MAXI ) THEN
+         LBINTB( 1 ) = VAL__MINI
+      ELSE
+         LBINTB( 2 ) = RL
+         UBINTB( 2 ) = RU
+      END IF
 
 *  Ensure the the exterior bounding box is returned "infinite".
       LBEXTB( 1 ) = VAL__MAXI

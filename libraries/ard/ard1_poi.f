@@ -1,5 +1,6 @@
-      SUBROUTINE ARD1_POI( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                     B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+      SUBROUTINE ARD1_POI( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D,
+     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     STATUS )
 *+
 *  Name:
 *     ARD1_POI
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_POI( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR, B,
+*     CALL ARD1_POI( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, B,
 *                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -20,7 +21,7 @@
 *     All points outside this box already hold exterior values.
 *     Interior values (equal to RINDEX) are then assigned to the points
 *     specified by the supplied parameters. The supplied parameters are
-*     the pixel co-ordinates of the interior points.
+*     the user co-ordinates of the interior points.
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -35,8 +36,16 @@
 *        The total number of elements in the B array.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
-*     PAR( NPAR ) = REAL (Given and Returned)
-*        A list of pixel co-ordinates, in groups of NDIM. On exit they
+*     D( * ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. There should be
+*        NDIM*(NDIM+1) elements in the array. The mapping is:
+*
+*        P1 = D0 + D1*U1 + D2*U2 + ...  + Dn*Un
+*        P2 = Dn+1 + Dn+2*U1 + Dn+3*U2 + ...  + D2n+1*Un
+*        ...
+*        Pn = ...
+*     PAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
+*        A list of user co-ordinates, in groups of NDIM. On exit they
 *        are converted to pixel indices.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
@@ -67,6 +76,8 @@
 *  History:
 *     1-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,9 +101,10 @@
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
       INTEGER NPAR
+      DOUBLE PRECISION D( * )
 
 *  Arguments Given and Returned:
-      REAL PAR( NPAR )
+      DOUBLE PRECISION PAR( NPAR )
       INTEGER B( MSKSIZ )
       INTEGER LBEXTB( NDIM )
       INTEGER UBEXTB( NDIM )
@@ -108,9 +120,6 @@
      :        IND,               ! Current Cartesian co-ord. value
      :        IPAR,              ! Index of current Cartesian co-ord.
      :        VA                 ! Vector address eqv to Cartesian pnt.
-
-      REAL
-     :        COORD              ! Integer part of pixel co-ordinate
 
 *.
 
@@ -129,10 +138,12 @@
          UBINTB( I ) = VAL__MINI
       END DO
 
-*  Convert the supplied pixel co-ordinates to pixel indices.
+*  Convert the supplied user coords to pixel coords.
+      CALL ARD1_LTRAN( NDIM, D, NPAR/NDIM, PAR, PAR, STATUS )
+
+*  Convert the pixel coords to pixel indices.
       DO IPAR = 1, NPAR
-         COORD = REAL( INT( PAR( IPAR ) ) )
-         IF( COORD .LT. PAR( IPAR ) ) PAR( IPAR ) = COORD + 1
+         PAR( IPAR ) = DBLE( NINT( PAR( IPAR ) + 0.5D0 ) )
       END DO
 
 *  Loop round each set of co-ordinates.

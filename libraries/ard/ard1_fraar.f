@@ -1,36 +1,32 @@
-      SUBROUTINE ARD1_FRAAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
 *     ARD1_FRAAR
 
 *  Purpose:
-*     Assemble argument list for a FRAME keyword
+*     Assemble argument list for an FRAME keyword
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_FRAAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
-*     The supplied border width is transformed from user co-ordinates
-*     to pixel co-ordinates and stored on the stack. The current
-*     transformation must be 2-D and have equal scales in both
-*     directions.
+*     The supplied arguments are stored on the operand stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from supplied
-*        co-ordinates to pixel co-ordinates.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
-*        The index of the last character in ELEM to be checked.
+*        The index of the final character in ELEM to be checked.
 *     IPOPND = INTEGER (Given)
 *        The pointer to the array holding the operand stack.
 *     IOPND = INTEGER (Given and Returned)
@@ -56,25 +52,27 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-
+      
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -90,12 +88,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER AXIS               ! Axis index
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL VALUE                 ! The argument value
-      REAL XSCA                  ! X scale factor
-      REAL YSCA                  ! Y scale factor
-
-
+      DOUBLE PRECISION VALUE     ! The argument value
+*.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -108,36 +104,26 @@
          GO TO 999
       END IF
 
+*  If he Frame is a SkyFrame the border width is given as an increment
+*  in latitude. Otherwise, it is given as an increment along axis 1.
+      IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+         AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
+      ELSE
+         AXIS = 1
+      END IF
+
 *  Attempt to read argument value from the current element until the
 *  end of the element, or the end of the argument list is encountered.
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
 *  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+     :                    STATUS )
 
-*  If an argument was obtained, increment the number of arguments
-*  supplied by the user.
+*  If an argument was obtained, store it on the operands stack.
          IF( OK ) THEN
             NARG = NARG + 1
-
-*  Calculate the X and Y scale factors between user co-ordinates and
-*  pixel co-ordinates.
-            XSCA = SQRT( C( 2 )**2 + C( 5 )**2 ) 
-            YSCA = SQRT( C( 3 )**2 + C( 6 )**2 ) 
-
-*  Report an error and abort if the two scale factors are not equal.
-            IF( ABS( XSCA - YSCA ) .GE. ABS( XSCA*VAL__EPSR ) .AND.
-     :          STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARD__SCALE
-               CALL ERR_REP( 'ARD1_FRAAR_ERR2', 'Current user '//
-     :                       'co-ordinate system has different '//
-     :                       'scales in the X and Y directions.',
-     :                       STATUS )
-               GO TO 999
-            END IF
-
-*  Store the transformed border width.
-            CALL ARD1_STORR( XSCA*VALUE, SZOPND, IOPND, IPOPND, STATUS )
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect.
@@ -145,7 +131,7 @@
  
             IF( NARG .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
-               CALL ERR_REP( 'ARD1_FRAAR_ERR4', 'Incorrect number of '//
+               CALL ERR_REP( 'ARD1_FRAAR_ERR1', 'Incorrect number of '//
      :                       'arguments found.', STATUS )
             END IF
 
@@ -153,7 +139,6 @@
 
       END DO
 
-*  Jump to here if an error occurs.
  999  CONTINUE
 
       END

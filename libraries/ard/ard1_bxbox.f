@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_BXBOX( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX,
-     :                       UBOX, NPAR, PAR, B, STATUS )
+     :                       UBOX, NPAR, D, PAR, B, STATUS )
 *+
 *  Name:
 *     ARD1_BXBOX
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL ARD1_BXBOX( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
-*                      NPAR, PAR, B, STATUS )
+*                      NPAR, D, PAR, B, STATUS )
 
 *  Description:
 *     All pixels which are within the supplied bounding box and also
@@ -39,10 +39,17 @@
 *        The upper pixel bounds of the box.
 *     NPAR = INTEGER (Given)
 *        No. of values in PAR.
-*     PAR( NPAR ) = REAL (Given)
-*        Parameters; Coeffs of user to pixel transformation, followed by
-*        user coords of box centre, followed by length of each side of
-*        the box (in user coords).
+*     D( * ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. There should be
+*        NDIM*(NDIM+1) elements in the array. The mapping is:
+*
+*        P1 = D0 + D1*U1 + D2*U2 + ...  + Dn*Un
+*        P2 = Dn+1 + Dn+2*U1 + Dn+3*U2 + ...  + D2n+1*Un
+*        ...
+*        Pn = ...
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
+*        Parameters; user coords of box centre, followed by length of each 
+*        side of the box (in user coords).
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array (in vector form).
 *     STATUS = INTEGER (Given and Returned)
@@ -55,6 +62,8 @@
 *  History:
 *     30-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,7 +88,8 @@
       INTEGER LBOX( NDIM )
       INTEGER UBOX( NDIM )
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( * )
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
@@ -93,20 +103,18 @@
      :        BINDEX( ARD__MXDIM ),! Current Cartesian co-ordinates
      :        BOXEL,             ! Vector address within the box
      :        BOXSIZ,            ! No. of pixels in the box
-     :        CEN0,              ! Offset to centre coordinates in PAR
      :        I,                 ! Loop count
      :        LLBOX( ARD__MXDIM ),! Local copy of LBOX
      :        LUBOX( ARD__MXDIM ),! Local copy of UBOX
      :        MDIM,              ! A dimension size in supplied array
      :        P,                 ! No. of pixels in (N-1)-Dim. object 
-     :        SIDE0,             ! Offset to box side length in PAR
      :        VA,                ! Vector address within supplied array
      :        VAINC( ARD__MXDIM) ! VA increment between N-D objects
 
       LOGICAL
      :        INSIDE             ! Is pixel inside user box?
 
-      REAL
+      DOUBLE PRECISION 
      :        C( ARD__MXDIM*(1+ARD__MXDIM) ),! Inverse transformation
      :        PCO(ARD__MXDIM),   ! Pixel coordinates
      :        UBLBND(ARD__MXDIM),! User box lower bounds (user coords)
@@ -121,21 +129,16 @@
 *  If the box is null, return without doing anything.                  
       IF( LBOX( 1 ) .NE. VAL__MINI ) THEN
 
-*  Find the inverse of the supplied transforrmation (i.e. from pixel to
+*  Find the inverse of the supplied transformation (i.e. from pixel to
 *  user co-ordinates).
-         CALL ARD1_INVRS( NDIM, PAR, C, STATUS )
-
-*  Store the offsets (within PAR) to the centre co-ordinates, and
-*  to the side lengths.
-         CEN0 = NDIM*( 1 + NDIM )
-         SIDE0 = NDIM*( 2 + NDIM )
+         CALL ARD1_INVRS( NDIM, D, C, STATUS )
 
 *  Store the upper and lower bounds (in user co-ordinates) of the user
 *  box. At the same time, take a copy of the pixel co-ordinate bounds.
 *  If the box is infinite, use the bounds of the mask.
          DO I = 1, NDIM
-            UBLBND( I ) = PAR( CEN0 + I ) - 0.5*PAR( SIDE0 + I )
-            UBUBND( I ) = PAR( CEN0 + I ) + 0.5*PAR( SIDE0 + I )
+            UBLBND( I ) = PAR( I ) - 0.5*PAR( NDIM + I )
+            UBUBND( I ) = PAR( I ) + 0.5*PAR( NDIM + I )
 
             IF( LBOX( 1 ) .NE. VAL__MAXI ) THEN
                LLBOX( I ) = LBOX( I )
@@ -222,11 +225,11 @@
 *  Store the pixel coordinates corresponding to the centre of the
 *  current pixel.
             DO I = 1, NDIM
-               PCO( I ) = REAL( BINDEX( I ) ) - 0.5
+               PCO( I ) = DBLE( BINDEX( I ) ) - 0.5
             END DO
 
 *  Transform these pixel co-odinates into user co-ordinates.
-            CALL ARD1_TRANS( NDIM, C, PCO, UCO )
+            CALL ARD1_LTRAN( NDIM, C, 1, PCO, UCO, STATUS )
 
 *  See if this pixel is inside the user box.
             INSIDE = .TRUE.

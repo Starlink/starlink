@@ -40,7 +40,7 @@
 *        The total number of elements in the B array.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
-*     PAR( NPAR ) = REAL (Given)
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
 *        A list of pixel co-ordinates, in groups of NDIM. 
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
@@ -62,6 +62,8 @@
 *  History:
 *     1-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -84,7 +86,7 @@
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
@@ -95,11 +97,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      REAL EPS                   ! Rounding error safety margin
-      PARAMETER ( EPS = 0.001 )
+      DOUBLE PRECISION EPS                   ! Rounding error safety margin
+      PARAMETER ( EPS = 0.001D0 )
 
-      REAL MARGIN                ! Second safety margin
-      PARAMETER ( MARGIN = 1.0 - VAL__EPSR )
+      DOUBLE PRECISION MARGIN                ! Second safety margin
+      PARAMETER ( MARGIN = 1.0 - VAL__EPSD )
 
 *  Local Variables:
       INTEGER
@@ -108,7 +110,7 @@
      :        K,                 ! Loop count
      :        VA                 ! Vector address eqv to Cartesian pnt.
 
-      REAL
+      DOUBLE PRECISION 
      :        ALPHA,             ! Line parameter at pixel boundary
      :        END( ARD__MXDIM ), ! Indices of end pixel
      :        HILIM,             ! Largest usable line parameter
@@ -120,7 +122,7 @@
      :        PCC,               ! Pixel co-ord. at usable line start
      :        PCI                ! Pixel index at usable line start
 
-      REAL
+      DOUBLE PRECISION 
      :        PDC,               ! Pixel co-ord. at usable line end
      :        PDI,               ! Pixel index at usable line end
      :        PEC,               ! Pixel co-ord. at pixel boundary
@@ -155,19 +157,19 @@
          INC( I ) = PBC( I ) - PAC( I )
 
 *  If the increment is not zero...
-         IF( ABS( INC( I ) ) .GT. VAL__SMLR ) THEN
+         IF( ABS( INC( I ) ) .GT. VAL__SMLD ) THEN
 
 *  ...store the reciprocal of the increment.
             RECINC( I ) = 1.0/INC( I )
 
 *  Find the value of ALPHA at which the line intersect the lower bound
 *  of this axis (plus a little bit to allow for rounding errors).
-            LALPHA = ( EPS + REAL( LBND( I ) ) - 1.0 - PAC( I ) )
+            LALPHA = ( EPS + DBLE( LBND( I ) ) - 1.0 - PAC( I ) )
      :                 *RECINC( I )
 
 *  Find the value of ALPHA at which the line intersect the upper bound
 *  of this axis (minus a little bit to allow for rounding errors).
-            UALPHA = ( -EPS + REAL( UBND( I ) ) - PAC( I ) )*RECINC( I )
+            UALPHA = ( -EPS + DBLE( UBND( I ) ) - PAC( I ) )*RECINC( I )
 
 *  Ensure that LALPHA is less than or equal to UALPHA
             IF( LALPHA .GT. UALPHA ) THEN
@@ -202,7 +204,7 @@
          PCC = PAC( I ) + INC( I )*LOLIM
 
 *  Find the corresponding pixel index.
-         PCI = REAL( INT( PCC ) ) 
+         PCI = DBLE( INT( PCC ) ) 
          IF( PCI .LT. PCC ) PCI = PCI + 1
 
 *  Save it.
@@ -213,7 +215,7 @@
          PDC = PAC( I ) + INC( I )*HILIM
 
 *  Find the corresponding pixel index.
-         PDI = REAL( INT( PDC ) ) 
+         PDI = DBLE( INT( PDC ) ) 
          IF( PDI .LT. PDC ) PDI = PDI + 1
 
 *  Save it.
@@ -236,7 +238,7 @@
 
 *  Find the value of ALPHA at which the line reaches this pixel
 *  boundary.
-            ALPHA = ( REAL( J ) - PAC( I ) )*RECINC( I )
+            ALPHA = ( DBLE( J ) - PAC( I ) )*RECINC( I )
 
 *  Find the corresponding pixel co-ordinates and indices on all axes, of
 *  the pixel which the line is leaving, and the pixel which the line is
@@ -245,7 +247,7 @@
             DO K = 1, NDIM
                PEC = PAC( K ) + INC( K )*ALPHA
 
-               PEI( K )  = REAL( INT( PEC ) ) 
+               PEI( K )  = DBLE( INT( PEC ) ) 
                IF( PEI( K ) .LT. PEC*MARGIN ) PEI( K ) = PEI( K ) + 1
 
             END DO

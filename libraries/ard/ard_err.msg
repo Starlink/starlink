@@ -14,5 +14,7 @@ MSPAR	<Missing parenthesis>
 NOT2D	<ARD description is not 2-D>
 SCALE	<Current mapping is not isotropic>
 BLANK   <Blank ARD expression supplied>
+NOPIX   <No PIXEL coordinate Frame supplied>
+NOTST   <Cannot find a good test point>
 
 .END

@@ -1,5 +1,6 @@
-      SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NDIM, AC, NEEDIM, NARG, II,
-     :                      UC, TC, STAT, STATUS )
+      SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, 
+     :                      NEEDIM, NARG, II, UWCS, MAP, STAT, IWCS, 
+     :                      WCSDAT, STATUS )
 *+
 *  Name:
 *     ARD1_STAT
@@ -12,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AC, NEEDIM, NARG, II, UC,
-*                     TC, STAT, STATUS )
+*     CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, NEEDIM, 
+*                     NARG, II, UWCS, MAP, STAT, IWCS, WCSDAT, STATUS )
 
 *  Description:
 *     On succesive passes through this routine, arguments are read from
@@ -30,10 +31,16 @@
 *        The index of the last character to be checked in ELEM.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the mask supplied to ARD_WORK.
-*     AC( * ) = REAL (Given)
-*        The co-efficients of the linear mapping from application
-*        co-ordinates to pixel co-ordinates. The array should hold
-*        NDIM*( NDIM + 1 ) values.
+*     AWCS = INTEGER (Given)
+*        A pointer to an AST FrameSet supplied by the application. This
+*        should have a Base Frame with Domain PIXEL referring to pixel
+*        coords within the pixel mask and another Frame with Domain 
+*        ARDAPP referring to "Application co-ordinates" (as defined by
+*        the TRCOEF argument of ARD_WORK).
+*     DLBND( * ) = DOUBLE PRECISION (Given)
+*        The lower bounds of pixel coordinates.
+*     DUBND( * ) = DOUBLE PRECISION (Given)
+*        The upper bounds of pixel coordinates.
 *     NEEDIM = LOGICAL (Given and Returned)
 *        .TRUE. if a DIMENSION statement is still needed to define the
 *        dimensionality of the ARD description.
@@ -43,19 +50,34 @@
 *        argument list is being started.
 *     II = INTEGER (Given and Returned)
 *        The index within ELEM of the next character to be checked.
-*     UC( * ) = REAL (Given and Returned)
-*        The co-efficients of the current linear mapping from user
-*        co-ordinates to application co-ordinates. The array should
-*        hold NDIM*( NDIM + 1 ) values.
-*     TC( * ) = REAL (Given and Returned)
-*        The co-efficients of the total current linear mapping from
-*        user co-ordinates to pixel co-ordinates. The array should hold
-*        NDIM*( NDIM + 1 ) values. This is the concatentation of UC and
-*        AC.
+*     UWCS = INTEGER (Given)
+*        A pointer to an AST FrameSet supplied by the user. If not
+*        AST__NULL, this should at least have a Frame with Domain ARDAPP 
+*        referring to "Application co-ordinates" (as defined by the TRCOEF 
+*        argument of ARD_WORK). The current Frame in this FrameSet should
+*        refer to "User co-ordinates" (i.e. the coord system in which
+*        positions are supplied in the ARD description).
+*     MAP = INTEGER (Returned)
+*        A pointer to an AST Mapping from the pixel coords in the mask,
+*        to the coordinate system in which positions are specified in the 
+*        ARD expression. This is obtained by merging UWCS and AWCS,
+*        aligning them in a suitable common Frame. 
 *     STAT = LOGICAL (Returned)
 *        Returned .TRUE. if more arguments are required for the current
 *        statement. Returned .FALSE. if the current statement has now
 *        been completed.
+*     IWCS = INTEGER (Returned)
+*        Returned equal to AST__NULL if the pixel->user mapping is linear.
+*        Otherwise, it is returned holding a pointer to an AST FrameSet
+*        containing just two Frames, the Base frame is pixel coords, the
+*        current Frame is user coords.
+*     WCSDAT( * ) = DOUBLE PRECISION (Returned)
+*        Returned holding information which qualifies IWCS. If IWCS is
+*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping 
+*        from pixel to user coords. Otherwise, wcsdat(1) holds a lower
+*        limit on the distance (within the user coords) per pixel, and
+*        the other elements in WCSDAT are not used. The supplied array
+*        should have at least NDIM*(NDIM+1) elements.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -66,6 +88,10 @@
 *  History:
 *     16-FEB-1994 (DSB):
 *        Original version.
+*     5-JUN-2001 (DSB):
+*        Modified to use AST instead of linear coeffs.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,6 +107,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
@@ -94,17 +121,21 @@
       CHARACTER ELEM*(*)
       INTEGER L
       INTEGER NDIM
-      REAL AC(*)
+      INTEGER AWCS
+      DOUBLE PRECISION DLBND( * )
+      DOUBLE PRECISION DUBND( * )
 
 *  Arguments Given and Returned:
       LOGICAL NEEDIM
       INTEGER NARG
       INTEGER II
-      REAL UC(*)
-      REAL TC(*)
+      INTEGER UWCS
 
 *  Arguments Returned:
+      INTEGER MAP
       LOGICAL STAT
+      INTEGER IWCS
+      DOUBLE PRECISION WCSDAT( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -116,81 +147,98 @@
       INTEGER
      :  ARGREQ,                  ! No. of arguments required
      :  I,                       ! Dimension counter
+     :  IGRP,                    ! Group to store WCS FrameSet
      :  IOFF,                    ! Index of offset term in mapping
      :  J,                       ! Row count
      :  K                        ! Column count
 
-      REAL
-     :  COST,                    ! Cosine of twist angle
-     :  CT( ARD__MXDIM*( ARD__MXDIM + 1 ) ),! Modified user mapping
-     :  SINT,                    ! Sine of twist angle
-     :  STARGS( ARD__MXSAR ),    ! Statement argument values
-     :  T                        ! Twist angle in radians
-
+      DOUBLE PRECISION
+     :  STARGS( ARD__MXSAR )     ! Statement argument values
+ 
 *  Ensure that the number of arguments required, and the arguments
 *  values obtained so far are preserved.
-      SAVE ARGREQ, STARGS
+      SAVE ARGREQ, STARGS, IGRP
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  WCS and COFRAME statements do not have a simple list of numerical arguments 
+*  and so are treated as special cases.
+      IF( TYPE .EQ. ARD__WCS .OR. TYPE .EQ. ARD__COF ) THEN 
+
 *  If a new argument list is being started...
-      IF( NARG .EQ. -1 ) THEN
+         IF( NARG .EQ. -1 ) THEN
+
+*  Create a GRP group to hold the body of the statement.
+            CALL GRP_NEW( ' ', IGRP, STATUS )
+
+         ENDIF
+
+*  Copy the argument list from the ARD description into the GRP group.
+         CALL ARD1_ARGS2( ELEM, L, IGRP, NARG, II, STAT, STATUS )
+
+*  Now handle statements with simple argument lists.
+      ELSE
+
+*  If a new argument list is being started...
+         IF( NARG .EQ. -1 ) THEN
 
 *  ...Store the number of arguments required for the statement.
-         ARGREQ = CMN_STARG( TYPE )
+            ARGREQ = CMN_STARG( TYPE )
 
 *  Some statements have a variable number of arguments (indicated by
 *  CMN_STARG being negative). Calculate the number of arguments required
 *  for such statements.
-         IF( ARGREQ .LT. 0 ) THEN
+            IF( ARGREQ .LT. 0 ) THEN
 
 *  Report an error and abort if the dimensionality of the ARD
 *  description has not yet been determined (NEEDIM is supplied .FALSE.
 *  if NDIM is 2).
-            IF( NEEDIM .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARD__BADDM
-               CALL MSG_SETI( 'NDIM', NDIM )
-               CALL ERR_REP( 'ARD1_STAT_ERR1', 'ARD description is'//
+               IF( NEEDIM .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = ARD__BADDM
+                  CALL MSG_SETI( 'NDIM', NDIM )
+                  CALL ERR_REP( 'ARD1_STAT_ERR1', 'ARD description is'//
      :                     ' defaulting to 2-dimensions. It should be'//
      :                     ' ^NDIM dimensional.', STATUS )
-               GO TO 999
-            END IF
+                  GO TO 999
+               END IF
 
 *  OFFSET - The number of arguments required for the OFFSET statement
 *  equals the dimensionality of the ARD description. 
-            IF( TYPE .EQ. ARD__OFF ) THEN
-               ARGREQ = NDIM
+               IF( TYPE .EQ. ARD__OFF ) THEN
+                  ARGREQ = NDIM
 
 *  STRETCH - The number of arguments required for the STRETCH statement
 *  equals the dimensionality of the ARD description. 
-            ELSE IF( TYPE .EQ. ARD__STR ) THEN
-               ARGREQ = NDIM
+               ELSE IF( TYPE .EQ. ARD__STR ) THEN
+                  ARGREQ = NDIM
 
 *  COEFFS - The number of arguments required for the COEFFS statement
 *  depends on the dimensionality of the ARD description. 
-            ELSE IF( TYPE .EQ. ARD__COE ) THEN
-               ARGREQ = NDIM*( NDIM + 1 )
+               ELSE IF( TYPE .EQ. ARD__COE ) THEN
+                  ARGREQ = NDIM*( NDIM + 1 )
 
 *  Report an error for any other statement.
-            ELSE IF (STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARD__INTER
-               CALL MSG_SETI( 'T', TYPE )
-               CALL ERR_REP( 'ARD1_STAT_ERR2', 'ARD1_STAT: Statement '//
-     :                    'type ^T should not have variable argument '//
-     :                    'list (programming error).', STATUS )
-               GO TO 999
+               ELSE IF (STATUS .EQ. SAI__OK ) THEN
+                  STATUS = ARD__INTER
+                  CALL MSG_SETI( 'T', TYPE )
+                  CALL ERR_REP( 'ARD1_STAT_ERR2', 'ARD1_STAT: '//
+     :                    'Statement type ^T should not have '//
+     :                    'variable argument list (programming error).', 
+     :                    STATUS )
+                  GO TO 999
+               END IF
+   
             END IF
-
+   
          END IF
 
-      END IF
-
 *  Copy the argument list from the ARD description into a local array.
-      CALL ARD1_ARGS( ELEM, L, ARGREQ, ARD__MXSAR, STARGS, NARG, II,
-     :                STAT, STATUS )
+         CALL ARD1_ARGS( ELEM, L, ARGREQ, ARD__MXSAR, STARGS, NARG, II,
+     :                   STAT, STATUS )
+      END IF
 
 *  If the argument list is complete, update the appropriate ARD
 *  parameters.
@@ -212,86 +260,40 @@
 *  Otherwise, indicate that a DIMENSION statement has been found.
             NEEDIM = .FALSE.
 
-*  If it is a COEFFS statement, store the argument list as the new
-*  user transformation (user -> application).
+*  If it is a WCS statement, read the UWCS FrameSet from the GRP group and
+*  delete it.
+         ELSE IF( TYPE .EQ. ARD__WCS ) THEN
+            IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
+            CALL ARD1_RDWCS( NDIM, IGRP, UWCS, STATUS )
+            CALL GRP_DELET( IGRP, STATUS )
+
+*  If it is a COFRAME statement, create a UWCS FrameSet from the GRP group and
+*  delete it.
+         ELSE IF( TYPE .EQ. ARD__COF ) THEN
+            IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
+            CALL ARD1_RDCOF( NDIM, IGRP, UWCS, STATUS )
+            CALL GRP_DELET( IGRP, STATUS )
+
+*  If it is a COEFFS statement, create a new UWCS from the coefficients.
          ELSE IF( TYPE .EQ. ARD__COE ) THEN
-            CALL ARD1_TRCOP( NDIM, STARGS, UC, STATUS )
+            IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
+            CALL ARD1_COWCS( NDIM, STARGS, UWCS, STATUS )
 
-*  If it is an OFFSET statement, modify the current user transformation.
+*  If it is an OFFSET statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__OFF ) THEN
+            CALL ARD1_OFWCS( NDIM, STARGS, UWCS, STATUS )
 
-            DO I = 1, NDIM
-               IOFF = ( I - 1 )*( NDIM + 1 ) + 1 
-               UC( IOFF ) = UC( IOFF ) + STARGS( I )
-            END DO
-
-*  If it is a SCALE statement, modify the current user transformation.
-*  Report an error if the scale factor is zero.
+*  If it is a SCALE statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__SCA ) THEN
+            CALL ARD1_SCWCS( NDIM, STARGS, UWCS, STATUS )
 
-            IF( ABS( STARGS( 1 ) ) .LE. VAL__SMLR .AND.
-     :          STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARD__INDET
-               CALL MSG_SETC( 'ST', CMN_STSYM( ARD__SCA ) )
-               CALL ERR_REP( 'ARD1_STAT_ERR4', '^ST statement '//
-     :                       'has invalid argument 0.0', STATUS )
-               GO TO 999
-
-            ELSE
-
-               DO I = 1, NDIM*( NDIM + 1 )
-                  UC( I ) = UC( I )*STARGS( 1 )
-               END DO
-
-            END IF
-
-*  If it is a TWIST statement, modify the current user transformation.
+*  If it is a TWIST statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__TWI ) THEN
+            CALL ARD1_TWWCS( NDIM, STARGS, UWCS, STATUS )
 
-*  Save commonly used values.
-            T = STARGS( 1 ) * ARD__DTOR
-            SINT = SIN( T )
-            COST = COS( T )
-
-*  Initialise the new mapping to be the same as the old mapping.
-            CALL ARD1_TRCOP( NDIM, UC, CT, STATUS )
-
-*  Rotate the new mapping within the X-Y plane. The rotation is about
-*  the origin of the application co-ordinate system.
-            CT( 1 ) = UC( 1 )*COST - UC( 4 )*SINT
-            CT( 2 ) = UC( 2 )*COST - UC( 5 )*SINT
-            CT( 3 ) = UC( 3 )*COST - UC( 6 )*SINT
-            CT( NDIM + 2 ) = UC( NDIM + 2 )*COST + UC( 1 )*SINT
-            CT( NDIM + 3 ) = UC( NDIM + 3 )*COST + UC( 2 )*SINT
-            CT( NDIM + 4 ) = UC( NDIM + 4 )*COST + UC( 3 )*SINT
-
-*  Copy the new mapping to the returned array.
-            CALL ARD1_TRCOP( NDIM, CT, UC, STATUS )
-
-*  If it is a STRETCH statement...
+*  If it is a STRETCH statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__STR ) THEN
-
-*  Initialise the index of the current mapping co-efficient
-            I = 1
-      
-*  Loop through the rows of the mapping matrix
-            DO J = 1, NDIM
-
-*  Increment the pointer to the next co-efficient in order to skip
-*  over the constant term.
-               I = I + 1
-
-*  Loop through the other columns of the mapping matrix
-               DO K = 1, NDIM
-
-*  Find the index of the current co-efficient within the supplied vector
-*  of co-efficients, and then modify its value.
-                  I = I + 1                  
-                  UC( I ) = UC( I )*STARGS( K )
-
-               END DO
-
-            END DO
+            CALL ARD1_STWCS( NDIM, STARGS, UWCS, STATUS )
 
 *  Report an error and abort for any other statement.
          ELSE
@@ -304,9 +306,9 @@
 
          END IF
 
-*  Update the total transformation (user->pixel) by concatentating the
-*  user and application transformation.
-         CALL ARD1_TRCON( NDIM, UC, AC, TC, STATUS )
+*  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
+         CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT, 
+     :                    STATUS )
 
       END IF
 

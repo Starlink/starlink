@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NDIM, C, ELEM, L, IPOPND,
-     :                      IOPND, PNARG, SZOPND, NARG, I, KEYW,
+      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
+     :                      IPOPND, IOPND, PNARG, SZOPND, NARG, I, KEYW,
      :                      STATUS )
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, C, ELEM, L, IPOPND, IOPND,
-*                     PNARG, SZOPND, NARG, I, KEYW, STATUS )
+*     CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, IPOPND, 
+*                     IOPND, PNARG, SZOPND, NARG, I, KEYW, STATUS )
 
 *  Description:
 *     This routine reads argument lists associated with keyword fields,
-*     and stores corresponding information in the operand stack. The
+*     and stores these arguments in the operand stack. The
 *     routine will need to be called several times supplying new
 *     elements each time if the argument list extends over more than
 *     one element. A flag (KEYW) is returned to indicate when the
@@ -32,24 +32,31 @@
 *        is reported if this is supplied .TRUE.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the mask supplied to ARD_WORK.
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current linear mapping from user
-*        co-ordinates to pixel co-ordinates. The array should hold
-*        NDIM*( NDIM + 1 ) values.
+*     IWCS = INTEGER (Given)
+*        If AST__NULL, then the pixel->user mapping is linear. Otherwise, 
+*        IWCS is a pointer to an AST FrameSet containing just two Frames, 
+*        the Base frame is pixel coords, the current Frame is user coords.
+*     WCSDAT( * ) = DOUBLE PRECISION (Given)
+*        Supplied holding information which qualifies IWCS. If IWCS is
+*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping 
+*        from pixel to user coords. Otherwise, wcsdat(1) holds a lower
+*        limit on the distance (within the user coords) per pixel, and
+*        the other elements in WCSDAT are not used. 
 *     ELEM = CHARACTER * ( * ) (Given)
 *        The text of the current element of the ARD description.
 *     L = INTEGER (Given)
 *        The index of the last non-blank character in ELEM.
 *     IPOPND = INTEGER (Given and Returned)
-*        A pointer to the one dimensional real work array holding the
-*        operand stack. The array is extended if necessary.
+*        A pointer to the one dimensional _double work array holding the
+*        operand stack. The array is extended if necessary. See ARD1_LKR
+*        for details of what is stored for each keyword.        
 *     IOPND = INTEGER (Given and Returned)
 *        The index at which the next value is to be stored in the
 *        operand stack.
 *     PNARG = INTEGER (Given and Returned)
 *        The number of values put onto the operand stack as a result of
 *        the current keyword is itself stored on the operand stack at
-*        the index supplied by PNARG. PNARG is incremented by one on
+*        the index supplied by PNARG. PNARG is incremented by one or more on
 *        return.
 *     SZOPND = INTEGER (Given and Returned)
 *        The current size of the array pointed to by IPOPND. 
@@ -71,6 +78,10 @@
 *  History:
 *     16-FEB-1994 (DSB):
 *        Original version.
+*     5-JUN-2001 (DSB):
+*        Modified to use AST instead of coeff lists.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -97,7 +108,8 @@
       INTEGER TYPE
       LOGICAL NEEDIM
       INTEGER NDIM
-      REAL C( * )
+      INTEGER IWCS
+      DOUBLE PRECISION WCSDAT( * )
       CHARACTER ELEM*(*)
       INTEGER L
       INTEGER IPOPND
@@ -120,7 +132,14 @@
 
 *  Local Variables:
       CHARACTER CC*1             ! Next character from ELEM
+      DOUBLE PRECISION DWCS      ! DOUBLE equivalence to variable JWCS
       INTEGER IOPND0             ! Top of operand stack on entry
+      INTEGER J                  ! Index into WCSDAT array
+      INTEGER JWCS(2)            ! AST FrameSet pointer equivalence
+
+*  Make DWCS and JWCS share the same memory so that we can interpret
+*  the real operand value as an integer identifier.
+      EQUIVALENCE ( JWCS, DWCS )
 
 *  Ensure that the local variable IOPND0 is saved between invocations 
 *  of this routine.
@@ -132,7 +151,7 @@
 
 *  If this is a new argument list, all we do this time through is
 *  initialise things and find the opening parenthesis which marks the
-*  start of the argument list. The routine then exists and is called
+*  start of the argument list. The routine then exits and is called
 *  again to continue reading the argument list.
       IF( NARG .EQ. -1 ) THEN
 
@@ -195,6 +214,9 @@
 *  If an argument list has been started...
       ELSE
 
+*  Get a pointer to the user coord Frame.
+         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+
 *  ... call a routine to read the keyword argument list from the ARD
 *  description and store appropriate values in the returned operand
 *  array. Note, keywords which do not have an argument list are not
@@ -202,65 +224,99 @@
 
 *  POINT and PIXEL keywords...
          IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX ) THEN
-            CALL ARD1_POIAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_POIAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 
 *  LINE keywords...
          ELSE IF( TYPE .EQ. ARD__LIN ) THEN
-            CALL ARD1_LINAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_LINAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 
 *  ROW keywords...
          ELSE IF( TYPE .EQ. ARD__ROW ) THEN
-            CALL ARD1_ROWAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_ROWAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  COLUMN keywords...
          ELSE IF( TYPE .EQ. ARD__COL ) THEN
-            CALL ARD1_COLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_COLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  BOX keywords...
          ELSE IF( TYPE .EQ. ARD__BOX ) THEN
-            CALL ARD1_BOXAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_BOXAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  RECT keywords...
          ELSE IF( TYPE .EQ. ARD__REC ) THEN
-            CALL ARD1_RECAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_RECAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  ROTBOX keywords...
          ELSE IF( TYPE .EQ. ARD__ROT ) THEN
-            CALL ARD1_ROTAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_ROTAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  POLYGON keywords...
          ELSE IF( TYPE .EQ. ARD__POL ) THEN
-            CALL ARD1_POLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_POLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  CIRCLE keywords...
          ELSE IF( TYPE .EQ. ARD__CIR ) THEN
-            CALL ARD1_CIRAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_CIRAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  ELLIPSE keywords...
          ELSE IF( TYPE .EQ. ARD__ELL ) THEN
-            CALL ARD1_ELLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_ELLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  FRAME keywords...
          ELSE IF( TYPE .EQ. ARD__FRA ) THEN
-            CALL ARD1_FRAAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
          END IF
 
 *  If the argument list is complete, store the number of values added
 *  to the operand stack, at the index supplied in argument PNARG.
-         IF( .NOT. KEYW ) CALL ARD1_STORR( REAL( IOPND - IOPND0 ),
-     :                                   SZOPND, PNARG, IPOPND, STATUS )
+         IF( .NOT. KEYW ) THEN
+            CALL ARD1_STORD( DBLE( IOPND - IOPND0 ), SZOPND, PNARG, 
+     :                       IPOPND, STATUS )
+
+*  Also store WCS Information in the operand stack. First deal with
+*  linear Mappings... store the transformation coefficients.
+            IF( IWCS .EQ. AST__NULL ) THEN
+               CALL ARD1_STORD( 0.0D0, SZOPND, PNARG, IPOPND, STATUS )
+               DO J = 1, NDIM*( NDIM + 1 )               
+                  CALL ARD1_STORD( WCSDAT( J ), SZOPND, PNARG, IPOPND, 
+     :                             STATUS )
+               END DO
+
+*  Now deal with non-linear Mappings, store the FrameSet pointer and the 
+*  user distance per pixel.
+            ELSE
+
+*  In order to store an integer AST pointer on the DOUBLE PRECISION
+*  operands stack, we make the double precision DWCS use the same memory as 
+*  the two element integer array JWCS (using a Fortran EQUIVALENCE statement
+*  at the top of the module). We then put the AST pointer value into the
+*  first element of the integer array, and store the equivalent double
+*  precision value on the stack.
+               JWCS( 1 ) = AST_CLONE( IWCS, STATUS )
+               CALL ARD1_STORD( RWCS, SZOPND, PNARG, IPOPND, STATUS )
+
+*  Now store the user distance per pixel.
+               CALL ARD1_STORD( WCSDAT( 1 ), SZOPND, PNARG, IPOPND, 
+     :                          STATUS )
+
+            END IF
+
+         END IF
+
+*  Annul the AST Pointers.
+         CALL AST_ANNUL( CFRM, STATUS )
 
       END IF
 

@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_BXCIR( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX,
-     :                       UBOX, NPAR, PAR, B, STATUS )
+     :                       UBOX, NPAR, D, PAR, B, STATUS )
 *+
 *  Name:
 *     ARD1_BXCIR
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL ARD1_BXCIR( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
-*                      NPAR, PAR, B, STATUS )
+*                      NPAR, D, PAR, B, STATUS )
 
 *  Description:
 *     All pixels which are within the supplied bounding box and also
@@ -34,19 +34,28 @@
 *        The total number of elements in the array.
 *     VALUE = INTEGER (Given)
 *        The value to be assigned to the circle.
-*     LBOX( NDIM ) = INTEGER (Given)
+*     LBOX( NDIM ) = INTEGER (Given and Returned)
 *        The lower pixel bounds of a box enclosing the circle. A value
 *        of VAL__MAXI for element 1 is used to indicate an infinite
 *        box, and a value of VAL__MINI for element 1 is used to
-*        indicate a zero sized box.
-*     UBOX( NDIM ) = INTEGER (Given)
-*        The upper pixel bounds of the box.
+*        indicate a zero sized box. On exit, the bounds of the box
+*        enclosing the pixels actually selected are returned.
+*     UBOX( NDIM ) = INTEGER (Given and Returned)
+*        The upper pixel bounds of the box. On exit, the bounds of the box
+*        enclosing the pixels actually selected are returned.
 *     NPAR = INTEGER (Given)
 *        No. of values in PAR.
-*     PAR( NPAR ) = REAL (Given)
-*        Parameters; Coeffs of user to pixel transformation, followed by
-*        user coords of circle centre, followed by the radius in user
-*        co-ordinates.
+*     D( * ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. There should be
+*        NDIM*(NDIM+1) elements in the array. The mapping is:
+*
+*        P1 = D0 + D1*U1 + D2*U2 + ...  + Dn*Un
+*        P2 = Dn+1 + Dn+2*U1 + Dn+3*U2 + ...  + D2n+1*Un
+*        ...
+*        Pn = ...
+*     PAR( NPAR ) = DOUBLE PRECISION (Given)
+*        Parameters; user coords of circle centre, followed by the radius in 
+*        user co-ordinates.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array (in vector form).
 *     STATUS = INTEGER (Given and Returned)
@@ -59,6 +68,8 @@
 *  History:
 *     11-APR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,12 +91,13 @@
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
       INTEGER VALUE
-      INTEGER LBOX( NDIM )
-      INTEGER UBOX( NDIM )
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( * ) 
+      DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
+      INTEGER LBOX( NDIM )
+      INTEGER UBOX( NDIM )
       INTEGER B( MSKSIZ )
 
 *  Status:
@@ -97,16 +109,17 @@
      :        BINDEX( ARD__MXDIM ),! Current Cartesian co-ordinates
      :        BOXEL,             ! Vector address within the box
      :        BOXSIZ,            ! No. of pixels in the box
-     :        CEN0,              ! Offset to centre coordinates in PAR
      :        I,                 ! Loop count
      :        LLBOX( ARD__MXDIM ),! Local copy of LBOX
      :        LUBOX( ARD__MXDIM ),! Local copy of UBOX
      :        MDIM,              ! A dimension size in supplied array
      :        P,                 ! No. of pixels in (N-1)-Dim. object 
+     :        RLBOX( ARD__MXDIM ),! Returned LBOX
+     :        RUBOX( ARD__MXDIM ),! Returned UBOX
      :        VA,                ! Vector address within supplied array
      :        VAINC( ARD__MXDIM) ! VA increment between N-D objects
 
-      REAL
+      DOUBLE PRECISION 
      :        C( ARD__MXDIM*(1+ARD__MXDIM) ),! Inverse transformation
      :        PCO(ARD__MXDIM),   ! Pixel coordinates
      :        R2,                ! Square of pixel-centre distance
@@ -123,13 +136,16 @@
 
 *  Find the inverse of the supplied transformation (i.e. from pixel to
 *  user co-ordinates).
-         CALL ARD1_INVRS( NDIM, PAR, C, STATUS )
-
-*  Store the offset (within PAR) to the centre co-ordinates.
-         CEN0 = NDIM*( 1 + NDIM )
+         CALL ARD1_INVRS( NDIM, D, C, STATUS )
 
 *  Store the square of the circle radius.
-         RSQ = PAR( CEN0 + NDIM + 1 )**2
+         RSQ = PAR( NDIM + 1 )**2
+
+*   Initialize the returned bounding box.
+         DO I = 1, NDIM
+            RUBOX( I ) = VAL__MINI
+            RLBOX( I ) = VAL__MAXI
+         END DO
 
 *  Working in a variable number of dimensions introduces complications
 *  not met if the dimensionality is fixed; particularly, arrays cannot
@@ -206,21 +222,29 @@
 *  Store the pixel coordinates corresponding to the centre of the
 *  current pixel.
             DO I = 1, NDIM
-               PCO( I ) = REAL( BINDEX( I ) ) - 0.5
+               PCO( I ) = DBLE( BINDEX( I ) ) - 0.5
             END DO
 
 *  Transform these pixel co-ordinates into user co-ordinates.
-            CALL ARD1_TRANS( NDIM, C, PCO, UCO )
+            CALL ARD1_LTRAN( NDIM, C, 1, PCO, UCO, STATUS )
 
 *  Find the square of the distance of this pixel from the circle centre.
             R2 = 0.0
             DO I = 1, NDIM
-               R2 = R2 + ( UCO( I ) - PAR( CEN0 + I ) )**2
+               R2 = R2 + ( UCO( I ) - PAR( I ) )**2
             END DO
 
 *  If the pixel is inside the user box, assign the value to the
-*  current pixel. 
-            IF( R2 .LE. RSQ ) B( VA ) = VALUE
+*  current pixel, and update the returned box.
+            IF( R2 .LE. RSQ ) THEN
+               B( VA ) = VALUE
+
+               DO I = 1, NDIM
+                  RUBOX( I ) = MAX( RUBOX( I ), BINDEX( I ) )
+                  RLBOX( I ) = MIN( RLBOX( I ), BINDEX( I ) )
+               END DO
+
+            END IF
 
 *  Increment the B array vector address of the next pixel to be
 *  processed
@@ -258,6 +282,17 @@
 
       END IF
 
+
  999  CONTINUE
+
+*   Return the new bounding box.
+      IF( RLBOX( 1 ) .EQ. VAL__MAXI ) THEN
+         LBOX( 1 ) = VAL__MINI
+      ELSE
+         DO I = 1, NDIM
+            UBOX( I ) = RUBOX( I ) 
+            LBOX( I ) = RLBOX( I ) 
+         END DO
+      END IF
 
       END

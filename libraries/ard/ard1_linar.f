@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_LINAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_LINAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,22 +11,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_LINAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_LINAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
 *     The two positions supplied as arguments to the LINE keyword are
-*     transformed into pixel co-ordinates and stored on the operand
-*     stack.
+*     stored on the operand stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from supplied
-*        co-ordinates to pixel co-ordinates. There should be
-*        NDIM*( NDIM + 1 ) values.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
@@ -56,6 +53,8 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,7 +72,7 @@
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -91,12 +90,8 @@
 *  Local Variables:
       INTEGER AXIS               ! Axis index
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL ARGS( ARD__MXDIM )    ! A set of co-ordinates
-      REAL VALUE                 ! The argument value
+      DOUBLE PRECISION VALUE     ! The argument value
 
-*  Ensure that the contents of the ARGS array is saved between
-*  invocations of this routine.
-      SAVE ARGS
 *.
 
 *  Check inherited global status.
@@ -106,24 +101,17 @@
 *  end of the element, or the end of the argument list is encountered.
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
-*  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+*  If another argument is obtained, which axis will it refer to?
+         AXIS = MOD( NARG, NDIM ) + 1
 
-*  If an argument was obtained, work out which axis it refers to (they
-*  cycle round from 1 to NDIM).
+*  Read the next argument.
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+     :                    STATUS )
+
+*  If an argument was obtained, store it on the operands stack.
          IF( OK ) THEN
             NARG = NARG + 1
-            AXIS = MOD( NARG - 1, NDIM ) + 1
-
-*  Store the argument value in a temporary array.
-            ARGS( AXIS ) = VALUE
-
-*  If a complete set of co-ordinates have now been obtained, transform
-*  them using the supplied transformation and store in the operand
-*  stack.
-            IF( AXIS .EQ. NDIM ) CALL ARD1_STORP( NDIM, C, ARGS,
-     :                                            IPOPND, IOPND,
-     :                                            SZOPND, STATUS )
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect.

@@ -23,6 +23,8 @@
 *  History:
 *     22-FEB-1994 (DSB):
 *        Original version
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -36,6 +38,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants.
       INCLUDE 'ARD_CONST'        ! ARD private constants.
+      INCLUDE 'AST_PAR'          ! AST constants.
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks.
@@ -198,6 +201,7 @@
       DATA CMN_STSYM( ARD__SCA ) /'SCALE'/
       DATA CMN_STSYM( ARD__TWI ) /'TWIST'/
       DATA CMN_STSYM( ARD__STR ) /'STRETCH'/
+      DATA CMN_STSYM( ARD__WCS ) /'WCS'/
 
 *  The actual length of each statement.
       DATA CMN_STLEN( ARD__DIM ) /9/
@@ -206,6 +210,7 @@
       DATA CMN_STLEN( ARD__SCA ) /5/
       DATA CMN_STLEN( ARD__TWI ) /5/
       DATA CMN_STLEN( ARD__STR ) /7/
+      DATA CMN_STLEN( ARD__WCS ) /3/
 
 *  The number of arguments taken by each statement. -1 is used if
 *  the number of arguments is variable.
@@ -215,6 +220,7 @@
       DATA CMN_STARG( ARD__SCA ) /1/
       DATA CMN_STARG( ARD__TWI ) /1/
       DATA CMN_STARG( ARD__STR ) /-1/
+      DATA CMN_STARG( ARD__WCS ) /-1/
 
 *  The number of arguments taken by each keyword. -1 is used if
 *  the number of arguments is variable.
@@ -232,5 +238,12 @@
       DATA CMN_KWARG( ARD__FRA ) /1/
       DATA CMN_KWARG( ARD__WHO ) /0/
       DATA CMN_KWARG( ARD__INP ) /0/
+
+*  Use zero to indicate that no memory has yet been allocated to store
+*  a positions list.
+      DATA CMN_PSET /0/
+
+*  No Application FrameSet is avalable as yet.
+      DATA CMN_AWCS /AST__NULL/
 
       END

@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_RECAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_RECAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,26 +11,22 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_RECAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_RECAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
-*     The co-efficients of the current transformation from user
-*     co-ordinates to pixel co-ordinates are stored on the stack,
-*     followed by the supplied user co-ordinates of the two diagonally
-*     opposite corners.
+*     The supplied arguments are stored on the operand stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from user
-*        co-ordinates to pixel co-ordinates.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
-*        The index of the last character in ELEM to be checked.
+*        The index of the final character in ELEM to be checked.
 *     IPOPND = INTEGER (Given)
 *        The pointer to the array holding the operand stack.
 *     IOPND = INTEGER (Given and Returned)
@@ -56,12 +52,15 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+      
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,7 +71,7 @@
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -88,9 +87,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER ID                 ! Loop count
+      INTEGER AXIS               ! Axis index
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL VALUE                 ! The argument value
+      DOUBLE PRECISION VALUE     ! The argument value
 
 *.
 
@@ -101,25 +100,17 @@
 *  end of the element, or the end of the argument list is encountered.
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
-*  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+*  If another argument is obtained, which axis will it refer to?
+         AXIS = MOD( NARG, NDIM ) + 1
 
-*  If an argument was obtained, increment the number of arguments
-*  obtained so far.
+*  Read the next argument.
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+     :                    STATUS )
+
+*  If an argument was obtained, store it on the operands stack.
          IF( OK ) THEN
             NARG = NARG + 1
-
-*  If an argument list has just been started, store the co-efficients
-*  of the current transformation on the operand stack.
-            IF( NARG .EQ. 1 ) THEN
-               DO ID = 1, NDIM*( NDIM + 1 )
-                  CALL ARD1_STORR( C( ID ), SZOPND, IOPND, IPOPND,
-     :                             STATUS )
-               END DO         
-            END IF
-
-*  Store the argument value in the operand stack.
-            CALL ARD1_STORR( VALUE, SZOPND, IOPND, IPOPND, STATUS )
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect.

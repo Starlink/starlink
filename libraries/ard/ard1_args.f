@@ -34,7 +34,7 @@
 *        The total number of arguments required.
 *     MXARG = INTEGER (Given)
 *        The size of the ARGS array.
-*     ARGS( MXARG ) = REAL (Given and Returned)
+*     ARGS( MXARG ) = DOUBLE PRECISION (Given and Returned)
 *        An array holding the argument values obtained so far, in the
 *        order in which they occur within the ARD description.
 *     NARG = INTEGER (Given and Returned)
@@ -56,6 +56,8 @@
 *  History:
 *     16-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,7 +79,7 @@
       INTEGER MXARG
 
 *  Arguments Given and Returned:
-      REAL ARGS( MXARG )
+      DOUBLE PRECISION ARGS( MXARG )
       INTEGER NARG
       INTEGER I
       LOGICAL MORE
@@ -88,7 +90,7 @@
 *  Local Variables:
       CHARACTER CC*1             ! Next character
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL    VALUE              ! An argument value
+      DOUBLE PRECISION VALUE     ! An argument value
 
 *.
 
@@ -145,7 +147,7 @@
          DO WHILE( I .LE. L .AND. MORE .AND. STATUS .EQ. SAI__OK ) 
 
 *  Read the next argument.
-            CALL ARD1_GTARG( ELEM, L, I, OK, MORE, VALUE, STATUS )
+            CALL ARD1_GTARG( 0, 0, ELEM, L, I, OK, MORE, VALUE, STATUS )
 
 *  If an argument was obtained, store it in the returned array. Report
 *  an error if there is no room for any more arguments.

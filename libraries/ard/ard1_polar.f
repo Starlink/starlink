@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_POLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_POLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,26 +11,25 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_POLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_POLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
-*     Each supplied vertex is transformed from user co-ordinates to
-*     pixel co-ordinates, and then stored on the operand stack.
+*     The positions supplied as arguments to the POINT keyword are
+*     stored on the operand stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from supplied
-*        co-ordinates to pixel co-ordinates.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
-*        The index of the final character in ELEM to be checked.
-*     IPOPND = INTEGER (Given)
-*        The pointer to the array holding the operand stack.
+*        The index of the last non-blank character in ELEM.
+*     IPOPND = INTEGER (Given and Returned)
+*        The pointer to the _double array holding the operand stack.
 *     IOPND = INTEGER (Given and Returned)
 *        The index within the operand stack at which the next value
 *        should be stored.
@@ -54,6 +53,8 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -66,12 +67,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -89,12 +91,7 @@
 *  Local Variables:
       INTEGER AXIS               ! Axis index
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL ARGS( ARD__MXDIM )    ! A set of co-ordinates
-      REAL VALUE                 ! The argument value
-
-*  Ensure that the contents of the ARGS array is saved between
-*  invocations of this routine.
-      SAVE ARGS
+      DOUBLE PRECISION VALUE     ! The argument value
 *.
 
 *  Check inherited global status.
@@ -103,8 +100,8 @@
 *  Report an error and abort if the dimensionality is not 2.
       IF( NDIM .NE. 2 ) THEN
          STATUS = ARD__NOT2D
-         CALL ERR_REP( 'ARD1_POLAR_ERR1', 'POLYGON keyword found in '//
-     :                 'non-2D ARD description.', STATUS )
+         CALL ERR_REP( 'ARD1_POLAR_ERR1', 'ARD mask is not 2 '//
+     :                 'dimensional.', STATUS )
          GO TO 999
       END IF
 
@@ -112,49 +109,34 @@
 *  end of the element, or the end of the argument list is encountered.
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
-*  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+*  If another argument is obtained, which axis will it refer to?
+         AXIS = MOD( NARG, NDIM ) + 1
 
-*  If an argument was obtained, work out which axis it refers to (they
-*  cycle round from 1 to 2).
+*  Read the next argument.
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+     :                    STATUS )
+
+*  If an argument was obtained, store it on the operands stack.
          IF( OK ) THEN
             NARG = NARG + 1
-            AXIS = MOD( NARG - 1, 2 ) + 1
-
-*  Store the argument value in a temporary array.
-            ARGS( AXIS ) = VALUE
-
-*  If a complete set of co-ordinates have now been obtained, transform
-*  them using the supplied transformation and store in the operand
-*  stack.
-            IF( AXIS .EQ. 2 ) CALL ARD1_STORP( 2, C, ARGS, IPOPND,
-     :                                         IOPND, SZOPND,
-     :                                         STATUS )
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect (i.e. if it not a
-*  multiple of 2).
-         ELSE IF( .NOT. KEYW .AND. STATUS .EQ. SAI__OK ) THEN
+*  multiple of NDIM or if it is less than 3).
+         ELSE IF( .NOT. KEYW ) THEN
  
-            IF( AXIS .NE. 2 ) THEN
+            IF( ( MOD( NARG, NDIM ) .NE. 0 .OR. NARG .LT. 3*NDIM ) .AND. 
+     :          STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
-               CALL ERR_REP( 'ARD1_POLAR_ERR2', 'Incorrect number of '//
-     :                       'arguments found.', STATUS )
-
-*  Report an error if less than 3 vertices have been supplied.
-            ELSE IF( NARG .LT. 6 ) THEN
-               STATUS = ARD__ARGS
-               CALL ERR_REP( 'ARD1_POLAR_ERR3', 'Argument list '//
-     :                       'specifies less than 3 vertices.',
-     :                       STATUS )
-
+               CALL ERR_REP( 'ARD1_POLAR_ERR1', 'Incorrect number of '//
+     :                       'arguments.', STATUS )
             END IF
 
          END IF
 
       END DO
 
-*  Jump to here if an error occurs.
  999  CONTINUE
 
       END

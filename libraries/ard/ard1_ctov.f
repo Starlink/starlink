@@ -25,7 +25,7 @@
 *        The lower pixel index bounds of the array.
 *     UBND( NDIM ) = INTEGER (Given)
 *        The upper pixel index bounds of the array.
-*     INDX( NDIM ) = REAL (Given)
+*     INDX( NDIM ) = DOUBLE PRECISION (Given)
 *        The Cartesian pixel indices.
 *     VA = INTEGER (Returned)
 *        The vector address.
@@ -39,6 +39,8 @@
 *  History:
 *     1-MAR-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -56,7 +58,7 @@
       INTEGER NDIM
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
-      REAL INDX( NDIM )
+      DOUBLE PRECISION INDX( NDIM )
 
 *  Arguments Returned:
       INTEGER VA

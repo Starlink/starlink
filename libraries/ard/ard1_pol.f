@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR,
-     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, PAR, B,
-*                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+*     CALL ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, 
+*                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
 *     The array B is initialised by setting all values within the
@@ -21,7 +21,7 @@
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
 *     supplied parameters. The supplied parameters are a list of (x,y)
-*     pixel co-ordinate pairs for each vertex of the polygon or rotated
+*     user co-ordinate pairs for each vertex of the polygon or rotated
 *     box.
 
 *  Arguments:
@@ -37,7 +37,11 @@
 *        The upper pixel index bounds of the B array on the second axis.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
-*     PAR( NPAR ) = REAL (Given)
+*     D( 6 ) = DOUBLE PRECISION (Given)
+*        The coefficients of the user->pixel mapping. The mapping is:
+*        P1 = D0 + D1*U1 + D2*U2 
+*        P2 = D3 + D4*U1 + D5*U2 
+*     PAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
 *        Region parameters. 
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
 *        The array.
@@ -68,6 +72,8 @@
 *  History:
 *     23-MAR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,9 +97,10 @@
       INTEGER LBND2
       INTEGER UBND2
       INTEGER NPAR
-      REAL PAR( NPAR )
+      DOUBLE PRECISION D( 6 )
 
 *  Arguments Given and Returned:
+      DOUBLE PRECISION PAR( NPAR )
       INTEGER B( LBND1:UBND1, LBND2:UBND2 )
       INTEGER LBEXTB( 2 )
       INTEGER UBEXTB( 2 )
@@ -108,7 +115,7 @@
       PARAMETER ( MXCRS = 100 )
 
 *  Local Variables:
-      REAL
+      DOUBLE PRECISION 
      :  DY,                    ! Gap in y between adjacent vertices
      :  PERT,                  ! Perturbation
      :  TEST,                  ! Line-polygon intersection test
@@ -167,12 +174,15 @@
       CALL ARD1_BXSET( 2, LBND, UBND, MSKSIZ, 0, LBINTB,
      :                 UBINTB, B, STATUS )
 
+* Convert all positions from user coords to pixel coords.
+      CALL ARD1_LTRAN( 2, D, NVERT, PAR, PAR, STATUS )
+
 *  Find the maximum and minimum x and y pixel coordinates at the
 *  supplied polygon vertices.
-      XMIN = VAL__MAXR
-      XMAX = VAL__MINR
-      YMIN = VAL__MAXR
-      YMAX = VAL__MINR
+      XMIN = VAL__MAXD
+      XMAX = VAL__MIND
+      YMIN = VAL__MAXD
+      YMAX = VAL__MIND
  
       DO N = 1, NVERT
          XMIN = MIN( PAR( 2*N - 1 ), XMIN )
@@ -188,16 +198,16 @@
 *  rounding problems causing the value to creep above the maximum value
 *  storable as an integer, and thus causing an overflow when the NINT
 *  function is evaluated.
-      MINX = NINT( MIN( MAX( -1.0E8, XMIN + 0.5 ), 1.0E8 ) )
+      MINX = NINT( MIN( MAX( -1.0D8, XMIN + 0.5 ), 1.0D8 ) )
       LBINTB( 1 ) = MIN( MAX( MINX, LBND1 ), UBND1 )
 
-      MAXX = NINT( MIN( MAX( -1.0E8, XMAX + 0.5 ), 1.0E8 ) )
+      MAXX = NINT( MIN( MAX( -1.0D8, XMAX + 0.5 ), 1.0D8 ) )
       UBINTB( 1 ) = MIN( MAX( MAXX, LBND1 ), UBND1 )
 
-      MINY = NINT( MIN( MAX( -1.0E8, YMIN + 0.5 ), 1.0E8 ) )
+      MINY = NINT( MIN( MAX( -1.0D8, YMIN + 0.5 ), 1.0D8 ) )
       LBINTB( 2 ) = MIN( MAX( MINY, LBND2 ), UBND2 )
 
-      MAXY = NINT( MIN( MAX( -1.0E8, YMAX + 0.5 ), 1.0E8 ) )
+      MAXY = NINT( MIN( MAX( -1.0D8, YMAX + 0.5 ), 1.0D8 ) )
       UBINTB( 2 ) = MIN( MAX( MAXY, LBND2 ), UBND2 )
 
 *  Scan the range of mask lines which cross the polygon.
@@ -205,13 +215,13 @@
 
 *  Store the Y pixel coordinate at the vertical centre of the mask
 *  line.
-         YL = REAL( J ) - 0.5
+         YL = DBLE( J ) - 0.5
 
 *  Problems occur in counting the number of intersections if any array
 *  line passes exactly through a polygon vertex. Therefore, the line
 *  positions are shifted by a negligible amount PERT to ensure this
 *  does not happen.
-         PERT = 1.0E-4
+         PERT = 1.0D-4
 
 *  Loop back to here with a new value for PERT if the current value
 *  causes a vertex to fall exactly on the current line. Initialise the
@@ -235,8 +245,8 @@
 *  PERT and start again ( "the line" refers to a line through the
 *  middle of the pixel. The act of increasing PERT effectively moves the
 *  line a small amount in the +ve Y direction).
-            IF( ABS( TEST ) .LT. VAL__SMLR ) THEN
-               PERT = PERT + 1.0E-4
+            IF( ABS( TEST ) .LT. VAL__SMLD ) THEN
+               PERT = PERT + 1.0D-4
                GO TO 20
 
 *  If TEST is positive, adjacent vertices lie on opposite sides of the
@@ -248,7 +258,7 @@
                IF( NCROSS .LE. MXCRS ) THEN
                   DY = PAR( 2*N2 ) - PAR( 2*N1 )
  
-                  IF( ABS( DY ) .LT. VAL__SMLR ) DY = SIGN( VAL__SMLR,
+                  IF( ABS( DY ) .LT. VAL__SMLD ) DY = SIGN( VAL__SMLD,
      :                                                      DY )
                   XCROSS( NCROSS ) = PAR( 2*N1 - 1 ) +
      :                         ( YL - PAR( 2*N1 ) ) *
@@ -300,11 +310,11 @@
 *  the current mask line. The bounds are limited to the bounds of the
 *  smallest rectangle enclosing the polygon. The end pixels are included
 *  if their centres fall within the intersection.
-               MINX = NINT( MIN( MAX( -1.0E8, XCROSS( N - 1 )  ),
-     :                           1.0E8 ) ) + 1
+               MINX = NINT( MIN( MAX( -1.0D8, XCROSS( N - 1 )  ),
+     :                           1.0D8 ) ) + 1
                MINX = MAX( MINX, LBINTB( 1 ) )
 
-               MAXX = NINT( MIN( MAX( -1.0E8, XCROSS( N ) ), 1.0E8 ) )
+               MAXX = NINT( MIN( MAX( -1.0D8, XCROSS( N ) ), 1.0D8 ) )
                MAXX = MIN( MAXX, UBINTB( 1 ) )
 
 *  Set mask pixels lying between each pair of intersections to the

@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_ADANL( IGRP, NDIM, AC, IPEXPR, IPOPND, SZEXPR,
-     :                       SZOPND, INP, STATUS )
+      SUBROUTINE ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, 
+     :                       IPOPND, SZEXPR, SZOPND, INP, STATUS )
 *+
 *  Name:
 *     ARD1_ADANL
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ADANL( IGRP, NDIM, AC, IPEXPR, IPOPND, SZEXPR, SZOPND,
-*                      INP, STATUS )
+*     CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, 
+*                      IPOPND, SZEXPR, SZOPND, INP, STATUS )
 
 *  Description:
 *     This routine analyses the supplied ARD description by identifying
@@ -31,10 +31,17 @@
 *        complete ARD description.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the mask supplied to ARD_WORK.
-*     AC( * ) = REAL (Given)
-*        The co-efficients of the linear mapping from application
-*        co-ordinates to pixel co-ordinates. The array should hold
-*        NDIM*( NDIM + 1 ) values.
+*     AWCS = INTEGER (Given)
+*        A pointer to an AST FrameSet supplied by the application. This
+*        should have a Base Frame with Domain PIXEL referring to pixel
+*        coords within the pixel mask and another Frame with Domain 
+*        ARDAPP referring to "Application co-ordinates" (as defined by
+*        the TRCOEF argument of ARD_WORK). The current Frame should be
+*        the preferred user coordinate system.
+*     DLBND( * ) = DOUBLE PRECISION (Given)
+*        The lower bounds of pixel coordinates.
+*     DUBND( * ) = DOUBLE PRECISION (Given)
+*        The upper bounds of pixel coordinates.
 *     IPEXPR = INTEGER (Given and Returned)
 *        A pointer to a one dimensional integer work array. On return,
 *        the logical expression representing the ARD description is
@@ -53,19 +60,13 @@
 *        at the end of the ARD description. The array is extended if
 *        necessary.
 *     IPOPND = INTEGER (Given and Returned)
-*        A pointer to a one dimensional real work array. On return, the
+*        A pointer to a one dimensional _DOUBLE work array. On return, the
 *        array holds information about all the operands (i.e. keywords)
 *        used within the logical expression representing the ARD
-*        description. Each operand is defined by a block on N+3 values,
-*        where N is the number of arguments associated with the
-*        keyword.  The first value in the block is an integer code
-*        representing the keyword. These are defined in include file
-*        ARD_CONST. The second value is the position of the keyword
-*        within the ARD description (1 for the first, 2 for the second,
-*        etc). The third value is the number of arguments associated
-*        with the keyword (i.e. N above), the following N values are
-*        the N arguments. Checks are made on the validity of the
-*        keyword argument lists.  The array is extended if necessary.
+*        description. Each operand is defined by a variable length block 
+*        of values (see ARD1_LKR prologue for details). Checks are made on 
+*        the validity of the keyword argument lists.  The array is extended 
+*        if necessary.
 *     SZEXPR = INTEGER (Given and Returned)
 *        The size of the array pointed to by IPEXPR. The array is
 *        truncated on exit so that there is no un-used space at the
@@ -89,6 +90,10 @@
 *        Original version.
 *     25-OCT-2000 (DSB):
 *        Report an error if a blank ARD expression is supplied.
+*     5-JUN-2001 (DSB):
+*        Modified to use AST FrameSets insetad of coeff arrays.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,6 +108,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constans
       INCLUDE 'GRP_PAR'          ! GRP_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants and functions
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
@@ -116,7 +122,9 @@
 *  Arguments Given:
       INTEGER IGRP
       INTEGER NDIM
-      REAL AC(*)
+      INTEGER AWCS
+      DOUBLE PRECISION DLBND( * )
+      DOUBLE PRECISION DUBND( * )
 
 *  Arguments Given and Returned:
       INTEGER IPEXPR
@@ -138,18 +146,24 @@
       CHARACTER
      : ELEM*(GRP__SZNAM )        ! Current GRP element
 
+      DOUBLE PRECISION           ! Extra WCS data
+     : WCSDAT( ARD__MXDIM*( ARD__MXDIM + 1 ) )
+
       INTEGER
      : I,                        ! Index of next character 
      : IELEM,                    ! Index of next GRP element
      : IEXPR,                    ! Next free entry in expression array
      : IOPND,                    ! Next free entry in operands array
+     : IWCS,                     ! Total FrameSet from pixel to user coords
      : L,                        ! Used length of current GRP element
+     : MAP,                      ! AST Mapping from PIXEL to user coords
      : NARG,                     ! No. of arguments obtained so far
      : NKEYW,                    ! No. of keywords in ARD description
      : PNARG,                    ! Index at which to store no. of arg.s
      : SIZE,                     ! No. of elements in group
-     : TYPE                      ! Identifier for operator or operand
-
+     : TYPE,                     ! Identifier for operator or operand
+     : UWCS                      ! FrameSet supplied by user 
+      
       LOGICAL
      : KEYW,                     ! Is current field a keyword?
      : MORE,                     ! More GRP elements to be processed?
@@ -158,14 +172,13 @@
      : OPER,                     ! Is current field an operator?
      : STAT                      ! Is current field a statement?
 
-      REAL
-     : TC( ARD__MXDIM*( ARD__MXDIM + 1 ) ),! User -> pixel mapping
-     : UC( ARD__MXDIM*( ARD__MXDIM + 1 ) ) ! User -> application mapping
-
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Get the size of the group containing the supplied ARD description.
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
@@ -210,13 +223,15 @@
 *  case).
       NEEDIM = NDIM .NE. 2
 
-*  Initialise the current transformations so that user co-ordinates
-*  are identical to application co-ordinates. This is done by setting
-*  the user transformation (user -> application) to a unit
-*  transformation, and the total transformation (user -> pixel) equal to
-*  the supplied application transformation (application -> pixel).
-      CALL ARD1_TRUNI( NDIM, UC, STATUS )
-      CALL ARD1_TRCOP( NDIM, AC, TC, STATUS )
+*  Create a default user FrameSet in which application coords and user
+*  coords are connected by a UnitMap.
+      UWCS = AST__NULL
+      CALL ARD1_COWCS( NDIM, AST__BAD, UWCS, STATUS )
+
+*  The total Mapping from PIXEL to user coords is currently just the 
+*  supplied FrameSet.
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( AWCS, AST__BASE, AST__CURRENT, 
+     :                                    STATUS ), STATUS )
 
 *  Initialise a flag to show that no INPUT keywords have yet been found.
       INP = .FALSE.
@@ -269,9 +284,6 @@
 *  Find the index of the last non-blank character in the element.
                L = CHR_LEN( ELEM )
 
-*  Unless the element is completely blank, convert it to upper case.
-               IF( L .GT. 0 ) CALL CHR_UCASE( ELEM( : L ) )
-
 *  Initialise the index of the next character to be checked in the
 *  new element.
                I = 1
@@ -283,17 +295,18 @@
 *  keyword field, copy any remaining keyword arguments from the current
 *  GRP element into the returned operand array.
          ELSE IF( KEYW ) THEN
-            CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, TC, ELEM, L, IPOPND,
-     :                      IOPND, PNARG, SZOPND, NARG, I, KEYW,
-     :                      STATUS )
+            CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
+     :                      IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
+     :                      KEYW, STATUS )
 
 *  If we are in the middle of processing a statement field, obtain any 
 *  remaining arguments from the GRP element. When the argument list
 *  is complete, make any modifications to the current transformations,
 *  etc, specified by the statement.
          ELSE IF( STAT ) THEN
-            CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AC, NEEDIM, NARG, I,
-     :                      UC, TC, STAT, STATUS )
+            CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, 
+     :                      NEEDIM, NARG, I, UWCS, MAP, STAT, IWCS, 
+     :                      WCSDAT, STATUS )
 
 *  If we are ready to start a new field...
          ELSE
@@ -326,7 +339,7 @@
 *  array. The argument list for the operand will be read from the
 *  supplied GRP group and added to the operand array in succesive
 *  passes through the DO-WHILE loop.
-               CALL ARD1_STORR( REAL( TYPE ), SZOPND, IOPND, IPOPND,
+               CALL ARD1_STORD( DBLE( TYPE ), SZOPND, IOPND, IPOPND,
      :                          STATUS )
 
 *  Now insert a value into the operand array which records the position
@@ -334,14 +347,14 @@
 *  keywords).
                IF( TYPE .NE. ARD__INP ) THEN
                   NKEYW = NKEYW + 1
-                  CALL ARD1_STORR( REAL( NKEYW ), SZOPND, IOPND, IPOPND,
+                  CALL ARD1_STORD( DBLE( NKEYW ), SZOPND, IOPND, IPOPND,
      :                             STATUS )
 
 *  If this is an INPUT keyword, store a zero for the keyword position,
 *  and set a flag to indicate that the ARD description contained at
 *  least one INPUT keyword.
                ELSE
-                  CALL ARD1_STORR( 0.0, SZOPND, IOPND, IPOPND, STATUS )
+                  CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, STATUS )
                   INP = .TRUE.
                END IF
 
@@ -359,7 +372,7 @@
 *  arguments is known. Initialise the number of arguments associated
 *  with the keyword to zero.
                PNARG = IOPND
-               CALL ARD1_STORR( 0.0, SZOPND, IOPND, IPOPND, STATUS )
+               CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If a statement field was found...
             ELSE IF( STAT ) THEN
@@ -394,9 +407,12 @@
       SZEXPR = IEXPR - 1
       SZOPND = IOPND - 1
       CALL PSX_REALLOC( SZEXPR*VAL__NBI, IPEXPR, STATUS )
-      CALL PSX_REALLOC( SZOPND*VAL__NBR, IPOPND, STATUS )
+      CALL PSX_REALLOC( SZOPND*VAL__NBD, IPOPND, STATUS )
 
 *  Jump to here if an error occurs.
  999  CONTINUE
       
+*  End the AST context.
+      CALL AST_END( STATUS )
+
       END

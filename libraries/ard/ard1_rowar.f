@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_ROWAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_ROWAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,24 +11,18 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ROWAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_ROWAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
-*     The first two values stored on the operand stack are the
-*     components of a 2-D vector (in pixel co-ordinates) giving the
-*     direction of the lines corresponding to the specified rows.
-*     After that come pairs of (x,y) pixel co-ordinates (one for each
-*     row) of the points (0,YY) where YY is one of the supplied argument
-*     values.
+*     The supplied arguments are stored on the stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from supplied
-*        co-ordinates to pixel co-ordinates.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
@@ -58,6 +52,8 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -75,7 +71,7 @@
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
 
@@ -92,9 +88,7 @@
 
 *  Local Variables:
       LOGICAL OK                 ! Was an argument value obtained?
-      REAL VALUE                 ! The argument value
-      REAL X                     ! X pixel co-ord at user x axis
-      REAL Y                     ! Y pixel co-ord at user x axis
+      DOUBLE PRECISION VALUE     ! The argument value
 
 *.
 
@@ -114,28 +108,13 @@
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
 *  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+         CALL ARD1_GTARG( CFRM, 2, ELEM, L, I, OK, KEYW, VALUE, STATUS )
 
 *  If an argument was obtained, increment the number of arguments
-*  supplied by the user.
+*  supplied by the user, and store the parameter value.
          IF( OK ) THEN
             NARG = NARG + 1
-
-*  If an argument list has just been started, store the direction
-*  vector of the lines in pixel co-ordinates on the operand stack.
-            IF( NARG .EQ. 1 ) THEN
-               CALL ARD1_STORR( C( 2 ), SZOPND, IOPND, IPOPND, STATUS )
-               CALL ARD1_STORR( C( 5 ), SZOPND, IOPND, IPOPND, STATUS )
-            END IF
-
-*  Find the pixel co-ordinates corresponding to (0,VALUE).
-            X = C( 1 ) + C( 3 )*VALUE
-            Y = C( 4 ) + C( 6 )*VALUE
-
-*  Store them on the operand stack.
-            CALL ARD1_STORR( X, SZOPND, IOPND, IPOPND, STATUS )
-            CALL ARD1_STORR( Y, SZOPND, IOPND, IPOPND, STATUS )
-  
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
          END IF
 
       END DO

@@ -1,39 +1,32 @@
-      SUBROUTINE ARD1_ELLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_ELLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
 *     ARD1_ELLAR
 
 *  Purpose:
-*     Assemble argument list for a ELLIPSE keyword
+*     Assemble argument list for an ELLIPSE keyword
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ELLAR( NDIM, C, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_ELLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
-*     The co-efficients of the current (user -> pixel) transformation 
-*     are stored on the operand stack, followed by the user
-*     co-ordinates of the ellipse centre, the lengths of the two
-*     ellipse axes (in user co-ordinates), and the angle from the user
-*     X axis to the first ellipse axis (in degrees, measured +ve from
-*     user +X to user +Y).
+*     The supplied arguments are stored on the operand stack.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
-*     C( * ) = REAL (Given)
-*        The co-efficients of the current mapping from user
-*        co-ordinates to pixel co-ordinates.
+*     CFRM = INTEGER (Given)
+*        An AST pointer to a Frame describing user coordinates.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        An element of an ARD description.
 *     L = INTEGER (Given)
-*        The index of the last character in ELEM which needs to be 
-*        checked.
+*        The index of the final character in ELEM to be checked.
 *     IPOPND = INTEGER (Given)
 *        The pointer to the array holding the operand stack.
 *     IOPND = INTEGER (Given and Returned)
@@ -59,6 +52,8 @@
 *  History:
 *     17-FEB-1994 (DSB):
 *        Original version.
+*     18-JUL-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,18 +66,18 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
       INTEGER NDIM
-      REAL C( * )
+      INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
-      INTEGER IPOPND
 
 *  Arguments Given and Returned:
+      INTEGER IPOPND
       INTEGER IOPND
       INTEGER SZOPND
       INTEGER NARG
@@ -93,10 +88,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER ID                 ! Loop count
-      LOGICAL OK                 ! Was an argument obtained?
-      REAL VALUE                 ! Current argument value
-      
+      INTEGER AXIS               ! Axis index
+      LOGICAL OK                 ! Was an argument value obtained?
+      DOUBLE PRECISION VALUE     ! The argument value
+
+
 *.
 
 *  Check inherited global status.
@@ -105,8 +101,8 @@
 *  Report an error and abort if the dimensionality is not 2.
       IF( NDIM .NE. 2 ) THEN
          STATUS = ARD__NOT2D
-         CALL ERR_REP( 'ARD1_ELLAR_ERR1', 'ARD mask is not '//
-     :                 '2 dimensional.', STATUS )
+         CALL ERR_REP( 'ARD1_ELLAR_ERR1', 'ARD mask is not 2 '//
+     :                 'dimensional.', STATUS )
          GO TO 999
       END IF
 
@@ -114,25 +110,36 @@
 *  end of the element, or the end of the argument list is encountered.
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
-*  Read the next argument.
-         CALL ARD1_GTARG( ELEM, L, I, OK, KEYW, VALUE, STATUS )
+*  First argument refers to axis 1.
+         IF( NARG .EQ. 0 ) THEN
+            AXIS = 1
 
-*  If an argument was obtained increment the number of arguments
-*  obtained so far.
-         IF( OK ) THEN
-            NARG = NARG + 1
+*  Second argument refers to axis 2.
+         ELSE IF( NARG .EQ. 1 ) THEN
+            AXIS = 2
 
-*  If this is the first argument, store the co-efficients of the
-*  transformation on the operand stack.
-            IF( NARG .EQ. 1 ) THEN
-               DO ID = 1, 6
-                  CALL ARD1_STORR( C( ID ), SZOPND, IOPND, IPOPND,
-     :                             STATUS )
-               END DO         
+*  Third and fourth arguments, refer to axis 1 - unless the Frame is a
+*  SkyFrame in which case it refers to the latitude-like axis.
+         ELSE IF( NARG .LT. 4 ) THEN
+            IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+               AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
+            ELSE
+               AXIS = 1
             END IF
 
-*  Store the argument in the operand stack.
-            CALL ARD1_STORR( VALUE, SZOPND, IOPND, IPOPND, STATUS )
+*  Any other axes are interpreted as simple floating point values.
+         ELSE 
+            AXIS = 0
+         END IF
+
+*  Read the next argument.
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+     :                    STATUS )
+
+*  If an argument was obtained, store it on the operands stack.
+         IF( OK ) THEN
+            NARG = NARG + 1
+            CALL ARD1_STORD( VALUE, SZOPND, IOPND, IPOPND, STATUS )
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect.
@@ -140,7 +147,7 @@
  
             IF( NARG .NE. 5 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
-               CALL ERR_REP( 'ARD1_ELLAR_ERR2', 'Incorect number of '//
+               CALL ERR_REP( 'ARD1_ELLAR_ERR1', 'Incorrect number of '//
      :                       'arguments found.', STATUS )
             END IF
 
@@ -148,7 +155,6 @@
 
       END DO
 
-*  Jump to here if an error occurs.
  999  CONTINUE
 
       END

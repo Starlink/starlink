@@ -5,7 +5,7 @@
 *     ARD1_WHO
 
 *  Purpose:
-*     Initialise an array to hold a CIRCLE region.
+*     Initialise an array to hold a WHOLE region.
 
 *  Language:
 *     Starlink Fortran 77
@@ -55,6 +55,8 @@
 *  History:
 *     15-APR-1994 (DSB):
 *        Original version.
+*     26-JUN-2001 (DSB):
+*        Modified for ARD version 2.0.
 *     {enter_changes_here}
 
 *  Bugs:
