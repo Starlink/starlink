@@ -78,8 +78,8 @@ C
 	CHARACTER LOC*(DAT__SZLOC),LOCF*(DAT__SZLOC)
 	CHARACTER*80 INFO(MAXF)
 	REAL BAND(MAXF)
-	DATA NFIL/0/
 	SAVE POS,NFIL,INFO,BAND
+	DATA NFIL/0/
 C
 	IF(ISTAT.NE.0) RETURN
 C Get stuff from MCF
@@ -123,9 +123,10 @@ C Get data
 	CHARACTER*3 RPS(MAXF)
 	INTEGER POS(MAXF),NFIL
 	SAVE RPS,POS,NFIL
-	DATA NFIL/0/
         INCLUDE 'DAT_PAR'
 	CHARACTER*(DAT__SZLOC) LOC,LOCF
+	DATA NFIL/0/
+
 C Get data from MCF if missing
 	IF(NFIL.EQ.0) THEN
 C Get locator to MCF
@@ -159,9 +160,10 @@ C Get data
 	PARAMETER (MAXF=16)
 	INTEGER POS(MAXF),TLM(MAXF),NFIL
 	SAVE POS,NFIL,TLM
-	DATA NFIL/0/
         INCLUDE 'DAT_PAR'
 	CHARACTER*(DAT__SZLOC) LOC,LOCF
+	DATA NFIL/0/
+
 C Get data from MCF if missing
 	IF(NFIL.EQ.0) THEN
 C Get locator to MCF
@@ -197,10 +199,11 @@ C Get data
 	CHARACTER*3 RPS(MAXF)
 	INTEGER POS(MAXF),NFIL
 	SAVE RPS,POS,NFIL
-	DATA NFIL/0/
         INCLUDE 'DAT_PAR'
 	CHARACTER*(DAT__SZLOC) LOC,LOCF
 	CHARACTER TUP*3,RUP*3
+	DATA NFIL/0/
+
 C Get data from MCF if missing
 	IF(NFIL.EQ.0) THEN
 C Get locator to MCF
@@ -268,99 +271,8 @@ C Queue introduces a knee
 		CAL_FRADEAD=0.0
 	ENDIF
 	END
-*+CAL_GET_ALIGN	Gets an alignment set from the master Cal File
-      OPTIONS /EXTEND_SOURCE
-      SUBROUTINE CAL_GET_ALIGN (REQUEST,CAL,STATUS)
-
-*  Calling Arguments
-      CHARACTER*(*) REQUEST		! 'ALL' or one of 'ROSAT_TO_ROST',
-				! 'WFC_TO_ST','ROSAT_TO_WFC','WFC_TO_FOV'
-*   Returns structure CAL containing Euler angles
-      INCLUDE 'CIN_ALIGN_LOW'
-      INCLUDE 'CIN_ALIGN'
-
-      INTEGER STATUS
-* Original M.J. Ricketts
-* Modified M.Denby, 16-May-89 to conform to CAL library conventions
-* Modified to use standard epoch indexing Dick Willingale 1990-May-10
-*-
-
-*  Local Variables
-
-      INCLUDE 'CIN_ALIGN_TYPES'
-
-      RECORD /ALIGN_REC/ AREC(2)
-        INCLUDE 'DAT_PAR'
-      CHARACTER*(DAT__SZLOC) ALOC,CELL, KLOC, RLOC
-      CHARACTER*20 LOCATOR, REL_DATE
-      INTEGER NREC, ISET, NGOT
-      CHARACTER*(DAT__SZLOC)  LOC			! Locator to MCF
-      DOUBLE PRECISION MJDLO,MJDHI
-
-*  Executable Code
-      IF (STATUS.NE.0) RETURN
-
-* Get locator to MCF
-      CALL CIN_INIT (LOC,STATUS)
-
-*  Get issue date and version number
-      CALL CMP_GET0C(LOC,'ISSUE_DATE',cal.ISSUE_DATE,STATUS)
-      CALL CMP_GET0I(LOC,'VERSION',cal.VERSION_NUMBER,STATUS)
-
-* Get next level 'align'
-      CALL DAT_FIND(LOC,'ALIGN',KLOC,STATUS)
 
 
-      IF (STATUS.NE.0) RETURN
-
-      NGOT = 0
-
-      DO ISET = 1,NALIGN_TYPES
-
-         IF ((REQUEST.EQ.'ALL').OR.(REQUEST.EQ.ALTYPE(ISET))) THEN
-            LOCATOR = ALTYPE(ISET)
-
-            NGOT = NGOT + 1			! Count types got
-
-            CALL DAT_FIND(KLOC,LOCATOR,ALOC,STATUS)
-
-* Get epoch record
-	    CALL CIN_FEPOCH(CAL.MJD,ALOC,NREC,MJDLO,MJDHI,STATUS)
-	    CALL DAT_FIND(ALOC,'DATA_RECORD',RLOC,STATUS)
-	    CALL DAT_CELL(RLOC,1,NREC,CELL,STATUS)
-
-	    MJD_VALID=MJDHI
-* Get cal data
-	    IF(MJDLO.LT.40000.) THEN
-		REL_DATE='BEFORE 1ST'
-		CALL CIN_ALIGN_GETSET(AREC(1),CELL,STATUS)
-	    ELSEIF(MJDHI.GT.70000.) THEN
-		REL_DATE='AFTER LAST'
-		CALL CIN_ALIGN_GETSET(AREC(1),CELL,STATUS)
-	    ELSE
-		REL_DATE='BETWEEN'
-		CALL CIN_ALIGN_GETSET(AREC(1),CELL,STATUS)
-		CALL DAT_ANNUL(CELL,STATUS)
-		NREC=NREC+1
-		CALL DAT_CELL(RLOC,1,NREC,CELL,STATUS)
-		CALL CIN_ALIGN_GETSET(AREC(2),CELL,STATUS)
-	    ENDIF
-
-	    CALL DAT_ANNUL(CELL,STATUS)
-            CALL DAT_ANNUL(ALOC,STATUS)
-	    CALL DAT_ANNUL(RLOC,STATUS)
-
-            CALL CIN_ALIGN_DATE(AREC,CAL.ALIGNMENT(ISET),CAL.MJD,REL_DATE)
-
-         END IF
-
-      END DO					! Loop for 1 or 4 sets
-
-      CALL DAT_ANNUL(KLOC,STATUS)
-
-      IF (STATUS.EQ.0 .AND. NGOT .EQ. 0) STATUS = -9
-
-      END
 *+ CAL_INIT explicit CAL initialise call
 	SUBROUTINE CAL_INIT (STATUS)
 *Input
@@ -389,6 +301,8 @@ C Queue introduces a knee
 * Output
 	REAL		AZ(*), EL(*)		! Local sherics (rads)
 	INTEGER		IQ(*)			! Qual (0-OK,1-null,2-masked)
+        REAL SLA_RANDOM
+	LOGICAL CIN_HIT_MASK
 
 	DATA ISEED /325678945/
 
@@ -403,8 +317,6 @@ C Queue introduces a knee
 * IX and IY are always 0-511 for zoomed and unzoomed data. For zoomed data
 * this range corresponds to the centre quarter section giving twice the
 * (linear) resolution
-        REAL SLA_RANDOM
-	LOGICAL CIN_HIT_MASK
 
 	NPIX = 512/NLIN
 	NPIX2 = NPIX*2
@@ -466,9 +378,9 @@ C Check masking
 	PARAMETER (MAXP=50)
 	INTEGER ISX,ISY,IXT(MAXP),IYT(MAXP)
 	REAL CXP(MAXP),CYP(MAXP),CXQ(MAXP),CYQ(MAXP)
+	LOGICAL VIRGIN,SEARCHING,CIN_HIT_MASK
 	SAVE ISX,ISY
 	DATA ISX,ISY/33,33/
-	LOGICAL VIRGIN,SEARCHING,CIN_HIT_MASK
 C Check if hit masked area
 	IF(CIN_HIT_MASK(QMAP,AZ,EL)) THEN
 		IQ=2
@@ -982,6 +894,8 @@ C
       REAL RMIN,RMAX
       REAL DELTA_AZ,DELTA_EL,ENERGY,ARRAY(N_AZ,N_EL),OAZ,OEL
       LOGICAL ZOOM
+      PARAMETER (DTOR=0.0174532, PI=3.1415927)
+      PARAMETER (MAXPIX=101, MAXZONE=10, MAXANGLE=10)
 *DMJD	    input	date required
 *IFILT	    input	filter number (not used at present)
 *ENERGY	    input	energy (eV)
@@ -1000,8 +914,6 @@ C
 * Anne Sansom 1990-Apr-25
 * Last modified 24th May 1990 (bug correction)
 *-
-      PARAMETER (DTOR=0.0174532, PI=3.1415927)
-      PARAMETER (MAXPIX=101, MAXZONE=10, MAXANGLE=10)
 *
 * MAXPIX = max. allowed number of pixels in each dimension
 * MAXZONE = max. allowed number of annular zones in instrument fov
@@ -1322,88 +1234,8 @@ C Interpolate
 		ENDDO
 	ENDDO
 	END
-*+CIN_ALIGN_DATE Gets alignment set for the given date, either set or interp.
-      SUBROUTINE CIN_ALIGN_DATE(AREC,ALIGNMENT,REQUEST_MJD,REL_DATE)
 
-*  Calling Arguments
-      REAL*8 REQUEST_MJD
-      CHARACTER*20 REL_DATE
 
-      INCLUDE 'CIN_ALIGN_LOW'
-      RECORD /ALIGN_REC/ AREC(2),ALIGNMENT
-* Original M.J. Ricketts
-* Modified for CALLIB M. Denby
-* Modified to fix valid time error MJR 30-Jun-90
-* Revised version placed in library, RW 4-Jul-90
-*-
-
-      IF (REL_DATE.NE.'NONE') THEN
-       IF (REL_DATE.EQ.'BETWEEN') THEN
-         FRAC = (REQUEST_MJD - AREC(1).MJD)/(AREC(2).MJD-AREC(1).MJD)
-
-         DO I=1,3
-            ALIGNMENT.EULER(I)=(1.-FRAC)*AREC(1).EULER(I)+
-     &                                  FRAC * AREC(2).EULER(I)
-         END DO
-         DO I=1,3
-            VAR1 = AREC(1).ERROR(I)
-            VAR1 = VAR1 * VAR1
-            VAR2 = AREC(2).ERROR(I)
-            VAR2 = VAR2 * VAR2
-            ALIGNMENT.ERROR(I) = SQRT( (1.-FRAC)*VAR1 + FRAC*VAR2 )
-         END DO
-         ALIGNMENT.CAL_TYPE = 'INTERPOLATED'
-
-*     Find how long it is valid for
-         ALIGNMENT.MJD = MIN(REQUEST_MJD + 1.0D0, AREC(2).MJD)
-
-       ELSE
-         DO I=1,3
-            ALIGNMENT.EULER(I) = AREC(1).EULER(I)
-            ALIGNMENT.ERROR(I) = AREC(1).ERROR(I)
-         END DO
-         ALIGNMENT.CAL_TYPE = REL_DATE//' '//AREC(1).CAL_TYPE
-         ALIGNMENT.MJD = 0.0D0
-
-       END IF
-      ELSE
-       ALIGNMENT.CAL_TYPE = 'NONE'
-      END IF
-
-      END
-*+CIN_ALIGN_GETSET Gets an alignment set in the master Cal File
-      SUBROUTINE CIN_ALIGN_GETSET(ALIGN,CELL,STATUS)
-
-      INCLUDE 'CIN_ALIGN_LOW'
-
-      RECORD/ALIGN_REC/ ALIGN
-        INCLUDE 'DAT_PAR'
-      CHARACTER*(DAT__SZLOC) CELL
-      INTEGER STATUS
-* Original M.J. Ricketts
-* Modified for CALLIB M. Denby
-*-
-*  Local Variables
-      INTEGER NEUL, NERR
-
-*  Executable Code
-
-      IF (STATUS.NE.0) RETURN
-
-      CALL CMP_GET0D(CELL,'DATE_MJD',ALIGN.MJD,STATUS)
-
-*  Euler angles, errors
-      CALL CMP_GET1R(CELL,'EULER',3,ALIGN.EULER,NEUL,STATUS)
-      CALL CMP_GET1R(CELL,'ERROR',3,ALIGN.ERROR,NERR,STATUS)
-      IF (NEUL.NE.3.OR.NERR.NE.3) THEN
-         STATUS=-33
-	 RETURN
-      END IF
-
-*  Calibration Type
-      CALL CMP_GET0C(CELL,'CAL_TYPE',ALIGN.CAL_TYPE,STATUS)
-
-      END
 *+CIN_AREA evaluate efficiency at centre of the field of view
 	FUNCTION CIN_AREA(DMJD,IDET,IFILT,ENERGY,ISTAT)
 	DOUBLE PRECISION DMJD
@@ -1753,12 +1585,12 @@ C Masked if outside this radius
 	INTEGER VERSION
 	SAVE LOCSAV
 	SAVE CAL_OPEN
-	DATA CAL_OPEN/.FALSE./
-
 C If the CAL_ interface is changed then SOFTFACE should be altered
 C and the MCF reissued with a new value of object INTERFACE
 	PARAMETER (SOFTFACE=2)
 C
+	DATA CAL_OPEN/.FALSE./
+
 	IF(ISTAT.NE.0) RETURN
 C See if already open
 	IF (.NOT.CAL_OPEN) THEN
@@ -2231,10 +2063,10 @@ C
 	SAVE DNOW
 	DATA DNOW/0/
 	DOUBLE PRECISION MJDLO,MJDHI
+	LOGICAL CIN_VALID
 	SAVE MJDLO,MJDHI
 	DATA MJDLO/-1./
 	DATA MJDHI/-1./
-	LOGICAL CIN_VALID
 C Check status
 	IF(ISTAT.NE.0) RETURN
 C See if current value OK
@@ -2323,9 +2155,9 @@ C
 	DATA MDIM/2,64/
 	LOGICAL CIN_VALID,NEWI,NEWF
 	SAVE MJDLO,MJDHI,MJDLOF,MJDHIF,FNOW,IMASK,JMASK
-	DATA FNOW/-1/
         INCLUDE 'DAT_PAR'
 	CHARACTER*(DAT__SZLOC) LOC,LOC1,LOC2,LOC3,LOC4,LOC5
+	DATA FNOW/-1/
 C
 	IF(ISTAT.NE.0) RETURN
 C If filter 0 then return all areas good
@@ -2431,10 +2263,10 @@ C Check status
 	INTEGER NDIMS(3),IELS(3),NC,NR,NE
 	PARAMETER (NCMAX=20,NRMAX=20,NEMAX=4)
 	REAL CA(NCMAX,NRMAX,NEMAX),RAD(NRMAX),EN(NEMAX)
-	DATA NDIMS/NCMAX,NRMAX,NEMAX/
 	REAL ESAV,AZSAV,ELSAV
 	SAVE CA,RAD,EN,NC,NE,NR,FNAME,ESAV,AZSAV,ELSAV
 	LOGICAL CIN_VALID
+	DATA NDIMS/NCMAX,NRMAX,NEMAX/
 
 CC
 	IF(ISTAT.NE.0) RETURN
