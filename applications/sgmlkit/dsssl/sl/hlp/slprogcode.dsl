@@ -87,6 +87,15 @@
             (make formatting-instruction data: text)
             (newline)))
 
+;  Output a single literal character - if it might confuse nroff then 
+;  escape it properly.
+      (define (escape-chr chr)
+         (case chr 
+            ((".") (make formatting-instruction data: (string #\\ #\& #\.)))
+            (("'") (make formatting-instruction data: (string #\\ #\& #\')))
+            (("\\") (make formatting-instruction data: (string #\\ #\e)))
+            (else (make formatting-instruction data: chr))))
+
 
 ;  Output text of a node in normal output mode.  This ought to strip 
 ;  troublesome whitespace, which is all leading and trailing whitespace
@@ -98,8 +107,7 @@
 ;  script anyway to pull out some extra whitespace.
 ;  Additionally, this function ensures that all CDATA characters are 
 ;  passed directly to the output (by using a formatting-instruction)
-;  rather than getting translated to &#38;s etc, and it does some minor
-;  escaping of characters to avoid inadvertently making roff commands.
+;  rather than getting translated to &#38;s etc.
       (define (process-children-normal)
          (let loop ((trim #t)
                     (in (node-property 'content (current-node) 
@@ -121,20 +129,8 @@
                       (sosofo-append 
                          out
                          (if datachar?
-                            (cond 
-                               (trimmed? 
-                                  (empty-sosofo))
-                               ((equal? chr ".") 
-                                  (make formatting-instruction
-                                        data: (string #\\ #\& #\.)))
-                               ((equal? chr "'") 
-                                  (make formatting-instruction
-                                        data: (string #\\ #\& #\')))
-                               ((equal? chr (string #\\))
-                                  (make formatting-instruction
-                                        data: (string #\\ #\e)))
-                               (else 
-                                  (make formatting-instruction data: chr)))
+                            (if trimmed? (empty-sosofo)
+                                         (escape-chr chr))
                             (process-node-list node))))))))
 
 
@@ -174,7 +170,7 @@
                                    (empty-sosofo))
                                (if trimmed?
                                    (empty-sosofo)
-                                   (make formatting-instruction data: chr)))
+                                   (escape-chr chr)))
                             (process-children-verb verb-strip node))))))))
 
 
@@ -370,7 +366,9 @@
 
 ;  Default rule.
       (default
-         (process-children-normal))
+         (make sequence
+            (process-children-normal)
+            (newline)))
 
 
 ;  Rules for the document elements.
@@ -399,7 +397,8 @@
             (request "m4 0")
             (request "na")           ; No justification
             (request "nh")           ; No hyphenation
-            (process-children)))
+            (process-children)
+            (newline)))
 
 
       (element routine
@@ -412,7 +411,8 @@
                 (process-first-descendant 'usage))
             (with-mode active 
                 (process-first-descendant (list 'routineprologue 'description)))
-            (process-children)))
+            (process-children)
+            (newline)))
        
 
 
@@ -491,7 +491,8 @@
       (element examplelist
          (make sequence
             (heading 2 "Examples")
-            (process-children-normal)))
+            (process-children-normal)
+            (newline)))
 
       (element parameterlist
          (make sequence
@@ -499,17 +500,20 @@
             (request "LP")
             (line "For information on individual parameters")
             (line "select from the list below:")
-            (process-children-normal)))
+            (process-children-normal)
+            (newline)))
 
       (element authorlist
          (make sequence
             (heading 2 "Authors")
-            (process-children-normal)))
+            (process-children-normal)
+            (newline)))
 
       (element history
          (make sequence
             (heading 2 "History")
-            (process-children-normal)))
+            (process-children-normal)
+            (newline)))
 
       (element implementationstatus
          (make sequence
@@ -546,6 +550,7 @@
          (make sequence
             (request "LP")
             (process-children-normal)
+            (newline)
             (if (node-list-empty? (follow (current-node)))
                 (empty-sosofo)
                 (request "sp"))))
@@ -554,6 +559,7 @@
          (make sequence
             (request "LP")
             (process-children-normal)
+            (newline)
             (if (node-list-empty? (follow (current-node)))
                 (empty-sosofo)
                 (request "sp"))))
@@ -570,14 +576,17 @@
             (if (or (not mediatypes)
                     (assoc "tty" mediatypes)
                     (assoc "all" mediatypes))
-                (process-children-normal)
+                (make sequence
+                   (process-children-normal)
+                   (newline))
                 (empty-sosofo))))
 
             
 ;  Programcode specific elements.
       (element verbatim
          (make sequence
-            (request "(l M")
+            (newline)
+            (request "(l L")
             (process-children-verb 5)
             (newline)
             (request ")l")))
@@ -614,6 +623,7 @@
             (request "in 9")
             (request "ti -9")
             (process-children-normal)
+            (newline)
             (request "in 0")
             (request "ba 0")))
 
@@ -632,6 +642,7 @@
                                  "):"))
             (request "ba +4")
             (process-children-normal)
+            (newline)
             (request "ba -4")
             (request "sp")))
 
@@ -680,6 +691,7 @@
       (element line
          (make sequence
             (process-children)
+            (newline)
             (request "LP")))
 
       (element quote
@@ -704,6 +716,7 @@
       (element webref
          (make sequence
             (process-children)
+            (newline)
             (line (string-append 
                      (string #\<)
                      (trim-string (attribute-string (normalize "url")))
@@ -715,7 +728,9 @@
 ;  source, which is not entirely satisfactory.
 
       (element m
-         (process-children))
+         (make sequence
+            (process-children)
+            (newline)))
       (element mequation
          (indent-block (process-children-verb 5)))
       (element mlabel
@@ -723,15 +738,29 @@
       (element meqnarray
          (indent-block (process-children)))
       (element mline
-         (process-children-verb 5))
+         (make sequence 
+            (process-children-verb 5)
+            (newline)))
 
 
-;  Descriptive list elements.
+;  Lists.
       (element dl
          (make sequence
             (indent-block (process-children-normal))
             (request "sp")))
 
+      (element ul
+         (make sequence 
+            (indent-block (process-children-normal))
+            (request "sp")))
+
+      (element ol
+         (make sequence
+            (indent-block (process-children-normal))
+            (request "sp")))
+
+
+;  Descriptive list elements.
       (element dt
          (make sequence
             (request "sp")
@@ -754,9 +783,6 @@
              
 
 ;  Unordered list elements.
-      (element ul
-         (indent-block (process-children-normal)))
-
       (element (ul li)
          (make sequence
             (request "bu")
@@ -767,9 +793,6 @@
             (newline)))
 
 ;  Ordered list elements.
-      (element ol
-         (indent-block (process-children-normal)))
-
       (element (ol li)
          (make sequence
             (request (string-append 
@@ -806,6 +829,7 @@
                          (string-append format ".")
                          (string-append "l " (loop (- colnum 1) format)))))
                (process-children-normal)
+               (newline)
                (request "TE"))))
 
        (element colspec (empty-sosofo))
@@ -813,13 +837,18 @@
        (element thead
           (make sequence
              (process-children-normal)
+             (newline)
              (line "=")))
 
        (element tbody
-          (process-children-normal))
+          (make sequence 
+             (process-children-normal)
+             (newline)))
 
        (element row
-          (process-children-normal))
+          (make sequence
+             (process-children-normal)
+             (newline)))
 
        (element entry
           (make sequence
