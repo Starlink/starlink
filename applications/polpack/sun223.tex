@@ -2517,9 +2517,8 @@ for NDF applications.
       values which are badly inconsistent with the calculated I, Q and U
       values. After rejecting such values, the algorithm goes on to
       re-calculate the I, Q and U values excluding the rejected input
-      values. This process is repeated until no new pixels are rejected
-      or the maximum number of iterations specified by parameter NITER
-      is reached. Input values are rejected if they differ by more than
+      values. This process is repeated a number of times given by
+      parameter NITER. Input values are rejected if they differ by more than
       NSIGMA standard deviations from the value implied by the current
       I, Q and U values. The standard deviation used is the square
       root of the input variance value if output variances are being

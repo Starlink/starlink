@@ -319,8 +319,10 @@
 *  Go back to recalculate the output I,Q,U values excluding aberrant input
 *  data values unless we have already done the required number of iterations.
          ITER = ITER + 1
-         IF( STATUS .EQ. SAI__OK .AND. ITER .LE. NITER ) GO TO 10
-
+         IF( STATUS .EQ. SAI__OK .AND. ITER .LE. NITER ) THEN
+            IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
+            GO TO 10
+         END IF
       END IF
 
 *  Tidy up

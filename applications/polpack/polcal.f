@@ -175,9 +175,8 @@
 *        values which are badly inconsistent with the calculated I, Q and U 
 *        values. After rejecting such values, the algorithm goes on to 
 *        re-calculate the I, Q and U values excluding the rejected input 
-*        values. This process is repeated until no new pixels are rejected
-*        or the maximum number of iterations specified by parameter NITER
-*        is reached. Input values are rejected if they differ by more than
+*        values. This process is repeated a number of times given by parameter 
+*        NITER. Input values are rejected if they differ by more than
 *        NSIGMA standard deviations from the value implied by the current
 *        I, Q and U values. The standard deviation used is the square
 *        root of the input variance value if output variances are being
@@ -308,11 +307,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER DBEAM              ! Dual/single beam mode flag
       INTEGER IGRP               ! GRP identifier for input images group      
       INTEGER ILEVEL             ! Screen information level
       INTEGER NNDF               ! No. of input images to process      
       INTEGER VAR                ! Variances required flag
+      LOGICAL DBEAM              ! Use dual-beam mode?
       LOGICAL LVAL               ! Logical parameter value
 *.
 
@@ -328,13 +327,6 @@
 
 *  Get the amount of information to be displayed on the screen.
       CALL PAR_GET0I( 'ILEVEL', ILEVEL, STATUS )
-
-*  Report the number of NDFs found to the user.
-      IF( ILEVEL .GT. 0 ) THEN
-         CALL MSG_SETI( 'NNDF', NNDF )
-         CALL MSG_OUT( 'POLCAL_MSG1', 'Processing ^NNDF images...',
-     :                 STATUS )
-      END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -362,35 +354,35 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  See if we should run in single neam or dual beam mode. If a null
-*  parameter value is supplied, annul the error and leave the choice to
-*  be made later on the basis of the supplied images (i.e. run in dual
-*  beam mode if all the supplied images contain dual-beam data, and run 
-*  in single beam mode if any do not). DBEAM > 0 implies dual-beam; 
-*  DBEAM < 0 implies single-beam; and DBEAM == 0 implies "dual-beam if
-*  possible otherwise single-beam".
-      CALL PAR_GET0L( 'DUALBEAM', LVAL, STATUS )
-
+*  See if we should run in single-beam or dual-beam mode. If a null
+*  parameter value is supplied, annul the error and make the choice
+*  based on the content of the supplied NDFs (if all contain dual-beam
+*  data, use dual-beam mode, otherwise use single-beam mode).
+      CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         DBEAM = 0
-
-      ELSE IF( LVAL ) THEN
-         DBEAM = 1
-
-      ELSE
-         DBEAM = -1
+         CALL POL1_DBEAM( IGRP, DBEAM, STATUS )
       END IF
 
-*  Unless the user has specifically requested single-beam mode, try
-*  dual-beam mode first. The DBEAM value will be set > 0 on exit if
-*  the data was succesfully processed as dual-beam data.
-      IF( DBEAM .GE. 0 ) CALL POL1_DULBM( IGRP, VAR, DBEAM, ILEVEL, 
-     :                                    STATUS )
+*  Report the mode, and number of NDFs found to the user.
+      IF( ILEVEL .GT. 0 ) THEN
+         CALL MSG_SETI( 'NNDF', NNDF )
+         IF( DBEAM ) THEN
+            CALL MSG_OUT( 'POLCAL_MSG1', '   Processing ^NNDF images '//
+     :                    'in dual-beam mode...', STATUS )
+         ELSE
+            CALL MSG_OUT( 'POLCAL_MSG1', '   Processing ^NNDF images '//
+     :                    'in single-beam mode...', STATUS )
+         END IF
+         CALL MSG_BLANK( STATUS )
+      END IF
 
-*  If the data was not succesfully processed as dual-beam data, try
-*  single beam mode.
-      IF( DBEAM .LE. 0 ) CALL POL1_SNGBM( IGRP, VAR, ILEVEL, STATUS )
+*  Process the data using dual or single beam mode.
+      IF( DBEAM ) THEN
+         CALL POL1_DULBM( IGRP, VAR, ILEVEL, STATUS )
+      ELSE
+         CALL POL1_SNGBM( IGRP, VAR, ILEVEL, STATUS )
+      END IF
 
 * Tidy up.
  999  CONTINUE
