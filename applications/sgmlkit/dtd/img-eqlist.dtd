@@ -1,0 +1,15 @@
+<!--
+  The DTD for the document spat out by img-eqlist.pl.  See that
+  program, and .../slmaths.dsl for details.
+-->
+<!element img-eqlist - - (img-eq)+>
+<!element img-eq     - o EMPTY>
+<!attlist img-eq
+	label		-- label for this image --
+		id
+		#required
+	sysid		-- system-id of the file which contains the
+			   image's equation --
+		cdata
+		#required
+	>
