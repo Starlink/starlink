@@ -115,6 +115,8 @@
 #        Original version.
 #     9-JUL-1996 (PDRAPER):
 #        Converted to itcl2.0.
+#     5-MAR-1999 (PDRAPER):
+#        Changed name in error messages to reflect the command.
 #     {enter_further_changes_here}
 
 #-
@@ -253,8 +255,8 @@ itcl::class gaia::StarApp {
 
       #  Check for an error.
       if { [string range $output 0 1 ] == "!!" } {
-         error_dialog "$monotask_($monolith_): $output"
-	 puts stderr "$monotask_($monolith_): $output"
+         error_dialog "$shortname_: $output"
+	 puts stderr "$shortname_: $output"
       }
 
       #  Write output from task into window if required.
@@ -287,8 +289,9 @@ itcl::class gaia::StarApp {
       if { $start } {
          #  Either not running or failed so start it up.  Need new
          #  task name to avoid clashes with other (previous) instances
-         #  of the monolith.
-         set taskname "starmono[incr monocount_]"
+         #  of the monolith, so append a unique integer to the monolith
+         #  filename (no directory or file type).
+         set taskname "[file rootname [file tail $monolith_]][incr monocount_]"
          adamtask $taskname $monolith_
          set count 0
          while { [$taskname path] == 0 } {
