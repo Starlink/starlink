@@ -1,7 +1,7 @@
 INTERFACE EVSORT
 
   PARAMETER INP
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     POSITION    1
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.EVDS'
@@ -10,7 +10,7 @@ INTERFACE EVSORT
   ENDPARAMETER
 
   PARAMETER OUT
-    TYPE        '_UNIV'
+    TYPE        'LITERAL'
     POSITION    2
     ASSOCIATION '->GLOBAL.EVDS'
     PROMPT      'Enter name of output dataset'
@@ -21,9 +21,8 @@ INTERFACE EVSORT
     TYPE        'LITERAL'
     POSITION    3
     VPATH       'PROMPT'
-    PPATH       'DYNAMIC,CURRENT'
+    PPATH       'DYNAMIC'
     PROMPT      'List to sort by'
-    HELP        'Up to 10 LISTs may have ranges imposed simultaneously.'
   ENDPARAMETER
 
   PARAMETER ASCEND

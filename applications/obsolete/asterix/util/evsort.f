@@ -1,256 +1,240 @@
-*+  EVSORT - Sorts event dataset by list value
       SUBROUTINE EVSORT( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     EVSORT
+
+*  Purpose:
+*     Reorder an event list on the values in a particular list
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL EVSORT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     The events in the input dataset are sorted into order by the value
 *     of one of the lists.
-*
-*    Parameters :
-*
-*     INP = UNIV(R)
-*           Input dataset
-*     OUT = UNIV(W)
-*           Input dataset
-*
-*    Method :
-*
-*     All lists in the current object are mapped into virtual memory arrays
-*     and these are printed item by item on the output device.
-*     Note - uses the DEC FORTRAN '$' facility in format control.
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     11 May 93 : V1.7-0  Original (DJA)
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     14 Aug 95 : V1.8-1  Started ADI conversion (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'LIST_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local constants :
-*
-      INTEGER                MXLIN              ! Max amount of history text
-        PARAMETER            ( MXLIN = 8 )
-*
-*    Local variables :
-*
-      CHARACTER*(DAT__SZLOC) ILOC               ! Input dataset
-      CHARACTER*(DAT__SZLOC) OLOC               ! Output dataset
-      CHARACTER*(DAT__SZLOC) LLOC(LIST__MXNL)   ! List locators
-      CHARACTER*(DAT__SZNAM) LNAMES(LIST__MXNL) ! Names of lists
-      CHARACTER*(DAT__SZNAM) SLIST              ! Sort list name
-      CHARACTER*80           TXT(MXLIN)         ! History text
 
-      INTEGER                I                  ! Loop counters
-      INTEGER			IFID			! Input dataset
-      INTEGER                LLENGTH            ! List length
-      INTEGER                IPTR, OPTR         ! Input and output list data
-      INTEGER                IDPTR              ! Sort index
-      INTEGER                ISLIST             ! Sort list index
-      INTEGER                NLIN               ! Number of text lines used
-      INTEGER                NLIST              ! Number of lists in input
-      INTEGER                NVAL               ! Number of values mapped
-      INTEGER			OFID			! Output dataset
+*  Usage:
+*     evsort {parameter_usage}
 
-      LOGICAL                ASCEND             ! Sort in ascending order?
-*
-*    Local constants :
-*
-      CHARACTER*(30)         VERSION            ! version id
-        PARAMETER           (VERSION = 'EVSORT Version 1.8-1')
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input dataset
+*     OUT = CHAR (read)
+*        Input dataset
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     evsort, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     11 May 1993 V1.7-0 (DJA):
+*        Original version.
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     14 Aug 1995 V1.8-1 (DJA):
+*        Started ADI conversion
+*     18 Aug 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Version anouncement
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_INSET
+        LOGICAL			CHR_INSET
+
+*  Local Constants:
+      INTEGER                	MXLIN              	! Max amount of history
+        PARAMETER            	( MXLIN = 8 )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'EVSORT Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*20		MTYPE			! List mapping type
+      CHARACTER*20		NAME			! Any old list name
+      CHARACTER*20 		SLIST              	! Sort list name
+      CHARACTER*80           	TXT(MXLIN)         	! History text
+      CHARACTER*20		TYPE			! List data type
+
+      INTEGER                	I                  	! Loop counters
+      INTEGER			IFID			! Input dataset
+      INTEGER			ILID			! Input list id
+      INTEGER			LLEN            	! List length
+      INTEGER                	IPTR, OPTR         	! I/p and o/p list data
+      INTEGER                	IDPTR              	! Sort index
+      INTEGER                	NLIN               	! # text lines used
+      INTEGER                	NLIST              	! # lists in input
+      INTEGER			OFID			! Output dataset
+
+      LOGICAL                	ASCEND             	! Sort in ascending order?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialize
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Obtain data objects
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL USI_TASSOCO( 'OUT', 'EVDS', OFID, STATUS )
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
+*  Obtain data objects
+      CALL USI_ASSOC( 'INP', 'EventDS', 'READ', IFID, STATUS )
+      CALL USI_CLONE( 'INP', 'OUT', 'EventDS', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Find all lists in the object
-      CALL LIST_FINDALLOK (ILOC, .FALSE., LLOC, LNAMES, NLIST, LLENGTH,
-     :                                                         STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+*  Get number of lists and events
+      CALL EDI_GETNS( IFID, LLEN, NLIST, STATUS )
 
-*    Tell user if there aren't any
+*  Tell user if there aren't any
       IF ( NLIST .EQ. 0 ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'There are no lists to print', STATUS )
-        GOTO 99
       END IF
-
-*    If RAW_TIMETAG is present offer it as the default
-      CALL EVSORT_FIND( NLIST, LNAMES, 'RAW_TIMETAG', I, STATUS )
-      IF ( I .GT. 0 ) THEN
-        CALL USI_DEF0C( 'SLIST', 'RAW_TIMETAG', STATUS )
-      END IF
-
-*    Get list to sort by
-      CALL USI_GET0C( 'SLIST', SLIST, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Locate list to be sorted
-      CALL EVSORT_FIND( NLIST, LNAMES, SLIST, ISLIST, STATUS )
-      IF ( ISLIST .EQ. 0 ) THEN
-        CALL MSG_SETC( 'SL', SLIST )
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'No such list ^SL present in input', STATUS )
-        GOTO 99
-      END IF
+*  Define the default to the SLIST parameter
+      CALL EDI_DEFLD( IFID, 'SLIST', 'T', 'name', STATUS )
 
-*    Ascending order?
+*  Locate list to be sorted
+      CALL EDI_SELCTN( IFID, 'SLIST', SLIST, STATUS )
+
+*  Ascending order?
       CALL USI_GET0L( 'ASCEND', ASCEND, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Copy input to output
-      CALL ADI_FCOPY( IFID, OFID, STATUS )
+*  Map input list
+      CALL EDI_MAPD( IFID, SLIST, 'READ', 0, 0, IPTR, STATUS )
 
-*    Map input list
-      CALL LIST_MAPV( ILOC, SLIST, '_DOUBLE', 'READ', IPTR, NVAL,
-     :                                                   STATUS )
+*  Create index array
+      CALL DYN_MAPI( 1, LLEN, IDPTR, STATUS )
+      CALL ARR_REG1I( 1, 1, LLEN, %VAL(IDPTR), STATUS )
 
-*    Create index array
-      CALL DYN_MAPI( 1, LLENGTH, IDPTR, STATUS )
-      CALL ARR_REG1I( 1, 1, LLENGTH, %VAL(IDPTR), STATUS )
-
-*    Sort the index
+*  Sort the index
       CALL MSG_SETC( 'SL', SLIST )
       CALL MSG_PRNT( 'Sorting by ^SL...' )
-      CALL SORT_IDXD( LLENGTH, %VAL(IPTR), ASCEND, %VAL(IDPTR),
-     :                                                 STATUS )
+      CALL SORT_IDXD( LLEN, %VAL(IPTR), ASCEND, %VAL(IDPTR), STATUS )
 
-*    Unmap sort list
-      CALL LIST_UNMAP( ILOC, SLIST, STATUS )
+*  Unmap sort list
+      CALL EDI_UNMAP( IFID, SLIST, STATUS )
 
-*    Move data using index for each output list
+*  Move data using index for each output list
       DO I = 1, NLIST
 
-*      Map input and output list data
-        CALL LIST_MAPV( ILOC, LNAMES(I), '_DOUBLE', 'READ', IPTR, NVAL,
-     :                                                         STATUS )
-        CALL LIST_MAPV( OLOC, LNAMES(I), '_DOUBLE', 'WRITE', OPTR, NVAL,
-     :                                                          STATUS )
+*    Locate input list
+        CALL EDI_IDX( IFID, I, ILID, STATUS )
+        CALL ADI_CGET0C( ILID, 'TYPE', TYPE, STATUS )
 
-*      Move the data using the index
-        CALL SORT_MVIDXD( LLENGTH, %VAL(IPTR), %VAL(IDPTR), %VAL(OPTR),
-     :                                                         STATUS )
+*    Get the name of this list
+        CALL ADI_CGET0C( ILID, 'Name', NAME, STATUS )
 
-*      Unmap the lists
-        CALL LIST_UNMAP( ILOC, LNAMES(I), STATUS )
-        CALL LIST_UNMAP( OLOC, LNAMES(I), STATUS )
-        CALL DAT_ANNUL( LLOC(I), STATUS )
+*    Choose mapping type
+        CALL EDI_MTYPE( ILID, MTYPE, STATUS )
+
+*    Map input and output lists
+        CALL EDI_MAP( IFID, NAME, MTYPE, 'READ', 0, 0, IPTR, STATUS )
+        CALL EDI_MAP( OFID, NAME, MTYPE, 'WRITE', 0, 0, OPTR, STATUS )
+
+*    Move the data using the index
+        CALL SORT_MVIDXT( LLEN, MTYPE, %VAL(IPTR), %VAL(IDPTR),
+     :                                     %VAL(OPTR), STATUS )
+
+*    Unmap the lists
+        CALL EDI_UNMAP( IFID, NAME, STATUS )
+        CALL EDI_UNMAP( OFID, NAME, STATUS )
+
+*    Free the list
+        CALL ADI_ERASE( ILID, STATUS )
 
       END DO
 
-*    Free the index array
+*  Free the index array
       CALL DYN_UNMAP( IDPTR, STATUS )
 
-*    Write history
+*  Write history
       CALL HSI_ADD( OFID, VERSION, STATUS )
       TXT(1) = 'Input evds {INP}'
-      TXT(2) = 'Sorted by list '//SLIST
+      CALL MSG_SETC( 'L', SLIST )
       IF ( ASCEND ) THEN
-        TXT(3) = '  in ascending order'
+        CALL MSG_SETC( 'O', 'ascending' )
       ELSE
-        TXT(3) = '  in descending order'
+        CALL MSG_SETC( 'O', 'descending' )
       END IF
+      CALL MSG_SETC( 'L', SLIST )
+      TXT(2) = 'Sorted by list ^L in ^O order'
       NLIN = MXLIN
       CALL USI_TEXT( 3, TXT, NLIN, STATUS )
       CALL HSI_PTXT( OFID, NLIN, TXT, STATUS )
 
-*    Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
-
-      END
-
-
-*+  EVSORT_FIND - Locates a list name in a list of such names
-      SUBROUTINE EVSORT_FIND( N, LNAMES, NAME, I, STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     11 May 93 : Original (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Import :
-*
-      INTEGER                N                  ! Number of names
-      CHARACTER*(*)          LNAMES(*)          ! List of names
-      CHARACTER*(*)          NAME               ! Name to search for
-*
-*    Export :
-*
-      INTEGER                I                  ! Name index
-*
-*    Functions :
-*
-      LOGICAL                CHR_SIMLR
-*
-*    Local variables :
-*
-      LOGICAL                FOUND              ! Found NAME in LNAMES yet?
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Look through list
-      FOUND = .FALSE.
-      DO WHILE ( (I.LE.N) .AND. .NOT. FOUND )
-        IF ( CHR_SIMLR(LNAMES(I),NAME)  ) THEN
-          FOUND = .TRUE.
-        ELSE
-          I = I + 1
-        END IF
-      END DO
-
-*    Reset I if not found
-      IF ( .NOT. FOUND ) I = 0
 
       END
