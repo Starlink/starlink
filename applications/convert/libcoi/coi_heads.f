@@ -155,34 +155,35 @@
       CALL NHIST( IMDESC, NHISTL, NCHARS )
      
 *  Check for empty lines.
-      EMPTY = 0
-      DO 5 K = 1, NHISTL
-         CARD = ' '
-         CALL GETHIS( IMDESC, K, HISTRN )
-         IF ( CHR_LEN( HISTRN ) .EQ. 0 ) EMPTY = EMPTY + 1
-    5 CONTINUE
+      IF ( NHISTL .GT. 0 ) THEN
+         EMPTY = 0
+         DO 5 K = 1, NHISTL
+            CARD = ' '
+            CALL GETHIS( IMDESC, K, HISTRN )
+            IF ( CHR_LEN( HISTRN ) .EQ. 0 ) EMPTY = EMPTY + 1
+    5    CONTINUE
 
-*  Derive the number of non-blank header lines, and report it when
-*  verbose reporting is switched on.
-      NHISTL = NHISTL - EMPTY
-      CALL MSG_SETI( 'NHISTL', NHISTL )
-      CALL MSG_OUTIF( MSG__VERB, ' ',
-     :  'There are ^NHISTL history lines.', STATUS )
-      
+*  Derive the number of non-blank header lines
+         NHISTL = NHISTL - EMPTY
+      END IF
+
 *  Check whether each history entry is properly terminated by a newline
 *  character.  In the history area, each entry should be terminated
 *  with a newline character.  We should never go more than FITSHI
 *  characters without encountering a newline.  Any more than FITSHI
 *  chars will not fit into a FITS standard HISTORY line.
-      IF ( NCHARS .GT. FITSHI .AND. NHISTL .LE. 1 ) THEN
+      IF ( NCHARS .GT. FITSHI .OR. NHISTL .LE. 1 ) THEN
          NHISTL = 0
-         CALL MSG_OUT( ' ', 'HISTORY parsing error.  The HISTORY '/
+         CALL MSG_OUT( ' ', 'HISTORY parsing error.  The history '/
      :     /'information in the IRAF image is too long or not '/
      :     /'delimited by newlines.', STATUS )
+
+*  Report the number of IRAF history records when verbose reporting is
+*  switched on.
       ELSE
          CALL MSG_SETI( 'NHISTL', NHISTL )
-         CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of HISTORY lines '/
-     :     /'in the header is ^NHISTL', STATUS )
+         CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of IRAF history '/
+     :     /'lines is ^NHISTL', STATUS )
       END IF
      
 *  Calculate the size of the FITS extension.
@@ -194,7 +195,6 @@
 *  Otherwise, will have to add it. The FITS extension should, after
 *  all, contain lines conforming to the FITS standard. Only carried out if 
 *  a header was found.
-
       CARD=' '
       IF ( NHEAD .GT. 0 ) CALL GETLIN( IMDESC, 1, CARD )
       ADFITS = .FALSE.
