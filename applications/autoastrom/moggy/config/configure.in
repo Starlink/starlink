@@ -71,7 +71,7 @@ dnl   Take a `copy' of the means autoconf uses to echo a string
 dnl   without a newline.  This will be a Makefile variable, so double
 dnl   the dollar sign to escape it.
 AC_SUBST(ECHONONL)
-ECHONONL='echononl () { echo '$ac_n' $$* '$ac_c'; }'
+ECHONONL='echononl () { echo '$ac_n' "$$*'$ac_c'"; }'
 dnl (you'd think we could just write
 dnl   'echo $ac_n $$* $ac_c' and escape it automagically, but that's
 dnl   unexpectedly hard).
