@@ -212,6 +212,10 @@ c    :                   BDI2_IMGET, DID, STATUS )
      :                   BDI2_MAP, DID, STATUS )
 c    :                   BDI2_IMMAP, DID, STATUS )
 
+        CALL ADI_DEFFUN(
+     :       'FileItemPut(_XYimage,_FITSfile,_CHAR,_)',
+     :                   BDI2_PUT, DID, STATUS )
+
 *    FITS general binned interface
         CALL ADI_DEFFUN(
      :       'FileItemChk(_BinDS,_FITSfile,_CHAR)',
