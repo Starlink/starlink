@@ -105,6 +105,19 @@
  *      New version of cnf casts input pointer as unsigned int (in line
  *      with alpha port). This breaks under cast from pointer to structure
  *      (ContextPtr) on ultrix. Added cast to F77_POINTER_TYPE to fix this.
+ *      Norman Gray: 17-FEB-2004:
+ *      Changed to use execlp() rather than system() (you should use
+ *      system(3) or fork(2)+execve(2), but not both), and be more
+ *      cautious about dup'ping file descriptors.  Though I can't pin
+ *      it down precisely, the previous version seemed to be getting
+ *      _very_ confused, and apparently trying to read in its own
+ *      output.  Waits for the child in find_file_end rather than
+ *      immediately after the fork -- the previous version probably
+ *      worked only when the ls output was smaller than the default
+ *      pipe buffer, so that the child process could run to completion
+ *      before the parent even started reading from the pipe.
+ *      Required adding an extra pid field to ContextStruct.  Uses
+ *      <config.h>, containing results of autoconf tests.
  *+
  */
 
@@ -139,15 +152,54 @@
  */
 
 typedef struct ContextStruct {
-   int Fds[2];          /* Input and output file descriptors for the pipe */
-   char Directory[DIRECTORY_LEN];
-                        /* Last directory spec output by 'ls' process */
+    int Fds[2];                 /* Input and output file descriptors
+                                   for the pipe */
+    char Directory[DIRECTORY_LEN];
+                                /* Last directory spec output by 'ls'
+                                   process */
+    int ls_pid;                 /* pid of child process */
 } ContextStruct;
 
+#include <config.h>
 
 #include <fcntl.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+/* The following should be defined by unistd.h, but be defensive */
+#ifndef STDIN_FILENO
+#define STDIN_FILENO 0
+#endif
+#ifndef STDOUT_FILENO
+#define STDOUT_FILENO 1
+#endif
+#ifndef STDERR_FILENO
+#define STDERR_FILENO 2
+#endif
+
+#ifdef HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
+#ifndef WIFEXITED
+#define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif
+
+/* memcpy is declared in string.h -- read this if we have it, or
+   declare memcpy in terms of (BSD) bcopy if not */
+#if STDC_HEADERS
+#  include <string.h>
+#  include <ctype.h>
+#else
+#  if !HAVE_MEMCPY
+#    define memcpy(d, s, n) bcopy((s), (d), (n))
+#  endif
+#  define isspace(x) ((x) == ' ')
+#endif
+
 #include "f77.h"
+
 
 F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
                         POINTER(Context) TRAIL(FileSpec) TRAIL(FileName) )
@@ -167,7 +219,6 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
    char Char;            /* Byte read from pipe */
    int ColonIndex;       /* Index in Line of last colon */
    ContextStruct *ContextPtr; /* Pointer to current context information */
-   char Command[256];    /* 'ls' command executed */
    int Error;            /* Flag indicating an error message received */
    int *Fdptr;           /* Pointer to array of two integer file descriptors */
    int GotFileName;      /* Used to control loop reading lines from 'ls' */
@@ -201,12 +252,14 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
     */
 
    if (*Context == 0) {
+       /* FIXME: explain why malloc 2*sizeof()? */
       ContextPtr = (ContextStruct *) malloc(2 * sizeof(ContextStruct));
       if ((int) ContextPtr == 0) {
          Status = MALLOC_ERROR;
       } else {
          Fdptr = ContextPtr->Fds;
          ContextPtr->Directory[0] = '\0';
+         ContextPtr->ls_pid = 0; /* safe value, tested for in find_file_end */
 
          /*  Fdptr now points to an array of two ints, which we will use
           *  as the two file descriptors of a pipe which we now create.
@@ -222,21 +275,32 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
              *  will use to give us the filenames we want.
              */
 
-            int STATUS;
-            if ((STATUS = fork()) == 0) {
+            int STATUS = fork();
+            if (STATUS < 0) {
 
-               /*  This is the child process that we will use to run 'ls'
-                *  for us.  We construct the command using the filespec
-                *  we have been passed, remembering that this is a string
-                *  from a Fortran program, and so is blank padded rather than
-                *  null terminated.
-                */
+                /* error: unable to fork */
+                Status = PIPE_ERROR;
 
-               (void) strcpy(Command,"ls ");
-               Nchars = sizeof(Command) - 3;
-               if (Nchars > SpecLength) Nchars = SpecLength;
-               for (I = 3; I < (Nchars + 3); I++) Command[I] = *PointFSpec++;
-               Command[I] = '\0';
+            } else if (STATUS == 0) {
+
+                /*  This is the child process in which we will exec
+                 *  `ls'.  Copy the filespec from the PointFSpec
+                 *  pointer that we have been passed, remembering that
+                 *  this is a string from a Fortran program, and so is
+                 *  blank padded rather than null terminated.
+                 */
+
+                /* SpecLength is the total length of FileSpec,
+                   including trailing blanks */
+                char *fspec;
+                int fspeclen;   /* length not including blanks */
+                for (fspeclen = 0; fspeclen < SpecLength; fspeclen++)
+                    if (isspace(PointFSpec[fspeclen]))
+                        break;
+
+                fspec = (char*) malloc (fspeclen+1);
+                memcpy ((void*)fspec, (const void*)PointFSpec, fspeclen);
+                fspec[fspeclen] = '\0';
 
                /*  Now we arrange things so that the 'ls' command will
                 *  send its output back down our pipe.  We want to redirect
@@ -245,12 +309,14 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
                 */
 
                (void) close(Fdptr[0]);  /* Don't need to read from pipe */
-               (void) close(1);         /* Close fd 1 (standard output) so that
-                                         * the dup call will find fd 1 as the
-                                         * first available fd. */
-               (void) dup(Fdptr[1]);    /* Duplicate pipe write fd as first
-                                         * available fd, ie standard output */
-               (void) close(Fdptr[1]);  /* Pipe write fd no longer needed */
+               if (Fdptr[1] != STDOUT_FILENO) {
+                   /* Close stdout (not generally necessary, but
+                      required by Single Unix spec) */
+                   close(STDOUT_FILENO); 
+                   dup2(Fdptr[1], STDOUT_FILENO);
+                   close(Fdptr[1]);  /* Pipe write fd no longer needed */
+               }
+               
                /*  We're going to ignore any error messages from 'ls', so
                 *  we do the same trick for standard error, this time using
                 *  a file descriptor opened on the null device. This has the
@@ -258,23 +324,24 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
                 */
 
                NullFd = open("/dev/null",O_WRONLY,0);
-               (void) close(2);
-               (void) dup(NullFd);
+               (void) close(STDERR_FILENO);
+               (void) dup2(NullFd, STDERR_FILENO);
                (void) close(NullFd);
 
-               /*  And now we run execute the "ls filespec" command.  This
+               /*  And now we exec the "ls filespec" command.  This
                 *  will write the set of files to our pipe, and the process
                 *  will close down when all the files are listed.
                 */
 
-               (void) system (Command);
-               (void) exit(0);
+               execlp ("ls", "ls", fspec, (char*)0);
+
+               /* We shouldn't get here -- exit without calling exit
+                  handlers or flushing and closing output */
+               _exit (PIPE_ERROR);
 
             } else {
-               /* Wait for forked process to terminate			    */
-
-               (void) wait( &STATUS );
-               /* .... and continue					    */
+                /* Save the pid of the child */
+                ContextPtr->ls_pid = STATUS;
 
                /*  This is the parent process, continuing after forking off
                 *  the 'ls' command. Here we set Context to be the address
@@ -302,7 +369,9 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
 
    ContextPtr = (ContextStruct *) *Context;
    Fdptr = ContextPtr->Fds;
-   if (NameLength < 1) {
+   if (Status != OK) {
+       /* Do nothing */
+   } else if (NameLength < 1) {
       Status = LENGTH_ERROR;
    } else {
 
@@ -382,7 +451,8 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
                 *  blank pad it properly.
                 */
 
-               for (I = strlen(FileName); I < NameLength; FileName[I++] = ' ');
+               for (I = strlen(FileName); I < NameLength; FileName[I++] = ' ')
+                   ;
             }
          }
       }
@@ -442,6 +512,8 @@ F77_INTEGER_FUNCTION(find_file_end)( POINTER(Context) )
    char Char;                        /* Character read from pipe */
    ContextStruct *ContextPtr;        /* Pointer to context structure */
 
+   int return_status = OK;
+
    /*  If the Context passed to us is a non-null pointer, attempt to
     *  close the input fd for the pipe it should contain, and to release
     *  the memory used for it. Also empty the pipe so that the writing
@@ -452,9 +524,20 @@ F77_INTEGER_FUNCTION(find_file_end)( POINTER(Context) )
       ContextPtr = (ContextStruct *) *Context;
       while (read(ContextPtr->Fds[0],&Char,1) > 0);
       (void) close (ContextPtr->Fds[0]);
+      if (ContextPtr->ls_pid > 0) {
+          /* Wait for the child process, and reap its status.  The pid
+             should be positive, but we test this just out of
+             paranoia. */
+          int process_status;
+          waitpid (ContextPtr->ls_pid, &process_status, 0);
+          if (! WIFEXITED(process_status)) {
+              /* non-normal exit */
+              return_status = PIPE_ERROR;
+          }
+      }
       (void) free ((char *) ContextPtr);
    }
 
-   return (OK);
+   return (return_status);
 }
 /* @(#)find_file.c   1.1   94/12/05 11:38:26   96/07/05 10:27:34 */
