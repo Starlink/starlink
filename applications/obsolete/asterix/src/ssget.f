@@ -43,6 +43,7 @@
 *
 *      6 Oct 94 : V1.8-0 Original, adapted from HGET (DJA)
 *     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
+*      8 Feb 1996 : V1.8-2 Use SSI routines (DJA)
 *
 *    Type Definitions :
 *
@@ -51,7 +52,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -73,7 +73,6 @@
       CHARACTER*200          	CVALUE           	! Character attribute
       CHARACTER*40           	FIELD            	! Field to get
       CHARACTER*40           	FITEM            	! Field item to get
-      CHARACTER*(DAT__SZLOC) 	SLOC              	! Locator to data object
       CHARACTER*40           	ITEM             	! Item to get
 
       DOUBLE PRECISION       	DVALUE           	! Double value
@@ -91,13 +90,12 @@
       INTEGER                	TSTAT            	! Temporary status
 
       LOGICAL                	ECHO             	! Echo to standard output?
-      LOGICAL		     	IS_SET			! SSDS is a set?
       LOGICAL                	OK               	! Validity check
 *
 *    Version id :
 *
       CHARACTER*40           VERSION
-        PARAMETER            ( VERSION='SSGET Version 1.8-1' )
+        PARAMETER            ( VERSION='SSGET Version 1.8-2' )
 *-
 
 *    Check status
@@ -108,11 +106,12 @@
       CALL SSO_INIT()
 
 *    Get input object from user
-      CALL SSO_ASSOCI( 'INP', 'READ', SLOC, IS_SET, STATUS )
+      CALL USI_ASSOC( 'INP', 'SSDS', 'READ', SFID, STATUS )
+      CALL ADI1_GETLOC
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get number of sources
-      CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+      CALL SSI_GETNSRC( SFID, NSRC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get item code
@@ -128,7 +127,7 @@
 
 *    Number of files searched
       ELSE IF ( STR_ABBREV( ITEM, 'NFILE' ) ) THEN
-        CALL SSO_CHKBOOK( SLOC, OK, NCOMP, STATUS )
+        CALL ADI_CGET0I( SFID, 'NFILE', NCOMP, STATUS )
         ATYPE = TYP_INT
         IVALUE = NCOMP
 
@@ -149,7 +148,7 @@
           FIELD = ITEM
           CPOS = 0
         END IF
-        CALL SSO_CHKFLD( SLOC, FIELD, OK, STATUS )
+        CALL SSI_CHKFLD( SFID, FIELD, OK, STATUS )
         IF ( .NOT. OK ) THEN
           CALL MSG_SETC( 'FIELD', FIELD )
           STATUS = SAI__ERROR
@@ -164,9 +163,9 @@
           CALL USI_GET0I( 'ISRC', ISRC, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-          CALL SSO_MAPFLD( SLOC, FIELD, '_DOUBLE', 'READ', PTR, STATUS )
+          CALL SSI_MAPFLD( SFID, FIELD, '_DOUBLE', 'READ', PTR, STATUS )
           CALL ARR_ELEM1D( PTR, NSRC, ISRC, DVALUE, STATUS )
-          CALL SSO_UNMAPFLD( SLOC, FIELD, STATUS )
+          CALL SSI_UNMAPFLD( SFID, FIELD, STATUS )
           ATYPE = TYP_DBLE
 
 *      Errors
@@ -176,15 +175,15 @@
           CALL USI_GET0I( 'ISRC', ISRC, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-          CALL SSO_MAPFLDERR( SLOC, FIELD, '_DOUBLE', 'READ', PTR,
+          CALL SSI_MAPFLDERR( SFID, FIELD, '_DOUBLE', 'READ', PTR,
      :                        STATUS )
           CALL ARR_ELEM1D( PTR, NSRC, ISRC, DVALUE, STATUS )
-          CALL SSO_UNMAPFLD( SLOC, FIELD, STATUS )
+          CALL SSI_UNMAPFLD( SFID, FIELD, STATUS )
           ATYPE = TYP_DBLE
 
 *      Other kind of field item
         ELSE
-          CALL SSO_GETFITEM0C( SLOC, FIELD, FITEM, CVALUE, STATUS )
+          CALL SSI_GETFITEM0C( SFID, FIELD, FITEM, CVALUE, STATUS )
           CLEN = CHR_LEN(CVALUE)
           ATYPE = TYP_CHAR
 
@@ -219,7 +218,7 @@
       IF ( ECHO ) CALL MSG_PRNT( '^VAL' )
 
 *    Release input file
-      CALL SSO_RELEASE( SLOC, STATUS )
+      CALL SSI_RELEASE( SFID, STATUS )
 
 *    Tidy up
  99   CALL SSO_CLOSE( STATUS )
