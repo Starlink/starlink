@@ -497,8 +497,7 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 LATEX_DOCS = polka.tex polmap.tex
 HYPERTEXT_DOCS = 
-#HYPERTEXT_HELP = polka.htx polmap.htx
-HYPERTEXT_HELP = 
+HYPERTEXT_HELP = polka.htx polmap.htx
 
 #  List of documentation files.
 
