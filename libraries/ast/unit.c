@@ -172,11 +172,11 @@ static int ReplaceNode( UnitNode *, UnitNode *, UnitNode * );
 static void FindFactors( UnitNode *, UnitNode ***, double **, int *, double * );
 static const char *MakeExp( UnitNode *, int, int );
 
+/*  Debug functions... 
 static const char *DisplayTree( UnitNode *, int );
 static const char *OpSym( UnitNode * );
 static const char *OpName( Oper );
 static const char *TreeExp( UnitNode * );
-/*  Debug functions... 
 */
 
 
@@ -1695,7 +1695,6 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "g", "gram", NULL );
       MakeKnownUnit( "s", "second", NULL );
       MakeKnownUnit( "rad", "radian", NULL );
-      MakeKnownUnit( "sr", "steradian", NULL );
       MakeKnownUnit( "K", "Kelvin", NULL );
       MakeKnownUnit( "A", "Ampere", NULL );
       MakeKnownUnit( "mol", "mole", NULL );
@@ -1703,6 +1702,7 @@ static KnownUnit *GetKnownUnits() {
 
 /* Now do all IAU derived units. Unit definitions may only refer to units
    which have already been defined. */
+      MakeKnownUnit( "sr", "steradian", "rad rad" );
       MakeKnownUnit( "Hz", "Hertz", "1/s" );
       MakeKnownUnit( "N", "Newton", "kg m/s**2" );
       MakeKnownUnit( "J", "Joule", "N m" );
@@ -3033,17 +3033,19 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 */
 
 /* Local Variables: */
+   KnownUnit *munit;
+   KnownUnit *unit;
    Multiplier *mult;
    Oper op;
-   KnownUnit *unit;
    UnitNode *result;
    char buff[ 10 ];
+   char d;
    const char *c;
    double con;
    int depth;
    int i;
+   int maxlen;
    int n;           
-   char d;
    int oplen;
 
 /* Initialise */
@@ -3337,11 +3339,18 @@ static UnitNode *MakeTree( const char *exp, int nc ){
          } else {
 
 /* See if the string ends with the symbol for any of the known basic
-   units. First ensure descriptions of the known units are available. */
+   units. If it matches more than one basic unit, choose the longest. 
+   First ensure descriptions of the known units are available. */
             unit = GetKnownUnits();
+
+            maxlen = -1;
+            munit = NULL;
             while( unit ) {
                if( !strncmp( exp + nc - unit->symlen, unit->sym, unit->symlen ) ) {
-                  break;
+                  if( unit->symlen > maxlen ) {
+                     maxlen = unit->symlen;
+                     munit = unit;
+                  }
                }
                unit = unit->next;
             }
@@ -3349,6 +3358,7 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 /* If a known unit was found, but did not account for the entire string, 
    ensure anything which preceeds it is a known multiplier prefix. */
             mult = NULL;
+            unit = munit;
             if( unit && unit->symlen < nc ) {
                mult = GetMultipliers();
                while( mult ) {
@@ -4612,7 +4622,6 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
 /* The rest of this file contains functions which are of use for debugging 
    this module. They are usually commented out. 
-*/
 
 
 
@@ -4784,4 +4793,4 @@ static const char *TreeExp( UnitNode *node ) {
 
    return astStore( NULL, buff, strlen( buff ) + 1 );
 }
-
+*/
