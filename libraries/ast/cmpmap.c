@@ -70,6 +70,8 @@ f     The CmpMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        - Modified MapMerge so that a parallel CmpMap can swap with a
 *        suitable PermMap lower neighbour.
+*     23-APR-2004 (DSB):
+*        - Modified Simplify to avoid infinite loops.
 *class--
 */
 
@@ -102,6 +104,7 @@ f     The CmpMap class does not define any new routines beyond those
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 /* Module Variables. */
 /* ================= */
@@ -126,6 +129,8 @@ AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
 static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int CountMappings( AstMapping * );
+static int PatternCheck( int, int, int **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
@@ -806,6 +811,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *simp1;            /* Pointer to simplified Mapping */
    AstMapping *simp2;            /* Pointer to simplified Mapping */
    AstPermMap *permmap1;         /* Pointer to first PermMap */
+   AstPermMap *new_pm;           /* Pointer to new PermMap */
+   AstCmpMap *new_cm;            /* Pointer to new CmpMap */
    const char *class;            /* Pointer to Mapping class string */
    int *inperm;                  /* Pointer to copy of PermMap inperm array */
    int *outperm;                 /* Pointer to copy of PermMap outperm array */
@@ -822,7 +829,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int invert2b;                 /* Invert flag for sub-Mapping */
    int invert;                   /* Invert attribute value */
    int j;                        /* Coordinate index */
-   int nc;                       /* No. of coordinates */
    int new_invert;               /* New Invert attribute value */
    int nin2a;                    /* No. input coordinates for sub-Mapping */
    int nin2b;                    /* No. input coordinates for sub-Mapping */
@@ -831,6 +837,22 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int result;                   /* Result value to return */
    int set;                      /* Invert attribute set? */
    int simpler;                  /* Simplification possible? */
+
+   int npout;                    /* No. of outputs for original PermMap */
+   int npin;                     /* No. of inputs for original PermMap */
+   int nout2a;                   /* No. of outputs for 1st component Mapping */
+   int nout2b;                   /* No. of outputs for 2nd component Mapping */
+   int aconstants;               /* Are all 1st component outputs constant? */
+   int bconstants;               /* Are all 2nd component outputs constant? */
+   double *p;                    /* Pointer to PermMap input position */
+   double *q;                    /* Pointer to PermMap output position */
+   double *qa;                   /* Pointer to 1st component output position */
+   double *qb;                   /* Pointer to 2nd component output position */
+   int npin_new;                 /* No. of inputs for new PermMap */
+   int npout_new;                /* No. of outputs for new PermMap */
+   int *inperm_new;              /* Pointer to new PermMap inperm array */
+   int *outperm_new;             /* Pointer to new PermMap outperm array */
+   double *const_new;            /* Pointer to new PermMap constants array */
 
 /* Initialise.*/
    result = -1;
@@ -1095,7 +1117,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
    }
 
-/* If we are merging the Mapings in series, and if the nominated CmpMap 
+/* If we are merging the Mappings in series, and if the nominated CmpMap 
    is a parallel CmpMap, and if the lower neighbour is a PermMap, it may 
    be possible to swap the PermMap and the CmpMap. This may allow one of 
    the two swapped Mappings to merge with its new neighbour. 
@@ -1134,75 +1156,173 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          astSetInvert( permmap1, ( *invert_list )[ imap1 ] );     
          astSetInvert( cmpmap2, ( *invert_list )[ imap2 ] );     
 
-/* In order to swap the Mappings, the PermMap must have the same number 
-   of inputs and outputs (this will equal the number of inputs to the
-   nominated Cmpmap). */
-         nc = astGetNout( permmap1 );
-         if( astGetNin( permmap1 ) == nc ) {
+/* Get the number of inputs and outputs for the PermMap.*/
+         npout = astGetNout( permmap1 );
+         npin = astGetNin( permmap1 );
 
-/* Get the number of inputs to the two components of the nominated parallel 
-   CmpMap. */
-            nin2a = astGetNin( cmpmap2->map1 );
-            nin2b = astGetNin( cmpmap2->map2 );
+/* Get the number of inputs and outputs for the two components of the 
+   nominated parallel CmpMap. */
+         nin2a = astGetNin( cmpmap2->map1 );
+         nin2b = astGetNin( cmpmap2->map2 );
+         nout2a = astGetNout( cmpmap2->map1 );
+         nout2b = astGetNout( cmpmap2->map2 );
 
 /* Get the input and output axis permutation arrays from the PermMap */
-            inperm =astGetInPerm( permmap1 );
-            outperm =astGetOutPerm( permmap1 );
+         inperm =astGetInPerm( permmap1 );
+         outperm =astGetOutPerm( permmap1 );
 
 /* In order to swap the Mappings, the PermMap outputs which feed the
    inputs of the first component of the parallel CmpMap must be copied
-   from a contiguous block at the end of the list of PermMap inputs.
-   Likewise, the PermMap outputs which feed the inputs of the second 
-   component of the parallel CmpMap must be copied from a contiguous block 
-   at the beggining of the list of PermMap inputs. Also, there must be a
+   from a contiguous block at the end of the list of PermMap inputs, or
+   must all be assigned constant values. Likewise, the PermMap outputs which 
+   feed the inputs of the second component of the parallel CmpMap must be 
+   copied from a contiguous block at the beggining of the list of PermMap 
+   inputs or must be assigned constant values. Also, there must be a
    one-to-one correspondance between inputs and outputs in the PermMap.
    Check that the first block of nin2a PermMap outputs are copied from
-   the last block of nin2a PermMap inputs, and vica-versa. */
-            canswap = 1;
-            for( i = 0, j = nc - nin2a; i < nin2a; i++, j++ ) {
-               if( outperm[ i ] != j || inperm[ j ] != i ) {
+   the last block of nin2a PermMap inputs (and vica-versa) or are constant. */
+         canswap = 1;
+         aconstants = ( outperm[ 0 ] < 0 );
+
+         for( i = 0, j = npin - nin2a; i < nin2a; i++, j++ ) {
+            if( aconstants ) {
+               if( outperm[ i ] >= 0 ) {
                   canswap = 0;
                   break;
                }
+
+            } else if( outperm[ i ] != j || inperm[ j ] != i ) {
+               canswap = 0;
+               break;
             }
+         }
 
 /* Check that the first block of nin2b PermMap inputs are copied from
    the last block of nin2b PermMap outputs, and vica-versa. */
-            for( i = 0, j = nc - nin2b; i < nin2b; i++, j++ ) {
-               if( inperm[ i ] != j || outperm[ j ] != i ) {
+         bconstants = ( outperm[ nin2a ] < 0 );
+         for( i = 0, j = npout - nin2b; i < nin2b; i++, j++ ) {
+            if( bconstants ) {
+               if( outperm[ j ] >= 0 ) {
                   canswap = 0;
                   break;
                }
+            } else if( inperm[ i ] != j || outperm[ j ] != i ) {
+               canswap = 0;
+               break;
             }
+         }
 
 /* If the Mappings can be swapped.. */
-            if( canswap ) {
+         if( canswap ) {
 
-/* Create a new parallel CmpMap with the component mappings of the
-   nominated parallel CmpMap reversed. First temporarily set the Invert 
-   attributes of the component Mappings to the values they had when 
-   the CmpMap was created. */
-               invert2a = astGetInvert( cmpmap2->map1 );
-               invert2b = astGetInvert( cmpmap2->map2 );
-               astSetInvert( cmpmap2->map1, cmpmap2->invert1 );
-               astSetInvert( cmpmap2->map2, cmpmap2->invert2 );
+/* Temporarily set the Invert attributes of the component Mappings to the 
+   values they had when the CmpMap was created. */
+            invert2a = astGetInvert( cmpmap2->map1 );
+            invert2b = astGetInvert( cmpmap2->map2 );
+            astSetInvert( cmpmap2->map1, cmpmap2->invert1 );
+            astSetInvert( cmpmap2->map2, cmpmap2->invert2 );
 
-/* Create the new parallel Cmpmap, with the component Mappings in reverse 
-   order. */
-               new = (AstMapping *) astCmpMap( cmpmap2->map2, cmpmap2->map1, 
-                                               0, "" );
+/* If any PermMap outputs are constant, we will need the results of
+   transforming these constants using the CmpMap which follows. */
+            if( aconstants || bconstants ) {
 
-/* Re-instate the original Invert attributes in the component Mappings. */
-               astSetInvert( cmpmap2->map1, invert2a );
-               astSetInvert( cmpmap2->map2, invert2b );
+/* Transform a set of bad inputs using the PermMap. This will assign the
+   PermMap constant to any fixed outputs. */
+               p = astMalloc( sizeof( double )*(size_t) npin );
+               q = astMalloc( sizeof( double )*(size_t) npout );
+               qa = astMalloc( sizeof( double )*(size_t) nout2a );
+               qb = astMalloc( sizeof( double )*(size_t) nout2b );
+               if( astOK ) {
+                  for( i = 0; i < npin; i++ ) p[ i ] = AST__BAD;
+                  astTranN( permmap1, 1, npin, 1, p, 1, npout, 1, q );
+
+/* Transform the PermMap outputs using the two component Mappings in the
+   CmpMap. */
+                  astTranN( cmpmap2->map1, 1, nin2a, 1, q, 1, nout2a, 1, qa );
+                  astTranN( cmpmap2->map2, 1, nin2b, 1, q + nin2a, 1, nout2b, 1, qb );
+
+               }
+               p = astFree( p );
+               q = astFree( q );
+            }
+
+/* Determine the number of inputs and outputs for the resulting PermMap
+   and allocate memory for their permutation arrays. */
+            npin_new = 0;
+            if( !aconstants ) npin_new += nout2a;
+            if( !bconstants ) npin_new += nout2b;
+            npout_new = nout2a + nout2b;
+            outperm_new = astMalloc( sizeof( int )*(size_t) npout_new );
+            inperm_new = astMalloc( sizeof( int )*(size_t) npin_new );
+            const_new = astMalloc( sizeof( double )*(size_t) npout_new );
+            if( astOK ) {
+
+/* First assign permutations for the second component Mapping, if used. */
+               if( !bconstants ) {
+                  for( i = 0, j = npout_new - nout2b; i < nout2b; i++,j++ ) {
+                     inperm_new[ i ] = j;
+                     outperm_new[ j ] = i;
+                  }
+
+/* Otherwise, store constants */
+               } else {
+                  for( i = 0, j = npout_new - nout2b; i < nout2b; i++,j++ ) {
+                     outperm_new[ j ] = -( i + 1 );
+                     const_new[ i ] = qb[ i ];
+                  }
+               }
+
+/* Now assign permutations for the first component Mapping, if used. */
+               if( !aconstants ) {
+                  for( i = 0, j = npin_new - nout2a; i < nout2a; i++,j++ ) {
+                     inperm_new[ j ] = i;
+                     outperm_new[ i ] = j;
+                  }
+
+/* Otherwise, store constants */
+               } else {
+                  for( i = 0; i < nout2a; i++ ) {
+                     outperm_new[ i ] = -( i + 1 );
+                     const_new[ i ] = qa[ i ];
+                  }
+               }
+
+/* Create the new PermMap */
+               new_pm = astPermMap( npin_new, inperm_new, npout_new,
+                                    outperm_new, const_new, "" );
+
+/* Create the new CmpMap.*/
+               if( aconstants ) {
+                  new_cm = astCopy( cmpmap2->map2 );
+
+               } else if( bconstants ) {
+                  new_cm = astCopy( cmpmap2->map1 );
+
+               } else{
+                  new_cm = astCmpMap( cmpmap2->map2, cmpmap2->map1, 0, "" );
+               }
 
             }
+
+/* Free Memory. */
+            outperm_new = astFree( outperm_new );
+            inperm_new = astFree( inperm_new );
+            const_new = astFree( const_new );
+            if( aconstants || bconstants ) {
+               qa = astFree( qa );
+               qb = astFree( qb );
+            }
+
+/* Re-instate the original Invert attributes in the component Mappings. */
+            astSetInvert( cmpmap2->map1, invert2a );
+            astSetInvert( cmpmap2->map2, invert2b );
+
+         }
 
 /* Release the arrays holding the input and output permutation arrays
    copied from the PermMap. */
-            inperm = astFree( inperm );
-            outperm = astFree( outperm );
-         }
+         inperm = astFree( inperm );
+         outperm = astFree( outperm );
 
 /* Re-instate the original values of the Invert attributes of both
    Mappings. */
@@ -1210,21 +1330,21 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          astSetInvert( cmpmap2, invert2 );     
 
 /* If the Mappings can be swapped... */
-         if( astOK && new ) {
+         if( astOK && new_cm && new_pm ) {
 
-/* Annul the supplied pointer to the nominated CmpMap. */
+/* Annul the supplied pointer to the two Mappings. */
+            ( *map_list )[ imap1 ] = astAnnul( ( *map_list )[ imap1 ] );
             ( *map_list )[ imap2 ] = astAnnul( ( *map_list )[ imap2 ] );
 
-/* Copy the PermMap pointer to the slot previously occupied by the
-   nominated CmpMap pointer. Likewise, copy the invert flag. */
-            ( *map_list )[ imap2 ] = ( *map_list )[ imap1 ];
-            ( *invert_list )[ imap2 ] = ( *invert_list )[ imap1 ];
+/* Store the new PermMap pointer in the slot previously occupied by the
+   nominated CmpMap pointer. Likewise, store the invert flag. */
+            ( *map_list )[ imap2 ] = (AstMapping *) new_pm;
+            ( *invert_list )[ imap2 ] = astGetInvert( new_pm );
 
-/* Store a pointer to the new CmpMap in the slot previously occupied by
-   the PermMap. Set the corresponding invert flag to zero to indicate
-   that the CmpMap has not been inverted. */
-            ( *map_list )[ imap1 ] = new;
-            ( *invert_list )[ imap1 ] = 0;
+/* Store the new PermMap pointer in the slot previously occupied by the
+   nominated CmpMap pointer. Likewise, store the invert flag. */
+            ( *map_list )[ imap1 ] = (AstMapping *) new_cm;
+            ( *invert_list )[ imap1 ] = astGetInvert( new_cm );
 
 /* Return the index of the first modified element. */
             result = imap1;
@@ -1284,16 +1404,27 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstMapping *result;           /* Result pointer to return */
    AstMapping *tmp;              /* Temporary Mapping pointer */
    int *invert_list;             /* Invert array pointer */
+   int *mlist;                   /* Point to list of modified Mapping indices */
+   int *nlist;                   /* Point to list of Mapping counts */
    int i;                        /* Loop counter for Mappings */
    int improved;                 /* Simplification achieved? */
    int invert;                   /* Invert attribute value */
    int invert_n;                 /* Invert value for final Mapping */
+   int mlist_len;                /* No. of entries in mlist */
+   int nlist_len;                /* No. of entries in nlist */
    int modified;                 /* Index of first modified Mapping */
    int nmap;                     /* Mapping count */
    int nominated;                /* Index of nominated Mapping */
    int set;                      /* Invert attribute set? */
    int set_n;                    /* Invert set for final Mapping? */
    int simpler;                  /* Simplification possible? */
+   int t;                        /* Temporary storage */
+   int wlen1;                    /* Pattern wavelength for "modified" values */
+   int wlen2;                    /* Pattern wavelength for "nmap" values */
+
+   static int depth = 0;         /* Depth of recursive nesting */
+   static int *clist = NULL;     /* Pointer to  list holding atomic mapping counts */
+   static int clist_len = 0;     /* Length of clist list */
 
 /* Initialise. */
    result = NULL;
@@ -1304,87 +1435,147 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Obtain a pointer to the CmpMap structure. */
    this = (AstCmpMap *) this_mapping;
 
+/* Increment the number of recursive entries into this function. */
+   depth++;
+
+/* If this is a top-level entry, initialise a pointer to a dynamic list
+   used to hold the number of atomic Mappings in the CmpMap supplied at
+   each entry. */
+   if( depth == 1 ) clist = NULL;
+
+/* Count the total number of atomic Mappings contained in this CmpMap.
+   Add this number onto the end of the list initialised above. If there
+   is evidence of repeating patterns in the list, this probably means we
+   are in infinite recursive loop. In this case, we just returned the
+   supplied pointer in order to break out of the loop. We also remove the
+   value added to the list since it will disrupt any pattern occuring at
+   a higher level. */
+   if( PatternCheck( CountMappings( this_mapping ), 1, &clist, &clist_len ) ){
+      result = astClone( this_mapping );
+      clist_len--;
+
+/* If there is no evidence of looping in the recursive invocations of
+   this function, continue to simplify the supplied Mapping */
+   } else {
+
 /* Initialise dynamic arrays of Mapping pointers and associated Invert
    flags. */
-   nmap = 0;
-   map_list = NULL;
-   invert_list = NULL;
+      nmap = 0;
+      map_list = NULL;
+      invert_list = NULL;
 
 /* Decompose the CmpMap into a sequence of Mappings to be applied in
    series or parallel, as appropriate, and an associated list of
    Invert flags. */
-   astMapList( this_mapping, this->series, astGetInvert( this ), &nmap,
-               &map_list, &invert_list );
+      astMapList( this_mapping, this->series, astGetInvert( this ), &nmap,
+                  &map_list, &invert_list );
+
+/* Initialise pointers to memory used to hold lists of the modified
+   Mapping index and the number of mappings after each call of
+   astMapMerge. */
+      mlist = NULL;
+      nlist = NULL;
 
 /* Loop to simplify the sequence until a complete pass through it has
    been made without producing any improvement. */
-   simpler = 0;
-   improved = 1;
-   while ( astOK && improved ) {
-      improved = 0;
+      simpler = 0;
+      improved = 1;
+      while ( astOK && improved ) {
+         improved = 0;
 
 /* Loop to nominate each Mapping in the sequence in turn. */
-      nominated = 0;
-      while ( astOK && ( nominated < nmap ) ) {
+         nominated = 0;
+         while ( astOK && ( nominated < nmap ) ) {
 
 /* Clone a pointer to the nominated Mapping and attempt to merge it
    with its neighbours. Annul the cloned pointer afterwards. */
-         map = astClone( map_list[ nominated ] );
-         modified = astMapMerge( map, nominated, this->series,
-                                 &nmap, &map_list, &invert_list );
-         map = astAnnul( map );
+            map = astClone( map_list[ nominated ] );
+            modified = astMapMerge( map, nominated, this->series,
+                                    &nmap, &map_list, &invert_list );
+            map = astAnnul( map );
 
 /* Move on to nominate the next Mapping in the sequence. */
-         nominated++;
+            nominated++;
 
 /* Note if any simplification occurred above. */
-         if ( modified >= 0 ) {
-            improved = 1;
-            simpler = 1;
+            if( modified >= 0 ) {
+
+/* Append the index of the first modified Mapping in the list and and check 
+   that there is no repreating pattern in the list. If there is, we are 
+   probably in a loop where one mapping class is making a change, and another 
+   is undoing the change. The Looping function returns the "wavelength"
+   of any pattern found. If a pattern was discovered, we ignore it unless 
+   there is also a pattern in the "nmap" values - the wavelengths of the
+   two patterns must be related by a integer factor. */
+               wlen1 = PatternCheck( modified, 1, &mlist, &mlist_len );
+               wlen2 = PatternCheck( nmap, wlen1, &nlist, &nlist_len );
+               if( wlen1 && wlen2 ) {
+
+/* Ensure wlen2 is larger tnan or equal to wlen1. */
+                  if( wlen1 > wlen2 ) {
+                     t = wlen1;
+                     wlen1 = wlen2;
+                     wlen2 = wlen1;
+                  }
+
+/* See if wlen2 is an integer multiple of wlen1. If not, ignore the
+   patterns. */
+                  if( ( wlen2 % wlen1 ) != 0 ) wlen1 = 0;
+               }
+
+/* Ignore the simplication if a repeating pattern is occurring. */
+               if( wlen1 == 0 ) {
+                  improved = 1;
+                  simpler = 1;
 
 /* If the simplification resulted in modification of an earlier
    Mapping than would normally be considered next, then go back to
    consider the modified one first. */
-            if ( modified < nominated ) nominated = modified;
+                  if ( modified < nominated ) nominated = modified;
+               }
+            }
          }
       }
-   }
+
+/* Free resources */
+      if( mlist ) mlist = astFree( mlist );
+      if( nlist ) nlist = astFree( nlist );
 
 /* Construct the output Mapping. */
 /* ============================= */
 /* If no simplification occurred above, then simply clone a pointer to
    the original Mapping. */
-   if ( astOK ) {
-      if ( !simpler ) {
-         result = astClone( this );
+      if ( astOK ) {
+         if ( !simpler ) {
+            result = astClone( this );
 
 /* Otherwise, we must construct the result from the contents of the
    Mapping list. */
-      } else {
+         } else {
 
 /* If the simplified Mapping list has only a single element, then the
    output Mapping will not be a CmpMap. In this case, we cannot
    necessarily set the Invert flag of the Mapping to the value we want
    (because we must not modify the Mapping itself. */
-         if ( nmap == 1 ) {
+            if ( nmap == 1 ) {
 
 /* Test if the Mapping already has the Invert attribute value we
    want. If so, we are lucky and can simply clone a pointer to it. */
-            if ( invert_list[ 0 ] == astGetInvert( map_list[ 0 ] ) ) {
-               result = astClone( map_list[ 0 ] );
+               if ( invert_list[ 0 ] == astGetInvert( map_list[ 0 ] ) ) {
+                  result = astClone( map_list[ 0 ] );
 
 /* If not, we must make a copy. */
-            } else {
-               result = astCopy( map_list[ 0 ] );
+               } else {
+                  result = astCopy( map_list[ 0 ] );
 
 /* Either clear the copy's Invert attribute, or set it to 1, as
    required. */
-               if ( invert_list[ 0 ] ) {
-                  astSetInvert( result, 1 );
-               } else {
-                  astClearInvert( result );
+                  if ( invert_list[ 0 ] ) {
+                     astSetInvert( result, 1 );
+                  } else {
+                     astClearInvert( result );
+                  }
                }
-            }
 
 /* If the simplified Mapping sequence has more than one element, the
    output Mapping will be a CmpMap. In this case, we can set each
@@ -1393,75 +1584,84 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    state again afterwards (once a Mapping is encapsulated inside a
    CmpMap, further external changes to its Invert attribute do not
    affect the behaviour of the CmpMap). */
-         } else {
+            } else {
 
 /* Determine if the Invert attribute for the last Mapping is set, and
    obtain its value. */
-            set_n = astTestInvert( map_list[ nmap - 1 ] );
-            invert_n = astGetInvert( map_list[ nmap - 1 ] );
+               set_n = astTestInvert( map_list[ nmap - 1 ] );
+               invert_n = astGetInvert( map_list[ nmap - 1 ] );
 
 /* Set this attribute to the value we want. */
-            astSetInvert( map_list[ nmap - 1 ], invert_list[ nmap - 1 ] );
+               astSetInvert( map_list[ nmap - 1 ], invert_list[ nmap - 1 ] );
 
 /* Loop through the Mapping sequence in reverse to merge it into an
    equivalent CmpMap. */
-            for ( i = nmap - 1; i >= 0; i-- ) {
+               for ( i = nmap - 1; i >= 0; i-- ) {
 
 /* Simply clone the pointer to the last Mapping in the sequence (which
    will be encountered first). */
-               if ( !result ) {
-                  result = astClone( map_list[ i ] );
+                  if ( !result ) {
+                     result = astClone( map_list[ i ] );
 
 /* For subsequent Mappings, test if the Invert attribute is set and
    save its value. */
-               } else {
-                  set = astTestInvert( map_list[ i ] );
-                  invert = astGetInvert( map_list[ i ] );
+                  } else {
+                     set = astTestInvert( map_list[ i ] );
+                     invert = astGetInvert( map_list[ i ] );
 
 /* Set this attribute to the value required. */
-                  astSetInvert( map_list[ i ], invert_list[ i ] );
+                     astSetInvert( map_list[ i ], invert_list[ i ] );
                
 /* Combine the Mapping with the CmpMap formed so far and replace the
    result pointer with the new pointer this produces, annulling the
    previous pointer. */
-                  tmp = (AstMapping *) astCmpMap( map_list[ i ], result,
-                                                  this->series, "" );
-                  (void) astAnnul( result );
-                  result = tmp;
+                     tmp = (AstMapping *) astCmpMap( map_list[ i ], result,
+                                                     this->series, "" );
+                     (void) astAnnul( result );
+                     result = tmp;
 
 /* Restore the Invert attribute of the Mapping to its original
    state. */
-                  if ( !set ) {
-                     astClearInvert( map_list[ i ] );
-                  } else {
-                     astSetInvert( map_list[ i ], invert );
+                     if ( !set ) {
+                        astClearInvert( map_list[ i ] );
+                     } else {
+                        astSetInvert( map_list[ i ], invert );
+                     }
                   }
                }
-            }
 
 /* When all the Mappings have been merged into the CmpMap, restore the
    state of the Invert attribute for the final Mapping in the
    sequence. */
-            if ( !set_n ) {
-               astClearInvert( map_list[ nmap - 1  ] );
-            } else {
-               astSetInvert( map_list[ nmap - 1 ], invert_n );
+               if ( !set_n ) {
+                  astClearInvert( map_list[ nmap - 1  ] );
+               } else {
+                  astSetInvert( map_list[ nmap - 1 ], invert_n );
+               }
             }
          }
       }
-   }
 
 /* Clean up. */
 /* ========= */
 /* Loop to annul all the Mapping pointers in the simplified list. */
-   for ( i = 0; i < nmap; i++ ) map_list[ i ] = astAnnul( map_list[ i ] );
+      for ( i = 0; i < nmap; i++ ) map_list[ i ] = astAnnul( map_list[ i ] );
 
 /* Free the dynamic arrays. */
-   map_list = astFree( map_list );
-   invert_list = astFree( invert_list );
+      map_list = astFree( map_list );
+      invert_list = astFree( invert_list );
+   }
 
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) result = astAnnul( result );
+
+/* If this is a top-level entry, free the pointer to the dynamic list
+   used to hold the number of atomic Mappings in the CmpMap supplied at
+   each entry. */
+   if( depth == 1 ) clist = astFree( clist );
+
+/* Decrement the number of recursive entries into this function. */
+   depth--;
 
 /* Return the result. */
    return result;
@@ -2521,3 +2721,181 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
    same interface. */
 
 /* None. */
+
+
+
+static int PatternCheck( int val, int check, int **list, int *list_len ){
+/*
+*  Name:
+*     Looping
+
+*  Purpose:
+*     Check for repeating patterns in a set of integer values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int PatternCheck( int val, int nmap, int **mlist, int **nlist, int *list_len )
+
+*  Class Membership:
+*     CmpMap member function.
+
+*  Description:
+*     This function appends a supplied integer to a dynamic list, creating 
+*     or expanding the list if necessary.It then optionally, check the
+*     list for evidence of repeating patterns. If such a pattern is
+*     found, its wavelength is returned.
+
+*  Parameters:
+*     val
+*        The integer value to add to the list.
+*     check
+*        Should a check for reating patterns be performed?
+*     list
+*        Address of a location at which is stored a pointer to an array
+*        holding the values supplied on previous invocations of this 
+*        function. If a NULL pointer is supplied a new array is allocated.
+*        On exit, the supplied value is appended to the end of the array. The 
+*        array is extended as necessary. The returned pointer should be
+*        freed using astFree when no longer needed.
+*     list_len
+*        Address of a location at which is stored the number of elements
+*        in the "list" array.
+
+*  Returned Value:
+*     A non-zero "wavelength" value is returned if there is a repeating
+*     pattern is found in the "list" array. Otherwise, zero is returned.
+*     The "wavelength" is the number of integer values which constitute a
+*     single instance of the pattern.
+
+*  Notes:
+*     - A value of 1 is returned if this function is invoked with the AST 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   int *wave1;               /* Start of most recent wave */
+   int *wave2;               /* Start of 2nd wave */
+   int *wave3;               /* Start of 3rd wave */
+   int iat;                  /* Index of elements added by this invocation */
+   int jat;                  /* Index of element condiered next */
+   int jlo;                  /* Earliest "mlist" entry to consider */
+   int k;                    /* Index of element within pattern */
+   int mxwave;               /* Max pattern length to consider */
+   int result;               /* Returned flag */
+   int wavelen;              /* Current pattern length */
+
+/* Check the global status. */
+   if ( !astOK ) return 1;
+
+/* Initialise */
+   result = 0;
+
+/* If no array has been supplied, create a new array. */
+   if( !(*list) ) {
+      *list = astMalloc( 100*sizeof( int ) );
+      *list_len = 0;
+   }
+
+/* Store the new value in the array, extending it if necessary. */
+   iat = (*list_len)++;
+   *list = astGrow( *list, *list_len, sizeof( int ) );
+   if( astOK ) {
+      (*list)[ iat ] = val;
+
+/* If required, determine the maximum "wavelength" for looping patterns to be 
+   checked, and store the earliest list entry to consider. We take 3 complete 
+   patterns as evidence of looping. */
+      if( check ){
+         mxwave = iat/3;
+         if( mxwave > 50 ) mxwave = 50;
+         jlo = iat - 3*mxwave;
+
+/* Search backwards from the end of "list" looking for the most recent
+   occurence of the supplied "val" value. Limit the search to
+   wavelengths of no more than the above limit. */
+         jat = iat - 1;
+         while( jat >= jlo ) {
+            if( (*list)[ jat ] == val ) {
+
+/* When an earlier occurrence of "val" is found, see if the values
+   which preceed it are the same as the values which preceed the new
+   element if "list" added by this invocation. We use 3 complete
+   patterns as evidence of looping. Ignore wavelenths of 1 since these
+   can occur legitamately. */
+               wavelen = iat - jat;
+               if( wavelen > 1 && 3*wavelen <= *list_len ) {
+                  result = 1;
+                  wave1 = *list + *list_len - wavelen;
+                  wave2 = wave1 - wavelen;
+                  wave3 = wave2 - wavelen;
+                  for( k = 0; k < wavelen; k++, wave1++, wave2++, wave3++ ) {
+                     if( *wave2 != *wave1 || *wave3 != *wave1 ) {
+                        result= 0;
+                        break;
+                     }
+                  }   
+               }
+            }
+            jat--;
+         }
+      }
+   }
+
+   if( !astOK ) result= 1;
+
+/* Return the result.*/
+   return result;
+}
+
+
+
+static int CountMappings( AstMapping *this_mapping ){
+/*
+*  Name:
+*     CountMappings
+
+*  Purpose:
+*     Count the total number of atomic Mappings in a given Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int CountMappings( AstMapping *this_mapping )
+
+*  Class Membership:
+*     CmpMap member function.
+
+*  Description:
+*     This function returns the number of atomic Mappings in the given
+*     Mapping. This will be one unless the supplied Mapping is a CmpMap.
+
+*  Parameters:
+*     this_mapping
+*        Pointer to the Mapping.
+
+*  Returned Value:
+*     The Mapping count. Zero if an error has occurred.
+
+*/
+
+/* Local Variables: */
+   AstCmpMap *this;  /* Pointer to the CmpMap structure */
+   int result;       /* Returned value */
+
+/* Check the global status. */
+   if ( !astOK ) return 0;
+
+   if( astIsACmpMap( this_mapping ) ) {
+      this = (AstCmpMap *) this_mapping;
+      result = CountMappings( this->map1 ) + CountMappings( this->map2 );
+   } else {
+      result = 1;
+   }
+
+   return result;
+}

@@ -74,6 +74,8 @@ f     The WinMap class does not define any new routines beyond those
 *     10-NOV-2003 (DSB):
 *        Modified functions which swap a WinMap with another Mapping
 *        (e.g. WinPerm, etc), to simplify the returned Mappings.
+*     23-APR-2004 (DSB):
+*        Changes to simplification algorithm.
 *class--
 */
 
@@ -145,7 +147,7 @@ static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int );
 static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int );
 static AstWinMap *WinZoom( AstWinMap *, AstZoomMap *, int, int, int, int );
 static const char *GetAttrib( AstObject *, const char * );
-static int CanSwap( AstMapping *, AstMapping *, int, int );
+static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int WinTerms( AstWinMap *, double **, double ** );
@@ -172,7 +174,8 @@ exceptions, so bad values are dealt with explicitly. */
 
 /* Member functions. */
 /* ================= */
-static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
+static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
+                    int *simpler ){
 /*
 *  Name:
 *     CanSwap
@@ -185,7 +188,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 *  Synopsis:
 *     #include "winmap.h"
-*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 )
+*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
+*                  int *simpler )
 
 *  Class Membership:
 *     WinMap member function 
@@ -208,6 +212,10 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 *        mapping to be used.
 *     inv2
 *        The invert flag to use with map2. 
+*     simpler
+*        Addresss of a location at which to return a flag indicating if
+*        the swapped Mappings would be intrinsically simpler than the
+*        original Mappings.
 
 *  Returned Value:
 *     1 if the Mappings could be swapped, 0 otherwise.
@@ -242,6 +250,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 /* Initialise */
    ret = 0;
+   *simpler = 0;
 
 /* Temporarily set the Invert attributes of both Mappings to the supplied 
    values. */
@@ -322,6 +331,16 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
                      break;
                   }
                }
+            }
+
+/* If we can swap with the PermMap, the swapped Mappings may be
+   intrinsically simpler than the original mappings. */
+            if( ret ) {
+
+/* If the PermMap preceeds the WinMap, this will be the case if the PermMap
+   has more outputs than inputs. If the WinMap preceeds the PermMap, this 
+   will be the case if the PermMap has more inputs than outputs. */
+               *simpler = ( nowin == map1 ) ? nout > nin : nin > nout;
             }
 
 /* Free the axis permutation and constants arrays. */
@@ -702,6 +721,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int *invlt;           /* New invert flags list pointer */
    int cmlow;            /* Is lower neighbour a CmpMap? */
    int diag;             /* Is WinMap equivalent to a diagonal matrix? */
+   int do1;              /* Would a backward swap make a simplification? */
+   int do2;              /* Would a forward swap make a simplification? */
    int i1;               /* Index of first WinMap to merge */
    int i2;               /* Index of last WinMap to merge */
    int i;                /* Loop counter */
@@ -1033,12 +1054,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    in the list. */
          } else {
 
-/* Set a flag if we could swap the WinMap with its higher neighbour. */
+/* Set a flag if we could swap the WinMap with its higher neighbour. "do2"
+   is returned if swapping the Mappings would simplify either of the
+   Mappings. */
             if( where + 1 < *nmap ){
                swaphi = CanSwap(  ( *map_list )[ where ], 
                                   ( *map_list )[ where + 1 ],
                                   ( *invert_list )[ where ], 
-                                  ( *invert_list )[ where + 1 ] );
+                                  ( *invert_list )[ where + 1 ], &do2 );
             } else {
                swaphi = 0;
             }
@@ -1082,7 +1105,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
                                   ( *map_list )[ where ],
                                   ( *invert_list )[ where - 1 ], 
-                                  ( *invert_list )[ where ] );
+                                  ( *invert_list )[ where ], &do1 );
             } else {
                swaplo = 0;
             }
@@ -1111,12 +1134,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Choose which neighbour to swap with so that the WinMap moves towards the
    nearest Mapping with which it can merge. */
-            if( nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ){
+            if( do1 || ( 
+                nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ) ){
                nclass = class1;
                i1 = where - 1;
                i2 = where;
                neighbour = i1;
-            } else if( nstep2 != -1 ){
+            } else if( do2 || nstep2 != -1 ){
                nclass = class2;
                i1 = where;
                i2 = where + 1;

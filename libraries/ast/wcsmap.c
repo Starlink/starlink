@@ -155,6 +155,8 @@ f     The WcsMap class does not define any new routines beyond those
 *     11-FEB-2004 (DSB):
 *        Corrected axis numbering when reporting missing keywords in
 *        Transform.
+*     23-APR-2004 (DSB):
+*        Changes to simplification algorithm.
 *class--
 */
 
@@ -653,7 +655,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * )
 static const PrjData *FindPrjData( int );
 static const char *GetAttrib( AstObject *, const char * );
 static int CanMerge( AstMapping *, int, AstMapping *, int );
-static int CanSwap( AstMapping *, AstMapping *, int, int );
+static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
 static int GetNP( AstWcsMap *, int );
 static int IsZenithal( AstWcsMap * );
 static int Map( AstWcsMap *, int, int, double *, double *, double *, double *);
@@ -781,7 +783,8 @@ static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 ){
    return ret;
 }
 
-static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
+static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
+                    int *simpler ){
 /*
 *  Name:
 
@@ -795,7 +798,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 )
+*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
+*                  int *simpler )
 
 *  Class Membership:
 *     WcsMap member function 
@@ -818,6 +822,10 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 *        mapping to be used.
 *     inv2
 *        The invert flag to use with map2. 
+*     simpler
+*        Addresss of a location at which to return a flag indicating if
+*        the swapped Mappings would be intrinsically simpler than the
+*        original Mappings.
 
 *  Returned Value:
 *     1 if the Mappings could be swapped, 0 otherwise.
@@ -852,6 +860,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 /* Initialise */
    ret = 0;
+   *simpler = 0;
 
 /* Temporarily set the Invert attributes of both Mappings to the supplied 
    values. */
@@ -920,24 +929,41 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
             }
 
 /* Check that the longitude and latitude axes both have bi-directional
-   links in the PermMap. Get the indices of the longitude and latitude
-   axes in the WcsMap */
-            lonax = astGetWcsAxis( wcs, 0 );
-            latax = astGetWcsAxis( wcs, 1 );
+   links in the PermMap, or are both unassigned. */
+            if( ret ) {
+
+/* Get the indices of the longitude and latitude axes in the WcsMap */
+               lonax = astGetWcsAxis( wcs, 0 );
+               latax = astGetWcsAxis( wcs, 1 );
 
 /* If the WcsMap is applied first... */
-            if( wcs == (AstWcsMap *) map1 ) {
-               if( inperm[ lonax ] < 0 || inperm[ lonax ] >= nout ||
-                   inperm[ latax ] < 0 || inperm[ latax ] >= nout ) {
-                  ret = 0;
-               } 
+               if( wcs == (AstWcsMap *) map1 ) {
+                  if( inperm[ lonax] < 0 && inperm[ latax ] < 0 ) {
+                     ret = 1;
+                  } else if( inperm[ lonax ] < 0 || inperm[ lonax ] >= nout ||
+                             inperm[ latax ] < 0 || inperm[ latax ] >= nout ) {
+                     ret = 0;
+                  } 
 
 /* If the WcsMap is applied second ... */
-            } else {
-               if( outperm[ lonax ] < 0 || outperm[ lonax ] >= nin ||
-                   outperm[ latax ] < 0 || outperm[ latax ] >= nin ) {
-                  ret = 0;
-               } 
+               } else {
+                  if( outperm[ lonax ] < 0 && outperm[ latax ] < 0 ) {
+                     ret = 1;
+                  } else if( outperm[ lonax ] < 0 || outperm[ lonax ] >= nin ||
+                             outperm[ latax ] < 0 || outperm[ latax ] >= nin ) {
+                     ret = 0;
+                  } 
+               }
+            }
+
+/* If we can swap with the PermMap, the swapped Mappings may be
+   intrinsically simpler than the original mappings. */
+            if( ret ) {
+
+/* If the PermMap preceeds the WcsMap, this will be the case if the PermMap
+   has more outputs than inputs. If the WcsMap preceeds the PermMap, this 
+   will be the case if the PermMap has more inputs than outputs. */
+               *simpler = ( nowcs == map1 ) ? nout > nin : nin > nout;
             }
 
 /* Free the axis permutation and constants arrays. */
@@ -2386,6 +2412,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    const char *nclass;   /* Pointer to neighbouring Mapping class */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
+   int do1;              /* Would a backward swap make a simplification? */
+   int do2;              /* Would a forward swap make a simplification? */
    int i1;               /* Lower index of the two WcsMaps being merged */
    int i2;               /* Upper index of the two WcsMaps being merged */
    int i;                /* Mapping index */
@@ -2499,12 +2527,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    number of Mappings in the list. */
       } else {
 
-/* Set a flag if we could swap the WcsMap with its higher neighbour. */
+/* Set a flag if we could swap the WcsMap with its higher neighbour. "do2"
+   is returned if swapping the Mappings would simplify either of the
+   Mappings. */
          if( where + 1 < *nmap ){
             swaphi = CanSwap(  ( *map_list )[ where ], 
                                ( *map_list )[ where + 1 ],
                                ( *invert_list )[ where ], 
-                               ( *invert_list )[ where + 1 ] );
+                               ( *invert_list )[ where + 1 ], &do2 );
          } else {
             swaphi = 0;
          }
@@ -2545,7 +2575,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
                                ( *map_list )[ where ],
                                ( *invert_list )[ where - 1 ], 
-                               ( *invert_list )[ where ] );
+                               ( *invert_list )[ where ], &do1 );
          } else {
             swaplo = 0;
          }
@@ -2571,11 +2601,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Choose which neighbour to swap with so that the WcsMap moves towards the
    nearest Mapping with which it can merge. */
-         if( nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ){
+         if( do1 || ( 
+             nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ) ){
             nclass = class1;
             i1 = where - 1;
             i2 = where;
-         } else if( nstep2 != -1 ){
+         } else if( do2 || nstep2 != -1 ){
             nclass = class2;
             i1 = where;
             i2 = where + 1;
@@ -3564,7 +3595,8 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
 
 /* Local Variables: */
    AstPermMap *pm;               /* Pointer to the supplied PermMap */
-   AstWcsMap *w1;                /* Pointer to the returned WcsMap */
+   AstPermMap *newpm;            /* Pointer to the returned PermMap */
+   AstMapping *newwm;            /* Pointer to the returned WcsMap */
    AstWcsMap *wm;                /* Pointer to the supplied WcsMap */
    double *consts;               /* Pointer to constants array */
    int *inperm;                  /* Pointer to input axis permutation array */
@@ -3574,7 +3606,12 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
    int npin;                     /* No. of input axes in supplied PermMap */
    int npout;                    /* No. of output axes in supplied PermMap */
    int old_pinv;                 /* Invert value for the supplied PermMap */
+   int old_winv;                 /* Invert value for the supplied WcsMap */
    int type;                     /* Projection type */
+   int done;                     /* Have Mappings been swapped? */
+   int i;                        /* AXis index */
+   double *p;                    /* Pointer to input position */
+   double *q;                    /* Pointer to output position */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3587,6 +3624,8 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
    supplied values. */
    old_pinv = astGetInvert( pm );
    astSetInvert( pm, inverts[ 1 - iwm ] );
+   old_winv = astGetInvert( wm );
+   astSetInvert( wm, inverts[ iwm ] );
 
 /* Get the projection type of the supplied WcsMap and the indices of the
    longitude and latitude axes. */
@@ -3606,21 +3645,118 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
       npin = astGetNin( pm );
       npout = astGetNout( pm );
 
-/* Create the new WcsMap with permuted longitude and latitude axes. Note,
-   the private interface to astWcsMap uses 1-based axis indices. */
+/* If the lon and lat axes of the WcsMap are unassigned, we return a
+   UnitMap instead of a WcsMap. 
+   ================================================================ */
+      done = 0;
+
+/* If the PermMap comes after the WcsMap... */
       if( iwm == 0 ) {
-         w1 = astWcsMap( npout, type, inperm[ lonax ] + 1, 
-                         inperm[ latax ] + 1, "" );
+         if( inperm[ lonax ] < 0 && inperm[ latax ] < 0 ) {
+            done = 1;
+
+/* Transform the constant values, using AST__BAD for other axes. */
+            p = (double *) astMalloc( sizeof( double )*(size_t) npin );
+            q = (double *) astMalloc( sizeof( double )*(size_t) npin );
+            if( astOK ) {
+               for( i = 0; i < npin; i++ ) {
+                  if( inperm[ i ] < 0 ) {
+                     p[ i ] = consts[ -inperm[ i ] - 1 ];
+                  } else {
+                     p[ i ] = AST__BAD;
+                  }
+               }
+
+/* Transform this position using the inverse WcsMap. */
+               astTranN( wm, 1, npin, 1, p, 0, npin, 1, q );
+
+/* The new PermMap has the same axis permutations as the original, but it
+   has different constants. */
+               for( i = 0; i < npin; i++ ) {
+                  if( inperm[ i ] < 0 ) {
+                     consts[ -inperm[ i ] - 1 ] = q[ i ];
+                  } 
+               }
+
+               newpm = astPermMap( npin, inperm, npout, outperm, consts, "" );
+
+/* Use a UnitMap instead of the WcsMap. */
+               newwm = (AstMapping *) astUnitMap( npout, "" );
+
+            }
+
+/* Free memory */
+            p = astFree( p );
+            q = astFree( q );
+
+         }
+
+/* If the WcsMap comes after the PermMap... */
       } else {
-         w1 = astWcsMap( npin, type, outperm[ lonax ] + 1, 
-                         outperm[ latax ] + 1, "" );
+         if( outperm[ lonax ] < 0 && outperm[ latax ] < 0 ) {
+            done = 1;
+
+/* Transform the constant values, using AST__BAD for other axes. */
+            p = (double *) astMalloc( sizeof( double )*(size_t) npout );
+            q = (double *) astMalloc( sizeof( double )*(size_t) npout );
+            if( astOK ) {
+               for( i = 0; i < npout; i++ ) {
+                  if( outperm[ i ] < 0 ) {
+                     p[ i ] = consts[ -outperm[ i ] - 1 ];
+                  } else {
+                     p[ i ] = AST__BAD;
+                  }
+               }
+
+/* Transform this position using the forward WcsMap. */
+               astTranN( wm, 1, npout, 1, p, 1, npout, 1, q );
+
+/* The new PermMap has the same axis permutations as the original, but it
+   has different constants. */
+               for( i = 0; i < npout; i++ ) {
+                  if( outperm[ i ] < 0 ) {
+                     consts[ -outperm[ i ] - 1 ] = q[ i ];
+                  } 
+               }
+
+               newpm = astPermMap( npin, inperm, npout, outperm, consts, "" );
+
+/* Use a UnitMap instead ofhte WcsMap. */
+               newwm = (AstMapping *) astUnitMap( npin, "" );
+
+            }
+
+/* Free memory */
+            p = astFree( p );
+            q = astFree( q );
+
+         }
       }
 
+/* If the lon and lat axes of the WcsMap are both assigned, we return a
+   WcsMap. 
+   ================================================================ */
+      if( !done ) {
+      
+/* Create the new WcsMap with permuted longitude and latitude axes. Note,
+   the private interface to astWcsMap uses 1-based axis indices. */
+         if( iwm == 0 ) {
+            newwm = (AstMapping *) astWcsMap( npout, type, inperm[ lonax ] + 1, 
+                                              inperm[ latax ] + 1, "" );
+         } else {
+            newwm = (AstMapping *) astWcsMap( npin, type, outperm[ lonax ] + 1, 
+                                              outperm[ latax ] + 1, "" );
+         }
+
 /* Copy any projection parameters which have been set. */
-      CopyPV( wm, w1 );
+         CopyPV( wm, (AstWcsMap *) newwm );
 
 /* Set the invert flag. */
-      astSetInvert( w1, inverts[ iwm ] );
+         astSetInvert( newwm, inverts[ iwm ] );
+
+/* The returned PermMap is a clone of the supplied PermMap */
+         newpm = astClone( pm );
+      }
 
 /* Free the axis permutation and constants arrays. */
       outperm = (int *) astFree( (void *) outperm );
@@ -3628,23 +3764,19 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
       consts = (double *) astFree( (void *) consts );
    }
 
-/* Re-instate the original value of the Invert attribute of the supplied 
-   PermMap. */
+/* Re-instate the original value of the Invert attributes. */
    astSetInvert( pm, old_pinv );
+   astSetInvert( wm, old_winv );
 
-/* Replace the supplied WcsMap with the one created above, swapping the
-   order. */
-   if( astOK ){
-      old_pinv = inverts[ 1 - iwm ] ;
+/* Annul the supplied pointers */
+   astAnnul( pm );
+   astAnnul( wm );
 
-      (void) astAnnul( wm );
-      maps[ 1 - iwm ] = (AstMapping *) w1;
-      inverts[ 1 - iwm ] = inverts[ iwm ] ;
-
-      maps[ iwm ] = (AstMapping *) pm;
-      inverts[ iwm ] = old_pinv;
-
-   }
+/* Store the returned Mappings. */
+   maps[ iwm ] = (AstMapping *) newpm;
+   inverts[ iwm ] = astGetInvert( newpm );
+   maps[ 1 - iwm ] = newwm;
+   inverts[ 1 - iwm ] = astGetInvert( newwm );
 
 /* Return. */
    return;

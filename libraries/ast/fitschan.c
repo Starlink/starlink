@@ -536,6 +536,17 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     21-APR-2004 (DSB):
 *        - FindWcs: Corrected to use correct OBSGEO template. This bug
 *        caused OBSGEO keywords to be misplaced in written headers.
+*     23-APR-2004 (DSB):
+*        - SplitMap: Modified so that a Mapping which has celestial axes 
+*        with constant values (such as produced by a PermMap) are treated 
+*        as a valid sky coordinate Mapping.
+*        - AddFrame modified so that WCS Frames with a different number
+*        of axes ot the pixel Frame can be added into the FrameSet.
+*        - IRAFFromStore and AIPSFromStore modified so that they do not
+*        create any output keywords if the number of WCS axes is different 
+*        to the number of pixel axes. 
+*        - Handling of OBSGEO-X/Y/Z corrected again.
+*        - WCSFromStore modified to avouid writing partial axis descriptions.
 *class--
 */
 
@@ -995,7 +1006,7 @@ static int PCFromStore( AstFitsChan *, FitsStore *, const char *, const char * )
 static int SearchCard( AstFitsChan *, const char *, const char *, const char *);
 static int Similar( const char *, const char * );
 static int SkySys( AstSkyFrame *, int, FitsStore *, int, int, char c, const char *, const char * );
-static int SplitMap( AstMapping *, int, AstMapping **, AstWcsMap **, AstMapping ** );
+static int SplitMap( AstMapping *, int, int, int, AstMapping **, AstWcsMap **, AstMapping ** );
 static int SplitMap2( AstMapping *, int, AstMapping **, AstWcsMap **, AstMapping ** );
 static int SplitMat( int , double *, double * );
 static int TestAttrib( AstObject *, const char * );
@@ -1007,7 +1018,7 @@ static int WcsNatPole( AstFitsChan *, AstWcsMap *, double, double, double, doubl
 static int Write( AstChannel *, AstObject * );
 static int astSplit_( const char *, char **, char **, char **, const char *, const char * );
 static void *CardData( AstFitsChan *, size_t * );
-static void AddFrame( AstFitsChan *, AstFrameSet *, int, FitsStore *, char, const char *, const char * );  
+static void AddFrame( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, char, const char *, const char * );  
 static void CheckZero( char *, double, int );
 static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
@@ -1070,7 +1081,7 @@ static void WriteToSink( AstFitsChan * );
 /* Member functions. */
 /* ================= */
 static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel, 
-                      FitsStore *store, char s, const char *method, 
+                      int npix, FitsStore *store, char s, const char *method, 
                       const char *class ){
 /*
 *  Name:
@@ -1086,7 +1097,7 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 *  Synopsis:
 *     #include "fitschan.h"
 *     void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel, 
-*                    FitsStore *store, char s, const char *method, 
+*                    int npix, FitsStore *store, char s, const char *method, 
 *                    const char *class )
 
 *  Class Membership:
@@ -1108,6 +1119,8 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 *        Pointer to the FrameSet to be extended.
 *     pixel
 *        The index of the pixel (GRID) Frame within fset.
+*     npix
+*        The number of pixel axes.
 *     store
 *        The FitsStore containing the required information extracted from 
 *        the FitsChan.
@@ -1126,6 +1139,13 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 /* Local Variables: */
    AstFrame *frame;            /* Requested Frame */
    AstMapping *mapping;        /* Mapping from pixel to requested Frame */
+   AstMapping *tmap;           /* Temporary Mapping pointer */
+   AstPermMap *pmap;           /* PermMap pointer to add or remove axes */
+   double con;                 /* Value to be assigned to missing axes */
+   int *inperm;                /* Pointer to input axis permutation array */
+   int *outperm;               /* Pointer to output axis permutation array */
+   int i;                      /* Axis index */
+   int nwcs;                   /* Number of wcs axes */
 
 /* Check the inherited status. */
    if( !astOK ) return;
@@ -1135,8 +1155,34 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
    physical coordinate system. */
    mapping = WcsMapFrm( this, store, s, &frame, method, class );
 
-/* Add the Frame into the FrameSet, and annul the mapping and frame. */
+/* Add the Frame into the FrameSet, and annul the mapping and frame. If
+   the new Frame has more axes than the pixel Frame, use a PermMap which
+   assigns constant value 1.0 to the extra axes. If the new Frame has less 
+   axes than the pixel Frame, use a PermMap which throws away the extra
+   axes. */
    if( mapping != NULL ) {
+      nwcs = astGetNin( mapping );
+      if( nwcs != npix ) {
+         inperm = astMalloc( sizeof(int)*(size_t)npix );
+         outperm = astMalloc( sizeof(int)*(size_t)nwcs );
+         if( astOK ) {
+            for( i = 0; i < npix; i++ ) {
+               inperm[ i ] = ( i < nwcs ) ? i : -1;
+            }
+            for( i = 0; i < nwcs; i++ ) {
+               outperm[ i ] = ( i < npix ) ? i : -1;
+            }
+            con = 1.0;
+            pmap = astPermMap( npix, inperm, nwcs, outperm, &con, "" );
+            tmap = (AstMapping *) astCmpMap( pmap, mapping, 1, "" );
+            pmap = astAnnul( pmap );
+            astAnnul( mapping );
+            mapping = tmap;
+         }
+         inperm = astFree( inperm );
+         outperm = astFree( outperm );
+      }
+
       astAddFrame( fset, pixel, mapping, frame );
 
 /* Annul temporary resources. */
@@ -1363,8 +1409,9 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
                      ((int)( crpix*1.0E6 + 0.5 ))*1.0E-6);
          }
       }
-
    }
+
+
 
 /* Free remaining resources. */
    if( crvals ) crvals = astFree( crvals );
@@ -1692,8 +1739,12 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
           != AST__BAD ) ok = 0;
    }
 
-/* Save the number of pixel axes */
+/* Save the number of axes */
    naxis = GetMaxJM( &(store->crpix), ' ' ) + 1;
+
+/* If this is different to the value of NAXIS abort since this encoding
+   does not support WCSAXES keyword. */
+   if( naxis != store->naxis ) ok = 0;
 
 /* Allocate memory to store the CDELT values */
    if( ok ) {
@@ -2370,7 +2421,7 @@ static AstMapping *CelestialAxes( AstFrameSet *fs, double *dim, int *wperm,
    Mappings up to (but not including) the WcsMap, the second returned Mapping 
    is the (inverted) WcsMap, and the third returned Mapping is anything 
    following the WcsMap. Only proceed if one and only one WcsMap is found. */
-      if( SplitMap( map, astGetInvert( map ), &map1, &map2, &map3 ) ){
+      if( SplitMap( map, astGetInvert( map ), ilon, ilat, &map1, &map2, &map3 ) ){
 
 /* Get the indices of the latitude and longitude axes within the SkyFrame
    (not necessarily (1,0) because they may have been permuted). */
@@ -5819,7 +5870,6 @@ static int MakeBasisVectors( AstMapping *map, int nin, int nout,
             }            
          }
       }
-
    }
 
 /* Return the result. */
@@ -5950,6 +6000,7 @@ static int FindBasisVectors( AstMapping *map, int nin, int nout,
                g0[ i ] = dd;
             }
          }
+
          ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
 
 /* If the above didn't produce good positions, try moving out along each
@@ -6220,7 +6271,9 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
              Match( keyname, "ZSOURCE%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "RESTFRQ%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "MJD_AVG%0c", 0, NULL, &nfld, method, class ) ||
-             Match( keyname, "OBSGEO%1c", 0, NULL, &nfld, method, class ) ) {
+             Match( keyname, "OBSGEO-X", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "OBSGEO-Y", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "OBSGEO-Z", 0, NULL, &nfld, method, class ) ) {
 
             if( last ) MoveCard( this, 1, method, class );
             break;
@@ -7082,7 +7135,7 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Produce the Frame describing the primary axis descriptions, and add it
    into the FrameSet. */
-      AddFrame( this, ret, pixel, store, ' ', method, class );  
+      AddFrame( this, ret, pixel, store->naxis, store, ' ', method, class );  
 
 /* Get the index of the primary physical co-ordinate Frame in the FrameSet. */
       physical = astGetCurrent( ret );
@@ -7105,7 +7158,7 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
 
 /* If this co-ordinate version has been used, add a Frame to the returned
    FrameSet holding this co-ordinate version. */
-         if( use ) AddFrame( this, ret, pixel, store, s, method, class );  
+         if( use ) AddFrame( this, ret, pixel, store->naxis, store, s, method, class );  
 
       }
 
@@ -12309,7 +12362,6 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
             (void) strcpy( lattype + 4, "-GLS" );
          }
 
-
 /* SIN projections are only acceptable if the associated projection
    parameters are both zero, or if the first is zero and the second 
    = cot( reference point latitude )  (the latter case is equivalent to 
@@ -12361,11 +12413,15 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
       ok = 1;
    }
 
+/* Save the number of axes */
+   naxis = GetMaxJM( &(store->crpix), ' ' ) + 1;
+
+/* If this is different to the value of NAXIS abort since this encoding
+   does not support WCSAXES keyword. */
+   if( naxis != store->naxis ) ok = 0;
+
 /* Return if the FitsStore does not conform to IRAF encoding. */
    if( !ok ) return ret;
-
-/* Save the number of pixel axes */
-   naxis = GetMaxJM( &(store->crpix), ' ' ) + 1;
 
 /* Get and save CRPIX for all pixel axes. These are required, so return
    if they are not available. */
@@ -13418,7 +13474,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs ) {
    is the (inverted) WcsMap, and the third returned Mapping is anything 
    following the WcsMap. Only proceed if one and only one WcsMap is found. */
                tmap0 = astGetMapping( tfs, AST__BASE, AST__CURRENT );
-               if( SplitMap( tmap0, astGetInvert( tmap0 ), &map1, &map2, &map3 ) ){
+               if( SplitMap( tmap0, astGetInvert( tmap0 ), ilon, ilat, &map1, &map2, &map3 ) ){
 
 /* The reference point in the celestial coordinate system is found by
    transforming the fiducial point in native spherical co-ordinates
@@ -13842,14 +13898,18 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          }
       }
 
-/* Check the Mapping was linear. */
-      if( ret ) {
-
 /* If the number of outputs for "map" is larger than the number of inputs,
    then we will still be missing some column vectors for the CDi_j matrix
    (which has to be square). We invent these such that the they are
-   orthogonal to all the other column vectors. */
+   orthogonal to all the other column vectors. Only od this if the
+   Mapping is linear. */
+      if( ret ) {
          fullmat = OrthVectorSet( nout, nin, partmat );
+         if( !fullmat ) ret = 0;
+      }
+
+/* Check everything is OK. */
+      if( ret ) {
 
 /* Set up an array holding index of the Mapping output corresponding to
    each IWC axis (the inverse of "wperm"). Also look for matching pairs of
@@ -13926,7 +13986,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    First deal with axes for which there are Mapping inputs. */
             if( j < nin ) {
                crp = g0[ j ] - y[ j ];
-            
+
 /* If this is a grid axis which has been created to represent a "missing" 
    input to the mapping, we need to add on 1.0 to the crpix value found
    above. This is because the "w0" vector corresponds to a value of zero
@@ -13943,7 +14003,9 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
                for( i = 0; i < nout; i++ ) {
                   cdmat[ wperm[ i ]*nout+j ] = colvec[ i ] ;
                }
+
                SetItem( &(store->crpix), 0, j, s, crp );
+
 
 /* The length of the unit vector along any "degenerate" axes was fixed
    arbitrarily at 1.0 by the call to OrthVectorSet. We can probably
@@ -21319,8 +21381,8 @@ int astSplit_( const char *card, char **name, char **value,
    
 }
 
-static int SplitMap( AstMapping *map, int invert, AstMapping **map1, AstWcsMap **map2,
-                     AstMapping **map3 ){
+static int SplitMap( AstMapping *map, int invert, int ilon, int ilat, 
+                     AstMapping **map1, AstWcsMap **map2, AstMapping **map3 ){
 /*
 *  Name:
 *     SplitMap
@@ -21332,8 +21394,8 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1, AstWcsMap *
 *     Private function.
 
 *  Synopsis:
-*     int SplitMap( AstMapping *map, int invert, AstMapping **map1, 
-*                   AstWcsMap **map2, AstMapping **map3 )
+*     int SplitMap( AstMapping *map, int invert, int ilon, int ilat, 
+*                   AstMapping **map1, AstWcsMap **map2, AstMapping **map3 )
 
 *  Class Membership:
 *     FitsChan
@@ -21359,12 +21421,16 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1, AstWcsMap *
 *     invert
 *        The value of the Invert attribute to use with "map" (the value 
 *        returned by astGetInvert is not used).
+*     ilon
+*        Index of mapping output which is connected to the longitude axis.
+*     ilat
+*        Index of mapping output which is connected to the latitude axis.
 *     map1
 *        A location at which to return a pointer to the Mapping from pixel 
 *        to intermediate world coordinates. 
 *     map2
-*        A location at which to return a pointer to the Mapping from relative 
-*        physical coordinates to native spherical coordinates. This will
+*        A location at which to return a pointer to the Mapping from intermediate
+*        world coordinates to native spherical coordinates. This will
 *        be an inverted WcsMap.
 *     map3
 *        A location at which to return a pointer to the Mapping from 
@@ -21393,9 +21459,22 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1, AstWcsMap *
 */
 
 /* Local Variables */
+   AstFitsChan *fc;        /* Pointer to temporary FitsChan */
+   AstFrameSet *tfs;       /* Temporary FrameSet */
    AstMapping *mapa;       /* Pre-wcs Mapping */
-   AstWcsMap  *mapb;       /* WcsMap */
    AstMapping *mapc;       /* Post-wcs Mapping */
+   AstMapping *tmap1;      /* Temporary Mapping */
+   AstMapping *tmap2;      /* Temporary Mapping */
+   AstPointSet *pset1;     /* Pixel positions */
+   AstPointSet *pset2;     /* WCS positions */
+   AstWcsMap  *mapb;       /* WcsMap */
+   char card[ FITSCARDLEN + 1 ]; /* Buffer for header card */
+   double **ptr1;          /* Pointer to pixel axis values */
+   double **ptr2;          /* Pointer to WCS axis values */
+   double *w1;             /* Pointer to work space */
+   int i;                  /* Loop index */
+   int npix;               /* Number of pixel axes */
+   int nwcs;               /* Number of WCS axes */
    int ret;                /* Was a non-linear Mapping found? */
 
 /* Initialise */
@@ -21436,13 +21515,109 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1, AstWcsMap *
             mapc = astAnnul( mapc );
          }
       }
+   } 
 
-      if( !ret ) {
-         *map1 = astAnnul( *map1 );
-         *map2 = astAnnul( *map2 );
-         *map3 = astAnnul( *map3 );
+/* If the above failed to find a suitable WcsMap, we now consider cases
+   where the output (long,lat) values are constants supplied by a
+   final PermMap. We can invent a WcsMap for such cases. */
+   if( !ret ) {
+
+/* Transform two arbitrary pixel positions into the WCS Frame. */
+      npix = astGetNin( map );
+      nwcs = astGetNout( map );
+      pset1 = astPointSet( 2, npix, "" );
+      pset2 = astPointSet( 2, nwcs, "" );
+      ptr1 = astGetPoints( pset1 );
+      ptr2 = astGetPoints( pset2 );
+      w1 = astMalloc( sizeof( double )*(size_t) nwcs );
+      if( astOK ) {
+         for( i = 0; i < npix; i++ ) {
+            ptr1[ i ][ 0 ] = 1.0;
+            ptr1[ i ][ 1 ] = 1000.0;
+         }
+         astTransform( map, pset1, 1, pset2 );
+
+/* If the two wcs positions have equal longitude and latitude values,
+   assume that the output longitude and latitude axes are assigned
+   constant values by the Mapping. */
+         if( ptr2[ ilon ][ 0 ] == ptr2[ ilon ][ 1 ] &&
+             ptr2[ ilon ][ 0 ] != AST__BAD &&
+             ptr2[ ilat ][ 0 ] == ptr2[ ilat ][ 1 ] &&
+             ptr2[ ilat ][ 0 ] != AST__BAD ) {
+
+/* Create a set of Mappings to return, including a WcsMap, which result in 
+   these constant latitude and longitude values. We do this by creating a 
+   FITS-WCS header and reading the FrameSet from it. Keywords which are not
+   important to the final mappings are given arbitrary values. */
+            fc = astFitsChan( NULL, NULL, "" );
+            for( i = 0; i < nwcs; i++ ) {
+               sprintf( card, "CRPIX%d  = 0", i + 1 );
+               astPutFits( fc, card, 0 );
+               sprintf( card, "CDELT%d  = 0.0003", i + 1 );
+               astPutFits( fc, card, 0 );
+               if( i == ilon ) {
+                  sprintf( card, "CTYPE%d  = 'RA---TAN'", i + 1 );
+               } else if( i == ilat ) {
+                  sprintf( card, "CTYPE%d  = 'DEC--TAN'", i + 1 );
+               } else {
+                  sprintf( card, "CTYPE%d  = 'DUMMY'", i + 1 );
+               }
+               astPutFits( fc, card, 0 );
+
+               if( i == ilon ) {
+                  sprintf( card, "CRVAL%d  = %.*g", i + 1, DBL_DIG, AST__DR2D*ptr2[ ilon ][ 0 ] );
+               } else if( i == ilat ) {
+                  sprintf( card, "CRVAL%d  = %.*g", i + 1, DBL_DIG, AST__DR2D*ptr2[ ilat ][ 0 ] );
+               } else {
+                  sprintf( card, "CRVAL%d  = 0.0", i + 1 );
+               }
+               astPutFits( fc, card, 0 );
+            }
+
+            astClearCard( fc );
+            tfs = astRead( fc );
+            if( tfs ) {
+
+/* Use SplitMap to get the required Mapings from the FrameSet. */
+               tmap2 = astGetMapping( tfs, AST__BASE, AST__CURRENT );
+               SplitMap( tmap2, 0, 0, 1, &tmap1, map2, map3 );
+               tmap1 = astAnnul( tmap1 );
+               tmap2 = astAnnul( tmap2 );
+               
+/* Create a ShiftMap which subtract the constant longitude and latitude
+   values off the inputs. */
+               for( i = 0; i < nwcs; i++ ) w1[ i ] = 0.0;
+               w1[ ilon ] = -ptr2[ ilon ][ 0 ];
+               w1[ ilat ] = -ptr2[ ilat ][ 0 ];
+                            
+               tmap1 = (AstMapping *) astShiftMap( nwcs, w1, "" );
+
+/* Compose this with the supplied Mapping. This results in the celestial
+   outputs being zero. This gives the required "map1". */
+               *map1 = (AstMapping *) astCmpMap( map, tmap1, 1, "" );
+
+/* Indicate success.*/
+               ret = 1;
+
+/* Free resources. */
+               tmap1 = astAnnul( tmap1 );
+               tfs = astAnnul( tfs );
+            }
+            fc = astAnnul( fc );           
+         }
       }
 
+/* Free resources */
+      pset1 = astAnnul( pset1 );
+      pset2 = astAnnul( pset2 );
+      w1 = astFree( w1 );
+
+   }
+
+   if( !ret ) {
+      if( *map1 ) *map1 = astAnnul( *map1 );
+      if( *map2 ) *map2 = astAnnul( *map2 );
+      if( *map3 ) *map3 = astAnnul( *map3 );
    }
 
    return ret;
@@ -23765,6 +23940,18 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
    sup = GetMaxS( &(store->crval) );
    for( s = ' '; s <= sup && astOK; s++ ){      
 
+/* For alternate axes, skip this axis description if there is no CRPIX1 or
+   CRVAL1 value. This avoids partial axis descriptions being written out. */
+      if( s != ' ' ) {
+         if( GetItem( &(store->crpix), 0, 0, s, NULL, method, class ) == 
+             AST__BAD ||
+             GetItem( &(store->crval), 0, 0, s, NULL, method, class ) ==
+             AST__BAD ) {
+            ok = 0;
+            goto next;
+         }
+      }      
+
 /* Assume the Frame can be created succesfully. */
       ok = 1;
 
@@ -23980,8 +24167,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
       }
 
       val = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, FormatKey( "MJD-AVG", -1, -1, s ),
-                                      &val, AST__FLOAT, 
+      if( val != AST__BAD ) SetValue( this, "MJD-AVG", &val, AST__FLOAT, 
                                       "Average Modified Julian Date of observation" );
 
 /* Projection parameters */
@@ -24048,16 +24234,14 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
       if( val != AST__BAD ) SetValue( this, FormatKey( "RESTWAV", -1, -1, s ),
                                       &val, AST__FLOAT, "[m] Rest wavelength" );
 
-/* OBSGEO-X/Y/Z - observers geocentric coords. */
+/* OBSGEO-X/Y/Z - observers geocentric coords. Note, these always refer
+   to the primary axes. */
       val = GetItem( &(store->obsgeox), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, FormatKey( "OBSGEOX", -1, -1, s ),
-                                      &val, AST__FLOAT, "[m] Observatory geocentric X" );
+      if( val != AST__BAD ) SetValue( this, "OBSGEO-X", &val, AST__FLOAT, "[m] Observatory geocentric X" );
       val = GetItem( &(store->obsgeoy), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, FormatKey( "OBSGEOY", -1, -1, s ),
-                                      &val, AST__FLOAT, "[m] Observatory geocentric Y" );
+      if( val != AST__BAD ) SetValue( this, "OBSGEO-Y", &val, AST__FLOAT, "[m] Observatory geocentric Y" );
       val = GetItem( &(store->obsgeoz), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, FormatKey( "OBSGEOZ", -1, -1, s ),
-                                      &val, AST__FLOAT, "[m] Observatory geocentric Z" );
+      if( val != AST__BAD ) SetValue( this, "OBSGEO-Z", &val, AST__FLOAT, "[m] Observatory geocentric Z" );
 
 /* See if a Frame was sucessfully written to the FitsChan. */
 next:
@@ -26045,7 +26229,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             }         
             astSetRestFreq( specfrm, restfrq );
 
-/* Observer's position. Get the OBSGEO_X/Y/Z keywords, convert to geodetic 
+/* Observer's position. Get the OBSGEO-X/Y/Z keywords, convert to geodetic 
    longitude and latitude and store as the SpecFrame's GeoLat and GeoLon
    attributes (we ignore the height of the observer above sea level ). */
             obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, s, NULL, method, class );
