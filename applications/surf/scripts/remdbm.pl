@@ -140,6 +140,7 @@ if ($use_ams) {
   print "Starting monoliths...";
   $Mon{surf_mon} = new ORAC::Msg::ADAM::Task("surf_mon_$$", $ENV{SURF_DIR}."/surf_mon");
   $Mon{kappa_mon} = new ORAC::Msg::ADAM::Task("kappa_mon_$$",$ENV{KAPPA_DIR}."/kappa_mon");
+  $Mon{ndfpack_mon} = new ORAC::Msg::ADAM::Task("ndfpack_mon_$$",$ENV{KAPPA_DIR}."/ndfpack_mon");
 
   # Start ADAM messaging
   $adam = new ORAC::Msg::ADAM::Control;
@@ -152,6 +153,7 @@ if ($use_ams) {
 
   $Mon{surf_mon} = new ORAC::Msg::ADAM::Shell("surf_mon_$$", $ENV{SURF_DIR}."/surf_mon");
   $Mon{kappa_mon} = new ORAC::Msg::ADAM::Shell("kappa_mon_$$",$ENV{KAPPA_DIR}."/kappa_mon");
+  $Mon{ndfpack_mon} = new ORAC::Msg::ADAM::Shell("ndfpack_mon_$$",$ENV{KAPPA_DIR}."/ndfpack_mon");
 
 }
 
@@ -424,6 +426,13 @@ check_status($status);
 
 # Now remove the intermediate file
 unlink "invfft$output$ext";
+
+# Finally remove some of the extra FITS keywords relating to chops that
+# should not be in the header of the deconvolved image
+foreach my $key ('CHOP_PA', 'CHOP_THR', 'CHOP_CRD') {
+  $status = $Mon{ndfpack_mon}->obeyw("fitsmod","ndf=$output keyword=$key edit=delete");
+  last if $status != 0;
+}
 
 print "Result stored in $output\n";
 
