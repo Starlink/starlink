@@ -4,9 +4,13 @@
 #
 #   Script to automate scan/map data reduction.
 #   Design it such that it can be used in ORACDR
+use sigtrap qw/die normal-signals error-signals/;
+use Carp;
 
 use Getopt::Long;                       # Command line options
 use NDF;                                # to access NDF headers
+
+use constant DIAMETER => 15.0;          # Diameter of telescope
 
 $use_ams = 0;   # We are not using AMS
 
@@ -24,7 +28,7 @@ if (! $@) {
   # Cant put this inside the packages since they
   # do not seem to be evaluated.
   $SAI__OK = &Starlink::ADAM::SAI__OK;
-  $DTASK__ACTCOMPLETE = 142115659;
+  $DTASK__ACTCOMPLETE = &Starlink::ADAM::DTASK__ACTCOMPLETE;
 } 
 
 # Need to uncomment if we are using external ORAC classes
@@ -47,7 +51,8 @@ $| = 1;
 $result = GetOptions("help"    => \$h,
 		     "version" => \$v,
 		     "out=s"   => \$outfile,
-                     "noams"   => \$noams
+                     "noams"   => \$noams,
+		     "filter"  => \$filter,
 		     );
 
 $h = 1 unless $result == 1;  # Print help info if unknown option
@@ -65,7 +70,8 @@ Options:
 \t-h[elp]   \tThis message.
 \t-v[ersion]\tPrint version number of program.
 \t-out=s    \tSpecify output filename. Default is "final".
-\t-noams    \tTurn off ADAM messaging (default is false if ADAM
+\t-noams    \tTurn off ADAM messaging (default is false if ADAM not found)
+\t-filter   \tTurn on high frequency filtering
 \t          \tmessaging is allowed)
 \t"files"   \tList of files to be processed.
 Description:
@@ -109,12 +115,13 @@ if ($use_ams) {
 
 # Decide whether we are using the new KAPPA (>0.13) or the old
 # This governs whether we can use the WCSCOPY command
+my $newkappa;
 $newkappa = ( -e "$ENV{KAPPA_DIR}/style.def" ? 1 : 0);
 
 
 # Setup default output filename
 
-if ($outfile =~ /./) {
+if (defined $outfile) {
   $outfile =~ s/\.sdf$//;  # Strip .sdf
   $output = $outfile;
 } else {
@@ -134,7 +141,7 @@ if ($use_ams) {
   $adam = new ORAC::Msg::ADAM::Control;
   $status = $adam->init;
   check_status($status);
-  $adam->timeout(600);     # task timeout of 10 minutes
+  $adam->timeout(1200);     # task timeout of 20 minutes
 
   
 } else {
@@ -193,13 +200,8 @@ ndf_end($status);
 
 die "Should be 2-dimensional data" if $ndim != 2;
 
-# Store pixel size
-$pixsize = $Frm->hdr('SCUPIXSZ');
-
-
 # Generate the weight
 
-@ffts    = ();   # Store FFT names
 $wt = "weight";  # Name of file containing total weight
 $ext = ".sdf";   # Filename extension
 $i = 0;          # Counter
@@ -220,7 +222,10 @@ foreach $frame ($Grp->members) {
   $outwt = 'wt_' . $chop_pa . '_' . $chop_thr;
   $outft = 'ft_' . $chop_pa . '_' . $chop_thr;
 
-  $string = "chop=$chop_thr pa=$chop_pa pixsize=$pixsize size=[$dim[0],$dim[1]] ftchop=$outft wtchop=$outwt accept";
+
+  # Make it LIKE the current image so that the origin information
+  # is correct
+  $string = "like=".$frame->file." ftchop=$outft wtchop=$outwt accept";
 
   $status = $Mon{surf_mon}->obeyw("scumakewt","$string");
   check_status($status);
@@ -334,6 +339,53 @@ check_status($status);
 # Remove the weight
 unlink "s$wt$ext", "$re$ext", "$im$ext";
 
+
+# Put filtering in here - have to mask the real and imaginary
+# components using ARDMASK, centred on pixel origin (0,0)
+# Radius of mask is related to the pixel size and wavelength
+
+if ($filter) {
+  my $wlength = $Grp->frame(0)->hdr('WAVELEN');
+  my $pixsz   = $Grp->frame(0)->hdr('SCUPIXSZ');
+
+  # Find dimensions of map
+  ndf_begin;
+  $status = &NDF::SAI__OK;
+  ndf_find(&NDF::DAT__ROOT, 'rediv', $indf, $status);
+  my @dim = ();
+  ndf_dim($indf, 2, @dim, $ndim, $status);
+  ndf_annul($indf, $status);
+  ndf_end($status);
+
+  # Find radius in pixels
+  my $scale = DIAMETER * $pixsz / ($wlength * 206265);
+
+  my $xrad = int (($dim[0] * $scale) + 1);
+  my $yrad = int (($dim[1] * $scale) + 1);
+
+  print "Filtering out high frequencies...\n";
+
+  # Create ARD file
+  my $ardfile = "ard$$.mask";
+  open ARD, "> $ardfile" || die "Error creating ARD file for fourier filter\n";
+  print ARD ".NOT.ELLIPSE(0,0,$xrad,$yrad,0)\n";
+  close ARD || die "Error closing ARD file\n";
+
+  my $args = "cosys=world ardfile=$ardfile";
+  $status = $Mon{kappa_mon}->obeyw("ardmask","in=rediv out=rediv_ard $args");
+  check_status($status);
+  $status = $Mon{kappa_mon}->obeyw("ardmask","in=imdiv out=imdiv_ard $args");
+  check_status($status);
+
+  # Rename the files to overwrite the originals
+  rename "rediv_ard.sdf", "rediv.sdf";
+  rename "imdiv_ard.sdf", "imdiv.sdf";
+
+  unlink $ardfile;
+}
+
+
+
 print "Running inverse FFT...\n";
 # Inverse fourier
 $status = $Mon{kappa_mon}->obeyw("fourier","inverse realin=rediv imagin=imdiv out=invfft$output reset");
@@ -344,7 +396,7 @@ unlink "rediv$ext", "imdiv$ext";
 
 # Now copy the astrometry from one of the input images to the
 # output of the FFT. We need to do this since the inverse FFT image
-# has lost pixel origin, axis information and WCS (but has retained
+# has lost axis information and WCS (but has retained
 # the extensions)
 
 # Since the WCSCOPY command (currently) only copies WCS information and not
@@ -353,15 +405,10 @@ unlink "rediv$ext", "imdiv$ext";
 # and the output by 1. MATHS propogates WCS and AXIS correctly since
 # the input images are identical before and after the FFT
 
-# This does assume that the bounds of the two input images match.
-# Since we dont explcitly check for this I have to assume that the
-# pixel origin is 1,1 (since that is what the origin for the output
-# of FOURIER is).
-
 # Select first map as reference
 $file = $Grp->frame(0)->file;
 
-$status = $Mon{kappa_mon}->obeyw("maths","exp='IA*0+IB' ia=$file ib=invfft$output out=$output title='SURF:remdbm' reset");
+$status = $Mon{kappa_mon}->obeyw("maths","exp='IA*0+IB' ia=$file ib=invfft$output out=$output title='SURF:remdbm' novariance reset");
 check_status($status);
 
 # Now remove the intermediate file
@@ -377,7 +424,7 @@ exit;
 sub check_status {
   my $status = shift;
 
-  die "Bad status: $status" if $status != 0;
+  croak "Bad status: $status" if $status != 0;
 
 
 }
@@ -903,19 +950,19 @@ sub configure {
   $self->header($self->readhdr);
  
   # Find the group name and set it
-  $self->group($self->findgroup);
+#  $self->group($self->findgroup);
  
   # Find the recipe name
-  $self->recipe($self->findrecipe);
+#  $self->recipe($self->findrecipe);
  
   # Find number of sub-instruments from header
   # and store this value along with all sub-instrument info.
   # Do this so that the header can be changed without us
   # losing the original state information
-  $self->nsubs($self->findnsubs);
-  $self->subs($self->findsubs);
-  $self->filters($self->findfilters);
-  $self->wavelengths($self->findwavelengths);
+#  $self->nsubs($self->findnsubs);
+#  $self->subs($self->findsubs);
+#  $self->filters($self->findfilters);
+#  $self->wavelengths($self->findwavelengths);
 
   # Return something
   return 1;
@@ -961,18 +1008,19 @@ sub readhdr {
 Return the group associated with the Frame. 
 This group is constructed from header information.
 
+For remdbm - they should all be in the group so return a constant.
+
 =cut
 
 # Supply a new method for finding a group
+
 
 sub findgroup {
 
   my $self = shift;
 
   # construct group name
-  my $group = $self->hdr('MODE') . 
-    $self->hdr('OBJECT'). 
-      $self->hdr('FILTER');
+  my $group = 'REMDBM';
  
   return $group;
 
@@ -2467,6 +2515,8 @@ __END__
 *      enabled.
 *    -out=file
 *      Filename of output image. Default is 'final.sdf'
+*    -filter
+*      Filter out frequencies higher than can be detected by the telescope.
 *    files
 *      List of input files to be processed. Shell wildcards are allowed.
 *      See notes for restrictions.
