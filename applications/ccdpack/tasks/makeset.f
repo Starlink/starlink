@@ -44,7 +44,7 @@
 *     but various options exist to tune how it is done.
 
 *  Usage:
-*     makeset in
+*     makeset in mode
 
 *  ADAM Parameters:
 *     ADDWCS = _LOGICAL (Read)
@@ -58,6 +58,10 @@
 *        are present.  Therefore this parameter should be set true 
 *        if the images which will form a Set are known to be aligned
 *        in their common Current coordinate system.
+*
+*        If MODE=SPLIT, this parameter is ignored and a new CCD_SET
+*        coordinate system which is a copy of the Pixel coordinate
+*        system will be added in any case.
 *        [TRUE]
 *     ASTFILE = LITERAL (Read)
 *        If this parameter is supplied, it gives the name of a file
@@ -72,7 +76,8 @@
 *        The file named by this parameter will normally have been
 *        written by the ASTEXP program, saving a known correct 
 *        alignment of images within a Set that corresponds to 
-*        the one being created by this program.
+*        the one being created by this program.  This parameter
+*        is ignored if MODE=SPLIT.
 *        [!]
 *     FITSINDEX = LITERAL (Read)
 *        The name of the FITS header card whose value will determine
@@ -143,6 +148,7 @@
 *           - LIST
 *           - CONTAINER
 *           - FITS
+*           - SPLIT
 *
 *        When MODE=LIST, new Sets will be formed according to the
 *        order in which NDFs are named in the IN list.
@@ -172,6 +178,19 @@
 *        Note this can only be used if both a Name-like and an 
 *        Index-like header card is available in the FITS header of
 *        each file.
+*
+*        When MODE=SPLIT, a new Set is created for each of the members
+*        of the IN list.  Each Set will consist of the data from the
+*        input image split up into pieces according to the XSTART
+*        and YSTART parameters, or the SECTIONS parameter.
+*        A new HDS container file will be written for
+*        each IN file, with a name given by the OUT parameter.  Each
+*        split piece of the input file will be written as a separate
+*        NDF in the container file, with a Set Name given by the 
+*        name of the original NDF and a Set Index given by the
+*        position in the list of pieces.  Unlike the other modes,
+*        this does not alter the input file, but creates a new output
+*        file to contain the rearranged data.
 *        [LIST]
 *     NAME = LITERAL (Read)
 *        The NAME parameter is used to determine the Set NAME attribute
@@ -188,6 +207,41 @@
 *        (if MODE=CONTAINER).  If MODE=FITS it is ignored.  There 
 *        is normally no need to use a value other than the default.
 *        [*]
+*     OUT = LITERAL (Read)
+*        If MODE=SPLIT, this parameter gives the names to use for the
+*        output HDS container files; one output filename must be 
+*        specified for each input NDF.  These may be given as a 
+*        comma-separated list of names, using indirection if required,
+*        or as a single modification element (of the input names).
+*        A common modification element is '*', meaning the same name
+*        as the input file, so out="*-set" would create output
+*        files with the same name as the input files but with "-set"
+*        appended.
+*        
+*        If MODE is not SPLIT then no new output files are created, so
+*        this parameter is ignored.
+*     SECTIONS( * ) = LITERAL (Read)
+*        If MODE=SPLIT, this parameter may be used to give a list
+*        of NDF section specifiers from which to form the members of
+*        the newly created Set.  Each element may optionally be
+*        enclosed in parentheses, and should be of the form 
+*        explained in the "NDF Sections" section of SUN/33; 
+*        typically it will be of the form "(xmin:xmax,ymin:ymax)".
+*        Note that if supplying this parameter on the command line
+*        it will be necessary to include each element in quotes and
+*        the whole list in square brackets, e.g.:
+*           sections=["(17:500,1:1024)","(525:1000,1:1024)"]
+*
+*        When using a Unix shell the whole thing will have to be
+*        placed in single quotes as well.
+*
+*        If a null value (!) is given for this parameter the 
+*        XSTART and YSTART parameters are used instead; if the 
+*        sections into which the input images are to be split
+*        tile the whole of the input image, this is usually 
+*        more convenient.  This parameter is ignored unless 
+*        MODE=SPLIT.
+*        [!]
 *     SETSIZE = _INTEGER (Read)
 *        The number of NDFs in each set.  This will default initially 
 *        to the number of NDFs in the IN list, but if set to a 
@@ -201,6 +255,34 @@
 *        invocation of MAKESET is forced to be the same size.
 *        Only used if MODE=LIST.
 *        [dynamic]
+*     XSTART( * ) = _INTEGER (Read)
+*        If MODE=SPLIT and SECTIONS is null, this gives a list of
+*        the first pixel index in the X direction (first coordinate)
+*        of rectangular regions which will become members of a new Set.
+*        If there are NX elements given for XSTART and NY for YSTART
+*        then each created Set will contain NX*NY members.  The
+*        region at position (IX,IY) will be composed of pixels
+*        XSTART(IX)..XSTART(IX+1)-1 in the X direction and
+*        YSTART(IY)..YSTART(IY+1)-1 in the Y direction, where the
+*        last pixel in the input image is implied for the upper
+*        bound of the NX'th element of XSTART.  The
+*        XSTART and YSTART parameters are given for convenience; the
+*        same information can be given by specifying an appropriate
+*        value for the more flexible SECTIONS parameter.
+*     YSTART( * ) = _INTEGER (Read)
+*        If MODE=SPLIT and SECTIONS is null, this gives a list of
+*        the first pixel index in the Y direction (second coordinate)
+*        of rectangular sections which will become members of a new Set.
+*        If there are NX elements given for XSTART and NY for YSTART
+*        then each created Set will contain NX*NY members.  The 
+*        region at position (IX,IY) will be composed of pixels
+*        XSTART(IX)..XSTART(IX+1)-1 in the X direction and
+*        YSTART(IY)..YSTART(IY+1)-1 in the Y direction, where the
+*        last pixel in the input image is implied for the upper
+*        bound of the NY'th element of YSTART.  The
+*        XSTART and YSTART parameters are given for convenience; the
+*        same information can be given by specifying an appropriate
+*        value for the more flexible SECTIONS parameter.
 
 *  Examples:
 *     makeset "data1,data2,data3,data4" addwcs mode=list
@@ -252,6 +334,32 @@
 *        might be necessary for comparison with 3-member sets if the
 *        Index=2 one is absent in this case due to a loss of the data
 *        file for some reason.
+*
+*     makeset multi split out=multi-s 
+*             sections=["(1:32,1:48)","(1:32,49:96)",
+*                       "(33:64,1:48)","(33:64,49:96)"]
+*        A new HDS container file called multi-s is created which
+*        contains the data from the single image multi, split up
+*        into four new NDFs.  A new coordinate system with the 
+*        domain CCD_SET will be added which is a copy of the 
+*        Pixel coordinates, and the Pixel coordinate of each of
+*        the new images will be the same as it was in the original.
+*
+*     makeset multi split out=multi-s 
+*             sections=["(:32,:48)","(:32,49:)","(33:,:48)","(33:,49:)"]
+*        If the input NDF multi has X pixels in the range 1:64 and
+*        Y pixels in the range 1:96, this does exactly the same as
+*        the previous example, cutting multi into quarters.  The
+*        abbreviated NDF section specifier syntax allows omission
+*        of a pixel bound when it is at the edge of the NDF.
+*
+*     makeset in=* mode=split out=*-s sections=! 
+*             xstart="1,33" ystart="1,49"
+*        This does the same as the previous example again, using the
+*        somewhat simpler XSTART and YSTART parameters.  This time
+*        a new Set is created for each of the NDFs in the current 
+*        directory, and written into a container file with the
+*        same name but '-s' appended.
 
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
@@ -320,20 +428,26 @@
 
 *  Local Constants:
       INTEGER MXFSET             ! Maximum framesets in one file
-      PARAMETER( MXFSET = 100 )
+      PARAMETER ( MXFSET = 100 )
+      INTEGER MXSECT             ! Maximum number of sections to split into
+      PARAMETER ( MXSECT = 32 )
 
 *  Local Variables:
+      INTEGER FIRST              ! Position of first character in string
       INTEGER FSET( MXFSET )     ! AST pointers to import framesets
       INTEGER FSMAT              ! AST pointer to matching frameset
       INTEGER I                  ! Loop variable
+      INTEGER IAT                ! Position in string
       INTEGER ICARD              ! Index of FITS header card
       INTEGER IF                 ! Loop index for framesets
       INTEGER IGOT               ! Found index in GRP group
+      INTEGER IGRP               ! Temporary GRP identifier
       INTEGER INDEX              ! Set INDEX attribute
       INTEGER INDDFL( CCD1__MXNDF ) ! Default values for INDXS
       INTEGER INDXS( CCD1__MXNDF ) ! Index values for successive NDFs in Set
       INTEGER INDF               ! NDF identifier
       INTEGER INGRP              ! GRP identifier for input NDFs
+      INTEGER INNDF              ! Input only NDF identifier
       INTEGER IPFITS             ! Pointer to mapped FITS headers
       INTEGER ISET( CCD1__MXNDF ) ! Which Set NDF belongs to
       INTEGER IVGRP              ! GRP identifier for index values
@@ -342,6 +456,7 @@
       INTEGER J                  ! Loop variable
       INTEGER JSET               ! Symbolic frame index for new WCS frame
       INTEGER K                  ! Offset into input NDF list
+      INTEGER LAST               ! Position of last character in string
       INTEGER LDRGRP             ! GRP identifier for NDF base names
       INTEGER NAMGRP             ! GRP identifier for Set NAME attributes
       INTEGER NC( CCD1__MXNDF )  ! Number of NDFs so far in each Set
@@ -350,11 +465,19 @@
       INTEGER NFSET              ! Number of framesets in group
       INTEGER NIV                ! Number of index values
       INTEGER NNDF               ! Number of input NDFs
+      INTEGER NOUT               ! Number of output NDFs
       INTEGER NRET               ! Number of names returned (dummy)
+      INTEGER NSECT              ! Number of sections to split into
       INTEGER NSET               ! Number of Sets to be generated
+      INTEGER NSX                ! Number of split panels in X direction
+      INTEGER NSY                ! Number of split panels in Y direction
       INTEGER NTRY               ! Number of tries for parameter entry
+      INTEGER OUTGRP             ! GRP identifier for output file names
+      INTEGER PLACE( CCD1__MXNDF ) ! Placeholders for output NDFs
       INTEGER SETSIZ             ! Number of NDFs in each Set
       INTEGER SINDEX( CCD1__MXNDF ) ! What Set Index the NDF has
+      INTEGER SX( MXSECT )       ! X direction split panel start pixel indices
+      INTEGER SY( MXSECT )       ! Y direction split panel start pixel indices
       LOGICAL ADDWCS             ! Add a CCD_SET frame?
       LOGICAL ASTFL              ! Use an AST file?
       LOGICAL DIFER              ! Do some NDFs have different Current domain?
@@ -375,6 +498,7 @@
       CHARACTER * ( GRP__SZNAM ) FIELDS( 6 ) ! NDG supplementary information
       CHARACTER * ( GRP__SZNAM ) NAME ! Set NAME attribute
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) SECTS( MXSECT ) ! Section specifiers
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for character output
 
 *.
@@ -393,6 +517,7 @@
       INGRP = GRP__NOID
       LDRGRP = GRP__NOID
       NAMGRP = GRP__NOID
+      OUTGRP = GRP__NOID
 
 *  ====================================================================
 *  Preparation section.  Work out what Set header information will be
@@ -402,12 +527,13 @@
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NNDF, STATUS )
 
 *  What shall we do with all these NDFs?
-      CALL PAR_CHOIC( 'MODE', 'LIST', 'LIST,CONTAINER,FITS', .TRUE.,
-     :                MODE, STATUS )
+      CALL PAR_CHOIC( 'MODE', 'LIST', 'LIST,CONTAINER,FITS,SPLIT',
+     :                .TRUE., MODE, STATUS )
 
 *  Initialise number of Sets and Set base name group.
       NSET = 0
       CALL GRP_NEW( 'CCD:BASENAMES', LDRGRP, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Getting Set information by position in container files.
       IF ( MODE .EQ. 'CONTAINER' ) THEN
@@ -506,6 +632,113 @@
                K = K + 1
             END DO
          END DO
+
+*  Creating a new Set by splitting the input NDF.
+      ELSE IF ( MODE .EQ. 'SPLIT' ) THEN
+
+*  Get NDF Section specifiers for the members of each Set.
+         CALL PAR_GET1C( 'SECTIONS', MXSECT, SECTS, NSECT, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Ensure that the NDF section specifiers contain surrounding parentheses
+*  (optional in supplying the parameter value).
+            DO I = 1, NSECT
+               CALL CHR_FANDL( SECTS( I ), FIRST, LAST )
+               IF ( SECTS( I )( FIRST:FIRST ) .EQ. '(' .AND.
+     :              SECTS( I )( LAST:LAST ) .EQ. ')' ) THEN
+                  SECTS( I )( FIRST:FIRST ) = ' '
+                  SECTS( I )( LAST:LAST ) = ' '
+                  CALL CHR_RMBLK( SECTS( I ) )
+               END IF
+               SECTS( I ) = '(' // SECTS( I )( 1:CHR_LEN( SECTS( I ) ) )
+     :                      // ')'
+            END DO
+
+*  If the SECTIONS parameter has not been supplied, construct NDF
+*  section specifiers from the conventence XSTART and YSTART
+*  parameters instead.
+         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+
+*  Annul the error.
+            CALL ERR_ANNUL( STATUS )
+
+*  Get the parameter values.
+            CALL PAR_GET1I( 'XSTART', MXSECT, SX, NSX, STATUS )
+            CALL PAR_GET1I( 'YSTART', MXSECT / NSX, SY, NSY, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Construct an NDF section specifier for each of the NSX * NSY
+*  rectangles.
+            NSECT = 0
+            DO I = 1, NSX
+               DO J = 1, NSY
+                  NSECT = NSECT + 1
+                  CALL MSG_SETI( 'X1', SX( I ) )
+                  IF ( I .LT. NSX ) THEN
+                     CALL MSG_SETI( 'X2', SX( I + 1 ) )
+                  ELSE
+                     CALL MSG_SETC( 'X2', ' ' )
+                  END IF
+                  CALL MSG_SETI( 'Y1', SY( J ) )
+                  IF ( J .LT. NSY ) THEN
+                     CALL MSG_SETI( 'Y2', SY( J + 1 ) )
+                  ELSE
+                     CALL MSG_SETC( 'Y2', ' ' )
+                  END IF
+                  CALL MSG_LOAD( ' ', '(^X1:^X2,^Y1:^Y2)',
+     :                           SECTS( NSECT ), IAT, STATUS )
+                  CALL CHR_RMBLK( SECTS( NSECT ) )
+               END DO
+            END DO
+         END IF
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Get the names of the output files by modification of the input NDF
+*  name group.
+         CALL CCD1_NDFPG( 'OUT', INGRP, NNDF, OUTGRP, STATUS )
+
+*  Create a new group of input NDF names (now one for each NDF section, 
+*  rather than just one for each input NDF), and corresponding output
+*  NDF placeholders.
+         IGRP = INGRP
+         NSET = NNDF
+         NOUT = 0
+         CALL GRP_NEW( 'CCD:NAMES', INGRP, STATUS )
+         DO I = 1, NNDF
+
+*  Use the names of the input NDFs to construct the Set Name attributes.
+            CALL GRP_GET( IGRP, I, 1, NAME, STATUS )
+            CALL GRP_PUT( LDRGRP, 1, NAME, I, STATUS )
+
+*  Create a new HDS container file for each new Set.
+            CALL GRP_GET( OUTGRP, I, 1, NAME, STATUS )
+            CALL HDS_NEW( NAME, 'NDFS', 'NDF_CONTAINER', 0, 0, LOC,
+     :                    STATUS )
+
+*  Prepare to write one NDF for each Set into the container file.
+            DO J = 1, NSECT
+               NOUT = NOUT + 1
+
+*  Record which Set this one is in.
+               ISET( NOUT ) = I
+               SINDEX( NOUT ) = J
+
+*  Get a placeholder.
+               CALL MSG_SETI( 'INDEX', J )
+               CALL MSG_LOAD( ' ', 'i^INDEX', NAME, IAT, STATUS )
+               CALL NDF_PLACE( LOC, NAME, PLACE( NOUT ), STATUS )
+
+*  Record its name.
+               CALL GRP_GET( IGRP, I, 1, NAME, STATUS )
+               NAME( CHR_LEN( NAME ) + 1: ) = SECTS( J )
+               CALL GRP_PUT( INGRP, 1, NAME, 0, STATUS )
+            END DO
+            CALL DAT_ANNUL( LOC, STATUS )
+         END DO
+         NNDF = NOUT
+
+*  Release resources.
+         CALL CCD1_GRDEL( IGRP, STATUS )
 
 *  Getting Set information from FITS headers.
       ELSE IF ( MODE .EQ. 'FITS' ) THEN
@@ -644,22 +877,27 @@
 
 *  Read framesets from an AST file if required; if this is done, they
 *  will be used as the CCD_SET alignment frames.
-      CALL CCD1_AFRD( 'ASTFILE', MXFSET, FSET, FSID, FITRTS, NFSET,
-     :                STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         ASTFL = .FALSE.
-         CALL ERR_ANNUL( STATUS )
-      ELSE
-         ASTFL = .TRUE.
-      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      ASTFL = .FALSE.
+      ADDWCS = .FALSE.
+      JSET = AST__NOFRAME
+      IF ( MODE .NE. 'SPLIT' ) THEN
+         CALL CCD1_AFRD( 'ASTFILE', MXFSET, FSET, FSID, FITRTS, NFSET,
+     :                   STATUS )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            ASTFL = .FALSE.
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            ASTFL = .TRUE.
+         END IF
 
 *  Determine whether we are to mark the Current frame as the CCD_SET
 *  alignment frame.
-      JSET = AST__NOFRAME
-      IF ( .NOT. ASTFL ) THEN
-         CALL PAR_GET0L( 'ADDWCS', ADDWCS, STATUS )
-         IF ( ADDWCS ) THEN
-            JSET = AST__CURRENT
+         IF ( .NOT. ASTFL ) THEN
+            CALL PAR_GET0L( 'ADDWCS', ADDWCS, STATUS )
+            IF ( ADDWCS ) THEN
+               JSET = AST__CURRENT
+            END IF
          END IF
       END IF
 
@@ -688,13 +926,21 @@
 *  Loop over Sets to be generated.
       K = 0
       DO I = 1, NSET
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+
+*  If we are writing output files, log the name to the user.
+         IF ( MODE .EQ. 'SPLIT' ) THEN
+            CALL GRP_GET( OUTGRP, I, 1, NAME, STATUS )
+            CALL MSG_SETC( 'NAME', NAME )
+            CALL CCD1_MSG( ' ', ' Writing to container file ^NAME',
+     :                     STATUS )
+         END IF
 
 *  Get the NAME attribute for this Set, and write it to the user.
          CALL GRP_GET( NAMGRP, I, 1, NAME, STATUS )
          LINE = ' '
          LINE( 2: ) = NAME
          LINE( CHR_LEN( LINE ) + 1: ) = ':'
-         CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', LINE, STATUS )
 
 *  Search out NDFs to be placed in this Set.
@@ -705,8 +951,20 @@
                K = K + 1
                INDEX = SINDEX( J )
 
-*  Get the NDF identifier and name.
-               CALL NDG_NDFAS( INGRP, J, 'UPDATE', INDF, STATUS )
+*  Get the NDF identifier.
+               IF ( MODE .EQ. 'SPLIT' ) THEN
+
+*  In the case of MODE=SPLIT, create a new NDF here from the input one.
+                  CALL NDG_NDFAS( INGRP, J, 'READ', INNDF, STATUS )
+                  CALL NDF_SCOPY( INNDF, 'Axis,WCS,Data,Quality,'
+     :                            //'Variance,Units', PLACE( J ),
+     :                            INDF, STATUS )
+                  CALL NDF_ANNUL( INNDF, STATUS )
+               ELSE
+                  CALL NDG_NDFAS( INGRP, J, 'UPDATE', INDF, STATUS )
+               END IF
+
+*  Get the NDF name.
                CALL GRP_GET( INGRP, J, 1, NDFNAM, STATUS )
 
 *  Initialise WCS data.
@@ -752,6 +1010,9 @@
                      CALL CCD1_ADFRM( IWCS, FSMAT, 'CCD_SET', 0D0,
      :                                FITRTS( I ), NCARD, IPFITS,
      :                                STATUS )
+
+*  Write the modified WCS component back to the NDF.
+                     CALL NDF_PTWCS( IWCS, INDF, STATUS )
                   END IF
 
 *  Release resources.
@@ -765,6 +1026,13 @@
                   CALL CCD1_GTWCS( INDF, IWCS, STATUS )
                   DOMAIN = AST_GETC( IWCS, 'Domain', STATUS )
                   JSET = AST_GETI( IWCS, 'Current', STATUS )
+                  CALL AST_ANNUL( IWCS, STATUS )
+
+*  Arrange to write a new CCD_SET frame as a copy of the PIXEL frame.
+               ELSE IF ( MODE .EQ. 'SPLIT' ) THEN
+                  DOMAIN = 'PIXEL'
+                  CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+                  CALL CCD1_FRDM( IWCS, 'PIXEL', JSET, STATUS )
                   CALL AST_ANNUL( IWCS, STATUS )
                END IF
 
@@ -810,6 +1078,7 @@
       CALL CCD1_GRDEL( INGRP, STATUS )
       CALL CCD1_GRDEL( LDRGRP, STATUS )
       CALL CCD1_GRDEL( NAMGRP, STATUS )
+      CALL CCD1_GRDEL( OUTGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
