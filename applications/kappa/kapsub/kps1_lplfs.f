@@ -91,6 +91,9 @@
 *        Modified DATAPLOT Frame to be a CmpFrame rather than a Frame
 *        formed using AST_PICKAXES. this means that the behaviour of
 *        SpecFrame axes is retained in the DATAPLOT Frame.
+*     25-FEB-2003 (DSB):
+*        Extended length of TEXT variable to avoid spurious errors in Y
+*        axis label.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,7 +131,7 @@
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER LAB*80           ! Label text string
-      CHARACTER TEXT*30          ! General text string
+      CHARACTER TEXT*100         ! General text string
       DOUBLE PRECISION POS( 2 )  ! Start and end of samples in GRID Frame
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
       INTEGER CFRM               ! Current Frame in supplied FrameSet
