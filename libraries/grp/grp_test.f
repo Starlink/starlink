@@ -79,8 +79,8 @@
 
 *  Obtain a list of names and put them in the group just created. Append 
 *  the letter B to them using a kernel.
-      CALL GRP_GRPEX( '{+grp_test.dat}B', GRP__NOID, IGRP, SIZE, ADDED,
-     :                FLAG, STATUS )
+      CALL GRP_GRPEX( '{+$PWD/grp_test.dat}B', GRP__NOID, IGRP, SIZE,
+     :                ADDED, FLAG, STATUS )
 
 *  Report an error if the group does not contain 4 names.
       IF( STATUS .EQ. SAI__OK .AND. SIZE .NE. 4 ) THEN

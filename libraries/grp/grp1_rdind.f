@@ -116,6 +116,7 @@
 *  Local Variables:
       CHARACTER COMC*1           ! Groups current omment character.
       CHARACTER ESCC*1           ! The escape character
+      CHARACTER FILE*(GRP__SZFNM)! A line of text read from the file
       CHARACTER FLAGC*1          ! Current flag character
       CHARACTER GEXP*(GRP__SZNAM)! A group expression read from a file
       CHARACTER KCLCC*1          ! Closing kernel delimiter character
