@@ -618,7 +618,7 @@ int StarRtdImage::loadFile()
         image_->saveParams(p);
         delete image_;
         image_ = (ImageData *) NULL;
-        updateViews(); 
+        updateViews();
     }
 
     //  Check that the image exists and parse it.
@@ -700,7 +700,7 @@ int StarRtdImage::astcelestialCmd( int argc, char *argv[] )
 //
 //   Return if coordinate system is celestial.
 //-
-int StarRtdImage::isCelestial() 
+int StarRtdImage::isCelestial()
 {
     StarWCS* wcsp = getStarWCSPtr();
     if ( wcsp ) {
@@ -730,7 +730,7 @@ int StarRtdImage::isCelestial()
 //   be FITS-WCS or DSS) and a successful FITS- WCS has not already
 //   been written.
 //
-//   The return from this function is either TCL_OK for success 
+//   The return from this function is either TCL_OK for success
 //   or TCL_ERROR for failure. Either way the return may have
 //   diagnostic messages that should be shown to the user.
 //
@@ -867,7 +867,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             } else {
 
                 //  Write succeeded using default encoding.
-                message << "WCS: saved WCS using default encoding: " 
+                message << "WCS: saved WCS using default encoding: "
                         << default_encoding << endl;
                 saved = 1;
                 if ( strcmp( "NATIVE", default_encoding ) == 0 ) {
@@ -893,9 +893,9 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 
                     if ( astOK && nextra != 0 ) {
                         saved = 1;
-                        message << "WCS: saved WCS using additional encoding: " 
+                        message << "WCS: saved WCS using additional encoding: "
                                 << argv[1] << endl;
-                    } 
+                    }
                     else {
                         message << "WCS: failed to save WCS using "
                                 << "additional encoding: " << argv[1] << endl;
@@ -933,7 +933,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                                 << "could only be saved as an AST native "
                                 << "encoding, this will limit its "
                                 << "usefulness to AST compatible programs "
-                                << "(GAIA, KAPPA, EXTRACTOR etc.)" 
+                                << "(GAIA, KAPPA, EXTRACTOR etc.)"
                                 << endl;
                         result = TCL_ERROR;
                     }
@@ -946,7 +946,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                     message << "WCS: error, failed to save your modified WCS "
                             << endl;
                     result = TCL_ERROR;
-                } 
+                }
                 else {
                     message << "WCS: your modified WCS was "
                             << "successfully saved" << endl;
@@ -2523,7 +2523,7 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
 //  StarRtdImage::astpix2curCmd
 //
 //  Purpose:
-//     Given an image X and Y position return them as formatted 
+//     Given an image X and Y position return them as formatted
 //     coordinates in the current frame.
 //
 //  Input:
@@ -2551,22 +2551,17 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
 
-    //  Convert to current coordinates. Note we get result as
-    //  degrees. Convert back to radians...
+    //  Convert to current coordinates.
     double ra;
     double dec;
     if ( image_->wcs().pix2wcs( x, y, ra, dec ) == 0 ) {
-        ra /= R2D;
-        dec /= R2D;
-        
-        //  Format the values according to the current frame.
-        StarWCS* wcsp = getStarWCSPtr();
-        AstFrameSet *wcs = wcsp->astWCSClone();
-        const char *ra_buf = astFormat( wcs, 1, ra );
-        const char *dec_buf = astFormat( wcs, 2, dec );
+
+        //  Format the values according to the current frame...
+        StarWCS *wcsp = getStarWCSPtr();
+        const char *ra_buf = wcsp->formatRAValue( ra );
+        const char *dec_buf = wcsp->formatDecValue( dec );
         Tcl_AppendElement( interp_, (char *) ra_buf );
         Tcl_AppendElement( interp_, (char *) dec_buf );
-        astAnnul( wcs );
         return TCL_OK;
     }
     else {
@@ -5122,7 +5117,7 @@ int StarRtdImage::isfitsCmd( int argc, char *argv[] )
 //
 //   Purpose:
 //      Returns whether the displayed image is a FITS file or not.
-//- 
+//-
 int StarRtdImage::isfits()
 {
     //  See what kind of image type we have.

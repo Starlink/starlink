@@ -52,6 +52,11 @@
 //     7-DEC-2000 (PWD):
 //        Added methods to return a list of domains and to set an AST
 //        attribute.
+//    18-NOV-2002 (PWD):
+//        Sorted out issues with N/E interchanged. Some distances were
+//        incorrect. Added members to format axis values according to
+//        the the RA/Dec swap.
+
 //-
 
 #include <string.h>
@@ -150,7 +155,8 @@ StarWCS::StarWCS( const char *header, const int lheader )
                         //  trivial like a formatting problem.
                         astClearStatus;
                     }
-                } else {
+                } 
+                else {
                     break;
                 }
             }
@@ -189,7 +195,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
 #if ( AST_MAJOR_VERS > 1 ) || \
     ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS == 8 && AST_RELEASE >= 7 ) || \
     ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS > 8 )
-                 
+
             //  CAR projections are sometimes incorrect and what is
             //  required in a linear transformation. Make this the
             //  default until someone complains that they want the
@@ -197,7 +203,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
             //  that time).
 	    astSet( fitschan, "CarLin=1" );
 #endif
- 
+
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
             //  convenient.
@@ -221,31 +227,11 @@ StarWCS::StarWCS( const char *header, const int lheader )
                     astClearStatus;
                     wcs_ = (AstFrameSet *) astAnnul( wcs_ );
                     print_error( "Failed to read a 2D World Coordinate System from FITS headers");
-                } else {
+                } 
+                else {
 
                     // See if WCS is a celestial system.
                     setCelestial();
-                    if ( issky_ ) {
-
-                        // Set the equinox value and string. Note this may
-                        // be reset later if any warnings about the equinox
-                        // are given.
-                        setEquinox();
-
-                        // Finally work out which axes are longitude
-                        // and which are latitude (might be a better
-                        // way to do this, note we leave at defaults
-                        // if neither is a time axis).
-                        int astime2 = astGetI( wcs_, "astime(2)" );
-                        if ( astime2 ) {
-                            raIndex_  = 2;
-                            decIndex_ = 1;
-                        }
-
-                        // Note the number of arcsecs per pixel for
-                        // later access.
-                        setSecPix();
-                    }
                 }
             }
 
@@ -294,30 +280,17 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
             wcs_ = astcopy;
             error( "Failed to read a 2D World Coordinate System from FITS headers");
             return 0;
-        } else {
-            // Set the equinox value and string.
-            setEquinox();
+        } 
+        else {
+            setCelestial();
 
             // Release the old WCS.
-            astcopy = (AstFrameSet *) astAnnul( astcopy );
-
-            // Finally work out which axes are longitude and which are
-            // latitude (might be a better way to do this, note we leave
-            // at defaults if neither is a time axis).
-            int astime2 = astGetI( wcs_, "astime(2)" );
-            if ( astime2 ) {
-                raIndex_  = 2;
-                decIndex_ = 1;
-            } else {
-                raIndex_  = 1;
-                decIndex_ = 2;
+            if ( astcopy != NULL ) {
+               astcopy = (AstFrameSet *) astAnnul( astcopy );
             }
-
-            // note the number of arcsecs per pixel for later access
-            setSecPix();
-
         }
-    } else {
+    } 
+    else {
 
         //  Not a valid FrameSet
         if ( !astOK ) astClearStatus;
@@ -353,26 +326,21 @@ void StarWCS::setSecPix()
     xin[1] = xcen + 0.5;
     yin[0] = yin[1] = ycen;
 
-    // Transform these image positions into sky coordinates.
+    // Transform these image positions into sky coordinates and get
+    // the distance between them.
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-
-    // And now get the distance between these positions in degrees.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    } else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
+
+    // Convert from Radians to arcsec.
     if ( dist == AST__BAD ) {
         xSecPix_ = 0.0;
-    } else {
+    } 
+    else {
         xSecPix_ = dist * R2D * 3600.0;
     }
 
@@ -381,26 +349,17 @@ void StarWCS::setSecPix()
     yin[0] = ycen - 0.5;
     yin[1] = ycen + 0.5;
 
-    // Transform these image positions into sky coordinates.
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-
-    // And now get the distance between these positions in degrees.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    } else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         ySecPix_ = 0.0;
-    } else {
+    } 
+    else {
         ySecPix_ = dist * R2D * 3600.0;
     }
 }
@@ -411,40 +370,39 @@ void StarWCS::setSecPix()
 void StarWCS::setEquinox()
 {
     equinoxStr_[0] = '\0';
+    if ( issky_ ) { 
+       equinox_ = astGetD( wcs_, "Equinox" );
+       const char *system = astGetC( wcs_, "System" );
+       if ( !astOK ) {
+           astClearStatus;
+       } 
+       else if ( system ) {
 
-    //  Make sure equinox has a valid value.
-    equinox_ = astGetD( wcs_, "Equinox" );
-    const char *system = astGetC( wcs_, "System" );
-    int ok = 1;
-    if ( !astOK ) {
-        astClearStatus;
-        ok = 0;
-    } else if ( system ) {
+           //  Make sure system should have an equinox associated with it.
+           if ( strncmp( "FK", system, 2 ) == 0 ||
+                strcmp( "ECLIPTIC", system ) == 0 ) {
 
-        //  Make sure system should have an equinox associated with it.
-        if ( strncmp( "FK", system, 2 ) == 0 ||
-             strcmp( "ECLIPTIC", system ) == 0 ) {
-
-            //  Get a string version of the equinox to display.
-            if ( equinox_ == 2000.0 ) {
-                strcpy( equinoxStr_, "J2000" );
-            } else if ( equinox_ == 1950.0 ) {
-                strcpy( equinoxStr_, "B1950" );
-            } else {
-                if ( ok ) {
-                    sprintf( equinoxStr_, "%g %s", equinox_, system );
-                    if ( ! astOK ) astClearStatus;
-                }
-            }
-        }
+               //  Get a string version of the equinox to display.
+               if ( equinox_ == 2000.0 ) {
+                   strcpy( equinoxStr_, "J2000" );
+               } 
+               else if ( equinox_ == 1950.0 ) {
+                   strcpy( equinoxStr_, "B1950" );
+               } 
+               else {
+                   sprintf( equinoxStr_, "%g %s", equinox_, system );
+                   if ( ! astOK ) astClearStatus;
+               }
+           }
+       }
+       
+       //  Set the number of digits for displaying coordinates. This
+       //  is done once here, rather than every time a coordinate is
+       //  requested. Note that we may extend this to guarantee the
+       //  number of steps per-pixel
+       astSet( wcs_, "digits(%d) = 8", raIndex_ );
+       astSet( wcs_, "digits(%d) = 8", decIndex_ );
     }
-
-    //  Set the number of digits for displaying coordinates. This is
-    //  done once here, rather than every time a coordinate is
-    //  requested. Note that we may extend this to guarantee the number
-    //  of steps per-pixel
-    astSet( wcs_, "digits(%d) = 8", raIndex_ );
-    astSet( wcs_, "digits(%d) = 8", decIndex_ );
 }
 
 //
@@ -490,7 +448,8 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
         if ( raIndex_ == 1 ) {
             ra = point[0];
             dec = point[1];
-        } else {
+        } 
+        else {
             dec = point[0];
             ra = point[1];
         }
@@ -501,7 +460,8 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
                 if ( rastr && decstr ) {
                     sprintf (buf, "%s %s %s", rastr, decstr, equinoxStr_);
                 }
-            } else {
+            } 
+            else {
 
                 // If hms_flag is not set then return the result in degrees.
                 sprintf (buf, "%g %g %s", ra * R2D, dec * R2D, equinoxStr_);
@@ -518,7 +478,7 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
 //  possible, and write the results to the arguments ra and dec as doubles
 //  in degrees.  If no conversion can be done, ra and dec are set to 0.0
 //  and 1 is returned, otherwise 0 is returned.
-///
+//
 int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
 {
     if ( !isWcs() ) {
@@ -541,13 +501,15 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
     if ( ! astOK ) {
         astClearStatus;
         return error("can't convert world coordinates: out of range");
-    } else {
+    } 
+    else {
 
         // Return values are in degrees and swapped if necessary.
         if ( raIndex_ == 1 ) {
             ra = point[0] * R2D;
             dec = point[1] * R2D;
-        } else {
+        } 
+        else {
             dec = point[0] * R2D;
             ra = point[1] * R2D;
         }
@@ -572,7 +534,8 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     if ( raIndex_ == 1 ) {
         oldx[0] = ra * D2R;  // Convert into radians.
         oldy[0] = dec * D2R;
-    } else {
+    } 
+    else {
         oldy[0] = ra * D2R;
         oldx[0] = dec * D2R;
     }
@@ -580,7 +543,8 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     if ( ! astOK ) {
         astClearStatus;
         return error("can't convert world coords");
-    } else {
+    } 
+    else {
         x = newx[0];
         y = newy[0];
 
@@ -635,7 +599,8 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         xin[1] = 1.0;
         yin[0] = 0.0;
         yin[1] = 0.0;
-    } else {
+    } 
+    else {
         xin[0] = 0.0;
         xin[1] = 0.0;
         yin[0] = 0.0;
@@ -654,7 +619,8 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         xin[1] = 0.0;
         yin[0] = 0.0;
         yin[1] = 1.0;
-    } else {
+    } 
+    else {
         xin[0] = 0.0;
         xin[1] = 1.0;
         yin[0] = 0.0;
@@ -690,7 +656,8 @@ double StarWCS::dist(double ra0, double dec0, double ra1, double dec1) const
     if ( raIndex_ == 1 ) {
         point1[0] = ra0 * D2R, point2[0] = ra1 * D2R;
         point1[1] = dec0 * D2R, point2[1] = dec1 * D2R;
-    } else {
+    } 
+    else {
         point1[1] = ra0 * D2R, point2[1] = ra1 * D2R;
         point1[0] = dec0 * D2R, point2[0] = dec1 * D2R;
     }
@@ -722,21 +689,13 @@ double StarWCS::width() const
     xin[1] = (double) nxpix_;
     yin[0] = yin[1] = 0.5 * (double) nypix_;
 
-    // Transform these image positions into sky coordinates.
+    // Transform these image positions into sky coordinates and get
+    // there separation in radians.
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-
-    // And now get the distance between these positions in degrees.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    } else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
@@ -748,7 +707,8 @@ double StarWCS::width() const
     //  estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = xSecPix_ * nxpix_;
-    } else {
+    } 
+    else {
         dist *= 60.0 * R2D;
     }
     return dist;
@@ -774,21 +734,13 @@ double StarWCS::height() const
     yin[0] = 1.0;
     yin[1] = (double) nypix_;
 
-    // Transform these image positions into sky coordinates.
+    // Transform these image positions into sky coordinates and get
+    // there separation in radians.
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-
-    // And now get the distance between these positions in radians.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    } else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
@@ -799,7 +751,8 @@ double StarWCS::height() const
     //  is same coordinate. If so use arcsec per pixel estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = ySecPix_ * nypix_;
-    } else {
+    } 
+    else {
         dist *= 60.0 * R2D;
     }
     return dist;
@@ -829,17 +782,10 @@ double StarWCS::radius() const
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
 
     // And now get the distance between these positions in radians.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    } else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
@@ -853,7 +799,8 @@ double StarWCS::radius() const
         dist = sqrt ( 0.25 * xSecPix_ * nxpix_ * xSecPix_ * nxpix_
                       + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
 
-    } else {
+    } 
+    else {
         dist *= 60.0 * R2D;
     }
     return dist;
@@ -946,14 +893,14 @@ int StarWCS::set( double ra, double dec,
     AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
     if ( fitsset != AST__NULL ) {
         wcs_ = fitsset;
-    } else {
+    } 
+    else {
         if ( ! astOK ) astClearStatus;
         fitschan = (AstFitsChan *) astAnnul( fitschan );
         return error("Cannot locate a valid world coordinate system");
     }
     fitschan = (AstFitsChan *) astAnnul( fitschan );
-    setEquinox();
-    setSecPix();
+    setCelestial();
     if ( ! astOK ) astClearStatus;
     return 0;
 }
@@ -1000,6 +947,12 @@ int StarWCS::astSetAttrib( const char *what, const char *value )
         astClearStatus;
         return 0;
     }
+
+    //  If this is a change of Current frame, then we need to know as
+    //  some member variables need resetting.
+    if ( strncasecmp( "current", what, 7 ) == 0 ) {
+        setCelestial();
+    }
     return 1;
 }
 
@@ -1032,14 +985,16 @@ int StarWCS::make2D()
         baseframe = (AstFrame *) astAnnul( baseframe );
         skyframe = (AstFrame *) astAnnul( skyframe );
         return 1;
-    } else if ( nbase < 2 || nsky < 2 ) {
+    } 
+    else if ( nbase < 2 || nsky < 2 ) {
 
         // Only one dimension. Cannot process this.
         baseframe = (AstFrame *) astAnnul( baseframe );
         skyframe = (AstFrame *) astAnnul( skyframe );
         error( "Input WCS has only one dimension, need 2" );
         return 0;
-    } else if ( nbase > MAXDIM || nsky > MAXDIM ) {
+    } 
+    else if ( nbase > MAXDIM || nsky > MAXDIM ) {
         baseframe = (AstFrame *) astAnnul( baseframe );
         skyframe = (AstFrame *) astAnnul( skyframe );
         error( "Input WCS has two many dimensions" );
@@ -1112,7 +1067,8 @@ int StarWCS::make2D()
         error( "Input WCS is too complex" );
         return 0;
 
-    } else if ( n < 2 ) {
+    } 
+    else if ( n < 2 ) {
         //  Something is horribly wrong here. All transformed values are
         //  0.0, this probably means we cannot easily pick a reference
         //  position to transform. Let's just try to pick out a skyframe,
@@ -1127,7 +1083,8 @@ int StarWCS::make2D()
                 out1[i][0] = 1.0;
                 out2[i][0] = 3.0;
                 if ( naxes == 2 ) break;
-            } else {
+            } 
+            else {
                 astClearStatus;
             }
         }
@@ -1146,7 +1103,8 @@ int StarWCS::make2D()
         if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
             outperm[n++] = i + 1;
             inperm[i] = i + 1;
-        } else {
+        } 
+        else {
             inperm[i] = -1;
         }
     }
@@ -1170,7 +1128,8 @@ int StarWCS::make2D()
     // indicate an error.
     if ( !astOK ) {
         return 0;
-    } else {
+    } 
+    else {
         return 1;
     }
 }
@@ -1221,13 +1180,40 @@ double StarWCS::plaindist(double x0, double y0, double x1, double y1) const
 
 //
 //  Check the WCS to see if current coordinates are a celestial
-//  coordinate system.
+//  coordinate system and configure things that are triggered by
+//  this.
 //
 void StarWCS::setCelestial()
 {
     AstFrame *frame = (AstFrame *) astGetFrame( wcs_, AST__CURRENT );
     issky_ = astIsASkyFrame( frame );
     frame = (AstFrame *) astAnnul( frame );
+    if ( issky_ ) {
+
+        // Work out which axes are longitude and which are latitude
+        // (might be a better way to do this, note we leave at
+        // defaults if neither is a time axis).
+        int astime2 = astGetI( wcs_, "astime(2)" );
+        if ( astime2 ) {
+            raIndex_ = 2;
+            decIndex_ = 1;
+        }
+        else {
+            raIndex_ = 1;
+            decIndex_ = 2;
+        }
+    }
+    else {
+        raIndex_ = 1;
+        decIndex_ = 2;
+    }
+
+    // Set the equinox value and string. Note this may be reset
+    // later if any warnings about the equinox are given.
+    setEquinox();
+
+    // Note the number of arcsecs per pixel for later access.
+    setSecPix();
 }
 
 //
@@ -1274,7 +1260,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
         //  for empty cards. We just concatenate these together.
         astClear( fitschan, "Card" );
         while ( astFindFits( fitschan, "ASTWARN", card, 1 ) ) {
-            
+
             //  See if this is a report about the equinox. If so don't
             //  show a valid one.
             equinox = strstr( card, "equinox" );
@@ -1300,9 +1286,8 @@ const char *StarWCS::getWarning()
 {
     if ( warnings_ ) {
         return warnings_;
-    } else {
-        return NULL;
-    }
+    } 
+    return NULL;
 }
 
 //
@@ -1348,4 +1333,20 @@ char *StarWCS::getDomains()
         astClearStatus;
     }
     return namelist;
+}
+
+//
+// Return a value formatted for the RA axis. Value is assumed in degrees.
+//
+const char *StarWCS::formatRAValue( double value )
+{
+    return astFormat( wcs_, raIndex_, value * D2R );
+}
+
+//
+// Return a value formatted for the DEC axis. Value is assumed in degrees.
+//
+const char *StarWCS::formatDecValue( double value )
+{
+   return astFormat( wcs_, decIndex_, value * D2R );
 }
