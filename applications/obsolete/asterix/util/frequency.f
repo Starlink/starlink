@@ -21,11 +21,11 @@
 *
 *     INP=UNIV(R)
 *           Input data object
-*     REG_SPACED=LOGICAL(R)
+*     REG=LOGICAL(R)
 *           Whether output bins are to be regularly spaced
-*     BIN_SPACING=REAL(R)
+*     SPACING=REAL(R)
 *           (Regular) spacing between output bin centres
-*     BIN_BOUNDARIES()=REAL(R)
+*     BOUNDARIES()=REAL(R)
 *           (Irregularly spaced) output bin boundaries
 *     NORMALISE=LOGICAL(R)
 *           Normalisation required (default=.true.)
@@ -231,8 +231,8 @@
       CALL MSG_PRNT( 'The data range is ^DMIN to ^DMAX' )
 
 *    Regularly spaced bins required?
-      CALL USI_GET0L( 'REG_SPACED', REG, STATUS )
-      CALL USI_CANCL( 'REG_SPACED', STATUS )
+      CALL USI_GET0L( 'REG', REG, STATUS )
+      CALL USI_CANCL( 'REG', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( REG ) THEN
@@ -241,8 +241,8 @@
         OK = .FALSE.
         DO WHILE ( (.NOT. OK) .AND. (STATUS .EQ. SAI__OK) )
 
- 10       CALL USI_GET0R( 'BIN_SPACING', SPACING, STATUS )
-          CALL USI_CANCL( 'BIN_SPACING', STATUS )
+ 10       CALL USI_GET0R( 'SPACING', SPACING, STATUS )
+          CALL USI_CANCL( 'SPACING', STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Deduce number of bins
@@ -269,8 +269,8 @@
       ELSE
 
 *      Get bin boundaries
-        CALL PRS_GETRANGES( 'BIN_BOUNDARIES', MXBIN, 1, DMIN, DMAX,
-     :                                       BOUNDS, NBIN, STATUS )
+        CALL PRS_GETRANGES( 'BOUNDARIES', MXBIN, 1, DMIN, DMAX,
+     :                                   BOUNDS, NBIN, STATUS )
 
 *      Check bounds increase monotonically
         CALL ARR_INCR( NBIN, BOUNDS, INCREASING, STATUS )
