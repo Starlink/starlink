@@ -69,7 +69,6 @@
 *    Global constants :
 	INCLUDE 'SAE_PAR'
 	INCLUDE 'ADI_PAR'
-	INCLUDE 'DAT_PAR'
 	INCLUDE 'PAR_ERR'
 	INCLUDE 'FIT_PAR'
 *    Structure definitions :
@@ -124,7 +123,7 @@
 
 *  Version :
       CHARACTER*30 		VERSION
-	PARAMETER		( VERSION = 'SSIM VERSION 1.8-3' )
+	PARAMETER		( VERSION = 'SSIM VERSION 2.0-0' )
 *-
 
 *  Version
@@ -176,15 +175,15 @@
 *  Get red-shift
       CALL SFIT_GETZ( Z, STATUS )
 
-*  Output dataset
-      CALL BDI_NEW( 'Spectrum', 1, NCHAN, 'REAL', SPID, STATUS )
-      CALL USI_CREAT( 'OUT', SPID, OFID, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
 *  Set up the only OBDAT component needed (no. of channels, taken from response)
       CALL ADI_CGET0I( INSTR.R_ID, 'NCHAN', NCHAN, STATUS )
       OBDAT.NDAT = NCHAN
       OBDAT.V_ID = ADI__NULLID
+
+*  Output dataset
+      CALL BDI_NEW( 'Spectrum', 1, NCHAN, 'REAL', SPID, STATUS )
+      CALL USI_CREAT( 'OUT', SPID, OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Set up PREDDAT (no workspace required)
       PREDDAT.CONVOLVE = .TRUE.
