@@ -460,8 +460,8 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      Find celestial coordinates
         IF ( GE_OK ) THEN
-          APOS(1) = S_CP(1,ID)
-          APOS(2) = S_CP(2,ID)
+          APOS(1) = S_CP(1,ID)/AX_TOR(1)
+          APOS(2) = S_CP(2,ID)/AX_TOR(2)
           CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
           S_RA(ID) = CELPOS(1)*MATH__DRTOD
           S_DEC(ID) = CELPOS(2)*MATH__DRTOD
