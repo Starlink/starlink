@@ -101,6 +101,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
+      CHARACTER*(DAT__SZLOC)	LLOC			! LIVE_TIME object
 
       DOUBLE PRECISION		UTC			! BASE_UTC value
 
@@ -136,6 +137,18 @@
 *  Write its member values
       IF ( MJDOK ) CALL ADI_CPUT0D( OARG, 'MJDObs', DBLE(IMJD) +
      :                              UTC/86400D0, STATUS )
+
+*  Live times
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CALL ADI1_LOCLIVE( ARGS(1), .FALSE., LLOC, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL ADI1_CCH2AT( LLOC, 'ON', OARG, 'LiveOn', STATUS )
+          CALL ADI1_CCH2AT( LLOC, 'OFF', OARG, 'LiveOff', STATUS )
+          CALL ADI1_CCH2AT( LLOC, 'DURATION', OARG, 'LiveDur', STATUS )
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI1_READ', STATUS )
