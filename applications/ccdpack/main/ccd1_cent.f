@@ -75,11 +75,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-OCT-1992 (PDRAPER):
 *        Original version.
+*     8-APR-2001 (MBT):
+*        Modified so that finding no centroids is no longer an error.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -200,13 +203,6 @@
          END IF
  1    CONTINUE
       CALL ERR_RLSE
-
-*  Check that some centroids have been found.
-      IF ( NOUT .EQ. 0 ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCD1_CENT_NONE',
-     : '  No object centroids have been located', STATUS )
-      END IF
 
  99   CONTINUE
       END
