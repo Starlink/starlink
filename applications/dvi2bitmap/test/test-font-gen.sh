@@ -45,7 +45,7 @@ fi
 
 # Force the output filename, and set what file we expect to be generated
 opfmt="--output=$opfroot-%d"
-defaultftype=`$d2bpath --query=types --process=options-only | awk '/^Qtypes/{print $2}'`
+defaultftype=`$d2bpath --query=types --process=options | awk '/^Qtypes/{print $2}'`
 opfname="$opfroot-1.$defaultftype"
 rm -f $opfname
 
