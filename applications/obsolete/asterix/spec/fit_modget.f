@@ -77,20 +77,13 @@
       CHARACTER*(DAT__SZLOC) 	MILOC     		! locator to pmodel I
       CHARACTER*(DAT__SZLOC) 	MIPLOC    		! locator to parameters of pmodel I
       CHARACTER*(DAT__SZLOC) 	MIPJLOC   		! locator to parameter J of pmodel I
-      CHARACTER*(DAT__SZLOC)	TLOC			! TIES object
-      CHARACTER*(DAT__SZLOC)	TCLOC			! Particular TIES object
       CHARACTER*(DAT__SZTYP) 	TYP	 		! object type
 
       CHARACTER*14		TYPE			! pmodel type
 
       INTEGER 			JPAR			! No. pmodel parameters
       INTEGER 			I,J
-      INTEGER			ITIE			! Loop over ties
-      INTEGER			ITPAR			! Loop over tied pars
       INTEGER			NDIM			! Dummy from DAT_SHAPE
-      INTEGER			NTIESTR			! Dimensions of TIES
-      INTEGER			NTPAR			! No. tied parameters
-      INTEGER			TPARS(NPAMAX)		! Tied parameters
 
       LOGICAL 			THERE                   ! HDS component exists?
 *-
