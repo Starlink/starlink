@@ -34,6 +34,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = @build@
 subdir = lib
 DIST_COMMON = $(dist_pkgvdata_DATA) $(dist_script_DATA) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in COPYING INSTALL \
@@ -41,13 +42,7 @@ DIST_COMMON = $(dist_pkgvdata_DATA) $(dist_script_DATA) \
 	elisp-comp install-sh mdate-sh missing mkinstalldirs \
 	py-compile texinfo.tex ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/amversion.m4 \
-	$(top_srcdir)/m4/auxdir.m4 $(top_srcdir)/m4/init.m4 \
-	$(top_srcdir)/m4/install-sh.m4 $(top_srcdir)/m4/lead-dot.m4 \
-	$(top_srcdir)/m4/missing.m4 $(top_srcdir)/m4/mkdirp.m4 \
-	$(top_srcdir)/m4/options.m4 $(top_srcdir)/m4/runlog.m4 \
-	$(top_srcdir)/m4/sanity.m4 $(top_srcdir)/m4/strip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
@@ -67,8 +62,8 @@ DATA = $(dist_pkgvdata_DATA) $(dist_script_DATA)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
-	$(STAR_EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
+	$(EXTRA_DIST) 
 REAL_INSTALL = install-recursive
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -144,7 +139,6 @@ dist_script_DATA = config.guess config.sub install-sh mdate-sh missing \
   mkinstalldirs elisp-comp ylwrap acinstall depcomp compile py-compile \
   symlink-tree
 
-STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-recursive
 
 .SUFFIXES:
@@ -432,6 +426,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f make.log
+	-rm -f configure.log
+	-rm -f starconf.status
 clean: clean-recursive
 
 clean-am: clean-generic mostlyclean-am

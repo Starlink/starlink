@@ -34,19 +34,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = @build@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/component.xml.in \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	THANKS TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/amversion.m4 \
-	$(top_srcdir)/m4/auxdir.m4 $(top_srcdir)/m4/init.m4 \
-	$(top_srcdir)/m4/install-sh.m4 $(top_srcdir)/m4/lead-dot.m4 \
-	$(top_srcdir)/m4/missing.m4 $(top_srcdir)/m4/mkdirp.m4 \
-	$(top_srcdir)/m4/options.m4 $(top_srcdir)/m4/runlog.m4 \
-	$(top_srcdir)/m4/sanity.m4 $(top_srcdir)/m4/strip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -67,8 +62,8 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
-	$(STAR_EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
+	$(EXTRA_DIST) 
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 am__remove_distdir = \
@@ -172,7 +167,6 @@ config.sub \
 symlink-tree \
 texinfo.tex
 
-STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-recursive
 
 .SUFFIXES:
@@ -354,7 +348,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/m4 $(distdir)/tests
+	$(mkdir_p) $(distdir)/. $(distdir)/tests
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -549,6 +543,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f make.log
+	-rm -f configure.log
+	-rm -f starconf.status
 clean: clean-recursive
 
 clean-am: clean-generic mostlyclean-am
