@@ -18,8 +18,13 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
+AC_PROG_FC
 AC_CHECK_FUNCS([getpwuid geteuid getlogin cuserid])
+AC_CHECK_DECLS([cuserid])
+AC_CHECK_FUNCS([setenv])
 AC_PROG_LIBTOOL
+
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae])

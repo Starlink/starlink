@@ -55,3 +55,46 @@ TEST_ROUTINES = psx_test.f \
 	test_uname.f
 
 BUILT_SOURCES = psx_err.h
+
+# Tests
+
+TESTS = psx_test test_alloc test_cuserid test_getenv test_getpid \
+	test_getuid test_putenv test_rand test_term test_time test_uname
+
+check_PROGRAMS = psx_test test_alloc test_cuserid test_getenv test_getpid \
+	test_getuid test_putenv test_rand test_term test_time test_uname
+
+psx_test_SOURCES = psx_test.f
+psx_test_LDADD = `$(srcdir)/psx_link`
+
+test_alloc_SOURCES = test_alloc.f
+test_alloc_LDADD = `$(srcdir)/psx_link`
+
+test_cuserid_SOURCES = test_cuserid.f
+test_cuserid_LDADD = `$(srcdir)/psx_link`
+
+test_getenv_SOURCES = test_getenv.f
+test_getenv_LDADD = `$(srcdir)/psx_link`
+
+test_getpid_SOURCES = test_getpid.f
+test_getpid_LDADD = `$(srcdir)/psx_link`
+
+test_getuid_SOURCES = test_getuid.f
+test_getuid_LDADD = `$(srcdir)/psx_link`
+
+test_putenv_SOURCES = test_putenv.f
+test_putenv_LDADD = `$(srcdir)/psx_link`
+
+test_rand_SOURCES = test_rand.f
+test_rand_LDADD = `$(srcdir)/psx_link`
+
+test_term_SOURCES = test_term.f
+test_term_LDADD = `$(srcdir)/psx_link`
+
+test_time_SOURCES = test_time.f
+test_time_LDADD = `$(srcdir)/psx_link`
+
+test_uname_SOURCES = test_uname.f
+test_uname_LDADD = `$(srcdir)/psx_link`
+
+
