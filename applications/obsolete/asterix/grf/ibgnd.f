@@ -1042,7 +1042,7 @@
 *  Reset transformation database
       CALL GTR_ZERO(STATUS)
 
-*  Ensure we have the correcy GCB
+*  Ensure we have the correct GCB
       CALL GCB_ATTACH( 'IMAGE', STATUS )
       CALL IMG_2DGCB( STATUS )
 
@@ -1055,6 +1055,13 @@
 *    Set colours
         CALL GFX_SETCOLS(STATUS)
 
+*    Convert to residuals?
+        IF ( RESID ) THEN
+          CALL IBGND_SURF_RESID( I_NX*I_NY, %VAL(I_BGM_SAMIDX),
+     :                           %VAL(I_DPTR), %VAL(I_BGM_DPTR),
+     :                           .TRUE., STATUS )
+        END IF
+
 *    Plot bounds
         CALL ARR_RANG1R( I_NX*I_NY, %VAL(I_BGM_DPTR), PMIN, PMAX,
      :                   STATUS )
@@ -1064,22 +1071,159 @@
         END IF
 
 *    Plot the pixels
-        CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+        IF ( RESID .AND. I_QOK .AND. I_BAD ) THEN
+          CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+     :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
+     :                     %VAL(I_BGM_DPTR), PMIN,PMAX,%VAL(I_QPTR),
+     :                    I_MASK,STATUS)
+        ELSE
+          CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
      :                     %VAL(I_BGM_DPTR), PMIN,PMAX,STATUS)
+        END IF
+
+*    Convert back from residuals?
+        IF ( RESID ) THEN
+          CALL IBGND_SURF_RESID( I_NX*I_NY, %VAL(I_BGM_SAMIDX),
+     :                           %VAL(I_DPTR), %VAL(I_BGM_DPTR),
+     :                           .FALSE., STATUS )
+        END IF
 
       ENDIF
-      CALL GCB_GETL('CONT_FLAG',OK,YES,STATUS)
-      IF (OK.AND.YES) THEN
-        CALL IMG_CONTOUR(STATUS)
-      ENDIF
 
+*  Plot axes
       CALL IMG_AXES( STATUS )
 
 *  Flag current plotting status
-      CALL GCB_SETL( 'SURF_FLAG', .FALSE., STATUS )
       I_DISP = .TRUE.
       I_DISP_1D = .FALSE.
+
+      END
+
+
+
+      SUBROUTINE IBGND_SURF_RESID( N, IDX, DATA, MODEL, FORW, STATUS )
+*+
+*  Name:
+*     IBGND_SURF_RESID
+
+*  Purpose:
+*     Calculate or uncalculate residuals
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_SURF_RESID( N, IDX, DATA, MODEL, FORW, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     RESID = LOGICAL (given)
+*        Display residuals?
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			N, IDX(*)
+      REAL			DATA(*)
+      LOGICAL			FORW
+
+*  Arguments Given and Returned:
+      REAL			MODEL(*)
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over inputs
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Forward?
+      IF ( FORW ) THEN
+        DO I = 1, N
+          IF ( IDX(I) .GE. 0 ) THEN
+            MODEL(I) = DATA(I) - MODEL(I)
+          END IF
+        END DO
+      ELSE
+        DO I = 1, N
+          IF ( IDX(I) .GE. 0 ) THEN
+            MODEL(I) = MODEL(I) - DATA(I)
+          END IF
+        END DO
+      END IF
 
       END
 
@@ -2724,7 +2868,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER MLINE
-      PARAMETER (MLINE=14)
+      PARAMETER (MLINE=15)
 *    Local variables :
       CHARACTER*79 MTEXT(MLINE)
      :/' Source commands:',' ',
@@ -2735,7 +2879,7 @@
      : '  SETSAMP - Set sampling mode (WHOLE, ANNULUS or BOX)',
      : '  SETFIT  - Method of sample interpolation',
      : ' ', ' Plotting commands:',' ',
-     : '  DISP    - Display background model image'/
+     : '  DISP    - Display background model image',
      : '  RDISP   - Display data - background model residuals'/
       INTEGER ILINE
 *-
