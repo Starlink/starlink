@@ -32,26 +32,26 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.324 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.321 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.146 sec
+    [junit] Testcase: testGetChildElementByName took 0.142 sec
     [junit] Testcase: testGetTextContent took 0.016 sec
     [junit] Testcase: testNewDocument took 0.035 sec
-    [junit] Testcase: testRelativizeDOM took 0.124 sec
+    [junit] Testcase: testRelativizeDOM took 0.123 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 3.985 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 3.845 sec
 
-    [junit] Testcase: testData took 0.888 sec
-    [junit] Testcase: testIntro took 0.581 sec
-    [junit] Testcase: testStream took 0.61 sec
-    [junit] Testcase: testHybridStream took 0.649 sec
-    [junit] Testcase: testCombo1 took 1.02 sec
-    [junit] Testcase: testResourceStream took 0.232 sec
+    [junit] Testcase: testData took 0.882 sec
+    [junit] Testcase: testIntro took 0.759 sec
+    [junit] Testcase: testStream took 0.456 sec
+    [junit] Testcase: testHybridStream took 0.594 sec
+    [junit] Testcase: testCombo1 took 0.946 sec
+    [junit] Testcase: testResourceStream took 0.204 sec
     [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.036 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.039 sec
 
-    [junit] Testcase: testDataInput took 0.019 sec
-    [junit] Testcase: testInputStream took 0.012 sec
+    [junit] Testcase: testDataInput took 0.02 sec
+    [junit] Testcase: testInputStream took 0.015 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.16 sec
 
@@ -65,13 +65,13 @@ run-tests:
 
     [junit] Testcase: testGetDOM took 0.247 sec
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.363 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.361 sec
 
-    [junit] Testcase: testFlags took 0.299 sec
+    [junit] Testcase: testFlags took 0.297 sec
     [junit] Testcase: testAssertSource took 0.02 sec
     [junit] Testcase: testValidation took 0.04 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.136 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.135 sec
 
     [junit] Testcase: testXMLEncodeAndDecode took 0.132 sec
 
@@ -223,28 +223,28 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.ast.AstTest
-    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 3.684 sec
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 4.188 sec
     [junit] ------------- Standard Output ---------------
     [junit] Headless environment - no Plot testing
     [junit] AST V2.0-9; JNIAST native V2.0-4; JNIAST java V2.0-4
     [junit] ------------- ---------------- ---------------
 
-    [junit] Testcase: testAstObject took 0.221 sec
-    [junit] Testcase: testChannel took 0.002 sec
-    [junit] Testcase: testFitsChan took 0.02 sec
-    [junit] Testcase: testFrame took 0.009 sec
-    [junit] Testcase: testFrameSet took 0.002 sec
+    [junit] Testcase: testAstObject took 0.225 sec
+    [junit] Testcase: testChannel took 0.003 sec
+    [junit] Testcase: testFitsChan took 0.019 sec
+    [junit] Testcase: testFrame took 0.517 sec
+    [junit] Testcase: testFrameSet took 0.003 sec
     [junit] Testcase: testGeometry took 0.002 sec
-    [junit] Testcase: testMapping took 0.036 sec
-    [junit] Testcase: testPlot took 3.367 sec
+    [junit] Testcase: testMapping took 0.13 sec
+    [junit] Testcase: testPlot took 3.231 sec
     [junit] Testcase: testAstConstants took 0.009 sec
     [junit] Testcase: testSpecMap took 0.002 sec
     [junit] Testcase: testSpecFrame took 0.003 sec
-    [junit] Testcase: testException took 0.001 sec
+    [junit] Testcase: testException took 0 sec
     [junit] Testsuite: uk.ac.starlink.ast.xml.XAstTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.26 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.251 sec
 
-    [junit] Testcase: testReadWriteElement took 0.186 sec
+    [junit] Testcase: testReadWriteElement took 0.187 sec
     [junit] Testcase: testReadWriteSource took 0.034 sec
     [junit] Testcase: testExceptions took 0.017 sec
     [junit] Testcase: testDefault took 0.009 sec
@@ -286,16 +286,16 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.hds.HDSObjectTest
-    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.209 sec
+    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.235 sec
 
-    [junit] Testcase: testConstants took 0.074 sec
+    [junit] Testcase: testConstants took 0.093 sec
     [junit] Testcase: testFileOperations took 0.009 sec
     [junit] Testcase: testObject took 0 sec
-    [junit] Testcase: testProperties took 0.015 sec
+    [junit] Testcase: testProperties took 0.022 sec
     [junit] Testcase: testGet took 0.017 sec
     [junit] Testcase: testPut took 0.07 sec
     [junit] Testcase: testWrite took 0.001 sec
-    [junit] Testcase: testMap took 0.019 sec
+    [junit] Testcase: testMap took 0.02 sec
 
 test:
      [echo] Executing HDX target: test
@@ -312,14 +312,14 @@ compile-tests:
 
 run-tests:
     [junit] Running uk.ac.starlink.hdx.HdxTest
-    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.762 sec
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.688 sec
     [junit] Testsuite: uk.ac.starlink.hdx.HdxTest
-    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.762 sec
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.688 sec
 
     [junit] Running uk.ac.starlink.hdx.ResourceTypeTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.443 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.442 sec
     [junit] Testsuite: uk.ac.starlink.hdx.ResourceTypeTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.443 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.442 sec
 
 
 test:
@@ -349,32 +349,32 @@ run-tests:
     [junit] Testsuite: uk.ac.starlink.array.ArrayImplTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.138 sec
 
-    [junit] Testcase: testDeterministic took 0.098 sec
-    [junit] Testcase: testNio took 0.039 sec
+    [junit] Testcase: testDeterministic took 0.097 sec
+    [junit] Testcase: testNio took 0.04 sec
     [junit] Testsuite: uk.ac.starlink.array.BadHandlerTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.027 sec
 
     [junit] Testcase: testBadHandler took 0.022 sec
     [junit] Testcase: testNullBadHandler took 0.005 sec
     [junit] Testsuite: uk.ac.starlink.array.ChunkStepperTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.022 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.021 sec
 
-    [junit] Testcase: testValidateArguments took 0.001 sec
+    [junit] Testcase: testValidateArguments took 0.002 sec
     [junit] Testcase: testIteration took 0.019 sec
     [junit] Testsuite: uk.ac.starlink.array.CombineArrayImplTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.123 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.124 sec
 
     [junit] Testcase: testCombine took 0.123 sec
     [junit] Testsuite: uk.ac.starlink.array.NDArrayTest
-    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 2.146 sec
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 2.142 sec
 
-    [junit] Testcase: testTiles took 0.239 sec
+    [junit] Testcase: testTiles took 0.238 sec
     [junit] Testcase: testDummy took 0.042 sec
     [junit] Testcase: testMoulded took 0.206 sec
     [junit] Testcase: testWindow took 0.098 sec
-    [junit] Testcase: testOffset took 0.034 sec
-    [junit] Testcase: testToRequired took 1.331 sec
-    [junit] Testcase: testNDArrays took 0.195 sec
+    [junit] Testcase: testOffset took 0.033 sec
+    [junit] Testcase: testToRequired took 1.332 sec
+    [junit] Testcase: testNDArrays took 0.192 sec
     [junit] Testsuite: uk.ac.starlink.array.OrderTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.002 sec
 
@@ -383,13 +383,13 @@ run-tests:
     [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.022 sec
 
     [junit] Testcase: testBlank took 0.003 sec
-    [junit] Testcase: testSettings took 0.018 sec
+    [junit] Testcase: testSettings took 0.017 sec
     [junit] Testcase: testBad took 0 sec
     [junit] Testcase: testExceptions took 0.001 sec
     [junit] Testsuite: uk.ac.starlink.array.ShapeTest
     [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 0.045 sec
 
-    [junit] Testcase: testNDShapeObject took 0.004 sec
+    [junit] Testcase: testNDShapeObject took 0.003 sec
     [junit] Testcase: testOrderedNDShapeObject took 0.003 sec
     [junit] Testcase: testOrigins took 0 sec
     [junit] Testcase: testNDShapeFunctions took 0.001 sec
@@ -399,7 +399,7 @@ run-tests:
     [junit] Testcase: testNDShapeExceptions took 0 sec
     [junit] Testcase: testOrderedNDShapeExceptions took 0.001 sec
     [junit] Testsuite: uk.ac.starlink.array.TypeConverterTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.152 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.151 sec
 
     [junit] Testcase: testConversionSame took 0.092 sec
     [junit] Testcase: testConversionDown took 0.041 sec
@@ -408,12 +408,12 @@ run-tests:
     [junit] Testsuite: uk.ac.starlink.array.TypeTest
     [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.017 sec
 
-    [junit] Testcase: testBad took 0.014 sec
-    [junit] Testcase: testTypeSet took 0 sec
-    [junit] Testcase: testCheckArray took 0.001 sec
+    [junit] Testcase: testBad took 0.015 sec
+    [junit] Testcase: testTypeSet took 0.001 sec
+    [junit] Testcase: testCheckArray took 0 sec
     [junit] Testcase: testNewArray took 0 sec
     [junit] Testcase: testCharacteristics took 0 sec
-    [junit] Testcase: testMinMax took 0.001 sec
+    [junit] Testcase: testMinMax took 0 sec
     [junit] Testcase: testGetType took 0 sec
 
 test:
@@ -433,19 +433,19 @@ compile-tests:
 
 run-tests:
     [junit] Running uk.ac.starlink.ndx.NdxTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.511 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.465 sec
     [junit] Testsuite: uk.ac.starlink.ndx.NdxTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.511 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.465 sec
 
-    [junit] Testcase: testNdx took 1.225 sec
-    [junit] Testcase: testNdxs took 0.284 sec
+    [junit] Testcase: testNdx took 1.214 sec
+    [junit] Testcase: testNdxs took 0.249 sec
     [junit] Running uk.ac.starlink.ndx.XmlNdxTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.675 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.667 sec
     [junit] Testsuite: uk.ac.starlink.ndx.XmlNdxTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.675 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.667 sec
 
-    [junit] Testcase: testNoNS took 0.589 sec
-    [junit] Testcase: testMultiNS took 0.083 sec
+    [junit] Testcase: testNoNS took 0.581 sec
+    [junit] Testcase: testMultiNS took 0.082 sec
 
 test:
      [echo] Executing Table target: test
@@ -462,13 +462,13 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.table.FormatsTest
-    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 4.46 sec
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 4.563 sec
 
     [junit] Testsuite: uk.ac.starlink.table.TableTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.024 sec
 
     [junit] Testsuite: uk.ac.starlink.table.gui.StarTableNodeChooserTest
-    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 3.253 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 3.244 sec
 
     [junit] Testcase: testChooserAvailability(uk.ac.starlink.table.gui.StarTableNodeChooserTest):	Caused an ERROR
     [junit] Can't connect to X11 window server using 'rlspc10:0.0' as the value of the DISPLAY variable.
