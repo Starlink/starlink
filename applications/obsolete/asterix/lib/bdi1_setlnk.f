@@ -72,8 +72,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     11 Dec 1995 (DJA):
+*        Can now derive dimensions from axes alone.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,6 +106,7 @@
       CHARACTER*(DAT__SZLOC)	AXDLOC			! AXIS data array
       CHARACTER*(DAT__SZLOC)	AXLOC			! AXIS structure array
       CHARACTER*(DAT__SZLOC)	LOC			! Locator to file
+      CHARACTER*(DAT__SZNAM)	NAME			! Object name
       CHARACTER*(DAT__SZTYP)	TYP			! Top level type
 
       INTEGER			DIMS(DAT__MXDIM)	! Dimensions
@@ -177,10 +180,18 @@
 *      Store the type as the dataset type
           CALL ADI_CPUT0C( MDID, 'DatasetType', TYP, STATUS )
 
-*      The best chance is the primary data array
-          CALL BDI1_CFIND( MDID, ARGS(2), 'Data', .FALSE.,
-     :                     ALOC, NDIM, DIMS, STATUS )
-          IF ( STATUS .NE. SAI__OK ) THEN
+*      Get the object name
+          CALL DAT_NAME( LOC, NAME, STATUS )
+
+*      The best chance is the primary data array, except for spatial
+*      response structures where this gives the wrong answer
+          IF ( NAME .NE. 'SPATIAL_RESP' ) THEN
+            CALL BDI1_CFIND( MDID, ARGS(2), 'Data', .FALSE.,
+     :                            ALOC, NDIM, DIMS, STATUS )
+          END IF
+
+          IF ( (NAME .EQ. 'SPATIAL_RESP') .OR.
+     :         (STATUS .NE. SAI__OK) ) THEN
 
 *        New error context to protect axis code below
             CALL ERR_BEGIN( STATUS )
@@ -189,12 +200,14 @@
             GOTAX = .FALSE.
             CALL DAT_THERE( LOC, 'AXIS', THERE, STATUS )
             IF ( THERE ) THEN
+
               CALL DAT_FIND( LOC, 'AXIS', AXLOC, STATUS )
               CALL DAT_SHAPE( AXLOC, 1, NDIM, IDUM, STATUS )
               DO I = 1, NDIM
                 CALL DAT_CELL( AXLOC, 1, I, AXCLOC, STATUS )
                 CALL DAT_FIND( AXCLOC, 'DATA_ARRAY', AXDLOC, STATUS )
-                CALL ADI1_ARYSHP( AXDLOC, 1, DIMS(I), IDUM, TYP, STATUS )
+                CALL ADI1_ARYSHP( AXDLOC, 1, DIMS(I), IDUM, TYP,
+     :                            STATUS )
                 CALL DAT_ANNUL( AXDLOC, STATUS )
                 CALL DAT_ANNUL( AXCLOC, STATUS )
               END DO
@@ -211,7 +224,7 @@
             CALL ERR_END( STATUS )
 
 *        Report or annul original error
-            IF ( GOTAX ) THEN
+            IF ( GOTAX .AND. (STATUS.NE.SAI__OK) ) THEN
               CALL ERR_ANNUL( STATUS )
             ELSE
               CALL ERR_REP( 'BDI1_SETLNK', 'Unable to find primary '/
@@ -229,7 +242,8 @@
           IF ( .NOT. GOTAX ) THEN
 
 *        Get dimensions and type from this object
-            CALL ADI1_ARYSHP( ALOC, DAT__MXDIM, DIMS, NDIM, TYP, STATUS )
+            CALL ADI1_ARYSHP( ALOC, DAT__MXDIM, DIMS, NDIM, TYP,
+     :                        STATUS )
 
 *        Free the object
             CALL DAT_ANNUL( ALOC, STATUS )
