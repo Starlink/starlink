@@ -125,7 +125,7 @@
       CALL SSO_INIT( STATUS )
 
 *    Associate input dataset
-      CALL USI_ASSOCI( 'INPUT', 'UPDATE', ILOC, INPRIM, STATUS )
+      CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *    Check input ok
