@@ -621,6 +621,7 @@ libextractor.a libfits.a: extractor_source.tar
 	- mkdir extract
 	(cd extract ;\
 	export INSTALL; unset INSTALL;\
+	export SHELL; unset SHELL;\
 	export LINK; unset LINK; \
 	$(TAR_OUT) ../extractor_source.tar ;\
 	./configure ;\
@@ -649,6 +650,7 @@ $(NATIVE_BINARY): sextractor_source.tar
 	- mkdir sextractor
 	(cd sextractor ;\
 	export INSTALL; unset INSTALL;\
+	export SHELL; unset SHELL;\
 	export LINK; unset LINK; \
 	$(TAR_OUT) ../sextractor_source.tar ;\
 	./configure ;\
