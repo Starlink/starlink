@@ -227,6 +227,10 @@ PipeStream::~PipeStream()
  */
 void PipeStream::close(void)
 {
+    InputByteStream::close();
+
+    if (getVerbosity() > normal)
+        cerr << "PipeStream::close" << endl;
     if (pid_ > 0) {
 	errno = 0;
 	if (kill(pid_, SIGHUP)) {
@@ -277,7 +281,6 @@ void PipeStream::close(void)
 	}
 	pid_ = 0;
     }
-    InputByteStream::close();
 }
 
 /**
@@ -321,6 +324,9 @@ int PipeStream::getStatus(void)
     throw (InputByteStreamError)
 {
     SSTREAM resp;
+    if (getVerbosity() > normal)
+        cerr << "PipeStream::getResult(" << (allOfFile?"true":"false")
+             << ',' << (gobbleRest?"true":"false") << ")" << endl;
     if (allOfFile) {
 	for (Byte b=getByte(); !eof(); b=getByte())
 	    resp << b;
@@ -331,6 +337,9 @@ int PipeStream::getStatus(void)
 	    while (!eof())
 		getByte();
     }
+    if (getVerbosity() > normal)
+        cerr << "PipeStream::getResult... got <" << SS_STRING(resp)
+             << ">" << endl;
 
     string response;
     int status = getStatus();
