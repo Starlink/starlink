@@ -631,7 +631,7 @@ sub creobj {
     return $status;
   }
 
-  print "# -> creobj: $object\n";
+  print "# -> creobj: $object\n" if $DEBUG;
 
   # The dims array must be turned into an array
   # We use a separate ndims variable to indicate scalars
