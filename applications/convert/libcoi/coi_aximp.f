@@ -128,7 +128,7 @@
 
 *  Find the Wavelength dimension for Equispec format.
 *  ==================================================
-      IF ( SYSTEM .EQ. 'EQUISPEC' ) THEN
+      IF ( SYSTEM( 1:8 ) .EQ. 'EQUISPEC' ) THEN
 
 *  Get a WCSDIM value.
          CALL IMGKWI( IMDESC, 'WAT0_001', WCSDIM, ERR )
@@ -138,15 +138,16 @@
 
 *  Deal with linear axes.
 *  ======================
-      IF ( SYSTEM .EQ. 'WORLD' .OR. SYSTEM .EQ. 'LINEAR' .OR.
-     :     SYSTEM .EQ. 'EQUISPEC' ) THEN
+      IF ( SYSTEM( 1:6 ) .EQ. 'WORLD' .OR.
+     :     SYSTEM( 1:6 ) .EQ. 'LINEAR' .OR.
+     :     SYSTEM( 1:8 ) .EQ. 'EQUISPEC' ) THEN
 
 *  Use default start and reference values for equispec system, if the
 *  CRVALn, CRPIXn, CDELTn/CDn_n keywords are not present in the headers.
          CALL COI_LINAX( IMDESC, NDF, SYSTEM .EQ. 'EQUISPEC', BUFFER,
      :                   STATUS )
 
-      ELSE IF ( SYSTEM .EQ. 'MULTISPEC' ) THEN
+      ELSE IF ( SYSTEM( 1:9 ) .EQ. 'MULTISPEC' ) THEN
          CALL COI_MULAX( IMDESC, NDF, BUFFER, VALUE, STATUS )
 
       END IF
