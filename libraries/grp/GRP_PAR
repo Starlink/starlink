@@ -1,0 +1,62 @@
+*+
+*  Name:
+*     GRP_PAR
+
+*  Purpose:
+*     Define public global constants for the GRP_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     by the GRP_ system and which may also be needed by software which
+*     calls routines from this system.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1992 (DSB):
+*        Original version
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+
+
+
+*  General
+*  =======
+
+*  An illegal GRP_ identifier value. This value can sometimes be
+*  specified by an application in place of a GRP_ identifier in order
+*  to supress some operation.
+      INTEGER GRP__NOID
+      PARAMETER ( GRP__NOID = 0 )
+
+*  String lengths.
+*  ==============
+
+*  Maximum length of a group expression.
+      INTEGER GRP__SZGEX
+      PARAMETER ( GRP__SZGEX = 255 )
+
+*  Length of a name within a group.
+      INTEGER GRP__SZNAM
+      PARAMETER ( GRP__SZNAM = 255 )
+
+*  Max. length of a group type
+      INTEGER GRP__SZTYP
+      PARAMETER ( GRP__SZTYP = 80 )
+
+*  Max. length of a file name.
+      INTEGER GRP__SZFNM
+      PARAMETER ( GRP__SZFNM = 256 )
+
+*.

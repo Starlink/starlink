@@ -1,0 +1,165 @@
+*+
+*  Name:
+*     GRP_CONST
+
+*  Purpose:
+*     Define private (internal) constants for the GRP_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     internally by the GRP_ system but which are not needed by software
+*     which calls GRP_ routines.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1992 (DSB):
+*        Original version
+*     13-JAN-1994 (DSB):
+*        GRP__POPKC and GRP__PCLKC added
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+
+
+
+*  GENERAL
+*  =======
+
+*  The GRP facility error number.
+      INTEGER GRP__FAC
+      PARAMETER ( GRP__FAC = 1516 )
+
+*  The number of cells by which NAMES arrays are extended, when the
+*  current array size is exhausted.
+      INTEGER GRP__INCN
+      PARAMETER ( GRP__INCN = 5 )
+
+*  The initial size of each NAMES array.
+      INTEGER GRP__INITN
+      PARAMETER ( GRP__INITN = 20 )
+
+*  The maximum allowed depth of indirection.
+      INTEGER GRP__MAXDI
+      PARAMETER ( GRP__MAXDI = 7 )
+
+*  The size of the common arrays. This is the limit on the number of
+*  groups which can be used by an application at once.
+      INTEGER GRP__MAXG
+      PARAMETER ( GRP__MAXG = 100 )
+
+*  Upper limit on fortran logical unit numbers.
+      INTEGER GRP__MAXUN
+      PARAMETER ( GRP__MAXUN = 99 )
+
+*  Lower limit on fortran logical unit numbers. This excludes the lower
+*  unit numbers which are sometimes grabbed by applications without
+*  first checking that they are not already used.
+      INTEGER GRP__MINUN
+      PARAMETER ( GRP__MINUN = 20 )
+
+*  A value used to indicate an invalid Fortran logical unit number.
+      INTEGER GRP__INVUN
+      PARAMETER ( GRP__INVUN = -1 )
+
+*  Lengths of data types
+*  =====================
+
+*  No. of bytes per INTEGER
+      INTEGER GRP__NBI
+      PARAMETER ( GRP__NBI = 4 )
+
+*  No. of bytes per CHARACTER*1
+      INTEGER GRP__NBC
+      PARAMETER ( GRP__NBC = 1 )
+
+
+*  GRP_ "control" characters.
+*  =========================
+*  The names given to the control characters are stored in the common
+*  array CMN_CCNAM.
+
+*  The number of control characters.
+      INTEGER GRP__NCHAR
+      PARAMETER ( GRP__NCHAR = 11 )
+
+*  Default control characters.
+      CHARACTER GRP__DEFCC*(GRP__NCHAR)
+      PARAMETER ( GRP__DEFCC = '^#,*|()-%{}' )
+
+*  Position (within GRP__DEFCC) of the character used to indicate
+*  indirection through a text file.
+      INTEGER GRP__PINDC
+      PARAMETER ( GRP__PINDC = 1 )
+
+*  Position (within GRP__DEFCC) of the character used to indicate
+*  a comment.
+      INTEGER GRP__PCOMC
+      PARAMETER ( GRP__PCOMC = 2 )
+
+*  Position (within GRP__DEFCC) of the character used to delimit
+*  elements in a group expression.
+      INTEGER GRP__PDELC
+      PARAMETER ( GRP__PDELC = 3 )
+
+*  Position (within GRP__DEFCC) of the character used as a token for
+*  the input name in a modification element.
+      INTEGER GRP__PMNMC
+      PARAMETER ( GRP__PMNMC = 4 )
+
+*  Position (within GRP__DEFCC) of the character used to separate old
+*  and new strings in a modification element.
+      INTEGER GRP__PMSPC
+      PARAMETER ( GRP__PMSPC = 5 )
+
+*  Position (within GRP__DEFCC) of the character used to indicate
+*  opening of a nesting level within a group expression. Element
+*  delimiters are ignored if they occur within matching opening and
+*  closing nesting characters.
+      INTEGER GRP__POPNC
+      PARAMETER ( GRP__POPNC = 6 )
+
+*  Position (within GRP__DEFCC) of the character used to indicate
+*  closing of a nesting level within a group expression. Element
+*  delimiters are ignored if they occur within matching opening and
+*  closing nesting characters.
+      INTEGER GRP__PCLNC
+      PARAMETER ( GRP__PCLNC = 7 )
+
+*  Position (within GRP__DEFCC) of the character used to "flag" a group
+*  expression. The group expression is "flagged" if the final character
+*  in the expression equals the flag character.
+      INTEGER GRP__PFLGC
+      PARAMETER ( GRP__PFLGC = 8 )
+
+*  Position (within GRP__DEFCC) of the NULL character. If any of the
+*  other control characters are set to the current value of the NULL
+*  control character, then those control characters are ignored.
+      INTEGER GRP__PNULC
+      PARAMETER ( GRP__PNULC = 9 )
+
+*  Position (within GRP__DEFCC) of the character used to open a new
+*  kernel within a group expression or element.
+      INTEGER GRP__POPKC
+      PARAMETER ( GRP__POPKC = 10 )
+
+*  Position (within GRP__DEFCC) of the character used to close a
+*  kernel within a group expression or element.
+      INTEGER GRP__PCLKC
+      PARAMETER ( GRP__PCLKC = 11 )
+
+*  Max. length of a control character name.
+      INTEGER GRP__SZWRD
+      PARAMETER ( GRP__SZWRD = 12 )
+
+*.

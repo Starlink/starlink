@@ -1,0 +1,158 @@
+*+
+*  Name:
+*     GRP_COM
+
+*  Purpose:
+*     Define GRP_ common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which describe the state of
+*     GRP, and properties of each group known to GRP. Information
+*     describing each group is stored in arrays in common. The same
+*     element from different arrays holds information for the same
+*     group. Different elements within each array hold information for
+*     different groups. The arrays have a lower bound of 1 and an upper
+*     bound given by symbolic constant GRP__MAXG.
+*
+*     Note, the names which actually form the group are not stored in
+*     common, but are stored in an array in temporary work space (see
+*     routine GRP1_GTSLT).
+
+*  Prior Requirements:
+*     The SAE_PAR and GRP_PAR include files should be included before
+*     this file, in order to define constants used here.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1992 (DSB):
+*        Original version
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Case sensitivity.
+*  ================
+*  If true, then case is insignificant within the group (all strings
+*  are converted to upper case before being used). If false, case is
+*  significant and all strings are used just as given.
+      LOGICAL CMN_UPPER( GRP__MAXG )
+
+*  Group size.
+*  ==========
+*  The number of names stored in each group. This is generally smaller
+*  than the size of the arrays used to hold the group contents.
+      INTEGER CMN_GSIZE( GRP__MAXG )
+
+*  Pointers to mapped arrays holding group contents.
+*  ===============================================
+*  The 6 array components of each GROUP structure are kept permanently
+*  mapped (until the group is annulled).
+      INTEGER CMN_NMPNT( GRP__MAXG )
+      INTEGER CMN_MGPNT( GRP__MAXG )
+      INTEGER CMN_MIPNT( GRP__MAXG )
+      INTEGER CMN_LVPNT( GRP__MAXG )
+      INTEGER CMN_INPNT( GRP__MAXG )
+      INTEGER CMN_FLPNT( GRP__MAXG )
+
+*  The number of indirection files current used.
+*  ============================================
+*  A seperate list of the indirection files used to specify the contents
+*  of each group is maintained. These are stored in the arrays pointed
+*  to by CMN_FLPNT. The size of these arrays are stored in CMN_FLPNT.
+      INTEGER CMN_FLSIZ( GRP__MAXG )
+
+*  Group types.
+*  ============
+*  A string describing the type of each group.
+      CHARACTER CMN_TYPE( GRP__MAXG )*( GRP__SZTYP )
+
+*  Group owners and slaves.
+*  ========================
+*  Each group may be "owned" by another group. This association between
+*  groups can be used for whatever purpose the calling application
+*  wishes. For each group, CMN_OWNER contains the GRP identifier of
+*  the group which owns that group. If a group has no owner (the default
+*  case), then the value GRP__NOID is stored.
+      INTEGER CMN_OWNER( GRP__MAXG )
+
+*  For each group, CMN_SLAVE contains the GRP identifier of the group
+*  that group owns (i.e. its slave group). If a group has no slave (the
+*  default case), then the value GRP__NOID is stored.
+      INTEGER CMN_SLAVE( GRP__MAXG )
+
+*  Group control characters.
+*  ========================
+*  The control characters used to define the syntax of group
+*  expressions. A set of characters stored in a single string for
+*  each group. The order is defined by global constants GRP__PINDC,
+*  GRP__PDELC, GRP__PCOMC, etc (see GRP_PAR).
+      CHARACTER*(GRP__NCHAR) CMN_CHARS( GRP__MAXG )
+
+*  Each control character has an associated name by which the user can
+*  identify it. These are stored in CMN_CCNAM in the same order as the
+*  characters in CMN_CHARS
+      CHARACTER*(GRP__SZWRD) CMN_CCNAM( GRP__NCHAR )
+
+*  Size of the arrays used to hold the group contents.
+*  ==================================================
+*  This array holds the upper bound of the array components of each
+*  GROUP structure (the lower bound is always 1). It is updated when
+*  the arrays are extended to make room for more names.
+      INTEGER CMN_SIZE( GRP__MAXG )
+
+*  Which slots have been used.
+*  ==========================
+*  Each element of this array is .TRUE. if the corresponding element of
+*  the other arrays holds information describing a currently defined
+*  group. Further information described the group (including the names
+*  which form the group) is stored in arrays in temporary workspace.
+      LOGICAL CMN_USED( GRP__MAXG )
+
+*  Record of identifiers issued.
+*  ============================
+*  The value of CMN_IDCNT is initialised by the GRP1_INIT block data
+*  routine and is incremented each time a group identifier is issued.
+*  The next identifier value is generated using the new value of
+*  CMN_IDCNT and this ensures that identifier values are not re-used.
+*  When an identifier is issued for a slot, its value is stored in the
+*  CMN_CHK entry and an identifier is only considered valid if it
+*  matches the CMN_CHK entry in the slot to which it refers. This
+*  allows identifiers to be rendered invalid either by the user (by
+*  assigning the GRP__NOID value to them), or by the GRP_ system (by
+*  marking the slot as not used, or by re-using it with a new
+*  identifier value).
+      INTEGER CMN_CHK( GRP__MAXG )
+      INTEGER CMN_IDCNT
+
+*  Context in which each identifier was issued.
+*  ============================================
+*  Identifier context for each common slot and "current" context level.
+*  NOTE, at the moment these are not used for anything.
+      INTEGER CMN_CTX( GRP__MAXG )
+      INTEGER CMN_IDCTX
+
+*  Declare the common block /GRP_C1/, to hold non-character variables.
+      COMMON /GRP_C1/ CMN_GSIZE, CMN_NMPNT, CMN_MGPNT, CMN_MIPNT,
+     :                  CMN_LVPNT, CMN_FLPNT, CMN_SIZE, CMN_USED,
+     :                  CMN_OWNER, CMN_UPPER, CMN_CHK, CMN_IDCNT,
+     :                  CMN_CTX, CMN_IDCTX, CMN_INPNT, CMN_FLSIZ,
+     :                  CMN_SLAVE
+
+*  Declare the common block /GRP_C2/, to hold character variables.
+      COMMON /GRP_C2/ CMN_TYPE, CMN_CHARS, CMN_CCNAM
+
+*  Ensure that common blocks are saved.
+      SAVE /GRP_C1/, /GRP_C2/
+
+*.
