@@ -250,6 +250,17 @@
 #        Version 6.7-10
 #      8-MAR-2002 (AJC):
 #        Version 6.7-11
+#     30-OCT-2002 (AJC):
+#        Version 6.7-12
+#     26-NOV-2002 (AJC):
+#        Version 6.7-13
+#     15-APR-2003 (AJC):
+#        Added SET-DATA-DIRECTORY
+#        Version 6.8
+#      9-MAY-2003 (AJC):
+#        Added SWITCH-DATE (still v6.8)
+#     11-JUN-2003 (AJC):
+#        Version 6.8-1
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -442,7 +453,7 @@ PKG_LINK = SPECX
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 6.7-12
+PKG_VERS = 6.8-3
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -594,7 +605,8 @@ PI_SUB18 =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = DAT_PAR DAT_ERR SAE_PAR PRM_PAR NDF_PAR NDF_ERR f77.h
+EXTERNAL_INCLUDES = DAT_PAR DAT_ERR SAE_PAR PRM_PAR PSX_ERR NDF_PAR NDF_ERR \
+             f77.h
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -617,8 +629,8 @@ F_SUB2 = \
    calc_image.f close_fits.f fitsmap.f \
    open_fits.f wrfitsmap.f wrfitsspec.f wrfitscube.f\
    rdfitsspec.f bad2blank.f \
-   index_gsd.f read_gsd.f rd_gsd_ras.f sgsdreopen.f\
-   sgsdclose.f sgsdlist.f sgsdlocate.f sgsdopen.f sgsdv4data.f \
+   set_datadir.f switch_date.f index_gsd.f read_gsd.f rd_gsd_ras.f \
+   sgsdreopen.f sgsdclose.f sgsdlist.f sgsdlocate.f sgsdopen.f sgsdv4data.f \
    sgsdv4header.f sgsdv51data.f sgsdv52data.f sgsdv5data.f sgsdv5header.f \
    write_gildas.f
 
@@ -1029,8 +1041,12 @@ L_SUB20 = GSD_VAR
 $(PKG_LINK)_ERR:   $(PKG_NAME)_err;               $(LINK) $? $@
 $(PKG_LINK)_PAR:   $(PKG_NAME)_par;               $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
+DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
 NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
+PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
+PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@ 
+SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 f77.h:     $(STAR_INC)/f77.h;     $(LINK) $? $@
 
 #  Links for include files in specx_inc.tar
@@ -1070,10 +1086,6 @@ GSD_INDEX.INC:     gsd_index.inc;         $(LINK) $? $@
 GSD_VAR.INC:       gsd_var.inc;           $(LINK) $? $@
 
 #  Links for include files in specx_fv4.tar
-
-SAE_PAR:           $(STAR_INC)/sae_par;   $(LINK) $? $@
-DAT_ERR:           $(STAR_INC)/dat_err;   $(LINK) $? $@
-PRM_PAR:           $(STAR_INC)/prm_par;   $(LINK) $? $@
 
 #  Links for include files in specx_gen.tar
 
@@ -1945,7 +1957,7 @@ do_deinstall:
 	- for f in $(FIGURES) ""; do \
            if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
               chmod 644 $$f; rm -f $$f;\
-              chmod 744 $(INSTALL_DOCS)/$$f;\
+              chmod 755 $(INSTALL_DOCS)/$$f;\
               ( cd $(INSTALL_DOCS) ; $(TAR_IN) - $$f ) | $(TAR_OUT) -  ;\
               rm -rf $(INSTALL_DOCS)/$$f;\
            else :; fi;\
@@ -2334,8 +2346,8 @@ $(PKG_NAME)_util.tarf: $(F_SUB18) $(I_SUB18) $(B_SUB18) $(C_SUB18) \
            $(PF_SUB18:.f=.f_ix86_Linux)
 	$(TAR_IN) $(PKG_NAME)_util.tar $(F_SUB18) $(I_SUB18) \
            $(B_SUB18) $(C_SUB18) \
-           $(PF_SUB18:.f=.f_alpha_OSF1) $(PF_SUB18:.f=.f_sun4_Solaris \
-           $(PF_SUB18:.f=.f_ix86_Linux
+           $(PF_SUB18:.f=.f_alpha_OSF1) $(PF_SUB18:.f=.f_sun4_Solaris) \
+           $(PF_SUB18:.f=.f_ix86_Linux)
 
 $(PKG_NAME)_vms.tarf: $(F_SUB19) $(I_SUB19) $(B_SUB19) $(C_SUB19) \
            $(PF_SUB19:.f=.f_alpha_OSF1) $(PF_SUB19:.f=.f_sun4_Solaris) \
@@ -2398,6 +2410,7 @@ open_fits.o: SPECX_FITS
 rd_gsd_ras.o: FLAGCOMM GSD_FILE.INC GSD_VAR.INC STACKCOMM STAKPAR
 rdfitsspec.o: FLAGCOMM SPECX_FITS STACKCOMM STAKPAR
 read_gsd.o: FLAGCOMM GSD_FILE.INC GSD_VAR.INC STACKCOMM STAKPAR
+set_datadir.o: PSX_ERR SAE_PAR
 sgsdclose.o: GSD_FILE.INC
 sgsdlist.o: FLAGCOMM GSD_VAR.INC
 sgsdlocate.o: GSD_VAR.INC SPECX_PARS STACKCOMM STAKPAR
@@ -2409,6 +2422,7 @@ sgsdv51data.o: FLAGCOMM GSD_FILE.INC GSD_INDEX.INC GSD_VAR.INC SPECX_PARS STACKC
 sgsdv52data.o: FLAGCOMM GSD_FILE.INC GSD_INDEX.INC GSD_VAR.INC SPECX_PARS STACKCOMM STAKPAR
 sgsdv5data.o: FLAGCOMM GSD_FILE.INC GSD_INDEX.INC GSD_VAR.INC SPECX_PARS STACKCOMM STAKPAR
 sgsdv5header.o: FLAGCOMM GSD_FILE.INC GSD_INDEX.INC GSD_VAR.INC STACKCOMM
+switch_date.o: PSX_ERR SAE_PAR FLAGCOMM
 wrfitscube.o: CUBE DOPPLER FLAGCOMM MAPHD MAPS SPECX_FITS STACKCOMM STAKPAR
 wrfitsmap.o: DOPPLER FLAGCOMM MAPHD MAPS PLOT2D PROTOTYPE SPECX_FITS
 wrfitsspec.o: DOPPLER FLAGCOMM SPECX_FITS STACKCOMM
@@ -2737,6 +2751,7 @@ putscreen.o: FLAGCOMM
 spack.o: SAE_PAR
 spacl.o: SAE_PAR
 spaeg.o: SAE_PAR
+sysdep.o: SAE_PAR PSX_ERR
 vms_help.o: SAE_PAR
    
 #  Dependencies for command
