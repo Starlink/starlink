@@ -7,6 +7,31 @@ Reimplement kpathsea as a singleton object
 
 ----------------------------------------------------------------------
 
-Implement PostscriptImage, either using PipeStream, or using libgs
+Have InputByteStream mmap its target file, if possible [very easy,
+    really just a matter of the right bookkeeping]
 
-Handle multiple DVI files on the command line
+Implement PostscriptImage, either using PipeStream, or using libgs
+    [potentially messy, but not terribly hard]
+
+Handle multiple DVI files on the command line.  Similarly, have it able
+    to read more than one DVI file from the same source: that would
+    mean that it would be possible to have dvi2bitmap sitting reading
+    from a FIFO, while a succession of TeX processes write to the
+    FIFO. [a bit harder than it might seem, as a variety of things
+    might have to be re-initialised]
+
+Have dvi2bitmap able to write one of its bitmaps to the stdout.  This
+    would make it possible to regard dvi2bitmap as a filter [this
+    should be pretty easy]
+
+Support PBM graphics; support PICT graphics on the Mac. [PICT is
+    harder than PBM, because there's a lot more Mac apparatus has to
+    be learned about]
+
+Perhaps have a configuration file, rather than all those options
+
+Improve antialiasing, if there is in fact a more sophisticated
+    algorithm available than the simple scale-it-up-then-
+    scale-it-down used at present.  At least add a --antialiasing
+    option to abbreviate --scale + --magnification [the latter at
+    least is quite trivial]
