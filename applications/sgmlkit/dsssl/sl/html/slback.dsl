@@ -569,13 +569,27 @@ removed from it elements which are expensive to work with.
 <description>
 Indexing support.
 <codebody>
+;; Extract all the explicit "index" elements, returning a node-list
 (define (*get-all-index-elements*)
   (select-elements (select-by-class (descendants (getdocbody)) 'element)
                    (normalize "index")))
+;; Extract all the sectioning elements which have an "indexkey" attribute,
+;; returning a list of nodes
+(define (*get-all-indexed-sections*)
+  (let ((allsects (node-list-filter-by-gi (select-by-class
+                                           (descendants (getdocbody))
+                                           'element)
+                                          (section-element-list))))
+    (node-list-reduce allsects
+                      (lambda (result n)
+                        (if (attribute-string "indexkey" n)
+                            (cons n result)
+                            result))
+                      '())))
 (define (haskeywordindex?)
-  (if suppress-keywordindex
-      #f
-      (not (node-list-empty? (*get-all-index-elements*)))))
+  (not (or suppress-keywordindex
+           (and (node-list-empty? (*get-all-index-elements*))
+                (null? (*get-all-indexed-sections*))))))
 (define (keywordindex-sys-id)
   (if (chunking?)
       (html-file uniq: "keywordindex")
@@ -601,6 +615,23 @@ Indexing support.
                            navbars?: #f)
             body))))
 
+;; Given a key in "topic!subtopic!detail" form and a node, return the 
+;; index key which corresponds to this.  This is an improper list
+;; consisting of the components of the key split at '!', terminated by
+;; the all-element-number, which keeps the sort stable, and avoids
+;; duplicate keys
+(define (*index-string-to-key* key nd)
+  (let loop ((l (tokenise-string
+                 key
+                 boundary-char?: (lambda (c)
+                                   (char=? c #\!)))))
+    (cond ((<= (length l) 0)
+           (error "Impossible length in *reduce-one-index-entry*"))
+          ((= (length l) 1)
+           (cons (car l) (all-element-number nd)))
+          (else
+           (cons (car l) (loop (cdr l)))))))
+
 ;; *reduce-one-index-entry*: node-list-reduce procedure.
 ;; Make a list of index entry pairs.  Each pair has (key . ref-sosofo)
 (define (*reduce-one-index-entry* result n)
@@ -608,19 +639,8 @@ Indexing support.
     (if (= (string-length key) 0)       ; user error, but don't fail
         result
         (cons (cons
-               ;; index key: an improper list consisting of the components of
-               ;; the key split at '!', terminated by the all-element-number,
-               ;; which keeps the sort stable, and avoids duplicate keys
-               (let loop ((l (tokenise-string
-                              key
-                              boundary-char?: (lambda (c)
-                                                (char=? c #\!)))))
-                 (cond ((<= (length l) 0)
-                        (error "Impossible length in *reduce-one-index-entry*"))
-                       ((= (length l) 1)
-                        (cons (car l) (all-element-number n)))
-                       (else
-                        (cons (car l) (loop (cdr l))))))
+               ;; index key
+               (*index-string-to-key* key n)
                ;; reference -- an "a" element
                (make element gi: "a"
                      attributes: `(("href" ,(href-to n)))
@@ -629,6 +649,21 @@ Indexing support.
                                n
                                (section-element-list)))))
               result))))
+
+;; The same, but from a list of sub*section nodes which have an
+;; "indexkey" attribute.
+(define (*index-entry-from-section* sectionlist)
+  (if (null? sectionlist)
+      '()
+      (cons (let ((nd (car sectionlist)))
+              (cons
+               ;; index key
+               (*index-string-to-key* (attribute-string "indexkey" nd) nd)
+               ;; reference -- an "a" element
+               (make element gi: "a"
+                     attributes: `(("href" ,(href-to nd)))
+                     (make-section-reference target: nd))))
+            (*index-entry-from-section* (cdr sectionlist)))))
 
 ;; Test ordering of two index lists.
 ;; Arguments are lists where the first argument is an improper list consisting
@@ -709,9 +744,14 @@ Indexing support.
                             (make element gi: "em"
                                   (cdr idxpair))))
                     (*collapse-index*
-                     (sort-list (node-list-reduce indexents
-                                                  *reduce-one-index-entry*
-                                                  '())
+                     (sort-list (append
+                                 ;; list of sections with indexkey attributes
+                                 (*index-entry-from-section*
+                                  (*get-all-indexed-sections*))
+                                 ;; all the "index" elements
+                                 (node-list-reduce indexents
+                                                   *reduce-one-index-entry*
+                                                   '()))
                                 *idx<=?*)))))))
 
 
