@@ -255,7 +255,6 @@
       END IF
 
 *  Get equinox of dataset
-      call adi_print(sysid(1), status)
       CALL ADI_CGET0I( SYSID(1), 'EQUINOX', EQUINOX1, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
