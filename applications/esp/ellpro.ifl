@@ -338,8 +338,8 @@ interface ELLPRO
     access 'read'
     keyword 'MINMOD'
     prompt 'Minimisation type?'
-    ppath 'current,default'
-    vpath 'prompt'
+    ppath 'default,current'
+    vpath 'default,current'
     default 0
     range 0,2	# range is defined by ELP__RESxx in elp__par
     helpkey '*'
