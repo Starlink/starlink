@@ -517,7 +517,7 @@
       INTEGER DUMMY			! Value not used
       character*(DAT__SZNAM) name
       logical valid
-      integer dummy,i
+      integer dummy,i,ncomp
       character*(DAT__SZLOC) ploc
 *
       IF (STATUS.NE.SAI__OK) RETURN
@@ -531,8 +531,8 @@
         print *,name
         call dat_struc(loc,valid,status)
         print *,'struc',valid
-        call dat_ncomp(loc,dummy,status)
-	print *,'ncomp',dummy
+        call dat_ncomp(loc,ncomp,status)
+	print *,'ncomp',ncomp
         call dat_size(loc,dummy,status)
 	print *,'size',dummy
         call dat_paren(loc,ploc,status)
@@ -542,8 +542,8 @@
 	print *,'cloned'
         name=' '
         i=1
-        do while (name.ne.'HEAD')
-          call dat_index(cloc,1,aloc,status)
+        do while (name.ne.'HEAD'.and.i.le.ncomp.and.status.eq.sai__ok)
+          call dat_index(cloc,i,aloc,status)
           call dat_name(aloc,name,status)
           print *,i,name
           if (name.ne.'HEAD') then
