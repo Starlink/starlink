@@ -33,7 +33,6 @@
 #include	"photom.h"
 #include	"psf.h"
 #include	"retina.h"
-#include        "astrom.h"  /*PWD: modification here  */
 
 /********************************* analyse ***********************************/
 void  analyse(picstruct *field, picstruct *dfield, int objnb,

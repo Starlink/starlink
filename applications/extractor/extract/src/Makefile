@@ -155,3 +155,4 @@ weight.o: $(STDH) $(STDO) weight.c weight.h field.h
 libwcs_c.a:
 	($(CD) wcs && $(MAKE))
 
+# DO NOT DELETE

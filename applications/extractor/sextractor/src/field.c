@@ -27,7 +27,6 @@
 #include	"field.h"
 #include	"filter.h"
 #include	"interpolate.h"
-#include        "astrom.h"
 
 /********************************* newfield **********************************/
 /*

@@ -398,7 +398,7 @@ PKG_LINK =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0
+PKG_VERS = 1.0-1
 
 #  List the source subdirectories
 
@@ -493,7 +493,8 @@ C_SUB1 = adamprint.c analyse.c assoc.c astrom.c back.c bpro.c catout.c \
          fitsfield.c fitshead.c fitskey.c fitsmisc.c fitsread.c fitstab.c \
          fitsutil.c fitswrite.c flag.c graph.c growth.c image.c interpolate.c \
          makeit.c manobjlist.c misc.c neurro.c photom.c plist.c poly.c \
-         prefs.c psf.c readimage.c refine.c retina.c scan.c som.c weight.c
+         prefs.c psf.c readimage.c refine.c retina.c scan.c som.c \
+         weight.c pc.c
 
 C_SUB2 =
 
@@ -1450,6 +1451,8 @@ scan.o: define.h globals.h back.h check.h clean.h extract.h filter.h plist.h \
 som.o: define.h globals.h fitscat.h som.h types.h
 
 weight.o: define.h globals.h field.h weight.h types.h
+
+pc.o: define.h globals.h types.h ast.h fitscat.h check.h image.h poly.h psf.h
 
 #-------------------------------------------------------------------------------
 #  Target for development purposes only:
