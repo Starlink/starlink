@@ -406,6 +406,10 @@ int main (int argc, char **argv)
     if (dviname.length() == 0)
 	Usage();
 
+    if (verbosity >= normal)
+	// Banner
+	cout << "This is " << version_string << '\n';
+
     if (bm.ofile_pattern.length() == 0)
 	bm.ofile_pattern = get_ofn_pattern (dviname);
     if (bm.ofile_pattern.length() == 0)
