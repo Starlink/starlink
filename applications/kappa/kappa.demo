@@ -177,7 +177,6 @@ package {
    email "ussc@star.rl.ac.uk"
    url "http://www.ast.man.ac.uk/~dsb/kappa/kappa.html"
    sun "sun95"
-   monolith kappa $KAPPA_DIR/kappa_mon
 
    info "<pack KAPPA> is a package comprised of about 180 general-purpose
    commands for astronomical image processing and data visualisation. It
