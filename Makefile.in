@@ -143,25 +143,29 @@ world: $(ALL_TARGETS)
 # admittedly lame, but good enough for the moment.
 #
 # componentset.xml `really' depends on all the component.xml files
-# below it, but don't state this, for the reason explained above
-# Makefile.dependencies.  If you add a component, then delete
-# componentset.xml here and remake Makefile.dependencies.
+# below it, but don't state this, for the reason explained above.
+# If you add a component, then delete componentset.xml here and
+# remake Makefile.dependencies. 
 #
 Makefile.dependencies:
-	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >componentset.xml
-	echo '<componentset>' >>componentset.xml
-	find . -name component.xml | sort | { \
-	    while read cname; do \
-		sed -e '/^<?/d' -e '/^<!DOCTYPE/d' $$cname >>componentset.xml; \
-	    done; }
-	echo '</componentset>' >>componentset.xml
-	if test $(JAVA) != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
-	    (cd buildsupport/starconf/java \
-	        && $(MAKE) GenerateDependencies.class) \
-	    && $(JAVA) -classpath buildsupport/starconf/java \
-		GenerateDependencies componentset.xml >$@; \
+	rm -f componentset.xml
+	exec 5>componentset.xml; \
+	  echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >&5; \
+	  echo '<componentset>' >&5; \
+	  find . -name component.xml | sort | \
+	    { while read c; do cat $$c; done } | \
+	    sed '/^<?/d;/^<!DOCTYPE/d' >&5; \
+	  echo '</componentset>' >&5
+	if test "$(JAVA)" != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
+	  rm -f Makefile.dependencies.tmp \
+	  && (cd buildsupport/starconf/java \
+	      && $(MAKE) GenerateDependencies.class) \
+	  && $(JAVA) -classpath buildsupport/starconf/java \
+	    GenerateDependencies componentset.xml \
+	    >Makefile.dependencies.tmp \
+	  && mv Makefile.dependencies.tmp $@; \
 	else \
-	    touch Makefile.dependencies; \
+	  touch $@; \
 	fi
 
 # Make a link to an installed componentinfo.dtd file.  This will not
