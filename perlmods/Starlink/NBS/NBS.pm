@@ -16,7 +16,7 @@ require AutoLoader;
 
 
 # VERSION number
-$VERSION = '0.5';
+$VERSION = '1.0';
 
 
 # Set up export tags just in case somebody doesn't want to use
