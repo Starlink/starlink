@@ -33,6 +33,8 @@ file by a Perl script -- we use this extra step so that the Perl can try to
 reuse equations wherever possible, the logic for which is probably rather
 difficult in DSSSL.
 <p>The `interface' is the same as for the <code/tth/ version below.
+<p>Changes here might need corresponding changes in make-manifest-mode in
+sl.dsl
 
 <func>
 <routinename>get-maths
