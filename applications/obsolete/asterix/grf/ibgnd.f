@@ -1806,6 +1806,7 @@
             XW = I_XBASE + (I-1)*I_XSCALE
             R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
             IDX(I,J) = INT(R) + 1
+	PRINT *,I,J,' ok ',idx(i,j)
 	ELSE
 	PRINT *,I,J,' bad ',idx(i,j)
           END IF
