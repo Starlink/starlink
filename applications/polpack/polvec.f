@@ -219,6 +219,7 @@
 
 *  Local Variables:
       CHARACTER METH*6           ! Binning method
+      CHARACTER ONAME*256        ! Full file spec for output catalogue
       CHARACTER STOKES*(NDF__MXDIM) ! Identifiers for each plane of input
       CHARACTER TITLE*80         ! Title from input Stokes cube
       CHARACTER UNITS*40         ! Units from input Stokes cube
@@ -771,7 +772,7 @@
 *  Create the catalogue.
       CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 
      :                 UNITS, VAR, ANGRT, TITLE, RADEC, CI, EQMAP, 
-     :                 STATUS )
+     :                 ONAME, STATUS )
 
 *  If successful, set a flag indicating that a catalogue is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -869,7 +870,12 @@
 
 *  If a catalogue was created, store the WCS information with it as "textual
 *  information", and release it.
-      IF( MAKECT ) CALL POL1_CLCAT( IWCS, CI, STATUS )
+      IF( MAKECT ) THEN
+         CALL POL1_CLCAT( IWCS, CI, STATUS )
+
+*  If an error has occurred, delete the output catalogue.
+         IF( STATUS .NE. SAI__OK ) CALL POL1_RM( ONAME )
+      END IF
 
 *  Release any work space used to hold the binned Stokes parameters.
       IF( WKBNSZ .GT. 0 ) THEN

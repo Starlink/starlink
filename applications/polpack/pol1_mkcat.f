@@ -1,5 +1,5 @@
       SUBROUTINE POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, 
-     :                       TITLE, GETEQM, CI, EQMAP, STATUS )
+     :                       TITLE, GETEQM, CI, EQMAP, NAME, STATUS )
 *+
 *  Name:
 *     POL1_MKCAT
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, TITLE, 
-*                      GETEQM, CI, EQMAP, STATUS )
+*                      GETEQM, CI, EQMAP, NAME, STATUS )
 
 *  Description:
 *     This routine creates a new CAT catalogue. Columns are created for the 
@@ -58,6 +58,8 @@
 *        (X,Y(,Z)) pixel co-ordinates to RA,DEC (J2000) co-ordinates. If the
 *        supplied FrameSet (IWCS) does not allow this information to be
 *        found, or if GETEQM is .FALSE., AST__NULL is returned for EQMAP.
+*     NAME = CHARACTER * ( * ) (Returned)
+*        The full file spec of the created catalogue.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -103,12 +105,12 @@
 *  Arguments Returned:
       INTEGER CI
       INTEGER EQMAP
+      CHARACTER NAME*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER NAME*250         ! Catalogue specification
       INTEGER EQFS               ! An AST FrameSet
       INTEGER II                 ! CAT identifier for most recent part
       INTEGER FRM                ! Pointer to Base Frame

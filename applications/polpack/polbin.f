@@ -167,6 +167,7 @@
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER METH*6           ! Binning method
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
+      CHARACTER ONAME*256        ! Full file spec for output catalogue
       CHARACTER STOKES*3         ! Identifiers for cube planes
       CHARACTER TITLE*80         ! Title from input catalogue
       CHARACTER UNITS*( CAT__SZUNI )! Units of the total intensity column
@@ -471,13 +472,13 @@
 
 *  Warn the user that an ANGROT value of 90 is being assumed.
          ANGROT = 90.0
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLBIN_1', 'No usable WCS information is '//
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_OUT( 'POLBIN_1', '  No usable WCS information is '//
      :                 'available in the input catalogue.', STATUS )
-         CALL ERR_REP( 'POLBIN_2', 'Assuming the reference '//
+         CALL MSG_OUT( 'POLBIN_2', '  Assuming the reference '//
      :                 'direction is parallel to the second pixel '//
      :                 'axis.', STATUS )
-         CALL ERR_FLUSH( STATUS )
+         CALL MSG_BLANK( STATUS )
 
 *  Create a default FrameSet containing a single Frame describing the X and 
 *  Y columns. The Axis Symbols are assigned the column names.
@@ -954,7 +955,7 @@
 
 *  Create the output catalogue.
       CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGRT, TITLE,
-     :                 RADEC, CIOUT, EQMAP, STATUS )
+     :                 RADEC, CIOUT, EQMAP, ONAME, STATUS )
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -997,6 +998,9 @@
 *  Close the output catalogue, storing a copy of the WCS information from 
 *  the input catalogue.
       CALL POL1_CLCAT( IWCS, CIOUT, STATUS )
+
+*  If an error has occurred, delete the output catalogue.
+      IF( STATUS .NE. SAI__OK ) CALL POL1_RM( ONAME )
 
 *  Release work space.
       IF( .NOT. CIRC ) THEN

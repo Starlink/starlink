@@ -120,7 +120,11 @@
 
       END IF
 
-*  Release the catalogue.
+*  Release the catalogue. Do this in a new error reporting context
+*  since CAT_TRLSE doesn't check the inherited status before reporting
+*  new ones.
+      CALL ERR_BEGIN( STATUS )
       CALL CAT_TRLSE( CI, STATUS )
+      CALL ERR_END( STATUS )
 
       END
