@@ -335,7 +335,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported, though only to remove them by the DEF value.
@@ -387,6 +387,8 @@
 *        Corrected typo's, and made minor stylistic changes and
 *        improvements to the documentation including a Related
 *        Applications section.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -975,7 +977,7 @@
 *  NDF is based on the input NDF.
       CALL ERR_MARK
 
-      CALL NDF_PROP( INDF, 'AXIS,QUALITY,UNITS', 'MODELOUT', NMDNDF,
+      CALL NDF_PROP( INDF, 'WCS,AXIS,QUALITY,UNITS', 'MODELOUT', NMDNDF,
      :               STATUS )
 
 *  If an NDF was given, store the new model in it.

@@ -153,7 +153,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.  The bad-pixel flag is also written for the data and
@@ -165,6 +165,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -191,6 +192,8 @@
 *        1-dimensional arrays.  Used lowercase examples and usage.
 *        Added Related Applications and additional commentary.  Changed
 *        default of TITLE to null.  Used PSX to obtain workspace.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -411,7 +414,8 @@
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDF_PROP( NDF1, 'Axis,Quality,Units', 'OUT', NDF2, STATUS )
+      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+     :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 
 *  Map the input and output arrays.

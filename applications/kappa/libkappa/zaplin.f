@@ -248,7 +248,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -265,6 +265,7 @@
 *  Authors:
 *     MJM: Mark McCaughrean (UoE)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -317,6 +318,8 @@
 *        pixel too small, i.e. in co-ordinates not pixel indices.
 *     1995 September 20 (MJC):
 *     	 Changed default of TITLE to null.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -668,7 +671,7 @@
 *    This is initially a copy of the input NDF, which will then be
 *    altered.
 
-      CALL NDF_PROP( NDF, 'Data,Variance,Quality,Axis,Units', 'OUT',
+      CALL NDF_PROP( NDF, 'WCS,Data,Variance,Quality,Axis,Units', 'OUT',
      :               NDFO, STATUS )
 
 *    The input NDF is no longer required so annul its identifier.

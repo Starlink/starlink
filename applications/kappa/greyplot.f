@@ -377,7 +377,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+*     VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  This application will handle data in all numeric types, though
@@ -388,6 +388,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -424,6 +425,8 @@
 *        Supports Error component.
 *     1997 May 28 (MJC):
 *        QUALITY and HISTORY no longer propagated to the OUT NDF.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -2298,7 +2301,7 @@
 *       Create the output NDF structure based on the input NDF.
 
          CALL NDF_PROP( NDF, 'AXIS,NOHISTORY,NOQUALITY,NOVARIANCE,'/
-     :                  /'NOEXTENSION()', 'OUT', NDFO, STATUS )
+     :                  /'NOEXTENSION(),WCS', 'OUT', NDFO, STATUS )
 
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )

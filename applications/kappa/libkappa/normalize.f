@@ -190,7 +190,7 @@
 
 *  Implementation Status:
 *     -  The routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
 *     and propagates all extensions to the output NDF.  All propagated
 *     components come from the NDF to be normalised.
 *     -  At the moment, variance values are not used in the fitting
@@ -245,6 +245,8 @@
 *        Sets the bad-pixel flags.  Removed old histogram subroutine
 *        calls.  Used PSX for workspace.  Made the Usage and Examples
 *        lowercase.  Added Related Applications.  Title propagated.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -363,7 +365,7 @@
 *  Get an NDF identifier for the output NDF. The output is based on IN1
 *  and inherits all the components of IN1 except the data and variance
 *  arrays.
-      CALL NDF_PROP( NDF1S, 'Axis,Quality,Units', 'OUT', NDFOUT,
+      CALL NDF_PROP( NDF1S, 'WCS,Axis,Quality,Units', 'OUT', NDFOUT,
      :               STATUS )
 
 *  If an output NDF was obtained successfully...

@@ -80,7 +80,7 @@
 
 *  Implementation Status:
 *     If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
-*     QUALITY, AXIS and HISTORY components are copied by this routine,
+*     QUALITY, AXIS WCS and HISTORY components are copied by this routine,
 *     together with all extensions.  The output NDF's title may be
 *     modified, if required, by specifying a new value via the TITLE
 *     parameter.
@@ -91,6 +91,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -102,6 +103,8 @@
 *        Added the TITLE parameter.
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -166,7 +169,7 @@
 *  Copy the input NDF (or section) to create the output NDF.
       CALL NDF_PROP( NDF1,
      :               'Title,Label,Units,Data,Variance,Quality,Axis,' //
-     :               'History', 'OUT', NDF3, STATUS )
+     :               'History,WCS', 'OUT', NDF3, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDF3, 'Title', STATUS )

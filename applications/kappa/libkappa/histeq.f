@@ -77,7 +77,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, and HISTORY components of an NDF data structure and
+*     LABEL, TITLE, WCS and HISTORY components of an NDF data structure and
 *     propagates all extensions.  UNITS and VARIANCE become undefined
 *     by the transformation, and so are not propagated.
 *     -  Processing of bad pixels and automatic quality masking are
@@ -87,6 +87,7 @@
 *  
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -95,6 +96,8 @@
 *     1995 January 12 (MJC):
 *        Replaced AIF calls with PAR and PSX.  Lowercase examples and
 *        usage.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -155,10 +158,10 @@
 *  Create the output NDF.
 *  ======================
 
-*  Propagate the QUALITY, LABEL, HISTORY and AXIS components from the
+*  Propagate the QUALITY, LABEL, HISTORY, WCS and AXIS components from the
 *  input NDF to the output.  Note that UNITS and VARIANCE become
 *  undefined following the transformation and so are not propagated.
-      CALL NDF_PROP( NDFI, 'Quality,Axis', 'OUT', NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'WCS,Quality,Axis', 'OUT', NDFO, STATUS )
 
 *  This application supports all the non-complex numeric types
 *  directly.  Therefore for the given type of the image find in which

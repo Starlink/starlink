@@ -52,7 +52,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
+*     LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
 *     structure and propagates all extensions.
 *     -  Units processing is not supported at present and therefore the
 *     UNITS component is not propagated.
@@ -71,6 +71,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +82,8 @@
 *     1995 September 12 (MJC):
 *        Title inherited by default.  Usage and examples to lowercase.
 *        Added Related Applications.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,8 +135,8 @@
       CALL NDF_MBND( 'TRIM', NDF1, NDF2, STATUS )
 
 *  Create a new output NDF based on the first input NDF. Propagate the
-*  axis and quality components.
-      CALL NDF_PROP( NDF1, 'Axis,Quality', 'OUT', NDF3, STATUS )
+*  WCS, axis and quality components.
+      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality', 'OUT', NDF3, STATUS )
 
 *  See whether a variance component is defined in both the input NDFs
 *  and set the list of components to be processed accordingly.

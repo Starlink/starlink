@@ -162,7 +162,7 @@
 
 *  Implementation Status: 
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.  The output bad-pixel flag is set to indicate no bad
@@ -183,6 +183,8 @@
 *     21-MAY-1998 (DSB):
 *        Check that input variances are not all bad or zero, and ignore
 *        them if they are.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -356,7 +358,8 @@
 
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.
-      CALL NDF_PROP( NDFI, 'Axis,Units,Quality', 'OUT', NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
+     :               STATUS )
 
 *  Set an appropriate numeric type for the output arrays.
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )

@@ -224,7 +224,7 @@
 *     
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, LABEL, TITLE,
-*     UNITS, and HISTORY components of an NDF data structure and
+*     UNITS, WCS and HISTORY components of an NDF data structure and
 *     propagates all extensions.  VARIANCE is not used to weight the
 *     median filter and is not propagated.  QUALITY is also lost.
 *     -  Processing of bad pixels and automatic quality masking are
@@ -235,6 +235,7 @@
 *     DB: Dave Baines (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     SMB: Steven Beard (ROE)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -290,6 +291,8 @@
 *        Made to operate on all numeric data types.  Used a modern-style
 *        prologue with additional topics.  Modern-style coding.  Made
 *        messages conditional.  Removed a couple of unnecessary calls.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -490,9 +493,9 @@
 *  Create the output NDF.
 *  ======================
 
-*  Create output NDF structure, propagating the DATA, AXIS, UNITS,
+*  Create output NDF structure, propagating the DATA, AXIS, UNITS, WCS,
 *  LABEL, TITLE, HISTORY and extensions from the input NDF.
-      CALL NDF_PROP( NDFI, 'Data,Axis,Units', 'OUT', NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'Data,Axis,Units<WCS', 'OUT', NDFO, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )

@@ -51,7 +51,7 @@
 *     KAPPA: CADD, CDIV, CMULT, CSUB, DIV, MATHS, MULT, SUB.
 
 *  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, QUALITY,
+*     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
 *     LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
 *     structure and propagates all extensions.
 *     -  Units processing is not supported at present and therefore the
@@ -67,6 +67,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,8 @@
 *     1995 September 12 (MJC):
 *        Title inherited by default.  Usage and examples to lowercase.
 *        Added Related Applications.
+*     5-JUN-1998 (DSB):
+*        Added propagation of WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,8 +131,8 @@
       CALL NDF_MBND( 'TRIM', NDF1, NDF2, STATUS )
 
 *  Create a new output NDF based on the first input NDF. Propagate the
-*  axis and quality components.
-      CALL NDF_PROP( NDF1, 'Axis,Quality', 'OUT', NDF3, STATUS )
+*  WCS, axis and quality components.
+      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality', 'OUT', NDF3, STATUS )
 
 *  Determine which data type to use to process the input data/variance
 *  arrays and set an appropriate data type for these components in the

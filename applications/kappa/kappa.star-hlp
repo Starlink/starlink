@@ -53,6 +53,8 @@ result if they have no pixels in common.
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  4-APR-1990 (RFWS):
     Original version, derived from the previous non-NDF routine of
@@ -64,8 +66,11 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of WCS component.
 2 Implementation_Status
-   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
    LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
    structure and propagates all extensions.
 
@@ -567,6 +572,8 @@ ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
 GJP: Grant Privett (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  08-Jun-1994 (GJP):
     Original version.
@@ -584,8 +591,11 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1996 July 31 (MJC):
     Made ARDFILE have type FILENAME for IRAF usage.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
-   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
    LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
    data structure and propagates all extensions.
 
@@ -1022,9 +1032,12 @@ DSB: David S. Berry (STARLINK)
     Added a "Related Applications" section.  Fixed bug that
     attempted to create an output variance array when the median
     estimator was selected.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, and HISTORY components of the input NDF and
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
    propagates all extensions.  In addition, if the mean estimator is
    used, the VARIANCE component is also processed.  If the median
    estimator is used, then the output NDF will have no VARIANCE
@@ -1079,6 +1092,8 @@ cadd title="HD123456" out=b in=a scalar=17.3
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  11-APR-1990 (RFWS):
     Original version.
@@ -1089,9 +1104,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -1395,9 +1413,12 @@ MJC: Malcolm J. Currie (STARLINK)
     spelling, and other errors.  Used a modern-style variable
     declaration.  Usage and Examples to lowercase.  Made the
     parameter names consistent.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -1447,6 +1468,8 @@ cdiv in=data1 out=data2 scalar=-38
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  12-MAR-1991 (RFWS):
     Original version.
@@ -1454,9 +1477,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -3476,324 +3502,317 @@ chpix in=zzcha out=zzcha_c section="45,21," newval=-1
    SUBSTITUTE, ZAPLIN; Figaro: CSET, ICSET, NCSET, TIPPEX.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1995 April 25 (MJC):
     Original NDF version.
+
+ 27-FEB-1998 (DSB):
+    Use NUM_ functions to convert lower precision integer values to
+    _INTEGER when calling PAR_MIX0I.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
+ {enter_any_changes_here}
 2 Implementation_Status
-   -  The routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF;
-   and propagates all extensions.
+   -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
+   TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF; and
+   propagates all extensions.  Bad pixels and all non-complex
+   numeric data types can be handled.
 
-   -  Processing of bad pixels and automatic quality masking are
-   supported.
-
-   -  All non-complex numeric data types can be handled.
+   -  The HISTORY component, if present, is simply propagated without
+   change.
 1 Classified_commands
+KAPPA applications may be classified in terms of their functions as 
+follows:
 
-2 Analysis
-CENTROID  - Finds the centroids of star-like features in an NDF.
-NORMALIZE - Normalises one NDF to a similar NDF by calculating a
-            scale factor and zero difference.
-PSF       - Determines the parameters of a model star profile by
-            fitting star images in a two-dimensional NDF.
+2 Data_import_&_export
 
-2 Arithmetic
-ADD       - Adds two NDF data structures.
-CADD      - Adds a scalar to an NDF data structure.
-CDIV      - Divides an NDF by a scalar.
-CMULT     - Multiplies an NDF by a scalar.
-CSUB      - Subtracts a scalar from an NDF data structure.
-DIV       - Divides one NDF data structure by another.
-EXP10     - Takes the base-10 exponential of each pixel of a data array.
-EXPE      - Takes the exponential of each pixel of a data array
-            (base e).
-EXPON     - Takes the exponential of each pixel of a data array
-            (specified base).
-LOG10     - Takes the base-10 logarithm of each pixel of a data array.
-LOGAR     - Takes the logarithm of each pixel of a data array (specified
-            base).
-LOGE      - Takes the natural logarithm of each pixel of a data array.
-MATHS     - Evaluates mathematical expressions applied to NDF data
-            structures.
-MULT      - Multiplies two NDF data structures.
-POW       - Takes the specified power of each pixel of a data array.
-SUB       - Subtracts one NDF data structure from another.
-TRIG      - Performs a trigonometric transformation on a data array.
+3 Image_generation_and_input
+CREFRAME    - Generates a test 2-d data array from a selection of
+              several types.
+FITSDIN     - Reads a FITS disc file composed of simple, group or table
+              objects.
+FITSHEAD    - Lists the headers of FITS files.
+FITSIMP     - Imports FITS information into an NDF extension.
+FITSIN      - Reads a FITS tape composed of simple, group or table
+              files.
+MATHS       - Evaluates mathematical expressions applied to NDF data
+              structures.
+TRANDAT     - Converts free-format data into an NDF.
 
-2 Combination
-CALPOL    - Calculates polarisation parameters.
-MOSAIC    - Merges several non-congruent 2-d data arrays into one
-            output data array.
-KSTEST    - Compares data sets using the Kolmogorov-Smirnov test.
-NORMALIZE - Normalizes one NDF to a similar NDF by calculating a
-            scale and zero difference.
-QUILT     - Generates a mosaic from equally sized 2-d data arrays,
-            optionally specified from an ASCII file.
+3 Preparation_for_output
+FITSEDIT    - Edits the FITS extension of an NDF.
+FITSEXP     - Exports NDF-extension information into an NDF FITS
+              extension.
+FITSMOD     - Edits an NDF FITS extension via a text file or parameters.
+FITSTEXT    - Creates an NDF FITS extension from a text file.
+FITSWRITE   - Writes a new keyword to the FITS extension.
 
-2 Compression_and_Expansion
-COMPADD     - Reduces the size of an NDF by adding values in
-              rectangular boxes.
+2 Data_display
+
+3 Detail_enhancement
+HISTEQ      - Performs an histogram equalisation on an NDF.
+LAPLACE     - Performs a Laplacian convolution as an edge detector in a
+              2-d data array.
+SHADOW      - Enhances edges in a 2-dimensional NDF using a shadow
+              effect.
+THRESH      - Edits an NDF such that array values below and above two
+              thresholds take constant values.
+
+3 Device_selection
+GDNAMES     - Shows which graphics devices are available.
+GDSET       - Selects a current graphics device.
+IDSET       - Selects a current image-display device.
+OVSET       - Selects a current image-display overlay.
+
+3 Display_control
+CURSOR      - Reports the co-ordinates of points selected using the
+              cursor.
+GDCLEAR     - Clears a graphics device and purges its database entries.
+GDSTATE     - Shows the current status of a graphics device.
+IDCLEAR     - Clears an image display and purges its database entries.
+IDINVISIBLE - Makes memory planes of an image-display device invisible.
+IDPAZO      - Pans and zooms an image-display device.
+IDSTATE     - Shows the current status of an image display.
+OVCLEAR     - Clears an image-display overlay.
+
+3 Graphics_database
+PICBASE     - Selects the BASE picture from the graphics database.
+PICCUR      - Uses a cursor to select the current picture and to report
+              the co-ordinates of points.
+PICDATA     - Selects the last DATA picture from the graphics database.
+PICDEF      - Defines a new graphics-database FRAME picture or an array
+              of FRAME pictures.
+PICEMPTY    - Finds the first empty FRAME picture in the graphics
+              database.
+PICENTIRE   - Finds the first unobscured and unobscuring FRAME picture
+              in the graphics database.
+PICFRAME    - Selects the last FRAME picture from the graphics database.
+PICGRID     - Creates an array of FRAME pictures.
+PICIN       - Finds the attributes of a picture interior to the current
+              picture.
+PICLABEL    - Labels the current graphics-database picture.
+PICLAST     - Selects the last picture from the graphics database.
+PICLIST     - Lists the pictures in the graphics database for a device.
+PICSEL      - Selects a graphics-database picture by its label.
+PICTRANS    - Transforms co-ordinates between the current and BASE
+              pictures.
+PICVIS      - Finds the first unobscured FRAME picture in the graphics
+              database.
+PICXY       - Creates a new picture defined by co-ordinate bounds.
+
+3 Lookup/colour_tables
+CRELUT      - Creates or manipulates an image-display lookup table using
+              a palette.
+LUTABLE     - Manipulates an image-display colour table.
+LUTBGYRW    - Loads the BGYRW  lookup table.
+LUTCOL      - Loads the standard colour lookup table.
+LUTCONT     - Loads a lookup table to give the display the appearance of
+              a contour plot.
+LUTFC       - Loads the standard false-colour lookup table.
+LUTFLIP     - Flips the colour table of an image-display device.
+LUTGREY     - Loads the standard greyscale lookup table.
+LUTHEAT     - Loads the heat  lookup table.
+LUTHILITE   - Highlights a colour table of an image-display device.
+LUTIKON     - Loads the default Ikon  lookup table.
+LUTNEG      - Loads the standard negative greyscale lookup table.
+LUTRAMPS    - Loads the coloured-ramps lookup table.
+LUTREAD     - Loads an image-display lookup table from an NDF.
+LUTROT      - Rotates the colour table of an image-display device.
+LUTSAVE     - Saves the current colour table of an image-display device
+              in an NDF.
+LUTSPEC     - Loads a spectrum-like lookup table.
+LUTTWEAK    - Tweaks a colour table of an image-display device.
+LUTVIEW     - Draws a colour-table key.
+LUTZEBRA    - Loads a pseudo-contour lookup table.
+
+3 Output
+CONTOUR     - Contours a 2-d NDF.
+CONTOVER    - Contours a 2-d data array overlaid on an image displayed
+              previously.
+DISPLAY     - Displays a 1-d or 2-d NDF.
+DRAWSIG     - Draws +/- n standard-deviation lines on a line plot.
+ELPROF      - Creates a radial or azimuthal profile of a 2-dimensional
+              image.
+GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
+INSPECT     - Inspects a 2-d NDF in a variety of ways.
+LINPLOT     - Draws a line plot of a 1-d NDF's data values against their
+              axis co-ordinates.
+LOOK        - Outputs the values of a sub-array of a 2-d data array to
+              the screen or a text file.
+MLINPLOT    - Draws a multi-line plot of a 2-d NDF's data values against
+              their axis co-ordinates.
+SNAPSHOT    - Dumps an image-display memory to a graphics hardcopy and
+              optionally to an NDF.
+TURBOCONT   - Contours a 2-d NDF quickly.
+VECPLOT     - Plots a 2-dimensional vector map.
+
+3 Palette
+PALDEF      - Loads the default palette to a colour table.
+PALENTRY    - Enters a colour into an image display's palette.
+PALREAD     - Fills the palette of a colour table from an NDF.
+PALSAVE     - Saves the current palette of a colour table to an NDF.
+
+2 Data_manipulation
+
+3 Arithmetic
+ADD         - Adds two NDF data structures.
+CADD        - Adds a scalar to an NDF data structure.
+CDIV        - Divides an NDF by a scalar.
+CMULT       - Multiplies an NDF by a scalar.
+CSUB        - Subtracts a scalar from an NDF data structure.
+DIV         - Divides one NDF data structure by another.
+EXP10       - Takes the base-10 exponential of each pixel of a data
+              array.
+EXPE        - Takes the exponential of each pixel of a data array 
+              (base e).
+EXPON       - Takes the exponential of each pixel of a data array
+              (specified base).
+LOG10       - Takes the base-10 logarithm of each pixel of a data array.
+LOGAR       - Takes the logarithm of each pixel of a data array
+              (specified base).
+LOGE        - Takes the natural logarithm of each pixel of a data array.
+MATHS       - Evaluates mathematical expressions applied to NDF data
+              structures.
+MULT        - Multiplies two NDF data structures.
+POW         - Takes the specified power of each pixel of a data array.
+SUB         - Subtracts one NDF data structure from another.
+TRIG        - Performs a trigonometric transformation on a data array.
+
+3 Combination
+CALPOL      - Calculates polarisation parameters.
+KSTEST      - Compares data sets using the Kolmogorov-Smirnov test.
+MOSAIC      - Merges several non-congruent 2-d data arrays into one
+              output data array.
+NORMALIZE   - Normalises one NDF to a similar NDF by calculating a scale
+              factor and zero difference.
+QUILT       - Generates a mosaic from equally sized 2-d data arrays,
+              optionally specified from an ASCII file.
+
+3 Compression_and_expansion
+COMPADD     - Reduces the size of an NDF by adding values in rectangular
+              boxes.
 COMPAVE     - Reduces the size of an NDF by averaging values in
               rectangular boxes.
 COMPICK     - Reduces the size of an NDF by picking equally spaced
               pixels.
 PIXDUPE     - Expands an NDF by pixel duplication.
-SQORST      - Squashes or stretches a 2-d data array in either or
-              both axes.
+SQORST      - Squashes or stretches a 2-d data array in either or both
+              axes.
 TRANSFORMER - Applies a transformation to an NDF.
 
-2 Configuration_change
-FLIP      - Reverses an NDF's pixels along a specified dimension.
-INSPECT   - Inspects a 2-d NDF in a variety of ways.
-MANIC     - Converts all or part of a data array from one
-            dimensionality to another.
-NDFCOPY   - Copies an NDF (or NDF section) to a new location.
-ROTATE    - Rotates a 2-dimensional NDF about its centre through any
-            angle.
-SETBOUND  - Sets new bounds for an NDF.
-SLIDE     - Realigns a 2-d data array via an $x$-$y$ shift.
+3 Configuration_change
+FLIP        - Reverses an NDF's pixels along a specified dimension.
+INSPECT     - Inspects a 2-d NDF in a variety of ways.
+MANIC       - Converts all or part of a data array from one
+              dimensionality to another.
+NDFCOPY     - Copies an NDF (or NDF section) to a new location.
+ROTATE      - Rotates a 2-dimensional NDF about its centre through any
+              angle.
+SETBOUND    - Sets new bounds for an NDF.
+SLIDE       - Realigns a 2-d data array via an x-y shift.
 
-2 Detail_enhancement
-HISTEQ    - Performs an histogram equalisation on an NDF.
-LAPLACE   - Performs a Laplacian convolution as an edge detector in
-            a 2-d data array.
-SHADOW    - Enhances edges in a 2-dimensional NDF using a shadow
-            effect.
-THRESH    - Edits an NDF such that array values below and above two
-            thresholds take constant values.
+3 Filtering
+BLOCK       - Smooths a 1- or 2-dimensional image using a square or
+              rectangular box filter.
+CONVOLVE    - Convolves a pair of 1- or 2-dimensional NDFs together.
+FFCLEAN     - Removes defects from a substantially flat 1- or
+              2-dimensional NDF.
+FOURIER     - Performs forward and inverse Fourier transforms of 1- or
+              2-dimensional NDFs.
+GAUSMOOTH   - Smooths a 1- or 2-dimensional image using a Gaussian
+              filter.
+LUCY        - Performs a Richardson-Lucy deconvolution of a 1- or
+              2-dimensional array.
+MEDIAN      - Smooths a 2-dimensional data array using a weighted median
+              filter.
+MEM2D       - Performs a Maximum-Entropy deconvolution of a
+              2-dimensional NDF.
+WIENER      - Applies a Wiener filter to a 1- or 2-dimensional array.
 
-2 Device_selection
-GDNAMES   - Shows which graphics devices are available.
-GDSET     - Selects a current graphics device.
-IDSET     - Selects a current image-display device.
-OVSET     - Selects a current image-display overlay.
+3 HDS_components
+ERASE       - Erases an HDS object.
+NATIVE      - Converts an HDS object to native machine data
+              representation.
 
-2 Display_control
-CURSOR      - Reports the co-ordinates of points selected using the
-              cursor.
-GDCLEAR     - Clears a graphics device and purges its database
-              entries.
-GDSTATE     - Shows the current status of a graphics device.
-IDCLEAR     - Clears an image display and purges its database
-              entries.
-IDINVISIBLE - Makes memory planes of an image-display device
-              invisible.
-IDPAZO      - Pans and zooms an image-display device.
-IDSTATE     - Shows the current status of an image display.
-OVCLEAR     - Clears an image-display overlay.
+3 NDF_array_components
+NDFCOPY     - Copies an NDF (or NDF section) to a new location.
+SETBAD      - Sets new bad-pixel flag values for an NDF.
+SETBB       - Sets a new value for the quality bad-bits mask of an NDF.
+SETBOUND    - Sets new bounds for an NDF.
+SETTYPE     - Sets a new numeric type for the data and variance
+              components of an NDF.
+SETVAR      - Sets new values for the variance component of an NDF data
+              structure.
 
-2 Filtering
-BLOCK     - Smooths a 1- or 2-dimensional image using a square or
-            rectangular box filter.
-CONVOLVE  - Convolves a pair of 1- or 2-dimensional NDFs together.
-FFCLEAN   - Removes defects from a substantially flat 1- or
-            2-dimensional NDF.
-FOURIER   - Performs forward and inverse Fourier transforms of 1- or
-            2-dimensional NDFs.
-GAUSMOOTH - Smooths a 1- or 2-dimensional image using a Gaussian
-            filter.
-LUCY      - Performs a Richardson-Lucy deconvolution of a 1- or
-            2-dimensional array.
-MEDIAN    - Smooths a 2-dimensional data array using a weighted
-            median filter.
-MEM2D     - Performs a Maximum-Entropy deconvolution of a
-            2-dimensional NDF.
-WIENER    - Applies a Wiener filter to a 1- or 2-dimensional array.
+3 NDF_axis_components
+AXCONV      - Expands spaced axes in an NDF into the primitive form.
+AXLABEL     - Sets a new label value for an axis within an NDF data
+              structure.
+AXUNITS     - Sets a new units value for an axis within an NDF data
+              structure.
+SETAXIS     - Sets values for an axis array component within an NDF data
+              structure.
+SETNORM     - Sets a new value for one or all of an NDF's
+              axis-normalisation flags.
 
-2 Graphics_Database
-PICBASE   - Selects the BASE picture from the graphics database.
-PICCUR    - Uses a cursor to select the current picture and to
-            report the co-ordinates of points.
-PICDATA   - Selects the last DATA picture from the graphics
-            database.
-PICDEF    - Defines a new graphics-database FRAME picture or an
-            array of FRAME pictures.
-PICEMPTY  - Finds the first empty FRAME picture in the graphics
-            database.
-PICENTIRE - Finds the first unobscured and unobscuring FRAME
-            picture in the graphics database.
-PICFRAME  - Selects the last FRAME picture from the graphics
-            database.
-PICGRID   - Creates an array of FRAME pictures.
-PICIN     - Finds the attributes of a picture interior to the
-            current picture.
-PICLABEL  - Labels the current graphics-database picture.
-PICLAST   - Selects the last picture from the graphics database.
-PICLIST   - Lists the pictures in the graphics database for a
-            device.
-PICSEL    - Selects a graphics-database picture by its label.
-PICTRANS  - Transforms co-ordinates between the current and BASE
-            pictures.
-PICVIS    - Finds the first unobscured FRAME picture in the
-            graphics database.
-PICXY     - Creates a new picture defined by co-ordinate bounds.
+3 NDF_character_components
+SETLABEL    - Sets a new label for an NDF data structure.
+SETTITLE    - Sets a new title for an NDF data structure.
+SETUNITS    - Sets a new units value for an NDF data structure.
 
-2 HDS_components
-ERASE     - Erases an HDS object.
-NATIVE    - Converts an HDS object to native machine data
-            representation.
+3 NDF_extensions
+FITSEDIT    - Edits the FITS extension of an NDF.
+FITSEXIST   - Inquires whether or not a keyword exists in a FITS
+              extension.
+FITSEXP     - Exports NDF-extension information into an NDF FITS
+              extension.
+FITSLIST    - Lists the FITS extension of an NDF.
+FITSMOD     - Edits an NDF FITS extension via a text file or parameters.
+FITSTEXT    - Creates an NDF FITS extension from a text file.
+FITSVAL     - Reports the value of a keyword in the FITS extension.
+FITSWRITE   - Writes a new keyword to the FITS extension.
+SETEXT      - Manipulates the contents of a specified NDF extension.
+SETSKY      - Makes an IRAS astrometry extension.
 
-2 NDF_array_components
-NDFCOPY   - Copies an NDF (or NDF section) to a new location.
-SETBAD    - Sets new bad-pixel flag values for an NDF.
-SETBB     - Sets a new value for the quality bad-bits mask of an
-            NDF.
-SETBOUND  - Sets new bounds for an NDF.
-SETTYPE   - Sets a new numeric type for the data and variance
-            components of an NDF.
-SETVAR    - Sets new values for the variance component of an NDF
-            data structure.
+3 NDF_history
+HISCOM      - Adds commentary to the history of an NDF.
+HISLIST     - Lists NDF history records.
+HISSET      - Sets the NDF history update mode.
 
-2 NDF_axis_components
-AXCONV    - Expands spaced axes in an NDF into the primitive form.
-AXLABEL   - Sets a new label value for an axis within an NDF data
-            structure.
-AXUNITS   - Sets a new units value for an axis within an NDF data
-            structure.
-SETAXIS   - Sets values for an axis array component within an NDF
-            data structure.
-SETNORM   - Sets a new value for one or all of an NDF's
-            axis-normalisation flags.
+3 Pixel_editing_and_masking
+ARDGEN      - Creates a text file describing selected regions of an
+              image.
+ARDMASK     - Uses an ARD file to set some pixels of an NDF to be bad.
+CHPIX       - Replaces the values of selected pixels in an NDF.
+ERRCLIP     - Removes pixels with large errors from an NDF.
+FFCLEAN     - Removes defects from a substantially flat 1- or
+              2-dimensional NDF.
+FILLBAD     - Removes regions of bad values from a 2-dimensional NDF.
+GLITCH      - Replaces bad pixels in a 2-d data array with the local
+              median.
+NOMAGIC     - Replaces all occurrences of magic value pixels in an NDF
+              array with a new value.
+OUTSET      - Sets pixels outside a specified circle in a 2-d data array
+              to a specified value.
+PASTE       - Pastes a series of NDFs upon each other.
+RIFT        - Adds a scalar to a section of an NDF data structure to
+              correct rift-valley defects.
+SEGMENT     - Copies polygonal segments from one NDF to another.
+SETMAGIC    - Replaces all occurrences of a given value in an NDF array
+              with the bad value.
+SUBSTITUTE  - Replaces all occurrences of a given value in an NDF array
+              with another value.
+ZAPLIN      - Replaces regions in a 2-d NDF by bad values or by linear
+              interpolation.
 
-2 NDF_character_components
-SETLABEL  - Sets a new label for an NDF data structure.
-SETTITLE  - Set a new title for an NDF data structure.
-SETUNITS  - Sets a new units value for an NDF data structure.
+3 Polarimetry
+CALPOL      - Calculates polarisation parameters.
 
-2 NDF_extensions
-FITSEDIT  - Edits the FITS extension of an NDF.
-FITSEXIST - Inquires whether or not a keyword exists in a FITS
-            extension.
-FITSEXP   - Exports NDF-extension information into an NDF FITS
-            extension.
-FITSLIST  - Lists the FITS extension of an NDF.
-FITSMOD   - Edits an NDF FITS extension via a text file or parameters.
-FITSTEXT  - Creates an NDF FITS extension from a text file.
-FITSVAL   - Reports the value of a keyword in the FITS extension.
-FITSWRITE - Writes a new keyword to the FITS extension.
-SETEXT    - Manipulates the contents of a specified NDF extension.
-SETSKY    - Makes an IRAS astrometry extension.
-
-2 NDF_History
-HISCOM    - Adds commentary to the history of an NDF.
-HISLIST   - Lists NDF history records.
-HISSET    - Sets the NDF history update mode.
-
-2 Image_generation_and_input
-CREFRAME  - Generates a test 2-d data array from a selection of
-            several types.
-FITSDIN   - Reads a FITS disc file composed of simple, group or
-            table objects.
-FITSHEAD  - Lists the headers of FITS files.
-FITSIMP   - Imports FITS information into an NDF extension.
-FITSIN    - Reads a FITS tape composed of simple, group or table
-            files.
-MATHS     - Evaluates mathematical expressions applied to NDF data
-            structures.
-TRANDAT   - Converts free-format data into an NDF.
-
-2 Inquiries_and_Status
-GLOBALS   - Displays the values of the KAPPA global parameters.
-FITSEXIST - Inquires whether or not a keyword exists in a FITS
-            extension.
-FITSLIST  - Lists the FITS extension of an NDF.
-FITSVAL   - Reports the value of a keyword in the FITS extension.
-NDFTRACE  - Displays the attributes of an NDF data structure.
-NOGLOBALS - Resets the KAPPA global parameters.
-
-2 Lookup_tables
-CRELUT    - Creates or manipulates an image-display lookup table
-            using a palette.
-LUTABLE   - Manipulates an image-display colour table.
-LUTBGYRW  - Loads the BGYRW lookup table.
-LUTCOL    - Loads the standard colour lookup table.
-LUTCONT   - Loads a lookup table to give the display the appearance
-            of a contour plot.
-LUTFC     - Loads the standard false-colour lookup table.
-LUTFLIP   - Flips the colour table of an image-display device.
-LUTGREY   - Loads the standard greyscale lookup table.
-LUTHEAT   - Loads the heat lookup table.
-LUTHILITE - Highlights a colour table of an image-display device.
-LUTIKON   - Loads the default Ikon lookup table.
-LUTNEG    - Loads the standard negative greyscale lookup table.
-LUTRAMPS  - Loads the coloured-ramps lookup table.
-LUTREAD   - Loads an image-display lookup table from an NDF.
-LUTROT    - Rotates the colour table of an image-display device.
-LUTSAVE   - Saves the current colour table of an image-display
-            device in an NDF.
-LUTSPEC   - Loads a spectrum-like lookup table.
-LUTTWEAK  - Tweaks a colour table of an image-display device.
-LUTVIEW   - Draws a colour-table key.
-LUTZEBRA  - Loads a pseudo-contour lookup table.
-
-2 Miscellaneous
-KAPHELP   - Gives help about KAPPA.
-
-2 Output_and_display
-CONTOUR   - Contours a 2-d NDF.
-CONTOVER  - Contours a 2-d data array overlaid on an image
-            displayed previously.
-DISPLAY   - Displays a 1-d or 2-d NDF.
-DRAWSIG   - Draws +/-n standard-deviation lines on a line plot.
-ELPROF    - Creates a radial or azimuthal profile of a
-            2-dimensional image.
-GREYPLOT  - Produces a greyscale plot of a 1-d or 2-d NDF.
-INSPECT   - Inspects a 2-d NDF in a variety of ways.
-LINPLOT   - Draws a line plot of a 1-d NDF's data values against
-            their axis co-ordinates.
-LOOK      - Outputs the values of a sub-array of a 2-d data array to
-            the screen or a text file.
-MLINPLOT  - Draws a multi-line plot of a 2-d NDF's data values
-            against their axis co-ordinates.
-SNAPSHOT  - Dumps an image-display memory to a graphics hardcopy and
-            optionally to an NDF.
-TURBOCONT - Contours a 2-d NDF quickly.
-VECPLOT   - Plots a 2-dimensional vector map.
-
-2 Palette
-PALDEF    - Loads the default palette to a colour table.
-PALENTRY  - Enters a colour into an image display's palette.
-PALREAD   - Fills the palette of a colour table from an NDF.
-PALSAVE   - Saves the palette of a colour table to an NDF.
-
-2 Pixel_editing
-ARDGEN    - Creates a text file describing selected regions of an
-            image.
-ARDMASK   - Uses an ARD file to set some pixels of an NDF to be bad.
-CHPIX     - Replaces the values of selected pixels in an NDF.
-ERRCLIP   - Removes pixels with large errors from an NDF.
-FFCLEAN   - Removes defects from a substantially flat 1- or
-            2-dimensional NDF.
-FILLBAD   - Removes regions of bad values from a 2-dimensional NDF.
-GLITCH    - Replaces bad pixels in a 2-d data array with the local
-            median.
-NOMAGIC   - Replaces all occurrences of magic value pixels in an
-            NDF array with a new value.
-OUTSET    - Sets pixels outside a specified circle in a 2-d data
-            array to a specified value.
-PASTE     - Pastes a series of NDFs upon each other.
-RIFT      - Adds a scalar to a section of an NDF data structure to
-            correct rift-valley defects.
-SEGMENT   - Copies polygonal segments from one NDF to another.
-SETMAGIC  - Replaces all occurrences of a given value in an NDF
-            array with the bad value.
-SUBSTITUTE - Replaces all occurrences of a given value in an NDF
-            array with another value.
-ZAPLIN    - Replaces regions in a 2-d NDF by bad values or by linear
-            interpolation.
-
-2 Polarimetry
-CALPOL    - Calculates polarisation parameters.
-
-2 Preparation_for_output
-FITSEDIT  - Edits the FITS extension of an NDF.
-FITSEXP   - Exports NDF-extension information into an NDF FITS
-            extension.
-FITSMOD   - Edits an NDF FITS extension via a text file or parameters.
-FITSTEXT  - Creates an NDF FITS extension from a text file.
-FITSWRITE - Writes a new keyword to the FITS extension.
-
-2 Resampling and transformations
+3 Resampling_and_transformations
 TRANINVERT  - Inverts a transformation.
 TRANJOIN    - Joins two transformations.
 TRANMAKE    - Makes a transformation structure given its co-ordinate
@@ -3801,30 +3820,52 @@ TRANMAKE    - Makes a transformation structure given its co-ordinate
 TRANSFORMER - Applies a transformation to an NDF.
 TRANTRACE   - Lists the contents of a transformation structure.
 
-2 Scripting_tools
-CALC      - Evaluates a mathematical expression.
-PARGET    - Obtains the value or values of an application parameter.
-
-2 Statistics
-APERADD   - Derives statistics of pixels within a specified circle
-            of a 2-d data array.
-HISTAT    - Computes ordered statistics for an NDF's pixels using an
-            histogram.
-HISTOGRAM - Computes an histogram of an NDF's values.
-INSPECT   - Inspects a 2-d NDF in a variety of ways.
-KSTEST    - Compares data sets using the Kolmogorov-Smirnov test.
-MSTATS    - Does cumulative statistics on a 2-d sub-array over a
-            sequence of data arrays.
-NUMB      - Counts the number of elements of an NDF with values or
-            absolute values above or below a threshold.
-STATS     - Computes simple statistics for an NDF's pixels.
-
-2 Surface_fitting
-FITSURFACE  - Fits a polynomial surface to 2-dimensional data array.
+3 Surface_fitting
+FITSURFACE  - FITS a polynomial surface to 2-dimensional data array.
 MAKESURFACE - Creates a 2-dimensional NDF from the coefficients of a
               polynomial surface.
-SURFIT      - Fits a polynomial or spline surface to a 2-d data array
+SURFIT      - FITS a polynomial or spline surface to a 2-d data array
               using blocking.
+
+2 Data_analysis
+
+3 Statistics
+APERADD     - Derives statistics of pixels within a specified circle of
+              a 2-d data array.
+HISTAT      - Computes ordered statistics for an NDF's pixels using an
+              histogram.
+HISTOGRAM   - Computes an histogram of an NDF's values.
+INSPECT     - Inspects a 2-d NDF in a variety of ways.
+MSTATS      - Does cumulative statistics on a 2-d sub-array over a
+              sequence of data arrays.
+NUMB        - Counts the number of elements of an NDF with values or
+              absolute values above or below a threshold.
+STATS       - Computes simple statistics for an NDF's pixels.
+
+3 Other
+CENTROID    - Finds the centroids of star-like features in an NDF.
+NORMALIZE   - Normalises one NDF to a similar NDF by calculating a scale
+              factor and zero-point difference.
+PSF         - Determines the parameters of a model star profile by
+              fitting star images in a two-dimensional NDF.
+SURFIT      - FITS a polynomial or spline surface to a 2-d data array.
+
+2 Scripting_tools
+CALC        - Evaluates a mathematical expression.
+PARGET      - Obtains the value or values of an application parameter.
+
+2 Inquiries_&_status
+GLOBALS     - Displays the values of the KAPPA global parameters.
+FITSEXIST   - Inquires whether or not a keyword exists in a FITS
+              extension.
+FITSLIST    - Lists the FITS extension of an NDF.
+FITSVAL     - Reports the value of a keyword in the FITS extension.
+NDFTRACE    - Displays the attributes of an NDF data structure.
+NOGLOBALS   - Resets the KAPPA global parameters.
+
+2 Miscellaneous
+KAPHELP     - Gives help about KAPPA.
+
 1 CMULT
 Multiplies an NDF by a scalar.
 
@@ -3867,6 +3908,8 @@ cmult in=rawdata out=newdata scalar=-19
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  17-APR-1990 (RFWS):
     Original version.
@@ -3878,9 +3921,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -6131,9 +6177,12 @@ MJC: Malcolm J. Currie (STARLINK)
     Improvements to the documentation including remarks about
     suggested defaults for XCENTRE and YCENTRE, and a related
     example, and a list of related applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -6771,6 +6820,8 @@ csub title="HD123456" out=b in=a scalar=21.9
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  12-APR-1990 (RFWS):
     Original version.
@@ -6781,9 +6832,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -7945,6 +7999,8 @@ array.
    KAPPA: GREYPLOT; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1990 July 12 (MJC):
     Original version based on the pre-V0.7 DISPLAY.
@@ -8010,9 +8066,12 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1997 May 28 (MJC):
     QUALITY and HISTORY no longer propagated to the OUT NDF.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+   VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
 
    -  Processing of bad pixels and automatic quality masking are
    supported.
@@ -8566,9 +8625,12 @@ MJC: Malcolm J. Currie (STARLINK)
     efficient.  Made message reporting conditional.  Ensured that
     the LIMIT could not be zero. Used a modern-style of variable
     declaration and other minor stylistic changes.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -8980,7 +9042,7 @@ MJC: Malcolm J. Currie (STARLINK)
     workspace.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -9151,13 +9213,22 @@ be replaced.
    COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, REMBAD, TIPPEX.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1995 April 16 (MJC):
     Original version.  Some of the documentation was derived from
     R.F. Warren-Smith's EDRS manual.
+
+ 21-MAY-1998 (DSB):
+    Check that input variances are not all bad or zero, and ignore
+    them if they are.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -9419,6 +9490,8 @@ Description:
    This procedure allows you to use your favourite editor to
    modify the FITS headers stored in an NDF's FITS extension.
    There is limited validation of the FITS headers after editing.
+   A FITS extension is created if the NDF does not already have 
+   one.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 NDF
@@ -9438,12 +9511,21 @@ modified version, performing some validation at this stage.
    KAPPA: FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
 2 Authors
 Malcolm J. Currie (STARLINK)
+David S. Berry (DSB):
 2 History
  1994 September 28 (MJC):
     Original version.
 
  1994 November 4 (MJC):
     Added ADAM-like help and abort facility for the parameter.
+
+ 1996 January 16 (MJC):
+    Added suggested default and search path for foreign data
+    formats.
+
+ 5-JUN-1998 (DSB):
+    Added facility to create a new FITS extension if there is no 
+    existing FITS extension in the NDF.
 1 FITSEXIST
 Inquires whether or not a keyword exists in a FITS extension.
 
@@ -11570,6 +11652,8 @@ gausmooth ngc1097 ngc1097s fwhm=7.2 wlim=0.1
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  7-AUG-1990 (RFWS):
     Original version.
@@ -11601,9 +11685,12 @@ MJC: Malcolm J. Currie (STARLINK)
     1-dimensional arrays.  Used lowercase examples and usage.
     Added Related Applications and additional commentary.  Changed
     default of TITLE to null.  Used PSX to obtain workspace.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -13290,6 +13377,8 @@ applications can process it.
    KAPPA: DISPLAY; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 February 7 (MJC):
     NDF version based on the pre-0.8 version.
@@ -13338,9 +13427,12 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1997 May 28 (MJC):
     QUALITY and HISTORY no longer propagated to the OUT NDF.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+   VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
 
    -  Processing of bad pixels and automatic quality masking are
    supported.
@@ -14130,6 +14222,8 @@ data array via THRESH, or have a large number of histogram bins.
    KAPPA: LAPLACE, LUTABLE, SHADOW, THRESH; Figaro: HOPT.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 8 (MJC):
     Original NDF version.
@@ -14137,9 +14231,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 January 12 (MJC):
     Replaced AIF calls with PAR and PSX.  Lowercase examples and
     usage.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, and HISTORY components of an NDF data structure and
+   LABEL, TITLE, WCS and HISTORY components of an NDF data structure and
    propagates all extensions.  UNITS and VARIANCE become undefined
    by the transformation, and so are not propagated.
 
@@ -15085,6 +15182,8 @@ by different dashed-line patterns.  Use PALENTRY to change the
 colour of the lines.
 2 Authors
 MJC: Malcolm Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 June 11 (MJC)
     Original NDF version, based on the pre-V0.8 version.
@@ -15112,12 +15211,15 @@ MJC: Malcolm Currie  (STARLINK)
     Leaves the palette of the overlay device unchanged.  Added
     a note describing the roles of the palette colours used.
     Inserted the "Save" option into the description of OPTION.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  Only real data can be processed directly.  Other data types
    will undergo a type conversion before processing occurs.
 
    -  The routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
    and propagates all extensions to the output Region NDF.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -15272,6 +15374,82 @@ KAPPA is loaded by typing kappa at the cl> prompt.  Applications are
 invoked and parameter values generally given as for normal IRAF tasks.
 There are a few anomalies and these are described in SUN/217.
 
+1 DIV
+Divides one NDF data structure by another.
+
+Usage:
+
+   div in1 in2 out
+
+Description:
+
+   The routine divides one NDF data structure by another
+   pixel-by-pixel to produce a new NDF.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN1
+IN1 = NDF (Read)
+   First NDF, to be divided by the second NDF.
+3 IN2
+IN2 = NDF (Read)
+   Second NDF, to be divided into the first NDF.
+3 OUT
+OUT = NDF (Write)
+   Output NDF to contain the ratio of the two input NDFs.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN1 to be used
+   instead. [!]
+2 Examples
+div a b c
+   This divides the NDF called a by the NDF called b, to make the
+   NDF called c.  NDF c inherits its title from a.
+
+div out=c in1=a in2=b title="Normalised data"
+   This divides the NDF called a by the NDF called b, to make the
+   NDF called c.  NDF c has the title "Normalised data".
+2 Notes
+If the two input NDFs have different pixel-index bounds, then
+they will be trimmed to match before being divided.  An error will
+result if they have no pixels in common.
+2 Related_Applications
+   KAPPA: ADD, CADD, CDIV, CMULT, CSUB, MATHS, MULT, SUB.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
+2 History
+ 9-APR-1990 (RFWS):
+    Original version.
+
+ 1992 January 15 (MJC):
+    Added Usage and Examples items.
+
+ 1995 September 12 (MJC):
+    Title inherited by default.  Usage and examples to lowercase.
+    Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
+   structure and propagates all extensions.
+
+   -  Units processing is not supported at present and therefore the
+   UNITS component is not propagated.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+   Calculations will be performed using either real or double
+   precision arithmetic, whichever is more appropriate.  If the
+   input NDF structures contain values with other data types, then
+   conversion will be performed as necessary.
 1 KAPHELP
 Gives help about KAPPA.
 
@@ -16875,9 +17053,12 @@ MJC: Malcolm J. Currie (STARLINK)
     Used conditional message reporting and modern-style variable
     declarations.  Added Related Applications.  Corrected typo's
     and made stylistic changes.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -18218,7 +18399,7 @@ UBOUND( 2 ) = _INTEGER (Read)
 VARIANCE = _LOGICAL (Read)
    If TRUE, a variance array is created in the output NDF
    provided the SURFACEFIT.FIT structure contains variance
-   information.  [FALSE]
+   information.
 3 XLIMIT
 XLIMIT( 2 ) = _DOUBLE (Read)
    Co-ordinates of the left then right edges of the x axis (if
@@ -18270,6 +18451,8 @@ be flipped with respect to the image from which it was fitted.
 SMB: Steven M. Beard (ROE)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  11-May-1993 (SMB):
     Original version.
@@ -18293,9 +18476,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1997 May 10 (MJC):
     Added support for creating a variance array.  Obtained
     workspace by PSX for efficiency.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.  However, neither
    QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
    null.
@@ -19265,6 +19451,8 @@ has a numeric type of _DOUBLE.
 MJC: Malcolm Currie (STARLINK)
 
 RFWS: R.F. Warren-Smith (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1989 August 20 (MJC):
     First implementation.
@@ -19284,9 +19472,12 @@ RFWS: R.F. Warren-Smith (STARLINK)
     parameters, Usage, Related Applications, and additional
     examples.  Enabled use of variance and co-ordinates in the
     expression.  Examples changed to lowercase.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDFs.  HISTORY and extensions are propagated from both the
    primary NDF and template NDF.
 
@@ -19525,6 +19716,8 @@ DB: Dave Baines (ROE)
 MJC: Malcolm J. Currie (STARLINK)
 
 SMB: Steven Beard (ROE)
+
+DSB: David S. Berry (STARLINK)
 2 History
  20/10/1983 (DB):
     Original version.
@@ -19594,9 +19787,12 @@ SMB: Steven Beard (ROE)
     Made to operate on all numeric data types.  Used a modern-style
     prologue with additional topics.  Modern-style coding.  Made
     messages conditional.  Removed a couple of unnecessary calls.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, LABEL, TITLE,
-   UNITS, and HISTORY components of an NDF data structure and
+   UNITS, WCS and HISTORY components of an NDF data structure and
    propagates all extensions.  VARIANCE is not used to weight the
    median filter and is not propagated.  QUALITY is also lost.
 
@@ -20001,9 +20197,12 @@ MJC: Malcolm J. Currie (STARLINK)
     Corrected typo's, and made minor stylistic changes and
     improvements to the documentation including a Related
     Applications section.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -20992,6 +21191,8 @@ will result if they have no pixels in common.
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  9-APR-1990 (RFWS):
     Original version.
@@ -21002,9 +21203,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
+   LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
    structure and propagates all extensions.
 
    -  Units processing is not supported at present and therefore the
@@ -21066,296 +21270,6 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 April 24 (MJC):
     Made usage and examples lowercase.  Sorted the variable
     declarations.
-1 NDFCOPY
-Copies an NDF (or NDF section) to a new location.
-
-Usage:
-
-   ndfcopy in out
-
-Description:
-
-   This application copies an NDF to a new location.  By supplying an
-   NDF section as input it may be used to extract a subset, or to
-   change the size or dimensionality of an NDF.  A second NDF may
-   also be supplied to act as a shape template, and hence to define
-   the region of the first NDF which is to be copied.
-
-   Any unused space will be eliminated by the copying operation
-   performed by this routine, so it may be used as a way of
-   compressing NDF structures from which components have been
-   deleted.  This ability also makes NDFCOPY a useful alternative to
-   SETBOUND in cases where an NDF's size is to be reduced.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 IN
-IN = NDF (Read)
-   The input NDF (or section) which is to be copied.
-3 LIKE
-LIKE = NDF (Read)
-   This parameter may be used to supply an NDF to be used as a
-   shape template during the copying operation.  If such a
-   template is supplied, then its shape will be used to select a
-   matching section from the input NDF before copying takes
-   place.  By default, no template will be used and the shape of
-   the output NDF will therefore match that of the input NDF (or
-   NDF section). [!]
-3 OUT
-OUT = NDF (Write)
-   The output NDF data structure.
-3 TITLE
-TITLE = LITERAL (Read)
-   A title for the output NDF.  A null value (the default) will
-   cause the title of the NDF supplied for parameter IN to be
-   used instead. [!]
-2 Examples
-ndfcopy infile outfile
-   Copies the contents of the NDF structure infile to the new
-   structure outfile.  Any unused space will be eliminated during
-   the copying operation.
-
-ndfcopy in=data1(3:40,-3:17) out=data2 title="Extracted section"
-   Copies the section (3:40,-3:17) of the NDF called data1 to a
-   new NDF called data2.  The output NDF is assigned the new title
-   "Extracted section", which replaces the title derived from the
-   input NDF.
-
-ndfcopy galaxy newgalaxy like=oldgalaxy
-   Copies a section of the NDF called galaxy to form a new NDF
-   called newgalaxy.  The section which is copied will correspond
-   in shape with the template oldgalaxy.  Thus, after the copying
-   operation, both newgalaxy and oldgalaxy will have the same
-   pixel-index bounds.
-
-ndfcopy aa(20~11,20~11) bb like=aa
-   Copies from the NDF section consisting of an 11x11 pixel
-   region of aa centred on pixel (20,20), into a new NDF called
-   bb.  The shape of the region copied is made to match the
-   original shape of aa.  The effect is to extract the selected
-   square region of pixels into a new NDF of the same shape as
-   the original, setting the surrounding region to the bad-pixel
-   value.
-2 Related_Applications
-   KAPPA: SETBOUND; Figaro: ISUBSET.
-2 Authors
-RFWS: R.F. Warren-Smith (STARLINK, RAL)
-
-MJC: Malcolm J. Currie (STARLINK)
-2 History
- 27-FEB-1991 (RFWS):
-    Original version.
-
- 19-MAR-1991 (RFWS):
-    Added the LIKE parameter to allow the use of a shape template.
-
- 22-MAR-1991 (RFWS):
-    Added the TITLE parameter.
-
- 1995 April 24 (MJC):
-    Made usage and examples lowercase.  Added Related Applications.
-2 Implementation_Status
-   If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
-   QUALITY, AXIS and HISTORY components are copied by this routine,
-   together with all extensions.  The output NDF's title may be
-   modified, if required, by specifying a new value via the TITLE
-   parameter.
-1 NDFTRACE
-Displays the attributes of an NDF data structure.
-
-Usage:
-
-   ndftrace ndf
-
-Description:
-
-   This routine displays the attributes of an NDF data structure
-   including:
-
-   -  its name;
-
-   -  the values of its character components (title, label and
-   units);
-
-   -  its shape (pixel bounds, dimension sizes, number of dimensions
-   and total number of pixels);
-
-   -  zxis co-ordinate information (axis labels, units and extents);
-
-   -  optionally, axis array attributes (type and storage form) and
-   the values of the axis normalisation flags;
-
-   -  attributes of the main data array and any other array
-   components present (including the type and storage form and an
-   indication of whether `bad' pixels may be present);
-
-   -  a list of any NDF extensions present, together with their data
-   types; and
-
-   -  history information (creation and last-updated dates, the
-   update mode and the number of history records).
-
-   Most of this information is output to parameters.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 AEND
-AEND( ) = _DOUBLE (Write)
-   The axis upper extents of the NDF.  For non-monotonic axes,
-   zero is used.  See parameter AMONO.  This is not assigned if
-   AXIS is FALSE.
-3 AFORM
-AFORM( ) = LITERAL (Write)
-   The storage forms of the axis centres of the NDF.  This is
-   only written when FULLAXIS is TRUE and AXIS is TRUE.
-3 ALABEL
-ALABEL( ) = LITERAL (Write)
-   The axis labels of the NDF.  This is not assigned if AXIS is
-   FALSE.
-3 AMONO
-AMONO( ) = _LOGICAL (Write)
-   These are TRUE when the axis centres are monotonic, and FALSE
-   otherwise.  This is not assigned if AXIS is FALSE.
-3 ANORM
-ANORM( ) = _LOGICAL (Write)
-   The axis normalisation flags of the NDF.  This is only written
-   when FULLAXIS is TRUE and AXIS is TRUE.
-3 ASTART
-ASTART( ) = _DOUBLE (Write)
-   The axis lower extents of the NDF.  For non-monotonic axes,
-   zero is used.  See parameter AMONO.  This is not assigned if
-   AXIS is FALSE.
-3 ATYPE
-ATYPE( ) = LITERAL (Write)
-   The data types of the axis centres of the NDF.  This is only
-   written when FULLAXIS is TRUE and AXIS is TRUE.
-3 AUNITS
-AUNITS( ) = LITERAL (Write)
-   The axis units of the NDF.  This is not assigned if AXIS is
-   FALSE.
-3 AVARIANCE
-AVARIANCE( ) = _LOGICAL (Write)
-   Whether or not there are axis variance arrays present in the
-   NDF.  This is only written when FULLAXIS is TRUE and AXIS is
-   TRUE.
-3 AXIS
-AXIS = _LOGICAL (Write)
-   Whether or not the NDF has an axis system.
-3 BAD
-BAD = _LOGICAL (Write)
-   If TRUE, the NDF's data array may contain bad values.
-3 BADBITS
-BADBITS = LITERAL (Write)
-   The BADBITS mask.  This is only valid when QUALITY is TRUE.
-3 DIMS
-DIMS( ) = _INTEGER (Write)
-   The dimensions of the NDF.
-3 EXTNAME
-EXTNAME( ) = LITERAL (Write)
-   The names of the extensions in the NDF.  It is only written
-   when NEXTN is positive.
-3 EXTTYPE
-EXTTYPE( ) = LITERAL (Write)
-   The types of the extensions in the NDF.  Their order
-   corresponds to the names in EXTNAME.  It is only written when
-   NEXTN is positive.
-3 FORM
-FORM = LITERAL (Write)
-   The storage form of the NDF's data array.
-3 FULLAXIS
-FULLAXIS = _LOGICAL (Read)
-   If the NDF being examined has an axis co-ordinate system
-   defined, then by default only the label, units and extent of
-   each axis will be displayed.  However, if a TRUE value is given
-   for this parameter, full details of the attributes of all the
-   axis arrays will also be given. [FALSE]
-3 HISTORY
-HISTORY = _LOGICAL (Write)
-   Whether or not the NDF contains HISTORY records.
-3 LABEL
-LABEL = LITERAL (Write)
-   The label of the NDF.
-3 LBOUND
-LBOUND( ) = _INTEGER (Write)
-   The lower bounds of the NDF.
-3 NDF
-NDF = NDF (Read)
-   The NDF data structure whose attributes are to be displayed.
-3 NDIM
-NDIM = _INTEGER (Write)
-   The number of dimensions of the NDF.
-3 NEXTN
-NEXTN = _INTEGER (Write)
-   The number of extensions in the NDF.
-3 QUALITY
-QUALITY = _LOGICAL (Write)
-   Whether or not the NDF contains a QUALITY array.
-3 QUIET
-QUIET = _LOGICAL (Read)
-   A TRUE value suppresses the reporting of the NDF's attributes.
-   It is intended for procedures and scripts where only the
-   output parameters are needed. [FALSE]
-3 TITLE
-TITLE = LITERAL (Write)
-   The title of the NDF.
-3 TYPE
-TYPE = LITERAL (Write)
-   The data type of the NDF's data array.
-3 UBOUND
-UBOUND( ) = _INTEGER (Write)
-   The upper bounds of the NDF.
-3 UNITS
-UNITS = LITERAL (Write)
-   The units of the NDF.
-3 VARIANCE
-VARIANCE = _LOGICAL (Write)
-   Whether or not the NDF contains a VARIANCE array.
-3 WIDTH
-WIDTH( ) = _LOGICAL (Write)
-   Whether or not there are axis width arrays present in the NDF.
-   This is only written when FULLAXIS is TRUE and AXIS is TRUE.
-2 Examples
-ndftrace mydata
-   Displays information about the attributes of the NDF structure
-   called mydata.
-
-ndftrace ndf=r106 fullaxis
-   Displays information about the NDF structure r106, including
-   full details of any axis arrays present.
-
-ndftrace mydata quiet ndim=(mdim)
-   Passes the number of dimensions of the NDF called mydata
-   into the ICL variable mdim.  No information is displayed.
-2 Related_Applications
-   HDSTRACE.
-2 Authors
-RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
-2 History
- 1990 April 6 (RFWS):
-    Original version.
-
- 1991 April 29 (RFWS):
-    Added support for axis components and added the usage and
-    examples sections to the prologue.
-
- 1992 November 30 (MJC):
-    Reports non-monotonic axis centres.
-
- 1993 February 4 (MJC):
-    Fixed bug that caused incorrect axis extents to be reported
-    when there were no axis-width arrays and the axis centres did
-    not increment by one.
-
- 1994 July 29 (RFWS):
-    Adapted to handle history information.
-
- 1995 April 24 (MJC):
-    Made usage and examples lowercase.  Added Related Applications.
-    Added History to the Description.  Sorted the variable
-    declarations and other tidying.
-
- 1995 June 18 (MJC):
-    Added QUIET option and the output parameters.
 1 NDF_History
 
 During a spring clean of directories to free some space, most of us
@@ -21694,6 +21608,301 @@ with HISSET.
 
  Many other combinations are obviously possible.
 
+1 NDFCOPY
+Copies an NDF (or NDF section) to a new location.
+
+Usage:
+
+   ndfcopy in out
+
+Description:
+
+   This application copies an NDF to a new location.  By supplying an
+   NDF section as input it may be used to extract a subset, or to
+   change the size or dimensionality of an NDF.  A second NDF may
+   also be supplied to act as a shape template, and hence to define
+   the region of the first NDF which is to be copied.
+
+   Any unused space will be eliminated by the copying operation
+   performed by this routine, so it may be used as a way of
+   compressing NDF structures from which components have been
+   deleted.  This ability also makes NDFCOPY a useful alternative to
+   SETBOUND in cases where an NDF's size is to be reduced.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF (or section) which is to be copied.
+3 LIKE
+LIKE = NDF (Read)
+   This parameter may be used to supply an NDF to be used as a
+   shape template during the copying operation.  If such a
+   template is supplied, then its shape will be used to select a
+   matching section from the input NDF before copying takes
+   place.  By default, no template will be used and the shape of
+   the output NDF will therefore match that of the input NDF (or
+   NDF section). [!]
+3 OUT
+OUT = NDF (Write)
+   The output NDF data structure.
+3 TITLE
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value (the default) will
+   cause the title of the NDF supplied for parameter IN to be
+   used instead. [!]
+2 Examples
+ndfcopy infile outfile
+   Copies the contents of the NDF structure infile to the new
+   structure outfile.  Any unused space will be eliminated during
+   the copying operation.
+
+ndfcopy in=data1(3:40,-3:17) out=data2 title="Extracted section"
+   Copies the section (3:40,-3:17) of the NDF called data1 to a
+   new NDF called data2.  The output NDF is assigned the new title
+   "Extracted section", which replaces the title derived from the
+   input NDF.
+
+ndfcopy galaxy newgalaxy like=oldgalaxy
+   Copies a section of the NDF called galaxy to form a new NDF
+   called newgalaxy.  The section which is copied will correspond
+   in shape with the template oldgalaxy.  Thus, after the copying
+   operation, both newgalaxy and oldgalaxy will have the same
+   pixel-index bounds.
+
+ndfcopy aa(20~11,20~11) bb like=aa
+   Copies from the NDF section consisting of an 11x11 pixel
+   region of aa centred on pixel (20,20), into a new NDF called
+   bb.  The shape of the region copied is made to match the
+   original shape of aa.  The effect is to extract the selected
+   square region of pixels into a new NDF of the same shape as
+   the original, setting the surrounding region to the bad-pixel
+   value.
+2 Related_Applications
+   KAPPA: SETBOUND; Figaro: ISUBSET.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
+2 History
+ 27-FEB-1991 (RFWS):
+    Original version.
+
+ 19-MAR-1991 (RFWS):
+    Added the LIKE parameter to allow the use of a shape template.
+
+ 22-MAR-1991 (RFWS):
+    Added the TITLE parameter.
+
+ 1995 April 24 (MJC):
+    Made usage and examples lowercase.  Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+2 Implementation_Status
+   If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
+   QUALITY, AXIS WCS and HISTORY components are copied by this routine,
+   together with all extensions.  The output NDF's title may be
+   modified, if required, by specifying a new value via the TITLE
+   parameter.
+1 NDFTRACE
+Displays the attributes of an NDF data structure.
+
+Usage:
+
+   ndftrace ndf
+
+Description:
+
+   This routine displays the attributes of an NDF data structure
+   including:
+
+   -  its name;
+
+   -  the values of its character components (title, label and
+   units);
+
+   -  its shape (pixel bounds, dimension sizes, number of dimensions
+   and total number of pixels);
+
+   -  zxis co-ordinate information (axis labels, units and extents);
+
+   -  optionally, axis array attributes (type and storage form) and
+   the values of the axis normalisation flags;
+
+   -  attributes of the main data array and any other array
+   components present (including the type and storage form and an
+   indication of whether `bad' pixels may be present);
+
+   -  a list of any NDF extensions present, together with their data
+   types; and
+
+   -  history information (creation and last-updated dates, the
+   update mode and the number of history records).
+
+   Most of this information is output to parameters.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AEND
+AEND( ) = _DOUBLE (Write)
+   The axis upper extents of the NDF.  For non-monotonic axes,
+   zero is used.  See parameter AMONO.  This is not assigned if
+   AXIS is FALSE.
+3 AFORM
+AFORM( ) = LITERAL (Write)
+   The storage forms of the axis centres of the NDF.  This is
+   only written when FULLAXIS is TRUE and AXIS is TRUE.
+3 ALABEL
+ALABEL( ) = LITERAL (Write)
+   The axis labels of the NDF.  This is not assigned if AXIS is
+   FALSE.
+3 AMONO
+AMONO( ) = _LOGICAL (Write)
+   These are TRUE when the axis centres are monotonic, and FALSE
+   otherwise.  This is not assigned if AXIS is FALSE.
+3 ANORM
+ANORM( ) = _LOGICAL (Write)
+   The axis normalisation flags of the NDF.  This is only written
+   when FULLAXIS is TRUE and AXIS is TRUE.
+3 ASTART
+ASTART( ) = _DOUBLE (Write)
+   The axis lower extents of the NDF.  For non-monotonic axes,
+   zero is used.  See parameter AMONO.  This is not assigned if
+   AXIS is FALSE.
+3 ATYPE
+ATYPE( ) = LITERAL (Write)
+   The data types of the axis centres of the NDF.  This is only
+   written when FULLAXIS is TRUE and AXIS is TRUE.
+3 AUNITS
+AUNITS( ) = LITERAL (Write)
+   The axis units of the NDF.  This is not assigned if AXIS is
+   FALSE.
+3 AVARIANCE
+AVARIANCE( ) = _LOGICAL (Write)
+   Whether or not there are axis variance arrays present in the
+   NDF.  This is only written when FULLAXIS is TRUE and AXIS is
+   TRUE.
+3 AXIS
+AXIS = _LOGICAL (Write)
+   Whether or not the NDF has an axis system.
+3 BAD
+BAD = _LOGICAL (Write)
+   If TRUE, the NDF's data array may contain bad values.
+3 BADBITS
+BADBITS = LITERAL (Write)
+   The BADBITS mask.  This is only valid when QUALITY is TRUE.
+3 DIMS
+DIMS( ) = _INTEGER (Write)
+   The dimensions of the NDF.
+3 EXTNAME
+EXTNAME( ) = LITERAL (Write)
+   The names of the extensions in the NDF.  It is only written
+   when NEXTN is positive.
+3 EXTTYPE
+EXTTYPE( ) = LITERAL (Write)
+   The types of the extensions in the NDF.  Their order
+   corresponds to the names in EXTNAME.  It is only written when
+   NEXTN is positive.
+3 FORM
+FORM = LITERAL (Write)
+   The storage form of the NDF's data array.
+3 FULLAXIS
+FULLAXIS = _LOGICAL (Read)
+   If the NDF being examined has an axis co-ordinate system
+   defined, then by default only the label, units and extent of
+   each axis will be displayed.  However, if a TRUE value is given
+   for this parameter, full details of the attributes of all the
+   axis arrays will also be given. [FALSE]
+3 HISTORY
+HISTORY = _LOGICAL (Write)
+   Whether or not the NDF contains HISTORY records.
+3 LABEL
+LABEL = LITERAL (Write)
+   The label of the NDF.
+3 LBOUND
+LBOUND( ) = _INTEGER (Write)
+   The lower bounds of the NDF.
+3 NDF
+NDF = NDF (Read)
+   The NDF data structure whose attributes are to be displayed.
+3 NDIM
+NDIM = _INTEGER (Write)
+   The number of dimensions of the NDF.
+3 NEXTN
+NEXTN = _INTEGER (Write)
+   The number of extensions in the NDF.
+3 QUALITY
+QUALITY = _LOGICAL (Write)
+   Whether or not the NDF contains a QUALITY array.
+3 QUIET
+QUIET = _LOGICAL (Read)
+   A TRUE value suppresses the reporting of the NDF's attributes.
+   It is intended for procedures and scripts where only the
+   output parameters are needed. [FALSE]
+3 TITLE
+TITLE = LITERAL (Write)
+   The title of the NDF.
+3 TYPE
+TYPE = LITERAL (Write)
+   The data type of the NDF's data array.
+3 UBOUND
+UBOUND( ) = _INTEGER (Write)
+   The upper bounds of the NDF.
+3 UNITS
+UNITS = LITERAL (Write)
+   The units of the NDF.
+3 VARIANCE
+VARIANCE = _LOGICAL (Write)
+   Whether or not the NDF contains a VARIANCE array.
+3 WIDTH
+WIDTH( ) = _LOGICAL (Write)
+   Whether or not there are axis width arrays present in the NDF.
+   This is only written when FULLAXIS is TRUE and AXIS is TRUE.
+2 Examples
+ndftrace mydata
+   Displays information about the attributes of the NDF structure
+   called mydata.
+
+ndftrace ndf=r106 fullaxis
+   Displays information about the NDF structure r106, including
+   full details of any axis arrays present.
+
+ndftrace mydata quiet ndim=(mdim)
+   Passes the number of dimensions of the NDF called mydata
+   into the ICL variable mdim.  No information is displayed.
+2 Related_Applications
+   HDSTRACE.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 April 6 (RFWS):
+    Original version.
+
+ 1991 April 29 (RFWS):
+    Added support for axis components and added the usage and
+    examples sections to the prologue.
+
+ 1992 November 30 (MJC):
+    Reports non-monotonic axis centres.
+
+ 1993 February 4 (MJC):
+    Fixed bug that caused incorrect axis extents to be reported
+    when there were no axis-width arrays and the axis centres did
+    not increment by one.
+
+ 1994 July 29 (RFWS):
+    Adapted to handle history information.
+
+ 1995 April 24 (MJC):
+    Made usage and examples lowercase.  Added Related Applications.
+    Added History to the Description.  Sorted the variable
+    declarations and other tidying.
+
+ 1995 June 18 (MJC):
+    Added QUIET option and the output parameters.
 1 NOGLOBALS
 Resets the KAPPA global parameters.
 
@@ -21837,9 +22046,12 @@ DSB: David S. Berry (STARLINK)
     components rather than COMP( I ) component to avoid
     possibility of NDF_UNMAP being asked to unmap the 'Error'
     component.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -22076,9 +22288,12 @@ MJC: Malcolm J. Currie (STARLINK)
     Sets the bad-pixel flags.  Removed old histogram subroutine
     calls.  Used PSX for workspace.  Made the Usage and Examples
     lowercase.  Added Related Applications.  Title propagated.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  The routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
    and propagates all extensions to the output NDF.  All propagated
    components come from the NDF to be normalised.
 
@@ -23441,12 +23656,17 @@ paste ccd fudge inset out=ccdc
    may be larger than those of ccdc.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 15 (MJC):
     Original version.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an NDF
    data structure and propagates all extensions.  Propagation is from
    the base NDF.
 
@@ -26172,6 +26392,8 @@ paste the result back into the full array.
    ICSET, NCSET, TIPPEX.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 October 31 (MJC):
     Original version based on RFWS's CADD.
@@ -26180,9 +26402,12 @@ MJC: Malcolm J. Currie (STARLINK)
     Used the SECTION parameter instead of pixel bounds.  Made Usage
     and Examples Lowercase.  Added Related Applications, Examples,
     and Implementation Status.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -26626,6 +26851,9 @@ MJC: Malcolm J. Currie (STARLINK)
     When POLY1 is given on the command line in file mode, it is
     now possible to supply additional polygons through parameters
     POLY2-POLY20 also given on the command line.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine will propagate VARIANCE component values so long
    as all supplied input NDFs have defined VARIANCE components, and
@@ -26635,7 +26863,7 @@ MJC: Malcolm J. Currie (STARLINK)
    as all supplied input NDFs have defined QUALITY components, and
    parameter QUALITY is not FALSE.
 
-   -  The UNITS, AXIS, LABEL, TITLE, and HISTORY components are
+   -  The UNITS, AXIS, LABEL, TITLE, WCS and HISTORY components are
    propagated from the first supplied input NDF, together with all
    extensions.
 
@@ -27612,6 +27840,8 @@ less than their mean times the precision of the data type.
    ZAPLIN; SPECDRE: GOODVAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 6 (MJC):
     Original NDF_ version.
@@ -27619,9 +27849,12 @@ MJC: Malcolm J. Currie  (STARLINK)
  1994 September 26 (MJC):
     Replaced AIF calls, and used a modern style of commenting.
     Made messages conditional.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -28380,12 +28613,17 @@ shadow out=aash in=aa [-1,-1] title="Bas relief"
    KAPPA: LAPLACE, MEDIAN; Figaro: ICONV3.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1995 April 28 (MJC):
     Original NDF version.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF data
+   VARIANCE, LABEL, TITLE, UNITS, AXIS and HISTORY components of an NDF data
    structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -29010,6 +29248,8 @@ will result if they have no pixels in common.
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  6-APR-1990 (RFWS):
     Original version.
@@ -29020,9 +29260,12 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
+   LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
    structure and propagates all extensions.
 
    -  Units processing is not supported at present and therefore the
@@ -29106,12 +29349,17 @@ less than their mean times the precision of the data type.
    SPECDRE: GOODVAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1997 May 23 (MJC):
     Original version.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  All non-complex numeric data types can be handled.
@@ -29505,27 +29753,26 @@ FITTYPE = LITERAL (Read)
    The type of fit.  It must be either "Polynomial" for a
    Chebyshev polynomial or "Spline" for a bi-cubic spline.  The
    default is the current value, which initially is "Spline". []
+3 LOGFILE
+LOGFILE = FILENAME (Read)
+   Name of the file to log the binned array and errors before and
+   after fitting.  If null, there will be no logging. [!]
 3 IN
 IN = NDF (Read)
    NDF containing the 2-dimensional data array to be fitted.
 3 KNOTS
 KNOTS( 2 ) = _INTEGER (Read)
    The number of interior knots used for the bi-cubic-spline fit
-   along the x and y axes.  These knots are equally spaced
-   within the image.  Both values must be in the range 0 to
-   11.  If you supply a single value, it applies to both axes.
-   Thus 1 creates one interior knot, [5,4] gives 5 along the x
-   axis and 4 along the y direction.  Increasing this
-   parameter values increases the flexibility of the surface.
-   Normally, 4 is a reasonable value.  The upper limit of
-   acceptable values will be reduced along each axis when its
-   binned array dimension is less than 29.  KNOTS is only
-   accessed when FITTYPE="Spline".  The default is the current
-   value, which is 4 initially. []
-3 LOGFILE
-LOGFILE = FILENAME (Read)
-   Name of the file to log the binned array and errors before and
-   after fitting.  If null, there will be no logging. [!]
+   along the x and y axes.  These knots are equally spaced within
+   the image.  Both values must be in the range 0 to 11.  If you
+   supply a single value, it applies to both axes.  Thus 1
+   creates one interior knot, [5,4] gives 5 along the x axis and
+   4 along the y direction.  Increasing this parameter values
+   increases the flexibility of the surface.  Normally, 4 is a
+   reasonable value.  The upper limit of acceptable values will
+   be reduced along each axis when its binned array dimension is
+   less than 29.  KNOTS is only accessed when FITTYPE="Spline".
+   The default is the current value, which is 4 initially. []
 3 ORDER
 ORDER( 2 ) = _INTEGER (Read)
    The orders of the fits along the x and y directions.  Both
@@ -29596,12 +29843,17 @@ surfit in=irasorion out=sback evaluate=all fittype=s knots=7
    KAPPA: ARDMASK, FITSURFACE, MAKESURFACE.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK).
+
+DSB: David S. Berry (STARLINK)
 2 History
  1996 October 23 (MJC):
     Original NDF version.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, and HISTORY components of the input NDF.
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
    There is no support for VARIANCE processing.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -29705,6 +29957,8 @@ thresh pavo pavosky -0.02 0.02 bad bad
    KAPPA: HISTEQ, MATHS; Figaro: CLIP, IDIFF, RESCALE.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 6 (MJC):
     Original NDF_ version.
@@ -29715,9 +29969,12 @@ MJC: Malcolm J. Currie  (STARLINK)
 
  1996 April 11 (MJC):
     Use the bad-pixel flag.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -30420,12 +30677,6 @@ expressions actually define a pair of complementary mappings.
 -  On completion, the destination structure for the
 transformation information equates to the current transformation
 global parameter.
-
--  Expressions supplied for parameters FOR1-FOR7 and INV1-INV7 
-should be enclosed in double quotes (even when given in response 
-to a prompt) to protect the equals sign from interpretation by 
-the shell or parameter system.
-
 2 Related_Applications
    KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANSFORMER,
    TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
@@ -31943,9 +32194,12 @@ MJC: Malcolm J. Currie (STARLINK)
     typo's, used a modern-style variable declaration and other
     stylistic changes, shortened long lines, and made message
     reporting conditional.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, and HISTORY components of the
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
@@ -32162,6 +32416,8 @@ and second dimensions of the NDF as a whole.  See the "Examples".
 MJM: Mark McCaughrean (UoE)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  01-07-1985 (MJM):
     First implementation, using line/column co-ordinates read from
@@ -32230,9 +32486,12 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1995 September 20 (MJC):
     Changed default of TITLE to null.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

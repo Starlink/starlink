@@ -52,7 +52,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+*     LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -63,6 +63,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,8 @@
 *     1995 September 12 (MJC):
 *        Title inherited by default.  Usage and examples to lowercase.
 *        Added Related Applications.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,9 +124,10 @@
 *  Obtain the scalar value for division.
       CALL PAR_GET0D( 'SCALAR', CONST, STATUS )
 
-*  Create a new output NDF based on the input NDF. Propagate the axis,
+*  Create a new output NDF based on the input NDF. Propagate the WCS, axis,
 *  quality and units components.
-      CALL NDF_PROP( NDF1, 'Axis,Quality,Units', 'OUT', NDF2, STATUS )
+      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+     :               STATUS )
 
 *  See if the input NDF has a variance component and set the list of
 *  components to process accordingly.

@@ -77,7 +77,7 @@
 *     and the online help.
 
 *  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, QUALITY,
+*     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
 *     LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
@@ -91,6 +91,7 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -108,6 +109,8 @@
 *        TITLE a parameter.
 *     1996 July 31 (MJC):
 *        Made ARDFILE have type FILENAME for IRAF usage.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -293,8 +296,8 @@
       END IF
 
 *  Propagate the bits of the source NDF required.
-      CALL NDF_PROP( NDFI, 'Data,Variance,Quality,Axis,Units', 'OUT',
-     :               NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'Data,Variance,Quality,Axis,Units,WCS', 
+     :               'OUT', NDFO, STATUS )
 
 *  Get the title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )

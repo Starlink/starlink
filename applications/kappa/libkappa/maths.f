@@ -304,7 +304,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDFs.  HISTORY and extensions are propagated from both the
 *     primary NDF and template NDF.
 *     -  Processing of bad pixels and automatic quality masking are
@@ -316,6 +316,7 @@
 *  Authors:
 *     MJC: Malcolm Currie (STARLINK)
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -333,6 +334,8 @@
 *        parameters, Usage, Related Applications, and additional
 *        examples.  Enabled use of variance and co-ordinates in the
 *        expression.  Examples changed to lowercase.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -686,13 +689,13 @@
          CALL PAR_GET0L( 'UNITS', UNITS, STATUS )
 
 *  Create an output NDF based on the (alphabetically) first input NDF,
-*  propagating the axis and quality information (and the units
+*  propagating the WCS, axis and quality information (and the units
 *  information if required).
          IF ( UNITS ) THEN
-            CALL NDF_PROP( NDF( 1 ), 'Axis,Quality,Units', 'OUT',
+            CALL NDF_PROP( NDF( 1 ), 'WCS,Axis,Quality,Units', 'OUT',
      :                     NDFOUT, STATUS )
          ELSE
-            CALL NDF_PROP( NDF( 1 ), 'Axis,Quality', 'OUT', NDFOUT,
+            CALL NDF_PROP( NDF( 1 ), 'WCS,Axis,Quality', 'OUT', NDFOUT,
      :                     STATUS )
          END IF
 
@@ -731,12 +734,12 @@
             CALL PAR_GET0L( 'UNITS', UNITS, STATUS )
 
 *  Create an output NDF using the supplied template, propagating the
-*  data and axis arrays, the title, label and history.
+*  data and axis arrays, the title, label, WCS and history.
             IF ( UNITS ) THEN
-               CALL NDF_PROP( LIKEID, 'Data,Units,Axis', 'OUT', NDFOUT,
-     :                        STATUS )
+               CALL NDF_PROP( LIKEID, 'Data,Units,Axis,WCS', 'OUT', 
+     :                        NDFOUT, STATUS )
             ELSE
-               CALL NDF_PROP( LIKEID, 'Data,Axis', 'OUT', NDFOUT,
+               CALL NDF_PROP( LIKEID, 'Data,Axis,WCS', 'OUT', NDFOUT,
      :                        STATUS )
             END IF
 

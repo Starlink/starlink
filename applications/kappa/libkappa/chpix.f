@@ -89,7 +89,7 @@
 
 *  Implementation Status:
 *     -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
-*     TITLE, UNITS, HISTORY, and VARIANCE components of an NDF; and
+*     TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF; and
 *     propagates all extensions.  Bad pixels and all non-complex
 *     numeric data types can be handled.
 *     -  The HISTORY component, if present, is simply propagated without
@@ -106,6 +106,8 @@
 *     27-FEB-1998 (DSB):
 *        Use NUM_ functions to convert lower precision integer values to 
 *        _INTEGER when calling PAR_MIX0I.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -204,8 +206,8 @@
 *  Create the output NDF.
 *  ======================
 *  Obtain an output NDF and propagate the whole of the input NDF to it.
-      CALL NDF_PROP( NDFI, 'Data,Variance,Quality,Axis,Units', 'OUT',
-     :               NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'WCS,Data,Variance,Quality,Axis,Units', 
+     :               'OUT', NDFO, STATUS )
 
 *  Get the title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )

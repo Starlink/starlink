@@ -111,7 +111,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.  However, neither
 *     QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
 *     null.
@@ -131,6 +131,7 @@
 *  Authors:
 *     SMB: Steven M. Beard (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -152,6 +153,8 @@
 *     1997 May 10 (MJC):
 *        Added support for creating a variance array.  Obtained
 *        workspace by PSX for efficiency.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -353,7 +356,7 @@
 *  and axis arrays, the title, label and history but NOT the SURFACEFIT
 *  extension.
                      CALL NDF_PROP( LIKEID, 'DATA,UNITS,AXIS,TITLE,'/
-     :                              /'LABEL,HISTORY,'/
+     :                              /'LABEL,HISTORY,WCS,'/
      :                              /'NOEXTENSION(SURFACEFIT)',
      :                              'OUT', NDFO, STATUS )
 

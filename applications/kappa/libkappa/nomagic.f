@@ -137,7 +137,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -160,6 +160,8 @@
 *        components rather than COMP( I ) component to avoid
 *        possibility of NDF_UNMAP being asked to unmap the 'Error'
 *        component.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -336,7 +338,7 @@
 *  Propagate the QUALITY, UNITS and AXIS components from the input NDF
 *  to the output, and the arrays not to be processed.
       IF ( PROCES( 1 ) .AND. PROCES( 2 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Quality,Units,Axis', 'OUT', NDFO,
+         CALL NDF_PROP( NDFI, 'Quality,Units,Axis,WCS', 'OUT', NDFO,
      :                  STATUS )
 
 *  This application supports all the non-complex numeric types
@@ -351,7 +353,7 @@
          CALL NDF_STYPE( DTYPE, NDFO, 'Data,Variance', STATUS )
 
       ELSE IF ( PROCES( 1 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Variance,Quality,Units,Axis', 'OUT',
+         CALL NDF_PROP( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
@@ -359,8 +361,8 @@
      :                   DTYPE, STATUS )
 
       ELSE IF ( PROCES( 2 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Data,Quality,Units,Axis', 'OUT', NDFO,
-     :                  STATUS )
+         CALL NDF_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
+     :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
      :                   /'_DOUBLE', NDFI, NDFI, 'Variance', ITYPE,

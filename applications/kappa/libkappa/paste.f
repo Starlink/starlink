@@ -85,12 +85,9 @@
 *        values are transparent.  The bounds and dimensionality of ccd
 *        may be larger than those of ccdc.
 
-*  Algorithm:
-*     {algorithm_description}...
-
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an NDF
 *     data structure and propagates all extensions.  Propagation is from
 *     the base NDF.
 *     -  Processing of bad pixels and automatic quality masking are
@@ -98,14 +95,16 @@
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1991 November 15 (MJC):
 *        Original version.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -343,9 +342,11 @@
 *  have the bounds of the output pasted NDF.  Want to propagate from
 *  the principal array.
       IF ( CONFIN ) THEN
-         CALL NDF_PROP( NDFI( 1 ), 'AXIS,UNITS', 'OUT', NDFO, STATUS )
+         CALL NDF_PROP( NDFI( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
+     :                  STATUS )
       ELSE
-         CALL NDF_PROP( NDFIC( 1 ), 'AXIS,UNITS', 'OUT', NDFO, STATUS )
+         CALL NDF_PROP( NDFIC( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
+     :                  STATUS )
       END IF
 
 *  Set the array types.

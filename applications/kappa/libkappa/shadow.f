@@ -62,7 +62,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF data
+*     VARIANCE, LABEL, TITLE, UNITS, AXIS and HISTORY components of an NDF data
 *     structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -72,11 +72,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 April 28 (MJC):
 *        Original NDF version.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -160,8 +163,9 @@
       CALL NDF_MBND( 'TRIM', NDFI, NDFS, STATUS )
 
 *  Create a new output NDF based on the first input NDF.  Propagate the
-*  axis, quality, and units components.
-      CALL NDF_PROP( NDFI, 'Axis,Quality,Units', 'OUT', NDFO, STATUS )
+*  axis, quality, WCS and units components.
+      CALL NDF_PROP( NDFI, 'Axis,Quality,Units,WCS', 'OUT', NDFO, 
+     :               STATUS )
 
 *  Determine which data type to use to process the input data/variance
 *  arrays and set an appropriate data type for these components in the

@@ -478,7 +478,7 @@
 *     -  Only real data can be processed directly.  Other data types
 *     will undergo a type conversion before processing occurs.
 *     -  The routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
 *     and propagates all extensions to the output Region NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.  Bad pixels are are excluded from statistics and are
@@ -503,6 +503,7 @@
 
 *  Authors:
 *     MJC: Malcolm Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -526,6 +527,8 @@
 *        Leaves the palette of the overlay device unchanged.  Added
 *        a note describing the roles of the palette colours used.
 *        Inserted the "Save" option into the description of OPTION.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1403,7 +1406,7 @@
 *       Create a new NDF of the section, propagating all other
 *       components.
 
-         CALL NDF_PROP( NDFR, 'Data,Quality,Variance,Axis,Units',
+         CALL NDF_PROP( NDFR, 'Data,Quality,Variance,Axis,Units,WCS',
      :                  'OUT', NDFO, STATUS )
 
 *       Get the title for the NDF.

@@ -142,7 +142,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -163,6 +163,8 @@
 *        spelling, and other errors.  Used a modern-style variable
 *        declaration.  Usage and Examples to lowercase.  Made the
 *        parameter names consistent.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -297,7 +299,7 @@
 *  ===============================
 
 *  Attempt to get an output NDF to hold total intensity.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'I', NDFI, 
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'I', NDFI, 
      :               STATUS )
 
 *  If successful, set a flag indicating that a total-intensity NDF is to
@@ -328,7 +330,7 @@
 
 *  Attempt to get an output NDF to hold the normalised Q Stokes
 *  parameter.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY', 'Q', NDFQ, STATUS )
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ, STATUS )
 
 *  If successful, set a flag indicating that a
 *  normalised-Q-Stokes-parameter NDF is to be produced.
@@ -358,7 +360,7 @@
 
 *  Attempt to get an output NDF to hold the normalised U Stokes
 *  parameter.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY', 'U', NDFU, STATUS )
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU, STATUS )
 
 *  If successful, set a flag indicating that a U NDF is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -386,7 +388,7 @@
 *  ===========================================
 
 *  Attempt to get an output NDF to hold percentage polarisation.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY', 'P', NDFP, STATUS )
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP, STATUS )
 
 *  If successful, set a flag indicating that a percent-polarisation NDF
 *  is to be produced.
@@ -420,7 +422,8 @@
 *  ======================================
 
 *  Attempt to get an output NDF to hold polarisation angle.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY', 'THETA', NDFT, STATUS )
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'THETA', NDFT, 
+     :               STATUS )
 
 *  If successful, set a flag indicating that an angle NDF is to
 *  be produced.
@@ -452,7 +455,7 @@
 *  =======================================
 
 *  Attempt to get an output NDF to hold polarised intensity.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IP', NDFIP, 
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IP', NDFIP, 
      :               STATUS )
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
@@ -484,7 +487,7 @@
 
 *  Attempt to get an output NDF to hold total-intensity estimate based
 *  on the first and third input NDFs.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IA', NDFIA, 
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IA', NDFIA, 
      :               STATUS )
 
 *  If successful, set a flag indicating that this total-intensity NDF is
@@ -516,7 +519,7 @@
 
 *  Attempt to get an output NDF to hold total-intensity estimate based
 *  on the second and fourth input NDFs.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IB', NDFIB, 
+      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IB', NDFIB, 
      :               STATUS )
 
 *  If successful, set a flag indicating that this total intensity NDF is

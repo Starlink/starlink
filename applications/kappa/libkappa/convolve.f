@@ -109,7 +109,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -131,6 +131,8 @@
 *        Improvements to the documentation including remarks about
 *        suggested defaults for XCENTRE and YCENTRE, and a related
 *        example, and a list of related applications.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -257,10 +259,10 @@
       CALL FTSIZE( DIM1( 1 ) + 2 * PSFXSZ, NPIX, STATUS )
       CALL FTSIZE( DIM1( 2 ) + 2 * PSFYSZ, NLIN, STATUS )
 
-*  Propagate the output NDF from the input array NDF, copying UNITS,
+*  Propagate the output NDF from the input array NDF, copying WCS, UNITS,
 *  AXIS and QUALITY components (the default components HISTORY, TITLE
 *  and LABEL and all extensions are also copied).
-      CALL NDF_PROP( INDF1, 'UNITS, AXIS, QUALITY', 'OUT', INDF3, 
+      CALL NDF_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF3, 
      :               STATUS )
       
 *  Map the required components of the output array.

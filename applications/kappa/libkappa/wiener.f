@@ -208,7 +208,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, UNITS, and HISTORY components of the
+*     LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -228,6 +228,8 @@
 *        typo's, used a modern-style variable declaration and other
 *        stylistic changes, shortened long lines, and made message
 *        reporting conditional.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -613,7 +615,7 @@
 
 *  Create the output NDF, based upon the input NDF, and map its DATA
 *  array.
-      CALL NDF_PROP( INDF1, 'Axis, Quality, Units', 'OUT', INDF4,
+      CALL NDF_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF4,
      :               STATUS )
       CALL NDF_MAP( INDF4, 'Data', '_REAL', 'WRITE', IPN4, NEL4,
      :              STATUS )

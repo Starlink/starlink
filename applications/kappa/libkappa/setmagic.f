@@ -93,7 +93,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -102,6 +102,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -110,6 +111,8 @@
 *     1994 September 26 (MJC):
 *        Replaced AIF calls, and used a modern style of commenting.
 *        Made messages conditional.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -242,10 +245,10 @@
 *  Create the output NDF.
 *  ======================
 
-*  Propagate the QUALITY, UNITS and AXIS components from the input
+*  Propagate the QUALITY, UNITS, WCS and AXIS components from the input
 *  NDF to the output, and the arrays not to be processed.
       IF ( LCOMP( 1 ) .AND. LCOMP( 2 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Quality,Units,Axis', 'OUT', NDFO,
+         CALL NDF_PROP( NDFI, 'Quality,Units,Axis,WCS', 'OUT', NDFO,
      :                  STATUS )
 
 *  This application supports all the non-complex numeric types
@@ -260,7 +263,7 @@
          CALL NDF_STYPE( DTYPE, NDFO, 'Data,Variance', STATUS )
 
       ELSE IF ( LCOMP( 1 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Variance,Quality,Units,Axis', 'OUT',
+         CALL NDF_PROP( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
@@ -268,8 +271,8 @@
      :                   DTYPE, STATUS )
 
       ELSE IF ( LCOMP( 2 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Data,Quality,Units,Axis', 'OUT', NDFO,
-     :                  STATUS )
+         CALL NDF_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
+     :                  NDFO, STATUS )
 
 *  For this purpose Error and Variance structures are synonymous.
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/

@@ -239,7 +239,7 @@
 *     -  This routine will propagate QUALITY component values so long
 *     as all supplied input NDFs have defined QUALITY components, and
 *     parameter QUALITY is not FALSE.
-*     -  The UNITS, AXIS, LABEL, TITLE, and HISTORY components are
+*     -  The UNITS, AXIS, LABEL, TITLE, WCS and HISTORY components are
 *     propagated from the first supplied input NDF, together with all
 *     extensions.
 *     -  All non-complex numeric types are supported.  The following
@@ -269,6 +269,8 @@
 *        When POLY1 is given on the command line in file mode, it is
 *        now possible to supply additional polygons through parameters
 *        POLY2-POLY20 also given on the command line.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -463,11 +465,11 @@
 *  If the first input NDF was supplied, propagate the output NDF from
 *  the first input NDF.
       IF ( GOT1 ) THEN
-         CALL NDF_PROP( INDF1, 'UNITS,AXIS', 'OUT', INDF3, STATUS )
+         CALL NDF_PROP( INDF1, 'UNITS,AXIS,WCS', 'OUT', INDF3, STATUS )
 
 *  Otherwise, propagate the output NDF from the second input NDF.
       ELSE
-         CALL NDF_PROP( INDF2, 'UNITS,AXIS', 'OUT', INDF3, STATUS )
+         CALL NDF_PROP( INDF2, 'UNITS,AXIS,WCS', 'OUT', INDF3, STATUS )
       END IF
 
 *  Decide in which plane to specify polygonal segments.

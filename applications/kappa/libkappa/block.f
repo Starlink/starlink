@@ -129,7 +129,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, UNITS, and HISTORY components of the input NDF and
+*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
 *     propagates all extensions.  In addition, if the mean estimator is
 *     used, the VARIANCE component is also processed.  If the median
 *     estimator is used, then the output NDF will have no VARIANCE
@@ -170,6 +170,8 @@
 *        Added a "Related Applications" section.  Fixed bug that
 *        attempted to create an output variance array when the median
 *        estimator was selected.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -305,7 +307,8 @@
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDF_PROP( NDF1, 'Axis,Quality,Units', 'OUT', NDF2, STATUS )
+      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+     :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 
 *  Map the input and output arrays.

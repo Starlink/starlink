@@ -113,7 +113,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -122,6 +122,7 @@
 *  
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -132,6 +133,8 @@
 *        and usage.
 *     1996 April 11 (MJC):
 *        Use the bad-pixel flag.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -236,19 +239,19 @@
 *  Create the output NDF.
 *  ======================
 
-*  Propagate the LABEL, HISTORY, UNITS and AXIS components from the
+*  Propagate the LABEL, WCS, HISTORY, UNITS and AXIS components from the
 *  input NDF to the output, and the arrays not to be processed.
       IF ( COMP( 1:4 ) .EQ. 'DATA' ) THEN
-         CALL NDF_PROP( NDFI, 'Variance,Quality,Units,Axis', 'OUT',
+         CALL NDF_PROP( NDFI, 'WCS,Variance,Quality,Units,Axis', 'OUT',
      :                  NDFO, STATUS )
 
       ELSE IF ( COMP .EQ. 'VARIANCE' ) THEN
-         CALL NDF_PROP( NDFI, 'Data,Quality,Units,Axis', 'OUT',
+         CALL NDF_PROP( NDFI, 'WCS,Data,Quality,Units,Axis', 'OUT',
      :                  NDFO, STATUS )
 
       ELSE IF ( COMP( 1:7 ) .EQ. 'QUALITY' ) THEN
-         CALL NDF_PROP( NDFI, 'Data,Variance,Units,Axis', 'OUT', NDFO,
-     :                  STATUS )
+         CALL NDF_PROP( NDFI, 'WCS,Data,Variance,Units,Axis', 'OUT', 
+     :                  NDFO, STATUS )
 
       END IF
 

@@ -120,7 +120,7 @@
 
 *  Implementation Status: 
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -294,7 +294,8 @@
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDF_PROP( NDFI, 'Axis,Units,Quality', 'OUT', NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
+     :               STATUS )
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
 *  Map the input and output data arrays.
@@ -413,7 +414,7 @@
 *  used.  Set the suggested default arguments to bad values in order to
 *  have no dynamic defaults.
       CALL ERR_MARK
-      IF ( ITYPE .EQ. 'DOUBLE' )THEN
+      IF ( ITYPE .EQ. '_DOUBLE' )THEN
          DTHDEF( 1 ) = VAL__BADD
          DTHDEF( 2 ) = VAL__BADD
          CALL PAR_GDR1D( 'THRESH', 2, DTHDEF, VAL__MIND, VAL__MAXD,

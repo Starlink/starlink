@@ -69,7 +69,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -92,6 +92,8 @@
 *        efficient.  Made message reporting conditional.  Ensured that
 *        the LIMIT could not be zero. Used a modern-style of variable
 *        declaration and other minor stylistic changes.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,7 +155,8 @@
 
 *  Get the output NDF, propagating all components and extensions except
 *  DATA and VARIANCE.
-      CALL NDF_PROP( INDF1, 'UNITS,AXIS,QUALITY', 'OUT', INDF2, STATUS )
+      CALL NDF_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF2, 
+     :               STATUS )
 
 *  See what type of limit is to be used.
       CALL PAR_CHOIC( 'MODE', 'SIGMA', 'SIGMA,VARIANCE,SNR', .FALSE.,

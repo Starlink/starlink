@@ -171,7 +171,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, UNITS, and HISTORY components of the input NDF.
+*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
 *     There is no support for VARIANCE processing.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -181,11 +181,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK).
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 October 23 (MJC):
 *        Original NDF version.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -421,9 +424,9 @@
 *  Find out if the NDF contains magic bad values.
       CALL NDF_BAD( NDFI, 'Data', .FALSE., BAD, STATUS )
 
-*  Create the surface-fit NDF, propagating the AXIS, UNITS, LABEL,
+*  Create the surface-fit NDF, propagating the WCS, AXIS, UNITS, LABEL,
 *  TITLE, HISTORY and extensions from the input NDF.
-      CALL NDF_PROP( NDFI, 'Axis,Units', 'OUT', NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'WCS,Axis,Units', 'OUT', NDFO, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
