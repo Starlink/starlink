@@ -25,7 +25,7 @@
  *       Improve screen mode I/O
  *       Make ringbelll ring bell not flash screen
  *     01-JUL-2004 (TIMJ):
- *       Now use autoconf test for atexit
+ *       Now use autoconf test for atexit. GLOB_NOMATCH is not standard.
  *
  * Source file for the basic ICL input/output subsystem. This is a separate
  * processs forked by ICL which handles terminal I/O. It does this by
@@ -1087,6 +1087,7 @@ int lenext;
 int trunc;
 int istart, i;
 int nexts;
+int nomatch = 0;
 
 /* Find beginning of word */
 /* Get word into filename */
@@ -1217,7 +1218,16 @@ int nexts;
 
          } else {  
 /*               Failed getting filenames */
-            if ( status == GLOB_NOMATCH )
+#ifdef GLOB_NOMATCH
+	   if ( status == GLOB_NOMATCH ) nomatch = 1;
+#else
+            /* If GLOB_NOMATCH is not defined assume that we get
+               good status even when match count is zero. This
+               branch then only hits if no matches and status is good.
+             */
+	   if ( status == 0 && filelist.gl_pathc == 0) nomatch = 1;
+#endif
+            if ( nomatch )
                if (screenstate == SCREENMODE) {
                   waddstr(bottomwin, "\nNo match.\n");
                   wrefresh(bottomwin);
