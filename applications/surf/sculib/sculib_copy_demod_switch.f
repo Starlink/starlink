@@ -2,7 +2,7 @@
 *                              arrays holding the switch chop data, chop 
 *                              variance, calibrator, cal variance and quality
 *                              separately
-      SUBROUTINE SCULIB_COPY_DEMOD_SWITCH (NBOLS, NJIG, LEVEL,
+      SUBROUTINE SCULIB_COPY_DEMOD_SWITCH (NBOLS, NDATA, NJIG, LEVEL,
      :  SWITCH, SWITCH_DATA, SWITCH_VARIANCE, SWITCH_CALIBRATOR,
      :  SWITCH_CAL_VARIANCE, SWITCH_QUALITY, STATUS)
 *    Description :
@@ -11,12 +11,15 @@
 *     chop data, chop variance, calibrator, cal variance and quality.
 *     Quality is marked bad if BIT 1 is set and LEVEL is greater than requested
 *    Invocation :
-*     CALL SCULIB_COPY_DEMOD_SWITCH (NBOLS, NJIG,
+*     CALL SCULIB_COPY_DEMOD_SWITCH (NBOLS, NDATA, NJIG,
 *    :  SWITCH, SWITCH_DATA, SWITCH_VARIANCE, SWITCH_CALIBRATOR,
 *    :  SWITCH_CAL_VARIANCE, SWITCH_QUALITY, STATUS)
 *    Parameters :
 *     NBOLS                           = INTEGER (Given)
 *           number of bolometers being measured
+*     NDATA                           = INTEGER (Given)
+*           number of data per measured position; 5 for jiggle data, 4 for
+*           raster
 *     NJIG                            = INTEGER (Given)
 *           number of jiggle positions measured
 *     LEVEL                           = INTEGER (Given)
@@ -51,8 +54,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
-      INTEGER NBOLS, NJIG, LEVEL
-      REAL SWITCH (5, NBOLS, NJIG)
+      INTEGER NBOLS, NDATA, NJIG, LEVEL
+      REAL SWITCH (NDATA, NBOLS, NJIG)
 *    Inport-Export :
 *    Export :
       REAL SWITCH_DATA (NBOLS, NJIG)
@@ -87,10 +90,17 @@
             SWITCH_DATA (BOL, J) = SWITCH (1, BOL, J)
             SWITCH_VARIANCE (BOL, J) = SWITCH (2, BOL, J)
             SWITCH_CALIBRATOR (BOL, J) = SWITCH (3, BOL, J)
-            SWITCH_CAL_VARIANCE (BOL, J) = SWITCH (4, BOL, J)
 
-*           Check the quality
-            NQUAL = NINT(SWITCH (5, BOL, J))
+            IF (NDATA .EQ. 4) THEN
+               SWITCH_CAL_VARIANCE (BOL, J) = 0.0
+               NQUAL = NINT (SWITCH(4, BOL, J))
+            ELSE
+               SWITCH_CAL_VARIANCE (BOL, J) = SWITCH (4, BOL, J)
+               NQUAL = NINT (SWITCH(5, BOL, J))
+            END IF
+
+*  check the quality
+
             SWITCH_QUALITY(BOL,J) = 0
 
             IF (NQUAL .GT. 0) THEN
