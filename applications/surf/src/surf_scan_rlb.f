@@ -211,11 +211,6 @@
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: map was not obtained '//
      :        'with RASTER sampling', STATUS)
-         ELSE IF (CHOP_COORDS .NE. 'SC') THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: the secondary was not '//
-     :        'chopping along the direction of scan', STATUS)
          END IF
       END IF
 
