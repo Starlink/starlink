@@ -49,17 +49,27 @@
 *
 *    History :
 *
-*      7 Jul 92 : V1.6-0 Original. Adapted from EVSIM (DJA)
-*      1 Sep 92 : V1.6-1 PSFCON no longer needed (DJA)
-*      4 Dec 92 : V1.7-0 Added Log NS mode. Changed from RAN to SLA_RANDOM
-*                        for SUN portability (DJA)
-*      5 Mar 93 : V1.7-1 Changed to non-congruential random generator (DJA)
-*     14 Jul 93 : V1.7-2 Changed it again to the MATH_RND generator which
-*                        uses the GNU generator (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     14 Dec 94 : V1.8-1 Test to see if corrected model (DJA)
-*     28 Mar 95 : V1.8-2 New data interface (DJA)
-*     15 Nov 95 : V2.0-0 Full ADI port (DJA)
+*      7 Jul 1992 V1.6-0 (DJA):
+*        Original version. Adapted from EVSIM (DJA)
+*      1 Sep 1992 V1.6-1 (DJA):
+*        PSFCON no longer needed
+*      4 Dec 1992 V1.7-0 (DJA):
+*        Added Log NS mode. Changed from RAN to SLA_RANDOM for SUN portability
+*      5 Mar 1993 V1.7-1 (DJA):
+*        Changed to non-congruential random generator
+*     14 Jul 1993 V1.7-2 (DJA):
+*        Changed it again to the MATH_RND generator which
+*                        uses the GNU generator
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     14 Dec 1994 V1.8-1 (DJA):
+*        Test to see if corrected model
+*     28 Mar 1995 V1.8-2 (DJA):
+*        New data interface
+*     15 Nov 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     15 May 1996 V2.0-1 (DJA):
+*        Fixed convolution option
 *
 *    Type definitions :
 *
@@ -121,31 +131,31 @@
       INTEGER           	IFILE                  	! Loop over files
       INTEGER           	ISRC                   	! Loop over sources
       INTEGER           	IWID                   	! Loop over widths
-      INTEGER           LNPTR                  ! Workspace for Log NS routine
-      INTEGER           LNSRC                  ! # sources in last image
+      INTEGER           	LNPTR                  	! Workspace for Log NS routine
+      INTEGER           	LNSRC                  	! # sources in last image
       INTEGER           	MDPTR                  	! Model data ptr
       INTEGER			MFID			! Model dataset
-      INTEGER           MIPTR                  ! Model probability index ptr
+      INTEGER           	MIPTR                  	! Model probability index ptr
       INTEGER			MPSF			! Model psf handle
       INTEGER           	MQPTR                  	! Model quality ptr
       INTEGER           	NPT                    	! # points in position lists
       INTEGER           	NBACK                  	! # background counts
       INTEGER           	NELM                   	! Bgnd elements
       INTEGER           	NFILE                  	! # files to create
-      INTEGER           NOUT                   ! # events outside field ranges
+      INTEGER           	NOUT                   	! # events outside field ranges
       INTEGER           	NSRC                   	! # sources in image
       INTEGER           	NVAL                   	! # values in model axis
       INTEGER           	ODPTR                  	! Output data array
       INTEGER			OFID			! Output dataset id
-      INTEGER           ONBACK                 ! Requested # background counts
-      INTEGER           OSCOUNT(MAXSRC)        ! Requested # of source counts
-      INTEGER           	PDPTR                  	! Psf data ptr
-      INTEGER           PIN                    ! Length of psf prob index
+      INTEGER           	ONBACK                 	! Requested # background counts
+      INTEGER           	OSCOUNT(MAXSRC)        	! Requested # of source counts
+      INTEGER           	PDPTR,PTPTR,PKPTR                  	! Psf data ptr
+      INTEGER           	PIN                    	! Length of psf prob index
       INTEGER           	PIPTR                  	! Psf prob index ptr
       INTEGER			PIXID, PRJID, SYSID	! World coordinates
       INTEGER           	PSLOT                  	! PSF system slot
-      INTEGER           PSW                    ! Psf access width in pixels
-      INTEGER           PSW2                   ! Psf model width in pixels
+      INTEGER           	PSW                    	! Psf access width in pixels
+      INTEGER           	PSW2                   	! Psf model width in pixels
       INTEGER           	ODIMS(ADI__MXDIM)      	! Output dimensions
       INTEGER           	ONDIM                  	! Output dimensionality
       INTEGER           	SCOUNT(MAXSRC)         	! Actual source counts
@@ -163,7 +173,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-        PARAMETER       ( VERSION = 'IMSIM Version 2.0-0' )
+        PARAMETER       ( VERSION = 'IMSIM Version 2.0-1' )
 *
 *    Local Data:
 *
@@ -491,6 +501,8 @@
           END IF
           CALL DYN_MAPR( 1, PIN*NSRC, PDPTR, STATUS )
           CALL DYN_MAPR( 1, (PIN+1)*NSRC, PIPTR, STATUS )
+          CALL DYN_MAPR( 1, PIN, PTPTR, STATUS )
+          CALL DYN_MAPR( 1, PIN, PKPTR, STATUS )
         END IF
 
 *      Introduce Poisson noise into source and background
@@ -587,7 +599,8 @@
      :                  YSCALE, NSRC, SCOUNT, WIDS, NBACK, MOK,
      :                  %VAL(MIPTR), XSCALE*TOR, YSCALE*TOR, TOR,
      :                  ODIMS(1), ODIMS(2), %VAL(ODPTR), IFILE, PSW2,
-     :                  %VAL(PDPTR), PIN, %VAL(PIPTR),
+     :                  %VAL(PDPTR), %VAL(PTPTR), %VAL(PKPTR),
+     :                  PIN, %VAL(PIPTR),
      :                  XPOS, YPOS, NOUT, STATUS )
 
 *      Always unmap data and release from BDA
@@ -620,7 +633,8 @@
       SUBROUTINE IMSIM_INT( OFID, PSFH, ISEED,
      :                      XBASE, XSCALE, YBASE, YSCALE,
      :                      NSRC, SCOUNT, WID, NMOD, MOK, MPI, DX, DY,
-     :                      TOR, NX, NY, ODAT, IFILE, PW, PD, PIN, PI,
+     :                      TOR, NX, NY, ODAT, IFILE, PW, PD,
+     :                      PTEMP, PKERN, PIN, PI,
      :                      SX, SY, NOUT, STATUS )
 *
 *    Description:
@@ -662,6 +676,8 @@
       REAL			XBASE, XSCALE, YBASE, YSCALE
 
       REAL                    PD(-PW:PW,-PW:PW,*) ! Psf data
+      REAL		      PTEMP(-PW:PW,-PW:PW)
+      REAL		      PKERN(-PW:PW,-PW:PW)
       INTEGER                 PIN                 ! Psf index size (PW*2+1)^2+1
       REAL                    PI(PIN,*)           ! Psf index data
       INTEGER                 ISEED               ! Seed for random generator
@@ -695,6 +711,7 @@
 *
       REAL             PCA                              ! Axis value of pix cen
       REAL             PSUM                             ! Psf normalisation
+      REAL			SIGP			! Smooth width pi
       REAL             QX(MAXSRC), QY(MAXSRC)           ! Pixel offset for src
 
       INTEGER          ISRC                             ! Loop indices
@@ -742,6 +759,25 @@
           CALL PSF_2D_DATA( PSFH, SX(ISRC)*TOR, SY(ISRC)*TOR, QX(ISRC),
      :                      QY(ISRC), DX, DY, .TRUE., TPW,
      :                      TPW, PD(-PW,-PW,ISRC), STATUS )
+
+*        Convolve with gaussian?
+          IF ( WID(ISRC) .GT. 0.0 ) THEN
+
+*          Make gaussian of this width
+            SIGP = (WID(ISRC) / (2.0 * SQRT(2.0*ALOG(2.0))))
+     :             / (ABS(DX)*MATH__RTOD*60.0)
+            CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, REAL(TPW)/2.0,
+     :                          REAL(TPW)/2.0, 0.0, 0.0, TPW, TPW,
+     :                          PKERN, STATUS ))
+
+*          Make copy of psf
+            CALL ARR_COP1R( TPW*TPW, PD(-PW,-PW,ISRC), PTEMP, STATUS )
+
+*          Convolve
+            CALL PSF_CONVOLVE( TPW, TPW, PTEMP, TPW, TPW, PKERN,
+     :                         PD(-PW,-PW,ISRC), STATUS )
+
+          END IF
 
 *        Adjust for lack of psf coverage
           CALL SIM_PADJUST( TPW, PD(-PW,-PW,ISRC), STATUS )
