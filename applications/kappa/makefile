@@ -1316,36 +1316,6 @@ IFC_FILES = $(IFL_FILES:.ifl=.ifc) $(MONO_IFL:.ifl=.ifc)
 .ifl.ifc:
 	$(STAR_BIN)/compifl $< 
 
-#  Define the rule for building the main monolith interface file.
-$(KAPPA_MON).ifl : $(KAPPA_IFL_FILES)
-	@- if test -f $(KAPPA_MON).ifl ; then rm -f $(KAPPA_MON).ifl; else :; fi
-	echo ## KAPPA - The KAPPA Monolith Interface File > $(KAPPA_MON).ifl
-	echo                              >> $(KAPPA_MON).ifl
-	echo monolith      $(KAPPA_MON)   >> $(KAPPA_MON).ifl
-	cat $(KAPPA_IFL_FILES)            >> $(KAPPA_MON).ifl
-	echo                              >> $(KAPPA_MON).ifl
-	echo endmonolith                  >> $(KAPPA_MON).ifl
-
-#  Define the rule for building the KAPVIEW monolith interface file.
-$(KAPVIEW_MON).ifl : $(KAPVIEW_IFL_FILES)
-	@- if test -f $(KAPVIEW_MON).ifl ; then rm -f $(KAPVIEW_MON).ifl; else :; fi
-	echo ## KAPVIEW - The KAPVIEW Monolith Interface File > $(KAPVIEW_MON).ifl
-	echo                              >> $(KAPVIEW_MON).ifl
-	echo monolith      $(KAPVIEW_MON) >> $(KAPVIEW_MON).ifl
-	cat $(KAPVIEW_IFL_FILES)          >> $(KAPVIEW_MON).ifl
-	echo                              >> $(KAPVIEW_MON).ifl
-	echo endmonolith                  >> $(KAPVIEW_MON).ifl
-
-#  Define the rule for building the NDFPACK monolith interface file.
-$(NDFPACK_MON).ifl : $(NDFPACK_IFL_FILES)
-	@- if test -f $(NDFPACK_MON).ifl ; then rm -f $(NDFPACK_MON).ifl; else :; fi
-	echo ## NDFPACK - The NDFPACK Monolith Interface File > $(NDFPACK_MON).ifl
-	echo                              >> $(NDFPACK_MON).ifl
-	echo monolith      $(NDFPACK_MON) >> $(NDFPACK_MON).ifl
-	cat $(NDFPACK_IFL_FILES)          >> $(NDFPACK_MON).ifl
-	echo                              >> $(NDFPACK_MON).ifl
-	echo endmonolith                  >> $(NDFPACK_MON).ifl
-
 #  List of the help libraries and rules for building them.
 
 HELP_FILES = $(HELP_SOURCES:.hlp=.shl)

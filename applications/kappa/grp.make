@@ -318,9 +318,10 @@ fitsimp.ifl fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl hiscom.ifl \
 hislist.ifl hisset.ifl native.ifl ndfcopy.ifl ndftrace.ifl setaxis.ifl \
 setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
-mem2d.ifl wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
+wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
-reshape.ifl copybad.ifl wcstran.ifl scatter.ifl 
+reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
+kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
