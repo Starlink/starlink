@@ -7264,9 +7264,15 @@ static void FixUsed( AstFitsChan *this, int used, int remove,
 /* Local Variables: */
    FitsCard *card0;        /* Pointer to current FitsCard */
    int *flags;             /* Pointer to flags mask for the current card */
+   int old_ignoreused;     /* Original value of external variable IgnoreUsed */
 
 /* Return if no FitsChan was supplied, or if the FitsChan is empty. */
    if ( !this || !this->head ) return;
+
+/* Indicate that we should not skip over cards marked as having been
+   read. */
+   old_ignoreused = IgnoreUsed;
+   IgnoreUsed = 0;
 
 /* Save a pointer to the current card, and the reset the current card to
    be the first card. */
@@ -7289,13 +7295,24 @@ static void FixUsed( AstFitsChan *this, int used, int remove,
 /* If required, set the definitely used flag. */
          if( used ) *flags = (*flags) | USED;
 
-/* If required, delete the card. */
-         if( remove ) DeleteCard( this, method, class );
+/* If required, delete the card. The next card is made current. If we are
+   about to delete the original current card, we need to update the
+   pointer to the card to be made current at the end of this function. */
+         if( remove ) {
+            if( card0 == this->card && card0 ) {
+               card0 = ( (FitsCard *) this->card )->next;
+            }
+            DeleteCard( this, method, class );
 
+/* Otherwise, just move on to the next card. */
+         } else {
+            MoveCard( this, 1, method, class );
+         }
+
+/* If this card has not bee provisionally used, move on to the next card. */
+      } else {
+         MoveCard( this, 1, method, class );
       }
-
-/* Increment the card count and move on to the next card. */
-      MoveCard( this, 1, method, class );
 
    }
 
@@ -7305,7 +7322,14 @@ static void FixUsed( AstFitsChan *this, int used, int remove,
 /* If this card is now flagged as definitely used, move forward to the
    next un-used card. */
    flags = CardFlags( this );
-   if( flags && (*flags & USED ) ) MoveCard( this, 1, method, class );
+   if( flags && (*flags & USED ) ) {
+      IgnoreUsed = 1;
+      MoveCard( this, 1, method, class );
+   }
+
+/* Re-instate the original flag indicating if cards marked as having been 
+   read should be skipped over. */
+   IgnoreUsed = old_ignoreused;
 
 /* Return */
    return;
