@@ -582,7 +582,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
          for( ipoint = 0; ipoint < npoint; ipoint++ ) {
 
 /* Copy this point into the work array. */
-            for( ic = 0; ic < ncoord; ic++ ) work[ ic ] = ptr[ ic ][ 0 ];
+            for( ic = 0; ic < ncoord; ic++ ) work[ ic ] = ptr[ ic ][ ipoint ];
 
 /* Find the rate of change of the specified output of the encapsulated
    Mapping with respect to the specified input. */                  
