@@ -13,12 +13,17 @@ FC=f77
 FFLAGS=
 ADDLIBS=
 
-test: fitsdump
+test: fitsdump t2.run
 	- ./runtests
 
 # Utility to dump fits files, for diffing
 fitsdump: fitsdump.f
 	$(FC) $(FFLAGS) -o fitsdump fitsdump.f -L/star/lib -lcfitsio $(ADDLIBS)
+
+t2.o: t2.c
+	$(CC) -c -o $@ -DFORTRAN_DCMPF=1 $<
+t2.run: t2.o
+	$(FC) -o $@ $< -L/star/lib `sla_link`
 
 clean:
 	rm -f *~ *.run *.stderr *.stdout *.tmp *.delete
