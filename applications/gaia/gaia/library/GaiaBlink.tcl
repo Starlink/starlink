@@ -805,7 +805,7 @@ itcl::class gaia::GaiaBlink {
    }
 
    #  Set the origins for FITS using CRPIX values.
-   protected method set_fits_origins_ { {crpix 1} } {
+   protected method set_fits_origins_ {} {
       catch {
          if { [info exists clones_(0)] } {
 
@@ -813,11 +813,11 @@ itcl::class gaia::GaiaBlink {
             #  upper left.
             $canvas_ coords $image_($mobile_) 0 0
 
-            set bxo [$image_($mobile_) fits get $CRPIX1]
+            set bxo [$image_($mobile_) fits get CRPIX1]
             if { $bxo == {} } {
                set bxo 1
             }
-            set byo [$image_($mobile_) fits get $CRPIX2]
+            set byo [$image_($mobile_) fits get CRPIX2]
             if { $byo == {} } {
                set byo 1
             }
@@ -827,11 +827,11 @@ itcl::class gaia::GaiaBlink {
             for { set i 0 } { $i < $n_ } { incr i } {
 
                #  Origin of upper left of this image (image coordinates).
-               set xo [$image_($i) fits get $CRPIX1]
+               set xo [$image_($i) fits get CRPIX1]
                if { $xo == {} } {
                   set xo 1
                }
-               set yo [$image_($i) fits get $CRPIX2]
+               set yo [$image_($i) fits get CRPIX2]
                if { $yo == {} } {
                   set yo 1
                }
