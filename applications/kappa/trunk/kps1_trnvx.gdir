@@ -18,7 +18,9 @@
 *  Description:
 *     This routine transfers the supplied data values whose co-ordinates
 *     and values are known to a regularly-spaced n-d output array.  A
-*     scaling between pixel separations may be made.
+*     scaling between pixel separations may be made.  The bin selected
+*     is calculated as follows:
+*        index = IFIX( ( CODATA - COMIN ) / PSCALE ) + 1
 
 *  Arguments:
 *     NDIMS = INTEGER (Given)
@@ -65,17 +67,19 @@
 *     value when created.
 
 *  Authors:
-*     Malcolm J. Currie  STARLINK (RAL::CUR)
+*     MJC: Malcolm J. Currie  (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 Jun 18  (MJC)
+*     1990 Jun 18 (MJC):
 *        Original loosely based on the 2-d version of the
 *        routine, then called TRNDSB (RAL::CUR).
+*     1991 May 27 (MJC):
+*        Corrected the calculation of pixel index by removing a 
+*        superfluous + 0.5 from the IFIX calculation.
 *     {enter_further_changes_here}
 
 *  Bugs:
-*     None known.
 *     {note_new_bugs_here}
 
 *-
@@ -145,8 +149,8 @@
 
 *          Calculate the pixel "co-ordinate" of the current data point.
 
-            COORD = IFIX( ( ( CURPOS - COMIN( J ) ) / PSCALE( J ) )
-     :               + 0.5 ) + 1
+            COORD = IFIX( ( ( CURPOS - COMIN( J ) ) / PSCALE( J ) ) ) +
+     :              1
 
 *          Find the position within the vector.
 
