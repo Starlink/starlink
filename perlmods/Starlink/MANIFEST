@@ -11,6 +11,8 @@ EMS/t/cstyle.t
 EMS/t/sai.t
 EMS/t/ems.t
 EMS/t/token.t
+EMS/t/depr.t
+EMS/t/misc.t
 ADAM/ADAM.pm
 ADAM/ADAM.xs
 ADAM/Makefile.PL
