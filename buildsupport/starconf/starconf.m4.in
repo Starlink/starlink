@@ -26,7 +26,7 @@ for opt in $1 NONE
 do
     case $opt in
         per-package-dirs)
-            _star_per_package_dirs=true
+            _star_per_package_dirs=:
             ;;
         NONE)
             ;;
@@ -98,20 +98,20 @@ fi
 
 # Handle --without-stardocs.  Don't build and install documentation.
 # Default is --with-stardocs.
-_star_build_docs=true
+_star_build_docs=:
 AC_ARG_WITH(stardocs,
             AS_HELP_STRING([--without-stardocs],
                            [Do not install built documentation (default --with)]),
             [echo "with-stardocs: <$withval>"
              if test -z "$withval"; then
-                 _star_build_docs=true # default
+                 _star_build_docs=: # default
              elif test "X$withval" = Xno; then
                  _star_build_docs=false
              elif test "X$withval" = Xyes; then
-                 _star_build_docs=true
+                 _star_build_docs=:
              else
                  AC_MSG_WARN([bad arg to --with-stardocs: using yes])
-                 _star_build_docs=true
+                 _star_build_docs=:
              fi])
 
 # Everything depends on where /star is.  Declare STARLINK as a
@@ -330,7 +330,7 @@ AC_DEFUN([STAR_PREDIST_SOURCES],
 for marker in $1
 do
     if test -f $marker; then
-        _star_predist_marker_present=true
+        _star_predist_marker_present=:
         AC_MSG_NOTICE([found predist marker file $marker])
     else
         _star_predist_marker_present=false
@@ -341,6 +341,7 @@ do
                 # we do want to build sourceset files
                 _star_predist_status=predist
                 PREDIST=
+                echo "In predistribution state"
             else
                 # leave default PREDIST='#'
                 _star_predist_status=postdist
@@ -355,7 +356,7 @@ do
             ;;
         postdist)
             if $_star_predist_marker_present; then
-                AC_MSG_WARN([Not building predist, but marker file $marker is present])
+                AC_MSG_WARN([In postdistribution state, but predist marker file $marker is present])
             fi
             ;;
         *)
