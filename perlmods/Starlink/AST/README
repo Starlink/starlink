@@ -32,7 +32,8 @@ REQUIREMENTS
 ------------
 
 Has been tested with AST v1.8 onwards (AST is currently at v3.2)
-and with perl 5.005 through perl 5.8.3.
+and with perl 5.005 through perl 5.8.3. Also known to work on Linux,
+Mac OS X, Solaris and Digital Unix.
 
 You will need to install the AST library. See
 
