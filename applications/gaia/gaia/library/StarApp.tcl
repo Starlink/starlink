@@ -209,9 +209,13 @@ itcl::class gaia::StarApp {
       return $application_status_
    }
 
-   #  Delete the application when ready.
+   #  Delete the application when ready. Do it now if nothing is queued.
    public method delete_sometime {} {
       set delete_sometime_ 1
+      if { [$command_queue_ size] == 0 && 
+           $application_status_ != {running...} } {
+         catch {delete object $this}
+      }
    }
 
    #  Execute the next command on the queue. Note status is set.
@@ -219,8 +223,8 @@ itcl::class gaia::StarApp {
       set args [$command_queue_ pop]
       if { $args != {}  } {
          $monotask_($monolith_) obey $shortname_ "$args" \
-            -endmsg   [code $this command_completed_] \
-            -inform   [code $this inform_ %V] \
+            -endmsg [code $this command_completed_] \
+            -inform [code $this inform_ %V] \
             -paramreq "$monotask_($monolith_) paramreply %R !!"
       }
    }
