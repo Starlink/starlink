@@ -47,7 +47,7 @@
 #  Set up destination directory, logfile and comparison script.
       destdir="./$filter.changed"
       logfile="./$filter.log"
-      cmp_scr="cmp_$filter.pl"
+      cmp_scr="cmp_$filter"
 
 #  Set up temporary file for buffering warnings.
       warnfile="$destdir/.tmp.warnings"
@@ -71,7 +71,7 @@
       fi
 
 #  Set up location of commands.
-      compare="perl `which $cmp_scr`"
+      compare="`which $cmp_scr`"
       if [ `which $filter | wc -w` = "1" -a `which $cmp_scr | wc -w` = "1" ]
       then
          :

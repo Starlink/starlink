@@ -2,13 +2,13 @@
 
 #+
 #  Name:
-#     extmk.pl
+#     extmk
 #
 #  Purpose:
 #     Modify mk file for use with EXTREME data sets.
 #
 #  Usage:
-#     extmk.pl < mk > mk.new
+#     extmk < mk > mk.new
 #
 #  Description:
 #     This is a simple filter which takes a Starlink mk file as input and
@@ -54,9 +54,29 @@
 #  Safe programming.
       use strict;
 
+#  Set up input and output.
+      if ( @ARGV > 2 ) {
+         print( STDERR "Usage: extmk [ in [ out ] ]\n" );
+         exit( 1 );
+      }
+      if ( @ARGV ) {
+         my( $infile ) = shift( @ARGV );
+         open( IN, $infile ) 
+            or die( "Failed to open $infile for reading.\n" );
+      }
+      else {
+         *IN = *STDIN;
+      }
+      if ( @ARGV ) {
+         my( $outfile ) = shift( @ARGV );
+         open( OUT, ">$outfile" ) 
+            or die( "Failed to open $outfile for writing.\n" );
+         select( OUT );
+      }
+
 #  Read input.
       my( @mk );
-      while (<>) {
+      while (<IN>) {
          push( @mk, $_ );
       }
       my( $mk ) = join( '', @mk );
