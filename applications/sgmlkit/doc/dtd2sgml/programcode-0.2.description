@@ -1,0 +1,77 @@
+<!doctype dtddescription system "dtddescription.dtd" [
+  <!entity progelems system "programcode-0.2.dtdsummary" subdoc>
+]>
+<!-- $Id$ -->
+
+<dtddescription elementlist=progelems prefix='progcode'>
+
+<element gi='argumentlist'>
+<p>The list of arguments/parameters to a function.
+
+<attribute name='none'>
+<p>If this attribute is present, it indicates that the function has no
+arguments.  In this case, there should be no <elemref gi=parameter> content.
+
+<element gi='parameter'>
+<p>A single parameter for a function.
+<attribute name='direction'>
+<p>Indicates whether the parameter is passed in to the function,
+set by the function, and so on.  In some languages (such as 
+DSSSL), all parameters are read-only, and so the corresponding DTD
+might default this.
+<attribute name='default'>
+<p>The default value, if this parameter is optional and omitted.
+<attribute name='optional'>
+<p>This attribute is present if the parameter is optional.
+Optional means that
+the parameter will be defaulted if omitted,
+and keyword means that the parameter is
+specified with a keyword.  Both mechanisms
+are used in both DSSSL and IDL (for
+example). 
+<!--
+<element gi='author'>
+<attribute name='id'>
+<attribute name='affiliation'>
+<element gi='authorlist'>
+<element gi='authornote'>
+<element gi='authorref'>
+<attribute name='id'>
+<attribute name='note'>
+<element gi='change'>
+<attribute name='author'>
+<attribute name='date'>
+<element gi='code'>
+<element gi='codebody'>
+<attribute name='empty'>
+<element gi='codegroup'>
+<attribute name='language'>
+<element gi='codeprologue'>
+<element gi='codereference'>
+<attribute name='docid'>
+<attribute name='doc'>
+<element gi='copyright'>
+<element gi='description'>
+<element gi='docblock'>
+<element gi='em'>
+<element gi='func'>
+<element gi='funcname'>
+<element gi='history'>
+<element gi='li'>
+<element gi='misccode'>
+<element gi='miscprologue'>
+<element gi='name'>
+<element gi='otherauthors'>
+<element gi='othernames'>
+<element gi='p'>
+<element gi='programcode'>
+<element gi='purpose'>
+<element gi='returnvalue'>
+<attribute name='none'>
+<attribute name='type'>
+<element gi='routinename'>
+<element gi='title'>
+<element gi='type'>
+<element gi='ul'>
+<element gi='url'>
+-->
