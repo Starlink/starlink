@@ -215,9 +215,9 @@
 
 *   Add the appropriate extensions to the input and output files.
          NCF = CHR_LEN( FIGFIL ) 
-         CALL CHR_APPND( '.DST', FIGFIL, NCF )
+         CALL CHR_APPND( '.dst', FIGFIL, NCF )
          NCN = CHR_LEN( NDFFIL ) 
-         CALL CHR_APPND( '.SDF', NDFFIL, NCN )
+         CALL CHR_APPND( '.sdf', NDFFIL, NCN )
 
 *   Call the conversion subroutine.
          CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), STATUS )
