@@ -49,11 +49,11 @@
 	ArcNamrA	NAME	HyNames
 	ArcSuprA	NAME	sHyTime
 	ArcIgnDA	NAME	HyIgnD
-	ArcDocF		NAME	#fixed	HyDoc
+	ArcDocF		NAME	#FIXED	HyDoc
 	ArcDTD		CDATA	"HyTime.DTD"
-	ArcQuant	CDATA	#fixed	"NAMELEN 9"
-	ArcDataF	NAME	#fixed	HyBridN
-	ArcBridF	name	#fixed	HyBrid
+	ArcQuant	CDATA	#FIXED	"NAMELEN 9"
+	ArcDataF	NAME	#FIXED	HyBridN
+	ArcBridF	NAME	#FIXED	HyBrid
 	ArcAuto		(ArcAuto|nArcAuto)	nArcAuto
 	ArcOptSA	NAMES	"GenArc base links locs rend sched"
 
@@ -63,7 +63,7 @@
 	base		CDATA	"bos"
 	locs		CDATA	
 			"nmsploc multloc refctl referatt refloc queryloc"
-	links		CDATA	#fixed	"hylink clink agglink traverse"
+	links		CDATA	#FIXED	"hylink clink agglink traverse"
 	exrefs		NAME	exrefs
 	manyanch	NUMBER	2
 >
@@ -87,7 +87,7 @@
 <!ENTITY % simplephrase	"em | strong | quote | code | kbd | cite">
 
 <!-- Define all the simple markup elements -->
-<!element (%simplephrase) - - (#pcdata)>
+<!ELEMENT (%simplephrase) - - (#pcdata)>
 ]]>
 
 <!--
@@ -121,7 +121,7 @@
 %ISOents;
 
 
-<!element DocumentSummary o o (docinfo, docbody)>
+<!ELEMENT documentsummary O O (docinfo, docbody)>
 
 <!--
   The URLLINKPOLICY attribute governs how we may produce HTML links to
@@ -139,17 +139,17 @@
   link to elements which have the EXPORT attribute present; if it has
   the value "ALL", then we may link to all elements.
 -->
-<!ENTITY % version.attr "version cdata #fixed '%DTD.Summary.Version;'">
-<!attlist DocumentSummary
+<!ENTITY % version.attr "version CDATA #FIXED '%DTD.Summary.Version;'">
+<!ATTLIST documentsummary
 	urllinkpolicy		-- how do we link to targets described
 				   in this summary? --
 		(automatic | explicit | none)
-		#required
+		#REQUIRED
 	urlpath			-- what is the URL of the `head'
 				   document?  Required only if
 				   URLLINKPOLICY is `explicit' --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	exportedlinkpolicy	-- may we refer to non-exported targets? --
 		(onlyexported | all)
 		onlyexported
@@ -167,14 +167,14 @@
   For further discussion of the common elements, see the Starlink
   General DTD.
 -->
-<!element DOCINFO 	o o (title & authorlist & keyword* & docnumber)>
+<!ELEMENT docinfo 	O O (title & authorlist & keyword* & docnumber)>
 
-<!element TITLE		o o (#pcdata)	-- document title -->
-<!element AUTHORLIST	o o (author+, otherauthors?)
+<!ELEMENT title		O O (#PCDATA)	-- document title -->
+<!ELEMENT authorlist	O O (author+, otherauthors?)
 					-- contains author names -->
-<!element OTHERAUTHORS	- o (author+)	-- other contributors -->
-<!element AUTHOR	- o (#pcdata)	-- contains author's name -->
-<!element KEYWORD	- o (#pcdata)	-- contains a keyword for document -->
+<!ELEMENT otherauthors	- O (author+)	-- other contributors -->
+<!ELEMENT author	- O (#PCDATA)	-- contains author's name -->
+<!ELEMENT keyword	- O (#PCDATA)	-- contains a keyword for document -->
 
 <!--
   The content of the DOCNUMBER element is supposed to be the document
@@ -184,36 +184,36 @@
   intended purely as a transmitter of information, rather than an
   archive source.
 -->
-<!element DOCNUMBER	- o (#pcdata)	-- document number in series -->
-<!attlist DOCNUMBER
+<!ELEMENT docnumber	- O (#PCDATA)	-- document number in series -->
+<!ATTLIST docnumber
 	documenttype
 		(sug|sc|sg|sun|sgp|ssn|mud)
-		#implied
+		#IMPLIED
 		-- Which series is it part of --
 	unassigned
 		(unassigned)
-		#implied
+		#IMPLIED
 		-- indicates that no number has (yet?) been assigned
 		   to this document, and so that any content should be
 		   IGNOREd --
 	>
 
-<!attlist author
+<!ATTLIST author
 	email		-- author's email address	--
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	webpage		-- author's home page		--
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	affiliation	-- author's physical address/affiliation, etc --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	role		-- editor, maintainer, etc	--
-		cdata
-		#implied	
+		CDATA
+		#IMPLIED	
 	id		-- eg, initials, referred to in element UPDATE --
-		id
-		#implied	-- required, in General DTD --
+		ID
+		#IMPLIED	-- required, in General DTD --
 	>
 
 
@@ -224,38 +224,38 @@
 -->
 
 
-<!element DOCBODY 	o o ((docxref | label)*,
+<!ELEMENT docbody 	O O ((docxref | label)*,
 				abstract?, sect*, appendices?)>
 
-<![ IGNORE [ <!element ABSTRACT	- - ((#pcdata | %simplephrase)*)> ]]>
-<!element ABSTRACT	- - (#pcdata)>
-<!element SECT          - o (subhead, (docxref | label)*, subsect*)>
-<!element SUBSECT       - o (subhead, (docxref | label)*, subsubsect*)>
-<!element SUBSUBSECT    - o (subhead, (docxref | label)*, subsubsubsect*)>
-<!element SUBSUBSUBSECT - o (subhead, (docxref | label)*)>
+<![ IGNORE [ <!ELEMENT abstract	- - ((#PCDATA | %simplephrase)*)> ]]>
+<!ELEMENT abstract	- - (#PCDATA)>
+<!ELEMENT sect          - O (subhead, (docxref | label)*, subsect*)>
+<!ELEMENT subsect       - O (subhead, (docxref | label)*, subsubsect*)>
+<!ELEMENT subsubsect    - O (subhead, (docxref | label)*, subsubsubsect*)>
+<!ELEMENT subsubsubsect - O (subhead, (docxref | label)*)>
 
-<!element APPENDICES	- o (sect+)>
+<!ELEMENT appendices	- O (sect+)>
 
-<!element SUBHEAD	o o (title)>
+<!ELEMENT subhead	O O (title)>
 
-<!attlist (sect|subsect|subsubsect|subsubsubsect)
+<!ATTLIST (sect|subsect|subsubsect|subsubsubsect)
 	id			-- an ID for this section --
-		id
-		#implied
+		ID
+		#IMPLIED
 	urlpath			-- if present, this is an explicit
 				   setting for the URL which refers to
 				   this element.  This is permissible
 				   only if DOCUMENTSUMMARY has the
 				   attribute URLLINKPOLICY set to
 				   EXPLICIT. --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	export			-- if present, the document commits
 				   itself to maintaining this ID in
 				   future: that is, it can safely be
 				   linked to from outside --
 		(export)
-		#implied
+		#IMPLIED
 	>
 
 
@@ -263,33 +263,33 @@
   Include DOCXREFs in the summary document.  See General DTD for
   discussion.
 -->
-<!element DOCXREF - O empty	-- References to elements and data within other
+<!ELEMENT docxref - O EMPTY	-- References to elements and data within other
 				   Starlink documents -- 
 	>
-<!attlist DOCXREF
+<!ATTLIST docxref
 	doc			-- Starlink document which holds the target --
 		ENTITY
-		#required
+		#REQUIRED
 	loc			-- location within document, or whole document
 				   if this is missing --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 
 	-- following are the HyTime attributes --
 	loctype			-- declare addressing method --
-		cdata
-		#fixed "loc idloc"
+		CDATA
+		#FIXED "loc idloc"
 	rflocsrc		-- declare that the LOC is a reference
 				   relative to the document addressed by
 				   DOC --
-		cdata
-		#fixed "loc doc"
+		CDATA
+		#FIXED "loc doc"
 	HyTime			-- bind to HyTime clink form --
-		name
-		#fixed "clink"
+		NAME
+		#FIXED "clink"
 	HyNames			-- bind id attribute to clink's linkend --
-		cdata
-		#fixed "linkend loc"
+		CDATA
+		#FIXED "linkend loc"
 	>
 
 <!--
@@ -318,17 +318,17 @@
   documents.  It could be relaxed if this element is used in other
   contexts, too.
  -->
-<!element LABEL - o EMPTY>
-<!attlist LABEL
+<!ELEMENT label - O EMPTY>
+<!ATTLIST label
 	id			-- The ID which this document exports --
-		id
-		#required
+		ID
+		#REQUIRED
 	export			-- This location is linkable from
 				   outside (see General DTD for
 				   discussion). --
 		(export)
-		#required
+		#REQUIRED
 	urlpath			-- Suffix of URL which locates this part --
-		cdata
-		#required
+		CDATA
+		#REQUIRED
 	>
