@@ -51,6 +51,8 @@
 #        Add USEGRD
 #     1998 Dec 8 (TIMJ)
 #        Correct prompt for LONG_OUT
+#     1998 Dec 10 (TIMJ)
+#        Rename USEGRD to GUARD
 #     {enter_further_changes_here}
 
 #-
@@ -135,7 +137,7 @@
 	 HELPKEY  '*'
       ENDPARAMETER  
 
-      PARAMETER USEGRD
+      PARAMETER GUARD
          TYPE '_LOGICAL'
          VPATH 'DYNAMIC,PROMPT'
          PPATH 'DYNAMIC'
