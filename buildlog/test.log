@@ -32,36 +32,36 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.36 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.363 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.127 sec
+    [junit] Testcase: testGetChildElementByName took 0.129 sec
     [junit] Testcase: testGetTextContent took 0.028 sec
     [junit] Testcase: testNewDocument took 0.017 sec
-    [junit] Testcase: testRelativizeDOM took 0.179 sec
+    [junit] Testcase: testRelativizeDOM took 0.181 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.108 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 3.685 sec
 
-    [junit] Testcase: testData took 0.884 sec
-    [junit] Testcase: testIntro took 0.758 sec
-    [junit] Testcase: testStream took 0.888 sec
-    [junit] Testcase: testHybridStream took 0.641 sec
-    [junit] Testcase: testCombo1 took 0.758 sec
-    [junit] Testcase: testResourceStream took 0.173 sec
+    [junit] Testcase: testData took 0.871 sec
+    [junit] Testcase: testIntro took 0.674 sec
+    [junit] Testcase: testStream took 0.62 sec
+    [junit] Testcase: testHybridStream took 0.599 sec
+    [junit] Testcase: testCombo1 took 0.744 sec
+    [junit] Testcase: testResourceStream took 0.172 sec
     [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.021 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.459 sec
 
-    [junit] Testcase: testDataInput took 0.008 sec
-    [junit] Testcase: testInputStream took 0.009 sec
+    [junit] Testcase: testDataInput took 0.007 sec
+    [junit] Testcase: testInputStream took 0.448 sec
     [junit] Testsuite: uk.ac.starlink.util.LoaderTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.672 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.605 sec
     [junit] ------------- Standard Error -----------------
-    [junit] Oct 25, 2004 5:17:14 AM uk.ac.starlink.util.Loader warn
+    [junit] Oct 26, 2004 5:17:09 AM uk.ac.starlink.util.Loader warn
     [junit] WARNING: Class no.class.here.mate not found
-    [junit] Oct 25, 2004 5:17:14 AM uk.ac.starlink.util.Loader warn
+    [junit] Oct 26, 2004 5:17:09 AM uk.ac.starlink.util.Loader warn
     [junit] WARNING: Class uk.ac.starlink.util.LoaderTest is not a java.lang.Comparable
     [junit] ------------- ---------------- ---------------
 
-    [junit] Testcase: testLoader took 0.664 sec
+    [junit] Testcase: testLoader took 0.597 sec
     [junit] Testcase: testGetClassInstances took 0.004 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.143 sec
@@ -73,9 +73,9 @@ run-tests:
     [junit] Testcase: testPipe1 took 0.036 sec
     [junit] Testcase: testPipeBlock took 0.025 sec
     [junit] Testsuite: uk.ac.starlink.util.ReaderThreadTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.018 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.02 sec
 
-    [junit] Testcase: testThread took 1.014 sec
+    [junit] Testcase: testThread took 1.016 sec
     [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.705 sec
 
@@ -83,18 +83,18 @@ run-tests:
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.404 sec
 
-    [junit] Testcase: testFlags took 0.305 sec
+    [junit] Testcase: testFlags took 0.304 sec
     [junit] Testcase: testAssertSource took 0.048 sec
     [junit] Testcase: testValidation took 0.047 sec
     [junit] Testsuite: uk.ac.starlink.util.URLUtilsTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.017 sec
 
     [junit] Testcase: testMakeURL took 0.011 sec
-    [junit] Testcase: testUrlToUri took 0.003 sec
+    [junit] Testcase: testUrlToUri took 0.002 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
-    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 3.712 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 3.711 sec
 
-    [junit] Testcase: testXMLEncodeDecode took 3.706 sec
+    [junit] Testcase: testXMLEncodeDecode took 3.704 sec
     [junit] 	Caused an ERROR
     [junit] Can't connect to X11 window server using 'europa:0.0' as the value of the DISPLAY variable.
     [junit] java.lang.InternalError: Can't connect to X11 window server using 'europa:0.0' as the value of the DISPLAY variable.
