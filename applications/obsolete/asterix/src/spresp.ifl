@@ -40,7 +40,7 @@ INTERFACE SPRESP
 
   PARAMETER NEBIN
     TYPE        '_INTEGER'
-    VPATH       'DYNAMIC,PROMPT'
+    VPATH       'PROMPT'
     PPATH       'DYNAMIC'
     PROMPT      'Number of samples along energy dimension'
     HELP        'Default is number of energy bins in data'
@@ -65,7 +65,7 @@ INTERFACE SPRESP
   PARAMETER RLIMIT
     TYPE        '_INTEGER'
     VPATH       'PROMPT'
-    DEFAULT     50
+    DEFAULT     20
     PPATH       'DEFAULT'
     PROMPT      'Maximum radius of the psf in pixels'
     HELP        'Use this option to limit the size of the psf'
