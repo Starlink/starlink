@@ -862,7 +862,7 @@ do_test:
         echo "scbindex.pl:  Build test index of scb_test.tar" && \
         $(INSTALL_BIN)/scbindex.pl scb_test.tar && \
         echo " " && \
-        echo "scbcp.pl: Copy indices to new directory" && \
+        echo "scbcp.pl: Copy indexes to new directory" && \
         echo " " && \
         mkdir $$SCB_INDEX/junk && \
         $(INSTALL_BIN)/scbcp.pl $$SCB_INDEX $$SCB_INDEX/junk && \
