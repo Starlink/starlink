@@ -327,6 +327,7 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
@@ -622,6 +623,7 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \

@@ -178,7 +178,7 @@ text files.  CURSA also includes some facilities for accessing remote
 on-line catalogues via the Internet.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgp</build><build>graphpar</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgplot</build><build>graphpar</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1116,7 +1116,7 @@ in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
 package. 
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>sla</build><build>fio</build><build>pda</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>agi</build><build option='link'>sla</build><build option='link'>fio</build><build option='link'>pda</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
