@@ -90,7 +90,7 @@
       INCLUDE 'SAE_PAR'          			! SAE constants
       INCLUDE 'ADI_PAR'					! ADI constants
       INCLUDE 'DAT_PAR'					! HDS constants
-      INCLUDE 'HIST_PAR'
+      INCLUDE 'HSI_PAR'
 
 *  Arguments Given:
       INTEGER			NARG			! # arguments
@@ -153,7 +153,7 @@
       CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
 
 *  Only write text if verbosity is QUIET or greater
-      IF ( IVERB .GE. HIST__QUIET ) THEN
+      IF ( IVERB .GE. HSI__QUIET ) THEN
 
 *    Locate RECORDS structure, and find its size
         CALL DAT_FIND( HLOC, 'RECORDS', RLOC, STATUS )
