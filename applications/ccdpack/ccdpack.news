@@ -1,42 +1,77 @@
-1 CCDPACK_minor_update
+1 CCDPACK_major_update
 
-  Release v3.2-1 is a minor update of CCDPACK, but provides greatly 
-  improved facilities for interactive registration:
+  Release v4.0 is a major update of CCDPACK; major new facilities have 
+  been added in these areas:
 
-   - The following programs have been completely rewritten:
+  CCDPACK Sets (mosaic cameras)
+  -----------------------------
+
+     CCDPACK now offers the concept of a Set of image files, which might
+     typically be a group of frames taken from the different CCDs on the
+     same mosaic camera during the same observation.  This makes the
+     data reduction and registration steps much more straightforward
+     when processing this type of data.  Two new applications have been
+     added for explicit handling of Set header information:
+
+      - MAKESET  -- Writes Set header information to images
+      - SHOWSET  -- Outputs image Set header information
+
+     Most of the existing CCDPACK applications have been modified to  
+     be aware of this Set information, but will behave as previously 
+     on data which has not had Set headers explicitly added.  Some
+     of the existing applications remain to be upgraded for Set use;
+     this will be done for the next release.
+
+  Interactive registration programs
+  ---------------------------------
+
+     The following programs have been completely rewritten:
 
       - IDICURS  -- Views and writes position lists interactively
       - PAIRNDF  -- Aligns images graphically by drag and drop
       - CCDALIGN -- Aligns images graphically by interactive object selection
 
-     These programs should now work on all X displays, including those
-     which do not offer a PseudoColor visual (e.g. typical newer Linux 
-     displays).  In addition, they provide a much more intuitive and 
-     easier to use graphical interface than in their previous 
-     incarnations. 
+     They now feature a much more intuitive, powerful and easy to use
+     graphical interface than in their previous incarnations.  They 
+     will also work on all X displays, rather than requiring a 
+     PseudoColor visual as previously.  Although these programs offer
+     basically the same facilities as they did in previous versions of
+     CCDPACK, parameter usage has in some cases changed considerably.
 
+  New display application
+  -----------------------
 
-  The following new program has been added for viewing positioning of
-  registered images:
+     The following new program has been added for viewing images and
+     their alignment:
 
-      - BOUNDS   -- Draws aligned boundaries of images on a graphics display
+      - DRAWNDF  -- Draws aligned images or outlines on a graphics display
 
+     It will plot the outline, or the pixels, or both of one or more
+     images on a display device.  This makes it quick and easy to preview
+     the positioning of images in their Current coordinate system, 
+     and to see how they are aligned with each other, for instance prior
+     to resampling and generating a mosaic.
 
-  The following minor changes have also been made since v3.1-1:
+  Other items
+  -----------
 
-   - A bug in FINDOFF which caused failure when NDFNAMES=false has
-     been fixed.
+     The following minor changes have also been made since v3.1-1:
 
-   - FINDOFF will now propagate values in trailing columns from the
-     input to output position lists.
+      - A bug in FINDOFF which caused failure when NDFNAMES=false has
+        been fixed.
 
-   - PLOTLIST has been modified to interact with the AGI database
-     in a more KAPPA-compatible way, so that alignment with KAPPA 
-     graphical output should be improved.
+      - FINDOFF will now propagate values in trailing columns from the
+        input to output position lists.
 
-   - There have been some improvements and bug fixes to the percentile
-     location routine used by FINDOBJ.
+      - PLOTLIST has been modified to interact with the AGI database
+        in a more KAPPA-compatible way, so that alignment with KAPPA 
+        graphical output should be improved.
 
-   - The MODIFIED parameter of WCSEDIT has been withdrawn and replaced 
-     by the NAMELIST parameter.
+      - There have been some improvements and bug fixes to the percentile
+        location routine used by FINDOBJ.
+
+      - The MODIFIED parameter of WCSEDIT has been withdrawn and replaced 
+        by the NAMELIST parameter.
+
+      - TRANNDF will now (sensibly) refuse to resample into a SkyFrame.
 
