@@ -522,11 +522,15 @@ irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f irq1_cmqm.f \
 irq1_count.f irq1_evstk.f irq1_get.f irq1_gtidq.f irq1_iannu.f \
 irq1_indf.f irq1_init.f irq1_islot.f irq1_mod.f irq1_ndtov.f irq1_nulop.f \
 irq1_opand.f irq1_qcnt.f irq1_qlst.f irq1_qlst2.f irq1_qmsk.f irq1_qset.f \
-irq1_rbit.f irq1_reset.f irq1_rslot.f irq1_sbad1.f irq1_searc.f \
+irq1_rbit.f irq1_reset.f irq1_rslot.f \
+irq1_sbad1b.f irq1_sbad1d.f irq1_sbad1i.f irq1_sbad1r.f irq1_sbad1ub.f \
+irq1_sbad1uw.f irq1_sbad1w.f \
+irq_sbadb.f irq_sbadd.f irq_sbadi.f irq_sbadr.f irq_sbadub.f \
+irq_sbaduw.f irq_sbadw.f irq1_searc.f \
 irq1_simpl.f irq1_sorti.f irq1_space.f irq1_temp.f irq1_vtofx.f \
 irq_addqn.f irq_annul.f irq_chkqn.f irq_close.f irq_cntq.f irq_comp.f \
 irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f irq_remqn.f \
-irq_resq.f irq_resql.f irq_resqm.f irq_rlse.f irq_sbad.f irq_setq.f \
+irq_resq.f irq_resql.f irq_resqm.f irq_rlse.f irq_setq.f \
 irq_setql.f irq_setqm.f irq_syntx.f
 
 KPG_F_ROUTINES = bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
@@ -1771,7 +1775,13 @@ irq1_qset.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 irq1_rbit.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
 irq1_reset.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
 irq1_rslot.o: DAT_PAR IRQ_PAR SAE_PAR
-irq1_sbad1.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1b.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1ub.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1w.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1uw.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1i.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1r.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_sbad1d.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
 irq1_searc.o: IRQ_ERR IRQ_PAR SAE_PAR
 irq1_simpl.o: IRQ_OPC IRQ_PAR SAE_PAR
 irq1_sorti.o: SAE_PAR
@@ -1794,7 +1804,13 @@ irq_resq.o: IRQ_ERR IRQ_PAR SAE_PAR
 irq_resql.o: IRQ_ERR IRQ_PAR NDF_PAR SAE_PAR
 irq_resqm.o: IRQ_ERR IRQ_PAR SAE_PAR
 irq_rlse.o: DAT_PAR IRQ_PAR SAE_PAR
-irq_sbad.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbadb.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbadub.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbadw.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbaduw.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbadi.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbadr.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_sbadd.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
 irq_setq.o: IRQ_ERR IRQ_PAR SAE_PAR
 irq_setql.o: IRQ_ERR IRQ_PAR NDF_PAR SAE_PAR
 irq_setqm.o: IRQ_ERR IRQ_PAR SAE_PAR

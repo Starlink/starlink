@@ -207,19 +207,33 @@ ira_dtoc1.f ira_exprt.f ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f \
 ira_gtscs.f ira_init.f ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f \
 ira_seteq.f ira_trans.f ira_write.f ira_read.f ira_com ira_par ira_err 
 
-# The contents of the irq_source.tar file:
-IRQ_SOURCE = irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f \
+# The source RCS files needed to create the irq_source.tar file:
+IRQ_SOURCES = $(IRQ_NONGEN) $(IRQ_GEN) irq_com irq_err irq_cmo \
+irq_opc irq_pao irq_par 
+
+# Generic source files needed for irq_source.tar:
+IRQ_GEN = irq_sbad.gen irq1_sbad1.gen
+
+# Non-generic source files needed for irq_source.tar:
+IRQ_NONGEN = irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f \
 irq1_cmqm.f irq1_count.f irq1_evstk.f irq1_get.f irq1_gtidq.f \
 irq1_iannu.f irq1_indf.f irq1_init.f irq1_islot.f irq1_mod.f \
 irq1_ndtov.f irq1_nulop.f irq1_opcin.f irq1_opand.f irq1_qcnt.f \
 irq1_qlst2.f irq1_qlst.f irq1_qmsk.f irq1_qset.f irq1_rbit.f \
-irq1_reset.f irq1_rslot.f irq1_sbad1.f irq1_searc.f irq1_simpl.f \
+irq1_reset.f irq1_rslot.f irq1_searc.f irq1_simpl.f \
 irq1_sorti.f irq1_space.f irq1_temp.f irq1_vtofx.f irq_addqn.f \
-irq_annul.f irq_chkqn.f irq_close.f irq_cmo irq_cntq.f irq_comp.f \
-irq_com irq_err irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f \
-irq_opc irq_pao irq_par irq_remqn.f irq_resql.f irq_resqm.f irq_resq.f \
-irq_rlse.f irq_sbad.f irq_setqm.f irq_setql.f irq_setq.f irq_syntx.f \
+irq_annul.f irq_chkqn.f irq_close.f irq_cntq.f irq_comp.f \
+irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f \
+irq_remqn.f irq_resql.f irq_resqm.f irq_resq.f \
+irq_rlse.f irq_setqm.f irq_setql.f irq_setq.f irq_syntx.f \
 irq_test.f
+
+# The contents of the irq_source.tar file (including expanded generic
+# files and the generic source files):
+IRQ_SOURCE = $(IRQ_SOURCES) irq_sbadb.f irq_sbadd.f irq_sbadi.f \
+irq_sbadr.f irq_sbadub.f irq_sbaduw.f irq_sbadw.f irq1_sbad1b.f \
+irq1_sbad1d.f irq1_sbad1i.f irq1_sbad1r.f irq1_sbad1ub.f \
+irq1_sbad1uw.f irq1_sbad1w.f 
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KPG_GEN)
@@ -230,7 +244,7 @@ UNIX_OTHERS = makefile mk sun238.tex id6.tex kaplibs.news KAPLIBS_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) $(IRQ_SOURCE) \
+UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) $(IRQ_SOURCES) \
 $(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES) $(SEARCHTOOLS) $(KAPGRF_SOURCE)
 
 #  The contents of kaplibs.tar.
