@@ -1,38 +1,17 @@
 1 Update to EXTRACTOR
+  
+  A minor update to EXTRACTOR.
 
- The EXTRACTOR and SExtractor programs have been updated to SExtractor
- version 2.0.19 (the previous version was 2.0.15). The changes
- introduced by this are (from the SExtractor change log):
+     - The range of output WCS coordinates should now always be 
+       correctly normalised (i.e. RA's in range 0-24hrs).
 
-    - SEGMENTATION numbering problem fixed.
-    - new ASSOC_TYPE NEAREST option.
-    - MAP_RMS measurement mode and FLAG_TYPE MAX bugs fixed.
-    - new BACK_TYPE, BACK_VALUE and THRESH_TYPE parameters.
-    - FLUX_RADIUS no longer requires FLUX_AUTO.
-    - Documentation (mud165) slightly improved.
+     - Apertures should now be visible in the "APERTURES" checkimage.
 
- The BACK_TYPE/BACK_VALUE parameters now allow the background used to
- be defined as a single constant for the whole image (BACK_TYPE takes
- the values "INTERNAL" and "MANUAL") and the THRESH_TYPE controls
- whether the detection and analysis thresholds are a multiple of the 
- background RMS, or just in absolute data units.
-
- A serious bug calculating the CLASS_STAR parameter (which is only 
- revealed on Digital UNIX systems) has been fixed.
-
- The MAG_APER parameter now works correctly under ICL (and TCL). This
- was crashing during a second run.
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
     % showme sun226
 
- Peter W. Draper 24th May 1999 (P.W.Draper@durham.ac.uk).
-
-----
-
-1.1-2 release:
-
-    Fixed normalisation of output WCS coordinates
+ Peter W. Draper 22nd October 1999 (P.W.Draper@durham.ac.uk).
 
