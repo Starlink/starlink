@@ -99,6 +99,7 @@
       INTEGER                   STATUS                  ! Global status
 
 *  Local Variables:
+      INTEGER			ARGS(2)			! Method arguments
       INTEGER			RESID			! Method result
 *.
 
