@@ -13,7 +13,7 @@
 //     Allan Brighton, ESO (ALLAN)
 //
 //  Copyright:
-//     Copyright (C) 1997-2000 Central Laboratory of the Research Councils
+//     Copyright (C) 1997-2003 Central Laboratory of the Research Councils
 //
 //  History:
 //     15-FEB-1996 (PWD):
@@ -1158,7 +1158,6 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
     char* outy_name = argv[1];
 
     // Set the origin information if available.
-    Tcl_ResetResult(interp_);
     char *x = image_->image().get("LBOUND1");
     if ( ! x ) x = "1";
     Tcl_SetVar(interp_, outx_name, x, 0);
@@ -1516,7 +1515,7 @@ int StarRtdImage::astgetCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
     const char *result = wcsp->astGetAttrib( argv[0] );
-    Tcl_SetResult( interp_, (char *)result, TCL_VOLATILE );
+    set_result( result );
     return TCL_OK;
 }
 
@@ -2482,10 +2481,9 @@ int StarRtdImage::astwcs2pixCmd( int argc, char *argv[] )
     worldToImageCoords(x, y, 0);
 
     //  And return the values as the result of this command.
-    Tcl_ResetResult( interp_ );
     char *buffer = Tcl_Alloc( TCL_DOUBLE_SPACE * 2 + 2 );
     sprintf( buffer, "%g %g", x, y );
-    Tcl_SetResult( interp_, buffer, TCL_DYNAMIC );
+    set_result( buffer );
     return TCL_OK;
 }
 
@@ -2528,7 +2526,7 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
     image_->wcs().pix2wcs( x, y, buffer, 80, 0);
 
     //  Set the result and return.
-    Tcl_SetResult( interp_, buffer, TCL_VOLATILE );
+    set_result( buffer );
     return TCL_OK;
 }
 
@@ -2577,8 +2575,8 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
         AstFrameSet *wcs = wcsp->astWCSClone();
         const char *ra_buf = astFormat( wcs, 1, ra );
         const char *dec_buf = astFormat( wcs, 2, dec );
-        Tcl_AppendElement( interp_, (char *) ra_buf );
-        Tcl_AppendElement( interp_, (char *) dec_buf );
+        append_result( ra_buf );
+        append_result( dec_buf );
         astAnnul( wcs );
         return TCL_OK;
     }
@@ -4392,7 +4390,6 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     os << ends;
     set_result( os.str() );
     os.rdbuf()->freeze( 0 );
-    //os.freeze( false );
     return TCL_OK;
 }
 
@@ -5513,8 +5510,8 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
         astNorm( wcs, point );
         const char *ra_buf = astFormat( wcs, 1, point[0] );
         const char *dec_buf = astFormat( wcs, 2, point[1] );
-        Tcl_AppendElement( interp_, (char *)ra_buf );
-        Tcl_AppendElement( interp_, (char *)dec_buf );
+        append_result( ra_buf );
+        append_result( dec_buf );
     }
     astSetI( wcs, "Current", current );
     astSetI( wcs, "Base", base );
@@ -5811,7 +5808,7 @@ int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
     }
 
     char *result = wcsp->getDomains();
-    Tcl_SetResult( interp_, (char *)result, TCL_VOLATILE );
+    set_result( result );
     free( result );
     return TCL_OK;
 }
@@ -5874,23 +5871,33 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
     if ( strcmp( argv[0], "slaobs" ) == 0 ) {
 
         //  Other arguments should be observation index and/or
-        //  observation station.
+        //  observation station. Use -1 to get list of observatories.
         int n = 0;
         char c[11];
         char name[41];
         double w, p, h;
         if ( argc >= 2 ) {
-            //Tcl_GetInt( argv[1], &n );
+            if ( Tcl_GetInt( interp_, argv[1], &n) != TCL_OK ) {
+                return error( argv[1], " is not an integer");
+            }
         }
-        if ( argc == 3 ) {
+        if ( argc >= 3 ) {
             strncpy( c, argv[2], 11 );
         }
+        else {
+            c[0] = '\0';
+        }
         slaObs( n, c, name, &w, &p, &h );
-        //set_result( c, name, w, p, h );
+        
+        // Construct a list return of all the parameters.
+        char result[ 60 + TCL_DOUBLE_SPACE * 3 ];
+        sprintf( result, "{%s} {%s} {%f} {%f} {%f}", c, name, w, p, h );
+        set_result( result );
+    }
+    else {
+        return error( argv[0], " : unknown slalib subcommand" );
     }
     return TCL_OK;
-
-
 }
 
 //  ==================================
