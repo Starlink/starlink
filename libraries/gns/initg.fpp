@@ -65,7 +65,7 @@
 #elif FC_RECL_UNIT == 4
        PARAMETER ( BYTEPRU = 4 )
 #else
-#  error "Impossible FC_RECL_UNIT"
+ error "Impossible FC_RECL_UNIT"
 #endif
 
       DATA IDEL/NDELS*LREC/

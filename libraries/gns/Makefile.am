@@ -42,6 +42,9 @@ fndf.f
 
 FPP_ROUTINES = initg.fpp initi.fpp
 
+initg.f: initg.fpp
+initi.f: initi.fpp
+
 BUILT_SOURCES = GNS_ERR
 
 # Need to specify how to create the binary database files
@@ -49,6 +52,9 @@ BUILT_SOURCES = GNS_ERR
 noinst_PROGRAMS = gksbuild idibuild
 gksbuild_SOURCES = gksbuild.fpp
 idibuild_SOURCES = idibuild.fpp
+
+gksbuild.o: gksbuild.f
+idibuild.o: idibuild.f
 
 gns_gksdevices : gksbuild gksdevices.txt
 	-rm -f gns_gksdevices
