@@ -166,7 +166,7 @@ itcl::class gaia::GaiaImageName {
 	 set i1 [string first {.sdf} $fullname_]
 	 if { $i1 > -1 } {
 	    incr i1 -1
-	    if { [regsub {.sdf} $fullname_ "" name] } {
+	    if { [regsub {\.sdf} $fullname_ "" name] } {
 	       return $name
 	    }
 	 }
