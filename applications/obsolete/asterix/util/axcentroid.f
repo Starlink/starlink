@@ -244,10 +244,12 @@ C        END IF
       END IF
 
 *    Write history
-      CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL MSG_SETI( 'AX', AXIS )
-      CALL MSG_MAKE( 'Centroided axis ^AX', TEXT, TLEN )
-      CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
+      IF ( NDIM .GT. 1 ) THEN
+        CALL HSI_ADD( OFID, VERSION, STATUS )
+        CALL MSG_SETI( 'AX', AXIS )
+        CALL MSG_MAKE( 'Centroided axis ^AX', TEXT, TLEN )
+        CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
+      END IF
 
 *    Tidy up
  99   CALL AST_CLOSE()
