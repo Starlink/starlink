@@ -51,10 +51,17 @@ dnl    have done something as wierd as Apple.
 LIBS="$LIBS -L/usr/X11R6/lib"
 CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
 
-AC_CHECK_HEADER([X11/Xaw3d/SimpleP.h], set have_xaheader = "yes" ) 
-AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, set have_xalib = "yes" )
+AC_CHECK_HEADER([X11/Xaw3d/Simple.h], set have_xa3dheader = "yes" ) 
+AC_CHECK_HEADER([X11/Xaw/Simple.h], set have_xaheader = "yes" ) 
+
+AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, set have_xa3dlib = "yes" )
+AC_CHECK_LIB(Xaw, XawInitializeWidgetSet, set have_xalib = "yes" )
+
+
 AM_CONDITIONAL( HAVE_XATHENA, \
-   [test "$have_xaheader" = "yes" && test "$test_xalib" = "yes"] )
+   [(test "$have_xa3dheader" = "yes" || test "$have_xaheader" = "yes") && \
+    (test "$test_xa3dlib" = "yes" || test "$test_xadlib" = "yes")] )
+
      
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot

@@ -14,3 +14,4 @@ if HAVE_XATHENA
    AM_CFLAGS = -DPG_PPU -I../
 
 endif
+
