@@ -291,17 +291,28 @@ cat >dtask_applic.f <<FOO
       END
 FOO
 
-# We need to link monoliths statically.  This is partly because if we don't,
-# we need to worry about setting LD_LIBRARY_PATH or similar,
+# We need to link monoliths statically.  This is partly because if we
+# don't, we need to worry about setting LD_LIBRARY_PATH or similar,
 # but mostly because monoliths appear not to work if linked against
 # shared libraries.  This needs further investigation, but in the mean
-# time, force static linking.  This option may be specific to
-# gcc/gnuld, and so might need configuration in future.
-alinkextraflags='-Wl,--static'
+# time, force static linking.
+#
+# NOTE NOTE NOTE: This option is almost certainly specific to
+# gcc/gnuld, and so will surely need configuration in future.  Better
+# overall would be to use libtool to do this link.
+#
+if @FC@ --version | sed 1q | grep -i 'gnu fortran' >/dev/null; then
+    : OK
+else
+    echo "NOTE ilink is currently g77-specific: link may not work!"
+    echo "NOTE ilink is currently g77-specific: link may not work!" >&2
+fi
+
+alinkextraflags='-static-libgcc -Wl,--static'
 if $includedebug
 then
     $verbose && echo "Including debugging support in dtask_main.f"
-    alinkextraflags="$extraflags -g"
+    alinkextraflags="$alinkextraflags -g"
     sed -e s#PROGNAME#$PROGNAME# @staretcdir@/dtask_main.txt \
            >dtask_main.f
 fi
