@@ -20,7 +20,7 @@
 *     14 Dec 88 : V0.6-2 Thaw multiple parameters, allow param resetting (TJP)
 *     20 Jun 89 : V1.0-1 ASTERIX88 release (TJP)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*
+*     20 Dec 1995 : V2.0-0 ADI port (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -44,11 +44,11 @@
 	CHARACTER*(DAT__SZLOC) MIPJLOC		! Locator to one param of pmod I
 	CHARACTER*(DAT__SZTYP) TYP		! Object type
 	CHARACTER*25 PARNAME			! Parameter name
-	LOGICAL INPRIM				! Input data primitive?
 	LOGICAL FROZEN				! Parameter frozen?
 	LOGICAL PVALS				! Param values entered?
 	LOGICAL GETPAR				! Parameter component accessed?
 	LOGICAL VALID				! Locator valid?
+        INTEGER FID
 	INTEGER NCOMP				! No of pmodels in cmodel
 	INTEGER NPAR				! No of pmodel parameters
 	INTEGER NTHAW				! No of parameters to be thawed
@@ -61,8 +61,7 @@
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'THAW Version 1.0-1')
-
+	PARAMETER		(VERSION = 'THAW Version 2.0-0')
 *-
 
 * Version not announced (neater)
@@ -70,7 +69,8 @@
         CALL AST_INIT()
 
 * Access and check fit_model object
-	CALL USI_ASSOCI('MODEL','UPDATE',FLOC,INPRIM,STATUS)
+        CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', FID, STATUS )
+        CALL ADI1_GETLOC( FID, FLOC, STATUS )
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 	CALL DAT_TYPE(FLOC,TYP,STATUS)
 	IF(TYP.NE.'FIT_MODEL')THEN
@@ -81,7 +81,7 @@
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Get parameter numbers
-	CALL USI_GET1I('PAR',MAXTHAW,PARNO,NTHAW,STATUS)
+	CALL PRS_GETLIST('PAR',MAXTHAW,PARNO,NTHAW,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Check for invalid parameter numbers
@@ -127,7 +127,6 @@ D	  print *,'comp,npmin,npmax,nthaw: ',i,npmin,npmax,nthaw
 * Find required parameter(s)
 	  GETPAR=.TRUE.
 	  DO J=1,NTHAW
-D	    print *,'j: ',j
 	    IF(PARNO(J).GE.NPMIN.AND.PARNO(J).LE.NPMAX)THEN
 	      IF(GETPAR)THEN
 	        CALL DAT_FIND(MILOC,'PAR',MIPLOC,STATUS)
@@ -155,8 +154,8 @@ D	    print *,'j: ',j
 	      ELSE
 	        CALL CMP_PUT0L(MIPJLOC,'FROZEN',.FALSE.,STATUS)
 	        IF(STATUS.NE.SAI__OK) GO TO 9000
-	        WRITE(6,500)PARNAME
- 500	        FORMAT(16X,'* ',A<CHR_LEN(PARNAME)>,1X,'thawed')
+                CALL MSG_SETC( 'PN', PARNAME )
+                CALL MSG_PRNT( '* ^PN thawed' )
 	      ENDIF
 	      CALL DAT_ANNUL(MIPJLOC,STATUS)
 	    ENDIF
