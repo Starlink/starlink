@@ -65,11 +65,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
-*     2 Feb 1995 (DJA):
+*      2 Feb 1995 (DJA):
 *        Original version.
+*     15 May 1997 (RB):
+*        Spruce up a bit.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -345,6 +348,7 @@
 *  Local Variables:
       CHARACTER*1		AXC			! Axis # in char
       CHARACTER*72		CMNT			! Keyword comment
+      CHARACTER*40		VALUE			! Keyword value
       CHARACTER*8		TYPE			! Basic data type
 
       INTEGER			BITPIX			! Bits per pixel
@@ -357,7 +361,6 @@
       INTEGER			NDIM,DIMS(ADI__MXDIM)	! Data shape
       INTEGER			NELM			! Total # elements
       INTEGER			PCOUNT, GCOUNT		! Group counters
-      INTEGER			IREAD
 
       LOGICAL			EXTEND			! Dataset has extensions?
       LOGICAL			ISTABLE			! Table HDU?
@@ -377,12 +380,14 @@
 *    Increment output HDU counter
         OIHDU = OIHDU + 1
 
-*    Move to this hdu
+*    Move to this hdu (but only create if you have to - RB)
         FSTAT = 0
-        IF ( IHDU .GT. 1 ) THEN
+        CALL FTMAHD( OLUN, OIHDU, HDUTYPE, FSTAT )
+        IF ( FSTAT .NE. SAI__OK ) THEN
+          FSTAT = 0
+          CALL FTMAHD( OLUN, OIHDU-1, HDUTYPE, FSTAT )
           CALL FTCRHD( OLUN, FSTAT )
         END IF
-        CALL FTMAHD( OLUN, OIHDU, HDUTYPE, FSTAT )
 
 *    Modified?
         CALL ADI_CGET0L( HDUID, 'Modified', MODIFIED, STATUS )
@@ -399,11 +404,11 @@
           CALL ADI_CGET0L( HDUID, 'IsTable', ISTABLE, STATUS )
           IF ( ISTABLE ) THEN
 
-*        Shall we add some code here too? - rb
+*        Keywords for binary table extension (RB)
             CALL FTPKYS( OLUN, 'XTENSION', 'BINTABLE',
      :                   'binary table extension', FSTAT )
             CALL ADI2_IMGTSHP( HDUID, .TRUE., BITPIX, NDIM, DIMS,
-     :                   STATUS )
+     :                         STATUS )
             CALL FTPKYJ( OLUN, 'BITPIX', BITPIX, 'bits per pixel',
      :                   FSTAT )
             CALL FTPKYJ( OLUN, 'NAXIS', NDIM,
@@ -412,17 +417,13 @@
      :                   'width of table in bytes', FSTAT)
             CALL FTPKYJ( OLUN, 'NAXIS2', DIMS(2),
      :                   'number of rows in table', FSTAT)
-c           CALL FTPKYJ( OLUN, 'PCOUNT', 0,
-c    :                   'size of special data  area', FSTAT)
-c           CALL FTPKYJ( OLUN, 'GCOUNT', 1,
-c    :                   'one data group (required keyword)', FSTAT)
 
 *        Define the data size
             CALL FTPDEF( OLUN, BITPIX, NDIM, DIMS, PCOUNT, GCOUNT,
      :                   FSTAT )
 
 *        Write remaining header cards
-            CALL ADI2_FCOMIT_CARDS( OLUN, HDUID, NDIM + 1, STATUS )
+            CALL ADI2_FCOMIT_CARDS( OLUN, HDUID, 1, STATUS )
 
 *      Image HDU
           ELSE
@@ -436,6 +437,13 @@ c    :                   'one data group (required keyword)', FSTAT)
             IF ( STATUS .NE. SAI__OK ) THEN
               CALL ERR_ANNUL( STATUS )
               SIMPLE = .TRUE.
+            END IF
+
+*        Exension type?
+            CALL ADI2_HGKYC( HDUID, '>XTENSION', VALUE, CMNT, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL( STATUS )
+              VALUE = 'UNKNOWN'
             END IF
 
 *        Get grouping values
@@ -515,7 +523,7 @@ c    :                   'one data group (required keyword)', FSTAT)
      :                   FSTAT )
 
 *        Write remaining header cards
-            CALL ADI2_FCOMIT_CARDS( OLUN, HDUID, NDIM + 1, STATUS )
+            CALL ADI2_FCOMIT_CARDS( OLUN, HDUID, 1, STATUS )
 
 *        Non-zero extension size
             IF ( NDIM .GT. 0 ) THEN
@@ -546,10 +554,6 @@ c    :                   'one data group (required keyword)', FSTAT)
                   CALL ADI_CTYPE( HDUID, 'Image', TYPE, STATUS )
                   CALL ADI_CMAP( HDUID, 'Image', TYPE, 'READ', IPTR,
      :                           STATUS )
-c                 CALL ADI_NEW1( TYPE, DIMS(1), IPTR, STATUS )
-c                 CALL ADI_MAP( IMID, TYPE, 'READ', IPTR, STATUS )
-c                 CALL ADI_GET1( IMID, TYPE, DIMS(1), %VAL(IPTR),
-c    :                           IREAD, STATUS )
                 END IF
 
                 IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -564,9 +568,9 @@ c    :                           IREAD, STATUS )
                   CALL FTPPRE( OLUN, 1, 1, NELM, %VAL(IPTR), FSTAT )
                 ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
                   CALL FTPPRJ( OLUN, 1, 1, NELM, %VAL(IPTR), FSTAT )
-                ELSE IF ( TYPE .EQ. 'WORD' ) THEN
+                ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
                   CALL FTPPRI( OLUN, 1, 1, NELM, %VAL(IPTR), FSTAT )
-                ELSE IF ( TYPE .EQ. 'BYTE' ) THEN
+                ELSE IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
                   CALL FTPPRB( OLUN, 1, 1, NELM, %VAL(IPTR), FSTAT )
                 END IF
 
@@ -763,8 +767,14 @@ c               CALL ADI_CUNMAP( IMID, 'Value', IPTR, STATUS )
               CALL ADI_CGET0C( CRDID, 'Name', KEYWRD, STATUS )
 
 *          Locate keyword value
-              CALL ADI_FIND( CRDID, 'Value', VID, STATUS )
-              CALL ADI_TYPE( VID, VTYPE, STATUS )
+              CALL ADI_THERE( CRDID, 'Value', THERE, STATUS )
+              IF ( THERE ) THEN
+                CALL ADI_FIND( CRDID, 'Value', VID, STATUS )
+                CALL ADI_TYPE( VID, VTYPE, STATUS )
+              ELSE
+                CALL ADI_NEWV0C( 'unknown', VID, STATUS )
+                VTYPE = 'CHAR'
+              END IF
 
 *          Get keyword comment
               CALL ADI_THERE( CRDID, 'Comment', THERE, STATUS )
