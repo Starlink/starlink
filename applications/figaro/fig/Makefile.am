@@ -24,6 +24,4 @@ fig_verticalq.f fig_wavest.f fig_wavset.f fig_wcheck.f fig_wfill.f \
 fig_wfilld.f fig_wxyfit.f fig_xtract.f fig_xvalue.f \
 fig_xyfit.f fig_ytract.f fig_zaprays.f fig_zaprow.f
 
-FPP_ROUTINES = fig_dfits.fpp
-
-fig_dfits.f: fig_dfits.fpp
+FPP_ROUTINES = fig_dfits.F

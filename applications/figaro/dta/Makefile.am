@@ -33,6 +33,4 @@ dta_szvar.f dta_trname.f dta_tytidy.f dta_tyvar.f dta_versname.f \
 dta_wrvar.f dta_wrvarb.f dta_wrvarc.f dta_wrvard.f dta_wrvarf.f \
 dta_wrvari.f dta_wrvars.f dta_wrvaru.f 
 
-FPP_ROUTINES = dta_chrptr.fpp
-
-dta_chrptr.f: dta_chrptr.fpp
+FPP_ROUTINES = dta_chrptr.F

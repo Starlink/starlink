@@ -4,7 +4,7 @@ AM_FCFLAGS = -I../
 noinst_LTLIBRARIES = libchart.la
 libchart_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(PRIVATE_INCLUDES)
 
-FPP_ROUTINES = fileopen.fpp
+FPP_ROUTINES = fileopen.F
 
 F_ROUTINES = catinf.f convdec.f ellipse.f hdng.f near.f page.f prt26.f \
 set.f subbsrch.f titles.f catrec.f conv.f finput.f ident.f nnint.f     \

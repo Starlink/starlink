@@ -17,6 +17,4 @@ fit_scald.f fit_wrayd.f fit_wstr.f fit_close.f fit_init.f fit_scalu.f \
 fit_wrayf.f fit_dinit.f fit_mwrit.f fit_wcmt.f fit_wrayfd.f \
 fit_dismt.f fit_posn.f fit_wdble.f fit_wrayi.f fit_wend.f fit_noterm.f
 
-FPP_ROUTINES = fit_dfopen.fpp
-
-fit_dfopen.f: fit_dfopen.fpp
+FPP_ROUTINES = fit_dfopen.F

@@ -13,7 +13,7 @@ bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
 
 bin_MONOLITHS = convert_mon
 
-convert_mon_SOURCES = convert_mon.f $(TASKS:=.f) $(FPP_TASKS:=.fpp)
+convert_mon_SOURCES = convert_mon.f $(TASKS:=.f) $(FPP_TASKS:=.F)
 convert_mon_LDADD = libcoi/libcoi.la libcof/libcof.la libcon/libcon.la \
              libaif/libaif.la \
              iraf/libconspp.la $(FIGLIBS) `$(srcdir)/iraf_link` \
@@ -21,9 +21,6 @@ convert_mon_LDADD = libcoi/libcoi.la libcof/libcof.la libcon/libcon.la \
 convert_mon_TASKS = $(TASKS) $(FPP_TASKS)
 
 FPP_TASKS = ndf2iraf iraf2ndf
-
-ndf2iraf.f: ndf2iraf.fpp
-iraf2ndf.f: iraf2ndf.fpp
 
 TASKS = ascii2ndf ast2ndf conhelp da2ndf dst2ndf fits2ndf \
  gasp2ndf ircam2ndf ndf2ascii ndf2da ndf2dst ndf2fits ndf2gasp \

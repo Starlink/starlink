@@ -7,9 +7,7 @@ bin_PROGRAMS = cocomain
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 cocomain_SOURCES = dp.f dr2tn.f opw.f prompt.f repra.f repsys.f	\
-cocoml.f dqp.f ktest.f par1.f r2dr.f repres.f tran.f cocomain.f opr.fpp
-
-opr.f: opr.fpp
+cocoml.f dqp.f ktest.f par1.f r2dr.f repres.f tran.f cocomain.f opr.F
 
 cocomain_LDADD = `sla_link`
 

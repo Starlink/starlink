@@ -29,8 +29,4 @@ gen_sortf.f gen_subad.f gen_subaf.f gen_subafe.f gen_subset.f \
 gen_subsetb.f gen_success.f gen_supset.f gen_time.f gen_wait.f \
 gen_xop21.f gen_yop21.f
 
-FPP_ROUTINES =  gen_bswap.fpp gen_wbswap.fpp
-       
-
-gen_bswap.f: gen_bswap.fpp
-gen_wbswap.f: gen_wbswap.fpp
+FPP_ROUTINES =  gen_bswap.F gen_wbswap.F

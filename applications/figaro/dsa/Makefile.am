@@ -66,7 +66,4 @@ dsa_val_axi.f dsa_var_err.f dsa_var_ty.f dsa_wrflush.f dsa_wrname.f \
 dsa_wruser.f dsa_xcstr.f dsa_zfill.f \
 dsaz_fname.f dsaz_inq_nam.f
 
-FPP_ROUTINES = dsaz_tfopen.fpp
-
-dsaz_tfopen.f: dsaz_tfopen.fpp
-
+FPP_ROUTINES = dsaz_tfopen.F
