@@ -1700,7 +1700,7 @@ static void PutNextText( AstChannel *this, const char *line ) {
    if ( !astOK ) return;
 
 /* If a sink function (and its wrapper function) is defined for the
-   Channel, use the wrapper function to invoke the sink finction to
+   Channel, use the wrapper function to invoke the sink function to
    output the text line. */
    if ( this->sink && this->sink_wrap ) {
       ( *this->sink_wrap )( *this->sink, line );
