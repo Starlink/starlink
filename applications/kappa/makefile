@@ -677,7 +677,7 @@ kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f kpg1_asshr.f \
 kpg1_lutky.f kpg1_pvers.f
 
 KAPVIEW_F_ROUTINES = \
-contour.f contover.f \
+colcomp.f contour.f contover.f \
 crelut.f cursor.f drawsig.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
 greyplot.f idclear.f \
@@ -803,7 +803,7 @@ kps1_cenad.f kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f \
 kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
-kps1_elmap.f kps1_pswcs.f kps1_vect.f 
+kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2459,6 +2459,7 @@ cmult.o:	 SAE_PAR NDF_PAR
 cnthlt.o:	 SAE_PAR
 cntkey.o:	 SAE_PAR
 cntsbp.o:	 SAE_PAR
+colcomp.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR SUBPAR_PAR CTM_PAR
 compadd.o:	 SAE_PAR PAR_ERR NDF_PAR
 compave.o:	 SAE_PAR PAR_ERR NDF_PAR
 compick.o:	 SAE_PAR PAR_ERR NDF_PAR
@@ -3169,6 +3170,9 @@ kps1_ardmuw.o:	 SAE_PAR PRM_PAR
 kps1_ardmw.o:	 SAE_PAR PRM_PAR
 kps1_bafid.o:	 SAE_PAR PRM_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_bafir.o:	 SAE_PAR PRM_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT
+
+kps1_ccmpp.o:	 SAE_PAR PRM_PAR
+kps1_ccmqn.o:	 SAE_PAR PRM_PAR
 kps1_cenab.o:	 SAE_PAR
 kps1_cenad.o:	 SAE_PAR
 kps1_cenai.o:	 SAE_PAR

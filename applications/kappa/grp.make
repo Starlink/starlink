@@ -199,7 +199,7 @@ lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
 picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
 ardmask.par axconv.par axlabel.par axunits.par block.par cadd.par \
 calc.par calpol.par cdiv.par centroid.par chpix.par cmult.par compadd.par \
-compave.par compick.par contour.par contover.par convolve.par \
+compave.par compick.par contour.par contover.par convolve.par colcomp.par \
 creframe.par crelut.par csub.par cursor.par display.par drawsig.par \
 elprof.par erase.par errclip.par exp10.par expe.par expon.par ffclean.par \
 fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
@@ -245,7 +245,7 @@ fitsexp.hlp fitsexist.hlp fitshead.hlp fitsimp.hlp fitsin.hlp \
 fitslist.hlp fitsmod.hlp fitstext.hlp fitsurface.hlp fitsval.hlp \
 fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
-graphics_database.hlp greyplot.hlp hints.hlp hds_data_types.hlp \
+graphics_database.hlp greyplot.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
 hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
 idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp inspect.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
@@ -310,7 +310,7 @@ noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
 paste.ifl pixdupe.ifl pow.ifl psf.ifl quilt.ifl rift.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
-tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl \
+tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl contover.ifl crelut.ifl cursor.ifl \
 drawsig.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl greyplot.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
@@ -422,7 +422,7 @@ kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f \
 kps1_censg.f kps1_censh.f kps1_nmplt.f kps1_mlpcp.f kps1_mlplb.f \
 kps1_mlpng.f kps1_mlpcv.f kps1_mlpml.f kps1_mlppn.f kps1_mlpfs.f \
 kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
-kps1_vect.f
+kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
@@ -431,7 +431,7 @@ idinvisible.f idpazo.f idset.f idstate.f inspect.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
-pictrans.f picvis.f scatter.f snapshot.f turbocont.f vecplot.f 
+pictrans.f picvis.f scatter.f snapshot.f turbocont.f vecplot.f colcomp.f
 
 # The contents of the ndfpack_sub.tar file:
 NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \
