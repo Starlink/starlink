@@ -1,0 +1,26 @@
+
+Instructions for making a release:
+
+  - Check out the _module_ autoastrom, which includes astrom and catlib
+  - ./mk build
+  - (until the generation of documentation is fixed again, you'll
+    probably have to copy in sun242.* from some earlier distribution)
+ 
+
+Notes
+
+  - moggy doesn't appear to work with catlib-3.7-4 (the most recent
+    version in the repository).  Thus you currently have to _replace_ the
+    checked-out catlib with the catlib that's tagged with
+    autoastrom-0-5-11.  Awful, I know, but this is probably one of the
+    things that's bad about modules.
+
+  - catlib doesn't build with gcc 3.3.  It does build with 3.2, but
+    the compiler's obviously rather unhappy about it.
+
+All this should improve when catlib and astrom are built as separate
+components, and autoastrom just uses them as such.  Oh happy day.
+
+Norman
+2004 June 18
+
