@@ -16,7 +16,8 @@ require Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf popd pushd module_name incdir srcdir indexfile taskfile/;
+@EXPORT = qw/tarxf popd pushd module_name starpack
+             incdir srcdir indexfile taskfile/;
 
 ########################################################################
 #  Global variables.
@@ -24,8 +25,8 @@ require Exporter;
 
 #  Directory locations.
 
-$main::srcdir = "/local/scratch/sources";  # head of source tree
-$main::incdir = "/star/include";           # include directory
+$main::srcdir = "/local/star/src/from-ussc";  # head of source tree
+$main::incdir = "/star/include";              # include directory
 
 #  Index file locations.
 
@@ -176,6 +177,15 @@ sub module_name {
    return $name;
 }
 
+########################################################################
+sub starpack {
+
+#  Identifies the package name from a logical path.
+
+   local $_ = shift;
+   /^(\w+)#/;
+   return $1;
+}
 
 ########################################################################
 # include for pushd and popd.
