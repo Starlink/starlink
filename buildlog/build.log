@@ -216,7 +216,7 @@ build:
 prepare:
 
 check_packages:
-[available] Dec 15, 2003 5:16:16 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 16, 2003 5:15:59 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -433,10 +433,10 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 169 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 178 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 64 files to /apps/cvsbuild/java/source/splat/build/classes
+     [copy] Copying 65 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
      [copy] Copying 11 files to /apps/cvsbuild/java/source/splat/lib/splat
 
@@ -520,7 +520,7 @@ build_demo:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 108 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 111 source files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 67 files to /apps/cvsbuild/java/source/treeview/build/classes
@@ -582,4 +582,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 37 seconds
+Total time: 1 minute 54 seconds
