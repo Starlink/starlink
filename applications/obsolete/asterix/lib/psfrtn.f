@@ -4021,7 +4021,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CALL PSF0_GETID0R( PSID, 'Energy', ENER, STATUS )
 
 *  Ignore integration flag
-      CALL CAL_PSFT2D_SUR( MJD, FID, ENER, .FALSE., 0.0, IRIS, LDX, NX,
+      CALL CAL_PSFT2D_SUR( DMJD, FID, ENER, .FALSE., 0.0, IRIS, LDX, NX,
      :                     ABS(DY), NY, QX*(DX/LDX), QY,ARRAY,STATUS )
 
       END
