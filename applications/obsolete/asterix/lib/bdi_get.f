@@ -302,7 +302,7 @@
 *  Local Variables:
       CHARACTER*20		LITEM			! Local item name
 
-      REAL			SPARR(2)		! Regular spaced data
+      DOUBLE PRECISION		SPARR(2)		! Regular spaced data
 
       INTEGER			ARGS(3)			! Function args
       INTEGER			AXNO			! Axis number
@@ -376,24 +376,24 @@
           CALL CHR_CTOI( LITEM(6:6), AXNO, STATUS )
 
 *      Map the axis data
-          CALL BDI_AXMAPR( ID, AXNO, 'Data', 'READ', AXPTR, STATUS )
+          CALL BDI_AXMAPD( ID, AXNO, 'Data', 'READ', AXPTR, STATUS )
 
 *      Extract extrema and convert to base and scale
           CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
-          CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), 1, SPARR(1), STATUS )
+          CALL ARR_ELEM1D( AXPTR, DIMS(AXNO), 1, SPARR(1), STATUS )
           IF ( DIMS(AXNO) .GT. 1 ) THEN
-            CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), DIMS(AXNO), SPARR(2),
+            CALL ARR_ELEM1D( AXPTR, DIMS(AXNO), DIMS(AXNO), SPARR(2),
      :                       STATUS )
             SPARR(2) = (SPARR(2) - SPARR(1))/REAL(DIMS(AXNO)-1)
           ELSE
-            SPARR(2) = 1.0
+            SPARR(2) = 1.0D0
           END IF
 
 *      Unmap the axis
           CALL BDI_AXUNMAP( ID, AXNO, 'Data', AXPTR, STATUS )
 
 *      Create the data
-          CALL ADI_NEWV1R( 2, SPARR, DID, STATUS )
+          CALL ADI_NEWV1D( 2, SPARR, DID, STATUS )
 
 *    Otherwise report error
         ELSE

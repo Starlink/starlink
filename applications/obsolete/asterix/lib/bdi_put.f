@@ -278,6 +278,7 @@
       CHARACTER*15              LTYPE                   ! Local type
 
       DOUBLE PRECISION		SPARR(2)		! Spaced array info
+      DOUBLE PRECISION		SCWID			! Scalar width
 
       INTEGER			ARGS(4)			! Function args
       INTEGER			DIMS(ADI__MXDIM)	! Dataset dimensions
@@ -297,7 +298,7 @@
 *  special item names such as E_Axis_Label.
       CALL BDI0_CHKITM( ID, ITEM, LITEM, LITL, STATUS )
 
-*  Check specials
+*  Check specials. First spaced axis arrays
       IF ( (LITEM(1:5) .EQ. 'Axis_') .AND.
      :          (LITEM(8:17).EQ.'SpacedData') ) THEN
 
@@ -322,6 +323,31 @@
 
 *    Change local item
         LITEM = LITEM(:7)//'Data'
+
+*  Scalar axis widths
+      ELSE IF ( (LITEM(1:5) .EQ. 'Axis_') .AND.
+     :          (LITEM(8:18).EQ.'ScalarWidth') ) THEN
+
+*    Decode axis number
+        CALL CHR_CTOI( LITEM(6:6), IAX, STATUS )
+
+*    Get shape of data
+        CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
+*    Create new object in same type as supplied spaced data
+        CALL ADI_TYPE( DATA, LTYPE, STATUS )
+        CALL ADI_NEW1( LTYPE, DIMS(IAX), LDATA, STATUS )
+
+*    Extract spaced parameters
+        CALL ADI_GET0D( DATA, SCWID, STATUS )
+
+*    Map temporary object
+        CALL ADI_MAPD( LDATA, 'WRITE', DPTR, STATUS )
+        CALL ARR_INIT1D( SCWID, DIMS(IAX), %VAL(DPTR), STATUS )
+        CALL ADI_UNMAP( LDATA, DPTR, STATUS )
+
+*    Change local item
+        LITEM = LITEM(:7)//'Width'
 
       ELSE
         CALL ADI_CLONE( DATA, LDATA, STATUS )

@@ -108,7 +108,6 @@
       CHARACTER*(DAT__SZLOC)	TLOC			! Top level object
 
       INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model dimensions
-      INTEGER			NELM			! # data elements
 
       LOGICAL			STRUC			! Object is a structure
 *.
