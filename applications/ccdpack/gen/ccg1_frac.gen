@@ -109,6 +109,8 @@
 *        -1 times the minimum.
 *     15-NOV-2000 (MBT):
 *        Fixed overflow bug possible when using signed integer types.
+*     21-NOV-2000 (MBT):
+*        Fixed overflow bug possibly when using DOUBLE type.
 *     {enter_further_changes_here}
 
 *-
@@ -373,7 +375,8 @@
                AVELIM = ( ABS( DATLIM( 2 ) / 2<CONST> ) +
      :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
                MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
-     :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) ) )
+     :                  MIN( NUM_ITO<T>( VAL__MAXI ),
+     :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) ) ) )
             END IF
 
 *  Set the number of bins.  This is adjusted because the clipping itself
