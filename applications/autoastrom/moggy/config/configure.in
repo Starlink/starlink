@@ -33,12 +33,6 @@ AC_PATH_PROG(PROGGZIP, gzip)
 dnl   Check for other tools
 AC_PROG_RANLIB
 
-dnl   Checks for header files.  I don't actually use these defines within
-dnl   the program, so there doesn't seem much point in testing for them. 
-dnl AC_HEADER_STDC
-dnl AC_CHECK_HEADERS(fcntl.h unistd.h)
-dnl AC_CHECK_HEADERS(assert.h)
-
 dnl   Check if we've got sstream.  If not, we'll assume we have the older
 dnl   strstream
 AC_CHECK_HEADERS(sstream)
@@ -52,8 +46,10 @@ AC_CHECK_FUNCS(setenv)
 dnl   Check whether we need to include `-lnsl -lsocket' to use the
 dnl   socket() call and friends (catlib needs these functions, and you
 dnl   do need these on Solaris)
-AC_CHECK_LIB(nsl, gethostbyname)
-AC_CHECK_LIB(socket, socket,,,-lnsl)
+AC_CHECK_FUNC(gethostname,,
+  AC_CHECK_LIB(nsl, gethostbyname))
+AC_CHECK_FUNC(socket,,
+  AC_CHECK_LIB(socket, socket,,,-lnsl))
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
@@ -74,9 +70,9 @@ AC_TRY_COMPILE([#include <cstdio>],,
 
 dnl   Are the standard functions in the std namespace?
 AC_MSG_CHECKING(whether standard functions are in namespace std)
-AC_TRY_COMPILE([#include <ostream>], [cout << "Hello\n";],
+AC_TRY_COMPILE([#include <string>], [string t;],
   AC_MSG_RESULT(no),
-  AC_TRY_COMPILE([#include <ostream>], [using namespace std;cout<<"Hello\n";],
+  AC_TRY_COMPILE([#include <string>], [using namespace std;string t;],
     AC_DEFINE(HAVE_STD_NAMESPACE)
     AC_MSG_RESULT(yes),
     AC_MSG_RESULT(ARGHH -- error compiling)))
@@ -99,105 +95,21 @@ dnl LIBS="$LIBS -L$STARLINK/lib"
 dnl AC_CHECK_HEADER(ast.h)
 dnl AC_CHECK_LIB(ast, astIsAFrameSet)
 
-dnl   Specify any non-default location for the SkyCat build
-AC_SUBST(CATLIBSRCDIR)
-AC_ARG_WITH(catlib-builddir,
-[  --with-catlib-builddir=path  Build SkyCat here (default=PWD)],
-  if test "$withval" = "yes"; then
-    # Just take this to indicate the default
-    # Note we need a full path name, since this will
-    # be handed to the SkyCat configure script, which will be doing
-    # its installation from within a different directory to the
-    # current one.
-    CATLIBSRCDIR=`pwd`/SkyCat-build
-  elif test "$withval" != "no"; then
-    test -d $withval || mkdir -p $withval
-    # If the following directory already exists, then the distribution 
-    # won't be unpacked.
-    CATLIBSRCDIR=$withval/SkyCat-build
-  else
-    AC_MSG_WARN(can't say --without-catlib-builddir: using default)
-    CATLIBSRCDIR=`pwd`/SkyCat-build
-  fi,
-  CATLIBSRCDIR=`pwd`/SkyCat-build)
-
-dnl   Find the SkyCat cat library tarball, unpack it, and configure it
-dnl   for building without Tcl.
+AC_SUBST(CATLIBDIR)
+dnl   Find where the SkyCat cat library has been installed.
 AC_ARG_WITH(catlib,
-[  --with-catlib[=path]    Give non-default location of SkyCat tarball],
+[  --with-catlib[=path]    Give non-default location of SkyCat installation],
   if test "$withval" = "yes"; then
-    # Look in the current directory
-    tarball=`ls ./catlib*tar* 2>/dev/null`
-  elif test "$withval" != "no"; then
-    tarball=`ls $withval 2>/dev/null`
+    # Default place
+    CATLIBDIR=../catlib
+  elif test "$withval" = "no"; then
+    CATLIBDIR=NOTHING
+  else
+    CATLIBDIR=$withval
   fi,
-  tarball=`ls ./catlib*tar* 2>/dev/null`)
+  CATLIBDIR=../catlib)
 
-echo "Unpacking SkyCat..."
 
-AC_SUBST(CATLIBINSTALLDIR)
-AC_SUBST(CATLIBTOP)
-if test -z "$tarball"; then
-    AC_MSG_ERROR(Can't find SkyCat catlib tarball)
-else
-    # canonicalise the tarball name with a full path
-    tarballdir=`dirname $tarball`
-    tarball=`cd $tarballdir;pwd`/`basename $tarball`
-    # Find the base-name of the tarball -- "catlib" plus version number
-    #CATLIBSRCDIR=`expr $tarball : '.*\(catlib\([-.0-9]*[0-9]\+\)\?\)[^/]*$'`
-    if test -d $CATLIBSRCDIR; then
-	AC_MSG_WARN(Directory $CATLIBSRCDIR already exists -- not unpacked/configured again)
-	# ...but we do have to refind the configure scripts, in order
-	# to find the top of the source tree.  Done as below.
-	config=`find $CATLIBSRCDIR -name configure | \
-		awk 'BEGIN{l=999;s=x;} \
-			{if (length() < l) {l=length();s=$0;}} \
-			END {print s;}'`
-	if test -z "$config"; then
-	    AC_MSG_ERROR(Can't find any configure script in $CATLIBSRCDIR)
-	fi
-	CATLIBTOP=`dirname $config`
-	CATLIBINSTALLDIR=$CATLIBSRCDIR/INSTALL
-    else
-	# NB m4 quote brackets below
-	tarballext=[`expr $tarball : '.*\.\([^.]*\)$'`]
-	case "$tarballext" in
-	    Z)   tarballuncompress="$PROGUNCOMPRESS -c" ;;
-	    gz)  tarballuncompress="$PROGGZIP -d -c" ;;
-	    #bz2) tarballuncompress=`which bzip2 2>/dev/null`' -d -c' ;;
-	    tar) tarballuncompress=cat ;;
-	    *)   tarballuncompress='' ;;
-	esac
-	if test -z "$tarballuncompress"; then
-	    AC_MSG_ERROR([Don't know how to uncompress files like $tarball, with extension <$tarballext>])
-	elif expr "x$tarballuncompress" : "x *-" >/dev/null; then
-	    AC_MSG_ERROR(Can't find the command to uncompress extension <$tarballext>)
-	else
-	    # We know this directory doesn't exist, because we tested
-	    # for that above.
-	    mkdir $CATLIBSRCDIR
-	    (cd $CATLIBSRCDIR; $tarballuncompress $tarball | tar xf -)
-	    # Find the top-level configure script by finding all the configure
-	    # scripts and picking the shortest
-	    config=`find $CATLIBSRCDIR -name configure | \
-			awk 'BEGIN{l=999;s=x;} \
-				{if (length() < l) {l=length();s=$0;}} 
-				END {print s;}'`
-	    if test -z "$config"; then
-		AC_MSG_ERROR(Can't find any configure script in $CATLIBSRCDIR)
-	    fi
-	    CATLIBTOP=`dirname $config`
-	    CATLIBINSTALLDIR=$CATLIBSRCDIR/INSTALL
-	    mkdir $CATLIBINSTALLDIR
-	    # Configure catlib with the --with-notcl option
-	    echo "Configuring SkyCat..."
-	    # Don't use --with-gcc or --with-cc here, but instead rely
-	    # on having variables CXX and CC set in the environment
-	    (cd $CATLIBTOP;./configure --prefix=$CATLIBINSTALLDIR --with-notcl)
-	    echo "Done!  SkyCat configured"
-	fi
-    fi
-fi
 
 dnl dnl   AC_CHECK_HEADER(cat/AstroCatalog.h,AC_DEFINE(ENABLE_CAT))
 dnl dnl   Specify (or at least check) the location of the cat library.
