@@ -103,7 +103,7 @@
           ELSE
             CALL FIO_WRITE( USI_LOGFID,
      :            USI_CTX(USI_ICTX).CSTRING(:USI_CTX(USI_ICTX).CLEN)/
-     :                   /''//LC, STATUS )
+     :                   /' '//LC, STATUS )
             CALL FIO_WRITE( USI_LOGFID,
      :            USI_CTX(USI_ICTX).PSTRING(:USI_CTX(USI_ICTX).PLEN),
      :            STATUS )
