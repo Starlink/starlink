@@ -71,6 +71,7 @@ bool process_special (DviFile *, string specialString,
 		      Bitmap*, bitmap_info&);
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
+bool parseRGB (Bitmap::BitmapColour&, char*);
 void Usage (void);
 char *progname;
 
@@ -268,16 +269,16 @@ int main (int argc, char **argv)
 		while (*++*argv != '\0')
 		    switch (**argv)
 		    {
-		      case 'B':	// blur bitmap
+		      case 'b':	// blur bitmap
 			bm.blur_bitmap = true;
 			break;
-		      case 'b':	// don't
+		      case 'B':	// don't
 			bm.blur_bitmap = false;
 			break;
-		      case 'T':	// make bitmap transparent
+		      case 't':	// make bitmap transparent
 			bm.make_transparent = true;
 			break;
-		      case 't':	// don't
+		      case 'T':	// don't
 			bm.make_transparent = false;
 			break;
 		      default:
@@ -304,7 +305,7 @@ int main (int argc, char **argv)
 		Bitmap::verbosity(verbosity);
 		BitmapImage::verbosity(verbosity);
 		break;
-	      case 'Q':		// run silently - no warnings or errors
+	      case 'Q':		// various queries
 		while (*++*argv != '\0')
 		    switch (**argv)
 		    {
@@ -341,6 +342,23 @@ int main (int argc, char **argv)
 		PkFont::setResolution (atoi(*argv));
 		resolution = PkFont::dpiBase();
 		break;
+	      case 'R':		// set colours
+		char c;
+		c = *++*argv;
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		if (c == 'f' || c == 'b')
+		{
+		    Bitmap::BitmapColour rgb;
+		    if (parseRGB(rgb, *argv))
+			Bitmap::setDefaultRGB (c=='f', &rgb);
+		    else
+			Usage();
+		}
+		else
+		    Usage();
+		break;		    
 	      case 's':		// scale down
 		argc--, argv++;
 		if (argc <= 0)
@@ -855,16 +873,17 @@ bool process_special (DviFile *dvif, string specialString,
 	    else if (*s == "foreground" || *s == "background")
 	    {
 		bool isfg = (*s == "foreground");
-		Byte r, g, b;
+		//Byte r, g, b;
+		Bitmap::BitmapColour rgb;
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		r = static_cast<Byte>(atoi (s->c_str()));
+		rgb.red   = static_cast<Byte>(strtol (s->c_str(), 0, 0));
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		g = static_cast<Byte>(atoi (s->c_str()));
+		rgb.green = static_cast<Byte>(strtol (s->c_str(), 0, 0));
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		b = static_cast<Byte>(atoi (s->c_str()));
+		rgb.blue  = static_cast<Byte>(strtol (s->c_str(), 0, 0));
 
 		if (stringOK)
 		{
@@ -873,10 +892,13 @@ bool process_special (DviFile *dvif, string specialString,
 			     << (setDefault ? "(default) " : "")
 			     << (isfg ? "foreground" : "background")
 			     << " to "
-			     << static_cast<int>(r) << ','
-			     << static_cast<int>(g) << ','
-			     << static_cast<int>(b) << '\n';
-		    bitmap->setRGB (setDefault, isfg, r, g, b);
+			     << static_cast<int>(rgb.red) << ','
+			     << static_cast<int>(rgb.green) << ','
+			     << static_cast<int>(rgb.blue) << '\n';
+		    if (setDefault)
+			Bitmap::setDefaultRGB (isfg, &rgb);
+		    else
+			bitmap->setRGB (isfg, &rgb);
 		}
 	    }
 	    else if (*s == "strut")
@@ -1005,13 +1027,48 @@ string_list& tokenise_string (string str)
     return *l;
 }
 
+bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
+{
+    char *p;
+    rgb.red = strtol (s, &p, 0);
+    if (p == s)			// no digit
+	return false;
+    if (*p == '\0')		// end of string
+	return false;
+    s = p;
+    while (!isxdigit(*s))
+    {
+	if (*s == '\0') return false;
+	s++;
+    }
+
+    rgb.green = strtol (s, &p, 0);
+    if (p == s)			// no digit
+	return false;
+    if (*p == '\0')		// end of string
+	return false;
+    s = p;
+    while (!isxdigit(*s))
+    {
+	if (*s == '\0') return false;
+	s++;
+    }
+
+    rgb.blue = strtol (s, &p, 0);
+    if (p == s)			// no digit
+	return false;
+
+    return true;
+}
+
 
 void Usage (void)
 {
     cerr << "Usage: " << progname << " [-qV] [-Q[Fft]] [-b(h|w) size]\n\
 	[-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
-	[-r resolution] [-P[bt]] [-s scale-factor] [-o outfile-pattern]\n\
+	[-r resolution] [-P[bBtT]] [-s scale-factor] [-o outfile-pattern]\n\
 	[-m magmag ] [-[Cc][lrtb]] [-n]\n\
+	[-R[fb] int,int,int]\n\
 	[-p num] [-l num] [-pp ranges] [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
