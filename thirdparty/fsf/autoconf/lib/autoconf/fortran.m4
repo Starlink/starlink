@@ -1970,7 +1970,7 @@ dnl AC_LANG_POP()dnl
 #
 # If we need to use a separate preprocessor, we must override make's
 # `direct' .fpp.o rule in order to do `indirect' compilation
-# (.fpp -> .f then .f -> .o).
+# (.fpp -> .f then .f -> .o). PWD: see FIXME.
 #
 # It's up to Autoconf to decide whether indirect or direct compilation
 # works better; it does this by setting a number of configure-time
@@ -2012,7 +2012,11 @@ dnl AC_LANG_POP()dnl
 # FIXME: Martin Wilck's original version of these macros noted that it
 # was necessary to generate explicit rules for .fpp -> .o compilations
 # in order to override make's builtin rules in a portable manner
-# (i.e. without using make extensions).  Is this true?
+# (i.e. without using make extensions).  Is this true? 
+# PWD: yes it is, not all makes do chains of implicit rules, so we cannot 
+#      depend on .fpp.f, .f.o rules generating a .f file. We need 
+#      unified .fpp.o and .fpp.lo rules, but that's complicated, 
+#      an alternative is to name the intermediary .f files in the Makefiles.
 # POSIX/Single-Unix states that inference rules can be redefined, and
 # there's no warning against this in Autoconf's section on
 # `Limitations of Make'.
@@ -2090,7 +2094,10 @@ if test $ac_cv_fpp_build_rule = direct; then
 else
     FPP_COMPILE_EXT=DUMMYf
     FPP_PREPROCESS_EXT=$FPP_SRC_EXT
-    FPP_MAKE_FLAGS=""
+
+#  PWD: seem to need mainly for getting DEFAULT_INCLUDES and INCLUDES
+#  to the FC compiler (i.e $FC -I$(INCLUDES) to get local include files).
+    FPP_MAKE_FLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS)'
 fi
 if test -z "$ac_fpp_out"; then
    FPP_OUTPUT=" "
@@ -2233,6 +2240,11 @@ if test "x$ac_fc_name" != "x$ac_fpp_name"; then
 # Redefine the compile and link commands for indirect compilation
   ac_fpp_compile='${FPP-fpp} $FPPFLAGS conftest.$ac_ext '"$ac_fpp_out"' && ${FC-fc} -c $FFLAGS conftest.f >&AS_MESSAGE_LOG_FD'
   ac_fpp_link='${FPP-fpp} $FPPFLAGS conftest.$ac_ext '"$ac_fpp_out"' && ${FC-fc} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.f $LIBS >&AS_MESSAGE_LOG_FD'
+
+# PWD: we are not picking up indirection compilation for the following
+# tests, maybe we need to reset more than the above variables.
+  AC_LANG_POP(Preprocessed Fortran)
+  AC_LANG_PUSH(Preprocessed Fortran)
 
 # Redo all the feature checks for indirect compilation: perhaps we have an
 # external preprocessor that does a better job than FC
