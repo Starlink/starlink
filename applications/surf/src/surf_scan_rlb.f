@@ -123,7 +123,7 @@
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_rlb','b'/
+      DATA SUFFIX_STRINGS /'!_rlb','b','_rlb'/
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN

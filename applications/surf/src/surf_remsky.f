@@ -96,6 +96,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.12  1997/11/06 23:19:16  timj
+*     Add the verbose suffix option.
+*
 *     Revision 1.11  1997/11/06 22:20:53  timj
 *     Decode the bolometer strings in a subroutine.
 *     Report the number and bolometer list (if verbose).
@@ -225,7 +228,7 @@
       INTEGER          UBND(MAXDIM)     ! Upper bounds of section
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_sky','s'/
+      DATA SUFFIX_STRINGS /'!_sky','s','_sky'/
 
 *.
 

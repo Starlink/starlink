@@ -48,6 +48,9 @@
 
 *    History :
 *     $Log$
+*     Revision 1.2  1997/11/06 23:22:45  timj
+*     Add the verbose suffix option.
+*
 *     Revision 1.1  1997/09/04 18:43:36  timj
 *     Initial revision
 *
@@ -75,7 +78,7 @@
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10 TSKNAME            ! Name of task
-      PARAMETER (TSKNAME = 'DESPIKE')
+      PARAMETER (TSKNAME = 'DESPIKE2')
 
 *    Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
@@ -132,7 +135,7 @@
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_des','d'/
+      DATA SUFFIX_STRINGS /'!_des','d','_des'/
 
 *.
 

@@ -186,6 +186,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.42  1997/11/06 23:27:22  timj
+*     Add the verbose suffix option.
+*
 *     Revision 1.41  1997/10/28 19:08:38  timj
 *     Add support for despiking.
 *
@@ -522,7 +525,7 @@ c
 
 * Local data:
 
-      DATA SUFFIX_STRINGS /'_dsp','d'/ ! Used for DESPIKE
+      DATA SUFFIX_STRINGS /'!_dsp','d','_dsp'/ ! Used for DESPIKE
 
 
 *-

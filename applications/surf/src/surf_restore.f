@@ -143,7 +143,7 @@
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_res','r'/
+      DATA SUFFIX_STRINGS /'!_res','r','_res'/
 
 
 *.

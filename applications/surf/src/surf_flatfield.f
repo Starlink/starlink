@@ -69,6 +69,9 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.13  1997/11/06 23:20:07  timj
+*     Add the verbose suffix option.
+*
 *     Revision 1.12  1997/09/03 23:58:31  timj
 *     Automatically supply the output filename.
 *
@@ -175,7 +178,7 @@ c
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_flat','f'/
+      DATA SUFFIX_STRINGS /'!_flat','f','_flat'/
 
 *.
 
