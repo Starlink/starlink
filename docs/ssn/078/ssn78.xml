@@ -2937,6 +2937,18 @@ dist_noinst_SCRIPTS = makeh
           opaque if all the information about particular files is kept
           in one place.</p>
 
+        <p>Incidentally, the other occasionally important `prefix-prefix' like
+          <code>dist</code> is <code>nobase</code>.  A
+          <code>Makefile.am</code> line like
+          <code>include_HEADERS = a.h subdir/b.h</code> will cause
+          both <code>a.h</code> and <code>b.h</code> to be installed
+          in the same place: <code>nobase_include_HEADERS</code> will
+          cause the hierarchy to be preserved.  This is documented
+          rather in passing in the automake manual, in the section
+          <webref url="&automakehtml/Alternative.html" >An Alternative
+            Approach to Subdirectories</webref> (and no, I don't know
+          why `nobase' is supposed to be intuitive, either).</p>
+
         <p>On the other hand, files in <code>_SOURCES</code> variables
           are distributed by default, so you must turn this off if one
           of these files is generated at configure time:
