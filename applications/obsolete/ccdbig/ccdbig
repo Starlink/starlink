@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh
 #+
 #  Name:
 #     CCDBIG
@@ -38,13 +38,9 @@
 #
       onintr EXIT
 
-#  Initialise CCDPACK within this shell.
-#
-#  See if the ccdpack startup command exists
-      set startup_com=`alias ccdpack | grep ccdpack`
-      if ( "$startup_com" == "" ) then
-	 source /star/etc/cshrc
-      endif
+#  Initialize starlink environment
+      source /star/etc/cshrc
+      source /star/etc/login
 
 #  Ensure CCDPACK commands are available
       ccdpack
@@ -57,8 +53,9 @@
       endif
 
 #  Copy required files from source directory.
-      if ( -e $CCDBIG_DIR/ccdbig_obj.dat ) cp $CCDBIG_DIR/ccdbig_obj.dat .
+      if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
       if ( -e $CCDBIG_DIR/ccdtest_ard.dat ) cp $CCDBIG_DIR/ccdtest_ard.dat .
+      if ( -x $CCDBIG_DIR/timediff )        cp $CCDBIG_DIR/timediff .
       if ( ! -e ccdbig_obj.dat ) then
         echo "Can't find file of objects ccdbig_obj.dat - aborting"
         goto EXIT
@@ -219,6 +216,13 @@
             stopwatch
             timelog ccdgenerate
 
+#  Temporary fix for inconsistent versions of CCDPACK on Sun and Linux:
+            foreach digit (1 2 3 4)
+               mv BIAS${digit}.sdf bias${digit}.sdf
+               mv DATA${digit}.sdf data${digit}.sdf
+               mv   FF${digit}.sdf   ff${digit}.sdf
+            end
+
 #  If display capability is enabled then display one DATA frame.
             if ( "$device" != "NONE" ) then
                echo " "
@@ -263,6 +267,7 @@
             makebias \
                in='bias*' \
                out=master_bias \
+               preserve
                accept
 #           end makebias
             stopwatch
