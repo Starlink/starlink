@@ -5923,6 +5923,21 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    }
    \sstparameters{
       \sstsubsection{
+         AUTOSCALE = _LOGICAL (Read)
+      } {
+         Whether to "automatically" adjust the centroid location
+         parameters to reflect the fact that picking good initial
+         positions is less likely when dealing with very large images
+         (these tend to be displayed using one display pixel to
+         represent many image pixels).
+
+         If TRUE then the values of the parameters ISIZE, TOLER and
+         MAXSHIFT are scaled by an amount that maps the largest
+         dimension of each input image to an image of size 1024
+         square (so an image of size 2048 square will have these
+         parameters increased by a factor of two).
+         [FALSE]
+      \sstsubsection{
          IN = LITERAL (Read)
       } {
          The names of the images whose data components contain image
