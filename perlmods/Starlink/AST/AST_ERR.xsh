@@ -1243,3 +1243,14 @@ AST__XMLWF()
  OUTPUT:
   RETVAL
 
+StatusType
+AST__ZERAX()
+ CODE:
+#ifdef AST__ZERAX
+    RETVAL = AST__ZERAX;
+#else
+    Perl_croak(aTHX_ "Constant AST__ZERAX not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
