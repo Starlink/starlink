@@ -262,6 +262,9 @@ foreach $scufile (@sortndf) {
     $fitsitem{$item} = $value;
   }
 
+  # Skip if the observation mode is not defined
+  next if $fitsitem{'MODE'} eq "undefined";  
+
   # Now check the observation mode against $whichmode
   # If whichmode is not specified run anyway
   if ($whichmode !~ /./ | $whichmode =~ /$fitsitem{'MODE'}/i) {
