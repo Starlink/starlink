@@ -15,7 +15,16 @@
   <!entity % Feature.Routinelist 'include'>
   <!entity rsqbrack ']'>
   <!-- DSSSL source code -->
-  <!entity dsssl.lib system "../../dsssl/sl/lib/sllib.dsl" subdoc>
+  <!entity dsssl.lib
+	system "../../dsssl/sl/lib/sllib.dsl" subdoc>
+  <!entity dsssl.common
+	system "../../dsssl/sl/common/slcommon.dsl" subdoc>
+  <!entity dsssl.html.params
+	system "../../dsssl/sl/html/slparams.dsl" subdoc>
+  <!entity dsssl.latex.params
+	system "../../dsssl/sl/latex/slparams.dsl" subdoc>
+  <!entity release.notes 
+	system "../../ReleaseNotes">
 ]>
 <!-- $Id$ -->
 
@@ -58,12 +67,9 @@ documentation needs, such as <code/runoff/ or &latex, because it is a
 well-defined system, so that there is excellent support for it in
 tools, and it is designed to be converted into whichever presentation
 format is most convenient.
-<!--
- (see also the Frequently Asked Questions
-<ref id=faq.html> and <ref id=faq.latex>).
 The DTD is designed to be flexible, rather than imposing a
-particularly tight document structure.
--->
+particularly tight document structure.  At the same time it has
+<em/enough/ structure that it can be indexed and stored effectively.
 
 <p>Although this system can help with many of the tasks involved in
 document creation, it cannot write the document for you (shame!).  For
@@ -75,7 +81,9 @@ aims, describing how to read a Document Type Definition (DTD), and
 pointing to sources of information.  In <ref id=markup>, I describe
 how you would go about actually writing a document, describing the
 structure of Starlink documents which is crystallised in the
-specification of this system.  In <ref id=doccode>, I describe the
+specification of this system.  In <ref id=structure>, I describe the
+structure of the document DTD, and the categories of elements you will use.
+In <ref id=doccode>, I describe the
 support which exists to support documentation of source code, allowing
 you to maintain detailed routine documentation along with the routine
 source code.  In <ref id=processing>, I describe the details of how
@@ -240,21 +248,45 @@ authoritative account see
 <citation/goldfarb/, which is an exegesis of the standard,
 <citation/iso8879/. 
 
-<!-- FIXME: Add these sections
 <subsect id=faq export>Frequently Asked Questions
 
-<subsubsect id=faq.html export>What's wrong with HTML?
+<subsubsect id=faq.html>What's wrong with HTML?
 
-<p>Well?
+<p>HTML was designed as a flexible and generic markup language.
+Unfortunately, it is a little <em/too/ flexible and generic to be
+really useful.  The power of SGML comes from its ability to represent
+the structure of a document faithfully, and HTML cannot do this in
+most cases - it has a <code/&lt;title>/ element, and some structural
+markup <code/&lt;Hn>/, but apart from that, it's little better than
+simple ASCII text.  As well, it suffers from some of the same diseases
+as &latex;, as described above in <ref id=why.sgml>, in that the
+effective definition of a `good' HTML document is `viewable by
+netscape', and that means that you're even less well-assured of the
+content and structure of a document than you are if you use &latex;
+(if you are going to get involved in validating documents,
+you might as well go the whole hog and do it properly).
 
-<subsubsect id=faq.latex export>What's wrong with &latex?
+<subsubsect id=faq.latex>What about &latex;?
 
-<p>Well?
+<p>See the discussion in <ref id=why.sgml>, as
+that describes SGML's advantages by comparing them to the problems
+with the current &latex; system.  &latex; is marvellous -- this system
+uses it as a back-end print formatter -- but it's not ideal for a
+large and various document set.
 
-<subsubsect id=faq.xml export>What about XML?
+<subsubsect id=faq.xml>What about XML?
 
-<p>Well?
--->
+<p>XML is a cut-down version of SGML, omitting rarely-used or
+dispensable features, but preserving many of its strengths (<ref
+id=further.xml>).  I have, however, used several of these omitted
+features in this application.  Some of these features, such as markup
+minimisation (<ref id=markup.min>) are not vital, and would simply be
+inconvenient to lose, but others such as SGML's support for
+subdocuments would radically change (for the worse) the nature of the
+application's support for complicated documents.
+
+<p>I would like to support XML in future, if there's development time
+available.
 
 <sect id=markup export>Marking up your document
 
@@ -472,10 +504,6 @@ id=sgml.dtdsubset>.
 <code>&lt;entity...></code> declaration is forbidden in the body of
 the document.  While this is occasionally inconvenient, it helps keep
 all the document's monkey-business in one place.
-<!-- FIXME -->
-<draftnote>Is it indeed true that entities can't be defined outside
-the DTD subset.  What then is the difference between general and
-parameter entities?  See also section sgml.entities</draftnote>
 
 <subsubsect>Referring to text
 
@@ -1170,6 +1198,16 @@ resource on the web.  The webref element is much like HTML's <code/a/
 element, providing link text and a URL for the target; the url element
 quotes the URL directly.
 
+<p>As rather a special case, these cross-reference elements are
+allowable in the <ref id=el.sun.verbatim text='verbatim'> element,
+which is occasionally quite useful.  For example, the contents of <ref
+id=figure.programcode> makes extensive use of this, to link from the
+element names to their documentation in <ref
+id=appx.programcode.dtd>.  This application uses the ref element's
+text attribute, and the result is that the link disappears in the
+paper version of the document.  I don't imagine that the docxref
+element would often be useful here, but url and webref might be.
+
 <subsect id=str.figures export>Figures
 
 <p>Includes
@@ -1720,7 +1758,7 @@ is interpreted as
 <subsubsect id=doccode.dsssl>DSSSL
 
 <p>DSSSL is a language defined in ISO/IEC 10179:1996
-\citation{iso10179} as a means of specifying the formatting of SGML
+<citation>iso10179</citation> as a means of specifying the formatting of SGML
 documents.  It is the language, as implemented in the free DSSSL
 system <webref url='http://www.jclark.com/jade/' >Jade</webref>, used
 for almost all the processing of SGML documents in this Starlink SGML
@@ -1739,7 +1777,7 @@ architectural form, <code/codereference/ to
 <code/external-specification/ (with attribute name remapping) and
 <code/codebody/ to <code/style-specification-body/. This follows a
 discussion of this technique in <code/comp.text.sgml/ by Eliot
-Kimber~\citation{kimber98}.
+Kimber~<citation>kimber97</citation>.
 
 <p>Also it defines the entity <code/%direction.attr/ to be simply
 `given', since arguments to DSSSL functions are only passed in.
@@ -1837,9 +1875,13 @@ of the document summary files) and
 <code>/home/norman/s/src/sgml/w/sgml/dtd/CATALOG</code> (the main
 distributed SGML catalogue).
 
+<p>To test the setup, go to <code>$STARLINK_SGML_DIR/doc/ssn70</code>
+and type <kbd/make ssn70.html.stamp/ -- this should build the HTML
+version of the documentation.  If you type <kbd/make
+ssn70.latex.stamp/ you should get the &latex version.
 
-<!-- <p>Packaging document for distribution.  BOS?  Manifest?
-     Figures?  Makefile? -->
+
+<!-- FIXME: BOS?  Manifest? -->
 
 <subsect id=editors export>Editors
 
@@ -1847,8 +1889,8 @@ distributed SGML catalogue).
 whichever editor you prefer.
 
 <p>If you use emacs, you can benefit from an emacs SGML mode called
-<!-- FIXME psgml URL -->
-<code/psgml/.  This can help with simple things such as automatically
+<webref url='http://www.lysator.liu.se/projects/about_psgml.html'
+/psgml/.  This can help with simple things such as automatically
 inserting appropriate closing tags, all the way up to validating your
 document.
 
@@ -1935,11 +1977,13 @@ generally portable.
 this as a dependency of the <code/%.latex.stamp/ target, when a
 document has backmatter.
 
-<dt><code/%.parse: %.sgml/
+<dt><code/%.parse: %.sgml/ 
 <dd>The <code/%.parse/ target is the SGML parser's view of the
-document.  The format is a standard, and can be parsed by Perl
-libraries such as SGMLSpm.
-<!-- FIXME: find URLs for this format, and SGMLSpm -->
+document.  The format is <webref
+url="http://www.jclark.com/sp/sgmlsout.htm" >standard</webref>, though
+not formally defined, and
+can be parsed by Perl libraries such as <webref
+url="http://www.cpan.org/modules/by-module/SGMLS/" >SGMLSpm</webref>.
 
 <dt><code/%.data: %.sgml/
 <dd>The <code/%.data/ target contains all the character data content
@@ -1953,11 +1997,153 @@ convenience.
 
 </dl>
 
-<sect id=future export>Further developments
+<sect id=further export>Further information
 
-<p>What next?  Weaknesses with the current implementation.
+<subsect id=further.development export>Further developments
 
-<p>HyTime?  XML?  Searching?
+<p>What's next?
+<ul>
+<li>I'd like to support XML (see <ref id=further.xml>).  This requires
+a little development of the DTD but, more substantially, also requires
+investigating what level of support we can reasonably expect from
+users' browsers.  There is a great deal of work being done on XML at
+present (mid-1999) -- when the developments settle down we can start
+to exploit them.
+
+<li>I'd like to support sophisticated searching.  The Starlink HTX
+system allows some context-based searching (see <docxref
+doc="sun188" loc='searching_for_information'>), and it should be easy
+to support this and more in the SGML system.
+
+</ul>
+
+<subsect id=further.xml export>XML
+
+<p>The primary XML resources are
+<ul>
+<li><url>http://www.w3.org/XML</url> for the W3C's XML spec
+<li><url>http://www.ucc.ie/xml/</url> for the XML FAQ
+<li><url>http://www.xml.com/xml/pub/axml/axmlintro.html</url> for the
+annotated spec
+</ul>
+
+<subsubsect>XML is SGML--
+<p><ul>
+<li>An SGML document consists of an `SGML declaration' which
+sets various options, a `document type definition' (DTD) which
+establishes the syntax of a document type, and a `document instance',
+which is the actual document.
+
+<li>XML has a single, fixed, SGML declaration, which sets most of the
+SGML options to `off'.  For example, in XML all element names are case
+sensitive, there is no tag omission, there are some restrictions on
+the possible syntaxes expressible by the DTD, and more exotic features
+such as SUBDOC are forbidden.  For a more detailed discussion of the
+differences, see 
+<webref url='http://www.w3.org/TR/WD-xml-lang.html#secA.'
+>appendix A</webref> of the spec.
+
+<li>This means that parsers are easy to write, and there are numerous
+such parsers available for free.
+
+<li>XML dispenses with the SGML declaration; it can dispense with a
+DTD as well.  XML introduces the notion of `well-formed' versus
+`valid' documents.
+<p>If a document has all closing tags present,
+and all elements properly nested, and starts with the declaration
+<verbatim>
+   &lt;?xml version="1.0" standalone="yes"?>
+</verbatim>
+and empty elements are
+written <code>&lt;empty/></code>, then it is `<webref
+url='http://www.ucc.ie/xml/#FAQ-WF' >well-formed</webref>', and may
+be processed in the absence of a DTD.
+
+<li>A file which has a DTD and which conforms to it (which will also
+be well-formed), is `<webref url='http://www.ucc.ie/xml/#FAQ-VALID'
+>valid</webref>'.  It may optionally also begin with the XML declaration
+<verbatim>
+&lt;?xml version="1.0"?>
+</verbatim>
+
+<li>That is, a valid XML document is also a conforming SGML document.
+This has been made possible by recent subtle, technical, changes to
+the SGML standard.
+
+<li>The latter has come about because there has been close cooperation
+between the developers of XML and the wider SGML community.  That is,
+XML is fully legit as SGML.
+
+</ul>
+
+<subsubsect>XML is not HTML++
+
+<p><ul>
+<li>XML is a real standard (well, there <em/are/ HTML standards, but
+noone pays any attention to them).
+<li>HTML has a fixed element set, and associates fixed semantics with
+those elements.  XML has neither restriction.
+</ul>
+
+<subsubsect>Associated standards
+
+<p><ul>
+
+<li><webref url='http://www.w3.org/TR/WD-xlink' >XLink</webref> is a draft
+specification for links in XML. It's closely related to the hyperlinks
+module of HyTime.
+
+<li><webref url='http://www.w3.org/TR/WD-xptr' >XPointer</webref> is a
+draft specification for location specifiers in XML, so that you
+can refer, for example, to `the second section beneath the
+element with id so-and-so'. As with XLink, it's closely related
+to HyTime.
+
+<li><webref url='http://www.w3.org/Style/XSL/' >XSL</webref> are style
+sheets for XML.  These are vital if XML is to be readable when it is
+served over the web (because it doesn't have the fixed semantics HTML
+has, XML rendering can't be left entirely to a browser).
+
+<li>The <webref url='http://www.w3.org/DOM/' >Document Object
+Model</webref> (DOM) is `a platform- and language-neutral interface that
+allows programs and scripts to dynamically access and update the
+content, structure and style of documents' [from the spec].  It's a
+simple set of O-O declarations for querying and manipulating XML
+documents in simple ways (small subset of DSSSL).
+
+<li><webref url='http://www.hytime.org/' >HyTime</webref> is a very
+high-level standard for associating semantics with SGML DTDs.
+
+<li><webref url='http://www.oasis-open.org/cover/dsssl.html'
+>DSSSL</webref> is the Document Style and Semantics Specification
+Language. It's a language for writing stylesheets in.  Both HyTime and
+DSSSL are specific to SGML, but have informed the other standards
+above.
+
+</ul>
+
+<subsubsect>Future developments
+
+<p><ul>
+
+<li>SGML technology will work with XML (as long as it conforms to the
+minor technical corrigenda mentioned above)
+
+<li>Because XML is <em/much/ easier to parse than fully general SGML,
+it is <em/much/ easier to produce parsers for it.  It is therefore
+very likely that we will soon see many XML editors and XML-aware
+browsers in the months to come.
+
+<li>We should also see XML-aware search engines, potentially finally
+realising the possibilities offered by hightly structured information
+storage and retrieval.
+
+<li>The development of 
+<webref url='http://www.w3.org/Math/' >MathML</webref> should help see
+maths on the internet
+
+</ul>
+
 
 <appendices>
 
@@ -2188,28 +2374,36 @@ from the document you are writing.
 declarations within the DTD, and this is done within the `document
 type declaration subset'.
 
-<p>The subset is a DTD fragment which ...
-FIXME
+<p>The DTD subset is typically used to declare entities of one type or
+another, as described in <ref id=markup.dtdsubset>.
 
-get-out-of-jail-free card
+<p>The subset is a DTD fragment which is processed <em/before/ the
+declaration refers to.  Thus, any (parameter) entity declarations
+there override corresponding ones in the DTD, so it is possible for a
+document author to do some limited rewriting of the DTD on the fly.
+This will be most common when a DTD is modular, as the Starlink DTD
+is.  As described in <ref id=str.structure>, you can enable features
+within your DTD by setting a suitable entity.
 
-<p>Can be used to include subfiles, create abbreviations, necessarily
-declare subdocs or, in extremis, modify the DTD.  Use for HTML-only
-sections, etc.  Recapitulate the warnings about careless use making
-the document invalid.  Perhaps put this into a separate section on
-marked sections, and mention the CDATA marked section.
-
-%Feature....
-
+<p>This get-out-of-jail-free card is obviously eminently abusable, and
+you should avoid doing anything clever here.
 
 <subsect id=sgml.entities export>SGML entities
 
-<p>Entity references are a mechanism for referring to characters, or
+<p>As described in <ref id=markup.entities>, entity references are a
+mechanism for referring to characters, or 
 longer pieces of text, which you cannot type on your keyboard, which
 must be escaped from the parser, or which you simply want to
 abbreviate.
 
-<!-- <p>As well as general entities, there are parameter entities -->
+<p>As well as general entities, there are parameter entities.  These
+can be referenced only within markup declarations, and hence are
+effectively restricted to the DTD.  The only time you'd use them in a
+document instance would be within a marked section (<ref
+id=sgml.ms>).  The point of parameter entities is that a document
+author can define any entities they want in the declaration subset,
+without having to worry that they might conflict with declarations in
+the DTD.
 
 <p>A reference to an entity <code/amp/ is of the form
 <code/&amp;amp;/.  It is prefixed by the character <code/&amp/ and
@@ -2408,24 +2602,34 @@ system
 
 <p>Documentation system is standard in SGML and HyTime terms (apart
 from the `SQL query...' bit in the definition of docxref).  The
-processing system uses DSSSL, which is a standard, but generates HTML
-using DSSSL extensions specific to Jade, and generates LaTeX using
-DSSSL extensions specific to a version of Jade using my patch.
-Include the `This is an SGML/HyTime application...' declaration
-somewhere -- here?
+processing system uses <webref
+url="http://www.oasis-open.org/cover/dsssl.html" >DSSSL</webref>,
+which is a standard, but generates HTML using DSSSL extensions
+specific to Jade, and generates LaTeX using DSSSL extensions specific
+to a version of Jade using my patch.  Include the `This is an
+SGML/HyTime application...' declaration somewhere -- here?
+
+<p><ref id=appx.dssslcode> include a selection of the more important
+DSSSL code modules.
 
 <subsect id=appx.dssslcode export>The DSSSL source code
 
 <routinelist>
+<codecollection doc="dsssl.common">
+<codecollection doc="dsssl.html.params">
+<codecollection doc="dsssl.latex.params">
 <codecollection doc=dsssl.lib>
 
 <subsect id=install export>Installation
+
+<p>More here presently.  For the present, see the notes on setting up,
+in <ref id=proc.setup>.
 
 <p>How to install everything, including building Jade.
 
 <sect id=appx.releasenotes export>Release Notes
 
-<p>Insert the TODO list, and news.
+&release.notes;
 
 <backmatter>
 <notecontents>
