@@ -77,4 +77,15 @@ PRIVATE_INCLUDES = \
         FIOPAR_SYS \
 	FIOPA_CMN
 
+# fiotest is an ADAM monolith
+# Note that fio_test.f is not used anywhere but there is no calling
+# program for it to run as a test
+
+TESTS = fiotest
+check_MONOLITHS = fiotest
+
+fiotest_TASKS =
+fiotest_SOURCES = fiotest.f
+fiotest_LDADD = `$(srcdir)/fio_link_adam`
+
 

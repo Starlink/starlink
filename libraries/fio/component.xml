@@ -12,7 +12,7 @@
       the Starlink software environment, plus routines to interface to
       the Starlink parameter system.</abstract>
   <dependencies >
-    <build>sae</build><build>par</build><link>chr</link><link>ems</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><link>chr</link><link>ems</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

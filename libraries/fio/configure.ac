@@ -21,6 +21,10 @@ AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl   Tests require access to monoliths
+dnl   This may be a problem if alink has not yet been installed
+STAR_MONOLITHS
+
 STAR_DECLARE_DEPENDENCIES([build], [sae par])
 STAR_DECLARE_DEPENDENCIES([link],  [chr ems mers subpar])
 
