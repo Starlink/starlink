@@ -350,9 +350,9 @@ ast.h: $(AST_H_FILES) ast_err.h makeh
 # just rely on the dependencies expressed in the main body above to
 # have AST_PAR built before it is needed.
 #
-BUILT_SOURCES = AST_ERR ast_err.h 
-
-object.c: version.h
+# version.h is included by object.h, and thus indirectly by most modules.
+# It's most straightforward to build it at the beginning.
+BUILT_SOURCES = AST_ERR ast_err.h version.h
 
 #  Form a second link to the main object library. This is used when a second
 #  pass through the library is needed during linking.
