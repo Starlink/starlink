@@ -116,4 +116,10 @@ UDVOF           <undefined variable or function in expression>
 VARIN           <variable name invalid>
 WRNFA           <wrong number of function arguments in expression>
 
+! New codes introduced for V2.0.
+BADUN           <Invalid units specification>
+NORSF           <No rest frequency is defined>
+NOSOR           <No standard of rest is defined>
+SPCIN           <Invalid SpecMap>
+
 .END
