@@ -26,7 +26,7 @@ sex_SOURCES =
 ## These are actually created in sub-directories, so we need a target to get
 ## them into the local dependencies.
 
-BUILT_SOURCES = libextractor.a libfits.a sex
+BUILT_SOURCES = libextractor.a libfits.a sex extractor.ifl
 
 #  Data for share/extractor. Currently this is any misc docs (news file) 
 #  and configuration information (in this case the SExtractor config
