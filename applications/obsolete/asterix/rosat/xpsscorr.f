@@ -105,6 +105,7 @@
       INTEGER     EXPTR              ! Pointer to exposure map data
       INTEGER     EAPTR1             ! Pointer to exposure map axis 1
       INTEGER     EAPTR2             ! Pointer to exposure map axis 2
+      INTEGER     L
 
       LOGICAL     ERRORS             ! Flux errors present in input?
       LOGICAL     OK                 ! Dataset ok?
@@ -347,19 +348,14 @@
 
 *     Select the default efective area file (dependent on the date of the
 *     observation)
-*        Find the XRTCAL directory
-            CALL XRT_CALDEF(CALDIR, STATUS)
-*
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL MSG_PRNT('Warning: XRT cal directory not found')
-               CALL ERR_ANNUL(STATUS)
-            ENDIF
 *
             IF (INDEX(DET, 'PSPCB') .NE. 0) THEN
-               EFILE = '$XRTCAL/pspcb_eff'
+               CALL AST_PATH('AST_ETC','XRTCAL','pspcb_eff',
+     :                                         EFILE,L,STATUS)
                CALL USI_DEF0C('EFFILE', EFILE, STATUS)
             ELSEIF (INDEX(DET, 'PSPCC') .NE. 0) THEN
-               EFILE = '$XRTCAL/pspcc_eff'
+               CALL AST_PATH('AST_ETC','XRTCAL','pspcc_eff',
+     :                                         EFILE,L,STATUS)
                CALL USI_DEF0C('EFFILE', EFILE, STATUS)
             ENDIF
 *
