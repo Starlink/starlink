@@ -20,9 +20,9 @@
 *     Remove the instrumental polarisation signal from the data
 *     The following formula is used:
 *
-*     New flux = Measured flux / (1 + %age IP )
+*     New flux = Measured flux * (1 - %age IP )
 *
-*     IP = %age polarisation * cos (4*waveplate - 2* IP angle)
+*     IP = %age polarisation * (1 + cos (4*waveplate - 2* IP angle))
 *
 *     where %age polarisation and IP angle vary linearly with
 *     elevation.
@@ -31,9 +31,15 @@
 *
 *       Actual flux = measured flux - mean flux * %age IP
 *
-*     where IP = P * (1 + cos (4 WP - 2 THETA ) )
-*     because the mean flux can not be calculated trivially since
-*     the bolometers are jiggling on and off the source
+*     where 
+*
+*        IP = P * (1 + cos (4 WP - 2 THETA ) ),
+*
+*     and we have assumed that the instrumental polarisation is small
+*     such that the measured flux and the mean fluxed are
+*     approximately equal. This is approximation is required since
+*     the mean flux can not be calculated trivially since the
+*     bolometers are jiggling on and off the source.
 *
 *     This routine corrects the data point for each bolometer
 *     by looking up the IP data in the supplied array. Only one 
@@ -91,6 +97,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  2003/04/03 03:19:09  timj
+*     Calculation now fixed to S(meas)*(1-P(1+cos[])
+*
 *     Revision 1.3  1999/08/03 19:32:53  timj
 *     Add copyright message to header.
 *
@@ -241,7 +250,7 @@
 *     Now calculate the IP correction 
 
                ANG_BIT = COS((4.0*WPANG) - (2.0*THETA_IP))
-               IP = P_IP * ANG_BIT
+               IP = P_IP * ( 1 + ANG_BIT )
 
 *     Now calculate the error in the IP calculation
 *     First the variance in the cosine 'bit' [note that the angles
@@ -262,7 +271,7 @@
 
                IF (BOL_DATA(BOL) .NE. VAL__BADR) THEN
                   BEFORE = BOL_DATA(BOL) ! Needed for variance calc
-                  BOL_DATA(BOL) = BOL_DATA(BOL) / (1 + IP)
+                  BOL_DATA(BOL) = BOL_DATA(BOL) * (1 - IP)
 
 *     Division by zero protection
                   IF (BOL_VAR(BOL) .NE. VAL__BADR
