@@ -69,14 +69,10 @@ this attempts to give you some advice about what you need to do on
 your particular system to tell dvi2bitmap where its fonts are.
 
 If you want it to be able to generate GIFs, then give the configure
-option `--enable-gif'.  The GIF format is the copyright of CompuServe.
-As far as I understand it, one does not need a licence from CompuServe
-if one is distributing non-commercial, not-for-profit software, such
-as this.  You probably shouldn't enable GIF support when you build
-this program unless you're in that category as well.  But don't listen
-to me: there's a much fuller account of the whole sorry business in
-the comp.graphics.misc FAQ at, for example,
-<http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html>
+option `--enable-gif'.  Starting in 2005, this is enabled by default,
+since the Unisys patents appear to have expired in 2004.  You can
+disable the ability to generate GIFs (probably a good plan, if you
+have the PNG library available) with the option `--disable-gif'.
 
 If you want it to be able to generate PNG files (much better, since
 they're free of the GIF copyright problems), then give the configure
