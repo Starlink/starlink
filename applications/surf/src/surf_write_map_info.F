@@ -91,7 +91,7 @@
       CHARACTER*(*)    CHOP_CRD
       REAL             CHOP_PA
       REAL             CHOP_THROW
-      CHARACTER*40     FILENAME (NFILE)
+      CHARACTER*(*)    FILENAME (NFILE)
       INTEGER          I_CENTRE
       INTEGER          J_CENTRE
       DOUBLE PRECISION MJD_STANDARD
@@ -159,6 +159,10 @@
 
 
 *     .
+
+*     Check status
+      IF (STATUS .NE. SAI__OK) RETURN
+
 
 *     set up the output axes
 
