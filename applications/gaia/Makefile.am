@@ -45,6 +45,10 @@ BUILT_SOURCES = $(TCL_FILE) $(SKYCAT_FILES) $(GAIA_FILES)
 ##  Tasks present in the gaiaMon binary.
 GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 
+bin_MONOLITHS = gaiaMon
+gaiaMon_SOURCES =
+gaiaMon_TASKS = $(GAIA_TASKS) 
+
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
 ## makefiles in the sub-directories and return to this level to complete the
@@ -125,7 +129,18 @@ distclean-local:
 MAINTAINERCLEANFILES =
 
 ##  Need all the source code in the sub-directories.
-EXTRA_DIST = gaia skycat tcl gaia.news
+EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps
+
+##  Additional files. These have traditionally gone into bindir. 
+##  Not having frame.sdf there would be an issue. Use a trick to get these
+##  installed. 
+gaiasupportdir = $(bindir)
+gaiasupport_DATA = demodata.tar
+
+##  Demodata depends on demodata
+demodata.tar: demodata
+	(cd demodata; \
+	tar cvf ../demodata.tar *)
 
 ##  Before distributing subdirectories we need to clean then up (we get all
 ##  the files in these directories). Also remove the CVS trace.
