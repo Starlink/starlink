@@ -87,6 +87,14 @@ package ccdpack {
    version PKG_VERS
    prefix ccd
 
+#  The following definition allows the flagging text "[G]" to appear 
+#  appended to prompt strings in IRAF contexts only.  It is invoked by
+#  including the Tcl command substitution "[ccd_global]" in the relevant
+#  prompt strings.  Note in this case that the prompt strings must be
+#  delimited by double quotes, not braces.
+   proc ccd_global {} { return {} }
+   iraf: { proc ccd_global {} { return {[G]} } }
+
    executable ccdpack_red {
       source makebias.ifd
       source debias.ifd
