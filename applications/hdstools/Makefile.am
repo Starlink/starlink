@@ -50,6 +50,7 @@ prohlp=	@PROHLP@
 
 hdstools.hlp: $(hdstools_mon_TASKS:=.f) hdstools_master.hlp
 	PATH=$(PATH):$(STARLINK)/bin/sst; \
+	export PATH ; \
 	for f in $(hdstools_mon_TASKS:=.f); do \
 	   $(prohlp) in=$${f} out=$${f}.help ;\
 	done
