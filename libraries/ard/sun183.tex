@@ -1,0 +1,2287 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun183.3}
+\newcommand{\stardocnumber}    {183.3}
+\newcommand{\stardocauthors}   {D.S. Berry}
+\newcommand{\stardocdate}      {21st March 1996}
+\newcommand{\stardoctitle}     {ARD \\ [1ex]
+                                A Textual Language for Describing \\
+                                Regions within a Data Array}
+\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+%\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+The ARD (ASCII Region Definition) system provides a textual language for 
+describing regions within a data array, together with software for converting
+a textual description into a pixel mask. The textual language is based on a 
+set of keywords identifying simple shapes (boxes, circles, lines, etc.). These 
+keywords can be combined together using Boolean-style operators (AND, OR,
+NOT, etc.) to create more complex shapes. Data arrays can be multi-dimensional.
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+
+\section{Introduction}
+
+Astronomical applications often require the user to identify regions of interest
+within a data array. For instance a statistics application may need to be told
+the region within the input image in which it is to evaluate the pixel
+statistics. Another example is a data calibration application which needs
+to be told the regions in which the detector was unreliable so that it can flag
+the corresponding output pixels as bad.
+
+One way of identifying such regions is through the use of a pixel mask. In a
+pixel mask, different pixel values are used to differentiate between those
+pixels which are to be included by the application and those which are to be
+excluded. Such pixel masks are usually the same size and shape as the data array
+being processed by the application (so that a one-for-one correspondence exists
+between mask pixels and data pixels). This results in such masks occupying large
+amounts of disk space. More importantly, it means that different pixel masks are
+required for data arrays with different sizes or shapes. 
+
+ARD circumvents these problems by using textual expressions (known as ``ARD
+descriptions'') to describe the pixels to be included by the application.
+Multi-dimensional data arrays can be handled. A simple 2-dimensional ARD
+description such as: 
+
+\small
+\begin{verbatim}
+      CIRCLE( 20, 20, 5 ) .OR. RECT( 20, 20, 30, 30 ) 
+\end{verbatim}
+\normalsize
+
+tells the application to process all pixels which are {\em either} within a
+circle centred on pixel co-ordinates (20,20) with a radius of 5 pixels, 
+{\em or} are within the rectangle with opposite corners at pixels co-ordinates 
+(20,20) and (30,30). The \htmlref{ARD\_WORK}{ARD_WORK}
+subroutine will convert an ARD description such as this into a pixel mask, with
+a shape and size specified by the application. The application will usually know
+the shape and size of the data array and so can ask \htmlref{ARD\_WORK}{ARD_WORK} to create a pixel
+mask of the correct shape and size. Once the pixel mask is no longer needed,
+the storage space used to hold the mask can be released; there is no need to
+keep permanent copies of the pixel mask on disk. 
+
+In the above example, positions and distances in the ARD description were given
+in pixel co-ordinates. The ARD language allows positions and distances to be
+given in any co-ordinate system which is linearly related to pixel co-ordinates.
+Thus for instance, positions within a 2-dimensional image could be given in
+arc-seconds north and east from a given position on the sky (assuming the image
+is sufficiently small to be able to ignore non-linearities in the
+equatorial co-ordinate system). 
+
+\subsection{Some Example ARD Descriptions}
+ARD descriptions are made up by using logical \htmlref{operators}{SEC:OPER} 
+(\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, \htmlref{.NOT.}{OP:NOT},
+etc.) to combine together \htmlref{keywords}{SEC:KEYW} which represent the basic shapes known to ARD.
+\htmlref{statements}{SEC:STAT} can also be included which modify the way the ARD description is
+interpreted (for instance, by setting up an alternative co-ordinate system). 
+
+The ARD library includes two subroutines (\htmlref{ARD\_GROUP}{ARD_GROUP} and \htmlref{ARD\_GRPEX}{ARD_GRPEX}) which
+simplify the task of obtaining ARD descriptions from the user or environment.
+Using these routines, an ARD description can be supplied to an application
+either directly, or by storing it in a text file and supplying the name of the
+text file to the application. The following examples represent lines stored in a
+text file. Such lines are effectively concatenated together into a single string
+before being processed by ARD: 
+
+\small
+\begin{verbatim}
+      ROTBOX( 0, 0, 20, 10, 30 )
+\end{verbatim}
+\normalsize
+
+This example is simply a single keyword representing one of the basic shapes
+known to ARD. It selects all pixels which have centres on or within a
+2-dimensional rotated box. The box is centred on co-ordinates (0,0) and has
+sides of length 20 and 10. The first side of the box (i.e. the one with length 
+20) is at an angle of $30^{\circ}$ \hspace{1mm} to the array X axis (measured 
+anti-clockwise). 
+
+\small
+\begin{verbatim}
+      CIR( 0, 0, 10 ) .AND. .NOT. ( COL( 10 ) .OR. ROW( 5 ) )
+\end{verbatim}
+\normalsize
+
+This example uses logical \htmlref{operators}{SEC:OPER} and parentheses to combine several basic
+shapes together into a more complex shape. It also shows the use of abbreviated
+\htmlref{keywords}{SEC:KEYW}. All pixels within the circle of radius 10 centred on (0,0) are
+selected, except for those which are on column 10 or row 5. 
+
+
+\small
+\begin{verbatim}
+      SCALE( 0.5 )         #  Make unit distance in user co-ordinates equal to
+                           #  0.5 in application co-ordinates.
+      TWIST( 45 )          #  Rotate the user co-ordinate system anti-
+                           #  clockwise by 45 degrees.
+      OFFSET( 10,15 )      #  Move the origin of user co-ordinates to (10,15) 
+                           #  in application co-ordinates.
+      PIXEL(  1,  1 )
+      PIXEL( 20, 13 )
+      PIXEL(-55,122 )
+      PIXEL(112, 87 )
+      PIXEL( 33, 12 )
+\end{verbatim}
+\normalsize
+
+This example shows the use of comments in an ARD description. It also shows the
+use of \htmlref{statements}{SEC:STAT} to establish a user co-ordinate system which is different to
+that expected by the application. Another feature demonstrated by this example
+is the ability of ARD to recognise implicit \htmlref{.OR.}{OP:OR} operators. The list of
+\htmlref{PIXEL}{KEY:PIX}
+keywords specifies a set of individual pixels. Since these keywords have no
+intervening operators, ARD assumes that a \htmlref{.OR.}{OP:OR} operator is to be inserted
+between each pair, i.e. the union of all the individual pixels is assumed. 
+
+
+\subsection{\label{SEC:EXAMC}An Example ARD Application}
+This section presents Fortran code for an ADAM application which obtains a data
+array (in the form of an NDF structure, see \xref{SUN/33}{sun33}{}) and an ARD description from
+the environment, converts the ARD description into a pixel mask, and then finds
+and displays the data sum within the region specified by the ARD description.
+The application will deal with NDFs of any dimensionality up to the limit
+imposed by the NDF\_ system. 
+
+\small
+\begin{verbatim}
+      SUBROUTINE ARD_TEST( STATUS )                             [1]
+      IMPLICIT NONE                                           
+                                                              
+*  Include definitions of global constants.                   
+      INCLUDE 'SAE_PAR'                                         [2]
+      INCLUDE 'NDF_PAR'                                        
+      INCLUDE 'PRM_PAR'                                        
+      INCLUDE 'GRP_PAR'                                        
+                                                              
+*  Declare local variables.                                   
+      INTEGER STATUS, IGRP, INDF, NDIM, IPDATA, IPMASK, EL,   
+     :        LBND( NDF__MXDIM ), UBND( NDF__MXDIM ),           [3]
+     :        LBNDI( NDF__MXDIM ), UBNDI( NDF__MXDIM ),       
+     :        LBNDE( NDF__MXDIM ), UBNDE( NDF__MXDIM ),       
+     :        REGVAL                                          
+      REAL SUM, TRCOEF( 1 )                                   
+                                                              
+*  Check inherited global status.                             
+      IF ( STATUS .NE. SAI__OK ) RETURN                         [4]
+                                                              
+*  Obtain an identifier for the input NDF.                    
+      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )             [5]
+                                                              
+*  Obtain the bounds of the NDF.                              
+      CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM,       [6]
+     :                STATUS )                                
+                                                              
+*  Map the DATA component of the NDF.                         
+      CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPDATA, EL,  [7]
+     :              STATUS )                                  
+                                                              
+*  Obtain an ARD description specifying the region in which   
+*  the pixel values are to be summed.                         
+      CALL ARD_GROUP( 'REGION', GRP__NOID, IGRP, STATUS )       [8]
+                                                              
+*  Obtain workspace to hold the pixel mask corresponding to   
+*  the supplied ARD description.                              
+      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )         [9]
+                                                              
+*  Indicate that this application expects positions and       
+*  distances within the ARD description to be specified in    
+*  pixel co-ordinates.                                        
+      TRCOEF( 1 ) = VAL__BADR                                   [10]
+                                                              
+*  Indicate that the value 2 should be used to represent      
+*  pixels specified by the first keyword in the ARD           
+*  description.                                               
+      REGVAL = 2                                              
+                                                              
+*  Call ARD_WORK to store positive values at all mask pixels  
+*  specified by the ARD description, and zero at all other    
+*  pixels.                                                    
+      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,   [11]
+     :               REGVAL, %VAL( IPMASK ), LBNDI, UBNDI,    
+     :               LBNDE,  UBNDE, STATUS )                  
+                                                              
+*  Call a subroutine to sum the data in the specified regions.
+      CALL SUMIT( EL, %VAL( IPDATA ), %VAL( IPMASK ), SUM,    
+     :            STATUS )                                      [12]
+                                                              
+*  Display the data sum.                                      
+      CALL MSG_SETR( 'SUM', SUM )                             
+      CALL MSG_OUT( 'ARD_TEST_MSG1', '  Data sum: ^SUM',        [13]
+     :               STATUS )                                 
+                                                              
+*  Release the work space used to hold the pixel mask.        
+      CALL PSX_FREE( IPMASK, STATUS )                           [14]
+                                                              
+*  Delete the group used to hold the ARD description.         
+      CALL GRP_DELET( IGRP, STATUS )                            [15]
+                                                              
+*  Annul the NDF identifier.                                  
+      CALL NDF_ANNUL( INDF, STATUS )                            [16]
+                                                              
+      END                                                     
+\end{verbatim}
+\normalsize
+
+{\bf Programming notes:}
+
+\begin{enumerate}
+
+\item The example is actually an ADAM A-task, and so consists of a subroutine
+with a single argument giving the inherited status value. See
+\xref{SUN/101}{sun101}{} for
+further details about writing ADAM A-tasks. A ``stand-alone'' equivalent to the
+\htmlref{ARD\_GROUP}{ARD_GROUP} routine is available which can be used with non-ADAM applications. 
+
+\item The INCLUDE statements are used to define the various ``symbolic
+constants'', which are used in this routine. Starlink software makes widespread
+use of such constants, which should always be defined in this way rather than by
+using actual numerical values. They are recognisable by the double underscore
+``\_\_'' (e.g. ``SAI\_\_OK'') which distinguishes them from subroutine names.
+SAE\_PAR defines constants starting with ``SAI\_\_'', NDF\_PAR defines constants
+starting with ``NDF\_\_'' (see \xref{SUN/33}{sun33}{}), PRM\_PAR defines constants starting with
+``VAL\_\_'' (see \xref{SUN/39}{sun39}{}), and GRP\_PAR defines constants starting with
+``GRP\_\_'' (see \xref{SUN/150}{sun150}{}). 
+
+\item This application is designed to be able to handle data arrays of any
+dimensionality, up to the limit set by the NDF library. This limit is given by
+the symbolic constant NDF\_\_MXDIM, which is used in the declaration of various
+arrays used to hold information describing each axis. 
+
+\item The value of the STATUS argument is checked. This is because the
+application uses the Starlink error handling strategy (see
+\xref{SUN/104}{sun104}{}), which
+requires that a subroutine should do nothing unless its STATUS argument is set
+to the value SAI\_\_OK on entry. Here, we simply return without action if STATUS
+has the wrong value. 
+
+\item The input NDF is now obtained using the ADAM parameter 'NDF'. This may
+involve prompting the user, or the NDF may be identified using some other means
+(for instance, the NDF may have been specified on the command line which
+invoked the application). An integer value is returned to the application in 
+variable INDF. This is an NDF {\em identifier} and is used to refer to the NDF 
+throughout the rest of the application.
+
+\item The shape and size of the NDF is now obtained. This returns the number of
+dimensions, and the upper and lower bounds on each axis. These bounds are needed
+to be able to correctly locate positions supplied within the ARD description. 
+
+\item The DATA array in the NDF is then accessed by calling NDF\_MAP. Rather 
+than returning actual data values, this routine returns a {\em pointer} to the 
+data values in IPDATA. The total number of pixels in the array is returned in 
+EL.
+
+\item Next, the ARD description is obtained using ADAM parameter 'REGION'. The
+returned ARD description is stored in a ``GRP group'' (rather like a Fortran
+character array). The GRP package is described in \xref{SUN/150}{sun150}{} and programmers using
+ARD should be aware of its contents. An integer value is returned in IGRP
+which is used to identify the group containing the ARD description throughout
+the rest of the application. The second argument is a ``null group identifier''
+(a symbolic constant defined within the include file GRP\_PAR). It is used to
+indicate that there is no existing ARD description on which to base the new ARD
+description; a completely new ARD description must be supplied. 
+
+\item We now obtain a pointer to a temporary array in which we can store the
+pixel mask corresponding to the ARD description. The mask has the same number of
+pixels as the data array, and each pixel stores an integer value. The PSX 
+library is a Fortran interface to the POSIX library and is described in SUN/121.
+
+\item This application expects the user to supply positions and distances in the
+pixel co-ordinate system of the NDF, and indicates this by assigning the
+``special'' value given by the symbolic constant VAL\_\_BADR to the first
+element of the TRCOEF array. It is possible for an application to specify some
+other co-ordinate system, so long as the co-ordinate system is linearly related
+to pixel co-ordinates. In this case TRCOEF would be used to store the
+co-efficients of the mapping from the new ``application'' co-ordinate
+system, to the pixel co-ordinate system. See Section \ref{SEC:COORD}.
+
+\item The subroutine \htmlref{ARD\_WORK}{ARD_WORK} is now called to create the pixel mask
+identifying the pixels specified by the ARD description. Positive values are
+stored in the mask for such pixels, and zero is stored for all other pixels. 
+
+\item A subroutine is now called to add up the pixel values in the regions
+specified by the ARD description. The pointer values returned by NDF\_MAP and
+PSX\_CALLOC are turned into actual Fortran arrays at this point, which SUMIT can
+access. This is done using the \%VAL function in the call to SUMIT. SUMIT
+is not part of the ARD package, but would be written by the application
+programmer. It may look like this: 
+
+\small
+\begin{verbatim}
+      SUBROUTINE SUMIT( EL, DATA, MASK, SUM, STATUS )         
+      IMPLICIT NONE                                           
+                                                              
+*  Include definitions of global constants.                   
+      INCLUDE 'SAE_PAR'                                       
+      INCLUDE 'PRM_PAR'                                        
+                                                              
+*  Arguments Given.                                           
+      INTEGER EL                                              
+      REAL DATA( EL )                                         
+      INTEGER MASK( EL )                                      
+                                                              
+*  Arguments Returned.                                        
+      REAL SUM                                                
+                                                              
+*  Arguments Given and Returned.                              
+      INTEGER STATUS                                          
+                                                              
+*  Declare local variables.                                   
+      INTEGER I                                               
+                                                              
+*  Check inherited global status.                             
+      IF ( STATUS .NE. SAI__OK ) RETURN                       
+                                                              
+*  Initialise the sum of the valid data values.               
+      SUM = 0.0                                               
+                                                              
+*  Loop round every element in the data array.                
+      DO I = 1, EL                                            
+                                                              
+*  Check to see if this pixel was included in the ARD         
+*  description. It will have a positive mask value if it was. 
+*  Skip over the pixel if it was not included.                
+         IF( MASK( I ) .GT. 0 ) THEN                          
+                                                              
+*  The regions selected by the ARD description may contain    
+*  pixels which are flagged as unusable in the input NDF.     
+*  Such pixels have the value given by the symbolic constant  
+*  VAL__BADR and should not be included in the returned data  
+*  sum.                                                       
+            IF( DATA( I ) .NE. VAL__BADR ) THEN               
+               SUM = SUM + DATA( I )                          
+            END IF                                            
+                                                              
+         END IF                                               
+                                                              
+      END DO                                                  
+                                                              
+      END                                                     
+\end{verbatim}
+\normalsize
+
+The two arrays can be treated as one dimensional vectors because they are the
+same size and shape. This makes it easy to process arrays of any dimensionality.
+
+
+\item The data sum is displayed by assigning its value to an ``MSG token'' and 
+then incorporating this token into a message to be displayed on the standard 
+output device. See SUN/104 for a description of the MSG package.
+
+\item The storage space used to hold the pixel mask is released so that it can 
+be re-used.
+
+\item The storage space used by the GRP group to hold the ARD description is 
+released.
+
+\item Finally, the NDF is closed.
+\end{enumerate}
+
+\subsection{Supplying ARD Descriptions to an Application}
+This section outlines some of the ways in which a user could supply an ARD
+description in response to a prompt for the 'REGION' parameter in the example
+application described in the previous section. 
+
+The first thing to be said is that the dimensionality of the ARD description
+(i.e. the number of values used to represent a single position in the ARD
+description) must match that of the supplied NDF. If it
+doesn't, then \htmlref{ARD\_WORK}{ARD_WORK} will report an error. By default, ARD descriptions are
+always assumed to be 2-dimensional, but this default can be over-ridden by
+including a \htmlref{DIMENSION}{ST:DIM} statement in the ARD description. Thus for instance, if 
+the NDF is known to be 3-dimensional, the user may want to give an ARD 
+description such as:
+
+\small
+\begin{verbatim}
+      DIMENSION( 3 )
+      CIRCLE( 40, 50, 60, 10) .OR. CIRCLE( 45, 55, 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+The \htmlref{DIMENSION}{ST:DIM} statement tells ARD to expect three values per position. The rest
+of the ARD description specifies the union of two spheres (i.e. ``3-dimensional
+circles''), centred on (40,50,60) and (45,55,65), each of radius 10. This ARD
+description uses the default co-ordinate system established by the application's
+call to \htmlref{ARD\_WORK}{ARD_WORK}. In the case of the application above, this default
+co-ordinate system is just the pixel co-ordinate system of the NDF. 
+
+ARD uses the versatile facilities of the GRP package to obtain the ARD
+description. The following examples outline some of the ways in which the above
+ARD description could be specified in response to a prompt for parameter
+'REGION'. For more details on the facilities of GRP, see \xref{SUN/150}{sun150}{}. In each case
+the ``$>$'' represents the final character of the prompt string issued by the
+ADAM parameter system and is not actually typed in by the user: 
+
+\begin{enumerate}
+
+\item The entire ARD description could be given as a single literal string:
+
+\small
+\begin{verbatim}
+      > DIMENSION(3) CIRCLE( 40, 50, 60, 10) .OR. CIRCLE( 45, 55, 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+All blanks and tabs are ignored.
+
+\item The ARD description could be split up into several strings given in
+response to successive prompts. This is particularly useful for long ARD
+descriptions:
+
+\small
+\begin{verbatim}
+      > DIMENSION(3) -
+      > CIRCLE( 40, 50, 60, 10) .OR. -
+      > CIRCLE( 45, 55, 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+If an ARD description ends with a minus sign (``$-$''), the \htmlref{ARD\_GROUP}{ARD_GROUP} subroutine 
+will issue another prompt and append any string supplied to the end of the 
+previously supplied string. This continues until an ARD description is supplied 
+which doesn't end with a minus sign.
+
+\item ARD descriptions can be split anywhere except in the middle of a numerical
+value. So, for instance, the following responses would be valid: 
+
+\small
+\begin{verbatim}
+      > DIMENSION(3) CIRCLE( 40, 50, -
+      > 60, 10) .OR. CIRCLE( 45, 55, -
+      > 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+\item If ARD finds adjacent keywords without any intervening operator, an
+implicit \htmlref{.OR.}{OP:OR} is inserted between them. So the following, in which the \htmlref{.OR.}{OP:OR}
+operator is not explicitly included, would give the same results as the previous
+examples: 
+
+\small
+\begin{verbatim}
+      > DIMENSION(3) -
+      > CIRCLE( 40, 50, 60, 10 ) -
+      > CIRCLE( 45, 55, 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+\item Instead of supplying the ARD description directly in response to the 
+parameter prompt, it can be stored in a text file and the name of the text file 
+given in response to the prompt. To do this, the file name must be 
+preceded by an up-arrow symbol (``\verb+^+''). If the file \verb+desc.ard+
+contained the three lines:
+
+\small
+\begin{verbatim}
+      DIMENSION(3)             
+      CIRCLE( 40, 50, 60, 10 ) 
+      CIRCLE( 45, 55, 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+then the user could give the following response:
+
+\small
+\begin{verbatim}
+      > ^desc.ard
+\end{verbatim}
+\normalsize
+
+The ARD description can be split between the lines of the file in any way the 
+user chooses. 
+
+\item If only part of the ARD description is stored in a text file, then the two
+methods can be combined. For instance, if the \htmlref{DIMENSION}{ST:DIM} statement is omitted 
+from the file, so that \verb+desc.ard+ contains: 
+
+\small
+\begin{verbatim}
+      CIRCLE( 40, 50, 60, 10 ) 
+      CIRCLE( 45, 55, 65, 10 ) 
+\end{verbatim}
+\normalsize
+
+then the user could give the complete ARD description by giving the following 
+response:
+
+\small
+\begin{verbatim}
+      > DIMENSION(3);^desc.ard
+\end{verbatim}
+\normalsize
+
+This would cause the contents of the file \verb+desc.ard+ to be concatenated with the 
+string preceeding the ``;'' character. Note, the semi-colon is not included in 
+the ARD description returned by \htmlref{ARD\_GROUP}{ARD_GROUP}.
+
+\item If the ARD description were to be split over several files, the contents 
+of the files could be concatenated together in a similar way:
+
+\small
+\begin{verbatim}
+      > ^desc1.ard;^desc2.ard;^desc3.ard
+\end{verbatim}
+\normalsize
+
+This would cause the contents of files \verb+desc1.ard+, \verb+desc2.ard+ and 
+\verb+desc3.ard+ to be 
+combined to form the final ARD description.
+
+\item Indirection through text files can be nested. So if the string
+
+\small
+\begin{verbatim}
+      ^desc1.ard;^desc2.ard;^desc3.ard
+\end{verbatim}
+\normalsize
+
+were stored in a file \verb+total.ard+, then the user could give the response: 
+
+\small
+\begin{verbatim}
+      > ^total.ard
+\end{verbatim}
+\normalsize
+
+\end{enumerate}
+
+\section{\xlabel{ARDSyntax}ARD Description Syntax}
+An ARD description consists of a stream of {\em fields}, optionally
+separated by one or more spaces, or tabs. There are three types of fields:
+
+\begin{enumerate}
+
+\item \htmlref{{\em Keyword}}{SEC:KEYW} fields: These specify the basic shapes known to ARD 
+(\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) from which more complex shapes are constructed. 
+
+\item \htmlref{{\em Operator}}{SEC:OPER} fields: These are logical operators, as in Fortran 
+(\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, \htmlref{.XOR.}{OP:XOR}, \htmlref{.NOT.}{OP:NOT} etc.).
+
+\item \htmlref{{\em Statement}}{SEC:STAT} fields: These are fields which effect the way that the 
+keyword fields are interpreted, e.g. setting up the dimensionality of the system 
+(\htmlref{DIMENSION}{ST:DIM}), the user co-ordinate system (\htmlref{COEFFS}{ST:COE}), etc.
+
+\end{enumerate}
+
+Some keyword and statement fields require argument lists, and these are enclosed
+within parentheses following the keyword or statement. Arguments are delimited
+by commas. 
+
+\htmlref{keywords}{SEC:KEYW} and \htmlref{statements}{SEC:STAT} can be abbreviated to three characters (\htmlref{operators}{SEC:OPER} cannot
+be abbreviated). ARD descriptions are case-insensitive, and white space (eg
+spaces, blank records in a file, blank group expressions) is ignored. 
+
+\subsection{Restrictions on the Order of Fields}
+An ARD description is basically an algebraic expression in which the \htmlref{operators}{SEC:OPER}
+are {\em logical} operators (\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, etc.) and the operands are represented
+by \htmlref{keywords}{SEC:KEYW} (\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) which notionally take true or false values
+depending on whether or not the current pixel is inside or outside the specified
+region. Therefore, all the usual restrictions exist on the placing of operators
+and operands in algebraic expressions; binary operators (e.g. \htmlref{.AND.}{OP:AND}) must have
+an operand or bracketed expression on each side, unary operators (e.g. \htmlref{.NOT.}{OP:NOT})
+must be followed by an operand or bracketed expression, opening and closing
+parentheses must balance, etc.
+
+There are, however, certain ways in which an ARD description can depart from 
+this syntax:
+
+\begin{itemize}
+
+\item Statement fields can be embedded within an ARD description at any point. 
+They are always removed before evaluating the ARD description as an algebraic 
+expression.
+
+\item If .TRUE. is supplied for \htmlref{ARD\_WORK}{ARD_WORK} argument CONCAT, then a single
+operator field may appear before the first keyword field. In this case the
+``missing'' operand value to the left of the first operator is defined by the
+initial mask supplied to routine \htmlref{ARD\_WORK}{ARD_WORK}. If CONCAT is supplied .TRUE. and no
+operator field is found before the first keyword field, then an implicit \htmlref{.OR.}{OP:OR}
+operator is assumed. 
+
+\item If two keyword fields do not have an intervening operator field, then an
+implicit \htmlref{.OR.}{OP:OR} operator is assumed. This allows a simple list of regions to 
+be specified such as:
+
+\small
+\begin{verbatim}
+   #
+   #  ARD description file
+   #
+   POLYGON( 20, 20, 50, 50, 25, 75)      # A triangle
+   ELLIPSE( 10.0, 10.0, 8.0, 5.0, 45.0 )
+   CIRCLE( 22, 22, 40 )
+\end{verbatim}
+\normalsize
+
+This is effectively equivalent to:
+
+\small
+\begin{verbatim}
+   POLYGON( 20, 20, 50, 50, 25, 75) .OR.
+   ELLIPSE( 10.0, 10.0, 8.0, 5.0, 45.0 ) .OR.
+   CIRCLE( 22, 22, 40 )
+\end{verbatim}
+\normalsize
+
+The returned integer mask will contain positive values within the union of the 
+three regions, and zero outside.
+
+\item If an operand is directly followed by a \htmlref{.NOT.}{OP:NOT} operator then an implicit 
+\htmlref{.OR.}{OP:OR} will be inserted in front of the \htmlref{.NOT.}{OP:NOT} This allows lists of regions such 
+as the following to be given:
+
+\small
+\begin{verbatim}
+   POLYGON( 20, 20, 50, 50, 25, 75)
+   .NOT.ELLIPSE( 10.0, 10.0, 8.0, 5.0, 45.0 )
+   .NOT.CIRCLE( 22, 22, 40 )
+\end{verbatim}
+\normalsize
+
+The returned mask will contain positive values for all pixels which are {\em 
+either} within the polygon, or are {\em not} within the ellipse, or are {\em 
+not} within the circle. It may need to be emphasised here that \htmlref{.OR.}{OP:OR} operators
+are inserted and not \htmlref{.AND.}{OP:AND} operators.
+
+\end{itemize}
+
+\subsection{\label{SEC:GRPCC}Group Expression Control Characters}
+The following two sub-sections supply details of the interaction of ARD with the
+GRP package, and may safely be skipped over on an initial reading through this
+document. 
+
+The stream of ARD fields is supplied in the form of a GRP group expression (and
+stored in a normal GRP group) with the following control characters (see
+\xref{SUN/150}{sun150}{}): 
+
+\begin{itemize}
+
+\item ``\verb+^+'' is used to mark the start of an indirection file, from which 
+further ARD fields should be read.
+
+\item ``\verb+#+'' is used to initiate a comment. 
+
+\item ``\verb+;+'' is used to delimit GRP elements. A GRP element may contain 
+any
+number of ARD fields (within the restrictions on string length set by GRP).
+Argument lists for keyword and statement fields can be split between elements.
+An element may consist of a single reference to an indirection file (using the
+``\verb+^+'' character). In this case the element must not contain any 
+explicit ARD fields. Note, GRP elements cannot span records. Thus,
+carriage returns (either in a file or entered at a prompt) also act as GRP 
+element delimiters, in addition to the ``\verb+;+'' character.
+
+\item ``\verb+*+'' is used as the token which represents basis names 
+within a modification element.
+
+\item ``\verb+|+'' is used to separate old and new substitution strings
+when editing names. 
+
+\item The ``OPEN\_NEST'' and ``CLOSE\_NEST'' control characters are not used 
+(they are set ``null'').
+
+\item ``\verb+-+'' is used as the flag character. If a group expression is
+supplied which ends with ``\verb+-+'', then the user is re-prompted for a
+further group expression, which will be appended to the end of the earlier ones.
+The interpretation of ``\verb+-+'' as the GRP flag character takes precedence
+over it's interpretation as a synonym for the \htmlref{.NOT.}{OP:NOT} operator. 
+
+\item ``\verb+{+'' is used to open a new kernel. 
+
+\item ``\verb+}+'' is used to close a kernel. A typical use of the kernel
+characters is to allow the contents of an indirection file to be edited before
+being used. An element such as ``\verb+{^file1.ard}|100|200|+'' would cause the
+contents of \verb+file1.ard+ to be read, and then all occurrences of 100 would
+be replaced by 200. 
+
+\end{itemize}
+
+A complete ARD description can be broken across several lines of an indirection
+file, or across several directly supplied group expressions (each one terminated
+with the flag character ``\verb+-+''). However, breaks must occur either {\em
+between} fields or between values in a keyword or statement argument list. 
+
+\subsection{\label{SEC:MOD}Use of GRP Modification Elements}
+The GRP system provides a facility which allows a user to modify the
+contents of a group previously created by the calling application. To do
+this, a ``modification element'' is included in the supplied ARD
+description (or ``group expression'' to use GRP parlance). A GRP
+identifier for an existing group can be supplied to the routines
+\htmlref{ARD\_GROUP}{ARD_GROUP} and \htmlref{ARD\_GRPEX}{ARD_GRPEX}
+(argument IGRP1). If the ARD description supplied by the user contains a
+modification element, then the contents of the group identified by IGRP1
+will be modified according to the instructions in the modification
+element, and the results incorporated into the returned group. Note, the
+specified editing is applied separately to each element in the existing
+group, to produce the corresponding element for the new group. Elements are
+delimited in ARD descriptions by the ``\verb+;+'' character, {\em and by 
+carriage returns}.
+
+For instance, suppose that the application has already created a group 
+containing the following ARD description:
+
+\small
+\begin{verbatim}
+      CIRCLE( 0, 10, 10 ) .OR. CIRCLE( 0, -10, 10 )
+\end{verbatim}
+\normalsize
+
+If the GRP identifier for this group is supplied as argument IGRP1 to
+routine \htmlref{ARD\_GROUP}{ARD_GROUP}, the user may supply an ARD 
+description including a modification element such as:
+
+\small
+\begin{verbatim}
+      ( * ) .AND. BOX( 0, 0, 5, 5 )
+\end{verbatim}
+\normalsize
+
+The asterisk is replaced in turn by each element of the contents of the 
+group identified by IGRP1 (the ``basis'' group). 
+Thus, the above ARD description is equivalent to the following:
+
+\small
+\begin{verbatim}
+      ( CIRCLE( 0, 10, 10 ) .OR. CIRCLE( 0, -10, 10 ) ) .AND. BOX( 0, 0, 5, 5 )
+\end{verbatim}
+\normalsize
+
+Note, the original ARD description was supplied on a single line, and was
+thus stored as a single element in the group. If it had spanned lines,
+then each line would have been edited separately. For instance, if the
+original ARD description had been supplied as follows, on two lines:
+
+\small
+\begin{verbatim}
+      CIRCLE( 0, 10, 10 ) .OR. 
+      CIRCLE( 0, -10, 10 )
+\end{verbatim}
+\normalsize
+
+then the modified ARD description would be :
+
+\small
+\begin{verbatim}
+      ( CIRCLE( 0, 10, 10 ) .OR. ) .AND. BOX( 0, 0, 5, 5 )
+      ( CIRCLE( 0, -10, 10 ) ) .AND. BOX( 0, 0, 5, 5 )
+\end{verbatim}
+\normalsize
+
+This group expresion would not be accepted by \htmlref{ARD\_WORK}{ARD_WORK}
+because of the missing operand after the \htmlref{.OR.}{OP:OR} operator.
+
+If the user has supplied the ARD description on a single line, and then
+modified it using the following ARD desscription:
+
+\small
+\begin{verbatim}
+      ( *|10|5| ) .AND. BOX( 0, 0, 5, 5 )
+\end{verbatim}
+\normalsize
+
+then the basis group would be edited by replacing all occurrences of the
+string ``10'' by the string ``5'', before being included in the final ARD
+description. Thus the above would be equivalent to:
+
+\small
+\begin{verbatim}
+      ( CIRCLE( 0, 5, 5 ) .OR. CIRCLE( 0, -5, 5 ) ) .AND. BOX( 0, 0, 5, 5 )
+\end{verbatim}
+\normalsize
+
+The syntax of such modification elements is described fully in \xref{SUN/150}{sun150}{}.
+
+\section{\xlabel{ARDInterpretation}Interpretation of ARD Descriptions}
+After removal of all statement fields, and the insertion of any implicit \htmlref{.OR.}{OP:OR}
+operators, the fields in an ARD description are treated as a Fortran-like
+logical expression. Each keyword field forms a logical operand, acted upon by
+the adjoining operator fields. \htmlref{operators}{SEC:OPER} have their usual Fortran precedence
+(see Section \ref{SEC:OPER}). The order of evaluation can be changed by
+enclosing sub-expressions within parentheses as usual. The interpretation of
+operands depends on the type of keyword: 
+
+\begin{itemize}
+
+\item Operands for regions which (in general) have non-zero volume (e.g.
+\htmlref{POLYGON}{KEY:POL},
+\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) are .TRUE. if the {\em centre} of the current pixel lies on or
+within the boundary of the region, and are .FALSE. otherwise. 
+
+\item Operands for regions which have zero volume (e.g.
+\htmlref{POINT}{KEY:POINT},
+\htmlref{LINE}{KEY:LINE}, \htmlref{ROW}{KEY:ROW}, \htmlref{COLUMN}{KEY:COL},
+etc.) are .TRUE. if the boundary of the region passes {\em through} the current
+pixel. The pixel with index $I$ along some axis is assumed to cover a range of
+pixel co-ordinates $P$ given by $(I-1) < P \leq I$.
+
+\end{itemize}
+
+\subsection{Values within the Pixel Mask}
+The \htmlref{ARD\_WORK}{ARD_WORK} subroutine creates an array of integer values (the ``mask'') which
+holds the result of evaluating the entire logical expression at each pixel.
+Positive integers represent .TRUE. (i.e. included pixels) and zero represents
+.FALSE. (i.e. excluded pixels). 
+
+Each keyword included in an ARD description is represented by a different
+positive integer. This provides the possibility for applications to
+differentiate between the different regions within an ARD description on the
+basis of the pixel mask alone. 
+
+\subsubsection{Background Pixels}
+The \htmlref{.NOT.}{OP:NOT} operator adds a few complications in that it requests pixels to be 
+included which are {\em not} within a given region. For instance:
+
+\small
+\begin{verbatim}
+      .NOT.CIRCLE( 0, 0, 10)
+\end{verbatim}
+\normalsize
+
+includes all pixels which are not within the circle of radius 10 centred on the
+origin. If (say) the value 2 was used to represent the \htmlref{CIRCLE}{KEY:CIR} region, what value
+should be used to represent the pixels which are {\em not} within the circle?
+The solution adopted by ARD is to consider all pixels {\em not} within a region
+to be ``background'' pixels, and to reserve the value 1 to represent such
+pixels. All \htmlref{.NOT.}{OP:NOT} operators in an ARD description use the value 1 to represent
+included background pixels. Note, ARD doesn't know if a pixel is truly part of 
+the background or not, it just assumes that all pixels selected by a \htmlref{.NOT.}{OP:NOT} 
+operator will be background. This gives rise to a possible anomaly which can be 
+illustrated by the ARD description:
+
+\small
+\begin{verbatim}
+      .NOT. ( .NOT. CIRCLE( 0, 0, 10 ) )
+\end{verbatim}
+\normalsize
+
+One might expect this to be equivalent to the ARD description:
+
+\small
+\begin{verbatim}
+      CIRCLE( 0, 0, 10 )
+\end{verbatim}
+\normalsize
+
+but there will be a difference. The two ARD descriptions will store positive
+values at the same pixels (i.e. those within the circle), but the values stored
+will be different. In the first ARD description, the included pixels are
+generated by a \htmlref{.NOT.}{OP:NOT} operator and so will be considered to be ``background''
+pixels and will be represented by the value 1. In the second ARD description,
+the included pixels are generated directly by the \htmlref{CIRCLE}{KEY:CIR} keyword and will be
+represented by the value assigned to the keyword (which will be larger than 1).
+
+The \htmlref{.EQV.}{OP:EQV} operator can also cause background pixels to be included in the 
+returned mask, and such background pixels are again represented by the value 1.
+The ARD description:
+
+\small
+\begin{verbatim}
+      CIRCLE( 0, 0, 10 ) .EQV. CIRCLE( 10, 0, 10)
+\end{verbatim}
+\normalsize
+
+selects pixels which are either within both circles or within neither circle.
+Pixels which are within neither circle form part of the background, and are
+represented by the value 1. Pixels which are within both circles are represented
+by the larger of the two values assigned to the two keywords. 
+
+\subsubsection{Assignment of Keyword Values}
+The choice of which positive value to use to represent each keyword in the ARD
+description is controlled by the REGVAL argument supplied to the \htmlref{ARD\_WORK}{ARD_WORK}
+routine. If a positive value is supplied for REGVAL then the first keyword in the
+ARD description (working from left to right) is assigned the supplied value.
+Successive values are assigned to the remaining keywords. An error is reported
+if REGVAL is supplied equal to 1. This is because 1 is reserved to represent
+background pixels and may not be used to represent keywords. 
+
+If a zero or negative value is supplied for REGVAL, then the array of pixel
+values supplied to \htmlref{ARD\_WORK}{ARD_WORK} in argument MASK is examined and the maximum value
+found. This value is incremented by one and used to represent the first keyword
+in the ARD description (if the incremented value is less than 2, then 2 is used
+instead). Successive values are assigned to the remaining \htmlref{keywords}{SEC:KEYW}. 
+
+There is one exception to these rules; pixels selected using an \htmlref{INPUT}{KEY:INP} keyword
+(see section \ref{SEC:MASK}) are assigned the values of the corresponding pixels
+in the input mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}, irrespective of the position of the
+\htmlref{INPUT}{KEY:INP} keyword in the ARD description. The inclusion of \htmlref{INPUT}{KEY:INP} keywords within an
+ARD description does not effect the integer values used to represent other
+\htmlref{keywords}{SEC:KEYW}. Thus if REGVAL is supplied equal to 2 and the ARD description is: 
+
+\small
+\begin{verbatim}
+      CIRCLE( 0, 0, 10 ) .AND. ( INPUT .OR. CIRCLE( 0, 10, 10 ) )
+\end{verbatim}
+\normalsize
+
+then the \htmlref{CIRCLE}{KEY:CIR}(0,0,10) region is assigned the value 2 and the \htmlref{CIRCLE}{KEY:CIR}(0,10,10)
+region is assigned the value 3 (i.e. the \htmlref{INPUT}{KEY:INP} keyword is not included in the
+count of \htmlref{keywords}{SEC:KEYW}).
+
+On return from \htmlref{ARD\_WORK}{ARD_WORK} the REGVAL argument will hold a value one larger than
+the value assigned to the last keyword in the ARD description. 
+
+\subsubsection{Pixels Included in Several Regions}
+If a given pixel falls within more than one region, then the largest of the
+values associated with the regions is stored at the pixel's location.
+Specifically, the rules for determining the result of each operator are: 
+
+\begin{description}
+\item [.AND.] - A zero is returned unless both operands are positive, in which 
+case the larger of the two positive values is returned.
+\item [.OR.] - The larger of the two operand values is returned.
+\item [.XOR.] - If either operand is zero, then the value of the other operand
+is returned. If neither operand is zero, then zero is returned.
+\item [.EQV.] - If neither of the operands is zero, then the larger of the two
+operands is returned. If one of the operands is zero, then zero is returned. If
+both of the operands are zero, then the value 1 is returned.
+\item [.NOT.] - If the operand is positive, then zero is returned. If the
+operand is zero, then 1 is returned.
+\end{description}
+
+Let's look at an example:
+
+\small
+\begin{verbatim}
+      CIR( 0, 0, 50 )
+      CIR( 0, 0, 40 )
+      CIR( 0, 0, 30 )
+      CIR( 0, 0, 20 )
+      CIR( 0, 0, 10 )
+\end{verbatim}
+\normalsize
+
+An implicit \htmlref{.OR.}{OP:OR} operator is assumed to exist between each of the \htmlref{CIRCLE}{KEY:CIR}
+keywords. Let's assume that \htmlref{ARD\_WORK}{ARD_WORK} is called with argument REGVAL set to
+2. The \htmlref{CIR}{KEY:CIR}(0,0,50) keyword is evaluated first and causes a circular region
+of radius 50 to be filled with the value 2. Next, the \htmlref{CIR}{KEY:CIR}(0,0,40) keyword is
+evaluated. The value used to represent included pixels is incremented to 3, and
+a circular region of radius 40 is filled with this value, over-writing some of
+the 2's which were written to the mask because of the previous keyword. Since
+the circular regions are concentric (both being centred on the (0,0) ), this
+will leave an annulus containing the value 2 around the edge of the circle
+containing value 3. The remaining \htmlref{keywords}{SEC:KEYW} are processed in the same way, each
+successive keyword over-writing all but an annulus of the circle created by the
+previous keyword. The final mask consists of a set of concentric annuli, each of
+thickness 10. Working outwards from the centre, the annuli have the values 6, 5,
+4, 3 and 2. The REGVAL argument will be returned holding 7.
+
+One consequence of allowing larger values to ``over-write'' smaller values is
+that background pixels always get over-written by pixels which are selected by
+virtue of being within a keyword region. Consider the following (assuming that 
+REGVAL is again supplied equal to 2): 
+
+\small
+\begin{verbatim}
+      CIRCLE( 0, 0, 10 ) .AND. .NOT. CIRCLE( 0, 0, 5 )
+\end{verbatim}
+\normalsize
+
+This ARD description will be evaluated by first creating two intermediate masks,
+one containing the \htmlref{CIRCLE}{KEY:CIR}(0,0,10) region and another containing the
+\htmlref{.NOT.}{OP:NOT}\htmlref{CIRCLE}{KEY:CIR}(0,0,5) region. These two masks will then be combined together using
+the \htmlref{.AND.}{OP:AND} operator to create the final mask. The first intermediate mask
+contains the value 2 at all pixels which are within the \htmlref{CIRCLE}{KEY:CIR}(0,0,10) region,
+and zero at all other pixels. 
+
+The second intermediate mask is initially set to hold the region \htmlref{CIRCLE}{KEY:CIR}(0,0,5).
+This means that pixels within the circle are given the value 3 and all others
+are given the value zero. The mask is then inverted to take account of the \htmlref{.NOT.}{OP:NOT}
+operator. Pixels inside the circle which previously held the value 3 are changed
+to zero (indicating that these pixels have {\em not} been selected). Pixels
+outside the circle which previously held the value zero are assigned the value 1
+(indicating that these pixels are background pixels). 
+
+The last stage is to combine the two intermediate masks together following the
+rules described above for an \htmlref{.AND.}{OP:AND} operator. Pixels which are further than 10
+units from the origin (i.e. outside the \htmlref{CIRCLE}{KEY:CIR}(0,0,10) region) will hold zero in
+the first mask and 1 in the second mask, and so will be assigned a
+value zero in the final mask. Pixels which are between 5 and 10 units from the
+origin (i.e. inside the first circle but not the second) will have the value 2
+in the first mask and the value 1 in the second. Both these values are
+positive and so the output mask pixel will also be positive. The rules for the
+\htmlref{.AND.}{OP:AND} operator above say that the positive value used will be the larger of the
+two values in the input masks. Thus the output mask pixels are assigned the
+value 2. Pixels which are less than 5 units from the origin will have the value
+2 in the first mask and the value zero in the second mask, and so are assigned
+the value zero in the output mask. The final mask thus holds an annulus 
+extending from radius 5 to radius 10 in which the pixels hold the value 2, all
+other pixels holding the value zero.
+
+\subsection{\label{SEC:MASK}Supplying an Initial Pixel Mask}
+It may sometimes be necessary for applications to combine together pixel masks
+created from different ARD descriptions. To do this, the ARD descriptions should
+be processed in turn by \htmlref{ARD\_WORK}{ARD_WORK} and they should use the ``\htmlref{INPUT}{KEY:INP}'' keyword.
+This keyword refers to the pixel mask supplied to routine \htmlref{ARD\_WORK}{ARD_WORK} in argument
+MASK; if a pixel holds a positive value in the supplied mask then the \htmlref{INPUT}{KEY:INP}
+keyword is notionally .TRUE., and is notionally .FALSE. if the pixel value is
+zero or negative. This keyword can be used at any point in an ARD description,
+and can be included any number of times. A simple example of its use could be: 
+
+\small
+\begin{verbatim}
+      .NOT. INPUT
+\end{verbatim}
+\normalsize
+
+which inverts the supplied mask. If the ARD description does not include any
+references to the \htmlref{INPUT}{KEY:INP} keyword, then the application can force an \htmlref{INPUT}{KEY:INP} keyword
+to be inserted at the start of the ARD description by supplying a .TRUE. value
+for \htmlref{ARD\_WORK}{ARD_WORK} argument CONCAT. For instance, if CONCAT is supplied .TRUE., then
+the ARD description: 
+
+\small
+\begin{verbatim}
+      BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 )
+\end{verbatim}
+\normalsize
+
+becomes 
+
+\small
+\begin{verbatim}
+      INPUT BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 )
+\end{verbatim}
+\normalsize
+
+There is now no operator between the \htmlref{INPUT}{KEY:INP} and \htmlref{BOX}{KEY:BOX} keywords, and so ARD inserts
+an implicit \htmlref{.OR.}{OP:OR} so that the final ARD description used is:
+
+\small
+\begin{verbatim}
+      INPUT .OR. BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 )
+\end{verbatim}
+\normalsize
+
+If the supplied ARD description had started with an operator, for instance: 
+
+\small
+\begin{verbatim}
+      .AND.( BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 ) )
+\end{verbatim}
+\normalsize
+
+then there would be no need to insert an implicit \htmlref{.OR.}{OP:OR} after the \htmlref{INPUT}{KEY:INP} keyword, 
+and so the final used ARD description would be:
+
+\small
+\begin{verbatim}
+      INPUT .AND.( BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 ) )
+\end{verbatim}
+\normalsize
+
+To re-iterate, an \htmlref{INPUT}{KEY:INP} keyword is inserted at the start of the ARD description 
+only if the ARD description as supplied contains no \htmlref{INPUT}{KEY:INP} keywords, {\em and}
+the \htmlref{ARD\_WORK}{ARD_WORK} argument CONCAT is supplied .TRUE.. If either of these conditions 
+is broken then the ARD description is left as supplied.
+
+\subsection{\label{SEC:BBOX}Bounding Boxes}
+To combine two large masks using a binary operator at every pixel can be
+wasteful of processor time, especially if not many of the pixels have actually
+been selected. To reduce this waste, ARD keeps track of the regions within the
+mask where the selected pixels are located, and only processes pixels in those
+regions. Precisely, ARD maintains a pair of ``bounding boxes'' throughout its
+evaluation of an ARD description. These are referred to as the internal and
+external bounding boxes. Each bounding box is a rectangular region of the mask.
+The internal bounding box contains {\em all} included pixels in the mask, but
+may also contain some excluded pixels. Conversely, the external bounding box
+contains all excluded pixels and may also contain some included pixels. 
+
+The upper and lower bounds of these boxes are returned to the calling 
+application when the mask is complete. If an application is only interested in 
+included pixels, it may then restrict its attention to the region of the data 
+array contained within the internal bounding box (all pixels outside this box 
+are guaranteed to be excluded). It is still necessary for the application to 
+check mask pixels to see if they are included or excluded, but the checks can 
+at least be restricted to the region of the internal bounding box. The external 
+bounding box can be used in a similar way if the application is only interested 
+in excluded pixels.
+
+If {\em all} mask pixels are included (i.e. if there are no excluded pixels)
+then the external bounding box will be returned ``null'', and the internal
+bounding box will be returned covering the entire mask. Likewise, if {\em all}
+mask pixels are excluded (i.e. if there are no included pixels) then the
+internal bounding box will be returned ``null'', and the external bounding box
+will be returned covering the entire mask. Null bounding boxes are identified by
+the fact that the lower bound of each axis is greater than the corresponding
+upper bound. This condition should always be checked for before using a 
+bounding box. 
+
+\section{\label{SEC:COORD}\xlabel{ARDCoords}Co-ordinate Systems}
+There are three co-ordinate systems recognised by ARD:
+
+\begin{enumerate}
+
+\item {\em Pixel Co-ordinates} - These refer to the pixel mask returned by
+\htmlref{ARD\_WORK}{ARD_WORK}. The position of the origin of pixel co-ordinates within the mask is
+fixed by the upper and lower bounds of the mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}. The
+conventions for pixel co-ordinates used by Starlink software are described in
+\xref{Starlink System Note (SSN) 22}{ssn22}{}.
+
+\item {\em Application Co-ordinates} - These are the co-ordinates in which an
+application {\em expects} positions within an ARD description to be given. Any
+co-ordinate system can be used which is linearly related to pixel co-ordinates.
+An application would usually select a co-ordinate system which naturally
+describes the data in the data array. All applications in a given package
+could, for instance, use the same application co-ordinate system.
+
+\item {\em User Co-ordinates} - These are the co-ordinates in which the user
+decides to give positions within an ARD description. By default, user
+co-ordinates will be assumed to be identical with application co-ordinates.
+\htmlref{statements}{SEC:STAT} which establish an alternative user co-ordinate system must be
+included in the ARD description in order to replace this default. 
+
+\end{enumerate}
+
+In order to locate a given keyword region within the pixel mask, the positions 
+supplied within the ARD description are first transformed from user co-ordinates
+into application co-ordinates, and then from application co-ordinates into pixel
+co-ordinates (in fact the two transformations are combined into a single step). 
+
+\subsection{Application Co-ordinates}
+The application uses the TRCOEF argument of the \htmlref{ARD\_WORK}{ARD_WORK} routine to define the
+application co-ordinate system. TRCOEF should be supplied holding the
+co-efficients of the linear mapping from application co-ordinates to pixel
+co-ordinates. For instance, if a 2-dimensional application co-ordinates system
+$(x_{a},y_{a})$ is required to be equal to pixel co-ordinates $(x_{p},y_{p})$,
+but with the origin shifted to pixel co-ordinates $(10,20)$, then the linear
+mapping from $(x_{a},y_{a})$ to $(x_{p},y_{p})$ is:
+\small
+\begin{eqnarray*}
+x_{p} & = & 10 + 1.x_{a} + 0.y_{a} \\
+y_{p} & = & 20 + 0.x_{a} + 1.y_{a} 
+\end{eqnarray*}
+\normalsize
+
+In this case TRCOEF would be supplied holding the 6 co-efficient values
+(10,1,0,20,0,1). In general, if ($Y_{1}$, $Y_{2}$, $Y_{3}$, ..., $Y_{N}$) are a
+set of application co-ordinates in $N$ dimensions, and ($Z_{1}$, $Z_{2}$,
+$Z_{3}$, ..., $Z_{N}$) are the corresponding pixel co-ordinates, then the
+application supplies a set of constants $C_{1}$ to $C_{N*(N+1)}$, where: 
+\small
+\begin{eqnarray*}
+Z_{1} & = & C_{1} + C_{2}.Y_{1} + C_{3}.Y_{2} + ... + C_{N+1}.Y_{N} \\
+Z_{2} & = & C_{N+2} + C_{N+3}.Y_{1} + C_{N+4}.Y_{2} + ... + C_{2.(N+1)}.Y_{N} \\
+ ....\\
+Z_{N} & = & C_{N.N} + C_{N.(N+1)}.Y_{1} + C_{N.(N+2)}.Y_{2} + ... + C_{N.(N+1)}.Y_{N} 
+\end{eqnarray*}
+\normalsize
+
+These constants can be supplied to \htmlref{ARD\_WORK}{ARD_WORK} as a 1-dimensional vector 
+$C$ with N.(N+1) elements, or as a 2-dimensional array $T$ with dimensions 
+( 0:N, N ) where:
+\small
+\begin{eqnarray*}
+Z_{1} & = & T(0,1) + T(1,1).Y_{1} + T(2,1).Y_{2} + ... + T(N,1).Y_{N} \\
+Z_{2} & = & T(0,2) + T(1,2).Y_{1} + T(2,2).Y_{2} + ... + T(N,2).Y_{N} \\
+ ....\\
+Z_{N} & = & T(0,N) + T(1,N).Y_{1} + T(2,N).Y_{2} + ... + T(N,N).Y_{N} 
+\end{eqnarray*}
+\normalsize
+
+The order in which the co-efficient values are stored is the same in both
+cases.
+
+There will be many cases in which application co-ordinates are required to be
+just equal to pixel co-ordinates. In this case the diagonal elements of the T
+array ( T(1,1), T(2,2), etc.) would be set to one and all other elements of T
+would be set to zero. This is likely to be a common requirement, and so
+\htmlref{ARD\_WORK}{ARD_WORK} has a special facility for creating such a ``unit'' mapping. If the
+first co-efficient ( C(1) or T(0,1) ) is set equal to the symbolic constant
+VAL\_\_BADR (defined in include file PRM\_PAR), then \htmlref{ARD\_WORK}{ARD_WORK} will ignore the
+supplied values of TRCOEF and use a unit mapping instead.
+
+\subsection{User Co-ordinates}
+The positions and displacements within an ARD description are interpreted as
+application co-ordinates by default. If the user wishes to supply such positions
+and displacements in some other co-ordinate system, then the ARD description
+should contain suitable statement fields defining the mapping from user
+co-ordinates to application co-ordinates. Such mappings are restricted to be
+linear and can be set up using the \htmlref{statements}{SEC:STAT} \htmlref{COEFFS}{ST:COE}, \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCALE}, \htmlref{TWIST}{ST:TWI} and
+\htmlref{STRETCH}{ST:STR}.
+For instance, if the application expects co-ordinates to be given in arc-seconds
+but the user wishes to give them in arc-minutes, then the statement \htmlref{SCALE}{ST:SCALE}( 60 )
+should be included in the ARD description before the first keyword. This mapping
+is then concatenated with the mapping supplied by the application to get the
+mapping from user co-ordinates to pixel co-ordinates. 
+
+The user co-ordinate system may be changed at any point within an ARD
+description using suitable statement (\htmlref{COEFFS}{ST:COE}, etc.), and the new mapping
+will be used to interpret all further positions until the user co-ordinate 
+system is modified again.
+
+Arguments which specify distances (such as the radius of a circle for instance)
+are subject to the current mapping. Thus, for instance, a circle may be
+transformed into an ellipse if the co-ordinate axes have different scales. 
+
+The following example ARD description illustrates these last two points:
+
+\small
+\begin{verbatim}
+      DIMENSION( 2 )
+      CIRCLE( 0, 0, 10 )
+      COEFFS( 0, 1, 0, 0, 0, 2 )
+      CIRCLE( 0, 0, 10 )
+\end{verbatim}
+\normalsize
+
+The arguments of the first \htmlref{CIRCLE}{KEY:CIR} keyword refer to the application co-ordinate
+system because no alternative user co-ordinate system has been specified at this
+point. Thus, the first circular region is centred on application co-ordinates
+$(0,0)$ and cuts the axes at $(\pm10,0)$ and $(0,\pm10)$. The following \htmlref{COEFFS}{ST:COE}
+statement establishes a user co-ordinate system which is identical with
+application co-ordinates except that Y co-ordinate values in the application
+co-ordinate system are twice the corresponding Y values in user co-ordinates.
+The arguments of the second \htmlref{CIRCLE}{KEY:CIR} keyword refer to this new user co-ordinate
+system. Thus, even though the arguments are numerically the same as the first
+\htmlref{CIRCLE}{KEY:CIR} keyword, they will result in a different region being selected. The
+selected region will be a circle which has been stretched in the Y direction to
+produce an ellipse. The ellipse will be centred on application co-ordinates
+$(0,0)$ and will cut the application co-ordinate axes at $(\pm10,0)$ and
+$(0,\pm20)$. 
+
+\section{\label{SEC:KEYW}\xlabel{ARDKeywords}Keywords}
+Keywords are fields within an ARD description which specify one of the basic
+shapes known to ARD. Most are followed by an argument list giving numerical
+values for the size, position, orientation, etc., of the shape. Argument lists
+are contained within parentheses, and arguments are separated by commas.
+Keywords can be abbreviated to three characters. The following keywords are
+currently supported ($N$ represents the dimensionality of the ARD description,
+and all positions and distances are given in user co-ordinates): 
+
+\begin{description}
+
+\item [\label{KEY:BOX}BOX] - A rectangular box with sides parallel to the user co-ordinate
+axes. The argument list should contain $2*N$ values; the first $N$ values give
+the co-ordinates of the box centre, and the remaining $N$ values give the
+lengths of the box sides. It may sometimes be more convenient to use the
+\htmlref{RECT}{KEY:REC}
+keyword which specifies a rectangular box in terms of two diagonally opposite
+corners. 
+
+\item [\label{KEY:CIR}CIRCLE] - A circle (for $N=2$) or sphere (for $N>2$). The argument list
+should contain $N+1$ values; the first $N$ values give the co-ordinates of the
+centre of the circle or sphere, and the remaining value gives the radius
+(in user co-ordinates). 
+
+\item [\label{KEY:COL}COLUMN] - A set of lines parallel to the Y axis. The argument list can
+contain any number of values (one for each of the lines). Each argument value $X$
+specifies that the corresponding line should pass through the position $(X,0)$.
+This keyword can only be used in 2-dimensional ARD descriptions. 
+
+\item [\label{KEY:ELL}ELLIPSE] - A 2-dimensional ellipse. The argument list should contain 5
+values; the first pair give the X and Y co-ordinates of the centre of the
+ellipse, the second pair give the half-lengths of the two axes of the
+ellipse (in user co-ordinates),
+and the fifth value gives the angle (in degrees) between the X axis and the
+first of the two ellipse axes. Rotation from the X to the Y axis is positive.
+This keyword can only be used in 2-dimensional ARD descriptions. 
+
+\item [\label{KEY:FRA}FRAME] - The entire mask excluding a border of given width. The argument
+list should contain a single value giving the width of the border. This keyword
+can only be used in 2-dimensional ARD descriptions. A further restriction on its
+use is that the current mapping from user co-ordinates to pixel co-ordinates
+must be isomorphic (i.e. each mask pixel must correspond to a square area in
+user co-ordinates; the square may be rotated, shifted and/or scaled, but it must
+still be a square). If this is not the case an error will be reported by
+\htmlref{ARD\_WORK}{ARD_WORK}. 
+
+\item [\label{KEY:INP}INPUT] - The pixel mask supplied as input to routine \htmlref{ARD\_WORK}{ARD_WORK}. 
+
+\item [\label{KEY:LIN}LINE] - A straight line between two given positions. The argument list
+should contain $2*N$ values, the first set of $N$ values giving the co-ordinates
+of the first position, and the second set of $N$ values giving the second
+position. Only the section of the line between (and including) the two positions
+is included in the mask.
+
+\item [\label{KEY:PIX}PIXEL] - A set of individual pixels. The argument list should contain an
+integer multiple of $N$ values; each set of $N$ values giving the co-ordinates 
+of a point to be included.
+
+\item [\label{KEY:POI}POINT] - POINT is a synonym for PIXEL. 
+
+\item [\label{KEY:POL}POLYGON] - A 2-dimensional polygonal area. The argument list should
+contain an even number of values; each pair giving the co-ordinates of a vertex
+of the polygon. These vertices are joined together in the order given to form
+the polygon. The last vertex is joined to the first to close the polygon. This
+keyword can only be used in 2-dimensional ARD descriptions. 
+
+\item [\label{KEY:REC}RECT] - A rectangular box with sides parallel to the user co-ordinate
+axes. The argument list should contain $2*N$ values; each set of $N$ values
+giving the co-ordinates of a pair of diagonally opposite corners. It may 
+sometimes be more convenient to use the BOX keyword which specifies a 
+rectangular box in terms of its centre and dimensions.
+
+\item [\label{KEY:ROT}ROTBOX] - A rotated box. The argument list should contain 5 values; the
+first pair give the co-ordinates of the box centre, the second pair give the
+lengths of the two sides, and the fifth value gives the angle (in degrees)
+between the X axis and the first side of the box. Rotation from the X to the Y
+axis is positive. This keyword can only be used in 2-dimensional ARD
+descriptions. 
+
+\item [\label{KEY:ROW}ROW] - A set of lines parallel to the X axis. The argument list can
+contain any number of values (one for each of the lines). Each argument value $Y$
+specifies that the corresponding line should pass through the position $(0,Y)$.
+This keyword can only be used in 2-dimensional ARD descriptions. 
+
+\item [\label{KEY:WHO}WHOLE] - This keyword selects all pixels in the mask. It has no argument
+list. 
+
+\end{description}
+
+\section{\label{SEC:OPER}\xlabel{ARDOperators}Operators}
+Operators are fields within an ARD description which specify an operation to
+perform on one or two keyword fields. They cannot be abbreviated, and the
+leading and trailing dots must be included. The following operators are
+supported (they are listed in order of decreasing precedence): 
+
+\begin{description}
+
+\item [\label{OP:NOT}.NOT.] - Invert the region specified by the following keyword or
+expression (i.e. included pixels become excluded, and excluded pixels become
+included). A minus sign is recognised as a synonym for .NOT..
+
+\item [\label{OP:AND}.AND.] - Take the intersection of the two regions. A pixel is included
+only if it is within {\em both} of the regions given on either side of the
+.AND. field. 
+
+\item [\label{OP:OR}.OR.] - Take the union of the two regions. A pixel is included if it is
+within {\em either} of the regions given on either side of the .OR. field. 
+
+\item [\label{OP:XOR}.XOR.] - Take the exclusive OR of the two regions. A pixel is included if
+it is within one, but not both, of the regions given on either side of the .XOR.
+field. 
+
+\item [\label{OP:EQV}.EQV.] - Take the equivalence of the two regions. A pixel is included if
+it is within {\em both} of the regions given on either side of the .EQV. field,
+or if it is within {\em neither}. 
+
+\end{description}
+
+.XOR. and .EQV. have equal precedence. Opening and closing parentheses
+(``\verb+(+'' and ``\verb+)+'') can be used to bracket sub-expressions within 
+an ARD description. 
+
+\section{\label{SEC:STAT}\xlabel{ARDStatements}Statements}
+Statements are fields within an ARD description which modify the way in which
+\htmlref{keywords}{SEC:KEYW} are interpreted. They are followed by an argument list giving various
+numerical values. Statements can be abbreviated to three characters. The
+following statements are currently supported ($N$ represents the dimensionality
+of the ARD description): 
+
+\begin{description}
+
+\item [\label{ST:DIM}DIMENSION( N )] - This establishes the number of co-ordinates (N)
+required to describe a single point. If no DIMENSION statement is found before
+the first keyword field, a value of 2 is assumed for N. The dimensionality may
+not be changed after the first keyword field, but multiple DIMENSION statements
+may be included (so long as they all specify the same value for N) to improve
+readability, and to allow the concatenation of multiple ARD descriptions which
+contain compatible DIMENSION statements. 
+
+\item [\label{ST:COE}COEFFS( C1, C2, ... )] - This establishes a new linear mapping from user
+co-ordinates to application co-ordinates replacing any previous mapping (see 
+Section \ref{SEC:COORD}). The
+statement must have $N*(N+1)$ arguments. If ($X_{1}$, $X_{2}$, $X_{3}$, ...,
+$X_{N}$) are a set of user co-ordinates in $N$ dimensions, and ($Y_{1}$,
+$Y_{2}$, $Y_{3}$, ..., $Y_{N}$) are the corresponding application co-ordinates,
+then the argument list should contain a set of constants $C_{1}$ to
+$C_{N*(N+1)}$, where: 
+
+\begin{eqnarray*}
+Y_{1} & = & C_{1} + C_{2}.X_{1} + C_{3}.X_{2} + ... + C_{N+1}.X_{N} \\
+Y_{2} & = & C_{N+2} + C_{N+3}.X_{1} + C_{N+4}.X_{2} + ... + C_{2.(N+1)}.X_{N} \\
+ ....\\
+Y_{N} & = & C_{N.N} + C_{N.(N+1)}.X_{1} + C_{N.(N+2)}.X_{2} + ... + C_{N.(N+1)}.X_{N} 
+\end{eqnarray*}
+
+The mapping established replaces any previous mapping, and is used to transform
+all following co-ordinates, until another mapping is established. The default
+mapping results in user co-ordinates being identical with application
+co-ordinates. The \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCALE}, \htmlref{TWIST}{ST:TWI} and \htmlref{STRETCH}{ST:STR} statements allow complex
+mappings to be created without the use of COEFF statement in certain cases. 
+
+\item [\label{ST:OFF}OFFSET( X, Y, Z, ... )] - This modifies the current mapping
+from user co-ordinates to application co-ordinates so that the origin of the
+user co-ordinate system is moved by the given offsets in application
+co-ordinates. The initial position for the origin of user co-ordinates is
+(0,0,0,..). In a 2-dimensional ARD description, the first statement OFFSET(10,15)
+would put the origin at (10,15) in the application co-ordinates system. A second
+statement OFFSET(2,3) would move it to (12,18). The statement must have $N$ 
+arguments.
+
+\item [\label{ST:SCA}SCALE( F )] - This modifies the current mapping from user co-ordinates to
+application co-ordinates so that the user co-ordinate system is magnified by the
+given factor F along all axes. The magnification is centred on the origin of the
+application co-ordinate system. 
+
+\item [\label{ST:STR}STRETCH( F1, F2, F3, ... )] - This modifies the current mapping from user
+co-ordinates to application co-ordinates so that the user co-ordinate system is
+magnified by the given factor $F_{i}$ along axis $i$. Unlike the SCALE
+statement, the magnifications are centred on the origin of the {\em user}
+co-ordinate system (i.e. the position of the origin of the user co-ordinate
+system within the application co-ordinate system is not changed by this
+statement). The statement must have $N$ arguments. 
+
+\item [\label{ST:TWI}TWIST( T )] - This statement modifies the current mapping from user
+co-ordinates to application co-ordinates so that the user co-ordinate system is
+rotated by an angle T (in degrees). The rotation is about the origin of the
+application co-ordinate system. If the ARD description has more than 2
+dimensions, then the rotation takes place in the X-Y plane. Rotation from the X
+axis to the Y axis is positive. ``TWIST'' is used rather than the more obvious
+``ROTATE'' in order to avoid a name clash with the keyword
+\htmlref{ROTBOX}{KEY:ROT}. 
+
+\end{description}
+
+\section{Compiling and Linking}
+
+To compile and link a UNIX ADAM application with the ARD package, the following
+commands should be used (see \xref{SUN/144}{sun144}{}): 
+
+\small
+\verb#      % alink adamprog.f -L/star/lib# `\verb#ard_link_adam#`
+\normalsize
+
+(note the use of {\em opening} apostrophes (`) rather than 
+closing apostrophe (') ). To compile and link a stand-alone UNIX application with
+the ARD package, the following commands should be used: 
+
+\small
+\verb#      % f77 prog.f -o prog -L/star/lib# `\verb#ard_link#`
+\normalsize
+
+This produces an executable image called \verb+prog+.
+
+The ADAM and stand-alone versions of the ARD\_ system differ, in that the
+stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}.
+
+\appendix
+\section{Alphabetical List of Routines}
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newcommand{\noteroutine}[3]{
+\begin{description}
+\item [{\small \bf {#1} \parbox[t]{4in}{#2}}] 
+\mbox{} \nopagebreak \\
+{\em #3}
+\end{description}
+}
+
+\begin{htmlonly}
+
+\renewcommand{\noteroutine}[3]{
+\begin{description}
+\item [{\small \bf {#1}{#2}}] 
+{\em #3}
+\end{description}
+}
+
+\end{htmlonly}
+
+
+% List of routines:
+% =================
+
+\noteroutine{ARD\_GROUP}{( PARAM, IGRP1, IGRP2, STATUS )}
+            {Obtain an ARD description from the environment}
+\noteroutine{ARD\_GRPEX}{( DESC, IGRP1, IGRP2, FLAG, STATUS )}
+            {Store an explicitly supplied ARD description in a GRP group}
+\noteroutine{ARD\_WORK}{( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT, REGVAL, 
+             MASK, LBNDI, UBNDI, LBNDE, UBNDE, STATUS )}
+            {Create a pixel mask from an ARD description}
+
+
+\newpage
+\section{\label{APP:SPEC}Routine Descriptions}
+
+% +
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2HTML. The contents of this file should be included in the
+%     source prior to any statements that make use of the SST commands.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+% -
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\newfont{\ssttt}{cmtt10 scaled 1095}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
+%  \sstroutine.
+   \renewcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  \sstdescription
+   \renewcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstusage
+   \renewcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  \sstinvocation
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  \sstarguments
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstreturnedvalue
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstparameters
+   \renewcommand{\sstparameters}[1]{
+      \item[Parameters:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstexamples
+   \renewcommand{\sstexamples}[1]{
+      \item[Examples:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstsubsection
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  \sstexamplesubsection
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+
+%  \sstnotes
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstdiytopic
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
+
+%  \sstimplementationstatus
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+   }
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+% .
+% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+
+\begin{small}
+
+\sstroutine{
+   ARD\_GROUP
+}{
+   Obtain an ARD description from the environment
+}{
+   \sstdescription{
+      An ARD description is obtained from the environment using the
+      supplied parameter name and stored in a group identified by the
+      returned value of IGRP2. If the last character in the ARD
+      description is a minus sign ({\tt "}-{\tt "}) then the parameter value is
+      then cancelled and further ARD descriptions are obtained and
+      appended to the returned group. This process continues until an
+      ARD description is supplied which does not end with a minus
+      sign, or a null value is supplied.
+
+      If a GRP identifier for an existing group is supplied for IGRP1
+      then the group will be used as the basis for any modification
+      elements contained within the ARD descriptions obtained from the
+      environment. No checks are made for modification elements if the
+      symbolic constant GRP\_\_NOID is supplied for IGRP1.
+   }
+   \sstinvocation{
+      CALL ARD\_GROUP( PARAM, IGRP1, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         GRP identifier for a group to be used as a basis for
+         modification elements.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Returned)
+      }{
+         GRP identifier for the created group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         No checks are made on the syntax of the ARD description.
+
+         \sstitem
+         The returned GRP identifier (IGRP2) should be deleted using
+         GRP\_DELET when it is no longer needed.
+
+         \sstitem
+         If an error occurs either before or during this routine then
+         IGRP2 will be returned holding the symbolic value GRP\_\_NOID
+         (defined in include file GRP\_PAR).
+
+         \sstitem
+         An error is returned if the first value obtained for the
+         parameter is a null value.
+      }
+   }
+}
+\sstroutine{
+   ARD\_GRPEX
+}{
+   Store an ARD description in a GRP group
+}{
+   \sstdescription{
+      The supplied ARD description is appended to the group
+      identified by IGRP2. If the symbolic constant GRP\_\_NOID is
+      supplied for IGRP2 then a new group is first created and its
+      identifier is returned in IGRP2.
+
+      If a GRP identifier for an existing group is supplied for IGRP1
+      then the group will be used as the basis for any modification
+      elements contained within the ARD description. No checks are
+      made for modification elements if the symbolic constant GRP\_\_NOID
+      is supplied for IGRP1.
+   }
+   \sstinvocation{
+      CALL ARD\_GRPEX( DESC, IGRP1, IGRP2, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DESC = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The ARD description.
+      }
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         GRP identifier for a group to be used as a basis for
+         modification elements.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given and Returned)
+      }{
+         GRP identifier for the group holding the ARD description.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         Returned .TRUE. if the last non-blank character in the
+         supplied ARD description is a minus sign ({\tt "}-{\tt "}).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         No checks are made on the syntax of the ARD description.
+
+         \sstitem
+         The returned GRP identifier (IGRP2) should be deleted using
+         GRP\_DELET when it is no longer needed.
+
+         \sstitem
+         The symbolic constant GRP\_\_NOID is defined in the include file
+         GRP\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARD\_WORK
+}{
+   Convert an ARD description into a pixel mask
+}{
+   \sstdescription{
+      This routine returns an array which contains a positive value
+      for all pixels within the areas specified by a given ARD
+      description, and zero for all other pixels.
+   }
+   \sstinvocation{
+      CALL ARD\_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT, REGVAL,
+                     MASK, LBNDI, UBNDI, LBNDE, UBNDE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group holding the ARD description.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of dimensions in the mask array.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         The lower pixel index bounds of the mask array.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         The upper pixel index bounds of the mask array.
+      }
+      \sstsubsection{
+         TRCOEF( 0:NDIM, NDIM ) = REAL (Given)
+      }{
+         The co-efficients of the mapping from application co-ordinates
+         to pixel co-ordinates (see {\tt "}Notes:{\tt "} below).
+      }
+      \sstsubsection{
+         CONCAT = LOGICAL (Given)
+      }{
+         If .TRUE., then an \htmlref{INPUT}{KEY:INP} keyword is inserted at the start of
+         the ARD description so long as the ARD description does not
+         already contain any \htmlref{INPUT}{KEY:INP} keywords. If .FALSE., the ARD
+         description is left as supplied.
+      }
+      \sstsubsection{
+         REGVAL = INTEGER (Given and Returned)
+      }{
+         A positive integer to use to represent the first keyword in the ARD
+         description (excluding \htmlref{INPUT}{KEY:INP} keywords). An error is reported
+         if the value 1 is supplied. If the supplied value is negative
+         or zero, then the value used is one greater than the maximum
+         pixel value supplied in MASK (except that 2 is used if the
+         maximum mask value is 1 or less). On return, REGVAL holds one
+         more than the largest value used to represent any of the
+         \htmlref{keywords}{SEC:KEYW} in the ARD description.
+      }
+      \sstsubsection{
+         MASK( $*$ ) = INTEGER (Given and Returned)
+      }{
+         The mask array. Any negative values in the supplied array are
+         treated as zero.
+      }
+      \sstsubsection{
+         LBNDI( NDIM ) = INTEGER (Returned)
+      }{
+         The lower pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all internal
+         pixels. If there are no internal pixels in the returned mask,
+         each lower bound is returned greater than the corresponding
+         upper bound.
+      }
+      \sstsubsection{
+         UBNDI( NDIM ) = INTEGER (Returned)
+      }{
+         The upper pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all internal
+         pixels.
+      }
+      \sstsubsection{
+         LBNDE( NDIM ) = INTEGER (Returned)
+      }{
+         The lower pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all external
+         pixels. If there are no external pixels in the returned mask,
+         each lower bound is returned greater than the corresponding
+         upper bound.
+      }
+      \sstsubsection{
+         UBNDE( NDIM ) = INTEGER (Returned)
+      }{
+         The upper pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all external
+         pixels.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if the dimensionality of the ARD
+         description is different to that of the mask array (as specified
+         by argument NDIM).
+
+         \sstitem
+         If the first element of TRCOEF (i.e. TRCOEF(0,1) ) is supplied
+         equal to the symbolic value VAL\_\_BADR, then a unit mapping is
+         assumed (i.e. application co-ordinates are assumed to be the same
+         as pixel co-ordinates).
+
+         \sstitem
+         VAL\_\_BADR is defined in the PRIMDAT include file PRM\_PAR
+         (see \xref{SUN/39}{sun39}{}).
+      }
+   }
+}
+
+\end{small}
+
+
+\section{\label{APP:ERRORS}ARD Error Status Values}
+
+This appendix lists the STATUS values generated within the ARD package.
+These STATUS values are defined in the include file
+\verb+/star/include/ard_err+. Note, STATUS values generated by the
+packages listed in Appendix \ref{APP:PACK} may also be returned.
+
+\begin{description}
+\item [ARD\_\_ARGS]   -  Invalid argument list found for a keyword or statement.
+\item [ARD\_\_BADAR]  -  Invalid argument value found in an argument list.
+\item [ARD\_\_BADDM]  -  ARD description has an invalid dimensionality.
+\item [ARD\_\_BADFL]  -  An unrecognised field was found in an ARD description.
+\item [ARD\_\_BADIN]  -  An illegal value was supplied for \htmlref{ARD\_WORK}{ARD_WORK} argument 
+                         REGVAL.
+\item [ARD\_\_INDET]  -  Singular or indeterminate mapping or arguments encountered.
+\item [ARD\_\_INTER]  -  Internal programming error. Notify Starlink 
+                         User Support at RAL.
+\item [ARD\_\_MISOP]  -  \htmlref{operators}{SEC:OPER} found with no intervening \htmlref{keywords}{SEC:KEYW}.
+\item [ARD\_\_MSPAR]  -  Missing parenthesis.
+\item [ARD\_\_NOT2D]  -  A Keyword which is only valid in a 2-dimensional ARD 
+description has been found in an ARD description which is not 2-dimensional.
+\item [ARD\_\_SCALE]  -  Current mapping is not isotropic.
+\end{description}
+
+\section{\label{APP:PACK}Packages Called From Within ARD}
+
+The ARD package makes use of subroutines from the GRP library (see \xref{SUN/150}{sun150}{}), the
+SLALIB library (see \xref{SUN/67}{sun67}{}), the PSX library (see 
+\xref{SUN/121}{sun121}{}), the CHR library (see
+\xref{SUN/40}{sun40}{}) and the ERR library (see \xref{SUN/104}{sun104}{}). 
+
+\section{Acknowledgements}
+
+The current ARD system arose out of previous system produced by Peter Draper. I
+am grateful to the following people for useful suggestions: Peter Draper,
+Malcolm Currie, Richard Saxton, Rodney Warren-Smith and Grant Privet. 
+
+\section{Changes Introduced in Version 3 of this Document}
+The only changes are a clarification of the use of modification elements
+within ARD descriptions (section \ref{SEC:MOD}), and the manner in which
+multi-line ARD descriptions are split into separate elements by the
+carriage returns (section \ref{SEC:GRPCC}). No changes have been made to
+the code.
+
+
+\end{document}

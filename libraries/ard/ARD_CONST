@@ -1,0 +1,245 @@
+*+
+*  Name:
+*     ARD_CONST
+
+*  Purpose:
+*     Define private (internal) constants for the ARD_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants used
+*     internally by routines in the ARD_ system, which are not needed
+*     by external users of this system.
+
+*  Prior Requirements:
+*     The SAE_PAR include file should be included prior to this file, in
+*     order to define constants which are needed here.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-FEB-1994 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Constants:
+
+*  Instructions
+*  ============
+
+*  The number of instructions recognised by the ARD processor routine.
+      INTEGER ARD__NINST
+      PARAMETER ( ARD__NINST = 11 )
+
+*  An integer value used to represent the .AND. instruction.
+      INTEGER ARD__AND
+      PARAMETER ( ARD__AND = 1 )
+
+*  An integer value used to represent the .OR. instruction.
+      INTEGER ARD__OR
+      PARAMETER ( ARD__OR = 2 )
+
+*  An integer value used to represent the .XOR. instruction.
+      INTEGER ARD__XOR
+      PARAMETER ( ARD__XOR = 3 )
+
+*  An integer value used to represent the .EQV. instruction.
+      INTEGER ARD__EQV
+      PARAMETER ( ARD__EQV = 4 )
+
+*  An integer value used to represent the .NOT. instruction.
+      INTEGER ARD__NOT
+      PARAMETER ( ARD__NOT = 5 )
+
+*  An integer value used to represent the "Close brackets" instruction.
+      INTEGER ARD__CLS
+      PARAMETER ( ARD__CLS = 6 )
+
+*  An integer value used to represent the "Open brackets" instruction.
+      INTEGER ARD__OPN
+      PARAMETER ( ARD__OPN = 7 )
+
+*  An integer value used to represent the "End expression" instruction
+* .
+      INTEGER ARD__END
+      PARAMETER ( ARD__END = 8 )
+
+*  An integer value used to represent the "Load Supplied Mask"
+*  instruction.
+      INTEGER ARD__LSM
+      PARAMETER ( ARD__LSM = 9 )
+
+*  An integer value used to represent the "Load Keyword Region"
+*  instruction.
+      INTEGER ARD__LKR
+      PARAMETER ( ARD__LKR = 10 )
+
+*  An integer value used to represent the "Null" instruction.
+      INTEGER ARD__NUL
+      PARAMETER ( ARD__NUL = 11 )
+
+
+*  Operators
+*  =========
+
+*  The number of operator symbols which can be included within ARD
+*  descriptions (including synonyms).
+      INTEGER ARD__NOPSY
+      PARAMETER ( ARD__NOPSY = 8 )
+
+
+*  Keywords
+*  ========
+
+*  The number of keywords recognised by ARD
+      INTEGER ARD__NKEYW
+      PARAMETER ( ARD__NKEYW = 14 )
+
+*  An integer value used to represent the POINT keyword internally.
+      INTEGER ARD__POI
+      PARAMETER ( ARD__POI = 1 )
+
+*  An integer value used to represent the PIXEL keyword internally.
+      INTEGER ARD__PIX
+      PARAMETER ( ARD__PIX = 2 )
+
+*  An integer value used to represent the LINE keyword internally.
+      INTEGER ARD__LIN
+      PARAMETER ( ARD__LIN = 3 )
+
+*  An integer value used to represent the ROW keyword internally.
+      INTEGER ARD__ROW
+      PARAMETER ( ARD__ROW = 4 )
+
+*  An integer value used to represent the COLUMN keyword internally.
+      INTEGER ARD__COL
+      PARAMETER ( ARD__COL = 5 )
+
+*  An integer value used to represent the BOX keyword internally.
+      INTEGER ARD__BOX
+      PARAMETER ( ARD__BOX = 6 )
+
+*  An integer value used to represent the RECT keyword internally.
+      INTEGER ARD__REC
+      PARAMETER ( ARD__REC = 7 )
+
+*  An integer value used to represent the ROTBOX keyword internally.
+      INTEGER ARD__ROT
+      PARAMETER ( ARD__ROT = 8 )
+
+*  An integer value used to represent the POLYGON keyword internally.
+      INTEGER ARD__POL
+      PARAMETER ( ARD__POL = 9 )
+
+*  An integer value used to represent the CIRCLE keyword internally.
+      INTEGER ARD__CIR
+      PARAMETER ( ARD__CIR = 10 )
+
+*  An integer value used to represent the ELLIPSE keyword internally.
+      INTEGER ARD__ELL
+      PARAMETER ( ARD__ELL = 11 )
+
+*  An integer value used to represent the FRAME keyword internally.
+      INTEGER ARD__FRA
+      PARAMETER ( ARD__FRA = 12 )
+
+*  An integer value used to represent the WHOLE keyword internally.
+      INTEGER ARD__WHO
+      PARAMETER ( ARD__WHO = 13 )
+
+*  An integer value used to represent the INPUT keyword internally.
+      INTEGER ARD__INP
+      PARAMETER ( ARD__INP = 14 )
+
+*  Statements
+*  ==========
+
+*  The number of statements recognised by ARD
+      INTEGER ARD__NSTAT
+      PARAMETER ( ARD__NSTAT = 6 )
+
+*  An integer value used to represent the DIMENSION statement
+*  internally.
+      INTEGER ARD__DIM
+      PARAMETER ( ARD__DIM = 1 )
+
+*  An integer value used to represent the COEFFS statement
+*  internally.
+      INTEGER ARD__COE
+      PARAMETER ( ARD__COE = 2 )
+
+*  An integer value used to represent the OFFSET statement
+*  internally.
+      INTEGER ARD__OFF
+      PARAMETER ( ARD__OFF = 3 )
+
+*  An integer value used to represent the SCALE statement
+*  internally.
+      INTEGER ARD__SCA
+      PARAMETER ( ARD__SCA = 4 )
+
+*  An integer value used to represent the TWIST statement
+*  internally.
+      INTEGER ARD__TWI
+      PARAMETER ( ARD__TWI = 5 )
+
+*  An integer value used to represent the STRETCH statement
+*  internally.
+      INTEGER ARD__STR
+      PARAMETER ( ARD__STR = 6 )
+
+*  String lengths
+*  ===============
+
+*  Maximum length of an operator symbol (including dots).
+      INTEGER ARD__SZOPR
+      PARAMETER ( ARD__SZOPR = 5 )
+
+*  Maximum length of a keyword symbol.
+      INTEGER ARD__SZKEY
+      PARAMETER ( ARD__SZKEY = 7 )
+
+*  Maximum length of a statement symbol.
+      INTEGER ARD__SZSTA
+      PARAMETER ( ARD__SZSTA = 9 )
+
+*  Maximum length of an instruction description.
+      INTEGER ARD__SZINS
+      PARAMETER ( ARD__SZINS = 21 )
+
+
+*  Miscellaneous.
+*  =============
+
+*  Factor for converting degrees to radians
+      REAL ARD__DTOR
+      PARAMETER ( ARD__DTOR = 1.7453293E-2 )
+
+*  The maximum number of dimensions which ARD can handle.
+      INTEGER ARD__MXDIM
+      PARAMETER ( ARD__MXDIM = 7 )
+
+*  The maximum number of arguments required for a statement.
+      INTEGER ARD__MXSAR
+      PARAMETER ( ARD__MXSAR = ARD__MXDIM*( ARD__MXDIM + 1 ) )
+
+*  Minimum number of characters needed to uniquely identify a field
+*  label (operator, keyword or statement).
+      INTEGER ARD__SZABB
+      PARAMETER ( ARD__SZABB = 3 )
+
+*  The number of elements to be added to the operand or expression stack
+*  each time the size is increased.
+      INTEGER ARD__SZINC
+      PARAMETER ( ARD__SZINC = 20 )
+
+*.

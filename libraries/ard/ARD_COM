@@ -1,0 +1,122 @@
+*+
+*  Name:
+*     ARD_COM
+
+*  Purpose:
+*     Define ARD_ common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which describe the state of
+*     ARD. 
+
+*  Prior Requirements:
+*     The SAE_PAR and ARD_CONST include files should be included before
+*     this file, in order to define constants used here.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-FEB-1994 (DSB):
+*        Original version
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Operators
+*  =========
+*  The symbols used to represent each operator.
+      CHARACTER CMN_OPSYM( ARD__NOPSY )*( ARD__SZOPR ) 
+
+*  The actual length of each operator symbol (including dots).
+      INTEGER CMN_OPLEN( ARD__NOPSY )
+
+*  The integer codes for the instructions associated with each operator
+*  symbol.
+      INTEGER CMN_OPCOD( ARD__NOPSY )
+
+
+*  Instructions
+*  ============
+*  Change in size of evaluation stack as a result of each instruction.
+      INTEGER CMN_DSTK( ARD__NINST )
+
+*  If set to one, then an operand is needed to the left of the
+*  instruction.
+      INTEGER CMN_OPL( ARD__NINST )
+
+*  If set to one, then an operand is needed to the right of the
+*  instruction.
+      INTEGER CMN_OPR( ARD__NINST )
+
+*  The number of operands required by the instruction.
+      INTEGER CMN_OPS( ARD__NINST )
+
+*  Precedence (seen from the left).
+      INTEGER CMN_PRL( ARD__NINST )
+
+*  Precedence (seen from the right).
+      INTEGER CMN_PRR( ARD__NINST )
+
+*  Set to one if the instruction writes a value to the FILO evaluation
+*  stack.
+      INTEGER CMN_WRT( ARD__NINST )
+
+*  A string used to describe the instruction.
+      CHARACTER CMN_INSTR( ARD__NINST )*( ARD__SZINS )
+
+*  The number of arguments following the instruction in the evaluation
+*  stack.
+      INTEGER CMN_NARG( ARD__NINST )
+
+*  Keyword
+*  =======
+*  The symbols used to represent each keyword.
+      CHARACTER CMN_KWSYM( ARD__NKEYW )*( ARD__SZKEY ) 
+
+*  The actual length of each keyword.
+      INTEGER CMN_KWLEN( ARD__NKEYW )
+
+*  The number of arguments taken by each keyword.
+      INTEGER CMN_KWARG( ARD__NKEYW )
+
+
+*  Statements
+*  ==========
+*  The symbols used to represent each statement.
+      CHARACTER CMN_STSYM( ARD__NSTAT )*( ARD__SZSTA ) 
+
+*  The actual length of each statement.
+      INTEGER CMN_STLEN( ARD__NSTAT )
+
+*  The number of arguments taken by each statement.
+      INTEGER CMN_STARG( ARD__NSTAT )
+
+*  Misc.
+*  =====
+*  The co-efficients of the current mapping from pixel co-ordinates to
+*  user co-ordinates.
+      REAL CMN_INVRS( ARD__MXDIM*( ARD__MXDIM + 1 ) )
+
+*  Declare the common block /ARD_C1/, to hold non-character variables.
+      COMMON /ARD_C1/ CMN_DSTK, CMN_KWLEN, CMN_NARG, CMN_OPCOD,
+     :                CMN_OPL, CMN_OPLEN, CMN_OPR, CMN_OPS, CMN_PRL,
+     :                CMN_PRR, CMN_STARG, CMN_STLEN, CMN_WRT, CMN_KWARG,
+     :                CMN_INVRS
+
+*  Declare the common block /ARD_C2/, to hold character variables.
+      COMMON /ARD_C2/ CMN_OPSYM, CMN_KWSYM, CMN_STSYM, CMN_INSTR
+
+*  Ensure that common blocks are saved.
+      SAVE /ARD_C1/, /ARD_C2/
+
+*.

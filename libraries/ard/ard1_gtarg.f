@@ -1,0 +1,191 @@
+      SUBROUTINE ARD1_GTARG( ELEM, L, I, OK, MORE, VALUE, STATUS )
+*+
+*  Name:
+*     ARD1_GTARG
+
+*  Purpose:
+*     Read a numerical argument value from an argument list
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL ARD1_GTARG( ELEM, L, I, OK, MORE, VALUE, STATUS )
+
+*  Description:
+*     If the next non-blank character in the element is a closing
+*     parenthesis, then MORE and OK are both returned FALSE to indicate
+*     that the end of the argument list has been found. Otherwise, the
+*     string between character I and the next delimiter, closing
+*     parenthesis, or end of string (which ever comes first) is
+*     converted into a numerical value. I is returned pointing to the
+*     next character to be checked.
+
+*  Arguments:
+*     ELEM = CHARACTER * ( * ) (Given)
+*        An element of an ARD description.
+*     L = INTEGER (Given)
+*        The index of the last non-blank character in ELEM.
+*     I = INTEGER (Given and Returned)
+*        The index of the next character to be checked in ELEM.
+*     OK = LOGICAL (Returned)
+*        .TRUE. if an argument value was succesfully obtained. .FALSE.
+*        otherwise.
+*     MORE = LOGICAL (Returned)
+*        Returned .FALSE. if a closing parenthesis was found. .FALSE.
+*        otherwise.
+*     VALUE = REAL (Returned)
+*        The argument value (undefined if OK is returned .FALSE.).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-FEB-1994 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ARD_ERR'          ! ARD_ error constants
+
+*  Arguments Given:
+      CHARACTER ELEM*(*)
+      INTEGER L
+
+*  Arguments Given and Returned:
+      INTEGER I
+
+*  Arguments Returned:
+      LOGICAL OK
+      LOGICAL MORE
+      REAL VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER
+     :  DELIM,                   ! Offset from I to the next delimiter
+     :  END,                     ! Offset from I to end of argument
+     :  J,                       ! Index of last character in argument
+     :  PAREN                    ! Offset from I to next ")" character
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the returned flags.
+      OK = .FALSE.
+      MORE = .TRUE.      
+
+*  Find the next non-blank character in ELEM.
+ 10   CONTINUE
+      IF( ELEM( I : I ) .EQ. ' ' ) THEN
+         IF( I .LT. L ) THEN
+            I = I + 1
+            GO TO 10
+         END IF
+
+*  If a non-blank character is found...
+      ELSE
+
+*  If the first non-blank character is a closing parenthesis, the
+*  argument list is complete. Set the corresponding flag and increment
+*  the pointer to the next character.
+         IF( ELEM( I : I ) .EQ. ')' ) THEN
+            MORE = .FALSE.
+            I = I + 1
+
+*  If the first non-blank character is an argument delimiter, increment
+*  the pointer to the next character. The next pass through this routine
+*  will pick up any arguments following the delimiter.
+         ELSE IF( ELEM( I : I ) .EQ. ',' ) THEN
+            I = I + 1      
+
+*  If the first non-blank character is neither a delimiter nor a closing
+*  parenthesis, assume it is the first character of an argument value.
+         ELSE
+
+*  The last character in the argument value preceeds the next argument
+*  delimiter or closing parenthesis (which ever comes first).
+            DELIM = INDEX( ELEM( I : ), ',' )
+            PAREN = INDEX( ELEM( I : ), ')' )
+         
+            IF( DELIM .EQ. 0 ) THEN
+               END = PAREN
+
+            ELSE IF( PAREN .EQ. 0) THEN
+               END = DELIM
+
+            ELSE
+               END = MIN( PAREN, DELIM )
+
+            END IF
+
+*  If one or the other was found, calculate the index of the last
+*  character before the sooner of the two.
+            IF( END .GT. 0 ) THEN
+               J = END + I - 2
+
+*  If neither a closing parenthesis nor an argument delimiter was found,
+*  assume the argument value extends to (and includes) the last
+*  character in the string.
+            ELSE
+               J = L
+
+            END IF
+
+*  If the string is not null...
+            IF( J .GE. I ) THEN
+
+*  and if it is not blank...
+               IF( ELEM( I : J ) .NE. ' ' ) THEN
+
+*  attempt to convert it to a numerical value.
+                  CALL CHR_CTOR( ELEM( I : J ), VALUE, STATUS )
+
+*  Set the OK flag if a vlaue was obtained succesfully.
+                  OK = ( STATUS .EQ. SAI__OK )
+
+*  If the value was bad, display it.
+                  IF( STATUS .NE. SAI__OK ) THEN
+                     CALL MSG_SETC( 'DESC', ELEM( I : J ) )
+                     CALL ERR_REP( 'ARD1_GTARG_ERR1', 'Bad value '//
+     :                             '''^DESC''', STATUS )
+                  END IF
+
+*  Return the index of the next following the end of the argument value.
+                  I = J + 1
+
+*  Report an error if blank argument value was found.
+               ELSE
+                  STATUS = ARD__BADAR
+                  CALL ERR_REP( 'ARD1_GTARG_ERR2', 'Blank argument '//
+     :                          'found.', STATUS )
+               END IF
+
+*  Report an error if a null argument value was found
+            ELSE
+               STATUS = ARD__BADAR
+               CALL ERR_REP( 'ARD1_GTARG_ERR3', 'Null argument found.',
+     :                       STATUS )
+
+            END IF
+
+         END IF
+
+      END IF
+
+      END
