@@ -69,7 +69,7 @@
 *        The second score isn't calculated as it is the negative
 *        of the first score.
 *     20-APR-1998 (DSB):
-*        Error reported if NSET if bigger than CCD1_MXNDF.
+*        Error reported if NSET if bigger than CCD1__MXNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,14 +116,14 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error if NSET is too big.
-      IF( NSET .GT. CCD1_MXNDF ) THEN
+      IF( NSET .GT. CCD1__MXNDF ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'SZ', CCD1_MXNDF )
+         CALL MSG_SETI( 'SZ', CCD1__MXNDF )
          CALL ERR_REP( 'CCD1_ORVAR_1', 'The bin size is too big to '//
      :                 'use the selected estimator. Only the MEAN '//
      :                 'estimator may be used with bins containing '//
      :                 'more than ^SZ pixels.', STATUS )
-         GO TO 1
+         GO TO 999
       END IF
 
 *  Loop for all possible values of the ordered set size.
@@ -163,5 +163,7 @@
  3          CONTINUE
          END IF
  1    CONTINUE
+
+ 999  CONTINUE
+
       END
-* $Id$

@@ -108,7 +108,8 @@
 *           -  MEAN      -- Mean of the input data values
 *           -  MEDIAN    -- Median of the input data values
 *           -  SIGMA     -- A sigma clipped mean
-*        [MEDIAN]
+*        Note, only the MEAN method may be used with bins containing more
+*        than 100 values. [MEDIAN]
 *     P = NDF (Write)
 *        An output NDF holding percentage polarisation. A null value can be
 *        supplied if this output image is not required. [!]

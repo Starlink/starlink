@@ -51,7 +51,7 @@ kpg1_odrst.f kpg1_asrep.f ccd1_repc.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
-UNIX_OTHERS = polpack.news mk makefile polka.tex polmap.tex sunxxx.tex
+UNIX_OTHERS = polpack.news mk makefile polka.tex polmap.tex sun223.tex
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
