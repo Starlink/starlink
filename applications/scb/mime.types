@@ -1,0 +1,53 @@
+#+
+#  Name:
+#     mime.types
+#
+#  Purpose:
+#     Map filename extension to MIME types.
+#
+#  Description:
+#     This file is a minimal mime.types database for use with the SCB
+#     package.  The point of it is so that the scb.pl CGI program can 
+#     serve files which occur in Starlink package source sets as an
+#     appropriate MIME type.  Normally, the appropriate MIME type is 
+#     text/plain, which is the default; this is the case even when
+#     some other type might be indicated, for instance a .tex file,
+#     simply because when you're looking at packages using scb you 
+#     probably want to have the plain text if such a thing is intelligible.
+#
+#     Thus this file is intentionally a bit sparse: the entries in here 
+#     are those for which a suitable MIME type exists and is more 
+#     appropriate than seeing them in plain text.
+#
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#
+#  History:
+#     09-DEC-1999 (MBT):
+#        Initial revision.  Selectively pinched from the Apache version.
+#-
+
+application/pdf                 pdf
+application/postscript          ai eps ps
+application/x-dvi               dvi
+audio/mpeg                      mpga mp2 mp3
+audio/x-aiff                    aif aiff aifc
+audio/x-wav                     wav
+image/gif                       gif
+image/ief                       ief
+image/jpeg                      jpeg jpg jpe
+image/png                       png
+image/tiff                      tiff tif
+image/x-portable-anymap         pnm
+image/x-portable-bitmap         pbm
+image/x-portable-graymap        pgm
+image/x-portable-pixmap         ppm
+image/x-rgb                     rgb
+image/x-xbitmap                 xbm
+image/x-xpixmap                 xpm
+image/x-xwindowdump             xwd
+video/mpeg                      mpeg mpg mpe
+video/quicktime                 qt mov
+text/html                       html htm
+
+# $Id$
