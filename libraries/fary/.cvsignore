@@ -8,6 +8,7 @@ ssn*.log
 *.toc
 *.aux
 *.htx
+*.htx_tar
 autom4te.cache
 componentinfo.dtd
 config.log
