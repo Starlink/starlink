@@ -1,5 +1,43 @@
 1 GAIA major update
 
+  Release 2.8-0: 04 November 2004
+  ===============================
+
+  A major release of GAIA incorporating a new NDF cube handling facility.
+  GAIA will now detect 3D input data (ideally in NDF format) and display
+  slices along one of the extra dimensions. This may be animated.
+
+  You can also create a new image that is a combination of images between
+  a range of indices. The tool also shows the world coordinates along the
+  extra dimensions. All displayed and created images can be processed like
+  any other image, so you can perform photometry, region statistics etc.
+
+  The following minor issues have also been fixed.
+
+    - A print of the "whole image" now works when repeated.
+
+    - The astrometry tables now offer a button to project X,Y to RA,DEC
+      to complement the reset projection of RA,DEC to X,Y.
+
+    - Incompatabilities in the WCS are now ignored (older versions of 
+      AST cannot read newer encodings). This will naturally only effect
+      GAIA in future versions.
+
+    - XY profiles now display a local value when a row or column contains
+      no valid values (previous this displayed zero, which occasionally 
+      made the graphs scale to silly values). 
+
+    - Contouring toolbox bug fixed. If you entered an incorrect NDF name for
+      the second image, the error was never recovered and GAIA had to be
+      restarted. 
+
+    - Fixed problem with coordinate readout coupling when more than one
+      interactive slice or XY profile is being used.
+
+
+  Release 2.7-4: 28 April 2004
+  ============================
+
   This is a major release of GAIA incorporating two new automated astrometry
   toolboxes, a major re-write of the blink comparison toolbox and many
   changes and fixes.
@@ -93,38 +131,10 @@
      - Region statistics now also include values for the NDF variance
        component.
 
-  To try out GAIA for yourself type the following command:
 
-      %  gaia [image_file]
-
-  from the C-shell.
 
   If you have any comments or problems with GAIA then mail:
 
       gaia@star.rl.ac.uk
 
   Peter W. Draper (p.w.draper@durham.ac.uk)
-
-  28th April 2004
-
-  You can now view image slices of a cube and collapse a range
-  of slices into a single image.
-
-  A print of the "whole image" now works when repeated.
-
-  The astrometry tables now offer a button to project X,Y to RA,DEC
-  to complement the reset projection of RA,DEC to X,Y.
-
-  Incompatabilities in the WCS are now ignored (older versions of 
-  AST cannot read newer encodings). Not much use yet.
-
-  XY profiles now display a local value when a row or column contains
-  no valid values (previous this displayed zero, which occasionally 
-  made the graphs scale to silly values). 
-
-  Contouring toolbox bug fixed. If you entered an incorrect NDF name for the 
-  second image, the error was never recovered and GAIA had to be restarted.
-
-  Fixed problem with coordinate readout coupling when more than one interactive
-  slice or XY profile is being used.
-
