@@ -148,6 +148,8 @@ int main (int argc, char **argv)
 
     DviFile* dvi;
     try {
+	string mode72dpi = "mactrue"; // a mode listed as 72dpi
+	PkFont::setMissingFontMode(mode72dpi);
 	dvi = new DviFile(dviname, 72);
     } catch (DviError& e) {
 	cerr << "Can't open DVI file " << dviname
