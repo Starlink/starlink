@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.16  2002/01/15 00:12:58  timj
+#        RPT: Fix uninit warning and change dir search order
+#
 #        Revision 1.15  2001/12/13 21:42:29  timj
 #        Fix from RPT to use UT rather than HST
 #
@@ -162,8 +165,8 @@ my $idsk = -1;
 # Noise file variables:
 
 my $run = "";
-my $hst = "";
-my $ut =  "";
+my $hst = "00:00:00.0";
+my $ut =  "00:00:00.0";
 my (@runlist, @noiseentry, %bol, %xybol, @pw_point, @bw_point);
 my ($source, %min, %max, $varinfo, $iteminfo);
 my ($cutoff, $cutoff_line);
@@ -295,12 +298,13 @@ sub set_disks {
   push(@disk,File::Spec->curdir);
   if ($domain eq "jach" || $domain eq "Hilo") {
     push(@disk,"/net/luu/scubadata");
-    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
+    push(@disk,"/net/ieie/jcmtarchive");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+#    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
   } elsif ($domain eq "jcmt") {
     push(@disk,"/net/ieie/jcmtarchive");
-    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+#    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/luu/scubadata");
   } elsif ($^O eq 'MSWin32') {
     push(@disk, "\\\\Ola\\scuba-data\\");
