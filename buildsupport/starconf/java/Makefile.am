@@ -1,11 +1,16 @@
-JAVAC=@JAVAC@
-JAVA=@JAVA@
+## Process this file with automake to produce Makefile.in
 
-.SUFFIXES: .java .class
+java_DATA = starconf.jar
+# The following must match what's returned by
+# `starconf --show buildsupportjar`
+javadir = $(pkgdatadir)
+
+starconf.jar: GenerateDependencies.class Transformer.class
+	$(JAR) cf $@ *.class
+
+SUFFIXES = .java .class
 .java.class:
 	$(JAVAC) -source 1.4 $<
-
-GenerateDependencies.class: GenerateDependencies.java
 
 check: GenerateDependencies.class testdeps.xml testdeps.correct
 	rm -f testdeps.stdout testdeps.stderr
@@ -14,5 +19,3 @@ check: GenerateDependencies.class testdeps.xml testdeps.correct
 	diff testdeps.correct testdeps.stdout
 	rm -f testdeps.stdout testdeps.stderr
 
-clean:
-	rm -f *.class

@@ -15,6 +15,7 @@
 buildsupport=@prefix@
 buildsupportbin=@bindir@
 buildsupportdata=@pkgdatadir@
+buildsupportjar=@pkgdatadir@/starconf.jar
 ln_s="@LN_S@"
 versionint="@PACKAGE_VERSIONINT@"
 version="@PACKAGE_VERSION@"
@@ -27,7 +28,7 @@ progname=$0
 : ${STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@}
 
 # List all the variables which can be displayed with --show
-showvars="STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX buildsupport buildsupportbin buildsupportdata finder version versionint "
+showvars="STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX buildsupport buildsupportbin buildsupportdata buildsupportjar finder version versionint "
 
 # Argument parsing
 if test $# -gt 0; then

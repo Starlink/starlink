@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 
 /**
  * Generates a Makefile fragment containing the dependencies expressed
- * in a componentinfo XML file.
+ * in a componentinfo XML file.  For use only within the project, as
+ * its behaviour might change with little warning.
  *
  * <p>Usage:
  * <pre>
@@ -33,7 +34,10 @@ import java.util.regex.Pattern;
  * <dt><code>--flatdeps=filename</code>
  * <dd>Write an XML file containing just the flattened build and
  * sourceset dependencies.  There is no pre-defined DTD for this, but
- * the structure should be obvious, and it will be well-formed.
+ * the structure should be obvious, and it will be well-formed.  The
+ * structure of this is as yet provisional, and if there is further
+ * derived information which it would be useful to generate here,
+ * both the structure of the file and the name of this option might change.
  * <dt><code>--verbose</code>
  * <dd>Turn on chattering.  Lots of it.
  * </dl>
@@ -471,14 +475,21 @@ public class GenerateDependencies {
 
     /**
      * Make an XML file containing the flattened dependencies of each
-     * component.  This is very similar in its logic to {@link
-     * makeMakefile} -- see that routine for discussion.
+     * component.  This is very similar in its logic to
+     * {@link makeMakefile} -- see that routine for discussion.
      */
     private static void makeFlatdeps(PrintStream flatdeps) {
         String[] header = {
             "<?xml version=\"1.0\"?>",
-            "<!-- All dependencies, flattened -->",
-            "<flatdependencies>",
+            "<!-- Other derived information about components.",
+            "",
+            "     This file is not an instance of a DTD, and its structure",
+            "     is as yet provisional: use with caution.",
+            "",
+            "     The dependencies elements below contain the full",
+            "     dependencies of the given components, flattened.",
+            "-->",
+            "<extrainfo>",
             "",
         };
         for (int i=0; i<header.length; i++)
@@ -510,7 +521,8 @@ public class GenerateDependencies {
                 // implies ssdeps is empty, too
                 flatdeps.println("<!-- no dependencies for " + c + " -->");
             } else {
-                flatdeps.println("<dependencies component='" + c + "'>");
+                flatdeps.println("<component id='" + c + "'>");
+                flatdeps.println("<dependencies>");
                 if (! ssdeps.isEmpty())
                     flatdeps.println("<sourceset>"
                                      + showSet(ssdeps, "", "")
@@ -519,11 +531,12 @@ public class GenerateDependencies {
                                  + showSet(builddeps,"","")
                                  + "</build>");
                 flatdeps.println("</dependencies>");
+                flatdeps.println("</component>");
             }
             flatdeps.println();
         }
 
-        flatdeps.println("</flatdependencies>");
+        flatdeps.println("</extrainfo>");
 
         return;
     }

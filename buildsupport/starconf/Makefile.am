@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = java
+
 bin_SCRIPTS = starconf starconf-validate starconf-finder
 pkgdata_DATA = \
 	componentinfo.dtd \
@@ -73,8 +75,3 @@ install-exec-local:
 	      done; \
 	    fi ); \
 	fi; true
-
-## It would be good to include making GenerateDependencies.class in
-## here, but that would require finessing automake, which demands that
-## Java files be guilt with gcj.  At least, it would be good to
-## install the build class files from subdirectory java/.
