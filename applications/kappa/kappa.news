@@ -5,6 +5,9 @@
    - Modified COLLAPSE so that output variances can be created for any
    size of input array when using the median estimator.
 
+   - Bug in APERADD has been fixed which caused the value of the DIAM 
+   parameter to be used as the radius of the aperture instead of the diameter.
+
    For complete details of all changes, see the "Release Notes" appendix in 
    SUN/95. 
 
