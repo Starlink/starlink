@@ -2436,6 +2436,8 @@ sub handle_monoliths
                          TRUE,
                          'ALINK');
 
+      my $linkmagic = derive_linkmagic ($xlink);
+
       # If the resulting program lies into a subdirectory,
       # make sure this directory will exist.
       my $dirstamp = require_build_directory_maybe ($one_file);
@@ -2446,7 +2448,8 @@ sub handle_monoliths
                                        XPROGRAM => $xname,
                                        XLINK => $xlink,
                                        DIRSTAMP => $dirstamp,
-                                       EXEEXT => '$(EXEEXT)');
+                                       EXEEXT => '$(EXEEXT)',
+                                       LINKMAGIC => $linkmagic);
 
       if ($seen_libobjs || $seen_global_libobjs)
         {
@@ -2828,9 +2831,9 @@ sub derive_linkmagic ($)
   # Determine any link magic required.  Return a $(lang_lang_linker_MAGIC)
   # variable or blank.
   my ($xlink) = @_;
-  my $linkmagic;
+  my $linkmagic = '';
 
-  if ($xlink ne 'LINK')
+  if ($xlink ne 'LINK' && $xlink ne 'ALINK')
     {
       # We're about to use a non-C linker.  Do we need any other
       # linking magic?  In the case of C and Fortran on the Mac,
@@ -2855,10 +2858,6 @@ sub derive_linkmagic ($)
             . uc(join('_', @langlist) . '_' . $xlink . '_magic')
             . ')';
         }
-    }
-  else
-    {
-      $linkmagic = '';
     }
 
   return $linkmagic;
