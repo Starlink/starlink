@@ -2,7 +2,7 @@
       SUBROUTINE SCULIB_3POS_DECONV (N_EXPOSURES, N_INTEGRATIONS,
      :  N_MEASUREMENTS, DEMOD_POINTER, N_BOL, N_POS, IN_DATA,
      :  IN_VARIANCE, IN_QUALITY, SAMPLE_DX, BEAM_SEP, 
-     :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
+     :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, BADBIT, STATUS)
 *    Description :
 *     This routine deconvolves the 3 position chopped beam response from the
 *     individual scans of a SCUBA raster map. 
@@ -41,7 +41,7 @@
 *           the measured data
 *     IN_VARIANCE (N_BOL, N_POS)  = REAL (Given)
 *           the variance on IN_DATA
-*     IN_QUALITY (N_BOL, N_POS)   = INTEGER (Given)
+*     IN_QUALITY (N_BOL, N_POS)   = BYTE (Given)
 *           the quality on IN_DATA
 *     SAMPLE_DX                   = REAL (Given)
 *           the measurement spacing along the scan (arcseconds)
@@ -51,7 +51,7 @@
 *           the deconvolved data
 *     OUT_VARIANCE (N_BOL, N_POS) = REAL (Returned)
 *           the variance on OUT_DATA
-*     OUT_QUALITY (N_BOL, N_POS)  = INTEGER (Returned)
+*     OUT_QUALITY (N_BOL, N_POS)  = BYTE (Returned)
 *           the quality on OUT_DATA
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
@@ -79,14 +79,15 @@
       INTEGER N_POS
       REAL    IN_DATA (N_BOL, N_POS)
       REAL    IN_VARIANCE (N_BOL, N_POS)
-      INTEGER IN_QUALITY (N_BOL, N_POS)
+      BYTE IN_QUALITY (N_BOL, N_POS)
       REAL    SAMPLE_DX
       REAL    BEAM_SEP
+      BYTE    BADBIT
 *    Import-Export :
 *    Export :
       REAL    OUT_DATA (N_BOL, N_POS)
       REAL    OUT_VARIANCE (N_BOL, N_POS)
-      INTEGER OUT_QUALITY (N_BOL, N_POS)
+      BYTE OUT_QUALITY (N_BOL, N_POS)
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -131,6 +132,13 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
             DO EXPOSURE = 1, N_EXPOSURES
+
+
+               CALL MSG_SETI('NI', INTEGRATION)
+               CALL MSG_SETI('NE', EXPOSURE)
+
+               CALL MSG_OUT(' ','3POS_DECONV: Processing exposure ^NE'//
+     :              ' of integration ^NI', STATUS)
 
                CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, 1,
      :           N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
@@ -208,13 +216,13 @@
      :                 SCRATCH1_VARIANCE, SCRATCH1_QUALITY, 
      :                 SY_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :                 SCRATCH2_DATA, SCRATCH2_VARIANCE, 
-     :                 SCRATCH2_QUALITY, STATUS)
+     :                 SCRATCH2_QUALITY, BADBIT, STATUS)
 
                      CALL SCULIB_CONVOLVE (SCRATCH2_DATA,
      :                 SCRATCH2_VARIANCE, SCRATCH2_QUALITY, 
      :                 AS_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :                 SCRATCH1_DATA, SCRATCH1_VARIANCE, 
-     :                 SCRATCH1_QUALITY, STATUS)
+     :                 SCRATCH1_QUALITY, BADBIT, STATUS)
 
 *  copy the convolved data from the output scratch array to the appropriate
 *  position in the output array
