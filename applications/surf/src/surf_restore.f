@@ -24,15 +24,29 @@
 *     observations.
 
 *  Usage:
-*     restore IN OUT
+*     restore in out chop
 
 *  ADAM Parameters:
 *     CHOP = INTEGER (Read)
-*        Chop throw in arcseconds.
+*        Chop throw in arcseconds. The defualt chop throw is read from
+*        the FITS header of the input file.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
+*     MSG_FILTER = CHAR (Read)
+*        Message filter level. Default is NORM.
 *     OUT = NDF (Write)
 *        The name of the output file to contain the processed data.
+
+*  Examples:
+*     restore input output \
+*        Restore input.sdf to output.sdf using the default chop throw.
+*     restore resw restore 40.2
+*        Restore resw.sdf to restore.sdf using a chop throw of 40.2 
+*        arcseconds.
+
+*  Notes:
+*     Uses the Emerson, Klein and Haslam algorithm (1979, A&A, 76, 92).
+
 
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
