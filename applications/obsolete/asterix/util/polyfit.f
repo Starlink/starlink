@@ -73,7 +73,7 @@
 *
       CHARACTER*80           TEXT (5)        ! History file message
       CHARACTER*12           NAME
-      REAL                   COEFF(12)
+      REAL                   PARAM(12)
 
       INTEGER                AXPTR           ! Pointers to mapped axis values
       INTEGER                BLEN            ! No. of fits to be performed
@@ -288,13 +288,13 @@
 *      Loop over NDIM-1 dimensions, performing 1 d fits
         CALL POLYFIT_LOOPWT (POLY, NDEG, NDIM, LDIMS(1), BLEN,
      :        %VAL(AXPTR), %VAL(NBPTR), %VAL(WTPTR), %VAL(DPTR),
-     :                                           COEFF,  STATUS)
+     :                                           PARAM,  STATUS)
 
       ELSE
 
 *      Loop over NDIM-1 dimensions, performing 1 d fits
         CALL POLYFIT_LOOPNOWT( POLY, NDEG, NDIM, LDIMS(1), BLEN,
-     :                         %VAL(AXPTR), %VAL(DPTR),COEFF,STATUS)
+     :                         %VAL(AXPTR), %VAL(DPTR),PARAM,STATUS)
 
       END IF
 
@@ -310,7 +310,7 @@
         NAME='FUNC_PAR'
         DO I=1,MIN(6,NDEG+1)
           WRITE(NAME(9:9),'(I1)') I
-          CALL GCB_SETR(NAME,COEFF(I),STATUS)
+          CALL GCB_SETR(NAME,PARAM(I),STATUS)
         ENDDO
         CALL GCB_FSAVE(IFID,STATUS)
         CALL GCB_DETACH(STATUS)
@@ -430,7 +430,7 @@
 
 *+  POLYFIT_LOOPWT - Loop over dataset performing 1d weighted fits
       SUBROUTINE POLYFIT_LOOPWT (POLY, NDEG, NDIM, NDAT, BLEN, AXIS,
-     :                                BAD, WEIGHT, DATA, COEFF,STATUS)
+     :                                BAD, WEIGHT, DATA, PARAM,STATUS)
 *    Description :
 *     Loops ofer n dimensioal dataset performing 1d fits
 *    Environment parameters :
@@ -460,7 +460,7 @@
       REAL                   DATA(NDAT, BLEN)   ! Data array on exit contains either
                                                 ! original data - fit (POLY = .FALSE.)
                                                 ! or fit (POLY = .TRUE.)
-      REAL                   COEFF(*)       ! Coeffs of polynomial fitted to normalized axis
+      REAL                   PARAM(*)       ! Coeffs of polynomial fitted to normalized axis
 *    Status :
       INTEGER STATUS
 *
@@ -480,6 +480,7 @@
 
       REAL                   AXMAX, AXMIN    ! Max & min axis values
       REAL                   C1, C2, FIT     ! Used in calculating fit coefficients to real axis
+      REAL COEFF(12)
 *-
 
 *    Check status
@@ -529,6 +530,8 @@
 
           END DO
 
+          PARAM(B+1)=FIT
+
           IF (B .EQ. 0) THEN
             CALL MSG_SETR ('FIT', FIT)
             CALL MSG_SETI ('N', B)
@@ -564,7 +567,7 @@
 
 *+  POLYFIT_LOOPNOWT - Loop over dataset performing 1d unweighted fits
       SUBROUTINE POLYFIT_LOOPNOWT (POLY, NDEG, NDIM, NDAT, BLEN, AXIS,
-     :                                            DATA,COEFF, STATUS)
+     :                                            DATA,PARAM, STATUS)
 *    Description :
 *     Loops ofer n dimensioal dataset performing 1d fits
 *    Environment parameters :
@@ -592,7 +595,7 @@
       REAL                   DATA(NDAT, BLEN)   ! Data array on exit contains either
                                                 ! original data - fit (POLY = .FALSE.)
                                                 ! or fit (POLY = .TRUE.)
-      REAL                   COEFF(*)       ! Coeffs of polynomial fitted to normalized axis
+      REAL                   PARAM(*)       ! Coeffs of polynomial fitted to normalized axis
 *    Status :
       INTEGER STATUS
 *
@@ -612,6 +615,7 @@
 
       REAL                   AXMAX, AXMIN    ! Max & min axis values
       REAL                   C1, C2, FIT     ! Used in calculating fit coefficients to real axis
+      REAL COEFF(12)
 *-
 
 *    Check status
@@ -657,6 +661,8 @@
      :                * ((C2 / C1)**(C - B) ))
 
           END DO
+
+          PARAM(B+1)=FIT
 
           IF (B .EQ. 0) THEN
             CALL MSG_SETR ('FIT', FIT)
