@@ -91,7 +91,12 @@ Took opportunity of a bug-fix release of the software to make
 miscellaneous minor edits to the documentation.
 
 <distribution string="0.9-7" date='05-Feb-2001' author='ng' versionid='v0-9-7'>
-The program now generates XPM bitmaps, too, and I noted this where appropriate.
+The program now generates XPM bitmaps, too, and I noted this where
+appropriate.</px></distribution>
+
+<change date="02-Apr-2001" author=ng versionid='v0-9-7-1'>
+<px>Minor documentation updates.</px>
+</change>
 
 </history>
 
@@ -629,6 +634,10 @@ Added description of setting DVI2BITMAP_PK_PATH automatically.
 Added discussion of the `make test' script, and clarified (I hope)
 description of how to set DVI2BITMAP_PK_PATH.
 </update>
+<update versionid="v0-9-7-1">
+<px>Included a reference to the RedHat config problem, pointing
+towards the next section.</px>
+</update>
 
 <p>The program searches in up to three places for fonts.
 
@@ -734,6 +743,11 @@ using the configuration switch <code/&ddash;enable-fontgen>.
 -->
 
 <subsubsect id=usage.fonts.notfinding>Not finding fonts
+<update versionid="v0-9-7-1">
+<px>Slightly expanded the reference to the RedHat config problem,
+including a cross-reference.</px>
+</update>
+</subhead>
 
 <p>It can sometimes happen that <code/dvi2bitmap> fails to find fonts,
 successfully calls <code/mktexpk> to build them, but then <em/still>
@@ -910,6 +924,9 @@ to live.
 <p>You can customise the program using flags to the
 <code>./configure</code> command:
 <dl>
+<update versionid="v0-9-7-1">
+<px>Corrected the URL for the Graphics File Format FAQ.</px>
+</update>
 
 <dt><code/&ddash;with-kpathsea> and <code/&ddash;without-kpathsea>
 
