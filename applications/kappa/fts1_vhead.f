@@ -1,3 +1,4 @@
+
       SUBROUTINE FTS1_VHEAD( BUFFER, FIXED, CARD, STATUS )
 *+
 *  Name:
@@ -73,6 +74,12 @@
 *        Modified to retain trailing spaces within string values.
 *        Fixed bug which caused random character strings to be used as
 *        comments for string keywords if no comment was supplied in the header.
+*     2-NOV-2000 (DSB):
+*        Modified to accept:
+*         - blank keyword values
+*         - missing equals sign (but only iof the value is blank)
+*        Also fixed bug which caused comments to be lost if they abut the
+*        keyword value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,8 +170,10 @@
       INTEGER NCSTQ              ! Column from where to start search
                                  ! for a trailing quote for a FITS
                                  ! character value
+      LOGICAL NOEQS              ! True if the equals sign should be omitted
       INTEGER NWORD              ! Number of words in value (fixed at 1)
       REAL RVAL                  ! Holds real value
+      INTEGER SLASH              ! Index of comment character
       INTEGER STARTW             ! Column position of the start of the
                                  ! header value (w.r.t. = sign)
       LOGICAL TRAILQ             ! True when value has a trailing quote
@@ -180,7 +189,8 @@
 *  Initialise the validated card.
       CARD = ' '
       VALID = .TRUE.
-
+      NOEQS = .FALSE.
+       
 *  Validate the length of the card.
 *  ================================
 
@@ -295,12 +305,32 @@
 *  Locate the first equals sign.
             COLEQS = INDEX( BUFFER, '=' )
 
-*  If the equals sign is absent, insert one.
+*  If the equals sign is absent, the card is valid only if there is no
+*  keyword value.
             IF ( COLEQS .EQ. 0 ) THEN
-               VALID = .FALSE.
-               CALL MSG_OUTIF( MSG__NORM, 'FITS_VHEAD_NOEQS',
-     :           'The header card has no equals sign.', STATUS )
                COLEQS = 9
+
+*  Find the first comment character (slash) following column 9. Use one more 
+*  than the length of the string if no slash is found.
+               SLASH = INDEX( BUFFER( COLEQS: ), '/' )
+               IF( SLASH .EQ. 0 ) THEN
+                  SLASH = NCBUFF + 1
+               ELSE
+                  SLASH = COLEQS + SLASH - 1
+               END IF
+
+*  If there are non-blank characters between column 9 and the slash, we
+*  need to insert an equals sign.
+               IF( BUFFER( COLEQS : SLASH - 1 ) .NE. ' ' ) THEN
+                  VALID = .FALSE.
+                  CALL MSG_OUTIF( MSG__NORM, 'FITS_VHEAD_NOEQS',
+     :              'The header card has no equals sign.', STATUS )
+
+*  If the value strign is blank, we do not need an equals in the returned
+*  card.
+               ELSE
+                  NOEQS = .TRUE.
+               END IF
 
 *  Report if the equals sign is misplaced.
             ELSE IF ( COLEQS .NE. 9 ) THEN
@@ -469,17 +499,22 @@
                CALL CHR_DCWRD( BUFFER( COLEQS + 1: ), 1, NWORD,
      :                         STARTW, ENDW, FITDAT, LSTAT )
 
+*  Store safe values if no words were found.
+               IF( NWORD .EQ. 0 ) THEN
+                  STARTW = 0
+                  ENDW = 0
+                  FITDAT = ' '
+               END IF
+
 *  Allow for any trailing comment delimiter abutted to the value by
 *  setting the value to blanks from this point in the extract word.
 *  The column positions are with respect to the equals sign.
                NCC = INDEX( FITDAT, '/' )
                IF ( NCC .EQ. 0 ) THEN
                   NCOMS = ENDW + 1
-
                ELSE
                   FITDAT( NCC: ) = ' '
-                  NCOMS = NCC + STARTW
-
+                  NCOMS = NCC + STARTW - 1
                END IF
 
 *  Shift the origin of the character pointer used to start the search
@@ -586,7 +621,11 @@
                CLEN = CHR_LEN( CDUMMY )
 
 *  Create the start of the FITS header.
-               CARD = FITNAM//'= '
+               IF( NOEQS ) THEN
+                  CARD = FITNAM//'  '
+               ELSE
+                  CARD = FITNAM//'= '
+               END IF
 
 *  Define the column where the value is to start in the rewritten
 *  header card.  Right justify the value to column 30 for the
@@ -655,6 +694,16 @@
 *  Create the output card by appending the value and as much of the
 *  comment as will fit into the header card.
                         CALL CHR_APPND( CDUMMY, CARD, CPOS )
+                        IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                           CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                        END IF
+
+*  Check for a blank value
+*  -----------------------
+                     ELSE IF( CDUMMY .EQ. ' '  ) THEN
+
+*  Create the output card by appending as much of the comment as will fit 
+*  into the header card.
                         IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                            CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
                         END IF
