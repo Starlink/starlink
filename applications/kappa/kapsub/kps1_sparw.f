@@ -1,8 +1,8 @@
       SUBROUTINE KPS1_SPARW( CFRM, MAP,  DIM1, DIM2, ARRAY, LBND, 
      :                       ISIZE, RANGE, GAUSS, NXY, POS, LOGF, FD,
-     :                       PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, IDS, 
-     :                       GOTIDS, AXISR, THETA, FWHM, GAMMA, WIDTH, 
-     :                       SIG, PX, PY, STATUS )
+     :                       PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, PAMP,
+     :                       IDS, GOTIDS, NM, AXISR, THETA, FWHM, GAMMA, 
+     :                       WIDTH, SIG, PX, PY, AMP, STATUS )
 *+
 *  Name:
 *     KPS1_SPARW
@@ -17,8 +17,8 @@
 *  Invocation:
 *     CALL KPS1_SPARW( CFRM, MAP, DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE,
 *                      GAUSS, NXY, POS, LOGF, FD, PNMIN, PAXISR, PORIEN, 
-*                      PFWHM, PGAMMA, IDS, GOTIDS, AXISR, THETA, FWHM, 
-*                      GAMMA, WIDTH, SIG, PX, PY, STATUS )
+*                      PFWHM, PGAMMA, PAMP, IDS, GOTIDS, NM, AXISR, THETA,
+*                      FWHM, GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
 
 *  Description:
 *     This routine calls a number of subroutines to find a set of 
@@ -80,12 +80,18 @@
 *     PGAMMA = CHARACTER * ( * ) (Given)
 *        The name of an output parameter which will be used to store
 *        the exponent in the radial star profile.
+*     PAMP = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the fitted amplitude of hte first usable star.
 *     IDS( NXY ) = INTEGER (Given)
 *        An array of integer identifiers for the supplied positions. Only
 *        accessed if GOTIDS is .TRUE.
 *     GOTIDS = LOGICAL (Given)
 *        Does the IDS array contain usable position identifiers? If not,
 *        position identifiers 1, 2, 3, ... NXY will be used.
+*     NM = LOGICAL (Given)
+*        Should the PSF be normalized to unity? Otherise it is normalized
+*        to the fitted peak value of the first usable star.
 *     AXISR = REAL (Returned)
 *        The axis ratio of the star images.
 *     THETA = REAL (Returned)
@@ -106,6 +112,9 @@
 *        The X pixel co-ordinate of the first fitted star.
 *     PY = REAL (Returned)
 *        The Y pixel co-ordinate of the first fitted star.
+*     AMP = REAL (Returned)
+*        The peak amplitude in the fitted PSF, normalised according to
+*        the value supplied for argument NM.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -150,6 +159,8 @@
 *        PNOUTT, and PNFONT.
 *     20-SEP-1999 (DSB):
 *        Big changes for AST version.
+*     2-MAY-2000 (DSB):
+*        Added arguments PAMP, NM and AMP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,8 +195,10 @@
       CHARACTER * ( * ) PORIEN
       CHARACTER * ( * ) PFWHM
       CHARACTER * ( * ) PGAMMA
+      CHARACTER * ( * ) PAMP
       INTEGER IDS( NXY )
       LOGICAL GOTIDS
+      LOGICAL NM
 
 *  Arguments Returned:
       REAL AXISR
@@ -196,6 +209,7 @@
       REAL SIG( NXY, 5 )
       REAL PX
       REAL PY
+      REAL AMP
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -253,7 +267,7 @@
       INTEGER PDW                ! Pointer to the double precision workspace 
       LOGICAL GOTSKY             ! Is the current Frame a SkyFrame?
       LOGICAL SWAP               ! SkyFrame axes swapped?
-      REAL AMP                   ! Gaussian amplitude
+      REAL AMP1                  ! Gaussian amplt. of first fitted star profile
       REAL ANGOUT                ! Axis orientation in current Frame      
       REAL AXROUT                ! Axis ratio in current Frame      
       REAL BACK                  ! Background level
@@ -267,6 +281,7 @@
       REAL STAAXS                ! Star axis ratio
       REAL STASIG                ! Star sigma
       REAL STATHE                ! Star orientation
+      REAL YSCALE                ! Y axis scale factor for plot
 *.
 
 *  Check the inherited global status.
@@ -668,14 +683,24 @@
      :                     %VAL( MRPTR ), %VAL( LLPTR ), %VAL( NPPTR ),
      :                     %VAL( DAPTR ), %VAL( IAPTR ), %VAL( NAPTR ),
      :                     %VAL( PVPTR ), %VAL( PRPTR ), %VAL( PWPTR ),
-     :                     FWHM, AMP, BACK, SIGMA, GAMMA, STATUS )
+     :                     FWHM, AMP, BACK, SIGMA, GAMMA, AMP1, STATUS )
 
 *  Optionally plot the mean radial profile. 
 *  ========================================
 
+*  Set the scale factor for the Y axis to give either a peak value of 1.o
+*  or a peak value equal to the first usable star.
+         IF( NM ) THEN
+            YSCALE = 1.0/AMP
+         ELSE
+            YSCALE = AMP1/AMP
+         END IF
+
+*  Plot the profile.
          CALL KPS1_PSPLT( NBIN2, SIGMA, AXISR, AMP, GAMMA, BACK, SCALE,
-     :                    FWHMUN, PNMIN, %VAL( PVPTR ), %VAL( PRPTR ), 
-     :                    %VAL( PWPTR ), %VAL( PDW ), STATUS )
+     :                    YSCALE, FWHMUN, PNMIN, %VAL( PVPTR ), 
+     :                    %VAL( PRPTR ), %VAL( PWPTR ), %VAL( PDW ), 
+     :                    STATUS )
 
 *  Tidy up the workspace.
          CALL PSX_FREE( MOPTR, STATUS )
@@ -689,6 +714,9 @@
          CALL PSX_FREE( PVPTR, STATUS )
          CALL PSX_FREE( PWPTR, STATUS )
          CALL PSX_FREE( PDW, STATUS )
+
+*  Return the scaled peak amplitude.
+         AMP = AMP*YSCALE
 
 *  Report results to the user and to the optional log file. These have
 *  only been calculated if FWHM is not undefined.
@@ -706,11 +734,13 @@
                CALL FIO_WRITE( FD, ' ', STATUS )
                CALL FIO_WRITE( FD, BUFFER( :21 ), STATUS )
             END IF
+
          END IF
 
 *  Now write them to the output parameters.
          CALL PAR_PUT0R( PFWHM, FWHM*SCALE, STATUS )
          CALL PAR_PUT0R( PGAMMA, GAMMA, STATUS )
+         CALL PAR_PUT0R( PAMP, AMP1, STATUS )
 
       ELSE
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR

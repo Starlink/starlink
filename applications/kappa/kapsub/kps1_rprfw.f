@@ -3,10 +3,10 @@
      :                        RSCL2, NBIN1, NBIN2, BINPTS, DMODE, R,
      :                        LSTART, NPTS, DATA, IADR, NXTADR, PROFIL,
      :                        PROFR, PROFWT, FWHM, AMP, BACK, SIGMA,
-     :                        GAMMA, STATUS )
+     :                        GAMMA, AMP1, STATUS )
 *+
 *  Name:
-*     KPS1_RPRFW
+*     KPS1_RPRF<X>
 
 *  Purpose:
 *     Fits a radial profile to a set of star images.
@@ -15,11 +15,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_RPRFW( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
+*     CALL KPS1_RPRF<X>( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
 *                      RANGE, GAUSS, NXY, POS, WT, RSCALE, RSCL2, NBIN1,
 *                      NBIN2, BINPTS, DMODE, R, LSTART, NPTS, DATA,
 *                      IADR, NXTADR, PROFIL, PROFR, PROFWT, FWHM, AMP,
-*                      BACK, SIGMA, GAMMA, STATUS )
+*                      BACK, SIGMA, GAMMA, AMP1, STATUS )
 
 *  Description:
 *     This routine combines the profiles of a number of stars whose
@@ -104,6 +104,9 @@
 *     GAMMA = REAL (Returned)
 *        Star radial-profile parameter, gamma, of the fitted mean
 *        point-spread function.
+*     AMP1 = REAL (Returned)
+*        The Gaussian amplitude of the fitted point-spread function for
+*        the first usable star.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -139,6 +142,8 @@
 *        Flipped the order of NXY and POS.
 *     20-SEP-1999 (DSB):
 *        Swapped order of POS indices and made it _DOUBLE for use with AST.
+*     2-MAY-2000 (DSB):
+*        Added argument AMP1.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,6 +193,7 @@
       REAL BACK
       REAL SIGMA
       REAL GAMMA
+      REAL AMP1
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -296,6 +302,10 @@
          PROFIL( BIN ) = 0.0
          PROFWT( BIN ) = 0.0
       END DO
+
+*  Indicate that the fitted amplitude of the first usable star is not yet
+*  known.
+      AMP1 = VAL__BADR 
 
 *  Consider each star which has positive weight.
       DO STAR = 1, NXY
@@ -433,6 +443,9 @@
                AMP = REAL( SUMW * SUMDF - SUMD * SUMF ) / DET
                BACK = REAL( SUMF2 * SUMD - SUMDF * SUMF ) / DET
 
+*  Save the fitted amplitude of the first usable star.
+               IF( AMP1 .EQ. VAL__BADR ) AMP1 = AMP
+
 *  Insert the star profile into the mean-profile bins.
                DO BIN = 0, NBIN1 - 1
 
@@ -479,7 +492,7 @@
       END DO
 
 *  Set initial estimates of profile parameters and call routine to
-*  obtain a full least-squares fit to the profile.
+*  obtain a full least-squares fit to the profile. 
       AMP = 1.0
       BACK = 0.0
       GAMMA = 2.0

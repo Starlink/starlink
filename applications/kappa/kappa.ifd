@@ -14151,6 +14151,15 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter amp1 {
+            access WRITE
+            type _REAL
+            vpath DEFAULT
+            prompt {Object to contain the amplitude of the first star}
+            default 0.0
+            helpkey *
+          }
+
          parameter axes {
             type _LOGICAL
             vpath DEFAULT
@@ -14295,6 +14304,15 @@ iraf! {
             vpath DEFAULT
             default TRUE
             helpkey *
+          }
+
+         parameter norm {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Should the PSF be normalized to a peak value of unity?}
+            helpkey *
+            default TRUE
           }
 
          parameter orient {

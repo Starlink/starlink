@@ -52,6 +52,9 @@
 *     psf in incat [device] [out] [cut] [range] [isize] [poscols]
 
 *  ADAM Parameters:
+*     AMP1 = _REAL (Write)
+*        The fitted peak amplitude of the first usable star, in the data
+*        units of the input NDF.
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot. The width of the margins left for the annotation may be 
@@ -141,6 +144,11 @@
 *        If MINOR is TRUE the horizontal axis of the plot is annotated
 *        with distance along the minor axis from the centre of the PSF. If 
 *        MINOR is FALSE, the distance along the major axis is used.  [TRUE]
+*     NORM = _LOGICAL (Read)
+*        If TRUE, the model PSF is normalized so that it has a peak value
+*        of unity. Otherwise, its peak value is equal to the peak
+*        value of the first usable star, in the data units of the input
+*        NDF. [TRUE]
 *     ORIENT = _REAL (Write)
 *        The orientation of the major axis of the star images, in degrees. 
 *        If the current Frame of the NDF is a SKY Frame, this will be a 
@@ -309,6 +317,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -352,6 +361,8 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     2-MAY-2000 (DSB):
+*        Added parameters AMP1 and NORM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -428,6 +439,8 @@
       LOGICAL GAUSS             ! Fit to a Gaussian?
       LOGICAL GOTID             ! Does IPID point to an array of identifiers?
       LOGICAL LOGPOS            ! Log file is open for co-ordinates?
+      LOGICAL NM                ! Normalize PSF to amplitude of unity?
+      REAL AMP                  ! Peak amplitude of the fitted PSF
       REAL AXISR                ! Axis ratio o fthe star images
       REAL CUT                  ! The threshold to which the output PSF must extend
       REAL FWHM                 ! FWHM of the star images
@@ -625,6 +638,11 @@
       CALL PAR_GET0L( 'GAUSS', GAUSS, STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Determine whether or not the PSF is to be normalized to an amplitude of 
+*  unity.
+      CALL PAR_GET0L( 'NORM', NM, STATUS )
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -643,63 +661,70 @@
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_SPARB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_SPARD( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_SPARI( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_SPARUW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_SPARUB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_SPARW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
+     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    PX, PY, STATUS )
+     :                    PX, PY, AMP, STATUS )
 
       END IF
 
@@ -766,7 +791,7 @@
 
 *  Fill the data array with the evaluated point-spread function.
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, LBND( 1 ), 
+         CALL KPS1_PSEVL( AMP, AXISR, THETA, FWHM, GAMMA, LBND( 1 ), 
      :                    UBND( 1 ), LBND( 2 ), UBND( 2 ), PX, PY,
      :                    %VAL( IPPSF ), STATUS )
 
