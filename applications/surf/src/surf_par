@@ -49,4 +49,4 @@
       PARAMETER (PACKAGE = 'SURF')
 
       INTEGER SCUBA__N_TEMPS            ! Number of temperatures per reading
-      PARAMETER (N_TEMPS = 3)           ! for SKYDIP: AMBIENT, SKY, COLD
+      PARAMETER (SCUBA__N_TEMPS = 3)    ! for SKYDIP: AMBIENT, SKY, COLD
