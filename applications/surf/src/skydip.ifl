@@ -26,13 +26,24 @@
 #	 extinction correction.
 #     1998 Jan 6 (TimJ)
 #        Add the CVAR variable.
+#     1998 Jan 12 (TimJ)
+#        Add the FIT parameters
 #-
 
    INTERFACE SKYDIP
 
       HELPLIB 'SURF_HELP:'
 
-      PARAMETER   B_FIT 
+      PARAMETER B_FIT
+        PROMPT 'Fitted value of B'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
+      PARAMETER   B_VAL 
         POSITION 5
         PROMPT   'B parameter'
         TYPE     '_REAL'
@@ -57,6 +68,24 @@
         RANGE    -1000000, 1.0
 	HELPKEY '*'
       ENDPARAMETER 
+
+      PARAMETER ETA_TEL_FIT
+        PROMPT 'Fitted value of Eta_Tel'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
+      PARAMETER GOODFIT
+        PROMPT 'Was the fit good'
+        TYPE '_LOGICAL'
+        DEFAULT FALSE
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
 
       PARAMETER IN
         POSITION 1 
@@ -98,6 +127,15 @@
 	 DEFAULT  !
 	 HELPKEY '*'
       ENDPARAMETER 
+
+      PARAMETER TAUZ_FIT
+        PROMPT 'Fitted sky opacity'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
          
       PARAMETER   T_COLD
         POSITION 3
@@ -106,5 +144,24 @@
         RANGE    1, 300
 	HELPKEY '*'
       ENDPARAMETER
+
+      PARAMETER WAVELENGTH
+        PROMPT 'Selected wavelength of fit'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
+      PARAMETER XISQ
+        PROMPT 'Reduced chi square of fit'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
 
     ENDINTERFACE   
