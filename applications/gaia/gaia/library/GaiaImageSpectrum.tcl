@@ -215,13 +215,15 @@ itcl::class gaia::GaiaImageSpectrum {
 
          #  Get a name for the slice.
          set slice [filename_dialog "." "*.sdf" $w_]
-	 $namer_ configure -imagename $slice
-	 set slice [$namer_ ndfname]
+         if { $slice != "" } {
+            $namer_ configure -imagename $slice
+            set slice [$namer_ ndfname]
 
-         #  And create it.
-         busy {
-            $image_ foreign writeslice \
-               "-file $slice -line $xs $ys $xe $ye -nelem $numValues -name $image"
+            #  And create it.
+            busy {
+               $image_ foreign writeslice \
+                  "-file $slice -line $xs $ys $xe $ye -nelem $numValues -name $image"
+            }
          }
       } else {
          error_dialog "No image is displayed"
