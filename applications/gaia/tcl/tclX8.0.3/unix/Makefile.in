@@ -35,16 +35,14 @@ PASS_FLAGS = "CC=${CC}" "CFLAGS=${CFLAGS}" "LDFLAGS=${LDFLAGS}"
 
 all: TCLX TKX_${TKX_BUILD}
 
-TCLX: TOOLS
+TCLX: 
+	(cd tools && ${MAKE} ${PASS_FLAGS} all)
 	(cd ../tcl/unix && ${MAKE} ${PASS_FLAGS} all)
 
 TKX_YES: TOOLS
 	(cd ../tk/unix && ${MAKE} ${PASS_FLAGS} all)
 
 TKX_NO:
-
-TOOLS:
-	(cd tools && ${MAKE} ${PASS_FLAGS} all)
 
 #------------------------------------------------------------------------------
 # Static executables.
