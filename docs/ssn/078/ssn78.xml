@@ -67,7 +67,7 @@
       </px>
 
       <px>See <span
-          media="print"><url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn78/ssn78.xml</url></span><span media='screen'><webref url="http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn78/ssn78.xml">the repository</webref></span> for 
+          media="print"><url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn/078/ssn78.xml</url></span><span media='screen'><webref url="http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn/078/ssn78.xml">the repository</webref></span> for 
         changes and its current status.</px>
 
     </abstract>
@@ -97,29 +97,17 @@
           <li>
             <p>the conventions for branching and tagging which are at
               present only documented in the wiki, on the pages
-              <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/BranchingPolicy</url> and <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/CvsTagging</url>.</p>
+              <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/BranchingPolicy</url>
+              and
+              <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/CvsTagging</url>
+              (you will currently need a wiki account to see these pages).</p>
           </li>
         </ul>
       </p>
 
       <p>The repository is on the machine
-        <code>cvs.starlink.ac.uk</code>, and when you are making a
-        fresh checkout, or giving other commands not within the
-        context of a local check-out, you should refer to it as
-        <verbatim>
-% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs &lt;cvs-command&gt;
-</verbatim>
-        where <code>username</code> is your username on that
-        system<index>CVS!repository</index>.
-        You will need to set the environment variable
-        <code>CVS_RSH</code> to <code>ssh</code> to connect to the
-        repository.  If you need an account on this machine, get in
-        touch with <webref url="mailto:ussc@star.rl.ac.uk"
-          ><code>ussc@star.rl.ac.uk</code></webref>.  There is
-        currently anonymous web-based access to the repository at
-        <url>http://cvsweb.starlink.ac.uk</url>, and we expect to
-        offer anonymous CVS access in the near future.  See
-        <url>http://dev.starlink.ac.uk/</url> for news.</p>
+        <code>cvs.starlink.ac.uk</code> -- see
+        <ref id="starlink-cvs"/> for further details.</p>
 
       <p>The build system is intended to cover two main cases.
         Firstly, it covers the problem of building code directly from
@@ -203,6 +191,58 @@
         (<ref id="building"/>); and we describe the process of
         adapting a currently working package to the build system's
         conventions (<ref id="autoconfing"/>).</p>
+
+      <subsect id="entrypoints" export="export">
+        <subhead>
+          <title>Quick entry-points</title>
+        </subhead>
+
+        <p>The build system is intended to be a fairly integrated
+          whole, and so this document is intended to be read straight
+          through, rather than act purely as a reference manual.
+          However it should be fairly well cross-referenced, and so
+          depending on your motivations for reading this document,
+          there is more than one reasonable entry-point.
+          <ul>
+            <li>
+              <p>If you want to build and install a distributed source
+                tarball, then you are probably reading the wrong
+                manual, since this one contains rather more
+                information than you need.  To build the distribution
+                you should not need to do more than
+                <code>./configure; make; make install</code> -- if you
+                do need more than that, that's either a bug, or
+                there's a readme you didn't read.  If you
+                need to know more about the options to
+                <code>./configure</code>, then <code>./configure
+                --help</code> should provide that.  And if you really
+                want or need the gory details, then <ref
+                  id="configure-script"/> has them all.</p>
+            </li>
+            <li>
+              <p>If you want to start building and using software from
+                the repository, then start with
+                <ref id="starlink-cvs"/> or
+                <ref id="buildingcomponents"/>.</p>
+            </li>
+            <li>
+              <p>If you want to add another component to the
+                repository, then you are probably going to have to
+                read quite a lot of the document, but
+                <ref id="autoconfingexample"/> and
+                <ref id="importing-thirdparty"/> (and indeed most of
+                <ref id="autoconfing"/>) are good places to start.</p>
+            </li>
+            <li>
+              <p>There are some FAQs in <ref id="faqs"/>.</p>
+            </li>
+            <li>
+              <p>There is a reference for the Starlink autoconf macros
+                in <ref id="starconfmacros"/>.</p>
+            </li>
+          </ul>
+        </p>
+      </subsect>
 
     </sect>
 
@@ -488,7 +528,8 @@
             <title>Autoconf</title>
           </subhead>
 
-          <p>We use an extended version of autoconf 2.59.</p>
+          <p>We use a slightly extended version of autoconf.  See
+            <code>autoconf --version</code> for the base version number.</p>
 
           <p>The goal of autoconf is to help you make your program
             portable, by allowing you, at build time, to adapt the
@@ -843,7 +884,8 @@ AC_INIT(...)
             for you.  This has the additional advantage that we can
             support and enforce Starlink-specific conventions with a
             customised installation of automake.  We (currently) use
-            an adapted version of automake 1.8.2 -- see <ref
+            an adapted version of automake -- see <code>automake
+              --version</code> for the version number, and <ref
               id="gnutools"/> for a summary of the differences.</p>
 
           <p>The file which controls automake is
@@ -1222,7 +1264,8 @@ hds_machine.txt: hds_machine
             <title>Libtool</title>
           </subhead>
 
-          <p>We are using unmodified Libtool 1.5.</p>
+          <p>We are using unmodified Libtool.  See <code>libtool
+          --version</code> for the actual version.</p>
 
           <p>Libtool contains the darkest magic of the autotools, so
             it is fortunate that we need barely concern ourselves with
@@ -1952,6 +1995,64 @@ AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
 
       </subsect>
 
+      <subsect id="starlink-cvs" export="export">
+        <subhead>
+          <title>Using the Starlink CVS repository</title>
+        </subhead>
+
+        <p>The Starlink source code is held in a CVS repository, which
+          has public readonly access.</p>
+
+        <p>If you have an account on the repository machine, you have
+          read and write access to the full source set.  When you are
+          making a fresh checkout, or giving other commands not within
+          the context of a local check-out, you should refer to it as
+<verbatim>
+% cvs -d :ext:<em>username</em>@cvs.starlink.ac.uk:/cvs &lt;cvs-command&gt;
+</verbatim>
+          where <em>username</em> is your username on that
+          system<index>CVS!repository</index>; you will need to set
+          the environment variable <code>CVS_RSH</code> to
+          <code>ssh</code> to connect to the repository.  There is
+          currently anonymous web-based access to the repository at
+          <url>http://cvsweb.starlink.ac.uk</url>, and we expect to
+          offer anonymous CVS access in the near future.  See
+          <url>http://dev.starlink.ac.uk/</url> for news. [XXX add
+          details of the anoncvs setup]</p>
+
+        <p>There are a few more details about CVS,
+          including a link to a CVS Primer, in <ref id="tool-cvs"/>.</p>
+
+        <p>Part of the point of the Starlink CVS repository is to give
+          users ready access to the fully up-to-date sources so that
+          more sophisticated users can build the most recent
+          application versions for themselves and even, if they find a
+          bug, offer fixes.  Anyone who finds a bug is invited to
+          report it through the Project's bug-reporting system at
+          <url>http://dev.starlink.ac.uk/bugzilla/</url> [XXX fill in
+          details about how to do this without an account on
+          <code>cvs.starlink.ac.uk</code>], but if this report comes
+          with fixes, it will be <em>particularly</em> welcome.</p>
+
+        <p>If you do have bugfixes to offer, then you should get in
+          touch with the `owner' of the component to discuss how to
+          give them to the project.  You will find the owner of a
+          component by looking at the file <code>component.xml</code>
+          in the component's checkout directory.  This should list
+          those who have worked on the component, and... [XXX or what
+          -- how formal should we be? -- how do we remember, ourselves,
+          who'd be likely to know most about <code>chr</code>, for
+          example? -- even with good memories, how will we know in a
+          couple of years?].</p>
+
+        <p>If you make quite a few fixes, then it might be best to
+          give you committer access to the repository, by giving you
+          an account on the repository machine.  Talk to
+          someone from the project about setting that up.</p>
+        <!-- Nothing more specific: force folk to go via the person
+          they've been submitting patches to. -->
+      </subsect>
+
       <subsect id="tool-cvs" export="export" indexkey="CVS">
         <subhead>
           <title>CVS</title>
@@ -2360,8 +2461,7 @@ autoconf (GNU Autoconf) 2.59
           tools if they are not installed
           already<index>bootstrapping!buildsupport</index>.
           Instructions for 
-          that are in the <ref id="bootstrappingonly">next
-            section</ref>.</p>
+          that are <ref id="bootstrappingonly">below</ref>.</p>
 
         <p>That should be all you have to do before starting work.
           The above will generate a <code>Makefile</code> which will
@@ -5363,9 +5463,11 @@ AC_SUBST(STAR_MANIFEST_DIR)
           autoconf, automake and
           libtool.  Each of these is checked in to the CVS
           repository, and built and installed during the top-level
-          <code>./bootstrap</code> process.</p>
+          <code>./bootstrap</code> process.  Run the commands with the
+          <code>--version</code> option to see the actual installed
+          version.</p>
 
-        <p>The checked-in libtool is an unmodified libtool 1.5
+        <p>The checked-in libtool is an unmodified libtool
           distribution.<index>libtool</index></p>
 
         <p>The Starlink autoconf<index>autoconf</index> is based on
@@ -5380,7 +5482,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
           described in <ref id="starconfmacros"/>.</p>
 
         <p>The Starlink automake is a more heavily modified
-          version of automake version 1.8.2<index>automake!Starlink changes</index>.  There are a few
+          version of automake<index>automake!Starlink changes</index>.
+          There are a few 
           generic changes to support the added Fortran
           autoconf macros, but the majority of the changes
           are in the service of Starlink's specific requirements.  They
