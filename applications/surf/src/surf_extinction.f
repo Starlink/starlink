@@ -1,7 +1,25 @@
-*+  REDS_EXTINCTION - remove the effect of atmospheric extinction from a 
-*                     SCUBA observation
       SUBROUTINE REDS_EXTINCTION (STATUS)
-*    Description :
+*+
+*  Name:
+*     EXTINCTION
+
+*  Purpose:
+*     Remove the effect of atmospheric extinction from a SCUBA observation
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_EXTINCTION( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description :
 *     This application extracts from a demodulated-data file data for a 
 *     specified SCUBA sub-instrument and corrects it for the effect of 
 *     atmospheric extinction. The airmass at which each bolometer measurement
@@ -14,30 +32,36 @@
 *     the values input in parameters FIRST_TAU and LAST_TAU. If the measurement
 *     was taken at a time outside the range covered by FIRST_TAU and LAST_TAU
 *     then the value closest in time will be used.
-*       The parameters used are:-
-*
-*     IN                   The name of the input file containing demodulated
-*                          SCUBA data.
-*
-*     SUB_INSTRUMENT       The name of the sub-instrument whose data are to
-*                          be selected from the input file and extinction
-*                          corrected. Permitted values are SHORT, LONG,
-*                          P1100, P1300 and P2000.
-*
-*     FIRST_TAU            The zenith sky opacity before the observation.
-*
-*     FIRST_LST            The local sidereal time at which FIRST_TAU was
-*                          the zenith sky opacity, in hh mm ss.ss format.
-*
-*     SECOND_TAU           The zenith sky opacity after the observation.
-*
-*     SECOND_LST           The local sidereal time at which SECOND_TAU was
-*                          the zenith sky opacity, in hh mm ss.ss format.
-*
-*     OUT                  The name of the output file to contain the
-*                          extinction corrected data for the specified
-*                          sub-instrument.
-*
+
+*  Usage:
+*     extinction [IN] [SUB_INSTRUMENT=] [FIRST_TAU=] [FIRST_LST=]
+*                [SECOND_TAU=] [SECOND_LST=]
+
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*        The name of the input file containing demodulated SCUBA data.
+*     FIRST_LST = _CHAR (Read)
+*        The local sidereal time at which FIRST_TAU was
+*        the zenith sky opacity, in hh mm ss.ss format.
+*     FIRST_TAU = _REAL (Read)
+*        The zenith sky opacity before the observation.
+*     OUT = NDF (Write)
+*        The name of the output file to contain the
+*        extinction corrected data for the specified
+*        sub-instrument.
+*     SECOND_LST = _CHAR (Read)
+*        The local sidereal time at which SECOND_TAU was
+*        the zenith sky opacity, in hh mm ss.ss format.
+*     SECOND_TAU = _REAL (Read)
+*        The zenith sky opacity after the observation.
+*     SUB_INSTRUMENT = _CHAR (Read)
+*        The name of the sub-instrument whose data are to
+*        be selected from the input file and extinction
+*        corrected. Permitted values are SHORT, LONG,
+*        P1100, P1300 and P2000. This paramter is only used if more than
+*        one sub-instrument is present in the file.
+
+*  Algorithm:
 *     If status is good on entry the routine will open the IN file, read
 *     some FITS items describing the observation and report them to the
 *     user. The file `history' is read and a check made that the REDUCE_SWITCH
@@ -88,38 +112,47 @@
 *     the airmass of each bolometer and correct its data for the effect of
 *     sky opacity.
 *       Lastly, the IN and OUT files are closed.
-*    Invocation :
-*     CALL REDS_EXTINCTION (STATUS)
-*    Parameters :
-*     STATUS           = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Implementation status:
+*     Data, Variance and Quality arrays are copied. 
+*     Bad pixels are recognised.
+
+*  Authors:
+*     JFL: John Lightfoot (jfl@roe.ac.uk)
+*     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+*     {enter_new_authors_here}
+
+*  History:
 *     $Id$
 *     1-AUG-1995: original version.
-*    endhistory
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     Aborted datasets have an incorrect Y-axis scale.
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions :
+      IMPLICIT NONE                     ! No implicit typing allowed
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'REDS_SYS'                ! REDS constants
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+
+*  Status :
       INTEGER STATUS
+
 *    External references :
       INTEGER CHR_LEN                   ! CHR used string length function
-*    Global variables :
+      EXTERNAL CHR_LEN
+
 *    Local Constants :
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
+
 *    Local variables :
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
@@ -245,6 +278,8 @@
                                         ! was at LAT2,LONG2 for PLANET centre
                                         ! coordinate system
       INTEGER          NDIM             ! the number of dimensions in an array
+      INTEGER          NINTS            ! Number of whole ints (+1 if abort)
+      INTEGER          NJIGGLE          ! Number of jiggles in an aborted int
       INTEGER          NREC             ! number of history records in file
       INTEGER          N_BEAM           ! number of beams for which data have
                                         ! been reduced
@@ -331,8 +366,7 @@
       CHARACTER*15     UTSTART          ! UT of start of observation
       DOUBLE PRECISION UT1              ! UT1 of start of observation expressed
                                         ! as modified Julian day
-*    Internal References :
-*    Local data :
+
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -1421,7 +1455,7 @@
 
                      N_POINT = 0
   
-                     CALL SCULIB_CALC_BOL_COORDS (RA_CENTRE, 
+                     CALL SCULIB_CALC_BOL_COORDS ('RA', RA_CENTRE, 
      :                 DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS,
      :                 OFFSET_X, OFFSET_Y, ROTATION, N_POINT,
      :                 SCUBA__MAX_POINT, POINT_LST, POINT_DAZ, 
@@ -1463,8 +1497,18 @@
 
             POSITION = 0
 
-            DO I = 1, N_MEASUREMENTS * N_INTEGRATIONS
-               DO J = 1, JIGGLE_COUNT
+*     For aborted datasets need to be careful so must use N_POS
+*     and not just N_INTEGRATIONS
+
+            NINTS = N_POS / JIGGLE_COUNT
+            IF (NINTS * JIGGLE_COUNT .LT. N_POS) NINTS = NINTS + 1
+            
+            DO I = 1, NINTS
+
+               NJIGGLE = MOD(N_POS - (I-1) * JIGGLE_COUNT, JIGGLE_COUNT)
+               IF (NJIGGLE .EQ. 0) NJIGGLE = JIGGLE_COUNT
+
+               DO J = 1, NJIGGLE
                   RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
                   CALL SCULIB_CFILLR(1,RTEMP,
      :                 %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
