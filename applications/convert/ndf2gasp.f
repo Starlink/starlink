@@ -220,7 +220,7 @@
          CALL NDF_NEW( '_WORD', NDIM, LBND, UBND, PLACE, NDFT, STATUS )
 
 *  Map the temporary NDF.
-         CALL NDF_MAP( NDF, 'Data', '_WORD', 'WRITE', PNTRT, EL,
+         CALL NDF_MAP( NDFT, 'Data', '_WORD', 'WRITE', PNTRT, EL,
      :                 STATUS )
 
 *  Since the value is already clamped to be within the signed-word
