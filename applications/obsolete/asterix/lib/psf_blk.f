@@ -33,7 +33,7 @@
       INCLUDE 'PSF_PAR'                 ! Psf system constants
 
 *  Global Variables:
-      INCLUDE 'ASTLIB(PSF_CMN)'		! PSF Initialisation Switches
+      INCLUDE 'PSF_CMN'			! PSF Initialisation Switches
 *        PSFINIT = LOGICAL (Returned)
 *           Psf subsystem initialised?
 

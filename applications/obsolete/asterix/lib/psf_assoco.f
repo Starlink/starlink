@@ -30,7 +30,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
@@ -52,13 +52,8 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Psf system initialised yet?
-      IF ( .NOT. PSFINIT ) THEN
-        CALL PSF_INIT( STATUS )
-      END IF
-
 *    Grab slot
-      CALL PSF_GETSLOT( SLOT, STATUS )
+      CALL PSF_GETSLOTL( LOC, SLOT, STATUS )
 
 *    Get library and routine name from user
       CALL PSF_PROMPT( .FALSE., ' ', SLOT, STATUS )
