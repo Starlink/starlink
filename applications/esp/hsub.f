@@ -3,20 +3,20 @@
 *+
 *  Name:
 *     HSUB
-
+*
 *  Purpose:
 *     A subroutine version of HISTPEAK for developers.
-
+*
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *     CALL HSUB( STATUS )
-
+*
 *  Arguments:   
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Description: 
 *     A subroutine version of HISTPEAK that has been designed to be
 *     easily transplanted into the users ADAM programs. It establishes 
@@ -32,10 +32,10 @@
 *     filter of integer radius SFACT. In general, values less than 3 
 *     have very little effect. A value of 0 indicates no smoothing is to
 *     be employed. 
- 
+* 
 *  Usage:
-*     HSUB IN SFACT TYPE
-
+*     HSUB IN SFACT TYPE OUT FORMATTED
+*
 *  ADAM Parameters:
 *     IN = _NDF (Read)
 *        The name of the NDF data structure/file that is to be 
@@ -62,7 +62,15 @@
 *        A negative value is returned if the application cannot supply a
 *        result using the method requested. The value returned for 
 *        mode is the next best estimate.
-
+*     OUT = _CHAR (Read)
+*        The name of an output file which is to receive the results.  If
+*        not present, then the results are printed on stdout.
+*     FORMATTED = _LOGICAL (Read)
+*        If true, then the output file will be free-format -- intended
+*        to be human-readable.  If false, then the output will be a
+*        series of keyword-value pairs, which isn't really _un_readable,
+*        but is designed to be suitable for easy parsing.
+*
 *  Examples:
 *     hsub in=ic3374 sfact=0 type=0
 *
@@ -78,16 +86,16 @@
 *        The results required are those for the smoothed histogram 
 *        only.
 *
-*     hsub in=forn4 sfact=6 type=3
+*     hsub in=forn4 sfact=6 type=3 out=hsub.res noformatted
 *
 *        A histogram of the values in image FORN4 is used. The image 
 *        is smoothed using a gaussian filter of radius 6 and the 
 *        results returned those for the projected mode value.
-
+*
 *  Implementation Status:
 *     The current version will not accept a pixel value range greater 
 *     than the largest integer value possible. 
-
+*
 *  Notes: 
 *     HSUB should be viewed as a coding example for users wishing
 *     to incorporate the functions of HISTPEAK into their own 
@@ -98,56 +106,70 @@
 *     data from the application will need to modify subroutines HSUB
 *     and HISTPEA2 so that the desired parameters (say mean or median)
 *     are passed between them.
-
+*
+*     With the addition of the OUT and FORMATTED keywords, HSUB is now
+*     used by GAIA to generate backgrounds.  You should not, therefore,
+*     change the keywords in the non-FORMATTED output.
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
-*     {enter_new_authors_here}
-
+*     NG: Norman Gray (Starlink, Glasgow)
+*
 *  History:
 *     13-Nov-1992 (GJP)
-*     (Original version)
+*       (Original version)
 *     29-Jan-1993 (GJP)
-*     Bug in the interpolation method corrected.
-
+*       Bug in the interpolation method corrected.
+*     24-Nov-1999 (NG)
+*       Added OUT and FORMATTED keywords, so it can be used by GAIA.
 *-
 
 *  Type Definitions:                  ! No implicit typing
-      IMPLICIT NONE
+      implicit none
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'NDF_PAR'               ! NDF_ public constant
-      INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-      INCLUDE 'hsb_par'               ! HSUB system variables
+      include 'SAE_PAR'               ! Standard SAE constants
+      include 'NDF_PAR'               ! NDF_ public constant
+      include 'PRM_PAR'               ! PRIMDAT primitive data constants
+      include 'PAR_ERR'               ! PAR constants
+      include 'hsb_par'               ! HSUB system variables
                      
 *  Status:     
-      INTEGER STATUS                  ! Global status
+      integer status                  ! Global status
 
 *  Local Variables:
-      INTEGER ELEMS                   ! Number of pixels in the image
-      INTEGER NDF1                    ! NDF identifier
-      INTEGER NUPOI                   ! Number of points used in the 
-                                      ! Calculation of mode
-      INTEGER POINT1(10)              ! Pointer to NDF array to be used
-      INTEGER SFACT                   ! Gaussian filter radius requested
-      INTEGER TEMP                    ! Temporary storage
-      INTEGER TYPE                    ! Value indicating whether the final
+      integer elems                   ! Number of pixels in the image
+      integer ndf1                    ! NDF identifier
+      integer nupoi                   ! Number of points used in the 
+                                      ! calculation of mode
+      integer point1(10)              ! Pointer to NDF array to be used
+      integer sfact                   ! Gaussian filter radius requested
+      integer temp                    ! Temporary storage
+      integer type                    ! Value indicating whether the final
                                       ! estimate for mode given is to be from:
                                       ! 0 - get best available
                                       ! 1 - raw histogram
                                       ! 2 - smoothed histogram
                                       ! 3 - projecting peak chords
                                       ! 4 - interpolating smoothed histogram 
-      DOUBLE PRECISION KURTO          ! Image pixel count kurtosis
-      DOUBLE PRECISION MODEV          ! Estimate of the image mode value 
-      DOUBLE PRECISION SKEWN          ! Image skewness value
-      DOUBLE PRECISION STAND          ! Estimate of the standard deviation
+      character *(80) ofname          ! Output file name
+      integer fiod,ounit	      ! Output file descriptor and unit
+      logical outtofile               ! Send output to file, rather than stdout
+      logical formatted               ! Use formatted output
+*      LOGICAL EXCLAIM		      ! Parameter to aif_asfio
+      double precision kurto          ! Image pixel count kurtosis
+      double precision modev          ! Estimate of the image mode value 
+      double precision skewn          ! Image skewness value
+      double precision stand          ! Estimate of the standard deviation
                                       ! of the pixel values or the
                                       ! background count standard deviation
+      
+*   Local functions
+      logical fio_test		      ! Test FIO system
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      if (status.ne.sai__ok) return   
 
 *********************************************************************
 
@@ -156,98 +178,165 @@
 *   size as POINT1(1) and ELEMS respectively. 
 
 *   Begin an NDF context.                               
-      CALL NDF_BEGIN
+      call ndf_begin
+      
+*   Check inherited status
+      if (status.ne.sai__ok) return
 
 *   Show that the application is running.
-      CALL MSG_BLANK(STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      CALL MSG_OUT(' ','ESP HSUB running.',STATUS)
+      call msg_blank(status)
+      call msg_out(' ','ESP HSUB running.',status)
 
+*   Obtain parameters:
+*
 *   Obtain an identifier for the NDF structure to be examined.       
-      CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
+      call ndf_assoc('in','read',ndf1,status)
 
-*   Determine the smoothing filter radius required. SFACT=-1 is automatic,
-*   SFACT=0 is none. Upper limit fixed by the HSB__SFLIM.
-      CALL PAR_GET0I('SFACT',SFACT,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (SFACT.GT.HSB__SFLIM) THEN
-         CALL MSG_OUT(' ','WARNING!!!',STATUS)
-         CALL MSG_OUT(' ','The value selected exceeded the maximum'/
-     :                /' permitted.',STATUS)
-         CALL MSG_OUT(' ','The maximum value has been employed.',
-     :                STATUS)
-         SFACT=HSB__SFLIM
-      END IF
+*   Smoothing factor
+      call par_get0i('sfact',sfact,status)
 
 *   Determine the calculation method to be employed. TYPE=0 is automatic,
-      CALL PAR_GET0I('TYPE',TYPE,STATUS)
+      call par_get0i('type',type,status)
+      
+*   Is the output to be formatted
+      call par_get0l('formatted',formatted,status)
+      
+*   Output file name
+      call err_mark
+
+      call par_get0c ('out',ofname,status)
+      if (status .eq. par__null) then
+         outtofile = .false.
+         call err_annul (status)
+      else
+         outtofile = .true.
+      endif
+      
+      call err_rlse
+      
+*   JUMP OUT if the parameter-reading has not been successful (which
+*   includes the case where a user enters ANNUL (`!!')
+      if (status .ne. sai__ok) goto 9999
+      
+
+*   Interpret parameters:
+*
+*   Determine the smoothing filter radius required. SFACT=-1 is automatic,
+*   SFACT=0 is none. Upper limit fixed by the HSB__SFLIM.
+      if (sfact.gt.hsb__sflim) then
+         call msg_out(' ','WARNING!!!',status)
+         call msg_out(' ','The value selected exceeded the maximum'/
+     :                /' permitted.',status)
+         call msg_out(' ','The maximum value has been employed.',
+     :                status)
+         sfact=hsb__sflim
+      end if
+
+      if (outtofile) then
+         call err_mark
+         call fio_open (ofname,'write','list',0,fiod,status)
+         if (fio_test('OPEN error',status)) then
+*         Call err_flush to flush out the EMS error messages generated
+*         by fio_test, and reset status to sai__ok
+            call err_flush(status)
+            call msg_out(' ','Couldn''t open file -- writing to stdout',
+     :           status)
+            outtofile = .false.
+            ounit = 6
+         else
+            call fio_unit(fiod,ounit,status)
+         endif
+         call err_rlse
+      else
+         ounit = 6              ! stdout
+      endif
+      
+*      write (*,'("unit ",i3," opened")')ounit
+*      if (outtofile) then
+*         write (*,'("to file")')
+*      else
+*         write (*,'("to stdout")')
+*      endif
 
 *   Map the source NDF data array as _REAL values for reading.
-      CALL NDF_MAP(NDF1,'Data','_REAL','READ',POINT1(1),ELEMS,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
+      call ndf_map(ndf1,'data','_real','read',point1(1),elems,status)
 
 *   Show whats going on.
-      CALL MSG_BLANK(STATUS)
-      CALL MSG_OUT(' ','HSUB calculating.',STATUS)
-
-*******************************************************************
+      call msg_blank(status)
+      call msg_out(' ','HSUB calculating.',status)
+      
+**********************************************************************
 *   MAIN SUBROUTINE
 
 *   Call the modified version of HISTPEAK.
-      CALL HISTPEA2(POINT1,ELEMS,SFACT,TYPE,MODEV,STAND,KURTO,
-     :              SKEWN,NUPOI,STATUS)
-                    
+      call histpea2(point1,elems,sfact,type,modev,stand,kurto,
+     :              skewn,nupoi,status)
 
+**********************************************************************
 
- 9999 CONTINUE
+*   If something has gone wrong, then skip the output stage
+      if (status.ne.sai__ok) goto 9999
 
 *   Display the results. Crude cos its only used  to test the example.
 
-*   Modal value and standard deviation
-      CALL MSG_FMTD('MODEV','F8.1',MODEV)
-      CALL MSG_OUT(' ','Mode value:               ^MODEV',STATUS)
-      CALL MSG_FMTD('STAND','F8.1',STAND)
-      CALL MSG_OUT(' ','Std. dev.:                ^STAND',STATUS)
-      CALL MSG_BLANK(STATUS)
+      if (formatted) then
+*      Modal value and standard deviation
+*         call msg_fmtd('modev','f8.1',modev)
+*         call msg_out(' ','Mode value:               ^modev',status)
+*         call msg_fmtd('stand','f8.1',stand)
+*         call msg_out(' ','Std. dev.:                ^stand',status)
+*         call msg_blank(status)
+         write (ounit,'("Mode value:               ",f8.1)'),modev
+         write (ounit,'("Std. dev.:                ",f8.1/)'),stand
 
-*   Kurtosis and skewness.
-      CALL MSG_FMTD('KURTO','F8.3',KURTO)
-      CALL MSG_OUT(' ','Kurtosis:                 ^KURTO',STATUS)
-      CALL MSG_FMTD('SKEWN','F8.3',SKEWN)
-      CALL MSG_OUT(' ','Skewness:                 ^SKEWN',STATUS)
-      CALL MSG_BLANK(STATUS)
+*      Kurtosis and skewness.
+         write (ounit,'("Kurtosis:                 ",f8.3)'),kurto
+         write (ounit,'("Skewness:                 ",f8.3/)'),skewn
 
-*   Number of points used etc.
-      CALL MSG_FMTI('ELEMS','I8',ELEMS)
-      CALL MSG_OUT(' ','Number of points given:   ^ELEMS',STATUS)
-      CALL MSG_FMTI('NUPOI','I8',NUPOI)
-      CALL MSG_OUT(' ','Number of points used     ^NUPOI',STATUS)
-      CALL MSG_FMTI('SFACT','I8',SFACT)
-      CALL MSG_OUT(' ','Filter radius used:       ^SFACT',STATUS)
-      CALL MSG_BLANK(STATUS)
+*      Number of points used etc.
+         write (ounit,'("Number of points given:   ",i8)'),elems
+         write (ounit,'("Number of points used     ",i8)'),nupoi
+         write (ounit,'("Filter radius used:       ",i8/)'),sfact
 
-*   Type of modal value found.
-      CALL MSG_FMTI('TYPE','I8',TYPE)
-      CALL MSG_OUT(' ','Mode type 1-4:            ^TYPE',STATUS)
-      TEMP=STATUS
-      CALL MSG_FMTI('STATS','I8',TEMP)
-      CALL MSG_OUT(' ','Global status:            ^STATS',STATUS)
+*      Type of modal value found.
+         write (ounit,'("Mode type 1-4:            ",i8)'),type
+         write (ounit,'("Global status:            ",i8)'),status
+      else
+*      Write out the results as a sequence of keyword-value pairs.
+*      Don't change the keywords here, as GAIA relies on them.  Feel
+*      free to change the order, though, and to include comments
+*      beginning with `#'
+         write (ounit,'("# HSUB output file")')
+         write (ounit,'("mode     ",F8.1)') MODEV
+         write (ounit,'("sd       ",F8.1)') STAND
+         write (ounit,'("kurtosis ",F8.3)') KURTO
+         write (ounit,'("skewness ",F8.3)') SKEWN
+         write (ounit,'("ngiven   ",I8)')   ELEMS
+         write (ounit,'("nused    ",I8)')   NUPOI
+         write (ounit,'("sfact    ",I8)')   SFACT
+         write (ounit,'("modetype ",I8)')   TYPE
+      endif
 
 ********************************************************************
 
-*   Close down resources used for the example
+ 9999 continue
+
+*   Close down resources used
 
 *   Un-map/annul the source NDF data array. 
-      CALL NDF_UNMAP(NDF1,'Data',STATUS)
-      CALL NDF_ANNUL(NDF1,STATUS)                          
+      call ndf_unmap(ndf1,'data',status)
+      call ndf_annul(ndf1,status)                          
 
 *   End the NDF context.
-      CALL NDF_END(STATUS)                              
-
+      call ndf_end(status)        
+      
+      if (outtofile) then
+         call fio_close(fiod,status)
+      endif
+      
 ********************************************************************
 
-      END 
+      end 
 
 
       SUBROUTINE HISTPEA2(POINT1,ELEMS,SFACT,TYPE,MODEV,STAND,

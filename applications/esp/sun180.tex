@@ -4839,7 +4839,7 @@ ardfil=$\wedge$okay.dat
       be employed.
    }
    \sstusage{
-      HSUB IN SFACT TYPE
+      HSUB IN SFACT TYPE OUT FORMATTED
    }
    \sstparameters{
       \sstsubsection{
@@ -4884,6 +4884,20 @@ ardfil=$\wedge$okay.dat
          result using the method requested. The value returned for
          mode is the next best estimate.
       }
+      \sstsubsection{
+         OUT = \_CHAR (Read)
+      }{
+         The name of an output file which is to receive the results.  If
+         not present, then the results are printed on stdout.
+      }
+      \sstsubsection{
+         FORMATTED = \_LOGICAL (Read)
+      }{
+         If true, then the output file will be free-format -- intended
+         to be human-readable.  If false, then the output will be a
+         series of keyword-value pairs, which isn't really \emph{un}readable,
+         but is designed to be suitable for easy parsing.
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -4903,7 +4917,7 @@ ardfil=$\wedge$okay.dat
          only.
       }
       \sstexamplesubsection{
-         hsub in=forn4 sfact=6 type=3
+         hsub in=forn4 sfact=6 type=3 out=hsub.res noformatted
       }{
          A histogram of the values in image FORN4 is used. The image
          is smoothed using a gaussian filter of radius 6 and the
@@ -4920,6 +4934,10 @@ ardfil=$\wedge$okay.dat
       data from the application will need to modify subroutines HSUB
       and HISTPEA2 so that the desired parameters (say mean or median)
       are passed between them.
+
+      With the addition of the OUT and FORMATTED keywords, HSUB is now
+      used by GAIA to generate backgrounds.  You should not, therefore,
+      change the keywords in the non-FORMATTED output.
    }
    \sstimplementationstatus{
       The current version will not accept a pixel value range greater

@@ -1223,6 +1223,31 @@ do_deinstall:
 	@- rm -f .INSTALLED_$(SYSTEM) 1>/dev/null 2>/dev/null
 	@ echo '$(SYSTEM)' > .BUILT
 
+#  Quick installation, used during development
+test-install:
+#  Install the monolith, giving it world execute permission.
+	for f in $(MONOLITH) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 755 $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#  Install the interface files, giving them world read permission.
+	for f in $(IFC_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#  Create the application/task name soft links.
+	for f in $(TASKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) -f ./$(MONOLITH) $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
+
+
+
 #  test: Perform an installation test.
 #  ----------------------------------
 #

@@ -59,4 +59,28 @@ interface HSUB
     helpkey '*'
   endparameter
 
+ parameter OUT       # The name of the text file to contain the output
+    type '_CHAR'
+    access 'read'
+    position 4
+    keyword 'OUT'
+    prompt 'Text file for profile output'
+    ppath 'current,default'
+    vpath 'prompt'
+    default hsub.dat
+    helpkey '*'
+  endparameter
+
+  parameter FORMATTED # Is output formatted, or intended to be machine readable
+    type '_LOGICAL'
+    access 'read'
+    keyword 'FORMATTED'
+    position 5
+    prompt 'Is output formatted, or machine-readable?'
+    ppath 'current,default'
+    vpath 'prompt'
+    default t
+    helpkey '*'
+  endparameter
+
 endinterface

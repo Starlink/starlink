@@ -1227,7 +1227,7 @@ A subroutine version of HISTPEAK for developers.
 
 Usage:
 
-   HSUB IN SFACT TYPE
+   HSUB IN SFACT TYPE OUT FORMATTED
 
 Description:
 
@@ -1278,6 +1278,16 @@ TYPE = _INTEGER (Read)
    A negative value is returned if the application cannot supply a
    result using the method requested. The value returned for
    mode is the next best estimate.
+3 OUT
+OUT = _CHAR (Read)
+   The name of an output file which is to receive the results.  If
+   not present, then the results are printed on stdout.
+3 FORMATTED
+FORMATTED = _LOGICAL (Read)
+   If true, then the output file will be free-format -- intended
+   to be human-readable.  If false, then the output will be a
+   series of keyword-value pairs, which isn't really _un_readable,
+   but is designed to be suitable for easy parsing.
 2 Examples
 hsub in=ic3374 sfact=0 type=0
    A histogram of the values in image IC3374 is constructed.
@@ -1291,7 +1301,7 @@ hsub in=galaxy sfact=10 type=4
    The results required are those for the smoothed histogram
    only.
 
-hsub in=forn4 sfact=6 type=3
+hsub in=forn4 sfact=6 type=3 out=hsub.res noformatted
    A histogram of the values in image FORN4 is used. The image
    is smoothed using a gaussian filter of radius 6 and the
    results returned those for the projected mode value.
@@ -1305,16 +1315,23 @@ program requiring image statistics. The user requiring other
 data from the application will need to modify subroutines HSUB
 and HISTPEA2 so that the desired parameters (say mean or median)
 are passed between them.
+
+With the addition of the OUT and FORMATTED keywords, HSUB is now
+used by GAIA to generate backgrounds.  You should not, therefore,
+change the keywords in the non-FORMATTED output.
 2 Authors
 GJP: Grant Privett (STARLINK)
+
+NG: Norman Gray (Starlink, Glasgow)
 2 History
  13-Nov-1992 (GJP)
-
- (Original version)
+    (Original version)
 
  29-Jan-1993 (GJP)
+    Bug in the interpolation method corrected.
 
- Bug in the interpolation method corrected.
+ 24-Nov-1999 (NG)
+    Added OUT and FORMATTED keywords, so it can be used by GAIA.
 2 Implementation_Status
    The current version will not accept a pixel value range greater
    than the largest integer value possible.
