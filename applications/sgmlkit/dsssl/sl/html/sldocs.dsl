@@ -124,8 +124,12 @@ are shown at the top of the document.
 	 (coverimage (getdocinfo 'coverimage))
 	 )
     (make sequence
+      ;; need something to hook the xref label on,
+      ;; and it can't be the table, since that contains A elements
+      ;; Improve this sometime!
       (make element gi: "a" attributes: '(("name" "xref_"))
-	    (make element gi: "TABLE"
+	    (literal "."))
+      (make element gi: "TABLE"
 	    attributes: '(("WIDTH" "100%"))
 	    (make sequence
 	      (make element gi: "TR"
@@ -183,7 +187,7 @@ are shown at the top of the document.
 						(list "COLSPAN" "2"))
 			      (make element gi: "SMALL"
 				    %starlink-banner%)))
-		  (empty-sosofo)))))
+		  (empty-sosofo))))
       (if coverimage
 	  (make element gi: "table"
 		attributes: '(("width" "100%")

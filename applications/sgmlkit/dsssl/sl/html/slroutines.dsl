@@ -101,14 +101,16 @@ $Id$
     (let ((affil (attribute-string (normalize "affiliation")))
 	  (id (attribute-string (normalize "id"))))
     (make element gi: "li"
-	  (make sequence
-	    (make element gi: "a"
-		  attributes: (list (list "name" (string-append "AUTHOR_"
-								id)))
-		  (process-children))
-	    (if affil
-		(literal (string-append " (" affil ")"))
-		(empty-sosofo))))))
+	  (let ((kids (children (current-node))))
+	    (make sequence
+	      (make element gi: "a"
+		    attributes: (list (list "name" (string-append "AUTHOR_"
+								  id)))
+		    (process-node-list (node-list-first kids)))
+	      (process-node-list (node-list-rest kids))
+	      (if affil
+		  (literal (string-append " (" affil ")"))
+		  (empty-sosofo)))))))
   (element authorref
     (let* ((aut-id (attribute-string (normalize "id")))
 	   (aut-el (and aut-id
@@ -116,15 +118,17 @@ $Id$
 	   (note (attribute-string (normalize "note"))))
       (if (and (not (node-list-empty? aut-el))
 	       (string=? (gi aut-el) (normalize "author")))
-	  (make element gi: "a"
-		attributes: (list (list "href"
-					(string-append "#AUTHOR_" aut-id)))
-		(make sequence
-		  (with-mode routine-ref-get-reference
-		    (process-node-list aut-el))
-		  (if note
-		      (literal (string-append " (" note ")"))
-		      (empty-sosofo))))
+	  (make element gi: "li"
+		(make element gi: "a"
+		      attributes: (list (list "href"
+					      (string-append "#AUTHOR_"
+							     aut-id)))
+		      (make sequence
+			(with-mode routine-ref-get-reference
+			  (process-node-list aut-el))
+			(if note
+			    (literal (string-append " (" note ")"))
+			    (empty-sosofo)))))
 	  (error (string-append "ID " aut-id " is not an AUTHOR element")))))
   (element authornote
     (make sequence
