@@ -87,7 +87,7 @@
             KK = MIN( NRAD, KK )
           ELSE
             KK = 1
-            DO WHILE ( (KK.LE.NRBIN) .AND. (RAD.GT.RBNDS(KK*2-1))
+            DO WHILE ( (KK.LE.NRBIN) .AND. (RAD.GT.RBNDS(KK*2-1)) )
               KK = KK + 1
             END DO
           END IF
