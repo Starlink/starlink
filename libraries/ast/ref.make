@@ -111,25 +111,25 @@ do_unix_release:
 #  Pack the files into the source archive, omitting any which must be kept
 #  separate for licensing reasons. Then remove the original copies of the
 #  files that were packed.
-	tar_files=`{  echo $(WCSLIB_FILES);\
-                      awk 'BEGIN{printf(" > ")}' </dev/null;\
+	tar_files="`{  echo $(WCSLIB_FILES);\
+                      awk 'BEGIN{printf(\" > \")}' </dev/null;\
                       echo $(C_ROUTINES) $(F_ROUTINES) $(C_INCLUDE_FILES) \
                            $(DERIVED_FILES) $(F_INCLUDE_FILES) \
                            $(UNIX_STARTUP_FILES) $(UNIX_LINK_FILES) \
                            $(UTILITY_PROGRAMS) $(TEST_PROGRAMS);\
-                    } | awk 'BEGIN{RS=" \n"}{ \
-                       if ( $$1 == ">" ) { \
+                    } | awk 'BEGIN{RS=\" \"}{ \
+                       if ( $$1 == \">\" ) { \
                           x++ \
                        } else if ( !x ) { \
                           a[ $$1 ]++ \
                        } else { \
                           if ( !a[ $$1 ] ) print \
-                       } }'`;\
+                       } }'`";\
         $(TAR_IN) $(PKG)_source.tar $${tar_files};\
         rm -f $${tar_files}
 #
 #  Pack the wcslib files into their own library and then remove the originals.
-	tar_files=$(WCSLIB_FILES);\
+	tar_files="$(WCSLIB_FILES)";\
         $(TAR_IN) wcslib.tar $${tar_files};\
         rm -f $${tar_files}
 #
