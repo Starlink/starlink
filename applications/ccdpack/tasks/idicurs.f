@@ -349,10 +349,6 @@
       INCLUDE 'AST_PAR'          ! AST system declarations
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
 
-*  Local Constants:
-      INTEGER MAXPOS             ! Maximum positions in the list
-      PARAMETER ( MAXPOS = 999 )
-                     
 *  Status:           
       INTEGER STATUS             ! Global status
 
@@ -363,17 +359,22 @@
 *  Local Variables:  
       INTEGER FD                 ! FIO identifier of output file
       INTEGER I                  ! Loop counter
-      INTEGER ID( MAXPOS )       ! Identifiers for position list
       INTEGER ILSTGR             ! GRP identifier for input position list files
       INTEGER IMEM( CCD1__MXNDF ) ! Input NDFs in Set order
       INTEGER IMEMOF( CCD1__MXNDF + 1 ) ! Indexes into IMEM
       INTEGER INDEX              ! Index in list of NDFs
       INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers
-      INTEGER IPDAT              ! Pointer to input position list coordinates
-      INTEGER IPIND              ! Pointer to input position list indices
+      INTEGER IPDAT( CCD1__MXNDF ) ! Pointers to input position list coordinates
+      INTEGER IPII               ! Pointer to input Set position list IDs
+      INTEGER IPIND( CCD1__MXNDF ) ! Pointers to input position list indices
+      INTEGER IPIO               ! Pointer to output Set position list IDs
       INTEGER IPI2               ! Poiter to position list indices
+      INTEGER IPXI               ! Pointer to input Set position list X coords
+      INTEGER IPXO               ! Pointer to output Set position list X coords
       INTEGER IPX1               ! Pointer to X coordinates
       INTEGER IPX2               ! Pointer to X coordinates
+      INTEGER IPYI               ! Pointer to input Set position list Y coords
+      INTEGER IPYO               ! Pointer to output Set position list Y coords
       INTEGER IPY1               ! Pointer to Y coordinates
       INTEGER IPY2               ! Pointer to Y coordinates
       INTEGER IS                 ! Set loop counter
@@ -387,11 +388,14 @@
       INTEGER MAXCNV             ! Initial maximum canvas dimension
       INTEGER NDIM               ! Number of dimensions of NDF
       INTEGER NDFGR              ! NDG identifier of group of NDFs
-      INTEGER NF                 ! Number of fields per line of input list
+      INTEGER NF( CCD1__MXNDF )  ! Number of fields per line of input list
       INTEGER NFIELD             ! Number of fields in first line of input file
       INTEGER NMEM               ! Number of members in Set
-      INTEGER NP                 ! Number of positions in this list
-      INTEGER NPOS               ! Number of positions in total
+      INTEGER NP( CCD1__MXNDF )  ! Number of positions in this list
+      INTEGER NPA                ! Position list index counter
+      INTEGER NPO                ! Selected number of output points
+      INTEGER NPOSI              ! Total number of input positions
+      INTEGER NPOSO              ! Total number of output positions
       INTEGER NRET               ! Number of returns
       INTEGER NSET               ! Number of Sets
       INTEGER NNDF               ! Number of NDFs in group
@@ -408,10 +412,8 @@
       DOUBLE PRECISION PERCNT( 2 ) ! Low and high percentiles for display
       DOUBLE PRECISION XLO       ! Lower X limit of NDF
       DOUBLE PRECISION XHI       ! Upper X limit of NDF
-      DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
       DOUBLE PRECISION YLO       ! Lower Y limit of NDF
       DOUBLE PRECISION YHI       ! Upper Y limit of NDF
-      DOUBLE PRECISION YPOS( MAXPOS ) ! Y coordinates of positions in list
       DOUBLE PRECISION ZOOM      ! Zoom factor for display
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for line output to file
       CHARACTER * ( GRP__SZNAM ) NDFNMS( CCD1__MXNDF ) ! NDF names
@@ -556,7 +558,7 @@
 
 *  Unless we read some in, there will be no positions in the initial 
 *  position list.
-         NPOS = 0
+         NPOSI = 0
 
 *  If we are using an initial position list, we will have to read the 
 *  positions in.
@@ -573,94 +575,116 @@
      :                             STATUS )
 
 *  Map in X and Y positions only (non-standard file).
+*  Note: this could screw up (give duplicate ID values) in the event that
+*  a Set contains some files with explicit ID values and some with
+*  implicit ID values.  There would also be trouble in the case that
+*  the concatenation of a Set's position list files contain duplicate
+*  ID values themselves.  Under normal circumstances (if you have been
+*  doing previous processing in a Set-aware way) neither case is likely.
+*  If it happens, too bad (probably some positions will get lost).
                   IF ( NFIELD .EQ. 2 ) THEN
-                     CALL CCD1_NLMAP( FD, LINE, CCD1__BLEN, IPDAT, NPOS,
-     :                                NF, STATUS )
+                     CALL CCD1_NLMAP( FD, LINE, CCD1__BLEN, IPDAT( I ),
+     :                                NP( I ), NF( I ), STATUS )
+                     CALL CCD1_MALL( NP( I ), '_INTEGER', IPIND( I ),
+     :                               STATUS )
+                     CALL CCD1_GISEQ( NPOSI + 1, 1, NP( I ),
+     :                                %VAL( IPIND( I ) ), STATUS )
 
 *  Standard file format map these in.
                   ELSE
-                     CALL CCD1_LMAP( FD, LINE, CCD1__BLEN, IPIND, IPDAT,
-     :                               NP, NF, STATUS )
+                     CALL CCD1_LMAP( FD, LINE, CCD1__BLEN, IPIND( I ),
+     :                               IPDAT( I ), NP( I ), NF( I ),
+     :                               STATUS )
                   END IF
 
 *  Close the input file.
                   CALL FIO_CLOSE( FD, STATUS )
 
 *  Log to user.
-                  CALL MSG_SETI( 'NP', NP )
+                  CALL MSG_SETI( 'NP', NP( I ) )
                   CALL MSG_SETC( 'ILIST', FNAME )
                   CALL CCD1_MSG( ' ', 
      :            '    Read ^NP positions from file ^ILIST.', STATUS )
 
-*  If there are too many points in the input position list then prepare
-*  to truncate it.
-                  IF ( NPOS + NP .GT. MAXPOS ) THEN
-                     CALL MSG_SETI( 'NUM', NPOS + NP - MAXPOS )
-                     CALL CCD1_MSG( ' ', 
-     :'    Warning - too many points in input list, discarding ^NUM',
-     :                              STATUS )
-                     NP = MAXPOS - NPOS
-                  END IF
-
 *  No input file - no points.
                ELSE
-                  NP = 0
+                  NP( I ) = 0
                END IF
 
-*  See if we have a non-empty list.
-               IF ( NP .GT. 0 ) THEN
+*  Accumulate total points for this Set.
+               NPOSI = NPOSI + NP( I )
+            END DO
+         END IF
 
-*  Copy the points so they can be read by the GUI routine, and free the 
-*  temporarily allocated memory.
-                  IF ( NFIELD .EQ. 2 ) THEN
-                     CALL CCD1_GISEQ( NPOS + 1, 1, NP, ID( NPOS + 1 ), 
-     :                                STATUS )
-                  ELSE
-                     CALL CCG1_COPAI( NP, %VAL( IPIND ), ID( NPOS + 1 ),
-     :                                STATUS )
-                     CALL CCD1_MFREE( IPIND, STATUS )
-                  END IF
+*  Allocate memory for the Set position list.
+         IF ( NPOSI .GT. 0 ) THEN
+            CALL CCD1_MALL( NPOSI, '_INTEGER', IPII, STATUS )
+            CALL CCD1_MALL( NPOSI, '_DOUBLE', IPXI, STATUS )
+            CALL CCD1_MALL( NPOSI, '_DOUBLE', IPYI, STATUS )
+
+*  Construct the Set position list from the lists read from each of
+*  the member NDFs.
+            NPA = 1
+            DO I = 1, NMEM
+
+*  See if we have a non-empty list.
+               IF ( NP( I ) .GT. 0 ) THEN
 
 *  Transform the points if necessary.
+                  CALL CCD1_MALL( NP( I ), '_DOUBLE', IPX2, STATUS )
+                  CALL CCD1_MALL( NP( I ), '_DOUBLE', IPY2, STATUS )
                   IF ( DOMAIN .EQ. 'PIXEL' ) THEN
-                     CALL CCD1_LEXT( %VAL( IPDAT ), NP, NF, 1,
-     :                               XPOS( NPOS + 1 ), STATUS )
-                     CALL CCD1_LEXT( %VAL( IPDAT ), NP, NF, 2,
-     :                               YPOS( NPOS + 1 ), STATUS )
+                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
+     :                               NF( I ), 1, %VAL( IPX2 ), STATUS )
+                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
+     :                               NF( I ), 2, %VAL( IPY2 ), STATUS )
                   ELSE
-                     CALL CCD1_MALL( NP, '_DOUBLE', IPX1, STATUS )
-                     CALL CCD1_MALL( NP, '_DOUBLE', IPY1, STATUS )
-                     CALL CCD1_LEXT( %VAL( IPDAT ), NP, NF, 1,
-     :                               %VAL( IPX1 ), STATUS )
-                     CALL CCD1_LEXT( %VAL( IPDAT ), NP, NF, 2,
-     :                               %VAL( IPY1 ), STATUS )
-                     CALL AST_TRAN2( MAP( I ), NP, %VAL( IPX1 ),
+                     CALL CCD1_MALL( NP( I ), '_DOUBLE', IPX1, STATUS )
+                     CALL CCD1_MALL( NP( I ), '_DOUBLE', IPY1, STATUS )
+                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
+     :                               NF( I ), 1, %VAL( IPX1 ), STATUS )
+                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
+     :                               NF( I ), 2, %VAL( IPY1 ), STATUS )
+                     CALL AST_TRAN2( MAP( I ), NP( I ), %VAL( IPX1 ),
      :                               %VAL( IPY1 ), .TRUE., 
-     :                               XPOS( NPOS + 1 ), YPOS( NPOS + 1 ),
+     :                               %VAL( IPX2 ), %VAL( IPY2 ),
      :                               STATUS )
                      CALL CCD1_MFREE( IPX1, STATUS )
                      CALL CCD1_MFREE( IPY1, STATUS )
                   END IF
 
-*  Release memory.
-                  CALL CCD1_MFREE( IPDAT, STATUS )
-               END IF
+*  Copy the points from their current arrays into the right part of 
+*  the Set array.
+                  CALL CCG1_COPSI( 1, %VAL( IPIND( I ) ), NP( I ),
+     :                             NPA, %VAL( IPII ), STATUS )
+                  CALL CCG1_COPSD( 1, %VAL( IPX2 ), NP( I ), NPA,
+     :                             %VAL( IPXI ), STATUS )
+                  CALL CCG1_COPSD( 1, %VAL( IPY2 ), NP( I ), NPA,
+     :                             %VAL( IPYI ), STATUS )
 
-*  Increment the total number of points for this Set.
-               NPOS = NPOS + NP
+*  Increment the position in the Set array.
+                  NPA = NPA + NP( I )
+
+*  Release memory.
+                  CALL CCD1_MFREE( IPDAT( I ), STATUS )
+                  CALL CCD1_MFREE( IPIND( I ), STATUS )
+                  CALL CCD1_MFREE( IPX2, STATUS )
+                  CALL CCD1_MFREE( IPY2, STATUS )
+               END IF
             END DO
          END IF
          
 *  Invoke the Tcl code to do the work.
-         CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN, MAXPOS, PERCNT,
-     :                    ZOOM, MAXCNV, WINDIM, MSTYLE, VERBOS, ID,
-     :                    XPOS, YPOS, NPOS, STATUS )
+         CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN, %VAL( IPII ),
+     :                    %VAL( IPXI ), %VAL( IPYI ), NPOSI, PERCNT,
+     :                    ZOOM, MAXCNV, WINDIM, MSTYLE, VERBOS, 
+     :                    IPIO, IPXO, IPYO, NPOSO, STATUS )
 
 *  If requested to do so, write the returned positions to an output 
 *  position list file.
          IF ( WRLIST ) THEN
             IF ( NMEM .EQ. 1 ) THEN
-               IF ( NPOS .GT. 0 ) THEN
+               IF ( NPOSO .GT. 0 ) THEN
 
 *  Open the output position list file.
                   CALL GRP_GET( OLSTGR, IMEM( IMEMOF( IS ) ), 1, FNAME,
@@ -672,13 +696,14 @@
                   CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
 
 *  Write the positions to the output file.
-                  CALL CCD1_WRIXY( FD, ID, XPOS, YPOS, NPOS, LINE, 
+                  CALL CCD1_WRIXY( FD, %VAL( IPIO ), %VAL( IPXO ),
+     :                             %VAL( IPYO ), NPOSO, LINE,
      :                             CCD1__BLEN, STATUS )
 
 *  Report file used and number of entries.
                   CALL CCD1_MSG( ' ', ' ', STATUS )
                   CALL MSG_SETC( 'FNAME', FNAME )
-                  CALL MSG_SETI( 'NPOS', NPOS )
+                  CALL MSG_SETI( 'NPOS', NPOSO )
                   CALL CCD1_MSG( ' ', 
      :            '    Wrote ^NPOS positions to file ^FNAME', STATUS )
 
@@ -700,21 +725,22 @@
 
 *  Allocate enough space to hold transformed coordinates, and a 
 *  subset of this Set's position list.
-               IF ( NPOS .GT. 0 ) THEN
-                  CALL CCD1_MALL( NPOS, '_DOUBLE', IPX1, STATUS )
-                  CALL CCD1_MALL( NPOS, '_DOUBLE', IPY1, STATUS )
-                  CALL CCD1_MALL( NPOS, '_DOUBLE', IPX2, STATUS )
-                  CALL CCD1_MALL( NPOS, '_DOUBLE', IPY2, STATUS )
-                  CALL CCD1_MALL( NPOS, '_INTEGER', IPI2, STATUS )
+               IF ( NPOSO .GT. 0 ) THEN
+                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPX1, STATUS )
+                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPY1, STATUS )
+                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPX2, STATUS )
+                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPY2, STATUS )
+                  CALL CCD1_MALL( NPOSO, '_INTEGER', IPI2, STATUS )
 
 *  Loop over each NDF in this Set.
                   DO I = 1, NMEM
                      INDEX = IMEM( IMEMOF( IS ) + I - 1 )
 
 *  Transform the positions into pixel coordinates.
-                     CALL AST_TRAN2( MAP( I ), NPOS, XPOS, YPOS,
-     :                               .FALSE., %VAL( IPX1 ),
-     :                               %VAL( IPY1 ), STATUS )
+                     CALL AST_TRAN2( MAP( I ), NPOSO, %VAL( IPXO ),
+     :                               %VAL( IPYO ), .FALSE.,
+     :                               %VAL( IPX1 ), %VAL( IPY1 ),
+     :                               STATUS )
 
 *  Get the NDF's bounds.
                      CALL NDF_BOUND( INDF( I ), 2, LBND, UBND, NDIM,
@@ -726,14 +752,15 @@
 
 *  Select only the points in this position list which fall within the
 *  bounds of this NDF.
-                     CALL CCD1_CHUSB( ID, %VAL( IPX1 ), %VAL( IPY1 ),
-     :                                NPOS, XLO, XHI, YLO, YHI, 
+                     CALL CCD1_CHUSB( %VAL( IPIO ), %VAL( IPX1 ),
+     :                                %VAL( IPY1 ),
+     :                                NPOSO, XLO, XHI, YLO, YHI, 
      :                                %VAL( IPI2 ), %VAL( IPX2 ), 
-     :                                %VAL( IPY2 ), NP, STATUS )
+     :                                %VAL( IPY2 ), NPO, STATUS )
 
 *  If the subset contains some points, write a list and associate it
 *  with this NDF.
-                     IF ( NP .GT. 0 ) THEN
+                     IF ( NPO .GT. 0 ) THEN
 
 *  Open the position list file.
                         CALL GRP_GET( OLSTGR, INDEX, 1, FNAME, STATUS )
@@ -746,12 +773,12 @@
 
 *  Write the positions out.
                         CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
-     :                                   %VAL( IPY2 ), NP, LINE,
+     :                                   %VAL( IPY2 ), NPO, LINE,
      :                                   CCD1__BLEN, STATUS )
 
 *  Report file used and number of entries.
                         CALL MSG_SETC( 'FNAME', FNAME )
-                        CALL MSG_SETI( 'NPOS', NP )
+                        CALL MSG_SETI( 'NPOS', NPO )
                         CALL CCD1_MSG( ' ',
      :'    Wrote ^NPOS positions to file ^FNAME', STATUS )
 
@@ -782,6 +809,18 @@
                   END DO
                END IF
             END IF
+         END IF
+
+*  Free memory.
+         IF ( NPOSI .GT. 0 ) THEN
+            CALL CCD1_MFREE( IPXI, STATUS )
+            CALL CCD1_MFREE( IPYI, STATUS )
+            CALL CCD1_MFREE( IPII, STATUS )
+         END IF
+         IF ( NPOSO .GT. 0 ) THEN
+            CALL CCD1_MFREE( IPXO, STATUS )
+            CALL CCD1_MFREE( IPYO, STATUS )
+            CALL CCD1_MFREE( IPIO, STATUS )
          END IF
       END DO
 
