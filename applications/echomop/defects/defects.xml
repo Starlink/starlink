@@ -138,10 +138,10 @@ RESULT_TYPE: SCROBJ).</p>
 
 <title>Interface problems</title>
 
-<defect status="open"
-	originator="Michael Albrow"
-	originatoremail="phys170@cantua.canterbury.ac.nz"
-	date="1-Feb-1999">
+<defect status="closed"
+        originator="Michael Albrow"
+        originatoremail="phys170@cantua.canterbury.ac.nz"
+        date="1-Feb-1999">
 <title>ech_dekker and ech_object apparently yoked together</title>
 <p>Michael Albrow:
 <blockquote>
@@ -155,15 +155,25 @@ either option seems to do the same as option "4" (ech_spatial).</p>
 <appendices>
 <email id="albrow1" src="albrow1.mail"/>
 </appendices>
+<resolution status="fixed" author="Norman" date="16-Jul-2002">
+<p>There was a bug in the option-parsing code, which in fact caused
+the same problem with all suboptions.  Made <em>much</em> more robust
+in release 3.3-6.</p>
+</resolution>
 </defect>
 
-<defect status="open" originator="Dave James"
-originatoremail="djj@st-andrews.ac.uk" date="14-Sep-1999">
+<defect status="closed"
+         originator="Dave James"
+        originatoremail="djj@st-andrews.ac.uk"
+        date="14-Sep-1999">
 <title>Option 4.2</title>
 <p>Option 4.2 isn't `sticky'.</p>
 <appendices>
 <email id="djj1" src="djj1.mail"/>
 </appendices>
+<resolution status="fixed" author="Norman" date="26-Jul-2002">
+<p>Same fix as the previous problem.</p>
+</resolution>
 </defect>
 
 <defect status="open" originator="Rachel North"
