@@ -55,6 +55,8 @@
 *        Add INTER flag to disable interactivity (from IRCAMPACK)
 *     14 August 2004 (TIMJ):
 *        Use FIO to get unit number
+*     4 Oct 2004 (TIMJ):
+*        Use SHL_PAGRST to initialise common block
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -66,25 +68,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
-
-*  Global Variables:
-      INCLUDE 'SHL_HLPCMD'           ! KAPPA help I/O
-*        CMD = CHARACTER * ( 80 ) (Write)
-*           The command line.
-*        LHELP = INTEGER (Write)
-*           Lines of help output this screenful.
-*        HELPN = LOGICAL (Write)
-*           If true, help output is enabled.
-*        LTOP = INTEGER (Write)
-*           Top line number for the scrolling region.
-*        LBOT = INTEGER (Write)
-*           Bottom line number for the scrolling region.
-*        ANSI = LOGICAL (Write)
-*           If true, an ANSI terminal is in use.
-*        LUCMD = INTEGER (Write)
-*           Logical-unit number of the command input.
-*        LUTERM = INTEGER (Write)
-*           Logical-unit number of the terminal output.
 
 *  Arguments Given:
       LOGICAL   INTER
@@ -134,21 +117,7 @@
 *  Initialise COMMON-block variables.
 *  ==================================
 
-*  Nothing has been output, and there is no command.
-      LHELP = 0
-      HELPN = .TRUE.
-      CMD = ' '
-
-*  Fixed for test purposes.  Note these are hardware specific.
-      ANSI = .FALSE.
-      LUCMD = 5
-      LUTERM = 6
-
-*  Find the height and width of the screen.  Use the full screen area.
-*  A zero or negative LBOT (which occurs when there is an error) will
-*  suppress paging.
-      CALL ONE_SCRSZ( WIDTH, LBOT, STATUS )
-      LTOP = 1
+      CALL SHL_PAGRST( STATUS )
 
 *  Get help.
 *  =========

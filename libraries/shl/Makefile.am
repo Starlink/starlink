@@ -3,7 +3,7 @@
 bin_SCRIPTS = shl_link shl_link_adam
 
 bin_PROGRAMS = browsehlp
-include_HEADERS = $(PUBLIC_INCLUDES) shl.h
+include_HEADERS = shl.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = libshl.la `err_link` `one_link` `hlp_link` `fio_link`\
@@ -13,7 +13,6 @@ browsehlp_DEPENDENCIES = shl.h
 lib_LTLIBRARIES = libshl.la libshl_adam.la
 
 libshl_la_SOURCES = \
-	$(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
 	$(C_ROUTINES)
 
@@ -21,12 +20,12 @@ libshl_la_DEPENDENCIES = $(PRIVATE_INCLUDES)
 
 libshl_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
-PUBLIC_INCLUDES = SHL_HLPCMD
+PRIVATE_INCLUDES = SHL_HLPCMD
 
 # These are the standard KAPPA help routines renamed to
 # enter the SHL namespace
 F_ROUTINES = shl_gethlp.f shl_gthlpi.f shl_pthlpo.f shl_sread.f \
-	shl_trnvar.f
+	shl_trnvar.f shl_pagtxt.f shl_pagrst.f
 
 # This is a modification of a standard A-task help application
 # subroutine re-written to be callable with the help environment
@@ -41,9 +40,9 @@ ADAM_F_ROUTINES = shl_adam.f
 C_ROUTINES = shl_standalone.c
 
 # Testing
-TESTS = testhelp ctesthelp
+TESTS = testhelp ctesthelp test_pager
 
-check_PROGRAMS = ctesthelp
+check_PROGRAMS = ctesthelp test_pager
 check_MONOLITHS = testhelp
 # no variable testhelp_TASKS -- testhelp is an ATASK
 testhelp_SOURCES = testhelp.f
@@ -56,6 +55,9 @@ ctesthelp_SOURCES = ctesthelp.c
 ctesthelp_DEPENDENCIES = demo.shl
 ctesthelp_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link` \
 	@FCLIBS@
+
+test_pager_SOURCES = test_pager.f
+test_pager_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link`
 
 # need to compile the test help file
 demo.shl: demo.hlp
