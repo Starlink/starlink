@@ -883,7 +883,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 7, 2004 5:39:30 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 8, 2004 5:39:02 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -891,9 +891,6 @@ docs:
   [javadoc] Constructing Javadoc information...
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
-Xlib: connection to "europa:0.0" refused by server
-Xlib: No protocol specified
-
      [xslt] apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt:580:68: Error! java.lang.reflect.InvocationTargetException Cause: java.lang.reflect.InvocationTargetException
      [xslt] : Fatal Error! java.lang.NullPointerException Cause: java.lang.NullPointerException
      [xslt] Failed to process /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
@@ -901,4 +898,4 @@ Xlib: No protocol specified
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 21 minutes 56 seconds
+Total time: 21 minutes 37 seconds
