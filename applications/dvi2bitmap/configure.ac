@@ -39,6 +39,7 @@ dnl  spurious linking errors on, for example, Solaris)
 AC_LANG([C])
 
 AC_PATH_PROG(PERL, perl)
+AC_PATH_PROG(TEX, tex, NOTEX)
 AC_PATH_PROG(DOXYGEN, doxygen, [])
 if test -z "$DOXYGEN"; then
     AC_MSG_NOTICE([Couldn't find Doxygen -- I'll just create a stub library document.  Doxygen's good though: you can get it from www.doxygen.org])
@@ -526,5 +527,6 @@ DOXYGEN_OUTPUT_DIRECTORY="doc_libdvi2bitmap"
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile component.xml
                  Doxyfile version.h])
+AC_CONFIG_FILES(test/t8.pl, [chmod +x test/t8.pl])
 AC_OUTPUT
 
