@@ -26,6 +26,10 @@ AC_PROG_CPP
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
+#   ast_link needs to be able to link against the Fortran runtime if
+#   necessary
+AC_FC_LIBRARY_LDFLAGS
+
 #   Find an absolute path to the Perl binary, augmenting the path with the
 #   location of the Starlink Perl build.  If this fails, then set @PERL@
 #   to the backup `/usr/bin/env perl', which will find Perl if it exists

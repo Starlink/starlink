@@ -170,10 +170,10 @@
 #  This line is edited during configuration of this script to define a list
 #  of the libraries that must be linked in order to resolve Fortran 77
 #  references made from within a C main program. Typically, these will arise
-#  from libraries written in Fortran which the C program calls.
-#  The value here is worked out by the autoconf macro AC_F77_LIBRARY_LDFLAGS.
-#      flibs='@FCLIBS@'
-       flibs=''
+#  from libraries written in Fortran which the AST library (or the C
+#  program) calls.  The value here is worked out by the autoconf macro
+#  AC_FC_LIBRARY_LDFLAGS.
+      flibs='@FCLIBS@'
 
 #  This function searches the directory path specified in PATH, looking for
 #  an executable file which is not a directory. If found, it echos the full
