@@ -36,6 +36,8 @@
         RECORD /SSO_MI_REC/         MI(SSO__MXMI)
       END STRUCTURE
 
+      LOGICAL SSO_INIT_Q
+
 *    Declare common block
       RECORD /SSO_SYS/ SSO
-      COMMON /SSO_CMN/ SSO
+      COMMON /SSO_CMN/ SSO,SSO_INIT_Q
