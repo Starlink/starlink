@@ -7,8 +7,8 @@ lib_LTLIBRARIES = libchr.la
 libchr_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) \
-	CHR_ERR \
-	CHR_SYS
+	$(PRIVATE_INCLUDES) \
+	$(PUBLIC_INCLUDES)
 
 F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr_atom.f  chr_btoi.f  chr_clean.f chr_copy.f  chr_ctoc.f \
@@ -29,6 +29,12 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
 
 C_ROUTINES = chr_etom.c chr_mtoe.c
 
+PRIVATE_INCLUDES = CHR_SYS
+
+PUBLIC_INCLUDES = CHR_ERR
+
+BUILT_SOURCES = CHR_ERR
+
 TEST_ROUTINES = case.f compare.f decode.f edit.f \
         encode.f enquire.f port.f search.f \
         test_abbrv.f test_achr.f test_appnd.f test_atok.f \
@@ -47,4 +53,3 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_swap.f  test_term.f  test_tochr.f test_trchr.f test_trunc.f \
         test_ucase.f test_upper.f test_wild.f 
 
-BUILT_ROUTINES = CHR_ERR
