@@ -78,8 +78,6 @@ $usage = "Usage: $self [-html]    <func-name> [<package>]\n"
 
 use Fcntl;
 use Scb;
-use FortranTag;
-use CTag;
 use Directory;
 
 #  Declarations.
@@ -97,6 +95,7 @@ sub footer;
 sub hprint;
 sub quasialph;
 sub demeta;
+sub tidyup;
 
 #  Determine whether we are being run as a CGI script, and take appropriate
 #  action if so.
@@ -105,6 +104,7 @@ if (exists $ENV{'SERVER_PROTOCOL'}) {
    $cgi = 1;
    print "Content-Type: text/html\n\n";
    @ARGV = split '&', $ENV{'QUERY_STRING'};
+   $ENV{'PATH'} = '/bin:/usr/bin';
 }
 
 #  Parse command line arguments.
@@ -141,6 +141,13 @@ if (!$name || $type eq 'regex') {
    close TASKS;
    @packages = sort keys %tasks;
 }
+
+#  Set up signal handler.  Note this is not entirely safe since tidyup
+#  does non-trivial work and so (probably) calls some non-reentrant
+#  routines.  If the handler is called at an unlucky time this may
+#  result in an inelegant exit (core dump).
+
+$SIG{'INT'} = sub {tidyup; exit;};
 
 #  Main processing.
 
@@ -207,7 +214,7 @@ elsif (!$name) {
       footer;
    }
    else {
-      die $usage;
+      error $usage;
    }
 }
 else {
@@ -215,6 +222,8 @@ else {
 }
 
 #  End
+
+tidyup;
 
 exit;
 
@@ -571,6 +580,7 @@ sub get_module {
 
 #  Set up scratch directory.
 
+   $tmpfiles = 1;
    mkdir "$tmpdir", 0777;
    chdir "$tmpdir"  or error "Failed to enter $tmpdir";
 
@@ -602,14 +612,10 @@ sub get_module {
 
    extract_file $file, $head;
 
-#  Finished with STDOUT; by closing it here the CGI user doesn't have to
-#  wait any longer than necessary (I think).
-
-   close STDOUT;
-
 #  Tidy up.
 
    rmrf $tmpdir;
+   $tmpfiles = 0;
 
 #  Return successful exit code.
 
@@ -744,7 +750,7 @@ sub output {
 
    if ($html) {
       header $locname;
-      print "<pre>\n" if ($html);
+      print "<pre>\n";
    }
    else {
       print STDERR "$locname\n";
@@ -754,19 +760,13 @@ sub output {
 
    if ($html) {
 
-#     Add SGML-like tags to source code.
-
-      if ($ftype eq 'f' || $ftype eq 'gen') {
-         $tagged = FortranTag::tag (join '', <FILE>);
-      }
-      elsif ($ftype eq 'c' || $ftype eq 'h') {
-         $tagged = CTag::tag (join '', <FILE>);
-      }     
-
+      $file =~ /\.([^.]+)$/;
+      my $ext = $1 || '';
+      if ($rtagger = $tagger{$ext}) {
+         $tagged = &$rtagger (join '', <FILE>);
 
 #     Check tags, and remove those which fail to refer.
 
-      if ($tagged) {
          my $inhref = 0;
          $tagged =~ s{(<[^>]+>)}{
             &{
@@ -781,7 +781,7 @@ sub output {
                            $file =~ tr/A-Z/a-z/;
                         }
                         if ($file_index->get($file)) {
-                           $href = "$scb?file=$file&amp;$package";
+                           $href = "$scb?$file&amp;$package&amp;type=file";
                         }
                      }
                      else {
@@ -809,12 +809,6 @@ sub output {
                      $inhref = 0;
                      return $retval;
                   }
-                  elsif (($tag{'Start'} eq 'a') && ($ftype eq 'gen') &&
-                         ($tag{'name'} =~ /(.*)(&lt;t&gt;)(.*)/i)) {
-                     my ($pre, $gen, $post) = ($1, $2, $3);
-                     return join ('', map ("<a name='$pre$_$post'>",
-                        ($gen, qw/i r d l c b ub w uw/)));
-                  }
                   return $1;
                }
             }
@@ -831,6 +825,18 @@ sub output {
          }
 
       }
+
+#     Output appropriate footer text.
+
+      print "</pre>\n";
+      my $year = 1900 + (localtime)[5];
+      hprint "
+         <hr><i>
+         Copyright &copy; $year Central Laboratory of the Research Councils
+         </i>
+      " unless ($copyright);
+      footer;
+
    }
 
    else {
@@ -844,19 +850,12 @@ sub output {
 
    close FILE;
 
-#  Output appropriate footer text.
+}
 
-   print "</pre>\n" if ($html);
-   if ($html && !$copyright) {
-      my $year = 1900 + (localtime)[5];
-      hprint "
-         <hr><i>
-         Copyright &copy; $year Central Laboratory of the Research Councils
-         </i>
-      ";
-   }
-   footer;
 
+########################################################################
+sub tidyup {
+   rmrf $tmpdir if ($tmpfiles);
 }
 
 
@@ -874,7 +873,7 @@ sub error {
    my $message = shift;       # Terse error message text.
    my $more = shift;          # Verbose explanation of error.
 
-   rmrf $tmpdir;
+   tidyup;
 
    if ($cgi) {
       header "Error";
@@ -914,9 +913,14 @@ sub footer {
 }
 
 
+########################################################################
 sub demeta {
 
    my $string = shift;
+
+   $string =~ s/&lt;/</g;
+   $string =~ s/&gt;/>/g;
+   $string =~ s/&amp;/&/g;
 
    $string =~ s/&/&amp;/g;
    $string =~ s/>/&gt;/g;
