@@ -1,4 +1,4 @@
-1 KAPRH_Version_1.0
+1 KAPRH_Version_2.0
 
    KAPRH is a package containing commands retired from the KAPPA
    package (see SUN/95). These commands have been removed from KAPPA 
@@ -7,6 +7,5 @@
 
    This release adds the following commands to KAPRH:
 
-   CONTOVER, GREYPLOT, INSPECT, KRHHELP, MOSAIC, QUILT, SNAPSHOT, 
-   TURBOCONT
+   CRELUT   
 
