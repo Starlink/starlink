@@ -101,41 +101,15 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			SLA_EPJ
-        DOUBLE PRECISION	SLA_EPJ
-
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! Object header
-      CHARACTER*80		LABEL			! X,Y axis labels
-      CHARACTER*3		PRJ			! Projection name
-      CHARACTER*3		SYS			! Coord system name
-      CHARACTER*40		UNITS(2)		! X,Y axis units
 
-      DOUBLE PRECISION		BTAI			! Value of BASE_TAI
-      DOUBLE PRECISION		EPOCH			! Epoch
-      DOUBLE PRECISION		MJD			! Observation time
-      DOUBLE PRECISION		PA			! Position angle
       DOUBLE PRECISION		SPOINT(2)		! RA, DEC
 
-      REAL			BASE(2), SCALE(2)	! Axis values
-      REAL			EQNX			! Equinox
-      REAL			TOR			! Radian conversion
-
-      INTEGER			DIMS(2)			! Axis dimensions
-      INTEGER			IMJD			! Value of BASE_MJD
-      INTEGER			IPSF			! Psf system handle
       INTEGER			NACT			! Actual # values read
       INTEGER			PIXID			! Pixellation object
       INTEGER			PRJID			! Projection object
-      INTEGER			PTR(2)			! Axis data pointers
       INTEGER			SYSID			! CoordSystem object
-      INTEGER			X_AX,Y_AX,E_AX,T_AX	! Axis numbers
-
-      LOGICAL			HASPIX			! Spatial axes exist?
-      LOGICAL			REG(2)			! Axes regular
-      LOGICAL			PRJOK, SYSOK		! Projection/system ok?
-      LOGICAL			TAIOK			! BASE_TAI found?
 *.
 
 *  Check inherited global status.
@@ -150,7 +124,16 @@
       CALL ADI1_LOCHEAD( ARGS(2), .TRUE., HLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*    Write data to header
+*    Stuff in the pixellation description structure
+        IF ( PIXID .NE. ADI__NULLID ) THEN
+
+*      Position angle
+          CALL ADI1_CCA2HD( PIXID, 'ROTATION', HLOC, 'POSITION_ANGLE',
+     :                      STATUS )
+
+        END IF
+
+*    Stuff in projection object
         IF ( PRJID .NE. ADI__NULLID ) THEN
 
 *      The pointing direction
@@ -158,13 +141,22 @@
           CALL HDX_PUTD( HLOC, 'AXIS_RA', 1, SPOINT(1), STATUS )
           CALL HDX_PUTD( HLOC, 'AXIS_DEC', 1, SPOINT(2), STATUS )
 
+*      The nominal pointing direction
+          CALL ADI_CGET1D( PRJID, 'NPOINT', 2, SPOINT, NACT, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL HDX_PUTD( HLOC, 'FIELD_RA', 1, SPOINT(1), STATUS )
+            CALL HDX_PUTD( HLOC, 'FIELD_DEC', 1, SPOINT(2), STATUS )
+          ELSE
+            CALL ERR_ANNUL( STATUS )
+          END IF
+
         END IF
 
+*    Stuff in the coordinate system description structure
         IF ( SYSID .NE. ADI__NULLID ) THEN
 
 *      Equinox
-          CALL ADI_CGET0R( SYSID, 'EQUINOX', EQNX, STATUS )
-          CALL HDX_PUTR( HLOC, 'EQUINOX', 1, EQNX, STATUS )
+          CALL ADI1_CCA2HD( SYSID, 'EQUINOX', HLOC, 'EQUINOX', STATUS )
 
         END IF
 
