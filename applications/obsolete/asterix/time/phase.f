@@ -166,7 +166,7 @@
       COEFF(1) = COEFF(1) - 2400000.5
 
 *    Then to atomic time
-      CALL TIM_MJD2TAI( COEFF(1), EPHEM_TAI )
+      CALL TCI_MJD2TAI( COEFF(1), EPHEM_TAI )
 
 *    Find difference from dataset reference time in seconds, and other
 *    coefficents in seconds
