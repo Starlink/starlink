@@ -33,9 +33,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'AST_IMG:IMG_CMN'
+      INCLUDE 'IMG_CMN'
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_XRTHEAD)'
 *    Status :
