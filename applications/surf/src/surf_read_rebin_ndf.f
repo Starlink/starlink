@@ -7,7 +7,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
-     :     USE_LST, LST_PTR, INT_LIST,
+     :     USE_LST, LST_PTR, INT_LIST, BOLWT,
      :     STATUS)
 *+
 *  Name:
@@ -26,7 +26,7 @@
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
 *     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
-*     :     USE_LST, LST_PTR, INT_LIST,
+*     :     USE_LST, LST_PTR, INT_LIST, BOLWT,
 *     :     STATUS)
 
  
@@ -119,6 +119,8 @@
 *        Array of pointers (begin and end)  to array of LSTs
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
+*     BOLWT ( N_BOL ) = REAL (Returned)
+*        Relative weights of each bolometer
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -132,6 +134,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.14  1998/04/28 02:22:24  timj
+*     Add BOLWT
+*
 *     Revision 1.13  1998/03/18 22:55:48  timj
 *     Add support for multiple beams
 *
@@ -188,6 +193,7 @@
       INTEGER          BOL_DEC_PTR
       INTEGER          BOL_RA_END
       INTEGER          BOL_RA_PTR
+      REAL             BOLWT( SCUBA__NUM_CHAN * SCUBA__NUM_ADC )
       INTEGER          DATA_END
       INTEGER          DATA_PTR
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
@@ -236,7 +242,7 @@
       INTEGER          FILE_VARIANCE_PTR
                                        ! pointer to variance array in input file
       CHARACTER*80     FITS (SCUBA__MAX_FITS) 
-                                       ! array of FITS keywords
+                                       ! FITS array
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
       INTEGER          I               ! DO loop index
@@ -859,6 +865,38 @@
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration '//
      :        '^N_I of measurement ^N_M', STATUS)
+      END IF
+
+*     Deal with bolometer weights
+
+      IF (STATUS .EQ. SAI__OK) THEN
+
+*     Read in the bolometer weights if they are there
+
+         CALL CMP_GET1R(IN_REDSX_LOC, 'BOLWT', N_BOL,
+     :        BOLWT, ITEMP, STATUS)
+
+*     If there was an error this means that the BOLWT extension is not there
+*     therefore fill up the weights array with ones
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
+            DO I = 1, N_BOL
+               BOLWT(I) = 1.0
+            END DO
+
+*     Make sure we read in the correct number of values
+*     Raise an error if not
+         ELSE IF (ITEMP .NE. N_BOL) THEN
+
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL MSG_SETI('NB', ITEMP)
+            CALL MSG_SETI('NBOL', N_BOL)
+            CALL ERR_REP(' ','^TASK: The number of entries in the '//
+     :           'BOLWT extension (^NB) does not match the number '//
+     :           'of bolometers in the file (^NBOL)', STATUS)
+         END IF
+
       END IF
 
 *     calculate the apparent RA and Dec of the map centre at IN_UT1
