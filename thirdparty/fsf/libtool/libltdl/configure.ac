@@ -28,6 +28,12 @@ AC_INIT([libltdl], [1.2], [bug-libtool@gnu.org])
 AC_CONFIG_SRCDIR([ltdl.c])
 
 
+# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
+# This causes the `install-manifest' target to be included in Makefile.in
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
+
+
 ## ------------------------------- ##
 ## Libltdl specific configuration. ##
 ## ------------------------------- ##
