@@ -67,7 +67,8 @@
 *        highest row is listed first.
 *
 *        In all cases, adjacent values are sepaerated by spaces, and bad
-*        pixel values are represented by the string "BAD".
+*        pixel values are represented by the string "BAD". Values equal
+*        to (VAL__MAXD - 1) are represented by the string "OUT".
 *     MAXLEN = INTEGER (Given)
 *        The maximum length allowed for a line of textual output.
 *     VALUE = DOUBLE PRECISION (Returned)
@@ -124,6 +125,15 @@
       CHARACTER BADTXT*(BADLEN)! Text for bad values
       PARAMETER( BADTXT = 'BAD' )
 
+      DOUBLE PRECISION OUTVAL  ! The out value
+      PARAMETER( OUTVAL = VAL__MAXD - 1.0D0 )
+
+      INTEGER OUTLEN           ! Length of text for out values
+      PARAMETER( OUTLEN = 3 )
+
+      CHARACTER OUTTXT*(OUTLEN)! Text for out values
+      PARAMETER( OUTTXT = 'OUT' )
+
       INTEGER XGAP             ! No. of characters between row index and data
       PARAMETER( XGAP = 3    ) ! values in Strips format (one will be a ":").
 
@@ -149,11 +159,13 @@
       VWID = 0
       DO IY = YLO, YHI
          DO IX = XLO, XHI
-            IF( ARRAY( IX, IY ) .NE. VAL__BADD ) THEN
+            IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+               JAT = BADLEN
+            ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+               JAT = OUTLEN
+            ELSE
                CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
      :                                    STATUS ), LINE, JAT )
-            ELSE
-               JAT = BADLEN
             END IF
             VWID = MAX( VWID, JAT )
          END DO
@@ -234,11 +246,15 @@
 *  Append the data values for each column.
                DO IX = IX0, MIN( IX0 + NV - 1, XHI )
                   JAT = IAT
-                  IF( ARRAY( IX, IY ) .NE. VAL__BADD ) THEN
+                  IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                     CALL CHR_PUTC( BADTXT, LINE, JAT )
+
+                  ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                     CALL CHR_PUTC( OUTTXT, LINE, JAT )
+
+                  ELSE
                      CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
      :                                          STATUS ), LINE, JAT )
-                  ELSE 
-                     CALL CHR_PUTC( BADTXT, LINE, JAT )
                   END IF
                   IAT = IAT + COLWID
                END DO
@@ -274,11 +290,15 @@
                CALL CHR_PUTI( IY, LINE, JAT )
                IAT = IAT + YWID
 
-               IF( ARRAY( IX, IY ) .NE. VAL__BADD ) THEN
+               IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                  CALL CHR_PUTC( BADTXT, LINE, IAT )
+
+               ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                  CALL CHR_PUTC( OUTTXT, LINE, IAT )
+
+               ELSE
                   CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
      :                                       STATUS ), LINE, IAT )
-               ELSE 
-                  CALL CHR_PUTC( BADTXT, LINE, IAT )
                END IF
 
                CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, STATUS )
@@ -292,11 +312,15 @@
       ELSE IF( FORMAT .EQ. 'VLIST' ) THEN
          DO IY = YLO, YHI
             DO IX = XLO, XHI
-               IF( ARRAY( IX, IY ) .NE. VAL__BADD ) THEN
+               IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                  CALL CHR_PUTC( BADTXT, LINE, JAT )
+
+               ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                  CALL CHR_PUTC( OUTTXT, LINE, JAT )
+
+               ELSE
                   CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
      :                                       STATUS ), LINE, JAT )
-               ELSE 
-                  CALL CHR_CTOC( BADTXT, LINE, JAT )
                END IF
                CALL KPG1_REPRT( LINE( : JAT ), QUIET, LOG, FD, STATUS )
             END DO
@@ -313,11 +337,15 @@
 
             DO IX = XLO, XHI
                JAT = IAT
-               IF( ARRAY( IX, IY ) .NE. VAL__BADD ) THEN
+               IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                  CALL CHR_PUTC( BADTXT, LINE, JAT )
+
+               ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                  CALL CHR_PUTC( OUTTXT, LINE, JAT )
+
+               ELSE
                   CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
      :                                       STATUS ), LINE, JAT )
-               ELSE 
-                  CALL CHR_PUTC( BADTXT, LINE, JAT )
                END IF
                IAT = IAT + VWID
             END DO
