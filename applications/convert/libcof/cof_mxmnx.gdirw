@@ -1,0 +1,234 @@
+      SUBROUTINE COF_MXMN<T>( BAD, DIM, ARRAY, NINVAL, MAXMUM, MINMUM,
+     :                        MAXPOS, MINPOS, STATUS )
+*+
+*  Name:
+*     COF_MXMNx
+
+*  Purpose:
+*     Returns the maximum and minimum values of an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation
+*     CALL COF_MXMNx( BAD, DIM, ARRAY, NINVAL, MAXMUM,
+*    :                 MINMUM, MAXPOS, MINPOS, STATUS )
+
+*  Description:
+*     This routine returns the maximum and minimum values of an input
+*     array, where it found the maxima and minima, and the number of
+*     good and bad pixels in the array.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If true there may be bad pixels present in the array.  If false
+*        it is safe not to check for bad values.
+*     DIM = INTEGER (Given)
+*        The dimension of the input array.
+*     ARRAY( DIM )  =  ? (Given)
+*        Input array of data.
+*     NINVAL  =  INTEGER (Returned)
+*        Number of bad pixels in the array.
+*     MAXMUM  =  ? (Returned)
+*        Maximum value found in the array.
+*     MINMUM  =  ? (Returned)
+*        Minimum value found in the array.
+*     MAXPOS  =  INTEGER (Returned)
+*        Index of the pixel where the maximum value is (first) found.
+*     MINPOS  =  INTEGER (Returned)
+*        Index of the pixel where the minimum value is (first) found.
+*     STATUS = INTEGER  (Given)
+*        Global status value
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     array supplied to the routine must have the data type specified.
+
+*  Algorithm:
+*     - Initialise extreme values to opposite extremes, and postions
+*     to the first array element.
+*     - Loop for all pixels comparing current value with the current
+*     minimum and maximum.  Use separate loops with and without bad-
+*     element checks.  In the former count the number of bad elements.
+
+*  Authors:
+*     MJC: Malcolm J. Currie  (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1994 June 22 (MJC):
+*        Original version copied from KPG1_MXMNx.
+*     {enter_any_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE              ! no default typing allowed
+
+*  Global Constants:
+      INCLUDE  'SAE_PAR'          ! SSE global definitions
+      INCLUDE  'PRM_PAR'          ! Magic-value definitions
+
+*  Arguments Given:
+      INTEGER
+     :  DIM
+
+      LOGICAL
+     :  BAD
+
+      <TYPE>
+     :  ARRAY( DIM )
+
+*  Arguments Returned:
+      INTEGER
+     :  NINVAL,
+     :  MAXPOS,
+     :  MINPOS
+
+      <TYPE>
+     :  MAXMUM,
+     :  MINMUM
+
+*  Status:
+      INTEGER  STATUS
+
+*  Local Variables:
+      INTEGER
+     :  I                         ! Counter
+
+*.
+
+*    check status on entry - return if not o.k.
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Initialise maximum and minimum variables to be equal to the value
+*    of the first element of the array, and the positions of each to be
+*    there.
+
+      MINMUM = ARRAY( 1 )
+      MAXMUM = ARRAY( 1 )
+      MAXPOS = 1
+      MINPOS = 1
+
+*    Initialise the bad value count.
+
+      IF ( BAD ) THEN
+
+*       Watch for a bad first value.
+
+         IF ( ARRAY( 1 ) .EQ. VAL__BAD<T> ) THEN
+
+*          Search for the first non-bad value.
+
+            I = 2
+            DO WHILE ( I .LE. DIM  .AND.
+     :                 ARRAY( MIN( I, DIM ) ) .EQ. VAL__BAD<T> )
+               I = I + 1
+            END DO
+            NINVAL = I - 1
+
+*          Check to see if all pixels are undefined.
+
+            IF ( NINVAL .EQ. DIM ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'COF_MXMNX_ARINV',
+     :           'All pixels in the sub-array are bad.', STATUS )
+               GOTO 999
+            END IF
+
+*          Set the initial values.
+
+            MINMUM = ARRAY( I )
+            MAXMUM = ARRAY( I )
+            MAXPOS = I
+            MINPOS = I
+
+*       The first value is not bad, so proceed normally.
+
+         ELSE
+            NINVAL = 0
+         END IF
+      END IF
+
+*    That's all that needs to be done if there is but one pixel.
+
+      IF ( DIM .EQ. 1 ) GOTO 999
+
+*    Bad-pixel testing to be undertaken.
+*    ===================================
+
+      IF ( BAD ) THEN
+
+*       Loop round all the elements of the array.
+
+         DO  I = MIN( NINVAL + 2, DIM ), DIM
+
+*          Test for valid pixel.
+
+            IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+
+*             Check current maximum against current pixel value.
+
+               IF ( ARRAY( I ) .GT. MAXMUM ) THEN
+                  MAXMUM = ARRAY( I )
+                  MAXPOS = I
+
+*             Check current minimum against current pixel value.
+
+               ELSE IF ( ARRAY( I ) .LT. MINMUM ) THEN
+                  MINMUM = ARRAY( I )
+                  MINPOS = I
+               END IF
+            ELSE
+
+*             One more bad pixel to the count.
+
+               NINVAL = NINVAL + 1
+            END IF
+
+*        End of loop round the array elements.
+
+         END DO
+
+*    No bad-pixel testing...
+*    =======================
+
+      ELSE
+
+*       No bad pixels by definition.
+
+         NINVAL = 0
+
+*       Loop round all the elements of the array.
+
+         DO  I = 2, DIM
+
+*          Check current maximum against current pixel value.
+
+            IF ( ARRAY( I ) .GT. MAXMUM ) THEN
+               MAXMUM = ARRAY( I )
+               MAXPOS = I
+
+*          Check current minimum against current pixel value.
+
+            ELSE IF ( ARRAY( I ) .LT. MINMUM ) THEN
+               MINMUM = ARRAY( I )
+               MINPOS = I
+            END IF
+
+*        End of loop round the array elements.
+
+         END DO
+      END IF
+
+  999 CONTINUE
+
+*    Return and end.
+
+      END
