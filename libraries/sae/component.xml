@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sae">
+  <version>1.0</version>
+  <path>libraries/sae</path>
+  <description>Starlink Applications Environment special files</description>
+  <abstract>
+    <p>The SAE package brings together some include files, a facility
+      error file and a shell script needed for development of software
+      in the Starlink environment, and for building the USSC.</p>
+  </abstract>
+  <dependencies>
+    <build>starconf star2html messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>bly</uname>
+      <email>NONE</email>
+    </person>
+  </developers>
+ <documentation> sun191</documentation> 
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
