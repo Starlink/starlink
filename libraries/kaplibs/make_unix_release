@@ -73,7 +73,7 @@
 
 #  Edit the kplsearch script to include the names and purposes of
 #  all routines.
-      set ans = `confirm "Re-create SUN238?\n\n$n"`
+      set ans = `confirm "Re-create SUN238?"`
       if( "$ans" == "n" || "$ans" == "N" ) then
          set makesun = "no"
       else
