@@ -127,78 +127,78 @@
 *  Get user HDU specification
       CALL ADI_CGET0I( ID, 'UserHDU', UIHDU, STATUS )
 
-*  Make local copy of HDU name
+*  Make local copy of HDU name. Convert if user HDU number supplied
       LHDU = HDU
+      IF ( HDU .EQ. ' ' ) LHDU = 'PRIMARY'
+      IF ( (UIHDU .GT. 0) .AND. (HDU.GT.' ') ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Attempted illegal index to named HDU '/
+     :              /'when file opened with specific HDU', STATUS )
+        GOTO 99
+      END IF
 
-*  Access is at file level?
-      IF ( UIHDU .EQ. 0 ) THEN
+*  HDU already found?
+      CALL ADI_THERE( HCID, LHDU, THERE, STATUS )
+      IF ( THERE ) THEN
+        CALL ADI_FIND( HCID, LHDU, HDUID, STATUS )
+        GOTO 99
+      END IF
 
-*    Import HDU name
-        IF ( LHDU .EQ. ' ' ) LHDU = 'PRIMARY'
-        CALL ADI_THERE( HCID, LHDU, THERE, STATUS )
-        IF ( THERE ) THEN
-          CALL ADI_FIND( HCID, LHDU, HDUID, STATUS )
-          GOTO 99
+*  Extract logical unit
+      CALL ADI_CGET0I( ID, 'Lun', LUN, STATUS )
 
+*  Move to start of file?
+      IF ( (UIHDU.EQ.1) .OR. (LHDU .EQ. 'PRIMARY') ) THEN
+
+*    Move to first HDU
+        CALL ADI2_MVAHDU( ID, LUN, 1, HDUTYP, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL ADI2_ADDHDU( ID, LHDU, 1, HDUTYP, HDUID, STATUS )
         ELSE
+          GOTO 99
+        END IF
 
-*      Extract logical unit
-          CALL ADI_CGET0I( ID, 'Lun', LUN, STATUS )
+      ELSE
 
-*      Move to start of file
-          IF ( LHDU .EQ. 'PRIMARY' ) THEN
+*    Scan HDU for HDU matching requested name
+        FOUND = .FALSE.
+        IHDU = 2
+        DO WHILE ( (STATUS.EQ.SAI__OK) .AND. .NOT. FOUND )
 
-*        Move to first HDU
-            CALL ADI2_MVAHDU( ID, LUN, 1, HDUTYP, STATUS )
-            IF ( STATUS .EQ. SAI__OK ) THEN
-              CALL ADI2_ADDHDU( ID, LHDU, 1, HDUTYP, HDUID, STATUS )
-            ELSE
-              GOTO 99
+*      Move to next HDU
+          CALL ADI2_MVAHDU( ID, LUN, IHDU, HDUTYP, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
+
+*        Construct name for HDU
+            FSTAT = 0
+            CALL FTGKYS( LUN, 'EXTNAME', EXTNAM, CMNT, FSTAT )
+            IF ( FSTAT .NE. 0 ) THEN
+              FSTAT = 0
+              WRITE( EXTNAM, '(A,I2.2)' ) 'HDU_', IHDU
             END IF
 
-          ELSE
+*        Add its description to our list
+            CALL ADI2_ADDHDU( ID, EXTNAM, IHDU, HDUTYP, HDUID, STATUS )
 
-*        Scan HDU for HDU matching requested name
-            FOUND = .FALSE.
-            IHDU = 2
-            DO WHILE ( (STATUS.EQ.SAI__OK) .AND. .NOT. FOUND )
-
-*          Move to next HDU
-              CALL ADI2_MVAHDU( ID, LUN, IHDU, HDUTYP, STATUS )
-              IF ( STATUS .EQ. SAI__OK ) THEN
-
-                FSTAT = 0
-                CALL FTGKYS( LUN, 'EXTNAME', EXTNAM, CMNT, FSTAT )
-                IF ( FSTAT .NE. 0 ) THEN
-                  FSTAT = 0
-                  WRITE( EXTNAM, '(A,I2.2)' ) 'HDU_', IHDU
-                END IF
-
-*            Add its description to our list
-                CALL ADI2_ADDHDU( ID, EXTNAM, IHDU, HDUTYP, HDUID,
-     :                            STATUS )
-
-*            If not found release this HDU
-                IF ( EXTNAM .EQ. LHDU ) THEN
-                  FOUND = .TRUE.
-                ELSE
-                  CALL ADI_ERASE( HDUID, STATUS )
-                  IHDU = IHDU + 1
-                END IF
-
-              END IF
-
-            END DO
-
-*        If we didn't find the HDU, write the number of HDU's in the file
-            IF ( .NOT. FOUND ) THEN
-              CALL ERR_BEGIN( STATUS )
-              CALL ADI_CPUT0I( ID, 'Nhdu', IHDU-1, STATUS )
-              CALL ERR_END( STATUS )
+*        If not found release this HDU
+            IF ( (UIHDU.GT.0) .AND. (IHDU.EQ.UIHDU) ) THEN
+              FOUND = .TRUE.
+            ELSE IF ( EXTNAM .EQ. LHDU ) THEN
+              FOUND = .TRUE.
+            ELSE
+              CALL ADI_ERASE( HDUID, STATUS )
+              IHDU = IHDU + 1
             END IF
 
           END IF
 
+        END DO
+
+*    If we didn't find the HDU, write the number of HDU's in the file
+        IF ( .NOT. FOUND ) THEN
+          CALL ERR_BEGIN( STATUS )
+          CALL ADI_CPUT0I( ID, 'Nhdu', IHDU-1, STATUS )
+          CALL ERR_END( STATUS )
         END IF
 
       END IF
@@ -211,7 +211,7 @@
 *  Report if not found
       IF ( HDUID .EQ. ADI__NULLID ) THEN
         STATUS = SAI__ERROR
-        CALL MSG_SETC( 'HDU', HDU )
+        CALL MSG_SETC( 'HDU', LHDU )
         CALL ERR_REP( ' ', 'HDU /^HDU/ not found in file', STATUS )
       END IF
 
