@@ -221,6 +221,8 @@
 #        Original version, based on a standard template.
 #     15-NOV-1996 (RFWS):
 #        Added Linux support.
+#     10-DEC-1998 (RFWS):
+#        Change to using egcs as the C compiler on Linux.
 #-
 
 #  Export "local" definitions to the environment for use by make.
@@ -289,7 +291,7 @@
             ix86_Linux)
                AR_IN='ar r'
                BLD_SHR='f() { ld -shared -soname $$1 -o $$1 $$2;}; f'
-	       CC='gcc'
+	       CC='egcs'
                CFLAGS='-ansi -O2 -fPIC'
                FC='g77'
 	       FFLAGS='-fno-second-underscore -O2 -fPIC'
