@@ -64,6 +64,7 @@
 *     4 Jul 94    V1.7-1  HRI quantum efficiency and vignetting (RJV)
 *    20 Nov 94    V1.7-2  HRI deadtime (RJV)
 *    15 Feb 95    V1.8-0  Option not to do exposure correction (RJV)
+*     9 Oct 95    V1.8-1  Fixed cock-up with effective exposure (RJV)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -150,7 +151,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTCORR version 1.8-0')
+      PARAMETER (VERSION = 'XRTCORR version 1.8-1')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
@@ -1412,6 +1413,10 @@ D        WRITE(*,*) RLP
       ENDIF
 
       END
+      CALL XRTCORR_DOIT(LOCOUT, HEAD, NX, NY, NT, NP, NR, NWIRE,
+     &          NTHRESH, %val(CDPNTR), %val(PVSING), PSING,
+     &          %val(CIVPNTR), %val(CTPNTR), %val(CWPNTR), %val(DXPNTR),
+     &          %val(DPNTR), %val(VPNTR), %val(QPNTR),STATUS)
 
 *+  XRTCORR_DOIT - apply corrections to an XRT data array
       SUBROUTINE XRTCORR_DOIT(LOC, HEAD, NX, NY, NT, NP, NR,
@@ -1464,7 +1469,6 @@ D        WRITE(*,*) RLP
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 
-      EFF_EXPOS=0.0
 
 * Apply corrections to each bin
       DO RLP=1,NR
@@ -1482,7 +1486,6 @@ D        WRITE(*,*) RLP
                      TOT_CORR = DCORR(TLP) * TCORR(1) * PCORR *
      &                           VCORR(RLP) * WCORR(1) / EXPOS(TLP)
 
-                     EFF_EXPOS = EFF_EXPOS + EXPOS(TLP)/DCORR(TLP)
 *
                      DATA(XLP,YLP,TLP,PLP,RLP) =
      &                     DATA(XLP,YLP,TLP,PLP,RLP) * TOT_CORR
@@ -1510,9 +1513,12 @@ D        WRITE(*,*) RLP
         ENDDO
       ENDDO
 *
-* Write in an effective exposure value into the header
-       CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
-       CALL HDX_PUTR(HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS)
+* Write in an effective exposure value into the header for non time series
+      IF (NT.EQ.1) THEN
+        EFF_EXPOS=EXPOS(1)/DCORR(1)
+        CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
+        CALL HDX_PUTR(HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS)
+      ENDIF
 
  999  IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_REP(' ','from XRTCORR_DOIT',STATUS)
