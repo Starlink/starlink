@@ -60,7 +60,7 @@ my %counts = (
 	      WSDRIV => 0,
 	      X2DRIV => 0,
 	      XWDRIV => 2,
-	      STARXWDRIV => 2,
+	      STAR_XWDRIV => 2,
 	      ZEDRIV => 0,
 	      LHDRIV => 0,
 	      MSDRIV => 0,
@@ -103,6 +103,10 @@ push(@lines, "          NBUF = 1\n");
 # Now go through the drivers
 my $devnum = 0;
 for my $drv (@entries) {
+  # If we have an underscore, assume an alias for another driver name
+  # eg star_xwdriv is really a variant of xwdriv
+  my $ldrv = $drv;
+  $ldrv =~ s/^.*_//;
   my $max = $counts{$drv};
   $max = 1 if $max == 0;
   for my $i (1..$max) {
@@ -110,7 +114,7 @@ for my $drv (@entries) {
     my $index = ",$i";
     $index = '' if $max == 1;
     push(@lines, "      ELSE IF (IDEV .EQ. $devnum) THEN\n");
-    push(@lines, "        CALL $drv(IFUNC,RBUF,NBUF,CHR,LCHR$index)\n");
+    push(@lines, "        CALL $ldrv(IFUNC,RBUF,NBUF,CHR,LCHR$index)\n");
   }
 }
 
