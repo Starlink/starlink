@@ -768,7 +768,7 @@
 *  write each pixel allowing for line continuation
               NPIX=NPIX+1
               XP=REAL(I)+0.1*I_XSCALE/ABS(I_XSCALE)
-              YP=REAL(I)+0.1*I_YSCALE/ABS(I_YSCALE)
+              YP=REAL(J)+0.1*I_YSCALE/ABS(I_YSCALE)
               CALL IMG_PIXTOWORLD(XP,YP,X,Y,STATUS)
               CALL MSG_SETR( 'X', X)
               CALL MSG_SETR( 'Y', Y)

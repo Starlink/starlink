@@ -31,6 +31,7 @@
 *      5 Oct 90 : V1.3-0  REVERSE option added (DJA)
 *      3 Nov 94 : V1.8-0  Upgraded to new graphics (DJA)
 *     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
+*     12 Jan 95 : V1.8-2  HDS removed, using new interfaces (DJA)
 *
 *    Type definitions :
 *
@@ -39,7 +40,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -47,36 +48,36 @@
 *
 *    Local constants :
 *
-      INTEGER                     MAXLINES         ! Maximum amount of hist text
+      INTEGER                   MAXLINES         ! Maximum amount of hist text
          PARAMETER                (MAXLINES = 5)
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)      ILOC             ! Input dataset
-      CHARACTER*(DAT__SZLOC)      OLOC             ! Output dataset
-      CHARACTER*132               TEXT(MAXLINES)   ! Hostory text
+      CHARACTER*132             TEXT(MAXLINES)   	! Hostory text
 
-      INTEGER                     DIMS(DAT__MXDIM) ! Input dimensions
-      INTEGER                     QDIMS(DAT__MXDIM)! Input quality dimensions
+      INTEGER                   DIMS(ADI__MXDIM) 	! Input dimensions
+      INTEGER                   QDIMS(ADI__MXDIM)	! Input quality dimensions
 
-      INTEGER                     IDATA_PTR        ! Input data
-      INTEGER                     IQUAL_PTR        ! Input quality data
-      INTEGER                     NDIM             ! Input dimensionality
-      INTEGER                     NELM             ! Total number of data items
-      INTEGER                     NREC             ! Amount of TEXT used
-      INTEGER                     ODATA_PTR        ! Output data
-      INTEGER                     QNDIM            ! Input quality dimensionality
+      INTEGER                   IDPTR        		! Input data
+      INTEGER			IFID			! I/p file identifier
+      INTEGER                   IQPTR        		! Input quality data
+      INTEGER                   NDIM             	! Input dimensionality
+      INTEGER                   NELM             	! Total number of data items
+      INTEGER                   NREC             	! Amount of TEXT used
+      INTEGER                   ODPTR        		! Output data
+      INTEGER			OFID			! O/p file identifier
+      INTEGER                   QNDIM            	! Input quality dimensionality
 
-      LOGICAL                     ANY_BAD_QUAL     ! Any bad quality points?
-      LOGICAL                     IN_PRIM          ! Input primitive?
-      LOGICAL                     DATA_OK          ! Input data ok?
-      LOGICAL                     REVERSE          ! In reverse mode?
-      LOGICAL                     QUAL_OK          ! Input has quality?
+      LOGICAL                   ANYBAD     		! Any bad quality points?
+      LOGICAL                   DATA_OK          	! Input data ok?
+      LOGICAL			IN_PRIM			! Input is primitive?
+      LOGICAL                   REVERSE          	! In reverse mode?
+      LOGICAL                   QUAL_OK          	! Input has quality?
 *
 *    Version :
 *
       CHARACTER*30 VERSION
-         PARAMETER (VERSION = 'BINSUM Version 1.8-1')
+         PARAMETER (VERSION = 'BINSUM Version 1.8-2')
 *-
 
 *    Check status
@@ -86,18 +87,18 @@
       CALL MSG_PRNT( VERSION )
 
 *    Initialise
-      CALL AST_INIT( STATUS )
+      CALL AST_INIT()
 
 *    Associate input dataset - can be primitive
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, IN_PRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', 'BinDS,Primitive', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check data
-      CALL BDA_CHKDATA( ILOC, DATA_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, DATA_OK, NDIM, DIMS, STATUS )
       IF ( DATA_OK ) THEN
-         CALL BDA_MAPDATA( ILOC, 'READ', IDATA_PTR, STATUS )
+        CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
       ELSE
-         CALL ERR_REP( ' ', 'Invalid data', STATUS )
+        CALL ERR_REP( ' ', 'Invalid data', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -113,69 +114,61 @@
 *    Find total number of elements in dataset
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*    Look for quality and axis values if not primitive
-      IF ( .NOT. IN_PRIM ) THEN
+*    Check quality
+      CALL BDI_CHKQUAL( IFID, QUAL_OK, QNDIM, QDIMS, STATUS )
 
-*       Check quality
-         CALL BDA_CHKQUAL( ILOC, QUAL_OK, QNDIM, QDIMS, STATUS )
+*    If quality there
+      IF ( QUAL_OK ) THEN
 
-*       If quality there
-         IF ( QUAL_OK ) THEN
+*      Map it
+        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
 
-*          Map it
-            CALL BDA_MAPLQUAL( ILOC, 'READ', ANY_BAD_QUAL, IQUAL_PTR,
-     :                                                       STATUS )
-
-*          Check for all good quality though
-            IF ( .NOT. ANY_BAD_QUAL ) THEN
-               CALL BDA_UNMAPLQUAL( ILOC, STATUS )
-               QUAL_OK = .FALSE.
-            END IF
-
-         END IF
-
-      ELSE
-         QUAL_OK = .FALSE.
+*      Check for all good quality though
+        IF ( .NOT. ANYBAD ) THEN
+          CALL BDI_UNMAPLQUAL( IFID, STATUS )
+          QUAL_OK = .FALSE.
+        END IF
 
       END IF
 
 *    Associate output dataset
-      CALL USI_ASSOCO( 'OUT', 'CUM_DISTRIB', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'CUM_DISTRIB', OFID, STATUS )
 
 *    Create components
-      CALL BDA_CREDATA( OLOC, NDIM, DIMS, STATUS )
+      CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
       IF ( QUAL_OK ) THEN
-         CALL BDA_CREQUAL( OLOC, NDIM, DIMS, STATUS )
+         CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
       END IF
 
 *    Map output data
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODATA_PTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *    Perform integration
-      CALL BINSUM_INT( DIMS(1), NELM / DIMS(1), REVERSE,%VAL(IDATA_PTR),
-     :          QUAL_OK, %VAL(IQUAL_PTR), %VAL(ODATA_PTR), STATUS )
+      CALL BINSUM_INT( DIMS(1), NELM / DIMS(1), REVERSE,%VAL(IDPTR),
+     :          QUAL_OK, %VAL(IQPTR), %VAL(ODPTR), STATUS )
 
 *    Copy axis data from dataset to the other
+      CALL USI_PRIM( IFID, IN_PRIM, STATUS )
       IF ( .NOT. IN_PRIM ) THEN
 
 *       Copy axis bin info
-         CALL BDA_COPAXES( ILOC, OLOC, STATUS )
+         CALL BDI_COPAXES( IFID, OFID, STATUS )
 
       END IF
 
 *    Copy data label
-      CALL BDA_COPTEXT( ILOC, OLOC, STATUS )
+      CALL BDI_COPTEXT( IFID, OFID, STATUS )
 
 *    Copy over MORE box and QUALITY if present
-      CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
       IF ( QUAL_OK ) THEN
-         CALL BDA_COPQUAL( ILOC, OLOC, STATUS )
+        CALL BDI_COPQUAL( IFID, OFID, STATUS )
       END IF
 
 *    Set up histogram style
       CALL GCB_LCONNECT(STATUS)
       CALL GCB_SETL('STEP_FLAG',.TRUE.,STATUS)
-      CALL GCB_SAVE(OLOC,STATUS)
+      CALL GCB_FSAVE(OFID,STATUS)
       CALL GCB_DETACH(STATUS)
 
 *    Put name of input dataset into history
@@ -184,20 +177,15 @@
       CALL USI_TEXT( 1, TEXT, NREC, STATUS )
 
 *    Write this into history structure
-      CALL HIST_PTXT( OLOC, NREC, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
 
 *    Copy and update HISTORY
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Tidy up
- 99   CONTINUE
-
-      CALL AST_CLOSE
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( ' ', '...from BINSUM', STATUS )
-      END IF
+ 99   CALL AST_CLOSE
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -218,7 +206,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
