@@ -885,7 +885,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(MEMTASKS) \
               $(IRAF_OUTPAR_FILES) $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) \
               $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
               $(IRAF_DEMO) $(IRAF_DATA) $(STYLE_FILES) $(DEMO_FILES) \
-              $(MONO_IFL) $(MISC_FILES)
+              $(MONO_IFL) $(MISC_FILES) $(OBJECT_LIBRARIES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
