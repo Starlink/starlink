@@ -91,10 +91,12 @@
 //     Copyright (C) 1999 Central Laboratory of the Research Councils
 //
 //  History:
-//     23-JUL-1997 (PWD):
+//     23-MAY-1999 (PWD):
 //        Original version. The contouring algorithm is based on
 //        Rodney Warren-Smith's used in the KPS1_CNTF. See the
 //        drawContour member for how this works.
+//     06-JUL-1999 (PWD):
+//        Added BSCALE and BZERO corrections to contour level.
 //     {enter_changes_here}
 //-
 
@@ -306,6 +308,8 @@ int Contour::drawContours()
   int nx = imageio_.width();
   int ny= imageio_.height();
   int type = imageio_.bitpix();
+  double bscale = imageio_.bscale();
+  double bzero = imageio_.bzero();
 
   //  Make sure the part of the image to draw is sane.
   int xsize = xsize_;
@@ -324,6 +328,10 @@ int Contour::drawContours()
   //  Scan through each contour level.
   for ( int icont = 0; icont < nlevels_; icont++ ) {
     cval = levels_[icont];
+
+    //  Correct the contour level for any scale and zero factors (FITS 
+    //  scaled images only).
+    cval = ( cval - bzero ) / bscale;
 
     // If different properties are being used, produce a modified Plot
     // which draws curves with the pen style supplied for this
