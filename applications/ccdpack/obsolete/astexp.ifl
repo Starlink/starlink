@@ -12,6 +12,8 @@
 #  History:
 #     19-MAR-1999 (MBT):
 #        Original version.
+#     27-APR-1999 (MBT):
+#        Added OUTTITLE parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -66,6 +68,16 @@ interface ASTEXP
       type        _DOUBLE
       ppath       'DYNAMIC,CURRENT'
       prompt      'Base frame epoch of observation'
+      helpkey     '*'
+   endparameter
+
+   parameter OUTTITLE
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Title of exported output frame'
+      default     !
       helpkey     '*'
    endparameter
 
