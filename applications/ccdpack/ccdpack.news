@@ -12,3 +12,5 @@
    - In TRANNDF a bug in which flux conservation was lost when using
      flipped images has been fixed.
 
+   - A MAKEMOS bug has been fixed.
+
