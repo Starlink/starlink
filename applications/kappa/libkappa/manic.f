@@ -86,7 +86,7 @@
 *        the pixel axes into account.
 *     manic cube summ [3]
 *        This creates a one dimensional output NDF called summ, in which
-*        the single pixel axis correspinds to the Z (third) axis in an input
+*        the single pixel axis corresponds to the Z (third) axis in an input
 *        NDF called (cube). Each element in the output is equal to the 
 *        average data value in the corresponding XY plane of the input.
 *     manic line plane [0,1] lbnd=1 ubnd=25
@@ -101,7 +101,7 @@
 *        output NDF so that it is parallel to pixel axis 1 (X) in the 
 *        output NDF, instead of pixel axis 2 (Y) as before.
 *     manic cube hyper [1,0,0,0,0,0,3] ubnd=[2,4,2,2,1] accept
-*        This manic example projects the second dimension of an input
+*        This example projects the second dimension of an input
 *        3-dimensional NDF onto the plane formed by its first and third
 *        dimensions by averaging, and grows the resulting plane
 *        up through five new dimensions with a variety of extents.
