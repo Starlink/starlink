@@ -5,7 +5,7 @@
 #
 SEXMACHINE= solaris
 CC    = cc				# the C compiler
-COPTS = -fast -xO5 -DSUN_SOLARIS		# options for the C compiler
+COPTS = -O -DSUN_SOLARIS	# options for the C compiler
 CD    = cd
 CP    = cp
 RM    = rm -f
