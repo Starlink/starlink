@@ -11,7 +11,7 @@
 
 #  Description:
 #     This class provides a very simple control which just contains a 
-#     button.  It just provides the -command and -text configuration
+#     button.  It just provides the -cmd and -text configuration
 #     options, and doesn't do anything fancy, but it inherits from
 #     the Control class, and so inherits any appropriate behaviour 
 #     from there.
@@ -25,7 +25,7 @@
 #     text
 #        Text with which to label the button.
 #
-#     comm
+#     cmd
 #        A command string to execute when the button is pressed.  Note
 #        this is not called -command becuase of a clash with the 
 #        -command option inherited from the Control class.
@@ -68,9 +68,9 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public variable comm {} {
+      public variable cmd {} {
 #-----------------------------------------------------------------------
-         $itk_component(button) configure -command $comm
+         $itk_component(button) configure -command $cmd
       }
 
 
