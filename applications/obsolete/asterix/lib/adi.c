@@ -852,13 +852,9 @@ ADIobj adix_estab_ord( ADIobj classes, ADIobj dsupers, ADIstatus status )
     ADIobj      cands;
     ADIobj      winner;
 
-ADIstrmPrintf( ADIcvStdOut, "ppairs = %O\n", status, ppairs );
-ADIstrmFlush( ADIcvStdOut, status );
-
 /* Next lot of candidates */
     cands = adix_filt_classes( curcls, ppairs, status );
-ADIstrmPrintf( ADIcvStdOut, "cls = %O, cands = %O\n", status, curcls, cands );
-ADIstrmFlush( ADIcvStdOut, status );
+
     winner = adix_filt_cands( cands, preclst, dsupers, status );
 
     ppairs = adix_filt_pairs( ppairs, winner, status );
