@@ -1,6 +1,7 @@
 1 PISA_update
 
- This release has some minor changes to SUN/109, the PISA documentation.
+ In this release the ADDNOISE command has been changed to generate
+ a different set of random numbers on each occasion that it is started.
 
- Peter Draper (p.w.draper@durham.ac.uk) 14th September 2001
+ Peter Draper (p.w.draper@durham.ac.uk) 23rd October 2002
 

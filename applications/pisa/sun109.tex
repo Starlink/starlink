@@ -3139,51 +3139,12 @@ this package.
     \end{itemize}
 \end{itemize}
 
-\section{Changes in release: 2.3-0}
+\section{Changes in this release}
 
 \begin{itemize}
-  \item The PISAFIND application has been changed so that the ISMOO
-        parameter works as described. Previously detection was always
-        based on smoothed data. This change may increase the number of
-        falsely detected objects.
-  \item A new application \iref{PISA2CAT} has been introduced. This
-        allows any of the PISA results files to be converted into
-        catalogues that can be used by the CURSA and CATPAC packages.
-  \item A bug in the \iref{PISA2ARD} application has been fixed. This
-        produced incorrect orientations for the ellipses.
-\end{itemize}
-
-\section{Changes in release: 2.4-0}
-
-\begin{itemize}
-   \item PISA no longer relies on any NAG routines. This changes the 
-    applications \iref{PISAGEN}, \iref{ADDNOISE}, \iref{PISAKNN} and 
-    \iref{PISAFIT}. There should be no significant effects due to
-    these changes. NAG removal has been performed to allow PISA to run
-    on Linux based PCs.
-
-    \item SUN/109 has been changed to show the
-     \htmlref{formulae}{RESULTS} involved in the calculation of the 
-     image moments and ellipticity.
-\end{itemize}
-
-\section{Changes in release: 2.4-1}
-
-\begin{itemize}
-    \item SUN/109 has been changed to show the correct formulae
-    for the calculation of the semi-major and semi-minor axes of the
-    object ellipse (these were incorrectly shown as $a$ and $b$,
-    rather than $a^{2}$ and $b^{2}$). Formulae have also been added 
-    showing how to calculate these values out to the detection isophote.
-\end{itemize}
-
-\section{Changes in release: 2.4-2}
-
-\begin{itemize}
-    \item 
-      A workaround for a crash that occurs in PISAFIND when too many
-      pixels are accumulated in a single object has been added. When this
-      occurs the application should now gracefully exit.
+    \item The \iref{ADDNOISE} command has been changed so that a
+          different sequence of random numbers is used each time
+          it is started.
 \end{itemize}
 
 \end{document}
