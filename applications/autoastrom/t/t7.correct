@@ -6,7 +6,7 @@
 -- WCS information from AST
 -- Dumping state, and exiting...
 NDF=t5
-keeptemps=1
+keeptemps=0
 tempDir=/tmp/t7-temp/t1
 insertwcs=1
 retainwcs=<UNDEF>
@@ -592,7 +592,7 @@ $NDFinfo->{wcs}: ref to ARRAY:
 -- WCS information from FITS
 -- Dumping state, and exiting...
 NDF=t5
-keeptemps=1
+keeptemps=0
 tempDir=/tmp/t7-temp/t2
 insertwcs=1
 retainwcs=<UNDEF>
@@ -1143,7 +1143,7 @@ $NDFinfo->{wcs}: ref to ARRAY:
 -- WCS information from command line
 -- Dumping state, and exiting...
 NDF=t5
-keeptemps=1
+keeptemps=0
 tempDir=/tmp/t7-temp/t3
 insertwcs=1
 retainwcs=<UNDEF>
