@@ -1,5 +1,7 @@
 RV - Radial components of Observer's Velocity
                                                         Expires: ????.??.??
+ v2.4-5: 13-MAR-2004
+    Convert to Gnu autoconf build system
 
  v2.4-4: 8-JUL_2002
     A typo in the header information of the RV output has been corrected:
