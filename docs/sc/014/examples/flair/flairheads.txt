@@ -1,0 +1,24 @@
+rawflair0001.imh[420,578][short]: Bias
+rawflair0002.imh[420,578][short]: Hg-Cd
+rawflair0003.imh[420,578][short]: F454-1
+rawflair0004.imh[420,578][short]: F454-2
+rawflair0005.imh[420,578][short]: F454-3
+rawflair0006.imh[420,578][short]: F454-4
+rawflair0007.imh[420,578][short]: F454-5
+rawflair0008.imh[420,578][short]: Rb
+rawflair0009.imh[420,578][short]: Rb
+rawflair0010.imh[420,578][short]: Hg-Cd
+rawflair0011.imh[420,578][short]: Hg-Cd
+rawflair0012.imh[420,578][short]: Dome flat
+rawflair0013.imh[420,578][short]: Dome flat
+rawflair0014.imh[420,578][short]: Dome flat
+rawflair0015.imh[420,578][short]: Bias
+rawflair0016.imh[420,578][short]: Bias
+rawflair0017.imh[420,578][short]: Bias
+rawflair0018.imh[420,578][short]: Bias
+rawflair0019.imh[420,578][short]: Bias
+rawflair0020.imh[420,578][short]: Bias
+rawflair0021.imh[420,578][short]: Bias
+rawflair0022.imh[420,578][short]: Bias
+rawflair0023.imh[420,578][short]: Bias
+rawflair0024.imh[420,578][short]: Bias
