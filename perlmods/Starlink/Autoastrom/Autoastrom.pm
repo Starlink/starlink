@@ -177,6 +177,18 @@ sub solve {
                                          type => 'J2000',
                                          units => 'radians',
                                        );
+
+# Determine the epoch of observation. This should be in the AST FrameSet,
+# but if it's not we'll have to resort to using the generic header EPOCH.
+# If that doesn't work, default to epoch 2000.0.
+  my $epoch = $frameset->GetC("Epoch");
+  if( ! defined( $epoch ) ) {
+    $epoch = $generic_headers{'EPOCH'};
+  }
+  if( ! defined( $epoch ) ) {
+    $epoch = "2000.0";
+  }
+
 # Determine the search radius. The distance method returns the
 # answer as an Astro::Coords::Angle object which you can use
 # to get the number of degrees, and thus the number of arcminutes
@@ -203,7 +215,7 @@ sub solve {
   $deccen = $cencoords->dec2000;
   $racen->str_delim(' ');
   $deccen->str_delim(' ');
-print "querying 2MASS: " . $cencoords . " $search_radius\n";
+
   my $twomassquery = new Astro::Catalog::Query::2MASS( RA => "$racen",
                                                        Dec => "$deccen",
                                                        Radius => $search_radius,
@@ -247,6 +259,7 @@ print "querying 2MASS: " . $cencoords . " $search_radius\n";
                                             Coords => $twomassstar->coords,
                                             X => $ndfstar->x,
                                             Y => $ndfstar->y,
+                                            WCS => $twomassstar->wcs,
                                           );
     $merged->pushstar( $newstar );
   }
