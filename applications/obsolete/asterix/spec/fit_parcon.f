@@ -3,7 +3,7 @@
      :                       OPCHAN, NEPAR, EPAR, NPAR, LB,
      :                       UB, FROZEN, SSCALE, DPAR, FSTAT, PREDICTOR,
      :                       STATMIN, PARAM, PEGGED, LE, UE,
-     :                       PEGCODE, STATUS )
+     :                       PEGCODE, LNDFAC, STATUS )
 *
 *    Description :
 *
@@ -142,6 +142,7 @@ c     RECORD /MODEL_SPEC/ MODEL			! Model specification
       REAL                DPAR(NPAR)		! Param increments for differencing
       INTEGER             FSTAT                 ! Statistic to use
       EXTERNAL            PREDICTOR             ! Model predictor
+      DOUBLE PRECISION    LNDFAC                ! lnd!
 *
 *    Import-Export  :
 *
@@ -250,7 +251,8 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
             CALL FIT1_COPDEPL( IMOD, FFROZEN, STATUS )
 
 *        Get initial value of statistic
-	    CALL FIT_STAT( NDS, IMOD, FPAR, FSTAT, PREDICTOR, STAT, STATUS )
+	    CALL FIT_STAT( NDS, IMOD, FPAR, FSTAT, PREDICTOR, STAT,
+     :                     LNDFAC, STATUS )
 
 *        Catch case where there is only one parameter (no minimisation needed)
 	    IF ( NUNFROZEN .EQ. 1 ) THEN
@@ -263,15 +265,15 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
 *        Find minimum
             CALL FCI_RESET( MCTRL, STATUS )
 	    CALL FIT_MIN( NDS, IMOD, MCTRL, 0, .FALSE.,
-     :                    NPAR, LB, UB, FFROZEN, SSCALE, FSTAT,
+     :                    NPAR, LB, UB, FFROZEN, SSCALE, LNDFAC, FSTAT,
      :                    PREDICTOR, FPAR, DPAR, FPEGGED, STAT,
      :                    FINISHED, FITERR, STATUS )
 	      IF(FITERR.NE.0)THEN
 	        CALL MSG_SETI('FERR',FITERR)
 	        CALL MSG_SETI('NPAR',J)
 	        STATUS=SAI__ERROR
-	        CALL ERR_REP('LB_ERR','Fitting error ^FERR in evaluating '//
-     :          'lower bound for parameter ^NPAR',STATUS)
+	        CALL ERR_REP('LB_ERR','Fitting error ^FERR in '//
+     :          'evaluating lower bound for parameter ^NPAR',STATUS)
 *        Warning if minimum not found
 	      ELSE IF(OPCHAN.GT.0.AND.(.NOT.FINISHED))THEN
 	        WRITE(OPCHAN,*) '! Minimum not achieved after max. no'//
@@ -348,7 +350,8 @@ D	      print *,'new le: ',le(j)
               CALL FIT1_COPDEPL( IMOD, FFROZEN, STATUS )
 
 *        Get initial chi-squared value
-	      CALL FIT_STAT(NDS,IMOD,FPAR,FSTAT,PREDICTOR,STAT,STATUS)
+	      CALL FIT_STAT(NDS,IMOD,FPAR,FSTAT,PREDICTOR,STAT,LNDFAC,
+     :                      STATUS)
 
 *        Catch case where there is only one parameter (no minimisation needed)
 	      IF(NUNFROZEN.EQ.1)THEN
@@ -362,14 +365,14 @@ D	      print *,'new le: ',le(j)
               CALL FCI_RESET( MCTRL, STATUS )
 	      CALL FIT_MIN( NDS, IMOD, MCTRL, 0,
      :                      .FALSE., NPAR, LB, UB, FFROZEN, SSCALE,
-     :                      FSTAT, PREDICTOR, FPAR, DPAR,
+     :                      LNDFAC, FSTAT, PREDICTOR, FPAR, DPAR,
      :                      FPEGGED, STAT, FINISHED, FITERR, STATUS )
 	      IF(FITERR.NE.0)THEN
 	        CALL MSG_SETI('FERR',FITERR)
 	        CALL MSG_SETI('NPAR',J)
 	        STATUS=SAI__ERROR
-	        CALL ERR_REP('UB_ERR','Fitting error ^FERR in evaluating '//
-     :          'upper bound for parameter ^NPAR',STATUS)
+	        CALL ERR_REP('UB_ERR','Fitting error ^FERR in '//
+     :          'evaluating upper bound for parameter ^NPAR',STATUS)
 *        Warning if minimum not found
 	      ELSE IF(OPCHAN.GT.0.AND.(.NOT.FINISHED))THEN
 	        WRITE(OPCHAN,*) '! Minimum not achieved after max. no'//

@@ -1,6 +1,6 @@
 *+  FIT_STAT - Evaluates statistical fit between predicted and observed data
       SUBROUTINE FIT_STAT( NDS, IMOD, PARAM, FSTAT,
-     :                          PREDICTOR, STAT, STATUS )
+     :                     PREDICTOR, STAT, LNDFAC, STATUS )
 *    Description :
 *
 *     Evaluates current predicted data (storing the result in PREDDAT) and
@@ -78,6 +78,7 @@ c     RECORD /MODEL_SPEC/ MODEL			! Model specification
       REAL                PARAM(NPAMAX)		! Model parameters
       INTEGER             FSTAT                 ! Statistic to use
       EXTERNAL            PREDICTOR             ! Model data predictor
+      DOUBLE PRECISION    LNDFAC
 *
 *    Import-Export :
 *
@@ -151,6 +152,8 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
         END IF
 
       END DO
+
+      IF ( MAXL ) DSTAT=DSTAT+2.0D0*LNDFAC
 
 ***** temporary bodge to get round problem
       IF ( DSTAT .GT. 1.0D20 ) THEN

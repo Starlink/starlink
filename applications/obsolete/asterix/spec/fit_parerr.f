@@ -1,6 +1,6 @@
 *+  FIT_PARERR - Estimates 1 sigma errors in best fit parameters
       SUBROUTINE FIT_PARERR(NDS,IMOD,NPAR,PARAM,LB,UB,DPAR,
-     :       FROZEN,PEGGED,SSCALE,FSTAT,PREDICTOR,PARSIG,STATUS)
+     :       FROZEN,PEGGED,SSCALE,FSTAT,PREDICTOR,PARSIG,LNDFAC,STATUS)
 *
 *    Description :
 *
@@ -79,6 +79,7 @@ c     RECORD /MODEL_SPEC/ MODEL			! Model specification
       INTEGER             SSCALE		! Statistic scale factor
       INTEGER             FSTAT                 ! Statistic to use
       EXTERNAL            PREDICTOR             ! Model data predictor
+      DOUBLE PRECISION    LNDFAC
 *
 *    Import/export :
 *
@@ -183,9 +184,9 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
 
 *        Find derivative at -+ve deviations
 	  CALL FIT_STATDERIV(NDS,IMOD,NPAR,LPAR,LB,UB,JP2,
-     :             DPAR(JP2),FSTAT,PREDICTOR,LSTATDERIV,STATUS)
+     :             DPAR(JP2),FSTAT,PREDICTOR,LSTATDERIV,LNDFAC,STATUS)
 	  CALL FIT_STATDERIV(NDS,IMOD,NPAR,UPAR,LB,UB,JP2,
-     :             DPAR(JP2),FSTAT,PREDICTOR,USTATDERIV,STATUS)
+     :             DPAR(JP2),FSTAT,PREDICTOR,USTATDERIV,LNDFAC,STATUS)
           IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *        Form alpha matrix (derivs of reduced chisq in terms of scaled params)
