@@ -8,7 +8,7 @@
 /CommentFont /Palatino-Italic findfont Module 0.9 mul scalefont def
 %%EndProlog
 
-/Nlines 7 def
+/Nlines 8 def
 
 /Vpos LineGap Nlines mul def
 
@@ -31,7 +31,8 @@ ScriptFont setfont
 (% cvs checkout .) Line
 (% more README) Line
 (% ./bootstrap) Line
-(% make configure-deps) Line
+(% make) Line
+(   configure-deps) Line
 (% ./configure -C) Line
 (% make world) Line
 
