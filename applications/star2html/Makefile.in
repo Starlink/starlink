@@ -38,10 +38,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(dist_data_DATA) \
-	$(srcdir)/../install-sh $(srcdir)/../missing \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/component.xml.in $(srcdir)/xlabel.in \
-	$(top_srcdir)/configure
+	$(top_srcdir)/configure install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -112,6 +111,8 @@ STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
 STRIP = @STRIP@
+UNCOMPRESS = @UNCOMPRESS@
+UUDECODE = @UUDECODE@
 VERSION = @VERSION@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__leading_dot = @am__leading_dot@
@@ -159,6 +160,8 @@ edit = sed \
     -e 's,@PERL\@,$(PERL),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
     -e 's,@PACKAGE_BUGREPORT\@,$(PACKAGE_BUGREPORT),g' \
+    -e 's,@UUDECODE\@,$(UUDECODE),g' \
+    -e 's,@UNCOMPRESS\@,$(UNCOMPRESS),g' \
     -e 's,@l2hdir\@,$(l2hdir),g'
 
 all: all-am
@@ -310,7 +313,7 @@ install-manifest: install-manifest.xml
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/..
+	$(mkdir_p) $(distdir)/.
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -1177,8 +1177,8 @@ sub source_icon {
    open( ICONS , '>generate.icon' );
    print( ICONS <<'_EOF_' );
 #!/bin/sh
-sed -e 's/^ //' << \#end-of-data | uudecode; \
-uncompress -c source.sh.Z | tar xvf - 1>/dev/null 2>&1; \
+sed -e 's/^ //' << \#end-of-data | @UUDECODE@; \
+@UNCOMPRESS@ -c source.sh.Z | tar xvf - 1>/dev/null 2>&1; \
 rm -f source.sh.Z 
  begin 644 source.sh.Z
  M'YV0<][4D3.FC(LS:<P`6,BPH<.'$"-*G$BQ8D48&&]H!`$`1HP9-&K<X(A1

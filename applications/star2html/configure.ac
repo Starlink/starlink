@@ -17,6 +17,8 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PATH_PROG(PERL, perl)
+AC_PATH_PROG(UUDECODE, uudecode)
+AC_PATH_PROGS(UNCOMPRESS, [gunzip uncompress])
 
 dnl    This package has no dependencies
 

@@ -44,6 +44,8 @@ edit=sed \
     -e 's,@PERL\@,$(PERL),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
     -e 's,@PACKAGE_BUGREPORT\@,$(PACKAGE_BUGREPORT),g' \
+    -e 's,@UUDECODE\@,$(UUDECODE),g' \
+    -e 's,@UNCOMPRESS\@,$(UNCOMPRESS),g' \
     -e 's,@l2hdir\@,$(l2hdir),g'
 latex2html: Makefile $(srcdir)/latex2html.in
 	rm -f latex2html latex2html.tmp
