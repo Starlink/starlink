@@ -1,0 +1,160 @@
+$ VERIFY = F$VERIFY( 0 )
+$!+
+$! Name:
+$!    MAKE_CONVERT_ATASKS
+$!
+$! Purpose:
+$!    Builds the CONVERT A-tasks.
+$!
+$! Language:
+$!    DCL
+$!
+$! Type of Module:
+$!    Command procedure.
+$!
+$! Invocation:
+$!    @MAKE_CONVERT_ATASKS
+$!
+$! Description :
+$!    This procedure builds one or all the CONVERT A-tasks for use from DCL. 
+$!    It opens the file that contains the list of CONVERT's A-tasks, and
+$!    for each application it links the A-task, and creates the 
+$!    associated compiled interface file.
+$!
+$! Arguments:
+$!    P1 --- If this is null or "ALL" then all the CONVERT A-tasks and
+$!           their compiled interface files are built.  If it is the
+$!           name of an application, just that application and compiled
+$!           interface file are built.
+$!    
+$! Prior requirements:
+$!    It is assumed that you are logged in for ADAM and KAPPA
+$!    development, (the procedure CONVERT_DIR:CONVERTDEV.COM will do
+$!    this) and you are currently in the directory where CONVERT is to
+$!    be built.  CONVERT development includes activating LIBMAINT.
+$!
+$! Output:
+$!    -  CONVERT A-task executables and compiled interface files.
+$!
+$! Side Effects:
+$!    On exit the current LIBMAINT library is CONVERT_DIR:CONVERT_IFL.
+$!
+$! Authors:
+$!    MJC: Malcolm J. Currie (STARLINK)
+$!    {enter_new_authors_here}
+$!
+$! History:
+$!    1992 September 7 (MJC):
+$!       Original version based on MAKE_KAPPA_ATASKS.
+$!    {enter_changes_here}
+$!
+$! Bugs:
+$!    {note_any_bugs_here}
+$!
+$!
+$  ON ERROR THEN GOTO ABORT
+$!
+$! The applications source library should be selected so that modules
+$! may be extracted.
+$!
+$ DEFLIB CONVERT_DIR:CONVERT
+$!
+$! There are two modes.  Either build all the A-tasks, or a specific
+$! A-task.  Deal with the former case first.
+$!
+$ P1 = F$PARSE( P1, , , "NAME" )
+$ IF P1 .EQS. "" .OR. P1 .EQS "ALL"
+$ THEN
+$!
+$! Open file containing a list of the CONVERT tasks.
+$!
+$   OPEN/READ CONVERT_TASK CONVERT_DIR:CONVERT_TASKS.LIS 
+$!
+$! Read the name of each task.  Call this procedure recursively to
+$! prevent exhausting the symbol table with subroutine labels.  This
+$! is less efficient, but works.
+$!
+$    LOOP1:
+$       READ/END_OF_FILE=ENDLOOP1 CONVERT_TASK TASK_NAME
+$!
+$! Cater for the two types of CONVERT_TASKS.LIS file.  The generated one 
+$! has file names. 
+$!
+$       IF TASK_NAME .NES. "CONVERT" .AND. TASK_NAME .NES. "CONVERT" .AND. TASK_NAME .NES. "CONVERT.FOR" 
+$       THEN
+$          @CONVERT_DIR:MAKE_CONVERT_ATASKS 'TASK_NAME'
+$       ENDIF
+$!
+$       GOTO LOOP1
+$!
+$    ENDLOOP1:
+$    CLOSE CONVERT_TASK
+$!
+$! Build a single named A-task.
+$!
+$ ELSE
+$!
+$! Extract the source from the library and compile it.
+$!
+$    EXTRACT 'P1'
+$    FORTRAN 'P1'
+$!
+$! Build the executable.  Delete the source and any
+$! other files created.
+$!
+$    CALL LINK_'P1'
+$    DUMMY = "''P1'" + ".FOR;0"
+$    DELETE 'DUMMY'
+$    DUMMY = "''P1'" + ".OBJ;0"
+$    DELETE 'DUMMY'
+$    DUMMY = "''P1'" + ".MAP;0"
+$    IF F$SEARCH( DUMMY ) .NES. "" THEN DELETE 'DUMMY'
+$    DUMMY = "''P1'" + ".LIS;0"
+$    IF F$SEARCH( DUMMY ) .NES. "" THEN DELETE 'DUMMY'
+$!
+$! The applications interface-file library should be selected so that
+$! the module may be extracted.
+$!
+$    DEFLIB CONVERT_DIR:CONVERT_IFL
+$!
+$! Build a single named interface file.  Extract the interface file from
+$! the library and compile it. Build the executable.  Delete the source.
+$!
+$    DUMMY = "''P1'" + ".IFL"
+$    EXTRACT 'DUMMY'
+$    COMPIFL 'P1'
+$    DUMMY = "''P1'" + ".IFL;0"
+$    DELETE 'DUMMY'
+$ ENDIF
+$!
+$!  Exit the procedure.
+$!
+$ ABORT:
+$ IF ( VERIFY ) THEN SET VERIFY
+$ EXIT
+$!
+$! Linking subroutines follow in alphabetical order.
+$!
+$ LINK_BDF2NDF: SUBROUTINE
+$    ALINK BDF2NDF,CONVERT_DIR:CONLIB/L,KAPPA_DIR:PART/LIB,ADAM_LIB:FIOLINK/OPT,INTERIM/LIB/INCLUDE=(STL_DATA) 
+$ ENDSUBROUTINE
+$!
+$ LINK_DIPSO2NDF: SUBROUTINE
+$    ALINK DIPSO2NDF,CONVERT_DIR:CONLIB/L,KAPPA_DIR:AIF/LIB,ADAM_LIB:FIOLINK/OPT
+$ ENDSUBROUTINE
+$!
+$ LINK_DST2NDF: SUBROUTINE
+$    ALINK DST2NDF,CONVERT_DIR:CONLIB/LIB,PRM_LINK/OPT,FIGARO_LIBS:DTA/LIB,DYN/LIB,CNV/LIB,SYS$LIBRARY:VAXCRTL/LIB
+$ ENDSUBROUTINE
+$!
+$ LINK_NDF2BDF: SUBROUTINE
+$    ALINK NDF2BDF,CONVERT_DIR:CONLIB/LIB,ADAM_LIB:FIOLINK/OPT,INTERIM/LIB/INCLUDE=(STL_DATA)
+$ ENDSUBROUTINE
+$!
+$ LINK_NDF2DIPSO: SUBROUTINE
+$    ALINK NDF2DIPSO,CONVERT_DIR:CONLIB/LIB,KAPPA_DIR:AIF/LIB,ADAM_LIB:FIOLINK/OPT
+$ ENDSUBROUTINE
+$!
+$ LINK_NDF2DST: SUBROUTINE
+$    ALINK NDF2DST,CONVERT_DIR:CONLIB/LIB,PRM_LINK/OPT
+$ ENDSUBROUTINE
