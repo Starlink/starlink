@@ -173,8 +173,14 @@ BUILT_SOURCES = PRM_ERR prm_err.h PRM_PAR prm_par.h $(PLATFORM_INCLUDES)
 
 # Tests
 
-TESTS = prm_test
-check_PROGRAMS = prm_test
+TESTS = prm_test make-prm-par-test
+check_PROGRAMS = $(TESTS)
 
 prm_test_SOURCES = prm_test.f
 prm_test_LDADD = libprm.la libprm_a.la
+
+make_prm_par_test_SOURCES = make-prm-par-test.f
+make-prm-par-test.f: make-prm-par
+	./make-prm-par -tmake-prm-par-test.f
+
+DISTCLEANFILES = make-prm-par-test.f
