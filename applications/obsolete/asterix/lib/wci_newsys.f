@@ -1,4 +1,4 @@
-      SUBROUTINE WCI_NEWSYS( NAME, EQNX, MJDOBS, ID, STATUS )
+      SUBROUTINE WCI_NEWSYS( NAME, EQNX, EPOCH, ID, STATUS )
 *+
 *  Name:
 *     WCI_NEWSYS
@@ -7,10 +7,10 @@
 *     Create a new coordinate system object
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
-*     CALL WCI_NEWSYS( NAME, EQNX, MJDOBS, ID, STATUS )
+*     CALL WCI_NEWSYS( NAME, EQNX, EPOCH, ID, STATUS )
 
 *  Description:
 *     Creates a coordinate system object which fully defines an absolute
@@ -22,9 +22,9 @@
 *        GALACTIC or SUPERGALACTIC, or any abbreviation thereof.
 *     EQNX = REAL (given)
 *        The epoch of the mean equator and equinox in years.
-*     MJDOBS = DOUBLE (given)
-*        Modified Julian date (JD-2400000.5) of observation in days. If the
-*        value WCI__FLAG is supplied then the MJD of the EQNX is used.
+*     EPOCH = DOUBLE (given)
+*        Epoch of the observation in years. If the value WCI__FLAG is
+*        supplied then the MJD of the EQNX is used.
 *     ID = INTEGER (returned)
 *        The ADI identifier of the new CoordSystem object
 *     STATUS = INTEGER (given and returned)
@@ -58,11 +58,8 @@
 *  {machine}-specific features used:
 *     {routine_machine_specifics}...
 
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     WCI Subroutine Guide : http://www.sr.star.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
 *     package:wci, usage:public
@@ -99,7 +96,7 @@
 *  Arguments Given:
       CHARACTER*(*)		NAME
       REAL			EQNX
-      DOUBLE PRECISION  	MJDOBS
+      DOUBLE PRECISION  	EPOCH
 
 *  Arguments Returned:
       INTEGER			ID
@@ -108,10 +105,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			SLA_EPCO		! Epoch convertor
-        DOUBLE PRECISION	SLA_EPCO
-      EXTERNAL			SLA_EPJ2D		! Epoch -> MJD
-        DOUBLE PRECISION	SLA_EPJ2D
       EXTERNAL			WCI1_BLK		! Common block init
 
 *  Local variables:
@@ -139,12 +132,11 @@
       CALL ADI_CPUT0C( ID, 'NAME', LNAME, STATUS )
       CALL ADI_CPUT0R( ID, 'EQUINOX', EQNX, STATUS )
 
-*  Convert EQNX to MJD if MJDOBS has flag value, otherwise simply write
-*  the user supplied value
-      IF ( MJDOBS .EQ. WCI__FLAG ) THEN
+*  Use EQNX for the epoch if EPOCH has the flag value
+      IF ( EPOCH .EQ. WCI__FLAG ) THEN
         LEPOCH = EQNX
       ELSE
-        LEPOCH = MJDOBS
+        LEPOCH = EPOCH
       END IF
 
 *  Choose the epoch type, Besselian or Julian
@@ -162,9 +154,6 @@
       CALL ADI_CPUT0C( ID, 'EFORM', EFORM, STATUS )
 
 *  Convert epoch to years if flag value not used
-      IF ( MJDOBS .NE. WCI__FLAG ) THEN
-        LEPOCH = SLA_EPJ2D( SLA_EPCO( 'J', EFORM, LEPOCH ) )
-      END IF
       CALL ADI_CPUT0D( ID, 'EPOCH', LEPOCH, STATUS )
 
 *  Report any errors
