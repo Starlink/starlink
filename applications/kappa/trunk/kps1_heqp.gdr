@@ -116,7 +116,7 @@
 
 *    Global constants :
 
-      INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'        ! Global SSE definitions
 
 *    Import :
 
@@ -191,7 +191,7 @@
       IF ( MAXV .EQ. MINV ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'ERR_HSTEQP_EQL',
-     :     'HSTEQP: Maximum and minimum are equal', STATUS )
+     :     'HSTEQP: Maximum and minimum are equal.', STATUS )
          GOTO 999
       END IF
 
@@ -333,7 +333,7 @@
          IF ( MAXVAL .LT. 1.0D-10 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'ERR_HSTEQP_INAF',
-     :        'HSTEQP: Inaccurate fit', STATUS )
+     :        'HSTEQP: Inaccurate fit.', STATUS )
             GOTO 999
          END IF
 
@@ -425,6 +425,8 @@
                XI = XI + STEP
             END IF
 
+*          Assign colours to the pen numbers.
+
             PENS( I ) = MIN( MAX( INT( DBLE( NINTS ) * TEMP ), 0 ),
      :                  NINTS - 1 )
          END DO
@@ -463,9 +465,10 @@
                XI = XI + STEP
             END IF
 
-*          Solve the quadratic equation that arises from integrating
-*          the required cumulative histogram form, as given by the
-*          linear equation SHADE * PEN + C0 - SHADE/2.
+*          Assign the colours to the pens.  Solve the quadratic equation
+*          that arises from integrating the required cumulative
+*          histogram form, as given by the linear equation
+*          SHADE * PEN + C0 - SHADE/2.
 
             PENS( I ) = MIN( MAX( INT( REAL( NINTS ) * ( -A/SHADE
      :                  + SQRT( A * A + 2.0D0 * SHADE * TEMP ) /
