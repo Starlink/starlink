@@ -104,7 +104,7 @@ defhelp  con_unf2ndf       convert_dir:convert
 
 print  " "
 print  " --    Initialised for Convert    -- "
-print  " --  Version 0.5, 1992 September  -- "
+print  " --  Version 0.5, 1993 November  -- "
 print  " "
 print  " Type HELP CONVERT for CONVERT help  "
 print  " "

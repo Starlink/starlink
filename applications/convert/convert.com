@@ -96,7 +96,7 @@ $!  =======================================
 $!
 $ WRITE SYS$OUTPUT  " "
 $ WRITE SYS$OUTPUT  " --    Initialised for CONVERT    -- "
-$ WRITE SYS$OUTPUT  " --  Version 0.5, 1993 September  -- "
+$ WRITE SYS$OUTPUT  " --  Version 0.5, 1993 November  -- "
 $ WRITE SYS$OUTPUT  " "
 $ WRITE SYS$OUTPUT  "    Type CONHELP for CONVERT help"
 $ WRITE SYS$OUTPUT  " "
