@@ -123,7 +123,7 @@ but if you use 11pt, LaTeX (or rather the font-selection scheme) uses
 magnified cmr10.  In other words, this appears to be yet another font
 magnification problem!  Grrr -- why is this so hard?</p>
 
-<p>This is displayed even more clearly by the following Plain file (thanks to
+<p>This is displayed very clearly by the following Plain file (thanks to
 `TenThumbs' at the USNO, noted 2002 July 25):
 <verbatim>
 \font\vlarge = cmr10 scaled\magstep4
@@ -131,7 +131,8 @@ magnification problem!  Grrr -- why is this so hard?</p>
 \vlarge BOLD words indeed
 \bye
 </verbatim>
-which makes it transparently clear that it is specifically font
+which produces a bitmap which is very scrunched up horizontally, and
+thus makes it transparently clear that it is specifically font 
 magnification that's confused.  Sigh, again.
 </p>
 
