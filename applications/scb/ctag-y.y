@@ -473,8 +473,13 @@ identifier
       }
       else {
          printf( "%s", text );
-         /*yyerrok;*/
          yyclearin;
+
+         /* yyerrok call here is sensible, but fails because of a bug in 
+          * certain yacc versions (yyerrok symbol not declared at the 
+          * right place in generated c) - hence yyerrok invocation is made 
+          * where this routine is called instead. */
+         /*yyerrok;*/
       }
 
 /* Release memory allocated by ucontent. */
