@@ -1,0 +1,285 @@
+#!/usr/bin/tclsh
+
+#+
+#  Name:
+#     kplsearch
+
+#  Purpose:
+#     Display names of kaplibs routines (see SUN/238) which contain
+#     a given search phrase in their "Purpose" string.
+
+#  Language:
+#     tcl
+
+#  Invocation:
+#     kplsearch [options] <search phrase>
+
+#  Options:
+#     -exact       match whole search phrase only
+#                  (default is to match any sub-phrases)
+#     -alpha       sort matching routine names alphabetically
+#                  (default is to sort by relevance)
+#     -whole       match only whole words
+#                  (default is to match sub-words)
+
+#  Authors:
+#     DSB: David S. Berry (Starlink)
+
+#  History:
+#     2-MAY-2001 (DSB):
+#        Original version.
+#-
+
+
+#  Searchs for any sub-string of $words within $test, and returns a
+#  weight for all matches. Matches of longer sub-strings have more 
+#  weight per word than shorter sub-strings. Thus checking the test
+#  string "Here is a good routine" for words "Here bad good routine" 
+#  will return the sum of the following weights:
+#        1 for the single matching word "Here"
+#        1 for the single matching word "good"
+#        1 for the single matching word "routine"
+#        2 for each of the two words in the matching phrase 
+#          "good routine" (giving 4 in total).
+#
+#     This equals a total returned weight of 7 (=1+1+1+2+2)
+# -------------------------------------------------------------------
+proc subsearch {test words} {
+
+#  Search for the whole phrase.
+   set ret [search $test $words]
+
+#  Store the number of supplied words.
+   set nw [llength $words]
+
+#  Set the next phrase length.
+   set pl [expr $nw - 1]
+
+# Set the number of phrases with this phrase length.
+   set nph 2
+   
+#  Loop round searching for shorter sub-phrases each time.
+   while { $pl > 0 } {
+
+#  Search for sub-phrases of the current length.
+      for {set i 0} {$i < $nph} {incr i} {
+         set newwords [lrange $words $i [expr $i + $pl - 1]]
+         set ret [expr $ret + [search $test $newwords] ]
+      }
+
+#  Shorten the current sub-phrase length, and increase the number of
+#  sub-phrases to check.
+      incr pl -1
+      incr nph
+
+   }
+   return $ret
+}
+
+#  Search the test string for an exact phrase, and return a weight for any 
+#  match equal to the square of the number of words in the length.
+#  ------------------------------------------------------------------------
+proc search {test words} {
+   global wholeword
+
+#  Create a regular expression for matching the supplied words with any
+#  number of spaces between them. If only matching whole words, require 
+#  one or more spaces (or the beggining or end of the string) on either 
+#  side of the phrase.
+   if { $wholeword } {
+      set re "(^| +)"
+   } else {
+      set re ""
+   }
+
+   set first 1
+   set nw 0
+   foreach word $words {
+      if { !$first } {append re " +"}
+      append re "$word"
+      set first 0
+      incr nw
+   }         
+
+   if { $wholeword } { append re "( +|\$)" }
+
+#  Check the supplied test string.
+   if { [regexp -nocase $re $test] } {  
+      set ret [expr $nw*$nw] 
+   } else {
+      set ret 0
+   }
+
+#  Return the weight.
+   return $ret
+}
+
+
+#  Main entry...
+#  ==============
+   global env
+
+#  Set defaults
+   set whole 0
+   set wholeword 0
+   set sort "w"
+
+#  Check each command line argument.
+   set ok 1
+   foreach arg $argv {
+
+      if { $arg == "-exact" } {
+         set whole 1
+
+      } elseif { $arg == "-whole" } {
+         set wholeword 1
+
+      } elseif { $arg == "-alpha" } {
+         set sort "a"
+
+      } elseif { [regexp {^-} $arg] } {
+         set ok 0
+         break
+
+      } else {
+         if { [info exists phrase] } {
+            set ok 0
+            break
+         } else {
+            set phrase $arg
+         }
+      }      
+   }
+
+#  If arguments were wrong, or if no search phrase was supplied, 
+#  display help and abort.
+   if { !$ok || ![info exists phrase] } {
+      puts ""
+      puts "Searches for kaplibs routines (see SUN/238) which contain a"
+      puts "given search phrase in their \"Purpose\" string."
+      puts ""
+      puts "usage: kplsearch \[options\] <search phrase>"
+      puts ""
+      puts "where options are:"
+      puts "  -exact       match whole search phrase only"
+      puts "               (default is to match any sub-phrases)"
+      puts "  -alpha       sort matching routine names alphabetically"
+      puts "               (default is to sort by relevance)"
+      puts "  -whole       match only whole words"
+      puts "               (default is to match sub-words)"
+      puts ""
+      exit
+   }
+
+#  Set up an associative array holding the purpose of each routine.
+#  The following code is edited into this script when the kaplibs.tar.Z 
+#  is created from the RCS repository.
+
+<purposes placeholder>
+
+#  Store a list of the available routine names. 
+   set routines [array names purpose]
+
+#  Removing leading and trailing spaces from the search phrase.
+   set phrase [string trim $phrase]
+
+#  If it is supprounded in quotes, strip them and set a flag indicating
+#  "match whole phrase only".
+   if { [regexp {^'(.*)'$} $phrase match inner] } {
+     set whole 1
+     set phrase $inner
+   }
+
+#  Split the phrase up into a list of words.
+   set temp $phrase
+   while { [regexp {^([^ ]+) +(.*)$} $temp match word rest] } {
+      lappend words $word
+      set temp [string trim $rest]
+   }
+   if { $temp != "" } { lappend words $temp }
+
+#  If matching whole phrase only...
+   if { $whole } {
+      foreach name $routines {
+         set w [search $purpose($name) $words]
+         if { $w > 0.0 } { set weight($name) $w }
+      }
+
+#  If sub-phrases can be matched...
+   } else {
+      foreach name $routines {
+         set w [subsearch $purpose($name) $words]
+         if { $w > 0.0 } { set weight($name) $w }
+      }
+   }
+
+#  Store a list of the matching routine names. 
+   set names [array names weight]
+
+#  If no matching routines were found, say so.
+   if { $names == "" } {
+      set result "No matching KALIB routines found."
+   } else {
+
+#  Set up an associative array of routine names index by position in the
+#  results list.
+      set nr 0
+      foreach name $names {
+         set routine($nr) $name
+         incr nr
+      }
+      set nrout $nr
+
+#  If the results are to be ordered purely alphabetical, set all weights
+#  equal.
+      if { $sort == "a" } {
+         foreach name $names {
+            set weight($name) 0
+         }
+      }
+
+#  Bubble sort the matching routine names first by weight then by alphabetical 
+#  order.
+      set again 1
+      while { $again } {
+         incr nr -1
+         set j 0
+         set again 0
+
+         for {set i 0} {$i < $nr} {incr i} {
+            incr j
+
+            set namei $routine($i)
+            set namej $routine($j)
+
+            if { $weight($namej) > $weight($namei) } {
+               set routine($i) $namej
+               set routine($j) $namei
+               set again 1
+
+            } elseif { $weight($namej) == $weight($namei) } {
+               if { $namej < $namei } {
+                  set routine($i) $namej
+                  set routine($j) $namei
+                  set again 1
+               }
+            }
+
+         }
+      }         
+
+#  Format the results.
+      for {set i 0} {$i < $nrout} {incr i} {
+         set name $routine($i)
+         set purp $purpose($name)
+         append result "  $name:\n     $purp\n"
+      }
+   }
+
+#  Display the results.
+   puts ""
+   puts $result
+   puts ""
+
+#  End.
+   exit
