@@ -294,6 +294,7 @@ void ADImemAllocBlock( ADIclassDef *cdef, ADIblock **newb,
       bptr->size = cdef->alloc.size;
       bptr->next = cdef->alloc.f_block;
       bptr->master = ADI__nullid;
+      bptr->vdat.std.used = NULL;
       cdef->alloc.f_block = jblk;
 
 /* Set return values */
