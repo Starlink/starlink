@@ -161,6 +161,26 @@ public class GSDObject {
     }
 
     /**
+     * Returns a short summary of the object. The format of this string
+     * is not specified but may include the file name and the number of
+     * data items.
+     */
+    public String toString() {
+	String datastring;
+	try {
+	    GSDItem maindata = this.itemByName( "C13DAT" );
+	    datastring = " Data array size: " + maindata.size() + " elements";
+	} catch ( GSDException e ) {
+	    datastring = "No C13DAT";
+	}
+	String result = "GSD file: " + this.getFilename() +
+	    " Number of items: " + this.getNumItems() +
+	    datastring;
+	return result;
+    }
+
+
+    /**
      * Dump the contents of the file as text to standard out
      * without special formatting. Equivalent to the gsdprint
      * command.
@@ -348,14 +368,9 @@ public class GSDObject {
 	}
 	//System.out.println("Read " + nread + " bytes from item header");
 
-	// Loop over each item in turn
+	// Loop over each scalar item in turn. We will do the array items
+	// with a second pass
 	for (int i = 0; i< this.no_items; i++ ) {
-	    GSDItem curritem = new GSDItem();
-
-	    // If we decide to read an item header at a time then
-	    // uncomment this and make sure offset is set to 0
-	    // after each loop
-	    // int nread = this.fptr.read( byteArray, 0, szstruct  );
 
 	    // recalculate global offset on the basis of index rather than
 	    // assuming we have started at the beginning
@@ -365,7 +380,7 @@ public class GSDObject {
 	    int j = 0;
 
 	    // isArray item?
-	    curritem.isArray( GSDVAXBytes.tobool( byteArray, offset ) );
+	    boolean isArray = GSDVAXBytes.tobool( byteArray, offset );
 
 	    // Item name and then its length
 	    offset += struct[j]; j++;
@@ -374,11 +389,9 @@ public class GSDObject {
 
 	    offset += struct[j]; j++;
 	    short namelen = GSDVAXBytes.toshort( byteArray, offset );
-	    //System.out.println("Length of name = " + namelen );
 
-	    // Store the item of the right length
+	    // Extract the substring of the right length
 	    itemname = itemname.substring(0,namelen);
-	    curritem.name( itemname );
 
 	    // Data units [10 characters] plus length
 	    offset += struct[j]; j++;
@@ -387,35 +400,32 @@ public class GSDObject {
 
 	    offset += struct[j]; j++;
 	    short unitlen = GSDVAXBytes.toshort( byteArray, offset );
-	    //System.out.println("Length of unit = " + unitlen );
 
 	    // Must trim the string
 	    itemunit = itemunit.substring(0,unitlen);
-	    curritem.unit( itemunit );
-
-	    //System.out.println("["+ i +"]" + " Name: " + curritem.name() +
-	    //		       " Unit: " + curritem.unit() +
-	    //		       " IsArray: " + curritem.isArray() );
 
 	    // Data type
 	    offset += struct[j]; j++;
 	    short type = GSDVAXBytes.toshort( byteArray, offset );
-	    curritem.type( GSD__TYPES[type-1] );
+
+	    // curritem.type( GSD__TYPES[type-1] );
 	    //System.out.println("Data type = " + curritem.type() );
 
 	    // Location of this item in the data array
 	    // corrected for the start position of the GSD data segment
 	    offset += struct[j]; j++;
-	    curritem.start_byte( GSDVAXBytes.toint( byteArray, offset ) -
-				 this.start_data );
+	    int start_byte = GSDVAXBytes.toint( byteArray, offset ) -
+		this.start_data;
 
 	    // Number of bytes in data array to read
 	    offset += struct[j]; j++;
-	    curritem.nbytes( GSDVAXBytes.toint( byteArray, offset ));
+	    int nbytes =  GSDVAXBytes.toint( byteArray, offset );
 	    
 	    // Number of dimensions if array
+	    // Some dimensions can be negative (!) -1
+	    // Set those to 0 assuming we are scalar
 	    offset += struct[j]; j++;
-	    curritem.ndims( GSDVAXBytes.toint( byteArray, offset ) );
+	    int ndims = GSDVAXBytes.toint( byteArray, offset );
 
 	    //System.out.println("Location: " +  curritem.start_byte() +
 	    //		       " Length = "  + curritem.nbytes()  +
@@ -427,8 +437,14 @@ public class GSDObject {
 	    // dimensions says 83 that means the dimension is specified
 	    // by the contents of scalar item 83.
 	    offset += struct[j];
-	    curritem.dimnumbers( GSDVAXBytes.tointArray(byteArray, 
-							offset, GSD__MAXDIMS));
+	    int[] dimnumbers = GSDVAXBytes.tointArray(byteArray, 
+						      offset, GSD__MAXDIMS);
+
+	    // and create the actual object
+	    GSDItem curritem = new GSDItem( i+1, start_byte, nbytes,
+					    ndims, itemname, itemunit, 
+					    GSD__TYPES[type-1],
+					    dimnumbers );
 
 	    // and place the item in context
 	    items[i] = curritem;

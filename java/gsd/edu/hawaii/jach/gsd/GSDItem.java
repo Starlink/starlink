@@ -15,10 +15,10 @@ import java.lang.reflect.*;
  *
  * Objects are created for each item in a GSD file by the GSDObject
  * constructor. In general, GSDItem objects are usually not instantiated
- * from user code. Whilst the public interface does allow for the attributes
- * stored in the object to be modified, this is usually only useful
- * for object population via GSDObject class since the data retrieved
- * from GSD files are currently read-only and can not be modified on disk.
+ * from user code. Once instantiated, GSDItem objects are immutable
+ * since GSD files are readonly [at least that is the goal - currently
+ * they are modified after instantiation by the GSDObject during read
+ * but they will be immutable after that].
  *
  * @author  Tim Jenness (JAC)
  * @version $Id$
@@ -32,11 +32,10 @@ public class GSDItem {
 
     // Instance variables that contain information useful
     // for public consumption.
-    private int number;
-    private String name;
-    private String unit;
-    private char type;
-    private boolean isArray;
+    private final int number;
+    private final String name;
+    private final String unit;
+    private final char type;
 
     // For array items
     private String[] dimnames;
@@ -61,113 +60,79 @@ public class GSDItem {
 
     // This is the offset into the ByteBuffer, relative to the
     // start of the buffer and not the start of the GSD file
-    private int start_byte;
+    private final int start_byte;
 
     // The number of byte representing the data in the GSD data segment
-    private int nbytes;
+    private final int nbytes;
 
     // The actual number of dimensions associated with the data.
     // Useful for stopping loops whilst reading the data in.
-    private int ndims;
+    private final int ndims;
 
-
-    // Set methods. Note that start_byte, ndims and contents are here
-    // since they are required in order to allow the object to be
-    // configured by the GSDObject class. Alternative is to provide
-    // a constructor that includes these attributes.
 
     /**
-     * Set the number of the item in the original GSD file.
-     *
+     * Constructor takes all arguments required to configure a GSDItem
+     * and is package-private. GSDItem object can currently only be
+     * instantiated by classes in the gsd package. Currently the object
+     * can not be fully configured during instantiation due to
+     * order dependencies in the GSD reader (the data must be mapped
+     * after the item header is read, the array items can only be specified
+     * after the scalar items have content)
      */
-    public void number( int itemnum ) { this.number = itemnum; };
+    GSDItem(int itemnum, int start_byte, int nbytes,
+	    int ndims, String item_name, String item_unit, char type,
+	    int[] dimnums ) {
 
-    /**
-     * Set the start byte position for this item in the mapped data buffer.
-     * Set by the GSDObject when the data segment is mapped.
-     *
-     * @param pos Offset position from start of ByteBuffer.
-     */
-    public void start_byte( int pos ) { this.start_byte = pos; };
+	// Nothing clever
+	this.number = itemnum;
+	this.start_byte = start_byte;
+	this.nbytes = nbytes;
 
-    /**
-     * Set the number of bytes used to represent the data in the GSD file.
-     *
-     */
-    public void nbytes( int numbytes ) { this.nbytes = numbytes; };
+	// could have a private setter for this? Only an issue if it 
+	// is set somewhere else.
+	if (ndims < 0) { ndims = 0; }
+	this.ndims = ndims;
+	this.name = item_name.toUpperCase();
+	this.unit = item_unit;
+	this.type = type;
+	this.dimnumbers = dimnums;
+    }
 
-    /**
-     * Set the number of dimensions in the data. Zero indicates a scalar.
-     *
-     */
-    public void ndims( int numdims ) { this.ndims = numdims; };
 
     /**
      * Set the (possibly) mapped ByteBuffer associated with the data
      * array in the GSD file (not this specfic item). Will be null if
-     * the file has been unmapped.
+     * the file has been unmapped. This is package private.
      *
      */
-    public void contents( ByteBuffer buf ) {this.contents = buf; }
-
-    /**
-     * Set the name of the item in the GSD file. GSD item names are
-     * always uppercased.
-     *
-     * @param item_name
-     */
-    public void name( String item_name ) { 
-	this.name = item_name.toUpperCase(); 
-    };
-
-    /**
-     * Set the unit associated with the data.
-     *
-     */
-    public void unit( String item_unit ) { this.unit = item_unit; };
-
-    /**
-     * Set whether the item is an array or scalar. Could also determine
-     * this from the ndims() attribute.
-     */
-    public void isArray( boolean arrok ) { this.isArray = arrok; };
-
-    /**
-     * Set the type of the item (as a single character).
-     *
-     */
-    public void type( char dtype ) { this.type = dtype; };
+    void contents( ByteBuffer buf ) {this.contents = buf; }
 
     /**
      * Set the size of each of the data dimensions.
      */
-    public void dimensions( int[] dims ) { this.dimensions = dims; };
-
-    /**
-     * Set the item numbers associated with each data dimension.
-     */
-    public void dimnumbers( int[] dimitems ) { this.dimnumbers = dimitems; };
+    void dimensions( int[] dims ) { this.dimensions = dims; };
 
     /**
      * Set the name of each dimensions.
      */
-    public void dimnames( String[] dimnam ) { this.dimnames = dimnam; };
+    void dimnames( String[] dimnam ) { this.dimnames = dimnam; };
 
     /**
      * Set the units of each dimension.
      */
-    public void dimunits( String[] dimunt ) { this.dimunits = dimunt; };
+    void dimunits( String[] dimunt ) { this.dimunits = dimunt; };
 
     /**
-     * Store the actual data associated with this item.
+     * Store the actual data associated with this item. Should only
+     * be allowed from within the package.
      */
-    public void setData( Object thedata ) { this.data = thedata; };
+    private void setData( Object thedata ) { this.data = thedata; };
 
     // Accessor methods
 
-    // Extra accessors that must be documented
-    // Returns the start position of the byte stream. For internal use
-    // only. This avoids confusion.
+    // Extra accessors that must be documented but are not part of the
+    // public interface.  Returns the start position of the byte
+    // stream. For internal use only. This avoids confusion.
     private int start_byte() { return this.start_byte; }
 
     // Number of bytes representing the data in the byte buffer
@@ -221,7 +186,13 @@ public class GSDItem {
     /**
      * Indicates whether the item is scalar or an array of values.
      */
-    public boolean isArray() { return this.isArray; }
+    public boolean isArray() { 
+	boolean result = true;
+	if (this.ndims == 0) {
+	    result = false;
+	}
+	return result;
+    }
 
     /**
      * If an array, this is the dimensionality of the data array.
@@ -272,6 +243,32 @@ public class GSDItem {
     }
 
     /**
+     * Return a short description of the item.
+     */
+    public String toString() {
+	String header = this.name() + "  [" + this.unit() +
+	   "] Type:" + this.type();
+
+        // Different display depending on array type
+        if (this.isArray()) {
+            String size = "" + this.size();
+            header = header + " [Array]" + " " +
+                "Array size=" + size;
+        } else {
+            header = header + " [Scalar]" + " ";
+	    try {
+		Object data = this.getData();
+		header = header + data;
+	    } catch (IOException e) {
+		header = header + "<undefined>";
+	    } catch (GSDException e) {
+		header = header + "<undefined>";
+	    }
+        }
+	return header;
+    }
+
+    /**
      * Print the contents of the Item to standard output regardless
      * of the size of the item.
      */
@@ -305,7 +302,7 @@ public class GSDItem {
 	}
 	System.out.println(header);
 	
-	if (this.isArray) {
+	if (this.isArray()) {
 	    // dimensions
 	    int[] dims = this.dimensions;
 	    if ( dims != null ) {
