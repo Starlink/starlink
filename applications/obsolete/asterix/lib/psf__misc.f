@@ -106,7 +106,7 @@
       MID = P_MODID(SLOT)
       IF ( L_MOD_PFL(MID,LID) .NE. 0 ) THEN
         CALL PSF_ENERGY_PFL_SPEC( %VAL(L_MOD_PFL(MID,LID)),
-     :                          SLOT, NFRAC, FRAC, RADII, STATUS )
+     :               PS_PSID(SLOT), NFRAC, FRAC, RADII, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           GOTO 99
         ELSE
@@ -187,7 +187,7 @@
 
 
 *+  PSF_ENERGY_PFL_SPEC - Invoke library routine for profiling
-      SUBROUTINE PSF_ENERGY_PFL_SPEC( ROUTINE, SLOT, NFRAC, FRAC,
+      SUBROUTINE PSF_ENERGY_PFL_SPEC( ROUTINE, PSID, NFRAC, FRAC,
      :                                            RADII, STATUS )
 *
 *    Description :
@@ -216,7 +216,7 @@
 *    Import :
 *
       EXTERNAL                 ROUTINE                 ! LIB routine to call
-      INTEGER                  SLOT                    ! The PSF id
+      INTEGER                  PSID                    ! The PSF id
       INTEGER                  NFRAC                   ! Number of fractions
       REAL                     FRAC(NFRAC)             ! Requested fractions
 *
@@ -232,7 +232,7 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL ROUTINE( SLOT, NFRAC, FRAC, RADII, STATUS )
+      CALL ROUTINE( PSID, NFRAC, FRAC, RADII, STATUS )
 
       END
 
