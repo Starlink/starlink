@@ -47,6 +47,7 @@ c     - astSet<X>: Set an attribute value for an Object
 c     - astShow: Display a textual representation of an Object on standard
 c     output
 c     - astTest: Test if an attribute value is set for an Object
+c     - astVersion: Return the verson of the AST library being used.
 f     - AST_ANNUL: Annul a pointer to an Object
 f     - AST_BEGIN: Begin a new AST context
 f     - AST_CLEAR: Clear attribute values for an Object
@@ -63,6 +64,7 @@ f     - AST_SET<X>: Set an attribute value for an Object
 f     - AST_SHOW: Display a textual representation of an Object on standard
 f     output
 f     - AST_TEST: Test if an attribute value is set for an Object
+f     - AST_VERSION: Return the verson of the AST library being used.
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -3292,6 +3294,7 @@ void astEnd_( void );
 void astExemptId_( AstObject * );
 void astExportId_( AstObject * );
 void astSetId_( void *, const char *, ... );
+int astVersion_( void );
 
 /* External Interface Functions. */
 /* ----------------------------- */
@@ -4654,4 +4657,54 @@ void astSetId_( void *this_id_void, const char *settings, ... ) {
       astVSet( this, settings, args );
       va_end( args );
    }
+}
+
+int astVersion_( void ) {
+/*
+*++
+*  Name:
+c     astVersion
+f     AST_VERSION
+
+*  Purpose:
+*     Return the version of the AST library being used.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "object.h"
+c     int astVersion
+f     RESULT = AST_VERSION()
+
+*  Class Membership:
+*     Object class function.
+
+*  Description:
+c     This macro invokes a function which 
+f     This function 
+*     returns an integer representing the version of the AST library
+*     being used. The library version is formatted as a string such as 
+*     "2.0-7" which contains integers representing the "major version" (2), 
+*     the "minor version" (0) and the "release" (7). The integer returned 
+*     by this function combines all three integers together into a single 
+*     integer using the expresion:
+*
+*     (major version)*1.0E6+(minor version)*1.0E3+(release)
+
+*  Returned Value:
+c     astVersion
+f     AST_VERSION = INTEGER
+*        The major version, minor version and release numbers for the AST
+*        library, encoded as a single integer.
+
+*  Applicability:
+*     Object
+c        This macro applies to all Objects.
+f        This routine applies to all Objects.
+
+*--
+*/
+
+   return ;
 }

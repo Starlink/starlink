@@ -156,7 +156,10 @@ print( ' (makeh):
 *-
 */
 
-/* This is AST version <VERSION_NUMBER>-<RELEASE_NUMBER>. */
+/* This is AST version <VERSION_NUMBER>-<RELEASE_NUMBER>. Note, these macros 
+   are kept for backwards compatibility only. The AST__VMAJOR, AST__VMINOR and
+   AST__RELEASE macros should normally be used in preference to these, due to 
+   the non-standard use of single underscores. */
 #define AST_MAJOR_VERS <MAJOR_VERSION_NUMBER>
 #define AST_MINOR_VERS <MINOR_VERSION_NUMBER>
 #define AST_RELEASE <RELEASE_NUMBER>

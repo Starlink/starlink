@@ -145,6 +145,8 @@
 *           End an AST context.
 *        astIsAObject
 *           Test class membership.
+*        astVersion
+*           Returns the AST library version number.
 *
 *     Protected:
 *        astCheckObject
@@ -168,6 +170,12 @@
 *     Public:
 *        AST__NULL
 *           Null Object pointer value.
+*        AST__VMAJOR
+*           The AST library major version number.
+*        AST__VMINOR
+*           The AST library minor version number.
+*        AST__RELEASE 
+*           The AST library release number.
 *
 *     Protected:
 *        astMAKE_CHECK
@@ -247,6 +255,9 @@
 *        Added Ident attribute.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitObjectVtab method.
+*     30-APR-2003 (DSB):
+*        Added macros AST__VMAJOR, AST__VMINOR and AST__RELEASE.
+*        Added astVersion function.
 *--
 */
 
@@ -1048,6 +1059,16 @@ int astTest##attribute##_( Ast##class *this ) { \
    pointer. */
 #define AST__NULL (astI2P(0))
 
+
+/* VERSION MACROS */
+/* -------------- */
+/* define macros containing the library major version, minor version and 
+   release numbers. The values of these macros are edited in automatically
+   when the AST release is prepared. */
+#define AST__VMAJOR <MAJOR_VERSION_NUMBER>
+#define AST__VMINOR <MINOR_VERSION_NUMBER>
+#define AST__RELEASE <RELEASE_NUMBER>
+
 /* Type Definitions. */
 /* ================= */
 
@@ -1156,6 +1177,7 @@ AstObject *astI2P_( int );
 AstObject *astMakeId_( AstObject * );
 AstObject *astMakePointer_( AstObject * );
 int astP2I_( AstObject * );
+int astVersion_( void );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
@@ -1248,6 +1270,7 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astEnd astINVOKE(V,astEnd_())
 #endif
 
+#define astVersion astVersion_()
 #define astI2P(integer) ((void *)astI2P_(integer))
 #define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer)))
 #define astMakePointer(id) ((void *)astMakePointer_((AstObject *)(id)))
