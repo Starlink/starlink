@@ -59,8 +59,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      REAL INTER
-      INTEGER I, J
 
 *.
 
@@ -84,4 +82,4 @@
       END IF
 
       END
-* $Id: big1_flmult.f,v 1.1 1998/07/03 13:16:44 mbt Exp $
+* $Id: big1_flmult.f,v 1.2 1998/07/03 15:37:42 mbt Exp $
