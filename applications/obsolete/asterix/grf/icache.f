@@ -32,10 +32,7 @@
 
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
-      ELSEIF (.NOT.I_DISP) THEN
-        CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
-
 
         CALL USI_GET0C('MODE',MODE,STATUS)
         CALL CHR_UCASE(MODE)

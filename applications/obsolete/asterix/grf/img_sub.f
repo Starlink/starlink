@@ -3148,27 +3148,40 @@ c      LOGICAL VOK,QOK
       IF (STATUS.EQ.SAI__OK) THEN
 
         N=I_NX*I_NY
-        CALL DYN_SIZE(I_DPTR_M,M,STATUS)
-        IF (M.LT.N) THEN
-          CALL DYN_UNMAP(I_DPTR_M,STATUS)
+        IF (I_DPTR_M.EQ.0) THEN
           CALL DYN_MAPR(1,N,I_DPTR_M,STATUS)
-          CALL DYN_UNMAP(I_XPTR_M,STATUS)
           CALL DYN_MAPR(1,I_NX,I_XPTR_M,STATUS)
-          CALL DYN_UNMAP(I_YPTR_M,STATUS)
           CALL DYN_MAPR(1,I_NY,I_YPTR_M,STATUS)
+        ELSE
+          CALL DYN_SIZE(I_DPTR_M,M,STATUS)
+          IF (M.LT.N) THEN
+            CALL DYN_UNMAP(I_DPTR_M,STATUS)
+            CALL DYN_MAPR(1,N,I_DPTR_M,STATUS)
+            CALL DYN_UNMAP(I_XPTR_M,STATUS)
+            CALL DYN_MAPR(1,I_NX,I_XPTR_M,STATUS)
+            CALL DYN_UNMAP(I_YPTR_M,STATUS)
+            CALL DYN_MAPR(1,I_NY,I_YPTR_M,STATUS)
+          ENDIF
         ENDIF
         IF (V) THEN
-          CALL DYN_SIZE(I_VPTR_M,M,STATUS)
-          IF (M.LT.N) THEN
-            CALL DYN_UNMAP(I_VPTR_M,STATUS)
+          IF (I_VPTR_M.EQ.0) THEN
             CALL DYN_MAPR(1,N,I_VPTR_M,STATUS)
+          ELSE
+            CALL DYN_SIZE(I_VPTR_M,M,STATUS)
+            IF (M.LT.N) THEN
+              CALL DYN_UNMAP(I_VPTR_M,STATUS)
+              CALL DYN_MAPR(1,N,I_VPTR_M,STATUS)
+            ENDIF
           ENDIF
         ENDIF
         IF (Q) THEN
-          CALL DYN_SIZE(I_QPTR_M,M,STATUS)
-          IF (M.LT.N) THEN
-            CALL DYN_UNMAP(I_QPTR_M,STATUS)
+          IF (I_QPTR_M.EQ.0) THEN
             CALL DYN_MAPB(1,N,I_QPTR_M,STATUS)
+          ELSE
+            CALL DYN_SIZE(I_QPTR_M,M,STATUS)
+            IF (M.LT.N) THEN
+              CALL DYN_UNMAP(I_QPTR_M,STATUS)
+            ENDIF
           ENDIF
         ENDIF
         CALL GCB_CRECACHE(I_CACHE_M,STATUS)
