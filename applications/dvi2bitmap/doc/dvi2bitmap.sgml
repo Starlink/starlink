@@ -14,8 +14,9 @@
 <version number=1 date='14-JUN-1999' author=ng>Initial
 version</version>
 <distribution string="1" date="14-JUN-1999" author="ng">
-First public release
-</distribution>
+  First public release
+<change date="17-JUN-1999" author=ng versionid=upd1>
+  Added kpathsea support, and appendix on TeX dimensions.
 </history>
 
 <copyright>
@@ -246,6 +247,10 @@ non-Starlink library which is not distributed with this package.  See
 the non-Starlink instructions, <ref id=install.nonstarlink>, for details.
 
 <subsect id=install.nonstarlink export>Non-starlink machines
+<update versionid="upd1">
+  Added instructions on configuring in support for the kpathsea
+  library
+</update>
 
 <p>If you are not on a Starlink node, then you should build and
 install as follows.
@@ -480,3 +485,141 @@ the web.  It uses yet another notation, and converts it to online
 form using a plugin (no printing, and Windows only, as of
 April 1999).
 
+<sect id=tex.dimensions export>TeX dimensions
+
+<p>When producing this program, I became terribly confused about the
+variety of dimensions which appear in DVI and PK files.  The following
+is a summary of the sizes which appear, for the benefit of anyone else
+attempting a project like this.  The reference [Dn] refers to
+section~`<m/n/' of the webbed DVItype document and [Pn] to section~`<m/n/' of
+the PktoPX document (see <ref id=refs>).
+
+<p>If you feel I have misunderstood something here, or got one of the
+conversion factors wrong (I hate these!), please correct me.
+
+<table>
+<caption>
+Sizes in TeX
+</caption>
+<tgroup cols="3">
+<thead>
+<row><entry>Context<entry>Description<entry>See
+<tbody>
+<row>
+<entry>DVI preamble
+<entry><code/num/, <code/den/: multiply a `DVI unit' by
+<m>\mbox{num}/\mbox{den}</m> to obtain a length in units of
+<m/10^{-7}\mathrm{m}/
+<entry>[D17]
+
+<row>
+<entry>
+<entry><code/mag/: DVI units are actually multiplied by
+<m>\mbox{num}\times\mbox{mag}/1000\times\mbox{den}</m>
+<entry>[D17]
+
+<row>
+<entry>DVI font definition
+<entry><code/d/: a design size, in DVI units.  The nominal size of the font.
+<entry>[D18]
+
+<row>
+<entry>
+<entry><code/s/: a `fixed point' scale factor, range
+<m>2^{27}>s>0</m>, scaling <code/d/ (see note).
+<entry>[D18]
+
+<row>
+<entry>PK preamble
+<entry><code/ds/: the font design size in units of <m/2^{-20}/ points.
+<entry>[P12]
+
+<row>
+<entry>
+<entry><code/hppp/, <code/vppp/: number of pixels per point, times
+<m/2^{16}/ (see note).
+<entry>[P12]
+
+<row>
+<entry>Character
+<entry><code/tfmwidth/: the width of the character (see note).
+<entry>[D37], [P9]
+
+<row>
+<entry>
+<entry><code/w/, <code/h/: the width and height, in pixels, of the
+character pixel map.
+<entry>[P21]
+
+<row>
+<entry>
+<entry><code/hoff/ and <code/voff/: offset of the pixel map from the
+reference point.
+<entry>[P21]
+
+<row>
+<entry>
+<entry><code/dm/, <code/dx/, <code/dy/: the pixel escapements.
+<code/dm/ in pixels, <code/dx/ and <code/dy/ in pixels times
+<m/2^{16}/ (see note).
+<entry>[P21]
+
+</tbody>
+</tgroup>
+</table>
+
+<p><ol>
+<li><code/s/ scales the design size, so that a font is actually used at
+<m>\mbox{mag}\times\mbox{s}/1000\times\mbox{d}</m> times its normal
+size.
+
+<li><code/hppp/ and <code/vppp/ aren't used as sizes, but can be used
+to check you have the right fonts by comparing resolution, etc..
+
+<li><code/tfmwidth/ is the `physical' size of a character, and is the
+only size that &tex; uses in its calculations, and which the DVI
+reader uses when working out how far to move the reference point when
+it sets a character.  This is defined in [P9] to be in units of
+<code/FIXes/, where one <code/FIX/ is <em/2^{-20}/ points.  [D37]
+describes how to multiply these widths by scaling factors without
+overflowing.
+
+<li>The difference between the pixel escapements and <code/tfmwidth/
+is that the latter is a resolution-independent shift of the DVI
+reference point, and the former is the PK file's recommendation of the
+number of pixels the DVI processor should actually move.  The DVI
+processor keeps track of the two reference points, and readjusts the
+pixel-based one when rounding errors move it too far from the
+resolution-independent one.  See [D89] and [D91]; also [D40].
+
+</ol>
+
+<p>A few useful conversions are:
+<ul>
+<li>The design size of a font is a physical length, of
+<m>\mbox{ds}/2^{20}</m> points. [P12]
+
+<li>A <code/FIX/ is a physical size, of length
+<m>(\mbox{designsize})/2^{20}</m>
+
+<li>A TFM width is a physical size.  The <code/tfmwidth/ parameter is
+in units of <code/FIXes/, so that the TFM width is a length of
+<code/tfmwidth/ fixes, which is equal to <m>\mbox{tfmwidth}/2^{20}
+\times \mbox{ds}/2^{20}</m> points.
+
+<li>Writing `dviu' for the unit `DVI units', `sp' for the scaled point
+of <m/2^{-16}/ points, `px' for pixels, and <m/d\mu/ for Knuth's
+deci-micron, or <m/10^{-7}\mathrm{m}/,
+<meqnarray>
+1\mathrm{sp} = \frac{1}{2^{20}}\mathrm{pt} & = & 
+	\frac{25400000}{7227\times 2^{16}} d\mu \\
+7227\mathrm{pt} & = & 254\mathrm{cm} = 25400000 d\mu \\
+1\mathrm{dviu} & = & \frac{\mathrm{num}\times\mathrm{resolution}}%
+		{\mathrm{den}\times 254000} \mathrm{px} \\
+1\mathrm{dviu} & = & \frac{\mathrm{num}\times 7227}%
+		{\mathrm{den}\times 25400000} \mathrm{pt} \\
+</meqnarray>
+
+</ul>
+
+<backmatter>
