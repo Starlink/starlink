@@ -90,10 +90,14 @@ ndf_begin;
 # Loop over each name
 foreach $name (@names) {
 
-  $name =~ /(.*)_PEAK/ & ($bol = $1);
-  print "Bolometer: $bol\n";
+   # Read the header info
+   ($hashref,$status) = fits_read_header("$file.$name");
 
-  print "Section   Mean   Sigma\n";
+  $name =~ /(.*)_PEAK/ & ($bol = $1);
+
+  print "\n";
+  # print the first line of the header
+  print "$$hashref{OBJECT} $$hashref{WAVE_1} ${bol}_$$hashref{RUN} $$hashref{UTDATE}\n";
 
     # Now need to find out how many integrations we have so that
     # we can split it into sections
@@ -105,8 +109,16 @@ foreach $name (@names) {
     ndf_dim($indf, 1, @dim, $ndim, $status);
 #    ndf_size($indf, $npix, $status);
     $npix = $dim[0];
-    print "Npix = $npis\n";
     ndf_annul($indf, $status);
+
+    # Now that I know the size print the second header line
+    $nposplate = int($npix/$int_per_wp + 0.99);
+
+    # Convert the time to hours
+    (@times) = split(/:/,$$hashref{STSTART});
+    $lst = $times[0] + ($times[1] / 60) + ($times[2] / 3600); 
+
+    print "$nposplate $int_per_wp $$hashref{MEANRA} $$hashref{MEANDEC} $lst\n";
 
     # Number of time round the loop depends on $npix
 
@@ -122,7 +134,7 @@ foreach $name (@names) {
       ($mean) =  par_get("mean", "stats", \$status);
       ($sigma) = par_get("sigma", "stats", \$status);
 
-      print "($start:$end)    $mean   $sigma\n";
+      print "$mean   $sigma\n";
 
     }
 
