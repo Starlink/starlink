@@ -66,6 +66,8 @@
 #        Original version.
 #-
 
+#  Global variables.
+      global Done
 
 #  Set defaults for some arguments.
       foreach pair { { MAXCANV 0 } { MAXPOS 100 } { PERCLO 5 } { PERCHI 95 } \
@@ -107,9 +109,10 @@
 #  Set the pair selection criterion.
       set choosestate ""
       proc pairok { a b } {
-         if { ( $a != "" && $b != "" ) && ( [ array size done ] == 0 || \
-                                            [ array names done $a ] != "" || \
-                                            [ array names done $b ] != "" ) } { 
+         global Done
+         if { ( $a != "" && $b != "" ) && ( [ array size Done ] == 0 || \
+                                            [ array names Done $a ] != "" || \
+                                            [ array names Done $b ] != "" ) } { 
             return 1 
          } else {
             return 0
@@ -144,7 +147,7 @@
       $quitdialog hide Help
 
 #  Loop until all the NDFs have been paired.
-      while { [ array size done ] < $nndf } {
+      while { [ array size Done ] < $nndf } {
 
 #  Get the user to pick a pair of NDFs.
          wm deiconify $chooser
@@ -178,9 +181,9 @@
 
 #  Load the NDF pair into the aligner widget and wait for the user to 
 #  select some positions in common.
-         wm withdraw $chooser
          wm deiconify $aligner
-         raise $aligner
+         raise $aligner $chooser
+         wm withdraw $chooser
          set percA [ $chooser percentiles $iA ]
          set percB [ $chooser percentiles $iB ]
          $aligner loadndf A $ndfs($iA) CURRENT $percA $MAXCANV
@@ -204,8 +207,7 @@
                                   [ lindex [ lindex $pB $i ] 1 ] \
                                   [ lindex [ lindex $pB $i ] 2 ] ]
             }
-	    set scale [ expr [ $aligner cget -zoom ] * \
-                             [ $ndfs($iA) pixelsize CURRENT ] ]
+	    set scale [ $aligner cget -zoom ]
             set offset [ ndfcentroffset $ndfs($iA) CURRENT $ndfs($iB) CURRENT \
                          $pts $scale ]
             set nmatch [ lindex $offset 0 ]
@@ -226,8 +228,8 @@
                set pairs($iA,$iB) [ list $nmatch $xoff $yoff $matchpts ]
 
 #  Record the fact that these images have been connected.
-               set done($iA) 1
-               set done($iB) 1
+               set Done($iA) 1
+               set Done($iB) 1
 
 #  Visually reflect the fact that they have been connected.
                $chooser highlight $iA 1
@@ -264,13 +266,14 @@
          lappend MATPTS $matpts
       }
 
-#  Retrieve characteristics of the chooser window which may have been 
+#  Retrieve characteristics of the windows which may have been 
 #  changed by the user.
       set vp [ $chooser cget -viewport ]
       if { [ llength $vp ] == 2 } {
          set PREVX [ lindex $vp 0 ]
          set PREVY [ lindex $vp 1 ]
       }
+      regexp {^([0-9]+)x([0-9]+)} [ winfo geometry $aligner ] dummy WINX WINY
 
 #  Destroy remaining windows.
       destroy $chooser
