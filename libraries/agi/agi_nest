@@ -1,0 +1,34 @@
+*+
+*   --------
+*   AGI_NEST
+*   --------
+*   This contains the common block holding the level of nesting for
+*   the AGI_BEGIN - AGI_END blocks. It also stores the picture that
+*   was current when AGI_BEGIN was called.
+*
+*   Note. Have to include 'SAE_PAR' in front of this.
+*
+*   Nick Eaton  Nov 1990
+*               Feb 1992  Separate character and numerical entries
+*-
+
+*   NESLEN defines the maximum level of nesting
+      INTEGER NESLEN
+      PARAMETER ( NESLEN = 8 )
+
+*   CNEST is the nesting counter
+      INTEGER CNEST
+
+*   CNESWK and CNESPN stores the details of the current picture
+      CHARACTER * ( DAT__SZNAM ) CNESWK( NESLEN )
+      INTEGER CNESPN( NESLEN )
+
+*   CLOSEF indicates if the database file is to be closed or not
+      LOGICAL CLOSEF
+
+      COMMON / AGI_NEST / CNEST, CNESPN, CLOSEF
+      COMMON / AGI_CNES / CNESWK
+
+      SAVE / AGI_NEST /
+      SAVE / AGI_CNES /
+      

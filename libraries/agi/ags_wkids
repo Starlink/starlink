@@ -1,0 +1,33 @@
+*+
+*   ---------
+*   AGS_WKIDS
+*   ---------
+*   This contains the common blocks for those variables that are
+*   indexed by the GKS workstation identifier. These are required
+*   because, for example,  the workstation identifier on its own
+*   cannot recreate the initial device name.
+*
+*   Nick Eaton  Aug 1992
+*+
+
+*   MWKIDS specifies the maximum possible value of the GKS workstation
+*   identifiers and thus the length of the arrays. SGS assigns values to
+*   these identifiers between 1 and MXOPWK, where MXOPWK is returned
+*   from GQWKM. This value is currently 4.
+      INTEGER MWKIDS
+      PARAMETER ( MWKIDS = 4 )
+
+*   The contents of the common block are as follows
+*     cbzone      i()    SGS base zone identifiers
+*     cgonam      c()    Graphics name used to open device.
+
+      INTEGER CBZONE( MWKIDS )
+
+      CHARACTER * 64 CGONAM( MWKIDS )
+
+      COMMON / AGS_WKIDS / CBZONE
+      COMMON / AGS_CWKID / CGONAM
+
+      SAVE / AGS_WKIDS /
+      SAVE / AGS_CWKID /
+

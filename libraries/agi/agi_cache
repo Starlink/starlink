@@ -1,0 +1,80 @@
+*+
+*   ---------
+*   AGI_CACHE
+*   ---------
+*   This contains the common blocks for the picture cache.
+*   This is used for reducing the number of enquiries to the database.
+*   The picture cache works on a simplified First In First Out ( FIFO )
+*   principle. There are no checks to see if the FIFO is full, instead
+*   the oldest member is simply overwritten.
+*   An array FIFO contains picture numbers which have already been
+*   cached, and a pointer PFIFO points to the most recent member.
+*   When pictures are erased from the cache, the FIFO is not sorted,
+*   and the pointer is not updated.
+*   FIFO array is initialised with AGI_INIT
+*
+*   The FIFO is reproduced a number of times to further reduce the
+*   search time. This is done by adding another dimension to the
+*   arrays which is accessed by the FIFO number. The FIFO number is
+*   constructed by hashing the picture number using the function
+*   MOD( PICNUM, NFIFO ).
+*
+*   Note. Have to include 'SAE_PAR' and 'AGI_PAR' in front of this.
+*
+*   Nick Eaton  Nov 1987
+*   Amended     Mar 1988  Added save statement needed by FORTRAN standard
+*   Amended     Jul 1988  Made comment strings of length AGI__CMAX
+*   Amended     Jun 1989  Added the extra dimension to the FIFO's
+*   Amended     Jun 1990  Added CMEMID
+*   Amended     Aug 1990  Added CNUMPS and CNUMPW
+*   Amended     Feb 1992  Separate character and numerical entries
+*   Amended     Jan 1993  Replace the unused CPACT with CHEAD
+*+
+
+*   FIFLEN specifies the length of the FIFO buffer
+      INTEGER FIFLEN
+      PARAMETER ( FIFLEN = 5 )
+
+*   NFIFO specifies the number of FIFO's
+      INTEGER NFIFO
+      PARAMETER ( NFIFO = 25 )
+
+*   The contents of the common block reflect the database entries
+*        fifo        i()    array of current cached picture members
+*        pfifo       i      pointer to most recent cache member
+*        cwknam      c()    workstation name
+*        cpname      c()    name of pictures
+*        ccom        c()    comment associated with pictures
+*        cdev        r()    array of device coordinates
+*        cndc        r()    array of ndc coordinates
+*        cworld      r()    array of world coordinates
+*        cmemid      i()    array of memory identifiers
+*        ctrfor      i()    forward transformation number
+*        ctrinv      i()    inverse transformation number
+*        cnumps      i      number of pictures in workstation
+*        cnumpw      c      workstation for which cnumps applies
+*        chead       i      header control block
+*                           record the number of times the database is cleared
+
+      INTEGER CHEAD, CMEMID( 0 : FIFLEN - 1, 0 : NFIFO - 1 ), CNUMPS,
+     :        CTRFOR( 0 : FIFLEN - 1, 0 : NFIFO - 1 ),
+     :        CTRINV( 0 : FIFLEN - 1, 0 : NFIFO - 1 ),
+     :        FIFO( 0 : FIFLEN - 1, 0 : NFIFO - 1 ),
+     :        PFIFO( 0 : NFIFO - 1 )
+
+      REAL CDEV( 4, 0 : FIFLEN - 1, 0 : NFIFO - 1 ),
+     :     CNDC( 4, 0 : FIFLEN - 1, 0 : NFIFO - 1 ),
+     :     CWORLD( 4, 0 : FIFLEN - 1, 0 : NFIFO - 1 )
+
+      CHARACTER * ( DAT__SZNAM ) CNUMPW,
+     :                           CPNAME( 0 : FIFLEN - 1, 0: NFIFO - 1 ),
+     :                           CWKNAM( 0 : FIFLEN - 1, 0 : NFIFO - 1 )
+      CHARACTER * ( AGI__CMAX ) CCOM( 0 : FIFLEN - 1, 0 : NFIFO - 1 )
+
+      COMMON / AGI_CACHE / FIFO, PFIFO, CDEV, CNDC, CWORLD,
+     :                     CMEMID, CTRFOR, CTRINV, CNUMPS, CHEAD
+      COMMON / AGI_CCACH / CWKNAM, CPNAME, CCOM, CNUMPW
+
+      SAVE / AGI_CACHE /
+      SAVE / AGI_CCACH /
+

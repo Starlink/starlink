@@ -1,0 +1,62 @@
+*   Description :
+*    This file contains the global constants for the names of HDS
+*    structures in the AGI database.
+*   Global Constants :
+
+*   Name of active picture structure
+      CHARACTER * ( DAT__SZNAM ) AGI__ACNAM
+      PARAMETER ( AGI__ACNAM = 'PACTIVE' )
+
+*   Mode of access of database
+      CHARACTER * ( DAT__SZMOD ) AGI__DBMOD
+      PARAMETER ( AGI__DBMOD = 'UPDATE' )
+
+*   Name of structure for database
+      CHARACTER * ( DAT__SZNAM ) AGI__DBNAM
+      PARAMETER ( AGI__DBNAM = 'DATABASE' )
+
+*   Structure type for database
+      CHARACTER * ( DAT__SZTYP ) AGI__DBTYP
+      PARAMETER ( AGI__DBTYP = 'DATABASE' )
+
+*   Default name of container file for database
+      CHARACTER * ( * ) AGI__FNAME
+      PARAMETER ( AGI__FNAME = 'agi_dat' )
+
+*   Default name of container file extension
+      CHARACTER * ( * ) AGI__ENAME
+      PARAMETER ( AGI__ENAME = '.sdf' )
+
+*   Name of header control block
+      CHARACTER * ( DAT__SZNAM ) AGI__HENAM
+      PARAMETER ( AGI__HENAM = 'HEADER' )
+
+*   Name of IDI parameter structure
+      CHARACTER * ( DAT__SZNAM ) AGI__IDNAM
+      PARAMETER ( AGI__IDNAM = 'IDIPAR' )
+
+*   Name of label structure
+      CHARACTER * ( DAT__SZNAM ) AGI__LANAM
+      PARAMETER ( AGI__LANAM = 'LABELS' )
+
+*   Name of more structure
+      CHARACTER * ( DAT__SZNAM ) AGI__MONAM
+      PARAMETER ( AGI__MONAM = 'MORE' )
+
+*   Name of structure for pictures
+      CHARACTER * ( DAT__SZNAM ) AGI__PCNAM
+      PARAMETER ( AGI__PCNAM = 'PICTURE' )
+
+*   Name of structure for reference object
+      CHARACTER * ( DAT__SZNAM ) AGI__REFOB
+      PARAMETER ( AGI__REFOB = 'REFERENCE' )
+
+*   Name of structure for transformation
+      CHARACTER * ( DAT__SZNAM ) AGI__TRANS
+      PARAMETER ( AGI__TRANS = 'TRANSFORMATION' )
+
+*   Stucture type for workstation
+      CHARACTER * ( DAT__SZTYP ) AGI__WKTYP
+      PARAMETER ( AGI__WKTYP = 'WORKSTATION' )
+
+*-

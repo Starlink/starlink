@@ -1,0 +1,71 @@
+*+
+*   ---------
+*   AGI_PFREE
+*   ---------
+*   This contains the common blocks for the picture identifier free
+*   list and storage space.
+*   The picture identifier is just a pointer into the storage space
+*   and they are allocated by the next member of the free list.
+*   When picture identifiers are released the free list should be updated.
+*   The end of the free list is recognised by a negative number.
+*   The free list is initialised by AGI_FINIT.
+*   The common block also contains an array for storing the ADAM
+*   parameter name associated with the devices.
+*
+*   Note. Have to include 'SAE_PAR' and 'AGI_PAR' in front of this.
+*
+*   Nick Eaton  Aug 1988
+*               Dec 1989  Added CIDIID
+*               Jul 1990  Added CROOT
+*               Oct 1990  Added picture deferral
+*               Nov 1990  Added nesting level and clear flags
+*               Feb 1992  Separate character and numerical entries
+*                         Define parameter string lengths with AGI__SZPAR
+*+
+
+*   FRELEN specifies the length of the free list. This indicates the
+*   maximum number of pictures referenced at any one tiime.
+      INTEGER FRELEN
+      PARAMETER ( FRELEN = 40 )
+
+*   CLRLEN specifies the length of the clear flag array.
+      INTEGER CLRLEN
+      PARAMETER ( CLRLEN = 8 )
+
+*   The contents of the common block are as follows
+*        nexfre      i      pointer to next free member of free list.
+*        frelis      i()    array of pointers to next free member.
+*        cgrawk      c()    Graphics system workstation name.
+*        cagiwk      c()    AGI workstation name.
+*        cpicnm      i()    Picture number.
+*        curpid      i      Identifier for current picture.
+*        ptname      c()    ADAM parameter name associated with device.
+*        picacs      c()    Access mode for the pictures.
+*        cidiid      i()    IDI display identifier
+*        clevel      i()    Nesting level for identifier
+*        croot       i      Flag for root picture
+*        cnumid      i      Number of picture identifiers allocated
+*        cdeps       i()    List of deferred picture identifiers
+*        cisdep      l      Indicates if a picture is awaiting release
+*        clearf      i()    Indicates if a clear flag is set
+*        clearw      c()    The workstation the clear flag points to
+
+      LOGICAL CISDEP
+
+      INTEGER CDEPS( FRELEN ), CIDIID( FRELEN ), CLEVEL( FRELEN ),
+     :        CLEARF( CLRLEN ), CNUMID, CPICNM( FRELEN ), CROOT, CURPID,
+     :        FRELIS( FRELEN ), NEXFRE
+
+      CHARACTER * 255 CGRAWK( FRELEN )
+      CHARACTER * ( DAT__SZNAM ) CAGIWK( FRELEN )
+      CHARACTER * ( AGI__SZPAR ) PTNAME( FRELEN )
+      CHARACTER * ( DAT__SZNAM ) PICACS( FRELEN )
+      CHARACTER * ( DAT__SZNAM ) CLEARW( CLRLEN )
+
+      COMMON / AGI_PFREE / NEXFRE, FRELIS, CPICNM, CURPID, CIDIID,
+     :                     CLEVEL, CROOT, CNUMID, CDEPS, CISDEP, CLEARF
+      COMMON / AGI_CPFRE / CGRAWK, CAGIWK, PTNAME, PICACS, CLEARW
+
+      SAVE / AGI_PFREE /
+      SAVE / AGI_CPFRE /
+

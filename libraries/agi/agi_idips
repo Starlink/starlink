@@ -1,0 +1,52 @@
+*+
+*   ---------
+*   AGI_IDIPS
+*   ---------
+*   This contains the common blocks for the IDI parameters.
+*
+*   Nick Eaton  Jun 1990
+*+
+
+*   MXMEMS specifies the maximum number of memories on a device
+      INTEGER MXMEMS
+      PARAMETER ( MXMEMS = 4 )
+
+*   The contents of the common block are
+*        cdipid    i    display identifier of device being stored
+*        cnmems    i    actual number of memories on the device
+*        czoomf    i()  zoom factors of the memories
+*        cxscrl    i()  x-scroll factors of the memories
+*        cyscrl    i()  y-scroll factors of the memories
+*        cidion    l    flag to indicate IDI has been started
+*        cgkson    l    flag to indicate GKS has been started
+*        cpgpon    l    flag to indicate PGPLOT has been started
+
+*   The display identifier of the device being stored
+      INTEGER CDIPID
+
+*   Actual number of memories on the device
+      INTEGER CNMEMS
+
+*   Zoom factors of the memories
+      INTEGER CZOOMF( 0 : MXMEMS - 1 )
+
+*   X-scroll factors of the memories
+      INTEGER CXSCRL( 0 : MXMEMS - 1 )
+
+*   Y-scroll factors of the memories
+      INTEGER CYSCRL( 0 : MXMEMS - 1 )
+
+*   Flag to indicate IDI has been started
+      LOGICAL CIDION
+
+*   Flag to indicate GKS has been started
+      LOGICAL CGKSON
+
+*   Flag to indicate PGPLOT has been started
+      LOGICAL CPGPON
+
+      COMMON / AGI_IDIPS / CDIPID, CNMEMS, CZOOMF, CXSCRL, CYSCRL,
+     :                     CIDION, CGKSON, CPGPON
+
+      SAVE / AGI_IDIPS /
+

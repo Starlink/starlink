@@ -1,0 +1,18 @@
+*+
+*   --------
+*   AGI_CREF
+*   --------
+*   This contains the common block holding the reference counter for
+*   the number of times AGI_ASSOC has been called.
+*
+*   Nick Eaton  May 1989
+*-
+
+
+*   CREF is the reference counter
+      INTEGER CREF
+
+      COMMON / AGI_CREF / CREF
+
+      SAVE / AGI_CREF /
+      

@@ -1,0 +1,31 @@
+*+
+*   --------
+*   AGI_LOCS
+*   --------
+*   This contains the common blocks for the HDS database locators.
+*   The locators stored in the common block are :-
+*   DABLOC - Locator to top level container file
+*
+*   Note. Have to include 'SAE_PAR' in front of this.
+*
+*   Nick Eaton  Jul 1989
+*               Dec 1989  Added FLUSH flag
+*               Feb 1992  Separate character and numerical entries
+*+
+
+*   FLUSH is a flag to indicate if HDS should be flushed to output
+*   any cached data.
+      LOGICAL FLUSH
+
+*   LOCVAL is a flag to indicate if the database locator is valid
+      LOGICAL LOCVAL
+
+*   DABLOC is the HDS locator to the top level container file
+      CHARACTER * ( DAT__SZLOC ) DABLOC
+
+      COMMON / AGI_LOCS / FLUSH, LOCVAL
+      COMMON / AGI_CLOC / DABLOC
+
+      SAVE / AGI_LOCS /
+      SAVE / AGI_CLOC /
+

@@ -1,0 +1,27 @@
+
+Plan for AGI
+
+ - Need to build AGI_ERR before anything else is built.
+
+ - Need to change agi_par to AGI_PAR
+
+ - Need to edit source code to change lower case AGI_PAR and AGI_ERR
+   to upper case.
+
+      perl -pi -e 's/agi_par/AGI_PAR/' *.f
+
+ - Since AC_CONFIG_SUBDIRS traverses subdirs before
+   building files in current directory, the AGI_ERR  
+   has to be built in a subdir first.
+
+    Else move AGI_ERR creation to start of dependencies.
+
+ - Everything now works if AGI_ERR is created first.
+
+Tests are outstanding since
+  1. They test with IDI
+  2. They need the fortran SLEEP call and so an extra C file.
+     This files is not needed if SLEEP intrinsic is available.
+
+
+Documentation: sun48a.tex could simply be included in tex file

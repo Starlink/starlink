@@ -1,0 +1,89 @@
+************************************************************************
+*+  AGI_1OWORK - Open workstation structure
+
+      SUBROUTINE AGI_1OWORK ( WKNAME, WKSLOC, STATUS )
+
+*    Description :
+*     Open a workstation structure
+*
+*    Invocation :
+*     CALL AGI_1OWORK ( WKNAME, WKSLOC, STATUS )
+*
+*    Method :
+*     Check status on entry.
+*     Find out if the workstation is already open.
+*     If it is not then
+*        Create a new workstation structure and get a locator to it.
+*     Endif
+*
+*    Authors :
+*     Nick Eaton  ( DUVAD::NE )
+*
+*    History :
+*     July 1988
+*     Amended July 1989  Read database locator from common block
+*     Amended January 1993  Create header structure
+*    endhistory
+*
+*    Type Definitions :
+      IMPLICIT NONE
+
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'agi_nam'
+
+*    Import :
+
+*     Name of workstation
+      CHARACTER * ( * ) WKNAME
+
+*    Export :
+
+*     Locator to workstation
+      CHARACTER * ( DAT__SZLOC ) WKSLOC
+
+*    Status :
+      INTEGER STATUS
+
+*    Global variables
+      INCLUDE 'agi_locs'
+
+*    Local variables :
+      LOGICAL FOUND
+
+      CHARACTER * ( DAT__SZLOC ) HENLOC
+*-
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*   Check if workstation is already open
+         WKSLOC = ' '
+         CALL AGI_1FWORK( WKNAME, WKSLOC, FOUND, STATUS )
+
+*   If there is no workstation then create it and get locator
+         IF ( .NOT. FOUND ) THEN
+            CALL DAT_NEW( DABLOC, WKNAME, AGI__WKTYP, 0, 0, STATUS )
+            CALL DAT_FIND( DABLOC, WKNAME, WKSLOC, STATUS )
+
+*   Create the workstation header block and intialise it to zero
+            HENLOC = ' '
+            CALL DAT_NEW0I( WKSLOC, AGI__HENAM, STATUS )
+            CALL DAT_FIND( WKSLOC, AGI__HENAM, HENLOC, STATUS )
+            CALL DAT_PUT0I( HENLOC, 0, STATUS )
+            CALL DAT_ANNUL( HENLOC, STATUS )
+            HENLOC = ' '
+
+*   Indicate that the database has been updated
+            FLUSH = .TRUE.
+
+         ENDIF
+
+      ENDIF
+
+*      print*, '+++++ AGI_1OWORK +++++'
+*      call HDS_SHOW( 'FILES', status )
+*      call HDS_SHOW( 'LOCATORS', status )
+
+      END
+

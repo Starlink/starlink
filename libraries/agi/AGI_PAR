@@ -1,0 +1,20 @@
+*   Description :
+*    This file contains the External Global Constants for AGI.
+*   Global Constants :
+
+*   Maximum length of comment strings in the database
+      INTEGER AGI__CMAX
+      PARAMETER ( AGI__CMAX = 80 )
+
+*   Maximum length of label strings in the database
+      INTEGER AGI__SZLAB
+      PARAMETER ( AGI__SZLAB = 15 )
+
+*   Maximum length of name strings in the database
+      INTEGER AGI__SZNAM
+      PARAMETER ( AGI__SZNAM = 15 )
+
+*   Maximum length of parameter name strings
+      INTEGER AGI__SZPAR
+      PARAMETER ( AGI__SZPAR = 15 )
+
