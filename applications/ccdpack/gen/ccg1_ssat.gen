@@ -1,0 +1,137 @@
+      SUBROUTINE CCG1_SSAT<T>( BAD, ARR, EL, SETSAT, SATVAL, NSAT,
+     :                         STATUS )
+*+
+*  Name:
+*     CCG1_SSAT<T>
+
+*  Purpose:
+*     To set saturated values BAD or to a given value.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_SSAT<T>( BAD, ARR, EL, SETSAT, SATVAL, STATUS )
+
+*  Description:
+*     The routine looks at all non BAD values in the array. IF the value
+*     exceeds SATVAL then the output value is either set to BAD or to
+*     SATVAL depending on whether SETSAT is valid or not. The number of
+*     saturated values is counted and returned.
+
+*  Arguments:
+*     BAD = LOGICAL (Given and Returned)
+*        Set true if BAD pixels are present.
+*     ARR ( EL ) = <COMM> (Given and Returned)
+*        Array of values to saturate.
+*     EL = INTEGER (Given)
+*        Size of data.
+*     SETSAT = LOGICAL (Given)
+*        Whether the saturated data is to be set to the saturation
+*        value or not.
+*     SATVAL = DOUBLE PRECISION (Given)
+*        The saturation value.
+*     NSAT = INTEGER (Returned)
+*        The number of saturated values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-APR-1991 (PDRAPER):
+*        Original version.
+*     12-JUN-1991 (PDRAPER):
+*        Added number of saturated values.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value constants
+
+*  Arguments Given:
+      INTEGER EL
+      LOGICAL SETSAT
+      DOUBLE PRECISION SATVAL
+
+*  Arguments Given and Returned:
+      <TYPE> ARR( EL )
+      LOGICAL BAD
+
+*  Arguments Returned:
+      INTEGER NSAT
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      <TYPE> VAL_DTO<T>          ! Numeric conversion with protection
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      <TYPE> SVAL                ! Saturation value in array type
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert saturation value to input array type
+      SVAL = VAL_DTO<T>(.FALSE., SATVAL, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Input saturation value invalid for this data type. Not a serious
+*  error, report that no saturation has occurred.
+         CALL ERR_ANNUL( STATUS )
+         CALL MSG_SETD( 'SATVAL', SATVAL )
+         CALL CCD1_MSG(' CCG1_SSAT1',
+     :   '  Saturation value ^SATVAL outside the permitted range '//
+     :   'of type <HTYPE> - no saturation performed', STATUS )
+      ELSE
+
+*  Loop over whole array checking values for greater than equal to the
+*  saturation value. Count up the number of saturated values.
+         NSAT = 0
+         IF ( BAD ) THEN
+            DO 1  I = 1, EL
+               IF ( ARR( I ) .NE. VAL__BAD<T> ) THEN
+                  IF ( .NOT. ARR( I ) .LT. SVAL ) THEN
+                     NSAT = NSAT + 1
+                     IF ( SETSAT ) THEN
+                        ARR( I ) = SVAL
+                     ELSE
+                        ARR( I ) = VAL__BAD<T>
+                     END IF
+                  END IF
+               END IF
+ 1          CONTINUE
+         ELSE
+
+*  No bad values to process.
+            DO 2 I = 1, EL
+               IF ( .NOT. ARR( I ) .LT. SVAL ) THEN
+                  NSAT = NSAT + 1
+                  IF ( SETSAT ) THEN
+                     ARR( I ) = SVAL
+                  ELSE
+                     ARR( I ) = VAL__BAD<T>
+                     BAD = .TRUE.
+                  END IF
+               END IF
+ 2          CONTINUE
+         END IF
+      END IF
+
+99    CONTINUE
+      END
+* $Id$

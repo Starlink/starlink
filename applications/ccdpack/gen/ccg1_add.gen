@@ -1,0 +1,143 @@
+      SUBROUTINE CCG1_ADD<T>( BAD, EL, A, B, NERR, STATUS )
+*+
+*  Name:
+*     CCG1_ADD<T>
+
+*  Purpose:
+*     To add two vectorised arrays, returning the result in the first
+*     array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_ADD<T>( BAD, EL, A, B, NERR, STATUS )
+
+*  Description:
+*     The routine adds each element of a vectorised array A to the array
+*     B returning the result in A. Bad value checking is performed if
+*     required.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether to check for bad values in the input array.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     A( EL ) = <COMM> (Given and Returned)
+*        First input array - note the result is returned in this array.
+*     B( EL ) = <COMM> (Returned)
+*        Second array.
+*     NERR = INTEGER (Returned)
+*        Number of numerical errors which occurred while processing the
+*        array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine will handle numerical errors (i.e. overflow) by
+*     assigning the appropriate "bad" value to affected output array
+*     elements. If the constant supplied cannot be converted to the
+*     data type of the arrays without overflow, then all elements of
+*     the output array will be assigned this bad value and NERR will
+*     return the value of EL.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-APR-1991 (PDRAPER):
+*        Based on RFWSs KPG1_ routines.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD data constants
+
+*  Global Variables:
+      INCLUDE 'NUM_CMN'          ! Numerical error flag
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER EL
+      <TYPE> B( EL )
+
+*  Arguments Given and Returned:
+      <TYPE> A( EL )
+
+*  Arguments Returned:
+      INTEGER NERR
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter for array elements
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEC_<T>'      ! NUM_ arithmetic/maths functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+      INCLUDE 'NUM_DEF_<T>'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      CALL NUM_HANDL( NUM_TRAP )
+      NUM_ERROR = SAI__OK
+      NERR = 0
+
+*  No bad values present:
+*  =====================
+      IF ( .NOT. BAD ) THEN
+
+*  Add the array values.
+         DO 2 I = 1, EL
+            A( I ) = NUM_ADD<T>( A( I ), B( I ) )
+
+*  Check for numerical errors (i.e. overflow). If present, then assign
+*  a bad value to the output array element and count the error. Reset
+*  the numerical error flag.
+               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  A( I ) = VAL__BAD<T>
+                  NERR = NERR + 1
+                  NUM_ERROR = SAI__OK
+               END IF
+2           CONTINUE
+
+*  Bad values present:
+*  ==================
+      ELSE
+
+*  If the input array element is bad, then so is the output element.
+         DO 3 I = 1, EL
+            IF ( A( I ) .NE. VAL__BAD<T> ) THEN
+               A( I ) = NUM_ADD<T>( A( I ), B( I ) )
+               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  A( I ) = VAL__BAD<T>
+                  NERR = NERR + 1
+                  NUM_ERROR = SAI__OK
+               END IF
+            END IF
+3        CONTINUE
+      END IF
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END
+* $Id$

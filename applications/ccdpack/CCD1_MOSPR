@@ -1,0 +1,52 @@
+*+
+*  Name:
+*     CCD1_MOSPR
+
+*  Purpose:
+*     Define global constants specific to the MAKEMOS application.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines global constants which are used by more than
+*     one routine in the MAKEMOS application.
+
+*  Prior Requirements:
+*     This file should be preceded by the CCD1_PAR include file which
+*     defines necessary constants.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-APR-1992 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Constants:
+
+*  Maximum possible number of pair-wise inter-comparisons of the input
+*  NDFs (note we allow for one extra "reference NDF" in addition to the
+*  limit set by CCD1__MXNDF).
+      INTEGER CCD1__MXCMP
+      PARAMETER ( CCD1__MXCMP =
+     :          ( ( CCD1__MXNDF + 1 ) * CCD1__MXNDF ) / 2 )
+
+*  A "large" weighting factor; sufficient to swamp all other "normal"
+*  weights but not so large as to cause numerical problems such as
+*  overflow.
+      DOUBLE PRECISION CCD1__BIGWT
+      PARAMETER ( CCD1__BIGWT = 1.0D4 )
+
+*.
+* $Id$

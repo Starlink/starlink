@@ -1,0 +1,97 @@
+      SUBROUTINE CCG1_SUBC<T>( BAD, STACK, NPIX, NLINES, CONST, STATUS )
+*+
+*  Name:
+*     CCG1_SUBC<T>
+
+*  Purpose:
+*     To subtract a series of constants from a stack of (vectorised)
+*     data lines.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_SUBC<T>( BAD, STACK, NPIX, NLINES, CONST, STATUS )
+
+*  Description:
+*     The routine subtracts the constants CONST from the corresponding
+*     lines of data values in STACK.
+
+*  Notes
+*     - uses kappa internal routine KPG1_CSUB<T>
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        True if BAD pixels are present.
+*     STACK( NPIX, NLINES ) = <COMM> (Given and Returned)
+*        The stack of vectorised lines of data from which the constants
+*        are to be subtracted.
+*     NPIX = INTEGER (Given)
+*        Number of values in a line of data.
+*     NLINES = INTEGER (Given)
+*        The number of lines of vectorised data in STACK.
+*     CONST( NLINES ) = DOUBLE PRECISION (Given)
+*        The constants to subtract from the lines of data (one per
+*        line).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-APR-1991 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NPIX
+      INTEGER NLINES
+      DOUBLE PRECISION CONST( NLINES )
+      LOGICAL BAD
+
+*  Arguments Given and Returned:
+      <TYPE> STACK( NPIX, NLINES )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER J                  ! Loop variable
+      INTEGER NERR               ! Number of arithmetic errors in
+                                 ! subtraction.
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop for all lines of data.
+      DO 1 J = 1, NLINES
+
+*  Subtract the appropriate constant from the data.
+         CALL KPG1_CSUB<T>( BAD, NPIX, STACK( 1, J ), CONST( J ),
+     :                      STACK( 1, J ), NERR, STATUS )
+
+*  NERR is set to NPIX if input CONST are invalid. Set status and
+*  return.
+         IF( NERR .EQ. NPIX ) THEN
+            STATUS = SAI__ERROR
+            GO TO 99
+         END IF
+ 1    CONTINUE
+
+ 99   END
+* $Id$

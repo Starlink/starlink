@@ -1,0 +1,127 @@
+      SUBROUTINE CCG1_FCH0<T>( ID, NAME, VALUE, OK, STATUS )
+*+
+*  Name:
+*     CCG1_FCH0<T>
+
+*  Purpose:
+*     To fetch a scalar value from the CCDPACK extension.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_FCH0<T>( ID, NAME, VALUE, OK, STATUS )
+
+*  Description:
+*     The routine attempts to read a value of the given type, from the
+*     object name, within the CCDPACK extension. If the extension does
+*     not exist or the value is invalid ok is set false and the calling
+*     routine needs to take suitable action.
+
+*  Arguments:
+*     ID = INTEGER (Given)
+*        Identifier of the NDF with the extension to be read.
+*     NAME = CHARACTER * ( * ) (Given)
+*        The name of the required object. Note that this is the name of
+*        the object excluding the implied 'NDF.MORE.CCDPACK' string.
+*     VALUE = <COMM> (Returned)
+*        The value stored at the object.
+*     OK = LOGICAL (Returned)
+*        If for any reason a value cannot be returned then this flag is
+*        set false. These reasons may include the non-existence of the
+*        extension, the data object, or problems with the object type or
+*        shape.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     This routine has versions for B, UB, W, UW, I, R, D, C and L data
+*     types.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'PRM_PAR'          ! BAD values codes
+
+*  Arguments Given:
+      INTEGER ID
+      CHARACTER * ( * ) NAME
+
+*  Arguments Returned:
+      <TYPE> VALUE
+      LOGICAL OK
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      LOGICAL THERE              ! Set true if extension exists.
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to data object.
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set local status flag.
+      OK = .TRUE.
+
+*  Set up an error context.
+      CALL ERR_MARK
+
+*  Check that the extension exists.
+      CALL NDF_XSTAT( ID, 'CCDPACK', THERE, STATUS )
+
+*  Proceed if the extension exists, otherwise set the OK flag to false.
+      IF ( THERE ) THEN
+
+*  Get a locator to the extension
+         CALL NDF_XLOC( ID, 'CCDPACK', 'READ', LOC, STATUS )
+
+*  If there is a problem with the extension then put ok reset and
+*  terminate.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            OK = .FALSE.
+         ELSE
+
+*  Try to retrieve the data value.
+            CALL CMP_GET0<T>( LOC, NAME, VALUE, STATUS )
+
+*  Record failure.
+            IF ( STATUS .NE. SAI__OK ) THEN
+               OK = .FALSE.
+            END IF
+
+*  Annul the locator.
+            CALL DAT_ANNUL( LOC, STATUS )
+         END IF
+      ELSE
+
+*  Extension does not exist.
+        OK = .FALSE.
+      END IF
+
+*  Release the error context, not flushing any errors, the calling
+*  routine should handle the situation of a missing extension item.
+      IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+      CALL ERR_RLSE
+
+      END
+* $Id$

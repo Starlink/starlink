@@ -1,0 +1,223 @@
+      SUBROUTINE CCG1_STMN<T>( BAD, VEC, SIZE, AVEACC, NOISE, VALPIX,
+     :                         STATUS )
+*+
+*  Name:
+*     CCG1_STMN<T>
+
+*  Purpose:
+*     To form the mean of the vectorised array VEC, also forms an
+*     estimate of the noise in the values.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_STMN<T>( BAD, VEC, SIZE, AVEACC, VALPIX, STATUS )
+
+*  Description:
+*     The routine forms the sum of all valid pixels in the vectorised
+*     array VEC. The mean is then this value divided by the number of
+*     valid pixels.  For reasonably small sections of the array
+*     estimates of the noise are made. From these estimates a global
+*     noise value is derived. This hopefully stops problems with large
+*     scale variations and represents the 'true' small scale noise.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Flag set if there are bad pixels present in input array.
+*     VEC( SIZE ) = <COMM> (Given)
+*        The vectorised array of values.
+*     SIZE = INTEGER (Given)
+*        Size of the array.
+*     AVEACC = DOUBLE PRECISION (Returned)
+*        The average value of the array expressed in double precision.
+*     NOISE = DOUBLE PRECISION (Returned)
+*        The noise level in the data.
+*     VALPIX = INTEGER (Returned)
+*        The number of non-bad pixels in the vectorised array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Accuracy:
+*     The routine uses double precision for all calculations, returning
+*     the derived value in both the array precision and double
+*     precision.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     27-MAR-1991 (PDRAPER):
+*        Original Generic version.
+*     8-APR-1991 (PDRAPER):
+*        Changed to estimate noise levels.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad value codes
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER SIZE
+      <TYPE> VEC( SIZE )
+
+*  Arguments Returned:
+      DOUBLE PRECISION AVEACC
+      DOUBLE PRECISION NOISE
+      INTEGER VALPIX
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER NSECT              ! Number of consecutive values in a
+      PARAMETER ( NSECT = 20 )   ! section within which a noise
+                                 ! estimate is formed
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      DOUBLE PRECISION SUM       ! Sum of values in VEC
+      DOUBLE PRECISION SUMSQ     ! Sum of squares
+      DOUBLE PRECISION VAL       ! Dummy
+      DOUBLE PRECISION DNSECT    ! Inverse NSECT as DBLE
+      DOUBLE PRECISION DBIAS     ! Bias factor as DBLE constant
+      INTEGER LEFT               ! Number of pixels left in section
+      INTEGER IMEAN              ! Number of estimates of the mean
+      INTEGER NVAL               ! Number of valid pixels in section
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion statement
+      INCLUDE 'NUM_DEF_CVT'      ! functions
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set counter for summing the values in VEC.
+      SUM = 0.0D0
+      SUMSQ = 0.0D0
+
+*  Set number of initially known valid pixels etc.
+      VALPIX = 0
+      NOISE = 0.0D0
+      AVEACC = 0.0D0
+      NVAL = 0
+      IMEAN = 0
+
+*  Decision block for processing with or without bad values.
+      IF( BAD ) THEN
+
+*  Loop for all elements of VEC adding up values.
+         DO 1 I = 1, SIZE
+            IF ( VEC( I ) .NE. VAL__BAD<T> ) THEN
+               NVAL = NVAL + 1
+               VAL = NUM_<T>TOD( VEC( I ) )
+               SUM = SUM + VAL
+               SUMSQ = SUMSQ + VAL * VAL
+               IF ( MOD( I, NSECT ) .EQ. 0 ) THEN
+
+*  Every NSECT values form a new mean and variance, add these to the
+*  cumulative means and variances. If the number of values accumilated
+*  is less 2 then skip this contribution. (Note that NVAL/NVAL-1 factor
+*  is required to unbias the variance estimate - consider if NSECT=2?)
+                  IF ( NVAL .GT. 1 ) THEN
+                     SUM = SUM / DBLE( NVAL )
+                     AVEACC = AVEACC + SUM
+                     SUMSQ = ( SUMSQ / DBLE( NVAL ) ) - ( SUM * SUM )
+                     NOISE = NOISE + ABS( SUMSQ ) * NVAL / ( NVAL - 1 )
+
+*  Add these values to count and increment number of means count.
+                     VALPIX = VALPIX + NVAL
+                     IMEAN = IMEAN + 1
+                  END IF
+
+*  Reset sum counters.
+                  SUMSQ = 0.0D0
+                  SUM = 0.0D0
+                  NVAL = 0
+               END IF
+            END IF
+ 1       CONTINUE
+
+*  Finish calcs, last section may well have unprocessed values. Do use
+*  these unless they are the only ones. (VALPIX = 0)
+         IF ( NVAL .NE. 0 .AND. VALPIX .EQ. 0 ) THEN
+            IF ( NVAL .GT. 1 ) THEN
+               SUM = SUM / DBLE( NVAL )
+               AVEACC = AVEACC + SUM
+               SUMSQ = ( SUMSQ / DBLE( NVAL ) ) - ( SUM * SUM )
+               NOISE = NOISE + ABS( SUMSQ ) * NVAL / ( NVAL - 1 )
+               VALPIX = NVAL
+               IMEAN = 1
+            END IF
+         END IF
+      ELSE
+
+*  No BAD pixels - works faster
+*  Get constants in DBLE form.
+         DNSECT = 1.0D0 / DBLE( NSECT )
+         DBIAS = NSECT / ( NSECT - 1 )
+
+*  Loop for all elements of VEC adding up values.
+         DO 2 I = 1, SIZE
+            VAL = NUM_<T>TOD( VEC( I ) )
+            SUM = SUM + VAL
+            SUMSQ = SUMSQ + VAL * VAL
+            IF ( MOD( I, NSECT ) .EQ. 0 ) THEN
+
+*  Every NSECT values form a new mean and variance, add these to the
+*  cumalative means and variances
+               SUM = SUM * DNSECT
+               AVEACC = AVEACC + SUM
+               SUMSQ = ( SUMSQ * DNSECT ) - ( SUM * SUM )
+               NOISE = NOISE + ABS( SUMSQ ) * DBIAS
+
+*  Reset sum counters increment number of means and variances counter
+               SUMSQ = 0.0D0
+               SUM = 0.0D0
+               IMEAN = IMEAN + 1
+               VALPIX = VALPIX + NSECT
+            END IF
+ 2       CONTINUE
+
+*  Finish calcs, last section may well have unprocessed values. Do use
+*  these unless they are the only ones. (VALPIX = 0)
+         IF ( VALPIX .EQ. 0 ) THEN
+            IF ( SIZE .GT. 1 ) THEN
+               SUM = SUM / DBLE( SIZE )
+               AVEACC = AVEACC + SUM
+               SUMSQ = SUMSQ / DBLE( SIZE ) - ( SUM * SUM )
+               NOISE = NOISE + ABS( SUMSQ ) * SIZE / ( SIZE - 1 )
+               VALPIX = SIZE
+               IMEAN = 1
+            END IF
+         END IF
+      END IF
+
+*  Correct mean and variances sums and form standard deviation
+      IF ( VALPIX .GT. 0  ) THEN
+         AVEACC = AVEACC / DBLE( IMEAN )
+         NOISE = NOISE / DBLE( IMEAN )
+         NOISE = SQRT( NOISE )
+      ELSE
+
+*  Not enough values to form the mean and standard deviation estimates
+*  set status and issue an error.
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCG1_STMN_ERR',
+     :   '  CCG1_STMN<T>: Insufficient (valid) values to form mean' ,
+     :   STATUS )
+      END IF
+      END
+* $Id$

@@ -1,0 +1,172 @@
+#+
+#  Name:
+#     FINDOBJ.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-OCT-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface FINDOBJ
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Name of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter MINPIX              # Minimum number of pixels per group
+      position 2
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  6
+      prompt   'Minimum number of pixels per group'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST             # Output position file list.
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*.dat'
+      prompt   'Results file names'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'FINDOBJ.LIS'
+      prompt   'Name of output filenames listing'
+   endparameter
+
+   parameter THRESH              # Threshold to use for detecting
+				 # objects
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DYNAMIC,CURRENT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Detection threshold'
+      helpkey  '*'
+   endparameter
+
+   parameter AUTOTHRESH          # Whether autothreshold values are used
+				 # or not
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  true
+      prompt   'Use automatic threshold values'
+      helpkey  '*'
+   endparameter
+
+   parameter BINFRAC                 # Fraction of total counts in one
+				     # bin
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  2.5
+      prompt   'Fraction of counts in one bin (percent)'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERSAMP                 # Oversampling factor
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      prompt   'Histogram oversampling factor'
+      helpkey  '*'
+   endparameter
+
+   parameter USEPER                 # Whether to use percentile for
+				    # threshold estimation or not
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Use percentiles to estimate threshold '
+      helpkey  '*'
+   endparameter
+
+   parameter PERCENTILE                # Percentile for threshold estimate
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      prompt   'Percentile for detection threshold'
+      default  96.0
+      helpkey  '*'
+   endparameter
+
+   parameter NSIGMA              # Number of sigmas above background
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      prompt   'Standard deviations above detection threshold'
+      default  5.0
+      helpkey  '*'
+   endparameter
+
+   parameter TOUCH               # Whether to pixel groups may touch the
+				 # edges of the array
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'May pixel groups touch the edges of array'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# $Id$

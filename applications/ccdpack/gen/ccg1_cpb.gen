@@ -1,0 +1,78 @@
+      SUBROUTINE CCG1_CPB<T>( BADVEC, VEC, EL, STATUS )
+*+
+*  Name:
+*     CCG1_CPB<T>
+
+*  Purpose:
+*     To CoPy the BAD values from BADVEC into VEC.
+
+*  Description:
+*     The routine loops all the values in BADVEC. If it encounters a BAD
+*     value then in the corresponding element of the VEC array is set
+*     BAD.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_CPB<T>( BADVEC, VEC, EL, STATUS )
+
+*  Arguments:
+*     BADVEC ( EL ) = <COMM> (Given)
+*        Vectorised array from which the BAD values are to be copied
+*     VEC ( EL ) = <COMM> (Given and Returned)
+*        Vectorised array into which the BAD values are to be copied
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*   Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-APR-1991 (PDRAPER):
+*        Orginal Version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*.
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value codes
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> BADVEC( EL )
+
+*  Arguments Given and Returned:
+      <TYPE> VEC( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter for array elements
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DO 1 I = 1, EL
+         IF ( BADVEC( I ) .EQ. VAL__BAD<T> ) THEN
+            VEC( I ) = VAL__BAD<T>
+         END IF
+ 1    CONTINUE
+
+      END
+* $Id$

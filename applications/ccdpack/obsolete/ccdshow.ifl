@@ -1,0 +1,219 @@
+#+
+#  Name:
+#     CCDSHOW.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     5-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     28-JAN-1994 (PDRAPER):
+#     	 Added saturation extensions.
+#     {enter_further_changes_here}
+
+#-
+
+interface CCDSHOW
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTOD              # Dummy version of LOGTO to get just
+				 # the global value.
+       type        LITERAL
+       access      READ
+       vpath       'GLOBAL,DEFAULT'
+       ppath       'GLOBAL,DEFAULT'
+       association '<-global.ccdpack_logto'
+       default     !
+   endparameter
+
+   parameter      LOGFILED        # Dummy version of LOGFILE to get just
+				 # the global value.
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      default     !
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion 
+                                 # factor
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_adc'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-global.ccdpack_bounds'
+      default   !
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_rnoise'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      keyword  MASK
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_mask'
+   endparameter
+
+   parameter FLAT                # flatfield
+      keyword  FLAT
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_flat'
+   endparameter
+
+   parameter BIAS                # Master bias
+      keyword  BIAS
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_bias'
+   endparameter
+
+   parameter CAL                 # Master calibration NDF
+      keyword  CAL
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_cal'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_direct'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_defer'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association '<-global.ccdpack_extent'
+   endparameter
+
+   parameter PRESERVE            # Whether to preserve input data type
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_preser'
+   endparameter
+
+   parameter GENVAR              # Whether to generate variances or not
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_genvar'
+   endparameter
+ 
+   parameter NDFNAMES            # Whether positions list are associated
+				 # with NDFs
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_ndfnam'
+   endparameter
+ 
+   parameter SATURATE            # Look for saturated values
+      type        _LOGICAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT '
+      default     !
+      association '<-global.ccdpack_satur'
+   endparameter
+
+   parameter SATURATION          # The saturation value.
+      type        _DOUBLE
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT '
+      default     !
+      association '<-global.ccdpack_satval'
+   endparameter
+
+   parameter SETSAT              # Whether to set saturated pixels to
+				 # the saturation value or not.
+      type        _LOGICAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT '
+      default     !
+      association '<-global.ccdpack_setsat'
+   endparameter
+
+endinterface
+# $Id$

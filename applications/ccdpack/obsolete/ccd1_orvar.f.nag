@@ -1,0 +1,125 @@
+      SUBROUTINE CCD1_ORVAR( NSET, NBIG, PP, VEC, STATUS )
+*+
+*  Name:
+*     CCD1_ORVAR
+
+*  Purpose:
+*     To return the variances and covariances of the order statistics
+*     from n to 1, assuming an initially normal distribution.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_ORVAR( NSET, NBIG, PP, VEC, STATUS )
+
+*  Description:
+*     The routine returns the variances and covariances of the order
+*     statistics, assuming an initial (pre-ordered) normal distribution
+*     of mean 0 and standard deviation 1. The routine returns all
+*     variance/covariances in an array with the terms vectorised - that
+*     is following on after each row. This uses the symmetric nature of
+*     the matrix to compress the data storage, but remember to double
+*     the covariance components if summing in quadrature. The variances
+*     -covariances are returned for all statistics from n to 1. The
+*     special case of n = 1 returns the variance of 2/pi (median).
+
+*  Arguments:
+*     NSET = INTEGER (Given)
+*        Number of members in ordered set.
+*     NBIG = INTEGER (Given)
+*        Maximum number of entries in covariance array row.
+*        equal to NSET*(NSET+1)/2).
+*     PP( NSET ) = DOUBLE PRECISION (Given)
+*        Workspace for storing expected values of order statistics.
+*     VEC( NBIG, NSET ) = DOUBLE PRECISION (Returned)
+*        The upper triangles of the nset by nset variance-covariance
+*        matrix packed by columns. Each triangle is packed into a
+*        single row. For each row element Vij is stored in
+*        VEC(i+j*(j-1)/2), for 1<=i<=j<=nset.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  Uses NAG library routines to evaluate the normal scores of the
+*     order set size.
+*     -  Data is returned as above to save on repeated calls of the NAG
+*     routines. To get the actual variance of the data of order n you
+*     need to sum all the variances and twice the covariances and use
+*     these to modify the actaul variance of the (unordered) data.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-MAR-1991 (PDRAPER):
+*        Original version.
+*     22-MAY-1992 (PDRAPER):
+*        Changed 2/pi to pi/2 - in line with other variances.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NSET
+      INTEGER NBIG
+      DOUBLE PRECISION PP( NSET )
+
+*  Arguments Returned:
+      DOUBLE PRECISION VEC( NBIG, NSET)
+
+*  Local Constants:
+      DOUBLE PRECISION PIBY2
+      PARAMETER ( PIBY2 = 1.57079632679  ) ! PI/2.0
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION SUMSQ     ! Sum of squares
+      INTEGER I, J               ! Loop variables
+      INTEGER IFAIL              ! NaG status return
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop for all possible values of the ordered set size.
+      DO 1  I = 1, NSET
+         IF( I .EQ. 1 ) THEN
+
+*  If just have the one nset then the appropriate value is pi/2
+*  Nag routine fails for n=1.
+            VEC( 1, 1 ) = PIBY2
+         ELSE
+            IFAIL = -1
+
+*  Get the expected values of the normal order statistics.
+            CALL G01DBF( I, PP, IFAIL )
+
+*  Form sum of squares of the expected values of the normal order
+*  statistics
+            SUMSQ= 0.0D0
+            DO 2 J = 1, I
+               SUMSQ = PP( J ) * PP( J ) + SUMSQ
+ 2          CONTINUE
+
+*  Get the covariance matrix
+            IFAIL = -1
+            CALL G01DCF( I, PP( I ), PP( I - 1 ), SUMSQ,
+     :                   VEC( 1, I ), IFAIL )
+         END IF
+ 1    CONTINUE
+
+      END
+* $Id$

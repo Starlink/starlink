@@ -1,0 +1,26 @@
+interface CCDIMP
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter      IN                # NDF to be modified
+      position    1
+      type        NDF
+      access      UPDATE
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Data structure to modify'
+      helpkey     '*'
+   endparameter
+
+   parameter      TABLE          # Keyword translation table
+      position    2
+      type        FILENAME
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'FITS keyword translation table'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,212 @@
+#!/bin/csh
+#+
+#   Name:
+#      CCDFORK
+
+#   Purpose:
+#      Creates a script for executing CCDPACK commands in a background
+#      process.
+
+#   Language:
+#      C shell
+   
+#   Type of Module:
+#      C shell script
+
+#   Note:
+#      - C shell specific.
+
+#   Usage:
+#      ccdfork input_script [output_script] [directory]
+
+#   Description:
+#       This procedure performs any additional work that is required
+#       to safely execute a set of CCDPACK commands in a background job.
+#
+#       The input to it is a file that contains just the CCDPACK commands
+#       that you want to execute. This procedure then writes another
+#       script that re-initializes CCDPACK and isolates any existing 
+#       program parameters from your interactive processes.
+#
+#       The output script should be executed as a nice priority
+#       background job (see the examples section).
+
+#   ADAM Parameters:
+#      $1 = filename (read)
+#         The name of the script file which contains the 
+#         CCDPACK commands which are to be run in the background. 
+#      $2 = filename (write)
+#         The name of the output script which will re-establish
+#         an isolated copy of the current ADAM context and execute 
+#         your command file. 
+#         [ccdpack_fork]
+#      $3 = directory (write)
+#         The name of a directory in which to store the current
+#         ADAM context. If no value is given then a sub-directory
+#         of the current ADAM_USER parent is created. 
+#         [adam_unique_string]
+
+#   Examples:
+#      ccdfork ccdred
+#      nice ccdpack_fork &
+#         In this example ccdfork saves the current ADAM parameter
+#         files and writes a script file named ccdpack_fork which 
+#         will enable the ccdred script file to execute in the
+#         background. The output script ccdpack_fork is then nice'd
+#         into the background.
+#
+#      ccdfork ccdred batch1
+#      nice batch1 &
+#         As above except that the output script is now called
+#         batch1.
+#      
+#      ccdfork ccdred batch2 /scratch/user/batch2
+#         As above except the output script is now called batch2
+#         and the ADAM parameter files are written to the directory
+#         /scratch/user/batch2.
+
+#   Authors:
+#      PDRAPER: Peter Draper (STARLINK)
+#      {enter_new_authors_here}
+
+#   History:
+#      30-APR-1992 (PDRAPER):
+#         Original Version.
+#      12-AUG-1993 (PDRAPER):
+#         Changed to test for ccdpack definition.
+#      {enter_further_changes_here}
+#-
+
+
+# test for at least one parameter - the user shell script.
+    if ( $1 == "" ) then
+        echo -n "Name of script file: "
+        set ccdpack_script = $<
+        if ( $ccdpack_script == "" ) then
+           exit
+        endif
+     else
+        set ccdpack_script = $1
+     endif
+
+# Look for environment variable ADAM_USER which if 
+# defined shows where current environment is stored
+     if ( !( $?ADAM_USER ) ) then
+        set envhome="$HOME/adam"
+     else
+        set envhome="$ADAM_USER"
+     endif 
+
+# test for existence of directory
+     set copyenv = "true"
+     if ( ! ( -d $envhome ) ) then 
+        echo " "
+        echo "No adam parameter file directory exists : files not copied"
+        echo " "
+     
+# set flag to pass file copy stage.
+        copyenv = "false"
+     endif 
+
+# located directory report to user
+     echo "ADAM parameter files located in $envhome"
+     
+# create new directory for environment, this should be passed as $3 
+# if given.
+     if ( $3 == "" ) then
+     
+# no value for destination directory given create one.
+        set envdest = $envhome:h 
+        set newdir = `date | awk '{split($4,a,":");print $3a[1]a[2]a[3]}'`
+        set envdest = $envdest/'adam_'$newdir
+        echo "New home directory: $envdest"
+        if ( !( -d $envdest ) ) then 
+           mkdir $envdest
+        endif
+     else
+
+# third argument given create this directory if required.
+        if ( !( -d $3 ) ) then 
+
+# directory for storage does not exist create it.
+           mkdir $3
+        endif
+        set envdest = $3
+     endif
+     echo "Saving current ADAM context in directory $envdest"
+
+# copy the contents of old adam_user to new adam_user
+     if ( $copyenv == "true" ) then 
+        'cp' $envhome/*.sdf $envdest
+     endif 
+
+     echo "Context saved"
+
+# create script for executing user defined script
+
+# test for existence of second parameter, if it doesn't exist then 
+# call output file ccdpack_fork. check for a file already called 
+# the output name. If it exists offer user possibility to overwrite.
+
+     if ( $2 == "" ) then 
+        set outfile = ccdpack_fork
+     else
+        set outfile = $2
+     endif
+     while ( -e $outfile )
+        echo -n "The file $outfile already exists, do you want to overwrite"\
+             "it ? (y or n): "
+        set answer = $<
+        if ( $answer == "y" ) then
+           'rm' $outfile
+        else
+           echo -n "Give a name for the output script file ?:"
+           set outfile = $<
+        endif
+     end  # end while
+
+     cat >$outfile <<FOO
+#!/bin/csh
+#
+# C shell script to restore ADAM environment to sub-shell
+# initialising for CCDPACK and executing user script.
+#
+# Generated: `date`
+#
+# Restore envirionment and initialise CCDPACK
+     setenv ADAM_USER $envdest
+#
+FOO
+#
+# Append this, stopping interpretation of special  characters.
+     cat >> $outfile << 'FOO'
+
+# Make sure that ccdpack is ready to go.
+     source $CCDPACK_DIR/ccdpack.csh
+
+'FOO'
+#
+# Back to normal to get name of script etc.
+     cat >>$outfile <<FOO
+#
+# Execute user script.
+#
+     source $ccdpack_script
+#
+# Remove environment.
+#
+     'rm' $envdest/*
+     'rmdir' $envdest
+#
+# Finished.
+#
+     exit
+FOO
+
+# Change protection of file to allow execution
+     chmod +x $outfile
+
+# inform user 
+     echo "Background script file created: $outfile"
+     exit
+# $Id$

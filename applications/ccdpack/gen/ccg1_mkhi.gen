@@ -1,0 +1,212 @@
+      SUBROUTINE CCG1_MKHI<T>( ARRAY, NPIX, BAD, MINBIN, NHIST, HIST,
+     :                         MODE, NBIN, ZERO, WIDTH, STATUS )
+*+
+*  Name:
+*     CCD1_MKHI<T>
+
+*  Purpose:
+*     Creates an optimised histogram of a data array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_MKHI<T>( ARRAY, NPIX, BAD, MINBIN, NHIST, HIST, MODE,
+*                        NBIN, ZERO, WIDTH, STATUS )
+
+*  Description:
+*     This routine forms a histogram of an array of data values of
+*     type <COMM>. The histogram is formed in such a way that at least
+*     MINBIN values are present in the peak counts bin. The first
+*     estimate of the histogram is formed using NHIST elements. If
+*     more than MINBIN counts are present in at least one bin then no
+*     further action is taken, if less than is number of counts are
+*     present in the peak bin then the histogram is rebinned to increase
+*     the number count until MINBIN is exceeded. On exit the number of
+*     bins used to form the histogram is returned together with the bin
+*     number which contains the peak count level and the width (in data
+*     values) of the bin and a zero point. The original data values are
+*     related to the bin number (starting at 1 up to NBIN) by
+*
+*        VALUE = (NBIN-1)*WIDTH+ZERO
+
+*  Arguments:
+*     ARRAY( NPIX ) = <COMM> (Given)
+*        Input array of values.
+*     NPIX = INTEGER (Given)
+*        Number of elements in input array.
+*     BAD = LOGICAL (Given)
+*        Whether the input array contains BAD values or not.
+*     MINBIN = INTEGER (Given)
+*        The minimum number of counts which may be in the peak bin on
+*        exit.
+*     NHIST = INTEGER (Given)
+*        Size of the input histogram array. This value is used as the
+*        starting point for forming the histogram. The size of this
+*        should be sufficient to ensure that the histogram is initially
+*        oversampled (so that the MINBIN criterion is NOT meet) if it is
+*        vital that the MINBIN count level is just meet.
+*     HIST( NHIST ) = INTEGER (Returned)
+*        The histogram of the input data values.
+*     MODE = INTEGER (Returned)
+*        The number of the bin which contains the peak count.
+*     NBIN = INTEGER (Returned)
+*        The number of bins used to form the histogram (i.e. size of
+*        HIST on exit).
+*     ZERO = DOUBLE PRECISION (Returned)
+*        The zero point of the histogram in data values.
+*     WIDTH = DOUBLE PRECISION (Returned)
+*        The width of a bin of the histogram in data values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-NOV-1992 (PDRAPER):
+*        Original version.
+*     9-NOV-1992 (PDRAPER):
+*        Made generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER NPIX
+      <TYPE> ARRAY( NPIX )
+      INTEGER MINBIN
+      INTEGER NHIST
+      LOGICAL BAD
+
+*  Arguments Returned:
+      INTEGER HIST( NHIST )
+      INTEGER MODE
+      INTEGER NBIN
+      DOUBLE PRECISION ZERO
+      DOUBLE PRECISION WIDTH
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION SCALE     ! Data scaling factor 
+      INTEGER I                  ! Loop variable
+      INTEGER IDIFF              ! Histogram index of current value
+      INTEGER NOW                ! Current histogram index
+      INTEGER PEAK               ! Peak bin count
+      LOGICAL OK                 ! Flag which controls optimisation loop
+      <TYPE> DMAX                ! Data maximum
+      <TYPE> DMIN                ! Data minimum
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find the minimum and maximum values in the array.
+      CALL CCG1_MNMX<T>( ARRAY, NPIX, BAD, DMIN, DMAX, STATUS )
+
+*  Check that array was not single valued.
+      IF ( DMIN .EQ. DMAX ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCD1_MKHIS',
+     : '  Array is single valued; cannot form optimised histogram.',
+     :   STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Clear the histogram of any previous values.
+      DO 11 I = 1, NHIST
+         HIST( I ) = 0
+ 11   CONTINUE
+
+*  The number of bins must be a even number so ensure this. (Note that
+*  the first bin is 0 hence the - 1 which actually makes NBIN ODD but
+*  makes the number of actual bins even).
+      NBIN = ( NHIST / 2 ) * 2 - 1
+
+*  Form the first estimate of the histogram.
+      SCALE = DBLE( NBIN )/ ( NUM_<T>TOD( DMAX ) - NUM_<T>TOD( DMIN ) )
+      IF ( BAD ) THEN 
+         DO 1 I = 1, NPIX
+            IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN 
+               IDIFF = NINT( SCALE * ( NUM_<T>TOD( ARRAY( I ) )  -
+     :                                 NUM_<T>TOD( DMIN ) ) + 1.0D0 )
+               HIST( IDIFF ) = HIST( IDIFF ) + 1
+            END IF
+ 1       CONTINUE
+      ELSE
+         DO 2 I = 1, NPIX
+            IDIFF = NINT( SCALE * ( NUM_<T>TOD( ARRAY( I ) )  -
+     :                              NUM_<T>TOD( DMIN ) ) + 1.0D0 )
+            HIST( IDIFF ) = HIST( IDIFF ) + 1
+ 2       CONTINUE
+      END IF
+
+*  Set the initial bin width.
+      WIDTH = 1.0D0 / SCALE
+
+*  Set the zero point for data values.
+      ZERO = NUM_<T>TOD( DMIN ) - WIDTH / 2.0D0 
+
+*  Set the actual number of bins which are occupied.
+      NBIN = NBIN + 1
+
+*  Now loop while required to form optimised histogram.
+      OK = .TRUE.
+ 10   CONTINUE                   ! Start of 'DO WHILE' loop
+      IF ( OK ) THEN
+
+*  Look for present peak count (this is the mode bin also).
+         MODE = 0 
+         PEAK = 0
+         DO 3 I = 1, NBIN
+            IF ( HIST( I ) .GT. PEAK ) THEN
+               PEAK = HIST( I )
+               MODE = I
+            END IF
+ 3       CONTINUE
+
+*  If mode has a higher count than required then stop. Otherwise
+*  rebin the histogram to increase the count per bin.
+         IF ( PEAK .GT. MINBIN ) THEN
+            OK = .FALSE.
+         ELSE
+
+*  Rebin the histogram. Binning is performed using a factor of two
+*  to keep things simple.
+            NOW = 0
+            DO 4 I = 1, NBIN, 2
+               NOW = NOW + 1
+               HIST( NOW ) = HIST( I ) + HIST( I + 1 )
+ 4          CONTINUE
+
+*  Change the number of bins.
+            NBIN = NBIN / 2
+
+*  Change the bin width.
+            WIDTH = WIDTH * 2.0D0 
+         END IF
+         GO TO 10
+      END IF     
+
+*  Exit label.
+ 99   CONTINUE
+      END
+* $Id$

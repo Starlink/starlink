@@ -1,0 +1,102 @@
+#+
+#  Name:
+#     makefile
+
+#  Purpose:
+#     Build IRH for UNIX.
+
+#  Type of Module:
+#     Description file for the "make" command.
+
+#  Description:
+#     This description file is used by the "make" command to build
+#     IRH from the released source code files on a UNIX system and
+#     to install the resulting system on Starlink machines.
+
+#  Invocation:
+#     make [build]
+#        Causes make to build the target "build". This results in compilation
+#        of the source files and creation of the executables and object
+#        libraries
+#     make clean
+#        Causes make to clean up after building the system, deleting all
+#        intermediate files created during the building process.
+#     make test
+#        Causes make to run a test program to check for correct installation
+#        of IRH.
+#
+# --------- no install/deinstall at present assumes local directory ----------
+#     make install
+#        Causes make to install components of the built system into the
+#        appropriate directories on Starlink machines.
+#     make deinstall
+#        Causes make to de-install components of the built system from the
+#        appropriate directories on Starlink systems.
+# ----------------------------------------------------------------------------
+
+#  External Dependencies:
+#     The IRH package depends on the following external files and systems,
+#     which must previously have been installed in the appropriate Starlink
+#     local and directories:
+#        fio
+#           File access, input and output.
+#        chr
+#           Character Handling Routines.
+#        ems
+#           Error and message routines.
+#        hds
+#           Hierarchical Data System.
+#        adam
+#           ADAM unix kernel.
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-MAR-1992 (PDRAPER):
+#        Original Version
+#     {note_further_changes_here}
+
+#-
+
+#  Define targets for building IRG
+build: libirh.a irh_par irh_err irh_com 
+
+#  Target for cleaning up the directory
+clean:
+	 -rm *.o *.f *.c
+
+#  Macro defining various source code
+IRHSRC = aif_antmp.f aif_asfio.f aif_temp.f irh1_brack.f irh1_cpelm.f \
+         irh1_elems.f irh1_erelm.f irh1_find.f irh1_grapp.f irh1_gsupp.f \
+         irh1_gtelm.f irh1_gtidh.f irh1_iannu.f irh1_icpel.f irh1_iget.f \
+         irh1_ilist.f irh1_init.f irh1_ipurg.f irh1_iput.f irh1_irmbl.f \
+         irh1_ishow.f irh1_mgres.f irh1_modif.f irh1_ptelm.f irh1_readf.f \
+         irh1_rembl.f irh1_setc.f irh1_seti.f irh_annul.f irh_close.f \
+         irh_get.f irh_group.f irh_grpsz.f irh_gttl.f irh_index.f irh_info.f \
+         irh_list.f irh_new.f irh_pttl.f irh_purge.f irh_put.f irh_sect.f \
+         irh_setsz.f irh_show.f irm_delob.f irm_subst.f
+
+#  Macro defining various object modules
+IRHOBJ = aif_antmp.o aif_asfio.o aif_temp.o irh1_brack.o irh1_cpelm.o \
+         irh1_elems.o irh1_erelm.o irh1_find.o irh1_grapp.o irh1_gsupp.o \
+         irh1_gtelm.o irh1_gtidh.o irh1_iannu.o irh1_icpel.o irh1_iget.o \
+         irh1_ilist.o irh1_init.o irh1_ipurg.o irh1_iput.o irh1_irmbl.o \
+         irh1_ishow.o irh1_mgres.o irh1_modif.o irh1_ptelm.o irh1_readf.o \
+         irh1_rembl.o irh1_setc.o irh1_seti.o irh_annul.o irh_close.o \
+         irh_get.o irh_group.o irh_grpsz.o irh_gttl.o irh_index.o irh_info.o \
+         irh_list.o irh_new.o irh_pttl.o irh_purge.o irh_put.o irh_sect.o \
+         irh_setsz.o irh_show.o irm_delob.o irm_subst.o
+
+# Rules for extracting source code.
+$(IRHSRC) : irh.a
+	ar x irh.a $@
+
+# Rules for building object libraries.
+libirh.a : $(IRHOBJ)
+	ar r libirh.a $?
+	ranlib libirh.a
+
+#  End of makefile.
+# $Id$

@@ -1,0 +1,198 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     XREDUCE
+
+#  Purpose:
+#     Starts the automated CCD data reduction GUI.
+
+#  Type of Module:
+#     Shell script
+
+#  Usage:
+#     xreduce
+
+#  Description:
+#     This command starts the CCDPACK reduction GUI.
+#
+#     The GUI is specifically designed to help the inexperienced or
+#     occasional reducer of CCD data (although others will also find
+#     it of use). These aims are meet by providing an easy to use, X
+#     based, graphical interface that features contextual help and
+#     that limits options to those of immediate relevance. It
+#     concentrates on data organization and the definition of any CCD
+#     characteristics rather than on the nature and control of the
+#     core CCDPACK reduction programs.
+#
+#     The reduction of the actual data is separate to the GUI and uses
+#     the automated scheduling facilities of CCDPACK.
+
+#  Notes:
+#     Unknown detectors.
+#        If you do develop an import table or restoration (setup) file
+#        for a telescope/detector pass these on to the maintainer of
+#        this package, together with a description. They will be
+#        distributed in future releases for the benefit of others.
+
+#  Configuration:
+#     The interface can be configured by controlling the values of
+#     various CCDxxxxx global variables. These can be set in either a
+#     global configuration file called ".ccdpack" which should be
+#     placed in the $HOME directory, or by loading as part of a state
+#     from a local ".ccdpack" file. The names and functions of the
+#     more significant configurations follows.
+#
+#        - CCDbrowser, the name of the WWW browser used to show
+#          hypertext help. This may only be Mosaic or netscape (or
+#          whatever the names of these browsers are on your system)
+#          and should be the full path names if they are not located
+#          on your PATH.
+#
+#          This option can also be set using the environment variable
+#          HTX_BROWSER.
+#
+#          The default is [Mm]osiac followed by [Nn]etscape.
+#
+#        - CCDstarhtml, the top directories that contains the
+#          Starlink HTML documents (in particular sun139 and ccdpack
+#          hypertext help). This defaults to 
+#          $CCDPACK_DIR/../../docs:$CCDPACK_DIR/../../help.
+#
+#        - CCDprefs, this is an array of values that define widget
+#          preferences such as the colour scheme and the reliefs etc.
+#          The more interesting elements are:
+#             - (priority), this defines the priority of the preferences.
+#               If you want to override colours and fonts etc. from
+#               your .Xdefaults then set this value to widgetDefault.
+#               The normal value is userDefault as I think it looks nice
+#               the way it is.
+#             - (font_size), this is set to 12 or 14. Normally this is
+#               set to 14 if your display has more than 800 pixels in
+#               both dimensions.
+#             - (scheme_colour), this controls the scheme of colours
+#               used by the interface. XREDUCE has its own scheme but
+#               you override this by setting this to a new colour for
+#               the background, the other colours will be derived from
+#               this. For finer control see the palette.tcl script in
+#               the Tcl distribution.
+#             - (click_for_focus), this controls how the focus moves
+#               between the various widgets. If you set this to 0
+#               (false), then the focus follows the cursor position.
+#
+#        - CCDdetectorcache, the directory that contains the known
+#          detector setups and import tables. Defaults to CCDPACK_DIR.
+#          If the variable CCDPACKC_CONFIG is set this directory is also
+#          used.
+#
+#     An example configuration file follows.
+#
+#        file: ~/.ccdpack
+#
+#        set CCDbrowser netscape
+#        set CCDprefs(priority) widgetDefault
+#        set CCDprefs(scheme_colour) bisque
+#        set CCDprefs(click_for_focus) 1
+#        set CCDdetectorcache /home/user/ccdsetups
+#
+#     This sets the default browser to netscape, allows your .Xdefaults
+#     to override any internal preferences, makes the focus follow the
+#     mouse and defines a local directory that contains setups and
+#     import tables.
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-SEP-1995 (PDRAPER):
+#        Original version.
+#     2-JUN-1997 (PDRAPER):
+#        Added ITCL_LIBRARY for itcl2.0 support.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Check that CCDPACK_DIR is around.
+
+if test "$CCDPACK_DIR" = ""; then
+  echo "!! Cannot start xreduce; CCDPACK_DIR environment variable not set."
+  exit 1
+fi
+
+#  Standalone TCL initialisations (necessary while CCDPACK distributes
+#  ccdwish binaries).
+
+TCL_LIBRARY=$CCDPACK_DIR
+TK_LIBRARY=$CCDPACK_DIR
+ITCL_LIBRARY=$CCDPACK_DIR
+export TCL_LIBRARY
+export TK_LIBRARY
+export ITCL_LIBRARY
+
+#  Notes:
+#     The ${1+"$@"} passes on any command line arguments? Perhaps $0
+#     is also required?
+
+#  Check all the necessary elements are available and start up the GUI.
+
+if test -r $CCDPACK_DIR/CCDMain.tcl ; then
+  if test -x $CCDPACK_DIR/ccdwish ; then
+
+#  Try to stop problems with the AMS rendevous files by creating a
+#  new directory as ADAM_USER.
+    OLD_ADAM_USER=${ADAM_USER:-"${HOME}/adam"}
+    ADAM_USER=${OLD_ADAM_USER}/xreduce_$$
+    export ADAM_USER    
+
+#  Make sure directory exists.
+    if test -f $ADAM_USER; then
+      rm -r -f $ADAM_USER
+    fi
+    mkdir -p $ADAM_USER
+
+#  Copy the existing applications files that we're interested in
+#  ccdpack_anything and GLOBAL.sdf. Since the interface runs as an 
+#  I task these are almost unnecessary and will not be updated... 
+#  (so perhaps could be dispensed with?).
+    (cp $OLD_ADAM_USER/ccdpack_*.sdf $OLD_ADAM_USER/GLOBAL.sdf $ADAM_USER) 2>/dev/null
+
+#  Make sure we clean this up on exit.
+    trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
+
+#  Trap pids of all existing KAPPA processes.
+    oldkappa=`ps | grep kappa | grep -v grep | awk '{print $1}'`
+
+#  And run up the interface.
+    $CCDPACK_DIR/ccdwish -f $CCDPACK_DIR/CCDMain.tcl ${1+"$@"}
+
+#  Trap pids of any new KAPPA processes.
+    newkappa=`ps | grep kappa | grep -v grep | awk '{print $1}'`
+
+
+#  Kill any new processes.
+    for newpid in "$newkappa"; do
+       dokill=1
+       for oldpid in "$oldkappa"; do
+          if test "$newpid" = "$oldpid"; then
+             dokill=0
+          fi
+       done
+       if test "$dokill" = "1"; then 
+          kill -SYS $newpid
+       fi
+    done
+    exit
+  else
+    echo "!! Cannot start xreduce; failed to locate $CCDPACK_DIR/ccdwish."
+    exit 1
+  fi
+else
+  echo "!! Cannot start xreduce; failed to locate $CCDPACK_DIR/CCDMain.tcl."
+  exit 1
+fi
+
+# $Id$

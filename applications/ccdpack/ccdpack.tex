@@ -1,0 +1,1169 @@
+\documentclass[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Hypertext routine help}
+\newcommand{\stardocinitials}  {HRH}
+\newcommand{\stardocsource}    {ccdpack}
+\newcommand{\stardocnumber}    {1.0}
+\newcommand{\stardocauthors}   {P.W. Draper}
+\newcommand{\stardocdate}      {14th November 1995}
+\newcommand{\stardoctitle}     {Hypertext help}
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjuction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to recentre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Un-comment the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+%  Add any document specific \newcommand or \newenvironment commands here
+
+\newcommand{\butt}[1]{{\small \bf \tt #1}}
+\newcommand{\menu}[1]{{\small \bf \em #1}}
+\newcommand{\wlab}[1]{{\small \bf #1}}
+\newcommand{\text}[1]{{\small \tt #1}}
+
+%  Don't use the fbox options as this breaks up the text line too much.
+%\newcommand{\butt}[1]{\fbox{\small \tt #1}}
+%\newcommand{\menu}[1]{\fbox{\small \bf \em #1}}
+%\newcommand{\wlab}[1]{\fbox{\small \bf #1}}
+
+%  Don't use the colour option as this looks dreadful in netscape.
+%\definecolor{lightgrey}{gray}{.82}
+%\newcommand{\butt}[1]{\colorbox{lightgrey}{\small #1}}
+%\newcommand{\menu}[1]{\colorbox{lightgrey}{\em \small #1}}
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+%  Add heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Description}
+   \end{center}
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+%  Add picture here if required.
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      Particle Physics \& Astronomy Research Council \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+
+%  HTML document table of contents.
+%  ================================
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
+  \label{stardoccontents}
+  \begin{rawhtml}
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+%  Start new section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+%  Document Abstract. (if used)
+%  ==================
+This document provides any additional hypertext help required by
+\xref{CCDPACK}{sun139}{} beyond that available in SUN/139.
+
+Primarily this consists of the window and context sensitive help
+for the \xref{XREDUCE}{sun139}{XREDUCE} application.
+
+The XREDUCE GUI is specifically designed to help the inexperienced or
+occasional reducer of CCD data (although others will also find it of
+use). These aims are met by providing an easy to use, X based,
+graphical interface that features contextual help (this document) and
+that limits options to those of immediate relevance. It concentrates
+on data organization and the definition of any CCD characteristics
+rather than on the nature and control of the core CCDPACK reduction
+programs.
+
+The reduction of the actual data is separate to the GUI and uses the
+automated scheduling facilities of CCDPACK.
+
+
+% -----------------------------------------------------------------------------
+%  Latex document Table of Contents (if used).
+%  ===========================================
+\begin{latexonly}
+  \setlength{\parskip}{0mm}
+  \latexonlytoc
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+\end{latexonly}
+% -----------------------------------------------------------------------------
+\section{This package \xlabel{OnVersion}}
+\begin{center}
+\begin{latexonly}
+{\Huge \bf  CCDPACK \\
+\LARGE Data reduction package \\
+\Large \em Version 2.0 \\
+}
+\end{latexonly}
+\begin{htmlonly}
+   \htmladdimg{ccdv2.gif} \\
+\end{htmlonly}
+\stardocdate
+\end{center}
+
+\section{How to get context sensitive help \xlabel{OnContext}}
+Context sensitive help is obtained by putting the mouse pointer over
+the part of the window that you're interested in and pressing either
+the F1,F2 or Help keys. F2 may be your only option on some keyboards
+(OpenWindows).
+
+\section{Help Menu \xlabel{OnHelp}}
+Use the \menu{Help} menu to get advice on using this window.
+
+\section{File Menu \xlabel{OnFile}}
+The \menu{File} menu can be used to \menu{Exit} this program and
+usually also contains items for closing the window (same effect as a
+\butt{Cancel} button) or accept the window's contents and act
+upon it (same as a \butt{OK} button).
+
+\section{Starting a CCDPACK reduction \xlabel{CCDMainWindow}}
+This window displays buttons and menus that allow you to get
+ready to perform an automated reduction. The sequence of operations
+that you need to perform depends on the type of data you have.
+
+\begin{rawhtml}
+<P>
+<IMG SRC="xreduce.gif">
+<P>
+\end{rawhtml}
+
+Under the \menu{Options} menu there is a \menu{Set Detector...}
+item. This will list the known CCD detectors. If you're in luck the
+one you've obtained your data with will be listed here. If so select it.
+
+The next action that you must perform is to choose one or both of the
+buttons \butt{General Options} and \butt{CCD Characteristics}. If you
+have been able to choose a known detector with an import table (this
+is shown by the text \text{(table)} after its name) then you probably
+only need to visit the \butt{General Options} window. Otherwise you
+should visit the \butt{CCD Characteristics} window as well.
+
+After completing the \wlab{Configuration} section you now need to
+proceed to \wlab{Data Import}. In this section you identify all the
+data frames to be processed.
+
+If you have been able to choose an import table then visit the
+\butt{Using FITS Headers} window. If not (unless you have an import
+table of your own) you must visit the \butt{Manual Organization}
+window.
+
+The final section is \wlab{Reduction}. Just press the \butt{Setup and
+Run} button to visit the final window.
+
+If you're new to CCD reduction you might want to learn a little more 
+about the \xref{basic principles}{sun139}{CCDprinciples} before 
+proceeding.
+
+\subsection{Configuration \xlabel{CCDMainConfiguration}}
+\begin{itemize}
+\item \butt{General Options}: the window activated by this button
+allows you to do a general configuration. Things like the name of the
+log file used by any programs and whether to generate errors for your
+data.
+\item \butt{CCD Characteristics}: this window is used to define things
+about the CCD your data was taken with. Things like the positions of
+any bias strips and the useful CCD area.
+\item \butt{Bypass Stage}: this button allows you to proceed to
+\wlab{Data Import}. This is probably only of use if you have
+\htmlref{restored the state}{CCDMainMenu}
+ of the interface from a previous time.
+\end{itemize}
+
+\subsection{Data Import \xlabel{CCDMainDataImport}}
+After configuration you now need to identify your data.
+\begin{itemize}
+\item \butt{Using FITS Headers}:
+if you have been able to choose an existing import table (or you have
+one of your own) then you can just name all your data frames in the
+window created by this button.
+\item \butt{Manual Organization}:
+otherwise you will need to organize your data into its different types
+(target, bias, flatfield etc.) by hand in this window.
+\item \butt{Bypass Stage}: this button allows you to proceed to
+\wlab{Reduction} stage.
+This is probably only of use if you have
+\htmlref{restored the state}{CCDMainMenu}
+of the interface from a previous time (but note that you'll also need to be
+using the same data, if not you must not bypass this stage).
+\end{itemize}
+
+\subsection{Reduction \xlabel{CCDMainReduction}}
+After \wlab{Configuration} and \wlab{Data Import} have been completed
+successfully you're now in a position to reduce your data. Press
+\butt{Setup and Run} to see the final options and start a reduction
+(there is a brief pause at this point while the range of debiassing
+options available to you are assessed).
+
+\subsection{Known Data Files \xlabel{CCDMainKnownData}}
+The \wlab{Known Data Files} section displays the list of currently
+known data files. Due to a limitation in the XREDUCE program it may be
+necessary to press the \butt{Update} button to see this list.
+
+\begin{itemize}
+\item \butt{Exit}: conditionally exits the program closing the GUI.
+\item \butt{Update}: updates the list of known data files.
+\end{itemize}
+
+\subsection{Menus \xlabel{CCDMainMenu} \label{CCDMainMenu}}
+The \menu{Options} menu provides the following items.
+
+\begin{itemize}
+\item \menu{Set detector...}:
+this option allows you to choose from a list of known detectors.
+
+\item \menu{Save current state...} \& \menu{Restore state...}:
+these options allow you to save and restore the `state' of the GUI.
+The `state' is the current internal configuration of the GUI (it
+specifies such things as which data frames have been imported, fonts,
+colours etc.). This means that you can stop this application at any
+time and re-start it where you left off. Or that you can re-configure
+it for different telescopes/detectors etc. trivially.  The general
+interface configuration options are described in the main help for
+\xref{XREDUCE}{sun139}{XREDUCE}.
+
+\item \menu{Monitor output from tasks}:
+this allows you to toggle the monitoring of any output from CCDPACK
+programs that are controlled by the GUI (unless things are going wrong
+you shouldn't normally be interested in this).
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program.
+
+
+\section{Selecting a known detector \xlabel{CCDSetDetectorWindow}
+         \label{CCDSetDetectorWindow}}
+This window displays a list of files that contain ``setups'' for
+all the different CCDs that are known, together with one-line
+descriptions. Select a line by pressing mouse button 1 over it
+and selecting \butt{OK}, or by double clicking over it.
+
+There are two different ``setup'' types available. These are
+distinguished by \text{(setup)} and \text{(table)} at the end of their
+descriptions.
+
+The most complete setup type are import tables. They contain a
+description of how to interpret the FITS header information stored in
+your data. Tables have the capability to work out the frame type
+(target,bias,flat) of each of your files, so you will only need to
+supply the names of the files to process (in \butt{Using FITS Headers}
+in the main window). A complete description of the
+\xref{table format}{sun139}{TableFormat} is available elsewhere.
+
+Ordinary setups are less comprehensive and contain only the physical
+descriptions of the CCD (things like where the bias strips are, the
+useful CCD area and the CCD noise characteristics). If you choose one
+of these then you will need to indicate which sort of frame each of
+your files is at a later stage (in \butt{Manual Organization} in the
+main window).
+
+\subsection{Menus \xlabel{CCDSetDetectorMenu}}
+
+The \menu{Options} menu contains one entry \menu{View file
+contents...}. Viewing the file contents may allow you to better
+determine if a setup or table is correct for your data.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Selecting an existing file \xlabel{CCDGetFileNameWindow}}
+This window allows you to select a file from a list in a directory.
+
+The \wlab{Directory:} entry shows the current directory. You can edit this
+and then move to a new directory by pressing Return.
+
+The \wlab{File Filter:} entry shows the pattern used to filter the
+filenames in the current directory (patterns are similar to those used
+by \text{ls}). You can apply the filter by either pressing return in
+this entry or by pressing the \butt{Filter} button.
+
+The list on the left-hand side shows all the directories that are in
+the current directory. You move into a new directory by double
+clicking on its name. \text{"../"} moves up one directory.
+
+The list on the right-hand side shows all the files that match the filter
+pattern in the current directory. Select a file by clicking its name and
+pressing \butt{OK}, or by double clicking.
+
+The \wlab{Name of selected file:} entry shows the name of the chosen file.
+You could just type the filename here and accept it by pressing Return or
+\butt{OK}.
+
+\subsection{Menus \xlabel{CCDGetFileNameMenu}}
+
+The \menu{Options} menu contains a list of the directories that you
+have visited (as well as the current and your home directory) and can
+be used as a shortcut.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Creating a new file \xlabel{CCDNewFileNameWindow}}
+This window allows you to give the name of a file, that may or may not
+already exist. Just type in the name of the new file (if not already
+shown) and press Return or \butt{OK} to accept.
+
+\subsection{Menus \xlabel{CCDNewFileNameMenu}}
+The \menu{Options} contains a single item that allows you to choose
+from a list of files that already exist.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Setting\xlabel{CCDSetGenGlobalsWindow}the general reduction
+         parameters}
+In this window you define general features of the reduction. Briefly
+the meaning of the sections in this window are.
+
+\begin{itemize}
+\item \wlab{Keep application log:} \& \wlab{Name of logfile:}.
+The programs that are used by XREDUCE and those that do the actual
+reduction can write their output to a CCDPACK specific log file. If
+you want them to do this then select the \text{true} button and give
+a name for the logfile.
+
+\item \wlab{Look for saturated pixels:}. If your data could have pixels
+that are saturated (and the level at which saturation occurs is known)
+then set this value \text{true}.
+
+\item \wlab{Flag saturated pixels using BAD value:}. There is more than
+one way that CCDPACK can record the fact that a pixel is saturated.
+Just leave this option at \text{true} unless you know that this method
+is a problem for you.  A \xref{complete description}{sun139}{CCDsaturate}
+of the various methods available is given in the main documentation.
+
+
+\item \wlab{Generate data errors:}. This option tells CCDPACK to
+generate errors for your data (it derives these from a consideration
+of the readout noise and the Poissonian nature of the electron count).
+These errors are stored as variances (the error squared) and can be
+propagated during processing.  The down side of this is that storing
+errors requires twice the disk space you'd normally require for your
+data.
+
+\item \wlab{Preserve data types:}. If your data are stored in a
+non-floating point format then CCDPACK can either convert them to
+floating point or do its processing in their data type. It may be
+occasionally useful to convert the data type to a more precise one, if
+you suspect that this will be the case for your data then select
+\text{false}.
+
+\end{itemize}
+
+Press \butt{OK} when you've happy with the values.
+
+\subsection{Menus \xlabel{CCDSetGenGlobalsMenu}}
+
+The \menu{Options} menu provides the following items.
+\begin{itemize}
+\item \menu{Restore setup...} \& \menu{Save setup...}. The values
+shown in this window and the \butt{CCD Characteristics} window can be
+stored in a file and used again. This allows you to define setups for
+commonly used CCDs (some of these are available as part of CCDPACK,
+see the
+\htmlref{\menu{Set detector...}}{CCDSetDetectorWindow}
+item in the \menu{Options} menu in the main window).
+
+\item \menu{Select logfile from existing files...}. This allows you to
+browse files that already exist.
+
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program or
+accept the window.
+
+\section{Setting the CCD characteristics \xlabel{CCDSetCCDGlobalsWindow}
+         \label{CCDSetCCDGlobalsWindow}}
+
+In this window you need to define the CCD characteristics necessary
+for the type of reduction to be performed. If you're unsure of what
+this might entail then see the description of the
+\xref{principles of CCD reduction}{sun139}{CCDprinciples}
+and a section describing a little more about
+\xref{XREDUCE}{sun139}{usingxreduce},
+or alternatively push on.
+
+\begin{itemize}
+\item \wlab{Extent of useful detector area:}, \wlab{Readout direction:}
+      \& \wlab{Bounds of bias strips (1 or 2 pairs)}:.
+These values define the part of the CCD data that is actually used to
+record data, where the bias strips of your data (if any) are and the
+direction between the bias strips.
+
+If you've decided to push on or have no idea if your data have bias
+strips and what the ``readout'' direction and useful detector area are
+then check under \menu{Options} and select the item
+\htmlref{\menu{Display/define CCD geometry...}}{definegeometry}. This
+option can also be used to check any values that you have.
+
+\item \wlab{Analogue-to-digital conversion factor:}. This parameter is
+\xref{described}{sun139}{CCDADC} in the main document. It is used to change
+the output data values to electrons and is required if you want to
+determine data errors.
+
+\item \wlab{Readout noise (ADUs):}. This is the
+\xref{readout noise}{sun139}{CCDrnoise} of your CCD in ADUs. It is only used
+if generating data errors.
+
+\item \wlab{Defect mask:}. If your data have fixed
+defective parts then you may want to remove them. The creation of a
+file to do this is \xref{discussed}{sun139}{datamasks} in the main
+document. Leave this entry blank otherwise.
+
+\item \wlab{Deferred charge:}. If you don't know what this parameter
+\xref{means}{sun139}{CCDdeferred} then do not set a value.
+
+\item \wlab{Saturated pixel value (ADUs):}. If you selected to detect
+saturated pixels then you need to supply the lowest value that a pixel
+must have to be saturated.
+
+\item \wlab{Bias level (ADUs):}. If you do not have any bias frames, or
+bias strips then it is possible to debias your data by subtracting a
+constant. If your data is already debiassed then you can get it
+reprocessed by supplying a zero ($0$) here (you may want to do this
+if you want to generate data errors, and/or apply a defect mask).
+
+\end{itemize}
+
+If you're trying to \xref{reduce}{sun139}{IRreduction} some infra-red
+(IR) data then it will also need to be debiassed, even if this has
+already been done for you at the telescope. If this is the case then
+enter 0 for the \wlab{Bias level:} value. Even if your data has been
+debiassed you may well want to generate data errors or remove the
+glitched pixels, if so you'll need to enter values for the
+\wlab{Analogue-to-digital conversion factor:},
+\wlab{Readout noise:} and \wlab{Defect mask:} parts.
+
+
+\subsection{Menus \xlabel{CCDSetCCDGlobalsMenu}}
+
+The \menu{Options} menu provides the following items.
+
+\begin{itemize}
+\item \menu{Restore setup...} \& \menu{Save setup...}\,. The values
+shown in this window and the \butt{General Options} window can be
+stored in a file and used again. This allows you to define setups for
+commonly used CCDs (some of these are available as part of CCDPACK,
+see the
+\htmlref{\menu{Set detector...}}{CCDSetDetectorWindow}
+item in the \menu{Options} menu in the main window).
+
+\item \menu{Display/define CCD geometry...}\,. \label{definegeometry}
+This option allows you to interactively define where the bias strips
+(if any) and useful area of your data are. First you'll need to select
+a raw data frame (not a bias frame) for display.  This option can also
+be used to check that the current values for the bias strip positions
+and useful area are correct.
+
+\item \menu{Select MASK from existing files...}. This allows you to
+browse any existing files to select a mask file.
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program or
+accept the window.
+
+\section{Examining or setting the CCD geometries \xlabel{CCDGeometryWindow}}
+This window allows you to examine or define the geometrical
+characteristics of your CCD data. The first thing that you need to do
+before proceeding is select a data frame to display. This should be a
+one where the various regions are clearly defined, so flatfields and
+target frames are the more appropriate.
+
+When an image is displayed you can stroke out the positions of the
+bias strips and the useful part of the CCD. To define a region select
+a button from the \wlab{Define:} section (such as \text{Bias strip 1})
+and set the upper left hand point of this region by pressing mouse
+button 1, now drag to the right without releasing the button.
+
+To delete a region press mouse button 3 over it, or select its named
+button in the \wlab{Define:} list and press the \butt{Remove Region}
+button. If it's useful the image can be coloured using the
+\butt{Colour} button (and transformed back to greyscale using \butt{Grey}).
+
+The bias strips should be seen as dark regions down the side of the
+image, these usually either run down the sides (or tops) of the image
+and sometimes run along the sides and either the top or bottom, i.e.
+
+\begin{rawhtml}
+<IMG ALIGN=CENTER SRC="geom1.gif">
+<P>
+or
+<P>
+<IMG ALIGN=CENTER SRC="geom2.gif">
+<P>
+\end{rawhtml}
+
+It is often recommended that you only use the strip on the left-hand
+side as the overscan (the right-hand strip) may be contaminated with
+residual charge. If you decide to use the right-hand strip check that
+it is not contaminated first (this should be visible as a gradient in
+the intensity level, use the \menu{Options} menu item
+\menu{Change display range...} to choose a suitable intensity range
+to explore this effect).
+
+\subsection{Selecting an image for display \xlabel{CCDGeometryNDF}}
+The displayed image can be changed either by typing a new name into
+the \wlab{Current image:} entry or by browsing from a list of files in a
+directory using the \menu{Option} menu item \menu{Change image...}\,.
+
+\subsection{Controlling the image \xlabel{CCDGeometryGwm}}
+The displayed image can be controlled in several different ways. The
+most obvious is by increasing or decreasing its size using the
+\butt{Enlarge} and \butt{Shrink} buttons. The image can then be
+scrolled using the scrollbars or by pressing and holding down mouse
+button 2 over the image and then moving the mouse. The image can be
+made to fit the size of the window by selecting the \menu{Resize image
+when window changes} item in the \menu{Options} menu and then
+changing the window size to that required.
+
+\subsection{Menu \xlabel{CCDGeometryMenu}}
+The \menu{Options} menu contains the following items.
+\begin{itemize}
+\item \menu{Set outline colour...} \& \menu{Set stipple colour...}\,.
+These items create a window in which you can select a new colour for
+the region outline and stipple (the fill colour). The window is fairly
+self-explanatory.
+\item \menu{Resize image when window changes}.
+If you select this item then the image will be redrawn to fit the window
+if it is resized (note this cancels any size changes made using the
+\butt{Enlarge} and \butt{Shrink} buttons).
+\item \menu{Change image...}\,.
+This creates a new window in which you can browse any existing files
+for a new image to display.
+\item \menu{Change display range...}\,.
+This item creates a new window in which you can change the percentile
+display range of the image. Use this if the image doesn't show the
+regions you want to define sufficiently well.
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+\section{Manual organization \xlabel{CCDNDFOrganizeWindow}
+         \label{CCDNDFOrganizeWindow}}
+
+In this window you need to describe what type of data you have. The
+various elements are fairly obvious.
+
+\begin{itemize}
+
+\item \wlab{Frame types present:} just indicate all the types of data
+that you have. \text{targets} are the astronomy data so you should
+definitely have some of these, you should probably also have some
+\text{flatfields} (unless you're reducing IR data), the rest are more
+or less optional depending on your data (i.e. if you have no bias
+frames then you should probably have some bias strips).
+
+In this region you also have the opportunity to choose calibration
+frames that were not produced by CCDPACK (spectral flatfields are one
+possibility) or to re-use any that you've already produced.
+
+\item \wlab{Data have same filter type:} if your data consist of
+frames taken with more than one filter then select \text{false} here.
+
+\item \wlab{Filter names:} enter the names of any filters here. The
+names should be short (like B,V,R) and be separated by commas (the
+names may not include spaces).
+
+\item \wlab{Use targets as possible flatfields:} if you do not have
+any flatfields (this is typical for IR data) then you may want to use
+your target frames to produce flatfields (this is done by median
+stacking, and assumes that in your data the objects are moved about the
+frame so that sky is the typical contribution at any point).
+
+\item \wlab{Master bias has a mean of zero:} if for some reason you
+want to use a master bias calibration frame that was produced by
+another package, or by a previous reduction, then you'll need to
+indicate whether the mean of the data values in the frame are zero or
+not (this effects the way that debiassing is done).
+
+\item \wlab{Dark times are all the same:} if you have any dark
+current calibration frames then select \text{false} here only if they
+do not have the same exposure time as your target data (usually dark
+frames do have the same exposure). If they do not have the same
+exposure times you'll have to supply these later.
+
+\item \wlab{Flash times are all the same:} if you have any pre-flash
+calibration frames (very unlikely) then select \text{false} here only
+if they do not have the same exposure time as your target data.
+
+\end{itemize}
+
+Press \butt{OK} when you're finished with this window and go on to
+supply the names of the different types of data.
+
+\section{Organizing frames into types \xlabel{CCDNDFDoImportWindow}}
+This window allows you to enter files into their different categories.
+The categories that you have selected are shown at the top of the
+window in the \wlab{Data type:} section, this looks something like.
+\begin{rawhtml}
+<P>
+<IMG SRC="datatype.gif">
+<P>
+\end{rawhtml}
+
+To organize your files you select one of the options from
+\wlab{Data type:} (in the case above \text{TARGET} is selected), and
+then choose the files that you require from the \wlab{Files in
+directory} list and enter these into the \wlab{Files selected:}
+list. You can select files by clicking them, dragging the pointer over
+a range (without releasing the mouse button), or using a combination
+of shift and control with mouse clicks (control for disjoint
+selections) and then transfer the files using the \butt{Add} button,
+or you can just double click on a file to transfer it.
+
+After you've selected all the files in the current category, select
+another from the \wlab{Data type:} radio buttons and transfer these to
+\wlab{Files selected:}.
+
+You can remove files from \wlab{Files selected:} by using the buttons
+\butt{Remove} and \butt{Remove all}.
+
+If you have dark or flash count data that do {\bf not} have the exact
+exposure times necessary ({\em i.e.} have the same dark exposure time
+as the target data), then the \wlab{Files selected:} region will contain
+extra fields (these appear after you've entered a file name) in which
+you will need to enter the exposure times.
+
+The other parts of this window allow you to select files from other
+directories.
+
+The \xlabel{CCDNDFDoImportDirectory}\wlab{Directory:} entry shows the
+current directory. You can edit this and then move to a new directory
+by pressing Return.
+
+The \xlabel{CCDNDFDoImportFilter}\wlab{File Filter:} entry shows the
+pattern used to filter the filenames in the current directory
+(patterns are similar to those used by \text{ls}). You can apply the
+filter by either pressing return in this entry or by pressing the
+\butt{Filter} button.
+
+The \xlabel{CCDNDFDoImportDirectories}\wlab{Directories:} list on the
+left-hand side shows all the directories that are in the current
+directory. You move into a new directory double clicking on its
+name. \text{"../"} moves up one directory.
+
+When \xlabel{CCDNDFDoImportChoice}you have organized all your frames
+into the appropriate groups then exit by pressing \butt{OK}. This
+enters information into your data about what type they are (and any
+information you gave in the \butt{CCD Characteristics} window) and
+might take some time. \butt{Cancel} exits without modifying your data.
+
+\subsection{Menus  \xlabel{CCDNDFDoImportMenu}}
+The \menu{Options} menu contains a list of the directories that you have
+visited (as well as the current and your home directory) and can be
+used as a shortcut to visit them.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Importing data with FITS headers \xlabel{CCDFITSImportWindow}}
+This window allows you to specify a FITS import control table and
+the names of the data frames that you want to process.
+
+The import control table should already be shown if you've chosen from the
+list of known detectors. Otherwise you should type in the name of the table
+into the \wlab{Import Control Table:} entry (you can also browse existing
+files by using the \menu{Select import control table from existing files...}
+item in the \menu{Options} menu). Import control tables are
+\xref{described}{sun139}{TableFormat} in the main documentation and can be
+created or inspected using the \menu{Create/inspect import control table...}
+item in the \menu{Options} menu.
+
+To select a file for processing you need to transfer it from the
+\wlab{Files in directory:} list to the \wlab{Files selected:} list.
+You can select files by clicking them, dragging the pointer over
+a range (without releasing the mouse button), or using a combination
+of shift and control with mouse clicks (control for picking out a set of
+frames that are not adjacent) and then transfer the files using the
+\butt{Add} button, or you can just double click on a file to transfer it.
+
+You can remove files from \wlab{Files selected:} by selecting the
+them as described above (but in the \wlab{Files selected:} list) and
+pressing the \butt{Remove} button. \butt{Remove all} removes them all.
+
+The other parts of this window allow you to select files from other
+directories.
+
+
+The\xlabel{CCDFITSImportDirectory} \wlab{Directory:} entry shows the
+current directory. You can edit this and then move to a new directory
+by pressing Return.
+
+
+The\xlabel{CCDFITSImportFilter} \wlab{File Filter:} entry shows the
+pattern used to filter the filenames in the current directory
+(patterns are similar to those used by \text{ls}). You can apply the
+filter by either pressing return in this entry or by pressing the
+\butt{Filter} button.
+
+
+The\xlabel{CCDFITSImportDirectories} \wlab{Directories:} list on the
+left-hand side shows all the directories that are in the current
+directory. You move into a new directory by double clicking on its
+name. \text{"../"} moves up one directory.
+
+
+When\xlabel{CCDFITSImportChoice} you have selected all your frames and
+chosen an import table then exit (and enter the translation of the
+FITS items into your data) by pressing \butt{OK} (this might take some
+time).
+\butt{Cancel} exits without modifying your data.
+
+\subsection{Menus  \xlabel{CCDFITSImportMenu}}
+The \menu{Options} menu contains a list of the directories that you have
+visited (as well as the current and your home directory) and can be
+used as a shortcut to visit them. It also contains.
+\begin{itemize}
+\item \menu{Select import control table from existing files...}, this just
+allows you to browse around for the import control table.
+\item \menu{Create/inspect import control table...}, this is a complex
+option for inspecting the contents of your import control table, best
+avoided by novices. It also helps in the creation of new import tables.
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Creating an import table \xlabel{CCDCreateImportTableWindow}}
+This window is designed to help in the creation of import control tables.
+These tables describe how to interpret FITS headers. The
+\xref{format}{sun139}{TableFormat} is described elsewhere (in the main
+document) and should be understood before attempting to use this screen.
+An understanding of the information that CCDPACK requires from FITS headers
+is also necessary. These are also \xref{listed}{sun139}{reductionitems}
+in the main document.
+
+Having a complete set of FITS header items to translate isn't necessary,
+but if any are missing then you will need to supply these by using the
+\htmlref{\butt{CCD characteristics}}{CCDSetCCDGlobalsWindow}
+window or you may need to visit
+\htmlref{\butt{Manual Organization}}{CCDNDFOrganizeWindow}
+to sort your data into its different types.
+
+\subsection{Using a reference frame \xlabel{CCDCreateImportTableReferenceNDF}
+            \label{refndf}}
+This part of the window helps you to find out what FITS headers are
+available in your data.
+\begin{rawhtml}
+<P>
+<IMG SRC="fitsextract.gif">
+<P>
+\end{rawhtml}
+It does this by extracting the names of any headers in a data frame
+and listing them. Choose a reference frame either by typing its name
+in the \wlab{Reference frame:} entry or by choosing the
+\menu{Select reference frame...} item in the \menu{Options} menu.
+Clicking on the name of a header item enters it into the \wlab{FITS
+item:} entry on the right.
+
+\subsection{Typing FITS headers \xlabel{CCDCreateImportTableFITStypes}}
+In this part of the window you should name all the FITS headers that
+you are going to use in the table.
+\begin{rawhtml}
+<P>
+<IMG SRC="fitstype.gif">
+<P>
+\end{rawhtml}
+The data type of the headers are also needed (these are used when
+extracting the header values). The data types are called
+\wlab{HDS type} as these are the native forms that CCDPACK understands. If you
+click in the \wlab{HDS type:} entry a list of the known HDS types will
+appear. The meanings of the names are fairly obvious (\text{\_INTEGER}
+for integers, \text{_CHAR} for character strings etc.).
+
+To enter an item and its type, type its name into the \wlab{FITS
+item:} entry (or select one from the list extracted from your
+\htmlref{reference}{refndf} frame), and then press the \butt{Add}
+button. To remove an item from the list select it by clicking on its
+name and then press the \butt{Remove} button. The \butt{Unique} button
+removes any duplicate entries in the list.
+
+It is also possible to just directly edit any entries in the list of
+names and types, but take care to spell these correctly.
+
+\subsection{Mapping FITS functions to extension items
+            \xlabel{CCDCreateImportTableFunctions}}
+This part of the window is used to specify how FITS header item values
+should be converted into CCDPACK extension items (the extension is a
+part of your data for storing package specific information).
+\begin{rawhtml}
+<P>
+<IMG SRC="fitsfunction.gif">
+<P>
+\end{rawhtml}
+
+You should understand the
+\xref{structure}{sun139}{TableFormat}
+of an import table before attempting to use this part. The known items
+are listed for convenience down the left hand side and can be selected
+and inserted in the \wlab{Extension item:} entry. The transformation
+of the FITS values that results in the required CCDPACK extension item
+should be typed into the \wlab{FITS function} entry, pressing
+\butt{Add} will then insert this into the list.
+
+To remove an entry from the list just select it and press
+\butt{Remove}. \butt{Unique} removes any duplicate extension items
+from the list.
+
+
+When\xlabel{CCDCreateImportTableOK} you've finished creating the
+import table press the \butt{OK} button to exit. \butt{Cancel} exits
+without checking that the work you've done is saved.
+
+
+\subsection{Menus \xlabel{CCDCreateImportTableMenu}}
+The \menu{Options} menu contains the following items.
+\begin{itemize}
+\item \menu{Select reference frame...}, this allows you to browse files
+to select a data frame. The FITS headers in this frame are extracted
+and displayed in the \wlab{Reference frame:} entry.
+\item \menu{Read an import table file...}, allows you to browse for an
+import table. This is then read in and displayed in the main window.
+\item \menu{Save import table in file...}, this writes the current
+window contents into a file.
+\item \menu{Keep later unique values}, this toggle button indicates
+whether you want the \butt{Unique} buttons to keep the any versions from
+further down the lists, rather than the from nearer the top. This is
+useful as the \butt{Add} buttons insert at the end of the lists.
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Starting the reduction \xlabel{CCDReduceWindow}}
+This window allows you to set the final configuration options before
+scheduling a reduction and running it in the background.
+\begin{rawhtml}
+<P>
+<IMG SRC="ccdreduce.gif">
+<P>
+\end{rawhtml}
+
+
+The\xlabel{CCDReduceDebias} range of possible reduction options
+available to you are shown in the \wlab{Debias using:} section (in the
+image above all the known options are shown, normally your window will
+only show a subset of these). You should accept the default method
+unless you have good reason not to.
+
+The various options you might have available are.
+\begin{itemize}
+\item \text{zeroed master bias, offsetting to bias strips}
+
+In this option all your bias frames are combined together (to reduce
+the data noise) into a `master bias'. The mean value of this master is
+zero (because the bias frames themselves are zeroed before being
+combined), and the bias strips are used to estimate an offset, so that
+the master bias zero point is shifted to that of the data.
+
+\item \text{unzeroed master bias}
+
+In this option your bias frames are combined without adjusting their
+zero points. The resulting master is subtracted from your other data.
+
+\item \text{interpolate using bias strips}
+
+If you have no bias frames then the bias contribution can estimated
+from the data in the bias strips. The estimation method is defined in
+the \wlab{Interpolation method:} section.
+
+\item \text{single constant}
+
+If you have no bias frame or bias strips then you must have a bias
+level estimate (this is either imported from your FITS headers or
+defined in the \htmlref{\wlab{CCD characteristics}}
+{CCDSetCCDGlobalsWindow} window).
+
+\end{itemize}
+
+
+If\xlabel{CCDReduceInterpolation} you want to debias using the bias
+strips then you should select
+\text{interpolate using bias strips} from the \wlab{Debias using:}
+section. The ways in which you can debias your data depend on how many
+bias strips you have. If you have two then all four of the methods
+described below are available. If you have only one then only two are
+available. Only those options that are available to you will be shown.
+
+\begin{itemize}
+\item \text{constant for each line}
+
+In this option each line running between your bias strips has the mean
+value in the bias strips subtracted from it (normally there is some
+smoothing applied to the bias strips to reduce the inter-line noise).
+
+\item \text{single constant for whole frame}
+
+In this option the mean of the data in the bias strips in subtracted
+from the whole frame.
+
+\item \text{linear fit for each line}
+
+In this option each line is fitted by a least squares linear fit and
+this fit is subtracted from the data (normally there is some smoothing
+applied to the bias strips to reduce the inter-line noise).
+
+\item \text{plane across frame}
+
+In this option all the data in the bias strips are fitted by a
+plane and the fit to the plane is subtracted from the data.
+\end{itemize}
+
+\xlabel{CCDReduceSavespace}
+
+During the reduction many intermediary frames are produced, these are
+not normally of any use and can be deleted by choosing an option in
+the \wlab{Save how much disk space:} section. Choosing any option
+other than \text{none} will reduce the amount of disk space that
+is required for the reduction.
+
+\begin{itemize}
+\item \text{some}
+
+Choosing this option deletes all intermediary frames as soon as they
+are no longer needed.
+
+\item \text{lots}
+
+Choosing this option is the same as choosing \text{some} except that
+the original raw data is also deleted as soon as they are no longer
+needed.
+
+\end{itemize}
+
+\xlabel{CCDReduceOK}
+
+When you're happy with the settings in this window press \butt{OK} to
+schedule the reduction and have it started in the background (at nice
+priority). \butt{Cancel} exits without doing this. 
+
+If you decide to schedule a reduction a {\em separate} window will 
+appear that monitors the output from the background process. This 
+is independent of XREDUCE which can now be closed.
+
+\subsection{Menus \xlabel{CCDReduceMenu}}
+The \menu{Options} menu contains the following items.
+\begin{itemize}
+\item \menu{View frames...}, this allows you to inspect a list of the
+frames that will be processed.
+\item \menu{Set additional options...}, this creates a new window in
+which you can set further options controlling the reduction (such as
+the names of the output data frames).
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Setting the extra reduction options \xlabel{CCDReduceExtrasWindow}}
+This window allows you to set some additional options that control the
+reduction. The options you can set are mostly related to the
+names of the calibration frame masters, intermediary products and the
+final reduced data.
+
+The way that new names for your reduced data are made is by appending
+extensions to the existing names. So for instance (using the default
+settings) if you had a frame \text{DATA1.sdf} this would be called
+\text{DATA1\_db.sdf} when it was debiassed and \text{DATA1\_db\_fl.sdf} when
+it was flatfielded. If it was also dark count corrected (for some
+reason) its final name would be \text{DATA1\_db\_dk\_fl.sdf}.
+
+Since flatfields can be colour dependent more than one master flat can
+be produced. So the names of these frames have the filter name appended
+to them. So for instance if you use the default master flatfield
+prefix and have filters \text{B,V,R}, then you will get three master
+flats, \text{MASTER\_FLATB.sdf}, \text{MASTER\_FLATV.sdf} and
+\text{MASTER\_FLATR.sdf}.
+
+\subsection{Menus \xlabel{CCDReduceExtrasMenu}}
+The \menu{Options} menu contains just one item, \menu{View
+frames...}. This lists all the frames that are to be reduced.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program or
+accept the window.
+
+\section{Background process monitor \xlabel{CCDFileMonitorMain}}
+This window displays any output from your background process. The
+output is updated as the job proceeds. This window may safely be
+disposed of {\em without} affecting the progress of the job. It is
+independent of XREDUCE which may also be closed.
+
+
+\end{document}

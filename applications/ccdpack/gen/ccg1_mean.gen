@@ -1,0 +1,114 @@
+      SUBROUTINE CCG1_MEAN<T>( BAD, VEC, SIZE, AVEACC, VALPIX, STATUS )
+*+
+*  Name:
+*     MEAN<T>
+
+*  Purpose:
+*     To form the mean of the vectorised array VEC.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_MEAN<T>( BAD, VEC, SIZE, AVEACC, VALPIX, STATUS )
+
+*  Description:
+*     The routine forms the sum of all valid pixels in the vectorised
+*     array VEC. The mean is then this value divided by the number of
+*     valid pixels.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Flag set if there are bad pixels present in input array.
+*     VEC( SIZE ) = <COMM> (Given)
+*        The vectorised array of values.
+*     SIZE = INTEGER (Given)
+*        Size of the array.
+*     AVEACC = DOUBLE PRECISION (Returned)
+*        The average value of the array expressed in double precision.
+*     VALPIX = INTEGER (Returned)
+*        The number of non-bad pixels in the vectorised array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Accuracy:
+*     The routine uses double precision for all calculations, returning
+*     the derived value in both the array precision and double
+*     precision.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     27-MAR-1991 (PDRAPER):
+*        Original Generic version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad value codes
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER SIZE
+      <TYPE> VEC( SIZE )
+
+*  Arguments Returned:
+      DOUBLE PRECISION AVEACC
+      INTEGER VALPIX
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      DOUBLE PRECISION SUM       ! Sum of values in VEC
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion statement
+      INCLUDE 'NUM_DEF_CVT'      ! functions
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set counter for summing the values in VEC.
+      SUM = 0.0D0
+
+*  Set number of initially known valid pixels.
+      VALPIX = 0
+
+*  Decision block for processing with or without bad values.
+      IF( BAD ) THEN
+
+*  Loop for all elements of VEC adding up values.
+         DO 1 I = 1, SIZE
+            IF ( VEC( I ) .NE. VAL__BAD<T> ) THEN
+               SUM = SUM + NUM_<T>TOD( VEC( I ) )
+               VALPIX = VALPIX + 1
+            END IF
+ 1       CONTINUE
+      ELSE
+
+*  Loop for all elements of VEC adding up values.
+         DO 2 I = 1, SIZE
+            SUM = SUM + NUM_<T>TOD( VEC( I ) )
+            VALPIX = VALPIX + 1
+ 2       CONTINUE
+      END IF
+
+*  Now form AVEACC value
+      AVEACC = SUM / DBLE( MAX( 1, VALPIX ) )
+
+      END
+* $Id$

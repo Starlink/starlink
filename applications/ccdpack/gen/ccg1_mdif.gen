@@ -1,0 +1,116 @@
+      SUBROUTINE CCG1_MDIF<T>( BAD, D1, D2, N, MEAN, STATUS )
+*+
+*  Name:
+*     CCG1_MDIF<T>
+
+*  Purpose:
+*     Forms the mean difference between two arrays.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_MDIF<T>( BAD, D1, D2, N, MEAN, STATUS )
+
+*  Description:
+*     The routine subtracts the values D1(I) and D2(I) and forms the
+*     mean value.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether BAD values are present in the input data.
+*     D1( N ) = <COMM> (Given)
+*        First array of values.
+*     D1( N ) = <COMM> (Given)
+*        Second array of values.
+*     N = INTEGER (Given)
+*        Number of values in input arrays.
+*     MEAN = DOUBLE PRECISION (Returned)
+*        The mean difference in the input arrays.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-JAN-1993 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER N
+      <TYPE> D1( N )
+      <TYPE> D2( N )
+
+*  Arguments Returned:
+      DOUBLE PRECISION MEAN
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION SUMA      ! Sum of differences
+      INTEGER NVAL               ! Number of values
+      INTEGER I                  ! Loop variable
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+ 
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over all the values in both arrays forming the sums for the mean
+*  values.
+      IF ( BAD ) THEN
+
+*  Skip any positions with either value BAD.
+         SUMA = 0.0D0
+         NVAL = 0
+         DO 1 I = 1, N 
+            IF ( D1( I ) .NE. VAL__BAD<T> .AND.
+     :           D2( I ) .NE. VAL__BAD<T> ) THEN
+               SUMA = SUMA + NUM_<T>TOD( D1( I ) ) -
+     :                       NUM_<T>TOD( D2( I ) )
+               NVAL = NVAL + 1
+            END IF
+ 1       CONTINUE
+      ELSE
+
+*  No BAD values so no checking required.
+         SUMA = 0.0D0
+         DO 2 I = 1, N
+            SUMA = SUMA + NUM_<T>TOD( D1( I ) ) - NUM_<T>TOD( D2( I ) )
+ 2       CONTINUE
+         NVAL = N
+      END IF
+
+*  Form the mean.
+      IF ( NVAL .GT. 0 ) THEN 
+         MEAN = SUMA / DBLE( NVAL )
+      ELSE
+         MEAN = VAL__BADD
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCG1_MDIF<T>',
+     :'  CCG1_MDIF<T>: Cannot form mean; no valid values', STATUS )
+      END IF
+
+      END
+* $Id$

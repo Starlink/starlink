@@ -1,0 +1,206 @@
+      SUBROUTINE CCG1_CM3R<T>( STACK, NPIX, NLINES, VARS, IMETH, MINPIX,
+     :                         NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
+     :                         WRK1, WRK2, NCON, POINT, USED, STATUS )
+*+
+*  Name:
+*     CCG1_CM3R<T>
+
+*  Purpose:
+*     To combine a stack of array lines into one line, using a variety
+*     of methods. REAL version.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_CM3R<T>( STACK, NPIX, NLINES, VARS, IMETH, MINPIX,
+*                        NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
+*                        WRK1, WRK2, NCON, POINT, USED, STATUS )
+
+*  Description:
+*     The routine works along each line of the input stack of lines,
+*     combining the data. This variant uses a single variance for each
+*     line and and does NOT propagate it.  All work is done in single
+*     precision when possible and double precision when not.  Note that
+*     the output array is in the processing precision.  The array NCON
+*     holds the actual numbers of pixels which were used in deriving
+*     the output value plus any values already present in the array -
+*     thus a cumilative sum of contributing pixel numbers may be kept.
+
+*  Arguments:
+*     STACK( NPIX, NLINES ) = <COMM> (Given)
+*        The array of lines which are to be combined into a single line.
+*     NPIX = INTEGER (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER (Given)
+*        The number of lines of data in the stack.
+*     VARS( NLINES ) = DOUBLE PRECISION (Given)
+*        The variance to to used for each line of data.
+*     IMETH = INTEGER (Given)
+*        The method to use in combining the lines. Has a code of 2 to 9
+*        which represent.
+*        2 = MEAN
+*        3 = MEDIAN
+*        4 = TRIMMED MEAN
+*        5 = MODE
+*        6 = SIGMA CLIPPED MEAN
+*        7 = THRESHOLD EXCLUSION MEAN
+*        8 = MINMAX MEAN
+*        9 = BROADENED MEDIAN
+*     MINPIX = INTEGER (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     NITER = INTEGER (Given)
+*        The maximum number of iterations ( IMETH = 5 and 6 ), NITER
+*        should have been set to one for IMETH = 6.
+*     NSIGMA = REAL (Given)
+*        The number of sigmas to clip the data at (IMETH = 5 and 6 ).
+*     ALPHA = REAL (Given)
+*        The fraction of data values to remove from data (IMETH = 4 ).
+*     RMIN = REAL (Given)
+*        The minimum allowed data value ( IMETH = 7 )
+*     RMAX = REAL (Given)
+*        The maximum allowed data value ( IMETH = 7 )
+*     RESULT( NPIX ) = REAL (Returned)
+*        The output line of data.
+*     WRK1( NLINES ) = REAL (Given and Returned)
+*        Workspace for calculations.
+*     WRK2( NLINES ) = REAL (Given and Returned)
+*        Workspace for calculations.
+*     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     POINT( NLINES ) = INTEGER (Given and Returned)
+*        Workspace to hold pointers to the original positions of the
+*        data before extraction and conversion in to the WRK1 array.
+*     USED( NLINES ) =LOGICAL (Given and Returned)
+*        Workspace used to indicate which values have been used in
+*        estimating a resultant value.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - Various of the options are simply variations on a theme. The
+*     Broadened median is just a trimmed mean with a variable trimming
+*     fraction. The Mode is an iteratively carried out version of the
+*     sigma clipping (or more precisely the reverse). The minmax and
+*     threshold mean are also just trimmed means, but require their own
+*     mechanisms.
+*     - No propagation of variances is performed using this routine.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-MAY-1992 (PDRAPER):
+*        Original version with no variance propagation. Revamping of
+*        routine structure to increase efficiency.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NPIX
+      INTEGER NLINES
+      INTEGER IMETH
+      INTEGER MINPIX
+      <TYPE> STACK( NPIX, NLINES )
+      DOUBLE PRECISION VARS( NLINES )
+      INTEGER NITER
+      REAL NSIGMA
+      REAL ALPHA
+      REAL RMIN
+      REAL RMAX
+
+*  Arguments Given and Returned:
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER POINT( NLINES )
+      LOGICAL USED( NLINES )
+      REAL WRK1( NLINES )
+      REAL WRK2( NLINES )
+
+*  Arguments Returned:
+      REAL RESULT( NPIX )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Branch for each method.
+      IF ( IMETH .EQ. 2 ) THEN
+
+*  Forming the weighted mean.
+         CALL CCG1_MER3<T>( STACK, NPIX, NLINES, VARS, MINPIX,
+     :                      RESULT, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 3 ) THEN
+
+*  Forming the weighted median.
+         CALL CCG1_MDR3<T>( STACK, NPIX, NLINES, VARS, MINPIX,
+     :                      RESULT, WRK1, WRK2, NCON, POINT, USED,
+     :                      STATUS )
+
+      ELSE IF ( IMETH .EQ. 4 ) THEN
+
+*  Forming trimmed mean.
+          CALL CCG1_TMR3<T>( ALPHA, STACK, NPIX, NLINES, MINPIX,
+     :                       RESULT, WRK1, NCON, POINT, USED, STATUS )
+
+      ELSE IF ( IMETH .EQ. 5 ) THEN
+
+*  Forming the mode.
+         CALL CCG1_MOR3<T>( NSIGMA, NITER, STACK, NPIX, NLINES,
+     :                      VARS, MINPIX, RESULT, WRK1, WRK2, NCON,
+     :                      POINT, USED, STATUS )
+
+      ELSE IF ( IMETH .EQ. 6 ) THEN
+
+*  Forming sigma clipped mean.
+         CALL CCG1_SCR3<T>( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
+     :                      RESULT, WRK1, WRK2, NCON, POINT, USED,
+     :                      STATUS )
+
+      ELSE IF ( IMETH .EQ. 7 ) THEN
+
+*  Forming threshold trimmed mean.
+          CALL CCG1_TCR3<T>( RMIN, RMAX, STACK, NPIX, NLINES, VARS,
+     :                       MINPIX, RESULT, WRK1, WRK2, NCON, POINT,
+     :                       USED, STATUS )
+
+      ELSE IF ( IMETH .EQ. 8 ) THEN
+
+*  Forming Min-Max exclusion mean.
+         CALL CCG1_MMR3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, WRK1,
+     :                      NCON, POINT, USED, STATUS )
+
+      ELSE IF ( IMETH .EQ. 9 ) THEN
+
+*  Forming broadened median,
+         CALL CCG1_BMR3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, WRK1,
+     :                      NCON, POINT, USED, STATUS )
+
+      ELSE
+
+*  Invalid method report error
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'BAD_METH',
+     :                 'Bad method specified for image combination'//
+     :                 ' ( invalid or not implemented )', STATUS )
+      END IF
+
+      END
+* $Id$

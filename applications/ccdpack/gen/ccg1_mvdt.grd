@@ -1,0 +1,339 @@
+      SUBROUTINE CCD1_MVDT<T>( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
+     :                         DATIN, VARIN, I1, I2, IZ, SCALE, DSCALE,
+     :                         ZERO, DZERO, ORIG, LBOUT, UBOUT, OUT,
+     :                         NBAD, STATUS )
+*+
+*  Name:
+*     CCD1_MVDTx
+
+*  Purpose:
+*     Move data from an image plane into a stack, applying corrections.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_MVDTx( ADJUST, BAD, ISVAR, LBIN, UBIN, NY, DATIN,
+*                      VARIN, I1, I2, IZ, SCALE, DSCALE, ZERO, DZERO,
+*                      ORIG, LBOUT, UBOUT, OUT, NBAD, STATUS )
+
+*  Description:
+*     The routine moves values from a range of columns in an array
+*     (regarded as a 2-dimensional image) into a corresponding area in
+*     a selected plane of a 3-dimensional "stack".  At the same time,
+*     it optionally applies scale factor and zero point corrections to
+*     data values according to the formula:
+*
+*        OUT = ( DATIN - ORIG ) * SCALE + ZERO
+*
+*     The routine may also be used to generate corrected variance
+*     values as output, in which case the appropriate statistical error
+*     propagation formula is used.
+
+*  Arguments:
+*     ADJUST = LOGICAL (Given)
+*        Whether scale factor and zero point corrections are to be
+*        applied; if .FALSE. is specified, then the output values will
+*        not have these corrections applied.
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for the presence of bad
+*        values in the input data (and variance, if given).
+*     ISVAR = LOGICAL (Given)
+*        Whether the output values should be variances (as opposed to
+*        data values).
+*     LBIN = INTEGER (Given)
+*        Lower bound on the first dimension of the input image.
+*     UBIN = INTEGER (Given)
+*        Upper bound on the first dimension of the input image.
+*     NY = INTEGER (Given)
+*        Second dimension size of the input image.
+*     DATIN( LBIN : UBIN, NY ) = ? (Given)
+*        Input image containing data values.
+*     VARIN( LBIN : UBIN, NY ) = ? (Given)
+*        Input image containing variance values. This is only
+*        referenced if ISVAR is .TRUE..
+*     I1 = INTEGER (Given)
+*        Lower bound on the range of columns to be moved (must lie in
+*        the range LBIN to UBIN inclusive).
+*     I2 = INTEGER (Given)
+*        Upper bound on the range of columns to be moved (must lie in
+*        the range LBIN to UBIN inclusive and be at least equal to I1).
+*     IZ = INTEGER (Given)
+*        Number of the plane in the output image stack into which the
+*        results are to be placed.
+*     SCALE = DOUBLE PRECISION (Given)
+*        Scale factor correction to be applied. This is only used if
+*        ADJUST is .TRUE..
+*     DSCALE = DOUBLE PRECISION (Given)
+*        Standard error on the scale factor correction.  This is only
+*        referenced if (ADJUST.AND.ISVAR) is .TRUE..
+*     ZERO = DOUBLE PRECISION (Given)
+*        Zero point correction to be applied. This is only used if
+*        ADJUST is .TRUE..
+*     DZERO = DOUBLE PRECISION (Given)
+*        Standard error on the zero point correction.  This is only
+*        referenced if (ADJUST.AND.ISVAR) is .TRUE..
+*     ORIG = DOUBLE PRECISION (Given)
+*        Origin value to be used in making the correction. This should
+*        be chosen so that the errors on the scale factor and zero
+*        point corrections are expected to be un-correlated. This is
+*        only used if ADJUST is .TRUE..
+*     LBOUT = INTEGER (Given)
+*        Lower bound on the first dimension of the output stack (must
+*        not exceed I1).
+*     UBOUT = INTEGER (Given)
+*        Upper bound on the first dimension of the output stack (must
+*        not be less than I2).
+*     OUT( LBOUT : UBOUT, NY, * ) = ? (Given and Returned)
+*        Stack into which the results are to be inserted. The region
+*        affected is OUT( I1:I2, 1:NY, IZ:IZ ) - other parts of this
+*        array are returned unchanged. The final dimension size must be
+*        at least equal to IZ.
+*     NBAD = INTEGER (Returned)
+*        Number of bad values generated amongst the output values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     There are routines for processing both real and double precision
+*     values; replace "x" in the routine name by R or D as appropriate.
+*     The types of the DATIN, VARIN and OUT arrays must match the
+*     routine being used.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     1-MAY-1992 (RFWS):
+*        Original version.
+*     2-JUN-1992 (RFWS):
+*        Added the ADJUST argument.
+*     2-JUN-1992 (RFWS):
+*        Converted to a generic routine.
+*     27-JUL-1992 (RFWS):
+*        Allow zero variance values to be processed without producing a
+*        bad result.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primitive data constants
+
+*  Arguments Given:
+      LOGICAL ADJUST
+      LOGICAL BAD
+      LOGICAL ISVAR
+      INTEGER LBIN
+      INTEGER UBIN
+      INTEGER NY
+      <TYPE> DATIN( LBIN : UBIN, NY )
+      <TYPE> VARIN( LBIN : UBIN, NY )
+      INTEGER I1
+      INTEGER I2
+      INTEGER IZ
+      DOUBLE PRECISION SCALE
+      DOUBLE PRECISION DSCALE
+      DOUBLE PRECISION ZERO
+      DOUBLE PRECISION DZERO
+      DOUBLE PRECISION ORIG
+      INTEGER LBOUT
+      INTEGER UBOUT
+
+*  Arguments Given and Returned:
+      <TYPE> OUT( LBOUT : UBOUT, NY, * )
+
+*  Arguments Returned:
+      INTEGER NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      <TYPE> A                   ! First correction constant
+      <TYPE> B                   ! Second correction constant
+      <TYPE> C                   ! Third correction constant
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise.
+      NBAD = 0
+
+*  Producing output data values.
+*  ============================
+      IF ( .NOT. ISVAR ) THEN
+
+*  First handle the case where corrections are to be applied.  Set up
+*  the constants required.
+         IF ( ADJUST ) THEN
+            A = SCALE
+            B = ZERO
+
+*  Treat the case where bad values may be present.  Loop through the
+*  array region to be moved.
+            IF ( BAD ) THEN
+               DO 2 J = 1, NY
+                  DO 1 I = I1, I2
+
+*  Test for bad input values, producing corresponding bad values in the
+*  output array and counting them.
+                     IF ( DATIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                        OUT( I, J, IZ ) = VAL__BAD<T>
+                        NBAD = NBAD + 1
+
+*  If OK, copy the data, correcting them in the process.
+                     ELSE
+                        OUT( I, J, IZ ) = A * ( DATIN( I, J ) - ORIG ) +
+     :                                    B
+                     END IF
+ 1                CONTINUE
+ 2             CONTINUE
+
+*  Treat the case where bad values are absent.
+            ELSE
+               DO 4 J = 1, NY
+                  DO 3 I = I1, I2
+
+*  Copy the data, correcting them in the process.
+                     OUT( I, J, IZ ) = A * ( DATIN( I, J ) - ORIG ) + B
+ 3                CONTINUE
+ 4             CONTINUE
+            END IF
+
+*  Handle the case where no corrections are to be applied. If bad
+*  values may be present, then the data must be checked and the bad
+*  values counted. The good values are simply copied.
+         ELSE
+            IF ( BAD ) THEN
+               DO 6 J = 1, NY
+                  DO 5 I = I1, I2
+                     IF ( DATIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                        OUT( I, J, IZ ) = VAL__BAD<T>
+                        NBAD = NBAD + 1
+                     ELSE
+                        OUT( I, J, IZ ) = DATIN( I, J )
+                     END IF
+ 5                CONTINUE
+ 6             CONTINUE
+
+*  If no bad values are present, then all the data are simply copied.
+            ELSE
+               DO 8 J = 1, NY
+                  DO 7 I = I1, I2
+                     OUT( I, J, IZ ) = DATIN( I, J )
+ 7                CONTINUE
+ 8             CONTINUE
+            END IF
+         END IF
+
+*  Producing output variance values.
+*  ================================
+      ELSE
+
+*  First handle the case where corrections are to be applied.  Set up
+*  the constants required.
+         IF ( ADJUST ) THEN
+            A = SCALE ** 2
+            B = DSCALE ** 2
+            C = DZERO ** 2
+
+*  Treat the case where bad values may be present.  Loop through the
+*  array region to be moved.
+            IF ( BAD ) THEN
+               DO 10 J = 1, NY
+                  DO 9 I = I1, I2
+
+*  Test for bad input values, producing corresponding bad values in the
+*  output array and counting them. Note that both the data and variance
+*  values must be good and the variance must be zero or positive.
+                     IF ( ( DATIN( I, J ) .EQ. VAL__BAD<T> ) .OR.
+     :                    ( VARIN( I, J ) .EQ. VAL__BAD<T> ) .OR.
+     :                    ( VARIN( I, J ) .LT. 0<CONST> ) ) THEN
+                        OUT( I, J, IZ ) = VAL__BAD<T>
+                        NBAD = NBAD + 1
+
+*  If OK, copy the variances, correcting them in the process.
+                     ELSE
+                        OUT( I, J, IZ ) =
+     :                              A * VARIN( I, J ) +
+     :                              B * ( DATIN( I, J ) - ORIG ) ** 2 +
+     :                              C
+                     END IF
+ 9               CONTINUE
+ 10            CONTINUE
+
+*  Treat the case where bad values are absent.
+            ELSE
+               DO 12 J = 1, NY
+                  DO 11 I = I1, I2
+
+*  We must still check that variance values are zero or positive,
+*  producing corresponding bad values in the output array if they are
+*  not.
+                     IF ( VARIN( I, J ) .LT. 0<CONST> ) THEN
+                        OUT( I, J, IZ ) = VAL__BAD<T>
+                        NBAD = NBAD + 1
+
+*  If OK, copy the variances, correcting them in the process.
+                     ELSE
+                        OUT( I, J, IZ ) =
+     :                              A * VARIN( I, J ) +
+     :                              B * ( DATIN( I, J ) - ORIG ) ** 2 +
+     :                              C
+                     END IF
+ 11               CONTINUE
+ 12            CONTINUE
+            END IF
+
+*  Handle the case where no corrections are to be applied. If bad
+*  values may be present, then the variances must be checked and bad or
+*  invalid ones counted. The good values are simply copied.
+         ELSE
+            IF ( BAD ) THEN
+               DO 14 J = 1, NY
+                  DO 13 I = I1, I2
+                     IF ( ( VARIN( I, J ) .EQ. VAL__BAD<T> ) .OR.
+     :                    ( VARIN( I, J ) .LT. 0<CONST> ) ) THEN
+                        OUT( I, J, IZ ) = VAL__BAD<T>
+                        NBAD = NBAD + 1
+                     ELSE
+                        OUT( I, J, IZ ) = VARIN( I, J )
+                     END IF
+ 13               CONTINUE
+ 14            CONTINUE
+
+*  If no bad values are present, then we must still check for invalid
+*  variance values.
+            ELSE
+               DO 16 J = 1, NY
+                  DO 15 I = I1, I2
+                     IF ( VARIN( I, J ) .LT. 0<CONST> ) THEN
+                        OUT( I, J, IZ ) = VAL__BAD<T>
+                        NBAD = NBAD + 1
+                     ELSE
+                        OUT( I, J, IZ ) = VARIN( I, J )
+                     END IF
+ 15                CONTINUE
+ 16             CONTINUE
+            END IF
+         END IF
+      END IF
+
+      END
+* $Id$

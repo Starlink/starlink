@@ -1,0 +1,42 @@
+*+
+*  Name:
+*     CCD1_TMPCM
+
+*  Purpose:
+*     Define CCDPACK disk-file workspace common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines the CCDPACK common block for controlling access
+*     to disk-resident workspace.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  Notes:
+*     - must include CCD1_PAR and DAT_PAR before including this common
+*     block.
+
+*  History:
+*     25-MAY-1992 (PDRAPER):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Define space.
+      CHARACTER * ( DAT__SZLOC ) CCD1_TMPLO( CCD1__MXPNT )
+      INTEGER CCD1_TMPPO( CCD1__MXPNT )
+
+*  Define common blocks, keep characters and integer separate.
+      COMMON/ CCD1_TMPC / CCD1_TMPLO
+      COMMON/ CCD1_TMPI / CCD1_TMPPO
+* $Id$

@@ -1,0 +1,17 @@
+#  Setup for ING GEC7, standard speed readout. Warning: no useful area available.
+#
+#  Derived from ING document gec7, Tue Nov 29 1994.
+#
+#  Real size = 335x520, clocked size = 400x590.
+#
+#  Only one strip (the underscan) recommended for use and of this only
+#  10:500 in Y.
+
+ADC = 1.3
+RNOISE = 5.4
+SATURATION = 61440
+BOUNDS = 5,30
+DIRECTION = X
+EXTENT=UNKNOWN
+
+# $Id$

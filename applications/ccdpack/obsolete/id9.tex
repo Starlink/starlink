@@ -1,0 +1,1243 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\irasdoccategory}  {IRAS90 Document}
+\newcommand{\irasdocinitials}  {ID}
+\newcommand{\irasdocnumber}    {9.7}
+\newcommand{\irasdocauthors}   {D.S. Berry}
+\newcommand{\irasdocdate}      {3rd February, 1991.}
+\newcommand{\irasdoctitle}     {IRH: List access subroutine package}
+%------------------------------------------------------------------------------
+
+\newcommand{\irasdocname}{\irasdocinitials /\irasdocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\irasdocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \irasdocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf IRAS90\\}
+{\large\bf \irasdoccategory\ \irasdocnumber}
+\begin{flushright}
+\irasdocauthors\\
+\irasdocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \irasdoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\irasdocname}
+
+\section {Introduction}
+
+It is sometimes necessary for a user to specify a set of text strings while
+running an application. One way of doing this is to prompt the user many times,
+allowing the user to specify another string at each prompt. Alternatively, an
+array of text strings can be given in response to a single prompt, by separating
+the values with commas and enclosing the entire list in square brackets. Both of
+these methods can be implemented simply using the PAR\_ library. However, one
+method which cannot be implemented directly using PAR\_ is ``indirection''
+through a text file. In this method, the user gives {\em the name of a text
+file} containing the required strings, rather than the required strings
+themselves. The IRH library provides a means of getting a list of strings from
+the user, in which the user can use any of these three methods to specify the
+list. Additionally, IRH allows list of strings to be created in which each
+string is a modified version of the corresponding string in another, previously
+defined, list. 
+
+IRH assumes nothing about what these names correspond to; they are treated as 
+arbitrary character strings. The IRAS90 IRG library (see ID/5) provides similar 
+facilities to IRH but includes the assumption that each name is the name of an 
+NDF.
+
+\section {Names and Groups}
+In the context of the IRH library, each string within such a list is called a
+{\em name}, and the word {\em group} is used rather than {\em list} to refer to
+a set of names. A name is a text string of up to 255 characters. Names must not
+contain any of the characters ``\verb+^+'', ``,'' or ``\#'' (with the exception
+that commas are allowed within sub-strings enclosed within parentheses). All
+these characters have special meanings within IRH as described below. All names
+are converted to upper case before being stored within IRH. 
+
+Applications can maintain information about 100 independent groups
+simultaneously. There is no limit on the number of names that a single group can
+contain (other than those imposed by system quotas).
+The IRH system distinguishes between different groups by use of an
+{identifier} system. When a new group is created, it is assigned an ``IRH
+identifier'' or ``group identifier''. This value is used to specify which group
+is to be acted upon by subsequent IRH calls. The symbolic constant IRH\_\_NOID
+is an invalid IRH identifier, which applications can specify when calling
+IRH\_GROUP in order to suppress the use of modification elements
+(see below). 
+
+The names which form a group are actually stored in a temporary HDS structure, 
+but calling applications need never now anything about these structures. All 
+access to these structures are performed within IRH.
+
+\section {Group Expressions}
+The main routine within IRH is IRH\_GROUP. This places names specified by the
+user through the ADAM parameter system into a group previously created using
+IRH\_NEW. A value is obtained for a specified ADAM parameter (which must be of
+type LITERAL). The string obtained is known as a ``group expression''. It
+consists of a list of ``elements'' separated by commas (except that commas
+occurring within parentheses are considered to be {\em part of} the element,
+rather than signifying the {\em end} of an element). A selection of example
+group expressions are described in section \ref {SEC:EXAM}. Each element can be
+one of the following: 
+\begin{description}
+\item [A name ] - An explicit name to be included in the group.
+\item [An ``indirection'' element] - This consists of the character ``\verb+^+''
+(up arrow) followed by the name of a text file (if no file type is included, it
+defaults to ``.DAT''). The file is read to obtain further names to be added to
+the group. Each line in the file can contain another group expression containing
+any combination of the elements described in this section, including further
+indirection elements. IRH imposes a limit of 7 levels of indirection, primarily
+to safe-guard against ``run-away'' indirection which happens (for instance) when
+a file specifies {\em itself} within an indirection element. 
+\item [A ``modification'' element] - This is a method for specifying a set of
+names in which each name is a modified version of a corresponding name in a
+pre-defined group of names. Modification elements are only recognised if the
+application has provided a group on which to base the modified names. If no such
+group is provided, then the modification element is treated like a single
+literal name. See section \ref {SEC:MOD} for more details on the syntax of
+modification elements. 
+\end{description}
+
+IRH\_GROUP converts the supplied group expression into a list of explicit names,
+which are stored in a temporary HDS structure. Group expressions may be
+terminated by a special character called the ``termination character''. This
+character may appear on the end of a group expression typed in response to a
+prompt from IRH\_GROUP, or may be included in a text file specified in an
+indirection element. The character is not included in the name stored in the
+temporary HDS structure, but a flag is returned to the calling application
+indicating if a termination character was found. The application can use this
+flag for any purpose it chooses, for instance it may use it to indicate that the
+user wishes to add more name to the group, or conversely, that the user does not
+wish to add any more names to the group. The actual character used for the
+termination character is specified by the calling application. 
+
+\section {Comments}
+It is often useful to mix comments with names in a text file. All group
+expressions (whether obtained from the environment or from a text file) are
+truncated if a ``\#'' character is found. All text occurring after such
+a character is ignored. In a text file, the comment is assumed to extend
+from the comment character, to the end of the line, and so a new group
+expression may be given on the next line. 
+
+\section {Syntax of Modification Elements}
+\label {SEC:MOD}
+
+Modification elements are only checked for if a previously 
+defined group (the ``input'' group) exists on which to base the modified names.
+Some examples are described in section \ref {SEC:EXAM}, and the syntax is 
+described here.
+
+The element can consist of up to three sections separated by the ``/''
+character. The first section is mandatory and must contain a single ``$*$''
+wildcard. Two optional strings can be appended to this string, delimited by
+``/'' characters. If such strings are given, then a new group is formed by
+modifying each name in the input group by replacing all occurrences of the first
+of these two strings, with the second (the comparison is case insensitive). If
+these optional strings are {\em not} given, the names to be put in the new group
+are just copied without change from the old group. All the names in this new
+group are then further modified by substituting each name for the ``$*$''
+character in the mandatory first string. 
+
+\section {Example Group Expressions}
+\label {SEC:EXAM}
+Throughout the following examples it is assumed that the ``-'' character is 
+specified as the termination character when IRG\_GROUP is called.
+
+\begin{enumerate}
+
+\item
+The simplest interactive use of IRH consists of giving a single name in reply to
+each prompt. The application makes a call to IRH\_GROUP specifying ADAM
+parameter NAME. The user is then prompted for NAME and gives the
+following values:
+\begin{verbatim}
+NAME > ALPHA
+\end{verbatim}
+The resulting group returned by IRH\_GROUP to the calling application contains
+the name ``ALPHA''. The termination character flag is returned false.
+
+\item More names could have been given in the same prompt
+\begin{verbatim}
+NAME > ALPHA,BETA(1,(-2,3)),GAMMA-
+\end{verbatim}
+This creates a group containing the names ``ALPHA'', ``BETA(1,(-2,3))'' and
+``GAMMA''. Note, the string ``BETA(1,(-2,3))'' was interpreted as a single
+element (rather than as the three element ``BETA(1'', ``(-2'' and ``3))'' )
+because the commas were contained within parentheses. The termination flag is
+returned true to indicate the presence of the final ``-'' character. 
+
+\item The names could be written into a text file called (for example) 
+NAMES.LIS; either all three on a single line, or spread over several lines. The 
+file can be commented. As an example, it may look like:
+\begin{verbatim}
+#  
+# File used to demonstrate the IRH package.
+#
+ALPHA         # The first name.
+BETA, GAMMA   # The second and third names.
+\end{verbatim}
+The prompt for NAME could then be replied to as follows:
+\begin{verbatim}
+NAME > ^NAMES.LIS
+\end{verbatim}
+The ``\verb+^+'' indicates that what follows is not a {\em name} to be added to the 
+group, but a {\em file} from which such names are to be read. 
+
+\item The methods of the previous examples can be mixed freely, for example:
+\begin{verbatim}
+NAME > A,B,C,^NAMES.LIS,D
+\end{verbatim}
+This would result in a group containing the names; A,B,C,ALPHA,BETA,GAMMA,D.
+
+\item The termination character can be put in a text file specified by an 
+indirection element, so long as the indirection element is the last element in 
+the group expression. For example, if the file NAMES.DAT contains
+\begin{verbatim}
+#  
+# File used to demonstrate the IRH package.
+#
+ALPHA, BETA, GAMMA-   # The first name.
+\end{verbatim}
+The prompt for NAME could then be replied to as follows:
+\begin{verbatim}
+NAME > A,B,C,^NAMES
+\end{verbatim}
+The ``\verb+^+'' indicates that ``NAMES'' is a text file. The file type defaults to 
+.DAT. The ``-'' character contained in NAMES.DAT causes the termination flag to 
+be returned true.
+
+\item 
+On the other hand, if the reply to the prompt in the previous example had been
+\begin{verbatim}
+NAME > A,B,^NAMES,C
+\end{verbatim}
+then the termination flag would have been returned false, and the ``-'' 
+character in NAMES.DAT would have been treated as part of a name. Thus the
+name ``GAMMA'' would be replaced by the name ``GAMMA-'' in the output group.
+
+\item 
+There can be more than one level of indirection. Thus the file NAMES.DAT used 
+in the previous example could have contained:
+\begin{verbatim}
+#  
+# File used to demonstrate the IRH package.
+#
+ALPHA, BETA, GAMMA, ^OTHERS   # The first name.
+\end{verbatim}
+
+This would require a file OTHERS.DAT to be created. It could, for instance 
+contain the following:
+\begin{verbatim}
+OTHER,GREEK,LETTERS   # Three more names.
+\end{verbatim}
+The response
+\begin{verbatim}
+NAME > ^NAMES
+\end{verbatim}
+would then produce a group containing the names; ALPHA, BETA, GAMMA, OTHER, 
+GREEK, LETTERS.
+
+\item
+If the group ``ALPHA, BETA, GAMMA'' had previously been created, a modification
+element could be used to create a new group based on this group. Whether
+modification elements are checked for or not, and if so, which existing group is
+used as the basis for the modified group, is under the control of the
+application. If the ADAM parameter NAME2 is used to access this second group,
+the following group expressions could be given: 
+
+\begin{verbatim}
+NAME2 > *
+\end{verbatim}
+would give an identical group, containing ALPHA, BETA and GAMMA.
+
+\begin{verbatim}
+NAME2 > *_2
+\end{verbatim}
+would give a group containing ALPHA\_2, BETA\_2 and GAMMA\_2.
+
+\begin{verbatim}
+NAME2 > TEST_*_2
+\end{verbatim}
+would give a group containing TEST\_ALPHA\_2, TEST\_BETA\_2 and TEST\_GAMMA\_2.
+
+\begin{verbatim}
+NAME2 > TEST_*_2/E/ZZ/
+\end{verbatim}
+would give a group containing TEST\_ALPHA\_2, TEST\_BZZTA\_2 and TEST\_GAMMA\_2.
+
+\item
+\end{enumerate}
+
+\section{Using IRH routines}
+The IRH package has associated with it various symbolic constants defining such 
+things as the required length of various character variables, an invalid IRH 
+identifier value, etc. These values consist of a name of up to 6 characters 
+prefixed by ``IRH\_\_''  (note the {\em double} underscore), and can be made 
+available to an application by including the lines
+
+\begin{verbatim}
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'IRH_PAR'
+\end{verbatim}
+
+in the routine which needs the IRH constants. The values thus defined are 
+described in the following sections, and also in the subroutine specifications. 
+Another set of symbolic constants is made available by the statements
+
+\begin{verbatim}
+      INCLUDE 'I90_PAR'
+      INCLUDE 'IRH_ERR'
+\end{verbatim}
+
+These values have the same format of those contained in IRH\_PAR, put define
+various error conditions which can be generated within the IRH package.
+Applications can compare the $STATUS$ argument with these values to check for
+specific error conditions. These values are described in appendix \ref
+{APP:ERRORS}. 
+
+The first IRH routine called must be IRH\_NEW. This routine initialises IRH (if
+not previously initialised) and creates a new group for which an IRH identifier
+is returned. Initially the group contains no names. Names can then be added
+either by calling IRH\_PUT (for names specified by the application) or
+IRH\_GROUP (for names obtained through the ADAM parameter system). IRH\_ANNUL
+should be called to annul a group once it is no longer needed,and IRH\_CLOSE
+should be called once IRH has been finished with. 
+
+Once a group has been created, it can be interrogated in various ways. Each name
+has an associated integer index, greater than or equal to 1. The index value is
+just the position of the name within the list of names which forms the group.
+The names stored in a given subsection of a group (defined by its upper and
+lower index values) can be found using IRH\_GET. The index of a given name can
+be found using IRH\_INDEX. 
+The number of names in a group subsection can be found using IRH\_GRPSZ.
+
+IRH\_PURGE will remove duplicated names from a group. The purged list of names
+is placed in a new group, an IRH identifier for which is returned. It should be
+noted that this will result in names having different indices after the call to
+IRH\_PURGE, than they did before the call. A section of a group can be copied to
+a new group using IRH\_SECT. 
+
+The contents of a group subsection 
+can be displayed on the terminal screen (or batch job log
+file) using IRH\_SHOW. IRH\_LIST will create a text file holding the contents of
+a group subsection. The name of the file is obtained through the ADAM parameter
+system. The created file can be used within an indirection element in a later
+group expression. This provides a convenient means for passing on large numbers
+of names from one application to another. 
+
+Specific names can be added to a group using routine IRH\_PUT. The group is 
+extended if necessary to make room for the new names. 
+
+Some applications may need to differentiate between different {\em types} of
+groups. When a group is created using IRH\_NEW, the calling
+application specifies a ``title'' to associate with the group. Later routines
+can check the title of supplied groups to ensure that they are of the correct
+form. The way in which the group title is used is left completely up to the
+application. The title of a group can be retrieved using IRH\_GTTL, and a new
+title can be associated with a group using IRH\_PTTL. 
+
+\section {Linking with IRH}
+To link an application with IRH, the linker options file IRH\_LINK should be
+included in the linker command line. This logical name can be made available by
+executing the START.COM procedure within IRH\_DIR. For example, to link an ADAM
+application called PROG with the IRH library, the commands 
+
+\begin{verbatim}
+$ @IRH_DIR:START
+$ ALINK PROG, IRH_LINK/OPT 
+\end{verbatim}
+
+should be used. This linking procedure may change when development of IRAS90 is
+complete. The procedure IRH\_DIR:START.COM also defines logical names defining
+the include files IRH\_PAR and IRH\_ERR, and so should be executed before
+compiling any routines which include them. 
+
+\appendix
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newcommand{\noteroutine}[2]{{\small \bf #1} \\
+                              \hspace*{3em} {\em #2} \\[1.5ex]}
+
+\section {Routine descriptions}
+
+\subsection {Routine list}
+
+\noteroutine{IRH\_ANNUL(IDH,STATUS)}
+   {Release the resources used by a group.}
+\noteroutine{IRH\_CLOSE(STATUS)}
+   {Close down the IRH system.}
+\noteroutine{IRH\_GET(IDH,INDEX,SIZE,NAMES,STATUS)}
+   {Return a set of names from a group subsection.}
+\noteroutine{IRH\_GROUP(PARAM,IDH1,IDH2,TERMC,SIZE,ADDED, TERM,STATUS)}
+   {Append names obtained from the ADAM environment to a group.}
+\noteroutine{IRH\_GRPSZ(IDH,SIZE,STATUS)}
+   {Return the size of a group.}
+\noteroutine{IRH\_GTTL(IDH,TITLE,STATUS)}
+   {Retrieve the title associated with a given group.}
+\noteroutine{IRH\_INDEX(NAME,IDH,INDEX,STATUS)}
+   {Find the index of a given name within a group.}
+\noteroutine{IRH\_INFO(IDH,INDEX,NAME,MODGRP,MODIND,DEPTH,FILE,STATUS )}
+   {Retrieve a name from a group with supplementary information.}
+\noteroutine{IRH\_LIST(PARAM,INDXLO,INDXHI,COMNT,IDH,STATUS)}
+   {Create a text file containing the names in a group subsection.}
+\noteroutine{IRH\_NEW(TITLE,IDH,STATUS)}
+   {Create a new, empty group.}
+\noteroutine{IRH\_PTTL(IDH,TITLE,STATUS)}
+   {Replace the title associated with a given group.}
+\noteroutine{IRH\_PURGE(IDH1,IDH2,STATUS)} 
+   {Remove any duplicated entries from a group.}
+\noteroutine{IRH\_PUT(IDH,SIZE,NAMES,INDEX,STATUS)}
+   {Store a set of names in a group subsection.}
+\noteroutine{IRH\_SECT(IDH,INDXLO,INDXHI,REJECT,IDH2,STATUS)}
+   {Create a new group containing a section of a previously existing group.}
+\noteroutine{IRH\_SETSZ(IDH,SIZE,STATUS)}
+   {Reduce the size of a group.}
+\noteroutine{IRH\_SHOW(IDH,INDXLO,INDXHI,STATUS)}
+   {Display the contents of a group subsection on the terminal screen.}
+
+\subsection {Full Routine Specifications}
+\label {SEC:FULLSPEC}
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\font\ssttt=CMTT10 scaled 1095
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+\newcommand{\sstitem}{\item}
+\sstroutine{
+   IRH\_ANNUL
+}{
+   Release a group from the IRH system
+}{
+   \sstdescription{
+      All internal resources used by the group are released. Any
+      parameter association used to establish the group is NOT
+      cancelled.
+
+      This routine attempts to execute even if STATUS is bad on entry,
+      although no further error report will be made if it subsequently
+      fails under these circumstances.
+   }
+   \sstinvocation{
+      CALL IRH\_ANNUL( IDH, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH identifier for the group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_CLOSE
+}{
+   Close down the IRH package
+}{
+   \sstdescription{
+      All internal resources used by any groups currently in use are
+      released.
+
+      This routine attempts to execute even if STATUS is bad on entry,
+      although no further error report will be made if it subsequently
+      fails under these circumstances.
+   }
+   \sstinvocation{
+      CALL IRH\_CLOSE( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_GET
+}{
+   Returns a set of names contained in a group
+}{
+   \sstdescription{
+      The names with indices between INDEX and INDEX$+$SIZE-1 (inclusive)
+      contained in the given group are returned.
+   }
+   \sstinvocation{
+      CALL IRH\_GET( IDH, INDEX, SIZE, NAMES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH identifier for the group.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The lowest index for which the corresponding name is required.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The number of names required.
+      }
+      \sstsubsection{
+         NAMES( SIZE ) = CHARACTER$*$($*$) (Returned)
+      }{
+         The names held at the given positions in the group. The
+         corresponding character variables should have declared length
+         specified by the symbolic constant IRH\_\_SZNAM.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_GROUP
+}{
+   Append a list of names obtained from the ADAM environment
+   to a previously created group
+}{
+   \sstdescription{
+      A group expression is obtained from the ADAM environment
+      using the supplied parameter name. The expression is parsed to
+      produce a list of names which are appended to the end of the
+      group identified by IDH2.
+
+      If the group expression contains any modification elements, then
+      the list of names added to the output group is based on the group
+      identified by IDH1. If IDH1 is invalid (equal to the symbolic
+      constant IRH\_\_NOID for instance), then no checks are made for
+      modification elements. In this case, any elements with the syntax
+      of a modification element are stored in the output group as a
+      single literal name.
+
+      The calling routine can specify a {\tt "}termination character{\tt "} to be
+      searched for (argument TERMC). If the last character read from
+      the group expression (or from a text file if the last element of
+      the group expression is an indirection element) is equal to the
+      character specified by TERMC, then argument TERM is returned set
+      to true. Otherwise, it is returned set to false.  The calling
+      application can use this character for any purpose (e.g. it may use
+      it to indicate that the user wants to give more names).
+   }
+   \sstinvocation{
+      CALL IRH\_GROUP( PARAM, IDH1, IDH2, TERMC, SIZE, ADDED, TERM,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The ADAM parameter with which to associate the group
+         expression. Note, the parameter association set up by this
+         routine is not cancelled within the routine.
+      }
+      \sstsubsection{
+         IDH1 = INTEGER (Given)
+      }{
+         An IRH identifier for the group to be used as the basis for any
+         modification elements which may be contained within the group
+         expression obtained from the environment. This can be set to
+         the symbolic constant IRH\_\_NOID if modification elements are
+         to be treated as literal names.
+      }
+      \sstsubsection{
+         IDH2 = INTEGER (Given)
+      }{
+         An IRH identifier for the group to which the new names are to
+         be appended.
+      }
+      \sstsubsection{
+         TERMC = CHARACTER (Given)
+      }{
+         The termination character. If the TERMC  argument contains more
+         than one character, only the first character is used.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The number of names in the returned group.
+      }
+      \sstsubsection{
+         ADDED = INTEGER (Returned)
+      }{
+         The number of names added to the group as a result of the
+         current call to this routine.
+      }
+      \sstsubsection{
+         TERM = LOGICAL (Returned)
+      }{
+         .TRUE. if the group expression ended with the character
+         specified by TERMC. .FALSE. otherwise.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_GRPSZ
+}{
+   Returns the number of names in a group
+}{
+   \sstdescription{
+      This routine returns the number of names in a group.
+   }
+   \sstinvocation{
+      CALL IRH\_GRPSZ( IDH, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH identifier for the group.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The number of names in the group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_GTTL
+}{
+   Retrieve the title associated with a group
+}{
+   \sstdescription{
+      The title specified when the group was created is retrieved.
+   }
+   \sstinvocation{
+      CALL IRH\_GTTL( IDH, TITLE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH group identifier.
+      }
+      \sstsubsection{
+         TITLE = CHARACTER (Returned)
+      }{
+         The group title.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_INDEX
+}{
+   Searches a group for a given name and if found, returns its
+   index
+}{
+   \sstdescription{
+      The given group is searched for the given name. If it is found
+      then the corresponding index within the group is returned. If it
+      is not found, the index is set to zero, but no error status is
+      generated. The search is case insensitive. If the group contains
+      the name more than once then the lowest index is returned.
+   }
+   \sstinvocation{
+      CALL IRH\_INDEX( NAME, IDH, INDEX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER$*$($*$) (Given)
+      }{
+         The name to be searched for.
+      }
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH identifier for the group to be searched.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Returned)
+      }{
+         The index of the name within the group. This number is greater
+         than or equal to one if the name is found, and zero if it is
+         not found.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_INFO
+}{
+   Retrieve a name with supplementary information from a group
+}{
+   \sstdescription{
+      This routine returns a single name from a group, together with
+      various items of supplementary information about the name. This
+      information consists of:
+
+      1) If the name was specified by means of a modification element,
+      then the the IRH identifier of the group used as a basis for the
+      modification element is returned in MODGRP. If the name was not
+      specified by a modification element, then zero is returned.
+      Note, if the group upon which the modification was based has been
+      annulled, then a value of zero is returned.
+
+      2) If the name was specified by means of a modification element,
+      then the index of the original name (upon which the returned name
+      was based) is returned in MODIND. This is an index into the group
+      identified by MODGRP. If MODGRP is zero, then MODIND will also be
+      zero.
+
+      3) The number of levels of indirection at which the name was
+      specified is returned in DEPTH. Names given explicitly within a
+      response to a parameter prompt have a DEPTH value of zero. Names
+      given explicitly within a DEPTH zero indirection element have
+      DEPTH 1. Names given explicitly within a DEPTH 1 indirection
+      element, have DEPTH 2, etc.
+
+      4) The name of the indirection text file within which the name was
+      explicitly given, is returned in FILE. If the name was specified
+      at a depth of zero then FILE is returned blank.
+   }
+   \sstinvocation{
+      CALL IRH\_INFO( IDH, INDEX, NAME, MODGRP, MODIND, DEPTH, FILE,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         IRH group identifier.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         Index (within the group specified by IDH) of the required name.
+         If the supplied value is outside the bounds of th egroup, then
+         {\tt "}null{\tt "} information is returned, as described below.
+      }
+      \sstsubsection{
+         NAME = CHARACTER (Returned)
+      }{
+         The name stored at the index given by INDEX, within the group
+         given by IDH. The {\tt "}null{\tt "} value is blank.
+      }
+      \sstsubsection{
+         MODGRP = INTEGER (Returned)
+      }{
+         The group identifier containing the modified name (see above).
+         The {\tt "}null{\tt "} value is zero.
+      }
+      \sstsubsection{
+         MODIND = INTEGER (Returned)
+      }{
+         The index of the modified name within the group identified by
+         MODGRP (see above). The {\tt "}null{\tt "} value is zero.
+      }
+      \sstsubsection{
+         DEPTH = INTEGER (Returned)
+      }{
+         The depth of indirection at which the name was specified (see
+         above). The {\tt "}null{\tt "} value is zero.
+      }
+      \sstsubsection{
+         FILE = CHARACTER (Returned)
+      }{
+         The file name within which the name was explicitly given (see
+         above). The {\tt "}null{\tt "} value is blank.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_LIST
+}{
+   Produce an text file holding a list of the names in a group
+   subsection
+}{
+   \sstdescription{
+      A text file is created with a name obtained from the environment
+      using the supplied ADAM parameter. The supplied comment is
+      written to the file as the first record. All the names stored
+      within the specified group subsection are then written to the
+      file, one name per record.
+   }
+   \sstinvocation{
+      CALL IRH\_LIST( PARAM, INDXLO, INDXHI, COMNT, IDH, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The ADAM parameter to be used to get the name of the text file.
+         to be created.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The low index limit of the group subsection. Values less than
+         one cause the value one to be used instead.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The high index limit of the group subsection. Values greater
+         than the size of the group cause a value equal to the size of
+         the group to be used instead.
+      }
+      \sstsubsection{
+         COMNT = CHARACTER$*$($*$) (Given)
+      }{
+         A Comment line to form the first record in the file. The text
+         is prefixed with an IRH comment character before being written
+         to the file.
+      }
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         The IRH identifier for the group to be listed.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_NEW
+}{
+   Create a new empty group
+}{
+   \sstdescription{
+      A new empty group is created and an identifier to it is returned
+      in IDH. Names can be stored in this group by calling routines
+      IRH\_APPND (for names obtained through the ADAM parameter system)
+      or IRH\_PUT (for names specified by the application).  The string
+      supplied in TITLE is associated with the group. It can be
+      retrieved by IRH\_GTTL, or modified by IRG\_PTTL.
+   }
+   \sstinvocation{
+      CALL IRH\_NEW( TITLE, IDH, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TITLE = CHARACTER (Given)
+      }{
+         A descriptive string to be associated with the group.
+      }
+      \sstsubsection{
+         IDH = INTEGER (Returned)
+      }{
+         An identifier for the created group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_PTTL
+}{
+   Associated a new title with a group
+}{
+   \sstdescription{
+      The given title is associated with the group, replacing the one
+      which was specified when the group was created.
+   }
+   \sstinvocation{
+      CALL IRH\_PTTL( IDH, TITLE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH group identifier.
+      }
+      \sstsubsection{
+         TITLE = CHARACTER (Given)
+      }{
+         The group title.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_PURGE
+}{
+   Purge duplicate entries from a group
+}{
+   \sstdescription{
+      This routine creates a new group based on a given existing group.
+      The contents of the existing group are copied to the new group,
+      but any duplicated names are only included once. The check for
+      duplication is case insensitive. The new group inherits the title
+      of the old group.
+
+      Note, indices determined from the old group will in general not
+      point to the same name in the new group. The old group should be
+      annulled using IRH\_ANNUL if it is no longer required.
+   }
+   \sstinvocation{
+      CALL IRH\_PURGE( IDH1, IDH2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH1 = INTEGER (Given)
+      }{
+         The IRH identifier for an existing group.
+      }
+      \sstsubsection{
+         IDH2 = INTEGER (Returned)
+      }{
+         An IRH identifier for the created group. This group is a purged
+         form of the group identified by IDH1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_PUT
+}{
+   Put a given set of names into a group
+}{
+   \sstdescription{
+      The given names are stored in the group, overwriting the previous
+      names. The group is extended if necessary. The names can be
+      appended to the end of the group by giving INDEX a value of zero.
+   }
+   \sstinvocation{
+      CALL IRH\_PUT( IDH, SIZE, NAMES, INDEX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH identifier for the group.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The size of the NAMES array.
+      }
+      \sstsubsection{
+         NAMES( SIZE ) = CHARACTER$*$($*$) (Given)
+      }{
+         The names to be stored in the group. The first name is stored
+         at the index given by INDEX, the last is stored at index
+         INDEX$+$SIZE-1. The previous names with these indices are
+         overwritten. The group is extended as necessary to make room
+         for the new names.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index at which to store the first name. A value of zero
+         causes the names to be appended to the end of the group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_SECT
+}{
+   Produce a new group holding a subsection of an existing group
+}{
+   \sstdescription{
+      A new group is created by copying a subsection of an existing
+      group. A range of indices are supplied in INDXLO and INDXHI. The
+      output group can be formed in one of two ways:
+
+      1) All names from the input group are copied to the output group
+      except for those with indices in the given range.
+
+      2) Only those names from the input group which have indices within
+      the given range are copied to the output group.
+
+      The method to use is determined by the argument REJECT. Note, a
+      name with a given index in the input group will in general have a
+      different index in the output group. The new group inherits the
+      title of the old group. If the input group is no longer required,
+      it should be annulled using IRH\_ANNUL.
+   }
+   \sstinvocation{
+      CALL IRH\_SECT( IDH, INDXLO, INDXHI, REJECT, IDH2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH1 = INTEGER (Given)
+      }{
+         The IRH identifier for the input group.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The lowest index to reject or to copy.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The highest index to reject or to copy.
+      }
+      \sstsubsection{
+         REJECT = LOGICAL ( Given)
+      }{
+         If reject is true, then method 1) (see above) is used to
+         create the group (i.e. names in the given range are rejected).
+         Otherwise, method 2) is used (i.e. names in the given range are
+         copied).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_SETSZ
+}{
+   Reduce the size of a group
+}{
+   \sstdescription{
+      This routine sets the size of the given group to the specified
+      value. The new size must be less than or equal to the old size.
+      The names with indices greater than the new size are lost. Other
+      names remain unaltered.
+   }
+   \sstinvocation{
+      CALL IRH\_SETSZ( IDH, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         An IRH identifier for the group.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The new group size.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRH\_SHOW
+}{
+   List names in a group subsection on the terminal
+}{
+   \sstdescription{
+      All the valid names in the specified group subsection are
+      displayed on the terminal screen or in the batch job log file.
+      One name is displayed per line with 5 spaces at the start of each
+      line.
+   }
+   \sstinvocation{
+      CALL IRH\_SHOW( IDH, INDXLO, INDXHI, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDH = INTEGER (Given)
+      }{
+         The IRH identifier for the group to be listed.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The low index limit of the group subsection. Values less than
+         one cause the value one to be used instead.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The high index limit of the group subsection. Values greater
+         than the size of the group cause a value equal to the size of
+         the group to be used instead.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\section {IRH Error Codes}
+\label {APP:ERRORS}
+IRH routines can return any $STATUS$ value generated by the subroutine packages 
+which it calls. In addition it can return the following IRH-specific values 
+(made available by the Fortran statement 
+\begin{verbatim}
+      INCLUDE 'I90_PAR'
+      INCLUDE 'IRH_ERR'
+\end{verbatim}
+
+\begin{description}
+
+\item {\bf IRH\_\_BADME}\\  
+A modification element had an illegal format.
+
+\item {\bf IRH\_\_DEEP}\\  
+The maximum depth of indirection has been exceeded.
+
+\item {\bf IRH\_\_INVID    }\\  
+An invalid IRH identifier was specified.
+
+\item {\bf IRH\_\_NOMORE   }\\  
+No more free IRH identifiers are available.
+
+\item {\bf IRH\_\_OUTBN}\\  
+Given group index was out of bounds (less than 1 or greater than the maximum 
+index in the group).
+
+\item {\bf IRH\_\_SZINC}\\  
+An attempt has been made to use IRH\_SETSZ to increase the size of a group.
+
+\end{description}
+
+\end{document}
+%% $Id$

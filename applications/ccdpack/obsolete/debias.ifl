@@ -1,0 +1,418 @@
+#+
+#  Name:
+#     DEBIAS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-MAY-1991 (PDRAPER):
+#        Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added help library info and associations.
+#     21-AUG-1991 (PDRAPER):
+#     	 Added GENVAR parameter.
+#     28-JAN-1994 (PDRAPER):
+#     	 Added USEEXT, GETBIAS and GETMASK
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter.
+#     20-JUN-1997 (PDRAPER):
+#        Removed FIXORIGIN global association to SETSAT!
+#     {enter_further_changes_here}
+
+#-
+
+interface DEBIAS
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # List of input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                # List of Output NDF
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'List of output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter BIAS                # Bias NDF
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  !
+      association '<-global.ccdpack_bias'
+      prompt   'Master bias NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      position 4
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT'
+      ppath    'GLOBAL,CURRENT '
+      association '<-global.ccdpack_bounds'
+      prompt   'Pixel indices of bias strips (in pairs)'
+      helpkey  '*'
+   endparameter
+
+   parameter RNOISE              # The readout noise
+      position 5
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DYNAMIC,DEFAULT '
+      default  1.0
+      association '<-global.ccdpack_rnoise'
+      prompt   'Readout noise (ADUs)'
+      helpkey  '*'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion
+				 # factor
+      position 6
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DYNAMIC,DEFAULT '
+      default  1.0
+      association '<-global.ccdpack_adc'
+      prompt   'Number of electrons per ADU'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      position 7
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  !
+      association '<-global.ccdpack_mask'
+      prompt   'Mask data file'
+      helpkey  '*'
+   endparameter
+
+   parameter USEEXT              # Controls whether extension is used
+                                 # for getting values.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_useext'
+      default  FALSE
+      prompt   'Use NDF extension information'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE 
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter GETBIAS             # Controls whether an attempt is made
+				 # to get a master bias frame or not.
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Get a master bias NDF via BIAS parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter GETMASK             # Controls whether an attempt is made
+				 # to get a mask or not.
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Get a defect mask via MASK parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter GENVAR   # Whether variance generation is to occur
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_genvar'
+      default  FALSE
+      prompt   'Do you want to generate variance estimates'
+      helpkey  '*'
+   endparameter
+
+   parameter OFFSET            # Do you want bias scaling to zeros
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Offset the bias values to zero'
+      helpkey  '*'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_direct'
+      default  'X'
+      prompt   'Readout direction ( X or Y )'
+      helpkey  '*'
+   endparameter
+
+   parameter SMODE               # The interpolation mode
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'CONSTANT'
+      prompt   'Mode to fit data (Linear or Constant)'
+      helpkey  '*'
+   endparameter
+
+   parameter FMODE               # The interpolation method
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'LINE'
+      prompt   'Fit type (Plane or Line or Global)'
+      helpkey  '*'
+   endparameter
+
+   parameter CMODE               # Clean up or weighting ?
+      type     LITERAL 
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'BOX'
+      prompt   'Clean up mode (Weight,Box or Sigma)'
+      helpkey  '*'
+   endparameter
+
+   parameter BOXSIZE             # The half side of box for smooothing
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  15,15
+      prompt   'Box side sizes for smoothing bias strips '
+      helpkey  '*'
+   endparameter
+
+   parameter NSIGMA              # Number of sigma to clip at.
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  4.0
+      prompt   'Number of sigmas to clip at'
+      helpkey  '*'
+   endparameter
+
+   parameter WMODE               # The weighting mode
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'LINEAR'
+      prompt   'Weighting mode (Linear, Exp or None)'
+      helpkey  '*'
+   endparameter
+
+   parameter PRESERVE         # Whether to preserve input data type
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_preser'
+      default  TRUE
+      prompt   'Do you want to preserve the input type'
+      helpkey  '*'
+   endparameter
+
+   parameter USECON          # Whether to use user supplied global
+			     # zero point
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Do you want to supply a global zero level'
+      helpkey  '*'
+   endparameter
+
+   parameter ZERO        # User supplied global zero point
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT '
+      default  0.0
+      prompt   'Global zero point value'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE # Title for the output NDF
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from DEBIAS'
+      prompt   'Title for the output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO               # Log output to?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter SETBAD              # Controls how the values are set BAD
+      keyword  SETBAD
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Set output pixels BAD'
+      helpkey  '*'
+   endparameter
+
+   parameter BADBITS             # BADBITS mask value
+      keyword  BADBITS
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1
+      range    1, 255
+      prompt   'BADBITS mask value'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPAND              # Whether to expand input data to
+                                 # electrons or not
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT '
+      ppath    'CURRENT,DYNAMIC,DEFAULT '        #Dynamic default set
+						 #for different data
+						 #types
+      default  TRUE
+      prompt   'Convert input ADUs to electrons on output'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATE            # Whether saturation will occur
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Look for saturated data'
+      association '<-global.ccdpack_satur'
+      helpkey  '*'
+   endparameter
+
+   parameter SETSAT            # Flag saturation with a user defined value
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Set saturated pixels to the saturation value'
+      association '<-global.ccdpack_setsat'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION          # Saturation value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  1.0D6
+      prompt   'Saturation value'
+      association '<-global.ccdpack_satval'
+      helpkey  '*'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  0.0
+      association '<-global.ccdpack_defer'
+      prompt   'Deferred charge (ADUs)'
+      helpkey  '*'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT,DYNAMIC'
+      ppath    'GLOBAL,CURRENT,DYNAMIC'
+      association '<-global.ccdpack_extent'
+      prompt   'Useful CCD region (xmin,xmax,ymin,ymax)'
+      helpkey  '*'
+   endparameter
+
+   parameter FIXORIGIN 	      # Whether to set origin off output NDFs
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Set origin of output NDFs to 1,1'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,196 @@
+      SUBROUTINE CCG1_RENP<T>( IMAGEA, NCOLA, NLINEA, BADIN, NCOLB,
+     :                         NLINEB, FILL, SCALE, IMAGEB, BADOUT,
+     :                         STATUS )
+*+
+*  Name:
+*     CCD1_RENP<T>
+
+*  Purpose:
+*     Resamples an array of data to fit within another array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_RENP<T>( IMAGEA , NCOLA, NLINEA, BADIN, NCOLB, NLINEB,
+*                        FILL, SCALE, IMAGEB, BADOUT, STATUS )
+
+*  Description:
+*     The routine uses nearest neighbour interpolation to map the data
+*     in the input array IMAGEA into the array IMAGEB. If FILL is true
+*     then the mapping is performed so that all the data in one the
+*     dimension of IMAGEA maps completely into the corresponding
+*     dimension of IMAGEB and the scaling factor is returned.  If FILL
+*     is false then the SCALE factor is used. This is intended for use
+*     in cases when the pixel-pixel correspondence between scaled
+*     images needs to be maintained (the first run of this routine
+*     supplies the scale factor later runs use it again).
+
+*  Arguments:
+*     IMAGEA( NCOL, NLINE ) = <COMM> (Given)
+*        The input data array which is to be resampled.
+*     NCOLA = INTEGER (Given)
+*        First dimension of input array.
+*     NLINEA = INTEGER (Given)
+*        Second dimension of input arrays
+*     BADIN = LOGICAL (Given)
+*        True if the input data may contain BAD values.
+*     NCOLB = INTEGER (Given)
+*        First dimension of output array.
+*     NLINEB = INTEGER (Given)
+*        Second dimension of output array.
+*     FILL = LOGICAL (Returned)
+*        If fill is true then a SCALE is determined which scales one
+*        axis of the input array to the output array exactly.
+*     SCALE = DOUBLE PRECISION (Given and Returned)
+*        The scale factor used to convert IMAGEB positions into IMAGEA
+*        positions. IF FILL is false then this value should be supplied.
+*        Otherwise the value is determined internally and returned.
+*     IMAGEB( NCOL, NLINE ) = <COMM> (Returned)
+*        The output - resampled - data.
+*     BADIN = LOGICAL (Returned)
+*        True if the output data contains BAD values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-JAN-1993 (PDRAPER):
+*        Original version - based on EDRS SHFIMG routine, written by
+*        Rodney Warren-Smith (Durham Polarimetry Group).
+*     3-FEB-1993 (PDRAPER):
+*        Adapted from CCD1_DSHF routine 
+*     8-FEB-1993 (PDRAPER):
+*        Made generic.
+*     2-APR-1993 (PDRAPER):
+*        Changed to use nearest neighbour interpolation for speed.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad values
+
+*  Global Variables:
+      INCLUDE 'NUM_CMN'          ! Numeric error flag
+
+*  Arguments Given:
+      INTEGER NCOLA
+      INTEGER NLINEA
+      <TYPE> IMAGEA( NCOLA, NLINEA )
+      LOGICAL BADIN
+      INTEGER NCOLB
+      INTEGER NLINEB
+
+*  Arguments Given and Returned.
+      LOGICAL FILL
+      DOUBLE PRECISION SCALE
+
+*  Arguments Returned:
+      <TYPE> IMAGEB( NCOLB, NLINEB )
+      LOGICAL BADOUT
+
+*  External References:
+      INTEGER NUM_TRAP
+      EXTERNAL NUM_TRAP          ! Numeric error trap
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION FOFF      ! Fractional offset
+      DOUBLE PRECISION XDASH     ! New X position
+      DOUBLE PRECISION YDASH     ! New Y position
+      INTEGER X,Y                ! current position in output image
+      INTEGER XCEN, YCEN         ! nearest pixel centre to above
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( FILL ) THEN  
+*  Determine the scaling factor which maps IMAGEB pixels to IMAGEA
+*  pixels. This should completely fill one dimension.
+         SCALE = MIN( DBLE( NCOLA ) / DBLE( NCOLB ),
+     :                DBLE( NLINEA )/ DBLE( NLINEB ) )
+      END IF
+
+*  The range of array coordinates which we are mapping is 1/2,1/2 to
+*  ncola+1/2,nlinea+1/2 etc. This is so that the range is completely
+*  filled. Using this system requires a fractional offset of 1/2.
+      FOFF = 0.5D0 * SCALE
+
+*  Set the output BAD pixel flag.
+      BADOUT = .FALSE.
+
+*  Branch on the presence of input BAD pixels.
+      IF ( BADIN ) THEN 
+
+*  Scan the area of the output image (location x,y) and
+*  calculate the transformed position (xdash,ydash) in the input
+*  image.
+         DO 1 Y = 1, NLINEB
+            YDASH = DBLE( Y ) * SCALE - FOFF + 0.5D0
+            DO 2 X = 1, NCOLB
+               XDASH = DBLE( X ) * SCALE - FOFF + 0.5D0
+               
+*  Find nearest pixel location
+               XCEN = NINT( XDASH )
+               YCEN = NINT( YDASH )
+               
+*  If nearest pixel lies outside input image, output pixel is invalid
+*  otherwise continue with interpolation
+               IF( ( XCEN .LT. 1 )  .OR.  ( XCEN .GT. NCOLA )  .OR.
+     :             ( YCEN .LT. 1 )  .OR.  ( YCEN .GT. NLINEA ) ) THEN
+                  IMAGEB( X, Y ) = VAL__BAD<T>
+                  BADOUT = .TRUE.
+               ELSE
+               
+*  Output pixel is invalid if nearest input pixel is invalid. Otherwise
+*  continue with interpolation.
+                  IF( IMAGEA( XCEN, YCEN ) .EQ. VAL__BAD<T> ) THEN
+                     IMAGEB( X, Y ) = VAL__BAD<T>
+                     BADOUT = .TRUE.
+                  ELSE
+                     IMAGEB( X, Y ) = IMAGEA( XCEN, YCEN )
+                  END IF
+               END IF
+ 2          CONTINUE
+ 1       CONTINUE
+      ELSE
+
+*  No BAD pixels in the input array. Can leave out those checks.
+         DO 3 Y = 1, NLINEB
+            YDASH = DBLE( Y ) * SCALE - FOFF + 0.5D0
+            DO 4 X = 1, NCOLB
+               XDASH = DBLE( X ) * SCALE - FOFF + 0.5D0
+               
+*  Find nearest pixel location
+               XCEN = NINT( XDASH )
+               YCEN = NINT( YDASH )
+               
+*  If nearest pixel lies outside input image, output pixel is invalid
+*  otherwise continue with interpolation
+               IF( ( XCEN .LT. 1 )  .OR.  ( XCEN .GT. NCOLA )  .OR.
+     :             ( YCEN .LT. 1 )  .OR.  ( YCEN .GT. NLINEA ) ) THEN
+                  IMAGEB( X, Y ) = VAL__BAD<T>
+                  BADOUT = .TRUE.
+               ELSE
+                  IMAGEB( X, Y ) = IMAGEA( XCEN, YCEN )
+               END IF
+ 4          CONTINUE
+ 3       CONTINUE 
+      END IF
+      END
+* $Id$

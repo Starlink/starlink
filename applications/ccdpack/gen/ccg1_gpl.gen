@@ -1,0 +1,99 @@
+      SUBROUTINE CCG1_GPL<T>( ABC, ARR, NCOL, NLINE, STATUS )
+*+
+*  Name:
+*     CCG1_GPL<T>
+
+*  Purpose:
+*     To generate an array containing a plane.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_GPL( ABC, ARR, NCOL, NLINE, STATUS )
+
+*  Description:
+*     The routine loops over the whole of the output data array
+*     generating the values which a plane with coefficients ABC would
+*     have at that point.
+
+*  Arguments:
+*     ABC( 3 ) = DOUBLE PRECISION (Given)
+*        The coefficients of the equation of the plane.
+*     ARR( NCOL, NLINE ) = <TYPE> (Returned)
+*        The output array of data with the plane values.
+*     NCOL = INTEGER (Given)
+*        The first dimension of the data array.
+*     NLINE = INTEGER (Given)
+*        The second dimension of the output data array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     The plane has the form.
+*     z = ABC(1)*x + ABC(2)* y + ABC(3)
+*     where x and y are the array indices and z is the array value.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-APR-1991 (PDRAPER):
+*        Original version.
+*     24-APR-1991 (PDRAPER):
+*        Changed to generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      DOUBLE PRECISION ABC( 3 )
+      INTEGER NCOL
+      INTEGER NLINE
+
+*  Arguments Returned:
+      <TYPE> ARR( NCOL, NLINE )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I, J               ! Loop variables
+      DOUBLE PRECISION DX        ! Double precision dummy
+      DOUBLE PRECISION DY        ! ""
+      DOUBLE PRECISION DZ        ! ""
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion routines
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over the whole of the output array generating the values a plane
+*  would have at the position given by the array indices.
+      DO 1 J = 1, NLINE
+         DY = DBLE( J )
+         DO 2 I = 1, NCOL
+            DX = DBLE( I )
+
+*  Form the planar value.
+            DZ = ABC( 1 ) * DX + ABC( 2 ) * DY + ABC( 3 )
+            ARR( I, J ) = NUM_DTO<T>( DZ )
+ 2       CONTINUE
+ 1    CONTINUE
+
+      END
+* $Id$

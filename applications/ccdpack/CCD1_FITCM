@@ -1,0 +1,60 @@
+*+
+*  Name:
+*     CCD1_FITCM
+
+*  Purpose:
+*     Defines the common block for transfering fit data.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JUL-1992 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+*  Global Variables:
+*        CCD1_IPPIN = INTEGER
+*           Pointer to array to hold all the parameter values as
+*           variables on input to the transformation.
+*        CCD1_IPPO = INTEGER
+*           Pointer to array to hold the output (transformed)
+*           X and Y positions.
+*        CCD1_IPX = INTEGER
+*           Pointer to X reference positions.
+*        CCD1_IPY = INTEGER
+*           Pointer to Y reference positions.
+*        CCD1_NDXY = INTEGER
+*           Size of first dimension of CCD1_IPX, CCD1_IPY arrays
+*           when declared.
+*        CCD1_NREC = INTEGER
+*           Number of values in X and Y lists.
+*        CCD1_NPAR = INTEGER
+*           Number of parameters in forward transformation.
+*        CCD1_IDTR = INTEGER
+*           TRANSFORM identifier.
+
+*  Define number of parameter names
+      INTEGER CCD1_NPAR
+
+*  Pointers for data.
+      INTEGER CCD1_IPPIN
+      INTEGER CCD1_IPPO
+      INTEGER CCD1_IPX
+      INTEGER CCD1_IPY
+      INTEGER CCD1_NDXY
+      INTEGER CCD1_NREC
+
+*  TRANSFORM identifier
+      INTEGER CCD1_IDTR
+
+*  Define separate common blocks for character variables.
+      COMMON/ CCD1_FITCM1 / CCD1_IPPIN, CCD1_IPPO, CCD1_IPX, CCD1_IPY,
+     :                      CCD1_NDXY, CCD1_NREC, CCD1_NPAR, CCD1_IDTR
+
+* $Id$

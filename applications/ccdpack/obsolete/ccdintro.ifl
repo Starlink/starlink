@@ -1,0 +1,289 @@
+#+
+#  Name:
+#     CCDINTRO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDINTRO
+
+   parameter SIMPLE              # Whether input NDF names specified in
+				 # one.
+      position 1
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Do input NDFs have a FRAME_TYPE value'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters SIMPLE'
+   endparameter
+
+   parameter IN                  # Input NDF names
+      position 2
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*'
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters IN'
+   endparameter
+
+   parameter MODIFY
+      position 3
+      type     _LOGICAL 
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Modify existing extension items'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters MODIFY'
+   endparameter
+
+   parameter ADDTIMES
+      position 4
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Add various exposure times to extension'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters ADDTIMES'
+   endparameter
+ 
+   parameter BIAS                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters BIAS'
+   endparameter
+
+   parameter TARGET              # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters TARGET'
+   endparameter
+
+   parameter DARK                # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DARK'
+   endparameter
+
+   parameter FLASH                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FLASH'
+   endparameter
+
+   parameter FLAT                # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FLAT'
+   endparameter
+
+   parameter FTYPE		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Frame type'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FTYPE'
+   endparameter
+
+   parameter FILTER		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Filter type'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FILTER'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion 
+                                 # factor
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Number of electrons per ADU'
+      association '<-global.ccdpack_adc'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters ADC'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Pixel indices of bias strips (in pairs)'
+      association '<-global.ccdpack_bounds'
+      default   !
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters BOUNDS'
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout noise (ADUs)'
+      association '<-global.ccdpack_rnoise'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters RNOISE'
+   endparameter
+
+   parameter BIASVALUE		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Nominal bias value (ADUs)'
+      association '<-global.ccdpack_biasval'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters BIASVALUE'
+   endparameter
+
+   parameter SATURATION		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Data saturation value (ADUs)'
+      association '<-global.ccdpack_satval'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters SATURATION'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      keyword  MASK
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Mask data file'
+      association '<-global.ccdpack_mask'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters MASK'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout direction (X or Y)'
+      association '<-global.ccdpack_direct'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DIRECTION'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Deferred charge (ADUs)'
+      association '<-global.ccdpack_defer'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DEFERRED'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Useful CCD region (xmin,xmax,ymin,ymax)'
+      default  !
+      association '<-global.ccdpack_extent'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters EXTENT'
+   endparameter
+
+
+   parameter EXPOSURE            # Frame exposure time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Exposure time'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters EXPOSURE'
+   endparameter
+
+   parameter DARKTIME            # Frame dark time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Dark count exposure time'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DARKTIME'
+   endparameter
+
+   parameter FLASHTIME           # Frame pre-flash exposure time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Pre-flash exposure time'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FLASHTIME'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     'ccdpack_dir:ccdhelp ccdintro parameters LOGTO'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey     'ccdpack_dir:ccdhelp ccdintro parameters LOGFILE'
+   endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,175 @@
+#+
+#  Name:
+#     PAIRNDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-FEB-1993 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface PAIRNDF
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Input list of NDF names
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST                  # Names of output lists
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Names for output lists'
+      default  '*.DAT'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE              # Name of IDI device
+      position 3
+      ptype     DEVICE
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.IMAGE_DISPLAY'
+      default  xwindows
+      prompt   'Name of display device'
+      helpkey  '*'
+   endparameter
+
+   parameter PERCENTILES         # Percentage histogram range
+      position 4
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  2,98
+      prompt   'Display percentiles'
+      helpkey  '*'
+   endparameter
+
+   parameter PALFRAC             # Fraction of display surface used
+      type    _DOUBLE		 #	for palette (X)
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default 0.25D0
+      prompt  'Fraction of display surface for palette'
+      helpkey '*'
+   endparameter
+
+   parameter FILLFRAC            # Fraction of scratch area which an
+				 # image may fill.
+      type    _DOUBLE
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default 0.55D0
+      prompt  'Fraction of scratch area for displayed image'
+      helpkey '*'
+   endparameter
+
+   parameter KEEPLUT             # Keep current look-up-table?
+      type    _LOGICAL
+      access   READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default TRUE
+      prompt  'Keep the current Look-Up-Table'
+      helpkey '*'
+   endparameter
+
+   parameter MAKEBIG             # Make images big enough to fill area aways
+      type    _LOGICAL
+      access   READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default TRUE
+      prompt  'Make images as big as possible'
+      helpkey '*'
+   endparameter
+
+   parameter MSIZE               # Size of marker as fraction of display
+				 # width
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.03
+      prompt   'Relative size of feature marker (0-1)'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK               # Line thickness
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT,'
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Feature marker thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter MEMORY              # Memory id
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT,'
+      ppath    'CURRENT,DEFAULT '
+      default  0
+      range    0,1
+      prompt   'Memory id'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'PAIRNDF.LIS'
+      prompt   'Output filenames list'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+endinterface
+
+# $Id$

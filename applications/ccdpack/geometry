@@ -1,0 +1,112 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     geometry
+
+#  Purpose:
+#     Interactively determine important CCD geometries.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+
+#  Invocation:
+#     geometry
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-OCT-1995 (PDRAPER):
+#        Original version.
+#     5-JUN-1997 (PDRAPER):
+#        Added ITCL_LIBRARY.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Check that CCDPACK_DIR is around.
+
+if test "$CCDPACK_DIR" = ""; then
+  echo "!! Cannot start geometry; CCDPACK_DIR environment variable not set."
+  exit 1
+fi
+
+#  Standalone TCL initialisations (necessary while CCDPACK distributes
+#  ccdwish binaries).
+
+TCL_LIBRARY=$CCDPACK_DIR
+TK_LIBRARY=$CCDPACK_DIR
+ITCL_LIBRARY=$CCDPACK_DIR
+export TCL_LIBRARY
+export TK_LIBRARY
+export ITCL_LIBRARY
+
+#  Notes:
+#     The ${1+"$@"} passes on any command line arguments? Perhaps $0
+#     is also required?
+
+#  Check all the necessary elements are available and start up the GUI.
+
+if test -r $CCDPACK_DIR/CCDGeometryMain.tcl ; then
+  if test -x $CCDPACK_DIR/ccdwish ; then
+
+#  Try to stop problems with the AMS rendevous files by creating a
+#  new directory as ADAM_USER.
+    OLD_ADAM_USER=${ADAM_USER:-"${HOME}/adam"}
+    ADAM_USER=${OLD_ADAM_USER}/geometry_$$
+    export ADAM_USER    
+
+#  Make sure directory exists.
+    if test -d $ADAM_USER; then
+      rm -r -f $ADAM_USER
+    fi
+    mkdir -p $ADAM_USER
+
+#  Copy the existing applications files that we're interested in
+#  ccdpack_anything and GLOBAL.sdf. Since the interface runs as an 
+#  I task these are almost unnecessary and will not be updated... 
+#  (so perhaps could be dispensed with?).
+    (cp $OLD_ADAM_USER/ccdpack_*.sdf $OLD_ADAM_USER/GLOBAL.sdf $ADAM_USER) 2>/dev/null
+
+#  Trap pids of all existing KAPPA processes.
+    oldkappa=`ps | grep kappa | grep -v grep | awk '{print $1}'`
+
+#  Make sure we clean up on exit.
+    trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
+
+#  And run up interface.
+    $CCDPACK_DIR/ccdwish $CCDPACK_DIR/CCDGeometryMain.tcl ${1+"$@"}
+
+#  Trap pids of any new KAPPA processes.
+    newkappa=`ps | grep kappa | grep -v grep | awk '{print $1}'`
+
+#  Kill any new processes.
+    for newpid in "$newkappa"; do
+       dokill=1
+       for oldpid in "$oldkappa"; do
+          if test "$newpid" = "$oldpid"; then
+             dokill=0
+          fi
+       done
+       if test "$dokill" = "1"; then 
+          kill -SYS $newpid
+       fi
+    done
+    exit
+  else
+    echo "!! Cannot start geometry; failed to locate $CCDPACK_DIR/ccdwish."
+    exit 1
+  fi
+else
+  echo "!! Cannot start geometry; failed to locate $CCDPACK_DIR/CCDGeometryMain.tcl."
+  exit 1
+fi
+
+# $Id$

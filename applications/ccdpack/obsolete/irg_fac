@@ -1,0 +1,36 @@
+*+
+*  Name:
+*     IRG_FAC
+
+*  Purpose:
+*     Include file all IRG and IRH error contants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE FILE
+
+*  Description:
+*     This file include the IRG_ERR, IRH_ERR, IRG_PAR and IRH_PAR files
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-JUL-1991 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Include all the IRG and IRH include files.
+      INCLUDE 'IRG_ERR'
+      INCLUDE 'IRG_PAR'
+      INCLUDE 'IRH_ERR'
+      INCLUDE 'IRH_PAR'
+* $Id$

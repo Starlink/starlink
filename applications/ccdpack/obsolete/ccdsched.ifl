@@ -1,0 +1,82 @@
+#+
+#  Name:
+#     CCDSCHED.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     24-MAR-1995 (PDRAPER):
+#        Added WAIT parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface CCDSCHED
+
+   helplib 'CCDPACK_DIR:'
+
+   parameter IN                  # Input NDFs list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  '*'
+      association '<-global.ccdpack_ndflist'
+      prompt   'Names of input NDFs'
+      helpkey  'ccdpack_dir:ccdhelp ccdsched parameters IN'
+   endparameter
+
+   parameter SCRIPT              # Reduction script name
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'ccdauto.reduce'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter STYPE               # Reduction script type
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'CSH'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,129 @@
+      SUBROUTINE CCG1_BEXT<T>( DIRECT, ARRA, NCOL, NLINE, BOUNDS,
+     :                         NENT, ARRB, STATUS )
+*+
+*  Name:
+*     CCG1_BEXT<T>
+
+*  Purpose:
+*     To copy ranges of columns or rows from one array to another.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_BEXT<T>( DIRECT, ARRA, NCOL, NLINE, BOUNDS, NENT, ARRB,
+*                        STATUS )
+
+*  Description:
+*     Each line is scanned in turn. Pixels lying within the range of
+*     bounds specified in the BOUNDS array are copied to the output
+*     image.  Any number of bounds ranges may be specified. Note that
+*     all of the output array except those within the given bounds is
+*     left at its input value.
+
+*  Arguments:
+*     DIRECT = INTEGER (Given)
+*        The direction of the bounds.
+*        1: x direction
+*        2: y direction
+*     ARRA( NCOL, NLINE ) = <COMM> (Given)
+*        The array containing the lines to copy.
+*     NCOL = INTEGER (Given)
+*        The first dimension of the input and output arrays.
+*     NLINE = INTEGER (Given)
+*        The second dimension of the input and output arrays.
+*     BOUNDS( NENT ) = INTEGER (Given)
+*        The array specifying the ranges of columns or rows to be
+*        copied.  bounds(2*i -1) and bounds(2*i) contain the first and
+*        last columns or rows to be copied in range i.
+*     NENT = INTEGER (Given)
+*        Number of entries in ICOLS.
+*     ARRB( NCOL, NLINE ) = <COMM> (Given)
+*        The output array with contains only the data within the given
+*        columns or rows.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-APR-1991 (PDRAPER):
+*        Original Version - based on COLX.
+*     24-APR-1991 (PDRAPER):
+*        Changed to generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     -  Large paging overheads will be incurred for large datasets if
+*     direct = 2.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER DIRECT
+      INTEGER NCOL
+      INTEGER NLINE
+      INTEGER NENT
+      <TYPE> ARRA( NCOL, NLINE )
+      INTEGER BOUNDS( NENT )
+
+*  Arguments Returned:
+      <TYPE> ARRB( NCOL, NLINE )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I, J, K
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Branch on the value of DIRECT
+      IF ( DIRECT .EQ. 1 ) THEN
+
+*  Scan through the lines.
+         DO 1 J = 1, NLINE
+
+*  Scan through the column ranges.
+            DO 2 K = 2, NENT, 2
+
+*  Scan through the columns and copy the pixels, ensuring we remain
+*  inside the image.
+               DO 3 I = MAX(    1, BOUNDS( K - 1 ) ),
+     :                  MIN( NCOL, BOUNDS( K     ) )
+                  ARRB( I, J ) = ARRA( I, J )
+ 3             CONTINUE
+ 2          CONTINUE
+ 1       CONTINUE
+      ELSE
+
+*  Scan through the rows.
+         DO 4 J = 1, NCOL
+
+*  Scan through the row ranges.
+            DO 5 K = 2, NENT, 2
+
+*  Scan through the rows and copy the pixels, ensuring we remain
+*  inside the image.
+               DO 6 I = MAX(     1, BOUNDS( K - 1 ) ),
+     :                  MIN( NLINE, BOUNDS( K     ) )
+                  ARRB( J, I ) = ARRA( J, I )
+ 6             CONTINUE
+ 5          CONTINUE
+ 4       CONTINUE
+      END IF
+
+      END
+* $Id$

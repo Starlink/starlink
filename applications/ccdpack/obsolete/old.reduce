@@ -1,0 +1,107 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     REDUCE
+
+#  Purpose:
+#     Automatic CCD data reduction facility (command-line version).
+
+#  Type of Module:
+#     Shell script
+
+#  Usage:
+#     reduce
+
+#  Description:
+#     This routine provides a command-line interface to the automated
+#     reduction facilities of CCDPACK.
+#
+#     The script guides you though the selection of the appropriate
+#     route for performing a reduction. Possible routes are using an
+#     import control table to interpret FITS headers, choosing from a
+#     list of known detector setups or just supplying all the
+#     necessary information.
+#
+#     Using FITS headers is only possible if your data contains the
+#     correct information. If a table is not listed for your
+#     telescope/detector combination then you will need to create one.
+#     The contents of import tables are described in the help for the
+#     program IMPORT. Unless you (and perhaps your colleagues) are
+#     going to reduce large amounts of data from an unknown telescope
+#     then you should use the normal setup and data organization
+#     techniques.
+#
+#     If you choose a detector setup file or have none you will need
+#     to organize your data into different frame types (bias, flat,
+#     target etc.), so either use a naming scheme that allows you to
+#     distinguish between them using wildcard patterns or create lists
+#     of the names in files.
+#
+#     If you cannot select from any of the known detectors then the
+#     most crucial information that you require is a knowledge of
+#     where the bias strips are and the useful CCD area (if these are
+#     appropriate for the type of data you're reducing). If you are
+#     sitting at an X display then the CCD geometry can be determined
+#     from within reduce. Otherwise you will need to determine these
+#     before running reduce.
+
+#  Notes:
+#     Unknown detectors.
+#        If you do develop an import table or restoration (setup) file
+#        for a telescope/detector pass these on to the maintainer of
+#        this package, together with a description. They will be
+#        distributed in future releases for the benefit of others.
+
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-SEP-1995 (PDRAPER):
+#        Original version.
+#     2-JUN-1997 (PDRAPER):
+#        Added ITCL_LIBRARY for itcl2.0 support.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Check that CCDPACK_DIR is around.
+
+if test "$CCDPACK_DIR" = ""; then
+  echo "!! Cannot start reduce; CCDPACK_DIR environment variable not set."
+  exit 1
+fi
+
+#  Standalone TCL initialisations (necessary while CCDPACK distributes
+#  ccdwish binaries).
+
+TCL_LIBRARY=$CCDPACK_DIR
+ITCL_LIBRARY=$CCDPACK_DIR
+export TCL_LIBRARY
+export ITCL_LIBRARY
+
+#  Notes:
+#     The ${1+"$@"} passes on any command line arguments? Perhaps $0
+#     is also required?
+
+#  Check all the necessary elements are available and start up the GUI.
+
+if test -r $CCDPACK_DIR/ccdReduceMain.tcl ; then
+  if test -x $CCDPACK_DIR/atclsh ; then
+    exec $CCDPACK_DIR/atclsh $CCDPACK_DIR/ccdReduceMain.tcl ${1+"$@"}
+    exit
+  else
+    echo "!! Cannot start reduce; failed to locate $CCDPACK_DIR/atclsh."
+    exit 1
+  fi
+else
+  echo "!! Cannot start reduce; failed to locate $CCDPACK_DIR/ccdReduceMain.tcl."
+  exit 1
+fi
+
+# $Id$

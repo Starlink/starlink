@@ -1,0 +1,98 @@
+      SUBROUTINE CCG1_CLIP<T>( <T>ARR, NENT, <T>MIN, <T>MAX , NGOOD,
+     :                         STATUS )
+*+
+*  Name:
+*     CCG1_CLIP<T>
+
+*  Purpose:
+*     To set any data outside a given range BAD.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_CLIP<T>( <T>ARR, NENT, <T>MIN, <T>MAX , STATUS )
+
+*  Description:
+*     This generic routine loops over all entries in <T>A. If any values
+*     are outside the range <T>MIN to <T>MAX then they are set BAD.
+*
+
+*  Arguments:
+*     <T>ARR = <COMM> (Given and Returned)
+*        The list of values to be clipped within the given range. On
+*        output this contains the clipped list.
+*     NENT = INTEGER (Given)
+*        The number of entries in <T>ARR.
+*     <T>MIN = <COMM> (Given)
+*        The minimum allowed value. All values below this are set BAD.
+*     <T>MAX = <COMM> (Given)
+*        The maximum allowed value. All values above this are set BAD.
+*     NGOOD = INTEGER (Returned)
+*        The number of values left after rejection.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-APR-1991 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD values
+
+*  Arguments Given:
+      INTEGER NENT
+      <TYPE> <T>MIN
+      <TYPE> <T>MAX
+
+*  Arguments Given and Returned:
+      <TYPE> <T>ARR( NENT )
+
+*  Arguments Returned:
+      INTEGER NGOOD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop for all input values
+      NGOOD = NENT
+      DO 1 I = 1, NENT
+
+*  If this value is not BAD then test it.
+         IF ( <T>ARR( I ) .NE. VAL__BAD<T> ) THEN
+            IF ( <T>ARR( I ) .LT. <T>MIN  .OR.
+     :           <T>ARR( I ) .GT. <T>MAX ) THEN
+
+*  Set it BAD.
+               <T>ARR( I ) = VAL__BAD<T>
+
+*  Decrement the valid values counter
+               NGOOD = NGOOD - 1
+            END IF
+         END IF
+ 1    CONTINUE
+
+      END
+* $Id$

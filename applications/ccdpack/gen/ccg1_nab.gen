@@ -1,0 +1,115 @@
+      SUBROUTINE CCG1_NAB<T>( VEC, EL, BAD, VAL, NUM, STATUS )
+*+
+*  Name:
+*     CCG1_NAB<T>
+
+*  Purpose:
+*     Counts the number of values above a given value.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CDC1_NAB<T>( VEC, EL, BAD, VAL, NUM, STATUS )
+
+*  Description:
+*     This routine looks at all the values in the vectorised array
+*     VEC and counts the number that have value above VAL. 
+
+*  Arguments:
+*     VEC( EL ) = <COMM>(Given)
+*        The vectorised array for which a count of the number of values
+*        above a threshold is required.
+*     EL = INTEGER (Given)
+*        The number of values in VEC.
+*     BAD = LOGICAL (Given)
+*        True if input BAD values are present in data.
+*     VAL = DOUBLE PRECISION (Given)
+*        The threshold value.
+*     NUM = INTEGER (Returned)
+*        The number of elements whose value lies above the threshold
+*        value.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-OCT-1992 (PDRAPER):
+*        Original version.
+*     9-NOV-1992 (PDRAPER):
+*        Made generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> VEC( EL )
+      LOGICAL BAD
+      DOUBLE PRECISION VAL
+
+*  Arguments Returned:
+      INTEGER NUM
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL VAL_DTO<T>
+      <TYPE> VAL_DTO<T>          ! Converts double precision to
+                                 ! `real' data type.
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      <TYPE> CF                  ! Comparison variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      CF = VAL_DTO<T>( .FALSE., VAL, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Initialise counter for number of values above threshold.
+         NUM = 0 
+
+*  Now loop over array counting the values.
+         IF ( BAD ) THEN 
+            DO 1 I = 1, EL
+               IF ( VEC( I ) .NE. VAL__BAD<T> ) THEN
+                  IF ( VEC( I ) .GT. CF ) THEN
+                     NUM = NUM + 1
+                  END IF
+               END IF
+ 1          CONTINUE
+         ELSE
+            DO 2 I = 1, EL
+               IF ( VEC( I ) .GT. CF ) THEN
+                  NUM = NUM + 1
+               END IF
+ 2          CONTINUE
+         END IF
+      ELSE
+
+*  Failed to convert threshold value to data type.
+         CALL MSG_SETD( 'VAL', VAL )
+         CALL ERR_REP( 'CCG1_NAB',
+     :   '  Failed to convert threshold (^VAL) to <HTYPE>', STATUS )
+      END IF
+
+      END
+* $Id$

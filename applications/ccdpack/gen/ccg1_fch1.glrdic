@@ -1,0 +1,217 @@
+      SUBROUTINE CCG1_FCH1<T>( ID, SNAME, CNAME, NVALS, VALUES, OK,
+     :                         STATUS )
+*+
+*  Name:
+*     CCG1_FCH1<T>
+
+*  Purpose:
+*     To fetch a series of scalar values from the CCDPACK extension.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_FCH1<T>( ID, SNAME, CNAME, NVALS, VALUES, OK, STATUS )
+
+*  Description:
+*     The routine attempts to read the values in a sub-structure of
+*     the CCDPACK extension. The names of the components of the
+*     sub-structure should be given as comma separated list in CNAME.
+*     Hence if the routine were given the values
+*        SNAME = 'SUBSTRUCT'
+*        CNAME = 'FIRST,SECOND,THIRD,LAST,'
+*
+*     They would be interpreted as (excluding an implied
+*     NDF.MORE.CCDPACK)
+*        .SUBSTRUCT   <GENERIC>
+*           .FIRST       VALUES( 1 )
+*           .SECOND      VALUES( 2 )
+*           .THIRD       VALUES( 3 )
+*           .LAST        VALUES( 4 )
+*     and the values VALUES(1-4) would be returned.
+
+*  Arguments:
+*     ID = INTEGER (Given)
+*        Identifier of the NDF with the extension to be read.
+*     SNAME = CHARACTER * ( * ) (Given)
+*        Name of the structure containing the values.
+*     CNAME = CHARACTER * ( * ) (Given)
+*        List of comma separated names for the objects below SNAME.
+*        Note the last entry should also be terminated by a comma.
+*     NVALS = INTEGER (Given)
+*        Number of values to read -- equal to the number of
+*        components.
+*     VALUES( * ) = <COMM> (Returned)
+*        The values stored in the objects.
+*     OK = LOGICAL (Returned)
+*        If for any reason a value cannot be returned then this flag
+*        will be set false. These reasons may include the non-existence
+*        of the extension or any of the objects.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     This routine has versions for B, UB, W, UW, I, R, D, C and L data
+*     types.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (PDRAPER):
+*        Original version.
+*     17-FEB-1992 (PDRAPER):
+*        Changed to store spread vector values.
+*     29-SEP-1993 (PDRAPER):
+*        Changed to read spread vector values.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'PRM_PAR'          ! BAD values codes
+
+*  Arguments Given:
+      INTEGER ID
+      CHARACTER * ( * ) SNAME
+      CHARACTER * ( * ) CNAME
+
+*  Arguments Returned:
+      <TYPE> VALUES( * )
+      INTEGER NVALS
+      LOGICAL OK
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN
+      EXTERNAL CHR_LEN           ! Length of string excluding trailing
+                                 ! blanks
+
+*  Local Variables:
+      LOGICAL THERE              ! Set true if extension exists.
+      CHARACTER * ( DAT__SZLOC ) SLOC ! Locator to structure
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to component
+      INTEGER FIRST              ! First character of component name
+      INTEGER LAST               ! Last character of component name
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set ok flag true.
+      OK = .TRUE.
+
+*  Set up an error mark (no HDS errors are reported from this module).
+      CALL ERR_MARK
+
+*  Check that the CCDPACK extension exists.
+      CALL NDF_XSTAT( ID, 'CCDPACK', THERE, STATUS )
+      IF ( THERE ) THEN 
+
+*  Get a locator to it.
+         CALL NDF_XLOC( ID, 'CCDPACK', 'READ', LOC, STATUS )
+
+*  Look for the structure that contains the objects which are to be
+*  read.    
+         CALL DAT_THERE( LOC, SNAME, THERE, STATUS )
+         IF ( THERE ) THEN
+            
+*  Get a locator to this component.
+            SLOC = ' '
+            CALL DAT_FIND( LOC, SNAME, SLOC, STATUS )
+            
+*  Release LOC.
+            CALL DAT_ANNUL( LOC, STATUS )
+            
+*  Now go looking for each of the sub-components.
+            FIRST = 1
+            LAST = 1
+            DO 1 I = 1, NVALS
+            
+*  Get the name of this component.
+               LAST = INDEX( CNAME( FIRST : ) , ',' )
+               IF ( LAST .EQ. 0 ) THEN
+            
+*  No more components. Is this the last?
+                  IF ( FIRST .NE. LEN( CNAME ) ) THEN
+            
+*  No it isn't -- probably a missing comma, just push on.
+                     LAST = LEN( CNAME ) + 1
+                  ELSE
+            
+*  No more to do. Must have missed one somehow.
+                     OK = .FALSE.
+                  END IF
+               END IF
+            
+*  Remove comma from name.
+               LAST = LAST + FIRST - 2
+            
+*  Look for storage object.
+               CALL DAT_THERE( SLOC, CNAME( FIRST : LAST ), THERE,
+     :                         STATUS )
+               IF ( THERE ) THEN
+
+*  Get a locator to it.
+                  CALL DAT_FIND( SLOC, CNAME( FIRST : LAST ), LOC,
+     :                           STATUS )
+            
+*  Try to read the data value.
+                  CALL DAT_GET0<T>( LOC, VALUES( I ), STATUS )
+
+*  Release locator.
+                  CALL DAT_ANNUL( LOC, STATUS )
+               ELSE
+
+*  Sub-component doesn't exist, not OK.
+                  OK = .FALSE.
+               END IF
+            
+*  Set component name pointer.
+               FIRST = LAST + 2
+
+*  Is we're carrying a BAD status then stop.
+               IF ( STATUS .NE. SAI__OK .OR. .NOT. OK ) THEN
+                  OK = .FALSE.
+                  GO TO 99
+               END IF
+ 1          CONTINUE
+
+*  Annul the structure locator
+            CALL DAT_ANNUL( SLOC, STATUS )
+         ELSE    
+         
+*  No sub-component.
+            OK = .FALSE.          
+         END IF
+      ELSE
+         
+*  Extension doesn't exist.
+         OK = .FALSE.
+      END IF
+
+*  Exit in error label.
+ 99   CONTINUE
+
+*  Release the error context.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_ANNUL( STATUS )
+         OK = .FALSE.
+      END IF
+      CALL ERR_RLSE
+
+      END
+* $Id$

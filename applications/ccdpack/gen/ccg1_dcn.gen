@@ -1,0 +1,540 @@
+      SUBROUTINE CCG1_DCN<T>( ARRAY, NCOL, NLINE, BAD, THRES, TOUCH,
+     :                        XLIST, YLIST, ILIST, LABEL, NGROUP,
+     :                        NTHRES, STATUS )
+*+
+*  Name:
+*     CCG1_DCN<T>
+
+*  Purpose:
+*     Determines the connectivity of pixels above a threshold.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_DCN<T>( ARRAY, NCOL, NLINE, BAD, THRES, TOUCH, XLIST,
+*                       YLIST, ILIST, LABEL, NGROUP, NTHRES, STATUS )
+
+*  Description:
+*     This routine determines the connectivitity of pixel groups
+*     using an 8-connected pixel scan technique. The results of this
+*     process are a list of the X and Y positions of the pixels above
+*     the threshold, their value (intensity) and a list of labels which
+*     indicate which group of connected pixels the pixel belongs to.
+*
+*     The basic algorithm is to find all non-bad pixels above a given
+*     threshold and look at its neighbours at positions
+*     x-1,y; x-1,y-1; x,y-1; x+1, y-1. If these are all below the
+*     threshold then a new pixel group is begun, if any of these are
+*     above the threshold then their group numbers are determined. The
+*     current pixel is assigned to the group of one of these pixels and
+*     all the groups numbers of these pixels are aliased to the same
+*     group. Pixel groups which contact the edges of the array may be
+*     rejected if required.
+*
+*     The input data to this routine can be of any HDS non-complex
+*     numeric type.
+
+*  Arguments:
+*     ARRAY( NCOL, NLINE ) = <COMM> (Given)
+*        The input pixel array.
+*     NCOL = INTEGER (Given)
+*        First dimension of the pixel array.
+*     NLINE = INTEGER (Given)
+*        Second dimension of the pixel array.
+*     BAD = LOGICAL (Given)
+*        Flag indicating the presence of BAD values in the input data.
+*     THRES = DOUBLE PRECISION (Given)
+*        The threshold value. The connectivity of pixels above this
+*        value is determined.
+*     TOUCH = LOGICAL (Given)
+*        Whether or not pixel groups may contact the edges of the
+*        array.
+*     XLIST( * ) = INTEGER (Returned)
+*        A list of the X positions of the pixels above the threshold
+*        value. This array should be large enough to accomdate all
+*        pixels above the threshold.
+*     YLIST( * ) = INTEGER (Returned)
+*        A list of the Y positions of the pixels above the threshold
+*        value. This array should be large enough to accomdate all
+*        pixels above the threshold.
+*     ILIST( * ) = DOUBLE PRECISION (Returned)
+*        A list of the values of the thresholded pixels.
+*     LABEL( * ) = INTEGER (Returned)
+*        A list of the group to which a given pixel belongs to.
+*        Groups are specified by having the same label.
+*     NTHRES = INTEGER (Returned)
+*        The number of pixel positions located.
+*     NGROUP = INTEGER (Returned)
+*        The number of pixel groups located. Note this may not be the
+*        actual number of groups returned, but may be used as an upper
+*        limit on the this number. Anti-aliasing of initially
+*        fragmented groups reduces the number of groups returned from
+*        this value.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine uses contiguous group number assigments which are
+*     not reordered hence the NG variable should not be decreased. This
+*     may use excess memory as a need to provide enough space for
+*     pointing into by the group numbers is required. Re-ordering these
+*     will require sorting, in which case NG may be decremented to the
+*     true number of output groups.
+*     [routine_notes]...
+
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-OCT-1992 (PDRAPER):
+*        Original version.
+*     9-NOV-1992 (PDRAPER):
+*        Made generic.
+*     10-NOV-1992 (PDRAPER):
+*        Added touch option.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER NCOL
+      INTEGER NLINE
+      <TYPE> ARRAY( NCOL, NLINE )
+      DOUBLE PRECISION THRES
+      LOGICAL BAD
+      LOGICAL TOUCH
+
+*  Arguments Returned:
+      INTEGER XLIST( * )
+      INTEGER YLIST( * )
+      DOUBLE PRECISION ILIST( * )
+      INTEGER LABEL( * )
+      INTEGER NGROUP
+      INTEGER NTHRES
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL VAL_DTO<T>
+      <TYPE> VAL_DTO<T>          ! Function to convert DBLE to local
+                                 ! type
+
+*  Local Variables:
+      INTEGER BADGRP             ! Label of group to invalidate
+      INTEGER GRLAB              ! Group label for all neighbours
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      INTEGER K                  ! Loop variable
+      INTEGER L                  ! Loop variable
+      INTEGER LAB( 4 )           ! Group labels of neighbours
+      INTEGER NG                 ! Number of pixel groups        
+      INTEGER NGOOD              ! Number of valid neighbours
+      INTEGER NNOW               ! Number of thresholded pixels counted
+      INTEGER NT                 ! Number of thresholded pixels
+      LOGICAL SAME               ! Flag showing when all labels are same
+      LOGICAL MODIFY             ! Flag indicating that lists have been
+                                 ! modified
+      <TYPE> LOCAL               ! Threshold in local data type
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert the input threshold to local data type.
+      LOCAL = VAL_DTO<T>( .FALSE., THRES, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETD( 'VAL', THRES )
+         CALL ERR_REP( 'CCG1_DCN',
+     :   '  Failed to convert threshold (^VAL) to <HTYPE>', STATUS )
+         GO TO 99
+      END IF
+
+*  Initialise the group counter.
+      NG = 0
+
+*  Initialise the thresholded pixel counter.
+      NT = 0
+
+*  Branch on whether BAD pixels are present or not.
+      IF ( BAD ) THEN
+
+*  Loop over the whole data array, looking for values above the
+*  threshold
+         DO 1 J = 1, NLINE
+            DO 2 I = 1, NCOL
+
+*  Is current value non-bad and above threshold?
+               IF ( ARRAY( I, J ) .NE. VAL__BAD<T> ) THEN
+                  IF ( ARRAY( I, J ) .GT. LOCAL ) THEN
+
+*  Got one enter its coordinate and data value into lists.
+                     NT = NT + 1
+                     XLIST( NT ) = I
+                     YLIST( NT ) = J
+                     ILIST( NT ) = NUM_<T>TOD( ARRAY( I, J ) )
+
+*  Find out which of these potentially connected neighbours are actually
+*  connected. The criterion is non-bad and greater than threshold (and
+*  within the bounds of the array). (Note the following repeated code
+*  sections are included explicitly for efficiency)
+                     NGOOD = 0
+                     IF ( I .GT. 1 ) THEN 
+
+*  Pixel at I-1,J
+                        IF ( ARRAY( I - 1, J ) .NE. VAL__BAD<T> ) THEN
+                           IF ( ARRAY( I - 1, J ) .GT. LOCAL ) THEN 
+                              NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                              DO 3 K = NT, 1, -1
+                                 IF ( XLIST( K ) .EQ. I - 1 ) THEN
+                                    IF ( YLIST( K ) .EQ. J ) THEN
+
+*  This is its position in lists.
+                                       LAB( NGOOD ) = LABEL( K )
+                                       GO TO 4
+                                    END IF
+                                 END IF
+ 3                            CONTINUE
+ 4                            CONTINUE
+                           END IF
+                        END IF
+                        IF ( J .GT. 1 ) THEN 
+
+*  Pixel at I - 1, J - 1.
+                           IF ( ARRAY( I - 1, J - 1 ) .NE. 
+     :                          VAL__BAD<T> ) THEN 
+                              IF ( ARRAY( I - 1, J - 1 ) .GT. LOCAL ) 
+     :                        THEN 
+                                 NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                                 DO 5 K = NT, 1, -1
+                                    IF ( XLIST( K ) .EQ. I - 1 ) THEN
+                                       IF ( YLIST( K ) .EQ. J - 1 ) THEN
+
+*  This is its position in lists.
+                                          LAB( NGOOD ) = LABEL( K )
+                                          GO TO 6
+                                       END IF
+                                    END IF
+ 5                               CONTINUE
+ 6                               CONTINUE
+                              END IF
+                           END IF
+                        END IF           ! J.GT.1
+                     END IF              ! I.GT.1
+
+*  Pixel at I, J - 1.
+                     IF ( J .GT. 1 ) THEN 
+                        IF ( ARRAY( I, J - 1 ) .NE. VAL__BAD<T> ) THEN
+                           IF ( ARRAY( I, J - 1 ) .GT. LOCAL ) THEN 
+                              NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                              DO 7 K = NT, 1, -1
+                                 IF ( XLIST( K ) .EQ. I ) THEN
+                                    IF ( YLIST( K ) .EQ. J - 1 ) THEN
+
+*  This is its position in lists.
+                                       LAB( NGOOD ) = LABEL( K )
+                                       GO TO 8
+                                    END IF
+                                 END IF
+ 7                            CONTINUE
+ 8                            CONTINUE
+                           END IF
+                        END IF
+                        IF ( I .NE. NCOL ) THEN 
+
+*  Pixel at I + 1, J - 1
+                           IF ( ARRAY( I + 1, J - 1 ) .NE. VAL__BAD<T> )
+     :                     THEN
+                              IF ( ARRAY( I + 1, J - 1) .GT. LOCAL ) 
+     :                        THEN 
+                                 NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                                 DO 9 K = NT, 1, -1
+                                    IF ( XLIST( K ) .EQ. I + 1 ) THEN
+                                       IF ( YLIST( K ) .EQ. J - 1 ) THEN
+
+*  This is its position in lists.
+                                          LAB( NGOOD ) = LABEL( K )
+                                          GO TO 10
+                                       END IF
+                                    END IF
+ 9                               CONTINUE
+ 10                              CONTINUE
+                              END IF
+                           END IF
+                        END IF
+                     END IF  ! J .GT. 1
+
+*  If any good neighbours have been located then process them. Otherwise
+*  start a new group.
+                     IF ( NGOOD .GT. 0 ) THEN
+
+*  Assign this pixel and all members in the groups of the connected
+*  pixels to the first group.
+                        GRLAB = LAB( 1 )
+                        SAME = .TRUE.
+                        IF ( NGOOD .GT. 1 ) THEN 
+                           DO 11 K = 2, NGOOD
+                              SAME = SAME .AND. LAB( K ) .EQ. GRLAB
+ 11                        CONTINUE
+                        END IF
+
+*  If group labels differ then change all associated groups to
+*  the picked group label
+                        IF ( .NOT. SAME ) THEN
+                           DO 12 K = NT, 1, -1
+                              DO 13 L = 1, NGOOD
+                                 IF ( LABEL( K ) .EQ. LAB( L ) ) THEN
+                                    LABEL( K ) = GRLAB
+                                 END IF
+ 13                           CONTINUE
+ 12                        CONTINUE
+                        END IF
+
+*  Finally assign this pixel to this group.
+                        LABEL( NT ) = GRLAB
+                     ELSE
+
+*  No neighbours, created a new group.
+                        NG = NG + 1
+                        LABEL( NT ) = NG
+                     END IF
+                  END IF
+               END IF
+ 2          CONTINUE
+ 1       CONTINUE
+      ELSE
+
+*  No BAD pixels.............
+*  Loop over the whole data array, looking for values above the
+*  threshold
+         DO 21 J = 1, NLINE
+            DO 22 I = 1, NCOL
+
+*  Is current value above threshold?
+               IF ( ARRAY( I, J ) .GT. LOCAL ) THEN
+
+*  Got one enter its coordinate and data value into lists.
+                  NT = NT + 1
+                  XLIST( NT ) = I
+                  YLIST( NT ) = J
+                  ILIST( NT ) = NUM_<T>TOD( ARRAY( I, J ) )
+
+*  Find out which of these potentially connected neighbours are
+*  actually connected. The criterion and greater than threshold (and
+*  within the bounds of the array). (Note the following repeated code
+*  sections are included explicitly for efficiency)
+                  NGOOD = 0
+                  IF ( I .GT. 1 ) THEN 
+
+*  Pixel at I-1,J
+                     IF ( ARRAY( I - 1, J ) .GT. LOCAL ) THEN 
+                        NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                        DO 23 K = NT, 1, -1
+                           IF ( XLIST( K ) .EQ. I - 1 ) THEN
+                              IF ( YLIST( K ) .EQ. J ) THEN
+
+*  This is its position in lists.
+                                 LAB( NGOOD ) = LABEL( K )
+                                 GO TO 24
+                              END IF
+                           END IF
+ 23                     CONTINUE
+ 24                     CONTINUE
+                     END IF
+
+                     IF ( J .GT. 1 ) THEN 
+
+*  Pixel at I - 1, J - 1.
+                        IF ( ARRAY( I - 1, J - 1 ) .GT. LOCAL ) THEN 
+                           NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                           DO 25 K = NT, 1, -1
+                              IF ( XLIST( K ) .EQ. I - 1 ) THEN
+                                 IF ( YLIST( K ) .EQ. J - 1 ) THEN
+
+*  This is its position in lists.
+                                    LAB( NGOOD ) = LABEL( K )
+                                    GO TO 26
+                                 END IF
+                              END IF
+ 25                        CONTINUE
+ 26                        CONTINUE
+                        END IF
+                     END IF   ! J.GT.1
+                  END IF      ! I.GT.1
+
+*  Pixel at I, J - 1.
+                  IF ( J .GT. 1 ) THEN 
+                     IF ( ARRAY( I, J - 1 ) .GT. LOCAL ) THEN 
+                        NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                        DO 27 K = NT, 1, -1
+                           IF ( XLIST( K ) .EQ. I ) THEN
+                              IF ( YLIST( K ) .EQ. J - 1 ) THEN
+
+*  This is its position in lists.
+                                 LAB( NGOOD ) = LABEL( K )
+                                 GO TO 28
+                              END IF
+                           END IF
+ 27                     CONTINUE
+ 28                     CONTINUE
+                     END IF
+                     IF ( I .NE. NCOL ) THEN 
+
+*  Pixel at I + 1, J - 1
+                        IF ( ARRAY( I + 1, J - 1) .GT. LOCAL ) THEN 
+                           NGOOD = NGOOD + 1
+
+*  This one is connected. Find out its label.
+                           DO 29 K = NT, 1, -1
+                              IF ( XLIST( K ) .EQ. I + 1 ) THEN
+                                 IF ( YLIST( K ) .EQ. J - 1 ) THEN
+
+*  This is its position in lists.
+                                    LAB( NGOOD ) = LABEL( K )
+                                    GO TO 30
+                                 END IF
+                              END IF
+ 29                        CONTINUE
+ 30                        CONTINUE
+                        END IF
+                     END IF           ! I.NE.NCOL
+                  END IF              ! J.GT.1
+
+*  If any good neighbours have been located then process them. Otherwise
+*  start a new group.
+                  IF ( NGOOD .GT. 0 ) THEN
+
+*  Assign this pixel and all members in the groups of the connected
+*  pixels to the first group.
+                     GRLAB = LAB( 1 )
+                     SAME = .TRUE.
+                     IF ( NGOOD .GT. 1 ) THEN 
+                        DO 31 K = 2, NGOOD
+                           SAME = SAME .AND. LAB( K ) .EQ. GRLAB
+ 31                     CONTINUE
+                     END IF
+
+*  If group labels differ then change all associated groups to
+*  the picked group label
+                     IF ( .NOT. SAME ) THEN
+                        DO 32 K = NT, 1, -1
+                           DO 33 L = 1, NGOOD
+                              IF ( LABEL( K ) .EQ. LAB( L ) ) THEN
+                                 LABEL( K ) = GRLAB
+                              END IF
+ 33                        CONTINUE
+ 32                     CONTINUE
+                     END IF
+
+*  Finally assign this pixel to this group.
+                     LABEL( NT ) = GRLAB
+                  ELSE
+
+*  No neighbours, created a new group.
+                     NG = NG + 1
+                     LABEL( NT ) = NG
+                  END IF
+               END IF
+ 22         CONTINUE
+ 21      CONTINUE
+      END IF
+
+*  Look for pixel groups that touch the edge of the array it this option
+*  is required.
+      IF ( .NOT. TOUCH ) THEN 
+         MODIFY = .FALSE.
+         DO 40 I = 1, NT
+
+*  If a thresholded pixel contact the edge of the array then invalidate
+*  all the members of its group.
+            IF ( LABEL( I ) .NE. -1 ) THEN 
+               IF ( XLIST( I ) .EQ. 1 .OR. XLIST( I ) .EQ. NCOL .OR.
+     :              YLIST( I ) .EQ. 1 .OR. YLIST( I ) .EQ. NLINE ) THEN
+
+*  Touches the edge. Set all members of this group to the invalid group
+*  flag. Set flag to indicate that the lists have been modified and
+*  decrement the group counter.
+                  MODIFY = .TRUE.
+                  BADGRP = LABEL( I )
+C                  NG = NG - 1  ! remove as decrease in group count
+C                               ! is not allowed. Put back if changed.
+                  DO 41 J = 1, NT
+                     IF ( LABEL( J ) .EQ. BADGRP ) THEN
+                        LABEL( J ) = -1
+                     END IF
+ 41               CONTINUE
+               END IF
+            END IF
+ 40      CONTINUE
+
+*  If the groups lists have been modified (by the rejection of a
+*  pixel group which touches the edges of the array) then remove the
+*  invalidated groups from the lists.
+         IF ( MODIFY ) THEN 
+            NNOW = 0
+            DO 42 I = 1, NT
+               IF ( LABEL( I ) .NE. -1 ) THEN
+
+*  This value ok. Copy into new position.
+                  NNOW = NNOW + 1
+                  XLIST( NNOW ) = XLIST( I )
+                  YLIST( NNOW ) = YLIST( I )
+                  ILIST( NNOW ) = ILIST( I )
+                  LABEL( NNOW ) = LABEL( I )
+               END IF
+ 42         CONTINUE
+
+*  Update the number of thresholded pixels counter.
+            NT = NNOW
+         END IF
+      END IF
+
+*  Return the maximum number of groups that may have been located and
+*  the actual number of thresholded pixels.
+      NGROUP = NG
+      NTHRES = NT
+      IF ( NG .EQ. 0 ) THEN
+
+*  No pixels have been thresholded
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', '  No pixels have been found above the'//
+     :   ' threshold', STATUS )
+      END IF
+
+
+*  Exit label
+ 99   CONTINUE
+      END
+* $Id$

@@ -1,0 +1,122 @@
+*+
+*  Name:
+*     IRH_COM
+
+*  Purpose:
+*     Define IRH_ common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which describe the state of
+*     IRH, and properties of each group known to IRH. Information
+*     describing each group is stored in arrays in common. The same
+*     element from different arrays holds information for the same
+*     group. Different elements within each array hold information for
+*     different groups.  The identifiers used by IRH to identify each
+*     group are just the index into these common arrays at which the
+*     information describing the group is stored. The arrays have a
+*     lower bound of 1 and an upper bound given by symbolic constant
+*     IRH__MAXG.
+*
+*     Note, the names which actually form the group are not stored in
+*     common, but are stored in a temporary HDS structure (see routine
+*     IRH1_GTIDH).
+
+*  Prior Requirements:
+*     The SAE_PAR and IRH_PAR include files should be included before
+*     this file, in order to define constants used here.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Group size.
+*  ==========
+*  The number of names stored in each group. This is generally smaller
+*  than the size of the arrays used to hold the group contents.
+      INTEGER HCM_GSIZE( IRH__MAXG )
+
+*  GROUP array locator.
+*  ===================
+*  The locator to the array of group structures. Each GROUP structure is
+*  one cell of this array.
+      CHARACTER HCM_LOC*( DAT__SZLOC )
+
+*  GROUP structure locators.
+*  ========================
+*  This array holds the HDS locators to the GROUP structures holding
+*  information about the names which form each group.
+      CHARACTER HCM_LOCG( IRH__MAXG )*( DAT__SZLOC )
+
+*  Locators to GROUP components holding group contents.
+*  ===================================================
+*  Each GROUP structure has 5 primative array components, called
+*  NAMES, MOD_GROUP, MOD_INDEX, LEVEL, and FILE. These define the actual
+*  contents of the group and have indentical sizes (given by HCM_SIZE).
+      CHARACTER HCM_LOCNM( IRH__MAXG )*( DAT__SZLOC )
+      CHARACTER HCM_LOCMG( IRH__MAXG )*( DAT__SZLOC )
+      CHARACTER HCM_LOCMI( IRH__MAXG )*( DAT__SZLOC )
+      CHARACTER HCM_LOCLV( IRH__MAXG )*( DAT__SZLOC )
+      CHARACTER HCM_LOCFL( IRH__MAXG )*( DAT__SZLOC )
+
+*  Pointers to mapped arrays holding group contents.
+*  ===============================================
+*  The 5 array components of each GROUP structure are kept permanently
+*  mapped (until the group is annulled).
+      INTEGER HCM_NMPNT( IRH__MAXG )
+      INTEGER HCM_MGPNT( IRH__MAXG )
+      INTEGER HCM_MIPNT( IRH__MAXG )
+      INTEGER HCM_LVPNT( IRH__MAXG )
+      INTEGER HCM_FLPNT( IRH__MAXG )
+
+*  Size of the arrays used to hold the group contents.
+*  ==================================================
+*  This array holds the upper bound of the array components of each
+*  GROUP structure (the lower bound is always 1). It is updated when
+*  the arrays are extended to make room for more names.
+      INTEGER HCM_SIZE( IRH__MAXG )
+
+*  State of the IRH system.
+*  =======================
+*  This character scalar is used to indicate that IRH has been
+*  initialised. On initialisation, it is set to the value of the
+*  symbolic constant IRH__GOING. When IRH is closed it is set to a
+*  blank value.
+      CHARACTER HCM_STATE*( IRH__SZSTAT )
+
+*  Which slots have been used.
+*  ==========================
+*  Each element of this array is .TRUE. if the corresponding element of 
+*  the other arrays holds information describing a currently defined
+*  group. Further information described the group (including the names
+*  which form the group) is stored in a temporary HDS structure of type
+*  GROUP.
+      LOGICAL HCM_VALID( IRH__MAXG )
+
+
+
+
+*  Declare the common block /IRH_COM1/, to hold word-aligned variables.
+      COMMON /IRH_COM1/ HCM_GSIZE, HCM_NMPNT, HCM_MGPNT, HCM_MIPNT,
+     :                  HCM_LVPNT, HCM_FLPNT, HCM_SIZE, HCM_VALID
+
+*  Declare the common block /IRH_COM2/, to hold character variables.
+      COMMON /IRH_COM2/ HCM_LOC, HCM_LOCG, HCM_LOCNM, HCM_LOCMG,
+     :                  HCM_LOCMI, HCM_LOCLV, HCM_LOCFL, HCM_STATE
+
+*.
+* $Id$

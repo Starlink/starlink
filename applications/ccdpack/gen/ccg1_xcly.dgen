@@ -1,0 +1,340 @@
+      SUBROUTINE CCG1_<T1>CL<T2>( BAD, EL, DARRI, VARRI, DCALI, VCALI,
+     :                            HAVDV, HAVCV, EXPOSE, DARRO, VARRO,
+     :                            NERR, STATUS )
+*+
+*  Name:
+*     CCG1_<T1>CL<T2>
+
+*  Purpose:
+*     To subtract an array of any type from another scaled array of any
+*     type, returning the data in the numerator type.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_<T1>CL<T2>( BAD, EL, DARRI, VARRI, DCALI, VCALI, HAVDV,
+*                           HAVCV, EXPOSE, DARRO, VARRO, NERR, STATUS )
+
+*  Description:
+*     This is a special case of subtraction because the noiseless case
+*     (in the denominator) is also accomodated.  The routine subtracts
+*     the input arrays (scaling the denominator by the expose factor)
+*     and suitably modifies the variances. If BAD pixels are present
+*     they are suitably processed.  If numeric errors occur then they
+*     are trapped and the output values are set BAD.
+
+*  Arguments:
+*     BAD = LOGICAL (Given and Returned)
+*        Set to true if BAD pixels are present or generated.
+*     EL = INTEGER (Given)
+*        Number of pixels in input arrays.
+*     DARRI( EL ) = <TYPE2> (Given)
+*        The numerator array.
+*     VARRI( EL ) = <TYPE2> (Given)
+*        The numerator variance component.
+*     DCALI( EL ) = <TYPE1> (Given)
+*        The denominator array.
+*     VCALI( EL ) = <TYPE1> (Given)
+*        The denominator variance component.
+*     HAVDV = LOGICAL (Given)
+*        Set to true if the input Data component has an associated
+*        variance.
+*     HAVCV = LOGICAL (Given)
+*        Set to true if the input calibration Data component has an
+*        associated variance.
+*     DARRO( EL ) = <TYPE2> (Returned)
+*        The result array.
+*     VARRO( EL ) = <TYPE2> (Returned)
+*        The result variance component.
+*     NERR = INTEGER (Returned)
+*        The number of numeric errors which have occurred.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-MAY-1991 (PDRAPER):
+*        Original version based on KAPPA KPG1_DIVX routine.
+*     30-MAY-1991 (PDRAPER):
+*        Changed to subtract a scaled data component and renamed to
+*        ccg1_clc<t> from ccg1_ffc<t>.
+*     9-JAN-1992 (PDRAPER):
+*        Renamed CCG1_XCLY. Made doubly generic.
+*     4-OCT-1996 (PDRAPER):
+*        Changed LIB$ calls to NUM_.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Global Variables:
+      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR status flag
+
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL HAVDV
+      LOGICAL HAVCV
+      INTEGER EL
+      <TYPE2> DARRI( EL )
+      <TYPE2> VARRI( EL )
+      <TYPE1> DCALI( EL )
+      <TYPE1> VCALI( EL )
+      DOUBLE PRECISION EXPOSE
+
+*  Arguments Returned:
+      <TYPE2> DARRO( EL )
+      <TYPE2> VARRO( EL )
+      INTEGER NERR
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER IERR               ! Initial error position (dummy)
+      DOUBLE PRECISION  DUM1     ! Dummy DBLE variable
+      DOUBLE PRECISION  DUM2     ! ""
+      DOUBLE PRECISION  EXPSQ    ! Exposure squared value
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! PRIMDAT numeric conversion
+      INCLUDE 'NUM_DEF_CVT'      ! declarations
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  No variance components to process:
+*  ================================
+*  Simply subtract the two data arrays.
+      IF ( .NOT. HAVDV .AND. .NOT. HAVCV ) THEN
+
+*  Establish a numerical error handler and initialise the numerical
+*  error status and error count.
+         CALL NUM_HANDL( NUM_TRAP )
+         NUM_ERROR = SAI__OK
+         NERR = 0
+
+*  No bad values present:
+*  =====================
+         IF ( .NOT. BAD ) THEN
+
+*  Subtract the data arrays, checking for numerical errors after each
+*  calculation.
+            DO 1 I = 1, EL
+
+*  Perform the scaled subtraction in double precision.
+               DUM1 = NUM_<T2>TOD( DARRI( I ) )
+               DUM2 = NUM_<T1>TOD( DCALI( I ) )
+               DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
+               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  DARRO( I ) = VAL__BAD<T2>
+                  NERR = NERR + 1
+                  NUM_ERROR = SAI__OK
+               END IF
+1           CONTINUE
+
+*  Bad values present:
+*  ==================
+         ELSE
+            DO 2 I = 1, EL
+
+*  See if either input data value is bad. If so, then set bad output
+*  values.
+               IF ( ( DARRI( I ) .EQ. VAL__BAD<T2> ) .OR.
+     :              ( DCALI( I ) .EQ. VAL__BAD<T1> ) ) THEN
+                  DARRO( I ) = VAL__BAD<T2>
+
+*  Divide the data values, checking for numerical errors..
+               ELSE
+                  DUM1 = NUM_<T2>TOD( DARRI( I ) )
+                  DUM2 = NUM_<T1>TOD( DCALI( I ) )
+                  DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
+                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                     DARRO( I ) = VAL__BAD<T2>
+                     NERR = NERR + 1
+                     NUM_ERROR = SAI__OK
+                  END IF
+               END IF
+2           CONTINUE
+         END IF
+
+*  At least one Variance component present:
+*  ========================================
+*  If have input Variance pretend that the flatfield is noiseless
+*  and process this.
+
+      ELSE IF ( HAVDV .AND. .NOT. HAVCV ) THEN
+
+*  Establish a numerical error handler and initialise the numerical
+*  error status and error count.
+         CALL NUM_HANDL( NUM_TRAP )
+         NUM_ERROR = SAI__OK
+         NERR = 0
+
+*  No bad values present:
+*  =====================
+         IF ( .NOT. BAD ) THEN
+
+*  Subtract the data arrays, checking for numerical errors after each
+*  calculation.
+            DO 3 I = 1, EL
+               DUM1 = NUM_<T2>TOD( DARRI( I ) )
+               DUM2 = NUM_<T1>TOD( DCALI( I ) )
+               DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
+               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  DARRO( I ) = VAL__BAD<T2>
+                  NERR = NERR + 1
+                  NUM_ERROR = SAI__OK
+               END IF
+
+*  This is the noiseless case the variance is unmodified.
+               VARRO( I ) = VARRI( I )
+3           CONTINUE
+
+*  Bad values present:
+*  ==================
+         ELSE
+            DO 4 I = 1, EL
+
+*  See if either input data value is bad. If so, then set bad output
+*  values.
+               IF ( ( DARRI( I ) .EQ. VAL__BAD<T2> ) .OR.
+     :              ( DCALI( I ) .EQ. VAL__BAD<T1> ) ) THEN
+                  DARRO( I ) = VAL__BAD<T2>
+                  VARRO( I ) = VAL__BAD<T2>
+
+*  Divide the data values, checking for numerical errors..
+               ELSE
+                  DUM1 = NUM_<T2>TOD( DARRI( I ) )
+                  DUM2 = NUM_<T1>TOD( DCALI( I ) )
+                  DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
+                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                     DARRO( I ) = VAL__BAD<T2>
+                     NERR = NERR + 1
+                     NUM_ERROR = SAI__OK
+                  END IF
+               END IF
+
+*  This is the noiseless case the variance is unmodified.
+               VARRO( I ) = VARRI( I )
+4           CONTINUE
+         END IF
+
+*  Remove the numerical error handler.
+         CALL NUM_REVRT
+
+*  Have both variance components to process
+*  ========================================
+      ELSE
+
+*  Calculate EXPOSE squared
+         EXPSQ = EXPOSE * EXPOSE
+
+*  Establish a numerical error handler and initialise the numerical
+*  error status and error count.
+         CALL NUM_HANDL( NUM_TRAP )
+         NUM_ERROR = SAI__OK
+         NERR = 0
+
+*  No bad values present:
+*  =====================
+         IF ( .NOT. BAD ) THEN
+
+*  Divide the data arrays, checking for numerical errors after each
+*  calculation.
+            DO 5 I = 1, EL
+               DUM1 = NUM_<T2>TOD( DARRI( I ) )
+               DUM2 = NUM_<T1>TOD( DCALI( I ) )
+               DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
+               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  DARRO( I ) = VAL__BAD<T2>
+                  NERR = NERR + 1
+                  NUM_ERROR = SAI__OK
+               END IF
+
+*  Derive the variance value for the same values, again checking for
+*  numerical errors.
+               DUM1 = NUM_<T2>TOD( VARRI( I ) )
+               DUM2 = NUM_<T1>TOD( VCALI( I ) )
+               VARRO( I ) = NUM_DTO<T2>( DUM1 + EXPSQ * DUM2 )
+               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  VARRO( I ) = VAL__BAD<T2>
+                  NERR = NERR + 1
+                  NUM_ERROR = SAI__OK
+               END IF
+5           CONTINUE
+
+*  Bad values present:
+*  ==================
+         ELSE
+            DO 6 I = 1, EL
+
+*  See if either input data value is bad. If so, then set bad output
+*  values.
+               IF ( ( DARRI( I ) .EQ. VAL__BAD<T2> ) .OR.
+     :              ( DCALI( I ) .EQ. VAL__BAD<T1> ) ) THEN
+                  DARRO( I ) = VAL__BAD<T2>
+                  VARRO( I ) = VAL__BAD<T2>
+
+*  Divide the data values, checking for numerical errors..
+               ELSE
+                  DUM1 = NUM_<T2>TOD( DARRI( I ) )
+                  DUM2 = NUM_<T1>TOD( DCALI( I ) )
+                  DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
+                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                     DARRO( I ) = VAL__BAD<T2>
+                     NERR = NERR + 1
+                     NUM_ERROR = SAI__OK
+                  END IF
+
+*  See if either input variance value is bad. If so, then set a bad
+*  output variance value.
+                  IF ( ( VARRI( I ) .EQ. VAL__BAD<T2> ) .OR.
+     :                 ( VCALI( I ) .EQ. VAL__BAD<T1> ) ) THEN
+                     VARRO( I ) = VAL__BAD<T2>
+
+*  Calculate the output variance value, again checking for numerical
+*  errors.
+                  ELSE
+                     DUM1 = NUM_<T2>TOD( VARRI( I ) )
+                     DUM2 = NUM_<T1>TOD( VCALI( I ) )
+                     VARRO( I ) = NUM_DTO<T2>( DUM1 + EXPSQ * DUM2 )
+                     IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                        VARRO( I ) = VAL__BAD<T2>
+                        NERR = NERR + 1
+                        NUM_ERROR = SAI__OK
+                     END IF
+                  END IF
+               END IF
+ 6          CONTINUE
+         END IF
+
+*  Remove the numerical error handler.
+         CALL NUM_REVRT
+      END IF
+
+*  Update BAD flag.
+      BAD = BAD .OR. ( NERR .NE. 0 )
+
+99    CONTINUE
+      END
+* $Id$

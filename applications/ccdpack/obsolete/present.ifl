@@ -1,0 +1,384 @@
+#+
+#  Name:
+#     PRESENT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface PRESENT
+
+   helplib  'CCDPACK_HELP:'
+
+   parameter SIMPLE              # Whether input NDF names specified in
+				 # one.
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Do input NDFs already have frame types'
+      helpkey  '*'
+   endparameter
+
+   parameter MULTIENTRY          # Whether input group also has NDF
+				 # types and factors.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Does input list contain frame types and factors'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*'
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter MODIFY
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Modify existing extension items'
+      helpkey  '*'
+   endparameter
+
+   parameter BIAS
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Bias frame names'
+      helpkey  '*'
+   endparameter
+
+   parameter TARGET
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Target frame names'
+      helpkey  '*'
+   endparameter
+
+   parameter DARK
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Dark frame names'
+      helpkey  '*'
+   endparameter
+
+   parameter FLASH
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Pre-flash frame names'
+      helpkey  '*'
+   endparameter
+
+   parameter FLAT
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Flatfield names'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERBIAS
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Name of master bias'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERDARK
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Name of master dark'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERFLASH
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Name of master flash'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERFLAT
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Master flatfield names'
+      helpkey  '*'
+   endparameter
+
+   parameter ADDDARK
+      type    _LOGICAL
+      access  READ
+      vpath   'DYNAMIC,CURRENT,DEFAULT'
+      ppath   'DYNAMIC,CURRENT,DEFAULT'
+      default FALSE
+      prompt  'Add dark exposure times to NDFs'
+      helpkey '*'
+   endparameter
+
+   parameter ADDFLASH
+      type    _LOGICAL
+      access  READ
+      vpath   'DYNAMIC,CURRENT,DEFAULT'
+      ppath   'DYNAMIC,CURRENT,DEFAULT'
+      default FALSE
+      prompt  'Add pre-flash exposure times to NDFs'
+      helpkey '*'
+   endparameter
+
+   parameter FTYPE		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Frame type'
+      helpkey  '*'
+   endparameter
+
+   parameter FILTER		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Filter type'
+      helpkey  '*'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion
+                                 # factor
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Number of electrons per ADU'
+      association '<-global.ccdpack_adc'
+      helpkey  '*'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Pixel indices of bias strips (in pairs)'
+      association '<-global.ccdpack_bounds'
+      default   !
+      helpkey  '*'
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout noise (ADUs)'
+      association '<-global.ccdpack_rnoise'
+      helpkey  '*'
+   endparameter
+
+   parameter BIASVALUE		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Nominal bias value (ADUs)'
+      association '<-global.ccdpack_biasval'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Data saturation value (ADUs)'
+      association '<-global.ccdpack_satval'
+      helpkey  '*'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout direction (X or Y)'
+      association '<-global.ccdpack_direct'
+      helpkey  '*'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Deferred charge (ADUs)'
+      association '<-global.ccdpack_defer'
+      helpkey  '*'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Useful CCD region (xmin,xmax,ymin,ymax)'
+      default  !
+      association '<-global.ccdpack_extent'
+      helpkey  '*'
+   endparameter
+
+   parameter DARKTIME            # Frame dark time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Dark count exposure time'
+      helpkey  '*'
+   endparameter
+
+   parameter FLASHTIME           # Frame pre-flash exposure time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Pre-flash exposure time'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Input NDF name list'
+   endparameter
+
+   parameter ONEFILTER
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Use one filter type'
+      helpkey  '*'
+   endparameter
+
+   parameter ONEDARKTIME
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Use one dark count exposure time'
+      helpkey  '*'
+   endparameter
+
+   parameter ONEFLASHTIME
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Use one pre-flash exposure time'
+      helpkey  '*'
+   endparameter
+
+   parameter ZEROED
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Does the MASTER_BIAS frame have a mean of zero'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERS
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Do you have some master calibration frames'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,17 @@
+#  Setup for ING EEV5, quick speed readout. Warning useful area unknown.
+#
+#  Derived from ING document eev5, Tue Nov 29 1994.
+#
+#  Real size = 1242x1152, clocked size = 1280x1180
+#
+#  Only one strip (the underscan) recommended for use and of this only
+#  1,1000 in Y.
+
+ADC = 1.4
+RNOISE = 4.2
+EXTENT = UNKNOWN
+DIRECTION = X
+BOUNDS = 1,20
+SATURATION = 61440
+
+# $Id$

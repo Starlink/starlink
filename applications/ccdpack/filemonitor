@@ -1,0 +1,93 @@
+#!/bin/sh
+#  N.B. the previous line should be blank (changed for Linux).
+#+
+#  Name:
+#     filemonitor
+
+#  Purpose:
+#     Displays the contents of a file, updating as new input 
+#     is written.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This routine initializes a GUI that monitors the contents of
+#     a file. The files contents are displayed in a text widget, as
+#     it contents change the text widget is updated to display the 
+#     next contents. 
+# 
+#     This is intended to monitor the progress of a background job.
+
+#  Invocation:
+#     filemonitor file
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-NOV-1995 (PDRAPER):
+#        Original version.
+#     10-DEC-1996 (PDRAPER):
+#        Modified invocation to explicity use /bin/sh 
+#        as invocation fails from Tcl otherwise on Linux.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Check that CCDPACK_DIR is around.
+
+if test "$CCDPACK_DIR" = ""; then
+  echo "!! Cannot start filemonitor; CCDPACK_DIR environment variable not set."
+  exit 1
+fi
+
+#  Standalone TCL initialisations (necessary while CCDPACK distributes
+#  ccdwish binaries).
+
+TCL_LIBRARY=$CCDPACK_DIR
+TK_LIBRARY=$CCDPACK_DIR
+export TCL_LIBRARY
+export TK_LIBRARY
+
+#  Notes:
+#     The ${1+"$@"} passes on any command line arguments? Perhaps $0
+#     is also required?
+
+#  Check all the necessary elements are available and start up the GUI.
+
+if test -r $CCDPACK_DIR/CCDFileMonitorMain.tcl ; then
+  if test -x $CCDPACK_DIR/ccdwish ; then
+
+#  Try to stop problems with the AMS rendevous files by creating a
+#  new directory as ADAM_USER.
+    OLD_ADAM_USER=${ADAM_USER:-"${HOME}/adam"}
+    ADAM_USER=${OLD_ADAM_USER}/geometry_$$
+    export ADAM_USER    
+
+#  Make sure directory exists.
+    if test -d $ADAM_USER; then
+      rm -r -f $ADAM_USER
+    fi
+    mkdir -p $ADAM_USER
+
+#  Make sure we clean up on exit.
+    trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
+
+#  And run up interface.
+    $CCDPACK_DIR/ccdwish $CCDPACK_DIR/CCDFileMonitorMain.tcl ${1+"$@"}
+    exit
+  else
+    echo "!! Cannot start filemonitor; failed to locate $CCDPACK_DIR/ccdwish."
+    exit 1
+  fi
+else
+  echo "!! Cannot start filemonitor; failed to locate $CCDPACK_DIR/CCDFileMonitorMain.tcl."
+  exit 1
+fi
+
+# $Id$

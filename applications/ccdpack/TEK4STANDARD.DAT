@@ -1,0 +1,19 @@
+#  Setup for ING TEK4, standard speed readout.
+#
+#  Derived from ING document tek4, October 18 1994.
+#
+#  Real size = 1024x1024, clocked size = 1124x1124.
+#
+#  Only one strip (the underscan) recommended for use and of this only
+#  100:500 in Y.
+#
+#  The EXTENT assumes the ING standard configuration.
+
+ADC = 0.75
+RNOISE = 6.1
+SATURATION = 61440
+EXTENT = 51,1074,1,1024
+DIRECTION = X
+BOUNDS = 11,40
+
+# $Id$

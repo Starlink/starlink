@@ -1,0 +1,105 @@
+*+
+*  Name:
+*     CCD1_MOSCM
+
+*  Purpose:
+*     Define global variables for the MAKEMOS application.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables for the MAKEMOS application
+*     which forms mosaics from multiple NDFs. These variables are used
+*     to pass data to service routines called by the NAG library.
+
+*  Prior Requirements:
+*     This include file must be preceded by the CCD1_PAR and CCD1_MOSPR
+*     include files which define necessary constants.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-APR-1992 (RFWS):
+*        Original version.
+*     22-SEP-1992 (RFWS):
+*        Added the CCD1_MORIG, CCD1_RNG1 and CCD1_RNG2 variables to
+*        provide well-scaled values during optimisation of the scale
+*        factor and zero point corrections.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Array of standard errors for the observed scale factor differences
+*  obtained when data arrays are inter-compared in pairs.
+      DOUBLE PRECISION CCD1_DDIFS( CCD1__MXCMP )
+
+*  Similar array of standard errors for the observed zero point
+*  differences.
+      DOUBLE PRECISION CCD1_DDIFZ( CCD1__MXCMP )
+
+*  Array to contain the observed scale factor differences (plus an
+*  extra element for use by NAG routines to constrain the optimised
+*  corrections obtained).
+      DOUBLE PRECISION CCD1_DIFS( CCD1__MXCMP + 1 )
+
+*  Array to contain the observed zero point differences (plus an extra
+*  element for use by NAG routines to constrain the optimised
+*  corrections obtained).
+      DOUBLE PRECISION CCD1_DIFZ( CCD1__MXCMP + 1 )
+
+*  Weighted mean false origin value used for each data array involved
+*  in inter-comparisons (used as a reference to ensure a good starting
+*  point and to avoid numerical problems when optimising the zero point
+*  corrections in the presence of scale factor corrections).
+      DOUBLE PRECISION CCD1_MORIG( CCD1__MXNDF )
+
+*  Array of "false origin" values used when obtaining the scale factor
+*  and zero point differences.
+      DOUBLE PRECISION CCD1_ORIG( CCD1__MXCMP )
+
+*  Approximate range of values expected for the optimised logarithmic
+*  scale factor and zero point corrections (used for scaling the
+*  optimisation process to avoid numerical problems).
+      DOUBLE PRECISION CCD1_RNG1
+      DOUBLE PRECISION CCD1_RNG2
+
+*  Arrays of weighting factors for use when solving for global
+*  corrections. If only one parameter is being corrected, then the
+*  CCD1_WT1 array is used. If two parameters are involved, then
+*  CCD1_WT1 is used to weight the logarithmic scale factor residuals
+*  and CCD1_WT2 is used for the zero point residuals.
+      DOUBLE PRECISION CCD1_WT1( CCD1__MXCMP )
+      DOUBLE PRECISION CCD1_WT2( CCD1__MXCMP )
+
+*  Array of pairs of integers giving the indices of the two data arrays
+*  involved in each inter-comparison.
+      INTEGER CCD1_IPAIR( 2, CCD1__MXCMP )
+
+*  Index of the "reference NDF" to which the others should be
+*  normailsed when scale factor or zero point corrections are applied
+*  (set to zero if there is no reference NDF).
+      INTEGER CCD1_IREF
+
+*  Number of equations and unknowns in non-linear system.
+      INTEGER CCD1_N, CCD1_M
+
+*  Common block.
+      COMMON /MOS_CMN/ CCD1_DIFS, CCD1_DDIFS, CCD1_DIFZ, CCD1_DDIFZ,
+     :                 CCD1_MORIG, CCD1_RNG1, CCD1_RNG2, CCD1_WT1,
+     :                 CCD1_WT2, CCD1_ORIG, CCD1_IPAIR, CCD1_IREF,
+     :                 CCD1_N, CCD1_M
+      SAVE /MOS_CMN/
+
+*.
+* $Id$

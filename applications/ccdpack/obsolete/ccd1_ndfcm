@@ -1,0 +1,40 @@
+*+
+*  Name:
+*     CCD1_NDFCM
+
+*  Purpose:
+*     Define CCDPACK NDF access common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines the CCDPACK common block for containing the
+*     primary locators to NDFs.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     31-OCT-1991 (PDRAPER):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Define space for storing locators to NDFs.
+      CHARACTER * ( DAT__SZLOC ) CCD1_TLOC( CCD1__MXNDF )
+
+*  Number of locators stored in common
+      INTEGER CCD1_NACC
+
+*  Define separate common blocks for character variables.
+      COMMON/ CCD1_NDFCM1 / CCD1_TLOC
+      COMMON/ CCD1_NDFCM2 / CCD1_NACC
+* $Id$

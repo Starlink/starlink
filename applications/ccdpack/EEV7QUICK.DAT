@@ -1,0 +1,18 @@
+#  Setup for ING EEV7, quick speed readout. Warning no useful area available.
+#
+#  Derived from ING document eev7, Tue Nov 29 1994.
+#
+#
+#  Real size = 1242x1152, clocked size = 1280x1180
+#
+#  Only one strip (the underscan) recommended for use and of this only
+#  100:1000 in Y.
+
+ADC = 1.33
+RNOISE = 3.8
+SATURATION = 56320
+EXTENT = UNKNOWN 
+DIRECTION = X
+BOUNDS = 5,15
+
+# $Id$

@@ -1,0 +1,199 @@
+      SUBROUTINE CCG1_GVAR<T>( ARR, VAR, EL, RNOISE, ADC, NERR, STATUS )
+*+
+*  Name:
+*     CCG1_GVAR
+
+*  Purpose:
+*     To generate the variances of a bias subtracted CCD frame.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_GVAR<T>( ARR, VAR, EL, RNOISE, ADC, NERR, STATUS )
+
+*  Description:
+*     The routine forms the value: DATA / ADC + RNOISE**2, as a
+*     estimate of the noise in a CCD frame, if any values are already
+*     present in the variance array they are added to this value. In
+*     this way the variance contribution can be summed on going through
+*     the bias subtraction phase (which the previously written
+*     variances are derived from - they should be the bias frame
+*     variances). The value DATA * ADC is equal to its poissonian
+*     variance, and the readout noise is that due to the on chip ADC.
+*     Note - the readout noise should be in ADUs also
+*     The routine guards against numeric errors (VAX specific), the
+*     number of errors is returned in the parameter NERR.
+
+*  Arguments:
+*     ARR( EL ) = <COMM> (Given)
+*        The input array of CCD data values in ADUs.
+*     VAR( EL ) =<COMM> (Given and Returned)
+*        The variance array - value already present in this will be
+*        added to the noise estimate for the CCD data.
+*     EL = INTEGER (Given)
+*        Size of the data and variance arrays.
+*     RNOISE = DOUBLE PRECISION (Given)
+*        The readout noise in ADUs.
+*     ADC = DOUBLE PRECISION (Given)
+*        The CCD gain factor - converts the data values in CCD array to
+*        detected electrons.
+*     NERR = INTEGER (Returned)
+*        The number of numeric errors which occurred when performing the
+*        variance generation. If NERR is equal to EL on exit the status
+*        is set and an error message issued.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  Notes:
+*     - The observed variance (Vo in ADUs) in the output from a CCD is
+*     given by:
+*
+*     Vo = Ro**2 + So * G
+*
+*     were Ro is the readout noise and So the signal level in ADUs.
+*     Consequently the input data to this routine should be in ADUs
+*     for the analysis to be correct. The value G is the `gain' this is
+*     in ADUs per electron and is the inverse factor to the usual value
+*     the ADC conversion factor (ADC) which converts ADUs into
+*     electrons (i.e. is in electrons per ADU) this is the factor
+*     which this routine requires.
+*
+*     -  Vax specific.
+
+*  History:
+*     26-APR-1991 (PDRAPER):
+*        Original version.
+*     12-DEC-1991 (PDRAPER):
+*        Included numeric error traps - non portable.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value constants
+
+*  Global variables:
+      INCLUDE 'NUM_CMN'          ! NUM common block definition defines
+                                 ! NUM_ERROR
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> ARR( EL )
+      DOUBLE PRECISION RNOISE
+      DOUBLE PRECISION ADC
+
+*  Arguments Given and Returned:
+      <TYPE> VAR( EL )
+
+*  Arguments Returned:
+      INTEGER NERR
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER NUM_TRAP
+      EXTERNAL NUM_TRAP          ! Condition handler
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      DOUBLE PRECISION NOISE     ! Readout noise squared
+      DOUBLE PRECISION NEWVAR    ! New variance estimate
+      DOUBLE PRECISION IADC      ! Inverse ADC value (the `gain')
+      INTEGER NGOOD              ! Number of non bad pixels.
+      INTEGER BADVAR             ! Number of BAD variances
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion routines
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Establish the condition handler.
+      CALL NUM_HANDL( NUM_TRAP )
+
+*  Initialise the error flag.
+      NUM_ERROR = SAI__OK
+
+*  Set number of numeric errors
+      NERR = 0
+
+*  Initialise good pixel count.
+      NGOOD = 0
+
+*  Initialise bad variance count.
+      BADVAR = 0
+
+*  Loop over the whole array, if the input data value in not BAD then
+*  generate a variance estimate. If the corresponding variance element
+*  is not BAD then add this new value to it, otherwise just set the
+*  variance to the derived value.
+      NOISE = RNOISE * RNOISE
+      IADC = 1.0D0 / MAX( 1.0D-20, ADC )
+      DO 1 I = 1, EL
+         IF ( ARR( I ) .NE. VAL__BAD<T> ) THEN
+
+*  Add one to good pixel count.
+            NGOOD = NGOOD + 1
+
+*  Work out noise value.
+            NEWVAR = NUM_<T>TOD( ARR( I ) ) * IADC + NOISE
+
+*  If have an input variance then add this contribution to this
+*  else just set to this value.
+            IF ( VAR( I ) .NE. VAL__BAD<T> ) THEN
+               VAR( I ) = VAR( I ) + NUM_DTO<T>( NEWVAR )
+            ELSE
+               VAR( I ) = NUM_DTO<T>( NEWVAR )
+            END IF
+
+*  Check for numeric error and that variance is greater than zero.
+            IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               NERR = NERR + 1
+               NUM_ERROR = SAI__OK
+
+*  Set output value BAD.
+               VAR( I ) = VAL__BAD<T>
+            ELSE IF ( VAR( I ) .LE. 0<CONST> ) THEN
+
+*  Cannot have a negative variance.
+               VAR( I ) = VAL__BAD<T>
+
+*  Increment BADVAR count - expect some bad variances from bias strips
+*  so exclude these from numeric counts.
+               BADVAR = BADVAR + 1
+            END IF
+         END IF
+ 1    CONTINUE
+
+*  Check that the number of numeric errors if not equal to NGOOD. If
+*  this is true then no variances have been produced, this is not a
+*  useful result.
+      IF ( ( NERR + BADVAR ) .EQ. NGOOD ) THEN
+         STATUS = SAI__ERROR
+         CALL CCD1_ERREP( 'CCG1_GVAR1',
+     :   '  CCG1_GVAR: Cannot generate variances using a data '//
+     :   'type of <HTYPE> - '//
+     :   'complete numeric over or underflow' ,
+     :   STATUS )
+      END IF
+
+*  Release the numeric error handler.
+      CALL NUM_REVRT
+
+      END
+* $Id$

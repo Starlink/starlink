@@ -1,0 +1,59 @@
+#! /bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+TCL_LIBRARY=$CCDPACK_DIR;TK_LIBRARY=$CCDPACK_DIR;export TCL_LIBRARY;export TK_LIBRARY;exec $CCDPACK_DIR/atclsh $0 ${1+"$@"}
+#
+#  Read a GLITCH file and convert it into an ARD file.
+#
+if { $argc == 0 } { 
+   puts -nonewline "Name of glitch file:"
+   set glitch_file [gets stdin] 
+} else {
+   set glitch_file [lindex $argv 0]
+}
+if { ! [file readable $glitch_file] } { 
+   puts stderr "Cannot read glitch file $glitch_file"
+   exit 1
+} else { 
+    if { $argc == 1 || $argc == 0 } { 
+	puts -nonewline "Name of ARD file:"
+	set ard_file [gets stdin]
+    } else { 
+	set ard_file [lindex $argv 1]
+    }
+    if { $ard_file != "" } { 
+       set a [open $ard_file w]
+    } else { 
+       set a -1
+    }
+    if { $a == -1 } { 
+	puts stderr "Cannot create ARD file $ard_file"
+	exit 1
+    } else { 
+	set g [open $glitch_file r] 
+	if { $g == -1 } {
+	    puts stderr "Cannot open glitch file $glitch_file"
+	    exit 1 
+	} else {
+
+#  Both files available and open, so proceed to read in the 
+#  glitch file and transform its contents to an ARD file.
+            puts $a "\#  ARD file generated from glitch file $glitch_file"
+            puts $a "\#"
+            catch { puts $a "\#  on [exec date] by [exec whoami]" }
+            puts $a "\#"
+
+# Throw away first line.
+            set line [gets $g]
+            while { [gets $g line] != -1 } { 
+
+#  Get X and Y.
+               scan $line "%d %d" X Y
+               puts $a "PIXEL($X,$Y)"
+            }
+            close $a
+            close $g
+        }
+    }
+}
+exit
+# $Id$

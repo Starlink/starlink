@@ -1,0 +1,159 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     irg_wild
+
+#  Purpose:
+#     Wildcards files into a list for use by NDF applications.
+
+#  Type of Module:
+#     Bourne shell script
+
+#  Usage:
+#     irg_wild filename_pattern [filename_pattern] ...
+
+#  Description:
+#     This routine is designed to output a list of files that can be
+#     processed by applications that use the NDF library. The
+#     filenames are typically specified as a set of patterns (that
+#     most likely contain wildcards such as "*" and "?"). The patterns
+#     are expanded into a filename listing that contains only files
+#     that can be processed by NDF applications. The list is also
+#     correct in that any duplicate filenames (with different
+#     extensions) are sorted using the priority specified in the 
+#     NDF_FORMATS_IN environment variable.
+
+#  Examples:
+#
+#     irg_wild "*"
+#        This list all the files in the current directory that 
+#        can be processed. Any duplicates are removed according
+#        to the priority defined the NDF_FORMATS_IN variable. 
+#        
+#     irg_wild "*.fit" "*.imh"
+#        This example would output a list of all the files with 
+#        extensions ".fit" and ".imh".
+
+#  Notes:
+#     - Any files returned by this routine only exist, they are not
+#     guaranteed to be genuine data files (in the case of NDF, they
+#     could well be HDS files that do not contain NDFs). This fact can
+#     only be ascertained by accessing them using the appropriate
+#     libraries (or format conversion applications).
+#
+#     - If the variable NDF_FORMATS_IN isn't set then only files
+#     ending with the extension .sdf are returned.
+#
+#     - Explicitly named files are not always returned. This happens
+#     when two (or more) files with the same name but different extensions
+#     are located. Only the file with higher priority in the 
+#     NDF_FORMATS_IN string will be returned (even if this second
+#     name is "only" picked up from pattern).
+
+#  Authors:
+#     RFWS: Rodney Warren-Smith (Starlink)
+#     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     Mists of time (RFWS):
+#        Original version.
+#     25-FEB-1997 (PDRAPER):
+#        Added comments & prologue, changed to use NDF_FORMATS_IN
+#        instead of hardcoded file types. Also modified to ignore
+#        any types not present in NDF_FORMATS_IN. Fixed comparisons
+#        to work with old awk on Solaris. Sorted out case when have
+#        multiple input patterns, later patterns always overwrote
+#        earlier ones.
+#     22-MAR-1997 (PDRAPER):
+#        Added check for file existence immediately after creating 
+#        all possible names (this fixes the problem where say a file
+#        "m.fit" isn't seen when its name is given as "m" because
+#        the preferred expansion name is "m.sdf").
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Parse NDF_FORMATS_IN to extract the types that are available. Note
+#  that .sdf if always available and is first.
+types='.sdf'
+if test "$NDF_FORMATS_IN" != ""; then
+
+#  Construct a list of the existing types listed in NDF_FORMATS_IN.
+#  This splits the string into words (which were separated by commas)
+#  and then removes all characters up to and including the first (
+#  finally removes the last ).
+
+   oldIFS=$IFS
+   IFS=","
+   for f in $NDF_FORMATS_IN; do
+      types="$types `echo $f | sed -e 's/.*(//' -e 's/)//'`"
+   done
+   IFS=$oldIFS
+fi
+
+#  Now for each file pattern. Each pattern is globed by the shell and
+#  processed by awk to output a list of files (possibly prepended by
+#  the known extensions). All these names are then checked for existence.
+#  If they exist then they are processed further to remove any names that
+#  are duplicated using a different file extension (the priority in this
+#  case is determined by the order within the NDF_FORMATS_IN string).
+#  This effect is achieved by using the filename without
+#  an extension to index the results array. If the element of the
+#  array already exists then a check is made to test if it is already
+#  written by a lower order extension type, if not the new value is
+#  stored.  The final names are then sorted and printed to standard
+#  output.
+
+for file in `for pattern in "${@}"; do
+                echo "${pattern}"
+             done | awk '
+                    {
+                       if ( $0 ~ /\.$/ ) {
+                          print( substr( $0, 1, length( $0 ) - 1 ) )
+                       } else if ( $0 ~ /\.[^\/]*$/ ) {
+                          print
+                       } else {
+                          if ( ! nt ) nt = split( types, type )
+                          for ( i = nt; i > 0; i-- ) {
+                             printf( "%s%s\n", $0, type[ i ] )
+                          }
+                       }
+                    }' types="${types}" -`; do
+   echo "${file}"
+done | for file in `cat`; do
+             if test -f "${file}"; then
+                echo "${file}" 
+             fi 
+       done | awk '
+       {
+          if ( ! nt ) nt = split( types, type )
+          file = ""
+          for ( i = 1; i <= nt; i++ ) {
+             nbits = split( $0, bits, "." )
+             if ( "."bits[ nbits ] == type[ i ] ) {
+                file = substr( $0, 1, length( $0 ) - length( type[ i ] ) )
+                break
+             }
+          }
+          if ( file != "" ) { 
+             if ( result[ file ] != "" ) {
+                if ( rtype[ file ] > i ) {
+                   result[ file ] = $0
+                   rtype[ file ] = i
+                }
+             } else {
+                result[ file ] = $0
+                rtype[ file ] = i
+             }
+          }
+       } END {
+          for ( i in result ) {
+             print( result[ i ] )
+          }
+       }' types="${types}" - | sort -u 
+

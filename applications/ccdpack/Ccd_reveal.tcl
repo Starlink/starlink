@@ -1,0 +1,300 @@
+   itcl_class Ccd_reveal {
+
+#+
+#  Name:
+#     Ccd_reveal
+
+#  Type of Module:
+#     [incr Tcl] class
+
+# Purpose:
+#     Provides a class for hiding and revealing many sub-windows within
+#     one window.
+
+#  Description:
+#     This class provides a method for controlling the display of one
+#     of a set of related windows in a larger window. A row of radio
+#     buttons are programmed to reveal a named window (and all of its
+#     packed children), in a space above or below the button bar. This
+#     is for use when many displays of information are required, but
+#     window size considerations make it possible to view only one at
+#     a time.
+#
+#           +--------------------------------------------+
+#           |   +------+  +------+  +------+  +------+   |
+#           |   |View 1|  |View 2|  |View 3|  |View 4|   |
+#           |   +------+  +------+  +------+  +------+   |
+#           +--------------------------------------------+
+#           |                                            |
+#           |                                            |
+#           |                                            |
+#           |                  V I E W  1                |
+#           |                                            |
+#           |                                            |
+#           |                                            |
+#           +--------------------------------------------+
+#
+#     So pressing button "View 2" would unpack the "VIEW 1" window and
+#     pack into its place "VIEW 2" etc.
+#
+#     Note that unless you provide a -in option then the windows
+#     revealed should be created after invoking this class and need to
+#     be descended from the instance created (so that packing
+#     works). No information about the actual contents of the windows
+#     is contained here, so for a tidy exit they should be destroyed
+#     before this.
+
+#  Invocations:
+#
+#        Ccd_reveal window [-option value]...
+#
+#     This command creates an instance of a "Ccd_reveal" and returns a
+#     command "window" for manipulating it via the methods and
+#     configuration options described below. Configuration options may
+#     be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
+
+#  Configuration options:
+#
+#        -placebar (top|bottom|left|right)
+#
+#     This option configures where to place the choice (button) bar
+#     component, either above, below, to the left or to the right of
+#     the part to contain the windows that are revealed.
+#
+#        -stack (horizontal|vertical|array)
+#
+#     Controls how the array of buttons are displayed (See Ccd_radioarray).
+#
+#         -columns columns
+#
+#     Number of columns used when -stack is set to array.
+#
+#         -label "string"
+#
+#     String for labelling the radiobuttons (See Ccd_radioarray).
+#
+#          -in window
+#
+#     Name of a window to pack the revealed window into. This must
+#     exist and be a parent or a descendent of the parent of the
+#     windows to be controlled. If not supplied this defaults to the
+#     name of this instance, so the windows to be controlled should be
+#     children of this. Reconfiguring in will apply to all windows.
+
+#  Methods:
+#     constructor [-option value]...
+#        This method is invoked automatically by the class command and
+#	 creates the "Ccd_reveal" widget with a default configuration,
+#	 except when overridden by command line options.
+#     destructor
+#        Destroys the "Ccd_reveal" instance, invoked by the "delete"
+#        method.
+#     configure [-option value]...
+#        Activates the configuration options. If no configuration value
+#	 is given then the current value of any known option is returned
+#	 in a form similar (but not identical to) the Tk widget command.
+#     addbutton text [window]
+#        This method adds a button to the choice bar and enters the
+#        text as its label. The window argument is optional and should
+#        be the name of a window to reveal in response to a press of
+#        this button.
+#     addwindow text window
+#        Adds/replaces a window associated with the button whose label
+#        is "text".
+#     resettext name text
+#        Set the text label of a button to a new value.
+#     seewindow window
+#        Reveals the named window (must be registered with a button).
+
+
+#  Inheritance:
+#     This class inherits "Ccd_base" and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     {15-JUN-1995} (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+#  Inheritances:
+      inherit Ccd_base
+
+#.
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Construction creates a instance of the class and configures it with
+#  the default and command-line options.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      constructor { config } {
+
+#  Create a base frame widget. This must have the same name as the class
+#  command.
+         Ccd_base::constructor
+
+#  Create the radioarray bar for the containing the buttons.
+         Ccd_radioarray $oldthis.bar
+
+#  Set default configurations.
+         configure -placebar          $placebar
+         configure -columns           $columns
+         configure -stack             $stack
+         configure -label             $label
+
+#  Define sub-component widgets for configuration via the wconfig
+#  method.
+         set widgetnames($oldthis:bar) $oldthis.bar
+      }
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Methods.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Add a button to the choice bar.
+      method addbutton { text args } {
+         if { $args == "" } {
+            $oldthis.bar addbutton $text [list $text]
+         } else {
+            $oldthis.bar addbutton $text [list $text] "$oldthis seewindow $args"
+            set lastwin $args
+         }
+      }
+
+#  Change/add window to be revealed.
+      method addwindow { text window } {
+         $oldthis.bar addcommand $text "$oldthis seewindow $window"
+      }
+
+#  Change the revealed window (use the last window if none given).
+      method seewindow { window } {
+         if { $window == "" } {
+            if { $lastwin != "" } {
+               set window $lastwin
+            }
+         }
+         if { $packed != $window } {
+            if { $packed != "" } {
+               pack forget $packed
+            }
+            switch -exact $placebar {
+               top {
+                  pack $window -in $in -side bottom -fill both -expand true
+                  pack $oldthis.bar -side top -fill x
+               }
+               bottom {
+                  pack $window -in $in -side top -fill both -expand true
+                  pack $oldthis.bar -side bottom -fill x
+               }
+               left {
+                  pack $window -in $in -side right -fill both -expand true
+                  pack $oldthis.bar -side left -fill y
+               }
+               right {
+                  pack $window -in $in -side left -fill both -expand true
+                  pack $oldthis.bar -side right -fill y
+               }
+            }
+            set packed $window
+         }
+      }
+
+#  Return the name of the currently select window.
+      method current {} {
+         if { $packed != "" } {
+            return $packed
+         } else {
+            return ""
+         }
+      }
+
+#  Invoke the button associated with a window.
+      method invoke name {
+         if { $name != "" } {
+            $oldthis.bar invoke $name
+         }
+      }
+
+#  Set a button text string to a new value.
+      method resettext { name text } {
+         $oldthis.bar resettext $name $text
+      }
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Configuration options:
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Where to place the array of radio buttons.
+      public placebar {top} {
+         if $exists {
+            if { $packed != "" } {
+               set window $packed
+               set packed ""
+               seewindow $window
+            } else {
+               switch -regexp $placebar {
+                  (top|bottom) {
+                     pack $oldthis.bar -side $placebar -fill x
+                  }
+                  (left|right) {
+                     pack $oldthis.bar -side $placebar -fill y
+                  }
+               }
+            }
+         }
+      }
+
+#  Label for the radiobuttons.
+      public label {} {
+         if $exists {
+            $oldthis.bar configure -label $label
+         }
+      }
+
+#  Stack method for the radiobuttons.
+      public stack {array} {
+         if $exists {
+            $oldthis.bar configure -stack $stack
+         }
+      }
+
+#  Number of columns used when stacking in an array.
+      public columns 5 {
+         if $exists {
+            $oldthis.bar configure -columns $columns
+         }
+      }
+
+#  Window to parent the windows that are controlled.
+      public in {} {
+         if { $in == "" } {
+            set in $oldthis
+         }
+      }
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Common and protected variables.  Common are visible to all instances
+#  of this class, protected to just this instance (both are available
+#  anywhere in the scope of this class and in derived classes).
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Name of currently packed window.
+      protected packed ""
+
+#  Name of last window
+      protected lastwin ""
+
+#  End of class defintion.
+   }
+
+# $Id$

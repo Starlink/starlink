@@ -1,0 +1,74 @@
+      SUBROUTINE CCG1_COPA<T>( DIM, ARRIN, ARROUT, STATUS )
+*+
+*  Name:
+*     CCG1_COPA<T>
+
+*  Purpose:
+*     To copy one vectorised array to another.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_COPA<T>( DIM, ARRIN, ARROUT, STATUS )
+
+*  Description:
+*     The input array, ARRIN, of dimension DIM, is copied into the
+*     output array, ARROUT, of the same dimension.
+
+*  Arguments:
+*     DIM = INTEGER(Given)
+*           Dimension of the input and output arrays.
+*     ARRIN( DIM ) = <COMM>(Given)
+*           The array to be copied.
+*     ARROUT( DIM ) = <COMM>(Returned)
+*           Output array containing copy of the input array.
+*     STATUS = INTEGER (Given and Returned)
+*           Global Status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-MAY-1991 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER DIM
+      <TYPE> ARRIN( DIM )
+
+*  Arguments Returned:
+      <TYPE> ARROUT( DIM )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over the whole of the input array copying the values to the
+*  output array.
+      DO 1 I = 1, DIM
+         ARROUT( I ) = ARRIN( I )
+ 1    CONTINUE
+
+      END
+* $Id$

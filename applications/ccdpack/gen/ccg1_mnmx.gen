@@ -1,0 +1,131 @@
+      SUBROUTINE CCG1_MNMX<T>( ARRAY, NPIX, BAD, <T>MIN, <T>MAX,
+     :                         STATUS )
+*+
+*  Name:
+*     CCG1_MNMX<T>
+
+*  Purpose:
+*     Finds the minimum and maximum value in ARRAY.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_MNMX<T>( ARRAY, NPIX, BAD, <T>MIN, <T>MAX, STATUS )
+
+*  Description:
+*     This routine scan a vectorised array locating the minimum and
+*     maximum values.
+
+*  Arguments:
+*     ARRAY( NPIX ) = <COMM> (Given)
+*        Array of values of the given type.
+*     NPIX = INTEGER (Given)
+*        Number of values.
+*     BAD = LOGICAL (Given and Returned)
+*        If true then it is assumed that BAD pixels are present in the
+*        data array. This flag may be reset on exit if true on entry
+*        and no BAD pixels are located.
+*     <T>MIN = <COMM>(Returned)
+*        The array minimum.
+*     <T>MAX = <COMM> (Returned)
+*        The array maximum.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-NOV-1992 (PDRAPER):
+*        {changes}
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER NPIX
+      <TYPE> ARRAY( NPIX )
+
+*  Arguments Given and Returned:
+      LOGICAL BAD
+
+*  Arguments Returned:
+      <TYPE> <T>MIN
+      <TYPE> <T>MAX
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER NGOOD              ! Number of non-BAD values in array
+      <TYPE> DUMMY               ! Local storage.
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check for sensible number of elements in input array.
+      IF ( NPIX .GT. 0 ) THEN
+
+*  Initialise output maximum and minimum arguments.
+         <T>MIN = VAL__MAX<T>
+         <T>MAX = VAL__MIN<T>
+
+*  If BAD pixels are present then perform suitable check. Count the
+*  number of BAD pixels which are located. If no good pixels are found
+*  then issue an error. If no BAD pixels are found then reset the BAD
+*  flag.
+         IF ( BAD ) THEN 
+            NGOOD = 0
+            DO 1 I = 1, NPIX
+               DUMMY = ARRAY( I )
+               IF ( DUMMY .NE. VAL__BAD<T> ) THEN 
+                  IF ( DUMMY .LT. <T>MIN ) <T>MIN = DUMMY
+                  IF ( DUMMY .GT. <T>MAX ) <T>MAX = DUMMY
+                  NGOOD = NGOOD + 1
+               END IF
+ 1          CONTINUE
+
+*  Check the value of NGOOD. If it is zero then an error has occurred.
+*  If it is equal to NPIX then reset the BAD flag.
+            IF ( NGOOD .EQ. 0 ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'CCD1_MNMX<T>1',
+     : '  CCD1_MNMX<T>: Data array has no good values.', STATUS )
+            ELSE IF ( NGOOD .EQ. NPIX ) THEN
+               BAD = .FALSE.
+            END IF
+         ELSE
+
+*  Simple case just located the minimum and maximum values.
+            DO 2 I = 1, NPIX
+               DUMMY = ARRAY( I )
+               IF ( DUMMY .LT. <T>MIN ) <T>MIN = DUMMY
+               IF ( DUMMY .GT. <T>MAX ) <T>MAX = DUMMY
+ 2          CONTINUE
+         END IF
+      ELSE
+
+*  Empty array.
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCD1_MNMX<T>2',
+     : '  CCD1_MNMX<T>: Data array contains no values', STATUS )
+      
+      END IF 
+
+      END
+* $Id$

@@ -1,0 +1,624 @@
+#+
+#  Name:
+#     TRANLIST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TRANLIST
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of input position lists'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Names for output lists'
+      helpkey  '*'
+   endparameter
+
+   parameter TRTYPE
+      position 3
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'COEFF'
+      prompt   'Transformation type'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      default  true
+      prompt   'Position list names in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter INEXT
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Locate transform structure in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'TRANLIST.LIS'
+      prompt   'Name of output filenames listing'
+   endparameter
+
+   parameter TR
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0,1,0,0,0,1
+      prompt   'Linear transformation coefficients (6)'
+      helpkey  '*'
+   endparameter
+
+   parameter XFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'X mapping expression'
+      helpkey  '*'
+   endparameter
+
+   parameter YFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Y mapping expression'
+      helpkey  '*'
+   endparameter
+
+   parameter TRANSFORM
+      type     'TRN'
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Transformation structure'
+      helpkey  '*'
+   endparameter
+
+   parameter FORWARD
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'true'
+      prompt   'Use forward transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter PA
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PB
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PC
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PD
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PE
+      type     _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PF
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PG
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PH
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PI
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   3.14159265359D0
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PJ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PK
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PL
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PM
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PN
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PO
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PP
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PQ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PR
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PS
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PT
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PU
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PV
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PW
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PX
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PY
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PZ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter FA
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FB
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FC
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FD
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FE
+      type     LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FF
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FG
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FH
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FI
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FJ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FK
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FL
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FM
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FO
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FP
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FQ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FS
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FT
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FU
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FW
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FX
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FY
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FZ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,18 @@
+1 CCDPACK_update
+
+ fixed the restoration output from CCDSETUP to not jusr repeat
+ the first bound twice when only two bounds are given (worked
+ correctly for four bounds).
+
+ PAIRNDF ha better control of reserved pens.
+
+
+
+ The FINDOFF routine now reports when any input files have less 
+ than 2 positions.
+
+ IMPORT now works on Linux (TRN problem -- check this).
+
+ SCHEDULE now writes the correct comment delimeter on Linux.
+
+ Peter Draper 17th February 1997, (P.W.Draper@durham).

@@ -1,0 +1,6609 @@
+monolith CCDPACK_MON
+#+
+#  Name:
+#     CALCOR.IFL
+#     
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-MAY-1991 (PDRAPER):
+#     	 Original Version
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and helpkey info.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter (USEEXT and TYPE already present)
+#     {enter_further_changes_here}
+
+#-
+
+interface CALCOR
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # List of input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                # Output NDF
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'List of output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter CAL                 # Calibration NDF
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT'
+      ppath    'GLOBAL,CURRENT'
+      association '<-global.ccdpack_cal'
+      prompt   'NDF containing the Dark or Flash calibration data'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPOSE              # the exposure factor
+      position 4
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Exposure times for input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter USEEXT              # Controls whether extension is used
+                                 # for getting values.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_useext'
+      default  FALSE
+      prompt   'Use NDF extension information'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter TYPE                # Frame types of input NDFs
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  'NONE'
+      prompt   'Frame type of input NDFs (NONE,DARK,FLASH)'
+      helpkey  '*'
+   endparameter
+
+   parameter PRESERVE         # Whether to preserve input data type
+      position 5
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_preser'
+      default  TRUE
+      prompt   'Do you want to preserve the input type'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE # Title for the output NDF
+      position 6
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from CALCOR'
+      prompt   'Title for the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter SETSAT            # Whether saturation has occurred
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Saturated data set to a non-BAD value'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION          # Saturation value
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,PROMPT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1.0D6
+      prompt   'Saturation value'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)calcor.ifl	2.8     11 Sep 1995     2
+#+
+#  Name:
+#     CCDCLEAR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     5-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDCLEAR
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter BYNAME              # Mode of operation
+      position 1
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Clear parameters by specific name'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The CCDPACK log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'Name of CCDPACK logfile'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMES		 # Name of parameters to clear
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Parameter names'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)ccdclear.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     CCDEDIT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUN-1993 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDEDIT
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter MODE
+      position 1
+      type     LITERAL
+      access   'UPDATE'
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'ALIST'
+      prompt   'Editing mode (ALIST,ERASE,TRANSFORM,INVERT)'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position  2
+      type      LITERAL
+      access    READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt    'List of NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter INLIST
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of position lists to associate'
+      helpkey  '*'
+   endparameter
+
+   parameter TRTYPE
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'COEFF'
+      prompt   'Transformation type'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Name of extension component'
+      helpkey  '*'
+   endparameter
+
+   parameter TR
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0,1,0,0,0,1
+      prompt   'Linear transformation coefficients (6)'
+      helpkey  '*'
+   endparameter
+
+   parameter FITTYPE                # Fittype parameter
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      range    1, 5
+      prompt   'Type of linear transform (1-5) '
+      helpkey  '*'
+   endparameter
+
+   parameter TRANSFORM
+      type     'TRN'
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Transformation structure'
+      helpkey  '*'
+   endparameter
+
+   parameter XFOR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Expression for X forward mapping'
+      helpkey   '*' 
+   endparameter
+
+   parameter YFOR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Expression for Y forward mapping'
+      helpkey   '*' 
+   endparameter
+
+   parameter XINV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Expression for X inverse mapping'
+      helpkey   '*' 
+   endparameter
+
+   parameter YINV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Expression for Y inverse mapping'
+      helpkey   '*' 
+   endparameter
+
+   parameter CLASSIFY		 # Add a classification structure
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Add classifications'
+      helpkey  '*'
+   endparameter
+
+   parameter CLASS
+      type      _CHAR
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Transformation classifications'
+      helpkey   '*' 
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter PA
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PB
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PC
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PD
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PE
+      type     _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PF
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PG
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PH
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PI
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   3.14159265359D0
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PJ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PK
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PL
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PM
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PN
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PO
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PP
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PQ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PR
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PS
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PT
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PU
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PV
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PW
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PX
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PY
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter PZ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'CCDEDIT parameters PA-PZ' 
+   endparameter
+
+   parameter FA
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FB
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FC
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FD
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FE
+      type     LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FF
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FG
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FH
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FI
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FJ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FK
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FL
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FM
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FO
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FP
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FQ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FS
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FT
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FU
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FW
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FX
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FY
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+   parameter FZ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'CCDEDIT parameters FA-FZ' 
+   endparameter
+
+endinterface
+# @(#)ccdedit.ifl	2.2     12 Sep 1995     2
+#+
+#  Name:
+#     CCDGENERATE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDGENERATE
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter FILE                # Name of input list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'List containing object positions etc.'
+      helpkey  '*'
+   endparameter
+
+   parameter NSEQ                # Number of test sequences to create
+      position 2
+      type     _INTEGER
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      range    1, 26
+      prompt   'How many data sequences do you want'
+      helpkey  '*'
+   endparameter
+
+   parameter UBNDS
+      type     _INTEGER
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Upper bounds'
+      helpkey  '*'
+   endparameter
+
+   parameter LBNDS
+      type     _INTEGER
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Lower bounds'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# @(#)ccdgenerate.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     CCDHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1986 November 14 (MJC):
+#	 Original version.
+#     1992 August 19 (MJC):
+#     	 Added prologue, and access to help library.
+#     1993 January 5 (PDRAPER):
+#        Rename CCDHELP.
+#     {enter_further_changes_here}
+
+#-
+
+
+interface CCDHELP
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+   endparameter
+
+endinterface
+
+# @(#)ccdhelp.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     CCDINTRO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDINTRO
+
+   parameter SIMPLE              # Whether input NDF names specified in
+				 # one.
+      position 1
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Do input NDFs have a FRAME_TYPE value'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters SIMPLE'
+   endparameter
+
+   parameter IN                  # Input NDF names
+      position 2
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*'
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters IN'
+   endparameter
+
+   parameter MODIFY
+      position 3
+      type     _LOGICAL 
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Modify existing extension items'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters MODIFY'
+   endparameter
+
+   parameter ADDTIMES
+      position 4
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Add various exposure times to extension'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters ADDTIMES'
+   endparameter
+ 
+   parameter BIAS                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters BIAS'
+   endparameter
+
+   parameter TARGET              # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters TARGET'
+   endparameter
+
+   parameter DARK                # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DARK'
+   endparameter
+
+   parameter FLASH                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FLASH'
+   endparameter
+
+   parameter FLAT                # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FLAT'
+   endparameter
+
+   parameter FTYPE		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Frame type'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FTYPE'
+   endparameter
+
+   parameter FILTER		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Filter type'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FILTER'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion 
+                                 # factor
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Number of electrons per ADU'
+      association '<-global.ccdpack_adc'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters ADC'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Pixel indices of bias strips (in pairs)'
+      association '<-global.ccdpack_bounds'
+      default   !
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters BOUNDS'
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout noise (ADUs)'
+      association '<-global.ccdpack_rnoise'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters RNOISE'
+   endparameter
+
+   parameter BIASVALUE		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Nominal bias value (ADUs)'
+      association '<-global.ccdpack_biasval'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters BIASVALUE'
+   endparameter
+
+   parameter SATURATION		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Data saturation value (ADUs)'
+      association '<-global.ccdpack_satval'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters SATURATION'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      keyword  MASK
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Mask data file'
+      association '<-global.ccdpack_mask'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters MASK'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout direction (X or Y)'
+      association '<-global.ccdpack_direct'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DIRECTION'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Deferred charge (ADUs)'
+      association '<-global.ccdpack_defer'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DEFERRED'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Useful CCD region (xmin,xmax,ymin,ymax)'
+      default  !
+      association '<-global.ccdpack_extent'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters EXTENT'
+   endparameter
+
+
+   parameter EXPOSURE            # Frame exposure time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Exposure time'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters EXPOSURE'
+   endparameter
+
+   parameter DARKTIME            # Frame dark time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Dark count exposure time'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters DARKTIME'
+   endparameter
+
+   parameter FLASHTIME           # Frame pre-flash exposure time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Pre-flash exposure time'
+      helpkey  'ccdpack_dir:ccdhelp ccdintro parameters FLASHTIME'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     'ccdpack_dir:ccdhelp ccdintro parameters LOGTO'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey     'ccdpack_dir:ccdhelp ccdintro parameters LOGFILE'
+   endparameter
+
+endinterface
+# @(#)ccdintro.ifl	1.4     12 Jan 1994     1
+#+
+#  Name:
+#     CCDNDFAC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-JUN-1993 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDNDFAC
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter NAMELIST
+      position 1
+      type     LITERAL
+      access   'READ'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      DEFAULT  'CCDNDFAC.LIS'
+      prompt   'Name of output file for NDF namelist'
+   endparameter
+
+   parameter ECHO                # Echo NDF names
+      position 2
+      type     _LOGICAL
+      access   'READ'
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Echo NDF names to user'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXNDF              # Maximum number of NDFs that may be
+				 # accessed.
+      type     _INTEGER
+      access   'READ'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Maximum number of NDFs to access'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Single input group
+      type     LITERAL
+      access   'READ'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      prompt   'List of NDFs'
+      default  !
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# @(#)ccdndfac.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     CCDNOTE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDNOTE
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter NOTE                # Note to enter into log file.
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT '
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)ccdnote.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     CCDSCHED.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     24-MAR-1995 (PDRAPER):
+#        Added WAIT parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface CCDSCHED
+
+   helplib 'CCDPACK_DIR:'
+
+   parameter IN                  # Input NDFs list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  '*'
+      association '<-global.ccdpack_ndflist'
+      prompt   'Names of input NDFs'
+      helpkey  'ccdpack_dir:ccdhelp ccdsched parameters IN'
+   endparameter
+
+   parameter SCRIPT              # Reduction script name
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'ccdauto.reduce'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter STYPE               # Reduction script type
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'CSH'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# @(#)ccdsched.ifl	1.5     28 Mar 1995     1
+#+
+#  Name:
+#     CCDSETUP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#        Added helpkey info.
+#     15-JAN-1992 (PDRAPER):
+#        Added GENVAR changed prompts.
+#     21-AUG-1993 (PDRAPER):
+#        Added NDFNAMES.
+#     14-SEP-1993 (PDRAPER):
+#     	 Added RESTORE and SAVE options. Added DYNAMIC ppaths for
+#	 parameters which are restored.
+#     28-JAN-1994 (PDRAPER):
+#     	 Added saturation stuff.
+#     {enter_further_changes_here}
+
+#-
+
+interface CCDSETUP
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter RESTORE             # Use a restoration file
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use a setup restoration file'
+      helpkey  '*'
+   endparameter
+
+   parameter RESTOREFILE         # Name of restoration file
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'CCDPACK_SETUP.DAT'
+      prompt   'Setup restoration file'
+      helpkey  '*'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion 
+                                 # factor
+      type        _DOUBLE
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     !
+      prompt      'Number of electrons per ADU'
+      association '<->global.ccdpack_adc'
+      helpkey     '*'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type        _INTEGER
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      prompt      'Pixel indices of bias strips (in pairs)'
+      association '<->global.ccdpack_bounds'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type        _DOUBLE
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     !
+      prompt      'Readout noise (ADUs)'
+      association '<->global.ccdpack_rnoise'
+      helpkey     '*'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     !
+      prompt      'Mask data file'
+      association '<->global.ccdpack_mask'
+      helpkey     '*'
+   endparameter
+
+# Full name of the mask NDF. Used to write out to global file.
+   parameter MASKNAME
+      type        LITERAL
+      access      'WRITE'
+      vpath       'DEFAULT'
+      association '->global.ccdpack_mask'
+      default     0.0
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     !
+      prompt      'Readout direction (X or Y)'
+      association '<->global.ccdpack_direct'
+      helpkey     '*'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type        _DOUBLE
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     !
+      prompt      'Deferred charge (ADUs)'
+      association '<->global.ccdpack_defer'
+      helpkey     '*'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type        _INTEGER
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      prompt      'Useful CCD region (xmin,xmax,ymin,ymax)'
+      default     !
+      association '<->global.ccdpack_extent'
+      helpkey     '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+      type        LITERAL
+      access      UPDATE
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      association '<->global.ccdpack_logto'
+      prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+      default     'Both'
+      helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      prompt      'logfile name'
+      association '<->global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter PRESERVE         # Whether to preserve input data type
+      type        _LOGICAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     TRUE
+      association '<->global.ccdpack_preser'
+      prompt      'Do you want to preserve your input data types'
+      helpkey     '*'
+   endparameter
+
+   parameter GENVAR              # Whether to generate variances or not
+      type        _LOGICAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     TRUE
+      association '<->global.ccdpack_genvar'
+      prompt      'Do you want to generate variance estimates'
+      helpkey     '*'
+   endparameter
+
+   parameter NDFNAMES            # Whether positions list are associated
+				 # with NDFs
+      type        _LOGICAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     TRUE
+      prompt      'Associate position lists with NDF names'
+      association '<->global.ccdpack_ndfnam'
+   endparameter
+
+   parameter SAVE		 # Whether to save CCD parameters or not
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Save CCD parameters for future restoration'
+      helpkey  '*'
+   endparameter
+
+   parameter SAVEFILE		 # Name of the file to save parameters
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'CCDPACK_SETUP.DAT'
+      prompt   'File to store CCD parameters'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATE            # Look for saturated values
+      type        _LOGICAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     FALSE
+      prompt      'Look for saturated pixels'
+      association '<->global.ccdpack_satur'
+   endparameter
+
+   parameter SATURATION          # The saturation value.
+      type        _DOUBLE
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     1.0D6
+      prompt      'Saturation value'
+      association '<->global.ccdpack_satval'
+   endparameter
+
+   parameter SETSAT              # Whether to set saturated pixels to
+				 # the saturation value or not.
+      type        _LOGICAL
+      access      READ
+      vpath       'PROMPT,DYNAMIC,GLOBAL,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,GLOBAL,CURRENT,DEFAULT '
+      default     FALSE
+      prompt      'Set saturated pixels to saturation value'
+      association '<->global.ccdpack_setsat'
+   endparameter
+
+endinterface
+# @(#)ccdsetup.ifl	2.14     12 Sep 1995     2
+#+
+#  Name:
+#     CCDSHOW.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     5-JUL-1991 (PDRAPER):
+#     	 Original version.
+#     28-JAN-1994 (PDRAPER):
+#     	 Added saturation extensions.
+#     {enter_further_changes_here}
+
+#-
+
+interface CCDSHOW
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTOD              # Dummy version of LOGTO to get just
+				 # the global value.
+       type        LITERAL
+       access      READ
+       vpath       'GLOBAL,DEFAULT'
+       ppath       'GLOBAL,DEFAULT'
+       association '<-global.ccdpack_logto'
+       default     !
+   endparameter
+
+   parameter      LOGFILED        # Dummy version of LOGFILE to get just
+				 # the global value.
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      default     !
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion 
+                                 # factor
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_adc'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-global.ccdpack_bounds'
+      default   !
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_rnoise'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      keyword  MASK
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_mask'
+   endparameter
+
+   parameter FLAT                # flatfield
+      keyword  FLAT
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_flat'
+   endparameter
+
+   parameter BIAS                # Master bias
+      keyword  BIAS
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_bias'
+   endparameter
+
+   parameter CAL                 # Master calibration NDF
+      keyword  CAL
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_cal'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_direct'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_defer'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association '<-global.ccdpack_extent'
+   endparameter
+
+   parameter PRESERVE            # Whether to preserve input data type
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_preser'
+   endparameter
+
+   parameter GENVAR              # Whether to generate variances or not
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_genvar'
+   endparameter
+ 
+   parameter NDFNAMES            # Whether positions list are associated
+				 # with NDFs
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT '
+      default  !
+      association '<-global.ccdpack_ndfnam'
+   endparameter
+ 
+   parameter SATURATE            # Look for saturated values
+      type        _LOGICAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT '
+      default     !
+      association '<-global.ccdpack_satur'
+   endparameter
+
+   parameter SATURATION          # The saturation value.
+      type        _DOUBLE
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT '
+      default     !
+      association '<-global.ccdpack_satval'
+   endparameter
+
+   parameter SETSAT              # Whether to set saturated pixels to
+				 # the saturation value or not.
+      type        _LOGICAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DEFAULT '
+      default     !
+      association '<-global.ccdpack_setsat'
+   endparameter
+
+endinterface
+# @(#)ccdshow.ifl	2.7     12 Sep 1995     2
+#+
+#  Name:
+#     DEBIAS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-MAY-1991 (PDRAPER):
+#        Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added help library info and associations.
+#     21-AUG-1991 (PDRAPER):
+#     	 Added GENVAR parameter.
+#     28-JAN-1994 (PDRAPER):
+#     	 Added USEEXT, GETBIAS and GETMASK
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface DEBIAS
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # List of input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                # List of Output NDF
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'List of output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter BIAS                # Bias NDF
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  !
+      association '<-global.ccdpack_bias'
+      prompt   'Master bias NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      position 4
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT'
+      ppath    'GLOBAL,CURRENT '
+      association '<-global.ccdpack_bounds'
+      prompt   'Pixel indices of bias strips (in pairs)'
+      helpkey  '*'
+   endparameter
+
+   parameter RNOISE              # The readout noise
+      position 5
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DYNAMIC,DEFAULT '
+      default  1.0
+      association '<-global.ccdpack_rnoise'
+      prompt   'Readout noise (ADUs)'
+      helpkey  '*'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion
+				 # factor
+      position 6
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DYNAMIC,DEFAULT '
+      default  1.0
+      association '<-global.ccdpack_adc'
+      prompt   'Number of electrons per ADU'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK                # Mask NDF
+      position 7
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  !
+      association '<-global.ccdpack_mask'
+      prompt   'Mask data file'
+      helpkey  '*'
+   endparameter
+
+   parameter USEEXT              # Controls whether extension is used
+                                 # for getting values.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_useext'
+      default  FALSE
+      prompt   'Use NDF extension information'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE 
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter GETBIAS             # Controls whether an attempt is made
+				 # to get a master bias frame or not.
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Get a master bias NDF via BIAS parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter GETMASK             # Controls whether an attempt is made
+				 # to get a mask or not.
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Get a defect mask via MASK parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter GENVAR   # Whether variance generation is to occur
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_genvar'
+      default  TRUE
+      prompt   'Do you want to generate variance estimates'
+      helpkey  '*'
+   endparameter
+
+   parameter OFFSET            # Do you want bias scaling to zeros
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Offset the bias values to zero'
+      helpkey  '*'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_direct'
+      default  'X'
+      prompt   'Readout direction ( X or Y )'
+      helpkey  '*'
+   endparameter
+
+   parameter SMODE               # The interpolation mode
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'CONSTANT'
+      prompt   'Mode to fit data (Linear or Constant)'
+      helpkey  '*'
+   endparameter
+
+   parameter FMODE               # The interpolation method
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'LINE'
+      prompt   'Fit type (Plane or Line or Global)'
+      helpkey  '*'
+   endparameter
+
+   parameter CMODE               # Clean up or weighting ?
+      type     LITERAL 
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'BOX'
+      prompt   'Clean up mode (Weight,Box or Sigma)'
+      helpkey  '*'
+   endparameter
+
+   parameter BOXSIZE             # The half side of box for smooothing
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  15,15
+      prompt   'Box side sizes for smoothing bias strips '
+      helpkey  '*'
+   endparameter
+
+   parameter NSIGMA              # Number of sigma to clip at.
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  4.0
+      prompt   'Number of sigmas to clip at'
+      helpkey  '*'
+   endparameter
+
+   parameter WMODE               # The weighting mode
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'LINEAR'
+      prompt   'Weighting mode (Linear, Exp or None)'
+      helpkey  '*'
+   endparameter
+
+   parameter PRESERVE         # Whether to preserve input data type
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_preser'
+      default  TRUE
+      prompt   'Do you want to preserve the input type'
+      helpkey  '*'
+   endparameter
+
+   parameter USECON          # Whether to use user supplied global
+			     # zero point
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Do you want to supply a global zero level'
+      helpkey  '*'
+   endparameter
+
+   parameter ZERO        # User supplied global zero point
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT '
+      default  0.0
+      prompt   'Global zero point value'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE # Title for the output NDF
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from DEBIAS'
+      prompt   'Title for the output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO               # Log output to?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter SETBAD              # Controls how the values are set BAD
+      keyword  SETBAD
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Set output pixels BAD'
+      helpkey  '*'
+   endparameter
+
+   parameter BADBITS             # BADBITS mask value
+      keyword  BADBITS
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1
+      range    1, 255
+      prompt   'BADBITS mask value'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPAND              # Whether to expand input data to
+                                 # electrons or not
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT '
+      ppath    'CURRENT,DYNAMIC,DEFAULT '        #Dynamic default set
+						 #for different data
+						 #types
+      default  TRUE
+      prompt   'Convert input ADUs to electrons on output'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATE            # Whether saturation will occur
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Look for saturated data'
+      association '<-global.ccdpack_satur'
+      helpkey  '*'
+   endparameter
+
+   parameter SETSAT            # Flag saturation with a user defined value
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Set saturated pixels to the saturation value'
+      association '<-global.ccdpack_setsat'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION          # Saturation value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  1.0D6
+      prompt   'Saturation value'
+      association '<-global.ccdpack_satval'
+      helpkey  '*'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT '
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  0.0
+      association '<-global.ccdpack_defer'
+      prompt   'Deferred charge (ADUs)'
+      helpkey  '*'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT,DYNAMIC'
+      ppath    'GLOBAL,CURRENT,DYNAMIC'
+      association '<-global.ccdpack_extent'
+      prompt   'Useful CCD region (xmin,xmax,ymin,ymax)'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)debias.ifl	2.16     15 Sep 1995     2
+#+
+#  Name:
+#     FINDCENT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     8-MAR-1993 (PDRAPER):
+#        Added new descriptions.
+#     {enter_changes_here}
+
+#-
+
+interface FINDCENT
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter NDFNAMES
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      default  true
+      prompt   'Position list names are located in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Input NDF names
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Input NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST             # Input list of positions
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*.cent'
+      prompt   'Output position list names'
+      helpkey  '*'
+   endparameter
+
+   parameter INLIST              # Input list of positions
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Input position list names'
+      helpkey  '*'
+   endparameter
+
+   parameter ISIZE               # Search box size
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  9
+      prompt   'Size of search box'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXSHIFT            # Maximum shift in feature position
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5.5D0
+      prompt   'Maximum shift in position'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXITER             # Maximum number of iterations
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Maximum number of refining iterations'
+      helpkey  '*'
+   endparameter
+
+   parameter TOLER               # Required tolerance
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.05D0
+      prompt   'Positional tolerance in centroid'
+      helpkey  '*'
+   endparameter
+
+   parameter POSITIVE            # Sign of features
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Features have positive signal'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'FINDCENT.LIS'
+      prompt   'Output filename listing'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# @(#)findcent.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     FINDOBJ.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-OCT-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface FINDOBJ
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Name of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter MINPIX              # Minimum number of pixels per group
+      position 2
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  6
+      prompt   'Minimum number of pixels per group'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST             # Output position file list.
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*.dat'
+      prompt   'Results file names'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'FINDOBJ.LIS'
+      prompt   'Name of output filenames listing'
+   endparameter
+
+   parameter THRESH              # Threshold to use for detecting
+				 # objects
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,DYNAMIC,CURRENT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Detection threshold'
+      helpkey  '*'
+   endparameter
+
+   parameter AUTOTHRESH          # Whether autothreshold values are used
+				 # or not
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  true
+      prompt   'Use automatic threshold values'
+      helpkey  '*'
+   endparameter
+
+   parameter BINFRAC                 # Fraction of total counts in one
+				     # bin
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  2.5
+      prompt   'Fraction of counts in one bin (percent)'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERSAMP                 # Oversampling factor
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      prompt   'Histogram oversampling factor'
+      helpkey  '*'
+   endparameter
+
+   parameter USEPER                 # Whether to use percentile for
+				    # threshold estimation or not
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Use percentiles to estimate threshold '
+      helpkey  '*'
+   endparameter
+
+   parameter PERCENTILE                # Percentile for threshold estimate
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      prompt   'Percentile for detection threshold'
+      default  96.0
+      helpkey  '*'
+   endparameter
+
+   parameter NSIGMA              # Number of sigmas above background
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      prompt   'Standard deviations above detection threshold'
+      default  5.0
+      helpkey  '*'
+   endparameter
+
+   parameter TOUCH               # Whether to pixel groups may touch the
+				 # edges of the array
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'May pixel groups touch the edges of array'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# @(#)findobj.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     FINDOFF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-SEP-1992 (PDRAPER):
+#     	 Original version.
+#     29-SEP-1992 (PDRAPER):
+#     	 Now FINDOFF.
+#     {enter_further_changes_here}
+
+#-
+
+interface FINDOFF
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of position lists'
+      helpkey  '*'
+   endparameter
+
+   parameter ERROR
+      position 2
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1.0
+      prompt   'Error in positions'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST
+      position 3
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT'
+      prompt   'Names for output position lists'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type    _LOGICAL
+      access  READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      default true
+      prompt  'Position list names in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter FAST
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Perform FAST algorithm'
+      helpkey  '*'
+   endparameter
+
+   parameter FAILSAFE
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Perform SLOW algorithm if FAST fails'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'FINDOFF.LIS'
+      prompt   'Name of output filenames listing'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter COMPLETE
+      type    _DOUBLE
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default 0.5D0
+      prompt  'Minimum completeness level'
+      helpkey  '*'
+   endparameter
+
+   parameter USECOMP
+      type    _LOGICAL
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default true
+      prompt  'Use completeness as weight'
+      helpkey  '*'
+   endparameter
+
+   parameter MINSEP
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT '
+      ppath    'CURRENT,DYNAMIC,DEFAULT '
+      default  5.0
+      prompt   'Minimum distance between positions'
+      helpkey  '*'
+   endparameter
+
+   parameter MINMATCH
+      type     _INTEGER
+      access   READ
+     vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Minimum number of positions required for match'
+     helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)findoff.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     FLATCOR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-MAY-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and helpkey info.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface FLATCOR
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Input NDF
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                # Output NDF
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'List of output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter FLAT               # Flatfield NDF
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT '
+      ppath    'GLOBAL,CURRENT'
+      association '<-global.ccdpack_flat'
+      prompt   'Flatfield NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter PRESERVE         # Whether to preserve input data type
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_preser'
+      default  TRUE
+      prompt   'Do you want to preserve the input type'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE # Title for the output NDF
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from FLATCOR'
+      prompt   'Title for the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE             # Log file name
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter SETSAT            # Whether saturation has occurred
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Has saturated data been set to a non-BAD value'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION          # Saturation value
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,PROMPT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1.0D6
+      prompt   'Saturation value'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)flatcor.ifl	2.7     15 Sep 1995     2
+#+
+#  Name:
+#     IDICURS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface IDICURS
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter OUTLIST             # Name of output list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'IDICURS.LIS'
+      prompt   'Filename for output list'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE              # Name of the device.
+      position 2
+      type     DEVICE
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<->GLOBAL.IMAGE_DISPLAY'
+      default  xwindows
+      prompt   'Display device'
+      helpkey  '*'
+   endparameter
+
+   parameter IN			 # NDFs to have extensions updated
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDFs to associate with positions'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPLUT             # Keep current look-up-table?
+      type    _LOGICAL
+      access   READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default TRUE
+      prompt  'Keep the current Look-Up-Table'
+      helpkey '*'
+   endparameter
+
+   parameter SCROLL
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Enable scrolling when zoomed'
+      helpkey  '*'
+   endparameter
+
+   parameter ARROWS
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use keyboard arrows for controlling scroll'
+      helpkey  '*'
+   endparameter
+
+   parameter COLOUR              # Marker colour
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      range    0, 4
+      prompt   'Marker colour index (0-4)'
+      helpkey  '*'
+   endparameter
+
+   parameter MSIZE               # Size of marker as fraction of display
+                                 # width
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0.03
+      prompt   'Relative size of marker (0-1)'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK               # Line thickness
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT,'
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Line thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter MEMORY              # Memory id
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT,'
+      ppath    'CURRENT,DEFAULT '
+      default  0
+      range    0,1
+      prompt   'Memory id'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# @(#)idicurs.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     IMPORT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-DEC-1993 (PDRAPER):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface IMPORT 
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # List of Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter TABLE               # Import control table
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'import.tab'
+      prompt   'Import control table'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL 
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Input NDF name list'
+   endparameter
+
+
+endinterface
+# @(#)import.ifl	1.7     22 Sep 1995     1
+#+
+#  Name:
+#     LISTLOG.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     UNKNOWN:
+#     PDRAPER: Peter Draper (STARLINK)
+
+#  History:
+#     - (UNKNOWN):
+#     	 Original version.
+#     8-JAN-1992 (PDRAPER):
+#     	 Changed prompting. Use S for the DTNS default.
+#     {enter_further_changes_here}
+
+#-
+
+interface LISTLOG
+
+      helplib  'CCDPACK_HELP:'
+
+      parameter  LOGFILENAME
+         keyword    'LOGFILENAME'
+         position   1
+         type       LITERAL
+         access     'READ'
+         vpath      'PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'ADAM_LOGFILE'
+         prompt     'Logfile name'
+         helpkey    '*'
+      endparameter
+
+      parameter  OUTPUT
+         keyword    'OUTPUT'
+         position   2
+         type       LITERAL
+         access     'READ'
+         vpath      'PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'S'
+         prompt     'Name of file ( "S" outputs to screen )'
+         helpkey    '*'
+      endparameter
+
+      parameter  SINCE
+         keyword    'SINCE'
+         position   3
+         type       LITERAL
+         access     'READ'
+         vpath      'DEFAULT,PROMPT'
+         ppath      'DEFAULT'
+         default    'S'
+         prompt     'Select records since ( "S" means from start )'
+         helpkey    '*'
+      endparameter
+
+      parameter  DTNS
+         keyword    'DTNS'
+         position   4
+         type       LITERAL
+         access     'READ'
+         vpath      'CURRENT,DEFAULT,PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'S'
+         prompt     'Required elements of logfile D-T-N-S'
+         helpkey    '*'
+      endparameter
+
+      parameter  NAMES
+         keyword    'TASKS'
+         position   5
+         type       '_CHAR'
+         access     'READ'
+         vpath      'CURRENT,DEFAULT,PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'ALL'
+         prompt     'Select task names ?'
+         helpkey    '*'
+      endparameter
+
+      parameter  LABELS
+         keyword    'LABELS'
+         position   6
+         type       '_CHAR'
+         access     'READ'
+         vpath      'CURRENT,DEFAULT,PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'ALL'
+         prompt     'Match entry string against ?'
+         helpkey    '*'
+      endparameter
+
+endinterface
+# @(#)listlog.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     MAKEBIAS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-3-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and help library specifications.
+#     20-AUG-1991 (PDRAPER):
+#     	 Added GENVAR parameter.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN, USEEXT already present.
+#     {enter_further_changes_here}
+
+#-
+
+interface MAKEBIAS
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Input NDF 1
+      position 1
+      keyword  IN
+      type     LITERAL           # string of NDFs
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                 # Output NDF may use IRG type expressions
+      position 2
+      keyword  OUT
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Output NDF'
+      association '->global.ccdpack_bias'
+      helpkey  '*'
+   endparameter
+
+   parameter RNOISE              # Readout Noise (ADU)
+      position 3
+      keyword  RNOISE
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,GLOBAL,DYNAMIC,CURRENT,DEFAULT '
+      ppath    'GLOBAL,DYNAMIC,CURRENT,DEFAULT '
+      default  0.0
+      prompt   'Readout noise (ADUs)'
+      association '<-global.ccdpack_rnoise'
+      helpkey  '*'
+   endparameter
+
+   parameter METHOD              # Combination method
+      position 4
+      keyword  METHOD
+      type     LITERAL
+      access   UPDATE            # written to by AIF_CHOIC routine
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  'MEDIAN'
+      prompt   'Data combination method'
+      helpkey  '*'
+   endparameter
+
+   parameter GENVAR              # Controls whether variances are
+				 # generated
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_genvar'
+      default  TRUE
+      prompt   'Do you want to generate a variance component'
+      helpkey  '*'
+   endparameter
+
+   parameter USEEXT              # Controls whether extension is used
+				 # for getting values.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_useext'
+      default  FALSE
+      prompt   'Use NDF extension information'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter ALPHA               # Trimming fraction
+      keyword  ALPHA
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.2
+      prompt   'Trim fraction '
+      helpkey  '*'
+   endparameter
+
+   parameter SIGMAS              # Number of sigmas for clipping (MODE + SIGMA)
+      keyword  SIGMAS
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  4.0
+      prompt   'Clipping limit (standard deviations)'
+      helpkey  '*'
+   endparameter
+
+   parameter NITER               # Number of refining iterations (MODE)
+      keyword  NITER
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  7
+      prompt   'Number of clipping iterations'
+      helpkey  '*'
+   endparameter
+
+   parameter MIN                 # Minimum value in combination
+      keyword  MIN
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT'
+      default  -100.0
+      prompt   'Minimum allowed value'
+      helpkey  '*'
+   endparameter
+
+   parameter MAX                 # Minimum value in combination
+      keyword  MAX
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT'
+      default  100.0
+      prompt   'Maximum allowed value'
+      helpkey  '*'
+   endparameter
+
+   parameter ZERO                # Zero output array
+      keyword  ZERO
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Make average of output data zero'
+      helpkey  '*'
+   endparameter
+
+   parameter MINPIX              # Minimum number of contributing pixels 
+      keyword  MINPIX
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT,PROMPT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  1
+      prompt   'Minimum number of contributing pixels per output pixel'
+      helpkey  '*'
+   endparameter
+
+   parameter PRESERVE            # Preserve the input data type
+      keyword  PRESERVE
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT,PROMPT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      default  TRUE
+      association '<-global.ccdpack_preser'
+      prompt   'Preserve input NDF data type'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE               # Title for the output NDF
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from MAKEBIAS'
+      prompt   'Title for the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      association '<-global.ccdpack_logfile'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)makebias.ifl	2.11     15 Sep 1995     2
+#+
+#  Name:
+#     MAKECAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-3-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added log file association and helpkeys.
+#     29-SEP-1993 (PDRAPER):
+#     	 Added TYPE parameter.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter (USEEXT already present).
+#     {enter_further_changes_here}
+
+#-
+
+interface MAKECAL
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # List of Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPOSE              # List of exposure factors
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Input NDF exposure times'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                 # OUTPUT NDF
+      position 3
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      association '->global.ccdpack_cal'
+      prompt   'Output NDF name'
+      helpkey  '*'
+   endparameter
+
+   parameter METHOD              # Combination mode
+      position 4
+      type     'LITERAL'
+      access   UPDATE            # written to by AIF_CHOIC routine
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  'MEDIAN'
+      prompt   'Data combination method'
+      helpkey  '*'
+   endparameter
+
+   parameter USEEXT              # Controls whether extension is used
+                                 # for getting values.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_useext'
+      default  FALSE
+      prompt   'Use NDF extension information'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'Do not dELETE input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter TYPE                # Frame types of input NDFs
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  'NONE'
+      prompt   'Frame type of input NDFs (NONE,DARK,FLASH)'
+      helpkey  '*'
+   endparameter
+
+   parameter ALPHA               # Trimming fraction
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.2
+      prompt   'Trim fraction '
+      helpkey  '*'
+   endparameter
+
+   parameter SIGMAS              # Number of sigmas for clipping (MODE + SIGMA)
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  4.0
+      prompt   'Clipping limit (standard deviations)'
+      helpkey  '*'
+   endparameter
+
+   parameter NITER               # Number of refining iterations (MODE)
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Number of clipping iterations'
+      helpkey  '*'
+   endparameter
+
+   parameter MIN                 # Minimum value in combination
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Minimum allowed value'
+      helpkey  '*'
+   endparameter
+
+   parameter MAX                 # Minimum value in combination
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      vpath    'PROMPT '
+      ppath    'CURRENT'
+      prompt   'Maximum allowed value'
+      helpkey  '*'
+   endparameter
+
+   parameter MINPIX              # Minimum number of contributing pixels 
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1
+      prompt   'Minimum number of contributing pixels per output pixel'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE               # Title for the output NDF
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from MAKECAL'
+      prompt   'Title for the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL 
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)makecal.ifl	2.11     15 Sep 1995     2
+#+
+#  Name:
+#     MAKEFLAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-5-1991 (PDRAPER):
+#     	 Original version.
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and helpkey info.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface MAKEFLAT
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Names of the input NDFs.
+      position 1
+      keyword  IN
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                 # Output NDF
+      position 2
+      keyword  OUT
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'Output NDF name '
+      association '->global.ccdpack_flat'
+      helpkey  '*'
+   endparameter
+
+   parameter METHOD              # Combination mode
+      position 3
+      keyword  METHOD
+      type     'LITERAL'
+      access   UPDATE            # written to by AIF_CHOIC routine
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  'MEDIAN'
+      prompt   'Data combination method'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter ALPHA               # Trimming fraction
+      keyword  ALPHA
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.2
+      prompt   'Trim fraction '
+      helpkey  '*'
+   endparameter
+
+   parameter SIGMAS              # Number of sigmas for clipping (MODE + SIGMA)
+      keyword  SIGMAS
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  4.0
+      prompt   'Clipping limit (standard deviations)'
+      helpkey  '*'
+   endparameter
+
+   parameter NITER               # Number of refining iterations (MODE)
+      keyword  NITER
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Number of clipping iterations'
+      helpkey  '*'
+   endparameter
+
+   parameter MIN                 # Minimum value in combination
+      keyword  MIN
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT'
+      prompt   'Minimum allowed value'
+      helpkey  '*'
+   endparameter
+
+   parameter MAX                 # Minimum value in combination
+      keyword  MAX
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT'
+      prompt   'Maximum allowed value'
+      helpkey  '*'
+   endparameter
+
+   parameter MINPIX              # Minimum number of contributing pixels 
+      keyword  MINPIX
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT, DEFAULT '
+      ppath    'CURRENT, DEFAULT '
+      default  1
+      prompt   'Minimum number of contributing pixels per output pixel'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE               # Title for the output NDF
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from MAKEFLAT'
+      prompt   'Title for the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO               # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter GAMMA               # Number of sigmas to reject data
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  3.0
+      prompt   'Number of standard deviations to reject at'
+      helpkey  '*'
+   endparameter
+
+   parameter ITER                # Number of clipping (GAMMA) rejecting iterations
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Number of rejecting iterations'
+      helpkey  '*'
+   endparameter
+
+   parameter BOXSIZE             # The side of box for smooothing
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  15,15
+      prompt   'Sizes of box filter sides'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)makeflat.ifl	2.11     15 Sep 1995     2
+#+
+#  Name:
+#     MAKEMOS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-FEB-1992 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface MAKEMOS
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter ALPHA               # Trimming fraction
+      type     _REAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      default  0.2
+      prompt   'Trimming fraction'
+      helpkey  *
+   endparameter
+
+   parameter CMPVAR              # Use variance during inter-comparison?
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Use variance during inter-comparison?'
+      helpkey  *
+   endparameter
+
+   parameter GENVAR              # Generate output variance information?
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Generate output variance information?'
+      helpkey  *
+   endparameter
+
+   parameter IN                  # List of input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  *
+   endparameter
+
+   parameter LISTIN              # List input NDFs?
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'List input NDF names?'
+      helpkey  *
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      prompt      'Logfile name'
+      helpkey     *
+   endparameter
+
+   parameter LOGTO               # Logging system interaction level
+      type        LITERAL
+      access      UPDATE
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logto'
+      default     'BOTH'
+      prompt      'Write output to (Logfile,Terminal,Neither,Both)'
+      helpkey     *
+   endparameter
+
+   parameter MAX                 # Maximum value for data combination
+      type     _REAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DYNAMIC'
+      prompt   'Maximum data value'
+      helpkey  *
+   endparameter
+
+   parameter MAXIT               # Maximum number of inter-comparison iterations
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  20
+      prompt   'Maximum number of inter-comparison iterations'
+      helpkey  *
+   endparameter
+
+   parameter METHOD              # Data combination method
+      type     'LITERAL'
+      access   UPDATE            # Written to by AIF_CHOIC routine (naughty)
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MEDIAN'
+      prompt   'Data combination method'
+      helpkey  *
+   endparameter
+
+   parameter MIN                 # Minimum value for data combination
+      type     _REAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DYNAMIC'
+      prompt   'Minimum data value'
+      helpkey  *
+   endparameter
+
+   parameter MODIFY              # Modify input NDFs?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Modify input NDFs?'
+      helpkey  *
+   endparameter
+
+   parameter NITER               # Number of mode refining iterations
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      default  7
+      prompt   'Number of mode refining iterations'
+      helpkey  *
+   endparameter
+  
+   parameter OUT                 # Output mosaic NDF
+      position 2
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT'
+      association ->global.data_array
+      prompt   'Output mosaic NDF'
+      helpkey  *
+   endparameter
+
+   parameter OPTOV               # Optimum number of overlaps per NDF
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  3
+      prompt   'Optimum number of overlaps per NDF'
+      helpkey  *
+   endparameter
+
+   parameter PRESERVE            # Preserve input data type?
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_preser'
+      default  TRUE
+      prompt   'Preserve input data type?'
+      helpkey  *
+   endparameter
+
+   parameter REF                 # Reference NDF
+      type     NDF
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default   !
+      prompt   'Reference NDF'
+      helpkey  *
+   endparameter
+
+   parameter SCALE               # Adjust scale-factors?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Adjust scale-factors?'
+      helpkey  *
+   endparameter
+
+   parameter SIGMAS              # Number of standard deviations for clipping
+      type     _REAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      default  4.0
+      prompt   'Clipping limit (standard deviations)'
+      helpkey  *
+   endparameter
+  
+   parameter SKYSUP              # Sky noise suppression factor
+      type     _REAL
+      access   READ
+      vpath    'DYNAMIC,DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  10.0
+      prompt   'Sky noise suppression factor'
+      helpkey  *
+   endparameter
+
+   parameter TITLE               # Title for output mosaic NDF
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Output from MAKEMOS'
+      prompt   'Title for output mosaic'
+      helpkey  *
+   endparameter
+
+   parameter TOLS                # Scale-factor accuracy tolerance
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  0.001
+      prompt   'Fractional scale-factor tolerance'
+      helpkey  *
+   endparameter
+
+   parameter TOLZ                # Zero-point accuracy tolerance
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  0.05
+      prompt   'Zero-point tolerance'
+      helpkey  *
+   endparameter
+
+   parameter USEVAR              # Use variance during data combination?
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Use variance during data combination?'
+      helpkey  *
+   endparameter
+
+   parameter WEIGHTS             # Weighting factors for input NDFs
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'NDF weighting factors'
+      helpkey  *
+   endparameter
+
+   parameter ZERO                # Adjust zero-points?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Adjust zero-points?'
+      helpkey  *
+   endparameter
+
+endinterface
+# @(#)makemos.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     PAIRNDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-FEB-1993 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface PAIRNDF
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # Input list of NDF names
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST                  # Names of output lists
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Names for output lists'
+      default  '*.DAT'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE              # Name of IDI device
+      position 3
+      ptype     DEVICE
+      access   READ
+      vpath    'GLOBAL,PROMPT,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.IMAGE_DISPLAY'
+      default  xwindows
+      prompt   'Name of display device'
+      helpkey  '*'
+   endparameter
+
+   parameter PERCENTILES         # Percentage histogram range
+      position 4
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  2,98
+      prompt   'Display percentiles'
+      helpkey  '*'
+   endparameter
+
+   parameter PALFRAC             # Fraction of display surface used
+      type    _DOUBLE		 #	for palette (X)
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default 0.25D0
+      prompt  'Fraction of display surface for palette'
+      helpkey '*'
+   endparameter
+
+   parameter FILLFRAC            # Fraction of scratch area which an
+				 # image may fill.
+      type    _DOUBLE
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default 0.55D0
+      prompt  'Fraction of scratch area for displayed image'
+      helpkey '*'
+   endparameter
+
+   parameter KEEPLUT             # Keep current look-up-table?
+      type    _LOGICAL
+      access   READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default TRUE
+      prompt  'Keep the current Look-Up-Table'
+      helpkey '*'
+   endparameter
+
+   parameter MAKEBIG             # Make images big enough to fill area aways
+      type    _LOGICAL
+      access   READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default TRUE
+      prompt  'Make images as big as possible'
+      helpkey '*'
+   endparameter
+
+   parameter MSIZE               # Size of marker as fraction of display
+				 # width
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.03
+      prompt   'Relative size of feature marker (0-1)'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK               # Line thickness
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT,'
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Feature marker thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter MEMORY              # Memory id
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT,'
+      ppath    'CURRENT,DEFAULT '
+      default  0
+      range    0,1
+      prompt   'Memory id'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'PAIRNDF.LIS'
+      prompt   'Output filenames list'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+endinterface
+
+# @(#)pairndf.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     PICINFO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-SEP-1995 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface PICINFO
+
+   parameter DEVICE
+      position 1
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT '
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  xwindows
+      ptype    DEVICE
+      prompt   'Name of device'
+   endparameter
+
+endinterface
+# @(#)picinfo.ifl   1.1   95/09/29 11:12:36   95/10/11 15:15:18
+#+
+#  Name:
+#     PLOTLIST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-SEP-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface PLOTLIST
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Input list'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      default  true
+      prompt   'Position list names in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter MSIZE
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  2.5
+      prompt   'Marker size (multiple of default)'
+      helpkey  '*'
+   endparameter
+
+   parameter MTYPE
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  2                                  # plus sign
+      prompt   'Marker type (0-31) -ve uses ids'
+      helpkey  '*'
+   endparameter
+
+   parameter PALNUM
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3                                  # Green
+      prompt   'Pen number'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1                                  # Green
+      prompt   'Thickness of markers'
+      helpkey  '*'
+   endparameter
+
+   parameter CLEAR
+      access   READ
+      type     _LOGICAL
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Clear display device'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      position 2
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT '
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  xwindows
+      ptype    DEVICE
+      prompt   'Name of device'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)plotlist.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     PRESENT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface PRESENT
+
+   helplib  'CCDPACK_HELP:'
+
+   parameter SIMPLE              # Whether input NDF names specified in
+				 # one.
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Do input NDFs already have frame types'
+      helpkey  '*'
+   endparameter
+
+   parameter MULTIENTRY          # Whether input group also has NDF
+				 # types and factors.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Does input list contain frame types and factors'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  '*'
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter MODIFY
+      type     _LOGICAL 
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Modify existing extension items'
+      helpkey  '*'
+   endparameter
+
+   parameter BIAS                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter TARGET              # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter DARK                # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter FLASH                  # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter FLAT                # Input NDF names
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'List of NDF names'
+      helpkey  '*'
+   endparameter
+
+   parameter ADDDARK
+      type    _LOGICAL
+      access  READ
+      vpath   'DYNAMIC,CURRENT,DEFAULT'
+      ppath   'DYNAMIC,CURRENT,DEFAULT'
+      default FALSE      
+      prompt  'Add dark exposure times to NDFs'
+      helpkey '*'
+   endparameter
+
+   parameter ADDFLASH
+      type    _LOGICAL
+      access  READ
+      vpath   'DYNAMIC,CURRENT,DEFAULT'
+      ppath   'DYNAMIC,CURRENT,DEFAULT'
+      default FALSE      
+      prompt  'Add pre-flash exposure times to NDFs'
+      helpkey '*'
+   endparameter
+
+   parameter FTYPE		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Frame type'
+      helpkey  '*'
+   endparameter
+
+   parameter FILTER		 # Frame type parameter
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,CURRENT '
+      prompt   'Filter type'
+      helpkey  '*'
+   endparameter
+
+   parameter ADC                 # The analogue to digital conversion 
+                                 # factor
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Number of electrons per ADU'
+      association '<-global.ccdpack_adc'
+      helpkey  '*'
+   endparameter
+
+   parameter BOUNDS            # Pixel indices of bias strips
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Pixel indices of bias strips (in pairs)'
+      association '<-global.ccdpack_bounds'
+      default   !
+      helpkey  '*'
+   endparameter
+
+   parameter RNOISE		 # The readout noise
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout noise (ADUs)'
+      association '<-global.ccdpack_rnoise'
+      helpkey  '*'
+   endparameter
+
+   parameter BIASVALUE		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Nominal bias value (ADUs)'
+      association '<-global.ccdpack_biasval'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION		 # Bias zero point value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Data saturation value (ADUs)'
+      association '<-global.ccdpack_satval'
+      helpkey  '*'
+   endparameter
+
+   parameter DIRECTION           # Readout direction
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Readout direction (X or Y)'
+      association '<-global.ccdpack_direct'
+      helpkey  '*'
+   endparameter
+
+   parameter DEFERRED            # Deferred charge value
+      type     _DOUBLE
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      prompt   'Deferred charge (ADUs)'
+      association '<-global.ccdpack_defer'
+      helpkey  '*'
+   endparameter
+
+   parameter EXTENT              # Extent of useful CCD area
+      type     _INTEGER
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      prompt   'Useful CCD region (xmin,xmax,ymin,ymax)'
+      default  !
+      association '<-global.ccdpack_extent'
+      helpkey  '*'
+   endparameter
+
+   parameter DARKTIME            # Frame dark time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Dark count exposure time'
+      helpkey  '*'
+   endparameter
+
+   parameter FLASHTIME           # Frame pre-flash exposure time
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Pre-flash exposure time'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Input NDF name list'
+   endparameter
+
+endinterface
+# @(#)present.ifl	1.12     22 Sep 1995     1
+#+
+#  Name:
+#     REGISTER.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface REGISTER
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of position list files'
+      helpkey  '*'
+   endparameter
+
+   parameter FITTYPE                # Fittype parameter
+      position 2
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      range    1, 6
+      prompt   'Type of fit to be performed (1-6) '
+      helpkey  '*'
+   endparameter
+
+   parameter REFPOS
+      position 3
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1
+      prompt   'Position of reference set'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTREF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      prompt   'Name of extended reference set'
+      default  !
+      helpkey  '*'
+   endparameter
+
+   parameter PLACEIN
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'NDF'
+      prompt   'Store transformation structures in'
+      helpkey  '*'
+   endparameter
+
+   parameter TOLER
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.001D0
+      prompt   'Convergence tolerance'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type    _LOGICAL
+      access  READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      prompt   'Position list names in NDF extensions'
+      default true
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'List of NDFs to contain transforms'
+      helpkey  '*'
+   endparameter
+
+   parameter TRFILE
+      type     TRFILE
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Name of container file to store transforms'
+      helpkey  '*'
+   endparameter
+
+   parameter XFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Forward X transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter XINV
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Inverse X transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter YFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Forward Y transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter YINV
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Inverse Y transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter FULL
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  false
+      prompt   'Perform a full transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter CLASSIFY		 # Add a classification structure
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Add classifications'
+      helpkey  '*'
+   endparameter
+
+   parameter CLASS		 # Classifications
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      helpkey  '*'
+   endparameter
+
+   parameter FA
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FB
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FC
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FD
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FE
+      type     LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FF
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FG
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FH
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FI
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FJ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FK
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FL
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FM
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FO
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FP
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FQ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FS
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FT
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FU
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FW
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FX
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FY
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FZ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+
+   parameter PA
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PB
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PC
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PD
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PE
+      type     _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PF
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PG
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PH
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PI
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT,'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PJ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PK
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PL
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PM
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PN
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PO
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PP
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PQ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PR
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PS
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PT
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PU
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PV
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PW
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PX
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PY
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PZ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+endinterface
+# @(#)register.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     SCHEDULE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface SCHEDULE
+
+   helplib 'CCDPACK_DIR:'
+
+   parameter IN                  # Input NDFs list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  '*'
+      association '<-global.ccdpack_ndflist'
+      prompt   'Names of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter SCRIPT              # Reduction script name
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,DYNAMIC,CURRENT,DEFAULT'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  'schedule'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter STYPE               # Reduction script type
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'csh'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter DEBIAS               # Type of debiassing to perform
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Debiassing method'
+      helpkey  '*'
+   endparameter
+
+   parameter EXELOGFILE          # logfile name if executing now.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'schedule.log'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter INTERP              # Type of interpolation performed
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Interpolation method'
+      helpkey  '*'
+   endparameter
+
+   parameter SPACESAVE           # How to save disk space
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      default  'none'
+      prompt   'Save disk space (none,some,lots)'
+      helpkey  '*'
+   endparameter
+
+   parameter EXECUTE             # Whether to execute the command
+				 # procedure or not.
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Execute the command procedure'
+      helpkey  '*'
+   endparameter
+     
+   parameter MASTERBIAS          # Name of master bias NDF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_BIAS'
+      prompt   'Name of master bias NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERDARK          # Name of master dark NDF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_DARK'
+      prompt   'Name of master dark NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERFLASH         # Name of master flash NDF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_FLASH'
+      prompt   'Name of master pre-flash NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERFLAT          # Prefix of master flat names
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_FLAT'
+      prompt   'Prefix name for master flats NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEBIASEXT           # modification applied to NDF names
+				 # output from DEBIAS
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-db'
+      prompt   'Extension of names output from DEBIAS'
+      helpkey  '*'
+   endparameter
+
+   parameter DARKEXT             # modification applied to NDF names
+				 # output from CALCOR dark.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-dk'
+      prompt   'Extension of names output after dark correction'
+      helpkey  '*'
+   endparameter
+
+   parameter FLASHEXT            # modification applied to NDF names
+				 # output from CALCOR flash.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-fls'
+      prompt   'Extension of names output after flash correction'
+      helpkey  '*'
+   endparameter
+
+   parameter FLATEXT             # modification applied to NDF names
+				 # output from FLATCOR.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-flt'
+      prompt   'Extension of names output after flatfielding'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)schedule.ifl	1.10     15 Sep 1995     1
+#+
+#  Name:
+#     TRANLIST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TRANLIST
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of input position lists'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Names for output lists'
+      helpkey  '*'
+   endparameter
+
+   parameter TRTYPE
+      position 3
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'COEFF'
+      prompt   'Transformation type'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      default  true
+      prompt   'Position list names in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter INEXT
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Locate transform structure in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'TRANLIST.LIS'
+      prompt   'Name of output filenames listing'
+   endparameter
+
+   parameter TR
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0,1,0,0,0,1
+      prompt   'Linear transformation coefficients (6)'
+      helpkey  '*'
+   endparameter
+
+   parameter XFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'X mapping expression'
+      helpkey  '*'
+   endparameter
+
+   parameter YFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Y mapping expression'
+      helpkey  '*'
+   endparameter
+
+   parameter TRANSFORM
+      type     'TRN'
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Transformation structure'
+      helpkey  '*'
+   endparameter
+
+   parameter FORWARD
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'true'
+      prompt   'Use forward transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter PA
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PB
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PC
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PD
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PE
+      type     _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PF
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PG
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PH
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PI
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   3.14159265359D0
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PJ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PK
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PL
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PM
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PN
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PO
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PP
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PQ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PR
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PS
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PT
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PU
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PV
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PW
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PX
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PY
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter PZ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Constant value'
+      helpkey   'TRANLIST parameters PA-PZ' 
+   endparameter
+
+   parameter FA
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FB
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FC
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FD
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FE
+      type     LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FF
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FG
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FH
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FI
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FJ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FK
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FL
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FM
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FO
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FP
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FQ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FS
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FT
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FU
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FW
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FX
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FY
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+   parameter FZ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'TRANLIST parameters FA-FZ' 
+   endparameter
+
+endinterface
+# @(#)tranlist.ifl	2.1     30 Nov 1993     2
+#+
+#  Name:
+#     TRANNDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 March 16 (MJC):
+#     	 Original version.
+#     1993 March 25 (MJC):
+#     	 Added LCOORD, UCOORD, LBOUND, and UBOUND. Revised SHAPE.
+#	 Removed SAME.
+#     18-JUN-1993 (PDRAPER):
+#     	 Changed to TRANNDF.
+#     {enter_further_changes_here}
+
+#-
+
+interface TRANNDF
+
+   helplib        'CCDPACK_HELP:'
+
+   parameter      CONSERVE       # Conserve flux
+      type        '_LOGICAL'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'CURRENT,DEFAULT'
+      prompt      'Conserve flux?'
+      helpkey     '*'
+      default     TRUE
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        LITERAL
+      access      'READ'
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt      'List of NDFs'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'LITERAL'
+      access      'WRITE'
+      vpath       'PROMPt,CURRENT'
+      ppath       'CURRENT'
+      association '->global.data_array'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      METHOD         # Resampling method
+      position    3
+      type        'LITERAL'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Re-sampling method'
+      helpkey     '*'
+      default     'Nearest'
+#     in          'Linint', 'Nearest'
+   endparameter
+
+   parameter      SHAPE          # How to shape output NDFs
+      type        'LITERAL'
+      access      'UPDATE'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'CURRENT,DEFAULT'
+      default     'AUTO'
+      prompt      'Method used to get bounds of output NDFs'
+      helpkey     '*'
+   endparameter
+
+   parameter INEXT               # Get transformation structures from NDFs
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Locate transform structure in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter      LBOUND        # Lower bounds of output NDFs
+      type        '_DOUBLE'
+      vpath       'PROMPT,DYNAMIC,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,CURRENT,DEFAULT'
+      prompt      'Lower bounds of the output NDFs'
+      helpkey     '*'
+   endparameter
+
+   parameter      UBOUND        # Upper bound of output NDFs
+      type        '_DOUBLE'
+      vpath       'PROMPT,DYNAMIC,CURRENT,DEFAULT'
+      ppath       'DYNAMIC,CURRENT,DEFAULT'
+      prompt      'Upper bounds of the output NDFs'
+      helpkey     '*'
+   endparameter
+
+   parameter TRANSFORM           # Transformation structure
+      access   READ
+      type     'TRN'
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Transformation structure'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter TITLE # Title for the output NDF
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from TRANNDF'
+      prompt   'Title for the output NDFs'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)tranndf.ifl	2.1     30 Nov 1993     2
+endmonolith
+# $Id$

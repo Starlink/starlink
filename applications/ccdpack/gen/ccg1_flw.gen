@@ -1,0 +1,325 @@
+      SUBROUTINE CCG1_FLW<T>( ARRA, W, NCOL, NLINE, IMETH, DIRECT, NMIN,
+     :                        NBAD, ARRB, STATUS )
+*+
+*  Name:
+*     CCG1_FLW<T>
+
+*  Purpose:
+*     To evaluate an array, each column or row of which is a constant
+*     or straight line least-squares fit to the corresponding input
+*     array line.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_FLW<T>( ARRA, W, NCOL, NLINE, IMETH, DIRECT, NMIN,
+*                       NBAD, ARRB, STATUS )
+
+*  Description:
+*     Scan each input image column or row, forming the required
+*     weighted sums for performing the fit, using only the valid
+*     pixels. If sufficient pixels are valid, evaluate the fit over the
+*     output line.  Otherwise set the output line invalid.
+
+*  Arguments:
+*     ARRA( NCOL, NLINE ) = <COMM> (Given)
+*        The input array to fit with lines.
+*     W( * ) = DOUBLE PRECISION (Given)
+*        A line of weights for the values in ARRA. The length of the
+*        line is NCOL if DIRECT=1, else length is NLINE.
+*     NCOL = INTEGER (Given)
+*        First dimension of input array.
+*     NLINE = INTEGER (Given)
+*        Second dimension of input array.
+*     IMETH = INTEGER (Given)
+*        The method of fitting line. Can be one of
+*        1: Constant
+*        2: Straight Line.
+*     DIRECT = INTEGER (Given)
+*        Direction to fit lines.
+*        1: x direction
+*        2: y direction
+*     NMIN = INTEGER (Given)
+*        The minimum number of non BAD values required in each line for
+*        the output line to be valid.
+*     NBAD = INTEGER (Returned)
+*        The number of lines of data not fitted due to too many BAD
+*        pixels.
+*     ARRB( NCOL, NLINE ) = <COMM> (Returned)
+*        The output array of fitted lines.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     RFWS: Rodney Warren-Smith (Durham University)
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     - (RFWS):
+*        Original version (EDRS).
+*     15-APR-1991 (PDRAPER):
+*        Added new style prologue, changed to use STATUS, declared all
+*        variables, changed to REAL etc.
+*     15-APR-1991 (PDRAPER):
+*        Added weighting.
+*     19-APR-1991 (PDRAPER):
+*        Added directions.
+*     24-APR-1991 (PDRAPER):
+*        Made generic.
+*     28-OCT-1991 (PDRAPER):
+*        Changed to use a line of weights to save workspace.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     -  Sort of - the direct = 2 line fits scan in columns not rows
+*     this will incur large paging overheads for large frames. A
+*     possible improvement to this algorithm would be to form the sums
+*     (in workspace) for all output lines in one pass.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value codes
+
+*  Arguments Given:
+      INTEGER NCOL
+      INTEGER NLINE
+      <TYPE> ARRA( NCOL, NLINE )
+      DOUBLE PRECISION W( * )
+      INTEGER IMETH
+      INTEGER DIRECT
+      INTEGER NMIN
+
+*  Arguments Returned:
+      <TYPE> ARRB( NCOL, NLINE )
+      INTEGER NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION S0
+      DOUBLE PRECISION S1
+      DOUBLE PRECISION S2
+      DOUBLE PRECISION T0
+      DOUBLE PRECISION T1
+      DOUBLE PRECISION X
+      DOUBLE PRECISION SUM
+      DOUBLE PRECISION A
+      DOUBLE PRECISION B
+      DOUBLE PRECISION DW        ! Sum of weights
+      <TYPE> VAL
+      DOUBLE PRECISION DVAL
+      INTEGER I
+      INTEGER J
+      INTEGER MINPIX
+      INTEGER NPT
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion routines.
+      INCLUDE 'NUM_DEF_CVT'
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+* Minimum pixels per line must lie in the range IMETH to NCOL.
+      MINPIX = MIN( MAX( IMETH, NMIN ), NCOL )
+      NBAD = 0
+
+      IF ( DIRECT .EQ. 1 ) THEN
+* X direction
+
+* Scan through the image lines.
+         DO 100 J = 1, NLINE
+
+* FOR FITTING A CONSTANT
+* ----------------------
+
+            IF ( IMETH .EQ. 1 ) THEN
+
+* Form sums for the mean of all the valid pixels.
+               SUM = 0.0D0
+               NPT = 0
+               DW = 0.0D0
+               DO 6  I = 1, NCOL
+                  IF ( ARRA( I, J ) .NE. VAL__BAD<T>   .AND.
+     :                    W( I ) .NE. VAL__BADD ) THEN
+                     SUM = SUM +
+     :                     NUM_<T>TOD( ARRA( I, J ) ) * W( I )
+                     DW = DW + W( I )
+                     NPT = NPT + 1
+                  END IF
+    6          CONTINUE
+
+* If there are sufficient valid pixels, set the output line to the
+* mean value.
+               IF ( NPT .GE. MINPIX ) THEN
+                  VAL = NUM_ DTO<T>( SUM / DW )
+                  DO 7 I = 1, NCOL
+                     ARRB( I, J ) = VAL
+    7             CONTINUE
+
+* If there are insufficient valid pixels, the output line is invalid
+* count 1 bad line.
+               ELSE
+                  NBAD = NBAD + 1
+                  DO 8 I = 1, NCOL
+                    ARRB( I, J ) = VAL__BAD<T>
+    8             CONTINUE
+               END IF
+
+* FOR STRAIGHT LINE FIT
+* ---------------------
+           ELSE IF ( IMETH .EQ. 2 ) THEN
+
+* Initiallise sums for least-squares fit.
+              NPT = 0
+              S1 = 0.0D0
+              S2 = 0.0D0
+              T0 = 0.0D0
+              T1 = 0.0D0
+              S0 = 0.0D0
+
+* Form the sums over the valid pixels.
+              DO 16 I = 1, NCOL
+                 IF ( ARRA( I, J ) .NE. VAL__BAD<T>  .AND.
+     :                   W( I ) .NE. VAL__BADD) THEN
+                    X = DBLE( I )
+                    DW = W( I )
+                    NPT = NPT + 1
+                    S1 = S1 + X * DW
+                    S2 = S2 + X * X * DW
+                    DVAL = NUM_<T>TOD( ARRA( I, J ) ) * W( I )
+                    T0 = T0 + DVAL
+                    T1 = T1 + DVAL * X
+                    S0 = S0 + DW
+                 END IF
+   16         CONTINUE
+
+* If there are sufficient valid pixels, calculate the coefficients
+* of the straight line fit.
+                 IF ( NPT .GE. MINPIX ) THEN
+                    A = ( S0 * T1 - S1 * T0 ) / ( S0 * S2 - S1 * S1 )
+                    B = ( S2 * T0 - S1 * T1 ) / ( S0 * S2 - S1 * S1 )
+
+* Evaluate the fit over the output line.
+                    DO 17 I = 1, NCOL
+                       VAL = NUM_DTO<T>( A * DBLE( I ) + B )
+                       ARRB( I, J ) = VAL
+   17               CONTINUE
+
+* If there are insufficient valid pixels, output line is invalid
+* count 1 bad line. Or weighting is incorrect!
+              ELSE
+                 NBAD = NBAD + 1
+                 DO 18 I = 1, NCOL
+                    ARRB( I, J ) = VAL__BAD<T>
+   18            CONTINUE
+              END IF
+           END IF
+  100    CONTINUE
+      ELSE
+
+*  Y direction - Do the sums over columns instead of rows.
+*  Scan through the image columns.
+         DO 101 J = 1, NCOL
+
+* FOR FITTING A CONSTANT
+* ----------------------
+
+            IF ( IMETH .EQ. 1 ) THEN
+
+* Form sums for the mean of all the valid pixels.
+               SUM = 0.0D0
+               NPT = 0
+               DW = 0.0D0
+               DO 20  I = 1, NLINE
+                  IF ( ARRA( J, I ) .NE. VAL__BAD<T>   .AND.
+     :                    W( I ) .NE. VAL__BADD ) THEN
+                     SUM = SUM + NUM_<T>TOD( ARRA( J, I ) ) * W( I )
+                     DW = DW + W( I )
+                     NPT = NPT + 1
+                  END IF
+   20          CONTINUE
+
+* If there are sufficient valid pixels, set the output line to the
+* mean value.
+               IF ( NPT .GE. MINPIX ) THEN
+                  VAL = NUM_DTO<T>( SUM / DW )
+                  DO 22 I = 1, NLINE
+                     ARRB( J, I ) = VAL
+   22             CONTINUE
+
+* If there are insufficient valid pixels, the output line is invalid
+* count 1 bad line.
+               ELSE
+                  NBAD = NBAD + 1
+                  DO 23 I = 1, NLINE
+                    ARRB( J, I ) = VAL__BAD<T>
+   23             CONTINUE
+               END IF
+
+* FOR STRAIGHT LINE FIT
+* ---------------------
+           ELSE IF ( IMETH .EQ. 2 ) THEN
+
+* Initiallise sums for least-squares fit.
+              NPT = 0
+              S1 = 0.0D0
+              S2 = 0.0D0
+              T0 = 0.0D0
+              T1 = 0.0D0
+              S0 = 0.0D0
+
+* Form the sums over the valid pixels.
+              DO 24 I = 1, NLINE
+                 IF ( ARRA( J, I ) .NE. VAL__BAD<T>  .AND.
+     :                   W( I ) .NE. VAL__BADD ) THEN
+                    X = DBLE( I )
+                    DW = W( I )
+                    NPT = NPT + 1
+                    S1 = S1 + X * DW
+                    S2 = S2 + X * X * DW
+                    DVAL = NUM_<T>TOD( ARRA( J, I ) ) * W( I )
+                    T0 = T0 + DVAL
+                    T1 = T1 + DVAL * X
+                    S0 = S0 + DW
+                 END IF
+   24         CONTINUE
+
+* If there are sufficient valid pixels, calculate the coefficients
+* of the straight line fit.
+                 IF ( NPT .GE. MINPIX ) THEN
+                    A = ( S0 * T1 - S1 * T0 ) / ( S0 * S2 - S1 * S1 )
+                    B = ( S2 * T0 - S1 * T1 ) / ( S0 * S2 - S1 * S1 )
+
+* Evaluate the fit over the output line.
+                    DO 25 I = 1, NLINE
+                       VAL = NUM_DTO<T>( A * DBLE( I ) + B )
+                       ARRB( J, I ) = VAL
+   25               CONTINUE
+
+* If there are insufficient valid pixels, output line is invalid
+* count 1 bad line. Or weighting is incorrect!
+              ELSE
+                 NBAD = NBAD + 1
+                 DO 26 I = 1, NLINE
+                    ARRB( J, I ) = VAL__BAD<T>
+   26            CONTINUE
+              END IF
+           END IF
+  101    CONTINUE
+
+
+      END IF
+      END
+
+* $Id$

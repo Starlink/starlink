@@ -1,0 +1,88 @@
+*+
+*  Name:
+*     ARD_COM
+
+*  Purpose:
+*     Define ARD_ keyword common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables in which the ARD system can
+*     store the current list of region keywords, together with their
+*     properties - this information forms a description table. The
+*     properties define how many trailing coordinates are expected with
+*     each keyword, which dimensions are valid, how many extra values
+*     are required after the coordinate specifiers, whether to check
+*     the coordinates for dimension compliance and the allowed
+*     coordinate types.
+
+*  Prior requirements:
+*     The file ARD_PAR should be included before this file.
+
+*  Notes:
+*     These values should be initialised by the ARD_INIT routine.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-OCT-1991 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+
+      CHARACTER * ( ARD__KEYLEN ) ARD_KWORDS( ARD__MAXKEY )
+*  The list of available keywords.
+
+      INTEGER ARD_PERDIM( ARD__MAXKEY )
+*  The number of coordinates expected per dimension.  (I.e. if require
+*  X,Y then PERDIM is 1, if expect X1,Y1,X2,Y2 then PERDIM is 2). If
+*  set to -1 then no limit is set (-1) then no limit should be applied
+*  other than an integer of the current dimensionality.
+
+      LOGICAL ARD_VALDIM( ARD__MAXDIM, ARD__MAXKEY )
+*  The dimensionalities which are valid for this keyword.
+*  If PERDIM is -1 and COMPLY is set false then this value should be
+*  set true for the dimensions which the values actually apply in.
+
+      INTEGER ARD_EXTRA( ARD__MAXKEY )
+*  The number of extra values which trail a valid sequence of
+*  coordinates.
+
+      LOGICAL ARD_COMPLY( ARD__MAXKEY )
+*  Whether to check the coordinate list for compliance with the current
+*  dimensionality. This should simply be performed by finding out
+*  whether the coordinates are a multiple of the dimensionality. Regions
+*  with explicit requirements (ie. PERDIM not equal to -1 ) should set
+*  this value to false, as checking is performed explicitly for the
+*  required number of returns.
+
+      CHARACTER * ( 1 ) ARD_TYPE( ARD__MAXKEY )
+*  The coordinate type which a region requires. May be one one 'C', 'P'
+*  or 'A'. 'C' means that only none pixel index coordinates are
+*  supported, this is indicated by a floating type for all coordinates.
+*  'P' means that the values should be pixel indices and only pixel
+*  indices. 'A' stands for any if which case the coordinates will not be
+*  checked for type.
+
+*  Define common block for character alignments.
+      COMMON / ARD_COM1 /
+     : ARD_KWORDS,
+     : ARD_TYPE
+
+*  Define common block for word-aligned variables.
+      COMMON / ARD_COM2 /
+     : ARD_PERDIM,
+     : ARD_VALDIM,
+     : ARD_EXTRA,
+     : ARD_COMPLY
+* $Id$

@@ -1,0 +1,159 @@
+      SUBROUTINE CCG1_WMNL<T>( BAD, ARR, W, NCOLS, NLINES, DIRECT,
+     :                         MEAN, STATUS )
+*+
+*  Name:
+*     CCG1_WMNL<T>
+
+*  Purpose:
+*     To form a weighted mean of a 2D array with a line of
+*     weights.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_WMNL<T>( BAD, ARR, W, NCOLS, NLINES, DIRECT, MEAN,
+*                        STATUS )
+
+*  Description:
+*     The routine forms the weighted mean of values in the array ARR.
+*     The weights are given in the form of a line of double precision
+*     values. The line of weights is applied to each of the array lines
+*     in turn. The line of weights is either applied in the X direction
+*     DIRECT = 1 or in the Y direction DIRECT = 2.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether to check for BAD values or not.
+*     ARR( NPIX, NLINES ) = <COMM> (Given)
+*        The array of values for which the weighted mean is required.
+*     W( * ) = DOUBLE PRECISION (Given)
+*        Array of positive weights for values in ARR. The size of this
+*        array will be assummed as NPIX if DIRECT=1 otherwise as NLINES.
+*     NCOLS = INTEGER (Given)
+*        First dimension of array ARR.
+*     NLINES = INTEGER (Given)
+*        Second dimension of array ARR.
+*     DIRECT = INTEGER (Given)
+*        Direction along which line of weights applies.
+*        1 = X direction
+*        2 = Y direction.
+*     MEAN = DOUBLE PRECISION (Returned)
+*        The weighted mean.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-APR-1991 (PDRAPER):
+*        Original version.
+*     28-OCT-1991 (PDRAPER):
+*        Adapted from CCG1_WMN to use a single line of weights, to gain
+*        considerable workspace savings.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primdat constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER NCOLS
+      INTEGER NLINES
+      INTEGER DIRECT
+      <TYPE> ARR( NCOLS, NLINES )
+      DOUBLE PRECISION W( * )
+
+*  Arguments Returned:
+      DOUBLE PRECISION MEAN
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION VAR       ! Value times weight
+      DOUBLE PRECISION SUMVAR    ! Sum of values and weights
+      DOUBLE PRECISION SUMWEI    ! Sum of weights
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion references
+      INCLUDE 'NUM_DEF_CVT'
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      SUMWEI = 0.0D0
+      SUMVAR = 0.0D0
+      IF ( BAD ) THEN
+
+*  Loop over array forming the sums.
+
+*  Branch on which direction to loop over.
+         IF ( DIRECT .EQ. 1 ) THEN
+            DO 1 J = 1, NLINES
+               DO 2 I = 1, NCOLS
+                  IF ( ARR( I, J ) .NE. VAL__BAD<T> .AND.
+     :                 W( I ) .NE. VAL__BADD ) THEN
+                     VAR = W( I ) * NUM_<T>TOD( ARR( I, J ) )
+                     SUMVAR = SUMVAR + VAR
+                     SUMWEI = SUMWEI + W( I )
+                  END IF
+ 2             CONTINUE
+ 1          CONTINUE
+         ELSE
+
+*  Other direction.
+            DO 3 J = 1, NLINES
+               DO 4 I = 1, NCOLS
+                  IF ( ARR( I, J ) .NE. VAL__BAD<T> .AND.
+     :                 W( J ) .NE. VAL__BADD ) THEN
+                     VAR = W( J ) * NUM_<T>TOD( ARR( I, J ) )
+                     SUMVAR = SUMVAR + VAR
+                     SUMWEI = SUMWEI + W( J )
+                  END IF
+ 4             CONTINUE
+ 3          CONTINUE
+         END IF
+
+      ELSE
+*  No BAD values, just from sums without checking.
+*  Branch on which direction to loop over.
+         IF ( DIRECT .EQ. 1 ) THEN
+            DO 5 J = 1, NLINES
+               DO 6 I = 1, NCOLS
+                  VAR = W( I ) * NUM_<T>TOD( ARR( I, J ) )
+                  SUMVAR = SUMVAR + VAR
+                  SUMWEI = SUMWEI + W( I )
+ 6             CONTINUE
+ 5          CONTINUE
+         ELSE
+
+*  Other direction.
+            DO 7 J = 1, NLINES
+               DO 8 I = 1, NCOLS
+                  VAR = W( J ) * NUM_<T>TOD( ARR( I, J ) )
+                  SUMVAR = SUMVAR + VAR
+                  SUMWEI = SUMWEI + W( J )
+ 8             CONTINUE
+ 7          CONTINUE
+         END IF
+      END IF
+
+*  Weighted Mean.
+      MEAN = SUMVAR / MAX( 1.0D-20, SUMWEI )
+
+      END
+* $Id$

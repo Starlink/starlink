@@ -1,0 +1,35 @@
+#  WHT data (circa '94 onwards)
+
+#  CCDPACK - import control table for the WHT. 
+#
+#  The detector isn't relevant if these FITS items are correct, 
+#  although the FILTER entry will depend on the configuration used.
+
+#  Name the required FITS items and their types.
+_INTEGER CCDXIMSI
+_INTEGER CCDYIMSI
+_DOUBLE  GAIN
+_DOUBLE  READNOIS
+_INTEGER CCDYIMST
+_INTEGER CCDXIMST
+_CHAR    PFMFNAME
+_INTEGER CCDXSIZE
+_CHAR    OBSTYPE
+
+#  Map the FITS information into the CCDPACK extension. This would be
+#  easier if the bias strip bounds where given rather than inferred.
+FILTER        PFMFNAME
+EXTENT.MINX   CCDXIMST
+EXTENT.MINY   CCDYIMST
+EXTENT.MAXX   CCDXIMST+CCDXIMSI-1
+EXTENT.MAXY   CCDYIMST+CCDYIMSI-1
+BOUNDS.START1 1
+BOUNDS.END1   CCDXIMST-3
+BOUNDS.START2 CCDXIMST+CCDXIMSI+3
+BOUNDS.END2   CCDXSIZE
+ADC           GAIN
+RNOISE        READNOIS/GAIN
+FTYPE         OBSTYPE TARGET=TARGET SKY=FLAT BIAS=BIAS
+
+# $Id$
+

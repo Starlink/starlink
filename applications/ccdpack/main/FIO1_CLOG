@@ -1,0 +1,55 @@
+*+
+*  Name:
+*     CCD1_CLOG
+
+*  Purpose:
+*     CCDPACK log file system common block
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Include file for declaring common block.
+
+*  Description:
+*     CCDPACK log file system include file. This file declares the
+*     common block  /CCD1_CLOG/CCD1_LOGFD,CCD1_ILEVL,CCD1_BUFF, which
+*     controls the echoing of any output strings to the logfile and
+*     terminal. THIS VERSION USES FIO and PSX.
+*
+*  Notes:
+*     - This version is designed for use on machines which do not
+*        support the ICL/ADAM logging system. It uses FIO and PSX open
+*        and control the file, and to perform the date/time stamping.
+*     - includes the MSG system parameters to define the size of the
+*       character buffer
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-JUN-1991 (PDRAPER):
+*        Original version.
+*     1-NOV-1991 (PDRAPER):
+*        Extended system to include new options for not getting any
+*        output.
+*     19-FEB-1992 (PDRAPER):
+*        Changed to use FIO and PSX
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+      INCLUDE '/star/include/msg_par'            ! Size of the MSG system buffer
+
+*  Global Variables:
+      CHARACTER * ( MSG__SZMSG ) CCD1_BUFF ! MSG system buffer
+      INTEGER CCD1_ILEV          ! Log system interaction level
+      INTEGER CCD1_LOGFD         ! FIO system file descriptor
+
+*  Global common blocks:
+*  Separate characters from others.
+      COMMON/ CCD1_CLOG1 / CCD1_LOGFD, CCD1_ILEV
+      COMMON/ CCD1_CLOG2 / CCD1_BUFF
+* $Id$

@@ -1,0 +1,102 @@
+      SUBROUTINE CCD1_PTBD<T>( LBND, UBND, NY, I1, I2, DATA, STATUS )
+*+
+*  Name:
+*     CCD1_PTBDx
+
+*  Purpose:
+*     Fill selected columns of an image with bad values.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_PTBDx( LBND, UBND, NY, I1, I2, DATA, STATUS )
+
+*  Description:
+*     The routine fills a specified range of columns in an array
+*     (regarded as a 2-dimensional image) with the "bad" value.  Other
+*     elements of the array are left unchanged.
+
+*  Arguments:
+*     LBND = INTEGER (Given)
+*        Lower bound of the first dimension of the array.
+*     UBND = INTEGER (Given)
+*        Upper bound of the first dimension of the array.
+*     NY = INTEGER (Given)
+*        Second dimension size of the array.
+*     I1 = INTEGER (Given)
+*        Lower bound on the range of columns to be filled (must lie in
+*        the range LBND to UBND inclusive).
+*     I2 = INTEGER (Given)
+*        Upper bound on the range of columns to be filled (must lie in
+*        the range LBND to UBND inclusive and be at least equal to I1).
+*     DATA( LBND : UBND, NY ) = ? (Given and Returned)
+*        Array to be filled. The region affected is DATA( I1:I2, 1:NY )
+*        - other elements are returned unchanged.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     There is a routine for processing real and double precision data;
+*     replace "x" in the routine name by R or D as appropriate. The
+*     type of the DATA argument must match the routine being used.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     6-MAY-1992 (RFWS):
+*        Original version.
+*     8-JUN-1992 (RFWS):
+*        Made generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primitive data constants
+
+*  Arguments Given:
+      INTEGER LBND
+      INTEGER UBND
+      INTEGER NY
+      INTEGER I1
+      INTEGER I2
+
+*  Arguments Given and Returned:
+      <TYPE> DATA( LBND : UBND, NY )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop through the region of the array to be modified.
+      DO 2 J = 1, NY
+         DO 1 I = I1, I2
+
+*  Assign the bad value.
+            DATA( I, J ) = VAL__BAD<T>
+ 1       CONTINUE
+ 2    CONTINUE
+
+      END
+* $Id$

@@ -1,0 +1,87 @@
+      SUBROUTINE CCG1_LAPN<T>( VAL, NVAL, IAT, BIGL, STATUS )
+*+
+*  Name:
+*     CCG1_LAPN
+
+*  Purpose:
+*     Insert a list of values into a bigger list.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_LAPN( VAL, NVAL, IAT, BIGL, STATUS )
+
+*  Description:
+*     The routine inserts the array VAL(NVAL) into the array BIGL(*)
+*     starting at the positions IAT. 
+
+*  Arguments:
+*     VAL( NVAL ) = <COMM> (Given)
+*        Values to be inserted in the larger list BIGL
+*     NVAL = INTEGER (Given)
+*        The number of entries in VAL.
+*     IAT = INTEGER (Given)
+*        Position within BIGL at which the values in VAL are to be
+*        inserted.
+*     BIGL( * ) = <COMM> (Given and Returned)
+*        Array into which the values in VAL are to be inserted. The
+*        insertion begins at position IAT, until position IAT+NVAL-1.
+*        The calling routine should ensure that BIGL is large enough to
+*        contain elements up to IAT+NVAL-1 as no bounds checking is
+*        performed by this routine. Elements of BIGL outside of the
+*        range are left unmodified.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     27-JUL-1992 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NVAL
+      <TYPE> VAL( NVAL )
+      INTEGER IAT
+
+*  Arguments Given and Returned:
+      <TYPE> BIGL( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER IPOINT
+      INTEGER I
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise pointer to current position in output array.
+      IPOINT = IAT
+
+*  Loop copying the elements of VAL into the appropriate elements of
+*  BIGL.
+      DO 1 I = 1, NVAL
+         BIGL( IPOINT ) = VAL( I )
+         IPOINT = IPOINT + 1
+ 1    CONTINUE
+      END
+* $Id$

@@ -1,0 +1,16 @@
+#  Setup for ING EEV6, standard speed readout. Warning no useful area available.
+#
+#  Derived from ING document eev6, Tue Nov 29 1994.
+#
+#  Real size = 1142x1152, clocked size = 1280x1180.
+#
+#  Only one strip (the underscan) recommended for use and of this only
+#  100,1000 in Y.
+
+ADC = 0.9
+RNOISE = 3.9
+EXTENT = UNKNOWN 
+DIRECTION = X
+BOUNDS = 6,15
+
+# $Id$

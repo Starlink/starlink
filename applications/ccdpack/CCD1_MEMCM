@@ -1,0 +1,39 @@
+*+
+*  Name:
+*     CCD1_MEMCM
+
+*  Purpose:
+*     Define CCDPACK virtual memory control common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines the CCDPACK common block for containing
+*     pointers to any allocated virtual memory. If also stores the
+*     number of memory requests that have been made that cannot be
+*     fitted into this space.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-SEP-1992 (PDRAPER):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Define space.
+      INTEGER CCD1_MEMCM( CCD1__MXPNT )
+      INTEGER CCD1_OVER
+
+*  Define common block.
+      COMMON/ CCD1_MEMCM / CCD1_MEMCM, CCD1_OVER
+* $Id$

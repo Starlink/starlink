@@ -1,0 +1,176 @@
+#!/bin/csh
+
+#+
+#   Name:
+#      ccdexecute
+#
+#   Purpose:
+#      Executes a CCDPACK command file in the background.
+#
+#   Language:
+#      C shell
+#
+#   Type of Module:
+#      C shell script
+#
+#   Note:
+#      - C shell specific.
+#
+#   Usage:
+#      ccdexecute script_type user_script [logfile]
+#
+#   Description:
+#      This command saves the current ADAM execution environment
+#      and then executes the given command procedure in the
+#      background. The output from executing the procedure is
+#      written to the file "logfile". The type of script file
+#      should be "CSH" or "ICL". "CSH" for a C-shell script and
+#      "ICL" for an ICL script.
+#
+#   ADAM Parameters:
+#      $1 = string (read)
+#         The type of command file to be executed, "CSH" or "ICL".
+#      $2 = filename (read)
+#         The name of the script file which contains the
+#         CCDPACK commands which are to be run in the background.
+#      $3 = filename (write)
+#         The name of a file to contain any output from the execution
+#         of the command procedure.
+#
+#   Examples:
+#      ccdexecute ccdred ccdred.log
+#         In this example the CCDPACK commands written in the file
+#         ccdred are executed and any output is recorded in the
+#         file ccdred.log.
+#
+#   Authors:
+#      PDRAPER: Peter Draper (STARLINK)
+#      {enter_new_authors_here}
+#
+#   History:
+#      4-JAN-1994 (PDRAPER):
+#         Original Version.
+#      18-AUG-1995 (PDRAPER):
+#         Added code to unset ICL_TASK_NAME as this was causing tasks
+#         to try to communicate with ICL when run from the Tcl GUI! Also
+#         unset ADAM_TASK_TYPE which might make future TCL tasks not
+#         reset the parameter system (probably not important for C-shell).
+#      {enter_changes_here}
+#-
+
+#  Test for at least two parameters - the user shell type and script name.
+   set script_type="$1"
+check_type:
+   switch ("$script_type")
+      case "[Ii][Cc][Ll]":
+         set script_type = "icl"
+      breaksw
+      case "[Cc][Ss][Hh]":
+         set script_type = "csh"
+      breaksw
+      default:
+         echo -n "Type of script file (csh or icl): "
+         set script_type = $<
+         if ( $script_type == "" ) then
+	    exit
+         else
+            goto check_type
+         endif
+      breaksw
+   endsw
+
+#  Script file.
+   set ccdpack_script = "$2"
+check_script:
+   if ( "$ccdpack_script" == "" || ! -r "$ccdpack_script"  ) then
+      echo -n "Name of script file: "
+      set ccdpack_script = $<
+      if ( $ccdpack_script == "" ) then
+         exit
+      else
+         goto check_script
+      endif
+   endif
+
+#  Make sure that the tasks run as a C-shell programs, rather than
+#  ICL or TCL ones, if this is invoked from those interfaces.
+   if ( $?ICL_TASK_NAME ) then
+      unsetenv ICL_TASK_NAME
+   endif
+   if ( $?ADAM_TASK_TYPE ) then
+      unsetenv  ADAM_TASK_TYPE
+   endif
+
+#  Look for environment variable ADAM_USER which if
+#  defined shows where current environment is stored
+   if ( !( $?ADAM_USER ) ) then
+      set envhome="$HOME/adam"
+   else
+      set envhome="$ADAM_USER"
+   endif
+
+#  Test for existence of directory
+   set copyenv = "true"
+   if ( ! ( -d $envhome ) ) then
+      echo " "
+      echo "No adam parameter file directory exists : files not copied"
+      echo " "
+
+#  Set flag to pass file copy stage.
+      copyenv = "false"
+   endif
+
+#  Located directory report to user
+   echo "ADAM parameter files located in $envhome"
+
+#  Create new directory for environment.
+   set envdest = $envhome:h
+   set newdir = `date | awk '{split($4,a,":");print $3a[1]a[2]a[3]}'`
+   set envdest = $envdest/'adam_'$newdir
+   echo "New home directory: $envdest"
+   if ( !( -d $envdest ) ) then
+      mkdir $envdest
+   endif
+   echo "Saving current ADAM context in directory $envdest"
+
+#  Copy the contents of old adam_user to new adam_user
+   if ( $copyenv == "true" ) then
+      'cp' $envhome/*.sdf $envdest
+   endif
+   echo "Context saved"
+
+#  Set the new directory to be the current ADAM_USER.
+   setenv ADAM_USER $envdest
+
+#  Get the name of the log file.
+   if ( "$3" == "" ) then
+      set outfile = ccdexecute.log
+   else
+      set outfile = $3
+   endif
+
+
+#  Branch for different script types.
+   if ( "$script_type" == "csh" ) then
+
+#  Make sure that ccdpack is ready to go.
+      set ccdpack_defined = `alias ccdpack`
+      if ( "$ccdpack_defined" == "" ) then
+         if ( -e /star/etc/cshrc ) then
+            source /star/etc/cshrc
+         else
+	    echo "Unable to locate Starlink C shell startup script - aborting"
+	    exit
+         endif
+      endif
+
+#  CCDPACK is available so contruct the command to run in the
+#  background, need to make this command "nice" and make the CCDPACK
+#  commands available to it.
+      eval '(source $CCDPACK_DIR/ccdpack.csh;nice source $ccdpack_script;'rm' -r $envdest)' >&! $outfile \&
+   else
+      eval '(nice icl $ccdpack_script;'rm' -r $envdest)' >&! $outfile \&
+   endif
+
+   exit
+# $Id$

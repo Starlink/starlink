@@ -1,0 +1,98 @@
+#+
+#  Name:
+#     LISTLOG.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     UNKNOWN:
+#     PDRAPER: Peter Draper (STARLINK)
+
+#  History:
+#     - (UNKNOWN):
+#     	 Original version.
+#     8-JAN-1992 (PDRAPER):
+#     	 Changed prompting. Use S for the DTNS default.
+#     {enter_further_changes_here}
+
+#-
+
+interface LISTLOG
+
+      helplib  'CCDPACK_HELP:'
+
+      parameter  LOGFILENAME
+         keyword    'LOGFILENAME'
+         position   1
+         type       LITERAL
+         access     'READ'
+         vpath      'PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'ADAM_LOGFILE'
+         prompt     'Logfile name'
+         helpkey    '*'
+      endparameter
+
+      parameter  OUTPUT
+         keyword    'OUTPUT'
+         position   2
+         type       LITERAL
+         access     'READ'
+         vpath      'PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'S'
+         prompt     'Name of file ( "S" outputs to screen )'
+         helpkey    '*'
+      endparameter
+
+      parameter  SINCE
+         keyword    'SINCE'
+         position   3
+         type       LITERAL
+         access     'READ'
+         vpath      'DEFAULT,PROMPT'
+         ppath      'DEFAULT'
+         default    'S'
+         prompt     'Select records since ( "S" means from start )'
+         helpkey    '*'
+      endparameter
+
+      parameter  DTNS
+         keyword    'DTNS'
+         position   4
+         type       LITERAL
+         access     'READ'
+         vpath      'CURRENT,DEFAULT,PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'S'
+         prompt     'Required elements of logfile D-T-N-S'
+         helpkey    '*'
+      endparameter
+
+      parameter  NAMES
+         keyword    'TASKS'
+         position   5
+         type       '_CHAR'
+         access     'READ'
+         vpath      'CURRENT,DEFAULT,PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'ALL'
+         prompt     'Select task names ?'
+         helpkey    '*'
+      endparameter
+
+      parameter  LABELS
+         keyword    'LABELS'
+         position   6
+         type       '_CHAR'
+         access     'READ'
+         vpath      'CURRENT,DEFAULT,PROMPT'
+         ppath      'CURRENT,DEFAULT'
+         default    'ALL'
+         prompt     'Match entry string against ?'
+         helpkey    '*'
+      endparameter
+
+endinterface
+# $Id$

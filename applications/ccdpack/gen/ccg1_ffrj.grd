@@ -1,0 +1,293 @@
+      SUBROUTINE CCG1_FFRJ<T>( BAD, ARRIN, NX, NY, NITER, GAMMA, IX,
+     :                         IY, SIGMA, ARROUT, NGOOD, WRKIMG, ILINE,
+     :                         NLINE, STATUS )
+*+
+*  Name:
+*     CCG1_FFRJ<T>
+
+*  Purpose:
+*     To reject defects in a substantially smooth image.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_FFRJ<T>( BAD, ARRIN, NX, NY, NITER, GAMMA, IX, IY,
+*                        SIGMA, ARROUT, NGOOD, WRKIMG, ILINE,
+*                        NLINE, STATUS )
+
+*  Description:
+*     First the routine smooths the image using a rectangular filter
+*     and forms a noise estimate based on a comparison of the original
+*     image with the smoothed version. It then rejects pixels which
+*     deviate from the smoothed version by more than a determined
+*     number of standard deviations. Iterations then occur smoothing
+*     the most recent rejected image each time.
+
+*  Arguments:
+*     BAD = LOGICAL (Given and Returned)
+*        Whether BAD pixels are initially present or not, on exit
+*        signfies if pixels have been rejected.
+*     ARRIN( NX, NY ) = <COMM>(Given)
+*        The 2D array which requires cleaning.
+*     NX = INTEGER (Given)
+*        First dimension of input array.
+*     NY = INTEGER (Given)
+*        Second dimension of input array.
+*     NITER = INTEGER (Given)
+*        Number of cleaning interations.
+*     GAMMA = REAL (Given)
+*        The number of standard deviations at which rejection occurs.
+*     IX = INTEGER (Given)
+*        X size of the smoothing box.
+*     IY = INTEGER (Given)
+*        Y size of the smoothing box.
+*     SIGMA = REAL (Returned)
+*        Estimate of the RMS noise in an output pixel.
+*     ARROUT( NX, NY ) = <COMM> (Returned)
+*        The cleaned output array.
+*     NGOOD = INTEGER (Returned)
+*        The number of good pixels left in image after cleaning.
+*     WRKIMG( NX * NY ) = <COMM> (Given and Returned)
+*        Workspace.
+*     ILINE( NX ) = INTEGER (Given and Returned)
+*        Workspace.
+*     NLINE( NX ) = <COMM> (Given and Returned)
+*        Workspace.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - Although this routine is generic the types should be limited to
+*     REAL and DOUBLE PRECISION as the blocking routine is limited to
+*     these.
+
+*  Authors:
+*     RFWS: Rodney Warren-Smith (Durham University)
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     - (RFWS):
+*        Original version (EDRS).
+*     1-MAY-1991 (PDRAPER):
+*        Added prologue, changed to REALS etc.
+*     3-MAY-1991 (PDRAPER):
+*        Converted to use KPG1_BLOCx, MSG etc. major re-organisation.
+*     8-MAY-1991 (PDRAPER):
+*        Changed to generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value constants
+
+*  Arguments Given:
+      INTEGER NX
+      INTEGER NY
+      <TYPE> ARRIN( NX * NY )
+      INTEGER NITER
+      REAL GAMMA
+      INTEGER IX
+      INTEGER IY
+      REAL SIGMA
+
+*  Arguments Given and Returned:
+      LOGICAL BAD
+      <TYPE> WRKIMG( NX * NY )
+      INTEGER ILINE( NX )
+      <TYPE> NLINE( NX )
+
+*  Arguments Returned:
+      <TYPE> ARROUT( NX * NY )
+      INTEGER NGOOD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local constants:
+*  Q0 is the smallest value that the variance of a pixel can take.
+*  Set it to a small number.
+      <TYPE> Q0
+      PARAMETER ( Q0 = 0.001 )
+
+*  Local Variables:
+      INTEGER I
+      INTEGER IDX
+      INTEGER IDY
+      INTEGER IIX
+      INTEGER IIY
+      INTEGER ITER
+      INTEGER NMIN
+      INTEGER NN
+      INTEGER NREJ
+      INTEGER NSTART
+      LOGICAL BADOUT
+      <TYPE> A
+      <TYPE> B
+      <TYPE> DIFF
+      <TYPE> DIFF2
+      <TYPE> SIG
+      <TYPE> THRESH
+      <TYPE> VAR
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+* Make the sides of the filter area odd.
+      IDX = MAX( 0, IX / 2 )
+      IDY = MAX( 0, IY / 2 )
+      IIX = 2 * IDX + 1
+      IIY = 2 * IDY + 1
+
+*  Set threshold for required number of valid pixels per box to
+*  0.25 * box area.
+
+      NMIN = MAX( ( IIX * IIY ) / 4, 1 )
+
+*  Count the number of valid pixels. Copy input array to output.
+      NN = NX * NY
+      NSTART = 0
+      DO 1 I = 1, NN
+         IF( ARRIN( I ) .NE. VAL__BAD<T> ) THEN
+            NSTART = NSTART + 1
+         END IF
+         ARROUT( I ) = ARRIN( I )
+ 1    CONTINUE
+      BAD = NSTART .NE. NN
+
+*  Inform user about how many good pixels there are.
+      CALL MSG_SETI( 'FFREJ_NSTART', NSTART )
+      CALL CCD1_MSG( 'FFREJ_START',
+     : '  Data initially has ^FFREJ_NSTART valid pixel(s)',
+     : STATUS )
+
+*  If there are no valid pixels, exit with error status.
+      IF ( NSTART .LE. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'FFREJ_NOPIX','Data contains no valid pixels',
+     :                 STATUS )
+         BAD = .TRUE.
+         GO TO 99
+      END IF
+
+*  Perform the rejection iterations.
+*  ---------------------------------
+      DO 66 ITER = 1, NITER
+
+*  Smooth the image using KPG1_BLOCR to apply a rectangular filter.
+         CALL KPG1_BLOC<T>( BAD, .FALSE., .FALSE., NX, NY, ARROUT,
+     :                      IIX, IIY, NMIN, WRKIMG, BADOUT, NLINE,
+     :                      ILINE, STATUS )
+         BAD = BAD .OR. BADOUT
+*  Smoothed image is in workspace at this stage.
+*  On the first iteration, compare the smoothed image with the original
+*  and derive a noise estimate.
+         IF ( ITER .EQ. 1 ) THEN
+            SIG = 0<CONST>
+            NGOOD = 0
+            DO 2 I = 1, NN
+
+*  Use only those pixels valid in both images.
+               IF ( ARRIN( I ) .NE. VAL__BAD<T> ) THEN
+                  IF ( WRKIMG( I ) .NE. VAL__BAD<T> ) THEN
+                     A = ARRIN( I )
+                     B = WRKIMG( I )
+                     DIFF = A - B
+                     SIG = SIG + DIFF * DIFF
+                     NGOOD = NGOOD + 1
+                  END IF
+               END IF
+    2       CONTINUE
+            IF( NGOOD .GE. 1 ) THEN
+               VAR = MAX( SIG / NGOOD, Q0 )
+            ELSE
+               VAR = Q0
+            END IF
+
+*  Set threshold for the squared deviations at gamma standard
+*  deviations.
+            THRESH = GAMMA * GAMMA * VAR
+         END IF
+
+*  Now copy the input image to the output matrix, rejecting pixels
+*  outside the threshold.
+         SIG = 0<CONST>
+         NGOOD = 0
+         DO 3 I = 1, NN
+
+*  Accept only those pixels valid in both images.
+            IF ( ARROUT( I ) .NE. VAL__BAD<T> ) THEN
+               IF ( WRKIMG( I ) .NE. VAL__BAD<T> ) THEN
+                  A = ARROUT( I )
+                  B = WRKIMG( I )
+                  DIFF = A - B
+                  DIFF2 = DIFF * DIFF
+                  IF ( DIFF2 .LE. THRESH ) THEN
+
+*  Form a new noise estimate at the same time.
+                     ARROUT( I ) = ARRIN( I )
+                     SIG = SIG + DIFF2
+                     NGOOD = NGOOD + 1
+                  ELSE
+                     ARROUT( I ) = VAL__BAD<T>
+                  END IF
+               END IF
+            ELSE
+               ARROUT( I ) = VAL__BAD<T>
+            END IF
+    3    CONTINUE
+         BAD = BAD .OR. ( NGOOD .NE. NN )
+
+*  Evaluate the noise estimate.
+         IF( NGOOD .GE. 1 ) THEN
+            VAR = MAX( SIG / NGOOD, Q0 )
+         ELSE
+            VAR = Q0
+         END IF
+
+*  Set new rejection threshold.
+         THRESH = GAMMA * GAMMA * VAR
+
+*  Show the user the progress of the iterations
+         SIGMA = SQRT( ( VAR * IIX * IIY )/( MAX( 1, IIX * IIY - 1 ) ) )
+         CALL MSG_SETI( 'FFREJ_ITER', ITER )
+         CALL MSG_SETR( 'FFREJ_SIGMA', SIGMA )
+         CALL MSG_SETI( 'FFREJ_NGOOD', NGOOD )
+         CALL CCD1_MSG( 'FFREJ_STATE',
+     :   '  Iteration ^FFREJ_ITER : ^FFREJ_NGOOD valid pixel(s) :'//
+     :   ' sigma=^FFREJ_SIGMA', STATUS )
+
+*  If all pixels have been rejected, then exit
+         IF ( NGOOD .LE. 0 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'FFREJ_ALL', 'All pixels have been rejected',
+     :                     STATUS )
+            GO TO 99
+         END IF
+ 66   CONTINUE
+
+*   Show how many pixels were rejected after all iterations are complete
+      NREJ = NSTART - NGOOD
+      CALL MSG_SETI( 'FFREJ_NREJ', NREJ )
+      CALL CCD1_MSG( 'FFREJ_FINAL',
+     : '  ^FFREJ_NREJ pixel(s) rejected in total', STATUS )
+      CALL CCD1_MSG( ' ', ' ', STATUS )
+
+*  Set final BAD value
+      BAD = BAD .OR. ( NGOOD .NE. NN )
+
+ 99   CONTINUE
+      RETURN
+      END
+* $Id$

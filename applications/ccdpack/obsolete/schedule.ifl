@@ -1,0 +1,223 @@
+#+
+#  Name:
+#     SCHEDULE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-FEB-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface SCHEDULE
+
+   helplib 'CCDPACK_DIR:'
+
+   parameter IN                  # Input NDFs list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  '*'
+      association '<-global.ccdpack_ndflist'
+      prompt   'Names of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter SCRIPT              # Reduction script name
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,DYNAMIC,CURRENT,DEFAULT'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  'schedule'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter STYPE               # Reduction script type
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'csh'
+      prompt   'Type of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter DEBIAS               # Type of debiassing to perform
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Debiassing method'
+      helpkey  '*'
+   endparameter
+
+   parameter EXELOGFILE          # logfile name if executing now.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'schedule.log'
+      prompt   'Name of output script'
+      helpkey  '*'
+   endparameter
+
+   parameter INTERP              # Type of interpolation performed
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Interpolation method'
+      helpkey  '*'
+   endparameter
+
+   parameter SPACESAVE           # How to save disk space
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      default  'none'
+      prompt   'Save disk space (none,some,lots)'
+      helpkey  '*'
+   endparameter
+
+   parameter EXECUTE             # Whether to execute the command
+				 # procedure or not.
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Execute the command procedure'
+      helpkey  '*'
+   endparameter
+
+   parameter IRFLATS             # Flatfields may be TARGETS!
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Using TARGETS as possible flatfields'
+      helpkey  '*'
+   endparameter
+     
+   parameter MASTERBIAS          # Name of master bias NDF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_BIAS'
+      prompt   'Name of master bias NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERDARK          # Name of master dark NDF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_DARK'
+      prompt   'Name of master dark NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERFLASH         # Name of master flash NDF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_FLASH'
+      prompt   'Name of master pre-flash NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter MASTERFLAT          # Prefix of master flat names
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'MASTER_FLAT'
+      prompt   'Prefix name for master flats NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEBIASEXT           # modification applied to NDF names
+				 # output from DEBIAS
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-db'
+      prompt   'Extension of names output from DEBIAS'
+      helpkey  '*'
+   endparameter
+
+   parameter DARKEXT             # modification applied to NDF names
+				 # output from CALCOR dark.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-dk'
+      prompt   'Extension of names output after dark correction'
+      helpkey  '*'
+   endparameter
+
+   parameter FLASHEXT            # modification applied to NDF names
+				 # output from CALCOR flash.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-fls'
+      prompt   'Extension of names output after flash correction'
+      helpkey  '*'
+   endparameter
+
+   parameter FLATEXT             # modification applied to NDF names
+				 # output from FLATCOR.
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '-flt'
+      prompt   'Extension of names output after flatfielding'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Log output to ?
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      prompt      'logfile name'
+      association '<-global.ccdpack_logfile'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$

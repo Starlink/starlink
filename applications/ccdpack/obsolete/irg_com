@@ -1,0 +1,30 @@
+*+
+*  Name:
+*     IRG_COM
+
+*  Purpose:
+*     Defines IRG common blocks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAR-1992 (PDRAPER):
+*        Changed common blocks to split character and logical data.
+*     {enter_changes_here}
+
+*-
+      CHARACTER GCM_AMODE(IRH__MAXG)*6   ! Access mode for each group.
+      LOGICAL   GCM_OUT(IRH__MAXG)       ! If true, then the group is an
+                                         ! output group. Otherwise it is
+                                         ! an input group.
+      
+
+      COMMON /IRG_COM1/ GCM_AMODE
+      COMMON /IRG_COM2/ GCM_OUT
+* $Id$

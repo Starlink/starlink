@@ -1,0 +1,698 @@
+#+
+#  Name:
+#     REGISTER.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface REGISTER
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of position list files'
+      helpkey  '*'
+   endparameter
+
+   parameter FITTYPE                # Fittype parameter
+      position 2
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      range    1, 6
+      prompt   'Type of fit to be performed (1-6) '
+      helpkey  '*'
+   endparameter
+
+   parameter REFPOS
+      position 3
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1
+      prompt   'Position of reference set'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTREF
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      prompt   'Name of extended reference set'
+      default  !
+      helpkey  '*'
+   endparameter
+
+   parameter PLACEIN
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'NDF'
+      prompt   'Store transformation structures in'
+      helpkey  '*'
+   endparameter
+
+   parameter TOLER
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.001D0
+      prompt   'Convergence tolerance'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type    _LOGICAL
+      access  READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      prompt   'Position list names in NDF extensions'
+      default true
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'List of NDFs to contain transforms'
+      helpkey  '*'
+   endparameter
+
+   parameter TRFILE
+      type     TRFILE
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Name of container file to store transforms'
+      helpkey  '*'
+   endparameter
+
+   parameter XFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Forward X transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter XINV
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Inverse X transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter YFOR
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Forward Y transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter YINV
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'Inverse Y transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter FULL
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  false
+      prompt   'Perform a full transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter CLASSIFY		 # Add a classification structure
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Add classifications'
+      helpkey  '*'
+   endparameter
+
+   parameter CLASS		 # Classifications
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      helpkey  '*'
+   endparameter
+
+   parameter FA
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FB
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FC
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FD
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FE
+      type     LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FF
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FG
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FH
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FI
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FJ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FK
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FL
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FM
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FN
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FO
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FP
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FQ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FR
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FS
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FT
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FU
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FV
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FW
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FX
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FY
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+   parameter FZ
+      type      LITERAL
+      access    READ
+      vpath     'PROMPT,CURRENT'
+      ppath     'CURRENT'
+      prompt    'Sub-expression'
+      helpkey   'REGISTER parameters FA-FZ' 
+   endparameter
+
+
+   parameter PA
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PB
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PC
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PD
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PE
+      type     _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PF
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PG
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PH
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PI
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT,'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PJ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PK
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PL
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PM
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PN
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PO
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PP
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PQ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PR
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PS
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PT
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PU
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PV
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PW
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PX
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PY
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+   parameter PZ
+      type      _DOUBLE
+      access    READ
+      vpath     'PROMPT,CURRENT,DEFAULT'
+      ppath     'CURRENT,DEFAULT'
+      default   1.0d0
+      prompt    'Initial guess at parameter value'
+      helpkey   'REGISTER parameters PA-PZ' 
+   endparameter
+
+endinterface
+# $Id$

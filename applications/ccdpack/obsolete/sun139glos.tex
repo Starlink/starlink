@@ -1,0 +1,150 @@
+In the following section various terms which are used when describing
+CCD datasets are explained, a little of the rationale for the
+existence of the various CCD data types is also given. A pixel in
+following context is one of the CCDs light sensitive elements and
+should not be mistaken for a data pixel, although there is a one to
+one correspondence between them.
+
+\subsection{The bias level\xlabel{CCDglosbias}}
+
+
+The bias level of a CCD frame is an artificially induced electronic offset
+which ensures that the Analogue-to-Digital Converter (ADC) always receives a
+positive signal. All CCD data has such an offset which must be removed if the
+data values are to be truly representative of the counts recorded per pixel.
+
+\subsection{Readout-noise\xlabel{CCDglosreadnoise}}
+
+The readout-noise is the noise which is seen in the bias level. This is produced
+by the on-chip amplifier and other sources of noise in the data transmission
+before the signal is converted into a digital representation by the ADC.
+Typically this can be represented by one value which is an estimate of the
+standard deviation of the bias level values.
+
+\subsection{Bias strips\xlabel{CCDglosbiasstrips}}
+
+In order that the bias level of the CCD system can be constantly monitored (it
+may at times move due to thermal changes and very occasionally, discontinuous
+steps) values (columns or rows) are read from the CCD {\em without} moving any
+charge into the output registers. These extra readouts are usually found at the
+sides of the real data and are often referred to as bias strips or over-scan
+regions (see Figure \ref{CCDPICCY}).
+
+\subsection{ADC factor\xlabel{CCDglosADCfactor}}
+
+The analogue to digital converter, samples the charge which is returned from
+the CCD and returns a digital value (usually a 15 or 16 bit value). This value
+does not equate to the actual number of electrons detected in the pixel in
+question, but is proportional to it. Typically the proportionality constant is
+determined by noise considerations --- the variance of the actual detected
+electrons is poissonian, hence the variance in the output from the ADC should
+equate to this (plus a few other terms such as the readout-noise), so the
+constant ADC factor can be derived. The output from an ADC is measured in
+analogue to digital units (ADUs). The ADC factor is multiplicative and converts
+ADUs into detected electrons.
+
+\subsection{Saturation\xlabel{CCDglossaturation}}
+
+The capability of pixels to hold charge (charge is entered into a pixel
+every time a photon is detected) is not infinite and after a certain
+limit is exceeded the pixel then stops accumulating charge. When the
+charge in such a pixel is clocked along the CCD (on route to the output
+registers, from where it is amplified and transferred to the ADC) the
+excess from it `bleeds' along the readout columns and sometimes even
+across them. Before saturation slight non-linearities in
+intensity occur. Data values which exceed this non-linearity limit
+should be removed from the final datasets and generally cause no further
+problems. However, because of charge bleeding, contamination may occur
+around the vicinity and care should be taken when using such data.
+
+\subsection{Dark current\xlabel{CCDglosdarkcurrent}}
+
+All CCDs, at some level, exhibit the phenomenon of dark current. This is
+basically charge which accumulates in the CCD pixels due to thermal
+noise. The effect of dark current is to produce an additive quantity to
+the electron count in each pixel. The reduction of dark current is the
+main reason why all astronomical CCDs are cooled to liquid nitrogen
+temperatures. Most modern CCDs only produce a few ADU (or less) counts
+per pixel per hour and so this effect can generally be ignored. This,
+however, is not the case for Infra-Red arrays.
+
+\subsection{Pre-flashing\xlabel{CCDglospreflash}}
+
+The transfer of charge between pixels (and hence along columns) suffers
+from inefficiencies. Usually this amounts to a charge loss which is
+never read out from the CCD well - this level is often referred to as
+the `fat' or `skinny' zero to confuse matters; I refer to it as the
+deferred charge value. When observing objects with low sky backgrounds
+(and/or low counts themselves) this loss of charge may be significant
+(at least in some older CCDs). To overcome this CCDs can be pre-flashed.
+This amounts simply to illuminating the CCD with a uniform light flux
+just prior to the actual object exposure. The object counts are then
+simply added to this pre-flash level of charge in the CCD wells. Note,
+however, that this method is of no use for very low counts as the signal
+to noise level which is required after pre-flashing is higher than
+before (the noise from the pre-flash photons adding to the noise of the
+object photons). Correction of data for pre-flashing is achieved by
+subtracting the pre-flash ADU count from the final data (before
+flatfielding).
+
+\subsection{Flatfielding\xlabel{CCDglosflatfielding}}
+
+The sensitivity of a CCD to incident photon flux is not uniform across
+the whole of its surface and before data can be said to be properly
+relatively flux calibrated this needs to be corrected for. The
+variations in CCD response can be on the large scale (one end of the CCD
+to the other) and pixel-to-pixel. The relative flux levels on different
+parts of the CCD are also vignetted by of the optics of the instrument
+and telescope, this variation also needs correcting for and is performed
+together with the CCD sensitivity corrections \footnote {An additional
+effect of interest, which cannot be fully corrected, is the colour
+sensitivity of the CCD pixels. Most pixels on a typical CCD frame are
+exposed to the night sky which has a specific colour, this, however, may
+not be the same colour as the object itself, so the best case response
+is that the object and night sky colours mix to produce a response not
+typical to the night sky dominated parts of the frame, if the object is
+much brighter than the sky then its colour will dominate and ideally the
+flatfield should be produced with a source mimicking this colour
+response.}.
+
+Flatfield calibration frames are usually taken of a photometrically flat
+source using the same optical setup as that used to take the object
+frames. In the past images of the interior of the telescope dome have
+been used for this purpose, however, it now generally thought that
+images of the twilight/dawn sky are more representative of a true
+flatfield, having the same global illumination as the data and having a
+good signal level (remember that calibration frames will be applied to
+the object data at some stage and hence will introduce a noise
+contribution to the final data values, it is therefore essential to get
+a good set of calibration frames with lots of signal if this process is
+to introduce the absolute minimum of noise, CCDPACK provides calibration
+frame combination routines to produce `best bet' calibration frames with
+very low noise levels), but these frames have a colour response which
+may be not representative of the colour of the night time sky. If this
+factor is important then specially taken night sky flatfields must be
+produced. These can be taken of star free parts of the sky or produced
+from many object frames whose (contaminating) objects are removed,
+before median stacking to remove more spurious data values. Note in this
+final case that the noise levels required to correct for small scale
+variations are very time consuming to meet.
+
+\subsection{Fringing\xlabel{CCDglosfringing}}
+
+Some CCD data show an effect known as `fringing'. This usually has the
+appearance of a series of `ripples' in the sky regions. Fringing is
+caused by the multiple reflection and interference of the night-sky
+emission lines in the CCD substrate. The effect is considerably enhanced
+in CCDs whose substrates have been machined thinned to increase the blue
+sensitivity, the thickness of the substrate being comparable to that of
+the incident radiation, hence any deviations from a planar geometry
+cause these `Newton Ring' like effects.
+
+The fringe pattern is an additive effect and must be subtracted. To
+de-fringe data it is necessary to get special exposures of an object
+clear part of the night sky, or, alternatively, remove all the
+contaminations (objects) from data frames with large areas of night sky.
+These frames should then be combined to give complete spatial coverage
+and to reduce the noise contribution. This `fringe-frame' should then be
+scaled to the fringes present on the data frame (after normalisation
+--- MAKEMOS) and {\em subtracted}.
+

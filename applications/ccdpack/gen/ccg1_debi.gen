@@ -1,0 +1,310 @@
+      SUBROUTINE CCG1_DEBI<T>( BAD, EL, ARRIN, IDIM1, IDIM2, ARROUT,
+     :                         GOTBIA, BIAS, OFFSET, FMODE, SMODE,
+     :                         CMODE, WMODE, SIZE, NSIGMA, MEAN,
+     :                         RNOISE, DIRECT, BOUNDS, NBOUND, DWORK,
+     :                         WORK, IWBOX, WBOX, STATUS )
+*+
+*  Name:
+*     DEBI<T>
+
+*  Purpose:
+*     Subtracts a bias component from a CCD frame.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_DEBI<T>( BAD, EL, ARRIN, IDIM1, IDIM2, ARROUT, GOTBIA,
+*                        BIAS, OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
+*                        NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
+*                        DWORK, WORK, IWBOX, WBOX , STATUS )
+
+*  Description:
+*     The routine subtracts a bias component from an array in three
+*     basic methods, either the subtraction of a given bias array or
+*     the subtraction of a global constant, or the subtraction of a
+*     series of interpolated lines or plane. Initially the routine sets
+*     up the weights and extracts the rows or columns if interpolation
+*     or scaling of the bias frame is required. It then cleans up the
+*     bias strips if required by smoothing them with a box filter or
+*     sigma clipping. If derived global constant is required a weighted
+*     mean of the values in the extracted strips is formed, otherwise
+*     the fit of the individual lines or of a plane is performed.
+*     The fit, or offset bias frame or global constant is then
+*     subtracted from the data array.
+
+*  Arguments:
+*     BAD = LOGICAL (Given and Returned)
+*        Whether there are BAD pixels present.
+*     EL = INTEGER (Given)
+*        The size of the data arrays.
+*     ARRIN( IDIM1, IDIM2 ) = <COMM>
+*        The input data which requires debiasing.
+*     IDIM1 = INTEGER (Given)
+*        First dimension of input array.
+*     IDIM2 = INTEGER (Given)
+*        Second dimension of input array.
+*     ARROUT( IDIM1, IDIM2 ) = <COMM> (Returned)
+*        Output array of debiased data.
+*     GOTBIA = LOGICAL (Given)
+*        Set to true if have a bias frame to subtract.
+*     BIAS( IDIM1, IDIM2 ) = <COMM> (Given)
+*        Bias data array.
+*     OFFSET = LOGICAL (Given)
+*        If true then the bias frame is to be offset to the mean value
+*        of the bias strips.
+*     FMODE = CHARACTER * ( * ) (Given)
+*        How the interpolation is to be performed, either line by line
+*        or by a plane. (LINE, PLANE). A special value of GLOBAL is
+*        reserved for a constant subtraction, the constant is given by
+*        the value MEAN.
+*     SMODE = CHARACTER * ( * ) (Given)
+*        What sort of interpolation is to be used, either by a constant
+*        or a linear fit. (CONSTANT, LINEAR)
+*     CMODE = CHARACTER * ( * ) (Given)
+*        The clean up mode for the bias strips either, box filtered,
+*        sigma clipped or none. (BOX, SIGMA, NONE)
+*     WMODE = CHARACTER * ( * ) (Given)
+*        The weighting mode for forming means or for the least squares
+*        fit.
+*     SIZE = INTEGER( 2 ) (Given)
+*        The box sizes for performing the box filtering of bias strips.
+*     NSIGMA = REAL (Given)
+*        The number of sigma to clip data at.
+*     MEAN = DOUBLE PRECISION (Given and Returned)
+*        Either the user supplied mean value for the bias, or (on
+*        return) the derived global mean (fitted constant plane or
+*        offset bias value).
+*     RNOISE = DOUBLE PRECISION (Given)
+*        The readout noise of the bias strips, used for sigma clipping
+*        or as a estimate of the bias strip noise if no bias variance is
+*        given.
+*     DIRECT = INTEGER (Given)
+*        The direction of the given bounds:
+*        1 : horizontally (rows)
+*        2 : vertically (columns)
+*     BOUNDS( NBOUND ) = INTEGER (Given)
+*        The upper and lower bounds of the row or column sections.
+*     DWORK( * ) = DOUBLE PRECISION (Given)
+*        Workspace array of size IDIM1 or IDIM2 depending on readout
+*        direction. IDIM for X direction, IDIM2 for Y direction.
+*     WORK( IDIM1, IDIM2 ) = <COMM> (Given)
+*        Workspace array.
+*     IWBOX( * ) = INTEGER (Given)
+*        Workspace for blocking of size IDIM1.
+*     WBOX( * ) = DOUBLE PRECISION (Given)
+*        Workspace for blocking of size IDIM1.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     Fully generic.
+
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-APR-1991 (PDRAPER):
+*        Original version.
+*     28-OCT-1991 (PDRAPER):
+*        Changed DWORK to one line from an array (idim1*idim2) -
+*        considerable workspace savings.
+*     10-DEC-1991 (PDRAPER):
+*        Converted to fully generic.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Arguments Given:
+      CHARACTER * ( 20 ) CMODE
+      CHARACTER * ( 20 ) FMODE
+      CHARACTER * ( 20 ) SMODE
+      CHARACTER * ( 20 ) WMODE
+      INTEGER IDIM1
+      INTEGER IDIM2
+      DOUBLE PRECISION RNOISE
+      DOUBLE PRECISION DWORK( * )
+      INTEGER NBOUND
+      INTEGER BOUNDS( NBOUND )
+      INTEGER DIRECT
+      INTEGER EL
+      INTEGER SIZE( 2 )
+      INTEGER IWBOX( * )
+      REAL NSIGMA
+      LOGICAL GOTBIA
+      LOGICAL OFFSET
+      LOGICAL BAD
+      <TYPE> BIAS( IDIM1, IDIM2 )
+      <TYPE> ARRIN( IDIM1, IDIM2 )
+      <TYPE> WORK( IDIM1, IDIM2 )
+      DOUBLE PRECISION WBOX( * )
+
+*  Arguments Given and Returned
+      DOUBLE PRECISION MEAN
+
+*  Arguments returned:
+      <TYPE> ARROUT( IDIM1, IDIM2 )
+
+*  Local Variables:
+      <TYPE> <T>MAX              ! Maximum value for clipping
+      <TYPE> <T>MIN              ! Minimum value for clipping
+      LOGICAL BADOUT             ! Bad pixels present in output
+      INTEGER NGOOD              ! Good value counter
+      INTEGER NBAD               ! Bad value counter
+      INTEGER IWMODE             ! Weighting mode
+      INTEGER IERR               ! Numeric error buffer
+      INTEGER NERR               ! Numeric error counter
+      INTEGER NDIR               ! Number of pixels along readout
+                                 ! direction
+      DOUBLE PRECISION ABC( 3 )  ! Plane coefficients
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric converstion routines.
+      INCLUDE 'NUM_DEF_CVT'
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Weighting is required set up the weights array, for values within the
+*  given columns or rows.
+      IF ( FMODE .NE. 'GLOBAL' .AND. ( ( GOTBIA .AND. OFFSET) .OR.
+     :     .NOT. GOTBIA )  ) THEN
+         IF ( WMODE .EQ. 'LINEAR' ) THEN
+             IWMODE = 1
+         ELSE IF ( WMODE .EQ. 'EXP' ) THEN
+             IWMODE = 2
+         ELSE
+             IWMODE = 0
+         END IF
+
+*  Trap how many elements in the readout direction.
+         IF ( DIRECT .EQ. 1 ) THEN
+            NDIR = IDIM1
+         ELSE
+            NDIR = IDIM2
+         END IF
+         CALL CCD1_WEDGE( IWMODE, NDIR, BOUNDS, NBOUND, 10.0D0,
+     :                    DWORK, STATUS )
+
+*  Extract the appropriate columns or rows for averaging or
+*  interpolating.
+         CALL CCG1_BEXT<T>( DIRECT, ARRIN, IDIM1, IDIM2, BOUNDS,
+     :                      NBOUND, WORK, STATUS )
+
+*  Reject or smooth the data as maybe required.
+         IF ( CMODE .EQ. 'SIGMA' ) THEN
+            <T>MIN = NUM_DTO<T>( MEAN - DBLE( NSIGMA ) * RNOISE )
+            <T>MAX = NUM_DTO<T>( MEAN + DBLE( NSIGMA ) * RNOISE )
+            CALL CCG1_CLIP<T>( WORK, EL, <T>MIN, <T>MAX , NGOOD,
+     :                         STATUS )
+         ELSE IF ( CMODE .EQ. 'BOX' ) THEN
+            CALL CCG1_BL<T>( BAD, .TRUE., .FALSE., IDIM1, IDIM2,
+     :                       WORK, SIZE( 1 ), SIZE( 2 ), 1, ARROUT,
+     :                       BADOUT, WBOX, IWBOX, STATUS )
+            BAD = BAD .OR. BADOUT
+
+*  Copy the result to the workspace array.
+            CALL CCG1_COPA<T>( EL, ARROUT, WORK, STATUS )
+         END IF
+
+*  Produce the values to be subtracted or the scaling factor.
+         IF ( GOTBIA .OR. SMODE .EQ. 'CONSTANT' .AND.
+     :         FMODE .EQ. 'PLANE' ) THEN
+
+*  Just want the weighted mean of the bias strip values, this will be
+*  used either to simply subtract from the bias frame or to add on to
+*  the unscaled (mean of zero) bias frame.
+            CALL CCG1_WMNL<T>( BAD, WORK, DWORK, IDIM1, IDIM2, DIRECT,
+     :                         MEAN, STATUS )
+         ELSE IF ( SMODE .EQ. 'CONSTANT' .AND. FMODE .EQ. 'LINE' ) THEN
+
+*  Fitting a constant line by line.
+            CALL CCG1_FLW<T>( WORK, DWORK, IDIM1, IDIM2, 1, DIRECT, 1,
+     :                        NBAD, ARROUT, STATUS )
+            CALL CCG1_COPA<T>( EL, ARROUT, WORK, STATUS )
+            MEAN =0.0D0
+            BAD = BAD .OR. ( NBAD .NE. 0 )
+         ELSE IF( SMODE .EQ. 'LINEAR' .AND. FMODE .EQ. 'PLANE' ) THEN
+
+*  Wants to fit a plane
+            CALL CCG1_FPW<T>( WORK, DWORK, IDIM1, IDIM2, DIRECT, ABC,
+     :                        STATUS )
+            CALL CCG1_GPL<T>( ABC, WORK, IDIM1, IDIM2, STATUS )
+            MEAN =0.0D0
+         ELSE IF ( FMODE .NE. 'GLOBAL' ) THEN
+
+*  Only method left is to fit the bias by linear interpolation across
+*  each line.
+            CALL CCG1_FLW<T>( WORK, DWORK, IDIM1, IDIM2, 2, DIRECT, 1,
+     :                        NBAD, ARROUT, STATUS )
+            MEAN = 0.0D0
+            BAD = BAD .OR. ( NBAD .NE. 0 )
+            CALL CCG1_COPA<T>( EL, ARROUT, WORK, STATUS )
+         END IF
+      END IF
+
+*  Right by this stage we've either got an array of data for subtracting
+*  or a constant to offset the bias or to subtract.
+*  Can arrive directly here if just require to subtract the bias with no
+*  scaling, or have a constant to subtract
+ 98   CONTINUE
+
+      IF ( ( SMODE .EQ. 'CONSTANT' .AND. FMODE .EQ. 'PLANE' ) .OR.
+     :       FMODE .EQ. 'GLOBAL' ) THEN
+
+*  Subtract a constant.
+         CALL KPG1_CSUB<T>( BAD, EL, ARRIN, MEAN, ARROUT, NERR, STATUS )
+         BAD = BAD .OR. ( NERR .NE. 0 )
+      ELSE
+
+*  If have bias frame, will want to either scale it and subtract or just
+*  subtract.
+         IF ( .NOT. OFFSET .AND. GOTBIA ) THEN
+
+*  Simple bias subtraction
+            CALL VEC_SUB<T>( BAD, EL, ARRIN, BIAS, ARROUT, IERR, NERR,
+     :                       STATUS )
+         ELSE
+            IF( OFFSET .AND. GOTBIA ) THEN
+
+*  Have to apply an offset to the bias
+               CALL KPG1_CADD<T>( BAD, EL, BIAS, MEAN, WORK, NERR,
+     :                            STATUS )
+            END IF
+
+*  Have either the interpolated array of values or the scaled bias
+*  in WORK - subtract it.
+            CALL VEC_SUB<T>( BAD, EL, ARRIN, WORK, ARROUT, IERR, NERR,
+     :                       STATUS )
+         END IF
+         BAD = BAD .OR. ( NERR .NE. 0 )
+      END IF
+
+*  Check for numeric overflows etc. which may have occurred.
+      IF ( NERR .NE. 0 .AND. STATUS .NE. SAI__OK ) THEN
+
+*  Report number of errors reset status and continue.
+        STATUS = SAI__OK
+        CALL MSG_SETI( 'NERR', NERR )
+        CALL CCD1_MSG( 'CCG1_DEBI1',
+     :  '  ^NERR numeric errors have occurred when '//
+     :  'subtracting bias contribution', STATUS )
+      END IF
+
+      END
+* $Id$

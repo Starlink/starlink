@@ -1,0 +1,88 @@
+#+
+#  Name:
+#     CCDNDFAC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-JUN-1993 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDNDFAC
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter NAMELIST
+      position 1
+      type     LITERAL
+      access   'READ'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      DEFAULT  'CCDNDFAC.LIS'
+      prompt   'Name of output file for NDF namelist'
+   endparameter
+
+   parameter ECHO                # Echo NDF names
+      position 2
+      type     _LOGICAL
+      access   'READ'
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Echo NDF names to user'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXNDF              # Maximum number of NDFs that may be
+				 # accessed.
+      type     _INTEGER
+      access   'READ'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  !
+      prompt   'Maximum number of NDFs to access'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Single input group
+      type     LITERAL
+      access   'READ'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      prompt   'List of NDFs'
+      default  !
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# $Id$

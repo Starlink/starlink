@@ -1,0 +1,114 @@
+      SUBROUTINE CCG1_SQB<T>( VEC, QUAL, EL, BADBIT, STATUS )
+*+
+*  Name:
+*     CCG1_SQB<T>
+
+*  Purpose:
+*     To Set the Quality values so that they show BAD when VEC has BAD
+*     values.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The routine loops over all values in array VEC, if a BAD values is
+*     encountered then the corresponding quality value of the array
+*     QUAL is bitwise logically OR'ed with the BADBIT value. The quality
+*     component is in this way propagated unchanged except for the bits
+*     reserved to indicate BAD.
+
+*  Invocation:
+*     CALL CCG1_SQB<T>( VEC, QUAL, EL, BADBIT, STATUS )
+
+*  Arguments:
+*     VEC ( EL ) = <COMM> (Given and Returned)
+*        Vectorised array from which the BAD values are to be copied
+*     QUAL ( EL ) = BYTE (Given and Returned)
+*        Vectorised quality array to which the BAD values are to be
+*        placed.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     BADBIT = BYTE (Given)
+*        Byte with the bits set which represents BAD in the quality
+*        component.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     May be non-portable as uses BIT manipulation routines.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-APR-1991 (PDRAPER):
+*        Orginal Version
+*     4-OCT-1996 (PDRAPER):
+*        Removed JZEXT as zero extender for conversion from byte to integer. 
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*.
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value codes
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> VEC( EL )
+      BYTE BADBIT
+
+*  Arguments Given and Returned:
+      BYTE QUAL( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER IBIT               ! Integer buffer for BADBIT value
+      BYTE MYBYTE                ! Local byte variable
+      INTEGER MYINT              ! Local integer variable
+
+*  Equivalence a local integer to a local byte. 
+      EQUIVALENCE ( MYBYTE, MYINT )
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set all bits of MYINT to 0.
+      MYINT = 0
+
+*  Copy BADBIT to MYBYTE (thus zero extending it) and then copy to IBIT.
+      MYBYTE = BADBIT
+      IBIT = MYINT
+
+*  Loop over all input elements.
+      DO 1 I = 1, EL
+
+*  If the input element is bad, then set the quality bit to BADBIT.
+         IF ( VEC( I ) .EQ. VAL__BAD<T> ) THEN
+
+*  Copy quality into local integer with zero padding.
+            MYBYTE = QUAL( I )
+
+*  Now do a logical Bitwise OR with the current quality value (must do
+*  this using two integers).
+            MYINT = IOR( MYINT, IBIT )
+            QUAL( I ) = MYBYTE
+         END IF
+ 1    CONTINUE
+
+      END
+* $Id$

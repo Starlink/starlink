@@ -1,0 +1,77 @@
+      SUBROUTINE CCG1_TB<T>( ARRAY, NEL, ALLBAD, STATUS )
+*+
+*  Name:
+*     CCG1_TB<T>
+
+*  Purpose:
+*     Tests an array of data to see if all elements are set BAD.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     RESULT = {routine_name}( [p_]... )
+
+*  Description:
+*     The routine tests the value of the data in array against that
+*     appropriate primdat BAD value if all the elements are BAD then it
+*     returns an ALLBAD value of TRUE otherwise a FALSE value is
+*     returned.
+
+*  Arguments:
+*     ARRAY( NEL ) = <TYPE> (Given)
+*        The array of data to be tested.
+*     NEL = INTEGER (Given)
+*        The number of elements in ARRAY
+*     ALLBAD = LOGICAL (Returned)
+*        Set true if all elements of array are BAD.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JAN-1992 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primdat constants
+
+*  Arguments Given:
+      INTEGER NEL
+      <TYPE> ARRAY( NEL )
+
+*  Arguments Returned:
+      LOGICAL ALLBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Loop over array testing against the VAL__BAD<T> value.
+      ALLBAD = .TRUE.
+      DO 1 I = 1, NEL
+         IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+            ALLBAD = .FALSE.
+            GO TO 2
+         END IF
+ 1    CONTINUE
+ 2    CONTINUE
+      END
+* $Id$

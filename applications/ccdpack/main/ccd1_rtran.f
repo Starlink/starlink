@@ -1,0 +1,174 @@
+      SUBROUTINE CCD1_RTRAN( TRTYPE, INEXT, TR, XMAP, YMAP, LOCTR,
+     :                       FORWRD, STATUS )
+*+
+*  Name:
+*     CCD1_RTRAN
+
+*  Purpose:
+*     Reports the various parameters as used by TRANLIST
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_RTRAN( TRTYPE, INEXT, TR, XMAP, YMAP, LOCTR, FORWRD,
+*                      STATUS )
+
+*  Description:
+*     This routine writes a report about the transformation options
+*     used by TRANLIST.
+
+*  Arguments:
+*     TRTYPE = CHARACTER * ( * ) (Given)
+*        The type of transformation information supplied by the user.
+*        One of COEFF, EXPRES or STRUCT.
+*     INEXT = LOGICAL (Given)
+*        Whether the TRANSFORM structures are to be found in the
+*        NDF extensions.
+*     TR( 6 ) = DOUBLE PRECISION (Given)
+*        If TRTYPE = 'COEFF' then these values are the six linear
+*        transformation coefficients.
+*     XMAP = CHARACTER * ( * ) (Given)
+*        The X transformation expression used if TRTYPE = 'EXPRES'.
+*     XMAP = CHARACTER * ( * ) (Given)
+*        The Y transformation expression used if TRTYPE = 'EXPRES'.
+*     LOCTR = CHARACTER * ( * ) (Given)
+*        Locator to the transform structure used if TRTYPE = 'STRUCT'.
+*     FORWRD = LOGICAL (Given)
+*        If true then the forward transformation was used. Otherwise the
+*        inverse transformation.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     9-OCT-1992 (PDRAPER):
+*        Original version.
+*     8-FEB-1993 (PDRAPER):
+*        Changed to not report file names, just transformation
+*        information.
+*     14-JUN-1993 (PDRAPER):
+*        Added INEXT parameter + associated changes.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+  
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MSG_PAR'          ! Message system parameters
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      CHARACTER * ( * ) TRTYPE
+      LOGICAL INEXT
+      DOUBLE PRECISION TR( 6 )
+      CHARACTER * ( * ) XMAP
+      CHARACTER * ( * ) YMAP
+      CHARACTER * ( * ) LOCTR
+      LOGICAL FORWRD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER * ( MSG__SZMSG ) BUFFER ! Buffer to hold output
+                                               ! strings
+      INTEGER IAT                ! Position in string
+      INTEGER NCHAR              ! Number of characters returned
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Start with a blank.
+      CALL CCD1_MSG( ' ', ' ', STATUS )
+
+      IF ( TRTYPE .EQ. 'COEFF' ) THEN
+
+*  Transformation given as a series of linear coefficients.
+         CALL CCD1_MSG( ' ',
+     : '  Transformation defined by a series of linear coefficients',
+     :   STATUS )
+
+*  Construct an output string with a tabular look.
+         IAT = 5
+         BUFFER( IAT: ) = 'C1 = '
+         IAT = 11
+         CALL CHR_DTOC( TR( 1 ), BUFFER( IAT : ), NCHAR )
+         IAT = IAT + VAL__SZD
+         BUFFER( IAT: ) = '    C2 = '
+         IAT = IAT + 12
+         CALL CHR_DTOC( TR( 2 ), BUFFER( IAT : ), NCHAR )
+         CALL CCD1_MSG( ' ', BUFFER, STATUS )
+
+         IAT = 5
+         BUFFER( IAT: ) = 'C3 = '
+         IAT = 11
+         CALL CHR_DTOC( TR( 3 ), BUFFER( IAT : ), NCHAR )
+         IAT = IAT + VAL__SZD
+         BUFFER( IAT: ) = '    C4 = '
+         IAT = IAT + 12
+         CALL CHR_DTOC( TR( 4 ), BUFFER( IAT : ), NCHAR )
+         CALL CCD1_MSG( ' ', BUFFER, STATUS )
+
+         IAT = 5
+         BUFFER( IAT: ) = 'C5 = '
+         IAT = 11
+         CALL CHR_DTOC( TR( 5 ), BUFFER( IAT : ), NCHAR )
+         IAT = IAT + VAL__SZD
+         BUFFER( IAT: ) = '    C6 = '
+         IAT = IAT + 12
+         CALL CHR_DTOC( TR( 6 ), BUFFER( IAT : ), NCHAR )
+         CALL CCD1_MSG( ' ', BUFFER, STATUS )
+
+*  Transformation given as a expression.
+      ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN 
+         CALL CCD1_MSG( ' ',
+     : '  Transformation defined by the expressions:', STATUS )
+         CALL MSG_SETC( 'XMAP', XMAP )
+         CALL CCD1_MSG( ' ',
+     : '    ^XMAP', STATUS )
+         CALL MSG_SETC( 'YMAP', YMAP )
+         CALL CCD1_MSG( ' ',
+     : '    ^YMAP', STATUS )
+
+      ELSE
+
+*  Transformation given as a TRN_TRANSFORM structure. This is either in
+*  the NDF extension or directly.
+         IF ( INEXT ) THEN
+            IF ( FORWRD ) THEN
+               CALL CCD1_MSG( ' ',
+     : '  Transformation defined by forward mapping in NDF extensions',
+     :                        STATUS )
+            ELSE
+               CALL CCD1_MSG( ' ',
+     : '  Transformation defined by inverse mapping in NDF extensions',
+     :                        STATUS )
+            END IF
+         ELSE
+            IF ( FORWRD ) THEN
+               CALL CCD1_MSG( ' ',
+     : '  Transformation defined by forward mapping in:', STATUS )
+            ELSE
+               CALL CCD1_MSG( ' ',
+     : '  Transformation defined by inverse mapping in:', STATUS )
+            END IF
+
+*  Get the name of the object which has the TRN_TRANSFORM structure.
+            CALL DAT_MSG( 'OBJ', LOCTR )
+            CALL CCD1_MSG( ' ', '    ^OBJ', STATUS )
+         END IF
+      END IF 
+      END
+* $Id$

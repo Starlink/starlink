@@ -1,0 +1,232 @@
+      SUBROUTINE CCD1_CRDT<T>( BAD, DOVAR, EL, SCALE, DSCALE, ZERO,
+     :                         DZERO, ORIG, DAT, VAR, NBADD, NBADV,
+     :                         STATUS )
+*+
+*  Name:
+*     CCD1_CRDTx
+
+*  Purpose:
+*     Apply corrections to a data and (optional) variance array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_CRDTx( BAD, DOVAR, EL, SCALE, DSCALE, ZERO, DZERO,
+*                      ORIG, DAT, VAR, NBADD, NBADV, STATUS )
+
+*  Description:
+*     The routine applies scale factor and zero point corrections to a
+*     data array and (optionally) an associated variance array using
+*     the formula:
+*
+*        DAT = ( DAT - ORIG ) * SCALE + ZERO
+*
+*     and the corresponding error propagation formula for the variance
+*     (if required).
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for the presence of bad
+*        values in the data (and variance, if given).
+*     DOVAR = LOGICAL (Given)
+*        Whether a variance array is also to be processed.
+*     EL = INTEGER (Given)
+*        Number of data elements to be corrected.
+*     SCALE = DOUBLE PRECISION (Given)
+*        Scale factor correction to be applied.
+*     DSCALE = DOUBLE PRECISION (Given)
+*        Standard error on the scale factor correction.
+*     ZERO = DOUBLE PRECISION (Given)
+*        Zero point correction to be applied.
+*     DZERO = DOUBLE PRECISION (Given)
+*        Standard error on the zero point correction.
+*     ORIG = DOUBLE PRECISION (Given)
+*        Origin value to be used in making the correction. This should
+*        be chosen so that the errors on the scale factor and zero
+*        point corrections are expected to be un-correlated.
+*     DAT( EL ) = ? (Given and Returned)
+*        Data array to be corrected.
+*     VAR( EL ) = ? (Given)
+*        Optional variance array to be corrected. This is only
+*        referenced if DOVAR is .TRUE..
+*     NBADD = INTEGER (Returned)
+*        Number of bad values generated amongst the corrected data
+*        values.
+*     NBADV = INTEGER (Returned)
+*        Number of bad values generated amongst the corrected variance
+*        values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     There are routines for processing both real and double precision
+*     values; replace "x" in the routine name by R or D as appropriate.
+*     The types of the DAT and VAR arrays must match the routine being
+*     used.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-JUN-1992 (RFWS):
+*        Original version.
+*     27-JUL-1992 (RFWS):
+*        Allow variance values of zero to be corrected without producing
+*        a bad result.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primitive data constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL DOVAR
+      INTEGER EL
+      DOUBLE PRECISION SCALE
+      DOUBLE PRECISION DSCALE
+      DOUBLE PRECISION ZERO
+      DOUBLE PRECISION DZERO
+      DOUBLE PRECISION ORIG
+
+*  Arguments Given and Returned:
+      <TYPE> DAT( EL )
+      <TYPE> VAR( EL )
+
+*  Arguments Returned:
+      INTEGER NBADD
+      INTEGER NBADV
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      <TYPE> A                   ! First correction constant
+      <TYPE> B                   ! Second correction constant
+      <TYPE> C                   ! Third correction constant
+      <TYPE> D                   ! Fourth correction constant
+      <TYPE> E                   ! Fifth correction constant
+      <TYPE> DATIN               ! Saved initial data value
+      INTEGER I                  ! Loop counter
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise.
+      NBADD = 0
+      NBADV = 0
+
+*  Processing data values alone.
+*  ============================
+      IF ( .NOT. DOVAR ) THEN
+
+*  Set up the constants required.
+         A = SCALE
+         B = ZERO
+
+*  Treat the case where bad values may be present. Loop through the
+*  array.
+         IF ( BAD ) THEN
+            DO 1 I = 1, EL
+
+*  Test for bad data values and count them. Correct the rest.
+               IF ( DAT( I ) .EQ. VAL__BAD<T> ) THEN
+                  NBADD = NBADD + 1
+               ELSE
+                  DAT( I ) = A * ( DAT( I ) - ORIG ) + B
+               END IF
+ 1          CONTINUE
+
+*  Treat the case where bad values are absent. Simply correct the data
+*  values.
+         ELSE
+            DO 2 I = 1, EL
+               DAT( I ) = A * ( DAT( I ) - ORIG ) + B
+ 2          CONTINUE
+         END IF
+
+*  Processing both data and variance values.
+*  ========================================
+      ELSE
+
+*  Set up the constants required.
+         A = SCALE
+         B = ZERO
+         C = SCALE ** 2
+         D = DSCALE ** 2
+         E = DZERO ** 2
+
+*  Treat the case where bad values may be present. Loop through the
+*  array, saving each initial data value.
+         IF ( BAD ) THEN
+            DO 3 I = 1, EL
+               DATIN = DAT( I )
+
+*  Test for bad data values and count them. Correct the rest.
+               IF ( DATIN .EQ. VAL__BAD<T> ) THEN
+                  NBADD = NBADD + 1
+               ELSE
+                  DAT( I ) = A * ( DATIN - ORIG ) + B
+               END IF
+
+*  Now test for the data or variance value being bad (both must be good
+*  and the variance must also be zero or positive if a corrected
+*  variance is to be obtained). Produce a bad variance value and count
+*  it if necessary.
+               IF ( ( DATIN .EQ. VAL__BAD<T> ) .OR.
+     :              ( VAR( I ) .EQ. VAL__BAD<T> ) .OR.
+     :              ( VAR( I ) .LT. 0<CONST> ) ) THEN
+                  VAR( I ) = VAL__BAD<T>
+                  NBADV = NBADV + 1
+
+*  Otherwise, correct the variance value.
+               ELSE
+                  VAR( I ) = C * VAR( I ) +
+     :                       D * ( DATIN - ORIG ) ** 2 +
+     :                       E
+               END IF
+ 3          CONTINUE
+
+*  Treat the case where bad values are absent. Loop through the array,
+*  saving each initial data value.
+         ELSE
+            DO 4 I = 1, EL
+               DATIN = DAT( I )
+
+*  Produce a corrected data value.
+               DAT( I ) = A * ( DATIN - ORIG ) + B
+
+*  We must still check that variance values are zero or positive,
+*  producing corresponding bad values if they are not, and counting
+*  them.
+               IF ( VAR( I ) .LT. 0<CONST> ) THEN
+                  VAR( I ) = VAL__BAD<T>
+                  NBADV = NBADV + 1
+
+*  Otherwise, produce a corrected variance.
+               ELSE
+                  VAR( I ) = C * VAR( I ) +
+     :                       D * ( DATIN - ORIG ) ** 2 +
+     :                       E
+               END IF
+ 4          CONTINUE
+         END IF
+      END IF
+
+      END
+* $Id$

@@ -1,0 +1,85 @@
+      SUBROUTINE CCG1_AXIN<T>( LBND, UBND, AXIS, STATUS )
+*+
+*  Name:
+*     CCG1_AXIN<T>
+
+*  Purpose:
+*     Initialises an axis component to pixel coordinates.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_AXIN<T>( LBND, UBND, AXIS, STATUS )
+
+*  Description:
+*     This routine initialises an axis component of type _REAL or
+*     _DOUBLE to pixel coordinates. The axis coordinates start at
+*     LBND - 0.5 to UBND -0.5.
+
+*  Arguments:
+*     LBND = INTEGER (Given)
+*        The lower bounds of the first element of the axes component
+*        (pixel indices).
+*     UBND = INTEGER (Given)
+*        The upper bounds of the last element of the axes component
+*        (pixel indices).
+*     AXIS( LBND : UBND ) = <COMM> (Returned)
+*        The axis component to be initialised to pixel coordinates.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-JUN-1993 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER LBND
+      INTEGER UBND
+
+*  Arguments Returned:
+      <TYPE> AXIS( LBND : UBND )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      <TYPE> HALF                ! 1/2 in local data type
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! PRIMDAT type conversion functions
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set 1/2 in current data type.
+      HALF = NUM_DTO<T>( 0.5D0 )
+ 
+*  Loop to assign a value to each array element, checking that the
+*  values are in range.
+      DO 1 I = LBND, UBND
+         AXIS( I ) = NUM_ITO<T>( I ) - HALF
+ 1    CONTINUE
+
+      END
+* $Id$

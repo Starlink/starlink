@@ -1,0 +1,188 @@
+      SUBROUTINE CCG1_STO1<T>( ID, SNAME, STYPE, CNAME, NVALS,
+     :                         VALUES, STATUS )
+*+
+*  Name:
+*     CCG1_STO1<T>
+
+*  Purpose:
+*     To store a series of scalar values in the CCDPACK extension.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_STO1<T>( ID, SNAME, STYPE, CNAME, NVALS, VALUES,
+*                        STATUS )
+
+*  Description:
+*     The routine attempts to store the first NVALS values in VALUES
+*     in a sub-structure of the CCDPACK extension. The names of the
+*     components of the sub-structure should be given as comma separated
+*     list in CNAME. Hence if the routine were given the values
+*     SNAME = 'SUBSTRUCT'
+*     STYPE = 'GENERIC'
+*     CNAME = 'FIRST,SECOND,THIRD,LAST,'
+*
+*     They would be stored as (excluding an implied NDF.MORE.CCDPACK)
+*
+*     .SUBSTRUCT   <GENERIC>
+*        .FIRST       VALUES( 1 )
+*        .SECOND      VALUES( 2 )
+*        .THIRD       VALUES( 3 )
+*        .LAST        VALUES( 4 )
+
+*  Arguments:
+*     ID = INTEGER (Given)
+*        Identifier of the NDF with the extension to be written to.
+*     SNAME = CHARACTER * ( * ) (Given)
+*        Name of the structure to store the values in.
+*     STYPE = CHARACTER * ( * ) (Given)
+*        Type of the structure to contain the values.
+*     CNAME = CHARACTER * ( * ) (Given)
+*        List of comma separated names for the objects to store the
+*        values in. Note the last entry should also be terminated by a
+*        comma.
+*     NVALS = INTEGER (Given)
+*        Number of values to store (should be less than equal to the
+*        number of component names).
+*     VALUES( * ) = <COMM> (Given)
+*        The value to be stored at the object.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     This routine has versions for B, UB, W, UW, I, R, D, C and L data
+*     types.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (PDRAPER):
+*        Original version.
+*     17-FEB-1992 (PDRAPER):
+*        Changed to store spread vector values.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'PRM_PAR'          ! BAD values codes
+
+*  Arguments Given:
+      INTEGER ID
+      INTEGER NVALS
+      CHARACTER * ( * ) SNAME
+      CHARACTER * ( * ) STYPE
+      CHARACTER * ( * ) CNAME
+      <TYPE> VALUES( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN
+      EXTERNAL CHR_LEN           ! Length of string excluding trailing
+                                 ! blanks
+
+*  Local Variables:
+      LOGICAL THERE              ! Set true if extension exists.
+      CHARACTER * ( DAT__SZLOC ) SLOC ! Locator to structure
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to component
+      INTEGER FIRST              ! First character of component name
+      INTEGER LAST               ! Last character of component name
+      INTEGER I                  ! Loop variable
+      INTEGER DUMMY( 1 )         ! Dummy integer array
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that the CCDPACK extension exists.
+      CALL NDF_XSTAT( ID, 'CCDPACK', THERE, STATUS )
+
+*  If the extension does not exist then create it.
+      IF ( .NOT. THERE ) THEN
+         CALL NDF_XNEW( ID, 'CCDPACK', 'CCDPACK_EXT', 0, 0, SLOC,
+     :                  STATUS )
+      ELSE
+
+*  Just get a locator to it.
+         CALL NDF_XLOC( ID, 'CCDPACK', 'UPDATE', LOC, STATUS )
+      END IF
+
+*  Make sure that the structure to contain the objects exists.
+      CALL DAT_THERE( LOC, SNAME, THERE, STATUS )
+      IF ( .NOT. THERE ) THEN
+
+*  Create a component with this name and type.
+         DUMMY( 1 ) = 0
+         CALL DAT_NEW( LOC, SNAME, STYPE, 0, DUMMY, STATUS )
+      END IF
+
+*  Get a locator to this component.
+      SLOC = ' '
+      CALL DAT_FIND( LOC, SNAME, SLOC, STATUS )
+
+*  Release LOC.
+      CALL DAT_ANNUL( LOC, STATUS )
+
+*  Set up counters into component names.
+      FIRST = 1
+      LAST = 1
+
+*  Create the storage objects and enter the values.
+      DO 1 I = 1, NVALS
+
+*  Get the name of this component.
+         LAST = INDEX( CNAME( FIRST : ) , ',' )
+         IF ( LAST .EQ. 0 ) THEN
+
+*  No component name, issue error and quit.
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'CCG1_STO1<T>1',
+     :      '  CCG1_STO1<T>: Component name list incomplete', STATUS )
+            GO TO 99
+         END IF
+
+*  Remove comma from name.
+         LAST = LAST + FIRST - 2
+
+*  Create the storage object, if it doesn't exist already.
+         CALL DAT_THERE( SLOC, CNAME( FIRST : LAST ), THERE, STATUS )
+         IF ( .NOT. THERE ) THEN
+
+*  Create a component with this name and type.
+            DUMMY( 1 ) = 0
+            CALL DAT_NEW( SLOC, CNAME( FIRST : LAST ), '<HTYPE>', 0,
+     :                    DUMMY, STATUS )
+         END IF
+
+*  Get a locator to it.
+         CALL DAT_FIND( SLOC, CNAME( FIRST : LAST ), LOC, STATUS )
+
+*  Try to store the data value.
+         CALL DAT_PUT0<T>( LOC, VALUES( I ), STATUS )
+
+*  Set component name pointer.
+         FIRST = LAST + 2
+
+*  Release locator.
+         CALL DAT_ANNUL( LOC, STATUS )
+ 1    CONTINUE
+
+*  Annul the structure locator
+ 99   CALL DAT_ANNUL( SLOC, STATUS )
+
+      END
+* $Id$

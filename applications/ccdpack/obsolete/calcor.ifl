@@ -1,0 +1,170 @@
+#+
+#  Name:
+#     CALCOR.IFL
+#     
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-MAY-1991 (PDRAPER):
+#     	 Original Version
+#     4-JUL-1991 (PDRAPER):
+#     	 Added associations and helpkey info.
+#     2-FEB-1994 (PDRAPER):
+#     	 Added KEEPIN parameter (USEEXT and TYPE already present)
+#     {enter_further_changes_here}
+
+#-
+
+interface CALCOR
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN                  # List of input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'List of input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                # Output NDF
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT '
+      prompt   'List of output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter CAL                 # Calibration NDF
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,GLOBAL,CURRENT'
+      ppath    'GLOBAL,CURRENT'
+      association '<-global.ccdpack_cal'
+      prompt   'NDF containing the Dark or Flash calibration data'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPOSE              # the exposure factor
+      position 4
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Exposure times for input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter USEEXT              # Controls whether extension is used
+                                 # for getting values.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_useext'
+      default  FALSE
+      prompt   'Use NDF extension information'
+      helpkey  '*'
+   endparameter
+
+   parameter KEEPIN              # Controls whether input NDFs are
+				 # deleted
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'Do not delete input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter TYPE                # Frame types of input NDFs
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  'NONE'
+      prompt   'Frame type of input NDFs (NONE,DARK,FLASH)'
+      helpkey  '*'
+   endparameter
+
+   parameter PRESERVE         # Whether to preserve input data type
+      position 5
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT '
+      association '<-global.ccdpack_preser'
+      default  TRUE
+      prompt   'Do you want to preserve the input type'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE # Title for the output NDF
+      position 6
+      keyword  TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT,PROMPT '
+      ppath    'CURRENT,DEFAULT '
+      default  'Output from CALCOR'
+      prompt   'Title for the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+      helpkey  '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      keyword     LOGFILE
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+   parameter SETSAT            # Whether saturation has occurred
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Saturated data set to a non-BAD value'
+      helpkey  '*'
+   endparameter
+
+   parameter SATURATION          # Saturation value
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,PROMPT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1.0D6
+      prompt   'Saturation value'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$

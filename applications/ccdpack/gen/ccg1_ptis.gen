@@ -1,0 +1,97 @@
+      SUBROUTINE CCG1_PTIS<T>( STACK, EL, LINES, ILINE, DATA, STATUS )
+*+
+*  Name:
+*     CCG1_PTIS - PuT Into Stack
+
+*  Purpose:
+*     To enter a line of data into an array of vectorised lines.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_PTIS<T>( STACK, EL, LINES, ILINE, DATA, STATUS )
+
+*  Description:
+*     The routine copies the data, pixel by pixel, into the line of
+*     STACK. The precisions of the input and output arrays are
+*     the same so no difficulties should occur. The array STACK is
+*     assumed vectorised in all except the last dimension.
+
+*  Arguments:
+*     STACK( EL, LINES ) = <COMM> (Given and Returned)
+*        The array to enter the data line into.
+*     EL = INTEGER (Given)
+*        The number of pixels in the first dimension of the output
+*        array. This should be the product of all dimensions except the
+*        last.
+*     LINES = INTEGER (Given)
+*        The last dimension of the output array. This should be the size
+*        of the last dimension of the passed array.
+*     ILINE = INTEGER (Given)
+*        The line number to insert data in.
+*     DATA( EL ) = <COMM> (Given)
+*        The vectorised line of data to copy into STACK.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-MAR-1991 (PDRAPER):
+*        Original version.
+*     27-MAR-1991 (PDRAPER):
+*        Changed to generic.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER EL
+      INTEGER LINES
+      INTEGER ILINE
+      <TYPE> DATA( EL )
+
+*  Arguments Given and Returned:
+      <TYPE> STACK( EL, LINES)
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that ILINE is valid
+      IF ( ILINE .GT. 0  .AND. ILINE .LE. LINES) THEN
+
+*  Loop around one plane of the stack transfering the plane of data
+         DO 1 I = 1, EL
+            STACK( I, ILINE ) = DATA( I )
+ 1       CONTINUE
+      ELSE
+
+*  Invalid ILINE abort
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'BADIPLANE',
+     :   'Invalid operation adding data array to stack', STATUS )
+
+      END IF
+
+      END
+* $Id$

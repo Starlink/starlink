@@ -1,0 +1,279 @@
+      SUBROUTINE CCG1_IRHG<T>( FACNAM, MINVAL, MAXVAL, ONEOK, NRET, GID,
+     :                         STATUS )
+*+
+*  Name:
+*     CCD1_IRHG<T>
+
+*  Purpose:
+*     To get an IRH group of type <COMM> from a single prompt.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_IRHG<T>( FACNAM, MINVAL, MAXVAL, ONEOK, NRET, GID,
+*                        STATUS)
+
+*  Description:
+*     The routine uses the IRH system to access a list of strings which
+*     are values of the given type. The returns from IRH are converted
+*     to the type to check that the values are valid. The number of
+*     values is retricted to lie within the bounds MINVAL to MAXVAL.
+*     Additional facility -- ONEOK: If one value is returned and ONEOK
+*     is set true then this value is taken as the value for the rest of
+*     the possible group (up to MAXVAL).
+
+*  Notes:
+*     - the routine uses the CCDPACK IRH continuation character '-'
+*     to force reprompting.
+
+*  Arguments:
+*     FACNAM = CHARACTER * ( * ) (Given)
+*        The associated factor name.
+*     MINVAL = INTEGER (Given)
+*        The minimum number of values which can be returned.
+*     MAXVAL = INTEGER (Given)
+*        The maximum number of values that can be returned (may be
+*        equal to MINVAL).
+*     ONEOK = LOGICAL (Given)
+*        If set true and one value is returned then this value is used
+*        for all returns up to MAXVAL.
+*     NRET = INTEGER (Returned)
+*        The actual number of returned values.
+*     GID = INTEGER (Given)
+*        The IRH group identifier pointing to the validated strings.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JUL-1991 (PDRAPER):
+*        Original Version.
+*     27-NOV-1991 (PDRAPER):
+*        Added ONEOK.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'IRG_FAC'          ! IRG and IRH facility errors and
+                                 ! parameters
+      INCLUDE 'PAR_ERR'          ! Parameter system error codes
+      INCLUDE 'FIO_ERR'          ! FIO system error codes.
+
+*  Arguments Given:
+      INTEGER MAXVAL
+      INTEGER MINVAL
+      CHARACTER FACNAM * ( * )
+      LOGICAL ONEOK
+
+*  Arguments Returned:
+      INTEGER NRET
+      INTEGER GID
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER CURSTR * ( IRH__SZNAM ) ! String to hold one of the
+                                        ! associated factors expressed
+                                        ! as a string
+      INTEGER INDEX              ! Current index into IRH group
+      INTEGER NTRY               ! Number of attempts to get string
+      INTEGER IDH1               ! IRH identifier for modification group
+                                 ! (none)
+      INTEGER ADDED              ! Dummy
+      LOGICAL TERM               ! Set if the continuation character
+                                 ! is set
+      LOGICAL AGAIN              ! Controls the looping for new values
+      LOGICAL FILL               ! Set when 1 return is given
+      <TYPE> FACTOR              ! Value of string translation
+
+*.
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Access a number of character strings using IRH. These should
+*  represent the associated factor. Insist on a number of values within
+*  the range. Then try to decode the strings as <COMM> values. Reprompt
+*  on failure.
+      NTRY = 0
+      IDH1 = IRH__NOID
+
+*  Set flag controlling return of one value.
+      FILL = .FALSE.
+
+*  Create a new group to associate names with
+      CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+ 3    CONTINUE                      ! Return here if error converting
+                                    ! strings into <COMM> values.
+
+
+*  Get the user return.
+
+         TERM = .FALSE.
+         ADDED = -1
+         CALL IRH_GROUP( FACNAM, IDH1, GID, '-', NRET, ADDED, TERM,
+     :                   STATUS )
+
+*  Get out if a null return has been given or a par_abort. Also quit
+*  after an unreasonble number of attempts.
+         IF ( STATUS .EQ. PAR__ABORT )THEN
+            GO TO 99
+         ELSE IF ( NTRY .GT. 10 ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'NAME', FACNAM )
+            CALL ERR_REP( 'CCG1_IRHG1',
+     :      '  Unable to obtain valid list of values using parameter'//
+     :      ' %^NAME ' , STATUS )
+            GO TO 99
+         END IF
+
+*  Check that the number of values returned. This has to be between the
+*  the limits MINVAL and MAXVAL. If the continuation character has been
+*  used then reprompt if appropriate. etc.
+         AGAIN = .FALSE.
+         IF ( NRET .GT. MAXVAL ) THEN
+
+*  Comment on this futile exercise.
+            CALL MSG_SETI( 'MAXVAL', MAXVAL )
+            CALL MSG_OUT( ' ', 'Too many values given only need '//
+     :                       '^MAXVAL - try again', STATUS )
+
+*  Reset everything ready for next attempt.
+            CALL IRH_ANNUL( GID, STATUS )
+            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+            IDH1 = IRH__NOID
+            AGAIN = .TRUE.
+            NTRY = NTRY + 1
+            CALL PAR_CANCL( FACNAM, STATUS )
+
+*  Check for special case when we have one return.
+         ELSE IF ( ONEOK .AND. NRET .EQ. 1 ) THEN
+            AGAIN = .FALSE.
+            FILL = .TRUE.
+         ELSE IF ( NRET .LT. MINVAL ) THEN
+
+*  Comment on this futile exercise.
+            CALL MSG_SETI( 'MINVAL', MINVAL )
+            CALL MSG_OUT( ' ', 'Too few values given need ^MINVAL'//
+     :      '- try again', STATUS )
+
+*  Reset everything ready for next attempt.
+            CALL IRH_ANNUL( GID, STATUS )
+            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+            IDH1 = IRH__NOID
+            AGAIN = .TRUE.
+            NTRY = NTRY + 1
+            CALL PAR_CANCL( FACNAM, STATUS )
+         ELSE IF ( TERM ) THEN
+
+*  Continuation character has been issued reprompt, appending to the
+*  present group.
+            AGAIN = .TRUE.
+            CALL PAR_CANCL( FACNAM, STATUS )
+
+*  Status may have been set by IRH for a good reason.. check for this
+*  and reprompt. (Note FIO system filename and file not found errors
+*  these are not captured by IRG).
+         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
+     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
+     :   THEN
+
+*  Issue the error.
+            CALL ERR_FLUSH( STATUS )
+
+*  Reset everything and try again.
+            CALL IRH_ANNUL( GID, STATUS )
+            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+            IDH1 = IRH__NOID
+            AGAIN = .TRUE.
+            NTRY = NTRY + 1
+            CALL PAR_CANCL( FACNAM, STATUS )
+
+*  Try to trap a special case of ' ' string return. This should leave
+*  added unmodified. This will be taken as a request to exit. The normal
+*  stop entry request from an blank line will be `!' .
+         ELSE IF ( ADDED .EQ. -1 .AND. .NOT. TERM ) THEN
+            AGAIN = .FALSE.
+
+*  If status is set to par__null then reset status, note that this is
+*  only tested if the checks for number of values etc. have been passed.
+         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            AGAIN = .FALSE.
+         END IF
+      IF ( AGAIN ) GO TO 3
+
+*  Right loop through inputs converting to DBLE.
+      IF ( .NOT. FILL ) THEN
+         DO 4 INDEX = 1, NRET
+
+*  Get the string
+            CALL IRH_GET( GID, INDEX, 1, CURSTR, STATUS )
+
+*  Try to convert the string.
+            CALL CHR_CTO<T>( CURSTR, FACTOR, STATUS )
+
+*  See if translation occurred successfully.
+            IF ( STATUS .EQ. SAI__ERROR ) THEN
+               CALL ERR_ANNUL( STATUS )
+
+*  Bad value try again.
+               CALL MSG_SETC( 'IRH_STR', CURSTR )
+               CALL MSG_OUT( ' ',
+     :         '  Cannot convert ^IRH_STR - try again.', STATUS )
+               CALL PAR_CANCL( FACNAM, STATUS )
+               CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+               AGAIN = .TRUE.
+               NTRY = NTRY + 1
+               NRET = 0
+               GO TO 3
+            END IF
+ 4       CONTINUE
+      ELSE
+
+*  Need to use this one value to fill out group - try to translate it
+*  first.
+         CALL IRH_GET( GID, 1, 1, CURSTR, STATUS )
+
+*  Try to convert the string.
+         CALL CHR_CTO<T>( CURSTR, FACTOR, STATUS )
+
+*  See if translation occurred successfully.
+         IF ( STATUS .EQ. SAI__ERROR ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+*  Bad value try again.
+            CALL MSG_SETC( 'IRH_STR', CURSTR )
+            CALL MSG_OUT( ' ',
+     :      '  Cannot convert string ^IRH_STR into numeric value - '//
+     :      'try again.', STATUS )
+            CALL PAR_CANCL( FACNAM, STATUS )
+            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+            AGAIN = .TRUE.
+            NTRY = NTRY + 1
+            NRET = 0
+            GO TO 3
+         END IF
+
+*  Fill group with this string.
+         DO 5 INDEX = 2, MAXVAL
+            CALL IRH_PUT( GID, 1, CURSTR, 0, STATUS )
+ 5       CONTINUE
+      END IF
+
+99    END
+* $Id$

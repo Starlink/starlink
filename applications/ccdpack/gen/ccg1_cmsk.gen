@@ -1,0 +1,103 @@
+      SUBROUTINE CCG1_CMSK<T>( MASK, NPIX, VALUE, ARRAY, STATUS )
+*+
+*  Name:
+*     CCG1_CMSK
+
+*  Purpose:
+*     Converts an ARD mask to an invalid mask.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_CMSK( MASK, NPIX, VALUE, ARRAY, STATUS )
+
+*  Description:
+*     The routine looks at all values in the integer array MASK, when it
+*     encounters a value greater than zero it sets the corresponding value 
+*     in ARRAY to BAD.
+
+*  Arguments:
+*     MASK( NPIX ) = INTEGER (Given)
+*        The ARD mask
+*     NPIX = INTEGER (Given)
+*        Number of entries in MASK and ARRAY.
+*     VALUE = DOUBLE PRECISION (Given)
+*        Value for elements of ARRAY that are not BAD on output.
+*     ARRAY( NPIX ) = <COMM> (Returned)
+*        Output mask with BAD values set where MASK is non-zero.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-OCT-1991 (PDRAPER):
+*        Original version.
+*     5-SEP-1995 (PDRAPER):
+*        Convert to ARD format MASKs.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primdat BAD values
+
+*  Arguments Given:
+      INTEGER NPIX
+      INTEGER MASK( NPIX )
+      DOUBLE PRECISION VALUE
+
+*  Arguments Returned:
+      <TYPE> ARRAY( NPIX )
+
+*  External References:
+      <TYPE> VAL_DTO<T>
+      EXTERNAL VAL_DTO<T>        ! Converts double precision to ARRAY type.
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      <TYPE> LOCVAL              ! This type VALUE.
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert input constant to ARRAY data type.
+      LOCVAL = VAL_DTO<T>( .TRUE., VALUE, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Loop for all input MASK elements setting ARRAY BAD when MASK is 
+*  greater than zero .
+         DO 1  I = 1, NPIX
+            IF ( MASK( I ) .GT. 0 ) THEN
+               ARRAY( I ) = VAL__BAD<T>
+            ELSE
+               ARRAY( I ) = LOCVAL
+            END IF
+ 1       CONTINUE
+      ELSE
+
+*  report error.
+         CALL MSG_SETC( 'TYPE', '<COMM>' )
+         CALL ERR_REP( 'CCD1_CMSK1', '  CCG1_CMSK: error'//
+     :   ' converting given value to type ^TYPE'//
+     :   ' (possible programming error)', STATUS )
+      END IF
+
+
+      END
+* $Id$

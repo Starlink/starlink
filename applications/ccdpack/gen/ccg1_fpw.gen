@@ -1,0 +1,239 @@
+      SUBROUTINE CCG1_FPW<T>( ARR, W, NCOL, NLINE, DIRECT, ABC, STATUS )
+*+
+*  Name:
+*     CCG1_FPW<T>
+
+*  Purpose:
+*     To fit a plane to an ARRAY of data with line of weights W.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_FPW<T>( ARR, W, NCOL, NLINE, DIRECT, ABC, STATUS )
+
+*  Description:
+*     The routine uses a least squares fit to the data. The x and y
+*     positions are those of the pixels indices. The routine forms the
+*     normal equations then uses a PDA routine to solve the system of
+*     linear equations. The weights given are those of the data values
+*     in array ARR along direction DIRECT (1=X,2=Y) and are used to
+*     weight the residuals.
+
+*  Arguments:
+*     ARR( NCOL, NLINE ) = <COMM> (Given)
+*        The array of data which is to have a plane fitted to it. The x
+*        and y coordinates are the indices of the data. The z value is
+*        the value of the data array at x,y.
+*     W( * ) = DOUBLE PRECISION (Given)
+*        An line of weights to use when forming z value sums. The line
+*        is assumed to have NCOL values if DIRECT=1 otherwise it is
+*        assumed to have NLINE values.
+*     NCOL = INTEGER (Given)
+*        The first dimension of the data array.
+*     NLINE = INTEGER (Given)
+*        The second dimension of the data array.
+*     DIRECT = INTEGER (Given)
+*        The direction that the line of input weights applies too.
+*     ABC( 3 ) = DOUBLE PRECISION (Returned)
+*        The coefficients of the fitted plane.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     The routine fits the equation.
+*     z = Ax + By + C
+*     using the normal equations.
+*
+*     [xz] - [x**2]A -   [xy]B - [x]C = 0
+*     [yz] -   [xy]A - [y**2]B - [y]C = 0
+*      [z] -    [x]A -    [y]B -   nC = 0
+*     with all sums weighted.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-APR-1991 (PDRAPER):
+*        Original version.
+*     15-APR-1991 (PDRAPER):
+*        Changed to use a weights array.
+*     16-APR-1991 (PDRAPER):
+*        Changed to weight residuals.
+*     24-APR-1991 (PDRAPER):
+*        Changed to generic.
+*     28-OCT-1991 (PDRAPER):
+*        Changed to use a line of weights instead of an array, gives
+*        considerable workspace savings in CCDPACK.
+*     9-SEP-1996 (PDRAPER):
+*        Changed to use a PDA routine instead of the NAG routine F04ATF.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value codes
+
+*  Arguments Given:
+      INTEGER NCOL
+      INTEGER NLINE
+      <TYPE> ARR( NCOL, NLINE )
+      DOUBLE PRECISION W( * )
+      INTEGER DIRECT
+
+*  Arguments Returned:
+      DOUBLE PRECISION ABC( 3 )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION A( 3, 3 ) ! Left hand side matrix.   Ax=B
+      DOUBLE PRECISION DW       ! Z weight
+      DOUBLE PRECISION DX       ! X position
+      DOUBLE PRECISION DY       ! Y position
+      DOUBLE PRECISION DZ       ! Z value
+      DOUBLE PRECISION SW       ! Sum of weights
+      DOUBLE PRECISION WORK( 3 ) ! Workspace
+      DOUBLE PRECISION X        !
+      DOUBLE PRECISION XX       ! as indicated
+      DOUBLE PRECISION XY       !
+      DOUBLE PRECISION XZ       ! Sums buffers
+      DOUBLE PRECISION Y        !
+      DOUBLE PRECISION YY       !
+      DOUBLE PRECISION YZ       !
+      DOUBLE PRECISION Z        !
+      INTEGER I, J              ! Loop variables
+      INTEGER ITASK             ! Solution flag
+      INTEGER IND               ! Estimate of number of figures of
+                                ! accuracy in solution
+      INTEGER N                 ! Number of non bad values
+      INTEGER IWORK( 3 )        ! Workspace.
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Zero sums buffers.
+      XZ = 0.0D0
+      XX = 0.0D0
+      XY = 0.0D0
+      X  = 0.0D0
+      YZ = 0.0D0
+      YY = 0.0D0
+      Y  = 0.0D0
+      Z  = 0.0D0
+      SW = 0.00
+      N  = 0
+
+*  Loop over data array forming the sums for the normal equations.
+
+*  Branch according to whether the weights are along the X or Y
+*  directions.
+      IF ( DIRECT .EQ. 1 ) THEN
+         DO 1 J = 1, NLINE
+            DY = DBLE( J )
+            DO 2 I = 1, NCOL
+               IF ( ARR( I, J ) .NE. VAL__BAD<T>   .AND.
+     :              W( I ) .NE. VAL__BADD ) THEN
+                  DX = DBLE( I )
+
+*  Weight all z values.
+                  DW = W( I )
+                  DZ = NUM_<T>TOD( ARR( I, J ) )
+                  XZ = XZ + DX * DZ * DW
+                  XX = XX + DX * DX * DW
+                  XY = XY + DX * DY * DW
+                  X  =  X + DX      * DW
+                  YZ = YZ + DY * DZ * DW
+                  YY = YY + DY * DY * DW
+                  Y  = Y  + DY      * DW
+                  Z  = Z  + DZ      * DW
+                  N  = N  + 1
+                  SW = SW + DW
+               END IF
+ 2          CONTINUE
+ 1       CONTINUE
+
+      ELSE
+
+*  Y direction weights
+         DO 3 J = 1, NLINE
+            DY = DBLE( J )
+            DO 4 I = 1, NCOL
+               IF ( ARR( I, J ) .NE. VAL__BAD<T>   .AND.
+     :              W( J ) .NE. VAL__BADD ) THEN
+                  DX = DBLE( I )
+
+*  Weight all z values.
+                  DW = W( J )
+                  DZ = NUM_<T>TOD( ARR( I, J ) )
+                  XZ = XZ + DX * DZ * DW
+                  XX = XX + DX * DX * DW
+                  XY = XY + DX * DY * DW
+                  X  =  X + DX      * DW
+                  YZ = YZ + DY * DZ * DW
+                  YY = YY + DY * DY * DW
+                  Y  = Y  + DY      * DW
+                  Z  = Z  + DZ      * DW
+                  N  = N  + 1
+                  SW = SW + DW
+               END IF
+ 4          CONTINUE
+ 3       CONTINUE
+      END IF
+
+*  If there are not enough points for a fit stop.
+      IF ( N .LT. 3 ) THEN
+         STATUS =SAI__ERROR
+         CALL ERR_REP( 'FPLAW_NEED3',
+     :   'CCG1_FPW: Insufficient points to fit a plane.', STATUS )
+         GO TO 99
+      END IF
+
+*  Enter these values into the main (3,3 ) matrix.
+      A( 1, 1 ) = XX
+      A( 2, 1 ) = XY
+      A( 3, 1 ) = X
+      A( 1, 2 ) = XY
+      A( 2, 2 ) = YY
+      A( 3, 2 ) = Y
+      A( 1, 3 ) = X
+      A( 2, 3 ) = Y
+      A( 3, 3 ) = SW
+
+*  Enter the values for the right handside matrix.
+      ABC( 1 ) = XZ
+      ABC( 2 ) = YZ
+      ABC( 3 ) = Z
+
+*  Solve the equations using a LU factorization with partial pivoting.
+      ITASK = 1
+      IND = 16
+      CALL PDA_DGEFS( A, 3, 3, ABC, ITASK, IND, WORK, IWORK, STATUS )
+
+*  If have failed then set status and return
+      IF ( IND .LT. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'IND', IND )
+         CALL ERR_REP( 'FPLAW_IFAILED',
+     :'CCG1_FPW: Failed to fit plane. Matrix ill conditioned (^IND)', 
+     :        STATUS )
+         GO TO 99
+      END IF
+
+99    END
+* $Id$

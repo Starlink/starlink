@@ -1,0 +1,16 @@
+#  Setup for ING EEV6, standard quick readout.
+#
+#  Derived from ING document eev6, Tue Nov 29 1994.
+#
+#  Real size = 1242x1152, clocked size = 1280x1180
+#
+#  Only one strip (the underscan) recommended for use and of this only
+#  100:1000 in Y.
+
+ADC = 1.25
+RNOISE = 3.5
+EXTENT = UNKNOWN 
+DIRECTION = X
+BOUNDS = 6,15
+
+# $Id$

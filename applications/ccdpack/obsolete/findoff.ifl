@@ -1,0 +1,161 @@
+#+
+#  Name:
+#     FINDOFF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-SEP-1992 (PDRAPER):
+#     	 Original version.
+#     29-SEP-1992 (PDRAPER):
+#     	 Now FINDOFF.
+#     {enter_further_changes_here}
+
+#-
+
+interface FINDOFF
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter INLIST
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<-global.ccdpack_ndfin'
+      prompt   'Names of position lists'
+      helpkey  '*'
+   endparameter
+
+   parameter ERROR
+      position 2
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  1.0
+      prompt   'Error in positions'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLIST
+      position 3
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT,CURRENT '
+      ppath    'CURRENT'
+      prompt   'Names for output position lists'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFNAMES
+      type    _LOGICAL
+      access  READ
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_ndfnam'
+      default true
+      prompt  'Position list names in NDF extensions'
+      helpkey  '*'
+   endparameter
+
+   parameter FAST
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Perform FAST algorithm'
+      helpkey  '*'
+   endparameter
+
+   parameter FAILSAFE
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  true
+      prompt   'Perform SLOW algorithm if FAST fails'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   WRITE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'FINDOFF.LIS'
+      prompt   'Name of output filenames listing'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+   parameter COMPLETE
+      type    _DOUBLE
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default 0.5D0
+      prompt  'Minimum completeness level'
+      helpkey  '*'
+   endparameter
+
+   parameter USECOMP
+      type    _LOGICAL
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default true
+      prompt  'Use completeness as weight'
+      helpkey  '*'
+   endparameter
+
+   parameter MINSEP
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DYNAMIC,DEFAULT '
+      ppath    'CURRENT,DYNAMIC,DEFAULT '
+      default  5.0
+      prompt   'Minimum distance between positions'
+      helpkey  '*'
+   endparameter
+
+   parameter MINMATCH
+      type     _INTEGER
+      access   READ
+     vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Minimum number of positions required for match'
+     helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$
