@@ -115,13 +115,16 @@ the current node.
 	 (entfile (html-file target_nd: target))
 	 (url (string-append (if full-url %starlink-document-server% "")
 			     entfile))
-	 (fragid (or force-frag
-		     (case (gi target)
-		       (("MLABEL") (href-to-fragid-mlabel target))
-		       (else (if (or (chunk? target)
-				     (not id))
-				 "#xref_"
-				 (string-append "#xref_" id))))))
+	 (fragid (cond
+		  (force-frag force-frag)
+		  ((node-list=? target (document-element))
+		   "#xref_")
+		  (else (case (gi target)
+			  (("MLABEL") (href-to-fragid-mlabel target))
+			  (else (if (or (chunk? target)
+					(not id))
+				    ""
+				    (string-append "#xref_" id)))))))
 	 ;(fragid (if (or (chunk? target)
 		;	 (not id))
 		;     ""
