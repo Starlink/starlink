@@ -1,0 +1,24 @@
+#! /bin/csh
+#
+#					outfits
+#
+#	AUTHOR:	E. BERTIN	V1.0 (26/11/96)
+#
+#	TYPE:	C-Shell procedure
+#
+#	PURPOSE:copy numerous files .
+#
+#	SYNTAX:	replace <string1> <string2> <file_list>
+#
+#
+if( $#argv == 0) then
+   echo "SYNTAX: replace <string1> <string2> <file_list>"
+   exit 0
+endif
+echo "Replacing "$1" by "$2":"
+foreach file ($argv[3-])
+	echo $file"..."
+	sed "s/$1/$2/g" $file >toto
+	mv toto $file
+end
+echo "All done."
