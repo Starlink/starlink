@@ -449,6 +449,14 @@
             END IF
           END IF
 
+*    Spaced data
+        ELSE IF ( ITEM(8:) .EQ. 'SpacedData' ) THEN
+
+*      Access keyword
+          CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
+     :                     DELETE, RTYPE, 0, 0, DIDCRE, CACHEID,
+     :                     STATUS )
+
 *    Axis widths
         ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
 
@@ -456,7 +464,6 @@
           CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
      :                     DELETE, RTYPE, 0, 0, DIDCRE, CACHEID,
      :                     STATUS )
-
 
 *    Axis normalisation flag (end rb)
         ELSE IF ( ITEM(8:) .EQ. 'Normalised' ) THEN
