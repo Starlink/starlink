@@ -138,6 +138,7 @@
       INCLUDE  'SAE_PAR'       ! Global SSE definitions
       INCLUDE  'PAR_ERR'       ! Parameter-system errors
       INCLUDE  'NDF_PAR'       ! NDF_ public constants
+      INCLUDE  'PRM_PAR'       ! VAL__ constants
 
 *  Status:
       INTEGER STATUS
