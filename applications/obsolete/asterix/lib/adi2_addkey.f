@@ -99,7 +99,8 @@
 
 *  Local Variables:
       INTEGER			KCID			! Keywords list
-      INTEGER			NKEY			! Keyword number
+      INTEGER			MCARD			! First changed card
+      INTEGER			NCARD			! HDU card number
       INTEGER			OKID			! Existing keyword data
 
       LOGICAL			THERE			! Keyword exists?
@@ -120,7 +121,7 @@
           CALL ADI_FIND( KCID, KEY, OKID, STATUS )
 
 *      Read the old keyword index
-          CALL ADI_CGET0I( OKID, '.Ikey', NKEY, STATUS )
+          CALL ADI_CGET0I( OKID, '.Icard', NCARD, STATUS )
 
 *      Erase value
           CALL ADI_ERASE( OKID, STATUS )
@@ -130,18 +131,28 @@
       END IF
 
 *  Mark keyword and HDU as changed
+      CALL ADI_CPUT0L( KID, '.Changed', UPDATE, STATUS )
       IF ( UPDATE ) THEN
-        CALL ADI_CPUT0L( KID, '.Changed', .TRUE., STATUS )
-        CALL ADI_CPUT0L( HDUID, '.Changed', .TRUE., STATUS )
+        CALL ADI_CPUT0L( HDUID, 'Changed', .TRUE., STATUS )
       END IF
 
 *  Get keyword number and update
-      IF ( .NOT. UPDATE ) THEN
-        CALL ADI_CGET0I( HDUID, 'Nkey', NKEY, STATUS )
-        NKEY = NKEY + 1
-        CALL ADI_CPUT0I( HDUID, 'Nkey', NKEY, STATUS )
+      IF ( UPDATE ) THEN
+        IF ( THERE ) THEN
+          CALL ADI_CPUT0I( KID, '.Icard', NCARD, STATUS )
+        ELSE
+          CALL ADI2_ADDCRC( HDUID, 'K'//KEY, KID, NCARD, STATUS )
+        END IF
+
+*  Update first changed card number
+        CALL ADI_CGET0I( HDUID, 'MinDiffCard', MCARD, STATUS )
+        IF ( MCARD .EQ. 0 ) MCARD = NCARD
+        CALL ADI_CPUT0I( HDUID, 'MinDiffCard', MIN(MCARD,NCARD),
+     :                   STATUS )
+
+      ELSE
+        CALL ADI2_ADDCRC( HDUID, 'K'//KEY, KID, NCARD, STATUS )
       END IF
-      CALL ADI_CPUT0I( KID, '.Ikey', NKEY, STATUS )
 
 *  Write component to container
       CALL ADI_CPUTID( KCID, KEY, KID, STATUS )
