@@ -2,6 +2,15 @@
 dvi2bitmap
 ==========
 
+dvi2bitmap is a utility to convert TeX DVI files to bitmaps.  The
+original motivation for this is to prepare mathematical equations for
+inclusion in HTML files, but I expect there are plenty of uses beyond
+that.  It can generate XBM and GIF bitmaps, plus PNG, if you have the
+libpng library installed.  It uses the same kpathsea font-searching
+library as other TeX programs, again as long as you have the
+appropriate library installed.
+
+
 Configuring and building
 ------------------------
 
@@ -27,14 +36,21 @@ to me: there's a much fuller account of the whole sorry business in
 the comp.graphics.misc FAQ at, for example,
 <http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html>
 
+If you want it to be able to generate PNG files (much better, since
+they're free of the GIF copyright problems), then give the configure
+option `--enable-png'.  This will check you have the libpng library
+and headers somewhere the compilers can find them, and build in
+support if it finds them.  The PNG library is not distributed with
+this utility: you can find it at <http://www.libpng.org/pub/png/>.
+
 The program can work with the kpathsea library.  This is the same
 path-searching library which several TeX implementations use to find
 fonts (and more).  If you wish to use this, then give the option
 `--with-kpathsea' to the configure command, and if the library is
 installed on your machine, the program will use it.
 
-The program builds successfully on (at least) egcs-2.90, Sun Workshop
-C++ 5.0, and Alpha Digital C++ 6.0.  It should be written in
+The program builds successfully on (at least) egcs-2.91, Sun Workshop
+C++ 5.0, and Alpha Digital C++ 6.2.  It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
 conformant as I think it is (in which case please tell me), (2) your
 compiler is not as conformant as you think it is (in which case please
@@ -46,8 +62,15 @@ I can do in the autoconfigure script).
 Documentation
 -------------
 
-See doc.tar -- there are fuller installation instructions there.
-There's also a man-page in dvi2bitmap.1, but this is not necessarily
-as up-to-date as the main documentation.
+See directory doc/ -- there are fuller installation instructions
+there.  There's also a man-page in dvi2bitmap.1, but this is not
+necessarily as up-to-date as the main documentation.
 
 
+Copyright
+---------
+
+Copyright 1999, 2000, Council for the Central Laboratories of the
+Research Councils.  Free for non-commercial use.  See the file
+LICENCE, or the URL
+<http://www.starlink.rl.ac.uk/store/conditions.html>, for details.

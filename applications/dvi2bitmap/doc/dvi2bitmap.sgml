@@ -703,7 +703,7 @@ with the same calling interface.
 <dd>If you give this option, and if the PNG library is installed, then
 the program will be compiled with support for PNG bitmaps as an output
 format.  You can obtain the PNG library from the 
-<webref url="http://www.cdrom.com/pub/png/" >PNG home page</webref>.
+<webref url="http://www.libpng.org/pub/png/" >PNG home page</webref>.
 
 <dt><code/&ddash;enable-gif/
 <dd>The program generates only XBM bitmaps by default.  
