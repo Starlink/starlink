@@ -107,9 +107,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check initialised
-      IF ( .NOT. FSI_INIT ) CALL FSI0_INIT( STATUS )
-
 *  Construct selection object
       ARGS(1) = FID
       CALL ADI_NEWV0I( IDX, ARGS(2), STATUS )
