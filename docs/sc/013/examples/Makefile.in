@@ -1,5 +1,13 @@
 # Makefile for the demo programs for SC/13
 #
+# To build all the example programs, give the commands
+#
+#    ./configure
+#    make
+#
+# See README for further discussion.
+#
+#
 # $Id$
 
 
@@ -8,22 +16,6 @@ CC=@CC@
 F77=@F77@
 DEFS=@DEFS@
 
-# Some of the programs in here require specific compiler options.  
-#
-# The configure script should sort these out, but you might need to
-# specify them by hand in the makefile.  For example:
-#
-# Sun's f77:
-#    PROFILING=-pg
-#    NOUNDERSCORES=-ext_names=plain
-# gcc/g77:
-#    PROFILING=-pg  ???
-#    NOUNDERSCORES=-fno-underscoring
-#
-# If you can tell norman@astro.gla.ac.uk the appropriate settings for
-# your machine, along with the `Target system' string reported by the
-# configure script, I can add them to the special-cases within the
-# configure script.
 PROFILING=@PROFILINGOPTION@
 NOUNDERSCORES=@NOUNDERSCORES@
 
@@ -38,11 +30,6 @@ EXAMPLES=crash.c fpp.c fpdemo.c \
 
 
 all: $(EXECS)
-
-sgmlexamples: $(EXAMPLES:=.sgml)
-
-%.sgml: %
-	sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' $< > $@
 
 #
 # Floating-point demo
@@ -96,10 +83,29 @@ mixed-c.o: mixed-c.c
 	$(CC) -c mixed-c.c
 
 
-# Tar up the current directory
-examples.tar: clean
-	(THISDIR=`basename \`pwd\``; cd .. ; tar cf $@ $$THISDIR)
-	mv ../$@ .
+######################################################################
+#
+# Following are maintenance targets
+#
+
+# Create SGML-ised versions of the example programs (with < and & escaped)
+%.sgml: %
+	sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' $< > $@
+
+sgmlexamples: $(EXAMPLES:=.sgml)
+
+# Tar up the current directory, folding in the version number stored
+# in file ../VERSION
+sc13-examples.tar: configure
+	DIRNAME=sc13.`cat ../VERSION`-examples; \
+		mkdir $$DIRNAME; \
+		for f in ../VERSION Makefile.in configure $(EXAMPLES) gausssine.dat; \
+			do ln $$f $$DIRNAME/$$f; \
+		done; \
+		sed 's/%%VERSION%%/'`cat ../VERSION`/ README.in >$$DIRNAME/README; \
+		tar cf $$DIRNAME.tar $$DIRNAME; \
+		ln -s $$DIRNAME.tar $@; \
+		rm -Rf $$DIRNAME
 
 %.gz: %
 	gzip -9 $<
