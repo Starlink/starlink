@@ -9,6 +9,9 @@
 #
 
 use Carp;
+# use strict; - formats make strictness difficult since they use globals
+# %fitsitem contains the current header
+use vars qw/ %fitsitem /;
 use sigtrap qw/stack-trace normal-signals error-signals/;
 use NDF;
 
@@ -19,27 +22,28 @@ use Cwd;
 use Getopt::Long;
 
 # Parse the command line options
-
-$result = GetOptions("help"     => \$h,
-		     "all"      => \$all,
-		     "summary!" => \$summary,
-		     "begin=i"  => \$begin,
-		     "end=i"    => \$end,
-		     "demod!"   => \$demod,
-		     "reduced!" => \$reduced,
-		     "nodatadir"=> \$nodatadir,
-		     "mode=s"   => \$whichmode
-		    );
+my ($h, $all, $summary, $begin, $end, $demod, $reduced, $nodatadir, 
+    $whichmode);
+my $result = GetOptions("help"     => \$h,
+			"all"      => \$all,
+			"summary!" => \$summary,
+			"begin=i"  => \$begin,
+			"end=i"    => \$end,
+			"demod!"   => \$demod,
+			"reduced!" => \$reduced,
+			"nodatadir"=> \$nodatadir,
+			"mode=s"   => \$whichmode
+		       );
 
 $h = 1 unless $result == 1;  # Print help info if unknown option
 
 # Parameter for max number of sub-instruments
-$MAX_SUB = 5;
+my $MAX_SUB = 5;
 
 # Work out what I have been called as
 
-@parts = split(/\//, $0);
-$prog = $parts[$#prog];
+my @parts = split(/\//, $0);
+my $prog = $parts[0];
 
 # Help information
 
@@ -77,25 +81,25 @@ Author:
 
 # CWD
 
-$startdir = cwd;
+my $startdir = cwd;
 
 # PI
 
-$pi = 3.141592654;
+my $pi = 3.141592654;
 
 # NDF name for FITS information in RO files
 
-$rohead = ".HEADER";
+my $rohead = ".HEADER";
 
 
 # Am I processing skydip data 
-$dotau = 0;
+my $dotau = 0;
 if ($prog =~ /photsum|mapsum|pointsum|skysum/) {
   $dotau = 1;
 }
 
 # Set up mode filter
-$whichmode = '';
+my $whichmode = '';
 if ($prog eq "photsum") {
   $whichmode = "photom,skydip,polphot";
 } elsif ($prog eq "mapsum") {
@@ -114,16 +118,16 @@ if ($prog eq "photsum") {
 # Get list of files....
 # Now start asking some questions
 
-$start = 0;
-$stop = 9999;
+my $start = 0;
+my $stop = 9999;
 unless ($all) {
 
   if (defined $begin) {
     $start = $begin;
   } else {
-    
+
     print "\n Enter starting observation number [0] ";
- 
+
     chomp($start = <>);
     $start !~ /./ && ($start = 0);
   }
@@ -133,18 +137,17 @@ unless ($all) {
   } else {
 
     print " Enter final observation number [last] ";
-    
+
     chomp($stop =<>);
     $stop !~ /./ && ($stop = "last");
     $stop = 9999 if $stop =~ /^l/i;
   }
 }
- 
+
 # Create search list for files
-@dirlist = ("$startdir"); # select cwd
+my @dirlist = ("$startdir"); # select cwd
 push(@dirlist,$ENV{'DATADIR'}) if defined $ENV{'DATADIR'};
 
- 
 # Read in the list of files from each directory in @dirlist
 # The file list will depend on the command line options for
 #   1) Range
@@ -152,6 +155,7 @@ push(@dirlist,$ENV{'DATADIR'}) if defined $ENV{'DATADIR'};
 #   3) Whether we want reduced
 # Modify the pattern match accordingly and then include the .sdf pattern at the end
 
+my $pattern;
 if ($reduced & $demod) {
   $pattern = q/_(red|dem)_\d+\.sdf$/;
 } elsif ($reduced) {
@@ -161,14 +165,13 @@ if ($reduced & $demod) {
 } else {
   $pattern = q/\.sdf$/;
 }
- 
+
 #$pattern = ".*\.sdf$";
 #$pattern = "_dem_" if $demod;
 #$pattern = "_red_" if $reduced;
 #$pattern = "_(red|dem)_" if ($reduced & $demod); # Yes this is a kludge
 
- 
-%files = ();
+my %files = ();
 
 # Loop over all specified directories
 DIRS: foreach my $ddir (@dirlist) {
@@ -176,6 +179,8 @@ DIRS: foreach my $ddir (@dirlist) {
   # Open the directory
   opendir (DATADIR, $ddir) ||
     do { print "WARNING: unable to read directory $ddir\n"; next DIRS};
+
+  my $pseudout = "UNKNOWN1";
 
   # Loop over all the files in the directory looking for .sdf files
   FILES: foreach my $file (readdir(DATADIR)) {
@@ -191,12 +196,15 @@ DIRS: foreach my $ddir (@dirlist) {
       # If bits only has one part then we had a problem
       if ($#bits == 0) {
 	# Try matching as non-number and number
-	if ( $file =~ /(\D+)(\d+$ )/ ) { 
-	  $bits[0] = $1; 
-	  $bits[1] = $2; 
+	if ( $file =~ /(\D+)(\d+)$/ ) {
+	  $bits[0] = $1;
+	  $bits[1] = $2;
 	} else {
-	  # No match so just use a default
-	  $bits[0] =  0;  # UTdate 0
+	  # No match so just use a default - we have to make sure
+	  # that the defaults change so that we dont simply end up
+	  # with the last file that doesnt match.
+	  # Use a UTdate string that changes per directory
+	  $bits[0] =  $pseudout++;  # UTdate
 	  $bits[1] =  0;  # ObsNum 0
 	}
       }
@@ -227,12 +235,12 @@ err_begin($status);
 foreach my $ddir (keys %files) {
 
   # Go to the correct directory
-  chdir $ddir || 
+  chdir $ddir or
     die "Error changing to directory $ddir\n";
 
   # Cant write the directory location out until we have decided on the header
   # information
-  $write_dir = 1;
+  my $write_dir = 1;
 
   # Now loop over UT dates in $ddir
   # First read them so that I can decide whether to print the information out
@@ -241,6 +249,7 @@ foreach my $ddir (keys %files) {
   foreach my $ut (@utdates) {
 
     # Print the UT date if required
+    my $write_ut;
     if ($ut != 0 && $#utdates > 0) {
       $write_ut = 1;
     } else {
@@ -578,26 +587,26 @@ sub find_skydip {
 
   if (($fitsitem{'MODE'} =~ /SKYDIP/) && ($fname =~ /_red_/)) {
     # Can only do this for modern _red_ files
-    hds_open($fname, 'READ', $sdip_loc, $status);
+    hds_open($fname, 'READ', my $sdip_loc, $status);
     dat_ncomp($sdip_loc, $ncomp, $status);
-    
+
     # Cycle over the HDS components
-    for $comp (1..$ncomp - 1) { # HEADER is always last so ignore
-      dat_index($sdip_loc, $comp, $nsdip_loc, $status);
-      dat_name($nsdip_loc, $name, $status);
-      dat_type($nsdip_loc, $sdip_type, $status);
-      
+    for my $comp (1..$ncomp - 1) { # HEADER is always last so ignore
+      dat_index($sdip_loc, $comp, my $nsdip_loc, $status);
+      dat_name($nsdip_loc, my $name, $status);
+      dat_type($nsdip_loc, my $sdip_type, $status);
+
       if ($sdip_type eq 'NDF') {
-	  
+
 	# Open ths NDF
-	ndf_find(&NDF::DAT__ROOT, "$fname.$name", $sdip_ndf, $status);
+	ndf_find(&NDF::DAT__ROOT, "$fname.$name", my $sdip_ndf, $status);
 	
 	# Open the SKYDIP_FIT extension
-	ndf_xloc($sdip_ndf, 'SKYDIP_FIT', 'READ', $sdip_xloc, $status);
+	ndf_xloc($sdip_ndf, 'SKYDIP_FIT', 'READ', my $sdip_xloc, $status);
 
 	# Now read the fit result
-	cmp_get0r($sdip_xloc, 'TAUZ_FIT1', $tauz, $status);
-  
+	cmp_get0r($sdip_xloc, 'TAUZ_FIT1', my $tauz, $status);
+
 	dat_annul($sdip_xloc, $status);
 	ndf_annul($sdip_ndf, $status);
 
@@ -621,10 +630,10 @@ sub find_skydip {
 
 sub find_photom {
   my @photom = ();
-  my ($el, $pntr, $indf, $pntr2, $i, $j);
+  my ($el, $pntr, $indf, $pntr2, $j);
 
   if (($fitsitem{'MODE'} =~ /PHOTOM/) && ($fname =~ /_red_/)) {
-      
+
     # All PHOTOMetry data is stored in a subinstrument extension
     # eg LONG, SHORT, P1350...
 
@@ -634,11 +643,11 @@ sub find_photom {
 
     ndf_begin;
 
-    for ($i = 1; $i <= $fitsitem{'N_SUBS'}; $i++) {
+    for my $i (1 ..$fitsitem{'N_SUBS'} ) {
 
       my @data = ();
       my @err = ();
-      $name = $fitsitem{"SUB_$i"};
+      my $name = $fitsitem{"SUB_$i"};
 
       # Open ths NDF
       ndf_find(&NDF::DAT__ROOT, "$fname.$name", $indf, $status);
@@ -661,15 +670,13 @@ sub find_photom {
 
 
 #      print "$name: DATA: $data[0] and $err[0] $status\n";
-      
-
 
       # Construct a string (assume one measurement)
 
       push (@photom, $name,sprintf("%8.2e",$data[0]));
 
       # Signal to noise
-      $StoN = undef;
+      my $StoN = undef;
       $StoN = $data[0] / $err[0] if ($err[0] > 1.0e-9);
       push (@photom, $StoN);
 

@@ -1,3 +1,8 @@
+2000-10-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/sculog: Fix problem when accessing files of name o??.sdf
+	- only the last was accepted due to error in pattern match
+
 2000-09-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	----------->>>>>>>>>>>> SURF 1.6-2 <<<<<<<<<<<-----------
