@@ -1110,7 +1110,7 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
 /* Table of nice degrees gaps. */
    const double deg_table[] =
       { 1.0, 2.0, 5.0, 10.0, 30.0, 45.0, 60.0, 90.0, 180.0, 360.0, -1.0 };
-   const deg_nticks[] =
+   const int deg_nticks[] =
       { 4,   4,   5,   5,    6,    3,    6,    3,    3,     4 };
 
 /* Table of nice hours gaps. */

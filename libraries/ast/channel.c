@@ -134,7 +134,7 @@ static void (* parent_setattrib)( AstObject *, const char * );
 
 /* Count of the number of output items written since the last "Begin"
    or "IsA" item. */
-static items_written = 0;
+static int items_written = 0;
 
 /* Amount of indentation to be applied to the next output item. */
 static int current_indent = 0;
