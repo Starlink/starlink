@@ -10852,6 +10852,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Adds a scalar to a section of an NDF data structure to correct rift-valley defects.}
 \menuitem{ROTATE}{
  Rotates a 2-dimensional NDF about its centre through any angle.}
+\menuitem{SCATTER}{
+ Displays a scatter plot between data in two NDFs.}
 \menuitem{SEGMENT}{
  Copies polygonal segments from one NDF to another.}
 \menuitem{SETAXIS}{
@@ -11157,6 +11159,8 @@ functions as follows.
 \classitem{MLINPLOT}
  Draws a multi-line plot of a 2-d NDF's data values against their axis
  co-ordinates.
+\classitem{SCATTER}
+ Displays a scatter plot between data in two NDFs.
 \classitem{SNAPSHOT}
  Dumps an image-display memory to a graphics hardcopy and
  optionally to an NDF.
@@ -33359,6 +33363,250 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    }
 }
 \sstroutine{
+   SCATTER
+}{
+   Displays a scatter plot between data in two NDFs
+}{
+   \sstdescription{
+      This application displays a 2-dimensional plot in which the
+      horizontal axis corresponds to the data value in the NDF given
+      by parameter IN1, and the vertical axis corresponds to the data
+      value in the NDF given by parameter IN2. Optionally, the variance,
+      standard deviation or quality may be used instead of the data value for
+      either axis (see parameters COMP1 and COMP2). A symbol is displayed
+      at an appropriate position in the plot for each pixel which has a
+      good value in both NDFs, and falls within the bounds specified by
+      parameter XLEFT, XRIGHT, YBOT and YTOP. The type of symbol may be
+      specified using parameter MARKER.
+
+      The supplied arrays may be compressed prior to display (see parameter
+      COMPRESS). This reduces the number of points in the scatter plot, and
+      also reduces the noise in the data.
+   }
+   \sstusage{
+      scatter in1 in2 comp1 comp2 device
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         TRUE if labelled and annotated axes are to be drawn around the
+         plot. The width of the margins left for the annotation may be
+         controlled using parameter MARGIN. The appearance of the axes
+         (colours, fonts, \emph{etc.}) can be controlled using the parameter
+         STYLE. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         If TRUE the current picture is cleared before the plot is
+         drawn. If CLEAR is FALSE not only is the existing plot retained,
+         but also an attempt is made to align the new picture with the
+         existing picture. Thus you can generate a composite plot within
+         a single set of axes, say using different colours or modes to
+         distinguish data from different datasets. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         COMP1 = LITERAL (Read)
+      }{
+         The NDF array component to be displayed on the horizontal axis.
+         It may be {\tt "}Data{\tt "}, {\tt "}Quality{\tt "}, {\tt "}Variance{\tt "}, or {\tt "}Error{\tt "} (where {\tt "}Error{\tt "}
+         is an alternative to {\tt "}Variance{\tt "} and causes the square root of the
+         variance values to be displayed).  If {\tt "}Quality{\tt "} is specified,
+         then the quality values are treated as numerical values (in
+         the range 0 to 255). {\tt ["Data"]}
+      }
+      \sstsubsection{
+         COMP2 = LITERAL (Read)
+      }{
+         The NDF array component to be displayed on the vertical axis.
+         It may be {\tt "}Data{\tt "}, {\tt "}Quality{\tt "}, {\tt "}Variance{\tt "}, or {\tt "}Error{\tt "} (where {\tt "}Error{\tt "}
+         is an alternative to {\tt "}Variance{\tt "} and causes the square root of the
+         variance values to be displayed).  If {\tt "}Quality{\tt "} is specified,
+         then the quality values are treated as numerical values (in
+         the range 0 to 255). {\tt ["Data"]}
+      }
+      \sstsubsection{
+         COMPRESS() = \_INTEGER (Read)
+      }{
+         The compression factors to be used when compressing the supplied
+         arrays prior to display. If any of the supplied values are greater
+         than 1, then the supplied arrays are compressed prior to display
+         by replacing each box of input pixels by a single pixel equal to
+         the mean of the pixels in the box. The size of each box in pixels
+         is given by the compression factors. No compression occurs if all
+         values supplied for this parameter are 1. If the number of values
+         supplied is smaller than the number of axes, the final value
+         supplied is duplicated for the remaining axes. {\tt [1]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The graphics workstation on which to produce the plot.  If a
+         null value (!) is supplied no plot will be made. {\tt [Current graphics
+         device]}
+      }
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         The NDF to be displayed on the horizontal axis.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         The NDF to be displayed on the vertical axis.
+      }
+      \sstsubsection{
+         MARGIN( 4 ) = \_REAL (Read)
+      }{
+         The widths of the margins to leave for axis annotation, given
+         as fractions of the corresponding dimension of the DATA picture.
+         Four values may be given, in the order - bottom, right, top, left.
+         If less than four values are given, extra values are used equal to
+         the first supplied value. If these margins are too narrow any axis
+         annotation may be clipped. The dynamic default is 0.18 (for all
+         edges) if annotated axes are produced, and zero otherwise. {\tt []}
+      }
+      \sstsubsection{
+         MARKER = \_INTEGER (Read)
+      }{
+         Specifies the symbol with which each position should be marked in
+         the plot. It should be given as an integer PGPLOT marker type. For
+         instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
+         an asterisk, 7 gives a triangle. The value must be larger than or
+         equal to -31. {\tt [current value]}
+      }
+      \sstsubsection{
+         PERC1( 2 ) = \_REAL (Read)
+      }{
+         The percentiles that define the default values for XLEFT and
+         XRIGHT. For example, [5,95] would result in the lowest and
+         highest 5\% of the data value in IN1 being excluded from the plot
+         if the default values are accepted for XLEFT and XRIGHT.
+         {\tt [current value]}
+      }
+      \sstsubsection{
+         PERC2( 2 ) = \_REAL (Read)
+      }{
+         The percentiles that define the default values for YBOT and
+         YTOP. For example, [5,95] would result in the lowest and
+         highest 5\% of the data value in IN2 being excluded from the plot
+         if the default values are accepted for YBOT and YTOP.
+         {\tt [current value]}
+      }
+      \sstsubsection{
+         STYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the plotting style to use
+         when drawing the annotated axes, and markers.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of markers is controlled by Colour(Markers),
+         Width(Markers), \emph{etc.} (the synonym Symbols may be used in place
+         of Markers). {\tt [current value]}
+      }
+      \sstsubsection{
+         XLEFT = \_REAL (Read)
+      }{
+         The axis value to place at the left hand end of the horizontal
+         axis. The dynamic default is determined by parameter PERC1. The
+         value supplied may be greater than or less than the value supplied
+         for XRIGHT. {\tt []}
+      }
+      \sstsubsection{
+         XRIGHT = \_REAL (Read)
+      }{
+         The axis value to place at the right hand end of the horizontal
+         axis. The dynamic default is determined by parameter PERC1. The
+         value supplied may be greater than or less than the value supplied
+         for XLEFT. {\tt []}
+      }
+      \sstsubsection{
+         YBOT = \_REAL (Read)
+      }{
+         The axis value to place at the bottom end of the vertical axis.
+         The dynamic default is determined by parameter PERC2. The value
+         supplied may be greater than or less than the value supplied
+         for YTOP. {\tt []}
+      }
+      \sstsubsection{
+         YTOP = \_REAL (Read)
+      }{
+         The axis value to place at the top end of the vertical axis.
+         The dynamic default is determined by parameter PERC2. The value
+         supplied may be greater than or less than the value supplied
+         for YBOT. {\tt []}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         scatter cl123a cl123b
+      }{
+         This displays a scatter plot of the data value in NDF cl123b
+         against the data value in NDF cl123a, on the current graphics
+         device.
+      }
+      \sstexamplesubsection{
+         scatter cl123a cl123a pscol\_l comp2=error compress=3
+      }{
+         This displays a scatter plot of the error in NDF cl123a
+         against the data value in the same NDF. The graphics device used
+         is {\tt "}pscol\_l{\tt "}. The data is compressed by a factor of 3 on each
+         axis before forming the plot.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The application stores two pictures in the graphics database in
+         the following order: a FRAME picture containing the annotated axes
+         and data plot, and a DATA picture containing just the data plot.
+         Note, the FRAME picture is only created if annotated axes have been
+         drawn, or if non-zero margins were specified using parameter
+         MARGIN. The world co-ordinates in the DATA picture will correspond
+         to data value in the two NDFs.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA:NORMALIZE.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         Only \_REAL data can be processed directly.  Other non-complex
+         numeric data types will undergo a type conversion before
+         processing occurs.
+      }
+   }
+}
+\sstroutine{
    ROTATE
 }{
    Rotates a 2-dimensional NDF about its centre through any angle
@@ -42723,6 +42971,12 @@ The following applications have been modified:
 
    \end{description}
 
+\subsection{New applications}
+\begin{description}
+   \item [\htmlref{SCATTER}{SCATTER}] -- Displays a scatter plot between
+    data in two n-dimension NDFs.
+\end{description}
+
 \begin{latexonly}
 \newpage
 \pagestyle{empty}
@@ -42946,6 +43200,8 @@ functions as follows.
 \classitem{SNAPSHOT}
  Dumps an image-display memory to a graphics hardcopy and
  optionally to an NDF.
+\classitem{SCATTER}
+ Displays a scatter plot between data in two NDFs.
 \classitem{TURBOCONT}
  Contours a 2-d NDF quickly.
 \classitem{VECPLOT}
