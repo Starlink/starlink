@@ -2418,16 +2418,16 @@ javadocs:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the range (i.e. data limits) of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:68: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time and data value)
   [javadoc]   that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:57: warning - The first sentence is interpreted to be:
   [javadoc] "Get the dimension of the time series (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the dimension of the time series (i.e. the number of values
   [javadoc]   it contains)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:68: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:57: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/TimeSeriesAccess.html...
   [javadoc] "Get the full range (i.e."
@@ -2767,4 +2767,4 @@ javadocs:
   [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 10 seconds
+Total time: 3 minutes 11 seconds
