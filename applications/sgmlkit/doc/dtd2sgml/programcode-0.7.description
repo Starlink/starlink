@@ -75,6 +75,66 @@ particular function.  Authors who have indirectly contributed code --
 perhaps a package you've based the function on -- can be credited in
 the <elemref gi="otherauthors"/> element.
 </p>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 12 May 2000 17:30:29 +0100 (BST)</date>
+<subject>Clumsy cross-referencing</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Fri May 12 17:30:30 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-programcode-0.7+authorlist@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 12 May 2000 17:30:30 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12qIKc-0004q6-00 for sgml-programcode-0.7+authorlist@astro.gla.ac.uk; Fri, 12 May 2000 17:30:30 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12qIKb-0005Mf-00 for sgml-programcode-0.7+authorlist@astro.gla.ac.uk; Fri, 12 May 2000 17:30:29 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005121721270.18710-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+The way that authors are listed in the programcode DTD is rather
+clumsy (Mark has made this point before -- this is a note of it in
+these comments plus a proposed solution).
+
+Within the code prologues, you'd like to be able to say something like
+
+    &lt;author id=ng affiliation='Glasgow'&gt;Norman Gray
+
+and be done with it.  No -- the id attribute here is an SGML ID, which
+means there can be only one of them in a document.  Since routines are
+generally bundled together in skeleton documents (at least, that's how
+I do it, and how it's designed to be used), this is a problem, and the
+current way of referring to authors has the &lt;author&gt; element in the
+skeleton document, and &lt;authorref&gt; elements in the routine prologues,
+which cross refer to the `definition' of the author at the top of the
+skeleton document.
+
+This has some advantages, in that the &lt;author&gt; definition at the top
+of the document can be longer, and have things like webpage and email
+attributes attached to it, which it would be tedious to add to every
+&lt;authorref&gt; element.  However it's also confusing and error-prone.
+
+As an alternative, how about losing the &lt;authorref&gt; elements, and making
+the id attribute of the &lt;author&gt; elements in the prologues be simply a
+CDATA string, with the understanding that &lt;author&gt; elements displaying
+the same id are for the same author.  When the document's being processed,
+author information can be collected from all the &lt;author&gt; elements
+with the same id, and possibly bundled together at the top of the
+generated document.  The only thing is what to do when some of these
+elements have conflicting further attributes.  Just pick the first
+one?  Or object?
+
+Norman
+
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
 <!--splice:authorlist-->
 </element>
 
@@ -388,6 +448,12 @@ here).
 <p>See <elemxref gi="mline" dtd="sundtd"/>
 </p>
 <!--splice:mline-->
+</element>
+
+<element gi="moduletype" status="beta">
+<p>Indicate what type of module this is, for example
+<code>&lt;moduletype>Perl module</code>.</p>
+<!--splice:moduletype-->
 </element>
 
 <element gi="name" status="beta">
@@ -783,3 +849,9 @@ long as the keywords you invent are prefixed with `general: ...'.
 
 <!--splice:general-comments-->
 </dtddescription>
+
+<!--
+Local Variables:
+mode: sgml
+End:
+-->
