@@ -37,6 +37,10 @@
 *        Fix Y2K problem by using MOD on year i.s.o. subtracting 1900
 *     30 Dec 1999 (timj):
 *        Use informative header
+*     17 May 2000 (timj):
+*        Fix precision error that caused 1999.0722 to be translated
+*        to 23-JUL-99. Forced the conversion to be all in DBLE rather
+*        than first going to REAL.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -66,7 +70,7 @@
 
       IYEAR = INT (DDATE)
       MONTH = 100.*(DDATE-FLOAT(IYEAR))
-      IDAY  = NINT(10000.*(DDATE-(IYEAR+.01*MONTH)))
+      IDAY  = NINT(10000.*(DDATE-DBLE(IYEAR+.01D0*MONTH)))
 
       WRITE (DATE, '(I2.2,''-'',A3,''-'',I2.2)', IOSTAT=IERR)
      &                IDAY, MONTHS(MONTH), MOD(IYEAR,100)
