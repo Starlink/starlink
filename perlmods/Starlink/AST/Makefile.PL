@@ -37,6 +37,12 @@ ast_link command is not in your path." if $astlibs !~ /./;
 my $libs = "-L$StarConfig{Star_Lib} $astlibs ";
 $libs = "-L/sw/lib $libs" if $^O eq 'darwin';
 
+# Typemap files. We have a typemap to use by default.
+# For perl 5.6.1 and older we need to provide a typemap for
+# T_AVREF and T_HVREF. Only use that if required.
+my @typemaps = ( "typemap" );
+unshift( @typemaps, "typemap.561") if $] < 5.008;
+
 
 # Write the makefile....
 WriteMakefile(
@@ -44,6 +50,7 @@ WriteMakefile(
     'VERSION_FROM' => 'AST.pm', # finds $VERSION
     'LIBS'      => [ $libs ],   # e.g., '-lm' 
     'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other' 
+    'TYPEMAPS'  => \@typemaps,
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

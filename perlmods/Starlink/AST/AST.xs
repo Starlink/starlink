@@ -25,6 +25,7 @@ extern "C" {
 #include "EXTERN.h"   /* std perl include */
 #include "perl.h"     /* std perl include */
 #include "XSUB.h"     /* XSUB include */
+#include "ppport.h"
 #ifdef __cplusplus
 }
 #endif
@@ -183,7 +184,9 @@ static void sinkWrap( void (*sink)(const char *), const char *line ) {
    the AST simultaneously. May need to protect this from
    non-threaded perl */
 
+#ifdef USE_ITHREADS
 static perl_mutex AST_mutex;
+#endif
 
 /* An array to store the messages coming from the error system */
 AV* ErrBuff;
