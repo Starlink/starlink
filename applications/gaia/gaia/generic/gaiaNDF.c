@@ -15,7 +15,7 @@
  *      functions that GAIA requires.
  *
  *  Copyright:
- *     Copyright (C) 2000 Central Laboratory of the Research Councils
+ *     Copyright (C) 2000-2001 Central Laboratory of the Research Councils
  *
  *   Authors:
  *      PWD: Peter W. Draper, Starlink - University of Durham
@@ -32,6 +32,9 @@
  *         (and old code changed as time permits).
  *      12-JAN-2000
  *         Added changes for "HDU" support.
+ *      31-MAY-2001
+ *         Made NDF name handling more robust to very long names 
+ *         (>MAXNDFNAME).
  *      {enter_changes_here}
  *-
  */
@@ -50,27 +53,24 @@
 #include "gaiaNDF.h"
 
 /*  Maximum number of pixels to copy during chunking. */
-#define MXPIX 500000
-
-/*  Maximum name of NDF filename or HDS path */
-#define MXNAME 256
+#define MXPIX 2000000
 
 /*
  *  Structure to store information about an NDF.
  */
 struct NDFinfo {
-      char name[MXNAME];    /*  NDF name (within file)*/
-      int ndfid;            /*  NDF identifier */
-      int ncomp;            /*  Number of data components */
-      int type;             /*  NDF data type (as bitpix) */
-      int nx;               /*  First dimension of NDF */
-      int ny;               /*  Second dimension of NDF */
-      int readonly;         /*  Readonly access */
-      int havevar;          /*  Variance component exists */
-      int havequal;         /*  Quality array exists */
-      char *header;         /*  Pointer to FITS headers */
-      int hlen;             /*  Length of header */
-      struct NDFinfo *next; /*  Pointer to next NDF with displayables */
+      char name[MAXNDFNAME]; /*  NDF name (within file)*/
+      int ndfid;             /*  NDF identifier */
+      int ncomp;             /*  Number of data components */
+      int type;              /*  NDF data type (as bitpix) */
+      int nx;                /*  First dimension of NDF */
+      int ny;                /*  Second dimension of NDF */
+      int readonly;          /*  Readonly access */
+      int havevar;           /*  Variance component exists */
+      int havequal;          /*  Quality array exists */
+      char *header;          /*  Pointer to FITS headers */
+      int hlen;              /*  Length of header */
+      struct NDFinfo *next;  /*  Pointer to next NDF with displayables */
 };
 typedef struct NDFinfo NDFinfo;
 
@@ -190,38 +190,45 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
                    char **header, int *header_length, int *ndfid,
                    char **error_mess )
 {
-   DECLARE_CHARACTER(ndfname, MXNAME);   /* Local copy of filename (F77) */
-   DECLARE_CHARACTER(tmpname, MXNAME);   /* Local copy of filename (F77) */
-   DECLARE_INTEGER(status);              /* Global status */
-   DECLARE_POINTER(charPtr);             /* Pointer to F77 character array */
+   DECLARE_CHARACTER(ndfname, MAXNDFNAME);   /* Local copy of filename (F77) */
+   DECLARE_CHARACTER(tmpname, MAXNDFNAME);   /* Local copy of filename (F77) */
+   DECLARE_INTEGER(status);                  /* Global status */
+   DECLARE_POINTER(charPtr);                 /* Pointer to F77 character array */
 
    /* Convert the file name into an F77 string */
-   strcpy( tmpname, filename );
-   cnf_exprt( tmpname, ndfname, ndfname_length );
+   if ( strlen( filename ) <= MAXNDFNAME ) {
+       strncpy( tmpname, filename, tmpname_length );
+       cnf_exprt( tmpname, ndfname, ndfname_length );
 
-   /* Attempt to open the NDF. */
-   emsMark();
-   F77_CALL( rtd_rdndf )( CHARACTER_ARG(ndfname),
-                          INTEGER_ARG(type),
-                          INTEGER_ARG(ndfid),
-                          INTEGER_ARG(width),
-                          INTEGER_ARG(height),
-                          POINTER_ARG(&charPtr),
-                          INTEGER_ARG(header_length),
-                          INTEGER_ARG(&status)
-                          TRAIL_ARG(ndfname)
-      );
-   if ( status != SAI__OK ) {
-      *error_mess = errMessage( &status );
-      emsRlse();
-      return 0;
+       /* Attempt to open the NDF. */
+       emsMark();
+       F77_CALL( rtd_rdndf )( CHARACTER_ARG(ndfname),
+                              INTEGER_ARG(type),
+                              INTEGER_ARG(ndfid),
+                              INTEGER_ARG(width),
+                              INTEGER_ARG(height),
+                              POINTER_ARG(&charPtr),
+                              INTEGER_ARG(header_length),
+                              INTEGER_ARG(&status)
+                              TRAIL_ARG(ndfname)
+           );
+       if ( status != SAI__OK ) {
+           *error_mess = errMessage( &status );
+           emsRlse();
+           return 0;
+       }
+
+       /* Convert the FITS headers into a C string */
+       *header = cnf_creib( (char *)charPtr, 80 * (*header_length) );
+       cnf_free( (void *)charPtr );
+       emsRlse();
+       return 1;
+   } else {
+       
+       /* Filename too long. */
+       *error_mess = strdup( "NDF specification is too long" );
+       return 0;
    }
-
-   /* Convert the FITS headers into a C string */
-   *header = cnf_creib( (char *)charPtr, 80 * (*header_length) );
-   cnf_free( (void *)charPtr );
-   emsRlse();
-   return 1;
 }
 
 
@@ -237,16 +244,16 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
                   void *data , int ndfid, const char *component,
                   const char *header, int lheader, char **error_mess )
 {
-   DECLARE_CHARACTER(ndfname,MXNAME);   /* Local copy of filename (F77) */
-   DECLARE_CHARACTER(tmpname,MXNAME);   /* Local copy of filename (F77) */
-   DECLARE_CHARACTER(comp, 20);         /* NDF component to use (F77) */
-   DECLARE_INTEGER(status);             /* Global status */
-   DECLARE_POINTER(dataPtr);            /* Pointer to F77 memory */
+   DECLARE_CHARACTER(ndfname,MAXNDFNAME);   /* Local copy of filename (F77) */
+   DECLARE_CHARACTER(tmpname,MAXNDFNAME);   /* Local copy of filename (F77) */
+   DECLARE_CHARACTER(comp, 20);             /* NDF component to use (F77) */
+   DECLARE_INTEGER(status);                 /* Global status */
+   DECLARE_POINTER(dataPtr);                /* Pointer to F77 memory */
    DECLARE_CHARACTER_ARRAY_DYN(fhead);
    int dims[1];
 
    /* Convert the file name into an F77 string */
-   strcpy( tmpname, filename );
+   strncpy( tmpname, filename, tmpname_length );
    cnf_exprt( tmpname, ndfname, ndfname_length );
 
    /* Convert the NDF component into a F77 string */
@@ -552,7 +559,7 @@ static void setState( struct NDFinfo *state, int ndfid, const char *name,
    int ncomp = 1;
    int exists = 0;
 
-   strncpy( state->name, name, MXNAME );
+   strncpy( state->name, name, MAXNDFNAME );
    state->ndfid = ndfid;
    state->type = type;
    state->nx = nx;
@@ -648,10 +655,10 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
    char *path;
    char *right;
    char baseloc[DAT__SZLOC];
-   char ndffile[MXNAME];
-   char ndfpath[MXNAME];
+   char ndffile[MAXNDFNAME];
+   char ndfpath[MAXNDFNAME];
    char newloc[DAT__SZLOC];
-   char slice[MXNAME];
+   char slice[MAXNDFNAME];
    char tmploc[DAT__SZLOC];
    int baseid = 0;
    int first;
@@ -670,6 +677,15 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 
    /*  Mark the error stack */
    emsMark();
+
+   /*  Check that we're not going to have problems with the name
+       length */
+   if ( strlen( name ) > MAXNDFNAME ) {
+       *error_mess = (char *) malloc( (size_t) MAXNDFNAME );
+       sprintf( *error_mess, "NDF specification is too long "
+                "(limit is %d characters)", MAXNDFNAME );
+       return 0;
+   }
 
    /*  Attempt to open the given name as an NDF */
    if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
@@ -765,7 +781,8 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
          datIndex( baseloc, i, newloc, &status );
 
          /*  Get full name of component and see if it is an NDF */
-         hdsTrace( newloc, &level, ndfpath, MXNAME, ndffile, MXNAME, &status );
+         hdsTrace( newloc, &level, ndfpath, MAXNDFNAME, ndffile,
+                   MAXNDFNAME, &status ); 
 
          ftype = strstr( ndffile, ".sdf" ); /* Strip off .sdf from filename */
          if ( ftype ) *ftype = '\0';
@@ -778,7 +795,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
          strcat( ndffile, path );        /*  Join filename and HDS
                                              path to give NDF full
                                              name */
-         if ( slice ) {
+         if ( slice[0] != '\0' ) {
             strcat( ndffile, slice );    /*  Add the NDF slice, if set */
             strcat( path, slice );
          }

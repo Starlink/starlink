@@ -70,6 +70,8 @@ extern "C" {
 #include "cnf.h"
 }
 
+//  Length of a FITS header card.
+#define FITSCARD 80
 
 //+
 //  Constructor.
@@ -121,7 +123,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
    char *error_mess;
    char *inheader;
    char *name;
-   const int header_length = 80;      //  Length of FITS header.
+   const int header_length = FITSCARD;      //  Length of FITS header.
    double bscale = 1.0;
    double bzero = 0.0;
    int bitpix = 0;
@@ -224,14 +226,14 @@ int NDFIO::getFitsHeader(ostream& os) const
 {
    istrstream is((char*)header_.ptr(), header_.size());
    char buf[81];
-   while(is.read(buf, 80)) {
+   while(is.read(buf, FITSCARD)) {
       for (int i = 0; i < 79; i++) {
          if (!isascii(buf[i])) {
             buf[i] = ' ';
          }
       }
       buf[79] = '\n';
-      os.write(buf, 80);
+      os.write(buf, FITSCARD);
       if (strncmp(buf, "END     ", 8) == 0) {
          break;
       }
@@ -408,7 +410,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
       char *error_mess;
       char *inheader;
       char *name;
-      const int header_length = 80;
+      const int header_length = FITSCARD;
       int bitpix = 0;
       int header_records = 0;
       int height = 0;
@@ -484,6 +486,9 @@ int NDFIO::makeDisplayable( int index, const char *component )
 
 //
 //  Get information about an NDF. All returned as strings.
+//
+//  Note that name should have a length equal to MAXNDFNAME (defined
+//  in gaiaNDF.h).
 //
 void NDFIO::getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
                         char *hasvar, char *hasqual )

@@ -2,6 +2,9 @@
  *  External prototypes for gaiaNDF.c.
  */
 
+/*  Maximum character length of NDF filename or HDS path */
+#define MAXNDFNAME 256
+
 #ifdef __cplusplus
 extern "C" {
 #endif

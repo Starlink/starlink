@@ -177,6 +177,7 @@
 #include "tcl_err.h"
 #include "rtdDtrn.h"
 #include "GaiaRtdRemote.h"
+#include "gaiaNDF.h"
 
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
@@ -187,6 +188,9 @@ static const int eval_buf_size_ = 1024;
 
 //  Size of buffer used temporary filenames.
 static const int file_buf_size_ = 1024;
+
+//  Number of characters in a FITS header card.
+static const int FITSCARD = 80;
 
 //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
@@ -710,11 +714,11 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             Mem oldhead = image_->header();
             char *oldptr = (char *) oldhead.ptr();
             int oldsize = oldhead.size();
-            char card[81];
-            int ncard = oldsize / 80;
-            for ( int i = 0 ; i < ncard; i++, oldptr += 80 ) {
-                memcpy( card, (void *)oldptr, (size_t) 80 );
-                card[80] = '\0';
+            char card[FITSCARD+1];
+            int ncard = oldsize / FITSCARD;
+            for ( int i = 0 ; i < ncard; i++, oldptr += FITSCARD ) {
+                memcpy( card, (void *)oldptr, (size_t)FITSCARD );
+                card[FITSCARD] = '\0';
 
                 //  Read all cards up to, but not including, the END card.
                 if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
@@ -802,13 +806,13 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 //  Write the FITS channel out to a Mem object and use
                 //  it to replace the existing headers.
                 ncard = astGetI( chan, "Ncard" );
-                Mem newhead = Mem( 80 * ( ncard + 1 ), 0 );
+                Mem newhead = Mem( FITSCARD * ( ncard + 1 ), 0 );
                 char *newptr = (char *) newhead.ptr();
                 astClear( chan, "Card" );
                 int i;
-                for ( i = 0; i < ncard; i++, newptr += 80 ) {
+                for ( i = 0; i < ncard; i++, newptr += FITSCARD ) {
                     astFindFits( chan, "%f", card, 1 );
-                    memcpy( newptr, card, 80 );
+                    memcpy( newptr, card, FITSCARD );
                 }
                 strcpy( newptr, "END" );
                 newptr += 3;
@@ -1500,7 +1504,7 @@ void StarRtdImage::storeCard( AstFitsChan *channel, const char *keyword,
                               const char *value, const char *comment,
                               int overwrite )
 {
-    char card[80];
+    char card[FITSCARD];
     const char *dummy = "No comment";
     if ( comment == NULL ) comment = dummy;
     if ( strlen(value) > 21 ) {
@@ -1624,7 +1628,7 @@ int StarRtdImage::astcreateCmd( int argc, char *argv[] )
 //-
 void StarRtdImage::initChannel( int slot )
 {
-    char buffer[80];
+    char buffer[FITSCARD];
     channels_[slot] = astFitsChan( NULL, NULL, "" );
     storeCard( channels_[slot], "NAXIS", "2", "Number of axes" );
     sprintf( buffer, "%d", image_->width() );
@@ -4180,7 +4184,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     //  Loop though all NDFs getting the required information.
     ostrstream os;
     for ( int i = 1; i <= numNDFs; i++ ) {
-        char name[80], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
+        char name[MAXNDFNAME], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
         ndf->getNDFInfo( i, name, naxis1, naxis2, hasvar, hasqual );
         os << "{"
            << i
