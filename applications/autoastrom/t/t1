@@ -60,9 +60,11 @@ foreach $v (('0:0:0',
 	     '24:0:0',		# should turn into zero
 	     '00:00:00.1',	# small values
 	     '  12:34:56.78  ',	# whitespace
+	     ' +12:34:56.78  ',	#   ..and leading sign
 	     '09:09:00',	# not getting confused about octal, no?
 	     '25:0:0',		# out of range
-	     '-1:0:0',
+	     '-1:0:0',          # negatives angles: malformed
+             '-0:30:0',         #   ..ditto
 	     '12',		# malformed...
 	     '12:34',
 	     '12:ping:00.0',
@@ -81,6 +83,10 @@ foreach $v (('0:0:0',
 # Tests: sexagesimal Dec to decimal
 foreach $v (('0:0:0',
 	     '-0:0:0',		# odd, but shouldn't object
+             '1:30:0',          # simple case
+             '+1:30:0',         #   ..with leading sign
+             '-15:06:0',        # 6' south of -15, not 6' north
+             '-0:30:0',         # -0.5
 	     '00:00:00.1',	# small values
 	     '09:09:00',	# not getting confused about octal, no?
 	     '+90:0:0',		# does this round properly?

@@ -1229,7 +1229,7 @@ sub match_positions_findoff ($$$$$) {
 }
 
 
-# Given two catalogues, generate an ASTROM input file.  
+# Given two catalogues, generate an ASTROM input file.
 #
 # The input catalogues are arrays of hashes, containing at least keys
 # {id}, {x} and {y} in the case of CCDin, and {id}, {ra} and {dec} in
@@ -1672,10 +1672,14 @@ sub sex2deg ($$) {
 
     defined($val) || return undef;
 
-    my ($dh,$min,$sec);
-    if (($dh,$min,$sec) = ($val =~ /^ *([-+]?[0-9]+):([0-9]+):([0-9]+(\.[0-9]+)?) *$/)) {
+    my ($sign,$dh,$min,$sec);
+    if (($sign,$dh,$min,$sec) = ($val =~ /^ *([-+]?)([0-9]+):([0-9]+):([0-9]+(\.[0-9]+)?) *$/)) {
 	my $rval = $dh + $min/60.0 + $sec/3600.0;
 	if ($isra) {
+            if ($sign eq '-') {
+                print STDERR "sex2deg: RA $val --> must be positive\n";
+                return undef;
+            }
 	    $rval *= 15;	# Hours --> degrees
 	    if ($rval == 360.0) { $rval = 0.0; } # accept 360, but fix
 	    if ($rval < 0.0 || $rval >= 360.0) {
@@ -1683,6 +1687,9 @@ sub sex2deg ($$) {
 		return undef;
 	    }
 	} else {
+            if ($sign eq '-' && $rval != 0.0) {
+                $rval = -$rval;
+            }
 	    if ($rval < -90.0 || $rval > +90.0) {
 		print STDERR "sex2deg: sexagesimal Dec $val --> $rval out of range\n";
 		return undef;
