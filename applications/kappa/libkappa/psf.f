@@ -110,6 +110,11 @@
 *        The radial fall-off parameter of the star images. See the 
 *        description for more details.  A gamma of two would be a
 *        Gaussian.
+*     GAUSS = _LOGICAL (Read)
+*        If TRUE, the gamma coefficient is fixed to be 2; in other words
+*        the best-fitting two-dimensional Gaussian is evaluated.  If
+*        FALSE, gamma is a free parameter of the fit, and the derived
+*        value is returned in parameter GAMMA. [FALSE]
 *     IN = NDF (Read)
 *        The NDF containing the star images to be fitted.
 *     ISIZE = _INTEGER (Read)
@@ -195,6 +200,9 @@
 *        The results are stored in the parameter file psf.sdf.
 *     psf ngc6405i starlist device=!
 *        As above but there is no graphical output. 
+*     psf ngc6405i starlist.dat gauss \
+*        As the first example, except the psf is fitted to a
+*        two-dimensional Gaussian.
 *     psf cofile=starlist in=ngc6405i logfile=fit.log fwhm=(seeing) \
 *        As the first example, but the results, including the fits to
 *        each star, are written to the text file fit.log.  The
@@ -318,6 +326,10 @@
 *        Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
 *        parameters for adjustment of the plotting style, for scaling
 *        from pixels to physical units, and for minor-axis profiles.
+*     1998 May 26 (MJC):
+*        Added GAUSS parameter.  A failure to meet the tolerance test
+*        is no longer fatal.  Warning messages showing the requested
+*        and used tolerances replace the error message.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -356,106 +368,94 @@
  
 
 *  Local Variables:
-      INTEGER
-     :  AEL( NDF__MXDIM ),     ! Number of elements in a mapped axis
-     :  AXPNTR( NDF__MXDIM ),  ! Pointers to the mapped axes
-     :  COUNT,                 ! Number of data points input
-     :  DCPLCE,                ! Placeholder to temporay NDF for data
-                               ! co-ordinates
-     :  DCPNTR( 1 ),           ! Pointer to work array for data co-ords
-     :  DIMS( NDIM ),          ! Dimensions of the NDF
-     :  EL,                    ! Number of elements in the input array
-                               ! and output array
-     :  FDL,                   ! File description for log file
-     :  FDXY,                  ! File description for file of x-y
-                               ! positions
-     :  I,                     ! Loop counter
-     :  ISIZE,                 ! Pixel size of square about a star used
-                               ! to form marginal profiles
-     :  LBND( NDF__MXDIM ),    ! Lower bounds of the image
-     :  LSTLEN                 ! Number of non-comment lines in the
-                               ! x-y file
-
-      INTEGER
-     :  NC,                    ! Character column counter in output
-                               ! buffer
-     :  NCHAR,                 ! Number of characters in the buffer read
-                               ! from the x-y file
-     :  NCF,                   ! Character column counter of file names
-     :  NDIMS,                 ! Actual number of dimensions of the NDF
-     :  NDF,                   ! NDF identifier
-     :  NDFDC,                 ! NDF identifier for data co-ordinates
-     :  NDFDCS,                ! NDF identifier for data co-ordinates
-                               ! along one axis
-     :  NDFO,                  ! NDF identifier for output PSF
-     :  NDFWC,                 ! NDF identifier for world co-ordinates
-     :  NDFWCS                 ! NDF identifier for world co-ordinates
-                               ! along one axis
-
-      INTEGER
-     :  PNTRI( 1 ),            ! Pointer to input data array
-     :  POSCOD( NDIM ),        ! Positions of co-ordinates in records
-     :  POSDEF( NDIM ),        ! Suggested default positions of
-                               ! co-ordinates in records
-     :  PSFDIM( NDIM ),        ! PSF dimensions
-     :  PSFPTR( 1 ),           ! Pointer to output PSF data array
-     :  PSFSIZ,                ! Dimension of region used to calculate
-                               ! mean PSF
-     :  SDIM( NDF__MXDIM ),    ! Significant dimensions of the NDF
-     :  SLBND( NDIM ),         ! Significant lower bounds of the image
-     :  SUBND( NDIM ),         ! Significant upper bounds of the image
-     :  UBND( NDF__MXDIM )     ! Upper bounds of the image
-
-      INTEGER
-     :  WCPLCE,                ! Placeholder to temporay NDF for world
-                               ! co-ordinates
-     :  WCPNTR( 1 ),           ! Pointer to work array for world co-ords
-     :  WLBND( 2 ),            ! Lower bounds of the work space
-     :  WOBT,                  ! Number of workspace arrays obtained
-                               ! (not temporary NDFs)
-     :  WPNTR( 2 ),            ! Pointers to work array for width data
-                               ! and for co-ordinates
-     :  WUBND( 2 )             ! Upper bounds of the work space
-
-      REAL
-     :  AXISR,                 ! Axis ratio o fthe star images
-     :  CUT,                   ! The threshold to which the output PSF
-                               ! must extend
-     :  FWHM,                  ! FWHM of the star images
-     :  GAMMA,                 ! Radial fall-off parameter
-     :  LBNDP( NDIM ),         ! Minimum co-ordinates input alias the
-                               ! origin co-ordinates
-     :  RANGE,                 ! Number of image profile widths to which
-                               ! the radial profile is to be fitted
-     :  SCALE,                 ! Scale factor to convert radial pixels
-                               ! into physical units
-     :  THETA,                 ! Orientation of the star images
-     :  UBNDP( NDIM )          ! Maximum co-ordinates input
-
-      DOUBLE PRECISION
-     :  DLBNDP( NDIM ),        ! Minimum data co-ordinates input
-     :  DUBNDP( NDIM )         ! Maximum data co-ordinates input
-
-      CHARACTER
-     :  BUFFER * ( NCHLIN ),   ! Buffer to store output string
-     :  COSYS * 5,             ! Co-ordinate system
-     :  DATNAM * 100,          ! Name of input NDF
-     :  DTYPE * ( NDF__SZFTP ),! HDS type of the data values
-     :  FILNAM * 100,          ! Name of input x-y file
-     :  ITYPE * ( NDF__SZTYP ),! Implemention HDS type
-     :  RUNITS * ( 48 )        ! Units of scaled radial distance (length
-                               ! governed by output of results, 32
-                               ! characters used)
-
-      LOGICAL                  ! True if:
-     :  CMPLET,                ! Completely read the text file
-     :  DACOOR,                ! The NDF contains an axis structure
-     :  DATACO,                ! Input positions are to be given in
-                               ! data co-ordinates
-     :  LOGFIL,                ! Log file is open
-     :  MONOTO,                ! Axis is monotonic
-     :  POSDUP                 ! Obtained different column positions for
-                               ! co-ordinates
+      INTEGER AEL( NDF__MXDIM )  ! Number of elements in a mapped axis
+      REAL AXISR                 ! Axis ratio o fthe star images
+      INTEGER AXPNTR( NDF__MXDIM ) ! Pointers to the mapped axes
+      CHARACTER BUFFER * ( NCHLIN ) ! Buffer to store output string
+      LOGICAL CMPLET             ! Completely read the text file?
+      INTEGER COUNT              ! Number of data points input
+      CHARACTER COSYS * ( 5 )    ! Co-ordinate system
+      REAL CUT                   ! The threshold to which the output PSF
+                                 ! must extend
+      LOGICAL DACOOR             ! The NDF contains an axis structure?
+      LOGICAL DATACO             ! Input positions are to be given in
+                                 ! data co-ordinates?
+      CHARACTER DATNAM * ( 100 ) ! Name of input NDF
+      INTEGER DCPLCE             ! Placeholder to temporay NDF for data
+                                 ! co-ordinates
+      INTEGER DCPNTR( 1 )        ! Pointer to work array for data
+                                 ! co-ordinates
+      INTEGER DIMS( NDIM )       ! Dimensions of the NDF
+      CHARACTER DTYPE * ( NDF__SZFTP ) ! HDS type of the data values
+      DOUBLE PRECISION DLBNDP( NDIM ) ! Minimum data co-ordinates input
+      DOUBLE PRECISION DUBNDP( NDIM ) ! Maximum data co-ordinates input
+      INTEGER EL                 ! Number of elements in the input array
+                                 ! and output array
+      INTEGER FDL                ! File description for log file
+      INTEGER FDXY               ! File description for file of x-y
+                                 ! positions
+      REAL FWHM                  ! FWHM of the star images
+      CHARACTER FILNAM * ( 100 ) ! Name of input x-y file
+      REAL GAMMA                 ! Radial fall-off parameter
+      LOGICAL GAUSS              ! Fit to a Gaussian?
+      INTEGER I                  ! Loop counter
+      INTEGER ISIZE              ! Pixel size of square about a star
+                                 ! used to form marginal profiles
+      CHARACTER ITYPE * ( NDF__SZTYP ) ! Implemention HDS type
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the image
+      REAL LBNDP( NDIM )         ! Minimum co-ordinates input alias the
+                                 ! origin co-ordinates
+      LOGICAL LOGFIL             ! Log file is open?
+                                 ! for co-ordinates?
+      INTEGER LSTLEN             ! Number of non-comment lines in the
+                                 ! x-y file
+      LOGICAL MONOTO             ! Axis is monotonic?
+      INTEGER NC                 ! Character column counter in output
+                                 ! buffer
+      INTEGER NCHAR              ! Number of characters in the buffer
+                                 ! read from the x-y file
+      INTEGER NCF                ! Character column counter of filenames
+      INTEGER NDIMS              ! Actual number of dimensions of NDF
+      INTEGER NDF                ! NDF identifier
+      INTEGER NDFDC              ! NDF identifier for data co-ordinates
+      INTEGER NDFDCS             ! NDF identifier for data co-ordinates
+                                 ! along one axis
+      INTEGER NDFO               ! NDF identifier for output PSF
+      INTEGER NDFWC              ! NDF identifier for world co-ordinates
+      INTEGER NDFWCS             ! NDF identifier for world co-ordinates
+                                 ! along one axis
+      INTEGER PNTRI( 1 )         ! Pointer to input data array
+      INTEGER POSCOD( NDIM )     ! Positions of co-ordinates in records
+      INTEGER POSDEF( NDIM )     ! Suggested default positions of
+                                 ! co-ordinates in records
+      LOGICAL POSDUP             ! Obtained different column positions
+      INTEGER PSFDIM( NDIM )     ! PSF dimensions
+      INTEGER PSFPTR( 1 )        ! Pointer to output PSF data array
+      INTEGER PSFSIZ             ! Dimension of region used to calculate
+                                 ! mean PSF
+      REAL RANGE                 ! Number of image profile widths to
+                                 ! which radial profile is to be fitted
+      CHARACTER RUNITS * ( 48 )  ! Units of scaled radial distance
+                                 ! (length governed by output of
+                                 ! results, 32 characters used)
+      REAL SCALE                 ! Scale factor to convert radial pixels
+                                 ! into physical units
+      INTEGER SDIM( NDF__MXDIM ) ! Significant dimensions of the NDF
+      INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
+      INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
+      REAL THETA                 ! Orientation of the star images
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the image
+      REAL UBNDP( NDIM )         ! Maximum co-ordinates input
+      INTEGER WCPLCE             ! Placeholder to temporay NDF for world
+                                 ! co-ordinates
+      INTEGER WCPNTR( 1 )        ! Pointer to work array for world
+                                 ! co-ordinatess
+      INTEGER WLBND( 2 )         ! Lower bounds of the work space
+      INTEGER WOBT               ! Number of workspace arrays obtained
+                                 ! (not temporary NDFs)
+      INTEGER WPNTR( 2 )         ! Pointers to work array for width data
+                                 ! and for co-ordinates
+      INTEGER WUBND( 2 )         ! Upper bounds of the work space
 
 *.
 
@@ -547,7 +547,7 @@
       END DO
 
 *  Map the image.
-      CALL KPG1_MAP( NDF, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL NDF_MAP( NDF, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
 
 *  Get the type of co-ordinates to input.
 *  ======================================
@@ -672,7 +672,7 @@
          CALL NDF_TEMP( DCPLCE, STATUS )
          CALL NDF_NEW( '_DOUBLE', 2, WLBND, WUBND, DCPLCE, NDFDC,
      :                 STATUS )
-         CALL KPG1_MAP( NDFDC, 'Data', '_DOUBLE', 'WRITE', DCPNTR, EL,
+         CALL NDF_MAP( NDFDC, 'Data', '_DOUBLE', 'WRITE', DCPNTR, EL,
      :                 STATUS )
 
          CALL NDF_TEMP( WCPLCE, STATUS )
@@ -731,10 +731,10 @@
             WLBND( 1 ) = I
             WUBND( 1 ) = I
             CALL NDF_SECT( NDFDC, 2, WLBND, WUBND, NDFDCS, STATUS )
-            CALL KPG1_MAP( NDFDCS, 'Data', '_DOUBLE', 'READ', DCPNTR, 
-     :                    EL, STATUS )
+            CALL NDF_MAP( NDFDCS, 'Data', '_DOUBLE', 'READ', DCPNTR, EL,
+     :                    STATUS )
             CALL NDF_SECT( NDFWC, 2, WLBND, WUBND, NDFWCS, STATUS )
-            CALL KPG1_MAP( NDFWCS, 'Data', '_DOUBLE', 'WRITE', WCPNTR,
+            CALL NDF_MAP( NDFWCS, 'Data', '_DOUBLE', 'WRITE', WCPNTR,
      :                    EL, STATUS )
       
 *  Derive its world equivalent, i.e. pixel indices.
@@ -753,7 +753,7 @@
 
 *  Map the array of world co-ordinates as single precision.  Use the
 *  same pointer as for world co-ordinates.
-         CALL KPG1_MAP( NDFWC, 'Data', '_REAL', 'READ', WPNTR( 2 ), EL,
+         CALL NDF_MAP( NDFWC, 'Data', '_REAL', 'READ', WPNTR( 2 ), EL,
      :                 STATUS )
       END IF
 
@@ -763,6 +763,8 @@
       CALL PAR_GODD( 'ISIZE', 15, 3, 101, .TRUE., ISIZE, STATUS )
       CALL PAR_GDR0R( 'RANGE', 4.0, 1.0, 10.0, .FALSE., RANGE, STATUS )
 
+*  Determine whether or not gamma is a free parameter.
+      CALL PAR_GET0L( 'GAUSS', GAUSS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 960
       
 *  Open a log file for the tabulated results.
@@ -835,7 +837,7 @@
 *  appropriate data type.  Plot the results as required.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_SPARR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                    SLBND, ISIZE, RANGE, LSTLEN,
+     :                    SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                    %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                    FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                    'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -845,7 +847,7 @@
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_SPARB( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                    SLBND, ISIZE, RANGE, LSTLEN,
+     :                    SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                    %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                    FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                    'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -855,7 +857,7 @@
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_SPARD( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                    SLBND, ISIZE, RANGE, LSTLEN,
+     :                    SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                    %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                    FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                    'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -865,7 +867,7 @@
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_SPARI( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                    SLBND, ISIZE, RANGE, LSTLEN,
+     :                    SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                    %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                    FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                    'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -875,7 +877,7 @@
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_SPARUW( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                     SLBND, ISIZE, RANGE, LSTLEN,
+     :                     SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                     %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                     FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                     'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -885,7 +887,7 @@
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_SPARUB( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                     SLBND, ISIZE, RANGE, LSTLEN,
+     :                     SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                     %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                     FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                     'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -895,7 +897,7 @@
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_SPARW( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
-     :                    SLBND, ISIZE, RANGE, LSTLEN,
+     :                    SLBND, ISIZE, RANGE, GAUSS, LSTLEN,
      :                    %VAL( WPNTR( 2 ) ), SCALE, RUNITS, LOGFIL,
      :                    FDL, 'CLEAR', 'DEVICE', 'MINOR', 'PXSIZE',
      :                    'PYSIZE', 'PLTITL', 'ABSLAB', 'ORDLAB',
@@ -938,8 +940,7 @@
       CALL NDF_CREP( 'OUT', '_REAL', NDIM, PSFDIM, NDFO, STATUS )
 
 *  Map it for write access.
-      CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', PSFPTR, EL, 
-     :               STATUS )
+      CALL NDF_MAP( NDFO, 'Data', '_REAL', 'WRITE', PSFPTR, EL, STATUS )
 
 *  Fill the data array with the evaluated point-spread function.
 *  Exclude origin information. (Eventually would like to have the PSF

@@ -26934,7 +26934,9 @@ Description:
    photometry, or for filtering.
 
    The model has a radial profile:
+
       D =  A exp(-0.5 * (r/sigma) ** gamma )
+
    where r is calculated from the true radial distance from the star
    centre allowing for image ellipticity, sigma is the Gaussian
    precision constant or profile width.  The application combines a
@@ -27024,6 +27026,12 @@ GAMMA = _REAL (Write)
    The radial fall-off parameter of the star images. See the
    description for more details.  A gamma of two would be a
    Gaussian.
+3 GAUSS
+GAUSS = _LOGICAL (Read)
+   If TRUE, the gamma coefficient is fixed to be 2; in other words
+   the best-fitting two-dimensional Gaussian is evaluated.  If
+   FALSE, gamma is a free parameter of the fit, and the derived
+   value is returned in parameter GAMMA. [FALSE]
 3 IN
 IN = NDF (Read)
    The NDF containing the star images to be fitted.
@@ -27128,6 +27136,10 @@ psf ngc6405i starlist.dat \
 psf ngc6405i starlist device=!
    As above but there is no graphical output.
 
+psf ngc6405i starlist.dat gauss \
+   As the first example, except the psf is fitted to a
+   two-dimensional Gaussian.
+
 psf cofile=starlist in=ngc6405i logfile=fit.log fwhm=(seeing) \
    As the first example, but the results, including the fits to
    each star, are written to the text file fit.log.  The
@@ -27225,6 +27237,11 @@ MJC: Malcolm J. Currie (STARLINK)
     Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
     parameters for adjustment of the plotting style, for scaling
     from pixels to physical units, and for minor-axis profiles.
+
+ 1998 May 26 (MJC):
+    Added GAUSS parameter.  A failure to meet the tolerance test
+    is no longer fatal.  Warning messages showing the requested
+    and used tolerances replace the error message.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    LABEL, and TITLE components of an NDF data structure.

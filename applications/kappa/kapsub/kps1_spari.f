@@ -1,9 +1,9 @@
       SUBROUTINE KPS1_SPARI( DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE,
-     :                        NXY, POS, SCALE, RUNITS, LOGF, FD, PNCLER,
-     :                        PNDEV, PNMIN, PNXSIZ, PNYSIZ, PNTIT,
-     :                        PNABSL, PNORDL, PNMINT, PNMAJT, PNOUTT,
-     :                        PNFONT, COMMNT, AXISR, THETA, FWHM, GAMMA,
-     :                        WIDTH, SIG, STATUS )
+     :                        GAUSS, NXY, POS, SCALE, RUNITS, LOGF, FD,
+     :                        PNCLER, PNDEV, PNMIN, PNXSIZ, PNYSIZ,
+     :                        PNTIT, PNABSL, PNORDL, PNMINT, PNMAJT,
+     :                        PNOUTT, PNFONT, COMMNT, AXISR, THETA,
+     :                        FWHM, GAMMA, WIDTH, SIG, STATUS )
 *+
 *  Name:
 *     KPS1_SPARx
@@ -16,11 +16,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_SPARx( DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE, NXY, POS,
-*                      SCALE, RUNITS, LOGF, FD, PNCLER, PNDEV, PNMIN,
-*                      PNXSIZ, PNYSIZ, PNTIT, PNABSL, PNORDL, PNMINT,
-*                      PNMAJT, PNOUTT, PNFONT, COMMNT, AXISR, THETA,
-*                      FWHM, GAMMA, WIDTH, SIG, STATUS )
+*     CALL KPS1_SPARx( DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE, GAUSS,
+*                      NXY, POS, SCALE, RUNITS, LOGF, FD, PNCLER, PNDEV,
+*                      PNMIN, PNXSIZ, PNYSIZ, PNTIT, PNABSL, PNORDL,
+*                      PNMINT, PNMAJT, PNOUTT, PNFONT, COMMNT, AXISR,
+*                      THETA, FWHM, GAMMA, WIDTH, SIG, STATUS )
 
 *  Description:
 *     This routine calls a number of subroutines to find a set of 
@@ -49,6 +49,11 @@
 *     RANGE = REAL (Given)
 *        The radius in units of the star 'sigma' out to which the
 *        radial profile is fitted.
+*     GAUSS = LOGICAL (Given)
+*        If .TRUE., the radial-fall-off parameter (gamma) is fixed to be
+*        2; in other words the best-fitting two-dimensional Gaussian is
+*        evaluated.  If .FALSE., gamma is a free parameter of the fit,
+*        and the derived value is returned in argument GAMMA.
 *     NXY = INTEGER (Given)
 *        The number of stars to be fitted.
 *     POS( 2, NXY ) = REAL (Given)
@@ -187,6 +192,8 @@
 *        Used PSX to obtain workspace.
 *     1997 December 20 (MJC):
 *        Used PSX_MALLOC where arbitrary data type is required.
+*     1998 May 26 (MJC):
+*        Added GAUSS argument.  Used modern style of variable ordering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,50 +209,40 @@
       INCLUDE 'PRM_PAR'          ! Magic-value definitions
 
 *  Arguments Given:
-      INTEGER
-     :  DIM1, DIM2,
-     :  LBND( 2 ),
-     :  FD,
-     :  ISIZE,
-     :  NXY
-
-      INTEGER
-     :  ARRAY( DIM1, DIM2 )
-
-      REAL
-     :  RANGE,
-     :  SCALE,
-     :  POS( 2, NXY )
-
-      CHARACTER * ( * )
-     :  COMMNT,
-     :  RUNITS,
-     :  PNCLER,
-     :  PNDEV,
-     :  PNMIN,
-     :  PNXSIZ,
-     :  PNYSIZ,
-     :  PNTIT,
-     :  PNABSL,
-     :  PNORDL,
-     :  PNMINT,
-     :  PNMAJT,
-     :  PNOUTT,
-     :  PNFONT
-
-      LOGICAL
-     :  LOGF
+      INTEGER DIM1
+      INTEGER DIM2
+      INTEGER ARRAY( DIM1, DIM2 )
+      INTEGER LBND( 2 )
+      INTEGER ISIZE
+      LOGICAL GAUSS
+      REAL RANGE
+      INTEGER NXY
+      REAL SCALE
+      REAL POS( 2, NXY )
+      CHARACTER * ( * ) RUNITS
+      LOGICAL LOGF
+      INTEGER FD
+      CHARACTER * ( * ) PNCLER
+      CHARACTER * ( * ) PNDEV
+      CHARACTER * ( * ) PNMIN
+      CHARACTER * ( * ) PNXSIZ
+      CHARACTER * ( * ) PNYSIZ
+      CHARACTER * ( * ) PNTIT
+      CHARACTER * ( * ) PNABSL
+      CHARACTER * ( * ) PNORDL
+      CHARACTER * ( * ) PNMINT
+      CHARACTER * ( * ) PNMAJT
+      CHARACTER * ( * ) PNOUTT
+      CHARACTER * ( * ) PNFONT
+      CHARACTER * ( * ) COMMNT
 
 *  Arguments Returned:
-      REAL
-     :  AXISR,
-     :  FWHM,
-     :  GAMMA,
-     :  SIG( NXY, 5 ),
-     :  THETA
-
-      INTEGER
-     :  WIDTH
+      REAL AXISR
+      REAL THETA
+      REAL FWHM
+      REAL GAMMA
+      INTEGER WIDTH
+      REAL SIG( NXY, 5 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -270,55 +267,48 @@
       PARAMETER ( RESOL2 = 10.0 )
 
 *  Local Variables:
-      REAL
-     :  ANGLE,                   ! Star orientation in degrees
-     :  AMP,                     ! Gaussian amplitude
-     :  BACK,                    ! Background level
-     :  LIMIT,                   ! Radius limit
-     :  PRF( 4 ),                ! Profile parameters
-     :  RSCALE,                  ! Scale factor for converting radial
-                                 ! distance into bins (per star)
-     :  RSCL2,                   ! Scale factor for converting radial
-                                 ! distance into bins (mean star)
-     :  SEEING,                  ! FWHM seeing disk
-     :  SIG0,                    ! Star sigma across minor axis
-     :  SIGMA,                   ! Mean profile sigma across minor axis
-     :  STAAXS,                  ! Star axis ratio
-     :  STASIG,                  ! Star sigma
-     :  STATHE                   ! Star orientation
-
-      INTEGER
-     :  BINPTS,                  ! Number of pixels in to be considered
-     :  DAPTR,                   ! Pointer to the workspace for the
+      REAL ANGLE                 ! Star orientation in degrees
+      REAL AMP                   ! Gaussian amplitude
+      REAL BACK                  ! Background level
+      INTEGER BINPTS             ! Number of pixels in to be considered
+      CHARACTER * ( 80 ) BUFFER  ! Buffer to write results
+      INTEGER DAPTR              ! Pointer to the workspace for the
                                  ! radial-bin pixels
-     :  I,                       ! Loop counter
-     :  IAPTR,                   ! Pointer to the workspace for the
+      INTEGER I                  ! Loop counter
+      INTEGER IAPTR              ! Pointer to the workspace for the
                                  ! linked list
-     :  LLPTR,                   ! Pointer to the workspace for the
+      REAL LIMIT                 ! Radius limit
+      INTEGER LLPTR              ! Pointer to the workspace for the
                                  ! linked-list starts
-     :  MOPTR,                   ! Pointer to the workspace for the
+      INTEGER MOPTR              ! Pointer to the workspace for the
                                  ! radial-bin modes
-     :  MRPTR,                   ! Pointer to the workspace for the
+      INTEGER MRPTR              ! Pointer to the workspace for the
                                  ! radial-bin mean radii
-     :  NAPTR,                   ! Pointer to the workspace for the
+      INTEGER NAPTR              ! Pointer to the workspace for the
                                  ! next address in  the linked list
-     :  NBIN1,                   ! Number of bins for each star
-     :  NBIN2,                   ! Number of bins for the mean star
-     :  NC,                      ! Number of characters
-     :  NGOOD,                   ! Number of stars in the fit
-     :  NPPTR                    ! Pointer to the workspace for the
+      INTEGER NBIN1              ! Number of bins for each star
+      INTEGER NBIN2              ! Number of bins for the mean star
+      INTEGER NC                 ! Number of characters
+      INTEGER NGOOD              ! Number of stars in the fit
+      INTEGER NPPTR              ! Pointer to the workspace for the
                                  ! number of pixels in each radial bin
-
-      INTEGER
-     :  PRPTR,                   ! Pointer to the workspace for the
+      INTEGER PRPTR              ! Pointer to the workspace for the
                                  ! mean radial-profile radii
-     :  PVPTR,                   ! Pointer to the workspace for the
+      INTEGER PVPTR              ! Pointer to the workspace for the
                                  ! mean radial-profile values
-     :  PWPTR                    ! Pointer to the workspace for the
+      INTEGER PWPTR              ! Pointer to the workspace for the
                                  ! mean radial-profile weights
-
-      CHARACTER
-     :  BUFFER * 80              ! Buffer to write results
+      REAL PRF( 4 )              ! Profile parameters
+      REAL RSCALE                ! Scale factor for converting radial
+                                 ! distance into bins (per star)
+      REAL RSCL2                 ! Scale factor for converting radial
+                                 ! distance into bins (mean star)
+      REAL SEEING                ! FWHM seeing disk
+      REAL SIG0                  ! Star sigma across minor axis
+      REAL SIGMA                 ! Mean profile sigma across minor axis
+      REAL STAAXS                ! Star axis ratio
+      REAL STASIG                ! Star sigma
+      REAL STATHE                ! Star orientation
 
 *.
 
@@ -439,6 +429,7 @@
       WRITE ( BUFFER, '( ''   Mean orientation of major axis ='','/
      :        /'SS, G11.4, '' degrees'' )' ) THETA * 57.29578
       CALL MSG_OUT( 'ORIENTATION', BUFFER( :54 ), STATUS )
+      CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
       IF ( NGOOD .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
@@ -506,7 +497,7 @@
 *  Determine the form of the radial profile.
 *  =========================================
          CALL KPS1_RPRFI( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
-     :                     RANGE, POS, NXY, SIG( 1, 5 ), RSCALE,
+     :                     RANGE, GAUSS, NXY, POS, SIG( 1, 5 ), RSCALE,
      :                     RSCL2, NBIN1, NBIN2, BINPTS, %VAL( MOPTR ),
      :                     %VAL( MRPTR ), %VAL( LLPTR ), %VAL( NPPTR ),
      :                     %VAL( DAPTR ), %VAL( IAPTR ), %VAL( NAPTR ),
