@@ -1,34 +1,37 @@
 #! /bin/sh
 
 #+
-#  Name:
+#  <name>
 #     sgml2hlp
 #
-#  Purpose:
+#  <moduletype>
+#     Shell script
+#
+#  <purpose>
 #     Generate Starlink HLP file from SGML source.
 #
-#  Description:
+#  <description>
 #     This program uses an appropriate downconverter to generate a 
 #     Starlink HLP file from an SGML source document which conforms to
 #     the PROGRAMCODE DTD.  The resulting HLP file can be fed to the 
 #     HLIB program to generate a .shl help library as per SUN/124.
 #
-#  Usage:
-#     sgml2hlp routines.sgml >package.hlp
+#  <usage>
+#     <code>sgml2hlp routines.sgml >package.hlp</code>
 #
-#  Environment:
-#     Requires that the environment variable STARLINK_SGML_DIR is 
+#  <diytopic>Environment
+#     <p>Requires that the environment variable <code/STARLINK_SGML_DIR/ is 
 #     properly set, pointing to the root of the Starlink SGML kit.
 #
-#     The following binaries must be in the path:
+#     <p>The following binaries must be in the path:
 #        jade nroff tbl sed
 #
-#  Authors:
+#  <authorlist>
+#  <authorref id=mbt>
 #     MBT: Mark Taylor
 #
-#  History:
-#     5-APR-2000 (MBT):
-#        Initial version.
+#  <history>
+#     <change author=mbt date='5-APR-2000'>Initial version.
 #-
 
 #  Set some file locations.

@@ -3,14 +3,17 @@
 RCSID='$Id$'
 #
 #+
-#  Name:
+#  <routinename id=sgml2docs>
 #     sgml2docs
 #
-#  Purpose:
+#  <moduletype>
+#     Shell script
+#
+#  <purpose>
 #     Generate HTML or LaTeX files from an SGML source file, marked up using
 #     one of the Starlink DTDs.
 #
-#  Description:
+#  <description>
 #     Given a single argument, specifying an SGML source file, this
 #     uses the Starlink DSSSL stylesheets to process this into a
 #     collection of HTML files and GIFs, or LaTeX and EPS files
@@ -18,21 +21,24 @@ RCSID='$Id$'
 #     then creates a tarball in the source directory holding the
 #     generated files.
 #
-#  Environment:
-#     Requires that the environment variable STARLINK_SGML_DIR is
+#  <diytopic>Environment
+#     <p>Requires that the environment variable STARLINK_SGML_DIR is
 #     properly set, pointing to the root of the Starlink SGML kit.  It
 #     also requires that dvi2bitmap is in the PATH.
 #
-#     The script creates a work directory and does its processing
+#     <p>The script creates a work directory and does its processing
 #     there.  If it is necessary to run BibTeX, it will be done with
 #     that temporary directory as the current directory, so that it
 #     might be necessary to set BIBINPUTS (for example) to let the
 #     system find the bibliography database.
 #
-#  Arguments:
-#     SGML file to be processed.
+#  <argumentlist>
+#     <parameter>arg1
+#     <type>filename
+#     <description>SGML file to be processed.
 #
-#  Options:
+#  <diytopic>Options
+#     <dl>
 #     --html: generate HTML (the default).
 #     --htmlsingle: generate HTML in a single file.
 #     --latex: generate LaTeX.
@@ -45,13 +51,14 @@ RCSID='$Id$'
 #     --version: display version and exit.
 #     --debug: do some debugging.  Specifically, don't tidy up at end.
 #     -n: don't actually run anything, just show what would happen.
+#     </dl>
 #
-#  Authors:
-#     NG: Norman Gray (Starlink, Glasgow)
+#  <authorlist>
+#  <authorref id=ng>
+#     Norman Gray (Starlink, Glasgow)
 #
-#  History:
-#     29-SEP-1999 (NG):
-#        Initial version.
+#  <history>
+#     <change author=ng date='29-SEP-1999'>Initial version.
 #-
 
 LIBDIR=${STARLINK_SGML_DIR}/lib
