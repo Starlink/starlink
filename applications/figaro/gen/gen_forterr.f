@@ -39,6 +39,8 @@
 *  History:
 *     19 Jul 1995 (hme):
 *        Original version.
+*     11 Feb 2005 (timj):
+*        g77 requires a format of Iw rather than just I
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -59,6 +61,6 @@
 *.
 
       WRITE( ERROR,
-     :   '( ''A Fortran error occured: IOSTAT = '', I )' ) IOS
+     :   '( ''A Fortran error occured: IOSTAT = '', I4 )' ) IOS
 
       END
