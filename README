@@ -58,6 +58,13 @@ following steps are required:
       % setenv PATH $STARCONF_DEFAULT_PREFIX/bin:$STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
       % ./bootstrap
 
+ - If you will need to give ./configure some help to find include
+   files and libraries (for example, you are on a Mac and have
+   installed Fink in /sw or OpenDarwin in /opt/local, or are on a Sun
+   and have extra software in /opt), then do so by setting (for
+   example) CFLAGS=-I/opt/local/include and LDFLAGS=-L/opt/local/lib
+   in the environment.
+
  - Now configure and build the system.  The dependencies within the
    Makefile ensure that everthing in built in the correct order.
 
