@@ -118,7 +118,10 @@ appropriate arguments
 
 <func>
 <routinename>img-eqnref
-<description>Returns a unique reference to an equation.
+<description>Returns a unique reference to an equation.  If the element does
+  not have one of MEQUATION or MEQNARRAY in its ancestry (for example because
+  it is an M element), then we won't need to refer to this label.  It must,
+  however, be generated and be unique.
 <returnvalue type=string>String usable as an ID attribute value.
 <parameter optional default='(current-node)'>nd
   <type>node-list
@@ -126,11 +129,14 @@ appropriate arguments
   to be referred to.
 <codebody>
 (define (img-eqnref #!optional (nd (current-node)))
-  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY"))))
+  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY"))
+			  ))
     (if (node-list-empty? refable-ancestor)
-	"UNKNOWN"
+	(string-append "DUMMYEQ" (gi nd) (number->string (element-number nd)))
 	(string-append "EQ" (gi refable-ancestor)
-		       (number->string (element-number refable-ancestor))))))
+		       (number->string (element-number refable-ancestor)))
+	)
+    ))
 
 <misccode>
 <description>
