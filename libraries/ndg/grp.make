@@ -18,13 +18,13 @@ ndg1_asexp.f  ndg1_hcut.f   ndg1_pshdb.f  ndg_crea1.f   ndg_ndfpr.f \
 ndg1_chscn.f  ndg1_hfind.f  ndg1_pshde.f  ndg_creat.f   ndg_prop1.f \
 ndg1_crexp.f  ndg1_hsplt.f  ndg1_pshdf.f  ndg_crep1.f   ndg_ptsup.f \
 ndg1_expan.f  ndg1_lasto.f  ndg1_sdfex.f  ndg_gtsup.f   ndg_setsz.f \
-ndg1_fpars.f  ndg1_match.f  ndg1_subst.f  ndg_ndfas.f   ndg1_sort.f \
+ndg1_fpars.f  ndg1_subst.f  ndg_ndfas.f   ndg1_sort.f \
 ndg1_fparx.f  ndg1_ndfch.f  ndg_asso1.f   ndg_ndfcp.f   ndg1_crpth.f \
 ndg1_open.f   ndg1_forxt.f
 
 #  C source files 
 C_FILES = \
-ndg1_wild.c ndg1_regsb.c
+ndg1_wild.c ndg1_regsb.c ndg1_match.c
 
 #  Text files destined for UNIX release ndg_source.tar.
 OTHER_UNIX_SOURCES = ndg_dev ndg_link ndg_link_adam ndg_test.f 

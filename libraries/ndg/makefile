@@ -386,7 +386,7 @@ C_ROUTINES = $(BASIC_C_ROUTINES)
 
 BASIC_F_ROUTINES = ndg1_appen.f ndg1_asexp.f ndg1_chscn.f ndg1_crexp.f \
 ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
-ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
+ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_ndfch.f \
 ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
 ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f ndg1_forxt.f
@@ -413,7 +413,7 @@ PLATFORM_F =
 
 #  C routines required for both standalone and ADAM versions of the library.
 
-BASIC_C_ROUTINES = ndg1_wild.c ndg1_regsb.c
+BASIC_C_ROUTINES = ndg1_wild.c ndg1_regsb.c ndg1_match.c
 
 #  The facility error file.
 
@@ -1202,7 +1202,6 @@ ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_hsplt.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_lasto.o:	 SAE_PAR
-ndg1_match.o:	 SAE_PAR GRP_PAR NDG_CONST
 ndg1_ndfch.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
 ndg1_ndfdl.o:	 SAE_PAR GRP_PAR DAT_PAR
 ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR

@@ -43,6 +43,11 @@
 *     18-JUL-2000 (DSB):
 *        Use "[" as an additional delimiter for the basename, in order to
 *        allow for foreign extension specifiers.
+*     27-FEB-2001 (DSB):
+*        Restructure to so that a "[..]" string is only treated as a
+*        foreign extension specified if it ocurs at the end of the file basename
+*        or after the file type. Such strings occurring within the file
+*        basename will be treated as a globbing wildcard pattern.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,10 +81,9 @@
       INTEGER BNEND              ! Index of last character in base name
       INTEGER DIRBEG             ! Index of first character in directory
       INTEGER DIREND             ! Index of last character in directory
-      INTEGER DOT                ! Index of dot
-      INTEGER FXS                ! Index of opening square bracket 
       INTEGER LSPEC              ! Length of spec
-      INTEGER PAR                ! Index of opening parenthesis
+      INTEGER SECBEG             ! Index of first character in section
+      INTEGER SECEND             ! Index of last character in section
       INTEGER SUFBEG             ! Index of first character in suffix
       INTEGER SUFEND             ! Index of last character in suffix
 *.
@@ -106,45 +110,50 @@
 *  The first character in the file basename follows the last "/".
       BNBEG = DIREND + 1
 
-*  Find the first dot following the start of the basename.
-      DOT = INDEX( SPEC( BNBEG : ), '.' )
-      IF( DOT .EQ. 0 ) DOT = 100000
-
-*  Find the first "(" following the start of the basename (a potential 
-*  NDF slice or HDS cell specification).
-      PAR = INDEX( SPEC( BNBEG : ), '(' )
-      IF( PAR .EQ. 0 ) PAR = 100000
-
-*  Find the first "[" following the start of the basename (a potential 
-*  foreign extension specifier).
-      FXS = INDEX( SPEC( BNBEG : ), '[' )
-      IF( FXS .EQ. 0 ) FXS = 100000
-
-*  The end of the current file basename is marked by the earlier of the
-*  three.
-      BNEND = MIN( DOT, MIN( PAR, FXS ) ) - 1
-
-*  If no end marker was found use the whole string. 
-      IF( BNEND .EQ. -1 ) THEN
-         BNEND = LSPEC 
-
-*  Otherwise, correct for the start of the string.
-      ELSE
-         BNEND = BNEND + BNBEG - 1
+*  If present the NDF section string must be the last field in the spec.
+*  Check to see if the last character in the string is a closing parenthesis.
+*  If so find the last opening parenthesis (this is the start of the section).
+      SECBEG = 0
+      SECEND = -1
+      IF( SPEC( LSPEC : LSPEC ) .EQ. ')' ) THEN
+         CALL NDG1_LASTO( SPEC, '(', SECBEG, STATUS )
+         IF( SECBEG .GT. 0 ) THEN 
+            SECEND = LSPEC
+            LSPEC = SECBEG - 1
+         END IF
       END IF
 
-*  The file suffix is any string following the basename, extending
-*  to the first "]" or "(" or the end of the string (which ever is first).
-      SUFBEG = BNEND + 1
-      FXS = INDEX( SPEC( SUFBEG : ), ']' )
-      IF( FXS .EQ. 0 ) FXS = 100000
-      SUFEND = MIN( LSPEC, MIN( PAR + BNBEG, FXS + SUFBEG ) 
-     :                     + BNBEG - 2 )
+*  Find the first dot following the start of the basename.
+      SUFBEG = INDEX( SPEC( BNBEG : LSPEC ), '.' )
+      SUFEND = -1
+
+*  If a dot was found it marks the start of the suffix, which extends to
+*  the end of the remaining string.
+      IF( SUFBEG .GT. 0 ) THEN
+         SUFBEG = BNBEG + SUFBEG - 1
+         SUFEND = LSPEC  
+         LSPEC = SUFBEG - 1
+
+*  Otherwise, if the last remaining character is a "]" the suffix
+*  consists of a foreign extension specifier.
+      ELSE IF( SPEC( LSPEC : LSPEC ) .EQ. ']' ) THEN
+
+*  Find the last "[" in the string. This marks the start of the suffix. 
+         CALL NDG1_LASTO( SPEC, '[', SUFBEG, STATUS )
+         IF( SUFBEG .GT. 0 ) THEN 
+            SUFEND = LSPEC
+            LSPEC = SUFBEG - 1
+         END IF
+
+      END IF         
+
+*  The end of the remaining string is the end of the basename.
+      BNEND = LSPEC
 
 *  Extract the fields into separate variables.
       IF( DIRBEG .LE. DIREND ) DIR = SPEC( DIRBEG : DIREND )
       IF( BNBEG .LE. BNEND ) BN = SPEC( BNBEG : BNEND )
       IF( SUFBEG .LE. SUFEND ) SUF = SPEC( SUFBEG : SUFEND )
-      IF( SUFEND .LT. LSPEC ) SEC = SPEC( SUFEND + 1 : LSPEC )
+      IF( SECBEG .LE. SECEND ) SEC = SPEC( SECBEG : SECEND )
 
       END

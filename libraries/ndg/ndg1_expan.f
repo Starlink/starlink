@@ -84,6 +84,10 @@
 *        Added argument VERB.
 *     18-JUL-2000 (DSB):
 *        Added support for foreign extension specifiers.
+*     28-FEB-2001 (DSB):
+*        Assume trailing "[.]" strings are glob patterns, unless they
+*        result in no matching files, in which case assume they are 
+*        foreign extension specifiers.
 *     {enter_further_changes_here}
 
 *-
@@ -121,6 +125,7 @@
 
 *  Local Variables:
       CHARACTER BN*50              ! File basename
+      CHARACTER BNM*50             ! Modified file basename
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
       CHARACTER FTEMP*(GRP__SZNAM) ! File template
       CHARACTER FXS*200            ! Foreign extension specifier
@@ -129,14 +134,17 @@
       CHARACTER NAM*(GRP__SZNAM)   ! File base name field
       CHARACTER PATH*(GRP__SZNAM)  ! Data path 
       CHARACTER REST*(GRP__SZNAM)  ! The remaining text after the file spec
-      CHARACTER SEC*50             ! File NDF/HDS section
       CHARACTER SEARCH*(MXSRCH)    ! The total search string
+      CHARACTER SEC*50             ! File NDF/HDS section
       CHARACTER SLICE*(GRP__SZNAM) ! The NDF slice spec
       CHARACTER SPEC*(GRP__SZNAM)  ! The file spec of the matching file
       CHARACTER STORED*(GRP__SZNAM)! Text to store in the supplied group
       CHARACTER SUF*50             ! File suffix
+      CHARACTER SUFF*50            ! Modified file suffix
       CHARACTER TYP*(GRP__SZNAM)   ! File type field
       INTEGER F                  ! Index of first non-blank character
+      INTEGER G2SIZ              ! Size of IGRP2 group
+      INTEGER G2SIZ0             ! Original size of IGRP2 group
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of a string
       INTEGER IFMT               ! Index of current file type
@@ -152,8 +160,10 @@
       INTEGER NMATCH             ! No. of matching file types
       INTEGER SIZE0              ! Size of original group
       INTEGER SLEN               ! Length of total search string
+      LOGICAL MORE               ! Loop again?
       LOGICAL OK                 ! Was NDF slice OK?
       LOGICAL PURGE              ! Purge duplicate file names?
+      LOGICAL USEFXS             ! Use a "[.]" string as a for. ext. spec?
 *.
 
 *  Initialise the returned flag to indicate that no matching files have
@@ -233,20 +243,35 @@
       ELSE
          CALL NDG1_FPARS( TEMPLT, DIR, BN, SUF, SEC, STATUS )
 
-*  First of all look for any ".sdf" files with the given directory path
-*  and file basename. Ignore the file suffix since "fred.fit" could refer
-*  to component ".fit" within file fred.sdf. Store matching file specs
-*  in IGRP2, and "the rest" (i.e. file suffix - so long as it is not a
-*  simple wild-card ".*" - and section) in IGRP3.
+*  Take copies of the file base name and suffix so that the originals 
+*  are not changed by the following code.
+         BNM = BN
+         SUFF = SUF
+
+*  First, we look for any ".sdf" files with the given directory path
+*  and file basename, ignoring the file suffix since "fred.fit" could refer
+*  to component ".fit" within file fred.sdf. Any "[..]" string at the
+*  start of the suffix is interpreted as a glob pattern, and is 
+*  transferred to the end of the basename.
+         CALL NDG1_FORXT( SUFF, F, L, STATUS )
+         IF( F .LE. L .AND. F .EQ. 1 ) THEN
+            IAT = CHR_LEN( BNM )
+            CALL CHR_APPND( SUFF( F : L ), BNM, IAT )
+            SUFF( F : L ) = ' ' 
+            CALL CHR_RMBLK( SUFF )
+         END IF
+
+*  Store matching file specs in IGRP2, and "the rest" (i.e. file suffix 
+*  - so long as it is not a simple wild-card ".*" - and section) in IGRP3.
          REST = ' '
          IAT = 0
-         IF( SUF .NE. '.*') CALL CHR_APPND( SUF, REST, IAT )
+         IF( SUFF .NE. '.*') CALL CHR_APPND( SUFF, REST, IAT )
          CALL CHR_APPND( SEC, REST, IAT )
-   
+
          FTEMP = ' '
          IAT = 0
          CALL CHR_APPND( DIR, FTEMP, IAT )
-         CALL CHR_APPND( BN, FTEMP, IAT )
+         CALL CHR_APPND( BNM, FTEMP, IAT )
          CALL CHR_APPND( NDG__NDFTP, FTEMP, IAT )
    
          IF( IAT .GT. 0 ) THEN
@@ -254,70 +279,116 @@
      :                       STATUS )
          END IF
 
-*  See if there is a foreign extension specifier included in the suffix
-*  (a trailing string enclosed in square brackets). If so, save it and 
-*  remove it form the suffix.
-         CALL NDG1_FORXT( SUF, F, L, STATUS )
-         IF( F .LE. L ) THEN
-            FXS = SUF( F : L )
-            SUF( F : L ) = ' ' 
-         ELSE
+*  On the first pass through this "DO WHILE" loop, any trailing "[..]"
+*  string in the suffix is treated as a glob pattern. If this assumption 
+*  results in no files being found, we make a second pass through this 
+*  loop in whoch the trailing "[..]" string is interpreted as a foreign 
+*  extension specifier.
+         USEFXS = .TRUE.
+         MORE = .TRUE.
+         DO WHILE( MORE )
+            USEFXS = .NOT. USEFXS
+            IF( USEFXS ) MORE = .FALSE.
+
+*  Take copies of the file base name and suffix so that the originals 
+*  are not changed by the following code.
+            BNM = BN
+            SUFF = SUF
+
+*  Indicate we have not yet found a foreign extension specifier.
             FXS = ' '
-         END IF
+
+*  See if there is a "[...]" string in the suffix. If not, pass on 
+*  without modifying the file base name or suffix.
+            CALL NDG1_FORXT( SUF, F, L, STATUS )
+            IF( F .LE. L ) THEN
+
+*  If we are recognizing foreign extension specifiers, see if there is 
+*  a foreign extension specifier included in the suffix (a trailing 
+*  string enclosed in square brackets). If so, save it and remove it 
+*  from the suffix.
+               IF( USEFXS ) THEN 
+                  FXS = SUF( F : L )
+                  SUFF( F : L ) = ' ' 
+                  CALL CHR_RMBLK( SUFF )
+
+*  If we are not recognizing foreign extension specifiers, any "[..]" 
+*  string in the suffix is assumed to be a glob pattern matching string.
+*  If the "[..]" string is at the start of the suffix then it really
+*  belongs at the end of the file base name. Transfer it.
+               ELSE IF( F .EQ. 1 ) THEN
+                  IAT = CHR_LEN( BNM )
+                  CALL CHR_APPND( SUF( F : L ), BNM, IAT )
+                  SUFF( F : L ) = ' ' 
+                  CALL CHR_RMBLK( SUFF )
+
+               END IF
+
+            END IF
 
 *  Construct the total trailing string following the file type.
-         REST = ' '
-         IAT = 0
-         CALL CHR_APPND( FXS, REST, IAT )
-         CALL CHR_APPND( SEC, REST, IAT )
+            REST = ' '
+            IAT = 0
+            CALL CHR_APPND( FXS, REST, IAT )
+            CALL CHR_APPND( SEC, REST, IAT )
 
 *  From now on, if no suffix was given, use ".*" so that we pick up files 
 *  with any of the types included in NDF_FORMATS_IN. But indicate that
 *  duplicate files with different file types should be purged.
-         IF( SUF .EQ. ' ' ) THEN
-            SUF = '.*'
-            PURGE = .TRUE.
+            IF( SUFF .EQ. ' ' ) THEN
+               SUFF = '.*'
+               PURGE = .TRUE.
 
 *  If a suffix was given, remove any foreign extension specifier (any
 *  trailing string enclosed in matching square brackets).
-         ELSE
-            PURGE = .FALSE.
-         END IF
+            ELSE
+               PURGE = .FALSE.
+            END IF
 
 *  Initialise the total file search string.
-         SEARCH = ' '
-         SLEN = 0
+            SEARCH = ' '
+            SLEN = 0
 
 *  Now loop round each file type in NDF_FORMATS_IN (if any).
-         DO IFMT = 1, NFMT
+            DO IFMT = 1, NFMT
 
 *  Does the suffix supplied in the template match this known foreign file
 *  type?
-            IF( NDG1_MATCH( SUF, FMT( IFMT ), STATUS ) ) THEN
+               IF( NDG1_MATCH( SUFF, FMT( IFMT ), STATUS ) ) THEN
 
 *  If it does, append a wildcard template to the total file search string
 *  which will match files with the given base name and the current
 *  file type. Append a trailing space by incrementing SLEN.
-               FTEMP = ' '
-               IAT = 0
-               CALL CHR_APPND( DIR, FTEMP, IAT )
-               CALL CHR_APPND( BN, FTEMP, IAT )
-               CALL CHR_APPND( FMT( IFMT ), FTEMP, IAT )
-         
-               IF( IAT .GT. 0 .AND. MXSRCH - SLEN .GT. IAT ) THEN
-                  CALL CHR_APPND( FTEMP( : IAT ), SEARCH, SLEN )
-                  SLEN = SLEN + 1
-               ENDIF
+                  FTEMP = ' '
+                  IAT = 0
+                  CALL CHR_APPND( DIR, FTEMP, IAT )
+                  CALL CHR_APPND( BNM, FTEMP, IAT )
+                  CALL CHR_APPND( FMT( IFMT ), FTEMP, IAT )
+            
+                  IF( IAT .GT. 0 .AND. MXSRCH - SLEN .GT. IAT ) THEN
+                     CALL CHR_APPND( FTEMP( : IAT ), SEARCH, SLEN )
+                     SLEN = SLEN + 1
+                  ENDIF
+   
+               END IF
+   
+            END DO
+
+*  Get a list of all matching files, appending them to IGRP2. If the
+*  the group increases in size, we have found some matching files. So
+*  leave the "DO WHILE" loop.
+            IF( SLEN .GT. 0 ) THEN
+               CALL GRP_GRPSZ( IGRP2, G2SIZ0, STATUS )
+
+               CALL NDG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), REST, 
+     :                          STATUS )
+
+               CALL GRP_GRPSZ( IGRP2, G2SIZ, STATUS )
+               IF( G2SIZ .GT. G2SIZ0 ) MORE =.FALSE.
 
             END IF
 
          END DO
-
-*  Get a list of all matching files, appending them to IGRP2.
-         IF( SLEN .GT. 0 ) THEN
-            CALL NDG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), REST, 
-     :                       STATUS )
-         END IF
 
       END IF
 
