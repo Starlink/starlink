@@ -1,0 +1,126 @@
+#!/bin/sh
+
+#+
+#  Name:
+#     do_crepint
+#
+#  Purpose:
+#     Apply crepint filter to a list of files.
+#
+#  Usage:
+#     do_crepint files
+#
+#  Description:
+#     This script provides a simple example of applying the crepint
+#     filter to insert CNF_PVAL calls where appropriate in Fortran 
+#     source code.  As well as running the program on all the relevant
+#     files, it does some simple checking to see if the expected files
+#     have been changed, and logs a brief summary.
+#
+#     An input and output directory is given; only files which are 
+#     modified by crepint are written to the output directory.
+#     A line is written to standard error for any conversion which 
+#     either inscnf, or this script, suspects may have run into 
+#     problems.  Most of these will be false alarms, but it may be
+#     worth checking them out by hand.
+#
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#
+#  History:
+#     17-JAN-2000 (MBT):
+#        Initial version.
+#-
+
+
+###### Change the following assignments to configure the script ######
+
+#  Set up source and destination directories, and logfile.
+      destdir="./changed"
+      logfile="./crepint.log"
+
+###### Nothing after this line needs to be changed for normal configuration ###
+
+#  Check command line arguments.
+      if [ ! "$*" ] 
+      then
+         echo "Usage: $0 files"
+         exit 1
+      else
+         :
+      fi
+
+#  Set up location of commands.
+      crepint=crepint
+      ccmppl=ccmp.pl
+      ccmp="perl `which $ccmppl`"
+      if [ `which $crepint | wc -w` = "1" -a `which $ccmppl | wc -w` = "1" ]
+      then
+         :
+      else
+         echo "$0: The crepint and ccmp.pl commands must be in the path."
+         exit 1
+      fi
+ 
+#  Initialise files.
+      mkdir -p $destdir
+      rm -f $logfile
+
+#  Initialise counters.
+      nf="0"
+      nc="0"
+
+#  Process each file.
+      for f in $@
+      do
+
+#  Get names of input and output files.
+         infile="$f"
+         outfile="$destdir/$f"
+
+#  Do the processing
+         $crepint $infile $outfile 2>&1 | \
+         while read errtext
+         do
+            printf 1>&2 "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$errtext" "***"
+         done
+
+#  See if the processing made any changes.  Remove the output file if not.
+         changed=`diff $infile $outfile | grep -c "^<"`
+         if [ "$changed" = "0" ]
+         then
+            rm $destdir/$f
+         else
+            nc=`echo $nc 1 + p | dc`
+         fi
+
+#  Check that no mistakes have been made while breaking lines etc.
+#  This uses a quick and dirty Perl script - again, an error here 
+#  does not necessarily mean that something has gone wrong, but could
+#  use a check.
+         if [ "$changed" != "0" ]
+         then
+            if $ccmp $infile $outfile >/dev/null
+            then
+               :
+            else
+               warn="Possible error in text insertion?"
+               printf 1>&2 "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+            fi
+         else
+            :
+         fi
+
+#  Write to log file.
+         printf >>$logfile "%-30s  %4d lines changed\n" "$infile" "$changed"
+         nf=`echo $nf 1 + p | dc`
+      done
+
+#  Summarise to standard output.
+      echo " "
+      echo "$nc/$nf modified files written in $destdir"
+      echo "Logfile is $logfile"
+      
+
+
+# $Id$
