@@ -6,7 +6,7 @@
 
 //#include <fstream>
 #include <string>
-//#include <stack>
+#include <stack>
 #include <map>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
@@ -23,7 +23,7 @@ public:
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
-    static debug (int level) { debug_ = level; }
+    static void debug (int level) { debug_ = level; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
     int currH() const { return hh_; }	// device units
@@ -63,7 +63,7 @@ private:
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output
     // change (for example if we produce oversize gifs, ready for shrinking).
-    const int max_drift_ = 0;
+    static const int max_drift_ = 0;
 
     Byte getByte();
     signed int getSIU(int), getSIS(int);
@@ -88,7 +88,8 @@ private:
 	PosState(int h, int v, int w, int x, int y, int z, int hh, int vv)
 	    : h(h),v(v),w(w),x(x),y(y),z(z),hh(hh),vv(vv) { }
     };
-    //stack<PosState*> posStack_;
+    stack<PosState> posStack_;
+    /*
     class PosStateStack {
 	// It seems wrong to implement a stack rather than using the standard
 	// one, but either I'm doing something wrong the way
@@ -96,16 +97,17 @@ private:
 	// it's reasonable to use a non-extendable stack, since the DVI
 	// postamble specifies the maximum stack size required.
     public:
+	PosStateStack(int size);
 	void push(const PosState *p);
 	const PosState *pop();
 	bool empty() const { return i == 0; }
 	void clear();
-	PosStateStack(int size);
     private:
 	unsigned int size, i;
         const PosState **s;
     };
     PosStateStack *posStack_;
+    */
     map<int,PkFont*> fontMap_;
     map<int,PkFont*>::const_iterator fontIter_;
     static int debug_;

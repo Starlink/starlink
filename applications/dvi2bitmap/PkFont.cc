@@ -1,6 +1,7 @@
 // part of dvi2bitmap
 // $Id$
 
+#include <iostream>		// for debugging code, written to cerr
 #include <cstring>
 #include <cmath>
 #include <cstdio>		// for sprintf
@@ -38,7 +39,7 @@ PkFont::PkFont(unsigned int dvimag,
     int scaled_res = static_cast<int>(resolution_
 				      * ((double)s * (double)dvimag)
 				      / ((double)d * 1000.0));
-    sprintf (fnbuf, "%s/%s.%dpk",
+    std::sprintf (fnbuf, "%s/%s.%dpk",
 	     fontpath_.c_str(), name.c_str(), scaled_res);
     path_ = fnbuf;
     if (debug_ > 1)
@@ -106,12 +107,12 @@ void PkFont::read_font (InputByteStream& pkf)
     for (;comment_length > 0; comment_length--)
 	preamble_.comment += static_cast<char>(pkf.getByte());
     unsigned int i = pkf.getUIU(4);
-    preamble_.designSize = (double)i/two20_;
+    preamble_.designSize = (double)i/(double)two20_;
     preamble_.cs   = pkf.getUIU(4);
     i = pkf.getUIU(4);
-    preamble_.hppp = (double)i/two16_;
+    preamble_.hppp = (double)i/(double)two16_;
     i = pkf.getUIU(4);
-    preamble_.vppp = (double)i/two16_;
+    preamble_.vppp = (double)i/(double)two16_;
 
 
     if (debug_ > 1)
@@ -333,7 +334,7 @@ PkGlyph::PkGlyph(unsigned int cc,
       hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
       longform_(false), bitmap_(0) 
 {
-    tfmwidth_ = tfmwidth/two20_ * f->designSize();
+    tfmwidth_ = (double)tfmwidth/two20_ * f->designSize();
     dx_ = dm;
     dy_ = 0;
 };
@@ -352,9 +353,9 @@ PkGlyph::PkGlyph(unsigned int cc,
       hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
       longform_(true), bitmap_(0)
 {
-    tfmwidth_ = tfmwidth/two20_ * f->designSize();
-    dx_ = static_cast<int>(floor(dx / two16_ + 0.5));
-    dy_ = static_cast<int>(floor(dy / two16_ + 0.5));
+    tfmwidth_ = (double)tfmwidth/(double)two20_ * f->designSize();
+    dx_ = static_cast<int>(floor(dx / (double)two16_ + 0.5));
+    dy_ = static_cast<int>(floor(dy / (double)two16_ + 0.5));
 };
 
 PkGlyph::PkGlyph(int resolution, PkFont *f)
@@ -385,7 +386,7 @@ PkRasterdata::PkRasterdata(Byte opcode,
     dyn_f_ = opcode >> 4;
     start_black_ = opcode&8;
     rasterdata_ = new Byte[len];
-    (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
+    (void) std::memcpy ((void*)rasterdata_, (void*)rasterdata, len);
     eob_ = rasterdata_+len_;
 };
 

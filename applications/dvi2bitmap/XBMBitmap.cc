@@ -1,43 +1,15 @@
 // $Id$
 
-#include "Bitmap.h"
-#include "XBMBitmap.h"
+#include <iostream>		// debug code writes to cerr
 #include <cstdio>
 #include <cctype>
 
+#include "Bitmap.h"
+#include "XBMBitmap.h"
+
 XBMBitmap::XBMBitmap (const int w, const int h)
-    : w_(w), h_(h), bitmapRows_(0), myBitmap_(false)
+    : BitmapImage (w, h)
 {
-}
-
-XBMBitmap::~XBMBitmap ()
-{
-    if (myBitmap_)
-	delete[] allocBitmap_;
-}
-
-void XBMBitmap::setBitmap (const Byte *b)
-{
-    if (bitmapRows_ != 0)
-	throw DviBug ("setBitmap: bitmap not empty");
-    bitmap_ = b;
-    bitmapRows_ = h_;
-}
-
-void XBMBitmap::setBitmapRow (const Byte *b)
-{
-    if (bitmapRows_ == 0)
-    {
-	allocBitmap_ = new Byte[w_ * h_];
-	bitmap_ = allocBitmap_;
-	myBitmap_ = true;
-    }
-    if (bitmapRows_ == h_)
-	throw DviBug ("too many rows received by XBMBitmap::setBitmapRow");
-    Byte *p = &allocBitmap_[bitmapRows_ * w_];
-    for (int i=0; i<w_; i++)
-	*p++ = *b++;
-    bitmapRows_ ++;
 }
 
 void XBMBitmap::write (const string filename)

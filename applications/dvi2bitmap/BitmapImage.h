@@ -9,14 +9,26 @@ class BitmapImage {
  public:
     //enum imageFormats { gif, debugbitmap };
     //BitmapImage (imageFormats format, int width, int height, int bpp=1);
-    virtual ~BitmapImage() { };
-    virtual void setBitmap (const Byte *B) = 0;
-    virtual void setBitmapRow (const Byte *B) = 0;
+    BitmapImage(const int w, const int h)
+	: w_(w), h_(h), bitmap_(0), bitmapRows_(0),
+	  isTransparent_(false), myBitmap_(false) { };
+    ~BitmapImage();
+    void setBitmap (const Byte *B);
+    void setBitmapRow (const Byte *B);
     //virtual void setColourTable (???) = 0;
-    virtual void setTransparent (const bool) = 0;
+    void setTransparent (const bool sw) { isTransparent_ = sw; };
     virtual void write (const string filename) = 0;
     virtual string fileExtension() const = 0;
+
     static BitmapImage *newBitmapImage
 	(const string format, const int w, const int h, const int bpp=1);
+
+ protected:
+    int w_, h_;
+    const Byte *bitmap_;
+    Byte *allocBitmap_;
+    bool myBitmap_;
+    int bitmapRows_;
+    bool isTransparent_;
 };
 #endif // #ifndef BITMAPIMAGE_HEADER_READ

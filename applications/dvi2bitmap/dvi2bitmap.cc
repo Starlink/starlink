@@ -4,12 +4,12 @@
 #include "dvi2bitmap.h"
 #include <iostream>
 #include <vector>
-#include <cstdlib>
-#include <cstdarg>
-#include <cctype>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <ctype.h>
 
 #if VSPRINTF_IN_STDIO
-#include <cstdio>
+#include <stdio.h>
 #endif
 
 #include "DviFile.h"
@@ -144,7 +144,7 @@ main (int argc, char **argv)
     if (ofile_pattern.length() == 0)
     {
 	cout << "Can't make output filename pattern from " << dviname << '\n';
-	std::exit(0);
+	exit(0);
     }
 
     try
@@ -153,7 +153,7 @@ main (int argc, char **argv)
 	if (dvif->eof())
 	{
 	    cout << "Can't open file " << dviname << " to read\n";
-	    std::exit(1);
+	    exit(1);
 	}
 
 	if (show_font_list > 0)
@@ -260,11 +260,11 @@ main (int argc, char **argv)
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }
-    catch (DviError& e)
+    catch (DviBug& e)
     {
 	e.print();
     }
-    catch (DviBug& e)
+    catch (DviError& e)
     {
 	e.print();
     }
@@ -272,7 +272,7 @@ main (int argc, char **argv)
     exit (0);
 }
 
-DviError::DviError(char *fmt,...)
+DviError::DviError(const char *fmt,...)
 {
     char *p = new char[2*strlen(fmt)];
     va_list ap;
@@ -283,7 +283,10 @@ DviError::DviError(char *fmt,...)
     delete[] p;
 }
 
-DviBug::DviBug(char *fmt,...)
+void DviError::print() const { cerr << "DVI error: " << problem_ << '\n'; }
+void DviBug::print() const { cerr << "BUG: " << problem_ << '\n'; }
+
+DviBug::DviBug(const char *fmt,...)
 {
     char *p = new char[2*strlen(fmt)];
     va_list ap;

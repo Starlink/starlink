@@ -4,15 +4,16 @@
 #ifndef DVI2BITMAP_HEADER_READ
 #define DVI2BITMAP_HEADER_READ 1
 #include <string>
+using namespace std;
 
 typedef unsigned char Byte;
 const char path_separator = '/';
 
 class DviError {
  public:
-    DviError(string s) : problem_(s) { }
-    DviError(char *fmt, ...);
-    virtual void print() const { cerr << "DVI error: " << problem_ << '\n'; }
+    DviError(const string s) : problem_(s) { }
+    DviError(const char *fmt, ...);
+    virtual void print() const;
     string problem() const { return problem_; }
  protected:
     DviError() { };
@@ -20,9 +21,9 @@ class DviError {
 };
 class DviBug : public DviError {
  public:
-    DviBug(string s) : DviError(s) { }
-    DviBug(char *fmt, ...);
-    void print() const { cerr << "BUG: " << problem_ << '\n'; }
+    DviBug(const string s) : DviError(s) { }
+    DviBug(const char *fmt, ...);
+    void print() const;
 };
 
 

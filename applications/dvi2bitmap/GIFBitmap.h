@@ -22,17 +22,18 @@ class GIFBitmap : public BitmapImage {
     ~GIFBitmap ();
     void setBitmap (const Byte *b);
     void setBitmapRow (const Byte *b);
-    void setTransparent (const bool sw) { transparent_ = sw; }
+    //void setTransparent (const bool sw) { transparent_ = sw; }
     void write (const string filename);
     string fileExtension() const { return "gif"; }
 
  private:
-    const Byte *bitmap_;
-    Byte *allocBitmap_;
-    const int w_, h_, bpp_;
-    int bitmapRows_;
-    bool transparent_;
-    bool myBitmap_;
+    //const Byte *bitmap_;
+    //Byte *allocBitmap_;
+    //const int w_, h_;
+    const int bpp_;
+    //int bitmapRows_;
+    //bool transparent_;
+    //bool myBitmap_;
     void GIFEncode(FILE* fp,
 		  int GWidth, int GHeight,
 		  int GInterlace,

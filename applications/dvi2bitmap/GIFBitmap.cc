@@ -53,12 +53,17 @@ GIFBitmap::GIFBitmap (const int w, const int h, const Byte *b, const int bpp=1)
 // of the bitmap shortly - for now, initialise the bitmap to receive
 // them, and set myBitmap_ to true, indicating that the bitmap should be
 // deleted in the destructor
-GIFBitmap::GIFBitmap (const int w, const int h, const int bpp=1)
-    : w_(w), h_(h), bitmapRows_(0), bpp_(bpp),
-      myBitmap_(false), transparent_(false)
+//GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
+//    : w_(w), h_(h), bitmapRows_(0), bpp_(bpp),
+//      myBitmap_(false), transparent_(false)
+//{
+//}
+GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
+    : BitmapImage (w, h), bpp_(bpp)
 {
 }
 
+/*
 GIFBitmap::~GIFBitmap ()
 {
     if (myBitmap_)
@@ -88,6 +93,8 @@ void GIFBitmap::setBitmapRow (const Byte *b)
 	*p++ = *b++;
     bitmapRows_ ++;
 }
+*/
+
 
 void GIFBitmap::write (const string filename)
 {
@@ -97,10 +104,10 @@ void GIFBitmap::write (const string filename)
     // make a colour table, appropriate for bpp_ bits-per-pixel
     if (bpp_ > 8)
 	throw DviBug ("max of 8 bits-per-pixel");
-    int ncolours = 1<<bpp_;
-    int step = 256 >> bpp_;
+    const int ncolours = 1<<bpp_;
+    const int step = 256 >> bpp_;
 
-    int CT[ncolours];
+    int *CT = new int[ncolours];
     int val;
     for (int i=0, val=255; i<ncolours-1; i++, val-=step)
 	CT[i] = val;
@@ -114,14 +121,14 @@ void GIFBitmap::write (const string filename)
     //int Green[] = { 255, 0 };
     //int Blue[]  = { 255, 0 };
 
-    FILE *F = fopen (filename.c_str(), "wb");
+    FILE *F = std::fopen (filename.c_str(), "wb");
     if (F == 0)
 	throw BitmapError ("can't open GIF file "+filename+" to write");
     GIFEncode (F,		// open file
 	       w_, h_,		// width and height of bitmap
 	       1,		// interlace?
 	       0,		// which CT entry is the background?
-	       (transparent_ ? 0 : -1),	// make entry 0 transparent, if req'd
+	       (isTransparent_ ? 0 : -1),	// make entry 0 transparent, if req'd
 	       bpp_,		// bits-per-pixel
 	       CT, CT, CT	// colour tables
 	       );
@@ -279,7 +286,7 @@ void GIFBitmap::GIFEncode(FILE* fp,
         /*
          * Write the Magic header
          */
-        fwrite( Transparent < 0 ? "GIF87a" : "GIF89a", 1, 6, fp );
+        std::fwrite( Transparent < 0 ? "GIF87a" : "GIF89a", 1, 6, fp );
 
         /*
          * Write out the screen width and height
@@ -305,45 +312,45 @@ void GIFBitmap::GIFEncode(FILE* fp,
         /*
          * Write it out
          */
-        fputc( B, fp );
+        std::fputc( B, fp );
 
         /*
          * Write out the Background colour
          */
-        fputc( Background, fp );
+        std::fputc( Background, fp );
 
         /*
          * Byte of 0's (future expansion)
          */
-        fputc( 0, fp );
+        std::fputc( 0, fp );
 
         /*
          * Write out the Global Colour Map
          */
         for( i=0; i<ColorMapSize; ++i ) {
-                fputc( Red[i], fp );
-                fputc( Green[i], fp );
-                fputc( Blue[i], fp );
+                std::fputc( Red[i], fp );
+                std::fputc( Green[i], fp );
+                std::fputc( Blue[i], fp );
         }
 
 	/*
 	 * Write out extension for transparent colour index, if necessary.
 	 */
 	if ( Transparent >= 0 ) {
-	    fputc( '!', fp );
-	    fputc( 0xf9, fp );
-	    fputc( 4, fp );
-	    fputc( 1, fp );
-	    fputc( 0, fp );
-	    fputc( 0, fp );
-	    fputc( Transparent, fp );
-	    fputc( 0, fp );
+	    std::fputc( '!', fp );
+	    std::fputc( 0xf9, fp );
+	    std::fputc( 4, fp );
+	    std::fputc( 1, fp );
+	    std::fputc( 0, fp );
+	    std::fputc( 0, fp );
+	    std::fputc( Transparent, fp );
+	    std::fputc( 0, fp );
 	}
 
         /*
          * Write an Image separator
          */
-        fputc( ',', fp );
+        std::fputc( ',', fp );
 
         /*
          * Write the Image header
@@ -358,14 +365,14 @@ void GIFBitmap::GIFEncode(FILE* fp,
          * Write out whether or not the image is interlaced
          */
         if( Interlace )
-                fputc( 0x40, fp );
+                std::fputc( 0x40, fp );
         else
-                fputc( 0x00, fp );
+                std::fputc( 0x00, fp );
 
         /*
          * Write out the initial code size
          */
-        fputc( InitCodeSize, fp );
+        std::fputc( InitCodeSize, fp );
 
         /*
          * Go and actually compress the data
@@ -375,17 +382,17 @@ void GIFBitmap::GIFEncode(FILE* fp,
         /*
          * Write out a Zero-length packet (to end the series)
          */
-        fputc( 0, fp );
+        std::fputc( 0, fp );
 
         /*
          * Write the GIF file terminator
          */
-        fputc( ';', fp );
+        std::fputc( ';', fp );
 
         /*
          * And close the file
          */
-        fclose( fp );
+        std::fclose( fp );
 }
 
 /*
@@ -393,8 +400,8 @@ void GIFBitmap::GIFEncode(FILE* fp,
  */
 void GIFBitmap::Putword(int w, FILE* fp)
 {
-        fputc( w & 0xff, fp );
-        fputc( (w / 256) & 0xff, fp );
+        std::fputc( w & 0xff, fp );
+        std::fputc( (w / 256) & 0xff, fp );
 }
 
 
@@ -673,7 +680,7 @@ void GIFBitmap::output(code_int  code)
 
         flush_char();
 
-        fflush( g_outfile );
+        std::fflush( g_outfile );
 
         if( ferror( g_outfile ) )
                 throw BitmapError ("error in GIFBitmap");
@@ -776,8 +783,8 @@ void GIFBitmap::char_out( int c )
 void GIFBitmap::flush_char()
 {
         if( a_count > 0 ) {
-                fputc( a_count, g_outfile );
-                fwrite( accum, 1, a_count, g_outfile );
+                std::fputc( a_count, g_outfile );
+                std::fwrite( accum, 1, a_count, g_outfile );
                 a_count = 0;
         }
 }

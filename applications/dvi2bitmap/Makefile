@@ -1,6 +1,13 @@
 # part of dvi2bitmap
 # $Id$
 
+# Alpha cxx requires `-std strict_ansi' or else the iostream header doesn't
+# work (alternatively, you can define __USE_STD_STREAM),
+# and it doesn't seem to have the
+# <cstdio> etc headers, but requires you to specify <stdio.h> instead.
+# There's some issue with `using namespace std;' which I don't fully
+# understand (my lack of understanding of namespaces, I think).
+# The flag -using_std is connected with this.
 CXXFLAGS=-g
 
 EXEC=dvi2bitmap

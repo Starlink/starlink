@@ -1,11 +1,13 @@
 // $Id$
 
-#include "dvi2bitmap.h"
-#include "Bitmap.h"
-#include "BitmapImage.h"
+#include <iostream>		// debug code writes to cerr
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+
+#include "dvi2bitmap.h"
+#include "Bitmap.h"
+#include "BitmapImage.h"
 
 int Bitmap::debug_ = 0;
 
@@ -19,7 +21,7 @@ int Bitmap::debug_ = 0;
 
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
-Bitmap::Bitmap (int w, int h, int bpp=1)
+Bitmap::Bitmap (const int w, const int h, const int bpp)
     : W(w), H(h), bpp_(bpp), transparent_(false)
 {
     B = new Byte[W*H];

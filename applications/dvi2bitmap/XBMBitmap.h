@@ -15,13 +15,6 @@ class XBMBitmap : public BitmapImage {
     void setTransparent (const bool) { };
     void write (const string filename);
     string fileExtension() const { return "xbm"; }
-
- private:
-    int w_, h_;
-    const Byte *bitmap_;
-    Byte *allocBitmap_;
-    bool myBitmap_;
-    int bitmapRows_;
 };
 
 #endif // #ifndef XBMBITMAP_HEADER_READ

@@ -3,7 +3,7 @@
 
 #define NULL 0
 #include <iostream>
-#include <cmath>
+#include <math.h>
 #include "DviFile.h"
 #include "PkFont.h"
 #include "InputByteStream.h"
@@ -11,7 +11,7 @@
 // Static debug switch
 int DviFile::debug_;
 
-DviFile::DviFile (string s, int res, double magmag=1.0)
+DviFile::DviFile (string s, int res, double magmag)
     : fileName_(s), resolution_(res), magmag_(magmag)
 {
     PkFont::setResolution(res);
@@ -20,7 +20,7 @@ DviFile::DviFile (string s, int res, double magmag=1.0)
     {
 	dvif_ = new InputByteStream (s);
 	read_postamble();
-	posStack_ = new PosStateStack(postamble_.s);
+	//posStack_ = new PosStateStack(postamble_.s);
 	dvif_->seek(0);		// return to beginning
     }
     catch (InputByteStreamError& e)
@@ -153,22 +153,25 @@ DviFileEvent *DviFile::getEvent()
 			pageEvent->count[i] = getSIS(4);
 		    pageEvent->previous = getSIS(4);
 		    h_ = v_ = w_ = x_ = y_ = z_ = hh_ = vv_ = 0;
-		    posStack_->clear();
+		    //posStack_->clear();
+		    while (posStack_.size() > 0)
+			posStack_.pop();
 		    gotEvent = pageEvent;
 		}
 		break;
 	      case 140:		// eop
-		if (!posStack_->empty())
+		//if (!posStack_->empty())
+		if (!posStack_.empty())
 		    throw DviBug("EOP: position stack not empty");
 		gotEvent = new DviFilePage(false);
 		break;
 	      case 141:		// push
 		{
-		    const PosState *ps
-			= new PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
-		    posStack_->push(ps);
-		    //PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
-		    //posStack_.push(ps);
+		    //const PosState *ps
+		    //= new PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
+		    //posStack_->push(ps);
+		    PosState ps = PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
+		    posStack_.push(ps);
 		    if (debug_ > 1)
 			cerr << ">>("<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
@@ -179,25 +182,25 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 142:		// pop
 		{
-		    //PosState *ps = posStack_.top();
-		    //posStack_.pop();
+		    const PosState& ps = posStack_.top();
+		    posStack_.pop();
+		    h_ = ps.h;
+		    v_ = ps.v;
+		    w_ = ps.w;
+		    x_ = ps.x;
+		    y_ = ps.y;
+		    z_ = ps.z;
+		    //delete ps;
+		    //const PosState *ps = posStack_->pop();
 		    //h_ = ps->h;
 		    //v_ = ps->v;
+		    //hh_ = ps->hh;
+		    //vv_ = ps->vv;
 		    //w_ = ps->w;
 		    //x_ = ps->x;
 		    //y_ = ps->y;
 		    //z_ = ps->z;
 		    //delete ps;
-		    const PosState *ps = posStack_->pop();
-		    h_ = ps->h;
-		    v_ = ps->v;
-		    hh_ = ps->hh;
-		    vv_ = ps->vv;
-		    w_ = ps->w;
-		    x_ = ps->x;
-		    y_ = ps->y;
-		    z_ = ps->z;
-		    delete ps;
 		    if (debug_ > 1)
 			cerr << "<<("<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
@@ -488,10 +491,8 @@ DviFileEvent *DviFile::getEvent()
 	      case 249:		// post_post
 		// This shouldn't happen within getEvent
 		throw DviBug("post_post found in getEvent");
-		break;
 	      default:
 		throw DviBug("unrecognised opcode in getEvent");
-		break;
 	    }
 	}
     }
@@ -629,7 +630,7 @@ void DviFile::updateV_ (int y)
 
 void DviFile::read_postamble()
 {
-    const tailbuflen = 64;
+    const int tailbuflen = 64;
     // get final 64 bytes of file
     const Byte *dviBuf = dvif_->getBlock(-1, tailbuflen);
     const Byte *p;
@@ -753,7 +754,6 @@ void DviFile::read_postamble()
 
 	  default:		// error
 	    throw DviError ("unexpected opcode (%d) in postamble", opcode);
-	    break;
 	}
     }
 }
@@ -876,6 +876,7 @@ const
 	comment << "\'\n";
 }
 
+/*
 void DviFile::PosStateStack::push(const PosState *p)
 {
     if (i == size)
@@ -904,7 +905,7 @@ void DviFile::PosStateStack::clear()
 	delete s[--i];
     while (i != 0);
 }
-
+*/
 
 // Font iterator -- probably better implemented as an iterator itself
 PkFont *DviFile::firstFont()

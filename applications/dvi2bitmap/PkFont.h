@@ -22,7 +22,7 @@ class PkRasterdata {
 		 unsigned int w, unsigned int h);
     const Byte *bitmap()
 	{ if (bitmap_ == 0) construct_bitmap(); return bitmap_; }
-    static debug (int level) { debug_ = level; }
+    static void debug (int level) { debug_ = level; }
  private:
     Byte *rasterdata_, *eob_;
     const unsigned int len_, w_, h_;
@@ -50,7 +50,7 @@ class PkGlyph {
 	    int hoff, int voff,
 	    PkRasterdata *rasterdata, PkFont *f);
     // Final constructor is for the single dummy glyph
-    PkGlyph::PkGlyph(int resolution, PkFont *f);
+    PkGlyph(int resolution, PkFont *f);
     // bitmap() returns the character's bitmap.  This runs from the 
     // top-left of the character.
     const Byte *bitmap();
@@ -70,7 +70,7 @@ class PkGlyph {
     // escapements in pixels
     int hEscapement() const { return dx_; }
     int vEscapement() const { return dy_; }
-    static debug (int level) { debug_ = level; }
+    static void debug (int level) { debug_ = level; }
 
  private:
     unsigned int cc_, dx_, dy_, w_, h_;
@@ -81,8 +81,8 @@ class PkGlyph {
     bool longform_;
     const Byte *bitmap_;
     static int debug_;
-    const double two20_ = 1048576;	// 2^20
-    const double two16_ = 65536; // 2^16
+    static const int two20_ = 1048576;	// 2^20
+    static const int two16_ = 65536; // 2^16
 };
 
 class PkFont {
@@ -103,7 +103,7 @@ class PkFont {
 	else
 	    return glyphs_[0];	// dummy glyph
     }
-    static debug (int level) { debug_ = level; }
+    static void debug (int level) { debug_ = level; }
     static void setFontPath(string fp) { fontpath_ = fp; }
     static void setFontPath(char  *fp) { fontpath_ = fp; }
     static void setResolution(int res) { resolution_ = res; }
@@ -137,6 +137,10 @@ class PkFont {
     bool loaded() const { return font_loaded_; }
 
  private:
+    static const int nglyphs_ = 256;
+    static const int two20_ = 1048576; // 2^20
+    static const int two16_ = 65536; // 2^16
+
     string name_;
     string path_;
     InputByteStream *pkf_;
@@ -154,9 +158,6 @@ class PkFont {
     //double fontscale_;
     // following are in DVI units
     double quad_, word_space_, back_space_;
-    const int nglyphs_ = 256;
-    const double two20_ = 1048576; // 2^20
-    const double two16_ = 65536; // 2^16
     PkGlyph *glyphs_[nglyphs_];
     void read_font(InputByteStream&);
     bool seen_in_doc_;		// true once the font_def command has been

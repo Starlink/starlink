@@ -11,7 +11,7 @@
 
 // Open the requested file.  If preload is true, then open the file and
 // read it entire into memory, since the client will be seeking a lot.
-InputByteStream::InputByteStream (string s, bool preload=false)
+InputByteStream::InputByteStream (string s, bool preload)
     : eof_(true), preloaded_(preload)
 {
     fd_ = open (s.c_str(), O_RDONLY);
@@ -53,7 +53,7 @@ InputByteStream::~InputByteStream ()
     delete[] buf_;
 }
 
-Byte InputByteStream::getByte(int n=1)
+Byte InputByteStream::getByte(int n)
 {
     if (eof_)
 	return 0;
@@ -115,7 +115,7 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 	    if (blockp > eob_)
 	    {
 		char buf[100];
-		sprintf (buf,
+		std::sprintf (buf,
 		      "InputByteStream::getBlock: pointer beyond EOF (%d,%d)",
 			 pos, length);
 		throw DviBug (buf);
@@ -123,7 +123,7 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 	    if (blockp+length > eob_)
 	    {
 		char buf[100];
-		sprintf (buf,
+		std::sprintf (buf,
 		"InputByteStream::getBlock: requested block too large (%d,%d)",
 			 pos,length);
 		throw DviBug (buf);

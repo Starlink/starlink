@@ -7,7 +7,7 @@
 
 class Bitmap {
  public:
-    Bitmap (const int width, const int height, int bpp=1);
+    Bitmap (const int width, const int height, const int bpp=1);
     ~Bitmap();
     void paint (const int x, const int y, const int w, const int h,
 		const Byte* b);
@@ -18,7 +18,7 @@ class Bitmap {
     void setTransparent(const bool sw) { transparent_ = sw; }
     void scaleDown (const int factor);
     bool empty () const { return (bbL >= bbR || bbT >= bbB); }
-    static debug (const int level) { debug_ = level; }
+    static void debug (const int level) { debug_ = level; }
 
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
