@@ -4822,6 +4822,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
             INDEX=1
             DO WHILE (ARDIN.GT.' '.AND.STATUS.EQ.SAI__OK)
               CALL GRP_PUT(GRPID,1,ARDIN,INDEX,STATUS)
+              INDEX=INDEX+1
               CALL USI_CANCL(PAR1,STATUS)
               ARDIN=' '
               CALL USI_GET0C(PAR1,ARDIN,STATUS)
