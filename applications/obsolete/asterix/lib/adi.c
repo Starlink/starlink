@@ -1422,7 +1422,7 @@ void ADIdefClassNewMemberData( ADIobj pstr, ADIobj member,
   memb->cdata = prsx_cvalue( pstr, status );
 
 /* Mark it as readonly */
-  _han_readonly(memb->cdata) = ADI__true;
+/*  _han_readonly(memb->cdata) = ADI__true; */
   }
 
 
