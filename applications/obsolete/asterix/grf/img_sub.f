@@ -2201,7 +2201,9 @@ c        ENDIF
 
       IF (STATUS.EQ.SAI__OK) THEN
 
+*  create or adjust space for data
         NVAL=I_N_1D
+        CALL IMG_GET1D(NVAL,STATUS)
 
 *  map data and  axis values
         CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
@@ -2223,6 +2225,7 @@ c        ENDIF
         CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
         CALL DYN_MAPB(1,NVAL,I_QPTR_1D,STATUS)
         CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR_1D),STATUS)
+        CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
 
 *  get top level text
         CALL BDI_GET0C( IFID, 'Title', I_TITLE_1D, STATUS )
