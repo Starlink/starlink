@@ -117,12 +117,13 @@
 *  ==============================   
 
 *  Correct for scale and zero point 
-      IF( GETS ) THEN
-         SZDAT = REAL(SCALE)*NUM_<T>TOR( IDAT( X, Y ) )
-      ELSE IF( GETZ ) THEN
-         SZDAT = NUM_<T>TOR( IDAT( X, Y ) ) + REAL(ZERO)
-      ELSE IF( GETS .AND. GETZ ) THEN
-         SZDAT = REAL(SCALE)*NUM_<T>TOR( IDAT( X, Y ) ) + REAL(ZERO)
+      IF ( GETS .AND. GETZ ) THEN
+         SZDAT = REAL( SCALE ) * NUM_<T>TOR( IDAT( X, Y ) ) 
+            + REAL( ZERO )
+      ELSE IF ( GETS ) THEN
+         SZDAT = REAL( SCALE ) * NUM_<T>TOR( IDAT( X, Y ) )
+      ELSE IF ( GETZ ) THEN
+         SZDAT = NUM_<T>TOR( IDAT( X, Y ) ) + REAL( ZERO )
       ELSE
          SZDAT = NUM_<T>TOR( IDAT( X, Y ) )
       ENDIF
@@ -130,38 +131,38 @@
 *  If we are using inverse variance maps as weights, calculate
 *  the weight for this input pixel
       IF( GETM ) THEN
-         XYWHT = VARFAC*( 1.0D0/NUM_<T>TOR( IVAR( X, Y ) ) )
+         XYWHT = VARFAC * ( 1.0D0 / NUM_<T>TOR( IVAR( X, Y ) ) )
       ENDIF
                    
 *  For the case where previous drizzling has assigned VAL__BADR
 *  to the output pixel
-      IF( (IDAT(X, Y) .NE. VAL__BADR) .AND.
-     :    (ODAT(L, M) .EQ. VAL__BADR) ) THEN
+      IF ( ( IDAT( X, Y ) .NE. VAL__BADR ) .AND.
+     :     ( ODAT( L, M ) .EQ. VAL__BADR ) ) THEN
          
-         IF( GETM ) THEN
+         IF ( GETM ) THEN
             ODAT( L, M ) = SZDAT
-            OWHT( L, M ) = REAL(OVER*XYWHT)
+            OWHT( L, M ) = REAL( OVER * XYWHT )
             OCNT( L, M ) = 1            
          ELSE                        
             ODAT( L, M ) = SZDAT
-            OWHT( L, M ) = REAL(OVER*WEIGHT)
+            OWHT( L, M ) = REAL( OVER * WEIGHT )
             OCNT( L, M ) = 1
          ENDIF
                           
 *  For the case where there hasn't been any input data drizzled 
 *  onto the output array yet
-      ELSE IF( (IDAT(X, Y) .NE. VAL__BADR) .AND.
-     :         (ODAT(L, M) .NE. VAL__BADR) ) THEN
+      ELSE IF ( ( IDAT( X, Y ) .NE. VAL__BADR ) .AND.
+     :          ( ODAT( L, M ) .NE. VAL__BADR ) ) THEN
 
-         IF( OCNT( L, M ) .EQ. 0) THEN
+         IF( OCNT( L, M ) .EQ. 0 ) THEN
 
             IF( GETM ) THEN
                ODAT( L, M ) = SZDAT
-               OWHT( L, M ) = REAL(OVER*XYWHT)
+               OWHT( L, M ) = REAL( OVER * XYWHT )
                OCNT( L, M ) = 1            
             ELSE                             
                ODAT( L, M ) = SZDAT
-               OWHT( L, M ) = REAL(OVER*WEIGHT)
+               OWHT( L, M ) = REAL( OVER * WEIGHT )
                OCNT( L, M ) = 1
             ENDIF
                           
@@ -171,17 +172,17 @@
 
             IF( GETM ) THEN
                ODAT( L, M ) = ODAT( L, M )*OWHT( L, M )
-     :                        + REAL(XYWHT*OVER)*SZDAT
+     :                        + REAL( XYWHT * OVER ) * SZDAT
                ODAT( L, M ) = ODAT( L, M )/
-     :                        ( OWHT( L, M) + REAL(OVER*XYWHT) )
-               OWHT( L, M ) = OWHT( L, M ) + REAL(OVER*XYWHT)
+     :                        ( OWHT( L, M) + REAL( OVER * XYWHT ) )
+               OWHT( L, M ) = OWHT( L, M ) + REAL( OVER * XYWHT )
                OCNT( L, M ) = OCNT( L, M ) + 1            
             ELSE                           
-               ODAT( L, M ) = ODAT( L, M )*OWHT( L, M )
-     :                        + REAL(WEIGHT*OVER)*SZDAT
-               ODAT( L, M ) = ODAT( L, M )/
-     :                        ( OWHT( L, M) + REAL(OVER*WEIGHT) )
-               OWHT( L, M ) = OWHT( L, M ) + REAL(OVER*WEIGHT)
+               ODAT( L, M ) = ODAT( L, M ) * OWHT( L, M )
+     :                        + REAL( WEIGHT * OVER ) * SZDAT
+               ODAT( L, M ) = ODAT( L, M ) /
+     :                        ( OWHT( L, M) + REAL( OVER * WEIGHT ) )
+               OWHT( L, M ) = OWHT( L, M ) + REAL( OVER * WEIGHT )
                OCNT( L, M ) = OCNT( L, M ) + 1
             ENDIF
                           
