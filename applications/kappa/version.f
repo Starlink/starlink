@@ -35,7 +35,7 @@
 *        The supplied string should be in the format "V<ddd>.<ddd>-<ddd>, 
 *        where "<ddd>" represents a set of digits. The leading "V" can be
 *        omitted, as can any number of trailing fields (missing trailing
-*        fields default to zero).
+*        fields default to zero). [!]
 *     RESULT = INTEGER (Write)
 *        If a value is given for the COMPARE parameter, then RESULT is
 *        set to one of the following values:
