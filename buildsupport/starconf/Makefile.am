@@ -2,7 +2,6 @@
 bin_SCRIPTS = starconf starconf-validate
 data_DATA = \
 	componentinfo.dtd \
-	template-bootstrap \
 	template-Makefile.am \
 	template-configure.ac \
 	template-component.xml.in
@@ -14,14 +13,16 @@ data_DATA = \
 CLEANFILES=starconf make-starconf starconf.m4
 
 # Include (possibly) required files in the starconf script.
-#     acinclude.m4              to add Starlink autoconf macros;
+#     starconf.m4               to add Starlink autoconf macros;
 #     install-with-manifest.in  since the STAR_DEFAULTS macro depends on it;
 #     Makefile.starconf         included in Makefile.am
+#     bootstrap                 standardised bootstrap script
+#     extra-fortran.m4          macros for handling fpp
 #
-# make-starconf allows filenames to be preceded by a question mark '?':
-# files which are _not_ thus prefixed are always unpacked; others are
-# unpacked only if starconf detects certain features in the configure.ac
-# (the latter is an empty set currently).
+# make-starconf allows filenames to be preceded by a question mark
+# '?': files which are _not_ thus prefixed are always unpacked; files
+# with the `?' are unpacked only if starconf detects certain features
+# in the configure.ac.
 #
 # Filenames preceded with `!' are always unpacked, overwriting any more
 # recent file in the directory; those without are only
@@ -29,12 +30,14 @@ CLEANFILES=starconf make-starconf starconf.m4
 starconf: make-starconf \
 		install-with-manifest.in \
 		starconf.m4 \
-		Makefile.starconf
+		Makefile.starconf \
+		extra-fortran.m4
 	./make-starconf \
 		!install-with-manifest.in \
-		!acinclude.m4:starconf.m4 \
+		!starconf.m4 \
 		!Makefile.starconf \
-		*?bootstrap:bootstrap.installed
+		*?bootstrap:bootstrap.installed \
+		?extra-fortran.m4
 
 # The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
@@ -50,7 +53,8 @@ edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
-	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g'
+	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
+	-e 's,@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g'
 make-starconf: make-starconf.in
 	rm -f make-starconf.tmp make-starconf
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
