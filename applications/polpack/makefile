@@ -170,6 +170,8 @@
 #        Use the KAPPA grf module.
 #     15-SEP-1999 (DSB):
 #        Updated NDG library. Added CTG library.
+#     17-JUL-2000 (DSB):
+#        Removed NDG library, which is now distributed separately.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -370,7 +372,7 @@ PKG_VERS = 2.1-3
 #  smaller source archives in place of one large one to speed up build
 #  times.
 
-SOURCE_FILES = $(PKG_NAME)_source.tar ndg_source.tar ctg_source.tar \
+SOURCE_FILES = $(PKG_NAME)_source.tar ctg_source.tar \
 makefile mk $(DOCUMENTATION) $(PKG_NAME)_iraf.tar
 
 #  List of public script files.  These are scripts which form part of
@@ -405,9 +407,8 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = $(I_NDG) $(I_CTG) $(I_SUB1)
+PRIVATE_INCLUDES = $(I_CTG) $(I_SUB1)
 
-I_NDG = ndg_com ndg_const ndg_err
 I_CTG = ctg_const ctg_err
 
 I_SUB1 = hlpcmd ccd1_par ccd1_memcm 
@@ -427,16 +428,8 @@ AGI_PAR CAT_ERR DAT_ERR ast.h
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).  
 
-F_ROUTINES = $(F_NDG) $(F_CTG) $(F_SUB1) $(MONO_SOURCE) \
+F_ROUTINES = $(F_CTG) $(F_SUB1) $(MONO_SOURCE) \
              $(GENLRDICSRC) $(GENLRDICSRC:.glrdic=.f) 
-
-F_NDG = ndg1_appen.f ndg1_asexp.f ndg1_chscn.f ndg1_crexp.f \
-ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
-ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
-ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
-ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
-ndg_ptsup.f ndg_setsz.f ndg_asso1.f ndg_assoc.f ndg_crea1.f ndg_creat.f \
-ndg_crep1.f ndg_prop1.f ndg1_sort.f ndg1_crpth.f ndg1_open.f
 
 F_CTG = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
@@ -480,9 +473,8 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = $(C_NDG) $(C_CTG) $(C_SUB1)
+C_ROUTINES = $(C_CTG) $(C_SUB1)
 
-C_NDG = ndg1_wild.c
 C_CTG = ctg1_wild.c ctg1_rm.c 
 
 C_SUB1 = polpack.c pol1_ceval.c
@@ -652,15 +644,13 @@ $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) $(IRAF_DEMO) $(IRAF_DATA)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
-CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST CTG_ERR CTG_CONST 
+CCD1_PAR CCD1_MEMCM HLPCMD CTG_ERR CTG_CONST 
 
 #  Rules to set up links to locate each of the above include files.
 
 HLPCMD:      hlpcmd;                  $(LINK) $? $@
 CCD1_PAR:    ccd1_par;                $(LINK) $? $@
 CCD1_MEMCM:  ccd1_memcm;              $(LINK) $? $@
-NDG_CONST:   ndg_const;               $(LINK) $? $@
-NDG_ERR:     ndg_err;                 $(LINK) $? $@
 CTG_CONST:   ctg_const;               $(LINK) $? $@
 CTG_ERR:     ctg_err;                 $(LINK) $? $@
 
@@ -680,6 +670,7 @@ GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
+NDG_ERR:   $(STAR_INC)/ndg_err;   $(LINK) $? $@
 NUM_CMN:   $(STAR_INC)/num_cmn;   $(LINK) $? $@
 NUM_DEC_CVT:    $(STAR_INC)/num_dec_cvt;  $(LINK) $? $@
 NUM_DEC_R:      $(STAR_INC)/num_dec_R;     $(LINK) $? $@
@@ -697,11 +688,6 @@ TRN_ERR:   $(STAR_INC)/trn_err;   $(LINK) $? $@
 $(PUBLIC_SCRIPTS) $(LINK_SCRIPT) $(MONO_SOURCE) $(HELP_SOURCES) $(DATA_FILES) \
 $(STARTUP_SCRIPT) $(IFL_FILES) $(MONO_IFL) $(ICL_SCRIPT) $(TEST_SCRIPT):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
-
-$(F_NDG) $(I_NDG) $(C_NDG):
-	$(TAR_OUT) ndg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -741,9 +727,8 @@ $(IRAF_DEMO) :
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(O_NDG) $(O_CTG) $(O_SUB1) $(MONO_OBJECT) 
+OBJECT_FILES = $(O_CTG) $(O_SUB1) $(MONO_OBJECT) 
 
-O_NDG = $(F_NDG:.f=.o) $(C_NDG:.c=.o) 
 O_CTG = $(F_CTG:.f=.o) $(C_CTG:.c=.o) 
 
 O_SUB1 = $(F_SUB1:.f=.o) $(C_SUB1:.c=.o) $(PLATFORM_C:.c=.o) $(ADDOBJS) \
@@ -771,11 +756,7 @@ $(ADDOBJS):
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libpolpack.a libndg.a libctg.a
-
-libndg.a: $(O_NDG)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
+OBJECT_LIBRARIES = libpolpack.a libctg.a
 
 libctg.a: $(O_CTG)
 	$(AR_IN) $@ $?
@@ -1808,40 +1789,6 @@ ctg_setsz.o:	 SAE_PAR GRP_PAR
 datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
-ndg1_appen.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR
-ndg1_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
-ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_crpth.o:    SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDG_CONST
-ndg1_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
-ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_fpars.o:	 SAE_PAR
-ndg1_gtyps.o:	 SAE_PAR
-ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_hsplt.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_lasto.o:	 SAE_PAR
-ndg1_match.o:	 SAE_PAR GRP_PAR NDG_CONST
-ndg1_ndfch.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
-ndg1_ndfdl.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_sort.o:	 SAE_PAR GRP_PAR PRM_PAR NDG_CONST
-ndg1_subst.o:	 SAE_PAR
-ndg_asso1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
-ndg_crea1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
-ndg_crep1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_gtsup.o:	 SAE_PAR GRP_PAR
-ndg_ndfas.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfcp.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfcr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfpr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_prop1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_ptsup.o:	 SAE_PAR GRP_PAR
-ndg_setsz.o:	 SAE_PAR GRP_PAR
 pol1_angrt.o:	 SAE_PAR AST_PAR
 pol1_blkwr.o:	 SAE_PAR PRM_PAR
 pol1_chkex.o:	 SAE_PAR GRP_PAR DAT_PAR NDF_PAR AST_PAR

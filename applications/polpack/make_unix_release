@@ -52,8 +52,7 @@
       cp ${POLPACK_DEV}/../polka.htx_tar ${REL_DIR}
       cp ${POLPACK_DEV}/../sun223.htx_tar ${REL_DIR}
 
-#  Make the ndg and ctg source tar files.
-      ${NDG_SYS}/dev/bin/make_source.csh
+#  Make the ctg source tar file.
       ${CTG_SYS}/dev/bin/make_source.csh
 
 #  Ensure all files are accessable.
