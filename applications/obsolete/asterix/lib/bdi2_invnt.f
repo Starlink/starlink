@@ -128,11 +128,13 @@
 
 *  Local Variables:
       CHARACTER*8		AKEY			! Axis keyword
-      CHARACTER*1		CAX			! Axis code char
+      CHARACTER*1		CAX, AXIS		! Axis code char
       CHARACTER*72		CMNT			! Keyword comment
 
-      REAL			AXVAL			! Axis scale
-      REAL			RPIX, PIXW		! Axis keyword values
+      DOUBLE PRECISION		AXVAL			! Axis scale
+      DOUBLE PRECISION		RPIX, PIXW		! Axis keyword values
+      DOUBLE PRECISION		PLTSCL, PIXSIZ		! Plate scale and pixel sizes
+      DOUBLE PRECISION		BASE, DELTA		! Axis values
 
       INTEGER			I			! Loop variable
       INTEGER			IAX			! Axis number
@@ -179,33 +181,58 @@
         CALL ADI2_FNDHDU( FITID, 'PRIMARY', .FALSE., PHDU, STATUS )
 
 *    Enumerated axis values?
-        CALL ADI2_HGKYR( PHDU, 'AX'//CAX//'C0001', AXVAL, CMNT,
+        CALL ADI2_HGKYD( PHDU, 'AX'//CAX//'C0001', AXVAL, CMNT,
      :                   STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Read them one by one
           DO I = 1, DIMS(IAX)
             WRITE( AKEY, '(A,I4.4)' ) 'AX'//CAX//'C', I
-            CALL ADI2_HGKYR( PHDU, AKEY, AXVAL, CMNT, STATUS )
-            CALL ARR_SELEM1R( WPTR, DIMS(IAX), I, AXVAL, STATUS )
+            CALL ADI2_HGKYD( PHDU, AKEY, AXVAL, CMNT, STATUS )
+            CALL ARR_SELEM1R( WPTR, DIMS(IAX), I, REAL(AXVAL), STATUS )
           END DO
 
 *    Test for standard keywords
         ELSE
           CALL ERR_ANNUL( STATUS )
-          CALL ADI2_HGKYR( PHDU, 'CRPIX'//CAX, RPIX, CMNT, STATUS )
-          CALL ADI2_HGKYR( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
+          CALL ADI2_HGKYD( PHDU, 'CRPIX'//CAX, RPIX, CMNT, STATUS )
+          CALL ADI2_HGKYD( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
+          if (cax.eq.'1' .and. pixw.gt.0.0d0) then
+            print*, '*** Warning: CDELT1 made -ve, trying to correct'
+            pixw = -1.0d0 * pixw
+            call adi2_hpkyd( phdu, 'CDELT'//cax, pixw, cmnt, status )
+          end if
 
 *      Standard keywords there?
           IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL ARR_REG1R( PIXW*(1.0 - RPIX), PIXW, DIMS(IAX),
-     :                      %VAL(WPTR), STATUS )
+            CALL ARR_REG1R( REAL(PIXW*(1.0D0 - RPIX)), REAL(PIXW),
+     :                      DIMS(IAX), %VAL(WPTR), STATUS )
 
-*      Otherwise regular values
+*      Plate pixel values there?
           ELSE
             CALL ERR_ANNUL( STATUS )
-            CALL ARR_REG1R( 1.0, 1.0, DIMS(IAX), %VAL(WPTR), STATUS )
+            IF ( CAX .EQ. '1' ) THEN
+              AXIS = 'X'
+            ELSE
+              AXIS = 'Y'
+            END IF
+            CALL ADI2_HGKYD( PHDU, 'PLTSCALE', PLTSCL, CMNT, STATUS )
+            CALL ADI2_HGKYD( PHDU, AXIS//'PIXELSZ', PIXSIZ, CMNT,
+     :                       STATUS )
 
+*        Standard keywords there?
+            IF ( STATUS .EQ. SAI__OK ) THEN
+              BASE = (DIMS(IAX) / 2.0D0) + 0.5D0
+              DELTA = ( PLTSCL * PIXSIZ ) / ( 1000.0D0 * 3600.0D0 )
+              IF ( AXIS .EQ. 'X' ) DELTA = -1.0D0 * DELTA
+              CALL ARR_REG1R( REAL(DELTA*(1.0D0 - BASE)), REAL(DELTA),
+     :                        DIMS(IAX), %VAL(WPTR), STATUS )
+
+*      Otherwise regular pixel values
+            ELSE
+              CALL ERR_ANNUL( STATUS )
+              CALL ARR_REG1R( 0.5, 1.0, DIMS(IAX), %VAL(WPTR), STATUS )
+            END IF
           END IF
 
 *      Now check the item is catered for and invent properly
@@ -297,9 +324,6 @@
 
       END IF
 
-c     print*, ' '
-c     print*, '*** ', item(:chr_len(item)), ' ***'
-c     call adi_print(itid, status)
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI2_INVNT', STATUS )
 
