@@ -519,13 +519,16 @@ public class GenerateDependencies {
                 globalStatus++;
                 continue;
             }
-            Set builddeps = new TreeSet(Dependency.simpleComparator());
-            
-            builddeps.addAll(s);
-            builddeps.addAll(ssdeps);
 
             Set confdeps = new TreeSet(Dependency.simpleComparator());
             confdeps.addAll(c.getCompleteDependencies(Dependency.CONFIGURE));
+
+            ssdeps.addAll(confdeps);
+
+            Set builddeps = new TreeSet(Dependency.simpleComparator());
+            builddeps.addAll(s);
+            builddeps.addAll(ssdeps);
+            builddeps.addAll(confdeps);
 
             if (builddeps.isEmpty()) {
                 // implies ssdeps and confdeps are empty, too
