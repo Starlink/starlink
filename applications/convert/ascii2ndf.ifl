@@ -14,7 +14,9 @@
 #  History:
 #     1991 September 18 (MJC):
 #	 Original version.
-#     {enter_changes_here}
+#     1997 December 2 (MJC):
+#     	 Added MAXLEN.
+#     {enter_further_changes_here}
 
 #-
 
@@ -49,6 +51,15 @@ interface ASCII2NDF
       ppath       'CURRENT'
       prompt      'ASCII file'
       helpkey     '*'
+   endparameter
+
+   parameter      MAXLEN         # Maximum length of input records
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Maximum length in bytes of text-file records'
+      helpkey     '*'
+      default     512
    endparameter
 
    parameter      OUT            # Output NDF
