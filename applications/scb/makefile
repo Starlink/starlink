@@ -128,6 +128,8 @@
 #        Updated to Mk V standard.
 #     16-OCT-1998 (MBT):
 #        Adapted for SCB.
+#     08-DEC-1999 (MBT):
+#        Modifications for using lex/yacc-based parsing.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -250,6 +252,13 @@ CFLAGS = -O
 FC = fort77
 FFLAGS = -O
 
+#  Default macros for lex and yacc commands.
+
+LEX = lex
+LFLAGS = 
+YACC = yacc
+YFLAGS =
+
 #  Command for forming a link to a file.
 
 LINK = ln
@@ -279,7 +288,7 @@ BLD_SHR = :
 #  be overridden in the mk file, or as environment variables at build
 #  time.
 
-#  Directory for installing Perl modules
+#  Directory where some Perl modules are installed.
 
 PERL_MOD_DIR = $(INSTALL)/Perl/lib/perl5/site_perl
 
@@ -335,7 +344,7 @@ PKG_NAME = scb
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.1
+PKG_VERS = 1.1-0
 
 #  List of files comprising the distributed source-only system. This
 #  defines the minimum set of files required to rebuild completely the
@@ -344,6 +353,11 @@ PKG_VERS = 0.1
 
 SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME)_test.tar \
                makefile mk $(DOCUMENTATION)
+
+#  Startup script.  This is the file that must be executed (sourced)
+#  by a user of this package in order to define appropriate aliases.
+
+STARTUP_SCRIPT = $(PKG_NAME).csh
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -363,7 +377,15 @@ CGI_SCRIPTS = scb.pl
 #  public script files $(PUBLIC_SCRIPTS) and will be installed in the
 #  $(INSTALL_PERL_MOD) directory.
 
-PERL_MODULES = Tag.pm CTag.pm FortranTag.pm Scb.pm StarIndex.pm
+PERL_MODULES = YyTag.pm Scb.pm StarIndex.pm
+
+#  List of files compiled using lex, yacc, and C.
+
+YY_BINARIES = ctag ftag
+
+#  List of source files required to produce YY_BINARIES.
+
+YY_SOURCES = $(YY_BINARIES:=-l.l) $(YY_BINARIES:=-y.y) tag.c tag.h flex.skl
 
 #  Lists of Latex and hypertext documents.
 
@@ -391,22 +413,40 @@ TEST_FILES = $(PKG_NAME)_test.tar
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(PUBLIC_SCRIPTS) $(PERL_MODULES)
+BUILT_FILES = $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(PERL_MODULES) \
+              $(YY_BINARIES)
 
 #  Rules for extracting source files from the source archive.
 
-$(PUBLIC_SCRIPTS):
+$(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 	chmod 755 $@
 
-$(PERL_MODULES):
+$(PERL_MODULES) $(YY_SOURCES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 	chmod 644 $@
 
+#  Rules and dependencies for building the lex/yacc files.  
+#  We use the default rules for standard lex, yacc and C compilations.
+
+ctag: ctag-y.o tag.o
+	$(CC) $(CFLAGS) -o $@ $@-y.o tag.o
+
+ftag: ftag-y.o tag.o
+	$(CC) $(CFLAGS) -o $@ $@-y.o tag.o
+
+ctag-l.c: ctag-l.l flex.skl
+ftag-l.c: ftag-l.l flex.skl
+ctag-y.c: ctag-y.y
+ftag-y.c: ftag-y.y
+ctag-y.o: ctag-l.c ctag-y.c tag.h
+ftag-y.o: ftag-l.c ftag-y.c tag.h
+ctag.o: ctag.c tag.h
+	
 #  Name of the date stamp file. This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
 #  There must be no rule for generating this file; it is updated only
@@ -417,7 +457,7 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 #  Pathnames of directories into which files may be placed when the
 #  package is installed.
 
-INSTALL_BIN = $(INSTALL)/bin
+INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_ETC = $(INSTALL)/etc
@@ -425,13 +465,16 @@ INSTALL_HELP = $(INSTALL)/help
 INSTALL_INC = $(INSTALL)/include
 INSTALL_LIB = $(INSTALL)/lib
 INSTALL_SHARE = $(INSTALL)/share
-INSTALL_PERL_MOD = $(PERL_MOD_DIR)
-INSTALL_CGI = $(INSTALL_BIN)/cgi
+INSTALL_PERL_MOD = $(INSTALL_BIN)
+INSTALL_CGI = $(INSTALL_BIN)
 
 #  List of directories actually used for installation (selected from
-#  those above) and rules to create them.
+#  those above) and rules to create them.  Note that each directory should
+#  only be included once; so for instance if INSTALL_CGI is assigned to 
+#  INSTALL_BIN above then both should not appear in this list, but if they
+#  refer to different locations then they should.
 
-INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_PERL_MOD) $(INSTALL_CGI) \
+INSTALL_DIRS = $(INSTALL_BIN) \
                $(INSTALL_DOCS) $(INSTALL_HELP) $(INSTALL_DATES) \
                $(SCB_INDEX)
 
@@ -549,7 +592,7 @@ build:
 	@ echo '   TAR_IN          : $(TAR_IN)'           >>$(DATE_STAMP)
 	@ echo '   TAR_OUT         : $(TAR_OUT)'          >>$(DATE_STAMP)
 	@ echo '   PERL5           : $(PERL5)'            >>$(DATE_STAMP)
-	@ echo '   PERL_MOD_DIR    : $(PERL_MOD_DIR)'     >>$(DATE_STAMP)
+	@ echo '   INSTALL_PERL_MOD: $(INSTALL_PERL_MOD)' >>$(DATE_STAMP)
 	@ echo ''                                         >>$(DATE_STAMP)
 #
 #  Record completion of the build.
@@ -617,10 +660,12 @@ VAR_SUBST = sed \
             -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
             -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
             -e 's%"$$HTX_SERVER"%"$(HTX_SERVER)"%' \
-            -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
+            -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%' \
+            -e 's%"$$PKG_VERS"%"$(PKG_VERS)"%' \
+            -e 's%"$$SCB_DIR"%"$(INSTALL_BIN)"%'
 
 VARLIB_SUBST = $(VAR_SUBST) \
-            -e '1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(PERL_MOD_DIR)%'
+            -e '1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(INSTALL_PERL_MOD)%'
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
 #
@@ -636,6 +681,14 @@ VARLIB_SUBST = $(VAR_SUBST) \
            else :; fi;\
         done
 #
+#  Install the CGI binaries giving them world execute permission.
+	for f in $(CGI_SCRIPTS) ""; do \
+           if test -n "$$f"; then \
+              $(VARLIB_SUBST) $$f > $(INSTALL_CGI)/$$f;\
+              chmod 755 $(INSTALL_CGI)/$$f;\
+           else :; fi;\
+        done
+#
 #  Install the Perl modules, giving them world read permission.
 	for f in $(PERL_MODULES) ""; do \
            if test -n "$$f"; then \
@@ -644,14 +697,22 @@ VARLIB_SUBST = $(VAR_SUBST) \
            else :; fi;\
         done
 #
-#  Install the CGI binaries (copying from the INSTALL_BIN directory), 
-#  giving them world execute permission.
-	for f in $(CGI_SCRIPTS) ""; do \
+#  Install the lex/yacc binaries, giving them world execute permission.
+	for f in $(YY_BINARIES) ""; do \
            if test -n "$$f"; then \
-              cp -p $(INSTALL_BIN)/$$f $(INSTALL_CGI);\
-              chmod 755 $(INSTALL_CGI)/$$f;\
+              cp -p $$f $(INSTALL_BIN)/$$f;\
+              chmod 755 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
+#
+#  Install the package startup script, editing in the package version 
+#  number and the directory containging the installed binaries.
+	if test -n "$(STARTUP_SCRIPT)"; then \
+           $(VAR_SUBST) $(STARTUP_SCRIPT) > $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
+           chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
+        else :; fi
 #
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
@@ -755,12 +816,29 @@ do_deinstall:
            else :; fi;\
         done
 #
+#  Deinstall the lex/yacc binaries, if installed versions exist.
+	- for f in $(YY_BINARIES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
 #  Deinstall the CGI binary files, if installed versions exist.
 	- for f in $(CGI_SCRIPTS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_CGI)/$$f; then \
               rm -f $(INSTALL_CGI)/$$f;\
            else :; fi;\
         done
+#
+#  Deinstall the startup script, if installed version exists.
+	- if test -n "$(STARTUP_SCRIPT)"; then \
+           if test -f $(INSTALL_BIN)/$(STARTUP_SCRIPT); then\
+              rm -f $(INSTALL_BIN)/$(STARTUP_SCRIPT);\
+           else :; fi ;\
+           $(MAKE) $(STARTUP_SCRIPT);\
+        else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
@@ -837,11 +915,12 @@ do_test:
 #  The test proper is to build a small index in a temporary directory from
 #  a small source archive supplied with this package, and to extract files
 #  from that index. 
-	$(PERL5) -e 'require 5;'
+	@ $(PERL5) -e 'require 5;'
+	@ SCB_DIR=$(INSTALL_BIN) && \
 	SCB_INDEX=/usr/tmp/scb_test && \
         SCB_BROWSER_TMP=$$SCB_INDEX/browser_tmp && \
         SCB_INDEXER_TMP=$$SCB_INDEX/indexer_tmp && \
-        export SCB_INDEX SCB_BROWSER_TMP SCB_INDEXER_TMP && \
+        export SCB_DIR SCB_INDEX SCB_BROWSER_TMP SCB_INDEXER_TMP && \
         echo SCB_INDEX: $$SCB_INDEX && \
         rm -rf $$SCB_INDEX && \
         mkdir $$SCB_INDEX $$SCB_BROWSER_TMP $$SCB_INDEXER_TMP && \
@@ -974,8 +1053,10 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
+	@- rm -f $(YY_SOURCES) $(YY_BINARIES:=-l.c) $(YY_BINARIES:=-y.c) \
+           $(YY_BINARIES:=-y.o) tag.o y.tab.c y.tab.h y.output lex.yy.c
 	@ echo
-	@ echo '*** $(PACK_NAME) has no intermediate files to remove'
+	@ echo '*** Intermediate files removed'
 	@ echo
 
 #  unbuild: Reverse the build process.
