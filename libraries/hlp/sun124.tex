@@ -1,0 +1,1593 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun124.10}
+\newcommand{\stardocnumber}    {124.10}
+\newcommand{\stardocauthors}   {P.\,T.\,Wallace}
+\newcommand{\stardocdate}      {13th June 1995}
+\newcommand{\stardoctitle}     {HLP --- Interactive Help System}
+\newcommand{\stardocversion}   {v3.3}
+\newcommand{\stardocmanual}    {User Guide}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{{\tt HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+%\newenvironment{tabs}{\goodbreak\begin{tabbing}}{\end{tabbing}}
+%\newenvironment{cmnds}{\begin{tabs}
+%XXX \= XX \= XXXXXXXXXXXXXXXXXXXX \= \kill}{\end{tabs}}
+%\newenvironment{cmd}{\begin{tabbing}
+%XXXXXX \= XX \= XXXXXXXXXXXX \= \kill}{\end{tabbing}}
+
+\newcommand{\qt}[1]{``{\tt{#1}}''}
+\begin{htmlonly}
+   \renewcommand{\qt}[1]{{\tt{"#1"}}}
+\end{htmlonly}
+
+\newcommand{\fstring}[1]{\hbox{\hspace{0.05em}{\qt{#1}}\hspace{0.05em}}}
+
+%\renewcommand{\_}{{\tt\char'137}}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+  \vspace{10mm}
+  \begin{center}
+     {\Large\bf Abstract}
+  \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+\section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+The Starlink HLP system
+allows an application program to retrieve named items from
+a hierarchically-arranged library of text.
+The facility resembles VAX/VMS HELP.  It consists
+of a library plus
+utility programs for creating, listing and reading help
+libraries.
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{INTRODUCTION}
+The Starlink HLP system is a set of subprograms and utilities which
+allows an application program to retrieve named items from
+a hierarchically-arranged library of text.
+
+The facility is functionally
+very similar to the VAX/VMS Help system.  The major differences
+are that the Starlink HLP system (i)~is implemented in
+a portable way and is not tied to the VAX, and (ii)~allows
+independent creation of multiple libraries which
+are bound together at run-time and appear to the user as a single
+``tree''.  The system is written in a free-standing manner and does not call
+any other Starlink packages.
+
+The present document will be of most interest to application programmers,
+though users of application packages which incorporate the HLP system
+may find Section~2 of some
+value.  Section~5 is
+relevant only to those providing software support for the package,
+or others who are interested in the internals of the system.
+
+\subsection{Comparison with VMS Help}
+Readers already familiar with the VMS Help system may find it
+most convenient to begin by looking at how the Starlink HLP
+system differs.  In the
+list, below, the most useful or significant features are
+described first, with less important differences later.
+\begin{itemize}
+\item The package is portable, and available from Starlink in
+source form.
+\item The Starlink system allows different parts of the help text
+tree to be stored in separate files which are joined
+at run-time, transparently.  It is possible to refer to a file
+from more than one point in the hierarchy.
+\item If no keyword is supplied, the VMS Help system delivers
+the help information for the \fstring{HELP} topic, though this
+behaviour can be suppressed.  In the Starlink HLP
+system each library has a unique top-level topic which is
+returned under these circumstances.
+\item In the VAX version, the \fstring{...} ellipsis feature
+only works for top-level topics.  In the Starlink HLP system
+ellipsis can be used from any level.
+\item The keyword matching capabilities are slightly more
+elaborate in the Starlink version: a keyword can consist
+of multiple words, separated by
+underscores, each of which can be individually abbreviated.
+For example, the keyword \fstring{ACTIVE\_GALACTIC\_NUCLEI} could
+be abbreviated \fstring{A\_G\_N} (or \fstring{A} {\it etc}).  
+\item In both systems, \fstring{\%} and \fstring{*}
+wildcard characters can be used
+when specifying the keyword to be searched for.  In the VMS system
+these characters
+must not form part of a keyword in a library.  In the Starlink
+system it is possible (though not recommended) to use such
+characters, their special function being
+suppressed by preceding them with a \fstring{$\backslash$}
+``escape'' character in the search string.
+\item In the Starlink system there is no capability for specifying
+different help libraries on the command line.  Any such facilities
+must be provided by the application.
+\item The VAX system treats a keyword beginning with the character
+\fstring{/} as a special case, signifying a command qualifier.  This feature
+does not exist in the Starlink HLP system;  all topics and subtopics
+begin with a level number.
+\item Like the VAX Help system, the Starlink HLP system ignores
+records beginning with \fstring{!}.  However, the Starlink
+system allows exclamation marks to appear in HLP text, whereas
+the VAX system would interpret them as end-of-line comments.
+\item The package includes subprogram interfaces and utility
+programs only;  no equivalent of the DCL HELP command
+has been implemented.
+\item The Starlink system offers fewer library maintenance facilities.
+In particular, a library has to be rebuilt in its entirety from source
+when a single topic is changed (but note that pieces of library
+can be separate files in the Starlink system).
+\item The VMS routine LBR\$OUTPUT\_HELP supports five options
+(through its {\it flags}\, argument) that are irrelevant for the
+Starlink HLP\_HELP routine.  The only option common to both is
+the one which enables and disables interactive prompting.
+\item In the Starlink HLP system a series of keywords is
+separated by spaces;  in the VMS Help system, \fstring{/} can also
+be used.
+\item There are minor differences in the handling of unusual
+and unimportant conditions, {\it e.g.}\ duplicate keywords in
+a library, use of punctuation characters in keywords.
+\item In the VAX system, top-level topics always appear in
+alphabetical order.  In the Starlink system they appear in the order
+specified in the help source, as do subtopics in both systems.
+\item There are small differences in the way blank lines
+are handled.  In particular, multiple
+blank lines preceding and following
+the text for a given topic are ignored in the Starlink version.
+\item There are unimportant differences in the formatting of
+output text -- where blank lines occur, what keywords are
+converted to uppercase, {\it etc}.
+\end{itemize}
+
+\subsection{Portability}
+Although the Starlink HLP facility is
+functionally similar to the one provided
+with VAX/VMS, it is not tied to the VAX, makes no use of the VMS
+Librarian utility and Run-Time Library and does not depend (to any
+significant extent) on DEC Fortran extensions.  Written almost entirely
+in ANSI-standard Fortran, the few unavoidable machine and operating
+system dependencies are isolated within a small number of routines which
+are supplied in different forms for different platforms.  At present,
+VAX/VMS, Sun/SunOS, Sun/Solaris, DECstation/Utrix and DEC Alpha/OSF-1
+variants are available (there is also a private PC/MS-Fortran version
+available from the author), plus
+functionally inferior but machine-independent variants.
+
+The present document describes only the VAX and Unix versions.  The
+VAX release contains also the PC versions.  More information
+on portability issues can be found in Section~5.2.
+
+\subsection{Package Contents}
+The main components of the Starlink HLP system are as follows:
+\begin{itemize}
+\item A utility program CREHLP,
+which reads a file of help text and writes a help library;
+\item A command procedure, HLIB, which front-ends the
+CREHLP program.
+\item An object library containing, among other things:
+   \begin{itemize}
+   \item a subprogram, HLP\_HELP, which executes an interactive
+   help session; and
+   \item a subprogram, HLP\_ERRMES, which translates internal error
+   codes into message strings.
+   \end{itemize}
+For VAX/VMS and some Unix platforms two shareable libraries are supplied
+in addition to the non-shared library.  One
+(HLP\_IMAGE\_ADAM.EXE on VMS) is for use with applications which run
+under the ADAM software environment; the other
+(HLP\_IMAGE.EXE on VMS) is for use with stand-alone applications.
+There are associated link option files (HLP\_LINK.OPT and HLP\_LINK\_ADAM.OPT
+for VMS, hlp\_link and hlp\_link\_adam for Unix).
+\end{itemize}
+Other useful items include:
+\begin{itemize}
+\item An example application program, TSTHLP, which allows a help
+library to be interrogated.
+\item An example help library, {\tt demo.hlp} (source)
+and {\tt demo.shl} (library format).
+\item Example implementations of the user-supplied routines which
+(a)~output a line of text, (b)~obtain an interactive response and
+(c)~translate a library name into a filename.  The
+names of these examples are HLP\_OUTSUB, HLP\_INSUB and
+HLP\_NAMETR respectively.
+\item The HLP\_CREH subprogram, which carries out the translation of
+a file of help text into the library format.  (The CREHLP program
+is just a front-end for HLP\_CREH.)
+\end{itemize}
+Also supplied, but of less interest, are:
+\begin{itemize}
+\item A number of internal subprograms, some of which may have uses outside
+the HLP system but are not officially part of the published interface
+to the system,
+{\it e.g.}\ some of the
+character-string handling and I/O routines.
+\item Command procedures for managing development of the software.
+\item A utility program, LSTHLP, that lists a help library
+file for diagnostic purposes, showing the various index pointers {\it etc.}
+Section 5.3 includes an example of such a listing.
+\end{itemize}
+
+\section{USING HELP}
+The example program TSTHLP, together with the sample library {\tt demo.shl},
+shows a typical help session.
+Type the following command:
+
+\begin{tabular}{ll}
+\htmlimage{scale=1.2}
+\\
+{\it VAX/VMS} & {\it UNIX} \\ \\
+{\tt \$ RUN HLP\_DIR:TSTHLP} &{\tt \% /star/bin/tsthlp} \\ \\
+\end{tabular}
+
+This will produce an announcement, followed by the question:
+\begin{verse}
+{\tt Name of help library?}
+\end{verse}
+Give the reply:
+
+\begin{tabular}{ll}
+\htmlimage{scale=1.2}
+\\
+{\it VAX/VMS} & {\it UNIX} \\ \\
+{\tt HLP\_DIR:DEMO.SHL} & {\tt /star/bin/examples/hlp/demo.shl} \\ \\
+\end{tabular}
+
+This will produce a \fstring{:} prompt; enter one of the following:
+\begin{itemize}
+\item $<$CR$>$ to display the top-level help text and subtopics,
+\item a topic name to display the help text for the nominated topic, or
+\item a period to terminate the program.
+\end{itemize}
+At other prompts, enter:
+\begin{itemize}
+\item a subtopic name to display the text for that subtopic,
+\item $<$CR$>$ to move back one level in the hierarchy,
+\item question mark \fstring{?} to
+redisplay the text for the current topic, or
+\item ellipsis \fstring{...} to display all
+the text below the current point in the hierarchy.
+\end{itemize}
+The topic and subtopic names in the library are called
+``keywords''.  When searching for a given keyword, it is unnecessary to
+give the full name.  The rules for abbreviating keywords are as follows:
+\begin{enumerate}
+\item The simplest form of abbreviation is to give only the first few
+characters.  Thus \fstring{FRED} is a valid
+abbreviation of \fstring{FREDERIC}.
+\item A keyword can be made up of one or more ``words'' separated by an
+underscore.  Each such word can be abbreviated individually.  Thus
+\fstring{A\_D} is a valid abbreviation of \fstring{ANNO\_DOMINI}.
+\item The characters \fstring{\%} and \fstring{*}
+match, respectively, any single
+non-space character or any sequence of such characters.
+\item The character \fstring{$\backslash$}
+in the entered string is itself ignored but
+causes the next character to be accepted literally (but not space).
+This means that the various special characters can appear in keywords;
+however, exploiting this feature is not recommended.
+\item If a word from the entered string contains but does not end with a
+\fstring{*} wildcard, it must not be truncated.
+Thus, although \fstring{SAM} and \fstring{S*E} are both valid
+matches for \fstring{SAMPLE}, \fstring{S*PL} is not.
+This feature allows abbreviations
+to be used which unambiguously specify the end of the string as well as
+the beginning.
+\item Neither the keyword in the library nor the string entered may
+contain leading or embedded spaces.
+\end{enumerate}
+When the entered string is a valid abbreviation of
+more than one topic but is not an
+exact match for any topic, all the matched
+topics are reported.  Thus \fstring{*  *  *} would display all the level-three
+topics, and \fstring{...} would display every topic in the library.
+When the entered string is an exact match for a topic, no further
+matches are reported once the exact match has been found.
+
+Keyword comparisons are not case-sensitive: \fstring{aBc} is a valid match for
+\fstring{ABC} for example.
+
+\section{CREATING A HELP LIBRARY}
+Help files exist in two forms: (i)~the {\it source}\, form, which you
+create using a text editor, and (ii)~the {\it library}\, form, which
+is read by the application program when it
+calls the HLP\_HELP subprogram.  The source form is read
+sequentially (a two-pass operation) by the HLP\_CREH routine
+to write the randomly-addressable indexed library file which
+can be interrogated by means of the HLP\_HELP routine.
+
+No facilities exist for inserting a single topic into an existing
+help library.
+
+\subsection{The Source File}
+Each source file contains one hierarchy of help text.  Embedded
+within the file may be pointers to other help libraries, though
+it is perfectly possible and normal for all the help text for a given
+application to be stored in a single source file.  Whether or not
+multiple files are used, the result always appears to the user as a
+single ``tree'' of help information.
+
+Each topic within a help source file consists of lines of plain
+text, preceded by a special line of text containing the {\it level
+number} and the {\it keyword}.  The level number, a single decimal
+digit in the first character position, can be from 0 to 9, and shows
+the hierarchical level of the help text which follows.  The keyword
+is a unique name for the topic, which will be specified by the
+user to retrieve the text for that topic or one of its subtopics.
+
+The source file comprises four sorts of record;  COMMENT, KEYWORD,
+TEXT and END records.  All are ordinary formatted alphanumeric
+records, as produced by a text editor.  Up to 132 characters
+are accepted, though a maximum of 80 characters is recommended.
+
+COMMENT records have \fstring{!} as their first character, and are ignored.
+
+The format of a KEYWORD record is either:
+\begin{verse}
+{\it n~~~keyword}
+\end{verse}
+where {\it n}\, is the level number, or:
+\begin{verse}
+{\it @library~~~n~~~keyword}
+\end{verse}
+where {\it library} is the name of another (different) help library and
+follows the \fstring{@} with no intervening spaces.  The {\it @library},
+{\it n}\, and {\it keyword}\, fields are separated by one or more spaces.
+Spaces before the {\it n}\, or \fstring{@} are
+not allowed.  More details on level numbers and keywords are
+given later.
+
+TEXT records are just plain text, and apply to the preceding keyword.
+Any that precede the first keyword are
+ignored.  Blank lines before and after each group of TEXT records
+are ignored.  Note that the rules for recognizing other sorts of
+record mean that text records cannot begin with a decimal digit,
+\fstring{@} or \fstring{END} {\it etc.}  It
+is also recommended that the character \fstring{/} is avoided;
+\fstring{/} is reserved for future use by Starlink and also could
+cause incompatibilities with VMS Help.
+
+The optional END record consists of the three characters \fstring{END}, in
+any mixture of uppercase and lowercase.
+
+The rules for {\it level numbers}\, are as follows:
+\begin{enumerate}
+\item Higher-level topics have smaller level numbers.  Thus a topic at
+level $n$ embraces any material at levels $n+1$, $n+2$, {\it etc.}.
+\item The order in which the keyword records appear in the source file
+defines the hierarchy.  A level number one larger than the previous
+one means a subtopic; a level number less than or equal to the previous one
+means that the current branch has finished and we have moved
+to the next branch of the given level.
+\item A level number can be less than the previous one, the same,
+or one more.  Increases greater than one are not allowed.
+\item The first keyword record in the source file defines the
+highest level topic for that file.  Each file must have exactly
+one such record:  no further keyword records at that level (or higher)
+are permitted.
+\item Though it is conventional to start each source file with a
+zero-level topic, it is permissible to start at any level; apart
+from limiting the number of levels which can appear in that
+library, it makes no difference.
+\item Where one help library refers to another it is not necessary for
+the levels to match.  It is possible, for example, for the same
+library to appear twice in a tree at two different levels.
+\item Irrespective of the range of levels in the
+individual libraries, the complete help tree must not go beyond
+level~9.
+\end{enumerate}
+
+The rules for {\it keywords}\, are as follows:
+\begin{enumerate}
+\item The maximum length of a keyword is 64 characters.  In practice,
+keywords longer than about 20 characters are inconvenient to use
+and are discouraged.
+\item Keywords remain in the format in which they were entered, with
+use of uppercase and lowercase preserved.  Character case is, however,
+ignored when matching.
+\item The wildcard, escape and abbreviation features available during
+text retrieval mean that there is considerable freedom in choosing
+keywords.  However, it is strongly recommended that only alphabetic
+characters (uppercase and lowercase), decimal digits, dollar sign,
+underscore and hyphen be used.  Prohibited or deprecated are
+asterisk, percent sign, ellipsis (three or more consecutive periods), at
+sign, slashes (forward or back), parentheses (left or right), and quote
+marks (single or double).
+\item Accessing topics whose names are valid abbreviations
+of any that precede them can be awkward: it would be
+unwise to have a topic PLOT following a topic PLOTXY for example.
+Topics arranged in alphabetical order automatically comply with
+this recommendation.
+\end{enumerate}
+
+Here is an example help source file:
+\vspace{-1mm}
+\begin{small}
+\begin{verbatim}
+   !
+   !  Example help library
+   !
+   0 PROGRAMMING_LANGUAGES
+
+   Programming via front-panel switches, or by plugboards, is no longer
+   in fashion.  Even macho programmers now resort to describing what the
+   computer is to do in terms of text which is assembled or compiled into
+   machine code, or which is interpreted and executed line by line.
+
+   1 Assemblers
+
+   One line of assembly language used to turn into one machine instruction,
+   but these days you're never quite sure.
+
+   1 Compilers
+
+   A compiler turns high-level code which is supposed to be machine-
+   independent but isn't into machine code which definitely isn't .
+
+   2 Fortran
+
+   An archaic language, a fossil remnant of 1950s IBM machines.  Used
+   to excellent effect by hordes of programmers round the world.  Produces
+   more efficient code than anything except assembler.  Its imminent
+   demise has been announced annually since about 1963.
+
+   2 PASCAL
+
+   Used for teaching structured programming.  Comes in various toxic
+   vendor-specific flavours.
+
+   2 C
+
+   The most successful computer virus to date.  Great to write in.
+   Produces really impressive gibberish code.  Goes wrong in all sorts
+   of fun ways.
+
+   1 Interpreters
+
+   There's nothing quite like changing a line of code and instantly
+   seeing the result.
+
+   2 BASIC
+
+   Revolting old-fashioned language which lots of people understand
+   and use, and which runs surprisingly fast on lots of computers.
+
+   2 Forth
+
+   Forth combines fast execution with compact code and rapid program
+   development turnaround.  Other benefits are really sensational
+   gibberish code which no-one can ever understand, and a propensity
+   to spectacular crashes.
+
+   END
+\end{verbatim}
+\end{small}
+
+The file {\tt HLP\_DIR:DEMO.HLP} on VAX/VMS or
+{\tt /star/bin/examples/hlp/demo.shl} on Unix platforms
+contains a more elaborate example.
+
+\subsection{Creating the Library File}
+To translate one or more files of help source into a library which can be
+read by an application program, execute the {\tt hlib} command script:
+
+\begin{tabular}{ll}
+\htmlimage{scale=1.2}
+\\
+{\it VAX/VMS} & {\it UNIX} \\ \\
+{\tt \$ @HLP\_DIR:HLIB}~~{\it source~~library} &
+   {\tt \% hlib}~~{\it source\_1~~source\_2}~~\ldots \\ \\
+\end{tabular}
+
+where {\it source..}\ is a file of help text to be
+input and (on VAX/VMS
+platforms only) {\it library}\, is the library file to be written.
+
+On {\bf VAX/VMS}, the default file extensions are {\tt .HLP} for the
+source file and {\tt .SHL} for the library file.  A wildcard in the name
+of the source file will cause each such file to be processed
+individually.  If the first argument is omitted it defaults to
+\fstring{*}.  If the second argument is omitted then
+{\it library}\, = {\it source}\, with
+extension changed to {\tt .SHL}.  A wildcarded name in the second argument
+defaults to the name field of the first filename.  Typical uses are
+as follows.
+
+To translate source {\tt EXAMPLE.HLP} into library file {\tt EXAMPLE.SHL}:
+\begin{verse}
+{\tt \$ @HLP\_DIR:HLIB EXAMPLE}
+\end{verse}
+To translate all {\tt *.HLP} source files in the current directory
+into {\tt *.SHL} library files:
+\begin{verse}
+{\tt \$ @HLP\_DIR:HLIB}
+\end{verse}
+To translate all {\tt *.HLP} source files in the current directory into
+{\tt *.SHL} library files in directory {\tt [.SUB]}:
+\begin{verse}
+{\tt \$ @HLP\_DIR:HLIB * [.SUB]*}
+\end{verse}
+
+On {\bf Unix} platforms, less flexibility is provided.  The library
+file always has file extension {\tt .shl}.  A series of source file names
+may be specified, perhaps using a wildcard, and each one will be
+translated into an appropriately-named {\tt .shl} file.  Typical uses are
+as follows.
+
+To translate source {\tt example.hlp} into library file {\tt example.shl}:
+\begin{verse}
+{\tt \% hlib example.hlp}
+\end{verse}
+To translate all {\tt *.hlp} source files in the current directory
+into {\tt *.shl} library files:
+\begin{verse}
+{\tt \% hlib *.hlp}
+\end{verse}
+
+Programmers wishing to integrate help library creation into their
+application packages may use the HLP\_CREH subprogram:
+\begin{verse}
+{\tt  CALL HLP\_CREH (NAMETR, LUIN, SOURCE, LUOUT, LIB, LUERR, EOS, JSTAT)}
+\end{verse}
+where the arguments are as follows:
+
+\begin{tabular}{llll}
+\htmlimage{scale=1.2}
+\\
+Given: \\
+& {\tt NAMETR} & {\tt EXTERNAL} &
+              subroutine to translate library names into filenames \\
+& {\tt LUIN} & {\tt INTEGER} &
+                           I/O unit number for reading help source \\
+& {\tt SOURCE} & {\tt CHARACTER*(*)} &
+                               filename for help source, or spaces \\
+& {\tt LUOUT} & {\tt INTEGER} &
+                          I/O unit number for writing help library \\
+& {\tt LIB} & {\tt CHARACTER*(*)} &
+                              filename for help library, or spaces \\
+& {\tt LUERR} & {\tt INTEGER} &
+                                I/O unit number for error messages \\
+& {\tt EOS} & {\tt CHARACTER*1} &
+                                 character to use as end-of-string \\ \\
+Returned: \\
+& {\tt JSTAT} & {\tt INTEGER} &
+                                         status: $0=$OK, $-9$=fail \\ \\
+\end{tabular}
+
+The conventional EOS value in all present implementations is {\tt CHAR(0)}.
+
+\section{RETRIEVING HELP TEXT}
+Once a help library has been created, it can be interrogated by an
+application program through the HLP\_HELP subprogram.  The programmer
+supplies the following four things:
+\begin{itemize}
+\item The call to HLP\_HELP.
+\item A subprogram which handles one line of retrieved help text,
+typically displaying it in some way.
+\item A subprogram which provides one line of interactive input.
+\item A subprogram which translates a help library name into a filename.
+\end{itemize}
+
+The HLP package includes a demonstration application TSTHLP.FOR,
+together with subprograms HLP\_OUTSUB.FOR, HLP\_INSUB.FOR and HLP\_NAMETR.FOR.
+
+\subsection{The HLP\_HELP Subprogram}
+The HLP\_HELP routine takes a line of text containing commands
+or keywords and enters an interactive help session, using supplied
+application-specific routines to obtain further command and keyword
+input and to handle retrieved text.  Once the help session is complete,
+control passes back to the calling program.
+
+The usual way to generate the initial line of input will be to
+interpret the application's own help command and to present the
+arguments appropriately formatted.  For example, the application may
+respond to a command \fstring{HELP COMP C} by calling HLP\_HELP with
+\fstring{COMP C} as the initial response string.  The HLP\_HELP routine
+will then search for the subtopic \fstring{C} of topic \fstring{COMP},
+hand back to the application any text it finds, request further lines
+of input, and allow the user to explore the help tree before finally
+terminating and returning to the application.
+
+The response strings accepted at each stage are given in
+Section~2.
+
+The HLP\_HELP routine is an integer function subprogram, which
+returns the number $+1$ to indicate successful completion and a
+range of negative integers to indicate various error conditions
+(see Section~4.6).  The call is as follows:
+\begin{verse}
+{\tt ISTAT = HLP\_HELP (OUTSUB, LOUT, INLINE, LU, LIB, JFLAGS, INSUB, NAMETR)}
+\end{verse}
+where the arguments are:
+
+\begin{tabular}{llll}
+\htmlimage{scale=1.2}
+\\
+Given: \\
+& {\tt OUTSUB} & {\tt EXTERNAL} &
+                   user-supplied output subroutine (note 2, below) \\
+& {\tt LOUT} & {\tt INTEGER} &
+                          maximum record length accepted by OUTSUB \\
+& {\tt INLINE} & {\tt CHARACTER*(*)} &
+                     string specifying required help text (note 3) \\
+& {\tt LU} & {\tt INTEGER} &
+                     I/O unit number for reading help library file \\
+& {\tt LIB} & {\tt CHARACTER*(*)} &
+                                name of help library file (note 4) \\
+& {\tt JFLAGS} & {\tt INTEGER} &
+                                                    flags (note 5) \\
+& {\tt INSUB} & {\tt EXTERNAL} &
+                  user-supplied interactive input routine (note 6) \\
+& {\tt NAMETR} & {\tt EXTERNAL} &
+                   user-supplied name translation routine (note 7) \\ \\
+Returned: \\
+& {\tt HLP\_HELP} & {\tt INTEGER} &
+                              status:  $+1=$ OK \\
+& & & \hspace{2.6em}               $-11=$ illegal current level \\
+& & & \hspace{2.6em}               $-12=$ OUTSUB reported error \\
+& & & \hspace{2.6em}               $-13=$ INSUB reported error \\
+& & & \hspace{2.75em}             else = other errors (note 8) \\ \\
+\end{tabular}
+
+Notes:
+\nopagebreak
+\begin{enumerate}
+\item This routine is similar, but not identical, in its argument list
+and action to the VAX/VMS routine LBR\$OUTPUT\_HELP.
+\item The user-supplied OUTSUB routine is responsible for
+knowing where to
+write the information, how to handle pagination, and so on.  Details
+are given in Section~4.2, below.
+\item The INLINE string contains the initial series of help keywords,
+separated by spaces.  The interactive help session will begin at the
+place in the help tree so specified.  INLINE may contain leading as well as
+embedded and trailing spaces.  The command itself, for example
+\fstring{HELP}, is not included in this string, nor any command
+qualifiers which the application supports.  A maximum of 9 keywords is
+accepted;  any more are ignored.  Keywords longer than 64 characters
+are truncated.
+\item The help library specified by LIB is in a special format, produced by
+the HLP\_CREH routine
+(as described in Section~3.2).  The system is not compatible with
+VMS .HLB files, though the source form of the library is very
+similar (see Section~3.1).  The name is subject to environment-dependent
+translation at open time through the NAMETR routine (see
+section 4.4).
+\item At present, JFLAGS controls only one option, though more
+may be added in the future.  JFLAGS=1 means that
+interactive help prompting is in effect, while JFLAGS=0
+value means that the help text for the topic specified in
+INLINE is looked up but no interactive dialogue ensues.
+\item The user-supplied INSUB routine is responsible for
+carrying out a prompted read from the interactive command device.
+Details are given in Section~4.3, below. (Note that if JFLAGS=0
+INSUB is never called.)
+\item The user-supplied NAMETR routine is responsible for translating
+a help library name into a filename.  Details are given in Section 4.4,
+below.
+\item The status values returned by this routine may be translated into
+text by means of the routine HLP\_ERRMES.  See Section 4.6.
+\end{enumerate}
+
+\subsection{The Output Subprogram}
+The user-supplied output routine, which is named OUTSUB in the above
+example call to HLP\_HELP but can have any name,
+is an integer function subprogram which
+accepts one argument, the string to be output, and returns a
+status of $+1$ if OK.  The output routine is responsible for knowing where to
+write the information, how to handle pagination, and so on.
+
+The HLP package contains a simple example of an output routine.  It
+is called HLP\_OUTSUB and is the one used in the TSTHLP demonstration
+program.
+
+Note that there is no obligation for applications simply to display
+the lines of text retrieved by the help system.  For example,
+information could be encoded into the help text which allows the
+application to plot graphs, log usage information, change the
+display colour {\it etc}.
+
+\subsection{The Input Subprogram}
+The user-supplied interactive input routine, which has the name INSUB
+in the above
+example call to HLP\_HELP but which can have any name, is an
+integer function subprogram with arguments STRING, PROMPT, L.
+The argument STRING
+receives the line input, PROMPT is the string to output prior to
+reading the line, and L the number of characters input.  If the
+call is successful, a function value of $+1$ is returned.
+
+The HLP package contains a simple example of an input routine.  It
+is called HLP\_INSUB and is the one used in the TSTHLP demonstration
+program.
+
+\subsection{The Name Translation Subprogram}
+Help libraries have two names:
+\begin{itemize}
+\item The name specified either through the {\tt LIB} argument of the
+HLP\_HELP call or following \fstring{@} in the help source file.
+\item The filename required by Fortran OPEN statements.
+\end{itemize}
+It is the job of the user-supplied
+NAMETR routine to translate the first form into the second.
+
+The call is as follows:
+\begin{verse}
+{\tt CALL nametr (KMD, INSTR, OUTSTR, JSTAT)}
+\end{verse}
+where the arguments are:
+
+\begin{tabular}{llll}
+\htmlimage{scale=1.2}
+\\
+Given: \\
+& {\tt KMD} & {\tt CHARACTER*(*)} & function number (see below) \\
+& {\tt INSTR} & {\tt CHARACTER*(*)} & given string \\ \\
+Returned: \\
+& {\tt OUTSTR} & {\tt CHARACTER*(*)} & returned string \\
+& {\tt JSTAT} & {\tt INTEGER} & status:  $0=$ OK \\
+& & & \hspace{1.7em}         $-16=$ a string had to be truncated \\
+& & & \hspace{1.7em}         $-17=$ other error \\ \\
+\end{tabular}
+
+The function number {\tt KMD} is always zero when the NAMETR routine
+is called by the HLP system, and means ``{\tt INSTR} is a help
+library name; translate it into a filename {\tt OUTSTR}''.  Non-zero
+{\tt KMD} values are available to implementors for their own
+purposes.
+
+The HLP package contains a suitable NAMETR routine, called
+HLP\_NAMETR.  The translation it provides is to
+enclose the supplied name within a prefix and suffix.  This
+simple transformation adequately supports applications
+which must run on multiple platforms.
+The prefix and
+suffix are originally spaces, which HLP\_NAMETR treats as meaning
+``no translation required''.  The full set of options supported by
+HLP\_NAMETR is as follows:
+
+\begin{tabular}{llll}
+\htmlimage{scale=1.2}
+\\
+{\it KMD} & {\it INSTR} & {\it OUTSTR} & {\it action} \\ \\
+~~0 & library name & filename & translate library name to filename \\
+~~1 & prefix & -- & specify prefix \\
+~~2 & suffix & -- & specify suffix \\
+~~3 & -- & prefix & enquire prefix \\
+~~4 & -- & suffix & enquire suffix \\ \\
+\end{tabular}
+
+This is what the application must do:
+\begin{verbatim}
+        :
+*  Routines used by HLP_HELP
+      EXTERNAL ...,hlp_NAMETR
+        :
+        :
+*  Define prefix and suffix for help name translations
+      CALL HLP_NAMETR(1,PREFIX,DUMMY,J)
+      IF (J.NE.0) ... error
+      CALL HLP_NAMETR(2,SUFFIX,DUMMY,J)
+      IF (J.NE.0) ... error
+        :
+        :
+*  Perform help session
+      CALL HLP_HELP(...,HLP_NAMETR)
+        :
+\end{verbatim}
+An example prefix and suffix might be \fstring{/star/help/tpoint/} and
+\fstring{.shl} respectively.  A library name \fstring{model} would
+then become the filename \fstring{/star/help/tpoint/model.shl}.
+
+If this simple prefix+name+suffix model is not adequate, the programmer
+is free to supply his own translation routine, perhaps using
+environment variables or an internal table.
+
+\subsection{Terminal Handling}
+The example application TSTHLP works in the simplest way possible.  Most
+real-life applications will be more sophisticated:
+\begin{itemize}
+\item The output routine HLP\_OUTSUB used in
+TSTHLP outputs lines of text to the terminal without
+regard to screen management.  The output routines of real
+applications may count lines and issue a ``press return for more''
+message after a certain number, then wait for a response before going
+on; on appropriate terminals there may be screen erasures; and
+so on.
+\item Some sort of ``abort'' feature is useful, to provide a
+quick exit from the help session.  On the VAX,
+detection of $<$CTRL$>$/Z in the
+application's input routine (by means of the {\tt END=} feature
+of the {\tt READ} statement), followed by simulation of multiple
+$<$CR$>$ responses and ignoring of lines supplied to the output routine, is
+one way to arrange this.
+\item In the VMS DCL command HELP, a \fstring{?} response requires no
+$<$CR$>$, and it is possible an application may wish to provide this
+feature.  (The demonstration program TSTHLP does not.)
+\end{itemize}
+
+\subsection{Error Codes}
+The HLP\_CREH routine and all internal subprograms
+return status information through an integer argument using the
+following codes:
+
+\begin{tabular}{rl}
+\htmlimage{scale=1.2}
+\\
+   $0=$ & OK \\
+  $-1=$ & Help system in wrong state \\
+  $-2=$ & Help library error on OPEN \\
+  $-3=$ & Help library error on WRITE \\
+  $-4=$ & Help library error on READ \\
+  $-5=$ & Help file error on CLOSE \\
+  $-6=$ & Attempt to WRITE outside HELP library \\
+  $-7=$ & Attempt to READ outside HELP library \\
+  $-8=$ & Help record overflows supplied string \\
+  $-9=$ & Help library creation failure \\
+ $-10=$ & Unused \\
+ $-11=$ & HLP\_HELP internal error \\
+ $-12=$ & Line output failure \\
+ $-13=$ & Line input failure \\
+ $-14=$ & Invalid index entry \\
+ $-15=$ & Attempted switch to current library \\
+ $-16=$ & String too small for file name \\
+ $-17=$ & Name translation failed \\ \\
+\end{tabular}
+
+HLP\_HELP returns a function value of $+1$ rather than 0 to indicate
+success, for compatibility with the VMS HELP system.  HLP\_HELP may also
+return certain of the error values from the above list.
+
+Most of these error conditions can only occur as a result of
+bugs in the HLP software.  The most common one to arise during
+normal use is \fstring{HELP library error on OPEN} -- for example where
+an incorrect library name has been supplied.
+
+A status value {\tt J} returned by the HLP routines may be translated
+into a message string {\tt MES} by means of the HLP\_ERRMES routine:
+\begin{verse}
+{\tt CALL hlp\_ERRMES(J,MES)}
+\end{verse}
+The length of the {\tt MES} string should be at least 50~characters.
+
+\subsection{Linking}
+ADAM tasks will be linked with the HLP library automatically.
+Other applications which call HLP\_HELP, HLP\_ERRMES, HLP\_CREH,
+or any other of the other public
+routines in the HLP package may be linked as follows.
+
+On VAX/VMS:
+\begin{verse}
+{\tt \$ LINK program, HLP\_LINK/OPT}
+\end{verse}
+
+On the Unix platforms:\begin{verse}
+{\tt \% f77 program.o -L/star/lib `hlp\_link` -o program.out}
+\end{verse}
+(The above assumes that all Starlink directories
+have been added to the environment variables {\tt PATH} and
+{\tt LD\_LIBRARY\_PATH} as described in SUN/118.)
+
+\section{SOFTWARE SUPPORT GUIDE}
+This section is intended for support programmers and those interested
+in the internal workings of the HLP package.  It is unlikely to
+interest application programmers or users.
+
+\subsection{Release Contents}
+The complete HLP system, for all platforms,
+is stored in a single VAX/VMS directory.
+The following files are included:
+
+\begin{tabular}{ll}
+\htmlimage{scale=1.2}
+\\
+ *.FOR & Fortran source (machine-independent) \\
+ *.BAT & various PC MS/DOS command procedures (PC only)\\
+ *.COM & various VAX/VMS DCL command procedures \\
+ *.OPT & various VAX/VMS link option files \\
+ *.MAR & transfer vector for VMS shareable images \\
+ *.IND & Fortran source (machine-independent) \\
+ *.VAX & Fortran source (VAX/VMS etc) \\
+ *.PCM & Fortran source (PC -- Microsoft Fortran under MS/DOS) \\
+ *.SUN4 & Fortran source (Sun SPARC etc) \\
+ *.EXE & Utility programs -- VAX executables \\
+ *.OLB & VAX object module library \\
+ READ.ME & General information \\
+ HLP.NEWS & NEWS item for current release \\
+ *.TEX,*.TOC & \LaTeX\ source for document \\
+ MAKEFILE. & make file for Unix platforms \\
+ MK. & mk script, which sets environment variables and runs make \\
+ HLIB. & Unix shell script for running CREHLP \\
+ HLP\_LINK*. & Part of Unix link procedure. \\
+ VAX\_TO\_UNIX.USH & Unix shell script which accepts the release. \\ \\
+\end{tabular}
+
+\subsection{Portability Issues}
+The bulk of the system is coded in ANSI-standard Fortran.  The only
+VAX extensions used are the SGP/16-sanctioned
+INCLUDE, DO~WHILE, DO~...~END~DO and names longer than
+6 characters.  Full ANSI-compliance would be achieved by including
+the INCLUDEd text, recoding
+all the DOs and stripping the prefix \fstring{HLP\_} from
+external names.
+
+Specific machine dependencies are as follows.  Filenames are given
+in their uppercase VAX/VMS forms, but are always lowercase on
+the Unix platforms.
+\begin{itemize}
+\item COMIC -- Two versions of this INCLUDE file are supplied.
+{\tt COMIC.FOR} is ANSI standard except that underscore, percent and
+backslash appear in character strings.  {\tt COMIC.SUN4} has a double
+backslash to override the ``escape'' mechanism used by the Fortran
+compilers found on most Unix platforms.
+\item FOPR -- Two versions are supplied.  {\tt FOPR.VAX} uses
+the OPEN keyword {\tt READONLY} to avoid requiring
+write access to the help library;  it is used on the VAX and
+the DECstation.  The PC version uses the OPEN option
+{\tt MODE='READ'} for the same
+purpose.  The machine-independent version {\tt FOPR.IND} uses a
+standard OPEN;  this is the version used on the Sun.
+\item INSUB -- Three versions are supplied.  The VAX version
+{\tt INSUB.VAX} uses
+the format descriptor {\tt \$} to suppress the newline after the
+prompt, and begins each line with a blank to act as a printer
+control code.  The PC version {\tt INSUB.PCM} is similar, but uses the
+format descriptor $\backslash$ to suppress the newline.
+{\tt INSUB.SUN4}, which works on both the Sun and DECstation,
+like the VAX version uses {\tt \$}, but does not output
+a blank.
+With the machine-independent version {\tt INSUB.IND}, a newline (unavoidably)
+follows the prompt.
+\item CREHLP -- Three versions are supplied.  {\tt CREHLP.VAX} is essentially
+VAX-only, and works in conjunction with the {\tt HLIB.COM} command procedure.
+{\tt CREHLP.IND} works on the PC and may work on other machines;  however,
+it uses explicit I/O unit numbers, which may need to be changed.
+{\tt CREHLP.SUN4} works on the Sun and DECstations and may work on other Unix
+platforms;  however, it uses explicit I/O unit numbers and also the
+filenames {\tt fort.1} and {\tt fort.2} (as required by the {\tt hlib}
+script).
+\item LSTHLP -- An explicit I/O unit number is used, which may need to
+be changed on some machines.
+\item OUTSUB -- Two versions are supplied.
+{\tt OUTSUB.IND}, which is used on VAX and PC, outputs
+a blank printer control code. {\tt OUTSUB.SUN4} doesn't, and is
+used on the Sun and DECstation.
+In all versions, an explicit I/O unit number is used,
+which may need to be changed on some machines.
+\item TSTHLP -- An explicit I/O unit number is used, which may need to
+be changed on some machines.
+\item UPCASE -- The algorithm depends on ASCII coding, in that
+a--z is assumed to exist and be in the same collating order as A--Z.
+\item NAMETR -- The routine supplied, HLP\_NAMETR, either leaves
+the name unchanged or adds a prefix and suffix.  Some
+other behaviour may be more approriate or convenient.
+\end{itemize}
+
+The VAX, Sun SPARCstation and DECstation versions of the HLP system
+are supported by the Starlink Project.  Versions for other Unix
+platforms will be produced if and when they are needed and will
+also be Starlink-supported.  The PC version is supported by the author.
+
+\subsection{Library Format}
+A help library file (as opposed to a help source file)
+consists of three regions:
+\begin{enumerate}
+\item The {\it header}\, region, a single record, gives the size of the
+file, in characters, as a decimal number in {\tt I12.12} format.
+\item The {\it index}\, region, terminated by an empty record.
+\item The {\it data}\, region, lines of help
+text interspersed with keyword records.  The text region, and
+the whole file, are terminated by an empty record.
+\end{enumerate}
+
+For a more detailed picture, it is best to look at an
+actual file, and one is listed below.  It is the
+example help source file given in Section~3.1, translated
+into a help library with the HLIB procedure, and listed using the
+LSTHLP utility.
+The first column of the listing is the character address.  All
+records are terminated with the chosen ``EOS'' character,
+conventionally the null {\tt CHAR(0)}.
+
+The file begins with the header record, in this case giving the
+total length of the file as 1937 characters.
+The records at character 13, 67, \ldots\ 348 are the index
+region of the file, terminated by the empty record at character 386.
+The records at character 387, 411, \ldots\ 1912 are the
+data region of the file, terminated by the
+empty record at character 1936.
+
+The various fields of each index record are separated by spaces.
+Each record begins with three pointers in {\tt I9.9} format.
+The first pointer indicates the position of
+the item in the data region of the file.  The second pointer
+indicates the position of
+the next index entry down the branch of the help tree.  The
+third pointer indicates the position of the next entry of the
+same level.
+In this simple library, which does not contain references to
+other libraries, the three pointers are followed by the
+level number and the keyword.  Where the library refers to
+another, the name of the referred-to library, prefixed with an \fstring{@},
+is included prior to the level number;  an example of this is
+given later.
+
+\begin{small}
+\begin{verbatim}
+    0   000000001937
+   13   000000387 000000067 000000386 0 PROGRAMMING_LANGUAGES
+   67   000000686 000000110 000000110 1 Assemblers
+  110   000000812 000000197 000000152 1 Compilers
+  152   000001473 000000310 000000386 1 Interpreters
+  197   000000955 000000237 000000237 2 Fortran
+  237   000001223 000000276 000000276 2 PASCAL
+  276   000001324 000000152 000000152 2 C
+  310   000001572 000000348 000000348 2 BASIC
+  348   000001709 000000386 000000386 2 Forth
+  386   
+  387   0 PROGRAMMING_LANGUAGES
+  411   Programming via front-panel switches, or by plugboards, is no longer
+  480   in fashion.  Even macho programmers now resort to describing what the
+  550   computer is to do in terms of text which is assembled or compiled into
+  621   machine code, or which is interpreted and executed line by line.
+  686   1 Assemblers
+  699   One line of assembly language used to turn into one machine instruction,
+  772   but these days you're never quite sure.
+  812   1 Compilers
+  824   A compiler turns high-level code which is supposed to be machine-
+  890   independent but isn't into machine code which definitely isn't .
+  955   2 Fortran
+  965   An archaic language, a fossil remnant of 1950s IBM machines.  Used
+ 1032   to excellent effect by hordes of programmers round the world.  Produces
+ 1104   more efficient code than anything except assembler.  Its imminent
+ 1170   demise has been announced annually since about 1963.
+ 1223   2 PASCAL
+ 1232   Used for teaching structured programming.  Comes in various toxic
+ 1298   vendor-specific flavours.
+ 1324   2 C
+ 1328   The most successful computer virus to date.  Great to write in.
+ 1392   Produces really impressive gibberish code.  Goes wrong in all sorts
+ 1460   of fun ways.
+ 1473   1 Interpreters
+ 1488   There's nothing quite like changing a line of code and instantly
+ 1553   seeing the result.
+ 1572   2 BASIC
+ 1580   Revolting old-fashioned language which lots of people understand
+ 1645   and use, and which runs surprisingly fast on lots of computers.
+ 1709   2 Forth
+ 1717   Forth combines fast execution with compact code and rapid program
+ 1783   development turnaround.  Other benefits are really sensational
+ 1846   gibberish code which no-one can ever understand, and a propensity
+ 1912   to spectacular crashes.
+ 1936    
+\end{verbatim}
+\end{small}
+
+Where a help library includes references to other libraries, index
+entries like the following one appear:
+
+\begin{verbatim}
+   91   000002791 000000149 000000149 @cmnds 1 Commands
+\end{verbatim}
+
+The corresponding keyword entry in the data region of the file is
+normal in appearance except that there are no text records.
+
+\subsection{The INCLUDE files}
+The files
+{\tt helpic} and {\tt comic}
+(on the Unix platforms -- {\tt HELPIC.FOR} and {\tt COMIC.FOR} on the VAX,
+{\tt HELPIC} and {\tt COMIC} on the PC) contain definitions and
+COMMON declarations.  They are included through \fstring{INCLUDE 'helpic'}
+and \fstring{INCLUDE 'comic'} statements, the 
+interpretation of which is machine-dependent.
+The {\tt comic} INCLUDE is used only by the \fstring{HLP\_COMSTR}
+routine and exists in different forms for different platforms.
+
+\subsection{Subprograms}
+This section is a classified summary of the subprograms
+which make up the HLP package.  For more complete information,
+including argument data types and character string lengths, it will
+be necessary to refer to the source code itself.
+
+\subsubsection{Supported interfaces}
+The following three routines, plus the templates described in the
+next section, constitute the supported interface
+to the HLP package.  Use of any other HLP\_ routines, or of the
+COMMON blocks used by the HLP system, is at the
+programmer's own risk.
+\begin{verse}
+{\tt SUBROUTINE HLP\_ERRMES(J,MES)}
+\end{verse}
+HLP\_ERRMES translates a HLP system error code {\tt J}
+into a message string {\tt MES}.  See Section~4.6.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_CREH(NAMETR,LUIN,SOURCE,LUOUT,LIB,LUERR,EOS,JSTAT)}
+\end{verse}
+HLP\_CREH translates a file of help source {\tt SOURCE},
+on I/O unit {\tt LUIN}, into a help library {\tt LIB}, subject
+to name translation by the routine {\tt NAMETR}, on I/O
+unit {\tt LUOUT}.  Any error messages go to I/O unit {\tt LUERR}.
+{\tt EOS} is the end-of-string character, conventionally {\tt CHAR(0)}.
+{\tt JSTAT} is the status.  See Section~3.2.
+
+\begin{verse}
+{\tt INTEGER FUNCTION HLP\_HELP(OUTSUB,LOUT,INLINE,LU,LIB,JFLAGS,INSUB)}
+\end{verse}
+HLP\_HELP is the main interface between an application and the
+HLP system, and carries out a complete interactive help session.
+Full details are given in Section~4.1.
+
+\subsubsection{Templates}
+\begin{verse}
+{\tt SUBROUTINE HLP\_NAMETR(KMD,INSTR,OUTSTR,JSTAT)}
+\end{verse}
+This implementation of the user-supplied name translation routine is
+suitable for use in a multiple-platform environment.  It forms each
+filename by sandwiching the library name within a prefix and a suffix.
+HLP\_NAMETR, or a user-supplied equivalent, is called by the
+HLP system prior to opening any help library, always
+with {\tt KMD=0}.  The
+library name to be translated is supplied in {\tt INSTR}, and
+the filename is returned in {\tt OUTSTR} ready for use in a
+Fortran OPEN statement.
+See Section~4.4 for further details of the HLP\_NAMETR routine
+supplied, which uses other {\tt KMD} values to set and enquire the
+prefix and suffix strings.
+
+\begin{verse}
+{\tt INTEGER FUNCTION HLP\_INSUB(STRING,PROMPT,L)}
+\end{verse}
+This is a simple example of the user-supplied input
+routine which is to be called by the HLP\_HELP routine each
+time an interactive response is required.  {\tt STRING} is the response
+received. {\tt PROMPT} is the prompt string,
+output before {\tt STRING} is solicited.  {\tt L} is the length
+of {\tt STRING}, excluding any trailing spaces.  The function
+returns the value $+1$ to indicate success.  Note that the order of
+the arguments does not comply with Starlink standards (see SGP/16),
+a consequence of maintaining a family-resemblance with VMS Help.  See
+Section~4.3.  As well as being a template, HLP\_INSUB is used in
+the LSTHLP and TSTHLP programs.
+
+\begin{verse}
+{\tt INTEGER FUNCTION HLP\_OUTSUB(STRING)}
+\end{verse}
+This is a simple example of the user-supplied output routine which is
+to be called by the HLP\_HELP routine each time a line of help text
+is to be output.
+{\tt STRING} is the string to be output.  The function
+returns the value $+1$ to indicate success.  See Section~4.2.
+As well as being a template, HLP\_OUTSUB is called in
+the LSTHLP and TSTHLP programs.
+
+\subsubsection{String handling}
+The following routines overlap in function with ones found
+in other Starlink packages, but are included in the HLP package for
+independence.
+
+\begin{verse}
+{\tt LOGICAL FUNCTION HLP\_COMSTR(FULSTR,STR)}
+\end{verse}
+HLP\_COMSTR compares two keywords for agreement, under the HLP
+package's rules for abbreviation (see Section~2).  {\tt FULSTR}
+is the full keyword read from the HLP library; {\tt STR} is
+the abbreviated string, including wildcards {\it etc}, supplied
+by the user.  A .TRUE.\, response is returned if the
+two strings match.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_DEC(STRING,IPTR,NUM)}
+\end{verse}
+HLP\_DEC decodes a decimal integer {\tt NUM}
+from a string {\tt STRING}, starting at position {\tt IPTR}.
+The pointer {\tt IPTR} is incremented ready for the next call.
+
+\begin{verse}
+{\tt INTEGER FUNCTION HLP\_LENGTH(STRING)}
+\end{verse}
+The HLP\_LENGTH function returns the
+length of a string {\tt STRING} excluding any
+trailing spaces.  An all-blank string is length 1.  The routine is
+optimized for speed in the case where the string is mostly trailing
+spaces.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_SPLIT(STRING,ISTART,IFROM,ITO)}
+\end{verse}
+HLP\_SPLIT splits up a sentence into words.
+{\tt STRING} consists of words separated by spaces.  Starting
+at character position {\tt ISTART}, this routine locates the
+beginning and end of the next word {\tt IFROM} and {\tt ITO}.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_UPCASE(STRING)}
+\end{verse}
+HLP\_UPCASE converts a string {\tt STRING} to uppercase, in place.
+
+\subsubsection{Variable-length random-access file package}
+help libraries are standard Fortran direct-access files, which have
+a fixed record length, on which the system implements a
+variable-length record scheme.  The following routines manage
+these files.  They communicate in part through labelled
+COMMON.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HCLOSE(JSTAT)}
+\end{verse}
+HLP\_HCLOSE closes the current help library.  {\tt JSTAT} is the
+status return.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HDREAD(IADR,STRING,NC,JSTAT)}
+\end{verse}
+HLP\_HDREAD performs a direct-access read from the current help library.
+{\tt IADR} is the character address from which the read is to
+begin.  {\tt STRING} is the record that is found there, and
+{\tt NC} its length.  {\tt JSTAT} is the status.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HDWRIT(STRING,IADR,JSTAT)}
+\end{verse}
+HLP\_HDWRIT performs a direct-access write to the current help library.
+{\tt IADR} is the character address from which the write is to begin.
+{\tt STRING} is the record to be written.  {\tt JSTAT} is the status.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HINIT(LU,FNAME,EOS)}
+\end{verse}
+HLP\_HINIT initializes the HLP system labelled COMMON blocks.
+{\tt LU} is the I/O unit number to be used for accessing the
+help library file.  {\tt FNAME} is the initial help library name.
+{\tt EOS} is the special character that will signify end-of-string,
+conventionally {\tt CHAR(0)}.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HOPENR(NAMETR,JSTAT)}
+\end{verse}
+HLP\_HOPENR opens or re-opens the current help library for reading,
+with the assistance of the library name to filename translation
+routine {\tt NAMETR}.
+{\tt JSTAT} is the status.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HOPENW(NAMETR,NCHARS,JSTAT)}
+\end{verse}
+HLP\_HOPENW opens the current help library for writing,
+with the assistance of the library name to filename translation
+routine {\tt NAMETR}.
+{\tt NCHARS}
+is the length of the file, which must be known before the call.
+{\tt JSTAT} is the status.
+
+\subsubsection{Indexed-sequential package}
+The HLP system uses its variable-length direct-access file
+system, described above,
+to implement the indexed-sequential structure described
+in Section~5.3.  The file has an index region and a
+data region.  The index region contains three sets of pointers,
+to the data, to the next index entry down the branch, and the
+next index entry at the same level in the current branch.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HREADD(STRING,NC,JSTAT)}
+\end{verse}
+HLP\_HREADD performs a sequential-access read from the data
+region of the help library.  The returned string
+{\tt STRING} has length {\tt NC}.  {\tt JSTAT} is the status.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HREADX(NAMETR,NAVIG,STRING,NC,JSTAT)}
+\end{verse}
+HLP\_HREADX reads the help library index, leaving
+the sequential-access addresses pointing to the indexed record.
+If it is necessary to translate a library name into a filename,
+the routine {\tt NAMETR} will be called.
+{\tt NAVIG} controls which track through the library is
+required -- down the branch or along a level.  {\tt STRING} is
+the record input and {\tt NC} its length.  {\tt JSTAT} is the
+status.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HSEEKX(FNAME,IADRX,LOGLEV)}
+\end{verse}
+HLP\_HSEEKX positions the index of the help library {\tt FNAME}
+for a sequential
+access (using the HLP\_HREADX routine) starting at character address
+{\tt IADRX}.  The caller also supplies {\tt LOGLEV},
+the {\it logical level}, which specifies the hierarchical level,
+on this occasion, of the help subtree contained in the library.
+
+\begin{verse}
+{\tt SUBROUTINE HLP\_HTELLX(FNAME,IADRX,LOGLEV)}
+\end{verse}
+HLP\_HTELLX inquires the help library's current name, index address
+and logical level.
+
+\subsubsection{Internal}
+The following are highly specialized internal routines, with no
+significant potential use outside the HLP system (and which
+are in any case
+inaccessible to users of the shareable libraries on VMS).
+For further details, see the source code.
+\begin{verse}
+{\tt SUBROUTINE HLP\_HCHKL(RECORD,LEVEL,NAME)}
+\end{verse}
+\begin{verse}
+{\tt SUBROUTINE HLP\_HLEAP(NAMETR,STRING,FNAME,IADR,LOGL,JSTAT)}
+\end{verse}
+\begin{verse}
+{\tt SUBROUTINE HLP\_LINOUT(OUTSUB,LOUT,INDENT,BUFFER,JSTAT)}
+\end{verse}
+\begin{verse}
+{\tt SUBROUTINE HLP\_REPSUB(NAMETR,OUTSUB,LOUT,LEVCUR,NAME,OUTBUF,HLPBUF,ISTAT)}
+\end{verse}
+\begin{verse}
+{\tt SUBROUTINE HLP\_FOPR (NAMETR,LU,FILE,LREC,JSTAT)}
+\end{verse}
+
+\subsection{Rebuilding the System}
+On the VAX, the DCL command procedure CREATE.COM in the release
+directory rebuilds the object
+library, compiles and links the executable programs, generates
+the demonstration help library from source, and produces the
+Unix release.  The latter consists of an archive file, a {\tt makefile},
+and a script {\tt mk} which sets up environment variables and
+then runs make.  For details about the targets supported, execute
+{\tt mk help}.
+
+\subsection{VAX/VMS Logical Names}
+On VAX/VMS, in order to run applications using HLP the following
+logical names must be assigned:
+
+\begin{tabular}{lll}
+\htmlimage{scale=1.2}
+\\
+ {\it logical name} & {\it points to} & {\it typical assignment} \\ \\
+ HLP\_DIR & HLP software & {\tt STARDISK:[STARLINK.LIB.HELP]} \\
+ HLP\_IMAGE & shareable library (non-ADAM) &
+                               {\tt HLP\_DIR:HLP\_IMAGE.EXE} \\
+ HLP\_IMAGE\_ADAM & shareable library (ADAM) &
+                                 {\tt HLP\_DIR:HLP\_IMAGE\_ADAM.EXE} \\ \\
+\end{tabular}
+
+In order to link a non-ADAM application with the shared library, the
+following additional assignment is required:
+
+\begin{tabular}{lll}
+\htmlimage{scale=1.2}
+\\
+ HLP\_LINK & link options file & {\tt HLP\_DIR:HLP\_LINK.OPT} \\ \\
+\end{tabular}
+
+\section{ACKNOWLEDGMENTS}
+Early versions of the HLP system drew on the code developed by
+Roger~Noble (Jodrell~Bank) which runs on the Alliant machine as part of
+the OLAF system.  Additional guidance came from the MRAO Cambridge HELP
+system, which runs on Norsk Data computers;  listings of this software
+were kindly supplied by David~Titterington.  Development of the
+HLP\_COMSTR string-comparison routine was done in collaboration with
+Paul~Rees (Starlink Project).  Brian~McIlwrath and David~Terrett
+(Starlink Project) wrote the HLIB command procedure and the {\tt hlib}
+shell script respectively.  The port to Unix was carried out
+with the help of David~Terrett, Paul~Rees and Chris~Clayton.  Further
+work, concerning use in the ADAM environment, the provision
+of shared libraries, and the use of the Starlink template makefile
+was carried out by Alan~Chipperfield and Peter~Allan (Starlink
+Project).
+
+The VAX/VMS Help system was an invaluable guide in the development of
+the specification for the Starlink HLP package.
+\end{document}

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="hlp">
+  <version>3.3-2</version>
+  <path>libraries/hlp</path>
+  <description>HLP -- interactive help system</description>
+  <abstract><p>The Starlink HLP system allows an application program
+      to retrieve named items from a hierarchically-arranged library
+      of text.  The facility resembles VAX/VMS HELP.  It consists of a
+      library plus utility programs for creating, listing and reading
+      help libraries.</p></abstract>
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P T Wallace</name>
+      <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>

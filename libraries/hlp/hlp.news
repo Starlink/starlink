@@ -1,0 +1,39 @@
+1 HLP - Portable help system 
+
+HLP version 3.3-6
+
+*  Modified Linux integration to use g77, produce shared library.
+   Re-added updated hlib script (as in 3.3-4).
+
+HLP version 3.3-5
+
+*  Bug fix to help.f to set EXACT array to .FALSE. on move to new help level.
+   Integrated Linux support (makefile, mk, source archive).
+
+HLP version 3.3-4
+
+*  Update to hlib script to force it to delete its temporary fort.1 file.
+   Add checks to hlib for presence of fort.1 and fort.2 before attempting
+   to use them.
+   
+HLP version 3.3-3
+
+*  Maintenance release to add hypertext documentation.  No changes to
+   source code or to document text.
+
+HLP version 3.3-2
+
+The latest release of the Starlink Portable Help system includes the
+following change:
+
+*  The behaviour in the no-interactive-prompting (JFLAGS=0) case has
+   been changed.  Previously, if no topics were found for the given
+   INLINE string, no output occurred.  Now, exactly the same output
+   occurs as in the normal JFLAGS=1 case (i.e. the "Sorry..." message
+   and the list of level-1 topics).
+
+*  The name of the package has been changed from HELP to HLP.
+
+ P.T.Wallace
+ ptw@star.rl.ac.uk
+ +44-235-44-5372

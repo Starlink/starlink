@@ -1,0 +1,146 @@
+Revision Date 13 June 1995
+
+=================================
+Starlink HLP system version 3.3-2
+=================================
+
+To import a new version from VAX to PC, copy all the files and execute
+the command procedure PC.BAT.
+
+To rebuild both the VAX and the Unix releases, execute the CREATE.COM
+command procedure.  This ends with instructions on what to do from
+the Unix end.
+
+------------------------------------------------------------------------
+
+Version 1.1
+
+*  Logical name HELP_DIR changed to HELPDIR to avoid name clash with
+   a JACH system.  (14 June 1991, requested by P N Daly)
+
+------------------------------------------------------------------------
+
+Version 1.2
+
+*  Default file extension .HLB for Starlink HELP libraries changed
+   to .SHL in order to avoid confusion with VMS Help library files.
+   (25 June 1991, requested by D Mills)
+
+------------------------------------------------------------------------
+
+Version 1.3
+
+*  Small modifications to the PC batch files.
+
+------------------------------------------------------------------------
+
+Version 2.0
+
+*  Portable to Sun SPARCstation and DECstation.
+
+------------------------------------------------------------------------
+
+Version 2.1
+
+*  THERE ARE SIGNIFICANT CHANGES TO THE HELP SYSTEM WHICH MAKE IT
+   NECESSARY TO MODIFY APPLICATION CODE.
+
+*  The principal interface to the help system is now called hlp_HELP.
+   This new routine has the same call as the old hlp_OUTHLP but with
+   one extra argument - the name translation routine to be used.
+
+*  The hlp_OUTHLP routine has been retired.
+
+*  A new version of the supplied implementation of the name translation
+   routine, still called hlp_NAMETR, includes internal character strings
+   which will be, respectively, prefixed and suffixed to the BEFORE
+   string to produce the filename AFTER.  The prefix and suffix strings
+   will initially be spaces and will cause hlp_NAMETR to continue handing
+   back the given string unchanged as in previous releases.
+
+*  The argument list for the name translation routine has been changed,
+   and now contains an extra first argument, and integer command number.
+   The HELP system only ever calls the routine with zero as the command
+   number.  The supplied routine, hlp_NAMETR, accepts commands 0-4, which
+   do the following things:
+
+         CALL hlp_NAMETR (command,instring,outstring,status)
+
+         command        action          instring     outstring
+
+            0         translate name     before        after
+            1         change prefix      prefix          -
+            2         change suffix      suffix          -
+            3         enquire prefix       -           prefix
+            4         enquire suffix       -           suffix
+
+   In each case, bad status means that a string suffered significant
+   truncation.
+
+   (The above changes were implemented in August 1992)
+
+------------------------------------------------------------------------
+
+Version 2.2
+
+*  There was a bug in the internal routine hlp_HLEAP affecting the
+   case where library A points to library B and library B is missing.
+   The error was being handled correctly but left the system in a
+   state where further invocations of hlp_HELP did not work properly:
+   whenever a topic was requested the previous error would get
+   re-reported.  This has been fixed.  (25 August 1992, reported by
+   A.J.Chipperfield)
+   
+*  There was a bug in the internal routine hlp_COMSTR which meant that
+   under some circumstances an entered help topic could be interpreted
+   as if it had been prefixed with a "match n" wildcard.  For example,
+   an entered string "c*" might occasionally be matched to the help
+   topic "abcdef".  This has been fixed.  (26 August 1992)
+
+------------------------------------------------------------------------
+
+Version 3.1
+
+*  Added the important missing feature that when a topic is specified
+   exactly (no abbreviations or wildcards), the search stops at that
+   point to give access to subtopics.
+
+*  Added VMS shareable images and link options file.
+
+*  Added hlp_link_adam for Unix.
+
+*  Simplified makefile, combining build_demo with build etc.
+
+-----------------------------------------------------------------------
+
+Version 3.2
+
+*  New mk script and makefile supplied.
+
+-----------------------------------------------------------------------
+
+Version 3.3
+
+*  The behaviour in the no-interactive-prompting (JFLAGS=0) case has
+   been changed.  Previously, if no topics were found for the given
+   INLINE string, no output occurred.  Now, exactly the same output
+   occurs as in the normal JFLAGS=1 case (i.e. the "Sorry..." message
+   and the list of level-1 topics).
+
+*  The name of the package was changed from HELP to HLP.  The VMS
+   directory changed from HELPDIR to HLP_DIR.
+
+-----------------------------------------------------------------------
+
+Version 3.3-2
+
+*  Imported into CVS and autoconfed.  Since autoconfing generally
+   obviates the need for the platform-specific files, I took this
+   opportunity to rationalise this.  In fact the `platform-specific'
+   files `comic*', `crehlp.f*', `insub.f*' and `outsub.f*' were
+   identical on all platforms (even to the extent of all saying they
+   were the Sparc version!), and have been collapsed to a single file.
+   Only the `fopr.f*' files were actually platform dependent, (as
+   usual depending on the OPEN READONLY statement), and these have
+   been turned into a single .fpp file.  There are no functionality
+   changes in this version.
