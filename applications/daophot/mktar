@@ -1,0 +1,56 @@
+#!/bin/sh
+
+tar cf daophot_unix.tar \
+   aif_antmp.f \
+   aif_temp.f \
+   dao_alloc.f \
+   dao_askfile.f \
+   dao_attach.f \
+   dao_byebye.f \
+   dao_case.f \
+   dao_clfile.f \
+   dao_clpic.f \
+   dao_coppic.f \
+   dao_deall.f \
+   dao_delpic.f \
+   dao_fabort.f \
+   dao_infile.f \
+   dao_list.f \
+   dao_oops.f \
+   dao_outfil.f \
+   dao_ovrwrt.f \
+   dao_rdaray.f \
+   dao_wraray.f \
+
+tar cf daophot_source.tar \
+   addstar.f \
+   allstar.f \
+   allstar.opt \
+   allstsubs.f \
+   curator.tex \
+   daocurs.f \
+   daocurs.ifl \
+   daogrey.f \
+   daogrey.ifl \
+   daophot.csh \
+   daophot.f \
+   daophot.opt \
+   daophot_link \
+   daoplot.f \
+   daoplot.ifl \
+   find.f \
+   fotometry.f \
+   fudge.f \
+   group.f \
+   iosubs.f \
+   mathsubs.f \
+   ndf_cmn \
+   nstar.f \
+   pckpsf.f \
+   peak.f \
+   photo.opt \
+   psf.f \
+   sort.f \
+   substar.f \
+
+
