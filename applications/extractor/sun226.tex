@@ -18,7 +18,7 @@
 \newcommand{\stardocnumber}    {226.2}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {14 January 1999}
+\newcommand{\stardocdate}      {11 March 1999}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.0}
@@ -795,7 +795,7 @@ Starlink Software Support
 (\htmladdnormallink{ussc@star.rl.ac.uk}{mailto:ussc@star.rl.ac.uk}).
 
 \section{Changes}
-\subsection{Version 1.0-1}
+\subsection{Version 1.0-2}
 
  The \EXTRACTOR\ and \SExtractor\ programs have been updated to \SExtractor\
  version $2.0.19$ (the previous version was $2.0.15$). The changes
@@ -813,6 +813,9 @@ Starlink Software Support
  the values ``INTERNAL'' and ``MANUAL'') and the THRESH\_TYPE controls
  whether the detection and analysis thresholds are a multiple of the 
  background RMS, or just in absolute data units.
+
+ A serious bug calculating the CLASS_STAR parameter (which is only 
+ revealed on Digital UNIX systems) has been fixed.
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
