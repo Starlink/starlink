@@ -4342,6 +4342,11 @@ M Makefile.dependencies
           <title>General FAQs</title>
         </subhead>
 
+        <p>In the examples below, the installation location
+          (that is, <code>STARCONF_DEFAULT_PREFIX</code>) is written as
+          <code>/local-star</code>, and the example component is usually
+          <code>cpt</code>.</p>
+
         <p><dl>
             <dt>How do I control which compiler and compiler options I
               use?</dt>
@@ -4357,7 +4362,7 @@ M Makefile.dependencies
             </dd>
 
             <dt>I've just been told ``<code>make: *** No rule to make
-                target `/???/manifests/cpt', needed by
+                target `/local-star/manifests/cpt', needed by
                 `world'.  Stop.</code>  What's wrong?</dt>
             <dd>
               <p>The component <code>cpt</code> has been referred to
@@ -4375,7 +4380,7 @@ M Makefile.dependencies
               <p>The <kbd>make world</kbd> build works by comparing
                 timestamps of the <em>installed</em> files in the
                 manifests directory -- that is, in something like
-                <code>/my-star/manifests</code>, outside of the build
+                <code>/local-star/manifests</code>, outside of the build
                 tree.  It only checks whether each component was
                 <em>installed</em> after each of the components it
                 depends on.  If you wish to use this to (rebuild and)
@@ -4387,17 +4392,70 @@ M Makefile.dependencies
                   all</kbd> in each of its children, and thus bring
                 the whole tree up to date.</p>
               <p>You can check the default installation location --
-                shown as <code>/my-star</code> above -- with
+                shown as <code>/local-star</code> above -- with
                 <kbd>./starconf-status --show
                 STARCONF_DEFAULT_PREFIX</kbd></p>
               <p>Also, <kbd>make world</kbd> only makes those targets
                 listed in the variable <code>ALL_TARGETS</code> within
                 the top-level Makefile.  Thus if the component you're
                 interested in isn't there, nor required by something
-                that is there and will be rebuilt, nothing will
+                that is there and that will be rebuilt, nothing will
                 happen.  See also <ref id="autoconfing-final"/>.</p>
               <p>See <ref id="state-faqs"/> for a few more remarks
                 about state.</p>
+            </dd>
+
+            <dt>I've updated my checkout of a component.  How do I
+              best update the installation of it?</dt>
+            <dd>
+              <p>The most straightforward way is to change to
+                the directory in question, and do <kbd>./configure; make;
+                  make install</kbd> there.</p>
+              <p>Alternatively, you can stay in the top-level
+                directory, delete the component's manifest file,
+                <kbd>rm /local-star/manifests/cpt</kbd>, and remake it:
+                <kbd>make /local-star/manifests/cpt</kbd>.</p>
+            </dd>
+
+            <dt>Actually, the component is one of the buildsupport
+              tools.  Is that
+              different?<index>buildsupport!updating</index></dt>
+            <dd>
+              <p>Yes.  The best way is
+                update your checkout of the component in question,
+                then run <kbd>./bootstrap --buildsupport</kbd> in the
+                top level of the checkout.  When the bootstrap script
+                is run in this mode, it always deletes any
+                buildsupport manifests, to ensure that the
+                buildsupport tools are <em>always</em> rebuilt if
+                updated.</p>
+              <p>It's best to avoid the <kbd>./configure; make; make
+                install</kbd> route described in the last item.  Some
+                of the buildsupport tools need special handling, and
+                the <code>./bootstrap</code> script knows how to do that.</p>
+            </dd>
+
+            <dt>I've updated my checkout and a large number of
+              components were updated (or I'm paranoid).  What's the
+              best way to remake absolutely everything that needs it?</dt>
+            <dd><p>Just doing <kbd>make</kbd> would remake everything
+                that needs remaking, but wouldn't install it.  The
+                command <kbd>make world</kbd> wouldn't work either,
+                because that only works with the dependencies between
+                manifest files -- this is the way that the
+                <code>Makefile.dependencies</code> file expresses the
+                dependencies of components on each other.</p>
+              <p>The best way to do this is as follows.  After your
+              update, and while in the top-level directory, do
+<verbatim>
+% rm /local-star/manifests/*
+% make buildsupport
+% make world
+</verbatim>
+                That is, you delete <em>all</em> the manifests, and
+                remake them.  This does a <code>make; make
+                install</code> in each component directory, and that
+                step handles any files that were updated.</p>
             </dd>
 
             <dt>What's the best way to generate files at build
@@ -4814,23 +4872,6 @@ cd $(DESTDIR)/link; rm -f LINK; $(LN_S) $(DESTDIR)/target/TARGET LINK
 
               <p>For more details, see the notes on state in <ref
                   id="tool-state"/>.</p>
-            </dd>
-
-            <dt>I know the buildsupport tools have been updated in the
-              repository.  What's the best way to install the new
-              versions locally?<index>buildsupport!updating</index></dt>
-            <dd>
-              <p>The most straightforward way is to update your
-                checkout of the component in question, then invoke
-                <kbd>./configure; make; make install</kbd>
-                within that checkout directory.</p>
-              <p>The best way, however is to
-                update your checkout of the component in question,
-                then run <kbd>./bootstrap --buildsupport</kbd> in the
-                top level of the checkout.  When the bootstrap script
-                is run in this mode, it always deletes any
-                buildsupport manifests, to ensure that the
-                buildsupport tools are <em>always</em> rebuilt if updated.</p>
             </dd>
 
             <dt>What does this mean?: <code>required file
