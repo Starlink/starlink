@@ -2029,31 +2029,31 @@ void adix_caste_c( ADIlogical is_adi, ADIclassCode type, int nval, char *in,
   char          *iptr = in;             /* Cursor over input items */
   int           ival = nval;            /* Loop over input values */
   ADIlogical    nterm = (clen==_CSM);   /* Null terminated input? */
-  int           nc;                     /* Number of bytes written to buffer */
   int           oblen = clen;           /* Length of output buffer */
   char          *obuf;                  /* Output buffer */
   char          **odptr;                /* Cursor over null term'd strings */
   char          *optr;                  /* Cursor over block strings */
   ADIsegmentPtr osptr = NULL;           /* Cursor over ADI strings */
+  char		*sptr;			/* Loop over converted data */
 
   if ( nterm )                          /* Null terminated strings? */
     odptr = (char **) out;
-  else if ( is_adi )                    /* Block character strings? */
+  else if ( is_adi )                    /* ADI strings? */
     osptr = (ADIsegmentPtr) out;
-  else                                  /* ...otherwise ADI strings */
+  else                                  /* Block character strings? */
     optr = (char *) out;
 
-#define _cop_pad(_s,_n) \
+#define _cop_pad(_s) \
   if ( nterm ) {obuf=*odptr;} \
   else if ( is_adi ) {obuf=osptr->data;oblen=osptr->len;} \
   else obuf = optr; \
-  if ( (oblen) && (_n > oblen) ) \
-    {(*nerr)++;memset(obuf,' ',_n);}\
+  for(sptr=_s,ic=0;*sptr && (ic<oblen);sptr++,ic++) \
+    obuf[ic] = *sptr;\
+  if ( *sptr ) (*nerr)++;\
   else \
-    {for(ic=0;ic<_n;ic++) obuf[ic] = _s[ic]; \
-     if ( nterm ) obuf[_n]=0; \
-     else if ( _n < oblen ) \
-       {if (onulterm) obuf[_n]=0;else memset(obuf+_n,' ',oblen- _n);}}
+    {if ( nterm && ((ic+1)<oblen)) obuf[ic]=0; \
+     else if ( (ic+1) < oblen ) \
+       {if (onulterm) obuf[ic]=0;else memset(obuf+ic,' ',oblen-ic);}}
 
 #define _do_next if ( nterm ) odptr++; \
 		 else { if ( is_adi ) osptr++; else optr+=clen;}
@@ -2061,64 +2061,64 @@ void adix_caste_c( ADIlogical is_adi, ADIclassCode type, int nval, char *in,
   switch( type ) {
     case _TM_code(ub):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(ub)) ) {
-	nc = sprintf( buf, "%d", (int) *((_TM_ctype(ub) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%d", (int) *((_TM_ctype(ub) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(b):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(b)) ) {
-	nc = sprintf( buf, "%d", (int) *((_TM_ctype(b) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%d", (int) *((_TM_ctype(b) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(uw):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(uw)) ) {
-	nc = sprintf( buf, "%d", (int) *((_TM_ctype(uw) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%d", (int) *((_TM_ctype(uw) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(w):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(w)) ) {
-	nc = sprintf( buf, "%d", (int) *((_TM_ctype(w) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%d", (int) *((_TM_ctype(w) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(i):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(i)) ) {
-	nc = sprintf( buf, "%ld", *((_TM_ctype(i) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%ld", *((_TM_ctype(i) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(r):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(r)) ) {
-	nc = sprintf( buf, "%g", *((_TM_ctype(r) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%g", *((_TM_ctype(r) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(d):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(d)) ) {
-	nc = sprintf( buf, "%g", *((_TM_ctype(d) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%g", *((_TM_ctype(d) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
 
     case _TM_code(p):
       for( ; ival; ival--, iptr+=sizeof(_TM_ctype(p)) ) {
-	nc = sprintf( buf, "%x", *((_TM_ctype(p) *) iptr) );
-	_cop_pad(buf,nc);
+	sprintf( buf, "%x", *((_TM_ctype(p) *) iptr) );
+	_cop_pad(buf);
 	_do_next;
 	}
       break;
@@ -4078,7 +4078,7 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
       else {
 	ADIstrmPutStr( stream, ", superclasses {", _CSM, status );
 	for( ; _valid_q(cpar); cpar = _pdef_next(cpar) ) {
-	  ADIstrmPrintf( stream, "%S%c", status, _pdef_name(cpar),
+	  ADIstrmPrintf( stream, "0c", status, _pdef_name(cpar),
 			 _valid_q(cpar) ? ' ' : '}' );
 	  }
 	}
