@@ -350,7 +350,7 @@
 
 #  Intel PC running Linux.
 #  ----------------------
-            ix86_Linux)
+            ix86_Linux|i686_Linux)
                AR_IN='ar r'
 	       CC='gcc'
                CFLAGS='-I$(STAR_INC) -O'
