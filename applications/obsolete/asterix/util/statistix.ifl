@@ -10,28 +10,25 @@ INTERFACE STATISTIX
       HELP      'This must either be a primitive object, or a binned dataset.'
    ENDPARAMETER
 
-   PARAMETER DEVICE
+   PARAMETER DEV
       POSITION  2
       TYPE      'LITERAL'
-      KEYWORD   'DEV'
       VPATH     'DEFAULT'
       DEFAULT   'C'
       PROMPT    'Enter name of output device: '
       HELP      'P = Printer; N = New file; O = Old file; Anything else = terminal'
    ENDPARAMETER
 
-   PARAMETER USEERRORS
+   PARAMETER WEIGHT
       TYPE      '_LOGICAL'
-      KEYWORD   'WEIGHT'
       VPATH     'DEFAULT'
       DEFAULT   YES
       PROMPT    'Do you want the VARIANCE information used (y/n)?'
       HELP      'If yes, then will weight the calculations accordingly.'
    ENDPARAMETER
 
-   PARAMETER USEQUALITY
+   PARAMETER QUALITY
       TYPE      '_LOGICAL'
-      KEYWORD   'QUALITY'
       VPATH     'DEFAULT'
       DEFAULT   YES
       PROMPT    'Do you want the DATA_QUALITY information used (y/n)?'

@@ -1,8 +1,6 @@
 interface IMOSAIC
 
-
    parameter      NUMBER
-      keyword     'NUMBER'
       position    1
       type        '_INTEGER'
       vpath       'PROMPT'
@@ -12,8 +10,7 @@ interface IMOSAIC
 #     range       1, 20
    endparameter
 
-   parameter      INPIC1
-      keyword     'INP1'
+   parameter      INP1
       position    2
       type        'UNIV'
       vpath       'PROMPT'
@@ -22,8 +19,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC2
-      keyword     'INP2'
+   parameter      INP2
       position    3
       type        'UNIV'
       ppath       'CURRENT'
@@ -32,8 +28,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC3
-      keyword     'INP3'
+   parameter      INP3
       type        'UNIV'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -41,8 +36,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC4
-      keyword     'INP4'
+   parameter      INP4
       type        'UNIV'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -50,8 +44,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC5
-      keyword     'INP5'
+   parameter      INP5
       type        'UNIV'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -59,8 +52,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC6
-      keyword     'INP6'
+   parameter      INP6
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -69,8 +61,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC7
-      keyword     'INP7'
+   parameter      INP7
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -79,8 +70,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC8
-      keyword     'INP8'
+   parameter      INP8
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -89,8 +79,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC9
-      keyword     'INP9'
+   parameter      INP9
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -99,8 +88,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC10
-      keyword     'INP10'
+   parameter      INP10
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -109,8 +97,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC11
-      keyword     'INP11'
+   parameter      INP11
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -119,8 +106,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC12
-      keyword     'INP12'
+   parameter      INP12
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -129,8 +115,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC13
-      keyword     'INP13'
+   parameter      INP13
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -139,8 +124,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC14
-      keyword     'INP14'
+   parameter      INP14
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -149,8 +133,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC15
-      keyword     'INP15'
+   parameter      INP15
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -159,8 +142,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC16
-      keyword     'INP16'
+   parameter      INP16
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -169,8 +151,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC17
-      keyword     'INP17'
+   parameter      INP17
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -179,8 +160,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC18
-      keyword     'INP18'
+   parameter      INP18
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -189,8 +169,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC19
-      keyword     'INP19'
+   parameter      INP19
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -199,8 +178,7 @@ interface IMOSAIC
       help        'Name of the IMAGE structure containing the next 2-d data array to be added'
    endparameter
 
-   parameter      INPIC20
-      keyword     'INP20'
+   parameter      INP20
       type        'UNIV'
       access      'READ'
       ppath       'CURRENT'
@@ -210,7 +188,6 @@ interface IMOSAIC
    endparameter
 
    parameter      XOFFSET
-      keyword     'XOFFSET'
       type        '_INTEGER'
       vpath       'PROMPT'
       ppath       'CURRENT,DYNAMIC'
@@ -219,7 +196,6 @@ interface IMOSAIC
    endparameter
 
    parameter      YOFFSET
-      keyword     'YOFFSET'
       type        '_INTEGER'
       vpath       'PROMPT'
       ppath       'CURRENT,DYNAMIC'
@@ -227,8 +203,7 @@ interface IMOSAIC
       help        'Give the y offset in pixels of the current data array from the first data array input'
    endparameter
 
-   parameter      OUTPUT
-      keyword     'OUT'
+   parameter      OUT
       type        'UNIV'
       vpath       'PROMPT'
       prompt      'Mosaic image'
@@ -236,7 +211,6 @@ interface IMOSAIC
    endparameter
 
    parameter      OTITLE
-      keyword     'OTITLE'
       type        '_CHAR'
       vpath       'DEFAULT'
       prompt      'Title for output image'
@@ -245,7 +219,6 @@ interface IMOSAIC
    endparameter
 
    parameter      AVERAGE
-      keyword     'AVERAGE'
       type        '_LOGICAL'
       access      'READ'
       vpath       'DEFAULT'

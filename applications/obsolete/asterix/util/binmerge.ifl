@@ -32,7 +32,6 @@ Interface BINMERGE
    Parameter OUT
       position    1
       type        'UNIV'
-      keyword     'OUT'
       association '->GLOBAL.BINDS'
       prompt      'Output dataset'
    EndParameter

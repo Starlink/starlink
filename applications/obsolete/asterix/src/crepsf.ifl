@@ -1,6 +1,5 @@
 INTERFACE CREPSF
   parameter OUT
-    keyword 'OUT'
     position 1
     TYPE 'UNIV'
     association '->global.binds'
@@ -63,7 +62,6 @@ INTERFACE CREPSF
   endparameter
   parameter PSF
     type '_char'
-    keyword 'psf'
     vpath 'prompt'
     ppath 'dynamic,default'
     prompt 'Choose PSF to use for search'

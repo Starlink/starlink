@@ -2,7 +2,6 @@ Interface EVCSUBSET
    Parameter INP
       position    1
       type        'UNIV'
-      keyword     'INP'
       ppath       'GLOBAL'
       association '<-GLOBAL.EVDS'
       prompt      'Enter name of input dataset'
@@ -12,7 +11,6 @@ Interface EVCSUBSET
    Parameter OUT
       position    2
       type        'UNIV'
-      keyword     'OUT'
       association '->GLOBAL.EVDS'
       prompt      'Enter name of output dataset'
       help        'A new event dataset will be created'

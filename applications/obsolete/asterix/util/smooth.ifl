@@ -1,8 +1,7 @@
 	INTERFACE SMOOTH
 
-	    PARAMETER INPUT
+	    PARAMETER INP
                POSITION 1
-               KEYWORD 'INP'
                TYPE    'UNIV'
                PROMPT  'Input Data File '
                PPATH   'GLOBAL,CURRENT'
@@ -11,9 +10,8 @@
                HELP    'Datafile to smooth'
             ENDPARAMETER
 
-	    PARAMETER OUTPUT
+	    PARAMETER OUT
                POSITION 2
-               KEYWORD 'OUT'
                TYPE    'UNIV'
                PROMPT  'Output Data File '
                ASSOCIATION  '->GLOBAL.BINDS'

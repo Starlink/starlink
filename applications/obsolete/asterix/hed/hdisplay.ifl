@@ -7,9 +7,8 @@
        help 'Full path name of object to be displayed'
        ASSOCIATION '<->GLOBAL.HDSOBJ'
     ENDPARAMETER
-   parameter DEVICE
+   parameter DEV
      position 2
-     keyword 'DEV'                                                            
      type '_CHAR'
      vpath 'default'
      default 'TERMINAL'
@@ -30,9 +29,8 @@
      prompt 'Slice'                                                         
      help 'Should have format: i1:i2,j1:j2'                                      
    endparameter                                                                  
-   parameter FORMAT                                                              
+   parameter FMT
      type '_CHAR'
-     keyword 'FMT'                                         
      vpath 'default'                                                      
      default !
      prompt 'Output format'                                                      

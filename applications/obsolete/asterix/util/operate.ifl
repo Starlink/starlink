@@ -19,7 +19,6 @@ Interface OPERATE
    Parameter OPER
       position    3
       type        'LITERAL'
-      keyword     'OPER'
       prompt      'Required operation'
       help        '-, Abs, Log, Log10, Sqrt, Exp, or 10**'
    EndParameter
@@ -27,7 +26,6 @@ Interface OPERATE
    Parameter OVER
       type        '_LOGICAL'
       default     N
-      keyword     'OVER'
       vpath       'DEFAULT'
       prompt      'Overwrite existing output object?'
       help        'If yes then you will only be prompted for one dataset'

@@ -14,9 +14,8 @@ Interface EVLIST
       help        'A single pair of numbers is required'
    EndParameter
 
-   Parameter DEVICE
+   Parameter DEV
       TYPE        'LITERAL'
-      KEYWORD     'DEV'
       VPATH       'DEFAULT'
       DEFAULT     'TERMINAL'
       PROMPT      'Enter code for output device'

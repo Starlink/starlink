@@ -2,7 +2,6 @@ Interface EVPOLAR
    Parameter INP
       position    1
       type        'UNIV'
-      keyword     'INP'
       ppath       'GLOBAL'
       association '<-GLOBAL.EVDS'
       prompt      'Enter name of input dataset'
@@ -12,7 +11,6 @@ Interface EVPOLAR
    Parameter OUT
       position    2
       type        'UNIV'
-      keyword     'OUT'
       association '->GLOBAL.BINDS'
       prompt      'Enter name of the output dataset'
       help        'This will be a binned dataset.'

@@ -16,7 +16,6 @@ Interface ARITHMETIC
    Parameter OUT
       position    3
       type        'UNIV'
-      keyword     'OUT'
       prompt      'Output dataset'
       help        'This may be the same as either input data object, if not prim.'
    EndParameter
@@ -24,29 +23,25 @@ Interface ARITHMETIC
    Parameter OPER
       position    4
       type        '_CHAR'
-      keyword     'OPER'
       prompt      'Operator (+,-,*,/)'
       help        'Enter one of above options'
       in          '+','-','*','/'
    EndParameter
 
-   Parameter ERR1
+   Parameter ERRRO1
       type        'UNIV'
-      keyword     'ERROR1'
       prompt      'Error value(s) for first object'
       help        'Enter ''!'' if no errors required, otherwise a primitive HDS data object or a scalar number'
    EndParameter
 
-   Parameter ERR2
+   Parameter ERROR2
       type        'UNIV'
-      keyword     'ERROR2'
       prompt      'Error value(s) for second object'
       help        'Enter ''!'' if no errors required, otherwise a primitive HDS data object or a scalar number'
    EndParameter
 
    Parameter OVER
       type        '_LOGICAL'
-      keyword     'OVER'
       default      N
       vpath       'DEFAULT'
       prompt      'Overwrite first input data object?'
@@ -55,7 +50,6 @@ Interface ARITHMETIC
 
    Parameter ERRORS
       type        '_LOGICAL'
-      keyword     'ERRORS'
       default      N
       vpath       'DEFAULT'
       prompt      'Prompt for errors for primitive input?'

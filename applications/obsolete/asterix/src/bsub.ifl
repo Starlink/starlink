@@ -1,6 +1,5 @@
 INTERFACE BSUB
   parameter INP
-    keyword 'INP'
     position 1
     TYPE 'UNIV'
     vpath 'prompt'
@@ -9,7 +8,6 @@ INTERFACE BSUB
     prompt 'Input file'
   endparameter
   parameter OUT
-    keyword 'OUT'
     position 2
     TYPE 'UNIV'
     association '->global.binds'
@@ -67,7 +65,6 @@ INTERFACE BSUB
   endparameter
   parameter PSF
     type '_char'
-    keyword 'psf'
     vpath 'prompt'
     ppath 'dynamic,default'
     prompt 'Choose PSF to use for search'

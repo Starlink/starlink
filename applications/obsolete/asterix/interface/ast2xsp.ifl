@@ -1,6 +1,5 @@
 interface AST2XSP
-  parameter INPUT
-    keyword 'INP'
+  parameter INP
     type 'UNIV'
     position 1
     prompt 'Input dataset'
@@ -10,5 +9,12 @@ interface AST2XSP
     type '_INTEGER'
     prompt 'Number of spectra to use'
     help 'e.g. spectra number 4'
+  endparameter
+  parameter OUT
+    position 2
+    type   'LITERAL'
+    ppath  'DYNAMIC'
+    prompt 'Output file root'
+    help   'Spectrum will have extension .pha, and the response .rsp'
   endparameter
 endinterface

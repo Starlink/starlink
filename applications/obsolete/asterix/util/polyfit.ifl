@@ -15,17 +15,15 @@ Interface POLYFIT
       prompt      'Output file'
    EndParameter
 
-   Parameter    POLY_DEGREE
+   Parameter    DEGREE
       position    3
       type        '_INTEGER'
-      keyword     'DEGREE'
       prompt      'Degree of polynomial'
       help        'This must be an integer number between 0 - 10 inclusive'
    EndParameter
 
-   Parameter    POLYFIT
+   Parameter    FIT
       type      '_LOGICAL'
-      keyword   'FIT'
       vpath     'DEFAULT'
       default   T
       prompt    'FIT (T) or DTREND (F) mode ?'
@@ -41,7 +39,6 @@ Interface POLYFIT
    EndParameter
    Parameter    OVER
       type      '_LOGICAL'
-      keyword   'OVERWRITE'
       vpath     'DEFAULT'
       default   FALSE
       help      'Allows input file/object to be overwritten'

@@ -7,9 +7,8 @@
        help 'Full name of object whose components are to be listed'
        ASSOCIATION '<->GLOBAL.HDSOBJ'                                           
     ENDPARAMETER                                                                
-   parameter DEVICE                                                             
+   parameter DEV
      position 2                                                                 
-     keyword 'DEV'                                                           
      type '_CHAR'                                                               
      vpath 'default'                                                            
      default 'TERMINAL'                                                         

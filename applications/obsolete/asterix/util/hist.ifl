@@ -9,20 +9,18 @@ INTERFACE HIST
     HELP        'Dataset whose history is to be displayed'
   ENDPARAMETER
 
-  PARAMETER DEVICE
+  PARAMETER DEV
     POSITION    2
     TYPE        'LITERAL'
-    KEYWORD     'DEV'
     VPATH       'DEFAULT,PROMPT'
     DEFAULT     'TERMINAL'
     PROMPT      'Output device'
     HELP        'Type C=Console,P=Printer,O=Oldfile,N=Newfile ; anything else = filename'
   ENDPARAMETER
 
-  PARAMETER LINES_OF_TEXT
+  PARAMETER LINES
     POSITION    3
     TYPE        '_INTEGER'
-    KEYWORD     'LINES'
     VPATH       'DEFAULT'
     PROMPT      'Maximum number of lines of text required per record'
     HELP        'Up to 200 lines are allowed in any history record'
