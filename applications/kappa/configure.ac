@@ -40,6 +40,9 @@ STAR_DECLARE_DEPENDENCIES([build], [agi ast chr cnf fio grp hds ifd kaplibs mag 
 dnl The KAPPA link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [ard kaplibs one shl], [link])
 
+dnl We use the sst package to build documentation (prohlp)
+STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
+
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun95 sun221)
