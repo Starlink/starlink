@@ -8,6 +8,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 rv_x_SOURCES = input.f  ktest.f  opr.fpp  opw.f  rvmain.f  rvml.f  tran.f
 
+opr.f: opr.fpp
+
 rv_x_LDADD = `sla_link`
 
 
