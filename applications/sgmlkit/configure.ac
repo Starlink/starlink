@@ -15,6 +15,15 @@ AC_PATH_PROG(DVI2BITMAP, dvi2bitmap, dvi2bitmap)
 AC_PATH_PROG(PYTHON, python, python)
 AC_PROG_LN_S
 
+# We need dvi2bitmap in order to build the sgmlkit documentation
+STAR_DECLARE_DEPENDENCIES(sourceset, dvi2bitmap)
+
+STAR_PREDIST_SOURCES(doc/dtd2sgml/CATALOG)
+
+dnl FIXME: This is VERY dodgy, especially if I want to remove @PREDIST@
+dnl and reimplement that functionality using an automake conditional.
+dnl $PREDIST is null if we're in the predist state.
+if test -z "$PREDIST"; then
 # The documentation requires Earl Hood's perlSGML library.  See
 # http://search.cpan.org/~ehood/perlSGML.1997Sep18/
 # This is imported into this repository in directory
@@ -35,11 +44,19 @@ else
     # make PERLSGMLDIR absolute
     PERLSGMLDIR=`cd $PERLSGMLDIR; pwd`
 fi
+
+else # in post-distribution state
+    PERLSGMLDIR=
+fi
 AC_SUBST(PERLSGMLDIR)
+
+# Documentation is in SSN/70, but this is not built in the default way
+STAR_XML_DOCUMENTATION(ssn70,
+                       [doc/ssn70/ssn70.htx_tar doc/ssn70/ssn70.texml_tar])
+
 
 
 AC_CONFIG_FILES([Makefile component.xml \
-                 doc/dtd2sgml/Makefile doc/ssn70/Makefile \
                  dsssl/sl/common/slparams.dsl dsssl/sl/lib/Makefile])
 AC_CONFIG_FILES(lib/img-eqlist.pl, [chmod +x lib/img-eqlist.pl])
 # bin scripts are postprocessed from *.x at build time -- see Makefile.am
