@@ -11,7 +11,7 @@ use Getopt::Long;
 # Need to find output file
 my $outfile = "grexec.f";
 my $result = GetOptions( "outfile=s" => \$outfile );
-print "Outfile is $outfile with $result\n";
+print "Outfile is $outfile\n";
 
 my @files = @ARGV;
 
@@ -70,7 +70,7 @@ my %counts = (
 	      XADRIV => 0,
 	      TKDRIV => 0,
 	      RVDRIV => 0,
-	      GWMDRIV => 0,
+	      GWMDRIV => 1,
 	     );
 
 # First need to find all the driv files
@@ -112,7 +112,9 @@ for my $drv (@entries) {
   for my $i (1..$max) {
     $devnum++;
     my $index = ",$i";
-    $index = '' if $max == 1;
+    # note that if $counts{$drv} is 1 rather than 0 we should include
+    # the argument
+    $index = '' if ($max == 1 && $counts{$drv} != 1);
     push(@lines, "      ELSE IF (IDEV .EQ. $devnum) THEN\n");
     push(@lines, "        CALL $ldrv(IFUNC,RBUF,NBUF,CHR,LCHR$index)\n");
   }
