@@ -59,7 +59,6 @@ SOURCES =
 DIST_SOURCES =
 dataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(data_DATA)
-SUFFIXES = .tex .dvi .ps .htx_tar
 INSTALL_STARDATA = $(INSTALL_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -80,8 +79,6 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CYGPATH_W = @CYGPATH_W@
-DEFAULT_PREFIX = @DEFAULT_PREFIX@
-DEFAULT_STARLINK = @DEFAULT_STARLINK@
 DEFS = @DEFS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -106,6 +103,9 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+STARCONF_DEFAULT_PREFIX = @STARCONF_DEFAULT_PREFIX@
+STARCONF_DEFAULT_STARLINK = @STARCONF_DEFAULT_STARLINK@
+STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_STRIP = @ac_ct_STRIP@
@@ -153,34 +153,36 @@ CLEANFILES = starconf make-starconf starconf.m4
 # could legitimately be done at configure time -- it does not have to
 # be done this late -- but that would require us to have more than one
 # substitution step, which would be too confusing and messy.
+#
+# The set of !!...!!-substituted variables should be consistent with those in 
+# make-starconf.in
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
-	-e 's,@DEFAULT_STARLINK\@,@DEFAULT_STARLINK@,g' \
-	-e 's,@DEFAULT_PREFIX\@,@DEFAULT_PREFIX@,g' \
+	-e 's,@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g' \
+	-e 's,@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g' \
 	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
 	-e 's,@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g'
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -265,8 +267,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -279,17 +280,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-.tex.htx_tar:
-	- star2html $<
-	tar cf $@ ${<:.tex=.htx}
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
