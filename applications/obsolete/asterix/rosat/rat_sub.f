@@ -529,13 +529,20 @@
         call dat_name(loc,name,status)
         print *,name
         call dat_struc(loc,valid,status)
-        print *,valid
+        print *,'struc',valid
         call dat_ncomp(loc,dummy,status)
-	print *,dummy
+	print *,'ncomp',dummy
+        call dat_size(loc,dummy,status)
+	print *,'size',dummy
+        call dat_paren(loc,ploc,status)
+        call dat_name(ploc,name,status)
+	print *,'parent',name
         call dat_clone(loc,cloc,status)
-        call dat_there(cloc,'head',valid,status)
-        print *,valid
-        call dat_find(cloc,'head',aloc,status)
+	print *,'cloned'
+        call dat_index(cloc,1,aloc,status)
+c        call dat_there(cloc,'head',valid,status)
+c        print *,valid
+c        call dat_find(cloc,'head',aloc,status)
 c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
 	print *,1
