@@ -28,9 +28,8 @@
 *     co-ordinates to input pixel indices.  The two arrays may have
 *     different numbers of dimensions. In addition a variance array may
 *     be created likewise.
-
-*     This operates with double-precision co-ordinates.  Use KPG1_TRLIx
-*     for single precision.
+*
+*     This operates with double-precision co-ordinates.
 
 *  Arguments:
 *     NDIMI = INTEGER (Given)
@@ -269,7 +268,7 @@
       IF ( NDIMI .LT. 2 .OR. NDIMI .GT. NDF__MXDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIMI )
-         CALL ERR_REP( 'KPG1_ASLIx_INVDIM',
+         CALL ERR_REP( 'CCG1_ASLIx_INVDIM',
      :     'Unable to interpolate an array with '/
      :     /'dimensionality of ^NDIM. (Programming error.)', STATUS )
          GOTO 999
@@ -295,7 +294,7 @@
          CALL MSG_SETI( 'NCOUT', NCOUT )
          CALL MSG_SETI( 'IN', NDIMI )
          CALL MSG_SETI( 'OUT', NDIMO )
-         CALL ERR_REP( 'KPG1_ASLIx_MISMATCH',
+         CALL ERR_REP( 'CCG1_ASLIx_MISMATCH',
      :    'There is a mismatch between the number of values '/
      :    /'(^NCIN -> NCOUT) in the supplied transformation and the '/
      :    /'number of dimensions of the arrays (^IN -> ^OUT).', STATUS )
@@ -425,12 +424,8 @@
 
 *   Convert the co-ordinates for those of the output array, to those
 *   of the input array.
-*                 CALL AST_SET(IWCS, 'Report=1', STATUS)
                  CALL AST_TRANN( IWCS, ODIMS( 1 ), NCOUT, OEL,
      :                 COOUT, .FALSE., NCIN, OEL, COIN, STATUS )
-
-*                 CALL TRN_TRND( .TRUE., OEL, NCOUT, ODIMS( 1 ), COOUT,
-*     :                     IWCS, OEL, NCIN, COIN, STATUS )
 
 *   In turn convert those co-ordinates to fractional element indices.
 *   Note that when elements are found beyond the axis range, the called

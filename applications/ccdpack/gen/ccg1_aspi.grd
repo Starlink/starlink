@@ -94,7 +94,7 @@
 
 *  History:
 *     10-MAR-1999 (AA):
-*        Original version, based on KPG1_TRPI.GRD.
+*        Original version, based on CCG1_TRPI.GRD.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -167,7 +167,7 @@
       IF ( NDIMI .LT. 1 .OR. NDIMI .GT. NDF__MXDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIMI )
-         CALL ERR_REP( 'KPG1_ASPIx_INVDIM',
+         CALL ERR_REP( 'CCG1_ASPIx_INVDIM',
      :     'Unable to interpolate an array with '/
      :     /'dimensionality of ^NDIM. (Programming error.)', STATUS )
          GOTO 999
@@ -188,7 +188,7 @@
          CALL MSG_SETI( 'NCOUT', NCOUT )
          CALL MSG_SETI( 'IN', NDIMI )
          CALL MSG_SETI( 'OUT', NDIMO )
-         CALL ERR_REP( 'KPG1_ASPIx_MISMATCH',
+         CALL ERR_REP( 'CCG1_ASPIx_MISMATCH',
      :    'There is a mismatch between the number of values '/
      :    /'(^NCIN -> NCOUT) in the supplied transformation and the '/
      :    /'number of dimensions of the arrays (^IN -> ^OUT).', STATUS )
