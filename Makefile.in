@@ -6,7 +6,16 @@
 prefix=@prefix@
 MANIFEST=$(prefix)/manifests
 
-# Keep the following in alphabetical order
+# Keep the following in alphabetical order.  We don't actually _have_ to
+# include everything here, just enough to imply all the others that we
+# really need.  However, it does no harm to include more components than
+# minimally necessary.
+#
+# Targets not to include:
+#     No buildsupport targets: 'buildsupport' handles them below.
+#     No pseudo-components such as pcs, installing which actually installs
+#         multiple components, with some being potentially out of
+#         dependency order.
 ALL_TARGETS = \
 	$(MANIFEST)/adam \
 	$(MANIFEST)/ams \
@@ -27,13 +36,11 @@ ALL_TARGETS = \
 	$(MANIFEST)/msp \
 	$(MANIFEST)/par \
 	$(MANIFEST)/parsecon \
-	$(MANIFEST)/pcs \
 	$(MANIFEST)/psx \
 	$(MANIFEST)/sae \
 	$(MANIFEST)/sla \
 	$(MANIFEST)/sock \
 	$(MANIFEST)/sst \
-	$(MANIFEST)/starconf \
 	$(MANIFEST)/string \
 	$(MANIFEST)/subpar \
 	$(MANIFEST)/task

@@ -3,13 +3,17 @@
 # and that file should define the variable MANIFEST
 # to point to the directory which contains the collection
 # of manifest files, typically /star/manifests.
+#
+# If the environment variable BUILDSUPPORT_PREFIX is defined
+# then the buildsupport tools will be REconfigured when they
+# are built; if not, they must be configured already.
 
 
 $(MANIFEST)/adam: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/sae
 	cd libraries/pcs/adam \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/adamnet: \
 		$(MANIFEST)/adam \
@@ -30,7 +34,7 @@ $(MANIFEST)/adamnet: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/adamnet \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/ams: \
 		$(MANIFEST)/adam \
@@ -48,7 +52,43 @@ $(MANIFEST)/ams: \
 		$(MANIFEST)/sock \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/ams \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/ard: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/grp \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/subpar
+	cd libraries/ard \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/ary: \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/ary \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/ast: \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/sst \
+		$(MANIFEST)/star2html
+	cd libraries/ast \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/atimer: \
 		$(MANIFEST)/cnf \
@@ -56,31 +96,50 @@ $(MANIFEST)/atimer: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pcs/atimer \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/autoconf:
 	cd thirdparty/fsf/autoconf \
-		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
-		&& make>make.log && make install-manifest>>make.log
+	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
+	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
+	            >configure-output.log; \
+	    elif test ! -f Makefile; then \
+	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
+	          echo $t >configure-output.log; echo $t >&2; \
+	          exit 1; }; \
+	    else \
+	        echo "No configuration necessary" >configure-output.log; \
+	    fi \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/automake: \
 		$(MANIFEST)/autoconf \
 		$(MANIFEST)/libtool
 	cd thirdparty/fsf/automake \
-		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
-		&& make>make.log && make install-manifest>>make.log
+	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
+	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
+	            >configure-output.log; \
+	    elif test ! -f Makefile; then \
+	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
+	          echo $t >configure-output.log; echo $t >&2; \
+	          exit 1; }; \
+	    else \
+	        echo "No configuration necessary" >configure-output.log; \
+	    fi \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/chr: \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/chr \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/cnf: \
 		$(MANIFEST)/star2html
 	cd libraries/cnf \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/dtask: \
 		$(MANIFEST)/adam \
@@ -96,7 +155,7 @@ $(MANIFEST)/dtask: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/dtask \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/ems: \
 		$(MANIFEST)/cnf \
@@ -104,12 +163,13 @@ $(MANIFEST)/ems: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/ems \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/fio: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/lex \
@@ -117,11 +177,46 @@ $(MANIFEST)/fio: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd libraries/fio \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/grp: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/messys \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
-	cd libraries/fio \
-		&& make>make.log && make install-manifest>>make.log
+	cd libraries/grp \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/gsd: \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/gsd \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/gwm: \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/gwm \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/hds: \
 		$(MANIFEST)/cnf \
@@ -130,34 +225,78 @@ $(MANIFEST)/hds: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/hds \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/hdspar: \
 		$(MANIFEST)/sae
 	cd libraries/pcs/hdspar \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/hlp: \
 		$(MANIFEST)/star2html
 	cd libraries/hlp \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/idi: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd libraries/idi \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/lex: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pcs/lex \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/libtool:
 	cd thirdparty/fsf/libtool \
-		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
-		&& make>make.log && make install-manifest>>make.log
+	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
+	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
+	            >configure-output.log; \
+	    elif test ! -f Makefile; then \
+	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
+	          echo $t >configure-output.log; echo $t >&2; \
+	          exit 1; }; \
+	    else \
+	        echo "No configuration necessary" >configure-output.log; \
+	    fi \
+	    && make>make.log && make install-manifest>>make.log
 
-$(MANIFEST)/m4:
-	cd thirdparty/fsf/m4 \
-		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
-		&& make>make.log && make install-manifest>>make.log
+$(MANIFEST)/mag: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd libraries/mag \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/mers: \
 		$(MANIFEST)/cnf \
@@ -166,24 +305,24 @@ $(MANIFEST)/mers: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/mers \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/messgen: \
 		$(MANIFEST)/star2html
 	cd applications/messgen \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/messys: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pcs/messys \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/misc: \
 		$(MANIFEST)/cnf
 	cd libraries/pcs/misc \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/msp: \
 		$(MANIFEST)/messgen \
@@ -191,7 +330,31 @@ $(MANIFEST)/msp: \
 		$(MANIFEST)/sock \
 		$(MANIFEST)/star2html
 	cd libraries/pcs/msp \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/nbs: \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/nbs \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/ndf: \
+		$(MANIFEST)/ary \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/trn \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/par: \
 		$(MANIFEST)/adam \
@@ -207,7 +370,7 @@ $(MANIFEST)/par: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/par \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/parsecon: \
 		$(MANIFEST)/adam \
@@ -223,7 +386,7 @@ $(MANIFEST)/parsecon: \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/parsecon \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/pcs: \
 		$(MANIFEST)/adam \
@@ -248,36 +411,56 @@ $(MANIFEST)/pcs: \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/task
 	cd libraries/pcs \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/pda: \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/pda \
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/prm: \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/prm \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/psx: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/psx \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/ref: \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/ref \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sae: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/star2html
 	cd libraries/sae \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sla: \
 		$(MANIFEST)/star2html
 	cd libraries/sla \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sock: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pcs/sock \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/ssn78:
 	cd docs/ssn78 \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sst: \
 		$(MANIFEST)/adam \
@@ -299,26 +482,35 @@ $(MANIFEST)/sst: \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/task
 	cd applications/sst \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/star2html:
 	cd applications/star2html \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/starconf: \
 		$(MANIFEST)/autoconf \
 		$(MANIFEST)/automake \
 		$(MANIFEST)/libtool
 	cd buildsupport/starconf \
-		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
-		&& make>make.log && make install-manifest>>make.log
+	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
+	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
+	            >configure-output.log; \
+	    elif test ! -f Makefile; then \
+	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
+	          echo $t >configure-output.log; echo $t >&2; \
+	          exit 1; }; \
+	    else \
+	        echo "No configuration necessary" >configure-output.log; \
+	    fi \
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/string: \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/sae
 	cd libraries/pcs/string \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/subpar: \
 		$(MANIFEST)/adam \
@@ -332,7 +524,7 @@ $(MANIFEST)/subpar: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/pcs/subpar \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/task: \
 		$(MANIFEST)/adam \
@@ -349,7 +541,19 @@ $(MANIFEST)/task: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/task \
-		&& make>make.log && make install-manifest>>make.log
+	    && make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/trn: \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
+	cd libraries/trn \
+	    && make>make.log && make install-manifest>>make.log
 
 buildsupport: \
 		$(MANIFEST)/autoconf \
