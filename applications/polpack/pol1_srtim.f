@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, 
-     :                       ORIGIN, BIN, ANGRT, WORK, NOUT, PHI, LBND, 
-     :                       UBND, STATUS )
+     :                       ORIGIN, BIN, ANGRT, WORK, NOUT, PHI, NDIMO,
+     :                       LBND, UBND, STATUS )
 *+
 *  Name:
 *     POL1_SRTIM
@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN, 
-*                      BIN, ANGRT, WORK, NOUT, PHI, LBND, UBND, STATUS )
+*                      BIN, ANGRT, WORK, NOUT, PHI, NDIMO, LBND, UBND, 
+*                      STATUS )
 
 *  Description:
 *     This routine identifies the analysis angle bin to which each 
@@ -43,25 +44,28 @@
 *     ANGRT = REAL (Returned)
 *        The ACW angle from the +ve X axis in each output image to the
 *        output reference direction, in degrees.
-*     WORK( NBIN, -4 : NNDF ) = INTEGER (Returned)
+*     WORK( NBIN, -6 : NNDF ) = INTEGER (Returned)
 *        An array containing a column for each analysis angle bin.
 *        The row 0 contains the number of input NDFs in the bin. If 
 *        this value is N, then rows 1 to N contain a list of the N 
 *        input NDFs in the bin. Each NDF is identified by its index 
-*        within the supplied group. Rows -1 to -4 contains the pixel 
+*        within the supplied group. Rows -1 to -6 contains the pixel 
 *        bounds which span just the corresponding input NDFs, in the order
-*        LBND1, LBND2, UBND1, UBND2.
+*        LBND1, LBND2, UBND1, UBND2, (LBND3, UBND3).
 *     NOUT = INTEGER (Returned)
 *        The number of analysis angle bins containing MININ or more input NDFs.
 *     PHI( NNDF ) = INTEGER (Returned)
 *        The acw angle from output ref. direction (see ANGRT) to the 
 *        effective analyser position in each input NDF, in degrees.
-*     LBND( 3 ) = INTEGER (Given)
+*     NDIMO = INTEGER (Returned)
+*        The number of axes in the output stack; 3 if the inputs are 2d, and 4
+*        if the inputs are 3d.
+*     LBND( 4 ) = INTEGER (Returned)
 *        Lower pixel index bounds which span all the input images. The
-*        third axis is set to 1.
-*     UBND( 3 ) = INTEGER (Given)
+*        last (NDIMO'th) axis is set to 1.
+*     UBND( 4 ) = INTEGER (Returned)
 *        Upper pixel index bounds which span all the input images. The
-*        third axis is set to NOUT.
+*        last (NDIMO'th) axis is set to NOUT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -79,6 +83,8 @@
 *        Added RANGE argument.
 *     1-JUL-1999 (DSB):
 *        Added ORIGIN and ILEVEL arguments.
+*     19-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,11 +113,12 @@
 
 *  Arguments Returned:
       REAL ANGRT
-      INTEGER WORK( NBIN, -4 : NNDF )
+      INTEGER WORK( NBIN, -6 : NNDF )
       INTEGER NOUT
       REAL PHI( NNDF )
-      INTEGER LBND( 3 )
-      INTEGER UBND( 3 )
+      INTEGER NDIMO
+      INTEGER LBND( 4 )
+      INTEGER UBND( 4 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -125,10 +132,11 @@
       INTEGER IGNORE             ! No. of input NDFs not in any bin
       INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER IWCS               ! AST pointer to a WCS FrameSet
-      INTEGER LBNDI( 2 )         ! Lower bounds of input NDF
+      INTEGER LBNDI( 3 )         ! Lower bounds of input NDF
+      INTEGER NAX                ! Required no. of axes
       INTEGER NDIM               ! No. of axes in input NDF
       INTEGER NIN                ! No. of input NDFs in the current bin
-      INTEGER UBNDI( 2 )         ! Upper bounds of input NDF
+      INTEGER UBNDI( 3 )         ! Upper bounds of input NDF
       LOGICAL THERE              ! Does item exists?
       REAL ALPHA                 ! Angle from analyser to PRD
       REAL ANGROT                ! Angle from first image axis to the SRD
@@ -150,14 +158,20 @@
          WORK( I, -2 ) = VAL__MAXI
          WORK( I, -3 ) = VAL__MINI
          WORK( I, -4 ) = VAL__MINI
+         WORK( I, -5 ) = VAL__MAXI
+         WORK( I, -6 ) = VAL__MINI
 
       END DO
 
 *  Initialise the returned global pixel bounds.
       LBND( 1 ) = VAL__MAXI
       LBND( 2 ) = VAL__MAXI
+      LBND( 3 ) = VAL__MAXI
+      LBND( 4 ) = VAL__MAXI
       UBND( 1 ) = VAL__MINI
       UBND( 2 ) = VAL__MINI
+      UBND( 3 ) = VAL__MINI
+      UBND( 4 ) = VAL__MINI
 
 *  Display a blank line if details of the input NDFs are to be displayed.
       IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
@@ -171,8 +185,25 @@
 *  Get the current NDF identifier.
          CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
 
-*  Get the NDF bounds and check it is 2-dimensional.
-         CALL NDF_BOUND( INDF, 2, LBNDI, UBNDI, NDIM, STATUS )
+*  Get the NDF bounds and check it is 2 or 3-dimensional.
+         CALL NDF_BOUND( INDF, 3, LBNDI, UBNDI, NDIM, STATUS )
+
+*  If this is not the first NDF, check it has the same number of axes. 
+         IF( I .EQ. 1 ) THEN
+	    NAX = NDIM
+	    NDIMO = NDIM + 1
+	 END IF
+	 
+	 IF( NDIM .NE. NAX .AND. STATUS .EQ. SAI__OK ) THEN
+	    STATUS = SAI__ERROR
+	    CALL MSG_SETI( 'N', NDIM )
+	    CALL MSG_SETI( 'M', NAX )
+	    CALL NDF_MSG( 'NDF', INDF ) 
+	    CALL ERR_REP( 'POL1_SRTIM_ERR1', 'NDF ''^NDF'' is ^N '//
+     :                    'dimensional, but the first NDF was ^M '//
+     :                    'dimensional.', STATUS )
+            GO TO 999
+	 END IF
 
 *  See if the NDF has a POLPACK extension. If not, report an error.
          CALL NDF_XSTAT( INDF, 'POLPACK', THERE, STATUS )
@@ -282,6 +313,13 @@
             UBND( 1 ) = MAX( UBNDI( 1 ), UBND( 1 ) )
             UBND( 2 ) = MAX( UBNDI( 2 ), UBND( 2 ) )
 
+            IF( NDIM .EQ. 3 ) THEN
+               WORK( IBIN, -5 ) = MIN( LBNDI( 3 ), WORK( IBIN, -5 ) )
+               WORK( IBIN, -6 ) = MAX( UBNDI( 3 ), WORK( IBIN, -6 ) )
+               LBND( 3 ) = MIN( LBNDI( 3 ), LBND( 3 ) )
+               UBND( 3 ) = MAX( UBNDI( 3 ), UBND( 3 ) )
+	    END IF  
+
 *  Increment the number of illegal bin numbers.
          ELSE
             IGNORE = IGNORE + 1
@@ -323,9 +361,9 @@
          END IF
       END DO
 
-*  Set the bounds of the third axis of the output stack.
-      LBND( 3 ) = 1
-      UBND( 3 ) = NOUT
+*  Set the bounds of the last axis of the output stack.
+      LBND( NDIMO ) = 1
+      UBND( NDIMO ) = NOUT
 
 *  Warn the user of any NDFs were not include din a bin.
       IF( IGNORE .EQ. 1  ) THEN

@@ -21,15 +21,17 @@
 
 *  Description:
 *     This application combines a set of intensity images into a smaller
-*     number of similar intensity images. The input images must all be
-*     aligned pixel-for-pixel. Each output image corresponds to a range 
-*     of analysis angle, and is formed by stacking together the input 
-*     images which have analysis angles within the range of the output 
+*     number of similar intensity images (it may also be used to combine 
+*     intensity cubes containing spectropolarimetry data). The input images
+*     must all be aligned pixel-for-pixel. Each output image corresponds to
+*     a range of analysis angle, and is formed by stacking together the  
+*     input images which have analysis angles within the range of the output 
 *     image. The variance component of each output image is set to hold 
 *     the standard error of the input images which contribute to the 
 *     output image. The output images may, for instance, be processed by 
-*     POLCAL. In addition, a 3D stack may be created containing all the 
-*     output images in a single data array (see parameter STACK). 
+*     POLCAL. In addition, a 3D (or 4D if processing spectropolarimetry data) 
+*     stack may be created containing all the output images in a single data
+*     array - see parameter STACK. 
 *
 *     The same reference direction in used for all output images, and is
 *     equal to the reference direction in the first input image. For each
@@ -79,8 +81,8 @@
 *        details of the input images, and further details of each output
 *        image. [1]
 *     IN = NDF (Read)
-*        A group specifying the names of the input intensity images. This
-*        may take the form of a comma separated list, or any of the other 
+*        A group specifying the names of the input intensity images or cubes.
+*        This may take the form of a comma separated list, or any of the other 
 *        forms described in the help on "Group Expressions". These images
 *        must be aligned pixel-for-pixel.
 *     MININ = _INTEGER (Read)
@@ -93,18 +95,19 @@
 *        The run-time default is the current value, or 0.0 if there is no
 *        current value. []
 *     OUT = NDF (Read)
-*        A group specifying the names of the output intensity images. If
-*        the supplied string includes an asterisk (*) it is replaced by
+*        A group specifying the names of the output intensity images or cubes.
+*        If the supplied string includes an asterisk (*) it is replaced by
 *        an integer sequence number ranging from 1 to the number of
 *        output images. The sequence number increases monotonically with
 *        analyser position.
 *     STACK = NDF (Write)
-*        An optional 3-dimensional output cube. If created, each plane
-*        contains a copy of the output image with the same sequence number 
-*        (see parameter OUT). The analyser position corresponding to each
-*        plane is stored in the Axis structure for axis 3. No POLPACK
-*        extension is created. The stack is not created if a null (!) 
-*        value is supplied. [!]
+*        An optional 3-dimensional (or 4-dimensional when dealing with
+*        spectropolarimetry data) output cube. If created, each plane (or 
+*        cube) contains a copy of the output image (or cube) with the same
+*        sequence number (see parameter OUT). The analyser position 
+*        corresponding to each plane is stored in the Axis structure for the
+*        last axis. No POLPACK extension is created. The stack is not created
+*        if a null (!) value is supplied. [!]
 *     TWOPI = _LOGICAL (Read)
 *        If TRUE, then the range of analysis angles covered by the bins
 *        is 360 degrees, instead of 180 degrees. [FALSE]
@@ -140,6 +143,8 @@
 *        Added TWOPI parameter.
 *     1-JUL-1999 (DSB):
 *        Added ORIGIN parameter.
+*     19-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -170,13 +175,14 @@
       INTEGER IPSAX              ! Pointer to mapped centre array for axis 3
       INTEGER IPW1               ! Pointer to work array
       INTEGER IPPHI              ! Pointer to array of analysis angles
-      INTEGER LBND( 3 )          ! Lower pixel bounds for output stack
+      INTEGER LBND( 4 )          ! Lower pixel bounds for output stack
       INTEGER MININ              ! Min. no. of i/p images for an o/p image
       INTEGER NBIN               ! No. of analysis angle bins
+      INTEGER NDIMO              ! No. of axes in output NDF
       INTEGER NNDF               ! No. of input images to process      
       INTEGER NOUT               ! No. of output NDFs 
       INTEGER TLEN               ! Length of formated integer
-      INTEGER UBND( 3 )          ! Upper pixel bounds for output stack
+      INTEGER UBND( 4 )          ! Upper pixel bounds for output stack
       LOGICAL TWOPI              ! Bin over range 0 to 360 degrees?
       REAL ANGRT                 ! ACW angle from +ve X to o/p ref. direction
       REAL BIN                   ! Bin size
@@ -246,7 +252,7 @@
 
 *  Allocate an array in which to store a list of the input NDFs
 *  contributing to each output NDF, plus output pixel bounds.
-      CALL PSX_CALLOC( NBIN*( NNDF + 5 ), '_INTEGER', IPW1, STATUS )
+      CALL PSX_CALLOC( NBIN*( NNDF + 7 ), '_INTEGER', IPW1, STATUS )
 
 *  Allocate an array in which to store the analysis angle for each input 
 *  NDF.
@@ -256,7 +262,7 @@
 *  output reference direction.
       CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
      :                 BIN, ANGRT, %VAL( IPW1 ), NOUT, %VAL( IPPHI), 
-     :                 LBND, UBND, STATUS )
+     :                 LBND, UBND, NDIMO, STATUS )
 
 *  Abort if no output images will be created.
       IF( NOUT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
@@ -291,20 +297,22 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See if an output 3D stack is required.
-      CALL NDF_CREAT( 'STACK', '_REAL', 3, LBND, UBND, INDF, STATUS ) 
+      CALL NDF_CREAT( 'STACK', '_REAL', NDIMO, LBND, UBND, INDF, 
+     :                STATUS ) 
 
 *  If not annul the error.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
-*  If so, map the centre array for the 3rd axis.
+*  If so, map the centre array for the last axis.
       ELSE
-         CALL NDF_AMAP( INDF, 'Centre', 3, '_REAL', 'WRITE', IPSAX,
-     :                  NOUT, STATUS ) 
+         CALL NDF_AMAP( INDF, 'Centre', NDIMO, '_REAL', 'WRITE', 
+     :                  IPSAX, NOUT, STATUS ) 
 
 *  Set other axis attributes.
-         CALL NDF_ACPUT( 'Degrees', INDF, 'Units', 3, STATUS ) 
-         CALL NDF_ACPUT( 'Analyser position', INDF, 'Label', 3, STATUS ) 
+         CALL NDF_ACPUT( 'Degrees', INDF, 'Units', NDIMO, STATUS ) 
+         CALL NDF_ACPUT( 'Analyser position', INDF, 'Label', NDIMO,
+     :                   STATUS ) 
 
       END IF
 
@@ -319,8 +327,8 @@
             CALL POL1_STKIM( MININ, ANGRT, IGRP1, IGRP3, INDEX, INDF,
      :                       NBIN, NNDF, %VAL( IPW1 ), %VAL( IPPHI ),
      :                       ILEVEL, ( INDEX - 1 )*BIN + ORIGIN, 
-     :                       INDEX*BIN + ORIGIN, IOUT, %VAL( IPSAX ),
-     :                       STATUS )
+     :                       INDEX*BIN + ORIGIN, NDIMO - 1, IOUT, 
+     :                       %VAL( IPSAX ), STATUS )
          END IF
 
 *  Flush any error.

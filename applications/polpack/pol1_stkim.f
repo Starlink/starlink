@@ -1,6 +1,6 @@
       SUBROUTINE POL1_STKIM( MININ, ANGRT, IGRP1, IGRP2, IBIN, INDFT,
      :                       NBIN, NNDF, WORK, PHI, ILEVEL, BL, BH, 
-     :                       IOUT, SAXIS, STATUS )
+     :                       NAX, IOUT, SAXIS, STATUS )
 *+
 *  Name:
 *     POL1_STKIM
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_STKIM( MININ, ANGRT, IGRP1, IGRP2, IBIN, INDFT, NBIN, NNDF, 
-*                      WORK, PHI, ILEVEL, BL, BH, IOUT, SAXIS, STATUS )
+*                      WORK, PHI, ILEVEL, BL, BH, NAX, IOUT, SAXIS, STATUS )
 
 *  Description:
 *     This routine creates an output intensity image by stacking the 
@@ -32,20 +32,20 @@
 *     IBIN = INTEGER (Given)
 *        The IBIN of the output NDF to be created.
 *     INDFT = INTEGER (Given)
-*        An identifier for an output 3D stack to hold the output images.
+*        An identifier for an output 3/4D stack to hold the output images.
 *        Supplied equal to NDF__NOID if no stack is required.
 *     NBIN = INTEGER (Given)
 *        The number of analysis angle bins.
 *     NNDF = INTEGER (Given)
 *        The number of NDFs in the supplied group.
-*     WORK( NBIN, -4 : NNDF ) = INTEGER (Given)
+*     WORK( NBIN, -6 : NNDF ) = INTEGER (Given)
 *        An array containing a column for each analysis angle bin.
 *        The row 0 contains the number of input NDFs in the bin. If 
 *        this value is N, then rows 1 to N contain a list of the N 
 *        input NDFs in the bin. Each NDF is identified by its IBIN 
-*        within the supplied group. Rows -1 to -4 contains the pixel 
+*        within the supplied group. Rows -1 to -6 contains the pixel 
 *        bounds which span all the corresponding input NDFs, in the order
-*        LBND1, LBND2, UBND1, UBND2.
+*        LBND1, LBND2, UBND1, UBND2, (LBND3, UBND3).
 *     PHI( NNDF ) = INTEGER (Given)
 *        The acw angle from +ve X axis to the effective analyser position
 *        in each input NDF, in degrees.
@@ -55,11 +55,13 @@
 *        The lower analysis angle bound of the bin, in degrees.
 *     BH = REAL (Given)
 *        The upper analysis angle bound of the bin, in degrees.
+*     NAX = INTEGER (Given)
+*        The number of axes in each input NDF.
 *     IOUT = INTEGER (Given and Returned)
 *        The number of output NDFs created so far. Incremented by 1 on
 *        exit.
 *     SAXIS( * )= REAL (Given and Returned)
-*        The axis centre array for the 3rd axis of the output stack.
+*        The axis centre array for the last axis of the output stack.
 *        Ignored if INDFT is NDF__NOID.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -81,6 +83,8 @@
 *        Replaced argument QUIET with ILEVEL, and added extra reporting
 *        options. Create output NDF by propagation from first contributing
 *        input NDF (so that history is propagated).
+*     19-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,12 +111,13 @@
       INTEGER INDFT
       INTEGER NBIN
       INTEGER NNDF
-      INTEGER WORK( NBIN, -4 : NNDF )
+      INTEGER WORK( NBIN, -6 : NNDF )
       REAL PHI( NNDF )
       INTEGER ILEVEL
       REAL BL
       REAL BH
-
+      INTEGER NAX
+      
 *  Arguments Given and Returned:
       INTEGER IOUT
       REAL SAXIS( * )
@@ -138,11 +143,11 @@
       INTEGER IPVOUT             ! Pointer to output VARIANCE array
       INTEGER IPVP               ! Pointer to a plane of the VARIANCE stack
       INTEGER IWCS               ! AST pointer to a WCS FrameSet
-      INTEGER LBND( 3 )          ! Lower pixel bounds of output NDF
+      INTEGER LBND( 4 )          ! Lower pixel bounds of output NDF
       INTEGER NAMLEN             ! Length of name string
       INTEGER NERR               ! No. of numerical errors
       INTEGER NIN                ! No. of input NDFs in the current bin
-      INTEGER UBND( 3 )          ! Upper pixel bounds of output NDF
+      INTEGER UBND( 4 )          ! Upper pixel bounds of output NDF
       REAL ANGROT                ! Angle from first image axis to the ref. dirn
       REAL ANLANG                ! Angle from ref. dirn to effective analyser
       REAL ASUM                  ! Sum of input analysis angles
@@ -158,7 +163,7 @@
 *  Only proceed if the bin contains sufficient input images.
       IF( NIN .GE. MININ ) THEN
 
-*  Incrment the number of output images which will have been created on
+*  Increment the number of output images which will have been created on
 *  exit.
          IOUT = IOUT + 1
 
@@ -166,7 +171,7 @@
 *  occurred.
          CALL GRP_GET( IGRP2, IOUT, 1, NDFNAM, STATUS )
 
-*  Write out name of this NDF.
+*  Write out the name of this NDF.
          IF( ILEVEL .GT. 0 ) THEN
             CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
             CALL MSG_OUT( ' ', '   Creating ''^CURRENT_NDF''',
@@ -182,7 +187,7 @@
 *  can retain the history information. We will correct the shape later.
          CALL NDG_NDFPR( INDF, 'NOEXT(IRAS90,FITS,POLPACK)', IGRP2, 
      :                   IOUT, INDFO, STATUS )
-
+	 
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF, STATUS )
 
@@ -191,9 +196,13 @@
          LBND( 2 ) = WORK( IBIN, -2 ) 
          UBND( 1 ) = WORK( IBIN, -3 ) 
          UBND( 2 ) = WORK( IBIN, -4 ) 
+	 IF( NAX .EQ. 3 ) THEN
+	    LBND( 3 ) = WORK( IBIN, -5 )
+	    UBND( 3 ) = WORK( IBIN, -6 )
+	 END IF
 
 *  Set the shape of the output NDF.
-         CALL NDF_SBND( 2, LBND, UBND, INDFO, STATUS )
+         CALL NDF_SBND( NAX, LBND, UBND, INDFO, STATUS )
 
 *  Map the DATA and VARIANCE arrays.
          CALL NDF_MAP( INDFO, 'DATA', '_REAL', 'WRITE', IPDOUT, EL, 
@@ -230,7 +239,7 @@
      :                      STATUS )
 
 *  Get a section which matches the output NDF.
-            CALL NDF_SECT( INDF, 2, LBND, UBND, INDFS, STATUS ) 
+            CALL NDF_SECT( INDF, NAX, LBND, UBND, INDFS, STATUS ) 
 
 *  If this is the first input NDF...
             IF( I .EQ. 1 ) THEN
@@ -351,9 +360,9 @@
          IF( INDFT .NE. NDF__NOID ) THEN
 
 *  Get a section of the output stack which covers the output image.
-            LBND( 3 ) = IOUT
-            UBND( 3 ) = IOUT
-            CALL NDF_SECT( INDFT, 3, LBND, UBND, INDFS, STATUS ) 
+            LBND( NAX + 1 ) = IOUT
+            UBND( NAX + 1 ) = IOUT
+            CALL NDF_SECT( INDFT, NAX + 1, LBND, UBND, INDFS, STATUS ) 
 
 *  Map the DATA and VARIANCE arrays of this section of the stack.
             CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'WRITE', IPDP, EL, 
@@ -367,7 +376,7 @@
             CALL VEC_RTOR( .TRUE., EL, %VAL( IPVOUT ), %VAL( IPVP ), 
      :                     IERR, NERR, STATUS )
 
-*  Store the effective analyser position for the 3rd axis.
+*  Store the effective analyser position for the last axis.
             SAXIS( IOUT ) = ANLANG       
 
 *  Annul the section identifier.
