@@ -5,14 +5,14 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun183.3}
-\newcommand{\stardocnumber}    {183.3}
+\newcommand{\stardocsource}    {sun183.4}
+\newcommand{\stardocnumber}    {183.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {21st March 1996}
+\newcommand{\stardocdate}      {18th July 2001}
 \newcommand{\stardoctitle}     {ARD \\ [1ex]
                                 A Textual Language for Describing \\
                                 Regions within a Data Array}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 2.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -282,12 +282,45 @@ the storage space used to hold the mask can be released; there is no need to
 keep permanent copies of the pixel mask on disk. 
 
 In the above example, positions and distances in the ARD description were given
-in pixel co-ordinates. The ARD language allows positions and distances to be
-given in any co-ordinate system which is linearly related to pixel co-ordinates.
-Thus for instance, positions within a 2-dimensional image could be given in
-arc-seconds north and east from a given position on the sky (assuming the image
-is sufficiently small to be able to ignore non-linearities in the
-equatorial co-ordinate system). 
+in pixel co-ordinates. The ARD language includes two systems which allow 
+positions and distances to be given in other co-ordinate systems:
+\begin{enumerate}
+
+\item The calling application can define an "application co-ordinate
+system" which is linearly related to pixel co-ordinates. Positions within the 
+ARD description can then either be given directly in application co-ordinates, 
+or in any co-ordinate system linearly related to application coordinates
+(in which case the ARD description must include statements describing the
+linear transformation).
+
+\item As of ARD version 2.0, the calling application can define an
+arbitrary collection of coordinate systems (which need not be linearly
+related to pixel co-ordinates) by supplying an {\em AST FrameSet} (see 
+\xref{SUN/210}{sun210}{}). The FrameSet contains information which allows
+positions to be mapped from any of these coordinate systems into pixel
+co-ordinates. Positions within the ARD description can then be given 
+in any of these co-ordinates systems (a statement in the ARD description
+indicating which system is being used). Thus, for instance, if the pixel
+array has an RA/DEC calibration, the application could supply a FrameSet
+indicating how to convert from RA/DEC to pixel coordinates. This would
+allow the ARD description to include positions in RA/DEC.
+
+Alternatively, the ARD description itself can include a FrameSet defining
+a collection of inter-related coordinate systems (positions in the ARD
+description should be given in the "current" Frame of this FrameSet). In
+this case, an attempt is made to find a coordinate system which is
+contained both within the FrameSet supplied by the calling application,
+and within the FrameSet supplied in the ARD description. For instance,
+extending the previous example, if an ARD description contains position 
+given in pixel coordinates in some other specific image and also contains a 
+FrameSet which relates pixel positions within that image to RA/DEC, then 
+positions will be mapped from pixel coordinates within the original
+image, into RA/DEC, and then into pixel coordinates within the required
+mask image. This effectively allows pixel positions to be given within
+one image and then transfomed so that they can be used within another 
+image.
+
+\end{enumerate}
 
 \subsection{Some Example ARD Descriptions}
 ARD descriptions are made up by using logical \htmlref{operators}{SEC:OPER} 
@@ -328,6 +361,23 @@ shapes together into a more complex shape. It also shows the use of abbreviated
 \htmlref{keywords}{SEC:KEYW}. All pixels within the circle of radius 10 centred on (0,0) are
 selected, except for those which are on column 10 or row 5. 
 
+\small
+\begin{verbatim}
+      COFRAME( SKY, System=FK5, Equinox=2003.5 )
+      BOX( 12:23:41, -89:14, 1h40m, 20m ) 
+\end{verbatim}
+\normalsize
+
+This example shows the use of \htmlref{statements}{SEC:STAT} to specify the
+co-ordinate system in which positions are supplied. In this case, the
+\htmlref{COFRAME}{ST:COFRAME} statement indicates that positions are
+supplied in FK5 equatorial (RA/DEC) coordinates, referred to the equinox
+of 2003.5. The \htmlref{BOX}{KEY:BOX} keyword then selects a box centred
+at RA $12^{h}23^{m}41^{s}$ and Dec. $-89^{\deg}14^{'}$. The box covers an
+RA range of $1^{h}40^{m}$ and a Dec range of $20^{'}$. The edges of a BOX
+region are always lines of constant axis value. Since this region is very
+close to the south equatorial pole, the pixel region containing this
+"box" will have quite strongly curved sides.
 
 \small
 \begin{verbatim}
@@ -345,23 +395,25 @@ selected, except for those which are on column 10 or row 5.
 \end{verbatim}
 \normalsize
 
-This example shows the use of comments in an ARD description. It also shows the
-use of \htmlref{statements}{SEC:STAT} to establish a user co-ordinate system which is different to
-that expected by the application. Another feature demonstrated by this example
-is the ability of ARD to recognise implicit \htmlref{.OR.}{OP:OR} operators. The list of
-\htmlref{PIXEL}{KEY:PIX}
-keywords specifies a set of individual pixels. Since these keywords have no
-intervening operators, ARD assumes that a \htmlref{.OR.}{OP:OR} operator is to be inserted
-between each pair, i.e. the union of all the individual pixels is assumed. 
-
+This example shows the use of comments in an ARD description. It also
+shows the use of more \htmlref{statements}{SEC:STAT}. These establish a
+user co-ordinate system which is linearly related to the coordinate
+system expected by the application. Another feature demonstrated by this
+example is the ability of ARD to recognise implicit \htmlref{.OR.}{OP:OR}
+operators. The list of \htmlref{PIXEL}{KEY:PIX} keywords specifies a set
+of individual pixels. Since these keywords have no intervening operators,
+ARD assumes that a \htmlref{.OR.}{OP:OR} operator is to be inserted
+between each pair, i.e. the union of all the individual pixels is
+assumed.
 
 \subsection{\label{SEC:EXAMC}An Example ARD Application}
-This section presents Fortran code for an ADAM application which obtains a data
-array (in the form of an NDF structure, see \xref{SUN/33}{sun33}{}) and an ARD description from
-the environment, converts the ARD description into a pixel mask, and then finds
-and displays the data sum within the region specified by the ARD description.
-The application will deal with NDFs of any dimensionality up to the limit
-imposed by the NDF\_ system. 
+
+This section presents Fortran code for an ADAM application which obtains
+a data array (in the form of an NDF structure, see \xref{SUN/33}{sun33}{}) 
+and an ARD description from the environment, converts the ARD description
+into a pixel mask, and then finds and displays the data sum within the
+region specified by the ARD description. The application will deal with
+NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 
 \small
 \begin{verbatim}
@@ -373,6 +425,7 @@ imposed by the NDF\_ system.
       INCLUDE 'NDF_PAR'                                        
       INCLUDE 'PRM_PAR'                                        
       INCLUDE 'GRP_PAR'                                        
+      INCLUDE 'AST_PAR'                                        
                                                               
 *  Declare local variables.                                   
       INTEGER STATUS, IGRP, INDF, NDIM, IPDATA, IPMASK, EL,   
@@ -381,6 +434,7 @@ imposed by the NDF\_ system.
      :        LBNDE( NDF__MXDIM ), UBNDE( NDF__MXDIM ),       
      :        REGVAL                                          
       REAL SUM, TRCOEF( 1 )                                   
+      INTEGER IWCS
                                                               
 *  Check inherited global status.                             
       IF ( STATUS .NE. SAI__OK ) RETURN                         [4]
@@ -403,11 +457,18 @@ imposed by the NDF\_ system.
 *  Obtain workspace to hold the pixel mask corresponding to   
 *  the supplied ARD description.                              
       CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )         [9]
-                                                              
-*  Indicate that this application expects positions and       
-*  distances within the ARD description to be specified in    
-*  pixel co-ordinates.                                        
-      TRCOEF( 1 ) = VAL__BADR                                   [10]
+
+*  Get an AST FrameSet describing the WCS coordinate Frames stored
+*  in the NDF.
+      CALL NDF_GTWCS( INDF, IWCS, STATUS )                      [10]
+
+*  Indicate that positions within the ARD description can be given in
+*  any coordinate Frame included in the above WCS FrameSet.
+      CALL ARD_WCS( IWCS, STATUS )                              [11]
+
+*  Indicate that this application does not use a separate linear user
+*  coordinate system.
+      TRCOEF( 1 ) = VAL__BADR                                   [12]
                                                               
 *  Indicate that the value 2 should be used to represent      
 *  pixels specified by the first keyword in the ARD           
@@ -417,27 +478,33 @@ imposed by the NDF\_ system.
 *  Call ARD_WORK to store positive values at all mask pixels  
 *  specified by the ARD description, and zero at all other    
 *  pixels.                                                    
-      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,   [11]
+      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,   [13]
      :               REGVAL, %VAL( IPMASK ), LBNDI, UBNDI,    
      :               LBNDE,  UBNDE, STATUS )                  
                                                               
 *  Call a subroutine to sum the data in the specified regions.
       CALL SUMIT( EL, %VAL( IPDATA ), %VAL( IPMASK ), SUM,    
-     :            STATUS )                                      [12]
+     :            STATUS )                                      [14]
                                                               
 *  Display the data sum.                                      
       CALL MSG_SETR( 'SUM', SUM )                             
-      CALL MSG_OUT( 'ARD_TEST_MSG1', '  Data sum: ^SUM',        [13]
+      CALL MSG_OUT( 'ARD_TEST_MSG1', '  Data sum: ^SUM',        [15]
      :               STATUS )                                 
                                                               
+*  Release the resources used by ARD to store the FrameSet.
+      CALL ARD_WCS( AST__NULL, STATUS )                         [16]
+
 *  Release the work space used to hold the pixel mask.        
-      CALL PSX_FREE( IPMASK, STATUS )                           [14]
+      CALL PSX_FREE( IPMASK, STATUS )                           [17]
                                                               
 *  Delete the group used to hold the ARD description.         
-      CALL GRP_DELET( IGRP, STATUS )                            [15]
+      CALL GRP_DELET( IGRP, STATUS )                            [18]
+                                                              
+*  Annul the AST FrameSet identifier.                                  
+      CALL AST_ANNUL( IWCS, STATUS )                            [19]
                                                               
 *  Annul the NDF identifier.                                  
-      CALL NDF_ANNUL( INDF, STATUS )                            [16]
+      CALL NDF_ANNUL( INDF, STATUS )                            [20]
                                                               
       END                                                     
 \end{verbatim}
@@ -460,8 +527,9 @@ using actual numerical values. They are recognisable by the double underscore
 ``\_\_'' (e.g. ``SAI\_\_OK'') which distinguishes them from subroutine names.
 SAE\_PAR defines constants starting with ``SAI\_\_'', NDF\_PAR defines constants
 starting with ``NDF\_\_'' (see \xref{SUN/33}{sun33}{}), PRM\_PAR defines constants starting with
-``VAL\_\_'' (see \xref{SUN/39}{sun39}{}), and GRP\_PAR defines constants starting with
-``GRP\_\_'' (see \xref{SUN/150}{sun150}{}). 
+``VAL\_\_'' (see \xref{SUN/39}{sun39}{}), GRP\_PAR defines constants starting with
+``GRP\_\_'' (see \xref{SUN/150}{sun150}{}), and AST\_PAR defines constants 
+starting with ``AST\_\_'' (see \xref{SUN/210}{sun210}{}). 
 
 \item This application is designed to be able to handle data arrays of any
 dimensionality, up to the limit set by the NDF library. This limit is given by
@@ -506,14 +574,35 @@ pixel mask corresponding to the ARD description. The mask has the same number of
 pixels as the data array, and each pixel stores an integer value. The PSX 
 library is a Fortran interface to the POSIX library and is described in SUN/121.
 
-\item This application expects the user to supply positions and distances in the
-pixel co-ordinate system of the NDF, and indicates this by assigning the
-``special'' value given by the symbolic constant VAL\_\_BADR to the first
-element of the TRCOEF array. It is possible for an application to specify some
-other co-ordinate system, so long as the co-ordinate system is linearly related
-to pixel co-ordinates. In this case TRCOEF would be used to store the
-co-efficients of the mapping from the new ``application'' co-ordinate
-system, to the pixel co-ordinate system. See Section \ref{SEC:COORD}.
+\item An NDF structure can have a range of ``World Coordinate Systems''
+associated with it. Information describing these coordinate systems, and
+how to transform positions between them, is stored in the {\em WCS
+component} of the NDF. The NDF\_GTWCS routine returns an identifier for an 
+AST FrameSet which is a representation of the WCS component. The facilities 
+of the \xref{AST library}{sun210}{} can then be used to manipulate the WCS 
+information in many different ways.
+
+\item ARD\_WCS takes a copy of the supplied FrameSet and stores it
+internally for later use by the ARD\_WORK routine (we will call
+ARD\_WCS again towards the end of the application to release the 
+resources used to store this copy). Making this call to ARD\_WCS is
+optional. If it were not made, then positions within the ARD description  
+would have to be supplied in pixel co-ordinates. Since we are in fact
+calling ARD\_WCS, positions within the ARD description can be supplied in
+any coordinate system which can be related to any of the coordinate
+systems in the NDF's WCS FrameSet.
+
+\item This application expects the user to supply positions and distances in 
+one of the co-ordinate systems stored in the WCS component of the NDF
+({\em i.e.} one of the coordinate Frames in the FrameSet obtained above).
+It does not define any extra ``user'' coordinate system. It indicates
+this by assigning the ``special'' value given by the symbolic constant
+VAL\_\_BADR to the first element of the TRCOEF array. It is possible for
+an application to define an extra ``user'' co-ordinate system which is
+linearly related to pixel co-ordinates. In this case TRCOEF would be used
+to store the co-efficients of the mapping from the new ``application''
+co-ordinate system, to the pixel co-ordinate system. See Section
+\ref{SEC:COORD}.
 
 \item The subroutine \htmlref{ARD\_WORK}{ARD_WORK} is now called to create the pixel mask
 identifying the pixels specified by the ARD description. Positive values are
@@ -588,11 +677,19 @@ same size and shape. This makes it easy to process arrays of any dimensionality.
 then incorporating this token into a message to be displayed on the standard 
 output device. See SUN/104 for a description of the MSG package.
 
+\item The previous call to ARD\_WCS took a copy of the supplied FrameSet.
+We now call ARD\_WCS again to release the resources used to store this copy,
+this time supplying the ``null'' FrameSet pointer, AST\_\_NULL (a symbolic 
+constant defined within the AST\_PAR include file). 
+
 \item The storage space used to hold the pixel mask is released so that it can 
 be re-used.
 
 \item The storage space used by the GRP group to hold the ARD description is 
 released.
+
+\item We now tell the AST library to release the resources used to store
+the FrameSet read from the NDF.
 
 \item Finally, the NDF is closed.
 \end{enumerate}
@@ -777,9 +874,10 @@ separated by one or more spaces, or tabs. There are three types of fields:
 \item \htmlref{{\em Operator}}{SEC:OPER} fields: These are logical operators, as in Fortran 
 (\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, \htmlref{.XOR.}{OP:XOR}, \htmlref{.NOT.}{OP:NOT} etc.).
 
-\item \htmlref{{\em Statement}}{SEC:STAT} fields: These are fields which effect the way that the 
-keyword fields are interpreted, e.g. setting up the dimensionality of the system 
-(\htmlref{DIMENSION}{ST:DIM}), the user co-ordinate system (\htmlref{COEFFS}{ST:COE}), etc.
+\item \htmlref{{\em Statement}}{SEC:STAT} fields: These are fields which 
+effect the way that the keyword fields are interpreted, e.g. setting up
+the dimensionality of the system (\htmlref{DIMENSION}{ST:DIM}), the
+recognized co-ordinate systems (\htmlref{COFRAME}{ST:COFRAME}), etc.
 
 \end{enumerate}
 
@@ -1327,15 +1425,97 @@ upper bound. This condition should always be checked for before using a
 bounding box. 
 
 \section{\label{SEC:COORD}\xlabel{ARDCoords}Co-ordinate Systems}
-There are three co-ordinate systems recognised by ARD:
+At the end of the day, ARD\_WORK needs to be able to locate pixels within
+the given pixel mask. To do this, every position supplied in an ARD
+description must be converted into {\em pixel co-ordinates}. The position
+of the origin of pixel co-ordinates within the mask is fixed by the upper
+and lower bounds of the mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}.
+The conventions for pixel co-ordinates used by Starlink software are
+described in \xref{Starlink System Note (SSN) 22}{ssn22}{}.
+
+However, it is not always appropriate for an ARD description to describe
+a region in terms of pixel co-ordinates. For instance, in a mosaic image
+a given position on the sky may have different pixel co-ordinates in each
+image. To describe a given region in pixel coordinates would therefore
+require a separate description for each image. Ideally, we would like to
+use a single ARD description in which the region was defined in terms of
+RA and Dec. positions. This can be done, so long as ARD\_WORK knows how
+to transform an RA/Dec position into pixel coordinates within the
+specified pixel masks. The ARD\_WCS routine allows this information to be
+specified prior to calling ARD\_WORK\footnote{You may be wondering why a
+separate routine is used instead of simply passing the information to
+ARD\_WORK as an argument. This was done so that existing ARD application
+would continue to work without modification.}.
+
+ARD uses the facilities of the AST library (see \xref{SUN/210}{sun210}{})
+to manage coordinate systems. An AST ``FrameSet'' describes a collection
+of related coordinate systems (also called ``Frames''), together with the
+mappings which allows positions to be transformed from one Frame to
+another. The calling application should create a FrameSet describing all
+the co-ordinate systems which it nows about. One of these systems must be
+pixel co-ordinates within the pixel mask supplied to ARD\_WORK\footnote{ARD 
+recognizes this Frame by the fact that its Domain attribute is set to 
+``PIXEL''.}. It then passes this FrameSet to the ARD system by calling
+ARD\_WCS prior to calling ARD\_WORK. This FrameSet is known as the
+``Application FrameSet''.
+
+The ARD description must then include statements describing the 
+coordinate system in which positions are given. This can be done in one
+of three ways:
 
 \begin{enumerate}
+\item By including a \htmlref{COFRAME}{ST:COFRAME} statement before any
+keywords. A COFRAME statement describes a single coordinate system,
+namely that in which positions are given within the ARD description.
 
-\item {\em Pixel Co-ordinates} - These refer to the pixel mask returned by
-\htmlref{ARD\_WORK}{ARD_WORK}. The position of the origin of pixel co-ordinates within the mask is
-fixed by the upper and lower bounds of the mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}. The
-conventions for pixel co-ordinates used by Starlink software are described in
-\xref{Starlink System Note (SSN) 22}{ssn22}{}.
+ARD\_WORK will determine if there is any way of converting positions
+given within this coordinate system into any of the coordinate systems
+included in the Application FrameSet, and thus into pixel coordinates.
+If there is, then the corresponding transformation is used to locate
+positions within the pixel mask. Otherwise, an error is reported.
+
+\item By including a \htmlref{WCS}{ST:WCS} statement before any
+keywords. A WCS statement specifies a FrameSet describing a collection 
+of related coordinate system. Positions within the ARD description are
+then assumed to be given within the ``current'' Frame of this FrameSet.
+This FrameSet is known as the ``User FrameSet'' to distinguish it from
+the ``Application FrameSet''.
+
+ARD\_WORK will search both FrameSets looking for a co-ordinate system
+which is present in both. If such a Frame is found, the User FrameSet is 
+used to convert positions in the ARD description into the common Frame,
+and the Application FrameSet is then used to convert positions from the
+common Frame into pixel co-ordinates. If no common Frame is found, then
+an error is reported. It may be that there is more than one common Frame,
+in this case priority is given to Frames describing celestial coordinate
+systems, followed by pixel co-ordinate Frames, followed by Frames with
+Domain GRID, followed by Frames with Domain ARDAPP.
+
+\item If there is neither a WCS nor a COFRAME statement in the ARD
+description, then it is assumed that positions are supplied in pixel
+coordinates. The exception to this is that various depracated statements
+exist (COEFFS, OFFSET, TWIST, STRETCH, SCALE) which were used prior to
+ARD version 2.0 to allow another user coordinate system to be defined,
+with the proviso that it needed to be linearly related to pixel
+coordinates. If any of these statements are found, then positions are
+interpreted according to the old, version 1 system described below.
+
+\end{enumerate}
+
+
+
+
+
+
+
+
+\subsection{Co-ordinate Handling in ARD Version 1.0}
+
+
+
+
+
+
 
 \item {\em Application Co-ordinates} - These are the co-ordinates in which an
 application {\em expects} positions within an ARD description to be given. Any
