@@ -749,8 +749,10 @@ $(INSTALL_DIRS):
 
 SCRIPT_PLACES = \
 	./built/lib/tclX8.0.3/*.tcl \
-	./built/lib/tclX7.6.0/tcl.tndx \
-	./built/lib/tclX7.6.0/tcl.tlib \
+	./built/lib/tclX8.0.3/tcl.tndx \
+	./built/lib/tclX8.0.3/tcl.tlib \
+	./built/lib/tkX8.0.3/*.tcl \
+	./built/lib/itcl3.0/*.tcl \
 	./built/lib/itk3.0/*.itk \
 	./built/lib/itk3.0/*.tcl \
 	./built/lib/tcl8.0/*.tcl  \
@@ -758,6 +760,7 @@ SCRIPT_PLACES = \
 	./built/lib/tk8.0/*.tcl \
 	./built/lib/tk8.0/prolog.ps \
 	./built/lib/iwidgets3.0.0/scripts/*.itk \
+	./built/lib/iwidgets3.0.0/scripts/*.itcl \
 	./built/lib/iwidgets3.0.0/*.tcl \
 	./built/lib/blt2.4/*.tcl \
 	./built/lib/blt2.4/*.pro
