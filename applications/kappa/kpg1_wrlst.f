@@ -100,6 +100,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER CVAL*80          ! Character value obtained for the parameter
       INTEGER IPW                ! Pointer to work space
       INTEGER MAP                ! AST Pointer to Mapping
       INTEGER NBAX               ! No. of axes in BASE FRAME
@@ -111,12 +112,29 @@
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
 
+*  Get a character value for the parameter. This is done to see if a null
+*  parameter value is supplied. There is no need to create the positions
+*  list is a null parameter value is supplied.
+      CALL PAR_GET0C( PARAM, CVAL, STATUS )
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the simplified Mapping from the supplied Frame to the Base Frame.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, AST__BASE, 
      :                                    STATUS ), STATUS )
 
-*  If this Mapping is a UnitMap, we can store the positions as supplied.
-      IF( AST_ISAUNITMAP( MAP, STATUS ) ) THEN
+*  If the forward transformation is not defined, store the positions in
+*  the Frame in which they were supplied. The associated FrameSet contains
+*  just the specified Frame.
+      IF( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) ) THEN
+         CALL KPG1_WRLS2( PARAM, ARRDIM, NPOS, NAX, POS, 
+     :                    AST_FRAMESET( AST_GETFRAME( IWCS, IFRM, 
+     :                                                STATUS ), 
+     :                                  ' ', STATUS ),
+     :                    TITLE, ID0, IDENTS, STATUS )
+
+*  Otherwise, if the Mapping is a UnitMap, we can store the positions as 
+*  supplied, with the full FrameSet.
+      ELSE IF( AST_ISAUNITMAP( MAP, STATUS ) ) THEN
          CALL KPG1_WRLS2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
      :                    TITLE, ID0, IDENTS, STATUS )
 

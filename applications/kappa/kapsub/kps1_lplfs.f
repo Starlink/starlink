@@ -126,6 +126,8 @@
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
       INTEGER CFRM               ! Current Frame in supplied FrameSet
       INTEGER IAT                ! No. of characters in a string
+      INTEGER ICURR              ! Index of current Frame in IWCS
+      INTEGER INPRM(2)           ! Axis permutation array
       INTEGER IPD                ! Pointer to array of returned axis 1 values
       INTEGER IPG                ! Pointer to array of GRID values
       INTEGER IPW                ! Pointer to array of Current Frame values
@@ -140,6 +142,7 @@
       INTEGER XMAP               ! X axis 1-D Mapping
       INTEGER YMAP               ! Y axis 1-D Mapping
       LOGICAL BAD                ! Any bad values found?
+
 *.
 
 *  Initialise.
@@ -421,8 +424,29 @@
 *  Current Frame.
       CALL AST_ADDFRAME( FSET, AST__BASE, MAP2, WWWANT, STATUS ) 
 
+*  Add the supplied FrameSet into the returned FrameSet, connecting the
+*  Base (GRID) Frame to the "what we've got" Frame using a PermMap which
+*  maps axis 1 of the "w.w.got" Frame (GRID) onto the GRID Frame of the
+*  supplied FrameSet. Temporarily make the GRID Frame current in IWCS since
+*  AST_ADDFRAME uses the current Frame.
+      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+      CALL AST_SETI( IWCS, 'CURRENT', AST_GETI( IWCS, 'BASE', STATUS ),
+     :               STATUS )
+
+      INPRM( 1 ) = 1
+      INPRM( 2 ) = 0
+      CALL AST_ADDFRAME( FSET, AST__BASE, AST_PERMMAP( 2, INPRM, 1, 1,
+     :                                                 0.0D0, ' ', 
+     :                                                 STATUS ),
+     :                   IWCS, STATUS ) 
+
+      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+
 *  Set the Base Frame to correspond to the "uniform" Frame.
       CALL AST_SETI( FSET, 'BASE', 2, STATUS )
+
+*  Set the Current Frame to correspond to the "what we want" Frame.
+      CALL AST_SETI( FSET, 'CURRENT', 3, STATUS )
 
 *  Tidy up.
 *  ========

@@ -191,11 +191,13 @@
 *  Tab to the start of the next column. Subsequent positions use the 
 *  same tabs even though the field widths will be smaller (due to the 
 *  abscence of the units strings).
-         IF( NEWPIC ) THEN
-            IAT = 6*( 1 + IAT/6 )
-            ICOL( I ) = IAT
-         ELSE
-            IAT = MAX( ICOL( I ), 6*( 1 + IAT/6 ) )
+         IF( I .LT. NAX ) THEN
+            IF( NEWPIC ) THEN
+               IAT = 6*( 1 + IAT/6 )
+               ICOL( I ) = IAT
+            ELSE
+               IAT = MAX( ICOL( I ), 6*( 1 + IAT/6 ) )
+            END IF
          END IF
 
       END DO

@@ -267,6 +267,10 @@
 *     -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 *     position where there are no pictures of the selected name, the
 *     co-ordinates in the BASE picture are reported.
+*     -  Pixel co-ordinates are formatted with 1 decimal place unless a
+*     format has already been specified by setting the Format attributes
+*     for the axes of the PIXEL co-ordinate Frame (eg using application
+*     WCSATTRIB).
 *     -  Positions can be removed (the instructions state how), starting
 *     from the most-recent one.  Such positions are excluded from the 
 *     output positions list and log file (if applicable). If graphics
@@ -849,9 +853,10 @@
 *  Attempt to find a PIXEL Frame.
                CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
 
-*  If found, get a pointer to it.
+*  If found, get a pointer to it, and get the number of pixel axes.
                IF( IPIX .NE. AST__NOFRAME ) THEN
                   FRM2 = AST_GETFRAME( IPLOT, IPIX, STATUS )
+                  NAXP = AST_GETI( FRM2, 'NAXES', STATUS )
 
 *  If PIXEL co-ordinates are to be displayed as well as the required
 *  co-ordinate Frame get the simplified Mapping from Base (GRAPHICS) Frame 
@@ -956,7 +961,7 @@
 *  without axis symbols. Indent by 3 spaces.
                LINE = ' ('
                IAT = 2
-               CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAX, .FALSE., 
+               CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAXP, .FALSE., 
      :                          NEWPIC, IAT, LINE, ICOL, PGOOD, PXY, 
      :                          STATUS )
                CALL CHR_APPND( ')', LINE, IAT )
@@ -1146,7 +1151,7 @@
                CALL GRP_SETSZ( IGRP, NP, STATUS )
 
 *  We now need to decide whether the position should also be removed from 
-*  the list of positions to write to the output positions list. This is 
+*  the list of positions to write to the ouptput positions list. This is 
 *  only the case if the position lies within the first selected picture.
 
 *  In ANCHOR or CURRENT mode, the position must be in the original picture
