@@ -13255,6 +13255,71 @@
  directory rosat/doc/hri/hri_report.  This will help you to understand the
  corrections performed by XRTCORR.<p>
 
+  HRI reduction is complicated because:<p>
+
+  (a)  The relative level  of non-cosmic background is much higher
+  than for PSPC.<p>
+
+  (b) The  non-cosmic background is  dominated by unvignetted particle
+  events.<p>
+
+  (c) There  is  little available information   to model the  particle
+  component of  the background, the main source  being the PSPC Master
+  Veto count rate which was not designed for this purpose!<p>
+
+  Recommendations when flat-fielding with ASTERIX <p>
+
+  Pha range 3-8.<p>
+
+     Subset the pha range  between 3-8  (as  recommended in the  Rosat
+     Handbook).   Following   a   standard   Asterix   reduction,  pha
+     subsetting appears to reduce the background by approx 40% w.r.t.  full
+     pha range background.<p>
+
+  Do not use vignetting options.<p>
+
+     As the  majority of counts   are due to the unvignetted  particle
+     background, rather than vignetted photons, using XRTCORR with the
+     parameter vcorr is  not a good idea.  This  is true for  both the
+     full and subsetted pha ranges, but especially the full pha range.
+
+  Where possible select on-axis objects.<p>
+
+  Objects should not be more than 0.2 - 0.3 off-axis.<p>
+
+
+  XRTSUB works on HRI data but doesn't model  the size of the particle
+  component of background or perform  the vignetting of the photons in
+  the background.  XRTSUB  remains useful  for  correcting differences
+  between the source and background area.<p>
+
+  XRTCORR  when applied to data with  a background  should not use the
+  vignetting option  (vcorr) because   of the  effect  upon the  large
+  proportion of non vignetted particles.<p>
+
+  As an alternative to ASTERIX software ESAS written by S.L. Snowden's
+  is available from :<p>
+
+      ftp://legacy.gsfc.nasa.gov/rosat/software/fortran/sxrb/<p>
+
+  ESAS      is  available      to      OBELIX  users      on  SAL1  -
+  /soft/asterix/obelix/sxrb<p>
+
+  The ESAS software  makes   a reasonable job of   particle background
+  fitting   and    significantly   improves the    flat   fielding  of
+  observations, especially close to  the  field edges where  Asterix's
+  performance is worst.<p>
+
+  Conversely Snowden's  software;    offers   no way of    pha   range
+  subsetting, produces a standard 512*512 image with  a fixed 5" pixel
+  size and  involves  considerably  more  effort to  produce   a fully
+  Asterix compatible image.<p>
+
+  How is this  done? For more  information  upon the reduction of  HRI
+  data and a brief introduction to ESAS software :<p>
+
+     http://www.sr.bham.ac.uk/asterix/user/HRI_reduction.html<p>
+
 
 3 The_Boron_filter
  The filter only covers the region of the image within the central ring. 
