@@ -366,6 +366,7 @@ CC = cc
 CFLAGS = -O
 FC = f77
 FFLAGS = -O
+FLINK = f77
 
 #  Command for forming a link to a file.
 
@@ -430,7 +431,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0-10
+PKG_VERS = 4.0-11
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1353,7 +1354,7 @@ STARTCL_OBJ = $(STAR_LIB)/tkGwm.o $(STAR_LIB)/tkGwmCanv.o \
 
 $(WISH): $(OBJECT_LIBRARIES) $(WISH).o $(LINK_SCRIPT) $(GRF_OBJECT) \
 $(STARTCL_OBJ)
-	$(FC) $(FFLAGS) -o $(WISH) $(WISH).o \
+	$(FLINK) $(FFLAGS) -o $(WISH) $(WISH).o \
               $(ADDLIBS) -L$(STAR_LIB) $(OBJECT_LIBRARIES) \
               $(STARTCL_OBJ) $(TCL_LIBRARIES) $(LDFLAGS) \
               `./$(LINK_SCRIPT) -pgplot` \
@@ -2376,8 +2377,8 @@ ccd1_ggeom.o: FIO_ERR SAE_PAR
 ccd1_ggmap.o: AST_PAR CCD1_PAR PRM_PAR SAE_PAR 
 ccd1_giseq.o: SAE_PAR
 ccd1_gmdcp.o: PAR_ERR PRM_PAR SAE_PAR
-ccd1_gmid.o: PRM_PAR SAE_PAR
-ccd1_gmmp.o: PRM_PAR SAE_PAR
+ccd1_gmid.o: SAE_PAR
+ccd1_gmmp.o: SAE_PAR
 ccd1_gpnam.o: SAE_PAR DAT_PAR
 ccd1_gprmt.o: SAE_PAR DAT_PAR
 ccd1_gparf.o: SAE_PAR DAT_PAR FIO_PAR DAT_ERR
