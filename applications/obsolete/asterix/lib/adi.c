@@ -4493,7 +4493,7 @@ void adix_dinit( ADIstatus status )
 	       &ADI_G_stdmcf, status );
 
   adic_defcls( "FileRepresentation",
-	       "", "NAME,OPEN_RTN,NATRL_RTN",
+	       "", "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN",
 	       &DsysFileRep, status );
 
   adic_defcls( "ADIbase",
@@ -5202,6 +5202,119 @@ ADIobj adix_exec( char *func, int flen, int narg,
   return adix_execi( fname, narg, args, /* and execute the method */
 		     status );
   }
+
+
+/*
+ * Data system routines
+ */
+
+void adix_fclose( ADIobj id, ADIstatus status )
+  {
+  _chk_stat;
+  }
+
+void adix_fcreat_int( ADIobj rtn, ADIobj fspec, ADIobj id, ADIobj *fileid,
+                      ADIstatus status )
+  {
+  if ( _eprc_c(rtn) ) 			/* C routine? */
+    ((ADIcCreatRCB) _eprc_prc(rtn))( fspec, id, fileid, status );
+  else					/* Fortran routine */
+    ((ADIfCreatRCB) _eprc_prc(rtn))( &fspec, &id, fileid, status );
+  }
+
+void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
+                  ADIstatus status )
+  {
+  ADIobj	fid;			/* ADI version of fspec */
+  ADIboolean	found = ADI__false;	/* Located the representation? */
+  ADIobj	ortn;			/* Create routine */
+  char		*ppos;
+  ADIobj	rid = ADI__nullid;	/* Representation chosen */
+  int		rlen;
+
+  _chk_stat;				/* Check status on entry */
+
+  _GET_STRING(fspec,flen);		/* Import strings resolving lengths */
+
+  adic_newv0c_n( fspec, flen, &fid,	/* Construct ADI strings */
+                          status );
+
+  ppos = strstr( fspec, "%" );		/* Look for representation delimiter */
+
+  if ( ppos ) { 			/* User specified a representation? */
+    rlen = flen - (ppos-fspec) - 1;	/* Length of representation code */
+
+    adix_locrep( ppos+1, rlen, &rid,	/* Look for representation */
+		 status );
+
+    if ( _null_q(rid) )
+      adic_setecs( ADI__INVARG, "File representation /^REP/ not known",
+                   status );
+    else {
+
+/* Locate the file creation routine */
+      adix_locrcb( rid, "CREAT_RTN", _CSM, &ortn, status );
+
+/* Try to create the file */
+      adix_fcreat_int( ortn, fid, id, &fileid, status );
+
+      found = _ok(status);		/* Opened ok? */
+      }
+    }
+  else {
+    ADIobj	curp = ADI_G_replist;
+
+    while ( _valid_q(curp) && ! found )	/* Loop over representations */
+      {
+      ADIboolean	there=ADI__false;
+
+      ADIobj	repid = _CAR(curp);
+
+      adic_there( repid, "CREAT_RTN", &there, status );
+
+      if ( there ) {
+        adix_locrcb( repid, "CREAT_RTN",	/* Locate the opening routine */
+                     8, &ortn, status );
+
+/* Try to create the file */
+        adix_fcreat_int( ortn, fid, id, &fileid, status );
+
+        if ( _ok(status) )		/* Did it work? */
+	  found = ADI__true;
+        else
+          adix_errcnl( status );
+        }
+
+      if ( ! found )			/* Next one */
+        curp = _CDR(curp);
+      }
+
+    }
+
+  if ( ! found ) {			/* Not found? */
+    ADIstatype	istat = *status;
+    *status = SAI__ERROR;
+
+    adic_erase( &fid, status );		/* Release strings created */
+
+    *status = istat;
+
+    if ( ! ppos )
+      adic_setecs( ADI__INVARG, "File cannot be created", status );
+    }
+
+/* Link user object if created ok */
+  if ( _ok(status) && ! _null_q(id) ) {
+    ADIobj	ocls;
+
+    ocls = _DTDEF(id)->aname;		/* Class name of created object */
+
+/* Link user object to file object if required */
+    adix_setlnk( *fileid, id, status );
+    }
+
+  }
+
 
 void adix_fopen_int( ADIobj rtn, ADIobj fspec, ADIobj mode, ADIobj *id,
                      ADIstatus status )

@@ -2124,11 +2124,13 @@ F77_SUBROUTINE(adifn(fclose))( INTEGER(id), INTEGER(status) )
   _ERR_OUT;
   }
 
-F77_SUBROUTINE(adifn(fcreat))( CHARACTER(fspec), INTEGER(id), INTEGER(status)
+F77_SUBROUTINE(adifn(fcreat))( CHARACTER(fspec), INTEGER(id),
+                               INTEGER(fid), INTEGER(status)
                                TRAIL(fspec) )
   {
   GENPTR_CHARACTER(fspec)
   GENPTR_INTEGER(id)
+  GENPTR_INTEGER(fid)
   GENPTR_INTEGER(status)
 
   _chk_init; _chk_stat;			/* Check initialised and ok */
@@ -2136,7 +2138,7 @@ F77_SUBROUTINE(adifn(fcreat))( CHARACTER(fspec), INTEGER(id), INTEGER(status)
   _ERR_IN("ADI_FCREAT");		/* Mark routine for error reporting */
 
 /* Invoke kernel routine to create file */
-  adix_fcreat( fspec, fspec_length, (ADIobj) *id, status );
+  adix_fcreat( fspec, fspec_length, (ADIobj) *id, (ADIobj *) fid, status );
 
   _ERR_OUT;
   }

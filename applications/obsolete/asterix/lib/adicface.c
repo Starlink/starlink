@@ -154,6 +154,12 @@
 *
 *	adic_reqpkg	- Load a package from the search path
 *
+*      Data system :
+*
+*       adi_fclose      - Close a file system object
+*       adi_fcreat      - Create a new file system object
+*       adi_fopen       - Open existing file system object
+*
 *      Miscellaneous :
 *
 *	adic_link	- Link an identifier to a name group
@@ -1642,6 +1648,46 @@ void adic_reqpkg( char *pkg, ADIstatus status )
   }
 
 /* -------------------------------------------------------------------------
+ * Data system
+ * -------------------------------------------------------------------------
+ */
+void adic_fclose( ADIobj id, ADIstatus status )
+  {
+  _chk_init; _chk_stat;
+
+  _ERR_IN("adic_fclose");		/* Mark routine for error reporting */
+
+  adix_fclose( id, status );
+
+  _ERR_OUT;
+  }
+
+void adic_fcreat( char *fspec, ADIobj id, ADIobj *fid,
+                  ADIstatus status )
+  {
+  _chk_init; _chk_stat;
+
+  _ERR_IN("adic_fcreat");		/* Mark routine for error reporting */
+
+  adix_fcreat( fspec, _CSM, id, fid, status );
+
+  _ERR_OUT;
+  }
+
+void adic_fopen( char *fspec, char *cls, char *mode, ADIobj *id,
+                 ADIstatus status )
+  {
+  _chk_init; _chk_stat;
+
+  _ERR_IN("adic_fopen");		/* Mark routine for error reporting */
+
+  adix_fopen( fspec, _CSM, cls, _CSM,	/* Invoke kernel routine */
+	      mode, _CSM, id, status );
+
+  _ERR_OUT;
+  }
+
+/* -------------------------------------------------------------------------
  * Miscellaneous
  * -------------------------------------------------------------------------
  */
@@ -1727,15 +1773,3 @@ void adic_cmnstr( char *string, ADIobj *id, ADIstatus status )
   }
 
 
-void adic_fopen( char *fspec, char *cls, char *mode, ADIobj *id,
-                 ADIstatus status )
-  {
-  _chk_init; _chk_stat;
-
-  _ERR_IN("adic_fopen");		/* Mark routine for error reporting */
-
-  adix_fopen( fspec, _CSM, cls, _CSM,	/* Invoke kernel routine */
-	      mode, _CSM, id, status );
-
-  _ERR_OUT;
-  }
