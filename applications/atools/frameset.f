@@ -99,8 +99,8 @@
       INTEGER STATUS
 
 *  Local Variables:
-      INTEGER NAX
       INTEGER RESULT
+      INTEGER FRAME
 *.
 
 *  Check inherited status.      

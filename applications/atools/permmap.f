@@ -31,7 +31,7 @@
 *     assigned to any new ones. 
 
 *  Usage:
-*     permap inperm outperm constant options results
+*     permmap inperm outperm constant options results
 
 *  ADAM Parameters:
 *     CONSTANT() = _DOUBLE (Read)
@@ -125,8 +125,8 @@
       CALL PAR_GET1D( 'CONSTANTS', NDF__MXDIM, CONST, NCON, STATUS )
 
 *  Create the required PermMap.
-      RESULT = AST_PERMAP( NIN, INPRM, NOUT, OUTPRM, CONST, OPTIONS,
-     :                     STATUS 
+      RESULT = AST_PERMMAP( NIN, INPRM, NOUT, OUTPRM, CONST, ' ',
+     :                     STATUS )
 
 *  Store the required attribute values.
       CALL ATL1_SETOP( 'OPTIONS', RESULT, STATUS )

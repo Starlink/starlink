@@ -471,6 +471,52 @@ iraf! {
           }
 
       }
+      action permmap {
+         helplib {$ATOOLS_HELP}
+
+         parameter inperm {
+            position 1
+            type _INTEGER
+            prompt {Output axes for each input axis}
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
+         parameter outperm {
+            position 2
+            type _INTEGER
+            prompt {Input axes for each output axis}
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
+         parameter constants {
+            position 3
+            type _DOUBLE
+            prompt {Constant values for unattached axes}
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
+         parameter options {
+            position 4
+            type LITERAL
+            prompt {Options for the PermMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {Name of file in which to store the PermMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
       action unitmap {
          helplib {$ATOOLS_HELP}
 

@@ -102,6 +102,9 @@
       ELSE IF ( NAME .EQ. 'FRAMESET' ) THEN
          CALL FRAMESET( STATUS )
 
+      ELSE IF ( NAME .EQ. 'PERMMAP' ) THEN
+         CALL PERMMAP( STATUS )
+
       ELSE IF ( NAME .EQ. 'UNITMAP' ) THEN
          CALL UNITMAP( STATUS )
 
@@ -109,7 +112,7 @@
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'NAME', NAME )
-         CALL ERR_REP( 'atools_mon_ERR',
+         CALL ERR_REP( 'ATOOLS_MON_ERR',
      :        'ATOOLS_MON: The action name ''^NAME'' is ' //
      :        'not recognised by the ATOOLS_MON monolith.',
      :        STATUS )
