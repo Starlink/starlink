@@ -6999,6 +6999,8 @@ U java/source/splat/src/main/uk/ac/starlink/splat/ast/ASTChannel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/ast/ASTFITSChan.java
 U java/source/splat/src/main/uk/ac/starlink/splat/ast/ASTJ.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/data
+U java/source/splat/src/main/uk/ac/starlink/splat/data/AbstractEditableSpecDataImpl.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/AbstractSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/AnalyticSpectrum.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/DataLimits.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/EditableSpecData.java
@@ -7007,6 +7009,9 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSHeaderSource.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/HdxInputNameParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/InputNameParser.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDSpecData.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDSpecDataImpl.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDTXTSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/MEMSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/NDFSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/NDXSpecDataImpl.java
