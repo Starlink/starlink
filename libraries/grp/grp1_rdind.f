@@ -132,7 +132,6 @@
       INTEGER ICONTX             ! Context for grp1_wild
       INTEGER INDIND             ! Index within the FILES array
       INTEGER IOERR              ! Fortran IO status value
-      INTEGER ISTAT              ! Local status value
       INTEGER TLEN               ! Used length of the group expression
       LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
       LOGICAL EOF                ! Has end of file has been reached ?
@@ -305,20 +304,9 @@
 
          END IF
 
-*  If a system error was detected by GRP1_WILD, report it.
-      ELSE IF ( ISTAT .EQ. GRP__WPER ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'GRP1_APPEN_ERR1', 'GRP1_RDIND: Error'//
-     :                 ' getting pipe from forked process', 
-     :                 STATUS )
-
-      ELSE IF ( ISTAT .EQ. GRP__WMER ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'GRP1_APPEN_ERR2', 'GRP1_RDIND: '//
-     :                 'Cannot allocate memory', STATUS )
-
-*  Report an error if no file matched the supplied template.
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+*  Re-report the error if no file matched the supplied template.
+      ELSE IF( STATUS .EQ. ONE__NOFILES ) THEN
+         CALL ERR_ANNUL( STATUS )
          STATUS = GRP__FIOER
          CALL MSG_SETC( 'FNAME', INFILE )
          CALL MSG_SETI( 'UNIT', UNIT )
@@ -329,9 +317,6 @@
 
 *  End the search context.
  999  CONTINUE
-
-*  Clear status if no more files
-      IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
 
 *  End the search context.
       CALL ONE_FIND_FILE_END( ICONTX, STATUS )
