@@ -44,7 +44,7 @@ F_ROUTINES = abload.f abscal.f acheck.f arb.f arith.f arrow.f arysrt.f \
  velsort.f voigt.f vpeak.f vsp0rd.f window.f wrcopy.f write.f write_ndf.f \
  wrndf.f wrprop.f wtstruser.f xcorre.f xdcode.f xhelp.f xsort.f xsprmpt.f \
  yendmsk.f yxn.f zanstra.f croper.f rdcat.f getcat.f gtctcl.f rdctd.f \
- user.f
+ user.f gks_gstat.f
 
 C_ROUTINES = handlev.c rdkbd2.c
 
