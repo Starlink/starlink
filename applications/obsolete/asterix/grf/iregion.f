@@ -771,13 +771,6 @@
                 L = 1
               ENDIF
 
-              IF (EXCLUDE) THEN
-                TEXT(L:)='))'
-                L=L+1
-              ELSE
-                TEXT(L:L)=')'
-              ENDIF
-
               CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
@@ -785,6 +778,15 @@
 
           ENDDO
         ENDDO
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)='))'
+          L=L+1
+        ELSE
+          TEXT(L:L)=')'
+        ENDIF
+
+
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_GTE_SUB',STATUS)
