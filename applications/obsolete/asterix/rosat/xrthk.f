@@ -556,7 +556,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 * Set the last value to the largest time in the file if neccessary.
       IF (.NOT. NEW) THEN
-         CALL ARR_RANGD(NTIM, TIME, DMIN, DMAX)
+         CALL ARR_RANG1D(NTIM, TIME, DMIN, DMAX,STATUS)
          END1(CNT) = DMAX
       ELSE
 *
