@@ -23,6 +23,7 @@
      
 *     Modifications:
 
+*     31 Mar 05 : TIMJ- Fix infinite loop when time invalid
 *     18 Mar 05 : TIMJ- A THUMPER tweak to the output formatting
 *     2  Feb 04 : TIMJ- Fix TT vs UT confusion. RJDATE now returns TT MJD
 *                       since that is the most common variant. LST calculation
