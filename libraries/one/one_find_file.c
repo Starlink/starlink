@@ -163,6 +163,10 @@
 *         attempt to sync all extant find_file.c variants into one.
 *         Use CNF to do fortran integer to C pointer mapping. Can not
 *         execlp "ls" directly since that will not expand the wildcard pattern.
+*      21-OCT-2004 (PDRAPER):
+*         Made the Command string dynamic (was 256, which is too
+*         small for the current NDF_FORMATS_IN). Increased length
+*         of returned line to 512, in line with NDG practice.
 *.
 *-
  */
@@ -179,6 +183,7 @@
 #define TRUE 1                /* Standard truth value */
 #define FALSE 0               /* Standard false value */
 #define DIRECTORY_LEN 256     /* Number of characters allowed for directory */
+#define LINE_LEN 512          /* Length of returned line */
 
 /*  Structures used:
  *
@@ -268,13 +273,13 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    char Char;            /* Byte read from pipe */
    int ColonIndex;       /* Index in Line of last colon */
    ContextStruct *ContextPtr; /* Pointer to current context information */
-   char Command[255];    /* 'ls' command executed */
+   char *Command;        /* 'ls' command executed */
    int *Fdptr;           /* Pointer to array of two integer file descriptors */
    int GotFileName;      /* Used to control loop reading lines from 'ls' */
    int I;                /* Loop index used to copy strings */
    int Ichar;            /* Index into FileName for next character */
    char LastChar;        /* Last non-blank char read in line */
-   char Line[256];       /* String into which line is read */
+   char Line[LINE_LEN];  /* String into which line is read */
    int Nchars;           /* Maximum number of chars that can be copied */
    int NullFd;           /* File descriptor for the null device */
    char *PointFSpec;     /* Local copy of FileSpec          */
@@ -284,6 +289,9 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    if ( *Status != SAI__OK ) return FALSE;
 
    ColonIndex = 0;
+
+   /*  No file specification so nothing to do */
+   if ( FileSpec == NULL ) return FALSE;
 
    /*
       Set input string lengths to those returned by CNF.
@@ -304,6 +312,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
     */
 
    if (*Context == 0) {
+
        /* FIXME: explain why malloc 2*sizeof()? */
       ContextPtr = (ContextStruct *) cnfMalloc(2 * sizeof(ContextStruct));
       if ( ContextPtr == NULL ) {
@@ -323,6 +332,9 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
             *Status = ONE__PIPEERR;
 	    emsRep("one_find_file","Error from pipe",Status);
          } else {
+
+            /* Allocate enough room for the eventual ls command string */
+            Command = (char *) malloc( SpecLength + 10 );
 
             /*  Fdptr[0] can now be used as the reading end of the pipe,
              *  and Fdptr[1] as the writing end.  Having that, we now
@@ -350,15 +362,11 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
                    including trailing blanks */
                 /* Add -d to ls if we are not listing directory contents */
 	      
-	        Command[0] = '\0';
-	        (void) strcpy(Command,"ls ");
-	        Nchars = sizeof(Command) - 3;
+	        (void) strcpy( Command, "ls " );
 		if (*LisDir == F77_FALSE) {
-		  strncat( Command,"-d ", Nchars);
-		  Nchars -= 3;
+		  strcat( Command, "-d " );
 		}
-	        if (Nchars > SpecLength) Nchars = SpecLength;
-	        (void) strncat( Command, FileSpec, Nchars );
+	        (void) strncat( Command, FileSpec, SpecLength );
 
                /*  Now we arrange things so that the 'ls' command will
                 *  send its output back down our pipe.  We want to redirect
@@ -412,6 +420,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
 
                (void) close (Fdptr[1]);
 	       *Context = cnfFptr( ContextPtr );
+	       free( Command );
             }
          }
       }
