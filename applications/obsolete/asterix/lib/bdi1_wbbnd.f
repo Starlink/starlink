@@ -126,8 +126,8 @@
 
 *  Map the data and width for write access in the same type as the
 *  invented data mapping type
-      CALL DAT_MAP( DLOC, '_'//TYPE, NDIM, DIMS, DPTR, STATUS )
-      CALL DAT_MAP( DLOC, '_'//TYPE, NDIM, DIMS, WPTR, STATUS )
+      CALL DAT_MAP( DLOC, '_'//TYPE, 'WRITE', NDIM, DIMS, DPTR, STATUS )
+      CALL DAT_MAP( WLOC, '_'//TYPE, 'WRITE', NDIM, DIMS, WPTR, STATUS )
 
 *  Convert bounds to centres and widths
       IF ( TYPE .EQ. 'REAL' ) THEN

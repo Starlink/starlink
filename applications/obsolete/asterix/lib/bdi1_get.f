@@ -105,10 +105,10 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
-      CHARACTER*20		ITEM
+      CHARACTER*20		ITEM			! Item to get
 
       INTEGER			ITID			! Invented item id
-      INTEGER			NELM			! # invented elements
+      INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model object dims
       INTEGER			WBPTR			! Write back address
 
       LOGICAL			OK			! Data is valid?
@@ -125,7 +125,8 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate object to be got
-      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC, STATUS )
+      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC,
+     :                 NDIM, DIMS, STATUS )
 
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
@@ -179,7 +180,7 @@
 *    Try to invent data
         CALL ERR_BEGIN( STATUS )
         CALL BDI1_INVNT( ARGS(1), ARGS(2), ITEM, 'REAL', 'READ',
-     :                   ITID, NELM, WBPTR, STATUS )
+     :                   ITID, NDIM, DIMS, WBPTR, STATUS )
         CALL ERR_END( STATUS )
 
 *    Invented ok?
