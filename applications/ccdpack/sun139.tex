@@ -26,7 +26,7 @@
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
 allow you to debias, remove dark current, flatfield, register,
-resample and normalize your data.
+resample and normalize data from single- or multiple-CCD instruments.
 
 CCDPACK is designed to help you to reduce your data easily.
 The basic reduction stages can be set up using an X based GUI that
@@ -819,12 +819,13 @@ or
 % setexercise
 \end{verbatim}
 \end{myquote}
-Answering `xw' to the prompt will allow you to see the progress
-of the demonstration graphically if you have an Xwindows display.
+You will then be prompted for a graphics device: 
+answer `xw' to see the progress graphically on an Xwindows display,
+or `!' to run without graphics.
 
 Each of these scripts generates test data files (small fictional
 starfields) and various intermediate files in the current directory
-when it runs.  These can be deleted when you no longer need them.
+when it runs.  These can be deleted when the script has finished.
 However, you may find them useful as test data if you want to 
 see how the scripts have operated, or to experiment with the CCDPACK
 commands.  You can also use the scripts themselves as examples or
@@ -1051,7 +1052,7 @@ you'll have to work a bit harder.  Consult the description in the
 appendix for a little more about this routine, but it's probably
 worth trying it out and failing first.
 
-\section{Data\label{datatypes} \xlabel{datatypes} formats}
+\section{Data\label{datatypes}\xlabel{datatypes} formats}
 The ``native'' data format that CCDPACK uses is the Starlink NDF (the
 N-dimensional data format (\xref{SUN/33}{sun33}{}), which is based on
 HDS, the Hierarchical Data System \xref{(SUN/92)}{sun92}{}).  This is
@@ -1075,10 +1076,39 @@ use data in these formats you should initialise the CONVERT package
 % convert
 \end{verbatim}
 \end{myquote}
-and the necessary facilities will be set up. All you should now need to
-do is specify your files using their full names, see
-\hyperref{later}{section \S}{}{ndflists} for more about specifying
-image names.
+and the necessary facilities will be set up. 
+Having done this, the simplest way to proceed is to use the
+full name of the unconverted files (i.e.\ including an extension 
+such as `.fits') when giving filenames to CCDPACK; it will
+transparently convert them to NDF format as required without 
+any further effort from you.
+
+An alternative is to convert the files explicitly to NDF format
+before using CCDPACK commands on them.
+Depending on how you are using the commands, this may save processing
+time by preventing CCDPACK from doing the same conversion more than once.
+A full description of how to do this is given in \xref{SUN/55}{sun55}{},
+but normally it just consists of running a command called `<TYPE>2NDF'.
+For instance converting all the FITS files in the current directory
+to NDF files with the same name can be done like this:
+\begin{myquote}
+\begin{verbatim}
+% fits2ndf in='*.fits' out='*' 
+\end{verbatim}
+\end{myquote}
+One useful tip for \xref{FITS2NDF}{sun55}{FITS2NDF} 
+is to set the CONTAINER parameter to true if you are using Multi-Extension
+FITS files (MEFs), i.e.\ type instead
+\begin{myquote}
+\begin{verbatim}
+% fits2ndf in='*.fits' out='*' container=true
+\end{verbatim}
+\end{myquote}
+This will convert an MEF into a single HDS container file
+containing each of the HDUs in the MEF --- the upshot of this is that
+you can pass a single file name to CCDPACK programs and it will
+process all the images contained therein.
+It may also make Set processing (see section \ref{ccdpack_sets}) easier.
 
 One point that you should take note of is that not all formats are as
 flexible as NDF and cannot therefore store all the information that
@@ -1095,7 +1125,7 @@ about how to proceed. You should bear in mind that the requirements
 of CCDPACK are that your format supports the storage of an image and
 some associated header information (this is essential for registration).
 
-\section{Using the CCDPACK programs\xlabel{DIY}}
+\section{Using the data reduction programs\xlabel{DIY}}
 
 The following sections lead you through the CCD reduction process as
 you would do it without the aid of \xroutine{XREDUCE} or
@@ -2881,6 +2911,9 @@ image files using the commands:
 \item \xroutine{ASTEXP}
 \item \xroutine{ASTIMP}
 \end{itemize}
+(the \xroutine{MAKESET} routine can be used as a substitute for
+\routine{ASTIMP} if CCDPACK Sets are being used --- 
+see Section \ref{ccdpack_sets}).
 
 Sometimes the coordinate transformations which must be applied
 to one set of observations are the same as those
@@ -2943,7 +2976,7 @@ In any case, once a suitable AST file is available,
 it can be applied to many sets of images from the same instrument,
 as long as the instrument's characteristics remain the same.
 
-There is more detailed example of the use of \routine{ASTIMP} in 
+There is a more detailed example of the use of \routine{ASTIMP} in 
 section \S\ref{regexamples}.
 
 
@@ -3054,10 +3087,10 @@ which may be a time-consuming step, just
 to check that the alignment looks sensible.
 You can see an example of this in Figure \ref{OUTCLEAR}.
 
-\myfig{sun139outclear.eps}{height=0.5\textheight}{outclear.gif}{OUTCLEAR}{
+\myfig{sun139outclear.eps}{height=0.4\textheight}{outclear.gif}{OUTCLEAR}{
 This image was generated by registering the images and running the 
 command:\protect\\
-{\tt\ \ \ bounds r1059* clear noaxes labmode="index,name,opaque"}}
+\hspace*{2em}{\tt bounds r1059* clear noaxes labname labnum}}
 
 If CLEAR is FALSE however, \routine{BOUNDS} will try to align the
 outlines with an existing picture on the graphics display.
@@ -3082,22 +3115,24 @@ You can see an example of this in Figure \ref{OUTSKY}.
 \myfig{sun139outsky.eps}{height=0.5\textheight}{outsky.gif}{OUTSKY}{BOUNDS
 command with CLEAR=FALSE.  This picture was generated by displaying
 the sky region and then running the command:\protect\\
-{\tt\ \ \ bounds "gc6352p1-?" noclear labpos=cf style="width(curves)=2"}}
+\hspace*{2em}{\tt bounds "gc6352p1-?" noclear 
+                  labpos=cf style="width(curves)=2"}}
 
-Finally, BOUNDS can display the actual image data for you.
+Finally, \routine{BOUNDS} can display the actual image data for you.
 Unlike KAPPA's DISPLAY program, which always displays
-an image as a rectangle with pixel axes horiztal and vertical, 
+an image as a rectangle with pixel axes horizontal and vertical, 
 perhaps with with non-orthogonal image Current coordinate axes 
-drawn over it, BOUNDS always plots on a surface in which the 
+drawn over it, \routine{BOUNDS} always plots on a surface in which the 
 Current coordinate system has horizontal and vertical axes.
 The image data array is therefore resampled to fit within the
 image bounds as they would appear in these coordinates. 
 This can give you a good view of what a group of images will 
 look like when they have been resampled and combined into their
 Current coordinates.  Note however that unlike \xroutine{MAKEMOS},
-BOUNDS performs no averaging or sophisticated normalisation of
+\routine{BOUNDS} performs no averaging or sophisticated normalisation of
 images, so that if two images overlap in their Current coordinates,
-all but the last-plotted will be obscured.  
+all but the last-plotted will be obscured, and the relative
+brightnesses may not be right. 
 When this option is used, the display is always cleared.
 An example of a set of frames from a mosaic camera displayed 
 in this way is given in Figure \ref{OUTIM}.
@@ -3105,7 +3140,7 @@ in this way is given in Figure \ref{OUTIM}.
 \myfig{sun139outim.eps}{height=0.5\textheight}{outim.gif}{OUTIM}{BOUNDS
 command with IMAGE=TRUE.  This display was generated using the
 command:\protect\\
-{\tt\ \ \ bounds "r10629?" image=yes}}
+\hspace*{2em}{\tt bounds "r10629?" image=yes}}
 
 
 \subsection{\xlabel{resampling}\label{resampling}Data resampling}
@@ -3400,6 +3435,12 @@ together many of the capabilities discussed in the earlier sections.
 If your data are fairly simple, you may never need to use such a 
 complicated procedure.
 
+Note that while this example provides a good demonstration of much of the
+CCDPACK World Coordinate System functionality, 
+the steps here could be achieved more simply by using 
+\htmlref{CCDPACK Sets}{ccdpack_sets}. 
+See the example in Section \ref{reg_with_sets} for details.
+
 \myfig{sun139mos.eps}{}{mos.gif}{fig:overlap}{Overlapping observations
 taken using a mosaic camera.}
 
@@ -3581,7 +3622,7 @@ The command we use is therefore
            2  ->   1            OBS1
 
   6) 2c:
-           6  ->   2            SET2
+           6  ->   2            CCD_REG
            2  ->   1            OBS1
 \end{verbatim}
 \end{myquote}
@@ -3598,7 +3639,7 @@ command:
 % bounds '"1?,2?"' clear
 \end{verbatim}
 \end{myquote}
-This should display a plot which looks like 
+This should display a plot which resembles 
 \hyperref{the above figure}{Figure }{}{fig:overlap};
 if it shows an alignment different from what you expect, 
 now is the time to go back
@@ -3714,9 +3755,18 @@ registration, resampling and mosaicing.}
 \clearpage
 
 
-\section{\xlabel{ccdpack_sets}Grouping images by Set --- 
-         mosaic cameras and worse
+\section{\xlabel{ccdpack_sets}Set processing --- multiple image instruments
          \label{ccdpack_sets}}
+
+{\em
+The Set functionality described in this section in new in 
+CCDPACK version 4, released in mid-2001.
+Although most of the planned behaviour is in place, 
+a few additional features remain to be implemented,
+so some of the current behaviour described here may undergo minor changes
+in future releases.
+}
+
 
 In the simplest case, each exposure made on an instrument
 will read out one CCD using one amplifier/ADC and provide you 
@@ -3748,17 +3798,16 @@ other methods such as object matching.
 Both of these can be addressed to a large extent by careful use of the
 facilities of CCDPACK discussed so far, 
 but to make processing of this kind of
-data more painless, CCDPACK provides the concept of a Set of
-data files.  
+data more painless, CCDPACK provides the concept of a Set of images.  
 The idea is that each exposure from a given instrument produces
 a single Set of data with a given number of members.  
-Sets from a given instrument will consists of a fixed number of members:
-each member of a given set will share the same Set Name attribute
+Sets from a given instrument will consist of a fixed number of members:
+each member of a given Set will share the same Set Name attribute
 indicating its origin, 
-and has Set Index attribute differing from the other members
+and has its own Set Index attribute 
 indicating its r\^{o}le, or position, within the Set.
 Every exposure generated by a four-CCD mosaic camera for instance would
-typically produce a single Set with a unique Set Name, 
+produce a single Set with a unique Set Name, 
 and four members with Set Index values of 1, 2, 3 and 4.
 
 Using this functionality is quite simple: the user tells CCDPACK
@@ -3768,7 +3817,7 @@ The way this works is that
 a CCDPACK Set header is added to each file
 (in the .MORE.CCDPACK.SET extension of the NDF) which contains
 two items, the Set Name attribute (a string) and the Set Index
-attribute (a small positive integer).  Set alignment coordinates,
+attribute (a small positive integer).  Set alignment coordinates
 may also be added as an attached coordinate system,
 with the Domain name CCD\_SET,
 if a known alignment is to be associated with the Set.
@@ -3783,10 +3832,11 @@ CCDPACK worry about them for you.
 All the CCDPACK programs which can do Set-sensitive processing
 consult the USESET global parameter to see whether they should
 use Set header information if it exists (files without Set headers are
-treated as normal).
+always treated the same).
 USESET is true by default, which is normally harmless, 
 but if for some reason you wish to ignore Set information
-which exists in files you can set it to false globally by running
+which exists in files you can use \xroutine{CCDSET} to set it
+globally false like this:
 \begin{myquote}
 \begin{verbatim}
 % ccdsetup useset=false accept
@@ -3799,7 +3849,7 @@ and do not wish to use Sets, you may find that processing is speeded
 up by globally setting USESET to false as above.
 
 Note that Set Name attributes don't need to be (and in general will not be)
-actually unique between different Sets; for instance \routine{DEBIAS}
+totally unique between different Sets; for instance \routine{DEBIAS}
 will produce output files which have the same Set Names 
 as the corresponding input files.  However, no ambiguity will arise
 as long as only one Set of files with the same Set Name is presented
@@ -3821,10 +3871,18 @@ To add Set header information you need to use the command
 \begin{itemize}
 \item \xroutine{MAKESET}
 \end{itemize}
-\routine{MAKESET} can operate in a number of different modes,
-according to how your data are arranged in the first place.
-In the most straightforward case, you can use it to make a
-single Set out of a group of files listed by name:
+This can operate in a number of different ways according to 
+how your data is arranged in the first place.
+The most useful ones are described in the following subsections.
+For variations on these, including the ability to construct
+Set headers from FITS header information, see the full description
+of \routine{MAKESET} in appendix \ref{MAKESET}.
+
+
+\subsubsection{\label{makeset_list}Grouping by explicit list}
+
+In the most straightforward case, you can use \xroutine{MAKESET} 
+to make a single Set out of a group of files listed by name:
 \begin{myquote}
 \begin{verbatim}
 % makeset '"im01,im02,im03"' mode=list accept
@@ -3843,9 +3901,9 @@ single Set out of a group of files listed by name:
 \end{verbatim}
 \end{myquote}
 This will write a Set header to each of the named files.
-As the output shows, the Set Name attribute of each is ``im01'' 
-(the name of the first file in the list) and the Set Index attributes
-are 1, 2 and 3 respectively.
+As the output shows, a Set Name attribute ``im01'' 
+(the name of the first file in the list) is given to each, 
+and the Set Index attributes are 1, 2 and 3 respectively.
 
 If you have many files to put into Sets, this may be an unwieldy
 approach.  By using the SETSIZE parameter, an invocation like this
@@ -3907,11 +3965,13 @@ which is almost certainly not what you want.
 If you use \routine{MAKESET} with wildcards you should be careful
 to check the logged output to ensure that it has done the right thing.
 
+\subsubsection{\label{makeset_container}Grouping by container}
+
 If your data exists in HDS container files 
 so that one container file contains all the images from a single 
 exposure, then adding Set headers is easier.
 By running \routine{MAKESET} 
-with the MODE=CONTAINER,
+with MODE=CONTAINER,
 it will assume that each HDS container file corresponds to a single Set.
 In this case you can just type something like
 \begin{myquote}
@@ -3922,16 +3982,16 @@ In this case you can just type something like
 and the correct headers will be added.
 
 Note that if your data initially exists in the form of one 
-Multi-Extension FITS file (MEFs) per observation 
+Multi-Extension FITS file (MEF) per observation 
 you can convert these quite easily to
-HDS container files using the \xref{FITS2NDF}{sun55}{FITS2NDF} 
+HDS container files using the \xref{FITS2NDF}{sun55}{FITS2NDF} command
 with CONTAINER=TRUE.  So supposing you have three exposures,
 each stored in a 2-HDU MEF, you can do:
 \begin{myquote}
 \begin{verbatim}
 % convert
 
-   CONVERT commands are now available -- (Version 1.3-4 2000 December)
+   CONVERT commands are now available -- (Version 1.3-5 2001 January)
  
    Defaults for automatic NDF conversion are set.
  
@@ -3939,13 +3999,13 @@ each stored in a 2-HDU MEF, you can do:
    Type "showme sun55" to browse the hypertext documentation.
  
 % fits2ndf 'obs*.fits' 'conv-*' container=true
-2 files selected.
+3 files selected.
 
 % makeset 'conv-obs*' mode=container accept
 
     MAKESET
     =======
-  12 input NDFs accessed using parameter IN
+  6 input NDFs accessed using parameter IN
 
  Set name  Set index   NDF name
  --------  ---------   --------
@@ -3968,6 +4028,11 @@ supply the names of the container files (\text{conv-obs*})
 and the CCDPACK commands will look inside and find the 
 data frames with their 
 associated Set header information.
+See \xref{SUN/55}{sun55}{} for a full description of the CONVERT
+facility.
+
+\subsubsection{\label{makeset_split}Splitting a single image into 
+               multiple sections}
 
 If each observation initially exists as a single image 
 but needs to be treated as multiple images
@@ -3980,8 +4045,8 @@ with its own Set header.  You will have to supply the parameter OUT
 to give the name of the file containing the split data:
 this will be a single HDS container file containing as many
 NDF structures as the input array is split into.
-For full generality, the parameter SECTIONS describes how to
-split up the input frame, but for the common case of dividing the
+For full generality, the parameter SECTIONS specifies how 
+the input image is to be split up, but for the common case of dividing the
 array into grid of rectangles which butt up to each other the
 XSTART and YSTART parameters are easier.
 The following example shows creation of a Set made by dividing 
@@ -4006,6 +4071,11 @@ a 2048x4096 array into quarters:
                4       sg28948(1025:,2049:)                PIXEL
 \end{verbatim}
 \end{myquote}
+The command creates a single new HDS container file ``sg28948\_sp'':
+when you give this as an input to CCDPACK commands they will look inside 
+and process each of the four images in turn.
+
+\subsubsection{\label{ccd_set}Set alignment (CCD\_SET) coordinates}
 
 You may notice that in the last example, 
 a column headed ``CCD\_SET domain'' has appeared in the output,
@@ -4013,7 +4083,7 @@ with the entry ``PIXEL'' for each of the new Set members.
 This indicates that as well as the Set header, each file has
 had a new coordinate system attached to its WCS component.
 This new coordinate system added by \routine{MAKESET}
-always has the Domain (name) CCD\_SET, 
+always has the Domain (name) ``CCD\_SET'', 
 and in this case is a copy of the 
 PIXEL-Domain coordinate system which existed
 in the input image.
@@ -4023,7 +4093,7 @@ be correctly aligned in these coordinates.
 All the CCDPACK programs concerned with 
 registration\footnote{Actually, all except \xroutine{CCDALIGN}, 
                       for which Set functionality has not yet 
-                      been implemented.}%
+                      been implemented.}
 will recognise a CCD\_SET coordinate system and assume that 
 the alignment of all the images in a given Set is correct in
 these coordinates and is not to be tampered with.
@@ -4062,7 +4132,6 @@ and then add the Set headers with the ADDWCS parameter set true:
     MAKESET
     =======
   3 input NDFs accessed using parameter IN
-ASTFILE - Name of file containing exported AST framesets /!/ > 
 
  Set name  Set index   NDF name                            CCD_SET domain
  --------  ---------   --------                            --------------
@@ -4075,7 +4144,7 @@ ASTFILE - Name of file containing exported AST framesets /!/ >
 \end{myquote}
 As you can see, the FOCAL coordinate system is listed as the one copied to
 make the new one.
-Note that since the new CCD\_SET coordinate system is a copy
+Note that since the new CCD\_SET coordinate system is a {\em copy\/}
 of the FOCAL one, it will
 remain attached to the images even if the FOCAL one is erased or modified.
 
@@ -4116,9 +4185,10 @@ If you try to add a new Set header to
 an image which already has one using \routine{MAKESET}, 
 or a new CCD\_SET coordinate system to an image which already has one
 using \routine{MAKESET} or some other method,
-the old one will be overwritten without a fatal error.
+a warning will be issued, but
+the old one will be overwritten.
 
-\subsection{Interrogating Set headers}
+\subsection{Examining Set headers}
 
 For the most part, once you have added Set headers to your image
 files using \routine{MAKESET} you will be able to let them 
@@ -4134,11 +4204,11 @@ application is provided.
 
 In its simplest mode of operation, it will show you the Set headers
 of a list of images, grouped by Set Name or Set Index.
-Here is a simple invocation, showing the result of one of the
-examples in the previous section:
+Here is a simple invocation, showing the result of the
+example in Section \ref{makeset_container}:
 \begin{myquote}
 \begin{verbatim}
-% showset 'conv-obs?' reset accept
+% showset 'conv-obs?' reset 
 
     SHOWSET
     =======
@@ -4164,10 +4234,10 @@ examples in the previous section:
 As you can see, it gives very similar output to that written
 by \routine{MAKESET} when the headers were being added.
 If you prefer to have them grouped by Set Index, then change the
-LISTBY parameter (which defaults to NAME):
+LISTBY parameter (which defaults to `NAME'):
 \begin{myquote}
 \begin{verbatim}
-% showset 'conv-obs?' listby=index accept
+% showset 'conv-obs?' listby=index reset
 
     SHOWSET
     =======
@@ -4191,9 +4261,9 @@ LISTBY parameter (which defaults to NAME):
 
 As well as showing the Set information of all the files presented,
 \routine{SHOWSET} is also able to 
-select a sublist of presented files according to the values in their
+select a sublist of input files according to the values in their
 Set headers.  
-Using the PICKINDEX and/or PICKNAME parameters 
+By supplying the PICKINDEX and/or PICKNAME parameters,
 images can be selected according
 to the values of their Set Index and/or Set Name attributes
 respectively.
@@ -4210,31 +4280,37 @@ The same applies to the PICKINDEX, INDEX and INDEXLIKE parameters.
 Returning to another example in the previous section, 
 we can pick out only those images in the same Set as (i.e.\ having
 the same Set Name attribute as) \text{im12}
-but which have Set Index of 1 or 2 as follows:
+but which have Set Index of 1 or 2 as follows 
+(in this case some of the parameters are input as the response to prompts):
 \begin{myquote}
 \begin{verbatim}
-% showset 'im*' pickindex=equal index='"2,3"' pickname=like namelike='im12'
+% showset 'im*' pickindex=equal pickname=like listby=none
 
     SHOWSET
     =======
   12 input NDFs accessed using parameter IN
+NAMELIKE - Template NDFs for Set Name value > im12
   1 NDF accessed using parameter NAMELIKE
+INDEX - Acceptable Set Index values > 2,3
   Selection restricted to Set Name values: im10
   Selection restricted to Set Index values: 2
                                             3
 
- Set name  Set index   NDF name                                CCD_SET frame
- --------  ---------   --------                                -------------
- im10:
-           2           im11                                          no
-           3           im12                                          no
+ Set index Set name                    NDF name                CCD_SET frame
+ --------- --------                    --------                -------------
+ 2       im10                          im11                          no
+ 3       im10                          im12                          no
 
   Namelist written to file: showset.lis
 \end{verbatim}
 \end{myquote}
+Here we have also set the LISTBY parameter to `NONE', which does
+no grouping and lists the images in their input order.
+
 As it points out, \routine{SHOWSET} writes a list of the images it
-has output to a file given by the NAMELIST parameter --- by default
-\text{showset.lis}; in the above case that list would read:
+has output to a file given by the NAMELIST parameter, by default
+\text{showset.lis}. 
+In the above case that list would read:
 \begin{myquote}
 \begin{verbatim}
 # SHOWSET - selected NDF name list
@@ -4246,12 +4322,22 @@ This file can be used with the indirection character (`$^\wedge$')
 to provide input for any other program, so you can write scripts
 with commands which will operate only on members of certain Sets
 or certain Index values.
+For example, you could subsequently use \xroutine{BOUNDS} to
+display the outlines of the images that the above command has
+selected like this:
+\begin{myquote}
+\begin{verbatim}
+% bounds in='^showset.lis' clear lines
+\end{verbatim}
+\end{myquote}
+
 
 \subsection{Set functionality in reduction tasks}
 
-This section provides a brief description of what the CCDPACK
-reduction tasks (\xroutine{CALCOR}, \xroutine{DEBIAS}, \xroutine{FLATCOR},
-\xroutine{MAKEBIAS}, \xroutine{MAKECAL}, \xroutine{MAKEFLAT})
+This section provides a brief explanation of what the CCDPACK
+reduction tasks 
+(\xroutine{MAKEBIAS}, \xroutine{MAKECAL}, \xroutine{MAKEFLAT})
+(\xroutine{DEBIAS}, \xroutine{CALCOR}, \xroutine{FLATCOR})
 do when they encounter input files with Set header information.
 It assumes that the USESET parameter is TRUE, which should be the
 case unless you have taken steps to set it FALSE using \xroutine{CCDSETUP}
@@ -4261,16 +4347,16 @@ The reduction tasks considered here are all concerned with constructing
 calibration frames from a stack of input images 
 (\routine{MAKEBIAS}, \routine{MAKECAL}, \routine{MAKEFLAT})
 or with applying those calibration frames to a group of data frames
-(\routine{DEBIAS}, \routine{FLATCOR}, \routine{CALCOR}).
+(\routine{DEBIAS}, \routine{CALCOR}, \routine{FLATCOR}).
 In the case of a single-chip instrument it is normally adequate to
 bung all the input files together and combine them or correct them
 accordingly.  In a multi-chip context however, it is necessary 
-to group the data according to the chip which produced it
-and perform the make/apply calibration cycle separately for each one.
+to perform the make/apply calibration cycle separately for 
+the data from each chip.
 
 So the combination programs, 
 which take multiple input images and produce one output image for each chip,
-do this:
+do something like this:
 \begin{enumerate}
 \item 
 Read in all the input files
@@ -4306,7 +4392,7 @@ For each Set Index value represented in the input files:
 \item Read in the calibration frame with the corresponding Set Index
       from the calibration file
 \item Go through all the input files with this Set Index, correct them
-      using the current calibration frame, and write them out with
+      using the corresponding calibration frame, and write them out with
       the same Set headers as the input files
 \end{itemize}
 \end{enumerate}
@@ -4319,6 +4405,12 @@ If for some reason they will be fed together to the same
 CCDPACK Set-aware program though, you may need to doctor the Set Name
 headers of one or other Set (use the NAME parameter of \xroutine{MAKESET}).
 
+These programs assume that only one type of Set 
+(i.e.\ Set data from only one instrument) 
+is being considered at once --- if two images have the same Set Index
+attribute they are assumed to come from the same chip,
+so you should not mix data from different types of Set in the same
+invocation of a CCDPACK reduction command.
 
 It's not necessary to understand the technicalities to use these programs,
 the upshot is that although multiple calibration frames,
@@ -4331,19 +4423,20 @@ from which chip and use them in the correct places.
 When you look at the output of the various calibration programs
 operating on data with Set headers the operation of the 
 above scheme should be clear.  To see it in action, you can
-run the \text{setexercise} script (see section \ref{demos}).
+look at the log output of the 
+\text{setexercise} script (see section \ref{demos}).
 
 
 \subsection{Set functionality in registration tasks}
 
-This section provides a brief description of what the CCDPACK
+This section provides a brief explanation of what the CCDPACK
 registration tasks 
 (\xroutine{FINDOFF}, \xroutine{PAIRNDF}, 
 \xroutine{REGISTER}, \xroutine{WCSREG})
 do when they encounter input files with Set header information.
 
 By the registration stage, it is no longer of direct interest
-what the origin of each image is, only how it relates to the
+what the source of each image is, only how it relates to the
 others, so the Set Index attribute is simply ignored by these programs.
 In fact the registration applications will ignore Set header information
 altogether unless a Set alignment coordinate system 
@@ -4352,6 +4445,7 @@ is attached to the image.
 Whether there is one or not will depend on whether the 
 ADDWCS parameter was true when the Set headers were added
 with \xroutine{MAKESET}.
+It will also disregard Set alignment if USESET=FALSE.
 
 Only the Set Name attribute and the CCD\_SET coordinate system
 are considered by these programs then.
@@ -4365,6 +4459,7 @@ the images within a Set.
 So the programs 
 \routine{FINDOFF} and \routine{REGISTER} which deal in position lists
 will read in all the input images, construct a single superlist from
+the associated lists of 
 all the members of the same alignment Set, and treat this as if
 it came from a single image.
 \routine{PAIRNDF}, which slides images around under GUI control until
@@ -4372,8 +4467,8 @@ alignment is achieved, allows the user to manipulate a whole Set at
 once instead of one NDF at a time.
 And \routine{WCSREG}, which mediates between different coordinate
 systems to come up with a global registration using as many as necessary,
-accords maximum priority to alignment withing a Set in CCD\_SET 
-coordinates, and will not allow any alignment to occur which conflicts
+accords maximum priority to alignment within a Set in CCD\_SET 
+coordinates, and will not allow any realignment to occur which conflicts
 with that.
 
 Once again, for most purposes you can just feed the list of 
