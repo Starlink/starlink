@@ -44,7 +44,7 @@
         CALL AST_INIT()
       ELSE
         CALL USI_INIT()
-      END
+      ENDIF
 
       CALL MSG_PRNT(VERSION)
 
