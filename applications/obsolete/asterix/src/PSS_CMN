@@ -70,7 +70,8 @@
 *    The data cache
       INTEGER                   DC_LO, DC_HI, DC_CP_C
       REAL                      DC_IMD_S, DC_PSF_S, DC_BGND_S
-      INTEGER                   DC_PC(2), DC_VOLATILE
+      INTEGER                   DC_PC(2)
+      LOGICAL			DC_VOLATILE
       REAL                      DC_IMD(PSS__CACHELEN)
       REAL                      DC_PSF(PSS__CACHELEN)
       REAL                      DC_IMBV(PSS__CACHELEN)
