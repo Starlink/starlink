@@ -138,6 +138,9 @@
 
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+\begin{htmlonly}
+\renewcommand{\lsk}{*} 
+\end{htmlonly}
 
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
@@ -181,7 +184,7 @@
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
 \begin{htmlonly}
-\renewcommand{\dgs}{{\rawhtml &deg;}} 
+\renewcommand{\dgs}{degrees} 
 \end{htmlonly}
 
 % ? End of document specific commands
@@ -238,7 +241,7 @@
 
 % ? Add picture here if required.
    \begin{center}
-   \includegraphics[scale=0.7]{sun223_figures/map2.eps}
+   \includegraphics[scale=0.5]{sun223_figures/map2.eps}\hfill
    \end{center}
 % ? End of picture
 
@@ -395,7 +398,7 @@ described more fully below.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:optical}
-   \includegraphics[scale=0.8,width=8in]{sun223_figures/optical.eps}
+   \includegraphics[scale=0.6,width=8in]{sun223_figures/optical.eps}
    \caption{The main optical components in a typical dual-beam imaging polarimeter.}
    \end{figure}
    \end{quote}
@@ -438,7 +441,7 @@ a mask containing only a single aperture), but the principle is the same.
    \begin{quote}
    \begin{figure}[hbtp]
    \label{fig:grids}
-   \includegraphics[scale=0.5,width=8in]{sun223_figures/grids.eps}
+   \includegraphics[scale=0.35,width=9in]{sun223_figures/grids.eps}
    \caption{An example of a masking system used in a dual-beam imaging polarimeter.}
    \end{figure}
    \end{quote}
@@ -567,7 +570,7 @@ further processing.
    \begin{quote}
    \begin{figure}[hbtp]
    \label{fig:extract}
-   \includegraphics[scale=0.8,width=8in]{sun223_figures/extract.eps}
+   \includegraphics[scale=0.6,width=8in]{sun223_figures/extract.eps}
    \caption{Extraction of the $O$ and $E$ ray images.}
    \end{figure}
    \end{quote}
@@ -675,7 +678,7 @@ Figure~\ref{fig:dataflow}.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:dataflow}
-   \includegraphics[scale=0.8,width=8in]{sun223_figures/dataflow.eps}
+   \includegraphics[scale=0.6,width=8in]{sun223_figures/dataflow.eps}
    \caption{The main steps in the production of a polarization map.}
    \end{figure}
    \end{quote}
@@ -982,7 +985,7 @@ this phase.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:polka}
-   \includegraphics[scale=0.9,width=8in]{sun223_figures/polka.eps}
+   \includegraphics[scale=0.6,width=8in]{sun223_figures/polka.eps}
    \caption{The Graphical User Interface presented by POLKA.}
    \end{figure}
    \end{quote}
@@ -3957,7 +3960,7 @@ extension within an NDF may be examined using the
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:polext}
-   \includegraphics[scale=0.8,width=8in]{sun223_figures/polext.eps}
+   \includegraphics[scale=0.6,width=8in]{sun223_figures/polext.eps}
    \caption{The allowed items within the POLPACK extension.}
    \end{figure}
    \end{quote}
