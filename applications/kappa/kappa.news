@@ -1,6 +1,15 @@
 1 KAPPA_Version_0.12
 
  A new version of KAPPA (V0.12) is now available, containing fixes 
- for several bugs reported in the previous version. No new features or
- applications have been introduced. The revised version of SUN/95
- contains details of the changes made.
+ for several bugs reported in the previous version. In addition, some
+ preliminary support for the new NDF WCS component (which stores World
+ Coordinate System information) has been added. This support currently 
+ only includes:
+
+    1) Creation of the WCS component by FITSIN and FITSDIN on the basis 
+       of suitable FITS keywords.
+
+    2) Propagation of WCS information by most applications which create 
+       an output NDF based on a supplied input NDF.
+
+The revised version of SUN/95 contains details of these changes.
