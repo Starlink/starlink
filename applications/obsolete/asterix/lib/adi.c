@@ -3019,7 +3019,7 @@ void adix_findmem( ADIobj id, char *mem, int mlen,
   curmem = tdef->members;
 
   while ( ! (_null_q(curmem) || found) ) {
-    if ( strncmp( _mdef_name(curmem), mem, mlen ) ) {
+    if ( strx_cmpc( mem, mlen, _mdef_aname(curmem) ) ) {
       imem++;
       curmem = _mdef_next(curmem);
       }
