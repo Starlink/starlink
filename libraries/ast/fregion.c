@@ -1,0 +1,243 @@
+/*
+*+
+*  Name:
+*     fregion.c
+
+*  Purpose:
+*     Define a FORTRAN 77 interface to the AST Region class.
+
+*  Type of Module:
+*     C source file.
+
+*  Description:
+*     This file defines FORTRAN 77-callable C functions which provide
+*     a public FORTRAN 77 interface to the Region class.
+
+*  Routines Defined:
+*     AST_NEGATE
+*     AST_ISAREGION
+*     AST_MAPREGION
+*     AST_GETREGIONFRAME
+*     AST_OVERLAP
+*     AST_SETUNC
+
+*  Copyright:
+*     <COPYRIGHT_STATEMENT>
+
+*  Authors:
+*     DSB: David S. Berry (Starlink)
+
+*  History:
+*     22-MAR-2004 (DSB):
+*        Original version.
+*/
+
+/* Define the astFORTRAN77 macro which prevents error messages from
+   AST C functions from reporting the file and line number where the
+   error occurred (since these would refer to this file, they would
+   not be useful). */
+#define astFORTRAN77
+
+/* Header files. */
+/* ============= */
+#include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
+#include "c2f77.h"               /* F77 <-> C support functions/macros */
+#include "error.h"               /* Error reporting facilities */
+#include "region.h"              /* C interface to the Region class */
+
+/* FORTRAN interface functions. */
+/* ============================ */
+/* These functions implement the remainder of the FORTRAN interface. */
+
+F77_SUBROUTINE(ast_negate)( INTEGER(THIS),
+                            INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+
+   astAt( "AST_NEGATE", NULL, 0 );
+   astWatchSTATUS(
+      astNegate( astI2P( *THIS ) );
+   )
+}
+
+F77_SUBROUTINE(ast_setunc)( INTEGER(THIS),
+                            INTEGER(UNC),
+                            INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(UNC)
+
+   astAt( "AST_SETUNC", NULL, 0 );
+   astWatchSTATUS(
+      astSetUnc( astI2P( *THIS ), astI2P( *UNC ) );
+   )
+}
+
+F77_LOGICAL_FUNCTION(ast_isaregion)( INTEGER(THIS),
+                                     INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_LOGICAL_TYPE(RESULT);
+
+   astAt( "AST_ISAREGION", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astIsARegion( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_getregionframe)( INTEGER(THIS),
+                                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_GETREGIONFRAME", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astGetRegionFrame( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_mapregion)( INTEGER(REG),
+                                     INTEGER(MAP),
+                                     INTEGER(FRM),
+                                     INTEGER(STATUS) ) {
+   GENPTR_INTEGER(REG)
+   GENPTR_INTEGER(MAP)
+   GENPTR_INTEGER(FRM)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_MAPREGION", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astMapRegion( astI2P( *REG ), astI2P( *MAP ),
+                                     astI2P( *FRM ) ) );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_overlap)( INTEGER(THIS),
+                                   INTEGER(THAT),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(THAT)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_OVERLAP", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astOverlap( astI2P( *THIS ), astI2P( *THAT ) );
+   )
+   return RESULT;
+}
+
+/* AST_MASK<X> requires a function for each possible data type, so
+   define it via a macro. */
+#define MAKE_AST_MASK(f,F,Ftype,X,Xtype) \
+F77_INTEGER_FUNCTION(ast_mask##f)( INTEGER(THIS), \
+                                   INTEGER(MAP), \
+                                   LOGICAL(INSIDE), \
+                                   INTEGER(NDIM), \
+                                   INTEGER_ARRAY(LBND), \
+                                   INTEGER_ARRAY(UBND), \
+                                   Ftype##_ARRAY(IN), \
+                                   Ftype(VAL), \
+                                   INTEGER(STATUS) ) { \
+   GENPTR_INTEGER(THIS) \
+   GENPTR_INTEGER(MAP) \
+   GENPTR_LOGICAL(INSIDE) \
+   GENPTR_INTEGER(NDIM) \
+   GENPTR_INTEGER_ARRAY(LBND) \
+   GENPTR_INTEGER_ARRAY(UBND) \
+   GENPTR_##Ftype##_ARRAY(IN) \
+   GENPTR_##Ftype(VAL) \
+   GENPTR_INTEGER(STATUS) \
+\
+   F77_INTEGER_TYPE RESULT; \
+\
+   astAt( "AST_MASK"#F, NULL, 0 ); \
+   astWatchSTATUS( \
+\
+      RESULT = astMask##X( astI2P( *THIS ), astI2P( *MAP ), \
+                           F77_ISTRUE( *INSIDE ) ? 1 : 0, *NDIM, \
+                           LBND, UBND, (Xtype *) IN, *VAL ); \
+   ) \
+   return RESULT; \
+}
+
+/* Invoke the above macro to define a function for each data
+   type. Include synonyms for some functions. */
+MAKE_AST_MASK(d,D,DOUBLE,D,double)
+/* MAKE_AST_MASK(r,R,REAL,F,float) */
+MAKE_AST_MASK(i,I,INTEGER,I,int)
+MAKE_AST_MASK(ui,UI,INTEGER,UI,unsigned int)
+MAKE_AST_MASK(s,S,WORD,S,short int)
+MAKE_AST_MASK(us,US,UWORD,US,unsigned short int)
+MAKE_AST_MASK(w,W,WORD,S,short int)
+MAKE_AST_MASK(uw,UW,UWORD,US,unsigned short int)
+MAKE_AST_MASK(b,B,BYTE,B,signed char)
+MAKE_AST_MASK(ub,UB,UBYTE,UB,unsigned char)
+#undef MAKE_AST_MASK
+
+
+F77_INTEGER_FUNCTION(ast_maskr)( INTEGER(THIS), 
+                                   INTEGER(MAP), 
+                                   LOGICAL(INSIDE), 
+                                   INTEGER(NDIM), 
+                                   INTEGER_ARRAY(LBND), 
+                                   INTEGER_ARRAY(UBND), 
+                                   REAL_ARRAY(IN), 
+                                   REAL(VAL), 
+                                   INTEGER(STATUS) ) { 
+   GENPTR_INTEGER(THIS) 
+   GENPTR_INTEGER(MAP) 
+   GENPTR_LOGICAL(INSIDE) 
+   GENPTR_INTEGER(NDIM) 
+   GENPTR_INTEGER_ARRAY(LBND) 
+   GENPTR_INTEGER_ARRAY(UBND) 
+   GENPTR_REAL_ARRAY(IN) 
+   GENPTR_REAL(VAL) 
+   GENPTR_INTEGER(STATUS) 
+
+   F77_INTEGER_TYPE RESULT; 
+
+   astAt( "AST_MASKR", NULL, 0 ); 
+
+
+
+
+
+
+
+
+/* Begin a new C scope. */ 
+{ 
+
+/* Ensure that a pointer to the STATUS argument exists. */ 
+   GENPTR_INTEGER(STATUS) 
+
+/* Store the STATUS value in a local int. */ 
+   int ast_local_status = *STATUS; 
+
+/* Make this int the AST error status variable, saving the address of 
+   the previous variable. */ 
+   int *ast_previous_status = astWatch( &ast_local_status ); 
+
+      RESULT = astMaskF( astI2P( *THIS ), astI2P( *MAP ), 
+                           F77_ISTRUE( *INSIDE ) ? 1 : 0, *NDIM, 
+                           LBND, UBND, (float *) IN, *VAL ); 
+
+/* Restore the original error status variable. */ 
+   (void) astWatch( ast_previous_status ); 
+
+/* Return the final error status to STATUS. */ 
+   *STATUS = ast_local_status; 
+}
+
+
+
+
+
+
+
+
+
+   return RESULT; 
+}
+
+

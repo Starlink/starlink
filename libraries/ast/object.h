@@ -104,6 +104,8 @@
 *           Clear the value of the Ident attribute for an Object.
 *        astDump
 *           Write an Object to a Channel.
+*        astEqual
+*           Are two Objects equivalent?
 *        astGetAttrib
 *           Get the value of a specified attribute for an Object.
 *        astGetClass (deprecated synonym astClass)
@@ -270,6 +272,7 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
+#include "version.h"             /* Version number macros */
 
 /* C header files. */
 /* --------------- */
@@ -743,7 +746,7 @@ int astIsA##class##_( const Ast##class *this ) { \
 \
 /* To test if the object is correctly constructed, we first test if it is a \
    member of the parent class. This improves the security of the test by \
-   checking the object structure from the base Object class downwards \
+   checking the object structure from the base Object class downwards
    (without this, the "magic numbers" that identify classes might be \
    encountered by accident or we might address parts of the Object which \
    don't exist). */ \
@@ -1108,6 +1111,7 @@ typedef struct AstObjectVtab {
    void (* ClearID)( AstObject * );
    void (* ClearIdent)( AstObject * );
    void (* Dump)( AstObject *, struct AstChannel * );
+   int (* Equal)( AstObject *, AstObject * );
    void (* SetAttrib)( AstObject *, const char * );
    void (* SetID)( AstObject *, const char * );
    void (* SetIdent)( AstObject *, const char * );
@@ -1211,6 +1215,7 @@ const char *astGetAttrib_( AstObject *, const char * );
 const char *astGetClass_( const AstObject * );
 const char *astGetID_( AstObject * );
 const char *astGetIdent_( AstObject * );
+int astEqual_( AstObject *, AstObject * );
 int astGetNobject_( const AstObject * );
 int astGetRefCount_( const AstObject * );
 int astTestAttrib_( AstObject *, const char * );
@@ -1335,6 +1340,8 @@ astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib))
 #define astClearIdent(this) astINVOKE(V,astClearIdent_(astCheckObject(this)))
 #define astDump(this,channel) \
 astINVOKE(V,astDump_(astCheckObject(this),astCheckChannel(channel)))
+#define astEqual(this,that) \
+astINVOKE(V,astEqual_(astCheckObject(this),astCheckObject(that)))
 #define astGetAttrib(this,attrib) \
 astINVOKE(V,astGetAttrib_(astCheckObject(this),attrib))
 #define astGetClass(this) astINVOKE(V,astGetClass_((const AstObject *)(this)))

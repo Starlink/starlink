@@ -34,7 +34,9 @@
 *     19-OCT-2004 (DSB):
 *        Added astSetNpoint.
 *     2-NOV-2004 (DSB):
-*        Do not write out AST__BAD axis values in the Dump function.
+*        - Do not write out AST__BAD axis values in the Dump function.
+*        - Override astEqual method.
+*        - Add protected PointAccuracy attribute.
 */
 
 /* Module Macros. */
@@ -43,6 +45,358 @@
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS PointSet
+
+
+/*
+*
+*  Name:
+*     MAKE_CLEAR
+
+*  Purpose:
+*     Implement a method to clear a single value in a multi-valued attribute.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     MAKE_CLEAR(attr,component,assign)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static void Clear<Attribute>( AstPointSet *this, int axis )
+*
+*     and an external interface function of the form:
+*
+*        void astClear<Attribute>_( AstPointSet *this, int axis )
+*
+*     which implement a method for clearing a single value in a specified 
+*     multi-valued attribute for an axis of a PointSet. The "axis" value
+*     must be in the range 0 to (ncoord-1).
+
+*  Parameters:
+*     attr
+*        The name of the attribute to be cleared, as it appears in the function
+*        name (e.g. PointAccuracy in "astClearPointAccuracy").
+*     component
+*        The name of the class structure component that holds the attribute
+*        value.
+*     assign
+*        An expression that evaluates to the value to assign to the component
+*        to clear its value.
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*
+*/
+
+/* Define the macro. */
+#define MAKE_CLEAR(attr,component,assign) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static void Clear##attr( AstPointSet *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Validate the axis index. */ \
+   if( axis < 0 || axis >= this->ncoord ){ \
+      astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
+                #attr " - it should be in the range 1 to %d.", \
+                "astClear" #attr, astGetClass( this ), \
+                axis + 1, this->ncoord ); \
+\
+/* Assign the "clear" value. */ \
+   } else { \
+      this->component[ axis ] = (assign); \
+   } \
+} \
+\
+/* External interface. */ \
+/* ------------------- */ \
+void astClear##attr##_( AstPointSet *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   (**astMEMBER(this,PointSet,Clear##attr))( this, axis ); \
+}   
+
+
+/*
+*
+*  Name:
+*     MAKE_GET
+
+*  Purpose:
+*     Implement a method to get a single value in a multi-valued attribute.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     MAKE_GET(attr,type,bad_value,assign)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static <Type> Get<Attribute>( AstPointSet *this, int axis )
+*
+*     and an external interface function of the form:
+*
+*        <Type> astGet<Attribute>_( AstPointSet *this, int axis )
+*
+*     which implement a method for getting a single value from a specified 
+*     multi-valued attribute for an axis of a PointSet. The "axis" value
+*     must be in the range 0 to (ncoord-1).
+
+
+*  Parameters:
+*     attr
+*        The name of the attribute whose value is to be obtained, as it
+*        appears in the function name (e.g. PointAccuracy in "astGetPointAccuracy").
+*     type
+*        The C type of the attribute.
+*     bad_value
+*        A constant value to return if the global error status is set, or if
+*        the function fails.
+*     assign
+*        An expression that evaluates to the value to be returned. This can
+*        use the string "axis" to represent the zero-based value index.
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*
+*/
+
+/* Define the macro. */
+#define MAKE_GET(attr,type,bad_value,assign) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static type Get##attr( AstPointSet *this, int axis ) { \
+   type result;                  /* Result to be returned */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return (bad_value); \
+\
+/* Validate the axis index. */ \
+   if( axis < 0 || axis >= this->ncoord ){ \
+      astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
+                #attr " - it should be in the range 1 to %d.", \
+                "astGet" #attr, astGetClass( this ), \
+                axis + 1, this->ncoord ); \
+\
+/* Assign the result value. */ \
+   } else { \
+      result = (assign); \
+   } \
+\
+/* Check for errors and clear the result if necessary. */ \
+   if ( !astOK ) result = (bad_value); \
+\
+/* Return the result. */ \
+   return result; \
+} \
+/* External interface. */ \
+/* ------------------- */  \
+type astGet##attr##_( AstPointSet *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return (bad_value); \
+\
+/* Invoke the required method via the virtual function table. */ \
+   return (**astMEMBER(this,PointSet,Get##attr))( this, axis ); \
+}
+
+/*
+*
+*  Name:
+*     MAKE_SET
+
+*  Purpose:
+*     Implement a method to set a single value in a multi-valued attribute 
+*     for a PointSet.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     MAKE_SET(attr,type,component,assign)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static void Set<Attribute>( AstPointSet *this, int axis, <Type> value )
+*
+*     and an external interface function of the form:
+*
+*        void astSet<Attribute>_( AstPointSet *this, int axis, <Type> value )
+*
+*     which implement a method for setting a single value in a specified
+*     multi-valued attribute for a PointSet. The "axis" value must be in 
+*     the range 0 to (ncoord-1).
+
+*  Parameters:
+*      attr
+*         The name of the attribute to be set, as it appears in the function
+*         name (e.g. PointAccuracy in "astSetPointAccuracy").
+*      type
+*         The C type of the attribute.
+*      component
+*         The name of the class structure component that holds the attribute
+*         value.
+*      assign
+*         An expression that evaluates to the value to be assigned to the
+*         component.
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*-
+*/
+
+/* Define the macro. */
+#define MAKE_SET(attr,type,component,assign) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static void Set##attr( AstPointSet *this, int axis, type value ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Validate the axis index. */ \
+   if( axis < 0 || axis >= this->ncoord ){ \
+      astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
+                #attr " - it should be in the range 1 to %d.", \
+                "astSet" #attr, astGetClass( this ), \
+                axis + 1, this->ncoord ); \
+\
+/* Store the new value in the structure component. */ \
+   } else { \
+      this->component[ axis ] = (assign); \
+   } \
+} \
+\
+/* External interface. */ \
+/* ------------------- */ \
+void astSet##attr##_( AstPointSet *this, int axis, type value ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   (**astMEMBER(this,PointSet,Set##attr))( this, axis, value ); \
+}
+
+/*
+*
+*  Name:
+*     MAKE_TEST
+
+*  Purpose:
+*     Implement a method to test if a single value has been set in a 
+*     multi-valued attribute for a class.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     MAKE_TEST(attr,assign)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static int Test<Attribute>( AstPointSet *this, int axis )
+*
+*     and an external interface function of the form:
+*
+*        int astTest<Attribute>_( AstPointSet *this, int axis )
+*
+*     which implement a method for testing if a single value in a specified 
+*     multi-valued attribute has been set for a class. The "axis" value
+*     must be in the range 0 to (ncoord-1).
+
+*  Parameters:
+*      attr
+*         The name of the attribute to be tested, as it appears in the function
+*         name (e.g. PointAccuracy in "astTestPointAccuracy").
+*      assign
+*         An expression that evaluates to 0 or 1, to be used as the returned
+*         value. This can use the string "axis" to represent the zero-based
+*         index of the value within the attribute.
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*-
+*/
+
+/* Define the macro. */
+#define MAKE_TEST(attr,assign) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static int Test##attr( AstPointSet *this, int axis ) { \
+   int result;                   /* Value to return */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return 0; \
+\
+\
+/* Validate the axis index. */ \
+   if( axis < 0 || axis >= this->ncoord ){ \
+      astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
+                #attr " - it should be in the range 1 to %d.", \
+                "astTest" #attr, astGetClass( this ), \
+                axis + 1, this->ncoord ); \
+\
+/* Assign the result value. */ \
+   } else { \
+      result = (assign); \
+   } \
+\
+/* Check for errors and clear the result if necessary. */ \
+   if ( !astOK ) result = 0; \
+\
+/* Return the result. */ \
+   return result; \
+} \
+/* External interface. */ \
+/* ------------------- */ \
+int astTest##attr##_( AstPointSet *this, int axis ) { \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return 0; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   return (**astMEMBER(this,PointSet,Test##attr))( this, axis ); \
+}
 
 /* Include files. */
 /* ============== */
@@ -62,6 +416,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 
 /* Module Variables. */
@@ -78,6 +433,7 @@ static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_equal)( AstObject *, AstObject * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -90,6 +446,7 @@ AstPointSet *astPointSetId_( int, int, const char *, ... );
 /* ======================================== */
 static const char *GetAttrib( AstObject *, const char * );
 static double **GetPoints( AstPointSet * );
+static int Equal( AstObject *, AstObject * );
 static int GetNcoord( const AstPointSet * );
 static int GetNpoint( const AstPointSet * );
 static int TestAttrib( AstObject *, const char * );
@@ -102,6 +459,11 @@ static void SetAttrib( AstObject *, const char * );
 static void SetPoints( AstPointSet *, double ** );
 static void SetNpoint( AstPointSet *, int );
 static void SetSubPoints( AstPointSet *, int, int, AstPointSet * );
+
+static double GetPointAccuracy( AstPointSet *, int );
+static int TestPointAccuracy( AstPointSet *, int );
+static void ClearPointAccuracy( AstPointSet *, int );
+static void SetPointAccuracy( AstPointSet *, int, double );
 
 /* Member functions. */
 /* ================= */
@@ -118,7 +480,7 @@ static void CheckPerm( AstPointSet *this, const int *perm, const char *method ) 
 *     Protected virtual function.
 
 *  Synopsis:
-*     #include "frame.h"
+*     #include "pointset.h"
 *     void astCheckPerm( AstPointSet *this, const int *perm, const char *method )
 
 *  Class Membership:
@@ -276,6 +638,190 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two PointSets are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     PointSet member function (over-rides the astEqual protected
+*     method inherited from the Object class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two PointSets are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first PointSet.
+*     that
+*        Pointer to the second PointSet.
+
+*  Returned Value:
+*     One if the PointSets are equivalent, zero otherwise.
+
+*  Notes:
+*     - The two PointSets are considered equivalent if they have the same
+*     number of points, the same number of axis values per point, and the 
+*     same axis values to within the absolute tolerance specified by the
+*     Accuracy attribute of the two PointSets.
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *that;         /* Pointer to the second PointSet structure */
+   AstPointSet *this;         /* Pointer to the first PointSet structure */
+   double **ptr_that;         /* Pointer to axis values in second PointSet */
+   double **ptr_this;         /* Pointer to axis values in first PointSet */
+   double *p_that;            /* Pointer to next axis value in second PointSet */
+   double *p_this;            /* Pointer to next axis value in first PointSet */
+   double acc1;               /* Absolute accuracy for 1st PointSet axis value */
+   double acc2;               /* Absolute accuracy for 2nd PointSet axis value */
+   double acc;                /* Combined absolute accuracy */
+   double acc_that;           /* PointAccuracy attribute for 2nd PointSet */
+   double acc_this;           /* PointAccuracy attribute for 1st PointSet */
+   int ic;                    /* Axis index */
+   int ip;                    /* Point index */
+   int nc;                    /* No. of axis values per point */
+   int np;                    /* No. of points in each PointSet */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the Equal method inherited from the parent Object class. This checks
+   that the Objects are both of the same class (amongst other things). */
+   if( (*parent_equal)( this_object, that_object ) ) {
+
+/* Obtain pointers to the two PointSet structures. */
+      this = (AstPointSet *) this_object;
+      that = (AstPointSet *) that_object;
+
+/* Check the number of points and the number of axis values per point are
+   equal in the two PointSets. */
+      np = astGetNpoint( this );
+      nc = astGetNcoord( this );
+      if( np == astGetNpoint( that ) && nc == astGetNcoord( that ) ) {
+
+/* Get pointers to the axis values.*/
+         ptr_this = astGetPoints( this );
+         ptr_that = astGetPoints( that );
+         if( astOK ) {
+
+/* Assume the PointSets are equal until proven otherwise. */
+            result = 1;
+
+/* Loop round each axis, until we find a difference. */
+            for( ic = 0; ic < nc && result; ic++ ) {
+
+/* Get pointers to the next value for this axis. */
+               p_this = ptr_this[ ic ];
+               p_that = ptr_that[ ic ];
+
+/* Get the absolute accuracies for this axis. The default value for this
+   attribute is AST__BAD. */
+               acc_this = astGetPointAccuracy( this, ic );
+               acc_that = astGetPointAccuracy( that, ic );
+
+/* If both accuracies are available, combine them in quadrature. */
+               if( acc_this != AST__BAD && acc_that != AST__BAD ) {
+                  acc = sqrt( acc_this*acc_this + acc_that*acc_that );
+
+/* Loop round all points on this axis */
+                  for( ip = 0; ip < np; ip++, p_this++, p_that++ ){
+
+/* If either value is bad we do not need to compare values. */
+                     if( *p_this == AST__BAD || *p_that == AST__BAD ) {
+
+/* If one value is bad and one is good, they differ, so break. If both
+   values are bad they are equal so we continue. */
+                        if( *p_this != AST__BAD || *p_that != AST__BAD ) {
+                           result = 0;
+                           break;
+                        }
+
+/* Otherwise (if both axis values are good), compare axis values, and break if 
+   they differ by more than the absolute accuracy. */
+                     } else if( fabs( *p_this - *p_that ) > acc ) {
+                        result = 0;
+                        break;
+                     }
+                  }
+
+/* If either accuracy is unavailable, we use a default relative accuracy. */
+               } else {
+
+/* Loop round all points on this axis */
+                  for( ip = 0; ip < np; ip++, p_this++, p_that++ ){
+
+/* If either value is bad we do not need to compare values. */
+                     if( *p_this == AST__BAD || *p_that == AST__BAD ) {
+
+/* If one value is bad and one is good, they differ, so break. If both
+   values are bad they are equal so we continue. */
+                        if( *p_this != AST__BAD || *p_that != AST__BAD ) {
+                           result = 0;
+                           break;
+                        }
+
+/* Otherwise (if both axis values are good), find the absolute error for
+   both values. */
+                     } else {
+
+                        if( acc_this == AST__BAD ) {
+                           acc1 = fabs(*p_this)*DBL_EPSILON;
+                           if( acc1 < DBL_MIN ) acc1 = DBL_MIN;
+                           acc1 *= 1.0E8;
+                        } else {
+                           acc1 = acc_this;
+                        }
+
+                        if( acc_that == AST__BAD ) {
+                           acc2 = fabs(*p_that)*DBL_EPSILON;
+                           if( acc2 < DBL_MIN ) acc2 = DBL_MIN;
+                           acc2 *= 1.0E8;
+                        } else {
+                           acc2 = acc_that;
+                        }
+
+/* Combine them in quadrature. */
+                        acc = sqrt( acc1*acc1 + acc2*acc2 );
+
+/* Compare axis values, and break if they differ by more than the
+   absolute accuracy. */
+                        if( fabs( *p_this - *p_that ) > acc ) {
+                           result = 0;
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -625,6 +1171,11 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    vtab->SetNpoint = SetNpoint;
    vtab->SetSubPoints = SetSubPoints;
 
+   vtab->GetPointAccuracy = GetPointAccuracy;
+   vtab->SetPointAccuracy = SetPointAccuracy;
+   vtab->TestPointAccuracy = TestPointAccuracy;
+   vtab->ClearPointAccuracy = ClearPointAccuracy;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
@@ -637,6 +1188,8 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    object->SetAttrib = SetAttrib;
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+   parent_equal = object->Equal;
+   object->Equal = Equal;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -1165,6 +1718,41 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    return result;
 }
 
+/* Functions which access class attributes. */
+/* ---------------------------------------- */
+
+/*
+*att+
+*  Name:
+*     PointAccuracy
+
+*  Purpose:
+*     The absolute accuracies for all points in the PointSet.
+
+*  Type:
+*     Protected attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute holds the absolute accuracy for each axis in the 
+*     PointSet. It has a separate value for each axis. It is used when
+*     comparing two PointSets using the protected astEqual method inherited
+*     from the Object class. The default value for each axis is AST__BAD 
+*     which causes the a default accuracy of each axis value to be calculated 
+*     as  1.0E8*min( abs(axis value)*DBL_EPSILON, DBL_MIN ).
+
+*  Applicability:
+*     PointSet
+*        All PointSets have this attribute.
+*att-
+*/
+MAKE_CLEAR(PointAccuracy,acc,AST__BAD)
+MAKE_GET(PointAccuracy,double,AST__BAD,this->acc[axis])
+MAKE_SET(PointAccuracy,double,acc,((value!=AST__BAD)?fabs(value):AST__BAD))
+MAKE_TEST(PointAccuracy,(this->acc[axis]!=AST__BAD))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -1215,6 +1803,9 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    the output PointSet. */
    out->ptr = NULL;
    out->values = NULL;
+ 
+/* Copy axis accuracies. */
+   out->acc = astStore( NULL, in->acc, sizeof( double )*(size_t) in->ncoord );
 
 /* If the input PointSet is associated with coordinate values, we must
    allocate memory in the output PointSet to hold a copy of them. */
@@ -1292,6 +1883,9 @@ static void Delete( AstObject *obj ) {
 
 /* Obtain a pointer to the PointSet structure. */
    this = (AstPointSet *) obj;
+
+/* Free memory holding axis accuracies. */
+   this->acc = astFree( this->acc );
 
 /* Free any pointer array and associated coordinate values array, */
    this->ptr = (double **) astFree( (void *) this->ptr );
@@ -1378,6 +1972,16 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ------- */
    astWriteInt( channel, "Ncoord", 1, 1, this->ncoord,
                 "Number of coordinates per point" );
+
+/* Axis Acuracies. */
+/* --------------- */
+   for ( coord = 0; coord < this->ncoord; coord++ ) {
+      if( astTestPointAccuracy( this, coord ) ) {
+         (void) sprintf( key, "Acc%d", coord + 1 );
+         astWriteDouble( channel, key, 1, 1, astGetPointAccuracy( this, coord ),
+                         (coord == 0 ) ? "Axis accuracies..." : "" );
+      }
+   }
 
 /* Coordinate data. */
 /* ---------------- */
@@ -1652,6 +2256,7 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstPointSet *new;             /* Pointer to new PointSet */
+   int i;                        /* Axis index */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1689,6 +2294,10 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
    values array. */
       new->ptr = NULL;
       new->values = NULL;
+      new->acc = astMalloc( sizeof( double )*(size_t) ncoord );
+      if( astOK ) {
+         for( i = 0; i < ncoord; i++ ) (new->acc)[ i ] = AST__BAD;
+      }
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -1837,6 +2446,16 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 /* ------- */
       new->ncoord = astReadInt( channel, "ncoord", 1 );
       if ( new->ncoord < 1 ) new->ncoord = 1;
+
+/* Axis Acuracies. */
+/* --------------- */
+      new->acc = astMalloc( sizeof( double )*(size_t) new->ncoord );
+      if( astOK ) {
+         for ( coord = 0; coord < new->ncoord; coord++ ) {
+            (void) sprintf( key, "acc%d", coord + 1 );
+            new->acc[ coord ] = astReadDouble( channel, key, AST__BAD );
+         }
+      }
 
 /* Coordinate data. */
 /* ---------------- */

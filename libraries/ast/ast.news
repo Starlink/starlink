@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V3.4) of the Starlink AST (astrometry) library is
+   A new release (V3.5) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,52 +15,13 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-o  The Mapping class has a new method to calculate the co-efficients of 
-a linear approximation to a Mapping.
+- AST now provides facilities for representing regions of various
+shapes within a coordinate system. The Region class provides general
+facilities which are independent of the specific shape of region being
+used. Various sub-classes of Region are also now available which provide 
+means of creating Regions of specific shape. Facilities provided by the
+Region class include testing points to see if they are inside the
+Region, testing two Regions for overlap, transforming Regions from one
+coordinate system to another \emph{etc}.
 
-o  The Format attribute for simple Frames and SkyFrames has been extended.
-It has always been possible, in both classes, to specify a precision by
-including a dot in the Format value followed by an integer (e.g. "dms.1"
-for a SkyFrame, or "%.10g" for a simple Frame). The precision can now
-also be specified using an asterisk in place of the integer (e.g. "dms.*" 
-or "%.*g"). This causes the precision to be derived on the basis of the
-Digits attribute value.  
-
-o The Plot class has been changed so that the default value used for the
-Digits attribute is chosen to be the smallest value which results in no
-pair of adjacent labels being identical. For instance, if an annotated grid 
-is being drawn describing a SkyFrame, and the Format(1) value is set to
-"hms.*g" (the "g" causes field delimiters to be drawn as superscripts), and 
-the Digits(1) value is unset, then the seconds field will have a number of 
-decimal places which results in no pair of labels being identical.
-
-o  Addition of a new FITS encoding, "FITS-CLASS", which uses the
-conventions of the CLASS package (see
-http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html).
-
-o Addition of a new class classed DSBSpecFrame. This is a 
-sub-class of SpecFrame which can be used to describe spectral axes
-associated with dual sideband spectral data.
-
-o The FitsChan class will now read headers which use the old "-GLS"
-projection code, converting them to the corresponding modern "-SFL" code,
-provided that the celestial axes are not rotated.
-
-For further details of these changes, see the final appendix of Starlink
-User Note SUN/210 (Fortran version) or SUN/211 (C version). These are
-available on the WWW at:
-
-      http://www.starlink.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
-
-and
-      http://www.starlink.rl.ac.uk/cgi-bin/htxserver/sun211.htx/
-
-Alternatively, on Starlink systems, type:
-
-      showme sun210 changes
-
-or
-      showme sun211 changes
-
-13/11/2003
-
+9/11/04

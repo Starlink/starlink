@@ -1,32 +1,41 @@
 #define astCLASS
 #include "axis.h"
+#include "box.h"
 #include "channel.h"
+#include "circle.h"
 #include "cmpframe.h"
 #include "cmpmap.h"
-#include "dssmap.h"
+#include "cmpregion.h"
 #include "dsbspecframe.h"
+#include "dssmap.h"
+#include "ellipse.h"
 #include "fitschan.h"
 #include "frame.h"
 #include "frameset.h"
 #include "grismmap.h"
+#include "interval.h"
 #include "intramap.h"
 #include "loader.h"
 #include "lutmap.h"
 #include "mapping.h"
 #include "mathmap.h"
 #include "matrixmap.h"
+#include "nullregion.h"
 #include "object.h"
 #include "pcdmap.h"
 #include "permmap.h"
 #include "plot.h"
+#include "pointlist.h"
 #include "pointset.h"
+#include "polygon.h"
 #include "polymap.h"
+#include "region.h"
+#include "shiftmap.h"
 #include "skyaxis.h"
 #include "skyframe.h"
+#include "slamap.h"
 #include "specframe.h"
 #include "specmap.h"
-#include "shiftmap.h"
-#include "slamap.h"
 #include "sphmap.h"
 #include "unitmap.h"
 #include "wcsmap.h"
@@ -61,8 +70,6 @@
 *        Added the SpecMap and SpecFrame classes.
 *     15-JUL-2003 (DSB):
 *        Added the GrsimMap class.
-*     6-AUG-2004 (DSB):
-*        Added the DSBSpecFrame class.
 *-
 */
 
@@ -73,26 +80,35 @@ AstLoaderType *astGetLoader( const char *class ) {
 if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
 
    LOAD(Axis);
+   LOAD(Box);
    LOAD(Channel);
+   LOAD(Circle);
    LOAD(CmpFrame);
    LOAD(CmpMap);
+   LOAD(CmpRegion);
    LOAD(DSBSpecFrame);
    LOAD(DssMap);
+   LOAD(Ellipse);
    LOAD(FitsChan);
    LOAD(Frame);
    LOAD(FrameSet);
    LOAD(GrismMap);
+   LOAD(Interval);
    LOAD(IntraMap);
    LOAD(LutMap);
    LOAD(Mapping);
    LOAD(MathMap);
    LOAD(MatrixMap);
+   LOAD(NullRegion);
    LOAD(Object);
    LOAD(PcdMap);
    LOAD(PermMap);
    LOAD(Plot);
-   LOAD(PolyMap);
+   LOAD(PointList);
    LOAD(PointSet);
+   LOAD(PolyMap);
+   LOAD(Polygon);
+   LOAD(Region);
    LOAD(ShiftMap);
    LOAD(SkyAxis);
    LOAD(SkyFrame);

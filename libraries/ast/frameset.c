@@ -49,7 +49,13 @@ f     AST_FRAMESET
 c     Mapping, a FrameSet may also be inverted (see astInvert), which
 f     Mapping, a FrameSet may also be inverted (see AST_INVERT), which
 *     has the effect of interchanging its base and current Frames and
-*     hence of reversing the Mapping between them.
+*     hence of reversing the Mapping between them. 
+*
+*     Regions may be added into a FrameSet (since a Region is a type of
+*     Frame), either explicitly or as components within CmpFrames. In this 
+*     case the Mapping between a pair of Frames within a FrameSet will 
+*     include the effects of the clipping produced by any Regions included 
+*     in the path between the Frames. 
 
 *  Inheritance:
 *     The FrameSet class inherits from the Frame class.
@@ -173,6 +179,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     24-JAN-2004 (DSB):
 *        o  Override the astFields method.
 *        o  Add argument "fmt" to Abbrev.
+*     23-MAR-2004 (DSB):
+*        Modified astGetMapping and Span to include the clipping effect of 
+*        any Regions in the path between the two supplied Frames.
 *     24-AUG-2004 (DSB):
 *        - Override various methods inherited from Frame (astAngle,
 *	astAxAngle, astAxDistance, astAxOffset, astCheckPerm, astOffset2,
@@ -739,9 +748,16 @@ static double Angle( AstFrame *, const double[], const double[], const double[] 
 static double AxAngle( AstFrame *, const double[], const double[], int );
 static double AxDistance( AstFrame *, int, double, double );
 static double AxOffset( AstFrame *, int, double, double );
+static double Offset2( AstFrame *, const double[2], double, double, double[2] );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
+static AstSystemType SystemCode( AstFrame *, const char * );
+static const char *SystemString( AstFrame *, AstSystemType );
+static void CheckPerm( AstFrame *, const int *, const char * );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
+static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
+
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
-static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int ForceCopy( AstFrameSet *, int );
 static int GetBase( AstFrameSet * );
@@ -760,8 +776,9 @@ static int GetPermute( AstFrame * );
 static int GetPreserveAxes( AstFrame * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
+static int IsUnitFrame( AstFrame * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int Span( AstFrameSet *, int, int, int, AstMapping **, int * );
+static int Span( AstFrameSet *, AstFrame **, int, int, int, AstMapping **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestBase( AstFrameSet * );
@@ -783,11 +800,7 @@ static int TestUnit( AstFrame *, int );
 static int Unformat( AstFrame *, int, const char *, double * );
 static int ValidateAxis( AstFrame *, int, const char * );
 static int ValidateFrameIndex( AstFrameSet *, int, const char * );
-static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
-static AstSystemType SystemCode( AstFrame *, const char * );
-static const char *SystemString( AstFrame *, AstSystemType );
 static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame * );
-static void CheckPerm( AstFrame *, const int *, const char * );
 static void Clear( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearBase( AstFrameSet * );
@@ -817,7 +830,6 @@ static void RecordIntegrity( AstFrameSet * );
 static void RemapFrame( AstFrameSet *, int, AstMapping * );
 static void RemoveFrame( AstFrameSet *, int );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
-static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void RestoreIntegrity( AstFrameSet * );
 static void SetAttrib( AstObject *, const char * );
 static void SetAxis( AstFrame *, int, AstAxis * );
@@ -838,7 +850,6 @@ static void SetSymbol( AstFrame *, int, const char * );
 static void SetTitle( AstFrame *, const char * );
 static void SetUnit( AstFrame *, int, const char * );
 static void TidyNodes( AstFrameSet * );
-static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 static void VSet( AstObject *, const char *, va_list );
 
 static double GetBottom( AstFrame *, int );
@@ -1018,6 +1029,8 @@ f        Frame with index IFRAME) into coordinates in the new
 c     frame
 f     FRAME = INTEGER (Given)
 *        Pointer to a Frame that describes the new coordinate system.
+*        Any class of Frame may be supplied (including Regions and
+*        FrameSets).
 *
 c        This function may also be used to merge two FrameSets by
 c        supplying a pointer to a second FrameSet for this parameter
@@ -3801,6 +3814,9 @@ f     AST_GETMAPPING = INTEGER
 *        the opposite direction.
 
 *  Notes:
+*     - The returned Mapping will include the clipping effect of any
+*     Regions which occur on the path between the two supplied Frames
+*     (this includes the two supplied Frames themselves).
 c     - The values given for the "iframe1" and "iframe2" parameters
 f     - The values given for the IFRAME1 and IFRAME2 arguments
 *     should lie in the range from 1 to the number of Frames in the
@@ -3825,13 +3841,15 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Local Variables: */
    AstFrame *fr;                 /* Temporary pointer to Frame */
+   AstFrame **frames;            /* Pointer to array of Frames */
    AstMapping **path;            /* Pointer to array of conversion Mappings */
    AstMapping *copy;             /* Pointer to copy of Mapping */
    AstMapping *result;           /* Result pointer to be returned */
    AstMapping *tmp;              /* Temporary pointer for joining Mappings */
    int *forward;                 /* Pointer to array of Mapping directions */
    int ipath;                    /* Loop counter for conversion path steps */
-   int naxes;                    /* Number of Frame axes */
+   int iframe;                   /* Frame index */
+   int inode;                    /* Node index */
    int npath;                    /* Number of steps in conversion path */
 
 /* Initialise. */
@@ -3845,16 +3863,32 @@ f     function is invoked with STATUS set to an error value, or if it
    iframe2 = astValidateFrameIndex( this, iframe2, "astGetMapping" );
 
 /* Allocate memory to hold an array of Mapping pointers and associated
-   direction flags - a maximum of one element for each Mapping in the
-   FrameSet. */
-   path = astMalloc( sizeof( AstMapping * ) * (size_t) ( this->nnode - 1 ) );
-   forward = astMalloc( sizeof( int ) * (size_t) ( this->nnode - 1 ) );
+   direction flags - a maximum of one element for each Mapping and one
+   for each Frame in the FrameSet. */
+   path = astMalloc( sizeof( AstMapping * ) * (size_t) ( this->nnode - 1 +
+                                                         this->nframe ) );
+   forward = astMalloc( sizeof( int ) * (size_t) ( this->nnode - 1 +
+                                                   this->nframe ) );
 
-/* If OK, obtain the Mapping pointers and direction flags needed to
-   convert coordinates between the nodes associated with the two
-   specified Frames. */
+/* Allocate memory to hold a list of the Frame pointers (if any) associated
+   with each node. */
+   frames = astMalloc( sizeof( AstFrame * )  * (size_t) ( this->nnode ) );
+
+/* If OK, set up an array of Frame pointers indexed by node index. If a
+   node has no associated Frame store a NULL pointer. This is needed so
+   that we can find Frame pointers quickly within the Span function. Note,
+   we simply copy the pointers rather than cloning them, so they do not 
+   need to be annulled when finished with. */
    if ( astOK ) {
-      npath = Span( this, this->node[ iframe1 - 1 ],
+      for( inode = 0; inode < this->nnode; inode++ ) frames[ inode ] = NULL;
+      for( iframe = 0; iframe < this->nframe; iframe++ ) {
+         frames[ this->node[ iframe ] ] = this->frame[ iframe ];
+      }
+
+/* Obtain the Mapping pointers and direction flags needed to convert 
+   coordinates between the nodes associated with the two specified  
+   Frames. */
+      npath = Span( this, frames, this->node[ iframe1 - 1 ],
                     this->node[ iframe2 - 1 ], -1, path, forward ) - 1;
 
 /* If this failed, it indicates a corrupt FrameSet object, so report
@@ -3866,17 +3900,21 @@ f     function is invoked with STATUS set to an error value, or if it
                    iframe1, iframe2 );
 
 /* If the conversion path is of zero length (i.e. the two Frames are
-   the same) then we will return a UnitMap as the Mapping. Obtain a
-   pointer to the relevant Frame and determine how many axes it has,
-   annulling the pointer afterwards. */
+   the same) then we will return a Mapping which is equivalent to the 
+   Frame. Most classes of Frame are equivalent to a UnitMap. However, we do 
+   not hard-wire this equivalence since some classes of Frame (e.g. Regions 
+   or CmpFrames containing Regions) do not correspond to a UnitMap. Instead 
+   we use the astIsUnitFrame method on the Frame to determine if the
+   Frame is equivalent to a UnitMap.Is os, create a suitable UnitMap. If
+   not, return the Frame itself (a form of Mapping). */
       } else if ( npath == 0 ) {
          fr = astGetFrame( this, iframe1 );
-         naxes = astGetNaxes( fr );
+         if( astIsUnitFrame( fr ) ){
+            result = (AstMapping *) astUnitMap( astGetNaxes( fr ), "" );
+         } else {
+            result = (AstMapping *) astClone( fr );
+         }
          fr = astAnnul( fr );
-
-/* Create a UnitMap with the required number of input/output
-   coordinates. */
-         result = (AstMapping *) astUnitMap( naxes, "" );
 
 /* If the conversion path involves at least one non-trivial Mapping,
    make a copy of the first Mapping, inverting the copy if
@@ -3904,6 +3942,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Free the memory allocated for the conversion path information. */
    path = astFree( path );
    forward = astFree( forward );
+   frames = astFree( frames );
 
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) result = astAnnul( result );
@@ -4484,6 +4523,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->GetSymbol = GetSymbol;
    frame->GetTitle = GetTitle;
    frame->GetUnit = GetUnit;
+   frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->Norm = Norm;
    frame->Offset = Offset;
@@ -4564,6 +4604,71 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "FrameSet",
                "Set of inter-related coordinate systems" );
+}
+
+static int IsUnitFrame( AstFrame *this_frame ){
+/*
+*  Name:
+*     IsUnitFrame
+
+*  Purpose:
+*     Is this Frame equivalent to a UnitMap?
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int IsUnitFrame( AstFrame *this )
+
+*  Class Membership:
+*     Region member function (over-rides the protected astIsUnitFrame
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a flag indicating if the supplied Frame is
+*     equivalent to a UnitMap when treated as a Mapping (note, the Frame
+*     class inherits from Mapping and therefore every Frame is also a Mapping).
+
+*  Parameters:
+*     this 
+*        Pointer to the Frame.
+
+*  Returned Value:
+*     A non-zero value is returned if the supplied Frame is equivalent to
+*     a UnitMap when treated as a Mapping.
+
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to FrameSet's current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   int result;                   /* Result to be returned */
+
+/* Initialise the returned value. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame. */
+   fr = astGetFrame( this, AST__CURRENT );
+
+/* Invoke the astIsUnitFrame method for this Frame. */
+   result = astIsUnitFrame( fr );
+
+/* Annul the Frame pointer. */
+   fr = astAnnul( fr );
+
+/* If an error occurred, clean up by clearing the returned result. */
+   if ( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
 }
 
 static int Match( AstFrame *this_frame, AstFrame *target,
@@ -6484,8 +6589,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    this = (AstFrameSet *) this_mapping;
 
 /* Make a copy of the FrameSet, since we may alter it (this is a deep
-   copy, which is a minor limitation of the current
-   implementation). */
+   copy, which is a minor limitation of the current implementation). */
    new = astCopy( this );
 
 /* Loop to examine each of the Mappings between the Frames in the
@@ -6551,8 +6655,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    return result;
 }
 
-static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
-                 AstMapping **map, int *forward ) {
+static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2, 
+                 int avoid, AstMapping **map, int *forward ) {
 /*
 *  Name:
 *     Span
@@ -6565,8 +6669,8 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
-*               AstMapping **map, int *forward )
+*     int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2, 
+*               int avoid, AstMapping **map, int *forward )
 
 *  Class Membership:
 *     FrameSet member function.
@@ -6580,6 +6684,10 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     frames 
+*        Pointer to an array of Frame pointers, indexed by node index.
+*        Nodes which have no associated Frame will have a NULL pointer
+*        stored in this array.
 *     inode1
 *        Zero based index of the starting node.
 *     inode2
@@ -6597,9 +6705,9 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
 *        Pointer to the start of an array that will be filled with a
 *        series of pointers to Mappings which must be applied in turn
 *        in order to transform between the two Frames. External
-*        callers should ensure that this array contains as many
-*        elements as there are Mappings in the FrameSet (one less than
-*        the number of nodes).
+*        callers should ensure that this array contains at least as many
+*        elements as there are Mappings and Frames in the FrameSet (one less 
+*        than the number of nodes plus the number of Frames).
 *
 *        Note that the pointers are simply copies of addresses from
 *        the FrameSet's "map" array. They are not cloned, so should
@@ -6609,10 +6717,8 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
 *        with boolean flags (0 or 1) to indicate whether the forward
 *        (as opposed to the inverse) transformation should be used for
 *        each Mapping returned in order to effect the transformation
-*        between the starting and ending nodes. External callers
-*        should ensure that this array contains as many elements as
-*        there are Mappings in the FrameSet (one less than the number
-*        of nodes).
+*        between the starting and ending nodes. This array should be the
+*        same size as the "map" array.
 
 *  Returned Value:
 *     The function returns one more than the number of Mappings
@@ -6620,6 +6726,15 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
 *     possible to find a path between the two nodes.
 
 *  Notes:
+*     - If a node has an associated Frame, the Frame usually represents a
+*     UnitMap and so can be ignored. The exception is if the Frame is
+*     actually a Region (or a CmpFrame containing a Region), in which case 
+*     it represents a Mapping which returns bad values if the input position 
+*     is outside the region. This form of Mapping should not be ignored, and 
+*     so the returned list of Mappings includes the effect of any Frames
+*     along the path which are not equivalent to a UnitMap. This
+*     equivalence is determined by invoking the astSimplify method on the 
+*     Frame.
 *     - A value of zero will be returned if this function is invoked
 *     with the global status set, or if it should fail for any reason.
 *     - On the assumption that the FrameSet has been consistently
@@ -6632,24 +6747,46 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
 */
 
 /* Local Variables: */
-   int fwd;                      /* Forward Mapping identified? */
-   int inode;                    /* Loop counter for nodes */
-   int inv;                      /* Inverse Mapping identified? */
-   int invert;                   /* Original Mapping Invert value */
-   int result;                   /* Count of mappings (to be returned) */
+   AstFrame *frame;          /* Pointer to Frame associated with inode1 */
+   int fwd;                  /* Forward Mapping identified? */
+   int inode;                /* Loop counter for nodes */
+   int inv;                  /* Inverse Mapping identified? */
+   int invert;               /* Original Mapping Invert value */
+   int nextra;               /* No. of extra Mappings to add to path */
+   int result;               /* Count of mappings (to be returned) */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* See if the two nodes are the same. If so, there is nothing more to
-   do. */
+/* See if the two nodes are the same. */
    result = ( inode1 == inode2 );
+
+/* If so, we need to consider the Mapping represented by any Frame
+   associated with the node. Most classes of Frames are equivalent to a
+   UnitMap and so can be ignored. But some (e.g. the Region class) are not 
+   equivalent to a UnitMap and so needs to be included in the returned 
+   Mapping list. */
+   if( result ) {
+      result = 1;
+
+/* If inode1 is associated with a Frame, which is not equivalent to a
+   UnitMap, add the Frame as the first Mapping into the returned list. The 
+   "forward" value is irrelevant since the forward and inverse transformations 
+   of Frames are the same. */
+      frame = frames[ inode1 ];
+      if( frame ) {
+         if( !astIsUnitFrame( frame ) ) {
+            result++;
+            *map = (AstMapping *) frame;
+            *forward = 1;
+         }
+      }
 
 /* If the nodes are different, we now attempt to find the next step in
    the path between them. Loop through all available nodes looking for
    the next one to transform to (i.e. one that is directly related by
    a Mapping to our starting node). */
-   if ( !result ) {
+   } else {
       for ( inode = 0; inode < this->nnode; inode++ ) {
 
 /* Do not consider node "avoid". This prevents us re-tracing our steps
@@ -6666,23 +6803,34 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
    inverse direction). */
             inv = ( inode1 > 0 ) && ( this->link[ inode1 - 1 ] == inode );
 
-/* If the nodes are directly related, invoke this function recursively
-   to try and find a path from inode to inode2 without going back
-   through inode1. If this is possible, a non-zero result will be
-   returned. Store the returned Mappings and direction information in
-   the arrays supplied, but leave a space to insert information about
-   the Mapping between nodes inode1 and inode. */
+/* If the nodes are directly related, we try to find a path from inode to 
+   inode2 without going back through inode1. */
             if ( fwd || inv ) {
-               result = Span( this, inode, inode2, inode1,
-                              map + 1, forward + 1 );
+
+/* If node1 is associated with a Frame, we need to include the Frame
+   as a Mapping in the returned list unless the Frame is equivalent to a
+   UnitMap. Note the number of slots to be reserved for node1 when we call 
+   Span recursively below. */
+               nextra = 1;
+               frame = frames[ inode1 ];
+               if( frame && !astIsUnitFrame( frame ) ) nextra = 2;
+
+/* Invoke this function recursively to try and find a path from inode
+   to inode2 without going back through inode1. If this is possible, a 
+   non-zero result will be returned. Store the returned Mappings and 
+   direction information in the arrays supplied, but leave extra space to 
+   insert information about the Mapping between nodes inode1 and inode. */
+               result = Span( this, frames, inode, inode2, inode1,
+                              map + nextra, forward + nextra );
 
 /* If a path was found, increment the Mapping count to account for the
    one that transforms between nodes inode1 and inode and insert
    information for this Mapping into the output arrays. */
                if ( result ) {
                   result++;
-                  *map = this->map[ ( fwd ? inode : inode1 ) - 1 ];
-                  *forward = fwd;
+                  nextra--;
+                  map[ nextra ] = this->map[ ( fwd ? inode : inode1 ) - 1 ];
+                  forward[ nextra ] = fwd;
 
 /* Obtain the original value of the Invert attribute for the Mapping
    between nodes inode1 and inode (recorded when the Mapping was first
@@ -6691,7 +6839,19 @@ static int Span( AstFrameSet *this, int inode1, int inode2, int avoid,
    invert the returned direction information to compensate for
    this. */
                   invert = this->invert[ ( fwd ? inode : inode1 ) - 1 ];
-                  if ( invert != astGetInvert( *map ) ) *forward = !*forward;
+                  if ( invert != astGetInvert( map[ nextra ] ) ) {
+                     forward[ nextra ] = !forward[ nextra ];
+                  }
+
+/* If inode1 is associated with a non-unit Frame Mapping, add the Frame 
+   Mapping in as the first Mapping in the returned list. The "forward" value 
+   is irrelevant since the forward and inverse transformations of Frames
+   are the same. */
+                  if( nextra ) {
+                     result++;
+                     *map = (AstMapping *) frame;
+                     *forward = 1;
+                  }
 
 /* Quit searching once a path has been found. */
                   break;
@@ -9253,6 +9413,12 @@ c     Mapping, a FrameSet may also be inverted (see astInvert), which
 f     Mapping, a FrameSet may also be inverted (see AST_INVERT), which
 *     has the effect of interchanging its base and current Frames and
 *     hence of reversing the Mapping between them.
+*
+*     Regions may be added into a FrameSet (since a Region is a type of
+*     Frame), either explicitly or as components within CmpFrames. In this 
+*     case the Mapping between a pair of Frames within a FrameSet will 
+*     include the effects of the clipping produced by any Regions included 
+*     in the path between the Frames. 
 
 *  Parameters:
 c     frame

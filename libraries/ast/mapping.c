@@ -131,6 +131,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     4-OCT-2004 (DSB):
 *        Modify astMapList to return flag indicating presence of inverted
 *        CmpMaps in supplied Mapping.
+*     9-NOV-2004 (DSB):
+*        Override astEqual method.
 *class--
 */
 
@@ -151,6 +153,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "channel.h"             /* I/O channels */
 #include "mapping.h"             /* Interface definition for this class */
+#include "cmpmap.h"              /* Compund Mappings */
+#include "unitmap.h"             /* Unit Mappings */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -224,6 +228,7 @@ static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_equal)( AstObject *, AstObject * );
 
 /* Pointer to origin (unsimplified) Mapping, only used for reporting
    error messages. */
@@ -249,6 +254,7 @@ static double NewVertex( const MapData *, int, double, double [], double [], int
 static double Random( long int * );
 static double Rate( AstMapping *, double *, int, int, double * );
 static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int * );
+static int Equal( AstObject *, AstObject * );
 static int GetInvert( AstMapping * );
 static int GetNin( AstMapping * );
 static int GetNout( AstMapping * );
@@ -581,6 +587,92 @@ static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
    if( series ) *series = 1;
    if( invert1 ) *invert1 = astGetInvert( this );
    if( invert2 ) *invert2 = 0;
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two Mappings are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     Mapping member function (over-rides the astEqual protected
+*     method inherited from the Object class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two Mappings are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a Mapping).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the Frames are equivalent, zero otherwise.
+
+*  Notes:
+*     - The two Mappings are considered equivalent if the combination of
+*     the first in series with the inverse of the second simplifies to a
+*     UnitMap.
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpMap *cmpmap;         /* Pointer to the compound Mapping */
+   AstMapping *smap;          /* Pointer to the simplified Mapping */
+   AstMapping *that;          /* Pointer to the second Mapping structure */
+   AstMapping *this;          /* Pointer to the first Mapping structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the Equal method inherited from the parent Object class. This checks
+   that the Objects are both of the same class (amongst other things). */
+   if( (*parent_equal)( this_object, that_object ) ) {
+
+/* Obtain pointers to the two Mapping structures. */
+      this = (AstMapping *) this_object;
+      that = (AstMapping *) that_object;
+
+/* Temporarily invert the second, and create a CmpMap containing the
+   first in series with the inverse of the second. */
+      astInvert( that );
+      cmpmap = astCmpMap( this, that, 1, "" );
+      astInvert( that );
+
+/* Simplify the CmpMap. */
+      smap = astSimplify( cmpmap );
+
+/* The two Mappings are equivalent if the simplified CmpMap is a UnitMap. */
+      result = astIsAUnitMap( smap );
+
+/* Free resources. */
+      smap = astAnnul( smap );
+      cmpmap = astAnnul( cmpmap );
+
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
@@ -2092,6 +2184,8 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    object->SetAttrib = SetAttrib;
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+   parent_equal = object->Equal;
+   object->Equal = Equal;
 
 /* Declare the destructor, copy constructor and dump function. */
    astSetDelete( vtab, Delete );

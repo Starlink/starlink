@@ -49,6 +49,8 @@
 *        Added AST_RATE, POLYMAP, SHIFTMAP and GRISMMAP functions.
 *     13-NOV-2003 (DSB):
 *        Added XmlChan class.
+*     9-NOV-2004 (DSB):
+*        Added all initial Region classes.
 *-
 
 *  Length of character string returned by a character function.
@@ -354,3 +356,56 @@ c      PARAMETER ( AST__UKERNN = 2 )
       INTEGER AST_TRANMAP
       LOGICAL AST_ISATRANMAP
 
+*  Region class.
+      INTEGER AST_REGION
+      LOGICAL AST_ISAREGION
+      INTEGER AST_MAPREGION
+      INTEGER AST_OVERLAP
+      INTEGER AST_MASKB
+      INTEGER AST_MASKD
+      INTEGER AST_MASKI
+      INTEGER AST_MASKR
+      INTEGER AST_MASKS
+      INTEGER AST_MASKUB
+      INTEGER AST_MASKUI
+      INTEGER AST_MASKUS
+      INTEGER AST_MASKUW
+      INTEGER AST_MASKW
+
+*  Box class.
+      INTEGER AST_BOX
+      LOGICAL AST_ISABOX
+
+*  PointList class.
+      INTEGER AST_POINTLIST
+      LOGICAL AST_ISAPOINTLIST
+
+*  Polygon class.
+      INTEGER AST_POLYGON
+      LOGICAL AST_ISAPOLYGON
+
+*  Circle class.
+      INTEGER AST_CIRCLE
+      LOGICAL AST_ISACIRCLE
+
+*  Ellipse class.
+      INTEGER AST_ELLIPSE
+      LOGICAL AST_ISAELLIPSE
+
+*  NullRegion class.
+      INTEGER AST_NULLREGION
+      LOGICAL AST_ISANULLREGION
+
+*  Interval class.
+      INTEGER AST_INTERVAL
+      LOGICAL AST_ISAINTERVAL
+
+*  CmpRegion class.
+      INTEGER AST_CMPREGION
+      LOGICAL AST_ISACMPREGION
+
+      INTEGER AST__AND
+      PARAMETER( AST__AND = 1 )
+
+      INTEGER AST__OR
+      PARAMETER( AST__OR = 2 )

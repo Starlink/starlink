@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.17}
+\newcommand{\stardocnumber}    {211.18}
 c-
 f+
-\newcommand{\stardocnumber}    {210.17}
+\newcommand{\stardocnumber}    {210.18}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {16th September 2004}
+\newcommand{\stardocdate}      {9th November 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -18382,6 +18382,15 @@ Object             - Base class for all AST Objects
          CmpFrame  - Compound Frame
          FrameSet  - Set of inter-related coordinate systems
             Plot   - Provide facilities for graphical output
+         Region    - Specify areas within a coordinate system
+            Box    - A box region with sides parallel to the axes of a Frame
+            Circle - A circular or spherical region within a Frame
+            CmpRegion  - A combination of two regions within a single Frame
+            Ellipse    - An elliptical region within a 2-dimensional Frame
+            Interval   - Intervals on one or more axes of a Frame.
+            NullRegion - A boundless region within a Frame
+            PointList  - A collection of points in a Frame
+            Polygon    - A polygonal region within a 2-dimensional Frame
          SkyFrame  - Celestial coordinate system description
          SpecFrame - Spectral coordinate system description
       GrismMap     - Models the spectral dispersion produced by a grism
@@ -20499,12 +20508,10 @@ f-
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.4}
+\subsection{Changes Introduced in V3.4}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V3.3 and V3.4 (the
-current version):
+occurred in the AST library between versions V3.3 and V3.4:
 
 \begin{enumerate}
 
@@ -20548,6 +20555,27 @@ package - see
 \htmladdnormallink{
 http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}{
 http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}).
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.5}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.4 and V3.5 (the
+current version):
+
+\begin{enumerate}
+
+\item AST now provides facilities for representing regions of various
+shapes within a coordinate system. The Region class provides general
+facilities which are independent of the specific shape of region being
+used. Various sub-classes of Region are also now available which provide 
+means of creating Regions of specific shape. Facilities provided by the
+Region class include testing points to see if they are inside the
+Region, testing two Regions for overlap, transforming Regions from one
+coordinate system to another \emph{etc}.
 
 \end{enumerate}
 

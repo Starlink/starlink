@@ -40,6 +40,8 @@
 *        A read-only attribute that gives the number of points that
 *        can be stored in the PointSet. This value is determined when
 *        the PointSet is created.
+*     PointAccuracy (floating point)
+*        This stores the absolute accuracies for each axis in the PointSet.
 
 *  Methods Over-Ridden:
 *     Public:
@@ -59,8 +61,12 @@
 *     Public:
 *        astGetPoints
 *           Get a pointer to the coordinate values associated with a PointSet.
+*        astPermPoints
+*           Permute coordinates within a PointSet.
 *        astSetPoints
 *           Associate coordinate values with a PointSet.
+*        astSetNpoint
+*           Reduce the size of a PointSet.
 *        astSetSubPoints
 *           Associate one PointSet with a subset of another.
 *
@@ -69,10 +75,14 @@
 *           Get the number of points in a PointSet.
 *        astGetNcoord
 *           Get the number of coordinate values per point from a PointSet.
-*        astPermPoints
-*           Permute coordinates within a PointSet.
-*        astSetNpoint
-*           Reduce the size of a PointSet.
+*        astGetPointAccuracy
+*           Get the curent value of the PointAcuracy attribute for an axis.
+*        astSetPointAccuracy
+*           Set a new value for the PointAcuracy attribute for an axis.
+*        astTestPointAccuracy
+*           Test the value of the PointAcuracy attribute for an axis.
+*        astClearPointAccuracy
+*           Clear the value of the PointAcuracy attribute for an axis.
 
 *  Other Class Functions:
 *     Public:
@@ -126,6 +136,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     30-JAN-1996 (RFWS):
@@ -134,6 +145,8 @@
 *        Added external interface and I/O facilities.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitPointSetVtab method.
+*     2-NOV-2004 (DSB):
+*        Added PointAccuracy attribute.
 *-
 */
 
@@ -177,6 +190,7 @@
 
 *  Purpose:
 *     Bad value flag for coordinate data.
+
 *  Synopsis:
 *     #include "pointset.h"
 *     const double AST__BAD
@@ -335,6 +349,7 @@ typedef struct AstPointSet {
    double *values;               /* Pointer to array of coordinate values */
    int ncoord;                   /* Number of coordinate values per point */
    int npoint;                   /* Number of points */
+   double *acc;                  /* Axis accuracies */
 } AstPointSet;
 
 /* Virtual function table. */
@@ -355,9 +370,15 @@ typedef struct AstPointSetVtab {
    int (* GetNcoord)( const AstPointSet * );
    int (* GetNpoint)( const AstPointSet * );
    void (* PermPoints)( AstPointSet *, int, const int[] );
-   void (* SetNpoint)( AstPointSet *, int );
    void (* SetPoints)( AstPointSet *, double ** );
+   void (* SetNpoint)( AstPointSet *, int );
    void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet * );
+
+   double (* GetPointAccuracy)( AstPointSet *, int );
+   int (* TestPointAccuracy)( AstPointSet *, int );
+   void (* ClearPointAccuracy)( AstPointSet *, int );
+   void (* SetPointAccuracy)( AstPointSet *, int, double );
+
 } AstPointSetVtab;
 #endif
 
@@ -392,14 +413,20 @@ AstPointSet *astLoadPointSet_( void *, size_t, AstPointSetVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 double **astGetPoints_( AstPointSet * );
+void astPermPoints_( AstPointSet *, int, const int[] );
 void astSetPoints_( AstPointSet *, double ** );
+void astSetNpoint_( AstPointSet *, int );
 void astSetSubPoints_( AstPointSet *, int, int, AstPointSet * );
 
 # if defined(astCLASS)           /* Protected */
-void astPermPoints_( AstPointSet *, int, const int[] );
 int astGetNcoord_( const AstPointSet * );
 int astGetNpoint_( const AstPointSet * );
-void astSetNpoint_( AstPointSet *, int );
+
+double astGetPointAccuracy_( AstPointSet *, int );
+int astTestPointAccuracy_( AstPointSet *, int );
+void astClearPointAccuracy_( AstPointSet *, int );
+void astSetPointAccuracy_( AstPointSet *, int, double );
+
 #endif
 
 /* Function interfaces. */
@@ -449,19 +476,29 @@ astINVOKE(O,astLoadPointSet_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #define astGetPoints(this) \
 astINVOKE(V,astGetPoints_(astCheckPointSet(this)))
+#define astPermPoints(this,forward,perm) \
+astINVOKE(V,astPermPoints_(astCheckPointSet(this),forward,perm))
 #define astSetPoints(this,ptr) \
 astINVOKE(V,astSetPoints_(astCheckPointSet(this),ptr))
+#define astSetNpoint(this,np) \
+astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np))
 #define astSetSubPoints(point1,point,coord,point2) \
 astINVOKE(V,astSetSubPoints_(astCheckPointSet(point1),point,coord,astCheckPointSet(point2)))
 
 #if defined(astCLASS)            /* Protected */
-#define astPermPoints(this,forward,perm) \
-astINVOKE(V,astPermPoints_(astCheckPointSet(this),forward,perm))
 #define astGetNpoint(this) \
 astINVOKE(V,astGetNpoint_(astCheckPointSet(this)))
 #define astGetNcoord(this) \
 astINVOKE(V,astGetNcoord_(astCheckPointSet(this)))
-#define astSetNpoint(this,np) \
-astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np))
+
+#define astClearPointAccuracy(this,axis) \
+astINVOKE(V,astClearPointAccuracy_(astCheckPointSet(this),axis))
+#define astGetPointAccuracy(this,axis) \
+astINVOKE(V,astGetPointAccuracy_(astCheckPointSet(this),axis))
+#define astSetPointAccuracy(this,axis,value) \
+astINVOKE(V,astSetPointAccuracy_(astCheckPointSet(this),axis,value))
+#define astTestPointAccuracy(this,axis) \
+astINVOKE(V,astTestPointAccuracy_(astCheckPointSet(this),axis))
+
 #endif
 #endif

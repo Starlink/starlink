@@ -326,6 +326,8 @@
 *           Get a pointer to the Title attribute for a Frame.
 *        astGetUnit
 *           Get a pointer to the Unit attribute for a Frame axis.
+*        astIsUnitFrame
+*           Returns a flag indicating if a Frame is equivalent to a UnitMap.
 *        astMatch
 *           Determine if conversion is possible between two coordinate systems.
 *        astOverlay
@@ -502,6 +504,8 @@
 *     24-JUN-2004 (DSB):
 *        Remove unused entry "void (* SetMatchRange)( AstFrame *, int, int );"
 *        from AstFrameVtab structure.
+*     9-NOV-2004 (DSB):
+*        Added protected astIsAUnitFrame method.
 *-
 */
 
@@ -611,6 +615,7 @@ typedef struct AstFrameVtab {
    int (* GetNaxes)( AstFrame * );
    int (* GetPermute)( AstFrame * );
    int (* GetPreserveAxes)( AstFrame * );
+   int (* IsUnitFrame)( AstFrame * );
    int (* Match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
    int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
    int (* TestDigits)( AstFrame * );
@@ -794,6 +799,7 @@ int astGetMinAxes_( AstFrame * );
 int astGetNaxes_( AstFrame * );
 int astGetPermute_( AstFrame * );
 int astGetPreserveAxes_( AstFrame * );
+int astIsUnitFrame_( AstFrame * );
 int astMatch_( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 int astTestDigits_( AstFrame * );
@@ -1038,6 +1044,8 @@ astINVOKE(V,astGetTitle_(astCheckFrame(this)))
 astINVOKE(V,astGetUnit_(astCheckFrame(this),axis))
 #define astMatch(template,target,template_axes,target_axes,map,result) \
 astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result)))
+#define astIsUnitFrame(this) \
+astINVOKE(V,astIsUnitFrame_(astCheckFrame(this)))
 #define astOverlay(template,template_axes,result) \
 astINVOKE(V,astOverlay_(astCheckFrame(template),template_axes,astCheckFrame(result)))
 #define astPrimaryFrame(this,axis1,frame,axis2) \

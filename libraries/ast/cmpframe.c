@@ -21,6 +21,14 @@ f     AST_CMPFRAME
 *     component in forming further CmpFrames. Frames of arbitrary
 *     complexity may be built from simple individual Frames in this
 *     way.
+*
+*     Also since a Frame is a Mapping, a CmpFrame can also be used as a 
+*     Mapping. Normally, a CmpFrame is simply equivalent to a UnitMap,
+*     but if either of the component Frames within a CmpFrame is a Region 
+*     (a sub-class of Frame), then the CmpFrame will use the Region as a
+*     Mapping when transforming values for axes described by the Region. 
+*     Thus input axis values corresponding to positions which are outside the 
+*     Region will result in bad output axis values.
 
 *  Inheritance:
 *     The CmpFrame class inherits from the Frame class.
@@ -95,6 +103,10 @@ f     The CmpFrame class does not define any new routines beyond those
 *     24-JAN-2004 (DSB):
 *        o  Override the astFields method.
 *        o  Added argument "fmt" to Abbrev.
+*     24-MAR-2004 (DSB):
+*        Over-ride the astSimplify and astTransform methods.
+*     8-SEP-2004 (DSB):
+*        Over-ride astResolvePoints method.
 *class--
 */
 
@@ -514,6 +526,9 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstAxis *GetAxis( AstFrame *, int );
+static AstMapping *Simplify( AstMapping * );
+static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType GetSystem( AstFrame * );
 static AstSystemType SystemCode( AstFrame *, const char * );
@@ -539,6 +554,7 @@ static int GetMaxAxes( AstFrame * );
 static int GetMinAxes( AstFrame * );
 static int GetNaxes( AstFrame * );
 static int GoodPerm( int, const int [], int, const int [] );
+static int IsUnitFrame( AstFrame * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int PartMatch( AstCmpFrame *, AstFrame *, int, const int [], int, const int [], int **, int **, AstMapping **, AstFrame ** );
 static int QsortCmpAxes( const void *, const void * );
@@ -2900,6 +2916,9 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
 
+   mapping->Simplify = Simplify;
+   mapping->Transform = Transform;
+
    parent_getdomain = frame->GetDomain;
    frame->GetDomain = GetDomain;
 
@@ -2943,12 +2962,14 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    frame->GetPerm = GetPerm;
    frame->GetSymbol = GetSymbol;
    frame->GetUnit = GetUnit;
+   frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->Norm = Norm;
    frame->Offset = Offset;
    frame->PermAxes = PermAxes;
    frame->PrimaryFrame = PrimaryFrame;
    frame->Resolve = Resolve;
+   frame->ResolvePoints = ResolvePoints;
    frame->SetAxis = SetAxis;
    frame->SetDirection = SetDirection;
    frame->SetFormat = SetFormat;
@@ -2976,6 +2997,54 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "CmpFrame",
                "Compound coordinate system description" );
+}
+
+static int IsUnitFrame( AstFrame *this_frame ){
+/*
+*  Name:
+*     IsUnitFrame
+
+*  Purpose:
+*     Is this Frame equivalent to a UnitMap?
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int IsUnitFrame( AstFrame *this )
+
+*  Class Membership:
+*     Region member function (over-rides the protected astIsUnitFrame
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a flag indicating if the supplied Frame is
+*     equivalent to a UnitMap when treated as a Mapping (note, the Frame
+*     class inherits from Mapping and therefore every Frame is also a Mapping).
+
+*  Parameters:
+*     this 
+*        Pointer to the Frame.
+
+*  Returned Value:
+*     A non-zero value is returned if the supplied Frame is equivalent to
+*     a UnitMap when treated as a Mapping.
+
+*-
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Return the result. */
+   return astIsUnitFrame( this->frame1 ) && astIsUnitFrame( this->frame2 );
 }
 
 static int Match( AstFrame *template_frame, AstFrame *target,
@@ -4934,6 +5003,320 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 
 }
 
+static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[], 
+                                   const double point2[], AstPointSet *in,
+                                   AstPointSet *out ) {
+/*
+*  Name:
+*     ResolvePoints
+
+*  Purpose:
+*     Resolve a set of vectors into orthogonal components
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstPointSet *ResolvePoints( AstFrame *this, const double point1[], 
+*                                 const double point2[], AstPointSet *in,
+*                                 AstPointSet *out )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astResolvePoints method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function takes a CmpFrame and a set of vectors encapsulated
+*     in a PointSet, and resolves each one into two orthogonal components,
+*     returning these two components in another PointSet.
+*
+*     This is exactly the same as the public astResolve method, except
+*     that this method allows many vectors to be processed in a single call,
+*     thus reducing the computational cost of overheads of many
+*     individual calls to astResolve.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vectors to be resolved.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+*     in
+*        Pointer to the PointSet holding the ends of the vectors to be
+*        resolved.
+*     out
+*        Pointer to a PointSet which will hold the length of the two
+*        resolved components. A NULL value may also be given, in which 
+*        case a new PointSet will be created by this function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet. The first axis will 
+*     hold the lengths of the vector components parallel to the basis vector. 
+*     These values will be signed (positive values are in the same sense as 
+*     movement from point 1 to point 2. The second axis will hold the lengths 
+*     of the vector components perpendicular to the basis vector. These
+*     values will always be positive.
+
+*  Notes:
+*     - The number of coordinate values per point in the input
+*     PointSet must match the number of axes in the supplied Frame.
+*     - If an output PointSet is supplied, it must have space for
+*     sufficient number of points and 2 coordinate values per point.
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   AstPointSet *in1;             /* Pointer to input PointSet for frame1 */
+   AstPointSet *in2;             /* Pointer to input PointSet for frame2 */
+   AstPointSet *out1;            /* Pointer to output PointSet for frame1 */
+   AstPointSet *out2;            /* Pointer to output PointSet for frame2 */
+   AstPointSet *result;          /* Pointer to output PointSet */
+   const int *perm;              /* Pointer to axis permutation array */
+   double **ptr_in;              /* Pointers to input axis values */
+   double **ptr_out1;            /* Pointers to frame1 component lengths */
+   double **ptr_out2;            /* Pointers to frame2 component lengths */
+   double **ptr_out;             /* Pointers to returned component lengths */
+   double *d1;                   /* Pointer to next parallel component value */
+   double *d1_1;                 /* arallel distance in frame1 */
+   double *d1_2;                 /* Parallel distance in frame2 */
+   double *d2;                   /* Pointer to next perpendicular component value */
+   double *d2_1;                 /* Perpendicular distance in frame1 */
+   double *d2_2;                 /* Perpendicular distance in frame2 */
+   double *p1;                   /* Permuted coordinates for point1 */
+   double *p2;                   /* Permuted coordinates for point2 */
+   double *p3;                   /* Supplied vector */
+   double *p4;                   /* Closest approach to supplied vector */
+   double b1;                    /* Length of basis vector in frame1 */
+   double b2;                    /* Length of basis vector in frame2 */
+   double b;                     /* Length of basis vector */
+   int axis;                     /* Loop counter for axes */
+   int ipoint;                   /* Index of next point */
+   int nax;                      /* Number of Frame axes */
+   int naxes1;                   /* Number of axes in frame1 */
+   int naxes2;                   /* Number of axes in frame2 */
+   int ncoord_in;                /* Number of input PointSet coordinates */
+   int ncoord_out;               /* Number of coordinates in output PointSet */
+   int npoint;                   /* Number of points to transform */
+   int npoint_out;               /* Number of points in output PointSet */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Obtain the number of axes in the two component Frames */
+   naxes1 = astGetNaxes( this->frame1 );
+   naxes2 = astGetNaxes( this->frame2 );
+
+/* For the total number of axes. */
+   nax = naxes1 + naxes2;
+
+/* Obtain the number of input vectors to resolve and the number of coordinate
+   values per vector. */
+   npoint = astGetNpoint( in );
+   ncoord_in = astGetNcoord( in );
+
+/* If OK, check that the number of input coordinates matches the number
+   required by the Frame. Report an error if these numbers do not match. */
+   if ( astOK && ( ncoord_in != nax ) ) {
+      astError( AST__NCPIN, "astResolvePoints(%s): Bad number of coordinate "
+                "values (%d) in input %s.", astGetClass( this ), ncoord_in,
+                astGetClass( in ) );
+      astError( AST__NCPIN, "The %s given requires %d coordinate value(s) for "
+                "each input point.", astGetClass( this ), nax );
+   }
+
+/* If still OK, and a non-NULL pointer has been given for the output PointSet,
+   then obtain the number of points and number of coordinates per point for
+   this PointSet. */
+   if ( astOK && out ) {
+      npoint_out = astGetNpoint( out );
+      ncoord_out = astGetNcoord( out );
+
+/* Check that the dimensions of this PointSet are adequate to accommodate the
+   output coordinate values and report an error if they are not. */
+      if ( astOK ) {
+         if ( npoint_out < npoint ) {
+            astError( AST__NOPTS, "astResolvePoints(%s): Too few points (%d) in "
+                      "output %s.", astGetClass( this ), npoint_out,
+                      astGetClass( out ) );
+            astError( AST__NOPTS, "The %s needs space to hold %d transformed "
+                      "point(s).", astGetClass( this ), npoint );
+         } else if ( ncoord_out < 2 ) {
+            astError( AST__NOCTS, "astResolvePoints(%s): Too few coordinate "
+                      "values per point (%d) in output %s.",
+                      astGetClass( this ), ncoord_out, astGetClass( out ) );
+            astError( AST__NOCTS, "The %s supplied needs space to store 2 "
+                      "coordinate value(s) per transformed point.",
+                      astGetClass( this ) );
+         }
+      }
+   }
+
+/* If all the validation stages are passed successfully, and a NULL output
+   pointer was given, then create a new PointSet to encapsulate the output
+   coordinate data. */
+   if ( astOK ) {
+      if ( !out ) {
+         result = astPointSet( npoint, 2, "" );
+
+/* Otherwise, use the PointSet supplied. */
+      } else {
+         result = out;
+      }
+   }
+
+/* Store points to the first two axis arrays in the returned PointSet. */
+   ptr_out = astGetPoints( result );
+   if( astOK ) {
+      d1 = ptr_out[ 0 ];
+      d2 = ptr_out[ 1 ];
+   }
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. This array
+   holds the original axis index for each current Frame axis index. */
+   perm = astGetPerm( this );
+
+/* Temporarily permute the coordinates within the supplied PointSet back
+   in to the axis order which existed when the CmpFrame was created. */
+   astPermPoints( in, 0, perm );
+
+/* Extract the axis values relevant to each of the two sub-Frames from the 
+   point1 and point2 arrays, at the same time undoing any axis permutation 
+   applied to the CmpFrame as a whole. */
+   p1 = astMalloc( sizeof( double )*( size_t )nax );
+   p2 = astMalloc( sizeof( double )*( size_t )nax );
+   if( astOK ) {
+      for( axis = 0; axis < nax; axis++ ) {
+         p1[ perm[ axis ] ] = point1[ axis ];
+         p2[ perm[ axis ] ] = point2[ axis ];
+      }
+   }
+
+/* Project the first two input points into the two component Frames and
+   determine the length of the basis vector in each Frame. */
+   b1 = astDistance( this->frame1, p1, p2 );
+   b2 = astDistance( this->frame2, p1 + naxes1, p2 + naxes1 );
+
+/* If either of these distances is bad or if both are zero, then fill the
+   returned PointSet with bad values. */
+   if( b1 == AST__BAD || b2 == AST__BAD || ( b1 == 0.0 && b2 == 0.0 ) ) {
+     for( ipoint = 0; ipoint < npoint; ipoint++, d1++, d2++ ) {
+        *d1 = AST__BAD;
+        *d2 = AST__BAD;
+     }
+
+/* Otherwise we continue to calculate the resolved components */       
+   } else if( astOK ){
+
+/* Calculate the total distance between the two points. */
+      b = sqrt( b1*b1 + b2*b2 );
+
+/* Create PointSets holding the input values which refer to each of the
+   two component Frames. */
+      in1 = astPointSet( npoint, naxes1, "" );
+      in2 = astPointSet( npoint, naxes2, "" );
+
+/* Associated the appropriate subset of the data in the supplied input 
+   PointSet with each of these two PointSets. */ 
+      astSetSubPoints( in, 0, 0, in1 );
+      astSetSubPoints( in, 0, naxes1, in2 );
+
+/* Invoke the astResolvePoints method on each of the sub-Frames. These
+   invocations create two new PointSets containing the output values.  */
+      out1 = astResolvePoints( this->frame1, p1, p2, in1, NULL );
+      out2 = astResolvePoints( this->frame2, p1 + naxes1, p2 + naxes1, in2, NULL );
+
+/* Get pointers to the axis values in these pointsets. */
+      ptr_out1 = astGetPoints( out1 );
+      ptr_out2 = astGetPoints( out2 );
+
+/* More work space */
+      p3 = astMalloc( sizeof( double )*( size_t )nax );
+      p4 = astMalloc( sizeof( double )*( size_t )nax );
+
+/* Get pointers to the input axis values (these are still permuted to
+   undo any axis permutation applied to the CmpFrame). */
+      ptr_in = astGetPoints( in );
+
+/* Check pointers can be used safely. */
+      if( astOK ) {
+
+/* Get pointers to the parallel (d1) and perpendiclar (d2) components 
+   within the two sub-Frames (_1 and _2). */
+         d1_1 = ptr_out1[ 0 ];
+         d2_1 = ptr_out1[ 1 ];
+         d1_2 = ptr_out2[ 0 ];
+         d2_2 = ptr_out2[ 1 ];
+
+/* Loop round each supplied vector. */
+         for( ipoint = 0; ipoint < npoint; ipoint++, d1++, d2++,
+                                                     d1_1++, d2_1++, 
+                                                     d1_2++, d2_2++ ) {
+
+/* We can tolerate a bad parallel distance within a sub-Frame if the
+   basis vector has zero length in the sub-Frame, because the bad
+   parallel distance will have zero weight in the calculation. Set such
+   bad parallel distanced arbitrarily to zero. */
+            if( *d1_1 == AST__BAD && b1 == 0.0 ) *d1_1 = 0.0;
+            if( *d1_2 == AST__BAD && b2 == 0.0 ) *d1_2 = 0.0;
+
+/* Combine the parallel distances for the individual Frames into a single 
+   parallel distance for the entire CmpFrame. */
+            if( *d1_1 != AST__BAD && *d1_2 != AST__BAD ) {
+               *d1 = ( b1*(*d1_1) + b2*(*d1_2) )/b;
+
+/*  Offset this distance away from point 1 towards point 2 to get point 4. */
+               astOffset( this, p1, p2, *d1, p4 );
+
+/* Now find the perpendicular distance (the distance between point4 and
+   point3). */
+               for( axis = 0; axis < nax; axis++ ) p3[ axis ] = ptr_in[ axis ][ ipoint ];
+               *d2 = astDistance( this, p4, p3 );
+
+            } else {
+               *d1 = AST__BAD;
+               *d2 = AST__BAD;
+            }
+         }
+      }
+
+/* Free resources */
+      in1 = astAnnul( in1 );
+      in2 = astAnnul( in2 );
+      out1 = astAnnul( out1 );
+      out2 = astAnnul( out2 );
+      p3 = astFree( p3 );
+      p4 = astFree( p4 );
+   }
+
+/* Free resources */
+   p1 = astFree( p1 );
+   p2 = astFree( p2 );
+
+/* Re-instate the original ordering of the coordinates within the
+   supplied PointSet. */
+   astPermPoints( in, 1, perm );
+
+/* Annul the returned PointSet if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return a pointer to the output PointSet. */
+   return result;
+}
+
 static void SetAttrib( AstObject *this_object, const char *setting ) {
 /*
 *  Name:
@@ -5247,6 +5630,93 @@ static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
 */
 
 /* Do nothing. */
+}
+
+static AstMapping *Simplify( AstMapping *this_mapping ) {
+/*
+*  Name:
+*     Simplify
+
+*  Purpose:
+*     Simplify the Mapping represented by a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstMapping *Simplify( AstMapping *this )
+
+*  Class Membership:
+*     CmpFrame method (over-rides the astSimplify method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function simplifies the Mapping represented by a CmpFrame,
+*     by using the astSimplify method on each of the component Frames and
+*     combining the resulting Mappings together.
+
+*  Parameters:
+*     this
+*        Pointer to the original FrameSet.
+
+*  Returned Value:
+*     A new pointer to the simplified CmpFrame. 
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *new;         /* Pointer to new CmpFrame structure */
+   AstCmpFrame *this;        /* Pointer to original CmpFrame structure */
+   AstMapping *map1;         /* Intermediate Mapping */
+   AstMapping *map2;         /* Intermediate Mapping */
+   AstMapping *result;       /* Result pointer to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_mapping;
+
+/* Simplify each of the component Frames. */
+   map1 = astSimplify( this->frame1 );
+   map2 = astSimplify( this->frame2 );
+
+/* Did any usable simplification occur? */
+   if( astIsAFrame( map1 ) &&  astIsAFrame( map2 )  &&
+       ( map1 != (AstMapping *) this->frame1 || 
+         map2 != (AstMapping *) this->frame2 ) ) {
+
+/* Make a copy of the supplied CmpFrame. */
+      new = astCopy( this );
+      result = (AstMapping *) new;
+
+/* Replace the two component Frames with the simplified Frames. */
+      astAnnul( new->frame1 );
+      astAnnul( new->frame2 );
+      new->frame1 = (AstFrame *) map1;
+      new->frame2 = (AstFrame *) map2;
+
+/* If no simplication took place, annul the Mapping pointers and return a
+   clone of the supplied pointer. */
+   } else {
+       map1 = astAnnul( map1 );
+       map2 = astAnnul( map2 );
+       result= astClone( this );
+   }
+
+/* If an error occurred, annul the returned pointer. */
+   if ( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
 }
 
 static AstSystemType SystemCode( AstFrame *this, const char *system ) {
@@ -6191,6 +6661,146 @@ static int TestMinAxes( AstFrame *this_frame ) {
    return result;
 }
 
+static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
+                               int forward, AstPointSet *out ) {
+/*
+*  Name:
+*     Transform
+
+*  Purpose:
+*     Transform a set of points.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
+*                             int forward, AstPointSet *out )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astTransform method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function takes a CmpFrame and a set of points encapsulated
+*     in a PointSet, and applies the coordinate transformation equivalent
+*     to the CmpFrame (this will normally be a UnitMap but may not be if
+*     the CmpFrame contains any Regions).
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     in
+*        Pointer to the PointSet holding the input coordinate data.
+*     forward
+*        A non-zero value indicates that the forward coordinate transformation
+*        should be applied, while a zero value requests the inverse
+*        transformation. 
+*     out
+*        Pointer to a PointSet which will hold the transformed (output)
+*        coordinate values. A NULL value may also be given, in which case a
+*        new PointSet will be created by this function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet.
+
+*  Notes:
+*     - The number of coordinate values per point in the input
+*     PointSet must match the number of axes in the CmpFrame. 
+*     - If an output PointSet is supplied, it must have space for
+*     sufficient number of points and coordinate values per point to
+*     accommodate the result (e.g. the number of CmpFrame axes). Any 
+*     excess space will be ignored.
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;        /* Pointer to original CmpFrame structure */
+   AstCmpMap *map2;          /* Intermediate Mapping */
+   AstCmpMap *map;           /* Equivalent Mapping */
+   AstPermMap *pmap;         /* Intermediate PermMap */
+   AstPointSet *result;      /* Pointer value to return */
+   const int *inperm;        /* Pointer to axis permutation array */
+   int *outperm;             /* Pointer to inverse axis permutation array */
+   int i;                    /* External axis index */
+   int naxes;                /* Number of axes in CmpFrame */
+   int perm;                 /* Is there an axis permutation to undo? */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_mapping;
+
+/* Form a parallel CmpMap from the two component Frames. */
+   map = astCmpMap( this->frame1, this->frame2, 0, "" );
+
+/* The above CmpMap does not take into account any axis permutation 
+   which has been applied to the CmpFrame as a whole (as opposed to axis
+   permutations applied to the individual component Frames, which are taken
+   care of by the Transform methods of the individual Frames). Therefore
+   we need to modify the Mapping by adding a PermMap at the start which 
+   converts from external axis numbering to internal axis numbering, and a 
+   corresponding PermMap at the end which converts from internal to external
+   axis numbering. Obtain the number of axes in the CmpFrame */
+   naxes = astGetNaxes( this );
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. This
+   contains internal axis numbers and is indexed by external axis number. */
+   inperm = astGetPerm( this );
+
+/* Check if there is any axis permutation to be performed. */
+   perm = 0;
+   for( i = 0; i < naxes; i++ ) {
+      if( inperm[ i ] != i ) {
+         perm = 1;
+         break;
+      }
+   }
+
+/* If so, create an array holding the inverse permutation - one which 
+   contains external axis numbers and is indexed by internal axis number. */
+   if( perm ) {
+      outperm = astMalloc( sizeof( int )*(size_t) naxes );
+      if( astOK ) for( i = 0; i < naxes; i++ ) outperm[ inperm[ i ] ] = i;
+
+/* Create a PermMap from these permutation arrays. The forward
+   transformation maps from external axis indices to internal axis 
+   indices. */
+      pmap = astPermMap( naxes, inperm, naxes, outperm, NULL, "" );
+
+/* Combine this PermMap with the CmpMap created above, adding it in the
+   forward direction at the start and in the inverse direction at the end. */
+      map2 = astCmpMap( pmap, map, 1, "" );
+      map = astAnnul( map );
+      astInvert( pmap );
+      map = astCmpMap( map2, pmap, 1, "" );
+      map2 = astAnnul( map2 );
+      pmap = astAnnul( pmap );
+
+   }
+
+/* Apply the Mapping to the input PointSet. */
+   result = astTransform( map, in, forward, out );
+
+/* Annul the Mapping pointer. */
+   map = astAnnul( map );
+
+/* If an error has occurred and a new PointSet may have been created, then
+   clean up by annulling it. In any case, ensure that a NULL result is
+   returned.*/
+   if ( !astOK ) {
+      if ( !out ) result = astAnnul( result );
+      result = NULL;
+   }
+
+/* Return a pointer to the output PointSet. */
+   return result;
+}
+
 static int Unformat( AstFrame *this_frame, int axis, const char *string,
                      double *value ) {
 /*
@@ -6691,6 +7301,14 @@ f     RESULT = AST_CMPFRAME( FRAME1, FRAME2, OPTIONS, STATUS )
 *     component in forming further CmpFrames. Frames of arbitrary
 *     complexity may be built from simple individual Frames in this
 *     way.
+*
+*     Also since a Frame is a Mapping, a CmpFrame can also be used as a 
+*     Mapping. Normally, a CmpFrame is simply equivalent to a UnitMap,
+*     but if either of the component Frames within a CmpFrame is a Region 
+*     (a sub-class of Frame), then the CmpFrame will use the Region as a
+*     Mapping when transforming values for axes described by the Region. 
+*     Thus input axis values corresponding to positions which are outside the 
+*     Region will result in bad output axis values.
 
 *  Parameters:
 c     frame1

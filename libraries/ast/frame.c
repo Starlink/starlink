@@ -164,10 +164,13 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     24-JAN-2004 (DSB):
 *        o  Added astFields.
 *        o  Added argument "fmt" to Abbrev.
+*     24-MAR-2004 (DSB):
+*        Add protected function astIsUnitFrame.
 *     7-SEP-2004 (DSB):
 *        Modified SetUnit to exclude any trailing spaces
 *     8-SEP-2004 (DSB):
-*        Added astResolvePoints.
+*        - Added astResolvePoints.
+*        - Override astEqual.
 *class--
 */
 
@@ -600,6 +603,7 @@ static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_equal)( AstObject *, AstObject * );
 
 /* Define other static variables. */
 static char label_buff[ LABEL_BUFF_LEN + 1 ]; /* Default Label string buffer */
@@ -637,6 +641,7 @@ static int ConsistentMaxAxes( AstFrame *, int );
 static int ConsistentMinAxes( AstFrame *, int );
 static int DefaultMaxAxes( AstFrame * );
 static int DefaultMinAxes( AstFrame * );
+static int Equal( AstObject *, AstObject * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
@@ -694,6 +699,7 @@ static int TestPreserveAxes( AstFrame * );
 static int TestSymbol( AstFrame *, int );
 static int TestTitle( AstFrame * );
 static int TestUnit( AstFrame *, int );
+static int IsUnitFrame( AstFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
 static int ValidateAxis( AstFrame *, int, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
@@ -1237,7 +1243,7 @@ f        The global status.
 *  Returned Value:
 c     astAxDistance
 f     AST_AXDISTANCE = DOUBLE PRECISION
-*        The distance between the two axis values.
+*        The distance from the first to the second axis value.
 
 *  Notes:
 *     - This function will return a "bad" result value (AST__BAD) if
@@ -2772,6 +2778,85 @@ f     invoked with STATUS set to an error value, or if it should fail for
    }
 
 /* Return the result. */
+   return result;
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two Frames are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     Frame member function (over-rides the astEqual protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two Frames are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Frame.
+*     that
+*        Pointer to the second Frame.
+
+*  Returned Value:
+*     One if the Frames are equivalent, zero otherwise.
+
+*  Notes:
+*     - The two Frames are considered equivalent if the Mapping between 
+*     them is a UnitMap.
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *that;            /* Pointer to the second Frame structure */
+   AstFrame *this;            /* Pointer to the first Frame structure */
+   AstFrameSet *fs;           /* FrameSet connecting the two Frames */
+   AstMapping *map1;          /* Mapping connecting the two Frames */
+   AstMapping *map2;          /* Simplified mapping connecting two Frames */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Checks that the second object is of the same class as the first . */
+   if( !strcmp( astGetClass( this_object ), astGetClass( that_object ) ) ){
+
+/* Obtain pointers to the two Frame structures. */
+      this = (AstFrame *) this_object;
+      that = (AstFrame *) that_object;
+
+/* Get the Mapping between them, and see if it is a UnitMap. */
+      fs = astConvert( that, this, "" );
+      if( fs ) {
+         map1 = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         map2 = astSimplify( map1 );
+         result = astIsAUnitMap( map2 );
+         map1 = astAnnul( map1 );
+         map2 = astAnnul( map2 );
+         fs = astAnnul( fs );
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
    return result;
 }
 
@@ -4410,6 +4495,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->GetSymbol = GetSymbol;
    vtab->GetTitle = GetTitle;
    vtab->GetUnit = GetUnit;
+   vtab->IsUnitFrame = IsUnitFrame;
    vtab->Match = Match;
    vtab->Norm = Norm;
    vtab->AxDistance = AxDistance;
@@ -4491,6 +4577,8 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
 
+   parent_equal = object->Equal;
+   object->Equal = Equal;
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;
    parent_getattrib = object->GetAttrib;
@@ -4514,6 +4602,48 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "Frame", "Coordinate system description" );
+}
+
+static int IsUnitFrame( AstFrame *this ){
+/*
+*+
+*  Name:
+*     astIsUnitFrame
+
+*  Purpose:
+*     Is this Frame equivalent to a UnitMap?
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astIsUnitFrame( AstFrame *this )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function returns a flag indicating if the supplied Frame is
+*     equivalent to a UnitMap when treated as a Mapping (note, the Frame
+*     class inherits from Mapping and therefore every Frame is also a Mapping).
+
+*  Parameters:
+*     this 
+*        Pointer to the Frame.
+
+*  Returned Value:
+*     A non-zero value is returned if the supplied Frame is equivalent to
+*     a UnitMap when treated as a Mapping.
+
+*-
+*/
+
+/* Check the local error status. */
+   if( !astOK ) return 0;
+
+/* The base Frame class is always equivalent to a UnitMap. */
+   return 1;
 }
 
 static int Match( AstFrame *template, AstFrame *target,
@@ -6371,6 +6501,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
    double *basisv;               /* Pointer to array holding basis vector */
    double *d1;                   /* Pointer to next parallel component value */
    double *d2;                   /* Pointer to next perpendicular component value */
+   double *ip;                   /* Pointer to next input axis value */
    double bv;                    /* Length of basis vector */
    double c;                     /* Constant value */
    double d;                     /* Component length */
@@ -6452,11 +6583,26 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
    ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
+/* Store points to the first two axis arrays in the returned PointSet. */
+   d1 = ptr_out[ 0 ];
+   d2 = ptr_out[ 1 ];
+
 /* Allocate work space. */
    basisv = astMalloc( sizeof( double )*(size_t) nax );
 
-/* Check pointers can be used safely */
-   if( astOK ) {
+/* If the Frame has only one axis, then the supplied basic vector is
+   irrelevant - the returned perpendicular distances are always zero and
+   the returned parallel distances are just the distances from point1 
+   to each input point. */
+   if( nax < 2 && astOK ) {
+      ip = ptr_in[ 0 ];
+      for( ipoint = 0; ipoint < npoint; ipoint++, d1++, d2++, ip++ ) {
+         *d1 = astAxDistance( this, 1, point1[0], *ip );
+         *d2 = 0.0;
+      }
+
+/* Now deal with Frames which have 2 or more axes */
+   } else if( astOK ){
 
 /* Check if the supplied positions defining the basis vector are good.
    Store the basis vector, and get its squared length. */
@@ -9460,11 +9606,10 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *     will accept any of the values which may be assigned to the System
 *     attribute.
 *
-*     The Mapping returned by 
-f     AST_FINDFRAME or AST_CONVERT 
-c     astFindFrame or astConvert
-*     will use the coordinate system specified by the AlignSystem attribute as 
-*     an intermediate coordinate system. The total returned Mapping will first
+c     The Mapping returned by AST_FINDFRAME or AST_CONVERT will use the
+f     The Mapping returned by astFindFrame or astConvert will use the
+*     coordinate system specified by the AlignSystem attribute as an
+*     intermediate coordinate system. The total returned Mapping will first
 *     map positions from the first Frame into this intermediate coordinate
 *     system, using the attributes of the first Frame. It will then map
 *     these positions from the intermediate coordinate system into the
@@ -11029,6 +11174,10 @@ int astMatch_( AstFrame *this, AstFrame *target,
    return (**astMEMBER(this,Frame,Match))( this, target,
                                            template_axes, target_axes,
                                            map, result );
+}
+int astIsUnitFrame_( AstFrame *this ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,IsUnitFrame))( this );
 }
 void astNorm_( AstFrame *this, double value[] ) {
    if ( !astOK ) return;

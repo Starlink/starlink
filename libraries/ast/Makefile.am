@@ -4,49 +4,63 @@
 # from the grp.make file, as constructed by the SDT newdev command
 GRP_C_ROUTINES = \
     axis.c \
+    box.c \
     c2f77.c \
     channel.c \
+    circle.c \
     cmpframe.c \
     cmpmap.c \
+    cmpregion.c \
+    dsbspecframe.c \
     dssmap.c \
+    ellipse.c \
     error.c \
+    fbox.c \
     fchannel.c \
+    fcircle.c \
     fcmpframe.c \
     fcmpmap.c \
+    fcmpregion.c \
+    fdsbspecframe.c \
     fdssmap.c \
+    fellipse.c \
     ferror.c \
     ffitschan.c \
     fframe.c \
     fframeset.c \
     fgrismmap.c \
-    fpolymap.c \
+    finterval.c \
     fintramap.c \
     fitschan.c \
     flutmap.c \
     fmapping.c \
     fmathmap.c \
     fmatrixmap.c \
+    fnullregion.c \
     fobject.c \
     fpcdmap.c \
     fpermmap.c \
     fplot.c \
+    fpointlist.c \
+    fpolygon.c \
+    fpolymap.c \
     frame.c \
     frameset.c \
+    fregion.c \
+    fshiftmap.c \
     fskyframe.c \
     fslamap.c \
     fspecframe.c \
-    fdsbspecframe.c \
     fspecmap.c \
     fsphmap.c \
     ftranmap.c \
     funitmap.c \
     fwcsmap.c \
-    fshiftmap.c \
     fwinmap.c \
     fxmlchan.c \
     fzoommap.c \
     grismmap.c \
-    polymap.c \
+    interval.c \
     intramap.c \
     loader.c \
     lutmap.c \
@@ -54,15 +68,20 @@ GRP_C_ROUTINES = \
     mathmap.c \
     matrixmap.c \
     memory.c \
+    nullregion.c \
     object.c \
     pcdmap.c \
     permmap.c \
     plot.c \
+    pointlist.c \
     pointset.c \
+    polygon.c \
+    polymap.c \
+    region.c \
+    shiftmap.c \
     skyaxis.c \
     skyframe.c \
     slamap.c \
-    dsbspecframe.c \
     specframe.c \
     specmap.c \
     sphmap.c \
@@ -70,7 +89,6 @@ GRP_C_ROUTINES = \
     unit.c \
     unitmap.c \
     wcsmap.c \
-    shiftmap.c \
     winmap.c \
     xml.c \
     xmlchan.c \
@@ -118,6 +136,15 @@ AST_H_FILES = \
              skyframe.h \
              specframe.h \
                 dsbspecframe.h \
+             region.h \
+                box.h \
+                circle.h \
+                cmpregion.h \
+                ellipse.h \
+                interval.h \
+                nullregion.h \
+                pointlist.h \
+                polygon.h \
        channel.h \
           fitschan.h \
           xmlchan.h 

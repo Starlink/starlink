@@ -119,6 +119,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added astEscapes.
 *     10-FEB-2004 (DSB):
 *        Added debug conditional code to keep track of memory leaks.
+*     22-AUG-2004 (DSB):
+*        Added astEqual
 *class--
 */
 
@@ -183,6 +185,7 @@ static void Clear( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearID( AstObject * );
 static void ClearIdent( AstObject * );
+static int Equal( AstObject *, AstObject * );
 static void SetAttrib( AstObject *, const char * );
 static void SetID( AstObject *, const char * );
 static void SetIdent( AstObject *, const char * );
@@ -854,6 +857,67 @@ static void Dump( AstObject *this, AstChannel *channel ) {
 /* Terminate the output from the final dump function with an "End"
    item to match the initial "Begin" item. */
    astWriteEnd( channel, astGetClass( this ) );
+}
+
+static int Equal( AstObject *this, AstObject *that ){
+/*
+*+
+*  Name:
+*     astEqual 
+
+*  Purpose:
+*     Check equality of two AST Objects.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     int astEqual( AstObject *this, AstObject *this )
+
+*  Class Membership:
+*     Object virtual function.
+
+*  Description:
+*     This function returns non-zero if the two pointers identify
+*     equivalent objects.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object.
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     Non-zero if the objects are equivalent.
+
+*  Notes:
+*    - The implementation of this function provided by the base Object
+*    class simply compares the class names and the structure size.
+*    Sub-classes should override this method to provide more appropriate tests.
+*    - Zero is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+
+*-
+*/
+
+/* Local Variables: */
+   int result;
+
+/* Check inherited status */
+   if( !astOK ) return 0;
+
+/* Objects are equivalent if they are the same object. */
+   if( this == that ) {
+      result = 1;
+
+/* Otherwise, check the structure size and class names */
+   } else {
+      result = ( this->size == that->size &&
+                 !strcmp( astGetClass( this ), astGetClass( that ) ) );
+   }
+                 
+   return result;
 }
 
 static const char *Get( AstObject *this, const char *attrib ) {
@@ -2949,6 +3013,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    vtab->ClearID = ClearID;
    vtab->ClearIdent = ClearIdent;
    vtab->Dump = Dump;
+   vtab->Equal = Equal;
    vtab->GetAttrib = GetAttrib;
    vtab->GetID = GetID;
    vtab->GetIdent = GetIdent;
@@ -3259,6 +3324,11 @@ void astClearAttrib_( AstObject *this, const char *attrib ) {
 void astDump_( AstObject *this, AstChannel *channel ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Object,Dump))( this, channel );
+}
+int astEqual_( AstObject *this, AstObject *that ) {
+   if ( !astOK ) return 0;
+   if( this == that ) return 1;
+   return (**astMEMBER(this,Object,Equal))( this, that );
 }
 const char *astGetAttrib_( AstObject *this, const char *attrib ) {
    if ( !astOK ) return NULL;

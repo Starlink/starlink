@@ -26,28 +26,37 @@ PATH="${srcdir}:${perldir}:${PATH}"
 export PATH
 
 goodsource="${srcdir}/axis.c \
+            ${srcdir}/box.c \
             ${srcdir}/channel.c \
+            ${srcdir}/circle.c \
             ${srcdir}/cmpframe.c \
             ${srcdir}/cmpmap.c \
+            ${srcdir}/cmpregion.c \
             ${srcdir}/dsbspecframe.c \
             ${srcdir}/dssmap.c \
+            ${srcdir}/ellipse.c \
             ${srcdir}/error.c \
             ${srcdir}/fchannel.c \
             ${srcdir}/fitschan.c \
             ${srcdir}/frame.c \
             ${srcdir}/frameset.c \
             ${srcdir}/grismmap.c \
+            ${srcdir}/interval.c \
             ${srcdir}/intramap.c \
             ${srcdir}/lutmap.c \
             ${srcdir}/mapping.c \
             ${srcdir}/mathmap.c \
             ${srcdir}/matrixmap.c \
+            ${srcdir}/nullregion.c \
             ${srcdir}/object.c \
             ${srcdir}/pcdmap.c \
             ${srcdir}/permmap.c \
             ${srcdir}/plot.c \
+            ${srcdir}/pointlist.c \
             ${srcdir}/pointset.c \
+            ${srcdir}/polygon.c \
             ${srcdir}/polymap.c \
+            ${srcdir}/region.c \
             ${srcdir}/shiftmap.c \
             ${srcdir}/skyaxis.c \
             ${srcdir}/skyframe.c \

@@ -67,6 +67,7 @@ PRMIN           <permutation invalid>
 PTRIN           <pointer invalid>
 PTRNG           <range of points invalid>
 RDERR           <read error>
+REGIN           <invalid or corrupted Region structure supplied>
 REMIN           <invalid attempt to remove last Frame>
 SCSIN           <sky coordinate system invalid>
 SELIN           <axis selection invalid>

@@ -121,6 +121,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added HELIOECLIPTIC option for System attribute.
 *     19-APR-2004 (DSB):
 *        Added SkyRef, SkyRefIs, SkyRefP and AlignOffset attributes.
+*     8-SEP-2004 (DSB):
+*        Added astResolvePoints method.
 *class--
 */
 
@@ -581,6 +583,7 @@ static double piby2;
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstMapping *OffsetMap( AstSkyFrame * );
+static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
 static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType GetSystem( AstFrame * );
 static void SetSystem( AstFrame *, AstSystemType );
@@ -3166,9 +3169,10 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->Angle = Angle;
    frame->Distance = Distance;
    frame->Norm = Norm;
-   frame->Resolve = Resolve;
    frame->Offset = Offset;
    frame->Offset2 = Offset2;
+   frame->Resolve = Resolve;
+   frame->ResolvePoints = ResolvePoints;
    frame->ValidateSystem = ValidateSystem;
    frame->SystemString = SystemString;
    frame->SystemCode = SystemCode;
@@ -5062,6 +5066,290 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 
    return;
 
+}
+
+static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[], 
+                                   const double point2[], AstPointSet *in,
+                                   AstPointSet *out ) {
+/*
+*  Name:
+*     astResolvePoints
+
+*  Purpose:
+*     Resolve a set of vectors into orthogonal components
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[], 
+*                                    const double point2[], AstPointSet *in,
+*                                    AstPointSet *out )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astResolvePoints method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function takes a Frame and a set of vectors encapsulated
+*     in a PointSet, and resolves each one into two orthogonal components,
+*     returning these two components in another PointSet.
+*
+*     This is exactly the same as the public astResolve method, except
+*     that this method allows many vectors to be processed in a single call,
+*     thus reducing the computational cost of overheads of many
+*     individual calls to astResolve.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vectors to be resolved.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+*     in
+*        Pointer to the PointSet holding the ends of the vectors to be
+*        resolved.
+*     out
+*        Pointer to a PointSet which will hold the length of the two
+*        resolved components. A NULL value may also be given, in which 
+*        case a new PointSet will be created by this function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet. The first axis will 
+*     hold the lengths of the vector components parallel to the basis vector. 
+*     These values will be signed (positive values are in the same sense as 
+*     movement from point 1 to point 2. The second axis will hold the lengths 
+*     of the vector components perpendicular to the basis vector. These
+*     values will always be positive.
+
+*  Notes:
+*     - The number of coordinate values per point in the input
+*     PointSet must match the number of axes in the supplied Frame.
+*     - If an output PointSet is supplied, it must have space for
+*     sufficient number of points and 2 coordinate values per point.
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*     - We assume spherical geometry throughout this function. 
+*/
+
+/* Local Variables: */
+   AstPointSet *result;          /* Pointer to output PointSet */
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   const int *perm;              /* Pointer to axis permutation array */
+   double **ptr_in;              /* Pointers to input axis values */
+   double **ptr_out;             /* Pointers to returned axis values */
+   double *d1;                   /* Pointer to next parallel component value */
+   double *d2;                   /* Pointer to next perpendicular component value */
+   double *point3x;              /* Pointer to next first axis value */
+   double *point3y;              /* Pointer to next second axis value */
+   double n1[ 3 ];               /* Unit normal to grt crcl thru p1 and p2 */
+   double n2[ 3 ];               /* Unit normal to grt crcl thru p3 and p4 */
+   double p1[ 2 ];               /* Permuted coordinates for point1 */
+   double p2[ 2 ];               /* Permuted coordinates for point2 */
+   double p3[ 2 ];               /* Permuted coordinates for point3 */
+   double v1[ 3 ];               /* 3-vector for p1 */
+   double v2[ 3 ];               /* 3-vector for p2 */
+   double v3[ 3 ];               /* 3-vector for p3 */
+   double v4[ 3 ];               /* 3-vector for p4 */
+   double v5[ 3 ];               /* 3-vector 90 degs away from p1 */
+   double vmod;                  /* Modulus of vector */
+   double vtemp[ 3 ];            /* Temporary vector workspace */
+   int ipoint;                   /* Index of next point */
+   int ncoord_in;                /* Number of input PointSet coordinates */
+   int ncoord_out;               /* Number of coordinates in output PointSet */
+   int npoint;                   /* Number of points to transform */
+   int npoint_out;               /* Number of points in output PointSet */
+   int ok;                       /* OK to proceed? */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Obtain the number of input vectors to resolve and the number of coordinate
+   values per vector. */
+   npoint = astGetNpoint( in );
+   ncoord_in = astGetNcoord( in );
+
+/* If OK, check that the number of input coordinates matches the number
+   required by the Frame. Report an error if these numbers do not match. */
+   if ( astOK && ( ncoord_in != 2 ) ) {
+      astError( AST__NCPIN, "astResolvePoints(%s): Bad number of coordinate "
+                "values (%d) in input %s.", astGetClass( this ), ncoord_in,
+                astGetClass( in ) );
+      astError( AST__NCPIN, "The %s given requires 2 coordinate values for "
+                "each input point.", astGetClass( this ) );
+   }
+
+/* If still OK, and a non-NULL pointer has been given for the output PointSet,
+   then obtain the number of points and number of coordinates per point for
+   this PointSet. */
+   if ( astOK && out ) {
+      npoint_out = astGetNpoint( out );
+      ncoord_out = astGetNcoord( out );
+
+/* Check that the dimensions of this PointSet are adequate to accommodate the
+   output coordinate values and report an error if they are not. */
+      if ( astOK ) {
+         if ( npoint_out < npoint ) {
+            astError( AST__NOPTS, "astResolvePoints(%s): Too few points (%d) in "
+                      "output %s.", astGetClass( this ), npoint_out,
+                      astGetClass( out ) );
+            astError( AST__NOPTS, "The %s needs space to hold %d transformed "
+                      "point(s).", astGetClass( this ), npoint );
+         } else if ( ncoord_out < 2 ) {
+            astError( AST__NOCTS, "astResolvePoints(%s): Too few coordinate "
+                      "values per point (%d) in output %s.",
+                      astGetClass( this ), ncoord_out, astGetClass( out ) );
+            astError( AST__NOCTS, "The %s supplied needs space to store 2 "
+                      "coordinate value(s) per transformed point.",
+                      astGetClass( this ) );
+         }
+      }
+   }
+
+/* If all the validation stages are passed successfully, and a NULL output
+   pointer was given, then create a new PointSet to encapsulate the output
+   coordinate data. */
+   if ( astOK ) {
+      if ( !out ) {
+         result = astPointSet( npoint, 2, "" );
+
+/* Otherwise, use the PointSet supplied. */
+      } else {
+         result = out;
+      }
+   }
+
+/* Get pointers to the input and output axis values */
+   ptr_in = astGetPoints( in );
+   ptr_out = astGetPoints( result );
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+   perm = astGetPerm( this );
+
+/* Check pointers can be used safely */
+   if( astOK ) {
+
+/* Apply the axis permutation array to obtain the coordinates of the 
+   two supplied points in the required (longitude,latitude) order. */
+      p1[ perm[ 0 ] ] = point1[ 0 ];
+      p1[ perm[ 1 ] ] = point1[ 1 ];
+      p2[ perm[ 0 ] ] = point2[ 0 ];
+      p2[ perm[ 1 ] ] = point2[ 1 ];
+
+/* Convert these points into 3-vectors of unit length. */
+      slaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
+      slaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
+
+/* Find the cross product between the vectors, and normalize it. This is the 
+   unit normal to the great circle plane defining parallel distance. */
+      slaDvxv( v2, v1, vtemp );
+      slaDvn( vtemp, n1, &vmod );
+
+/* Return with bad values if the normal is undefined (i.e. if the first two 
+   vectors are identical or diametrically opposite). */
+      ok = 0;
+      if( vmod > 0.0 ) {
+         ok = 1;
+
+/* Now take the cross product of the normal vector and v1. This gives a
+   point, v5, on the great circle which is 90 degrees away from v1, in the
+   direction of v2. */
+         slaDvxv( v1, n1, v5 );
+      }
+
+/* Store pointers to the first two axis arrays in the returned PointSet. */
+      d1 = ptr_out[ 0 ];
+      d2 = ptr_out[ 1 ];
+
+/* Store pointers to the axis values in the supplied PointSet. */
+      point3x = ptr_in[ 0 ];
+      point3y = ptr_in[ 1 ];
+
+/* Check supplied values can be used */
+      if( ok ) {
+
+/* Loop round each supplied vector. */
+         for( ipoint = 0; ipoint < npoint; ipoint++, d1++, d2++,
+                                           point3x++, point3y++ ) {
+
+/* Store bad output values if either input axis value is bad. */
+            if( *point3x == AST__BAD || *point3y == AST__BAD ){
+               *d1 = AST__BAD;
+               *d2 = AST__BAD;
+
+/* If both are good... */
+            } else {
+
+/* Apply the axis permutation array to obtain the coordinates in the 
+   required (longitude,latitude) order. */
+               p3[ perm[ 0 ] ] = *point3x;
+               p3[ perm[ 1 ] ] = *point3y;
+
+/* Convert into a 3-vector of unit length. */
+               slaDcs2c( p3[ 0 ], p3[ 1 ], v3 );
+
+/* Find the cross product of the outlying point (point 3), and the vector
+   n1 found above, and normalize it. This is the unit normal to the great 
+   circle plane defining perpendicular distance. */
+               slaDvxv( v3, n1, vtemp );
+               slaDvn( vtemp, n2, &vmod );
+
+/* Return with bad values if the normal is undefined (i.e. if the
+   outlying point is normal to the great circle defining the basis 
+   vector). */
+               if( vmod <= 0.0 ) {
+                  *d1 = AST__BAD;
+                  *d2 = AST__BAD;
+               } else {
+
+/* The point of closest approach, point 4, is the point which is normal
+   to both normal vectors (i.e. the intersection of the two great circles).
+   This is the cross product of n1 and n2. No need to normalize this time 
+   since both n1 and n2 are unit vectors, and so v4 will already be a
+   unit vector. */
+                  slaDvxv( n1, n2, v4 );
+
+/* The dot product of v4 and v1 is the cos of the parallel distance,
+   d1, whilst the dot product of v4 and v5 is the sin of the parallel
+   distance. Use these to get the parallel distance with the correct
+   sign, in the range -PI to +PI. */
+                  *d1 = atan2( slaDvdv( v4, v5 ), slaDvdv( v4, v1 ) );
+
+/* The dot product of v4 and v3 is the cos of the perpendicular distance,
+   d2, whilst the dot product of n1 and v3 is the sin of the perpendicular
+   distance. Use these to get the perpendicular distance. */
+                  *d2 = fabs( atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) ) );
+               }
+            }
+         }
+
+/* If supplied values cannot be used, fill the returned PointSet with bad
+   values */
+      } else {
+         for( ipoint = 0; ipoint < npoint; ipoint++, d1++, d2++ ) {
+            *d1 = AST__BAD;
+            *d2 = AST__BAD;
+         }
+      }
+   }
+
+/* Annul the returned PointSet if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return a pointer to the output PointSet. */
+   return result;
 }
 
 static void SetAsTime( AstSkyFrame *this, int axis, int value ) {

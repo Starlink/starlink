@@ -11,7 +11,7 @@
 #     The standard output from regression.f is compared to the contents
 #     of file regression.current, and the user is warned if they differ.
 #
-#     Also runs tests of the XmlChan class.
+#     Also runs tests of the XmlChan class and all Region sub-classes.
 #
 #     Also attempts to convert various critical FITS headers of various 
 #     encodings to other encodings and compares the result to previous 
@@ -62,6 +62,7 @@ g77 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK
 g77 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
 g77 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 g77 -fno-second-underscore -o testxmlchan testxmlchan.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+g77 -fno-second-underscore -o testregions testregions.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the main regression tester
 regression >& regression.out
@@ -80,6 +81,10 @@ endif
 # Run the XmlChan tester
 echo "\nTesting XmlChan class...\n"
 testxmlchan
+
+# Run the Region tester
+echo "\nTesting Region subclasses...\n"
+testregions
 
 # Make new plots.
 echo "\nGenerating new plots...\n"
