@@ -107,13 +107,13 @@
       CALL ADI1_GETLOC( ID, LOC, STATUS )
 
 *  Locate field
-      CALL SSO_LOCFLDIF( ID, FLD, FLOC, STATUS )
+      CALL SSO_LOCFLD( ID, FLD, FLOC, STATUS )
 
 *  Get dimensions of error
       CALL CMP_SHAPE( FLOC, 'ERROR', MXDIM, DIMS, NDIM, STATUS )
 
 *  Free field locator
-      CALL DAT__ANULL( FLOC, STATUS )
+      CALL DAT_ANNUL( FLOC, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN

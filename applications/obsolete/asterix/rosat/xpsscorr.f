@@ -50,6 +50,7 @@
 *     23 Nov 94 : V1.7-2 Vignetting correction for HRI (RJV)
 *      8 Feb 95 : V1.8-0 Corrected bug in types of MDATE and MSWITCH.
 *                        HEAD.DET was also not being set up! (DJA)
+*      9 May 95 : V1.8-1 Updated access to SSDS files (DJA)
 *
 *    Type Definitions :
 *
@@ -59,7 +60,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -70,13 +70,9 @@
         EXTERNAL CHR_LEN
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) FELOC   ! Locator to input FLUX field
-      CHARACTER*(DAT__SZLOC) ILOC    ! Locator to PSS source file
-      CHARACTER*(DAT__SZLOC) HLOC    ! Locator to PSS source file header
       CHARACTER*(DAT__SZLOC) RLOC    ! Locator to response file
       CHARACTER*(DAT__SZLOC) ELOC    ! Locator to effective areas
       CHARACTER*(DAT__SZLOC) EXLOC   ! Locator to exposure map
-      CHARACTER*(DAT__SZLOC) BILOC   ! Locator to the instrument box
       CHARACTER*80 RFILE             ! Name of response file
       CHARACTER*80 EFILE             ! Name of eff. area file
       CHARACTER*80 EXPFIL            ! Name of exposure map
@@ -92,16 +88,21 @@
       INTEGER     EDIMS(3)           ! Error dimensions
       INTEGER     ENDIM              ! Error dimensionality
       INTEGER     DDIM(2)            ! Error dimensionality
+      INTEGER			DETID			! Detector details
+      INTEGER			IFID			! Input dataset
       INTEGER     MDATE,MSWITCH ! MJDs
       INTEGER     NED                ! Number of error items per source
       INTEGER     NELEV              ! Number of flux error levels
       INTEGER     NSRC               ! Number of sources
+      INTEGER			SFID			! Searched dataset
+      INTEGER			TIMID			! Timing info
       INTEGER     XPTR, YPTR         ! Pointers to source image coordinates
       INTEGER     NEDIM              ! Number of exposure map dims
       INTEGER     EXDIM(DAT__MXDIM)  ! Dimensions of exposure array
       INTEGER     EXPTR              ! Pointer to exposure map data
       INTEGER     EAPTR1             ! Pointer to exposure map axis 1
       INTEGER     EAPTR2             ! Pointer to exposure map axis 2
+
       LOGICAL     ERRORS             ! Flux errors present in input?
       LOGICAL     INPRIM             ! Is input primitive ?
       LOGICAL     OK                 ! Dataset ok?
@@ -110,8 +111,8 @@
 *
 *    Version :
 *
-      CHARACTER*30 VERSION
-        PARAMETER (VERSION = 'XPSSCORR version 1.8-0')
+      CHARACTER*30		VERSION
+        PARAMETER 		( VERSION = 'XPSSCORR version 1.8-1' )
 *-
 
 *    Check status
@@ -121,15 +122,14 @@
       CALL MSG_PRNT( VERSION )
 
 *    Initialise
-      CALL AST_INIT
-      CALL SSO_INIT( STATUS )
+      CALL AST_INIT()
 
 *    Associate input dataset
-      CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *    Check input ok
-      CALL SSO_VALID( ILOC, OK, STATUS )
+      CALL SSI_VALID( IFID, OK, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Dataset is not a results file!', STATUS )
@@ -137,7 +137,7 @@
       END IF
 
 *    Get number of sources
-      CALL SSO_GETNSRC( ILOC, NSRC, STATUS )
+      CALL SSI_GETNSRC( IFID, NSRC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Error reading no. of sources from file',
      :                                                      STATUS )
@@ -145,8 +145,8 @@
       END IF
 
 *    Map image coordinates
-      CALL SSO_MAPFLD( ILOC, 'X_CORR', '_REAL', 'READ', XPTR, STATUS )
-      CALL SSO_MAPFLD( ILOC, 'Y_CORR', '_REAL', 'READ', YPTR, STATUS )
+      CALL SSI_MAPFLD( IFID, 'X_CORR', '_REAL', 'READ', XPTR, STATUS )
+      CALL SSI_MAPFLD( IFID, 'Y_CORR', '_REAL', 'READ', YPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Error reading X and Y positions '/
      :                                  /'from file', STATUS )
@@ -154,7 +154,7 @@
       END IF
 
 *    Map flux
-      CALL SSO_MAPFLD( ILOC, 'FLUX', '_REAL', 'READ', FPTR, STATUS )
+      CALL SSI_MAPFLD( IFID, 'FLUX', '_REAL', 'READ', FPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Error reading source fluxes '/
      :                              /'from file', STATUS )
@@ -163,7 +163,7 @@
 
 *    Symmetric source parameter errors?
       NED = 1
-      CALL SSO_GETPAR0L( ILOC, 1, 'SYMMETRIC', SYM_ERRORS, STATUS )
+      CALL SSI_GETPAR0L( IFID, 1, 'SYMMETRIC', SYM_ERRORS, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         ERRORS = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -174,9 +174,9 @@
         IF ( .NOT. SYM_ERRORS ) NED = 2
 
 *      Get errors if present
-        CALL SSO_CHKFLDERR( ILOC, 'FLUX', ERRORS, STATUS )
+        CALL SSI_CHKFLDERR( IFID, 'FLUX', ERRORS, STATUS )
         IF ( ERRORS ) THEN
-          CALL SSO_MAPFLDERR( ILOC, 'FLUX', '_REAL', 'READ', EFPTR,
+          CALL SSI_MAPFLDERR( IFID, 'FLUX', '_REAL', 'READ', EFPTR,
      :                                                     STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -185,21 +185,19 @@
         END IF
 
       END IF
-*
+
 *    Create and map corrected flux
-      CALL SSO_CREFLD( ILOC, 'CFLUX', '_REAL', STATUS )
-      CALL SSO_MAPFLD( ILOC, 'CFLUX', '_REAL', 'WRITE', CFPTR, STATUS )
-      CALL SSO_PUTFITEM0C( ILOC, 'CFLUX', 'UNITS', 40, 'count/sec',
+      CALL SSI_CREFLD( IFID, 'CFLUX', '_REAL', STATUS )
+      CALL SSI_MAPFLD( IFID, 'CFLUX', '_REAL', 'WRITE', CFPTR, STATUS )
+      CALL SSI_PUTFITEM0C( IFID, 'CFLUX', 'UNITS', 40, 'count/sec',
      :                                                     STATUS )
 
 *    Create output errors if present in input
       IF ( ERRORS ) THEN
 
 *      Locate input errors and get dimensions
-        CALL SSO_LOCFLD( ILOC, 'FLUX', FELOC, STATUS )
-        CALL CMP_SHAPE( FELOC, 'ERROR', DAT__MXDIM, EDIMS, ENDIM,
-     :                                                   STATUS )
-        CALL DAT_ANNUL( FELOC, STATUS )
+        CALL SSI_SHPFLDERR( IFID, 'FLUX', DAT__MXDIM, EDIMS, ENDIM,
+     :                      STATUS )
 
 *      Number of levels
         IF ( SYM_ERRORS ) THEN
@@ -217,12 +215,12 @@
         END IF
 
 *      Create output errors
-        CALL SSO_CREFLDERR( ILOC, 'CFLUX', '_REAL', NED, NELEV, STATUS )
-        CALL SSO_MAPFLDERR( ILOC, 'CFLUX', '_REAL', 'WRITE', ECFPTR,
+        CALL SSI_CREFLDERR( IFID, 'CFLUX', '_REAL', NED, NELEV, STATUS )
+        CALL SSI_MAPFLDERR( IFID, 'CFLUX', '_REAL', 'WRITE', ECFPTR,
      :                                                      STATUS )
 
       ELSE
-*
+
 *    map two dynamic arrays if no errors
         DDIM(1) = NED
         DDIM(2) = NSRC
@@ -238,37 +236,42 @@
 *
       ENDIF
 *
-* Read the detector name from the header
-*    Get locator to the instrument box
-      CALL HDX_FIND( ILOC, 'BOOK(1).MORE.ASTERIX.INSTRUMENT',
-     &                                             BILOC, STATUS )
 
-*    Get detector type i.e. PSPC or HARI
-      CALL CMP_GET0C(BILOC, 'DETECTOR', DET, STATUS)
+*  Locate file searched by PSS. If error, prompt for it
+      CALL SSI_FINDDS( IFID, 1, SFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL USI_TASSOCI( 'SEARCHED', '*', 'READ', SFID, STATUS )
+      END IF
+
+*  Get detector details
+      CALL DCI_GETID( SFID, DETID, STATUS )
+
+*  Get detector type i.e. PSPC or HRI
+      CALL ADI_CGET0C( DETID, 'Detector', DET, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('*Error reading instrument type*')
          GOTO 999
-      ENDIF
-*
-      CALL DAT_ANNUL( BILOC, STATUS )
-*
-*    Is it an HRI observation ?
+      END IF
+
+*  Get timing info
+      CALL TCI_GETID( SFID, TIMID, STATUS )
+
+*  Is it an HRI observation ?
       IF ( INDEX(DET, 'HRI') .NE. 0) THEN
 
-*      Locate HEADER object to get exposure time
-         CALL HDX_FIND( ILOC, 'BOOK(1).MORE.ASTERIX.HEADER',
-     :                                             HLOC, STATUS )
-         CALL CMP_GET0R( HLOC, 'EXPOSURE_TIME', EXPOS, STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-           CALL ERR_REP( ' ', '! Error reading exposure time', STATUS )
-           GOTO 999
-         END IF
+*    Get raw exposure time
+        CALL ADI_CGET0R( TIMID, 'Exposure', EXPOS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_REP( ' ', 'Error reading exposure time', STATUS )
+          GOTO 999
+        END IF
 
-*      Apply the exposure correction
-         CALL XPSSCORR_HRI( NSRC, %VAL(XPTR),%VAL(YPTR),
-     :                             %VAL(FPTR), ERRORS, NED*NELEV,
-     :          %VAL(EFPTR), EXPOS, %VAL(CFPTR), %VAL(ECFPTR), STATUS )
-*
+*    Apply the exposure correction
+        CALL XPSSCORR_HRI( NSRC, %VAL(XPTR), %VAL(YPTR), %VAL(FPTR),
+     :                     ERRORS, NED*NELEV, %VAL(EFPTR), EXPOS,
+     :                     %VAL(CFPTR), %VAL(ECFPTR), STATUS )
+
       ELSE
 
 *    Ask if a correction for the wires is required
@@ -289,12 +292,10 @@
             CALL USI_GET0R( 'ENERGY', MEAN_EN, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*      Locate HEADER object to get exposure time
-            CALL HDX_FIND( ILOC, 'BOOK(1).MORE.ASTERIX.HEADER',
-     :                                             HLOC, STATUS )
-            CALL CMP_GET0R( HLOC, 'EXPOSURE_TIME', EXPOS, STATUS )
+*      Get exposure time
+            CALL ADI_CGET0R( TIMID, 'Exposure', EXPOS, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
-              CALL ERR_REP(' ', '! Error reading exposure time', STATUS)
+              CALL ERR_REP( ' ', 'Error reading exposure time', STATUS )
               GOTO 999
             END IF
 
@@ -309,12 +310,10 @@
 
 *     Get detector response matrix name
             CALL USI_GET0C('RESPFILE', RFILE, STATUS)
-*
             IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
 *     Open response matrix
             CALL HDS_OPEN(RFILE,'READ',RLOC,STATUS)
-*
             IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_SETC('RFILE', RFILE)
                CALL MSG_PRNT('Error opening ^RFILE')
@@ -330,17 +329,16 @@
      &              (INDEX(DET, 'PSPCC') .EQ. 0) ) THEN
 *
 *        Get the observation date as an MJD (use MJDs to compare dates)
-               CALL CMP_GET0I(HLOC, 'BASE_MJD', MDATE, STATUS)
-*
-               IF (STATUS .NE. SAI__OK) THEN
-                  CALL MSG_PRNT('** Error reading BASE_MJD **')
-                  CALL MSG_PRNT('** Can not determine detector type **')
-                  GOTO 999
-               ENDIF
-*
+              CALL ADI_CGET0I( TIMID, 'MJDObs', MDATE, STATUS )
+              IF (STATUS .NE. SAI__OK) THEN
+                CALL MSG_PRNT('** Error reading observation date **')
+                CALL MSG_PRNT('** Can not determine detector type **')
+                GOTO 999
+              END IF
+
 *        Convert 26th Jan 1991 to an MJD
                CALL CONV_YMDMJD(1991, 1, 26, MSWITCH)
-*
+
 *        Compare the MJD of the observation to the switch over point
                IF (MDATE .LE. MSWITCH) THEN
                   DET = 'PSPCC'
@@ -349,8 +347,6 @@
                ENDIF
 *
             ENDIF
-*
-            CALL DAT_ANNUL( HLOC, STATUS )
 
 *     Select the default efective area file (dependent on the date of the
 *     observation)
@@ -428,11 +424,13 @@
 *
          ENDIF
       ENDIF
-*
-*    Release dataset
-      CALL SSO_RELEASE( ILOC, STATUS )
 
-999   CALL AST_CLOSE(STATUS)
+*  Release datasets
+      CALL ADI_ERASE( SFID, STATUS )
+      CALL SSI_RELEASE( IFID, STATUS )
+
+*  Tidy up
+ 999  CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END
