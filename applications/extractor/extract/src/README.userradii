@@ -1,0 +1,24 @@
+
+Adding the "userradii" facility changes the following files:
+
+    analyse.c   -- changed to call the "userradii" function
+
+    catout.c    -- changed to initialise obj.rad FLAGs
+
+    userradii.c -- the code for doing the calculations
+
+    define.h    -- changed to define number of radii (NRAD)
+
+    userradii.h -- defines prototype for userradii call
+
+    param.h     -- added RAD0 through RAD15 catalogue parameters
+
+    types.h     -- added rad member to objstruct and rad_type,
+                   nrad_type, rad and nrad to prefstruct.
+
+    prefs.h     -- added RAD_THRESH and RAD_TYPE parameters
+
+
+Note: could make analysis more efficient by pre-calculating the
+thresholds somewhere just once, rather for each object.
+
