@@ -449,7 +449,7 @@ will add that to the end of the generated URL.</p>
 
 <p>If you want to make linking within your document more robust, you
 can generate document summaries yourself.  Try experimenting with the
-script in <code type="fspath">$STARLINK_SGML_DIR/lib/htx2summ.pl</code>
+script in <code>$STARLINK_SGML_DIR/lib/htx2summ.pl</code>
 to convert a current LaTeX-based Starlink document, and its HTX files,
 into a document summary file.  This should become easier, or even
 automatic, in future.</p>
