@@ -915,7 +915,7 @@ LATEX_DOCS = sun95.tex \
              sun95_agi1.eps sun95_agi2.eps sun95_agi3.eps sun95_agi4.eps \
              sun95_agi5.eps sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps \
              sun221.tex
-HYPERTEXT_DOCS = 
+HYPERTEXT_DOCS = sun95.htx sun221.htx
 
 #  List of documentation files.
 
