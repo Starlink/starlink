@@ -1,5 +1,5 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, STATUS )
+     :                      ORIGIN, PROFIT, PROEXT, PROHIS, STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-*                     ORIGIN, PROFIT, PROEXT, STATUS )
+*                     ORIGIN, PROFIT, PROEXT, PROHIS, STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -32,7 +32,9 @@
 *     BITPIX = INTEGER (Given)
 *        The number of bits per pixel (FITS BITPIX) required for the
 *        output FITS file.  A value of 0 means use the BITPIX of the
-*        input array.
+*        input array.  A value of -1 means use the value of the BITPIX
+*        keyword in the NDF's FITS extension; if the extension or BITPIX
+*        card is absent, the BITPIX of the input array is used.
 *     BLOCKF = INTEGER (Given)
 *        The blocking factor for the output file.  It must be a positive
 *        integer between 1 and 10.
@@ -50,6 +52,10 @@
 *        If .TRUE., the NDF extensions (other than the FITS extension)
 *        are propagated to the FITS files as FITS binary-table
 *        extensions, one per structure of the hierarchy.
+*     PROHIS = LOGICAL (Given)
+*        If .TRUE., any NDF history records are written to the primary
+*        FITS header as HISTORY cards.  These follow the mandatory
+*        headers and any merged FITS-extension headers (see PROFIT).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -79,19 +85,30 @@
 *        SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
-*          data array;
+*          data array; however the BITPIX in the FITS extension is
+*          transferred when argument BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
 *          structures are present, the values in the NDF FITS extension
 *          are copied (when parameter PROFITS is true).  If any axes
 *          are non-linear, all FITS axis information is lost.
-*        OBJECT, LABEL, BUNITS --- the values held in the NDF's title,
+*        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
 *          extension are used (provided parameter PROFITS is true).
 *        ORIGIN and DATE --- are created automatically.  However the
 *          former may be overriden by an ORIGIN card in the NDF
 *          extension.
+*        EXTNAME --- is the component name of the object from the COMP
+*          argument when the EXTNAME appears in the primary header or
+*          an IMAGE extension.  In a binary-table derived from an NDF
+*          extension, EXTNAME is the path of the extension within the
+*          NDF.
+*        EXTLEVEL --- is the level in the hierarchical structure of the
+*          extensions.  Thus a top-level extension has value 1,
+*          sub-components of this extension have value 2 and so on.
+*        EXTTYPE --- is the data type of the NDF extension used to
+*          create a binary table.
 *        EXTNAME --- is the component name of the object from the COMP
 *          argument.
 *        HDUCLAS1, HDUCLASn --- "NDF" and the value of COMP
@@ -107,16 +124,18 @@
 *          are written to reserve places in the header section.  These
 *          `reservation' cards are for efficiency and they can always
 *          be deleted later.  BLANK is set to the Starlink standard bad
-*          value corresponding to the type specified by BITPIX, but only
-*          for integer types and not for the quality array.  It appears
-*          regardless of whether or not there are bad values actually
-*          present in the array; this is for the same efficiency
-*          reasons as before.  The END card terminates the FITS header.
-*          The END card is written by FITSIO automatically once the
-*          header is closed.
+*          value corresponding to the type specified by the BITPIX
+*          keyword, but only for integer types and not for the quality
+*          array.  It appears regardless of whether or not there are
+*          bad values actually present in the array; this is for the
+*          same efficiency reasons as before.  The END card terminates
+*          the FITS header.  The END card is written by FITSIO
+*          automatically once the header is closed.
+*       HISTORY cards are propagated from the FITS extension when
+*          PROFIT is .TRUE., and from the NDF HISTORY component when
+*          PROHIS is .TRUE..
 
 *  Implementation Deficiencies:
-*     - There is no propagation of NDF history records to the FITS file.
 *     - There is no support for FITS World Co-ordinate Systems.
 *     [routine_deficiencies]...
 
@@ -132,6 +151,14 @@
 *        Some bug fixes and improvements.
 *     1996 September 11 (MJC):
 *        Simplified the error message when the FITS file exists.
+*     1997 January 13 (MJC):
+*        Added PROHIS argument and calls to enable propagation of
+*        history information from the HISTORY component to the FITS
+*        headers.  Checked for 2dF extensions, and created special
+*        binary tables for these.
+*     1997 March 16 (MJC):
+*        Allowed BITPIX argument to select the NDF's FITS extension
+*        BITPIX value to be propagated.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +185,7 @@
       CHARACTER * ( * ) ORIGIN
       LOGICAL PROFIT
       LOGICAL PROEXT
+      LOGICAL PROHIS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -189,15 +217,22 @@
       DOUBLE PRECISION BSCALE    ! Block-integer scale factor
       CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
       DOUBLE PRECISION BZERO     ! Block-integer offset
+      CHARACTER * ( 48 ) COMENT  ! Comment from FITS-extension header
+      DOUBLE PRECISION DELTA     ! Machine precision for scaling
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
+      LOGICAL E2DF                ! Extension is from 2dF?
       INTEGER EL                 ! Number of elements in array
       LOGICAL FEXIST             ! FITS already exists?
       LOGICAL FITPRE             ! FITS extension is present
+      DOUBLE PRECISION FSCALE    ! Reduction factor for scale
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
       INTEGER FUNIT              ! Fortran I/O unit for the FITS file
+      LOGICAL HISPRE             ! HISTORY records present?
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter
+      INTEGER IDEL               ! Increment to reduce an integer
+                                 ! scaling range
       INTEGER IPNTR              ! Pointer to input array
       DOUBLE PRECISION MAXV      ! Max. value to appear in scaled array
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
@@ -219,10 +254,13 @@
                                  ! propagated for the current header
       LOGICAL SCALE              ! True if the array is to be scaled
       LOGICAL SHIFT              ! True if a BZERO offset is required
+      LOGICAL THERE              ! True if the BITPIX FITS header card
+                                 ! is present
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
       LOGICAL VALID              ! True if the NDF identifier is valid
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
       CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
+      CHARACTER * ( DAT__SZTYP ) XTYPE ! Name of NDF extension
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -327,9 +365,27 @@
          IF ( ARRNAM( ICOMP ) .EQ. 'QUALITY' ) THEN
             BPOUT = 8
             BPOUTU = BPOUT
+
+*  Search the FITS extension for the first BITPIX keyword, and return
+*  its value.
+         ELSE IF ( BITPIX .EQ. -1 ) THEN
+            CALL CON_EKEYI( NDF, 'BITPIX', 1, THERE, BPOUT, COMENT,
+     :                      STATUS )
+
+            IF ( THERE ) THEN
+               BPOUTU = BPOUT
+
+*  Use the input array's values if the BITPIX keyword does not exist.
+            ELSE
+               BPOUT = BPIN
+               BPOUTU = BPINU
+            END IF
+
+*  Just use the input array's values.
          ELSE IF ( BITPIX .EQ. 0 ) THEN
             BPOUT = BPIN
             BPOUTU = BPINU
+
          ELSE
             BPOUT = BITPIX
 
@@ -372,6 +428,14 @@
      :                   STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
+*  Determine whether or not there are history records in the NDF.
+*  Append the history records for the first array.
+         IF ( PROHIS .AND. ICOMP .EQ. 1 ) THEN
+            CALL NDF_STATE( NDF, 'History', HISPRE, STATUS )
+            IF ( HISPRE ) CALL COF_WHISR( NDF, FUNIT, STATUS )
+         END IF
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 *  Determine the block-floating point conversion and blank value.
 *  ==============================================================
 *
@@ -386,6 +450,8 @@
          SHIFT = .FALSE.
          BSCALE = 1.0D0
          BZERO = 0.0D0
+         DELTA = DBLE( VAL__EPSR )
+         FSCALE = 1.0D0 - DELTA
 
 *  Is format conversion required?
 *  ------------------------------
@@ -468,7 +534,7 @@
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                NUL_32 = VAL__BADR
 
-            ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                NUL_64 = VAL__BADD
 
             END IF
@@ -522,16 +588,18 @@
                MINV = NUM_UBTOD( VAL__MINUB )
 
             ELSE IF ( BPOUT .EQ. 16 ) THEN
-               MAXV = NUM_WTOD( VAL__MAXW )
-               MINV = NUM_WTOD( VAL__MINW )
+               MAXV = NUM_WTOD( VAL__MAXW ) - 1.0D0
+               MINV = NUM_WTOD( VAL__MINW ) + 1.0D0
 
             ELSE IF ( BPOUT .EQ. 32 ) THEN
-               MAXV = DBLE( VAL__MAXI )
-               MINV = DBLE( VAL__MINI )
+               IDEL = MAX( INT( DBLE( VAL__MAXI ) * DELTA ) ,
+     :                     INT( DBLE( VAL__MINI ) * DELTA ) ) + 1
+               MAXV = DBLE( VAL__MAXI - SIGN( IDEL, VAL__MAXI ) )
+               MINV = DBLE( VAL__MINI - SIGN( IDEL, VAL__MINI ) )
 
             ELSE IF ( BPOUT .EQ. -32 ) THEN
-               MAXV = DBLE( VAL__MAXR )
-               MINV = DBLE( VAL__MINR )
+               MAXV = DBLE( VAL__MAXR ) * FSCALE
+               MINV = DBLE( VAL__MINR ) * FSCALE
 
             END IF
 
@@ -575,12 +643,11 @@
          IF ( SCALE .OR. SHIFT ) THEN
 
 *  Decide the appropriate number of decimals needed to represent the
-*  block floating point scale and offset.  The minus 7 excludes the
-*  sign, leading zero, decimal point and the trailing exponent.
+*  block floating point scale and offset.
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               NDECIM = VAL__SZD - 7
+               NDECIM = INT( -LOG10( VAL__EPSD ) )
             ELSE
-               NDECIM = VAL__SZR - 7
+               NDECIM = INT( -LOG10( VAL__EPSR ) )
             END IF
 
 *     Reset the BSCALE keyword in the header. Ampersand instructs the
@@ -635,7 +702,6 @@
 
 *  Write the output array to the FITS file.
 *  ========================================
-
          IF ( BAD ) THEN
 
 *  Call the appropriate routine for the data type of the supplied
@@ -646,23 +712,23 @@
 *  bad pixels.
             IF ( BPIN .EQ. 8 ) THEN
                CALL FTPPNB( FUNIT, 0, 1, EL, %VAL( IPNTR ), NULL8,
-     :                      ANYF, FSTAT )
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. 16 ) THEN
                CALL FTPPNI( FUNIT, 0, 1, EL, %VAL( IPNTR ), NULL16,
-     :                      ANYF, FSTAT )
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. 32 ) THEN
                CALL FTPPNJ( FUNIT, 0, 1, EL, %VAL( IPNTR ), NULL32,
-     :                      ANYF, FSTAT )
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. -32 ) THEN
                CALL FTPPNE( FUNIT, 0, 1, EL, %VAL( IPNTR ), NUL_32,
-     :                      ANYF, FSTAT )
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. -64) THEN
                CALL FTPPND( FUNIT, 0, 1, EL, %VAL( IPNTR ), NUL_64,
-     :                      ANYF, FSTAT )
+     :                      FSTAT )
             END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
@@ -758,18 +824,30 @@
 *  Get the name of the next extension.
                   CALL NDF_XNAME( NDF, I, XNAME, STATUS )
 
-*  Skip over the FITS extension.
-                  IF ( XNAME .NE. 'FITS' ) THEN
-
 *  Get a locator to the extension.
-                     CALL NDF_XLOC( NDF, XNAME, 'READ', XLOC, STATUS )
+                  CALL NDF_XLOC( NDF, XNAME, 'READ', XLOC, STATUS )
+
+*  Obtain the data type of the extension.
+                  CALL DAT_TYPE( XLOC, XTYPE, STATUS )
+
+*  Define any special extensions.
+                  E2DF = XNAME .EQ. 'FIBRES' .AND.
+     :                   XTYPE .EQ. 'FIBRES_EXT'
+
+*  Skip over the FITS extension.
+                  IF ( XNAME .NE. 'FITS' .AND. .NOT. E2DF ) THEN
 
 *  Process the extension into a hierarchy.
                      CALL COF_THIER( XNAME, XLOC, FUNIT, STATUS )
 
-*  Annul the locator so it may be reused.
-                     CALL DAT_ANNUL( XLOC, STATUS )
+*  Handle 2dF special case separately.
+                  ELSE IF ( E2DF ) THEN
+                     CALL COF_2DFEX( XNAME, XLOC, FUNIT, STATUS )
+
                   END IF
+
+*  Annul the locator so it may be reused.
+                  CALL DAT_ANNUL( XLOC, STATUS )
                END DO
             END IF
          END IF
