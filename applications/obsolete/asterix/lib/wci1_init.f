@@ -19,6 +19,9 @@
 *       Pixellation    - Describes pixel grid w.r.t. some fiducial point
 *       Projection     - Describes a map projection
 *       CoordSystem    - Describes an astronomical coordinate system
+*
+*     Methods are defined to read and write WCS information from HDS and
+*     FITS files.
 
 *  Arguments:
 *     STATUS = INTEGER (given and returned)
@@ -95,6 +98,10 @@
 
 *  External References:
       EXTERNAL			ADI_REQPKG
+      EXTERNAL                  WCI1_READHDS
+
+*  Local variables:
+      INTEGER			DID			! Ignored identifier
 *.
 
 *  Check inherited global status.
@@ -105,6 +112,9 @@
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'wcs', STATUS )
+
+*    Define the methods
+        CALL ADI_DEFMTH( 'ReadWCS(HDSfile)', WCI1_READHDS, DID, STATUS )
 
 *    Now initialised
 	WCI_INIT = .TRUE.
