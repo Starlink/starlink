@@ -115,7 +115,7 @@
 
       DOUBLE PRECISION		DVAL			! Scalar value
 
-      INTEGER			EP, PPOS		! Character pointers
+      INTEGER			EP, PPOS, EXT		! Character pointers
       INTEGER			FLEN			! Length of FNAME
       INTEGER			NDIG			! Chars used in SSTR
       INTEGER			PSID			! Parameter storage
@@ -197,6 +197,17 @@
 
 *    No representation supplied
         ELSE IF ( PPOS .EQ. 0 ) THEN
+
+*      Add a representation if its a FITS file or for ???.sdf convert to ???%hds
+          EXT = INDEX( FNAME, '.' )
+          IF ( EXT .GT. 0 ) THEN
+            IF ( FNAME(EXT+1:) .EQ. 'fits' .OR.
+     :           FNAME(EXT+1:) .EQ. 'fit' ) THEN
+              FNAME(MAX(1,FLEN)+1:) = '%fits'
+            ELSE IF ( FNAME(EXT+1:) .EQ. 'sdf' ) THEN
+              FNAME(EXT:) = '%hds'
+            END IF
+          END IF
           CALL ADI_FOPEN( FNAME, CLASS, ACCESS, ID, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'PAR', PAR )

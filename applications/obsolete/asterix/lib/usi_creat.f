@@ -106,7 +106,7 @@
 *  Local Variables:
       CHARACTER*200		FNAME,LFILE		! Input object
 
-      INTEGER			EP, PPOS		! Character pointers
+      INTEGER			EP, PPOS, EXT, FLEN	! Character pointers
 *.
 
 *  Check inherited global status.
@@ -122,11 +122,21 @@
 
 *  Get output file name
       CALL USI_GET0C( OUT(:EP), FNAME, STATUS )
+      FLEN = CHR_LEN(FNAME)
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    If caller specified a representation on the parameter, glue it
 *    on to the file name
         IF ( PPOS .EQ. 0 ) THEN
+          EXT = INDEX( FNAME, '.' )
+          IF ( EXT .GT. 0 ) THEN
+            IF ( FNAME(EXT+1:) .EQ. 'fits' .OR.
+     :           FNAME(EXT+1:) .EQ. 'fit' ) THEN
+              FNAME(MAX(1,FLEN)+1:) = '%fits'
+            ELSE IF ( FNAME(EXT+1:) .EQ. 'sdf' ) THEN
+              FNAME(EXT:) = '%hds'
+            END IF
+          END IF
           CALL ADI_FCREAT( FNAME, BASEID, ID, STATUS )
         ELSE
           LFILE = FNAME(:MAX(1,CHR_LEN(FNAME)))//OUT(PPOS:)
