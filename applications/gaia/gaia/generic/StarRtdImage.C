@@ -154,6 +154,12 @@
 //     27-JAN-2003 (PWD):
 //        Added facilities to support the display of coordinates at
 //        milli-arcsecond resolution.
+//     12-SEP-2003 (PWD):
+//        Added the slalib command. Currently only offers the ability
+//        to get a list of known observatories. A proper
+//        implementation would see this command refactored to a
+//        standalone Tcl command and more SLALIB facilities offered,
+//        but time presses.
 //-
 
 #include <string.h>
@@ -185,6 +191,7 @@
 #include "rtdDtrn.h"
 #include "GaiaRtdRemote.h"
 #include "gaiaNDF.h"
+#include "slasubs.h"
 
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
@@ -258,6 +265,7 @@ public:
     { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
     { "remotetcl",     &StarRtdImage::remoteTclCmd,    1,  1},
     { "slice",         &StarRtdImage::sliceCmd,       11, 11},
+    { "slalib",        &StarRtdImage::slalibCmd,       1, 10},
     { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
     { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 },
     { "xyprofile",     &StarRtdImage::xyProfileCmd,   14, 14}
@@ -5840,6 +5848,49 @@ int StarRtdImage::astmilliCmd( int argc, char *argv[] )
         wcsp->extraPrecision( 1 );
     }
     return TCL_OK;
+}
+
+//+
+//   StarRtdImage::slalibCmd
+//
+//   Purpose:
+//      Offers access to a limited set of SLALIB routines.
+//
+//   Arguments:
+//      Name of the SLALIB method to invoke, followed by any necessary
+//      arguments.
+//
+//   Result:
+//      A string value. An error is thrown if the request cannot be
+//      supported.
+//-
+int StarRtdImage::slalibCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::slalibCmd" << endl;
+#endif
+
+    //  First argument is name of SLALIB routine.
+    if ( strcmp( argv[0], "slaobs" ) == 0 ) {
+
+        //  Other arguments should be observation index and/or
+        //  observation station.
+        int n = 0;
+        char c[11];
+        char name[41];
+        double w, p, h;
+        if ( argc >= 2 ) {
+            //Tcl_GetInt( argv[1], &n );
+        }
+        if ( argc == 3 ) {
+            strncpy( c, argv[2], 11 );
+        }
+        slaObs( n, c, name, &w, &p, &h );
+        //set_result( c, name, w, p, h );
+    }
+    return TCL_OK;
+
+
 }
 
 //  ==================================

@@ -122,22 +122,22 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
     switch ( type ) {
     case BYTE_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (char *) image, nx, ny, bscale, bzero, 
+            extractSwapImage( (unsigned char *) image, nx, ny, bscale, bzero, 
                               x0, y0, x1, y1, xCoords, xVector,
                               yCoords, yVector, numValues );
         } else {
-            extractNativeImage( (char *) image, nx, ny, bscale, bzero,
+            extractNativeImage( (unsigned char *) image, nx, ny, bscale, bzero,
                                 x0, y0, x1, y1, xCoords, xVector,
                                 yCoords, yVector, numValues );
         }
         break;
     case X_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (unsigned char *) image, nx, ny, bscale, 
+            extractSwapImage( (char *) image, nx, ny, bscale, 
                               bzero, x0, y0, x1, y1, xCoords, xVector,
                               yCoords, yVector, numValues ); 
         } else {
-            extractNativeImage( (unsigned char *) image, nx, ny,
+            extractNativeImage( (char *) image, nx, ny,
                                 bscale, bzero, x0, y0,
                                 x1, y1, xCoords, xVector, yCoords, 
                                 yVector, numValues );

@@ -383,21 +383,22 @@ int Contour::drawContours()
       switch ( type ) {
          case BYTE_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (char *) image, nx, ny, lplot, cval,
-                                       xlower, ylower, xsize, ysize, done );
+               ndrawn = scanSwapImage( (unsigned char *) image, nx, ny, 
+                                       lplot, cval, xlower, ylower, 
+                                       xsize, ysize, done );
             } else {
-               ndrawn = scanNativeImage( (char *) image, nx, ny, lplot, cval,
-                                         xlower, ylower, xsize, ysize, done );
-
+               ndrawn = scanNativeImage( (unsigned char *) image, nx, ny, 
+                                         lplot, cval, xlower, ylower, 
+                                         xsize, ysize, done );
             }
             break;
          case X_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (unsigned char *) image, nx, ny,
+               ndrawn = scanSwapImage( (char *) image, nx, ny,
                                        lplot, cval, xlower, ylower, xsize,
                                        ysize, done ); 
             } else {
-               ndrawn = scanNativeImage( (unsigned char *) image, nx, ny,
+               ndrawn = scanNativeImage( (char *) image, nx, ny,
                                          lplot, cval, xlower, ylower, xsize,
                                          ysize, done ); 
             }

@@ -105,19 +105,19 @@ void RegionStats::calc()
     switch ( type ) {
         case BYTE_IMAGE:
             if ( swap_ ) {
-                calcSwap( (char *) image, nx, ny, bscale, bzero, 
+                calcSwap( (unsigned char *) image, nx, ny, bscale, bzero, 
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (char *) image, nx, ny, bscale, bzero, 
+                calcNative( (unsigned char *) image, nx, ny, bscale, bzero, 
                             x0, y0, x1, y1 );
             }
             break;
         case X_IMAGE:
             if ( swap_ ) {
-                calcSwap( (unsigned char *) image, nx, ny, bscale, bzero,
+                calcSwap( (char *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (unsigned char *) image, nx, ny, bscale, bzero,
+                calcNative( (char *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;
