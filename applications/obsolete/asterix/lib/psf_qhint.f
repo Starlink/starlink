@@ -18,7 +18,10 @@
 *
 *    History :
 *
-*     23 Dec 93 : Original (DJA)
+*     23 Dec 1993 (DJA):
+*        Original version
+*      1 May 1996 (DJA):
+*        Use method interface
 *
 *    Type definitions :
 *
@@ -46,19 +49,20 @@
 *    Status :
 *
       INTEGER                  STATUS
+*
+*  Local Variables:
+*
+      INTEGER			RTNPTR			! Psf method
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
-      OK = .FALSE.
-
-*    See if the library has a hint routine available
-      IF ( L_MOD_H(P_MODID(SLOT),P_LIBID(SLOT)) .NE. 0 ) THEN
-        CALL PSF_QHINT_EXEC( %VAL(L_MOD_H(P_MODID(SLOT),
-     :                                  P_LIBID(SLOT))),
-     :                      P_PSID(SLOT), HINT, DATA, STATUS )
+*  Routine exists?
+      CALL PSF0_FNDRTN( P_PSID(SLOT), 'Hint', OK, RTNPTR, STATUS )
+      IF ( OK ) THEN
+        CALL PSF_QHINT_EXEC( %VAL(RTNPTR), P_PSID(SLOT), HINT,
+     :                       DATA, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           OK = .TRUE.
         ELSE
@@ -86,7 +90,8 @@
 *
 *    History :
 *
-*     23 Dec 93 : Original (DJA)
+*     23 Dec 1993 (DJA):
+*        Original version
 *
 *    Type definitions :
 *
@@ -111,9 +116,10 @@
       INTEGER                  STATUS
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Invoke routine
       CALL ROUTINE( PSID, HINT, DATA, STATUS )
 
       END
