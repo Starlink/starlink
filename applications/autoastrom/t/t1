@@ -1,18 +1,100 @@
 
+##testing deg2sex, sex2deg
+
 test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
 test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
 
 export AUTOASTROM_DIR;
 exec $PERLBIN <<'EOD';
 
-use lib '..';
-use autoastrom;
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(deg2sex sex2deg);
 
-foreach $v (('0', '360', '261.636', '-12.345', '400')) {
-	printf "ra= %10f  -->  %s\n", $v, dmshms($v,1);
+print "deg2sex...\n";
+
+# Tests: decimal RA to sexagesimal
+foreach $v (('0', '360', '-360', # all three should turn into 0
+	     '261.636', '-12.345',
+	     '400',		# non-normalised number
+	     '12:34:56',	# malformed
+	    )) {
+    my $rval = deg2sex($v,1);
+    printf ("ra= %10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
 }
-foreach $v (('0', '90', '45', '12.345', '-12.345')) {
-	printf "dec=%10f  -->  %s\n", $v, dmshms($v,0);
+
+foreach $v (('0',
+	     '90',		# does this round properly?
+	     '45',
+	     '12.345', '-12.345', # positive and negative
+	     '91',		# out of range
+	     '-90.0001',	# out of range
+	     '12:34:56',	# malformed
+	    )) {
+    my $rval = deg2sex($v,0);
+    printf ("dec=%10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
+}
+
+# Colon separators
+print "colons...\n";
+foreach $v (('0',
+	     '0.0001',		# leading zero on mas
+	     '0.001',		# leading zero on arcsec
+	     '261.636', '-12.345',
+	    )) {
+    my $rval = deg2sex($v,1,':');
+    printf ("ra= %10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
+}
+
+foreach $v (('0', '0.001',
+	     '10.05',		# leading zero on minutes?
+	     '12.345', '-12.345', # positive and negative
+	    )) {
+    my $rval = deg2sex($v,0,':');
+    printf ("dec=%10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
+}
+
+print "sex2deg...\n";
+
+# Tests: sexagesimal RA to decimal
+foreach $v (('0:0:0',
+	     '24:0:0',		# should turn into zero
+	     '00:00:00.1',	# small values
+	     '  12:34:56.78  ',	# whitespace
+	     '09:09:00',	# not getting confused about octal, no?
+	     '25:0:0',		# out of range
+	     '-1:0:0',
+	     '12',		# malformed...
+	     '12:34',
+	     '12:ping:00.0',
+	     '12: 34 : 56',
+	     ':34:56',
+	     '12::56',
+	     '12:3.4:56',
+	     '12:34:',
+	     '12:34:56:78',
+	    )) {
+    my $rval = sex2deg($v,1);
+    print sprintf("ra= %20s  -->  ", '<'.$v.'>'),
+	    (defined($rval) ? $rval : "ERROR"), "\n";
+}
+
+# Tests: sexagesimal Dec to decimal
+foreach $v (('0:0:0',
+	     '-0:0:0',		# odd, but shouldn't object
+	     '00:00:00.1',	# small values
+	     '09:09:00',	# not getting confused about octal, no?
+	     '+90:0:0',		# does this round properly?
+	     '-90:0:0',		# ditto
+	     '-89:0:0',		# large negative
+	     '90:0:1',		# out of range
+	     '-91:0:0',		# out of range
+	     '12',		# malformed...
+	     '12:34',
+	     '12:ping:00.0',
+	    )) {
+    my $rval = sex2deg($v,0);
+    print sprintf("dec=%20s  -->  ", '<'.$v.'>'),
+	    (defined($rval) ? $rval : "ERROR"), "\n";
 }
 
 exit 0;
