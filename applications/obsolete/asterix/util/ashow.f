@@ -309,7 +309,7 @@
       CHARACTER*20		RAS, DECS		! RA,DEC in strings
       CHARACTER*3		SYS			! Coord system name
 
-      DOUBLE PRECISION		EQNX, EPOCH		! Equinox & epoch
+      DOUBLE PRECISION		EPOCH			! Equinox & epoch
       DOUBLE PRECISION		PNT(2)			! Pointing direction
 
       INTEGER			NVAL			! Values read from obj
@@ -337,12 +337,11 @@
 *  First the coordinate system
       CALL AIO_IWRITE( OCH, 4, 'Coordinate system :', STATUS )
       CALL AIO_BLNK( OCH, STATUS )
+      CALL ASHOW_OB( SYSID, 'NAME', 'C', 'System name', ' ',
+     :                'np', OCH, STATUS )
+      CALL ASHOW_OB( SYSID, 'EQUINOX', 'D', 'Equinox', ' ',
+     :                'np', OCH, STATUS )
       IF ( SYSID .NE. ADI__NULLID ) THEN
-        CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
-        CALL AIO_IWRITE( OCH, 6, 'System name     : '//SYS, STATUS )
-        CALL ADI_CGET0D( SYSID, 'EQUINOX', EQNX, STATUS )
-        CALL MSG_SETD( 'EQNX', EQNX )
-        CALL AIO_IWRITE( OCH, 6, 'Equinox         : ^EQNX', STATUS )
         CALL ADI_CGET0C( SYSID, 'EFORM', EFORM, STATUS )
         CALL ADI_CGET0D( SYSID, 'EPOCH', EPOCH, STATUS )
         CALL MSG_SETC( 'EF', EFORM )
@@ -358,6 +357,9 @@
      :                 STATUS )
       CALL AIO_BLNK( OCH, STATUS )
       IF ( SYSID .NE. ADI__NULLID ) THEN
+
+*    Name of system
+        CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
 
 *    Name of projection
         CALL ADI_CGET0C( PRJID, 'NAME', PRJ, STATUS )
@@ -502,8 +504,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*50		STR
-
       INTEGER			DETID			! DCI info
 *.
 
@@ -524,26 +524,22 @@
 *  The observation details
       CALL AIO_IWRITE( OCH, 4, 'Observation Details :', STATUS )
       CALL AIO_BLNK( OCH, STATUS )
-      CALL ADI_CGET0C( DETID, 'Observer', STR, STATUS )
-      CALL MSG_SETC( 'OBS', STR )
-      CALL AIO_IWRITE( OCH, 6, 'Observer        : ^OBS', STATUS )
-      CALL ADI_CGET0C( DETID, 'Target', STR, STATUS )
-      CALL MSG_SETC( 'TARG', STR )
-      CALL AIO_IWRITE( OCH, 6, 'Target          : ^TARG', STATUS )
+      CALL ASHOW_OB( DETID, 'Observer', 'C', 'Observer', ' ',
+     :                'ig', OCH, STATUS )
+      CALL ASHOW_OB( DETID, 'Target', 'C', 'Target', ' ',
+     :                'ig', OCH, STATUS )
       CALL AIO_BLNK( OCH, STATUS )
 
 *  The hardware
       CALL AIO_IWRITE( OCH, 4, 'Instrument Configuration :', STATUS )
       CALL AIO_BLNK( OCH, STATUS )
-      CALL ADI_CGET0C( DETID, 'Mission', STR, STATUS )
-      CALL MSG_SETC( 'MISSION', STR )
-      CALL AIO_IWRITE( OCH, 6, 'Mission         : ^MISSION', STATUS )
-      CALL ADI_CGET0C( DETID, 'Instrument', STR, STATUS )
-      CALL MSG_SETC( 'INSTRUM', STR )
-      CALL AIO_IWRITE( OCH, 6, 'Instrument      : ^INSTRUM', STATUS )
-      CALL ADI_CGET0C( DETID, 'Detector', STR, STATUS )
-      CALL MSG_SETC( 'DET', STR )
-      CALL AIO_IWRITE( OCH, 6, 'Detector        : ^DET', STATUS )
+      CALL ASHOW_OB( DETID, 'Mission', 'C', 'Mission', ' ',
+     :                'ig', OCH, STATUS )
+      CALL ASHOW_OB( DETID, 'Instrument', 'C', 'Instrument', ' ',
+     :                'ig', OCH, STATUS )
+      CALL ASHOW_OB( DETID, 'Detector', 'C', 'Detector', ' ',
+     :                'ig', OCH, STATUS )
+
       CALL AIO_BLNK( OCH, STATUS )
 
 *  Report any errors
