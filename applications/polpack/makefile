@@ -466,7 +466,7 @@ polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
 pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
 polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
-polversion.f
+polversion.f pol1_3dwcs.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 

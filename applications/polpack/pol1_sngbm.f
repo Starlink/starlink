@@ -111,6 +111,9 @@
 *  History:
 *     13-JAN-1999 (DSB):
 *        Original version.
+*     17-MAR-2000 (DSB):
+*        Modified to add a third WCS axis to the output cube describing
+*        the Stokes axis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -347,6 +350,10 @@
 *  POLANAL Frameis first deleted). The first axis of this Frame defines 
 *  the reference direction.
       CALL POL1_PTANG( ANGROT, IWCS, STATUS )
+
+*  Add a third axis to all 2D Frames in the WCS FrameSet. The extra axis
+*  represents the "conventional" Stokes axis.
+      CALL POL1_3DWCS( IWCS, STATUS )
 
 *  Store the modified FrameSet back in the NDF, and annul the pointer.
       CALL NDF_PTWCS( IWCS, INDFO, STATUS )

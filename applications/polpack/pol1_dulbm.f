@@ -110,6 +110,9 @@
 *        single-beam data).
 *     5-AUG-1999 (DSB):
 *        TRIM changed to PAD in call to NDF_MBNDN.
+*     17-MAR-2000 (DSB):
+*        Modified to add a third WCS axis to the output cube describing
+*        the Stokes axis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -842,6 +845,10 @@
 *  Add a POLANAL Frame to the WCS FrameSet. The first axis in this Frame 
 *  defines the reference direction in the output cube. 
       CALL POL1_PTANG( ANGRT, IWCS, STATUS )
+
+*  Add a third axis to all 2D Frames in the WCS FrameSet. The extra axis
+*  represents the "conventional" Stokes axis.
+      CALL POL1_3DWCS( IWCS, STATUS )
 
 *  Store the WCS FrameSet in the output NDF. All the input NDFs are assumed 
 *  to be aligned with each other, and with the output NDF. So just copy the 
