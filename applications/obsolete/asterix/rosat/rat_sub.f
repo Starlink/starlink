@@ -517,7 +517,7 @@
       INTEGER DUMMY			! Value not used
       character*(DAT__SZNAM) name
       logical valid
-      integer dummy
+      integer dummy,i
       character*(DAT__SZLOC) ploc
 *
       IF (STATUS.NE.SAI__OK) RETURN
@@ -540,7 +540,17 @@
 	print *,'parent',name
         call dat_clone(loc,cloc,status)
 	print *,'cloned'
-        call dat_index(cloc,1,aloc,status)
+        name=' '
+        i=1
+        do while (name.ne.'HEAD')
+          call dat_index(cloc,1,aloc,status)
+          call dat_name(aloc,name,status)
+          print *,i,name
+          if (name.ne.'HEAD') then
+            call dat_annul(aloc,status)
+          endif
+          i=i+1
+        enddo
 c        call dat_there(cloc,'head',valid,status)
 c        print *,valid
 c        call dat_find(cloc,'head',aloc,status)
@@ -612,6 +622,7 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
 ***** Test for any reading errors
       IF (STATUS.NE.SAI__OK) THEN
+        CALL ERR_REP(' ','from RAT_GETINDEX',STATUS)
       ENDIF
 
       END
