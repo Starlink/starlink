@@ -59,13 +59,13 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
 *     package:adi, usage:private, FITS
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -199,13 +199,13 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
 *     package:adi, usage:private, FITS
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -239,8 +239,15 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+
 *  Local Variables:
+      CHARACTER*40		LHDU			! Local copy of HDU
+
       INTEGER			EID			! EXTENSIONS identifier
+      INTEGER			HLEN			! Length of LHDU
 
       LOGICAL			THERE			! Object exists
 *.
@@ -258,13 +265,22 @@
 
 *  Otherwise named HDU in the EXTENSIONS structure
       ELSE
+
+*    Make local copy of name, and translate embedded spaces to underscores
+        LHDU = HDU
+        HLEN = CHR_LEN(LHDU)
+        IF ( INDEX(LHDU(:HLEN),' ') .GT. 0 ) THEN
+          DO I = 1, HLEN
+            IF ( LHDU(I:I) .EQ. ' ' ) LHDU(I:I) = '_'
+          END DO
+        END IF
         CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
-        CALL ADI_THERE( EID, HDU, THERE, STATUS )
+        CALL ADI_THERE( EID, LHDU(:HLEN), THERE, STATUS )
         IF ( CANCRE .AND. .NOT. THERE ) THEN
-          CALL ADI_CNEW0( EID, HDU, 'STRUC', STATUS )
+          CALL ADI_CNEW0( EID, LHDU(:HLEN), 'STRUC', STATUS )
           CREATED = .TRUE.
         END IF
-        CALL ADI_FIND( EID, HDU, ID, STATUS )
+        CALL ADI_FIND( EID, LHDU(:HLEN), ID, STATUS )
 
 *  Remove temporary
         CALL ADI_ERASE( EID, STATUS )
