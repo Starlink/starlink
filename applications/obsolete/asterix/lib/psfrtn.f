@@ -1773,55 +1773,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       END
 
-*+  PSF_PWFC_CLOSE - Shutdown the WFC psf system
-      SUBROUTINE PSF_PWFC_CLOSE( STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     23 May 89 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*
-*    Local variable :
-*
-      INTEGER                  IGNORE
-*-
-
-*    Shut down WFC calibration database if open
-      IGNORE = SAI__OK
-      IF ( WF_CALOK ) THEN
-C         CALL CAL_CLOSE( IGNORE )
-        WF_CALOK= .FALSE.
-
-        IF ( IGNORE .NE. SAI__OK ) THEN
-          CALL MSG_PRNT( 'WARNING : An error occurred releasing'/
-     :                         /' the WFC calibration database.' )
-        END IF
-
-      END IF
-
-      END
-
 *+  PSF_PWFC_INIT - Initialise the WFC pointed psf system
       SUBROUTINE PSF_PWFC_INIT( PSID, SLOT, FID, INST, STATUS )
 *
@@ -2153,7 +2104,7 @@ C         CALL CAL_CLOSE( IGNORE )
 *    Import :
 *
       REAL                     DX, DY, X0, Y0,QX,QY
-      INTEGER                  NX,NY,SLOT
+      INTEGER                  NX,NY,PSID
       LOGICAL                  INTEG
 *
 *    Export :
@@ -3360,9 +3311,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    New error context
       CALL ERR_MARK( STATUS )
 
-*    Shut down WFC system
-      CALL PSF_WFC_CLOSE( STATUS )
-
 *    Back to old error context
       CALL ERR_RLSE( STATUS )
 
@@ -4016,41 +3964,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *  Ignore integration flag
       CALL CAL_PSFT2D_SUR( DMJD, FID, ENER, .FALSE., 0.0, IRIS, LDX, NX,
      :                     ABS(DY), NY, QX*(DX/LDX), QY,ARRAY,STATUS )
-
-      END
-
-*+  PSF_WFC_CLOSE - Shutdown the WFC psf system
-      SUBROUTINE PSF_WFC_CLOSE( STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     10 Jul 89 : Original ( DJA )
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*-
-
-*    Just call the WFC routine
-      CALL PSF_PWFC_CLOSE( STATUS )
 
       END
 
