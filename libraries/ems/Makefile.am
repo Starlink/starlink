@@ -42,7 +42,33 @@ CF_ROUTINES = ems_annul.c ems_begin.c ems_eload.c ems_end.c ems_expnd.c \
 #  names in the tar file will be pkgOpen.c_sun4, pkgOpen.c_mips, etc.
 PLATFORM_CF = ems_fioer.c
 
-#  A list of files required for the test target
-TEST_FILES = $(PKG_NAME)_test.c
-
 BUILT_SOURCES = $(PLATFORM_CF) EMS_ERR ems_err.h
+
+
+#  Testing
+#  -------
+#  There are no regression tests as such.  The program ems_test.c does
+#  some simple checking of the installation.  test_iostat produces
+#  some Fortran errors, and calls ems_fioer, however these can't be
+#  tested mechanically since the results are necessarily platform dependent.
+
+TESTS = ems_test test_iostat
+check_PROGRAMS = test_iostat ems_test
+
+#  Make a test_iostat program.  The test_iostat_wrap.c program simply
+#  turns the return value of the function in test_iostat.f into the
+#  exit status.  We must make sure that we link test_iostat against
+#  the newly-built libraries in this directory, rather than installed
+#  versions, so use libtool explicitly, rather than through the
+#  default automake build rule.
+test_iostat_SOURCES = test_iostat.f test_iostat_wrap.c
+test_iostat_wrap.c:
+	echo "int main() { exit (test_iostat_()); }" >test_iostat_wrap.c
+test_iostat: $(test_iostat_OBJECTS)
+	$(LIBTOOL) --mode=link $(FC) -o test_iostat \
+		$(test_iostat_OBJECTS) libems.la libemsf.la \
+		`cnf_link`
+
+ems_test_SOURCES = ems_test.c
+ems_test_LDADD = `ems_link`
+

@@ -18,7 +18,24 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
+AC_C_CONST
+AC_HEADER_STDC
+AC_CHECK_FUNCS([strcmp snprintf])
+AC_CHECK_DECLS([strcmp])
 AC_PROG_LIBTOOL
+
+dnl    The function ems_fioer.c provides a mapping from Fortran IOSTAT
+dnl    codes to error messages.  The only way we can do this is by
+dnl    determining a Fortran compiler now, and hoping that is the same
+dnl    compiler used to compile the program which actually calls
+dnl    ems_fioer.  The configuration in ems_fioer.c.in uses the
+dnl    following configure variables.
+AC_PROG_FC
+AC_SUBST(ac_compiler_gnu)
+dnl    Autoconf complains that AC_CANONICAL_BUILD is called multiple
+dnl    times.  I don't know where else it's called, but this line does
+dnl    appear to be redundant.
+dnl AC_CANONICAL_BUILD
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
@@ -26,28 +43,17 @@ dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
 STAR_DECLARE_DEPENDENCIES([link],  [cnf])
 
-dnl    Platform-specific sources.  The original set of extensions was
-dnl    [alpha_OSF1 ix86_Linux sun4_Solaris], which has migrated to
-dnl    [_dec_osf _pc_linux _sun_solaris].  There's scope for more
-dnl    general configuration based on autoconf tests, but that's for a
-dnl    future project....
-STAR_PLATFORM_SOURCES([ems_fioer.c],
-                      [_dec_osf _pc_linux _sun_solaris])
-
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(ssn4)
 
-dnl    There is a .msg file in this directory, and this adds Makefile
-dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
-dnl    which correspond to it.
 STAR_MESSGEN(ems_err.msg)
 
 AC_CONFIG_HEADERS(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml ems_fioer.c)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
