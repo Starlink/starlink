@@ -41,8 +41,8 @@ install-data-local: l2h_source.tar
 	rm -Rf $(l2hdir)
 	$(mkdir_p) $(l2hdir)
 	wd=`pwd`; cd $(l2hdir); tar xf $$wd/l2h_source.tar
-	if test -n "$$MANIFEST_FILE"; then \
-	    tar tf l2h_source.tar | sed 's,^,$(l2hdir)/,' >>$$MANIFEST_FILE; \
+	if test -n "$$MANIFEST_FD"; then \
+	   tar tf l2h_source.tar | sed 's,^,$(l2hdir)/,' >&$${MANIFEST_FD-0}; \
 	else :; fi
 
 sun199.htx_tar: sun199.tex star2html latex2html l2h
