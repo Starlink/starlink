@@ -27,6 +27,9 @@
 *  History:
 *     18-MAR-1998 (RFWS):
 *        Original version.
+*     15-SEP-1999 (RFWS):
+*        Added a THIS pointer to the external transformation function
+*        used by an IntraMap.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -48,7 +51,7 @@
 
 /* Prototypes for private functions. */
 /* ================================= */
-static void TranWrap( void (*)( int, int, const double *[], int, int, double *[] ), int, int, const double *[], int, int, double *[] );
+static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
 
 /* Transformation function interface. */
 /* ================================== */
@@ -57,10 +60,11 @@ static void TranWrap( void (*)( int, int, const double *[], int, int, double *[]
    invoked when necessary by C code in the main class
    implementation. All FORTRAN-specific aspects of this interface are
    encapsulated here. */
-static void TranWrap( void (* tran)( int, int, const double *[], int, int,
-                                     double *[] ),
-                      int npoint, int ncoord_in, const double *ptr_in[],
-                      int forward, int ncoord_out, double *ptr_out[] ) {
+static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
+                                     int, int, double *[] ),
+                      AstMapping *this, int npoint, int ncoord_in,
+                      const double *ptr_in[], int forward, int ncoord_out,
+                      double *ptr_out[] ) {
 /*
 *  Name:
 *     TranWrap
@@ -72,10 +76,11 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
 *     Private function.
 
 *  Synopsis:
-*     void TranWrap( void (* tran)( int, int, const double *[], int, int,
-*                                   double *[] ),
-*                    int npoint, int ncoord_in, const double *ptr_in[],
-*                    int forward, int ncoord_out, double *ptr_out[] )
+*     void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
+*                                   int, int, double *[] ),
+*                    AstMapping *this, int npoint, int ncoord_in,
+*                    const double *ptr_in[], int forward, int ncoord_out,
+*                    double *ptr_out[] )
 
 *  Description:
 *     This function invokes a FORTRAN implementation of a
@@ -90,6 +95,9 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
 *        This should result from a cast applied to a pointer to a
 *        function that resembles AST_TRANN (but with the first
 *        argument omitted).
+*     this
+*        An external Mapping ID associated with the internal (true C) pointer
+*        for the IntraMap whose transformation is being evaluated.
 *     npoint
 *        The number of points to be transformed.
 *     ncoord_in
@@ -130,6 +138,7 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
    DECLARE_INTEGER(NPOINT);      /* Number of points */
    DECLARE_INTEGER(OUTDIM);      /* First dimension size of output array */
    DECLARE_INTEGER(STATUS);      /* FORTRAN error status variable */
+   DECLARE_INTEGER(THIS);        /* External ID for the IntraMap */
    DECLARE_LOGICAL(FORWARD);     /* Use forward transformation? */
    F77_DOUBLE_TYPE *IN;          /* Input coordinate array for FORTRAN */
    F77_DOUBLE_TYPE *OUT;         /* Output coordinate array for FORTRAN */
@@ -141,6 +150,7 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
 
 /* Assign input values to the arguments for the FORTRAN transformation
    function. */
+   THIS = astP2I( this );
    NPOINT = npoint;
    NCOORD_IN = ncoord_in;
    INDIM = npoint;
@@ -175,7 +185,8 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
    status to and from the subroutine's error status argument. */
    if ( astOK ) {
       STATUS = astStatus;
-      ( *(void (*)()) tran )( INTEGER_ARG(&NPOINT),
+      ( *(void (*)()) tran )( INTEGER_ARG(&THIS),
+                              INTEGER_ARG(&NPOINT),
                               INTEGER_ARG(&NCOORD_IN),
                               INTEGER_ARG(&INDIM),
                               DOUBLE_ARRAY_ARG(IN),
@@ -228,7 +239,8 @@ F77_SUBROUTINE(ast_intrareg)( CHARACTER(NAME),
    GENPTR_CHARACTER(AUTHOR)
    GENPTR_CHARACTER(CONTACT)
    char *name;
-   void (* tran)( int, int, const double *[], int, int, double *[] );
+   void (* tran)( AstMapping *, int, int, const double *[], int, int,
+                  double *[] );
    char *purpose;
    char *author;
    char *contact;
@@ -237,7 +249,8 @@ F77_SUBROUTINE(ast_intrareg)( CHARACTER(NAME),
    astWatchSTATUS(
       name = astString( NAME, NAME_length );
       tran =
-         (void (*)( int, int, const double *[], int, int, double *[] )) TRAN;
+         (void (*)( AstMapping *, int, int, const double *[], int, int,
+                    double *[] )) TRAN;
       purpose = astString( PURPOSE, PURPOSE_length );
       author = astString( AUTHOR, AUTHOR_length );
       contact = astString( CONTACT, CONTACT_length );

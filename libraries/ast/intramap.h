@@ -30,7 +30,8 @@
 *     None.
 
 *  New Attributes Defined:
-*     None.
+*     IntraID
+*        IntraMap identification string.
 
 *  Methods Over-Ridden:
 *     Public:
@@ -47,7 +48,15 @@
 *        None.
 *
 *     Protected:
-*        None.
+*        astClearIntraID
+*           Clear the IntraID attribute for an IntraMap.
+*        astGetIntraID
+*           Get the value of the IntraID attribute for an IntraMap.
+*        astSetIntraID
+*           Set the value of the IntraID attribute for an IntraMap.
+*        astTestIntraID
+*           Test whether a value has been set for the IntraID attribute of an
+*           IntraMap.
 
 *  Other Class Functions:
 *     Public:
@@ -95,6 +104,9 @@
 *  History:
 *     24-MAR-1998 (RFWS):
 *        Original version.
+*     16-SEP-1999 (RFWS):
+*        Added the IntraID attribute and added a Mapping pointer as a new
+*        first argument to transformation functions.
 *-
 */
 
@@ -135,6 +147,7 @@ typedef struct AstIntraMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
+   char *intra_id;               /* Pointer to identification string */
    int ifun;                     /* Transformation function index */
 } AstIntraMap;
 
@@ -152,6 +165,10 @@ typedef struct AstIntraMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   const char *(* GetIntraID)( AstIntraMap * );
+   int (* TestIntraID)( AstIntraMap * );
+   void (* ClearIntraID)( AstIntraMap * );
+   void (* SetIntraID)( AstIntraMap *, const char * );
 } AstIntraMapVtab;
 #endif
 
@@ -182,11 +199,16 @@ AstIntraMap *astLoadIntraMap_( void *, size_t, int, AstIntraMapVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astIntraReg_( const char *, int, int, void (*)( int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+void astIntraReg_( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
 
-# if defined(astCLASS)           /* Protected */
+#if defined(astCLASS)            /* Protected */
+const char *astGetIntraID_( AstIntraMap * );
+int astTestIntraID_( AstIntraMap * );
+void astClearIntraID_( AstIntraMap * );
+void astSetIntraID_( AstIntraMap *, const char * );
+
 #else                            /* Public only */
-void astIntraRegFor_( const char *, int, int, void (*)( int, int, const double *[], int, int, double *[] ), void (*)( void (*)( int, int, const double *[], int, int, double *[] ), int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+void astIntraRegFor_( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
 #endif
 
 /* Function interfaces. */
@@ -236,6 +258,15 @@ astINVOKE(O,astLoadIntraMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
 astIntraReg_(name,nin,nout,tran,flags,purpose,author,contact)
 
 #if defined(astCLASS)            /* Protected */
+#define astClearIntraID(this) \
+astINVOKE(V,astClearIntraID_(astCheckIntraMap(this)))
+#define astGetIntraID(this) \
+astINVOKE(V,astGetIntraID_(astCheckIntraMap(this)))
+#define astSetIntraID(this,IntraID) \
+astINVOKE(V,astSetIntraID_(astCheckIntraMap(this),IntraID))
+#define astTestIntraID(this) \
+astINVOKE(V,astTestIntraID_(astCheckIntraMap(this)))
+
 #else                            /* Public only */
 #define astIntraRegFor(name,nin,nout,tran,tran_wrap,flags,purpose,author,contact) \
 astIntraRegFor_(name,nin,nout,tran,tran_wrap,flags,purpose,author,contact)
