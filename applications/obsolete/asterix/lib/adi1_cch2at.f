@@ -76,6 +76,8 @@
 *  History:
 *     29 Mar 1995 (DJA):
 *        Original version.
+*      8 Nov 1995 (DJA):
+*        Extended to cope with SGP/38 style ARRAY objects
 *     {enter_changes_here}
 
 *  Bugs:
@@ -139,6 +141,9 @@
 
       ELSE IF ( TYPE(1:5) .EQ. '_CHAR' ) THEN
         CALL ADI1_CCH2AC( LOC, CMP, ID, MEMBER, STATUS )
+
+      ELSE IF ( TYPE(1:5) .EQ. 'ARRAY' ) THEN
+        CALL ADI1_CCH2AA( LOC, CMP, ID, MEMBER, STATUS )
 
       ELSE
         STATUS = SAI__ERROR

@@ -75,6 +75,8 @@
 *  History:
 *     9 Aug 1995 (DJA):
 *        Original version.
+*     8 Nov 1995 (DJA):
+*        Handle GET operation for whole axes
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,20 +126,39 @@
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
 
-*    Is its data valid?
-        CALL DAT_STATE( CLOC, OK, STATUS )
-        IF ( OK ) THEN
+*    Whole axis?
+        IF ( (ITEM(:5) .EQ. 'Axis_') .AND.
+     :       (INDEX(ITEM(6:),'_').EQ.0) ) THEN
 
-*      Copy from HDS to ADI
-          CALL ADI1_CCH2AT( CLOC, ' ', OARG, ' ', STATUS )
+*      Create ADI axis description object
+          CALL ADI_NEW0( 'BinDSAxis', OARG, STATUS )
+
+*      Copy each component of the axis structure
+          CALL ADI1_CCH2AC( CLOC, 'LABEL', OARG, 'Label', STATUS )
+          CALL ADI1_CCH2AC( CLOC, 'UNITS', OARG, 'Units', STATUS )
+          CALL ADI1_CCH2AL( CLOC, 'NORMALISED', OARG,
+     :                      'Normalised', STATUS )
+          CALL ADI1_CCH2AT( CLOC, 'DATA_ARRAY', OARG, 'Data', STATUS )
+          CALL ADI1_CCH2AT( CLOC, 'WIDTH', OARG, 'Width', STATUS )
+          CALL ADI1_CCH2AT( CLOC, 'LOWIDTH', OARG, 'LoWidth', STATUS )
+          CALL ADI1_CCH2AT( CLOC, 'HIWIDTH', OARG, 'HiWidth', STATUS )
 
         ELSE
-          STATUS = SAI__ERROR
-          CALL MSG_SETC( 'IT', ITEM )
-          CALL ERR_REP( 'BDI1_GET_1', 'Item ^IT data is invalid',
-     :                  STATUS )
 
-        END IF
+*      Is its data valid?
+          CALL DAT_STATE( CLOC, OK, STATUS )
+          IF ( OK ) THEN
+
+*        Copy from HDS to ADI
+            CALL ADI1_CCH2AT( CLOC, ' ', OARG, ' ', STATUS )
+
+          ELSE
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'IT', ITEM )
+            CALL ERR_REP( 'BDI1_GET_1', 'Item ^IT data is invalid',
+     :                    STATUS )
+
+          END IF
 
 *    Free the HDS object
         CALL DAT_ANNUL( CLOC, STATUS )
