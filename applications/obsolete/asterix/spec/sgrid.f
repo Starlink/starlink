@@ -258,7 +258,6 @@
 
 *  Version id
       CALL MSG_PRNT( VERSION )
-      CALL NAG_MISSING( 'G01ECF, G01EAF', STATUS )
 
 *  Set up genus in MODEL structure
       MODEL.GENUS = 'SPEC'

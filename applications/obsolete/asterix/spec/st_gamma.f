@@ -3,12 +3,12 @@
 *
         REAL*8 FUNCTION ST_GAMMA(PARAM)
 *
-* This routine is designed to help prevent NAG hard failures in S14AAF
-* (S14AAF caclulates the Gamma function). Before calling S14AAF with an
+* This routine is designed to help prevent NAG hard failures in PDA_GAMMA
+* (PDA_GAMMA caclulates the Gamma function). Before calling PDA_GAMMA with an
 * input parameter PARAM this routine should be called with the same parameter.
 * If PARAM is in a range likely to cause problems it is adjusted accordingly.
 *
-*        PARAM is the input argument for S14AAF
+*        PARAM is the input argument for PDA_GAMMA
 *        ST_GAMMA is the suggested value to avoid hard failures
 *
         REAL*8 PARAM

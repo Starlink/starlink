@@ -13,8 +13,8 @@
 *
 *    Method :
 *
-*     Integral under Gaussian is evaluated using NAG routine S15ABF. If W<=0
-*     then a delta function line is adopted.
+*     Integral under Gaussian is evaluated using NAG routine PDA+CNDFPX.
+*     If W<=0 then a delta function line is adopted.
 *     The leading constant A is the integrated photons/(cm**2*s) in the line.
 *     Note that if EL is not >>W then some of the line flux will be lost to
 *     negative energies.

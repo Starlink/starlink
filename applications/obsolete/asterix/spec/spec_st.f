@@ -62,7 +62,7 @@
         REAL*8 E(3)                     ! Bottom, middle and top of current
                                         ! channel
         REAL*8 EREF                     ! Reference energy (set to 1 keV)
-        REAL*8 GAMPAR                   ! The input argument for calls to S14AAF
+        REAL*8 GAMPAR                   ! The input argument for calls to PDA_GAMMA
         REAL*8 G1                       ! First Gamma function
         REAL*8 G2                       ! Second Gamma function
         REAL*8 G3                       ! Third Gamma function
