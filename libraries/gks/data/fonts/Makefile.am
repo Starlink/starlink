@@ -30,7 +30,9 @@ create_dbs:  $(FONTS)
 	if test -f create_dbs; then \
 	   rm create_dbs; \
 	else :; fi; \
-	echo './gksdbs <<!' > create_dbs
+	echo '#! /bin/sh' > create_dbs
+	echo '# AUTOMATICALLY GENERATED. DO NOT EDIT' >> create_dbs
+	echo './gksdbs <<!' >> create_dbs
 	echo `expr $(NFONTS) + 1` >> create_dbs
 	echo 'C' >> create_dbs
 	echo 'font001' >> create_dbs
@@ -48,7 +50,7 @@ create_dbs:  $(FONTS)
 
 gks.dbs-$(RLSE): gksdbs create_dbs hershey.dat
 	if test -f gks.dbs-$(RLSE); then \
-	   rm gks.dbs-$(RLSE) \
+	   rm gks.dbs-$(RLSE) ; \
 	else :; fi; \
 	./create_dbs
 	mv gks.dbs gks.dbs-$(RLSE)
