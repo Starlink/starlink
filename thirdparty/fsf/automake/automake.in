@@ -2332,21 +2332,20 @@ sub handle_monoliths
   my @proglist = &am_install_var ('monoliths', 'MONOLITHS',
                                   'bin', 'check', 'noinst');
 
-  my $star_monoliths_seen = (defined($starlink_seen_features{monoliths})
-                             && $starlink_seen_features{monoliths});
-
   # If there is no monolith support mentioned (bin_MONOLITHS), then do nothing.
   if (! @proglist)
     {
-      if ($star_monoliths_seen) {
-        err_am("STAR_MONOLITHS seen in configure.ac, but no bin_MONOLITHS declared in Makefile.am");
-      }
+      # We used to warn, here, if STAR_MONOLITHS had been seen in
+      # configure.ac, but there was no bin_MONOLITHS declared in Makefile.am.
+      # Don't do this, however, since if we're processing a Makefile.am in
+      # a subdirectory, then this situation can occur quite legitimately.
+
       return;
     }
 
   # Just to keep the user sane, check that we did see STAR_MONOLITHS in the
   # configure.ac.
-  $star_monoliths_seen || do {
+  $starlink_seen_features{monoliths} || do {
     err_am("have bin_MONOLITHS, but no STAR_MONOLITHS in configure.ac");
   };
   
@@ -4282,6 +4281,143 @@ sub handle_headers
     }
 }
 
+# Starlink: handle messgen declarations
+#
+# Declarations in Makefile.am look like:
+#   include_MESSAGES = x_err.h X_ERR
+#   x_err_h_SOURCES = x_err.msg
+# with the sources declaration defaulting obviously.  Since this subroutine 
+# defines starhelp_DATA (or appends to it if it is already defined), it must be
+# called before handle_data.
+sub handle_messgen
+{
+  my @r = &am_install_var ('-defaultdist',
+                           'header', 'MESSAGES',
+                           'include',
+                           'noinst');
+
+  $starlink_seen_features{messgen} || do {
+    err_am("have _MESSAGES primary, but no STAR_MESSGEN in configure.ac");
+  };
+
+  my %messgen_sourcefiles;
+  foreach (@r)
+    {
+      my $loc = $_->[0]->get;
+      my $msgfile = $_->[1];
+      my $normalmsg;
+      ($normalmsg = $msgfile) =~ s/[^a-zA-Z0-9@]/_/;
+      my $sourcesvar = var($normalmsg . '_SOURCES');
+      if ($sourcesvar)
+        {
+          my $srcfile = $sourcesvar ->rdef(TRUE)->value;
+          if (! -f $srcfile)
+            {
+              err_am ($loc . ": file $srcfile does not exist");
+              next;
+            }
+          if (defined $messgen_sourcefiles{$srcfile})
+            {
+              $messgen_sourcefiles{$srcfile} .= " $msgfile ";
+            }
+          else
+            {
+              $messgen_sourcefiles{$srcfile} = " $msgfile ";
+            }
+          set_seen ($sourcesvar->name);
+        }
+      else
+        {
+          # No sources variable -- default it
+          if ($msgfile =~ /^([A-Za-z_]*)(\.h)?$/)
+            {
+              my $srcfile = $1 . '.msg';
+              $srcfile =~ tr{[A-Z]}{[a-z]};
+              if (! -f $srcfile)
+                {
+                  err_am($loc . ": no ${normalmsg}_SOURCES variable, and defaulted $srcfile does not exist");
+                  next;
+                }
+              if (defined $messgen_sourcefiles{$srcfile})
+                {
+                  $messgen_sourcefiles{$srcfile} .= " $msgfile ";
+                }
+              else
+                {
+                  $messgen_sourcefiles{$srcfile} = " $msgfile ";
+                }
+            }
+          else
+            {
+              err_am($loc . ": unrecognised form of msg file $msgfile");
+              next;
+            }
+        }
+    }
+
+  foreach my $msg (keys %messgen_sourcefiles)
+    {
+      my $fac = '';
+      my $code = '';
+      open (MSG, "<$msg") ||
+        do {
+          print "Eeek! .msg source $msg doesn't exist -- ignored\n";
+          next;
+        };
+      while (<MSG>) 
+        {
+          # The messgen facility requires this line to match
+          # ([A-Z]*),(\d*).  Be (much) more liberal here, so that
+          # it's the messgen facility which objects to bad
+          # formatting, and not us.
+          if (/\.FACILITY\s*(\w*)\D*(\d*)/)
+            {
+              $fac = $1;
+              $code = $2;
+              last;
+            }
+        }
+      close(MSG);
+      my $ERRfile = $fac . '_ERR';
+      my $errfile = $fac . '_err';
+      my $errhfile = $fac . '_err.h';
+      my $facfile = 'fac_' . $code . '_err';
+      $errfile =~ tr[A-Z][a-z]; # force lowercase
+      $ERRfile =~ tr[a-z][A-Z]; # uppercase
+      $errhfile=~ tr[A-Z][a-z]; # force lowercase
+
+      my $reqfiles = $messgen_sourcefiles{$msg};
+      $reqfiles =~ / $ERRfile / || do { $ERRfile = 0; };
+      $reqfiles =~ / $errfile / || do { $errfile = 0; };
+      $reqfiles =~ / $errhfile / || do { $errhfile = 0; };
+
+      $output_rules .= &file_contents ('starlink_messgen',
+                                       new Automake::Location,
+                                       UERRFILE => $ERRfile,
+                                       LERRFILE => $errfile,
+                                       ERRHFILE => $errhfile,
+                                       FACERRFILE => $facfile,
+                                       MSG => $msg,
+                                       );
+
+      my $starhelpdata = var ('starhelp_DATA');
+      # Append the fac_ file to starhelp_DATA if this is defined, or define if not.
+      Automake::Variable::define ('starhelp_DATA', VAR_MAKEFILE,
+                                  ($starhelpdata ? '+' : ''), TRUE,
+                                  $facfile,
+                                  '', INTERNAL, VAR_ASIS);
+      # ...and distribute it.
+      push_dist_common ('$(srcdir)/' . $facfile);
+
+      $clean_files{$ERRfile}  = MAINTAINER_CLEAN if $ERRfile;
+      $clean_files{$errfile}  = MAINTAINER_CLEAN if $errfile;
+      $clean_files{$errhfile} = MAINTAINER_CLEAN if $errhfile;
+      $clean_files{$facfile}  = MAINTAINER_CLEAN;
+    }
+
+}
+  
+
 sub handle_gettext
 {
   return if ! $seen_gettext || $relative_dir ne '.';
@@ -4859,47 +4995,7 @@ sub handle_starlink
       defined($starlink_seen_features{latexdocs})
         && $starlink_seen_features{latexdocs};
 
-    if (defined($starlink_seen_features{messgen}))
-      {
-          # Generate build rules for the messgen application.
-          # The hash value consists of a list of .msg files.
-          foreach my $msg (split(' ', $starlink_seen_features{messgen}))
-            {
-                my $fac = '';
-                my $code = '';
-                open (MSG, "<$msg") ||
-                  do {
-                    print "Eeek! .msg source $msg doesn't exist -- ignored\n";
-                    next;
-                };
-                while (<MSG>) 
-                  {
-                      # The messgen facility requires this line to match
-                      # ([A-Z]*),(\d*).  Be (much) more liberal here, so that
-                      # it's the messgen facility which objects to bad
-                      # formatting, and not us.
-                      if (/\.FACILITY\s*(\w*)\D*(\d*)/)
-                        {
-                            $fac = $1;
-                            $code = $2;
-                            last;
-                        }
-                  }
-                close(MSG);                
-                $fac =~ tr[A-Z][a-z]; # force lowercase
-                my $ufac;
-                ($ufac = $fac) =~ tr[a-z][A-Z]; # make uppercase version
-                my $facfile = 'fac_' . $code . '_err';
-                $output_rules .= &file_contents ('starlink_messgen',
-                                                 new Automake::Location,
-                                                 MSG => $msg,
-                                                 LFAC => $fac,
-                                                 UFAC => $ufac,
-                                                 FACERRFILE => $facfile,
-                                                );
-                $clean_files{$facfile} = MAINTAINER_CLEAN;
-            }
-      }
+    # messgen handled in handle_messgen
 
     # Enhance the list of maintainer-clean files to include the following,
     # either installed by starconf or by the 'make world' process.
@@ -5232,18 +5328,11 @@ sub scan_autoconf_traces ($)
         }
       elsif ($macro eq 'STAR_LATEX_DOCUMENTATION')
         {
-            $starlink_seen_features{latexdocs} = 1;
+          $starlink_seen_features{latexdocs} = 1;
         }
       elsif ($macro eq 'STAR_MESSGEN')
         {
-            if (defined($starlink_seen_features{messgen}))
-              {
-                  $starlink_seen_features{messgen} .= ' ' . $args[1];
-              }
-            else
-              {
-                  $starlink_seen_features{messgen} = $args[1];
-              }
+          $starlink_seen_features{messgen} = 1;
         }
       elsif ($macro eq 'STAR_MONOLITHS')
         {
@@ -7572,6 +7661,7 @@ sub generate_makefile ($$)
   handle_python;
   handle_java;
   handle_man_pages;
+  handle_messgen;               # must be called before handle_data
   handle_data;
   handle_headers;
   handle_subdirs;
