@@ -2,7 +2,7 @@
 AutoAstrometry of Mosaics
 -------------------------
 
-%%VERSION%%    0.5-7
+%%VERSION%%    0.5-8
 
 
 This is a beta release of the autoastrometry package.
@@ -13,6 +13,8 @@ Changes
 -------
 
 Since 0.5: 
+  * In 0.5-8: Various stability improvements; added --ccdcatalogue and
+    --matchcatalogue options; documentation updated and tidied.
   * In 0.5-7: Fixed crashing error in 0.5-6; now works without `match'
     being installed; now distribute `match' with autoastrom.
   * Fixed typo in function name which made some informational
@@ -31,12 +33,11 @@ Since 0.5:
 Notes
 -----
 
-At present, you'll probably need to define the STARLINK environment
-variable to point to the /stardev tree.  If you have CCDPACK_DIR and
-ATOOLS_DIR defined, make sure that these are pointing to at least
-versions 4.0-1 and 1.3 respectively.  It's probably best if KAPPA_DIR
-and EXTRACTOR_DIR are pointing at /stardev versions, too, just on
-general principles.
+Autoastrom depends on fairly recent versions of several Starlink
+tools.  You will need a recent Starlink distribution -- Summer 2003
+should do.  In particular, you need CCDPACK 4.0-1 and ATOOLS 1.5 at
+least.  See <ftp://ftp.starlink.rl.ac.uk/pub/ussc/cdrom/current> for
+ISO images of the current release.
 
 To build, give the sequence of commands
 
@@ -50,26 +51,24 @@ There's a pre-installation regression test:
     ./mk test-install
     ./mk pretest
 
-A couple of regression tests fail on DUX, apparently due to rounding
-errors somewhere.
-
 This version includes plugins, and specifically a plugin to support
-the `match' application to be found at
-<http://acd188a-005.rit.edu/match/>.  The distribution includes a copy
-of the match distribution, but if you wish to replace this one with
-any newer one, you can (if its output is compatible with earlier
-versions): build it yourself and install it in the directory
-$AUTOASTROM_DIR.
+the `match' application to be found at <http://acd188a-005.rit.edu/match/>
+or <http://stupendous.rit.edu/richmond/>.  The distribution includes a
+copy of the match distribution, and has been tested against match 0.3,
+0.4 and 0.7; but if you wish to replace this version with any newer
+one, you can, if its output is compatible with earlier versions: build
+it yourself and install it in the directory $AUTOASTROM_DIR.
 
 Regression tests: A couple of the regression tests in directory t/
 (namely t/t7 and t/t9) are poor ones, since they depend far too much
 on details of the output, and are thus inappropriately sensitive to
 roundoff error, so that they almost always fail, entirely spuriously.
-Bah!  Ignore errors in these two tests.  Also, the test t/t9 (which
-consists of two runs of autoastrom right after each other) seems to
-hang on some machines, with an error which suggests that the Perl/ADAM
-system has got itself into a terminal fankle.  I suspect that this is
-caused by something like the monoliths from the first run not being
-fully shut down before the second starts, but I don't have a more
-specific explanation than that.  Like I said, it's a poor test.
+If they fail to run completely, however, that _is_ an error.  Bah!
+Ignore errors in these two tests.  Also, the test t/t9 (which consists
+of two runs of autoastrom right after each other) seems to hang on
+some machines, with an error which suggests that the Perl/ADAM system
+has got itself into a terminal fankle.  I suspect that this is caused
+by something like the monoliths from the first run not being fully
+shut down before the second starts, but I don't have a more specific
+explanation than that.  Like I said, it's a poor test.
 
