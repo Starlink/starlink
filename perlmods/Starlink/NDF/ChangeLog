@@ -1,3 +1,7 @@
+1998-09-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm (par_get): Retrieve DOUBLE values as double precision numbers
+
 1998-09-12  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.xs: Add status checking before using unpack1D and array
