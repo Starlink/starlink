@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #endif
+#include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/stat.h>		// for mkfifo
@@ -370,11 +371,27 @@ int do_stream_tests()
 	    // but not seekable.  Pipe name starts with "temp", so
 	    // it's cleared up with make clean
 #define PIPE_NAME "./temp-t6.pipe"
-	    if (mkfifo(PIPE_NAME, 0644) == -1) {
-		string errmsg = strerror(errno);
-		cerr << "Can't create FIFO: " << errmsg << endl;
-		tfails++;
-	    } else {
+            bool made_fifo;
+	    if (mkfifo(PIPE_NAME, 0644) == 0) {
+                made_fifo = true;
+            } else {
+                if (errno == EEXIST) {
+                    // A file of that name already exists, probably
+                    // from an earlier (failed?) run of this test.
+                    // Presume that is the case in fact, and don't
+                    // cause a spurious error here.
+                    cerr << "FIFO " << PIPE_NAME
+                         << " already exists -- reusing" << endl;
+                    made_fifo = true;
+                } else {
+                    string errmsg = strerror(errno);
+                    cerr << "Can't create FIFO: " << errmsg << endl;
+                    tfails++;
+                    made_fifo = false;
+                }
+            }
+            
+	    if (made_fifo) {
 		int pid = fork();
 		if (pid < 0) {
 		    cerr << "Can't fork!" << strerror(errno) << endl;
@@ -388,7 +405,7 @@ int do_stream_tests()
 			  0);
 		} else {
 		    // parent
-		    InputByteStream IBS("t6.pipe");
+		    InputByteStream IBS(PIPE_NAME);
 		    tfails += exercise_IBS(IBS);
 		    IBS.close();
 		    int status;
