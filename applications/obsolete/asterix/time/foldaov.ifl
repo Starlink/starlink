@@ -1,9 +1,8 @@
 	INTERFACE FOLDAOV
 
-	    PARAMETER INPUT
+	    PARAMETER INP
 		POSITION 	1
 		TYPE 		'UNIV'
-                KEYWORD         'INP'
 		PROMPT  	'Input datafile'
                 PPATH           'GLOBAL,CURRENT'
                 HELP            '1-dimensional datafile'

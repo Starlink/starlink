@@ -1,6 +1,6 @@
 	INTERFACE CLEANPOW
 
-	    PARAMETER INPUT
+	    PARAMETER INP
 		POSITION 	1
 		TYPE 		'UNIV'
 		PROMPT  	'Input datafile'
@@ -18,7 +18,7 @@
 		VPATH		'PROMPT'
 	    ENDPARAMETER
 
-	    PARAMETER OUTPUT
+	    PARAMETER OUT
 		POSITION 	3
 		TYPE 		'UNIV'
 		PROMPT  	'Output datafile'

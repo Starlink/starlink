@@ -1,8 +1,7 @@
 Interface FOLDLOTS
-   Parameter    INPUT
+   Parameter    INP
       position    1
       type        'univ'
-      KEYWORD     'INP'
       ppath       'GLOBAL'
       association '<->GLOBAL.BINDS'
       prompt      'Enter name of input file'
@@ -29,7 +28,6 @@ Interface FOLDLOTS
 
    Parameter    PERIOD
       position    4
-      keyword     'PERIOD'
       type        '_real'
       PPATH       'CURRENT'
       prompt      'Enter start period for folding'
@@ -38,7 +36,6 @@ Interface FOLDLOTS
 
    Parameter    PINC
       position    5
-      keyword     'PINC'
       type        '_real'
       PPATH       'CURRENT'
       prompt      'Enter increment period for folding'
@@ -47,7 +44,6 @@ Interface FOLDLOTS
 
    Parameter    NPER
       position    6
-      keyword     'NPER'
       type        '_integer'
       PPATH       'CURRENT'
       prompt      'Enter number of periods to fold at'

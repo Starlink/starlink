@@ -1,9 +1,8 @@
      INTERFACE STREAMLINE
 
-       PARAMETER INPUT
+       PARAMETER INP
          POSITION 1
          TYPE     'UNIV'
-         KEYWORD  'INP'
          PROMPT 'Name of input file'
          VPATH 'PROMPT'
          PPATH 'GLOBAL,CURRENT'
@@ -11,10 +10,9 @@
          HELP 'Enter without the file extension'
        ENDPARAMETER
 
-       PARAMETER OUTPUT
+       PARAMETER OUT
          POSITION 2
          TYPE     'UNIV'
-         KEYWORD  'OUT'
          PROMPT 'Name of output file'
          VPATH 'PROMPT'
          PPATH 'CURRENT'
