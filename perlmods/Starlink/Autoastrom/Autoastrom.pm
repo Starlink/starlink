@@ -280,4 +280,26 @@ sub solve {
 
 }
 
+=head1 CVS VERSION
+
+$Id$
+
+=head1 SEE ALSO
+
+Starlink User Note 242
+
+=head1 AUTHORS
+
+Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 Particle Physics and Astronomy Research
+Council.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same conditions as Perl itself.
+
+=cut
+
 1;
