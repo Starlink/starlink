@@ -265,11 +265,11 @@
 *    If present, look for lower or upper component
         IF ( THERE ) THEN
           IF ( ITEM .EQ. 'LoError' ) THEN
-            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, DELETE, RTYPE, NDIM,
-     :                        DIMS, THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, DELETE, RTYPE,
+     :                        NDIM, DIMS, THERE, CLOC, STATUS )
           ELSE
-            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, DELETE, RTYPE, NDIM,
-     :                        DIMS, THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, DELETE, RTYPE,
+     :                        NDIM, DIMS, THERE, CLOC, STATUS )
           END IF
           CALL DAT_ANNUL( ELOC, STATUS )
 
