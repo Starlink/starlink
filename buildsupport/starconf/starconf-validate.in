@@ -48,8 +48,12 @@ defined($srcdir) || do { $srcdir = '.'; };
 
 
 
-# Do not include in this list files which are required but generated,
-# such as Makefile.in
+# The `definitely_required' files must exist, or else we exit with a
+# non-zero status.  The `required_files' must exist, or we give a
+# warning and, if $force is not true, exit non-zero.  The
+# `extra_checkins' are like the `required_files' in that they must
+# exist; they are distinguished by being generated files rather than
+# source ones.
 @definitely_required =  qw{ Makefile.am
                             configure.ac
                           };
@@ -106,15 +110,18 @@ if ( -d "CVS" && -f "CVS/Entries" ) {
         }
     }
     close(ENT);
-    push (@required_files, @extra_checkins);
-    foreach $f (@required_files) {
-        if (! grep (m{$f}, @allent)) {
+    @allcvsfiles = ();
+    push(@allcvsfiles, @definitely_required);
+    push(@allcvsfiles, @required_files);
+    push(@allcvsfiles, @extra_checkins);
+    foreach $f (@allcvsfiles) {
+        if (! grep (m{^$f$}, @allent)) {
             print "$progname: file $f is not checked in, but should be\n";
             $nwarnings++;
         }
     }
     foreach $f (@non_checkins) {
-        if (grep (m{$f}, @allent)) {
+        if (grep (m{^$f$}, @allent)) {
             print "$progname: file $f is checked in, but shouldn't be\n";
             $nwarnings++;
         }
@@ -176,7 +183,7 @@ sub check_makefile {
 
     $includes_std_makefile = 0;
     while (<CF>) {
-        /include.*Makefile\.starconf/ && do {
+        /include *\$\(srcdir\)\/Makefile\.starconf/ && do {
             if ($includes_std_makefile) {
                 # been here already
                 print_error ($fn, $.,
