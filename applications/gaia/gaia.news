@@ -1,12 +1,25 @@
 1 Update to GAIA
 
-  This is a minor update to GAIA with the following fixes:
+  A new release of GAIA (v2.4) is now available. This release includes
+  a new toolbox and some minor improvements/fixes.
+
+  The new toolbox provides an interactive environment for doing the
+  surface photometry of extended sources (i.e. galaxies) and
+  inspecting the results. It is based on the ESP (SUN/180) package
+  commands ELLPRO and ELLFOU.
+
+  Minor changes are detailed below:
+
+    - It is expected that work to make the LEDAS catalogues available
+      should be completed by the time of this release (these will
+      appear in the "Browse Catalog Directories..." item under the
+      "Data-Servers" menu).
 
     - A percentiles option has been added to automatic contour
       generation.
 
     - The "automatic" generation option now correctly uses the image
-      to be contoured not the displayed image. 
+      to be contoured not the displayed image.
 
     - The measure band can now display pixels and non-celestial
       coordinate system offsets.
@@ -16,7 +29,7 @@
 
     - Automatic NDF history recording should be working again.
 
-    - NDFs stored within container files are now supported.
+    - Displaying NDFs stored within container files is now supported.
 
     - Floating point images of size 35000x2048 pixels are now known to
       display (if you have sufficient VM). Bigger images may also work.
@@ -58,8 +71,4 @@
 
 #########################################################################
 Not sure if adding this part.
-
-    - LEDAS catalogues should now be available again (these appear in
-      the "Browse Catalog Directories..." item under the
-      "Data-Servers" menu).
 
