@@ -217,6 +217,7 @@ public:
     { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
     { "astaddcolour",  &StarRtdImage::astaddcolourCmd, 2, 2 },
     { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
+    { "astcelestial",  &StarRtdImage::astcelestialCmd, 0, 0 },
     { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
     { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
     { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
@@ -670,9 +671,28 @@ StarWCS* StarRtdImage::getStarWCSPtr(ImageData* image)
 }
 
 //+
-// Return if coordinate system is celestial.
+//   StarRtdImage::astcelestialCmd
+//
+//   Return if coordinate system is celestial or not.
 //-
-int StarRtdImage::isCelestial() {
+int StarRtdImage::astcelestialCmd( int argc, char *argv[] )
+{
+    if ( isCelestial() ) {
+        set_result( 1 );
+    }
+    else {
+        set_result( 0 );
+    }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::isCelestial
+//
+//   Return if coordinate system is celestial.
+//-
+int StarRtdImage::isCelestial() 
+{
     StarWCS* wcsp = getStarWCSPtr();
     return wcsp->isCelestial();
 }
@@ -4471,11 +4491,8 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
 
     //  If WCS is available see if it is celestial.
     StarWCS *wcsp = (StarWCS *) NULL;
-    if ( isWcs() ) {
-        StarWCS* wcsp = getStarWCSPtr();
-        if ( wcsp->isCelestial() ) {
-            return RtdImage::mbandCmd( argc, argv );
-        }
+    if ( isWcs() && isCelestial() ) {
+        return RtdImage::mbandCmd( argc, argv );
     }
 
     //  Define buffers for width and height strings.
