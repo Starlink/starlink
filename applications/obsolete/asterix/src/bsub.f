@@ -1,5 +1,5 @@
 *+
-      SUBROUTINE BSUB_INT(STATUS)
+      SUBROUTINE BSUB(STATUS)
 *
 *    Description :
 *
@@ -113,13 +113,11 @@
 	INTEGER   COMPX_PTR, COMPY_PTR
 *-
 
-*
-*  set up top level error handler
-
-	BSUB_INT=.TRUE.
-
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Initialise
+      CALL AST_INIT()
 
 	ISTATUS=.TRUE.
 
@@ -131,9 +129,6 @@
 *    Get Output write parameter
       CALL USI_GET0L('OUT_MESSAGES',LOUD,STATUS)
       IF(STATUS.NE.SAI__OK)RETURN
-
-*    Initialise
-      CALL AST_INIT()
 
 *    Associate the input and output objects (files)
       CALL USI_ASSOCI( 'INP', 'READ', ILOC, IN_PRIM, STATUS )
@@ -278,9 +273,6 @@ C	   END IF
            GOTO 99
         ELSE
 
-d           SCF = SCF * MATH__RTOD * 3600.0
-d	    SCF=2.908882E-4		!temporary fix arcmins to radians
-
         END IF
 
 *    Get axis 1 stuff
@@ -330,11 +322,9 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
       R_95=RADII(4)/SCALE
 
 *    Get number pixels at 68%
-
       NPIX_R_PSF=NINT(MATH__PI*RADII(1)*RADII(1))
 
-*  Tell user radii of PSF
-
+*    Tell user radii of PSF
 	IF(LOUD)THEN
           CALL MSG_PRNT(' ')
           CALL MSG_FMTR('RAD','F6.1',R_PSF)
@@ -483,8 +473,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 	END IF		!if status OK after call to BSUB_SUBTRACT_BACKGROUND
 
 *    Tidy up
-
- 99	CONTINUE
+ 99   CONTINUE
 
 	IF(STATUS.NE.SAI__OK)THEN
 

@@ -40,7 +40,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -48,29 +48,28 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   ILOC                    ! Input object
-      CHARACTER*(DAT__SZLOC)   OLOC                    ! Output object
-      CHARACTER*40             LABEL, UNITS            ! Input data attributes
+      CHARACTER*40              LABEL, UNITS            ! Input data attributes
 
-      REAL                     DMAX, DMIN              ! Range in data
+      REAL                      DMAX, DMIN              ! Range in data
 
-      INTEGER                  DDIMS(DAT__MXDIM)       ! Dummy dimensions
-      INTEGER                  DNDIM                   ! Dummy dimensionality
-      INTEGER                  I                       ! General loop variable
-      INTEGER                  IDIMS(DAT__MXDIM)       ! Input dimensions
-      INTEGER                  IDPTR                   ! Input data ptr
-      INTEGER                  INDIM                   ! Input dimensionality
-      INTEGER                  INELM                   ! Input # of points
-      INTEGER                  IQPTR                   ! Input quality ptr
-      INTEGER                  NCBIN                   ! # coverage bins
-      INTEGER                  ODIMS(DAT__MXDIM-1)     ! Output dimensions
-      INTEGER                  ODPTR                   ! Output data ptr
-      INTEGER                  ONDIM                   ! Output dimensionality
+      INTEGER                   DDIMS(ADI__MXDIM)       ! Dummy dimensions
+      INTEGER                   DNDIM                   ! Dummy dimensionality
+      INTEGER                   I                       ! General loop variable
+      INTEGER                   IDIMS(ADI__MXDIM)       ! Input dimensions
+      INTEGER                   IDPTR                   ! Input data ptr
+      INTEGER			IFID			! Input dataset id
+      INTEGER                   INDIM                   ! Input dimensionality
+      INTEGER                   INELM                   ! Input # of points
+      INTEGER                   IQPTR                   ! Input quality ptr
+      INTEGER                   NCBIN                   ! # coverage bins
+      INTEGER                   ODIMS(ADI__MXDIM-1)     ! Output dimensions
+      INTEGER                   ODPTR                   ! Output data ptr
+      INTEGER			OFID			! Output dataset id
+      INTEGER                   ONDIM                   ! Output dimensionality
 
-      LOGICAL                  ANYBAD                  ! Any bad quality points
-      LOGICAL                  IPRIM                   ! Input primitive?
-      LOGICAL                  OK                      ! Validity test
-      LOGICAL                  QOK                     ! Quality present?
+      LOGICAL                   ANYBAD                  ! Any bad quality points
+      LOGICAL                   OK                      ! Validity test
+      LOGICAL                   QOK                     ! Quality present?
 *
 *    Version :
 *
@@ -88,11 +87,11 @@
       CALL AST_INIT()
 
 *    Get files
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, IPRIM, STATUS )
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check data
-      CALL BDA_CHKDATA( ILOC, OK, INDIM, IDIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, INDIM, IDIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( INDIM .LT. 2 ) THEN
         STATUS = SAI__ERROR
@@ -101,15 +100,15 @@
       END IF
 
 *    Map data
-      CALL BDA_MAPDATA( ILOC, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Quality present?
-      CALL BDA_CHKQUAL( ILOC, QOK, DNDIM, DDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, QOK, DNDIM, DDIMS, STATUS )
       IF ( QOK ) THEN
-        CALL BDA_MAPLQUAL( ILOC, 'READ', ANYBAD, IQPTR, STATUS )
+        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
         IF ( .NOT. ANYBAD ) THEN
-          CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+          CALL BDI_UNMAPLQUAL( IFID, STATUS )
           QOK = .FALSE.
         END IF
       END IF
@@ -149,29 +148,29 @@
 
 *    Create output axes. First axis comes from input data, second and
 *    subsequent axes are copied from 3rd onwards from input, if present.
-      CALL BDA_CREAXES( OLOC, ONDIM, STATUS )
-      CALL BDA_CREAXVAL( OLOC, 1, .TRUE., NCBIN, STATUS )
-      CALL BDA_PUTAXVAL( OLOC, 1, DMIN + (DMAX-DMIN)/REAL(NCBIN)/2.0,
+      CALL BDI_CREAXES( OFID, ONDIM, STATUS )
+      CALL BDI_CREAXVAL( OFID, 1, .TRUE., NCBIN, STATUS )
+      CALL BDI_PUTAXVAL( OFID, 1, DMIN + (DMAX-DMIN)/REAL(NCBIN)/2.0,
      :                (DMAX-DMIN)/REAL(NCBIN), NCBIN, STATUS )
-      CALL BDA_GETUNITS( ILOC, UNITS, STATUS )
-      CALL BDA_GETLABEL( ILOC, LABEL, STATUS )
+      CALL BDI_GETUNITS( IFID, UNITS, STATUS )
+      CALL BDI_GETLABEL( IFID, LABEL, STATUS )
       IF ( UNITS .GT. ' ' ) THEN
-        CALL BDA_PUTAXUNITS( OLOC, 1, UNITS, STATUS )
+        CALL BDI_PUTAXUNITS( OFID, 1, UNITS, STATUS )
       END IF
       IF ( LABEL .GT. ' ' ) THEN
-        CALL BDA_PUTAXLABEL( OLOC, 1, LABEL, STATUS )
+        CALL BDI_PUTAXLABEL( OFID, 1, LABEL, STATUS )
       END IF
       IF ( INDIM .GT. 2 ) THEN
         DO I = 3, INDIM
-          CALL BDA_COPAXIS( ILOC, OLOC, I, I-1, STATUS )
+          CALL BDI_COPAXIS( IFID, OFID, I, I-1, STATUS )
         END DO
       END IF
-      CALL BDA_PUTLABEL( OLOC, 'Coverage', STATUS )
-      CALL BDA_PUTUNITS( OLOC, 'percent', STATUS )
+      CALL BDI_PUTLABEL( OFID, 'Coverage', STATUS )
+      CALL BDI_PUTUNITS( OFID, 'percent', STATUS )
 
 *    Create output data
-      CALL BDA_CREDATA( OLOC, ONDIM, ODIMS, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+      CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *    Perform coverage analysis
       CALL COVERAGE_INT( IDIMS(1)*IDIMS(2), INELM/(IDIMS(1)*IDIMS(2)),
@@ -179,15 +178,15 @@
      :                   DMIN, DMAX, %VAL(ODPTR), STATUS )
 
 *    Copy ancillary stuff
-      CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *    History update
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Release datasets
-      CALL BDA_RELEASE( ILOC, STATUS )
-      CALL BDA_RELEASE( OLOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
