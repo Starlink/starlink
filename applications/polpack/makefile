@@ -393,7 +393,7 @@ I_SUB2 = hlpcmd
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR \
 PAR_PAR PRM_PAR FIO_ERR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
-NUM_DEC_CVT 
+NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -540,8 +540,11 @@ PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
 SUBPAR_PAR: $(STAR_INC)/subpar_par; $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+NUM_CMN:   $(STAR_INC)/num_cmn;   $(LINK) $? $@
 NUM_DEF_CVT:    $(STAR_INC)/num_def_cvt;  $(LINK) $? $@
 NUM_DEC_CVT:    $(STAR_INC)/num_dec_cvt;  $(LINK) $? $@
+NUM_DEC_R:      $(STAR_INC)/num_dec_R;     $(LINK) $? $@
+NUM_DEF_R:      $(STAR_INC)/num_def_R;     $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
