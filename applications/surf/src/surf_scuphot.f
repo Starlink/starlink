@@ -119,6 +119,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.9  1997/03/21 01:12:12  timj
+*     Use SCULIB_GET_DEM_PNTR
+*     Write FITS to output NDFs.
+*
 *     Revision 1.8  1997/03/20 21:41:30  timj
 *     Update header.
 *     Remove NDF_SCOPY and replace with NDF_NEW
@@ -185,7 +189,6 @@ c
                                        ! channel numbers of bolometers measured
                                        ! in input file
       CHARACTER*15     CENTRE_COORDS   ! coordinate system of telescope centre
-      INTEGER          DEM_PNTR_ARY    ! ARY pointer to SCUBA.DEM_PNTR extension
       INTEGER          DEM_PNTR_PTR    ! array pointer to SCUBA.DEM_PNTR array
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       REAL             EXPOSURE_TIME   ! exposure time per jiggle point
@@ -338,6 +341,8 @@ c
       CHARACTER*(DAT__SZLOC) OUT_LOC   ! locator of HDS container file for
 				       ! output
       CHARACTER*132    OUT             ! name of output HDS container file
+      CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
+                                       ! locator to FITS extension in output
       INTEGER          OUT_OFFSET      ! offset in output array
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! pointer to REDS extension in output
@@ -588,49 +593,14 @@ c
 
 *  map the DEM_PNTR array and check its dimensions
 
-*     CALL NDF_XIARY (IN_NDF, 'SCUBA', 'DEM_PNTR', 'READ',
-*    :  IN_DEM_PNTR_ARY, STATUS)
-      CALL ARY_FIND (IN_SCUBAX_LOC, 'DEM_PNTR', DEM_PNTR_ARY,
-     :  STATUS)
-      CALL ARY_DIM (DEM_PNTR_ARY, MAX_DIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (DEM_PNTR_ARY, '_INTEGER', 'READ',
-     :  DEM_PNTR_PTR, ITEMP, STATUS)
+      CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
+     :     DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_MEASUREMENTS, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (NDIM .NE. 3) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
-     :        'array has bad number of dimensions', STATUS)
-         ELSE
-            IF (DIM(1) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM1',DIM(1))
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
-     :           'array contains bad number of exposures - ^DIM1',
-     :           STATUS)
-            END IF
-            IF (DIM(2) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM2',DIM(2))
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
-     :           'array contains bad number of integrations - ^DIM2',
-     :           STATUS)
-            END IF
-            IF (DIM(3) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM3',DIM(3))
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
-     :           'array contains bad number of measurements - ^DIM3',
-     :           STATUS)
-            END IF
-         END IF
+*     unmap DEM_PNTR
+      CALL CMP_UNMAP(IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
 
-         N_EXPOSURES = DIM (1)
-         N_INTEGRATIONS = DIM (2)
-         N_MEASUREMENTS = DIM (3)
-      END IF
-
+*     write out some information
       CALL MSG_SETI ('N_E', N_EXPOSURES)
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
@@ -846,6 +816,16 @@ c
                CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
      :              IBEAM, STATUS)
 
+* probably should store the FITS header
+               CALL NDF_XNEW(IBEAM, 'FITS','_CHAR*80',
+     :              1, N_FITS, OUT_FITSX_LOC, STATUS)
+               CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+               CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
+
+* Create history 
+               CALL NDF_HCRE(IBEAM, STATUS)
+
+*  Map the output data
 	       CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
      :           MAP_Q_PTR, NELM, STATUS)
 	       CALL NDF_MAP (IBEAM, 'DATA', '_REAL', 'WRITE/ZERO',
@@ -911,6 +891,16 @@ c
                CALL NDF_NEW('_REAL',1,1,N_INTEGRATIONS, PLACE, 
      :              IPEAK, STATUS)
 
+* probably should store the FITS header
+               CALL NDF_XNEW(IPEAK, 'FITS','_CHAR*80',
+     :              1, N_FITS, OUT_FITSX_LOC, STATUS)
+               CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+               CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
+
+* Create history 
+               CALL NDF_HCRE(IPEAK, STATUS)
+
+* Map output data
                CALL NDF_MAP (IPEAK, 'QUALITY', '_UBYTE', 'WRITE',
      :           PEAK_Q_PTR, NELM, STATUS)
                CALL NDF_MAP (IPEAK, 'DATA', '_REAL', 'WRITE/ZERO',
