@@ -1930,43 +1930,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.treeview...
   [javadoc] Loading source files for package uk.ac.starlink.treeview.splat...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:17: package uk.ac.starlink.splat.plot does not exist
-  [javadoc] import uk.ac.starlink.splat.plot.DivaPlot;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:32: cannot resolve symbol
-  [javadoc] symbol  : class DivaPlot 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer
-  [javadoc] public class GraphViewer extends DivaPlot {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java:30: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.ControlWindow;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:6: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowser;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:7: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowserMain;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:17: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.treeview.SplatNdxDisplayer
-  [javadoc]     private SplatBrowser browser;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:45: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.treeview.SplatNdxDisplayer
-  [javadoc]     private synchronized SplatBrowser getBrowser( boolean embedded ) {
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:23: cannot resolve symbol
-  [javadoc] symbol  : class SpecDataFactory 
-  [javadoc] location: package data
-  [javadoc] import uk.ac.starlink.splat.data.SpecDataFactory;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:57: cannot resolve symbol
-  [javadoc] symbol  : class SpecDataFactory 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     private static SpecDataFactory specFactory = SpecDataFactory.getInstance();
-  [javadoc]                    ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -1981,7 +1944,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
   [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 17 warnings
+  [javadoc] 8 warnings
      [echo] Executing Coco target: javadocs
 
 prepare:
@@ -2038,20 +2001,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.frog.plot...
   [javadoc] Loading source files for package uk.ac.starlink.frog.util...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:25: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.ControlWindow;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:23: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.ControlWindow;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java:10: package bsh does not exist
-  [javadoc] import bsh.Interpreter;
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java:85: cannot resolve symbol
-  [javadoc] symbol  : class Interpreter 
-  [javadoc] location: class uk.ac.starlink.frog.util.RemoteServer
-  [javadoc]     protected Interpreter interp = null;
-  [javadoc]               ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -2819,7 +2768,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java:71: warning - Tag @link: can't find setFrogBrowser in uk.ac.starlink.frog.util.FrogSOAPServer
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java:17: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/stylesheet.css...
-  [javadoc] 208 warnings
+  [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 9 seconds
+Total time: 3 minutes 11 seconds

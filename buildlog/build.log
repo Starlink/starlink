@@ -317,17 +317,110 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
     [javac] Compiling 166 source files to /apps/cvsbuild/java/source/splat/build/classes
-    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:323: makeStarTable(uk.ac.starlink.util.DataSource,boolean,uk.ac.starlink.table.StoragePolicy) in uk.ac.starlink.fits.FitsTableBuilder cannot be applied to (uk.ac.starlink.util.DataSource,boolean)
-    [javac]                     new FitsTableBuilder().makeStarTable( datsrc, true );
-    [javac]                     ^
-    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:357: makeStarTable(uk.ac.starlink.util.DataSource,boolean,uk.ac.starlink.table.StoragePolicy) in uk.ac.starlink.votable.VOTableBuilder cannot be applied to (uk.ac.starlink.util.DataSource,boolean)
-    [javac]                 new VOTableBuilder().makeStarTable( datsrc, true );
-    [javac]                 ^
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-    [javac] 2 errors
+     [copy] Copying 68 files to /apps/cvsbuild/java/source/splat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
+     [copy] Copying 9 files to /apps/cvsbuild/java/source/splat/lib/splat
+
+execute_mk_script:
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/i386
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../splat_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing /apps/cvsbuild/star/lib/libndf.a
+     [exec] Processing /apps/cvsbuild/star/lib/libary.a
+     [exec] Processing /apps/cvsbuild/star/lib/libhds.a
+     [exec] Processing /apps/cvsbuild/star/lib/liberr.a
+     [exec] Processing /apps/cvsbuild/star/lib/liberr_standalone.a
+     [exec] Processing /apps/cvsbuild/star/lib/libpsx.a
+     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
+     [exec] Processing /apps/cvsbuild/star/lib/libprm.a
+     [exec] Processing /apps/cvsbuild/star/lib/libprm_a.a
+     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
+     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
+     [exec] Processing /apps/cvsbuild/star/lib/libems.a
+     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
+     [exec] rm -r -f temp
+     [echo] Executing Mirage target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
+     [echo] Executing TOPCAT target: build
+
+prepare:
+
+check_packages:
+
+build_demo:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
+     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
+
+build:
+    [javac] Compiling 75 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 56 files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 23 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+     [echo] Executing Treeview target: build
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/etc/demo
+     [gzip] Building: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar
+      [tar] Building tar: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 113 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:57: non-static method makeVOElement(javax.xml.transform.Source) cannot be referenced from a static context
+    [javac]             vocel = VOElementFactory.makeVOElement( xsrc );
+    [javac]                                     ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:222: non-static method makeVOElement(org.w3c.dom.Element,java.lang.String) cannot be referenced from a static context
+    [javac]                                        .makeVOElement( childEl, systemId )
+    [javac]                                        ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:230: cannot resolve symbol
+    [javac] symbol  : constructor ParamElement (org.w3c.dom.Element,java.lang.String)
+    [javac] location: class uk.ac.starlink.votable.ParamElement
+    [javac]                     params.add( new ParamElement( childEl, systemId ) );
+    [javac]                                 ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:234: non-static method makeVOElement(org.w3c.dom.Element,java.lang.String) cannot be referenced from a static context
+    [javac]                                 .makeVOElement( childEl, systemId ) );
+    [javac]                                 ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableDataNode.java:56: non-static method makeVOElement(javax.xml.transform.dom.DOMSource) cannot be referenced from a static context
+    [javac]             vocel = VOElementFactory.makeVOElement( getDocument() );
+    [javac]                                     ^
+    [javac] 5 errors
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/splat/build.xml:425: Compile failed; see the compiler error output for details.
+file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
 
-Total time: 46 seconds
+Total time: 1 minute 0 seconds

@@ -161,16 +161,19 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
      [echo] Executing TOPCAT target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
      [echo] Executing Treeview target: deinstall
 
 deinstall:
@@ -193,4 +196,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 10 seconds
+Total time: 11 seconds
