@@ -98,12 +98,12 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
          /*  Set up the intervals and starting intensities according to
              the differing number of parameters given */
          if ( prefs.nrad == 0 ) {
-
+            
             /*  No values given. The intervals follow the APM
                 description:
-
-                   Ii = It * 2^( i + 2 ), i = 2, NRAD
-
+                
+                Ii = It * 2^( i + 2 ), i = 2, NRAD
+                
                 where Ii = threshold for ith level, It = measurement
                 threshold. This gives approx 0.75 magnitude steps
                 ( = 2.5*log(2) )
@@ -111,7 +111,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
             for ( i = 1; i < NRAD; i++ ) {
                threshs[i] = field->thresh * pow( 2, i + 2 );
             }
-
+            
          } else if ( prefs.nrad == 1 ) {
 
             /*  Given interval in mags, starting point is analysis

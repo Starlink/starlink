@@ -1368,7 +1368,7 @@ assoc.o: define.h globals.h assoc.h types.h
 
 astrom.o: $(I_SUB2) define.h globals.h astrom.h types.h
 
-back.o: define.h globals.h back.h field.h types.h
+back.o: define.h globals.h back.h field.h types.h weight.h
 
 bpro.o: define.h globals.h fitscat.h bpro.h types.h
 
@@ -1453,6 +1453,8 @@ som.o: define.h globals.h fitscat.h som.h types.h
 weight.o: define.h globals.h field.h weight.h types.h
 
 pc.o: define.h globals.h types.h ast.h fitscat.h check.h image.h poly.h psf.h
+
+userradii.o: define.h globals.h plist.h userradii.h
 
 #-------------------------------------------------------------------------------
 #  Target for development purposes only:
