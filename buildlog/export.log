@@ -49,21 +49,21 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/FitsDate.java:38: warning - Tag @return cannot be used in constructor documentation.  It can only be used in the following types of documentation: method.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/FitsDate.java:39: warning - Tag @return cannot be used in constructor documentation.  It can only be used in the following types of documentation: method.
   [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/ColumnTable.java:254: warning - Tag @see: reference not found: ColumnTable.getColumn.
   [javadoc] Generating /apps/cvsbuild/java/source/tamfits/docs/tamfits/javadocs/stylesheet.css...
   [javadoc] 3 warnings
 
 dist:
-     [copy] Copying 5 files to /apps/cvsbuild/java/source/tamfits/docs/tamfits
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/tamfits/docs/tamfits
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/tamfits-0.93.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/tamfits/tamfits-0.93.tar
-     [gzip] Building: /apps/cvsbuild/export/tamfits-0.93.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/tamfits-0.93.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/tamfits/tamfits-0.93.tar
+      [zip] Building zip: /apps/cvsbuild/export/tamfits-0.96a.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/tamfits/tamfits-0.96a.tar
+     [gzip] Building: /apps/cvsbuild/export/tamfits-0.96a.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/tamfits-0.96a.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/tamfits/tamfits-0.96a.tar
      [echo] Executing axis target: export
 
 export:
@@ -76,18 +76,6 @@ create_archives:
      [gzip] Building: /apps/cvsbuild/export/axis-1.0b2.tar.gz
     [bzip2] Building: /apps/cvsbuild/export/axis-1.0b2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/axis/axis-1.0b2.tar
-     [echo] Executing dom4j target: export
-
-export:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/dom4j-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/dom4j/dom4j-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/dom4j-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/dom4j-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/dom4j/dom4j-0.1.tar
      [echo] Executing Jetty target: export
 
 export:
@@ -100,71 +88,6 @@ create_archives:
      [gzip] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.gz
     [bzip2] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
-     [echo] Executing JSky target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/classes
-    [javac] Compiling 332 source files to /apps/cvsbuild/java/source/jsky/build/classes
-     [copy] Copying 185 files to /apps/cvsbuild/java/source/jsky/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/lib/jsky
-     [copy] Copying 10 files to /apps/cvsbuild/java/source/jsky/lib/jsky
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/docs/jsky/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package jsky.app.jskycat...
-  [javadoc] Loading source files for package jsky.catalog...
-  [javadoc] Loading source files for package jsky.catalog.astrocat...
-  [javadoc] Loading source files for package jsky.catalog.gui...
-  [javadoc] Loading source files for package jsky.catalog.irsa...
-  [javadoc] Loading source files for package jsky.catalog.skycat...
-  [javadoc] Loading source files for package jsky.coords...
-  [javadoc] Loading source files for package jsky.graphics...
-  [javadoc] Loading source files for package jsky.html...
-  [javadoc] Loading source files for package jsky.image...
-  [javadoc] Loading source files for package jsky.image.fits...
-  [javadoc] Loading source files for package jsky.image.fits.codec...
-  [javadoc] Loading source files for package jsky.image.fits.gui...
-  [javadoc] Loading source files for package jsky.image.graphics...
-  [javadoc] Loading source files for package jsky.image.graphics.gui...
-  [javadoc] Loading source files for package jsky.image.gui...
-  [javadoc] Loading source files for package jsky.image.operator...
-  [javadoc] Loading source files for package jsky.navigator...
-  [javadoc] Loading source files for package jsky.science...
-  [javadoc] Loading source files for package jsky.timeline...
-  [javadoc] Loading source files for package jsky.util...
-  [javadoc] Loading source files for package jsky.util.gui...
-  [javadoc] Loading source files for package jsky.util.java2d...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
-     [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/jsky/jsky-2.0.tar
-     [gzip] Building: /apps/cvsbuild/export/jsky-2.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jsky-2.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/jsky/jsky-2.0.tar
      [echo] Executing UTIL target: export
 
 export:
@@ -175,8 +98,8 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 22 source files to /apps/cvsbuild/java/source/util/build/classes
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 29 source files to /apps/cvsbuild/java/source/util/build/classes
+     [copy] Copying 8 files to /apps/cvsbuild/java/source/util/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
@@ -198,19 +121,23 @@ javadocs:
   [javadoc]                               ^
   [javadoc] Standard Doclet version 1.4.1
 
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:141: cannot resolve symbol
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
   [javadoc] symbol: class CBZip2InputStream 
   [javadoc]             return new CBZip2InputStream( raw );
   [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 4 warnings
+  [javadoc] 8 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
@@ -261,4 +188,4 @@ create_archives:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/task/build.xml:516: /apps/cvsbuild/java/source/task/bin not found.
 
-Total time: 4 minutes 55 seconds
+Total time: 2 minutes 27 seconds

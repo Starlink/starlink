@@ -15,21 +15,7 @@ test:
      [echo] Executing axis target: test
 
 test:
-     [echo] Executing dom4j target: test
-
-test:
      [echo] Executing Jetty target: test
-
-test:
-     [echo] Executing JSky target: test
-
-prepare:
-
-check_packages:
-
-build:
-
-compile-tests:
 
 test:
      [echo] Executing UTIL target: test
@@ -45,28 +31,352 @@ compile-tests:
     [javac] Compiling 7 source files to /apps/cvsbuild/java/source/util/build/testcases
 
 run-tests:
-    [junit] Testsuite: TestProxySetupFrame
-    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.028 sec
+    [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.151 sec
 
-    [junit] Testcase: warning took 0.017 sec
-    [junit] 	FAILED
-    [junit] Class TestProxySetupFrame has no public constructor TestCase(String name)
-    [junit] junit.framework.AssertionFailedError: Class TestProxySetupFrame has no public constructor TestCase(String name)
-    [junit] 	at junit.framework.Assert.fail(Assert.java:51)
-    [junit] 	at junit.framework.TestSuite$1.runTest(TestSuite.java:225)
-    [junit] 	at junit.framework.TestCase.runBare(TestCase.java:140)
-    [junit] 	at junit.framework.TestResult$1.protect(TestResult.java:106)
-    [junit] 	at junit.framework.TestResult.runProtected(TestResult.java:124)
-    [junit] 	at junit.framework.TestResult.run(TestResult.java:109)
-    [junit] 	at junit.framework.TestCase.run(TestCase.java:131)
-    [junit] 	at junit.framework.TestSuite.runTest(TestSuite.java:173)
-    [junit] 	at junit.framework.TestSuite.run(TestSuite.java:168)
-    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:325)
-    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:536)
+    [junit] Testcase: testGetChildElementByName took 0.056 sec
+    [junit] Testcase: testGetTextContent took 0.022 sec
+    [junit] Testcase: testRelativizeDOM took 0.068 sec
+    [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.288 sec
 
-    [junit] Testcase: warning
+    [junit] Testcase: testData took 1.046 sec
+    [junit] Testcase: testIntro took 1.031 sec
+    [junit] Testcase: testStream took 0.701 sec
+    [junit] Testcase: testHybridStream took 0.491 sec
+    [junit] Testcase: testCombo1 took 0.835 sec
+    [junit] Testcase: testResourceStream took 0.178 sec
+    [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.073 sec
+
+    [junit] Testcase: testTraversal took 0.067 sec
+    [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.174 sec
+
+    [junit] Testcase: testGetDOM took 0.165 sec
+    [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.157 sec
+
+    [junit] Testcase: testFlags took 0.13 sec
+    [junit] Testcase: testAssertSource took 0.022 sec
+    [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.067 sec
+
+    [junit] Testcase: testXMLEncodeAndDecode took 0.06 sec
+
+test:
+     [echo] Executing Task target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/task/build/testcases
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/task/build/testcases
+
+run-tests:
+
+test:
+     [echo] Executing JNIAST target: test
+
+prepare:
+
+check_packages:
+
+get_ast_source:
+    [untar] Expanding: /apps/cvsbuild/java/source/jniast/src/ast/ast_source.tar into /apps/cvsbuild/java/source/jniast/build/ast
+
+assemble_java:
+
+build_classes:
+
+assemble_jni:
+    [javah] ClassArgument.name=uk.ac.starlink.ast.AstException
+    [javah] ClassArgument.name=uk.ac.starlink.ast.AstObject
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Channel
+    [javah] ClassArgument.name=uk.ac.starlink.ast.CmpFrame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.CmpMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.FitsChan
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Frame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.FrameSet
+    [javah] ClassArgument.name=uk.ac.starlink.ast.IntraMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.LutMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Mapping
+    [javah] ClassArgument.name=uk.ac.starlink.ast.MathMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.MatrixMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.PcdMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.PermMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Plot
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SkyFrame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SlaMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SpecFrame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SpecMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SphMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.UnitMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.WcsMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.WinMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.ZoomMap
+    [javah] [Search path = /apps/jdk-1.4.1_02/jre/lib/rt.jar:/apps/jdk-1.4.1_02/jre/lib/i18n.jar:/apps/jdk-1.4.1_02/jre/lib/sunrsasign.jar:/apps/jdk-1.4.1_02/jre/lib/jsse.jar:/apps/jdk-1.4.1_02/jre/lib/jce.jar:/apps/jdk-1.4.1_02/jre/lib/charsets.jar:/apps/jdk-1.4.1_02/jre/classes:/apps/cvsbuild/java/source/jniast/build/classes]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstException.class]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/lang/RuntimeException.class)]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/lang/Exception.class)]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/lang/Throwable.class)]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/lang/Object.class)]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstException.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstObject.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstObject.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Channel.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Channel.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/CmpFrame.class]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Frame.class]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Mapping.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_CmpFrame.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/CmpMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_CmpMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/FitsChan.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_FitsChan.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/FrameSet.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Frame.h]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_FrameSet.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/IntraMap.class]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Transformer.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_IntraMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/LutMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_LutMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Mapping$Interpolator.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Mapping.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/MathMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_MathMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/MatrixMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_MatrixMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PcdMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PcdMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PermMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PermMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Plot.class]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/awt/geom/Rectangle2D.class)]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/awt/geom/RectangularShape.class)]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Plot.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SkyFrame.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SkyFrame.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SlaMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SlaMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SpecFrame.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SpecFrame.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SpecMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SpecMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SphMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SphMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/UnitMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_UnitMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/WcsMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_WcsMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/WinMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_WinMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/ZoomMap.class]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_ZoomMap.h]
+
+build_jni:
+     [echo] If C compilation fails you may have the wrong AST version - see README
+
+execute_mk_script:
+     [echo] java.home=/apps/jdk-1.4.1_02/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] gcc -I. -I/stardev/local/include -I/apps/jdk-1.4.1_02/jre/../include -I/apps/jdk-1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c AstException.c
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]            for f in `../jniast_libraries` ""; do \
+     [exec]            echo "Processing $f"; \
+     [exec]            if test -n "$f"; then \
+     [exec]               ar x $f; \
+     [exec]            fi;\
+     [exec]         done)
+     [exec] Processing /apps/cvsbuild/star/lib/libast.a
+     [exec] Processing /apps/cvsbuild/star/lib/libast_wcslib.a
+     [exec] Processing /apps/cvsbuild/star/lib/libast_slalib.a
+     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
+     [exec] Processing /apps/cvsbuild/star/lib/libast_pass2.a
+     [exec] Processing 
+     [exec] f() { gcc -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/jniast/lib/i386/libjniast.so 'jniast.o err_jniast.o AstException.o AstObject.o Channel.o CmpFrame.o CmpMap.o FitsChan.o Frame.o FrameSet.o IntraMap.o LutMap.o Mapping.o MathMap.o MatrixMap.o PcdMap.o PermMap.o Plot.o SkyFrame.o SlaMap.o SpecFrame.o SpecMap.o SphMap.o UnitMap.o WcsMap.o WinMap.o ZoomMap.o temp/*.o' '';\
+     [exec] rm -r -f temp
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/testcases
+    [javac] Compiling 2 source files to /apps/cvsbuild/java/source/jniast/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.ast.AstTest
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 6.726 sec
+
+    [junit] Testcase: testAstObject took 0.333 sec
+    [junit] Testcase: testChannel took 0.003 sec
+    [junit] Testcase: testFitsChan took 0.021 sec
+    [junit] Testcase: testFrame took 0.005 sec
+    [junit] Testcase: testFrameSet took 0.003 sec
+    [junit] Testcase: testGeometry took 0.004 sec
+    [junit] Testcase: testMapping took 0.121 sec
+    [junit] Testcase: testPlot took 6.213 sec
+    [junit] Testcase: testAstConstants took 0.01 sec
+    [junit] Testcase: testSpecMap took 0.002 sec
+    [junit] Testcase: testSpecFrame took 0.004 sec
+    [junit] Testcase: testException took 0 sec
+    [junit] Testsuite: uk.ac.starlink.ast.xml.XAstTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.163 sec
+
+    [junit] Testcase: testReadWriteElement took 0.125 sec
+    [junit] Testcase: testReadWriteSource took 0.017 sec
+    [junit] Testcase: testExceptions took 0.015 sec
+
+test:
+     [echo] Executing ASTGUI target: test
+
+test:
+     [echo] Executing JNIHDS target: test
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+assemble_jni:
+    [javah] ClassArgument.name=uk.ac.starlink.hds.HDSObject
+    [javah] [Search path = /apps/jdk-1.4.1_02/jre/lib/rt.jar:/apps/jdk-1.4.1_02/jre/lib/i18n.jar:/apps/jdk-1.4.1_02/jre/lib/sunrsasign.jar:/apps/jdk-1.4.1_02/jre/lib/jsse.jar:/apps/jdk-1.4.1_02/jre/lib/jce.jar:/apps/jdk-1.4.1_02/jre/lib/charsets.jar:/apps/jdk-1.4.1_02/jre/classes:/apps/cvsbuild/java/source/jnihds/build/classes]
+    [javah] [Loaded /apps/cvsbuild/java/source/jnihds/build/classes/uk/ac/starlink/hds/HDSObject.class]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/lang/Object.class)]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/nio/ByteBuffer.class)]
+    [javah] [Loaded /apps/jdk-1.4.1_02/jre/lib/rt.jar(java/nio/Buffer.class)]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jnihds/build/jni/uk_ac_starlink_hds_HDSObject.h]
+
+build_jni:
+
+execute_mk_script:
+     [echo] java.home=/apps/jdk-1.4.1_02/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] make: Nothing to be done for `shared'.
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jnihds/build/testcases
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/jnihds/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.hds.HDSObjectTest
+    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.315 sec
+
+    [junit] Testcase: testConstants took 0.151 sec
+    [junit] Testcase: testFileOperations took 0.01 sec
+    [junit] Testcase: testObject took 0 sec
+    [junit] Testcase: testProperties took 0.016 sec
+    [junit] Testcase: testGet took 0.018 sec
+    [junit] Testcase: testPut took 0.091 sec
+    [junit] Testcase: testWrite took 0.001 sec
+    [junit] Testcase: testMap took 0.022 sec
+
+test:
+     [echo] Executing HDX target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/build/testcases
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/hdx/build/testcases
+
+run-tests:
+    [junit] Running uk.ac.starlink.hdx.HdxTest
+    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.179 sec
+    [junit] Testsuite: uk.ac.starlink.hdx.HdxTest
+    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.179 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] 09-Sep-2003 13:47:09 uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
+    [junit] 09-Sep-2003 13:47:10 uk.ac.starlink.hds.HDSPackage isAvailable
+    [junit] WARNING: JNIHDS native library not on java.library.path - no NDF/HDS access
+    [junit] ------------- ---------------- ---------------
+    [junit] Testcase: testURIResolution(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.ExceptionInInitializerError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Caused by: uk.ac.starlink.hdx.PluginException: Failed to load class uk.ac.starlink.hds.NDFNdxHandler (java.lang.LinkageError: Native code for the JNIHDS package is not installed)
+    [junit] 	at uk.ac.starlink.hdx.HdxFactory.<clinit>(HdxFactory.java:172)
+    [junit] 	... 10 more
+
+
+    [junit] Testcase: testHdxDocumentImportNode(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testTreeManipulations(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testText(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testBackingElements(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testBackingElementNamespaced(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testNamespaceParsing(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testToSource(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testHashCode(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testCloneNode(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
+    [junit] Testcase: testObjectOverrides(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
+    [junit] null
+    [junit] java.lang.NoClassDefFoundError
+    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+
+
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/util/build.xml:860: Test TestProxySetupFrame failed
+file:/apps/cvsbuild/java/source/hdx/build.xml:908: Test uk.ac.starlink.hdx.HdxTest failed
 
-Total time: 6 seconds
+Total time: 32 seconds

@@ -24,24 +24,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/axis/.axis.install
-     [echo] Executing dom4j target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/dom4j/.dom4j.install
      [echo] Executing Jetty target: deinstall
 
 deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/jetty/.jetty.install
-     [echo] Executing JSky target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/jsky/.jsky.install
      [echo] Executing UTIL target: deinstall
 
 deinstall:
@@ -78,12 +66,6 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/hdx/.hdx.install
-     [echo] Executing compatibility NDArray target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/oldarray/.oldarray.install
      [echo] Executing NDArray target: deinstall
 
 deinstall:
@@ -120,78 +102,76 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/fits/.fits.install
+     [echo] Executing DIVA target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing JSky target: deinstall
+
+deinstall:
+
+real_deinstall:
      [echo] Executing Pal target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing VOTable target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/votable/.votable.install
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/.jaiutil.install
      [echo] Executing SOAPSERVER target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/.soapserver.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/sog/.sog.install
      [echo] Executing SPLAT target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
      [echo] Executing TOPCAT target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
      [echo] Executing Treeview target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Coco target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/coco/.coco.install
      [echo] Executing RV target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/rv/.rv.install
      [echo] Executing FROG target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 clean:
 
@@ -208,19 +188,9 @@ clean:
      [echo] Executing axis target: clean
 
 clean:
-     [echo] Executing dom4j target: clean
-
-clean:
      [echo] Executing Jetty target: clean
 
 clean:
-     [echo] Executing JSky target: clean
-
-clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/docs
      [echo] Executing UTIL target: clean
 
 clean:
@@ -259,9 +229,6 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/hdx/build
    [delete] Deleting directory /apps/cvsbuild/java/source/hdx/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/hdx/docs
-     [echo] Executing compatibility NDArray target: clean
-
-clean:
      [echo] Executing NDArray target: clean
 
 clean:
@@ -300,89 +267,60 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/build
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/docs
+     [echo] Executing DIVA target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/diva/build
+     [echo] Executing JSky target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/build
      [echo] Executing Pal target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/docs
      [echo] Executing VOTable target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/votable/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/votable/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/votable/docs
      [echo] Executing JAIUtil target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/docs
      [echo] Executing SOAPSERVER target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/docs
      [echo] Executing SOG target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/sog/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/sog/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/sog/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/sog/docs
      [echo] Executing SPLAT target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/splat/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/splat/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/splat/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/splat/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/splat/etc
      [echo] Executing Mirage target: clean
 
 clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/docs
      [echo] Executing TOPCAT target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/topcat/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/etc
      [echo] Executing Treeview target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
      [echo] Executing Coco target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/coco/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/coco/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/coco/docs
      [echo] Executing RV target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/rv/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/rv/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/rv/docs
      [echo] Executing FROG target: clean
 
 clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 export-full-source:
       [zip] Building zip: /apps/cvsbuild/export/starjava-sources.zip
@@ -399,22 +337,14 @@ javadoc-sources:
      [echo] Executing axis target: javadoc-sources
 
 javadoc-sources:
-     [echo] Executing dom4j target: javadoc-sources
-
-javadoc-sources:
      [echo] Executing Jetty target: javadoc-sources
 
 javadoc-sources:
-     [echo] Executing JSky target: javadoc-sources
-
-javadoc-sources:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/java
-     [copy] Copying 332 files to /apps/cvsbuild/java/source/jsky/build/java
      [echo] Executing UTIL target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 24 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 36 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -437,7 +367,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astgui/build/java
-     [copy] Copying 47 files to /apps/cvsbuild/java/source/astgui/build/java
+     [copy] Copying 49 files to /apps/cvsbuild/java/source/astgui/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/astgui/build/java
      [echo] Executing JNIHDS target: javadoc-sources
 
@@ -450,9 +380,6 @@ javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/build/java
      [copy] Copying 18 files to /apps/cvsbuild/java/source/hdx/build/java
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/hdx/build/java
-     [echo] Executing compatibility NDArray target: javadoc-sources
-
-javadoc-sources:
      [echo] Executing NDArray target: javadoc-sources
 
 prepare:
@@ -466,12 +393,12 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/ndx/build/java
-     [copy] Copying 12 files to /apps/cvsbuild/java/source/ndx/build/java
+     [copy] Copying 13 files to /apps/cvsbuild/java/source/ndx/build/java
      [echo] Executing Table target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 63 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 64 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -488,6 +415,17 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
      [copy] Copying 11 files to /apps/cvsbuild/java/source/fits/build/java
+     [echo] Executing DIVA target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 792 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
+     [echo] Executing JSky target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/java
+     [copy] Copying 332 files to /apps/cvsbuild/java/source/jsky/build/java
      [echo] Executing Pal target: javadoc-sources
 
 javadoc-sources:
@@ -497,7 +435,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/java
-     [copy] Copying 26 files to /apps/cvsbuild/java/source/votable/build/java
+     [copy] Copying 25 files to /apps/cvsbuild/java/source/votable/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -511,9 +449,13 @@ javadoc-sources:
      [echo] Executing SOG target: javadoc-sources
 
 javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/build/java
+     [copy] Copying 34 files to /apps/cvsbuild/java/source/sog/build/java
      [echo] Executing SPLAT target: javadoc-sources
 
 javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 157 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -521,12 +463,12 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 35 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 37 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 87 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 109 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
@@ -542,11 +484,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1294 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1558 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 38 seconds
+Total time: 1 minute 43 seconds
