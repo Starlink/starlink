@@ -16,6 +16,8 @@ ps.stamp: dvi2bitmap.latex.stamp
 	rm -f $$ROOT.ps.gz ;\
 	$(MAKE) $$ROOT.ps.gz
 
+dvi2bitmap.html.stamp: dvi2bitmap.sgml dvi2bitmap.imgeq.list.stamp
+
 index.html: dvi2bitmap.html.stamp
 	ln -sf `awk -F: '{print $$1}' $<`.html $@
 
