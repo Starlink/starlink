@@ -1,7 +1,28 @@
-*+  REDS_WTFN_REBIN - routine to rebin demodulated SCUBA data onto output map
-*                       by convolution with a weighting function
       SUBROUTINE REDS_WTFN_REBIN (METHOD, STATUS)
-*    Description :
+*+
+*  Name:
+*     REDS_WTFN_REBIN
+
+*  Purpose:
+*     routine to rebin demodulated SCUBA data onto output map
+*     by convolution with a weighting function.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL REDS_WTFN_REBIN (METHOD, STATUS)
+
+*  Arguments:
+*     METHOD = CHARACTER * ()  (Given)
+*        The rebin method (BESSEL or LINEAR)
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+
+*  Description:
 *     This routine rebins the demodulated data from SCUBA MAP observations
 *     onto a rectangular mesh by convolving it with a weighting function.
 *     The width of the Bessel function is such that it should preserve all
@@ -15,43 +36,105 @@
 *     (the F.T. of the Bessel function), then transforming back into image
 *     space.
 *
-*     A linear weighting function is also available.
+*     A linear weighting function is also available which works out
+*     to one half-width..
 *
 *     The application can read in up to 10 separate input datasets. The 
-*     output map will be large enough 
-*    Invocation :
-*     CALL REDS_WTFN_REBIN (STATUS)
-*    Parameters :
-*     STATUS          = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     J.Lightfoot (JFL/ROE)
-*    History :
+*     output map will be large enough to include all data points.
+
+*  Usage:
+*     Invoked via the REBIN command.
+
+*  Parameters:
+*     IN = _CHAR (Read)
+*        The name of the input file to be rebinned. This parameter is requested
+*        repeatedly until a NULL value (!) is supplied.
+*     INTEGRATIONS = _INTEGER (Read)
+*        The inegrations that should be selected from the input data. Pass
+*        zero to select all integration (ie if you have gone into this mode
+*        by mistake). This question is only asked if SELECT_INTS is true [0]
+*     LAT_OUT = _CHAR (Read)
+*        The latitude of the output map centre [map centre of first map]
+*     LONG_OUT = _CHAR (Read)
+*        The longitude of the output map centre [map centre of first map]
+*     OUT = NDF (Write)
+*        The name of the NDF that will contain the rebinned map.
+*     OUT_COORDS = _CHAR (Read)
+*        The coordinate system of the output map. []
+*     OUT_OBJECT = _CHAR (Read)
+*        The name of the object (ie the NDF title). []
+*     PIXSIZE_OUT = _REAL (Read)
+*        Size of pixels in the output map
+*     REBIN_METHOD = _CHAR (Read)
+*        The rebin method to be used.[bessel]
+*     SELECT_INTS = _LOGICAL (Read)
+*        This parameter governs whether the user wishes to select any
+*        integrations for special treatment.[no]
+*     SHIFT_DX = _REAL (Read)
+*        The pointing shift (in X) to be applied that would bring the
+*        maps in line.
+*     SHIFT_DY = _REAL (Read)
+*        The pointing shift (in Y) to be applied that would bring the
+*        maps in line.
+*     USE_INTS = _LOGICAL (Read)
+*        If you wish to discard the integrations specified by the INTEGRATIONS
+*        parameter then select 'no'. If you wish to rebin a map using only
+*        the specified integrations select 'yes' [yes]
+*     WEIGHT = _REAL (Read)
+*        The relative weight that should be assigned to each dataset.[1.0]
+
+*  Examples:
+*     rebin REBIN_METHOD=LINEAR
+
+*  Notes: 
+*     For each file name that is entered, values for the parameters
+*     SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+
+*  Implementation status:
+*     - Can rebin using LINEAR or BESSEL weighting functions
+*     - Handles quality array (and bad values) correctly
+
+*  Authors :
+*     JFL: J.Lightfoot (ROE)
+*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+*  History :
 *     $Id$
 *     16-JUL-1995: Original version.
-*    endhistory
-*    Type Definitions :
+*     $Log$
+*     Revision 1.12  1996/10/30 00:30:41  timj
+*     Added GLOBAL default for IN parameter.
+*     Fixed bug (segmentation fault) when error occurs before NDF_STATE.
+*     Replace calls to SCULIB_COPY? with VEC_?TO?
+*
+*  endhistory
+
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+
+* Type Definitions :
       IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+
+* Global constants :
+      INCLUDE 'DAT_PAR'                ! DAT__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
+      INCLUDE 'PAR_ERR'                ! for PAR__ constants
       INCLUDE 'REDS_SYS'               ! REDS definitions
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+      INCLUDE 'SAE_PAR'                ! SSE global definitions
+
+* Arguments Given:
+      CHARACTER * (*)  METHOD
+
+* Status :
       INTEGER STATUS
-*    External references :
+* External references :
       INTEGER CHR_LEN                  ! CHR used-string-length function
-*    Global variables :
-*    Local Constants :
-      INTEGER          MAX__INT                  ! max number of integrations 
-      PARAMETER (MAX__INT = 20)                  ! that can be specified
+
+* Local Constants :
+      INTEGER          MAX__INT        ! max number of integrations 
+      PARAMETER (MAX__INT = 20)        ! that can be specified
       REAL DIAMETER                    ! diameter of JCMT mirror
       PARAMETER (DIAMETER = 15.0)
       INTEGER WTFNRES                  ! number of values per scale length
@@ -138,6 +221,7 @@
       INTEGER          I               ! DO loop index
       INTEGER          ID              ! day of an input observation
       INTEGER          IEND            ! index of end of sub-string
+      INTEGER          IERR            ! Position of error from VEC_
       INTEGER          IHOUR           ! hour in which observation started
       INTEGER          IM              ! month in which observation started
       INTEGER          IMIN            ! minute at which observation started
@@ -207,6 +291,7 @@
       INTEGER          IN_VARIANCE_PTR (MAX_FILE)
                                        ! pointer to scratch space holding
                                        ! data variance from input files
+      INTEGER          IPAR            ! ID for DUMMY  parameter
       INTEGER          ISTART          ! index of start of sub-string
       INTEGER          ITEMP           ! scratch integer
       INTEGER          IY              ! year in which input observation started
@@ -234,10 +319,10 @@
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
       INTEGER          MEASUREMENT     ! measurement index in DO loop
-      CHARACTER*15     METHOD          ! rebin method
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs of all
                                        ! measured positions are calculated
       INTEGER          NDIM            ! the number of dimensions in an array
+      INTEGER          NERR            ! Number of errors from VEC_
       INTEGER          NP              ! size of P array in call to IRA_CREAT
       INTEGER          NREC            ! number of history records in input file
       INTEGER          NX_OUT          ! x dimension of output map
@@ -351,15 +436,16 @@
       CHARACTER* 20    XLAB            ! X label for output map
       CHARACTER* 20    YLAB            ! Y label for output map
       
-
+* Some extra which wont be in the final release...
       REAL T0, T1
       REAL SECNDS
       EXTERNAL SECNDS
-*    Internal References :
-*    Local data :
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+* Start up the error system
+      CALL ERR_BEGIN(STATUS)
 
 * Make sure the Pointers really are 0
 
@@ -401,21 +487,25 @@
 
 *  read the name of the file to be read
 
+*     Read in the GLOBAL value first
          IF (FILE .EQ. 1) THEN
-            FILENAME (FILE) = ' '
+            CALL SUBPAR_FINDPAR( 'DUMMY', IPAR, STATUS)
+            CALL SUBPAR_GETNAME(IPAR, STEMP, STATUS)
+            CALL PAR_DEF0C('IN', STEMP, STATUS)
          ELSE
-            FILENAME (FILE) = 'end'
+*           Make sure the parameter is cancelled and DEFAULT (NULL) used
+            CALL PAR_CANCL('IN', STATUS)
+            CALL PAR_UNSET('IN', 'DEFAULT', STATUS)
          END IF
-
-         CALL PAR_DEF0C ('IN', FILENAME(FILE), STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_GET0C('IN', FILENAME(FILE), STATUS)
             CALL NDF_EXIST ('IN', 'READ', IN_NDF, STATUS)
 
-            IF (IN_NDF .EQ. NDF__NOID) THEN
+            IF (IN_NDF .EQ. NDF__NOID .OR. STATUS .EQ. PAR__NULL) THEN
                FILE = FILE - 1
                READING = .FALSE.
+               CALL ERR_ANNUL(STATUS)
             ELSE IF (FILE .GT. MAX_FILE) THEN
                CALL NDF_ANNUL (IN_NDF, STATUS)
                READING = .FALSE.
@@ -442,7 +532,7 @@
      :           STATUS)
                IF (STATUS .NE. SAI__OK) THEN
                   CALL ERR_ANNUL (STATUS)
-                  IN_REDSX_LOC = ' '
+                  IN_REDSX_LOC = DAT__NOLOC
                END IF
             END IF
 
@@ -477,7 +567,8 @@
             CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE '//
      :        'observation of ^OBJECT with ^SAMPLE sampling', STATUS)
 
-            IF (OBSERVING_MODE .NE. 'MAP') THEN
+            IF (OBSERVING_MODE .NE. 'MAP'.AND.
+     :           OBSERVING_MODE.NE.'POINTING') THEN
                IF (STATUS .EQ. SAI__OK) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the file '//
@@ -518,33 +609,51 @@
                END IF
 
                IF (STATUS .EQ. SAI__OK) THEN
+                  CALL ERR_MARK
                   IF (.NOT. REDUCE_SWITCH) THEN
                      STATUS = SAI__ERROR
                      CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
      :                 'REDUCE_SWITCH application has not been run '//
-     :                 'on the input file', STATUS)
+     :                 'on the input file. Please try again.', STATUS)
+                     CALL ERR_FLUSH(STATUS)
+                     CALL ERR_RLSE
+                     FILE = FILE - 1
+                     GO TO 1
                   END IF
 
                   IF (.NOT. EXTINCTION) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
-     :                 'EXTINCTION application has not been run on '//
-     :                 'the input file', STATUS)
+                     CALL ERR_REP (' ','REDS_BESSEL_REBIN: '//
+     :                 'the input data has not been corrected for '//
+     :                 'EXTINCTION. Please try again.', STATUS)
+                     CALL ERR_FLUSH(STATUS)
+                     CALL ERR_RLSE
+                     FILE = FILE - 1
+                     GO TO 1
                   END IF
 
 		  IF (.NOT. FLATFIELD) THEN
                      STATUS = SAI__ERROR
                      CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
      :                 'FLATFIELD application has not been run on '//
-     :                 'the input file', STATUS)
+     :                 'the input file. Please try again.', STATUS)
+                     CALL ERR_FLUSH(STATUS)
+                     CALL ERR_RLSE
+                     FILE = FILE - 1
+                     GO TO 1
                   END IF
 
                   IF (REBIN) THEN
                      STATUS = SAI__ERROR
                      CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
      :                 'REBIN application has already been run on '//
-     :                 'the input file', STATUS)
+     :                 'the input file. Please try again.', STATUS)
+                     CALL ERR_FLUSH(STATUS)
+                     CALL ERR_RLSE
+                     FILE = FILE - 1
+                     GO TO 1
                   END IF
+                  CALL ERR_RLSE
                END IF
             END IF
 
@@ -740,20 +849,6 @@
             END IF
 
 
-*  calculate the apparent RA and Dec of the map centre at IN_UT1
-
-            CALL SCULIB_CALC_APPARENT (IN_LONG_RAD, IN_LAT_RAD,
-     :        IN_LONG2_RAD, IN_LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), 
-     :        IN_CENTRE_COORDS, IN_UT1, IN_MJD1, IN_MJD2, IN_RA_CEN,
-     :        IN_DEC_CEN, IN_ROTATION, STATUS)
-
-*  set the default map centre to that of the first component observation
-
-            IF (FILE .EQ. 1) THEN
-               OUT_RA_CEN = IN_RA_CEN
-               OUT_DEC_CEN = IN_DEC_CEN
-            END IF
-
 *  map the various components of the data array and check the data
 *  dimensions
 
@@ -764,8 +859,10 @@
      :        FILE_DATA_PTR, ITEMP, STATUS)
 
 * Need to check if FIGARO has removed the VARIANCE array
+
             CALL NDF_STATE(IN_NDF, 'VARIANCE', STATE, STATUS)
 
+            IF (STATUS .EQ. SAI__OK) THEN
             IF (STATE) THEN
                CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ',
      :              FILE_VARIANCE_PTR, ITEMP, STATUS)
@@ -782,6 +879,7 @@
      :              %VAL(DUMMY_VARIANCE_PTR(FILE)))
                FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR(FILE)
             END IF               
+            END IF
  
             IF (STATUS .EQ. SAI__OK) THEN
                IF ((NDIM .NE. 2)    .OR.
@@ -906,6 +1004,20 @@
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
 
+*  calculate the apparent RA and Dec of the map centre at IN_UT1
+
+            CALL SCULIB_CALC_APPARENT (IN_LONG_RAD, IN_LAT_RAD,
+     :           IN_LONG2_RAD, IN_LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), 
+     :           IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
+     :           IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
+     :           STATUS)
+
+*  set the default map centre to that of the first component observation
+
+            IF (FILE .EQ. 1) THEN
+               OUT_RA_CEN = IN_RA_CEN
+               OUT_DEC_CEN = IN_DEC_CEN
+            END IF
 
 *  get the bolometer description arrays
 
@@ -1260,13 +1372,15 @@
      :        IN_VARIANCE_PTR(FILE), IN_VARIANCE_END(FILE), STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_COPYR (N_POS(FILE) * N_BOL(FILE), 
-     :           %val(FILE_DATA_PTR),
-     :           %val(IN_DATA_PTR(FILE)))
-               CALL SCULIB_COPYR (N_POS(FILE) * N_BOL(FILE),
-     :           %val(FILE_VARIANCE_PTR),
-     :           %val(IN_VARIANCE_PTR(FILE)))
+               CALL VEC_RTOR(.FALSE., N_POS(FILE) * N_BOL(FILE),
+     :              %VAL(FILE_DATA_PTR), %VAL(IN_DATA_PTR(FILE)), IERR,
+     :              NERR, STATUS)
+               CALL VEC_RTOR(.FALSE., N_POS(FILE) * N_BOL(FILE),
+     :              %VAL(FILE_VARIANCE_PTR), 
+     :              %VAL(IN_VARIANCE_PTR(FILE)), IERR, NERR, STATUS)
+
             END IF
+
 
 *  Maybe we only want to rebin some of the integrations
 
@@ -1352,9 +1466,9 @@
      :                       N_INTEGRATIONS + INTEGRATION - 1) *
      :                       N_EXPOSURES + EXPOSURE - 1) *
      :                       N_SWITCHES + I - 1
-                           CALL SCULIB_COPYD (1,
-     :                       %val(IN_LST_STRT_PTR + DATA_OFFSET *
-     :                       VAL__NBD), DTEMP)
+                           CALL VEC_DTOD(.FALSE., 1,
+     :                          %val(IN_LST_STRT_PTR + DATA_OFFSET *
+     :                          VAL__NBD), DTEMP, IERR, NERR, STATUS)
                            EXP_LST = EXP_LST + DTEMP
                         END DO
                         EXP_LST = EXP_LST / DBLE (N_SWITCHES)
@@ -1362,18 +1476,18 @@
 *  get the scan parameters for a raster map
 
                         IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                           CALL SCULIB_COPYR (1, 
-     :                       %val(IN_RA_STRT_PTR + DATA_OFFSET *
-     :                       VAL__NBR), RA_START)
-                           CALL SCULIB_COPYR (1, 
-     :                       %val(IN_RA_VEL_PTR + DATA_OFFSET *
-     :                       VAL__NBR), RA_VEL)
-                           CALL SCULIB_COPYR (1, 
-     :                       %val(IN_DEC_STRT_PTR + DATA_OFFSET *
-     :                       VAL__NBR), DEC_START)
-                           CALL SCULIB_COPYR (1, 
-     :                       %val(IN_DEC_VEL_PTR + DATA_OFFSET *
-     :                       VAL__NBR), DEC_VEL)
+                           CALL VEC_RTOR(.FALSE., 1,
+     :                          %val(IN_RA_STRT_PTR + DATA_OFFSET *
+     :                          VAL__NBR), RA_START, IERR, NERR, STATUS)
+                           CALL VEC_RTOR(.FALSE., 1,
+     :                          %val(IN_RA_VEL_PTR + DATA_OFFSET *
+     :                          VAL__NBR), RA_VEL, IERR, NERR, STATUS)
+                           CALL VEC_RTOR(.FALSE., 1,
+     :                          %val(IN_DEC_STRT_PTR + DATA_OFFSET *
+     :                          VAL__NBR), DEC_START, IERR, NERR,STATUS)
+                           CALL VEC_RTOR(.FALSE., 1,
+     :                          %val(IN_DEC_VEL_PTR + DATA_OFFSET *
+     :                          VAL__NBR), DEC_VEL, IERR, NERR, STATUS)
                         END IF
 
 *  find where the exposure starts and finishes in the data array
@@ -1471,17 +1585,20 @@
             CALL PAR_CANCL ('WEIGHT', STATUS)
             CALL PAR_CANCL ('SHIFT_DX', STATUS)
             CALL PAR_CANCL ('SHIFT_DY', STATUS)
+            CALL PAR_CANCL ('SELECT_INTS', STATUS)
 
 *  annul locators and array identifiers and close the file
 
-            CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
-            CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
-            IF (IN_REDSX_LOC .NE. ' ') THEN
-               CALL DAT_ANNUL (IN_REDSX_LOC, STATUS)
-            END IF
-
             CALL ARY_ANNUL (IN_DEM_PNTR_ARY, STATUS)
             CALL ARY_ANNUL (IN_LST_STRT_ARY, STATUS)
+
+ 1          CONTINUE   ! Jump here if error before mapping ARY
+
+            CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
+            CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
+            IF (IN_REDSX_LOC .NE. DAT__NOLOC) THEN
+               CALL DAT_ANNUL (IN_REDSX_LOC, STATUS)
+            END IF
 
             CALL NDF_ANNUL (IN_NDF, STATUS)
             CALL PAR_CANCL ('IN', STATUS)
@@ -1492,6 +1609,7 @@
          IF (STATUS .NE. SAI__OK) THEN
             READING = .FALSE.
          END IF
+
 
       END DO
 
@@ -1616,8 +1734,8 @@
 *  calculate the apparent RA,Dec of the selected output centre
 
       CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
-     :  0.0D0, 0.0D0, OUT_COORDS, MJD_STANDARD, 0.0D0, 0.0D0,
-     :  OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
+     :     0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
+     :     OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
 *  get the pixel spacing of the output map
 
@@ -1988,6 +2106,7 @@
 
       CALL IRA_CLOSE (STATUS)
       CALL NDF_END (STATUS)
+      CALL ERR_END(STATUS)
  
       END
 
