@@ -93,6 +93,9 @@
  
 *  History:
 *     $Log$
+*     Revision 1.6  1999/07/05 02:20:08  timj
+*     Fix args to surf_read_rebin_ndf
+*
 *     Revision 1.5  1999/05/15 01:48:42  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -139,6 +142,12 @@
       PARAMETER (NDIM = 3)
 
 * Local variables:
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2) 
+                                       ! Angles (wplate,angrot) for each
+                                       ! integration (polarimetry) 
+      REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
+                                       ! Angles (wplate,angrot) for each
+                                       ! measurement (polarimetry) 
       REAL    BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! Bolometer weights
       INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -173,6 +182,8 @@
       INTEGER ITEMP                     ! scratch integer
       INTEGER LBND(NDIM)                ! Lower bounds of output array
       INTEGER LST_PTR(2)                ! Array of pointers to LST (start/end)
+      INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
+                                       ! pointers to start of each measurement
       INTEGER NERR                      ! Number of errors in VEC_ copy
       INTEGER NSPEC                     ! Number of SCUBA sections
       INTEGER N_BEAM                    ! Number of beams requested
@@ -180,6 +191,7 @@
       INTEGER N_FILE                    ! File number (always 1)
       INTEGER N_FITS                    ! Number of fits entries in input
       INTEGER N_INTS                    ! Number of integrations in file
+      INTEGER N_MEAS                    ! Number of measurements in file
       INTEGER N_POS                     ! Number of samples (time axis)
       INTEGER N_PTS                     ! Number of points per beam
       CHARACTER * 40 OBJECT             ! name of object
@@ -274,7 +286,7 @@
 
       CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
      :     NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :     N_BOL, N_POS, N_INTS, N_BEAM,
+     :     N_BOL, N_POS, N_INTS, N_MEAS, N_BEAM,
      :     IN_UT1, IN_UT1, IN_RA_CEN, 
      :     IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, SUB_INSTRUMENT, 
      :     OBJECT, UTDATE, UTSTART, 
@@ -284,7 +296,7 @@
      :     DATA_END, VARIANCE_PTR,
      :     VARIANCE_END, QMF, QUALITY_PTR,
      :     QUALITY_END, QBITS, USELST, LST_PTR,
-     :     INT_LIST, BOLWT, STATUS)
+     :     ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST, BOLWT, STATUS)
 
 *     Number of points per beam
       N_PTS = N_POS * N_BOL
