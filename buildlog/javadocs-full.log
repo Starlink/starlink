@@ -499,12 +499,12 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node, i.e. it can contain children."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/ModularGraphModel.java:132: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/ModularGraphModel.java:132: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
   [javadoc] "Return if the Interpolator is full, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1541,4 +1541,4 @@ javadoc-sources:
   [javadoc] 577 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 8 seconds
+Total time: 1 minute 7 seconds
