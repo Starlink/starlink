@@ -418,7 +418,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jun 25, 2003 4:37:43 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 26, 2003 4:36:53 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
