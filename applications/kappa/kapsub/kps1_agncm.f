@@ -120,6 +120,9 @@
       CALL CHR_PREFX( ' .', OPER, LOPER )
       CALL CHR_APPND( '.', OPER, LOPER )
 
+*  Save the length of the supplied group.
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+
 *  Warn the user and return if there are currently insufficient defined
 *  regions for the operator.  All operators require two operands except
 *  for NOT which only requires one.
@@ -309,3 +312,4 @@
       IGRP = IGRP2      
       
       END
+

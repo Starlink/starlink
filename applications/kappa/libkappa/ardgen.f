@@ -452,6 +452,7 @@
      :                      'Style,Undo', .FALSE., OPTION, STATUS )
             CALL PAR_CANCL( 'OPTION', STATUS )
             READY = .FALSE.
+            IF( STATUS .EQ. PAR__NULL ) OPTION = 'QUIT'
          END IF
          
 *  If user wants to define more regions of the current shape...
