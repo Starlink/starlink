@@ -107,6 +107,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Over-ride the astSimplify and astTransform methods.
 *     8-SEP-2004 (DSB):
 *        Over-ride astResolvePoints method.
+*     21-JAN-2005 (DSB):
+*        Over-ride the astGetActiveUnit and astSetActiveUnit methods.
 *class--
 */
 
@@ -498,6 +500,8 @@ static AstCmpFrameVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static void (* parent_setactiveunit)( AstFrame *, int );
+static int (* parent_getactiveunit)( AstFrame * );
 static AstSystemType (* parent_getsystem)( AstFrame * );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static const char *(* parent_getdomain)( AstFrame * );
@@ -588,6 +592,8 @@ static void PrimaryFrame( AstFrame *, int, AstFrame **, int * );
 static void RenumberAxes( int, int [] );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAxis( AstFrame *, int, AstAxis * );
+static int GetActiveUnit( AstFrame * );
+static void SetActiveUnit( AstFrame *, int );
 static void SetDirection( AstFrame *, int, int );
 static void SetFormat( AstFrame *, int, const char * );
 static void SetLabel( AstFrame *, int, const char * );
@@ -2941,6 +2947,12 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 
    parent_overlay = frame->Overlay;
    frame->Overlay = Overlay;
+
+   parent_setactiveunit = frame->SetActiveUnit;
+   frame->SetActiveUnit = SetActiveUnit;
+
+   parent_getactiveunit = frame->GetActiveUnit;
+   frame->GetActiveUnit = GetActiveUnit;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -5579,6 +5591,105 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
    if( !astOK ) result = astAnnul( result );
 
 /* Return a pointer to the output PointSet. */
+   return result;
+}
+
+static void SetActiveUnit( AstFrame *this_frame, int value ){
+/*
+*  Name:
+*     SetActiveUnit
+
+*  Purpose:
+*     Specify how the Unit attribute should be used.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetActiveUnit( AstFrame *this, int value )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetActiveUnit method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the current value of the ActiveUnit flag for a 
+*     CmpFrame, which controls how the Frame behaves when it is used (by 
+*     astFindFrame) as a template to match another (target) Frame, or is 
+*     used as the "to" Frame by astConvert. It determines if the Mapping 
+*     between the template and target Frames should take differences in 
+*     axis units into account. 
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     value
+*        The new value to use.
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the parent method to set the ActiveUnitFlag for the CmpFrame,
+   then set the same value for the component Frames. */
+   (*parent_setactiveunit)( this_frame, value );
+   astSetActiveUnit( ((AstCmpFrame *)this_frame)->frame1, value );
+   astSetActiveUnit( ((AstCmpFrame *)this_frame)->frame2, value );
+}
+
+static int GetActiveUnit( AstFrame *this_frame ){
+/*
+*  Name:
+*     GetActiveUnit
+
+*  Purpose:
+*     Determines how the Unit attribute will be used.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int GetActiveUnit( AstFrame *this_frame )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetActiveUnit method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns the current value of the ActiveUnit flag for a 
+*     CmpFrame. See the description of the astSetActiveUnit function
+*     for a description of the ActiveUnit flag.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The current value of the ActiveUnit flag.
+
+*/
+
+/* Local Variables; */
+   int result;      /* The ActiveUnit flag for the CmpFrame */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the ActiveUnit value has been set for the CmpFrame use the parent
+   implementation to get its value. */
+   if( astTestActiveUnit( this_frame ) ) {
+      result = (*parent_getactiveunit)( this_frame );
+
+/* Otherwise, the default is determined by the component Frames. If both
+   components have active units, the default for the CmpFrame is "on" */
+   } else {
+      result = astGetActiveUnit( ((AstCmpFrame *)this_frame)->frame1 ) || 
+               astGetActiveUnit( ((AstCmpFrame *)this_frame)->frame2 );
+   }
+
+/* Return the result */
    return result;
 }
 

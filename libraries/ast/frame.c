@@ -6989,6 +6989,15 @@ c        The ActiveUnit flag for a FluxFrame is always 1 (any value
 c        supplied using this function is ignored).
 f        The ActiveUnit flag for a FluxFrame is always .TRUE. (any value
 f        supplied using this routine is ignored).
+*     CmpFrame
+c        The default ActiveUnit flag for a CmpFrame is 1 if both of the
+c        component Frames are using active units, and zero otherwise. When
+f        The default ActiveUnit flag for a CmpFrame is .TRUE. if both of the
+f        component Frames are using active units, and .FALSE. otherwise. When
+*        a new value is set for the ActiveUnit flag, the flag value
+*        is propagated to the component Frames. This change will be
+*        reflected through all references to the component Frames, not
+*        just those encapsulated within the CmpFrame.
 
 *  Notes:
 *     - The ActiveUnit flag resembles a Frame attribute, except that it
