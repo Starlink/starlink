@@ -96,9 +96,6 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			EDI0_BLK		! Ensures inclusion
-
 *  Local Variables:
       LOGICAL			OK			! List exists?
 *.
