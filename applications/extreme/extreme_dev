@@ -2,7 +2,7 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     ast_dev
+#     extreme_dev
 
 #  Purpose:
 #     Create links to EXTREME include files.
@@ -17,7 +17,7 @@
 #     to know where they reside.
 
 #  Invocation:
-#     ext_dev [option]
+#     extreme_dev [option]
 
 #  Arguments:
 #     option
@@ -27,9 +27,9 @@
 #        removed. Any other value results in an error.
 
 #  Examples:
-#     ext_dev
+#     extreme_dev
 #        Creates links to the EXTREME include files in your current directory.
-#     ext_dev remove
+#     extreme_dev remove
 #        Removes any links to the EXTREME include files from your current
 #        directory.
 
@@ -65,7 +65,7 @@
 
 #  Any other argument is invalid: report an error.
       *)
-         echo "ast_dev: invalid argument \"${1}\" given" >&2
+         echo "extreme_dev: invalid argument \"${1}\" given" >&2
          exit 1
       ;;
       esac
