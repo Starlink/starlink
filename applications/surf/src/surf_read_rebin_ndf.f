@@ -1,12 +1,13 @@
       SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
      :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :     N_BOL, N_POS, N_INTS, MJD_STANDARD, IN_UT1,
+     :     N_BOL, N_POS, N_INTS, N_BEAMS, MJD_STANDARD, IN_UT1,
      :     OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
      :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, INT_LIST,
+     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
+     :     USE_LST, LST_PTR, INT_LIST,
      :     STATUS)
 *+
 *  Name:
@@ -18,13 +19,14 @@
 *  Invocation:
 *      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
 *     :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-*     :     N_BOL, N_POS, N_INTS, MJD_STANDARD, IN_UT1,
+*     :     N_BOL, N_POS, N_INTS, N_BEAMS, MJD_STANDARD, IN_UT1,
 *     :     OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-*     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, INT_LIST,
+*     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
+*     :     USE_LST, LST_PTR, INT_LIST,
 *     :     STATUS)
 
  
@@ -54,6 +56,14 @@
 *        Number of samples in observation
 *     N_INTS = INTEGER (Returned)
 *        Number of integrations in observation
+*     N_BEAMS = INTEGER (Given & Returned)
+*        Number of beams requested in the positions arrays.
+*        N_BEAMS = 1  will return the middle-beam (standard position)
+*        N_BEAMS = 2 will return L and R beams for RASTER and JIGGLE
+*        N_BEAMS = 3 will return L, M and R beams (as M,L,R) for JIGGLE
+*                   data that has been reduce_switched and for SCAN
+*                   data. N_BEAM is set to 2 if a single switch of a
+*                   JIGGLE map is requested.
 *     MJD_STANDARD = DOUBLE (Given & Returned)
 *        Modified Julian data of observation. Returned if N_FILE=1.
 *     IN_UT1 = DOUBLE (Returned)
@@ -103,6 +113,10 @@
 *        Pointer to end of quality array
 *     BADBITS = BYTE (Returned)
 *        Bad bits mask for quality array
+*     USE_LST = LOGICAL (Given)
+*        Governs whether we want an LST array returned
+*     LST_PTR( 2 ) = INTEGER (Returned)
+*        Array of pointers (begin and end)  to array of LSTs
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
 *     STATUS = INTEGER (Given and Returned)
@@ -118,6 +132,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.13  1998/03/18 22:55:48  timj
+*     Add support for multiple beams
+*
 *     Revision 1.12  1997/11/04 23:21:12  timj
 *     Add support for LOCAL_COORDS and MAP_X/Y
 *
@@ -155,9 +172,11 @@
       CHARACTER*(*)    OUT_COORDS
       LOGICAL          QMF
       LOGICAL          USE_SECTION
+      LOGICAL          USE_LST
 
 *  Arguments Given & Returned:
       DOUBLE PRECISION MJD_STANDARD
+      INTEGER          N_BEAMS
       CHARACTER*(*)    SUB_INSTRUMENT
       REAL             WAVELENGTH
 
@@ -173,6 +192,7 @@
       INTEGER          DATA_PTR
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
       DOUBLE PRECISION IN_UT1
+      INTEGER          LST_PTR( 2 )
       INTEGER          N_BOL
       INTEGER          N_FILE
       INTEGER          N_INTS
@@ -961,17 +981,30 @@
 
 
 *     Get some memory for the bolometer positions
+*     Note that we have 1 position per beam
 
-      CALL SCULIB_MALLOC (N_POS * N_BOL * VAL__NBD,
+      CALL SCULIB_MALLOC (N_POS * N_BOL * N_BEAMS * VAL__NBD,
      :     BOL_RA_PTR, BOL_RA_END, STATUS)
-      CALL SCULIB_MALLOC (N_POS * N_BOL * VAL__NBD,
+      CALL SCULIB_MALLOC (N_POS * N_BOL * N_BEAMS * VAL__NBD,
      :     BOL_DEC_PTR, BOL_DEC_END, STATUS)
+
+*     Get some memory for the LST information
+      IF (USE_LST) THEN
+         CALL SCULIB_MALLOC (N_POS * VAL__NBD,
+     :        LST_PTR(1), LST_PTR(2), STATUS)
+
+*     Fill it with Bad values
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SCULIB_CFILLD(N_POS, VAL__BADD, %VAL(LST_PTR(1)))
+         END IF
+            
+      END IF
 
 *     Loop through bolometers and find apparent RA/Dec
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL SCULIB_PROCESS_BOLS(.FALSE., .FALSE.,1, N_BOL,
-     :        N_POS, N_SWITCHES, N_EXPOSURES, 
+     :        N_POS, N_BEAMS, N_SWITCHES, N_EXPOSURES, 
      :        N_INTEGRATIONS, N_MEASUREMENTS,
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1,N_MEASUREMENTS,
      :        N_FILE, N_FITS, FITS,
@@ -987,9 +1020,9 @@
      :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
-     :        BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0, 0.0, 0.0, 0.0,
+     :        BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0D0, 0.0D0, 0.0, 0.0,
      :        %VAL(BOL_DEC_PTR), %VAL(BOL_RA_PTR),
-     :        %VAL(DATA_PTR), 0.0, 
+     :        %VAL(DATA_PTR), 0, USE_LST, %VAL(LST_PTR(1)),
      :        STATUS)
 
       END IF
