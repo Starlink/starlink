@@ -29,11 +29,14 @@
  
 #  Authors:
 #     DSB: David Berry (Starlink - University of Manchester)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     29-JUN-1997 (DSB):
 #        Original version, based on ircampack_link_adam
+#     28-JUL-2004 (TIMJ):
+#        Add shl_link_adam
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -42,6 +45,7 @@
 #-
 
       echo -lsla `nbs_link_adam` `kaplibs_link_adam -nogks` \
+           `shl_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
