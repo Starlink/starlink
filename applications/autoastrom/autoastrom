@@ -31,6 +31,23 @@ my $progpath;			# Path to program.
 my $progname;			# Name of program
 ($progname = $0) =~ s+^.*/++;
 
+# Global variables.
+#
+# Declare several global variables.  This is necessary since these are
+# used by plugins read by `require' below; if they are declared as
+# lexically scoped using `my', they they're not visible in that context.
+use vars qw( %helpers $verbose );
+%helpers = ();			# Hash containing helper programs.
+                                # These can be monoliths (in which
+                                # case the value is a
+                                # Starlink::AMS::Task object) or
+                                # subroutines defined by plugins, or
+                                # other objects (such as a Moggy object).
+
+$verbose = 0;			# If true, then chatter to STDERR.
+
+
+# Lexically scoped global-ish variables
 my $NDF = undef;		# Name of the NDF to be processed
                                 # (with or without the .sdf
                                 # extension) 
@@ -86,8 +103,6 @@ my $esocatname = 'usno@eso';	# Name of the catalogue to use by
 
 my $skycatconfig = undef;	# SkyCat configuration file.
 
-my $verbose = 0;		# Chatter to STDERR.
-
 my $dumpstatefile = undef;	# If defined, then after all
                                 # command-line parsing is completed,
                                 # and before starting any actual work,
@@ -100,10 +115,16 @@ my $cmdlineobsdata = undef;	# Source for WCS information.  Can be
                                 # taken from any FITS extension in the
                                 # NDF), or ... explicit coordinates.
 
-# Global variables
-# None!
+my $matchplugin = undef;	# Name of plugin which is to be used
+                                # to do the matching.  Default if undefined.
 
-# Check that all the required environment variables have values.
+my %filterdefects;
+$filterdefects{filter} = 0;	# A reference to a hash which contains
+                                # the filterdefects keywords -- see
+                                # below.
+
+
+# check that all the required environment variables have values.
 $ENV{STARLINK} = '/star'
   unless defined ($ENV{STARLINK});
 $ENV{AUTOASTROM_DIR} = "$progpath"
@@ -190,12 +211,14 @@ foreach (@ARGV) { push (@arglist2, $_); }
 # xxx* are for testing and debugging only.
 my %optionset = ();
 GetOptions (\%optionset,
-	    "catalogue=s",	# SkyCat name of online catalogue to use
+	    "catalogue=s",	# SkyCat name of online catalogue to use 
+	    "defects:s",	# Defects removal keywords
 	    "dump=s",		# Dump state after parsing cmdline, and stop
 	    "help!",		# Print usage information
 	    "insert!",		# insert WCS info into NDF at end?
 	    "keepfits=s",	# retain FITS-WCS in this file
 	    "keeptemps!",	# keep temporary files?
+	    "match=s",		# name of plugin to do the matching
 	    "maxobj=i",		# maximum number of objects to process
 	    "messages!",	# show messages from monoliths?
 	    "obsdata=s",	# source of WCS info (AST/FITS)
@@ -213,14 +236,16 @@ if (defined($optionset{help}) && $optionset{help}) {
     print "Usage: $0 [options] NDF-file\n";
     print "Options: [and defaults; if no default, value is generated]\n";
     print "\tcatalogue     SkyCat name of online catalogue to use [$esocatname]\n";
+    print "\tdefects       Filter out defects [no]\n";
     print "\thelp          Print this help\n";
     print "\tinsert        Insert WCS info into NDF at end? [", ($insertwcs ? "true" : "false"), "]\n";
     print "\tkeepfits      Retain WCS in specified file (default if empty) ['']\n";
     print "\tkeeptemps     Keep temporary files? [", ($keeptemps ? "true" : "false"), "]\n";
+    print "\tmatch         Name of plugin to do matching [", (defined($matchplugin) ? $matchplugin : ''), "]\n";    
     print "\tmaxobj        Maximum number of objects to process [$maxobj]\n";
     print "\tmessages      Show messages from monoliths? [", ($monolithMessages ? "true" : "false"), "]\n";
     print "\tobsdata       WCS info=AST/FITS/[kwd-list] ['']\n";
-    print "\tskycatconfig  SkyCat configuration file [$skycatconfig]\n" if defined($skycatconfig);
+    print "\tskycatconfig  SkyCat configuration file [", (defined($skycatconfig) ? $skycatconfig : ''), "]\n";
     print "\ttemp          Name of temporary directory\n";
     print "\ttimeout       Monolith timeout [$monolithTimeout]\n";
     print "\tverbose       Verbosity [", ($verbose ? "true" : "false"), "]\n";
@@ -241,6 +266,7 @@ $esocatname = $optionset{catalogue}	if defined ($optionset{catalogue});
 $insertwcs = $optionset{insert}		if defined ($optionset{insert});
 $retainwcs = $optionset{keepfits}	if defined ($optionset{keepfits});
 $keeptemps = $optionset{keeptemps}	if defined ($optionset{keeptemps});
+$matchplugin = $optionset{match}	if defined ($optionset{match});
 $maxobj = $optionset{maxobj}		if defined ($optionset{maxobj});
 $monolithMessages = $optionset{messages} if defined ($optionset{messages});
 $cmdlineobsdata = $optionset{obsdata}	if defined ($optionset{obsdata});
@@ -255,13 +281,36 @@ $NDFoverrides = $optionset{xxxndfinfo}	if defined ($optionset{xxxndfinfo});
 # Do some processing, defaulting, and checking of options.
 
 (defined($retainwcs) || $insertwcs)
-  || wmessage 'fatal', "You must have either --fits or --insert specified (otherwise you won't get any results at all)";
+  || wmessage 'fatal', "You must have either --keepfits or --insert specified (otherwise you won't get any results at all)";
 
 # Pass the setting of $verbose to the autoastrom library functions.
 verbosity ($verbose);
 
 # --temp implicitly causes reuse of files.
 reuse_files() if $tempDir;
+
+if (defined($optionset{defects})) {
+    $filterdefects{filter} = 1;	# switch on filtering
+    foreach my $p (split (/ *, */, $optionset{defects})) {
+	if (my ($k,$v) = ($p =~ /^ *([A-Za-z]+) *= *(\S+) *$/)) {
+	    $filterdefects{$k} = $v;
+	} else {
+	    wmessage ('warning',
+		      "filterdefects keyword <$p> malformed (ignored)");
+	}
+    }
+}
+if ($verbose) {
+    if ($filterdefects{filter} == 1) {
+	print STDERR "Filterdefects: ";
+	foreach my $k (keys %filterdefects) {
+	    printf STDERR " %s->%s", $k, $filterdefects{$k};
+	}
+	print STDERR "\n";
+    } else {
+	print STDERR "No filterdefects\n";
+    }
+}
 
 # Generate a temporary file name, if it wasn't set
 defined($tempDir) || ($tempDir = "$ENV{AUTOASTROM_TEMPDIR}/autoastrom-$$");
@@ -328,7 +377,6 @@ $ENV{NDF_TEMP_FITS} = 'temp_fits_^name^fxscl';
 #$ENV{NDF_SHCVT} = 1;
 
 
-my %helpers = ();
 # I don't understand why, but all of these monoliths need to be
 # started up here rather than in the individual subroutines.  If we
 # don't do this, we get crashes.
@@ -377,7 +425,7 @@ wmessage ('info', "Monoliths OK");
 # AUTOASTROM_DIR which have names which match /^plugin-/.  Each such
 # file should define whatever subroutines it likes, and store
 # references to those subroutines in the hash %helpers, under names
-# which routines below to look for.
+# which routines below know to look for.
 #
 # The only routine that takes advantage of this so far is
 # match_positions, which is given a plugin name, say mymatch, and
@@ -385,9 +433,9 @@ wmessage ('info', "Monoliths OK");
 # mechanism stores pointers to the subroutines, but cannot do anything
 # in the way of checking the syntactical correctness of the calls to
 # them -- it is up to the routines which use this array to do that.
-
-# Default match plugin (this can be overridden by a plugin: this may
-# or may not be a good idea).
+#
+# First, define the default match plugin (first, so that it can be
+# overridden by a plugin: this may or may not be a good idea).
 $helpers{'plugin-match-findoff'} = \&autoastrom::match_positions_findoff
   unless defined ($helpers{'plugin-match-findoff'});
 
@@ -395,14 +443,21 @@ my $plugindir = (defined($ENV{AUTOASTROM_DIR}) ? $ENV{AUTOASTROM_DIR} : '.');
 opendir PLUGINDIR, $plugindir;
 my @plugindirents = readdir PLUGINDIR;
 closedir PLUGINDIR;
+print STDERR "plugindir=$plugindir  ents=@plugindirents\n";
 foreach my $d (@plugindirents) {
-    if ($d =~ /^plugin-/) {
+    if ($d =~ /^plugin-.*\.pl$/) {
+	print STDERR "Found plugin $d\n";
 	my $reqval = require "$plugindir/$d";
 	wmessage ('info', "Loaded plugin $plugindir/$d");
     }
 }
 
 
+foreach my $h (keys %helpers) {
+    print STDERR "helpers{$h} = $helpers{$h}\n";
+}
+defined ($helpers{'plugin-match-match'})
+  || die "plugin-match-match not defined";
 
 
 
@@ -585,7 +640,7 @@ my $moggy = Moggy->new($esocatname, $skycatconfig, $moggylocation);
 $helpers{moggy} = $moggy;
 #$moggy = Moggy->new ('dummy@home',
 #		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
-#$moggy->debug('asthandler cataloguehandler');
+#$moggy->debug('moggy cataloguehandler');
 
 
 # Obtain a catalogue covering the same part of the sky as the NDF.  We
@@ -597,15 +652,23 @@ $helpers{moggy} = $moggy;
 wmessage ('info', "Obtaining catalogue from $esocatname...");
 my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
 
+defined($CAT)
+  || wmessage ('fatal', "Catalogue query failed");
 
 # write an NDF which has the columns (number, ra/rad, dec/rad, ra/deg,
-# dec/deg.  That is, copy the id, ra and dec entries in each element
+# dec/deg and mag.  That is, copy the id, ra and dec entries in each element
 # in the $CAT array file, duplicating ra and dec into
 # columns (1,2) and converting them to radians (required for
 # asttrann).
+defined($CAT->[0]->{mag})
+  || wmessage ('fatal',
+	       "There is no magnitude information in the catalogue");
 my @catdata;
 foreach my $row (@$CAT) {
-    my @t = ($row->{id}, $row->{ra}, $row->{dec}, $row->{ra}, $row->{dec});
+    my @t = ($row->{id},
+	     $row->{ra}, $row->{dec},
+	     $row->{ra}, $row->{dec},
+	     $row->{mag});
     $t[1] /= $d2r;
     $t[2] /= $d2r;
     push (@catdata, \@t);
@@ -620,7 +683,7 @@ wmessage ('info', sprintf ("Obtained catalogue, %d entries, from %s",
 
 
 my $CCDcathash = undef;
-my %paramhash = ( maxobj => $maxobj, filterdefects => 1 );
+my %paramhash = ( maxobj => $maxobj );
 if (defined ($CCDcatname)) {
     # Read extraction catalogue from a file -- a testing/debugging
     # feature If CCDcatname is not defined (normal situation)
@@ -634,6 +697,7 @@ if (defined ($CCDcatname)) {
 	$paramhash{todump} = $CCDcatname;
     }
 }
+$paramhash{filterdefects} = \%filterdefects if ($filterdefects{filter});
 
 $CCDcathash = extract_objects (\%helpers,
 			       $NDF,
@@ -720,6 +784,7 @@ while ($iterno < $iterationsleft) {
 		   objsize => $CCDcathash->{objsize},
 		   area => ($NDFinfo->{dim1} * $NDFinfo->{dim2})
 		 );
+    $paramhash{method} = $matchplugin if (defined($matchplugin));
     my ($ccdlist, $catlist, $matchworked)
       = match_positions (\%helpers,
 			 @$CCDcat,
@@ -738,7 +803,7 @@ while ($iterno < $iterationsleft) {
 	    if $verbose;
 	$paramhash{poserr} *= 2.0; # double the position-error
  	($ccdlist, $catlist, $matchworked)
- 	  = match_positions ($CCDPack,
+ 	  = match_positions (\%helpers,
  			     @$CCDcat,
 			     @matchincat,
 			     \%paramhash,
@@ -889,8 +954,10 @@ while ($iterno < $iterationsleft) {
       || wmessage ('fatal', "Error getting atools/asttrann");
 
 
-    # Now turn $refstarndf (the best-so-far pixel coordinates
-    # of the reference stars) into a text input file for match_positions.
+    # Now turn $refstarndf (the best-so-far pixel coordinates of the
+    # reference stars) into a text input file for match_positions.
+    # When we created $CATNDF earlier, we put in six columns -- read
+    # these out of the transformed NDF.
     my $refstararr = ndf2twodarray ($refstarndf);
     @matchincat = ();		# erase previous values
     foreach my $r (@$refstararr) {
@@ -900,6 +967,7 @@ while ($iterno < $iterationsleft) {
 	$t{y} = $r->[2];
 	$t{ra} = $r->[3];
 	$t{dec} = $r->[4];
+	$t{mag} = $r->[5];
 	push (@matchincat, \%t);
     }
 

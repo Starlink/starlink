@@ -4,16 +4,22 @@
 # Broken into a separate file (a) in case I want to reuse them, and
 # (b) so that I can run regression tests on them.
 #
+# Copyright 2001, Council for the Central Laboratory of the Research Councils,
+# except where otherwise indicated.
+# Portions copyright 1995, Patrick Wallace.
+#
 # $Id$
 
 package autoastrom;
 use Exporter;
+use POSIX qw (sqrt atan2 sin cos fabs);
 @ISA = qw(Exporter);
 
 @EXPORT = qw( extract_objects ndf_info get_catalogue match_positions
 	      generate_astrom run_astrom
 	      twodarray2ndf ndf2twodarray txt2arr txt2ndf ndf2txt
 	      reuse_files get_temp_files make_pseudo_fits
+	      decompose_transform
 	      verbosity wmessage check_obsdata_kwd);
 
 @EXPORT_OK = (@EXPORT,
@@ -26,6 +32,7 @@ use Exporter;
 	      'canonicalise_ndfname',
 	      'get_dates',
 	      'parse_fits_date',
+	      'decompose_transform',
 	     );
 
 
@@ -62,6 +69,7 @@ sub get_dates ($$$);
 sub parse_fits_date ($);
 sub invP ($);
 sub make_pseudo_fits (\%\%);
+sub decompose_transform ($$$$$$);
 sub check_kwd_list ($$);
 sub check_obsdata_kwd (\%);
 sub verbosity ($);
@@ -80,9 +88,9 @@ my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 #
 # opts is a reference to a hash containing entries {maxobj}, the
 # maximum number of objects to return (default 100); {filterdefects}
-# which, if present (value ignored) indicates that objects which
+# which, if present indicates that objects which
 # appear to be CCD defects should be removed (see notes below for the
-# algorithm).
+# algorithm; if present it points to a hash which contains keywords).
 #
 # Return a (reference to) hash containing: {filename}, filename of the
 # resulting catalogue; {numobj}, the number of objects matched;
@@ -192,6 +200,7 @@ sub extract_objects ($$$$) {
 
     # Sort these by column 8 (FLUX_MAX), and output at most $maxobj objects.
     open (CAT, $tcat) || return undef;
+    print STDERR "Opened extractor catalogue $tcat\n" if $verbose;
     my %cathash = ( );
     my $line;
     # Read headers
@@ -205,6 +214,8 @@ sub extract_objects ($$$$) {
 		       $line, $2, $colkey{$2}) if $verbose;
     }
     # Now $line contains the first non-header line
+    printf STDERR ("First EXTRACTOR data line: <%.25s...>\n",
+		   defined($line) ? $line : 'UNDEFINED');
     my $NUMBERcol = $colkey{NUMBER} - 1;
     my $FLUXcol = $colkey{FLUX_ISO} - 1; # better than FLUX_MAX, since
                                          # it ignores spikes
@@ -224,7 +235,7 @@ sub extract_objects ($$$$) {
     my $nobj = 0;
     my $objrad = 0.0;
     my $objposerr = 0.0;
-    do {
+    while (defined($line)) {
 	chomp $line;
 	next if ($line !~ /^ *[0-9]/);
 	my @l = split (' ', $line);
@@ -249,9 +260,16 @@ sub extract_objects ($$$$) {
 	# estimate of the position error.  The standard deviation of
 	# r=\sqrt{x^2+y^2} is \sqrt{ERRX2+ERRY2}.
 	$objposerr += sqrt($l[$ERRX2col] + $l[$ERRY2col]);
+
+	$line = <CAT>;
     }
-    while (defined($line = <CAT>));
     close (CAT);
+
+    # Check we found some objects in the file
+    unless ($nobj > 0) {
+	wmessage ('warning', 'Found zero objects in EXTRACTOR output');
+	return undef;		# JUMP OUT
+    }
 
     # Sort in reverse alphabetic order (ie, descending order of flux)
     my @sortcat = sort {$b cmp $a} keys(%cathash);
@@ -259,24 +277,44 @@ sub extract_objects ($$$$) {
     my $cutoffarea = 0;		# zero: no cutoff by default
     my $cutoffellip = 1000;	# large number: no cutoff by default
     if (defined($filterdefects)) {
-	# Cut out CCD blemishes.  Some of the `objects' detected by
-	# EXTRACTOR are in fact CCD defects, or readout errors, or the
-	# like.  These are very bright, so they can confuse a matching
-	# program which examines only or preferentially the brightest
-	# objects.  However these are either very small or, if they're
-	# defects such as a line, extremely elliptical, with
-	# A/B=10+. Examining the list of detections with the test
-	# image r106282xx, all the defects which had an area of more
-	# than 100 pixels also had an `ellipticity' A/B of more than
-	# 3.5.  I think that the 100-pixel threshold will be
-	# independent of the size of the CCD, so it can be hard-wired
-	# into this routine.
+	my $reftype = ref($filterdefects);
+	if (!defined($reftype)) {
+	    wmessage ('warning',
+	      "filterdefects=$filterdefects: should be hash.  Ignored");
+	} elsif ($reftype ne 'HASH') {
+	    wmessage ('warning',
+		      "filterdefects must be a hash reference.  Ignored");
+	} else {
+	    # Cut out CCD blemishes.  Some of the `objects' detected by
+	    # EXTRACTOR are in fact CCD defects, or readout errors, or the
+	    # like.  These are very bright, so they can confuse a matching
+	    # program which examines only or preferentially the brightest
+	    # objects.  However these are either very small or, if they're
+	    # defects such as a line, extremely elliptical, with
+	    # A/B=10+. Examining the list of detections with the test
+	    # image r106282xx, all the defects which had an area of more
+	    # than 100 pixels also had an `ellipticity' A/B of more than
+	    # 3.5.  I think that the 100-pixel threshold will be
+	    # independent of the size of the CCD, so it can be hard-wired
+	    # into this routine.
 
-	# Cut off very small objects.  We're doing this to remove CCD
-	# flaws which are often bright `objects', but only ten or twenty
-	# pixels in area, whereas the largest objects are thousands.
-	$cutoffarea = 100;
-	$cutoffellip = 3.5;
+	    # Cut off very small objects.  We're doing this to remove
+	    # CCD flaws which are often bright `objects', but only ten
+	    # or twenty pixels in area, whereas the largest objects
+	    # are thousands. 
+
+	    # The filterdefects hash may contain either or both of the
+	    # keys {area} and {ellipticity} which indicate the minimum
+	    # area and maximum ellipticity required for an object to
+	    # be regarded as real.
+	
+	    $cutoffarea = (defined($filterdefects->{area})
+			   ? $filterdefects->{area}
+			   : 100);
+	    $cutoffellip = (defined($filterdefects->{ellipticity})
+			    ? $filterdefects->{ellipticity}
+			    : 3.5);
+	}
     }
 
     $rethash{numobj} = $nobj;
@@ -763,17 +801,22 @@ sub get_dates ($$$) {
 #
 # Return a reference to an array of (references to)
 # hashes, containing {id}, {x}, {y}, {ra}, {dec} and possibly {mag}.
-#    
+#
+# Return undef on error.
 sub get_catalogue ($\%$$) {
-    my ($cat, $NDFinforef, $maxobj, $tempdir) = @_;
+    my $cat = shift;		# Pointer to moggy object.
+    my $NDFinforef = shift;	# Reference to hash containing NDF
+                                # info.
+    my $maxobj = shift;		# Maximum number of objects to return.
+    my $tempdir = shift;	# Directory for temporary files.
 
     my $mytempfile = "$tempdir/catalogue";
 
-    if ($noregenerate && -e $mytempfile) {
-	print STDERR "Reusing $mytempfile...\n"
-	  if $verbose;
-	return $mytempfile;
-    }
+#    if ($noregenerate && -e $mytempfile) {
+#	print STDERR "Reusing $mytempfile...\n"
+#	  if $verbose;
+#	return $mytempfile;
+#    }
 
     # Pass the WCS information to moggy, declaring that future points
     # will be specified in the GRID domain (that domain in which the
@@ -784,17 +827,19 @@ sub get_catalogue ($\%$$) {
     # objects sitting in a box with these points at opposite
     # corners. In fact, ask for a box somewhat larger than this (say,
     # 10% in linear dimension), anticipating some misalignment in the
-    # initial astrometry.
+    # initial astrometry. XXX Unnecessary and can cause problems with `match'
     #
     # There's no need to make this margin of 10% configurable -- it
     # doesn't matter here if the projection pole is off the plate, as
     # long as the centre of _this_ plate is reasonably accurate.
     my $sizex = $NDFinforef->{dim1};
     my $sizey = $NDFinforef->{dim2};
-    my $errorest = 0.1;
+    #my $errorest = 0.1;
+    #$cat->point     (-$errorest*$sizex,-$errorest*$sizey);
+    #$cat->otherpoint( (1.0+$errorest)*$sizex, (1.0+$errorest)*$sizey);
+    $cat->point     (0, 0);
+    $cat->otherpoint($sizex, $sizey);
     $cat->searchtype('box');
-    $cat->point     (-$errorest*$sizex,-$errorest*$sizey);
-    $cat->otherpoint( (1.0+$errorest)*$sizex, (1.0+$errorest)*$sizey);
 
     # Get a decent number of points
     $cat->maxrow($maxobj);
@@ -807,6 +852,11 @@ sub get_catalogue ($\%$$) {
     $cat->query()
       || wmessage ('fatal', "Can't make catalogue query ("
 		   . $cat->current_statusmessage() . ")");
+
+    if ($cat->resultnrows() == 0) {
+	wmessage ('warning', "Catalogue query returned zero rows");
+	return undef;		# JUMP OUT
+    }
 
     printf STDERR ("get_catalogue: box(%f,%f)..(%f,%f) %d points\n",
 		   $cat->point()->[0], $cat->point()->[1],
@@ -850,14 +900,34 @@ sub get_catalogue ($\%$$) {
 
 
 # Invoke one of several routines to match the positions of the objects
-# in the two input catalogues.  The catalogues are arrays of hashes
-# with fields {id}, {x} and {y} at least.
+# in the two input catalogues.
 #
-# Return an array containing the two catalogues, in the same order as
-# the corresponding input files, plus a flag (1=ok, 0=error)
-# indicating whether the match succeeded or not.  The returned
-# catalogues much have the same fields as the corresponding input
-# catalogues.
+# The arguments are:
+#
+#    my $helpers = shift;	# Reference to hash of helper programs.
+#    my $cat1 = shift;		# First position catalogue
+#    my $cat2 = shift;		# Second position catalogue
+#    my $matchopts = shift;	# Reference to hash of options
+#				# (may include {poserr}, {objsize},
+#				# {area}).  Crucially may also contain
+#				# element {method}, which can be
+#				# `findoff', the default, or the name
+#				# of some other program loaded in a plugin.
+#    my $tempfn = shift;	# Temporary filename prefix
+#
+# The catalogues are arrays of hashes with fields {id}, {x} and {y} at
+# least. 
+#
+# Return an array containing references to the two catalogues, in the
+# same order as the corresponding input files, plus a flag (1=ok,
+# 0=error) indicating whether the match succeeded or not.  The
+# returned catalogues must have at least the same fields as the
+# corresponding input catalogues.
+#
+# The returned catalogues must be the same length, and ordered so that
+# entries with the same index describe the same object.  The returned
+# catalogues (as a list of references) may point to the original
+# hashes in the input file -- that is, they do not need to copy them.
 sub match_positions ($\@\@$$) {
     my $helpers = shift;	# Reference to hash of helper programs.
     my $cat1 = shift;		# First position catalogue
@@ -874,8 +944,11 @@ sub match_positions ($\@\@$$) {
 		       ? $matchopts->{method}
 		       : 'findoff');
     my $handlersub = $helpers->{'plugin-match-'.$matchmethod};
-    defined($handlersub)
-      || wmessage ('fatal', "Plugin plugin-match-$matchmethod unknown");
+    if (defined($handlersub)) {
+	wmessage ('info', "Match positions with $matchmethod");
+    } else {
+	wmessage ('fatal', "Plugin plugin-match-$matchmethod unknown");
+    }
 
     return &$handlersub ($helpers, $cat1, $cat2, $matchopts, $tempfn);
 }
@@ -919,6 +992,7 @@ sub match_positions_findoff ($$$$$) {
     open (FOFF, ">$cat1in")
       || wmessage ('fatal', "Can't open file $cat1in to write");
     my $line;
+    print FOFF "# Findoff input 1.\n# columns are id, x, y, @cat1keys\n";
     foreach my $t (@$cat1) {
 	$line = sprintf ("%5d %10.2f %10.2f", $t->{id}, $t->{x}, $t->{y});
 	foreach my $w (@cat1keys) {
@@ -936,6 +1010,7 @@ sub match_positions_findoff ($$$$$) {
     }
     open (FOFF, ">$cat2in")
       || wmessage ('fatal', "Can't open file $cat2in to write");
+    print FOFF "# Findoff input 2.\n# columns are id, x, y, @cat2keys\n";
     foreach my $t (@$cat2) {
 	$line = sprintf ("%5d %10.2f %10.2f", $t->{id}, $t->{x}, $t->{y});
 	foreach my $w (@cat2keys) {
@@ -1032,10 +1107,29 @@ sub match_positions_findoff ($$$$$) {
 
     my $matchworked = ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE);
     if (! $matchworked && ! $ccdpack->contact()) {
-	wmessage ('fatal', "Oh dear, it looks like the CCDPACK monolith has just died!\n(did I do that...?)");
+	wmessage ('fatal', "Oh dear, it looks like the CCDPACK monolith has just died! (did I do that...?)");
     }
 
-    # Now read the output files back into new hashes
+    # Check that the match worked by testing whether the output files
+    # $cat1out and $cat2out have been created.
+    unless (-e $cat1out && -e $cat2out) {
+	wmessage ('warning',
+		  "FINDOFF failed -- can't find files $cat1out and $cat2out");
+	return (undef, undef, 0); # return a failure status
+    }
+
+    # Now read the output files back into new hashes.
+    #
+    # The FINDOFF documentation, when documenting the `position list
+    # format', states that `The column one value must be an integer
+    # and is used to identify positions which are the same but which
+    # have different locations on different images.'  I take this to
+    # mean that objects which the application has matched are given
+    # the same output ID number (column 1).  In fact, these are always
+    # output in numerical order, so that these output lists match line
+    # by line, so it isn't necessary to explicitly match up the IDs.
+    # However, this does not conform to the documentation, so we
+    # should explicitly check that this is the case, and fail if it isn't.
     open (FOFF, "<$cat1out")
       || wmessage ('fatal',
 		  "match_positions_findoff: Can't open file $cat1out to read");
@@ -1054,8 +1148,10 @@ sub match_positions_findoff ($$$$$) {
 	for (my $i=0; $i<=$#cat1keys; $i++) {
 	    $t{$cat1keys[$i]} = $l[$i+3];
 	}
+	$t{foffid} = $l[0];	# preserve the FINDOFF id number for check
 	push (@cat1results, \%t);
     }
+    # Same again, for catalogue 2
     open (FOFF, "<$cat2out")
       || wmessage ('fatal',
 		  "match_positions_findoff: Can't open file $cat2out to read");
@@ -1073,7 +1169,24 @@ sub match_positions_findoff ($$$$$) {
 	for (my $i=0; $i<=$#cat2keys; $i++) {
 	    $t{$cat2keys[$i]} = $l[$i+3];
 	}
+	$t{foffid} = $l[0];	# preserve the FINDOFF id number for check
 	push (@cat2results, \%t);
+    }
+
+    # Now perform the check, referred to above, that the corresponding
+    # lines (and thus corresponding entries in the output arrays) did
+    # in fact have the same ID numbers.
+    ($#cat1results == $#cat2results)
+      || wmessage ('fatal',
+		   sprintf ("match_positions_findoff: results lists are different lengths (%d!=%d)",	
+			    $#cat1results, $#cat2results));
+    for (my $i=0; $i<=$#cat1results; $i++) {
+	($cat1results[$i]->{foffid} == $cat2results[$i]->{foffid})
+	  || wmessage ('fatal',
+		       sprintf ("match_positions_findoff: results lists don't match: line %d: %d!=%d",
+				$i, 
+				$cat1results[$i]->{foffid},
+				$cat2results[$i]->{foffid}));
     }
 
     return (\@cat1results, \@cat2results, $matchworked);
@@ -1084,14 +1197,17 @@ sub match_positions_findoff ($$$$$) {
 #
 # The input catalogues are arrays of hashes, containing at least keys
 # {id}, {x} and {y} in the case of CCDin, and {id}, {ra} and {dec} in
-# the case of catalogue.
+# the case of catalogue.  The two catalogues must be the same length,
+# and they are ordered, so that entries in the two catalogue arrays
+# with the same index (ie $par->{CCDin}->[i] and
+# $par->{catalogue}->[i]) describe the same object.
 #
-# We want to assemble entries consisting of
+# We want to assemble ASTROM entries consisting of
 #
-#    ASTROM:        ra      dec  0.0 0.0 J2000  * id1/id2
-#                   x-pos1  y-pos1  
+#    ra      dec  0.0 0.0 J2000  * id1/id2
+#    x-pos1  y-pos1  
 #
-# for each of the pairs for which the {id} fields match.
+# for each of the pairs in the two catalogues.
 #
 # Return a (reference to an) anonymous hash containing keys {filename}
 # (the name of the generated ASTROM input file), {nmatches} (the
@@ -2016,6 +2132,143 @@ sub make_pseudo_fits (\%\%) {
 
     return \@pfitsarray;
 }
+
+# decompose_transform: decompose a linear fit into zero shifts,
+# scales, nonperpendicularity and orientation.
+#
+# Given a model:
+#
+#    x_2 = a + b x_1 + c y_1
+#    y_2 = d + e x_1 + f y_1
+#
+# this routine decomposes it as detailed below.
+#
+# Arguments: (a, b, c, d, e, f)
+#
+# Return value: an array containing (xz, yz, xs, ys, perp, orient)
+# (see below).  The only difference from the SLALIB original is that
+# the perp and orient fields are returned in degrees rather than radians.
+#
+# This is a direct port of SLALIB's routine dcmpf.c.  It is Copyright
+# 1995, Patrick Wallace.  All rights reserved.
+sub decompose_transform ($$$$$$) {
+    #
+    #  - - - - - - - - -
+    #   s l a D c m p f
+    #  - - - - - - - - -
+    #
+    #  Decompose an [x,y] linear fit into its constituent parameters:
+    #  zero points, scales, nonperpendicularity and orientation.
+    #
+    #  Given:
+    #     coeffs    double[6]     transformation coefficients (see note)
+    #
+    #  Returned:
+    #     *xz       double        x zero point
+    #     *yz       double        y zero point
+    #     *xs       double        x scale
+    #     *ys       double        y scale
+    #     *perp     double        nonperpendicularity (radians)
+    #     *orient   double        orientation (radians)
+    #
+    #  The model relates two sets of [x,y] coordinates as follows.
+    #  Naming the elements of coeffs:
+    #
+    #     coeffs[0] = a
+    #     coeffs[1] = b
+    #     coeffs[2] = c
+    #     coeffs[3] = d
+    #     coeffs[4] = e
+    #     coeffs[5] = f
+    #
+    #  The model transforms coordinates [x1,y1] into coordinates
+    #  [x2,y2] as follows:
+    #
+    #     x2 = a + b*x1 + c*y1
+    #     y2 = d + e*x1 + f*y1
+    #
+    #  The transformation can be decomposed into four steps:
+    #
+    #     1)  Zero points:
+    #
+    #             x' = xz + x1
+    #             y' = yz + y1
+    #
+    #     2)  Scales:
+    #
+    #             x'' = xs*x'
+    #             y'' = ys*y'
+    #
+    #     3)  Nonperpendicularity:
+    #
+    #             x''' = cos(perp/2)*x'' + sin(perp/2)*y''
+    #             y''' = sin(perp/2)*x'' + cos(perp/2)*y''
+    #
+    #     4)  Orientation:
+    #
+    #             x2 = cos(orient)*x''' + sin(orient)*y'''
+    #             y2 =-sin(orient)*y''' + cos(orient)*y'''
+    #
+    #  See also slaFitxy, slaPxy, slaInvf, slaXy2xy
+    #
+    #  Last revision:   22 September 1995
+    #
+    #  Copyright P.T.Wallace.  All rights reserved.
+
+    # Arguments
+    my ($a,$b,$c,$d,$e,$f) = @_;
+
+
+    my ($rb2e2, $rc2f2, $xsc, $ysc, $p, $ws, $wc, $or);
+    my ($hp, $shp, $chp, $sor, $cor, $det, $x0, $y0);
+
+    my $pi = 2.0 * POSIX::asin(1.0);
+
+    # Scales
+    $rb2e2 = POSIX::sqrt ( $b * $b + $e * $e );
+    $rc2f2 = POSIX::sqrt ( $c * $c + $f * $f );
+    if ( ( $b * $f - $c * $e ) >= 0.0 ) {
+	$xsc = $rb2e2;
+    } else {
+	$b = -$b;
+	$e = -$e;
+	$xsc = -$rb2e2;
+    }
+    $ysc = $rc2f2;
+
+    # Non-perpendicularity
+    $p = ( ( $c != 0.0 || $f != 0.0 ) ? POSIX::atan2 ( $c, $f ) : 0.0 ) +
+         ( ( $e != 0.0 || $b != 0.0 ) ? POSIX::atan2 ( $e, $b ) : 0.0 );
+    # ...and ensure it's in [-Pi..+Pi]
+    while ($p < -$pi) { $p += 2*$pi; }
+    while ($p > +$pi) { $p -= 2*$pi; }
+
+    # Orientation
+    $ws = ( $c * $rb2e2 ) - ( $e * $rc2f2 );
+    $wc = ( $b * $rc2f2 ) + ( $f * $rb2e2 );
+    $or = ( $ws != 0.0 || $wc != 0.0 ) ? POSIX::atan2 ( $ws, $wc ) : 0.0;
+
+    # Zero corrections
+    $hp = $p / 2.0;
+    $shp = POSIX::sin ( $hp );
+    $chp = POSIX::cos ( $hp );
+    $sor = POSIX::sin ( $or );
+    $cor = POSIX::cos ( $or );
+    $det = $xsc * $ysc * ( $chp + $shp ) * ( $chp - $shp );
+    if ( POSIX::fabs ( $det ) > 0.0 ) {
+	$x0 = $ysc * ( $a * ( ( $chp * $cor ) - ( $shp * $sor ) )
+		       - $d * ( ( $chp * $sor ) + ( $shp * $cor ) ) ) / $det;
+	$y0 = $xsc * ( $a * ( ( $chp * $sor ) - ( $shp * $cor ) )
+		       + $d * ( ( $chp * $cor ) + ( $shp * $sor ) ) ) / $det;
+    } else {
+	$x0 = 0.0;
+	$y0 = 0.0;
+    }
+
+    # Results
+    return ($x0, $y0, $xsc, $ysc, $p*$d2r, $or*$d2r);
+}
+
 
 # Check a (reference to a) hash against another hash.  The keywords in
 # the first hash must all be present in the second, and the values of
