@@ -37,8 +37,7 @@ AC_CHECK_LIB(cc_dynamic, restFP)
 dnl    Dependences on starlink packages: depends on kappa, figaro and
 dnl    convert for the scripts in the package to work, so these must
 dnl    be declared as `use' dependencies.
-STAR_DECLARE_DEPENDENCIES(build, [ndf par sae])
-STAR_DECLARE_DEPENDENCIES(link,  [mers pcs])
+STAR_DECLARE_DEPENDENCIES(build, [generic ndf par sae shl mers pcs], [link])
 STAR_DECLARE_DEPENDENCIES(use,   [kappa figaro convert])
 
 dnl    Should investigate whether we really need this for a non-starlink
