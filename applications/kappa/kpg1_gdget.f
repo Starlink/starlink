@@ -214,6 +214,9 @@
          CALL AGI_ICURP( IPICL, STATUS )
       END IF
 
+*  Get the name of the selected picture.
+      CALL AGI_INAME( NAME, STATUS )
+
 *  Create a PGPLOT viewport from the picture. The viewport covers the 
 *  entire picture (no border is left), and has world co-ordinates defined
 *  by the AGI database.
@@ -241,7 +244,6 @@
                IF( STATUS .EQ. SAI__OK ) THEN
                   CALL AST_ANNUL( IPLOT, STATUS )
 
-                  CALL AGI_INAME( NAME, STATUS )
                   CALL MSG_SETC( 'NAME', NAME )
                   CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS',
      :                                                 STATUS ) )
@@ -360,7 +362,10 @@
 
 *  Create the BASEPIC Frame.
          BPIC = AST_FRAME( 2, 'DOMAIN=BASEPIC,TITLE=Normalised world '//
-     :                     'co-ordinates in the AGI BASE picture.',
+     :                     'co-ordinates in the AGI BASE picture.,'//
+     :                     'Symbol(1)=X,Symbol(2)=Y,'//
+     :                     'Label(1)=Horizontal offset,'//
+     :                     'Label(2)=Vertical offset',
      :                     STATUS )
 
 *  Save the original current Frame index.
@@ -369,8 +374,11 @@
 *  Add the BASEPIC Frame into the Plot.      
          CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, BPIC, STATUS )
 
-*  Re-instate the original current Frame index.
-         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
+*  If the picture is a DATA picture, re-instate the original current Frame 
+*  index. Otherwise, leave the BASEPIC Frame as the current Frame.
+         IF( NAME .EQ. 'DATA' ) THEN
+            CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
+         END IF
 
       END IF
 
