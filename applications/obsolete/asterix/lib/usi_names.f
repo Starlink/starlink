@@ -140,7 +140,7 @@
 
 *      Increment file counter
           NLINE = NLINE + 1
-          CALL CHR_ITOC( NFILE, FSTR, FNDIG )
+          CALL CHR_ITOC( NLINE, FSTR, FNDIG )
 
 *      Perform trace
           IF ( DS(I).ADIFPN ) THEN
