@@ -60,7 +60,7 @@
         N = 0
         I = 1
         DO WHILE ( ( I .LE. SSO__MXDS ) .AND. ( N .EQ. 0 ) )
-          IF ( ( LOC .EQ. SSO.DS(I).LOC ) .AND. SSO.DS(I).USED ) THEN
+          IF ( ( LOC .EQ. SSO_DS_LOC(I) ) .AND. SSO_DS_USED(I) ) THEN
             N = I
           ELSE
             I = I + 1
@@ -73,7 +73,7 @@
 *        Search for unused slot
           I = 1
           DO WHILE ( ( I .LE. SSO__MXDS ) .AND. ( N .EQ. 0 ) )
-            IF ( .NOT. SSO.DS(I).USED ) THEN
+            IF ( .NOT. SSO_DS_USED(I) ) THEN
               N = I
             ELSE
               I = I + 1
@@ -88,8 +88,8 @@
           ELSE
 
 *          Use slot
-            SSO.DS(N).USED = .TRUE.
-            SSO.DS(N).LOC = LOC
+            SSO_DS_USED(N) = .TRUE.
+            SSO_DS_LOC(N) = LOC
 
           END IF
 
@@ -97,7 +97,7 @@
 
 *      Tidy up
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_FINDDS', STATUS )
+          CALL AST_REXIT( 'SSO_FINDDS', STATUS )
         END IF
 
       END IF

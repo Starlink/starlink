@@ -69,10 +69,10 @@
         CALL SSO_ADDMAP( LOC, FLD, SSO__MI_DATA, NMI, STATUS )
 
 *      Already mapped?
-        IF ( SSO.MI(NMI).MAPPED ) THEN
+        IF ( SSO_MI_MAPPED(NMI) ) THEN
 
 *        Return stored pointer
-          PTR = SSO.MI(NMI).PTR
+          PTR = SSO_MI_PTR(NMI)
 
         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -84,9 +84,9 @@
           CALL CMP_MAPN( FLOC, 'DATA_ARRAY', TYPE(:TLEN-1), MODE, NDIM,
      :                                              PTR, DIMS, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
-            SSO.MI(NMI).PTR = PTR
-            SSO.MI(NMI).MAPPED = .TRUE.
-            SSO.MI(NMI).FLOC = FLOC
+            SSO_MI_PTR(NMI) = PTR
+            SSO_MI_MAPPED(NMI) = .TRUE.
+            SSO_MI_FLOC(NMI) = FLOC
           END IF
 
         END IF

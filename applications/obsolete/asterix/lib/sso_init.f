@@ -36,12 +36,12 @@
 
 *    for datasets
       DO I = 1, SSO__MXDS
-        SSO.DS(I).USED = .FALSE.
+        SSO_DS_USED(I) = .FALSE.
       END DO
 
 *    for mapped items
       DO I = 1, SSO__MXMI
-        SSO.MI(I).USED = .FALSE.
+        SSO_MI_USED(I) = .FALSE.
       END DO
 
       SSO_INIT_Q = .TRUE.

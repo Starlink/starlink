@@ -59,10 +59,10 @@
         N = 0
         I = 1
         DO WHILE ( ( I .LE. SSO__MXMI ) .AND. ( N .EQ. 0 ) )
-          IF ( ( NDS .EQ. SSO.MI(I).DS ) .AND.
-     :         ( FLD .EQ. SSO.MI(I).FLD ) .AND.
-     :         ( TYPE .EQ. SSO.MI(I).TYPE ) .AND.
-     :         SSO.MI(I).USED ) THEN
+          IF ( ( NDS .EQ. SSO_MI_DS(I) ) .AND.
+     :         ( FLD .EQ. SSO_MI_FLD(I) ) .AND.
+     :         ( TYPE .EQ. SSO_MI_TYPE(I) ) .AND.
+     :         SSO_MI_USED(I) ) THEN
             N = I
           ELSE
             I = I + 1
@@ -75,7 +75,7 @@
 *        Search for unused slot
           I = 1
           DO WHILE ( ( I .LE. SSO__MXMI ) .AND. ( N .EQ. 0 ) )
-            IF ( .NOT. SSO.MI(I).USED ) THEN
+            IF ( .NOT. SSO_MI_USED(I) ) THEN
               N = I
             ELSE
               I = I + 1
@@ -90,12 +90,12 @@
           ELSE
 
 *          Use slot
-            SSO.MI(N).USED = .TRUE.
-            SSO.MI(N).DS = NDS
-            SSO.MI(N).TYPE = TYPE
-            SSO.MI(N).FLD = FLD
-            SSO.MI(N).PTR = 0
-            SSO.MI(N).MAPPED = .FALSE.
+            SSO_MI_USED(N) = .TRUE.
+            SSO_MI_DS(N) = NDS
+            SSO_MI_TYPE(N) = TYPE
+            SSO_MI_FLD(N) = FLD
+            SSO_MI_PTR(N) = 0
+            SSO_MI_MAPPED(N) = .FALSE.
 
           END IF
 
@@ -107,7 +107,7 @@
 
 *      Tidy up
  99     IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_FINDMI', STATUS )
+          CALL AST_REXIT( 'SSO_FINDMI', STATUS )
         END IF
 
       END IF

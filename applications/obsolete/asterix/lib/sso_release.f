@@ -55,31 +55,31 @@
         DO I = 1, SSO__MXMI
 
 *        Belongs to this dataset?
-          IF ( SSO.MI(I).USED .AND. ( DS .EQ. SSO.MI(I).DS ) ) THEN
+          IF ( SSO_MI_USED(I) .AND. (DS .EQ. SSO_MI_DS(I) ) ) THEN
 
 *          Item is mapped?
-            IF ( SSO.MI(I).MAPPED ) THEN
-              CALL CMP_UNMAP( SSO.MI(I).FLOC, OBJS(SSO.MI(I).TYPE),
+            IF ( SSO_MI_MAPPED(I) ) THEN
+              CALL CMP_UNMAP( SSO_MI_FLOC(I), OBJS(SSO_MI_TYPE(I)),
      :                                                     STATUS )
-              SSO.MI(I).MAPPED = .FALSE.
+              SSO_MI_TYPE(I) = .FALSE.
             END IF
 
 *          Free field locator
-            CALL DAT_ANNUL( SSO.MI(I).FLOC, STATUS )
+            CALL DAT_ANNUL( SSO_MI_FLOC(I), STATUS )
 
 *          And reset
-            SSO.MI(I).USED = .FALSE.
+            SSO_MI_USED(I) = .FALSE.
 
           END IF
 
         END DO
 
 *      Free dataset slot
-        SSO.DS(DS).USED = .FALSE.
+        SSO_DS_USED(DS) = .FALSE.
 
 *      Tidy up
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_RELEASE', STATUS )
+          CALL AST_REXIT( 'SSO_RELEASE', STATUS )
         END IF
 
       END IF
