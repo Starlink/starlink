@@ -149,11 +149,13 @@
       CHARACTER METH*6           ! Binning method
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
       CHARACTER STOKES*3         ! Identifiers for cube planes
+      CHARACTER TITLE*80         ! Title from input catalogue
       CHARACTER UNITS*( CAT__SZUNI )! Units of the total intensity column
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER GI( 8 )            ! CAT identifiers for columns to be read
-      INTEGER GANG               ! CAT identifiers for ANGROT parameter
+      INTEGER GANG               ! CAT identifier for ANGROT parameter
+      INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
@@ -223,7 +225,7 @@
       REAL SYLO                  ! Lower bound of used region of Y axis 
       REAL Q                     ! Stored Q in input catalogue
       REAL U                     ! Stored U in input catalogue
-      REAL ANG                 ! Stored angle in input catalogue
+      REAL ANG                   ! Stored angle in input catalogue
       REAL TR( 4 )               ! Coeff.s of (X,Y) -> cell indices mapping
       REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
       REAL X0                    ! X at bottom left of bottom left cell
@@ -686,9 +688,22 @@
       UNITS = ' '
       CALL CAT_TIQAC( GI( I_ID ), 'UNITS', UNITS, STATUS) 
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the TITLE parameter (if any) from the input catalogue.
+      CALL CAT_TIDNT( CIIN, 'TITLE', GTTL, STATUS )       
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
+         CALL CAT_TRLSE( GTTL, STATUS )
+      ELSE
+         TITLE = ' '
+         CALL ERR_ANNUL( STATUS )
+      END IF
+
 *  Create the output catalogue.
-      CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGROT, CIOUT, 
-     :                 STATUS )
+      CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGROT, TITLE,
+     :                 CIOUT, STATUS )
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999

@@ -305,6 +305,12 @@
 *        vectors are aligned with the existing DATA picture.
 
 *  Notes:
+*     -  The TITLE parameter in the supplied catalogue is used as the default 
+*     title for the annotated axes. If the catalogue does not have a TITLE 
+*     parameter (of it is blank), then the default title is taken from current 
+*     co-ordinate Frame stored in the WCS component of the catalogue. This
+*     default may be over-ridden by specifying a value for the Title
+*     attribute using the STYLE parameter. 
 *     -  The columns specified by parameters COLX and COLY should hold
 *     coordinates in the "Base Frame" of the WCS information stored as 
 *     an AST FrameSet (see SUN/210) in the supplied catalogue. If the 
@@ -400,6 +406,7 @@
       INTEGER GIS( 2 )           ! CAT identifiers for X,Y catalogue columns
       INTEGER GIX                ! CAT identifier for X column
       INTEGER GIY                ! CAT identifier for X column
+      INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER I                  ! Loop count
       INTEGER ICAT               ! Index of (X,Y) Frame in IWCS and IPLOT
       INTEGER IFRM               ! Frame index
@@ -800,6 +807,35 @@
 *  Find the index of the Frame within the Plot corresponding to the 
 *  catalogue columns specifying the vector positions. 
       ICAT = ICAT + NFRM
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the TITLE parameter (if any) from the input catalogue.
+      CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )       
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
+         CALL CAT_TRLSE( GTTL, STATUS )
+      ELSE
+         TITLE = ' '
+         CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  If the user did not specify a Plot title (as indicated by the Plot title
+*  being the same as the WCS title), make the catalogue Title the default 
+*  Title for the Plot. We have to be careful about the timing of this change 
+*  to the Title. If we did it before KPG1_PLOT (i.e. if we set the Title in 
+*  IWCS) it may prevent alignment ocurring within KPG1_PLOT since alignment 
+*  fails if the Title of two Frames differ.
+      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
+     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+
+         IF( TITLE .NE. ' ' ) THEN
+            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ), 
+     :                     STATUS )
+         END IF
+
+      END IF
 
 *  See if axes are required
       CALL PAR_GET0L( 'AXES', AXES, STATUS )

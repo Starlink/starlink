@@ -196,6 +196,7 @@
       CHARACTER METH*6           ! Binning method
       CHARACTER STOKES*(NDF__MXDIM) ! Identifiers for each plane of input
       CHARACTER UNITS*40         ! Units from input Stokes cube
+      CHARACTER TITLE*80         ! Title from input Stokes cube
       DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
       INTEGER BOX( 2 )           ! Bin size
       INTEGER CI                 ! CAT identifier for output catalogue
@@ -670,10 +671,14 @@
          CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
       END IF
- 
+
+*  Get the Title component from the input cube. 
+      TITLE = ' '
+      CALL NDF_CGET( INDF1, 'TITLE', TITLE, STATUS ) 
+
 *  Create the catalogue.
       CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 
-     :                 UNITS, VAR, ANGROT, CI, STATUS )
+     :                 UNITS, VAR, ANGROT, TITLE, CI, STATUS )
 
 *  If successful, set a flag indicating that a catalogue is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN

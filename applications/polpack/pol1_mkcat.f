@@ -1,5 +1,5 @@
       SUBROUTINE POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, 
-     :                       CI, STATUS )
+     :                       TITLE, CI, STATUS )
 *+
 *  Name:
 *     POL1_MKCAT
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, CI, STATUS )
+*     CALL POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, TITLE, CI, 
+*                      STATUS )
 
 *  Description:
 *     This routine creates a new CAT catalogue. Columns are created for the 
@@ -40,6 +41,9 @@
 *     ANGROT = REAL (Given)
 *        ACW angle in degrees from pixel X axis to analyser angle. This
 *        is stored as a parameter of the catalogue.
+*     TITLE = CHARACTER * ( * ) (Given)
+*        A title string to store as the TITLE parameter for the catalogue.
+*        No TITLE parameter is created if TITLE is blank.
 *     CI = INTEGER (Returned)
 *        A CAT identifier for the created catalogue.
 *     STATUS = INTEGER (Given and Returned)
@@ -77,6 +81,7 @@
       CHARACTER UNITS*(*)
       LOGICAL VAR
       REAL ANGROT
+      CHARACTER TITLE*(*)
 
 *  Arguments Returned:
       INTEGER CI
@@ -87,7 +92,7 @@
 *  Local Variables:
       INTEGER II                 ! CAT identifier for most recent part
       INTEGER FRM                ! Pointer to Base Frame
-      INTEGER QI                 ! Identifier for ANGROT parameter
+      INTEGER QI                 ! Identifier for a catalogue parameter
 *.
 
 *  Check the inherited global status.
@@ -99,6 +104,12 @@
 
 *  Create the catalogue.
       CALL CAT_CREAT( PARAM, CI, STATUS )
+
+*  If required, set the TITLE parameter.
+      IF( TITLE .NE. ' ' ) THEN
+         CALL CAT_PPTSC( CI, 'TITLE', TITLE, 'Catalogue title', QI, STATUS )
+         CALL CAT_TRLSE( QI, STATUS )
+      END IF
 
 *  Create the columns...
 
