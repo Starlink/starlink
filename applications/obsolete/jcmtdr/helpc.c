@@ -90,10 +90,13 @@
 
  * Authors:
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    ajc: Alan Chipperfield (Starlink, RAL)
 
  * History:
  *    28 Mar 1994 (hme):
  *       Original version.
+ *    10 Feb 1998 (ajc):
+ *       Mod to use termios
  *-
  */
 
@@ -102,7 +105,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/termio.h>
+#include <termios.h>
+#ifndef TIOCGWINSZ
+#include <sys/ioctl.h>
+#endif
 #include "cnf.h"
 #include "f77.h"
 
@@ -195,7 +201,7 @@ void helpc( int argc, char **argv )
 
 /* Find out the terminal size.
  */
-   if ( ioctl( 1, TIOCGWINSZ, &term ) )
+   if ( ioctl( 1, TIOCGWINSZ, &term ) < 0 )
    {  width = WIDTH; page = PAGE;
    }
    else
