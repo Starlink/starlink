@@ -603,7 +603,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_szlsf.f \
  ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tcout.f ccd1_tfun.f \
- ccd1_tmpnm.f ccd1_tstb.f ccd1_untmp.f ccd1_vlin.f \
+ ccd1_tmpnm.f ccd1_trout.f ccd1_tstb.f ccd1_untmp.f ccd1_vlin.f \
  ccd1_wdpc.f ccd1_wedge.f ccd1_wffc.f \
  ccd1_wgtrn.f ccd1_winad.f ccd1_windr.f ccd1_wlis.f \
  ccd1_wltrn.f ccd1_wmmc.f ccd1_wrgra.f ccd1_wrixy.f \
@@ -956,10 +956,33 @@ $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip: $(PK
 
 CCDPACK_HOME = /mbt/support/ccdpack
 
+#  Files under RCS control.
+
+RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
+           $(PRIVATE_INCLUDES) $(MONO_SOURCE) $(HELP_SOURCES) \
+           $(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT) $(PUBLIC_SCRIPTS) \
+           $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
+           $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
+           $(GENLRDICSRC) $(GENLRDISRC) $(TASKSRC) $(IRGSRC) $(CIRGSRC) \
+           $(IRHSRC) $(DATA_FILES) $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) \
+           $(IRAF_PAR) $(IRAF_HELP)
+
+#  Build all required source files for distribution (tar archives etc)
+
 check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_dgen.tar \
  $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar \
- $(DOCUMENTATION) $(DATA_FILES) $(PKG_NAME)_iraf.tar
+ $(DOCUMENTATION) $(DATA_FILES) $(PKG_NAME)_iraf.tar \
+ rcsrevs
+
+#  Build list of files under RCS control used at this release, and log
+#  their version numbers.
+
+rcsrevs: RCS
+	for f in $(RCSFILES); do \
+           echo $$f":" `rlog -r $$f | awk '/^revision [0-9]/ {print $$2}'`; \
+        done \
+        > rcsrevs
 
 #  Rules for building release files from RCS repository.
 
@@ -2181,7 +2204,7 @@ ccd1_ffcor.o: SAE_PAR
 ccd1_filas.o: CCD1_PAR SAE_PAR
 ccd1_fiohd.o: MSG_PAR SAE_PAR
 ccd1_fitg.o: CCD1_FITCM DAT_PAR NUM_CMN SAE_PAR
-ccd1_fitlm.o: MSG_PAR NUM_CMN PRM_PAR SAE_PAR
+ccd1_fitlm.o: NUM_CMN SAE_PAR
 ccd1_flnms.o: CCD1_PAR SAE_PAR
 ccd1_frdm.o: AST_PAR SAE_PAR
 ccd1_frtmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR
@@ -2321,8 +2344,9 @@ ccd1_subcs.o: SAE_PAR
 ccd1_szlsf.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_szprd.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_szslv.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR PRM_PAR SAE_PAR USER_ERR
-ccd1_tcout.o: AST_PAR MSG_PAR PRM_PAR SAE_PAR
+ccd1_tcout.o: AST_PAR PRM_PAR SAE_PAR
 ccd1_tmpnm.o: PRM_PAR SAE_PAR
+ccd1_trout.o: SAE_PAR MSG_PAR
 ccd1_touch.o: SAE_PAR
 ccd1_tstb.o: SAE_PAR
 ccd1_untmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR
