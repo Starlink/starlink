@@ -1,395 +1,356 @@
-*+  CROSSCORR - Computes cross-correlation of two equal length series
-      SUBROUTINE CROSSCORR(STATUS)
-*    Description :
-*
+      SUBROUTINE CROSSCORR( STATUS )
+*+
+*  Name:
+*     CROSSCORR
+
+*  Purpose:
+*     Computes cross-correlation of two equal length series
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL CROSSCORR( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Calls subroutine TIM_XCOR to calculate the cross-correlation of two series
 *     Y and Z which may both come from the same file or from different files.
 *     If the series are not of equal length then the longer is truncated.
-*
-*    Environment parameters :
-*
-*     INP1=UNIV(R)
-*            first input object
-*     INP2=UNIV(R)
-*            second input object
-*     LAG=INTEGER(R)
-*            maximum lag to be computed
-*     WEIGHTED=LOGICAL(R)
-*            cross-correlation to be weighted?
-*     NOISE=LOGICAL(R)
-*            remove expected noise bias?
-*     OUT=UNIV(W)
-*            output object
-*
-*    Method :
-*
+
+*  Usage:
+*     crosscorr {parameter_usage}
+
+*  Environment Parameters:
+*     INP1 = CHAR (read)
+*         First input object
+*     INP2 = CHAR (read)
+*         Second input object
+*     LAG = INTEGER (read)
+*         Maximum lag to be computed
+*     WEIGHTED = LOGICAL (read)
+*         Cross-correlation to be weighted?
+*     NOISE = LOGICAL (read)
+*         Remove expected noise bias?
+*     OUT = CHAR (read)
+*         Name of output object
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     The autocorrelation calculated is the biased version, which has lower
 *     variance than the unbiased estimator. It reduces towards zero as the
 *     lag increases.
 *     Data weights may be taken into account, and the noise contribution
 *     can be removed from the denominator of the autocorrelation - see e.g.
 *     Weisskopf et al, Ap.J.199, L147.
-*
-*    Deficiencies :
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
 *     The FFT is not used; this involves a time penalty for large data sets.
-*
-*    Bugs :
-*    Authors :
-*
-*     Trevor Ponman  (BHVAD::TJP)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      4 Apr 84 : Original
-*     29 Aug 86 : graphics removed (JCMP)
-*     11 Jun 87 : restructured, COMMENT removed (pla@uk.ac.bham.sr.star)
-*     24 Sep 88 : V1.0-1 ASTERIX88 conversion (TJP)
-*     13 Dec 88 : V1.0-2 Rationalised to use standard subroutines etc. (TJP)
-*
-*     13 Jun 90 : V1.2-0 UTIL_NBAD removed (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     crosscorr, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      4 Apr 1984 V0.6-0 (TJP):
+*        Original version.
+*     29 Aug 1986 V0.6-1 (JCMP):
+*        Graphics removed
+*     11 Jun 1987 V1.0-0 (PLA):
+*        Restructured, COMMENT removed
+*     24 Sep 1988 V1.0-1 (TJP):
+*        ASTERIX88 conversion
+*     13 Dec 1988 V1.0-2 (TJP):
+*        Rationalised to use standard subroutines etc.
+*     13 Jun 1990 V1.2-0 (DJA):
+*        UTIL_NBAD removed
+*     13 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-      INTEGER CHR_LEN
-*    Local variables :
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL                  CHR_LEN
+        INTEGER                 CHR_LEN
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'CROSSCORR Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*80           STRING          ! Text string
       CHARACTER*80           TEXT(10)        ! History text
 
       REAL                   BASE            ! Axis base value
-      REAL                   SCALE           ! Axis scale value
-      REAL                   YSCALE          ! Axis scale value for Y
-      REAL                   ZSCALE          ! Axis scale value for Z
+      REAL                   OSCALE           ! Axis scale value
+      REAL                   SCALE(2)
       REAL                   VMIN,VMAX       ! Min and max variance values
 
       INTEGER                I
-      INTEGER			IFID			! I/p used as base
-      INTEGER                YDPTR           ! Pointer to Y data array
-      INTEGER                ZDPTR           ! Pointer to Z data array
-      INTEGER                YVPTR           ! Pointer to Y variance array
-      INTEGER                YQPTR           ! Pointer to Y quality array
-      INTEGER                ZVPTR           ! Pointer to Z variance array
-      INTEGER                ZQPTR           ! Pointer to Z quality array
       INTEGER                XCPTR           ! Pointer to cross-correln values
-      INTEGER                NY              ! No. of points in Y array
-      INTEGER                NZ              ! No. of points in Z array
       INTEGER                ND              ! No. of data points used
       INTEGER                LMAX            ! Maximum lag to be computed
       INTEGER                NL              ! Total number of lag values
       INTEGER                NDIM            ! Dimensionality of data
       INTEGER                NBAD            ! No.of bad quality data
       INTEGER                NVAL            ! No.of values
-      INTEGER                BASEFILE        ! File # from which MORE/HIST taken
-      INTEGER                QNDIM           ! Dimensionality of quality
-      INTEGER                QDIM(ADI__MXDIM)! Quality dimensions
       INTEGER                NLINE           ! Line no. of HISTORY text
       INTEGER                TEXTLEN         ! Length of text string
-      INTEGER                IDIM(ADI__MXDIM)! Size of each dimension
+
+      INTEGER                   BF                      ! The base file number
+      INTEGER                   DPTR(2)                 ! Mapped input data
+      INTEGER                   IFID(2)                 ! Input identifiers
+      INTEGER                   NELM(2)                 ! # points per input
+      INTEGER                   QPTR                    ! Input quality pointer
+      INTEGER                   VPTR(2)                 ! Mapped input errors
       INTEGER			XCID			! Output dataset id
-      INTEGER			YFID			! 1st input id
-      INTEGER			ZFID			! 2nd input id
 
-      LOGICAL                ANYBAD          ! Any bad quality points at all?
-      LOGICAL                DENOISE         ! Noise variance removed?
-      LOGICAL                OK              ! Present & correct?
-      LOGICAL                VARS            ! Variances available?
-      LOGICAL                WEIGHT          ! Weighted cross-correlation?
-      LOGICAL                YPRIM           ! Primitive input array 1?
-      LOGICAL                YREG            ! Y spacing known to be regular?
-      LOGICAL                ZPRIM           ! Primitive input array 2?
-      LOGICAL                ZREG            ! Z spacing known to be regular?
+      LOGICAL                   DENOISE                 ! Noise variance removed?
+      LOGICAL                   OK                      ! Present & correct?
+      LOGICAL                   VOK(2)                  ! Variances ok?
+      LOGICAL                   WEIGHT                  ! Weighted cross-correlation?
+*.
 
-*  Version :
-      CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'CROSSCORR Version 1.8-0' )
-*-
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Announce version
-      CALL MSG_PRNT(VERSION)
+*  Version id
+      CALL MSG_PRNT( VERSION )
 
-*    Initialise ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Obtain data objects
-      CALL USI_TASSOCI( 'INP1', '*', 'READ' , YFID, STATUS )
-      CALL USI_TASSOCI( 'INP2', '*', 'READ' , ZFID, STATUS )
-      IF(STATUS.NE.SAI__OK) GOTO 99
+*  Obtain input data
+      DO I = 1, 2
 
-*    Test whether primitive
-      CALL BDI_PRIM( YFID, YPRIM, STATUS )
-      CALL BDI_PRIM( ZFID, ZPRIM, STATUS )
+*    Associate file
+        CALL USI_IASSOC( 'INP', I, 'BinDS|Array', 'READ', IFID(1),
+     :                   STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check data, map if present and 1-dimensional
-      CALL BDI_CHKDATA(YFID,OK,NDIM,IDIM,STATUS)
-D     print *,'y;ok,ndim,idim,status:',ok,ndim,idim,status
-      IF(.NOT.OK)THEN
-        STATUS=SAI__ERROR
-        CALL ERR_REP('BADDAT','Invalid data in dataset 1',STATUS)
-      ELSE
-        IF(NDIM.NE.1)THEN
-          STATUS=SAI__ERROR
-          CALL ERR_REP( 'NOT_1DY', '$INP1 data are not one-dimensional',
-     :    STATUS )
+*    Data ok?
+        CALL BDI_CHK( IFID(I), 'Data', OK, STATUS )
+        IF ( .NOT. OK ) THEN
+          CALL MSG_SETI( 'N', I )
+          STATUS = SAI__ERROR
+          CALL ERR_REP( 'BADDAT', 'Invalid data in dataset ^N',
+     :                   STATUS )
+        END IF
+
+*    Get number of elements
+        CALL BDI_GETSHP( IFID(I), 1, NELM(I), NDIM, STATUS )
+
+*    Map input data
+        CALL BDI_MAPR( IFID(I), 'Data', 'READ', DPTR(I), STATUS )
+
+*    Variance present?
+        CALL BDI_CHK( IFID(I), 'Variance', VOK(I), STATUS )
+
+*    Warn if quality present
+        CALL BDI_CHK( IFID(I), 'Quality', OK, STATUS )
+        IF ( OK ) THEN
+          CALL BDI_MAPL( IFID(I), 'LogicalQuality', 'READ', QPTR,
+     :      STATUS )
+          CALL ARR_NBAD( NELM(I), %VAL(QPTR), NBAD, STATUS )
+          IF ( NBAD .GT. 0 ) THEN
+            CALL MSG_SETI( 'NB', NBAD )
+            CALL MSG_SETI( 'NF', I )
+            CALL MSG_PRNT( 'WARNING : There are ^NB bad quality '/
+     :      /'points in file ^NF which this program cannot handle' )
+          END IF
+          CALL BDI_UNMAP( IFID(I), 'LogicalQuality', QPTR, STATUS )
+
+        END IF
+
+*    Check axis values
+        CALL BDI_AXCHK( IFID(I), 1, 'Data', AOK(I), STATUS )
+        IF ( AOK(I) ) THEN
+          CALL BDI_AXMAPR( IFID(I), 1, 'Data', 'READ', APTR, STATUS )
+          CALL ARR_CHKREG( %VAL(APTR), NELM(I), REG, BASE, SCALE(I),
+     :      STATUS )
+          IF ( .NOT. REG ) THEN
+            CALL MSG_SETI( 'N', I )
+            CALL MSG_PRNT( 'WARNING : Axis of input ^N is not '/
+     :      /'regular; will continue using pixel numbers instead' )
+            SCALE(I) = 1.0
+          END IF
         ELSE
-          CALL BDI_MAPDATA(YFID,'READ',YDPTR,STATUS)
-          NY=IDIM(1)
-        ENDIF
-      ENDIF
-      IF(STATUS.NE.SAI__OK) GOTO 99
+          SCALE(I) = 1.0
+        END IF
 
-      CALL BDI_CHKDATA(ZFID,OK,NDIM,IDIM,STATUS)
-D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
-      IF(.NOT.OK)THEN
-        CALL ERR_REP('BADDAT','Invalid data in dataset 2',STATUS)
-        STATUS=SAI__ERROR
+      END DO
+
+*  Warn if axis scalings are different
+      IF ( (AOK(1) .AND. AOK(2)) .AND.
+     :  (ABS(SCALE(1)-SCALE(2)) .GT. ABS(SCALE(1)*1.0E-5)) ) THEN
+        CALL MSG_PRNT( 'WARNING : The two datasets have different'//
+     :    ' axis spacing; continuing assuming equal spacing' )
+        OSCALE = 1.0
       ELSE
-        IF(NDIM.NE.1)THEN
-          CALL ERR_REP( 'NOT_1DZ', '$INP2 data are not one-dimensional',
-     :    STATUS )
-          STATUS=SAI__ERROR
-        ELSE
-          CALL BDI_MAPDATA(ZFID,'READ',ZDPTR,STATUS)
-          NZ=IDIM(1)
-        ENDIF
-      ENDIF
-      IF(STATUS.NE.SAI__OK) GOTO 99
-
-*    Check for regular axis spacing
-      YREG=.FALSE.
-      IF(.NOT.YPRIM)THEN
-        CALL BDI_CHKAXVAL(YFID,1,OK,YREG,NVAL,STATUS)
-      ENDIF
-      IF (.NOT.YREG) THEN
-        CALL MSG_PRNT( 'Assuming $INP1 regularly spaced')
+        OSCALE = SCALE(1)
       END IF
-      IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
 
-      ZREG=.FALSE.
-      IF(.NOT.ZPRIM)THEN
-        CALL BDI_CHKAXVAL(ZFID,1,OK,ZREG,NVAL,STATUS)
-      ENDIF
-      IF(.NOT.ZREG) THEN
-        CALL MSG_PRNT( 'Assuming $INP2 regularly spaced')
-      END IF
-      IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+*  Truncate to shorter of inputs
+      ND = MIN( NELM(1), NELM(2) )
+      CALL MSG_SETI( 'NDAT', ND )
+      CALL MSG_PRNT( 'Using ^NDAT data points')
 
-*    Get axis spacing if available
-      IF(YREG)THEN
-        CALL BDI_GETAXVAL(YFID,1,BASE,YSCALE,I,STATUS)
-      ENDIF
-      IF(ZREG)THEN
-        CALL BDI_GETAXVAL(ZFID,1,BASE,ZSCALE,I,STATUS)
-      ENDIF
-      IF(YREG.AND.ZREG)THEN
-        IF(ABS(YSCALE-ZSCALE)/YSCALE.LT.0.0001)THEN
-          SCALE=YSCALE
-        ELSE
-          CALL ERR_REP('BADSCALES','The two datasets have different'//
-     :    ' axis spacing',STATUS)
-          STATUS=SAI__ERROR
-        ENDIF
-      ELSE IF(YREG)THEN
-        SCALE=YSCALE
-      ELSE IF(ZREG)THEN
-        SCALE=ZSCALE
-      ELSE
-        SCALE=1.0
-        CALL MSG_PRNT( 'Adopting unit axis spacing')
-      ENDIF
-
-*    If one array is larger than the other then truncate it
-      IF (NY.GT.NZ) THEN
-        CALL MSG_PRNT('$INP1 array truncated for use')
-        ND = NZ
-      ELSE IF (NZ.GT.NY) THEN
-        CALL MSG_PRNT('$INP2 array truncated for use')
-        ND=NY
-      ELSE
-        ND=NY
-      END IF
-      IF(ND.GT.1)THEN
-        CALL MSG_SETI( 'NDAT', ND )
-        CALL MSG_PRNT( 'Using ^NDAT data points')
-      ELSE
-        CALL ERR_REP('TOO_SHORT','Insufficient data to cross-correlate',
-     :  STATUS)
-        STATUS=SAI__ERROR
-        GOTO 99
-      ENDIF
-
-*    User input
-      CALL USI_DEF0I( 'LAG',ND-1,STATUS)
+*  User input
+      CALL USI_DEF0I( 'LAG', ND-1, STATUS )
       CALL USI_GET0I( 'LAG', LMAX, STATUS )
       IF(STATUS.NE.SAI__OK) GOTO 99
-      IF(LMAX.GT.ND-1)THEN
-        LMAX=ND-1
+      IF ( LMAX .GT. ND-1 ) THEN
+        LMAX = ND - 1
         CALL MSG_SETI('LMAX',LMAX)
         CALL MSG_PRNT('Maximum lag possible is ^LMAX')
-      ENDIF
-
-*    Check data variances - only allow weighting if all variances are available
-      IF((.NOT.YPRIM).AND.(.NOT.ZPRIM))THEN
-        CALL BDI_CHKVAR(YFID,VARS,NDIM,IDIM,STATUS)
-        IF(VARS)THEN
-          IF(NDIM.NE.1.OR.IDIM(1).NE.NY)THEN
-            CALL MSG_PRNT('WARNING: $INP1 variance array is'
-     :      //' wrong size. Will proceed without weighting.')
-            VARS=.FALSE.
-          ELSE
-            CALL BDI_CHKVAR(ZFID,OK,NDIM,IDIM,STATUS)
-            IF(OK)THEN
-              IF(NDIM.NE.1.OR.IDIM(1).NE.NZ)THEN
-                CALL MSG_PRNT('WARNING: $INP2 variance array'
-     :          //' is wrong size. Will proceed without weighting.')
-                VARS=.FALSE.
-              ENDIF
-            ENDIF
-          ENDIF
-        ENDIF
-
-*      Weighting &/or noise correction required?
-        IF(VARS)THEN
-          CALL USI_GET0L( 'WEIGHTED', WEIGHT, STATUS )
-          CALL USI_GET0L( 'NOISE', DENOISE, STATUS )
-        ENDIF
-        IF(STATUS.NE.SAI__OK) GOTO 99
-
-*      Map variances
-        IF(WEIGHT.OR.DENOISE)THEN
-          CALL BDI_MAPVAR(YFID,'READ',YVPTR,STATUS)
-          CALL BDI_MAPVAR(ZFID,'READ',ZVPTR,STATUS)
-        ENDIF
-        IF(STATUS.NE.SAI__OK)THEN
-          CALL ERR_REP('BAD_VAR','Failed to map variances - no '//
-     :    'weighting or noise correction performed',STATUS)
-          CALL ERR_FLUSH(STATUS)
-          WEIGHT=.FALSE.
-          DENOISE=.FALSE.
-        ENDIF
-
-*      Check data quality
-        CALL BDI_CHKQUAL( YFID, OK, QNDIM, QDIM, STATUS )
-        IF ( OK ) THEN
-           CALL BDI_MAPLQUAL( YFID, 'READ', ANYBAD, YQPTR, STATUS )
-           IF ( ANYBAD ) THEN
-              CALL ARR_NBAD( ND, %VAL(YQPTR), NBAD, STATUS )
-              CALL MSG_SETI( 'NBAD', NBAD )
-              CALL MSG_PRNT('WARNING: ^NBAD bad data points present'/
-     :                                                  /' in $INP1')
-           END IF
-           CALL BDI_UNMAPLQUAL( YFID, STATUS )
-        END IF
-        CALL BDI_CHKQUAL( ZFID, OK, QNDIM, QDIM, STATUS )
-        IF ( OK ) THEN
-           CALL BDI_MAPLQUAL( ZFID, 'READ', ANYBAD, ZQPTR, STATUS )
-           IF ( ANYBAD ) THEN
-              CALL ARR_NBAD( ND, %VAL(ZQPTR), NBAD, STATUS )
-              CALL MSG_SETI( 'NBAD', NBAD )
-              CALL MSG_PRNT('WARNING: ^NBAD bad data points present'/
-     :                                                  /' in $INP2')
-           END IF
-           CALL BDI_UNMAPLQUAL( ZFID, STATUS )
-        END IF
       END IF
 
-*    If variances are to be used check that they are all >0
-      IF(WEIGHT.OR.DENOISE)THEN
-        CALL ARR_RANG1R(ND,%VAL(YVPTR),VMIN,VMAX,STATUS)
-        IF(VMIN.LE.0.0)THEN
-          CALL MSG_PRNT('Non-positive variance values in '//
-     :    '$INP1 - proceeding without weighting')
-          WEIGHT=.FALSE.
-          DENOISE=.FALSE.
-        ELSE
-          CALL ARR_RANG1R(ND,%VAL(ZVPTR),VMIN,VMAX,STATUS)
-          IF(VMIN.LE.0.0)THEN
-            CALL MSG_PRNT('Non-positive variance values in '//
-     :      '$INP2 - proceeding without weighting')
-            WEIGHT=.FALSE.
-            DENOISE=.FALSE.
-          ENDIF
-        ENDIF
-      ENDIF
+*  Check data variances - only allow weighting if all variances are available
+      IF ( VOK(1) .AND. VOK(2) ) THEN
 
-*    Create a cross-correlation object
-      CALL USI_TASSOCO( 'OUT', 'CROSS_CORR', XCID, STATUS )
-      IF(STATUS.NE.SAI__OK) GOTO 99
+*    Weighting &/or noise correction required?
+        CALL USI_GET0L( 'WEIGHTED', WEIGHT, STATUS )
+        CALL USI_GET0L( 'NOISE', DENOISE, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Create principal arrays
+*      Map and check variances
+        IF ( WEIGHT .OR. DENOISE ) THEN
+          DO I = 1, 2
+
+*        Map the variances
+            CALL BDI_MAPR( IFID(I), 'Variance', 'READ', VPTR(I), STATUS )
+
+*        Get their range
+            CALL ARR_RANG1R( ND, %VAL(VPTR(I)), VMIN, VMAX, STATUS )
+            IF ( VMIN .LE. 0.0 ) THEN
+              CALL MSG_SETI( 'NF', I )
+              CALL MSG_PRNT( 'WARNING : Negative variances present'/
+     :          /' in input ^NF, proceeding without weighting' )
+              WEIGHT = .FALSE.
+              DENOISE = .FALSE.
+            END IF
+
+          END DO
+        END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+      END IF
+
+*  Create a cross-correlation object
+      CALL USI_CREAT( 'OUT', ADI__NULLID, XCID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Create principal arrays
       NL = 2*LMAX + 1
-      NDIM=1
-      IDIM(1)=NL
-      CALL BDI_CREBDS( XCID,NDIM,IDIM,.TRUE.,.FALSE.,.FALSE.,STATUS)
+      CALL BDI_LINK( 'BinDS', 1, NL, 'REAL', XCID, STATUS )
 
-*    Map output data
-      CALL BDI_MAPDATA( XCID,'WRITE',XCPTR,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 99
+*  Map output data
+      CALL BDI_MAPR( XCID, 'Data', 'WRITE', XCPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Compute cross-correlation
-      CALL TIM_XCOR(ND,%VAL(YDPTR),%VAL(ZDPTR),%VAL(YVPTR),%VAL(ZVPTR),
-     :WEIGHT,DENOISE,NL,%VAL(XCPTR))
+*  Compute cross-correlation
+      CALL TIM_XCOR( ND, %VAL(DPTR(1)), %VAL(DPTR(2)),
+     :  %VAL(VPTR(1)), %VAL(VPTR(2)), WEIGHT, DENOISE, NL,
+     :  %VAL(XCPTR))
 
-*    Enter lag values
-      CALL BDI_PUTAXVAL( XCID,1,-LMAX*SCALE,SCALE,NL,STATUS)
+*  Enter lag values
+      SPARR(1) = -LMAX*OSCALE
+      SPARR(2) = OSCALE
+      CALL BDI_AXPUT1R( XCID, 1, 'SpacedData', 2, SPARR, STATUS )
 
 *    Copy ancillary information from first non-primitive reg. spaced input file
-      IF(YREG)THEN
-        CALL ADI_CLONE(YFID,IFID,STATUS)
-        BASEFILE=1
+      BF = 1
+      IF ( YREG ) THEN
+        BF = 1
       ELSE IF(ZREG)THEN
-        CALL ADI_CLONE(ZFID,IFID,STATUS)
-        BASEFILE=2
+        BF = 2
       ELSE IF(.NOT.YPRIM)THEN
-        CALL ADI_CLONE(YFID,IFID,STATUS)
-        BASEFILE=1
+        BF = 1
       ELSE IF(.NOT.ZPRIM)THEN
-        CALL ADI_CLONE(ZFID,IFID,STATUS)
-        BASEFILE=2
-      ENDIF
+        BF = 2
+      END IF
 
-*    Create or copy data and axis ancillaries
-      CALL BDI_PUTLABEL( XCID,'Cross-correlation',STATUS)
-      CALL BDI_PUTAXLABEL( XCID,1,'Lag',STATUS)
-      CALL BDI_PUTAXWID( XCID,1,SCALE,STATUS)
-      IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
-      IF(.NOT.(YPRIM.AND.ZPRIM))THEN
-        CALL BDI_GETAXUNITS(IFID,1,STRING,STATUS)
-        CALL BDI_PUTAXUNITS( XCID,1,STRING,STATUS)
-        IF(STATUS.NE.SAI__OK) CALL ERR_ANNUL(STATUS)
+*  Create or copy data and axis ancillaries
+      CALL BDI_PUT0C( XCID, 'Label', 'Cross-correlation', STATUS )
+      CALL BDI_AXPUT0C( XCID, 1, 'Label', 'Lag', STATUS )
+      CALL BDI_AXPUT0R( XCID, 1, 'ScalarWidth', OSCALE, STATUS )
+      CALL BDI_AXCOPY( IFID(BF), 1, 'Units', XCID, 1, STATUS )
 
-*    Copy MORE
-        CALL BDI_COPMORE( IFID, XCID, STATUS )
+*  Copy ancillaries
+      CALL UDI_COPMORE( IFID(BF), 'grf', XCID, STATUS )
 
-* History entry (copy history file from IFID, if available)
-        CALL HSI_OK(IFID,OK,STATUS)
-        IF(OK)THEN
-          CALL HSI_COPY(IFID,XCID,STATUS)
-        ELSE
-          BASEFILE=0
-        ENDIF
-        IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
-      ENDIF
+*  History entry (copy history file from IFID, if available)
+      CALL HSI_COPY( IFID(BF), XCID, STATUS )
       CALL HSI_ADD(XCID,VERSION,STATUS)
       CALL USI_NAMEI(NLINE,TEXT,STATUS)
-      IF(BASEFILE.GT.0)THEN
-        NLINE=NLINE+1
-        CALL MSG_SETI('BF',BASEFILE)
-        CALL MSG_MAKE('NOTE: Above HISTORY records refer to '//
+      NLINE=NLINE+1
+      CALL MSG_SETI('BF',BF)
+      CALL MSG_MAKE('NOTE: Above HISTORY records refer to '//
      :  'dataset ^BF',TEXT(NLINE),TEXTLEN)
-      ENDIF
-      IF(WEIGHT)THEN
+      IF ( WEIGHT ) THEN
         STRING='Weighted cross-correlation'
       ELSE
         STRING='Unweighted cross-correlation'
       ENDIF
-      NLINE=NLINE+1
+      NLINE = NLINE + 1
       IF(DENOISE)THEN
         TEXT(NLINE)=STRING(1:CHR_LEN(STRING))//'    Noise '//
      :  'contribution removed from denominator'
@@ -399,7 +360,7 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
 
       CALL HSI_PTXT(XCID,NLINE,TEXT,STATUS)
 
-* Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
