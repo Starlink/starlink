@@ -2,7 +2,7 @@ INTERFACE COMPARE
 
    PARAMETER DATA
       POSITION    1
-      TYPE        'UNIV'
+      TYPE        'LITERAL'
       ASSOCIATION '<->GLOBAL.FITDAT'
       VPATH       'GLOBAL,PROMPT'
       PROMPT      'Data'
@@ -10,7 +10,7 @@ INTERFACE COMPARE
 
    PARAMETER MODEL
       POSITION    2
-      TYPE        'UNIV'
+      TYPE        'LITERAL'
       ASSOCIATION '<->GLOBAL.FITMOD'
       VPATH       'GLOBAL,PROMPT'
       PROMPT      'Model'
