@@ -150,13 +150,17 @@ static char *sourceWrap( const char *(*source)() ) {
   ENTER;
   SAVETMPS;
 
-  count = perl_call_sv( cb, G_NOARGS | G_SCALAR );
+  count = perl_call_sv( cb, G_NOARGS | G_SCALAR | G_EVAL );
+
+  ReportPerlError( AST__INTER );
 
   SPAGAIN ;
 
-  if (count != 1) Perl_croak(aTHX_ "Returned more than one arg from channel source\n");
+  if (astOK) {
+    if (count != 1) Perl_croak(aTHX_ "Returned more than one arg from channel source\n");
 
-  line = POPp;
+    line = POPp;
+  }
 
   PUTBACK;
   FREETMPS;
@@ -183,7 +187,9 @@ static void sinkWrap( void (*sink)(const char *), const char *line ) {
   XPUSHs( sv_2mortal( newSVpv( (char*)line, strlen(line) )));
   PUTBACK;
 
-  perl_call_sv( SvRV(cb), G_DISCARD | G_VOID );
+  perl_call_sv( SvRV(cb), G_DISCARD | G_VOID | G_EVAL );
+
+  ReportPerlError( AST__INTER );
 
   FREETMPS;
   LEAVE;
