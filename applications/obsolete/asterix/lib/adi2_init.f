@@ -91,6 +91,8 @@
       EXTERNAL        		ADI2_FCLOSE
       EXTERNAL        		ADI2_NEWLNK_ARR
 
+      EXTERNAL			EDI2_SETLNK
+
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
       INTEGER			RID			! Representation id
@@ -121,6 +123,9 @@
      :                   STATUS )
 
       CALL ADI_DEFMTH( 'NewLink(_Array,_FITSfile)', ADI2_NEWLNK_ARR,
+     :                   DID, STATUS )
+
+      CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
      :                   DID, STATUS )
 
 *  Report any errors

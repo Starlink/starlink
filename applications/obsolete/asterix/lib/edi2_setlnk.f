@@ -1,4 +1,4 @@
-      SUBROUTINE EDI2_SETLNK( LHS, RHS, STATUS )
+      SUBROUTINE EDI2_SETLNK( NARG, ARGS, OARG, STATUS )
 *+
 *  Name:
 *     EDI2_SETLNK
@@ -10,17 +10,13 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL EDI2_SETLNK( LHS, RHS, STATUS )
+*     CALL EDI2_SETLNK( NARG, ARGS, OARG, STATUS )
 
 *  Description:
 *     Establishes ADI file link between high level objects EventDS and
 *     its derivatives, and FITSfile.
 
 *  Arguments:
-*     LHS = INTEGER (given)
-*        ADI identifier of high level object
-*     RHS = INTEGER (given)
-*        ADI identifier of low level object
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -84,10 +80,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER                   LHS, RHS
+      INTEGER                   NARG, ARGS(*)
+
+*  Arguments Returned:
+      INTEGER			OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -96,137 +95,157 @@
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
-*  Local Variables:
-      CHARACTER*80		LABEL			! Column label
-      CHARACTER*40		NAME			! Column name
-      CHARACTER*3		STR			! Keyword trailer string
-      CHARACTER*20		TYPE			! Column type
+*  Local Constants:
+      CHARACTER*6		TSTRING
+        PARAMETER               ( TSTRING = 'BIJEDC' )
 
-      INTEGER			DIMS(DAT__MXDIM)	! List dimensions
+*  Local Variables:
+      CHARACTER*40		NAME			! Column name
+      CHARACTER*20		TYPE			! Column type
+      CHARACTER*40		UNITS			! Column name
+
+      DOUBLE PRECISION		DMAX, DMIN		! Field extrema
+
+      INTEGER			DIMS(ADI__MXDIM)	! List dimensions
+      INTEGER			EVHDU			! EVENTS hdu
+      INTEGER			IC			! Character ptr
       INTEGER			ILIST			! Loop over lists
       INTEGER			L			! Use length of NAME
       INTEGER			LID			! Lists object id
-      INTEGER			NCOMP			! Number of components
-      INTEGER			NDIG			! Digits used in STR
+      INTEGER			MAXID, MINID		! Extrema values
       INTEGER			NDIM			! List dimensionality
       INTEGER			NEVENT			! Number of records
       INTEGER			NLIST			! Number of lists
+      INTEGER			TPOS			! Type code index
+
+      LOGICAL			GOTMAX, GOTMIN		! Got extrema?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract logical unit from FITSfile
-      CALL ADI1_GETLOC( RHS, LUN, STATUS )
+*  Initialise
+      OARG = ADI__NULLID
 
 *  Try to locate the EVENTS extension
-      CALL ADI2_FNDEXT( RHS, 'EVENTS', 'BINTABLE', STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', EVHDU, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Read the keywords defining the number of events and columns
-      CALL ADI2_KGET0I( RHS, ' ', 'TFIELDS', .FALSE., .FALSE., NLIST,
-     :                 ' ', STATUS )
-      CALL ADI2_KGET0I( RHS, ' ', 'NAXIS2', .FALSE., .FALSE., NEVENT,
-     :                 ' ', STATUS )
+      CALL ADI2_HGKYI( EVHDU, 'TFIELDS', NLIST, STATUS )
+      CALL ADI2_HGKYI( EVHDU, 'NAXIS2', NEVENT, STATUS )
 
 *  Get number of top level components
       DO ILIST = 1, NLIST
 
-*    Construct numeric trailer for keywords
-        CALL CHR_ITOC( ILIST, STR, NDIG )
-
 *    Read keyword containing name and description of field
-        CALL ADI2_KGET0C( RHS, ' ', 'TTYPE'//STR(:NDIG), .FALSE.,
-     :                    .TRUE., NAME, LABEL, STATUS )
+        CALL ADI2_HGKYIC( EVHDU, 'TTYPE', ILIST, NAME, STATUS )
         L = CHR_LEN(NAME)
 
 *    Read table item describing the type of the data stored
-        CALL ADI2_KGET0C( RHS, ' ', 'TFORM'//STR(:NDIG), .FALSE.,
-     :                    .FALSE., TYPE, ' ', STATUS )
+        CALL ADI2_HGKYIC( EVHDU, 'TFORM', ILIST, TYPE, STATUS )
 
-*    Now the optional items
-
-*    Get its type, which must be LIST
-        CALL DAT_TYPE( CLOC, TYP, STATUS )
-        IF ( TYP .EQ. 'LIST' ) THEN
-
-*      Increment list counter
-          NLIST = NLIST + 1
-
-*      Extract the list name
-          CALL DAT_NAME( CLOC, NAME, STATUS )
-          L = CHR_LEN(NAME)
-
-*      Locate data array for the list
-          CALL DAT_FIND( CLOC, 'DATA_ARRAY', DLOC, STATUS )
-
-*      Get its shape
-          CALL DAT_SHAPE( DLOC, DAT__MXDIM, DIMS, NDIM, STATUS )
-          IF ( NLIST .EQ. 1 ) THEN
-            NEVENT = DIMS(NDIM)
-          ELSE IF ( DIMS(NDIM) .NE. NEVENT ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'L', NAME )
-            CALL ERR_REP( ' ', 'List ^L length is inconsistent '/
-     :                    /'with first list in dataset - probable'/
-     :                         /' corruption of dataset', STATUS )
-            GOTO 99
-          END IF
-
-*      Create new list descriptor
-          CALL ADI_NEW0( 'EventList', LID, STATUS )
-
-*      Write list name
-          CALL ADI_CPUT0C( LID, 'Name', NAME(:L), STATUS )
-
-*      Write shape data
-          IF ( NDIM .GT. 1 ) THEN
-            CALL ADI_CPUT1I( LID, 'SHAPE', NDIM-1, DIMS, STATUS )
-          END IF
-
-*      Get type and write
-          CALL DAT_TYPE( DLOC, TYP, STATUS )
-          CALL ADI_CPUT0C( LID, 'TYPE', TYP(2:CHR_LEN(TYP)), STATUS )
-
-*      Release array locator
-          CALL DAT_ANNUL( DLOC, STATUS )
-
-*      Conditional copy of other stuff
-          CALL ADI1_CCH2AL( CLOC, 'DECREASING',
-     :                      LID, 'Decreasing', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'FIELD_MIN', LID, 'Min', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'FIELD_MAX', LID, 'Max', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'QUANTUM', LID, 'Quantum', STATUS )
-          IF ( LABEL .GT. ' ' ) THEN
-            CALL ADI_CPUT0C( LID, 'Label', LABEL(:CHR_LEN(LABEL)),
-     :                       STATUS )
-          END IF
-          IF ( UNITS .GT. ' ' ) THEN
-            CALL ADI_CPUT0C( LID, 'Units', UNITS(:CHR_LEN(UNITS)),
-     :                       STATUS )
-          END IF
-
-*      Update list description
-          CALL EDI0_UPDLD( LHS, LID, STATUS )
-
+*    Translate type string to dimensions and ADI type. The format is
+*    [<dims>]<tcode> where <dims> is some number and <tcode> is one of
+*    TSTRING
+        NDIM = 0
+        TPOS = INDEX(TSTRING,TYPE(1:1))
+        IF ( TPOS .EQ. 0 ) THEN
+          IC = 2
+          DO WHILE ( TPOS .EQ. 0 )
+            TPOS = INDEX(TSTRING,TYPE(IC:IC))
+            IF ( TPOS .EQ. 0 ) IC = IC + 1
+          END DO
+          CALL CHR_CTOI( TYPE(1:IC-1), DIMS(1), STATUS )
+          IF ( DIMS(1) .GT. 1 ) NDIM = 1
+        END IF
+        IF ( TPOS .EQ. 1 ) THEN
+          TYPE = 'BYTE'
+        ELSE IF ( TPOS .EQ. 2 ) THEN
+          TYPE = 'WORD'
+        ELSE IF ( TPOS .EQ. 3 ) THEN
+          TYPE = 'INTEGER'
+        ELSE IF ( TPOS .EQ. 4 ) THEN
+          TYPE = 'REAL'
+        ELSE IF ( TPOS .EQ. 5 ) THEN
+          TYPE = 'DOUBLE'
+        ELSE IF ( TPOS .EQ. 6 ) THEN
+          TYPE = 'CHAR'
         END IF
 
-*    Free the component
-        CALL DAT_ANNUL( CLOC, STATUS )
+*    Now the optional items
+        CALL ADI2_HGKYIC( EVHDU, 'TUNIT', ILIST, UNITS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          UNITS = ' '
+        END IF
+
+        CALL ADI2_HGKYID( EVHDU, 'TLMIN', ILIST, DMIN, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          GOTMIN = .FALSE.
+        ELSE
+          GOTMIN = .TRUE.
+        END IF
+        CALL ADI2_HGKYID( EVHDU, 'TLMAX', ILIST, DMAX, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          GOTMAX = .FALSE.
+        ELSE
+          GOTMAX = .TRUE.
+        END IF
+
+*    Increment list counter
+        NLIST = NLIST + 1
+
+*    Create new list descriptor
+        CALL ADI_NEW0( 'EventList', LID, STATUS )
+
+*    Write list name
+        CALL ADI_CPUT0C( LID, 'Name', NAME(:L), STATUS )
+
+*    Write shape data
+        IF ( NDIM .GT. 1 ) THEN
+          CALL ADI_CPUT1I( LID, 'SHAPE', NDIM-1, DIMS, STATUS )
+        END IF
+
+*    Write the type
+        CALL ADI_CPUT0C( LID, 'TYPE', TYPE(:CHR_LEN(TYPE)), STATUS )
+
+*    Write extrema
+        IF ( GOTMIN ) THEN
+          CALL ADI_NEW0( TYPE, MINID, STATUS )
+          CALL ADI_PUT0D( MINID, DMIN, STATUS )
+          CALL ADI_CPUTID( LID, 'Min', MINID, STATUS )
+        END IF
+        IF ( GOTMAX ) THEN
+          CALL ADI_NEW0( TYPE, MAXID, STATUS )
+          CALL ADI_PUT0D( MAXID, DMAX, STATUS )
+          CALL ADI_CPUTID( LID, 'Max', MAXID, STATUS )
+        END IF
+
+*    Write units
+        IF ( UNITS .GT. ' ' ) THEN
+          CALL ADI_CPUT0C( LID, 'Units', UNITS(:CHR_LEN(UNITS)),
+     :                     STATUS )
+        END IF
+
+*    Update list description
+        CALL EDI0_UPDLD( ARGS(1), LID, STATUS )
 
 *  Next component
       END DO
 
-*  Dataset title
-      CALL ADI1_CCH2AC( LOC, 'TITLE', LHS, 'Title', STATUS )
-
 *  Write class members
-      CALL ADI_CPUT0I( LHS, 'NEVENT', NEVENT, STATUS )
+      CALL ADI_CPUT0I( ARGS(1), 'NEVENT', NEVENT, STATUS )
+
+*  Release HDU
+      CALL ADI_ERASE( EVHDU, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'EDI2_SETLNK', STATUS )
 
 *  Invoke base method to perform linkage
-      CALL ADI_CALNXT( STATUS )
+      CALL ADI_SETLNK( ARGS(1), ARGS(2), STATUS )
 
       END
