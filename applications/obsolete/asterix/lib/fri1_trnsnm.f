@@ -98,6 +98,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			CHR_SIMLR
+        LOGICAL			CHR_SIMLR
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
@@ -118,7 +120,7 @@
       IF ( (RLEN.GT.0) .AND. (STATUS .EQ. SAI__OK) ) THEN
 
 *    Swap logical name for HDS name if required
-        IF ( ROBJ(:RLEN) .EQ. 'BGND' ) THEN
+        IF ( CHR_SIMLR( ROBJ(:RLEN), 'BGND' ) ) THEN
           RLEN = 2
         END IF
 
