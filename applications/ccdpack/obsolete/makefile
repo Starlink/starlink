@@ -430,7 +430,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0-1b
+PKG_VERS = 4.0-2b
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -675,7 +675,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_wdpc.f ccd1_wedge.f ccd1_wffc.f \
  ccd1_wgtrn.f ccd1_winad.f ccd1_wlis.f \
  ccd1_wltrn.f ccd1_wmmc.f ccd1_wrgra.f ccd1_wridi.f ccd1_wrixy.f \
- ccd1_wrxyp.f ccd1_xadd.f ccd1_xyfmt.f fio1_cllog.f fio1_errep.f \
+ ccd1_wrxyp.f ccd1_xadd.f ccd1_xdat.f \
+ ccd1_xyfmt.f fio1_cllog.f fio1_errep.f \
  fio1_msg.f fio1_msgl.f fio1_oplog.f fio1_silev.f \
  ccd1_lsfun1.f ccd1_lsfuns.f ccd1_imfit.f ccd1_ftgrp.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_kpgt.f \
@@ -2389,7 +2390,7 @@ ccd1_gtcmp.o: SAE_PAR
 ccd1_gtcpb.o: SAE_PAR
 ccd1_gtcpc.o: SAE_PAR
 ccd1_gtdir.o: SAE_PAR
-ccd1_gtlig.o: DAT_PAR SAE_PAR USER_ERR GRP_PAR
+ccd1_gtlig.o: DAT_PAR SAE_PAR GRP_PAR CCD1_PAR
 ccd1_gtlih.o: SAE_PAR DAT_PAR GRP_PAR
 ccd1_gtlis.o: DAT_PAR SAE_PAR GRP_PAR
 ccd1_gtmlg.o: SAE_PAR GRP_PAR
@@ -2551,6 +2552,7 @@ ccd1_wrixy.o: PRM_PAR SAE_PAR
 ccd1_wrtpa.o: MSG_PAR SAE_PAR
 ccd1_wrxyp.o: PRM_PAR SAE_PAR
 ccd1_xadd.o: PAR_ERR SAE_PAR
+ccd1_xdat.o: SAE_PAR
 ccd1_xyfmt.o: AST_PAR SAE_PAR
 ccdalign.o: FIO_PAR FIO_ERR PSX_ERR SAE_PAR GRP_PAR DAT_PAR AST_PAR CCD1_PAR PAR_ERR
 ccdclear.o: DAT_ERR DAT_PAR SAE_PAR GRP_PAR
@@ -2614,6 +2616,7 @@ ccg1_is2.o: SAE_PAR
 ccg1_is3.o: SAE_PAR
 ccg1_is4.o: SAE_PAR
 ccg1_lapn.o: SAE_PAR
+ccg1_lexn.o: SAE_PAR
 ccg1_mdd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mdd2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mdd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
