@@ -1,0 +1,79 @@
+/*
+**
+**  INCLUDE FILES
+**
+*/
+
+#include <string.h>
+#include <stdlib.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "gwm_err.h"
+#include "gwm.h"
+
+int GWM_GetColTable( Display *display, Window win_id, 
+	unsigned long **table, unsigned long *size)
+/*
+*+
+*  Name :
+*     GWM_GetColTable
+*
+*  Purpose :
+*     Get window's colour table
+*     
+*  Language :
+*     C
+*
+*  Invocation :
+*     status = GWM_GetColTable( display, win_id, &table, &size);
+*
+*  Description :
+*     The GWM_colour_table property is fetched from the window and
+*     pointer to it and the number of values it contains returned.
+*
+*  Arguments :
+*     display = *Display (given)
+*        Display id
+*     win_id = Window (given)
+*        Window id
+*     table = *unsigned long (returned)
+*        Pointer to Colour table
+*     size = unsigned long (returned)
+*        Number of colour table entries
+*
+*  Authors :
+*     DLT: David Terrett (Starlink RAL)
+*     {enter_new_authors_here}
+*
+*  History :
+*      9-JUL-1991 (DLT):
+*        Orignal version
+*     {enter_changes_here}
+*
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+{
+    int status;
+    unsigned int i;
+    Atom atom, actual_type;
+    int actual_format;
+    unsigned long bytes_after;
+    unsigned long *local_table;
+
+    atom = XInternAtom(display, "GWM_colour_table", False );
+    if (!atom) return GWM_NO_COLTAB;
+    status = XGetWindowProperty( display, win_id , atom, 0, 1024, False,
+	XA_INTEGER, &actual_type, &actual_format, size, &bytes_after,
+	(unsigned char**)(&local_table));
+    if ( status != Success || *size == 0) return GWM_NO_COLTAB;
+    
+    *table = (unsigned long*)malloc( sizeof(unsigned long) * (*size));
+    if (!table) return( GWM_MEM_ALLOC);
+    
+    for ( i = 0; i < *size; i++ ) (*table)[i] = local_table[i];
+
+    XFree( (char*)local_table );
+    return GWM_SUCCESS;
+}

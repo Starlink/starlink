@@ -1,0 +1,5 @@
+This release of GWM adds support for windows created with visual types other 
+than the default visual type of the display. The simple display manager 
+distributed with the gwm library cannot create windows with alternative
+visual types but they can be created with the tcl/tk based manager that
+is distributed as part of startcl.

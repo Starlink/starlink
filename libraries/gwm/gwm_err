@@ -1,0 +1,31 @@
+*     FORTRAN level codes.
+*
+*     These are constructed from the equation
+*     CODE = 134250498 + 65536 * <fac> + 8 * <mes>
+*     where <mes> is the message number in the range 1 to 4095
+*     and <fac> is the facility number for GWM (1512).
+
+      INTEGER GWM__ERROR
+      PARAMETER ( GWM__ERROR = 233340938 )
+* Undefined error condition
+
+      INTEGER GWM__INOPT
+      PARAMETER ( GWM__INOPT = 233340946 )
+* Invalid option
+
+      INTEGER GWM__NODIS
+      PARAMETER ( GWM__NODIS = 233340954 )
+* Unable to open display
+
+      INTEGER GWM__NOWIN
+      PARAMTER ( GWM__NOWIN = 233340962 )
+* Unable to open window
+
+      INTEGER GWM__WINNF
+      PARAMETER ( GWM__WINNF = 233340970 )
+* Window not found
+
+      INTEGER GWM__XERR
+      PARAMETER ( GWM__XERR = 233340978 )
+* X error
+

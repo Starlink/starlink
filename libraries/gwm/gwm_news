@@ -1,0 +1,4 @@
+This is a maintenance release of gwm. The only significant change is to 
+correct a problem with gwm windows which have allocated a private colour
+map which could cause graphics applications to generate X errors.
+
