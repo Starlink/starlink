@@ -2882,7 +2882,7 @@ itcl::class gaia::GaiaSextractor {
       {BACKGROUND} {Full res. background}
       {BACKGROUND_RMS} {Full res. noise background}
       {MINIBACKGROUND} {Low res. background}
-      {MINIBACKGROUND_RMS} {Low res. noise background}
+      {MINIBACK_RMS} {Low res. noise background}
       {-BACKGROUND} {Background subtracted}
       {FILTERED} {Filtered background subtracted}
       {OBJECTS} {Detected objects}
