@@ -20,7 +20,8 @@
 \newcommand{\stardocdate}      {17 January 2000}
 \newcommand{\stardoctitle}     {EXTREME --- Handling extreme data sets}
 \newcommand{\stardocabstract}  {
-This package provides some utilities and background documentation 
+This package provides some utilities and background documentation,
+and associated files
 for adapting the USSC, and software which uses it, 
 to handle very large data sets.
 The principal focus of this is to move to use of 64 bits of address
@@ -579,7 +580,7 @@ but almost\footnote{
    There can be trouble with applications which use 
    \file{libkvm} or access \file{/proc}.}
 all binaries which run on the 32-bit version
-will also run on the 64-bit version, 
+will run equally well on the 64-bit version, 
 so that reconfiguring a system from 32-bit to 64-bit should be
 fairly painless from a software point of view.
 You can tell if your Solaris kernel is 64-bit 
@@ -629,21 +630,28 @@ The discussion here should be of use in any case.
 
 \section{Changeover to 64-bit systems}
 
-All of the changes discussed in this document
-are intended to be backwardly compatible, 
-so that packages thus modified should, eventually, 
-continue to work unchanged in 32-bit environments.
-However, because of the difficulties of handling the changeover of all 
-Starlink packages simultaneously, conversion of a package
-to work properly in 64 bits should be considered effectively as
-a port to a new platform.  
-When the entire USSC is properly in 64 bits it will be possible
-to discontinue support of the 32-bit platforms as a separate SYSTEM
-type in the \file{mk} file, but packages built for the the new 
-64-bit platforms should run properly on 32-bit systems.
-Two new values of the \file{mk}/\file{makefile} environment variable 
-SYSTEM will therefore be introduced: 
-``sun4\_Solaris\_64'' and ``alpha\_OSF1\_64''.
+In general, it is not possible to modify packages to deal with large
+images independently of each other;
+before changing a package to use 64 bits, it is necessary 
+that all the packages on which it depends are 64-bit compatible.
+Certain packages, which are used only at a command-line level, 
+may not need changes to the code, but any package which provides a library 
+against which other code is to link, must be modified,
+since the routine interfaces (argument types) will change, 
+and, in the case of Solaris
+the 32-bit and 64-bit object types cannot be mixed by the link loader.
+
+At some point in the future, it may be that support for 32-bit systems
+is dropped, but at the moment this is undesirable, since 
+Solaris systems running 32-bit kernels would be incapable of running
+code compiled for 64 bits.  
+Older Suns (before SPARC v9) cannot be made to run the 64-bit kernels.
+
+For these reasons, the transfer to 64 bits will be approached
+effectively as a port to a new system.  All Starlink packages should
+therefore come to 
+include support for two new values of the \file{makefile}/\file{mk}
+SYSTEM variable: ``{\tt alpha\_OSF1\_64}'' and ``{sun4\_Solaris\_64}''.
 
 
 
@@ -660,7 +668,7 @@ automatic changes to the source code.
 These changes boil down to making sure that Fortran pointers 
 can address any allocated memory,
 and making sure that non-pointer integers in Fortran and C 
-are large enough to hold big numbers.
+have enough bits to hold sufficiently large numbers.
 
 Because of the difficulty of distinguishing, in any automatic fashion,
 variables which may 
@@ -680,7 +688,8 @@ Such retrochanges could be appropriate in either of the following situations:
 The change has broken something which is easier to fix by returning to 
 a normal integer size than by other means
 \item
-The change results in overuse of resources, and returning to a normal
+The change results in significant overuse of resources, 
+and returning to a normal
 integer size will not cause too many problems.
 \end{itemize}
 
@@ -788,17 +797,17 @@ Thus
 must be changed to something like
 \begin{squote}
 \begin{verbatim}
-      INTEGER * 8 CONST_5
-      PARAMETER( CONST_5 = 5 )
+      INTEGER * 8 IFIVE
+      PARAMETER( IFIVE = 5 )
         ...
-      CALL SUB( CONST_5, STATUS )
+      CALL SUB( IFIVE, STATUS )
 \end{verbatim}
 \end{squote}
 or
 \begin{squote}
 \begin{verbatim}
-      INCLUDE 'EXT_DEC'          ! Conversion declarations
-      INCLUDE 'EXT_DEF'          ! Conversion definitions
+      INCLUDE 'EXT_DEC'          ! EXTREME conversion declarations
+      INCLUDE 'EXT_DEF'          ! EXTREME conversion definitions
         ...
       CALL SUB( EXT_ITOX( 5 ), STATUS )
 \end{verbatim}
@@ -807,7 +816,18 @@ Note that, as for the PRIMDAT file PRM\_DEF, the EXT\_DEF
 file must be included after all variable declarations but before
 the first executable statement of the routine.
 
-{\it (Perhaps this function should be put in PRIMDAT?)}
+For convenience another mechanism is provided by the EXTREME package;
+the file \file{EXT\_PAR} includes definitions of the integers
+-10\ldots 10, with names EXT\_\_M10\ldots EXT\_\_10.
+So a third alternative for the above situation would be
+\begin{squote}
+\begin{verbatim}
+      INCLUDE 'EXT_PAR'          ! Integer constant definitions
+        ...
+      CALL SUB( EXT__5, STATUS )
+\end{verbatim}
+\end{squote}
+{\it (Perhaps this functionality should be handed to PRIMDAT?)}
 %
 \item[Intrinsic functions]\mbox{}
 \\
@@ -823,8 +843,10 @@ Others may be available in particular Fortran implementations.
 %
 \item[Storage association]\mbox{}
 \\
-The Fortran 77 standard states that an INTEGER takes the same number of
-storage units as a REAL.  Converting all INTEGERs to INTEGER*8s will
+The Fortran 77 standard does not state how much storage is used by
+an INTEGER, but does state that it should be the same amount as that
+used by REALs and LOGICALs.
+Converting all INTEGERs to INTEGER*8s will
 probably have the effect that this is no longer the case.
 Thus code which relies on this, for instance by using COMMON blocks or
 EQUIVALENCE statements to address the same memory as both INTEGER and REAL,
@@ -863,13 +885,14 @@ Of the supported systems, Tru64 and Solaris seem to handle
 INTEGER*8 variables used for this purpose without complaint.
 Linux with g77 0.5.24 may fail to compile although (a) it seems to
 be OK if you compile with {\tt -O}, and (b) this is reportedly
-fixed at g77 0.5.25.  So it's probably all right to leave this.
+fixed at g77 0.5.25.  So it's probably all right to leave these cases.
 %
 \end{description}
 
 The program \xroutine{frepint} is provided for changing 
 INTEGER declarations to INTEGER*8.
-It is described in section \ref{sec:tools}.
+Details of which of the above constructs it fixes, and which it
+warns about, are given in section \ref{sec:tools}.
 
 
 \subsection{Enlarging integer type in C\label{sec:cint}}
@@ -889,14 +912,15 @@ should not be changed.  Type \cc{unsigned INT\_BIG}
 (or, redundantly, \cc{signed INT\_BIG}) may be used.
 
 As regards calling functions from external libraries,
-the approach described in the previous section of 
+the approach described in section \ref{sec:fint} of 
 recoding all the functions in the library will of course work in C too.
 However, this is not always necessary.
 If a function's declaration (prototype) is in scope when it is called,
-the compiler will convert each actual argument to the declared type of
+the compiler will normally 
+convert each actual argument to the declared type of
 the corresponding formal argument in the prototype 
 before passing it by value.
-Thus the following code
+Hence the following code
 \begin{squote}
 \begin{verbatim}
 int add( int a, int b );
@@ -1244,16 +1268,16 @@ file by way of example:
 #        alpha_OSF1_64
 #           DEC Alpha machines running OSF1, long integers
 #
+#        ix86_Linux
+#           Intel PC running Linux
+#
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
 #
 #        sun4_Solaris_64
 #           SUN Sparcstations running SunOS 5.x (64-bit Solaris), long integers
-#
-#        ix86_Linux
-#           Intel PC running Linux
    ...
-#        CFLAGS (-DINT_BIG=int)
+#        CFLAGS (-O -DINT_BIG=int)
 #           The C compiler options to use.
 #
 #        INTEGER8 (INTEGER    )
@@ -1267,34 +1291,43 @@ file by way of example:
 #           optional but may make source code more readable.
    ...
 
-      export CFLAGS
       export INTEGER8
    ...
 
       case "$SYSTEM" in
 
+#  DEC Alpha machines running OSF1.
+#  -------------------------------
          alpha_OSF1)
             CFLAGS='-DINT_BIG=int'
             INTEGER8='INTEGER    '
                ...
 
+#  DEC Alpha machines running OSF1, long integers.
+#  ----------------------------------------------
          alpha_OSF1_64)
             CFLAGS='-DINT_BIG=long'
             INTEGER8=''
             SOURCE_VARIANT='alpha_OSF1'
                ...
 
+#  SUN Sparcstations running SunOS 5.x (Solaris).
+#  ---------------------------------------------
          sun4_Solaris)
             CFLAGS='-DINT_BIG=int'
             INTEGER8='INTEGER    '
                ...
 
+#  SUN Sparcstations running SunOS 5.x (Solaris), long integers.
+#  ------------------------------------------------------------
          sun4_Solaris_64)
             CFLAGS='-DINT_BIG=long -xarch=v9'
             INTEGER8=''
             SOURCE_VARIANT='sun4_Solaris'
                ...
 
+#  Intel PC running Linux.
+#  ----------------------
          ix86_Linux)
             CFLAGS='-DINT_BIG=int'
             INTEGER8='INTEGER    '
@@ -1315,9 +1348,12 @@ The relevant parts of a suitable matching \file{makefile} would look
 something like this:
 \begin{squote}
 \begin{verbatim}
-#  Default values for macros.
+#  Default values for macros for compiling C and Fortran source code.
 
-CFLAGS = -DINT_BIG=int
+CFLAGS = -O -DINT_BIG=int
+
+#  Default replacement text for Fortran INTEGER * 8 type.
+
 INTEGER8 = INTEGER
    ...
 
@@ -1326,14 +1362,14 @@ INTEGER8 = INTEGER
 REPLACE_INTEGER8 = sed \
    "s/^[ \t]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr] *\* *8/      $(INTEGER8)/"
 
-#  Rules for extracting non-fortran files from the source archive.
+#  Rules for extracting non-Fortran files from the source archive.
 
 $(C_FILES):
         $(TAR_OUT) $(PKG_NAME)_source.tar $@
         @ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-#  Rules for extracting fortran files from the source archive.
+#  Rules for extracting Fortran files from the source archive.
 
 $(F_FILES):
         $(TAR_OUT) $(PKG_NAME)_source.tar $@
@@ -1344,7 +1380,7 @@ $(F_FILES):
            mv $@_tmp $@; \
         else :; fi
 
-#  Rules for extracting platform specific fortran files from the archive.
+#  Rules for extracting platform specific Fortran files from the archive.
 
 $(PLATFORM_F) dummy_target2:
         $(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
@@ -1354,12 +1390,25 @@ $(PLATFORM_F) dummy_target2:
            $(REPLACE_INTEGER8) < $@_$(SOURCE_VARIANT) > $@; \
            rm -f $@_$(SOURCE_VARIANT); \
            else mv $@_$(SOURCE_VARIANT) $@; fi
+   ...
+
+#  Enter information about the current machine and build environment
+#  into the date stamp file.
+   ...
+        @ echo '   INTEGER8: $(INTEGER8)'     >>$(DATE_STAMP)
 \end{verbatim}
 \end{squote}
 
+It may also be necessary to add dependencies for INCLUDE files inserted
+by the conversion tools; \xroutine{inscnf} may include \file{CNF\_PAR}
+and \xroutine{frepint} may include \file{EXT\_PAR} in some Fortran source
+files.  Rules will need to be made for building links to the referenced
+include files, and dependencies added for the object files corresponding
+to the source files so modified.
+
 Note that because of the way this method edits Fortran source files on
 their way out of the source archive
-(typically \file{\$(PKG_NAME)\_source.tar}),
+(typically \file{\$(PKG\_NAME)\_source.tar}),
 the copies of the files in the build directory may not be the same
 as the files in the source archive.
 This means that in general the source archive cannot be rebuilt 
@@ -1575,17 +1624,36 @@ given in section \ref{sec:filters}
       This program is a filter which takes FORTRAN 77 source code
       and modifies it so that INTEGER declarations are rewritten as
       {\tt '}INTEGER $*$ 8{\tt '}.  It also attempts to warn if there are usages which
-      might cause trouble given this change.  Other lines are left
-      unmodified.
+      might cause trouble given this change.
 
-      Attention is paid to fortran 77 source format, so that lines are
+      Additionally, if there appear to be actual arguments to subroutines
+      or functions which are literal integers, the program will attempt
+      to replace them with symbolic constants, as defined in the
+      EXT\_PAR include file.  It will also attempt to add a line INCLUDEing
+      this file.  This aspect of the processing is not foolproof.
+      It can misidentify an array reference as a function call - if
+      the {\tt '}function{\tt '} name contains an underscore it assumes that it is
+      a function name and not an array name.  Only single literal integers
+      as actual arguments are thus replaced, so that, e.g. the code
+
+         L = XXX1\_FUNC( X, Y, Z, 0, 3 $*$ 5, STATUS )
+
+      will be replaced by
+
+         L = XXX1\_FUNC( X, Y, Z, EXT\_\_0, 3 $*$ 5, STATUS )
+
+      Attention is paid to fortran 77 source format, so that lines
       more than 72 characters long are avoided (unless they were there
       in the first place).
 
       Some attention is paid to the aesthetic qualities of the output:
       line breaks are done, where possible, following the usage in, e.g.,
-      KAPPA.  An attempt is made copy the style of case usage and bracket
-      spacing from the input.
+      KAPPA.  An attempt is made copy the style of case usage from the
+      input.
+
+      No changes are made to comment lines so that, for instance, the
+      Arguments stanza of subroutine prologues will not have argument
+      types modified from {\tt '}INTEGER{\tt '} to {\tt '}INTEGER $*$ 8{\tt '}.
 
       The program will write a warning on standard error for certain
       constructions in the code which are likely to cause trouble after
@@ -1605,10 +1673,8 @@ given in section \ref{sec:filters}
               (IABS, ISIGN, IDIM, MAX0, AMAX0, MIN0, IMIN0)
 
          \sstitem
-            Literal integer constants used as actual arguments in function
-              or subroutine calls.  A function call is identified as such
-              (rather than an array reference) if its name contains an
-              underscore - obviously, this might lead to mistakes.
+            Any module (SUBROUTINE, FUNCTION or BLOCK DATA) which does not
+              include an IMPLICIT NONE statement.
       }
    }
    \sstusage{
@@ -1619,6 +1685,10 @@ given in section \ref{sec:filters}
       the assumption that it will be run on a file of a finite length:
       it may buffer large amounts of input before writing output, and
       it may not free up memory.
+   }
+   \sstbugs{
+      In some cases, the line breaks are not made in very beautiful places.
+      They should, however, always be correct.
    }
 }
 \newpage
@@ -1695,8 +1765,12 @@ given in section \ref{sec:filters}
               flag is useful for identifying these.
 
       }
-      The program tries to adjust spacing so that the output looks OK.
-      It currently does not cope will with tab characters however.
+      The program tries to adjust padding whitespace outside comments
+      so that the spacing of the output looks OK.
+
+      No changes are made to comment lines so that, for instance, the
+      Synopsis stanza of function prologues will not have formal argument
+      types changed from {\tt '}int{\tt '} to {\tt '}INT\_BIG{\tt '}.
    }
    \sstusage{
       crepint [ in [ out ] ]
