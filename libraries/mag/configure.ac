@@ -25,8 +25,8 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae par hds psx err])
-STAR_DECLARE_DEPENDENCIES([link],  [par hds psx err])
+STAR_DECLARE_DEPENDENCIES([build], [sae par hds psx mers])
+STAR_DECLARE_DEPENDENCIES([link],  [par hds psx mers])
  
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
