@@ -232,7 +232,7 @@
          IF( THERE ) CALL DAT_ERASE( CCDLOC, 'FILTER', STATUS )         
       END IF
 
-*  Store the new FILTER value.
+*  Store the new FILTER value in the CCDPACK extension.
       CALL DAT_NEW0C( CCDLOC, 'FILTER', IAT, STATUS ) 
       CALL CMP_PUT0C( CCDLOC, 'FILTER', FILTER( : IAT ), STATUS ) 
 

@@ -22,7 +22,7 @@ ccd1_skysr.f ccg1_cenr.f ccg1_cmltr.f ccg1_is2r.f ccg1_is3r.f ccg1_is4d.f \
 ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f pol1_sto0.glrdic \
 pol1_stoc.glrdic ccd1_asfio.f ccd1_cfgrp.f ccd1_ftgrp.f ccd1_hvcon.f \
 ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_rdlin.f \
-ccd1_rmcom.f pol1_cext.f pol1_chkex.f pol1_imfit.f pol1_knext.f \
+ccd1_rmcom.f pol1_chkex.f pol1_imfit.f pol1_knext.f \
 pol1_lnam.f polimp.ifl polimp.f ccd1_par ccd1_memcm
 
 # The other files which need to be extracted from the source code

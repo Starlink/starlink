@@ -20,18 +20,27 @@
 *        The global status.
 
 *  Description:
-*     This routine imports FITS information into the POLPACK extension
-*     of a list of NDFs. It can be used to prepare raw data prior to processing
-*     with POLPACK by copying required items of information (wave-plate
-*     position, filter, etc) from the FITS headers provided by the 
-*     instrument/telescope control systems, to the POLPACK extension.
-*     It can also be used to import partially processed data which has 
-*     previously been exported using POLEXP.
+*     This routine should be used to prepare data prior to processing 
+*     with POLPACK. It records the values of various items of information 
+*     required by POLPACK (wave-plate position, filter, etc) in the POLPACK
+*     extensions of the supplied NDFs. These values can either be supplied 
+*     explicitly or can be copied ("imported") from keywords stored in the 
+*     FITS extensions of the supplied NDFs. Such keywords may, for instance, 
+*     be provided by the instrument/telescope control systems.
 *
 *     The import is controlled by a "table" which specifies how FITS
 *     keyword values should be used to create the corresponding POLPACK
-*     extension items. This allows the evaluation of functions containing
-*     many FITS keywords as well as the translation of arbitrary strings.
+*     extension items. Each extension item may be assigned a specified 
+*     constant value, the value of a specified FITS keyword, or the value
+*     of an arbitrary function of several FITS keywords.
+*
+*     During the processing of data, POLPACK adds items to the POLPACK
+*     extension to indicate the state of the processing which has been
+*     applied to the data. This routine also allows values to be assigned 
+*     to these extra extension items and thus can be used to import partially 
+*     processed data. POLIMP can be used in conjunction with POLEXP to
+*     allow data to be moved backwards and forwards between POLPACK and
+*     other non-NDF based packages.
 
 *  Usage:
 *     polimp in table
@@ -41,25 +50,16 @@
 *        A list of NDF names. The NDF names should be separated by commas 
 *        and may include wildcards.
 *     NAMELIST = LITERAL (Read)
-*        The name of a file to contain a listing of the name of the
-*        succesfully processed NDFs. This is intended to be of use when 
-*        using these same names with other applications (such as POLREG). [!]
+*        The name of a file to create containing a list of the
+*        succesfully processed NDFs. This file can be used when 
+*        specifying the input NDFs for subsequent applications. [!]
 *     TABLE = LITERAL (Read)
-*        The name of the table containing the description of how FITS
+*        The name of the file containing the table describing how FITS
 *        keyword values are to be translated into POLPACK extension
 *        items. See the topic "Table Format" for information on how to
-*        create a translation table. If a null parameter value (!) is 
-*        supplied the following table is used which corresponds to the FITS
-*        keywords written by POLEXP:
-*
-*           ANGROT      PPCKANGR
-*           FILTER      PPCKFILT
-*           IMGID       PPCKIMID
-*           RAY?        PPCKRAY
-*           ROTATION?   PPCKROT
-*           WPLATE      PPCKWPLT
-*           YROTATION?  PPCKYROT
-*        [!]
+*        create a translation table. The run-time default control table 
+*        is "$POLPACK_DIR/polimp.tab" which corresponds to the FITS
+*        keywords written by POLEXP. [$POLPACK_DIR/polimp.tab]
 
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
@@ -68,62 +68,58 @@
 *     the file may be used, or the values may be derived from the values
 *     of FITS keywords stored in the FITS extension of the NDF.
 *
-*     In its most simple format a FITS control table is just a series of
-*     lines which contain the names of POLPACK extension items and the
-*     names of the constant value or FITS keyword to which they map.
-*
-*        Extension-item     Constant
-*        Extension-item     FITS-keyword
-*
-*     Some examples:
+*     In its most simple format each line in a FITS control table contains
+*     the name of a POLPACK extension item, followed by a constant value 
+*     or FITS keyword. This causes the value of the specified FITS keyword
+*     or constant, to be assigned to the specified extension item. Some 
+*     examples:
 *
 *        ANGROT             ANROTA
 *
-*           This copies the value of the FITS keyword ANROTA from the FITS
-*           extension to the ANGROT component in the POLPACK extension.
+*     This copies the value of the FITS keyword ANROTA from the FITS
+*     extension to the ANGROT component in the POLPACK extension.
 *
 *        ANGROT             45.0
 *
-*           This assigns the value 45.0 to the ANGROT component of the 
-*           POLPACK extension.
+*     This assigns the value 45.0 to the ANGROT component of the POLPACK 
+*     extension.
 *    
 *        IMGID              "M51_PLATEB"
 *
-*           This assigns the value M51_PLATE to the IMGID component of the 
-*           POLPACK extension. Note, textual constants must be enclosed
-*           within quotes.
+*     This assigns the value M51_PLATE to the IMGID component of the 
+*     POLPACK extension. Note, textual constants must be enclosed within 
+*     quotes.
 *
-*     To allow functions of FITS-keywords to be possible a second
-*     "declarative" form of statement is necessary.
+*     In addition to using the values of FITS keywords directly, it is also
+*     possible to use arbitrary functions of one or more keywords. To do
+*     this, each keyword used in the function must first be "declared" so
+*     that a data type may be associated with it. This is done by including
+*     lines with the following form in the control table prior to the
+*     function reference:
 *
-*        _HDS-type          FITS-keyword
+*        Data-type          FITS-keyword
 *
-*     So for instance if you wanted to assign a value to the ANGROT
-*     extension item (the orientation of the analyser), from the FITS
-*     keyword ROTA which gives the required value in radians, you 
+*     Here "Data-type" must be one of _INTEGER, _REAL, _DOUBLE, _WORD, _BYTE, 
+*     _CHAR. So for instance if you wanted to assign a value to the ANGROT
+*     extension item, the orientation of the analyser in degrees, from the 
+*     FITS keyword ROTA which gives the required value in radians, you 
 *     could use this sequence of commands:
 *
 *        _REAL             ROTA
 *        ANGROT            57.29578*ROTA
 *
-*     The "_REAL ROTA" tells this application to find a FITS
-*     keyword named ROTA and extract its value as a single precision
-*     floating point value. The other available data types are _INTEGER,
-*     _DOUBLE, _WORD, _BYTE, _CHAR. The function may use any of the usual 
-*     Fortran operators; +, -, *, /, ** and many others that are supported 
-*     by the TRANSFORM package (SUN/61).
+*     The function may use any of the usual Fortran operators; +, -, *, /, 
+*     ** and built-in functions (SIN, COS, TAN, LOG, etc). See SUN/61
+*     (appendix A) for complete details.
 *
-*     Characters strings cannot be manipulated by functions so a single
+*     Characters strings cannot be manipulated by these functions so a single
 *     special format for translating their values is provided. The name
 *     of the destination extension item is given as usual followed by a 
 *     FITS-keyword which supplies the string to be translated. This is then 
 *     followed by statements which translate an "input" string into an 
-*     "output" string. I.e.
-*
-*        FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
-*
-*     So for instance if you wanted to translate waveplate positions to those
-*     recognised by POLPACK you might use something like.
+*     "output" string. So for instance if you wanted to translate waveplate 
+*     positions to the equivalent strings recognised by POLPACK you might 
+*     use something like:
 *
 *        WPLATE     WAVEPLT  A=0.0 -
 *                            B=22.5 -
@@ -133,12 +129,38 @@
 *     This does a case insensitive comparison between the value of the FITS 
 *     keyword WAVEPLT and the strings on the left hand sides of the equals 
 *     signs ("A", "B", etc), If a match is found, it assigns the value from 
-*     the right hand side of the equals sign to the WPLATE component in
-*     the POLPACK extension. An error is reported if no match is found.
-*     The "-" signs at the end of each line indicate that the list
-*     continues on the next line. Note, if specified FITS keyword takes
-*     numeric values, then these are converted into textual form before
-*     doing the comparisons.
+*     the right hand side of the equals sign ("0.0", "22.5", etc, these
+*     are interpreted as strings, not numerical values) to the WPLATE 
+*     component in the POLPACK extension. An error is reported if no match 
+*     is found. The "-" signs at the end of each line indicate that the list
+*     continues on the next line. Note, if specified FITS keyword has a
+*     numerical value, then it is converted into textual form before doing 
+*     the comparisons.
+*
+*     If a control table contains more than one line for an extension
+*     item, then each line is processed in turn, replacing any value
+*     established by earlier lines. Thus the final value of the extension
+*     item will be given by the last line in the table refering to the 
+*     extension item.
+*
+*     If it is not known in advance if the FITS extension will contain the 
+*     keyword values needed to assign a value to a particular POLPACK
+*     extension item, then a question mark may be appended to the name of
+*     the POLPACK extension item. If the required FITS keyword values
+*     cannot be found, then the error messages which would normally be 
+*     issued are suppressed, and any remaining lines in the control table
+*     are processed as normal. If no value has been assigned to the item
+*     when the entire table has been processed, then the item will be set
+*     to its default value if it has one, or left undefined otherwise (see 
+*     below). For instance:
+*
+*        RAY?  OLDRAY
+*        RAY?  PPCKRAY
+*
+*     causes the POLPACK extension item RAY to be assigned the value of the
+*     FITS keyword PPCKRAY if the keyword has a value in the FITS
+*     extension. If not, then the FITS keyword OLDRAY is used instead. If
+*     this does not exist either, then RAY is left undefined.
 *
 *     Logical data types are restricted to a single keyword whose value
 *     must be "YES", "TRUE", "T", "Y" for TRUE or "NO", "FALSE", "N",
@@ -148,21 +170,6 @@
 *     amount of white space and tabs are also allowed. Comments may be
 *     placed anywhere and should start with the characters "#" or "!".
 *     Continuation onto a new line is indicated by use of "-". 
-*
-*     If it is not known in advance if the FITS extension will contain the 
-*     keyword values needed to assign a value to a particular POLPACK
-*     extension item, then a question mark may be appended to the name of
-*     the POLPACK extension item. If the required FITS keyword values
-*     cannot be found, then the error messages which would normally be 
-*     issued are suppressed, and the POLPACK extension item is assigned 
-*     its default value if it has one, or is left undefined otherwise (see 
-*     below). For instance:
-*
-*        RAY?  PPCKRAY
-*
-*     causes the POLPACK extension item RAY to be assigned the value of the
-*     FITS keyword PPCKRAY if the keyword has a value in the FITS
-*     extension. RAY is left undefined otherwise.
 
 *  POLPACK extension items:
 *     The POLPACK extension of an NDF may contain the following items.
@@ -219,9 +226,19 @@
 *        as giving the rotation of the X axis. Left undefined by default.
 
 *  Examples:
-*     polimp in='*' table=$POLPACK_DIR/WHTSKY.DAT
-*        This example shows all the NDFs in the current directory being
-*        processed using the import control table $POLPACK_DIR/WHTSKY.DAT.
+*     polimp in='*' table=mytable.dat
+*        This example processes all the NDFs in the current directory 
+*        using the import control table mytable.dat.
+*
+*     polimp in=^names.lis
+*        This example processes the NDFs listed in the text file
+*        "names.lis" using the default control table appropriate for
+*        partially processed data which has previously been exported using
+*        POLEXP.
+
+*  Notes:
+*     -  Any existing values in the POLPACK extension are deleted before 
+*     processing the supplied control table.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -291,7 +308,7 @@
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            NNDF, STATUS )
 
-*  Access the control table for items in the FITS block.
+*  Access the control table for items in the FITS block. 
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )
       FNAME = '<unknown>'
       CALL FIO_FNAME( FDIN, FNAME, STATUS )
@@ -299,7 +316,7 @@
 *  Transform the input table into word separated GRP groups (dynamic
 *  string allocation is performed using this method).
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL CCD1_CFGRP( FDIN, 3, 2, .FALSE., WRDGRP, LINGRP, STATUS )
+         CALL POL1_CFGRP( FDIN, 3, 2, .FALSE., WRDGRP, LINGRP, STATUS )
 
 *  Translate these groups into groups which contain the keyword and
 *  type of any FITS items which should be extracted from the NDFs
@@ -378,9 +395,11 @@
          CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
      :                  STATUS )
 
-*  Check that the POLPACK extension is present in the NDF. 
-*  This creates it if it doesn't exist.
-         CALL POL1_CEXT( INDF, .TRUE., 'UPDATE', POLLOC, STATUS )
+*  Ensure that the NDF does not already have a POLPACK extension, and
+*  then create one.
+         CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
+         CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC, 
+     :                  STATUS )            
 
 *  Look for a FITS extension in the NDF.
          IF( STATUS .EQ. SAI__OK ) THEN
