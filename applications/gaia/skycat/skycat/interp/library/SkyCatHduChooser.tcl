@@ -9,6 +9,8 @@
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  09/11/98   Created
 # Peter W. Draper 08/12/00   Slight corrections for missing CRPIX values.
+#                  14/11/01  Retro-fitted update from main image button
+#                            (from 2.4.7)
 
 itk::usual SkyCatHduChooser {}
 
@@ -92,6 +94,9 @@ itcl::class skycat::SkyCatHduChooser {
 	    [button $w_.buttons.open \
 		 -text Open \
 		 -command [code $this set_hdu]] \
+            [button $w_.buttons.settings \
+                -text "Use Settings from Main Image" \
+                -command [code $this use_settings_from_main_image]] \
 	    [button $w_.buttons.delete \
 		 -text Delete \
 		 -state disabled \
@@ -459,6 +464,32 @@ itcl::class skycat::SkyCatHduChooser {
 	return $entry
     }
 
+    # Set the cut levels and colormap for the image extensions to the ones
+    # used in the main image
+
+    method use_settings_from_main_image {} {
+	# return if no image
+	if {! [info exists ext_(0,image)]} {
+	    return
+	}
+
+	lassign [$image_ cut] low high
+	if { "$low" == "" || "$high" == "" || [$image_ isclear] } {
+	    return
+	}
+	set cmap [$image_ cmap file]
+	set itt [$image_ itt file]
+	set colorscale [$image_ colorscale]
+	busy {
+	    for {set i 0} {$i < $num_images_} {incr i} {
+		$ext_($i,image) cut $low $high
+		$ext_($i,image) colorscale $colorscale
+		$ext_($i,image) cmap file $cmap
+		$ext_($i,image) itt file $itt
+		update idletasks
+	    }
+	}
+    }
     
     # -- options  --
 

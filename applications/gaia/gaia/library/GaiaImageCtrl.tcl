@@ -827,7 +827,7 @@ itcl::class gaia::GaiaImageCtrl {
          #  Display and hide window automatically as needed.
          if { [winfo exists $w_.ndfhdu] } {
             if { $n > 1 } {
-               after idle [code $w_.ndfhdu show_hdu_list]
+               after idle [code catch {$w_.ndfhdu show_hdu_list}]
             } else {
                after idle "destroy $w_.ndfhdu"
             }
