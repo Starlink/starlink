@@ -43,13 +43,15 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (ROSAT, University of Birmingham)
 *
 *    History :
 *
 *     21 Apr 91 : V1.4-0  Original (DJA)
 *     14 Oct 92 : V1.4-1  Outputs index of min or max value (RDS)
 *      6 Jul 93 : V1.7-0  Added ECHO keyword (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*      9 May 97 : V2.1-0  Get VALUE as correct type and convert to string (RB)
 *
 *    Type Definitions :
 *
@@ -72,9 +74,10 @@
 *
 *    Local constants :
 *
-      INTEGER                TYP_INT, TYP_CHAR, TYP_REAL, TYP_LOG
-        PARAMETER            ( TYP_INT = 1, TYP_CHAR = 2,
-     :    TYP_LOG = 3, TYP_REAL = 4 )
+      INTEGER                TYP_INT, TYP_CHAR, TYP_LOG,
+     :                       TYP_REAL, TYP_DP
+        PARAMETER            ( TYP_INT = 1, TYP_CHAR = 2, TYP_LOG = 3,
+     :                         TYP_REAL = 4, TYP_DP = 5 )
 
       CHARACTER*40           VERSION
         PARAMETER            ( VERSION='HGET Version 2.1-0' )
@@ -84,6 +87,8 @@
       CHARACTER*200          CVALUE           ! Character attribute
       CHARACTER*(DAT__SZLOC) LOC              ! Locator to data object
       CHARACTER*40           ITEM             ! Item to get
+
+      DOUBLE PRECISION       DVALUE           ! Double attribute
 
       REAL                   RVALUE           ! Real attribute
       REAL                   MINVAL           ! Value of minimum
@@ -111,7 +116,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Version id
-c     CALL MSG_PRNT( VERSION )
+      CALL USI_GET0L( 'VERSION', OK, STATUS )
+      IF ( OK ) THEN
+        CALL MSG_PRNT( VERSION )
+      END IF
 
 *    Start ASTERIX
       CALL AST_INIT()
@@ -169,9 +177,30 @@ c     CALL MSG_PRNT( VERSION )
           IVALUE = NELM
 
 *      Object value
+*      Convert from correct type to preserve precision (RB)
         ELSE IF ( STR_ABBREV( ITEM, 'VALUE' ) ) THEN
-          ATYPE = TYP_CHAR
-          CALL DAT_GET0C( LOC, CVALUE, STATUS )
+          CALL DAT_TYPE( LOC, TYPSTR, STATUS )
+          FC = 1
+          IF ( TYPSTR(1:1) .EQ. '_' ) FC = 2
+          IF ( STR_ABBREV( 'CHAR', TYPSTR(FC:) ) ) THEN
+            ATYPE = TYP_CHAR
+            CALL DAT_GET0C( LOC, CVALUE, STATUS )
+          ELSE IF ( STR_ABBREV( 'DOUB', TYPSTR(FC:) ) ) THEN
+            ATYPE = TYP_DP
+            CALL DAT_GET0D( LOC, DVALUE, STATUS )
+          ELSE IF ( STR_ABBREV( 'REAL', TYPSTR(FC:) ) ) THEN
+            ATYPE = TYP_REAL
+            CALL DAT_GET0R( LOC, RVALUE, STATUS )
+          ELSE IF ( STR_ABBREV( 'INTE', TYPSTR(FC:) ) ) THEN
+            ATYPE = TYP_INT
+            CALL DAT_GET0I( LOC, IVALUE, STATUS )
+          ELSE IF ( STR_ABBREV( 'LOGI', TYPSTR(FC:) ) ) THEN
+            ATYPE = TYP_LOG
+            CALL DAT_GET0L( LOC, LVALUE, STATUS )
+          ELSE
+            ATYPE = TYP_CHAR
+            CALL DAT_GET0C( LOC, CVALUE, STATUS )
+          END IF
 
 *      Object type
         ELSE IF ( STR_ABBREV( ITEM, 'TYPE' ) ) THEN
@@ -235,6 +264,9 @@ c     CALL MSG_PRNT( VERSION )
       ELSE IF ( ATYPE .EQ. TYP_REAL ) THEN
         CALL USI_PUT0R( 'ATTR', RVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETR( 'VAL', RVALUE )
+      ELSE IF ( ATYPE .EQ. TYP_DP ) THEN
+        CALL USI_PUT0D( 'ATTR', DVALUE, TSTAT )
+        IF ( ECHO ) CALL MSG_SETD( 'VAL', DVALUE )
       ELSE IF ( ATYPE .EQ. TYP_CHAR ) THEN
         CLEN = CHR_LEN( CVALUE )
         CALL USI_PUT0C( 'ATTR', CVALUE(:CLEN), TSTAT )

@@ -33,15 +33,16 @@
 *    Authors :
 *
 *     David J. Allan (ROSAT,BHVAD::DJA)
+*     Richard Beard (ROSAT, University of Birmingham)
 *
 *    History :
 *
 *     15 Nov 93 : V1.7-0  Original (DJA)
 *     11 Jan 94 : V1.7-1  Corrected use of DAT_VALID instead of DAT_STATE (DJA)
 *     27 Apr 94 : V1.7-2  Recoded to use AIO_ routines for i/o (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     18 Jan 1996 V2.0-0 (DJA):
-*        Use new USI routine
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     18 Jan 1996 V2.0-0  (DJA): Use new USI routine
+*     15 May 1997 V2.1-0  Convert DOUBLE valus correctly (RB)
 *
 *    Type Definitions :
 *
@@ -174,6 +175,10 @@
       CHARACTER*(DAT__SZTYP)   	TYPE		! Object type
       CHARACTER*132		VSTR		! Value string
 
+      DOUBLE PRECISION		VDP
+
+      REAL			VREAL
+
       INTEGER			CLEN		! Length of character component
       INTEGER			CURC		! Current character index
       INTEGER			DLEN		! Length of DSTR used
@@ -188,6 +193,7 @@
       LOGICAL 			NEWL		! New line for object value?
       LOGICAL 			PRIM		! Object is primitive?
       LOGICAL 			VALID		! Object data is ok?
+
 *  Local Data:
       CHARACTER*80              BLNK
       DATA                      BLNK/' '/
@@ -257,7 +263,15 @@
 
 *    Scalar primitive
       ELSE IF ( (NDIM.EQ.0) .AND. PRIM ) THEN
-        CALL DAT_GET0C( LOC, VSTR, STATUS )
+        IF ( TYPE(1:5) .EQ. '_DOUB' ) THEN
+          CALL DAT_GET0D( LOC, VDP, STATUS)
+          CALL CHR_DTOC( VDP, VSTR, VLEN )
+        ELSE IF ( TYPE(1:5) .EQ. '_REAL' ) THEN
+          CALL DAT_GET0R( LOC, VREAL, STATUS)
+          CALL CHR_RTOC( VREAL, VSTR, VLEN )
+        ELSE
+          CALL DAT_GET0C( LOC, VSTR, STATUS )
+        END IF
         VLEN = CHR_LEN(VSTR)
 
 *      Add quotes for character strings
