@@ -390,16 +390,11 @@ $Id$
 	  (process-children)))
   (element example
     (make environment name: "sstexamplesubsection"
-	  (make environment name: "quote"
 		(make environment name: "small"
-		      (make environment
-			name: "verbatim"
-			recontrol: "/-/"
-			escape-tex?: #f
-			(process-children))))))
-  ;;(element example
-  ;;  (make environment name: "sstexamplesubsection"
-  ;;  (process-children)))
+                      (make environment
+		       name: "Verbatimlines"
+		       recontrol: "/-/" 
+		       (process-children)))))
   (element examplenote
     (process-children))
   (element usage
