@@ -131,11 +131,16 @@ runn=
 tempdest=tmp.stamp
 
 # The dvi2bitmap call is currently rather sensitive to the version
-DVI2BITMAPVERSION=`$DVI2BITMAP -V|sed -n '1s/^[^ ]* *\([^ ]*\).*$/\1/p'`
-if [ $DVI2BITMAPVERSION != 0.9 ]; then
+#DVI2BITMAPVERSION=`$DVI2BITMAP -V|sed -n '1s/^[^ ]* *\([^ ]*\).*$/\1/p'`
+# I'm in two minds about how elaborate this is.  On one hand, there
+# are significant issues about version skew, since this script does
+# depend rathe heavily on the dvi2bitmap version, but on the other,
+# this logic is just begging to go wrong somewhere....
+DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
+if [ $DVI2BITMAPVERSION -lt 9 ]; then
     echo "Using" $DVI2BITMAP "at"
     which `echo $DVI2BITMAP | awk '{print $1}'`
-    echo "Need dvi2bitmap version 0.9, but $DVI2BITMAP is version $DVI2BITMAPVERSION"
+    echo "Need dvi2bitmap version 0.9+, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
     exit 1
 fi
 
