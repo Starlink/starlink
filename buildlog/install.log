@@ -248,7 +248,7 @@ install:
 prepare:
 
 check_packages:
-[available] Oct 12, 2003 4:17:43 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Oct 14, 2003 4:17:37 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -688,6 +688,7 @@ dist:
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 435 files to /apps/cvsbuild/java/source/splat/docs/splat
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -890,4 +891,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 1 minute 54 seconds
+Total time: 1 minute 47 seconds
