@@ -118,10 +118,6 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
 *  Local Constants:
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'KSTAT Version V2.0-0' )
@@ -135,8 +131,6 @@
       INTEGER                NDIMS2              ! Number of dimensions in 2nd dataset
       INTEGER                DIM(ADI__MXDIM)     ! Size of each dimension
       INTEGER                DIM2(ADI__MXDIM)    ! Size of each dimension of 2nd input
-      INTEGER                QNDIMS              ! Number of dimensions in QUALITY
-      INTEGER                QDIM(ADI__MXDIM)    ! Size of each dimension in QUALITY
       INTEGER                NDAT                ! Number of data points
       INTEGER                NDAT2               ! Number of data points in 2nd array
       INTEGER                NTD                 ! # tied ranks in data array
@@ -151,7 +145,6 @@
       LOGICAL                QOK                 ! Data quality available?
       LOGICAL                CONTINUE            ! Used to control input
       LOGICAL                INPRIM              ! Is input object primitive?
-      LOGICAL                BAD                 ! Any bad QUALITY points?
 *.
 
 *  Check inherited global status.
@@ -195,7 +188,8 @@
             CONTINUE = .TRUE.
 
             DO WHILE ( CONTINUE )
-              CALL USI_ASSOC( 'INP2', 'BinDS|Array', 'READ', IFID2, STATUS )
+              CALL USI_ASSOC( 'INP2', 'BinDS|Array', 'READ', IFID2,
+     :                 STATUS )
               CALL ADI_DERVD( IFID2, 'Array', INPRIM, STATUS )
               INPRIM = (.NOT.INPRIM)
               IF (STATUS .NE. SAI__OK) GOTO 99
@@ -219,7 +213,7 @@
 
                     END IF
                   ELSE
-                    CALL MSG_PRNT ('ERROR: Input is not primative')
+                    CALL MSG_PRNT ('ERROR: Input is not primitive')
 
                   END IF
                 ELSE
