@@ -30,12 +30,15 @@
 *     used (see parameter MAPTYPE).
 *     
 *     When adding a new Frame to a WCS component, the Mapping is used to 
-*     connect the the new Frame to an existing one (called the "basis" 
-*     Frame). The newly added Frame is a copy of the basis Frame, with 
-*     the new Domain attribute specified by parameter DOMAIN, and becomes 
-*     the current co-ordinate Frame in the NDF. If necessary, other 
-*     attributes of the new Frame (Title, Label, Format, etc) can be 
-*     changed using application WCSATTRIB.
+*     connect the new Frame to an existing one (called the "basis" Frame
+*     - see parameter FRAME). The specific type of Frame to add is specified 
+*     using parameter FRMTYPE (the default is to simply copy the basis Frame). 
+*     Attributes which have been assigned an explicit value in the basis Frame 
+*     are transfered to the new Frame (but only if they are relevant to the 
+*     type of the new Frame). The value of the Domain attribute for the new 
+*     Frame can be specified using parameter DOMAIN. Other attribute values 
+*     for the new Frame may be specified using parameters ATTRS. The new 
+*     Frame becomes the current co-ordinate Frame in the NDF. 
 *
 *     WCSADD will only generate Mappings with the same number of 
 *     input and output axes; this number is determined by the number
@@ -46,6 +49,28 @@
 *     wcsadd ndf frame domain maptype
 
 *  ADAM Parameters:
+*     ATTRS = GROUP (Read)
+*        A group of attribute settings to be applied to the new Frame
+*        before adding it into the NDF.
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of an attribute appropriate to the type
+*        of Frame specified by parameter FRMTYPE (see SUN/210 for a complete
+*        description of all attributes), and <value> is the value to assign 
+*        to the attribute. Default values will be used for any unspecified 
+*        attributes - these defaults are inherited from the basis Frame. 
+*        Any unrecognised attributes are ignored (no error is reported). 
 *     CENTRE( 2 ) = _DOUBLE (Read)
 *        The co-ordinates of the centre of a pincushion distortion.
 *        Only used when MAPTYPE=PINCUSHION. See also DISCO.
@@ -114,6 +139,21 @@
 *        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) 
 *        (see section "Sky Co-ordinate Systems" in SUN/95).
 *
+*     FRMTYPE = LITERAL (Read)
+*        The type of Frame to add to the NDF. If a null (!) value is
+*        supplied, a copy of the basis Frame is used (as modified by 
+*        parameters ATTRS and DOMAIN). The allows values are:
+* 
+*        - FRAME      -- A simple Cartesian Frame (the number of axes is
+*                        equal to the number of outputs from the Mapping)
+*
+*        - SKYFRAME   -- A 2-dimensional Frame representing positions on
+*                        the celestial sphere.
+*
+*        - SPECFRAME  -- A 1-dimensional Frame representing positions
+*                        within an electromagnetic spectrum
+*
+*        [!]
 *     INVEXP = LITERAL (Read)
 *        The expressions to be used for the inverse co-ordinate 
 *        transformations in a MathMap. See FOREXP. Only used when
@@ -159,7 +199,7 @@
 *        ["LINEAR"]
 *     NAXES = _INTEGER (Read)
 *        The number of input and output axes which the Mapping will have.
-*        Only used if a null value is supplied for parameter NDF.
+*        Only used if a null value is supplied for parameter NDF. 
 *     NDF = NDF (Read and Write)
 *        The NDF in which to store a new co-ordinate Frame. Supply a null (!)
 *        value if you do not wish to add a Frame to an NDF (you can still 
@@ -217,6 +257,16 @@
 *        Only used when MAPTYPE=ZOOM. 
 
 *  Examples:
+*     wcsadd speca axis frmtype=specframe maptype=unit \
+*            attrs="'system=wave,unit=Angstrom'"
+*        This example assumes the NDF "speca" has an Axis structure
+*        describing wavelength in Angstroms. It adds a corresponding 
+*        SpecFrame into the WCS component of the NDF. The SpecFrame 
+*        is connected to the Frame describing the NDF Axis structure 
+*        using a unit Mapping. Subsequently, WCSATTRIB  can be used to 
+*        modify the SpecFrame so that it describes the spectral axis 
+*        value in some other system (frequency, velocities of various 
+*        forms, energy, wave number, etc).
 *     wcsadd ngc5128 pixel old_pixel unit
 *        This adds a new co-ordinate Frame into the WCS component of the
 *        NDF called ngc5128. The new Frame is given the domain OLD_PIXEL
@@ -294,6 +344,8 @@
 *     8-JAN-2002 (DSB):
 *        Minor prologue changes. Change some parameter logic. Use GRP to
 *        get the MATHMAP expressions.
+*     9-JAN-2003 (DSB):
+*        Added support for SpecFrames (parameters FRMTYPE and ATTRS).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -323,7 +375,10 @@
       PARAMETER( MAXEXP = 12 )
 
 *  Local Variables:
+      CHARACTER ATTRIB*20        ! Attribute name
       CHARACTER DOM*40           ! Domain for new Frame
+      CHARACTER DOM0*40          ! Domain for basis Frame
+      CHARACTER FRMTYP*16        ! Type of Frame to add
       CHARACTER MAPTYP*16        ! Type of transformation to add
       CHARACTER FOREXP( MAXEXP ) * ( GRP__SZNAM ) ! Forward expressions for MathMap
       CHARACTER INVEXP( MAXEXP ) * ( GRP__SZNAM ) ! Inverse expressions for MathMap
@@ -347,6 +402,7 @@
       INTEGER FRMB               ! Pointer to basis Frame
       INTEGER FRMN               ! Pointer to new Frame
       INTEGER I                  ! General loop count
+      INTEGER IAT                ! Used length of a string
       INTEGER IBASIS             ! Index of basis Frame
       INTEGER IGRP               ! GRP group for MATHMAP expresssions
       INTEGER INDF               ! NDF identifier for NDF being modified
@@ -361,6 +417,7 @@
       INTEGER NEXP               ! Number of expressions got so far
       INTEGER NFEXP              ! Number of expressions for forward transforms
       INTEGER NIEXP              ! Number of expressions for inverse transforms
+      INTEGER RESULT             ! Pointer to result FrameSet
       INTEGER SING               ! Non-zero if matrix is singular
       INTEGER WINMAP             ! WinMap implied by given co-efficients
       INTEGER WORK( NDF__MXDIM ) ! Work space
@@ -393,6 +450,7 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          INDF = NDF__NOID
+         FRMB = AST__NULL
 
 *  If we have no NDF we need to get the number of axes for the Mapping
 *  from the user.
@@ -417,19 +475,6 @@
          FRMB = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
          NAXB = AST_GETI( FRMB, 'NAXES', STATUS )
 
-*  Copy the basis Frame to create the new Frame.
-         FRMN = AST_COPY( FRMB, STATUS ) 
-
-*  Get the Domain for the new Frame. 
-         CALL PAR_GET0C( 'DOMAIN', DOM, STATUS )
-
-*  Remove spaces, and convert to upper case. 
-         CALL CHR_RMBLK( DOM )
-         CALL CHR_UCASE( DOM )
-
-*  Store it in the new Frame.
-         CALL AST_SETC( FRMN, 'DOMAIN', 
-     :                  DOM( : MAX( 1, CHR_LEN( DOM ) ) ), STATUS )
       END IF
 
 *  Construct the Mapping.
@@ -662,6 +707,137 @@
 *  Simplify the Mapping
       MAP = AST_SIMPLIFY( MAP, STATUS )
 
+*  Get the Frame to add.
+*  =====================
+
+*  We only need to do this if a basis Frame was supplied.
+      IF( FRMB .NE. AST__NULL ) THEN
+
+*  Choose the suggested default for parameter FRMTYPE. Make it equal to
+*  the class of the basis Frame.
+         IF( AST_ISASPECFRAME( FRMB, STATUS ) ) THEN
+            FRMTYP = 'SpecFrame'
+         ELSE IF( AST_ISASKYFRAME( FRMB, STATUS ) ) THEN
+            FRMTYP = 'SkyFrame'
+         ELSE
+            FRMTYP = 'Frame'
+         END IF
+
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the class for the new Frame.
+         CALL PAR_CHOIC( 'FRMTYPE', FRMTYP, 'Frame,SkyFrame,'//
+     :                   'SpecFrame', .FALSE., FRMTYP, STATUS )
+
+*  If a null value was supplied, simply copy the basis Frame */
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            FRMN = AST_COPY( FRMB, STATUS ) 
+
+*  Otherwise, create a default Frame of the specified class.
+         ELSE
+            IF( FRMTYP .EQ. 'SKYFRAME' ) THEN
+               FRMN = AST_SKYFRAME( ' ', STATUS )
+            ELSE IF( FRMTYP .EQ. 'SPECFRAME' ) THEN
+               FRMN = AST_SPECFRAME( ' ', STATUS )
+            ELSE 
+               FRMN = AST_FRAME( AST_GETI( MAP, 'NOUT', STATUS ), ' ', 
+     :                           STATUS )
+            END IF
+
+*  Transfer the values of attributes which have been set in the basis Frame 
+*  to the new Frame, and modify the Mapping. We temporarily clear the Domain 
+*  in the basis Frame (if set) so that we can transfer attribute values
+*  to Frames with other Domains.
+            IF( AST_TEST( FRMB, 'Domain', STATUS ) ) THEN
+               DOM0 = AST_GETC( FRMB, 'Domain', STATUS )
+               CALL AST_CLEAR( FRMB, 'Domain', STATUS )
+            ELSE
+               DOM0 = ' '
+            END IF
+
+*  Do the transferring.
+            RESULT = AST_FINDFRAME( FRMN, FRMB, ' ', STATUS )
+            IF( DOM0 .NE. ' ' ) CALL AST_SETC( FRMB, 'Domain', DOM0, 
+     :                                         STATUS )
+
+*  If succesful, use the modified new Frame and modify the Mapping.
+            IF( RESULT .NE. AST__NULL ) THEN
+               FRMN = AST_GETFRAME( RESULT, AST__CURRENT, STATUS )
+               MAP = AST_CMPMAP( MAP, AST_GETMAPPING( RESULT, AST__BASE,
+     :                                                AST__CURRENT, 
+     :                                                STATUS ), .TRUE.,
+     :                           ' ', STATUS )
+               MAP = AST_SIMPLIFY( MAP, STATUS )
+            END IF
+         END IF
+
+*  Check the number of axes in the Frame matches the number of outputs
+*  from the Mapping.
+         IF( AST_GETI( FRMN, 'NAXES', STATUS ) .NE.
+     :       AST_GETI( MAP, 'NOUT', STATUS ) .AND. 
+     :       STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'WCSMAP_ERR3', 'Mapping has ^NOUT outputs '//
+     :                    'but new Frame has ^NAX axes. These number '//
+     :                    'should be equal.', STATUS )
+            GO TO 999
+         END IF
+
+*  Note the current Domain in the Frame.
+         DOM0 = AST_GETC( FRMN, 'Domain', STATUS )
+
+*  Allow the user to modify the attributes of the Frame.
+         CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
+
+*  If the new Frame has active Unit attributes, check all Unit attributes
+*  have non-blank values.
+         IF( AST_GETACTIVEUNIT( FRMN, STATUS ) ) THEN
+            ATTRIB = 'Unit('
+            DO I = 1, AST_GETI( FRMN, 'Naxes', STATUS )
+               IAT = 5
+               CALL CHR_PUTI( I, ATTRIB, IAT )
+               CALL CHR_PUTC( ')', ATTRIB, IAT )
+               IF( AST_GETC( FRMN, ATTRIB( : IAT ), STATUS ) .EQ. 
+     :             ' ' .AND. STATUS .EQ. SAI__OK ) THEN
+                  CALL MSG_SETC( 'AT', ATTRIB( : IAT ) )
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'WCSADD_ERR', 'The ^AT attribute in '//
+     :                          'the new Frame has a blank value. The'//
+     :                          ' units must be specified for all '//
+     :                          'axes of the Frame.', STATUS )
+                  GO TO 999
+                END IF
+             END DO
+         END IF
+
+*  Get the Domain for the new Frame. If the current Domain is non-blank
+*  and different to the Domain of the basis Frame, use it as the dynamic
+*  default.
+         DOM = AST_GETC( FRMN, 'Domain', STATUS ) 
+         IF( DOM .NE. ' ' .AND. 
+     :       DOM .NE. AST_GETC( FRMB, 'Domain', STATUS ) ) THEN
+            CALL PAR_DEF0C( 'DOMAIN', DOM, STATUS )
+         END IF
+        
+         CALL PAR_GET0C( 'DOMAIN', DOM, STATUS )
+
+*  Remove spaces, and convert to upper case. 
+         CALL CHR_RMBLK( DOM )
+         CALL CHR_UCASE( DOM )
+
+*  Clear the Domain attribute.
+         CALL AST_CLEAR( FRMN, 'DOMAIN', STATUS )
+
+*  Store the new Domain if it is different to the default Domain.
+         IF( DOM .NE. AST_GETC( FRMN, 'DOMAIN', STATUS ) ) THEN
+            CALL AST_SETC( FRMN, 'DOMAIN', 
+     :                     DOM( : MAX( 1, CHR_LEN( DOM ) ) ), STATUS )
+         END IF
+
+      END IF
+
 *  Use the constructed Mapping.
 *  ============================
 
@@ -701,7 +877,7 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'WCSADD_ERR3', 'WCSADD: Failed to add a new '//
+         CALL ERR_REP( 'WCSADD_ERR4', 'WCSADD: Failed to add a new '//
      :                 'co-ordinate Frame into an NDF WCS component.',
      :                 STATUS )
       END IF

@@ -81,7 +81,20 @@
 *
 *     NEWVAL = LITERAL (Read)
 *        The new value to assign to the attribute.
-*     STATE = LOGICAL (Write)
+*     REMAP = _LOGICAL (Read)
+*        Only accessed if MODE is "Set". If REMAP is TRUE, then the
+*        Mappings which connect the current Frame to the other Frames
+*        within the WCS FrameSet will be modified (if necessary) to
+*        maintain the FrameSet integrity. For instance, if the current
+*        Frame of the NDF represents FK5 RA and DEC, and you change 
+*        System from "FK5" to "Galactic", then the Mappings which connect
+*        the SKY Frame to the other Frames (e.g. PIXEL, AXIS, etc) will
+*        be modified so that each pixel corresponds to the correct
+*        Galactic co-ordinates. If REMAP is FALSE, then the Mappings will
+*        not be changed. This can be useful if the FrameSet has incorrect
+*        attribute values for some reason, which need to be corrected
+*        without altering the Mappings to take account of the change. [TRUE]
+*     STATE = _LOGICAL (Write)
 *        On exit, this holds the state of the attribute on entry to this 
 *        application.
 *     VALUE = LITERAL (Write)
@@ -89,6 +102,12 @@
 *        application.
 
 *  Examples:
+*     wcsattrib my_spec set System freq
+*        This sets the System attribute of the current co-ordinate Frame in 
+*        the NDF called my_Spec so that the Frame represents frequency
+*        (this assumes the current Frame is a SpecFrame). The Mappings
+*        between the current Frame and the other Frames are modified to take
+*        account of the change of system.
 *     wcsattrib ngc5128 set title "Polarization map of Centaurus-A"
 *        This sets the Title attribute of the current co-ordinate Frame in 
 *        the NDF called ngc5128 to the string "Polarization map of Centaurus-A".
@@ -119,6 +138,18 @@
 *        This clears the Label attribute for the first axis of the current 
 *        co-ordinate Frame in the NDF called my_data. It reverts to its
 *        default value.
+*     wcsattrib my_data set equinox J2000 remap=no
+*        This assumes that the Equinox attribute for the current
+*        co-ordinate Frame within NDF "my_data" has been set to some
+*        incorrect value, which needs to be corrected to "J2000". The
+*        REMAP parameter is set false, which prevents the inter-Frame
+*        Mappings from being altered to take account of the new Equinox 
+*        value. This means that each pixel in the NDF will retain its
+*        original RA and DEC values (but they will now be interpreted as
+*        J2000). If REMAP had been left at its default value of TRUE,
+*        then the RA and DEC associated with each pixel would have been
+*        modified in order to precess them from the original (incorrect)
+*        equinox to J2000.
 
 *  Notes:
 *     -  An error is reported if an attempt is made to set or clear the 
@@ -139,6 +170,8 @@
 *        Original version.
 *     6-APR-2001 (DSB):
 *        Do not allow the PIXEL, GRID or AXIS Frames to be changed.
+*     13-JAN-2003 (DSB):
+*        Added parameter REMAP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -166,10 +199,12 @@
       CHARACTER NAME*30          ! Attribute name
       CHARACTER NEWVAL*255       ! New attribute value
       CHARACTER VALUE*255        ! Value of the attribute on entry
+      INTEGER FRM                ! Pointer to current Frame
       INTEGER INDF               ! NDF identifier for NDF being modified
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LVAL               ! Length of original value
       LOGICAL RDONLY             ! Prevent changes to attribute values?
+      LOGICAL REMAP              ! Use FrameSet method?
       LOGICAL STATE              ! State of the attribute on entry
 
 *  Local Functions:
@@ -262,9 +297,26 @@
                END IF
             END IF
 
-            CALL AST_SETC( IWCS, NAME, 
-     :                     NEWVAL( : MAX( 1, CHR_LEN( NEWVAL ) ) ), 
-     :                     STATUS )
+*  See if the attribute should be modified using the FrameSet method
+*  (which may cause inter-Frame Mappings to change in ordert ot maintain
+*  FrameSet integrity), or the Frame method (which will leave the
+*  Mappings unchanged).
+            CALL PAR_GET0L( 'REMAP', REMAP, STATUS )
+
+*  If the Frame is to be remapped, use thr FrameSet method.
+            IF( REMAP ) THEN
+               CALL AST_SETC( IWCS, NAME, 
+     :                        NEWVAL( : MAX( 1, CHR_LEN( NEWVAL ) ) ), 
+     :                        STATUS )
+
+*  Otherwise, extract the Frame and use the Frame method.
+            ELSE
+               FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+               CALL AST_SETC( FRM, NAME, 
+     :                        NEWVAL( : MAX( 1, CHR_LEN( NEWVAL ) ) ), 
+     :                        STATUS )
+               CALL AST_ANNUL( FRM, STATUS )
+            END IF
          END IF
 
 *  Test.

@@ -2246,6 +2246,14 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter attrs {
+            type LITERAL
+            ppath DEFAULT
+            prompt {Attributes for new Frame}
+            helpkey *
+            default !
+         }
+
          parameter centre {
             size *
             type _DOUBLE
@@ -2311,6 +2319,16 @@ package kappa {
             prompt {An existing co-ordinate Frame}
             helpkey *
             default !
+         }
+
+         parameter frmtype {
+            type LITERAL
+            access READ
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Type of co-ordinate frame to add}
+            default !
+            helpkey *
          }
 
          parameter invexp {
@@ -2464,6 +2482,16 @@ package kappa {
             prompt {Attribute value}
             helpkey *
           }
+
+         parameter remap {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Modify mappings to accomodate new attribute value?}
+            helpkey *
+         }
 
          parameter state {
             type _LOGICAL

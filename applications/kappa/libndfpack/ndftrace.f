@@ -248,6 +248,7 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      LOGICAL CHR_SIMLR          ! Strings equal apart from case?
 
 *  Local Constants:
       INTEGER MXEXTN             ! Maximum number of extensions
@@ -926,8 +927,10 @@
      :                 '      Number of coordinate Frames: ^NF',
      :                       STATUS )
                CALL MSG_BLANK( STATUS )
+               CALL MSG_SETI( 'N', ICURR )
                CALL MSG_OUT( 'WCS_CURRENT',
-     :                 '      Current coordinate Frame:', STATUS )
+     :                 '      Current coordinate Frame (Frame ^N):', 
+     :                        STATUS )
             END IF
 
          END IF
@@ -1118,7 +1121,7 @@
                      IF( AST_TEST( FRM, 'RestFreq', STATUS ) ) THEN
                         CALL MSG_SETD( 'RF', AST_GETD( FRM, 'RestFreq',
      :                                                 STATUS ) )
-                        CALL MSG_SETC( 'RF', ' Hz' )
+                        CALL MSG_SETC( 'RF', ' GHz' )
                      ELSE
                         CALL MSG_SETC( 'RF', '<not defined>' )
                      END IF
@@ -1128,36 +1131,21 @@
 
 *  Standard of Rest...
                      SOR = AST_GETC( FRM, 'STDOFREST', STATUS )
-                     IF( SOR .EQ. 'NONE' ) THEN
+                     IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
                         CALL MSG_SETC( 'SOR', '<not defined>' )
-
-                     ELSE IF( SOR .EQ. 'TOPOCENT' ) THEN
-                        CALL MSG_SETC( 'SOR', 'Topocentric' )
-
-                     ELSE IF( SOR .EQ. 'GEOCENTR' ) THEN
-                        CALL MSG_SETC( 'SOR', 'Geocentric' )
-
-                     ELSE IF( SOR .EQ. 'BARYCENT' ) THEN
-                        CALL MSG_SETC( 'SOR', 'Barycentric' )
-
-                     ELSE IF( SOR .EQ. 'HELIOCEN' ) THEN
-                        CALL MSG_SETC( 'SOR', 'Heliocentric' )
-
-                     ELSE IF( SOR .EQ. 'LSRK' ) THEN
+            
+                     ELSE IF( CHR_SIMLR( SOR, 'LSR' ) ) THEN
                         CALL MSG_SETC( 'SOR', 'Kinematical Local '//
      :                                 'Standard of Rest' )
-
-                     ELSE IF( SOR .EQ. 'LSRD' ) THEN
+            
+                     ELSE IF( CHR_SIMLR( SOR, 'LSRD' ) ) THEN
                         CALL MSG_SETC( 'SOR', 'Dynamical Local '//
      :                                 'Standard of Rest' )
-
-                     ELSE IF( SOR .EQ. 'GALACTOC' ) THEN
-                        CALL MSG_SETC( 'SOR', 'GALACTIC' )
-
-                     ELSE IF( SOR .EQ. 'LOCALGRP' ) THEN
+            
+                     ELSE IF(  CHR_SIMLR( SOR, 'LOCAL_GROUP' ) ) THEN
                         CALL MSG_SETC( 'SOR', 'Local group' )
-
-                     ELSE IF( SOR .EQ. 'LOCALGRP' ) THEN
+            
+                     ELSE 
                         CALL MSG_SETC( 'SOR', SOR )
                      END IF
 
@@ -1187,33 +1175,16 @@
 
 * Observers position...
                      IF( AST_TEST( FRM, 'GeoLon', STATUS ) ) THEN
-                        CALL sla_DR2AF( 1, AST_GETD( FRM, 'GeoLon', 
-     :                                               STATUS ),
-     :                                  SIGN, IDMSF )
-                        IAT = 0
                         POSBUF = ' '
-                        CALL CHR_APPND( SIGN, POSBUF, IAT )
-                        CALL CHR_PUTI( IDMSF( 1 ), POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL CHR_PUTI( IDMSF( 2 ), POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL CHR_PUTI( IDMSF( 3 ), POSBUF, IAT )
-                        CALL CHR_APPND( '.', POSBUF, IAT )
-                        CALL CHR_PUTI( IDMSF( 4 ), POSBUF, IAT )
+                        IAT = 0
+                        CALL CHR_APPND( AST_GETC( FRM, 'GeoLon',
+     :                                           STATUS ), POSBUF, IAT )
                         CALL CHR_APPND( ',', POSBUF, IAT )
                         IAT = IAT + 1
-
-                        CALL sla_DR2AF( 0, AST_GETD( FRM, 'GeoLat', 
-     :                                               STATUS ),
-     :                                  SIGN, IDMSF )
-                        CALL CHR_APPND( SIGN, POSBUF, IAT )
-                        CALL CHR_PUTI( IDMSF( 1 ), POSBUF, IAT )
+                        CALL CHR_APPND( AST_GETC( FRM, 'GeoLat',
+     :                                           STATUS ), POSBUF, IAT )
                         IAT = IAT + 1
-                        CALL CHR_PUTI( IDMSF( 2 ), POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL CHR_PUTI( IDMSF( 3 ), POSBUF, IAT )
                         CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
-
                      ELSE
                         CALL MSG_SETC( 'OBS', '<not defined>' )
                      END IF
