@@ -24,9 +24,12 @@ dnl    Leave out thirdparty for the moment -- the only directories
 dnl    there are fsf (which contains buildsupport tools which are
 dnl    configured as part of the bootstrap process) and eso (which
 dnl    contains libraries which haven't yet been brought within the
-dnl    Starlink build system).  In fact buildsupport doesn't really
-dnl    need configured either, but keep it in this list for consistency.
-AC_CONFIG_SUBDIRS(applications libraries buildsupport)
+dnl    Starlink build system).
+dnl
+dnl    Do NOT recurse into buildsupport.  If we include buildsupport
+dnl    here, then autoreconf will recurse into buildsupport/starconf,
+dnl    which means we end up reconfiguring it with a wrong --prefix.
+AC_CONFIG_SUBDIRS(applications libraries)
 dnl AC_CONFIG_SUBDIRS(applications libraries buildsupport thirdparty)
 
 AC_CONFIG_FILES(Makefile)
