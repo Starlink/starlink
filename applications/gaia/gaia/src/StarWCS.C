@@ -911,11 +911,9 @@ int StarWCS::set( double ra, double dec,
 
     //  Now read the headers back as a suitable frameset.
     astClear( fitschan, "Card" );
-    astShow( fitschan );
     AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
     if ( fitsset != AST__NULL ) {
         wcs_ = fitsset;
-        astShow( fitsset );
     } else {
         if ( ! astOK ) astClearStatus;
         fitschan = (AstFitsChan *) astAnnul( fitschan );
