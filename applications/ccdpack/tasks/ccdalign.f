@@ -174,8 +174,10 @@
 *     25-AUG-2000 (MBT):
 *        Removed the above IDI_ASSOC call since it causes obscure
 *        problems on alpha_osf1 and sun4_solaris.
-*        Also replaced some code which used CCD1_SETPA to call CCDNDFAC
-*        by code using SLV_OBEYW instead.
+*     29-AUG-2000 (MBT):
+*        Replaced use of CCDNDFAC A-task/routine, which caused weird 
+*        platform-dependent parameter-related problems, with the normal
+*        routine CCD1_NGLIS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -235,6 +237,7 @@
       INTEGER NDFLEN            ! length of NDF name
       INTEGER NGROUP            ! Number of file groups
       INTEGER NL                ! Length of NULL string
+      INTEGER NNDF              ! Number of NDFs in a group
       INTEGER NVAL              ! Dummy
       INTEGER OPLEN             ! String length
       INTEGER REFLEN            ! length of reference NDF name
@@ -362,29 +365,12 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
          CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
      :                  OPLEN, STATUS )
 
-*  If the output list for the filenames exists then delete it. We use
-*  existence of this file to indicate that new NDFs are available.
-         INQUIRE( FILE = NAMLST, EXIST = EXISTS )
-         IF ( EXISTS ) THEN
-            CMD = 'rm '//NAMLST
-            CALL CCD1_EXEC( CMD, STATUS )
-         END IF
-         CMD = 'namelist='//NAMLST//' '//
-     :         'echo=true '//
-     :         'maxndf=100 reset prompt'
-         CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
-c        CALL CCD1_SETPA( 'NAMELIST', NAMLST, STATUS )
-c        CALL CCD1_SETPA( 'ECHO', 'TRUE', STATUS )
-c        CALL CCD1_SETPA( 'MAXNDF', '100', STATUS )
-c        CALL CCDNDFAC( STATUS )
-c        CALL PAR_CANCL( 'IN', STATUS )
-c        CALL PAR_CANCL( 'NAMELIST', STATUS )
-         IF ( STATUS .EQ. SAI__OK ) THEN
+*  Get a list of NDFs from the user which constitute this group.
+         CALL CCD1_NGLIS( 'IN', NAMLST, 100, .TRUE., NNDF, STATUS )
 
-*  See if the file was created. If so we have some more NDFs and
-*  need to ask for some more. Otherwise terminate this loop.
-            INQUIRE( FILE = NAMLST, EXIST = EXISTS )
-            IF ( EXISTS ) THEN
+*  Bump the group number if the user gave some NDF names this time.
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            IF ( NNDF .GT. 0 ) THEN
                NGROUP = NGROUP + 1
             ELSE
                OK = .FALSE.
@@ -399,9 +385,7 @@ c        CALL PAR_CANCL( 'NAMELIST', STATUS )
             END IF
          END IF
 
-*  Cancel the parameter association to get a prompt on the next
-*  loop.
-         CALL PAR_CANCL( 'IN', STATUS )
+*  Return to the start of the loop to get some more NDFs if necessary.
          GO TO 1
       END IF
 
@@ -414,27 +398,10 @@ c        CALL PAR_CANCL( 'NAMELIST', STATUS )
      :       'the first group will be used.'
       CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
       CALL MSG_BLANK( STATUS )
-      INQUIRE( FILE = 'ccdalign_ref.list', EXIST = EXISTS )
-      IF ( EXISTS ) THEN
-         CALL CCD1_EXEC( 'rm ccdalign_ref.list', STATUS )
-      END IF
-      CMD = 'namelist=ccdalign_ref.list '//
-     :      'echo=true '//
-     :      'maxndf=100 reset'
-      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
-c     CALL CCD1_SETPA( 'NAMELIST', 'ccdalign_ref.list', STATUS )
-c     CALL CCD1_SETPA( 'ECHO', 'TRUE', STATUS )
-c     CALL CCD1_SETPA( 'MAXNDF', '100', STATUS )
-c     CALL CCDNDFAC( STATUS )
-c     CALL PAR_CANCL( 'IN', STATUS )
-c     CALL PAR_CANCL( 'NAMELIST', STATUS )
+      CALL CCD1_NGLIS( 'IN', 'ccdalign_ref.list', 100, .TRUE., NNDF,
+     :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      INQUIRE( FILE = 'ccdalign_ref.list', EXIST = EXISTS )
-      IF ( EXISTS ) THEN
-         HAVREF = .TRUE.
-      ELSE
-         HAVREF = .FALSE.
-      END IF
+      HAVREF = ( NNDF .GT. 0 )
 
 *  Now display the reference image or the very first NDF.
       IF ( HAVREF ) THEN
