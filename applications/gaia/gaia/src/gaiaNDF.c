@@ -827,10 +827,10 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     if ( status == SAI__OK && datValid( baseloc, &status ) ) {
 
         /*  Look for additional NDFs at baseloc, ignore tmploc which is
-         *  NDF itself (or baseloc).
+         *  NDF itself (or baseloc). If only one component, must be this NDF.
          */
         datNcomp( baseloc, &ncomp, &status );
-        if ( status != SAI__OK ) {
+        if ( status != SAI__OK || ncomp == 1 ) {
             ncomp = 0;
         }
         first = 1;
