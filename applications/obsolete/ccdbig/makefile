@@ -318,6 +318,11 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 
 SHELL_SCRIPTS = ccdbig reslog
 
+#  Link script.  This script does not form part of the package but is
+#  required for building it.  It will not be installed.
+
+LINK_SCRIPT = $(PKG_NAME)_link_adam
+
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
 #  installed packages.  This list should contain the names used to
@@ -382,7 +387,8 @@ OBJECT_FILES = $(SUBOBJ) $(TASKOBJ)
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(SHELL_SCRIPTS) $(TASKS) $(DATA_FILES) $(IFC_FILES)
+BUILT_FILES = $(LINK_SCRIPT) \
+              $(SHELL_SCRIPTS) $(TASKS) $(DATA_FILES) $(IFC_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -405,7 +411,7 @@ $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) $(PRIVATE_INCLUDES): \
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(SHELL_SCRIPTS): $(PKG_NAME)_source.tar
+$(SHELL_SCRIPTS) $(LINK_SCRIPT): $(PKG_NAME)_source.tar
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	chmod 755 $@
 	@ if test -f $@; then :;\
@@ -420,7 +426,8 @@ check_uptodate:
            else :; fi;\
         done
 
-RCS_FILES = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(SHELL_SCRIPTS) mk makefile
+RCS_FILES = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(SHELL_SCRIPTS) $(LINK_SCRIPT) \
+            mk makefile
 
 #  Target for checking existence of all source files.
 
@@ -429,7 +436,7 @@ check_source: $(SOURCE_FILES)
 #  Contents of the $(PKG_NAME)_source.tar archive.
 
 SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) \
-                  $(SHELL_SCRIPTS) $(PRIVATE_INCLUDES)
+                  $(SHELL_SCRIPTS) $(LINK_SCRIPT) $(PRIVATE_INCLUDES)
 
 #  Rules for building release files from RCS repository.
 
@@ -442,6 +449,7 @@ $(PKG_NAME)_source.tar:
            else :; fi;\
         done
 	co $(SOURCE_CONTENTS)
+	chmod 755 $(LINK_SCRIPT)
 	rm -f $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(SOURCE_CONTENTS)
 	rm -f $(SOURCE_CONTENTS)
@@ -456,9 +464,9 @@ $(PKG_NAME)_source.tar:
 CCDPACK_SOURCES = $(STAR_SOURCES)/ccdpack
 CCDPACK_LIBS = -lccdpack -lccdpack_gen -lccdpack_tasks
 
-$(TASKS): $(SUBOBJ) $$@.o
+$(TASKS): $(SUBOBJ) $(TASKOBJ) $(LINK_SCRIPT)
 	$(ALINK) $@.o $(SUBOBJ) -L$(CCDPACK_SOURCES) $(CCDPACK_LIBS) \
-                      `$(CCDPACK_SOURCES)/ccdpack_link_adam`
+                      `$(LINK_SCRIPT)`
 
 #  Rules for compiling the interface files.
 
