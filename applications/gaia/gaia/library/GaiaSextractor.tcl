@@ -201,6 +201,16 @@ itcl::class gaia::GaiaSextractor {
          {Draw detections as simple circles}
       set values_($this,draw_circles) 0
 
+      #  Add option to draw isophotal radii, if determined.
+      $Options add checkbutton  -label {Draw Radii} \
+         -variable [scope values_($this,draw_radii)] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Draw Radii}\
+         {Draw any isophotal radii as circles}
+      set values_($this,draw_radii) 0
+
       #  Allow selection of the detection image.
       set lwidth 18
       itk_component add detname {
@@ -299,23 +309,30 @@ itcl::class gaia::GaiaSextractor {
       set pages_(3) classification
       set revealed_(3) 0
 
+      #  Add a page for the isophotal radii options and get the
+      #  child site.
+      $itk_component(notebook) add -label "Isophot Radii" \
+         -command [code $this reveal_ 4]
+      set pages_(4) radii
+      set revealed_(4) 0
+
       #  Add a page for the background options and get the child site.
       $itk_component(notebook) add -label Background \
-         -command [code $this reveal_ 4]
-      set pages_(4) background
-      set revealed_(4) 0
+         -command [code $this reveal_ 5]
+      set pages_(5) background
+      set revealed_(5) 0
 
       #  Add a page for the check image options and get the child site.
       $itk_component(notebook) add -label Checkimage \
-         -command [code $this reveal_ 5]
-      set pages_(5) checkimage
-      set revealed_(5) 0
+         -command [code $this reveal_ 6]
+      set pages_(6) checkimage
+      set revealed_(6) 0
 
       #  Add a page for the catalogue options and get the child site.
       $itk_component(notebook) add -label Catalogue \
-         -command [code $this reveal_ 6]
-      set pages_(6) catalogue
-      set revealed_(6) 0
+         -command [code $this reveal_ 7]
+      set pages_(7) catalogue
+      set revealed_(7) 0
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
@@ -1374,11 +1391,109 @@ itcl::class gaia::GaiaSextractor {
       set values_($this,nettable) $values_($this,nettable)
    }
 
-
    #  Reset classification parameters to the builtin defaults.
    protected method reset_classification_ {} {
       $itk_component(fwhm) configure -value $defaults_(fwhm)
       $itk_component(nettable) configure -value $defaults_(nettable)
+   }
+
+   #  Add controls for all the isophotal radii parameters.
+   protected method add_radii_selections_ {parent} {
+      set lwidth 20
+      set vwidth 5
+
+      #  Type of values used to estimate radii.
+      itk_component add radtype {
+         LabelMenu $parent.radtype \
+            -labelwidth $lwidth \
+            -text "Type of values:" \
+            -variable [scope values_($this,radtype)]
+      }
+      pack $itk_component(radtype) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(radtype) \
+         {Type of values used to determine isophotal levels}
+      foreach {lname sname} \
+         "Default NONE {Surface Brightness} SB Intensity INT" {
+         $itk_component(radtype) add \
+            -label $lname \
+            -value $sname \
+            -command [code $this toggle_radtype_ $sname]
+      }
+
+      #  Values that determine the thresholds used.
+      itk_component add radthresh {
+         ManyLabelEntry $parent.radthresh \
+            -nentry 3 \
+            -text "Threshold parameters:" \
+            -labelwidth $lwidth \
+            -anchor w \
+            -validate real \
+            -orient vertical \
+            -value $values_($this,radthresh) \
+            -command [code $this set_values_ radthresh]
+      }
+      pack $itk_component(radthresh) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(radthresh) \
+         {Step, start and zeropoint (SB only) of thresholds}
+
+      toggle_radtype_ $values_($this,radtype)
+   }
+
+   #  Reset radii parameters to the builtin defaults.
+   protected method reset_radii_ {} {
+      $itk_component(radtype) configure -value $defaults_(radtype)
+      $itk_component(radthresh) configure -value $defaults_(radthresh)
+   }
+
+   #  Toggle state of other fields according to value of radtype.
+   protected method toggle_radtype_ {intype} {
+      if { $intype == "NONE" } {
+         $itk_component(radthresh) configure -state disabled
+      } else {
+         $itk_component(radthresh) configure -state normal
+      }
+      set values_($this,radtype) $intype
+   }
+
+   #  Set the value of RAD_TYPE. This is special as NONE means
+   #  do not use this parameter.
+   private method set_radtype_ {flag args} {
+      switch -exact $flag {
+         from {
+            #  Read in value, must be OK.
+            set values_($this,radtype) $args
+         }
+         to {
+            #  Return blank if "NONE".
+            if { "$args" == "NONE" } {
+               return ""
+            } else {
+               return "RAD_TYPE         $args"
+            }
+         }
+      }
+   }
+
+   #  Set the value of RAD_THRESH. This is special as radtype of NONE means
+   #  do not use this parameter.
+   private method set_radthresh_ {flag args} {
+      switch -exact $flag {
+         from {
+            #  Read in value(s), must be OK. Only catch is that these
+            #  may be comma separated.
+            regsub -all  {,} $args { } largs
+            set values_($this,radthresh) $largs
+         }
+         to {
+            #  Return blank if radtype "NONE".
+            if { "$values_($this,radtype)" == "NONE" } {
+               return ""
+            } else {
+
+               return "RAD_THRESH       [join $args {,}]"
+            }
+         }
+      }
    }
 
    #  Set the value of the network table filename. This will be
@@ -1400,7 +1515,6 @@ itcl::class gaia::GaiaSextractor {
          }
       }
    }
-
 
    #  Add controls for all the background parameters.
    protected method add_background_selections_ {parent} {
@@ -1767,6 +1881,20 @@ itcl::class gaia::GaiaSextractor {
       set to_(nettable) special
       set special_(nettable) {set_nettable_ to}
 
+      #  Type of isophotoal radii parameters. Special treatment as
+      #  NONE means do not use value.
+      set from_(RAD_TYPE) special
+      set special_(RAD_TYPE) {set_radtype_ from}
+      set to_(radtype) special
+      set special_(radtype) {set_radtype_ to}
+
+      #  Isophotoal radii threshold parameters. Special as need to
+      #  return blank when radtype is NONE.
+      set from_(RAD_THRESH) special
+      set special_(RAD_THRESH) {set_radthresh_ from}
+      set to_(radthresh) special
+      set special_(radthresh) {set_radthresh_ to}
+
       #  Background mesh size
       set from_(BACK_SIZE) backmesh
       set to_(backmesh) BACK_SIZE
@@ -1854,6 +1982,9 @@ itcl::class gaia::GaiaSextractor {
       set values_($this,checktype) "NONE"
       set values_($this,checkimage) "check.fits"
 
+      set values_($this,radtype)  "NONE"
+      set values_($this,radthresh) ""
+
       #  Memory parameters. These are not optional and may be changed
       #  using the local default.sex file.
       set values_($this,memory_objstack) 2000
@@ -1873,7 +2004,7 @@ itcl::class gaia::GaiaSextractor {
          imagescale photsat photgain photgamma fwhm nettable backmesh
          backfilter backtype backvalue backphot backthick checktype
          checkimage memory_objstack memory_pixstack memory_bufsize
-         verbose_type
+         verbose_type radtype radthresh
       }
 
       #  Record defaults so they can be restored.
@@ -2270,6 +2401,27 @@ itcl::class gaia::GaiaSextractor {
             [list circle red {} {} {} {}] \
             [list {4.0} {}]
       }
+
+      #  Isophotal radii, if available.
+      if { $values_($this,draw_radii) } {
+         if { "[array get columns_ $this,RAD*]" != "" } {
+            if {$values_($this,draw_kron_ellipses) ||
+                $values_($this,draw_iso_ellipses) ||
+                $values_($this,draw_circles) } {
+               lappend symbol {:}
+            }
+            for {set i 0} {$i < 16} {incr i} {
+               if { [info exists columns_($this,RAD$i)] &&
+                    $columns_($this,RAD$i) } {
+                  lappend symbol \
+                     RAD$i \
+                     [list circle yellow {} {} {} \$RAD$i>0] \
+                     [list \$RAD$i {}] {:}
+               }
+            }
+         }
+      }
+
       if { $symbol != {} } {
          eval $astrocat set_symbol $symbol
       }
@@ -2457,6 +2609,22 @@ itcl::class gaia::GaiaSextractor {
       {ISO5} {Isophotal area at level 5}
       {ISO6} {Isophotal area at level 6}
       {ISO7} {Isophotal area at level 7}
+      {RAD0} {Isophotal radius at level 0}
+      {RAD1} {Isophotal radius at level 1}
+      {RAD2} {Isophotal radius at level 2}
+      {RAD3} {Isophotal radius at level 3}
+      {RAD4} {Isophotal radius at level 4}
+      {RAD5} {Isophotal radius at level 5}
+      {RAD6} {Isophotal radius at level 6}
+      {RAD7} {Isophotal radius at level 7}
+      {RAD8} {Isophotal radius at level 8}
+      {RAD9} {Isophotal radius at level 9}
+      {RAD10} {Isophotal radius at level 10}
+      {RAD11} {Isophotal radius at level 11}
+      {RAD12} {Isophotal radius at level 12}
+      {RAD13} {Isophotal radius at level 13}
+      {RAD14} {Isophotal radius at level 14}
+      {RAD15} {Isophotal radius at level 15}
       {FLAGS} {Extraction flags}
       {FWHM_IMAGE} {FWHM assuming a gaussian core}
       {FWHM_WORLD} {FWHM assuming a gaussian core}
@@ -2536,7 +2704,7 @@ itcl::class gaia::GaiaSextractor {
 #      {ERRTHTPSF_J2000} {J2000 PSF error ellipse pos. angle (east of north)}
 #      {ERRTHTPSF_B1950} {B1950 PSF error ellipse pos. angle (east of north)}
 
-   #  Columns required when drawing ellipses.
+   #  Columns required when drawing ellipses/circles.
    protected variable kroncols_ {
       B_IMAGE KRON_RADIUS
    }
@@ -2545,6 +2713,10 @@ itcl::class gaia::GaiaSextractor {
    }
    protected variable commoncols_ {
       ELONGATION THETA_IMAGE
+   }
+   protected variable radiicols_ {
+      RAD0 RAD1 RAD2 RAD3 RAD4 RAD5 RAD6 RAD7 RAD8 RAD9 RAD10 RAD11
+      RAD12 RAD13 RAD14 RAD15
    }
 
    #  Columns we always generate -- need to plot positions somehow.
