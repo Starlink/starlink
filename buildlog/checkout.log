@@ -4290,6 +4290,7 @@ cvs checkout: Updating java/source/diva/src
 cvs checkout: Updating java/source/diva/src/docs
 U java/source/diva/src/docs/COPYRIGHT
 U java/source/diva/src/docs/README.txt
+U java/source/diva/src/docs/Starlink_COPYRIGHT
 U java/source/diva/src/docs/acknowledgments.html
 U java/source/diva/src/docs/changes.html
 U java/source/diva/src/docs/copyright.html
@@ -5454,6 +5455,66 @@ U java/source/diva/src/main/diva/whiteboard/WhiteboardState.java
 U java/source/diva/src/main/diva/whiteboard/WhiteboardView.java
 U java/source/diva/src/main/diva/whiteboard/makefile
 U java/source/diva/src/main/diva/whiteboard/package.html
+cvs checkout: Updating java/source/diva/src/main/uk
+cvs checkout: Updating java/source/diva/src/main/uk/ac
+cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva
+U java/source/diva/src/main/uk/ac/starlink/diva/DragRegion.java
+U java/source/diva/src/main/uk/ac/starlink/diva/Draw.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawActions.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawBasicFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawCompositeFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawController.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawEllipseFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawFigureFactory.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawFreehandFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawGraphicsMenu.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawGraphicsPane.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawLabelFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawLineFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawPathFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawPolygonFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawPolylineFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/DrawRectangleFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/FigureChangedEvent.java
+U java/source/diva/src/main/uk/ac/starlink/diva/FigureListener.java
+U java/source/diva/src/main/uk/ac/starlink/diva/FigureProps.java
+U java/source/diva/src/main/uk/ac/starlink/diva/InterpolatedCurveFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/InterpolatedCurveManipulator.java
+U java/source/diva/src/main/uk/ac/starlink/diva/RangeManipulator.java
+U java/source/diva/src/main/uk/ac/starlink/diva/TestDrawActions.java
+U java/source/diva/src/main/uk/ac/starlink/diva/XRangeFigure.java
+cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/geom
+U java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java
+cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/images
+U java/source/diva/src/main/uk/ac/starlink/diva/images/ImageHolder.java
+U java/source/diva/src/main/uk/ac/starlink/diva/images/curve.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/edit.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/ellipse.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/freehand.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/line.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/polygon.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/polyline.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/rectangle.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/region.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/select.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/text.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/width1.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/width2.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/width3.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/width4.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/width5.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/width6.gif
+U java/source/diva/src/main/uk/ac/starlink/diva/images/xrange.gif
+cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/interp
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/AkimaSplineInterp.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/CubicSplineInterp.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/HermiteSplineInterp.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/InterpolatedCurveIterator.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/LinearInterp.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/PolynomialInterp.java
 cvs checkout: Updating java/source/dom4j
 cvs checkout: Updating java/source/dom4j/docs
 cvs checkout: Updating java/source/dom4j/docs/dom4j
