@@ -10967,7 +10967,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedDrawAxes( this, axis - 1 );
+      ival = GetDrawAxes( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
