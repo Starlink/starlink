@@ -573,38 +573,26 @@ SKYCAT_FILES = \
  RtdRemoteTcl.tcl TopLevelWidget.tcl tclutil_version.tcl astrotcl_version.tcl
 
 TCL_FILES = \
- Archetype.itk hyperhelp.itk scale.tcl Toplevel.itk init.tcl \
- scrlbar.tcl Widget.itk itcl.tcl scrolledcanvas.itk adamMessageRelay \
- itk.tcl scrolledframe.itk adamtask.tcl iwidgets.tcl scrolledhtml.itk \
- atclsh labeledwidget.itk scrolledlistbox.itk bgerror.tcl ldAout.tcl \
- scrolledtext.itk buildidx.tcl listbox.tcl selectionbox.itk button.tcl \
- loadouster.tcl selectiondialog.itk buttonbox.itk menu.tcl shell.itk \
- canvasprintbox.itk menubar.itk spindate.itk canvasprintdialog.itk \
- messagedialog.itk spinint.itk clrpick.tcl msgbox.tcl spinner.itk \
- colors.itk notebook.itk spintime.itk combobox.itk obsolete.tcl \
- tabnotebook.itk comdlg.tcl optMenu.tcl tabset.itk console.tcl \
- optionmenu.itk dialog.itk palette.tcl tclx.tcl tcl.tndx tcl.tlib \
- dialog.tcl pane.itk tearoff.tcl dialogshell.itk panedwindow.itk \
- text.tcl entry.tcl parray.tcl tk.tcl entryfield.itk tkfbox.tcl \
- feedback.itk prolog.ps toolbar.itk fileselectionbox.itk \
- promptdialog.itk xmfbox.tcl fileselectiondialog.itk pushbutton.itk \
- focus.tcl radiobox.itk \
- Balloon.tcl   EFileBox.tcl  LabFrame.tcl  SText.tcl     VStack.tcl \
- BtnBox.tcl    EFileDlg.tcl  LabWidg.tcl   SWidget.tcl   VTree.tcl \
- CObjView.tcl  Event.tcl     ListNBk.tcl   SWindow.tcl   Variable.tcl \
- ChkList.tcl   FileBox.tcl   Meter.tcl     Select.tcl    Verify.tcl \
- ComboBox.tcl  FileCbx.tcl   MultView.tcl  Shell.tcl     Version.tcl \
- Compat.tcl    FileCmpt.tcl  NoteBook.tcl  SimpDlg.tcl   WInfo.tcl \
- Console.tcl   FileDlg.tcl   OldUtil.tcl   StackWin.tcl  WinFile.tcl \
- Control.tcl   FileEnt.tcl   OptMenu.tcl   StatBar.tcl   \
- DefSchm.tcl   FileUtil.tcl  PanedWin.tcl  StdBBox.tcl   \
- DialogS.tcl   FloatEnt.tcl  PopMenu.tcl   StdShell.tcl  \
- DirBox.tcl    Grid.tcl      Primitiv.tcl  TList.tcl     \
- DirDlg.tcl    HList.tcl     ResizeH.tcl   Tix.tcl       \
- DirList.tcl   HListDD.tcl   SGrid.tcl     Tree.tcl      \
- DirTree.tcl   IconView.tcl  SHList.tcl    UnixFile.tcl  \
- DragDrop.tcl  Init.tcl      SListBox.tcl  Utils.tcl     \
- DtlList.tcl   LabEntry.tcl  STList.tcl    VResize.tcl fs.tcl
+ Archetype.itk Toplevel.itk Widget.itk adamMessageRelay adamtask.tcl \
+ atclsh autoload.tcl bgerror.tcl buildidx.tcl button.tcl buttonbox.itk \
+ calendar.itk canvasprintbox.itk canvasprintdialog.itk checkbox.itk \
+ clrpick.tcl combobox.itk comdlg.tcl console.tcl dateentry.itk \
+ datefield.itk dialog.itk dialog.tcl dialogshell.itk \
+ disjointlistbox.itk entry.tcl entryfield.itk extfileselectionbox.itk \
+ extfileselectiondialog.itk feedback.itk fileselectionbox.itk \
+ fileselectiondialog.itk finddialog.itk focus.tcl hierarchy.itk \
+ history.tcl hyperhelp.itk init.tcl itk.tcl iwidgets.tcl \
+ labeledframe.itk labeledwidget.itk ldAout.tcl listbox.tcl \
+ mainwindow.itk menu.tcl menubar.itk messagebox.itk messagedialog.itk \
+ msgbox.tcl notebook.itk obsolete.tcl optMenu.tcl optionmenu.itk \
+ palette.tcl pane.itk panedwindow.itk parray.tcl pkgIndex.tcl prolog.ps \
+ promptdialog.itk pushbutton.itk radiobox.itk regexpfield.itk safe.tcl \
+ safetk.tcl scale.tcl scrlbar.tcl scrolledcanvas.itk scrolledframe.itk \
+ scrolledhtml.itk scrolledlistbox.itk scrolledtext.itk \
+ scrolledwidget.itk selectionbox.itk selectiondialog.itk shell.itk \
+ spindate.itk spinint.itk spinner.itk spintime.itk tabnotebook.itk \
+ tabset.itk tclx.tcl tearoff.tcl text.tcl timeentry.itk timefield.itk \
+ tk.tcl tkfbox.tcl toolbar.itk watch.itk word.tcl xmfbox.tcl
 
 GAIA_COLORMAP_FILES = bgyrw.lasc
 
@@ -745,18 +733,17 @@ $(INSTALL_DIRS):
 #  directory.  The actual installation copies these parts into place.
 
 SCRIPT_PLACES = \
-	./built/lib/tclX7.6.0/*.tcl \
+	./built/lib/tclX8.0.3/*.tcl \
 	./built/lib/tclX7.6.0/tcl.tndx \
 	./built/lib/tclX7.6.0/tcl.tlib \
-	./built/lib/itk2.2/*.itk \
-	./built/lib/itk2.2/*.tcl \
-	./built/lib/tcl7.6/*.tcl  \
+	./built/lib/itk3.0/*.itk \
+	./built/lib/itk3.0/*.tcl \
+	./built/lib/tcl8.0/*.tcl  \
 	./built/lib/startcl/* \
-	./built/lib/tk4.2/*.tcl \
-	./built/lib/tix4.1/*.tcl \
-	./built/lib/tk4.2/prolog.ps \
-	./built/lib/iwidgets2.2.0/*.itk \
-	./built/lib/iwidgets2.2.0/*.tcl
+	./built/lib/tk8.0/*.tcl \
+	./built/lib/tk8.0/prolog.ps \
+	./built/lib/iwidgets3.0.0/scripts/*.itk \
+	./built/lib/iwidgets3.0.0/*.tcl
 
 $(TCL_FILES): .tcl.built
 
@@ -770,7 +757,6 @@ $(TCL_FILES): .tcl.built
 	./configure --prefix=$${pwd}/built;\
 	make -e World)
 	cp -p ./built/bin/atclsh .
-	cp -p ./built/lib/itcl2.2/itcl.tcl .
 	for f in $(SCRIPT_PLACES) ""; do \
 	   if test -f "$$f"; then \
 	      cp -p $$f . ;\
@@ -783,11 +769,12 @@ $(TCL_FILES): .tcl.built
 $(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
 
 .skycat.built: gaia_skycat.tar
-	rm -r -f ./skycat/
+	- rm -r -f ./skycat/
 	$(TAR_OUT) gaia_skycat.tar
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./skycat; \
+	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
 	./configure --prefix=$${pwd}/built --with-$(CC);\
 	make -e all install)
