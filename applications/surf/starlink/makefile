@@ -553,7 +553,7 @@ KAP_INC = ctm_com ctm_par hlpcmd
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GKS_PAR GRP_PAR MSG_PAR NDF_PAR \
-	            NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PAR_PAR \
+	            NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PAR_PAR FIO_ERR \
 	            PRM_PAR DAT_ERR GNS_PAR NDF_FUNC AST_PAR NDF_ERR
 
 #  List of Fortran routines required for building the package.  This is
@@ -728,6 +728,7 @@ sun216_fitsdip.eps sun216_rawsdip.eps sun216_rawsdip2.eps \
 sun216_shift_diag.eps sun216_despikemodes.eps sun216_despike_eg.eps \
 sun216_4chops.eps sun216_flow_photom.eps sun216_flow_jig.eps \
 sun216_flow_scan.eps sun216_scansky.eps sun216_m82_remdbm.eps \
+sun216_omc1vec.eps \
 sc10.tex \
 sc10_fig1.eps sc10_fig2.eps sc10_fig3.eps sc10_fig4.eps sc10_logo.eps \
 sc11.tex \
