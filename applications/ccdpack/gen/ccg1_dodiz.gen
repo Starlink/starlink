@@ -222,14 +222,7 @@
      :                 'DRIZZLE: Not a two-dimensional output'
      :                 //' image? Can not proceed with drizzling.',
      :                 STATUS )
-         GOTO 999 
-         
-      ELSE
-
-         CALL MSG_SETI( 'IN_DIM', NDIMI )
-         CALL MSG_SETI( 'OUT_DIM', NDIMO )
-         CALL CCD1_MSG( ' ', '    Dimensions: Input (^IN_DIM)'
-     :                  //' = Output (^OUT_DIM)', STATUS )        
+         GOTO 999   
 
       ENDIF
 
