@@ -8,6 +8,7 @@
 
 #include <iostream>		// debug code writes to cerr
 #include <string>
+#include <assert.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +30,7 @@
 #include "BitmapImage.h"
 
 verbosities Bitmap::verbosity_ = normal;
+bool Bitmap::doCropMarginDefault = true;
 int  Bitmap::cropMarginDefault[4] = { 0, 0, 0, 0 };
 bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 //Byte Bitmap::def_fg_red_   = 0;
@@ -54,8 +56,8 @@ bool Bitmap::logBitmapInfo_ = false;
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
 Bitmap::Bitmap (const int w, const int h, const int bpp)
-    : W(w), H(h), frozen_(false), transparent_(false), bpp_(bpp),
-      customRGB_(false)
+    : W(w), H(h), frozen_(false), transparent_(false),
+      customRGB_(false), bpp_(bpp)
 {
     B = new Byte[W*H];
     memset ((void*)B, 0, W*H);
@@ -75,6 +77,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropMarginAbs[Right]  = cropMarginAbsDefault[Right];
     cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
+    doCropMargin	  = doCropMarginDefault;
 
     if (def_customRGB_)
     {
@@ -264,27 +267,64 @@ void Bitmap::crop ()
     if (!frozen_)
 	freeze();
 
-    cropL = (cropMarginAbs[Left]	? cropMargin[Left]
-					: bbL - cropMargin[Left]);
-    cropR = (cropMarginAbs[Right]	? cropMargin[Right]
+    if (doCropMargin)
+    {
+	cropL = (cropMarginAbs[Left]	? cropMargin[Left]
+		 			: bbL - cropMargin[Left]);
+	cropR = (cropMarginAbs[Right]	? cropMargin[Right]
 					: bbR + cropMargin[Right]);
-    cropT = (cropMarginAbs[Top]		? cropMargin[Top]
+	cropT = (cropMarginAbs[Top]		? cropMargin[Top]
 					: bbT - cropMargin[Top]);
-    cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
+	cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
 					: bbB + cropMargin[Bottom]);
+    }
     cropped_ = true;
 }
 
 void Bitmap::crop (Margin spec, int pixels, bool absolute)
 {
-    cropMargin[spec] = pixels;
-    cropMarginAbs[spec] = absolute;
+    if (spec == None)
+	doCropMargin = false;
+    else if (spec == All)
+    {
+	cropMargin[Left] = pixels;
+	cropMarginAbs[Left] = absolute;
+	cropMargin[Right] = pixels;
+	cropMarginAbs[Right] = absolute;
+	cropMargin[Top] = pixels;
+	cropMarginAbs[Top] = absolute;
+	cropMargin[Bottom] = pixels;
+	cropMarginAbs[Bottom] = absolute;
+    }
+    else
+    {
+	assert (spec >= Left && spec <= Bottom);
+	cropMargin[spec] = pixels;
+	cropMarginAbs[spec] = absolute;
+    }
 }	
 	
 void Bitmap::cropDefault (Margin spec, int pixels, bool absolute)
 {
-    cropMarginDefault[spec] = pixels;
-    cropMarginAbsDefault[spec] = absolute;
+    if (spec == None)
+	doCropMarginDefault = false;
+    else if (spec == All)
+    {
+	cropMarginDefault[Left] = pixels;
+	cropMarginAbsDefault[Left] = absolute;
+	cropMarginDefault[Right] = pixels;
+	cropMarginAbsDefault[Right] = absolute;
+	cropMarginDefault[Top] = pixels;
+	cropMarginAbsDefault[Top] = absolute;
+	cropMarginDefault[Bottom] = pixels;
+	cropMarginAbsDefault[Bottom] = absolute;
+    }
+    else
+    {
+	assert (spec >= Left && spec <= Bottom);
+	cropMarginDefault[spec] = pixels;
+	cropMarginAbsDefault[spec] = absolute;
+    }
 }	
 	
 
