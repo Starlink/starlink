@@ -176,14 +176,12 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Length of FILE
-      FLEN = CHR_LEN(FILE)
-
 *    Length of default extension
       ELEN = CHR_LEN(AIO_DEFEXT)
+      FLEN = CHR_LEN(FILE)
 
 *    If path is blank,
-      IF ( AIO_IPATH(1:1) .EQ.' ' ) THEN
+      IF ( AIO_IPATH(1:1) .EQ. ' ' ) THEN
 
 *      Just use FIO directly
         CALL FIO_OPEN( FILE, ACCESS, MODE, RECSZ, FD, STATUS )
@@ -191,7 +189,7 @@
 *      If that failed, and default extension is non-blank, try that
         IF ( (STATUS .NE. SAI__OK) .AND. (ELEN.GT.0) ) THEN
           CALL ERR_ANNUL( STATUS )
-          CALL FIO_OPEN( FILE//AIO_DEFEXT(:ELEN),
+          CALL FIO_OPEN( FILE(:FLEN)//AIO_DEFEXT(:ELEN),
      :                   ACCESS, MODE, RECSZ, FD, STATUS )
 
         END IF
