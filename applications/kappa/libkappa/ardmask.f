@@ -31,19 +31,17 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of the ARD file containing a description of the parts
-*        of the image to be masked out, i.e. set to bad.  The suggested
-*        default is the current value or ardfile.dat if there is no
-*        current value.
-*     COSYS = LITERAL (Read)
-*        The co-ordinate system to be used.  This can be either "World"
-*        or "Data".  If COSYS = "World" the co-ordinates used in the
-*        ARD file are pixel co-ordinates.  If COSYS = "Data"
-*        the co-ordinates used in the ARD file are interpreted as data
-*        co-ordinates, provided the NDF contains axes that map onto
-*        pixel co-ordinates using linear transformations.  If there are
-*        no axes, pixel co-ordinates are assumed; if axes are present
-*        but non-linear, the task fails.  COSYS="World" is recommended.
-*        [Current co-ordinate system]
+*        of the image to be masked out, i.e. set to bad. The suggested 
+*        default is the current value or ardfile.dat if there is no current 
+*        value. The co-ordinate system in which positions within this file 
+*        are given should be indicated by including suitable COFRAME or WCS 
+*        statements within the file (see SUN/183). For instance, starting the 
+*        file with a line containing the text "COFRAME(PIXEL)" will indicate 
+*        that positions are specified in pixel coordinates. The statement 
+*        "COFRAME(SKY,System=FK5)" would indicate that positions are
+*        specified in RA/DEC (FK5,J2000). If no such statements are included, 
+*        then it is assumed that positions are given within the current 
+*        co-ordinate system of the input NDF. 
 *     IN = NDF (Read)
 *        The name of the source NDF.
 *     OUT = NDF (Write)
@@ -64,9 +62,6 @@
 *        and sets the pixels specified by the ARD description contained
 *        in ardfile.txt to the bad value.  The resultant image is
 *        output to the NDF called ic3374a.  The title is unchanged.
-*     ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
-*        As the previous example except that the ARD file is
-*        written using data co-ordinates.
 
 *  ASCII-region-definition Descriptors:
 *     The ARD file may be created by ARDGEN or written manually.  In the
@@ -86,7 +81,7 @@
 *     -  All non-complex numeric data types can be handled.
 
 *  Related Applications:
-*     KAPPA: ARDGEN, ARDQUAL.
+*     KAPPA: ARDGEN.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -114,6 +109,8 @@
 *        bad pixels in the output dataset.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     20-AUG-2001 (DSB):
+*        Converted to ARD V2 by removing COSYS parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,63 +131,54 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:      
+      CHARACTER ATYPE*( NDF__SZTYP ) ! Numeric type for mapping AXIS centres
+      CHARACTER FILNAM*132 ! Name of ARD file
+      CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
       INTEGER AXES( NDF__MXDIM ) ! Indices of axes
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Numeric type for mapping AXIS
-                                 ! centres
-      LOGICAL CONT               ! ARD description to continue?
-      CHARACTER * ( 5 ) COSYS    ! Co-ordinate system
-      LOGICAL DATAVL             ! Are data co-ordinates available?
-      DOUBLE PRECISION DOFSET( NDF__MXDIM ) ! Axis co-ords at pixel
-                                 ! co-ords (0,0)
-      DOUBLE PRECISION DSCALE( NDF__MXDIM ) ! Dimensions of a pixel in
-                                 ! axis units
       INTEGER EL                 ! Total number of pixels in the image
       INTEGER FD                 ! File descriptor
-      CHARACTER * ( 132 ) FILNAM ! Name of ARD file
       INTEGER I                  ! Loop counter
       INTEGER IGRP               ! Group identifier
       INTEGER J                  ! Loop counter
       INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
-      INTEGER LBNDE( NDF__MXDIM ) ! Lower bounds of a box encompassing
-                                 ! all external array elements
-      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of a box encompassing
-                                 ! all internal array elements
-      INTEGER NDFI               ! Identifier for the source NDF  
-      INTEGER NDFO               ! Identifier for the output NDF
+      INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
+      INTEGER LBNDI( NDF__MXDIM )! Lower bounds of a box encompassing all internal array elements
+      INTEGER INDF1              ! Identifier for the source NDF  
+      INTEGER INDF2              ! Identifier for the output NDF
+      INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER NDIM               ! Number of dimensions in the image
       INTEGER NDP1               ! Numberof dimensions plus one.
-      REAL OFFSET( NDF__MXDIM )  ! Axis co-ords at pixel co-ords (0,0)
-      INTEGER POINT1( 1 )        ! Pointer to the data component of 
-                                 ! for the output NDF
-      INTEGER POINT2( 1 )        ! Pointer to the ARD logical mask
-      INTEGER REGVAL             ! Value assignied to the first ARD
-                                 ! region
-      REAL SCALE( NDF__MXDIM )   ! Dimensions of a pixel in axis units
-      REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world
-                                 ! co-ordinate conversions
-      CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
+      INTEGER IPIN               ! Pointer to the data component of for the output NDF
+      INTEGER IPMASK             ! Pointer to the ARD logical mask
+      INTEGER REGVAL             ! Value assignied to the first ARD region
       INTEGER UBND( NDF__MXDIM ) ! Upper limit for image index
-      INTEGER UBNDE( NDF__MXDIM ) ! Upper bounds of a box encompassing
-                                 ! all external array elements
-      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of a box encompassing
-                                 ! all internal array elements
+      INTEGER UBNDE( NDF__MXDIM )! Upper bounds of a box encompassing all external array elements
+      INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
+      LOGICAL CONT               ! ARD description to continue?
+      LOGICAL DATAVL             ! Are data co-ordinates available?
+      REAL OFFSET( NDF__MXDIM )  ! Axis co-ords at pixel co-ords (0,0)
+      REAL SCALE( NDF__MXDIM )   ! Dimensions of a pixel in axis units
+      REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
                                                           
 *.
 
 *  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the NDF structure to be examined.       
-      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Obtain the numeric type of the NDF array component to be analysed.
-      CALL NDF_TYPE( NDFI, 'Data', TYPE, STATUS )
+      CALL NDF_TYPE( INDF1, 'Data', TYPE, STATUS )
 
 *  Get the image bounds and also the size of the axes in pixels.
-      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Use a literal parameter to obtain the value to avoid having to give
 *  the indirection and continuation.  Call FIO to open the file to
@@ -206,160 +194,77 @@
       IGRP = GRP__NOID
       CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
-*  Obtain the desired co-ordinate system.
-      CALL PAR_CHOIC( 'COSYS', 'World', 'Data,World', .FALSE., COSYS,
-     :                STATUS )
-
-*  If data co-ordinates are to be supplied, we need to find out how to
-*  transform data co-ordinates into world co-ordinates within the output
-*  NDF.
-      IF ( COSYS .EQ. 'DATA' ) THEN
-
-*  Find the precision needed for the system of axis arrays.
-         CALL NDF_ATYPE( NDFI, 'Centre', 0, ATYPE, STATUS )
-
-*  See if there is an axis co-ordinate system defined within the NDF.
-         CALL NDF_STATE( NDFI, 'Axis', DATAVL, STATUS )
-         IF ( DATAVL ) THEN
-*  Specify the axes to be used.
-            DO I = 1, NDIM
-               AXES( I ) = I
-            END DO
-
-*  Obtain the scales and offsets of the linear transformation from
-*  pixel co-ordinates to data co-ordinates.  Axis co-ordinates must be
-*  monotonic to be usable.  If the axes are non-linear a warning
-*  message is issued and a linear approximation to the axis
-*  co-ordinates is returned.  Note that if we were to map a
-*  single-precision axis array as double precision, the linearity might
-*  be violated merely because of the increased sensitivity of the test.
-*  Thus the testing is done with the appropriate type.  Hereafter though
-*  the single-precision transformation is adequate for the job.
-            IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_CHAXD( NDFI, NDIM, AXES, DATAVL, DSCALE,
-     :                          DOFSET, STATUS )
-               DO I = 1, NDIM
-                  SCALE( I ) = SNGL( DSCALE( I ) )
-                  OFFSET( I ) = SNGL( DOFSET( I ) )
-               END DO
-            ELSE
-               CALL KPG1_CHAXR( NDFI, NDIM, AXES, DATAVL, SCALE, OFFSET,
-     :                          STATUS )
-            END IF
-
-*  If no usable AXIS structures have been found, report an error and
-*  abort.
-            IF ( ( .NOT. DATAVL ) .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'ARDMASK_WARN1', 'No usable data '/
-     :           /'co-ordinates can be found in the supplied NDF.  '/
-     :           /'Assuming that the ARD file is specified using '/
-     :           /'pixel co-ordinates.', STATUS )
-
-            ELSE
-
-*  Generate the transformation array.
-*
-*  First initialise the array.
-               NDP1 = NDIM + 1
-               DO J = 1, NDIM
-                  DO I = 1, NDP1
-                     TRCOEF( I + ( J - 1 ) * NDP1 ) = 0.0
-                  END DO
-               END DO
-
-*  Assign the offsets and scale factors.  Note that the scale and
-*  offsets returned above are for converting pixel co-ordinates to
-*  data, and ARD needs the inverse mapping.  A zero scale is not
-*  possible but double check for safety.
-               DO J = 1, NDIM
-                  IF ( ABS( SCALE( J ) ) .LT. VAL__EPSR ) THEN
-                     STATUS = SAI__ERROR
-                     CALL ERR_REP( 'ARDMASK_SCALE',
-     :                 'The scale factor for converting world to data '/
-     :                 /'co-ordinates along axis ^I is zero.', STATUS )
-                  ELSE
-                     TRCOEF( 1 + ( J - 1 ) * NDP1 ) = -OFFSET( J ) /
-     :                                                SCALE( J )
-                     TRCOEF( 1 + J + ( J - 1 ) * NDP1 ) = 1.0 /
-     :                                                    SCALE( J )
-                  END IF
-               END DO
-            END IF
-
-*  Use the identity matrix when there are no axes or the co-ordinate
-*  system is world.
-         ELSE
-            TRCOEF( 1 ) = VAL__BADR
-         END IF
-
-      ELSE
-         TRCOEF( 1 ) = VAL__BADR
-      END IF
-
 *  Propagate the bits of the source NDF required.
-      CALL LPG_PROP( NDFI, 'Data,Variance,Quality,Axis,Units,WCS', 
-     :               'OUT', NDFO, STATUS )
+      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
+     :               'OUT', INDF2, STATUS )
 
 *  Get the title for the output NDF.
-      CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
+      CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
 
-*  Map the output NDF data array as _REAL values for updating.
-      CALL KPG1_MAP( NDFO, 'Data', TYPE, 'UPDATE', POINT1( 1 ), EL,
+*  Map the output NDF data array for updating.
+      CALL NDF_MAP( INDF2, 'Data', TYPE, 'UPDATE', IPIN, EL,
      :              STATUS )
 
 *  Allocate the memory needed for the logical mask array.
-      CALL PSX_CALLOC( EL, '_INTEGER', POINT2( 1 ), STATUS )
+      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
       
+*  Get the WCS FrameSet from the NDF and use it to establish the WCS
+*  information used by the following cal to ARD_WORK.
+      CALL KPG1_GTWCS( INDF2, IWCS, STATUS )
+      CALL ARD_WCS( IWCS, STATUS )
+
 *  Create the mask.  Value 2 should be used to represent pixels
-*  specified by the first keyword in the ARD description.
+*  specified by the first keyword in the ARD description. TRCOEF is
+*  ignored because we have previously called ARD_WCS.
       REGVAL = 2
       CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( POINT2( 1 ) ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
      :               STATUS )
        
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
-      IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_ARDMR( EL, %VAL( POINT2( 1 ) ),
-     :                    %VAL( POINT1( 1 ) ), STATUS )
+      IF( TYPE .EQ. '_REAL' ) THEN
+         CALL KPS1_ARDMR( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
-      ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_ARDMB( EL, %VAL( POINT2( 1 ) ),
-     :                    %VAL( POINT1( 1 ) ), STATUS )
+      ELSE IF( TYPE .EQ. '_BYTE' ) THEN
+         CALL KPS1_ARDMB( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
-      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_ARDMD( EL, %VAL( POINT2( 1 ) ),
-     :                    %VAL( POINT1( 1 ) ), STATUS )
+      ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPS1_ARDMD( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
-      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_ARDMI( EL, %VAL( POINT2( 1 ) ),
-     :                    %VAL( POINT1( 1 ) ), STATUS )
+      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+         CALL KPS1_ARDMI( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
-      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_ARDMUB( EL, %VAL( POINT2( 1 ) ),
-     :                     %VAL( POINT1( 1 ) ), STATUS )
+      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+         CALL KPS1_ARDMUB( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
-      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_ARDMUW( EL, %VAL( POINT2( 1 ) ),
-     :                     %VAL( POINT1( 1 ) ), STATUS )
+      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+         CALL KPS1_ARDMUW( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
-      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_ARDMW( EL, %VAL( POINT2( 1 ) ),
-     :                    %VAL( POINT1( 1 ) ), STATUS )
+      ELSE IF( TYPE .EQ. '_WORD' ) THEN
+         CALL KPS1_ARDMW( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
 
       END IF
 
 *  Set the bad-pixel flag.
-      CALL NDF_SBAD( .TRUE., NDFO, 'Data', STATUS )
+      CALL NDF_SBAD( .TRUE., INDF2, 'Data', STATUS )
 
 *  Free the dynamic array space of the logical mask.
-      CALL PSX_FREE( POINT2( 1 ), STATUS )
+      CALL PSX_FREE( IPMASK, STATUS )
 
 *  Close down the group used to hold the pixel mask.
       CALL GRP_DELET( IGRP, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )                              
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'ARDMASK_ERR', 'ARDMASK: Failed to mask an NDF'//
+     :                 ' using an ARD file.', STATUS )
+      END IF
 
       END

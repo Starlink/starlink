@@ -6808,16 +6808,6 @@ package kappa {
             helpkey *
           }
 
-         parameter cosys {
-            type LITERAL
-            vpath GLOBAL DEFAULT
-            ppath GLOBAL DYNAMIC
-            prompt {Co-ordinate system used in the ARD file}
-            association <->GLOBAL.COORD_SYSTEM
-            helpkey *
-            default World
-          }
-
          parameter in {
             position 1
             type NDF
