@@ -1,0 +1,29 @@
+This directory contains several ASCII files related to SExtractor
+configuration:
+
+default.sex:	an example of SExtractor .sex configuration file.
+default.param:	a .param file, containing all parameters known by SExtractor.
+		To prevent some parameters to figure in the output catalog,
+		just erase or comment their names (by adding a # at the
+		beginning of the line).
+default.nnw:	a "Neural-Network-Weights" file for star/galaxy separation on
+		images with Moffat-like PSFs.
+*.conv:		several "classical" convolution masks for optimal detection:
+		- default.conv		a small pyramidal function (fast),
+		- gauss*.conv		a set of gaussian functions, for
+					seeing FWHMs between 1.5 and 5 pixels
+					(best for faint object detection),
+		- tophat*.conv		a set of "top-hat" functions. Use them
+					to detect extended, low-surface
+					brightness objects, with a very low
+					THRESHOLD.
+		- mexhat*.conv		"wavelets", producing a passband-
+					filtering of the image, tuned to
+					seeing FWHMs between 1.5 and 5 pixels.
+					Useful in very crowded star fields,
+					or in the vicinity of a nebula.
+					WARNING: may need a high THRESHOLD!!
+		- block_3x3.conv	a small "block" function (for rebinned
+					images like those of the DeNIS survey).
+
+		All these convolution files are normalized by default.
