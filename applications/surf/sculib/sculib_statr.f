@@ -1,0 +1,162 @@
+      SUBROUTINE SCULIB_STATR(N_POS, CLIP, SCUDATA, SCUQUAL, BADBIT,
+     :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, QSORT, STATUS)
+*+
+*  Name:
+*     SCULIB_STATR
+
+*  Purpose:
+*     To calculate mean and standard deviation of a REAL array
+
+*  Invocation:
+*     SUBROUTINE SCULIB_STATR(N_POS, SCUDATA, SCUQUAL, BADBIT,
+*    :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, QSORT, STATUS)
+
+*  Description:
+*     This routine calculates the mean and standard deviation of
+*     a real array.
+
+*  Arguments:
+*     N_POS = _INTEGER (Given)
+*        Number of jiggle positions in data set
+*     CLIP = _INTEGER (Given)
+*        Number of points to clip from mean
+*     SCUDATA(N_POS) = _REAL (Given)
+*        The data
+*     SCUQUAL(N_POS) = _BYTE (Given)
+*        The data quality
+*     BADBIT = _BYTE (Given)
+*        Bad bit mask
+*     NGOOD = _INTEGER (Returned)
+*        Number of good pixels in mean
+*     MEAN = _DOUBLE (Returned)
+*        Mean value
+*     MEDIAN = _DOUBLE (Returned)
+*        Median of good data
+*     SUM = _DOUBLE (Returned)
+*        Data sum
+*     SUMSQ = _DOUBLE (Returned)
+*        Sum of squares
+*     STDEV = _DOUBLE (Returned)
+*        Standard deviation 
+*     QSORT = _REAL (Returned)
+*        Sorted data set
+*     STATUS = INTEGER (Given and Returned)
+*        Global Status value
+
+*  Implementation Status:
+*     - Deals with bad pixels
+*     - Uses Kappa sort routine
+
+*  Authors:
+*     TIMJ: Tim Jenness (JACH)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     1996 November 18 (TIMJ):
+*       Original version
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'PRM_PAR'               ! VAL__ constants
+      INCLUDE 'SAE_PAR'               ! SSE global definitions
+
+*  Arguments Given:
+      INTEGER N_POS
+      INTEGER CLIP
+      BYTE    BADBIT
+      REAL    SCUDATA(N_POS)
+      BYTE    SCUQUAL(N_POS)
+
+*  Arguments Returned:
+      REAL   QSORT(N_POS)
+      DOUBLE PRECISION MEAN
+      DOUBLE PRECISION MEDIAN
+      INTEGER NGOOD
+      DOUBLE PRECISION STDEV
+      DOUBLE PRECISION SUM
+      DOUBLE PRECISION SUMSQ
+
+*  Status:
+      INTEGER STATUS                 ! Global status
+
+*  Local Variables:
+      INTEGER I                    ! Loop counter
+      INTEGER MIDPOINT             ! Middle of Good data
+      DOUBLE PRECISION VALUE       ! Value of data point
+
+*    External functions:
+      INCLUDE 'NDF_FUNC'
+*.
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      NGOOD = 0
+      SUM = 0.0D0
+      SUMSQ = 0.0D0
+
+*     Loop over all data and remove bad points
+      DO I = 1, N_POS
+         IF ((SCUDATA(I) .NE. VAL__BADR) .AND.
+     :        (NDF_QMASK(SCUQUAL(I), BADBIT))) THEN
+            NGOOD = NGOOD + 1
+            QSORT(NGOOD) = SCUDATA(I)
+         END IF
+      END DO
+
+
+* Set defaults
+      SUM = 0.0D0
+      SUMSQ = 0.0D0
+      MEAN = VAL__BADD
+      STDEV = VAL__BADD
+      MEDIAN = VAL__BADD
+
+*     Find Standard deviation and mean and median
+      IF (NGOOD .GT. 0) THEN
+
+*     Sort good data (with Kappa routine)
+         CALL KPG1_QSRTR(N_POS, 1, NGOOD, QSORT, STATUS)
+
+*     Median
+         MIDPOINT = NGOOD / 2
+
+         IF (MOD(NGOOD, 2) .EQ. 0) THEN    ! Even
+            MEDIAN = DBLE(QSORT(MIDPOINT) + QSORT(MIDPOINT+1))/2.0D0
+         ELSE    ! Odd
+            MEDIAN = DBLE(QSORT(MIDPOINT+1))
+         END IF
+
+         NGOOD = NGOOD - 2 * CLIP
+
+         IF (NGOOD .GT. 0) THEN
+            DO I = CLIP + 1, CLIP + NGOOD
+               VALUE = DBLE(QSORT(I))
+               SUM = SUM + VALUE
+               SUMSQ = SUMSQ + ( VALUE * VALUE )
+            END DO
+
+*     Mean and STDEV
+            MEAN = SUM / DBLE( NGOOD )
+            STDEV = SUMSQ - ( MEAN * MEAN * DBLE( NGOOD ) )
+            IF ( ( NGOOD .EQ. 1 ) .OR.
+     :           ( STDEV .LT. 0.0D0 ) ) THEN
+               STDEV = 0.0D0
+ 
+*     Otherwise, calculate the standard deviation normally.
+            ELSE
+               STDEV = SQRT( STDEV / DBLE( NGOOD - 1 ) )
+            END IF
+         
+         END IF
+
+      END IF
+
+      END
