@@ -336,6 +336,10 @@
 *        expression.  Examples changed to lowercase.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     1998 August 12 (MJC):
+*        Evaluates the FA-FZ tokens before any others.  Previously
+*        this was done after the IA-IZ and VA-VZ were expanded, hence
+*        sub-expressions could not contain these array tokens.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -440,8 +444,15 @@
       CALL CHR_UCASE( EXPRS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Determine its length.
-      NC = MAX( 1, CHR_LEN( EXPRS( : LEXP ) ) )
+*  Substitute any sub-expression (FA-FZ) tokens in the expression. 
+*  These may contain other tokens, such as those for data arrays,
+*  co-ordinates, and constants, hence FA-FZ tokens must be expanded
+*  before other tokens  are evaluated.
+      CALL KPG1_SATKC( 'F', EXPRS, STATUS )
+
+*  Evaluate the length of the expression.
+      NC = MAX( 1, CHR_LEN( EXPRS ) )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find out which NDF names appear in the expression by attempting to
 *  replace each name in turn by itself and seeing if a substitution
@@ -504,16 +515,6 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 999
    10 CONTINUE
 
-*  Substitute any tokens in the expressions.  Deal with the
-*  sub-expressions first as these may contain constants.
-      CALL KPG1_SATKC( 'F', EXPRS, STATUS )
-      CALL KPG1_SATKD( 'P', EXPRS, STATUS )
-
-*  Re-evaluate the length of the expression.
-      NC = MAX( 1, CHR_LEN( EXPRS ) )
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
-   20 CONTINUE
-
 *  Find out which pixel co-ordinate tokens appear in the expression by
 *  attempting to replace each name in turn by itself and seeing if a
 *  substitution results.
@@ -549,6 +550,14 @@
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 999
    40 CONTINUE
+
+*  Finally obtain values for the constants (PA-PZ), as these may not
+*  contain any further tokens.
+      CALL KPG1_SATKD( 'P', EXPRS, STATUS )
+
+*  Re-evaluate the length of the expression.
+      NC = MAX( 1, CHR_LEN( EXPRS ) )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If data co-ordinates are required, we need to check that there is a
 *  least one input NDF from which to obtain the co-ordinate system.

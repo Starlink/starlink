@@ -461,6 +461,12 @@
 *        representations, and do not re-instate original representations
 *        at end. This prevents the screen being cleared when the
 *        workstation is closed.
+*     1998 August 11 (MJC):
+*        Further work to fix the deferred refresh problem associated
+*        with changing the polyline colours.  Removed the update of
+*        the GKS workstation.  Used individual aspect source flags to
+*        set the polyline colour index for lines, symbols and error
+*        bars.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -560,8 +566,6 @@
                                  ! error bars
       REAL EMIN                  ! Minimum data co-ordinate allowing for
                                  ! error bars
-      LOGICAL EPLR               ! Polyline representation used for
-                                 ! error bars to be reset?
       LOGICAL ERRBAR             ! Error bars to be plotted?
       INTEGER ERRCI              ! Colour index required for error bars
       LOGICAL ERWORK             ! Workspace for pixel (zero) errors
@@ -579,11 +583,13 @@
       INTEGER GSTAT              ! GKS status
       REAL HXMAX                 ! Maximum data co-ordinate in histogram
       REAL HXMIN                 ! Minimum data co-ordinate in histogram
+      INTEGER I                  ! Loop count
       INTEGER IERR               ! GKS error indicator
       CHARACTER * ( 1 ) INV( 1 ) ! Inverse mapping (null)
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type of the image
       INTEGER IWKID              ! GKS workstation identifier
       INTEGER LASF( 13 )         ! GKS list of aspect source flags
+      INTEGER LASF0( 13 )        ! Original GKS aspect source flags
       INTEGER LCOLI              ! Original colour index of pen used for
                                  ! plotting the lines
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the NDF
@@ -638,8 +644,6 @@
       INTEGER SIGDIM( NDF__MXDIM ) ! The significant dimensions of the NDF
       INTEGER SLNTYP             ! Line type for current symbol SGS pen
       REAL SLWIDT                ! Width of the current symbol SGS pen
-      LOGICAL SPLR               ! Polyline representation used for
-                                 ! symbols to be reset?
       INTEGER SYMBOL             ! Symbol number in point plot
       INTEGER SYMCI              ! Colour index required for symbols
       LOGICAL TCKCTR             ! The numbers of tick marks cannot be
@@ -675,8 +679,6 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       DEVCAN = .FALSE.
-      EPLR = .FALSE.
-      SPLR = .FALSE.
 
 *  Obtain the plot style.
 *  ======================  
@@ -980,17 +982,23 @@
 *  benefits of choosing a palette colour.
       CALL KPG1_IVCI( 'DEVICE', 'LINCOL', .FALSE., LINCI, STATUS )
 
-*  Inquire the workstation identifier for GKS inquiries.
+*  Obtain the workstation identifier for GKS inquiries.
       CALL SGS_ICURW( IWKID )
 
-*  Inquire the current colour index of this pen (it will be restored
-*  after all plotting is complete).
-      CALL GQPLR( IWKID, LINPEN, GSET, IERR, LLNTYP, LLWIDT, LCOLI )
+*  Get the aspect source flags, and take a copy of them.
+      CALL GQASF( GSTAT, LASF0 )
 
-*  Store the new colour index and line thickness for this pen.  However,
-*  the latter appears not to work (probably due to NCAR resetting
-*  something.)
-      CALL GSPLR( IWKID, LINPEN, LLNTYP, THICK, LINCI )
+      DO I = 1, 13
+         LASF( I ) = LASF0( I )
+      END DO
+
+*  Set the linetype, linewidth, and polyline-colour-index aspect source
+*  flags to individual to prevent GKS refreshing the display.
+      LASF( 1 ) = 1
+      LASF( 2 ) = 1
+      LASF( 3 ) = 1
+
+      CALL GSASF( LASF )
 
 *  Obtain the colour index for the desired colour of the error bars.
 *  Don't restrict the colours to the palette to give the user more
@@ -998,41 +1006,15 @@
 *  benefits of choosing a palette colour.
       IF ( ERRBAR ) THEN
          CALL KPG1_IVCI( 'DEVICE', 'ERRCOL', .FALSE., ERRCI, STATUS )
-
-*  Inquire the current colour index of this pen (it will be restored
-*  after all plotting is complete).
-         CALL GQPLR( IWKID, ERRPEN, GSET, IERR, ELNTYP, ELWIDT, ECOLI )
-
-*  Store the new colour index and width for this pen.  However,
-*  the latter appears not to work (probably due to NCAR resetting
-*  something).
-         CALL GSPLR( IWKID, ERRPEN, ELNTYP, THICK, ERRCI )
-         EPLR = .TRUE.
       END IF
 
-*  Obtain the colour index for the desired colour of the error bars.
+*  Obtain the colour index for the desired colour of the symbols.
 *  Don't restrict the colours to the palette to give the user more
 *  control.  There are instructions in the documentation on the
 *  benefits of choosing a palette colour.
       IF ( MODE .EQ. 'POINT' ) THEN
          CALL KPG1_IVCI( 'DEVICE', 'SYMCOL', .FALSE., SYMCI, STATUS )
-
-*  Inquire the current colour index of this pen (it will be restored
-*  after all plotting is complete).
-         CALL GQPLR( IWKID, SYMPEN, GSET, IERR, SLNTYP, SLWIDT, SCOLI )
-
-*  Store the new colour index and line width for this pen.  However,
-*  the latter appears not to work (probably due to NCAR resetting
-*  something).
-         CALL GSPLR( IWKID, SYMPEN, SLNTYP, THICK, SYMCI )
-         SPLR = .TRUE.
       END IF
-
-*  Ensure that the pen changes have been applied. This may cause GKS to 
-*  redraw or clear the screen. It must be done now because otherwise, it
-*  would be done when the workstation is closed, resulting in the newly
-*  drawn graphics being erased.
-      CALL GUWK( IWKID, 1 )
 
 *  Obtain the ordinate limits.
 *  ===========================
@@ -1651,14 +1633,37 @@
 *  dataset.
       IF ( ABSLIM( 1 ) .LT. ABSLIM( 2 ) .OR. XLOG ) THEN
 
+*  Set the polyline to the colour of lines, storing the current value.
+         IF ( MODE .NE. 'POINT' ) THEN
+            CALL GQPLCI( IERR, LCOLI )
+            CALL GSPLCI( LINCI )
+
+*  Set the polyline to the colour of symbols, storing the current value.
+         ELSE
+            CALL GQPLCI( IERR, SCOLI )
+            CALL GSPLCI( SYMCI )
+         END IF
+
 *  Draw the locus of the line plot.
          CALL KPS1_LINPL( MODE, EL, %VAL( PXPNTR( 1 ) ),
      :                    %VAL( PXPNTR( 3 ) ), %VAL( PNTRI( 1 ) ),
      :                    ABSLIM( 1 ), ABSLIM( 2 ), ORDLIM( 1 ),
-     :                    ORDLIM( 2 ), XLOG, YLOG, LINPEN, SYMBOL,
-     :                    SYMPEN, %VAL( WPNTR ), STATUS )
+     :                    ORDLIM( 2 ), XLOG, YLOG, LINCI, SYMBOL,
+     :                    SYMCI, %VAL( WPNTR ), STATUS )
+
+*  Reset the polyline to its former colour.
+         IF ( MODE .NE. 'POINT' ) THEN
+            CALL GSPLCI( LCOLI )
+         ELSE
+            CALL GSPLCI( SCOLI )
+         END IF
 
          IF ( ERRBAR ) THEN
+
+*  Set the polyline to the colour of the error bars, storing the
+*  current value.
+            CALL GQPLCI( IERR, ECOLI )
+            CALL GSPLCI( ERRCI )
 
 *  Draw the error bars.
             CALL KPG1_ERBAR( ESHAPE, ERRPEN, ESPACE, EL,
@@ -1666,10 +1671,24 @@
      :                       %VAL( PNTRI( 1 ) ), %VAL( PNTRI( 2 ) ),
      :                       ABSLIM( 1 ), ABSLIM( 2 ), ORDLIM( 1 ),
      :                       ORDLIM( 2 ), XLOG, YLOG, STATUS )
+
+*  Reset the polyline to its former colour.
+            CALL GSPLCI( ECOLI )
          END IF
 
 *  Deal with a reversed x-axis.
       ELSE
+
+*  Set the polyline to the colour of lines, storing the current value.
+         IF ( MODE .NE. 'POINT' ) THEN
+            CALL GQPLCI( IERR, LCOLI )
+            CALL GSPLCI( LINCI )
+
+*  Set the polyline to the colour of symbols, storing the current value.
+         ELSE
+            CALL GQPLCI( IERR, SCOLI )
+            CALL GSPLCI( SYMCI )
+         END IF
 
 *  Draw the locus of the line plot.
          CALL KPS1_LINPL( MODE, EL, %VAL( FXPNTR( 1 ) ),
@@ -1678,7 +1697,30 @@
      :                    ORDLIM( 2 ), XLOG, YLOG, LINPEN, SYMBOL,
      :                    SYMPEN, %VAL( WPNTR ), STATUS )
 
+*  Set the polyline to the colour of lines, storing the current value.
+         IF ( MODE .NE. 'POINT' ) THEN
+            CALL GQPLCI( IERR, LCOLI )
+            CALL GSPLCI( LINCI )
+
+*  Set the polyline to the colour of symbols, storing the current value.
+         ELSE
+            CALL GQPLCI( IERR, SCOLI )
+            CALL GSPLCI( SYMCI )
+         END IF
+
+*  Reset the polyline to its former colour.
+         IF ( MODE .NE. 'POINT' ) THEN
+            CALL GSPLCI( LCOLI )
+         ELSE
+            CALL GSPLCI( SCOLI )
+         END IF
+
          IF ( ERRBAR ) THEN
+
+*  Set the polyline to the colour of the error bars, storing the
+*  current value.
+            CALL GQPLCI( IERR, ECOLI )
+            CALL GSPLCI( ERRCI )
 
 *  Draw the error bars.
             CALL KPG1_ERBAR( ESHAPE, ERRPEN, ESPACE, EL,
@@ -1687,6 +1729,8 @@
      :                       ABSLIM( 1 ), ABSLIM( 2 ), ORDLIM( 1 ),
      :                       ORDLIM( 2 ), XLOG, YLOG, STATUS )
 
+*  Reset the polyline to its former colour.
+            CALL GSPLCI( ECOLI )
          END IF
       END IF
 
@@ -1896,16 +1940,8 @@
 *  ============================
  960  CONTINUE
 
-*  Reset the line width.
-      IF ( ABS( THICK - 1.0 ) .GT. VAL__EPSR ) THEN
-
-*  Set the line width scale factor source flags to bundled.
-         LASF( 2 ) = 0
-         CALL GSASF( LASF )
-
-*  Watch out for any error.
-         CALL GKS_GSTAT( STATUS )
-      END IF
+*  Set the GKS Aspect Source Flags back to their original values.
+      CALL GSASF( LASF0 )
 
 *  Close the device.
       CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
