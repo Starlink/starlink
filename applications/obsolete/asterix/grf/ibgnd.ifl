@@ -6,6 +6,12 @@ interface IBGND
     help 'Type HELP for a full list'
   endparameter
 
+  parameter SUBMODE
+    position 2
+    type '_CHAR'
+    prompt 'Command sub-mode'
+  endparameter
+
   parameter X
     type '_REAL'
     ppath 'DYNAMIC,DEFAULT'
