@@ -39,7 +39,12 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ILOAD Version 1.7-5')
 *-
-      CALL USI_INIT()
+*  first invocation do global initialisation
+      IF (.NOT.I_OPEN) THEN
+        CALL AST_INIT()
+      ELSE
+        CALL USI_INIT()
+      END
 
       CALL MSG_PRNT(VERSION)
 
