@@ -750,6 +750,9 @@
           TEXT(L:)=' PIXEL( '
         ENDIF
         L=CHR_LEN(TEXT)
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+        TEXT = ' '
+        L = 1
 
 
 
