@@ -215,6 +215,7 @@
 *           - colour          -- colour of everything plotted
 *                                (including axes and axis labels) [1]
 *           - grid            -- whether to draw a grid (1=yes, 0=no) [0]
+*           - title           -- title to draw above the plot [coords title]
 *
 *        [""]
 *     USESET = _LOGICAL (Read)
@@ -870,8 +871,6 @@
          CALL PGQWIN( X1, X2, Y1, Y2 )
          CALL PGQCIR( LOCOL, HICOL )
          BADCOL = 0
-         SCHEME = AST__LINEAR
-         INTPAR( 1 ) = 0D0
 
 *  Add a frame to the Plot frameset which represents the array we have
 *  just allocated (graphical pixel coordinates).
@@ -906,7 +905,7 @@
                SCHEME = AST__BLOCKAVE
                INTPAR( 1 ) = ( 1D0 / PSIZE - 1D0 ) * 0.5D0
             ELSE
-               SCHEME = AST__LINEAR
+               SCHEME = AST__NEAREST
             END IF
 
 *  Open the NDF and map its data.
