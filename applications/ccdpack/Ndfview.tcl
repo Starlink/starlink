@@ -266,7 +266,7 @@
                margin=0 \
                style=\"tickall=1,drawtitle=0,$displaystyle\" \
                reset \
-            " "Displaying NDF $ndfname"
+            " "Displaying NDF $ndfname" $canvas
 
 #  Ugly bug workaround.
          $canvas move gwmitem [ lindex $shift 0 ] [ lindex $shift 1 ]

@@ -429,7 +429,8 @@
                      high=[ lindex $scalevals 1 ] \
                      margin=0 \
                      style=\"drawtitle=0,tickall=1,$displaystyle\" \
-                  " "Displaying ndf [ $ndf name ]"
+                  " "Displaying ndf [ $ndf name ]" \
+                  $itk_component(plot$index:display)
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                $ndf mapped 0

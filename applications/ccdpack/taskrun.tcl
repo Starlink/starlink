@@ -1,4 +1,4 @@
-   proc taskrun {app arguments {message ""}} {
+   proc taskrun {app arguments {message ""} {window ""}} {
 #+
 #  Name:
 #     taskrun
@@ -26,6 +26,10 @@
 #        If supplied as a non-empty string, this text will be displayed in
 #        a window while the application executes.  In this case, no user
 #        interaction will be allowed while the application is executing.
+#     window = string (read)
+#        If supplied as a non-empty string, and the message argument is
+#        also present, this gives the pathname of a window over which
+#        the message will be centred.
 
 #  Global variables (of note):
 #     CCDdir = string (read)
@@ -87,9 +91,13 @@ this interface (probably programming error)."
 
 #  Display a window if required.
       if { $message != "" } {
-         set msgwin [ toplevel .wait ]
-         set lab [ label $msgwin.message -text $message ]
+         set msgwin [ iwidgets::shell .wait -modality none ]
+         set lab [ label [ $msgwin childsite ].msg -text $message ]
          pack $lab
+         if { $window != "" } {
+            $msgwin center $window
+         }
+         $msgwin activate
          grab $msgwin
       }
 
@@ -106,6 +114,7 @@ this interface (probably programming error)."
 #  Remove the message window if required.
       if { $message != "" } {
          grab release $msgwin
+         destroy $msgwin
       }
 }
 # $Id$
