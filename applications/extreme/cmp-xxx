@@ -6,11 +6,11 @@
 
 #  Get name of filter.
       my( $filter ) = $name;
-      $filter =~ s/cmp_//;
+      $filter =~ s/cmp-//;
       $filter =~ s/\.pl//;
 
 #  Open.
-      if ( @ARGV < 1 || @ARGV >2 ) {
+      if ( @ARGV < 1 || @ARGV > 2 ) {
          die( "Usage: $name file [ modified-file ]\n" );
       }
       my( $f1, $f2 ) = @ARGV[ 0, 1 ];
@@ -41,7 +41,7 @@
          my( $l1, $l2 );
          my( $n ) = 0;
          while ( ( $l1 = shift( @s1 ) ) eq ( $l2 = shift( @s2 ) ) ) { $n++; }
-         print( " *** Edit error near line $n?:\n$l1\n$l2\n" );
+         print( " *** Edit error near line $n?:\n< $l1\n> $l2\n" );
          exit( 1 );
       }
 
@@ -66,23 +66,22 @@
       if ( $filter =~ /inscnf/ ) {
          s/^\* *inscnf:.*\n//g;
          s/^ *include *'cnf_par' *(!.*)?\n//mig;
-         s/\n[^*cCdD!]....[^ 0]//g;
+         s/\n[^\*cCdD!\n]....[^ 0]//g;
          s/ *//g;
          s/cnf_pval\(([^)]*)\)/$1/ig;
       }
 
 #  frepint: Gets rid of continuation lines, spaces, and changes INTEGER*8
 #  to INTEGER.
-#  Also removes EXT_PAR includes and undoes EXT__ comparison.
+#  Also removes INT__ local constant declarations and undoes INT__ use.
       elsif ( $filter =~ /frepint/ ) {
+         s/\n\* *Local constants for use as actual arguments:*\n.*?\n *\n/\n/sig;
          s/^\t/      /mg;
-         s/^ *include *'ext_par' *(!.*)?\n//mig;
-         s/ *\+ *ext__0//ig;
-         s/ext__//ig;
-         s%^/\* *frepint:.*?\*/ *\n%%msg;
-         s/\n[^*cCdD!]....[^ 0]//g;
+         s/int__//ig;
+         s/\n[^\*cCdD!\n]....[^ 0]//g;
          s/^([ \t]*integer) *\* *8/$1/mig;
          s/[ \t]+/ /g;
+         s/^ *\n/\n/mg;
       }
 
 #  crepint: Changes INT_BIG back to int and collapses spaces.
@@ -97,3 +96,4 @@
       return( $_ );
    }
       
+# $Id$
