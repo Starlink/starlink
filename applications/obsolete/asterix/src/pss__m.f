@@ -445,8 +445,8 @@
 	GE_EXEC_NSRC = ISRC
 
 *      Evaluate statistic at position
-C        CALL PSS_SRC_POS( S_CP(1,ID), 1, AX_DR(1), AX_DR(2), STATUS )
-C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
+        CALL PSS_SRC_POS( S_CP(1,ID), 1, AX_DR(1), AX_DR(2), STATUS )
+        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      Width fitting required?
         IF ( CP_FITWIDTH ) THEN
