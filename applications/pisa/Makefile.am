@@ -13,7 +13,7 @@ pisa_mon_SOURCES = \
 	$(SUBSRC) \
 	$(PRIVATE_INCLUDES)
 
-pisa_mon_LDADD = $(LDADD) `pisa_link_adam`
+pisa_mon_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
 
 pisa_mon_TASKS = pisafind pisaplot pisafit pisapeak pisamatch pisacut \
  pisagen pisaknn addnoise pisagrey pisa2ard pisa2cat
@@ -24,7 +24,7 @@ pisa_mon4_SOURCES = \
 	$(SUBSRC) \
 	$(PRIVATE_INCLUDES)
 
-pisa_mon4_LDADD = $(LDADD) `pisa_link_adam`
+pisa_mon4_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
 
 pisa_mon4_TASKS = pisafind4 pisafit4
 
