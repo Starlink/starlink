@@ -132,12 +132,21 @@
      :                 'WPLATE has no value.', STATUS )
       END IF
 
-*  Report an error if the WPLATE extension item now has an illegal value.
+*  Check the WPLATE extension item.
       IF( THERE ) THEN
          CALL CMP_GET0C( LOC, 'WPLATE', WPLATE, STATUS )
-         IF( WPLATE .NE. '0.0' .AND. WPLATE .NE. '45.0' .AND.
-     :       WPLATE .NE. '22.5' .AND. WPLATE .NE. '67.5' .AND.
-     :       STATUS .EQ. SAI__OK ) THEN
+
+*  If the value is "45" or "0", use "45.0" and "0.0"
+         IF( WPLATE .EQ. "0" ) THEN
+            CALL CMP_PUT0C( LOC, 'WPLATE', "0.0", STATUS ) 
+
+         ELSE IF( WPLATE .EQ. "45" ) THEN
+            CALL CMP_PUT0C( LOC, 'WPLATE', "45.0", STATUS ) 
+
+*  Report an error if the WPLATE extension item has an illegal value.
+         ELSE IF( WPLATE .NE. '0.0' .AND. WPLATE .NE. '45.0' .AND.
+     :            WPLATE .NE. '22.5' .AND. WPLATE .NE. '67.5' .AND.
+     :            STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'WP', WPLATE )
             CALL ERR_REP( 'POLIMP_BADWPL', 'Extension item WPLATE has'//
