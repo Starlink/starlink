@@ -52,6 +52,7 @@
 *                 No longer uses a temporary array for the data. (PLA)
 *     14 Jun 90 : V1.2-0  Checks for irregular axes and bad quality (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1 New data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -60,7 +61,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -72,8 +73,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC          ! Input data object locator.
-      CHARACTER*(DAT__SZLOC) OLOC          ! Locator to power spectrum obj.
       CHARACTER*80           DUNITS        ! Data units.
       CHARACTER*80           TUNITS        ! Time units.
       CHARACTER*80           TITLE         ! Of the dataset
@@ -82,17 +81,19 @@
       REAL                   DX            ! Data spacing.
 
       INTEGER                DPTR          ! Pointer to TIM_FPOWER array.
+      INTEGER			IFID			! Input dataset id
       INTEGER                NBAD          ! # of bad points
       INTEGER                NDIMS         ! Dimensionality of data.
       INTEGER                NDAT          ! No.of data points.
       INTEGER                NEWPTR        ! Pointer to Output array.
       INTEGER                NTRUNC        ! No. of points after truncation.
       INTEGER                NV            ! Number of freqs in power spec.
+      INTEGER			OFID			! Output dataset id
       INTEGER                QNDIM         ! Number of quality dimensions
       INTEGER                QPTR          !
       INTEGER                YPTR          ! Pointer to input data array.
-      INTEGER                LDIM(DAT__MXDIM)! Size of each dimension.
-      INTEGER                QDIMS(DAT__MXDIM)!
+      INTEGER                LDIM(ADI__MXDIM)! Size of each dimension.
+      INTEGER                QDIMS(ADI__MXDIM)!
 
       LOGICAL                ANYBAD        ! Any bad quality points
       LOGICAL                DEMEAN        ! Remove data mean?
@@ -106,7 +107,7 @@
 *    Version id :
 *
       CHARACTER*21           VERSION
-         PARAMETER           ( VERSION = 'POWER Version 1.8-0' )
+         PARAMETER           ( VERSION = 'POWER Version 1.8-1' )
 *-
 
 *    Check status.
@@ -119,19 +120,20 @@
       CALL AST_INIT()
 
 *    Obtain data object, access and check it.
-      CALL USI_ASSOCI ('INP', 'READ', ILOC, INPRIM, STATUS)
+      CALL USI_TASSOCI( 'INP', 'READ', IFID, STATUS )
 
 *    Create a POWER_SPECTRUM object.
-      CALL USI_ASSOCO ('OUT', 'POWER_SPECTRUM', OLOC, STATUS)
+      CALL USI_TASSOCO( 'OUT', 'POWER_SPECTRUM', OFID, STATUS )
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Get data object
-      CALL BDA_CHKDATA( ILOC, OK, NDIMS, LDIM, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIMS, LDIM, STATUS )
 
       IF ( OK ) THEN
-        CALL BDA_MAPDATA( ILOC, 'READ', YPTR, STATUS )
+        CALL BDI_MAPDATA( IFID, 'READ', YPTR, STATUS )
       ELSE
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'FATAL ERROR: No data object found.',
@@ -146,10 +148,10 @@
       IF ( NDIMS .EQ. 1 ) THEN
 
 *       Look for independent variable - if present & correct then map it
-         CALL BDA_CHKAXVAL( ILOC, 1, OK, REG, NDAT, STATUS )
+         CALL BDI_CHKAXVAL( IFID, 1, OK, REG, NDAT, STATUS )
 
          IF ( OK .AND. REG ) THEN
-            CALL BDA_GETAXVAL (ILOC, 1, BASE, DX, NDAT, STATUS)
+            CALL BDI_GETAXVAL (IFID, 1, BASE, DX, NDAT, STATUS)
          ELSE IF ( OK .AND. .NOT. REG ) THEN
             CALL MSG_PRNT( 'FATAL ERROR: Cannot operate on irreg'/
      :                                              /'ular data' )
@@ -164,9 +166,9 @@
          IF (STATUS .NE. SAI__OK) GOTO 99
 
 *       Check for bad quality
-         CALL BDA_CHKQUAL( ILOC, QOK, QNDIM, QDIMS, STATUS )
+         CALL BDI_CHKQUAL( IFID, QOK, QNDIM, QDIMS, STATUS )
          IF ( QOK ) THEN
-            CALL BDA_MAPLQUAL( ILOC, 'READ', ANYBAD, QPTR, STATUS )
+            CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, QPTR, STATUS )
             IF ( ANYBAD ) THEN
                CALL ARR_NBAD( NDAT, %VAL(QPTR), NBAD, STATUS )
                CALL MSG_SETI( 'NBAD', NBAD )
@@ -175,7 +177,7 @@
             ELSE
                NBAD = 0
             END IF
-            CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+            CALL BDI_UNMAPLQUAL( IFID, STATUS )
             IF ( NBAD .GT. 0 ) THEN
                STATUS = SAI__ERROR
                GOTO 99
@@ -238,42 +240,42 @@
 *       Create components in output file.
 *       Start with the axis values
          DX = 1.0 / ( REAL(NDAT) * DX )
-         CALL BDA_CREAXES( OLOC, 1, STATUS )
-         CALL BDA_PUTAXVAL( OLOC, 1, 0, DX, NV, STATUS )
-         CALL BDA_PUTAXLABEL( OLOC, 1, 'Frequency', STATUS )
-         CALL BDA_PUTLABEL( OLOC, 'Power', STATUS )
+         CALL BDI_CREAXES( OFID, 1, STATUS )
+         CALL BDI_PUTAXVAL( OFID, 1, 0, DX, NV, STATUS )
+         CALL BDI_PUTAXLABEL( OFID, 1, 'Frequency', STATUS )
+         CALL BDI_PUTLABEL( OFID, 'Power', STATUS )
 
          IF ( .NOT. INPRIM ) THEN
-            CALL BDA_GETTITLE( ILOC, TITLE, STATUS )
-            CALL BDA_PUTTITLE( OLOC, TITLE, STATUS )
-            CALL BDA_GETUNITS( ILOC, DUNITS, STATUS )
+            CALL BDI_GETTITLE( IFID, TITLE, STATUS )
+            CALL BDI_PUTTITLE( OFID, TITLE, STATUS )
+            CALL BDI_GETUNITS( IFID, DUNITS, STATUS )
 
             IF (CHR_LEN(DUNITS) .GT. 0) THEN
                DUNITS = '('//DUNITS(1:CHR_LEN(DUNITS))//')**2'
-               CALL BDA_PUTUNITS (OLOC, DUNITS, STATUS)
+               CALL BDI_PUTUNITS (OFID, DUNITS, STATUS)
             END IF
 
-            CALL BDA_GETAXUNITS (ILOC, 1, TUNITS, STATUS)
+            CALL BDI_GETAXUNITS (IFID, 1, TUNITS, STATUS)
             IF ( CHR_LEN(TUNITS) .GT. 0 ) THEN
                TUNITS = '('//TUNITS(1:CHR_LEN(TUNITS))//')**-1'
-               CALL BDA_PUTAXUNITS( OLOC, 1, TUNITS, STATUS)
+               CALL BDI_PUTAXUNITS( OFID, 1, TUNITS, STATUS)
             END IF
 
 *          Create output data array
-            CALL BDA_CREDATA( OLOC, 1, NV, STATUS )
-            CALL BDA_MAPDATA( OLOC, 'WRITE', NEWPTR, STATUS )
+            CALL BDI_CREDATA( OFID, 1, NV, STATUS )
+            CALL BDI_MAPDATA( OFID, 'WRITE', NEWPTR, STATUS )
             CALL ARR_COP1R( NV, %VAL(DPTR), %VAL(NEWPTR), STATUS )
 
 *          Copy MORE structure.
-            CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+            CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *          Copy History.
-            CALL HIST_COPY( ILOC, OLOC, STATUS)
+            CALL HSI_COPY( IFID, OFID, STATUS)
 
          END IF
 
 *       Add new history record. ! This should contain more info.
-         CALL HIST_ADD( OLOC, VERSION, STATUS )
+         CALL HSI_ADD( OFID, VERSION, STATUS )
 
       ELSE IF ( NDIMS .NE. 1 ) THEN
          CALL ERR_REP( ' ', 'FATAL ERROR: Data is not one-dimensional',
@@ -350,8 +352,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                NOLD                          ! Number of data points
 *    Export :
