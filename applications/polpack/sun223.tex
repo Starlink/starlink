@@ -498,12 +498,14 @@ complicated by the presence of the polarimeter in the light path. The
 purpose of flat-fielding is to ensure that there are no spatial
 variations in the sensitivity of the detector. This is normally achieved
 by taking images of a photometrically flat surface such as the inside of
-the observatory dome, or the twilight sky. Since the brightness of this
-surface is constant, any variations in the recorded image (the
-``flat-field'' image) must be due to variations in the sensitivity of the
-detector. These variations can then removed from the target observation
-by dividing every pixel value in the target image by the corresponding 
-pixel value in the flat-field image.
+the observatory dome, or the twilight sky\footnote{In the near infra-red
+flatfields are normally taken on the night sky which at these wavelengths
+is bright enough to give a good signal to noise ratio.}. Since the
+brightness of this surface is constant, any variations in the recorded
+image (the ``flat-field'' image) must be due to variations in the
+sensitivity of the detector. These variations can then removed from the
+target observation by dividing every pixel value in the target image by
+the corresponding pixel value in the flat-field image.
 
 Introducing a polarimeter into the light path can complicate this if the
 flat-field is taken in polarized light (such as produced by reflective
