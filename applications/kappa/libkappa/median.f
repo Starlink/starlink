@@ -495,7 +495,7 @@
 
 *  Create output NDF structure, propagating the DATA, AXIS, UNITS, WCS,
 *  LABEL, TITLE, HISTORY and extensions from the input NDF.
-      CALL NDF_PROP( NDFI, 'Data,Axis,Units<WCS', 'OUT', NDFO, STATUS )
+      CALL NDF_PROP( NDFI, 'Data,Axis,Units,WCS', 'OUT', NDFO, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
