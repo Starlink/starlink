@@ -372,8 +372,9 @@ drawn with a horizontal baseline. This will be an increment in the Y axis.
 =cut
 
 sub _GQch {
-   #croak( "_GQch: Not yet implemented");
-   my $canvas = shift;
+   my $external = shift;
+   my $canvas = $$external[0];
+   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    print "_GQch: Placeholder routine called\n";
    
    my $chv = 12/$canvas->cget( '-height' );
