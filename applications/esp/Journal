@@ -14,14 +14,14 @@
 
 	What I've done, therefore, is to modify the call to elp1_stats
 	to include a RTYPE and STAT parameters.  RTYPE may be one of
-	ELP1__RESnn defined in elp_par, and this selects which
+	ELP__RESnn defined in elp_par, and this selects which
 	residual is to be calculated; STAT is a statistic which the
 	program can usefully (?)  report.  The choice can be
 	elp__resmn for the original one, with STAT holding the mean;
 	elp__resmd for a residual which is the sum of the absolute
 	differences between the values on the ellipse and the median,
 	with STAT returning the median; and elp__resls which is like
-	res__mn, except that the residual is a simple
+	elp__resmn, except that the residual is a simple
 	squared-difference, without the (pointless) statistical
 	corrections and biasing of the original.
 
@@ -40,3 +40,10 @@
 	d1mach.f_littleieee, etc down from Glasgow, because they
 	hadn't been included in the `mk export_source') to build the
 	thing on star.rl.ac.uk.
+
+mid-1999
+
+	Incorporated the sources into CVS, including the changes
+	described above.  This file should now be for general
+	discursive notes rather than any logging details.
+
