@@ -101,7 +101,7 @@
      -->
 <!ENTITY % notationlist "fortran77 | DSSSL">
 <!ENTITY % language.attr
-        "language NOTATION (%notationlist;) #REQUIRED">
+        "language NOTATION (%notationlist;) #IMPLIED">
 
 <!-- Just for convenience, also define a LT ENTITY -->
 <!ENTITY lt "<">
@@ -289,6 +289,7 @@
      SUN/110).  The mapping is:
 
 	routinename	sstroutine
+	moduletype	[none]
 	purpose		[none]
 	description	sstdescription
 	returnvalue	sstreturnedvalue
@@ -308,6 +309,7 @@
      -->
 <!ELEMENT routineprologue O O (
 				(routinename,	diytopic*)? &
+				(moduletype,	diytopic*)? &
 				(purpose,	diytopic*)? &
 				(description,	diytopic*)  &
 				(returnvalue,	diytopic*)? &
@@ -330,6 +332,7 @@
 				-- some routines have a generic name
 				   like `proc_<type>', plus other
 				   names like `proc_real'. -->
+<!ELEMENT moduletype	- O (#PCDATA)>
 <!ELEMENT name		O O (#PCDATA)>
 <!ELEMENT othernames	- O (name+)>
 
@@ -420,7 +423,7 @@
 <!ELEMENT authornote	- O (%paralist;)
 				-- Other information/notes about this
 				   author -->
-<!ELEMENT authorref	- O EMPTY>
+<!ELEMENT authorref	- O (#PCDATA)>
 <!ELEMENT change	- O (%paralist;)>
 <!ELEMENT parameter	- O (name, type, description)>
 <!ELEMENT type		- O (#PCDATA)>
