@@ -712,6 +712,7 @@ $(GAIA_FILES): .gaia.built
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./gaia; \
+        sed -e s#PKG_VERS#$(PKG_VERS)# VERSION.in >$ VERSION ;\
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
 	./configure --prefix=$${pwd}/built;\
