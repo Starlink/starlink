@@ -146,6 +146,9 @@ DVI2BITMAP=dvi2bitmap
 %.dvi: %.tex
 	latex $<
 
+%.gz: %
+	gzip -9 $<
+
 %.data: %.sgml
 	$(SGMLPARSE) $(DECL) $< | \
 	sed -n '/^-/{;s/^-//;s/\\n/ /g;p;};' \
@@ -164,9 +167,14 @@ clean:	tidy
 	if ls *.html.stamp >/dev/null 2>&1 ; then \
 		for f in *.html.stamp; do \
 			rm -f `awk -F: '{print $$1}' $$f`* ; \
-	done ; \
+		done ; \
 	fi
-	rm -f *.stamp HTML.manifest *.tth-eqlist *.tth-html
+	if ls *.latex.stamp >/dev/null 2>&1 ; then \
+		for f in *.latex.stamp; do \
+			rm -f `awk -F: '{print $$1}' $$f`* ; \
+		done ; \
+	fi
+	rm -f *.stamp *.manifest *.tth-eqlist *.tth-html
 
 checkhtml:
 	for i in *.html; do echo $$i; $(SGMLPARSE) -s $(DECL) $$i; done
