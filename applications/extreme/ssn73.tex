@@ -18,8 +18,7 @@
 \newcommand{\stardocnumber}    {73.1}
 \newcommand{\stardocauthors}   {Mark Taylor}
 \newcommand{\stardocdate}      {17 January 2000}
-\newcommand{\stardoctitle}     {EXTREME --- 
-                                Utilities for handling extreme data sets}
+\newcommand{\stardoctitle}     {EXTREME --- Handling extreme data sets}
 \newcommand{\stardocabstract}  {
 This package provides some utilities and background documentation 
 for adapting the USSC to handle very large data sets.
@@ -267,6 +266,12 @@ space on 64-bit operating systems.
 
 % ? Main text
 
+% Private macro definitions.
+
+\newcommand{\xroutine}[1]{#1}
+\newcommand{\cc}[1]{{\tt #1}}
+\newenvironment{squote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
 \section{Introduction}
 
 The extreme dataset project is intended to allow use of ``unusually''
@@ -282,7 +287,8 @@ in memory, this means that it is impossible to map an image of more
 than 4Gbyte or, say, two images of half that size. 
 This could correspond to, for instance, an input and an output image
 simultaneously mapped each with an HDS type of \_DOUBLE and 
-dimensions of 16k $\times$ 16k pixels.  
+size of 16k pixels square.
+
 For this sort of work therefore an operating system with 64-bit 
 pointers is required.
 
@@ -297,28 +303,29 @@ but almost\footnote{
 all binaries which run on the 32-bit version
 will also run on the 64-bit version, 
 so that reconfiguring a system from 32-bit to 64-bit should be
-fairly painless.
+fairly painless from a software point of view.
 You can tell if your Solaris kernel is 64-bit 
 by using the {\tt isainfo -v} command; on a 64-bit system the
 following response will be given
-\begin{quote}
+\begin{squote}
 \begin{verbatim}
 % isainfo -v
 64-bit sparcv9 applications
 32-bit sparc applications
 \end{verbatim}
-\end{quote}
+\end{squote}
 
 User code will also run up against these problems.
 It is often necessary to count the pixels, or the bytes,
-in an image, and this is typically done using a Fortran {\tt INTEGER}
-or a C {\tt int}.  These are normally signed 32-bit values, with
+in an image, and this is typically done using a Fortran INTEGER
+or a C \cc{int}.  These are normally signed 32-bit values, with
 a maximum value of about $2 \times 10^9$; the pixel count of a 
 47k $\times$ 47k image, or the byte count of a 16k $\times$ 16k 
 \_DOUBLE image, will overflow this limit.
 
-Another common requirement is holding a pointer, which has ultimately been 
-acquired from a C routine such as {\tt malloc(3)}, 
+Another common requirement is holding a pointer 
+to allocated memory, which has ultimately been 
+acquired from a C routine such as \cc{malloc}, 
 in a variable.
 In C this will be taken care of automatically because the compiler
 will ensure that a pointer type is long enough to hold memory addresses.
@@ -328,8 +335,19 @@ The solution to this, explained in \xref{SUN/209}{sun209}{pointers},
 is to use the \xref{CNF\_PVAL}{sun209}{CNF\_PVAL} function.
 
 This package provides some tools and instructions for 
-package maintainers to use 
+software maintainers to use 
 in modifying their source code to work in a 64-bit environment.
+
+The issues addressed in this document apply to user programs which link
+against Starlink libraries as well as to the code which forms the USSC;
+if the USSC has been built for a 64-bit system, then user code 
+which uses its libraries will need to be modified at the 
+source level in order to work.
+Depending on the complexity of the code, it may be easier to do this
+with a few manual adjustments than by using the automatic 
+tools supplied with the EXTREME package.  
+The discussion here should be of use in any case.
+
 
 \section{Changeover to 64-bit systems}
 
@@ -350,17 +368,426 @@ SYSTEM will therefore be introduced:
 ``sun4\_Solaris\_64'' and ``alpha\_OSF1\_64''.
 
 
-\section{Tools}
+
+\section{Modifications to code}
+
+Making Starlink packages able to run in 64-bit environment and 
+handle appropriately large data sets requires changes to the source
+code of each package.
+For packages like \xref{HDS}{sun92}{}, 
+which get their hands dirty with data structures on disk,
+extensive changes are required.
+Most packages however can hopefully be fixed by making some more-or-less
+automatic changes to the source code.
+These changes boil down to making sure that Fortran pointers 
+can address any allocated memory,
+and making sure that non-pointer integers in Fortran and C 
+are large enough to hold big numbers.
+
+Because of the difficulty of distinguishing variables which may 
+need to hold big numbers from those which will not in any automatic
+fashion, the approach taken is to change the type of {\em all\/} 
+such variables to a 64-bit type in 64-bit environments.
+This is a somewhat extravagant solution,
+but the alternatives seem to be worse.
+Once the increase in integer size has been made 
+globally to the source code in a package,
+it is possible to identify variables which do not need the extra size
+and change their declarations (and other parts of the code which depend
+on these) back to the normal integer types.
+Such retrochanges could be appropriate in either of the following situations:
+\begin{itemize}
+\item
+The change has broken something which is easier to fix by returning to 
+a normal integer size than by other means
+\item
+The change results in overuse of resources, and returning to a normal
+integer size will not cause too many problems.
+\end{itemize}
+
+
+\subsection{Pointer references in Fortran}
+
+As explained in \xref{SUN/209}{sun209}{pointers} 
+whenever the \%VAL directive is used to pass the value of allocated
+memory to a subroutine, its argument should be wrapped in a call
+to \xref{CNF\_PVAL}{sun209}{CNF\_PVAL}.  This effectively allows
+a 32-bit integer to address memory in a 64-bit address space.
+Additionally, the header file {\tt CNF\_PAR} needs to be included
+in affected source files to provide the declaration of CNF\_PVAL.
+This modification is fairly unproblematic, 
+since it should not under normal
+circumstances affect the behaviour of the code in either 32-bit or
+64-bit environments, so it's possible, and advisable, to make this
+change to all code and test it before converting the normal integer types
+as described in section \ref{sec:fint}.  
+
+The main pitfall of making these modifications is
+wrapping the argument of a \%VAL in a CNF\_PVAL call when it ought
+not to be so wrapped.
+CNF\_PVAL should {\em only\/} be applied to registered pointers.
+If your fortran code uses pointers which are got from C without 
+being registered with CNF, you'll need to address this in the C code 
+as described in \xref{SUN/209}{sun209}{pointers}.
+More commonly, you may have \%VAL invocations which are not
+applied to pointers at all --- for instance when passing 
+the lengths of character variables as trailing arguments 
+as sometimes needs to be done when the compiler doesn't know that
+it's passing a character variable.  In this case the \%VAL 
+invocation should be left alone and no call to CNF\_PVAL inserted.
+In general, it is impossible to spot all such non-pointer uses
+of \%VAL automatically.  However, if %VAL is applied to a constant,
+or a small integer, then it should be left alone.
+
+The program \xroutine{crepint} is supplied for inserting CNF\_PVALs
+in the right places.  It wraps {\em all\/} arguments of \%VAL 
+in calls to CNF\_PVAL, but emits warnings for those which look like
+they may not be pointers.  It is described further in section 
+\ref{sec:tools}.
+
+
+\subsection{Enlarging integer type in Fortran\label{sec:fint}}
+
+
+In fortran there is no (even slightly) portable way of declaring
+an integer to be of a configurable length. 
+Therefore all variables currently declared as `INTEGER' 
+should be changed instead to type `INTEGER*8'. 
+This is not standard Fortran 77, but it is widely understood by compilers.
+This should not be interpreted (by a human) as an indication that exactly
+eight bytes are required, but as an indication that this needs to be
+long enough to hold a large number.
+At compile time, typically on 64-bit systems the code will be compiled
+as it stands, while on 32-bit systems a simple {\tt sed(1)} script or similar
+can preprocess the source code before it's fed to the compiler.
+
+Having done this, the following issues need to be addressed.
+\begin{description}
+%
+\item[External libraries]\mbox{}
+\\
+In Fortran, the actual arguments used in a subroutine/function
+call must be of the same type as the formal arguments declared
+in the routine itself, since arguments are passed by address.
+Thus if you change the type of integers passed to a subroutine,
+you have to change the type of the integers declared in the subroutine too.
+It is therefore necessary either to convert any called subroutines
+to using the new integer type (at least as far as their arguments go), 
+or to ensure that any calls to these routines use variables of 
+the old integer type.
+Thus a package can only be successfully converted to large integers
+and built once all the libraries against which it links have been 
+similarly converted.  The Starlink libraries will therefore have to
+be done before applications packages.
+If a program uses an external library which is not part of the USSC,
+then either the library will have to be converted in the same way,
+or the affected calls will have to be written using 
+variables specially declared as the normal INTEGER type.
+%
+\item[Literal integer constants as arguments]\mbox{}
+\\
+If there are any calls to functions or subroutines in the converted 
+code which have literal integer constants as actual arguments,
+these will need to be replaced with expressions of the right type.
+There is no way of specifying the length of a literal integer constant
+in fortran, so you should either assign a variable (perhaps assigned
+using the fortran PARAMETER statement) or ensure that the expression
+has the correct type by adding the special value EXT\_\_ZERO, defined
+in the EXT\_PAR include file.  EXT\_\_ZERO has a numerical value of 
+zero, but a large integer type, so combining it with
+a literal constant promotes the value to the correct type.
+Thus
+\begin{squote}
+\begin{verbatim}
+      CALL SUB( 5, STATUS )
+\end{verbatim}
+\end{squote}
+must be changed to something like
+\begin{squote}
+\begin{verbatim}
+      INTEGER * 8 CONST_5
+      PARAMETER( CONST_5 = 5 )
+      CALL SUB( CONST_5, STATUS )
+\end{verbatim}
+\end{squote}
+or
+\begin{squote}
+\begin{verbatim}
+      INCLUDE 'EXT_PAR'
+      CALL SUB( 5 + EXT__ZERO, STATUS )
+\end{verbatim}
+\end{squote}
+%
+\item[Intrinsic functions]\mbox{}
+\\
+Calls to Fortran intrinsic functions should take care of themselves,
+as long as the generic name is used rather than the specific one
+(e.g. you should use ABS instead of IABS).  This is always good
+practice in any case.  The only time it is not possible to do 
+this is if you are passing an intrinsic function as an actual
+argument to a procedure, which is pretty rare.
+%
+\item[I/O return values]\mbox{}
+\\
+A few Fortran I/O statements have specifiers which require the name
+of an INTEGER variable.  In standard Fortran 77 these are 
+IOSTAT (all I/O statements) and 
+NUMBER, RECL and NEXTREC (the INQUIRE statement).
+Particular compilers often provide a whole bunch more, but these
+should hopefully not be much used in Starlink code.
+So there may be a problem with the statement
+\begin{squote}
+\begin{verbatim}
+      CLOSE( UNIT = 99, IOSTAT = STVAL )
+\end{verbatim}
+\end{squote}
+if the variable STVAL is now declared INTEGER*8 rather than INTEGER.
+Of the supported systems, Tru64 and Solaris seem to handle 
+INTEGER*8 variables used for this purpose without complaint,
+while Linux/g77 fails to compile.
+%
+\end{description}
+
+
+
+\subsection{Enlarging integer type in C}
+
+All references to the type \cc{int} in C code should be changed to 
+\cc{INT\_BIG}.  This is a reference to a macro which can be defined
+in a header file or on the compiler command line 
+(and hence typically in the CFLAG {\tt mk} environment variable).  
+For 32-bit systems it would normally be defined at build time as 
+\cc{int} and for 64-bit systems as \cc{long}.
+As well as declarations of variables and functions, this applies
+to casts and arguments of \cc{sizeof} too (in fact any 
+syntactically significant occurrence of the identifier `\c{int}').
+References to the types \cc{short~int} and \cc{long~int},
+which are just synonyms for \cc{short} and \cc{long} respectively,
+should not be changed.  Type \cc{unsigned INT\_BIG} 
+(or, redundantly, \cc{signed INT\_BIG}) may be used.
+
+As regards calling functions from external libraries,
+the approach described in the previous section of 
+recoding all the functions in the library will of course work in C too.
+However, this is not always necessary.
+If a function's declaration (prototype) is in scope when it is called,
+the compiler will convert each actual argument to the declared type of
+the corresponding formal argument in the prototype 
+before passing it by value.
+Thus the following code
+\begin{squote}
+\begin{verbatim}
+int add( int a, int b );
+INT_BIG i, j;
+add( i, j );
+\end{verbatim}
+\end{squote}
+is correct whatever type \cc{INT\_BIG} is defined as, 
+since \cc{i} and \cc{j} are converted to type \cc{int}
+before \cc{add()} sees them.
+If the prototype of \cc{add()} were not in scope however,
+the conversion would not take place and the code would be
+in error.\footnote{
+   In fact, the standard says simply that the effect of the call is
+   undefined in this case.  Furthermore, it seems that the three
+   currently supported systems handle these cases without
+   any undesirable behaviour; presumably the compilers are written
+   such that all arguments are passed in 64 bits or in registers.
+   But such code is still not correct.
+}
+The lesson is to make sure that header files are
+included.
+
+However this does not solve all problems.
+Where a function has a variable argument list, the function prototype
+is not able to specify the types of all arguments,
+and so the type of the actual argument must match the type of
+the formal argument for correctness.  If it is impractical
+to recode the function (as in the case of \cc{printf}),
+the best solution is to cast the variable arguments to the type
+which is expected where the function is called.
+A more difficult problem is when the address of an argument is
+passed so that the contents of that address can be changed by
+the function.  In this case if the called function has a
+different idea of the length of the object being pointed to
+it will write to the wrong amount of memory, possibly overwriting
+other data.  Consider this function:
+\begin{squote}
+\begin{verbatim}
+   void zero( int *a ) { *a = 0; }
+\end{verbatim}
+\end{squote}
+and this code:
+\begin{squote}
+\begin{verbatim}
+   INT_BIG x;
+   zero( &x );
+\end{verbatim}
+\end{squote}
+If \cc{INT\_BIG} is a 64 bit type and \cc{int} is 32 bits
+then only half the bits in the variable \cc{x} will be zeroed by this call.
+If the function declaration is in the same file as the call,
+the compiler will (hopefully) issue a warning about this sort of thing; 
+again, make sure that the appropriate header files are included.
+Again, in the case of variable argument lists, the compiler can't spot it.
+
+To summarise, external functions should be declared before use by
+including the appropriate header files.  If this is done, then the only
+problems associated with calling functions which have not been
+converted to use \cc{INT\_BIG} instead of \cc{int} should be:
+\begin{description}
+\item[INT\_BIG in variable part of argument list:]
+A modified caller of an unmodified function should explicitly cast
+an \cc{INT\_BIG} argument in the variable (\cc{...}) part of the argument
+list.  
+Normally the cast should be to \cc{int}, but it may possible,
+as with \cc{printf}, to cast to \cc{long} and indicate to the called
+function that this has been done).
+A modified function which will may get called by unmodified code
+should expect arguments of type \cc{int}
+(i.e.\ should call the \cc{va\_arg} macro with a second argument
+of \cc{int} instead of \cc{INT\_BIG}).
+%
+\item[Pointer to INT\_BIG variable passed:]
+A modified caller of an unmodified function will have to declare
+a local variable of type \cc{int} and exchange values between it
+and the \cc{INT\_BIG} before, and possibly after, the call.
+A modified function which may get called by unmodified code 
+will have to declare pointer arguments as pointers to a given fixed
+type (presumably \cc{int}), not to \cc{INT\_BIG}.
+\item[Overflow:]
+If an \cc{INT\_BIG} value which is too large to be an \cc{int}
+is passed to a variable which is an \cc{int}, arithmetic overflow will
+occur when C tries to do the type conversion according to the function
+declaration.
+No warning is issued by the Solaris or Tru64 C runtime systems about
+such overflows.
+\end{description}
+
+
+External libraries which code may have to link against
+can be split into a few categories:
+\begin{description}
+%
+\item[Starlink libraries]\mbox{}
+\\
+As with Fortran, the plan is for Starlink libraries to get converted
+to use \cc{INT\_BIG}
+before code which uses them (although for C code calling C libraries
+this is not so necessary as with Fortran when functions are pre-declared
+using header files).
+%
+\item[Blocks of source code not to be converted:]\mbox{}
+\\
+It is probably not a good idea to do \cc{INT\_BIG} conversion to
+large bodies of non-Starlink code used by the USSC; Perl and Tcl
+spring to mind.  Perhaps MEMSYS too (this may be required by the
+licencing agreement).
+If there is function-level access to these packages,
+some recoding may be required as above.
+%
+\item[The C standard library:]\mbox{}
+\\
+The functions of the C standard library are no different from any
+other unconverted external library, but since their use is
+common, we discuss it in detail here.
+Most of the functions in the standard library will be handled
+adequately as described above by including the appropriate header files,
+since they do not have \cc{int~*} arguments or variable argument lists.
+The exception is those which use format strings:
+\cc{printf}, \cc{fprintf}, \cc{sprintf} and 
+\cc{scanf}, \cc{fscanf}, \cc{sscanf}; these fall foul of both obstacles.
+For \cc{printf} and friends 
+any of the format specifiers \cc{cdiouxX*}\footnote{
+   Inclusion of the \cc{c} format specifier here is not a mistake.
+   Although the corresponding argument will typically be of type \cc{char},
+   it is promoted to \cc{int} by the usual mechanism before being 
+   passed to \cc{printf}.  If the type of the actual argument is
+   of type \cc{char} and not type \cc{INT\_BIG} of course, no change 
+   will be required here.
+}
+indicate that the corresponding argument should be an \cc{int},
+and the \cc{n} specifier indicates a pointer to \cc{int}.
+For \cc{scanf} and friends, any of the specifiers \cc{diouxXn} indicate
+pointer to \cc{int}.
+If any of the actual arguments in the call is of type \cc{INT\_BIG} 
+(or \cc{INT\_BIG~*}) when it should be of type \cc{int} (or \cc{int~*}),
+then the calling code needs to be changed.
+
+In the case of \cc{int} arguments, if the actual argument
+might be too large to be
+represented in an \cc{int}, then an \cc{l} should be inserted to 
+indicate that a \cc{long} argument is being supplied and the 
+corresponding argument cast to \cc{long}.  If it will definitely
+be possible to store the value in an \cc{int} then the format specifier
+may be left alone and the argument cast to \cc{int}.
+In the case of \cc{int~*} arguments, intermediate variables have to be used.
+Here is an example.  If after simple substitution of \cc{INT\_BIG} for
+\cc{int} a piece of code reads:
+\begin{squote}
+\begin{verbatim}
+   extern INT_BIG quintuple( INT_BIG x );
+   INT_BIG i, j;
+   char c;
+   scanf( "%i %c", &i, &c );
+   j = quintuple( i );
+   printf( "Integer quintupled is %i; Character is '%c'\n", j, c );
+\end{verbatim}
+\end{squote}
+then the \cc{scanf} call must be replaced by something like this: 
+\begin{squote}
+\begin{verbatim}
+   {  long tmp; 
+      scanf( "%li %c", &tmp, &c ); 
+      i = tmp; 
+   }
+\end{verbatim}
+\end{squote}
+and the \cc{printf} call by something like this:
+\begin{squote}
+\begin{verbatim}
+   printf( "Integer quintupled is %li; Character is '%c'\n", (long) j, c );
+\end{verbatim}
+\end{squote}
+%
+\item[Other external libraries:]\mbox{}
+\\
+If your code links to any other external libraries
+which cannot, or will not, be converted to use \cc{INT\_BIG}s,
+some recoding of the calls may be required as above.
+\end{description}
+
+
+There is one other issue which arises from replacing \cc{int} type
+with \cc{INT\_BIG}:
+\begin{description}
+%
+\item[Limiting integer constants]\mbox{}
+\\
+Where an integer is compared against one of the values 
+\cc{INT\_MAX}, \cc{INT\_MIN} and \cc{UINT\_MAX} 
+defined in the system header file {\tt limits.h},
+an \cc{INT\_BIG} should be compared against one of the corresponding
+macros \cc{INT\_BIG\_MAX} etc.
+These macros are defined in the header file {\tt extreme.h}, 
+which should be included {\em after\/} {\tt limits.h} in the source file.
+%
+\end{description}
+
+
+\subsection{Changes to makefile/mk}
+
+
+
+
+
+\section{Tools\label{sec:tools}}
 
 This section documents utilities distributed with this package
 to modify source code for use in 64-bit environments.
 
-\subsection{{\tt inscnf} -- Insertion of CNF\_PVAL}
+\subsection{Insertion of CNF\_PVAL invocations}
 
-As described in \xref{SUN/209}{sun209}{pointers} the argument of
-any invocation of the \%VAL directive in Fortran code 
-should be wrapped in a call to 
-the \xref{CNF\_PVAL}{sun209}{CNF\_PVAL} function.
 
 The program {\tt inscnf} is provided to add such calls automatically
 to Fortran source code.  
@@ -372,11 +799,11 @@ conventions of case usage and spacing in the source code, and to
 break lines where necessary at reasonable places.  For files,
 and for source lines, which do not contain any invocations of \%VAL, 
 the output will be identical to the input.  Hence a pipeline like
-\begin{quote}
+\begin{squote}
 \begin{verbatim}
 % inscnf foo.f | diff foo.f - 
 \end{verbatim}
-\end{quote}
+\end{squote}
 will show up any differences the utility has made.
 
 The utility should be pretty robust, but it may be possible to
@@ -392,11 +819,11 @@ status, or both.
 
 The CNF\_PAR header file must be included to declare the CNF\_PVAL
 function.  {\tt inscnf} therefore tries to insert the line
-\begin{quote}
+\begin{squote}
 \begin{verbatim}
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 \end{verbatim}
-\end{quote}
+\end{squote}
 after  other INCLUDE lines in the relevant routine.  
 If there are no INCLUDE lines in the routine, {\tt inscnf} will
 complain and you will have to add this line by hand.
@@ -444,12 +871,12 @@ files to see if it looks like erroneous changes have been made:
 \begin{itemize}
 \item 
 It checks to see if an input file apparently contains any invocations
-of {\tt \%VAL} and {\tt CNF\_PVAL}, and guesses whether {\tt inscnf} 
+of \%VAL and CNF\_PVAL, and guesses whether {\tt inscnf} 
 should have made any changes.
 \item
 Where {\tt inscnf} has made changes it performs a crude comparison of
 the input and output files to see if they look the same apart from
-insertion of {\tt CNF\_PVAL} invocations.
+insertion of CNF\_PVAL invocations.
 \item
 It checks that no modified lines are longer than 72 characters.
 This shouldn't happen (barring strange antics with carriage return
@@ -459,6 +886,7 @@ If any of these checks produces a surprising result it writes a
 message to standard error; this does not mean for sure 
 that {\tt inscnf} has made an error, 
 but it is probably worth checking this by hand.
+
 
 
 
