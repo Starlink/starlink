@@ -4,12 +4,12 @@
 dvi2bitmap
 .SH SYNOPSIS
 .B dvi2bitmap 
-    [\-r resolution] [\-m magnification] 
-    [\-fp font-path] [\-fm mfmode] [\-fg] [\-fG]
-    [\-P[BbTt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
-    [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
-    [\-R[fb] int,int,int]
-    [\-nqV] [\-Q[fFgGtb]] [\-p num] [\-l num] [\-pp ranges]
+    [\-fp font-path] [\-r resolution] [\-m magnification] 
+    [\-P[BbTt]] [\-s scalefactor] [\-t pbm|gif|xbm]
+    [\-o output] [\-b(h|w) size] [\-bp a4|a4l|usletter...]
+    [\-c[lrtb] dimen] [\-cx] [\-C[lrtb] dimen] [\-nqV]
+    [\-Q[fFgGtbp]] [\-R[fb] int,int,int]
+    [\-p num] [\-l num] [\-pp ranges]
     dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -42,6 +42,16 @@ would suffice.  Note that the `h' in
 .I "\-bh"
 stands for height, not horizontal!  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.
+.TP
+.I "\-bp papersize"
+Set the initial size of the bitmap to be one of the paper sizes
+returned by
+.I "\-Qp."
+This is useful either to make sure that
+there is enough room on the initial bitmap, to aboid the warning
+above, or, along with the
+.I "\-cx"
+option, to force the output bitmap to be a certain size.
 .TP
 .I "\-c[edge] dimen, \-C[edge] dimen"
 The 
@@ -78,6 +88,9 @@ takes no account of any magnification in the DVI file.
 See below for TeX 
 .I "\especial"
 commands which set this within the TeX file.
+.TP
+.I "\-cx"
+Do not crop the output.
 .TP
 .I "\-fp font-path"
 Specifies the path to the PK fonts which dvi2bitmap will use.  See
@@ -309,6 +322,11 @@ The program then exits.
 .I "\-Qb"
 Prints on stdout a line for each bitmap it generates, giving the
 filename, horizontal size, and vertical size, in pixels.
+.TP
+.I "\-Qp"
+Show the list of paper sizes which are predefined for the
+.I "\-bp"
+option.
 .TP
 .I "\-r resolution"
 Specifies the output resolution, in pixels-per-inch.  This is used

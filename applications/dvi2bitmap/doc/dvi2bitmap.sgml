@@ -78,6 +78,10 @@ Mostly clarifying and amplifying explanations.</distribution>
 Adjustments to distribution -- no functionality change.
 </distribution>
 
+<distribution string="0.9-5" date="27-Jun-2000" author=ng" versionid="v0-9-5">
+Added -bp, -cx, -Qp options, and corrected bug which caused fonts to
+be generated at the wrong sizes.
+
 </history>
 
 <copyright>
@@ -130,8 +134,9 @@ make things a little clearer.</update>
 <verbatim>
 dvi2bitmap 
     [-f font-path] [-r resolution] [-m magnification] [-P[BbTt]]
-    [-s scalefactor] [-t pbm|gif|xbm] [-o output] [-b(h|w) size]
-    [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFgGtb]]
+    [-s scalefactor] [-t pbm|gif|xbm] [-o output]
+    [-b(h|w) size] [-bp a4|a4l|usletter...]
+    [-c[lrtb] dimen] [-cx] [-C[lrtb] dimen] [-nqV] [-Q[fFgGtbp]]
     [-R[fb] int,int,int]
     [-p num] [-l num] [-pp ranges]
     dvi-file
@@ -173,6 +178,7 @@ options.  Note that the old -l and -L options have changed into the
 new -L and -LL options.</update>
 <update versionid="v0-7">Clarified the -p, -l and -pp options.
 Changed -Q into -qq, and -L into -Qf.</update>
+<update versionid="v0-9-5">Added -bp, -Qp, -cx</update>
 
 <p><dl>
 <dt><code>-bh size, -bw size</code>
@@ -188,6 +194,13 @@ bottom-right of the bitmap: in this case <code>-bh 6300 -bw
 4200</code> would suffice.  Note that the `h' in <code>-bh</code> stands for
 height, not horizontal!  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.
+
+<dt><code>-bp papersize</code>
+<dd>Set the initial size of the bitmap to be one of the paper sizes
+returned by <code>-Qp</code>.  This is useful either to make sure that
+there is enough room on the initial bitmap, to aboid the warning
+above, or, along with the <code/-cx> option, to force the output
+bitmap to be a certain size.
 
 <dt><code>-c[edge] dimen, -C[edge] dimen</code>
 <dd>The <code/-c> and <code/-C> options allow you to control how the
@@ -207,6 +220,9 @@ already, but it doesn't notice if that's set after this option, and it
 takes no account of any magnification in the DVI file. 
 <p>See <ref id=usage.special/> for &tex; <code/\special> commands which
 set this within the &tex; file.
+
+<dt><code/-cx>
+<dd>Do not crop the output.
 
 <dt id=usage.options.fp><code>-fp font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
@@ -368,6 +384,10 @@ lines produced by the <code/-QF> option would start <code/QF cmbx10
   <dt><code/-Qb>
   <dd>Prints on stdout a line for each bitmap it generates, giving the
   filename, horizontal size, and vertical size, in pixels.
+
+  <dt><code/-Qp>
+  <dd>Show the list of paper sizes which are predefined for the
+  <code/-bp> option.
 
   </dl>
 
