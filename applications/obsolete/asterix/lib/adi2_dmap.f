@@ -135,8 +135,8 @@
       CHARACTER*1		AXIS
       INTEGER			IAX, I
       INTEGER			AXID, AXPTR
-      REAL			BASE, DELTA
-      REAL			PLTSCL, PIXSIZ
+      DOUBLE PRECISION		BASE, DELTA
+      DOUBLE PRECISION		PLTSCL, PIXSIZ
       LOGICAL			ISAXDAT, ISAXWID
 *.
 
@@ -189,19 +189,19 @@
      :                    .FALSE., DIMS(IAX), ' ', STATUS )
 
 *    Try for the axis base
-        CALL ADI2_GKEY0R( FITID, ' ', 'CRPIX'//ITEM(6:6), .FALSE.,
+        CALL ADI2_GKEY0D( FITID, ' ', 'CRPIX'//ITEM(6:6), .FALSE.,
      :                    .FALSE., BASE, ' ', STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          BASE = DIMS(IAX) / 2.0 + 0.5
+          BASE = DIMS(IAX) / 2.0D0 + 0.5D0
         END IF
 
 *    Try for the axis delta
-        CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
+        CALL ADI2_GKEY0D( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
      :                    .FALSE., DELTA, ' ', STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          CALL ADI2_GKEY0R( FITID, ' ', 'CD'//ITEM(6:6)//'_'//ITEM(6:6),
+          CALL ADI2_GKEY0D( FITID, ' ', 'CD'//ITEM(6:6)//'_'//ITEM(6:6),
      :                      .FALSE., .FALSE., DELTA, ' ', STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -210,17 +210,17 @@
             ELSE
               AXIS = 'Y'
             END IF
-            CALL ADI2_GKEY0R( FITID, ' ', 'PLTSCALE',
+            CALL ADI2_GKEY0D( FITID, ' ', 'PLTSCALE',
      :                        .FALSE., .FALSE., PLTSCL, ' ', STATUS )
-            CALL ADI2_GKEY0R( FITID, ' ', AXIS//'PIXELSZ',
+            CALL ADI2_GKEY0D( FITID, ' ', AXIS//'PIXELSZ',
      :                        .FALSE., .FALSE., PIXSIZ, ' ', STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
               CALL ERR_ANNUL( STATUS )
               DELTA = 1.0
             ELSE
-              DELTA = (PLTSCL * PIXSIZ) / (1000.0 * 3600.0)
+              DELTA = (PLTSCL * PIXSIZ) / (1000.0D0 * 3600.0D0)
               IF ( AXIS .EQ. 'X' ) THEN
-                DELTA = -1.0 * DELTA
+                DELTA = -1.0D0 * DELTA
               END IF
             END IF
           END IF
@@ -236,7 +236,7 @@
 *  Or invent some axis widths
       ELSE IF ( ISAXWID ) THEN
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
-        CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
+        CALL ADI2_GKEY0D( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
      :                    .FALSE., DELTA, ' ', STATUS )
         CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
         CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
@@ -279,8 +279,8 @@
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
-      REAL			BASE
-      REAL			DELTA
+      DOUBLE PRECISION		BASE
+      DOUBLE PRECISION		DELTA
       INTEGER			NELM
       REAL			AXDAT(*)
       INTEGER			STATUS
@@ -290,7 +290,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, NELM
-        AXDAT(I) = (I - BASE - 0.5) * DELTA
+        AXDAT(I) = REAL( (I - BASE - 0.5D0) * DELTA )
       END DO
 
       END
@@ -300,7 +300,7 @@
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
-      REAL			DELTA
+      DOUBLE PRECISION		DELTA
       INTEGER			NELM
       REAL			AXDAT(*)
       INTEGER			STATUS
@@ -310,7 +310,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, NELM
-        AXDAT(I) = DELTA
+        AXDAT(I) = REAL( DELTA )
       END DO
 
       END
+
