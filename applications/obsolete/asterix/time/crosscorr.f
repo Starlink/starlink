@@ -136,8 +136,7 @@
         PARAMETER		( VERSION = 'CROSSCORR Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80           	STRING          	! Text string
-      CHARACTER*80           	TEXT(10)        	! History text
+      CHARACTER*80           	HTXT(2)			! History text
 
       REAL                   	BASE            	! Axis base value
       REAL                   	OSCALE           	! Axis scale value
@@ -151,6 +150,7 @@
       INTEGER                   DPTR(2)                 ! Mapped input data
       INTEGER                	I			!
       INTEGER                   IFID(2)                 ! Input identifiers
+      INTEGER			IFILES			! Input file info
       INTEGER                	LMAX            	! Maximum lag to be computed
       INTEGER                	NBAD            	! No.of bad quality data
       INTEGER                	ND              	! No. of data points used
@@ -159,7 +159,7 @@
       INTEGER                	NL              	! Total number of lag values
       INTEGER                	NLINE           	! Line no. of HISTORY text
       INTEGER                   QPTR                    ! Input quality pointer
-      INTEGER                	TEXTLEN         	! Length of text string
+      INTEGER                	TLEN         		! Length of text string
       INTEGER                   VPTR(2)                 ! Mapped input errors
       INTEGER			XCID			! Output dataset id
       INTEGER                	XCPTR           	! Pointer to cross-correln values
@@ -335,25 +335,25 @@
 *  History entry (copy history file from IFID, if available)
       CALL HSI_COPY( IFID(BF), XCID, STATUS )
       CALL HSI_ADD(XCID,VERSION,STATUS)
-      CALL USI_NAMEI(NLINE,TEXT,STATUS)
-      NLINE=NLINE+1
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( XCID, IFILES, .TRUE., STATUS )
+
       CALL MSG_SETI('BF',BF)
       CALL MSG_MAKE('NOTE: Above HISTORY records refer to '//
-     :  'dataset ^BF',TEXT(NLINE),TEXTLEN)
+     :  'dataset ^BF',HTXT(1), TLEN)
       IF ( WEIGHT ) THEN
-        STRING='Weighted cross-correlation'
+        CALL MSG_SETC( 'W', 'Weighted cross-correlation' )
       ELSE
-        STRING='Unweighted cross-correlation'
-      ENDIF
-      NLINE = NLINE + 1
-      IF(DENOISE)THEN
-        TEXT(NLINE)=STRING(1:CHR_LEN(STRING))//'    Noise '//
-     :  'contribution removed from denominator'
+        CALL MSG_SETC( 'W', 'Unweighted cross-correlation' )
+      END IF
+      IF ( DENOISE ) THEN
+        CALL MSG_SETC( 'N', 'Noise contribution removed from'/
+     :                                       /' denominator' )
       ELSE
-        TEXT(NLINE)=STRING(1:CHR_LEN(STRING))//'    No noise correction'
-      ENDIF
-
-      CALL HSI_PTXT(XCID,NLINE,TEXT,STATUS)
+        CALL MSG_SETC( 'N', 'No noise correction' )
+      END IF
+      CALL MSG_MAKE( '^W. ^N', HTXT(2), TLEN )
+      CALL HSI_PTXT( XCID, 2, HTXT, STATUS )
 
 *  Exit
  99   CALL AST_CLOSE()
