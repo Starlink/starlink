@@ -1,6 +1,6 @@
       SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, 
-     :                       FD, SZBAT, LBND, UBND, WORK1, WORK2, WORK3, 
-     :                       STATUS )
+     :                       IDCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, 
+     :                       WORK3, STATUS )
 *+
 *  Name:
 *     POL1_WRTCL
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, FD, 
-*                      SZBAT, LBND, UBND, WORK1, WORK2, WORK3, STATUS )
+*     CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, IDCOL, 
+*                      FD, SZBAT, LBND, UBND, WORK1, WORK2, WORK3, STATUS )
 
 *  Description:
 *     This routine writes out a Tcl list holding the column data in a 
@@ -39,6 +39,8 @@
 *        the RA and DEC columns.
 *     NROW = INTEGER (Given)
 *        No. of rows.
+*     IDCOL = INTEGER (Given)
+*        Index of the ID column.
 *     FD = INTEGER (Given)
 *        FIO identifier for text file to hold output catalogue.
 *     SZBAT = INTEGER (Given)
@@ -80,6 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CAT_PAR'          ! CAT__ constants
 
 *  Arguments Given:
       INTEGER CI
@@ -89,6 +92,7 @@
       INTEGER NCOL
       INTEGER GCOL( NCOL )
       INTEGER NROW
+      INTEGER IDCOL
       INTEGER FD
       INTEGER SZBAT
       
@@ -139,11 +143,13 @@
       INTEGER JROW               ! Index of next row to be read
       INTEGER J                  ! Loop index
       INTEGER K                  ! Loop index
+      INTEGER KK                 ! Loop index
       INTEGER K0                 ! Loop index
       INTEGER MRAN               ! Number of unique random rows
       INTEGER RANROW( NRAN )     ! Random row numbers
       INTEGER SAVRAN             ! No. of random rows saved so far
       INTEGER UNIT               ! Fortran IO unit for output text file
+      LOGICAL MAKEID             ! Create ID values?
       LOGICAL SAVE               ! Is this row to be saved?
       REAL RAN( NRAN )           ! Random values between 0 and 1
       REAL RANX( NRAN )          ! X value for random rows
@@ -169,6 +175,9 @@
 
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  See if we need to construct ID values.
+      MAKERD = ( GCOL( IDCOL ) .EQ. CAT__NOID )
 
 *  Store some random row numbers. The X/Y and RA/DEC values at these rows
 *  are saved in local arrays as the rows are accessed. The row which is 
@@ -240,8 +249,14 @@
 
 *  Read the remaining columns.
             DO I = 5, NCOL
-               CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
-     :                          WORK3( 1, I - 4 ), STATUS )     
+               IF( MAKEID .AND. I .EQ. IDCOL ) THEN 
+                  DO KK = 1, BATSZ
+                     WORK3( KK, I - 4 ) = KK + IROW - 1
+                  END DO
+               ELSE
+                  CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+     :                             WORK3( 1, I - 4 ), STATUS )     
+               END IF
             END DO
 
 *  Look out for the first random row.
@@ -295,7 +310,7 @@
                   K0 = MIN( 3, NCOL - 4 - J )
                   WRITE( UNIT, * ) ( WORK3( I, J + K ), K = 0, K0),' \\'
                END DO
-               WRITE( UNIT, * ) JROW, '} \\'
+               WRITE( UNIT, * ) '} \\'
 
 *  Update the pixel bounding box.
                IF( X .LT. LBND( 1 ) ) LBND( 1 ) = X
@@ -311,8 +326,14 @@
 
 *  Read the remaining columns.
             DO I = 3, NCOL
-               CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
-     :                          WORK3( 1, I - 2 ), STATUS )     
+               IF( MAKEID .AND. I .EQ. IDCOL ) THEN 
+                  DO KK = 1, BATSZ
+                     WORK3( KK, I - 2 ) = KK + IROW - 1
+                  END DO
+               ELSE
+                  CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+     :                             WORK3( 1, I - 2 ), STATUS )     
+               END IF
             END DO
 
 *  Now write out the data to the text file as a series of rows, and
@@ -329,7 +350,7 @@
                   K0 = MIN( 3, NCOL - 2 - J )
                   WRITE( UNIT, * ) ( WORK3( I, J + K ), K = 0, K0),' \\'
                END DO
-               WRITE( UNIT, * ) JROW, '} \\'
+               WRITE( UNIT, * ) '} \\'
 
                IF( X .LT. LBND( 1 ) ) LBND( 1 ) = X
                IF( Y .LT. LBND( 2 ) ) LBND( 2 ) = Y

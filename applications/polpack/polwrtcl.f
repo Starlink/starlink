@@ -32,14 +32,11 @@
 *
 *      gotwcs_  : Set to 1 if RA/DEC columns are available, or 0 if
 *                 not.
-*      ra_col_  : If got_wcs is non-zero, ra_col is the index (zero based)
-*                 of the RA column.
-*      dec_col_ : If got_wcs is non-zero, dec_col is the index (zero based)
-*                 of the DEC column.
-*      x_col_   : The index (zero based) of the X pixel co-ordinate column
-*      y_col_   : The index (zero based) of the Y pixel co-ordinate column
-*      id_col_  : The index (zero based) of the column holding integer row IDs.
 *      headings_: A Tcl list holding the column headings.
+*      uses_    : A Tcl list holding the quantity stored in each column.
+*                 These will chosen from X, Y, RA, DEC, I, Q, U, V, DI,
+*                 DQ, DU, DV, P, ANG, PI, DP, DANG, DPI, ID (or will be null
+*                 if the quantity in the column is not known).
 *      xlo_     : The minimum X pixel index value in the data
 *      ylo_     : The minimum Y pixel index value in the data
 *      xhi_     : The maximum X pixel index value in the data
@@ -64,14 +61,6 @@
 *                 Column values are formatted with this format.
 *      hfmts_   : A list of Tcl formats specifications, one for each column.
 *                 Column headings are formatted with this format.
-*      icol_    : The name of the column storing I values
-*      qcol_    : The name of the column (if any) storing Q values
-*      ucol_    : The name of the column (if any) storing U values
-*      vcol_    : The name of the column (if any) storing V values
-*      dicol_   : The name of the column (if any) storing DI values
-*      dqcol_   : The name of the column (if any) storing DQ values
-*      ducol_   : The name of the column (if any) storing DU values
-*      dvcol_   : The name of the column (if any) storing DV values
 
 *  Usage:
 *     polwrtcl in out 
@@ -119,9 +108,6 @@
       INTEGER MXBAT
       PARAMETER ( MXBAT = 40000 )
 
-      INTEGER NQNAM
-      PARAMETER ( NQNAM = 8 )
-
       CHARACTER SYSTEM*3
       PARAMETER ( SYSTEM = 'FK5' )
 
@@ -159,12 +145,12 @@
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER FNAME*80
       CHARACTER HEAD( MXCOL + 2 )*15! Column names within the output catalogue
-      CHARACTER QNAM( NQNAM )*4  ! Internal quantity names
+      CHARACTER IDCNM*20         ! Name of the ID column
+      CHARACTER QUANT*10         ! Name of the column quantity
       CHARACTER RACNM*20         ! Name of the RA column
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
-      DOUBLE PRECISION DEPOCH    ! Epoch
       DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
@@ -177,6 +163,7 @@
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of TEXT
       INTEGER ICOL               ! Column index
+      INTEGER IDCOL              ! Column index of ID column
       INTEGER IFRM               ! Index of SkyFrame
       INTEGER IPW1               ! Pointer to work space
       INTEGER IPW2               ! Pointer to work space
@@ -184,6 +171,7 @@
       INTEGER ITEMP              ! Temporary storage
       INTEGER IWCS               ! The WCS FrameSet from the input catalogue
       INTEGER MAP                ! AST Mapping used to create new RA/DEC values
+      INTEGER NCIN               ! No. of columns in input catalogue
       INTEGER NCOL               ! No. of columns in output catalogue
       INTEGER NROW               ! No. of rows in output catalogue
       INTEGER RACOL              ! Index of RA column within output catalogue 
@@ -198,7 +186,6 @@
       REAL LBND( 2 )             ! Lower bounds of X/Y bounding box
       REAL UBND( 2 )             ! Upper bounds of X/Y bounding box
 
-      DATA QNAM / 'I', 'Q', 'U', 'V', 'DI', 'DQ', 'DU', 'DV' /
 *.
 
 *  Check the inherited global status.
@@ -217,33 +204,35 @@
       CALL CAT_TROWS( CI, NROW, STATUS ) 
 
 *  Get the number of columns in the supplied catalogue.
-      CALL CAT_TCOLS( CI, CAT__GPHYS, NCOL, STATUS ) 
-      IF( NCOL .GT. MXCOL .AND. STATUS .EQ. SAI__OK ) THEN
+      CALL CAT_TCOLS( CI, CAT__GPHYS, NCIN, STATUS ) 
+      IF( NCIN .GT. MXCOL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'N', NCOL )
+         CALL MSG_SETI( 'N', NCIN )
          CALL MSG_SETI( 'M', MXCOL )
          CALL ERR_REP( 'POLWRTCL_ERR1', 'Too many columns (^N) in '//
      :                 'catalogue ''$IN''. No more than ^M are '//
      :                 'allowed.', STATUS )
       END IF
 
-*  Get the names of the X, Y Ra and Dec columns in the input catalogue.
-      CALL POL1_COLNM( 'X', XCNM, STATUS )
-      CALL POL1_COLNM( 'Y', YCNM, STATUS )
-      CALL POL1_COLNM( 'RA', RACNM, STATUS )
-      CALL POL1_COLNM( 'DEC', DECCNM, STATUS )
+*  Get the names of the X, Y, Ra, Dec and ID columns in the input catalogue.
+      CALL POL1_COLNM( 'X', .FALSE., XCNM, STATUS )
+      CALL POL1_COLNM( 'Y', .FALSE., YCNM, STATUS )
+      CALL POL1_COLNM( 'RA', .FALSE., RACNM, STATUS )
+      CALL POL1_COLNM( 'DEC', .FALSE., DECCNM, STATUS )
+      CALL POL1_COLNM( 'ID', .FALSE., IDCNM, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get a list of column identifiers and headings from the input catalogue. 
-*  Note, the indices of the X, Y, RA and DEC columns. 
+*  Note, the indices of the X, Y, RA, DEC and ID columns. 
       XCOL = 0
       YCOL = 0
       RACOL = 0
       DECCOL = 0
+      IDCOL = 0
 
-      DO ICOL = 1, NCOL
+      DO ICOL = 1, NCIN
 
          CALL CAT_TNDNT( CI, CAT__FITYP, ICOL, GCOL( ICOL ), STATUS  )
          CALL CAT_TIQAC( GCOL( ICOL ), 'NAME', HEAD( ICOL ), STATUS )
@@ -260,9 +249,22 @@
          ELSE IF( HEAD( ICOL ) .EQ. DECCNM ) THEN
             DECCOL = ICOL
 
+         ELSE IF( HEAD( ICOL ) .EQ. IDCNM ) THEN
+            IDCOL = ICOL
+
          END IF
 
       END DO
+
+*  If the input catalogue has no ID column, we need to add one. 
+      IF( IDCOL .EQ. 0 ) THEN
+         NCOL = NCIN + 1
+         IDCOL = NCOL
+         GCOL( IDCOL ) = CAT__NOID
+         HEAD( IDCOL ) = IDCNM
+      ELSE
+         NCOL = NCIN
+      END IF
 
 *  Abort if no X or Y column was found.
       IF( STATUS .EQ. SAI__OK ) THEN 
@@ -294,6 +296,7 @@
       IF( YCOL .LT. XCOL ) YCOL = YCOL + 1
       IF( RACOL .GT.0 .AND. RACOL .LT. XCOL ) RACOL = RACOL + 1
       IF( DECCOL .GT.0 .AND. DECCOL .LT. XCOL ) DECCOL = DECCOL + 1
+      IF( IDCOL .LT. XCOL ) IDCOL = IDCOL + 1
       XCOL = 1
 
 *  Re-arrange them so that Y become column 2 in the output catalogue.
@@ -307,6 +310,7 @@
 
       IF( RACOL .GT.0 .AND. RACOL .LT. YCOL ) RACOL = RACOL + 1
       IF( DECCOL .GT.0 .AND. DECCOL .LT. YCOL ) DECCOL = DECCOL + 1
+      IF( IDCOL .LT. YCOL ) IDCOL = IDCOL + 1
       YCOL = 2
 
 *  Assume for the moment that the output catalogue will contain RA/DEC
@@ -527,6 +531,7 @@
          GCOL( 3 ) = ITEMP
    
          IF( DECCOL .LT. RACOL ) DECCOL = DECCOL + 1
+         IF( IDCOL .LT. RACOL ) IDCOL = IDCOL + 1
          RACOL = 3
 
          ITEMP = GCOL( DECCOL )
@@ -536,7 +541,8 @@
          END DO
          HEAD( 4 ) = DECCNM
          GCOL( 4 ) = ITEMP
-   
+
+         IF( IDCOL .LT. DECCOL ) IDCOL = IDCOL + 1
          DECCOL = 4
 
       END IF
@@ -546,41 +552,13 @@
       CALL FIO_FNAME( FD, FNAME, STATUS ) 
       CALL MSG_SETC( 'F', FNAME )
 
-*  Write X & Y column numbers (zero based) to the output text file.
-      TEXT = 'set x_col_ '
-      IAT = 11
-      CALL CHR_PUTI( XCOL - 1, TEXT, IAT )
-      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-
-      TEXT = 'set y_col_ '
-      IAT = 11
-      CALL CHR_PUTI( YCOL - 1, TEXT, IAT )
-      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-
 *  Write a flag to the output text file indicating if RA/DEC values 
-*  are available. If they are, write the RA and DEC column indices out.
+*  are available. 
       IF( GOTRD ) THEN
-         TEXT = 'set ra_col_ '
-         IAT = 12
-         CALL CHR_PUTI( RACOL - 1, TEXT, IAT )
-         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-
-         TEXT = 'set dec_col_ '
-         IAT = 13
-         CALL CHR_PUTI( DECCOL - 1, TEXT, IAT )
-         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-
          CALL FIO_WRITE( FD, 'set gotwcs_ 1', STATUS )
       ELSE
          CALL FIO_WRITE( FD, 'set gotwcs_ 0', STATUS )
       END IF
-
-*  Write out the index of the row ID column. This is an extra column
-*  added by this application.
-      TEXT = 'set id_col_ '
-      IAT = 12
-      CALL CHR_PUTI( NCOL, TEXT, IAT )
-      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Write a list of the column headings out to the text file.
       CALL FIO_WRITE( FD, 'set headings_ { \\', STATUS )
@@ -595,10 +573,28 @@
 
       CALL FIO_WRITE( FD, ' ID }', STATUS )
 
+*  Write a list of the quantities stored in each column out to the text file.
+      CALL FIO_WRITE( FD, 'set uses_ { \\', STATUS )
+
+      DO ICOL = 1, NCOL
+         TEXT = '   '
+         IAT = 3
+         CALL POL1_COLNM( HEAD( ICOL ), .TRUE., QUANT, STATUS )
+         IF( QUANT .NE. ' ' ) THEN
+            CALL CHR_APPND( QUANT, TEXT, IAT )
+         ELSE
+            CALL CHR_APPND( '""', TEXT, IAT )
+         END IF
+         CALL CHR_APPND( ' \\', TEXT, IAT )
+         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+      END DO
+
+      CALL FIO_WRITE( FD, ' ID }', STATUS )
+
 *  Write a list of the heading formats out to the text file.
       CALL FIO_WRITE( FD, 'set hfmts_ { \\', STATUS )
 
-      DO ICOL = 1, NCOL + 1
+      DO ICOL = 1, NCOL
          TEXT = '   '
          IAT = 3
          IF( ICOL .EQ. XCOL .OR. ICOL .EQ. YCOL ) THEN
@@ -617,7 +613,7 @@
 *  Write a list of the column formats out to the text file.
       CALL FIO_WRITE( FD, 'set fmts_ { \\', STATUS )
 
-      DO ICOL = 1, NCOL + 1
+      DO ICOL = 1, NCOL
          TEXT = '   '
          IAT = 3
          IF( ICOL .EQ. XCOL .OR. ICOL .EQ. YCOL ) THEN
@@ -642,7 +638,7 @@
 
       TEXT = 'set ncol_ '
       IAT = 10
-      CALL CHR_PUTI( NCOL + 1, TEXT, IAT )
+      CALL CHR_PUTI( NCOL, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Write out the equinox.
@@ -661,23 +657,6 @@
       END IF
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-*  Write out the names of the Stokes related columns.
-      DO I = 1, NQNAM
-         TEXT = 'set '
-         IAT = 4
-         CALL CHR_APPND( QNAM( I ), TEXT, IAT )
-         CALL CHR_LCASE( TEXT )
-         CALL CHR_APPND( 'col_', TEXT, IAT )
-         IAT = IAT + 1
-         CALL POL1_COLNM( QNAM( I ), COLNM, STATUS )
-         IF( COLNM .NE. ' ' ) THEN
-            CALL CHR_APPND( COLNM, TEXT, IAT )
-         ELSE 
-            CALL CHR_APPND( '""', TEXT, IAT )
-         END IF
-         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-      END DO
-
 *  Determine the size of each batch.
       SZBAT = MIN( NROW, MXBAT )
 
@@ -692,7 +671,7 @@
 
 *  Write values to the output file.
       CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, 
-     :                 FD, SZBAT, LBND, UBND, %VAL( IPW1 ), 
+     :                 IDCOL, FD, SZBAT, LBND, UBND, %VAL( IPW1 ), 
      :                 %VAL( IPW2 ), %VAL( IPW3 ), STATUS )
 
 *  Free the work space.
