@@ -229,7 +229,7 @@
       END IF
 
 *  Introduce dataset to psf system
-      CALL PSF_TASSOCI( IFID, IPSF, STATUS )
+      CALL PSF_ASSOCI( IFID, IPSF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Create spatial response structure

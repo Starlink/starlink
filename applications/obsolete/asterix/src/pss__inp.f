@@ -108,7 +108,7 @@
 
 *    Associate psf
       IF ( IFILE .EQ. 1 ) THEN
-        CALL PSF_TASSOCI( IM_ID, PSF_HAN, STATUS )
+        CALL PSF_ASSOCI( IM_ID, PSF_HAN, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 

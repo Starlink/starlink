@@ -164,7 +164,7 @@
       END IF
 
 *  Associate psf
-      CALL PSF_TASSOCI( IFID, PSFHAN, STATUS )
+      CALL PSF_ASSOCI( IFID, PSFHAN, STATUS )
 
 *  Check data
       CALL BDI_CHK( IFID, 'Data', DATA_OK, STATUS )

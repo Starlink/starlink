@@ -56,7 +56,7 @@
 
 *  get PSF if none yet loaded
         IF (I_PSF.EQ.0) THEN
-          CALL PSF_TASSOCI(I_FID,I_PSF,STATUS)
+          CALL PSF_ASSOCI(I_FID,I_PSF,STATUS)
         ELSE
 *  or see if different PSF to be loaded
           CALL USI_GET0L('NEW',NEW,STATUS)
