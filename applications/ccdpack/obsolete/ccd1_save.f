@@ -272,7 +272,7 @@
 
 *  Deferred charge value.
       IF ( GOTDEF ) THEN
-         CALL MSG_SETR( 'SAVE_DEFER', DEFER )
+         CALL MSG_SETR( 'SAVE_DEFER', REAL( DEFER ) )
          CALL MSG_LOAD( ' ',
      :   ' DEFERRED = ^SAVE_DEFER  ! Deferred charge in ADUs',
      :   BUFFER, IAT, STATUS )
