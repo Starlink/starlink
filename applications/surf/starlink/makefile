@@ -447,7 +447,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-1
+PKG_VERS = 1.0-0
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -458,7 +458,7 @@ PKG_VERS = 1.0-1
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 	$(PKG_NAME)_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_sculib.tar \
-	$(PKG_NAME)_kap.tar
+	$(PKG_NAME)_kap.tar INSTALL
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -471,7 +471,6 @@ PUBLIC_SCRIPTS = scuquick qdraw sigclip sdip.csh scupa.csh $(SCULOG)
 # These are all incarnations of sculog. They are invoked by using
 # soft links to sculog. SCULOG uses the name of the softlink to work
 # out what to do. This is better than duplicating code.
-
 
 SCULOG_SCRIPTS = photsum mapsum pointsum skysum
 
@@ -661,10 +660,12 @@ DATA_FILES =
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun216.tex \
-             sun216_arrays.eps  sun216_logo.eps    sun216_remsky.eps  \
-             sun216_flow.eps    sun216_qdraw.eps   sun216_skydip.eps
+sun216_arrays.eps  sun216_logo.eps    sun216_remsky.eps \
+sun216_flow.eps    sun216_qdraw.eps   sun216_skydip.eps sun216_3c279.eps \
+sc10.tex \
+sc10_fig1.eps sc10_fig2.eps sc10_fig3.eps sc10_fig4.eps sc10_logo.eps
 
-HYPERTEXT_DOCS = sun216.htx
+HYPERTEXT_DOCS = sun216.htx sc10.htx
 
 #  List of documentation files.
 
@@ -1049,15 +1050,13 @@ install:
               $(LINK) $(INSTALL_BIN)/$$f $$f;\
            else :; fi;\
         done
-
+#
 #  Setup the soft links to sculog
-
 	for f in $(SCULOG_SCRIPTS) ""; do \
            if test -n "$$f"; then \
               $(LINK) ./$(SCULOG) $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
-
 #
 #  Install the monolith, giving it world execute permission.
 	for f in $(MONOLITH) ""; do \
@@ -1114,6 +1113,7 @@ install:
 	if test -n "$(STARTUP_SCRIPT)"; then \
            sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
                -e s#INSTALL_HELP#$(INSTALL_HELP)# \
+               -e s#STARLINK#$(STARLINK)# \
                -e s#PKG_VERS#$(PKG_VERS)# \
               $(STARTUP_SCRIPT) >$(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
            chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
@@ -1222,7 +1222,6 @@ do_deinstall:
               rm -f $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
-
 #
 #  Deinstall the soft links to $(SCULOG)
 	- for f in $(SCULOG_SCRIPTS) ""; do \
@@ -1230,8 +1229,6 @@ do_deinstall:
                 rm -f $(INSTALL_BIN)/$$f ;\
            else :; fi;\
         done
-
-
 #
 #  Deinstall the monolith, if an installed version exists.
 	- for f in $(MONOLITH) ""; do \
@@ -1369,15 +1366,23 @@ do_test:
 	@ echo
 	@ echo '$(PACK_NAME) does not have a make driven installation test'
 	@ echo
-	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
-	@ echo 'thus (% is the shell prompt):'
+	@ echo 'To test that $(PACK_NAME) is installed correctly, run the'
+	@ echo 'startup script, then invoke the help facility:'
 	@ echo
-	@ echo ' % cd /empty_directory'
-	@ echo ' % source /star/etc/cshrc'
-	@ echo ' % xdisplay'
-	@ echo ' % $(PKG_NAME)setup'
-	@ echo ' % command_name'
+	@ echo ' % setenv SURF_DIR $(INSTALL_BIN)'
+	@ echo ' % setenv SURF_HELP $(INSTALL_HELP)/surf'
+	@ echo ' % source $(INSTALL_BIN)/surf.csh'
+	@ echo ' % scuhelp'
 	@ echo
+#	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
+#	@ echo 'thus (% is the shell prompt):'
+#	@ echo
+#	@ echo ' % cd /empty_directory'
+#	@ echo ' % source /star/etc/cshrc'
+#	@ echo ' % xdisplay'
+#	@ echo ' % $(PKG_NAME)setup'
+#	@ echo ' % command_name'
+#	@ echo
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
@@ -1489,7 +1494,7 @@ clean:
 	@- rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
               $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
-	@- rm -f $(F_ROUTINES) 1>/dev/null 2>/dev/null
+	@- rm -f $(F_ROUTINES) dtask_applic.f 1>/dev/null 2>/dev/null
 	@- rm -f $(OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
