@@ -107,9 +107,11 @@
       CHARACTER*40            TSTR       ! Temporary string
       CHARACTER RNGSTR*(SWTSZE*25)        ! Range global string
 
-      LOGICAL		      PRIM1      ! Value_object primitive?
-      LOGICAL		      PRIM2      ! Range_object primitive?
-      LOGICAL                 OK         ! General validity test
+      REAL		      MINVAL     ! Minimum value of specified range
+      REAL		      MAXVAL     ! Maximum value of specified range
+      REAL		      RANGE(2)   ! Value of range max and min from parameter sysytem
+      REAL		      SWITCH(SWTSZE) ! Array of results passed from subroutine
+      REAL		      	VALMAX, VALMIN     	! Max/min of value obj
 
       INTEGER		      	ACTVAL     		! Dummy for USI_GET
       INTEGER                 	I,J        		! Loop counters
@@ -122,12 +124,7 @@
       INTEGER                 RLEN,TLEN  ! Lengths of strings
       INTEGER			VFID			! Value object id
 
-      REAL		      MINVAL     ! Minimum value of specified range
-      REAL		      MAXVAL     ! Maximum value of specified range
-      REAL		      RANGE(2)   ! Value of range max and min from parameter sysytem
-      REAL		      SWITCH(SWTSZE) ! Array of results passed from subroutine
-      REAL		      VALMAX     ! Maximum value from Value Obj
-      REAL		      VALMIN     ! Minimum value from Value Obj
+      LOGICAL                 	OK         		! General validity test
 *
 *    Version id :
 *
@@ -160,18 +157,18 @@
 
 *  Now the range object - if not primitive then check for the case where
 *  we have a spaced data array.
-      CALL USI_ASSOC( 'INPUT_RANGE', 'Array', 'READ', PFID, STATUS )
+      CALL USI_ASSOC( 'INPUT_RANGE', 'Array', 'READ', RFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get shape and whether ok
-      CALL BDI_CHK( PFID, 'Data', OK, STATUS )
+      CALL BDI_CHK( RFID, 'Data', OK, STATUS )
       IF ( OK ) THEN
-        CALL BDI_GETNEL( PFID, RNGVAL, STATUS )
+        CALL BDI_GETNEL( RFID, RNGVAL, STATUS )
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Numeric data object required', STATUS )
       END IF
-      CALL BDA_MAPR( PFID, 'Data', 'READ', RNGPTR, STATUS )
+      CALL BDA_MAPR( RFID, 'Data', 'READ', RNGPTR, STATUS )
 
 *  Check data objects have same shape
       IF ( VALVAL .NE. RNGVAL ) THEN
