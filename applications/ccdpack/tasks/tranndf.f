@@ -223,6 +223,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK)
 *     AALLAN: Alasdair Allan (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -249,6 +250,8 @@
 *        Other minor changes.
 *     17-MAY-1999 (AALLAN):
 *        Final tweaks for shipping.
+*     20-MAY-1999 (MBT):
+*        Mucked about a bit.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -338,6 +341,7 @@
       INTEGER JPIX              ! Index of the PIXEL frame in the output NDF
       INTEGER MPCUR             ! Pointer to current mapping between CURRENT and PIXEL domains
       INTEGER MPINV             ! Inverse map of MPCUR
+      INTEGER MAP                ! Mapping to use
       INTEGER NBAD               ! Number of bad elements in output array
       INTEGER NDIMI              ! Number of dimensions in input NDF
       INTEGER NNDF               ! Number of NDFs to process
@@ -564,6 +568,8 @@
 *  It appears we have a WCS component, get a pointer to the current FrameSet
             
             CALL CCD1_GTWCS(IDIN, IWCS, STATUS)
+            MAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
+            MAP = AST_SIMPLIFY( MAP, STATUS )
             FRCUR = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get the index of the current frame for future use 
@@ -668,8 +674,8 @@
 
 *  Obtain the number of input and output co-ordinates for a Mapping
 
-           NVIN = AST_GETI(IWCS, 'Nin', STATUS)
-           NVOUT = AST_GETI(IWCS, 'Nout', STATUS)    
+           NVIN = AST_GETI( MAP, 'Nin', STATUS )
+           NVOUT = AST_GETI( MAP, 'Nout', STATUS )    
                                
          ELSE
          
@@ -774,7 +780,7 @@
 *  We're using AST FrameSets, the KPG1_ASBOx routine does the same job
 *  as the AST_MAPBOX routine, probably should be changed to this at
 *  some point in the future.
-            CALL KPG1_ASBOD( NVIN, ASTART, AEND, IWCS, NVOUT, DDLBND,
+            CALL KPG1_ASBOD( NVIN, ASTART, AEND, MAP, NVOUT, DDLBND,
      :                       DDUBND, STATUS )             
          ELSE
 *  We're using old fashioned TRN structures
@@ -970,8 +976,9 @@
 
 *  Apply the transformation.
             IF( USEWCS ) THEN
-              CALL AST_TRANN(IWCS, EL, NVIN, NDF__MXDIM + 1, COIN,
-     :               .TRUE., NVOUT, NDF__MXDIM + 1, COOUT, STATUS)
+              CALL AST_TRANN( MAP, EL, NVIN, NDF__MXDIM + 1, COIN,
+     :                        .TRUE., NVOUT, NDF__MXDIM + 1, COOUT, 
+     :                        STATUS )
             ELSE
               CALL TRN_TRND( .FALSE., NDF__MXDIM + 1, NVIN, EL, COIN,
      :                  TRIDF, NDF__MXDIM + 1, NVOUT, COOUT, STATUS )
@@ -1035,10 +1042,11 @@
 
 *  Generate the list of vector indices for the resampling.
             IF( USEWCS ) THEN
-                CALL KPG1_ASPID( NDIMI, IDIMS, IWCS, %VAL( CAXPTR ),
-     :                        WDIMS( 1 ), NVOUT, OLBND, ODIMS,
-     :                        %VAL( WPNTR1 ), %VAL( WPNTR3 ),
-     :                        %VAL( WPNTR2 ), %VAL( INPNTR ), STATUS )            
+                CALL KPG1_ASPID( NDIMI, IDIMS, MAP, %VAL( CAXPTR ),
+     :                           WDIMS( 1 ), NVOUT, OLBND, ODIMS,
+     :                           %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                           %VAL( WPNTR2 ), %VAL( INPNTR ), 
+     :                           STATUS )            
             ELSE
                 CALL KPG1_TRPID( NDIMI, IDIMS, TRIDI, %VAL( CAXPTR ),
      :                        WDIMS( 1 ), NVOUT, OLBND, ODIMS,
@@ -1199,7 +1207,7 @@
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   IF( USEWCS ) THEN 
                     CALL KPG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( OPNTR( 1 ) ),
@@ -1220,7 +1228,7 @@
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   IF( USEWCS ) THEN 
                     CALL KPG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( OPNTR( 1 ) ),
@@ -1241,7 +1249,7 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   IF ( USEWCS ) THEN
                     CALL KPG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( OPNTR( 1 ) ),
@@ -1262,7 +1270,7 @@
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( OPNTR( 1 ) ),
@@ -1283,7 +1291,7 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   IF (USEWCS ) THEN
                     CALL KPG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                              VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                              VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ),
@@ -1304,7 +1312,7 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                              VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                              VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ),
@@ -1325,7 +1333,7 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   IF(USEWCS) THEN
                     CALL KPG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( OPNTR( 1 ) ),
@@ -1360,7 +1368,7 @@
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARB, IWCS, FLUX,
+     :                             VAR, VARB, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
@@ -1380,7 +1388,7 @@
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARD, IWCS, FLUX,
+     :                             VAR, VARD, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
@@ -1400,7 +1408,7 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARI, IWCS, FLUX,
+     :                             VAR, VARI, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
@@ -1420,7 +1428,7 @@
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARR, IWCS, FLUX,
+     :                             VAR, VARR, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
@@ -1440,7 +1448,7 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                              VAR, VARB, IWCS, FLUX,
+     :                              VAR, VARB, MAP, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ), VARBO,
@@ -1460,7 +1468,7 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                              VAR, VARW, IWCS, FLUX,
+     :                              VAR, VARW, MAP, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ), VARBO,
@@ -1480,7 +1488,7 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   IF (USEWCS) THEN
                     CALL KPG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARW, IWCS, FLUX,
+     :                             VAR, VARW, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
