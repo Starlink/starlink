@@ -338,9 +338,11 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
@@ -646,9 +648,11 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
