@@ -84,8 +84,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  [optional_subroutine_items]...
-*
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
  
@@ -107,6 +105,9 @@
 *        Removed 10 character restrictions on image identifiers.
 *     24-JUN-1998 (DSB):
 *        Continue processing if the image inter-comparisons fail to converge.
+*     19-APR-2000 (DSB):
+*        Annull ignorable errors instead of flushing them if ILEVEL is
+*        less than 2.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -249,12 +250,18 @@
 
 *  If the iteration limit was reached before convergence was achieved, an
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
-*  resulting approximate solution will probably be OK, so just flush the
-*  error and carry on.
+*  resulting approximate solution will probably be OK, so just annur (or
+*  flush if ILEVEL is 2) the error and carry on.
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
-     :                       ' may only be approximate!', STATUS )
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+        :                       'does not matter and so is being '//
+        :                       'ignored... The F factors may only '//
+        :                       'be approximate!', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             END IF
 
 *  Store the values returned by CCD1_CMPRR.
@@ -276,9 +283,15 @@
      :                       %VAL( IPWRK4 ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
-     :                       ' may only be approximate!', STATUS )
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+        :                       'does not matter and so is being '//
+        :                       'ignored... The F factors may only '//
+        :                       'be approximate!', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             END IF
 
             F2 = SNGL( SCALE )
@@ -324,7 +337,14 @@
                   CALL MSG_OUT( ' ', STRING, STATUS )
                ENDIF
             ELSE
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+        :                       'does not matter and so is being '//
+        :                       'ignored...', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             ENDIF
          ENDIF
             
@@ -348,9 +368,15 @@
      :                       %VAL( IPWRK4 ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
-     :                       ' may only be approximate!', STATUS )
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+        :                       'does not matter and so is being '//
+        :                       'ignored... The F factors may only '//
+        :                       'be approximate!', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             END IF
 
             F1 = SNGL( SCALE )
@@ -372,9 +398,15 @@
      :                       %VAL( IPWRK4 ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
-     :                       ' may only be approximate!', STATUS )
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+        :                       'does not matter and so is being '//
+        :                       'ignored... The F factors may only '//
+        :                       'be approximate!', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             END IF
 
             F2 = SNGL( SCALE )
@@ -412,7 +444,14 @@
                   CALL MSG_OUT( ' ', STRING, STATUS )
                ENDIF
             ELSE
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+        :                       'does not matter and so is being '//
+        :                       'ignored...', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             ENDIF
          ENDIF
       ENDDO
