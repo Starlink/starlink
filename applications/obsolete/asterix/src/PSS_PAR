@@ -68,12 +68,6 @@
       REAL            BADERR
         PARAMETER     ( BADERR = -1.0 )
 
-*    Radian conversion constants to ridiculous numbers of places
-      DOUBLE PRECISION         PI, RTOD, DTOR
-        PARAMETER              ( PI = 3.141592653589793238462643D0,
-     :                           RTOD = 57.295779513082320876798D0,
-     :                           DTOR = 1.7453292519943295769D-02 )
-
 *    PSF access for PSS
       INTEGER                  NPSFLEV
          PARAMETER             ( NPSFLEV = 4 )
