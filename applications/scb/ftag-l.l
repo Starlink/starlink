@@ -1,3 +1,6 @@
+%pointer
+
+%{
 /*+
 * Name:
 *    ftag-l.l
@@ -55,10 +58,12 @@
 *-
 */
 
-CONT			(\n[^cCdD!*\n]....[^ 0\n])
-BLANK			([ \t]|!.*|{CONT}|\n[ \t]*!.*)*
-LETTER			[A-Za-z<>$_%]
-DIGIT			[0-9]
+void count();
+void ecount();
+void munch();
+
+%}
+
 A			[Aa]
 B			[Bb]
 C			[Cc]
@@ -86,69 +91,76 @@ X			[Xx]
 Y			[Yy]
 Z			[Zz]
 
+CONT			(\n[^cCdD!*\n]....[^ 0\n])
+BLANK			([ \t]|(!.*)?{CONT}|(!.*)?\n[ \t]*!.*)*
+LETTER			[A-Za-z<>$_%]
+DIGIT			[0-9]
+SPACE			[ \t]*
 
-%START	FIRST
+%start	FIRST
 
-%{
-
-void count();
-
-%}
+%p 5000
+%a 5000
+%o 5000
 
 %%
 
-^[0-9 ]{5,5}[ 0]{BLANK}		{ count(); BEGIN FIRST; return( LINE_START ); }
-^[0-9 ]{5,5}[ 0]{BLANK}\n	{ count(); return( BLANK_LINE ); }
-^{BLANK}\n			{ count(); return( BLANK_LINE ); }
-^[CcDd!*].*\n			{ count(); return( COMMENT_LINE ); }
-\n				{ count(); return( LINE_END ); }
+
+^[0-9 ]{5,5}[ 0]{SPACE}*	{ count(); BEGIN FIRST; return( LINE_START ); }
+^[0-9 ]{5,5}[ 0]{SPACE}*(!.*)?\n	{ ecount(); return( BLANK_LINE ); }
+^[ \t]*(!.*)?\n			{ ecount(); return( BLANK_LINE ); }
+^[CcDd!*].*\n			{ ecount(); return( COMMENT_LINE ); }
+(!.*)?\n			{ ecount(); return( LINE_END ); }
 
 
-<FIRST>{S}{U}{B}{R}{O}{U}{T}{I}{N}{E}{BLANK}	{ count(); return( SUBROUTINE ); }
-<FIRST>{E}{N}{T}{R}{Y}{BLANK}			{ count(); return( ENTRY ); }
-<FIRST>{B}{L}{O}{C}{K}{BLANK}{D}{A}{T}{A}{BLANK}	{ count(); return( BLOCKDATA ); }
-<FIRST>{P}{R}{O}{G}{R}{A}{M}{BLANK}		{ count(); return( PROGRAM ); }
-<FIRST>{I}{N}{C}{L}{U}{D}{E}{BLANK}		{ count(); return( INCLUDE ); }
-<FIRST>{E}{L}{S}{E}{BLANK}{I}{F}{BLANK}/\(	{ count(); return( ELSEIF ); }
-<FIRST>{T}{H}{E}{N}{BLANK}			{ count(); return( THEN ); }
-<FIRST>{I}{N}{T}{E}{G}{E}{R}{BLANK}		{ count(); return( INTEGER ); }
-<FIRST>{R}{E}{A}{L}{BLANK}			{ count(); return( REAL ); }
-<FIRST>{D}{O}{U}{B}{L}{E}{BLANK}{P}{R}{E}{C}{I}{S}{I}{O}{N}{BLANK}	{ 
+<FIRST>{S}{U}{B}{R}{O}{U}{T}{I}{N}{E}	{ count(); return( SUBROUTINE ); }
+<FIRST>{E}{N}{T}{R}{Y}			{ count(); return( ENTRY ); }
+<FIRST>{B}{L}{O}{C}{K}{SPACE}{D}{A}{T}{A}	{ count(); return( BLOCKDATA ); }
+<FIRST>{P}{R}{O}{G}{R}{A}{M}		{ count(); return( PROGRAM ); }
+<FIRST>{I}{N}{C}{L}{U}{D}{E}		{ count(); return( INCLUDE ); }
+<FIRST>{E}{L}{S}{E}{SPACE}{I}{F}/{SPACE}\(	{ count(); return( ELSEIF ); }
+<FIRST>{T}{H}{E}{N}			{ count(); return( THEN ); }
+<FIRST>{I}{N}{T}{E}{G}{E}{R}		{ count(); return( INTEGER ); }
+<FIRST>{R}{E}{A}{L}			{ count(); return( REAL ); }
+<FIRST>{D}{O}{U}{B}{L}{E}{SPACE}{P}{R}{E}{C}{I}{S}{I}{O}{N}	{ 
 					  count(); return( DOUBLEPRECISION ); }
-<FIRST>{C}{O}{M}{P}{L}{E}{X}{BLANK}		{ count(); return( COMPLEX ); }
-<FIRST>{L}{O}{G}{I}{C}{A}{L}{BLANK}		{ count(); return( LOGICAL ); }
-<FIRST>{C}{H}{A}{R}{A}{C}{T}{E}{R}{BLANK}	{ count(); return( CHARACTER ); }
-<FIRST>{B}{Y}{T}{E}{BLANK}			{ count(); return( BYTE ); }
-<FIRST>{U}{B}{Y}{T}{E}{BLANK}			{ count(); return( UBYTE ); }
-<FIRST>{W}{O}{R}{D}{BLANK}			{ count(); return( WORD ); }
-<FIRST>{U}{W}{O}{R}{D}{BLANK}			{ count(); return( UWORD ); }
-<FIRST>{D}{I}{M}{E}{N}{S}{I}{O}{N}{BLANK}	{ count(); return( DIMENSION ); }
-<FIRST>"<"{T}{Y}{P}{E}">"{BLANK}		{ count(); return( GENERIC_TYPE ); }
+<FIRST>{C}{O}{M}{P}{L}{E}{X}		{ count(); return( COMPLEX ); }
+<FIRST>{L}{O}{G}{I}{C}{A}{L}		{ count(); return( LOGICAL ); }
+<FIRST>{C}{H}{A}{R}{A}{C}{T}{E}{R}	{ count(); return( CHARACTER ); }
+<FIRST>{B}{Y}{T}{E}			{ count(); return( BYTE ); }
+<FIRST>{U}{B}{Y}{T}{E}			{ count(); return( UBYTE ); }
+<FIRST>{W}{O}{R}{D}			{ count(); return( WORD ); }
+<FIRST>{U}{W}{O}{R}{D}			{ count(); return( UWORD ); }
+<FIRST>{D}{I}{M}{E}{N}{S}{I}{O}{N}	{ count(); return( DIMENSION ); }
+<FIRST>"<"{T}{Y}{P}{E}">"		{ ecount(); return( GENERIC_TYPE ); }
 
-{F}{U}{N}{C}{T}{I}{O}{N}{BLANK}			{ count(); return( FUNCTION ); }
-{I}{F}{BLANK}/\(				{ count(); return( IF ); }
-{C}{A}{L}{L}{BLANK}				{ count(); return( CALL ); }
+{F}{U}{N}{C}{T}{I}{O}{N}		{ count(); return( FUNCTION ); }
+{I}{F}/{SPACE}\(			{ count(); return( IF ); }
+{C}{A}{L}{L}				{ count(); return( CALL ); }
 
+{DIGIT}+				{ count(); return( INTEGER_CONSTANT ); }
+\'(''|[^'\n]|{CONT})*\'			{ ecount(); return( STRING_CONSTANT ); }
 
-{DIGIT}+{BLANK}				{ count(); return( INTEGER_CONSTANT ); }
-\'(''|[^'\n]|{CONT})*\'{BLANK}		{ count(); return( STRING_CONSTANT ); }
+{LETTER}({LETTER}|{DIGIT})*/{BLANK}\(	{ ecount(); return( TOKEN_BRAC ); }
+{LETTER}({LETTER}|{DIGIT})*		{ ecount(); return( TOKEN ); }
 
-{LETTER}({LETTER}|{DIGIT})*{BLANK}/\(	{ count(); return( TOKEN_BRAC ); }
-{LETTER}({LETTER}|{DIGIT})*{BLANK}	{ count(); return( TOKEN ); }
+":"					{ count(); return( ':' ); }
+"("					{ count(); return( '(' ); }
+")"					{ count(); return( ')' ); }
+"+"					{ count(); return( '+' ); }
+"-"					{ count(); return( '-' ); }
+"*"					{ count(); return( '*' ); }
+"/" 					{ count(); return( '/' ); }
+"."					{ count(); return( '.' ); }
+","					{ count(); return( ',' ); }
+"="					{ count(); return( '=' ); }
+"<"					{ ecount(); return( ILLEGAL_CHAR ); }
+">"					{ ecount(); return( ILLEGAL_CHAR ); }
+"&"					{ ecount(); return( ILLEGAL_CHAR ); }
 
-":"{BLANK}				{ count(); return( ':' ); }
-"("{BLANK}				{ count(); return( '(' ); }
-")"{BLANK}				{ count(); return( ')' ); }
-"+"{BLANK}				{ count(); return( '+' ); }
-"-"{BLANK}				{ count(); return( '-' ); }
-"*"{BLANK}				{ count(); return( '*' ); }
-"/"{BLANK} 				{ count(); return( '/' ); }
-"."{BLANK}				{ count(); return( '.' ); }
-","{BLANK}				{ count(); return( ',' ); }
-"="{BLANK}				{ count(); return( '=' ); }
+{BLANK}					{ munch(); }
 
-.([ \t]|{CONT}){BLANK}			{ count(); return( ILLEGAL_CHAR ); }
-[^'\n]{BLANK}				{ count(); return( ILLEGAL_CHAR ); }
+.					{ count(); return( ILLEGAL_CHAR ); }
 
 
 %%
@@ -159,18 +171,25 @@ void count();
 
    int yywrap() {
 /*
-*+ 
+*+
 *  Name:
 *     yywrap
-*  
+*
 *  Purpose:
 *     Do necessary tidying up at end of lex input file.
-*  
+*
 *  Description:
 *     This routine has to return 1 to the caller (yylex) to indicate that
-*     there is no further text to come.
+*     there is no further text to come.  Additionally here, we output
+*     directly any text in preval, since if it hasn't yet been returned
+*     to the parser, it won't be returned at all.
 *-
 */
+      if ( preleng > 0 ) {
+         uadd( preval );
+         preleng = 0;
+         prealloc = 0;
+      }
       return(1);
    }
 
@@ -194,62 +213,53 @@ void count();
 *-
 */
 
-/* Local variables. */
-      char *entity, c;
-      int leng, wleng, i, j;
-
-/* Allocate the amount of space we will probably need (this may be an 
-   underestimate, if so it will get extended later). */
-      leng = yyleng;
-      yylval = (char *) malloc( leng + 1 );
-
-/* Go through token text a character at a time transferring to storage at
-   yyllval. */
-      for ( i = j = 0; i < yyleng; i++ ) {
-         c = yytext[ i ];
-
-/* Arrange for entity reference substitution if necessary. */
-         switch( c ) {
-            case '<':
-               entity = "&lt;";
-               wleng = 4;
-               break;
-            case '>':
-               entity = "&gt;";
-               wleng = 4;
-               break;
-            case '&':
-               entity = "&amp;";
-               wleng = 5;
-               break;
-            default:
-               wleng = 1;
-         }
-
-/* Either copy a single character */
-         if ( wleng == 1 ) {
-            yylval[ j++ ] = c;
-         }
-
-/* Or copy a string (the entity reference) in which case we need to extend
-   the memory allocated for the purpose. */
-         else {
-            wleng = strlen( entity );
-            leng += wleng;
-            yylval = (char *) realloc( yylval, leng + 1 );
-            strcpy( yylval + j, entity );
-            j += wleng;
-         }
+/* Append preval and the matched text. */
+      yyleng = preleng + strlen( yytext );
+      yylval = (char *) malloc( yyleng + 1 );
+      if ( preleng > 0 ) {
+         strcpy( yylval, preval );
+         strcat( yylval, yytext );
+      }
+      else {
+         strcpy( yylval, yytext );
       }
 
-/* Finish off the string. */
-      yylval[ j ] = '\0';
+/* Reclaim space used by preval if necessary. */
+      if ( prealloc > 0 ) {
+         free( preval );
+         preleng = 0;
+         prealloc = 0;
+      }
 
 /* Store the position of this encountered string in the global list. */
       uadd( yylval );
 
 /* Set to the normal (i.e. not first token in the line) lex start state. */
       BEGIN 0;
+   }
+
+
+   void ecount() {
+/*
+*+
+*  Name:
+*     ecount
+*
+*  Purpose:
+*     Set yylval substituting entity references.
+*-
+*/
+      int i;
+      for ( i = 0; i < strlen( yytext ); i++ )
+         cappend( yytext[ i ] );
+      *yytext = '\0';
+      yyleng = 0;
+      count();
+   }
+
+
+   void munch() {
+      sappend( yytext );
    }
 
 
