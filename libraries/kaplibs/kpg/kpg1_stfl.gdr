@@ -150,6 +150,8 @@
       DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input pixel coords
       DOUBLE PRECISION POS( NDF__MXDIM ) ! Ouput WCS coords
       INTEGER I                  ! Loop counter for dimensions
+      INTEGER IPIX               ! Index of PIXEL Frame in IWCS
+      INTEGER MAP                ! Mapping from PIXEL to current coords
       INTEGER NWCS               ! Number of current Frame coords
       INTEGER NC1                ! No. of characters in BUF1
       INTEGER NC2                ! No. of characters in BUF2
@@ -165,6 +167,10 @@
  
 *  Store the number of WCS axes.
       NWCS = AST_GETI( IWCS, 'NAXES', STATUS ) 
+ 
+*  Get the Mapping from PIXEL Frame to the current Frame.
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+      MAP = AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, STATUS )
  
 *  Display the pixel sum.
       CALL FIO_WRITE( IFIL, ' ', STATUS )
@@ -221,7 +227,7 @@
             DO I = 1, NDIM
                POSIN( I ) = DBLE( MINP( I ) ) + 0.5D0
             END DO
-            CALL AST_TRANN( IWCS, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
+            CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
 
 *  Now create the WCS text string.
@@ -269,7 +275,7 @@
             DO I = 1, NDIM
                POSIN( I ) = DBLE( MAXP( I ) ) + 0.5D0
             END DO
-            CALL AST_TRANN( IWCS, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
+            CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
 
 *  Now create the WCS text string.
@@ -363,4 +369,7 @@
       END IF
       CALL FIO_WRITE( IFIL, ' ', STATUS )
  
+*  Annul the Mapping pointer.
+      CALL AST_ANNUL( MAP, STATUS )
+
       END
