@@ -22,7 +22,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSS_PAR'
 *
@@ -68,7 +67,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSS_PAR'
 *
@@ -202,7 +200,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSS_PAR'
@@ -454,7 +451,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -537,7 +533,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
