@@ -261,7 +261,8 @@
          CALL POL1_CNEWS( CI, 'DP', (II .NE. CAT__NOID), CAT__TYPER, 0, 
      :                    '%', 'F6.3', 'Standard deviation on '//
      :                    'percentage polarisation', II, STATUS )
-         CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
+         IF( II .NE. CAT__NOID ) CALL CAT_TATTL( II, 'PRFDSP', .FALSE., 
+     :                                           STATUS )
       END IF
 
 *  Polarisation angle (degrees). 
@@ -272,7 +273,8 @@
          CALL POL1_CNEWS( CI, 'DANG', (II .NE. CAT__NOID), CAT__TYPER,
      :                    0, 'Degrees', 'F6.3', 'Standard deviation '//
      :                    'on polarisation angle', II, STATUS )
-         CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
+         IF( II .NE. CAT__NOID ) CALL CAT_TATTL( II, 'PRFDSP', .FALSE., 
+     :                                           STATUS )
       END IF
 
 *  Polarised intensity.
@@ -283,7 +285,8 @@
          CALL POL1_CNEWS( CI, 'DPI', (II .NE. CAT__NOID), CAT__TYPER, 0, 
      :                    UNITS, 'G13.6', 'Standard deviation on '//
      :                    'polarised intensity', II, STATUS )
-         CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
+         IF( II .NE. CAT__NOID ) CALL CAT_TATTL( II, 'PRFDSP', .FALSE., 
+     :                                           STATUS )
       END IF
 
 *  Add a Frame describing the reference direction to the supplied WCS
