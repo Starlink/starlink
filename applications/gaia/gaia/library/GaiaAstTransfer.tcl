@@ -104,7 +104,7 @@ itcl::class gaia::GaiaAstTransfer {
 
       #  Add table for displaying coordinates.
       itk_component add table {
-         GaiaAstTransferTable $w_.table \
+         gaia::GaiaAstTransferTable $w_.table \
             -markmenu $Markers \
             -rtdimage $itk_option(-rtdimage) \
             -canvas $itk_option(-canvas) \

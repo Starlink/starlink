@@ -32,7 +32,7 @@
 #     {enter_changes_here}
 
 #-
-global env
+global ::env ::tcl_version
 
 #.
 

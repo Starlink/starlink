@@ -71,12 +71,12 @@ itcl::class gaia::GaiaAstTransferTable {
       #  Change the internal configuration of Table widget to suit.
       set selectmode_ single
       set exportselection_ 1
-      eval StarAstTable::constructor $args
+      eval gaia::StarAstTable::constructor $args
    } {
 
       #  Evaluate any options [incr Tk].
-      itk_option remove StarAstTable::coupled
-      itk_option remove StarAstTable::bind_enters
+      itk_option remove gaia::StarAstTable::coupled
+      itk_option remove gaia::StarAstTable::bind_enters
       eval itk_initialize $args
 
       #  Override short help for Table window.
@@ -262,7 +262,7 @@ itcl::class gaia::GaiaAstTransferTable {
       $itk_component(targets) clear
 
       #  Locate and add all images. The current image is "$target_".
-      set images [SkyCat::get_skycat_images]
+      set images [skycat::SkyCat::get_skycat_images]
 
       #  And add to the menu.
       foreach w $images {

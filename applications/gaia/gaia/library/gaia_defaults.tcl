@@ -97,8 +97,9 @@ proc gaia::setXdefaults {} {
     option add *GaiaQueryResult.headingLines 1
     option add *GaiaQueryResult.titleFont    $labelFont
 
-    #  Stop ugly tearoff menus.
+    #  Stop ugly tearoff menus and post using "flush", as in Tk4.2.
     option add *TearOff  0 userDefault
+    option add *Menubutton*direction flush
 
     #  Fonts for canvas draw (used here as work around to modifying
     #  code, these are the Solaris Xsun optimised names).

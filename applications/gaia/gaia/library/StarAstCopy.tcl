@@ -80,7 +80,7 @@ itcl::class gaia::StarAstCopy {
 
       #  Remove options we're overriding from base class and then
       #  evaluate all options.
-      itk_option remove FileSelect::filter_types
+      itk_option remove util::FileSelect::filter_types
       eval itk_initialize $args
 
       #  Set the top-level window title.

@@ -94,7 +94,7 @@ itcl::class gaia::StarAstTable {
        eval itk_initialize $args
 
        #  Get name of TopLevelWidget (no . allowed!).
-       set top_ [winfo command [winfo toplevel $w_]]
+       set top_ [winfo toplevel $w_]
 
        # Add options to the edit menu if given.
        if { $itk_option(-editmenu) != {} } {

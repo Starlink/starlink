@@ -143,9 +143,22 @@ itcl::class gaia::Gaia {
    destructor {
    }
 
+   #  XXX Quit the application. Really.... Rtd doesn't.
+   public method quit {} {
+      delete object $this
+      after idle exit
+   }
+
    #  Called after the options have been evaluated. Add GAIA menu and
    #  extra items for other menus.
    public method init {} {
+
+      #  If not first window then show splash screen (better than no feedback).
+      if { $itk_option(-number) != 1 } { 
+         make_init_window 1
+      }
+
+      #  Do base class inits.
       SkyCat::init
 
       #  Get the clone number for this window.
@@ -189,26 +202,35 @@ itcl::class gaia::Gaia {
    }
 
    #  Display a window while the application is starting up, overriden
-   #  to remove skycat logo. Put back for plugin?
-   protected method make_init_window {} {
+   #  to remove skycat logo and add plain option for showing
+   #  minimalist stuff when creating a clone.
+   protected method make_init_window {{plain 0}} {
       global ::about_skycat ::gaia_library
-      set gaia_logo [image create pixmap -file $gaia_library/gaia_logo.xpm]
       set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
       rtd_set_cmap $w
       wm title $w "GAIA::SkyCat loading..."
       wm withdraw $w_
-      pack \
-         [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
-         -side top -padx 1m -pady 1m
-      pack \
-         [message $w.msg -text $about_skycat \
-             -width 8i \
-             -justify center \
-             -borderwidth 2 -relief groove] \
-         [ProgressBar $w.progress \
-             -from 0 -to 10 -value 0 \
-             -borderwidth 2 -relief groove] \
-         -side top -fill x -padx 1m -pady 2m -expand 1
+      if { ! $plain } { 
+         set gaia_logo [image create pixmap -file $gaia_library/gaia_logo.xpm]
+         pack \
+            [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
+            -side top -padx 1m -pady 1m
+         pack \
+            [message $w.msg -text $about_skycat \
+                -width 8i \
+                -justify center \
+                -borderwidth 2 -relief groove] \
+            [ProgressBar $w.progress \
+                -from 0 -to 10 -value 0 \
+                -borderwidth 2 -relief groove] \
+            -side top -fill x -padx 1m -pady 2m -expand 1
+      } else {
+         pack \
+            [ProgressBar $w.progress \
+                -from 0 -to 10 -value 0 \
+                -borderwidth 2 -relief groove] \
+            -side top -fill x -padx 1m -pady 2m -expand 1
+      }
       tkwait visibility $w
    }
 
@@ -298,6 +320,9 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-v> [code $image_ reopen]
       bind $w_  <Control-s> [code $image_ save_as]
       catch {$m delete "Save region as..."}
+      $m entryconfigure "Close" -label "Delete Window" -accelerator {Control-d}
+      bind $w_  <Control-d> "after idle destroy $w_"
+      $m entryconfigure "Print..." -accelerator {Control-p}
       bind $w_  <Control-p> [code $image_ print]
       bind $w_  <Control-n> [code $this clone]
       bind $w_  <Control-q> [code $this quit]
@@ -361,8 +386,8 @@ itcl::class gaia::Gaia {
       add_menuitem $m.photom command "Results in data counts..." \
          {Display aperture photometry toolbox (results in image data units)} \
          -command [code $this make_toolbox countphotom] \
-         -accelerator {Control-d}
-      bind $w_ <Control-d> [code $this make_toolbox countphotom]
+         -accelerator {Control-g}
+      bind $w_ <Control-g> [code $this make_toolbox countphotom]
 
       add_menuitem $m command "Image regions..." \
          {Perform operations on regions of image} \
@@ -746,11 +771,11 @@ itcl::class gaia::Gaia {
    #  Make a new main window, named either the next in sequence or
    #  using a given name.
    method clone {args} {
-      global ::argv ::argc
+      global ::argv ::argc ::gaia_usage
       set argv $args
       set argc [llength $argv]
       # use the -noop option to avoid reloading the main image (part of $argv list)
-      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file"]
+      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"]
       return $prefix_[expr $clone_+1]
    }
 

@@ -515,10 +515,21 @@ itcl::class gaia::GaiaImageCtrl {
    #  current image (used when deciding to delete file, shared
    #  temporary files are retained until all instances are released).
    private method only_user_ {} {
-      foreach inst [info objects "*" -isa "GaiaImageCtrl"] {
-         if { $inst != $this } {
-            if { $last_file_ == [$inst cget -file] } {
-               return 0
+      global ::tcl_version
+      if { $tcl_version >= 8.0 } { 
+         foreach inst [itcl::find objects "*" -isa "GaiaImageCtrl"] {
+            if { $inst != $this } {
+               if { $last_file_ == [$inst cget -file] } {
+                  return 0
+               }
+            }
+         }
+      } else {
+         foreach inst [info objects "*" -isa "GaiaImageCtrl"] {
+            if { $inst != $this } {
+               if { $last_file_ == [$inst cget -file] } {
+                  return 0
+               }
             }
          }
       }
@@ -534,11 +545,11 @@ itcl::class gaia::GaiaImageCtrl {
          #  other window has an interest in it.
          if { [only_user_] } {
             raise $w_
-            regsub {\.rtd} $top_ {} clone
+            regsub {\.gaia} $top_ {} clone
             set d [DialogWidget .#auto \
                       -title {Temporary image} \
                       -text "The image ($last_file_) that was displayed in \
-                             window GAIA/SkyCat ($clone) is marked \
+                             window GAIA::Skycat: ($clone) is marked \
                              temporary.\n\Are you sure you want to delete it?"\
                       -buttons [list Yes No]]
             set answer [$d activate]

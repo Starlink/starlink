@@ -406,12 +406,12 @@ ImageData* StarRtdImage::getStarImage(const char* filename, const char* slice)
       isfits = 0;
 
   if (!isfits && (isNDFtype( type ) || slice)) {
-    imio = NDFIO::read(file(), component());
+    imio = NDFIO::read( filename, component() );
   }  else {
     // Note: since some starlink routines access the raw data and expect
     // it to be already byte-swapped, if needed, we have to use a special
     // class that makes a memory copy of the image, if needed.
-    imio = StarFitsIO::read(file(), Mem::FILE_PRIVATE|Mem::FILE_RDWR);
+    imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE|Mem::FILE_RDWR );
 
   }
   if (imio.status() != 0)
@@ -1100,11 +1100,13 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
           // frameset mappings.
           astSetI( wcs, "Current", AST__BASE );
           AstFrameSet *cvt = (AstFrameSet *) astConvert( wcs, newsky, "" );
-          if ( !astOK ) {
-            more_error ( "failed to convert from existing system "
-                         "coordinates to new system");
+          if ( !astOK || cvt == (AstFrameSet *) NULL ) {
+            more_error ( "cannot find a way to convert your existing "
+                         "coordinates to the requested system");  
             inerror = 1;
-            cvt = (AstFrameSet *) astAnnul( cvt );
+            if ( cvt != (AstFrameSet *) NULL ) {
+              cvt = (AstFrameSet *) astAnnul( cvt );
+            }
           } else {
 
             // New frameset replaces old frameset.
