@@ -1,9 +1,7 @@
 package edu.hawaii.jach.gsd;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 
 /**
  * Information relating to a particular item in a GSD file.
@@ -31,12 +29,19 @@ public final class GSDItem {
     // to represent a string in the data segment of a GSD file.
     private static final int GSD__SZCHAR = 16;
 
+    // The lookup table for comments and long names
+    private static final GSDItemLut lutInfo = GSDItemLut.getLut();
+
     // Instance variables that contain information useful
     // for public consumption.
     private final int number;
     private final String name;
     private final String unit;
     private final char type;
+
+    // Cached long name and comment
+    private final String comment;
+    private final String longName;
 
     // For the dimensional information we simply extract that from
     // other scalar items (if we are an array item)
@@ -70,7 +75,6 @@ public final class GSDItem {
     // Useful for stopping loops whilst reading the data in.
     private final int ndims;
 
-
     /**
      * Constructor takes all arguments required to configure a GSDItem
      * and is package-private. GSDItem object can currently only be
@@ -80,25 +84,36 @@ public final class GSDItem {
      * after the item header is read, the array items can only be specified
      * after the scalar items have content)
      */
-    GSDItem(int itemnum, int start_byte, int nbytes,
-	    int ndims, String item_name, String item_unit, char type,
-	    GSDItem[] dimitems ) {
+    GSDItem(
+        int itemnum,
+        int start_byte,
+        int nbytes,
+        int ndims,
+        String item_name,
+        String item_unit,
+        char type,
+        GSDItem[] dimitems) {
 
-	// Nothing clever
-	this.number = itemnum;
-	this.start_byte = start_byte;
-	this.nbytes = nbytes;
+        // Nothing clever
+        this.number = itemnum;
+        this.start_byte = start_byte;
+        this.nbytes = nbytes;
 
-	// could have a private setter for this? Only an issue if it 
-	// is set somewhere else.
-	if (ndims < 0) { ndims = 0; }
-	this.ndims = ndims;
-	this.name = item_name.toUpperCase();
-	this.unit = item_unit;
-	this.type = type;
-	this.dimitems = dimitems;
+        // could have a private setter for this? Only an issue if it 
+        // is set somewhere else.
+        if (ndims < 0) {
+            ndims = 0;
+        }
+        this.ndims = ndims;
+        this.name = item_name.toUpperCase();
+        this.unit = item_unit;
+        this.type = type;
+        this.dimitems = dimitems;
+
+        // Populate the long name and comment
+        this.longName = lutInfo.getLongName(this.name);
+        this.comment = lutInfo.getComment(this.name);
     }
-
 
     /**
      * Set the (possibly) mapped ByteBuffer associated with the data
@@ -106,7 +121,9 @@ public final class GSDItem {
      * the file has been unmapped. This is package private.
      *
      */
-    void contents( ByteBuffer buf ) {this.contents = buf; }
+    void contents(ByteBuffer buf) {
+        this.contents = buf;
+    }
 
     /**
      * Store the actual data associated with this item. Should only
@@ -114,7 +131,9 @@ public final class GSDItem {
      * since currently the data segement is read from a GSD file after the
      * indivudal Items have been instantiated.
      */
-    private void setData( Object thedata ) { this.data = thedata; };
+    private void setData(Object thedata) {
+        this.data = thedata;
+    };
 
     // Accessor methods
 
@@ -123,7 +142,9 @@ public final class GSDItem {
      * This is also the number of elements in the dimnames(),
      * dimunits() and dimensions() arrays.
      */
-    public int ndims() { return this.ndims; }
+    public int ndims() {
+        return this.ndims;
+    }
 
     /**
      * For array items, each dimension in the data array is described
@@ -133,30 +154,54 @@ public final class GSDItem {
      *
      * @return An array of GSDItem object corresponding to each dimension.
      */
-    public GSDItem[] dimitems() { 
-	if (isArray() ) {
-	    // if we are an array item, return a clone of the actual dimitems.
-	    // It must be a clone to enfore immutability on this class
-	    return (GSDItem[])this.dimitems.clone();
-	} else {
-	    return new GSDItem[0];
-	}
+    public GSDItem[] dimitems() {
+        if (isArray()) {
+            // if we are an array item, return a clone of the actual dimitems.
+            // It must be a clone to enfore immutability on this class
+            return (GSDItem[]) this.dimitems.clone();
+        } else {
+            return new GSDItem[0];
+        }
     }
 
     /**
      * The item number in the original GSD file.
      */
-    public int number() { return this.number;}
+    public int number() {
+        return this.number;
+    }
 
     /**
      * The name of the item.
      */
-    public String name() { return this.name; }
+    public String name() {
+        return this.name;
+    }
 
     /**
      * The units associated with the data.
      */
-    public String unit() { return this.unit; }
+    public String unit() {
+        return this.unit;
+    }
+
+    /**
+     * The long (JCMT) name for the GSD Item.
+     * 
+     * @return
+     */
+    public String longName() {
+        return this.longName;
+    }
+
+    /**
+     * Return the description of the item.
+     *
+     * @return the (JCMT) comment.
+     */
+    public String comment() {
+        return this.comment;
+    }
 
     /**
      * A single character describing the underlying data type.
@@ -171,30 +216,32 @@ public final class GSDItem {
      * <dt>L</dt><dd>Boolean</dd>
      * </dl>
      */
-    public char type() { return this.type; }
+    public char type() {
+        return this.type;
+    }
 
     /**
      * Indicates whether the item is scalar or an array of values.
      * 
      */
-    public boolean isArray() { 
-	boolean result = true;
-	if (this.ndims == 0) {
-	    result = false;
-	}
-	return result;
+    public boolean isArray() {
+        boolean result = true;
+        if (this.ndims == 0) {
+            result = false;
+        }
+        return result;
     }
 
     /**
      * If an array, this is the dimensionality of the data array.
      */
-    public int[] dimensions()  { 
-	int[] dims = new int[ ndims ];
-	for (int i = 0; i < ndims; i++ ) {
-	    Integer val = (Integer)dimitems[i].getData();
-	    dims[i] = val.intValue();
-	}
-	return dims;
+    public int[] dimensions() {
+        int[] dims = new int[ndims];
+        for (int i = 0; i < ndims; i++) {
+            Integer val = (Integer) dimitems[i].getData();
+            dims[i] = val.intValue();
+        }
+        return dims;
     }
 
     /**
@@ -203,11 +250,25 @@ public final class GSDItem {
      * @return ndims strings.
      */
     public String[] dimnames() {
-	String[] names = new String[ ndims ];
-	for (int i = 0; i < ndims; i++ ) {
-	    names[i] = dimitems[i].name();
-	}
-	return names;
+        String[] names = new String[ndims];
+        for (int i = 0; i < ndims; i++) {
+            names[i] = dimitems[i].name();
+        }
+        return names;
+    }
+
+    /**
+     * If an array, this is the name of each axis, using the
+     * long name of the item.
+     *
+     * @return ndims strings.
+     */
+    public String[] dimnamesLong() {
+        String[] names = new String[ndims];
+        for (int i = 0; i < ndims; i++) {
+            names[i] = dimitems[i].longName();
+        }
+        return names;
     }
 
     /**
@@ -216,11 +277,11 @@ public final class GSDItem {
      * @return ndims strings.
      */
     public String[] dimunits() {
-	String[] units = new String[ ndims ];
-	for (int i = 0; i < ndims; i++ ) {
-	    units[i] = dimitems[i].unit();
-	}
-	return units;
+        String[] units = new String[ndims];
+        for (int i = 0; i < ndims; i++) {
+            units[i] = dimitems[i].unit();
+        }
+        return units;
     }
 
     /**
@@ -231,11 +292,11 @@ public final class GSDItem {
      * @return ndims numbers
      */
     public int[] dimnumbers() {
-	int[] nums = new int[ ndims ];
-	for (int i = 0; i < ndims; i++ ) {
-	    nums[i] = dimitems[i].number();
-	}
-	return nums;
+        int[] nums = new int[ndims];
+        for (int i = 0; i < ndims; i++) {
+            nums[i] = dimitems[i].number();
+        }
+        return nums;
     }
 
     /**
@@ -248,12 +309,12 @@ public final class GSDItem {
      *
      * @return A single object that must be cast into the correct type.
      */
-    public Object getData() { 
-	if (this.data == null) {
-	    // try to read
-	    this.attachItemData();
-	}
-	return this.data;
+    public Object getData() {
+        if (this.data == null) {
+            // try to read
+            this.attachItemData();
+        }
+        return this.data;
     }
 
     /**
@@ -265,13 +326,13 @@ public final class GSDItem {
      * @return the number of elements.
      */
     public int size() {
-	int nelm = 1;
-	if (this.isArray() ){
-	    int[] dims = this.dimensions();
-	    for (int i=0; i<this.ndims; i++) {
-		nelm *= dims[i];
-	    }
-	}
+        int nelm = 1;
+        if (this.isArray()) {
+            int[] dims = this.dimensions();
+            for (int i = 0; i < this.ndims; i++) {
+                nelm *= dims[i];
+            }
+        }
         return nelm;
     }
 
@@ -279,20 +340,28 @@ public final class GSDItem {
      * Return a short description of the item.
      */
     public String toString() {
-	String header = this.name() + "  [" + this.unit() +
-	   "] Type:" + this.type();
+        String header =
+            this.name() + "  [" + this.unit() + "] Type:" + this.type();
 
         // Different display depending on array type
         if (this.isArray()) {
             String size = "" + this.size();
-            header = header + " [Array]" + " " +
-                "Array size=" + size;
+            header = header + " [Array]" + " " + "Array size=" + size;
         } else {
             header = header + " [Scalar]" + " ";
-	    Object data = this.getData();
-	    header = header + data;
+            String myquote;
+            // Make sure that we quote strings to disambiguate them from the
+            // surroundings.
+            if (this.type() == 'C') {
+                myquote = "\"";
+            } else {
+                myquote = "";
+            }
+            Object data = this.getData();
+            header = header + myquote + data + myquote;
         }
-	return header;
+        header = header + " aka " + lutInfo.getLongName(this.name());
+        return header;
     }
 
     /**
@@ -302,8 +371,8 @@ public final class GSDItem {
      *
      */
     public void dumpIt() {
-	// Simply call dumpIt with a negative value
-	dumpIt( -1 );
+        // Simply call dumpIt with a negative value
+        dumpIt(-1);
     }
 
     /**
@@ -319,62 +388,71 @@ public final class GSDItem {
      *                 dumped regardless of size.
      */
 
-    public void dumpIt( long maxsize ) {
+    public void dumpIt(long maxsize) {
 
-	String header = this.name() + "      " + this.unit() +
-	    "     " + this.type();
+        String header =
+            GSDHelper.padString(this.longName(), GSDObject.GSD__SZNAME)
+                + " "
+                + GSDHelper.padString(this.unit(), GSDObject.GSD__SZUNIT)
+                + " "
+                + this.type();
 
-	// Different display depending on array type
-	if (this.isArray()) {
-	    String size = "" + this.size();
-	    header = header + " 1" + "      " +
-		"Array size=" + size;
-	} else {
-	    header = header + " 0" + "      " + this.getData();
-	}
-	System.out.println(header);
-	
-	if (this.isArray()) {
-	    // dimensions
-	    int[] dims = this.dimensions();
-	    if ( dims != null ) {
-		String[] dimnames = this.dimnames();
-		String[] dimunits = this.dimunits();
-		for(int i=0;i<dims.length;i++){
-		    System.out.println(" > " + dimnames[i] +
-				       " " +  dims[i] +
-				       " [" + dimunits[i] + "] ");
-		}
-	    } else {
-		System.out.println(" > Dimensions not defined ");
-	    }
+        // Different display depending on array type
+        if (this.isArray()) {
+            String size = "" + this.size();
+            header = header + "       1" + "       " + "Array size=" + size;
+        } else {
+            header = header + "       0" + "       " + this.getData();
+        }
+        System.out.println(header);
+        //System.out.println(this.comment());
 
-	    // Print out the data values 4 per line
-	    System.out.println(" Data:");
-	    String row = "";
-	    int length = this.size();
-	    if ((length <= maxsize) || (maxsize < 0)) {
-		// Force read of data
-		Object arrdata = this.getData();
-		if (arrdata != null) {
-		    for (int i = 0; i< length; i++) {
-			row = row + "   " + Array.get(arrdata,i);
-			if ((i+1) % 4 == 0) {
-			    System.out.println(row);
-			    row = "";
-			}
-		    }
-		    // print out the final row even if it is short
-		    if (row.length() > 0) {
-			System.out.println(row);
-		    }
-		} else {
-		    System.out.println("Data array not defined");
-		}
-	    } else {
-		System.out.println("Number of values exceeds limit");
-	    }
-	}
+        if (this.isArray()) {
+            // dimensions
+            int[] dims = this.dimensions();
+            if (dims != null) {
+                String[] dimnames = this.dimnamesLong();
+                String[] dimunits = this.dimunits();
+                for (int i = 0; i < dims.length; i++) {
+                    System.out.println(
+                        " > "
+                            + dimnames[i]
+                            + " "
+                            + dims[i]
+                            + " ["
+                            + dimunits[i]
+                            + "] ");
+                }
+            } else {
+                System.out.println(" > Dimensions not defined ");
+            }
+
+            // Print out the data values 4 per line
+            System.out.println(" Data:");
+            String row = "";
+            int length = this.size();
+            if ((length <= maxsize) || (maxsize < 0)) {
+                // Force read of data
+                Object arrdata = this.getData();
+                if (arrdata != null) {
+                    for (int i = 0; i < length; i++) {
+                        row = row + "   " + Array.get(arrdata, i);
+                        if ((i + 1) % 4 == 0) {
+                            System.out.println(row);
+                            row = "";
+                        }
+                    }
+                    // print out the final row even if it is short
+                    if (row.length() > 0) {
+                        System.out.println(row);
+                    }
+                } else {
+                    System.out.println("Data array not defined");
+                }
+            } else {
+                System.out.println("Number of values exceeds limit");
+            }
+        }
 
     }
 
@@ -384,92 +462,113 @@ public final class GSDItem {
      * Given a GSDItem, attempt to attach data to it. Nothing is
      * returned, the Item is modified in place. This method is called
      * automatically when the GSDItem.getData() method is invoked if
-     * the data have not previously been read from file.
+     * the data have not previously been read from file. Strings are trimmed
+     * of excess spaces.
      */
     private void attachItemData() {
-	// First we need to read the bytes from the file
-	// This may not be the most memory efficient approach
-	// for really large buffers
+        // First we need to read the bytes from the file
+        // This may not be the most memory efficient approach
+        // for really large buffers
 
-	// First make sure we have a buffer
-	if (this.contents == null) {
-	    return;
-	}
+        // First make sure we have a buffer
+        if (this.contents == null) {
+            return;
+        }
 
-	// find out the type
-	char type = this.type();
+        // find out the type
+        char type = this.type();
 
-	// Now we need to convert to native number[s]
-	if (this.isArray()) {
-	    // could do scalars and arrays with the same logic
-	    // simply because the number of elements will be one
-	    // each time. I need to practice with casting an Object[]
-	    // to an Object first.
+        // Now we need to convert to native number[s]
+        if (this.isArray()) {
+            // could do scalars and arrays with the same logic
+            // simply because the number of elements will be one
+            // each time. I need to practice with casting an Object[]
+            // to an Object first.
 
-	    if (type == 'B') {
-		this.setData( GSDVAXBytes.tobyteArrayNB( contents,
-							 this.start_byte,
-							 this.nbytes ) );
-	    } else if (type == 'L') {
-		this.setData( GSDVAXBytes.toboolArrayNB( contents,
-							 this.start_byte,
-							 this.nbytes ) );
-	    } else if (type == 'W') {
-		this.setData( GSDVAXBytes.toshortArrayNB( contents,
-							  this.start_byte,
-							  this.nbytes ) );
-	    } else if (type == 'I') {
-		this.setData( GSDVAXBytes.tointArrayNB( contents,
-							this.start_byte,
-							this.nbytes ) );
-	    } else if (type == 'R') {
-		this.setData( GSDVAXBytes.tofloatArrayNB( contents,
-							  this.start_byte,
-							  this.nbytes ) );
+            if (type == 'B') {
+                this.setData(
+                    GSDVAXBytes.tobyteArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes));
+            } else if (type == 'L') {
+                this.setData(
+                    GSDVAXBytes.toboolArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes));
+            } else if (type == 'W') {
+                this.setData(
+                    GSDVAXBytes.toshortArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes));
+            } else if (type == 'I') {
+                this.setData(
+                    GSDVAXBytes.tointArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes));
+            } else if (type == 'R') {
+                this.setData(
+                    GSDVAXBytes.tofloatArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes));
 
-	    } else if (type == 'D') {
-		this.setData( GSDVAXBytes.todoubleArrayNB( contents,
-							   this.start_byte,
-							   this.nbytes ) );
-	    } else if (type == 'C') {
-		this.setData( GSDVAXBytes.tostringArrayNB( contents,
-							   this.start_byte,
-							   this.nbytes,
-							   GSD__SZCHAR) );
-	    }
-	    
+            } else if (type == 'D') {
+                this.setData(
+                    GSDVAXBytes.todoubleArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes));
+            } else if (type == 'C') {
+                String[] stringarr =
+                    GSDVAXBytes.tostringArrayNB(
+                        contents,
+                        this.start_byte,
+                        this.nbytes,
+                        GSD__SZCHAR);
+                // Trim [either here or in the GSDVAXBytes.
+                // Still undecided. It seems to me that the
+                // bytes to String conversion should respect trailing
+                // spaces in general.
+                for (int i = 0; i < stringarr.length; i++) {
+                    stringarr[i] = stringarr[i].trim();
+                }
+                this.setData(stringarr);
+            }
 
-	} else {
+        } else {
 
-	    // Then position the buffer offset
-	    this.contents.position( this.start_byte );
+            // Then position the buffer offset
+            this.contents.position(this.start_byte);
 
-	    // a byte array to receive the scalar data
-	    // We know this is going to be a small array
-	    // so do not need to worry about memory consumption
-	    byte[] byteArray = new byte[ this.nbytes ];
+            // a byte array to receive the scalar data
+            // We know this is going to be a small array
+            // so do not need to worry about memory consumption
+            byte[] byteArray = new byte[this.nbytes];
 
-	    // and read in the data
-	    contents.get( byteArray );
-	
-	    // switch on type
-	    if (type == 'B') {
-		this.setData( new Byte( GSDVAXBytes.tobyte( byteArray ) ) );
-	    } else if (type == 'L') {
-		this.setData( new Boolean( GSDVAXBytes.tobool( byteArray ) ) );
-	    } else if (type == 'W') {
-		this.setData( new Short( GSDVAXBytes.toshort( byteArray ) ) );
-	    } else if (type == 'I') {
-		this.setData( new Integer( GSDVAXBytes.toint( byteArray ) ) );
-	    } else if (type == 'R') {
-		this.setData( new Float( GSDVAXBytes.tofloat( byteArray ) ) );
-	    } else if (type == 'D') {
-		this.setData( new Double( GSDVAXBytes.todouble( byteArray ) ));
-	    } else if (type == 'C') {
-		this.setData( GSDVAXBytes.tostring( byteArray ) );
-	    }
-	}
+            // and read in the data
+            contents.get(byteArray);
+
+            // switch on type
+            if (type == 'B') {
+                this.setData(new Byte(GSDVAXBytes.tobyte(byteArray)));
+            } else if (type == 'L') {
+                this.setData(new Boolean(GSDVAXBytes.tobool(byteArray)));
+            } else if (type == 'W') {
+                this.setData(new Short(GSDVAXBytes.toshort(byteArray)));
+            } else if (type == 'I') {
+                this.setData(new Integer(GSDVAXBytes.toint(byteArray)));
+            } else if (type == 'R') {
+                this.setData(new Float(GSDVAXBytes.tofloat(byteArray)));
+            } else if (type == 'D') {
+                this.setData(new Double(GSDVAXBytes.todouble(byteArray)));
+            } else if (type == 'C') {
+                this.setData(GSDVAXBytes.tostring(byteArray).trim());
+            }
+        }
     }
-
 
 }
