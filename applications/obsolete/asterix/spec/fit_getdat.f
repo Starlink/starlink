@@ -875,10 +875,12 @@ c110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
      :                      %VAL(DATASET_DPTR(NDS)),
      :                      %VAL(DATASET_QPTR(NDS)),SSCALE)
                 CALL FIT_GETDAT_LNDFACQ(DATASET_NDAT(NDS),
-     :                      %VAL(DATASET_DPTR(NDS)),%VAL(DATASET_QPTR(NDS)),
+     :                      %VAL(DATASET_DPTR(NDS)),
+     :                      %VAL(DATASET_QPTR(NDS)),
      :                      LNDFAC)
               ELSE
-	        CALL ARR_SUM1R( DATASET_NDAT(NDS), %VAL(DATASET_DPTR(NDS)),
+	        CALL ARR_SUM1R( DATASET_NDAT(NDS),
+     :                          %VAL(DATASET_DPTR(NDS)),
      :                          RSUM, STATUS )
                 SSCALE = SSCALE + NINT(RSUM)
                 CALL FIT_GETDAT_LNDFAC(DATASET_NDAT(NDS),
