@@ -1,0 +1,39 @@
+76d75
+<  *    sec: Steve Cockayne (JAC, Hilo)
+95,96d93
+<  *    26 Jul 1996 (sec):
+<  *       Support for the actual given filename. 
+133,134c130,131
+< /* Open the GSD file for read access. Check first the actual filename, 
+<  * then upper and lower case suffix and DATADIR
+---
+> /* Open the GSD file for read access. Check upper and lower
+>  * case suffix and DATADIR
+136c133
+<    sprintf( dfile, "%s", file );
+---
+>    sprintf( dfile, "%s.dat", file );
+139c136
+<      sprintf( dfile, "%s.dat", file );
+---
+>      sprintf( dfile, "%s.DAT", file );
+142,152c139,145
+<        sprintf( dfile, "%s.DAT", file );
+<        *fptr = fopen( dfile, "r" );
+<        if ( !*fptr ) { 
+<          if ( datadir != NULL ) {
+<   	   sprintf( dfile, "%s/%s.dat", datadir, file );
+<   	   *fptr = fopen( dfile, "r" );
+<   	   if ( !*fptr ) { 
+<   	     sprintf( dfile, "%s/%s.DAT", datadir, file );
+<   	     *fptr = fopen( dfile, "r" );
+<   	   }
+<          }
+---
+>        if ( datadir != NULL ) {
+> 	 sprintf( dfile, "%s/%s.dat", datadir, file );
+> 	 *fptr = fopen( dfile, "r" );
+> 	 if ( !*fptr ) { 
+> 	   sprintf( dfile, "%s/%s.DAT", datadir, file );
+> 	   *fptr = fopen( dfile, "r" );
+> 	 }
