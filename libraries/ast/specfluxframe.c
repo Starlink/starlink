@@ -4,7 +4,7 @@
 *     SpecFluxFrame
 
 *  Purpose:
-*     Compound spectram/flux Frame.
+*     Compound spectrum/flux Frame.
 
 *  Constructor Function:
 c     astSpecFluxFrame
