@@ -58,7 +58,7 @@
 % EXAMPLE: \paperID{P7-7}
 %
 
-\paperID{ }
+\paperID{FM-3}
 
 %-----------------------------------------------------------------------
 %		            Paper Title 
@@ -76,7 +76,7 @@
 %  \titlemark{Rapid Development for Distributed Computing}
 %
 
-\title{ }
+\title{TOPCAT \& STIL: Starlink Table/VOTable Processing Software}
 %\titlemark{ }
 
 %-----------------------------------------------------------------------
@@ -103,8 +103,12 @@
 % affiliation with the "Astronomy Department".  The fourth author,
 % "Troland", is affiliated with "University of Kentucky"
 
-\author{ }
-\affil{ }
+\author{Mark B.\ Taylor}
+\affil{Starlink,
+       Bristol University,
+       H.\ H.\ Wills Physics Laboratory,
+       Tyndall Avenue,
+       Bristol}
 
 %-----------------------------------------------------------------------
 %			 Contact Information
@@ -118,8 +122,8 @@
 %           \email{crabtree@cfht.hawaii.edu}
 %
 
-\contact{ }
-\email{ }
+\contact{Mark Taylor}
+\email{m.b.taylor@bristol.ac.uk}
 
 %-----------------------------------------------------------------------
 %		      Author Index Specification
@@ -144,8 +148,8 @@
 % of the \paindex and \aindex commmands.
 %
 
-\paindex{ }
-\aindex{ }     % Remove this line if there is only one author
+\paindex{Taylor, M. B.}
+% \aindex{ }     % Remove this line if there is only one author
 
 %-----------------------------------------------------------------------
 %		      Author list for page header	
@@ -162,7 +166,7 @@
 % Use the "et al." form in the case of seven or more authors, or if
 % the preferred form is too long to fit in the header.
 
-\authormark{ }
+\authormark{Taylor}
 
 %-----------------------------------------------------------------------
 %			Subject Index keywords
@@ -181,7 +185,12 @@
 % "radio" as the minor keyword.  The colon is used to introduce another
 % level into the index.
 
-\keywords{  }
+\keywords{VOTable,
+          catalogs,
+          Virtual Observatory,
+          software: applications,
+          software: data analysis,
+          java}
 
 %-----------------------------------------------------------------------
 %			       Abstract
@@ -193,7 +202,36 @@
 
 \begin{abstract}          % Leave intact
 % Place the text of your abstract here - NO BLANK LINES
+%
+The Starlink Tables Infrastructure Library (STIL) is a pure-Java,
+open source library for I/O and manipulation of tabular data such as
+astronomical catalogs.  It is written to be high-performance, and to
+cope with large tables (not limited by available memory).
+The core library is format-neutral, with the work of serialization
+and deserialization performed by pluggable format-specific I/O handlers.
+This means that the programmer seees a high-level abstraction of a table
+which is easy to work with, and also that support for new data 
+formats can be added easily.
+A corollary is that conversion between any of the supported 
+formats is trivial.  Supplied handlers provide support for 
+VOTables, FITS table extensions, relational databases via SQL 
+and plain text tables, amongst others.
+The VOTable handler, which has VOTable-specific as well as generic 
+table features, is believed to be the only existing library 
+capable of reading or writing all the defined VOTable 
+serialization formats (TABLEDATA, FITS, BINARY).
 
+TOPCAT, based on STIL, is a user-friendly graphical program for 
+viewing, analysis and modification of tables.
+It has facilities for plotting, cross matching, row selection, 
+sorting and metadata manipulation.
+Synthetic columns can be created and row selections made using a 
+powerful and extensible algabraic expression language.
+
+A description of how STIL can be used to read or write VOTables 
+or other tables in third party applications is given. 
+TOPCAT's analysis, matching and editing facilities were demonstrated;  
+this paper summarises a few of these capabilities.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -215,12 +253,113 @@
 % and sample2.tex, for examples for formatting references, footnotes,
 % figures, equations, html links, lists, and other special features.  
 
-\section{ }
+\section{Introduction}
+
+Tables are common in astronomy, and are becoming a particularly
+prominent feature of the data produced, transmitted and consumed by
+human and software elements of the Virtual Observatory.
+The fact that the VOTable format is one of the first standards to become
+an IVOA recommendation bears witness to this observation.
+A common example of astronomical tabular data is an object catalogue, 
+but other examples, such as event lists, are important too.
+This paper describes STIL, a library for generic I/O and processing of
+tables, and TOPCAT, a graphical user application built on top of STIL.
+
+\section{STIL}
+
+The Starlink Tables Infrastructure Library (STIL) is a generic I/O
+and processing library for tabular data.  It is open source (released
+under the Gnu Public Licence) and written in pure Java (J2SE1.4),
+making it highly portable and easy to deploy.
+Central to STIL is a relatively simple model of what a table is, namely
+a data structure which has
+\begin{itemize}
+\item Some per-table metadata, 
+      such as name, textual description, curation metadata...
+\item Some per-column metadata,
+      such as a name, textual description, unit information, 
+      Uniform Content Descriptor etc for each column, as well as 
+      a description of the shape and type of data it holds 
+      (integer, string etc)
+\item Cell data themselves, in the form of an entry per column 
+      for each of a number of rows
+\end{itemize}
+The {\tt StarTable} Java language interface embodies this data model,
+and it is {\tt StarTable} objects that the programmer deals with
+when manipulating tables within STIL.
+
+STIL has no native external data format, but a number of pluggable
+input and output handlers.  Input handlers perform the job of 
+deserializing tables from external storage and turning them into 
+StarTables, while output handlers peform the opposite task of taking
+a StarTable and serializing it to external storage.
+Since these I/O handlers are separate from the core processing code,
+it is easy to change their implementation and add new ones 
+without application code being aware of the fact.
+In this way the application programmer does not need to know or
+care whether the table he is manipulating has been obtained from
+a VOTable, FITS HDU, comma-separated value file, or an SQL query
+on a relational database.  Moreover, new handlers can be plugged
+in at runtime, so that an existing application based on STIL can 
+be reconfigured at run-time to read and write new table storage 
+formats without any modifications to the code (in practice this
+can be done using Java system properties).  This way of working
+resembles the way that Java's JDBC database communication layer works.
+A schematic diagram of this architecture is given in Figure~\ref{FM3-fig-1}.
+\begin{figure}
+\plotone{stilarch.eps}
+\caption{Schematic of STIL architecture.} \label{FM3-fig-1}
+\end{figure}
+Among the I/O handlers supplied are ones which can read/write 
+the VOTable format, 
+FITS BINTABLE and TABLE extensions, 
+relational databases, 
+and a number of text-based formats.
+
+As well as I/O, STIL provides a number of facilities for manipulation 
+of tables including ways to add, remove and rearrange columns and rows,
+join and split tables, and modify data and metadata.
+Flexible and efficient facilities for cross-matching are also distributed
+with the library, though these are currently not properly documented
+and somewhat experimental.
+
+Care has been taken to make the I/O and processing facilities scalable
+throughout STIL; the aim in particular is that it should be possible 
+to process a table with arbitrarily many rows in a finite amount of memory.  
+The {\tt StarTable} interface provides both sequential and random
+methods of data access for different processing modes; 
+in the former limited memory use can be achieved
+by streaming the data a row at a time, and in the latter by
+caching the cell data in a temporary disk file.
+
+STIL is fully documented; the public classes have comprehensive javadocs,
+and a user document, SUN/252, which contains examples and overview
+documentation is available in HTML and PDF formats.
+
+\subsection{STIL for VOTables}
+
+As noted above, one of the formats supported by STIL is the XML-based
+VOTable format.  Since this is of particular importance in the Virtual
+Observatory era, and because it has some notable features, there follow
+a few comments on this handler in particular.
+
+The STIL VOTable parser is, as far as we know, the only one
+which fully supports the VOTable standard.
+Although other available parsers can read the pure-XML TABLEDATA variant
+of the format, no others can read the FITS and BINARY variants.
+For reasons of bandwidth and CPU efficiency, TABLEDATA is inappropriate
+for encoding very large amounts of data, so this ability is of
+considerable significance.  As well as reading,
+STIL also makes it easy to write VOTables in any of the three variants.
+
+By use of custom stream-based (SAX) parsing, it is also able to
+provide a hierarchical in-memory view (DOM) of the structure of a 
+VOTable document even when very large tables are involved without
+the customary disadvantage of heavy memory usage.  This capability
+and how it is achieved are explained in more detail in the documentation.
 
 
-
-
-
+\section{TOPCAT}
 
 
 
