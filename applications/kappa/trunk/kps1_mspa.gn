@@ -1,9 +1,9 @@
-      SUBROUTINE KPS1_FSPA<T>( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS,
+      SUBROUTINE KPS1_MSPA<T>( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS,
      :                         YMIN, YMAX, NXPAR, NYPAR, MCHOEF, CHCOEF,
      :                         WORK, OUTARR, STATUS )
 *+
 *  Name:
-*     KPS1_FSPAx
+*     KPS1_MSPAx
 
 *  Purpose:
 *     Evaluates a bivariate Chebyshev polynomial series for all elements
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL KPS1_FSPAx( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS, YMIN,
+*      CALL KPS1_MSPAx( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS, YMIN,
 *                       YMAX, NXPAR, NYPAR, MCHOEF, CHCOEF, WORK,
 *                       OUTARR, STATUS )
 
@@ -77,10 +77,6 @@
 *           Fill the line with bad values
 *        end if
 
-*  External Routines Used:
-*     NAG:
-*        E02CBF
-
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     SMB: Steven M. Beard (ROE)
@@ -100,6 +96,13 @@
 *     1995 August 3 (MJC):
 *        Made generic.  Renamed from PLY2EA.  Used a modern-style
 *        prologue and coding.
+*     1996 October 8 (MJC):
+*        Replaced NAG call.  Although this could have been made truly
+*        generic and losing the WORK array, it would have generated
+*        major changes to the calling application code and other
+*        subroutines it calls.
+*     1997 May 10 (MJC):
+*        Renamed from KPS1_FSPAx.  Reordered code to improve efficiency.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,7 +147,6 @@
       INTEGER J                  ! Loop counter
       INTEGER MFIRST             ! Lower limit of of valid columns
       INTEGER MLAST              ! Upper limit of valid columns
-      INTEGER IFAIL              ! NAG error status
       DOUBLE PRECISION PX( MXPAR ) ! Work array
 
 *  Internal References:
@@ -155,52 +157,42 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Scan through the bins a line at a time. Note for efficiency reasons
-*  the fitting for a whole line is made in a single call.
-      DO J = 1, DIM2
-
-*  Check that the Y co-ordinate for this line is within the valid range.
-         IF ( ( YAXIS( J ) .GE. YMIN ) .AND.
-     :        ( YAXIS( J ) .LE. YMAX ) ) THEN
-
 *  Determine the range of x-axis values which are within the valid
 *  range.  It is assumed there is one contiguous run of good x-axis
 *  values, with any out of range values occurring at the beginning or
 *  end of the XAXIS array.  MFIRST and MLAST will denote the first and
 *  last x values within the good run.
-            I = 1
-            DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
-     :                   ( XAXIS( I ) .GT. XMAX ) ) .AND.
-     :                 ( I .LE. DIM1 ) )
-               I = I + 1
-            END DO
-            MFIRST = I
+      I = 1
+      DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
+     :             ( XAXIS( I ) .GT. XMAX ) ) .AND. ( I .LE. DIM1 ) )
+         I = I + 1
+      END DO
+      MFIRST = I
 
-            I = DIM1
-            DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
-     :                   ( XAXIS( I ) .GT. XMAX ) ) .AND.
-     :                 ( I .GE. 1 ) )
-               I = I - 1
-            END DO
-            MLAST = I
+      I = DIM1
+      DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
+     :             ( XAXIS( I ) .GT. XMAX ) ) .AND. ( I .GE. 1 ) )
+         I = I - 1
+      END DO
+      MLAST = I
 
 *  Check there is a least one good value.
-            IF ( MLAST .GE. MFIRST ) THEN
+      IF ( MLAST .GE. MFIRST ) THEN
+
+*  Scan through the bins a line at a time. Note for efficiency reasons
+*  the fitting for a whole line is made in a single call.
+         DO J = 1, DIM2
+
+*  Check that the Y co-ordinate for this line is within the valid range.
+            IF ( ( YAXIS( J ) .GE. YMIN ) .AND.
+     :           ( YAXIS( J ) .LE. YMAX ) ) THEN
 
 *  Evaluate the fitted surface for all pixels in the line between
 *  columns MFIRST and MLAST.
-               IFAIL = 1
-               CALL E02CBF( MFIRST, MLAST, NXPAR-1, NYPAR-1, XAXIS,
-     :                      XMIN, XMAX, YAXIS(J), YMIN, YMAX, WORK,
-     :                      CHCOEF, MCHOEF, PX, MXPAR, IFAIL )
-
-               IF ( IFAIL .NE. 0 ) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'IFAIL', IFAIL )
-                  CALL ERR_REP( 'KPS1_FSPAx_NAG', 'KPS1_FSPAx: Error '/
-     :              /'^IFAIL returned by E02CBF evaluation.', STATUS )
-                  GO TO 999
-               END IF
+               CALL KPG1_CHE2D( MLAST - MFIRST + 1, XMIN, XMAX,
+     :                          XAXIS( MFIRST ), YMIN, YMAX, YAXIS( J ),
+     :                          NXPAR - 1, NYPAR - 1, MCHOEF, CHCOEF,
+     :                          MXPAR, PX, WORK, STATUS )
 
 *  Return the polynomial values, setting the regions outside the run of
 *  good pixels to bad values.  (Note that the first and third loops may
@@ -225,16 +217,19 @@
                   OUTARR( I, J ) = VAL__BAD<T>
                END DO
             END IF
-         ELSE
+
+*  End of the loops through the line of pixels.
+         END DO
+
+      ELSE
 
 *  Y co-ordinate is the outside range.  Fill the line with bad values.
+         DO J = 1, DIM2
             DO I = 1, DIM1
                OUTARR( I, J ) = VAL__BAD<T>
             END DO
-         END IF
-
-*  End of the loops through the line of pixels.
-      END DO
+         END DO
+      END IF
 
   999 CONTINUE
 
