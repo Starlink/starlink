@@ -7307,6 +7307,7 @@ U java/source/table/src/main/uk/ac/starlink/table/ColumnData.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnPermutedStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnScratchTable.java
+U java/source/table/src/main/uk/ac/starlink/table/ColumnStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
@@ -7358,15 +7359,21 @@ cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ExtendedStarTableModel.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java
 U java/source/table/src/main/uk/ac/starlink/table/view/JELRowReader.java
 U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/PlasticStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/RowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
+U java/source/table/src/main/uk/ac/starlink/table/view/SubsetDialog.java
+U java/source/table/src/main/uk/ac/starlink/table/view/SubsetsDisplay.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticRowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableColumnModelAdapter.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableViewer.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ViewerTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/view/WindowTracker.java
 cvs checkout: Updating java/source/table/src/resources
 cvs checkout: Updating java/source/table/src/resources/uk
