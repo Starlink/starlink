@@ -27,6 +27,7 @@
 *  Authors:
 *     rp: Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     rpt: Remo Tilanus (JAC, Hilo)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,6 +42,9 @@
 *     27 Jan 1994 (hme):
 *        Review to support only disk-FITS and to maximise use of FITS
 *        related libraries in Portable Figaro.
+*     03 May 1999 (rpt)
+*        Since Figaro GEN routines for Byte-swap are now tied to
+*        host type, byte swap can no longer be an option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,8 +121,8 @@
       END IF
 
       BYTESWAP = .TRUE.
-      CALL GEN_YESNO( 'Should disk file be byte-reversed?',
-     :   BYTESWAP, BYTESWAP, ISTAT )
+*       CALL GEN_YESNO( 'Should disk file be byte-reversed?',
+*     :   BYTESWAP, BYTESWAP, ISTAT )
       CALL FIT_DINIT( LU, BYTESWAP, STATUS )
       IF ( STATUS .NE. 0 ) GO TO 500
       FITS_OPEN = .TRUE.
