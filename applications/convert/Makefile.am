@@ -14,7 +14,8 @@ IRAFLIBS=@IRAFLIBS@
 bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
  convertndf convertawk
 
-LOCAL_LINK = coi/libcoi.la cof/libcof.la con/libcon.la aif/libaif.la \
+LOCAL_LINK = libcoi/libcoi.la libcof/libcof.la libcon/libcon.la \
+             libaif/libaif.la \
              iraf/libconspp.la $(FIGLIBS) $(IRAFLIBS) \
              `$(srcdir)/convert_link_adam`
 

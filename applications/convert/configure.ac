@@ -42,18 +42,18 @@ dnl    Documentation.
 STAR_LATEX_DOCUMENTATION([sun55])
 
 dnl    Library/component sub-directories.
-AC_CONFIG_SUBDIRS([aif cof coi con idl iraf])
+AC_CONFIG_SUBDIRS([libaif libcof libcoi libcon idl iraf])
 
 dnl    Check if we have any IRAF libraries on this platform.
-dnl    On success this section gives a -DHAVE_IRAF_LIBIMFORT_A=1 macro 
+dnl    On success this section gives a -DHAVE_IRAF_LIBIMFORT_A=1 macro
 dnl    definition and substitutes @IRAFLIBS@ in the Makefile.am/.in.
 dnl    We cd into iraf, rather than perform this test there as this configure
 dnl    script is ran first.
-(cd iraf;\
-if test -f "libimfort.a"; then \;
-  rm libimfort.a ;\
-fi ;\
-STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a], 
+(cd iraf
+if test -f "libimfort.a"; then
+  rm libimfort.a
+fi
+STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a],
         [_pc_linux_gnu _sun_solaris _dec_osf _mips _apple_darwin NONE]))
 
 AC_CHECK_FILES([iraf/libimfort.a],
