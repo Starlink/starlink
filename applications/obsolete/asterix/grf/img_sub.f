@@ -424,6 +424,46 @@
       END
 
 
+*+ IMG_WORLDTOCEL50 - world (axis) coords to FK4 celestial coords
+	SUBROUTINE IMG_WORLDTOCEL50(X,Y,RA,DEC,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
+*  Import :
+	REAL X				!input	X value
+	REAL Y				!input	Y value
+*  Export :
+	DOUBLE PRECISION RA	!output	RA (degrees)
+	DOUBLE PRECISION DEC	!output	DEC (degrees)
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local variables :
+        DOUBLE PRECISION LCEL(2),FSYS(2)
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*    Convert to world coordinates in the file frame
+        CALL IMG_WORLDTOCEL( X,Y, FSYS(1), FSYS(2), STATUS )
+
+*    Convert to FK4
+        FSYS(1) = FSYS(1) * MATH__DDTOR
+        FSYS(2) = FSYS(2) * MATH__DDTOR
+        CALL WCI_CNS2S( I_SYSID, FSYS, I_FK4SYS, LCEL, STATUS )
+
+*    And export
+        RA = LCEL(1) * MATH__DRTOD
+        DEC = LCEL(2) * MATH__DRTOD
+
+      ENDIF
+
+      END
+
+
 *+ IMG_CELTOWORLD - Converts celestial coords to world coords
 	SUBROUTINE IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
 
@@ -2712,7 +2752,7 @@ c        INTEGER STATUS
           CALL NBS_PUT_CVALUE(ID,0,RAS,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'DEC',ID,STATUS)
           CALL NBS_PUT_CVALUE(ID,0,DECS,STATUS)
-C          CALL IMG_WORLDTOCEL50(X,Y,RA,DEC,STATUS)
+          CALL IMG_WORLDTOCEL50(X,Y,RA,DEC,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'RA1950',ID,STATUS)
           CALL NBS_PUT_VALUE(ID,0,VAL__NBD,RA,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'DEC1950',ID,STATUS)
