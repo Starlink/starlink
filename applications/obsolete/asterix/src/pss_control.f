@@ -22,7 +22,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -113,7 +112,7 @@
           CALL ERR_ANNUL( STATUS )
 
 *        Open file directly
-          CALL HDS_OPEN( MU_BCK, 'READ', BG_LOC, STATUS )
+          CALL ADI_FOPEN( MU_BCK, '*', 'READ', BG_ID, STATUS )
 
         END IF
         BPROCESS = .TRUE.
@@ -121,22 +120,23 @@
       ELSE IF ( IFILE .EQ. 1 ) THEN
 
 *      Get option from user
-        CALL USI_ASSOCI( 'BGND', 'READ', BG_LOC, BPRIM, STATUS )
+        CALL USI_TASSOCI( 'BGND', '*', 'READ', BG_ID, STATUS )
+        CALL BDI_PRIM( BG_ID, BPRIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Primitive?
         IF ( BPRIM ) THEN
 
 *        Check only one element
-          CALL DAT_SIZE( BG_LOC, BNELM, STATUS )
+          CALL BDI_SIZE( BG_ID, BNELM, STATUS )
           IF ( BNELM .NE. 1 ) THEN
-            CALL MSG_PRNT( '! Background must be file or single '/
-     :                                          /'numeric value' )
             STATUS = SAI__ERROR
+            CALL ERR_REP( ' ','Background must be file or single '/
+     :                                   /'numeric value', STATUS )
           END IF
 
 *        Get value
-          CALL DAT_GET0R( BG_LOC, VAL, STATUS )
+          CALL BDI_GET0R( BG_ID, VAL, STATUS )
           BPROCESS = .TRUE.
 
         END IF

@@ -40,10 +40,6 @@
 *    Status :
 *
       INTEGER                  STATUS                  ! Run-time error
-*
-*    Local variables :
-*
-      LOGICAL                  PRIM                    ! Input primitive?
 *-
 
 *    Check status
