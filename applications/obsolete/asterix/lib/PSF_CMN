@@ -81,6 +81,7 @@
       LOGICAL                   P_MODEL(PSF_NMAX) 	! Psf is a model
       LOGICAL                   P_EOK(PSF_NMAX)   	! Psf energy dependent?
       INTEGER		        P_INST(PSF_NMAX)	! Internal instance data
+      LOGICAL			P_GOTAX(PSF_NMAX)	! Got axis stuff yet?
 
 *    Time and energy bands
       LOGICAL                   TE_INIT           	! Initialised yet?
@@ -104,6 +105,6 @@
      :            L_MOD_I, L_MOD_D, L_MOD_DEF,
      :            L_MOD_PFL, L_MOD_C, L_MOD_H,
      :          P_USED, P_LIBID, P_MODID, P_EOK, 	! Psf instances
-     :            P_EVDS, P_MODEL, P_INST,
+     :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
      :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
      :          PSFINIT					! System initialised flag
