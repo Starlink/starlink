@@ -361,7 +361,7 @@ PKG_NAME = polpack
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.0-14
+PKG_VERS = 2.0-15
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1747,7 +1747,7 @@ clean:
 #  package is no longer built or tested.
 
 unbuild: clean
-	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	@- rm -rf $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
 
