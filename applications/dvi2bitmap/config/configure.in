@@ -82,6 +82,15 @@ AC_TRY_COMPILE([#include <cstdio>],,
   AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no))
 
+dnl   Are the standard functions in the std namespace?
+AC_MSG_CHECKING(whether standard functions are in namespace std)
+AC_TRY_COMPILE([#include <ostream>], [cout << "Hello\n";],
+  AC_MSG_RESULT(no),
+  AC_TRY_COMPILE([#include <ostream>], [using namespace std;cout<<"Hello\n";],
+    AC_DEFINE(HAVE_STD_NAMESPACE)
+    AC_MSG_RESULT(yes),
+    AC_MSG_RESULT(ARGHH -- error compiling)))
+
 dnl   Specify support for Kpathsea library
 dnl
 dnl   The texmfcnf and fake-progname options

@@ -1,12 +1,18 @@
 #include "config.h"
 
-#if HAVE_CSTD_INCLUDE
-#include <cstdio>
-using std::exit;
-#else
-#include <stdio.h>
-#endif
 #include <iostream>
+
+#if HAVE_CSTD_INCLUDE
+#include <cstdlib>
+#else
+#include <stdlib.h>
+#endif
+
+#if HAVE_STD_NAMESPACE
+using std::cout;
+using std::cerr;
+using std::endl;
+#endif
 
 #include <string>
 

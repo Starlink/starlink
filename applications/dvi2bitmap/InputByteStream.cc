@@ -18,10 +18,14 @@
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cerrno>
-using std::sprintf;
 #else
 #include <stdio.h>
 #include <errno.h>
+#endif
+
+#if HAVE_STD_NAMESPACE
+using std::cerr;
+using std::sprintf;
 #endif
 
 // Static debug switch

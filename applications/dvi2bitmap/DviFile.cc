@@ -8,6 +8,13 @@
 #include <iostream>
 #include <assert.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if HAVE_STD_NAMESPACE
+using std::cerr;
+#endif
 
 #include "DviFile.h"
 #include "PkFont.h"

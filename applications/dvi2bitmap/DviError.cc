@@ -12,6 +12,12 @@
 #include <string>
 #include <iostream>
 
+#if HAVE_STD_NAMESPACE
+#define STD std
+#else
+#define STD
+#endif
+
 #include "DviError.h"
 
 DviError::DviError(const char *fmt,...)
@@ -25,8 +31,10 @@ DviError::DviError(const char *fmt,...)
     delete[] p;
 }
 
-void DviError::print() const { cerr << "DVI error: " << problem_ << endl; }
-void DviBug::print() const { cerr << "BUG: " << problem_ << endl; }
+void DviError::print() const {
+    STD::cerr << "DVI error: " << problem_ << STD::endl; }
+void DviBug::print() const {
+    STD::cerr << "BUG: " << problem_ << STD::endl; }
 
 DviBug::DviBug(const char *fmt,...)
 {

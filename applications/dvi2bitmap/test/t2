@@ -3,7 +3,7 @@ test $? = 0 || exit 1
 
 run=./t2.run
 
-$run "f=%f m=%m b=%b d=%d M=%M %%" cmr10 3 110 330 ibmvga
-$run "%f%m%b%d%M" cmr10 3 110 330 ibmvga
+$run "f=%f m=%m b=%b d=%d M=%M %%" ibmvga cmr10 330 110 3
+$run "%f%m%b%d%M" ibmvga cmr10 330 110 3
 
 exit 0

@@ -43,11 +43,23 @@ modetest.dvi: modetest.tex
 # These regression tests depend on a libdvi2bitmap.a from the source
 # directory.  That directory doesn't use it, but we need it here,
 # otherwise linking all the tests is too complicated to deal with happily.
+# Add a suffix rule for stupid makes (hello, Tru64...)
+.SUFFIXES: .o .cc
+.cc.o:
+	$(CXX) $(CXXFLAGS) -c $<
+
 t1.run: t1.cc libdvi2bitmap.a
 	$(CXX) $(CXXFLAGS) -o $@ t1.cc -L.. -ldvi2bitmap
 
-t2.run: t2.cc libdvi2bitmap.a
-	$(CXX) $(CXXFLAGS) -o $@ t2.cc -L.. -ldvi2bitmap
+# For some reason, linking t2.o against the library in the parent
+# directory doesn't work, because they seem determined
+# to link in std::vector, referenced from ../libdvi2bitmap.a, for
+# some reason I am unable to fathom.  So link it against the full list
+# of object files.  libdvi2bitmap.a is therefore a phony target, here
+# to force all the parent object files to be built.
+t2.run: t2.o libdvi2bitmap.a
+	$(CXX) $(CXXFLAGS) -o $@ t2.o `ls ../*.o|sed '/dvi2bitmap/d'`
+#	$(CXX) $(CXXFLAGS) -o $@ t2.cc -L.. -ldvi2bitmap
 
 libdvi2bitmap.a:
 	cd ..; $(MAKE) libdvi2bitmap.a

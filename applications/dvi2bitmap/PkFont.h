@@ -7,11 +7,21 @@
 #ifndef PK_FONT_HEADER_READ
 #define PK_FONT_HEADER_READ 1
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string>
+#include <ostream>
 #include "InputByteStream.h"
 #include "Byte.h"
 #include "DviError.h"
 #include "verbosity.h"
+
+#if HAVE_STD_NAMESPACE
+//using namespace std;
+using std::ostream;
+#endif
 
 class PkFont;
 

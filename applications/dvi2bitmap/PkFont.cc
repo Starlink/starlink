@@ -10,22 +10,25 @@
 
 #include <iostream>		// for debugging code, written to cerr
 #include <sys/stat.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <vector>
 
 #if HAVE_CSTD_INCLUDE
 #include <cstring>
 #include <cmath>
-#include <cstdio>		// for sprintf
-#include <cstdlib>		// for system()
-using std::sprintf;
-using std::memcpy;
-using std::system;
 #else
 #include <string.h>
 #include <math.h>
-#include <stdio.h>		// for sprintf
-#include <stdlib.h>		// for system()
+#endif
+
+#if HAVE_STD_NAMESPACE
+using std::cerr;
+using std::endl;
+using std::ends;
+//using std::vector;
+#define STD std
+#else
+#define STD 
 #endif
 
 #include "DviError.h"
@@ -38,7 +41,7 @@ using std::system;
 #endif
 
 
-typedef vector<string> string_list;
+typedef STD::vector<string> string_list;
 string_list break_path (string);
     
 // define class static variables
@@ -355,7 +358,7 @@ string& PkFont::search_pkpath (string path, string name, double resolution)
 		else
 		    if (verbosity_ > normal)
 			cerr << "PkFont::search_pkpath: " << fname
-			     << " mode " << oct << S.st_mode << dec
+			     << " mode " << STD::oct << S.st_mode << STD::dec
 			     << " (not readable)" << endl;
 	    }
 	    else
@@ -394,6 +397,15 @@ string& PkFont::substitute_font_string (const string fmt,
     static string retval;
     SSTREAM newstring;
 
+    if (verbosity_ > normal)
+	cerr << "PkFont::substitute_font_string (fmt=" << fmt
+	     << " mode=" << mode
+	     << " fontname=" << fontname
+	     << " dpi=" << dpi
+	     << " basedpi=" << basedpi
+	     << " magnification=" << magnification
+	     << endl;
+
     for (const char *p = fmt.c_str(); *p != '\0'; p++)
     {
 	if (*p == '%')
@@ -424,15 +436,14 @@ string& PkFont::substitute_font_string (const string fmt,
 			<< *p
 			<< ".  Allowed characters {Mmfdb%}."
 			<< ends;
-		    throw PkError (C_STR(msg));
+		    throw PkError (SS_C_STR(msg));
 		}
 		/* NOTREACHED */
 	    }
 	else
 	    newstring << *p;
     }
-    newstring << ends;
-    retval = newstring.str();
+    retval = SS_STRING(newstring);
 
     return retval;
 }
@@ -510,7 +521,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << (g_cc>' ' && g_cc<='~' ?static_cast<char>(g_cc)
 						       :'?')
 			     << "\' "
-			     << hex
+			     << STD::hex
 			     << ": opcode=" << static_cast<int>(opcode)
 			     << " pl=" << packet_length
 			     << " cc=" << g_cc
@@ -521,7 +532,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << " h=" << g_h
 			     << " hoff=" << g_hoff
 			     << " voff=" << g_voff
-			     << dec
+			     << STD::dec
 			     << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
 
 		    PkRasterdata *rd
@@ -560,7 +571,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << (g_cc>' ' && g_cc<='~' ?static_cast<char>(g_cc)
 						       :'?')
 			     << "\' "
-			     << hex
+			     << STD::hex
 			     << ": opcode=" << static_cast<int>(opcode)
 			     << " pl=" << packet_length
 			     << " cc=" << g_cc
@@ -570,7 +581,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << " h=" << g_h
 			     << " hoff=" << g_hoff
 			     << " voff=" << g_voff
-			     << dec
+			     << STD::dec
 			     << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
 
 		    PkRasterdata *rd
@@ -609,7 +620,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			 << (g_cc>' ' && g_cc<='~' ? static_cast<char>(g_cc)
 						   : '?')
 			 << "\' "
-			 << hex
+			 << STD::hex
 			 << ": opcode=" << static_cast<int>(opcode)
 			 << " pl=" << packet_length
 			 << " cc=" << g_cc
@@ -619,7 +630,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			 << " h=" << g_h
 			 << " hoff=" << g_hoff
 			 << " voff=" << g_voff
-			 << dec
+			 << STD::dec
 			 << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
 
 		PkRasterdata *rd
@@ -761,7 +772,7 @@ PkRasterdata::PkRasterdata(Byte opcode,
     dyn_f_ = static_cast<Byte>(opcode >> 4);
     start_black_ = opcode&8;
     rasterdata_ = new Byte[len];
-    (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
+    (void) STD::memcpy ((void*)rasterdata_, (void*)rasterdata, len);
     eob_ = rasterdata_+len_;
 }
 
@@ -864,10 +875,10 @@ void PkRasterdata::construct_bitmap()
 	    cerr << "dyn_f=" << static_cast<int>(dyn_f_)
 		 << " h=" << h_
 		 << " w=" << w_
-		 << endl << "rasterdata=" << hex;
+		 << endl << "rasterdata=" << STD::hex;
 	    for (const Byte *p=rasterdata_; p<eob_; p++)
 		cerr << static_cast<int>(*p) << ' ';
-	    cerr << dec << endl;
+	    cerr << STD::dec << endl;
 	}
 
 	while (nrow < h_)

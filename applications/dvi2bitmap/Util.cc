@@ -1,6 +1,16 @@
+// Part of dvi2bitmap.
+// Copyright 1999, 2000, 2001, Council for the Central Laboratory of the Research Councils.
+// See file LICENCE for conditions.
+//
+// Various utility functions
+//
+// $Id$
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include <iostream>
 
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
@@ -8,6 +18,13 @@
 #else
 #include <stdio.h>
 #include <ctype.h>
+#endif
+
+#if HAVE_STD_NAMESPACE
+using std::ostream;
+using std::ends;
+using std::endl;
+using std::cerr;
 #endif
 
 #include "Util.h"
@@ -49,7 +66,6 @@ string Util::runCommandPipe (string cmd)
 	}
 	// else just keep reading to the end of the file
     }
-    resp << ends;		// terminate the string
 
     int exitval = pclose(PIN);
     if (exitval == -1)
@@ -61,7 +77,7 @@ string Util::runCommandPipe (string cmd)
     }
     else if ((exitval & 0xff) == 0)
 	// Get wait4(2) exit status -- low-order 8 bits
-	response = resp.str();
+	response = SS_STRING(resp);
     else
     {
 	if (verbosity_ >= normal)

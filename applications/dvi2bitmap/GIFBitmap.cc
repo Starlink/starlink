@@ -46,13 +46,16 @@
 #include <math.h>		// for floor() and ceil() in iround
 #endif
 
-#if HAVE_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
+#if HAVE_STD_NAMESPACE
 using std::fopen;
 using std::fwrite;
 using std::fputc;
 using std::fclose;
 using std::fflush;
 using std::fprintf;
+using std::floor;
+using std::ceil;
+using std::sqrt;
 #endif
 
 const unsigned long GIFBitmap::masks[] 

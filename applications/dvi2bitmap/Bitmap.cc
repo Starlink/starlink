@@ -25,6 +25,11 @@
 #include <limits.h>
 #endif
 
+#if HAVE_STD_NAMESPACE
+using std::cout;
+using std::cerr;
+#endif
+
 #include "Bitmap.h"
 #include "BitmapImage.h"
 

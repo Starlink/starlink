@@ -7,9 +7,20 @@
 #ifndef DVI_FILE_HEADER_READ
 #define DVI_FILE_HEADER_READ 1
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string>
+
 #include <stack>
 #include <map>
+
+#if HAVE_STD_NAMESPACE
+using std::stack;
+using std::map;
+#endif
+
 
 #include "Byte.h"
 #include "DviError.h"

@@ -25,12 +25,19 @@ static const char RCSID[] =
 #include <cstdlib>
 #include <cstdarg>
 #include <cctype>
-using std::exit;
+//using std::exit;
 #else
 #include <stdio.h>		// for vsprintf
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+#endif
+
+#if HAVE_STD_NAMESPACE
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::vector;
 #endif
 
 #include "DviFile.h"
@@ -746,7 +753,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			for (i=1; i<=last; i++)
 			    pageind << '.' << page.count[i];
 			pageind << '\0';
-			string ostr = pageind.str();
+			string ostr = SS_STRING(pageind);
 			if (outcount + ostr.length() > 78)
 			{
 			    cout << endl;

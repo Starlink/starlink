@@ -1,17 +1,20 @@
-// I can't get this to link on Alphas, for some reason!
-
 
 #include "config.h"
 
+#include <iostream>
+
 #if HAVE_CSTD_INCLUDE
-#include <cstdio>
 #include <cstdlib>
-using std::exit;
 #else
-#include <stdio.h>
 #include <stdlib.h>
 #endif
-#include <iostream>
+
+#if HAVE_STD_NAMESPACE
+using std::cerr;
+using std::cout;
+using std::exit;
+using std::endl;
+#endif
 
 #include <string>
 
@@ -33,7 +36,7 @@ int main (int argc, char **argv)
     int basedpi = atoi (argv[5]);
     double magnification = atof (argv[6]);
 
-
+    PkFont::verbosity(debug);
     cout << PkFont::substitute_font_string (fmt, mode, fontname,
 					    dpi, basedpi, magnification)
 	 << endl;

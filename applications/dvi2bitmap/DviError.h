@@ -2,6 +2,7 @@
 #define DVIERROR_HEADER_READ 1
 
 #include <string>
+using std::string;
 
 class DviError {
  public:
